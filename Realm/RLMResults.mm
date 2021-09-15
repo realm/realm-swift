@@ -514,32 +514,29 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     });
 }
 
+- (BOOL)isFrozen {
+    return _realm.frozen;
+}
+
+- (instancetype)resolveInRealm:(RLMRealm *)realm {
+    return translateRLMResultsErrors([&] {
+        return [self.class resultsWithObjectInfo:_info->resolve(realm)
+                                         results:_results.freeze(realm->_realm)];
+    });
+}
+
 - (instancetype)freeze {
     if (self.frozen) {
         return self;
     }
-
-    RLMRealm *frozenRealm = [_realm freeze];
-    return translateRLMResultsErrors([&] {
-        return [self.class resultsWithObjectInfo:_info->resolve(frozenRealm)
-                                         results:_results.freeze(frozenRealm->_realm)];
-    });
-}
-
-- (BOOL)isFrozen {
-    return _realm.frozen;
+    return [self resolveInRealm:_realm.freeze];
 }
 
 - (instancetype)thaw {
     if (!self.frozen) {
         return self;
     }
-
-    RLMRealm *liveRealm = [_realm thaw];
-    return translateRLMResultsErrors([&] {
-        return [self.class resultsWithObjectInfo:_info->resolve(liveRealm)
-                                         results:_results.freeze(liveRealm->_realm)];
-    });
+    return [self resolveInRealm:_realm.thaw];
 }
 
 // The compiler complains about the method's argument type not matching due to

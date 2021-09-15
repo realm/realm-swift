@@ -19,6 +19,10 @@
 import Realm
 import Realm.Private
 
+#if !(os(iOS) && (arch(i386) || arch(arm)))
+import Combine
+#endif
+
 /**
  An object representing a MongoDB Realm user.
 
@@ -44,7 +48,7 @@ public extension User {
 }
 
 /**
- A singleton which configures and manages MongoDB Realm synchronization-related
+ A manager which configures and manages MongoDB Realm synchronization-related
  functionality.
 
  - see: `RLMSyncManager`
@@ -248,10 +252,6 @@ public typealias Provider = RLMIdentityProvider
     }
 }
 
-#if canImport(Combine)
-import Combine
-#endif
-
 /// Structure providing an interface to call a MongoDB Realm function with the provided name and arguments.
 ///
 ///     user.functions.sum([1, 2, 3, 4, 5]) { sum, error in
@@ -311,7 +311,7 @@ import Combine
         }
     }
 
-    #if canImport(Combine)
+    #if !(os(iOS) && (arch(i386) || arch(arm)))
     /// The implementation of @dynamicMemberLookup that allows for dynamic remote function calls.
     @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, macCatalyst 13.0, macCatalystApplicationExtension 13.0, *)
     public subscript(dynamicMember string: String) -> ([AnyBSON]) -> Future<AnyBSON, Error> {
@@ -583,7 +583,7 @@ extension Realm {
     }
 }
 
-#if canImport(Combine)
+#if !(os(iOS) && (arch(i386) || arch(arm)))
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, macCatalyst 13.0, macCatalystApplicationExtension 13.0, *)
 public extension User {
     /// Refresh a user's custom data. This will, in effect, refresh the user's auth session.

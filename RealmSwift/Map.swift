@@ -264,6 +264,17 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
     }
 
     /**
+     Returns a `Results` containing all matching values in the map with the given query.
+
+     - Note: This should only be used with classes using the `@Persistable` property declaration.
+
+     - parameter predicate: The predicate with which to filter the objects.
+     */
+    public func query(_ query: ((Query<Value>) -> Query<Value>)) -> Results<Value> {
+        return filter(query(Query()).predicate)
+    }
+
+    /**
      Returns a Boolean value indicating whether the Map contains the key-value pair
      satisfies the given predicate
 
@@ -695,6 +706,27 @@ public extension Map where Value: OptionalProtocol, Value.Wrapped: AddableType {
      */
     func average<T: AddableType>() -> T? {
         return average(ofProperty: "self")
+    }
+}
+
+// MARK: - Codable
+
+extension Map: Decodable where Key: Decodable, Value: Decodable {
+    public convenience init(from decoder: Decoder) throws {
+        self.init()
+        let container = try decoder.singleValueContainer()
+        for (key, value) in try container.decode([Key: Value].self) {
+            self[key] = value
+        }
+    }
+}
+
+extension Map: Encodable where Key: Encodable, Value: Encodable {
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(self.reduce(into: [Key: Value]()) { map, element in
+            map[element.key] = element.value
+        })
     }
 }
 

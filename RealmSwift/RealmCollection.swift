@@ -155,7 +155,7 @@ public protocol _RealmMapValue {
 
      - parameter deletions:     The indices in the previous version of the collection which were removed from this one.
      - parameter insertions:    The indices in the new collection which were added in this version.
-     - parameter modifications: The indices of the objects in the new collection which were modified in this version.
+     - parameter modifications: The indices of the objects which were modified in the previous version of this collection.
      */
     case update(CollectionType, deletions: [Int], insertions: [Int], modifications: [Int])
 
@@ -638,6 +638,126 @@ public protocol RealmCollection: RealmCollectionBase {
                  on queue: DispatchQueue?,
                  _ block: @escaping (RealmCollectionChange<Self>) -> Void) -> NotificationToken
 
+    /**
+     Registers a block to be called each time the collection changes.
+
+     The block will be asynchronously called with the initial results, and then called again after each write
+     transaction which changes either any of the objects in the collection, or which objects are in the collection.
+
+     The `change` parameter that is passed to the block reports, in the form of indices within the collection, which of
+     the objects were added, removed, or modified during each write transaction. See the `RealmCollectionChange`
+     documentation for more information on the change information supplied and an example of how to use it to update a
+     `UITableView`.
+
+     At the time when the block is called, the collection will be fully evaluated and up-to-date, and as long as you do
+     not perform a write transaction on the same thread or explicitly call `realm.refresh()`, accessing it will never
+     perform blocking work.
+
+     If no queue is given, notifications are delivered via the standard run loop, and so can't be delivered while the
+     run loop is blocked by other activity. If a queue is given, notifications are delivered to that queue instead. When
+     notifications can't be delivered instantly, multiple notifications may be coalesced into a single notification.
+     This can include the notification with the initial collection.
+
+     For example, the following code performs a write transaction immediately after adding the notification block, so
+     there is no opportunity for the initial notification to be delivered first. As a result, the initial notification
+     will reflect the state of the Realm after the write transaction.
+
+     ```swift
+     let dogs = realm.objects(Dog.self)
+     print("dogs.count: \(dogs?.count)") // => 0
+     let token = dogs.observe { changes in
+         switch changes {
+         case .initial(let dogs):
+             // Will print "dogs.count: 1"
+             print("dogs.count: \(dogs.count)")
+             break
+         case .update:
+             // Will not be hit in this example
+             break
+         case .error:
+             break
+         }
+     }
+     try! realm.write {
+         let dog = Dog()
+         dog.name = "Rex"
+         person.dogs.append(dog)
+     }
+     // end of run loop execution context
+     ```
+
+     If no key paths are given, the block will be executed on any insertion,
+     modification, or deletion for all object properties and the properties of
+     any nested, linked objects. If a key path or key paths are provided,
+     then the block will be called for changes which occur only on the
+     provided key paths. For example, if:
+     ```swift
+     class Dog: Object {
+         @Persisted var name: String
+         @Persisted var age: Int
+         @Persisted var toys: List<Toy>
+     }
+     // ...
+     let dogs = realm.objects(Dog.self)
+
+     let token = dogs.observe(keyPaths: [\Dog.name]) { changes in
+         switch changes {
+         case .initial(let dogs):
+            // ...
+         case .update:
+            // This case is hit:
+            // - after the token is intialized
+            // - when the name property of an object in the
+            // collection is modified
+            // - when an element is inserted or removed
+            //   from the collection.
+            // This block is not triggered:
+            // - when a value other than name is modified on
+            //   one of the elements.
+         case .error:
+             // ...
+         }
+     }
+     // end of run loop execution context
+     ```
+     - If the observed key path were `[\Dog.toys.brand]`, then any insertion or
+     deletion to the `toys` list on any of the collection's elements would trigger the block.
+     Changes to the `brand` value on any `Toy` that is linked to a `Dog` in this
+     collection will trigger the block. Changes to a value other than `brand` on any `Toy` that
+     is linked to a `Dog` in this collection would not trigger the block.
+     Any insertion or removal to the `Dog` type collection being observed
+     would also trigger a notification.
+     - If the above example observed the `[\Dog.toys]` key path, then any insertion,
+     deletion, or modification to the `toys` list for any element in the collection
+     would trigger the block.
+     Changes to any value on any `Toy` that is linked to a `Dog` in this collection
+     would *not* trigger the block.
+     Any insertion or removal to the `Dog` type collection being observed
+     would still trigger a notification.
+
+     - note: Multiple notification tokens on the same object which filter for
+     separate key paths *do not* filter exclusively. If one key path
+     change is satisfied for one notification token, then all notification
+     token blocks for that object will execute.
+
+     You must retain the returned token for as long as you want updates to be sent to the block. To stop receiving
+     updates, call `invalidate()` on the token.
+
+     - warning: This method cannot be called during a write transaction, or when the containing Realm is read-only.
+
+     - parameter keyPaths: Only properties contained in the key paths array will trigger
+                           the block when they are modified. If `nil`, notifications
+                           will be delivered for any property change on the object.
+                           See description above for more detail on linked properties.
+     - parameter queue: The serial dispatch queue to receive notification on. If
+                        `nil`, notifications are delivered to the current thread.
+     - parameter block: The block to be called whenever a change occurs.
+     - returns: A token which must be held for as long as you want updates to be delivered.
+     */
+    func observe<T: ObjectBase>(keyPaths: [PartialKeyPath<T>],
+                                on queue: DispatchQueue?,
+                                _ block: @escaping (RealmCollectionChange<Self>) -> Void) -> NotificationToken
+
     /// :nodoc:
     func _observe(_ keyPaths: [String]?, _ queue: DispatchQueue?, _ block: @escaping (RealmCollectionChange<AnyRealmCollection<Element>>) -> Void) -> NotificationToken
 
@@ -922,6 +1042,7 @@ private class _AnyRealmCollectionBase<T: RealmCollectionValue>: AssistedObjectiv
         -> NotificationToken { fatalError() }
     func _observe(_ keyPaths: [String]?, _ queue: DispatchQueue?, _ block: @escaping (RealmCollectionChange<Wrapper>) -> Void)
         -> NotificationToken { fatalError() }
+    func _observe<T: ObjectBase>(_ keyPaths: [PartialKeyPath<T>], _ queue: DispatchQueue?, _ block: @escaping (RealmCollectionChange<Wrapper>) -> Void) -> NotificationToken { fatalError() }
     class func bridging(from objectiveCValue: Any, with metadata: Any?) -> Self { fatalError() }
     var bridged: (objectiveCValue: Any, metadata: Any?) { fatalError() }
     func asNSFastEnumerator() -> Any { fatalError() }
@@ -957,6 +1078,10 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
     // MARK: Filtering
 
     override func filter(_ predicate: NSPredicate) -> Results<C.Element> { return base.filter(predicate) }
+
+    override func query(_ query: ((Query<C.Element>) -> Query<C.Element>)) -> Results<C.Element> {
+        return base.query(query)
+    }
 
     // MARK: Sorting
 
@@ -1033,6 +1158,10 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
     /// :nodoc:
     override func _observe(_ keyPaths: [String]?, _ queue: DispatchQueue?, _ block: @escaping (RealmCollectionChange<Wrapper>) -> Void)
         -> NotificationToken { return base._observe(keyPaths, queue, block) }
+
+    override func _observe<T: ObjectBase>(_ keyPaths: [PartialKeyPath<T>], _ queue: DispatchQueue?, _ block: @escaping (RealmCollectionChange<_AnyRealmCollectionBase<C.Element>.Wrapper>) -> Void) -> NotificationToken {
+        return base._observe(keyPaths.map(_name(for:)), queue, block)
+    }
 
     // MARK: AssistedObjectiveCBridgeable
 
@@ -1143,11 +1272,11 @@ public struct AnyRealmCollection<Element: RealmCollectionValue>: RealmCollection
     public func filter(_ predicate: NSPredicate) -> Results<Element> { return base.filter(predicate) }
 
     /**
-     Returns a `Results` containing all objects matching the given predicate in the collection.
+     Returns a `Results` containing all objects matching the given query in the collection.
 
      - Note: This should only be used with classes using the `@Persistable` property declaration.
 
-     - parameter predicate: The predicate with which to filter the objects.
+     - parameter query: The query with which to filter the objects.
      */
     public func query(_ query: ((Query<Element>) -> Query<Element>)) -> Results<Element> { return base.query(query) }
 
@@ -1350,6 +1479,7 @@ public struct AnyRealmCollection<Element: RealmCollectionValue>: RealmCollection
     public func observe(on queue: DispatchQueue? = nil,
                         _ block: @escaping (RealmCollectionChange<AnyRealmCollection>) -> Void)
         -> NotificationToken { return base._observe(queue, block) }
+
     /**
      Registers a block to be called each time the collection changes.
 
@@ -1475,8 +1605,136 @@ public struct AnyRealmCollection<Element: RealmCollectionValue>: RealmCollection
                         _ block: @escaping (RealmCollectionChange<AnyRealmCollection>) -> Void)
         -> NotificationToken { return base._observe(keyPaths, queue, block) }
 
+    /**
+     Registers a block to be called each time the collection changes.
+
+     The block will be asynchronously called with the initial results, and then called again after each write
+     transaction which changes either any of the objects in the collection, or which objects are in the collection.
+
+     The `change` parameter that is passed to the block reports, in the form of indices within the collection, which of
+     the objects were added, removed, or modified during each write transaction. See the `RealmCollectionChange`
+     documentation for more information on the change information supplied and an example of how to use it to update a
+     `UITableView`.
+
+     At the time when the block is called, the collection will be fully evaluated and up-to-date, and as long as you do
+     not perform a write transaction on the same thread or explicitly call `realm.refresh()`, accessing it will never
+     perform blocking work.
+
+     Notifications are delivered via the standard run loop, and so can't be delivered while the run loop is blocked by
+     other activity. When notifications can't be delivered instantly, multiple notifications may be coalesced into a
+     single notification. This can include the notification with the initial collection.
+
+     For example, the following code performs a write transaction immediately after adding the notification block, so
+     there is no opportunity for the initial notification to be delivered first. As a result, the initial notification
+     will reflect the state of the Realm after the write transaction.
+
+     ```swift
+     let dogs = realm.objects(Dog.self)
+     print("dogs.count: \(dogs?.count)") // => 0
+     let token = dogs.observe { changes in
+         switch changes {
+         case .initial(let dogs):
+             // Will print "dogs.count: 1"
+             print("dogs.count: \(dogs.count)")
+             break
+         case .update:
+             // Will not be hit in this example
+             break
+         case .error:
+             break
+         }
+     }
+     try! realm.write {
+         let dog = Dog()
+         dog.name = "Rex"
+         person.dogs.append(dog)
+     }
+     // end of run loop execution context
+     ```
+
+     If no key paths are given, the block will be executed on any insertion,
+     modification, or deletion for all object properties and the properties of
+     any nested, linked objects. If a key path or key paths are provided,
+     then the block will be called for changes which occur only on the
+     provided key paths. For example, if:
+     ```swift
+     class Dog: Object {
+         @Persisted var name: String
+         @Persisted var age: Int
+         @Persisted var toys: List<Toy>
+     }
+     // ...
+     let dogs = realm.objects(Dog.self)
+
+     let token = dogs.observe(keyPaths: [\Dog.name]) { changes in
+         switch changes {
+         case .initial(let dogs):
+            // ...
+         case .update:
+            // This case is hit:
+            // - after the token is intialized
+            // - when the name property of an object in the
+            // collection is modified
+            // - when an element is inserted or removed
+            //   from the collection.
+            // This block is not triggered:
+            // - when a value other than name is modified on
+            //   one of the elements.
+         case .error:
+             // ...
+         }
+     }
+     // end of run loop execution context
+     ```
+     - If the observed key path were `[\Dog.toys.brand]`, then any insertion or
+     deletion to the `toys` list on any of the collection's elements would trigger the block.
+     Changes to the `brand` value on any `Toy` that is linked to a `Dog` in this
+     collection will trigger the block. Changes to a value other than `brand` on any `Toy` that
+     is linked to a `Dog` in this collection would not trigger the block.
+     Any insertion or removal to the `Dog` type collection being observed
+     would also trigger a notification.
+     - If the above example observed the `[\Dog.toys]` key path, then any insertion,
+     deletion, or modification to the `toys` list for any element in the collection
+     would trigger the block.
+     Changes to any value on any `Toy` that is linked to a `Dog` in this collection
+     would *not* trigger the block.
+     Any insertion or removal to the `Dog` type collection being observed
+     would still trigger a notification.
+
+     - note: Multiple notification tokens on the same object which filter for
+     separate key paths *do not* filter exclusively. If one key path
+     change is satisfied for one notification token, then all notification
+     token blocks for that object will execute.
+
+     If no queue is given, notifications are delivered via the standard run
+     loop, and so can't be delivered while the run loop is blocked by other
+     activity. If a queue is given, notifications are delivered to that queue
+     instead. When notifications can't be delivered instantly, multiple
+     notifications may be coalesced into a single notification.
+
+     You must retain the returned token for as long as you want updates to be sent to the block. To stop receiving
+     updates, call `invalidate()` on the token.
+     - warning: This method cannot be called during a write transaction, or when the containing Realm is read-only.
+     - parameter keyPaths: Only properties contained in the key paths array will trigger
+                           the block when they are modified. If `nil`, notifications
+                           will be delivered for any property change on the object.
+                           See description above for more detail on linked properties.
+     - parameter queue: The serial dispatch queue to receive notification on. If
+                        `nil`, notifications are delivered to the current thread.
+     - parameter block: The block to be called whenever a change occurs.
+     - returns: A token which must be held for as long as you want updates to be delivered.
+     */
+    public func observe<T: ObjectBase>(keyPaths: [PartialKeyPath<T>],
+                                       on queue: DispatchQueue? = nil,
+                                       _ block: @escaping (RealmCollectionChange<AnyRealmCollection>) -> Void)
+        -> NotificationToken { return base._observe(keyPaths, queue, block) }
+
     /// :nodoc:
     public func _observe(_ keyPaths: [String]?, _ queue: DispatchQueue?, _ block: @escaping (RealmCollectionChange<AnyRealmCollection>) -> Void)
+        -> NotificationToken { return base._observe(keyPaths, queue, block) }
+
+    /// :nodoc:
+    public func _observe<T: ObjectBase>(_ keyPaths: [PartialKeyPath<T>], _ queue: DispatchQueue?, _ block: @escaping (RealmCollectionChange<AnyRealmCollection>) -> Void)
         -> NotificationToken { return base._observe(keyPaths, queue, block) }
 
     /// :nodoc:

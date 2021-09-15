@@ -183,6 +183,10 @@ class RealmCollectionTypeTests: TestCase {
         XCTAssertEqual(1, collection.filter("stringCol = '1'").count)
         XCTAssertEqual(1, collection.filter("stringCol = '2'").count)
         XCTAssertEqual(0, collection.filter("stringCol = '0'").count)
+
+        XCTAssertEqual(1, collection.query { $0.stringCol == "1" }.count)
+        XCTAssertEqual(1, collection.query { $0.stringCol == "2" }.count)
+        XCTAssertEqual(0, collection.query { $0.stringCol == "0" }.count)
     }
 
     func testIndexOfObject() {
@@ -192,6 +196,10 @@ class RealmCollectionTypeTests: TestCase {
         let str1Only = collection.filter("stringCol = '1'")
         XCTAssertEqual(0, str1Only.index(of: str1)!)
         XCTAssertNil(str1Only.index(of: str2))
+
+        let str1OnlyQuery = collection.query { $0.stringCol == "1" }
+        XCTAssertEqual(0, str1OnlyQuery.index(of: str1)!)
+        XCTAssertNil(str1OnlyQuery.index(of: str2))
     }
 
     func testIndexOfPredicate() {
@@ -230,12 +238,18 @@ class RealmCollectionTypeTests: TestCase {
         assertEqual(str1, collection.first!)
         assertEqual(str2, collection.filter("stringCol = '2'").first!)
         XCTAssertNil(collection.filter("stringCol = '3'").first)
+
+        assertEqual(str2, collection.query { $0.stringCol == "2" }.first!)
+        XCTAssertNil(collection.query { $0.stringCol == "3" }.first)
     }
 
     func testLast() {
         assertEqual(str2, collection.last!)
         assertEqual(str2, collection.filter("stringCol = '2'").last!)
         XCTAssertNil(collection.filter("stringCol = '3'").last)
+
+        assertEqual(str2, collection.query { $0.stringCol == "2" }.last!)
+        XCTAssertNil(collection.query { $0.stringCol == "3" }.last)
     }
 
     func testValueForKey() {
@@ -260,6 +274,13 @@ class RealmCollectionTypeTests: TestCase {
         XCTAssertEqual(1, collection.filter("stringCol = %@", "1").count)
         XCTAssertEqual(1, collection.filter("stringCol = %@", "2").count)
         XCTAssertEqual(0, collection.filter("stringCol = %@", "3").count)
+
+        XCTAssertEqual(1, collection.filter { $0.stringCol == "1" }.count)
+        XCTAssertEqual(1, collection.filter { $0.stringCol == "2" }.count)
+        XCTAssertEqual(0, collection.filter { $0.stringCol == "3" }.count)
+
+        XCTAssertEqual(1, collection.query { $0.stringCol == "1" }.count)
+        XCTAssertEqual(0, collection.query { $0.stringCol == "3" }.count)
     }
 
     func testFilterWithAnyVarags() {
@@ -269,6 +290,9 @@ class RealmCollectionTypeTests: TestCase {
         let result = collection.filter("stringCol = %@ OR stringCol = %@ OR stringCol = %@",
                                        firstCriterion as Any, secondCriterion as Any, thirdCriterion as Any)
         XCTAssertEqual(2, result.count)
+
+        let queryResult = collection.query { $0.stringCol == firstCriterion || $0.stringCol == secondCriterion || $0.stringCol == thirdCriterion }
+        XCTAssertEqual(2, queryResult.count)
     }
 
     func testFilterList() {
@@ -281,6 +305,7 @@ class RealmCollectionTypeTests: TestCase {
             realm.add(outerArray)
         }
         XCTAssertEqual(1, outerArray.array.filter("ANY array IN %@", realm.objects(SwiftObject.self)).count)
+        XCTAssertEqual(1, outerArray.array.query { $0.array.containsAny(in: realm.objects(SwiftObject.self)) }.count)
     }
 
     func testFilterResults() {
@@ -533,6 +558,7 @@ class RealmCollectionTypeTests: TestCase {
 
         // Should not throw a type error.
         XCTAssertEqual(0, collection.filter("ANY stringListCol == %@", CTTNullableStringObjectWithLink()).count)
+        XCTAssertEqual(0, collection.query { $0.stringListCol.contains(CTTNullableStringObjectWithLink()) }.count)
     }
 
     func testObserve() {
@@ -721,6 +747,127 @@ class RealmCollectionTypeTests: TestCase {
         token.invalidate()
     }
 
+    func testObservePartialKeyPath() {
+        var ex = expectation(description: "initial notification")
+        let token0 = collection.observe(keyPaths: [\CTTNullableStringObjectWithLink.stringCol]) { (changes: RealmCollectionChange) in
+            switch changes {
+            case .initial(let collection):
+                XCTAssertEqual(collection.count, 2)
+            case .update(_, let deletions, let insertions, let modifications):
+                XCTAssertEqual(deletions, [])
+                XCTAssertEqual(insertions, [])
+                XCTAssertEqual(modifications, [0])
+            case .error:
+                XCTFail("error not expected")
+            }
+            ex.fulfill()
+        }
+        waitForExpectations(timeout: 0.2, handler: nil)
+
+        // Expect a change notification for the token observing `stringCol` keypath.
+        ex = self.expectation(description: "change notification")
+        dispatchSyncNewThread {
+            let realm = self.realmWithTestPath()
+            realm.beginWrite()
+            let obj = realm.objects(CTTNullableStringObjectWithLink.self).first!
+            obj.stringCol = "changed"
+            try! realm.commitWrite()
+        }
+        waitForExpectations(timeout: 0.1, handler: nil)
+        token0.invalidate()
+    }
+
+    func testObservePartialKeyPathNoChange() {
+        var ex = expectation(description: "initial notification")
+        let token0 = collection.observe(keyPaths: [\CTTNullableStringObjectWithLink.stringCol]) { (changes: RealmCollectionChange) in
+            switch changes {
+            case .initial(let collection):
+                XCTAssertEqual(collection.count, 2)
+            case .update:
+                XCTFail("update not expected")
+            case .error:
+                XCTFail("error not expected")
+            }
+            ex.fulfill()
+        }
+        waitForExpectations(timeout: 0.2, handler: nil)
+
+        // Expect no notification for `stringCol` key path because only `linkCol.id` will be modified.
+        ex = self.expectation(description: "NO change notification")
+        ex.isInverted = true // Inverted expectation causes failure if fulfilled.
+        dispatchSyncNewThread {
+            let realm = self.realmWithTestPath()
+            realm.beginWrite()
+            let obj = realm.objects(CTTNullableStringObjectWithLink.self).first!
+            obj.linkCol!.id = 2
+            try! realm.commitWrite()
+        }
+        waitForExpectations(timeout: 0.1, handler: nil)
+        token0.invalidate()
+    }
+
+    func testObservePartialKeyPathWithLink() {
+        var ex = expectation(description: "initial notification")
+        let token = collection.observe(keyPaths: [\CTTNullableStringObjectWithLink.linkCol?.id]) { (changes: RealmCollectionChange) in
+            switch changes {
+            case .initial(let collection):
+                XCTAssertEqual(collection.count, 2)
+            case .update(_, let deletions, let insertions, let modifications):
+                XCTAssertEqual(deletions, [])
+                XCTAssertEqual(insertions, [])
+                // The reason two column changes are expected here is because the
+                // single CTTLinkTarget object that is modified is linked to two origin objects.
+                // The 0, 1 index refers to the origin objects.
+                XCTAssertEqual(modifications, [0, 1])
+            case .error:
+                XCTFail("error not expected")
+            }
+            ex.fulfill()
+        }
+        waitForExpectations(timeout: 0.2, handler: nil)
+
+        // Only expect a change notification for `linkCol.id` keypath.
+        ex = self.expectation(description: "change notification")
+        dispatchSyncNewThread {
+            let realm = self.realmWithTestPath()
+            realm.beginWrite()
+            let obj = realm.objects(CTTNullableStringObjectWithLink.self).first!
+            obj.linkCol!.id = 2
+            try! realm.commitWrite()
+        }
+        waitForExpectations(timeout: 0.2, handler: nil)
+        token.invalidate()
+    }
+
+    func testObservePartialKeyPathWithLinkNoChangeList() {
+        var ex = expectation(description: "initial notification")
+        let token = collection.observe(keyPaths: [\CTTNullableStringObjectWithLink.linkCol]) { (changes: RealmCollectionChange) in
+            switch changes {
+            case .initial(let collection):
+                XCTAssertEqual(collection.count, 2)
+            case .update:
+                XCTFail("update not expected")
+            case .error:
+                XCTFail("error not expected")
+            }
+            ex.fulfill()
+        }
+        waitForExpectations(timeout: 0.2, handler: nil)
+
+        // Expect no notification for `linkCol` key path because only `linkCol.id` will be modified.
+        ex = self.expectation(description: "NO change notification")
+        ex.isInverted = true // Inverted expectation causes failure if fulfilled.
+        dispatchSyncNewThread {
+            let realm = self.realmWithTestPath()
+            realm.beginWrite()
+            let obj = realm.objects(CTTNullableStringObjectWithLink.self).first!
+            obj.linkCol!.id = 2
+            try! realm.commitWrite()
+        }
+        waitForExpectations(timeout: 0.1, handler: nil)
+        token.invalidate()
+    }
+
     func observeOnQueue<Collection: RealmCollection>(_ collection: Collection) where Collection.Element: Object {
         let sema = DispatchSemaphore(value: 0)
         let token = collection.observe(keyPaths: nil, on: queue) { (changes: RealmCollectionChange) in
@@ -827,6 +974,7 @@ class RealmCollectionTypeTests: TestCase {
 
         XCTAssertEqual(collection.count, 2) // stringCol "1" and "2"
         XCTAssertEqual(collection.filter("stringCol == %@", "3").count, 0)
+        XCTAssertEqual(collection.query { $0.stringCol == "3" }.count, 0)
 
         dispatchSyncNewThread {
             let realm = try! Realm(configuration: self.collection.realm!.configuration)
@@ -847,17 +995,29 @@ class RealmCollectionTypeTests: TestCase {
         XCTAssertEqual(frozen!.filter("stringCol == %@", "2").count, 0)
         XCTAssertEqual(frozen!.filter("stringCol == %@", "3").count, 1)
 
+        XCTAssertEqual(frozen!.query { $0.stringCol == "1" }.count, 0)
+        XCTAssertEqual(frozen!.query { $0.stringCol == "2" }.count, 0)
+        XCTAssertEqual(frozen!.query { $0.stringCol == "3" }.count, 1)
+
         XCTAssertEqual(thawed!.count, 2)
         XCTAssertEqual(thawed!.first?.stringCol, "1")
         XCTAssertEqual(thawed!.filter("stringCol == %@", "1").count, 1)
         XCTAssertEqual(thawed!.filter("stringCol == %@", "2").count, 1)
         XCTAssertEqual(thawed!.filter("stringCol == %@", "3").count, 0)
 
+        XCTAssertEqual(thawed!.query { $0.stringCol == "1" }.count, 1)
+        XCTAssertEqual(thawed!.query { $0.stringCol == "2" }.count, 1)
+        XCTAssertEqual(thawed!.query { $0.stringCol == "3" }.count, 0)
+
         XCTAssertEqual(collection.count, 2)
         XCTAssertEqual(collection.first?.stringCol, "1")
         XCTAssertEqual(collection.filter("stringCol == %@", "1").count, 1)
         XCTAssertEqual(collection.filter("stringCol == %@", "2").count, 1)
         XCTAssertEqual(collection.filter("stringCol == %@", "3").count, 0)
+
+        XCTAssertEqual(collection.query { $0.stringCol == "1" }.count, 1)
+        XCTAssertEqual(collection.query { $0.stringCol == "2" }.count, 1)
+        XCTAssertEqual(collection.query { $0.stringCol == "3" }.count, 0)
 
         let thawedQuery = frozenQuery!.thaw()
         XCTAssertEqual(frozenQuery!.count, 0)
@@ -866,11 +1026,19 @@ class RealmCollectionTypeTests: TestCase {
         XCTAssertEqual(frozenQuery!.filter("stringCol == %@", "2").count, 0)
         XCTAssertEqual(frozenQuery!.filter("stringCol == %@", "3").count, 0)
 
+        XCTAssertEqual(frozenQuery!.query { $0.stringCol == "1" }.count, 0)
+        XCTAssertEqual(frozenQuery!.query { $0.stringCol == "2" }.count, 0)
+        XCTAssertEqual(frozenQuery!.query { $0.stringCol == "3" }.count, 0)
+
         XCTAssertEqual(thawedQuery!.count, 1)
         XCTAssertEqual(thawedQuery!.first?.stringCol, "1")
         XCTAssertEqual(thawedQuery!.filter("stringCol == %@", "1").count, 1)
         XCTAssertEqual(thawedQuery!.filter("stringCol == %@", "2").count, 0)
         XCTAssertEqual(thawedQuery!.filter("stringCol == %@", "3").count, 0)
+
+        XCTAssertEqual(thawedQuery!.query { $0.stringCol == "1" }.count, 1)
+        XCTAssertEqual(thawedQuery!.query { $0.stringCol == "2" }.count, 0)
+        XCTAssertEqual(thawedQuery!.query { $0.stringCol == "3" }.count, 0)
 
         collection.realm!.refresh()
 
@@ -880,17 +1048,29 @@ class RealmCollectionTypeTests: TestCase {
         XCTAssertEqual(thawed!.filter("stringCol == %@", "2").count, 0)
         XCTAssertEqual(thawed!.filter("stringCol == %@", "3").count, 1)
 
+        XCTAssertEqual(thawed!.query { $0.stringCol == "1" }.count, 0)
+        XCTAssertEqual(thawed!.query { $0.stringCol == "2" }.count, 0)
+        XCTAssertEqual(thawed!.query { $0.stringCol == "3" }.count, 1)
+
         XCTAssertEqual(thawedQuery!.count, 0)
         XCTAssertEqual(thawedQuery!.first?.stringCol, nil)
         XCTAssertEqual(thawedQuery!.filter("stringCol == %@", "1").count, 0)
         XCTAssertEqual(thawedQuery!.filter("stringCol == %@", "2").count, 0)
         XCTAssertEqual(thawedQuery!.filter("stringCol == %@", "3").count, 0)
 
+        XCTAssertEqual(thawedQuery!.query { $0.stringCol == "1" }.count, 0)
+        XCTAssertEqual(thawedQuery!.query { $0.stringCol == "2" }.count, 0)
+        XCTAssertEqual(thawedQuery!.query { $0.stringCol == "3" }.count, 0)
+
         XCTAssertEqual(collection.count, 1)
         XCTAssertEqual(collection.first?.stringCol, "3")
         XCTAssertEqual(collection.filter("stringCol == %@", "1").count, 0)
         XCTAssertEqual(collection.filter("stringCol == %@", "2").count, 0)
         XCTAssertEqual(collection.filter("stringCol == %@", "3").count, 1)
+
+        XCTAssertEqual(collection.query { $0.stringCol == "1" }.count, 0)
+        XCTAssertEqual(collection.query { $0.stringCol == "2" }.count, 0)
+        XCTAssertEqual(collection.query { $0.stringCol == "3" }.count, 1)
     }
 
     func testThawDeletedParent() {
@@ -932,6 +1112,11 @@ class RealmCollectionTypeTests: TestCase {
         XCTAssertEqual(frozen.filter("stringCol = '2'").count, 1)
         XCTAssertEqual(frozen.filter("stringCol = '3'").count, 0)
         XCTAssertTrue(frozen.filter("stringCol = '3'").isFrozen)
+
+        XCTAssertEqual(frozen.query { $0.stringCol == "1" }.count, 1)
+        XCTAssertEqual(frozen.query { $0.stringCol == "2" }.count, 1)
+        XCTAssertEqual(frozen.query { $0.stringCol == "3" }.count, 0)
+        XCTAssertTrue(frozen.query { $0.stringCol == "3" }.isFrozen)
     }
 
     func testFilterWithInt8Property() {
@@ -943,6 +1128,15 @@ class RealmCollectionTypeTests: TestCase {
         results = realmWithTestPath().objects(CTTAggregateObject.self).filter("int8Col = %d", Int8(2))
         XCTAssertEqual(results.count, 1)
         results = realmWithTestPath().objects(CTTAggregateObject.self).filter("int8Col = %d", Int8(3))
+        XCTAssertEqual(results.count, 1)
+
+        results = realmWithTestPath().objects(CTTAggregateObject.self).query { $0.int8Col == 0 }
+        XCTAssertEqual(results.count, 0)
+        results = realmWithTestPath().objects(CTTAggregateObject.self).query { $0.int8Col == 1 }
+        XCTAssertEqual(results.count, 1)
+        results = realmWithTestPath().objects(CTTAggregateObject.self).query { $0.int8Col == 2 }
+        XCTAssertEqual(results.count, 1)
+        results = realmWithTestPath().objects(CTTAggregateObject.self).query { $0.int8Col == 3 }
         XCTAssertEqual(results.count, 1)
     }
 
@@ -956,6 +1150,15 @@ class RealmCollectionTypeTests: TestCase {
         XCTAssertEqual(results.count, 1)
         results = realmWithTestPath().objects(CTTAggregateObject.self).filter("int16Col = %d", Int16(3))
         XCTAssertEqual(results.count, 1)
+
+        results = realmWithTestPath().objects(CTTAggregateObject.self).query { $0.int16Col == 0 }
+        XCTAssertEqual(results.count, 0)
+        results = realmWithTestPath().objects(CTTAggregateObject.self).query { $0.int16Col == 1 }
+        XCTAssertEqual(results.count, 1)
+        results = realmWithTestPath().objects(CTTAggregateObject.self).query { $0.int16Col == 2 }
+        XCTAssertEqual(results.count, 1)
+        results = realmWithTestPath().objects(CTTAggregateObject.self).query { $0.int16Col == 3 }
+        XCTAssertEqual(results.count, 1)
     }
 
     func testFilterWithInt32Property() {
@@ -968,6 +1171,15 @@ class RealmCollectionTypeTests: TestCase {
         XCTAssertEqual(results.count, 1)
         results = realmWithTestPath().objects(CTTAggregateObject.self).filter("int32Col = %d", Int32(3))
         XCTAssertEqual(results.count, 1)
+
+        results = realmWithTestPath().objects(CTTAggregateObject.self).query { $0.int32Col == 0 }
+        XCTAssertEqual(results.count, 0)
+        results = realmWithTestPath().objects(CTTAggregateObject.self).query { $0.int32Col == 1 }
+        XCTAssertEqual(results.count, 1)
+        results = realmWithTestPath().objects(CTTAggregateObject.self).query { $0.int32Col == 2 }
+        XCTAssertEqual(results.count, 1)
+        results = realmWithTestPath().objects(CTTAggregateObject.self).query { $0.int32Col == 3 }
+        XCTAssertEqual(results.count, 1)
     }
 
     func testFilterWithInt64Property() {
@@ -979,6 +1191,15 @@ class RealmCollectionTypeTests: TestCase {
         results = realmWithTestPath().objects(CTTAggregateObject.self).filter("int64Col = %d", Int64(2))
         XCTAssertEqual(results.count, 1)
         results = realmWithTestPath().objects(CTTAggregateObject.self).filter("int64Col = %d", Int64(3))
+        XCTAssertEqual(results.count, 1)
+
+        results = realmWithTestPath().objects(CTTAggregateObject.self).query { $0.int64Col == 0 }
+        XCTAssertEqual(results.count, 0)
+        results = realmWithTestPath().objects(CTTAggregateObject.self).query { $0.int64Col == 1 }
+        XCTAssertEqual(results.count, 1)
+        results = realmWithTestPath().objects(CTTAggregateObject.self).query { $0.int64Col == 2 }
+        XCTAssertEqual(results.count, 1)
+        results = realmWithTestPath().objects(CTTAggregateObject.self).query { $0.int64Col == 3 }
         XCTAssertEqual(results.count, 1)
     }
 }
@@ -1423,6 +1644,7 @@ class ListUnmanagedRealmCollectionTypeTests: ListRealmCollectionTypeTests {
     override func testFilterFormat() {
         assertThrows(collection.filter("stringCol = '1'"))
         assertThrows(collection.filter("noSuchCol = '1'"))
+        assertThrows(collection.query { $0.stringCol == "1" })
     }
 
     override func testFilterPredicate() {
@@ -1462,6 +1684,22 @@ class ListUnmanagedRealmCollectionTypeTests: ListRealmCollectionTypeTests {
     }
 
     override func testObserveKeyPathWithLinkNoChangeList() {
+        assertThrows(collection.observe { _ in })
+    }
+
+    override func testObservePartialKeyPath() {
+        assertThrows(collection.observe { _ in })
+    }
+
+    override func testObservePartialKeyPathNoChange() {
+        assertThrows(collection.observe { _ in })
+    }
+
+    override func testObservePartialKeyPathWithLink() {
+        assertThrows(collection.observe { _ in })
+    }
+
+    override func testObservePartialKeyPathWithLinkNoChangeList() {
         assertThrows(collection.observe { _ in })
     }
 
@@ -1804,6 +2042,22 @@ class MutableSetUnmanagedRealmCollectionTypeTests: MutableSetRealmCollectionType
     }
 
     override func testObserveKeyPathWithLinkNoChangeList() {
+        assertThrows(collection.observe { _ in })
+    }
+
+    override func testObservePartialKeyPath() {
+        assertThrows(collection.observe { _ in })
+    }
+
+    override func testObservePartialKeyPathNoChange() {
+        assertThrows(collection.observe { _ in })
+    }
+
+    override func testObservePartialKeyPathWithLink() {
+        assertThrows(collection.observe { _ in })
+    }
+
+    override func testObservePartialKeyPathWithLinkNoChangeList() {
         assertThrows(collection.observe { _ in })
     }
 

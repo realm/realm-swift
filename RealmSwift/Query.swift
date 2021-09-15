@@ -26,7 +26,6 @@ public enum SearchOptions {
     case diacriticInsensitive
 }
 
-/// :nodoc:
 private enum QueryExpression {
     enum Prefix: String {
         case not = "NOT"
@@ -151,6 +150,7 @@ public struct Query<T: _RealmSchemaDiscoverable> {
     // Indicates if we need a closing parentheses after a map subscript expression.
     private var mapSubscriptNeedsResolution = false
 
+    /// :nodoc:
     public init() { }
     private init(expression: [QueryExpression], mapSubscriptNeedsResolution: Bool = false) {
         tokens = expression
@@ -174,6 +174,7 @@ public struct Query<T: _RealmSchemaDiscoverable> {
 
     // MARK: Prefix
 
+    /// :nodoc:
     public static prefix func ! (_ rhs: Query) -> Query {
         var tokensCopy = rhs.tokens
         let hasPlaceholder = !tokensCopy.enumerated().reversed().filter {
@@ -193,41 +194,44 @@ public struct Query<T: _RealmSchemaDiscoverable> {
 
     // MARK: Comparable
 
+    /// :nodoc:
     public static func == <V>(_ lhs: Query<V>, _ rhs: V) -> Query where V: _RealmSchemaDiscoverable {
         return lhs.append(tokens: [.basicComparison(.equal), .rhs(rhs)])
     }
-
+    /// :nodoc:
     public static func != <V>(_ lhs: Query<V>, _ rhs: V) -> Query where V: _RealmSchemaDiscoverable {
         return lhs.append(tokens: [.basicComparison(.notEqual), .rhs(rhs)])
     }
 
     // MARK: Numerics
 
+    /// :nodoc:
     public static func > <V>(_ lhs: Query<V>, _ rhs: V) -> Query where V: _QueryNumeric {
         return lhs.append(tokens: [.basicComparison(.greaterThan), .rhs(rhs)])
     }
-
+    /// :nodoc:
     public static func >= <V>(_ lhs: Query<V>, _ rhs: V) -> Query where V: _QueryNumeric {
         return lhs.append(tokens: [.basicComparison(.greaterThenOrEqual), .rhs(rhs)])
     }
-
+    /// :nodoc:
     public static func < <V>(_ lhs: Query<V>, _ rhs: V) -> Query where V: _QueryNumeric {
         return lhs.append(tokens: [.basicComparison(.lessThan), .rhs(rhs)])
     }
-
+    /// :nodoc:
     public static func <= <V>(_ lhs: Query<V>, _ rhs: V) -> Query where V: _QueryNumeric {
         return lhs.append(tokens: [.basicComparison(.lessThanOrEqual), .rhs(rhs)])
     }
 
     // MARK: Compound
 
+    /// :nodoc:
     public static func && (_ lhs: Query, _ rhs: Query) -> Query {
         // Wrap the left expression and right expression in parentheses
         var copy = lhs
         copy.tokens.insert(.special(.openParentheses), at: 0)
         return copy.append(tokens: [.compound(.and)] + rhs.tokens + [.special(.closeParentheses)])
     }
-
+    /// :nodoc:
     public static func || (_ lhs: Query, _ rhs: Query) -> Query {
         // Wrap the left expression and right expression in parentheses
         var copy = lhs
@@ -237,11 +241,12 @@ public struct Query<T: _RealmSchemaDiscoverable> {
 
     // MARK: Subscript
 
+    /// :nodoc:
     public subscript<V>(dynamicMember member: KeyPath<T, V>) -> Query<V> where T: ObjectBase {
         let name = _name(for: member)
         return append(tokens: [.keyPath(name: name)])
     }
-
+    /// :nodoc:
     public subscript<V: RealmCollectionBase>(dynamicMember member: KeyPath<T, V>) -> Query<V> where T: ObjectBase {
         let name = _name(for: member)
         return append(tokens: [.keyPath(name: name, isCollection: true)])
@@ -249,6 +254,9 @@ public struct Query<T: _RealmSchemaDiscoverable> {
 
     // MARK: Query Construction
 
+    /// Creates an NSPredicate compatibe string.
+    /// - Parameter isSubquery: States if tokens need to be arraged in a special way to cater to subqueries.
+    /// - Returns: A tuple containing the predicate string and an array of arguments.
     public func _constructPredicate(_ isSubquery: Bool = false) -> (String, [Any]) {
         var predicateString: [String] = []
         var arguments: [Any] = []
@@ -353,7 +361,6 @@ public struct Query<T: _RealmSchemaDiscoverable> {
                 case .anyInPrefix:
                     predicateString.append("ANY ")
                 }
-                break
             }
         }
 
@@ -380,38 +387,8 @@ public struct Query<T: _RealmSchemaDiscoverable> {
                                .basicComparison(isClosedRange ? .lessThanOrEqual : .lessThan),
                                .rhs(upperBound)])
     }
-}
 
-// MARK: OptionalProtocol
-
-extension Query where T: OptionalProtocol {
-    public subscript<V>(dynamicMember member: KeyPath<T.Wrapped, V>) -> Query<V> where T.Wrapped: ObjectBase {
-        let name = _name(for: member)
-        return append(tokens: [.keyPath(name: name)])
-    }
-}
-
-// MARK: RealmCollection
-
-extension Query where T: RealmCollection {
-    public subscript<V>(dynamicMember member: KeyPath<T.Element, V>) -> Query<V> where T.Element: ObjectBase {
-        let name = _name(for: member)
-        return append(tokens: [.keyPath(name: name)])
-    }
-
-    /// Query the count of the objects in the collection.
-    public func count() -> Query<Int> where T: RealmCollection {
-        return append(tokens: [.collectionAggregation(.count)])
-    }
-}
-
-extension Query where T: RealmCollection, T.Element: _RealmSchemaDiscoverable {
-    /// Checks if an element exists in this collection.
-    public func contains<V>(_ value: T.Element) -> Query<V> {
-        return append(tokens: [.comparison(.contains(value))])
-    }
-
-    public func containsAny<U: Sequence, V>(in collection: U) -> Query<V> where U.Element == T.Element {
+    private func doContainsAny<U: Sequence, V>(in collection: U) -> Query<V> {
         var keyPathDepth = 0
         for token in tokens.reversed() {
             if case .keyPath = token {
@@ -423,7 +400,44 @@ extension Query where T: RealmCollection, T.Element: _RealmSchemaDiscoverable {
         precondition(keyPathDepth != 0)
         var copy = self
         copy.tokens.insert(.special(.anyInPrefix), at: tokens.count - keyPathDepth)
-        return copy.append(tokens: [.comparison(.containsAny(NSArray(array: collection.map { $0 })))])
+        return copy.append(tokens: [.comparison(.containsAny(NSArray(array: collection.map(dynamicBridgeCast))))])
+    }
+}
+
+// MARK: OptionalProtocol
+
+extension Query where T: OptionalProtocol {
+    /// :nodoc:
+    public subscript<V>(dynamicMember member: KeyPath<T.Wrapped, V>) -> Query<V> where T.Wrapped: ObjectBase {
+        let name = _name(for: member)
+        return append(tokens: [.keyPath(name: name)])
+    }
+}
+
+// MARK: RealmCollection
+
+extension Query where T: RealmCollection {
+    /// :nodoc:
+    public subscript<V>(dynamicMember member: KeyPath<T.Element, V>) -> Query<V> where T.Element: ObjectBase {
+        let name = _name(for: member)
+        return append(tokens: [.keyPath(name: name)])
+    }
+
+    /// Query the count of the objects in the collection.
+    public func count() -> Query<Int> where T: RealmCollection {
+        return append(tokens: [.collectionAggregation(.count)])
+    }
+}
+
+extension Query where T: RealmCollection {
+    /// Checks if an element exists in this collection.
+    public func contains<V>(_ value: T.Element) -> Query<V> {
+        return append(tokens: [.comparison(.contains(value))])
+    }
+
+    /// Checks if any elements contained in the given array are present in the collection.
+    public func containsAny<U: Sequence, V>(in collection: U) -> Query<V> where U.Element == T.Element {
+        return doContainsAny(in: collection)
     }
 }
 
@@ -494,9 +508,14 @@ extension Query where T: RealmKeyedCollection {
                                  keyPath])
         return Query<U>(expression: copy, mapSubscriptNeedsResolution: true)
     }
+
+    /// Checks if any elements contained in the given array are present in the map's values.
+    public func containsAny<U: Sequence, V>(in collection: U) -> Query<V> where U.Element == T.Value {
+        return doContainsAny(in: collection)
+    }
 }
 
-extension Query where T: RealmKeyedCollection, T.Key: _RealmSchemaDiscoverable, T.Value: _RealmSchemaDiscoverable {
+extension Query where T: RealmKeyedCollection, T.Key: _RealmSchemaDiscoverable {
     /// Checks if an element exists in this collection.
     public func contains<V>(_ value: T.Value) -> Query<V> {
         return append(tokens: [.comparison(.contains(value))])
@@ -505,7 +524,7 @@ extension Query where T: RealmKeyedCollection, T.Key: _RealmSchemaDiscoverable, 
     public var values: Query<T.Value> {
         return append(tokens: [.collectionAggregation(.allValues)])
     }
-
+    /// :nodoc:
     public subscript(member: T.Key) -> Query<T.Value> {
         return memberSubscript(member)
     }
@@ -516,11 +535,11 @@ extension Query where T: RealmKeyedCollection, T.Key: _RealmSchemaDiscoverable, 
     public var values: Query<T.Value.Wrapped> {
         return append(tokens: [.collectionAggregation(.allValues)])
     }
-
+    /// :nodoc:
     public subscript(member: T.Key) -> Query<T.Value.Wrapped> {
         return memberSubscript(member)
     }
-
+    /// :nodoc:
     public subscript(member: T.Key) -> Query<T.Value> where T.Value.Wrapped: ObjectBase {
         return memberSubscript(member)
     }
@@ -560,26 +579,27 @@ extension Query where T: RealmKeyedCollection, T.Value: OptionalProtocol, T.Valu
 // MARK: PersistableEnum
 
 extension Query where T: PersistableEnum, T.RawValue: _RealmSchemaDiscoverable {
+    /// :nodoc:
     public static func == <V>(_ lhs: Query<T>, _ rhs: T) -> Query<V> {
         return lhs.append(tokens: [.basicComparison(.equal), .rhs(rhs.rawValue)])
     }
-
+    /// :nodoc:
     public static func != <V>(_ lhs: Query<T>, _ rhs: T) -> Query<V> {
         return lhs.append(tokens: [.basicComparison(.notEqual), .rhs(rhs.rawValue)])
     }
-
+    /// :nodoc:
     public static func > <V>(_ lhs: Query<T>, _ rhs: T) -> Query<V> where T.RawValue: _QueryNumeric {
         return lhs.append(tokens: [.basicComparison(.greaterThan), .rhs(rhs.rawValue)])
     }
-
+    /// :nodoc:
     public static func >= <V>(_ lhs: Query<T>, _ rhs: T) -> Query<V> where T.RawValue: _QueryNumeric {
         return lhs.append(tokens: [.basicComparison(.greaterThenOrEqual), .rhs(rhs.rawValue)])
     }
-
+    /// :nodoc:
     public static func < <V>(_ lhs: Query<T>, _ rhs: T) -> Query<V> where T.RawValue: _QueryNumeric {
         return lhs.append(tokens: [.basicComparison(.lessThan), .rhs(rhs.rawValue)])
     }
-
+    /// :nodoc:
     public static func <= <V>(_ lhs: Query<T>, _ rhs: T) -> Query<V> where T.RawValue: _QueryNumeric {
         return lhs.append(tokens: [.basicComparison(.lessThanOrEqual), .rhs(rhs.rawValue)])
     }
@@ -590,6 +610,7 @@ extension Query where T: PersistableEnum, T.RawValue: _RealmSchemaDiscoverable {
 extension Query where T: OptionalProtocol,
                       T.Wrapped: PersistableEnum,
                       T.Wrapped.RawValue: _RealmSchemaDiscoverable {
+    /// :nodoc:
     public static func == <V>(_ lhs: Query<T>, _ rhs: T) -> Query<V> {
         if case Optional<Any>.none = rhs as Any {
             return lhs.append(tokens: [.basicComparison(.equal), .rhs(nil)])
@@ -597,7 +618,7 @@ extension Query where T: OptionalProtocol,
             return lhs.append(tokens: [.basicComparison(.equal), .rhs(rhs._rlmInferWrappedType().rawValue)])
         }
     }
-
+    /// :nodoc:
     public static func != <V>(_ lhs: Query<T>, _ rhs: T) -> Query<V> {
         if case Optional<Any>.none = rhs as Any {
             return lhs.append(tokens: [.basicComparison(.notEqual), .rhs(nil)])
@@ -608,7 +629,7 @@ extension Query where T: OptionalProtocol,
 }
 
 extension Query where T: OptionalProtocol, T.Wrapped: PersistableEnum, T.Wrapped.RawValue: _QueryNumeric {
-
+    /// :nodoc:
     public static func > <V>(_ lhs: Query<T>, _ rhs: T) -> Query<V> {
         if case Optional<Any>.none = rhs as Any {
             return lhs.append(tokens: [.basicComparison(.greaterThan), .rhs(nil)])
@@ -616,7 +637,7 @@ extension Query where T: OptionalProtocol, T.Wrapped: PersistableEnum, T.Wrapped
             return lhs.append(tokens: [.basicComparison(.greaterThan), .rhs(rhs._rlmInferWrappedType().rawValue)])
         }
     }
-
+    /// :nodoc:
     public static func >= <V>(_ lhs: Query<T>, _ rhs: T) -> Query<V> {
         if case Optional<Any>.none = rhs as Any {
             return lhs.append(tokens: [.basicComparison(.greaterThenOrEqual), .rhs(nil)])
@@ -624,7 +645,7 @@ extension Query where T: OptionalProtocol, T.Wrapped: PersistableEnum, T.Wrapped
             return lhs.append(tokens: [.basicComparison(.greaterThenOrEqual), .rhs(rhs._rlmInferWrappedType().rawValue)])
         }
     }
-
+    /// :nodoc:
     public static func < <V>(_ lhs: Query<T>, _ rhs: T) -> Query<V> {
         if case Optional<Any>.none = rhs as Any {
             return lhs.append(tokens: [.basicComparison(.lessThan), .rhs(nil)])
@@ -632,7 +653,7 @@ extension Query where T: OptionalProtocol, T.Wrapped: PersistableEnum, T.Wrapped
             return lhs.append(tokens: [.basicComparison(.lessThan), .rhs(rhs._rlmInferWrappedType().rawValue)])
         }
     }
-
+    /// :nodoc:
     public static func <= <V>(_ lhs: Query<T>, _ rhs: T) -> Query<V> {
         if case Optional<Any>.none = rhs as Any {
             return lhs.append(tokens: [.basicComparison(.lessThanOrEqual), .rhs(nil)])
@@ -740,7 +761,7 @@ extension Query where T: OptionalProtocol, T.Wrapped: _QueryNumeric {
 extension Query where T == Bool {
     /// Completes a subquery expression.
     /// ```
-    /// ($0.myCollection.age >= 21).count > 0
+    /// ($0.myCollection.age >= 21).count() > 0
     /// ```
     public func count() -> Query<Int> {
         let collections = Set(tokens.filter {
@@ -752,7 +773,7 @@ extension Query where T == Bool {
             if case let .keyPath(name, _) = kp {
                 return name
             }
-            fatalError()
+            throwRealmException("Could not create subquery expression.")
         })
 
         if collections.count > 1 {

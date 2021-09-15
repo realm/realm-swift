@@ -955,6 +955,64 @@ class ObjectTests: TestCase {
         token.invalidate()
     }
 
+    func testModifyMultipleObservedPartialKeyPathLocally() {
+        let realm = try! Realm()
+        realm.beginWrite()
+        let object = SwiftObject()
+        realm.add(object)
+        try! realm.commitWrite()
+
+        // Expect notification for "intCol" keyPath when "intCol" is modified
+        var ex = expectation(description: "expect notification")
+        var token = object.observe(keyPaths: [\SwiftObject.intCol, \SwiftObject.stringCol]) { changes in
+            if case .change(_, let properties) = changes {
+                XCTAssertEqual(properties.count, 1)
+                XCTAssertEqual(properties[0].newValue as! Int, 2)
+                ex.fulfill()
+            }
+        }
+        try! realm.write {
+            object.intCol = 2
+        }
+        waitForExpectations(timeout: 0.1)
+        token.invalidate()
+
+        // Expect notification for "stringCol" keyPath when "stringCol" is modified
+        ex = expectation(description: "expect notification")
+        token = object.observe(keyPaths: [\SwiftObject.intCol, \SwiftObject.stringCol]) { changes in
+            if case .change(_, let properties) = changes {
+                XCTAssertEqual(properties.count, 1)
+                XCTAssertEqual(properties[0].newValue as! String, "new string")
+                ex.fulfill()
+            }
+        }
+        try! realm.write {
+            object.stringCol = "new string"
+        }
+        waitForExpectations(timeout: 0.1)
+        token.invalidate()
+    }
+
+    func testModifyUnobservedPartialKeyPathLocally() {
+        let realm = try! Realm()
+        realm.beginWrite()
+        let object = SwiftObject()
+        realm.add(object)
+        try! realm.commitWrite()
+
+        // Expect no notification for "boolCol" keypath when "intCol" is modified
+        let ex = expectation(description: "no change")
+        ex.isInverted = true
+        let token = object.observe(keyPaths: [\SwiftObject.boolCol, \SwiftObject.stringCol], { _ in
+            ex.fulfill()
+        })
+        try! realm.write {
+            object.intCol = 3
+        }
+        waitForExpectations(timeout: 0.1, handler: nil)
+        token.invalidate()
+    }
+
     func testModifyObservedObjectRemotely() {
         let realm = try! Realm()
         realm.beginWrite()
@@ -1642,6 +1700,21 @@ class ObjectTests: TestCase {
 
     func testFreezeUnmanaged() {
         assertThrows(SwiftStringObject().freeze(), reason: "Unmanaged objects cannot be frozen.")
+    }
+
+    func testModifyFrozenObject() {
+        let obj = SwiftStringObject()
+        XCTAssertFalse(obj.isFrozen)
+
+        let realm = try! Realm()
+        try! realm.write {
+            realm.add(obj)
+        }
+
+        let frozenObj = obj.freeze()
+
+        assertThrows(frozenObj.stringCol = "foo",
+                     reason: "Attempting to modify a frozen object - call thaw on the Object instance first.")
     }
 
     func testFreezeDynamicObject() {

@@ -14,10 +14,120 @@ x.y.z Release notes (yyyy-MM-dd)
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 12.5.1.
 * CocoaPods: 1.10 or later.
-* Xcode: 12.2-13.0 beta 3.
+* Xcode: 12.2-13.0 beta 5.
 
 ### Internal
 * Upgraded realm-core from ? to ?
+
+10.15.0 Release notes (2021-09-10)
+=============================================================
+
+### Enhancements
+
+* Add `async` versions of the  `Realm.asyncOpen` and `App.login` methods.
+* ThreadSafeReference no longer pins the source transaction version for
+  anything other than a Results created by filtering a collection. This means
+  that holding on to thread-safe references to other things (such as Objects)
+  will no longer cause file size growth.
+* A ThreadSafeReference to a Results backed by a collection can now be created
+  inside a write transaction as long as the collection was not created in the
+  current write transaction.
+* Synchronized Realms are no longer opened twice, cutting the address space and
+  file descriptors used in half.
+  ([Core #4839](https://github.com/realm/realm-core/pull/4839))
+
+### Fixed
+
+* Adding an unmanaged object to a Realm that was declared with
+  `@StateRealmObject` would throw the exception `"Cannot add an object with
+  observers to a Realm"`.
+* The `RealmCollectionChange` docs refered to indicies in modifications as the
+  'new' collection. This is incorrect and the docs now state that modifications
+  refer to the previous version of the collection. ([Cocoa #7390](https://github.com/realm/realm-cocoa/issues/7390))
+* Fix crash in `RLMSyncConfiguration.initWithUser` error mapping when a user is disabled/deleted from MongoDB Realm dashboard.
+  ([Cocoa #7399](https://github.com/realm/realm-cocoa/issues/7399), since v10.0.0)
+* If the application crashed at the wrong point when logging a user in, the
+  next run of the application could hit the assertion failure "m_state ==
+  SyncUser::State::LoggedIn" when a synchronized Realm is opened with that
+  user. ([Core #4875](https://github.com/realm/realm-core/issues/4875), since v10.0.0)
+
+### Compatibility
+
+* Realm Studio: 11.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 12.5.1.
+* CocoaPods: 1.10 or later.
+* Xcode: 12.2-13.0 beta 5.
+
+### Internal
+
+* Upgraded realm-core from 11.3.1 to 11.4.1
+
+10.14.0 Release notes (2021-09-03)
+=============================================================
+
+### Enhancements
+
+* Add additional `observe` methods for Objects and RealmCollections which take
+  a `PartialKeyPath` type key path parameter.
+* The release package once again contains Xcode 13 binaries.
+* `PersistableEnum` properties can now be indexed or used as the primary key if
+  the RawValue is an indexable or primary key type.
+
+### Fixed
+
+* `Map<Key, Value>` did not conform to `Codable`.
+  ([Cocoa #7418](https://github.com/realm/realm-cocoa/pull/7418), since v10.8.0)
+* Fixed "Invalid data type" assertion failure in the sync client when the
+  client recieved an AddColumn instruction from the server for an AnyRealmValue
+  property when that property already exists locally. ([Core #4873](https://github.com/realm/realm-core/issues/4873), since v10.8.0)
+
+### Compatibility
+
+* Realm Studio: 11.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 12.5.1.
+* CocoaPods: 1.10 or later.
+* Xcode: 12.2-13.0 beta 5.
+
+### Internal
+
+* Upgraded realm-core from 11.3.0 to 11.3.1.
+
+10.13.0 Release notes (2021-08-26)
+=============================================================
+
+### Enhancements
+
+* Sync logs now contain information about what object/changeset was being applied when the exception was thrown. 
+  ([Core #4836](https://github.com/realm/realm-core/issues/4836))
+* Added ServiceErrorCode for wrong username/password when using '`App.login`. 
+  ([Core #7380](https://github.com/realm/realm-cocoa/issues/7380)
+
+### Fixed
+
+* Fix crash in `MongoCollection.findOneDocument(filter:)` that occurred when no results were
+  found for a given filter. 
+  ([Cocoa #7380](https://github.com/realm/realm-cocoa/issues/7380), since v10.0.0)
+* Some of the SwiftUI property wrappers incorrectly required objects to conform
+  to ObjectKeyIdentifiable rather than Identifiable.
+  ([Cocoa #7372](https://github.com/realm/realm-cocoa/issues/7372), since v10.6.0)
+* Work around Xcode 13 beta 3+ shipping a broken swiftinterface file for Combine on 32-bit iOS.
+  ([Cocoa #7368](https://github.com/realm/realm-cocoa/issues/7368))
+* Fixes history corruption when replacing an embedded object in a list.
+  ([Core #4845](https://github.com/realm/realm-core/issues/4845)), since v10.0.0)
+
+### Compatibility
+
+* Realm Studio: 11.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 12.5.1.
+* CocoaPods: 1.10 or later.
+* Xcode: 12.2-13.0 beta 5.
+
+### Internal
+
+* Upgraded realm-core from 11.2.0 to 11.3.0
 
 10.12.0 Release notes (2021-08-03)
 =============================================================
@@ -131,6 +241,9 @@ x.y.z Release notes (yyyy-MM-dd)
   ([Cocoa #7323](https://github.com/realm/realm-cocoa/issues/7323), since v10.8.0)
 * `@Persisted<T?>` would crash when decoding a `null` value.
   ([#7332](https://github.com/realm/realm-cocoa/issues/7332), since v10.10.0).
+* Fixed an issue where `Realm.Configuration` would be set after views have been laid out
+  when using `.environment(\.realmConfiguration, ...)` in SwiftUI. This would cause issues if you are
+  required to bump your schema version and are using `@ObservedResults`.
 * Sync user profiles now correctly persist between runs.
 
 ### Compatibility
@@ -165,8 +278,8 @@ x.y.z Release notes (yyyy-MM-dd)
     - No more overriding class methods like `primaryKey()`,
       `indexedProperties()` or `ignoredProperties()`. The primary key and
       indexed flags are set directly in the property declaration with
-      `@Persisted(primaryKey: true) _id: ObjectId` or `@Persisted(indexed:
-      true) indexedProperty: Int`. If any `@Persisted` properties are present,
+      `@Persisted(primaryKey: true) var _id: ObjectId` or `@Persisted(indexed:
+      true) var indexedProperty: Int`. If any `@Persisted` properties are present,
       all other properties are implicitly ignored.
     - Some performance problems have been fixed. Declaring collection
       properties as `let listProp = List<T>()` resulted in the `List<T>` object

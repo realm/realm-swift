@@ -27,7 +27,7 @@ class SwiftUISyncTestHostUITests: SwiftSyncTestCase {
         super.setUp()
         // TODO: This should be a static method
         if !SwiftUISyncTestHostUITests.isDataCreated {
-            let user = logInUser(for: basicCredentials(withName: "1234567890ab1234567890ab", register: true))
+            let user = logInUser(for: basicCredentials(name: "1234567890ab1234567890ab", register: true))
             populateRealm(user: user, partitionValue: #function)
             SwiftUISyncTestHostUITests.isDataCreated = true
         }

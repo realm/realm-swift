@@ -17,6 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 import Foundation
+import Realm
 import Realm.Private
 
 // A type which we can get the runtime schema information from

@@ -17,6 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMMultiProcessTestCase.h"
+#import "RLMChildProcessEnvironment.h"
 
 #include <mach-o/dyld.h>
 
@@ -115,15 +116,12 @@
 }
 
 #if !TARGET_OS_IPHONE && !TARGET_IPHONE_SIMULATOR
-- (NSTask *)childTaskWithAppIds:(NSArray *)appIds {
+- (NSTask *)childTaskWithEnvironment:(RLMChildProcessEnvironment *)environment {
     NSString *testName = [NSString stringWithFormat:@"%@/%@", self.className, self.testName];
     NSMutableDictionary *env = [NSProcessInfo.processInfo.environment mutableCopy];
     env[@"RLMProcessIsChild"] = @"true";
     env[@"RLMParentProcessBundleID"] = [NSBundle mainBundle].bundleIdentifier;
-    if (appIds.count) {
-        env[@"RLMParentAppId"] = appIds[0];
-        env[@"RLMParentAppIds"] = [appIds componentsJoinedByString:@","];
-    }
+    [env addEntriesFromDictionary:[environment dictionaryValue]];
 
     // If we're running with address sanitizer or thread sanitizer we need to
     // explicitly tell dyld to inject the appropriate runtime library into
@@ -148,6 +146,14 @@
     task.environment = env;
     task.standardError = nil;
     return task;
+}
+
+- (NSTask *)childTaskWithAppIds:(NSArray *)appIds {
+    return [self childTaskWithEnvironment:[[RLMChildProcessEnvironment new] initWithAppIds:appIds
+                                                                                     email:nil
+                                                                                  password:nil
+                                                                                 identifer:0
+                                                                shouldCleanUpOnTermination:YES]];
 }
 
 - (NSTask *)childTask {
@@ -178,12 +184,16 @@
     return pipe;
 }
 
-- (int)runChildAndWaitWithAppIds:(NSArray *)appIds {
-    NSTask *task = [self childTaskWithAppIds:appIds];
+- (int)runChildAndWaitWithEnvironment:(RLMChildProcessEnvironment *)environment {
+    NSTask *task = [self childTaskWithEnvironment:environment];
     task.standardError = self.filterPipe;
     [task launch];
     [task waitUntilExit];
     return task.terminationStatus;
+}
+
+- (int)runChildAndWaitWithAppIds:(NSArray *)appIds {
+    return [self runChildAndWaitWithEnvironment:[[RLMChildProcessEnvironment new] initWithAppIds:appIds email:nil password:nil identifer:0 shouldCleanUpOnTermination:YES]];
 }
 
 - (int)runChildAndWait {
@@ -210,5 +220,8 @@
     return 1;
 }
 
+- (int)runChildAndWaitWithEnvironment:(RLMChildProcessEnvironment *)environment {
+    return 1;
+}
 #endif
 @end

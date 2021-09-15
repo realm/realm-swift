@@ -7,22 +7,22 @@ included:
   - examples/installation/ios/swift
   - examples/ios/swift
   - examples/tvos/swift
-excluded:
-  - RealmSwift/Tests/QueryTests.gyb.swift
 identifier_name:
   min_length: # not possible to disable this partial rule, so set it to zero
     warning: 0
     error: 0
   excluded:
+    - _constructPredicate(_:)
     - _id
-    - _nilValue()
     - _name(for:)
+    - _nilValue()
     - _nsError
     - _nsErrorDomain
     - _observe(_:)
     - _observe(_:_:)
     - _observe(_:_:_:)
     - _observe(_:on:_:)
+    - _publisher
     - _realmColumnNames()
     - _realmObjectName()
     - _rlmCollection
@@ -43,6 +43,9 @@ identifier_name:
     - id
     - pk
     - to
+type_name:
+  excluded:
+    - _RealmValue
 disabled_rules:
   - block_based_kvo
   # SwiftLint expects a space following a double slash comment: "//".

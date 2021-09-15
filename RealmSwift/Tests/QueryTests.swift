@@ -258,6 +258,49 @@ class QueryTests: TestCase {
         }
     }
 
+    private func assertCollectionQuery<T: _RealmSchemaDiscoverable>(on keyPath: KeyPath<ModernAllTypesObject, T>,
+                                                                    isList: Bool,
+                                                                    predicate: String,
+                                                                    values: [AnyHashable],
+                                                                    expectedCount: Int,
+                                                                    query: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>)) {
+        let colObj = realmWithTestPath().objects(ModernCollectionObject.self).first!
+        var results: Results<ModernAllTypesObject>!
+        if isList {
+            results = colObj.list.query(query)
+        } else {
+            results = colObj.set.query(query)
+        }
+        XCTAssertEqual(results.count, expectedCount)
+
+        let constructedPredicate = query(Query<ModernAllTypesObject>())._constructPredicate()
+        XCTAssertEqual(constructedPredicate.0,
+                       predicate)
+
+        for (e1, e2) in zip(constructedPredicate.1, values) {
+            XCTAssertEqual(e1 as! AnyHashable, e2)
+        }
+    }
+
+    private func assertMapQuery<T: _RealmSchemaDiscoverable>(on keyPath: KeyPath<ModernAllTypesObject, T>,
+                                                             predicate: String,
+                                                             values: [AnyHashable],
+                                                             expectedCount: Int,
+                                                             query: ((Query<ModernAllTypesObject?>) -> Query<ModernAllTypesObject?>)) {
+        let colObj = realmWithTestPath().objects(ModernCollectionObject.self).first!
+        var results: Results<ModernAllTypesObject?>!
+        results = colObj.map.query(query)
+        XCTAssertEqual(results.count, expectedCount)
+
+        let constructedPredicate = query(Query<ModernAllTypesObject?>())._constructPredicate()
+        XCTAssertEqual(constructedPredicate.0,
+                       predicate)
+
+        for (e1, e2) in zip(constructedPredicate.1, values) {
+            XCTAssertEqual(e1 as! AnyHashable, e2)
+        }
+    }
+
     // MARK: - Basic Comparison
 
     func testEquals() {
@@ -3256,21 +3299,6 @@ class QueryTests: TestCase {
             $0.list.contains(obj)
         }
         XCTAssertEqual(result2.count, 1)
-
-        let query: ((Query<ModernCollectionObject>) -> Query<ModernCollectionObject>) = {
-            $0.list.contains(obj)
-        }
-        let predicate = query(Query<ModernCollectionObject>())._constructPredicate()
-        XCTAssertEqual(predicate.0, "%@ IN list")
-        XCTAssertEqual(predicate.1 as! [AnyHashable], [obj])
-    }
-
-    func testListContainsAnyInObject() {
-
-    }
-
-    func testListFromProperty() {
-
     }
 
     func testListContainsRange() {
@@ -3436,6 +3464,372 @@ class QueryTests: TestCase {
             $0.arrayOptDecimal.contains(Decimal128(123.456)..<Decimal128(456.789))
         }
 
+    }
+
+    func testListContainsAnyInObject() {
+        assertQuery(predicate: "ANY arrayBool IN %@",
+                    values: [NSArray(array: [true, true])], expectedCount: 1) {
+            $0.arrayBool.containsAny(in: [true, true])
+        }
+        assertQuery(predicate: "ANY arrayInt IN %@",
+                    values: [NSArray(array: [1, 2])], expectedCount: 1) {
+            $0.arrayInt.containsAny(in: [1, 2])
+        }
+        assertQuery(predicate: "ANY arrayInt8 IN %@",
+                    values: [NSArray(array: [Int8(8), Int8(9)])], expectedCount: 1) {
+            $0.arrayInt8.containsAny(in: [Int8(8), Int8(9)])
+        }
+        assertQuery(predicate: "ANY arrayInt16 IN %@",
+                    values: [NSArray(array: [Int16(16), Int16(17)])], expectedCount: 1) {
+            $0.arrayInt16.containsAny(in: [Int16(16), Int16(17)])
+        }
+        assertQuery(predicate: "ANY arrayInt32 IN %@",
+                    values: [NSArray(array: [Int32(32), Int32(33)])], expectedCount: 1) {
+            $0.arrayInt32.containsAny(in: [Int32(32), Int32(33)])
+        }
+        assertQuery(predicate: "ANY arrayInt64 IN %@",
+                    values: [NSArray(array: [Int64(64), Int64(65)])], expectedCount: 1) {
+            $0.arrayInt64.containsAny(in: [Int64(64), Int64(65)])
+        }
+        assertQuery(predicate: "ANY arrayFloat IN %@",
+                    values: [NSArray(array: [Float(5.55444333), Float(6.55444333)])], expectedCount: 1) {
+            $0.arrayFloat.containsAny(in: [Float(5.55444333), Float(6.55444333)])
+        }
+        assertQuery(predicate: "ANY arrayDouble IN %@",
+                    values: [NSArray(array: [123.456, 234.456])], expectedCount: 1) {
+            $0.arrayDouble.containsAny(in: [123.456, 234.456])
+        }
+        assertQuery(predicate: "ANY arrayString IN %@",
+                    values: [NSArray(array: ["Foo", "Bar"])], expectedCount: 1) {
+            $0.arrayString.containsAny(in: ["Foo", "Bar"])
+        }
+        assertQuery(predicate: "ANY arrayBinary IN %@",
+                    values: [NSArray(array: [Data(count: 64), Data(count: 128)])], expectedCount: 1) {
+            $0.arrayBinary.containsAny(in: [Data(count: 64), Data(count: 128)])
+        }
+        assertQuery(predicate: "ANY arrayDate IN %@",
+                    values: [NSArray(array: [Date(timeIntervalSince1970: 1000000), Date(timeIntervalSince1970: 2000000)])], expectedCount: 1) {
+            $0.arrayDate.containsAny(in: [Date(timeIntervalSince1970: 1000000), Date(timeIntervalSince1970: 2000000)])
+        }
+        assertQuery(predicate: "ANY arrayDecimal IN %@",
+                    values: [NSArray(array: [Decimal128(123.456), Decimal128(456.789)])], expectedCount: 1) {
+            $0.arrayDecimal.containsAny(in: [Decimal128(123.456), Decimal128(456.789)])
+        }
+        assertQuery(predicate: "ANY arrayObjectId IN %@",
+                    values: [NSArray(array: [ObjectId("61184062c1d8f096a3695046"), ObjectId("61184062c1d8f096a3695045")])], expectedCount: 1) {
+            $0.arrayObjectId.containsAny(in: [ObjectId("61184062c1d8f096a3695046"), ObjectId("61184062c1d8f096a3695045")])
+        }
+        assertQuery(predicate: "ANY arrayUuid IN %@",
+                    values: [NSArray(array: [UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!, UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!])], expectedCount: 1) {
+            $0.arrayUuid.containsAny(in: [UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!, UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!])
+        }
+        assertQuery(predicate: "ANY arrayAny IN %@",
+                    values: [NSArray(array: [ObjectId("61184062c1d8f096a3695046"), "Hello"])], expectedCount: 1) {
+            $0.arrayAny.containsAny(in: [AnyRealmValue.objectId(ObjectId("61184062c1d8f096a3695046")), AnyRealmValue.string("Hello")])
+        }
+        assertQuery(predicate: "ANY arrayOptBool IN %@",
+                    values: [NSArray(array: [true, true])], expectedCount: 1) {
+            $0.arrayOptBool.containsAny(in: [true, true])
+        }
+        assertQuery(predicate: "ANY arrayOptInt IN %@",
+                    values: [NSArray(array: [1, 2])], expectedCount: 1) {
+            $0.arrayOptInt.containsAny(in: [1, 2])
+        }
+        assertQuery(predicate: "ANY arrayOptInt8 IN %@",
+                    values: [NSArray(array: [Int8(8), Int8(9)])], expectedCount: 1) {
+            $0.arrayOptInt8.containsAny(in: [Int8(8), Int8(9)])
+        }
+        assertQuery(predicate: "ANY arrayOptInt16 IN %@",
+                    values: [NSArray(array: [Int16(16), Int16(17)])], expectedCount: 1) {
+            $0.arrayOptInt16.containsAny(in: [Int16(16), Int16(17)])
+        }
+        assertQuery(predicate: "ANY arrayOptInt32 IN %@",
+                    values: [NSArray(array: [Int32(32), Int32(33)])], expectedCount: 1) {
+            $0.arrayOptInt32.containsAny(in: [Int32(32), Int32(33)])
+        }
+        assertQuery(predicate: "ANY arrayOptInt64 IN %@",
+                    values: [NSArray(array: [Int64(64), Int64(65)])], expectedCount: 1) {
+            $0.arrayOptInt64.containsAny(in: [Int64(64), Int64(65)])
+        }
+        assertQuery(predicate: "ANY arrayOptFloat IN %@",
+                    values: [NSArray(array: [Float(5.55444333), Float(6.55444333)])], expectedCount: 1) {
+            $0.arrayOptFloat.containsAny(in: [Float(5.55444333), Float(6.55444333)])
+        }
+        assertQuery(predicate: "ANY arrayOptDouble IN %@",
+                    values: [NSArray(array: [123.456, 234.456])], expectedCount: 1) {
+            $0.arrayOptDouble.containsAny(in: [123.456, 234.456])
+        }
+        assertQuery(predicate: "ANY arrayOptString IN %@",
+                    values: [NSArray(array: ["Foo", "Bar"])], expectedCount: 1) {
+            $0.arrayOptString.containsAny(in: ["Foo", "Bar"])
+        }
+        assertQuery(predicate: "ANY arrayOptBinary IN %@",
+                    values: [NSArray(array: [Data(count: 64), Data(count: 128)])], expectedCount: 1) {
+            $0.arrayOptBinary.containsAny(in: [Data(count: 64), Data(count: 128)])
+        }
+        assertQuery(predicate: "ANY arrayOptDate IN %@",
+                    values: [NSArray(array: [Date(timeIntervalSince1970: 1000000), Date(timeIntervalSince1970: 2000000)])], expectedCount: 1) {
+            $0.arrayOptDate.containsAny(in: [Date(timeIntervalSince1970: 1000000), Date(timeIntervalSince1970: 2000000)])
+        }
+        assertQuery(predicate: "ANY arrayOptDecimal IN %@",
+                    values: [NSArray(array: [Decimal128(123.456), Decimal128(456.789)])], expectedCount: 1) {
+            $0.arrayOptDecimal.containsAny(in: [Decimal128(123.456), Decimal128(456.789)])
+        }
+        assertQuery(predicate: "ANY arrayOptUuid IN %@",
+                    values: [NSArray(array: [UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!, UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!])], expectedCount: 1) {
+            $0.arrayOptUuid.containsAny(in: [UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!, UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!])
+        }
+        assertQuery(predicate: "ANY arrayOptObjectId IN %@",
+                    values: [NSArray(array: [ObjectId("61184062c1d8f096a3695046"), ObjectId("61184062c1d8f096a3695045")])], expectedCount: 1) {
+            $0.arrayOptObjectId.containsAny(in: [ObjectId("61184062c1d8f096a3695046"), ObjectId("61184062c1d8f096a3695045")])
+        }
+
+        let realm = realmWithTestPath()
+        let colObj = ModernCollectionObject()
+        let obj = objects().first!
+        colObj.list.append(obj)
+        try! realm.write {
+            realm.add(colObj)
+        }
+
+        assertCollectionObjectQuery(predicate: "ANY list IN %@", values: [NSArray(array: [obj])], expectedCount: 1) {
+            $0.list.containsAny(in: [obj])
+        }
+    }
+
+    func testListFromProperty() {
+        let realm = realmWithTestPath()
+        let colObj = ModernCollectionObject()
+        let obj = objects().first!
+        colObj.list.append(obj)
+        try! realm.write {
+            realm.add(colObj)
+        }
+
+        assertCollectionQuery(on: \.boolCol,
+                              isList: true,
+                              predicate: "boolCol == %@",
+                              values: [false],
+                              expectedCount: 1) {
+            $0.boolCol == false
+        }
+        assertCollectionQuery(on: \.intCol,
+                              isList: true,
+                              predicate: "intCol == %@",
+                              values: [6],
+                              expectedCount: 1) {
+            $0.intCol == 6
+        }
+        assertCollectionQuery(on: \.int8Col,
+                              isList: true,
+                              predicate: "int8Col == %@",
+                              values: [Int8(9)],
+                              expectedCount: 1) {
+            $0.int8Col == Int8(9)
+        }
+        assertCollectionQuery(on: \.int16Col,
+                              isList: true,
+                              predicate: "int16Col == %@",
+                              values: [Int16(17)],
+                              expectedCount: 1) {
+            $0.int16Col == Int16(17)
+        }
+        assertCollectionQuery(on: \.int32Col,
+                              isList: true,
+                              predicate: "int32Col == %@",
+                              values: [Int32(33)],
+                              expectedCount: 1) {
+            $0.int32Col == Int32(33)
+        }
+        assertCollectionQuery(on: \.int64Col,
+                              isList: true,
+                              predicate: "int64Col == %@",
+                              values: [Int64(65)],
+                              expectedCount: 1) {
+            $0.int64Col == Int64(65)
+        }
+        assertCollectionQuery(on: \.floatCol,
+                              isList: true,
+                              predicate: "floatCol == %@",
+                              values: [Float(6.55444333)],
+                              expectedCount: 1) {
+            $0.floatCol == Float(6.55444333)
+        }
+        assertCollectionQuery(on: \.doubleCol,
+                              isList: true,
+                              predicate: "doubleCol == %@",
+                              values: [6.55444333],
+                              expectedCount: 1) {
+            $0.doubleCol == 6.55444333
+        }
+        assertCollectionQuery(on: \.stringCol,
+                              isList: true,
+                              predicate: "stringCol == %@",
+                              values: ["Foó"],
+                              expectedCount: 1) {
+            $0.stringCol == "Foó"
+        }
+        assertCollectionQuery(on: \.binaryCol,
+                              isList: true,
+                              predicate: "binaryCol == %@",
+                              values: [Data(count: 128)],
+                              expectedCount: 1) {
+            $0.binaryCol == Data(count: 128)
+        }
+        assertCollectionQuery(on: \.dateCol,
+                              isList: true,
+                              predicate: "dateCol == %@",
+                              values: [Date(timeIntervalSince1970: 2000000)],
+                              expectedCount: 1) {
+            $0.dateCol == Date(timeIntervalSince1970: 2000000)
+        }
+        assertCollectionQuery(on: \.decimalCol,
+                              isList: true,
+                              predicate: "decimalCol == %@",
+                              values: [Decimal128(234.456)],
+                              expectedCount: 1) {
+            $0.decimalCol == Decimal128(234.456)
+        }
+        assertCollectionQuery(on: \.objectIdCol,
+                              isList: true,
+                              predicate: "objectIdCol == %@",
+                              values: [ObjectId("61184062c1d8f096a3695045")],
+                              expectedCount: 1) {
+            $0.objectIdCol == ObjectId("61184062c1d8f096a3695045")
+        }
+        assertCollectionQuery(on: \.intEnumCol,
+                              isList: true,
+                              predicate: "intEnumCol == %@",
+                              values: [ModernIntEnum.value2.rawValue],
+                              expectedCount: 1) {
+            $0.intEnumCol == .value2
+        }
+        assertCollectionQuery(on: \.stringEnumCol,
+                              isList: true,
+                              predicate: "stringEnumCol == %@",
+                              values: [ModernStringEnum.value2.rawValue],
+                              expectedCount: 1) {
+            $0.stringEnumCol == .value2
+        }
+        assertCollectionQuery(on: \.uuidCol,
+                              isList: true,
+                              predicate: "uuidCol == %@",
+                              values: [UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!],
+                              expectedCount: 1) {
+            $0.uuidCol == UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!
+        }
+        assertCollectionQuery(on: \.optBoolCol,
+                              isList: true,
+                              predicate: "optBoolCol == %@",
+                              values: [false],
+                              expectedCount: 1) {
+            $0.optBoolCol == false
+        }
+        assertCollectionQuery(on: \.optIntCol,
+                              isList: true,
+                              predicate: "optIntCol == %@",
+                              values: [6],
+                              expectedCount: 1) {
+            $0.optIntCol == 6
+        }
+        assertCollectionQuery(on: \.optInt8Col,
+                              isList: true,
+                              predicate: "optInt8Col == %@",
+                              values: [Int8(9)],
+                              expectedCount: 1) {
+            $0.optInt8Col == Int8(9)
+        }
+        assertCollectionQuery(on: \.optInt16Col,
+                              isList: true,
+                              predicate: "optInt16Col == %@",
+                              values: [Int16(17)],
+                              expectedCount: 1) {
+            $0.optInt16Col == Int16(17)
+        }
+        assertCollectionQuery(on: \.optInt32Col,
+                              isList: true,
+                              predicate: "optInt32Col == %@",
+                              values: [Int32(33)],
+                              expectedCount: 1) {
+            $0.optInt32Col == Int32(33)
+        }
+        assertCollectionQuery(on: \.optInt64Col,
+                              isList: true,
+                              predicate: "optInt64Col == %@",
+                              values: [Int64(65)],
+                              expectedCount: 1) {
+            $0.optInt64Col == Int64(65)
+        }
+        assertCollectionQuery(on: \.optFloatCol,
+                              isList: true,
+                              predicate: "optFloatCol == %@",
+                              values: [Float(6.55444333)],
+                              expectedCount: 1) {
+            $0.optFloatCol == Float(6.55444333)
+        }
+        assertCollectionQuery(on: \.optDoubleCol,
+                              isList: true,
+                              predicate: "optDoubleCol == %@",
+                              values: [6.55444333],
+                              expectedCount: 1) {
+            $0.optDoubleCol == 6.55444333
+        }
+        assertCollectionQuery(on: \.optStringCol,
+                              isList: true,
+                              predicate: "optStringCol == %@",
+                              values: ["Foó"],
+                              expectedCount: 1) {
+            $0.optStringCol == "Foó"
+        }
+        assertCollectionQuery(on: \.optBinaryCol,
+                              isList: true,
+                              predicate: "optBinaryCol == %@",
+                              values: [Data(count: 128)],
+                              expectedCount: 1) {
+            $0.optBinaryCol == Data(count: 128)
+        }
+        assertCollectionQuery(on: \.optDateCol,
+                              isList: true,
+                              predicate: "optDateCol == %@",
+                              values: [Date(timeIntervalSince1970: 2000000)],
+                              expectedCount: 1) {
+            $0.optDateCol == Date(timeIntervalSince1970: 2000000)
+        }
+        assertCollectionQuery(on: \.optDecimalCol,
+                              isList: true,
+                              predicate: "optDecimalCol == %@",
+                              values: [Decimal128(234.456)],
+                              expectedCount: 1) {
+            $0.optDecimalCol == Decimal128(234.456)
+        }
+        assertCollectionQuery(on: \.optObjectIdCol,
+                              isList: true,
+                              predicate: "optObjectIdCol == %@",
+                              values: [ObjectId("61184062c1d8f096a3695045")],
+                              expectedCount: 1) {
+            $0.optObjectIdCol == ObjectId("61184062c1d8f096a3695045")
+        }
+        assertCollectionQuery(on: \.optIntEnumCol,
+                              isList: true,
+                              predicate: "optIntEnumCol == %@",
+                              values: [ModernIntEnum.value2.rawValue],
+                              expectedCount: 1) {
+            $0.optIntEnumCol == .value2
+        }
+        assertCollectionQuery(on: \.optStringEnumCol,
+                              isList: true,
+                              predicate: "optStringEnumCol == %@",
+                              values: [ModernStringEnum.value2.rawValue],
+                              expectedCount: 1) {
+            $0.optStringEnumCol == .value2
+        }
+        assertCollectionQuery(on: \.optUuidCol,
+                              isList: true,
+                              predicate: "optUuidCol == %@",
+                              values: [UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!],
+                              expectedCount: 1) {
+            $0.optUuidCol == UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!
+        }
     }
 
     func testSetContainsElement() {
@@ -3866,6 +4260,372 @@ class QueryTests: TestCase {
             $0.set.contains(obj)
         }
         XCTAssertEqual(result2.count, 1)
+    }
+
+    func testSetContainsAnyInObject() {
+        assertQuery(predicate: "ANY setBool IN %@",
+                    values: [NSArray(array: [true, true])], expectedCount: 1) {
+            $0.setBool.containsAny(in: [true, true])
+        }
+        assertQuery(predicate: "ANY setInt IN %@",
+                    values: [NSArray(array: [1, 2])], expectedCount: 1) {
+            $0.setInt.containsAny(in: [1, 2])
+        }
+        assertQuery(predicate: "ANY setInt8 IN %@",
+                    values: [NSArray(array: [Int8(8), Int8(9)])], expectedCount: 1) {
+            $0.setInt8.containsAny(in: [Int8(8), Int8(9)])
+        }
+        assertQuery(predicate: "ANY setInt16 IN %@",
+                    values: [NSArray(array: [Int16(16), Int16(17)])], expectedCount: 1) {
+            $0.setInt16.containsAny(in: [Int16(16), Int16(17)])
+        }
+        assertQuery(predicate: "ANY setInt32 IN %@",
+                    values: [NSArray(array: [Int32(32), Int32(33)])], expectedCount: 1) {
+            $0.setInt32.containsAny(in: [Int32(32), Int32(33)])
+        }
+        assertQuery(predicate: "ANY setInt64 IN %@",
+                    values: [NSArray(array: [Int64(64), Int64(65)])], expectedCount: 1) {
+            $0.setInt64.containsAny(in: [Int64(64), Int64(65)])
+        }
+        assertQuery(predicate: "ANY setFloat IN %@",
+                    values: [NSArray(array: [Float(5.55444333), Float(6.55444333)])], expectedCount: 1) {
+            $0.setFloat.containsAny(in: [Float(5.55444333), Float(6.55444333)])
+        }
+        assertQuery(predicate: "ANY setDouble IN %@",
+                    values: [NSArray(array: [123.456, 234.456])], expectedCount: 1) {
+            $0.setDouble.containsAny(in: [123.456, 234.456])
+        }
+        assertQuery(predicate: "ANY setString IN %@",
+                    values: [NSArray(array: ["Foo", "Bar"])], expectedCount: 1) {
+            $0.setString.containsAny(in: ["Foo", "Bar"])
+        }
+        assertQuery(predicate: "ANY setBinary IN %@",
+                    values: [NSArray(array: [Data(count: 64), Data(count: 128)])], expectedCount: 1) {
+            $0.setBinary.containsAny(in: [Data(count: 64), Data(count: 128)])
+        }
+        assertQuery(predicate: "ANY setDate IN %@",
+                    values: [NSArray(array: [Date(timeIntervalSince1970: 1000000), Date(timeIntervalSince1970: 2000000)])], expectedCount: 1) {
+            $0.setDate.containsAny(in: [Date(timeIntervalSince1970: 1000000), Date(timeIntervalSince1970: 2000000)])
+        }
+        assertQuery(predicate: "ANY setDecimal IN %@",
+                    values: [NSArray(array: [Decimal128(123.456), Decimal128(456.789)])], expectedCount: 1) {
+            $0.setDecimal.containsAny(in: [Decimal128(123.456), Decimal128(456.789)])
+        }
+        assertQuery(predicate: "ANY setObjectId IN %@",
+                    values: [NSArray(array: [ObjectId("61184062c1d8f096a3695046"), ObjectId("61184062c1d8f096a3695045")])], expectedCount: 1) {
+            $0.setObjectId.containsAny(in: [ObjectId("61184062c1d8f096a3695046"), ObjectId("61184062c1d8f096a3695045")])
+        }
+        assertQuery(predicate: "ANY setUuid IN %@",
+                    values: [NSArray(array: [UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!, UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!])], expectedCount: 1) {
+            $0.setUuid.containsAny(in: [UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!, UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!])
+        }
+        assertQuery(predicate: "ANY setAny IN %@",
+                    values: [NSArray(array: [ObjectId("61184062c1d8f096a3695046"), "Hello"])], expectedCount: 1) {
+            $0.setAny.containsAny(in: [AnyRealmValue.objectId(ObjectId("61184062c1d8f096a3695046")), AnyRealmValue.string("Hello")])
+        }
+        assertQuery(predicate: "ANY setOptBool IN %@",
+                    values: [NSArray(array: [true, true])], expectedCount: 1) {
+            $0.setOptBool.containsAny(in: [true, true])
+        }
+        assertQuery(predicate: "ANY setOptInt IN %@",
+                    values: [NSArray(array: [1, 2])], expectedCount: 1) {
+            $0.setOptInt.containsAny(in: [1, 2])
+        }
+        assertQuery(predicate: "ANY setOptInt8 IN %@",
+                    values: [NSArray(array: [Int8(8), Int8(9)])], expectedCount: 1) {
+            $0.setOptInt8.containsAny(in: [Int8(8), Int8(9)])
+        }
+        assertQuery(predicate: "ANY setOptInt16 IN %@",
+                    values: [NSArray(array: [Int16(16), Int16(17)])], expectedCount: 1) {
+            $0.setOptInt16.containsAny(in: [Int16(16), Int16(17)])
+        }
+        assertQuery(predicate: "ANY setOptInt32 IN %@",
+                    values: [NSArray(array: [Int32(32), Int32(33)])], expectedCount: 1) {
+            $0.setOptInt32.containsAny(in: [Int32(32), Int32(33)])
+        }
+        assertQuery(predicate: "ANY setOptInt64 IN %@",
+                    values: [NSArray(array: [Int64(64), Int64(65)])], expectedCount: 1) {
+            $0.setOptInt64.containsAny(in: [Int64(64), Int64(65)])
+        }
+        assertQuery(predicate: "ANY setOptFloat IN %@",
+                    values: [NSArray(array: [Float(5.55444333), Float(6.55444333)])], expectedCount: 1) {
+            $0.setOptFloat.containsAny(in: [Float(5.55444333), Float(6.55444333)])
+        }
+        assertQuery(predicate: "ANY setOptDouble IN %@",
+                    values: [NSArray(array: [123.456, 234.456])], expectedCount: 1) {
+            $0.setOptDouble.containsAny(in: [123.456, 234.456])
+        }
+        assertQuery(predicate: "ANY setOptString IN %@",
+                    values: [NSArray(array: ["Foo", "Bar"])], expectedCount: 1) {
+            $0.setOptString.containsAny(in: ["Foo", "Bar"])
+        }
+        assertQuery(predicate: "ANY setOptBinary IN %@",
+                    values: [NSArray(array: [Data(count: 64), Data(count: 128)])], expectedCount: 1) {
+            $0.setOptBinary.containsAny(in: [Data(count: 64), Data(count: 128)])
+        }
+        assertQuery(predicate: "ANY setOptDate IN %@",
+                    values: [NSArray(array: [Date(timeIntervalSince1970: 1000000), Date(timeIntervalSince1970: 2000000)])], expectedCount: 1) {
+            $0.setOptDate.containsAny(in: [Date(timeIntervalSince1970: 1000000), Date(timeIntervalSince1970: 2000000)])
+        }
+        assertQuery(predicate: "ANY setOptDecimal IN %@",
+                    values: [NSArray(array: [Decimal128(123.456), Decimal128(456.789)])], expectedCount: 1) {
+            $0.setOptDecimal.containsAny(in: [Decimal128(123.456), Decimal128(456.789)])
+        }
+        assertQuery(predicate: "ANY setOptUuid IN %@",
+                    values: [NSArray(array: [UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!, UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!])], expectedCount: 1) {
+            $0.setOptUuid.containsAny(in: [UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!, UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!])
+        }
+        assertQuery(predicate: "ANY setOptObjectId IN %@",
+                    values: [NSArray(array: [ObjectId("61184062c1d8f096a3695046"), ObjectId("61184062c1d8f096a3695045")])], expectedCount: 1) {
+            $0.setOptObjectId.containsAny(in: [ObjectId("61184062c1d8f096a3695046"), ObjectId("61184062c1d8f096a3695045")])
+        }
+
+        let realm = realmWithTestPath()
+        let colObj = ModernCollectionObject()
+        let obj = objects().first!
+        colObj.set.insert(obj)
+        try! realm.write {
+            realm.add(colObj)
+        }
+
+        assertCollectionObjectQuery(predicate: "ANY set IN %@", values: [NSArray(array: [obj])], expectedCount: 1) {
+            $0.set.containsAny(in: [obj])
+        }
+    }
+
+    func testSetFromProperty() {
+        let realm = realmWithTestPath()
+        let colObj = ModernCollectionObject()
+        let obj = objects().first!
+        colObj.set.insert(obj)
+        try! realm.write {
+            realm.add(colObj)
+        }
+
+        assertCollectionQuery(on: \.boolCol,
+                              isList: false,
+                              predicate: "boolCol == %@",
+                              values: [false],
+                              expectedCount: 1) {
+            $0.boolCol == false
+        }
+        assertCollectionQuery(on: \.intCol,
+                              isList: false,
+                              predicate: "intCol == %@",
+                              values: [6],
+                              expectedCount: 1) {
+            $0.intCol == 6
+        }
+        assertCollectionQuery(on: \.int8Col,
+                              isList: false,
+                              predicate: "int8Col == %@",
+                              values: [Int8(9)],
+                              expectedCount: 1) {
+            $0.int8Col == Int8(9)
+        }
+        assertCollectionQuery(on: \.int16Col,
+                              isList: false,
+                              predicate: "int16Col == %@",
+                              values: [Int16(17)],
+                              expectedCount: 1) {
+            $0.int16Col == Int16(17)
+        }
+        assertCollectionQuery(on: \.int32Col,
+                              isList: false,
+                              predicate: "int32Col == %@",
+                              values: [Int32(33)],
+                              expectedCount: 1) {
+            $0.int32Col == Int32(33)
+        }
+        assertCollectionQuery(on: \.int64Col,
+                              isList: false,
+                              predicate: "int64Col == %@",
+                              values: [Int64(65)],
+                              expectedCount: 1) {
+            $0.int64Col == Int64(65)
+        }
+        assertCollectionQuery(on: \.floatCol,
+                              isList: false,
+                              predicate: "floatCol == %@",
+                              values: [Float(6.55444333)],
+                              expectedCount: 1) {
+            $0.floatCol == Float(6.55444333)
+        }
+        assertCollectionQuery(on: \.doubleCol,
+                              isList: false,
+                              predicate: "doubleCol == %@",
+                              values: [6.55444333],
+                              expectedCount: 1) {
+            $0.doubleCol == 6.55444333
+        }
+        assertCollectionQuery(on: \.stringCol,
+                              isList: false,
+                              predicate: "stringCol == %@",
+                              values: ["Foó"],
+                              expectedCount: 1) {
+            $0.stringCol == "Foó"
+        }
+        assertCollectionQuery(on: \.binaryCol,
+                              isList: false,
+                              predicate: "binaryCol == %@",
+                              values: [Data(count: 128)],
+                              expectedCount: 1) {
+            $0.binaryCol == Data(count: 128)
+        }
+        assertCollectionQuery(on: \.dateCol,
+                              isList: false,
+                              predicate: "dateCol == %@",
+                              values: [Date(timeIntervalSince1970: 2000000)],
+                              expectedCount: 1) {
+            $0.dateCol == Date(timeIntervalSince1970: 2000000)
+        }
+        assertCollectionQuery(on: \.decimalCol,
+                              isList: false,
+                              predicate: "decimalCol == %@",
+                              values: [Decimal128(234.456)],
+                              expectedCount: 1) {
+            $0.decimalCol == Decimal128(234.456)
+        }
+        assertCollectionQuery(on: \.objectIdCol,
+                              isList: false,
+                              predicate: "objectIdCol == %@",
+                              values: [ObjectId("61184062c1d8f096a3695045")],
+                              expectedCount: 1) {
+            $0.objectIdCol == ObjectId("61184062c1d8f096a3695045")
+        }
+        assertCollectionQuery(on: \.intEnumCol,
+                              isList: false,
+                              predicate: "intEnumCol == %@",
+                              values: [ModernIntEnum.value2.rawValue],
+                              expectedCount: 1) {
+            $0.intEnumCol == .value2
+        }
+        assertCollectionQuery(on: \.stringEnumCol,
+                              isList: false,
+                              predicate: "stringEnumCol == %@",
+                              values: [ModernStringEnum.value2.rawValue],
+                              expectedCount: 1) {
+            $0.stringEnumCol == .value2
+        }
+        assertCollectionQuery(on: \.uuidCol,
+                              isList: false,
+                              predicate: "uuidCol == %@",
+                              values: [UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!],
+                              expectedCount: 1) {
+            $0.uuidCol == UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!
+        }
+        assertCollectionQuery(on: \.optBoolCol,
+                              isList: false,
+                              predicate: "optBoolCol == %@",
+                              values: [false],
+                              expectedCount: 1) {
+            $0.optBoolCol == false
+        }
+        assertCollectionQuery(on: \.optIntCol,
+                              isList: false,
+                              predicate: "optIntCol == %@",
+                              values: [6],
+                              expectedCount: 1) {
+            $0.optIntCol == 6
+        }
+        assertCollectionQuery(on: \.optInt8Col,
+                              isList: false,
+                              predicate: "optInt8Col == %@",
+                              values: [Int8(9)],
+                              expectedCount: 1) {
+            $0.optInt8Col == Int8(9)
+        }
+        assertCollectionQuery(on: \.optInt16Col,
+                              isList: false,
+                              predicate: "optInt16Col == %@",
+                              values: [Int16(17)],
+                              expectedCount: 1) {
+            $0.optInt16Col == Int16(17)
+        }
+        assertCollectionQuery(on: \.optInt32Col,
+                              isList: false,
+                              predicate: "optInt32Col == %@",
+                              values: [Int32(33)],
+                              expectedCount: 1) {
+            $0.optInt32Col == Int32(33)
+        }
+        assertCollectionQuery(on: \.optInt64Col,
+                              isList: false,
+                              predicate: "optInt64Col == %@",
+                              values: [Int64(65)],
+                              expectedCount: 1) {
+            $0.optInt64Col == Int64(65)
+        }
+        assertCollectionQuery(on: \.optFloatCol,
+                              isList: false,
+                              predicate: "optFloatCol == %@",
+                              values: [Float(6.55444333)],
+                              expectedCount: 1) {
+            $0.optFloatCol == Float(6.55444333)
+        }
+        assertCollectionQuery(on: \.optDoubleCol,
+                              isList: false,
+                              predicate: "optDoubleCol == %@",
+                              values: [6.55444333],
+                              expectedCount: 1) {
+            $0.optDoubleCol == 6.55444333
+        }
+        assertCollectionQuery(on: \.optStringCol,
+                              isList: false,
+                              predicate: "optStringCol == %@",
+                              values: ["Foó"],
+                              expectedCount: 1) {
+            $0.optStringCol == "Foó"
+        }
+        assertCollectionQuery(on: \.optBinaryCol,
+                              isList: false,
+                              predicate: "optBinaryCol == %@",
+                              values: [Data(count: 128)],
+                              expectedCount: 1) {
+            $0.optBinaryCol == Data(count: 128)
+        }
+        assertCollectionQuery(on: \.optDateCol,
+                              isList: false,
+                              predicate: "optDateCol == %@",
+                              values: [Date(timeIntervalSince1970: 2000000)],
+                              expectedCount: 1) {
+            $0.optDateCol == Date(timeIntervalSince1970: 2000000)
+        }
+        assertCollectionQuery(on: \.optDecimalCol,
+                              isList: false,
+                              predicate: "optDecimalCol == %@",
+                              values: [Decimal128(234.456)],
+                              expectedCount: 1) {
+            $0.optDecimalCol == Decimal128(234.456)
+        }
+        assertCollectionQuery(on: \.optObjectIdCol,
+                              isList: false,
+                              predicate: "optObjectIdCol == %@",
+                              values: [ObjectId("61184062c1d8f096a3695045")],
+                              expectedCount: 1) {
+            $0.optObjectIdCol == ObjectId("61184062c1d8f096a3695045")
+        }
+        assertCollectionQuery(on: \.optIntEnumCol,
+                              isList: false,
+                              predicate: "optIntEnumCol == %@",
+                              values: [ModernIntEnum.value2.rawValue],
+                              expectedCount: 1) {
+            $0.optIntEnumCol == .value2
+        }
+        assertCollectionQuery(on: \.optStringEnumCol,
+                              isList: false,
+                              predicate: "optStringEnumCol == %@",
+                              values: [ModernStringEnum.value2.rawValue],
+                              expectedCount: 1) {
+            $0.optStringEnumCol == .value2
+        }
+        assertCollectionQuery(on: \.optUuidCol,
+                              isList: false,
+                              predicate: "optUuidCol == %@",
+                              values: [UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!],
+                              expectedCount: 1) {
+            $0.optUuidCol == UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!
+        }
     }
 
     // MARK: - Map
@@ -6776,6 +7536,360 @@ class QueryTests: TestCase {
         }
     }
 
+    func testMapContainsAnyInObject() {
+        assertQuery(predicate: "ANY mapBool IN %@",
+                    values: [NSArray(array: [true, true])], expectedCount: 1) {
+            $0.mapBool.containsAny(in: [true, true])
+        }
+        assertQuery(predicate: "ANY mapInt IN %@",
+                    values: [NSArray(array: [1, 2])], expectedCount: 1) {
+            $0.mapInt.containsAny(in: [1, 2])
+        }
+        assertQuery(predicate: "ANY mapInt8 IN %@",
+                    values: [NSArray(array: [Int8(8), Int8(9)])], expectedCount: 1) {
+            $0.mapInt8.containsAny(in: [Int8(8), Int8(9)])
+        }
+        assertQuery(predicate: "ANY mapInt16 IN %@",
+                    values: [NSArray(array: [Int16(16), Int16(17)])], expectedCount: 1) {
+            $0.mapInt16.containsAny(in: [Int16(16), Int16(17)])
+        }
+        assertQuery(predicate: "ANY mapInt32 IN %@",
+                    values: [NSArray(array: [Int32(32), Int32(33)])], expectedCount: 1) {
+            $0.mapInt32.containsAny(in: [Int32(32), Int32(33)])
+        }
+        assertQuery(predicate: "ANY mapInt64 IN %@",
+                    values: [NSArray(array: [Int64(64), Int64(65)])], expectedCount: 1) {
+            $0.mapInt64.containsAny(in: [Int64(64), Int64(65)])
+        }
+        assertQuery(predicate: "ANY mapFloat IN %@",
+                    values: [NSArray(array: [Float(5.55444333), Float(6.55444333)])], expectedCount: 1) {
+            $0.mapFloat.containsAny(in: [Float(5.55444333), Float(6.55444333)])
+        }
+        assertQuery(predicate: "ANY mapDouble IN %@",
+                    values: [NSArray(array: [123.456, 234.456])], expectedCount: 1) {
+            $0.mapDouble.containsAny(in: [123.456, 234.456])
+        }
+        assertQuery(predicate: "ANY mapString IN %@",
+                    values: [NSArray(array: ["Foo", "Bar"])], expectedCount: 1) {
+            $0.mapString.containsAny(in: ["Foo", "Bar"])
+        }
+        assertQuery(predicate: "ANY mapBinary IN %@",
+                    values: [NSArray(array: [Data(count: 64), Data(count: 128)])], expectedCount: 1) {
+            $0.mapBinary.containsAny(in: [Data(count: 64), Data(count: 128)])
+        }
+        assertQuery(predicate: "ANY mapDate IN %@",
+                    values: [NSArray(array: [Date(timeIntervalSince1970: 1000000), Date(timeIntervalSince1970: 2000000)])], expectedCount: 1) {
+            $0.mapDate.containsAny(in: [Date(timeIntervalSince1970: 1000000), Date(timeIntervalSince1970: 2000000)])
+        }
+        assertQuery(predicate: "ANY mapDecimal IN %@",
+                    values: [NSArray(array: [Decimal128(123.456), Decimal128(456.789)])], expectedCount: 1) {
+            $0.mapDecimal.containsAny(in: [Decimal128(123.456), Decimal128(456.789)])
+        }
+        assertQuery(predicate: "ANY mapObjectId IN %@",
+                    values: [NSArray(array: [ObjectId("61184062c1d8f096a3695046"), ObjectId("61184062c1d8f096a3695045")])], expectedCount: 1) {
+            $0.mapObjectId.containsAny(in: [ObjectId("61184062c1d8f096a3695046"), ObjectId("61184062c1d8f096a3695045")])
+        }
+        assertQuery(predicate: "ANY mapUuid IN %@",
+                    values: [NSArray(array: [UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!, UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!])], expectedCount: 1) {
+            $0.mapUuid.containsAny(in: [UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!, UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!])
+        }
+        assertQuery(predicate: "ANY mapAny IN %@",
+                    values: [NSArray(array: [ObjectId("61184062c1d8f096a3695046"), "Hello"])], expectedCount: 1) {
+            $0.mapAny.containsAny(in: [AnyRealmValue.objectId(ObjectId("61184062c1d8f096a3695046")), AnyRealmValue.string("Hello")])
+        }
+        assertQuery(predicate: "ANY mapOptBool IN %@",
+                    values: [NSArray(array: [true, true])], expectedCount: 1) {
+            $0.mapOptBool.containsAny(in: [true, true])
+        }
+        assertQuery(predicate: "ANY mapOptInt IN %@",
+                    values: [NSArray(array: [1, 2])], expectedCount: 1) {
+            $0.mapOptInt.containsAny(in: [1, 2])
+        }
+        assertQuery(predicate: "ANY mapOptInt8 IN %@",
+                    values: [NSArray(array: [Int8(8), Int8(9)])], expectedCount: 1) {
+            $0.mapOptInt8.containsAny(in: [Int8(8), Int8(9)])
+        }
+        assertQuery(predicate: "ANY mapOptInt16 IN %@",
+                    values: [NSArray(array: [Int16(16), Int16(17)])], expectedCount: 1) {
+            $0.mapOptInt16.containsAny(in: [Int16(16), Int16(17)])
+        }
+        assertQuery(predicate: "ANY mapOptInt32 IN %@",
+                    values: [NSArray(array: [Int32(32), Int32(33)])], expectedCount: 1) {
+            $0.mapOptInt32.containsAny(in: [Int32(32), Int32(33)])
+        }
+        assertQuery(predicate: "ANY mapOptInt64 IN %@",
+                    values: [NSArray(array: [Int64(64), Int64(65)])], expectedCount: 1) {
+            $0.mapOptInt64.containsAny(in: [Int64(64), Int64(65)])
+        }
+        assertQuery(predicate: "ANY mapOptFloat IN %@",
+                    values: [NSArray(array: [Float(5.55444333), Float(6.55444333)])], expectedCount: 1) {
+            $0.mapOptFloat.containsAny(in: [Float(5.55444333), Float(6.55444333)])
+        }
+        assertQuery(predicate: "ANY mapOptDouble IN %@",
+                    values: [NSArray(array: [123.456, 234.456])], expectedCount: 1) {
+            $0.mapOptDouble.containsAny(in: [123.456, 234.456])
+        }
+        assertQuery(predicate: "ANY mapOptString IN %@",
+                    values: [NSArray(array: ["Foo", "Bar"])], expectedCount: 1) {
+            $0.mapOptString.containsAny(in: ["Foo", "Bar"])
+        }
+        assertQuery(predicate: "ANY mapOptBinary IN %@",
+                    values: [NSArray(array: [Data(count: 64), Data(count: 128)])], expectedCount: 1) {
+            $0.mapOptBinary.containsAny(in: [Data(count: 64), Data(count: 128)])
+        }
+        assertQuery(predicate: "ANY mapOptDate IN %@",
+                    values: [NSArray(array: [Date(timeIntervalSince1970: 1000000), Date(timeIntervalSince1970: 2000000)])], expectedCount: 1) {
+            $0.mapOptDate.containsAny(in: [Date(timeIntervalSince1970: 1000000), Date(timeIntervalSince1970: 2000000)])
+        }
+        assertQuery(predicate: "ANY mapOptDecimal IN %@",
+                    values: [NSArray(array: [Decimal128(123.456), Decimal128(456.789)])], expectedCount: 1) {
+            $0.mapOptDecimal.containsAny(in: [Decimal128(123.456), Decimal128(456.789)])
+        }
+        assertQuery(predicate: "ANY mapOptUuid IN %@",
+                    values: [NSArray(array: [UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!, UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!])], expectedCount: 1) {
+            $0.mapOptUuid.containsAny(in: [UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!, UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!])
+        }
+        assertQuery(predicate: "ANY mapOptObjectId IN %@",
+                    values: [NSArray(array: [ObjectId("61184062c1d8f096a3695046"), ObjectId("61184062c1d8f096a3695045")])], expectedCount: 1) {
+            $0.mapOptObjectId.containsAny(in: [ObjectId("61184062c1d8f096a3695046"), ObjectId("61184062c1d8f096a3695045")])
+        }
+
+        let realm = realmWithTestPath()
+        let colObj = ModernCollectionObject()
+        let obj = objects().first!
+        colObj.map["foo"] = obj
+        try! realm.write {
+            realm.add(colObj)
+        }
+
+        assertCollectionObjectQuery(predicate: "ANY map IN %@", values: [NSArray(array: [obj])], expectedCount: 1) {
+            $0.map.containsAny(in: [obj])
+        }
+    }
+
+    func testMapFromProperty() {
+        let realm = realmWithTestPath()
+        let colObj = ModernCollectionObject()
+        let obj = objects().first!
+        colObj.map["foo"] = obj
+        try! realm.write {
+            realm.add(colObj)
+        }
+
+        assertMapQuery(on: \.boolCol,
+                       predicate: "boolCol == %@",
+                       values: [false],
+                       expectedCount: 1) {
+            $0.boolCol == false
+        }
+        assertMapQuery(on: \.intCol,
+                       predicate: "intCol == %@",
+                       values: [6],
+                       expectedCount: 1) {
+            $0.intCol == 6
+        }
+        assertMapQuery(on: \.int8Col,
+                       predicate: "int8Col == %@",
+                       values: [Int8(9)],
+                       expectedCount: 1) {
+            $0.int8Col == Int8(9)
+        }
+        assertMapQuery(on: \.int16Col,
+                       predicate: "int16Col == %@",
+                       values: [Int16(17)],
+                       expectedCount: 1) {
+            $0.int16Col == Int16(17)
+        }
+        assertMapQuery(on: \.int32Col,
+                       predicate: "int32Col == %@",
+                       values: [Int32(33)],
+                       expectedCount: 1) {
+            $0.int32Col == Int32(33)
+        }
+        assertMapQuery(on: \.int64Col,
+                       predicate: "int64Col == %@",
+                       values: [Int64(65)],
+                       expectedCount: 1) {
+            $0.int64Col == Int64(65)
+        }
+        assertMapQuery(on: \.floatCol,
+                       predicate: "floatCol == %@",
+                       values: [Float(6.55444333)],
+                       expectedCount: 1) {
+            $0.floatCol == Float(6.55444333)
+        }
+        assertMapQuery(on: \.doubleCol,
+                       predicate: "doubleCol == %@",
+                       values: [6.55444333],
+                       expectedCount: 1) {
+            $0.doubleCol == 6.55444333
+        }
+        assertMapQuery(on: \.stringCol,
+                       predicate: "stringCol == %@",
+                       values: ["Foó"],
+                       expectedCount: 1) {
+            $0.stringCol == "Foó"
+        }
+        assertMapQuery(on: \.binaryCol,
+                       predicate: "binaryCol == %@",
+                       values: [Data(count: 128)],
+                       expectedCount: 1) {
+            $0.binaryCol == Data(count: 128)
+        }
+        assertMapQuery(on: \.dateCol,
+                       predicate: "dateCol == %@",
+                       values: [Date(timeIntervalSince1970: 2000000)],
+                       expectedCount: 1) {
+            $0.dateCol == Date(timeIntervalSince1970: 2000000)
+        }
+        assertMapQuery(on: \.decimalCol,
+                       predicate: "decimalCol == %@",
+                       values: [Decimal128(234.456)],
+                       expectedCount: 1) {
+            $0.decimalCol == Decimal128(234.456)
+        }
+        assertMapQuery(on: \.objectIdCol,
+                       predicate: "objectIdCol == %@",
+                       values: [ObjectId("61184062c1d8f096a3695045")],
+                       expectedCount: 1) {
+            $0.objectIdCol == ObjectId("61184062c1d8f096a3695045")
+        }
+        assertMapQuery(on: \.intEnumCol,
+                       predicate: "intEnumCol == %@",
+                       values: [ModernIntEnum.value2.rawValue],
+                       expectedCount: 1) {
+            $0.intEnumCol == .value2
+        }
+        assertMapQuery(on: \.stringEnumCol,
+                       predicate: "stringEnumCol == %@",
+                       values: [ModernStringEnum.value2.rawValue],
+                       expectedCount: 1) {
+            $0.stringEnumCol == .value2
+        }
+        assertMapQuery(on: \.uuidCol,
+                       predicate: "uuidCol == %@",
+                       values: [UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!],
+                       expectedCount: 1) {
+            $0.uuidCol == UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!
+        }
+        assertMapQuery(on: \.optBoolCol,
+                       predicate: "optBoolCol == %@",
+                       values: [false],
+                       expectedCount: 1) {
+            $0.optBoolCol == false
+        }
+        assertMapQuery(on: \.optIntCol,
+                       predicate: "optIntCol == %@",
+                       values: [6],
+                       expectedCount: 1) {
+            $0.optIntCol == 6
+        }
+        assertMapQuery(on: \.optInt8Col,
+                       predicate: "optInt8Col == %@",
+                       values: [Int8(9)],
+                       expectedCount: 1) {
+            $0.optInt8Col == Int8(9)
+        }
+        assertMapQuery(on: \.optInt16Col,
+                       predicate: "optInt16Col == %@",
+                       values: [Int16(17)],
+                       expectedCount: 1) {
+            $0.optInt16Col == Int16(17)
+        }
+        assertMapQuery(on: \.optInt32Col,
+                       predicate: "optInt32Col == %@",
+                       values: [Int32(33)],
+                       expectedCount: 1) {
+            $0.optInt32Col == Int32(33)
+        }
+        assertMapQuery(on: \.optInt64Col,
+                       predicate: "optInt64Col == %@",
+                       values: [Int64(65)],
+                       expectedCount: 1) {
+            $0.optInt64Col == Int64(65)
+        }
+        assertMapQuery(on: \.optFloatCol,
+                       predicate: "optFloatCol == %@",
+                       values: [Float(6.55444333)],
+                       expectedCount: 1) {
+            $0.optFloatCol == Float(6.55444333)
+        }
+        assertMapQuery(on: \.optDoubleCol,
+                       predicate: "optDoubleCol == %@",
+                       values: [6.55444333],
+                       expectedCount: 1) {
+            $0.optDoubleCol == 6.55444333
+        }
+        assertMapQuery(on: \.optStringCol,
+                       predicate: "optStringCol == %@",
+                       values: ["Foó"],
+                       expectedCount: 1) {
+            $0.optStringCol == "Foó"
+        }
+        assertMapQuery(on: \.optBinaryCol,
+                       predicate: "optBinaryCol == %@",
+                       values: [Data(count: 128)],
+                       expectedCount: 1) {
+            $0.optBinaryCol == Data(count: 128)
+        }
+        assertMapQuery(on: \.optDateCol,
+                       predicate: "optDateCol == %@",
+                       values: [Date(timeIntervalSince1970: 2000000)],
+                       expectedCount: 1) {
+            $0.optDateCol == Date(timeIntervalSince1970: 2000000)
+        }
+        assertMapQuery(on: \.optDecimalCol,
+                       predicate: "optDecimalCol == %@",
+                       values: [Decimal128(234.456)],
+                       expectedCount: 1) {
+            $0.optDecimalCol == Decimal128(234.456)
+        }
+        assertMapQuery(on: \.optObjectIdCol,
+                       predicate: "optObjectIdCol == %@",
+                       values: [ObjectId("61184062c1d8f096a3695045")],
+                       expectedCount: 1) {
+            $0.optObjectIdCol == ObjectId("61184062c1d8f096a3695045")
+        }
+        assertMapQuery(on: \.optIntEnumCol,
+                       predicate: "optIntEnumCol == %@",
+                       values: [ModernIntEnum.value2.rawValue],
+                       expectedCount: 1) {
+            $0.optIntEnumCol == .value2
+        }
+        assertMapQuery(on: \.optStringEnumCol,
+                       predicate: "optStringEnumCol == %@",
+                       values: [ModernStringEnum.value2.rawValue],
+                       expectedCount: 1) {
+            $0.optStringEnumCol == .value2
+        }
+        assertMapQuery(on: \.optUuidCol,
+                       predicate: "optUuidCol == %@",
+                       values: [UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!],
+                       expectedCount: 1) {
+            $0.optUuidCol == UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!
+        }
+    }
+
+    // MARK: Linking Objects
+
+    func testLinkingObjects() {
+        assertQuery(predicate: "%@ IN linkingObjects", values: [objects().first!], expectedCount: 0) {
+            $0.linkingObjects.contains(objects().first!)
+        }
+
+        assertQuery(predicate: "ANY linkingObjects IN %@", values: [NSArray(array: objects().map { $0 })], expectedCount: 0) {
+            $0.linkingObjects.containsAny(in: objects())
+        }
+
+        assertQuery(predicate: "NOT %@ IN linkingObjects", values: [objects().first!], expectedCount: 1) {
+            !$0.linkingObjects.contains(objects().first!)
+        }
+
+        assertQuery(predicate: "NOT ANY linkingObjects IN %@", values: [NSArray(array: objects().map { $0 })], expectedCount: 1) {
+            !$0.linkingObjects.containsAny(in: objects())
+        }
+    }
+
     // MARK: Compound
 
     func testCompoundAnd() {
@@ -7218,10 +8332,14 @@ class QueryTests: TestCase {
             ($0.arrayCol.intCol != 123).count() > 0
         }
 
-        assertQuery(predicate: "(((intCol == %@ && arrayInt.@count == %@) && SUBQUERY(arrayCol, $obj, ($obj.intCol == %@ && $obj.stringCol == %@)).@count == %@) && SUBQUERY(arrayCol, $obj, $obj.stringCol == %@).@count == %@)", values: [6, 2, 5, "Foo", 1, "Bar", 0], expectedCount: 1) {
-            $0.intCol == 6 &&
-            $0.arrayInt.count() == 2 &&
-            ($0.arrayCol.intCol == 5 && $0.arrayCol.stringCol == "Foo").count() == 1 &&
+        assertQuery(predicate: "SUBQUERY(arrayCol, $obj, ($obj.intCol > %@ && $obj.intCol <= %@)).@count > %@", values: [0, 5, 0], expectedCount: 1) {
+            ($0.arrayCol.intCol > 0 && $0.arrayCol.intCol <= 5 ).count() > 0
+        }
+
+        assertQuery(predicate: "(((intCol == %@ && arrayInt.@count == %@) && SUBQUERY(arrayCol, $obj, $obj.intCol == %@).@count == %@) && SUBQUERY(arrayCol, $obj, $obj.stringCol == %@).@count == %@)", values: [6, 2, 5, 1, "Bar", 0], expectedCount: 1) {
+            ($0.intCol == 6) &&
+            ($0.arrayInt.count() == 2) &&
+            ($0.arrayCol.intCol == 5).count() == 1 &&
             ($0.arrayCol.stringCol == "Bar").count() == 0
         }
 
@@ -7232,20 +8350,18 @@ class QueryTests: TestCase {
             ($0.arrayCol.intCol != 123).count() > 0
         }
 
-        assertQuery(predicate: "(((intCol == %@ && setInt.@count == %@) && SUBQUERY(setCol, $obj, ($obj.intCol == %@ && $obj.stringCol == %@)).@count == %@) && SUBQUERY(setCol, $obj, $obj.stringCol == %@).@count == %@)", values: [6, 2, 5, "Foo", 1, "Bar", 0], expectedCount: 1) {
-            $0.intCol == 6 &&
-            $0.setInt.count() == 2 &&
-            ($0.setCol.intCol == 5 && $0.setCol.stringCol == "Foo").count() == 1 &&
+        assertQuery(predicate: "(((intCol == %@ && setInt.@count == %@) && SUBQUERY(setCol, $obj, $obj.intCol == %@).@count == %@) && SUBQUERY(setCol, $obj, $obj.stringCol == %@).@count == %@)", values: [6, 2, 5, 1, "Bar", 0], expectedCount: 1) {
+            ($0.intCol == 6) &&
+            ($0.setInt.count() == 2) &&
+            ($0.setCol.intCol == 5).count() == 1 &&
             ($0.setCol.stringCol == "Bar").count() == 0
         }
 
-        // Some more complex use cases
-        assertQuery(predicate: "((((intCol == %@ && setInt.@count == %@) && SUBQUERY(setCol, $obj, ($obj.intCol == %@ || $obj.stringCol == %@)).@count == %@) && SUBQUERY(setCol, $obj, (($obj.intCol == %@ || $obj.stringCol == %@) || ($obj.intCol == %@ && $obj.stringCol == %@))).@count == %@) && SUBQUERY(setCol, $obj, $obj.stringCol == %@).@count == %@)", values: [6, 2, 5, "Foo", 1, 5, "Foo", 5, "Foo", 1, "Bar", 0], expectedCount: 1) {
-            $0.intCol == 6 &&
-            $0.setInt.count() == 2 &&
-            ($0.setCol.intCol == 5 || $0.setCol.stringCol == "Foo").count() == 1 &&
-            ($0.setCol.intCol == 5 || $0.setCol.stringCol == "Foo" || $0.setCol.intCol == 5 && $0.setCol.stringCol == "Foo").count() == 1 &&
-            ($0.setCol.stringCol == "Bar").count() == 0
+        assertQuery(predicate: "(((intCol == %@ && setInt.@count == %@) && SUBQUERY(setCol, $obj, ($obj.intCol == %@ && $obj.stringCol != %@)).@count == %@) && SUBQUERY(setCol, $obj, $obj.stringCol == %@).@count == %@)", values: [6, 2, 5, "Blah", 1, "Bar", 0], expectedCount: 1) {
+            ($0.intCol == 6) &&
+            ($0.setInt.count() == 2) &&
+            (((($0.setCol.intCol == 5) && ($0.setCol.stringCol != "Blah"))).count() == 1) &&
+            (($0.setCol.stringCol == "Bar").count() == 0)
         }
 
         let query: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>) = {

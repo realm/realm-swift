@@ -334,6 +334,14 @@ class Admin {
                 request(on: group, httpMethod: "PUT", data: data, completionHandler)
             }
 
+            func delete(_ completionHandler: @escaping (Result<Any?, Error>) -> Void) {
+                request(httpMethod: "DELETE", completionHandler: completionHandler)
+            }
+
+            func delete(on group: DispatchGroup, _ completionHandler: @escaping (Result<Any?, Error>) -> Void) {
+                request(on: group, httpMethod: "DELETE", completionHandler)
+            }
+
             func patch(on group: DispatchGroup, _ data: Any, _ completionHandler: @escaping (Result<Any?, Error>) -> Void) {
                 request(on: group, httpMethod: "PATCH", data: data, completionHandler)
             }
@@ -519,15 +527,16 @@ public class RealmServer: NSObject {
         let binDir = Self.buildDir.appendingPathComponent("bin").path
         let libDir = Self.buildDir.appendingPathComponent("lib").path
         let binPath = "$PATH:\(binDir)"
+        let env = [
+            "PATH": binPath,
+            "DYLD_LIBRARY_PATH": libDir
+        ]
 
         let stitchRoot = RealmServer.buildDir.path + "/go/src/github.com/10gen/stitch"
 
         // create the admin user
         let userProcess = Process()
-        userProcess.environment = [
-            "PATH": binPath,
-            "LD_LIBRARY_PATH": libDir
-        ]
+        userProcess.environment = env
         userProcess.launchPath = "\(binDir)/create_user"
         userProcess.arguments = [
             "addUser",
@@ -541,10 +550,7 @@ public class RealmServer: NSObject {
         try userProcess.run()
         userProcess.waitUntilExit()
 
-        serverProcess.environment = [
-            "PATH": binPath,
-            "LD_LIBRARY_PATH": libDir
-        ]
+        serverProcess.environment = env
         // golang server needs a tmp directory
         try! FileManager.default.createDirectory(atPath: "\(tempDir.path)/tmp",
             withIntermediateDirectories: false, attributes: nil)
@@ -810,6 +816,42 @@ public class RealmServer: NSObject {
 
     @objc public func createApp() throws -> AppId {
         try createAppForBSONType("string")
+    }
+
+    // Retrieve MongoDB Realm AppId with ClientAppId using the Admin API
+    private func retrieveAppServerId(_ clientAppId: String) throws -> String {
+        guard let session = session else {
+            throw URLError(.unknown)
+        }
+
+        let appsListInfo = try session.apps.get().get()
+        guard let appsList = appsListInfo as? [[String: Any]] else {
+            throw URLError(.badServerResponse)
+        }
+
+        let app = appsList.first(where: {
+            guard let clientId = $0["client_app_id"] as? String else {
+                return false
+            }
+
+            return clientId == clientAppId
+        })
+
+        guard let appId = app?["_id"] as? String else {
+            throw URLError(.badServerResponse)
+        }
+        return appId
+    }
+
+    // Remove User from MongoDB Realm using the Admin API
+    public func removeUserForApp(_ appId: String, userId: String, _ completion: @escaping (Result<Any?, Error>) -> Void) {
+        guard let appServerId = try? RealmServer.shared.retrieveAppServerId(appId),
+              let session = session else {
+            completion(.failure(URLError.unknown as! Error))
+            return
+        }
+        let app = session.apps[appServerId]
+        app.users[userId].delete(completion)
     }
 }
 
