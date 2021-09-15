@@ -1,22 +1,23 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.15.1 Release notes (2021-09-15)
 =============================================================
+
 ### Enhancements
-* None.
+
+* Switch to building the Carthage release with Xcode 13.
 
 ### Fixed
-* Fix compilation error where Swift 5.5 is available but the macOS 12 SDK was not. This was notable for the Xcode 13 RC. This fix adds a #canImport check for the `_Concurrency` module that was not available before the macOS 12 SDK.
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+* Fix compilation error where Swift 5.5 is available but the macOS 12 SDK was
+  not. This was notable for the Xcode 13 RC. This fix adds a #canImport check
+  for the `_Concurrency` module that was not available before the macOS 12 SDK.
 
 ### Compatibility
+
 * Realm Studio: 11.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 13.0.
 * CocoaPods: 1.10 or later.
 * Xcode: 12.2-13.0.
-
-### Internal
-* Upgraded realm-core from ? to ?
 
 10.15.0 Release notes (2021-09-10)
 =============================================================
