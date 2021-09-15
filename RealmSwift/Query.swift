@@ -376,6 +376,21 @@ public struct Query<T: _RealmSchemaDiscoverable> {
                                .basicComparison(isClosedRange ? .lessThanOrEqual : .lessThan),
                                .rhs(upperBound)])
     }
+
+    private func doContainsAny<U: Sequence, V>(in collection: U) -> Query<V> {
+        var keyPathDepth = 0
+        for token in tokens.reversed() {
+            if case .keyPath = token {
+                keyPathDepth += 1
+            } else {
+                break
+            }
+        }
+        precondition(keyPathDepth != 0)
+        var copy = self
+        copy.tokens.insert(.special(.anyInPrefix), at: tokens.count - keyPathDepth)
+        return copy.append(tokens: [.comparison(.containsAny(NSArray(array: collection.map(dynamicBridgeCast))))])
+    }
 }
 
 // MARK: OptionalProtocol
@@ -408,18 +423,7 @@ extension Query where T: RealmCollection {
     }
 
     public func containsAny<U: Sequence, V>(in collection: U) -> Query<V> where U.Element == T.Element {
-        var keyPathDepth = 0
-        for token in tokens.reversed() {
-            if case .keyPath = token {
-                keyPathDepth += 1
-            } else {
-                break
-            }
-        }
-        precondition(keyPathDepth != 0)
-        var copy = self
-        copy.tokens.insert(.special(.anyInPrefix), at: tokens.count - keyPathDepth)
-        return copy.append(tokens: [.comparison(.containsAny(NSArray(array: collection.map(dynamicBridgeCast))))])
+        return doContainsAny(in: collection)
     }
 }
 
@@ -464,9 +468,13 @@ extension Query where T: RealmKeyedCollection {
                                  keyPath])
         return Query<U>(expression: copy, mapSubscriptNeedsResolution: true)
     }
+
+    public func containsAny<U: Sequence, V>(in collection: U) -> Query<V> where U.Element == T.Value {
+        return doContainsAny(in: collection)
+    }
 }
 
-extension Query where T: RealmKeyedCollection, T.Key: _RealmSchemaDiscoverable, T.Value: _RealmSchemaDiscoverable {
+extension Query where T: RealmKeyedCollection, T.Key: _RealmSchemaDiscoverable {
     /// Checks if an element exists in this collection.
     public func contains<V>(_ value: T.Value) -> Query<V> {
         return append(tokens: [.comparison(.contains(value))])

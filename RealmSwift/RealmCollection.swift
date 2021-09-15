@@ -1268,11 +1268,11 @@ public struct AnyRealmCollection<Element: RealmCollectionValue>: RealmCollection
     public func filter(_ predicate: NSPredicate) -> Results<Element> { return base.filter(predicate) }
 
     /**
-     Returns a `Results` containing all objects matching the given predicate in the collection.
+     Returns a `Results` containing all objects matching the given query in the collection.
 
      - Note: This should only be used with classes using the `@Persistable` property declaration.
 
-     - parameter predicate: The predicate with which to filter the objects.
+     - parameter query: The query with which to filter the objects.
      */
     public func query(_ query: ((Query<Element>) -> Query<Element>)) -> Results<Element> { return base.query(query) }
 

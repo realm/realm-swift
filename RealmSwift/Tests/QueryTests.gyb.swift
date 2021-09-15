@@ -316,33 +316,41 @@ class QueryTests: TestCase {
         }
     }
 
-    private enum CollectionType {
-        case list
-        case set
-        case map
-    }
-
     private func assertCollectionQuery<T: _RealmSchemaDiscoverable>(on keyPath: KeyPath<ModernAllTypesObject, T>,
-                                                                    collectionType: CollectionType,
+                                                                    isList: Bool,
                                                                     predicate: String,
                                                                     values: [AnyHashable],
                                                                     expectedCount: Int,
                                                                     query: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>)) {
         let colObj = realmWithTestPath().objects(ModernCollectionObject.self).first!
         var results: Results<ModernAllTypesObject>!
-        switch collectionType {
-        case .list:
+        if isList {
             results = colObj.list.query(query)
-        case .set:
+        } else {
             results = colObj.set.query(query)
-        case .map:
-                break
-            //results = colObj.map.query(query)
         }
-        colObj.list.query(query)
         XCTAssertEqual(results.count, expectedCount)
 
         let constructedPredicate = query(Query<ModernAllTypesObject>())._constructPredicate()
+        XCTAssertEqual(constructedPredicate.0,
+                       predicate)
+
+        for (e1, e2) in zip(constructedPredicate.1, values) {
+            XCTAssertEqual(e1 as! AnyHashable, e2)
+        }
+    }
+
+    private func assertMapQuery<T: _RealmSchemaDiscoverable>(on keyPath: KeyPath<ModernAllTypesObject, T>,
+                                                             predicate: String,
+                                                             values: [AnyHashable],
+                                                             expectedCount: Int,
+                                                             query: ((Query<ModernAllTypesObject?>) -> Query<ModernAllTypesObject?>)) {
+        let colObj = realmWithTestPath().objects(ModernCollectionObject.self).first!
+        var results: Results<ModernAllTypesObject?>!
+        results = colObj.map.query(query)
+        XCTAssertEqual(results.count, expectedCount)
+
+        let constructedPredicate = query(Query<ModernAllTypesObject?>())._constructPredicate()
         XCTAssertEqual(constructedPredicate.0,
                        predicate)
 
@@ -1261,6 +1269,22 @@ class QueryTests: TestCase {
         XCTAssertEqual(result2.count, 1)
     }
 
+    func testListContainsRange() {
+        % for property in listProperties + optListProperties:
+        % if property.category == 'numeric':
+        assertQuery(predicate: "${property.colName}.@min >= %@ && ${property.colName}.@max <= %@",
+                    values: [${property.foundationValue(0)}, ${property.foundationValue(1)}], expectedCount: 1) {
+            $0.${property.colName}.contains(${property.value(0)}...${property.value(1)})
+        }
+        assertQuery(predicate: "${property.colName}.@min >= %@ && ${property.colName}.@max < %@",
+                    values: [${property.foundationValue(0)}, ${property.foundationValue(1)}], expectedCount: 0) {
+            $0.${property.colName}.contains(${property.value(0)}..<${property.value(1)})
+        }
+
+        % end
+        % end
+    }
+
     func testListContainsAnyInObject() {
         % for property in listProperties + optListProperties:
         assertQuery(predicate: "ANY ${property.colName} IN %@",
@@ -1282,22 +1306,6 @@ class QueryTests: TestCase {
         }
     }
 
-    func testListContainsRange() {
-        % for property in listProperties + optListProperties:
-        % if property.category == 'numeric':
-        assertQuery(predicate: "${property.colName}.@min >= %@ && ${property.colName}.@max <= %@",
-                    values: [${property.foundationValue(0)}, ${property.foundationValue(1)}], expectedCount: 1) {
-            $0.${property.colName}.contains(${property.value(0)}...${property.value(1)})
-        }
-        assertQuery(predicate: "${property.colName}.@min >= %@ && ${property.colName}.@max < %@",
-                    values: [${property.foundationValue(0)}, ${property.foundationValue(1)}], expectedCount: 0) {
-            $0.${property.colName}.contains(${property.value(0)}..<${property.value(1)})
-        }
-
-        % end
-        % end
-    }
-
     func testListFromProperty() {
         let realm = realmWithTestPath()
         let colObj = ModernCollectionObject()
@@ -1308,13 +1316,13 @@ class QueryTests: TestCase {
         }
 
         % for property in properties + optProperties:
-        % value = property.enumName if property.enumName != None else property.foundationValue(0)
+        % value = property.enumName if property.enumName != None else property.foundationValue(1)
         assertCollectionQuery(on: \.${property.colName},
-                              collectionType: .list,
+                              isList: true,
                               predicate: "${property.colName} == %@",
                               values: [${value}],
                               expectedCount: 1) {
-            $0.${property.colName} == ${property.value(0)}
+            $0.${property.colName} == ${property.value(1)}
         }
         % end
     }
@@ -1420,13 +1428,13 @@ class QueryTests: TestCase {
         }
 
         % for property in properties + optProperties:
-        % value = property.enumName if property.enumName != None else property.foundationValue(0)
+        % value = property.enumName if property.enumName != None else property.foundationValue(1)
         assertCollectionQuery(on: \.${property.colName},
-                              collectionType: .list,
+                              isList: false,
                               predicate: "${property.colName} == %@",
                               values: [${value}],
                               expectedCount: 1) {
-            $0.${property.colName} == ${property.value(0)}
+            $0.${property.colName} == ${property.value(1)}
         }
         % end
     }
@@ -1698,6 +1706,47 @@ class QueryTests: TestCase {
         assertCollectionObjectQuery(predicate: "(map.@allKeys == %@ && map.objectCol.intCol == %@)", values: ["foo", 6], expectedCount: 1) {
             $0.map["foo"].objectCol.intCol == 6
         }
+    }
+
+    func testMapContainsAnyInObject() {
+        % for property in mapProperties + optMapProperties:
+        assertQuery(predicate: "ANY ${property.colName} IN %@",
+                    values: [NSArray(array: [${property.foundationValue(0)}, ${property.foundationValue(1)}])], expectedCount: 1) {
+            $0.${property.colName}.containsAny(in: [${property.value(0)}, ${property.value(1)}])
+        }
+        % end
+
+        let realm = realmWithTestPath()
+        let colObj = ModernCollectionObject()
+        let obj = objects().first!
+        colObj.map["foo"] = obj
+        try! realm.write {
+            realm.add(colObj)
+        }
+
+        assertCollectionObjectQuery(predicate: "ANY map IN %@", values: [NSArray(array: [obj])], expectedCount: 1) {
+            $0.map.containsAny(in: [obj])
+        }
+    }
+
+    func testMapFromProperty() {
+        let realm = realmWithTestPath()
+        let colObj = ModernCollectionObject()
+        let obj = objects().first!
+        colObj.map["foo"] = obj
+        try! realm.write {
+            realm.add(colObj)
+        }
+
+        % for property in properties + optProperties:
+        % value = property.enumName if property.enumName != None else property.foundationValue(1)
+        assertMapQuery(on: \.${property.colName},
+                       predicate: "${property.colName} == %@",
+                       values: [${value}],
+                       expectedCount: 1) {
+            $0.${property.colName} == ${property.value(1)}
+        }
+        % end
     }
 
     // MARK: Compound

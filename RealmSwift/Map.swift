@@ -264,6 +264,17 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
     }
 
     /**
+     Returns a `Results` containing all matching values in the map with the given query.
+
+     - Note: This should only be used with classes using the `@Persistable` property declaration.
+
+     - parameter predicate: The predicate with which to filter the objects.
+     */
+    public func query(_ query: ((Query<Value>) -> Query<Value>)) -> Results<Value> {
+        return filter(query(Query()).predicate)
+    }
+
+    /**
      Returns a Boolean value indicating whether the Map contains the key-value pair
      satisfies the given predicate
 
