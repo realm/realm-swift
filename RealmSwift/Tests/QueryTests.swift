@@ -8369,4 +8369,9111 @@ class QueryTests: TestCase {
         }
         assertThrows(query(Query<ModernAllTypesObject>())._constructPredicate(), reason: "Subquery predicates will only work on one collection at a time.")
     }
+
+    // MARK: Collection Aggregations
+
+    func testCollectionAggregatesAvg() {
+        let realm = realmWithTestPath()
+        let object = objects().first!
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["arrayInt": [1, 2, 3]])
+            if let oldObject = object.objectCol {
+                realm.delete(oldObject)
+            }
+            object.objectCol = modernObj
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt.@avg > %@", values: [1], expectedCount: 1) {
+            $0.objectCol.arrayInt.avg > 1
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt.@avg < %@", values: [3], expectedCount: 1) {
+            $0.objectCol.arrayInt.avg < 3
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt.@avg == %@", values: [2], expectedCount: 1) {
+            $0.objectCol.arrayInt.avg == 2
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt.@avg >= %@", values: [1], expectedCount: 1) {
+            $0.objectCol.arrayInt.avg >= 1
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt.@avg >= %@", values: [2], expectedCount: 1) {
+            $0.objectCol.arrayInt.avg >= 2
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt.@avg <= %@", values: [3], expectedCount: 1) {
+            $0.objectCol.arrayInt.avg <= 3
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt.@avg <= %@", values: [2], expectedCount: 1) {
+            $0.objectCol.arrayInt.avg <= 2
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "objectCol.arrayInt.@avg != %@", values: [2], expectedCount: 1) {
+            $0.objectCol.arrayInt.avg != 2
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt.@avg != %@", values: [1], expectedCount: 2) {
+            $0.objectCol.arrayInt.avg != 1
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["arrayInt8": [Int8(8), Int8(9), Int8(10)]])
+            if let oldObject = object.objectCol {
+                realm.delete(oldObject)
+            }
+            object.objectCol = modernObj
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt8.@avg > %@", values: [Int8(8)], expectedCount: 1) {
+            $0.objectCol.arrayInt8.avg > Int8(8)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt8.@avg < %@", values: [Int8(10)], expectedCount: 1) {
+            $0.objectCol.arrayInt8.avg < Int8(10)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt8.@avg == %@", values: [Int8(9)], expectedCount: 1) {
+            $0.objectCol.arrayInt8.avg == Int8(9)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt8.@avg >= %@", values: [Int8(8)], expectedCount: 1) {
+            $0.objectCol.arrayInt8.avg >= Int8(8)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt8.@avg >= %@", values: [Int8(9)], expectedCount: 1) {
+            $0.objectCol.arrayInt8.avg >= Int8(9)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt8.@avg <= %@", values: [Int8(10)], expectedCount: 1) {
+            $0.objectCol.arrayInt8.avg <= Int8(10)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt8.@avg <= %@", values: [Int8(9)], expectedCount: 1) {
+            $0.objectCol.arrayInt8.avg <= Int8(9)
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "objectCol.arrayInt8.@avg != %@", values: [Int8(9)], expectedCount: 1) {
+            $0.objectCol.arrayInt8.avg != Int8(9)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt8.@avg != %@", values: [Int8(8)], expectedCount: 2) {
+            $0.objectCol.arrayInt8.avg != Int8(8)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["arrayInt16": [Int16(16), Int16(17), Int16(18)]])
+            if let oldObject = object.objectCol {
+                realm.delete(oldObject)
+            }
+            object.objectCol = modernObj
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt16.@avg > %@", values: [Int16(16)], expectedCount: 1) {
+            $0.objectCol.arrayInt16.avg > Int16(16)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt16.@avg < %@", values: [Int16(18)], expectedCount: 1) {
+            $0.objectCol.arrayInt16.avg < Int16(18)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt16.@avg == %@", values: [Int16(17)], expectedCount: 1) {
+            $0.objectCol.arrayInt16.avg == Int16(17)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt16.@avg >= %@", values: [Int16(16)], expectedCount: 1) {
+            $0.objectCol.arrayInt16.avg >= Int16(16)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt16.@avg >= %@", values: [Int16(17)], expectedCount: 1) {
+            $0.objectCol.arrayInt16.avg >= Int16(17)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt16.@avg <= %@", values: [Int16(18)], expectedCount: 1) {
+            $0.objectCol.arrayInt16.avg <= Int16(18)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt16.@avg <= %@", values: [Int16(17)], expectedCount: 1) {
+            $0.objectCol.arrayInt16.avg <= Int16(17)
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "objectCol.arrayInt16.@avg != %@", values: [Int16(17)], expectedCount: 1) {
+            $0.objectCol.arrayInt16.avg != Int16(17)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt16.@avg != %@", values: [Int16(16)], expectedCount: 2) {
+            $0.objectCol.arrayInt16.avg != Int16(16)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["arrayInt32": [Int32(32), Int32(33), Int32(34)]])
+            if let oldObject = object.objectCol {
+                realm.delete(oldObject)
+            }
+            object.objectCol = modernObj
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt32.@avg > %@", values: [Int32(32)], expectedCount: 1) {
+            $0.objectCol.arrayInt32.avg > Int32(32)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt32.@avg < %@", values: [Int32(34)], expectedCount: 1) {
+            $0.objectCol.arrayInt32.avg < Int32(34)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt32.@avg == %@", values: [Int32(33)], expectedCount: 1) {
+            $0.objectCol.arrayInt32.avg == Int32(33)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt32.@avg >= %@", values: [Int32(32)], expectedCount: 1) {
+            $0.objectCol.arrayInt32.avg >= Int32(32)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt32.@avg >= %@", values: [Int32(33)], expectedCount: 1) {
+            $0.objectCol.arrayInt32.avg >= Int32(33)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt32.@avg <= %@", values: [Int32(34)], expectedCount: 1) {
+            $0.objectCol.arrayInt32.avg <= Int32(34)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt32.@avg <= %@", values: [Int32(33)], expectedCount: 1) {
+            $0.objectCol.arrayInt32.avg <= Int32(33)
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "objectCol.arrayInt32.@avg != %@", values: [Int32(33)], expectedCount: 1) {
+            $0.objectCol.arrayInt32.avg != Int32(33)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt32.@avg != %@", values: [Int32(32)], expectedCount: 2) {
+            $0.objectCol.arrayInt32.avg != Int32(32)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["arrayInt64": [Int64(64), Int64(65), Int64(66)]])
+            if let oldObject = object.objectCol {
+                realm.delete(oldObject)
+            }
+            object.objectCol = modernObj
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt64.@avg > %@", values: [Int64(64)], expectedCount: 1) {
+            $0.objectCol.arrayInt64.avg > Int64(64)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt64.@avg < %@", values: [Int64(66)], expectedCount: 1) {
+            $0.objectCol.arrayInt64.avg < Int64(66)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt64.@avg == %@", values: [Int64(65)], expectedCount: 1) {
+            $0.objectCol.arrayInt64.avg == Int64(65)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt64.@avg >= %@", values: [Int64(64)], expectedCount: 1) {
+            $0.objectCol.arrayInt64.avg >= Int64(64)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt64.@avg >= %@", values: [Int64(65)], expectedCount: 1) {
+            $0.objectCol.arrayInt64.avg >= Int64(65)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt64.@avg <= %@", values: [Int64(66)], expectedCount: 1) {
+            $0.objectCol.arrayInt64.avg <= Int64(66)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt64.@avg <= %@", values: [Int64(65)], expectedCount: 1) {
+            $0.objectCol.arrayInt64.avg <= Int64(65)
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "objectCol.arrayInt64.@avg != %@", values: [Int64(65)], expectedCount: 1) {
+            $0.objectCol.arrayInt64.avg != Int64(65)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt64.@avg != %@", values: [Int64(64)], expectedCount: 2) {
+            $0.objectCol.arrayInt64.avg != Int64(64)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["arrayFloat": [Float(5.55444333), Float(6.55444333), Float(7.55444333)]])
+            if let oldObject = object.objectCol {
+                realm.delete(oldObject)
+            }
+            object.objectCol = modernObj
+        }
+
+        assertQuery(predicate: "objectCol.arrayFloat.@avg > %@", values: [Float(5.55444333)], expectedCount: 1) {
+            $0.objectCol.arrayFloat.avg > Float(5.55444333)
+        }
+
+        assertQuery(predicate: "objectCol.arrayFloat.@avg < %@", values: [Float(7.55444333)], expectedCount: 1) {
+            $0.objectCol.arrayFloat.avg < Float(7.55444333)
+        }
+
+        assertQuery(predicate: "objectCol.arrayFloat.@avg == %@", values: [Float(6.55444333)], expectedCount: 1) {
+            $0.objectCol.arrayFloat.avg == Float(6.55444333)
+        }
+
+        assertQuery(predicate: "objectCol.arrayFloat.@avg >= %@", values: [Float(5.55444333)], expectedCount: 1) {
+            $0.objectCol.arrayFloat.avg >= Float(5.55444333)
+        }
+
+        assertQuery(predicate: "objectCol.arrayFloat.@avg >= %@", values: [Float(6.55444333)], expectedCount: 1) {
+            $0.objectCol.arrayFloat.avg >= Float(6.55444333)
+        }
+
+        assertQuery(predicate: "objectCol.arrayFloat.@avg <= %@", values: [Float(7.55444333)], expectedCount: 1) {
+            $0.objectCol.arrayFloat.avg <= Float(7.55444333)
+        }
+
+        assertQuery(predicate: "objectCol.arrayFloat.@avg <= %@", values: [Float(6.55444333)], expectedCount: 1) {
+            $0.objectCol.arrayFloat.avg <= Float(6.55444333)
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "objectCol.arrayFloat.@avg != %@", values: [Float(6.55444333)], expectedCount: 1) {
+            $0.objectCol.arrayFloat.avg != Float(6.55444333)
+        }
+
+        assertQuery(predicate: "objectCol.arrayFloat.@avg != %@", values: [Float(5.55444333)], expectedCount: 2) {
+            $0.objectCol.arrayFloat.avg != Float(5.55444333)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["arrayDouble": [123.456, 234.456, 345.567]])
+            if let oldObject = object.objectCol {
+                realm.delete(oldObject)
+            }
+            object.objectCol = modernObj
+        }
+
+        assertQuery(predicate: "objectCol.arrayDouble.@avg > %@", values: [123.456], expectedCount: 1) {
+            $0.objectCol.arrayDouble.avg > 123.456
+        }
+
+        assertQuery(predicate: "objectCol.arrayDouble.@avg < %@", values: [345.567], expectedCount: 1) {
+            $0.objectCol.arrayDouble.avg < 345.567
+        }
+
+        assertQuery(predicate: "objectCol.arrayDouble.@avg == %@", values: [234.456], expectedCount: 1) {
+            $0.objectCol.arrayDouble.avg == 234.456
+        }
+
+        assertQuery(predicate: "objectCol.arrayDouble.@avg >= %@", values: [123.456], expectedCount: 1) {
+            $0.objectCol.arrayDouble.avg >= 123.456
+        }
+
+        assertQuery(predicate: "objectCol.arrayDouble.@avg >= %@", values: [234.456], expectedCount: 1) {
+            $0.objectCol.arrayDouble.avg >= 234.456
+        }
+
+        assertQuery(predicate: "objectCol.arrayDouble.@avg <= %@", values: [345.567], expectedCount: 1) {
+            $0.objectCol.arrayDouble.avg <= 345.567
+        }
+
+        assertQuery(predicate: "objectCol.arrayDouble.@avg <= %@", values: [234.456], expectedCount: 1) {
+            $0.objectCol.arrayDouble.avg <= 234.456
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "objectCol.arrayDouble.@avg != %@", values: [234.456], expectedCount: 1) {
+            $0.objectCol.arrayDouble.avg != 234.456
+        }
+
+        assertQuery(predicate: "objectCol.arrayDouble.@avg != %@", values: [123.456], expectedCount: 2) {
+            $0.objectCol.arrayDouble.avg != 123.456
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["arrayDecimal": [Decimal128(123.456), Decimal128(456.789), Decimal128(963.852)]])
+            if let oldObject = object.objectCol {
+                realm.delete(oldObject)
+            }
+            object.objectCol = modernObj
+        }
+
+        assertQuery(predicate: "objectCol.arrayDecimal.@avg > %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.objectCol.arrayDecimal.avg > Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "objectCol.arrayDecimal.@avg < %@", values: [Decimal128(963.852)], expectedCount: 1) {
+            $0.objectCol.arrayDecimal.avg < Decimal128(963.852)
+        }
+
+        assertQuery(predicate: "objectCol.arrayDecimal.@avg == %@", values: [Decimal128(456.789)], expectedCount: 1) {
+            $0.objectCol.arrayDecimal.avg == Decimal128(456.789)
+        }
+
+        assertQuery(predicate: "objectCol.arrayDecimal.@avg >= %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.objectCol.arrayDecimal.avg >= Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "objectCol.arrayDecimal.@avg >= %@", values: [Decimal128(456.789)], expectedCount: 1) {
+            $0.objectCol.arrayDecimal.avg >= Decimal128(456.789)
+        }
+
+        assertQuery(predicate: "objectCol.arrayDecimal.@avg <= %@", values: [Decimal128(963.852)], expectedCount: 1) {
+            $0.objectCol.arrayDecimal.avg <= Decimal128(963.852)
+        }
+
+        assertQuery(predicate: "objectCol.arrayDecimal.@avg <= %@", values: [Decimal128(456.789)], expectedCount: 1) {
+            $0.objectCol.arrayDecimal.avg <= Decimal128(456.789)
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "objectCol.arrayDecimal.@avg != %@", values: [Decimal128(456.789)], expectedCount: 1) {
+            $0.objectCol.arrayDecimal.avg != Decimal128(456.789)
+        }
+
+        assertQuery(predicate: "objectCol.arrayDecimal.@avg != %@", values: [Decimal128(123.456)], expectedCount: 2) {
+            $0.objectCol.arrayDecimal.avg != Decimal128(123.456)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["arrayOptInt": [1, 2, 3]])
+            if let oldObject = object.objectCol {
+                realm.delete(oldObject)
+            }
+            object.objectCol = modernObj
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt.@avg > %@", values: [1], expectedCount: 1) {
+            $0.objectCol.arrayOptInt.avg > 1
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt.@avg < %@", values: [3], expectedCount: 1) {
+            $0.objectCol.arrayOptInt.avg < 3
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt.@avg == %@", values: [2], expectedCount: 1) {
+            $0.objectCol.arrayOptInt.avg == 2
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt.@avg >= %@", values: [1], expectedCount: 1) {
+            $0.objectCol.arrayOptInt.avg >= 1
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt.@avg >= %@", values: [2], expectedCount: 1) {
+            $0.objectCol.arrayOptInt.avg >= 2
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt.@avg <= %@", values: [3], expectedCount: 1) {
+            $0.objectCol.arrayOptInt.avg <= 3
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt.@avg <= %@", values: [2], expectedCount: 1) {
+            $0.objectCol.arrayOptInt.avg <= 2
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "objectCol.arrayOptInt.@avg != %@", values: [2], expectedCount: 1) {
+            $0.objectCol.arrayOptInt.avg != 2
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt.@avg != %@", values: [1], expectedCount: 2) {
+            $0.objectCol.arrayOptInt.avg != 1
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["arrayOptInt8": [Int8(8), Int8(9), Int8(10)]])
+            if let oldObject = object.objectCol {
+                realm.delete(oldObject)
+            }
+            object.objectCol = modernObj
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt8.@avg > %@", values: [Int8(8)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt8.avg > Int8(8)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt8.@avg < %@", values: [Int8(10)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt8.avg < Int8(10)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt8.@avg == %@", values: [Int8(9)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt8.avg == Int8(9)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt8.@avg >= %@", values: [Int8(8)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt8.avg >= Int8(8)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt8.@avg >= %@", values: [Int8(9)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt8.avg >= Int8(9)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt8.@avg <= %@", values: [Int8(10)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt8.avg <= Int8(10)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt8.@avg <= %@", values: [Int8(9)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt8.avg <= Int8(9)
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "objectCol.arrayOptInt8.@avg != %@", values: [Int8(9)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt8.avg != Int8(9)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt8.@avg != %@", values: [Int8(8)], expectedCount: 2) {
+            $0.objectCol.arrayOptInt8.avg != Int8(8)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["arrayOptInt16": [Int16(16), Int16(17), Int16(18)]])
+            if let oldObject = object.objectCol {
+                realm.delete(oldObject)
+            }
+            object.objectCol = modernObj
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt16.@avg > %@", values: [Int16(16)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt16.avg > Int16(16)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt16.@avg < %@", values: [Int16(18)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt16.avg < Int16(18)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt16.@avg == %@", values: [Int16(17)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt16.avg == Int16(17)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt16.@avg >= %@", values: [Int16(16)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt16.avg >= Int16(16)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt16.@avg >= %@", values: [Int16(17)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt16.avg >= Int16(17)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt16.@avg <= %@", values: [Int16(18)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt16.avg <= Int16(18)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt16.@avg <= %@", values: [Int16(17)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt16.avg <= Int16(17)
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "objectCol.arrayOptInt16.@avg != %@", values: [Int16(17)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt16.avg != Int16(17)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt16.@avg != %@", values: [Int16(16)], expectedCount: 2) {
+            $0.objectCol.arrayOptInt16.avg != Int16(16)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["arrayOptInt32": [Int32(32), Int32(33), Int32(34)]])
+            if let oldObject = object.objectCol {
+                realm.delete(oldObject)
+            }
+            object.objectCol = modernObj
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt32.@avg > %@", values: [Int32(32)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt32.avg > Int32(32)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt32.@avg < %@", values: [Int32(34)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt32.avg < Int32(34)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt32.@avg == %@", values: [Int32(33)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt32.avg == Int32(33)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt32.@avg >= %@", values: [Int32(32)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt32.avg >= Int32(32)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt32.@avg >= %@", values: [Int32(33)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt32.avg >= Int32(33)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt32.@avg <= %@", values: [Int32(34)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt32.avg <= Int32(34)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt32.@avg <= %@", values: [Int32(33)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt32.avg <= Int32(33)
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "objectCol.arrayOptInt32.@avg != %@", values: [Int32(33)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt32.avg != Int32(33)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt32.@avg != %@", values: [Int32(32)], expectedCount: 2) {
+            $0.objectCol.arrayOptInt32.avg != Int32(32)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["arrayOptInt64": [Int64(64), Int64(65), Int64(66)]])
+            if let oldObject = object.objectCol {
+                realm.delete(oldObject)
+            }
+            object.objectCol = modernObj
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt64.@avg > %@", values: [Int64(64)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt64.avg > Int64(64)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt64.@avg < %@", values: [Int64(66)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt64.avg < Int64(66)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt64.@avg == %@", values: [Int64(65)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt64.avg == Int64(65)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt64.@avg >= %@", values: [Int64(64)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt64.avg >= Int64(64)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt64.@avg >= %@", values: [Int64(65)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt64.avg >= Int64(65)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt64.@avg <= %@", values: [Int64(66)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt64.avg <= Int64(66)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt64.@avg <= %@", values: [Int64(65)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt64.avg <= Int64(65)
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "objectCol.arrayOptInt64.@avg != %@", values: [Int64(65)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt64.avg != Int64(65)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt64.@avg != %@", values: [Int64(64)], expectedCount: 2) {
+            $0.objectCol.arrayOptInt64.avg != Int64(64)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["arrayOptFloat": [Float(5.55444333), Float(6.55444333), Float(7.55444333)]])
+            if let oldObject = object.objectCol {
+                realm.delete(oldObject)
+            }
+            object.objectCol = modernObj
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptFloat.@avg > %@", values: [Float(5.55444333)], expectedCount: 1) {
+            $0.objectCol.arrayOptFloat.avg > Float(5.55444333)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptFloat.@avg < %@", values: [Float(7.55444333)], expectedCount: 1) {
+            $0.objectCol.arrayOptFloat.avg < Float(7.55444333)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptFloat.@avg == %@", values: [Float(6.55444333)], expectedCount: 1) {
+            $0.objectCol.arrayOptFloat.avg == Float(6.55444333)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptFloat.@avg >= %@", values: [Float(5.55444333)], expectedCount: 1) {
+            $0.objectCol.arrayOptFloat.avg >= Float(5.55444333)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptFloat.@avg >= %@", values: [Float(6.55444333)], expectedCount: 1) {
+            $0.objectCol.arrayOptFloat.avg >= Float(6.55444333)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptFloat.@avg <= %@", values: [Float(7.55444333)], expectedCount: 1) {
+            $0.objectCol.arrayOptFloat.avg <= Float(7.55444333)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptFloat.@avg <= %@", values: [Float(6.55444333)], expectedCount: 1) {
+            $0.objectCol.arrayOptFloat.avg <= Float(6.55444333)
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "objectCol.arrayOptFloat.@avg != %@", values: [Float(6.55444333)], expectedCount: 1) {
+            $0.objectCol.arrayOptFloat.avg != Float(6.55444333)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptFloat.@avg != %@", values: [Float(5.55444333)], expectedCount: 2) {
+            $0.objectCol.arrayOptFloat.avg != Float(5.55444333)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["arrayOptDouble": [123.456, 234.456, 345.567]])
+            if let oldObject = object.objectCol {
+                realm.delete(oldObject)
+            }
+            object.objectCol = modernObj
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDouble.@avg > %@", values: [123.456], expectedCount: 1) {
+            $0.objectCol.arrayOptDouble.avg > 123.456
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDouble.@avg < %@", values: [345.567], expectedCount: 1) {
+            $0.objectCol.arrayOptDouble.avg < 345.567
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDouble.@avg == %@", values: [234.456], expectedCount: 1) {
+            $0.objectCol.arrayOptDouble.avg == 234.456
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDouble.@avg >= %@", values: [123.456], expectedCount: 1) {
+            $0.objectCol.arrayOptDouble.avg >= 123.456
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDouble.@avg >= %@", values: [234.456], expectedCount: 1) {
+            $0.objectCol.arrayOptDouble.avg >= 234.456
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDouble.@avg <= %@", values: [345.567], expectedCount: 1) {
+            $0.objectCol.arrayOptDouble.avg <= 345.567
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDouble.@avg <= %@", values: [234.456], expectedCount: 1) {
+            $0.objectCol.arrayOptDouble.avg <= 234.456
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "objectCol.arrayOptDouble.@avg != %@", values: [234.456], expectedCount: 1) {
+            $0.objectCol.arrayOptDouble.avg != 234.456
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDouble.@avg != %@", values: [123.456], expectedCount: 2) {
+            $0.objectCol.arrayOptDouble.avg != 123.456
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["arrayOptDecimal": [Decimal128(123.456), Decimal128(456.789), Decimal128(963.852)]])
+            if let oldObject = object.objectCol {
+                realm.delete(oldObject)
+            }
+            object.objectCol = modernObj
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDecimal.@avg > %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.objectCol.arrayOptDecimal.avg > Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDecimal.@avg < %@", values: [Decimal128(963.852)], expectedCount: 1) {
+            $0.objectCol.arrayOptDecimal.avg < Decimal128(963.852)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDecimal.@avg == %@", values: [Decimal128(456.789)], expectedCount: 1) {
+            $0.objectCol.arrayOptDecimal.avg == Decimal128(456.789)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDecimal.@avg >= %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.objectCol.arrayOptDecimal.avg >= Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDecimal.@avg >= %@", values: [Decimal128(456.789)], expectedCount: 1) {
+            $0.objectCol.arrayOptDecimal.avg >= Decimal128(456.789)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDecimal.@avg <= %@", values: [Decimal128(963.852)], expectedCount: 1) {
+            $0.objectCol.arrayOptDecimal.avg <= Decimal128(963.852)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDecimal.@avg <= %@", values: [Decimal128(456.789)], expectedCount: 1) {
+            $0.objectCol.arrayOptDecimal.avg <= Decimal128(456.789)
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "objectCol.arrayOptDecimal.@avg != %@", values: [Decimal128(456.789)], expectedCount: 1) {
+            $0.objectCol.arrayOptDecimal.avg != Decimal128(456.789)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDecimal.@avg != %@", values: [Decimal128(123.456)], expectedCount: 2) {
+            $0.objectCol.arrayOptDecimal.avg != Decimal128(123.456)
+        }
+    }
+
+    func testCollectionAvg() {
+        let realm = realmWithTestPath()
+        let object = objects().first!
+
+        try! realm.write {
+            object.arrayInt.removeAll()
+            object.arrayInt.append(objectsIn: [1, 2, 3])
+        }
+
+        assertQuery(predicate: "arrayInt.@avg > %@", values: [1], expectedCount: 1) {
+            $0.arrayInt.avg > 1
+        }
+
+        assertQuery(predicate: "arrayInt.@avg < %@", values: [3], expectedCount: 1) {
+            $0.arrayInt.avg < 3
+        }
+
+        assertQuery(predicate: "arrayInt.@avg == %@", values: [2], expectedCount: 1) {
+            $0.arrayInt.avg == 2
+        }
+
+        assertQuery(predicate: "arrayInt.@avg >= %@", values: [1], expectedCount: 1) {
+            $0.arrayInt.avg >= 1
+        }
+
+        assertQuery(predicate: "arrayInt.@avg >= %@", values: [2], expectedCount: 1) {
+            $0.arrayInt.avg >= 2
+        }
+
+        assertQuery(predicate: "arrayInt.@avg <= %@", values: [3], expectedCount: 1) {
+            $0.arrayInt.avg <= 3
+        }
+
+        assertQuery(predicate: "arrayInt.@avg <= %@", values: [2], expectedCount: 1) {
+            $0.arrayInt.avg <= 2
+        }
+
+        assertQuery(predicate: "arrayInt.@avg != %@", values: [2], expectedCount: 0) {
+            $0.arrayInt.avg != 2
+        }
+
+        assertQuery(predicate: "arrayInt.@avg != %@", values: [1], expectedCount: 1) {
+            $0.arrayInt.avg != 1
+        }
+
+        try! realm.write {
+            object.arrayInt8.removeAll()
+            object.arrayInt8.append(objectsIn: [Int8(8), Int8(9), Int8(10)])
+        }
+
+        assertQuery(predicate: "arrayInt8.@avg > %@", values: [Int8(8)], expectedCount: 1) {
+            $0.arrayInt8.avg > Int8(8)
+        }
+
+        assertQuery(predicate: "arrayInt8.@avg < %@", values: [Int8(10)], expectedCount: 1) {
+            $0.arrayInt8.avg < Int8(10)
+        }
+
+        assertQuery(predicate: "arrayInt8.@avg == %@", values: [Int8(9)], expectedCount: 1) {
+            $0.arrayInt8.avg == Int8(9)
+        }
+
+        assertQuery(predicate: "arrayInt8.@avg >= %@", values: [Int8(8)], expectedCount: 1) {
+            $0.arrayInt8.avg >= Int8(8)
+        }
+
+        assertQuery(predicate: "arrayInt8.@avg >= %@", values: [Int8(9)], expectedCount: 1) {
+            $0.arrayInt8.avg >= Int8(9)
+        }
+
+        assertQuery(predicate: "arrayInt8.@avg <= %@", values: [Int8(10)], expectedCount: 1) {
+            $0.arrayInt8.avg <= Int8(10)
+        }
+
+        assertQuery(predicate: "arrayInt8.@avg <= %@", values: [Int8(9)], expectedCount: 1) {
+            $0.arrayInt8.avg <= Int8(9)
+        }
+
+        assertQuery(predicate: "arrayInt8.@avg != %@", values: [Int8(9)], expectedCount: 0) {
+            $0.arrayInt8.avg != Int8(9)
+        }
+
+        assertQuery(predicate: "arrayInt8.@avg != %@", values: [Int8(8)], expectedCount: 1) {
+            $0.arrayInt8.avg != Int8(8)
+        }
+
+        try! realm.write {
+            object.arrayInt16.removeAll()
+            object.arrayInt16.append(objectsIn: [Int16(16), Int16(17), Int16(18)])
+        }
+
+        assertQuery(predicate: "arrayInt16.@avg > %@", values: [Int16(16)], expectedCount: 1) {
+            $0.arrayInt16.avg > Int16(16)
+        }
+
+        assertQuery(predicate: "arrayInt16.@avg < %@", values: [Int16(18)], expectedCount: 1) {
+            $0.arrayInt16.avg < Int16(18)
+        }
+
+        assertQuery(predicate: "arrayInt16.@avg == %@", values: [Int16(17)], expectedCount: 1) {
+            $0.arrayInt16.avg == Int16(17)
+        }
+
+        assertQuery(predicate: "arrayInt16.@avg >= %@", values: [Int16(16)], expectedCount: 1) {
+            $0.arrayInt16.avg >= Int16(16)
+        }
+
+        assertQuery(predicate: "arrayInt16.@avg >= %@", values: [Int16(17)], expectedCount: 1) {
+            $0.arrayInt16.avg >= Int16(17)
+        }
+
+        assertQuery(predicate: "arrayInt16.@avg <= %@", values: [Int16(18)], expectedCount: 1) {
+            $0.arrayInt16.avg <= Int16(18)
+        }
+
+        assertQuery(predicate: "arrayInt16.@avg <= %@", values: [Int16(17)], expectedCount: 1) {
+            $0.arrayInt16.avg <= Int16(17)
+        }
+
+        assertQuery(predicate: "arrayInt16.@avg != %@", values: [Int16(17)], expectedCount: 0) {
+            $0.arrayInt16.avg != Int16(17)
+        }
+
+        assertQuery(predicate: "arrayInt16.@avg != %@", values: [Int16(16)], expectedCount: 1) {
+            $0.arrayInt16.avg != Int16(16)
+        }
+
+        try! realm.write {
+            object.arrayInt32.removeAll()
+            object.arrayInt32.append(objectsIn: [Int32(32), Int32(33), Int32(34)])
+        }
+
+        assertQuery(predicate: "arrayInt32.@avg > %@", values: [Int32(32)], expectedCount: 1) {
+            $0.arrayInt32.avg > Int32(32)
+        }
+
+        assertQuery(predicate: "arrayInt32.@avg < %@", values: [Int32(34)], expectedCount: 1) {
+            $0.arrayInt32.avg < Int32(34)
+        }
+
+        assertQuery(predicate: "arrayInt32.@avg == %@", values: [Int32(33)], expectedCount: 1) {
+            $0.arrayInt32.avg == Int32(33)
+        }
+
+        assertQuery(predicate: "arrayInt32.@avg >= %@", values: [Int32(32)], expectedCount: 1) {
+            $0.arrayInt32.avg >= Int32(32)
+        }
+
+        assertQuery(predicate: "arrayInt32.@avg >= %@", values: [Int32(33)], expectedCount: 1) {
+            $0.arrayInt32.avg >= Int32(33)
+        }
+
+        assertQuery(predicate: "arrayInt32.@avg <= %@", values: [Int32(34)], expectedCount: 1) {
+            $0.arrayInt32.avg <= Int32(34)
+        }
+
+        assertQuery(predicate: "arrayInt32.@avg <= %@", values: [Int32(33)], expectedCount: 1) {
+            $0.arrayInt32.avg <= Int32(33)
+        }
+
+        assertQuery(predicate: "arrayInt32.@avg != %@", values: [Int32(33)], expectedCount: 0) {
+            $0.arrayInt32.avg != Int32(33)
+        }
+
+        assertQuery(predicate: "arrayInt32.@avg != %@", values: [Int32(32)], expectedCount: 1) {
+            $0.arrayInt32.avg != Int32(32)
+        }
+
+        try! realm.write {
+            object.arrayInt64.removeAll()
+            object.arrayInt64.append(objectsIn: [Int64(64), Int64(65), Int64(66)])
+        }
+
+        assertQuery(predicate: "arrayInt64.@avg > %@", values: [Int64(64)], expectedCount: 1) {
+            $0.arrayInt64.avg > Int64(64)
+        }
+
+        assertQuery(predicate: "arrayInt64.@avg < %@", values: [Int64(66)], expectedCount: 1) {
+            $0.arrayInt64.avg < Int64(66)
+        }
+
+        assertQuery(predicate: "arrayInt64.@avg == %@", values: [Int64(65)], expectedCount: 1) {
+            $0.arrayInt64.avg == Int64(65)
+        }
+
+        assertQuery(predicate: "arrayInt64.@avg >= %@", values: [Int64(64)], expectedCount: 1) {
+            $0.arrayInt64.avg >= Int64(64)
+        }
+
+        assertQuery(predicate: "arrayInt64.@avg >= %@", values: [Int64(65)], expectedCount: 1) {
+            $0.arrayInt64.avg >= Int64(65)
+        }
+
+        assertQuery(predicate: "arrayInt64.@avg <= %@", values: [Int64(66)], expectedCount: 1) {
+            $0.arrayInt64.avg <= Int64(66)
+        }
+
+        assertQuery(predicate: "arrayInt64.@avg <= %@", values: [Int64(65)], expectedCount: 1) {
+            $0.arrayInt64.avg <= Int64(65)
+        }
+
+        assertQuery(predicate: "arrayInt64.@avg != %@", values: [Int64(65)], expectedCount: 0) {
+            $0.arrayInt64.avg != Int64(65)
+        }
+
+        assertQuery(predicate: "arrayInt64.@avg != %@", values: [Int64(64)], expectedCount: 1) {
+            $0.arrayInt64.avg != Int64(64)
+        }
+
+        try! realm.write {
+            object.arrayFloat.removeAll()
+            object.arrayFloat.append(objectsIn: [Float(5.55444333), Float(6.55444333), Float(7.55444333)])
+        }
+
+        assertQuery(predicate: "arrayFloat.@avg > %@", values: [Float(5.55444333)], expectedCount: 1) {
+            $0.arrayFloat.avg > Float(5.55444333)
+        }
+
+        assertQuery(predicate: "arrayFloat.@avg < %@", values: [Float(7.55444333)], expectedCount: 1) {
+            $0.arrayFloat.avg < Float(7.55444333)
+        }
+
+        assertQuery(predicate: "arrayFloat.@avg == %@", values: [Float(6.55444333)], expectedCount: 1) {
+            $0.arrayFloat.avg == Float(6.55444333)
+        }
+
+        assertQuery(predicate: "arrayFloat.@avg >= %@", values: [Float(5.55444333)], expectedCount: 1) {
+            $0.arrayFloat.avg >= Float(5.55444333)
+        }
+
+        assertQuery(predicate: "arrayFloat.@avg >= %@", values: [Float(6.55444333)], expectedCount: 1) {
+            $0.arrayFloat.avg >= Float(6.55444333)
+        }
+
+        assertQuery(predicate: "arrayFloat.@avg <= %@", values: [Float(7.55444333)], expectedCount: 1) {
+            $0.arrayFloat.avg <= Float(7.55444333)
+        }
+
+        assertQuery(predicate: "arrayFloat.@avg <= %@", values: [Float(6.55444333)], expectedCount: 1) {
+            $0.arrayFloat.avg <= Float(6.55444333)
+        }
+
+        assertQuery(predicate: "arrayFloat.@avg != %@", values: [Float(6.55444333)], expectedCount: 0) {
+            $0.arrayFloat.avg != Float(6.55444333)
+        }
+
+        assertQuery(predicate: "arrayFloat.@avg != %@", values: [Float(5.55444333)], expectedCount: 1) {
+            $0.arrayFloat.avg != Float(5.55444333)
+        }
+
+        try! realm.write {
+            object.arrayDouble.removeAll()
+            object.arrayDouble.append(objectsIn: [123.456, 234.456, 345.567])
+        }
+
+        assertQuery(predicate: "arrayDouble.@avg > %@", values: [123.456], expectedCount: 1) {
+            $0.arrayDouble.avg > 123.456
+        }
+
+        assertQuery(predicate: "arrayDouble.@avg < %@", values: [345.567], expectedCount: 1) {
+            $0.arrayDouble.avg < 345.567
+        }
+
+        assertQuery(predicate: "arrayDouble.@avg == %@", values: [234.456], expectedCount: 1) {
+            $0.arrayDouble.avg == 234.456
+        }
+
+        assertQuery(predicate: "arrayDouble.@avg >= %@", values: [123.456], expectedCount: 1) {
+            $0.arrayDouble.avg >= 123.456
+        }
+
+        assertQuery(predicate: "arrayDouble.@avg >= %@", values: [234.456], expectedCount: 1) {
+            $0.arrayDouble.avg >= 234.456
+        }
+
+        assertQuery(predicate: "arrayDouble.@avg <= %@", values: [345.567], expectedCount: 1) {
+            $0.arrayDouble.avg <= 345.567
+        }
+
+        assertQuery(predicate: "arrayDouble.@avg <= %@", values: [234.456], expectedCount: 1) {
+            $0.arrayDouble.avg <= 234.456
+        }
+
+        assertQuery(predicate: "arrayDouble.@avg != %@", values: [234.456], expectedCount: 0) {
+            $0.arrayDouble.avg != 234.456
+        }
+
+        assertQuery(predicate: "arrayDouble.@avg != %@", values: [123.456], expectedCount: 1) {
+            $0.arrayDouble.avg != 123.456
+        }
+
+        try! realm.write {
+            object.arrayDecimal.removeAll()
+            object.arrayDecimal.append(objectsIn: [Decimal128(123.456), Decimal128(456.789), Decimal128(963.852)])
+        }
+
+        assertQuery(predicate: "arrayDecimal.@avg > %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.arrayDecimal.avg > Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "arrayDecimal.@avg < %@", values: [Decimal128(963.852)], expectedCount: 1) {
+            $0.arrayDecimal.avg < Decimal128(963.852)
+        }
+
+        assertQuery(predicate: "arrayDecimal.@avg == %@", values: [Decimal128(456.789)], expectedCount: 1) {
+            $0.arrayDecimal.avg == Decimal128(456.789)
+        }
+
+        assertQuery(predicate: "arrayDecimal.@avg >= %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.arrayDecimal.avg >= Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "arrayDecimal.@avg >= %@", values: [Decimal128(456.789)], expectedCount: 1) {
+            $0.arrayDecimal.avg >= Decimal128(456.789)
+        }
+
+        assertQuery(predicate: "arrayDecimal.@avg <= %@", values: [Decimal128(963.852)], expectedCount: 1) {
+            $0.arrayDecimal.avg <= Decimal128(963.852)
+        }
+
+        assertQuery(predicate: "arrayDecimal.@avg <= %@", values: [Decimal128(456.789)], expectedCount: 1) {
+            $0.arrayDecimal.avg <= Decimal128(456.789)
+        }
+
+        assertQuery(predicate: "arrayDecimal.@avg != %@", values: [Decimal128(456.789)], expectedCount: 0) {
+            $0.arrayDecimal.avg != Decimal128(456.789)
+        }
+
+        assertQuery(predicate: "arrayDecimal.@avg != %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.arrayDecimal.avg != Decimal128(123.456)
+        }
+
+        try! realm.write {
+            object.arrayOptInt.removeAll()
+            object.arrayOptInt.append(objectsIn: [1, 2, 3])
+        }
+
+        assertQuery(predicate: "arrayOptInt.@avg > %@", values: [1], expectedCount: 1) {
+            $0.arrayOptInt.avg > 1
+        }
+
+        assertQuery(predicate: "arrayOptInt.@avg < %@", values: [3], expectedCount: 1) {
+            $0.arrayOptInt.avg < 3
+        }
+
+        assertQuery(predicate: "arrayOptInt.@avg == %@", values: [2], expectedCount: 1) {
+            $0.arrayOptInt.avg == 2
+        }
+
+        assertQuery(predicate: "arrayOptInt.@avg >= %@", values: [1], expectedCount: 1) {
+            $0.arrayOptInt.avg >= 1
+        }
+
+        assertQuery(predicate: "arrayOptInt.@avg >= %@", values: [2], expectedCount: 1) {
+            $0.arrayOptInt.avg >= 2
+        }
+
+        assertQuery(predicate: "arrayOptInt.@avg <= %@", values: [3], expectedCount: 1) {
+            $0.arrayOptInt.avg <= 3
+        }
+
+        assertQuery(predicate: "arrayOptInt.@avg <= %@", values: [2], expectedCount: 1) {
+            $0.arrayOptInt.avg <= 2
+        }
+
+        assertQuery(predicate: "arrayOptInt.@avg != %@", values: [2], expectedCount: 0) {
+            $0.arrayOptInt.avg != 2
+        }
+
+        assertQuery(predicate: "arrayOptInt.@avg != %@", values: [1], expectedCount: 1) {
+            $0.arrayOptInt.avg != 1
+        }
+
+        try! realm.write {
+            object.arrayOptInt8.removeAll()
+            object.arrayOptInt8.append(objectsIn: [Int8(8), Int8(9), Int8(10)])
+        }
+
+        assertQuery(predicate: "arrayOptInt8.@avg > %@", values: [Int8(8)], expectedCount: 1) {
+            $0.arrayOptInt8.avg > Int8(8)
+        }
+
+        assertQuery(predicate: "arrayOptInt8.@avg < %@", values: [Int8(10)], expectedCount: 1) {
+            $0.arrayOptInt8.avg < Int8(10)
+        }
+
+        assertQuery(predicate: "arrayOptInt8.@avg == %@", values: [Int8(9)], expectedCount: 1) {
+            $0.arrayOptInt8.avg == Int8(9)
+        }
+
+        assertQuery(predicate: "arrayOptInt8.@avg >= %@", values: [Int8(8)], expectedCount: 1) {
+            $0.arrayOptInt8.avg >= Int8(8)
+        }
+
+        assertQuery(predicate: "arrayOptInt8.@avg >= %@", values: [Int8(9)], expectedCount: 1) {
+            $0.arrayOptInt8.avg >= Int8(9)
+        }
+
+        assertQuery(predicate: "arrayOptInt8.@avg <= %@", values: [Int8(10)], expectedCount: 1) {
+            $0.arrayOptInt8.avg <= Int8(10)
+        }
+
+        assertQuery(predicate: "arrayOptInt8.@avg <= %@", values: [Int8(9)], expectedCount: 1) {
+            $0.arrayOptInt8.avg <= Int8(9)
+        }
+
+        assertQuery(predicate: "arrayOptInt8.@avg != %@", values: [Int8(9)], expectedCount: 0) {
+            $0.arrayOptInt8.avg != Int8(9)
+        }
+
+        assertQuery(predicate: "arrayOptInt8.@avg != %@", values: [Int8(8)], expectedCount: 1) {
+            $0.arrayOptInt8.avg != Int8(8)
+        }
+
+        try! realm.write {
+            object.arrayOptInt16.removeAll()
+            object.arrayOptInt16.append(objectsIn: [Int16(16), Int16(17), Int16(18)])
+        }
+
+        assertQuery(predicate: "arrayOptInt16.@avg > %@", values: [Int16(16)], expectedCount: 1) {
+            $0.arrayOptInt16.avg > Int16(16)
+        }
+
+        assertQuery(predicate: "arrayOptInt16.@avg < %@", values: [Int16(18)], expectedCount: 1) {
+            $0.arrayOptInt16.avg < Int16(18)
+        }
+
+        assertQuery(predicate: "arrayOptInt16.@avg == %@", values: [Int16(17)], expectedCount: 1) {
+            $0.arrayOptInt16.avg == Int16(17)
+        }
+
+        assertQuery(predicate: "arrayOptInt16.@avg >= %@", values: [Int16(16)], expectedCount: 1) {
+            $0.arrayOptInt16.avg >= Int16(16)
+        }
+
+        assertQuery(predicate: "arrayOptInt16.@avg >= %@", values: [Int16(17)], expectedCount: 1) {
+            $0.arrayOptInt16.avg >= Int16(17)
+        }
+
+        assertQuery(predicate: "arrayOptInt16.@avg <= %@", values: [Int16(18)], expectedCount: 1) {
+            $0.arrayOptInt16.avg <= Int16(18)
+        }
+
+        assertQuery(predicate: "arrayOptInt16.@avg <= %@", values: [Int16(17)], expectedCount: 1) {
+            $0.arrayOptInt16.avg <= Int16(17)
+        }
+
+        assertQuery(predicate: "arrayOptInt16.@avg != %@", values: [Int16(17)], expectedCount: 0) {
+            $0.arrayOptInt16.avg != Int16(17)
+        }
+
+        assertQuery(predicate: "arrayOptInt16.@avg != %@", values: [Int16(16)], expectedCount: 1) {
+            $0.arrayOptInt16.avg != Int16(16)
+        }
+
+        try! realm.write {
+            object.arrayOptInt32.removeAll()
+            object.arrayOptInt32.append(objectsIn: [Int32(32), Int32(33), Int32(34)])
+        }
+
+        assertQuery(predicate: "arrayOptInt32.@avg > %@", values: [Int32(32)], expectedCount: 1) {
+            $0.arrayOptInt32.avg > Int32(32)
+        }
+
+        assertQuery(predicate: "arrayOptInt32.@avg < %@", values: [Int32(34)], expectedCount: 1) {
+            $0.arrayOptInt32.avg < Int32(34)
+        }
+
+        assertQuery(predicate: "arrayOptInt32.@avg == %@", values: [Int32(33)], expectedCount: 1) {
+            $0.arrayOptInt32.avg == Int32(33)
+        }
+
+        assertQuery(predicate: "arrayOptInt32.@avg >= %@", values: [Int32(32)], expectedCount: 1) {
+            $0.arrayOptInt32.avg >= Int32(32)
+        }
+
+        assertQuery(predicate: "arrayOptInt32.@avg >= %@", values: [Int32(33)], expectedCount: 1) {
+            $0.arrayOptInt32.avg >= Int32(33)
+        }
+
+        assertQuery(predicate: "arrayOptInt32.@avg <= %@", values: [Int32(34)], expectedCount: 1) {
+            $0.arrayOptInt32.avg <= Int32(34)
+        }
+
+        assertQuery(predicate: "arrayOptInt32.@avg <= %@", values: [Int32(33)], expectedCount: 1) {
+            $0.arrayOptInt32.avg <= Int32(33)
+        }
+
+        assertQuery(predicate: "arrayOptInt32.@avg != %@", values: [Int32(33)], expectedCount: 0) {
+            $0.arrayOptInt32.avg != Int32(33)
+        }
+
+        assertQuery(predicate: "arrayOptInt32.@avg != %@", values: [Int32(32)], expectedCount: 1) {
+            $0.arrayOptInt32.avg != Int32(32)
+        }
+
+        try! realm.write {
+            object.arrayOptInt64.removeAll()
+            object.arrayOptInt64.append(objectsIn: [Int64(64), Int64(65), Int64(66)])
+        }
+
+        assertQuery(predicate: "arrayOptInt64.@avg > %@", values: [Int64(64)], expectedCount: 1) {
+            $0.arrayOptInt64.avg > Int64(64)
+        }
+
+        assertQuery(predicate: "arrayOptInt64.@avg < %@", values: [Int64(66)], expectedCount: 1) {
+            $0.arrayOptInt64.avg < Int64(66)
+        }
+
+        assertQuery(predicate: "arrayOptInt64.@avg == %@", values: [Int64(65)], expectedCount: 1) {
+            $0.arrayOptInt64.avg == Int64(65)
+        }
+
+        assertQuery(predicate: "arrayOptInt64.@avg >= %@", values: [Int64(64)], expectedCount: 1) {
+            $0.arrayOptInt64.avg >= Int64(64)
+        }
+
+        assertQuery(predicate: "arrayOptInt64.@avg >= %@", values: [Int64(65)], expectedCount: 1) {
+            $0.arrayOptInt64.avg >= Int64(65)
+        }
+
+        assertQuery(predicate: "arrayOptInt64.@avg <= %@", values: [Int64(66)], expectedCount: 1) {
+            $0.arrayOptInt64.avg <= Int64(66)
+        }
+
+        assertQuery(predicate: "arrayOptInt64.@avg <= %@", values: [Int64(65)], expectedCount: 1) {
+            $0.arrayOptInt64.avg <= Int64(65)
+        }
+
+        assertQuery(predicate: "arrayOptInt64.@avg != %@", values: [Int64(65)], expectedCount: 0) {
+            $0.arrayOptInt64.avg != Int64(65)
+        }
+
+        assertQuery(predicate: "arrayOptInt64.@avg != %@", values: [Int64(64)], expectedCount: 1) {
+            $0.arrayOptInt64.avg != Int64(64)
+        }
+
+        try! realm.write {
+            object.arrayOptFloat.removeAll()
+            object.arrayOptFloat.append(objectsIn: [Float(5.55444333), Float(6.55444333), Float(7.55444333)])
+        }
+
+        assertQuery(predicate: "arrayOptFloat.@avg > %@", values: [Float(5.55444333)], expectedCount: 1) {
+            $0.arrayOptFloat.avg > Float(5.55444333)
+        }
+
+        assertQuery(predicate: "arrayOptFloat.@avg < %@", values: [Float(7.55444333)], expectedCount: 1) {
+            $0.arrayOptFloat.avg < Float(7.55444333)
+        }
+
+        assertQuery(predicate: "arrayOptFloat.@avg == %@", values: [Float(6.55444333)], expectedCount: 1) {
+            $0.arrayOptFloat.avg == Float(6.55444333)
+        }
+
+        assertQuery(predicate: "arrayOptFloat.@avg >= %@", values: [Float(5.55444333)], expectedCount: 1) {
+            $0.arrayOptFloat.avg >= Float(5.55444333)
+        }
+
+        assertQuery(predicate: "arrayOptFloat.@avg >= %@", values: [Float(6.55444333)], expectedCount: 1) {
+            $0.arrayOptFloat.avg >= Float(6.55444333)
+        }
+
+        assertQuery(predicate: "arrayOptFloat.@avg <= %@", values: [Float(7.55444333)], expectedCount: 1) {
+            $0.arrayOptFloat.avg <= Float(7.55444333)
+        }
+
+        assertQuery(predicate: "arrayOptFloat.@avg <= %@", values: [Float(6.55444333)], expectedCount: 1) {
+            $0.arrayOptFloat.avg <= Float(6.55444333)
+        }
+
+        assertQuery(predicate: "arrayOptFloat.@avg != %@", values: [Float(6.55444333)], expectedCount: 0) {
+            $0.arrayOptFloat.avg != Float(6.55444333)
+        }
+
+        assertQuery(predicate: "arrayOptFloat.@avg != %@", values: [Float(5.55444333)], expectedCount: 1) {
+            $0.arrayOptFloat.avg != Float(5.55444333)
+        }
+
+        try! realm.write {
+            object.arrayOptDouble.removeAll()
+            object.arrayOptDouble.append(objectsIn: [123.456, 234.456, 345.567])
+        }
+
+        assertQuery(predicate: "arrayOptDouble.@avg > %@", values: [123.456], expectedCount: 1) {
+            $0.arrayOptDouble.avg > 123.456
+        }
+
+        assertQuery(predicate: "arrayOptDouble.@avg < %@", values: [345.567], expectedCount: 1) {
+            $0.arrayOptDouble.avg < 345.567
+        }
+
+        assertQuery(predicate: "arrayOptDouble.@avg == %@", values: [234.456], expectedCount: 1) {
+            $0.arrayOptDouble.avg == 234.456
+        }
+
+        assertQuery(predicate: "arrayOptDouble.@avg >= %@", values: [123.456], expectedCount: 1) {
+            $0.arrayOptDouble.avg >= 123.456
+        }
+
+        assertQuery(predicate: "arrayOptDouble.@avg >= %@", values: [234.456], expectedCount: 1) {
+            $0.arrayOptDouble.avg >= 234.456
+        }
+
+        assertQuery(predicate: "arrayOptDouble.@avg <= %@", values: [345.567], expectedCount: 1) {
+            $0.arrayOptDouble.avg <= 345.567
+        }
+
+        assertQuery(predicate: "arrayOptDouble.@avg <= %@", values: [234.456], expectedCount: 1) {
+            $0.arrayOptDouble.avg <= 234.456
+        }
+
+        assertQuery(predicate: "arrayOptDouble.@avg != %@", values: [234.456], expectedCount: 0) {
+            $0.arrayOptDouble.avg != 234.456
+        }
+
+        assertQuery(predicate: "arrayOptDouble.@avg != %@", values: [123.456], expectedCount: 1) {
+            $0.arrayOptDouble.avg != 123.456
+        }
+
+        try! realm.write {
+            object.arrayOptDecimal.removeAll()
+            object.arrayOptDecimal.append(objectsIn: [Decimal128(123.456), Decimal128(456.789), Decimal128(963.852)])
+        }
+
+        assertQuery(predicate: "arrayOptDecimal.@avg > %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.arrayOptDecimal.avg > Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "arrayOptDecimal.@avg < %@", values: [Decimal128(963.852)], expectedCount: 1) {
+            $0.arrayOptDecimal.avg < Decimal128(963.852)
+        }
+
+        assertQuery(predicate: "arrayOptDecimal.@avg == %@", values: [Decimal128(456.789)], expectedCount: 1) {
+            $0.arrayOptDecimal.avg == Decimal128(456.789)
+        }
+
+        assertQuery(predicate: "arrayOptDecimal.@avg >= %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.arrayOptDecimal.avg >= Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "arrayOptDecimal.@avg >= %@", values: [Decimal128(456.789)], expectedCount: 1) {
+            $0.arrayOptDecimal.avg >= Decimal128(456.789)
+        }
+
+        assertQuery(predicate: "arrayOptDecimal.@avg <= %@", values: [Decimal128(963.852)], expectedCount: 1) {
+            $0.arrayOptDecimal.avg <= Decimal128(963.852)
+        }
+
+        assertQuery(predicate: "arrayOptDecimal.@avg <= %@", values: [Decimal128(456.789)], expectedCount: 1) {
+            $0.arrayOptDecimal.avg <= Decimal128(456.789)
+        }
+
+        assertQuery(predicate: "arrayOptDecimal.@avg != %@", values: [Decimal128(456.789)], expectedCount: 0) {
+            $0.arrayOptDecimal.avg != Decimal128(456.789)
+        }
+
+        assertQuery(predicate: "arrayOptDecimal.@avg != %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.arrayOptDecimal.avg != Decimal128(123.456)
+        }
+    }
+
+    func testCollectionAggregatesMin() {
+        let realm = realmWithTestPath()
+        let object = objects().first!
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["arrayInt": [1, 2, 3]])
+            if let oldObject = object.objectCol {
+                realm.delete(oldObject)
+            }
+            object.objectCol = modernObj
+        }
+        assertQuery(predicate: "objectCol.arrayInt.@min > %@", values: [1], expectedCount: 0) {
+            $0.objectCol.arrayInt.min > 1
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt.@min < %@", values: [3], expectedCount: 1) {
+            $0.objectCol.arrayInt.min < 3
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt.@min == %@", values: [1], expectedCount: 1) {
+            $0.objectCol.arrayInt.min == 1
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt.@min >= %@", values: [2], expectedCount: 0) {
+            $0.objectCol.arrayInt.min >= 2
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt.@min >= %@", values: [1], expectedCount: 1) {
+            $0.objectCol.arrayInt.min >= 1
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt.@min <= %@", values: [3], expectedCount: 1) {
+            $0.objectCol.arrayInt.min <= 3
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt.@min <= %@", values: [1], expectedCount: 1) {
+            $0.objectCol.arrayInt.min <= 1
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt.@min != %@", values: [1], expectedCount: 1) {
+            $0.objectCol.arrayInt.min != 1
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt.@min != %@", values: [3], expectedCount: 2) {
+            $0.objectCol.arrayInt.min != 3
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["arrayInt8": [Int8(8), Int8(9), Int8(10)]])
+            if let oldObject = object.objectCol {
+                realm.delete(oldObject)
+            }
+            object.objectCol = modernObj
+        }
+        assertQuery(predicate: "objectCol.arrayInt8.@min > %@", values: [Int8(8)], expectedCount: 0) {
+            $0.objectCol.arrayInt8.min > Int8(8)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt8.@min < %@", values: [Int8(10)], expectedCount: 1) {
+            $0.objectCol.arrayInt8.min < Int8(10)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt8.@min == %@", values: [Int8(8)], expectedCount: 1) {
+            $0.objectCol.arrayInt8.min == Int8(8)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt8.@min >= %@", values: [Int8(9)], expectedCount: 0) {
+            $0.objectCol.arrayInt8.min >= Int8(9)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt8.@min >= %@", values: [Int8(8)], expectedCount: 1) {
+            $0.objectCol.arrayInt8.min >= Int8(8)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt8.@min <= %@", values: [Int8(10)], expectedCount: 1) {
+            $0.objectCol.arrayInt8.min <= Int8(10)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt8.@min <= %@", values: [Int8(8)], expectedCount: 1) {
+            $0.objectCol.arrayInt8.min <= Int8(8)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt8.@min != %@", values: [Int8(8)], expectedCount: 1) {
+            $0.objectCol.arrayInt8.min != Int8(8)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt8.@min != %@", values: [Int8(10)], expectedCount: 2) {
+            $0.objectCol.arrayInt8.min != Int8(10)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["arrayInt16": [Int16(16), Int16(17), Int16(18)]])
+            if let oldObject = object.objectCol {
+                realm.delete(oldObject)
+            }
+            object.objectCol = modernObj
+        }
+        assertQuery(predicate: "objectCol.arrayInt16.@min > %@", values: [Int16(16)], expectedCount: 0) {
+            $0.objectCol.arrayInt16.min > Int16(16)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt16.@min < %@", values: [Int16(18)], expectedCount: 1) {
+            $0.objectCol.arrayInt16.min < Int16(18)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt16.@min == %@", values: [Int16(16)], expectedCount: 1) {
+            $0.objectCol.arrayInt16.min == Int16(16)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt16.@min >= %@", values: [Int16(17)], expectedCount: 0) {
+            $0.objectCol.arrayInt16.min >= Int16(17)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt16.@min >= %@", values: [Int16(16)], expectedCount: 1) {
+            $0.objectCol.arrayInt16.min >= Int16(16)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt16.@min <= %@", values: [Int16(18)], expectedCount: 1) {
+            $0.objectCol.arrayInt16.min <= Int16(18)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt16.@min <= %@", values: [Int16(16)], expectedCount: 1) {
+            $0.objectCol.arrayInt16.min <= Int16(16)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt16.@min != %@", values: [Int16(16)], expectedCount: 1) {
+            $0.objectCol.arrayInt16.min != Int16(16)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt16.@min != %@", values: [Int16(18)], expectedCount: 2) {
+            $0.objectCol.arrayInt16.min != Int16(18)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["arrayInt32": [Int32(32), Int32(33), Int32(34)]])
+            if let oldObject = object.objectCol {
+                realm.delete(oldObject)
+            }
+            object.objectCol = modernObj
+        }
+        assertQuery(predicate: "objectCol.arrayInt32.@min > %@", values: [Int32(32)], expectedCount: 0) {
+            $0.objectCol.arrayInt32.min > Int32(32)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt32.@min < %@", values: [Int32(34)], expectedCount: 1) {
+            $0.objectCol.arrayInt32.min < Int32(34)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt32.@min == %@", values: [Int32(32)], expectedCount: 1) {
+            $0.objectCol.arrayInt32.min == Int32(32)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt32.@min >= %@", values: [Int32(33)], expectedCount: 0) {
+            $0.objectCol.arrayInt32.min >= Int32(33)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt32.@min >= %@", values: [Int32(32)], expectedCount: 1) {
+            $0.objectCol.arrayInt32.min >= Int32(32)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt32.@min <= %@", values: [Int32(34)], expectedCount: 1) {
+            $0.objectCol.arrayInt32.min <= Int32(34)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt32.@min <= %@", values: [Int32(32)], expectedCount: 1) {
+            $0.objectCol.arrayInt32.min <= Int32(32)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt32.@min != %@", values: [Int32(32)], expectedCount: 1) {
+            $0.objectCol.arrayInt32.min != Int32(32)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt32.@min != %@", values: [Int32(34)], expectedCount: 2) {
+            $0.objectCol.arrayInt32.min != Int32(34)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["arrayInt64": [Int64(64), Int64(65), Int64(66)]])
+            if let oldObject = object.objectCol {
+                realm.delete(oldObject)
+            }
+            object.objectCol = modernObj
+        }
+        assertQuery(predicate: "objectCol.arrayInt64.@min > %@", values: [Int64(64)], expectedCount: 0) {
+            $0.objectCol.arrayInt64.min > Int64(64)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt64.@min < %@", values: [Int64(66)], expectedCount: 1) {
+            $0.objectCol.arrayInt64.min < Int64(66)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt64.@min == %@", values: [Int64(64)], expectedCount: 1) {
+            $0.objectCol.arrayInt64.min == Int64(64)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt64.@min >= %@", values: [Int64(65)], expectedCount: 0) {
+            $0.objectCol.arrayInt64.min >= Int64(65)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt64.@min >= %@", values: [Int64(64)], expectedCount: 1) {
+            $0.objectCol.arrayInt64.min >= Int64(64)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt64.@min <= %@", values: [Int64(66)], expectedCount: 1) {
+            $0.objectCol.arrayInt64.min <= Int64(66)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt64.@min <= %@", values: [Int64(64)], expectedCount: 1) {
+            $0.objectCol.arrayInt64.min <= Int64(64)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt64.@min != %@", values: [Int64(64)], expectedCount: 1) {
+            $0.objectCol.arrayInt64.min != Int64(64)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt64.@min != %@", values: [Int64(66)], expectedCount: 2) {
+            $0.objectCol.arrayInt64.min != Int64(66)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["arrayFloat": [Float(5.55444333), Float(6.55444333), Float(7.55444333)]])
+            if let oldObject = object.objectCol {
+                realm.delete(oldObject)
+            }
+            object.objectCol = modernObj
+        }
+        assertQuery(predicate: "objectCol.arrayFloat.@min > %@", values: [Float(5.55444333)], expectedCount: 0) {
+            $0.objectCol.arrayFloat.min > Float(5.55444333)
+        }
+
+        assertQuery(predicate: "objectCol.arrayFloat.@min < %@", values: [Float(7.55444333)], expectedCount: 1) {
+            $0.objectCol.arrayFloat.min < Float(7.55444333)
+        }
+
+        assertQuery(predicate: "objectCol.arrayFloat.@min == %@", values: [Float(5.55444333)], expectedCount: 1) {
+            $0.objectCol.arrayFloat.min == Float(5.55444333)
+        }
+
+        assertQuery(predicate: "objectCol.arrayFloat.@min >= %@", values: [Float(6.55444333)], expectedCount: 0) {
+            $0.objectCol.arrayFloat.min >= Float(6.55444333)
+        }
+
+        assertQuery(predicate: "objectCol.arrayFloat.@min >= %@", values: [Float(5.55444333)], expectedCount: 1) {
+            $0.objectCol.arrayFloat.min >= Float(5.55444333)
+        }
+
+        assertQuery(predicate: "objectCol.arrayFloat.@min <= %@", values: [Float(7.55444333)], expectedCount: 1) {
+            $0.objectCol.arrayFloat.min <= Float(7.55444333)
+        }
+
+        assertQuery(predicate: "objectCol.arrayFloat.@min <= %@", values: [Float(5.55444333)], expectedCount: 1) {
+            $0.objectCol.arrayFloat.min <= Float(5.55444333)
+        }
+
+        assertQuery(predicate: "objectCol.arrayFloat.@min != %@", values: [Float(5.55444333)], expectedCount: 1) {
+            $0.objectCol.arrayFloat.min != Float(5.55444333)
+        }
+
+        assertQuery(predicate: "objectCol.arrayFloat.@min != %@", values: [Float(7.55444333)], expectedCount: 2) {
+            $0.objectCol.arrayFloat.min != Float(7.55444333)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["arrayDouble": [123.456, 234.456, 345.567]])
+            if let oldObject = object.objectCol {
+                realm.delete(oldObject)
+            }
+            object.objectCol = modernObj
+        }
+        assertQuery(predicate: "objectCol.arrayDouble.@min > %@", values: [123.456], expectedCount: 0) {
+            $0.objectCol.arrayDouble.min > 123.456
+        }
+
+        assertQuery(predicate: "objectCol.arrayDouble.@min < %@", values: [345.567], expectedCount: 1) {
+            $0.objectCol.arrayDouble.min < 345.567
+        }
+
+        assertQuery(predicate: "objectCol.arrayDouble.@min == %@", values: [123.456], expectedCount: 1) {
+            $0.objectCol.arrayDouble.min == 123.456
+        }
+
+        assertQuery(predicate: "objectCol.arrayDouble.@min >= %@", values: [234.456], expectedCount: 0) {
+            $0.objectCol.arrayDouble.min >= 234.456
+        }
+
+        assertQuery(predicate: "objectCol.arrayDouble.@min >= %@", values: [123.456], expectedCount: 1) {
+            $0.objectCol.arrayDouble.min >= 123.456
+        }
+
+        assertQuery(predicate: "objectCol.arrayDouble.@min <= %@", values: [345.567], expectedCount: 1) {
+            $0.objectCol.arrayDouble.min <= 345.567
+        }
+
+        assertQuery(predicate: "objectCol.arrayDouble.@min <= %@", values: [123.456], expectedCount: 1) {
+            $0.objectCol.arrayDouble.min <= 123.456
+        }
+
+        assertQuery(predicate: "objectCol.arrayDouble.@min != %@", values: [123.456], expectedCount: 1) {
+            $0.objectCol.arrayDouble.min != 123.456
+        }
+
+        assertQuery(predicate: "objectCol.arrayDouble.@min != %@", values: [345.567], expectedCount: 2) {
+            $0.objectCol.arrayDouble.min != 345.567
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["arrayDate": [Date(timeIntervalSince1970: 1000000), Date(timeIntervalSince1970: 2000000), Date(timeIntervalSince1970: 3000000)]])
+            if let oldObject = object.objectCol {
+                realm.delete(oldObject)
+            }
+            object.objectCol = modernObj
+        }
+        assertQuery(predicate: "objectCol.arrayDate.@min > %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 0) {
+            $0.objectCol.arrayDate.min > Date(timeIntervalSince1970: 1000000)
+        }
+
+        assertQuery(predicate: "objectCol.arrayDate.@min < %@", values: [Date(timeIntervalSince1970: 3000000)], expectedCount: 1) {
+            $0.objectCol.arrayDate.min < Date(timeIntervalSince1970: 3000000)
+        }
+
+        assertQuery(predicate: "objectCol.arrayDate.@min == %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
+            $0.objectCol.arrayDate.min == Date(timeIntervalSince1970: 1000000)
+        }
+
+        assertQuery(predicate: "objectCol.arrayDate.@min >= %@", values: [Date(timeIntervalSince1970: 2000000)], expectedCount: 0) {
+            $0.objectCol.arrayDate.min >= Date(timeIntervalSince1970: 2000000)
+        }
+
+        assertQuery(predicate: "objectCol.arrayDate.@min >= %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
+            $0.objectCol.arrayDate.min >= Date(timeIntervalSince1970: 1000000)
+        }
+
+        assertQuery(predicate: "objectCol.arrayDate.@min <= %@", values: [Date(timeIntervalSince1970: 3000000)], expectedCount: 1) {
+            $0.objectCol.arrayDate.min <= Date(timeIntervalSince1970: 3000000)
+        }
+
+        assertQuery(predicate: "objectCol.arrayDate.@min <= %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
+            $0.objectCol.arrayDate.min <= Date(timeIntervalSince1970: 1000000)
+        }
+
+        assertQuery(predicate: "objectCol.arrayDate.@min != %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
+            $0.objectCol.arrayDate.min != Date(timeIntervalSince1970: 1000000)
+        }
+
+        assertQuery(predicate: "objectCol.arrayDate.@min != %@", values: [Date(timeIntervalSince1970: 3000000)], expectedCount: 2) {
+            $0.objectCol.arrayDate.min != Date(timeIntervalSince1970: 3000000)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["arrayDecimal": [Decimal128(123.456), Decimal128(456.789), Decimal128(963.852)]])
+            if let oldObject = object.objectCol {
+                realm.delete(oldObject)
+            }
+            object.objectCol = modernObj
+        }
+        assertQuery(predicate: "objectCol.arrayDecimal.@min > %@", values: [Decimal128(123.456)], expectedCount: 0) {
+            $0.objectCol.arrayDecimal.min > Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "objectCol.arrayDecimal.@min < %@", values: [Decimal128(963.852)], expectedCount: 1) {
+            $0.objectCol.arrayDecimal.min < Decimal128(963.852)
+        }
+
+        assertQuery(predicate: "objectCol.arrayDecimal.@min == %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.objectCol.arrayDecimal.min == Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "objectCol.arrayDecimal.@min >= %@", values: [Decimal128(456.789)], expectedCount: 0) {
+            $0.objectCol.arrayDecimal.min >= Decimal128(456.789)
+        }
+
+        assertQuery(predicate: "objectCol.arrayDecimal.@min >= %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.objectCol.arrayDecimal.min >= Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "objectCol.arrayDecimal.@min <= %@", values: [Decimal128(963.852)], expectedCount: 1) {
+            $0.objectCol.arrayDecimal.min <= Decimal128(963.852)
+        }
+
+        assertQuery(predicate: "objectCol.arrayDecimal.@min <= %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.objectCol.arrayDecimal.min <= Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "objectCol.arrayDecimal.@min != %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.objectCol.arrayDecimal.min != Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "objectCol.arrayDecimal.@min != %@", values: [Decimal128(963.852)], expectedCount: 2) {
+            $0.objectCol.arrayDecimal.min != Decimal128(963.852)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["arrayOptInt": [1, 2, 3]])
+            if let oldObject = object.objectCol {
+                realm.delete(oldObject)
+            }
+            object.objectCol = modernObj
+        }
+        assertQuery(predicate: "objectCol.arrayOptInt.@min > %@", values: [1], expectedCount: 0) {
+            $0.objectCol.arrayOptInt.min > 1
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt.@min < %@", values: [3], expectedCount: 1) {
+            $0.objectCol.arrayOptInt.min < 3
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt.@min == %@", values: [1], expectedCount: 1) {
+            $0.objectCol.arrayOptInt.min == 1
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt.@min >= %@", values: [2], expectedCount: 0) {
+            $0.objectCol.arrayOptInt.min >= 2
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt.@min >= %@", values: [1], expectedCount: 1) {
+            $0.objectCol.arrayOptInt.min >= 1
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt.@min <= %@", values: [3], expectedCount: 1) {
+            $0.objectCol.arrayOptInt.min <= 3
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt.@min <= %@", values: [1], expectedCount: 1) {
+            $0.objectCol.arrayOptInt.min <= 1
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt.@min != %@", values: [1], expectedCount: 1) {
+            $0.objectCol.arrayOptInt.min != 1
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt.@min != %@", values: [3], expectedCount: 2) {
+            $0.objectCol.arrayOptInt.min != 3
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["arrayOptInt8": [Int8(8), Int8(9), Int8(10)]])
+            if let oldObject = object.objectCol {
+                realm.delete(oldObject)
+            }
+            object.objectCol = modernObj
+        }
+        assertQuery(predicate: "objectCol.arrayOptInt8.@min > %@", values: [Int8(8)], expectedCount: 0) {
+            $0.objectCol.arrayOptInt8.min > Int8(8)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt8.@min < %@", values: [Int8(10)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt8.min < Int8(10)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt8.@min == %@", values: [Int8(8)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt8.min == Int8(8)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt8.@min >= %@", values: [Int8(9)], expectedCount: 0) {
+            $0.objectCol.arrayOptInt8.min >= Int8(9)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt8.@min >= %@", values: [Int8(8)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt8.min >= Int8(8)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt8.@min <= %@", values: [Int8(10)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt8.min <= Int8(10)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt8.@min <= %@", values: [Int8(8)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt8.min <= Int8(8)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt8.@min != %@", values: [Int8(8)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt8.min != Int8(8)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt8.@min != %@", values: [Int8(10)], expectedCount: 2) {
+            $0.objectCol.arrayOptInt8.min != Int8(10)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["arrayOptInt16": [Int16(16), Int16(17), Int16(18)]])
+            if let oldObject = object.objectCol {
+                realm.delete(oldObject)
+            }
+            object.objectCol = modernObj
+        }
+        assertQuery(predicate: "objectCol.arrayOptInt16.@min > %@", values: [Int16(16)], expectedCount: 0) {
+            $0.objectCol.arrayOptInt16.min > Int16(16)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt16.@min < %@", values: [Int16(18)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt16.min < Int16(18)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt16.@min == %@", values: [Int16(16)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt16.min == Int16(16)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt16.@min >= %@", values: [Int16(17)], expectedCount: 0) {
+            $0.objectCol.arrayOptInt16.min >= Int16(17)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt16.@min >= %@", values: [Int16(16)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt16.min >= Int16(16)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt16.@min <= %@", values: [Int16(18)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt16.min <= Int16(18)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt16.@min <= %@", values: [Int16(16)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt16.min <= Int16(16)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt16.@min != %@", values: [Int16(16)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt16.min != Int16(16)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt16.@min != %@", values: [Int16(18)], expectedCount: 2) {
+            $0.objectCol.arrayOptInt16.min != Int16(18)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["arrayOptInt32": [Int32(32), Int32(33), Int32(34)]])
+            if let oldObject = object.objectCol {
+                realm.delete(oldObject)
+            }
+            object.objectCol = modernObj
+        }
+        assertQuery(predicate: "objectCol.arrayOptInt32.@min > %@", values: [Int32(32)], expectedCount: 0) {
+            $0.objectCol.arrayOptInt32.min > Int32(32)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt32.@min < %@", values: [Int32(34)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt32.min < Int32(34)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt32.@min == %@", values: [Int32(32)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt32.min == Int32(32)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt32.@min >= %@", values: [Int32(33)], expectedCount: 0) {
+            $0.objectCol.arrayOptInt32.min >= Int32(33)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt32.@min >= %@", values: [Int32(32)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt32.min >= Int32(32)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt32.@min <= %@", values: [Int32(34)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt32.min <= Int32(34)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt32.@min <= %@", values: [Int32(32)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt32.min <= Int32(32)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt32.@min != %@", values: [Int32(32)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt32.min != Int32(32)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt32.@min != %@", values: [Int32(34)], expectedCount: 2) {
+            $0.objectCol.arrayOptInt32.min != Int32(34)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["arrayOptInt64": [Int64(64), Int64(65), Int64(66)]])
+            if let oldObject = object.objectCol {
+                realm.delete(oldObject)
+            }
+            object.objectCol = modernObj
+        }
+        assertQuery(predicate: "objectCol.arrayOptInt64.@min > %@", values: [Int64(64)], expectedCount: 0) {
+            $0.objectCol.arrayOptInt64.min > Int64(64)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt64.@min < %@", values: [Int64(66)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt64.min < Int64(66)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt64.@min == %@", values: [Int64(64)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt64.min == Int64(64)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt64.@min >= %@", values: [Int64(65)], expectedCount: 0) {
+            $0.objectCol.arrayOptInt64.min >= Int64(65)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt64.@min >= %@", values: [Int64(64)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt64.min >= Int64(64)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt64.@min <= %@", values: [Int64(66)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt64.min <= Int64(66)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt64.@min <= %@", values: [Int64(64)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt64.min <= Int64(64)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt64.@min != %@", values: [Int64(64)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt64.min != Int64(64)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt64.@min != %@", values: [Int64(66)], expectedCount: 2) {
+            $0.objectCol.arrayOptInt64.min != Int64(66)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["arrayOptFloat": [Float(5.55444333), Float(6.55444333), Float(7.55444333)]])
+            if let oldObject = object.objectCol {
+                realm.delete(oldObject)
+            }
+            object.objectCol = modernObj
+        }
+        assertQuery(predicate: "objectCol.arrayOptFloat.@min > %@", values: [Float(5.55444333)], expectedCount: 0) {
+            $0.objectCol.arrayOptFloat.min > Float(5.55444333)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptFloat.@min < %@", values: [Float(7.55444333)], expectedCount: 1) {
+            $0.objectCol.arrayOptFloat.min < Float(7.55444333)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptFloat.@min == %@", values: [Float(5.55444333)], expectedCount: 1) {
+            $0.objectCol.arrayOptFloat.min == Float(5.55444333)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptFloat.@min >= %@", values: [Float(6.55444333)], expectedCount: 0) {
+            $0.objectCol.arrayOptFloat.min >= Float(6.55444333)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptFloat.@min >= %@", values: [Float(5.55444333)], expectedCount: 1) {
+            $0.objectCol.arrayOptFloat.min >= Float(5.55444333)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptFloat.@min <= %@", values: [Float(7.55444333)], expectedCount: 1) {
+            $0.objectCol.arrayOptFloat.min <= Float(7.55444333)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptFloat.@min <= %@", values: [Float(5.55444333)], expectedCount: 1) {
+            $0.objectCol.arrayOptFloat.min <= Float(5.55444333)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptFloat.@min != %@", values: [Float(5.55444333)], expectedCount: 1) {
+            $0.objectCol.arrayOptFloat.min != Float(5.55444333)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptFloat.@min != %@", values: [Float(7.55444333)], expectedCount: 2) {
+            $0.objectCol.arrayOptFloat.min != Float(7.55444333)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["arrayOptDouble": [123.456, 234.456, 345.567]])
+            if let oldObject = object.objectCol {
+                realm.delete(oldObject)
+            }
+            object.objectCol = modernObj
+        }
+        assertQuery(predicate: "objectCol.arrayOptDouble.@min > %@", values: [123.456], expectedCount: 0) {
+            $0.objectCol.arrayOptDouble.min > 123.456
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDouble.@min < %@", values: [345.567], expectedCount: 1) {
+            $0.objectCol.arrayOptDouble.min < 345.567
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDouble.@min == %@", values: [123.456], expectedCount: 1) {
+            $0.objectCol.arrayOptDouble.min == 123.456
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDouble.@min >= %@", values: [234.456], expectedCount: 0) {
+            $0.objectCol.arrayOptDouble.min >= 234.456
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDouble.@min >= %@", values: [123.456], expectedCount: 1) {
+            $0.objectCol.arrayOptDouble.min >= 123.456
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDouble.@min <= %@", values: [345.567], expectedCount: 1) {
+            $0.objectCol.arrayOptDouble.min <= 345.567
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDouble.@min <= %@", values: [123.456], expectedCount: 1) {
+            $0.objectCol.arrayOptDouble.min <= 123.456
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDouble.@min != %@", values: [123.456], expectedCount: 1) {
+            $0.objectCol.arrayOptDouble.min != 123.456
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDouble.@min != %@", values: [345.567], expectedCount: 2) {
+            $0.objectCol.arrayOptDouble.min != 345.567
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["arrayOptDate": [Date(timeIntervalSince1970: 1000000), Date(timeIntervalSince1970: 2000000), Date(timeIntervalSince1970: 3000000)]])
+            if let oldObject = object.objectCol {
+                realm.delete(oldObject)
+            }
+            object.objectCol = modernObj
+        }
+        assertQuery(predicate: "objectCol.arrayOptDate.@min > %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 0) {
+            $0.objectCol.arrayOptDate.min > Date(timeIntervalSince1970: 1000000)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDate.@min < %@", values: [Date(timeIntervalSince1970: 3000000)], expectedCount: 1) {
+            $0.objectCol.arrayOptDate.min < Date(timeIntervalSince1970: 3000000)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDate.@min == %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
+            $0.objectCol.arrayOptDate.min == Date(timeIntervalSince1970: 1000000)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDate.@min >= %@", values: [Date(timeIntervalSince1970: 2000000)], expectedCount: 0) {
+            $0.objectCol.arrayOptDate.min >= Date(timeIntervalSince1970: 2000000)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDate.@min >= %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
+            $0.objectCol.arrayOptDate.min >= Date(timeIntervalSince1970: 1000000)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDate.@min <= %@", values: [Date(timeIntervalSince1970: 3000000)], expectedCount: 1) {
+            $0.objectCol.arrayOptDate.min <= Date(timeIntervalSince1970: 3000000)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDate.@min <= %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
+            $0.objectCol.arrayOptDate.min <= Date(timeIntervalSince1970: 1000000)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDate.@min != %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
+            $0.objectCol.arrayOptDate.min != Date(timeIntervalSince1970: 1000000)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDate.@min != %@", values: [Date(timeIntervalSince1970: 3000000)], expectedCount: 2) {
+            $0.objectCol.arrayOptDate.min != Date(timeIntervalSince1970: 3000000)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["arrayOptDecimal": [Decimal128(123.456), Decimal128(456.789), Decimal128(963.852)]])
+            if let oldObject = object.objectCol {
+                realm.delete(oldObject)
+            }
+            object.objectCol = modernObj
+        }
+        assertQuery(predicate: "objectCol.arrayOptDecimal.@min > %@", values: [Decimal128(123.456)], expectedCount: 0) {
+            $0.objectCol.arrayOptDecimal.min > Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDecimal.@min < %@", values: [Decimal128(963.852)], expectedCount: 1) {
+            $0.objectCol.arrayOptDecimal.min < Decimal128(963.852)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDecimal.@min == %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.objectCol.arrayOptDecimal.min == Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDecimal.@min >= %@", values: [Decimal128(456.789)], expectedCount: 0) {
+            $0.objectCol.arrayOptDecimal.min >= Decimal128(456.789)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDecimal.@min >= %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.objectCol.arrayOptDecimal.min >= Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDecimal.@min <= %@", values: [Decimal128(963.852)], expectedCount: 1) {
+            $0.objectCol.arrayOptDecimal.min <= Decimal128(963.852)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDecimal.@min <= %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.objectCol.arrayOptDecimal.min <= Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDecimal.@min != %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.objectCol.arrayOptDecimal.min != Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDecimal.@min != %@", values: [Decimal128(963.852)], expectedCount: 2) {
+            $0.objectCol.arrayOptDecimal.min != Decimal128(963.852)
+        }
+    }
+
+    func testCollectionMin() {
+        let realm = realmWithTestPath()
+        let object = objects().first!
+
+        try! realm.write {
+            object.arrayInt.removeAll()
+            object.arrayInt.append(objectsIn: [1, 2, 3])
+        }
+
+        assertQuery(predicate: "arrayInt.@min > %@", values: [1], expectedCount: 0) {
+            $0.arrayInt.min > 1
+        }
+
+        assertQuery(predicate: "arrayInt.@min < %@", values: [3], expectedCount: 1) {
+            $0.arrayInt.min < 3
+        }
+
+        assertQuery(predicate: "arrayInt.@min == %@", values: [1], expectedCount: 1) {
+            $0.arrayInt.min == 1
+        }
+
+        assertQuery(predicate: "arrayInt.@min >= %@", values: [2], expectedCount: 0) {
+            $0.arrayInt.min >= 2
+        }
+
+        assertQuery(predicate: "arrayInt.@min >= %@", values: [1], expectedCount: 1) {
+            $0.arrayInt.min >= 1
+        }
+
+        assertQuery(predicate: "arrayInt.@min <= %@", values: [3], expectedCount: 1) {
+            $0.arrayInt.min <= 3
+        }
+
+        assertQuery(predicate: "arrayInt.@min <= %@", values: [1], expectedCount: 1) {
+            $0.arrayInt.min <= 1
+        }
+
+        assertQuery(predicate: "arrayInt.@min != %@", values: [1], expectedCount: 0) {
+            $0.arrayInt.min != 1
+        }
+
+        assertQuery(predicate: "arrayInt.@min != %@", values: [3], expectedCount: 1) {
+            $0.arrayInt.min != 3
+        }
+
+        try! realm.write {
+            object.arrayInt8.removeAll()
+            object.arrayInt8.append(objectsIn: [Int8(8), Int8(9), Int8(10)])
+        }
+
+        assertQuery(predicate: "arrayInt8.@min > %@", values: [Int8(8)], expectedCount: 0) {
+            $0.arrayInt8.min > Int8(8)
+        }
+
+        assertQuery(predicate: "arrayInt8.@min < %@", values: [Int8(10)], expectedCount: 1) {
+            $0.arrayInt8.min < Int8(10)
+        }
+
+        assertQuery(predicate: "arrayInt8.@min == %@", values: [Int8(8)], expectedCount: 1) {
+            $0.arrayInt8.min == Int8(8)
+        }
+
+        assertQuery(predicate: "arrayInt8.@min >= %@", values: [Int8(9)], expectedCount: 0) {
+            $0.arrayInt8.min >= Int8(9)
+        }
+
+        assertQuery(predicate: "arrayInt8.@min >= %@", values: [Int8(8)], expectedCount: 1) {
+            $0.arrayInt8.min >= Int8(8)
+        }
+
+        assertQuery(predicate: "arrayInt8.@min <= %@", values: [Int8(10)], expectedCount: 1) {
+            $0.arrayInt8.min <= Int8(10)
+        }
+
+        assertQuery(predicate: "arrayInt8.@min <= %@", values: [Int8(8)], expectedCount: 1) {
+            $0.arrayInt8.min <= Int8(8)
+        }
+
+        assertQuery(predicate: "arrayInt8.@min != %@", values: [Int8(8)], expectedCount: 0) {
+            $0.arrayInt8.min != Int8(8)
+        }
+
+        assertQuery(predicate: "arrayInt8.@min != %@", values: [Int8(10)], expectedCount: 1) {
+            $0.arrayInt8.min != Int8(10)
+        }
+
+        try! realm.write {
+            object.arrayInt16.removeAll()
+            object.arrayInt16.append(objectsIn: [Int16(16), Int16(17), Int16(18)])
+        }
+
+        assertQuery(predicate: "arrayInt16.@min > %@", values: [Int16(16)], expectedCount: 0) {
+            $0.arrayInt16.min > Int16(16)
+        }
+
+        assertQuery(predicate: "arrayInt16.@min < %@", values: [Int16(18)], expectedCount: 1) {
+            $0.arrayInt16.min < Int16(18)
+        }
+
+        assertQuery(predicate: "arrayInt16.@min == %@", values: [Int16(16)], expectedCount: 1) {
+            $0.arrayInt16.min == Int16(16)
+        }
+
+        assertQuery(predicate: "arrayInt16.@min >= %@", values: [Int16(17)], expectedCount: 0) {
+            $0.arrayInt16.min >= Int16(17)
+        }
+
+        assertQuery(predicate: "arrayInt16.@min >= %@", values: [Int16(16)], expectedCount: 1) {
+            $0.arrayInt16.min >= Int16(16)
+        }
+
+        assertQuery(predicate: "arrayInt16.@min <= %@", values: [Int16(18)], expectedCount: 1) {
+            $0.arrayInt16.min <= Int16(18)
+        }
+
+        assertQuery(predicate: "arrayInt16.@min <= %@", values: [Int16(16)], expectedCount: 1) {
+            $0.arrayInt16.min <= Int16(16)
+        }
+
+        assertQuery(predicate: "arrayInt16.@min != %@", values: [Int16(16)], expectedCount: 0) {
+            $0.arrayInt16.min != Int16(16)
+        }
+
+        assertQuery(predicate: "arrayInt16.@min != %@", values: [Int16(18)], expectedCount: 1) {
+            $0.arrayInt16.min != Int16(18)
+        }
+
+        try! realm.write {
+            object.arrayInt32.removeAll()
+            object.arrayInt32.append(objectsIn: [Int32(32), Int32(33), Int32(34)])
+        }
+
+        assertQuery(predicate: "arrayInt32.@min > %@", values: [Int32(32)], expectedCount: 0) {
+            $0.arrayInt32.min > Int32(32)
+        }
+
+        assertQuery(predicate: "arrayInt32.@min < %@", values: [Int32(34)], expectedCount: 1) {
+            $0.arrayInt32.min < Int32(34)
+        }
+
+        assertQuery(predicate: "arrayInt32.@min == %@", values: [Int32(32)], expectedCount: 1) {
+            $0.arrayInt32.min == Int32(32)
+        }
+
+        assertQuery(predicate: "arrayInt32.@min >= %@", values: [Int32(33)], expectedCount: 0) {
+            $0.arrayInt32.min >= Int32(33)
+        }
+
+        assertQuery(predicate: "arrayInt32.@min >= %@", values: [Int32(32)], expectedCount: 1) {
+            $0.arrayInt32.min >= Int32(32)
+        }
+
+        assertQuery(predicate: "arrayInt32.@min <= %@", values: [Int32(34)], expectedCount: 1) {
+            $0.arrayInt32.min <= Int32(34)
+        }
+
+        assertQuery(predicate: "arrayInt32.@min <= %@", values: [Int32(32)], expectedCount: 1) {
+            $0.arrayInt32.min <= Int32(32)
+        }
+
+        assertQuery(predicate: "arrayInt32.@min != %@", values: [Int32(32)], expectedCount: 0) {
+            $0.arrayInt32.min != Int32(32)
+        }
+
+        assertQuery(predicate: "arrayInt32.@min != %@", values: [Int32(34)], expectedCount: 1) {
+            $0.arrayInt32.min != Int32(34)
+        }
+
+        try! realm.write {
+            object.arrayInt64.removeAll()
+            object.arrayInt64.append(objectsIn: [Int64(64), Int64(65), Int64(66)])
+        }
+
+        assertQuery(predicate: "arrayInt64.@min > %@", values: [Int64(64)], expectedCount: 0) {
+            $0.arrayInt64.min > Int64(64)
+        }
+
+        assertQuery(predicate: "arrayInt64.@min < %@", values: [Int64(66)], expectedCount: 1) {
+            $0.arrayInt64.min < Int64(66)
+        }
+
+        assertQuery(predicate: "arrayInt64.@min == %@", values: [Int64(64)], expectedCount: 1) {
+            $0.arrayInt64.min == Int64(64)
+        }
+
+        assertQuery(predicate: "arrayInt64.@min >= %@", values: [Int64(65)], expectedCount: 0) {
+            $0.arrayInt64.min >= Int64(65)
+        }
+
+        assertQuery(predicate: "arrayInt64.@min >= %@", values: [Int64(64)], expectedCount: 1) {
+            $0.arrayInt64.min >= Int64(64)
+        }
+
+        assertQuery(predicate: "arrayInt64.@min <= %@", values: [Int64(66)], expectedCount: 1) {
+            $0.arrayInt64.min <= Int64(66)
+        }
+
+        assertQuery(predicate: "arrayInt64.@min <= %@", values: [Int64(64)], expectedCount: 1) {
+            $0.arrayInt64.min <= Int64(64)
+        }
+
+        assertQuery(predicate: "arrayInt64.@min != %@", values: [Int64(64)], expectedCount: 0) {
+            $0.arrayInt64.min != Int64(64)
+        }
+
+        assertQuery(predicate: "arrayInt64.@min != %@", values: [Int64(66)], expectedCount: 1) {
+            $0.arrayInt64.min != Int64(66)
+        }
+
+        try! realm.write {
+            object.arrayFloat.removeAll()
+            object.arrayFloat.append(objectsIn: [Float(5.55444333), Float(6.55444333), Float(7.55444333)])
+        }
+
+        assertQuery(predicate: "arrayFloat.@min > %@", values: [Float(5.55444333)], expectedCount: 0) {
+            $0.arrayFloat.min > Float(5.55444333)
+        }
+
+        assertQuery(predicate: "arrayFloat.@min < %@", values: [Float(7.55444333)], expectedCount: 1) {
+            $0.arrayFloat.min < Float(7.55444333)
+        }
+
+        assertQuery(predicate: "arrayFloat.@min == %@", values: [Float(5.55444333)], expectedCount: 1) {
+            $0.arrayFloat.min == Float(5.55444333)
+        }
+
+        assertQuery(predicate: "arrayFloat.@min >= %@", values: [Float(6.55444333)], expectedCount: 0) {
+            $0.arrayFloat.min >= Float(6.55444333)
+        }
+
+        assertQuery(predicate: "arrayFloat.@min >= %@", values: [Float(5.55444333)], expectedCount: 1) {
+            $0.arrayFloat.min >= Float(5.55444333)
+        }
+
+        assertQuery(predicate: "arrayFloat.@min <= %@", values: [Float(7.55444333)], expectedCount: 1) {
+            $0.arrayFloat.min <= Float(7.55444333)
+        }
+
+        assertQuery(predicate: "arrayFloat.@min <= %@", values: [Float(5.55444333)], expectedCount: 1) {
+            $0.arrayFloat.min <= Float(5.55444333)
+        }
+
+        assertQuery(predicate: "arrayFloat.@min != %@", values: [Float(5.55444333)], expectedCount: 0) {
+            $0.arrayFloat.min != Float(5.55444333)
+        }
+
+        assertQuery(predicate: "arrayFloat.@min != %@", values: [Float(7.55444333)], expectedCount: 1) {
+            $0.arrayFloat.min != Float(7.55444333)
+        }
+
+        try! realm.write {
+            object.arrayDouble.removeAll()
+            object.arrayDouble.append(objectsIn: [123.456, 234.456, 345.567])
+        }
+
+        assertQuery(predicate: "arrayDouble.@min > %@", values: [123.456], expectedCount: 0) {
+            $0.arrayDouble.min > 123.456
+        }
+
+        assertQuery(predicate: "arrayDouble.@min < %@", values: [345.567], expectedCount: 1) {
+            $0.arrayDouble.min < 345.567
+        }
+
+        assertQuery(predicate: "arrayDouble.@min == %@", values: [123.456], expectedCount: 1) {
+            $0.arrayDouble.min == 123.456
+        }
+
+        assertQuery(predicate: "arrayDouble.@min >= %@", values: [234.456], expectedCount: 0) {
+            $0.arrayDouble.min >= 234.456
+        }
+
+        assertQuery(predicate: "arrayDouble.@min >= %@", values: [123.456], expectedCount: 1) {
+            $0.arrayDouble.min >= 123.456
+        }
+
+        assertQuery(predicate: "arrayDouble.@min <= %@", values: [345.567], expectedCount: 1) {
+            $0.arrayDouble.min <= 345.567
+        }
+
+        assertQuery(predicate: "arrayDouble.@min <= %@", values: [123.456], expectedCount: 1) {
+            $0.arrayDouble.min <= 123.456
+        }
+
+        assertQuery(predicate: "arrayDouble.@min != %@", values: [123.456], expectedCount: 0) {
+            $0.arrayDouble.min != 123.456
+        }
+
+        assertQuery(predicate: "arrayDouble.@min != %@", values: [345.567], expectedCount: 1) {
+            $0.arrayDouble.min != 345.567
+        }
+
+        try! realm.write {
+            object.arrayDate.removeAll()
+            object.arrayDate.append(objectsIn: [Date(timeIntervalSince1970: 1000000), Date(timeIntervalSince1970: 2000000), Date(timeIntervalSince1970: 3000000)])
+        }
+
+        assertQuery(predicate: "arrayDate.@min > %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 0) {
+            $0.arrayDate.min > Date(timeIntervalSince1970: 1000000)
+        }
+
+        assertQuery(predicate: "arrayDate.@min < %@", values: [Date(timeIntervalSince1970: 3000000)], expectedCount: 1) {
+            $0.arrayDate.min < Date(timeIntervalSince1970: 3000000)
+        }
+
+        assertQuery(predicate: "arrayDate.@min == %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
+            $0.arrayDate.min == Date(timeIntervalSince1970: 1000000)
+        }
+
+        assertQuery(predicate: "arrayDate.@min >= %@", values: [Date(timeIntervalSince1970: 2000000)], expectedCount: 0) {
+            $0.arrayDate.min >= Date(timeIntervalSince1970: 2000000)
+        }
+
+        assertQuery(predicate: "arrayDate.@min >= %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
+            $0.arrayDate.min >= Date(timeIntervalSince1970: 1000000)
+        }
+
+        assertQuery(predicate: "arrayDate.@min <= %@", values: [Date(timeIntervalSince1970: 3000000)], expectedCount: 1) {
+            $0.arrayDate.min <= Date(timeIntervalSince1970: 3000000)
+        }
+
+        assertQuery(predicate: "arrayDate.@min <= %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
+            $0.arrayDate.min <= Date(timeIntervalSince1970: 1000000)
+        }
+
+        assertQuery(predicate: "arrayDate.@min != %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 0) {
+            $0.arrayDate.min != Date(timeIntervalSince1970: 1000000)
+        }
+
+        assertQuery(predicate: "arrayDate.@min != %@", values: [Date(timeIntervalSince1970: 3000000)], expectedCount: 1) {
+            $0.arrayDate.min != Date(timeIntervalSince1970: 3000000)
+        }
+
+        try! realm.write {
+            object.arrayDecimal.removeAll()
+            object.arrayDecimal.append(objectsIn: [Decimal128(123.456), Decimal128(456.789), Decimal128(963.852)])
+        }
+
+        assertQuery(predicate: "arrayDecimal.@min > %@", values: [Decimal128(123.456)], expectedCount: 0) {
+            $0.arrayDecimal.min > Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "arrayDecimal.@min < %@", values: [Decimal128(963.852)], expectedCount: 1) {
+            $0.arrayDecimal.min < Decimal128(963.852)
+        }
+
+        assertQuery(predicate: "arrayDecimal.@min == %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.arrayDecimal.min == Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "arrayDecimal.@min >= %@", values: [Decimal128(456.789)], expectedCount: 0) {
+            $0.arrayDecimal.min >= Decimal128(456.789)
+        }
+
+        assertQuery(predicate: "arrayDecimal.@min >= %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.arrayDecimal.min >= Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "arrayDecimal.@min <= %@", values: [Decimal128(963.852)], expectedCount: 1) {
+            $0.arrayDecimal.min <= Decimal128(963.852)
+        }
+
+        assertQuery(predicate: "arrayDecimal.@min <= %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.arrayDecimal.min <= Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "arrayDecimal.@min != %@", values: [Decimal128(123.456)], expectedCount: 0) {
+            $0.arrayDecimal.min != Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "arrayDecimal.@min != %@", values: [Decimal128(963.852)], expectedCount: 1) {
+            $0.arrayDecimal.min != Decimal128(963.852)
+        }
+
+        try! realm.write {
+            object.arrayOptInt.removeAll()
+            object.arrayOptInt.append(objectsIn: [1, 2, 3])
+        }
+
+        assertQuery(predicate: "arrayOptInt.@min > %@", values: [1], expectedCount: 0) {
+            $0.arrayOptInt.min > 1
+        }
+
+        assertQuery(predicate: "arrayOptInt.@min < %@", values: [3], expectedCount: 1) {
+            $0.arrayOptInt.min < 3
+        }
+
+        assertQuery(predicate: "arrayOptInt.@min == %@", values: [1], expectedCount: 1) {
+            $0.arrayOptInt.min == 1
+        }
+
+        assertQuery(predicate: "arrayOptInt.@min >= %@", values: [2], expectedCount: 0) {
+            $0.arrayOptInt.min >= 2
+        }
+
+        assertQuery(predicate: "arrayOptInt.@min >= %@", values: [1], expectedCount: 1) {
+            $0.arrayOptInt.min >= 1
+        }
+
+        assertQuery(predicate: "arrayOptInt.@min <= %@", values: [3], expectedCount: 1) {
+            $0.arrayOptInt.min <= 3
+        }
+
+        assertQuery(predicate: "arrayOptInt.@min <= %@", values: [1], expectedCount: 1) {
+            $0.arrayOptInt.min <= 1
+        }
+
+        assertQuery(predicate: "arrayOptInt.@min != %@", values: [1], expectedCount: 0) {
+            $0.arrayOptInt.min != 1
+        }
+
+        assertQuery(predicate: "arrayOptInt.@min != %@", values: [3], expectedCount: 1) {
+            $0.arrayOptInt.min != 3
+        }
+
+        try! realm.write {
+            object.arrayOptInt8.removeAll()
+            object.arrayOptInt8.append(objectsIn: [Int8(8), Int8(9), Int8(10)])
+        }
+
+        assertQuery(predicate: "arrayOptInt8.@min > %@", values: [Int8(8)], expectedCount: 0) {
+            $0.arrayOptInt8.min > Int8(8)
+        }
+
+        assertQuery(predicate: "arrayOptInt8.@min < %@", values: [Int8(10)], expectedCount: 1) {
+            $0.arrayOptInt8.min < Int8(10)
+        }
+
+        assertQuery(predicate: "arrayOptInt8.@min == %@", values: [Int8(8)], expectedCount: 1) {
+            $0.arrayOptInt8.min == Int8(8)
+        }
+
+        assertQuery(predicate: "arrayOptInt8.@min >= %@", values: [Int8(9)], expectedCount: 0) {
+            $0.arrayOptInt8.min >= Int8(9)
+        }
+
+        assertQuery(predicate: "arrayOptInt8.@min >= %@", values: [Int8(8)], expectedCount: 1) {
+            $0.arrayOptInt8.min >= Int8(8)
+        }
+
+        assertQuery(predicate: "arrayOptInt8.@min <= %@", values: [Int8(10)], expectedCount: 1) {
+            $0.arrayOptInt8.min <= Int8(10)
+        }
+
+        assertQuery(predicate: "arrayOptInt8.@min <= %@", values: [Int8(8)], expectedCount: 1) {
+            $0.arrayOptInt8.min <= Int8(8)
+        }
+
+        assertQuery(predicate: "arrayOptInt8.@min != %@", values: [Int8(8)], expectedCount: 0) {
+            $0.arrayOptInt8.min != Int8(8)
+        }
+
+        assertQuery(predicate: "arrayOptInt8.@min != %@", values: [Int8(10)], expectedCount: 1) {
+            $0.arrayOptInt8.min != Int8(10)
+        }
+
+        try! realm.write {
+            object.arrayOptInt16.removeAll()
+            object.arrayOptInt16.append(objectsIn: [Int16(16), Int16(17), Int16(18)])
+        }
+
+        assertQuery(predicate: "arrayOptInt16.@min > %@", values: [Int16(16)], expectedCount: 0) {
+            $0.arrayOptInt16.min > Int16(16)
+        }
+
+        assertQuery(predicate: "arrayOptInt16.@min < %@", values: [Int16(18)], expectedCount: 1) {
+            $0.arrayOptInt16.min < Int16(18)
+        }
+
+        assertQuery(predicate: "arrayOptInt16.@min == %@", values: [Int16(16)], expectedCount: 1) {
+            $0.arrayOptInt16.min == Int16(16)
+        }
+
+        assertQuery(predicate: "arrayOptInt16.@min >= %@", values: [Int16(17)], expectedCount: 0) {
+            $0.arrayOptInt16.min >= Int16(17)
+        }
+
+        assertQuery(predicate: "arrayOptInt16.@min >= %@", values: [Int16(16)], expectedCount: 1) {
+            $0.arrayOptInt16.min >= Int16(16)
+        }
+
+        assertQuery(predicate: "arrayOptInt16.@min <= %@", values: [Int16(18)], expectedCount: 1) {
+            $0.arrayOptInt16.min <= Int16(18)
+        }
+
+        assertQuery(predicate: "arrayOptInt16.@min <= %@", values: [Int16(16)], expectedCount: 1) {
+            $0.arrayOptInt16.min <= Int16(16)
+        }
+
+        assertQuery(predicate: "arrayOptInt16.@min != %@", values: [Int16(16)], expectedCount: 0) {
+            $0.arrayOptInt16.min != Int16(16)
+        }
+
+        assertQuery(predicate: "arrayOptInt16.@min != %@", values: [Int16(18)], expectedCount: 1) {
+            $0.arrayOptInt16.min != Int16(18)
+        }
+
+        try! realm.write {
+            object.arrayOptInt32.removeAll()
+            object.arrayOptInt32.append(objectsIn: [Int32(32), Int32(33), Int32(34)])
+        }
+
+        assertQuery(predicate: "arrayOptInt32.@min > %@", values: [Int32(32)], expectedCount: 0) {
+            $0.arrayOptInt32.min > Int32(32)
+        }
+
+        assertQuery(predicate: "arrayOptInt32.@min < %@", values: [Int32(34)], expectedCount: 1) {
+            $0.arrayOptInt32.min < Int32(34)
+        }
+
+        assertQuery(predicate: "arrayOptInt32.@min == %@", values: [Int32(32)], expectedCount: 1) {
+            $0.arrayOptInt32.min == Int32(32)
+        }
+
+        assertQuery(predicate: "arrayOptInt32.@min >= %@", values: [Int32(33)], expectedCount: 0) {
+            $0.arrayOptInt32.min >= Int32(33)
+        }
+
+        assertQuery(predicate: "arrayOptInt32.@min >= %@", values: [Int32(32)], expectedCount: 1) {
+            $0.arrayOptInt32.min >= Int32(32)
+        }
+
+        assertQuery(predicate: "arrayOptInt32.@min <= %@", values: [Int32(34)], expectedCount: 1) {
+            $0.arrayOptInt32.min <= Int32(34)
+        }
+
+        assertQuery(predicate: "arrayOptInt32.@min <= %@", values: [Int32(32)], expectedCount: 1) {
+            $0.arrayOptInt32.min <= Int32(32)
+        }
+
+        assertQuery(predicate: "arrayOptInt32.@min != %@", values: [Int32(32)], expectedCount: 0) {
+            $0.arrayOptInt32.min != Int32(32)
+        }
+
+        assertQuery(predicate: "arrayOptInt32.@min != %@", values: [Int32(34)], expectedCount: 1) {
+            $0.arrayOptInt32.min != Int32(34)
+        }
+
+        try! realm.write {
+            object.arrayOptInt64.removeAll()
+            object.arrayOptInt64.append(objectsIn: [Int64(64), Int64(65), Int64(66)])
+        }
+
+        assertQuery(predicate: "arrayOptInt64.@min > %@", values: [Int64(64)], expectedCount: 0) {
+            $0.arrayOptInt64.min > Int64(64)
+        }
+
+        assertQuery(predicate: "arrayOptInt64.@min < %@", values: [Int64(66)], expectedCount: 1) {
+            $0.arrayOptInt64.min < Int64(66)
+        }
+
+        assertQuery(predicate: "arrayOptInt64.@min == %@", values: [Int64(64)], expectedCount: 1) {
+            $0.arrayOptInt64.min == Int64(64)
+        }
+
+        assertQuery(predicate: "arrayOptInt64.@min >= %@", values: [Int64(65)], expectedCount: 0) {
+            $0.arrayOptInt64.min >= Int64(65)
+        }
+
+        assertQuery(predicate: "arrayOptInt64.@min >= %@", values: [Int64(64)], expectedCount: 1) {
+            $0.arrayOptInt64.min >= Int64(64)
+        }
+
+        assertQuery(predicate: "arrayOptInt64.@min <= %@", values: [Int64(66)], expectedCount: 1) {
+            $0.arrayOptInt64.min <= Int64(66)
+        }
+
+        assertQuery(predicate: "arrayOptInt64.@min <= %@", values: [Int64(64)], expectedCount: 1) {
+            $0.arrayOptInt64.min <= Int64(64)
+        }
+
+        assertQuery(predicate: "arrayOptInt64.@min != %@", values: [Int64(64)], expectedCount: 0) {
+            $0.arrayOptInt64.min != Int64(64)
+        }
+
+        assertQuery(predicate: "arrayOptInt64.@min != %@", values: [Int64(66)], expectedCount: 1) {
+            $0.arrayOptInt64.min != Int64(66)
+        }
+
+        try! realm.write {
+            object.arrayOptFloat.removeAll()
+            object.arrayOptFloat.append(objectsIn: [Float(5.55444333), Float(6.55444333), Float(7.55444333)])
+        }
+
+        assertQuery(predicate: "arrayOptFloat.@min > %@", values: [Float(5.55444333)], expectedCount: 0) {
+            $0.arrayOptFloat.min > Float(5.55444333)
+        }
+
+        assertQuery(predicate: "arrayOptFloat.@min < %@", values: [Float(7.55444333)], expectedCount: 1) {
+            $0.arrayOptFloat.min < Float(7.55444333)
+        }
+
+        assertQuery(predicate: "arrayOptFloat.@min == %@", values: [Float(5.55444333)], expectedCount: 1) {
+            $0.arrayOptFloat.min == Float(5.55444333)
+        }
+
+        assertQuery(predicate: "arrayOptFloat.@min >= %@", values: [Float(6.55444333)], expectedCount: 0) {
+            $0.arrayOptFloat.min >= Float(6.55444333)
+        }
+
+        assertQuery(predicate: "arrayOptFloat.@min >= %@", values: [Float(5.55444333)], expectedCount: 1) {
+            $0.arrayOptFloat.min >= Float(5.55444333)
+        }
+
+        assertQuery(predicate: "arrayOptFloat.@min <= %@", values: [Float(7.55444333)], expectedCount: 1) {
+            $0.arrayOptFloat.min <= Float(7.55444333)
+        }
+
+        assertQuery(predicate: "arrayOptFloat.@min <= %@", values: [Float(5.55444333)], expectedCount: 1) {
+            $0.arrayOptFloat.min <= Float(5.55444333)
+        }
+
+        assertQuery(predicate: "arrayOptFloat.@min != %@", values: [Float(5.55444333)], expectedCount: 0) {
+            $0.arrayOptFloat.min != Float(5.55444333)
+        }
+
+        assertQuery(predicate: "arrayOptFloat.@min != %@", values: [Float(7.55444333)], expectedCount: 1) {
+            $0.arrayOptFloat.min != Float(7.55444333)
+        }
+
+        try! realm.write {
+            object.arrayOptDouble.removeAll()
+            object.arrayOptDouble.append(objectsIn: [123.456, 234.456, 345.567])
+        }
+
+        assertQuery(predicate: "arrayOptDouble.@min > %@", values: [123.456], expectedCount: 0) {
+            $0.arrayOptDouble.min > 123.456
+        }
+
+        assertQuery(predicate: "arrayOptDouble.@min < %@", values: [345.567], expectedCount: 1) {
+            $0.arrayOptDouble.min < 345.567
+        }
+
+        assertQuery(predicate: "arrayOptDouble.@min == %@", values: [123.456], expectedCount: 1) {
+            $0.arrayOptDouble.min == 123.456
+        }
+
+        assertQuery(predicate: "arrayOptDouble.@min >= %@", values: [234.456], expectedCount: 0) {
+            $0.arrayOptDouble.min >= 234.456
+        }
+
+        assertQuery(predicate: "arrayOptDouble.@min >= %@", values: [123.456], expectedCount: 1) {
+            $0.arrayOptDouble.min >= 123.456
+        }
+
+        assertQuery(predicate: "arrayOptDouble.@min <= %@", values: [345.567], expectedCount: 1) {
+            $0.arrayOptDouble.min <= 345.567
+        }
+
+        assertQuery(predicate: "arrayOptDouble.@min <= %@", values: [123.456], expectedCount: 1) {
+            $0.arrayOptDouble.min <= 123.456
+        }
+
+        assertQuery(predicate: "arrayOptDouble.@min != %@", values: [123.456], expectedCount: 0) {
+            $0.arrayOptDouble.min != 123.456
+        }
+
+        assertQuery(predicate: "arrayOptDouble.@min != %@", values: [345.567], expectedCount: 1) {
+            $0.arrayOptDouble.min != 345.567
+        }
+
+        try! realm.write {
+            object.arrayOptDate.removeAll()
+            object.arrayOptDate.append(objectsIn: [Date(timeIntervalSince1970: 1000000), Date(timeIntervalSince1970: 2000000), Date(timeIntervalSince1970: 3000000)])
+        }
+
+        assertQuery(predicate: "arrayOptDate.@min > %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 0) {
+            $0.arrayOptDate.min > Date(timeIntervalSince1970: 1000000)
+        }
+
+        assertQuery(predicate: "arrayOptDate.@min < %@", values: [Date(timeIntervalSince1970: 3000000)], expectedCount: 1) {
+            $0.arrayOptDate.min < Date(timeIntervalSince1970: 3000000)
+        }
+
+        assertQuery(predicate: "arrayOptDate.@min == %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
+            $0.arrayOptDate.min == Date(timeIntervalSince1970: 1000000)
+        }
+
+        assertQuery(predicate: "arrayOptDate.@min >= %@", values: [Date(timeIntervalSince1970: 2000000)], expectedCount: 0) {
+            $0.arrayOptDate.min >= Date(timeIntervalSince1970: 2000000)
+        }
+
+        assertQuery(predicate: "arrayOptDate.@min >= %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
+            $0.arrayOptDate.min >= Date(timeIntervalSince1970: 1000000)
+        }
+
+        assertQuery(predicate: "arrayOptDate.@min <= %@", values: [Date(timeIntervalSince1970: 3000000)], expectedCount: 1) {
+            $0.arrayOptDate.min <= Date(timeIntervalSince1970: 3000000)
+        }
+
+        assertQuery(predicate: "arrayOptDate.@min <= %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
+            $0.arrayOptDate.min <= Date(timeIntervalSince1970: 1000000)
+        }
+
+        assertQuery(predicate: "arrayOptDate.@min != %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 0) {
+            $0.arrayOptDate.min != Date(timeIntervalSince1970: 1000000)
+        }
+
+        assertQuery(predicate: "arrayOptDate.@min != %@", values: [Date(timeIntervalSince1970: 3000000)], expectedCount: 1) {
+            $0.arrayOptDate.min != Date(timeIntervalSince1970: 3000000)
+        }
+
+        try! realm.write {
+            object.arrayOptDecimal.removeAll()
+            object.arrayOptDecimal.append(objectsIn: [Decimal128(123.456), Decimal128(456.789), Decimal128(963.852)])
+        }
+
+        assertQuery(predicate: "arrayOptDecimal.@min > %@", values: [Decimal128(123.456)], expectedCount: 0) {
+            $0.arrayOptDecimal.min > Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "arrayOptDecimal.@min < %@", values: [Decimal128(963.852)], expectedCount: 1) {
+            $0.arrayOptDecimal.min < Decimal128(963.852)
+        }
+
+        assertQuery(predicate: "arrayOptDecimal.@min == %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.arrayOptDecimal.min == Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "arrayOptDecimal.@min >= %@", values: [Decimal128(456.789)], expectedCount: 0) {
+            $0.arrayOptDecimal.min >= Decimal128(456.789)
+        }
+
+        assertQuery(predicate: "arrayOptDecimal.@min >= %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.arrayOptDecimal.min >= Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "arrayOptDecimal.@min <= %@", values: [Decimal128(963.852)], expectedCount: 1) {
+            $0.arrayOptDecimal.min <= Decimal128(963.852)
+        }
+
+        assertQuery(predicate: "arrayOptDecimal.@min <= %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.arrayOptDecimal.min <= Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "arrayOptDecimal.@min != %@", values: [Decimal128(123.456)], expectedCount: 0) {
+            $0.arrayOptDecimal.min != Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "arrayOptDecimal.@min != %@", values: [Decimal128(963.852)], expectedCount: 1) {
+            $0.arrayOptDecimal.min != Decimal128(963.852)
+        }
+    }
+
+    func testCollectionAggregatesMax() {
+        let realm = realmWithTestPath()
+        let object = objects().first!
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["arrayInt": [1, 2, 3]])
+            if let oldObject = object.objectCol {
+                realm.delete(oldObject)
+            }
+            object.objectCol = modernObj
+        }
+        assertQuery(predicate: "objectCol.arrayInt.@max > %@", values: [1], expectedCount: 1) {
+            $0.objectCol.arrayInt.max > 1
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt.@max < %@", values: [3], expectedCount: 0) {
+            $0.objectCol.arrayInt.max < 3
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt.@max == %@", values: [3], expectedCount: 1) {
+            $0.objectCol.arrayInt.max == 3
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt.@max >= %@", values: [1], expectedCount: 1) {
+            $0.objectCol.arrayInt.max >= 1
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt.@max >= %@", values: [3], expectedCount: 1) {
+            $0.objectCol.arrayInt.max >= 3
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt.@max <= %@", values: [2], expectedCount: 0) {
+            $0.objectCol.arrayInt.max <= 2
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt.@max <= %@", values: [3], expectedCount: 1) {
+            $0.objectCol.arrayInt.max <= 3
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "objectCol.arrayInt.@max != %@", values: [3], expectedCount: 1) {
+            $0.objectCol.arrayInt.max != 3
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt.@max != %@", values: [1], expectedCount: 2) {
+            $0.objectCol.arrayInt.max != 1
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["arrayInt8": [Int8(8), Int8(9), Int8(10)]])
+            if let oldObject = object.objectCol {
+                realm.delete(oldObject)
+            }
+            object.objectCol = modernObj
+        }
+        assertQuery(predicate: "objectCol.arrayInt8.@max > %@", values: [Int8(8)], expectedCount: 1) {
+            $0.objectCol.arrayInt8.max > Int8(8)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt8.@max < %@", values: [Int8(10)], expectedCount: 0) {
+            $0.objectCol.arrayInt8.max < Int8(10)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt8.@max == %@", values: [Int8(10)], expectedCount: 1) {
+            $0.objectCol.arrayInt8.max == Int8(10)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt8.@max >= %@", values: [Int8(8)], expectedCount: 1) {
+            $0.objectCol.arrayInt8.max >= Int8(8)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt8.@max >= %@", values: [Int8(10)], expectedCount: 1) {
+            $0.objectCol.arrayInt8.max >= Int8(10)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt8.@max <= %@", values: [Int8(9)], expectedCount: 0) {
+            $0.objectCol.arrayInt8.max <= Int8(9)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt8.@max <= %@", values: [Int8(10)], expectedCount: 1) {
+            $0.objectCol.arrayInt8.max <= Int8(10)
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "objectCol.arrayInt8.@max != %@", values: [Int8(10)], expectedCount: 1) {
+            $0.objectCol.arrayInt8.max != Int8(10)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt8.@max != %@", values: [Int8(8)], expectedCount: 2) {
+            $0.objectCol.arrayInt8.max != Int8(8)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["arrayInt16": [Int16(16), Int16(17), Int16(18)]])
+            if let oldObject = object.objectCol {
+                realm.delete(oldObject)
+            }
+            object.objectCol = modernObj
+        }
+        assertQuery(predicate: "objectCol.arrayInt16.@max > %@", values: [Int16(16)], expectedCount: 1) {
+            $0.objectCol.arrayInt16.max > Int16(16)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt16.@max < %@", values: [Int16(18)], expectedCount: 0) {
+            $0.objectCol.arrayInt16.max < Int16(18)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt16.@max == %@", values: [Int16(18)], expectedCount: 1) {
+            $0.objectCol.arrayInt16.max == Int16(18)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt16.@max >= %@", values: [Int16(16)], expectedCount: 1) {
+            $0.objectCol.arrayInt16.max >= Int16(16)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt16.@max >= %@", values: [Int16(18)], expectedCount: 1) {
+            $0.objectCol.arrayInt16.max >= Int16(18)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt16.@max <= %@", values: [Int16(17)], expectedCount: 0) {
+            $0.objectCol.arrayInt16.max <= Int16(17)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt16.@max <= %@", values: [Int16(18)], expectedCount: 1) {
+            $0.objectCol.arrayInt16.max <= Int16(18)
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "objectCol.arrayInt16.@max != %@", values: [Int16(18)], expectedCount: 1) {
+            $0.objectCol.arrayInt16.max != Int16(18)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt16.@max != %@", values: [Int16(16)], expectedCount: 2) {
+            $0.objectCol.arrayInt16.max != Int16(16)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["arrayInt32": [Int32(32), Int32(33), Int32(34)]])
+            if let oldObject = object.objectCol {
+                realm.delete(oldObject)
+            }
+            object.objectCol = modernObj
+        }
+        assertQuery(predicate: "objectCol.arrayInt32.@max > %@", values: [Int32(32)], expectedCount: 1) {
+            $0.objectCol.arrayInt32.max > Int32(32)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt32.@max < %@", values: [Int32(34)], expectedCount: 0) {
+            $0.objectCol.arrayInt32.max < Int32(34)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt32.@max == %@", values: [Int32(34)], expectedCount: 1) {
+            $0.objectCol.arrayInt32.max == Int32(34)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt32.@max >= %@", values: [Int32(32)], expectedCount: 1) {
+            $0.objectCol.arrayInt32.max >= Int32(32)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt32.@max >= %@", values: [Int32(34)], expectedCount: 1) {
+            $0.objectCol.arrayInt32.max >= Int32(34)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt32.@max <= %@", values: [Int32(33)], expectedCount: 0) {
+            $0.objectCol.arrayInt32.max <= Int32(33)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt32.@max <= %@", values: [Int32(34)], expectedCount: 1) {
+            $0.objectCol.arrayInt32.max <= Int32(34)
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "objectCol.arrayInt32.@max != %@", values: [Int32(34)], expectedCount: 1) {
+            $0.objectCol.arrayInt32.max != Int32(34)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt32.@max != %@", values: [Int32(32)], expectedCount: 2) {
+            $0.objectCol.arrayInt32.max != Int32(32)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["arrayInt64": [Int64(64), Int64(65), Int64(66)]])
+            if let oldObject = object.objectCol {
+                realm.delete(oldObject)
+            }
+            object.objectCol = modernObj
+        }
+        assertQuery(predicate: "objectCol.arrayInt64.@max > %@", values: [Int64(64)], expectedCount: 1) {
+            $0.objectCol.arrayInt64.max > Int64(64)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt64.@max < %@", values: [Int64(66)], expectedCount: 0) {
+            $0.objectCol.arrayInt64.max < Int64(66)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt64.@max == %@", values: [Int64(66)], expectedCount: 1) {
+            $0.objectCol.arrayInt64.max == Int64(66)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt64.@max >= %@", values: [Int64(64)], expectedCount: 1) {
+            $0.objectCol.arrayInt64.max >= Int64(64)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt64.@max >= %@", values: [Int64(66)], expectedCount: 1) {
+            $0.objectCol.arrayInt64.max >= Int64(66)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt64.@max <= %@", values: [Int64(65)], expectedCount: 0) {
+            $0.objectCol.arrayInt64.max <= Int64(65)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt64.@max <= %@", values: [Int64(66)], expectedCount: 1) {
+            $0.objectCol.arrayInt64.max <= Int64(66)
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "objectCol.arrayInt64.@max != %@", values: [Int64(66)], expectedCount: 1) {
+            $0.objectCol.arrayInt64.max != Int64(66)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt64.@max != %@", values: [Int64(64)], expectedCount: 2) {
+            $0.objectCol.arrayInt64.max != Int64(64)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["arrayFloat": [Float(5.55444333), Float(6.55444333), Float(7.55444333)]])
+            if let oldObject = object.objectCol {
+                realm.delete(oldObject)
+            }
+            object.objectCol = modernObj
+        }
+        assertQuery(predicate: "objectCol.arrayFloat.@max > %@", values: [Float(5.55444333)], expectedCount: 1) {
+            $0.objectCol.arrayFloat.max > Float(5.55444333)
+        }
+
+        assertQuery(predicate: "objectCol.arrayFloat.@max < %@", values: [Float(7.55444333)], expectedCount: 0) {
+            $0.objectCol.arrayFloat.max < Float(7.55444333)
+        }
+
+        assertQuery(predicate: "objectCol.arrayFloat.@max == %@", values: [Float(7.55444333)], expectedCount: 1) {
+            $0.objectCol.arrayFloat.max == Float(7.55444333)
+        }
+
+        assertQuery(predicate: "objectCol.arrayFloat.@max >= %@", values: [Float(5.55444333)], expectedCount: 1) {
+            $0.objectCol.arrayFloat.max >= Float(5.55444333)
+        }
+
+        assertQuery(predicate: "objectCol.arrayFloat.@max >= %@", values: [Float(7.55444333)], expectedCount: 1) {
+            $0.objectCol.arrayFloat.max >= Float(7.55444333)
+        }
+
+        assertQuery(predicate: "objectCol.arrayFloat.@max <= %@", values: [Float(6.55444333)], expectedCount: 0) {
+            $0.objectCol.arrayFloat.max <= Float(6.55444333)
+        }
+
+        assertQuery(predicate: "objectCol.arrayFloat.@max <= %@", values: [Float(7.55444333)], expectedCount: 1) {
+            $0.objectCol.arrayFloat.max <= Float(7.55444333)
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "objectCol.arrayFloat.@max != %@", values: [Float(7.55444333)], expectedCount: 1) {
+            $0.objectCol.arrayFloat.max != Float(7.55444333)
+        }
+
+        assertQuery(predicate: "objectCol.arrayFloat.@max != %@", values: [Float(5.55444333)], expectedCount: 2) {
+            $0.objectCol.arrayFloat.max != Float(5.55444333)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["arrayDouble": [123.456, 234.456, 345.567]])
+            if let oldObject = object.objectCol {
+                realm.delete(oldObject)
+            }
+            object.objectCol = modernObj
+        }
+        assertQuery(predicate: "objectCol.arrayDouble.@max > %@", values: [123.456], expectedCount: 1) {
+            $0.objectCol.arrayDouble.max > 123.456
+        }
+
+        assertQuery(predicate: "objectCol.arrayDouble.@max < %@", values: [345.567], expectedCount: 0) {
+            $0.objectCol.arrayDouble.max < 345.567
+        }
+
+        assertQuery(predicate: "objectCol.arrayDouble.@max == %@", values: [345.567], expectedCount: 1) {
+            $0.objectCol.arrayDouble.max == 345.567
+        }
+
+        assertQuery(predicate: "objectCol.arrayDouble.@max >= %@", values: [123.456], expectedCount: 1) {
+            $0.objectCol.arrayDouble.max >= 123.456
+        }
+
+        assertQuery(predicate: "objectCol.arrayDouble.@max >= %@", values: [345.567], expectedCount: 1) {
+            $0.objectCol.arrayDouble.max >= 345.567
+        }
+
+        assertQuery(predicate: "objectCol.arrayDouble.@max <= %@", values: [234.456], expectedCount: 0) {
+            $0.objectCol.arrayDouble.max <= 234.456
+        }
+
+        assertQuery(predicate: "objectCol.arrayDouble.@max <= %@", values: [345.567], expectedCount: 1) {
+            $0.objectCol.arrayDouble.max <= 345.567
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "objectCol.arrayDouble.@max != %@", values: [345.567], expectedCount: 1) {
+            $0.objectCol.arrayDouble.max != 345.567
+        }
+
+        assertQuery(predicate: "objectCol.arrayDouble.@max != %@", values: [123.456], expectedCount: 2) {
+            $0.objectCol.arrayDouble.max != 123.456
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["arrayDate": [Date(timeIntervalSince1970: 1000000), Date(timeIntervalSince1970: 2000000), Date(timeIntervalSince1970: 3000000)]])
+            if let oldObject = object.objectCol {
+                realm.delete(oldObject)
+            }
+            object.objectCol = modernObj
+        }
+        assertQuery(predicate: "objectCol.arrayDate.@max > %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
+            $0.objectCol.arrayDate.max > Date(timeIntervalSince1970: 1000000)
+        }
+
+        assertQuery(predicate: "objectCol.arrayDate.@max < %@", values: [Date(timeIntervalSince1970: 3000000)], expectedCount: 0) {
+            $0.objectCol.arrayDate.max < Date(timeIntervalSince1970: 3000000)
+        }
+
+        assertQuery(predicate: "objectCol.arrayDate.@max == %@", values: [Date(timeIntervalSince1970: 3000000)], expectedCount: 1) {
+            $0.objectCol.arrayDate.max == Date(timeIntervalSince1970: 3000000)
+        }
+
+        assertQuery(predicate: "objectCol.arrayDate.@max >= %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
+            $0.objectCol.arrayDate.max >= Date(timeIntervalSince1970: 1000000)
+        }
+
+        assertQuery(predicate: "objectCol.arrayDate.@max >= %@", values: [Date(timeIntervalSince1970: 3000000)], expectedCount: 1) {
+            $0.objectCol.arrayDate.max >= Date(timeIntervalSince1970: 3000000)
+        }
+
+        assertQuery(predicate: "objectCol.arrayDate.@max <= %@", values: [Date(timeIntervalSince1970: 2000000)], expectedCount: 0) {
+            $0.objectCol.arrayDate.max <= Date(timeIntervalSince1970: 2000000)
+        }
+
+        assertQuery(predicate: "objectCol.arrayDate.@max <= %@", values: [Date(timeIntervalSince1970: 3000000)], expectedCount: 1) {
+            $0.objectCol.arrayDate.max <= Date(timeIntervalSince1970: 3000000)
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "objectCol.arrayDate.@max != %@", values: [Date(timeIntervalSince1970: 3000000)], expectedCount: 1) {
+            $0.objectCol.arrayDate.max != Date(timeIntervalSince1970: 3000000)
+        }
+
+        assertQuery(predicate: "objectCol.arrayDate.@max != %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 2) {
+            $0.objectCol.arrayDate.max != Date(timeIntervalSince1970: 1000000)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["arrayDecimal": [Decimal128(123.456), Decimal128(456.789), Decimal128(963.852)]])
+            if let oldObject = object.objectCol {
+                realm.delete(oldObject)
+            }
+            object.objectCol = modernObj
+        }
+        assertQuery(predicate: "objectCol.arrayDecimal.@max > %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.objectCol.arrayDecimal.max > Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "objectCol.arrayDecimal.@max < %@", values: [Decimal128(963.852)], expectedCount: 0) {
+            $0.objectCol.arrayDecimal.max < Decimal128(963.852)
+        }
+
+        assertQuery(predicate: "objectCol.arrayDecimal.@max == %@", values: [Decimal128(963.852)], expectedCount: 1) {
+            $0.objectCol.arrayDecimal.max == Decimal128(963.852)
+        }
+
+        assertQuery(predicate: "objectCol.arrayDecimal.@max >= %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.objectCol.arrayDecimal.max >= Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "objectCol.arrayDecimal.@max >= %@", values: [Decimal128(963.852)], expectedCount: 1) {
+            $0.objectCol.arrayDecimal.max >= Decimal128(963.852)
+        }
+
+        assertQuery(predicate: "objectCol.arrayDecimal.@max <= %@", values: [Decimal128(456.789)], expectedCount: 0) {
+            $0.objectCol.arrayDecimal.max <= Decimal128(456.789)
+        }
+
+        assertQuery(predicate: "objectCol.arrayDecimal.@max <= %@", values: [Decimal128(963.852)], expectedCount: 1) {
+            $0.objectCol.arrayDecimal.max <= Decimal128(963.852)
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "objectCol.arrayDecimal.@max != %@", values: [Decimal128(963.852)], expectedCount: 1) {
+            $0.objectCol.arrayDecimal.max != Decimal128(963.852)
+        }
+
+        assertQuery(predicate: "objectCol.arrayDecimal.@max != %@", values: [Decimal128(123.456)], expectedCount: 2) {
+            $0.objectCol.arrayDecimal.max != Decimal128(123.456)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["arrayOptInt": [1, 2, 3]])
+            if let oldObject = object.objectCol {
+                realm.delete(oldObject)
+            }
+            object.objectCol = modernObj
+        }
+        assertQuery(predicate: "objectCol.arrayOptInt.@max > %@", values: [1], expectedCount: 1) {
+            $0.objectCol.arrayOptInt.max > 1
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt.@max < %@", values: [3], expectedCount: 0) {
+            $0.objectCol.arrayOptInt.max < 3
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt.@max == %@", values: [3], expectedCount: 1) {
+            $0.objectCol.arrayOptInt.max == 3
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt.@max >= %@", values: [1], expectedCount: 1) {
+            $0.objectCol.arrayOptInt.max >= 1
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt.@max >= %@", values: [3], expectedCount: 1) {
+            $0.objectCol.arrayOptInt.max >= 3
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt.@max <= %@", values: [2], expectedCount: 0) {
+            $0.objectCol.arrayOptInt.max <= 2
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt.@max <= %@", values: [3], expectedCount: 1) {
+            $0.objectCol.arrayOptInt.max <= 3
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "objectCol.arrayOptInt.@max != %@", values: [3], expectedCount: 1) {
+            $0.objectCol.arrayOptInt.max != 3
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt.@max != %@", values: [1], expectedCount: 2) {
+            $0.objectCol.arrayOptInt.max != 1
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["arrayOptInt8": [Int8(8), Int8(9), Int8(10)]])
+            if let oldObject = object.objectCol {
+                realm.delete(oldObject)
+            }
+            object.objectCol = modernObj
+        }
+        assertQuery(predicate: "objectCol.arrayOptInt8.@max > %@", values: [Int8(8)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt8.max > Int8(8)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt8.@max < %@", values: [Int8(10)], expectedCount: 0) {
+            $0.objectCol.arrayOptInt8.max < Int8(10)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt8.@max == %@", values: [Int8(10)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt8.max == Int8(10)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt8.@max >= %@", values: [Int8(8)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt8.max >= Int8(8)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt8.@max >= %@", values: [Int8(10)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt8.max >= Int8(10)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt8.@max <= %@", values: [Int8(9)], expectedCount: 0) {
+            $0.objectCol.arrayOptInt8.max <= Int8(9)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt8.@max <= %@", values: [Int8(10)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt8.max <= Int8(10)
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "objectCol.arrayOptInt8.@max != %@", values: [Int8(10)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt8.max != Int8(10)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt8.@max != %@", values: [Int8(8)], expectedCount: 2) {
+            $0.objectCol.arrayOptInt8.max != Int8(8)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["arrayOptInt16": [Int16(16), Int16(17), Int16(18)]])
+            if let oldObject = object.objectCol {
+                realm.delete(oldObject)
+            }
+            object.objectCol = modernObj
+        }
+        assertQuery(predicate: "objectCol.arrayOptInt16.@max > %@", values: [Int16(16)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt16.max > Int16(16)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt16.@max < %@", values: [Int16(18)], expectedCount: 0) {
+            $0.objectCol.arrayOptInt16.max < Int16(18)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt16.@max == %@", values: [Int16(18)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt16.max == Int16(18)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt16.@max >= %@", values: [Int16(16)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt16.max >= Int16(16)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt16.@max >= %@", values: [Int16(18)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt16.max >= Int16(18)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt16.@max <= %@", values: [Int16(17)], expectedCount: 0) {
+            $0.objectCol.arrayOptInt16.max <= Int16(17)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt16.@max <= %@", values: [Int16(18)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt16.max <= Int16(18)
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "objectCol.arrayOptInt16.@max != %@", values: [Int16(18)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt16.max != Int16(18)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt16.@max != %@", values: [Int16(16)], expectedCount: 2) {
+            $0.objectCol.arrayOptInt16.max != Int16(16)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["arrayOptInt32": [Int32(32), Int32(33), Int32(34)]])
+            if let oldObject = object.objectCol {
+                realm.delete(oldObject)
+            }
+            object.objectCol = modernObj
+        }
+        assertQuery(predicate: "objectCol.arrayOptInt32.@max > %@", values: [Int32(32)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt32.max > Int32(32)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt32.@max < %@", values: [Int32(34)], expectedCount: 0) {
+            $0.objectCol.arrayOptInt32.max < Int32(34)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt32.@max == %@", values: [Int32(34)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt32.max == Int32(34)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt32.@max >= %@", values: [Int32(32)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt32.max >= Int32(32)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt32.@max >= %@", values: [Int32(34)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt32.max >= Int32(34)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt32.@max <= %@", values: [Int32(33)], expectedCount: 0) {
+            $0.objectCol.arrayOptInt32.max <= Int32(33)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt32.@max <= %@", values: [Int32(34)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt32.max <= Int32(34)
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "objectCol.arrayOptInt32.@max != %@", values: [Int32(34)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt32.max != Int32(34)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt32.@max != %@", values: [Int32(32)], expectedCount: 2) {
+            $0.objectCol.arrayOptInt32.max != Int32(32)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["arrayOptInt64": [Int64(64), Int64(65), Int64(66)]])
+            if let oldObject = object.objectCol {
+                realm.delete(oldObject)
+            }
+            object.objectCol = modernObj
+        }
+        assertQuery(predicate: "objectCol.arrayOptInt64.@max > %@", values: [Int64(64)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt64.max > Int64(64)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt64.@max < %@", values: [Int64(66)], expectedCount: 0) {
+            $0.objectCol.arrayOptInt64.max < Int64(66)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt64.@max == %@", values: [Int64(66)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt64.max == Int64(66)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt64.@max >= %@", values: [Int64(64)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt64.max >= Int64(64)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt64.@max >= %@", values: [Int64(66)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt64.max >= Int64(66)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt64.@max <= %@", values: [Int64(65)], expectedCount: 0) {
+            $0.objectCol.arrayOptInt64.max <= Int64(65)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt64.@max <= %@", values: [Int64(66)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt64.max <= Int64(66)
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "objectCol.arrayOptInt64.@max != %@", values: [Int64(66)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt64.max != Int64(66)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt64.@max != %@", values: [Int64(64)], expectedCount: 2) {
+            $0.objectCol.arrayOptInt64.max != Int64(64)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["arrayOptFloat": [Float(5.55444333), Float(6.55444333), Float(7.55444333)]])
+            if let oldObject = object.objectCol {
+                realm.delete(oldObject)
+            }
+            object.objectCol = modernObj
+        }
+        assertQuery(predicate: "objectCol.arrayOptFloat.@max > %@", values: [Float(5.55444333)], expectedCount: 1) {
+            $0.objectCol.arrayOptFloat.max > Float(5.55444333)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptFloat.@max < %@", values: [Float(7.55444333)], expectedCount: 0) {
+            $0.objectCol.arrayOptFloat.max < Float(7.55444333)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptFloat.@max == %@", values: [Float(7.55444333)], expectedCount: 1) {
+            $0.objectCol.arrayOptFloat.max == Float(7.55444333)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptFloat.@max >= %@", values: [Float(5.55444333)], expectedCount: 1) {
+            $0.objectCol.arrayOptFloat.max >= Float(5.55444333)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptFloat.@max >= %@", values: [Float(7.55444333)], expectedCount: 1) {
+            $0.objectCol.arrayOptFloat.max >= Float(7.55444333)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptFloat.@max <= %@", values: [Float(6.55444333)], expectedCount: 0) {
+            $0.objectCol.arrayOptFloat.max <= Float(6.55444333)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptFloat.@max <= %@", values: [Float(7.55444333)], expectedCount: 1) {
+            $0.objectCol.arrayOptFloat.max <= Float(7.55444333)
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "objectCol.arrayOptFloat.@max != %@", values: [Float(7.55444333)], expectedCount: 1) {
+            $0.objectCol.arrayOptFloat.max != Float(7.55444333)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptFloat.@max != %@", values: [Float(5.55444333)], expectedCount: 2) {
+            $0.objectCol.arrayOptFloat.max != Float(5.55444333)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["arrayOptDouble": [123.456, 234.456, 345.567]])
+            if let oldObject = object.objectCol {
+                realm.delete(oldObject)
+            }
+            object.objectCol = modernObj
+        }
+        assertQuery(predicate: "objectCol.arrayOptDouble.@max > %@", values: [123.456], expectedCount: 1) {
+            $0.objectCol.arrayOptDouble.max > 123.456
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDouble.@max < %@", values: [345.567], expectedCount: 0) {
+            $0.objectCol.arrayOptDouble.max < 345.567
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDouble.@max == %@", values: [345.567], expectedCount: 1) {
+            $0.objectCol.arrayOptDouble.max == 345.567
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDouble.@max >= %@", values: [123.456], expectedCount: 1) {
+            $0.objectCol.arrayOptDouble.max >= 123.456
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDouble.@max >= %@", values: [345.567], expectedCount: 1) {
+            $0.objectCol.arrayOptDouble.max >= 345.567
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDouble.@max <= %@", values: [234.456], expectedCount: 0) {
+            $0.objectCol.arrayOptDouble.max <= 234.456
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDouble.@max <= %@", values: [345.567], expectedCount: 1) {
+            $0.objectCol.arrayOptDouble.max <= 345.567
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "objectCol.arrayOptDouble.@max != %@", values: [345.567], expectedCount: 1) {
+            $0.objectCol.arrayOptDouble.max != 345.567
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDouble.@max != %@", values: [123.456], expectedCount: 2) {
+            $0.objectCol.arrayOptDouble.max != 123.456
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["arrayOptDate": [Date(timeIntervalSince1970: 1000000), Date(timeIntervalSince1970: 2000000), Date(timeIntervalSince1970: 3000000)]])
+            if let oldObject = object.objectCol {
+                realm.delete(oldObject)
+            }
+            object.objectCol = modernObj
+        }
+        assertQuery(predicate: "objectCol.arrayOptDate.@max > %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
+            $0.objectCol.arrayOptDate.max > Date(timeIntervalSince1970: 1000000)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDate.@max < %@", values: [Date(timeIntervalSince1970: 3000000)], expectedCount: 0) {
+            $0.objectCol.arrayOptDate.max < Date(timeIntervalSince1970: 3000000)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDate.@max == %@", values: [Date(timeIntervalSince1970: 3000000)], expectedCount: 1) {
+            $0.objectCol.arrayOptDate.max == Date(timeIntervalSince1970: 3000000)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDate.@max >= %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
+            $0.objectCol.arrayOptDate.max >= Date(timeIntervalSince1970: 1000000)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDate.@max >= %@", values: [Date(timeIntervalSince1970: 3000000)], expectedCount: 1) {
+            $0.objectCol.arrayOptDate.max >= Date(timeIntervalSince1970: 3000000)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDate.@max <= %@", values: [Date(timeIntervalSince1970: 2000000)], expectedCount: 0) {
+            $0.objectCol.arrayOptDate.max <= Date(timeIntervalSince1970: 2000000)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDate.@max <= %@", values: [Date(timeIntervalSince1970: 3000000)], expectedCount: 1) {
+            $0.objectCol.arrayOptDate.max <= Date(timeIntervalSince1970: 3000000)
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "objectCol.arrayOptDate.@max != %@", values: [Date(timeIntervalSince1970: 3000000)], expectedCount: 1) {
+            $0.objectCol.arrayOptDate.max != Date(timeIntervalSince1970: 3000000)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDate.@max != %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 2) {
+            $0.objectCol.arrayOptDate.max != Date(timeIntervalSince1970: 1000000)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["arrayOptDecimal": [Decimal128(123.456), Decimal128(456.789), Decimal128(963.852)]])
+            if let oldObject = object.objectCol {
+                realm.delete(oldObject)
+            }
+            object.objectCol = modernObj
+        }
+        assertQuery(predicate: "objectCol.arrayOptDecimal.@max > %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.objectCol.arrayOptDecimal.max > Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDecimal.@max < %@", values: [Decimal128(963.852)], expectedCount: 0) {
+            $0.objectCol.arrayOptDecimal.max < Decimal128(963.852)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDecimal.@max == %@", values: [Decimal128(963.852)], expectedCount: 1) {
+            $0.objectCol.arrayOptDecimal.max == Decimal128(963.852)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDecimal.@max >= %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.objectCol.arrayOptDecimal.max >= Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDecimal.@max >= %@", values: [Decimal128(963.852)], expectedCount: 1) {
+            $0.objectCol.arrayOptDecimal.max >= Decimal128(963.852)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDecimal.@max <= %@", values: [Decimal128(456.789)], expectedCount: 0) {
+            $0.objectCol.arrayOptDecimal.max <= Decimal128(456.789)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDecimal.@max <= %@", values: [Decimal128(963.852)], expectedCount: 1) {
+            $0.objectCol.arrayOptDecimal.max <= Decimal128(963.852)
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "objectCol.arrayOptDecimal.@max != %@", values: [Decimal128(963.852)], expectedCount: 1) {
+            $0.objectCol.arrayOptDecimal.max != Decimal128(963.852)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDecimal.@max != %@", values: [Decimal128(123.456)], expectedCount: 2) {
+            $0.objectCol.arrayOptDecimal.max != Decimal128(123.456)
+        }
+    }
+
+    func testCollectionMax() {
+        let realm = realmWithTestPath()
+        let object = objects().first!
+
+        try! realm.write {
+            object.arrayInt.removeAll()
+            object.arrayInt.append(objectsIn: [1, 2, 3])
+        }
+
+        assertQuery(predicate: "arrayInt.@max > %@", values: [1], expectedCount: 1) {
+            $0.arrayInt.max > 1
+        }
+
+        assertQuery(predicate: "arrayInt.@max < %@", values: [3], expectedCount: 0) {
+            $0.arrayInt.max < 3
+        }
+
+        assertQuery(predicate: "arrayInt.@max == %@", values: [3], expectedCount: 1) {
+            $0.arrayInt.max == 3
+        }
+
+        assertQuery(predicate: "arrayInt.@max >= %@", values: [1], expectedCount: 1) {
+            $0.arrayInt.max >= 1
+        }
+
+        assertQuery(predicate: "arrayInt.@max >= %@", values: [3], expectedCount: 1) {
+            $0.arrayInt.max >= 3
+        }
+
+        assertQuery(predicate: "arrayInt.@max <= %@", values: [2], expectedCount: 0) {
+            $0.arrayInt.max <= 2
+        }
+
+        assertQuery(predicate: "arrayInt.@max <= %@", values: [3], expectedCount: 1) {
+            $0.arrayInt.max <= 3
+        }
+
+        assertQuery(predicate: "arrayInt.@max != %@", values: [3], expectedCount: 0) {
+            $0.arrayInt.max != 3
+        }
+
+        assertQuery(predicate: "arrayInt.@max != %@", values: [1], expectedCount: 1) {
+            $0.arrayInt.max != 1
+        }
+
+        try! realm.write {
+            object.arrayInt8.removeAll()
+            object.arrayInt8.append(objectsIn: [Int8(8), Int8(9), Int8(10)])
+        }
+
+        assertQuery(predicate: "arrayInt8.@max > %@", values: [Int8(8)], expectedCount: 1) {
+            $0.arrayInt8.max > Int8(8)
+        }
+
+        assertQuery(predicate: "arrayInt8.@max < %@", values: [Int8(10)], expectedCount: 0) {
+            $0.arrayInt8.max < Int8(10)
+        }
+
+        assertQuery(predicate: "arrayInt8.@max == %@", values: [Int8(10)], expectedCount: 1) {
+            $0.arrayInt8.max == Int8(10)
+        }
+
+        assertQuery(predicate: "arrayInt8.@max >= %@", values: [Int8(8)], expectedCount: 1) {
+            $0.arrayInt8.max >= Int8(8)
+        }
+
+        assertQuery(predicate: "arrayInt8.@max >= %@", values: [Int8(10)], expectedCount: 1) {
+            $0.arrayInt8.max >= Int8(10)
+        }
+
+        assertQuery(predicate: "arrayInt8.@max <= %@", values: [Int8(9)], expectedCount: 0) {
+            $0.arrayInt8.max <= Int8(9)
+        }
+
+        assertQuery(predicate: "arrayInt8.@max <= %@", values: [Int8(10)], expectedCount: 1) {
+            $0.arrayInt8.max <= Int8(10)
+        }
+
+        assertQuery(predicate: "arrayInt8.@max != %@", values: [Int8(10)], expectedCount: 0) {
+            $0.arrayInt8.max != Int8(10)
+        }
+
+        assertQuery(predicate: "arrayInt8.@max != %@", values: [Int8(8)], expectedCount: 1) {
+            $0.arrayInt8.max != Int8(8)
+        }
+
+        try! realm.write {
+            object.arrayInt16.removeAll()
+            object.arrayInt16.append(objectsIn: [Int16(16), Int16(17), Int16(18)])
+        }
+
+        assertQuery(predicate: "arrayInt16.@max > %@", values: [Int16(16)], expectedCount: 1) {
+            $0.arrayInt16.max > Int16(16)
+        }
+
+        assertQuery(predicate: "arrayInt16.@max < %@", values: [Int16(18)], expectedCount: 0) {
+            $0.arrayInt16.max < Int16(18)
+        }
+
+        assertQuery(predicate: "arrayInt16.@max == %@", values: [Int16(18)], expectedCount: 1) {
+            $0.arrayInt16.max == Int16(18)
+        }
+
+        assertQuery(predicate: "arrayInt16.@max >= %@", values: [Int16(16)], expectedCount: 1) {
+            $0.arrayInt16.max >= Int16(16)
+        }
+
+        assertQuery(predicate: "arrayInt16.@max >= %@", values: [Int16(18)], expectedCount: 1) {
+            $0.arrayInt16.max >= Int16(18)
+        }
+
+        assertQuery(predicate: "arrayInt16.@max <= %@", values: [Int16(17)], expectedCount: 0) {
+            $0.arrayInt16.max <= Int16(17)
+        }
+
+        assertQuery(predicate: "arrayInt16.@max <= %@", values: [Int16(18)], expectedCount: 1) {
+            $0.arrayInt16.max <= Int16(18)
+        }
+
+        assertQuery(predicate: "arrayInt16.@max != %@", values: [Int16(18)], expectedCount: 0) {
+            $0.arrayInt16.max != Int16(18)
+        }
+
+        assertQuery(predicate: "arrayInt16.@max != %@", values: [Int16(16)], expectedCount: 1) {
+            $0.arrayInt16.max != Int16(16)
+        }
+
+        try! realm.write {
+            object.arrayInt32.removeAll()
+            object.arrayInt32.append(objectsIn: [Int32(32), Int32(33), Int32(34)])
+        }
+
+        assertQuery(predicate: "arrayInt32.@max > %@", values: [Int32(32)], expectedCount: 1) {
+            $0.arrayInt32.max > Int32(32)
+        }
+
+        assertQuery(predicate: "arrayInt32.@max < %@", values: [Int32(34)], expectedCount: 0) {
+            $0.arrayInt32.max < Int32(34)
+        }
+
+        assertQuery(predicate: "arrayInt32.@max == %@", values: [Int32(34)], expectedCount: 1) {
+            $0.arrayInt32.max == Int32(34)
+        }
+
+        assertQuery(predicate: "arrayInt32.@max >= %@", values: [Int32(32)], expectedCount: 1) {
+            $0.arrayInt32.max >= Int32(32)
+        }
+
+        assertQuery(predicate: "arrayInt32.@max >= %@", values: [Int32(34)], expectedCount: 1) {
+            $0.arrayInt32.max >= Int32(34)
+        }
+
+        assertQuery(predicate: "arrayInt32.@max <= %@", values: [Int32(33)], expectedCount: 0) {
+            $0.arrayInt32.max <= Int32(33)
+        }
+
+        assertQuery(predicate: "arrayInt32.@max <= %@", values: [Int32(34)], expectedCount: 1) {
+            $0.arrayInt32.max <= Int32(34)
+        }
+
+        assertQuery(predicate: "arrayInt32.@max != %@", values: [Int32(34)], expectedCount: 0) {
+            $0.arrayInt32.max != Int32(34)
+        }
+
+        assertQuery(predicate: "arrayInt32.@max != %@", values: [Int32(32)], expectedCount: 1) {
+            $0.arrayInt32.max != Int32(32)
+        }
+
+        try! realm.write {
+            object.arrayInt64.removeAll()
+            object.arrayInt64.append(objectsIn: [Int64(64), Int64(65), Int64(66)])
+        }
+
+        assertQuery(predicate: "arrayInt64.@max > %@", values: [Int64(64)], expectedCount: 1) {
+            $0.arrayInt64.max > Int64(64)
+        }
+
+        assertQuery(predicate: "arrayInt64.@max < %@", values: [Int64(66)], expectedCount: 0) {
+            $0.arrayInt64.max < Int64(66)
+        }
+
+        assertQuery(predicate: "arrayInt64.@max == %@", values: [Int64(66)], expectedCount: 1) {
+            $0.arrayInt64.max == Int64(66)
+        }
+
+        assertQuery(predicate: "arrayInt64.@max >= %@", values: [Int64(64)], expectedCount: 1) {
+            $0.arrayInt64.max >= Int64(64)
+        }
+
+        assertQuery(predicate: "arrayInt64.@max >= %@", values: [Int64(66)], expectedCount: 1) {
+            $0.arrayInt64.max >= Int64(66)
+        }
+
+        assertQuery(predicate: "arrayInt64.@max <= %@", values: [Int64(65)], expectedCount: 0) {
+            $0.arrayInt64.max <= Int64(65)
+        }
+
+        assertQuery(predicate: "arrayInt64.@max <= %@", values: [Int64(66)], expectedCount: 1) {
+            $0.arrayInt64.max <= Int64(66)
+        }
+
+        assertQuery(predicate: "arrayInt64.@max != %@", values: [Int64(66)], expectedCount: 0) {
+            $0.arrayInt64.max != Int64(66)
+        }
+
+        assertQuery(predicate: "arrayInt64.@max != %@", values: [Int64(64)], expectedCount: 1) {
+            $0.arrayInt64.max != Int64(64)
+        }
+
+        try! realm.write {
+            object.arrayFloat.removeAll()
+            object.arrayFloat.append(objectsIn: [Float(5.55444333), Float(6.55444333), Float(7.55444333)])
+        }
+
+        assertQuery(predicate: "arrayFloat.@max > %@", values: [Float(5.55444333)], expectedCount: 1) {
+            $0.arrayFloat.max > Float(5.55444333)
+        }
+
+        assertQuery(predicate: "arrayFloat.@max < %@", values: [Float(7.55444333)], expectedCount: 0) {
+            $0.arrayFloat.max < Float(7.55444333)
+        }
+
+        assertQuery(predicate: "arrayFloat.@max == %@", values: [Float(7.55444333)], expectedCount: 1) {
+            $0.arrayFloat.max == Float(7.55444333)
+        }
+
+        assertQuery(predicate: "arrayFloat.@max >= %@", values: [Float(5.55444333)], expectedCount: 1) {
+            $0.arrayFloat.max >= Float(5.55444333)
+        }
+
+        assertQuery(predicate: "arrayFloat.@max >= %@", values: [Float(7.55444333)], expectedCount: 1) {
+            $0.arrayFloat.max >= Float(7.55444333)
+        }
+
+        assertQuery(predicate: "arrayFloat.@max <= %@", values: [Float(6.55444333)], expectedCount: 0) {
+            $0.arrayFloat.max <= Float(6.55444333)
+        }
+
+        assertQuery(predicate: "arrayFloat.@max <= %@", values: [Float(7.55444333)], expectedCount: 1) {
+            $0.arrayFloat.max <= Float(7.55444333)
+        }
+
+        assertQuery(predicate: "arrayFloat.@max != %@", values: [Float(7.55444333)], expectedCount: 0) {
+            $0.arrayFloat.max != Float(7.55444333)
+        }
+
+        assertQuery(predicate: "arrayFloat.@max != %@", values: [Float(5.55444333)], expectedCount: 1) {
+            $0.arrayFloat.max != Float(5.55444333)
+        }
+
+        try! realm.write {
+            object.arrayDouble.removeAll()
+            object.arrayDouble.append(objectsIn: [123.456, 234.456, 345.567])
+        }
+
+        assertQuery(predicate: "arrayDouble.@max > %@", values: [123.456], expectedCount: 1) {
+            $0.arrayDouble.max > 123.456
+        }
+
+        assertQuery(predicate: "arrayDouble.@max < %@", values: [345.567], expectedCount: 0) {
+            $0.arrayDouble.max < 345.567
+        }
+
+        assertQuery(predicate: "arrayDouble.@max == %@", values: [345.567], expectedCount: 1) {
+            $0.arrayDouble.max == 345.567
+        }
+
+        assertQuery(predicate: "arrayDouble.@max >= %@", values: [123.456], expectedCount: 1) {
+            $0.arrayDouble.max >= 123.456
+        }
+
+        assertQuery(predicate: "arrayDouble.@max >= %@", values: [345.567], expectedCount: 1) {
+            $0.arrayDouble.max >= 345.567
+        }
+
+        assertQuery(predicate: "arrayDouble.@max <= %@", values: [234.456], expectedCount: 0) {
+            $0.arrayDouble.max <= 234.456
+        }
+
+        assertQuery(predicate: "arrayDouble.@max <= %@", values: [345.567], expectedCount: 1) {
+            $0.arrayDouble.max <= 345.567
+        }
+
+        assertQuery(predicate: "arrayDouble.@max != %@", values: [345.567], expectedCount: 0) {
+            $0.arrayDouble.max != 345.567
+        }
+
+        assertQuery(predicate: "arrayDouble.@max != %@", values: [123.456], expectedCount: 1) {
+            $0.arrayDouble.max != 123.456
+        }
+
+        try! realm.write {
+            object.arrayDate.removeAll()
+            object.arrayDate.append(objectsIn: [Date(timeIntervalSince1970: 1000000), Date(timeIntervalSince1970: 2000000), Date(timeIntervalSince1970: 3000000)])
+        }
+
+        assertQuery(predicate: "arrayDate.@max > %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
+            $0.arrayDate.max > Date(timeIntervalSince1970: 1000000)
+        }
+
+        assertQuery(predicate: "arrayDate.@max < %@", values: [Date(timeIntervalSince1970: 3000000)], expectedCount: 0) {
+            $0.arrayDate.max < Date(timeIntervalSince1970: 3000000)
+        }
+
+        assertQuery(predicate: "arrayDate.@max == %@", values: [Date(timeIntervalSince1970: 3000000)], expectedCount: 1) {
+            $0.arrayDate.max == Date(timeIntervalSince1970: 3000000)
+        }
+
+        assertQuery(predicate: "arrayDate.@max >= %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
+            $0.arrayDate.max >= Date(timeIntervalSince1970: 1000000)
+        }
+
+        assertQuery(predicate: "arrayDate.@max >= %@", values: [Date(timeIntervalSince1970: 3000000)], expectedCount: 1) {
+            $0.arrayDate.max >= Date(timeIntervalSince1970: 3000000)
+        }
+
+        assertQuery(predicate: "arrayDate.@max <= %@", values: [Date(timeIntervalSince1970: 2000000)], expectedCount: 0) {
+            $0.arrayDate.max <= Date(timeIntervalSince1970: 2000000)
+        }
+
+        assertQuery(predicate: "arrayDate.@max <= %@", values: [Date(timeIntervalSince1970: 3000000)], expectedCount: 1) {
+            $0.arrayDate.max <= Date(timeIntervalSince1970: 3000000)
+        }
+
+        assertQuery(predicate: "arrayDate.@max != %@", values: [Date(timeIntervalSince1970: 3000000)], expectedCount: 0) {
+            $0.arrayDate.max != Date(timeIntervalSince1970: 3000000)
+        }
+
+        assertQuery(predicate: "arrayDate.@max != %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
+            $0.arrayDate.max != Date(timeIntervalSince1970: 1000000)
+        }
+
+        try! realm.write {
+            object.arrayDecimal.removeAll()
+            object.arrayDecimal.append(objectsIn: [Decimal128(123.456), Decimal128(456.789), Decimal128(963.852)])
+        }
+
+        assertQuery(predicate: "arrayDecimal.@max > %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.arrayDecimal.max > Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "arrayDecimal.@max < %@", values: [Decimal128(963.852)], expectedCount: 0) {
+            $0.arrayDecimal.max < Decimal128(963.852)
+        }
+
+        assertQuery(predicate: "arrayDecimal.@max == %@", values: [Decimal128(963.852)], expectedCount: 1) {
+            $0.arrayDecimal.max == Decimal128(963.852)
+        }
+
+        assertQuery(predicate: "arrayDecimal.@max >= %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.arrayDecimal.max >= Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "arrayDecimal.@max >= %@", values: [Decimal128(963.852)], expectedCount: 1) {
+            $0.arrayDecimal.max >= Decimal128(963.852)
+        }
+
+        assertQuery(predicate: "arrayDecimal.@max <= %@", values: [Decimal128(456.789)], expectedCount: 0) {
+            $0.arrayDecimal.max <= Decimal128(456.789)
+        }
+
+        assertQuery(predicate: "arrayDecimal.@max <= %@", values: [Decimal128(963.852)], expectedCount: 1) {
+            $0.arrayDecimal.max <= Decimal128(963.852)
+        }
+
+        assertQuery(predicate: "arrayDecimal.@max != %@", values: [Decimal128(963.852)], expectedCount: 0) {
+            $0.arrayDecimal.max != Decimal128(963.852)
+        }
+
+        assertQuery(predicate: "arrayDecimal.@max != %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.arrayDecimal.max != Decimal128(123.456)
+        }
+
+        try! realm.write {
+            object.arrayOptInt.removeAll()
+            object.arrayOptInt.append(objectsIn: [1, 2, 3])
+        }
+
+        assertQuery(predicate: "arrayOptInt.@max > %@", values: [1], expectedCount: 1) {
+            $0.arrayOptInt.max > 1
+        }
+
+        assertQuery(predicate: "arrayOptInt.@max < %@", values: [3], expectedCount: 0) {
+            $0.arrayOptInt.max < 3
+        }
+
+        assertQuery(predicate: "arrayOptInt.@max == %@", values: [3], expectedCount: 1) {
+            $0.arrayOptInt.max == 3
+        }
+
+        assertQuery(predicate: "arrayOptInt.@max >= %@", values: [1], expectedCount: 1) {
+            $0.arrayOptInt.max >= 1
+        }
+
+        assertQuery(predicate: "arrayOptInt.@max >= %@", values: [3], expectedCount: 1) {
+            $0.arrayOptInt.max >= 3
+        }
+
+        assertQuery(predicate: "arrayOptInt.@max <= %@", values: [2], expectedCount: 0) {
+            $0.arrayOptInt.max <= 2
+        }
+
+        assertQuery(predicate: "arrayOptInt.@max <= %@", values: [3], expectedCount: 1) {
+            $0.arrayOptInt.max <= 3
+        }
+
+        assertQuery(predicate: "arrayOptInt.@max != %@", values: [3], expectedCount: 0) {
+            $0.arrayOptInt.max != 3
+        }
+
+        assertQuery(predicate: "arrayOptInt.@max != %@", values: [1], expectedCount: 1) {
+            $0.arrayOptInt.max != 1
+        }
+
+        try! realm.write {
+            object.arrayOptInt8.removeAll()
+            object.arrayOptInt8.append(objectsIn: [Int8(8), Int8(9), Int8(10)])
+        }
+
+        assertQuery(predicate: "arrayOptInt8.@max > %@", values: [Int8(8)], expectedCount: 1) {
+            $0.arrayOptInt8.max > Int8(8)
+        }
+
+        assertQuery(predicate: "arrayOptInt8.@max < %@", values: [Int8(10)], expectedCount: 0) {
+            $0.arrayOptInt8.max < Int8(10)
+        }
+
+        assertQuery(predicate: "arrayOptInt8.@max == %@", values: [Int8(10)], expectedCount: 1) {
+            $0.arrayOptInt8.max == Int8(10)
+        }
+
+        assertQuery(predicate: "arrayOptInt8.@max >= %@", values: [Int8(8)], expectedCount: 1) {
+            $0.arrayOptInt8.max >= Int8(8)
+        }
+
+        assertQuery(predicate: "arrayOptInt8.@max >= %@", values: [Int8(10)], expectedCount: 1) {
+            $0.arrayOptInt8.max >= Int8(10)
+        }
+
+        assertQuery(predicate: "arrayOptInt8.@max <= %@", values: [Int8(9)], expectedCount: 0) {
+            $0.arrayOptInt8.max <= Int8(9)
+        }
+
+        assertQuery(predicate: "arrayOptInt8.@max <= %@", values: [Int8(10)], expectedCount: 1) {
+            $0.arrayOptInt8.max <= Int8(10)
+        }
+
+        assertQuery(predicate: "arrayOptInt8.@max != %@", values: [Int8(10)], expectedCount: 0) {
+            $0.arrayOptInt8.max != Int8(10)
+        }
+
+        assertQuery(predicate: "arrayOptInt8.@max != %@", values: [Int8(8)], expectedCount: 1) {
+            $0.arrayOptInt8.max != Int8(8)
+        }
+
+        try! realm.write {
+            object.arrayOptInt16.removeAll()
+            object.arrayOptInt16.append(objectsIn: [Int16(16), Int16(17), Int16(18)])
+        }
+
+        assertQuery(predicate: "arrayOptInt16.@max > %@", values: [Int16(16)], expectedCount: 1) {
+            $0.arrayOptInt16.max > Int16(16)
+        }
+
+        assertQuery(predicate: "arrayOptInt16.@max < %@", values: [Int16(18)], expectedCount: 0) {
+            $0.arrayOptInt16.max < Int16(18)
+        }
+
+        assertQuery(predicate: "arrayOptInt16.@max == %@", values: [Int16(18)], expectedCount: 1) {
+            $0.arrayOptInt16.max == Int16(18)
+        }
+
+        assertQuery(predicate: "arrayOptInt16.@max >= %@", values: [Int16(16)], expectedCount: 1) {
+            $0.arrayOptInt16.max >= Int16(16)
+        }
+
+        assertQuery(predicate: "arrayOptInt16.@max >= %@", values: [Int16(18)], expectedCount: 1) {
+            $0.arrayOptInt16.max >= Int16(18)
+        }
+
+        assertQuery(predicate: "arrayOptInt16.@max <= %@", values: [Int16(17)], expectedCount: 0) {
+            $0.arrayOptInt16.max <= Int16(17)
+        }
+
+        assertQuery(predicate: "arrayOptInt16.@max <= %@", values: [Int16(18)], expectedCount: 1) {
+            $0.arrayOptInt16.max <= Int16(18)
+        }
+
+        assertQuery(predicate: "arrayOptInt16.@max != %@", values: [Int16(18)], expectedCount: 0) {
+            $0.arrayOptInt16.max != Int16(18)
+        }
+
+        assertQuery(predicate: "arrayOptInt16.@max != %@", values: [Int16(16)], expectedCount: 1) {
+            $0.arrayOptInt16.max != Int16(16)
+        }
+
+        try! realm.write {
+            object.arrayOptInt32.removeAll()
+            object.arrayOptInt32.append(objectsIn: [Int32(32), Int32(33), Int32(34)])
+        }
+
+        assertQuery(predicate: "arrayOptInt32.@max > %@", values: [Int32(32)], expectedCount: 1) {
+            $0.arrayOptInt32.max > Int32(32)
+        }
+
+        assertQuery(predicate: "arrayOptInt32.@max < %@", values: [Int32(34)], expectedCount: 0) {
+            $0.arrayOptInt32.max < Int32(34)
+        }
+
+        assertQuery(predicate: "arrayOptInt32.@max == %@", values: [Int32(34)], expectedCount: 1) {
+            $0.arrayOptInt32.max == Int32(34)
+        }
+
+        assertQuery(predicate: "arrayOptInt32.@max >= %@", values: [Int32(32)], expectedCount: 1) {
+            $0.arrayOptInt32.max >= Int32(32)
+        }
+
+        assertQuery(predicate: "arrayOptInt32.@max >= %@", values: [Int32(34)], expectedCount: 1) {
+            $0.arrayOptInt32.max >= Int32(34)
+        }
+
+        assertQuery(predicate: "arrayOptInt32.@max <= %@", values: [Int32(33)], expectedCount: 0) {
+            $0.arrayOptInt32.max <= Int32(33)
+        }
+
+        assertQuery(predicate: "arrayOptInt32.@max <= %@", values: [Int32(34)], expectedCount: 1) {
+            $0.arrayOptInt32.max <= Int32(34)
+        }
+
+        assertQuery(predicate: "arrayOptInt32.@max != %@", values: [Int32(34)], expectedCount: 0) {
+            $0.arrayOptInt32.max != Int32(34)
+        }
+
+        assertQuery(predicate: "arrayOptInt32.@max != %@", values: [Int32(32)], expectedCount: 1) {
+            $0.arrayOptInt32.max != Int32(32)
+        }
+
+        try! realm.write {
+            object.arrayOptInt64.removeAll()
+            object.arrayOptInt64.append(objectsIn: [Int64(64), Int64(65), Int64(66)])
+        }
+
+        assertQuery(predicate: "arrayOptInt64.@max > %@", values: [Int64(64)], expectedCount: 1) {
+            $0.arrayOptInt64.max > Int64(64)
+        }
+
+        assertQuery(predicate: "arrayOptInt64.@max < %@", values: [Int64(66)], expectedCount: 0) {
+            $0.arrayOptInt64.max < Int64(66)
+        }
+
+        assertQuery(predicate: "arrayOptInt64.@max == %@", values: [Int64(66)], expectedCount: 1) {
+            $0.arrayOptInt64.max == Int64(66)
+        }
+
+        assertQuery(predicate: "arrayOptInt64.@max >= %@", values: [Int64(64)], expectedCount: 1) {
+            $0.arrayOptInt64.max >= Int64(64)
+        }
+
+        assertQuery(predicate: "arrayOptInt64.@max >= %@", values: [Int64(66)], expectedCount: 1) {
+            $0.arrayOptInt64.max >= Int64(66)
+        }
+
+        assertQuery(predicate: "arrayOptInt64.@max <= %@", values: [Int64(65)], expectedCount: 0) {
+            $0.arrayOptInt64.max <= Int64(65)
+        }
+
+        assertQuery(predicate: "arrayOptInt64.@max <= %@", values: [Int64(66)], expectedCount: 1) {
+            $0.arrayOptInt64.max <= Int64(66)
+        }
+
+        assertQuery(predicate: "arrayOptInt64.@max != %@", values: [Int64(66)], expectedCount: 0) {
+            $0.arrayOptInt64.max != Int64(66)
+        }
+
+        assertQuery(predicate: "arrayOptInt64.@max != %@", values: [Int64(64)], expectedCount: 1) {
+            $0.arrayOptInt64.max != Int64(64)
+        }
+
+        try! realm.write {
+            object.arrayOptFloat.removeAll()
+            object.arrayOptFloat.append(objectsIn: [Float(5.55444333), Float(6.55444333), Float(7.55444333)])
+        }
+
+        assertQuery(predicate: "arrayOptFloat.@max > %@", values: [Float(5.55444333)], expectedCount: 1) {
+            $0.arrayOptFloat.max > Float(5.55444333)
+        }
+
+        assertQuery(predicate: "arrayOptFloat.@max < %@", values: [Float(7.55444333)], expectedCount: 0) {
+            $0.arrayOptFloat.max < Float(7.55444333)
+        }
+
+        assertQuery(predicate: "arrayOptFloat.@max == %@", values: [Float(7.55444333)], expectedCount: 1) {
+            $0.arrayOptFloat.max == Float(7.55444333)
+        }
+
+        assertQuery(predicate: "arrayOptFloat.@max >= %@", values: [Float(5.55444333)], expectedCount: 1) {
+            $0.arrayOptFloat.max >= Float(5.55444333)
+        }
+
+        assertQuery(predicate: "arrayOptFloat.@max >= %@", values: [Float(7.55444333)], expectedCount: 1) {
+            $0.arrayOptFloat.max >= Float(7.55444333)
+        }
+
+        assertQuery(predicate: "arrayOptFloat.@max <= %@", values: [Float(6.55444333)], expectedCount: 0) {
+            $0.arrayOptFloat.max <= Float(6.55444333)
+        }
+
+        assertQuery(predicate: "arrayOptFloat.@max <= %@", values: [Float(7.55444333)], expectedCount: 1) {
+            $0.arrayOptFloat.max <= Float(7.55444333)
+        }
+
+        assertQuery(predicate: "arrayOptFloat.@max != %@", values: [Float(7.55444333)], expectedCount: 0) {
+            $0.arrayOptFloat.max != Float(7.55444333)
+        }
+
+        assertQuery(predicate: "arrayOptFloat.@max != %@", values: [Float(5.55444333)], expectedCount: 1) {
+            $0.arrayOptFloat.max != Float(5.55444333)
+        }
+
+        try! realm.write {
+            object.arrayOptDouble.removeAll()
+            object.arrayOptDouble.append(objectsIn: [123.456, 234.456, 345.567])
+        }
+
+        assertQuery(predicate: "arrayOptDouble.@max > %@", values: [123.456], expectedCount: 1) {
+            $0.arrayOptDouble.max > 123.456
+        }
+
+        assertQuery(predicate: "arrayOptDouble.@max < %@", values: [345.567], expectedCount: 0) {
+            $0.arrayOptDouble.max < 345.567
+        }
+
+        assertQuery(predicate: "arrayOptDouble.@max == %@", values: [345.567], expectedCount: 1) {
+            $0.arrayOptDouble.max == 345.567
+        }
+
+        assertQuery(predicate: "arrayOptDouble.@max >= %@", values: [123.456], expectedCount: 1) {
+            $0.arrayOptDouble.max >= 123.456
+        }
+
+        assertQuery(predicate: "arrayOptDouble.@max >= %@", values: [345.567], expectedCount: 1) {
+            $0.arrayOptDouble.max >= 345.567
+        }
+
+        assertQuery(predicate: "arrayOptDouble.@max <= %@", values: [234.456], expectedCount: 0) {
+            $0.arrayOptDouble.max <= 234.456
+        }
+
+        assertQuery(predicate: "arrayOptDouble.@max <= %@", values: [345.567], expectedCount: 1) {
+            $0.arrayOptDouble.max <= 345.567
+        }
+
+        assertQuery(predicate: "arrayOptDouble.@max != %@", values: [345.567], expectedCount: 0) {
+            $0.arrayOptDouble.max != 345.567
+        }
+
+        assertQuery(predicate: "arrayOptDouble.@max != %@", values: [123.456], expectedCount: 1) {
+            $0.arrayOptDouble.max != 123.456
+        }
+
+        try! realm.write {
+            object.arrayOptDate.removeAll()
+            object.arrayOptDate.append(objectsIn: [Date(timeIntervalSince1970: 1000000), Date(timeIntervalSince1970: 2000000), Date(timeIntervalSince1970: 3000000)])
+        }
+
+        assertQuery(predicate: "arrayOptDate.@max > %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
+            $0.arrayOptDate.max > Date(timeIntervalSince1970: 1000000)
+        }
+
+        assertQuery(predicate: "arrayOptDate.@max < %@", values: [Date(timeIntervalSince1970: 3000000)], expectedCount: 0) {
+            $0.arrayOptDate.max < Date(timeIntervalSince1970: 3000000)
+        }
+
+        assertQuery(predicate: "arrayOptDate.@max == %@", values: [Date(timeIntervalSince1970: 3000000)], expectedCount: 1) {
+            $0.arrayOptDate.max == Date(timeIntervalSince1970: 3000000)
+        }
+
+        assertQuery(predicate: "arrayOptDate.@max >= %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
+            $0.arrayOptDate.max >= Date(timeIntervalSince1970: 1000000)
+        }
+
+        assertQuery(predicate: "arrayOptDate.@max >= %@", values: [Date(timeIntervalSince1970: 3000000)], expectedCount: 1) {
+            $0.arrayOptDate.max >= Date(timeIntervalSince1970: 3000000)
+        }
+
+        assertQuery(predicate: "arrayOptDate.@max <= %@", values: [Date(timeIntervalSince1970: 2000000)], expectedCount: 0) {
+            $0.arrayOptDate.max <= Date(timeIntervalSince1970: 2000000)
+        }
+
+        assertQuery(predicate: "arrayOptDate.@max <= %@", values: [Date(timeIntervalSince1970: 3000000)], expectedCount: 1) {
+            $0.arrayOptDate.max <= Date(timeIntervalSince1970: 3000000)
+        }
+
+        assertQuery(predicate: "arrayOptDate.@max != %@", values: [Date(timeIntervalSince1970: 3000000)], expectedCount: 0) {
+            $0.arrayOptDate.max != Date(timeIntervalSince1970: 3000000)
+        }
+
+        assertQuery(predicate: "arrayOptDate.@max != %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
+            $0.arrayOptDate.max != Date(timeIntervalSince1970: 1000000)
+        }
+
+        try! realm.write {
+            object.arrayOptDecimal.removeAll()
+            object.arrayOptDecimal.append(objectsIn: [Decimal128(123.456), Decimal128(456.789), Decimal128(963.852)])
+        }
+
+        assertQuery(predicate: "arrayOptDecimal.@max > %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.arrayOptDecimal.max > Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "arrayOptDecimal.@max < %@", values: [Decimal128(963.852)], expectedCount: 0) {
+            $0.arrayOptDecimal.max < Decimal128(963.852)
+        }
+
+        assertQuery(predicate: "arrayOptDecimal.@max == %@", values: [Decimal128(963.852)], expectedCount: 1) {
+            $0.arrayOptDecimal.max == Decimal128(963.852)
+        }
+
+        assertQuery(predicate: "arrayOptDecimal.@max >= %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.arrayOptDecimal.max >= Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "arrayOptDecimal.@max >= %@", values: [Decimal128(963.852)], expectedCount: 1) {
+            $0.arrayOptDecimal.max >= Decimal128(963.852)
+        }
+
+        assertQuery(predicate: "arrayOptDecimal.@max <= %@", values: [Decimal128(456.789)], expectedCount: 0) {
+            $0.arrayOptDecimal.max <= Decimal128(456.789)
+        }
+
+        assertQuery(predicate: "arrayOptDecimal.@max <= %@", values: [Decimal128(963.852)], expectedCount: 1) {
+            $0.arrayOptDecimal.max <= Decimal128(963.852)
+        }
+
+        assertQuery(predicate: "arrayOptDecimal.@max != %@", values: [Decimal128(963.852)], expectedCount: 0) {
+            $0.arrayOptDecimal.max != Decimal128(963.852)
+        }
+
+        assertQuery(predicate: "arrayOptDecimal.@max != %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.arrayOptDecimal.max != Decimal128(123.456)
+        }
+    }
+
+    func testCollectionAggregatesSum() {
+        let realm = realmWithTestPath()
+        let object = objects().first!
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["arrayInt": [1, 2, 3]])
+            if let oldObject = object.objectCol {
+                realm.delete(oldObject)
+            }
+            object.objectCol = modernObj
+        }
+
+        let sumarrayInt = 1 + 2 + 3
+        assertQuery(predicate: "objectCol.arrayInt.@sum > %@", values: [3], expectedCount: 1) {
+            $0.objectCol.arrayInt.sum > 3
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt.@sum < %@", values: [3], expectedCount: 1) {
+            $0.objectCol.arrayInt.sum < 3
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt.@sum == %@", values: [3], expectedCount: 0) {
+            $0.objectCol.arrayInt.sum == 3
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt.@sum == %@", values: [sumarrayInt], expectedCount: 1) {
+            $0.objectCol.arrayInt.sum == sumarrayInt
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt.@sum >= %@", values: [3], expectedCount: 1) {
+            $0.objectCol.arrayInt.sum >= 3
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt.@sum >= %@", values: [sumarrayInt], expectedCount: 1) {
+            $0.objectCol.arrayInt.sum >= sumarrayInt
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt.@sum <= %@", values: [3], expectedCount: 1) {
+            $0.objectCol.arrayInt.sum <= 3
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt.@sum <= %@", values: [sumarrayInt], expectedCount: 2) {
+            $0.objectCol.arrayInt.sum <= sumarrayInt
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "objectCol.arrayInt.@sum != %@", values: [sumarrayInt], expectedCount: 1) {
+            $0.objectCol.arrayInt.sum != sumarrayInt
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt.@sum != %@", values: [1], expectedCount: 2) {
+            $0.objectCol.arrayInt.sum != 1
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["arrayInt8": [Int8(8), Int8(9), Int8(10)]])
+            if let oldObject = object.objectCol {
+                realm.delete(oldObject)
+            }
+            object.objectCol = modernObj
+        }
+
+        let sumarrayInt8 = Int8(8) + Int8(9) + Int8(10)
+        assertQuery(predicate: "objectCol.arrayInt8.@sum > %@", values: [Int8(10)], expectedCount: 1) {
+            $0.objectCol.arrayInt8.sum > Int8(10)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt8.@sum < %@", values: [Int8(10)], expectedCount: 1) {
+            $0.objectCol.arrayInt8.sum < Int8(10)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt8.@sum == %@", values: [Int8(10)], expectedCount: 0) {
+            $0.objectCol.arrayInt8.sum == Int8(10)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt8.@sum == %@", values: [sumarrayInt8], expectedCount: 1) {
+            $0.objectCol.arrayInt8.sum == sumarrayInt8
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt8.@sum >= %@", values: [Int8(10)], expectedCount: 1) {
+            $0.objectCol.arrayInt8.sum >= Int8(10)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt8.@sum >= %@", values: [sumarrayInt8], expectedCount: 1) {
+            $0.objectCol.arrayInt8.sum >= sumarrayInt8
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt8.@sum <= %@", values: [Int8(10)], expectedCount: 1) {
+            $0.objectCol.arrayInt8.sum <= Int8(10)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt8.@sum <= %@", values: [sumarrayInt8], expectedCount: 2) {
+            $0.objectCol.arrayInt8.sum <= sumarrayInt8
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "objectCol.arrayInt8.@sum != %@", values: [sumarrayInt8], expectedCount: 1) {
+            $0.objectCol.arrayInt8.sum != sumarrayInt8
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt8.@sum != %@", values: [Int8(8)], expectedCount: 2) {
+            $0.objectCol.arrayInt8.sum != Int8(8)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["arrayInt16": [Int16(16), Int16(17), Int16(18)]])
+            if let oldObject = object.objectCol {
+                realm.delete(oldObject)
+            }
+            object.objectCol = modernObj
+        }
+
+        let sumarrayInt16 = Int16(16) + Int16(17) + Int16(18)
+        assertQuery(predicate: "objectCol.arrayInt16.@sum > %@", values: [Int16(18)], expectedCount: 1) {
+            $0.objectCol.arrayInt16.sum > Int16(18)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt16.@sum < %@", values: [Int16(18)], expectedCount: 1) {
+            $0.objectCol.arrayInt16.sum < Int16(18)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt16.@sum == %@", values: [Int16(18)], expectedCount: 0) {
+            $0.objectCol.arrayInt16.sum == Int16(18)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt16.@sum == %@", values: [sumarrayInt16], expectedCount: 1) {
+            $0.objectCol.arrayInt16.sum == sumarrayInt16
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt16.@sum >= %@", values: [Int16(18)], expectedCount: 1) {
+            $0.objectCol.arrayInt16.sum >= Int16(18)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt16.@sum >= %@", values: [sumarrayInt16], expectedCount: 1) {
+            $0.objectCol.arrayInt16.sum >= sumarrayInt16
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt16.@sum <= %@", values: [Int16(18)], expectedCount: 1) {
+            $0.objectCol.arrayInt16.sum <= Int16(18)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt16.@sum <= %@", values: [sumarrayInt16], expectedCount: 2) {
+            $0.objectCol.arrayInt16.sum <= sumarrayInt16
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "objectCol.arrayInt16.@sum != %@", values: [sumarrayInt16], expectedCount: 1) {
+            $0.objectCol.arrayInt16.sum != sumarrayInt16
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt16.@sum != %@", values: [Int16(16)], expectedCount: 2) {
+            $0.objectCol.arrayInt16.sum != Int16(16)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["arrayInt32": [Int32(32), Int32(33), Int32(34)]])
+            if let oldObject = object.objectCol {
+                realm.delete(oldObject)
+            }
+            object.objectCol = modernObj
+        }
+
+        let sumarrayInt32 = Int32(32) + Int32(33) + Int32(34)
+        assertQuery(predicate: "objectCol.arrayInt32.@sum > %@", values: [Int32(34)], expectedCount: 1) {
+            $0.objectCol.arrayInt32.sum > Int32(34)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt32.@sum < %@", values: [Int32(34)], expectedCount: 1) {
+            $0.objectCol.arrayInt32.sum < Int32(34)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt32.@sum == %@", values: [Int32(34)], expectedCount: 0) {
+            $0.objectCol.arrayInt32.sum == Int32(34)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt32.@sum == %@", values: [sumarrayInt32], expectedCount: 1) {
+            $0.objectCol.arrayInt32.sum == sumarrayInt32
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt32.@sum >= %@", values: [Int32(34)], expectedCount: 1) {
+            $0.objectCol.arrayInt32.sum >= Int32(34)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt32.@sum >= %@", values: [sumarrayInt32], expectedCount: 1) {
+            $0.objectCol.arrayInt32.sum >= sumarrayInt32
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt32.@sum <= %@", values: [Int32(34)], expectedCount: 1) {
+            $0.objectCol.arrayInt32.sum <= Int32(34)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt32.@sum <= %@", values: [sumarrayInt32], expectedCount: 2) {
+            $0.objectCol.arrayInt32.sum <= sumarrayInt32
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "objectCol.arrayInt32.@sum != %@", values: [sumarrayInt32], expectedCount: 1) {
+            $0.objectCol.arrayInt32.sum != sumarrayInt32
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt32.@sum != %@", values: [Int32(32)], expectedCount: 2) {
+            $0.objectCol.arrayInt32.sum != Int32(32)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["arrayInt64": [Int64(64), Int64(65), Int64(66)]])
+            if let oldObject = object.objectCol {
+                realm.delete(oldObject)
+            }
+            object.objectCol = modernObj
+        }
+
+        let sumarrayInt64 = Int64(64) + Int64(65) + Int64(66)
+        assertQuery(predicate: "objectCol.arrayInt64.@sum > %@", values: [Int64(66)], expectedCount: 1) {
+            $0.objectCol.arrayInt64.sum > Int64(66)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt64.@sum < %@", values: [Int64(66)], expectedCount: 1) {
+            $0.objectCol.arrayInt64.sum < Int64(66)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt64.@sum == %@", values: [Int64(66)], expectedCount: 0) {
+            $0.objectCol.arrayInt64.sum == Int64(66)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt64.@sum == %@", values: [sumarrayInt64], expectedCount: 1) {
+            $0.objectCol.arrayInt64.sum == sumarrayInt64
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt64.@sum >= %@", values: [Int64(66)], expectedCount: 1) {
+            $0.objectCol.arrayInt64.sum >= Int64(66)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt64.@sum >= %@", values: [sumarrayInt64], expectedCount: 1) {
+            $0.objectCol.arrayInt64.sum >= sumarrayInt64
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt64.@sum <= %@", values: [Int64(66)], expectedCount: 1) {
+            $0.objectCol.arrayInt64.sum <= Int64(66)
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt64.@sum <= %@", values: [sumarrayInt64], expectedCount: 2) {
+            $0.objectCol.arrayInt64.sum <= sumarrayInt64
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "objectCol.arrayInt64.@sum != %@", values: [sumarrayInt64], expectedCount: 1) {
+            $0.objectCol.arrayInt64.sum != sumarrayInt64
+        }
+
+        assertQuery(predicate: "objectCol.arrayInt64.@sum != %@", values: [Int64(64)], expectedCount: 2) {
+            $0.objectCol.arrayInt64.sum != Int64(64)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["arrayFloat": [Float(5.55444333), Float(6.55444333), Float(7.55444333)]])
+            if let oldObject = object.objectCol {
+                realm.delete(oldObject)
+            }
+            object.objectCol = modernObj
+        }
+
+        let sumarrayFloat = Float(5.55444333) + Float(6.55444333) + Float(7.55444333)
+        assertQuery(predicate: "objectCol.arrayFloat.@sum > %@", values: [Float(7.55444333)], expectedCount: 1) {
+            $0.objectCol.arrayFloat.sum > Float(7.55444333)
+        }
+
+        assertQuery(predicate: "objectCol.arrayFloat.@sum < %@", values: [Float(7.55444333)], expectedCount: 1) {
+            $0.objectCol.arrayFloat.sum < Float(7.55444333)
+        }
+
+        assertQuery(predicate: "objectCol.arrayFloat.@sum == %@", values: [Float(7.55444333)], expectedCount: 0) {
+            $0.objectCol.arrayFloat.sum == Float(7.55444333)
+        }
+
+        assertQuery(predicate: "objectCol.arrayFloat.@sum == %@", values: [sumarrayFloat], expectedCount: 1) {
+            $0.objectCol.arrayFloat.sum == sumarrayFloat
+        }
+
+        assertQuery(predicate: "objectCol.arrayFloat.@sum >= %@", values: [Float(7.55444333)], expectedCount: 1) {
+            $0.objectCol.arrayFloat.sum >= Float(7.55444333)
+        }
+
+        assertQuery(predicate: "objectCol.arrayFloat.@sum >= %@", values: [sumarrayFloat], expectedCount: 1) {
+            $0.objectCol.arrayFloat.sum >= sumarrayFloat
+        }
+
+        assertQuery(predicate: "objectCol.arrayFloat.@sum <= %@", values: [Float(7.55444333)], expectedCount: 1) {
+            $0.objectCol.arrayFloat.sum <= Float(7.55444333)
+        }
+
+        assertQuery(predicate: "objectCol.arrayFloat.@sum <= %@", values: [sumarrayFloat], expectedCount: 2) {
+            $0.objectCol.arrayFloat.sum <= sumarrayFloat
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "objectCol.arrayFloat.@sum != %@", values: [sumarrayFloat], expectedCount: 1) {
+            $0.objectCol.arrayFloat.sum != sumarrayFloat
+        }
+
+        assertQuery(predicate: "objectCol.arrayFloat.@sum != %@", values: [Float(5.55444333)], expectedCount: 2) {
+            $0.objectCol.arrayFloat.sum != Float(5.55444333)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["arrayDouble": [123.456, 234.456, 345.567]])
+            if let oldObject = object.objectCol {
+                realm.delete(oldObject)
+            }
+            object.objectCol = modernObj
+        }
+
+        let sumarrayDouble = 123.456 + 234.456 + 345.567
+        assertQuery(predicate: "objectCol.arrayDouble.@sum > %@", values: [345.567], expectedCount: 1) {
+            $0.objectCol.arrayDouble.sum > 345.567
+        }
+
+        assertQuery(predicate: "objectCol.arrayDouble.@sum < %@", values: [345.567], expectedCount: 1) {
+            $0.objectCol.arrayDouble.sum < 345.567
+        }
+
+        assertQuery(predicate: "objectCol.arrayDouble.@sum == %@", values: [345.567], expectedCount: 0) {
+            $0.objectCol.arrayDouble.sum == 345.567
+        }
+
+        assertQuery(predicate: "objectCol.arrayDouble.@sum == %@", values: [sumarrayDouble], expectedCount: 1) {
+            $0.objectCol.arrayDouble.sum == sumarrayDouble
+        }
+
+        assertQuery(predicate: "objectCol.arrayDouble.@sum >= %@", values: [345.567], expectedCount: 1) {
+            $0.objectCol.arrayDouble.sum >= 345.567
+        }
+
+        assertQuery(predicate: "objectCol.arrayDouble.@sum >= %@", values: [sumarrayDouble], expectedCount: 1) {
+            $0.objectCol.arrayDouble.sum >= sumarrayDouble
+        }
+
+        assertQuery(predicate: "objectCol.arrayDouble.@sum <= %@", values: [345.567], expectedCount: 1) {
+            $0.objectCol.arrayDouble.sum <= 345.567
+        }
+
+        assertQuery(predicate: "objectCol.arrayDouble.@sum <= %@", values: [sumarrayDouble], expectedCount: 2) {
+            $0.objectCol.arrayDouble.sum <= sumarrayDouble
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "objectCol.arrayDouble.@sum != %@", values: [sumarrayDouble], expectedCount: 1) {
+            $0.objectCol.arrayDouble.sum != sumarrayDouble
+        }
+
+        assertQuery(predicate: "objectCol.arrayDouble.@sum != %@", values: [123.456], expectedCount: 2) {
+            $0.objectCol.arrayDouble.sum != 123.456
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["arrayDecimal": [Decimal128(123.456), Decimal128(456.789), Decimal128(963.852)]])
+            if let oldObject = object.objectCol {
+                realm.delete(oldObject)
+            }
+            object.objectCol = modernObj
+        }
+
+        let sumarrayDecimal = Decimal128(123.456) + Decimal128(456.789) + Decimal128(963.852)
+        assertQuery(predicate: "objectCol.arrayDecimal.@sum > %@", values: [Decimal128(963.852)], expectedCount: 1) {
+            $0.objectCol.arrayDecimal.sum > Decimal128(963.852)
+        }
+
+        assertQuery(predicate: "objectCol.arrayDecimal.@sum < %@", values: [Decimal128(963.852)], expectedCount: 1) {
+            $0.objectCol.arrayDecimal.sum < Decimal128(963.852)
+        }
+
+        assertQuery(predicate: "objectCol.arrayDecimal.@sum == %@", values: [Decimal128(963.852)], expectedCount: 0) {
+            $0.objectCol.arrayDecimal.sum == Decimal128(963.852)
+        }
+
+        assertQuery(predicate: "objectCol.arrayDecimal.@sum == %@", values: [sumarrayDecimal], expectedCount: 1) {
+            $0.objectCol.arrayDecimal.sum == sumarrayDecimal
+        }
+
+        assertQuery(predicate: "objectCol.arrayDecimal.@sum >= %@", values: [Decimal128(963.852)], expectedCount: 1) {
+            $0.objectCol.arrayDecimal.sum >= Decimal128(963.852)
+        }
+
+        assertQuery(predicate: "objectCol.arrayDecimal.@sum >= %@", values: [sumarrayDecimal], expectedCount: 1) {
+            $0.objectCol.arrayDecimal.sum >= sumarrayDecimal
+        }
+
+        assertQuery(predicate: "objectCol.arrayDecimal.@sum <= %@", values: [Decimal128(963.852)], expectedCount: 1) {
+            $0.objectCol.arrayDecimal.sum <= Decimal128(963.852)
+        }
+
+        assertQuery(predicate: "objectCol.arrayDecimal.@sum <= %@", values: [sumarrayDecimal], expectedCount: 2) {
+            $0.objectCol.arrayDecimal.sum <= sumarrayDecimal
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "objectCol.arrayDecimal.@sum != %@", values: [sumarrayDecimal], expectedCount: 1) {
+            $0.objectCol.arrayDecimal.sum != sumarrayDecimal
+        }
+
+        assertQuery(predicate: "objectCol.arrayDecimal.@sum != %@", values: [Decimal128(123.456)], expectedCount: 2) {
+            $0.objectCol.arrayDecimal.sum != Decimal128(123.456)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["arrayOptInt": [1, 2, 3]])
+            if let oldObject = object.objectCol {
+                realm.delete(oldObject)
+            }
+            object.objectCol = modernObj
+        }
+
+        let sumarrayOptInt = 1 + 2 + 3
+        assertQuery(predicate: "objectCol.arrayOptInt.@sum > %@", values: [3], expectedCount: 1) {
+            $0.objectCol.arrayOptInt.sum > 3
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt.@sum < %@", values: [3], expectedCount: 1) {
+            $0.objectCol.arrayOptInt.sum < 3
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt.@sum == %@", values: [3], expectedCount: 0) {
+            $0.objectCol.arrayOptInt.sum == 3
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt.@sum == %@", values: [sumarrayOptInt], expectedCount: 1) {
+            $0.objectCol.arrayOptInt.sum == sumarrayOptInt
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt.@sum >= %@", values: [3], expectedCount: 1) {
+            $0.objectCol.arrayOptInt.sum >= 3
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt.@sum >= %@", values: [sumarrayOptInt], expectedCount: 1) {
+            $0.objectCol.arrayOptInt.sum >= sumarrayOptInt
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt.@sum <= %@", values: [3], expectedCount: 1) {
+            $0.objectCol.arrayOptInt.sum <= 3
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt.@sum <= %@", values: [sumarrayOptInt], expectedCount: 2) {
+            $0.objectCol.arrayOptInt.sum <= sumarrayOptInt
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "objectCol.arrayOptInt.@sum != %@", values: [sumarrayOptInt], expectedCount: 1) {
+            $0.objectCol.arrayOptInt.sum != sumarrayOptInt
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt.@sum != %@", values: [1], expectedCount: 2) {
+            $0.objectCol.arrayOptInt.sum != 1
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["arrayOptInt8": [Int8(8), Int8(9), Int8(10)]])
+            if let oldObject = object.objectCol {
+                realm.delete(oldObject)
+            }
+            object.objectCol = modernObj
+        }
+
+        let sumarrayOptInt8 = Int8(8) + Int8(9) + Int8(10)
+        assertQuery(predicate: "objectCol.arrayOptInt8.@sum > %@", values: [Int8(10)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt8.sum > Int8(10)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt8.@sum < %@", values: [Int8(10)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt8.sum < Int8(10)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt8.@sum == %@", values: [Int8(10)], expectedCount: 0) {
+            $0.objectCol.arrayOptInt8.sum == Int8(10)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt8.@sum == %@", values: [sumarrayOptInt8], expectedCount: 1) {
+            $0.objectCol.arrayOptInt8.sum == sumarrayOptInt8
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt8.@sum >= %@", values: [Int8(10)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt8.sum >= Int8(10)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt8.@sum >= %@", values: [sumarrayOptInt8], expectedCount: 1) {
+            $0.objectCol.arrayOptInt8.sum >= sumarrayOptInt8
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt8.@sum <= %@", values: [Int8(10)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt8.sum <= Int8(10)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt8.@sum <= %@", values: [sumarrayOptInt8], expectedCount: 2) {
+            $0.objectCol.arrayOptInt8.sum <= sumarrayOptInt8
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "objectCol.arrayOptInt8.@sum != %@", values: [sumarrayOptInt8], expectedCount: 1) {
+            $0.objectCol.arrayOptInt8.sum != sumarrayOptInt8
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt8.@sum != %@", values: [Int8(8)], expectedCount: 2) {
+            $0.objectCol.arrayOptInt8.sum != Int8(8)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["arrayOptInt16": [Int16(16), Int16(17), Int16(18)]])
+            if let oldObject = object.objectCol {
+                realm.delete(oldObject)
+            }
+            object.objectCol = modernObj
+        }
+
+        let sumarrayOptInt16 = Int16(16) + Int16(17) + Int16(18)
+        assertQuery(predicate: "objectCol.arrayOptInt16.@sum > %@", values: [Int16(18)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt16.sum > Int16(18)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt16.@sum < %@", values: [Int16(18)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt16.sum < Int16(18)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt16.@sum == %@", values: [Int16(18)], expectedCount: 0) {
+            $0.objectCol.arrayOptInt16.sum == Int16(18)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt16.@sum == %@", values: [sumarrayOptInt16], expectedCount: 1) {
+            $0.objectCol.arrayOptInt16.sum == sumarrayOptInt16
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt16.@sum >= %@", values: [Int16(18)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt16.sum >= Int16(18)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt16.@sum >= %@", values: [sumarrayOptInt16], expectedCount: 1) {
+            $0.objectCol.arrayOptInt16.sum >= sumarrayOptInt16
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt16.@sum <= %@", values: [Int16(18)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt16.sum <= Int16(18)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt16.@sum <= %@", values: [sumarrayOptInt16], expectedCount: 2) {
+            $0.objectCol.arrayOptInt16.sum <= sumarrayOptInt16
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "objectCol.arrayOptInt16.@sum != %@", values: [sumarrayOptInt16], expectedCount: 1) {
+            $0.objectCol.arrayOptInt16.sum != sumarrayOptInt16
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt16.@sum != %@", values: [Int16(16)], expectedCount: 2) {
+            $0.objectCol.arrayOptInt16.sum != Int16(16)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["arrayOptInt32": [Int32(32), Int32(33), Int32(34)]])
+            if let oldObject = object.objectCol {
+                realm.delete(oldObject)
+            }
+            object.objectCol = modernObj
+        }
+
+        let sumarrayOptInt32 = Int32(32) + Int32(33) + Int32(34)
+        assertQuery(predicate: "objectCol.arrayOptInt32.@sum > %@", values: [Int32(34)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt32.sum > Int32(34)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt32.@sum < %@", values: [Int32(34)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt32.sum < Int32(34)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt32.@sum == %@", values: [Int32(34)], expectedCount: 0) {
+            $0.objectCol.arrayOptInt32.sum == Int32(34)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt32.@sum == %@", values: [sumarrayOptInt32], expectedCount: 1) {
+            $0.objectCol.arrayOptInt32.sum == sumarrayOptInt32
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt32.@sum >= %@", values: [Int32(34)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt32.sum >= Int32(34)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt32.@sum >= %@", values: [sumarrayOptInt32], expectedCount: 1) {
+            $0.objectCol.arrayOptInt32.sum >= sumarrayOptInt32
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt32.@sum <= %@", values: [Int32(34)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt32.sum <= Int32(34)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt32.@sum <= %@", values: [sumarrayOptInt32], expectedCount: 2) {
+            $0.objectCol.arrayOptInt32.sum <= sumarrayOptInt32
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "objectCol.arrayOptInt32.@sum != %@", values: [sumarrayOptInt32], expectedCount: 1) {
+            $0.objectCol.arrayOptInt32.sum != sumarrayOptInt32
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt32.@sum != %@", values: [Int32(32)], expectedCount: 2) {
+            $0.objectCol.arrayOptInt32.sum != Int32(32)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["arrayOptInt64": [Int64(64), Int64(65), Int64(66)]])
+            if let oldObject = object.objectCol {
+                realm.delete(oldObject)
+            }
+            object.objectCol = modernObj
+        }
+
+        let sumarrayOptInt64 = Int64(64) + Int64(65) + Int64(66)
+        assertQuery(predicate: "objectCol.arrayOptInt64.@sum > %@", values: [Int64(66)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt64.sum > Int64(66)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt64.@sum < %@", values: [Int64(66)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt64.sum < Int64(66)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt64.@sum == %@", values: [Int64(66)], expectedCount: 0) {
+            $0.objectCol.arrayOptInt64.sum == Int64(66)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt64.@sum == %@", values: [sumarrayOptInt64], expectedCount: 1) {
+            $0.objectCol.arrayOptInt64.sum == sumarrayOptInt64
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt64.@sum >= %@", values: [Int64(66)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt64.sum >= Int64(66)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt64.@sum >= %@", values: [sumarrayOptInt64], expectedCount: 1) {
+            $0.objectCol.arrayOptInt64.sum >= sumarrayOptInt64
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt64.@sum <= %@", values: [Int64(66)], expectedCount: 1) {
+            $0.objectCol.arrayOptInt64.sum <= Int64(66)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt64.@sum <= %@", values: [sumarrayOptInt64], expectedCount: 2) {
+            $0.objectCol.arrayOptInt64.sum <= sumarrayOptInt64
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "objectCol.arrayOptInt64.@sum != %@", values: [sumarrayOptInt64], expectedCount: 1) {
+            $0.objectCol.arrayOptInt64.sum != sumarrayOptInt64
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptInt64.@sum != %@", values: [Int64(64)], expectedCount: 2) {
+            $0.objectCol.arrayOptInt64.sum != Int64(64)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["arrayOptFloat": [Float(5.55444333), Float(6.55444333), Float(7.55444333)]])
+            if let oldObject = object.objectCol {
+                realm.delete(oldObject)
+            }
+            object.objectCol = modernObj
+        }
+
+        let sumarrayOptFloat = Float(5.55444333) + Float(6.55444333) + Float(7.55444333)
+        assertQuery(predicate: "objectCol.arrayOptFloat.@sum > %@", values: [Float(7.55444333)], expectedCount: 1) {
+            $0.objectCol.arrayOptFloat.sum > Float(7.55444333)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptFloat.@sum < %@", values: [Float(7.55444333)], expectedCount: 1) {
+            $0.objectCol.arrayOptFloat.sum < Float(7.55444333)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptFloat.@sum == %@", values: [Float(7.55444333)], expectedCount: 0) {
+            $0.objectCol.arrayOptFloat.sum == Float(7.55444333)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptFloat.@sum == %@", values: [sumarrayOptFloat], expectedCount: 1) {
+            $0.objectCol.arrayOptFloat.sum == sumarrayOptFloat
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptFloat.@sum >= %@", values: [Float(7.55444333)], expectedCount: 1) {
+            $0.objectCol.arrayOptFloat.sum >= Float(7.55444333)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptFloat.@sum >= %@", values: [sumarrayOptFloat], expectedCount: 1) {
+            $0.objectCol.arrayOptFloat.sum >= sumarrayOptFloat
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptFloat.@sum <= %@", values: [Float(7.55444333)], expectedCount: 1) {
+            $0.objectCol.arrayOptFloat.sum <= Float(7.55444333)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptFloat.@sum <= %@", values: [sumarrayOptFloat], expectedCount: 2) {
+            $0.objectCol.arrayOptFloat.sum <= sumarrayOptFloat
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "objectCol.arrayOptFloat.@sum != %@", values: [sumarrayOptFloat], expectedCount: 1) {
+            $0.objectCol.arrayOptFloat.sum != sumarrayOptFloat
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptFloat.@sum != %@", values: [Float(5.55444333)], expectedCount: 2) {
+            $0.objectCol.arrayOptFloat.sum != Float(5.55444333)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["arrayOptDouble": [123.456, 234.456, 345.567]])
+            if let oldObject = object.objectCol {
+                realm.delete(oldObject)
+            }
+            object.objectCol = modernObj
+        }
+
+        let sumarrayOptDouble = 123.456 + 234.456 + 345.567
+        assertQuery(predicate: "objectCol.arrayOptDouble.@sum > %@", values: [345.567], expectedCount: 1) {
+            $0.objectCol.arrayOptDouble.sum > 345.567
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDouble.@sum < %@", values: [345.567], expectedCount: 1) {
+            $0.objectCol.arrayOptDouble.sum < 345.567
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDouble.@sum == %@", values: [345.567], expectedCount: 0) {
+            $0.objectCol.arrayOptDouble.sum == 345.567
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDouble.@sum == %@", values: [sumarrayOptDouble], expectedCount: 1) {
+            $0.objectCol.arrayOptDouble.sum == sumarrayOptDouble
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDouble.@sum >= %@", values: [345.567], expectedCount: 1) {
+            $0.objectCol.arrayOptDouble.sum >= 345.567
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDouble.@sum >= %@", values: [sumarrayOptDouble], expectedCount: 1) {
+            $0.objectCol.arrayOptDouble.sum >= sumarrayOptDouble
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDouble.@sum <= %@", values: [345.567], expectedCount: 1) {
+            $0.objectCol.arrayOptDouble.sum <= 345.567
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDouble.@sum <= %@", values: [sumarrayOptDouble], expectedCount: 2) {
+            $0.objectCol.arrayOptDouble.sum <= sumarrayOptDouble
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "objectCol.arrayOptDouble.@sum != %@", values: [sumarrayOptDouble], expectedCount: 1) {
+            $0.objectCol.arrayOptDouble.sum != sumarrayOptDouble
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDouble.@sum != %@", values: [123.456], expectedCount: 2) {
+            $0.objectCol.arrayOptDouble.sum != 123.456
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["arrayOptDecimal": [Decimal128(123.456), Decimal128(456.789), Decimal128(963.852)]])
+            if let oldObject = object.objectCol {
+                realm.delete(oldObject)
+            }
+            object.objectCol = modernObj
+        }
+
+        let sumarrayOptDecimal = Decimal128(123.456) + Decimal128(456.789) + Decimal128(963.852)
+        assertQuery(predicate: "objectCol.arrayOptDecimal.@sum > %@", values: [Decimal128(963.852)], expectedCount: 1) {
+            $0.objectCol.arrayOptDecimal.sum > Decimal128(963.852)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDecimal.@sum < %@", values: [Decimal128(963.852)], expectedCount: 1) {
+            $0.objectCol.arrayOptDecimal.sum < Decimal128(963.852)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDecimal.@sum == %@", values: [Decimal128(963.852)], expectedCount: 0) {
+            $0.objectCol.arrayOptDecimal.sum == Decimal128(963.852)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDecimal.@sum == %@", values: [sumarrayOptDecimal], expectedCount: 1) {
+            $0.objectCol.arrayOptDecimal.sum == sumarrayOptDecimal
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDecimal.@sum >= %@", values: [Decimal128(963.852)], expectedCount: 1) {
+            $0.objectCol.arrayOptDecimal.sum >= Decimal128(963.852)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDecimal.@sum >= %@", values: [sumarrayOptDecimal], expectedCount: 1) {
+            $0.objectCol.arrayOptDecimal.sum >= sumarrayOptDecimal
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDecimal.@sum <= %@", values: [Decimal128(963.852)], expectedCount: 1) {
+            $0.objectCol.arrayOptDecimal.sum <= Decimal128(963.852)
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDecimal.@sum <= %@", values: [sumarrayOptDecimal], expectedCount: 2) {
+            $0.objectCol.arrayOptDecimal.sum <= sumarrayOptDecimal
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "objectCol.arrayOptDecimal.@sum != %@", values: [sumarrayOptDecimal], expectedCount: 1) {
+            $0.objectCol.arrayOptDecimal.sum != sumarrayOptDecimal
+        }
+
+        assertQuery(predicate: "objectCol.arrayOptDecimal.@sum != %@", values: [Decimal128(123.456)], expectedCount: 2) {
+            $0.objectCol.arrayOptDecimal.sum != Decimal128(123.456)
+        }
+    }
+
+    func testCollectionSum() {
+        let realm = realmWithTestPath()
+        let object = objects().first!
+        try! realm.write {
+            object.arrayInt.removeAll()
+            object.arrayInt.append(objectsIn: [1, 2, 3])
+        }
+
+        let sumarrayInt = 1 + 2 + 3
+        assertQuery(predicate: "arrayInt.@sum > %@", values: [3], expectedCount: 1) {
+            $0.arrayInt.sum > 3
+        }
+
+        assertQuery(predicate: "arrayInt.@sum < %@", values: [3], expectedCount: 0) {
+            $0.arrayInt.sum < 3
+        }
+
+        assertQuery(predicate: "arrayInt.@sum == %@", values: [3], expectedCount: 0) {
+            $0.arrayInt.sum == 3
+        }
+
+        assertQuery(predicate: "arrayInt.@sum == %@", values: [sumarrayInt], expectedCount: 1) {
+            $0.arrayInt.sum == sumarrayInt
+        }
+
+        assertQuery(predicate: "arrayInt.@sum >= %@", values: [3], expectedCount: 1) {
+            $0.arrayInt.sum >= 3
+        }
+
+        assertQuery(predicate: "arrayInt.@sum >= %@", values: [sumarrayInt], expectedCount: 1) {
+            $0.arrayInt.sum >= sumarrayInt
+        }
+
+        assertQuery(predicate: "arrayInt.@sum <= %@", values: [3], expectedCount: 0) {
+            $0.arrayInt.sum <= 3
+        }
+
+        assertQuery(predicate: "arrayInt.@sum <= %@", values: [sumarrayInt], expectedCount: 2) {
+            $0.arrayInt.sum <= sumarrayInt
+        }
+
+        assertQuery(predicate: "arrayInt.@sum != %@", values: [sumarrayInt], expectedCount: 1) {
+            $0.arrayInt.sum != sumarrayInt
+        }
+
+        assertQuery(predicate: "arrayInt.@sum != %@", values: [1], expectedCount: 2) {
+            $0.arrayInt.sum != 1
+        }
+        try! realm.write {
+            object.arrayInt8.removeAll()
+            object.arrayInt8.append(objectsIn: [Int8(8), Int8(9), Int8(10)])
+        }
+
+        let sumarrayInt8 = Int8(8) + Int8(9) + Int8(10)
+        assertQuery(predicate: "arrayInt8.@sum > %@", values: [Int8(10)], expectedCount: 1) {
+            $0.arrayInt8.sum > Int8(10)
+        }
+
+        assertQuery(predicate: "arrayInt8.@sum < %@", values: [Int8(10)], expectedCount: 0) {
+            $0.arrayInt8.sum < Int8(10)
+        }
+
+        assertQuery(predicate: "arrayInt8.@sum == %@", values: [Int8(10)], expectedCount: 0) {
+            $0.arrayInt8.sum == Int8(10)
+        }
+
+        assertQuery(predicate: "arrayInt8.@sum == %@", values: [sumarrayInt8], expectedCount: 1) {
+            $0.arrayInt8.sum == sumarrayInt8
+        }
+
+        assertQuery(predicate: "arrayInt8.@sum >= %@", values: [Int8(10)], expectedCount: 1) {
+            $0.arrayInt8.sum >= Int8(10)
+        }
+
+        assertQuery(predicate: "arrayInt8.@sum >= %@", values: [sumarrayInt8], expectedCount: 1) {
+            $0.arrayInt8.sum >= sumarrayInt8
+        }
+
+        assertQuery(predicate: "arrayInt8.@sum <= %@", values: [Int8(10)], expectedCount: 0) {
+            $0.arrayInt8.sum <= Int8(10)
+        }
+
+        assertQuery(predicate: "arrayInt8.@sum <= %@", values: [sumarrayInt8], expectedCount: 2) {
+            $0.arrayInt8.sum <= sumarrayInt8
+        }
+
+        assertQuery(predicate: "arrayInt8.@sum != %@", values: [sumarrayInt8], expectedCount: 1) {
+            $0.arrayInt8.sum != sumarrayInt8
+        }
+
+        assertQuery(predicate: "arrayInt8.@sum != %@", values: [Int8(8)], expectedCount: 2) {
+            $0.arrayInt8.sum != Int8(8)
+        }
+        try! realm.write {
+            object.arrayInt16.removeAll()
+            object.arrayInt16.append(objectsIn: [Int16(16), Int16(17), Int16(18)])
+        }
+
+        let sumarrayInt16 = Int16(16) + Int16(17) + Int16(18)
+        assertQuery(predicate: "arrayInt16.@sum > %@", values: [Int16(18)], expectedCount: 1) {
+            $0.arrayInt16.sum > Int16(18)
+        }
+
+        assertQuery(predicate: "arrayInt16.@sum < %@", values: [Int16(18)], expectedCount: 0) {
+            $0.arrayInt16.sum < Int16(18)
+        }
+
+        assertQuery(predicate: "arrayInt16.@sum == %@", values: [Int16(18)], expectedCount: 0) {
+            $0.arrayInt16.sum == Int16(18)
+        }
+
+        assertQuery(predicate: "arrayInt16.@sum == %@", values: [sumarrayInt16], expectedCount: 1) {
+            $0.arrayInt16.sum == sumarrayInt16
+        }
+
+        assertQuery(predicate: "arrayInt16.@sum >= %@", values: [Int16(18)], expectedCount: 1) {
+            $0.arrayInt16.sum >= Int16(18)
+        }
+
+        assertQuery(predicate: "arrayInt16.@sum >= %@", values: [sumarrayInt16], expectedCount: 1) {
+            $0.arrayInt16.sum >= sumarrayInt16
+        }
+
+        assertQuery(predicate: "arrayInt16.@sum <= %@", values: [Int16(18)], expectedCount: 0) {
+            $0.arrayInt16.sum <= Int16(18)
+        }
+
+        assertQuery(predicate: "arrayInt16.@sum <= %@", values: [sumarrayInt16], expectedCount: 2) {
+            $0.arrayInt16.sum <= sumarrayInt16
+        }
+
+        assertQuery(predicate: "arrayInt16.@sum != %@", values: [sumarrayInt16], expectedCount: 1) {
+            $0.arrayInt16.sum != sumarrayInt16
+        }
+
+        assertQuery(predicate: "arrayInt16.@sum != %@", values: [Int16(16)], expectedCount: 2) {
+            $0.arrayInt16.sum != Int16(16)
+        }
+        try! realm.write {
+            object.arrayInt32.removeAll()
+            object.arrayInt32.append(objectsIn: [Int32(32), Int32(33), Int32(34)])
+        }
+
+        let sumarrayInt32 = Int32(32) + Int32(33) + Int32(34)
+        assertQuery(predicate: "arrayInt32.@sum > %@", values: [Int32(34)], expectedCount: 1) {
+            $0.arrayInt32.sum > Int32(34)
+        }
+
+        assertQuery(predicate: "arrayInt32.@sum < %@", values: [Int32(34)], expectedCount: 0) {
+            $0.arrayInt32.sum < Int32(34)
+        }
+
+        assertQuery(predicate: "arrayInt32.@sum == %@", values: [Int32(34)], expectedCount: 0) {
+            $0.arrayInt32.sum == Int32(34)
+        }
+
+        assertQuery(predicate: "arrayInt32.@sum == %@", values: [sumarrayInt32], expectedCount: 1) {
+            $0.arrayInt32.sum == sumarrayInt32
+        }
+
+        assertQuery(predicate: "arrayInt32.@sum >= %@", values: [Int32(34)], expectedCount: 1) {
+            $0.arrayInt32.sum >= Int32(34)
+        }
+
+        assertQuery(predicate: "arrayInt32.@sum >= %@", values: [sumarrayInt32], expectedCount: 1) {
+            $0.arrayInt32.sum >= sumarrayInt32
+        }
+
+        assertQuery(predicate: "arrayInt32.@sum <= %@", values: [Int32(34)], expectedCount: 0) {
+            $0.arrayInt32.sum <= Int32(34)
+        }
+
+        assertQuery(predicate: "arrayInt32.@sum <= %@", values: [sumarrayInt32], expectedCount: 2) {
+            $0.arrayInt32.sum <= sumarrayInt32
+        }
+
+        assertQuery(predicate: "arrayInt32.@sum != %@", values: [sumarrayInt32], expectedCount: 1) {
+            $0.arrayInt32.sum != sumarrayInt32
+        }
+
+        assertQuery(predicate: "arrayInt32.@sum != %@", values: [Int32(32)], expectedCount: 2) {
+            $0.arrayInt32.sum != Int32(32)
+        }
+        try! realm.write {
+            object.arrayInt64.removeAll()
+            object.arrayInt64.append(objectsIn: [Int64(64), Int64(65), Int64(66)])
+        }
+
+        let sumarrayInt64 = Int64(64) + Int64(65) + Int64(66)
+        assertQuery(predicate: "arrayInt64.@sum > %@", values: [Int64(66)], expectedCount: 1) {
+            $0.arrayInt64.sum > Int64(66)
+        }
+
+        assertQuery(predicate: "arrayInt64.@sum < %@", values: [Int64(66)], expectedCount: 0) {
+            $0.arrayInt64.sum < Int64(66)
+        }
+
+        assertQuery(predicate: "arrayInt64.@sum == %@", values: [Int64(66)], expectedCount: 0) {
+            $0.arrayInt64.sum == Int64(66)
+        }
+
+        assertQuery(predicate: "arrayInt64.@sum == %@", values: [sumarrayInt64], expectedCount: 1) {
+            $0.arrayInt64.sum == sumarrayInt64
+        }
+
+        assertQuery(predicate: "arrayInt64.@sum >= %@", values: [Int64(66)], expectedCount: 1) {
+            $0.arrayInt64.sum >= Int64(66)
+        }
+
+        assertQuery(predicate: "arrayInt64.@sum >= %@", values: [sumarrayInt64], expectedCount: 1) {
+            $0.arrayInt64.sum >= sumarrayInt64
+        }
+
+        assertQuery(predicate: "arrayInt64.@sum <= %@", values: [Int64(66)], expectedCount: 0) {
+            $0.arrayInt64.sum <= Int64(66)
+        }
+
+        assertQuery(predicate: "arrayInt64.@sum <= %@", values: [sumarrayInt64], expectedCount: 2) {
+            $0.arrayInt64.sum <= sumarrayInt64
+        }
+
+        assertQuery(predicate: "arrayInt64.@sum != %@", values: [sumarrayInt64], expectedCount: 1) {
+            $0.arrayInt64.sum != sumarrayInt64
+        }
+
+        assertQuery(predicate: "arrayInt64.@sum != %@", values: [Int64(64)], expectedCount: 2) {
+            $0.arrayInt64.sum != Int64(64)
+        }
+        try! realm.write {
+            object.arrayFloat.removeAll()
+            object.arrayFloat.append(objectsIn: [Float(5.55444333), Float(6.55444333), Float(7.55444333)])
+        }
+
+        let sumarrayFloat = Float(5.55444333) + Float(6.55444333) + Float(7.55444333)
+        assertQuery(predicate: "arrayFloat.@sum > %@", values: [Float(7.55444333)], expectedCount: 1) {
+            $0.arrayFloat.sum > Float(7.55444333)
+        }
+
+        assertQuery(predicate: "arrayFloat.@sum < %@", values: [Float(7.55444333)], expectedCount: 0) {
+            $0.arrayFloat.sum < Float(7.55444333)
+        }
+
+        assertQuery(predicate: "arrayFloat.@sum == %@", values: [Float(7.55444333)], expectedCount: 0) {
+            $0.arrayFloat.sum == Float(7.55444333)
+        }
+
+        assertQuery(predicate: "arrayFloat.@sum == %@", values: [sumarrayFloat], expectedCount: 1) {
+            $0.arrayFloat.sum == sumarrayFloat
+        }
+
+        assertQuery(predicate: "arrayFloat.@sum >= %@", values: [Float(7.55444333)], expectedCount: 1) {
+            $0.arrayFloat.sum >= Float(7.55444333)
+        }
+
+        assertQuery(predicate: "arrayFloat.@sum >= %@", values: [sumarrayFloat], expectedCount: 1) {
+            $0.arrayFloat.sum >= sumarrayFloat
+        }
+
+        assertQuery(predicate: "arrayFloat.@sum <= %@", values: [Float(7.55444333)], expectedCount: 0) {
+            $0.arrayFloat.sum <= Float(7.55444333)
+        }
+
+        assertQuery(predicate: "arrayFloat.@sum <= %@", values: [sumarrayFloat], expectedCount: 2) {
+            $0.arrayFloat.sum <= sumarrayFloat
+        }
+
+        assertQuery(predicate: "arrayFloat.@sum != %@", values: [sumarrayFloat], expectedCount: 1) {
+            $0.arrayFloat.sum != sumarrayFloat
+        }
+
+        assertQuery(predicate: "arrayFloat.@sum != %@", values: [Float(5.55444333)], expectedCount: 2) {
+            $0.arrayFloat.sum != Float(5.55444333)
+        }
+        try! realm.write {
+            object.arrayDouble.removeAll()
+            object.arrayDouble.append(objectsIn: [123.456, 234.456, 345.567])
+        }
+
+        let sumarrayDouble = 123.456 + 234.456 + 345.567
+        assertQuery(predicate: "arrayDouble.@sum > %@", values: [345.567], expectedCount: 1) {
+            $0.arrayDouble.sum > 345.567
+        }
+
+        assertQuery(predicate: "arrayDouble.@sum < %@", values: [345.567], expectedCount: 0) {
+            $0.arrayDouble.sum < 345.567
+        }
+
+        assertQuery(predicate: "arrayDouble.@sum == %@", values: [345.567], expectedCount: 0) {
+            $0.arrayDouble.sum == 345.567
+        }
+
+        assertQuery(predicate: "arrayDouble.@sum == %@", values: [sumarrayDouble], expectedCount: 1) {
+            $0.arrayDouble.sum == sumarrayDouble
+        }
+
+        assertQuery(predicate: "arrayDouble.@sum >= %@", values: [345.567], expectedCount: 1) {
+            $0.arrayDouble.sum >= 345.567
+        }
+
+        assertQuery(predicate: "arrayDouble.@sum >= %@", values: [sumarrayDouble], expectedCount: 1) {
+            $0.arrayDouble.sum >= sumarrayDouble
+        }
+
+        assertQuery(predicate: "arrayDouble.@sum <= %@", values: [345.567], expectedCount: 0) {
+            $0.arrayDouble.sum <= 345.567
+        }
+
+        assertQuery(predicate: "arrayDouble.@sum <= %@", values: [sumarrayDouble], expectedCount: 2) {
+            $0.arrayDouble.sum <= sumarrayDouble
+        }
+
+        assertQuery(predicate: "arrayDouble.@sum != %@", values: [sumarrayDouble], expectedCount: 1) {
+            $0.arrayDouble.sum != sumarrayDouble
+        }
+
+        assertQuery(predicate: "arrayDouble.@sum != %@", values: [123.456], expectedCount: 2) {
+            $0.arrayDouble.sum != 123.456
+        }
+        try! realm.write {
+            object.arrayDecimal.removeAll()
+            object.arrayDecimal.append(objectsIn: [Decimal128(123.456), Decimal128(456.789), Decimal128(963.852)])
+        }
+
+        let sumarrayDecimal = Decimal128(123.456) + Decimal128(456.789) + Decimal128(963.852)
+        assertQuery(predicate: "arrayDecimal.@sum > %@", values: [Decimal128(963.852)], expectedCount: 1) {
+            $0.arrayDecimal.sum > Decimal128(963.852)
+        }
+
+        assertQuery(predicate: "arrayDecimal.@sum < %@", values: [Decimal128(963.852)], expectedCount: 0) {
+            $0.arrayDecimal.sum < Decimal128(963.852)
+        }
+
+        assertQuery(predicate: "arrayDecimal.@sum == %@", values: [Decimal128(963.852)], expectedCount: 0) {
+            $0.arrayDecimal.sum == Decimal128(963.852)
+        }
+
+        assertQuery(predicate: "arrayDecimal.@sum == %@", values: [sumarrayDecimal], expectedCount: 1) {
+            $0.arrayDecimal.sum == sumarrayDecimal
+        }
+
+        assertQuery(predicate: "arrayDecimal.@sum >= %@", values: [Decimal128(963.852)], expectedCount: 1) {
+            $0.arrayDecimal.sum >= Decimal128(963.852)
+        }
+
+        assertQuery(predicate: "arrayDecimal.@sum >= %@", values: [sumarrayDecimal], expectedCount: 1) {
+            $0.arrayDecimal.sum >= sumarrayDecimal
+        }
+
+        assertQuery(predicate: "arrayDecimal.@sum <= %@", values: [Decimal128(963.852)], expectedCount: 0) {
+            $0.arrayDecimal.sum <= Decimal128(963.852)
+        }
+
+        assertQuery(predicate: "arrayDecimal.@sum <= %@", values: [sumarrayDecimal], expectedCount: 2) {
+            $0.arrayDecimal.sum <= sumarrayDecimal
+        }
+
+        assertQuery(predicate: "arrayDecimal.@sum != %@", values: [sumarrayDecimal], expectedCount: 1) {
+            $0.arrayDecimal.sum != sumarrayDecimal
+        }
+
+        assertQuery(predicate: "arrayDecimal.@sum != %@", values: [Decimal128(123.456)], expectedCount: 2) {
+            $0.arrayDecimal.sum != Decimal128(123.456)
+        }
+        try! realm.write {
+            object.arrayOptInt.removeAll()
+            object.arrayOptInt.append(objectsIn: [1, 2, 3])
+        }
+
+        let sumarrayOptInt = 1 + 2 + 3
+        assertQuery(predicate: "arrayOptInt.@sum > %@", values: [3], expectedCount: 1) {
+            $0.arrayOptInt.sum > 3
+        }
+
+        assertQuery(predicate: "arrayOptInt.@sum < %@", values: [3], expectedCount: 0) {
+            $0.arrayOptInt.sum < 3
+        }
+
+        assertQuery(predicate: "arrayOptInt.@sum == %@", values: [3], expectedCount: 0) {
+            $0.arrayOptInt.sum == 3
+        }
+
+        assertQuery(predicate: "arrayOptInt.@sum == %@", values: [sumarrayOptInt], expectedCount: 1) {
+            $0.arrayOptInt.sum == sumarrayOptInt
+        }
+
+        assertQuery(predicate: "arrayOptInt.@sum >= %@", values: [3], expectedCount: 1) {
+            $0.arrayOptInt.sum >= 3
+        }
+
+        assertQuery(predicate: "arrayOptInt.@sum >= %@", values: [sumarrayOptInt], expectedCount: 1) {
+            $0.arrayOptInt.sum >= sumarrayOptInt
+        }
+
+        assertQuery(predicate: "arrayOptInt.@sum <= %@", values: [3], expectedCount: 0) {
+            $0.arrayOptInt.sum <= 3
+        }
+
+        assertQuery(predicate: "arrayOptInt.@sum <= %@", values: [sumarrayOptInt], expectedCount: 2) {
+            $0.arrayOptInt.sum <= sumarrayOptInt
+        }
+
+        assertQuery(predicate: "arrayOptInt.@sum != %@", values: [sumarrayOptInt], expectedCount: 1) {
+            $0.arrayOptInt.sum != sumarrayOptInt
+        }
+
+        assertQuery(predicate: "arrayOptInt.@sum != %@", values: [1], expectedCount: 2) {
+            $0.arrayOptInt.sum != 1
+        }
+        try! realm.write {
+            object.arrayOptInt8.removeAll()
+            object.arrayOptInt8.append(objectsIn: [Int8(8), Int8(9), Int8(10)])
+        }
+
+        let sumarrayOptInt8 = Int8(8) + Int8(9) + Int8(10)
+        assertQuery(predicate: "arrayOptInt8.@sum > %@", values: [Int8(10)], expectedCount: 1) {
+            $0.arrayOptInt8.sum > Int8(10)
+        }
+
+        assertQuery(predicate: "arrayOptInt8.@sum < %@", values: [Int8(10)], expectedCount: 0) {
+            $0.arrayOptInt8.sum < Int8(10)
+        }
+
+        assertQuery(predicate: "arrayOptInt8.@sum == %@", values: [Int8(10)], expectedCount: 0) {
+            $0.arrayOptInt8.sum == Int8(10)
+        }
+
+        assertQuery(predicate: "arrayOptInt8.@sum == %@", values: [sumarrayOptInt8], expectedCount: 1) {
+            $0.arrayOptInt8.sum == sumarrayOptInt8
+        }
+
+        assertQuery(predicate: "arrayOptInt8.@sum >= %@", values: [Int8(10)], expectedCount: 1) {
+            $0.arrayOptInt8.sum >= Int8(10)
+        }
+
+        assertQuery(predicate: "arrayOptInt8.@sum >= %@", values: [sumarrayOptInt8], expectedCount: 1) {
+            $0.arrayOptInt8.sum >= sumarrayOptInt8
+        }
+
+        assertQuery(predicate: "arrayOptInt8.@sum <= %@", values: [Int8(10)], expectedCount: 0) {
+            $0.arrayOptInt8.sum <= Int8(10)
+        }
+
+        assertQuery(predicate: "arrayOptInt8.@sum <= %@", values: [sumarrayOptInt8], expectedCount: 2) {
+            $0.arrayOptInt8.sum <= sumarrayOptInt8
+        }
+
+        assertQuery(predicate: "arrayOptInt8.@sum != %@", values: [sumarrayOptInt8], expectedCount: 1) {
+            $0.arrayOptInt8.sum != sumarrayOptInt8
+        }
+
+        assertQuery(predicate: "arrayOptInt8.@sum != %@", values: [Int8(8)], expectedCount: 2) {
+            $0.arrayOptInt8.sum != Int8(8)
+        }
+        try! realm.write {
+            object.arrayOptInt16.removeAll()
+            object.arrayOptInt16.append(objectsIn: [Int16(16), Int16(17), Int16(18)])
+        }
+
+        let sumarrayOptInt16 = Int16(16) + Int16(17) + Int16(18)
+        assertQuery(predicate: "arrayOptInt16.@sum > %@", values: [Int16(18)], expectedCount: 1) {
+            $0.arrayOptInt16.sum > Int16(18)
+        }
+
+        assertQuery(predicate: "arrayOptInt16.@sum < %@", values: [Int16(18)], expectedCount: 0) {
+            $0.arrayOptInt16.sum < Int16(18)
+        }
+
+        assertQuery(predicate: "arrayOptInt16.@sum == %@", values: [Int16(18)], expectedCount: 0) {
+            $0.arrayOptInt16.sum == Int16(18)
+        }
+
+        assertQuery(predicate: "arrayOptInt16.@sum == %@", values: [sumarrayOptInt16], expectedCount: 1) {
+            $0.arrayOptInt16.sum == sumarrayOptInt16
+        }
+
+        assertQuery(predicate: "arrayOptInt16.@sum >= %@", values: [Int16(18)], expectedCount: 1) {
+            $0.arrayOptInt16.sum >= Int16(18)
+        }
+
+        assertQuery(predicate: "arrayOptInt16.@sum >= %@", values: [sumarrayOptInt16], expectedCount: 1) {
+            $0.arrayOptInt16.sum >= sumarrayOptInt16
+        }
+
+        assertQuery(predicate: "arrayOptInt16.@sum <= %@", values: [Int16(18)], expectedCount: 0) {
+            $0.arrayOptInt16.sum <= Int16(18)
+        }
+
+        assertQuery(predicate: "arrayOptInt16.@sum <= %@", values: [sumarrayOptInt16], expectedCount: 2) {
+            $0.arrayOptInt16.sum <= sumarrayOptInt16
+        }
+
+        assertQuery(predicate: "arrayOptInt16.@sum != %@", values: [sumarrayOptInt16], expectedCount: 1) {
+            $0.arrayOptInt16.sum != sumarrayOptInt16
+        }
+
+        assertQuery(predicate: "arrayOptInt16.@sum != %@", values: [Int16(16)], expectedCount: 2) {
+            $0.arrayOptInt16.sum != Int16(16)
+        }
+        try! realm.write {
+            object.arrayOptInt32.removeAll()
+            object.arrayOptInt32.append(objectsIn: [Int32(32), Int32(33), Int32(34)])
+        }
+
+        let sumarrayOptInt32 = Int32(32) + Int32(33) + Int32(34)
+        assertQuery(predicate: "arrayOptInt32.@sum > %@", values: [Int32(34)], expectedCount: 1) {
+            $0.arrayOptInt32.sum > Int32(34)
+        }
+
+        assertQuery(predicate: "arrayOptInt32.@sum < %@", values: [Int32(34)], expectedCount: 0) {
+            $0.arrayOptInt32.sum < Int32(34)
+        }
+
+        assertQuery(predicate: "arrayOptInt32.@sum == %@", values: [Int32(34)], expectedCount: 0) {
+            $0.arrayOptInt32.sum == Int32(34)
+        }
+
+        assertQuery(predicate: "arrayOptInt32.@sum == %@", values: [sumarrayOptInt32], expectedCount: 1) {
+            $0.arrayOptInt32.sum == sumarrayOptInt32
+        }
+
+        assertQuery(predicate: "arrayOptInt32.@sum >= %@", values: [Int32(34)], expectedCount: 1) {
+            $0.arrayOptInt32.sum >= Int32(34)
+        }
+
+        assertQuery(predicate: "arrayOptInt32.@sum >= %@", values: [sumarrayOptInt32], expectedCount: 1) {
+            $0.arrayOptInt32.sum >= sumarrayOptInt32
+        }
+
+        assertQuery(predicate: "arrayOptInt32.@sum <= %@", values: [Int32(34)], expectedCount: 0) {
+            $0.arrayOptInt32.sum <= Int32(34)
+        }
+
+        assertQuery(predicate: "arrayOptInt32.@sum <= %@", values: [sumarrayOptInt32], expectedCount: 2) {
+            $0.arrayOptInt32.sum <= sumarrayOptInt32
+        }
+
+        assertQuery(predicate: "arrayOptInt32.@sum != %@", values: [sumarrayOptInt32], expectedCount: 1) {
+            $0.arrayOptInt32.sum != sumarrayOptInt32
+        }
+
+        assertQuery(predicate: "arrayOptInt32.@sum != %@", values: [Int32(32)], expectedCount: 2) {
+            $0.arrayOptInt32.sum != Int32(32)
+        }
+        try! realm.write {
+            object.arrayOptInt64.removeAll()
+            object.arrayOptInt64.append(objectsIn: [Int64(64), Int64(65), Int64(66)])
+        }
+
+        let sumarrayOptInt64 = Int64(64) + Int64(65) + Int64(66)
+        assertQuery(predicate: "arrayOptInt64.@sum > %@", values: [Int64(66)], expectedCount: 1) {
+            $0.arrayOptInt64.sum > Int64(66)
+        }
+
+        assertQuery(predicate: "arrayOptInt64.@sum < %@", values: [Int64(66)], expectedCount: 0) {
+            $0.arrayOptInt64.sum < Int64(66)
+        }
+
+        assertQuery(predicate: "arrayOptInt64.@sum == %@", values: [Int64(66)], expectedCount: 0) {
+            $0.arrayOptInt64.sum == Int64(66)
+        }
+
+        assertQuery(predicate: "arrayOptInt64.@sum == %@", values: [sumarrayOptInt64], expectedCount: 1) {
+            $0.arrayOptInt64.sum == sumarrayOptInt64
+        }
+
+        assertQuery(predicate: "arrayOptInt64.@sum >= %@", values: [Int64(66)], expectedCount: 1) {
+            $0.arrayOptInt64.sum >= Int64(66)
+        }
+
+        assertQuery(predicate: "arrayOptInt64.@sum >= %@", values: [sumarrayOptInt64], expectedCount: 1) {
+            $0.arrayOptInt64.sum >= sumarrayOptInt64
+        }
+
+        assertQuery(predicate: "arrayOptInt64.@sum <= %@", values: [Int64(66)], expectedCount: 0) {
+            $0.arrayOptInt64.sum <= Int64(66)
+        }
+
+        assertQuery(predicate: "arrayOptInt64.@sum <= %@", values: [sumarrayOptInt64], expectedCount: 2) {
+            $0.arrayOptInt64.sum <= sumarrayOptInt64
+        }
+
+        assertQuery(predicate: "arrayOptInt64.@sum != %@", values: [sumarrayOptInt64], expectedCount: 1) {
+            $0.arrayOptInt64.sum != sumarrayOptInt64
+        }
+
+        assertQuery(predicate: "arrayOptInt64.@sum != %@", values: [Int64(64)], expectedCount: 2) {
+            $0.arrayOptInt64.sum != Int64(64)
+        }
+        try! realm.write {
+            object.arrayOptFloat.removeAll()
+            object.arrayOptFloat.append(objectsIn: [Float(5.55444333), Float(6.55444333), Float(7.55444333)])
+        }
+
+        let sumarrayOptFloat = Float(5.55444333) + Float(6.55444333) + Float(7.55444333)
+        assertQuery(predicate: "arrayOptFloat.@sum > %@", values: [Float(7.55444333)], expectedCount: 1) {
+            $0.arrayOptFloat.sum > Float(7.55444333)
+        }
+
+        assertQuery(predicate: "arrayOptFloat.@sum < %@", values: [Float(7.55444333)], expectedCount: 0) {
+            $0.arrayOptFloat.sum < Float(7.55444333)
+        }
+
+        assertQuery(predicate: "arrayOptFloat.@sum == %@", values: [Float(7.55444333)], expectedCount: 0) {
+            $0.arrayOptFloat.sum == Float(7.55444333)
+        }
+
+        assertQuery(predicate: "arrayOptFloat.@sum == %@", values: [sumarrayOptFloat], expectedCount: 1) {
+            $0.arrayOptFloat.sum == sumarrayOptFloat
+        }
+
+        assertQuery(predicate: "arrayOptFloat.@sum >= %@", values: [Float(7.55444333)], expectedCount: 1) {
+            $0.arrayOptFloat.sum >= Float(7.55444333)
+        }
+
+        assertQuery(predicate: "arrayOptFloat.@sum >= %@", values: [sumarrayOptFloat], expectedCount: 1) {
+            $0.arrayOptFloat.sum >= sumarrayOptFloat
+        }
+
+        assertQuery(predicate: "arrayOptFloat.@sum <= %@", values: [Float(7.55444333)], expectedCount: 0) {
+            $0.arrayOptFloat.sum <= Float(7.55444333)
+        }
+
+        assertQuery(predicate: "arrayOptFloat.@sum <= %@", values: [sumarrayOptFloat], expectedCount: 2) {
+            $0.arrayOptFloat.sum <= sumarrayOptFloat
+        }
+
+        assertQuery(predicate: "arrayOptFloat.@sum != %@", values: [sumarrayOptFloat], expectedCount: 1) {
+            $0.arrayOptFloat.sum != sumarrayOptFloat
+        }
+
+        assertQuery(predicate: "arrayOptFloat.@sum != %@", values: [Float(5.55444333)], expectedCount: 2) {
+            $0.arrayOptFloat.sum != Float(5.55444333)
+        }
+        try! realm.write {
+            object.arrayOptDouble.removeAll()
+            object.arrayOptDouble.append(objectsIn: [123.456, 234.456, 345.567])
+        }
+
+        let sumarrayOptDouble = 123.456 + 234.456 + 345.567
+        assertQuery(predicate: "arrayOptDouble.@sum > %@", values: [345.567], expectedCount: 1) {
+            $0.arrayOptDouble.sum > 345.567
+        }
+
+        assertQuery(predicate: "arrayOptDouble.@sum < %@", values: [345.567], expectedCount: 0) {
+            $0.arrayOptDouble.sum < 345.567
+        }
+
+        assertQuery(predicate: "arrayOptDouble.@sum == %@", values: [345.567], expectedCount: 0) {
+            $0.arrayOptDouble.sum == 345.567
+        }
+
+        assertQuery(predicate: "arrayOptDouble.@sum == %@", values: [sumarrayOptDouble], expectedCount: 1) {
+            $0.arrayOptDouble.sum == sumarrayOptDouble
+        }
+
+        assertQuery(predicate: "arrayOptDouble.@sum >= %@", values: [345.567], expectedCount: 1) {
+            $0.arrayOptDouble.sum >= 345.567
+        }
+
+        assertQuery(predicate: "arrayOptDouble.@sum >= %@", values: [sumarrayOptDouble], expectedCount: 1) {
+            $0.arrayOptDouble.sum >= sumarrayOptDouble
+        }
+
+        assertQuery(predicate: "arrayOptDouble.@sum <= %@", values: [345.567], expectedCount: 0) {
+            $0.arrayOptDouble.sum <= 345.567
+        }
+
+        assertQuery(predicate: "arrayOptDouble.@sum <= %@", values: [sumarrayOptDouble], expectedCount: 2) {
+            $0.arrayOptDouble.sum <= sumarrayOptDouble
+        }
+
+        assertQuery(predicate: "arrayOptDouble.@sum != %@", values: [sumarrayOptDouble], expectedCount: 1) {
+            $0.arrayOptDouble.sum != sumarrayOptDouble
+        }
+
+        assertQuery(predicate: "arrayOptDouble.@sum != %@", values: [123.456], expectedCount: 2) {
+            $0.arrayOptDouble.sum != 123.456
+        }
+        try! realm.write {
+            object.arrayOptDecimal.removeAll()
+            object.arrayOptDecimal.append(objectsIn: [Decimal128(123.456), Decimal128(456.789), Decimal128(963.852)])
+        }
+
+        let sumarrayOptDecimal = Decimal128(123.456) + Decimal128(456.789) + Decimal128(963.852)
+        assertQuery(predicate: "arrayOptDecimal.@sum > %@", values: [Decimal128(963.852)], expectedCount: 1) {
+            $0.arrayOptDecimal.sum > Decimal128(963.852)
+        }
+
+        assertQuery(predicate: "arrayOptDecimal.@sum < %@", values: [Decimal128(963.852)], expectedCount: 0) {
+            $0.arrayOptDecimal.sum < Decimal128(963.852)
+        }
+
+        assertQuery(predicate: "arrayOptDecimal.@sum == %@", values: [Decimal128(963.852)], expectedCount: 0) {
+            $0.arrayOptDecimal.sum == Decimal128(963.852)
+        }
+
+        assertQuery(predicate: "arrayOptDecimal.@sum == %@", values: [sumarrayOptDecimal], expectedCount: 1) {
+            $0.arrayOptDecimal.sum == sumarrayOptDecimal
+        }
+
+        assertQuery(predicate: "arrayOptDecimal.@sum >= %@", values: [Decimal128(963.852)], expectedCount: 1) {
+            $0.arrayOptDecimal.sum >= Decimal128(963.852)
+        }
+
+        assertQuery(predicate: "arrayOptDecimal.@sum >= %@", values: [sumarrayOptDecimal], expectedCount: 1) {
+            $0.arrayOptDecimal.sum >= sumarrayOptDecimal
+        }
+
+        assertQuery(predicate: "arrayOptDecimal.@sum <= %@", values: [Decimal128(963.852)], expectedCount: 0) {
+            $0.arrayOptDecimal.sum <= Decimal128(963.852)
+        }
+
+        assertQuery(predicate: "arrayOptDecimal.@sum <= %@", values: [sumarrayOptDecimal], expectedCount: 2) {
+            $0.arrayOptDecimal.sum <= sumarrayOptDecimal
+        }
+
+        assertQuery(predicate: "arrayOptDecimal.@sum != %@", values: [sumarrayOptDecimal], expectedCount: 1) {
+            $0.arrayOptDecimal.sum != sumarrayOptDecimal
+        }
+
+        assertQuery(predicate: "arrayOptDecimal.@sum != %@", values: [Decimal128(123.456)], expectedCount: 2) {
+            $0.arrayOptDecimal.sum != Decimal128(123.456)
+        }
+    }
+
+    // MARK: Keypath Collection Aggregations
+
+    func testKeypathCollectionAggregatesAvg() {
+        let realm = realmWithTestPath()
+        let object = objects().first!
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["intCol": 5])
+            let modernObj1 = ModernAllTypesObject(value: ["intCol": 6])
+            let modernObj2 = ModernAllTypesObject(value: ["intCol": 7])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.intCol > %@", values: [5], expectedCount: 1) {
+            $0.arrayCol.intCol.avg > 5
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.intCol < %@", values: [7], expectedCount: 1) {
+            $0.arrayCol.intCol.avg < 7
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.intCol == %@", values: [6], expectedCount: 1) {
+            $0.arrayCol.intCol.avg == 6
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.intCol >= %@", values: [5], expectedCount: 1) {
+            $0.arrayCol.intCol.avg >= 5
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.intCol >= %@", values: [6], expectedCount: 1) {
+            $0.arrayCol.intCol.avg >= 6
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.intCol <= %@", values: [7], expectedCount: 1) {
+            $0.arrayCol.intCol.avg <= 7
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.intCol <= %@", values: [6], expectedCount: 1) {
+            $0.arrayCol.intCol.avg <= 6
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@avg.intCol != %@", values: [6], expectedCount: 3) {
+            $0.arrayCol.intCol.avg != 6
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.intCol != %@", values: [5], expectedCount: 4) {
+            $0.arrayCol.intCol.avg != 5
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["int8Col": Int8(8)])
+            let modernObj1 = ModernAllTypesObject(value: ["int8Col": Int8(9)])
+            let modernObj2 = ModernAllTypesObject(value: ["int8Col": Int8(10)])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.int8Col > %@", values: [Int8(8)], expectedCount: 1) {
+            $0.arrayCol.int8Col.avg > Int8(8)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.int8Col < %@", values: [Int8(10)], expectedCount: 1) {
+            $0.arrayCol.int8Col.avg < Int8(10)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.int8Col == %@", values: [Int8(9)], expectedCount: 1) {
+            $0.arrayCol.int8Col.avg == Int8(9)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.int8Col >= %@", values: [Int8(8)], expectedCount: 1) {
+            $0.arrayCol.int8Col.avg >= Int8(8)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.int8Col >= %@", values: [Int8(9)], expectedCount: 1) {
+            $0.arrayCol.int8Col.avg >= Int8(9)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.int8Col <= %@", values: [Int8(10)], expectedCount: 1) {
+            $0.arrayCol.int8Col.avg <= Int8(10)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.int8Col <= %@", values: [Int8(9)], expectedCount: 1) {
+            $0.arrayCol.int8Col.avg <= Int8(9)
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@avg.int8Col != %@", values: [Int8(9)], expectedCount: 3) {
+            $0.arrayCol.int8Col.avg != Int8(9)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.int8Col != %@", values: [Int8(8)], expectedCount: 4) {
+            $0.arrayCol.int8Col.avg != Int8(8)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["int16Col": Int16(16)])
+            let modernObj1 = ModernAllTypesObject(value: ["int16Col": Int16(17)])
+            let modernObj2 = ModernAllTypesObject(value: ["int16Col": Int16(18)])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.int16Col > %@", values: [Int16(16)], expectedCount: 1) {
+            $0.arrayCol.int16Col.avg > Int16(16)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.int16Col < %@", values: [Int16(18)], expectedCount: 1) {
+            $0.arrayCol.int16Col.avg < Int16(18)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.int16Col == %@", values: [Int16(17)], expectedCount: 1) {
+            $0.arrayCol.int16Col.avg == Int16(17)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.int16Col >= %@", values: [Int16(16)], expectedCount: 1) {
+            $0.arrayCol.int16Col.avg >= Int16(16)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.int16Col >= %@", values: [Int16(17)], expectedCount: 1) {
+            $0.arrayCol.int16Col.avg >= Int16(17)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.int16Col <= %@", values: [Int16(18)], expectedCount: 1) {
+            $0.arrayCol.int16Col.avg <= Int16(18)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.int16Col <= %@", values: [Int16(17)], expectedCount: 1) {
+            $0.arrayCol.int16Col.avg <= Int16(17)
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@avg.int16Col != %@", values: [Int16(17)], expectedCount: 3) {
+            $0.arrayCol.int16Col.avg != Int16(17)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.int16Col != %@", values: [Int16(16)], expectedCount: 4) {
+            $0.arrayCol.int16Col.avg != Int16(16)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["int32Col": Int32(32)])
+            let modernObj1 = ModernAllTypesObject(value: ["int32Col": Int32(33)])
+            let modernObj2 = ModernAllTypesObject(value: ["int32Col": Int32(34)])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.int32Col > %@", values: [Int32(32)], expectedCount: 1) {
+            $0.arrayCol.int32Col.avg > Int32(32)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.int32Col < %@", values: [Int32(34)], expectedCount: 1) {
+            $0.arrayCol.int32Col.avg < Int32(34)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.int32Col == %@", values: [Int32(33)], expectedCount: 1) {
+            $0.arrayCol.int32Col.avg == Int32(33)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.int32Col >= %@", values: [Int32(32)], expectedCount: 1) {
+            $0.arrayCol.int32Col.avg >= Int32(32)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.int32Col >= %@", values: [Int32(33)], expectedCount: 1) {
+            $0.arrayCol.int32Col.avg >= Int32(33)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.int32Col <= %@", values: [Int32(34)], expectedCount: 1) {
+            $0.arrayCol.int32Col.avg <= Int32(34)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.int32Col <= %@", values: [Int32(33)], expectedCount: 1) {
+            $0.arrayCol.int32Col.avg <= Int32(33)
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@avg.int32Col != %@", values: [Int32(33)], expectedCount: 3) {
+            $0.arrayCol.int32Col.avg != Int32(33)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.int32Col != %@", values: [Int32(32)], expectedCount: 4) {
+            $0.arrayCol.int32Col.avg != Int32(32)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["int64Col": Int64(64)])
+            let modernObj1 = ModernAllTypesObject(value: ["int64Col": Int64(65)])
+            let modernObj2 = ModernAllTypesObject(value: ["int64Col": Int64(66)])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.int64Col > %@", values: [Int64(64)], expectedCount: 1) {
+            $0.arrayCol.int64Col.avg > Int64(64)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.int64Col < %@", values: [Int64(66)], expectedCount: 1) {
+            $0.arrayCol.int64Col.avg < Int64(66)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.int64Col == %@", values: [Int64(65)], expectedCount: 1) {
+            $0.arrayCol.int64Col.avg == Int64(65)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.int64Col >= %@", values: [Int64(64)], expectedCount: 1) {
+            $0.arrayCol.int64Col.avg >= Int64(64)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.int64Col >= %@", values: [Int64(65)], expectedCount: 1) {
+            $0.arrayCol.int64Col.avg >= Int64(65)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.int64Col <= %@", values: [Int64(66)], expectedCount: 1) {
+            $0.arrayCol.int64Col.avg <= Int64(66)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.int64Col <= %@", values: [Int64(65)], expectedCount: 1) {
+            $0.arrayCol.int64Col.avg <= Int64(65)
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@avg.int64Col != %@", values: [Int64(65)], expectedCount: 3) {
+            $0.arrayCol.int64Col.avg != Int64(65)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.int64Col != %@", values: [Int64(64)], expectedCount: 4) {
+            $0.arrayCol.int64Col.avg != Int64(64)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["floatCol": Float(5.55444333)])
+            let modernObj1 = ModernAllTypesObject(value: ["floatCol": Float(6.55444333)])
+            let modernObj2 = ModernAllTypesObject(value: ["floatCol": Float(7.55444333)])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.floatCol > %@", values: [Float(5.55444333)], expectedCount: 1) {
+            $0.arrayCol.floatCol.avg > Float(5.55444333)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.floatCol < %@", values: [Float(7.55444333)], expectedCount: 1) {
+            $0.arrayCol.floatCol.avg < Float(7.55444333)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.floatCol == %@", values: [Float(6.55444333)], expectedCount: 1) {
+            $0.arrayCol.floatCol.avg == Float(6.55444333)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.floatCol >= %@", values: [Float(5.55444333)], expectedCount: 1) {
+            $0.arrayCol.floatCol.avg >= Float(5.55444333)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.floatCol >= %@", values: [Float(6.55444333)], expectedCount: 1) {
+            $0.arrayCol.floatCol.avg >= Float(6.55444333)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.floatCol <= %@", values: [Float(7.55444333)], expectedCount: 1) {
+            $0.arrayCol.floatCol.avg <= Float(7.55444333)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.floatCol <= %@", values: [Float(6.55444333)], expectedCount: 1) {
+            $0.arrayCol.floatCol.avg <= Float(6.55444333)
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@avg.floatCol != %@", values: [Float(6.55444333)], expectedCount: 3) {
+            $0.arrayCol.floatCol.avg != Float(6.55444333)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.floatCol != %@", values: [Float(5.55444333)], expectedCount: 4) {
+            $0.arrayCol.floatCol.avg != Float(5.55444333)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["doubleCol": 5.55444333])
+            let modernObj1 = ModernAllTypesObject(value: ["doubleCol": 6.55444333])
+            let modernObj2 = ModernAllTypesObject(value: ["doubleCol": 7.55444333])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.doubleCol > %@", values: [5.55444333], expectedCount: 1) {
+            $0.arrayCol.doubleCol.avg > 5.55444333
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.doubleCol < %@", values: [7.55444333], expectedCount: 1) {
+            $0.arrayCol.doubleCol.avg < 7.55444333
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.doubleCol == %@", values: [6.55444333], expectedCount: 1) {
+            $0.arrayCol.doubleCol.avg == 6.55444333
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.doubleCol >= %@", values: [5.55444333], expectedCount: 1) {
+            $0.arrayCol.doubleCol.avg >= 5.55444333
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.doubleCol >= %@", values: [6.55444333], expectedCount: 1) {
+            $0.arrayCol.doubleCol.avg >= 6.55444333
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.doubleCol <= %@", values: [7.55444333], expectedCount: 1) {
+            $0.arrayCol.doubleCol.avg <= 7.55444333
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.doubleCol <= %@", values: [6.55444333], expectedCount: 1) {
+            $0.arrayCol.doubleCol.avg <= 6.55444333
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@avg.doubleCol != %@", values: [6.55444333], expectedCount: 3) {
+            $0.arrayCol.doubleCol.avg != 6.55444333
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.doubleCol != %@", values: [5.55444333], expectedCount: 4) {
+            $0.arrayCol.doubleCol.avg != 5.55444333
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["decimalCol": Decimal128(123.456)])
+            let modernObj1 = ModernAllTypesObject(value: ["decimalCol": Decimal128(234.456)])
+            let modernObj2 = ModernAllTypesObject(value: ["decimalCol": Decimal128(345.456)])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.decimalCol > %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.arrayCol.decimalCol.avg > Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.decimalCol < %@", values: [Decimal128(345.456)], expectedCount: 1) {
+            $0.arrayCol.decimalCol.avg < Decimal128(345.456)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.decimalCol == %@", values: [Decimal128(234.456)], expectedCount: 1) {
+            $0.arrayCol.decimalCol.avg == Decimal128(234.456)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.decimalCol >= %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.arrayCol.decimalCol.avg >= Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.decimalCol >= %@", values: [Decimal128(234.456)], expectedCount: 1) {
+            $0.arrayCol.decimalCol.avg >= Decimal128(234.456)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.decimalCol <= %@", values: [Decimal128(345.456)], expectedCount: 1) {
+            $0.arrayCol.decimalCol.avg <= Decimal128(345.456)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.decimalCol <= %@", values: [Decimal128(234.456)], expectedCount: 1) {
+            $0.arrayCol.decimalCol.avg <= Decimal128(234.456)
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@avg.decimalCol != %@", values: [Decimal128(234.456)], expectedCount: 3) {
+            $0.arrayCol.decimalCol.avg != Decimal128(234.456)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.decimalCol != %@", values: [Decimal128(123.456)], expectedCount: 4) {
+            $0.arrayCol.decimalCol.avg != Decimal128(123.456)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["optIntCol": 5])
+            let modernObj1 = ModernAllTypesObject(value: ["optIntCol": 6])
+            let modernObj2 = ModernAllTypesObject(value: ["optIntCol": 7])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.optIntCol > %@", values: [5], expectedCount: 1) {
+            $0.arrayCol.optIntCol.avg > 5
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.optIntCol < %@", values: [7], expectedCount: 1) {
+            $0.arrayCol.optIntCol.avg < 7
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.optIntCol == %@", values: [6], expectedCount: 1) {
+            $0.arrayCol.optIntCol.avg == 6
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.optIntCol >= %@", values: [5], expectedCount: 1) {
+            $0.arrayCol.optIntCol.avg >= 5
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.optIntCol >= %@", values: [6], expectedCount: 1) {
+            $0.arrayCol.optIntCol.avg >= 6
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.optIntCol <= %@", values: [7], expectedCount: 1) {
+            $0.arrayCol.optIntCol.avg <= 7
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.optIntCol <= %@", values: [6], expectedCount: 1) {
+            $0.arrayCol.optIntCol.avg <= 6
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@avg.optIntCol != %@", values: [6], expectedCount: 3) {
+            $0.arrayCol.optIntCol.avg != 6
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.optIntCol != %@", values: [5], expectedCount: 4) {
+            $0.arrayCol.optIntCol.avg != 5
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["optInt8Col": Int8(8)])
+            let modernObj1 = ModernAllTypesObject(value: ["optInt8Col": Int8(9)])
+            let modernObj2 = ModernAllTypesObject(value: ["optInt8Col": Int8(10)])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.optInt8Col > %@", values: [Int8(8)], expectedCount: 1) {
+            $0.arrayCol.optInt8Col.avg > Int8(8)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.optInt8Col < %@", values: [Int8(10)], expectedCount: 1) {
+            $0.arrayCol.optInt8Col.avg < Int8(10)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.optInt8Col == %@", values: [Int8(9)], expectedCount: 1) {
+            $0.arrayCol.optInt8Col.avg == Int8(9)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.optInt8Col >= %@", values: [Int8(8)], expectedCount: 1) {
+            $0.arrayCol.optInt8Col.avg >= Int8(8)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.optInt8Col >= %@", values: [Int8(9)], expectedCount: 1) {
+            $0.arrayCol.optInt8Col.avg >= Int8(9)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.optInt8Col <= %@", values: [Int8(10)], expectedCount: 1) {
+            $0.arrayCol.optInt8Col.avg <= Int8(10)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.optInt8Col <= %@", values: [Int8(9)], expectedCount: 1) {
+            $0.arrayCol.optInt8Col.avg <= Int8(9)
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@avg.optInt8Col != %@", values: [Int8(9)], expectedCount: 3) {
+            $0.arrayCol.optInt8Col.avg != Int8(9)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.optInt8Col != %@", values: [Int8(8)], expectedCount: 4) {
+            $0.arrayCol.optInt8Col.avg != Int8(8)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["optInt16Col": Int16(16)])
+            let modernObj1 = ModernAllTypesObject(value: ["optInt16Col": Int16(17)])
+            let modernObj2 = ModernAllTypesObject(value: ["optInt16Col": Int16(18)])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.optInt16Col > %@", values: [Int16(16)], expectedCount: 1) {
+            $0.arrayCol.optInt16Col.avg > Int16(16)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.optInt16Col < %@", values: [Int16(18)], expectedCount: 1) {
+            $0.arrayCol.optInt16Col.avg < Int16(18)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.optInt16Col == %@", values: [Int16(17)], expectedCount: 1) {
+            $0.arrayCol.optInt16Col.avg == Int16(17)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.optInt16Col >= %@", values: [Int16(16)], expectedCount: 1) {
+            $0.arrayCol.optInt16Col.avg >= Int16(16)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.optInt16Col >= %@", values: [Int16(17)], expectedCount: 1) {
+            $0.arrayCol.optInt16Col.avg >= Int16(17)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.optInt16Col <= %@", values: [Int16(18)], expectedCount: 1) {
+            $0.arrayCol.optInt16Col.avg <= Int16(18)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.optInt16Col <= %@", values: [Int16(17)], expectedCount: 1) {
+            $0.arrayCol.optInt16Col.avg <= Int16(17)
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@avg.optInt16Col != %@", values: [Int16(17)], expectedCount: 3) {
+            $0.arrayCol.optInt16Col.avg != Int16(17)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.optInt16Col != %@", values: [Int16(16)], expectedCount: 4) {
+            $0.arrayCol.optInt16Col.avg != Int16(16)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["optInt32Col": Int32(32)])
+            let modernObj1 = ModernAllTypesObject(value: ["optInt32Col": Int32(33)])
+            let modernObj2 = ModernAllTypesObject(value: ["optInt32Col": Int32(34)])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.optInt32Col > %@", values: [Int32(32)], expectedCount: 1) {
+            $0.arrayCol.optInt32Col.avg > Int32(32)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.optInt32Col < %@", values: [Int32(34)], expectedCount: 1) {
+            $0.arrayCol.optInt32Col.avg < Int32(34)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.optInt32Col == %@", values: [Int32(33)], expectedCount: 1) {
+            $0.arrayCol.optInt32Col.avg == Int32(33)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.optInt32Col >= %@", values: [Int32(32)], expectedCount: 1) {
+            $0.arrayCol.optInt32Col.avg >= Int32(32)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.optInt32Col >= %@", values: [Int32(33)], expectedCount: 1) {
+            $0.arrayCol.optInt32Col.avg >= Int32(33)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.optInt32Col <= %@", values: [Int32(34)], expectedCount: 1) {
+            $0.arrayCol.optInt32Col.avg <= Int32(34)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.optInt32Col <= %@", values: [Int32(33)], expectedCount: 1) {
+            $0.arrayCol.optInt32Col.avg <= Int32(33)
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@avg.optInt32Col != %@", values: [Int32(33)], expectedCount: 3) {
+            $0.arrayCol.optInt32Col.avg != Int32(33)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.optInt32Col != %@", values: [Int32(32)], expectedCount: 4) {
+            $0.arrayCol.optInt32Col.avg != Int32(32)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["optInt64Col": Int64(64)])
+            let modernObj1 = ModernAllTypesObject(value: ["optInt64Col": Int64(65)])
+            let modernObj2 = ModernAllTypesObject(value: ["optInt64Col": Int64(66)])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.optInt64Col > %@", values: [Int64(64)], expectedCount: 1) {
+            $0.arrayCol.optInt64Col.avg > Int64(64)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.optInt64Col < %@", values: [Int64(66)], expectedCount: 1) {
+            $0.arrayCol.optInt64Col.avg < Int64(66)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.optInt64Col == %@", values: [Int64(65)], expectedCount: 1) {
+            $0.arrayCol.optInt64Col.avg == Int64(65)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.optInt64Col >= %@", values: [Int64(64)], expectedCount: 1) {
+            $0.arrayCol.optInt64Col.avg >= Int64(64)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.optInt64Col >= %@", values: [Int64(65)], expectedCount: 1) {
+            $0.arrayCol.optInt64Col.avg >= Int64(65)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.optInt64Col <= %@", values: [Int64(66)], expectedCount: 1) {
+            $0.arrayCol.optInt64Col.avg <= Int64(66)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.optInt64Col <= %@", values: [Int64(65)], expectedCount: 1) {
+            $0.arrayCol.optInt64Col.avg <= Int64(65)
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@avg.optInt64Col != %@", values: [Int64(65)], expectedCount: 3) {
+            $0.arrayCol.optInt64Col.avg != Int64(65)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.optInt64Col != %@", values: [Int64(64)], expectedCount: 4) {
+            $0.arrayCol.optInt64Col.avg != Int64(64)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["optFloatCol": Float(5.55444333)])
+            let modernObj1 = ModernAllTypesObject(value: ["optFloatCol": Float(6.55444333)])
+            let modernObj2 = ModernAllTypesObject(value: ["optFloatCol": Float(7.55444333)])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.optFloatCol > %@", values: [Float(5.55444333)], expectedCount: 1) {
+            $0.arrayCol.optFloatCol.avg > Float(5.55444333)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.optFloatCol < %@", values: [Float(7.55444333)], expectedCount: 1) {
+            $0.arrayCol.optFloatCol.avg < Float(7.55444333)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.optFloatCol == %@", values: [Float(6.55444333)], expectedCount: 1) {
+            $0.arrayCol.optFloatCol.avg == Float(6.55444333)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.optFloatCol >= %@", values: [Float(5.55444333)], expectedCount: 1) {
+            $0.arrayCol.optFloatCol.avg >= Float(5.55444333)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.optFloatCol >= %@", values: [Float(6.55444333)], expectedCount: 1) {
+            $0.arrayCol.optFloatCol.avg >= Float(6.55444333)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.optFloatCol <= %@", values: [Float(7.55444333)], expectedCount: 1) {
+            $0.arrayCol.optFloatCol.avg <= Float(7.55444333)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.optFloatCol <= %@", values: [Float(6.55444333)], expectedCount: 1) {
+            $0.arrayCol.optFloatCol.avg <= Float(6.55444333)
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@avg.optFloatCol != %@", values: [Float(6.55444333)], expectedCount: 3) {
+            $0.arrayCol.optFloatCol.avg != Float(6.55444333)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.optFloatCol != %@", values: [Float(5.55444333)], expectedCount: 4) {
+            $0.arrayCol.optFloatCol.avg != Float(5.55444333)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["optDoubleCol": 5.55444333])
+            let modernObj1 = ModernAllTypesObject(value: ["optDoubleCol": 6.55444333])
+            let modernObj2 = ModernAllTypesObject(value: ["optDoubleCol": 7.55444333])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.optDoubleCol > %@", values: [5.55444333], expectedCount: 1) {
+            $0.arrayCol.optDoubleCol.avg > 5.55444333
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.optDoubleCol < %@", values: [7.55444333], expectedCount: 1) {
+            $0.arrayCol.optDoubleCol.avg < 7.55444333
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.optDoubleCol == %@", values: [6.55444333], expectedCount: 1) {
+            $0.arrayCol.optDoubleCol.avg == 6.55444333
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.optDoubleCol >= %@", values: [5.55444333], expectedCount: 1) {
+            $0.arrayCol.optDoubleCol.avg >= 5.55444333
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.optDoubleCol >= %@", values: [6.55444333], expectedCount: 1) {
+            $0.arrayCol.optDoubleCol.avg >= 6.55444333
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.optDoubleCol <= %@", values: [7.55444333], expectedCount: 1) {
+            $0.arrayCol.optDoubleCol.avg <= 7.55444333
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.optDoubleCol <= %@", values: [6.55444333], expectedCount: 1) {
+            $0.arrayCol.optDoubleCol.avg <= 6.55444333
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@avg.optDoubleCol != %@", values: [6.55444333], expectedCount: 3) {
+            $0.arrayCol.optDoubleCol.avg != 6.55444333
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.optDoubleCol != %@", values: [5.55444333], expectedCount: 4) {
+            $0.arrayCol.optDoubleCol.avg != 5.55444333
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["optDecimalCol": Decimal128(123.456)])
+            let modernObj1 = ModernAllTypesObject(value: ["optDecimalCol": Decimal128(234.456)])
+            let modernObj2 = ModernAllTypesObject(value: ["optDecimalCol": Decimal128(345.456)])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.optDecimalCol > %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.arrayCol.optDecimalCol.avg > Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.optDecimalCol < %@", values: [Decimal128(345.456)], expectedCount: 1) {
+            $0.arrayCol.optDecimalCol.avg < Decimal128(345.456)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.optDecimalCol == %@", values: [Decimal128(234.456)], expectedCount: 1) {
+            $0.arrayCol.optDecimalCol.avg == Decimal128(234.456)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.optDecimalCol >= %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.arrayCol.optDecimalCol.avg >= Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.optDecimalCol >= %@", values: [Decimal128(234.456)], expectedCount: 1) {
+            $0.arrayCol.optDecimalCol.avg >= Decimal128(234.456)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.optDecimalCol <= %@", values: [Decimal128(345.456)], expectedCount: 1) {
+            $0.arrayCol.optDecimalCol.avg <= Decimal128(345.456)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.optDecimalCol <= %@", values: [Decimal128(234.456)], expectedCount: 1) {
+            $0.arrayCol.optDecimalCol.avg <= Decimal128(234.456)
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@avg.optDecimalCol != %@", values: [Decimal128(234.456)], expectedCount: 3) {
+            $0.arrayCol.optDecimalCol.avg != Decimal128(234.456)
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.optDecimalCol != %@", values: [Decimal128(123.456)], expectedCount: 4) {
+            $0.arrayCol.optDecimalCol.avg != Decimal128(123.456)
+        }
+    }
+
+    func testKeypathCollectionAggregatesMin() {
+        let realm = realmWithTestPath()
+        let object = objects().first!
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["intCol": 5])
+            let modernObj1 = ModernAllTypesObject(value: ["intCol": 6])
+            let modernObj2 = ModernAllTypesObject(value: ["intCol": 7])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+        assertQuery(predicate: "arrayCol.@min.intCol > %@", values: [5], expectedCount: 0) {
+            $0.arrayCol.intCol.min > 5
+        }
+
+        assertQuery(predicate: "arrayCol.@min.intCol < %@", values: [7], expectedCount: 1) {
+            $0.arrayCol.intCol.min < 7
+        }
+
+        assertQuery(predicate: "arrayCol.@min.intCol == %@", values: [5], expectedCount: 1) {
+            $0.arrayCol.intCol.min == 5
+        }
+
+        assertQuery(predicate: "arrayCol.@min.intCol >= %@", values: [6], expectedCount: 0) {
+            $0.arrayCol.intCol.min >= 6
+        }
+
+        assertQuery(predicate: "arrayCol.@min.intCol >= %@", values: [5], expectedCount: 1) {
+            $0.arrayCol.intCol.min >= 5
+        }
+
+        assertQuery(predicate: "arrayCol.@min.intCol <= %@", values: [7], expectedCount: 1) {
+            $0.arrayCol.intCol.min <= 7
+        }
+
+        assertQuery(predicate: "arrayCol.@min.intCol <= %@", values: [5], expectedCount: 1) {
+            $0.arrayCol.intCol.min <= 5
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@min.intCol != %@", values: [5], expectedCount: 3) {
+            $0.arrayCol.intCol.min != 5
+        }
+
+        assertQuery(predicate: "arrayCol.@min.intCol != %@", values: [7], expectedCount: 4) {
+            $0.arrayCol.intCol.min != 7
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["int8Col": Int8(8)])
+            let modernObj1 = ModernAllTypesObject(value: ["int8Col": Int8(9)])
+            let modernObj2 = ModernAllTypesObject(value: ["int8Col": Int8(10)])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+        assertQuery(predicate: "arrayCol.@min.int8Col > %@", values: [Int8(8)], expectedCount: 0) {
+            $0.arrayCol.int8Col.min > Int8(8)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.int8Col < %@", values: [Int8(10)], expectedCount: 1) {
+            $0.arrayCol.int8Col.min < Int8(10)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.int8Col == %@", values: [Int8(8)], expectedCount: 1) {
+            $0.arrayCol.int8Col.min == Int8(8)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.int8Col >= %@", values: [Int8(9)], expectedCount: 0) {
+            $0.arrayCol.int8Col.min >= Int8(9)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.int8Col >= %@", values: [Int8(8)], expectedCount: 1) {
+            $0.arrayCol.int8Col.min >= Int8(8)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.int8Col <= %@", values: [Int8(10)], expectedCount: 1) {
+            $0.arrayCol.int8Col.min <= Int8(10)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.int8Col <= %@", values: [Int8(8)], expectedCount: 1) {
+            $0.arrayCol.int8Col.min <= Int8(8)
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@min.int8Col != %@", values: [Int8(8)], expectedCount: 3) {
+            $0.arrayCol.int8Col.min != Int8(8)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.int8Col != %@", values: [Int8(10)], expectedCount: 4) {
+            $0.arrayCol.int8Col.min != Int8(10)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["int16Col": Int16(16)])
+            let modernObj1 = ModernAllTypesObject(value: ["int16Col": Int16(17)])
+            let modernObj2 = ModernAllTypesObject(value: ["int16Col": Int16(18)])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+        assertQuery(predicate: "arrayCol.@min.int16Col > %@", values: [Int16(16)], expectedCount: 0) {
+            $0.arrayCol.int16Col.min > Int16(16)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.int16Col < %@", values: [Int16(18)], expectedCount: 1) {
+            $0.arrayCol.int16Col.min < Int16(18)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.int16Col == %@", values: [Int16(16)], expectedCount: 1) {
+            $0.arrayCol.int16Col.min == Int16(16)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.int16Col >= %@", values: [Int16(17)], expectedCount: 0) {
+            $0.arrayCol.int16Col.min >= Int16(17)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.int16Col >= %@", values: [Int16(16)], expectedCount: 1) {
+            $0.arrayCol.int16Col.min >= Int16(16)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.int16Col <= %@", values: [Int16(18)], expectedCount: 1) {
+            $0.arrayCol.int16Col.min <= Int16(18)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.int16Col <= %@", values: [Int16(16)], expectedCount: 1) {
+            $0.arrayCol.int16Col.min <= Int16(16)
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@min.int16Col != %@", values: [Int16(16)], expectedCount: 3) {
+            $0.arrayCol.int16Col.min != Int16(16)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.int16Col != %@", values: [Int16(18)], expectedCount: 4) {
+            $0.arrayCol.int16Col.min != Int16(18)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["int32Col": Int32(32)])
+            let modernObj1 = ModernAllTypesObject(value: ["int32Col": Int32(33)])
+            let modernObj2 = ModernAllTypesObject(value: ["int32Col": Int32(34)])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+        assertQuery(predicate: "arrayCol.@min.int32Col > %@", values: [Int32(32)], expectedCount: 0) {
+            $0.arrayCol.int32Col.min > Int32(32)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.int32Col < %@", values: [Int32(34)], expectedCount: 1) {
+            $0.arrayCol.int32Col.min < Int32(34)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.int32Col == %@", values: [Int32(32)], expectedCount: 1) {
+            $0.arrayCol.int32Col.min == Int32(32)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.int32Col >= %@", values: [Int32(33)], expectedCount: 0) {
+            $0.arrayCol.int32Col.min >= Int32(33)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.int32Col >= %@", values: [Int32(32)], expectedCount: 1) {
+            $0.arrayCol.int32Col.min >= Int32(32)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.int32Col <= %@", values: [Int32(34)], expectedCount: 1) {
+            $0.arrayCol.int32Col.min <= Int32(34)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.int32Col <= %@", values: [Int32(32)], expectedCount: 1) {
+            $0.arrayCol.int32Col.min <= Int32(32)
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@min.int32Col != %@", values: [Int32(32)], expectedCount: 3) {
+            $0.arrayCol.int32Col.min != Int32(32)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.int32Col != %@", values: [Int32(34)], expectedCount: 4) {
+            $0.arrayCol.int32Col.min != Int32(34)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["int64Col": Int64(64)])
+            let modernObj1 = ModernAllTypesObject(value: ["int64Col": Int64(65)])
+            let modernObj2 = ModernAllTypesObject(value: ["int64Col": Int64(66)])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+        assertQuery(predicate: "arrayCol.@min.int64Col > %@", values: [Int64(64)], expectedCount: 0) {
+            $0.arrayCol.int64Col.min > Int64(64)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.int64Col < %@", values: [Int64(66)], expectedCount: 1) {
+            $0.arrayCol.int64Col.min < Int64(66)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.int64Col == %@", values: [Int64(64)], expectedCount: 1) {
+            $0.arrayCol.int64Col.min == Int64(64)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.int64Col >= %@", values: [Int64(65)], expectedCount: 0) {
+            $0.arrayCol.int64Col.min >= Int64(65)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.int64Col >= %@", values: [Int64(64)], expectedCount: 1) {
+            $0.arrayCol.int64Col.min >= Int64(64)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.int64Col <= %@", values: [Int64(66)], expectedCount: 1) {
+            $0.arrayCol.int64Col.min <= Int64(66)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.int64Col <= %@", values: [Int64(64)], expectedCount: 1) {
+            $0.arrayCol.int64Col.min <= Int64(64)
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@min.int64Col != %@", values: [Int64(64)], expectedCount: 3) {
+            $0.arrayCol.int64Col.min != Int64(64)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.int64Col != %@", values: [Int64(66)], expectedCount: 4) {
+            $0.arrayCol.int64Col.min != Int64(66)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["floatCol": Float(5.55444333)])
+            let modernObj1 = ModernAllTypesObject(value: ["floatCol": Float(6.55444333)])
+            let modernObj2 = ModernAllTypesObject(value: ["floatCol": Float(7.55444333)])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+        assertQuery(predicate: "arrayCol.@min.floatCol > %@", values: [Float(5.55444333)], expectedCount: 0) {
+            $0.arrayCol.floatCol.min > Float(5.55444333)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.floatCol < %@", values: [Float(7.55444333)], expectedCount: 1) {
+            $0.arrayCol.floatCol.min < Float(7.55444333)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.floatCol == %@", values: [Float(5.55444333)], expectedCount: 1) {
+            $0.arrayCol.floatCol.min == Float(5.55444333)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.floatCol >= %@", values: [Float(6.55444333)], expectedCount: 0) {
+            $0.arrayCol.floatCol.min >= Float(6.55444333)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.floatCol >= %@", values: [Float(5.55444333)], expectedCount: 1) {
+            $0.arrayCol.floatCol.min >= Float(5.55444333)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.floatCol <= %@", values: [Float(7.55444333)], expectedCount: 1) {
+            $0.arrayCol.floatCol.min <= Float(7.55444333)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.floatCol <= %@", values: [Float(5.55444333)], expectedCount: 1) {
+            $0.arrayCol.floatCol.min <= Float(5.55444333)
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@min.floatCol != %@", values: [Float(5.55444333)], expectedCount: 3) {
+            $0.arrayCol.floatCol.min != Float(5.55444333)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.floatCol != %@", values: [Float(7.55444333)], expectedCount: 4) {
+            $0.arrayCol.floatCol.min != Float(7.55444333)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["doubleCol": 5.55444333])
+            let modernObj1 = ModernAllTypesObject(value: ["doubleCol": 6.55444333])
+            let modernObj2 = ModernAllTypesObject(value: ["doubleCol": 7.55444333])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+        assertQuery(predicate: "arrayCol.@min.doubleCol > %@", values: [5.55444333], expectedCount: 0) {
+            $0.arrayCol.doubleCol.min > 5.55444333
+        }
+
+        assertQuery(predicate: "arrayCol.@min.doubleCol < %@", values: [7.55444333], expectedCount: 1) {
+            $0.arrayCol.doubleCol.min < 7.55444333
+        }
+
+        assertQuery(predicate: "arrayCol.@min.doubleCol == %@", values: [5.55444333], expectedCount: 1) {
+            $0.arrayCol.doubleCol.min == 5.55444333
+        }
+
+        assertQuery(predicate: "arrayCol.@min.doubleCol >= %@", values: [6.55444333], expectedCount: 0) {
+            $0.arrayCol.doubleCol.min >= 6.55444333
+        }
+
+        assertQuery(predicate: "arrayCol.@min.doubleCol >= %@", values: [5.55444333], expectedCount: 1) {
+            $0.arrayCol.doubleCol.min >= 5.55444333
+        }
+
+        assertQuery(predicate: "arrayCol.@min.doubleCol <= %@", values: [7.55444333], expectedCount: 1) {
+            $0.arrayCol.doubleCol.min <= 7.55444333
+        }
+
+        assertQuery(predicate: "arrayCol.@min.doubleCol <= %@", values: [5.55444333], expectedCount: 1) {
+            $0.arrayCol.doubleCol.min <= 5.55444333
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@min.doubleCol != %@", values: [5.55444333], expectedCount: 3) {
+            $0.arrayCol.doubleCol.min != 5.55444333
+        }
+
+        assertQuery(predicate: "arrayCol.@min.doubleCol != %@", values: [7.55444333], expectedCount: 4) {
+            $0.arrayCol.doubleCol.min != 7.55444333
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["dateCol": Date(timeIntervalSince1970: 1000000)])
+            let modernObj1 = ModernAllTypesObject(value: ["dateCol": Date(timeIntervalSince1970: 2000000)])
+            let modernObj2 = ModernAllTypesObject(value: ["dateCol": Date(timeIntervalSince1970: 3000000)])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+        assertQuery(predicate: "arrayCol.@min.dateCol > %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 0) {
+            $0.arrayCol.dateCol.min > Date(timeIntervalSince1970: 1000000)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.dateCol < %@", values: [Date(timeIntervalSince1970: 3000000)], expectedCount: 1) {
+            $0.arrayCol.dateCol.min < Date(timeIntervalSince1970: 3000000)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.dateCol == %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
+            $0.arrayCol.dateCol.min == Date(timeIntervalSince1970: 1000000)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.dateCol >= %@", values: [Date(timeIntervalSince1970: 2000000)], expectedCount: 0) {
+            $0.arrayCol.dateCol.min >= Date(timeIntervalSince1970: 2000000)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.dateCol >= %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
+            $0.arrayCol.dateCol.min >= Date(timeIntervalSince1970: 1000000)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.dateCol <= %@", values: [Date(timeIntervalSince1970: 3000000)], expectedCount: 1) {
+            $0.arrayCol.dateCol.min <= Date(timeIntervalSince1970: 3000000)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.dateCol <= %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
+            $0.arrayCol.dateCol.min <= Date(timeIntervalSince1970: 1000000)
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@min.dateCol != %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 3) {
+            $0.arrayCol.dateCol.min != Date(timeIntervalSince1970: 1000000)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.dateCol != %@", values: [Date(timeIntervalSince1970: 3000000)], expectedCount: 4) {
+            $0.arrayCol.dateCol.min != Date(timeIntervalSince1970: 3000000)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["decimalCol": Decimal128(123.456)])
+            let modernObj1 = ModernAllTypesObject(value: ["decimalCol": Decimal128(234.456)])
+            let modernObj2 = ModernAllTypesObject(value: ["decimalCol": Decimal128(345.456)])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+        assertQuery(predicate: "arrayCol.@min.decimalCol > %@", values: [Decimal128(123.456)], expectedCount: 0) {
+            $0.arrayCol.decimalCol.min > Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.decimalCol < %@", values: [Decimal128(345.456)], expectedCount: 1) {
+            $0.arrayCol.decimalCol.min < Decimal128(345.456)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.decimalCol == %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.arrayCol.decimalCol.min == Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.decimalCol >= %@", values: [Decimal128(234.456)], expectedCount: 0) {
+            $0.arrayCol.decimalCol.min >= Decimal128(234.456)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.decimalCol >= %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.arrayCol.decimalCol.min >= Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.decimalCol <= %@", values: [Decimal128(345.456)], expectedCount: 1) {
+            $0.arrayCol.decimalCol.min <= Decimal128(345.456)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.decimalCol <= %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.arrayCol.decimalCol.min <= Decimal128(123.456)
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@min.decimalCol != %@", values: [Decimal128(123.456)], expectedCount: 3) {
+            $0.arrayCol.decimalCol.min != Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.decimalCol != %@", values: [Decimal128(345.456)], expectedCount: 4) {
+            $0.arrayCol.decimalCol.min != Decimal128(345.456)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["optIntCol": 5])
+            let modernObj1 = ModernAllTypesObject(value: ["optIntCol": 6])
+            let modernObj2 = ModernAllTypesObject(value: ["optIntCol": 7])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+        assertQuery(predicate: "arrayCol.@min.optIntCol > %@", values: [5], expectedCount: 0) {
+            $0.arrayCol.optIntCol.min > 5
+        }
+
+        assertQuery(predicate: "arrayCol.@min.optIntCol < %@", values: [7], expectedCount: 1) {
+            $0.arrayCol.optIntCol.min < 7
+        }
+
+        assertQuery(predicate: "arrayCol.@min.optIntCol == %@", values: [5], expectedCount: 1) {
+            $0.arrayCol.optIntCol.min == 5
+        }
+
+        assertQuery(predicate: "arrayCol.@min.optIntCol >= %@", values: [6], expectedCount: 0) {
+            $0.arrayCol.optIntCol.min >= 6
+        }
+
+        assertQuery(predicate: "arrayCol.@min.optIntCol >= %@", values: [5], expectedCount: 1) {
+            $0.arrayCol.optIntCol.min >= 5
+        }
+
+        assertQuery(predicate: "arrayCol.@min.optIntCol <= %@", values: [7], expectedCount: 1) {
+            $0.arrayCol.optIntCol.min <= 7
+        }
+
+        assertQuery(predicate: "arrayCol.@min.optIntCol <= %@", values: [5], expectedCount: 1) {
+            $0.arrayCol.optIntCol.min <= 5
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@min.optIntCol != %@", values: [5], expectedCount: 3) {
+            $0.arrayCol.optIntCol.min != 5
+        }
+
+        assertQuery(predicate: "arrayCol.@min.optIntCol != %@", values: [7], expectedCount: 4) {
+            $0.arrayCol.optIntCol.min != 7
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["optInt8Col": Int8(8)])
+            let modernObj1 = ModernAllTypesObject(value: ["optInt8Col": Int8(9)])
+            let modernObj2 = ModernAllTypesObject(value: ["optInt8Col": Int8(10)])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+        assertQuery(predicate: "arrayCol.@min.optInt8Col > %@", values: [Int8(8)], expectedCount: 0) {
+            $0.arrayCol.optInt8Col.min > Int8(8)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.optInt8Col < %@", values: [Int8(10)], expectedCount: 1) {
+            $0.arrayCol.optInt8Col.min < Int8(10)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.optInt8Col == %@", values: [Int8(8)], expectedCount: 1) {
+            $0.arrayCol.optInt8Col.min == Int8(8)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.optInt8Col >= %@", values: [Int8(9)], expectedCount: 0) {
+            $0.arrayCol.optInt8Col.min >= Int8(9)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.optInt8Col >= %@", values: [Int8(8)], expectedCount: 1) {
+            $0.arrayCol.optInt8Col.min >= Int8(8)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.optInt8Col <= %@", values: [Int8(10)], expectedCount: 1) {
+            $0.arrayCol.optInt8Col.min <= Int8(10)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.optInt8Col <= %@", values: [Int8(8)], expectedCount: 1) {
+            $0.arrayCol.optInt8Col.min <= Int8(8)
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@min.optInt8Col != %@", values: [Int8(8)], expectedCount: 3) {
+            $0.arrayCol.optInt8Col.min != Int8(8)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.optInt8Col != %@", values: [Int8(10)], expectedCount: 4) {
+            $0.arrayCol.optInt8Col.min != Int8(10)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["optInt16Col": Int16(16)])
+            let modernObj1 = ModernAllTypesObject(value: ["optInt16Col": Int16(17)])
+            let modernObj2 = ModernAllTypesObject(value: ["optInt16Col": Int16(18)])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+        assertQuery(predicate: "arrayCol.@min.optInt16Col > %@", values: [Int16(16)], expectedCount: 0) {
+            $0.arrayCol.optInt16Col.min > Int16(16)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.optInt16Col < %@", values: [Int16(18)], expectedCount: 1) {
+            $0.arrayCol.optInt16Col.min < Int16(18)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.optInt16Col == %@", values: [Int16(16)], expectedCount: 1) {
+            $0.arrayCol.optInt16Col.min == Int16(16)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.optInt16Col >= %@", values: [Int16(17)], expectedCount: 0) {
+            $0.arrayCol.optInt16Col.min >= Int16(17)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.optInt16Col >= %@", values: [Int16(16)], expectedCount: 1) {
+            $0.arrayCol.optInt16Col.min >= Int16(16)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.optInt16Col <= %@", values: [Int16(18)], expectedCount: 1) {
+            $0.arrayCol.optInt16Col.min <= Int16(18)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.optInt16Col <= %@", values: [Int16(16)], expectedCount: 1) {
+            $0.arrayCol.optInt16Col.min <= Int16(16)
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@min.optInt16Col != %@", values: [Int16(16)], expectedCount: 3) {
+            $0.arrayCol.optInt16Col.min != Int16(16)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.optInt16Col != %@", values: [Int16(18)], expectedCount: 4) {
+            $0.arrayCol.optInt16Col.min != Int16(18)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["optInt32Col": Int32(32)])
+            let modernObj1 = ModernAllTypesObject(value: ["optInt32Col": Int32(33)])
+            let modernObj2 = ModernAllTypesObject(value: ["optInt32Col": Int32(34)])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+        assertQuery(predicate: "arrayCol.@min.optInt32Col > %@", values: [Int32(32)], expectedCount: 0) {
+            $0.arrayCol.optInt32Col.min > Int32(32)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.optInt32Col < %@", values: [Int32(34)], expectedCount: 1) {
+            $0.arrayCol.optInt32Col.min < Int32(34)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.optInt32Col == %@", values: [Int32(32)], expectedCount: 1) {
+            $0.arrayCol.optInt32Col.min == Int32(32)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.optInt32Col >= %@", values: [Int32(33)], expectedCount: 0) {
+            $0.arrayCol.optInt32Col.min >= Int32(33)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.optInt32Col >= %@", values: [Int32(32)], expectedCount: 1) {
+            $0.arrayCol.optInt32Col.min >= Int32(32)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.optInt32Col <= %@", values: [Int32(34)], expectedCount: 1) {
+            $0.arrayCol.optInt32Col.min <= Int32(34)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.optInt32Col <= %@", values: [Int32(32)], expectedCount: 1) {
+            $0.arrayCol.optInt32Col.min <= Int32(32)
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@min.optInt32Col != %@", values: [Int32(32)], expectedCount: 3) {
+            $0.arrayCol.optInt32Col.min != Int32(32)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.optInt32Col != %@", values: [Int32(34)], expectedCount: 4) {
+            $0.arrayCol.optInt32Col.min != Int32(34)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["optInt64Col": Int64(64)])
+            let modernObj1 = ModernAllTypesObject(value: ["optInt64Col": Int64(65)])
+            let modernObj2 = ModernAllTypesObject(value: ["optInt64Col": Int64(66)])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+        assertQuery(predicate: "arrayCol.@min.optInt64Col > %@", values: [Int64(64)], expectedCount: 0) {
+            $0.arrayCol.optInt64Col.min > Int64(64)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.optInt64Col < %@", values: [Int64(66)], expectedCount: 1) {
+            $0.arrayCol.optInt64Col.min < Int64(66)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.optInt64Col == %@", values: [Int64(64)], expectedCount: 1) {
+            $0.arrayCol.optInt64Col.min == Int64(64)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.optInt64Col >= %@", values: [Int64(65)], expectedCount: 0) {
+            $0.arrayCol.optInt64Col.min >= Int64(65)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.optInt64Col >= %@", values: [Int64(64)], expectedCount: 1) {
+            $0.arrayCol.optInt64Col.min >= Int64(64)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.optInt64Col <= %@", values: [Int64(66)], expectedCount: 1) {
+            $0.arrayCol.optInt64Col.min <= Int64(66)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.optInt64Col <= %@", values: [Int64(64)], expectedCount: 1) {
+            $0.arrayCol.optInt64Col.min <= Int64(64)
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@min.optInt64Col != %@", values: [Int64(64)], expectedCount: 3) {
+            $0.arrayCol.optInt64Col.min != Int64(64)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.optInt64Col != %@", values: [Int64(66)], expectedCount: 4) {
+            $0.arrayCol.optInt64Col.min != Int64(66)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["optFloatCol": Float(5.55444333)])
+            let modernObj1 = ModernAllTypesObject(value: ["optFloatCol": Float(6.55444333)])
+            let modernObj2 = ModernAllTypesObject(value: ["optFloatCol": Float(7.55444333)])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+        assertQuery(predicate: "arrayCol.@min.optFloatCol > %@", values: [Float(5.55444333)], expectedCount: 0) {
+            $0.arrayCol.optFloatCol.min > Float(5.55444333)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.optFloatCol < %@", values: [Float(7.55444333)], expectedCount: 1) {
+            $0.arrayCol.optFloatCol.min < Float(7.55444333)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.optFloatCol == %@", values: [Float(5.55444333)], expectedCount: 1) {
+            $0.arrayCol.optFloatCol.min == Float(5.55444333)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.optFloatCol >= %@", values: [Float(6.55444333)], expectedCount: 0) {
+            $0.arrayCol.optFloatCol.min >= Float(6.55444333)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.optFloatCol >= %@", values: [Float(5.55444333)], expectedCount: 1) {
+            $0.arrayCol.optFloatCol.min >= Float(5.55444333)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.optFloatCol <= %@", values: [Float(7.55444333)], expectedCount: 1) {
+            $0.arrayCol.optFloatCol.min <= Float(7.55444333)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.optFloatCol <= %@", values: [Float(5.55444333)], expectedCount: 1) {
+            $0.arrayCol.optFloatCol.min <= Float(5.55444333)
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@min.optFloatCol != %@", values: [Float(5.55444333)], expectedCount: 3) {
+            $0.arrayCol.optFloatCol.min != Float(5.55444333)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.optFloatCol != %@", values: [Float(7.55444333)], expectedCount: 4) {
+            $0.arrayCol.optFloatCol.min != Float(7.55444333)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["optDoubleCol": 5.55444333])
+            let modernObj1 = ModernAllTypesObject(value: ["optDoubleCol": 6.55444333])
+            let modernObj2 = ModernAllTypesObject(value: ["optDoubleCol": 7.55444333])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+        assertQuery(predicate: "arrayCol.@min.optDoubleCol > %@", values: [5.55444333], expectedCount: 0) {
+            $0.arrayCol.optDoubleCol.min > 5.55444333
+        }
+
+        assertQuery(predicate: "arrayCol.@min.optDoubleCol < %@", values: [7.55444333], expectedCount: 1) {
+            $0.arrayCol.optDoubleCol.min < 7.55444333
+        }
+
+        assertQuery(predicate: "arrayCol.@min.optDoubleCol == %@", values: [5.55444333], expectedCount: 1) {
+            $0.arrayCol.optDoubleCol.min == 5.55444333
+        }
+
+        assertQuery(predicate: "arrayCol.@min.optDoubleCol >= %@", values: [6.55444333], expectedCount: 0) {
+            $0.arrayCol.optDoubleCol.min >= 6.55444333
+        }
+
+        assertQuery(predicate: "arrayCol.@min.optDoubleCol >= %@", values: [5.55444333], expectedCount: 1) {
+            $0.arrayCol.optDoubleCol.min >= 5.55444333
+        }
+
+        assertQuery(predicate: "arrayCol.@min.optDoubleCol <= %@", values: [7.55444333], expectedCount: 1) {
+            $0.arrayCol.optDoubleCol.min <= 7.55444333
+        }
+
+        assertQuery(predicate: "arrayCol.@min.optDoubleCol <= %@", values: [5.55444333], expectedCount: 1) {
+            $0.arrayCol.optDoubleCol.min <= 5.55444333
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@min.optDoubleCol != %@", values: [5.55444333], expectedCount: 3) {
+            $0.arrayCol.optDoubleCol.min != 5.55444333
+        }
+
+        assertQuery(predicate: "arrayCol.@min.optDoubleCol != %@", values: [7.55444333], expectedCount: 4) {
+            $0.arrayCol.optDoubleCol.min != 7.55444333
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["optDateCol": Date(timeIntervalSince1970: 1000000)])
+            let modernObj1 = ModernAllTypesObject(value: ["optDateCol": Date(timeIntervalSince1970: 2000000)])
+            let modernObj2 = ModernAllTypesObject(value: ["optDateCol": Date(timeIntervalSince1970: 3000000)])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+        assertQuery(predicate: "arrayCol.@min.optDateCol > %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 0) {
+            $0.arrayCol.optDateCol.min > Date(timeIntervalSince1970: 1000000)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.optDateCol < %@", values: [Date(timeIntervalSince1970: 3000000)], expectedCount: 1) {
+            $0.arrayCol.optDateCol.min < Date(timeIntervalSince1970: 3000000)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.optDateCol == %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
+            $0.arrayCol.optDateCol.min == Date(timeIntervalSince1970: 1000000)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.optDateCol >= %@", values: [Date(timeIntervalSince1970: 2000000)], expectedCount: 0) {
+            $0.arrayCol.optDateCol.min >= Date(timeIntervalSince1970: 2000000)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.optDateCol >= %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
+            $0.arrayCol.optDateCol.min >= Date(timeIntervalSince1970: 1000000)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.optDateCol <= %@", values: [Date(timeIntervalSince1970: 3000000)], expectedCount: 1) {
+            $0.arrayCol.optDateCol.min <= Date(timeIntervalSince1970: 3000000)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.optDateCol <= %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
+            $0.arrayCol.optDateCol.min <= Date(timeIntervalSince1970: 1000000)
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@min.optDateCol != %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 3) {
+            $0.arrayCol.optDateCol.min != Date(timeIntervalSince1970: 1000000)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.optDateCol != %@", values: [Date(timeIntervalSince1970: 3000000)], expectedCount: 4) {
+            $0.arrayCol.optDateCol.min != Date(timeIntervalSince1970: 3000000)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["optDecimalCol": Decimal128(123.456)])
+            let modernObj1 = ModernAllTypesObject(value: ["optDecimalCol": Decimal128(234.456)])
+            let modernObj2 = ModernAllTypesObject(value: ["optDecimalCol": Decimal128(345.456)])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+        assertQuery(predicate: "arrayCol.@min.optDecimalCol > %@", values: [Decimal128(123.456)], expectedCount: 0) {
+            $0.arrayCol.optDecimalCol.min > Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.optDecimalCol < %@", values: [Decimal128(345.456)], expectedCount: 1) {
+            $0.arrayCol.optDecimalCol.min < Decimal128(345.456)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.optDecimalCol == %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.arrayCol.optDecimalCol.min == Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.optDecimalCol >= %@", values: [Decimal128(234.456)], expectedCount: 0) {
+            $0.arrayCol.optDecimalCol.min >= Decimal128(234.456)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.optDecimalCol >= %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.arrayCol.optDecimalCol.min >= Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.optDecimalCol <= %@", values: [Decimal128(345.456)], expectedCount: 1) {
+            $0.arrayCol.optDecimalCol.min <= Decimal128(345.456)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.optDecimalCol <= %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.arrayCol.optDecimalCol.min <= Decimal128(123.456)
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@min.optDecimalCol != %@", values: [Decimal128(123.456)], expectedCount: 3) {
+            $0.arrayCol.optDecimalCol.min != Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "arrayCol.@min.optDecimalCol != %@", values: [Decimal128(345.456)], expectedCount: 4) {
+            $0.arrayCol.optDecimalCol.min != Decimal128(345.456)
+        }
+    }
+
+    func testKeypathCollectionAggregatesMax() {
+        let realm = realmWithTestPath()
+        let object = objects().first!
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["intCol": 5])
+            let modernObj1 = ModernAllTypesObject(value: ["intCol": 6])
+            let modernObj2 = ModernAllTypesObject(value: ["intCol": 7])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+        assertQuery(predicate: "arrayCol.@max.intCol > %@", values: [5], expectedCount: 1) {
+            $0.arrayCol.intCol.max > 5
+        }
+
+        assertQuery(predicate: "arrayCol.@max.intCol < %@", values: [7], expectedCount: 0) {
+            $0.arrayCol.intCol.max < 7
+        }
+
+        assertQuery(predicate: "arrayCol.@max.intCol == %@", values: [7], expectedCount: 1) {
+            $0.arrayCol.intCol.max == 7
+        }
+
+        assertQuery(predicate: "arrayCol.@max.intCol >= %@", values: [5], expectedCount: 1) {
+            $0.arrayCol.intCol.max >= 5
+        }
+
+        assertQuery(predicate: "arrayCol.@max.intCol >= %@", values: [7], expectedCount: 1) {
+            $0.arrayCol.intCol.max >= 7
+        }
+
+        assertQuery(predicate: "arrayCol.@max.intCol <= %@", values: [6], expectedCount: 0) {
+            $0.arrayCol.intCol.max <= 6
+        }
+
+        assertQuery(predicate: "arrayCol.@max.intCol <= %@", values: [7], expectedCount: 1) {
+            $0.arrayCol.intCol.max <= 7
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@max.intCol != %@", values: [7], expectedCount: 3) {
+            $0.arrayCol.intCol.max != 7
+        }
+
+        assertQuery(predicate: "arrayCol.@max.intCol != %@", values: [5], expectedCount: 4) {
+            $0.arrayCol.intCol.max != 5
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["int8Col": Int8(8)])
+            let modernObj1 = ModernAllTypesObject(value: ["int8Col": Int8(9)])
+            let modernObj2 = ModernAllTypesObject(value: ["int8Col": Int8(10)])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+        assertQuery(predicate: "arrayCol.@max.int8Col > %@", values: [Int8(8)], expectedCount: 1) {
+            $0.arrayCol.int8Col.max > Int8(8)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.int8Col < %@", values: [Int8(10)], expectedCount: 0) {
+            $0.arrayCol.int8Col.max < Int8(10)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.int8Col == %@", values: [Int8(10)], expectedCount: 1) {
+            $0.arrayCol.int8Col.max == Int8(10)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.int8Col >= %@", values: [Int8(8)], expectedCount: 1) {
+            $0.arrayCol.int8Col.max >= Int8(8)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.int8Col >= %@", values: [Int8(10)], expectedCount: 1) {
+            $0.arrayCol.int8Col.max >= Int8(10)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.int8Col <= %@", values: [Int8(9)], expectedCount: 0) {
+            $0.arrayCol.int8Col.max <= Int8(9)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.int8Col <= %@", values: [Int8(10)], expectedCount: 1) {
+            $0.arrayCol.int8Col.max <= Int8(10)
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@max.int8Col != %@", values: [Int8(10)], expectedCount: 3) {
+            $0.arrayCol.int8Col.max != Int8(10)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.int8Col != %@", values: [Int8(8)], expectedCount: 4) {
+            $0.arrayCol.int8Col.max != Int8(8)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["int16Col": Int16(16)])
+            let modernObj1 = ModernAllTypesObject(value: ["int16Col": Int16(17)])
+            let modernObj2 = ModernAllTypesObject(value: ["int16Col": Int16(18)])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+        assertQuery(predicate: "arrayCol.@max.int16Col > %@", values: [Int16(16)], expectedCount: 1) {
+            $0.arrayCol.int16Col.max > Int16(16)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.int16Col < %@", values: [Int16(18)], expectedCount: 0) {
+            $0.arrayCol.int16Col.max < Int16(18)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.int16Col == %@", values: [Int16(18)], expectedCount: 1) {
+            $0.arrayCol.int16Col.max == Int16(18)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.int16Col >= %@", values: [Int16(16)], expectedCount: 1) {
+            $0.arrayCol.int16Col.max >= Int16(16)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.int16Col >= %@", values: [Int16(18)], expectedCount: 1) {
+            $0.arrayCol.int16Col.max >= Int16(18)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.int16Col <= %@", values: [Int16(17)], expectedCount: 0) {
+            $0.arrayCol.int16Col.max <= Int16(17)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.int16Col <= %@", values: [Int16(18)], expectedCount: 1) {
+            $0.arrayCol.int16Col.max <= Int16(18)
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@max.int16Col != %@", values: [Int16(18)], expectedCount: 3) {
+            $0.arrayCol.int16Col.max != Int16(18)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.int16Col != %@", values: [Int16(16)], expectedCount: 4) {
+            $0.arrayCol.int16Col.max != Int16(16)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["int32Col": Int32(32)])
+            let modernObj1 = ModernAllTypesObject(value: ["int32Col": Int32(33)])
+            let modernObj2 = ModernAllTypesObject(value: ["int32Col": Int32(34)])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+        assertQuery(predicate: "arrayCol.@max.int32Col > %@", values: [Int32(32)], expectedCount: 1) {
+            $0.arrayCol.int32Col.max > Int32(32)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.int32Col < %@", values: [Int32(34)], expectedCount: 0) {
+            $0.arrayCol.int32Col.max < Int32(34)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.int32Col == %@", values: [Int32(34)], expectedCount: 1) {
+            $0.arrayCol.int32Col.max == Int32(34)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.int32Col >= %@", values: [Int32(32)], expectedCount: 1) {
+            $0.arrayCol.int32Col.max >= Int32(32)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.int32Col >= %@", values: [Int32(34)], expectedCount: 1) {
+            $0.arrayCol.int32Col.max >= Int32(34)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.int32Col <= %@", values: [Int32(33)], expectedCount: 0) {
+            $0.arrayCol.int32Col.max <= Int32(33)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.int32Col <= %@", values: [Int32(34)], expectedCount: 1) {
+            $0.arrayCol.int32Col.max <= Int32(34)
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@max.int32Col != %@", values: [Int32(34)], expectedCount: 3) {
+            $0.arrayCol.int32Col.max != Int32(34)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.int32Col != %@", values: [Int32(32)], expectedCount: 4) {
+            $0.arrayCol.int32Col.max != Int32(32)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["int64Col": Int64(64)])
+            let modernObj1 = ModernAllTypesObject(value: ["int64Col": Int64(65)])
+            let modernObj2 = ModernAllTypesObject(value: ["int64Col": Int64(66)])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+        assertQuery(predicate: "arrayCol.@max.int64Col > %@", values: [Int64(64)], expectedCount: 1) {
+            $0.arrayCol.int64Col.max > Int64(64)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.int64Col < %@", values: [Int64(66)], expectedCount: 0) {
+            $0.arrayCol.int64Col.max < Int64(66)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.int64Col == %@", values: [Int64(66)], expectedCount: 1) {
+            $0.arrayCol.int64Col.max == Int64(66)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.int64Col >= %@", values: [Int64(64)], expectedCount: 1) {
+            $0.arrayCol.int64Col.max >= Int64(64)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.int64Col >= %@", values: [Int64(66)], expectedCount: 1) {
+            $0.arrayCol.int64Col.max >= Int64(66)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.int64Col <= %@", values: [Int64(65)], expectedCount: 0) {
+            $0.arrayCol.int64Col.max <= Int64(65)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.int64Col <= %@", values: [Int64(66)], expectedCount: 1) {
+            $0.arrayCol.int64Col.max <= Int64(66)
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@max.int64Col != %@", values: [Int64(66)], expectedCount: 3) {
+            $0.arrayCol.int64Col.max != Int64(66)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.int64Col != %@", values: [Int64(64)], expectedCount: 4) {
+            $0.arrayCol.int64Col.max != Int64(64)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["floatCol": Float(5.55444333)])
+            let modernObj1 = ModernAllTypesObject(value: ["floatCol": Float(6.55444333)])
+            let modernObj2 = ModernAllTypesObject(value: ["floatCol": Float(7.55444333)])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+        assertQuery(predicate: "arrayCol.@max.floatCol > %@", values: [Float(5.55444333)], expectedCount: 1) {
+            $0.arrayCol.floatCol.max > Float(5.55444333)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.floatCol < %@", values: [Float(7.55444333)], expectedCount: 0) {
+            $0.arrayCol.floatCol.max < Float(7.55444333)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.floatCol == %@", values: [Float(7.55444333)], expectedCount: 1) {
+            $0.arrayCol.floatCol.max == Float(7.55444333)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.floatCol >= %@", values: [Float(5.55444333)], expectedCount: 1) {
+            $0.arrayCol.floatCol.max >= Float(5.55444333)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.floatCol >= %@", values: [Float(7.55444333)], expectedCount: 1) {
+            $0.arrayCol.floatCol.max >= Float(7.55444333)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.floatCol <= %@", values: [Float(6.55444333)], expectedCount: 0) {
+            $0.arrayCol.floatCol.max <= Float(6.55444333)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.floatCol <= %@", values: [Float(7.55444333)], expectedCount: 1) {
+            $0.arrayCol.floatCol.max <= Float(7.55444333)
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@max.floatCol != %@", values: [Float(7.55444333)], expectedCount: 3) {
+            $0.arrayCol.floatCol.max != Float(7.55444333)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.floatCol != %@", values: [Float(5.55444333)], expectedCount: 4) {
+            $0.arrayCol.floatCol.max != Float(5.55444333)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["doubleCol": 5.55444333])
+            let modernObj1 = ModernAllTypesObject(value: ["doubleCol": 6.55444333])
+            let modernObj2 = ModernAllTypesObject(value: ["doubleCol": 7.55444333])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+        assertQuery(predicate: "arrayCol.@max.doubleCol > %@", values: [5.55444333], expectedCount: 1) {
+            $0.arrayCol.doubleCol.max > 5.55444333
+        }
+
+        assertQuery(predicate: "arrayCol.@max.doubleCol < %@", values: [7.55444333], expectedCount: 0) {
+            $0.arrayCol.doubleCol.max < 7.55444333
+        }
+
+        assertQuery(predicate: "arrayCol.@max.doubleCol == %@", values: [7.55444333], expectedCount: 1) {
+            $0.arrayCol.doubleCol.max == 7.55444333
+        }
+
+        assertQuery(predicate: "arrayCol.@max.doubleCol >= %@", values: [5.55444333], expectedCount: 1) {
+            $0.arrayCol.doubleCol.max >= 5.55444333
+        }
+
+        assertQuery(predicate: "arrayCol.@max.doubleCol >= %@", values: [7.55444333], expectedCount: 1) {
+            $0.arrayCol.doubleCol.max >= 7.55444333
+        }
+
+        assertQuery(predicate: "arrayCol.@max.doubleCol <= %@", values: [6.55444333], expectedCount: 0) {
+            $0.arrayCol.doubleCol.max <= 6.55444333
+        }
+
+        assertQuery(predicate: "arrayCol.@max.doubleCol <= %@", values: [7.55444333], expectedCount: 1) {
+            $0.arrayCol.doubleCol.max <= 7.55444333
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@max.doubleCol != %@", values: [7.55444333], expectedCount: 3) {
+            $0.arrayCol.doubleCol.max != 7.55444333
+        }
+
+        assertQuery(predicate: "arrayCol.@max.doubleCol != %@", values: [5.55444333], expectedCount: 4) {
+            $0.arrayCol.doubleCol.max != 5.55444333
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["dateCol": Date(timeIntervalSince1970: 1000000)])
+            let modernObj1 = ModernAllTypesObject(value: ["dateCol": Date(timeIntervalSince1970: 2000000)])
+            let modernObj2 = ModernAllTypesObject(value: ["dateCol": Date(timeIntervalSince1970: 3000000)])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+        assertQuery(predicate: "arrayCol.@max.dateCol > %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
+            $0.arrayCol.dateCol.max > Date(timeIntervalSince1970: 1000000)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.dateCol < %@", values: [Date(timeIntervalSince1970: 3000000)], expectedCount: 0) {
+            $0.arrayCol.dateCol.max < Date(timeIntervalSince1970: 3000000)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.dateCol == %@", values: [Date(timeIntervalSince1970: 3000000)], expectedCount: 1) {
+            $0.arrayCol.dateCol.max == Date(timeIntervalSince1970: 3000000)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.dateCol >= %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
+            $0.arrayCol.dateCol.max >= Date(timeIntervalSince1970: 1000000)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.dateCol >= %@", values: [Date(timeIntervalSince1970: 3000000)], expectedCount: 1) {
+            $0.arrayCol.dateCol.max >= Date(timeIntervalSince1970: 3000000)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.dateCol <= %@", values: [Date(timeIntervalSince1970: 2000000)], expectedCount: 0) {
+            $0.arrayCol.dateCol.max <= Date(timeIntervalSince1970: 2000000)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.dateCol <= %@", values: [Date(timeIntervalSince1970: 3000000)], expectedCount: 1) {
+            $0.arrayCol.dateCol.max <= Date(timeIntervalSince1970: 3000000)
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@max.dateCol != %@", values: [Date(timeIntervalSince1970: 3000000)], expectedCount: 3) {
+            $0.arrayCol.dateCol.max != Date(timeIntervalSince1970: 3000000)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.dateCol != %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 4) {
+            $0.arrayCol.dateCol.max != Date(timeIntervalSince1970: 1000000)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["decimalCol": Decimal128(123.456)])
+            let modernObj1 = ModernAllTypesObject(value: ["decimalCol": Decimal128(234.456)])
+            let modernObj2 = ModernAllTypesObject(value: ["decimalCol": Decimal128(345.456)])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+        assertQuery(predicate: "arrayCol.@max.decimalCol > %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.arrayCol.decimalCol.max > Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.decimalCol < %@", values: [Decimal128(345.456)], expectedCount: 0) {
+            $0.arrayCol.decimalCol.max < Decimal128(345.456)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.decimalCol == %@", values: [Decimal128(345.456)], expectedCount: 1) {
+            $0.arrayCol.decimalCol.max == Decimal128(345.456)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.decimalCol >= %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.arrayCol.decimalCol.max >= Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.decimalCol >= %@", values: [Decimal128(345.456)], expectedCount: 1) {
+            $0.arrayCol.decimalCol.max >= Decimal128(345.456)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.decimalCol <= %@", values: [Decimal128(234.456)], expectedCount: 0) {
+            $0.arrayCol.decimalCol.max <= Decimal128(234.456)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.decimalCol <= %@", values: [Decimal128(345.456)], expectedCount: 1) {
+            $0.arrayCol.decimalCol.max <= Decimal128(345.456)
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@max.decimalCol != %@", values: [Decimal128(345.456)], expectedCount: 3) {
+            $0.arrayCol.decimalCol.max != Decimal128(345.456)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.decimalCol != %@", values: [Decimal128(123.456)], expectedCount: 4) {
+            $0.arrayCol.decimalCol.max != Decimal128(123.456)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["optIntCol": 5])
+            let modernObj1 = ModernAllTypesObject(value: ["optIntCol": 6])
+            let modernObj2 = ModernAllTypesObject(value: ["optIntCol": 7])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+        assertQuery(predicate: "arrayCol.@max.optIntCol > %@", values: [5], expectedCount: 1) {
+            $0.arrayCol.optIntCol.max > 5
+        }
+
+        assertQuery(predicate: "arrayCol.@max.optIntCol < %@", values: [7], expectedCount: 0) {
+            $0.arrayCol.optIntCol.max < 7
+        }
+
+        assertQuery(predicate: "arrayCol.@max.optIntCol == %@", values: [7], expectedCount: 1) {
+            $0.arrayCol.optIntCol.max == 7
+        }
+
+        assertQuery(predicate: "arrayCol.@max.optIntCol >= %@", values: [5], expectedCount: 1) {
+            $0.arrayCol.optIntCol.max >= 5
+        }
+
+        assertQuery(predicate: "arrayCol.@max.optIntCol >= %@", values: [7], expectedCount: 1) {
+            $0.arrayCol.optIntCol.max >= 7
+        }
+
+        assertQuery(predicate: "arrayCol.@max.optIntCol <= %@", values: [6], expectedCount: 0) {
+            $0.arrayCol.optIntCol.max <= 6
+        }
+
+        assertQuery(predicate: "arrayCol.@max.optIntCol <= %@", values: [7], expectedCount: 1) {
+            $0.arrayCol.optIntCol.max <= 7
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@max.optIntCol != %@", values: [7], expectedCount: 3) {
+            $0.arrayCol.optIntCol.max != 7
+        }
+
+        assertQuery(predicate: "arrayCol.@max.optIntCol != %@", values: [5], expectedCount: 4) {
+            $0.arrayCol.optIntCol.max != 5
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["optInt8Col": Int8(8)])
+            let modernObj1 = ModernAllTypesObject(value: ["optInt8Col": Int8(9)])
+            let modernObj2 = ModernAllTypesObject(value: ["optInt8Col": Int8(10)])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+        assertQuery(predicate: "arrayCol.@max.optInt8Col > %@", values: [Int8(8)], expectedCount: 1) {
+            $0.arrayCol.optInt8Col.max > Int8(8)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.optInt8Col < %@", values: [Int8(10)], expectedCount: 0) {
+            $0.arrayCol.optInt8Col.max < Int8(10)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.optInt8Col == %@", values: [Int8(10)], expectedCount: 1) {
+            $0.arrayCol.optInt8Col.max == Int8(10)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.optInt8Col >= %@", values: [Int8(8)], expectedCount: 1) {
+            $0.arrayCol.optInt8Col.max >= Int8(8)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.optInt8Col >= %@", values: [Int8(10)], expectedCount: 1) {
+            $0.arrayCol.optInt8Col.max >= Int8(10)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.optInt8Col <= %@", values: [Int8(9)], expectedCount: 0) {
+            $0.arrayCol.optInt8Col.max <= Int8(9)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.optInt8Col <= %@", values: [Int8(10)], expectedCount: 1) {
+            $0.arrayCol.optInt8Col.max <= Int8(10)
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@max.optInt8Col != %@", values: [Int8(10)], expectedCount: 3) {
+            $0.arrayCol.optInt8Col.max != Int8(10)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.optInt8Col != %@", values: [Int8(8)], expectedCount: 4) {
+            $0.arrayCol.optInt8Col.max != Int8(8)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["optInt16Col": Int16(16)])
+            let modernObj1 = ModernAllTypesObject(value: ["optInt16Col": Int16(17)])
+            let modernObj2 = ModernAllTypesObject(value: ["optInt16Col": Int16(18)])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+        assertQuery(predicate: "arrayCol.@max.optInt16Col > %@", values: [Int16(16)], expectedCount: 1) {
+            $0.arrayCol.optInt16Col.max > Int16(16)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.optInt16Col < %@", values: [Int16(18)], expectedCount: 0) {
+            $0.arrayCol.optInt16Col.max < Int16(18)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.optInt16Col == %@", values: [Int16(18)], expectedCount: 1) {
+            $0.arrayCol.optInt16Col.max == Int16(18)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.optInt16Col >= %@", values: [Int16(16)], expectedCount: 1) {
+            $0.arrayCol.optInt16Col.max >= Int16(16)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.optInt16Col >= %@", values: [Int16(18)], expectedCount: 1) {
+            $0.arrayCol.optInt16Col.max >= Int16(18)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.optInt16Col <= %@", values: [Int16(17)], expectedCount: 0) {
+            $0.arrayCol.optInt16Col.max <= Int16(17)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.optInt16Col <= %@", values: [Int16(18)], expectedCount: 1) {
+            $0.arrayCol.optInt16Col.max <= Int16(18)
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@max.optInt16Col != %@", values: [Int16(18)], expectedCount: 3) {
+            $0.arrayCol.optInt16Col.max != Int16(18)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.optInt16Col != %@", values: [Int16(16)], expectedCount: 4) {
+            $0.arrayCol.optInt16Col.max != Int16(16)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["optInt32Col": Int32(32)])
+            let modernObj1 = ModernAllTypesObject(value: ["optInt32Col": Int32(33)])
+            let modernObj2 = ModernAllTypesObject(value: ["optInt32Col": Int32(34)])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+        assertQuery(predicate: "arrayCol.@max.optInt32Col > %@", values: [Int32(32)], expectedCount: 1) {
+            $0.arrayCol.optInt32Col.max > Int32(32)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.optInt32Col < %@", values: [Int32(34)], expectedCount: 0) {
+            $0.arrayCol.optInt32Col.max < Int32(34)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.optInt32Col == %@", values: [Int32(34)], expectedCount: 1) {
+            $0.arrayCol.optInt32Col.max == Int32(34)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.optInt32Col >= %@", values: [Int32(32)], expectedCount: 1) {
+            $0.arrayCol.optInt32Col.max >= Int32(32)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.optInt32Col >= %@", values: [Int32(34)], expectedCount: 1) {
+            $0.arrayCol.optInt32Col.max >= Int32(34)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.optInt32Col <= %@", values: [Int32(33)], expectedCount: 0) {
+            $0.arrayCol.optInt32Col.max <= Int32(33)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.optInt32Col <= %@", values: [Int32(34)], expectedCount: 1) {
+            $0.arrayCol.optInt32Col.max <= Int32(34)
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@max.optInt32Col != %@", values: [Int32(34)], expectedCount: 3) {
+            $0.arrayCol.optInt32Col.max != Int32(34)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.optInt32Col != %@", values: [Int32(32)], expectedCount: 4) {
+            $0.arrayCol.optInt32Col.max != Int32(32)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["optInt64Col": Int64(64)])
+            let modernObj1 = ModernAllTypesObject(value: ["optInt64Col": Int64(65)])
+            let modernObj2 = ModernAllTypesObject(value: ["optInt64Col": Int64(66)])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+        assertQuery(predicate: "arrayCol.@max.optInt64Col > %@", values: [Int64(64)], expectedCount: 1) {
+            $0.arrayCol.optInt64Col.max > Int64(64)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.optInt64Col < %@", values: [Int64(66)], expectedCount: 0) {
+            $0.arrayCol.optInt64Col.max < Int64(66)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.optInt64Col == %@", values: [Int64(66)], expectedCount: 1) {
+            $0.arrayCol.optInt64Col.max == Int64(66)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.optInt64Col >= %@", values: [Int64(64)], expectedCount: 1) {
+            $0.arrayCol.optInt64Col.max >= Int64(64)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.optInt64Col >= %@", values: [Int64(66)], expectedCount: 1) {
+            $0.arrayCol.optInt64Col.max >= Int64(66)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.optInt64Col <= %@", values: [Int64(65)], expectedCount: 0) {
+            $0.arrayCol.optInt64Col.max <= Int64(65)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.optInt64Col <= %@", values: [Int64(66)], expectedCount: 1) {
+            $0.arrayCol.optInt64Col.max <= Int64(66)
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@max.optInt64Col != %@", values: [Int64(66)], expectedCount: 3) {
+            $0.arrayCol.optInt64Col.max != Int64(66)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.optInt64Col != %@", values: [Int64(64)], expectedCount: 4) {
+            $0.arrayCol.optInt64Col.max != Int64(64)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["optFloatCol": Float(5.55444333)])
+            let modernObj1 = ModernAllTypesObject(value: ["optFloatCol": Float(6.55444333)])
+            let modernObj2 = ModernAllTypesObject(value: ["optFloatCol": Float(7.55444333)])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+        assertQuery(predicate: "arrayCol.@max.optFloatCol > %@", values: [Float(5.55444333)], expectedCount: 1) {
+            $0.arrayCol.optFloatCol.max > Float(5.55444333)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.optFloatCol < %@", values: [Float(7.55444333)], expectedCount: 0) {
+            $0.arrayCol.optFloatCol.max < Float(7.55444333)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.optFloatCol == %@", values: [Float(7.55444333)], expectedCount: 1) {
+            $0.arrayCol.optFloatCol.max == Float(7.55444333)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.optFloatCol >= %@", values: [Float(5.55444333)], expectedCount: 1) {
+            $0.arrayCol.optFloatCol.max >= Float(5.55444333)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.optFloatCol >= %@", values: [Float(7.55444333)], expectedCount: 1) {
+            $0.arrayCol.optFloatCol.max >= Float(7.55444333)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.optFloatCol <= %@", values: [Float(6.55444333)], expectedCount: 0) {
+            $0.arrayCol.optFloatCol.max <= Float(6.55444333)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.optFloatCol <= %@", values: [Float(7.55444333)], expectedCount: 1) {
+            $0.arrayCol.optFloatCol.max <= Float(7.55444333)
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@max.optFloatCol != %@", values: [Float(7.55444333)], expectedCount: 3) {
+            $0.arrayCol.optFloatCol.max != Float(7.55444333)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.optFloatCol != %@", values: [Float(5.55444333)], expectedCount: 4) {
+            $0.arrayCol.optFloatCol.max != Float(5.55444333)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["optDoubleCol": 5.55444333])
+            let modernObj1 = ModernAllTypesObject(value: ["optDoubleCol": 6.55444333])
+            let modernObj2 = ModernAllTypesObject(value: ["optDoubleCol": 7.55444333])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+        assertQuery(predicate: "arrayCol.@max.optDoubleCol > %@", values: [5.55444333], expectedCount: 1) {
+            $0.arrayCol.optDoubleCol.max > 5.55444333
+        }
+
+        assertQuery(predicate: "arrayCol.@max.optDoubleCol < %@", values: [7.55444333], expectedCount: 0) {
+            $0.arrayCol.optDoubleCol.max < 7.55444333
+        }
+
+        assertQuery(predicate: "arrayCol.@max.optDoubleCol == %@", values: [7.55444333], expectedCount: 1) {
+            $0.arrayCol.optDoubleCol.max == 7.55444333
+        }
+
+        assertQuery(predicate: "arrayCol.@max.optDoubleCol >= %@", values: [5.55444333], expectedCount: 1) {
+            $0.arrayCol.optDoubleCol.max >= 5.55444333
+        }
+
+        assertQuery(predicate: "arrayCol.@max.optDoubleCol >= %@", values: [7.55444333], expectedCount: 1) {
+            $0.arrayCol.optDoubleCol.max >= 7.55444333
+        }
+
+        assertQuery(predicate: "arrayCol.@max.optDoubleCol <= %@", values: [6.55444333], expectedCount: 0) {
+            $0.arrayCol.optDoubleCol.max <= 6.55444333
+        }
+
+        assertQuery(predicate: "arrayCol.@max.optDoubleCol <= %@", values: [7.55444333], expectedCount: 1) {
+            $0.arrayCol.optDoubleCol.max <= 7.55444333
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@max.optDoubleCol != %@", values: [7.55444333], expectedCount: 3) {
+            $0.arrayCol.optDoubleCol.max != 7.55444333
+        }
+
+        assertQuery(predicate: "arrayCol.@max.optDoubleCol != %@", values: [5.55444333], expectedCount: 4) {
+            $0.arrayCol.optDoubleCol.max != 5.55444333
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["optDateCol": Date(timeIntervalSince1970: 1000000)])
+            let modernObj1 = ModernAllTypesObject(value: ["optDateCol": Date(timeIntervalSince1970: 2000000)])
+            let modernObj2 = ModernAllTypesObject(value: ["optDateCol": Date(timeIntervalSince1970: 3000000)])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+        assertQuery(predicate: "arrayCol.@max.optDateCol > %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
+            $0.arrayCol.optDateCol.max > Date(timeIntervalSince1970: 1000000)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.optDateCol < %@", values: [Date(timeIntervalSince1970: 3000000)], expectedCount: 0) {
+            $0.arrayCol.optDateCol.max < Date(timeIntervalSince1970: 3000000)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.optDateCol == %@", values: [Date(timeIntervalSince1970: 3000000)], expectedCount: 1) {
+            $0.arrayCol.optDateCol.max == Date(timeIntervalSince1970: 3000000)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.optDateCol >= %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
+            $0.arrayCol.optDateCol.max >= Date(timeIntervalSince1970: 1000000)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.optDateCol >= %@", values: [Date(timeIntervalSince1970: 3000000)], expectedCount: 1) {
+            $0.arrayCol.optDateCol.max >= Date(timeIntervalSince1970: 3000000)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.optDateCol <= %@", values: [Date(timeIntervalSince1970: 2000000)], expectedCount: 0) {
+            $0.arrayCol.optDateCol.max <= Date(timeIntervalSince1970: 2000000)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.optDateCol <= %@", values: [Date(timeIntervalSince1970: 3000000)], expectedCount: 1) {
+            $0.arrayCol.optDateCol.max <= Date(timeIntervalSince1970: 3000000)
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@max.optDateCol != %@", values: [Date(timeIntervalSince1970: 3000000)], expectedCount: 3) {
+            $0.arrayCol.optDateCol.max != Date(timeIntervalSince1970: 3000000)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.optDateCol != %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 4) {
+            $0.arrayCol.optDateCol.max != Date(timeIntervalSince1970: 1000000)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["optDecimalCol": Decimal128(123.456)])
+            let modernObj1 = ModernAllTypesObject(value: ["optDecimalCol": Decimal128(234.456)])
+            let modernObj2 = ModernAllTypesObject(value: ["optDecimalCol": Decimal128(345.456)])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+        assertQuery(predicate: "arrayCol.@max.optDecimalCol > %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.arrayCol.optDecimalCol.max > Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.optDecimalCol < %@", values: [Decimal128(345.456)], expectedCount: 0) {
+            $0.arrayCol.optDecimalCol.max < Decimal128(345.456)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.optDecimalCol == %@", values: [Decimal128(345.456)], expectedCount: 1) {
+            $0.arrayCol.optDecimalCol.max == Decimal128(345.456)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.optDecimalCol >= %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.arrayCol.optDecimalCol.max >= Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.optDecimalCol >= %@", values: [Decimal128(345.456)], expectedCount: 1) {
+            $0.arrayCol.optDecimalCol.max >= Decimal128(345.456)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.optDecimalCol <= %@", values: [Decimal128(234.456)], expectedCount: 0) {
+            $0.arrayCol.optDecimalCol.max <= Decimal128(234.456)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.optDecimalCol <= %@", values: [Decimal128(345.456)], expectedCount: 1) {
+            $0.arrayCol.optDecimalCol.max <= Decimal128(345.456)
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@max.optDecimalCol != %@", values: [Decimal128(345.456)], expectedCount: 3) {
+            $0.arrayCol.optDecimalCol.max != Decimal128(345.456)
+        }
+
+        assertQuery(predicate: "arrayCol.@max.optDecimalCol != %@", values: [Decimal128(123.456)], expectedCount: 4) {
+            $0.arrayCol.optDecimalCol.max != Decimal128(123.456)
+        }
+    }
+
+    func testKeypathCollectionAggregatesSum() {
+        let realm = realmWithTestPath()
+        let object = objects().first!
+        
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["intCol": 5])
+            let modernObj1 = ModernAllTypesObject(value: ["intCol": 6])
+            let modernObj2 = ModernAllTypesObject(value: ["intCol": 7])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+        
+        let sumintCol = 5 + 6 + 7
+        assertQuery(predicate: "arrayCol.@sum.intCol > %@", values: [7], expectedCount: 1) {
+            $0.arrayCol.intCol.sum > 7
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.intCol < %@", values: [7], expectedCount: 3) {
+            $0.arrayCol.intCol.sum < 7
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.intCol == %@", values: [7], expectedCount: 0) {
+            $0.arrayCol.intCol.sum == 7
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.intCol == %@", values: [sumintCol], expectedCount: 1) {
+            $0.arrayCol.intCol.sum == sumintCol
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.intCol >= %@", values: [7], expectedCount: 1) {
+            $0.arrayCol.intCol.sum >= 7
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.intCol >= %@", values: [sumintCol], expectedCount: 1) {
+            $0.arrayCol.intCol.sum >= sumintCol
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.intCol <= %@", values: [7], expectedCount: 3) {
+            $0.arrayCol.intCol.sum <= 7
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.intCol <= %@", values: [sumintCol], expectedCount: 4) {
+            $0.arrayCol.intCol.sum <= sumintCol
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@sum.intCol != %@", values: [sumintCol], expectedCount: 3) {
+            $0.arrayCol.intCol.sum != sumintCol
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.intCol != %@", values: [5], expectedCount: 4) {
+            $0.arrayCol.intCol.sum != 5
+        }
+        
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["int8Col": Int8(8)])
+            let modernObj1 = ModernAllTypesObject(value: ["int8Col": Int8(9)])
+            let modernObj2 = ModernAllTypesObject(value: ["int8Col": Int8(10)])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+        
+        let sumint8Col = Int8(8) + Int8(9) + Int8(10)
+        assertQuery(predicate: "arrayCol.@sum.int8Col > %@", values: [Int8(10)], expectedCount: 1) {
+            $0.arrayCol.int8Col.sum > Int8(10)
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.int8Col < %@", values: [Int8(10)], expectedCount: 3) {
+            $0.arrayCol.int8Col.sum < Int8(10)
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.int8Col == %@", values: [Int8(10)], expectedCount: 0) {
+            $0.arrayCol.int8Col.sum == Int8(10)
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.int8Col == %@", values: [sumint8Col], expectedCount: 1) {
+            $0.arrayCol.int8Col.sum == sumint8Col
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.int8Col >= %@", values: [Int8(10)], expectedCount: 1) {
+            $0.arrayCol.int8Col.sum >= Int8(10)
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.int8Col >= %@", values: [sumint8Col], expectedCount: 1) {
+            $0.arrayCol.int8Col.sum >= sumint8Col
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.int8Col <= %@", values: [Int8(10)], expectedCount: 3) {
+            $0.arrayCol.int8Col.sum <= Int8(10)
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.int8Col <= %@", values: [sumint8Col], expectedCount: 4) {
+            $0.arrayCol.int8Col.sum <= sumint8Col
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@sum.int8Col != %@", values: [sumint8Col], expectedCount: 3) {
+            $0.arrayCol.int8Col.sum != sumint8Col
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.int8Col != %@", values: [Int8(8)], expectedCount: 4) {
+            $0.arrayCol.int8Col.sum != Int8(8)
+        }
+        
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["int16Col": Int16(16)])
+            let modernObj1 = ModernAllTypesObject(value: ["int16Col": Int16(17)])
+            let modernObj2 = ModernAllTypesObject(value: ["int16Col": Int16(18)])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+        
+        let sumint16Col = Int16(16) + Int16(17) + Int16(18)
+        assertQuery(predicate: "arrayCol.@sum.int16Col > %@", values: [Int16(18)], expectedCount: 1) {
+            $0.arrayCol.int16Col.sum > Int16(18)
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.int16Col < %@", values: [Int16(18)], expectedCount: 3) {
+            $0.arrayCol.int16Col.sum < Int16(18)
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.int16Col == %@", values: [Int16(18)], expectedCount: 0) {
+            $0.arrayCol.int16Col.sum == Int16(18)
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.int16Col == %@", values: [sumint16Col], expectedCount: 1) {
+            $0.arrayCol.int16Col.sum == sumint16Col
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.int16Col >= %@", values: [Int16(18)], expectedCount: 1) {
+            $0.arrayCol.int16Col.sum >= Int16(18)
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.int16Col >= %@", values: [sumint16Col], expectedCount: 1) {
+            $0.arrayCol.int16Col.sum >= sumint16Col
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.int16Col <= %@", values: [Int16(18)], expectedCount: 3) {
+            $0.arrayCol.int16Col.sum <= Int16(18)
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.int16Col <= %@", values: [sumint16Col], expectedCount: 4) {
+            $0.arrayCol.int16Col.sum <= sumint16Col
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@sum.int16Col != %@", values: [sumint16Col], expectedCount: 3) {
+            $0.arrayCol.int16Col.sum != sumint16Col
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.int16Col != %@", values: [Int16(16)], expectedCount: 4) {
+            $0.arrayCol.int16Col.sum != Int16(16)
+        }
+        
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["int32Col": Int32(32)])
+            let modernObj1 = ModernAllTypesObject(value: ["int32Col": Int32(33)])
+            let modernObj2 = ModernAllTypesObject(value: ["int32Col": Int32(34)])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+        
+        let sumint32Col = Int32(32) + Int32(33) + Int32(34)
+        assertQuery(predicate: "arrayCol.@sum.int32Col > %@", values: [Int32(34)], expectedCount: 1) {
+            $0.arrayCol.int32Col.sum > Int32(34)
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.int32Col < %@", values: [Int32(34)], expectedCount: 3) {
+            $0.arrayCol.int32Col.sum < Int32(34)
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.int32Col == %@", values: [Int32(34)], expectedCount: 0) {
+            $0.arrayCol.int32Col.sum == Int32(34)
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.int32Col == %@", values: [sumint32Col], expectedCount: 1) {
+            $0.arrayCol.int32Col.sum == sumint32Col
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.int32Col >= %@", values: [Int32(34)], expectedCount: 1) {
+            $0.arrayCol.int32Col.sum >= Int32(34)
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.int32Col >= %@", values: [sumint32Col], expectedCount: 1) {
+            $0.arrayCol.int32Col.sum >= sumint32Col
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.int32Col <= %@", values: [Int32(34)], expectedCount: 3) {
+            $0.arrayCol.int32Col.sum <= Int32(34)
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.int32Col <= %@", values: [sumint32Col], expectedCount: 4) {
+            $0.arrayCol.int32Col.sum <= sumint32Col
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@sum.int32Col != %@", values: [sumint32Col], expectedCount: 3) {
+            $0.arrayCol.int32Col.sum != sumint32Col
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.int32Col != %@", values: [Int32(32)], expectedCount: 4) {
+            $0.arrayCol.int32Col.sum != Int32(32)
+        }
+        
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["int64Col": Int64(64)])
+            let modernObj1 = ModernAllTypesObject(value: ["int64Col": Int64(65)])
+            let modernObj2 = ModernAllTypesObject(value: ["int64Col": Int64(66)])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+        
+        let sumint64Col = Int64(64) + Int64(65) + Int64(66)
+        assertQuery(predicate: "arrayCol.@sum.int64Col > %@", values: [Int64(66)], expectedCount: 1) {
+            $0.arrayCol.int64Col.sum > Int64(66)
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.int64Col < %@", values: [Int64(66)], expectedCount: 3) {
+            $0.arrayCol.int64Col.sum < Int64(66)
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.int64Col == %@", values: [Int64(66)], expectedCount: 0) {
+            $0.arrayCol.int64Col.sum == Int64(66)
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.int64Col == %@", values: [sumint64Col], expectedCount: 1) {
+            $0.arrayCol.int64Col.sum == sumint64Col
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.int64Col >= %@", values: [Int64(66)], expectedCount: 1) {
+            $0.arrayCol.int64Col.sum >= Int64(66)
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.int64Col >= %@", values: [sumint64Col], expectedCount: 1) {
+            $0.arrayCol.int64Col.sum >= sumint64Col
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.int64Col <= %@", values: [Int64(66)], expectedCount: 3) {
+            $0.arrayCol.int64Col.sum <= Int64(66)
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.int64Col <= %@", values: [sumint64Col], expectedCount: 4) {
+            $0.arrayCol.int64Col.sum <= sumint64Col
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@sum.int64Col != %@", values: [sumint64Col], expectedCount: 3) {
+            $0.arrayCol.int64Col.sum != sumint64Col
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.int64Col != %@", values: [Int64(64)], expectedCount: 4) {
+            $0.arrayCol.int64Col.sum != Int64(64)
+        }
+        
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["floatCol": Float(5.55444333)])
+            let modernObj1 = ModernAllTypesObject(value: ["floatCol": Float(6.55444333)])
+            let modernObj2 = ModernAllTypesObject(value: ["floatCol": Float(7.55444333)])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+        
+        let sumfloatCol = Float(5.55444333) + Float(6.55444333) + Float(7.55444333)
+        assertQuery(predicate: "arrayCol.@sum.floatCol > %@", values: [Float(7.55444333)], expectedCount: 1) {
+            $0.arrayCol.floatCol.sum > Float(7.55444333)
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.floatCol < %@", values: [Float(7.55444333)], expectedCount: 3) {
+            $0.arrayCol.floatCol.sum < Float(7.55444333)
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.floatCol == %@", values: [Float(7.55444333)], expectedCount: 0) {
+            $0.arrayCol.floatCol.sum == Float(7.55444333)
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.floatCol == %@", values: [sumfloatCol], expectedCount: 1) {
+            $0.arrayCol.floatCol.sum == sumfloatCol
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.floatCol >= %@", values: [Float(7.55444333)], expectedCount: 1) {
+            $0.arrayCol.floatCol.sum >= Float(7.55444333)
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.floatCol >= %@", values: [sumfloatCol], expectedCount: 1) {
+            $0.arrayCol.floatCol.sum >= sumfloatCol
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.floatCol <= %@", values: [Float(7.55444333)], expectedCount: 3) {
+            $0.arrayCol.floatCol.sum <= Float(7.55444333)
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.floatCol <= %@", values: [sumfloatCol], expectedCount: 4) {
+            $0.arrayCol.floatCol.sum <= sumfloatCol
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@sum.floatCol != %@", values: [sumfloatCol], expectedCount: 3) {
+            $0.arrayCol.floatCol.sum != sumfloatCol
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.floatCol != %@", values: [Float(5.55444333)], expectedCount: 4) {
+            $0.arrayCol.floatCol.sum != Float(5.55444333)
+        }
+        
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["doubleCol": 5.55444333])
+            let modernObj1 = ModernAllTypesObject(value: ["doubleCol": 6.55444333])
+            let modernObj2 = ModernAllTypesObject(value: ["doubleCol": 7.55444333])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+        
+        let sumdoubleCol = 5.55444333 + 6.55444333 + 7.55444333
+        assertQuery(predicate: "arrayCol.@sum.doubleCol > %@", values: [7.55444333], expectedCount: 1) {
+            $0.arrayCol.doubleCol.sum > 7.55444333
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.doubleCol < %@", values: [7.55444333], expectedCount: 3) {
+            $0.arrayCol.doubleCol.sum < 7.55444333
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.doubleCol == %@", values: [7.55444333], expectedCount: 0) {
+            $0.arrayCol.doubleCol.sum == 7.55444333
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.doubleCol == %@", values: [sumdoubleCol], expectedCount: 1) {
+            $0.arrayCol.doubleCol.sum == sumdoubleCol
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.doubleCol >= %@", values: [7.55444333], expectedCount: 1) {
+            $0.arrayCol.doubleCol.sum >= 7.55444333
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.doubleCol >= %@", values: [sumdoubleCol], expectedCount: 1) {
+            $0.arrayCol.doubleCol.sum >= sumdoubleCol
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.doubleCol <= %@", values: [7.55444333], expectedCount: 3) {
+            $0.arrayCol.doubleCol.sum <= 7.55444333
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.doubleCol <= %@", values: [sumdoubleCol], expectedCount: 4) {
+            $0.arrayCol.doubleCol.sum <= sumdoubleCol
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@sum.doubleCol != %@", values: [sumdoubleCol], expectedCount: 3) {
+            $0.arrayCol.doubleCol.sum != sumdoubleCol
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.doubleCol != %@", values: [5.55444333], expectedCount: 4) {
+            $0.arrayCol.doubleCol.sum != 5.55444333
+        }
+        
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["decimalCol": Decimal128(123.456)])
+            let modernObj1 = ModernAllTypesObject(value: ["decimalCol": Decimal128(234.456)])
+            let modernObj2 = ModernAllTypesObject(value: ["decimalCol": Decimal128(345.456)])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+        
+        let sumdecimalCol = Decimal128(123.456) + Decimal128(234.456) + Decimal128(345.456)
+        assertQuery(predicate: "arrayCol.@sum.decimalCol > %@", values: [Decimal128(345.456)], expectedCount: 1) {
+            $0.arrayCol.decimalCol.sum > Decimal128(345.456)
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.decimalCol < %@", values: [Decimal128(345.456)], expectedCount: 3) {
+            $0.arrayCol.decimalCol.sum < Decimal128(345.456)
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.decimalCol == %@", values: [Decimal128(345.456)], expectedCount: 0) {
+            $0.arrayCol.decimalCol.sum == Decimal128(345.456)
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.decimalCol == %@", values: [sumdecimalCol], expectedCount: 1) {
+            $0.arrayCol.decimalCol.sum == sumdecimalCol
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.decimalCol >= %@", values: [Decimal128(345.456)], expectedCount: 1) {
+            $0.arrayCol.decimalCol.sum >= Decimal128(345.456)
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.decimalCol >= %@", values: [sumdecimalCol], expectedCount: 1) {
+            $0.arrayCol.decimalCol.sum >= sumdecimalCol
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.decimalCol <= %@", values: [Decimal128(345.456)], expectedCount: 3) {
+            $0.arrayCol.decimalCol.sum <= Decimal128(345.456)
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.decimalCol <= %@", values: [sumdecimalCol], expectedCount: 4) {
+            $0.arrayCol.decimalCol.sum <= sumdecimalCol
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@sum.decimalCol != %@", values: [sumdecimalCol], expectedCount: 3) {
+            $0.arrayCol.decimalCol.sum != sumdecimalCol
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.decimalCol != %@", values: [Decimal128(123.456)], expectedCount: 4) {
+            $0.arrayCol.decimalCol.sum != Decimal128(123.456)
+        }
+        
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["optIntCol": 5])
+            let modernObj1 = ModernAllTypesObject(value: ["optIntCol": 6])
+            let modernObj2 = ModernAllTypesObject(value: ["optIntCol": 7])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+        
+        let sumoptIntCol = 5 + 6 + 7
+        assertQuery(predicate: "arrayCol.@sum.optIntCol > %@", values: [7], expectedCount: 1) {
+            $0.arrayCol.optIntCol.sum > 7
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.optIntCol < %@", values: [7], expectedCount: 3) {
+            $0.arrayCol.optIntCol.sum < 7
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.optIntCol == %@", values: [7], expectedCount: 0) {
+            $0.arrayCol.optIntCol.sum == 7
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.optIntCol == %@", values: [sumoptIntCol], expectedCount: 1) {
+            $0.arrayCol.optIntCol.sum == sumoptIntCol
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.optIntCol >= %@", values: [7], expectedCount: 1) {
+            $0.arrayCol.optIntCol.sum >= 7
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.optIntCol >= %@", values: [sumoptIntCol], expectedCount: 1) {
+            $0.arrayCol.optIntCol.sum >= sumoptIntCol
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.optIntCol <= %@", values: [7], expectedCount: 3) {
+            $0.arrayCol.optIntCol.sum <= 7
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.optIntCol <= %@", values: [sumoptIntCol], expectedCount: 4) {
+            $0.arrayCol.optIntCol.sum <= sumoptIntCol
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@sum.optIntCol != %@", values: [sumoptIntCol], expectedCount: 3) {
+            $0.arrayCol.optIntCol.sum != sumoptIntCol
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.optIntCol != %@", values: [5], expectedCount: 4) {
+            $0.arrayCol.optIntCol.sum != 5
+        }
+        
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["optInt8Col": Int8(8)])
+            let modernObj1 = ModernAllTypesObject(value: ["optInt8Col": Int8(9)])
+            let modernObj2 = ModernAllTypesObject(value: ["optInt8Col": Int8(10)])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+        
+        let sumoptInt8Col = Int8(8) + Int8(9) + Int8(10)
+        assertQuery(predicate: "arrayCol.@sum.optInt8Col > %@", values: [Int8(10)], expectedCount: 1) {
+            $0.arrayCol.optInt8Col.sum > Int8(10)
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.optInt8Col < %@", values: [Int8(10)], expectedCount: 3) {
+            $0.arrayCol.optInt8Col.sum < Int8(10)
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.optInt8Col == %@", values: [Int8(10)], expectedCount: 0) {
+            $0.arrayCol.optInt8Col.sum == Int8(10)
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.optInt8Col == %@", values: [sumoptInt8Col], expectedCount: 1) {
+            $0.arrayCol.optInt8Col.sum == sumoptInt8Col
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.optInt8Col >= %@", values: [Int8(10)], expectedCount: 1) {
+            $0.arrayCol.optInt8Col.sum >= Int8(10)
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.optInt8Col >= %@", values: [sumoptInt8Col], expectedCount: 1) {
+            $0.arrayCol.optInt8Col.sum >= sumoptInt8Col
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.optInt8Col <= %@", values: [Int8(10)], expectedCount: 3) {
+            $0.arrayCol.optInt8Col.sum <= Int8(10)
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.optInt8Col <= %@", values: [sumoptInt8Col], expectedCount: 4) {
+            $0.arrayCol.optInt8Col.sum <= sumoptInt8Col
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@sum.optInt8Col != %@", values: [sumoptInt8Col], expectedCount: 3) {
+            $0.arrayCol.optInt8Col.sum != sumoptInt8Col
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.optInt8Col != %@", values: [Int8(8)], expectedCount: 4) {
+            $0.arrayCol.optInt8Col.sum != Int8(8)
+        }
+        
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["optInt16Col": Int16(16)])
+            let modernObj1 = ModernAllTypesObject(value: ["optInt16Col": Int16(17)])
+            let modernObj2 = ModernAllTypesObject(value: ["optInt16Col": Int16(18)])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+        
+        let sumoptInt16Col = Int16(16) + Int16(17) + Int16(18)
+        assertQuery(predicate: "arrayCol.@sum.optInt16Col > %@", values: [Int16(18)], expectedCount: 1) {
+            $0.arrayCol.optInt16Col.sum > Int16(18)
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.optInt16Col < %@", values: [Int16(18)], expectedCount: 3) {
+            $0.arrayCol.optInt16Col.sum < Int16(18)
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.optInt16Col == %@", values: [Int16(18)], expectedCount: 0) {
+            $0.arrayCol.optInt16Col.sum == Int16(18)
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.optInt16Col == %@", values: [sumoptInt16Col], expectedCount: 1) {
+            $0.arrayCol.optInt16Col.sum == sumoptInt16Col
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.optInt16Col >= %@", values: [Int16(18)], expectedCount: 1) {
+            $0.arrayCol.optInt16Col.sum >= Int16(18)
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.optInt16Col >= %@", values: [sumoptInt16Col], expectedCount: 1) {
+            $0.arrayCol.optInt16Col.sum >= sumoptInt16Col
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.optInt16Col <= %@", values: [Int16(18)], expectedCount: 3) {
+            $0.arrayCol.optInt16Col.sum <= Int16(18)
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.optInt16Col <= %@", values: [sumoptInt16Col], expectedCount: 4) {
+            $0.arrayCol.optInt16Col.sum <= sumoptInt16Col
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@sum.optInt16Col != %@", values: [sumoptInt16Col], expectedCount: 3) {
+            $0.arrayCol.optInt16Col.sum != sumoptInt16Col
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.optInt16Col != %@", values: [Int16(16)], expectedCount: 4) {
+            $0.arrayCol.optInt16Col.sum != Int16(16)
+        }
+        
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["optInt32Col": Int32(32)])
+            let modernObj1 = ModernAllTypesObject(value: ["optInt32Col": Int32(33)])
+            let modernObj2 = ModernAllTypesObject(value: ["optInt32Col": Int32(34)])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+        
+        let sumoptInt32Col = Int32(32) + Int32(33) + Int32(34)
+        assertQuery(predicate: "arrayCol.@sum.optInt32Col > %@", values: [Int32(34)], expectedCount: 1) {
+            $0.arrayCol.optInt32Col.sum > Int32(34)
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.optInt32Col < %@", values: [Int32(34)], expectedCount: 3) {
+            $0.arrayCol.optInt32Col.sum < Int32(34)
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.optInt32Col == %@", values: [Int32(34)], expectedCount: 0) {
+            $0.arrayCol.optInt32Col.sum == Int32(34)
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.optInt32Col == %@", values: [sumoptInt32Col], expectedCount: 1) {
+            $0.arrayCol.optInt32Col.sum == sumoptInt32Col
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.optInt32Col >= %@", values: [Int32(34)], expectedCount: 1) {
+            $0.arrayCol.optInt32Col.sum >= Int32(34)
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.optInt32Col >= %@", values: [sumoptInt32Col], expectedCount: 1) {
+            $0.arrayCol.optInt32Col.sum >= sumoptInt32Col
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.optInt32Col <= %@", values: [Int32(34)], expectedCount: 3) {
+            $0.arrayCol.optInt32Col.sum <= Int32(34)
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.optInt32Col <= %@", values: [sumoptInt32Col], expectedCount: 4) {
+            $0.arrayCol.optInt32Col.sum <= sumoptInt32Col
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@sum.optInt32Col != %@", values: [sumoptInt32Col], expectedCount: 3) {
+            $0.arrayCol.optInt32Col.sum != sumoptInt32Col
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.optInt32Col != %@", values: [Int32(32)], expectedCount: 4) {
+            $0.arrayCol.optInt32Col.sum != Int32(32)
+        }
+        
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["optInt64Col": Int64(64)])
+            let modernObj1 = ModernAllTypesObject(value: ["optInt64Col": Int64(65)])
+            let modernObj2 = ModernAllTypesObject(value: ["optInt64Col": Int64(66)])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+        
+        let sumoptInt64Col = Int64(64) + Int64(65) + Int64(66)
+        assertQuery(predicate: "arrayCol.@sum.optInt64Col > %@", values: [Int64(66)], expectedCount: 1) {
+            $0.arrayCol.optInt64Col.sum > Int64(66)
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.optInt64Col < %@", values: [Int64(66)], expectedCount: 3) {
+            $0.arrayCol.optInt64Col.sum < Int64(66)
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.optInt64Col == %@", values: [Int64(66)], expectedCount: 0) {
+            $0.arrayCol.optInt64Col.sum == Int64(66)
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.optInt64Col == %@", values: [sumoptInt64Col], expectedCount: 1) {
+            $0.arrayCol.optInt64Col.sum == sumoptInt64Col
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.optInt64Col >= %@", values: [Int64(66)], expectedCount: 1) {
+            $0.arrayCol.optInt64Col.sum >= Int64(66)
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.optInt64Col >= %@", values: [sumoptInt64Col], expectedCount: 1) {
+            $0.arrayCol.optInt64Col.sum >= sumoptInt64Col
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.optInt64Col <= %@", values: [Int64(66)], expectedCount: 3) {
+            $0.arrayCol.optInt64Col.sum <= Int64(66)
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.optInt64Col <= %@", values: [sumoptInt64Col], expectedCount: 4) {
+            $0.arrayCol.optInt64Col.sum <= sumoptInt64Col
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@sum.optInt64Col != %@", values: [sumoptInt64Col], expectedCount: 3) {
+            $0.arrayCol.optInt64Col.sum != sumoptInt64Col
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.optInt64Col != %@", values: [Int64(64)], expectedCount: 4) {
+            $0.arrayCol.optInt64Col.sum != Int64(64)
+        }
+        
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["optFloatCol": Float(5.55444333)])
+            let modernObj1 = ModernAllTypesObject(value: ["optFloatCol": Float(6.55444333)])
+            let modernObj2 = ModernAllTypesObject(value: ["optFloatCol": Float(7.55444333)])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+        
+        let sumoptFloatCol = Float(5.55444333) + Float(6.55444333) + Float(7.55444333)
+        assertQuery(predicate: "arrayCol.@sum.optFloatCol > %@", values: [Float(7.55444333)], expectedCount: 1) {
+            $0.arrayCol.optFloatCol.sum > Float(7.55444333)
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.optFloatCol < %@", values: [Float(7.55444333)], expectedCount: 3) {
+            $0.arrayCol.optFloatCol.sum < Float(7.55444333)
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.optFloatCol == %@", values: [Float(7.55444333)], expectedCount: 0) {
+            $0.arrayCol.optFloatCol.sum == Float(7.55444333)
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.optFloatCol == %@", values: [sumoptFloatCol], expectedCount: 1) {
+            $0.arrayCol.optFloatCol.sum == sumoptFloatCol
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.optFloatCol >= %@", values: [Float(7.55444333)], expectedCount: 1) {
+            $0.arrayCol.optFloatCol.sum >= Float(7.55444333)
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.optFloatCol >= %@", values: [sumoptFloatCol], expectedCount: 1) {
+            $0.arrayCol.optFloatCol.sum >= sumoptFloatCol
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.optFloatCol <= %@", values: [Float(7.55444333)], expectedCount: 3) {
+            $0.arrayCol.optFloatCol.sum <= Float(7.55444333)
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.optFloatCol <= %@", values: [sumoptFloatCol], expectedCount: 4) {
+            $0.arrayCol.optFloatCol.sum <= sumoptFloatCol
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@sum.optFloatCol != %@", values: [sumoptFloatCol], expectedCount: 3) {
+            $0.arrayCol.optFloatCol.sum != sumoptFloatCol
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.optFloatCol != %@", values: [Float(5.55444333)], expectedCount: 4) {
+            $0.arrayCol.optFloatCol.sum != Float(5.55444333)
+        }
+        
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["optDoubleCol": 5.55444333])
+            let modernObj1 = ModernAllTypesObject(value: ["optDoubleCol": 6.55444333])
+            let modernObj2 = ModernAllTypesObject(value: ["optDoubleCol": 7.55444333])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+        
+        let sumoptDoubleCol = 5.55444333 + 6.55444333 + 7.55444333
+        assertQuery(predicate: "arrayCol.@sum.optDoubleCol > %@", values: [7.55444333], expectedCount: 1) {
+            $0.arrayCol.optDoubleCol.sum > 7.55444333
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.optDoubleCol < %@", values: [7.55444333], expectedCount: 3) {
+            $0.arrayCol.optDoubleCol.sum < 7.55444333
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.optDoubleCol == %@", values: [7.55444333], expectedCount: 0) {
+            $0.arrayCol.optDoubleCol.sum == 7.55444333
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.optDoubleCol == %@", values: [sumoptDoubleCol], expectedCount: 1) {
+            $0.arrayCol.optDoubleCol.sum == sumoptDoubleCol
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.optDoubleCol >= %@", values: [7.55444333], expectedCount: 1) {
+            $0.arrayCol.optDoubleCol.sum >= 7.55444333
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.optDoubleCol >= %@", values: [sumoptDoubleCol], expectedCount: 1) {
+            $0.arrayCol.optDoubleCol.sum >= sumoptDoubleCol
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.optDoubleCol <= %@", values: [7.55444333], expectedCount: 3) {
+            $0.arrayCol.optDoubleCol.sum <= 7.55444333
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.optDoubleCol <= %@", values: [sumoptDoubleCol], expectedCount: 4) {
+            $0.arrayCol.optDoubleCol.sum <= sumoptDoubleCol
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@sum.optDoubleCol != %@", values: [sumoptDoubleCol], expectedCount: 3) {
+            $0.arrayCol.optDoubleCol.sum != sumoptDoubleCol
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.optDoubleCol != %@", values: [5.55444333], expectedCount: 4) {
+            $0.arrayCol.optDoubleCol.sum != 5.55444333
+        }
+        
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["optDecimalCol": Decimal128(123.456)])
+            let modernObj1 = ModernAllTypesObject(value: ["optDecimalCol": Decimal128(234.456)])
+            let modernObj2 = ModernAllTypesObject(value: ["optDecimalCol": Decimal128(345.456)])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+        
+        let sumoptDecimalCol = Decimal128(123.456) + Decimal128(234.456) + Decimal128(345.456)
+        assertQuery(predicate: "arrayCol.@sum.optDecimalCol > %@", values: [Decimal128(345.456)], expectedCount: 1) {
+            $0.arrayCol.optDecimalCol.sum > Decimal128(345.456)
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.optDecimalCol < %@", values: [Decimal128(345.456)], expectedCount: 3) {
+            $0.arrayCol.optDecimalCol.sum < Decimal128(345.456)
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.optDecimalCol == %@", values: [Decimal128(345.456)], expectedCount: 0) {
+            $0.arrayCol.optDecimalCol.sum == Decimal128(345.456)
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.optDecimalCol == %@", values: [sumoptDecimalCol], expectedCount: 1) {
+            $0.arrayCol.optDecimalCol.sum == sumoptDecimalCol
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.optDecimalCol >= %@", values: [Decimal128(345.456)], expectedCount: 1) {
+            $0.arrayCol.optDecimalCol.sum >= Decimal128(345.456)
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.optDecimalCol >= %@", values: [sumoptDecimalCol], expectedCount: 1) {
+            $0.arrayCol.optDecimalCol.sum >= sumoptDecimalCol
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.optDecimalCol <= %@", values: [Decimal128(345.456)], expectedCount: 3) {
+            $0.arrayCol.optDecimalCol.sum <= Decimal128(345.456)
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.optDecimalCol <= %@", values: [sumoptDecimalCol], expectedCount: 4) {
+            $0.arrayCol.optDecimalCol.sum <= sumoptDecimalCol
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@sum.optDecimalCol != %@", values: [sumoptDecimalCol], expectedCount: 3) {
+            $0.arrayCol.optDecimalCol.sum != sumoptDecimalCol
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.optDecimalCol != %@", values: [Decimal128(123.456)], expectedCount: 4) {
+            $0.arrayCol.optDecimalCol.sum != Decimal128(123.456)
+        }
+    }
+
 }

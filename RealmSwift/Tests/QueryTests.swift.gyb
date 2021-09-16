@@ -2056,4 +2056,662 @@ class QueryTests: TestCase {
         }
         assertThrows(query(Query<ModernAllTypesObject>())._constructPredicate(), reason: "Subquery predicates will only work on one collection at a time.")
     }
+
+    // MARK: Collection Aggregations
+
+    func testCollectionAggregatesAvg() {
+        let realm = realmWithTestPath()
+        let object = objects().first!
+        % for property in listProperties + optListProperties:
+        % if property.enumName == None and property.category == 'numeric':
+        % if property.type != 'Date' and property.type != 'Date?':
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["${property.colName}": [${property.value(0)}, ${property.value(1)}, ${property.value(2)}]])
+            if let oldObject = object.objectCol {
+                realm.delete(oldObject)
+            }
+            object.objectCol = modernObj
+        }
+
+        assertQuery(predicate: "objectCol.${property.colName}.@avg > %@", values: [${property.value(0)}], expectedCount: 1) {
+            $0.objectCol.${property.colName}.avg > ${property.value(0)}
+        }
+
+        assertQuery(predicate: "objectCol.${property.colName}.@avg < %@", values: [${property.value(2)}], expectedCount: 1) {
+            $0.objectCol.${property.colName}.avg < ${property.value(2)}
+        }
+
+        assertQuery(predicate: "objectCol.${property.colName}.@avg == %@", values: [${property.value(1)}], expectedCount: 1) {
+            $0.objectCol.${property.colName}.avg == ${property.value(1)}
+        }
+
+        assertQuery(predicate: "objectCol.${property.colName}.@avg >= %@", values: [${property.value(0)}], expectedCount: 1) {
+            $0.objectCol.${property.colName}.avg >= ${property.value(0)}
+        }
+
+        assertQuery(predicate: "objectCol.${property.colName}.@avg >= %@", values: [${property.value(1)}], expectedCount: 1) {
+            $0.objectCol.${property.colName}.avg >= ${property.value(1)}
+        }
+
+        assertQuery(predicate: "objectCol.${property.colName}.@avg <= %@", values: [${property.value(2)}], expectedCount: 1) {
+            $0.objectCol.${property.colName}.avg <= ${property.value(2)}
+        }
+
+        assertQuery(predicate: "objectCol.${property.colName}.@avg <= %@", values: [${property.value(1)}], expectedCount: 1) {
+            $0.objectCol.${property.colName}.avg <= ${property.value(1)}
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "objectCol.${property.colName}.@avg != %@", values: [${property.value(1)}], expectedCount: 1) {
+            $0.objectCol.${property.colName}.avg != ${property.value(1)}
+        }
+
+        assertQuery(predicate: "objectCol.${property.colName}.@avg != %@", values: [${property.value(0)}], expectedCount: 2) {
+            $0.objectCol.${property.colName}.avg != ${property.value(0)}
+        }
+        % end
+        % end
+        % end
+    }
+
+    func testCollectionAvg() {
+        let realm = realmWithTestPath()
+        let object = objects().first!
+        % for property in listProperties + optListProperties:
+        % if property.enumName == None and property.category == 'numeric':
+        % if property.type != 'Date' and property.type != 'Date?':
+
+        try! realm.write {
+            object.${property.colName}.removeAll()
+            object.${property.colName}.append(objectsIn: [${property.value(0)}, ${property.value(1)}, ${property.value(2)}])
+        }
+
+        assertQuery(predicate: "${property.colName}.@avg > %@", values: [${property.value(0)}], expectedCount: 1) {
+            $0.${property.colName}.avg > ${property.value(0)}
+        }
+
+        assertQuery(predicate: "${property.colName}.@avg < %@", values: [${property.value(2)}], expectedCount: 1) {
+            $0.${property.colName}.avg < ${property.value(2)}
+        }
+
+        assertQuery(predicate: "${property.colName}.@avg == %@", values: [${property.value(1)}], expectedCount: 1) {
+            $0.${property.colName}.avg == ${property.value(1)}
+        }
+
+        assertQuery(predicate: "${property.colName}.@avg >= %@", values: [${property.value(0)}], expectedCount: 1) {
+            $0.${property.colName}.avg >= ${property.value(0)}
+        }
+
+        assertQuery(predicate: "${property.colName}.@avg >= %@", values: [${property.value(1)}], expectedCount: 1) {
+            $0.${property.colName}.avg >= ${property.value(1)}
+        }
+
+        assertQuery(predicate: "${property.colName}.@avg <= %@", values: [${property.value(2)}], expectedCount: 1) {
+            $0.${property.colName}.avg <= ${property.value(2)}
+        }
+
+        assertQuery(predicate: "${property.colName}.@avg <= %@", values: [${property.value(1)}], expectedCount: 1) {
+            $0.${property.colName}.avg <= ${property.value(1)}
+        }
+
+        assertQuery(predicate: "${property.colName}.@avg != %@", values: [${property.value(1)}], expectedCount: 0) {
+            $0.${property.colName}.avg != ${property.value(1)}
+        }
+
+        assertQuery(predicate: "${property.colName}.@avg != %@", values: [${property.value(0)}], expectedCount: 1) {
+            $0.${property.colName}.avg != ${property.value(0)}
+        }
+        % end
+        % end
+        % end
+    }
+
+    func testCollectionAggregatesMin() {
+        let realm = realmWithTestPath()
+        let object = objects().first!
+        % for property in listProperties + optListProperties:
+        % if property.enumName == None and property.category == 'numeric':
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["${property.colName}": [${property.value(0)}, ${property.value(1)}, ${property.value(2)}]])
+            if let oldObject = object.objectCol {
+                realm.delete(oldObject)
+            }
+            object.objectCol = modernObj
+        }
+        assertQuery(predicate: "objectCol.${property.colName}.@min > %@", values: [${property.value(0)}], expectedCount: 0) {
+            $0.objectCol.${property.colName}.min > ${property.value(0)}
+        }
+
+        assertQuery(predicate: "objectCol.${property.colName}.@min < %@", values: [${property.value(2)}], expectedCount: 1) {
+            $0.objectCol.${property.colName}.min < ${property.value(2)}
+        }
+
+        assertQuery(predicate: "objectCol.${property.colName}.@min == %@", values: [${property.value(0)}], expectedCount: 1) {
+            $0.objectCol.${property.colName}.min == ${property.value(0)}
+        }
+
+        assertQuery(predicate: "objectCol.${property.colName}.@min >= %@", values: [${property.value(1)}], expectedCount: 0) {
+            $0.objectCol.${property.colName}.min >= ${property.value(1)}
+        }
+
+        assertQuery(predicate: "objectCol.${property.colName}.@min >= %@", values: [${property.value(0)}], expectedCount: 1) {
+            $0.objectCol.${property.colName}.min >= ${property.value(0)}
+        }
+
+        assertQuery(predicate: "objectCol.${property.colName}.@min <= %@", values: [${property.value(2)}], expectedCount: 1) {
+            $0.objectCol.${property.colName}.min <= ${property.value(2)}
+        }
+
+        assertQuery(predicate: "objectCol.${property.colName}.@min <= %@", values: [${property.value(0)}], expectedCount: 1) {
+            $0.objectCol.${property.colName}.min <= ${property.value(0)}
+        }
+
+        assertQuery(predicate: "objectCol.${property.colName}.@min != %@", values: [${property.value(0)}], expectedCount: 1) {
+            $0.objectCol.${property.colName}.min != ${property.value(0)}
+        }
+
+        assertQuery(predicate: "objectCol.${property.colName}.@min != %@", values: [${property.value(2)}], expectedCount: 2) {
+            $0.objectCol.${property.colName}.min != ${property.value(2)}
+        }
+        % end
+        % end
+    }
+
+    func testCollectionMin() {
+        let realm = realmWithTestPath()
+        let object = objects().first!
+        % for property in listProperties + optListProperties:
+        % if property.enumName == None and property.category == 'numeric':
+
+        try! realm.write {
+            object.${property.colName}.removeAll()
+            object.${property.colName}.append(objectsIn: [${property.value(0)}, ${property.value(1)}, ${property.value(2)}])
+        }
+
+        assertQuery(predicate: "${property.colName}.@min > %@", values: [${property.value(0)}], expectedCount: 0) {
+            $0.${property.colName}.min > ${property.value(0)}
+        }
+
+        assertQuery(predicate: "${property.colName}.@min < %@", values: [${property.value(2)}], expectedCount: 1) {
+            $0.${property.colName}.min < ${property.value(2)}
+        }
+
+        assertQuery(predicate: "${property.colName}.@min == %@", values: [${property.value(0)}], expectedCount: 1) {
+            $0.${property.colName}.min == ${property.value(0)}
+        }
+
+        assertQuery(predicate: "${property.colName}.@min >= %@", values: [${property.value(1)}], expectedCount: 0) {
+            $0.${property.colName}.min >= ${property.value(1)}
+        }
+
+        assertQuery(predicate: "${property.colName}.@min >= %@", values: [${property.value(0)}], expectedCount: 1) {
+            $0.${property.colName}.min >= ${property.value(0)}
+        }
+
+        assertQuery(predicate: "${property.colName}.@min <= %@", values: [${property.value(2)}], expectedCount: 1) {
+            $0.${property.colName}.min <= ${property.value(2)}
+        }
+
+        assertQuery(predicate: "${property.colName}.@min <= %@", values: [${property.value(0)}], expectedCount: 1) {
+            $0.${property.colName}.min <= ${property.value(0)}
+        }
+
+        assertQuery(predicate: "${property.colName}.@min != %@", values: [${property.value(0)}], expectedCount: 0) {
+            $0.${property.colName}.min != ${property.value(0)}
+        }
+
+        assertQuery(predicate: "${property.colName}.@min != %@", values: [${property.value(2)}], expectedCount: 1) {
+            $0.${property.colName}.min != ${property.value(2)}
+        }
+        % end
+        % end
+    }
+
+    func testCollectionAggregatesMax() {
+        let realm = realmWithTestPath()
+        let object = objects().first!
+        % for property in listProperties + optListProperties:
+        % if property.enumName == None and property.category == 'numeric':
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["${property.colName}": [${property.value(0)}, ${property.value(1)}, ${property.value(2)}]])
+            if let oldObject = object.objectCol {
+                realm.delete(oldObject)
+            }
+            object.objectCol = modernObj
+        }
+        assertQuery(predicate: "objectCol.${property.colName}.@max > %@", values: [${property.value(0)}], expectedCount: 1) {
+            $0.objectCol.${property.colName}.max > ${property.value(0)}
+        }
+
+        assertQuery(predicate: "objectCol.${property.colName}.@max < %@", values: [${property.value(2)}], expectedCount: 0) {
+            $0.objectCol.${property.colName}.max < ${property.value(2)}
+        }
+
+        assertQuery(predicate: "objectCol.${property.colName}.@max == %@", values: [${property.value(2)}], expectedCount: 1) {
+            $0.objectCol.${property.colName}.max == ${property.value(2)}
+        }
+
+        assertQuery(predicate: "objectCol.${property.colName}.@max >= %@", values: [${property.value(0)}], expectedCount: 1) {
+            $0.objectCol.${property.colName}.max >= ${property.value(0)}
+        }
+
+        assertQuery(predicate: "objectCol.${property.colName}.@max >= %@", values: [${property.value(2)}], expectedCount: 1) {
+            $0.objectCol.${property.colName}.max >= ${property.value(2)}
+        }
+
+        assertQuery(predicate: "objectCol.${property.colName}.@max <= %@", values: [${property.value(1)}], expectedCount: 0) {
+            $0.objectCol.${property.colName}.max <= ${property.value(1)}
+        }
+
+        assertQuery(predicate: "objectCol.${property.colName}.@max <= %@", values: [${property.value(2)}], expectedCount: 1) {
+            $0.objectCol.${property.colName}.max <= ${property.value(2)}
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "objectCol.${property.colName}.@max != %@", values: [${property.value(2)}], expectedCount: 1) {
+            $0.objectCol.${property.colName}.max != ${property.value(2)}
+        }
+
+        assertQuery(predicate: "objectCol.${property.colName}.@max != %@", values: [${property.value(0)}], expectedCount: 2) {
+            $0.objectCol.${property.colName}.max != ${property.value(0)}
+        }
+        % end
+        % end
+    }
+
+    func testCollectionMax() {
+        let realm = realmWithTestPath()
+        let object = objects().first!
+        % for property in listProperties + optListProperties:
+        % if property.enumName == None and property.category == 'numeric':
+
+        try! realm.write {
+            object.${property.colName}.removeAll()
+            object.${property.colName}.append(objectsIn: [${property.value(0)}, ${property.value(1)}, ${property.value(2)}])
+        }
+
+        assertQuery(predicate: "${property.colName}.@max > %@", values: [${property.value(0)}], expectedCount: 1) {
+            $0.${property.colName}.max > ${property.value(0)}
+        }
+
+        assertQuery(predicate: "${property.colName}.@max < %@", values: [${property.value(2)}], expectedCount: 0) {
+            $0.${property.colName}.max < ${property.value(2)}
+        }
+
+        assertQuery(predicate: "${property.colName}.@max == %@", values: [${property.value(2)}], expectedCount: 1) {
+            $0.${property.colName}.max == ${property.value(2)}
+        }
+
+        assertQuery(predicate: "${property.colName}.@max >= %@", values: [${property.value(0)}], expectedCount: 1) {
+            $0.${property.colName}.max >= ${property.value(0)}
+        }
+
+        assertQuery(predicate: "${property.colName}.@max >= %@", values: [${property.value(2)}], expectedCount: 1) {
+            $0.${property.colName}.max >= ${property.value(2)}
+        }
+
+        assertQuery(predicate: "${property.colName}.@max <= %@", values: [${property.value(1)}], expectedCount: 0) {
+            $0.${property.colName}.max <= ${property.value(1)}
+        }
+
+        assertQuery(predicate: "${property.colName}.@max <= %@", values: [${property.value(2)}], expectedCount: 1) {
+            $0.${property.colName}.max <= ${property.value(2)}
+        }
+
+        assertQuery(predicate: "${property.colName}.@max != %@", values: [${property.value(2)}], expectedCount: 0) {
+            $0.${property.colName}.max != ${property.value(2)}
+        }
+
+        assertQuery(predicate: "${property.colName}.@max != %@", values: [${property.value(0)}], expectedCount: 1) {
+            $0.${property.colName}.max != ${property.value(0)}
+        }
+        % end
+        % end
+    }
+
+    func testCollectionAggregatesSum() {
+        let realm = realmWithTestPath()
+        let object = objects().first!
+        % for property in listProperties + optListProperties:
+        % if property.enumName == None and property.category == 'numeric':
+        % if property.type != 'Date' and property.type != 'Date?':
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["${property.colName}": [${property.value(0)}, ${property.value(1)}, ${property.value(2)}]])
+            if let oldObject = object.objectCol {
+                realm.delete(oldObject)
+            }
+            object.objectCol = modernObj
+        }
+
+        let sum${property.colName} = ${property.value(0)} + ${property.value(1)} + ${property.value(2)}
+        assertQuery(predicate: "objectCol.${property.colName}.@sum > %@", values: [${property.value(2)}], expectedCount: 1) {
+            $0.objectCol.${property.colName}.sum > ${property.value(2)}
+        }
+
+        assertQuery(predicate: "objectCol.${property.colName}.@sum < %@", values: [${property.value(2)}], expectedCount: 1) {
+            $0.objectCol.${property.colName}.sum < ${property.value(2)}
+        }
+
+        assertQuery(predicate: "objectCol.${property.colName}.@sum == %@", values: [${property.value(2)}], expectedCount: 0) {
+            $0.objectCol.${property.colName}.sum == ${property.value(2)}
+        }
+
+        assertQuery(predicate: "objectCol.${property.colName}.@sum == %@", values: [sum${property.colName}], expectedCount: 1) {
+            $0.objectCol.${property.colName}.sum == sum${property.colName}
+        }
+
+        assertQuery(predicate: "objectCol.${property.colName}.@sum >= %@", values: [${property.value(2)}], expectedCount: 1) {
+            $0.objectCol.${property.colName}.sum >= ${property.value(2)}
+        }
+
+        assertQuery(predicate: "objectCol.${property.colName}.@sum >= %@", values: [sum${property.colName}], expectedCount: 1) {
+            $0.objectCol.${property.colName}.sum >= sum${property.colName}
+        }
+
+        assertQuery(predicate: "objectCol.${property.colName}.@sum <= %@", values: [${property.value(2)}], expectedCount: 1) {
+            $0.objectCol.${property.colName}.sum <= ${property.value(2)}
+        }
+
+        assertQuery(predicate: "objectCol.${property.colName}.@sum <= %@", values: [sum${property.colName}], expectedCount: 2) {
+            $0.objectCol.${property.colName}.sum <= sum${property.colName}
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "objectCol.${property.colName}.@sum != %@", values: [sum${property.colName}], expectedCount: 1) {
+            $0.objectCol.${property.colName}.sum != sum${property.colName}
+        }
+
+        assertQuery(predicate: "objectCol.${property.colName}.@sum != %@", values: [${property.value(0)}], expectedCount: 2) {
+            $0.objectCol.${property.colName}.sum != ${property.value(0)}
+        }
+        % end
+        % end
+        % end
+    }
+
+    func testCollectionSum() {
+        let realm = realmWithTestPath()
+        let object = objects().first!
+        % for property in listProperties + optListProperties:
+        % if property.enumName == None and property.category == 'numeric':
+        % if property.type != 'Date' and property.type != 'Date?':
+        try! realm.write {
+            object.${property.colName}.removeAll()
+            object.${property.colName}.append(objectsIn: [${property.value(0)}, ${property.value(1)}, ${property.value(2)}])
+        }
+
+        let sum${property.colName} = ${property.value(0)} + ${property.value(1)} + ${property.value(2)}
+        assertQuery(predicate: "${property.colName}.@sum > %@", values: [${property.value(2)}], expectedCount: 1) {
+            $0.${property.colName}.sum > ${property.value(2)}
+        }
+
+        assertQuery(predicate: "${property.colName}.@sum < %@", values: [${property.value(2)}], expectedCount: 0) {
+            $0.${property.colName}.sum < ${property.value(2)}
+        }
+
+        assertQuery(predicate: "${property.colName}.@sum == %@", values: [${property.value(2)}], expectedCount: 0) {
+            $0.${property.colName}.sum == ${property.value(2)}
+        }
+
+        assertQuery(predicate: "${property.colName}.@sum == %@", values: [sum${property.colName}], expectedCount: 1) {
+            $0.${property.colName}.sum == sum${property.colName}
+        }
+
+        assertQuery(predicate: "${property.colName}.@sum >= %@", values: [${property.value(2)}], expectedCount: 1) {
+            $0.${property.colName}.sum >= ${property.value(2)}
+        }
+
+        assertQuery(predicate: "${property.colName}.@sum >= %@", values: [sum${property.colName}], expectedCount: 1) {
+            $0.${property.colName}.sum >= sum${property.colName}
+        }
+
+        assertQuery(predicate: "${property.colName}.@sum <= %@", values: [${property.value(2)}], expectedCount: 0) {
+            $0.${property.colName}.sum <= ${property.value(2)}
+        }
+
+        assertQuery(predicate: "${property.colName}.@sum <= %@", values: [sum${property.colName}], expectedCount: 2) {
+            $0.${property.colName}.sum <= sum${property.colName}
+        }
+
+        assertQuery(predicate: "${property.colName}.@sum != %@", values: [sum${property.colName}], expectedCount: 1) {
+            $0.${property.colName}.sum != sum${property.colName}
+        }
+
+        assertQuery(predicate: "${property.colName}.@sum != %@", values: [${property.value(0)}], expectedCount: 2) {
+            $0.${property.colName}.sum != ${property.value(0)}
+        }
+        % end
+        % end
+        % end
+    }
+
+    // MARK: Keypath Collection Aggregations
+
+    func testKeypathCollectionAggregatesAvg() {
+        let realm = realmWithTestPath()
+        let object = objects().first!
+        % for property in properties + optProperties:
+        % if property.enumName == None and property.category == 'numeric':
+        % if property.type != 'Date' and property.type != 'Date?':
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["${property.colName}": ${property.value(0)}])
+            let modernObj1 = ModernAllTypesObject(value: ["${property.colName}": ${property.value(1)}])
+            let modernObj2 = ModernAllTypesObject(value: ["${property.colName}": ${property.value(2)}])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.${property.colName} > %@", values: [${property.value(0)}], expectedCount: 1) {
+            $0.arrayCol.${property.colName}.avg > ${property.value(0)}
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.${property.colName} < %@", values: [${property.value(2)}], expectedCount: 1) {
+            $0.arrayCol.${property.colName}.avg < ${property.value(2)}
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.${property.colName} == %@", values: [${property.value(1)}], expectedCount: 1) {
+            $0.arrayCol.${property.colName}.avg == ${property.value(1)}
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.${property.colName} >= %@", values: [${property.value(0)}], expectedCount: 1) {
+            $0.arrayCol.${property.colName}.avg >= ${property.value(0)}
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.${property.colName} >= %@", values: [${property.value(1)}], expectedCount: 1) {
+            $0.arrayCol.${property.colName}.avg >= ${property.value(1)}
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.${property.colName} <= %@", values: [${property.value(2)}], expectedCount: 1) {
+            $0.arrayCol.${property.colName}.avg <= ${property.value(2)}
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.${property.colName} <= %@", values: [${property.value(1)}], expectedCount: 1) {
+            $0.arrayCol.${property.colName}.avg <= ${property.value(1)}
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@avg.${property.colName} != %@", values: [${property.value(1)}], expectedCount: 3) {
+            $0.arrayCol.${property.colName}.avg != ${property.value(1)}
+        }
+
+        assertQuery(predicate: "arrayCol.@avg.${property.colName} != %@", values: [${property.value(0)}], expectedCount: 4) {
+            $0.arrayCol.${property.colName}.avg != ${property.value(0)}
+        }
+        % end
+        % end
+        % end
+    }
+
+    func testKeypathCollectionAggregatesMin() {
+        let realm = realmWithTestPath()
+        let object = objects().first!
+        % for property in properties + optProperties:
+        % if property.enumName == None and property.category == 'numeric':
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["${property.colName}": ${property.value(0)}])
+            let modernObj1 = ModernAllTypesObject(value: ["${property.colName}": ${property.value(1)}])
+            let modernObj2 = ModernAllTypesObject(value: ["${property.colName}": ${property.value(2)}])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+        assertQuery(predicate: "arrayCol.@min.${property.colName} > %@", values: [${property.value(0)}], expectedCount: 0) {
+            $0.arrayCol.${property.colName}.min > ${property.value(0)}
+        }
+
+        assertQuery(predicate: "arrayCol.@min.${property.colName} < %@", values: [${property.value(2)}], expectedCount: 1) {
+            $0.arrayCol.${property.colName}.min < ${property.value(2)}
+        }
+
+        assertQuery(predicate: "arrayCol.@min.${property.colName} == %@", values: [${property.value(0)}], expectedCount: 1) {
+            $0.arrayCol.${property.colName}.min == ${property.value(0)}
+        }
+
+        assertQuery(predicate: "arrayCol.@min.${property.colName} >= %@", values: [${property.value(1)}], expectedCount: 0) {
+            $0.arrayCol.${property.colName}.min >= ${property.value(1)}
+        }
+
+        assertQuery(predicate: "arrayCol.@min.${property.colName} >= %@", values: [${property.value(0)}], expectedCount: 1) {
+            $0.arrayCol.${property.colName}.min >= ${property.value(0)}
+        }
+
+        assertQuery(predicate: "arrayCol.@min.${property.colName} <= %@", values: [${property.value(2)}], expectedCount: 1) {
+            $0.arrayCol.${property.colName}.min <= ${property.value(2)}
+        }
+
+        assertQuery(predicate: "arrayCol.@min.${property.colName} <= %@", values: [${property.value(0)}], expectedCount: 1) {
+            $0.arrayCol.${property.colName}.min <= ${property.value(0)}
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@min.${property.colName} != %@", values: [${property.value(0)}], expectedCount: 3) {
+            $0.arrayCol.${property.colName}.min != ${property.value(0)}
+        }
+
+        assertQuery(predicate: "arrayCol.@min.${property.colName} != %@", values: [${property.value(2)}], expectedCount: 4) {
+            $0.arrayCol.${property.colName}.min != ${property.value(2)}
+        }
+        % end
+        % end
+    }
+
+    func testKeypathCollectionAggregatesMax() {
+        let realm = realmWithTestPath()
+        let object = objects().first!
+        % for property in properties + optProperties:
+        % if property.enumName == None and property.category == 'numeric':
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["${property.colName}": ${property.value(0)}])
+            let modernObj1 = ModernAllTypesObject(value: ["${property.colName}": ${property.value(1)}])
+            let modernObj2 = ModernAllTypesObject(value: ["${property.colName}": ${property.value(2)}])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+        assertQuery(predicate: "arrayCol.@max.${property.colName} > %@", values: [${property.value(0)}], expectedCount: 1) {
+            $0.arrayCol.${property.colName}.max > ${property.value(0)}
+        }
+
+        assertQuery(predicate: "arrayCol.@max.${property.colName} < %@", values: [${property.value(2)}], expectedCount: 0) {
+            $0.arrayCol.${property.colName}.max < ${property.value(2)}
+        }
+
+        assertQuery(predicate: "arrayCol.@max.${property.colName} == %@", values: [${property.value(2)}], expectedCount: 1) {
+            $0.arrayCol.${property.colName}.max == ${property.value(2)}
+        }
+
+        assertQuery(predicate: "arrayCol.@max.${property.colName} >= %@", values: [${property.value(0)}], expectedCount: 1) {
+            $0.arrayCol.${property.colName}.max >= ${property.value(0)}
+        }
+
+        assertQuery(predicate: "arrayCol.@max.${property.colName} >= %@", values: [${property.value(2)}], expectedCount: 1) {
+            $0.arrayCol.${property.colName}.max >= ${property.value(2)}
+        }
+
+        assertQuery(predicate: "arrayCol.@max.${property.colName} <= %@", values: [${property.value(1)}], expectedCount: 0) {
+            $0.arrayCol.${property.colName}.max <= ${property.value(1)}
+        }
+
+        assertQuery(predicate: "arrayCol.@max.${property.colName} <= %@", values: [${property.value(2)}], expectedCount: 1) {
+            $0.arrayCol.${property.colName}.max <= ${property.value(2)}
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@max.${property.colName} != %@", values: [${property.value(2)}], expectedCount: 3) {
+            $0.arrayCol.${property.colName}.max != ${property.value(2)}
+        }
+
+        assertQuery(predicate: "arrayCol.@max.${property.colName} != %@", values: [${property.value(0)}], expectedCount: 4) {
+            $0.arrayCol.${property.colName}.max != ${property.value(0)}
+        }
+        % end
+        % end
+    }
+
+    func testKeypathCollectionAggregatesSum() {
+        let realm = realmWithTestPath()
+        let object = objects().first!
+        % for property in properties + optProperties:
+        % if property.enumName == None and property.category == 'numeric':
+        % if property.type != 'Date' and property.type != 'Date?':
+        
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["${property.colName}": ${property.value(0)}])
+            let modernObj1 = ModernAllTypesObject(value: ["${property.colName}": ${property.value(1)}])
+            let modernObj2 = ModernAllTypesObject(value: ["${property.colName}": ${property.value(2)}])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+        
+        let sum${property.colName} = ${property.value(0)} + ${property.value(1)} + ${property.value(2)}
+        assertQuery(predicate: "arrayCol.@sum.${property.colName} > %@", values: [${property.value(2)}], expectedCount: 1) {
+            $0.arrayCol.${property.colName}.sum > ${property.value(2)}
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.${property.colName} < %@", values: [${property.value(2)}], expectedCount: 3) {
+            $0.arrayCol.${property.colName}.sum < ${property.value(2)}
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.${property.colName} == %@", values: [${property.value(2)}], expectedCount: 0) {
+            $0.arrayCol.${property.colName}.sum == ${property.value(2)}
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.${property.colName} == %@", values: [sum${property.colName}], expectedCount: 1) {
+            $0.arrayCol.${property.colName}.sum == sum${property.colName}
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.${property.colName} >= %@", values: [${property.value(2)}], expectedCount: 1) {
+            $0.arrayCol.${property.colName}.sum >= ${property.value(2)}
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.${property.colName} >= %@", values: [sum${property.colName}], expectedCount: 1) {
+            $0.arrayCol.${property.colName}.sum >= sum${property.colName}
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.${property.colName} <= %@", values: [${property.value(2)}], expectedCount: 3) {
+            $0.arrayCol.${property.colName}.sum <= ${property.value(2)}
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.${property.colName} <= %@", values: [sum${property.colName}], expectedCount: 4) {
+            $0.arrayCol.${property.colName}.sum <= sum${property.colName}
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@sum.${property.colName} != %@", values: [sum${property.colName}], expectedCount: 3) {
+            $0.arrayCol.${property.colName}.sum != sum${property.colName}
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.${property.colName} != %@", values: [${property.value(0)}], expectedCount: 4) {
+            $0.arrayCol.${property.colName}.sum != ${property.value(0)}
+        }
+        % end
+        % end
+        % end
+    }
+
 }

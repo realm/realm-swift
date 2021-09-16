@@ -787,49 +787,47 @@ extension Query where T == Bool {
 // MARK: Aggregates
 
 extension Query where T: RealmCollection,
-                      T.Element: OptionalProtocol,
-                      T.Element.Wrapped: _QueryNumeric {
-    ///
+                      T.Element: _QueryNumeric {
+    /// Returns the minimum value in the collection.
+    public var min: Query {
+        return append(tokens: [.collectionAggregation(.min)])
+    }
+
+    /// Returns the maximum value in the collection.
+    public var max: Query {
+        return append(tokens: [.collectionAggregation(.max)])
+    }
+
+    /// Returns the average in the collection.
     public var avg: Query {
         return append(tokens: [.collectionAggregation(.avg)])
     }
 
-    ///
-    public var min: Query {
-        return append(tokens: [.collectionAggregation(.min)])
-    }
-
-    ///
-    public var max: Query {
-        return append(tokens: [.collectionAggregation(.min)])
-    }
-
-    ///
+    /// Returns the sum of all the values in the collection.
     public var sum: Query {
-        return append(tokens: [.collectionAggregation(.min)])
+        return append(tokens: [.collectionAggregation(.sum)])
     }
 }
 
-extension Query where T: OptionalProtocol,
-                      T.Wrapped: _QueryNumeric {
-    ///
+extension Query where T: _QueryNumeric {
+    /// Returns the minimum value of the objects in the collection base on the keypath.
+    public var min: Query {
+        return append(tokens: [.keypathCollectionAggregation(.min)])
+    }
+
+    /// Returns the maximum value of the objects in the collection base on the keypath.
+    public var max: Query {
+        return append(tokens: [.keypathCollectionAggregation(.max)])
+    }
+
+    /// Returns the average of the objects in the collection base on the keypath.
     public var avg: Query {
         return append(tokens: [.keypathCollectionAggregation(.avg)])
     }
 
-    ///
-    public var min: Query {
-        return append(tokens: [.keypathCollectionAggregation(.min)])
-    }
-
-    ///
-    public var max: Query {
-        return append(tokens: [.keypathCollectionAggregation(.min)])
-    }
-
-    ///
+    /// Returns the sum of the objects in the collection base on the keypath.
     public var sum: Query {
-        return append(tokens: [.keypathCollectionAggregation(.min)])
+        return append(tokens: [.keypathCollectionAggregation(.sum)])
     }
 }
 
