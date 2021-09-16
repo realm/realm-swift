@@ -73,17 +73,6 @@ r `User.linkUser` methods.
 * Switch to building the Carthage release with Xcode 13.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
-* None.
-* Add additional `observe` methods for Objects and RealmCollections which take a `PartialKeyPath` type key path parameter.
-* The release package once again contains Xcode 13 binaries for iOS.
-* Added support for multi-user on `@AsyncOpen` and `@AutoOpen`.
-
-### Fixed
-* `Map<Key, Value>` did not conform to `Codable`. ([Cocoa #7418](https://github.com/realm/realm-cocoa/pull/7418), since v10.8.0)
-* Fixed "Invalid data type" assertion failure in the sync client when the
-  client recieved an AddColumn instruction from the server for an AnyRealmValue
-  property when that property already exists locally. ([Core #4873](https://github.com/realm/realm-core/issues/4873), since v10.8.0)
 
 * Fix compilation error where Swift 5.5 is available but the macOS 12 SDK was
   not. This was notable for the Xcode 13 RC. This fix adds a #canImport check
