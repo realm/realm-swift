@@ -1,7 +1,10 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+
+* Add `async` versions for `EmailPasswordAuth.callResetPasswordFunction` and `User.linkUser` methods.
+* Add `async` version for `MongoCollection` methods.
+* Add `async` support for user functions.
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
@@ -25,9 +28,6 @@ x.y.z Release notes (yyyy-MM-dd)
 ### Enhancements
 
 * Switch to building the Carthage release with Xcode 13.
-* Add `async` versions for `EmailPasswordAuth.callResetPasswordFunction` and `User.linkUser` methods.
-* Add `async` version for `MongoCollection` methods.
-* Add `async` support for user functions.
 
 ### Fixed
 
