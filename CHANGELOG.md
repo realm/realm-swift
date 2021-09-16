@@ -14,12 +14,33 @@ x.y.z Release notes (yyyy-MM-dd)
 ### Compatibility
 * Realm Studio: 11.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
-* Carthage release for Swift is built with Xcode 12.5.1.
+* Carthage release for Swift is built with Xcode 13.0.
 * CocoaPods: 1.10 or later.
-* Xcode: 12.2-13.0 beta 5.
+* Xcode: 12.2-13.0.
 
 ### Internal
 * Upgraded realm-core from ? to ?
+
+10.15.1 Release notes (2021-09-15)
+=============================================================
+
+### Enhancements
+
+* Switch to building the Carthage release with Xcode 13.
+
+### Fixed
+
+* Fix compilation error where Swift 5.5 is available but the macOS 12 SDK was
+  not. This was notable for the Xcode 13 RC. This fix adds a #canImport check
+  for the `_Concurrency` module that was not available before the macOS 12 SDK.
+
+### Compatibility
+
+* Realm Studio: 11.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 13.0.
+* CocoaPods: 1.10 or later.
+* Xcode: 12.2-13.0.
 
 10.15.0 Release notes (2021-09-10)
 =============================================================
@@ -37,6 +58,11 @@ x.y.z Release notes (yyyy-MM-dd)
 * Synchronized Realms are no longer opened twice, cutting the address space and
   file descriptors used in half.
   ([Core #4839](https://github.com/realm/realm-core/pull/4839))
+* When using the SwiftUI helper types (@ObservedRealmObject and friends) to
+  bind to an Equatable property, self-assignment no longer performs a pointless
+  write transaction. SwiftUI appears to sometimes call a Binding's set function
+  multiple times for a single UI action, so this results in significantly fewer
+  writes being performed.
 
 ### Fixed
 
@@ -52,6 +78,7 @@ x.y.z Release notes (yyyy-MM-dd)
   next run of the application could hit the assertion failure "m_state ==
   SyncUser::State::LoggedIn" when a synchronized Realm is opened with that
   user. ([Core #4875](https://github.com/realm/realm-core/issues/4875), since v10.0.0)
+* The `keyPaths:` parameter to `@ObservedResults` did not work (since v10.12.0).
 
 ### Compatibility
 

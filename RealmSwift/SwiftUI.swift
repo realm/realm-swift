@@ -26,20 +26,20 @@ import Realm.Private
 
 private func safeWrite<Value>(_ value: Value, _ block: (Value) -> Void) where Value: ThreadConfined {
     let thawed = value.realm == nil ? value : value.thaw() ?? value
-    var didStartWrite = false
-    if thawed.realm?.isInWriteTransaction == false {
-        didStartWrite = true
-        thawed.realm?.beginWrite()
-    }
-    block(thawed)
-    if didStartWrite {
-        try! thawed.realm?.commitWrite()
+    if let realm = thawed.realm, !realm.isInWriteTransaction {
+        try! realm.write {
+            block(thawed)
+        }
+    } else {
+        block(thawed)
     }
 }
 
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-private func createBinding<T: ThreadConfined, V>(_ value: T,
-                                                 forKeyPath keyPath: ReferenceWritableKeyPath<T, V>) -> Binding<V> {
+private func createBinding<T: ThreadConfined, V>(
+    _ value: T,
+    forKeyPath keyPath: ReferenceWritableKeyPath<T, V>) -> Binding<V> {
+
     guard let value = value.isFrozen ? value.thaw() : value else {
         throwRealmException("Could not bind value")
     }
@@ -48,19 +48,59 @@ private func createBinding<T: ThreadConfined, V>(_ value: T,
     // is invalidated
     var lastValue = value[keyPath: keyPath]
     return Binding(get: {
-        guard !value.isInvalidated else {
-            return lastValue
-        }
+        guard !value.isInvalidated else { return lastValue }
         lastValue = value[keyPath: keyPath]
-        if let value = lastValue as? RLMSwiftCollectionBase & ThreadConfined, !value.isInvalidated && value.realm != nil {
-            return value.freeze() as! V
+        return lastValue
+    }, set: { newValue in
+        guard !value.isInvalidated else { return }
+        safeWrite(value) { value in
+            value[keyPath: keyPath] = newValue
+        }
+    })
+}
+
+@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+private func createCollectionBinding<T: ThreadConfined, V: RLMSwiftCollectionBase & ThreadConfined>(
+    _ value: T,
+    forKeyPath keyPath: ReferenceWritableKeyPath<T, V>) -> Binding<V> {
+
+    guard let value = value.isFrozen ? value.thaw() : value else {
+        throwRealmException("Could not bind value")
+    }
+
+    var lastValue = value[keyPath: keyPath]
+    return Binding(get: {
+        guard !value.isInvalidated else { return lastValue }
+        lastValue = value[keyPath: keyPath]
+        if lastValue.realm != nil {
+            lastValue = lastValue.freeze()
         }
         return lastValue
-    },
-    set: { newValue in
-        guard !value.isInvalidated else {
-            return
+    }, set: { newValue in
+        guard !value.isInvalidated else { return }
+        safeWrite(value) { value in
+            value[keyPath: keyPath] = newValue
         }
+    })
+}
+
+@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+private func createEquatableBinding<T: ThreadConfined, V: Equatable>(
+    _ value: T,
+    forKeyPath keyPath: ReferenceWritableKeyPath<T, V>) -> Binding<V> {
+
+    guard let value = value.isFrozen ? value.thaw() : value else {
+        throwRealmException("Could not bind value")
+    }
+
+    var lastValue = value[keyPath: keyPath]
+    return Binding(get: {
+        guard !value.isInvalidated else { return lastValue }
+        lastValue = value[keyPath: keyPath]
+        return lastValue
+    }, set: { newValue in
+        guard !value.isInvalidated else { return }
+        guard value[keyPath: keyPath] != newValue else { return }
         safeWrite(value) { value in
             value[keyPath: keyPath] = newValue
         }
@@ -188,6 +228,7 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
     init(_ value: ObservedType, _ keyPaths: [String]? = nil) {
         self.value = value.realm != nil && !value.isInvalidated ? value.thaw() ?? value : value
         self.objectWillChange = ObservableStoragePublisher(value, keyPaths)
+        self.keyPaths = keyPaths
     }
 }
 
@@ -309,7 +350,6 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 @propertyWrapper public struct ObservedResults<ResultType>: DynamicProperty, BoundCollection where ResultType: Object & Identifiable {
     private class Storage: ObservableStorage<Results<ResultType>> {
-
         var setupHasRun = false
 
         private func didSet() {
@@ -410,10 +450,25 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
         /// Returns a binding to the resulting value of a given key path.
         ///
         /// - Parameter keyPath  : A key path to a specific resulting value.
-        ///
         /// - Returns: A new binding.
         public subscript<Subject>(dynamicMember keyPath: ReferenceWritableKeyPath<ObjectType, Subject>) -> Binding<Subject> {
             createBinding(wrappedValue, forKeyPath: keyPath)
+        }
+        /// Returns a binding to the resulting equatable value of a given key path.
+        ///
+        /// This binding's set() will only perform a write if the new value is different from the existing value.
+        ///
+        /// - Parameter keyPath  : A key path to a specific resulting value.
+        /// - Returns: A new binding.
+        public subscript<Subject: Equatable>(dynamicMember keyPath: ReferenceWritableKeyPath<ObjectType, Subject>) -> Binding<Subject> {
+            createEquatableBinding(wrappedValue, forKeyPath: keyPath)
+        }
+        /// Returns a binding to the resulting collection value of a given key path.
+        ///
+        /// - Parameter keyPath  : A key path to a specific resulting value.
+        /// - Returns: A new binding.
+        public subscript<Subject: RLMSwiftCollectionBase & ThreadConfined>(dynamicMember keyPath: ReferenceWritableKeyPath<ObjectType, Subject>) -> Binding<Subject> {
+            createCollectionBinding(wrappedValue, forKeyPath: keyPath)
         }
     }
     /// The object to observe.
@@ -470,6 +525,14 @@ extension Binding where Value: ObjectBase & ThreadConfined {
     /// :nodoc:
     public subscript<V>(dynamicMember member: ReferenceWritableKeyPath<Value, V>) -> Binding<V> where V: _Persistable {
         createBinding(wrappedValue, forKeyPath: member)
+    }
+    /// :nodoc:
+    public subscript<V>(dynamicMember member: ReferenceWritableKeyPath<Value, V>) -> Binding<V> where V: _Persistable & RLMSwiftCollectionBase & ThreadConfined {
+        createCollectionBinding(wrappedValue, forKeyPath: member)
+    }
+    /// :nodoc:
+    public subscript<V>(dynamicMember member: ReferenceWritableKeyPath<Value, V>) -> Binding<V> where V: _Persistable & Equatable {
+        createEquatableBinding(wrappedValue, forKeyPath: member)
     }
 }
 
@@ -655,8 +718,12 @@ extension ThreadConfined where Self: ObjectBase {
      - parameter keyPath The key path to the member property.
      - returns A `Binding` to the member property.
      */
-    public func bind<V: _Persistable>(_ keyPath: ReferenceWritableKeyPath<Self, V>) -> Binding<V> {
-        createBinding(self.realm != nil ? self.thaw() ?? self : self, forKeyPath: keyPath)
+    public func bind<V: _Persistable & Equatable>(_ keyPath: ReferenceWritableKeyPath<Self, V>) -> Binding<V> {
+        createEquatableBinding(self, forKeyPath: keyPath)
+    }
+    /// :nodoc:
+    public func bind<V: _Persistable & RLMSwiftCollectionBase & ThreadConfined>(_ keyPath: ReferenceWritableKeyPath<Self, V>) -> Binding<V> {
+        createCollectionBinding(self, forKeyPath: keyPath)
     }
 }
 
