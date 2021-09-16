@@ -317,16 +317,18 @@ public typealias Provider = RLMIdentityProvider
     }
 }
 
-/// Structure providing an interface to been able to return a `callable` for a MongoDB Realm function.
+/// Structure enabling the following syntactic sugar for user functions:
+///
+///     guard case let .int32(sum) = try await user.functions.sum([1, 2, 3, 4, 5]) else {
+///        return
+///     }
+///
+/// The dynamic member name (`sum` in the above example) is provided by `@dynamicMemberLookup`
+/// which is directly associated with the function name.
 @dynamicCallable
 public struct FunctionCallable {
     fileprivate let name: String
     fileprivate let user: User
-
-    /// :nodoc:
-    public func dynamicallyCall(withArguments args: [Never]) {
-        /// Dummy implementation for @dynamicCallable
-    }
 
     #if !(os(iOS) && (arch(i386) || arch(arm)))
     /// The implementation of @dynamicCallable that allows  for `Future<AnyBSON, Error>` callable return.
@@ -349,6 +351,11 @@ public struct FunctionCallable {
                 }
             }
         }
+    }
+    #else
+    /// :nodoc:
+    public func dynamicallyCall(withArguments args: [Never]) {
+        //   noop
     }
     #endif
 }
