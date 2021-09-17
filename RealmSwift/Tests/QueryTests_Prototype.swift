@@ -265,6 +265,7 @@ class QueryTests_Prototype: TestCase {
     }
 
     func test() {
+    func testAggregates() {
         let predicate = "arrayCol.@avg.intCol > 60"
         let result = objects().filter(predicate)
         XCTAssertEqual(result.count, 1)

@@ -66,7 +66,7 @@ import RealmSwift
         Property('dateCol', ['Date(timeIntervalSince1970: 1000000)', 'Date(timeIntervalSince1970: 2000000)', 'Date(timeIntervalSince1970: 3000000)'], 'Date', 'numeric'),
         Property('decimalCol', ['Decimal128(123.456)', 'Decimal128(234.567)', 'Decimal128(345.678)'], 'Decimal128', 'numeric'),
         Property('objectIdCol', ['ObjectId("61184062c1d8f096a3695046")', 'ObjectId("61184062c1d8f096a3695045")'], 'ObjectId', 'objectId'),
-        Property('intEnumCol', ['.value1', '.value2'], 'Int', 'numeric', 'ModernIntEnum.value2.rawValue'),
+        Property('intEnumCol', ['.value1', '.value2', '.value3'], 'Int', 'numeric', 'ModernIntEnum.value2.rawValue'),
         Property('stringEnumCol', ['.value1', '.value2'], 'String', 'string', 'ModernStringEnum.value2.rawValue'),
         Property('uuidCol', ['UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!', 'UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!'], 'UUID', 'uuid')
     ]
@@ -85,7 +85,7 @@ import RealmSwift
         Property('optDateCol', ['Date(timeIntervalSince1970: 1000000)', 'Date(timeIntervalSince1970: 2000000)', 'Date(timeIntervalSince1970: 3000000)'], 'Date?', 'numeric'),
         Property('optDecimalCol', ['Decimal128(123.456)', 'Decimal128(234.567)', 'Decimal128(345.678)'], 'Decimal128?', 'numeric'),
         Property('optObjectIdCol', ['ObjectId("61184062c1d8f096a3695046")', 'ObjectId("61184062c1d8f096a3695045")'], 'ObjectId?', 'objectId'),
-        Property('optIntEnumCol', ['.value1', '.value2'], 'Int?', 'numeric', 'ModernIntEnum.value2.rawValue'),
+        Property('optIntEnumCol', ['.value1', '.value2', '.value3'], 'Int?', 'numeric', 'ModernIntEnum.value2.rawValue'),
         Property('optStringEnumCol', ['.value1', '.value2'], 'String?', 'string', 'ModernStringEnum.value2.rawValue'),
         Property('optUuidCol', ['UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!', 'UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!'], 'UUID?', 'uuid')
     ]
@@ -1865,13 +1865,39 @@ class QueryTests: TestCase {
         % for listProperty in [listProperties[1], optListProperties[1]]:
         let sum${listProperty.colName} = ${listProperty.value(0)} + ${listProperty.value(1)}
         assertQuery(predicate: "(((((${listProperty.colName}.@min <= %@ && ${listProperty.colName}.@max >= %@) && ${listProperty.colName}.@sum == %@) && ${listProperty.colName}.@count != %@) && ${listProperty.colName}.@avg > %@) && ${listProperty.colName}.@avg < %@)",
-                    values: [${listProperty.value(1)}, ${listProperty.value(0)}, (${listProperty.value(0)} + ${listProperty.value(1)}), 0, ${listProperty.value(0)}, ${listProperty.value(1)}], expectedCount: 1) {
-            $0.${listProperty.colName}.min <= ${listProperty.value(1)} &&
-            $0.${listProperty.colName}.max >= ${listProperty.value(0)} &&
+                    values: [${listProperty.value(0)}, ${listProperty.value(1)}, sum${listProperty.colName}, 0, ${listProperty.value(0)}, ${listProperty.value(1)}], expectedCount: 1) {
+            $0.${listProperty.colName}.min <= ${listProperty.value(0)} &&
+            $0.${listProperty.colName}.max >= ${listProperty.value(1)} &&
             $0.${listProperty.colName}.sum == sum${listProperty.colName} &&
             $0.${listProperty.colName}.count() != 0 &&
             $0.${listProperty.colName}.avg > ${listProperty.value(0)} &&
             $0.${listProperty.colName}.avg < ${listProperty.value(1)}
+        }
+        % end
+
+        // Keypath Collection Aggregates
+
+        let realm = realmWithTestPath()
+        let object = objects().first!
+        % for property in [properties[7], optProperties[7]]:
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["${property.colName}": ${property.value(0)}])
+            let modernObj1 = ModernAllTypesObject(value: ["${property.colName}": ${property.value(1)}])
+            let modernObj2 = ModernAllTypesObject(value: ["${property.colName}": ${property.value(2)}])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+
+        let sum${property.colName} = ${property.value(0)} + ${property.value(1)} + ${property.value(2)}
+        assertQuery(predicate: "(((((arrayCol.@min.${property.colName} <= %@ && arrayCol.@max.${property.colName} >= %@) && arrayCol.@sum.${property.colName} == %@) && arrayCol.@min.${property.colName} != %@) && arrayCol.@avg.${property.colName} > %@) && arrayCol.@avg.${property.colName} < %@)",
+                    values: [${property.value(0)}, ${property.value(2)}, sum${property.colName}, ${property.value(1)}, ${property.value(0)}, ${property.value(2)}], expectedCount: 1) {
+            $0.arrayCol.${property.colName}.min <= ${property.value(0)} &&
+            $0.arrayCol.${property.colName}.max >= ${property.value(2)} &&
+            $0.arrayCol.${property.colName}.sum == sum${property.colName} &&
+            $0.arrayCol.${property.colName}.min != ${property.value(1)} &&
+            $0.arrayCol.${property.colName}.avg > ${property.value(0)} &&
+            $0.arrayCol.${property.colName}.avg < ${property.value(2)}
         }
         % end
     }

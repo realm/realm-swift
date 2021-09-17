@@ -349,7 +349,7 @@ public struct Query<T: _RealmSchemaDiscoverable> {
             case let .collectionAggregation(agg):
                 predicateString.append(agg.rawValue)
             case let .keypathCollectionAggregation(agg):
-                predicateString.insert(agg.rawValue, at: idx-1)
+                predicateString.insert(agg.rawValue, at: predicateString.count-2)
             case let .special(s):
                 switch s {
                 case .openParentheses:
