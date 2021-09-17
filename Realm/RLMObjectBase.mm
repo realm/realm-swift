@@ -423,19 +423,6 @@ id RLMCreateManagedAccessor(Class cls, RLMClassInfo *info) {
     return RLMCreateObjectAccessor(realm->_info[objectClassName], object.obj());
 }
 
-- (void)assignFromObject:(RLMObjectBase *)object {
-    RLMRealm *liveRealm = object->_realm;
-    self->_info = object->_info;
-    self->_realm = object->_realm;
-    if (object->_info != nil) {
-        self->_objectSchema = object->_info->rlmObjectSchema;
-    }
-    if (liveRealm != nil) {
-        self->_row = liveRealm->_realm->import_copy_of(object->_row);
-    }
-    self->_lastAccessedNames = object->_lastAccessedNames;
-    RLMInitializeSwiftAccessor(self, false);
-}
 @end
 
 RLMRealm *RLMObjectBaseRealm(__unsafe_unretained RLMObjectBase *object) {
@@ -546,20 +533,6 @@ id RLMValidatedValueForProperty(id object, NSString *key, NSString *className) {
         }
         @throw;
     }
-}
-
-void RLMObjectMove(RLMObjectBase *lhs, RLMObjectBase *rhs) {
-//    RLMRealm *liveRealm = rhs->_realm;
-//    lhs->_info = rhs->_info;
-//    lhs->_realm = rhs->_realm;
-//    if (rhs->_info != nil) {
-//        lhs->_objectSchema = rhs->_info->rlmObjectSchema;
-//    }
-//    if (liveRealm != nil) {
-//        lhs->_row = liveRealm->_realm->import_copy_of(rhs->_row);
-//    }
-//    lhs->_lastAccessedNames = rhs->_lastAccessedNames;
-//    RLMInitializeSwiftAccessor(lhs, false);
 }
 
 #pragma mark - Notifications

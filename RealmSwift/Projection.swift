@@ -64,7 +64,6 @@ public struct Projected<T: ObjectBase, Value>: AnyProjected {
     private var set: ((T, Value) -> ())!
 
     /// :nodoc:
-    /// :nodoc:
     @available(*, unavailable, message: "@Persisted can only be used as a property on a Realm object")
     public var wrappedValue: Value {
         // The static subscript below is called instead of this when the property
