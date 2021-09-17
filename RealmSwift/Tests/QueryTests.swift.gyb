@@ -1859,6 +1859,21 @@ class QueryTests: TestCase {
         % end
         % end
         % end
+
+        // Aggregates
+
+        % for listProperty in [listProperties[1], optListProperties[1]]:
+        let sum${listProperty.colName} = ${listProperty.value(0)} + ${listProperty.value(1)}
+        assertQuery(predicate: "(((((${listProperty.colName}.@min <= %@ && ${listProperty.colName}.@max >= %@) && ${listProperty.colName}.@sum == %@) && ${listProperty.colName}.@count != %@) && ${listProperty.colName}.@avg > %@) && ${listProperty.colName}.@avg < %@)",
+                    values: [${listProperty.value(1)}, ${listProperty.value(0)}, (${listProperty.value(0)} + ${listProperty.value(1)}), 0, ${listProperty.value(0)}, ${listProperty.value(1)}], expectedCount: 1) {
+            $0.${listProperty.colName}.min <= ${listProperty.value(1)} &&
+            $0.${listProperty.colName}.max >= ${listProperty.value(0)} &&
+            $0.${listProperty.colName}.sum == sum${listProperty.colName} &&
+            $0.${listProperty.colName}.count() != 0 &&
+            $0.${listProperty.colName}.avg > ${listProperty.value(0)} &&
+            $0.${listProperty.colName}.avg < ${listProperty.value(1)}
+        }
+        % end
     }
 
     func testCompoundOr() {
@@ -2115,58 +2130,6 @@ class QueryTests: TestCase {
         % end
     }
 
-    func testCollectionAvg() {
-        let realm = realmWithTestPath()
-        let object = objects().first!
-        % for property in listProperties + optListProperties:
-        % if property.enumName == None and property.category == 'numeric':
-        % if property.type != 'Date' and property.type != 'Date?':
-
-        try! realm.write {
-            object.${property.colName}.removeAll()
-            object.${property.colName}.append(objectsIn: [${property.value(0)}, ${property.value(1)}, ${property.value(2)}])
-        }
-
-        assertQuery(predicate: "${property.colName}.@avg > %@", values: [${property.value(0)}], expectedCount: 1) {
-            $0.${property.colName}.avg > ${property.value(0)}
-        }
-
-        assertQuery(predicate: "${property.colName}.@avg < %@", values: [${property.value(2)}], expectedCount: 1) {
-            $0.${property.colName}.avg < ${property.value(2)}
-        }
-
-        assertQuery(predicate: "${property.colName}.@avg == %@", values: [${property.value(1)}], expectedCount: 1) {
-            $0.${property.colName}.avg == ${property.value(1)}
-        }
-
-        assertQuery(predicate: "${property.colName}.@avg >= %@", values: [${property.value(0)}], expectedCount: 1) {
-            $0.${property.colName}.avg >= ${property.value(0)}
-        }
-
-        assertQuery(predicate: "${property.colName}.@avg >= %@", values: [${property.value(1)}], expectedCount: 1) {
-            $0.${property.colName}.avg >= ${property.value(1)}
-        }
-
-        assertQuery(predicate: "${property.colName}.@avg <= %@", values: [${property.value(2)}], expectedCount: 1) {
-            $0.${property.colName}.avg <= ${property.value(2)}
-        }
-
-        assertQuery(predicate: "${property.colName}.@avg <= %@", values: [${property.value(1)}], expectedCount: 1) {
-            $0.${property.colName}.avg <= ${property.value(1)}
-        }
-
-        assertQuery(predicate: "${property.colName}.@avg != %@", values: [${property.value(1)}], expectedCount: 0) {
-            $0.${property.colName}.avg != ${property.value(1)}
-        }
-
-        assertQuery(predicate: "${property.colName}.@avg != %@", values: [${property.value(0)}], expectedCount: 1) {
-            $0.${property.colName}.avg != ${property.value(0)}
-        }
-        % end
-        % end
-        % end
-    }
-
     func testCollectionAggregatesMin() {
         let realm = realmWithTestPath()
         let object = objects().first!
@@ -2214,56 +2177,6 @@ class QueryTests: TestCase {
 
         assertQuery(predicate: "objectCol.${property.colName}.@min != %@", values: [${property.value(2)}], expectedCount: 2) {
             $0.objectCol.${property.colName}.min != ${property.value(2)}
-        }
-        % end
-        % end
-    }
-
-    func testCollectionMin() {
-        let realm = realmWithTestPath()
-        let object = objects().first!
-        % for property in listProperties + optListProperties:
-        % if property.enumName == None and property.category == 'numeric':
-
-        try! realm.write {
-            object.${property.colName}.removeAll()
-            object.${property.colName}.append(objectsIn: [${property.value(0)}, ${property.value(1)}, ${property.value(2)}])
-        }
-
-        assertQuery(predicate: "${property.colName}.@min > %@", values: [${property.value(0)}], expectedCount: 0) {
-            $0.${property.colName}.min > ${property.value(0)}
-        }
-
-        assertQuery(predicate: "${property.colName}.@min < %@", values: [${property.value(2)}], expectedCount: 1) {
-            $0.${property.colName}.min < ${property.value(2)}
-        }
-
-        assertQuery(predicate: "${property.colName}.@min == %@", values: [${property.value(0)}], expectedCount: 1) {
-            $0.${property.colName}.min == ${property.value(0)}
-        }
-
-        assertQuery(predicate: "${property.colName}.@min >= %@", values: [${property.value(1)}], expectedCount: 0) {
-            $0.${property.colName}.min >= ${property.value(1)}
-        }
-
-        assertQuery(predicate: "${property.colName}.@min >= %@", values: [${property.value(0)}], expectedCount: 1) {
-            $0.${property.colName}.min >= ${property.value(0)}
-        }
-
-        assertQuery(predicate: "${property.colName}.@min <= %@", values: [${property.value(2)}], expectedCount: 1) {
-            $0.${property.colName}.min <= ${property.value(2)}
-        }
-
-        assertQuery(predicate: "${property.colName}.@min <= %@", values: [${property.value(0)}], expectedCount: 1) {
-            $0.${property.colName}.min <= ${property.value(0)}
-        }
-
-        assertQuery(predicate: "${property.colName}.@min != %@", values: [${property.value(0)}], expectedCount: 0) {
-            $0.${property.colName}.min != ${property.value(0)}
-        }
-
-        assertQuery(predicate: "${property.colName}.@min != %@", values: [${property.value(2)}], expectedCount: 1) {
-            $0.${property.colName}.min != ${property.value(2)}
         }
         % end
         % end
@@ -2317,56 +2230,6 @@ class QueryTests: TestCase {
 
         assertQuery(predicate: "objectCol.${property.colName}.@max != %@", values: [${property.value(0)}], expectedCount: 2) {
             $0.objectCol.${property.colName}.max != ${property.value(0)}
-        }
-        % end
-        % end
-    }
-
-    func testCollectionMax() {
-        let realm = realmWithTestPath()
-        let object = objects().first!
-        % for property in listProperties + optListProperties:
-        % if property.enumName == None and property.category == 'numeric':
-
-        try! realm.write {
-            object.${property.colName}.removeAll()
-            object.${property.colName}.append(objectsIn: [${property.value(0)}, ${property.value(1)}, ${property.value(2)}])
-        }
-
-        assertQuery(predicate: "${property.colName}.@max > %@", values: [${property.value(0)}], expectedCount: 1) {
-            $0.${property.colName}.max > ${property.value(0)}
-        }
-
-        assertQuery(predicate: "${property.colName}.@max < %@", values: [${property.value(2)}], expectedCount: 0) {
-            $0.${property.colName}.max < ${property.value(2)}
-        }
-
-        assertQuery(predicate: "${property.colName}.@max == %@", values: [${property.value(2)}], expectedCount: 1) {
-            $0.${property.colName}.max == ${property.value(2)}
-        }
-
-        assertQuery(predicate: "${property.colName}.@max >= %@", values: [${property.value(0)}], expectedCount: 1) {
-            $0.${property.colName}.max >= ${property.value(0)}
-        }
-
-        assertQuery(predicate: "${property.colName}.@max >= %@", values: [${property.value(2)}], expectedCount: 1) {
-            $0.${property.colName}.max >= ${property.value(2)}
-        }
-
-        assertQuery(predicate: "${property.colName}.@max <= %@", values: [${property.value(1)}], expectedCount: 0) {
-            $0.${property.colName}.max <= ${property.value(1)}
-        }
-
-        assertQuery(predicate: "${property.colName}.@max <= %@", values: [${property.value(2)}], expectedCount: 1) {
-            $0.${property.colName}.max <= ${property.value(2)}
-        }
-
-        assertQuery(predicate: "${property.colName}.@max != %@", values: [${property.value(2)}], expectedCount: 0) {
-            $0.${property.colName}.max != ${property.value(2)}
-        }
-
-        assertQuery(predicate: "${property.colName}.@max != %@", values: [${property.value(0)}], expectedCount: 1) {
-            $0.${property.colName}.max != ${property.value(0)}
         }
         % end
         % end
@@ -2427,62 +2290,6 @@ class QueryTests: TestCase {
 
         assertQuery(predicate: "objectCol.${property.colName}.@sum != %@", values: [${property.value(0)}], expectedCount: 2) {
             $0.objectCol.${property.colName}.sum != ${property.value(0)}
-        }
-        % end
-        % end
-        % end
-    }
-
-    func testCollectionSum() {
-        let realm = realmWithTestPath()
-        let object = objects().first!
-        % for property in listProperties + optListProperties:
-        % if property.enumName == None and property.category == 'numeric':
-        % if property.type != 'Date' and property.type != 'Date?':
-        try! realm.write {
-            object.${property.colName}.removeAll()
-            object.${property.colName}.append(objectsIn: [${property.value(0)}, ${property.value(1)}, ${property.value(2)}])
-        }
-
-        let sum${property.colName} = ${property.value(0)} + ${property.value(1)} + ${property.value(2)}
-        assertQuery(predicate: "${property.colName}.@sum > %@", values: [${property.value(2)}], expectedCount: 1) {
-            $0.${property.colName}.sum > ${property.value(2)}
-        }
-
-        assertQuery(predicate: "${property.colName}.@sum < %@", values: [${property.value(2)}], expectedCount: 0) {
-            $0.${property.colName}.sum < ${property.value(2)}
-        }
-
-        assertQuery(predicate: "${property.colName}.@sum == %@", values: [${property.value(2)}], expectedCount: 0) {
-            $0.${property.colName}.sum == ${property.value(2)}
-        }
-
-        assertQuery(predicate: "${property.colName}.@sum == %@", values: [sum${property.colName}], expectedCount: 1) {
-            $0.${property.colName}.sum == sum${property.colName}
-        }
-
-        assertQuery(predicate: "${property.colName}.@sum >= %@", values: [${property.value(2)}], expectedCount: 1) {
-            $0.${property.colName}.sum >= ${property.value(2)}
-        }
-
-        assertQuery(predicate: "${property.colName}.@sum >= %@", values: [sum${property.colName}], expectedCount: 1) {
-            $0.${property.colName}.sum >= sum${property.colName}
-        }
-
-        assertQuery(predicate: "${property.colName}.@sum <= %@", values: [${property.value(2)}], expectedCount: 0) {
-            $0.${property.colName}.sum <= ${property.value(2)}
-        }
-
-        assertQuery(predicate: "${property.colName}.@sum <= %@", values: [sum${property.colName}], expectedCount: 1) {
-            $0.${property.colName}.sum <= sum${property.colName}
-        }
-
-        assertQuery(predicate: "${property.colName}.@sum != %@", values: [sum${property.colName}], expectedCount: 0) {
-            $0.${property.colName}.sum != sum${property.colName}
-        }
-
-        assertQuery(predicate: "${property.colName}.@sum != %@", values: [${property.value(0)}], expectedCount: 1) {
-            $0.${property.colName}.sum != ${property.value(0)}
         }
         % end
         % end
