@@ -810,22 +810,22 @@ extension Query where T: RealmCollection,
 }
 
 extension Query where T: _QueryNumeric {
-    /// Returns the minimum value of the objects in the collection base on the keypath.
+    /// Returns the minimum value of the objects in the collection based on the keypath.
     public var min: Query {
         return append(tokens: [.keypathCollectionAggregation(.min)])
     }
 
-    /// Returns the maximum value of the objects in the collection base on the keypath.
+    /// Returns the maximum value of the objects in the collection based on the keypath.
     public var max: Query {
         return append(tokens: [.keypathCollectionAggregation(.max)])
     }
 
-    /// Returns the average of the objects in the collection base on the keypath.
+    /// Returns the average of the objects in the collection based on the keypath.
     public var avg: Query {
         return append(tokens: [.keypathCollectionAggregation(.avg)])
     }
 
-    /// Returns the sum of the objects in the collection base on the keypath.
+    /// Returns the sum of the objects in the collection based on the keypath.
     public var sum: Query {
         return append(tokens: [.keypathCollectionAggregation(.sum)])
     }

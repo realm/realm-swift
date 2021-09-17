@@ -2489,6 +2489,117 @@ class QueryTests: TestCase {
         % end
     }
 
+    func testCollectionAggregatesCount() {
+        let realm = realmWithTestPath()
+        let object = objects().first!
+        % for property in listProperties + optListProperties:
+        % if property.enumName == None and property.category == 'numeric':
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["${property.colName}": [${property.value(0)}, ${property.value(1)}, ${property.value(2)}]])
+            if let oldObject = object.objectCol {
+                realm.delete(oldObject)
+            }
+            object.objectCol = modernObj
+        }
+
+        assertQuery(predicate: "objectCol.${property.colName}.@count > %@", values: [2], expectedCount: 1) {
+            $0.objectCol.${property.colName}.count() > 2
+        }
+
+        assertQuery(predicate: "objectCol.${property.colName}.@count < %@", values: [3], expectedCount: 1) {
+            $0.objectCol.${property.colName}.count() < 3
+        }
+
+        assertQuery(predicate: "objectCol.${property.colName}.@count == %@", values: [3], expectedCount: 1) {
+            $0.objectCol.${property.colName}.count() == 3
+        }
+
+        assertQuery(predicate: "objectCol.${property.colName}.@count == %@", values: [0], expectedCount: 1) {
+            $0.objectCol.${property.colName}.count() == 0
+        }
+
+        assertQuery(predicate: "objectCol.${property.colName}.@count >= %@", values: [4], expectedCount: 0) {
+            $0.objectCol.${property.colName}.count() >= 4
+        }
+
+        assertQuery(predicate: "objectCol.${property.colName}.@count >= %@", values: [3], expectedCount: 1) {
+            $0.objectCol.${property.colName}.count() >= 3
+        }
+
+        assertQuery(predicate: "objectCol.${property.colName}.@count <= %@", values: [2], expectedCount: 1) {
+            $0.objectCol.${property.colName}.count() <= 2
+        }
+
+        assertQuery(predicate: "objectCol.${property.colName}.@count <= %@", values: [3], expectedCount: 2) {
+            $0.objectCol.${property.colName}.count() <= 3
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "objectCol.${property.colName}.@count != %@", values: [3], expectedCount: 1) {
+            $0.objectCol.${property.colName}.count() != 3
+        }
+
+        assertQuery(predicate: "objectCol.${property.colName}.@count != %@", values: [1], expectedCount: 2) {
+            $0.objectCol.${property.colName}.count() != 1
+        }
+        % end
+        % end
+    }
+
+    func testCollectionCount() {
+        let realm = realmWithTestPath()
+        let object = objects().first!
+        % for property in listProperties + optListProperties:
+        % if property.enumName == None and property.category == 'numeric':
+        try! realm.write {
+            object.${property.colName}.removeAll()
+            object.${property.colName}.append(objectsIn: [${property.value(0)}, ${property.value(1)}, ${property.value(2)}])
+        }
+
+        assertQuery(predicate: "${property.colName}.@count > %@", values: [2], expectedCount: 1) {
+            $0.${property.colName}.count() > 2
+        }
+
+        assertQuery(predicate: "${property.colName}.@count < %@", values: [3], expectedCount: 0) {
+            $0.${property.colName}.count() < 3
+        }
+
+        assertQuery(predicate: "${property.colName}.@count == %@", values: [3], expectedCount: 1) {
+            $0.${property.colName}.count() == 3
+        }
+
+        assertQuery(predicate: "${property.colName}.@count == %@", values: [0], expectedCount: 0) {
+            $0.${property.colName}.count() == 0
+        }
+
+        assertQuery(predicate: "${property.colName}.@count >= %@", values: [4], expectedCount: 0) {
+            $0.${property.colName}.count() >= 4
+        }
+
+        assertQuery(predicate: "${property.colName}.@count >= %@", values: [3], expectedCount: 1) {
+            $0.${property.colName}.count() >= 3
+        }
+
+        assertQuery(predicate: "${property.colName}.@count <= %@", values: [2], expectedCount: 0) {
+            $0.${property.colName}.count() <= 2
+        }
+
+        assertQuery(predicate: "${property.colName}.@count <= %@", values: [3], expectedCount: 1) {
+            $0.${property.colName}.count() <= 3
+        }
+
+        assertQuery(predicate: "${property.colName}.@count != %@", values: [3], expectedCount: 0) {
+            $0.${property.colName}.count() != 3
+        }
+
+        assertQuery(predicate: "${property.colName}.@count != %@", values: [0], expectedCount: 1) {
+            $0.${property.colName}.count() != 0
+        }
+        % end
+        % end
+    }
+
     // MARK: Keypath Collection Aggregations
 
     func testKeypathCollectionAggregatesAvg() {
