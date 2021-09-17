@@ -324,14 +324,9 @@ class QueryTests_Prototype: TestCase {
         XCTAssertEqual(resultQuery4.count, 1)
 
         // Count
-        let query5: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>) = {
-            $0.arrayCol.intCol.count == 1
-        }
-        let predicateQuery5 = query5(Query<ModernAllTypesObject>())._constructPredicate()
-        XCTAssertEqual(predicateQuery5.0, "arrayCol.@avg.intCol > %@")
-
-        let resultQuery4 = objects().query(query4)
-        XCTAssertEqual(resultQuery4.count, 1)
+        let predicate7 = "arrayCol.arrayInt.@count < 2"
+        let result7 = objects().filter(predicate7)
+        XCTAssertEqual(result7.count, 1)
     }
 }
 

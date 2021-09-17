@@ -60,11 +60,11 @@ import RealmSwift
         Property('int32Col', ['Int32(32)', 'Int32(33)', 'Int32(34)'], 'Int32', 'numeric'),
         Property('int64Col', ['Int64(64)', 'Int64(65)', 'Int64(66)'], 'Int64', 'numeric'),
         Property('floatCol', ['Float(5.55444333)', 'Float(6.55444333)', 'Float(7.55444333)'], 'Float', 'numeric'),
-        Property('doubleCol', [5.55444333, 6.55444333, 7.55444333], 'Double', 'numeric'),
+        Property('doubleCol', [123.456, 234.567, 345.678], 'Double', 'numeric'),
         Property('stringCol', ['"Foo"', '"Foó"', '"foo"'], 'String', 'string'),
         Property('binaryCol', ['Data(count: 64)', 'Data(count: 128)'], 'Data', 'binary'),
         Property('dateCol', ['Date(timeIntervalSince1970: 1000000)', 'Date(timeIntervalSince1970: 2000000)', 'Date(timeIntervalSince1970: 3000000)'], 'Date', 'numeric'),
-        Property('decimalCol', ['Decimal128(123.456)', 'Decimal128(234.456)', 'Decimal128(345.456)'], 'Decimal128', 'numeric'),
+        Property('decimalCol', ['Decimal128(123.456)', 'Decimal128(234.567)', 'Decimal128(345.678)'], 'Decimal128', 'numeric'),
         Property('objectIdCol', ['ObjectId("61184062c1d8f096a3695046")', 'ObjectId("61184062c1d8f096a3695045")'], 'ObjectId', 'objectId'),
         Property('intEnumCol', ['.value1', '.value2'], 'Int', 'numeric', 'ModernIntEnum.value2.rawValue'),
         Property('stringEnumCol', ['.value1', '.value2'], 'String', 'string', 'ModernStringEnum.value2.rawValue'),
@@ -79,11 +79,11 @@ import RealmSwift
         Property('optInt32Col', ['Int32(32)', 'Int32(33)', 'Int32(34)'], 'Int32?', 'numeric'),
         Property('optInt64Col', ['Int64(64)', 'Int64(65)', 'Int64(66)'], 'Int64?', 'numeric'),
         Property('optFloatCol', ['Float(5.55444333)', 'Float(6.55444333)', 'Float(7.55444333)'], 'Float?', 'numeric'),
-        Property('optDoubleCol', [5.55444333, 6.55444333, 7.55444333], 'Double?', 'numeric'),
+        Property('optDoubleCol', [123.456, 234.567, 345.678], 'Double?', 'numeric'),
         Property('optStringCol', ['"Foo"', '"Foó"', '"foo"'], 'String?', 'string'),
         Property('optBinaryCol', ['Data(count: 64)', 'Data(count: 128)'], 'Data?', 'binary'),
         Property('optDateCol', ['Date(timeIntervalSince1970: 1000000)', 'Date(timeIntervalSince1970: 2000000)', 'Date(timeIntervalSince1970: 3000000)'], 'Date?', 'numeric'),
-        Property('optDecimalCol', ['Decimal128(123.456)', 'Decimal128(234.456)', 'Decimal128(345.456)'], 'Decimal128?', 'numeric'),
+        Property('optDecimalCol', ['Decimal128(123.456)', 'Decimal128(234.567)', 'Decimal128(345.678)'], 'Decimal128?', 'numeric'),
         Property('optObjectIdCol', ['ObjectId("61184062c1d8f096a3695046")', 'ObjectId("61184062c1d8f096a3695045")'], 'ObjectId?', 'objectId'),
         Property('optIntEnumCol', ['.value1', '.value2'], 'Int?', 'numeric', 'ModernIntEnum.value2.rawValue'),
         Property('optStringEnumCol', ['.value1', '.value2'], 'String?', 'string', 'ModernStringEnum.value2.rawValue'),
@@ -98,11 +98,11 @@ import RealmSwift
         Property('arrayInt32', ['Int32(32)', 'Int32(33)', 'Int32(34)'], 'Int32', 'numeric'),
         Property('arrayInt64', ['Int64(64)', 'Int64(65)', 'Int64(66)'], 'Int64', 'numeric'),
         Property('arrayFloat', ['Float(5.55444333)', 'Float(6.55444333)', 'Float(7.55444333)'], 'Float', 'numeric'),
-        Property('arrayDouble', [123.456, 234.456, 345.567], 'Double', 'numeric'),
+        Property('arrayDouble', [123.456, 234.567, 345.678], 'Double', 'numeric'),
         Property('arrayString', ['"Foo"', '"Bar"', '"Baz"'], 'String', 'string'),
         Property('arrayBinary', ['Data(count: 64)', 'Data(count: 128)', 'Data(count: 256)'], 'Data', 'binary'),
         Property('arrayDate', ['Date(timeIntervalSince1970: 1000000)', 'Date(timeIntervalSince1970: 2000000)', 'Date(timeIntervalSince1970: 3000000)'], 'Date', 'numeric'),
-        Property('arrayDecimal', ['Decimal128(123.456)', 'Decimal128(456.789)', 'Decimal128(963.852)'], 'Decimal128', 'numeric'),
+        Property('arrayDecimal', ['Decimal128(123.456)', 'Decimal128(234.567)', 'Decimal128(345.678)'], 'Decimal128', 'numeric'),
         Property('arrayObjectId', ['ObjectId("61184062c1d8f096a3695046")', 'ObjectId("61184062c1d8f096a3695045")', 'ObjectId("61184062c1d8f096a3695044")'], 'ObjectId', 'objectId'),
         Property('arrayUuid', ['UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!', 'UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!', 'UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d08e")!'], 'UUID', 'uuid'),
         Property('arrayAny', [['.objectId', 'ObjectId("61184062c1d8f096a3695046")'], ['.string', '"Hello"'], ['.int', 123]], 'AnyRealmValue', 'any'),
@@ -116,11 +116,11 @@ import RealmSwift
         Property('arrayOptInt32', ['Int32(32)', 'Int32(33)', 'Int32(34)'], 'Int32?', 'numeric'),
         Property('arrayOptInt64', ['Int64(64)', 'Int64(65)', 'Int64(66)'], 'Int64?', 'numeric'),
         Property('arrayOptFloat', ['Float(5.55444333)', 'Float(6.55444333)', 'Float(7.55444333)'], 'Float?', 'numeric'),
-        Property('arrayOptDouble', [123.456, 234.456, 345.567], 'Double?', 'numeric'),
+        Property('arrayOptDouble', [123.456, 234.567, 345.678], 'Double?', 'numeric'),
         Property('arrayOptString', ['"Foo"', '"Bar"', '"Baz"'], 'String?', 'string'),
         Property('arrayOptBinary', ['Data(count: 64)', 'Data(count: 128)', 'Data(count: 256)'], 'Data?', 'binary'),
         Property('arrayOptDate', ['Date(timeIntervalSince1970: 1000000)', 'Date(timeIntervalSince1970: 2000000)', 'Date(timeIntervalSince1970: 3000000)'], 'Date?', 'numeric'),
-        Property('arrayOptDecimal', ['Decimal128(123.456)', 'Decimal128(456.789)', 'Decimal128(963.852)'], 'Decimal128?', 'numeric'),
+        Property('arrayOptDecimal', ['Decimal128(123.456)', 'Decimal128(234.567)', 'Decimal128(345.678)'], 'Decimal128?', 'numeric'),
         Property('arrayOptUuid', ['UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!', 'UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!', 'UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d08e")!'], 'UUID?', 'uuid'),
         Property('arrayOptObjectId', ['ObjectId("61184062c1d8f096a3695046")', 'ObjectId("61184062c1d8f096a3695045")', 'ObjectId("61184062c1d8f096a3695044")'], 'ObjectId?', 'objectId'),
     ]
@@ -133,11 +133,11 @@ import RealmSwift
         Property('setInt32', ['Int32(32)', 'Int32(33)', 'Int32(34)'], 'Int32', 'numeric'),
         Property('setInt64', ['Int64(64)', 'Int64(65)', 'Int64(66)'], 'Int64', 'numeric'),
         Property('setFloat', ['Float(5.55444333)', 'Float(6.55444333)', 'Float(7.55444333)'], 'Float', 'numeric'),
-        Property('setDouble', [123.456, 234.456, 345.567], 'Double', 'numeric'),
+        Property('setDouble', [123.456, 234.567, 345.678], 'Double', 'numeric'),
         Property('setString', ['"Foo"', '"Bar"', '"Baz"'], 'String', 'string'),
         Property('setBinary', ['Data(count: 64)', 'Data(count: 128)', 'Data(count: 256)'], 'Data', 'binary'),
         Property('setDate', ['Date(timeIntervalSince1970: 1000000)', 'Date(timeIntervalSince1970: 2000000)', 'Date(timeIntervalSince1970: 3000000)'], 'Date', 'numeric'),
-        Property('setDecimal', ['Decimal128(123.456)', 'Decimal128(456.789)', 'Decimal128(963.852)'], 'Decimal128', 'numeric'),
+        Property('setDecimal', ['Decimal128(123.456)', 'Decimal128(234.567)', 'Decimal128(345.678)'], 'Decimal128', 'numeric'),
         Property('setObjectId', ['ObjectId("61184062c1d8f096a3695046")', 'ObjectId("61184062c1d8f096a3695045")', 'ObjectId("61184062c1d8f096a3695044")'], 'ObjectId', 'objectId'),
         Property('setUuid', ['UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!', 'UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!', 'UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d08e")!'], 'UUID', 'uuid'),
         Property('setAny', [['.objectId', 'ObjectId("61184062c1d8f096a3695046")'], ['.string', '"Hello"'], ['.int', 123]], 'AnyRealmValue', 'any'),
@@ -151,11 +151,11 @@ import RealmSwift
         Property('setOptInt32', ['Int32(32)', 'Int32(33)', 'Int32(34)'], 'Int32?', 'numeric'),
         Property('setOptInt64', ['Int64(64)', 'Int64(65)', 'Int64(66)'], 'Int64?', 'numeric'),
         Property('setOptFloat', ['Float(5.55444333)', 'Float(6.55444333)', 'Float(7.55444333)'], 'Float?', 'numeric'),
-        Property('setOptDouble', [123.456, 234.456, 345.567], 'Double?', 'numeric'),
+        Property('setOptDouble', [123.456, 234.567, 345.678], 'Double?', 'numeric'),
         Property('setOptString', ['"Foo"', '"Bar"', '"Baz"'], 'String?', 'string'),
         Property('setOptBinary', ['Data(count: 64)', 'Data(count: 128)', 'Data(count: 256)'], 'Data?', 'binary'),
         Property('setOptDate', ['Date(timeIntervalSince1970: 1000000)', 'Date(timeIntervalSince1970: 2000000)', 'Date(timeIntervalSince1970: 3000000)'], 'Date?', 'numeric'),
-        Property('setOptDecimal', ['Decimal128(123.456)', 'Decimal128(456.789)', 'Decimal128(963.852)'], 'Decimal128?', 'numeric'),
+        Property('setOptDecimal', ['Decimal128(123.456)', 'Decimal128(234.567)', 'Decimal128(345.678)'], 'Decimal128?', 'numeric'),
         Property('setOptUuid', ['UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!', 'UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!', 'UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d08e")!'], 'UUID?', 'uuid'),
         Property('setOptObjectId', ['ObjectId("61184062c1d8f096a3695046")', 'ObjectId("61184062c1d8f096a3695045")', 'ObjectId("61184062c1d8f096a3695044")'], 'ObjectId?', 'objectId'),
     ]
@@ -2473,15 +2473,15 @@ class QueryTests: TestCase {
             $0.${property.colName}.sum <= ${property.value(2)}
         }
 
-        assertQuery(predicate: "${property.colName}.@sum <= %@", values: [sum${property.colName}], expectedCount: 2) {
+        assertQuery(predicate: "${property.colName}.@sum <= %@", values: [sum${property.colName}], expectedCount: 1) {
             $0.${property.colName}.sum <= sum${property.colName}
         }
 
-        assertQuery(predicate: "${property.colName}.@sum != %@", values: [sum${property.colName}], expectedCount: 1) {
+        assertQuery(predicate: "${property.colName}.@sum != %@", values: [sum${property.colName}], expectedCount: 0) {
             $0.${property.colName}.sum != sum${property.colName}
         }
 
-        assertQuery(predicate: "${property.colName}.@sum != %@", values: [${property.value(0)}], expectedCount: 2) {
+        assertQuery(predicate: "${property.colName}.@sum != %@", values: [${property.value(0)}], expectedCount: 1) {
             $0.${property.colName}.sum != ${property.value(0)}
         }
         % end
@@ -2542,59 +2542,6 @@ class QueryTests: TestCase {
 
         assertQuery(predicate: "objectCol.${property.colName}.@count != %@", values: [1], expectedCount: 2) {
             $0.objectCol.${property.colName}.count() != 1
-        }
-        % end
-        % end
-    }
-
-    func testCollectionCount() {
-        let realm = realmWithTestPath()
-        let object = objects().first!
-        % for property in listProperties + optListProperties:
-        % if property.enumName == None and property.category == 'numeric':
-        try! realm.write {
-            object.${property.colName}.removeAll()
-            object.${property.colName}.append(objectsIn: [${property.value(0)}, ${property.value(1)}, ${property.value(2)}])
-        }
-
-        assertQuery(predicate: "${property.colName}.@count > %@", values: [2], expectedCount: 1) {
-            $0.${property.colName}.count() > 2
-        }
-
-        assertQuery(predicate: "${property.colName}.@count < %@", values: [3], expectedCount: 0) {
-            $0.${property.colName}.count() < 3
-        }
-
-        assertQuery(predicate: "${property.colName}.@count == %@", values: [3], expectedCount: 1) {
-            $0.${property.colName}.count() == 3
-        }
-
-        assertQuery(predicate: "${property.colName}.@count == %@", values: [0], expectedCount: 0) {
-            $0.${property.colName}.count() == 0
-        }
-
-        assertQuery(predicate: "${property.colName}.@count >= %@", values: [4], expectedCount: 0) {
-            $0.${property.colName}.count() >= 4
-        }
-
-        assertQuery(predicate: "${property.colName}.@count >= %@", values: [3], expectedCount: 1) {
-            $0.${property.colName}.count() >= 3
-        }
-
-        assertQuery(predicate: "${property.colName}.@count <= %@", values: [2], expectedCount: 0) {
-            $0.${property.colName}.count() <= 2
-        }
-
-        assertQuery(predicate: "${property.colName}.@count <= %@", values: [3], expectedCount: 1) {
-            $0.${property.colName}.count() <= 3
-        }
-
-        assertQuery(predicate: "${property.colName}.@count != %@", values: [3], expectedCount: 0) {
-            $0.${property.colName}.count() != 3
-        }
-
-        assertQuery(predicate: "${property.colName}.@count != %@", values: [0], expectedCount: 1) {
-            $0.${property.colName}.count() != 0
         }
         % end
         % end
@@ -2763,66 +2710,4 @@ class QueryTests: TestCase {
         % end
         % end
     }
-
-    func testKeypathCollectionAggregatesSum() {
-        let realm = realmWithTestPath()
-        let object = objects().first!
-        % for property in properties + optProperties:
-        % if property.enumName == None and property.category == 'numeric':
-        % if property.type != 'Date' and property.type != 'Date?':
-        
-        try! realm.write {
-            let modernObj = ModernAllTypesObject(value: ["${property.colName}": ${property.value(0)}])
-            let modernObj1 = ModernAllTypesObject(value: ["${property.colName}": ${property.value(1)}])
-            let modernObj2 = ModernAllTypesObject(value: ["${property.colName}": ${property.value(2)}])
-            realm.delete(object.arrayCol)
-            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
-        }
-        
-        let sum${property.colName} = ${property.value(0)} + ${property.value(1)} + ${property.value(2)}
-        assertQuery(predicate: "arrayCol.@sum.${property.colName} > %@", values: [${property.value(2)}], expectedCount: 1) {
-            $0.arrayCol.${property.colName}.sum > ${property.value(2)}
-        }
-
-        assertQuery(predicate: "arrayCol.@sum.${property.colName} < %@", values: [${property.value(2)}], expectedCount: 3) {
-            $0.arrayCol.${property.colName}.sum < ${property.value(2)}
-        }
-
-        assertQuery(predicate: "arrayCol.@sum.${property.colName} == %@", values: [${property.value(2)}], expectedCount: 0) {
-            $0.arrayCol.${property.colName}.sum == ${property.value(2)}
-        }
-
-        assertQuery(predicate: "arrayCol.@sum.${property.colName} == %@", values: [sum${property.colName}], expectedCount: 1) {
-            $0.arrayCol.${property.colName}.sum == sum${property.colName}
-        }
-
-        assertQuery(predicate: "arrayCol.@sum.${property.colName} >= %@", values: [${property.value(2)}], expectedCount: 1) {
-            $0.arrayCol.${property.colName}.sum >= ${property.value(2)}
-        }
-
-        assertQuery(predicate: "arrayCol.@sum.${property.colName} >= %@", values: [sum${property.colName}], expectedCount: 1) {
-            $0.arrayCol.${property.colName}.sum >= sum${property.colName}
-        }
-
-        assertQuery(predicate: "arrayCol.@sum.${property.colName} <= %@", values: [${property.value(2)}], expectedCount: 3) {
-            $0.arrayCol.${property.colName}.sum <= ${property.value(2)}
-        }
-
-        assertQuery(predicate: "arrayCol.@sum.${property.colName} <= %@", values: [sum${property.colName}], expectedCount: 4) {
-            $0.arrayCol.${property.colName}.sum <= sum${property.colName}
-        }
-
-        // This includes all ModernAllTypesObject objects beside the one we are populating
-        assertQuery(predicate: "arrayCol.@sum.${property.colName} != %@", values: [sum${property.colName}], expectedCount: 3) {
-            $0.arrayCol.${property.colName}.sum != sum${property.colName}
-        }
-
-        assertQuery(predicate: "arrayCol.@sum.${property.colName} != %@", values: [${property.value(0)}], expectedCount: 4) {
-            $0.arrayCol.${property.colName}.sum != ${property.value(0)}
-        }
-        % end
-        % end
-        % end
-    }
-
 }
