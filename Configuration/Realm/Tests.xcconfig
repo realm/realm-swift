@@ -15,7 +15,6 @@ SWIFT_OPTIMIZATION_LEVEL = -Onone;
 
 TEST_HOST[sdk=iphone*] = $(BUILT_PRODUCTS_DIR)/TestHost.app/TestHost;
 TEST_HOST[sdk=appletv*] = $(BUILT_PRODUCTS_DIR)/TestHost.app/TestHost;
-TEST_HOST[sdk=macosx*] = $(BUILT_PRODUCTS_DIR)/TestHost.app/Contents/MacOS/TestHost;
 
 EXCLUDED_SOURCE_FILE_NAMES[sdk=iphone*] = InterprocessTests.m SwiftSchemaTests.swift;
 EXCLUDED_SOURCE_FILE_NAMES[sdk=appletv*] = EncryptionTests.mm InterprocessTests.m SwiftSchemaTests.swift;

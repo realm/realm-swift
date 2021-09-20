@@ -305,12 +305,10 @@ public struct Query<T: _RealmSchemaDiscoverable> {
             case let .compound(comp):
                 predicateString.append(" \(comp.rawValue) ")
             case let .keyPath(name, isCollection):
-                // For the non verbose subqery
                 if isCollection && isSubquery {
                     predicateString.append("$obj")
                     continue
                 }
-                // Anything below the verbose subquery uses
                 var needsDot = false
                 if idx > 0, case .keyPath = tokens[idx-1] {
                     needsDot = true
@@ -424,7 +422,7 @@ extension Query where T: RealmCollection {
     }
 
     /// Query the count of the objects in the collection.
-    public func count() -> Query<Int> where T: RealmCollection {
+    public var count: Query<Int> {
         return append(tokens: [.collectionAggregation(.count)])
     }
 }
@@ -474,7 +472,7 @@ extension Query where T: RealmCollection, T.Element: _QueryNumeric {
         return lhs.append(tokens: [.basicComparison(.notEqual), .rhs(rhs)])
     }
 
-    public static func > <V>(_ lhs: Query<T>, _ rhs: T.Element) -> Query<V>{
+    public static func > <V>(_ lhs: Query<T>, _ rhs: T.Element) -> Query<V> {
         return lhs.append(tokens: [.basicComparison(.greaterThan), .rhs(rhs)])
     }
 
@@ -761,9 +759,9 @@ extension Query where T: OptionalProtocol, T.Wrapped: _QueryNumeric {
 extension Query where T == Bool {
     /// Completes a subquery expression.
     /// ```
-    /// ($0.myCollection.age >= 21).count() > 0
+    /// ($0.myCollection.age >= 21).count > 0
     /// ```
-    public func count() -> Query<Int> {
+    public var count: Query<Int> {
         let collections = Set(tokens.filter {
             if case let .keyPath(_, isCollection) = $0 {
                 return isCollection ? true : false

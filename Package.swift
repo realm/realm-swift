@@ -4,7 +4,7 @@ import PackageDescription
 import Foundation
 
 let coreVersionStr = "11.4.1"
-let cocoaVersionStr = "10.15.0"
+let cocoaVersionStr = "10.15.1"
 
 let coreVersionPieces = coreVersionStr.split(separator: ".")
 let coreVersionExtra = coreVersionPieces[2].split(separator: "-")
@@ -309,7 +309,8 @@ let package = Package(
                 "SwiftObjectServerTests.swift",
                 "SwiftCollectionSyncTests.swift",
                 "SwiftObjectServerPartitionTests.swift",
-                "SwiftUIServerTests.swift"
+                "SwiftUIServerTests.swift",
+                "SwiftMongoClientTests.swift"
             ]
         ),
         objectServerTestTarget(

@@ -7885,7 +7885,7 @@ class QueryTests: TestCase {
             !$0.linkingObjects.contains(objects().first!)
         }
 
-        assertQuery(predicate: "NOT ANY linkingObjects IN %@", values: [NSArray(array: objects().map { $0 })], expectedCount: 0) {
+        assertQuery(predicate: "NOT ANY linkingObjects IN %@", values: [NSArray(array: objects().map { $0 })], expectedCount: 1) {
             !$0.linkingObjects.containsAny(in: objects())
         }
     }
@@ -7967,7 +7967,7 @@ class QueryTests: TestCase {
             $0.arrayInt.min <= 1 &&
             $0.arrayInt.max >= 2 &&
             $0.arrayInt.sum == sumarrayInt &&
-            $0.arrayInt.count() != 0 &&
+            $0.arrayInt.count != 0 &&
             $0.arrayInt.avg > 1 &&
             $0.arrayInt.avg < 2
         }
@@ -7977,7 +7977,7 @@ class QueryTests: TestCase {
             $0.arrayOptInt.min <= 1 &&
             $0.arrayOptInt.max >= 2 &&
             $0.arrayOptInt.sum == sumarrayOptInt &&
-            $0.arrayOptInt.count() != 0 &&
+            $0.arrayOptInt.count != 0 &&
             $0.arrayOptInt.avg > 1 &&
             $0.arrayOptInt.avg < 2
         }
@@ -8484,28 +8484,28 @@ class QueryTests: TestCase {
 
         // Count of results will be 0 because there are no `ModernAllTypesObject`s in the list.
         assertQuery(predicate: "SUBQUERY(arrayCol, $obj, $obj.intCol != %@).@count > %@", values: [123, 0], expectedCount: 0) {
-            ($0.arrayCol.intCol != 123).count() > 0
+            ($0.arrayCol.intCol != 123).count > 0
         }
 
         assertQuery(predicate: "(((intCol == %@ && %@ IN arrayInt) && SUBQUERY(arrayCol, $obj, ($obj.intCol == %@ && $obj.stringCol == %@)).@count == %@) && SUBQUERY(arrayCol, $obj, $obj.stringCol == %@).@count == %@)", values: [5, 1, 5, "Foo", 3, "Bar", 0], expectedCount: 0) {
             $0.intCol == 5 &&
             $0.arrayInt.contains(1) &&
-            ($0.arrayCol.intCol == 5 && $0.arrayCol.stringCol == "Foo").count() == 3 &&
-            ($0.arrayCol.stringCol == "Bar").count() == 0
+            ($0.arrayCol.intCol == 5 && $0.arrayCol.stringCol == "Foo").count == 3 &&
+            ($0.arrayCol.stringCol == "Bar").count == 0
         }
 
         // Set
 
         // Will be 0 results because there are no `ModernAllTypesObject`s in the set.
         assertQuery(predicate: "SUBQUERY(arrayCol, $obj, $obj.intCol != %@).@count > %@", values: [123, 0], expectedCount: 0) {
-            ($0.arrayCol.intCol != 123).count() > 0
+            ($0.arrayCol.intCol != 123).count > 0
         }
 
         assertQuery(predicate: "(((intCol == %@ && %@ IN setInt) && SUBQUERY(setCol, $obj, ($obj.intCol == %@ && $obj.stringCol == %@)).@count == %@) && SUBQUERY(setCol, $obj, $obj.stringCol == %@).@count == %@)", values: [5, 1, 5, "Foo", 3, "Bar", 0], expectedCount: 0) {
             $0.intCol == 5 &&
             $0.setInt.contains(1) &&
-            ($0.setCol.intCol == 5 && $0.setCol.stringCol == "Foo").count() == 3 &&
-            ($0.setCol.stringCol == "Bar").count() == 0
+            ($0.setCol.intCol == 5 && $0.setCol.stringCol == "Foo").count == 3 &&
+            ($0.setCol.stringCol == "Bar").count == 0
         }
 
         let realm = realmWithTestPath()
@@ -8519,43 +8519,43 @@ class QueryTests: TestCase {
         // Results count should now be 1
 
         assertQuery(predicate: "SUBQUERY(arrayCol, $obj, $obj.intCol != %@).@count > %@", values: [123, 0], expectedCount: 1) {
-            ($0.arrayCol.intCol != 123).count() > 0
+            ($0.arrayCol.intCol != 123).count > 0
         }
 
         assertQuery(predicate: "SUBQUERY(arrayCol, $obj, ($obj.intCol > %@ && $obj.intCol <= %@)).@count > %@", values: [0, 5, 0], expectedCount: 1) {
-            ($0.arrayCol.intCol > 0 && $0.arrayCol.intCol <= 5 ).count() > 0
+            ($0.arrayCol.intCol > 0 && $0.arrayCol.intCol <= 5 ).count > 0
         }
 
         assertQuery(predicate: "(((intCol == %@ && arrayInt.@count == %@) && SUBQUERY(arrayCol, $obj, $obj.intCol == %@).@count == %@) && SUBQUERY(arrayCol, $obj, $obj.stringCol == %@).@count == %@)", values: [6, 2, 5, 1, "Bar", 0], expectedCount: 1) {
             ($0.intCol == 6) &&
-            ($0.arrayInt.count() == 2) &&
-            ($0.arrayCol.intCol == 5).count() == 1 &&
-            ($0.arrayCol.stringCol == "Bar").count() == 0
+            ($0.arrayInt.count == 2) &&
+            ($0.arrayCol.intCol == 5).count == 1 &&
+            ($0.arrayCol.stringCol == "Bar").count == 0
         }
 
         // Set
 
         // Will be 0 results because there are no `ModernAllTypesObject`s in the set.
         assertQuery(predicate: "SUBQUERY(arrayCol, $obj, $obj.intCol != %@).@count > %@", values: [123, 0], expectedCount: 1) {
-            ($0.arrayCol.intCol != 123).count() > 0
+            ($0.arrayCol.intCol != 123).count > 0
         }
 
         assertQuery(predicate: "(((intCol == %@ && setInt.@count == %@) && SUBQUERY(setCol, $obj, $obj.intCol == %@).@count == %@) && SUBQUERY(setCol, $obj, $obj.stringCol == %@).@count == %@)", values: [6, 2, 5, 1, "Bar", 0], expectedCount: 1) {
             ($0.intCol == 6) &&
-            ($0.setInt.count() == 2) &&
-            ($0.setCol.intCol == 5).count() == 1 &&
-            ($0.setCol.stringCol == "Bar").count() == 0
+            ($0.setInt.count == 2) &&
+            ($0.setCol.intCol == 5).count == 1 &&
+            ($0.setCol.stringCol == "Bar").count == 0
         }
 
         assertQuery(predicate: "(((intCol == %@ && setInt.@count == %@) && SUBQUERY(setCol, $obj, ($obj.intCol == %@ && $obj.stringCol != %@)).@count == %@) && SUBQUERY(setCol, $obj, $obj.stringCol == %@).@count == %@)", values: [6, 2, 5, "Blah", 1, "Bar", 0], expectedCount: 1) {
             ($0.intCol == 6) &&
-            ($0.setInt.count() == 2) &&
-            (((($0.setCol.intCol == 5) && ($0.setCol.stringCol != "Blah"))).count() == 1) &&
-            (($0.setCol.stringCol == "Bar").count() == 0)
+            ($0.setInt.count == 2) &&
+            (((($0.setCol.intCol == 5) && ($0.setCol.stringCol != "Blah"))).count == 1) &&
+            (($0.setCol.stringCol == "Bar").count == 0)
         }
 
         let query: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>) = {
-            ($0.setCol.intCol == 1 && $0.arrayCol.intCol == 1).count() > 0
+            ($0.setCol.intCol == 1 && $0.arrayCol.intCol == 1).count > 0
         }
         assertThrows(query(Query<ModernAllTypesObject>())._constructPredicate(), reason: "Subquery predicates will only work on one collection at a time.")
     }
@@ -11681,44 +11681,44 @@ class QueryTests: TestCase {
         }
 
         assertQuery(predicate: "objectCol.arrayInt.@count > %@", values: [2], expectedCount: 1) {
-            $0.objectCol.arrayInt.count() > 2
+            $0.objectCol.arrayInt.count > 2
         }
 
         assertQuery(predicate: "objectCol.arrayInt.@count < %@", values: [3], expectedCount: 1) {
-            $0.objectCol.arrayInt.count() < 3
+            $0.objectCol.arrayInt.count < 3
         }
 
         assertQuery(predicate: "objectCol.arrayInt.@count == %@", values: [3], expectedCount: 1) {
-            $0.objectCol.arrayInt.count() == 3
+            $0.objectCol.arrayInt.count == 3
         }
 
         assertQuery(predicate: "objectCol.arrayInt.@count == %@", values: [0], expectedCount: 1) {
-            $0.objectCol.arrayInt.count() == 0
+            $0.objectCol.arrayInt.count == 0
         }
 
         assertQuery(predicate: "objectCol.arrayInt.@count >= %@", values: [4], expectedCount: 0) {
-            $0.objectCol.arrayInt.count() >= 4
+            $0.objectCol.arrayInt.count >= 4
         }
 
         assertQuery(predicate: "objectCol.arrayInt.@count >= %@", values: [3], expectedCount: 1) {
-            $0.objectCol.arrayInt.count() >= 3
+            $0.objectCol.arrayInt.count >= 3
         }
 
         assertQuery(predicate: "objectCol.arrayInt.@count <= %@", values: [2], expectedCount: 1) {
-            $0.objectCol.arrayInt.count() <= 2
+            $0.objectCol.arrayInt.count <= 2
         }
 
         assertQuery(predicate: "objectCol.arrayInt.@count <= %@", values: [3], expectedCount: 2) {
-            $0.objectCol.arrayInt.count() <= 3
+            $0.objectCol.arrayInt.count <= 3
         }
 
         // This includes all ModernAllTypesObject objects beside the one we are populating
         assertQuery(predicate: "objectCol.arrayInt.@count != %@", values: [3], expectedCount: 1) {
-            $0.objectCol.arrayInt.count() != 3
+            $0.objectCol.arrayInt.count != 3
         }
 
         assertQuery(predicate: "objectCol.arrayInt.@count != %@", values: [1], expectedCount: 2) {
-            $0.objectCol.arrayInt.count() != 1
+            $0.objectCol.arrayInt.count != 1
         }
 
         try! realm.write {
@@ -11730,44 +11730,44 @@ class QueryTests: TestCase {
         }
 
         assertQuery(predicate: "objectCol.arrayInt8.@count > %@", values: [2], expectedCount: 1) {
-            $0.objectCol.arrayInt8.count() > 2
+            $0.objectCol.arrayInt8.count > 2
         }
 
         assertQuery(predicate: "objectCol.arrayInt8.@count < %@", values: [3], expectedCount: 1) {
-            $0.objectCol.arrayInt8.count() < 3
+            $0.objectCol.arrayInt8.count < 3
         }
 
         assertQuery(predicate: "objectCol.arrayInt8.@count == %@", values: [3], expectedCount: 1) {
-            $0.objectCol.arrayInt8.count() == 3
+            $0.objectCol.arrayInt8.count == 3
         }
 
         assertQuery(predicate: "objectCol.arrayInt8.@count == %@", values: [0], expectedCount: 1) {
-            $0.objectCol.arrayInt8.count() == 0
+            $0.objectCol.arrayInt8.count == 0
         }
 
         assertQuery(predicate: "objectCol.arrayInt8.@count >= %@", values: [4], expectedCount: 0) {
-            $0.objectCol.arrayInt8.count() >= 4
+            $0.objectCol.arrayInt8.count >= 4
         }
 
         assertQuery(predicate: "objectCol.arrayInt8.@count >= %@", values: [3], expectedCount: 1) {
-            $0.objectCol.arrayInt8.count() >= 3
+            $0.objectCol.arrayInt8.count >= 3
         }
 
         assertQuery(predicate: "objectCol.arrayInt8.@count <= %@", values: [2], expectedCount: 1) {
-            $0.objectCol.arrayInt8.count() <= 2
+            $0.objectCol.arrayInt8.count <= 2
         }
 
         assertQuery(predicate: "objectCol.arrayInt8.@count <= %@", values: [3], expectedCount: 2) {
-            $0.objectCol.arrayInt8.count() <= 3
+            $0.objectCol.arrayInt8.count <= 3
         }
 
         // This includes all ModernAllTypesObject objects beside the one we are populating
         assertQuery(predicate: "objectCol.arrayInt8.@count != %@", values: [3], expectedCount: 1) {
-            $0.objectCol.arrayInt8.count() != 3
+            $0.objectCol.arrayInt8.count != 3
         }
 
         assertQuery(predicate: "objectCol.arrayInt8.@count != %@", values: [1], expectedCount: 2) {
-            $0.objectCol.arrayInt8.count() != 1
+            $0.objectCol.arrayInt8.count != 1
         }
 
         try! realm.write {
@@ -11779,44 +11779,44 @@ class QueryTests: TestCase {
         }
 
         assertQuery(predicate: "objectCol.arrayInt16.@count > %@", values: [2], expectedCount: 1) {
-            $0.objectCol.arrayInt16.count() > 2
+            $0.objectCol.arrayInt16.count > 2
         }
 
         assertQuery(predicate: "objectCol.arrayInt16.@count < %@", values: [3], expectedCount: 1) {
-            $0.objectCol.arrayInt16.count() < 3
+            $0.objectCol.arrayInt16.count < 3
         }
 
         assertQuery(predicate: "objectCol.arrayInt16.@count == %@", values: [3], expectedCount: 1) {
-            $0.objectCol.arrayInt16.count() == 3
+            $0.objectCol.arrayInt16.count == 3
         }
 
         assertQuery(predicate: "objectCol.arrayInt16.@count == %@", values: [0], expectedCount: 1) {
-            $0.objectCol.arrayInt16.count() == 0
+            $0.objectCol.arrayInt16.count == 0
         }
 
         assertQuery(predicate: "objectCol.arrayInt16.@count >= %@", values: [4], expectedCount: 0) {
-            $0.objectCol.arrayInt16.count() >= 4
+            $0.objectCol.arrayInt16.count >= 4
         }
 
         assertQuery(predicate: "objectCol.arrayInt16.@count >= %@", values: [3], expectedCount: 1) {
-            $0.objectCol.arrayInt16.count() >= 3
+            $0.objectCol.arrayInt16.count >= 3
         }
 
         assertQuery(predicate: "objectCol.arrayInt16.@count <= %@", values: [2], expectedCount: 1) {
-            $0.objectCol.arrayInt16.count() <= 2
+            $0.objectCol.arrayInt16.count <= 2
         }
 
         assertQuery(predicate: "objectCol.arrayInt16.@count <= %@", values: [3], expectedCount: 2) {
-            $0.objectCol.arrayInt16.count() <= 3
+            $0.objectCol.arrayInt16.count <= 3
         }
 
         // This includes all ModernAllTypesObject objects beside the one we are populating
         assertQuery(predicate: "objectCol.arrayInt16.@count != %@", values: [3], expectedCount: 1) {
-            $0.objectCol.arrayInt16.count() != 3
+            $0.objectCol.arrayInt16.count != 3
         }
 
         assertQuery(predicate: "objectCol.arrayInt16.@count != %@", values: [1], expectedCount: 2) {
-            $0.objectCol.arrayInt16.count() != 1
+            $0.objectCol.arrayInt16.count != 1
         }
 
         try! realm.write {
@@ -11828,44 +11828,44 @@ class QueryTests: TestCase {
         }
 
         assertQuery(predicate: "objectCol.arrayInt32.@count > %@", values: [2], expectedCount: 1) {
-            $0.objectCol.arrayInt32.count() > 2
+            $0.objectCol.arrayInt32.count > 2
         }
 
         assertQuery(predicate: "objectCol.arrayInt32.@count < %@", values: [3], expectedCount: 1) {
-            $0.objectCol.arrayInt32.count() < 3
+            $0.objectCol.arrayInt32.count < 3
         }
 
         assertQuery(predicate: "objectCol.arrayInt32.@count == %@", values: [3], expectedCount: 1) {
-            $0.objectCol.arrayInt32.count() == 3
+            $0.objectCol.arrayInt32.count == 3
         }
 
         assertQuery(predicate: "objectCol.arrayInt32.@count == %@", values: [0], expectedCount: 1) {
-            $0.objectCol.arrayInt32.count() == 0
+            $0.objectCol.arrayInt32.count == 0
         }
 
         assertQuery(predicate: "objectCol.arrayInt32.@count >= %@", values: [4], expectedCount: 0) {
-            $0.objectCol.arrayInt32.count() >= 4
+            $0.objectCol.arrayInt32.count >= 4
         }
 
         assertQuery(predicate: "objectCol.arrayInt32.@count >= %@", values: [3], expectedCount: 1) {
-            $0.objectCol.arrayInt32.count() >= 3
+            $0.objectCol.arrayInt32.count >= 3
         }
 
         assertQuery(predicate: "objectCol.arrayInt32.@count <= %@", values: [2], expectedCount: 1) {
-            $0.objectCol.arrayInt32.count() <= 2
+            $0.objectCol.arrayInt32.count <= 2
         }
 
         assertQuery(predicate: "objectCol.arrayInt32.@count <= %@", values: [3], expectedCount: 2) {
-            $0.objectCol.arrayInt32.count() <= 3
+            $0.objectCol.arrayInt32.count <= 3
         }
 
         // This includes all ModernAllTypesObject objects beside the one we are populating
         assertQuery(predicate: "objectCol.arrayInt32.@count != %@", values: [3], expectedCount: 1) {
-            $0.objectCol.arrayInt32.count() != 3
+            $0.objectCol.arrayInt32.count != 3
         }
 
         assertQuery(predicate: "objectCol.arrayInt32.@count != %@", values: [1], expectedCount: 2) {
-            $0.objectCol.arrayInt32.count() != 1
+            $0.objectCol.arrayInt32.count != 1
         }
 
         try! realm.write {
@@ -11877,44 +11877,44 @@ class QueryTests: TestCase {
         }
 
         assertQuery(predicate: "objectCol.arrayInt64.@count > %@", values: [2], expectedCount: 1) {
-            $0.objectCol.arrayInt64.count() > 2
+            $0.objectCol.arrayInt64.count > 2
         }
 
         assertQuery(predicate: "objectCol.arrayInt64.@count < %@", values: [3], expectedCount: 1) {
-            $0.objectCol.arrayInt64.count() < 3
+            $0.objectCol.arrayInt64.count < 3
         }
 
         assertQuery(predicate: "objectCol.arrayInt64.@count == %@", values: [3], expectedCount: 1) {
-            $0.objectCol.arrayInt64.count() == 3
+            $0.objectCol.arrayInt64.count == 3
         }
 
         assertQuery(predicate: "objectCol.arrayInt64.@count == %@", values: [0], expectedCount: 1) {
-            $0.objectCol.arrayInt64.count() == 0
+            $0.objectCol.arrayInt64.count == 0
         }
 
         assertQuery(predicate: "objectCol.arrayInt64.@count >= %@", values: [4], expectedCount: 0) {
-            $0.objectCol.arrayInt64.count() >= 4
+            $0.objectCol.arrayInt64.count >= 4
         }
 
         assertQuery(predicate: "objectCol.arrayInt64.@count >= %@", values: [3], expectedCount: 1) {
-            $0.objectCol.arrayInt64.count() >= 3
+            $0.objectCol.arrayInt64.count >= 3
         }
 
         assertQuery(predicate: "objectCol.arrayInt64.@count <= %@", values: [2], expectedCount: 1) {
-            $0.objectCol.arrayInt64.count() <= 2
+            $0.objectCol.arrayInt64.count <= 2
         }
 
         assertQuery(predicate: "objectCol.arrayInt64.@count <= %@", values: [3], expectedCount: 2) {
-            $0.objectCol.arrayInt64.count() <= 3
+            $0.objectCol.arrayInt64.count <= 3
         }
 
         // This includes all ModernAllTypesObject objects beside the one we are populating
         assertQuery(predicate: "objectCol.arrayInt64.@count != %@", values: [3], expectedCount: 1) {
-            $0.objectCol.arrayInt64.count() != 3
+            $0.objectCol.arrayInt64.count != 3
         }
 
         assertQuery(predicate: "objectCol.arrayInt64.@count != %@", values: [1], expectedCount: 2) {
-            $0.objectCol.arrayInt64.count() != 1
+            $0.objectCol.arrayInt64.count != 1
         }
 
         try! realm.write {
@@ -11926,44 +11926,44 @@ class QueryTests: TestCase {
         }
 
         assertQuery(predicate: "objectCol.arrayFloat.@count > %@", values: [2], expectedCount: 1) {
-            $0.objectCol.arrayFloat.count() > 2
+            $0.objectCol.arrayFloat.count > 2
         }
 
         assertQuery(predicate: "objectCol.arrayFloat.@count < %@", values: [3], expectedCount: 1) {
-            $0.objectCol.arrayFloat.count() < 3
+            $0.objectCol.arrayFloat.count < 3
         }
 
         assertQuery(predicate: "objectCol.arrayFloat.@count == %@", values: [3], expectedCount: 1) {
-            $0.objectCol.arrayFloat.count() == 3
+            $0.objectCol.arrayFloat.count == 3
         }
 
         assertQuery(predicate: "objectCol.arrayFloat.@count == %@", values: [0], expectedCount: 1) {
-            $0.objectCol.arrayFloat.count() == 0
+            $0.objectCol.arrayFloat.count == 0
         }
 
         assertQuery(predicate: "objectCol.arrayFloat.@count >= %@", values: [4], expectedCount: 0) {
-            $0.objectCol.arrayFloat.count() >= 4
+            $0.objectCol.arrayFloat.count >= 4
         }
 
         assertQuery(predicate: "objectCol.arrayFloat.@count >= %@", values: [3], expectedCount: 1) {
-            $0.objectCol.arrayFloat.count() >= 3
+            $0.objectCol.arrayFloat.count >= 3
         }
 
         assertQuery(predicate: "objectCol.arrayFloat.@count <= %@", values: [2], expectedCount: 1) {
-            $0.objectCol.arrayFloat.count() <= 2
+            $0.objectCol.arrayFloat.count <= 2
         }
 
         assertQuery(predicate: "objectCol.arrayFloat.@count <= %@", values: [3], expectedCount: 2) {
-            $0.objectCol.arrayFloat.count() <= 3
+            $0.objectCol.arrayFloat.count <= 3
         }
 
         // This includes all ModernAllTypesObject objects beside the one we are populating
         assertQuery(predicate: "objectCol.arrayFloat.@count != %@", values: [3], expectedCount: 1) {
-            $0.objectCol.arrayFloat.count() != 3
+            $0.objectCol.arrayFloat.count != 3
         }
 
         assertQuery(predicate: "objectCol.arrayFloat.@count != %@", values: [1], expectedCount: 2) {
-            $0.objectCol.arrayFloat.count() != 1
+            $0.objectCol.arrayFloat.count != 1
         }
 
         try! realm.write {
@@ -11975,44 +11975,44 @@ class QueryTests: TestCase {
         }
 
         assertQuery(predicate: "objectCol.arrayDouble.@count > %@", values: [2], expectedCount: 1) {
-            $0.objectCol.arrayDouble.count() > 2
+            $0.objectCol.arrayDouble.count > 2
         }
 
         assertQuery(predicate: "objectCol.arrayDouble.@count < %@", values: [3], expectedCount: 1) {
-            $0.objectCol.arrayDouble.count() < 3
+            $0.objectCol.arrayDouble.count < 3
         }
 
         assertQuery(predicate: "objectCol.arrayDouble.@count == %@", values: [3], expectedCount: 1) {
-            $0.objectCol.arrayDouble.count() == 3
+            $0.objectCol.arrayDouble.count == 3
         }
 
         assertQuery(predicate: "objectCol.arrayDouble.@count == %@", values: [0], expectedCount: 1) {
-            $0.objectCol.arrayDouble.count() == 0
+            $0.objectCol.arrayDouble.count == 0
         }
 
         assertQuery(predicate: "objectCol.arrayDouble.@count >= %@", values: [4], expectedCount: 0) {
-            $0.objectCol.arrayDouble.count() >= 4
+            $0.objectCol.arrayDouble.count >= 4
         }
 
         assertQuery(predicate: "objectCol.arrayDouble.@count >= %@", values: [3], expectedCount: 1) {
-            $0.objectCol.arrayDouble.count() >= 3
+            $0.objectCol.arrayDouble.count >= 3
         }
 
         assertQuery(predicate: "objectCol.arrayDouble.@count <= %@", values: [2], expectedCount: 1) {
-            $0.objectCol.arrayDouble.count() <= 2
+            $0.objectCol.arrayDouble.count <= 2
         }
 
         assertQuery(predicate: "objectCol.arrayDouble.@count <= %@", values: [3], expectedCount: 2) {
-            $0.objectCol.arrayDouble.count() <= 3
+            $0.objectCol.arrayDouble.count <= 3
         }
 
         // This includes all ModernAllTypesObject objects beside the one we are populating
         assertQuery(predicate: "objectCol.arrayDouble.@count != %@", values: [3], expectedCount: 1) {
-            $0.objectCol.arrayDouble.count() != 3
+            $0.objectCol.arrayDouble.count != 3
         }
 
         assertQuery(predicate: "objectCol.arrayDouble.@count != %@", values: [1], expectedCount: 2) {
-            $0.objectCol.arrayDouble.count() != 1
+            $0.objectCol.arrayDouble.count != 1
         }
 
         try! realm.write {
@@ -12024,44 +12024,44 @@ class QueryTests: TestCase {
         }
 
         assertQuery(predicate: "objectCol.arrayDate.@count > %@", values: [2], expectedCount: 1) {
-            $0.objectCol.arrayDate.count() > 2
+            $0.objectCol.arrayDate.count > 2
         }
 
         assertQuery(predicate: "objectCol.arrayDate.@count < %@", values: [3], expectedCount: 1) {
-            $0.objectCol.arrayDate.count() < 3
+            $0.objectCol.arrayDate.count < 3
         }
 
         assertQuery(predicate: "objectCol.arrayDate.@count == %@", values: [3], expectedCount: 1) {
-            $0.objectCol.arrayDate.count() == 3
+            $0.objectCol.arrayDate.count == 3
         }
 
         assertQuery(predicate: "objectCol.arrayDate.@count == %@", values: [0], expectedCount: 1) {
-            $0.objectCol.arrayDate.count() == 0
+            $0.objectCol.arrayDate.count == 0
         }
 
         assertQuery(predicate: "objectCol.arrayDate.@count >= %@", values: [4], expectedCount: 0) {
-            $0.objectCol.arrayDate.count() >= 4
+            $0.objectCol.arrayDate.count >= 4
         }
 
         assertQuery(predicate: "objectCol.arrayDate.@count >= %@", values: [3], expectedCount: 1) {
-            $0.objectCol.arrayDate.count() >= 3
+            $0.objectCol.arrayDate.count >= 3
         }
 
         assertQuery(predicate: "objectCol.arrayDate.@count <= %@", values: [2], expectedCount: 1) {
-            $0.objectCol.arrayDate.count() <= 2
+            $0.objectCol.arrayDate.count <= 2
         }
 
         assertQuery(predicate: "objectCol.arrayDate.@count <= %@", values: [3], expectedCount: 2) {
-            $0.objectCol.arrayDate.count() <= 3
+            $0.objectCol.arrayDate.count <= 3
         }
 
         // This includes all ModernAllTypesObject objects beside the one we are populating
         assertQuery(predicate: "objectCol.arrayDate.@count != %@", values: [3], expectedCount: 1) {
-            $0.objectCol.arrayDate.count() != 3
+            $0.objectCol.arrayDate.count != 3
         }
 
         assertQuery(predicate: "objectCol.arrayDate.@count != %@", values: [1], expectedCount: 2) {
-            $0.objectCol.arrayDate.count() != 1
+            $0.objectCol.arrayDate.count != 1
         }
 
         try! realm.write {
@@ -12073,44 +12073,44 @@ class QueryTests: TestCase {
         }
 
         assertQuery(predicate: "objectCol.arrayDecimal.@count > %@", values: [2], expectedCount: 1) {
-            $0.objectCol.arrayDecimal.count() > 2
+            $0.objectCol.arrayDecimal.count > 2
         }
 
         assertQuery(predicate: "objectCol.arrayDecimal.@count < %@", values: [3], expectedCount: 1) {
-            $0.objectCol.arrayDecimal.count() < 3
+            $0.objectCol.arrayDecimal.count < 3
         }
 
         assertQuery(predicate: "objectCol.arrayDecimal.@count == %@", values: [3], expectedCount: 1) {
-            $0.objectCol.arrayDecimal.count() == 3
+            $0.objectCol.arrayDecimal.count == 3
         }
 
         assertQuery(predicate: "objectCol.arrayDecimal.@count == %@", values: [0], expectedCount: 1) {
-            $0.objectCol.arrayDecimal.count() == 0
+            $0.objectCol.arrayDecimal.count == 0
         }
 
         assertQuery(predicate: "objectCol.arrayDecimal.@count >= %@", values: [4], expectedCount: 0) {
-            $0.objectCol.arrayDecimal.count() >= 4
+            $0.objectCol.arrayDecimal.count >= 4
         }
 
         assertQuery(predicate: "objectCol.arrayDecimal.@count >= %@", values: [3], expectedCount: 1) {
-            $0.objectCol.arrayDecimal.count() >= 3
+            $0.objectCol.arrayDecimal.count >= 3
         }
 
         assertQuery(predicate: "objectCol.arrayDecimal.@count <= %@", values: [2], expectedCount: 1) {
-            $0.objectCol.arrayDecimal.count() <= 2
+            $0.objectCol.arrayDecimal.count <= 2
         }
 
         assertQuery(predicate: "objectCol.arrayDecimal.@count <= %@", values: [3], expectedCount: 2) {
-            $0.objectCol.arrayDecimal.count() <= 3
+            $0.objectCol.arrayDecimal.count <= 3
         }
 
         // This includes all ModernAllTypesObject objects beside the one we are populating
         assertQuery(predicate: "objectCol.arrayDecimal.@count != %@", values: [3], expectedCount: 1) {
-            $0.objectCol.arrayDecimal.count() != 3
+            $0.objectCol.arrayDecimal.count != 3
         }
 
         assertQuery(predicate: "objectCol.arrayDecimal.@count != %@", values: [1], expectedCount: 2) {
-            $0.objectCol.arrayDecimal.count() != 1
+            $0.objectCol.arrayDecimal.count != 1
         }
 
         try! realm.write {
@@ -12122,44 +12122,44 @@ class QueryTests: TestCase {
         }
 
         assertQuery(predicate: "objectCol.arrayOptInt.@count > %@", values: [2], expectedCount: 1) {
-            $0.objectCol.arrayOptInt.count() > 2
+            $0.objectCol.arrayOptInt.count > 2
         }
 
         assertQuery(predicate: "objectCol.arrayOptInt.@count < %@", values: [3], expectedCount: 1) {
-            $0.objectCol.arrayOptInt.count() < 3
+            $0.objectCol.arrayOptInt.count < 3
         }
 
         assertQuery(predicate: "objectCol.arrayOptInt.@count == %@", values: [3], expectedCount: 1) {
-            $0.objectCol.arrayOptInt.count() == 3
+            $0.objectCol.arrayOptInt.count == 3
         }
 
         assertQuery(predicate: "objectCol.arrayOptInt.@count == %@", values: [0], expectedCount: 1) {
-            $0.objectCol.arrayOptInt.count() == 0
+            $0.objectCol.arrayOptInt.count == 0
         }
 
         assertQuery(predicate: "objectCol.arrayOptInt.@count >= %@", values: [4], expectedCount: 0) {
-            $0.objectCol.arrayOptInt.count() >= 4
+            $0.objectCol.arrayOptInt.count >= 4
         }
 
         assertQuery(predicate: "objectCol.arrayOptInt.@count >= %@", values: [3], expectedCount: 1) {
-            $0.objectCol.arrayOptInt.count() >= 3
+            $0.objectCol.arrayOptInt.count >= 3
         }
 
         assertQuery(predicate: "objectCol.arrayOptInt.@count <= %@", values: [2], expectedCount: 1) {
-            $0.objectCol.arrayOptInt.count() <= 2
+            $0.objectCol.arrayOptInt.count <= 2
         }
 
         assertQuery(predicate: "objectCol.arrayOptInt.@count <= %@", values: [3], expectedCount: 2) {
-            $0.objectCol.arrayOptInt.count() <= 3
+            $0.objectCol.arrayOptInt.count <= 3
         }
 
         // This includes all ModernAllTypesObject objects beside the one we are populating
         assertQuery(predicate: "objectCol.arrayOptInt.@count != %@", values: [3], expectedCount: 1) {
-            $0.objectCol.arrayOptInt.count() != 3
+            $0.objectCol.arrayOptInt.count != 3
         }
 
         assertQuery(predicate: "objectCol.arrayOptInt.@count != %@", values: [1], expectedCount: 2) {
-            $0.objectCol.arrayOptInt.count() != 1
+            $0.objectCol.arrayOptInt.count != 1
         }
 
         try! realm.write {
@@ -12171,44 +12171,44 @@ class QueryTests: TestCase {
         }
 
         assertQuery(predicate: "objectCol.arrayOptInt8.@count > %@", values: [2], expectedCount: 1) {
-            $0.objectCol.arrayOptInt8.count() > 2
+            $0.objectCol.arrayOptInt8.count > 2
         }
 
         assertQuery(predicate: "objectCol.arrayOptInt8.@count < %@", values: [3], expectedCount: 1) {
-            $0.objectCol.arrayOptInt8.count() < 3
+            $0.objectCol.arrayOptInt8.count < 3
         }
 
         assertQuery(predicate: "objectCol.arrayOptInt8.@count == %@", values: [3], expectedCount: 1) {
-            $0.objectCol.arrayOptInt8.count() == 3
+            $0.objectCol.arrayOptInt8.count == 3
         }
 
         assertQuery(predicate: "objectCol.arrayOptInt8.@count == %@", values: [0], expectedCount: 1) {
-            $0.objectCol.arrayOptInt8.count() == 0
+            $0.objectCol.arrayOptInt8.count == 0
         }
 
         assertQuery(predicate: "objectCol.arrayOptInt8.@count >= %@", values: [4], expectedCount: 0) {
-            $0.objectCol.arrayOptInt8.count() >= 4
+            $0.objectCol.arrayOptInt8.count >= 4
         }
 
         assertQuery(predicate: "objectCol.arrayOptInt8.@count >= %@", values: [3], expectedCount: 1) {
-            $0.objectCol.arrayOptInt8.count() >= 3
+            $0.objectCol.arrayOptInt8.count >= 3
         }
 
         assertQuery(predicate: "objectCol.arrayOptInt8.@count <= %@", values: [2], expectedCount: 1) {
-            $0.objectCol.arrayOptInt8.count() <= 2
+            $0.objectCol.arrayOptInt8.count <= 2
         }
 
         assertQuery(predicate: "objectCol.arrayOptInt8.@count <= %@", values: [3], expectedCount: 2) {
-            $0.objectCol.arrayOptInt8.count() <= 3
+            $0.objectCol.arrayOptInt8.count <= 3
         }
 
         // This includes all ModernAllTypesObject objects beside the one we are populating
         assertQuery(predicate: "objectCol.arrayOptInt8.@count != %@", values: [3], expectedCount: 1) {
-            $0.objectCol.arrayOptInt8.count() != 3
+            $0.objectCol.arrayOptInt8.count != 3
         }
 
         assertQuery(predicate: "objectCol.arrayOptInt8.@count != %@", values: [1], expectedCount: 2) {
-            $0.objectCol.arrayOptInt8.count() != 1
+            $0.objectCol.arrayOptInt8.count != 1
         }
 
         try! realm.write {
@@ -12220,44 +12220,44 @@ class QueryTests: TestCase {
         }
 
         assertQuery(predicate: "objectCol.arrayOptInt16.@count > %@", values: [2], expectedCount: 1) {
-            $0.objectCol.arrayOptInt16.count() > 2
+            $0.objectCol.arrayOptInt16.count > 2
         }
 
         assertQuery(predicate: "objectCol.arrayOptInt16.@count < %@", values: [3], expectedCount: 1) {
-            $0.objectCol.arrayOptInt16.count() < 3
+            $0.objectCol.arrayOptInt16.count < 3
         }
 
         assertQuery(predicate: "objectCol.arrayOptInt16.@count == %@", values: [3], expectedCount: 1) {
-            $0.objectCol.arrayOptInt16.count() == 3
+            $0.objectCol.arrayOptInt16.count == 3
         }
 
         assertQuery(predicate: "objectCol.arrayOptInt16.@count == %@", values: [0], expectedCount: 1) {
-            $0.objectCol.arrayOptInt16.count() == 0
+            $0.objectCol.arrayOptInt16.count == 0
         }
 
         assertQuery(predicate: "objectCol.arrayOptInt16.@count >= %@", values: [4], expectedCount: 0) {
-            $0.objectCol.arrayOptInt16.count() >= 4
+            $0.objectCol.arrayOptInt16.count >= 4
         }
 
         assertQuery(predicate: "objectCol.arrayOptInt16.@count >= %@", values: [3], expectedCount: 1) {
-            $0.objectCol.arrayOptInt16.count() >= 3
+            $0.objectCol.arrayOptInt16.count >= 3
         }
 
         assertQuery(predicate: "objectCol.arrayOptInt16.@count <= %@", values: [2], expectedCount: 1) {
-            $0.objectCol.arrayOptInt16.count() <= 2
+            $0.objectCol.arrayOptInt16.count <= 2
         }
 
         assertQuery(predicate: "objectCol.arrayOptInt16.@count <= %@", values: [3], expectedCount: 2) {
-            $0.objectCol.arrayOptInt16.count() <= 3
+            $0.objectCol.arrayOptInt16.count <= 3
         }
 
         // This includes all ModernAllTypesObject objects beside the one we are populating
         assertQuery(predicate: "objectCol.arrayOptInt16.@count != %@", values: [3], expectedCount: 1) {
-            $0.objectCol.arrayOptInt16.count() != 3
+            $0.objectCol.arrayOptInt16.count != 3
         }
 
         assertQuery(predicate: "objectCol.arrayOptInt16.@count != %@", values: [1], expectedCount: 2) {
-            $0.objectCol.arrayOptInt16.count() != 1
+            $0.objectCol.arrayOptInt16.count != 1
         }
 
         try! realm.write {
@@ -12269,44 +12269,44 @@ class QueryTests: TestCase {
         }
 
         assertQuery(predicate: "objectCol.arrayOptInt32.@count > %@", values: [2], expectedCount: 1) {
-            $0.objectCol.arrayOptInt32.count() > 2
+            $0.objectCol.arrayOptInt32.count > 2
         }
 
         assertQuery(predicate: "objectCol.arrayOptInt32.@count < %@", values: [3], expectedCount: 1) {
-            $0.objectCol.arrayOptInt32.count() < 3
+            $0.objectCol.arrayOptInt32.count < 3
         }
 
         assertQuery(predicate: "objectCol.arrayOptInt32.@count == %@", values: [3], expectedCount: 1) {
-            $0.objectCol.arrayOptInt32.count() == 3
+            $0.objectCol.arrayOptInt32.count == 3
         }
 
         assertQuery(predicate: "objectCol.arrayOptInt32.@count == %@", values: [0], expectedCount: 1) {
-            $0.objectCol.arrayOptInt32.count() == 0
+            $0.objectCol.arrayOptInt32.count == 0
         }
 
         assertQuery(predicate: "objectCol.arrayOptInt32.@count >= %@", values: [4], expectedCount: 0) {
-            $0.objectCol.arrayOptInt32.count() >= 4
+            $0.objectCol.arrayOptInt32.count >= 4
         }
 
         assertQuery(predicate: "objectCol.arrayOptInt32.@count >= %@", values: [3], expectedCount: 1) {
-            $0.objectCol.arrayOptInt32.count() >= 3
+            $0.objectCol.arrayOptInt32.count >= 3
         }
 
         assertQuery(predicate: "objectCol.arrayOptInt32.@count <= %@", values: [2], expectedCount: 1) {
-            $0.objectCol.arrayOptInt32.count() <= 2
+            $0.objectCol.arrayOptInt32.count <= 2
         }
 
         assertQuery(predicate: "objectCol.arrayOptInt32.@count <= %@", values: [3], expectedCount: 2) {
-            $0.objectCol.arrayOptInt32.count() <= 3
+            $0.objectCol.arrayOptInt32.count <= 3
         }
 
         // This includes all ModernAllTypesObject objects beside the one we are populating
         assertQuery(predicate: "objectCol.arrayOptInt32.@count != %@", values: [3], expectedCount: 1) {
-            $0.objectCol.arrayOptInt32.count() != 3
+            $0.objectCol.arrayOptInt32.count != 3
         }
 
         assertQuery(predicate: "objectCol.arrayOptInt32.@count != %@", values: [1], expectedCount: 2) {
-            $0.objectCol.arrayOptInt32.count() != 1
+            $0.objectCol.arrayOptInt32.count != 1
         }
 
         try! realm.write {
@@ -12318,44 +12318,44 @@ class QueryTests: TestCase {
         }
 
         assertQuery(predicate: "objectCol.arrayOptInt64.@count > %@", values: [2], expectedCount: 1) {
-            $0.objectCol.arrayOptInt64.count() > 2
+            $0.objectCol.arrayOptInt64.count > 2
         }
 
         assertQuery(predicate: "objectCol.arrayOptInt64.@count < %@", values: [3], expectedCount: 1) {
-            $0.objectCol.arrayOptInt64.count() < 3
+            $0.objectCol.arrayOptInt64.count < 3
         }
 
         assertQuery(predicate: "objectCol.arrayOptInt64.@count == %@", values: [3], expectedCount: 1) {
-            $0.objectCol.arrayOptInt64.count() == 3
+            $0.objectCol.arrayOptInt64.count == 3
         }
 
         assertQuery(predicate: "objectCol.arrayOptInt64.@count == %@", values: [0], expectedCount: 1) {
-            $0.objectCol.arrayOptInt64.count() == 0
+            $0.objectCol.arrayOptInt64.count == 0
         }
 
         assertQuery(predicate: "objectCol.arrayOptInt64.@count >= %@", values: [4], expectedCount: 0) {
-            $0.objectCol.arrayOptInt64.count() >= 4
+            $0.objectCol.arrayOptInt64.count >= 4
         }
 
         assertQuery(predicate: "objectCol.arrayOptInt64.@count >= %@", values: [3], expectedCount: 1) {
-            $0.objectCol.arrayOptInt64.count() >= 3
+            $0.objectCol.arrayOptInt64.count >= 3
         }
 
         assertQuery(predicate: "objectCol.arrayOptInt64.@count <= %@", values: [2], expectedCount: 1) {
-            $0.objectCol.arrayOptInt64.count() <= 2
+            $0.objectCol.arrayOptInt64.count <= 2
         }
 
         assertQuery(predicate: "objectCol.arrayOptInt64.@count <= %@", values: [3], expectedCount: 2) {
-            $0.objectCol.arrayOptInt64.count() <= 3
+            $0.objectCol.arrayOptInt64.count <= 3
         }
 
         // This includes all ModernAllTypesObject objects beside the one we are populating
         assertQuery(predicate: "objectCol.arrayOptInt64.@count != %@", values: [3], expectedCount: 1) {
-            $0.objectCol.arrayOptInt64.count() != 3
+            $0.objectCol.arrayOptInt64.count != 3
         }
 
         assertQuery(predicate: "objectCol.arrayOptInt64.@count != %@", values: [1], expectedCount: 2) {
-            $0.objectCol.arrayOptInt64.count() != 1
+            $0.objectCol.arrayOptInt64.count != 1
         }
 
         try! realm.write {
@@ -12367,44 +12367,44 @@ class QueryTests: TestCase {
         }
 
         assertQuery(predicate: "objectCol.arrayOptFloat.@count > %@", values: [2], expectedCount: 1) {
-            $0.objectCol.arrayOptFloat.count() > 2
+            $0.objectCol.arrayOptFloat.count > 2
         }
 
         assertQuery(predicate: "objectCol.arrayOptFloat.@count < %@", values: [3], expectedCount: 1) {
-            $0.objectCol.arrayOptFloat.count() < 3
+            $0.objectCol.arrayOptFloat.count < 3
         }
 
         assertQuery(predicate: "objectCol.arrayOptFloat.@count == %@", values: [3], expectedCount: 1) {
-            $0.objectCol.arrayOptFloat.count() == 3
+            $0.objectCol.arrayOptFloat.count == 3
         }
 
         assertQuery(predicate: "objectCol.arrayOptFloat.@count == %@", values: [0], expectedCount: 1) {
-            $0.objectCol.arrayOptFloat.count() == 0
+            $0.objectCol.arrayOptFloat.count == 0
         }
 
         assertQuery(predicate: "objectCol.arrayOptFloat.@count >= %@", values: [4], expectedCount: 0) {
-            $0.objectCol.arrayOptFloat.count() >= 4
+            $0.objectCol.arrayOptFloat.count >= 4
         }
 
         assertQuery(predicate: "objectCol.arrayOptFloat.@count >= %@", values: [3], expectedCount: 1) {
-            $0.objectCol.arrayOptFloat.count() >= 3
+            $0.objectCol.arrayOptFloat.count >= 3
         }
 
         assertQuery(predicate: "objectCol.arrayOptFloat.@count <= %@", values: [2], expectedCount: 1) {
-            $0.objectCol.arrayOptFloat.count() <= 2
+            $0.objectCol.arrayOptFloat.count <= 2
         }
 
         assertQuery(predicate: "objectCol.arrayOptFloat.@count <= %@", values: [3], expectedCount: 2) {
-            $0.objectCol.arrayOptFloat.count() <= 3
+            $0.objectCol.arrayOptFloat.count <= 3
         }
 
         // This includes all ModernAllTypesObject objects beside the one we are populating
         assertQuery(predicate: "objectCol.arrayOptFloat.@count != %@", values: [3], expectedCount: 1) {
-            $0.objectCol.arrayOptFloat.count() != 3
+            $0.objectCol.arrayOptFloat.count != 3
         }
 
         assertQuery(predicate: "objectCol.arrayOptFloat.@count != %@", values: [1], expectedCount: 2) {
-            $0.objectCol.arrayOptFloat.count() != 1
+            $0.objectCol.arrayOptFloat.count != 1
         }
 
         try! realm.write {
@@ -12416,44 +12416,44 @@ class QueryTests: TestCase {
         }
 
         assertQuery(predicate: "objectCol.arrayOptDouble.@count > %@", values: [2], expectedCount: 1) {
-            $0.objectCol.arrayOptDouble.count() > 2
+            $0.objectCol.arrayOptDouble.count > 2
         }
 
         assertQuery(predicate: "objectCol.arrayOptDouble.@count < %@", values: [3], expectedCount: 1) {
-            $0.objectCol.arrayOptDouble.count() < 3
+            $0.objectCol.arrayOptDouble.count < 3
         }
 
         assertQuery(predicate: "objectCol.arrayOptDouble.@count == %@", values: [3], expectedCount: 1) {
-            $0.objectCol.arrayOptDouble.count() == 3
+            $0.objectCol.arrayOptDouble.count == 3
         }
 
         assertQuery(predicate: "objectCol.arrayOptDouble.@count == %@", values: [0], expectedCount: 1) {
-            $0.objectCol.arrayOptDouble.count() == 0
+            $0.objectCol.arrayOptDouble.count == 0
         }
 
         assertQuery(predicate: "objectCol.arrayOptDouble.@count >= %@", values: [4], expectedCount: 0) {
-            $0.objectCol.arrayOptDouble.count() >= 4
+            $0.objectCol.arrayOptDouble.count >= 4
         }
 
         assertQuery(predicate: "objectCol.arrayOptDouble.@count >= %@", values: [3], expectedCount: 1) {
-            $0.objectCol.arrayOptDouble.count() >= 3
+            $0.objectCol.arrayOptDouble.count >= 3
         }
 
         assertQuery(predicate: "objectCol.arrayOptDouble.@count <= %@", values: [2], expectedCount: 1) {
-            $0.objectCol.arrayOptDouble.count() <= 2
+            $0.objectCol.arrayOptDouble.count <= 2
         }
 
         assertQuery(predicate: "objectCol.arrayOptDouble.@count <= %@", values: [3], expectedCount: 2) {
-            $0.objectCol.arrayOptDouble.count() <= 3
+            $0.objectCol.arrayOptDouble.count <= 3
         }
 
         // This includes all ModernAllTypesObject objects beside the one we are populating
         assertQuery(predicate: "objectCol.arrayOptDouble.@count != %@", values: [3], expectedCount: 1) {
-            $0.objectCol.arrayOptDouble.count() != 3
+            $0.objectCol.arrayOptDouble.count != 3
         }
 
         assertQuery(predicate: "objectCol.arrayOptDouble.@count != %@", values: [1], expectedCount: 2) {
-            $0.objectCol.arrayOptDouble.count() != 1
+            $0.objectCol.arrayOptDouble.count != 1
         }
 
         try! realm.write {
@@ -12465,44 +12465,44 @@ class QueryTests: TestCase {
         }
 
         assertQuery(predicate: "objectCol.arrayOptDate.@count > %@", values: [2], expectedCount: 1) {
-            $0.objectCol.arrayOptDate.count() > 2
+            $0.objectCol.arrayOptDate.count > 2
         }
 
         assertQuery(predicate: "objectCol.arrayOptDate.@count < %@", values: [3], expectedCount: 1) {
-            $0.objectCol.arrayOptDate.count() < 3
+            $0.objectCol.arrayOptDate.count < 3
         }
 
         assertQuery(predicate: "objectCol.arrayOptDate.@count == %@", values: [3], expectedCount: 1) {
-            $0.objectCol.arrayOptDate.count() == 3
+            $0.objectCol.arrayOptDate.count == 3
         }
 
         assertQuery(predicate: "objectCol.arrayOptDate.@count == %@", values: [0], expectedCount: 1) {
-            $0.objectCol.arrayOptDate.count() == 0
+            $0.objectCol.arrayOptDate.count == 0
         }
 
         assertQuery(predicate: "objectCol.arrayOptDate.@count >= %@", values: [4], expectedCount: 0) {
-            $0.objectCol.arrayOptDate.count() >= 4
+            $0.objectCol.arrayOptDate.count >= 4
         }
 
         assertQuery(predicate: "objectCol.arrayOptDate.@count >= %@", values: [3], expectedCount: 1) {
-            $0.objectCol.arrayOptDate.count() >= 3
+            $0.objectCol.arrayOptDate.count >= 3
         }
 
         assertQuery(predicate: "objectCol.arrayOptDate.@count <= %@", values: [2], expectedCount: 1) {
-            $0.objectCol.arrayOptDate.count() <= 2
+            $0.objectCol.arrayOptDate.count <= 2
         }
 
         assertQuery(predicate: "objectCol.arrayOptDate.@count <= %@", values: [3], expectedCount: 2) {
-            $0.objectCol.arrayOptDate.count() <= 3
+            $0.objectCol.arrayOptDate.count <= 3
         }
 
         // This includes all ModernAllTypesObject objects beside the one we are populating
         assertQuery(predicate: "objectCol.arrayOptDate.@count != %@", values: [3], expectedCount: 1) {
-            $0.objectCol.arrayOptDate.count() != 3
+            $0.objectCol.arrayOptDate.count != 3
         }
 
         assertQuery(predicate: "objectCol.arrayOptDate.@count != %@", values: [1], expectedCount: 2) {
-            $0.objectCol.arrayOptDate.count() != 1
+            $0.objectCol.arrayOptDate.count != 1
         }
 
         try! realm.write {
@@ -12514,44 +12514,44 @@ class QueryTests: TestCase {
         }
 
         assertQuery(predicate: "objectCol.arrayOptDecimal.@count > %@", values: [2], expectedCount: 1) {
-            $0.objectCol.arrayOptDecimal.count() > 2
+            $0.objectCol.arrayOptDecimal.count > 2
         }
 
         assertQuery(predicate: "objectCol.arrayOptDecimal.@count < %@", values: [3], expectedCount: 1) {
-            $0.objectCol.arrayOptDecimal.count() < 3
+            $0.objectCol.arrayOptDecimal.count < 3
         }
 
         assertQuery(predicate: "objectCol.arrayOptDecimal.@count == %@", values: [3], expectedCount: 1) {
-            $0.objectCol.arrayOptDecimal.count() == 3
+            $0.objectCol.arrayOptDecimal.count == 3
         }
 
         assertQuery(predicate: "objectCol.arrayOptDecimal.@count == %@", values: [0], expectedCount: 1) {
-            $0.objectCol.arrayOptDecimal.count() == 0
+            $0.objectCol.arrayOptDecimal.count == 0
         }
 
         assertQuery(predicate: "objectCol.arrayOptDecimal.@count >= %@", values: [4], expectedCount: 0) {
-            $0.objectCol.arrayOptDecimal.count() >= 4
+            $0.objectCol.arrayOptDecimal.count >= 4
         }
 
         assertQuery(predicate: "objectCol.arrayOptDecimal.@count >= %@", values: [3], expectedCount: 1) {
-            $0.objectCol.arrayOptDecimal.count() >= 3
+            $0.objectCol.arrayOptDecimal.count >= 3
         }
 
         assertQuery(predicate: "objectCol.arrayOptDecimal.@count <= %@", values: [2], expectedCount: 1) {
-            $0.objectCol.arrayOptDecimal.count() <= 2
+            $0.objectCol.arrayOptDecimal.count <= 2
         }
 
         assertQuery(predicate: "objectCol.arrayOptDecimal.@count <= %@", values: [3], expectedCount: 2) {
-            $0.objectCol.arrayOptDecimal.count() <= 3
+            $0.objectCol.arrayOptDecimal.count <= 3
         }
 
         // This includes all ModernAllTypesObject objects beside the one we are populating
         assertQuery(predicate: "objectCol.arrayOptDecimal.@count != %@", values: [3], expectedCount: 1) {
-            $0.objectCol.arrayOptDecimal.count() != 3
+            $0.objectCol.arrayOptDecimal.count != 3
         }
 
         assertQuery(predicate: "objectCol.arrayOptDecimal.@count != %@", values: [1], expectedCount: 2) {
-            $0.objectCol.arrayOptDecimal.count() != 1
+            $0.objectCol.arrayOptDecimal.count != 1
         }
     }
 

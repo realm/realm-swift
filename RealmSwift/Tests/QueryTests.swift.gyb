@@ -1869,7 +1869,7 @@ class QueryTests: TestCase {
             $0.${listProperty.colName}.min <= ${listProperty.value(0)} &&
             $0.${listProperty.colName}.max >= ${listProperty.value(1)} &&
             $0.${listProperty.colName}.sum == sum${listProperty.colName} &&
-            $0.${listProperty.colName}.count() != 0 &&
+            $0.${listProperty.colName}.count != 0 &&
             $0.${listProperty.colName}.avg > ${listProperty.value(0)} &&
             $0.${listProperty.colName}.avg < ${listProperty.value(1)}
         }
@@ -2100,28 +2100,28 @@ class QueryTests: TestCase {
 
         // Count of results will be 0 because there are no `ModernAllTypesObject`s in the list.
         assertQuery(predicate: "SUBQUERY(arrayCol, $obj, $obj.intCol != %@).@count > %@", values: [123, 0], expectedCount: 0) {
-            ($0.arrayCol.intCol != 123).count() > 0
+            ($0.arrayCol.intCol != 123).count > 0
         }
 
         assertQuery(predicate: "(((intCol == %@ && %@ IN arrayInt) && SUBQUERY(arrayCol, $obj, ($obj.intCol == %@ && $obj.stringCol == %@)).@count == %@) && SUBQUERY(arrayCol, $obj, $obj.stringCol == %@).@count == %@)", values: [5, 1, 5, "Foo", 3, "Bar", 0], expectedCount: 0) {
             $0.intCol == 5 &&
             $0.arrayInt.contains(1) &&
-            ($0.arrayCol.intCol == 5 && $0.arrayCol.stringCol == "Foo").count() == 3 &&
-            ($0.arrayCol.stringCol == "Bar").count() == 0
+            ($0.arrayCol.intCol == 5 && $0.arrayCol.stringCol == "Foo").count == 3 &&
+            ($0.arrayCol.stringCol == "Bar").count == 0
         }
 
         // Set
 
         // Will be 0 results because there are no `ModernAllTypesObject`s in the set.
         assertQuery(predicate: "SUBQUERY(arrayCol, $obj, $obj.intCol != %@).@count > %@", values: [123, 0], expectedCount: 0) {
-            ($0.arrayCol.intCol != 123).count() > 0
+            ($0.arrayCol.intCol != 123).count > 0
         }
 
         assertQuery(predicate: "(((intCol == %@ && %@ IN setInt) && SUBQUERY(setCol, $obj, ($obj.intCol == %@ && $obj.stringCol == %@)).@count == %@) && SUBQUERY(setCol, $obj, $obj.stringCol == %@).@count == %@)", values: [5, 1, 5, "Foo", 3, "Bar", 0], expectedCount: 0) {
             $0.intCol == 5 &&
             $0.setInt.contains(1) &&
-            ($0.setCol.intCol == 5 && $0.setCol.stringCol == "Foo").count() == 3 &&
-            ($0.setCol.stringCol == "Bar").count() == 0
+            ($0.setCol.intCol == 5 && $0.setCol.stringCol == "Foo").count == 3 &&
+            ($0.setCol.stringCol == "Bar").count == 0
         }
 
         let realm = realmWithTestPath()
@@ -2135,43 +2135,43 @@ class QueryTests: TestCase {
         // Results count should now be 1
 
         assertQuery(predicate: "SUBQUERY(arrayCol, $obj, $obj.intCol != %@).@count > %@", values: [123, 0], expectedCount: 1) {
-            ($0.arrayCol.intCol != 123).count() > 0
+            ($0.arrayCol.intCol != 123).count > 0
         }
 
         assertQuery(predicate: "SUBQUERY(arrayCol, $obj, ($obj.intCol > %@ && $obj.intCol <= %@)).@count > %@", values: [0, 5, 0], expectedCount: 1) {
-            ($0.arrayCol.intCol > 0 && $0.arrayCol.intCol <= 5 ).count() > 0
+            ($0.arrayCol.intCol > 0 && $0.arrayCol.intCol <= 5 ).count > 0
         }
 
         assertQuery(predicate: "(((intCol == %@ && arrayInt.@count == %@) && SUBQUERY(arrayCol, $obj, $obj.intCol == %@).@count == %@) && SUBQUERY(arrayCol, $obj, $obj.stringCol == %@).@count == %@)", values: [6, 2, 5, 1, "Bar", 0], expectedCount: 1) {
             ($0.intCol == 6) &&
-            ($0.arrayInt.count() == 2) &&
-            ($0.arrayCol.intCol == 5).count() == 1 &&
-            ($0.arrayCol.stringCol == "Bar").count() == 0
+            ($0.arrayInt.count == 2) &&
+            ($0.arrayCol.intCol == 5).count == 1 &&
+            ($0.arrayCol.stringCol == "Bar").count == 0
         }
 
         // Set
 
         // Will be 0 results because there are no `ModernAllTypesObject`s in the set.
         assertQuery(predicate: "SUBQUERY(arrayCol, $obj, $obj.intCol != %@).@count > %@", values: [123, 0], expectedCount: 1) {
-            ($0.arrayCol.intCol != 123).count() > 0
+            ($0.arrayCol.intCol != 123).count > 0
         }
 
         assertQuery(predicate: "(((intCol == %@ && setInt.@count == %@) && SUBQUERY(setCol, $obj, $obj.intCol == %@).@count == %@) && SUBQUERY(setCol, $obj, $obj.stringCol == %@).@count == %@)", values: [6, 2, 5, 1, "Bar", 0], expectedCount: 1) {
             ($0.intCol == 6) &&
-            ($0.setInt.count() == 2) &&
-            ($0.setCol.intCol == 5).count() == 1 &&
-            ($0.setCol.stringCol == "Bar").count() == 0
+            ($0.setInt.count == 2) &&
+            ($0.setCol.intCol == 5).count == 1 &&
+            ($0.setCol.stringCol == "Bar").count == 0
         }
 
         assertQuery(predicate: "(((intCol == %@ && setInt.@count == %@) && SUBQUERY(setCol, $obj, ($obj.intCol == %@ && $obj.stringCol != %@)).@count == %@) && SUBQUERY(setCol, $obj, $obj.stringCol == %@).@count == %@)", values: [6, 2, 5, "Blah", 1, "Bar", 0], expectedCount: 1) {
             ($0.intCol == 6) &&
-            ($0.setInt.count() == 2) &&
-            (((($0.setCol.intCol == 5) && ($0.setCol.stringCol != "Blah"))).count() == 1) &&
-            (($0.setCol.stringCol == "Bar").count() == 0)
+            ($0.setInt.count == 2) &&
+            (((($0.setCol.intCol == 5) && ($0.setCol.stringCol != "Blah"))).count == 1) &&
+            (($0.setCol.stringCol == "Bar").count == 0)
         }
 
         let query: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>) = {
-            ($0.setCol.intCol == 1 && $0.arrayCol.intCol == 1).count() > 0
+            ($0.setCol.intCol == 1 && $0.arrayCol.intCol == 1).count > 0
         }
         assertThrows(query(Query<ModernAllTypesObject>())._constructPredicate(), reason: "Subquery predicates will only work on one collection at a time.")
     }
@@ -2415,44 +2415,44 @@ class QueryTests: TestCase {
         }
 
         assertQuery(predicate: "objectCol.${property.colName}.@count > %@", values: [2], expectedCount: 1) {
-            $0.objectCol.${property.colName}.count() > 2
+            $0.objectCol.${property.colName}.count > 2
         }
 
         assertQuery(predicate: "objectCol.${property.colName}.@count < %@", values: [3], expectedCount: 1) {
-            $0.objectCol.${property.colName}.count() < 3
+            $0.objectCol.${property.colName}.count < 3
         }
 
         assertQuery(predicate: "objectCol.${property.colName}.@count == %@", values: [3], expectedCount: 1) {
-            $0.objectCol.${property.colName}.count() == 3
+            $0.objectCol.${property.colName}.count == 3
         }
 
         assertQuery(predicate: "objectCol.${property.colName}.@count == %@", values: [0], expectedCount: 1) {
-            $0.objectCol.${property.colName}.count() == 0
+            $0.objectCol.${property.colName}.count == 0
         }
 
         assertQuery(predicate: "objectCol.${property.colName}.@count >= %@", values: [4], expectedCount: 0) {
-            $0.objectCol.${property.colName}.count() >= 4
+            $0.objectCol.${property.colName}.count >= 4
         }
 
         assertQuery(predicate: "objectCol.${property.colName}.@count >= %@", values: [3], expectedCount: 1) {
-            $0.objectCol.${property.colName}.count() >= 3
+            $0.objectCol.${property.colName}.count >= 3
         }
 
         assertQuery(predicate: "objectCol.${property.colName}.@count <= %@", values: [2], expectedCount: 1) {
-            $0.objectCol.${property.colName}.count() <= 2
+            $0.objectCol.${property.colName}.count <= 2
         }
 
         assertQuery(predicate: "objectCol.${property.colName}.@count <= %@", values: [3], expectedCount: 2) {
-            $0.objectCol.${property.colName}.count() <= 3
+            $0.objectCol.${property.colName}.count <= 3
         }
 
         // This includes all ModernAllTypesObject objects beside the one we are populating
         assertQuery(predicate: "objectCol.${property.colName}.@count != %@", values: [3], expectedCount: 1) {
-            $0.objectCol.${property.colName}.count() != 3
+            $0.objectCol.${property.colName}.count != 3
         }
 
         assertQuery(predicate: "objectCol.${property.colName}.@count != %@", values: [1], expectedCount: 2) {
-            $0.objectCol.${property.colName}.count() != 1
+            $0.objectCol.${property.colName}.count != 1
         }
         % end
         % end
