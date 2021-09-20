@@ -1866,12 +1866,12 @@ class QueryTests: TestCase {
         let sum${listProperty.colName} = ${listProperty.value(0)} + ${listProperty.value(1)}
         assertQuery(predicate: "(((((${listProperty.colName}.@min <= %@ && ${listProperty.colName}.@max >= %@) && ${listProperty.colName}.@sum == %@) && ${listProperty.colName}.@count != %@) && ${listProperty.colName}.@avg > %@) && ${listProperty.colName}.@avg < %@)",
                     values: [${listProperty.value(0)}, ${listProperty.value(1)}, sum${listProperty.colName}, 0, ${listProperty.value(0)}, ${listProperty.value(1)}], expectedCount: 1) {
-            $0.${listProperty.colName}.min <= ${listProperty.value(0)} &&
-            $0.${listProperty.colName}.max >= ${listProperty.value(1)} &&
-            $0.${listProperty.colName}.sum == sum${listProperty.colName} &&
-            $0.${listProperty.colName}.count != 0 &&
-            $0.${listProperty.colName}.avg > ${listProperty.value(0)} &&
-            $0.${listProperty.colName}.avg < ${listProperty.value(1)}
+            ($0.${listProperty.colName}.min <= ${listProperty.value(0)}) &&
+            ($0.${listProperty.colName}.max >= ${listProperty.value(1)}) &&
+            ($0.${listProperty.colName}.sum == sum${listProperty.colName}) &&
+            ($0.${listProperty.colName}.count != 0) &&
+            ($0.${listProperty.colName}.avg > ${listProperty.value(0)}) &&
+            ($0.${listProperty.colName}.avg < ${listProperty.value(1)})
         }
         % end
 
@@ -1997,12 +1997,12 @@ class QueryTests: TestCase {
         let sum${listProperty.colName} = ${listProperty.value(0)} + ${listProperty.value(1)}
         assertQuery(predicate: "(((((${listProperty.colName}.@min <= %@ || ${listProperty.colName}.@max >= %@) || ${listProperty.colName}.@sum != %@) || ${listProperty.colName}.@count == %@) || ${listProperty.colName}.@avg > %@) || ${listProperty.colName}.@avg < %@)",
                     values: [${listProperty.value(0)}, ${listProperty.value(2)}, sum${listProperty.colName}, 0, ${listProperty.value(1)}, ${listProperty.value(0)}], expectedCount: 1) {
-            $0.${listProperty.colName}.min <= ${listProperty.value(0)} ||
-            $0.${listProperty.colName}.max >= ${listProperty.value(2)} ||
-            $0.${listProperty.colName}.sum != sum${listProperty.colName} ||
-            $0.${listProperty.colName}.count() == 0 ||
-            $0.${listProperty.colName}.avg > ${listProperty.value(1)} ||
-            $0.${listProperty.colName}.avg < ${listProperty.value(0)}
+            ($0.${listProperty.colName}.min <= ${listProperty.value(0)}) ||
+            ($0.${listProperty.colName}.max >= ${listProperty.value(2)}) ||
+            ($0.${listProperty.colName}.sum != sum${listProperty.colName}) ||
+            ($0.${listProperty.colName}.count == 0) ||
+            ($0.${listProperty.colName}.avg > ${listProperty.value(1)}) ||
+            ($0.${listProperty.colName}.avg < ${listProperty.value(0)})
         }
         % end
 
@@ -2063,9 +2063,9 @@ class QueryTests: TestCase {
         let sum${listProperty.colName} = ${listProperty.value(0)} + ${listProperty.value(1)}
         assertQuery(predicate: "((((${listProperty.colName}.@min <= %@ || ${listProperty.colName}.@max >= %@) && ${listProperty.colName}.@sum == %@) && ${listProperty.colName}.@count != %@) && (${listProperty.colName}.@avg > %@ && ${listProperty.colName}.@avg < %@))",
                     values: [${listProperty.value(0)}, ${listProperty.value(2)}, sum${listProperty.colName}, 0, ${listProperty.value(0)}, ${listProperty.value(2)}], expectedCount: 1) {
-            ($0.${listProperty.colName}.min <= ${listProperty.value(0)} || $0.${listProperty.colName}.max >= ${listProperty.value(2)}) &&
-            $0.${listProperty.colName}.sum == sum${listProperty.colName} &&
-            $0.${listProperty.colName}.count() != 0 &&
+            (($0.${listProperty.colName}.min <= ${listProperty.value(0)}) || ($0.${listProperty.colName}.max >= ${listProperty.value(2)})) &&
+            ($0.${listProperty.colName}.sum == sum${listProperty.colName}) &&
+            ($0.${listProperty.colName}.count != 0) &&
             ($0.${listProperty.colName}.avg > ${listProperty.value(0)} && $0.${listProperty.colName}.avg < ${listProperty.value(2)})
         }
         % end

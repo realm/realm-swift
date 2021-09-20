@@ -7964,22 +7964,22 @@ class QueryTests: TestCase {
         let sumarrayInt = 1 + 2
         assertQuery(predicate: "(((((arrayInt.@min <= %@ && arrayInt.@max >= %@) && arrayInt.@sum == %@) && arrayInt.@count != %@) && arrayInt.@avg > %@) && arrayInt.@avg < %@)",
                     values: [1, 2, sumarrayInt, 0, 1, 2], expectedCount: 1) {
-            $0.arrayInt.min <= 1 &&
-            $0.arrayInt.max >= 2 &&
-            $0.arrayInt.sum == sumarrayInt &&
-            $0.arrayInt.count != 0 &&
-            $0.arrayInt.avg > 1 &&
-            $0.arrayInt.avg < 2
+            ($0.arrayInt.min <= 1) &&
+            ($0.arrayInt.max >= 2) &&
+            ($0.arrayInt.sum == sumarrayInt) &&
+            ($0.arrayInt.count != 0) &&
+            ($0.arrayInt.avg > 1) &&
+            ($0.arrayInt.avg < 2)
         }
         let sumarrayOptInt = 1 + 2
         assertQuery(predicate: "(((((arrayOptInt.@min <= %@ && arrayOptInt.@max >= %@) && arrayOptInt.@sum == %@) && arrayOptInt.@count != %@) && arrayOptInt.@avg > %@) && arrayOptInt.@avg < %@)",
                     values: [1, 2, sumarrayOptInt, 0, 1, 2], expectedCount: 1) {
-            $0.arrayOptInt.min <= 1 &&
-            $0.arrayOptInt.max >= 2 &&
-            $0.arrayOptInt.sum == sumarrayOptInt &&
-            $0.arrayOptInt.count != 0 &&
-            $0.arrayOptInt.avg > 1 &&
-            $0.arrayOptInt.avg < 2
+            ($0.arrayOptInt.min <= 1) &&
+            ($0.arrayOptInt.max >= 2) &&
+            ($0.arrayOptInt.sum == sumarrayOptInt) &&
+            ($0.arrayOptInt.count != 0) &&
+            ($0.arrayOptInt.avg > 1) &&
+            ($0.arrayOptInt.avg < 2)
         }
 
         // Keypath Collection Aggregates
@@ -8098,22 +8098,22 @@ class QueryTests: TestCase {
         let sumarrayInt = 1 + 2
         assertQuery(predicate: "(((((arrayInt.@min <= %@ || arrayInt.@max >= %@) || arrayInt.@sum != %@) || arrayInt.@count == %@) || arrayInt.@avg > %@) || arrayInt.@avg < %@)",
                     values: [1, 3, sumarrayInt, 0, 2, 1], expectedCount: 1) {
-            $0.arrayInt.min <= 1 ||
-            $0.arrayInt.max >= 3 ||
-            $0.arrayInt.sum != sumarrayInt ||
-            $0.arrayInt.count() == 0 ||
-            $0.arrayInt.avg > 2 ||
-            $0.arrayInt.avg < 1
+            ($0.arrayInt.min <= 1) ||
+            ($0.arrayInt.max >= 3) ||
+            ($0.arrayInt.sum != sumarrayInt) ||
+            ($0.arrayInt.count == 0) ||
+            ($0.arrayInt.avg > 2) ||
+            ($0.arrayInt.avg < 1)
         }
         let sumarrayOptInt = 1 + 2
         assertQuery(predicate: "(((((arrayOptInt.@min <= %@ || arrayOptInt.@max >= %@) || arrayOptInt.@sum != %@) || arrayOptInt.@count == %@) || arrayOptInt.@avg > %@) || arrayOptInt.@avg < %@)",
                     values: [1, 3, sumarrayOptInt, 0, 2, 1], expectedCount: 1) {
-            $0.arrayOptInt.min <= 1 ||
-            $0.arrayOptInt.max >= 3 ||
-            $0.arrayOptInt.sum != sumarrayOptInt ||
-            $0.arrayOptInt.count() == 0 ||
-            $0.arrayOptInt.avg > 2 ||
-            $0.arrayOptInt.avg < 1
+            ($0.arrayOptInt.min <= 1) ||
+            ($0.arrayOptInt.max >= 3) ||
+            ($0.arrayOptInt.sum != sumarrayOptInt) ||
+            ($0.arrayOptInt.count == 0) ||
+            ($0.arrayOptInt.avg > 2) ||
+            ($0.arrayOptInt.avg < 1)
         }
 
         // Keypath Collection Aggregates
@@ -8425,17 +8425,17 @@ class QueryTests: TestCase {
         let sumarrayInt = 1 + 2
         assertQuery(predicate: "((((arrayInt.@min <= %@ || arrayInt.@max >= %@) && arrayInt.@sum == %@) && arrayInt.@count != %@) && (arrayInt.@avg > %@ && arrayInt.@avg < %@))",
                     values: [1, 3, sumarrayInt, 0, 1, 3], expectedCount: 1) {
-            ($0.arrayInt.min <= 1 || $0.arrayInt.max >= 3) &&
-            $0.arrayInt.sum == sumarrayInt &&
-            $0.arrayInt.count() != 0 &&
+            (($0.arrayInt.min <= 1) || ($0.arrayInt.max >= 3)) &&
+            ($0.arrayInt.sum == sumarrayInt) &&
+            ($0.arrayInt.count != 0) &&
             ($0.arrayInt.avg > 1 && $0.arrayInt.avg < 3)
         }
         let sumarrayOptInt = 1 + 2
         assertQuery(predicate: "((((arrayOptInt.@min <= %@ || arrayOptInt.@max >= %@) && arrayOptInt.@sum == %@) && arrayOptInt.@count != %@) && (arrayOptInt.@avg > %@ && arrayOptInt.@avg < %@))",
                     values: [1, 3, sumarrayOptInt, 0, 1, 3], expectedCount: 1) {
-            ($0.arrayOptInt.min <= 1 || $0.arrayOptInt.max >= 3) &&
-            $0.arrayOptInt.sum == sumarrayOptInt &&
-            $0.arrayOptInt.count() != 0 &&
+            (($0.arrayOptInt.min <= 1) || ($0.arrayOptInt.max >= 3)) &&
+            ($0.arrayOptInt.sum == sumarrayOptInt) &&
+            ($0.arrayOptInt.count != 0) &&
             ($0.arrayOptInt.avg > 1 && $0.arrayOptInt.avg < 3)
         }
 
