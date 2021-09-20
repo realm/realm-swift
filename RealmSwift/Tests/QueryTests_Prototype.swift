@@ -264,7 +264,6 @@ class QueryTests_Prototype: TestCase {
         XCTAssertEqual(compoundQuery2.count, 1)
     }
 
-    func test() {
     func testAggregates() {
         let predicate = "arrayCol.@avg.intCol > 60"
         let result = objects().filter(predicate)
@@ -328,6 +327,15 @@ class QueryTests_Prototype: TestCase {
         let predicate7 = "arrayCol.arrayInt.@count < 2"
         let result7 = objects().filter(predicate7)
         XCTAssertEqual(result7.count, 1)
+
+        // Enum
+        let predicate8 = "arrayCol.@min.intEnumCol == 1"
+        let result8 = objects().filter(predicate8)
+        XCTAssertEqual(result8.count, 1)
+
+        let predicate9 = "arrayCol.arrayInt.@avg == 1"
+        let result9 = objects().filter(predicate9)
+        XCTAssertEqual(result9.count, 0)
     }
 }
 

@@ -1990,6 +1990,47 @@ class QueryTests: TestCase {
         % end
         % end
         % end
+
+        // Aggregates
+
+        % for listProperty in [listProperties[1], optListProperties[1]]:
+        let sum${listProperty.colName} = ${listProperty.value(0)} + ${listProperty.value(1)}
+        assertQuery(predicate: "(((((${listProperty.colName}.@min <= %@ || ${listProperty.colName}.@max >= %@) || ${listProperty.colName}.@sum != %@) || ${listProperty.colName}.@count == %@) || ${listProperty.colName}.@avg > %@) || ${listProperty.colName}.@avg < %@)",
+                    values: [${listProperty.value(0)}, ${listProperty.value(2)}, sum${listProperty.colName}, 0, ${listProperty.value(1)}, ${listProperty.value(0)}], expectedCount: 1) {
+            $0.${listProperty.colName}.min <= ${listProperty.value(0)} ||
+            $0.${listProperty.colName}.max >= ${listProperty.value(2)} ||
+            $0.${listProperty.colName}.sum != sum${listProperty.colName} ||
+            $0.${listProperty.colName}.count() == 0 ||
+            $0.${listProperty.colName}.avg > ${listProperty.value(1)} ||
+            $0.${listProperty.colName}.avg < ${listProperty.value(0)}
+        }
+        % end
+
+        // Keypath Collection Aggregates
+
+        let realm = realmWithTestPath()
+        let object = objects().first!
+        % for property in [properties[7], optProperties[7]]:
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["${property.colName}": ${property.value(0)}])
+            let modernObj1 = ModernAllTypesObject(value: ["${property.colName}": ${property.value(1)}])
+            let modernObj2 = ModernAllTypesObject(value: ["${property.colName}": ${property.value(2)}])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        let sum${property.colName} = ${property.value(0)} + ${property.value(1)} + ${property.value(2)}
+        assertQuery(predicate: "(((((arrayCol.@min.${property.colName} < %@ || arrayCol.@max.${property.colName} > %@) || arrayCol.@sum.${property.colName} != %@) || arrayCol.@min.${property.colName} == %@) || arrayCol.@avg.${property.colName} >= %@) || arrayCol.@avg.${property.colName} <= %@)", values: [${property.value(0)}, ${property.value(2)}, sum${property.colName}, 0, ${property.value(2)}, ${property.value(0)}], expectedCount: 3) {
+            $0.arrayCol.${property.colName}.min < ${property.value(0)} ||
+            $0.arrayCol.${property.colName}.max > ${property.value(2)} ||
+            $0.arrayCol.${property.colName}.sum != sum${property.colName} ||
+            $0.arrayCol.${property.colName}.min == 0 ||
+            $0.arrayCol.${property.colName}.avg >= ${property.value(2)} ||
+            $0.arrayCol.${property.colName}.avg <= ${property.value(0)}
+        }
+        % end
     }
 
     func testCompoundMixed() {
@@ -2014,6 +2055,43 @@ class QueryTests: TestCase {
         }
         % end
         % end
+        % end
+
+        // Aggregates
+
+        % for listProperty in [listProperties[1], optListProperties[1]]:
+        let sum${listProperty.colName} = ${listProperty.value(0)} + ${listProperty.value(1)}
+        assertQuery(predicate: "((((${listProperty.colName}.@min <= %@ || ${listProperty.colName}.@max >= %@) && ${listProperty.colName}.@sum == %@) && ${listProperty.colName}.@count != %@) && (${listProperty.colName}.@avg > %@ && ${listProperty.colName}.@avg < %@))",
+                    values: [${listProperty.value(0)}, ${listProperty.value(2)}, sum${listProperty.colName}, 0, ${listProperty.value(0)}, ${listProperty.value(2)}], expectedCount: 1) {
+            ($0.${listProperty.colName}.min <= ${listProperty.value(0)} || $0.${listProperty.colName}.max >= ${listProperty.value(2)}) &&
+            $0.${listProperty.colName}.sum == sum${listProperty.colName} &&
+            $0.${listProperty.colName}.count() != 0 &&
+            ($0.${listProperty.colName}.avg > ${listProperty.value(0)} && $0.${listProperty.colName}.avg < ${listProperty.value(2)})
+        }
+        % end
+
+        // Keypath Collection Aggregates
+
+        let realm = realmWithTestPath()
+        let object = objects().first!
+        % for property in [properties[7], optProperties[7]]:
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["${property.colName}": ${property.value(0)}])
+            let modernObj1 = ModernAllTypesObject(value: ["${property.colName}": ${property.value(1)}])
+            let modernObj2 = ModernAllTypesObject(value: ["${property.colName}": ${property.value(2)}])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        let sum${property.colName} = ${property.value(0)} + ${property.value(1)} + ${property.value(2)}
+        assertQuery(predicate: "((((arrayCol.@min.${property.colName} <= %@ || arrayCol.@max.${property.colName} >= %@) && arrayCol.@sum.${property.colName} == %@) && arrayCol.@sum.${property.colName} != %@) && (arrayCol.@avg.${property.colName} > %@ && arrayCol.@avg.${property.colName} < %@))", values: [${property.value(0)}, ${property.value(2)}, sum${property.colName}, 0, ${property.value(0)}, ${property.value(2)}], expectedCount: 1) {
+            ($0.arrayCol.${property.colName}.min <= ${property.value(0)} || $0.arrayCol.${property.colName}.max >= ${property.value(2)}) &&
+            $0.arrayCol.${property.colName}.sum == sum${property.colName} &&
+            $0.arrayCol.${property.colName}.sum != 0 &&
+            ($0.arrayCol.${property.colName}.avg > ${property.value(0)} && $0.arrayCol.${property.colName}.avg < ${property.value(2)})
+        }
         % end
     }
 

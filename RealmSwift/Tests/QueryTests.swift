@@ -8092,6 +8092,72 @@ class QueryTests: TestCase {
             ($0.mapOptBool["foo"] == true) ||
             ($0.mapOptBool["bar"] == true)
         }
+
+        // Aggregates
+
+        let sumarrayInt = 1 + 2
+        assertQuery(predicate: "(((((arrayInt.@min <= %@ || arrayInt.@max >= %@) || arrayInt.@sum != %@) || arrayInt.@count == %@) || arrayInt.@avg > %@) || arrayInt.@avg < %@)",
+                    values: [1, 3, sumarrayInt, 0, 2, 1], expectedCount: 1) {
+            $0.arrayInt.min <= 1 ||
+            $0.arrayInt.max >= 3 ||
+            $0.arrayInt.sum != sumarrayInt ||
+            $0.arrayInt.count() == 0 ||
+            $0.arrayInt.avg > 2 ||
+            $0.arrayInt.avg < 1
+        }
+        let sumarrayOptInt = 1 + 2
+        assertQuery(predicate: "(((((arrayOptInt.@min <= %@ || arrayOptInt.@max >= %@) || arrayOptInt.@sum != %@) || arrayOptInt.@count == %@) || arrayOptInt.@avg > %@) || arrayOptInt.@avg < %@)",
+                    values: [1, 3, sumarrayOptInt, 0, 2, 1], expectedCount: 1) {
+            $0.arrayOptInt.min <= 1 ||
+            $0.arrayOptInt.max >= 3 ||
+            $0.arrayOptInt.sum != sumarrayOptInt ||
+            $0.arrayOptInt.count() == 0 ||
+            $0.arrayOptInt.avg > 2 ||
+            $0.arrayOptInt.avg < 1
+        }
+
+        // Keypath Collection Aggregates
+
+        let realm = realmWithTestPath()
+        let object = objects().first!
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["doubleCol": 123.456])
+            let modernObj1 = ModernAllTypesObject(value: ["doubleCol": 234.567])
+            let modernObj2 = ModernAllTypesObject(value: ["doubleCol": 345.678])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        let sumdoubleCol = 123.456 + 234.567 + 345.678
+        assertQuery(predicate: "(((((arrayCol.@min.doubleCol < %@ || arrayCol.@max.doubleCol > %@) || arrayCol.@sum.doubleCol != %@) || arrayCol.@min.doubleCol == %@) || arrayCol.@avg.doubleCol >= %@) || arrayCol.@avg.doubleCol <= %@)", values: [123.456, 345.678, sumdoubleCol, 0, 345.678, 123.456], expectedCount: 3) {
+            $0.arrayCol.doubleCol.min < 123.456 ||
+            $0.arrayCol.doubleCol.max > 345.678 ||
+            $0.arrayCol.doubleCol.sum != sumdoubleCol ||
+            $0.arrayCol.doubleCol.min == 0 ||
+            $0.arrayCol.doubleCol.avg >= 345.678 ||
+            $0.arrayCol.doubleCol.avg <= 123.456
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["optDoubleCol": 123.456])
+            let modernObj1 = ModernAllTypesObject(value: ["optDoubleCol": 234.567])
+            let modernObj2 = ModernAllTypesObject(value: ["optDoubleCol": 345.678])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        let sumoptDoubleCol = 123.456 + 234.567 + 345.678
+        assertQuery(predicate: "(((((arrayCol.@min.optDoubleCol < %@ || arrayCol.@max.optDoubleCol > %@) || arrayCol.@sum.optDoubleCol != %@) || arrayCol.@min.optDoubleCol == %@) || arrayCol.@avg.optDoubleCol >= %@) || arrayCol.@avg.optDoubleCol <= %@)", values: [123.456, 345.678, sumoptDoubleCol, 0, 345.678, 123.456], expectedCount: 3) {
+            $0.arrayCol.optDoubleCol.min < 123.456 ||
+            $0.arrayCol.optDoubleCol.max > 345.678 ||
+            $0.arrayCol.optDoubleCol.sum != sumoptDoubleCol ||
+            $0.arrayCol.optDoubleCol.min == 0 ||
+            $0.arrayCol.optDoubleCol.avg >= 345.678 ||
+            $0.arrayCol.optDoubleCol.avg <= 123.456
+        }
     }
 
     func testCompoundMixed() {
@@ -8352,6 +8418,64 @@ class QueryTests: TestCase {
         }
         assertQuery(predicate: "(optStringEnumCol == %@ || optUuidCol == %@)", values: [ModernStringEnum.value2.rawValue, UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!], expectedCount: 1) {
             ($0.optStringEnumCol == .value2) || ($0.optUuidCol == UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!)
+        }
+
+        // Aggregates
+
+        let sumarrayInt = 1 + 2
+        assertQuery(predicate: "((((arrayInt.@min <= %@ || arrayInt.@max >= %@) && arrayInt.@sum == %@) && arrayInt.@count != %@) && (arrayInt.@avg > %@ && arrayInt.@avg < %@))",
+                    values: [1, 3, sumarrayInt, 0, 1, 3], expectedCount: 1) {
+            ($0.arrayInt.min <= 1 || $0.arrayInt.max >= 3) &&
+            $0.arrayInt.sum == sumarrayInt &&
+            $0.arrayInt.count() != 0 &&
+            ($0.arrayInt.avg > 1 && $0.arrayInt.avg < 3)
+        }
+        let sumarrayOptInt = 1 + 2
+        assertQuery(predicate: "((((arrayOptInt.@min <= %@ || arrayOptInt.@max >= %@) && arrayOptInt.@sum == %@) && arrayOptInt.@count != %@) && (arrayOptInt.@avg > %@ && arrayOptInt.@avg < %@))",
+                    values: [1, 3, sumarrayOptInt, 0, 1, 3], expectedCount: 1) {
+            ($0.arrayOptInt.min <= 1 || $0.arrayOptInt.max >= 3) &&
+            $0.arrayOptInt.sum == sumarrayOptInt &&
+            $0.arrayOptInt.count() != 0 &&
+            ($0.arrayOptInt.avg > 1 && $0.arrayOptInt.avg < 3)
+        }
+
+        // Keypath Collection Aggregates
+
+        let realm = realmWithTestPath()
+        let object = objects().first!
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["doubleCol": 123.456])
+            let modernObj1 = ModernAllTypesObject(value: ["doubleCol": 234.567])
+            let modernObj2 = ModernAllTypesObject(value: ["doubleCol": 345.678])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        let sumdoubleCol = 123.456 + 234.567 + 345.678
+        assertQuery(predicate: "((((arrayCol.@min.doubleCol <= %@ || arrayCol.@max.doubleCol >= %@) && arrayCol.@sum.doubleCol == %@) && arrayCol.@sum.doubleCol != %@) && (arrayCol.@avg.doubleCol > %@ && arrayCol.@avg.doubleCol < %@))", values: [123.456, 345.678, sumdoubleCol, 0, 123.456, 345.678], expectedCount: 1) {
+            ($0.arrayCol.doubleCol.min <= 123.456 || $0.arrayCol.doubleCol.max >= 345.678) &&
+            $0.arrayCol.doubleCol.sum == sumdoubleCol &&
+            $0.arrayCol.doubleCol.sum != 0 &&
+            ($0.arrayCol.doubleCol.avg > 123.456 && $0.arrayCol.doubleCol.avg < 345.678)
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["optDoubleCol": 123.456])
+            let modernObj1 = ModernAllTypesObject(value: ["optDoubleCol": 234.567])
+            let modernObj2 = ModernAllTypesObject(value: ["optDoubleCol": 345.678])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        let sumoptDoubleCol = 123.456 + 234.567 + 345.678
+        assertQuery(predicate: "((((arrayCol.@min.optDoubleCol <= %@ || arrayCol.@max.optDoubleCol >= %@) && arrayCol.@sum.optDoubleCol == %@) && arrayCol.@sum.optDoubleCol != %@) && (arrayCol.@avg.optDoubleCol > %@ && arrayCol.@avg.optDoubleCol < %@))", values: [123.456, 345.678, sumoptDoubleCol, 0, 123.456, 345.678], expectedCount: 1) {
+            ($0.arrayCol.optDoubleCol.min <= 123.456 || $0.arrayCol.optDoubleCol.max >= 345.678) &&
+            $0.arrayCol.optDoubleCol.sum == sumoptDoubleCol &&
+            $0.arrayCol.optDoubleCol.sum != 0 &&
+            ($0.arrayCol.optDoubleCol.avg > 123.456 && $0.arrayCol.optDoubleCol.avg < 345.678)
         }
     }
 
