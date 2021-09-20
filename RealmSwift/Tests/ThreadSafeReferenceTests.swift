@@ -336,6 +336,7 @@ struct TestThreadSafeWrapperStruct {
     @ThreadSafe var stringObject: SwiftStringObject?
     @ThreadSafe var intObject: SwiftIntObject?
     @ThreadSafe var employees: List<SwiftEmployeeObject>?
+    @ThreadSafe var mapObject: SwiftMapObject?
     @ThreadSafe var employeeSet: MutableSet<SwiftEmployeeObject>?
     @ThreadSafe var owners: LinkingObjects<SwiftOwnerObject>?
     @ThreadSafe var results: Results<SwiftStringObject>?
@@ -544,6 +545,28 @@ class ThreadSafeWrapperTests: ThreadSafeReferenceTests {
         XCTAssertEqual(2, testStruct.employees!.count)
         XCTAssertEqual("jp", testStruct.employees![0].name)
         XCTAssertEqual("az", testStruct.employees![1].name)
+    }
+
+    func testThreadSafeWrapperToMap() {
+        // create map
+        let realm = try! Realm()
+        let testStruct = TestThreadSafeWrapperStruct()
+        try! realm.write {
+            let mapObj = SwiftMapObject()
+            realm.add(mapObj)
+            mapObj.int["zero"] = 0
+            testStruct.mapObject = mapObj
+        }
+        dispatchSyncNewThread {
+            XCTAssertEqual(testStruct.mapObject?.int.count, 1)
+            XCTAssertEqual(testStruct.mapObject?.int["zero"]!, 0)
+            try! Realm().write {
+                testStruct.mapObject?.int["one"] = 1
+            }
+        }
+        XCTAssertEqual(testStruct.mapObject?.int.count, 2)
+        XCTAssertEqual(testStruct.mapObject?.int["zero"]!, 0)
+        XCTAssertEqual(testStruct.mapObject?.int["one"]!, 1)
     }
 
     func testThreadSafeWrapperToMutableSet() {
