@@ -8487,10 +8487,8 @@ class QueryTests: TestCase {
             ($0.arrayCol.intCol != 123).count > 0
         }
 
-        assertQuery(predicate: "(((intCol == %@ && %@ IN arrayInt) && SUBQUERY(arrayCol, $obj, ($obj.intCol == %@ && $obj.stringCol == %@)).@count == %@) && SUBQUERY(arrayCol, $obj, $obj.stringCol == %@).@count == %@)", values: [5, 1, 5, "Foo", 3, "Bar", 0], expectedCount: 0) {
+        assertQuery(predicate: "(intCol == %@ && SUBQUERY(arrayCol, $obj, $obj.stringCol == %@).@count == %@)", values: [5, "Bar", 0], expectedCount: 0) {
             $0.intCol == 5 &&
-            $0.arrayInt.contains(1) &&
-            ($0.arrayCol.intCol == 5 && $0.arrayCol.stringCol == "Foo").count == 3 &&
             ($0.arrayCol.stringCol == "Bar").count == 0
         }
 
@@ -8501,10 +8499,8 @@ class QueryTests: TestCase {
             ($0.arrayCol.intCol != 123).count > 0
         }
 
-        assertQuery(predicate: "(((intCol == %@ && %@ IN setInt) && SUBQUERY(setCol, $obj, ($obj.intCol == %@ && $obj.stringCol == %@)).@count == %@) && SUBQUERY(setCol, $obj, $obj.stringCol == %@).@count == %@)", values: [5, 1, 5, "Foo", 3, "Bar", 0], expectedCount: 0) {
+        assertQuery(predicate: "(intCol == %@ && SUBQUERY(setCol, $obj, $obj.stringCol == %@).@count == %@)", values: [5, "Bar", 0], expectedCount: 0) {
             $0.intCol == 5 &&
-            $0.setInt.contains(1) &&
-            ($0.setCol.intCol == 5 && $0.setCol.stringCol == "Foo").count == 3 &&
             ($0.setCol.stringCol == "Bar").count == 0
         }
 
@@ -8526,9 +8522,8 @@ class QueryTests: TestCase {
             ($0.arrayCol.intCol > 0 && $0.arrayCol.intCol <= 5 ).count > 0
         }
 
-        assertQuery(predicate: "(((intCol == %@ && arrayInt.@count == %@) && SUBQUERY(arrayCol, $obj, $obj.intCol == %@).@count == %@) && SUBQUERY(arrayCol, $obj, $obj.stringCol == %@).@count == %@)", values: [6, 2, 5, 1, "Bar", 0], expectedCount: 1) {
+        assertQuery(predicate: "((intCol == %@ && SUBQUERY(arrayCol, $obj, $obj.intCol == %@).@count == %@) && SUBQUERY(arrayCol, $obj, $obj.stringCol == %@).@count == %@)", values: [6, 5, 1, "Bar", 0], expectedCount: 1) {
             ($0.intCol == 6) &&
-            ($0.arrayInt.count == 2) &&
             ($0.arrayCol.intCol == 5).count == 1 &&
             ($0.arrayCol.stringCol == "Bar").count == 0
         }
@@ -8540,18 +8535,14 @@ class QueryTests: TestCase {
             ($0.arrayCol.intCol != 123).count > 0
         }
 
-        assertQuery(predicate: "(((intCol == %@ && setInt.@count == %@) && SUBQUERY(setCol, $obj, $obj.intCol == %@).@count == %@) && SUBQUERY(setCol, $obj, $obj.stringCol == %@).@count == %@)", values: [6, 2, 5, 1, "Bar", 0], expectedCount: 1) {
+        assertQuery(predicate: "(intCol == %@ && SUBQUERY(setCol, $obj, $obj.stringCol == %@).@count == %@)", values: [6, "Bar", 0], expectedCount: 1) {
             ($0.intCol == 6) &&
-            ($0.setInt.count == 2) &&
-            ($0.setCol.intCol == 5).count == 1 &&
             ($0.setCol.stringCol == "Bar").count == 0
         }
 
-        assertQuery(predicate: "(((intCol == %@ && setInt.@count == %@) && SUBQUERY(setCol, $obj, ($obj.intCol == %@ && $obj.stringCol != %@)).@count == %@) && SUBQUERY(setCol, $obj, $obj.stringCol == %@).@count == %@)", values: [6, 2, 5, "Blah", 1, "Bar", 0], expectedCount: 1) {
+        assertQuery(predicate: "(intCol == %@ && SUBQUERY(setCol, $obj, ($obj.intCol == %@ && $obj.stringCol != %@)).@count == %@)", values: [6, 5, "Blah", 1], expectedCount: 1) {
             ($0.intCol == 6) &&
-            ($0.setInt.count == 2) &&
-            (((($0.setCol.intCol == 5) && ($0.setCol.stringCol != "Blah"))).count == 1) &&
-            (($0.setCol.stringCol == "Bar").count == 0)
+            (((($0.setCol.intCol == 5) && ($0.setCol.stringCol != "Blah"))).count == 1)
         }
 
         let query: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>) = {

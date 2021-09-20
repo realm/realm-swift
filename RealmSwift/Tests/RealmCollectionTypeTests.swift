@@ -22,51 +22,51 @@ import XCTest
 import RealmSwift
 
 class CTTAggregateObject: Object {
-    @objc dynamic var intCol = 0
-    @objc dynamic var int8Col = 0
-    @objc dynamic var int16Col = 0
-    @objc dynamic var int32Col = 0
-    @objc dynamic var int64Col = 0
-    @objc dynamic var floatCol = 0 as Float
-    @objc dynamic var doubleCol = 0.0
-    @objc dynamic var boolCol = false
-    @objc dynamic var dateCol = Date()
-    @objc dynamic var trueCol = true
-    let stringListCol = List<CTTNullableStringObjectWithLink>()
-    let stringSetCol = MutableSet<CTTNullableStringObjectWithLink>()
-    @objc dynamic var linkCol: CTTLinkTarget?
-    @objc dynamic var childIntCol: CTTIntegerObject?
+    @Persisted var intCol = 0
+    @Persisted var int8Col = 0
+    @Persisted var int16Col = 0
+    @Persisted var int32Col = 0
+    @Persisted var int64Col = 0
+    @Persisted var floatCol = 0 as Float
+    @Persisted var doubleCol = 0.0
+    @Persisted var boolCol = false
+    @Persisted var dateCol = Date()
+    @Persisted var trueCol = true
+    @Persisted var stringListCol: List<CTTNullableStringObjectWithLink>
+    @Persisted var stringSetCol: MutableSet<CTTNullableStringObjectWithLink>
+    @Persisted var linkCol: CTTLinkTarget?
+    @Persisted var childIntCol: CTTIntegerObject?
 }
 
 class CTTIntegerObject: Object {
-    @objc dynamic var intCol = 0
+    @Persisted var intCol = 0
 }
 
 class CTTAggregateObjectList: Object {
-    let list = List<CTTAggregateObject>()
+    @Persisted var list: List<CTTAggregateObject>
 }
 
 class CTTAggregateObjectSet: Object {
-    let set = MutableSet<CTTAggregateObject>()
+    @Persisted var set: MutableSet<CTTAggregateObject>
 }
 
 class CTTNullableStringObjectWithLink: Object {
-    @objc dynamic var stringCol: String? = ""
-    @objc dynamic var linkCol: CTTLinkTarget?
+    @Persisted var stringCol: String? = ""
+    @Persisted var linkCol: CTTLinkTarget?
 }
 
 class CTTLinkTarget: Object {
-    @objc dynamic var id = 0
-    let stringObjects = LinkingObjects(fromType: CTTNullableStringObjectWithLink.self, property: "linkCol")
-    let aggregateObjects = LinkingObjects(fromType: CTTAggregateObject.self, property: "linkCol")
+    @Persisted var id = 0
+    @Persisted(originProperty: "linkCol") var stringObjects: LinkingObjects<CTTNullableStringObjectWithLink>
+    @Persisted(originProperty: "linkCol") var aggregateObjects: LinkingObjects<CTTAggregateObject>
 }
 
 class CTTStringList: Object {
-    let array = List<CTTNullableStringObjectWithLink>()
+    @Persisted var array: List<CTTNullableStringObjectWithLink>
 }
 
 class CTTStringSet: Object {
-    let set = MutableSet<CTTNullableStringObjectWithLink>()
+    @Persisted var set: MutableSet<CTTNullableStringObjectWithLink>
 }
 
 class RealmCollectionTypeTests: TestCase {
