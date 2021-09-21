@@ -142,6 +142,18 @@ private enum QueryExpression {
  - AND `&&`
  - OR `||`
  - NOT `!`
+
+ ### Aggregates
+ - @avg `.keys`
+ - @min `.values`
+ - @max `.values`
+ - @sum `.values`
+ - @sount `.values`
+ ```swift
+ let results = realm.objects(Person.self).query {
+    !$0.dogs.age.avg >= 0 || !$0.dogsAgesArray.avg >= 0
+ }
+ ```
  */
 @dynamicMemberLookup
 public struct Query<T: _RealmSchemaDiscoverable> {
@@ -347,6 +359,7 @@ public struct Query<T: _RealmSchemaDiscoverable> {
             case let .collectionAggregation(agg):
                 predicateString.append(agg.rawValue)
             case let .keypathCollectionAggregation(agg):
+                // Aggregates only work on numeric types if they are used as keypath in a collection.
                 if idx-2 >= 0,
                    case let .keyPath(_, isCollection) = tokens[idx-2],
                    isCollection {
@@ -586,6 +599,35 @@ extension Query where T: RealmKeyedCollection, T.Value: OptionalProtocol, T.Valu
     }
 }
 
+extension Query where T: RealmKeyedCollection,
+                      T.Key: _RealmSchemaDiscoverable,
+                      T.Value: _QueryNumeric {
+    /// Returns the minimum value in the keyed collection.
+    public var min: Query<T.Value> {
+        return append(tokens: [.collectionAggregation(.min)])
+    }
+
+    /// Returns the maximum value in the keyed collection.
+    public var max: Query<T.Value> {
+        return append(tokens: [.collectionAggregation(.max)])
+    }
+
+    /// Returns the average in the keyed collection.
+    public var avg: Query<T.Value> {
+        return append(tokens: [.collectionAggregation(.avg)])
+    }
+
+    /// Returns the sum of all the values in the keyed collection.
+    public var sum: Query<T.Value> {
+        return append(tokens: [.collectionAggregation(.sum)])
+    }
+
+    /// Returns the count of all the values in the keyed collection.
+    public var count: Query<T.Value> {
+        return append(tokens: [.collectionAggregation(.count)])
+    }
+}
+
 // MARK: PersistableEnum
 
 extension Query where T: PersistableEnum, T.RawValue: _RealmSchemaDiscoverable {
@@ -819,6 +861,15 @@ extension Query where T: RealmCollection,
     }
 }
 
+/**
+ You can use only use aggregates in numeric types as a keypath on a collection.
+ ```swift
+ let results = realm.objects(Person.self).query {
+   !$0.dogs.age.avg >= 0
+ }
+ ```
+ Where `dogs` is an array of objects.
+ */
 extension Query where T: _QueryNumeric {
     /// Returns the minimum value of the objects in the collection based on the keypath.
     public var min: Query {

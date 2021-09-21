@@ -167,12 +167,12 @@ import RealmSwift
         Property('mapInt16', ['Int16(16)', 'Int16(17)', 'Int16(18)'], 'Int16', 'numeric'),
         Property('mapInt32', ['Int32(32)', 'Int32(33)', 'Int32(34)'], 'Int32', 'numeric'),
         Property('mapInt64', ['Int64(64)', 'Int64(65)', 'Int64(66)'], 'Int64', 'numeric'),
-        Property('mapFloat', ['Float(5.55444333)', 'Float(6.55444333)', 'Float(7.55444333)'], 'Float', 'numeric'),
-        Property('mapDouble', [123.456, 234.456, 345.567], 'Double', 'numeric'),
+        Property('mapFloat', ['Float(5.5544)', 'Float(6.5544)', 'Float(7.5544)'], 'Float', 'numeric'),
+        Property('mapDouble', [123.456, 234.567, 345.678], 'Double', 'numeric'),
         Property('mapString', ['"Foo"', '"Bar"', '"Baz"'], 'String', 'string'),
         Property('mapBinary', ['Data(count: 64)', 'Data(count: 128)', 'Data(count: 256)'], 'Data', 'binary'),
         Property('mapDate', ['Date(timeIntervalSince1970: 1000000)', 'Date(timeIntervalSince1970: 2000000)', 'Date(timeIntervalSince1970: 3000000)'], 'Date', 'numeric'),
-        Property('mapDecimal', ['Decimal128(123.456)', 'Decimal128(456.789)', 'Decimal128(963.852)'], 'Decimal128', 'numeric'),
+        Property('mapDecimal', ['Decimal128(123.456)', 'Decimal128(234.567)', 'Decimal128(345.678)'], 'Decimal128', 'numeric'),
         Property('mapObjectId', ['ObjectId("61184062c1d8f096a3695046")', 'ObjectId("61184062c1d8f096a3695045")', 'ObjectId("61184062c1d8f096a3695044")'], 'ObjectId', 'objectId'),
         Property('mapUuid', ['UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!', 'UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!', 'UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d08e")!'], 'UUID', 'uuid'),
         Property('mapAny', [['.objectId', 'ObjectId("61184062c1d8f096a3695046")'], ['.string', '"Hello"'], ['.int', 123]], 'AnyRealmValue', 'any'),
@@ -185,12 +185,12 @@ import RealmSwift
         Property('mapOptInt16', ['Int16(16)', 'Int16(17)', 'Int16(18)'], 'Int16?', 'numeric'),
         Property('mapOptInt32', ['Int32(32)', 'Int32(33)', 'Int32(34)'], 'Int32?', 'numeric'),
         Property('mapOptInt64', ['Int64(64)', 'Int64(65)', 'Int64(66)'], 'Int64?', 'numeric'),
-        Property('mapOptFloat', ['Float(5.55444333)', 'Float(6.55444333)', 'Float(7.55444333)'], 'Float?', 'numeric'),
-        Property('mapOptDouble', [123.456, 234.456, 345.567], 'Double?', 'numeric'),
+        Property('mapOptFloat', ['Float(5.5544)', 'Float(6.5544)', 'Float(7.5544)'], 'Float?', 'numeric'),
+        Property('mapOptDouble', [123.456, 234.567, 345.678], 'Double?', 'numeric'),
         Property('mapOptString', ['"Foo"', '"Bar"', '"Baz"'], 'String?', 'string'),
         Property('mapOptBinary', ['Data(count: 64)', 'Data(count: 128)', 'Data(count: 256)'], 'Data?', 'binary'),
         Property('mapOptDate', ['Date(timeIntervalSince1970: 1000000)', 'Date(timeIntervalSince1970: 2000000)', 'Date(timeIntervalSince1970: 3000000)'], 'Date?', 'numeric'),
-        Property('mapOptDecimal', ['Decimal128(123.456)', 'Decimal128(456.789)', 'Decimal128(963.852)'], 'Decimal128?', 'numeric'),
+        Property('mapOptDecimal', ['Decimal128(123.456)', 'Decimal128(234.567)', 'Decimal128(345.678)'], 'Decimal128?', 'numeric'),
         Property('mapOptUuid', ['UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!', 'UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!', 'UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d08e")!'], 'UUID?', 'uuid'),
         Property('mapOptObjectId', ['ObjectId("61184062c1d8f096a3695046")', 'ObjectId("61184062c1d8f096a3695045")', 'ObjectId("61184062c1d8f096a3695044")'], 'ObjectId?', 'objectId'),
     ]
@@ -1749,7 +1749,7 @@ class QueryTests: TestCase {
         % end
     }
 
-    // MARK: Linking Objects
+    // MARK: - Linking Objects
 
     func testLinkingObjects() {
         assertQuery(predicate: "%@ IN linkingObjects", values: [objects().first!], expectedCount: 0) {
@@ -1769,7 +1769,7 @@ class QueryTests: TestCase {
         }
     }
 
-    // MARK: Compound
+    // MARK: - Compound
 
     func testCompoundAnd() {
         % values = [properties[0], optProperties[0]]
@@ -1862,7 +1862,7 @@ class QueryTests: TestCase {
 
         // Aggregates
 
-        % for listProperty in [listProperties[1], optListProperties[1]]:
+        % for listProperty in [listProperties[1], optListProperties[1], mapProperties[1], optMapProperties[1]]:
         let sum${listProperty.colName} = ${listProperty.value(0)} + ${listProperty.value(1)}
         assertQuery(predicate: "(((((${listProperty.colName}.@min <= %@ && ${listProperty.colName}.@max >= %@) && ${listProperty.colName}.@sum == %@) && ${listProperty.colName}.@count != %@) && ${listProperty.colName}.@avg > %@) && ${listProperty.colName}.@avg < %@)",
                     values: [${listProperty.value(0)}, ${listProperty.value(1)}, sum${listProperty.colName}, 0, ${listProperty.value(0)}, ${listProperty.value(1)}], expectedCount: 1) {
@@ -1963,7 +1963,7 @@ class QueryTests: TestCase {
 
         // Map
 
-        % for mapProperty in [mapProperties[0], optMapProperties[0]]:
+        % for mapProperty in [mapProperties[0], optMapProperties[0], mapProperties[1], optMapProperties[1]]:
         % for property in [properties[0]]:
         % value1 = property.enumName if property.enumName != None else property.foundationValue(1)
         % wrongValue = property.enumName if property.enumName != None else property.foundationValue(0)
@@ -2059,7 +2059,7 @@ class QueryTests: TestCase {
 
         // Aggregates
 
-        % for listProperty in [listProperties[1], optListProperties[1]]:
+        % for listProperty in [listProperties[1], optListProperties[1], mapProperties[1], optMapProperties[1]]:
         let sum${listProperty.colName} = ${listProperty.value(0)} + ${listProperty.value(1)}
         assertQuery(predicate: "((((${listProperty.colName}.@min <= %@ || ${listProperty.colName}.@max >= %@) && ${listProperty.colName}.@sum == %@) && ${listProperty.colName}.@count != %@) && (${listProperty.colName}.@avg > %@ && ${listProperty.colName}.@avg < %@))",
                     values: [${listProperty.value(0)}, ${listProperty.value(2)}, sum${listProperty.colName}, 0, ${listProperty.value(0)}, ${listProperty.value(2)}], expectedCount: 1) {
@@ -2167,7 +2167,9 @@ class QueryTests: TestCase {
         assertThrows(query(Query<ModernAllTypesObject>())._constructPredicate(), reason: "Subquery predicates will only work on one collection at a time.")
     }
 
-    // MARK: Collection Aggregations
+    // MARK: - Collection Aggregations
+
+    // @Avg
 
     func testCollectionAggregatesAvg() {
         let realm = realmWithTestPath()
@@ -2183,7 +2185,6 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
-
         assertQuery(predicate: "objectCol.${property.colName}.@avg > %@", values: [${property.value(0)}], expectedCount: 1) {
             $0.objectCol.${property.colName}.avg > ${property.value(0)}
         }
@@ -2224,6 +2225,61 @@ class QueryTests: TestCase {
         % end
         % end
     }
+
+    func testMapAggregatesAvg() {
+        let realm = realmWithTestPath()
+        let object = objects().first!
+        % for property in mapProperties + optMapProperties:
+        % if property.enumName == None and property.category == 'numeric':
+        % if property.type != 'Date' and property.type != 'Date?':
+
+        try! realm.write {
+            object.${property.colName}["foo"] = ${property.value(0)}
+            object.${property.colName}["bar"] = ${property.value(1)}
+            object.${property.colName}["baz"] = ${property.value(2)}
+        }
+
+        assertQuery(predicate: "${property.colName}.@avg > %@", values: [${property.value(0)}], expectedCount: 1) {
+            $0.${property.colName}.avg > ${property.value(0)}
+        }
+
+        assertQuery(predicate: "${property.colName}.@avg < %@", values: [${property.value(2)}], expectedCount: 1) {
+            $0.${property.colName}.avg < ${property.value(2)}
+        }
+
+        assertQuery(predicate: "${property.colName}.@avg == %@", values: [${property.value(1)}], expectedCount: 1) {
+            $0.${property.colName}.avg == ${property.value(1)}
+        }
+
+        assertQuery(predicate: "${property.colName}.@avg >= %@", values: [${property.value(0)}], expectedCount: 1) {
+            $0.${property.colName}.avg >= ${property.value(0)}
+        }
+
+        assertQuery(predicate: "${property.colName}.@avg >= %@", values: [${property.value(1)}], expectedCount: 1) {
+            $0.${property.colName}.avg >= ${property.value(1)}
+        }
+
+        assertQuery(predicate: "${property.colName}.@avg <= %@", values: [${property.value(2)}], expectedCount: 1) {
+            $0.${property.colName}.avg <= ${property.value(2)}
+        }
+
+        assertQuery(predicate: "${property.colName}.@avg <= %@", values: [${property.value(1)}], expectedCount: 1) {
+            $0.${property.colName}.avg <= ${property.value(1)}
+        }
+
+        assertQuery(predicate: "${property.colName}.@avg != %@", values: [${property.value(1)}], expectedCount: 0) {
+            $0.${property.colName}.avg != ${property.value(1)}
+        }
+
+        assertQuery(predicate: "${property.colName}.@avg != %@", values: [${property.value(0)}], expectedCount: 1) {
+            $0.${property.colName}.avg != ${property.value(0)}
+        }
+        % end
+        % end
+        % end
+    }
+
+    // @Min
 
     func testCollectionAggregatesMin() {
         let realm = realmWithTestPath()
@@ -2276,6 +2332,58 @@ class QueryTests: TestCase {
         % end
         % end
     }
+
+    func testMapAggregatesMin() {
+        let realm = realmWithTestPath()
+        let object = objects().first!
+        % for property in mapProperties + optMapProperties:
+        % if property.enumName == None and property.category == 'numeric':
+
+        try! realm.write {
+            object.${property.colName}["foo"] = ${property.value(0)}
+            object.${property.colName}["bar"] = ${property.value(1)}
+            object.${property.colName}["baz"] = ${property.value(2)}
+        }
+        assertQuery(predicate: "${property.colName}.@min > %@", values: [${property.value(0)}], expectedCount: 0) {
+            $0.${property.colName}.min > ${property.value(0)}
+        }
+
+        assertQuery(predicate: "${property.colName}.@min < %@", values: [${property.value(2)}], expectedCount: 1) {
+            $0.${property.colName}.min < ${property.value(2)}
+        }
+
+        assertQuery(predicate: "${property.colName}.@min == %@", values: [${property.value(0)}], expectedCount: 1) {
+            $0.${property.colName}.min == ${property.value(0)}
+        }
+
+        assertQuery(predicate: "${property.colName}.@min >= %@", values: [${property.value(1)}], expectedCount: 0) {
+            $0.${property.colName}.min >= ${property.value(1)}
+        }
+
+        assertQuery(predicate: "${property.colName}.@min >= %@", values: [${property.value(0)}], expectedCount: 1) {
+            $0.${property.colName}.min >= ${property.value(0)}
+        }
+
+        assertQuery(predicate: "${property.colName}.@min <= %@", values: [${property.value(2)}], expectedCount: 1) {
+            $0.${property.colName}.min <= ${property.value(2)}
+        }
+
+        assertQuery(predicate: "${property.colName}.@min <= %@", values: [${property.value(0)}], expectedCount: 1) {
+            $0.${property.colName}.min <= ${property.value(0)}
+        }
+
+        assertQuery(predicate: "${property.colName}.@min != %@", values: [${property.value(0)}], expectedCount: 0) {
+            $0.${property.colName}.min != ${property.value(0)}
+        }
+
+        assertQuery(predicate: "${property.colName}.@min != %@", values: [${property.value(2)}], expectedCount: 1) {
+            $0.${property.colName}.min != ${property.value(2)}
+        }
+        % end
+        % end
+    }
+
+    // @Max
 
     func testCollectionAggregatesMax() {
         let realm = realmWithTestPath()
@@ -2330,6 +2438,58 @@ class QueryTests: TestCase {
         % end
     }
 
+    func testMapAggregatesMax() {
+        let realm = realmWithTestPath()
+        let object = objects().first!
+        % for property in mapProperties + optMapProperties:
+        % if property.enumName == None and property.category == 'numeric':
+
+        try! realm.write {
+            object.${property.colName}["foo"] = ${property.value(0)}
+            object.${property.colName}["bar"] = ${property.value(1)}
+            object.${property.colName}["baz"] = ${property.value(2)}
+        }
+        assertQuery(predicate: "${property.colName}.@max > %@", values: [${property.value(0)}], expectedCount: 1) {
+            $0.${property.colName}.max > ${property.value(0)}
+        }
+
+        assertQuery(predicate: "${property.colName}.@max < %@", values: [${property.value(2)}], expectedCount: 0) {
+            $0.${property.colName}.max < ${property.value(2)}
+        }
+
+        assertQuery(predicate: "${property.colName}.@max == %@", values: [${property.value(2)}], expectedCount: 1) {
+            $0.${property.colName}.max == ${property.value(2)}
+        }
+
+        assertQuery(predicate: "${property.colName}.@max >= %@", values: [${property.value(0)}], expectedCount: 1) {
+            $0.${property.colName}.max >= ${property.value(0)}
+        }
+
+        assertQuery(predicate: "${property.colName}.@max >= %@", values: [${property.value(2)}], expectedCount: 1) {
+            $0.${property.colName}.max >= ${property.value(2)}
+        }
+
+        assertQuery(predicate: "${property.colName}.@max <= %@", values: [${property.value(1)}], expectedCount: 0) {
+            $0.${property.colName}.max <= ${property.value(1)}
+        }
+
+        assertQuery(predicate: "${property.colName}.@max <= %@", values: [${property.value(2)}], expectedCount: 1) {
+            $0.${property.colName}.max <= ${property.value(2)}
+        }
+
+        assertQuery(predicate: "${property.colName}.@max != %@", values: [${property.value(2)}], expectedCount: 0) {
+            $0.${property.colName}.max != ${property.value(2)}
+        }
+
+        assertQuery(predicate: "${property.colName}.@max != %@", values: [${property.value(0)}], expectedCount: 1) {
+            $0.${property.colName}.max != ${property.value(0)}
+        }
+        % end
+        % end
+    }
+
+    // @Sum
+
     func testCollectionAggregatesSum() {
         let realm = realmWithTestPath()
         let object = objects().first!
@@ -2344,7 +2504,6 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
-
         let sum${property.colName} = ${property.value(0)} + ${property.value(1)} + ${property.value(2)}
         assertQuery(predicate: "objectCol.${property.colName}.@sum > %@", values: [${property.value(2)}], expectedCount: 1) {
             $0.objectCol.${property.colName}.sum > ${property.value(2)}
@@ -2390,6 +2549,65 @@ class QueryTests: TestCase {
         % end
         % end
     }
+
+    func testMapAggregatesSum() {
+        let realm = realmWithTestPath()
+        let object = objects().first!
+        % for property in mapProperties + optMapProperties:
+        % if property.enumName == None and property.category == 'numeric':
+        % if property.type != 'Date' and property.type != 'Date?':
+
+        try! realm.write {
+            object.${property.colName}["foo"] = ${property.value(0)}
+            object.${property.colName}["bar"] = ${property.value(1)}
+            object.${property.colName}["baz"] = ${property.value(2)}
+        }
+        let sum${property.colName} = ${property.value(0)} + ${property.value(1)} + ${property.value(2)}
+        assertQuery(predicate: "${property.colName}.@sum > %@", values: [${property.value(2)}], expectedCount: 1) {
+            $0.${property.colName}.sum > ${property.value(2)}
+        }
+
+        assertQuery(predicate: "${property.colName}.@sum < %@", values: [${property.value(2)}], expectedCount: 0) {
+            $0.${property.colName}.sum < ${property.value(2)}
+        }
+
+        assertQuery(predicate: "${property.colName}.@sum == %@", values: [${property.value(2)}], expectedCount: 0) {
+            $0.${property.colName}.sum == ${property.value(2)}
+        }
+
+        assertQuery(predicate: "${property.colName}.@sum == %@", values: [sum${property.colName}], expectedCount: 1) {
+            $0.${property.colName}.sum == sum${property.colName}
+        }
+
+        assertQuery(predicate: "${property.colName}.@sum >= %@", values: [${property.value(2)}], expectedCount: 1) {
+            $0.${property.colName}.sum >= ${property.value(2)}
+        }
+
+        assertQuery(predicate: "${property.colName}.@sum >= %@", values: [sum${property.colName}], expectedCount: 1) {
+            $0.${property.colName}.sum >= sum${property.colName}
+        }
+
+        assertQuery(predicate: "${property.colName}.@sum <= %@", values: [${property.value(2)}], expectedCount: 0) {
+            $0.${property.colName}.sum <= ${property.value(2)}
+        }
+
+        assertQuery(predicate: "${property.colName}.@sum <= %@", values: [sum${property.colName}], expectedCount: 1) {
+            $0.${property.colName}.sum <= sum${property.colName}
+        }
+
+        assertQuery(predicate: "${property.colName}.@sum != %@", values: [sum${property.colName}], expectedCount: 0) {
+            $0.${property.colName}.sum != sum${property.colName}
+        }
+
+        assertQuery(predicate: "${property.colName}.@sum != %@", values: [${property.value(0)}], expectedCount: 1) {
+            $0.${property.colName}.sum != ${property.value(0)}
+        }
+        % end
+        % end
+        % end
+    }
+
+    // @Count
 
     func testCollectionAggregatesCount() {
         let realm = realmWithTestPath()
@@ -2449,7 +2667,7 @@ class QueryTests: TestCase {
         % end
     }
 
-    // MARK: Keypath Collection Aggregations
+    // MARK: - Keypath Collection Aggregations
 
     func testKeypathCollectionAggregatesAvg() {
         let realm = realmWithTestPath()

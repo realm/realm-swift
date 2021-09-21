@@ -167,10 +167,10 @@ class QueryTests: TestCase {
             object.mapInt32["bar"] = Int32(33)
             object.mapInt64["foo"] = Int64(64)
             object.mapInt64["bar"] = Int64(65)
-            object.mapFloat["foo"] = Float(5.55444333)
-            object.mapFloat["bar"] = Float(6.55444333)
+            object.mapFloat["foo"] = Float(5.5544)
+            object.mapFloat["bar"] = Float(6.5544)
             object.mapDouble["foo"] = 123.456
-            object.mapDouble["bar"] = 234.456
+            object.mapDouble["bar"] = 234.567
             object.mapString["foo"] = "Foo"
             object.mapString["bar"] = "Bar"
             object.mapBinary["foo"] = Data(count: 64)
@@ -178,7 +178,7 @@ class QueryTests: TestCase {
             object.mapDate["foo"] = Date(timeIntervalSince1970: 1000000)
             object.mapDate["bar"] = Date(timeIntervalSince1970: 2000000)
             object.mapDecimal["foo"] = Decimal128(123.456)
-            object.mapDecimal["bar"] = Decimal128(456.789)
+            object.mapDecimal["bar"] = Decimal128(234.567)
             object.mapObjectId["foo"] = ObjectId("61184062c1d8f096a3695046")
             object.mapObjectId["bar"] = ObjectId("61184062c1d8f096a3695045")
             object.mapUuid["foo"] = UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!
@@ -197,10 +197,10 @@ class QueryTests: TestCase {
             object.mapOptInt32["bar"] = Int32(33)
             object.mapOptInt64["foo"] = Int64(64)
             object.mapOptInt64["bar"] = Int64(65)
-            object.mapOptFloat["foo"] = Float(5.55444333)
-            object.mapOptFloat["bar"] = Float(6.55444333)
+            object.mapOptFloat["foo"] = Float(5.5544)
+            object.mapOptFloat["bar"] = Float(6.5544)
             object.mapOptDouble["foo"] = 123.456
-            object.mapOptDouble["bar"] = 234.456
+            object.mapOptDouble["bar"] = 234.567
             object.mapOptString["foo"] = "Foo"
             object.mapOptString["bar"] = "Bar"
             object.mapOptBinary["foo"] = Data(count: 64)
@@ -208,7 +208,7 @@ class QueryTests: TestCase {
             object.mapOptDate["foo"] = Date(timeIntervalSince1970: 1000000)
             object.mapOptDate["bar"] = Date(timeIntervalSince1970: 2000000)
             object.mapOptDecimal["foo"] = Decimal128(123.456)
-            object.mapOptDecimal["bar"] = Decimal128(456.789)
+            object.mapOptDecimal["bar"] = Decimal128(234.567)
             object.mapOptUuid["foo"] = UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!
             object.mapOptUuid["bar"] = UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!
             object.mapOptObjectId["foo"] = ObjectId("61184062c1d8f096a3695046")
@@ -4673,18 +4673,18 @@ class QueryTests: TestCase {
             $0.mapInt64.contains(Int64(66))
         }
 
-        assertQuery(predicate: "%@ IN mapFloat", values: [Float(5.55444333)], expectedCount: 1) {
-            $0.mapFloat.contains(Float(5.55444333))
+        assertQuery(predicate: "%@ IN mapFloat", values: [Float(5.5544)], expectedCount: 1) {
+            $0.mapFloat.contains(Float(5.5544))
         }
-        assertQuery(predicate: "%@ IN mapFloat", values: [Float(7.55444333)], expectedCount: 0) {
-            $0.mapFloat.contains(Float(7.55444333))
+        assertQuery(predicate: "%@ IN mapFloat", values: [Float(7.5544)], expectedCount: 0) {
+            $0.mapFloat.contains(Float(7.5544))
         }
 
         assertQuery(predicate: "%@ IN mapDouble", values: [123.456], expectedCount: 1) {
             $0.mapDouble.contains(123.456)
         }
-        assertQuery(predicate: "%@ IN mapDouble", values: [345.567], expectedCount: 0) {
-            $0.mapDouble.contains(345.567)
+        assertQuery(predicate: "%@ IN mapDouble", values: [345.678], expectedCount: 0) {
+            $0.mapDouble.contains(345.678)
         }
 
         assertQuery(predicate: "%@ IN mapString", values: ["Foo"], expectedCount: 1) {
@@ -4711,8 +4711,8 @@ class QueryTests: TestCase {
         assertQuery(predicate: "%@ IN mapDecimal", values: [Decimal128(123.456)], expectedCount: 1) {
             $0.mapDecimal.contains(Decimal128(123.456))
         }
-        assertQuery(predicate: "%@ IN mapDecimal", values: [Decimal128(963.852)], expectedCount: 0) {
-            $0.mapDecimal.contains(Decimal128(963.852))
+        assertQuery(predicate: "%@ IN mapDecimal", values: [Decimal128(345.678)], expectedCount: 0) {
+            $0.mapDecimal.contains(Decimal128(345.678))
         }
 
         assertQuery(predicate: "%@ IN mapObjectId", values: [ObjectId("61184062c1d8f096a3695046")], expectedCount: 1) {
@@ -4796,11 +4796,11 @@ class QueryTests: TestCase {
             $0.mapOptInt64.contains(nil)
         }
 
-        assertQuery(predicate: "%@ IN mapOptFloat", values: [Float(5.55444333)], expectedCount: 1) {
-            $0.mapOptFloat.contains(Float(5.55444333))
+        assertQuery(predicate: "%@ IN mapOptFloat", values: [Float(5.5544)], expectedCount: 1) {
+            $0.mapOptFloat.contains(Float(5.5544))
         }
-        assertQuery(predicate: "%@ IN mapOptFloat", values: [Float(7.55444333)], expectedCount: 0) {
-            $0.mapOptFloat.contains(Float(7.55444333))
+        assertQuery(predicate: "%@ IN mapOptFloat", values: [Float(7.5544)], expectedCount: 0) {
+            $0.mapOptFloat.contains(Float(7.5544))
         }
         assertQuery(predicate: "%@ IN mapOptFloat", values: [NSNull()], expectedCount: 0) {
             $0.mapOptFloat.contains(nil)
@@ -4809,8 +4809,8 @@ class QueryTests: TestCase {
         assertQuery(predicate: "%@ IN mapOptDouble", values: [123.456], expectedCount: 1) {
             $0.mapOptDouble.contains(123.456)
         }
-        assertQuery(predicate: "%@ IN mapOptDouble", values: [345.567], expectedCount: 0) {
-            $0.mapOptDouble.contains(345.567)
+        assertQuery(predicate: "%@ IN mapOptDouble", values: [345.678], expectedCount: 0) {
+            $0.mapOptDouble.contains(345.678)
         }
         assertQuery(predicate: "%@ IN mapOptDouble", values: [NSNull()], expectedCount: 0) {
             $0.mapOptDouble.contains(nil)
@@ -4849,8 +4849,8 @@ class QueryTests: TestCase {
         assertQuery(predicate: "%@ IN mapOptDecimal", values: [Decimal128(123.456)], expectedCount: 1) {
             $0.mapOptDecimal.contains(Decimal128(123.456))
         }
-        assertQuery(predicate: "%@ IN mapOptDecimal", values: [Decimal128(963.852)], expectedCount: 0) {
-            $0.mapOptDecimal.contains(Decimal128(963.852))
+        assertQuery(predicate: "%@ IN mapOptDecimal", values: [Decimal128(345.678)], expectedCount: 0) {
+            $0.mapOptDecimal.contains(Decimal128(345.678))
         }
         assertQuery(predicate: "%@ IN mapOptDecimal", values: [NSNull()], expectedCount: 0) {
             $0.mapOptDecimal.contains(nil)
@@ -6160,26 +6160,26 @@ class QueryTests: TestCase {
             $0.mapInt64.values <= Int64(64)
         }
 
-        assertQuery(predicate: "mapFloat.@allValues == %@", values: [Float(5.55444333)], expectedCount: 1) {
-            $0.mapFloat.values == Float(5.55444333)
+        assertQuery(predicate: "mapFloat.@allValues == %@", values: [Float(5.5544)], expectedCount: 1) {
+            $0.mapFloat.values == Float(5.5544)
         }
 
-        assertQuery(predicate: "mapFloat.@allValues != %@", values: [Float(5.55444333)], expectedCount: 1) {
-            $0.mapFloat.values != Float(5.55444333)
+        assertQuery(predicate: "mapFloat.@allValues != %@", values: [Float(5.5544)], expectedCount: 1) {
+            $0.mapFloat.values != Float(5.5544)
         }
-        assertQuery(predicate: "mapFloat.@allValues > %@", values: [Float(5.55444333)], expectedCount: 1) {
-            $0.mapFloat.values > Float(5.55444333)
-        }
-
-        assertQuery(predicate: "mapFloat.@allValues >= %@", values: [Float(5.55444333)], expectedCount: 1) {
-            $0.mapFloat.values >= Float(5.55444333)
-        }
-        assertQuery(predicate: "mapFloat.@allValues < %@", values: [Float(5.55444333)], expectedCount: 0) {
-            $0.mapFloat.values < Float(5.55444333)
+        assertQuery(predicate: "mapFloat.@allValues > %@", values: [Float(5.5544)], expectedCount: 1) {
+            $0.mapFloat.values > Float(5.5544)
         }
 
-        assertQuery(predicate: "mapFloat.@allValues <= %@", values: [Float(5.55444333)], expectedCount: 1) {
-            $0.mapFloat.values <= Float(5.55444333)
+        assertQuery(predicate: "mapFloat.@allValues >= %@", values: [Float(5.5544)], expectedCount: 1) {
+            $0.mapFloat.values >= Float(5.5544)
+        }
+        assertQuery(predicate: "mapFloat.@allValues < %@", values: [Float(5.5544)], expectedCount: 0) {
+            $0.mapFloat.values < Float(5.5544)
+        }
+
+        assertQuery(predicate: "mapFloat.@allValues <= %@", values: [Float(5.5544)], expectedCount: 1) {
+            $0.mapFloat.values <= Float(5.5544)
         }
 
         assertQuery(predicate: "mapDouble.@allValues == %@", values: [123.456], expectedCount: 1) {
@@ -6437,26 +6437,26 @@ class QueryTests: TestCase {
             $0.mapOptInt64.values <= Int64(64)
         }
 
-        assertQuery(predicate: "mapOptFloat.@allValues == %@", values: [Float(5.55444333)], expectedCount: 1) {
-            $0.mapOptFloat.values == Float(5.55444333)
+        assertQuery(predicate: "mapOptFloat.@allValues == %@", values: [Float(5.5544)], expectedCount: 1) {
+            $0.mapOptFloat.values == Float(5.5544)
         }
 
-        assertQuery(predicate: "mapOptFloat.@allValues != %@", values: [Float(5.55444333)], expectedCount: 1) {
-            $0.mapOptFloat.values != Float(5.55444333)
+        assertQuery(predicate: "mapOptFloat.@allValues != %@", values: [Float(5.5544)], expectedCount: 1) {
+            $0.mapOptFloat.values != Float(5.5544)
         }
-        assertQuery(predicate: "mapOptFloat.@allValues > %@", values: [Float(5.55444333)], expectedCount: 1) {
-            $0.mapOptFloat.values > Float(5.55444333)
-        }
-
-        assertQuery(predicate: "mapOptFloat.@allValues >= %@", values: [Float(5.55444333)], expectedCount: 1) {
-            $0.mapOptFloat.values >= Float(5.55444333)
-        }
-        assertQuery(predicate: "mapOptFloat.@allValues < %@", values: [Float(5.55444333)], expectedCount: 0) {
-            $0.mapOptFloat.values < Float(5.55444333)
+        assertQuery(predicate: "mapOptFloat.@allValues > %@", values: [Float(5.5544)], expectedCount: 1) {
+            $0.mapOptFloat.values > Float(5.5544)
         }
 
-        assertQuery(predicate: "mapOptFloat.@allValues <= %@", values: [Float(5.55444333)], expectedCount: 1) {
-            $0.mapOptFloat.values <= Float(5.55444333)
+        assertQuery(predicate: "mapOptFloat.@allValues >= %@", values: [Float(5.5544)], expectedCount: 1) {
+            $0.mapOptFloat.values >= Float(5.5544)
+        }
+        assertQuery(predicate: "mapOptFloat.@allValues < %@", values: [Float(5.5544)], expectedCount: 0) {
+            $0.mapOptFloat.values < Float(5.5544)
+        }
+
+        assertQuery(predicate: "mapOptFloat.@allValues <= %@", values: [Float(5.5544)], expectedCount: 1) {
+            $0.mapOptFloat.values <= Float(5.5544)
         }
 
         assertQuery(predicate: "mapOptDouble.@allValues == %@", values: [123.456], expectedCount: 1) {
@@ -6637,21 +6637,21 @@ class QueryTests: TestCase {
         }
 
         assertQuery(predicate: "mapFloat.@min >= %@ && mapFloat.@max <= %@",
-                    values: [Float(5.55444333), Float(6.55444333)], expectedCount: 1) {
-            $0.mapFloat.contains(Float(5.55444333)...Float(6.55444333))
+                    values: [Float(5.5544), Float(6.5544)], expectedCount: 1) {
+            $0.mapFloat.contains(Float(5.5544)...Float(6.5544))
         }
         assertQuery(predicate: "mapFloat.@min >= %@ && mapFloat.@max < %@",
-                    values: [Float(5.55444333), Float(6.55444333)], expectedCount: 0) {
-            $0.mapFloat.contains(Float(5.55444333)..<Float(6.55444333))
+                    values: [Float(5.5544), Float(6.5544)], expectedCount: 0) {
+            $0.mapFloat.contains(Float(5.5544)..<Float(6.5544))
         }
 
         assertQuery(predicate: "mapDouble.@min >= %@ && mapDouble.@max <= %@",
-                    values: [123.456, 234.456], expectedCount: 1) {
-            $0.mapDouble.contains(123.456...234.456)
+                    values: [123.456, 234.567], expectedCount: 1) {
+            $0.mapDouble.contains(123.456...234.567)
         }
         assertQuery(predicate: "mapDouble.@min >= %@ && mapDouble.@max < %@",
-                    values: [123.456, 234.456], expectedCount: 0) {
-            $0.mapDouble.contains(123.456..<234.456)
+                    values: [123.456, 234.567], expectedCount: 0) {
+            $0.mapDouble.contains(123.456..<234.567)
         }
 
         assertQuery(predicate: "mapDate.@min >= %@ && mapDate.@max <= %@",
@@ -6664,12 +6664,12 @@ class QueryTests: TestCase {
         }
 
         assertQuery(predicate: "mapDecimal.@min >= %@ && mapDecimal.@max <= %@",
-                    values: [Decimal128(123.456), Decimal128(456.789)], expectedCount: 1) {
-            $0.mapDecimal.contains(Decimal128(123.456)...Decimal128(456.789))
+                    values: [Decimal128(123.456), Decimal128(234.567)], expectedCount: 1) {
+            $0.mapDecimal.contains(Decimal128(123.456)...Decimal128(234.567))
         }
         assertQuery(predicate: "mapDecimal.@min >= %@ && mapDecimal.@max < %@",
-                    values: [Decimal128(123.456), Decimal128(456.789)], expectedCount: 0) {
-            $0.mapDecimal.contains(Decimal128(123.456)..<Decimal128(456.789))
+                    values: [Decimal128(123.456), Decimal128(234.567)], expectedCount: 0) {
+            $0.mapDecimal.contains(Decimal128(123.456)..<Decimal128(234.567))
         }
 
         assertQuery(predicate: "mapOptInt.@min >= %@ && mapOptInt.@max <= %@",
@@ -6718,21 +6718,21 @@ class QueryTests: TestCase {
         }
 
         assertQuery(predicate: "mapOptFloat.@min >= %@ && mapOptFloat.@max <= %@",
-                    values: [Float(5.55444333), Float(6.55444333)], expectedCount: 1) {
-            $0.mapOptFloat.contains(Float(5.55444333)...Float(6.55444333))
+                    values: [Float(5.5544), Float(6.5544)], expectedCount: 1) {
+            $0.mapOptFloat.contains(Float(5.5544)...Float(6.5544))
         }
         assertQuery(predicate: "mapOptFloat.@min >= %@ && mapOptFloat.@max < %@",
-                    values: [Float(5.55444333), Float(6.55444333)], expectedCount: 0) {
-            $0.mapOptFloat.contains(Float(5.55444333)..<Float(6.55444333))
+                    values: [Float(5.5544), Float(6.5544)], expectedCount: 0) {
+            $0.mapOptFloat.contains(Float(5.5544)..<Float(6.5544))
         }
 
         assertQuery(predicate: "mapOptDouble.@min >= %@ && mapOptDouble.@max <= %@",
-                    values: [123.456, 234.456], expectedCount: 1) {
-            $0.mapOptDouble.contains(123.456...234.456)
+                    values: [123.456, 234.567], expectedCount: 1) {
+            $0.mapOptDouble.contains(123.456...234.567)
         }
         assertQuery(predicate: "mapOptDouble.@min >= %@ && mapOptDouble.@max < %@",
-                    values: [123.456, 234.456], expectedCount: 0) {
-            $0.mapOptDouble.contains(123.456..<234.456)
+                    values: [123.456, 234.567], expectedCount: 0) {
+            $0.mapOptDouble.contains(123.456..<234.567)
         }
 
         assertQuery(predicate: "mapOptDate.@min >= %@ && mapOptDate.@max <= %@",
@@ -6745,12 +6745,12 @@ class QueryTests: TestCase {
         }
 
         assertQuery(predicate: "mapOptDecimal.@min >= %@ && mapOptDecimal.@max <= %@",
-                    values: [Decimal128(123.456), Decimal128(456.789)], expectedCount: 1) {
-            $0.mapOptDecimal.contains(Decimal128(123.456)...Decimal128(456.789))
+                    values: [Decimal128(123.456), Decimal128(234.567)], expectedCount: 1) {
+            $0.mapOptDecimal.contains(Decimal128(123.456)...Decimal128(234.567))
         }
         assertQuery(predicate: "mapOptDecimal.@min >= %@ && mapOptDecimal.@max < %@",
-                    values: [Decimal128(123.456), Decimal128(456.789)], expectedCount: 0) {
-            $0.mapOptDecimal.contains(Decimal128(123.456)..<Decimal128(456.789))
+                    values: [Decimal128(123.456), Decimal128(234.567)], expectedCount: 0) {
+            $0.mapOptDecimal.contains(Decimal128(123.456)..<Decimal128(234.567))
         }
 
     }
@@ -6891,26 +6891,26 @@ class QueryTests: TestCase {
             $0.mapInt64["foo"] <= Int64(64)
         }
 
-        assertQuery(predicate: "(mapFloat.@allKeys == %@ && mapFloat == %@)", values: ["foo", Float(5.55444333)], expectedCount: 1) {
-            $0.mapFloat["foo"] == Float(5.55444333)
+        assertQuery(predicate: "(mapFloat.@allKeys == %@ && mapFloat == %@)", values: ["foo", Float(5.5544)], expectedCount: 1) {
+            $0.mapFloat["foo"] == Float(5.5544)
         }
 
-        assertQuery(predicate: "(mapFloat.@allKeys == %@ && mapFloat != %@)", values: ["foo", Float(5.55444333)], expectedCount: 1) {
-            $0.mapFloat["foo"] != Float(5.55444333)
+        assertQuery(predicate: "(mapFloat.@allKeys == %@ && mapFloat != %@)", values: ["foo", Float(5.5544)], expectedCount: 1) {
+            $0.mapFloat["foo"] != Float(5.5544)
         }
-        assertQuery(predicate: "(mapFloat.@allKeys == %@ && mapFloat > %@)", values: ["foo", Float(5.55444333)], expectedCount: 1) {
-            $0.mapFloat["foo"] > Float(5.55444333)
-        }
-
-        assertQuery(predicate: "(mapFloat.@allKeys == %@ && mapFloat >= %@)", values: ["foo", Float(5.55444333)], expectedCount: 1) {
-            $0.mapFloat["foo"] >= Float(5.55444333)
-        }
-        assertQuery(predicate: "(mapFloat.@allKeys == %@ && mapFloat < %@)", values: ["foo", Float(5.55444333)], expectedCount: 0) {
-            $0.mapFloat["foo"] < Float(5.55444333)
+        assertQuery(predicate: "(mapFloat.@allKeys == %@ && mapFloat > %@)", values: ["foo", Float(5.5544)], expectedCount: 1) {
+            $0.mapFloat["foo"] > Float(5.5544)
         }
 
-        assertQuery(predicate: "(mapFloat.@allKeys == %@ && mapFloat <= %@)", values: ["foo", Float(5.55444333)], expectedCount: 1) {
-            $0.mapFloat["foo"] <= Float(5.55444333)
+        assertQuery(predicate: "(mapFloat.@allKeys == %@ && mapFloat >= %@)", values: ["foo", Float(5.5544)], expectedCount: 1) {
+            $0.mapFloat["foo"] >= Float(5.5544)
+        }
+        assertQuery(predicate: "(mapFloat.@allKeys == %@ && mapFloat < %@)", values: ["foo", Float(5.5544)], expectedCount: 0) {
+            $0.mapFloat["foo"] < Float(5.5544)
+        }
+
+        assertQuery(predicate: "(mapFloat.@allKeys == %@ && mapFloat <= %@)", values: ["foo", Float(5.5544)], expectedCount: 1) {
+            $0.mapFloat["foo"] <= Float(5.5544)
         }
 
         assertQuery(predicate: "(mapDouble.@allKeys == %@ && mapDouble == %@)", values: ["foo", 123.456], expectedCount: 1) {
@@ -7172,26 +7172,26 @@ class QueryTests: TestCase {
             $0.mapOptInt64["foo"] <= Int64(64)
         }
 
-        assertQuery(predicate: "(mapOptFloat.@allKeys == %@ && mapOptFloat == %@)", values: ["foo", Float(5.55444333)], expectedCount: 1) {
-            $0.mapOptFloat["foo"] == Float(5.55444333)
+        assertQuery(predicate: "(mapOptFloat.@allKeys == %@ && mapOptFloat == %@)", values: ["foo", Float(5.5544)], expectedCount: 1) {
+            $0.mapOptFloat["foo"] == Float(5.5544)
         }
 
-        assertQuery(predicate: "(mapOptFloat.@allKeys == %@ && mapOptFloat != %@)", values: ["foo", Float(5.55444333)], expectedCount: 1) {
-            $0.mapOptFloat["foo"] != Float(5.55444333)
+        assertQuery(predicate: "(mapOptFloat.@allKeys == %@ && mapOptFloat != %@)", values: ["foo", Float(5.5544)], expectedCount: 1) {
+            $0.mapOptFloat["foo"] != Float(5.5544)
         }
-        assertQuery(predicate: "(mapOptFloat.@allKeys == %@ && mapOptFloat > %@)", values: ["foo", Float(5.55444333)], expectedCount: 1) {
-            $0.mapOptFloat["foo"] > Float(5.55444333)
-        }
-
-        assertQuery(predicate: "(mapOptFloat.@allKeys == %@ && mapOptFloat >= %@)", values: ["foo", Float(5.55444333)], expectedCount: 1) {
-            $0.mapOptFloat["foo"] >= Float(5.55444333)
-        }
-        assertQuery(predicate: "(mapOptFloat.@allKeys == %@ && mapOptFloat < %@)", values: ["foo", Float(5.55444333)], expectedCount: 0) {
-            $0.mapOptFloat["foo"] < Float(5.55444333)
+        assertQuery(predicate: "(mapOptFloat.@allKeys == %@ && mapOptFloat > %@)", values: ["foo", Float(5.5544)], expectedCount: 1) {
+            $0.mapOptFloat["foo"] > Float(5.5544)
         }
 
-        assertQuery(predicate: "(mapOptFloat.@allKeys == %@ && mapOptFloat <= %@)", values: ["foo", Float(5.55444333)], expectedCount: 1) {
-            $0.mapOptFloat["foo"] <= Float(5.55444333)
+        assertQuery(predicate: "(mapOptFloat.@allKeys == %@ && mapOptFloat >= %@)", values: ["foo", Float(5.5544)], expectedCount: 1) {
+            $0.mapOptFloat["foo"] >= Float(5.5544)
+        }
+        assertQuery(predicate: "(mapOptFloat.@allKeys == %@ && mapOptFloat < %@)", values: ["foo", Float(5.5544)], expectedCount: 0) {
+            $0.mapOptFloat["foo"] < Float(5.5544)
+        }
+
+        assertQuery(predicate: "(mapOptFloat.@allKeys == %@ && mapOptFloat <= %@)", values: ["foo", Float(5.5544)], expectedCount: 1) {
+            $0.mapOptFloat["foo"] <= Float(5.5544)
         }
 
         assertQuery(predicate: "(mapOptDouble.@allKeys == %@ && mapOptDouble == %@)", values: ["foo", 123.456], expectedCount: 1) {
@@ -7562,12 +7562,12 @@ class QueryTests: TestCase {
             $0.mapInt64.containsAny(in: [Int64(64), Int64(65)])
         }
         assertQuery(predicate: "ANY mapFloat IN %@",
-                    values: [NSArray(array: [Float(5.55444333), Float(6.55444333)])], expectedCount: 1) {
-            $0.mapFloat.containsAny(in: [Float(5.55444333), Float(6.55444333)])
+                    values: [NSArray(array: [Float(5.5544), Float(6.5544)])], expectedCount: 1) {
+            $0.mapFloat.containsAny(in: [Float(5.5544), Float(6.5544)])
         }
         assertQuery(predicate: "ANY mapDouble IN %@",
-                    values: [NSArray(array: [123.456, 234.456])], expectedCount: 1) {
-            $0.mapDouble.containsAny(in: [123.456, 234.456])
+                    values: [NSArray(array: [123.456, 234.567])], expectedCount: 1) {
+            $0.mapDouble.containsAny(in: [123.456, 234.567])
         }
         assertQuery(predicate: "ANY mapString IN %@",
                     values: [NSArray(array: ["Foo", "Bar"])], expectedCount: 1) {
@@ -7582,8 +7582,8 @@ class QueryTests: TestCase {
             $0.mapDate.containsAny(in: [Date(timeIntervalSince1970: 1000000), Date(timeIntervalSince1970: 2000000)])
         }
         assertQuery(predicate: "ANY mapDecimal IN %@",
-                    values: [NSArray(array: [Decimal128(123.456), Decimal128(456.789)])], expectedCount: 1) {
-            $0.mapDecimal.containsAny(in: [Decimal128(123.456), Decimal128(456.789)])
+                    values: [NSArray(array: [Decimal128(123.456), Decimal128(234.567)])], expectedCount: 1) {
+            $0.mapDecimal.containsAny(in: [Decimal128(123.456), Decimal128(234.567)])
         }
         assertQuery(predicate: "ANY mapObjectId IN %@",
                     values: [NSArray(array: [ObjectId("61184062c1d8f096a3695046"), ObjectId("61184062c1d8f096a3695045")])], expectedCount: 1) {
@@ -7622,12 +7622,12 @@ class QueryTests: TestCase {
             $0.mapOptInt64.containsAny(in: [Int64(64), Int64(65)])
         }
         assertQuery(predicate: "ANY mapOptFloat IN %@",
-                    values: [NSArray(array: [Float(5.55444333), Float(6.55444333)])], expectedCount: 1) {
-            $0.mapOptFloat.containsAny(in: [Float(5.55444333), Float(6.55444333)])
+                    values: [NSArray(array: [Float(5.5544), Float(6.5544)])], expectedCount: 1) {
+            $0.mapOptFloat.containsAny(in: [Float(5.5544), Float(6.5544)])
         }
         assertQuery(predicate: "ANY mapOptDouble IN %@",
-                    values: [NSArray(array: [123.456, 234.456])], expectedCount: 1) {
-            $0.mapOptDouble.containsAny(in: [123.456, 234.456])
+                    values: [NSArray(array: [123.456, 234.567])], expectedCount: 1) {
+            $0.mapOptDouble.containsAny(in: [123.456, 234.567])
         }
         assertQuery(predicate: "ANY mapOptString IN %@",
                     values: [NSArray(array: ["Foo", "Bar"])], expectedCount: 1) {
@@ -7642,8 +7642,8 @@ class QueryTests: TestCase {
             $0.mapOptDate.containsAny(in: [Date(timeIntervalSince1970: 1000000), Date(timeIntervalSince1970: 2000000)])
         }
         assertQuery(predicate: "ANY mapOptDecimal IN %@",
-                    values: [NSArray(array: [Decimal128(123.456), Decimal128(456.789)])], expectedCount: 1) {
-            $0.mapOptDecimal.containsAny(in: [Decimal128(123.456), Decimal128(456.789)])
+                    values: [NSArray(array: [Decimal128(123.456), Decimal128(234.567)])], expectedCount: 1) {
+            $0.mapOptDecimal.containsAny(in: [Decimal128(123.456), Decimal128(234.567)])
         }
         assertQuery(predicate: "ANY mapOptUuid IN %@",
                     values: [NSArray(array: [UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!, UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!])], expectedCount: 1) {
@@ -7870,7 +7870,7 @@ class QueryTests: TestCase {
         }
     }
 
-    // MARK: Linking Objects
+    // MARK: - Linking Objects
 
     func testLinkingObjects() {
         assertQuery(predicate: "%@ IN linkingObjects", values: [objects().first!], expectedCount: 0) {
@@ -7890,7 +7890,7 @@ class QueryTests: TestCase {
         }
     }
 
-    // MARK: Compound
+    // MARK: - Compound
 
     func testCompoundAnd() {
         assertQuery(predicate: "(boolCol == %@ && optBoolCol == %@)", values: [false, false], expectedCount: 1) {
@@ -7980,6 +7980,26 @@ class QueryTests: TestCase {
             ($0.arrayOptInt.count != 0) &&
             ($0.arrayOptInt.avg > 1) &&
             ($0.arrayOptInt.avg < 2)
+        }
+        let summapInt = 1 + 2
+        assertQuery(predicate: "(((((mapInt.@min <= %@ && mapInt.@max >= %@) && mapInt.@sum == %@) && mapInt.@count != %@) && mapInt.@avg > %@) && mapInt.@avg < %@)",
+                    values: [1, 2, summapInt, 0, 1, 2], expectedCount: 1) {
+            ($0.mapInt.min <= 1) &&
+            ($0.mapInt.max >= 2) &&
+            ($0.mapInt.sum == summapInt) &&
+            ($0.mapInt.count != 0) &&
+            ($0.mapInt.avg > 1) &&
+            ($0.mapInt.avg < 2)
+        }
+        let summapOptInt = 1 + 2
+        assertQuery(predicate: "(((((mapOptInt.@min <= %@ && mapOptInt.@max >= %@) && mapOptInt.@sum == %@) && mapOptInt.@count != %@) && mapOptInt.@avg > %@) && mapOptInt.@avg < %@)",
+                    values: [1, 2, summapOptInt, 0, 1, 2], expectedCount: 1) {
+            ($0.mapOptInt.min <= 1) &&
+            ($0.mapOptInt.max >= 2) &&
+            ($0.mapOptInt.sum == summapOptInt) &&
+            ($0.mapOptInt.count != 0) &&
+            ($0.mapOptInt.avg > 1) &&
+            ($0.mapOptInt.avg < 2)
         }
 
         // Keypath Collection Aggregates
@@ -8091,6 +8111,32 @@ class QueryTests: TestCase {
             ($0.boolCol != true) ||
             ($0.mapOptBool["foo"] == true) ||
             ($0.mapOptBool["bar"] == true)
+        }
+        assertQuery(predicate: "(boolCol == %@ || %@ IN mapInt)", values: [false, 2], expectedCount: 1) {
+            $0.boolCol == false || $0.mapInt.contains(2)
+        }
+        assertQuery(predicate: "(boolCol != %@ || (mapInt.@allKeys == %@ && mapInt == %@))",
+                    values: [true, "foo", 2], expectedCount: 1) {
+            ($0.boolCol != true) || ($0.mapInt["foo"] == 2)
+        }
+        assertQuery(predicate: "((boolCol != %@ || (mapInt.@allKeys == %@ && mapInt == %@)) || (mapInt.@allKeys == %@ && mapInt == %@))",
+                    values: [true, "foo", 1, "bar", 2], expectedCount: 1) {
+            ($0.boolCol != true) ||
+            ($0.mapInt["foo"] == 1) ||
+            ($0.mapInt["bar"] == 2)
+        }
+        assertQuery(predicate: "(boolCol == %@ || %@ IN mapOptInt)", values: [false, 2], expectedCount: 1) {
+            $0.boolCol == false || $0.mapOptInt.contains(2)
+        }
+        assertQuery(predicate: "(boolCol != %@ || (mapOptInt.@allKeys == %@ && mapOptInt == %@))",
+                    values: [true, "foo", 2], expectedCount: 1) {
+            ($0.boolCol != true) || ($0.mapOptInt["foo"] == 2)
+        }
+        assertQuery(predicate: "((boolCol != %@ || (mapOptInt.@allKeys == %@ && mapOptInt == %@)) || (mapOptInt.@allKeys == %@ && mapOptInt == %@))",
+                    values: [true, "foo", 1, "bar", 2], expectedCount: 1) {
+            ($0.boolCol != true) ||
+            ($0.mapOptInt["foo"] == 1) ||
+            ($0.mapOptInt["bar"] == 2)
         }
 
         // Aggregates
@@ -8438,6 +8484,22 @@ class QueryTests: TestCase {
             ($0.arrayOptInt.count != 0) &&
             ($0.arrayOptInt.avg > 1 && $0.arrayOptInt.avg < 3)
         }
+        let summapInt = 1 + 2
+        assertQuery(predicate: "((((mapInt.@min <= %@ || mapInt.@max >= %@) && mapInt.@sum == %@) && mapInt.@count != %@) && (mapInt.@avg > %@ && mapInt.@avg < %@))",
+                    values: [1, 3, summapInt, 0, 1, 3], expectedCount: 1) {
+            (($0.mapInt.min <= 1) || ($0.mapInt.max >= 3)) &&
+            ($0.mapInt.sum == summapInt) &&
+            ($0.mapInt.count != 0) &&
+            ($0.mapInt.avg > 1 && $0.mapInt.avg < 3)
+        }
+        let summapOptInt = 1 + 2
+        assertQuery(predicate: "((((mapOptInt.@min <= %@ || mapOptInt.@max >= %@) && mapOptInt.@sum == %@) && mapOptInt.@count != %@) && (mapOptInt.@avg > %@ && mapOptInt.@avg < %@))",
+                    values: [1, 3, summapOptInt, 0, 1, 3], expectedCount: 1) {
+            (($0.mapOptInt.min <= 1) || ($0.mapOptInt.max >= 3)) &&
+            ($0.mapOptInt.sum == summapOptInt) &&
+            ($0.mapOptInt.count != 0) &&
+            ($0.mapOptInt.avg > 1 && $0.mapOptInt.avg < 3)
+        }
 
         // Keypath Collection Aggregates
 
@@ -8551,7 +8613,9 @@ class QueryTests: TestCase {
         assertThrows(query(Query<ModernAllTypesObject>())._constructPredicate(), reason: "Subquery predicates will only work on one collection at a time.")
     }
 
-    // MARK: Collection Aggregations
+    // MARK: - Collection Aggregations
+
+    // @Avg
 
     func testCollectionAggregatesAvg() {
         let realm = realmWithTestPath()
@@ -8564,7 +8628,6 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
-
         assertQuery(predicate: "objectCol.arrayInt.@avg > %@", values: [1], expectedCount: 1) {
             $0.objectCol.arrayInt.avg > 1
         }
@@ -8609,7 +8672,6 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
-
         assertQuery(predicate: "objectCol.arrayInt8.@avg > %@", values: [Int8(8)], expectedCount: 1) {
             $0.objectCol.arrayInt8.avg > Int8(8)
         }
@@ -8654,7 +8716,6 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
-
         assertQuery(predicate: "objectCol.arrayInt16.@avg > %@", values: [Int16(16)], expectedCount: 1) {
             $0.objectCol.arrayInt16.avg > Int16(16)
         }
@@ -8699,7 +8760,6 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
-
         assertQuery(predicate: "objectCol.arrayInt32.@avg > %@", values: [Int32(32)], expectedCount: 1) {
             $0.objectCol.arrayInt32.avg > Int32(32)
         }
@@ -8744,7 +8804,6 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
-
         assertQuery(predicate: "objectCol.arrayInt64.@avg > %@", values: [Int64(64)], expectedCount: 1) {
             $0.objectCol.arrayInt64.avg > Int64(64)
         }
@@ -8789,7 +8848,6 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
-
         assertQuery(predicate: "objectCol.arrayFloat.@avg > %@", values: [Float(5.55444333)], expectedCount: 1) {
             $0.objectCol.arrayFloat.avg > Float(5.55444333)
         }
@@ -8834,7 +8892,6 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
-
         assertQuery(predicate: "objectCol.arrayDouble.@avg > %@", values: [123.456], expectedCount: 1) {
             $0.objectCol.arrayDouble.avg > 123.456
         }
@@ -8879,7 +8936,6 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
-
         assertQuery(predicate: "objectCol.arrayDecimal.@avg > %@", values: [Decimal128(123.456)], expectedCount: 1) {
             $0.objectCol.arrayDecimal.avg > Decimal128(123.456)
         }
@@ -8924,7 +8980,6 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
-
         assertQuery(predicate: "objectCol.arrayOptInt.@avg > %@", values: [1], expectedCount: 1) {
             $0.objectCol.arrayOptInt.avg > 1
         }
@@ -8969,7 +9024,6 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
-
         assertQuery(predicate: "objectCol.arrayOptInt8.@avg > %@", values: [Int8(8)], expectedCount: 1) {
             $0.objectCol.arrayOptInt8.avg > Int8(8)
         }
@@ -9014,7 +9068,6 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
-
         assertQuery(predicate: "objectCol.arrayOptInt16.@avg > %@", values: [Int16(16)], expectedCount: 1) {
             $0.objectCol.arrayOptInt16.avg > Int16(16)
         }
@@ -9059,7 +9112,6 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
-
         assertQuery(predicate: "objectCol.arrayOptInt32.@avg > %@", values: [Int32(32)], expectedCount: 1) {
             $0.objectCol.arrayOptInt32.avg > Int32(32)
         }
@@ -9104,7 +9156,6 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
-
         assertQuery(predicate: "objectCol.arrayOptInt64.@avg > %@", values: [Int64(64)], expectedCount: 1) {
             $0.objectCol.arrayOptInt64.avg > Int64(64)
         }
@@ -9149,7 +9200,6 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
-
         assertQuery(predicate: "objectCol.arrayOptFloat.@avg > %@", values: [Float(5.55444333)], expectedCount: 1) {
             $0.objectCol.arrayOptFloat.avg > Float(5.55444333)
         }
@@ -9194,7 +9244,6 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
-
         assertQuery(predicate: "objectCol.arrayOptDouble.@avg > %@", values: [123.456], expectedCount: 1) {
             $0.objectCol.arrayOptDouble.avg > 123.456
         }
@@ -9239,7 +9288,6 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
-
         assertQuery(predicate: "objectCol.arrayOptDecimal.@avg > %@", values: [Decimal128(123.456)], expectedCount: 1) {
             $0.objectCol.arrayOptDecimal.avg > Decimal128(123.456)
         }
@@ -9277,6 +9325,685 @@ class QueryTests: TestCase {
             $0.objectCol.arrayOptDecimal.avg != Decimal128(123.456)
         }
     }
+
+    func testMapAggregatesAvg() {
+        let realm = realmWithTestPath()
+        let object = objects().first!
+
+        try! realm.write {
+            object.mapInt["foo"] = 1
+            object.mapInt["bar"] = 2
+            object.mapInt["baz"] = 3
+        }
+
+        assertQuery(predicate: "mapInt.@avg > %@", values: [1], expectedCount: 1) {
+            $0.mapInt.avg > 1
+        }
+
+        assertQuery(predicate: "mapInt.@avg < %@", values: [3], expectedCount: 1) {
+            $0.mapInt.avg < 3
+        }
+
+        assertQuery(predicate: "mapInt.@avg == %@", values: [2], expectedCount: 1) {
+            $0.mapInt.avg == 2
+        }
+
+        assertQuery(predicate: "mapInt.@avg >= %@", values: [1], expectedCount: 1) {
+            $0.mapInt.avg >= 1
+        }
+
+        assertQuery(predicate: "mapInt.@avg >= %@", values: [2], expectedCount: 1) {
+            $0.mapInt.avg >= 2
+        }
+
+        assertQuery(predicate: "mapInt.@avg <= %@", values: [3], expectedCount: 1) {
+            $0.mapInt.avg <= 3
+        }
+
+        assertQuery(predicate: "mapInt.@avg <= %@", values: [2], expectedCount: 1) {
+            $0.mapInt.avg <= 2
+        }
+
+        assertQuery(predicate: "mapInt.@avg != %@", values: [2], expectedCount: 0) {
+            $0.mapInt.avg != 2
+        }
+
+        assertQuery(predicate: "mapInt.@avg != %@", values: [1], expectedCount: 1) {
+            $0.mapInt.avg != 1
+        }
+
+        try! realm.write {
+            object.mapInt8["foo"] = Int8(8)
+            object.mapInt8["bar"] = Int8(9)
+            object.mapInt8["baz"] = Int8(10)
+        }
+
+        assertQuery(predicate: "mapInt8.@avg > %@", values: [Int8(8)], expectedCount: 1) {
+            $0.mapInt8.avg > Int8(8)
+        }
+
+        assertQuery(predicate: "mapInt8.@avg < %@", values: [Int8(10)], expectedCount: 1) {
+            $0.mapInt8.avg < Int8(10)
+        }
+
+        assertQuery(predicate: "mapInt8.@avg == %@", values: [Int8(9)], expectedCount: 1) {
+            $0.mapInt8.avg == Int8(9)
+        }
+
+        assertQuery(predicate: "mapInt8.@avg >= %@", values: [Int8(8)], expectedCount: 1) {
+            $0.mapInt8.avg >= Int8(8)
+        }
+
+        assertQuery(predicate: "mapInt8.@avg >= %@", values: [Int8(9)], expectedCount: 1) {
+            $0.mapInt8.avg >= Int8(9)
+        }
+
+        assertQuery(predicate: "mapInt8.@avg <= %@", values: [Int8(10)], expectedCount: 1) {
+            $0.mapInt8.avg <= Int8(10)
+        }
+
+        assertQuery(predicate: "mapInt8.@avg <= %@", values: [Int8(9)], expectedCount: 1) {
+            $0.mapInt8.avg <= Int8(9)
+        }
+
+        assertQuery(predicate: "mapInt8.@avg != %@", values: [Int8(9)], expectedCount: 0) {
+            $0.mapInt8.avg != Int8(9)
+        }
+
+        assertQuery(predicate: "mapInt8.@avg != %@", values: [Int8(8)], expectedCount: 1) {
+            $0.mapInt8.avg != Int8(8)
+        }
+
+        try! realm.write {
+            object.mapInt16["foo"] = Int16(16)
+            object.mapInt16["bar"] = Int16(17)
+            object.mapInt16["baz"] = Int16(18)
+        }
+
+        assertQuery(predicate: "mapInt16.@avg > %@", values: [Int16(16)], expectedCount: 1) {
+            $0.mapInt16.avg > Int16(16)
+        }
+
+        assertQuery(predicate: "mapInt16.@avg < %@", values: [Int16(18)], expectedCount: 1) {
+            $0.mapInt16.avg < Int16(18)
+        }
+
+        assertQuery(predicate: "mapInt16.@avg == %@", values: [Int16(17)], expectedCount: 1) {
+            $0.mapInt16.avg == Int16(17)
+        }
+
+        assertQuery(predicate: "mapInt16.@avg >= %@", values: [Int16(16)], expectedCount: 1) {
+            $0.mapInt16.avg >= Int16(16)
+        }
+
+        assertQuery(predicate: "mapInt16.@avg >= %@", values: [Int16(17)], expectedCount: 1) {
+            $0.mapInt16.avg >= Int16(17)
+        }
+
+        assertQuery(predicate: "mapInt16.@avg <= %@", values: [Int16(18)], expectedCount: 1) {
+            $0.mapInt16.avg <= Int16(18)
+        }
+
+        assertQuery(predicate: "mapInt16.@avg <= %@", values: [Int16(17)], expectedCount: 1) {
+            $0.mapInt16.avg <= Int16(17)
+        }
+
+        assertQuery(predicate: "mapInt16.@avg != %@", values: [Int16(17)], expectedCount: 0) {
+            $0.mapInt16.avg != Int16(17)
+        }
+
+        assertQuery(predicate: "mapInt16.@avg != %@", values: [Int16(16)], expectedCount: 1) {
+            $0.mapInt16.avg != Int16(16)
+        }
+
+        try! realm.write {
+            object.mapInt32["foo"] = Int32(32)
+            object.mapInt32["bar"] = Int32(33)
+            object.mapInt32["baz"] = Int32(34)
+        }
+
+        assertQuery(predicate: "mapInt32.@avg > %@", values: [Int32(32)], expectedCount: 1) {
+            $0.mapInt32.avg > Int32(32)
+        }
+
+        assertQuery(predicate: "mapInt32.@avg < %@", values: [Int32(34)], expectedCount: 1) {
+            $0.mapInt32.avg < Int32(34)
+        }
+
+        assertQuery(predicate: "mapInt32.@avg == %@", values: [Int32(33)], expectedCount: 1) {
+            $0.mapInt32.avg == Int32(33)
+        }
+
+        assertQuery(predicate: "mapInt32.@avg >= %@", values: [Int32(32)], expectedCount: 1) {
+            $0.mapInt32.avg >= Int32(32)
+        }
+
+        assertQuery(predicate: "mapInt32.@avg >= %@", values: [Int32(33)], expectedCount: 1) {
+            $0.mapInt32.avg >= Int32(33)
+        }
+
+        assertQuery(predicate: "mapInt32.@avg <= %@", values: [Int32(34)], expectedCount: 1) {
+            $0.mapInt32.avg <= Int32(34)
+        }
+
+        assertQuery(predicate: "mapInt32.@avg <= %@", values: [Int32(33)], expectedCount: 1) {
+            $0.mapInt32.avg <= Int32(33)
+        }
+
+        assertQuery(predicate: "mapInt32.@avg != %@", values: [Int32(33)], expectedCount: 0) {
+            $0.mapInt32.avg != Int32(33)
+        }
+
+        assertQuery(predicate: "mapInt32.@avg != %@", values: [Int32(32)], expectedCount: 1) {
+            $0.mapInt32.avg != Int32(32)
+        }
+
+        try! realm.write {
+            object.mapInt64["foo"] = Int64(64)
+            object.mapInt64["bar"] = Int64(65)
+            object.mapInt64["baz"] = Int64(66)
+        }
+
+        assertQuery(predicate: "mapInt64.@avg > %@", values: [Int64(64)], expectedCount: 1) {
+            $0.mapInt64.avg > Int64(64)
+        }
+
+        assertQuery(predicate: "mapInt64.@avg < %@", values: [Int64(66)], expectedCount: 1) {
+            $0.mapInt64.avg < Int64(66)
+        }
+
+        assertQuery(predicate: "mapInt64.@avg == %@", values: [Int64(65)], expectedCount: 1) {
+            $0.mapInt64.avg == Int64(65)
+        }
+
+        assertQuery(predicate: "mapInt64.@avg >= %@", values: [Int64(64)], expectedCount: 1) {
+            $0.mapInt64.avg >= Int64(64)
+        }
+
+        assertQuery(predicate: "mapInt64.@avg >= %@", values: [Int64(65)], expectedCount: 1) {
+            $0.mapInt64.avg >= Int64(65)
+        }
+
+        assertQuery(predicate: "mapInt64.@avg <= %@", values: [Int64(66)], expectedCount: 1) {
+            $0.mapInt64.avg <= Int64(66)
+        }
+
+        assertQuery(predicate: "mapInt64.@avg <= %@", values: [Int64(65)], expectedCount: 1) {
+            $0.mapInt64.avg <= Int64(65)
+        }
+
+        assertQuery(predicate: "mapInt64.@avg != %@", values: [Int64(65)], expectedCount: 0) {
+            $0.mapInt64.avg != Int64(65)
+        }
+
+        assertQuery(predicate: "mapInt64.@avg != %@", values: [Int64(64)], expectedCount: 1) {
+            $0.mapInt64.avg != Int64(64)
+        }
+
+        try! realm.write {
+            object.mapFloat["foo"] = Float(5.5544)
+            object.mapFloat["bar"] = Float(6.5544)
+            object.mapFloat["baz"] = Float(7.5544)
+        }
+
+        assertQuery(predicate: "mapFloat.@avg > %@", values: [Float(5.5544)], expectedCount: 1) {
+            $0.mapFloat.avg > Float(5.5544)
+        }
+
+        assertQuery(predicate: "mapFloat.@avg < %@", values: [Float(7.5544)], expectedCount: 1) {
+            $0.mapFloat.avg < Float(7.5544)
+        }
+
+        assertQuery(predicate: "mapFloat.@avg == %@", values: [Float(6.5544)], expectedCount: 1) {
+            $0.mapFloat.avg == Float(6.5544)
+        }
+
+        assertQuery(predicate: "mapFloat.@avg >= %@", values: [Float(5.5544)], expectedCount: 1) {
+            $0.mapFloat.avg >= Float(5.5544)
+        }
+
+        assertQuery(predicate: "mapFloat.@avg >= %@", values: [Float(6.5544)], expectedCount: 1) {
+            $0.mapFloat.avg >= Float(6.5544)
+        }
+
+        assertQuery(predicate: "mapFloat.@avg <= %@", values: [Float(7.5544)], expectedCount: 1) {
+            $0.mapFloat.avg <= Float(7.5544)
+        }
+
+        assertQuery(predicate: "mapFloat.@avg <= %@", values: [Float(6.5544)], expectedCount: 1) {
+            $0.mapFloat.avg <= Float(6.5544)
+        }
+
+        assertQuery(predicate: "mapFloat.@avg != %@", values: [Float(6.5544)], expectedCount: 0) {
+            $0.mapFloat.avg != Float(6.5544)
+        }
+
+        assertQuery(predicate: "mapFloat.@avg != %@", values: [Float(5.5544)], expectedCount: 1) {
+            $0.mapFloat.avg != Float(5.5544)
+        }
+
+        try! realm.write {
+            object.mapDouble["foo"] = 123.456
+            object.mapDouble["bar"] = 234.567
+            object.mapDouble["baz"] = 345.678
+        }
+
+        assertQuery(predicate: "mapDouble.@avg > %@", values: [123.456], expectedCount: 1) {
+            $0.mapDouble.avg > 123.456
+        }
+
+        assertQuery(predicate: "mapDouble.@avg < %@", values: [345.678], expectedCount: 1) {
+            $0.mapDouble.avg < 345.678
+        }
+
+        assertQuery(predicate: "mapDouble.@avg == %@", values: [234.567], expectedCount: 1) {
+            $0.mapDouble.avg == 234.567
+        }
+
+        assertQuery(predicate: "mapDouble.@avg >= %@", values: [123.456], expectedCount: 1) {
+            $0.mapDouble.avg >= 123.456
+        }
+
+        assertQuery(predicate: "mapDouble.@avg >= %@", values: [234.567], expectedCount: 1) {
+            $0.mapDouble.avg >= 234.567
+        }
+
+        assertQuery(predicate: "mapDouble.@avg <= %@", values: [345.678], expectedCount: 1) {
+            $0.mapDouble.avg <= 345.678
+        }
+
+        assertQuery(predicate: "mapDouble.@avg <= %@", values: [234.567], expectedCount: 1) {
+            $0.mapDouble.avg <= 234.567
+        }
+
+        assertQuery(predicate: "mapDouble.@avg != %@", values: [234.567], expectedCount: 0) {
+            $0.mapDouble.avg != 234.567
+        }
+
+        assertQuery(predicate: "mapDouble.@avg != %@", values: [123.456], expectedCount: 1) {
+            $0.mapDouble.avg != 123.456
+        }
+
+        try! realm.write {
+            object.mapDecimal["foo"] = Decimal128(123.456)
+            object.mapDecimal["bar"] = Decimal128(234.567)
+            object.mapDecimal["baz"] = Decimal128(345.678)
+        }
+
+        assertQuery(predicate: "mapDecimal.@avg > %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.mapDecimal.avg > Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "mapDecimal.@avg < %@", values: [Decimal128(345.678)], expectedCount: 1) {
+            $0.mapDecimal.avg < Decimal128(345.678)
+        }
+
+        assertQuery(predicate: "mapDecimal.@avg == %@", values: [Decimal128(234.567)], expectedCount: 1) {
+            $0.mapDecimal.avg == Decimal128(234.567)
+        }
+
+        assertQuery(predicate: "mapDecimal.@avg >= %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.mapDecimal.avg >= Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "mapDecimal.@avg >= %@", values: [Decimal128(234.567)], expectedCount: 1) {
+            $0.mapDecimal.avg >= Decimal128(234.567)
+        }
+
+        assertQuery(predicate: "mapDecimal.@avg <= %@", values: [Decimal128(345.678)], expectedCount: 1) {
+            $0.mapDecimal.avg <= Decimal128(345.678)
+        }
+
+        assertQuery(predicate: "mapDecimal.@avg <= %@", values: [Decimal128(234.567)], expectedCount: 1) {
+            $0.mapDecimal.avg <= Decimal128(234.567)
+        }
+
+        assertQuery(predicate: "mapDecimal.@avg != %@", values: [Decimal128(234.567)], expectedCount: 0) {
+            $0.mapDecimal.avg != Decimal128(234.567)
+        }
+
+        assertQuery(predicate: "mapDecimal.@avg != %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.mapDecimal.avg != Decimal128(123.456)
+        }
+
+        try! realm.write {
+            object.mapOptInt["foo"] = 1
+            object.mapOptInt["bar"] = 2
+            object.mapOptInt["baz"] = 3
+        }
+
+        assertQuery(predicate: "mapOptInt.@avg > %@", values: [1], expectedCount: 1) {
+            $0.mapOptInt.avg > 1
+        }
+
+        assertQuery(predicate: "mapOptInt.@avg < %@", values: [3], expectedCount: 1) {
+            $0.mapOptInt.avg < 3
+        }
+
+        assertQuery(predicate: "mapOptInt.@avg == %@", values: [2], expectedCount: 1) {
+            $0.mapOptInt.avg == 2
+        }
+
+        assertQuery(predicate: "mapOptInt.@avg >= %@", values: [1], expectedCount: 1) {
+            $0.mapOptInt.avg >= 1
+        }
+
+        assertQuery(predicate: "mapOptInt.@avg >= %@", values: [2], expectedCount: 1) {
+            $0.mapOptInt.avg >= 2
+        }
+
+        assertQuery(predicate: "mapOptInt.@avg <= %@", values: [3], expectedCount: 1) {
+            $0.mapOptInt.avg <= 3
+        }
+
+        assertQuery(predicate: "mapOptInt.@avg <= %@", values: [2], expectedCount: 1) {
+            $0.mapOptInt.avg <= 2
+        }
+
+        assertQuery(predicate: "mapOptInt.@avg != %@", values: [2], expectedCount: 0) {
+            $0.mapOptInt.avg != 2
+        }
+
+        assertQuery(predicate: "mapOptInt.@avg != %@", values: [1], expectedCount: 1) {
+            $0.mapOptInt.avg != 1
+        }
+
+        try! realm.write {
+            object.mapOptInt8["foo"] = Int8(8)
+            object.mapOptInt8["bar"] = Int8(9)
+            object.mapOptInt8["baz"] = Int8(10)
+        }
+
+        assertQuery(predicate: "mapOptInt8.@avg > %@", values: [Int8(8)], expectedCount: 1) {
+            $0.mapOptInt8.avg > Int8(8)
+        }
+
+        assertQuery(predicate: "mapOptInt8.@avg < %@", values: [Int8(10)], expectedCount: 1) {
+            $0.mapOptInt8.avg < Int8(10)
+        }
+
+        assertQuery(predicate: "mapOptInt8.@avg == %@", values: [Int8(9)], expectedCount: 1) {
+            $0.mapOptInt8.avg == Int8(9)
+        }
+
+        assertQuery(predicate: "mapOptInt8.@avg >= %@", values: [Int8(8)], expectedCount: 1) {
+            $0.mapOptInt8.avg >= Int8(8)
+        }
+
+        assertQuery(predicate: "mapOptInt8.@avg >= %@", values: [Int8(9)], expectedCount: 1) {
+            $0.mapOptInt8.avg >= Int8(9)
+        }
+
+        assertQuery(predicate: "mapOptInt8.@avg <= %@", values: [Int8(10)], expectedCount: 1) {
+            $0.mapOptInt8.avg <= Int8(10)
+        }
+
+        assertQuery(predicate: "mapOptInt8.@avg <= %@", values: [Int8(9)], expectedCount: 1) {
+            $0.mapOptInt8.avg <= Int8(9)
+        }
+
+        assertQuery(predicate: "mapOptInt8.@avg != %@", values: [Int8(9)], expectedCount: 0) {
+            $0.mapOptInt8.avg != Int8(9)
+        }
+
+        assertQuery(predicate: "mapOptInt8.@avg != %@", values: [Int8(8)], expectedCount: 1) {
+            $0.mapOptInt8.avg != Int8(8)
+        }
+
+        try! realm.write {
+            object.mapOptInt16["foo"] = Int16(16)
+            object.mapOptInt16["bar"] = Int16(17)
+            object.mapOptInt16["baz"] = Int16(18)
+        }
+
+        assertQuery(predicate: "mapOptInt16.@avg > %@", values: [Int16(16)], expectedCount: 1) {
+            $0.mapOptInt16.avg > Int16(16)
+        }
+
+        assertQuery(predicate: "mapOptInt16.@avg < %@", values: [Int16(18)], expectedCount: 1) {
+            $0.mapOptInt16.avg < Int16(18)
+        }
+
+        assertQuery(predicate: "mapOptInt16.@avg == %@", values: [Int16(17)], expectedCount: 1) {
+            $0.mapOptInt16.avg == Int16(17)
+        }
+
+        assertQuery(predicate: "mapOptInt16.@avg >= %@", values: [Int16(16)], expectedCount: 1) {
+            $0.mapOptInt16.avg >= Int16(16)
+        }
+
+        assertQuery(predicate: "mapOptInt16.@avg >= %@", values: [Int16(17)], expectedCount: 1) {
+            $0.mapOptInt16.avg >= Int16(17)
+        }
+
+        assertQuery(predicate: "mapOptInt16.@avg <= %@", values: [Int16(18)], expectedCount: 1) {
+            $0.mapOptInt16.avg <= Int16(18)
+        }
+
+        assertQuery(predicate: "mapOptInt16.@avg <= %@", values: [Int16(17)], expectedCount: 1) {
+            $0.mapOptInt16.avg <= Int16(17)
+        }
+
+        assertQuery(predicate: "mapOptInt16.@avg != %@", values: [Int16(17)], expectedCount: 0) {
+            $0.mapOptInt16.avg != Int16(17)
+        }
+
+        assertQuery(predicate: "mapOptInt16.@avg != %@", values: [Int16(16)], expectedCount: 1) {
+            $0.mapOptInt16.avg != Int16(16)
+        }
+
+        try! realm.write {
+            object.mapOptInt32["foo"] = Int32(32)
+            object.mapOptInt32["bar"] = Int32(33)
+            object.mapOptInt32["baz"] = Int32(34)
+        }
+
+        assertQuery(predicate: "mapOptInt32.@avg > %@", values: [Int32(32)], expectedCount: 1) {
+            $0.mapOptInt32.avg > Int32(32)
+        }
+
+        assertQuery(predicate: "mapOptInt32.@avg < %@", values: [Int32(34)], expectedCount: 1) {
+            $0.mapOptInt32.avg < Int32(34)
+        }
+
+        assertQuery(predicate: "mapOptInt32.@avg == %@", values: [Int32(33)], expectedCount: 1) {
+            $0.mapOptInt32.avg == Int32(33)
+        }
+
+        assertQuery(predicate: "mapOptInt32.@avg >= %@", values: [Int32(32)], expectedCount: 1) {
+            $0.mapOptInt32.avg >= Int32(32)
+        }
+
+        assertQuery(predicate: "mapOptInt32.@avg >= %@", values: [Int32(33)], expectedCount: 1) {
+            $0.mapOptInt32.avg >= Int32(33)
+        }
+
+        assertQuery(predicate: "mapOptInt32.@avg <= %@", values: [Int32(34)], expectedCount: 1) {
+            $0.mapOptInt32.avg <= Int32(34)
+        }
+
+        assertQuery(predicate: "mapOptInt32.@avg <= %@", values: [Int32(33)], expectedCount: 1) {
+            $0.mapOptInt32.avg <= Int32(33)
+        }
+
+        assertQuery(predicate: "mapOptInt32.@avg != %@", values: [Int32(33)], expectedCount: 0) {
+            $0.mapOptInt32.avg != Int32(33)
+        }
+
+        assertQuery(predicate: "mapOptInt32.@avg != %@", values: [Int32(32)], expectedCount: 1) {
+            $0.mapOptInt32.avg != Int32(32)
+        }
+
+        try! realm.write {
+            object.mapOptInt64["foo"] = Int64(64)
+            object.mapOptInt64["bar"] = Int64(65)
+            object.mapOptInt64["baz"] = Int64(66)
+        }
+
+        assertQuery(predicate: "mapOptInt64.@avg > %@", values: [Int64(64)], expectedCount: 1) {
+            $0.mapOptInt64.avg > Int64(64)
+        }
+
+        assertQuery(predicate: "mapOptInt64.@avg < %@", values: [Int64(66)], expectedCount: 1) {
+            $0.mapOptInt64.avg < Int64(66)
+        }
+
+        assertQuery(predicate: "mapOptInt64.@avg == %@", values: [Int64(65)], expectedCount: 1) {
+            $0.mapOptInt64.avg == Int64(65)
+        }
+
+        assertQuery(predicate: "mapOptInt64.@avg >= %@", values: [Int64(64)], expectedCount: 1) {
+            $0.mapOptInt64.avg >= Int64(64)
+        }
+
+        assertQuery(predicate: "mapOptInt64.@avg >= %@", values: [Int64(65)], expectedCount: 1) {
+            $0.mapOptInt64.avg >= Int64(65)
+        }
+
+        assertQuery(predicate: "mapOptInt64.@avg <= %@", values: [Int64(66)], expectedCount: 1) {
+            $0.mapOptInt64.avg <= Int64(66)
+        }
+
+        assertQuery(predicate: "mapOptInt64.@avg <= %@", values: [Int64(65)], expectedCount: 1) {
+            $0.mapOptInt64.avg <= Int64(65)
+        }
+
+        assertQuery(predicate: "mapOptInt64.@avg != %@", values: [Int64(65)], expectedCount: 0) {
+            $0.mapOptInt64.avg != Int64(65)
+        }
+
+        assertQuery(predicate: "mapOptInt64.@avg != %@", values: [Int64(64)], expectedCount: 1) {
+            $0.mapOptInt64.avg != Int64(64)
+        }
+
+        try! realm.write {
+            object.mapOptFloat["foo"] = Float(5.5544)
+            object.mapOptFloat["bar"] = Float(6.5544)
+            object.mapOptFloat["baz"] = Float(7.5544)
+        }
+
+        assertQuery(predicate: "mapOptFloat.@avg > %@", values: [Float(5.5544)], expectedCount: 1) {
+            $0.mapOptFloat.avg > Float(5.5544)
+        }
+
+        assertQuery(predicate: "mapOptFloat.@avg < %@", values: [Float(7.5544)], expectedCount: 1) {
+            $0.mapOptFloat.avg < Float(7.5544)
+        }
+
+        assertQuery(predicate: "mapOptFloat.@avg == %@", values: [Float(6.5544)], expectedCount: 1) {
+            $0.mapOptFloat.avg == Float(6.5544)
+        }
+
+        assertQuery(predicate: "mapOptFloat.@avg >= %@", values: [Float(5.5544)], expectedCount: 1) {
+            $0.mapOptFloat.avg >= Float(5.5544)
+        }
+
+        assertQuery(predicate: "mapOptFloat.@avg >= %@", values: [Float(6.5544)], expectedCount: 1) {
+            $0.mapOptFloat.avg >= Float(6.5544)
+        }
+
+        assertQuery(predicate: "mapOptFloat.@avg <= %@", values: [Float(7.5544)], expectedCount: 1) {
+            $0.mapOptFloat.avg <= Float(7.5544)
+        }
+
+        assertQuery(predicate: "mapOptFloat.@avg <= %@", values: [Float(6.5544)], expectedCount: 1) {
+            $0.mapOptFloat.avg <= Float(6.5544)
+        }
+
+        assertQuery(predicate: "mapOptFloat.@avg != %@", values: [Float(6.5544)], expectedCount: 0) {
+            $0.mapOptFloat.avg != Float(6.5544)
+        }
+
+        assertQuery(predicate: "mapOptFloat.@avg != %@", values: [Float(5.5544)], expectedCount: 1) {
+            $0.mapOptFloat.avg != Float(5.5544)
+        }
+
+        try! realm.write {
+            object.mapOptDouble["foo"] = 123.456
+            object.mapOptDouble["bar"] = 234.567
+            object.mapOptDouble["baz"] = 345.678
+        }
+
+        assertQuery(predicate: "mapOptDouble.@avg > %@", values: [123.456], expectedCount: 1) {
+            $0.mapOptDouble.avg > 123.456
+        }
+
+        assertQuery(predicate: "mapOptDouble.@avg < %@", values: [345.678], expectedCount: 1) {
+            $0.mapOptDouble.avg < 345.678
+        }
+
+        assertQuery(predicate: "mapOptDouble.@avg == %@", values: [234.567], expectedCount: 1) {
+            $0.mapOptDouble.avg == 234.567
+        }
+
+        assertQuery(predicate: "mapOptDouble.@avg >= %@", values: [123.456], expectedCount: 1) {
+            $0.mapOptDouble.avg >= 123.456
+        }
+
+        assertQuery(predicate: "mapOptDouble.@avg >= %@", values: [234.567], expectedCount: 1) {
+            $0.mapOptDouble.avg >= 234.567
+        }
+
+        assertQuery(predicate: "mapOptDouble.@avg <= %@", values: [345.678], expectedCount: 1) {
+            $0.mapOptDouble.avg <= 345.678
+        }
+
+        assertQuery(predicate: "mapOptDouble.@avg <= %@", values: [234.567], expectedCount: 1) {
+            $0.mapOptDouble.avg <= 234.567
+        }
+
+        assertQuery(predicate: "mapOptDouble.@avg != %@", values: [234.567], expectedCount: 0) {
+            $0.mapOptDouble.avg != 234.567
+        }
+
+        assertQuery(predicate: "mapOptDouble.@avg != %@", values: [123.456], expectedCount: 1) {
+            $0.mapOptDouble.avg != 123.456
+        }
+
+        try! realm.write {
+            object.mapOptDecimal["foo"] = Decimal128(123.456)
+            object.mapOptDecimal["bar"] = Decimal128(234.567)
+            object.mapOptDecimal["baz"] = Decimal128(345.678)
+        }
+
+        assertQuery(predicate: "mapOptDecimal.@avg > %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.mapOptDecimal.avg > Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "mapOptDecimal.@avg < %@", values: [Decimal128(345.678)], expectedCount: 1) {
+            $0.mapOptDecimal.avg < Decimal128(345.678)
+        }
+
+        assertQuery(predicate: "mapOptDecimal.@avg == %@", values: [Decimal128(234.567)], expectedCount: 1) {
+            $0.mapOptDecimal.avg == Decimal128(234.567)
+        }
+
+        assertQuery(predicate: "mapOptDecimal.@avg >= %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.mapOptDecimal.avg >= Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "mapOptDecimal.@avg >= %@", values: [Decimal128(234.567)], expectedCount: 1) {
+            $0.mapOptDecimal.avg >= Decimal128(234.567)
+        }
+
+        assertQuery(predicate: "mapOptDecimal.@avg <= %@", values: [Decimal128(345.678)], expectedCount: 1) {
+            $0.mapOptDecimal.avg <= Decimal128(345.678)
+        }
+
+        assertQuery(predicate: "mapOptDecimal.@avg <= %@", values: [Decimal128(234.567)], expectedCount: 1) {
+            $0.mapOptDecimal.avg <= Decimal128(234.567)
+        }
+
+        assertQuery(predicate: "mapOptDecimal.@avg != %@", values: [Decimal128(234.567)], expectedCount: 0) {
+            $0.mapOptDecimal.avg != Decimal128(234.567)
+        }
+
+        assertQuery(predicate: "mapOptDecimal.@avg != %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.mapOptDecimal.avg != Decimal128(123.456)
+        }
+    }
+
+    // @Min
 
     func testCollectionAggregatesMin() {
         let realm = realmWithTestPath()
@@ -10056,6 +10783,751 @@ class QueryTests: TestCase {
             $0.objectCol.arrayOptDecimal.min != Decimal128(345.678)
         }
     }
+
+    func testMapAggregatesMin() {
+        let realm = realmWithTestPath()
+        let object = objects().first!
+
+        try! realm.write {
+            object.mapInt["foo"] = 1
+            object.mapInt["bar"] = 2
+            object.mapInt["baz"] = 3
+        }
+        assertQuery(predicate: "mapInt.@min > %@", values: [1], expectedCount: 0) {
+            $0.mapInt.min > 1
+        }
+
+        assertQuery(predicate: "mapInt.@min < %@", values: [3], expectedCount: 1) {
+            $0.mapInt.min < 3
+        }
+
+        assertQuery(predicate: "mapInt.@min == %@", values: [1], expectedCount: 1) {
+            $0.mapInt.min == 1
+        }
+
+        assertQuery(predicate: "mapInt.@min >= %@", values: [2], expectedCount: 0) {
+            $0.mapInt.min >= 2
+        }
+
+        assertQuery(predicate: "mapInt.@min >= %@", values: [1], expectedCount: 1) {
+            $0.mapInt.min >= 1
+        }
+
+        assertQuery(predicate: "mapInt.@min <= %@", values: [3], expectedCount: 1) {
+            $0.mapInt.min <= 3
+        }
+
+        assertQuery(predicate: "mapInt.@min <= %@", values: [1], expectedCount: 1) {
+            $0.mapInt.min <= 1
+        }
+
+        assertQuery(predicate: "mapInt.@min != %@", values: [1], expectedCount: 0) {
+            $0.mapInt.min != 1
+        }
+
+        assertQuery(predicate: "mapInt.@min != %@", values: [3], expectedCount: 1) {
+            $0.mapInt.min != 3
+        }
+
+        try! realm.write {
+            object.mapInt8["foo"] = Int8(8)
+            object.mapInt8["bar"] = Int8(9)
+            object.mapInt8["baz"] = Int8(10)
+        }
+        assertQuery(predicate: "mapInt8.@min > %@", values: [Int8(8)], expectedCount: 0) {
+            $0.mapInt8.min > Int8(8)
+        }
+
+        assertQuery(predicate: "mapInt8.@min < %@", values: [Int8(10)], expectedCount: 1) {
+            $0.mapInt8.min < Int8(10)
+        }
+
+        assertQuery(predicate: "mapInt8.@min == %@", values: [Int8(8)], expectedCount: 1) {
+            $0.mapInt8.min == Int8(8)
+        }
+
+        assertQuery(predicate: "mapInt8.@min >= %@", values: [Int8(9)], expectedCount: 0) {
+            $0.mapInt8.min >= Int8(9)
+        }
+
+        assertQuery(predicate: "mapInt8.@min >= %@", values: [Int8(8)], expectedCount: 1) {
+            $0.mapInt8.min >= Int8(8)
+        }
+
+        assertQuery(predicate: "mapInt8.@min <= %@", values: [Int8(10)], expectedCount: 1) {
+            $0.mapInt8.min <= Int8(10)
+        }
+
+        assertQuery(predicate: "mapInt8.@min <= %@", values: [Int8(8)], expectedCount: 1) {
+            $0.mapInt8.min <= Int8(8)
+        }
+
+        assertQuery(predicate: "mapInt8.@min != %@", values: [Int8(8)], expectedCount: 0) {
+            $0.mapInt8.min != Int8(8)
+        }
+
+        assertQuery(predicate: "mapInt8.@min != %@", values: [Int8(10)], expectedCount: 1) {
+            $0.mapInt8.min != Int8(10)
+        }
+
+        try! realm.write {
+            object.mapInt16["foo"] = Int16(16)
+            object.mapInt16["bar"] = Int16(17)
+            object.mapInt16["baz"] = Int16(18)
+        }
+        assertQuery(predicate: "mapInt16.@min > %@", values: [Int16(16)], expectedCount: 0) {
+            $0.mapInt16.min > Int16(16)
+        }
+
+        assertQuery(predicate: "mapInt16.@min < %@", values: [Int16(18)], expectedCount: 1) {
+            $0.mapInt16.min < Int16(18)
+        }
+
+        assertQuery(predicate: "mapInt16.@min == %@", values: [Int16(16)], expectedCount: 1) {
+            $0.mapInt16.min == Int16(16)
+        }
+
+        assertQuery(predicate: "mapInt16.@min >= %@", values: [Int16(17)], expectedCount: 0) {
+            $0.mapInt16.min >= Int16(17)
+        }
+
+        assertQuery(predicate: "mapInt16.@min >= %@", values: [Int16(16)], expectedCount: 1) {
+            $0.mapInt16.min >= Int16(16)
+        }
+
+        assertQuery(predicate: "mapInt16.@min <= %@", values: [Int16(18)], expectedCount: 1) {
+            $0.mapInt16.min <= Int16(18)
+        }
+
+        assertQuery(predicate: "mapInt16.@min <= %@", values: [Int16(16)], expectedCount: 1) {
+            $0.mapInt16.min <= Int16(16)
+        }
+
+        assertQuery(predicate: "mapInt16.@min != %@", values: [Int16(16)], expectedCount: 0) {
+            $0.mapInt16.min != Int16(16)
+        }
+
+        assertQuery(predicate: "mapInt16.@min != %@", values: [Int16(18)], expectedCount: 1) {
+            $0.mapInt16.min != Int16(18)
+        }
+
+        try! realm.write {
+            object.mapInt32["foo"] = Int32(32)
+            object.mapInt32["bar"] = Int32(33)
+            object.mapInt32["baz"] = Int32(34)
+        }
+        assertQuery(predicate: "mapInt32.@min > %@", values: [Int32(32)], expectedCount: 0) {
+            $0.mapInt32.min > Int32(32)
+        }
+
+        assertQuery(predicate: "mapInt32.@min < %@", values: [Int32(34)], expectedCount: 1) {
+            $0.mapInt32.min < Int32(34)
+        }
+
+        assertQuery(predicate: "mapInt32.@min == %@", values: [Int32(32)], expectedCount: 1) {
+            $0.mapInt32.min == Int32(32)
+        }
+
+        assertQuery(predicate: "mapInt32.@min >= %@", values: [Int32(33)], expectedCount: 0) {
+            $0.mapInt32.min >= Int32(33)
+        }
+
+        assertQuery(predicate: "mapInt32.@min >= %@", values: [Int32(32)], expectedCount: 1) {
+            $0.mapInt32.min >= Int32(32)
+        }
+
+        assertQuery(predicate: "mapInt32.@min <= %@", values: [Int32(34)], expectedCount: 1) {
+            $0.mapInt32.min <= Int32(34)
+        }
+
+        assertQuery(predicate: "mapInt32.@min <= %@", values: [Int32(32)], expectedCount: 1) {
+            $0.mapInt32.min <= Int32(32)
+        }
+
+        assertQuery(predicate: "mapInt32.@min != %@", values: [Int32(32)], expectedCount: 0) {
+            $0.mapInt32.min != Int32(32)
+        }
+
+        assertQuery(predicate: "mapInt32.@min != %@", values: [Int32(34)], expectedCount: 1) {
+            $0.mapInt32.min != Int32(34)
+        }
+
+        try! realm.write {
+            object.mapInt64["foo"] = Int64(64)
+            object.mapInt64["bar"] = Int64(65)
+            object.mapInt64["baz"] = Int64(66)
+        }
+        assertQuery(predicate: "mapInt64.@min > %@", values: [Int64(64)], expectedCount: 0) {
+            $0.mapInt64.min > Int64(64)
+        }
+
+        assertQuery(predicate: "mapInt64.@min < %@", values: [Int64(66)], expectedCount: 1) {
+            $0.mapInt64.min < Int64(66)
+        }
+
+        assertQuery(predicate: "mapInt64.@min == %@", values: [Int64(64)], expectedCount: 1) {
+            $0.mapInt64.min == Int64(64)
+        }
+
+        assertQuery(predicate: "mapInt64.@min >= %@", values: [Int64(65)], expectedCount: 0) {
+            $0.mapInt64.min >= Int64(65)
+        }
+
+        assertQuery(predicate: "mapInt64.@min >= %@", values: [Int64(64)], expectedCount: 1) {
+            $0.mapInt64.min >= Int64(64)
+        }
+
+        assertQuery(predicate: "mapInt64.@min <= %@", values: [Int64(66)], expectedCount: 1) {
+            $0.mapInt64.min <= Int64(66)
+        }
+
+        assertQuery(predicate: "mapInt64.@min <= %@", values: [Int64(64)], expectedCount: 1) {
+            $0.mapInt64.min <= Int64(64)
+        }
+
+        assertQuery(predicate: "mapInt64.@min != %@", values: [Int64(64)], expectedCount: 0) {
+            $0.mapInt64.min != Int64(64)
+        }
+
+        assertQuery(predicate: "mapInt64.@min != %@", values: [Int64(66)], expectedCount: 1) {
+            $0.mapInt64.min != Int64(66)
+        }
+
+        try! realm.write {
+            object.mapFloat["foo"] = Float(5.5544)
+            object.mapFloat["bar"] = Float(6.5544)
+            object.mapFloat["baz"] = Float(7.5544)
+        }
+        assertQuery(predicate: "mapFloat.@min > %@", values: [Float(5.5544)], expectedCount: 0) {
+            $0.mapFloat.min > Float(5.5544)
+        }
+
+        assertQuery(predicate: "mapFloat.@min < %@", values: [Float(7.5544)], expectedCount: 1) {
+            $0.mapFloat.min < Float(7.5544)
+        }
+
+        assertQuery(predicate: "mapFloat.@min == %@", values: [Float(5.5544)], expectedCount: 1) {
+            $0.mapFloat.min == Float(5.5544)
+        }
+
+        assertQuery(predicate: "mapFloat.@min >= %@", values: [Float(6.5544)], expectedCount: 0) {
+            $0.mapFloat.min >= Float(6.5544)
+        }
+
+        assertQuery(predicate: "mapFloat.@min >= %@", values: [Float(5.5544)], expectedCount: 1) {
+            $0.mapFloat.min >= Float(5.5544)
+        }
+
+        assertQuery(predicate: "mapFloat.@min <= %@", values: [Float(7.5544)], expectedCount: 1) {
+            $0.mapFloat.min <= Float(7.5544)
+        }
+
+        assertQuery(predicate: "mapFloat.@min <= %@", values: [Float(5.5544)], expectedCount: 1) {
+            $0.mapFloat.min <= Float(5.5544)
+        }
+
+        assertQuery(predicate: "mapFloat.@min != %@", values: [Float(5.5544)], expectedCount: 0) {
+            $0.mapFloat.min != Float(5.5544)
+        }
+
+        assertQuery(predicate: "mapFloat.@min != %@", values: [Float(7.5544)], expectedCount: 1) {
+            $0.mapFloat.min != Float(7.5544)
+        }
+
+        try! realm.write {
+            object.mapDouble["foo"] = 123.456
+            object.mapDouble["bar"] = 234.567
+            object.mapDouble["baz"] = 345.678
+        }
+        assertQuery(predicate: "mapDouble.@min > %@", values: [123.456], expectedCount: 0) {
+            $0.mapDouble.min > 123.456
+        }
+
+        assertQuery(predicate: "mapDouble.@min < %@", values: [345.678], expectedCount: 1) {
+            $0.mapDouble.min < 345.678
+        }
+
+        assertQuery(predicate: "mapDouble.@min == %@", values: [123.456], expectedCount: 1) {
+            $0.mapDouble.min == 123.456
+        }
+
+        assertQuery(predicate: "mapDouble.@min >= %@", values: [234.567], expectedCount: 0) {
+            $0.mapDouble.min >= 234.567
+        }
+
+        assertQuery(predicate: "mapDouble.@min >= %@", values: [123.456], expectedCount: 1) {
+            $0.mapDouble.min >= 123.456
+        }
+
+        assertQuery(predicate: "mapDouble.@min <= %@", values: [345.678], expectedCount: 1) {
+            $0.mapDouble.min <= 345.678
+        }
+
+        assertQuery(predicate: "mapDouble.@min <= %@", values: [123.456], expectedCount: 1) {
+            $0.mapDouble.min <= 123.456
+        }
+
+        assertQuery(predicate: "mapDouble.@min != %@", values: [123.456], expectedCount: 0) {
+            $0.mapDouble.min != 123.456
+        }
+
+        assertQuery(predicate: "mapDouble.@min != %@", values: [345.678], expectedCount: 1) {
+            $0.mapDouble.min != 345.678
+        }
+
+        try! realm.write {
+            object.mapDate["foo"] = Date(timeIntervalSince1970: 1000000)
+            object.mapDate["bar"] = Date(timeIntervalSince1970: 2000000)
+            object.mapDate["baz"] = Date(timeIntervalSince1970: 3000000)
+        }
+        assertQuery(predicate: "mapDate.@min > %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 0) {
+            $0.mapDate.min > Date(timeIntervalSince1970: 1000000)
+        }
+
+        assertQuery(predicate: "mapDate.@min < %@", values: [Date(timeIntervalSince1970: 3000000)], expectedCount: 1) {
+            $0.mapDate.min < Date(timeIntervalSince1970: 3000000)
+        }
+
+        assertQuery(predicate: "mapDate.@min == %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
+            $0.mapDate.min == Date(timeIntervalSince1970: 1000000)
+        }
+
+        assertQuery(predicate: "mapDate.@min >= %@", values: [Date(timeIntervalSince1970: 2000000)], expectedCount: 0) {
+            $0.mapDate.min >= Date(timeIntervalSince1970: 2000000)
+        }
+
+        assertQuery(predicate: "mapDate.@min >= %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
+            $0.mapDate.min >= Date(timeIntervalSince1970: 1000000)
+        }
+
+        assertQuery(predicate: "mapDate.@min <= %@", values: [Date(timeIntervalSince1970: 3000000)], expectedCount: 1) {
+            $0.mapDate.min <= Date(timeIntervalSince1970: 3000000)
+        }
+
+        assertQuery(predicate: "mapDate.@min <= %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
+            $0.mapDate.min <= Date(timeIntervalSince1970: 1000000)
+        }
+
+        assertQuery(predicate: "mapDate.@min != %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 0) {
+            $0.mapDate.min != Date(timeIntervalSince1970: 1000000)
+        }
+
+        assertQuery(predicate: "mapDate.@min != %@", values: [Date(timeIntervalSince1970: 3000000)], expectedCount: 1) {
+            $0.mapDate.min != Date(timeIntervalSince1970: 3000000)
+        }
+
+        try! realm.write {
+            object.mapDecimal["foo"] = Decimal128(123.456)
+            object.mapDecimal["bar"] = Decimal128(234.567)
+            object.mapDecimal["baz"] = Decimal128(345.678)
+        }
+        assertQuery(predicate: "mapDecimal.@min > %@", values: [Decimal128(123.456)], expectedCount: 0) {
+            $0.mapDecimal.min > Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "mapDecimal.@min < %@", values: [Decimal128(345.678)], expectedCount: 1) {
+            $0.mapDecimal.min < Decimal128(345.678)
+        }
+
+        assertQuery(predicate: "mapDecimal.@min == %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.mapDecimal.min == Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "mapDecimal.@min >= %@", values: [Decimal128(234.567)], expectedCount: 0) {
+            $0.mapDecimal.min >= Decimal128(234.567)
+        }
+
+        assertQuery(predicate: "mapDecimal.@min >= %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.mapDecimal.min >= Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "mapDecimal.@min <= %@", values: [Decimal128(345.678)], expectedCount: 1) {
+            $0.mapDecimal.min <= Decimal128(345.678)
+        }
+
+        assertQuery(predicate: "mapDecimal.@min <= %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.mapDecimal.min <= Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "mapDecimal.@min != %@", values: [Decimal128(123.456)], expectedCount: 0) {
+            $0.mapDecimal.min != Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "mapDecimal.@min != %@", values: [Decimal128(345.678)], expectedCount: 1) {
+            $0.mapDecimal.min != Decimal128(345.678)
+        }
+
+        try! realm.write {
+            object.mapOptInt["foo"] = 1
+            object.mapOptInt["bar"] = 2
+            object.mapOptInt["baz"] = 3
+        }
+        assertQuery(predicate: "mapOptInt.@min > %@", values: [1], expectedCount: 0) {
+            $0.mapOptInt.min > 1
+        }
+
+        assertQuery(predicate: "mapOptInt.@min < %@", values: [3], expectedCount: 1) {
+            $0.mapOptInt.min < 3
+        }
+
+        assertQuery(predicate: "mapOptInt.@min == %@", values: [1], expectedCount: 1) {
+            $0.mapOptInt.min == 1
+        }
+
+        assertQuery(predicate: "mapOptInt.@min >= %@", values: [2], expectedCount: 0) {
+            $0.mapOptInt.min >= 2
+        }
+
+        assertQuery(predicate: "mapOptInt.@min >= %@", values: [1], expectedCount: 1) {
+            $0.mapOptInt.min >= 1
+        }
+
+        assertQuery(predicate: "mapOptInt.@min <= %@", values: [3], expectedCount: 1) {
+            $0.mapOptInt.min <= 3
+        }
+
+        assertQuery(predicate: "mapOptInt.@min <= %@", values: [1], expectedCount: 1) {
+            $0.mapOptInt.min <= 1
+        }
+
+        assertQuery(predicate: "mapOptInt.@min != %@", values: [1], expectedCount: 0) {
+            $0.mapOptInt.min != 1
+        }
+
+        assertQuery(predicate: "mapOptInt.@min != %@", values: [3], expectedCount: 1) {
+            $0.mapOptInt.min != 3
+        }
+
+        try! realm.write {
+            object.mapOptInt8["foo"] = Int8(8)
+            object.mapOptInt8["bar"] = Int8(9)
+            object.mapOptInt8["baz"] = Int8(10)
+        }
+        assertQuery(predicate: "mapOptInt8.@min > %@", values: [Int8(8)], expectedCount: 0) {
+            $0.mapOptInt8.min > Int8(8)
+        }
+
+        assertQuery(predicate: "mapOptInt8.@min < %@", values: [Int8(10)], expectedCount: 1) {
+            $0.mapOptInt8.min < Int8(10)
+        }
+
+        assertQuery(predicate: "mapOptInt8.@min == %@", values: [Int8(8)], expectedCount: 1) {
+            $0.mapOptInt8.min == Int8(8)
+        }
+
+        assertQuery(predicate: "mapOptInt8.@min >= %@", values: [Int8(9)], expectedCount: 0) {
+            $0.mapOptInt8.min >= Int8(9)
+        }
+
+        assertQuery(predicate: "mapOptInt8.@min >= %@", values: [Int8(8)], expectedCount: 1) {
+            $0.mapOptInt8.min >= Int8(8)
+        }
+
+        assertQuery(predicate: "mapOptInt8.@min <= %@", values: [Int8(10)], expectedCount: 1) {
+            $0.mapOptInt8.min <= Int8(10)
+        }
+
+        assertQuery(predicate: "mapOptInt8.@min <= %@", values: [Int8(8)], expectedCount: 1) {
+            $0.mapOptInt8.min <= Int8(8)
+        }
+
+        assertQuery(predicate: "mapOptInt8.@min != %@", values: [Int8(8)], expectedCount: 0) {
+            $0.mapOptInt8.min != Int8(8)
+        }
+
+        assertQuery(predicate: "mapOptInt8.@min != %@", values: [Int8(10)], expectedCount: 1) {
+            $0.mapOptInt8.min != Int8(10)
+        }
+
+        try! realm.write {
+            object.mapOptInt16["foo"] = Int16(16)
+            object.mapOptInt16["bar"] = Int16(17)
+            object.mapOptInt16["baz"] = Int16(18)
+        }
+        assertQuery(predicate: "mapOptInt16.@min > %@", values: [Int16(16)], expectedCount: 0) {
+            $0.mapOptInt16.min > Int16(16)
+        }
+
+        assertQuery(predicate: "mapOptInt16.@min < %@", values: [Int16(18)], expectedCount: 1) {
+            $0.mapOptInt16.min < Int16(18)
+        }
+
+        assertQuery(predicate: "mapOptInt16.@min == %@", values: [Int16(16)], expectedCount: 1) {
+            $0.mapOptInt16.min == Int16(16)
+        }
+
+        assertQuery(predicate: "mapOptInt16.@min >= %@", values: [Int16(17)], expectedCount: 0) {
+            $0.mapOptInt16.min >= Int16(17)
+        }
+
+        assertQuery(predicate: "mapOptInt16.@min >= %@", values: [Int16(16)], expectedCount: 1) {
+            $0.mapOptInt16.min >= Int16(16)
+        }
+
+        assertQuery(predicate: "mapOptInt16.@min <= %@", values: [Int16(18)], expectedCount: 1) {
+            $0.mapOptInt16.min <= Int16(18)
+        }
+
+        assertQuery(predicate: "mapOptInt16.@min <= %@", values: [Int16(16)], expectedCount: 1) {
+            $0.mapOptInt16.min <= Int16(16)
+        }
+
+        assertQuery(predicate: "mapOptInt16.@min != %@", values: [Int16(16)], expectedCount: 0) {
+            $0.mapOptInt16.min != Int16(16)
+        }
+
+        assertQuery(predicate: "mapOptInt16.@min != %@", values: [Int16(18)], expectedCount: 1) {
+            $0.mapOptInt16.min != Int16(18)
+        }
+
+        try! realm.write {
+            object.mapOptInt32["foo"] = Int32(32)
+            object.mapOptInt32["bar"] = Int32(33)
+            object.mapOptInt32["baz"] = Int32(34)
+        }
+        assertQuery(predicate: "mapOptInt32.@min > %@", values: [Int32(32)], expectedCount: 0) {
+            $0.mapOptInt32.min > Int32(32)
+        }
+
+        assertQuery(predicate: "mapOptInt32.@min < %@", values: [Int32(34)], expectedCount: 1) {
+            $0.mapOptInt32.min < Int32(34)
+        }
+
+        assertQuery(predicate: "mapOptInt32.@min == %@", values: [Int32(32)], expectedCount: 1) {
+            $0.mapOptInt32.min == Int32(32)
+        }
+
+        assertQuery(predicate: "mapOptInt32.@min >= %@", values: [Int32(33)], expectedCount: 0) {
+            $0.mapOptInt32.min >= Int32(33)
+        }
+
+        assertQuery(predicate: "mapOptInt32.@min >= %@", values: [Int32(32)], expectedCount: 1) {
+            $0.mapOptInt32.min >= Int32(32)
+        }
+
+        assertQuery(predicate: "mapOptInt32.@min <= %@", values: [Int32(34)], expectedCount: 1) {
+            $0.mapOptInt32.min <= Int32(34)
+        }
+
+        assertQuery(predicate: "mapOptInt32.@min <= %@", values: [Int32(32)], expectedCount: 1) {
+            $0.mapOptInt32.min <= Int32(32)
+        }
+
+        assertQuery(predicate: "mapOptInt32.@min != %@", values: [Int32(32)], expectedCount: 0) {
+            $0.mapOptInt32.min != Int32(32)
+        }
+
+        assertQuery(predicate: "mapOptInt32.@min != %@", values: [Int32(34)], expectedCount: 1) {
+            $0.mapOptInt32.min != Int32(34)
+        }
+
+        try! realm.write {
+            object.mapOptInt64["foo"] = Int64(64)
+            object.mapOptInt64["bar"] = Int64(65)
+            object.mapOptInt64["baz"] = Int64(66)
+        }
+        assertQuery(predicate: "mapOptInt64.@min > %@", values: [Int64(64)], expectedCount: 0) {
+            $0.mapOptInt64.min > Int64(64)
+        }
+
+        assertQuery(predicate: "mapOptInt64.@min < %@", values: [Int64(66)], expectedCount: 1) {
+            $0.mapOptInt64.min < Int64(66)
+        }
+
+        assertQuery(predicate: "mapOptInt64.@min == %@", values: [Int64(64)], expectedCount: 1) {
+            $0.mapOptInt64.min == Int64(64)
+        }
+
+        assertQuery(predicate: "mapOptInt64.@min >= %@", values: [Int64(65)], expectedCount: 0) {
+            $0.mapOptInt64.min >= Int64(65)
+        }
+
+        assertQuery(predicate: "mapOptInt64.@min >= %@", values: [Int64(64)], expectedCount: 1) {
+            $0.mapOptInt64.min >= Int64(64)
+        }
+
+        assertQuery(predicate: "mapOptInt64.@min <= %@", values: [Int64(66)], expectedCount: 1) {
+            $0.mapOptInt64.min <= Int64(66)
+        }
+
+        assertQuery(predicate: "mapOptInt64.@min <= %@", values: [Int64(64)], expectedCount: 1) {
+            $0.mapOptInt64.min <= Int64(64)
+        }
+
+        assertQuery(predicate: "mapOptInt64.@min != %@", values: [Int64(64)], expectedCount: 0) {
+            $0.mapOptInt64.min != Int64(64)
+        }
+
+        assertQuery(predicate: "mapOptInt64.@min != %@", values: [Int64(66)], expectedCount: 1) {
+            $0.mapOptInt64.min != Int64(66)
+        }
+
+        try! realm.write {
+            object.mapOptFloat["foo"] = Float(5.5544)
+            object.mapOptFloat["bar"] = Float(6.5544)
+            object.mapOptFloat["baz"] = Float(7.5544)
+        }
+        assertQuery(predicate: "mapOptFloat.@min > %@", values: [Float(5.5544)], expectedCount: 0) {
+            $0.mapOptFloat.min > Float(5.5544)
+        }
+
+        assertQuery(predicate: "mapOptFloat.@min < %@", values: [Float(7.5544)], expectedCount: 1) {
+            $0.mapOptFloat.min < Float(7.5544)
+        }
+
+        assertQuery(predicate: "mapOptFloat.@min == %@", values: [Float(5.5544)], expectedCount: 1) {
+            $0.mapOptFloat.min == Float(5.5544)
+        }
+
+        assertQuery(predicate: "mapOptFloat.@min >= %@", values: [Float(6.5544)], expectedCount: 0) {
+            $0.mapOptFloat.min >= Float(6.5544)
+        }
+
+        assertQuery(predicate: "mapOptFloat.@min >= %@", values: [Float(5.5544)], expectedCount: 1) {
+            $0.mapOptFloat.min >= Float(5.5544)
+        }
+
+        assertQuery(predicate: "mapOptFloat.@min <= %@", values: [Float(7.5544)], expectedCount: 1) {
+            $0.mapOptFloat.min <= Float(7.5544)
+        }
+
+        assertQuery(predicate: "mapOptFloat.@min <= %@", values: [Float(5.5544)], expectedCount: 1) {
+            $0.mapOptFloat.min <= Float(5.5544)
+        }
+
+        assertQuery(predicate: "mapOptFloat.@min != %@", values: [Float(5.5544)], expectedCount: 0) {
+            $0.mapOptFloat.min != Float(5.5544)
+        }
+
+        assertQuery(predicate: "mapOptFloat.@min != %@", values: [Float(7.5544)], expectedCount: 1) {
+            $0.mapOptFloat.min != Float(7.5544)
+        }
+
+        try! realm.write {
+            object.mapOptDouble["foo"] = 123.456
+            object.mapOptDouble["bar"] = 234.567
+            object.mapOptDouble["baz"] = 345.678
+        }
+        assertQuery(predicate: "mapOptDouble.@min > %@", values: [123.456], expectedCount: 0) {
+            $0.mapOptDouble.min > 123.456
+        }
+
+        assertQuery(predicate: "mapOptDouble.@min < %@", values: [345.678], expectedCount: 1) {
+            $0.mapOptDouble.min < 345.678
+        }
+
+        assertQuery(predicate: "mapOptDouble.@min == %@", values: [123.456], expectedCount: 1) {
+            $0.mapOptDouble.min == 123.456
+        }
+
+        assertQuery(predicate: "mapOptDouble.@min >= %@", values: [234.567], expectedCount: 0) {
+            $0.mapOptDouble.min >= 234.567
+        }
+
+        assertQuery(predicate: "mapOptDouble.@min >= %@", values: [123.456], expectedCount: 1) {
+            $0.mapOptDouble.min >= 123.456
+        }
+
+        assertQuery(predicate: "mapOptDouble.@min <= %@", values: [345.678], expectedCount: 1) {
+            $0.mapOptDouble.min <= 345.678
+        }
+
+        assertQuery(predicate: "mapOptDouble.@min <= %@", values: [123.456], expectedCount: 1) {
+            $0.mapOptDouble.min <= 123.456
+        }
+
+        assertQuery(predicate: "mapOptDouble.@min != %@", values: [123.456], expectedCount: 0) {
+            $0.mapOptDouble.min != 123.456
+        }
+
+        assertQuery(predicate: "mapOptDouble.@min != %@", values: [345.678], expectedCount: 1) {
+            $0.mapOptDouble.min != 345.678
+        }
+
+        try! realm.write {
+            object.mapOptDate["foo"] = Date(timeIntervalSince1970: 1000000)
+            object.mapOptDate["bar"] = Date(timeIntervalSince1970: 2000000)
+            object.mapOptDate["baz"] = Date(timeIntervalSince1970: 3000000)
+        }
+        assertQuery(predicate: "mapOptDate.@min > %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 0) {
+            $0.mapOptDate.min > Date(timeIntervalSince1970: 1000000)
+        }
+
+        assertQuery(predicate: "mapOptDate.@min < %@", values: [Date(timeIntervalSince1970: 3000000)], expectedCount: 1) {
+            $0.mapOptDate.min < Date(timeIntervalSince1970: 3000000)
+        }
+
+        assertQuery(predicate: "mapOptDate.@min == %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
+            $0.mapOptDate.min == Date(timeIntervalSince1970: 1000000)
+        }
+
+        assertQuery(predicate: "mapOptDate.@min >= %@", values: [Date(timeIntervalSince1970: 2000000)], expectedCount: 0) {
+            $0.mapOptDate.min >= Date(timeIntervalSince1970: 2000000)
+        }
+
+        assertQuery(predicate: "mapOptDate.@min >= %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
+            $0.mapOptDate.min >= Date(timeIntervalSince1970: 1000000)
+        }
+
+        assertQuery(predicate: "mapOptDate.@min <= %@", values: [Date(timeIntervalSince1970: 3000000)], expectedCount: 1) {
+            $0.mapOptDate.min <= Date(timeIntervalSince1970: 3000000)
+        }
+
+        assertQuery(predicate: "mapOptDate.@min <= %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
+            $0.mapOptDate.min <= Date(timeIntervalSince1970: 1000000)
+        }
+
+        assertQuery(predicate: "mapOptDate.@min != %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 0) {
+            $0.mapOptDate.min != Date(timeIntervalSince1970: 1000000)
+        }
+
+        assertQuery(predicate: "mapOptDate.@min != %@", values: [Date(timeIntervalSince1970: 3000000)], expectedCount: 1) {
+            $0.mapOptDate.min != Date(timeIntervalSince1970: 3000000)
+        }
+
+        try! realm.write {
+            object.mapOptDecimal["foo"] = Decimal128(123.456)
+            object.mapOptDecimal["bar"] = Decimal128(234.567)
+            object.mapOptDecimal["baz"] = Decimal128(345.678)
+        }
+        assertQuery(predicate: "mapOptDecimal.@min > %@", values: [Decimal128(123.456)], expectedCount: 0) {
+            $0.mapOptDecimal.min > Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "mapOptDecimal.@min < %@", values: [Decimal128(345.678)], expectedCount: 1) {
+            $0.mapOptDecimal.min < Decimal128(345.678)
+        }
+
+        assertQuery(predicate: "mapOptDecimal.@min == %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.mapOptDecimal.min == Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "mapOptDecimal.@min >= %@", values: [Decimal128(234.567)], expectedCount: 0) {
+            $0.mapOptDecimal.min >= Decimal128(234.567)
+        }
+
+        assertQuery(predicate: "mapOptDecimal.@min >= %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.mapOptDecimal.min >= Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "mapOptDecimal.@min <= %@", values: [Decimal128(345.678)], expectedCount: 1) {
+            $0.mapOptDecimal.min <= Decimal128(345.678)
+        }
+
+        assertQuery(predicate: "mapOptDecimal.@min <= %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.mapOptDecimal.min <= Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "mapOptDecimal.@min != %@", values: [Decimal128(123.456)], expectedCount: 0) {
+            $0.mapOptDecimal.min != Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "mapOptDecimal.@min != %@", values: [Decimal128(345.678)], expectedCount: 1) {
+            $0.mapOptDecimal.min != Decimal128(345.678)
+        }
+    }
+
+    // @Max
 
     func testCollectionAggregatesMax() {
         let realm = realmWithTestPath()
@@ -10854,6 +12326,751 @@ class QueryTests: TestCase {
         }
     }
 
+    func testMapAggregatesMax() {
+        let realm = realmWithTestPath()
+        let object = objects().first!
+
+        try! realm.write {
+            object.mapInt["foo"] = 1
+            object.mapInt["bar"] = 2
+            object.mapInt["baz"] = 3
+        }
+        assertQuery(predicate: "mapInt.@max > %@", values: [1], expectedCount: 1) {
+            $0.mapInt.max > 1
+        }
+
+        assertQuery(predicate: "mapInt.@max < %@", values: [3], expectedCount: 0) {
+            $0.mapInt.max < 3
+        }
+
+        assertQuery(predicate: "mapInt.@max == %@", values: [3], expectedCount: 1) {
+            $0.mapInt.max == 3
+        }
+
+        assertQuery(predicate: "mapInt.@max >= %@", values: [1], expectedCount: 1) {
+            $0.mapInt.max >= 1
+        }
+
+        assertQuery(predicate: "mapInt.@max >= %@", values: [3], expectedCount: 1) {
+            $0.mapInt.max >= 3
+        }
+
+        assertQuery(predicate: "mapInt.@max <= %@", values: [2], expectedCount: 0) {
+            $0.mapInt.max <= 2
+        }
+
+        assertQuery(predicate: "mapInt.@max <= %@", values: [3], expectedCount: 1) {
+            $0.mapInt.max <= 3
+        }
+
+        assertQuery(predicate: "mapInt.@max != %@", values: [3], expectedCount: 0) {
+            $0.mapInt.max != 3
+        }
+
+        assertQuery(predicate: "mapInt.@max != %@", values: [1], expectedCount: 1) {
+            $0.mapInt.max != 1
+        }
+
+        try! realm.write {
+            object.mapInt8["foo"] = Int8(8)
+            object.mapInt8["bar"] = Int8(9)
+            object.mapInt8["baz"] = Int8(10)
+        }
+        assertQuery(predicate: "mapInt8.@max > %@", values: [Int8(8)], expectedCount: 1) {
+            $0.mapInt8.max > Int8(8)
+        }
+
+        assertQuery(predicate: "mapInt8.@max < %@", values: [Int8(10)], expectedCount: 0) {
+            $0.mapInt8.max < Int8(10)
+        }
+
+        assertQuery(predicate: "mapInt8.@max == %@", values: [Int8(10)], expectedCount: 1) {
+            $0.mapInt8.max == Int8(10)
+        }
+
+        assertQuery(predicate: "mapInt8.@max >= %@", values: [Int8(8)], expectedCount: 1) {
+            $0.mapInt8.max >= Int8(8)
+        }
+
+        assertQuery(predicate: "mapInt8.@max >= %@", values: [Int8(10)], expectedCount: 1) {
+            $0.mapInt8.max >= Int8(10)
+        }
+
+        assertQuery(predicate: "mapInt8.@max <= %@", values: [Int8(9)], expectedCount: 0) {
+            $0.mapInt8.max <= Int8(9)
+        }
+
+        assertQuery(predicate: "mapInt8.@max <= %@", values: [Int8(10)], expectedCount: 1) {
+            $0.mapInt8.max <= Int8(10)
+        }
+
+        assertQuery(predicate: "mapInt8.@max != %@", values: [Int8(10)], expectedCount: 0) {
+            $0.mapInt8.max != Int8(10)
+        }
+
+        assertQuery(predicate: "mapInt8.@max != %@", values: [Int8(8)], expectedCount: 1) {
+            $0.mapInt8.max != Int8(8)
+        }
+
+        try! realm.write {
+            object.mapInt16["foo"] = Int16(16)
+            object.mapInt16["bar"] = Int16(17)
+            object.mapInt16["baz"] = Int16(18)
+        }
+        assertQuery(predicate: "mapInt16.@max > %@", values: [Int16(16)], expectedCount: 1) {
+            $0.mapInt16.max > Int16(16)
+        }
+
+        assertQuery(predicate: "mapInt16.@max < %@", values: [Int16(18)], expectedCount: 0) {
+            $0.mapInt16.max < Int16(18)
+        }
+
+        assertQuery(predicate: "mapInt16.@max == %@", values: [Int16(18)], expectedCount: 1) {
+            $0.mapInt16.max == Int16(18)
+        }
+
+        assertQuery(predicate: "mapInt16.@max >= %@", values: [Int16(16)], expectedCount: 1) {
+            $0.mapInt16.max >= Int16(16)
+        }
+
+        assertQuery(predicate: "mapInt16.@max >= %@", values: [Int16(18)], expectedCount: 1) {
+            $0.mapInt16.max >= Int16(18)
+        }
+
+        assertQuery(predicate: "mapInt16.@max <= %@", values: [Int16(17)], expectedCount: 0) {
+            $0.mapInt16.max <= Int16(17)
+        }
+
+        assertQuery(predicate: "mapInt16.@max <= %@", values: [Int16(18)], expectedCount: 1) {
+            $0.mapInt16.max <= Int16(18)
+        }
+
+        assertQuery(predicate: "mapInt16.@max != %@", values: [Int16(18)], expectedCount: 0) {
+            $0.mapInt16.max != Int16(18)
+        }
+
+        assertQuery(predicate: "mapInt16.@max != %@", values: [Int16(16)], expectedCount: 1) {
+            $0.mapInt16.max != Int16(16)
+        }
+
+        try! realm.write {
+            object.mapInt32["foo"] = Int32(32)
+            object.mapInt32["bar"] = Int32(33)
+            object.mapInt32["baz"] = Int32(34)
+        }
+        assertQuery(predicate: "mapInt32.@max > %@", values: [Int32(32)], expectedCount: 1) {
+            $0.mapInt32.max > Int32(32)
+        }
+
+        assertQuery(predicate: "mapInt32.@max < %@", values: [Int32(34)], expectedCount: 0) {
+            $0.mapInt32.max < Int32(34)
+        }
+
+        assertQuery(predicate: "mapInt32.@max == %@", values: [Int32(34)], expectedCount: 1) {
+            $0.mapInt32.max == Int32(34)
+        }
+
+        assertQuery(predicate: "mapInt32.@max >= %@", values: [Int32(32)], expectedCount: 1) {
+            $0.mapInt32.max >= Int32(32)
+        }
+
+        assertQuery(predicate: "mapInt32.@max >= %@", values: [Int32(34)], expectedCount: 1) {
+            $0.mapInt32.max >= Int32(34)
+        }
+
+        assertQuery(predicate: "mapInt32.@max <= %@", values: [Int32(33)], expectedCount: 0) {
+            $0.mapInt32.max <= Int32(33)
+        }
+
+        assertQuery(predicate: "mapInt32.@max <= %@", values: [Int32(34)], expectedCount: 1) {
+            $0.mapInt32.max <= Int32(34)
+        }
+
+        assertQuery(predicate: "mapInt32.@max != %@", values: [Int32(34)], expectedCount: 0) {
+            $0.mapInt32.max != Int32(34)
+        }
+
+        assertQuery(predicate: "mapInt32.@max != %@", values: [Int32(32)], expectedCount: 1) {
+            $0.mapInt32.max != Int32(32)
+        }
+
+        try! realm.write {
+            object.mapInt64["foo"] = Int64(64)
+            object.mapInt64["bar"] = Int64(65)
+            object.mapInt64["baz"] = Int64(66)
+        }
+        assertQuery(predicate: "mapInt64.@max > %@", values: [Int64(64)], expectedCount: 1) {
+            $0.mapInt64.max > Int64(64)
+        }
+
+        assertQuery(predicate: "mapInt64.@max < %@", values: [Int64(66)], expectedCount: 0) {
+            $0.mapInt64.max < Int64(66)
+        }
+
+        assertQuery(predicate: "mapInt64.@max == %@", values: [Int64(66)], expectedCount: 1) {
+            $0.mapInt64.max == Int64(66)
+        }
+
+        assertQuery(predicate: "mapInt64.@max >= %@", values: [Int64(64)], expectedCount: 1) {
+            $0.mapInt64.max >= Int64(64)
+        }
+
+        assertQuery(predicate: "mapInt64.@max >= %@", values: [Int64(66)], expectedCount: 1) {
+            $0.mapInt64.max >= Int64(66)
+        }
+
+        assertQuery(predicate: "mapInt64.@max <= %@", values: [Int64(65)], expectedCount: 0) {
+            $0.mapInt64.max <= Int64(65)
+        }
+
+        assertQuery(predicate: "mapInt64.@max <= %@", values: [Int64(66)], expectedCount: 1) {
+            $0.mapInt64.max <= Int64(66)
+        }
+
+        assertQuery(predicate: "mapInt64.@max != %@", values: [Int64(66)], expectedCount: 0) {
+            $0.mapInt64.max != Int64(66)
+        }
+
+        assertQuery(predicate: "mapInt64.@max != %@", values: [Int64(64)], expectedCount: 1) {
+            $0.mapInt64.max != Int64(64)
+        }
+
+        try! realm.write {
+            object.mapFloat["foo"] = Float(5.5544)
+            object.mapFloat["bar"] = Float(6.5544)
+            object.mapFloat["baz"] = Float(7.5544)
+        }
+        assertQuery(predicate: "mapFloat.@max > %@", values: [Float(5.5544)], expectedCount: 1) {
+            $0.mapFloat.max > Float(5.5544)
+        }
+
+        assertQuery(predicate: "mapFloat.@max < %@", values: [Float(7.5544)], expectedCount: 0) {
+            $0.mapFloat.max < Float(7.5544)
+        }
+
+        assertQuery(predicate: "mapFloat.@max == %@", values: [Float(7.5544)], expectedCount: 1) {
+            $0.mapFloat.max == Float(7.5544)
+        }
+
+        assertQuery(predicate: "mapFloat.@max >= %@", values: [Float(5.5544)], expectedCount: 1) {
+            $0.mapFloat.max >= Float(5.5544)
+        }
+
+        assertQuery(predicate: "mapFloat.@max >= %@", values: [Float(7.5544)], expectedCount: 1) {
+            $0.mapFloat.max >= Float(7.5544)
+        }
+
+        assertQuery(predicate: "mapFloat.@max <= %@", values: [Float(6.5544)], expectedCount: 0) {
+            $0.mapFloat.max <= Float(6.5544)
+        }
+
+        assertQuery(predicate: "mapFloat.@max <= %@", values: [Float(7.5544)], expectedCount: 1) {
+            $0.mapFloat.max <= Float(7.5544)
+        }
+
+        assertQuery(predicate: "mapFloat.@max != %@", values: [Float(7.5544)], expectedCount: 0) {
+            $0.mapFloat.max != Float(7.5544)
+        }
+
+        assertQuery(predicate: "mapFloat.@max != %@", values: [Float(5.5544)], expectedCount: 1) {
+            $0.mapFloat.max != Float(5.5544)
+        }
+
+        try! realm.write {
+            object.mapDouble["foo"] = 123.456
+            object.mapDouble["bar"] = 234.567
+            object.mapDouble["baz"] = 345.678
+        }
+        assertQuery(predicate: "mapDouble.@max > %@", values: [123.456], expectedCount: 1) {
+            $0.mapDouble.max > 123.456
+        }
+
+        assertQuery(predicate: "mapDouble.@max < %@", values: [345.678], expectedCount: 0) {
+            $0.mapDouble.max < 345.678
+        }
+
+        assertQuery(predicate: "mapDouble.@max == %@", values: [345.678], expectedCount: 1) {
+            $0.mapDouble.max == 345.678
+        }
+
+        assertQuery(predicate: "mapDouble.@max >= %@", values: [123.456], expectedCount: 1) {
+            $0.mapDouble.max >= 123.456
+        }
+
+        assertQuery(predicate: "mapDouble.@max >= %@", values: [345.678], expectedCount: 1) {
+            $0.mapDouble.max >= 345.678
+        }
+
+        assertQuery(predicate: "mapDouble.@max <= %@", values: [234.567], expectedCount: 0) {
+            $0.mapDouble.max <= 234.567
+        }
+
+        assertQuery(predicate: "mapDouble.@max <= %@", values: [345.678], expectedCount: 1) {
+            $0.mapDouble.max <= 345.678
+        }
+
+        assertQuery(predicate: "mapDouble.@max != %@", values: [345.678], expectedCount: 0) {
+            $0.mapDouble.max != 345.678
+        }
+
+        assertQuery(predicate: "mapDouble.@max != %@", values: [123.456], expectedCount: 1) {
+            $0.mapDouble.max != 123.456
+        }
+
+        try! realm.write {
+            object.mapDate["foo"] = Date(timeIntervalSince1970: 1000000)
+            object.mapDate["bar"] = Date(timeIntervalSince1970: 2000000)
+            object.mapDate["baz"] = Date(timeIntervalSince1970: 3000000)
+        }
+        assertQuery(predicate: "mapDate.@max > %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
+            $0.mapDate.max > Date(timeIntervalSince1970: 1000000)
+        }
+
+        assertQuery(predicate: "mapDate.@max < %@", values: [Date(timeIntervalSince1970: 3000000)], expectedCount: 0) {
+            $0.mapDate.max < Date(timeIntervalSince1970: 3000000)
+        }
+
+        assertQuery(predicate: "mapDate.@max == %@", values: [Date(timeIntervalSince1970: 3000000)], expectedCount: 1) {
+            $0.mapDate.max == Date(timeIntervalSince1970: 3000000)
+        }
+
+        assertQuery(predicate: "mapDate.@max >= %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
+            $0.mapDate.max >= Date(timeIntervalSince1970: 1000000)
+        }
+
+        assertQuery(predicate: "mapDate.@max >= %@", values: [Date(timeIntervalSince1970: 3000000)], expectedCount: 1) {
+            $0.mapDate.max >= Date(timeIntervalSince1970: 3000000)
+        }
+
+        assertQuery(predicate: "mapDate.@max <= %@", values: [Date(timeIntervalSince1970: 2000000)], expectedCount: 0) {
+            $0.mapDate.max <= Date(timeIntervalSince1970: 2000000)
+        }
+
+        assertQuery(predicate: "mapDate.@max <= %@", values: [Date(timeIntervalSince1970: 3000000)], expectedCount: 1) {
+            $0.mapDate.max <= Date(timeIntervalSince1970: 3000000)
+        }
+
+        assertQuery(predicate: "mapDate.@max != %@", values: [Date(timeIntervalSince1970: 3000000)], expectedCount: 0) {
+            $0.mapDate.max != Date(timeIntervalSince1970: 3000000)
+        }
+
+        assertQuery(predicate: "mapDate.@max != %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
+            $0.mapDate.max != Date(timeIntervalSince1970: 1000000)
+        }
+
+        try! realm.write {
+            object.mapDecimal["foo"] = Decimal128(123.456)
+            object.mapDecimal["bar"] = Decimal128(234.567)
+            object.mapDecimal["baz"] = Decimal128(345.678)
+        }
+        assertQuery(predicate: "mapDecimal.@max > %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.mapDecimal.max > Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "mapDecimal.@max < %@", values: [Decimal128(345.678)], expectedCount: 0) {
+            $0.mapDecimal.max < Decimal128(345.678)
+        }
+
+        assertQuery(predicate: "mapDecimal.@max == %@", values: [Decimal128(345.678)], expectedCount: 1) {
+            $0.mapDecimal.max == Decimal128(345.678)
+        }
+
+        assertQuery(predicate: "mapDecimal.@max >= %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.mapDecimal.max >= Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "mapDecimal.@max >= %@", values: [Decimal128(345.678)], expectedCount: 1) {
+            $0.mapDecimal.max >= Decimal128(345.678)
+        }
+
+        assertQuery(predicate: "mapDecimal.@max <= %@", values: [Decimal128(234.567)], expectedCount: 0) {
+            $0.mapDecimal.max <= Decimal128(234.567)
+        }
+
+        assertQuery(predicate: "mapDecimal.@max <= %@", values: [Decimal128(345.678)], expectedCount: 1) {
+            $0.mapDecimal.max <= Decimal128(345.678)
+        }
+
+        assertQuery(predicate: "mapDecimal.@max != %@", values: [Decimal128(345.678)], expectedCount: 0) {
+            $0.mapDecimal.max != Decimal128(345.678)
+        }
+
+        assertQuery(predicate: "mapDecimal.@max != %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.mapDecimal.max != Decimal128(123.456)
+        }
+
+        try! realm.write {
+            object.mapOptInt["foo"] = 1
+            object.mapOptInt["bar"] = 2
+            object.mapOptInt["baz"] = 3
+        }
+        assertQuery(predicate: "mapOptInt.@max > %@", values: [1], expectedCount: 1) {
+            $0.mapOptInt.max > 1
+        }
+
+        assertQuery(predicate: "mapOptInt.@max < %@", values: [3], expectedCount: 0) {
+            $0.mapOptInt.max < 3
+        }
+
+        assertQuery(predicate: "mapOptInt.@max == %@", values: [3], expectedCount: 1) {
+            $0.mapOptInt.max == 3
+        }
+
+        assertQuery(predicate: "mapOptInt.@max >= %@", values: [1], expectedCount: 1) {
+            $0.mapOptInt.max >= 1
+        }
+
+        assertQuery(predicate: "mapOptInt.@max >= %@", values: [3], expectedCount: 1) {
+            $0.mapOptInt.max >= 3
+        }
+
+        assertQuery(predicate: "mapOptInt.@max <= %@", values: [2], expectedCount: 0) {
+            $0.mapOptInt.max <= 2
+        }
+
+        assertQuery(predicate: "mapOptInt.@max <= %@", values: [3], expectedCount: 1) {
+            $0.mapOptInt.max <= 3
+        }
+
+        assertQuery(predicate: "mapOptInt.@max != %@", values: [3], expectedCount: 0) {
+            $0.mapOptInt.max != 3
+        }
+
+        assertQuery(predicate: "mapOptInt.@max != %@", values: [1], expectedCount: 1) {
+            $0.mapOptInt.max != 1
+        }
+
+        try! realm.write {
+            object.mapOptInt8["foo"] = Int8(8)
+            object.mapOptInt8["bar"] = Int8(9)
+            object.mapOptInt8["baz"] = Int8(10)
+        }
+        assertQuery(predicate: "mapOptInt8.@max > %@", values: [Int8(8)], expectedCount: 1) {
+            $0.mapOptInt8.max > Int8(8)
+        }
+
+        assertQuery(predicate: "mapOptInt8.@max < %@", values: [Int8(10)], expectedCount: 0) {
+            $0.mapOptInt8.max < Int8(10)
+        }
+
+        assertQuery(predicate: "mapOptInt8.@max == %@", values: [Int8(10)], expectedCount: 1) {
+            $0.mapOptInt8.max == Int8(10)
+        }
+
+        assertQuery(predicate: "mapOptInt8.@max >= %@", values: [Int8(8)], expectedCount: 1) {
+            $0.mapOptInt8.max >= Int8(8)
+        }
+
+        assertQuery(predicate: "mapOptInt8.@max >= %@", values: [Int8(10)], expectedCount: 1) {
+            $0.mapOptInt8.max >= Int8(10)
+        }
+
+        assertQuery(predicate: "mapOptInt8.@max <= %@", values: [Int8(9)], expectedCount: 0) {
+            $0.mapOptInt8.max <= Int8(9)
+        }
+
+        assertQuery(predicate: "mapOptInt8.@max <= %@", values: [Int8(10)], expectedCount: 1) {
+            $0.mapOptInt8.max <= Int8(10)
+        }
+
+        assertQuery(predicate: "mapOptInt8.@max != %@", values: [Int8(10)], expectedCount: 0) {
+            $0.mapOptInt8.max != Int8(10)
+        }
+
+        assertQuery(predicate: "mapOptInt8.@max != %@", values: [Int8(8)], expectedCount: 1) {
+            $0.mapOptInt8.max != Int8(8)
+        }
+
+        try! realm.write {
+            object.mapOptInt16["foo"] = Int16(16)
+            object.mapOptInt16["bar"] = Int16(17)
+            object.mapOptInt16["baz"] = Int16(18)
+        }
+        assertQuery(predicate: "mapOptInt16.@max > %@", values: [Int16(16)], expectedCount: 1) {
+            $0.mapOptInt16.max > Int16(16)
+        }
+
+        assertQuery(predicate: "mapOptInt16.@max < %@", values: [Int16(18)], expectedCount: 0) {
+            $0.mapOptInt16.max < Int16(18)
+        }
+
+        assertQuery(predicate: "mapOptInt16.@max == %@", values: [Int16(18)], expectedCount: 1) {
+            $0.mapOptInt16.max == Int16(18)
+        }
+
+        assertQuery(predicate: "mapOptInt16.@max >= %@", values: [Int16(16)], expectedCount: 1) {
+            $0.mapOptInt16.max >= Int16(16)
+        }
+
+        assertQuery(predicate: "mapOptInt16.@max >= %@", values: [Int16(18)], expectedCount: 1) {
+            $0.mapOptInt16.max >= Int16(18)
+        }
+
+        assertQuery(predicate: "mapOptInt16.@max <= %@", values: [Int16(17)], expectedCount: 0) {
+            $0.mapOptInt16.max <= Int16(17)
+        }
+
+        assertQuery(predicate: "mapOptInt16.@max <= %@", values: [Int16(18)], expectedCount: 1) {
+            $0.mapOptInt16.max <= Int16(18)
+        }
+
+        assertQuery(predicate: "mapOptInt16.@max != %@", values: [Int16(18)], expectedCount: 0) {
+            $0.mapOptInt16.max != Int16(18)
+        }
+
+        assertQuery(predicate: "mapOptInt16.@max != %@", values: [Int16(16)], expectedCount: 1) {
+            $0.mapOptInt16.max != Int16(16)
+        }
+
+        try! realm.write {
+            object.mapOptInt32["foo"] = Int32(32)
+            object.mapOptInt32["bar"] = Int32(33)
+            object.mapOptInt32["baz"] = Int32(34)
+        }
+        assertQuery(predicate: "mapOptInt32.@max > %@", values: [Int32(32)], expectedCount: 1) {
+            $0.mapOptInt32.max > Int32(32)
+        }
+
+        assertQuery(predicate: "mapOptInt32.@max < %@", values: [Int32(34)], expectedCount: 0) {
+            $0.mapOptInt32.max < Int32(34)
+        }
+
+        assertQuery(predicate: "mapOptInt32.@max == %@", values: [Int32(34)], expectedCount: 1) {
+            $0.mapOptInt32.max == Int32(34)
+        }
+
+        assertQuery(predicate: "mapOptInt32.@max >= %@", values: [Int32(32)], expectedCount: 1) {
+            $0.mapOptInt32.max >= Int32(32)
+        }
+
+        assertQuery(predicate: "mapOptInt32.@max >= %@", values: [Int32(34)], expectedCount: 1) {
+            $0.mapOptInt32.max >= Int32(34)
+        }
+
+        assertQuery(predicate: "mapOptInt32.@max <= %@", values: [Int32(33)], expectedCount: 0) {
+            $0.mapOptInt32.max <= Int32(33)
+        }
+
+        assertQuery(predicate: "mapOptInt32.@max <= %@", values: [Int32(34)], expectedCount: 1) {
+            $0.mapOptInt32.max <= Int32(34)
+        }
+
+        assertQuery(predicate: "mapOptInt32.@max != %@", values: [Int32(34)], expectedCount: 0) {
+            $0.mapOptInt32.max != Int32(34)
+        }
+
+        assertQuery(predicate: "mapOptInt32.@max != %@", values: [Int32(32)], expectedCount: 1) {
+            $0.mapOptInt32.max != Int32(32)
+        }
+
+        try! realm.write {
+            object.mapOptInt64["foo"] = Int64(64)
+            object.mapOptInt64["bar"] = Int64(65)
+            object.mapOptInt64["baz"] = Int64(66)
+        }
+        assertQuery(predicate: "mapOptInt64.@max > %@", values: [Int64(64)], expectedCount: 1) {
+            $0.mapOptInt64.max > Int64(64)
+        }
+
+        assertQuery(predicate: "mapOptInt64.@max < %@", values: [Int64(66)], expectedCount: 0) {
+            $0.mapOptInt64.max < Int64(66)
+        }
+
+        assertQuery(predicate: "mapOptInt64.@max == %@", values: [Int64(66)], expectedCount: 1) {
+            $0.mapOptInt64.max == Int64(66)
+        }
+
+        assertQuery(predicate: "mapOptInt64.@max >= %@", values: [Int64(64)], expectedCount: 1) {
+            $0.mapOptInt64.max >= Int64(64)
+        }
+
+        assertQuery(predicate: "mapOptInt64.@max >= %@", values: [Int64(66)], expectedCount: 1) {
+            $0.mapOptInt64.max >= Int64(66)
+        }
+
+        assertQuery(predicate: "mapOptInt64.@max <= %@", values: [Int64(65)], expectedCount: 0) {
+            $0.mapOptInt64.max <= Int64(65)
+        }
+
+        assertQuery(predicate: "mapOptInt64.@max <= %@", values: [Int64(66)], expectedCount: 1) {
+            $0.mapOptInt64.max <= Int64(66)
+        }
+
+        assertQuery(predicate: "mapOptInt64.@max != %@", values: [Int64(66)], expectedCount: 0) {
+            $0.mapOptInt64.max != Int64(66)
+        }
+
+        assertQuery(predicate: "mapOptInt64.@max != %@", values: [Int64(64)], expectedCount: 1) {
+            $0.mapOptInt64.max != Int64(64)
+        }
+
+        try! realm.write {
+            object.mapOptFloat["foo"] = Float(5.5544)
+            object.mapOptFloat["bar"] = Float(6.5544)
+            object.mapOptFloat["baz"] = Float(7.5544)
+        }
+        assertQuery(predicate: "mapOptFloat.@max > %@", values: [Float(5.5544)], expectedCount: 1) {
+            $0.mapOptFloat.max > Float(5.5544)
+        }
+
+        assertQuery(predicate: "mapOptFloat.@max < %@", values: [Float(7.5544)], expectedCount: 0) {
+            $0.mapOptFloat.max < Float(7.5544)
+        }
+
+        assertQuery(predicate: "mapOptFloat.@max == %@", values: [Float(7.5544)], expectedCount: 1) {
+            $0.mapOptFloat.max == Float(7.5544)
+        }
+
+        assertQuery(predicate: "mapOptFloat.@max >= %@", values: [Float(5.5544)], expectedCount: 1) {
+            $0.mapOptFloat.max >= Float(5.5544)
+        }
+
+        assertQuery(predicate: "mapOptFloat.@max >= %@", values: [Float(7.5544)], expectedCount: 1) {
+            $0.mapOptFloat.max >= Float(7.5544)
+        }
+
+        assertQuery(predicate: "mapOptFloat.@max <= %@", values: [Float(6.5544)], expectedCount: 0) {
+            $0.mapOptFloat.max <= Float(6.5544)
+        }
+
+        assertQuery(predicate: "mapOptFloat.@max <= %@", values: [Float(7.5544)], expectedCount: 1) {
+            $0.mapOptFloat.max <= Float(7.5544)
+        }
+
+        assertQuery(predicate: "mapOptFloat.@max != %@", values: [Float(7.5544)], expectedCount: 0) {
+            $0.mapOptFloat.max != Float(7.5544)
+        }
+
+        assertQuery(predicate: "mapOptFloat.@max != %@", values: [Float(5.5544)], expectedCount: 1) {
+            $0.mapOptFloat.max != Float(5.5544)
+        }
+
+        try! realm.write {
+            object.mapOptDouble["foo"] = 123.456
+            object.mapOptDouble["bar"] = 234.567
+            object.mapOptDouble["baz"] = 345.678
+        }
+        assertQuery(predicate: "mapOptDouble.@max > %@", values: [123.456], expectedCount: 1) {
+            $0.mapOptDouble.max > 123.456
+        }
+
+        assertQuery(predicate: "mapOptDouble.@max < %@", values: [345.678], expectedCount: 0) {
+            $0.mapOptDouble.max < 345.678
+        }
+
+        assertQuery(predicate: "mapOptDouble.@max == %@", values: [345.678], expectedCount: 1) {
+            $0.mapOptDouble.max == 345.678
+        }
+
+        assertQuery(predicate: "mapOptDouble.@max >= %@", values: [123.456], expectedCount: 1) {
+            $0.mapOptDouble.max >= 123.456
+        }
+
+        assertQuery(predicate: "mapOptDouble.@max >= %@", values: [345.678], expectedCount: 1) {
+            $0.mapOptDouble.max >= 345.678
+        }
+
+        assertQuery(predicate: "mapOptDouble.@max <= %@", values: [234.567], expectedCount: 0) {
+            $0.mapOptDouble.max <= 234.567
+        }
+
+        assertQuery(predicate: "mapOptDouble.@max <= %@", values: [345.678], expectedCount: 1) {
+            $0.mapOptDouble.max <= 345.678
+        }
+
+        assertQuery(predicate: "mapOptDouble.@max != %@", values: [345.678], expectedCount: 0) {
+            $0.mapOptDouble.max != 345.678
+        }
+
+        assertQuery(predicate: "mapOptDouble.@max != %@", values: [123.456], expectedCount: 1) {
+            $0.mapOptDouble.max != 123.456
+        }
+
+        try! realm.write {
+            object.mapOptDate["foo"] = Date(timeIntervalSince1970: 1000000)
+            object.mapOptDate["bar"] = Date(timeIntervalSince1970: 2000000)
+            object.mapOptDate["baz"] = Date(timeIntervalSince1970: 3000000)
+        }
+        assertQuery(predicate: "mapOptDate.@max > %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
+            $0.mapOptDate.max > Date(timeIntervalSince1970: 1000000)
+        }
+
+        assertQuery(predicate: "mapOptDate.@max < %@", values: [Date(timeIntervalSince1970: 3000000)], expectedCount: 0) {
+            $0.mapOptDate.max < Date(timeIntervalSince1970: 3000000)
+        }
+
+        assertQuery(predicate: "mapOptDate.@max == %@", values: [Date(timeIntervalSince1970: 3000000)], expectedCount: 1) {
+            $0.mapOptDate.max == Date(timeIntervalSince1970: 3000000)
+        }
+
+        assertQuery(predicate: "mapOptDate.@max >= %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
+            $0.mapOptDate.max >= Date(timeIntervalSince1970: 1000000)
+        }
+
+        assertQuery(predicate: "mapOptDate.@max >= %@", values: [Date(timeIntervalSince1970: 3000000)], expectedCount: 1) {
+            $0.mapOptDate.max >= Date(timeIntervalSince1970: 3000000)
+        }
+
+        assertQuery(predicate: "mapOptDate.@max <= %@", values: [Date(timeIntervalSince1970: 2000000)], expectedCount: 0) {
+            $0.mapOptDate.max <= Date(timeIntervalSince1970: 2000000)
+        }
+
+        assertQuery(predicate: "mapOptDate.@max <= %@", values: [Date(timeIntervalSince1970: 3000000)], expectedCount: 1) {
+            $0.mapOptDate.max <= Date(timeIntervalSince1970: 3000000)
+        }
+
+        assertQuery(predicate: "mapOptDate.@max != %@", values: [Date(timeIntervalSince1970: 3000000)], expectedCount: 0) {
+            $0.mapOptDate.max != Date(timeIntervalSince1970: 3000000)
+        }
+
+        assertQuery(predicate: "mapOptDate.@max != %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
+            $0.mapOptDate.max != Date(timeIntervalSince1970: 1000000)
+        }
+
+        try! realm.write {
+            object.mapOptDecimal["foo"] = Decimal128(123.456)
+            object.mapOptDecimal["bar"] = Decimal128(234.567)
+            object.mapOptDecimal["baz"] = Decimal128(345.678)
+        }
+        assertQuery(predicate: "mapOptDecimal.@max > %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.mapOptDecimal.max > Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "mapOptDecimal.@max < %@", values: [Decimal128(345.678)], expectedCount: 0) {
+            $0.mapOptDecimal.max < Decimal128(345.678)
+        }
+
+        assertQuery(predicate: "mapOptDecimal.@max == %@", values: [Decimal128(345.678)], expectedCount: 1) {
+            $0.mapOptDecimal.max == Decimal128(345.678)
+        }
+
+        assertQuery(predicate: "mapOptDecimal.@max >= %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.mapOptDecimal.max >= Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "mapOptDecimal.@max >= %@", values: [Decimal128(345.678)], expectedCount: 1) {
+            $0.mapOptDecimal.max >= Decimal128(345.678)
+        }
+
+        assertQuery(predicate: "mapOptDecimal.@max <= %@", values: [Decimal128(234.567)], expectedCount: 0) {
+            $0.mapOptDecimal.max <= Decimal128(234.567)
+        }
+
+        assertQuery(predicate: "mapOptDecimal.@max <= %@", values: [Decimal128(345.678)], expectedCount: 1) {
+            $0.mapOptDecimal.max <= Decimal128(345.678)
+        }
+
+        assertQuery(predicate: "mapOptDecimal.@max != %@", values: [Decimal128(345.678)], expectedCount: 0) {
+            $0.mapOptDecimal.max != Decimal128(345.678)
+        }
+
+        assertQuery(predicate: "mapOptDecimal.@max != %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.mapOptDecimal.max != Decimal128(123.456)
+        }
+    }
+
+    // @Sum
+
     func testCollectionAggregatesSum() {
         let realm = realmWithTestPath()
         let object = objects().first!
@@ -10865,7 +13082,6 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
-
         let sumarrayInt = 1 + 2 + 3
         assertQuery(predicate: "objectCol.arrayInt.@sum > %@", values: [3], expectedCount: 1) {
             $0.objectCol.arrayInt.sum > 3
@@ -10915,7 +13131,6 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
-
         let sumarrayInt8 = Int8(8) + Int8(9) + Int8(10)
         assertQuery(predicate: "objectCol.arrayInt8.@sum > %@", values: [Int8(10)], expectedCount: 1) {
             $0.objectCol.arrayInt8.sum > Int8(10)
@@ -10965,7 +13180,6 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
-
         let sumarrayInt16 = Int16(16) + Int16(17) + Int16(18)
         assertQuery(predicate: "objectCol.arrayInt16.@sum > %@", values: [Int16(18)], expectedCount: 1) {
             $0.objectCol.arrayInt16.sum > Int16(18)
@@ -11015,7 +13229,6 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
-
         let sumarrayInt32 = Int32(32) + Int32(33) + Int32(34)
         assertQuery(predicate: "objectCol.arrayInt32.@sum > %@", values: [Int32(34)], expectedCount: 1) {
             $0.objectCol.arrayInt32.sum > Int32(34)
@@ -11065,7 +13278,6 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
-
         let sumarrayInt64 = Int64(64) + Int64(65) + Int64(66)
         assertQuery(predicate: "objectCol.arrayInt64.@sum > %@", values: [Int64(66)], expectedCount: 1) {
             $0.objectCol.arrayInt64.sum > Int64(66)
@@ -11115,7 +13327,6 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
-
         let sumarrayFloat = Float(5.55444333) + Float(6.55444333) + Float(7.55444333)
         assertQuery(predicate: "objectCol.arrayFloat.@sum > %@", values: [Float(7.55444333)], expectedCount: 1) {
             $0.objectCol.arrayFloat.sum > Float(7.55444333)
@@ -11165,7 +13376,6 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
-
         let sumarrayDouble = 123.456 + 234.567 + 345.678
         assertQuery(predicate: "objectCol.arrayDouble.@sum > %@", values: [345.678], expectedCount: 1) {
             $0.objectCol.arrayDouble.sum > 345.678
@@ -11215,7 +13425,6 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
-
         let sumarrayDecimal = Decimal128(123.456) + Decimal128(234.567) + Decimal128(345.678)
         assertQuery(predicate: "objectCol.arrayDecimal.@sum > %@", values: [Decimal128(345.678)], expectedCount: 1) {
             $0.objectCol.arrayDecimal.sum > Decimal128(345.678)
@@ -11265,7 +13474,6 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
-
         let sumarrayOptInt = 1 + 2 + 3
         assertQuery(predicate: "objectCol.arrayOptInt.@sum > %@", values: [3], expectedCount: 1) {
             $0.objectCol.arrayOptInt.sum > 3
@@ -11315,7 +13523,6 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
-
         let sumarrayOptInt8 = Int8(8) + Int8(9) + Int8(10)
         assertQuery(predicate: "objectCol.arrayOptInt8.@sum > %@", values: [Int8(10)], expectedCount: 1) {
             $0.objectCol.arrayOptInt8.sum > Int8(10)
@@ -11365,7 +13572,6 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
-
         let sumarrayOptInt16 = Int16(16) + Int16(17) + Int16(18)
         assertQuery(predicate: "objectCol.arrayOptInt16.@sum > %@", values: [Int16(18)], expectedCount: 1) {
             $0.objectCol.arrayOptInt16.sum > Int16(18)
@@ -11415,7 +13621,6 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
-
         let sumarrayOptInt32 = Int32(32) + Int32(33) + Int32(34)
         assertQuery(predicate: "objectCol.arrayOptInt32.@sum > %@", values: [Int32(34)], expectedCount: 1) {
             $0.objectCol.arrayOptInt32.sum > Int32(34)
@@ -11465,7 +13670,6 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
-
         let sumarrayOptInt64 = Int64(64) + Int64(65) + Int64(66)
         assertQuery(predicate: "objectCol.arrayOptInt64.@sum > %@", values: [Int64(66)], expectedCount: 1) {
             $0.objectCol.arrayOptInt64.sum > Int64(66)
@@ -11515,7 +13719,6 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
-
         let sumarrayOptFloat = Float(5.55444333) + Float(6.55444333) + Float(7.55444333)
         assertQuery(predicate: "objectCol.arrayOptFloat.@sum > %@", values: [Float(7.55444333)], expectedCount: 1) {
             $0.objectCol.arrayOptFloat.sum > Float(7.55444333)
@@ -11565,7 +13768,6 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
-
         let sumarrayOptDouble = 123.456 + 234.567 + 345.678
         assertQuery(predicate: "objectCol.arrayOptDouble.@sum > %@", values: [345.678], expectedCount: 1) {
             $0.objectCol.arrayOptDouble.sum > 345.678
@@ -11615,7 +13817,6 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
-
         let sumarrayOptDecimal = Decimal128(123.456) + Decimal128(234.567) + Decimal128(345.678)
         assertQuery(predicate: "objectCol.arrayOptDecimal.@sum > %@", values: [Decimal128(345.678)], expectedCount: 1) {
             $0.objectCol.arrayOptDecimal.sum > Decimal128(345.678)
@@ -11658,6 +13859,749 @@ class QueryTests: TestCase {
             $0.objectCol.arrayOptDecimal.sum != Decimal128(123.456)
         }
     }
+
+    func testMapAggregatesSum() {
+        let realm = realmWithTestPath()
+        let object = objects().first!
+
+        try! realm.write {
+            object.mapInt["foo"] = 1
+            object.mapInt["bar"] = 2
+            object.mapInt["baz"] = 3
+        }
+        let summapInt = 1 + 2 + 3
+        assertQuery(predicate: "mapInt.@sum > %@", values: [3], expectedCount: 1) {
+            $0.mapInt.sum > 3
+        }
+
+        assertQuery(predicate: "mapInt.@sum < %@", values: [3], expectedCount: 0) {
+            $0.mapInt.sum < 3
+        }
+
+        assertQuery(predicate: "mapInt.@sum == %@", values: [3], expectedCount: 0) {
+            $0.mapInt.sum == 3
+        }
+
+        assertQuery(predicate: "mapInt.@sum == %@", values: [summapInt], expectedCount: 1) {
+            $0.mapInt.sum == summapInt
+        }
+
+        assertQuery(predicate: "mapInt.@sum >= %@", values: [3], expectedCount: 1) {
+            $0.mapInt.sum >= 3
+        }
+
+        assertQuery(predicate: "mapInt.@sum >= %@", values: [summapInt], expectedCount: 1) {
+            $0.mapInt.sum >= summapInt
+        }
+
+        assertQuery(predicate: "mapInt.@sum <= %@", values: [3], expectedCount: 0) {
+            $0.mapInt.sum <= 3
+        }
+
+        assertQuery(predicate: "mapInt.@sum <= %@", values: [summapInt], expectedCount: 1) {
+            $0.mapInt.sum <= summapInt
+        }
+
+        assertQuery(predicate: "mapInt.@sum != %@", values: [summapInt], expectedCount: 0) {
+            $0.mapInt.sum != summapInt
+        }
+
+        assertQuery(predicate: "mapInt.@sum != %@", values: [1], expectedCount: 1) {
+            $0.mapInt.sum != 1
+        }
+
+        try! realm.write {
+            object.mapInt8["foo"] = Int8(8)
+            object.mapInt8["bar"] = Int8(9)
+            object.mapInt8["baz"] = Int8(10)
+        }
+        let summapInt8 = Int8(8) + Int8(9) + Int8(10)
+        assertQuery(predicate: "mapInt8.@sum > %@", values: [Int8(10)], expectedCount: 1) {
+            $0.mapInt8.sum > Int8(10)
+        }
+
+        assertQuery(predicate: "mapInt8.@sum < %@", values: [Int8(10)], expectedCount: 0) {
+            $0.mapInt8.sum < Int8(10)
+        }
+
+        assertQuery(predicate: "mapInt8.@sum == %@", values: [Int8(10)], expectedCount: 0) {
+            $0.mapInt8.sum == Int8(10)
+        }
+
+        assertQuery(predicate: "mapInt8.@sum == %@", values: [summapInt8], expectedCount: 1) {
+            $0.mapInt8.sum == summapInt8
+        }
+
+        assertQuery(predicate: "mapInt8.@sum >= %@", values: [Int8(10)], expectedCount: 1) {
+            $0.mapInt8.sum >= Int8(10)
+        }
+
+        assertQuery(predicate: "mapInt8.@sum >= %@", values: [summapInt8], expectedCount: 1) {
+            $0.mapInt8.sum >= summapInt8
+        }
+
+        assertQuery(predicate: "mapInt8.@sum <= %@", values: [Int8(10)], expectedCount: 0) {
+            $0.mapInt8.sum <= Int8(10)
+        }
+
+        assertQuery(predicate: "mapInt8.@sum <= %@", values: [summapInt8], expectedCount: 1) {
+            $0.mapInt8.sum <= summapInt8
+        }
+
+        assertQuery(predicate: "mapInt8.@sum != %@", values: [summapInt8], expectedCount: 0) {
+            $0.mapInt8.sum != summapInt8
+        }
+
+        assertQuery(predicate: "mapInt8.@sum != %@", values: [Int8(8)], expectedCount: 1) {
+            $0.mapInt8.sum != Int8(8)
+        }
+
+        try! realm.write {
+            object.mapInt16["foo"] = Int16(16)
+            object.mapInt16["bar"] = Int16(17)
+            object.mapInt16["baz"] = Int16(18)
+        }
+        let summapInt16 = Int16(16) + Int16(17) + Int16(18)
+        assertQuery(predicate: "mapInt16.@sum > %@", values: [Int16(18)], expectedCount: 1) {
+            $0.mapInt16.sum > Int16(18)
+        }
+
+        assertQuery(predicate: "mapInt16.@sum < %@", values: [Int16(18)], expectedCount: 0) {
+            $0.mapInt16.sum < Int16(18)
+        }
+
+        assertQuery(predicate: "mapInt16.@sum == %@", values: [Int16(18)], expectedCount: 0) {
+            $0.mapInt16.sum == Int16(18)
+        }
+
+        assertQuery(predicate: "mapInt16.@sum == %@", values: [summapInt16], expectedCount: 1) {
+            $0.mapInt16.sum == summapInt16
+        }
+
+        assertQuery(predicate: "mapInt16.@sum >= %@", values: [Int16(18)], expectedCount: 1) {
+            $0.mapInt16.sum >= Int16(18)
+        }
+
+        assertQuery(predicate: "mapInt16.@sum >= %@", values: [summapInt16], expectedCount: 1) {
+            $0.mapInt16.sum >= summapInt16
+        }
+
+        assertQuery(predicate: "mapInt16.@sum <= %@", values: [Int16(18)], expectedCount: 0) {
+            $0.mapInt16.sum <= Int16(18)
+        }
+
+        assertQuery(predicate: "mapInt16.@sum <= %@", values: [summapInt16], expectedCount: 1) {
+            $0.mapInt16.sum <= summapInt16
+        }
+
+        assertQuery(predicate: "mapInt16.@sum != %@", values: [summapInt16], expectedCount: 0) {
+            $0.mapInt16.sum != summapInt16
+        }
+
+        assertQuery(predicate: "mapInt16.@sum != %@", values: [Int16(16)], expectedCount: 1) {
+            $0.mapInt16.sum != Int16(16)
+        }
+
+        try! realm.write {
+            object.mapInt32["foo"] = Int32(32)
+            object.mapInt32["bar"] = Int32(33)
+            object.mapInt32["baz"] = Int32(34)
+        }
+        let summapInt32 = Int32(32) + Int32(33) + Int32(34)
+        assertQuery(predicate: "mapInt32.@sum > %@", values: [Int32(34)], expectedCount: 1) {
+            $0.mapInt32.sum > Int32(34)
+        }
+
+        assertQuery(predicate: "mapInt32.@sum < %@", values: [Int32(34)], expectedCount: 0) {
+            $0.mapInt32.sum < Int32(34)
+        }
+
+        assertQuery(predicate: "mapInt32.@sum == %@", values: [Int32(34)], expectedCount: 0) {
+            $0.mapInt32.sum == Int32(34)
+        }
+
+        assertQuery(predicate: "mapInt32.@sum == %@", values: [summapInt32], expectedCount: 1) {
+            $0.mapInt32.sum == summapInt32
+        }
+
+        assertQuery(predicate: "mapInt32.@sum >= %@", values: [Int32(34)], expectedCount: 1) {
+            $0.mapInt32.sum >= Int32(34)
+        }
+
+        assertQuery(predicate: "mapInt32.@sum >= %@", values: [summapInt32], expectedCount: 1) {
+            $0.mapInt32.sum >= summapInt32
+        }
+
+        assertQuery(predicate: "mapInt32.@sum <= %@", values: [Int32(34)], expectedCount: 0) {
+            $0.mapInt32.sum <= Int32(34)
+        }
+
+        assertQuery(predicate: "mapInt32.@sum <= %@", values: [summapInt32], expectedCount: 1) {
+            $0.mapInt32.sum <= summapInt32
+        }
+
+        assertQuery(predicate: "mapInt32.@sum != %@", values: [summapInt32], expectedCount: 0) {
+            $0.mapInt32.sum != summapInt32
+        }
+
+        assertQuery(predicate: "mapInt32.@sum != %@", values: [Int32(32)], expectedCount: 1) {
+            $0.mapInt32.sum != Int32(32)
+        }
+
+        try! realm.write {
+            object.mapInt64["foo"] = Int64(64)
+            object.mapInt64["bar"] = Int64(65)
+            object.mapInt64["baz"] = Int64(66)
+        }
+        let summapInt64 = Int64(64) + Int64(65) + Int64(66)
+        assertQuery(predicate: "mapInt64.@sum > %@", values: [Int64(66)], expectedCount: 1) {
+            $0.mapInt64.sum > Int64(66)
+        }
+
+        assertQuery(predicate: "mapInt64.@sum < %@", values: [Int64(66)], expectedCount: 0) {
+            $0.mapInt64.sum < Int64(66)
+        }
+
+        assertQuery(predicate: "mapInt64.@sum == %@", values: [Int64(66)], expectedCount: 0) {
+            $0.mapInt64.sum == Int64(66)
+        }
+
+        assertQuery(predicate: "mapInt64.@sum == %@", values: [summapInt64], expectedCount: 1) {
+            $0.mapInt64.sum == summapInt64
+        }
+
+        assertQuery(predicate: "mapInt64.@sum >= %@", values: [Int64(66)], expectedCount: 1) {
+            $0.mapInt64.sum >= Int64(66)
+        }
+
+        assertQuery(predicate: "mapInt64.@sum >= %@", values: [summapInt64], expectedCount: 1) {
+            $0.mapInt64.sum >= summapInt64
+        }
+
+        assertQuery(predicate: "mapInt64.@sum <= %@", values: [Int64(66)], expectedCount: 0) {
+            $0.mapInt64.sum <= Int64(66)
+        }
+
+        assertQuery(predicate: "mapInt64.@sum <= %@", values: [summapInt64], expectedCount: 1) {
+            $0.mapInt64.sum <= summapInt64
+        }
+
+        assertQuery(predicate: "mapInt64.@sum != %@", values: [summapInt64], expectedCount: 0) {
+            $0.mapInt64.sum != summapInt64
+        }
+
+        assertQuery(predicate: "mapInt64.@sum != %@", values: [Int64(64)], expectedCount: 1) {
+            $0.mapInt64.sum != Int64(64)
+        }
+
+        try! realm.write {
+            object.mapFloat["foo"] = Float(5.5544)
+            object.mapFloat["bar"] = Float(6.5544)
+            object.mapFloat["baz"] = Float(7.5544)
+        }
+        let summapFloat = Float(5.5544) + Float(6.5544) + Float(7.5544)
+        assertQuery(predicate: "mapFloat.@sum > %@", values: [Float(7.5544)], expectedCount: 1) {
+            $0.mapFloat.sum > Float(7.5544)
+        }
+
+        assertQuery(predicate: "mapFloat.@sum < %@", values: [Float(7.5544)], expectedCount: 0) {
+            $0.mapFloat.sum < Float(7.5544)
+        }
+
+        assertQuery(predicate: "mapFloat.@sum == %@", values: [Float(7.5544)], expectedCount: 0) {
+            $0.mapFloat.sum == Float(7.5544)
+        }
+
+        assertQuery(predicate: "mapFloat.@sum == %@", values: [summapFloat], expectedCount: 1) {
+            $0.mapFloat.sum == summapFloat
+        }
+
+        assertQuery(predicate: "mapFloat.@sum >= %@", values: [Float(7.5544)], expectedCount: 1) {
+            $0.mapFloat.sum >= Float(7.5544)
+        }
+
+        assertQuery(predicate: "mapFloat.@sum >= %@", values: [summapFloat], expectedCount: 1) {
+            $0.mapFloat.sum >= summapFloat
+        }
+
+        assertQuery(predicate: "mapFloat.@sum <= %@", values: [Float(7.5544)], expectedCount: 0) {
+            $0.mapFloat.sum <= Float(7.5544)
+        }
+
+        assertQuery(predicate: "mapFloat.@sum <= %@", values: [summapFloat], expectedCount: 1) {
+            $0.mapFloat.sum <= summapFloat
+        }
+
+        assertQuery(predicate: "mapFloat.@sum != %@", values: [summapFloat], expectedCount: 0) {
+            $0.mapFloat.sum != summapFloat
+        }
+
+        assertQuery(predicate: "mapFloat.@sum != %@", values: [Float(5.5544)], expectedCount: 1) {
+            $0.mapFloat.sum != Float(5.5544)
+        }
+
+        try! realm.write {
+            object.mapDouble["foo"] = 123.456
+            object.mapDouble["bar"] = 234.567
+            object.mapDouble["baz"] = 345.678
+        }
+        let summapDouble = 123.456 + 234.567 + 345.678
+        assertQuery(predicate: "mapDouble.@sum > %@", values: [345.678], expectedCount: 1) {
+            $0.mapDouble.sum > 345.678
+        }
+
+        assertQuery(predicate: "mapDouble.@sum < %@", values: [345.678], expectedCount: 0) {
+            $0.mapDouble.sum < 345.678
+        }
+
+        assertQuery(predicate: "mapDouble.@sum == %@", values: [345.678], expectedCount: 0) {
+            $0.mapDouble.sum == 345.678
+        }
+
+        assertQuery(predicate: "mapDouble.@sum == %@", values: [summapDouble], expectedCount: 1) {
+            $0.mapDouble.sum == summapDouble
+        }
+
+        assertQuery(predicate: "mapDouble.@sum >= %@", values: [345.678], expectedCount: 1) {
+            $0.mapDouble.sum >= 345.678
+        }
+
+        assertQuery(predicate: "mapDouble.@sum >= %@", values: [summapDouble], expectedCount: 1) {
+            $0.mapDouble.sum >= summapDouble
+        }
+
+        assertQuery(predicate: "mapDouble.@sum <= %@", values: [345.678], expectedCount: 0) {
+            $0.mapDouble.sum <= 345.678
+        }
+
+        assertQuery(predicate: "mapDouble.@sum <= %@", values: [summapDouble], expectedCount: 1) {
+            $0.mapDouble.sum <= summapDouble
+        }
+
+        assertQuery(predicate: "mapDouble.@sum != %@", values: [summapDouble], expectedCount: 0) {
+            $0.mapDouble.sum != summapDouble
+        }
+
+        assertQuery(predicate: "mapDouble.@sum != %@", values: [123.456], expectedCount: 1) {
+            $0.mapDouble.sum != 123.456
+        }
+
+        try! realm.write {
+            object.mapDecimal["foo"] = Decimal128(123.456)
+            object.mapDecimal["bar"] = Decimal128(234.567)
+            object.mapDecimal["baz"] = Decimal128(345.678)
+        }
+        let summapDecimal = Decimal128(123.456) + Decimal128(234.567) + Decimal128(345.678)
+        assertQuery(predicate: "mapDecimal.@sum > %@", values: [Decimal128(345.678)], expectedCount: 1) {
+            $0.mapDecimal.sum > Decimal128(345.678)
+        }
+
+        assertQuery(predicate: "mapDecimal.@sum < %@", values: [Decimal128(345.678)], expectedCount: 0) {
+            $0.mapDecimal.sum < Decimal128(345.678)
+        }
+
+        assertQuery(predicate: "mapDecimal.@sum == %@", values: [Decimal128(345.678)], expectedCount: 0) {
+            $0.mapDecimal.sum == Decimal128(345.678)
+        }
+
+        assertQuery(predicate: "mapDecimal.@sum == %@", values: [summapDecimal], expectedCount: 1) {
+            $0.mapDecimal.sum == summapDecimal
+        }
+
+        assertQuery(predicate: "mapDecimal.@sum >= %@", values: [Decimal128(345.678)], expectedCount: 1) {
+            $0.mapDecimal.sum >= Decimal128(345.678)
+        }
+
+        assertQuery(predicate: "mapDecimal.@sum >= %@", values: [summapDecimal], expectedCount: 1) {
+            $0.mapDecimal.sum >= summapDecimal
+        }
+
+        assertQuery(predicate: "mapDecimal.@sum <= %@", values: [Decimal128(345.678)], expectedCount: 0) {
+            $0.mapDecimal.sum <= Decimal128(345.678)
+        }
+
+        assertQuery(predicate: "mapDecimal.@sum <= %@", values: [summapDecimal], expectedCount: 1) {
+            $0.mapDecimal.sum <= summapDecimal
+        }
+
+        assertQuery(predicate: "mapDecimal.@sum != %@", values: [summapDecimal], expectedCount: 0) {
+            $0.mapDecimal.sum != summapDecimal
+        }
+
+        assertQuery(predicate: "mapDecimal.@sum != %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.mapDecimal.sum != Decimal128(123.456)
+        }
+
+        try! realm.write {
+            object.mapOptInt["foo"] = 1
+            object.mapOptInt["bar"] = 2
+            object.mapOptInt["baz"] = 3
+        }
+        let summapOptInt = 1 + 2 + 3
+        assertQuery(predicate: "mapOptInt.@sum > %@", values: [3], expectedCount: 1) {
+            $0.mapOptInt.sum > 3
+        }
+
+        assertQuery(predicate: "mapOptInt.@sum < %@", values: [3], expectedCount: 0) {
+            $0.mapOptInt.sum < 3
+        }
+
+        assertQuery(predicate: "mapOptInt.@sum == %@", values: [3], expectedCount: 0) {
+            $0.mapOptInt.sum == 3
+        }
+
+        assertQuery(predicate: "mapOptInt.@sum == %@", values: [summapOptInt], expectedCount: 1) {
+            $0.mapOptInt.sum == summapOptInt
+        }
+
+        assertQuery(predicate: "mapOptInt.@sum >= %@", values: [3], expectedCount: 1) {
+            $0.mapOptInt.sum >= 3
+        }
+
+        assertQuery(predicate: "mapOptInt.@sum >= %@", values: [summapOptInt], expectedCount: 1) {
+            $0.mapOptInt.sum >= summapOptInt
+        }
+
+        assertQuery(predicate: "mapOptInt.@sum <= %@", values: [3], expectedCount: 0) {
+            $0.mapOptInt.sum <= 3
+        }
+
+        assertQuery(predicate: "mapOptInt.@sum <= %@", values: [summapOptInt], expectedCount: 1) {
+            $0.mapOptInt.sum <= summapOptInt
+        }
+
+        assertQuery(predicate: "mapOptInt.@sum != %@", values: [summapOptInt], expectedCount: 0) {
+            $0.mapOptInt.sum != summapOptInt
+        }
+
+        assertQuery(predicate: "mapOptInt.@sum != %@", values: [1], expectedCount: 1) {
+            $0.mapOptInt.sum != 1
+        }
+
+        try! realm.write {
+            object.mapOptInt8["foo"] = Int8(8)
+            object.mapOptInt8["bar"] = Int8(9)
+            object.mapOptInt8["baz"] = Int8(10)
+        }
+        let summapOptInt8 = Int8(8) + Int8(9) + Int8(10)
+        assertQuery(predicate: "mapOptInt8.@sum > %@", values: [Int8(10)], expectedCount: 1) {
+            $0.mapOptInt8.sum > Int8(10)
+        }
+
+        assertQuery(predicate: "mapOptInt8.@sum < %@", values: [Int8(10)], expectedCount: 0) {
+            $0.mapOptInt8.sum < Int8(10)
+        }
+
+        assertQuery(predicate: "mapOptInt8.@sum == %@", values: [Int8(10)], expectedCount: 0) {
+            $0.mapOptInt8.sum == Int8(10)
+        }
+
+        assertQuery(predicate: "mapOptInt8.@sum == %@", values: [summapOptInt8], expectedCount: 1) {
+            $0.mapOptInt8.sum == summapOptInt8
+        }
+
+        assertQuery(predicate: "mapOptInt8.@sum >= %@", values: [Int8(10)], expectedCount: 1) {
+            $0.mapOptInt8.sum >= Int8(10)
+        }
+
+        assertQuery(predicate: "mapOptInt8.@sum >= %@", values: [summapOptInt8], expectedCount: 1) {
+            $0.mapOptInt8.sum >= summapOptInt8
+        }
+
+        assertQuery(predicate: "mapOptInt8.@sum <= %@", values: [Int8(10)], expectedCount: 0) {
+            $0.mapOptInt8.sum <= Int8(10)
+        }
+
+        assertQuery(predicate: "mapOptInt8.@sum <= %@", values: [summapOptInt8], expectedCount: 1) {
+            $0.mapOptInt8.sum <= summapOptInt8
+        }
+
+        assertQuery(predicate: "mapOptInt8.@sum != %@", values: [summapOptInt8], expectedCount: 0) {
+            $0.mapOptInt8.sum != summapOptInt8
+        }
+
+        assertQuery(predicate: "mapOptInt8.@sum != %@", values: [Int8(8)], expectedCount: 1) {
+            $0.mapOptInt8.sum != Int8(8)
+        }
+
+        try! realm.write {
+            object.mapOptInt16["foo"] = Int16(16)
+            object.mapOptInt16["bar"] = Int16(17)
+            object.mapOptInt16["baz"] = Int16(18)
+        }
+        let summapOptInt16 = Int16(16) + Int16(17) + Int16(18)
+        assertQuery(predicate: "mapOptInt16.@sum > %@", values: [Int16(18)], expectedCount: 1) {
+            $0.mapOptInt16.sum > Int16(18)
+        }
+
+        assertQuery(predicate: "mapOptInt16.@sum < %@", values: [Int16(18)], expectedCount: 0) {
+            $0.mapOptInt16.sum < Int16(18)
+        }
+
+        assertQuery(predicate: "mapOptInt16.@sum == %@", values: [Int16(18)], expectedCount: 0) {
+            $0.mapOptInt16.sum == Int16(18)
+        }
+
+        assertQuery(predicate: "mapOptInt16.@sum == %@", values: [summapOptInt16], expectedCount: 1) {
+            $0.mapOptInt16.sum == summapOptInt16
+        }
+
+        assertQuery(predicate: "mapOptInt16.@sum >= %@", values: [Int16(18)], expectedCount: 1) {
+            $0.mapOptInt16.sum >= Int16(18)
+        }
+
+        assertQuery(predicate: "mapOptInt16.@sum >= %@", values: [summapOptInt16], expectedCount: 1) {
+            $0.mapOptInt16.sum >= summapOptInt16
+        }
+
+        assertQuery(predicate: "mapOptInt16.@sum <= %@", values: [Int16(18)], expectedCount: 0) {
+            $0.mapOptInt16.sum <= Int16(18)
+        }
+
+        assertQuery(predicate: "mapOptInt16.@sum <= %@", values: [summapOptInt16], expectedCount: 1) {
+            $0.mapOptInt16.sum <= summapOptInt16
+        }
+
+        assertQuery(predicate: "mapOptInt16.@sum != %@", values: [summapOptInt16], expectedCount: 0) {
+            $0.mapOptInt16.sum != summapOptInt16
+        }
+
+        assertQuery(predicate: "mapOptInt16.@sum != %@", values: [Int16(16)], expectedCount: 1) {
+            $0.mapOptInt16.sum != Int16(16)
+        }
+
+        try! realm.write {
+            object.mapOptInt32["foo"] = Int32(32)
+            object.mapOptInt32["bar"] = Int32(33)
+            object.mapOptInt32["baz"] = Int32(34)
+        }
+        let summapOptInt32 = Int32(32) + Int32(33) + Int32(34)
+        assertQuery(predicate: "mapOptInt32.@sum > %@", values: [Int32(34)], expectedCount: 1) {
+            $0.mapOptInt32.sum > Int32(34)
+        }
+
+        assertQuery(predicate: "mapOptInt32.@sum < %@", values: [Int32(34)], expectedCount: 0) {
+            $0.mapOptInt32.sum < Int32(34)
+        }
+
+        assertQuery(predicate: "mapOptInt32.@sum == %@", values: [Int32(34)], expectedCount: 0) {
+            $0.mapOptInt32.sum == Int32(34)
+        }
+
+        assertQuery(predicate: "mapOptInt32.@sum == %@", values: [summapOptInt32], expectedCount: 1) {
+            $0.mapOptInt32.sum == summapOptInt32
+        }
+
+        assertQuery(predicate: "mapOptInt32.@sum >= %@", values: [Int32(34)], expectedCount: 1) {
+            $0.mapOptInt32.sum >= Int32(34)
+        }
+
+        assertQuery(predicate: "mapOptInt32.@sum >= %@", values: [summapOptInt32], expectedCount: 1) {
+            $0.mapOptInt32.sum >= summapOptInt32
+        }
+
+        assertQuery(predicate: "mapOptInt32.@sum <= %@", values: [Int32(34)], expectedCount: 0) {
+            $0.mapOptInt32.sum <= Int32(34)
+        }
+
+        assertQuery(predicate: "mapOptInt32.@sum <= %@", values: [summapOptInt32], expectedCount: 1) {
+            $0.mapOptInt32.sum <= summapOptInt32
+        }
+
+        assertQuery(predicate: "mapOptInt32.@sum != %@", values: [summapOptInt32], expectedCount: 0) {
+            $0.mapOptInt32.sum != summapOptInt32
+        }
+
+        assertQuery(predicate: "mapOptInt32.@sum != %@", values: [Int32(32)], expectedCount: 1) {
+            $0.mapOptInt32.sum != Int32(32)
+        }
+
+        try! realm.write {
+            object.mapOptInt64["foo"] = Int64(64)
+            object.mapOptInt64["bar"] = Int64(65)
+            object.mapOptInt64["baz"] = Int64(66)
+        }
+        let summapOptInt64 = Int64(64) + Int64(65) + Int64(66)
+        assertQuery(predicate: "mapOptInt64.@sum > %@", values: [Int64(66)], expectedCount: 1) {
+            $0.mapOptInt64.sum > Int64(66)
+        }
+
+        assertQuery(predicate: "mapOptInt64.@sum < %@", values: [Int64(66)], expectedCount: 0) {
+            $0.mapOptInt64.sum < Int64(66)
+        }
+
+        assertQuery(predicate: "mapOptInt64.@sum == %@", values: [Int64(66)], expectedCount: 0) {
+            $0.mapOptInt64.sum == Int64(66)
+        }
+
+        assertQuery(predicate: "mapOptInt64.@sum == %@", values: [summapOptInt64], expectedCount: 1) {
+            $0.mapOptInt64.sum == summapOptInt64
+        }
+
+        assertQuery(predicate: "mapOptInt64.@sum >= %@", values: [Int64(66)], expectedCount: 1) {
+            $0.mapOptInt64.sum >= Int64(66)
+        }
+
+        assertQuery(predicate: "mapOptInt64.@sum >= %@", values: [summapOptInt64], expectedCount: 1) {
+            $0.mapOptInt64.sum >= summapOptInt64
+        }
+
+        assertQuery(predicate: "mapOptInt64.@sum <= %@", values: [Int64(66)], expectedCount: 0) {
+            $0.mapOptInt64.sum <= Int64(66)
+        }
+
+        assertQuery(predicate: "mapOptInt64.@sum <= %@", values: [summapOptInt64], expectedCount: 1) {
+            $0.mapOptInt64.sum <= summapOptInt64
+        }
+
+        assertQuery(predicate: "mapOptInt64.@sum != %@", values: [summapOptInt64], expectedCount: 0) {
+            $0.mapOptInt64.sum != summapOptInt64
+        }
+
+        assertQuery(predicate: "mapOptInt64.@sum != %@", values: [Int64(64)], expectedCount: 1) {
+            $0.mapOptInt64.sum != Int64(64)
+        }
+
+        try! realm.write {
+            object.mapOptFloat["foo"] = Float(5.5544)
+            object.mapOptFloat["bar"] = Float(6.5544)
+            object.mapOptFloat["baz"] = Float(7.5544)
+        }
+        let summapOptFloat = Float(5.5544) + Float(6.5544) + Float(7.5544)
+        assertQuery(predicate: "mapOptFloat.@sum > %@", values: [Float(7.5544)], expectedCount: 1) {
+            $0.mapOptFloat.sum > Float(7.5544)
+        }
+
+        assertQuery(predicate: "mapOptFloat.@sum < %@", values: [Float(7.5544)], expectedCount: 0) {
+            $0.mapOptFloat.sum < Float(7.5544)
+        }
+
+        assertQuery(predicate: "mapOptFloat.@sum == %@", values: [Float(7.5544)], expectedCount: 0) {
+            $0.mapOptFloat.sum == Float(7.5544)
+        }
+
+        assertQuery(predicate: "mapOptFloat.@sum == %@", values: [summapOptFloat], expectedCount: 1) {
+            $0.mapOptFloat.sum == summapOptFloat
+        }
+
+        assertQuery(predicate: "mapOptFloat.@sum >= %@", values: [Float(7.5544)], expectedCount: 1) {
+            $0.mapOptFloat.sum >= Float(7.5544)
+        }
+
+        assertQuery(predicate: "mapOptFloat.@sum >= %@", values: [summapOptFloat], expectedCount: 1) {
+            $0.mapOptFloat.sum >= summapOptFloat
+        }
+
+        assertQuery(predicate: "mapOptFloat.@sum <= %@", values: [Float(7.5544)], expectedCount: 0) {
+            $0.mapOptFloat.sum <= Float(7.5544)
+        }
+
+        assertQuery(predicate: "mapOptFloat.@sum <= %@", values: [summapOptFloat], expectedCount: 1) {
+            $0.mapOptFloat.sum <= summapOptFloat
+        }
+
+        assertQuery(predicate: "mapOptFloat.@sum != %@", values: [summapOptFloat], expectedCount: 0) {
+            $0.mapOptFloat.sum != summapOptFloat
+        }
+
+        assertQuery(predicate: "mapOptFloat.@sum != %@", values: [Float(5.5544)], expectedCount: 1) {
+            $0.mapOptFloat.sum != Float(5.5544)
+        }
+
+        try! realm.write {
+            object.mapOptDouble["foo"] = 123.456
+            object.mapOptDouble["bar"] = 234.567
+            object.mapOptDouble["baz"] = 345.678
+        }
+        let summapOptDouble = 123.456 + 234.567 + 345.678
+        assertQuery(predicate: "mapOptDouble.@sum > %@", values: [345.678], expectedCount: 1) {
+            $0.mapOptDouble.sum > 345.678
+        }
+
+        assertQuery(predicate: "mapOptDouble.@sum < %@", values: [345.678], expectedCount: 0) {
+            $0.mapOptDouble.sum < 345.678
+        }
+
+        assertQuery(predicate: "mapOptDouble.@sum == %@", values: [345.678], expectedCount: 0) {
+            $0.mapOptDouble.sum == 345.678
+        }
+
+        assertQuery(predicate: "mapOptDouble.@sum == %@", values: [summapOptDouble], expectedCount: 1) {
+            $0.mapOptDouble.sum == summapOptDouble
+        }
+
+        assertQuery(predicate: "mapOptDouble.@sum >= %@", values: [345.678], expectedCount: 1) {
+            $0.mapOptDouble.sum >= 345.678
+        }
+
+        assertQuery(predicate: "mapOptDouble.@sum >= %@", values: [summapOptDouble], expectedCount: 1) {
+            $0.mapOptDouble.sum >= summapOptDouble
+        }
+
+        assertQuery(predicate: "mapOptDouble.@sum <= %@", values: [345.678], expectedCount: 0) {
+            $0.mapOptDouble.sum <= 345.678
+        }
+
+        assertQuery(predicate: "mapOptDouble.@sum <= %@", values: [summapOptDouble], expectedCount: 1) {
+            $0.mapOptDouble.sum <= summapOptDouble
+        }
+
+        assertQuery(predicate: "mapOptDouble.@sum != %@", values: [summapOptDouble], expectedCount: 0) {
+            $0.mapOptDouble.sum != summapOptDouble
+        }
+
+        assertQuery(predicate: "mapOptDouble.@sum != %@", values: [123.456], expectedCount: 1) {
+            $0.mapOptDouble.sum != 123.456
+        }
+
+        try! realm.write {
+            object.mapOptDecimal["foo"] = Decimal128(123.456)
+            object.mapOptDecimal["bar"] = Decimal128(234.567)
+            object.mapOptDecimal["baz"] = Decimal128(345.678)
+        }
+        let summapOptDecimal = Decimal128(123.456) + Decimal128(234.567) + Decimal128(345.678)
+        assertQuery(predicate: "mapOptDecimal.@sum > %@", values: [Decimal128(345.678)], expectedCount: 1) {
+            $0.mapOptDecimal.sum > Decimal128(345.678)
+        }
+
+        assertQuery(predicate: "mapOptDecimal.@sum < %@", values: [Decimal128(345.678)], expectedCount: 0) {
+            $0.mapOptDecimal.sum < Decimal128(345.678)
+        }
+
+        assertQuery(predicate: "mapOptDecimal.@sum == %@", values: [Decimal128(345.678)], expectedCount: 0) {
+            $0.mapOptDecimal.sum == Decimal128(345.678)
+        }
+
+        assertQuery(predicate: "mapOptDecimal.@sum == %@", values: [summapOptDecimal], expectedCount: 1) {
+            $0.mapOptDecimal.sum == summapOptDecimal
+        }
+
+        assertQuery(predicate: "mapOptDecimal.@sum >= %@", values: [Decimal128(345.678)], expectedCount: 1) {
+            $0.mapOptDecimal.sum >= Decimal128(345.678)
+        }
+
+        assertQuery(predicate: "mapOptDecimal.@sum >= %@", values: [summapOptDecimal], expectedCount: 1) {
+            $0.mapOptDecimal.sum >= summapOptDecimal
+        }
+
+        assertQuery(predicate: "mapOptDecimal.@sum <= %@", values: [Decimal128(345.678)], expectedCount: 0) {
+            $0.mapOptDecimal.sum <= Decimal128(345.678)
+        }
+
+        assertQuery(predicate: "mapOptDecimal.@sum <= %@", values: [summapOptDecimal], expectedCount: 1) {
+            $0.mapOptDecimal.sum <= summapOptDecimal
+        }
+
+        assertQuery(predicate: "mapOptDecimal.@sum != %@", values: [summapOptDecimal], expectedCount: 0) {
+            $0.mapOptDecimal.sum != summapOptDecimal
+        }
+
+        assertQuery(predicate: "mapOptDecimal.@sum != %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.mapOptDecimal.sum != Decimal128(123.456)
+        }
+    }
+
+    // @Count
 
     func testCollectionAggregatesCount() {
         let realm = realmWithTestPath()
@@ -12546,7 +15490,7 @@ class QueryTests: TestCase {
         }
     }
 
-    // MARK: Keypath Collection Aggregations
+    // MARK: - Keypath Collection Aggregations
 
     func testKeypathCollectionAggregatesAvg() {
         let realm = realmWithTestPath()
