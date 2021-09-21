@@ -14866,4 +14866,26 @@ class QueryTests: TestCase {
             $0.arrayCol.optDecimalCol.max != Decimal128(123.456)
         }
     }
+
+    func testAggregateNotSupported() {
+        let queryAvg: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>) = {
+            $0.intCol.avg == 1
+        }
+        assertThrows(queryAvg(Query<ModernAllTypesObject>())._constructPredicate(), reason: "Could not aggregate `.@avg`, property is not within a collection.")
+
+        let queryMax: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>) = {
+            $0.doubleCol.max != 1
+        }
+        assertThrows(queryMax(Query<ModernAllTypesObject>())._constructPredicate(), reason: "Could not aggregate `.@max`, property is not within a collection.")
+
+        let queryMin: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>) = {
+            $0.dateCol.min > Date()
+        }
+        assertThrows(queryMin(Query<ModernAllTypesObject>())._constructPredicate(), reason: "Could not aggregate `.@min`, property is not within a collection.")
+
+        let querySum: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>) = {
+            $0.decimalCol.sum < 1
+        }
+        assertThrows(querySum(Query<ModernAllTypesObject>())._constructPredicate(), reason: "Could not aggregate `.@sum`, property is not within a collection.")
+    }
 }

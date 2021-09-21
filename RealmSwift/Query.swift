@@ -347,7 +347,13 @@ public struct Query<T: _RealmSchemaDiscoverable> {
             case let .collectionAggregation(agg):
                 predicateString.append(agg.rawValue)
             case let .keypathCollectionAggregation(agg):
-                predicateString.insert(agg.rawValue, at: predicateString.count-2)
+                if idx-2 >= 0,
+                   case let .keyPath(_, isCollection) = tokens[idx-2],
+                   isCollection {
+                    predicateString.insert(agg.rawValue, at: predicateString.count-2)
+                } else {
+                    throwRealmException("Could not aggregate `\(agg.rawValue)`, property is not within a collection.")
+                }
             case let .special(s):
                 switch s {
                 case .openParentheses:
@@ -464,26 +470,32 @@ extension Query where T: RealmCollection, T.Element: OptionalProtocol, T.Element
 }
 
 extension Query where T: RealmCollection, T.Element: _QueryNumeric {
+    /// :nodoc:
     public static func == <V>(_ lhs: Query<T>, _ rhs: T.Element) -> Query<V> {
         return lhs.append(tokens: [.basicComparison(.equal), .rhs(rhs)])
     }
 
+    /// :nodoc:
     public static func != <V>(_ lhs: Query<T>, _ rhs: T.Element) -> Query<V> {
         return lhs.append(tokens: [.basicComparison(.notEqual), .rhs(rhs)])
     }
 
+    /// :nodoc:
     public static func > <V>(_ lhs: Query<T>, _ rhs: T.Element) -> Query<V> {
         return lhs.append(tokens: [.basicComparison(.greaterThan), .rhs(rhs)])
     }
 
+    /// :nodoc:
     public static func >= <V>(_ lhs: Query<T>, _ rhs: T.Element) -> Query<V> {
         return lhs.append(tokens: [.basicComparison(.greaterThenOrEqual), .rhs(rhs)])
     }
 
+    /// :nodoc:
     public static func < <V>(_ lhs: Query<T>, _ rhs: T.Element) -> Query<V> {
         return lhs.append(tokens: [.basicComparison(.lessThan), .rhs(rhs)])
     }
 
+    /// :nodoc:
     public static func <= <V>(_ lhs: Query<T>, _ rhs: T.Element) -> Query<V> {
         return lhs.append(tokens: [.basicComparison(.lessThanOrEqual), .rhs(rhs)])
     }
