@@ -89,6 +89,8 @@ class ListTests: TestCase {
         XCTAssertEqual(obj.int.index(of: 6), 1)
         XCTAssertEqual(2, obj.int.index(matching: NSPredicate(format: "self == 7")))
         XCTAssertNil(obj.int.index(matching: NSPredicate(format: "self == 9")))
+        XCTAssertEqual(2, obj.int.index(matching: { $0 == 7 && $0 < 456 }))
+        XCTAssertNil(obj.int.index(matching: { $0 == 9 }))
         XCTAssertEqual(obj.int.max(), 8)
         XCTAssertEqual(obj.int.sum(), 26)
 

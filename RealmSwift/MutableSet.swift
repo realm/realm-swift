@@ -749,6 +749,11 @@ extension MutableSet: RealmCollection {
     }
 
     /// :nodoc:
+    public func index(matching query: ((Query<Element>) -> Query<Element>)) -> Int? {
+        fatalError("index(matching:) is not available on MutableSet")
+    }
+
+    /// :nodoc:
     public func objects(at indexes: IndexSet) -> [Element] {
         fatalError("objects(at indexes:) is not available on MutableSet")
     }

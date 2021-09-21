@@ -5,6 +5,27 @@ x.y.z Release notes (yyyy-MM-dd)
 * Add `async` versions for `EmailPasswordAuth.callResetPasswordFunction` and `User.linkUser` methods.
 * Add `async` version for `MongoCollection` methods.
 * Add `async` support for user functions.
+* Add an api for a type safe query syntax. This allows you to filter a Realm and collections managed by a Realm
+  with Swift style expressions. Here is a brief example:
+  ```swift
+  class Foo: Object {
+    @Persisted var name: String
+    @Persisted var age: String
+  }
+  class Person: Object {
+    @Persisted var stringList: List<String>
+    @Persisted var fooList: List<Foo>
+    @Persisted var foo: Foo
+  }
+
+  let persons = realm.objects(Person.self).where {
+    $0.stringList.contains("bar") || $0.stringList.contains("foo")
+  }
+
+  persons = realm.objects(Person.self).where {
+    (($0.fooList.age >= 21).count > 0) && $0.foo.name.starts(with: "L")
+  }
+  ```([Cocoa #7419](https://github.com/realm/realm-cocoa/pull/7419), since v10.?)
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)

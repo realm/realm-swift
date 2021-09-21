@@ -161,12 +161,26 @@ public struct Query<T: _RealmSchemaDiscoverable> {
     private var expression: [QueryExpression] = []
     // Indicates if we need a closing parentheses after a map subscript expression.
     private var mapSubscriptNeedsResolution = false
+    private var isPrimitive = false
 
-    /// :nodoc:
-    public init() { }
-    private init(expression: [QueryExpression], mapSubscriptNeedsResolution: Bool = false) {
+
+    /// Initializes a `Query` object.
+    /// - Parameter isPrimitive: States is the query is on 'self' and will have no key path context.
+    public init(isPrimitive: Bool=false) {
+        self.isPrimitive = isPrimitive
+        if isPrimitive {
+            expression.append(.keyPath(name: "self", isCollection: false))
+        }
+    }
+    private init(expression: [QueryExpression],
+                 mapSubscriptNeedsResolution: Bool = false,
+                 isPrimitive: Bool = false) {
         self.expression = expression
         self.mapSubscriptNeedsResolution = mapSubscriptNeedsResolution
+        self.isPrimitive = isPrimitive
+        if isPrimitive {
+            self.expression.append(.keyPath(name: "self", isCollection: false))
+        }
     }
 
     private func append<V>(expression: [QueryExpression]) -> Query<V> {
@@ -181,7 +195,8 @@ public struct Query<T: _RealmSchemaDiscoverable> {
             needsResolution = false
         }
         return Query<V>(expression: self.expression + copy,
-                        mapSubscriptNeedsResolution: needsResolution)
+                        mapSubscriptNeedsResolution: needsResolution,
+                        isPrimitive: isPrimitive)
     }
 
     // MARK: Prefix
@@ -286,6 +301,9 @@ public struct Query<T: _RealmSchemaDiscoverable> {
             str += "]"
             return str
         }
+
+        // Where an expression is performed on 'self' we need to manually
+        // insert the 'self
 
         for (idx, token) in expression.enumerated() {
             switch token {

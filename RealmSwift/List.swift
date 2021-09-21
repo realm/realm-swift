@@ -95,6 +95,16 @@ public final class List<Element: RealmCollectionValue>: RLMSwiftCollectionBase {
         return notFoundToNil(index: rlmArray.indexOfObject(with: predicate))
     }
 
+    /**
+     Returns the index of the first object in the list matching the query, or `nil` if no objects match.
+
+     - parameter query: The query with which to filter the objects.
+    */
+    public func index(matching query: ((Query<Element>) -> Query<Element>)) -> Int? {
+        let isPrimitive = rlmArray.type != .object
+        return index(matching: query(Query(isPrimitive: isPrimitive)).predicate)
+    }
+
     // MARK: Object Retrieval
 
     /**

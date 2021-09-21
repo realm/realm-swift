@@ -212,6 +212,12 @@ class RealmCollectionTypeTests: TestCase {
         XCTAssertNil(collection.index(matching: pred3))
     }
 
+    func testIndexOfQuery() {
+        XCTAssertEqual(0, collection.index(matching: { $0.stringCol == "1" })!)
+        XCTAssertEqual(1, collection.index(matching: { $0.stringCol == "2" })!)
+        XCTAssertNil(collection.index(matching: { $0.stringCol == "3" }))
+    }
+
     func testIndexOfFormat() {
         XCTAssertEqual(0, collection.index(matching: "stringCol = '1'")!)
         XCTAssertEqual(0, collection.index(matching: "stringCol = %@", "1")!)

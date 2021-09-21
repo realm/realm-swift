@@ -312,6 +312,13 @@ public protocol RealmCollection: RealmCollectionBase {
     func index(matching predicate: NSPredicate) -> Int?
 
     /**
+     Returns the index of the first object matching the query, or `nil` if no objects match.
+
+     - parameter query: The query to use to filter the objects.
+     */
+    func index(matching query: ((Query<Element>) -> Query<Element>)) -> Int?
+
+    /**
      Returns the index of the first object matching the predicate, or `nil` if no objects match.
 
      - parameter predicateFormat: A predicate format string, optionally followed by a variable number of arguments.
@@ -1020,6 +1027,7 @@ private class _AnyRealmCollectionBase<T: RealmCollectionValue>: AssistedObjectiv
     var description: String { fatalError() }
     func index(of object: Element) -> Int? { fatalError() }
     func index(matching predicate: NSPredicate) -> Int? { fatalError() }
+    func index(matching query: ((Query<Element>) -> Query<Element>)) -> Int? { fatalError() }
     func objects(at indexes: IndexSet) -> [Element] { fatalError() }
     func filter(_ predicate: NSPredicate) -> Results<Element> { fatalError() }
     func query(_ query: ((Query<Element>) -> Query<Element>)) -> Results<Element> { fatalError() }
@@ -1070,6 +1078,8 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
     override func index(of object: C.Element) -> Int? { return base.index(of: object) }
 
     override func index(matching predicate: NSPredicate) -> Int? { return base.index(matching: predicate) }
+
+    override func index(matching query: ((Query<Element>) -> Query<Element>)) -> Int? { return base.index(matching: query) }
 
     // MARK: Object Retrieval
 
@@ -1247,6 +1257,12 @@ public struct AnyRealmCollection<Element: RealmCollectionValue>: RealmCollection
      */
     public func index(matching predicate: NSPredicate) -> Int? { return base.index(matching: predicate) }
 
+    /**
+     Returns the index of the first object matching the given query, or `nil` if no objects match.
+
+     - parameter query: The query with which to filter the objects.
+     */
+    public func index(matching query: ((Query<Element>) -> Query<Element>)) -> Int? { return base.index(matching: query) }
 
     // MARK: Object Retrieval
 
