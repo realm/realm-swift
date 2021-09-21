@@ -548,9 +548,8 @@ class ThreadSafeWrapperTests: ThreadSafeReferenceTests {
     }
 
     func testThreadSafeWrapperToMap() {
-        let realm = try! Realm()
         let testStruct = TestThreadSafeWrapperStruct()
-
+        let realm = try! Realm()
         try! realm.write {
             let mapObject = SwiftMapObject()
             mapObject.object["before"] = realm.create(SwiftStringObject.self, value: ["stringCol": "first"])
