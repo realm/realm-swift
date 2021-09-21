@@ -2144,4 +2144,48 @@ class ManagedMapPublisherTests: TestCase {
     }
 }
 
+// MARK: - Projection
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+private class CombineProjectionPublisherTests: CombinePublisherTestCase {
+    
+    override class var defaultTestSuite: XCTestSuite {
+        if hasCombine() {
+            return super.defaultTestSuite
+        }
+        return XCTestSuite(name: "\(type(of: self))")
+    }
+
+    var obj: SimpleObject!
+    var proj: SimpleProjection!
+    
+    override func setUp() {
+        super.setUp()
+        try! realm.write {
+            obj = realm.create(SimpleObject.self)
+        }
+        proj = realm.objects(SimpleProjection.self).first!
+    }
+
+    func testWillChange() {
+        let exp = XCTestExpectation()
+        cancellable = proj.objectWillChange.sink {
+            exp.fulfill()
+        }
+        try! realm.write { obj.int = 1 }
+        wait(for: [exp], timeout: 1)
+    }
+
+    func testWillChangeWithToken() {
+        let exp = XCTestExpectation()
+        cancellable = proj
+            .objectWillChange
+            .saveToken(on: self, at: \.notificationToken)
+            .sink {
+            exp.fulfill()
+        }
+        XCTAssertNotNil(notificationToken)
+        try! realm.write { obj.int = 1 }
+    }
+}
+
 #endif // canImport(Combine)

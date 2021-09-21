@@ -18,6 +18,9 @@
 
 import Realm
 import Realm.Private
+#if canImport(Combine)
+import Combine
+#endif
 
 fileprivate protocol AnyProjected {
     var projectedKeyPath: AnyKeyPath { get }
@@ -521,3 +524,28 @@ extension Projection: AssistedObjectiveCBridgeable {
         return self.rootObject.bridged
     }
 }
+
+#if canImport(Combine)
+// MARK: - RealmSubscribable
+
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+extension Projection: ObservableObject, RealmSubscribable {
+    /// A publisher that emits Void each time the projection changes.
+    ///
+    /// Despite the name, this actually emits *after* the projection has changed.
+    public var objectWillChange: RealmPublishers.WillChange<Projection> {
+        RealmPublishers.WillChange(self)
+    }
+
+    /// :nodoc:
+    public func _observe<S>(_ keyPaths: [String]?, on queue: DispatchQueue?, _ subscriber: S) -> NotificationToken //where Projection<Root> : S.Input, S : Subscriber, S.Failure == Error {
+    where S.Input: Projection<Root>, S: Subscriber, S.Failure == Error {
+        fatalError()
+    }
+    
+    /// :nodoc:
+    public func _observe<S>(_ keyPaths: [String]?, _ subscriber: S) -> NotificationToken where S : Subscriber, S.Failure == Never, S.Input == Void {
+        fatalError()
+    }
+}
+#endif
