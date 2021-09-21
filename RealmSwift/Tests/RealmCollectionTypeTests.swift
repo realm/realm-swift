@@ -1846,6 +1846,8 @@ class MutableSetRealmCollectionTypeTests: RealmCollectionTypeTests {
 
     override func testIndexOfPredicate() { }
 
+    override func testIndexOfQuery() { }
+
     override func testSubscript() { }
 
     override func testObjectsAtIndexes() { }
