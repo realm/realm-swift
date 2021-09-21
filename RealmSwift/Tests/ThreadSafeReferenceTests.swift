@@ -336,7 +336,7 @@ struct TestThreadSafeWrapperStruct {
     @ThreadSafe var stringObject: SwiftStringObject?
     @ThreadSafe var intObject: SwiftIntObject?
     @ThreadSafe var employees: List<SwiftEmployeeObject>?
-    @ThreadSafe var mapObject: SwiftMapObject?
+    @ThreadSafe var stringMap: Map<String, SwiftStringObject?>?
     @ThreadSafe var employeeSet: MutableSet<SwiftEmployeeObject>?
     @ThreadSafe var owners: LinkingObjects<SwiftOwnerObject>?
     @ThreadSafe var results: Results<SwiftStringObject>?
@@ -548,25 +548,27 @@ class ThreadSafeWrapperTests: ThreadSafeReferenceTests {
     }
 
     func testThreadSafeWrapperToMap() {
-        // create map
         let realm = try! Realm()
         let testStruct = TestThreadSafeWrapperStruct()
+
         try! realm.write {
-            let mapObj = SwiftMapObject()
-            realm.add(mapObj)
-            mapObj.int["zero"] = 0
-            testStruct.mapObject = mapObj
+            let mapObject = SwiftMapObject()
+            mapObject.object["before"] = realm.create(SwiftStringObject.self, value: ["stringCol": "first"])
+            realm.add(mapObject)
+            testStruct.stringMap = mapObject.object
         }
         dispatchSyncNewThread {
-            XCTAssertEqual(testStruct.mapObject?.int.count, 1)
-            XCTAssertEqual(testStruct.mapObject?.int["zero"]!, 0)
-            try! Realm().write {
-                testStruct.mapObject?.int["one"] = 1
+            XCTAssertEqual(testStruct.stringMap?.count, 1)
+            XCTAssertEqual(testStruct.stringMap?["before"]??.stringCol, "first")
+            let realm = try! Realm()
+            try! realm.write {
+                let swiftStringObject = realm.create(SwiftStringObject.self, value: ["stringCol": "second"])
+                testStruct.stringMap!["after"] = swiftStringObject
             }
         }
-        XCTAssertEqual(testStruct.mapObject?.int.count, 2)
-        XCTAssertEqual(testStruct.mapObject?.int["zero"]!, 0)
-        XCTAssertEqual(testStruct.mapObject?.int["one"]!, 1)
+        XCTAssertEqual(testStruct.stringMap?.count, 2)
+        XCTAssertEqual(testStruct.stringMap?["before"]??.stringCol, "first")
+        XCTAssertEqual(testStruct.stringMap?["after"]??.stringCol, "second")
     }
 
     func testThreadSafeWrapperToMutableSet() {
