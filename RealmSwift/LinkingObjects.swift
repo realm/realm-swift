@@ -96,6 +96,15 @@ import Realm
         return notFoundToNil(index: rlmResults.indexOfObject(with: predicate))
     }
 
+    /**
+     Returns the index of the first object matching the given query, or `nil` if no objects match.
+
+     - parameter query: The query with which to filter the objects.
+     */
+    public func index(matching query: ((Query<Element>) -> Query<Element>)) -> Int? {
+        return index(matching: query(Query()).predicate)
+    }
+
     // MARK: Object Retrieval
 
     /**
