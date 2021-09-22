@@ -2840,6 +2840,63 @@ class QueryTests: TestCase {
         % end
     }
 
+    func testKeypathCollectionAggregatesSum() {
+        let realm = realmWithTestPath()
+        let object = objects().first!
+        % for property in properties + optProperties:
+        % if property.enumName == None and property.category == 'numeric':
+        % if property.type != 'Date' and property.type != 'Date?':
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["${ property.colName }": ${property.value(0)}])
+            let modernObj1 = ModernAllTypesObject(value: ["${ property.colName }": ${property.value(1)}])
+            let modernObj2 = ModernAllTypesObject(value: ["${ property.colName }": ${property.value(2)}])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+
+        let sum${ property.colName } = ${property.value(0)} + ${property.value(1)} + ${property.value(2)}
+        assertQuery(predicate: "arrayCol.@sum.${ property.colName } > %@", values: [${property.value(0)}], expectedCount: 1) {
+            $0.arrayCol.${ property.colName }.sum > ${property.value(0)}
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.${ property.colName } < %@", values: [${property.value(2)}], expectedCount: 3) {
+            $0.arrayCol.${ property.colName }.sum < ${property.value(2)}
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.${ property.colName } == %@", values: [sum${ property.colName }], expectedCount: 1) {
+            $0.arrayCol.${ property.colName }.sum == sum${ property.colName }
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.${ property.colName } >= %@", values: [${property.value(2)}], expectedCount: 1) {
+            $0.arrayCol.${ property.colName }.sum >= ${property.value(2)}
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.${ property.colName } >= %@", values: [sum${ property.colName }], expectedCount: 1) {
+            $0.arrayCol.${ property.colName }.sum >= sum${ property.colName }
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.${ property.colName } <= %@", values: [${property.value(2)}], expectedCount: 3) {
+            $0.arrayCol.${ property.colName }.sum <= ${property.value(2)}
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.${ property.colName } <= %@", values: [sum${ property.colName }], expectedCount: 4) {
+            $0.arrayCol.${ property.colName }.sum <= sum${ property.colName }
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@sum.${ property.colName } != %@", values: [sum${ property.colName }], expectedCount: 3) {
+            $0.arrayCol.${ property.colName }.sum != sum${ property.colName }
+        }
+
+        assertQuery(predicate: "arrayCol.@sum.${ property.colName } != %@", values: [${property.value(0)}], expectedCount: 4) {
+            $0.arrayCol.${ property.colName }.sum != ${property.value(0)}
+        }
+        % end
+        % end
+        % end
+    }
+
     func testAggregateNotSupported() {
         let queryAvg: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>) = {
             $0.intCol.avg == 1
