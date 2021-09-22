@@ -857,7 +857,7 @@ class ObjectTests: TestCase {
         assertThrows(object.observe(keyPaths: ["arrayCol.alsoNotAProperty"], { _ in }), reason: "Property 'alsoNotAProperty' not found in object of type 'SwiftBoolObject'")
     }
 
-    func checkChange<T: Equatable, U: Equatable>(_ name: String, _ old: T?, _ new: U?, _ change: ObjectChange<ObjectBase>) {
+    func checkChange<T: Equatable, U: Equatable, O: ObjectBase>(_ name: String, _ old: T?, _ new: U?, _ change: ObjectChange<O>) {
         if case .change(_, let properties) = change {
             XCTAssertEqual(properties.count, 1)
             if let prop = properties.first {
@@ -870,7 +870,7 @@ class ObjectTests: TestCase {
         }
     }
 
-    func expectChange<T: Equatable, U: Equatable>(_ name: String, _ old: T?, _ new: U?, _ inverted: Bool = false) -> ((ObjectChange<ObjectBase>) -> Void) {
+    func expectChange<T: Equatable, U: Equatable, O: ObjectBase>(_ name: String, _ old: T?, _ new: U?, _ inverted: Bool = false) -> ((ObjectChange<O>) -> Void) {
         let exp = expectation(description: "change from \(String(describing: old)) to \(String(describing: new))")
         exp.isInverted = inverted
         return { change in
@@ -964,7 +964,7 @@ class ObjectTests: TestCase {
 
         // Expect notification for "intCol" keyPath when "intCol" is modified
         var ex = expectation(description: "expect notification")
-        var token = object.observe(keyPaths: [\SwiftObject.intCol, \SwiftObject.stringCol]) { changes in
+        var token = object.observe(keyPaths: [\.intCol, \.stringCol]) { changes in
             if case .change(_, let properties) = changes {
                 XCTAssertEqual(properties.count, 1)
                 XCTAssertEqual(properties[0].newValue as! Int, 2)
@@ -979,7 +979,7 @@ class ObjectTests: TestCase {
 
         // Expect notification for "stringCol" keyPath when "stringCol" is modified
         ex = expectation(description: "expect notification")
-        token = object.observe(keyPaths: [\SwiftObject.intCol, \SwiftObject.stringCol]) { changes in
+        token = object.observe(keyPaths: [\.intCol, \.stringCol]) { changes in
             if case .change(_, let properties) = changes {
                 XCTAssertEqual(properties.count, 1)
                 XCTAssertEqual(properties[0].newValue as! String, "new string")
@@ -1003,7 +1003,7 @@ class ObjectTests: TestCase {
         // Expect no notification for "boolCol" keypath when "intCol" is modified
         let ex = expectation(description: "no change")
         ex.isInverted = true
-        let token = object.observe(keyPaths: [\SwiftObject.boolCol, \SwiftObject.stringCol], { _ in
+        let token = object.observe(keyPaths: [\.boolCol, \.stringCol], { _ in
             ex.fulfill()
         })
         try! realm.write {

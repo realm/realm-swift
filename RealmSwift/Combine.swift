@@ -70,6 +70,30 @@ public protocol RealmSubscribable {
         -> NotificationToken where S: Subscriber, S.Input == Void, S.Failure == Never
 }
 
+
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+extension RealmSubscribable where Self: RealmCollection {
+    /// :nodoc:
+    public func _observe<S>(_ keyPaths: [String]?, on queue: DispatchQueue?, _ subscriber: S) -> NotificationToken
+    where S.Input == Self, S: Subscriber, S.Failure == Error {
+        return self._observe(keyPaths, queue, { change in
+            switch change {
+            case .initial(let collection):
+                _ = subscriber.receive(collection.unwrap())
+            case .update(let collection, _, _, _):
+                _ = subscriber.receive(collection.unwrap())
+            case .error(let error):
+                subscriber.receive(completion: .failure(error))
+            }
+        })
+    }
+
+    /// :nodoc:
+    public func _observe<S>(_ keyPaths: [String]?, _ subscriber: S) -> NotificationToken where S: Subscriber, S.Failure == Never, S.Input == Void {
+        return _observe(keyPaths, nil, { _ in _ = subscriber.receive() })
+    }
+}
+
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 extension Publisher {
     /// Freezes all Realm objects and collections emitted by the upstream publisher
@@ -319,6 +343,9 @@ extension Publisher {
 }
 
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+extension AnyRealmCollection: RealmSubscribable {}
+
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 extension RealmCollection where Self: RealmSubscribable {
     /// A publisher that emits Void each time the collection changes.
     ///
@@ -449,25 +476,20 @@ extension Realm {
 // MARK: - Object
 
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
-extension Object: ObservableObject {
+extension RealmSubscribable where Self: ObjectBase, Self: ThreadConfined {
     /// A publisher that emits Void each time the object changes.
     ///
     /// Despite the name, this actually emits *after* the object has changed.
-    public var objectWillChange: RealmPublishers.WillChange<Object> {
+    public var objectWillChange: RealmPublishers.WillChange<Self> {
         return RealmPublishers.WillChange(self)
     }
 }
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
-extension EmbeddedObject: ObservableObject {
-    /// A publisher that emits Void each time the object changes.
-    ///
-    /// Despite the name, this actually emits *after* the embedded object has changed.
-    public var objectWillChange: RealmPublishers.WillChange<EmbeddedObject> {
-        return RealmPublishers.WillChange(self)
-    }
-}
+extension ObjectBase: RealmSubscribable {}
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
-extension ObjectBase: RealmSubscribable {
+extension RealmSubscribable where Self: ObjectBase {
+
+
     /// :nodoc:
     public func _observe<S>(_ keyPaths: [String]?, on queue: DispatchQueue?, _ subscriber: S) -> NotificationToken
         where S.Input: ObjectBase, S: Subscriber, S.Failure == Error {
@@ -540,6 +562,8 @@ extension LinkingObjects: RealmSubscribable {
 
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 extension Results: RealmSubscribable {
+
+
     /// A publisher that emits Void each time the collection changes.
     ///
     /// Despite the name, this actually emits *after* the collection has changed.
@@ -547,35 +571,6 @@ extension Results: RealmSubscribable {
         RealmPublishers.WillChange(self)
     }
 }
-
-// MARK: RealmCollection
-
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
-extension RealmCollection {
-    /// :nodoc:
-    public func _observe<S>(_ keyPaths: [String]? = nil, on queue: DispatchQueue? = nil, _ subscriber: S)
-        -> NotificationToken where S: Subscriber, S.Input == Self, S.Failure == Error {
-            // FIXME: we could skip some pointless work in converting the changeset to the Swift type here
-        return observe(keyPaths: keyPaths, on: queue) { change in
-                switch change {
-                case .initial(let collection):
-                    _ = subscriber.receive(collection)
-                case .update(let collection, deletions: _, insertions: _, modifications: _):
-                    _ = subscriber.receive(collection)
-                case .error(let error):
-                    subscriber.receive(completion: .failure(error))
-                }
-            }
-    }
-
-    /// :nodoc:
-    public func _observe<S: Subscriber>(_ keyPaths: [String]? = nil, _ subscriber: S) -> NotificationToken where S.Input == Void, S.Failure == Never {
-        return observe(keyPaths: keyPaths, on: nil) { _ in _ = subscriber.receive() }
-    }
-}
-
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
-extension AnyRealmCollection: RealmSubscribable {}
 
 // MARK: RealmKeyedCollection
 
@@ -1171,7 +1166,7 @@ public enum RealmPublishers {
             let token = self.object.observe(keyPaths: self.keyPaths, on: self.queue) { change in
                 switch change {
                 case .change(let o, let properties):
-                    _ = subscriber.receive(.change(o as! O, properties))
+                    _ = subscriber.receive(.change(o, properties))
                 case .error(let error):
                     _ = subscriber.receive(.error(error))
                 case .deleted:
@@ -1261,7 +1256,7 @@ public enum RealmPublishers {
             let token = self.object.observe(on: self.queue) { change in
                 switch change {
                 case .change(let o, let properties):
-                    _ = subscriber.receive(.change(o as! O, properties))
+                    _ = subscriber.receive(.change(o, properties))
                 case .error(let error):
                     _ = subscriber.receive(.error(error))
                 case .deleted:
@@ -1441,8 +1436,15 @@ public enum RealmPublishers {
 
         /// :nodoc:
         public func receive<S>(subscriber: S) where S: Subscriber, S.Failure == Never, Output == S.Input {
-            let token = self.collection.observe(keyPaths: self.keyPaths, on: self.queue) { change in
-                _ = subscriber.receive(change)
+            let token = self.collection._observe(self.keyPaths, self.queue) { change in
+                switch change {
+                case .initial(let collection):
+                    _ = subscriber.receive(.initial(collection.unwrap()))
+                case .update(let collection, let deletions, let insertions, let modifications):
+                    _ = subscriber.receive(.update(collection.unwrap(), deletions: deletions, insertions: insertions, modifications: modifications))
+                case .error(let error):
+                    _ = subscriber.receive(.error(error))
+                }
             }
             subscriber.receive(subscription: ObservationSubscription(token: token))
         }
