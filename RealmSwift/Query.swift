@@ -531,6 +531,29 @@ extension Query where T: RealmCollection, T.Element: _QueryNumeric {
     }
 }
 
+extension Query where T: RealmCollection,
+                      T.Element: _QueryNumeric {
+    /// Returns the minimum value in the collection.
+    public var min: Query {
+        return append(expression: [.collectionAggregation(.min)])
+    }
+
+    /// Returns the maximum value in the collection.
+    public var max: Query {
+        return append(expression: [.collectionAggregation(.max)])
+    }
+
+    /// Returns the average in the collection.
+    public var avg: Query {
+        return append(expression: [.collectionAggregation(.avg)])
+    }
+
+    /// Returns the sum of all the values in the collection.
+    public var sum: Query {
+        return append(expression: [.collectionAggregation(.sum)])
+    }
+}
+
 // MARK: RealmKeyedCollection
 
 extension Query where T: RealmKeyedCollection {
@@ -681,9 +704,24 @@ extension Query where T: PersistableEnum,
         return append(expression: [.keypathCollectionAggregation(.min)])
     }
 
-    /// Returns the maximum value in the collection based on the keypath.X
+    /// Returns the maximum value in the collection based on the keypath.
     public var max: Query {
         return append(expression: [.keypathCollectionAggregation(.max)])
+    }
+
+    /// Returns the average in the collection based on the keypath.
+    public var avg: Query {
+        return append(expression: [.keypathCollectionAggregation(.avg)])
+    }
+
+    /// Returns the sum of all the values in the collection based on the keypath.
+    public var sum: Query {
+        return append(expression: [.keypathCollectionAggregation(.sum)])
+    }
+
+    /// Returns the count of all the values in the collection based on the keypath.
+    public var count: Query {
+        return append(expression: [.keypathCollectionAggregation(.count)])
     }
 }
 
@@ -753,9 +791,19 @@ extension Query where T: OptionalProtocol,
         return append(expression: [.keypathCollectionAggregation(.min)])
     }
 
-    /// Returns the maximum value in the collection based on the keypath.X
+    /// Returns the maximum value in the collection based on the keypath.
     public var max: Query {
         return append(expression: [.keypathCollectionAggregation(.max)])
+    }
+
+    /// Returns the average in the collection based on the keypath.
+    public var avg: Query {
+        return append(expression: [.keypathCollectionAggregation(.avg)])
+    }
+
+    /// Returns the sum of all the value in the collection based on the keypath.
+    public var sum: Query {
+        return append(expression: [.keypathCollectionAggregation(.sum)])
     }
 }
 
@@ -880,30 +928,7 @@ extension Query where T == Bool {
     }
 }
 
-// MARK: Aggregates
-
-extension Query where T: RealmCollection,
-                      T.Element: _QueryNumeric {
-    /// Returns the minimum value in the collection.
-    public var min: Query {
-        return append(expression: [.collectionAggregation(.min)])
-    }
-
-    /// Returns the maximum value in the collection.
-    public var max: Query {
-        return append(expression: [.collectionAggregation(.max)])
-    }
-
-    /// Returns the average in the collection.
-    public var avg: Query {
-        return append(expression: [.collectionAggregation(.avg)])
-    }
-
-    /// Returns the sum of all the values in the collection.
-    public var sum: Query {
-        return append(expression: [.collectionAggregation(.sum)])
-    }
-}
+// MARK: Keypath Collection Aggregates
 
 /**
  You can use only use aggregates in numeric types as a keypath on a collection.

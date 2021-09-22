@@ -18720,8 +18720,8 @@ class QueryTests: TestCase {
             object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
         }
 
-        assertQuery(predicate: "arrayCol.@max.intEnumCol > %@", values: [ModernIntEnum.value3.rawValue], expectedCount: 0) {
-            $0.arrayCol.intEnumCol.max > .value3
+        assertQuery(predicate: "arrayCol.@sum.intEnumCol > %@", values: [ModernIntEnum.value3.rawValue], expectedCount: 1) {
+            $0.arrayCol.intEnumCol.sum > .value3
         }
 
         assertQuery(predicate: "arrayCol.@min.intEnumCol < %@", values: [ModernIntEnum.value1.rawValue], expectedCount: 0) {
@@ -18732,17 +18732,17 @@ class QueryTests: TestCase {
             $0.arrayCol.intEnumCol.max == .value3
         }
 
-        assertQuery(predicate: "arrayCol.@max.intEnumCol >= %@", values: [ModernIntEnum.value3.rawValue], expectedCount: 1) {
-            $0.arrayCol.intEnumCol.max >= .value3
+        assertQuery(predicate: "arrayCol.@avg.intEnumCol >= %@", values: [ModernIntEnum.value2.rawValue], expectedCount: 1) {
+            $0.arrayCol.intEnumCol.avg >= .value2
         }
 
-        assertQuery(predicate: "arrayCol.@min.intEnumCol <= %@", values: [ModernIntEnum.value1.rawValue], expectedCount: 1) {
-            $0.arrayCol.intEnumCol.min <= .value1
+        assertQuery(predicate: "arrayCol.@avg.intEnumCol <= %@", values: [ModernIntEnum.value2.rawValue], expectedCount: 1) {
+            $0.arrayCol.intEnumCol.avg <= .value2
         }
 
         // This includes all ModernAllTypesObject objects beside the one we are populating
-        assertQuery(predicate: "arrayCol.@min.intEnumCol != %@", values: [ModernIntEnum.value1.rawValue], expectedCount: 3) {
-            $0.arrayCol.intEnumCol.min != .value1
+        assertQuery(predicate: "arrayCol.@sum.intEnumCol != %@", values: [ModernIntEnum.value3.rawValue], expectedCount: 4) {
+            $0.arrayCol.intEnumCol.sum != .value3
         }
 
         try! realm.write {
@@ -18753,8 +18753,8 @@ class QueryTests: TestCase {
             object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
         }
 
-        assertQuery(predicate: "arrayCol.@max.optIntEnumCol > %@", values: [ModernIntEnum.value3.rawValue], expectedCount: 0) {
-            $0.arrayCol.optIntEnumCol.max > .value3
+        assertQuery(predicate: "arrayCol.@sum.optIntEnumCol > %@", values: [ModernIntEnum.value3.rawValue], expectedCount: 1) {
+            $0.arrayCol.optIntEnumCol.sum > .value3
         }
 
         assertQuery(predicate: "arrayCol.@min.optIntEnumCol < %@", values: [ModernIntEnum.value1.rawValue], expectedCount: 0) {
@@ -18765,17 +18765,17 @@ class QueryTests: TestCase {
             $0.arrayCol.optIntEnumCol.max == .value3
         }
 
-        assertQuery(predicate: "arrayCol.@max.optIntEnumCol >= %@", values: [ModernIntEnum.value3.rawValue], expectedCount: 1) {
-            $0.arrayCol.optIntEnumCol.max >= .value3
+        assertQuery(predicate: "arrayCol.@avg.optIntEnumCol >= %@", values: [ModernIntEnum.value2.rawValue], expectedCount: 1) {
+            $0.arrayCol.optIntEnumCol.avg >= .value2
         }
 
-        assertQuery(predicate: "arrayCol.@min.optIntEnumCol <= %@", values: [ModernIntEnum.value1.rawValue], expectedCount: 1) {
-            $0.arrayCol.optIntEnumCol.min <= .value1
+        assertQuery(predicate: "arrayCol.@avg.optIntEnumCol <= %@", values: [ModernIntEnum.value2.rawValue], expectedCount: 1) {
+            $0.arrayCol.optIntEnumCol.avg <= .value2
         }
 
         // This includes all ModernAllTypesObject objects beside the one we are populating
-        assertQuery(predicate: "arrayCol.@min.optIntEnumCol != %@", values: [ModernIntEnum.value1.rawValue], expectedCount: 3) {
-            $0.arrayCol.optIntEnumCol.min != .value1
+        assertQuery(predicate: "arrayCol.@sum.optIntEnumCol != %@", values: [ModernIntEnum.value3.rawValue], expectedCount: 4) {
+            $0.arrayCol.optIntEnumCol.sum != .value3
         }
     }
 
