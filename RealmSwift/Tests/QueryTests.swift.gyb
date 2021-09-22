@@ -2674,6 +2674,63 @@ class QueryTests: TestCase {
         % end
     }
 
+    func testMapAggregatesCount() {
+        let realm = realmWithTestPath()
+        let object = objects().first!
+        % for property in mapProperties + optMapProperties:
+        % if property.enumName == None and property.category == 'numeric':
+        % if property.type != 'Date' and property.type != 'Date?' and property.type != 'Decimal128' and property.type != 'Decimal128?':
+
+        try! realm.write {
+            object.${ property.colName }["foo"] = ${property.value(0)}
+            object.${ property.colName }["bar"] = ${property.value(1)}
+            object.${ property.colName }["baz"] = ${property.value(2)}
+        }
+
+        assertQuery(predicate: "${ property.colName }.@count > %@", values: [1], expectedCount: 1) {
+            $0.${ property.colName }.count > 1
+        }
+
+        assertQuery(predicate: "${ property.colName }.@count < %@", values: [1], expectedCount: 0) {
+            $0.${ property.colName }.count < 1
+        }
+
+        assertQuery(predicate: "${ property.colName }.@count == %@", values: [3], expectedCount: 1) {
+            $0.${ property.colName }.count == 3
+        }
+
+        assertQuery(predicate: "${ property.colName }.@count == %@", values: [2], expectedCount: 0) {
+            $0.${ property.colName }.count == 2
+        }
+
+        assertQuery(predicate: "${ property.colName }.@count >= %@", values: [3], expectedCount: 1) {
+            $0.${ property.colName }.count >= 3
+        }
+
+        assertQuery(predicate: "${ property.colName }.@count >= %@", values: [4], expectedCount: 0) {
+            $0.${ property.colName }.count >= 4
+        }
+
+        assertQuery(predicate: "${ property.colName }.@count <= %@", values: [3], expectedCount: 1) {
+            $0.${ property.colName }.count <= 3
+        }
+
+        assertQuery(predicate: "${ property.colName }.@count <= %@", values: [2], expectedCount: 0) {
+            $0.${ property.colName }.count <= 2
+        }
+
+        assertQuery(predicate: "${ property.colName }.@count != %@", values: [3], expectedCount: 0) {
+            $0.${ property.colName }.count != 3
+        }
+
+        assertQuery(predicate: "${ property.colName }.@count != %@", values: [0], expectedCount: 1) {
+            $0.${ property.colName }.count != 0
+        }
+        % end
+        % end
+        % end
+    }
+
     // MARK: - Keypath Collection Aggregations
 
     func testKeypathCollectionAggregatesAvg() {
