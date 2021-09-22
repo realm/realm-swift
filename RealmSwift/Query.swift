@@ -674,6 +674,19 @@ extension Query where T: PersistableEnum, T.RawValue: _RealmSchemaDiscoverable {
     }
 }
 
+extension Query where T: PersistableEnum,
+                      T.RawValue: _QueryNumeric {
+    /// Returns the minimum value in the collection based on the keypath.
+    public var min: Query {
+        return append(expression: [.keypathCollectionAggregation(.min)])
+    }
+
+    /// Returns the maximum value in the collection based on the keypath.X
+    public var max: Query {
+        return append(expression: [.keypathCollectionAggregation(.max)])
+    }
+}
+
 // MARK: Optional
 
 extension Query where T: OptionalProtocol,
@@ -729,6 +742,20 @@ extension Query where T: OptionalProtocol, T.Wrapped: PersistableEnum, T.Wrapped
         } else {
             return lhs.append(expression: [.basicComparison(.lessThanOrEqual), .rhs(rhs._rlmInferWrappedType().rawValue)])
         }
+    }
+}
+
+extension Query where T: OptionalProtocol,
+                      T.Wrapped: PersistableEnum,
+                      T.Wrapped.RawValue: _QueryNumeric {
+    /// Returns the minimum value in the collection based on the keypath.
+    public var min: Query {
+        return append(expression: [.keypathCollectionAggregation(.min)])
+    }
+
+    /// Returns the maximum value in the collection based on the keypath.X
+    public var max: Query {
+        return append(expression: [.keypathCollectionAggregation(.max)])
     }
 }
 

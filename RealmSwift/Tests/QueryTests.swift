@@ -18708,6 +18708,77 @@ class QueryTests: TestCase {
         }
     }
 
+    func testEnumKeypathCollectionAggregates() {
+        let realm = realmWithTestPath()
+        let object = objects().first!
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["intEnumCol": ModernIntEnum.value1])
+            let modernObj1 = ModernAllTypesObject(value: ["intEnumCol": ModernIntEnum.value2])
+            let modernObj2 = ModernAllTypesObject(value: ["intEnumCol": ModernIntEnum.value3])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+
+        assertQuery(predicate: "arrayCol.@max.intEnumCol > %@", values: [ModernIntEnum.value3.rawValue], expectedCount: 0) {
+            $0.arrayCol.intEnumCol.max > .value3
+        }
+
+        assertQuery(predicate: "arrayCol.@min.intEnumCol < %@", values: [ModernIntEnum.value1.rawValue], expectedCount: 0) {
+            $0.arrayCol.intEnumCol.min < .value1
+        }
+
+        assertQuery(predicate: "arrayCol.@max.intEnumCol == %@", values: [ModernIntEnum.value3.rawValue], expectedCount: 1) {
+            $0.arrayCol.intEnumCol.max == .value3
+        }
+
+        assertQuery(predicate: "arrayCol.@max.intEnumCol >= %@", values: [ModernIntEnum.value3.rawValue], expectedCount: 1) {
+            $0.arrayCol.intEnumCol.max >= .value3
+        }
+
+        assertQuery(predicate: "arrayCol.@min.intEnumCol <= %@", values: [ModernIntEnum.value1.rawValue], expectedCount: 1) {
+            $0.arrayCol.intEnumCol.min <= .value1
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@min.intEnumCol != %@", values: [ModernIntEnum.value1.rawValue], expectedCount: 3) {
+            $0.arrayCol.intEnumCol.min != .value1
+        }
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["optIntEnumCol": ModernIntEnum.value1])
+            let modernObj1 = ModernAllTypesObject(value: ["optIntEnumCol": ModernIntEnum.value2])
+            let modernObj2 = ModernAllTypesObject(value: ["optIntEnumCol": ModernIntEnum.value3])
+            realm.delete(object.arrayCol)
+            object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
+        }
+
+        assertQuery(predicate: "arrayCol.@max.optIntEnumCol > %@", values: [ModernIntEnum.value3.rawValue], expectedCount: 0) {
+            $0.arrayCol.optIntEnumCol.max > .value3
+        }
+
+        assertQuery(predicate: "arrayCol.@min.optIntEnumCol < %@", values: [ModernIntEnum.value1.rawValue], expectedCount: 0) {
+            $0.arrayCol.optIntEnumCol.min < .value1
+        }
+
+        assertQuery(predicate: "arrayCol.@max.optIntEnumCol == %@", values: [ModernIntEnum.value3.rawValue], expectedCount: 1) {
+            $0.arrayCol.optIntEnumCol.max == .value3
+        }
+
+        assertQuery(predicate: "arrayCol.@max.optIntEnumCol >= %@", values: [ModernIntEnum.value3.rawValue], expectedCount: 1) {
+            $0.arrayCol.optIntEnumCol.max >= .value3
+        }
+
+        assertQuery(predicate: "arrayCol.@min.optIntEnumCol <= %@", values: [ModernIntEnum.value1.rawValue], expectedCount: 1) {
+            $0.arrayCol.optIntEnumCol.min <= .value1
+        }
+
+        // This includes all ModernAllTypesObject objects beside the one we are populating
+        assertQuery(predicate: "arrayCol.@min.optIntEnumCol != %@", values: [ModernIntEnum.value1.rawValue], expectedCount: 3) {
+            $0.arrayCol.optIntEnumCol.min != .value1
+        }
+    }
+
     func testAggregateNotSupported() {
         let queryAvg: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>) = {
             $0.intCol.avg == 1
