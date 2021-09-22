@@ -1882,22 +1882,22 @@ class QueryTests: TestCase {
         % for property in [properties[7], optProperties[7]]:
 
         try! realm.write {
-            let modernObj = ModernAllTypesObject(value: ["${property.colName }": ${property.value(0)}])
-            let modernObj1 = ModernAllTypesObject(value: ["${property.colName }": ${property.value(1)}])
-            let modernObj2 = ModernAllTypesObject(value: ["${property.colName }": ${property.value(2)}])
+            let modernObj = ModernAllTypesObject(value: ["${ property.colName }": ${property.value(0)}])
+            let modernObj1 = ModernAllTypesObject(value: ["${ property.colName }": ${property.value(1)}])
+            let modernObj2 = ModernAllTypesObject(value: ["${ property.colName }": ${property.value(2)}])
             realm.delete(object.arrayCol)
             object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
         }
 
-        let sum${property.colName } = ${property.value(0)} + ${property.value(1)} + ${property.value(2)}
-        assertQuery(predicate: "(((((arrayCol.@min.${property.colName } <= %@ && arrayCol.@max.${property.colName } >= %@) && arrayCol.@sum.${property.colName } == %@) && arrayCol.@min.${property.colName } != %@) && arrayCol.@avg.${property.colName } > %@) && arrayCol.@avg.${property.colName } < %@)",
-                    values: [${property.value(0)}, ${property.value(2)}, sum${property.colName }, ${property.value(1)}, ${property.value(0)}, ${property.value(2)}], expectedCount: 1) {
-            $0.arrayCol.${property.colName }.min <= ${property.value(0)} &&
-            $0.arrayCol.${property.colName }.max >= ${property.value(2)} &&
-            $0.arrayCol.${property.colName }.sum == sum${property.colName } &&
-            $0.arrayCol.${property.colName }.min != ${property.value(1)} &&
-            $0.arrayCol.${property.colName }.avg > ${property.value(0)} &&
-            $0.arrayCol.${property.colName }.avg < ${property.value(2)}
+        let sum${ property.colName } = ${property.value(0)} + ${property.value(1)} + ${property.value(2)}
+        assertQuery(predicate: "(((((arrayCol.@min.${ property.colName } <= %@ && arrayCol.@max.${ property.colName } >= %@) && arrayCol.@sum.${ property.colName } == %@) && arrayCol.@min.${ property.colName } != %@) && arrayCol.@avg.${ property.colName } > %@) && arrayCol.@avg.${ property.colName } < %@)",
+                    values: [${property.value(0)}, ${property.value(2)}, sum${ property.colName }, ${property.value(1)}, ${property.value(0)}, ${property.value(2)}], expectedCount: 1) {
+            $0.arrayCol.${ property.colName }.min <= ${property.value(0)} &&
+            $0.arrayCol.${ property.colName }.max >= ${property.value(2)} &&
+            $0.arrayCol.${ property.colName }.sum == sum${ property.colName } &&
+            $0.arrayCol.${ property.colName }.min != ${property.value(1)} &&
+            $0.arrayCol.${ property.colName }.avg > ${property.value(0)} &&
+            $0.arrayCol.${ property.colName }.avg < ${property.value(2)}
         }
         % end
     }
@@ -2013,22 +2013,22 @@ class QueryTests: TestCase {
         % for property in [properties[7], optProperties[7]]:
 
         try! realm.write {
-            let modernObj = ModernAllTypesObject(value: ["${property.colName }": ${property.value(0)}])
-            let modernObj1 = ModernAllTypesObject(value: ["${property.colName }": ${property.value(1)}])
-            let modernObj2 = ModernAllTypesObject(value: ["${property.colName }": ${property.value(2)}])
+            let modernObj = ModernAllTypesObject(value: ["${ property.colName }": ${property.value(0)}])
+            let modernObj1 = ModernAllTypesObject(value: ["${ property.colName }": ${property.value(1)}])
+            let modernObj2 = ModernAllTypesObject(value: ["${ property.colName }": ${property.value(2)}])
             realm.delete(object.arrayCol)
             object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
         }
 
         // This includes all ModernAllTypesObject objects beside the one we are populating
-        let sum${property.colName } = ${property.value(0)} + ${property.value(1)} + ${property.value(2)}
-        assertQuery(predicate: "(((((arrayCol.@min.${property.colName } < %@ || arrayCol.@max.${property.colName } > %@) || arrayCol.@sum.${property.colName } != %@) || arrayCol.@min.${property.colName } == %@) || arrayCol.@avg.${property.colName } >= %@) || arrayCol.@avg.${property.colName } <= %@)", values: [${property.value(0)}, ${property.value(2)}, sum${property.colName }, 0, ${property.value(2)}, ${property.value(0)}], expectedCount: 3) {
-            $0.arrayCol.${property.colName }.min < ${property.value(0)} ||
-            $0.arrayCol.${property.colName }.max > ${property.value(2)} ||
-            $0.arrayCol.${property.colName }.sum != sum${property.colName } ||
-            $0.arrayCol.${property.colName }.min == 0 ||
-            $0.arrayCol.${property.colName }.avg >= ${property.value(2)} ||
-            $0.arrayCol.${property.colName }.avg <= ${property.value(0)}
+        let sum${ property.colName } = ${property.value(0)} + ${property.value(1)} + ${property.value(2)}
+        assertQuery(predicate: "(((((arrayCol.@min.${ property.colName } < %@ || arrayCol.@max.${ property.colName } > %@) || arrayCol.@sum.${ property.colName } != %@) || arrayCol.@min.${ property.colName } == %@) || arrayCol.@avg.${ property.colName } >= %@) || arrayCol.@avg.${ property.colName } <= %@)", values: [${property.value(0)}, ${property.value(2)}, sum${ property.colName }, 0, ${property.value(2)}, ${property.value(0)}], expectedCount: 3) {
+            $0.arrayCol.${ property.colName }.min < ${property.value(0)} ||
+            $0.arrayCol.${ property.colName }.max > ${property.value(2)} ||
+            $0.arrayCol.${ property.colName }.sum != sum${ property.colName } ||
+            $0.arrayCol.${ property.colName }.min == 0 ||
+            $0.arrayCol.${ property.colName }.avg >= ${property.value(2)} ||
+            $0.arrayCol.${ property.colName }.avg <= ${property.value(0)}
         }
         % end
     }
@@ -2077,20 +2077,20 @@ class QueryTests: TestCase {
         % for property in [properties[7], optProperties[7]]:
 
         try! realm.write {
-            let modernObj = ModernAllTypesObject(value: ["${property.colName }": ${property.value(0)}])
-            let modernObj1 = ModernAllTypesObject(value: ["${property.colName }": ${property.value(1)}])
-            let modernObj2 = ModernAllTypesObject(value: ["${property.colName }": ${property.value(2)}])
+            let modernObj = ModernAllTypesObject(value: ["${ property.colName }": ${property.value(0)}])
+            let modernObj1 = ModernAllTypesObject(value: ["${ property.colName }": ${property.value(1)}])
+            let modernObj2 = ModernAllTypesObject(value: ["${ property.colName }": ${property.value(2)}])
             realm.delete(object.arrayCol)
             object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
         }
 
         // This includes all ModernAllTypesObject objects beside the one we are populating
-        let sum${property.colName } = ${property.value(0)} + ${property.value(1)} + ${property.value(2)}
-        assertQuery(predicate: "((((arrayCol.@min.${property.colName } <= %@ || arrayCol.@max.${property.colName } >= %@) && arrayCol.@sum.${property.colName } == %@) && arrayCol.@sum.${property.colName } != %@) && (arrayCol.@avg.${property.colName } > %@ && arrayCol.@avg.${property.colName } < %@))", values: [${property.value(0)}, ${property.value(2)}, sum${property.colName }, 0, ${property.value(0)}, ${property.value(2)}], expectedCount: 1) {
-            ($0.arrayCol.${property.colName }.min <= ${property.value(0)} || $0.arrayCol.${property.colName }.max >= ${property.value(2)}) &&
-            $0.arrayCol.${property.colName }.sum == sum${property.colName } &&
-            $0.arrayCol.${property.colName }.sum != 0 &&
-            ($0.arrayCol.${property.colName }.avg > ${property.value(0)} && $0.arrayCol.${property.colName }.avg < ${property.value(2)})
+        let sum${ property.colName } = ${property.value(0)} + ${property.value(1)} + ${property.value(2)}
+        assertQuery(predicate: "((((arrayCol.@min.${ property.colName } <= %@ || arrayCol.@max.${ property.colName } >= %@) && arrayCol.@sum.${ property.colName } == %@) && arrayCol.@sum.${ property.colName } != %@) && (arrayCol.@avg.${ property.colName } > %@ && arrayCol.@avg.${ property.colName } < %@))", values: [${property.value(0)}, ${property.value(2)}, sum${ property.colName }, 0, ${property.value(0)}, ${property.value(2)}], expectedCount: 1) {
+            ($0.arrayCol.${ property.colName }.min <= ${property.value(0)} || $0.arrayCol.${ property.colName }.max >= ${property.value(2)}) &&
+            $0.arrayCol.${ property.colName }.sum == sum${ property.colName } &&
+            $0.arrayCol.${ property.colName }.sum != 0 &&
+            ($0.arrayCol.${ property.colName }.avg > ${property.value(0)} && $0.arrayCol.${ property.colName }.avg < ${property.value(2)})
         }
         % end
     }
@@ -2179,48 +2179,48 @@ class QueryTests: TestCase {
         % if property.type != 'Date' and property.type != 'Date?':
 
         try! realm.write {
-            let modernObj = ModernAllTypesObject(value: ["${property.colName }": [${property.value(0)}, ${property.value(1)}, ${property.value(2)}]])
+            let modernObj = ModernAllTypesObject(value: ["${ property.colName }": [${property.value(0)}, ${property.value(1)}, ${property.value(2)}]])
             if let oldObject = object.objectCol {
                 realm.delete(oldObject)
             }
             object.objectCol = modernObj
         }
 
-        assertQuery(predicate: "objectCol.${property.colName }.@avg > %@", values: [${property.value(0)}], expectedCount: 1) {
-            $0.objectCol.${property.colName }.avg > ${property.value(0)}
+        assertQuery(predicate: "objectCol.${ property.colName }.@avg > %@", values: [${property.value(0)}], expectedCount: 1) {
+            $0.objectCol.${ property.colName }.avg > ${property.value(0)}
         }
 
-        assertQuery(predicate: "objectCol.${property.colName }.@avg < %@", values: [${property.value(2)}], expectedCount: 1) {
-            $0.objectCol.${property.colName }.avg < ${property.value(2)}
+        assertQuery(predicate: "objectCol.${ property.colName }.@avg < %@", values: [${property.value(2)}], expectedCount: 1) {
+            $0.objectCol.${ property.colName }.avg < ${property.value(2)}
         }
 
-        assertQuery(predicate: "objectCol.${property.colName }.@avg == %@", values: [${property.value(1)}], expectedCount: 1) {
-            $0.objectCol.${property.colName }.avg == ${property.value(1)}
+        assertQuery(predicate: "objectCol.${ property.colName }.@avg == %@", values: [${property.value(1)}], expectedCount: 1) {
+            $0.objectCol.${ property.colName }.avg == ${property.value(1)}
         }
 
-        assertQuery(predicate: "objectCol.${property.colName }.@avg >= %@", values: [${property.value(0)}], expectedCount: 1) {
-            $0.objectCol.${property.colName }.avg >= ${property.value(0)}
+        assertQuery(predicate: "objectCol.${ property.colName }.@avg >= %@", values: [${property.value(0)}], expectedCount: 1) {
+            $0.objectCol.${ property.colName }.avg >= ${property.value(0)}
         }
 
-        assertQuery(predicate: "objectCol.${property.colName }.@avg >= %@", values: [${property.value(1)}], expectedCount: 1) {
-            $0.objectCol.${property.colName }.avg >= ${property.value(1)}
+        assertQuery(predicate: "objectCol.${ property.colName }.@avg >= %@", values: [${property.value(1)}], expectedCount: 1) {
+            $0.objectCol.${ property.colName }.avg >= ${property.value(1)}
         }
 
-        assertQuery(predicate: "objectCol.${property.colName }.@avg <= %@", values: [${property.value(2)}], expectedCount: 1) {
-            $0.objectCol.${property.colName }.avg <= ${property.value(2)}
+        assertQuery(predicate: "objectCol.${ property.colName }.@avg <= %@", values: [${property.value(2)}], expectedCount: 1) {
+            $0.objectCol.${ property.colName }.avg <= ${property.value(2)}
         }
 
-        assertQuery(predicate: "objectCol.${property.colName }.@avg <= %@", values: [${property.value(1)}], expectedCount: 1) {
-            $0.objectCol.${property.colName }.avg <= ${property.value(1)}
+        assertQuery(predicate: "objectCol.${ property.colName }.@avg <= %@", values: [${property.value(1)}], expectedCount: 1) {
+            $0.objectCol.${ property.colName }.avg <= ${property.value(1)}
         }
 
         // This includes all ModernAllTypesObject objects beside the one we are populating
-        assertQuery(predicate: "objectCol.${property.colName }.@avg != %@", values: [${property.value(1)}], expectedCount: 1) {
-            $0.objectCol.${property.colName }.avg != ${property.value(1)}
+        assertQuery(predicate: "objectCol.${ property.colName }.@avg != %@", values: [${property.value(1)}], expectedCount: 1) {
+            $0.objectCol.${ property.colName }.avg != ${property.value(1)}
         }
 
-        assertQuery(predicate: "objectCol.${property.colName }.@avg != %@", values: [${property.value(0)}], expectedCount: 2) {
-            $0.objectCol.${property.colName }.avg != ${property.value(0)}
+        assertQuery(predicate: "objectCol.${ property.colName }.@avg != %@", values: [${property.value(0)}], expectedCount: 2) {
+            $0.objectCol.${ property.colName }.avg != ${property.value(0)}
         }
         % end
         % end
@@ -2235,45 +2235,45 @@ class QueryTests: TestCase {
         % if property.type != 'Date' and property.type != 'Date?':
 
         try! realm.write {
-            object.${property.colName}["foo"] = ${property.value(0)}
-            object.${property.colName}["bar"] = ${property.value(1)}
-            object.${property.colName}["baz"] = ${property.value(2)}
+            object.${ property.colName }["foo"] = ${property.value(0)}
+            object.${ property.colName }["bar"] = ${property.value(1)}
+            object.${ property.colName }["baz"] = ${property.value(2)}
         }
 
-        assertQuery(predicate: "${property.colName}.@avg > %@", values: [${property.value(0)}], expectedCount: 1) {
-            $0.${property.colName}.avg > ${property.value(0)}
+        assertQuery(predicate: "${ property.colName }.@avg > %@", values: [${property.value(0)}], expectedCount: 1) {
+            $0.${ property.colName }.avg > ${property.value(0)}
         }
 
-        assertQuery(predicate: "${property.colName}.@avg < %@", values: [${property.value(2)}], expectedCount: 1) {
-            $0.${property.colName}.avg < ${property.value(2)}
+        assertQuery(predicate: "${ property.colName }.@avg < %@", values: [${property.value(2)}], expectedCount: 1) {
+            $0.${ property.colName }.avg < ${property.value(2)}
         }
 
-        assertQuery(predicate: "${property.colName}.@avg == %@", values: [${property.value(1)}], expectedCount: 1) {
-            $0.${property.colName}.avg == ${property.value(1)}
+        assertQuery(predicate: "${ property.colName }.@avg == %@", values: [${property.value(1)}], expectedCount: 1) {
+            $0.${ property.colName }.avg == ${property.value(1)}
         }
 
-        assertQuery(predicate: "${property.colName}.@avg >= %@", values: [${property.value(0)}], expectedCount: 1) {
-            $0.${property.colName}.avg >= ${property.value(0)}
+        assertQuery(predicate: "${ property.colName }.@avg >= %@", values: [${property.value(0)}], expectedCount: 1) {
+            $0.${ property.colName }.avg >= ${property.value(0)}
         }
 
-        assertQuery(predicate: "${property.colName}.@avg >= %@", values: [${property.value(1)}], expectedCount: 1) {
-            $0.${property.colName}.avg >= ${property.value(1)}
+        assertQuery(predicate: "${ property.colName }.@avg >= %@", values: [${property.value(1)}], expectedCount: 1) {
+            $0.${ property.colName }.avg >= ${property.value(1)}
         }
 
-        assertQuery(predicate: "${property.colName}.@avg <= %@", values: [${property.value(2)}], expectedCount: 1) {
-            $0.${property.colName}.avg <= ${property.value(2)}
+        assertQuery(predicate: "${ property.colName }.@avg <= %@", values: [${property.value(2)}], expectedCount: 1) {
+            $0.${ property.colName }.avg <= ${property.value(2)}
         }
 
-        assertQuery(predicate: "${property.colName}.@avg <= %@", values: [${property.value(1)}], expectedCount: 1) {
-            $0.${property.colName}.avg <= ${property.value(1)}
+        assertQuery(predicate: "${ property.colName }.@avg <= %@", values: [${property.value(1)}], expectedCount: 1) {
+            $0.${ property.colName }.avg <= ${property.value(1)}
         }
 
-        assertQuery(predicate: "${property.colName}.@avg != %@", values: [${property.value(1)}], expectedCount: 0) {
-            $0.${property.colName}.avg != ${property.value(1)}
+        assertQuery(predicate: "${ property.colName }.@avg != %@", values: [${property.value(1)}], expectedCount: 0) {
+            $0.${ property.colName }.avg != ${property.value(1)}
         }
 
-        assertQuery(predicate: "${property.colName}.@avg != %@", values: [${property.value(0)}], expectedCount: 1) {
-            $0.${property.colName}.avg != ${property.value(0)}
+        assertQuery(predicate: "${ property.colName }.@avg != %@", values: [${property.value(0)}], expectedCount: 1) {
+            $0.${ property.colName }.avg != ${property.value(0)}
         }
         % end
         % end
@@ -2289,46 +2289,47 @@ class QueryTests: TestCase {
         % if property.enumName == None and property.category == 'numeric':
 
         try! realm.write {
-            let modernObj = ModernAllTypesObject(value: ["${property.colName }": [${property.value(0)}, ${property.value(1)}, ${property.value(2)}]])
+            let modernObj = ModernAllTypesObject(value: ["${ property.colName }": [${property.value(0)}, ${property.value(1)}, ${property.value(2)}]])
             if let oldObject = object.objectCol {
                 realm.delete(oldObject)
             }
             object.objectCol = modernObj
         }
-        assertQuery(predicate: "objectCol.${property.colName }.@min > %@", values: [${property.value(0)}], expectedCount: 0) {
-            $0.objectCol.${property.colName }.min > ${property.value(0)}
+        
+        assertQuery(predicate: "objectCol.${ property.colName }.@min > %@", values: [${property.value(0)}], expectedCount: 0) {
+            $0.objectCol.${ property.colName }.min > ${property.value(0)}
         }
 
-        assertQuery(predicate: "objectCol.${property.colName }.@min < %@", values: [${property.value(2)}], expectedCount: 1) {
-            $0.objectCol.${property.colName }.min < ${property.value(2)}
+        assertQuery(predicate: "objectCol.${ property.colName }.@min < %@", values: [${property.value(2)}], expectedCount: 1) {
+            $0.objectCol.${ property.colName }.min < ${property.value(2)}
         }
 
-        assertQuery(predicate: "objectCol.${property.colName }.@min == %@", values: [${property.value(0)}], expectedCount: 1) {
-            $0.objectCol.${property.colName }.min == ${property.value(0)}
+        assertQuery(predicate: "objectCol.${ property.colName }.@min == %@", values: [${property.value(0)}], expectedCount: 1) {
+            $0.objectCol.${ property.colName }.min == ${property.value(0)}
         }
 
-        assertQuery(predicate: "objectCol.${property.colName }.@min >= %@", values: [${property.value(1)}], expectedCount: 0) {
-            $0.objectCol.${property.colName }.min >= ${property.value(1)}
+        assertQuery(predicate: "objectCol.${ property.colName }.@min >= %@", values: [${property.value(1)}], expectedCount: 0) {
+            $0.objectCol.${ property.colName }.min >= ${property.value(1)}
         }
 
-        assertQuery(predicate: "objectCol.${property.colName }.@min >= %@", values: [${property.value(0)}], expectedCount: 1) {
-            $0.objectCol.${property.colName }.min >= ${property.value(0)}
+        assertQuery(predicate: "objectCol.${ property.colName }.@min >= %@", values: [${property.value(0)}], expectedCount: 1) {
+            $0.objectCol.${ property.colName }.min >= ${property.value(0)}
         }
 
-        assertQuery(predicate: "objectCol.${property.colName }.@min <= %@", values: [${property.value(2)}], expectedCount: 1) {
-            $0.objectCol.${property.colName }.min <= ${property.value(2)}
+        assertQuery(predicate: "objectCol.${ property.colName }.@min <= %@", values: [${property.value(2)}], expectedCount: 1) {
+            $0.objectCol.${ property.colName }.min <= ${property.value(2)}
         }
 
-        assertQuery(predicate: "objectCol.${property.colName }.@min <= %@", values: [${property.value(0)}], expectedCount: 1) {
-            $0.objectCol.${property.colName }.min <= ${property.value(0)}
+        assertQuery(predicate: "objectCol.${ property.colName }.@min <= %@", values: [${property.value(0)}], expectedCount: 1) {
+            $0.objectCol.${ property.colName }.min <= ${property.value(0)}
         }
 
-        assertQuery(predicate: "objectCol.${property.colName }.@min != %@", values: [${property.value(0)}], expectedCount: 1) {
-            $0.objectCol.${property.colName }.min != ${property.value(0)}
+        assertQuery(predicate: "objectCol.${ property.colName }.@min != %@", values: [${property.value(0)}], expectedCount: 1) {
+            $0.objectCol.${ property.colName }.min != ${property.value(0)}
         }
 
-        assertQuery(predicate: "objectCol.${property.colName }.@min != %@", values: [${property.value(2)}], expectedCount: 2) {
-            $0.objectCol.${property.colName }.min != ${property.value(2)}
+        assertQuery(predicate: "objectCol.${ property.colName }.@min != %@", values: [${property.value(2)}], expectedCount: 2) {
+            $0.objectCol.${ property.colName }.min != ${property.value(2)}
         }
         % end
         % end
@@ -2341,44 +2342,45 @@ class QueryTests: TestCase {
         % if property.enumName == None and property.category == 'numeric':
 
         try! realm.write {
-            object.${property.colName}["foo"] = ${property.value(0)}
-            object.${property.colName}["bar"] = ${property.value(1)}
-            object.${property.colName}["baz"] = ${property.value(2)}
-        }
-        assertQuery(predicate: "${property.colName}.@min > %@", values: [${property.value(0)}], expectedCount: 0) {
-            $0.${property.colName}.min > ${property.value(0)}
+            object.${ property.colName }["foo"] = ${property.value(0)}
+            object.${ property.colName }["bar"] = ${property.value(1)}
+            object.${ property.colName }["baz"] = ${property.value(2)}
         }
 
-        assertQuery(predicate: "${property.colName}.@min < %@", values: [${property.value(2)}], expectedCount: 1) {
-            $0.${property.colName}.min < ${property.value(2)}
+        assertQuery(predicate: "${ property.colName }.@min > %@", values: [${property.value(0)}], expectedCount: 0) {
+            $0.${ property.colName }.min > ${property.value(0)}
         }
 
-        assertQuery(predicate: "${property.colName}.@min == %@", values: [${property.value(0)}], expectedCount: 1) {
-            $0.${property.colName}.min == ${property.value(0)}
+        assertQuery(predicate: "${ property.colName }.@min < %@", values: [${property.value(2)}], expectedCount: 1) {
+            $0.${ property.colName }.min < ${property.value(2)}
         }
 
-        assertQuery(predicate: "${property.colName}.@min >= %@", values: [${property.value(1)}], expectedCount: 0) {
-            $0.${property.colName}.min >= ${property.value(1)}
+        assertQuery(predicate: "${ property.colName }.@min == %@", values: [${property.value(0)}], expectedCount: 1) {
+            $0.${ property.colName }.min == ${property.value(0)}
         }
 
-        assertQuery(predicate: "${property.colName}.@min >= %@", values: [${property.value(0)}], expectedCount: 1) {
-            $0.${property.colName}.min >= ${property.value(0)}
+        assertQuery(predicate: "${ property.colName }.@min >= %@", values: [${property.value(1)}], expectedCount: 0) {
+            $0.${ property.colName }.min >= ${property.value(1)}
         }
 
-        assertQuery(predicate: "${property.colName}.@min <= %@", values: [${property.value(2)}], expectedCount: 1) {
-            $0.${property.colName}.min <= ${property.value(2)}
+        assertQuery(predicate: "${ property.colName }.@min >= %@", values: [${property.value(0)}], expectedCount: 1) {
+            $0.${ property.colName }.min >= ${property.value(0)}
         }
 
-        assertQuery(predicate: "${property.colName}.@min <= %@", values: [${property.value(0)}], expectedCount: 1) {
-            $0.${property.colName}.min <= ${property.value(0)}
+        assertQuery(predicate: "${ property.colName }.@min <= %@", values: [${property.value(2)}], expectedCount: 1) {
+            $0.${ property.colName }.min <= ${property.value(2)}
         }
 
-        assertQuery(predicate: "${property.colName}.@min != %@", values: [${property.value(0)}], expectedCount: 0) {
-            $0.${property.colName}.min != ${property.value(0)}
+        assertQuery(predicate: "${ property.colName }.@min <= %@", values: [${property.value(0)}], expectedCount: 1) {
+            $0.${ property.colName }.min <= ${property.value(0)}
         }
 
-        assertQuery(predicate: "${property.colName}.@min != %@", values: [${property.value(2)}], expectedCount: 1) {
-            $0.${property.colName}.min != ${property.value(2)}
+        assertQuery(predicate: "${ property.colName }.@min != %@", values: [${property.value(0)}], expectedCount: 0) {
+            $0.${ property.colName }.min != ${property.value(0)}
+        }
+
+        assertQuery(predicate: "${ property.colName }.@min != %@", values: [${property.value(2)}], expectedCount: 1) {
+            $0.${ property.colName }.min != ${property.value(2)}
         }
         % end
         % end
@@ -2393,47 +2395,48 @@ class QueryTests: TestCase {
         % if property.enumName == None and property.category == 'numeric':
 
         try! realm.write {
-            let modernObj = ModernAllTypesObject(value: ["${property.colName }": [${property.value(0)}, ${property.value(1)}, ${property.value(2)}]])
+            let modernObj = ModernAllTypesObject(value: ["${ property.colName }": [${property.value(0)}, ${property.value(1)}, ${property.value(2)}]])
             if let oldObject = object.objectCol {
                 realm.delete(oldObject)
             }
             object.objectCol = modernObj
         }
-        assertQuery(predicate: "objectCol.${property.colName }.@max > %@", values: [${property.value(0)}], expectedCount: 1) {
-            $0.objectCol.${property.colName }.max > ${property.value(0)}
+
+        assertQuery(predicate: "objectCol.${ property.colName }.@max > %@", values: [${property.value(0)}], expectedCount: 1) {
+            $0.objectCol.${ property.colName }.max > ${property.value(0)}
         }
 
-        assertQuery(predicate: "objectCol.${property.colName }.@max < %@", values: [${property.value(2)}], expectedCount: 0) {
-            $0.objectCol.${property.colName }.max < ${property.value(2)}
+        assertQuery(predicate: "objectCol.${ property.colName }.@max < %@", values: [${property.value(2)}], expectedCount: 0) {
+            $0.objectCol.${ property.colName }.max < ${property.value(2)}
         }
 
-        assertQuery(predicate: "objectCol.${property.colName }.@max == %@", values: [${property.value(2)}], expectedCount: 1) {
-            $0.objectCol.${property.colName }.max == ${property.value(2)}
+        assertQuery(predicate: "objectCol.${ property.colName }.@max == %@", values: [${property.value(2)}], expectedCount: 1) {
+            $0.objectCol.${ property.colName }.max == ${property.value(2)}
         }
 
-        assertQuery(predicate: "objectCol.${property.colName }.@max >= %@", values: [${property.value(0)}], expectedCount: 1) {
-            $0.objectCol.${property.colName }.max >= ${property.value(0)}
+        assertQuery(predicate: "objectCol.${ property.colName }.@max >= %@", values: [${property.value(0)}], expectedCount: 1) {
+            $0.objectCol.${ property.colName }.max >= ${property.value(0)}
         }
 
-        assertQuery(predicate: "objectCol.${property.colName }.@max >= %@", values: [${property.value(2)}], expectedCount: 1) {
-            $0.objectCol.${property.colName }.max >= ${property.value(2)}
+        assertQuery(predicate: "objectCol.${ property.colName }.@max >= %@", values: [${property.value(2)}], expectedCount: 1) {
+            $0.objectCol.${ property.colName }.max >= ${property.value(2)}
         }
 
-        assertQuery(predicate: "objectCol.${property.colName }.@max <= %@", values: [${property.value(1)}], expectedCount: 0) {
-            $0.objectCol.${property.colName }.max <= ${property.value(1)}
+        assertQuery(predicate: "objectCol.${ property.colName }.@max <= %@", values: [${property.value(1)}], expectedCount: 0) {
+            $0.objectCol.${ property.colName }.max <= ${property.value(1)}
         }
 
-        assertQuery(predicate: "objectCol.${property.colName }.@max <= %@", values: [${property.value(2)}], expectedCount: 1) {
-            $0.objectCol.${property.colName }.max <= ${property.value(2)}
+        assertQuery(predicate: "objectCol.${ property.colName }.@max <= %@", values: [${property.value(2)}], expectedCount: 1) {
+            $0.objectCol.${ property.colName }.max <= ${property.value(2)}
         }
 
         // This includes all ModernAllTypesObject objects beside the one we are populating
-        assertQuery(predicate: "objectCol.${property.colName }.@max != %@", values: [${property.value(2)}], expectedCount: 1) {
-            $0.objectCol.${property.colName }.max != ${property.value(2)}
+        assertQuery(predicate: "objectCol.${ property.colName }.@max != %@", values: [${property.value(2)}], expectedCount: 1) {
+            $0.objectCol.${ property.colName }.max != ${property.value(2)}
         }
 
-        assertQuery(predicate: "objectCol.${property.colName }.@max != %@", values: [${property.value(0)}], expectedCount: 2) {
-            $0.objectCol.${property.colName }.max != ${property.value(0)}
+        assertQuery(predicate: "objectCol.${ property.colName }.@max != %@", values: [${property.value(0)}], expectedCount: 2) {
+            $0.objectCol.${ property.colName }.max != ${property.value(0)}
         }
         % end
         % end
@@ -2446,44 +2449,45 @@ class QueryTests: TestCase {
         % if property.enumName == None and property.category == 'numeric':
 
         try! realm.write {
-            object.${property.colName}["foo"] = ${property.value(0)}
-            object.${property.colName}["bar"] = ${property.value(1)}
-            object.${property.colName}["baz"] = ${property.value(2)}
-        }
-        assertQuery(predicate: "${property.colName}.@max > %@", values: [${property.value(0)}], expectedCount: 1) {
-            $0.${property.colName}.max > ${property.value(0)}
+            object.${ property.colName }["foo"] = ${property.value(0)}
+            object.${ property.colName }["bar"] = ${property.value(1)}
+            object.${ property.colName }["baz"] = ${property.value(2)}
         }
 
-        assertQuery(predicate: "${property.colName}.@max < %@", values: [${property.value(2)}], expectedCount: 0) {
-            $0.${property.colName}.max < ${property.value(2)}
+        assertQuery(predicate: "${ property.colName }.@max > %@", values: [${property.value(0)}], expectedCount: 1) {
+            $0.${ property.colName }.max > ${property.value(0)}
         }
 
-        assertQuery(predicate: "${property.colName}.@max == %@", values: [${property.value(2)}], expectedCount: 1) {
-            $0.${property.colName}.max == ${property.value(2)}
+        assertQuery(predicate: "${ property.colName }.@max < %@", values: [${property.value(2)}], expectedCount: 0) {
+            $0.${ property.colName }.max < ${property.value(2)}
         }
 
-        assertQuery(predicate: "${property.colName}.@max >= %@", values: [${property.value(0)}], expectedCount: 1) {
-            $0.${property.colName}.max >= ${property.value(0)}
+        assertQuery(predicate: "${ property.colName }.@max == %@", values: [${property.value(2)}], expectedCount: 1) {
+            $0.${ property.colName }.max == ${property.value(2)}
         }
 
-        assertQuery(predicate: "${property.colName}.@max >= %@", values: [${property.value(2)}], expectedCount: 1) {
-            $0.${property.colName}.max >= ${property.value(2)}
+        assertQuery(predicate: "${ property.colName }.@max >= %@", values: [${property.value(0)}], expectedCount: 1) {
+            $0.${ property.colName }.max >= ${property.value(0)}
         }
 
-        assertQuery(predicate: "${property.colName}.@max <= %@", values: [${property.value(1)}], expectedCount: 0) {
-            $0.${property.colName}.max <= ${property.value(1)}
+        assertQuery(predicate: "${ property.colName }.@max >= %@", values: [${property.value(2)}], expectedCount: 1) {
+            $0.${ property.colName }.max >= ${property.value(2)}
         }
 
-        assertQuery(predicate: "${property.colName}.@max <= %@", values: [${property.value(2)}], expectedCount: 1) {
-            $0.${property.colName}.max <= ${property.value(2)}
+        assertQuery(predicate: "${ property.colName }.@max <= %@", values: [${property.value(1)}], expectedCount: 0) {
+            $0.${ property.colName }.max <= ${property.value(1)}
         }
 
-        assertQuery(predicate: "${property.colName}.@max != %@", values: [${property.value(2)}], expectedCount: 0) {
-            $0.${property.colName}.max != ${property.value(2)}
+        assertQuery(predicate: "${ property.colName }.@max <= %@", values: [${property.value(2)}], expectedCount: 1) {
+            $0.${ property.colName }.max <= ${property.value(2)}
         }
 
-        assertQuery(predicate: "${property.colName}.@max != %@", values: [${property.value(0)}], expectedCount: 1) {
-            $0.${property.colName}.max != ${property.value(0)}
+        assertQuery(predicate: "${ property.colName }.@max != %@", values: [${property.value(2)}], expectedCount: 0) {
+            $0.${ property.colName }.max != ${property.value(2)}
+        }
+
+        assertQuery(predicate: "${ property.colName }.@max != %@", values: [${property.value(0)}], expectedCount: 1) {
+            $0.${ property.colName }.max != ${property.value(0)}
         }
         % end
         % end
@@ -2499,53 +2503,53 @@ class QueryTests: TestCase {
         % if property.type != 'Date' and property.type != 'Date?':
 
         try! realm.write {
-            let modernObj = ModernAllTypesObject(value: ["${property.colName }": [${property.value(0)}, ${property.value(1)}, ${property.value(2)}]])
+            let modernObj = ModernAllTypesObject(value: ["${ property.colName }": [${property.value(0)}, ${property.value(1)}, ${property.value(2)}]])
             if let oldObject = object.objectCol {
                 realm.delete(oldObject)
             }
             object.objectCol = modernObj
         }
 
-        let sum${property.colName } = ${property.value(0)} + ${property.value(1)} + ${property.value(2)}
-        assertQuery(predicate: "objectCol.${property.colName }.@sum > %@", values: [${property.value(2)}], expectedCount: 1) {
-            $0.objectCol.${property.colName }.sum > ${property.value(2)}
+        let sum${ property.colName } = ${property.value(0)} + ${property.value(1)} + ${property.value(2)}
+        assertQuery(predicate: "objectCol.${ property.colName }.@sum > %@", values: [${property.value(2)}], expectedCount: 1) {
+            $0.objectCol.${ property.colName }.sum > ${property.value(2)}
         }
 
-        assertQuery(predicate: "objectCol.${property.colName }.@sum < %@", values: [${property.value(2)}], expectedCount: 1) {
-            $0.objectCol.${property.colName }.sum < ${property.value(2)}
+        assertQuery(predicate: "objectCol.${ property.colName }.@sum < %@", values: [${property.value(2)}], expectedCount: 1) {
+            $0.objectCol.${ property.colName }.sum < ${property.value(2)}
         }
 
-        assertQuery(predicate: "objectCol.${property.colName }.@sum == %@", values: [${property.value(2)}], expectedCount: 0) {
-            $0.objectCol.${property.colName }.sum == ${property.value(2)}
+        assertQuery(predicate: "objectCol.${ property.colName }.@sum == %@", values: [${property.value(2)}], expectedCount: 0) {
+            $0.objectCol.${ property.colName }.sum == ${property.value(2)}
         }
 
-        assertQuery(predicate: "objectCol.${property.colName }.@sum == %@", values: [sum${property.colName }], expectedCount: 1) {
-            $0.objectCol.${property.colName }.sum == sum${property.colName }
+        assertQuery(predicate: "objectCol.${ property.colName }.@sum == %@", values: [sum${ property.colName }], expectedCount: 1) {
+            $0.objectCol.${ property.colName }.sum == sum${ property.colName }
         }
 
-        assertQuery(predicate: "objectCol.${property.colName }.@sum >= %@", values: [${property.value(2)}], expectedCount: 1) {
-            $0.objectCol.${property.colName }.sum >= ${property.value(2)}
+        assertQuery(predicate: "objectCol.${ property.colName }.@sum >= %@", values: [${property.value(2)}], expectedCount: 1) {
+            $0.objectCol.${ property.colName }.sum >= ${property.value(2)}
         }
 
-        assertQuery(predicate: "objectCol.${property.colName }.@sum >= %@", values: [sum${property.colName }], expectedCount: 1) {
-            $0.objectCol.${property.colName }.sum >= sum${property.colName }
+        assertQuery(predicate: "objectCol.${ property.colName }.@sum >= %@", values: [sum${ property.colName }], expectedCount: 1) {
+            $0.objectCol.${ property.colName }.sum >= sum${ property.colName }
         }
 
-        assertQuery(predicate: "objectCol.${property.colName }.@sum <= %@", values: [${property.value(2)}], expectedCount: 1) {
-            $0.objectCol.${property.colName }.sum <= ${property.value(2)}
+        assertQuery(predicate: "objectCol.${ property.colName }.@sum <= %@", values: [${property.value(2)}], expectedCount: 1) {
+            $0.objectCol.${ property.colName }.sum <= ${property.value(2)}
         }
 
-        assertQuery(predicate: "objectCol.${property.colName }.@sum <= %@", values: [sum${property.colName }], expectedCount: 2) {
-            $0.objectCol.${property.colName }.sum <= sum${property.colName }
+        assertQuery(predicate: "objectCol.${ property.colName }.@sum <= %@", values: [sum${ property.colName }], expectedCount: 2) {
+            $0.objectCol.${ property.colName }.sum <= sum${ property.colName }
         }
 
         // This includes all ModernAllTypesObject objects beside the one we are populating
-        assertQuery(predicate: "objectCol.${property.colName }.@sum != %@", values: [sum${property.colName }], expectedCount: 1) {
-            $0.objectCol.${property.colName }.sum != sum${property.colName }
+        assertQuery(predicate: "objectCol.${ property.colName }.@sum != %@", values: [sum${ property.colName }], expectedCount: 1) {
+            $0.objectCol.${ property.colName }.sum != sum${ property.colName }
         }
 
-        assertQuery(predicate: "objectCol.${property.colName }.@sum != %@", values: [${property.value(0)}], expectedCount: 2) {
-            $0.objectCol.${property.colName }.sum != ${property.value(0)}
+        assertQuery(predicate: "objectCol.${ property.colName }.@sum != %@", values: [${property.value(0)}], expectedCount: 2) {
+            $0.objectCol.${ property.colName }.sum != ${property.value(0)}
         }
         % end
         % end
@@ -2560,49 +2564,50 @@ class QueryTests: TestCase {
         % if property.type != 'Date' and property.type != 'Date?':
 
         try! realm.write {
-            object.${property.colName}["foo"] = ${property.value(0)}
-            object.${property.colName}["bar"] = ${property.value(1)}
-            object.${property.colName}["baz"] = ${property.value(2)}
-        }
-        let sum${property.colName} = ${property.value(0)} + ${property.value(1)} + ${property.value(2)}
-        assertQuery(predicate: "${property.colName}.@sum > %@", values: [${property.value(2)}], expectedCount: 1) {
-            $0.${property.colName}.sum > ${property.value(2)}
+            object.${ property.colName }["foo"] = ${property.value(0)}
+            object.${ property.colName }["bar"] = ${property.value(1)}
+            object.${ property.colName }["baz"] = ${property.value(2)}
         }
 
-        assertQuery(predicate: "${property.colName}.@sum < %@", values: [${property.value(2)}], expectedCount: 0) {
-            $0.${property.colName}.sum < ${property.value(2)}
+        let sum${ property.colName } = ${property.value(0)} + ${property.value(1)} + ${property.value(2)}
+        assertQuery(predicate: "${ property.colName }.@sum > %@", values: [${property.value(2)}], expectedCount: 1) {
+            $0.${ property.colName }.sum > ${property.value(2)}
         }
 
-        assertQuery(predicate: "${property.colName}.@sum == %@", values: [${property.value(2)}], expectedCount: 0) {
-            $0.${property.colName}.sum == ${property.value(2)}
+        assertQuery(predicate: "${ property.colName }.@sum < %@", values: [${property.value(2)}], expectedCount: 0) {
+            $0.${ property.colName }.sum < ${property.value(2)}
         }
 
-        assertQuery(predicate: "${property.colName}.@sum == %@", values: [sum${property.colName}], expectedCount: 1) {
-            $0.${property.colName}.sum == sum${property.colName}
+        assertQuery(predicate: "${ property.colName }.@sum == %@", values: [${property.value(2)}], expectedCount: 0) {
+            $0.${ property.colName }.sum == ${property.value(2)}
         }
 
-        assertQuery(predicate: "${property.colName}.@sum >= %@", values: [${property.value(2)}], expectedCount: 1) {
-            $0.${property.colName}.sum >= ${property.value(2)}
+        assertQuery(predicate: "${ property.colName }.@sum == %@", values: [sum${ property.colName }], expectedCount: 1) {
+            $0.${ property.colName }.sum == sum${ property.colName }
         }
 
-        assertQuery(predicate: "${property.colName}.@sum >= %@", values: [sum${property.colName}], expectedCount: 1) {
-            $0.${property.colName}.sum >= sum${property.colName}
+        assertQuery(predicate: "${ property.colName }.@sum >= %@", values: [${property.value(2)}], expectedCount: 1) {
+            $0.${ property.colName }.sum >= ${property.value(2)}
         }
 
-        assertQuery(predicate: "${property.colName}.@sum <= %@", values: [${property.value(2)}], expectedCount: 0) {
-            $0.${property.colName}.sum <= ${property.value(2)}
+        assertQuery(predicate: "${ property.colName }.@sum >= %@", values: [sum${ property.colName }], expectedCount: 1) {
+            $0.${ property.colName }.sum >= sum${ property.colName }
         }
 
-        assertQuery(predicate: "${property.colName}.@sum <= %@", values: [sum${property.colName}], expectedCount: 1) {
-            $0.${property.colName}.sum <= sum${property.colName}
+        assertQuery(predicate: "${ property.colName }.@sum <= %@", values: [${property.value(2)}], expectedCount: 0) {
+            $0.${ property.colName }.sum <= ${property.value(2)}
         }
 
-        assertQuery(predicate: "${property.colName}.@sum != %@", values: [sum${property.colName}], expectedCount: 0) {
-            $0.${property.colName}.sum != sum${property.colName}
+        assertQuery(predicate: "${ property.colName }.@sum <= %@", values: [sum${ property.colName }], expectedCount: 1) {
+            $0.${ property.colName }.sum <= sum${ property.colName }
         }
 
-        assertQuery(predicate: "${property.colName}.@sum != %@", values: [${property.value(0)}], expectedCount: 1) {
-            $0.${property.colName}.sum != ${property.value(0)}
+        assertQuery(predicate: "${ property.colName }.@sum != %@", values: [sum${ property.colName }], expectedCount: 0) {
+            $0.${ property.colName }.sum != sum${ property.colName }
+        }
+
+        assertQuery(predicate: "${ property.colName }.@sum != %@", values: [${property.value(0)}], expectedCount: 1) {
+            $0.${ property.colName }.sum != ${property.value(0)}
         }
         % end
         % end
@@ -2618,52 +2623,52 @@ class QueryTests: TestCase {
         % if property.enumName == None and property.category == 'numeric':
 
         try! realm.write {
-            let modernObj = ModernAllTypesObject(value: ["${property.colName }": [${property.value(0)}, ${property.value(1)}, ${property.value(2)}]])
+            let modernObj = ModernAllTypesObject(value: ["${ property.colName }": [${property.value(0)}, ${property.value(1)}, ${property.value(2)}]])
             if let oldObject = object.objectCol {
                 realm.delete(oldObject)
             }
             object.objectCol = modernObj
         }
 
-        assertQuery(predicate: "objectCol.${property.colName }.@count > %@", values: [2], expectedCount: 1) {
-            $0.objectCol.${property.colName }.count > 2
+        assertQuery(predicate: "objectCol.${ property.colName }.@count > %@", values: [2], expectedCount: 1) {
+            $0.objectCol.${ property.colName }.count > 2
         }
 
-        assertQuery(predicate: "objectCol.${property.colName }.@count < %@", values: [3], expectedCount: 1) {
-            $0.objectCol.${property.colName }.count < 3
+        assertQuery(predicate: "objectCol.${ property.colName }.@count < %@", values: [3], expectedCount: 1) {
+            $0.objectCol.${ property.colName }.count < 3
         }
 
-        assertQuery(predicate: "objectCol.${property.colName }.@count == %@", values: [3], expectedCount: 1) {
-            $0.objectCol.${property.colName }.count == 3
+        assertQuery(predicate: "objectCol.${ property.colName }.@count == %@", values: [3], expectedCount: 1) {
+            $0.objectCol.${ property.colName }.count == 3
         }
 
-        assertQuery(predicate: "objectCol.${property.colName }.@count == %@", values: [0], expectedCount: 1) {
-            $0.objectCol.${property.colName }.count == 0
+        assertQuery(predicate: "objectCol.${ property.colName }.@count == %@", values: [0], expectedCount: 1) {
+            $0.objectCol.${ property.colName }.count == 0
         }
 
-        assertQuery(predicate: "objectCol.${property.colName }.@count >= %@", values: [4], expectedCount: 0) {
-            $0.objectCol.${property.colName }.count >= 4
+        assertQuery(predicate: "objectCol.${ property.colName }.@count >= %@", values: [4], expectedCount: 0) {
+            $0.objectCol.${ property.colName }.count >= 4
         }
 
-        assertQuery(predicate: "objectCol.${property.colName }.@count >= %@", values: [3], expectedCount: 1) {
-            $0.objectCol.${property.colName }.count >= 3
+        assertQuery(predicate: "objectCol.${ property.colName }.@count >= %@", values: [3], expectedCount: 1) {
+            $0.objectCol.${ property.colName }.count >= 3
         }
 
-        assertQuery(predicate: "objectCol.${property.colName }.@count <= %@", values: [2], expectedCount: 1) {
-            $0.objectCol.${property.colName }.count <= 2
+        assertQuery(predicate: "objectCol.${ property.colName }.@count <= %@", values: [2], expectedCount: 1) {
+            $0.objectCol.${ property.colName }.count <= 2
         }
 
-        assertQuery(predicate: "objectCol.${property.colName }.@count <= %@", values: [3], expectedCount: 2) {
-            $0.objectCol.${property.colName }.count <= 3
+        assertQuery(predicate: "objectCol.${ property.colName }.@count <= %@", values: [3], expectedCount: 2) {
+            $0.objectCol.${ property.colName }.count <= 3
         }
 
         // This includes all ModernAllTypesObject objects beside the one we are populating
-        assertQuery(predicate: "objectCol.${property.colName }.@count != %@", values: [3], expectedCount: 1) {
-            $0.objectCol.${property.colName }.count != 3
+        assertQuery(predicate: "objectCol.${ property.colName }.@count != %@", values: [3], expectedCount: 1) {
+            $0.objectCol.${ property.colName }.count != 3
         }
 
-        assertQuery(predicate: "objectCol.${property.colName }.@count != %@", values: [1], expectedCount: 2) {
-            $0.objectCol.${property.colName }.count != 1
+        assertQuery(predicate: "objectCol.${ property.colName }.@count != %@", values: [1], expectedCount: 2) {
+            $0.objectCol.${ property.colName }.count != 1
         }
         % end
         % end
@@ -2679,48 +2684,48 @@ class QueryTests: TestCase {
         % if property.type != 'Date' and property.type != 'Date?':
 
         try! realm.write {
-            let modernObj = ModernAllTypesObject(value: ["${property.colName }": ${property.value(0)}])
-            let modernObj1 = ModernAllTypesObject(value: ["${property.colName }": ${property.value(1)}])
-            let modernObj2 = ModernAllTypesObject(value: ["${property.colName }": ${property.value(2)}])
+            let modernObj = ModernAllTypesObject(value: ["${ property.colName }": ${property.value(0)}])
+            let modernObj1 = ModernAllTypesObject(value: ["${ property.colName }": ${property.value(1)}])
+            let modernObj2 = ModernAllTypesObject(value: ["${ property.colName }": ${property.value(2)}])
             realm.delete(object.arrayCol)
             object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
         }
 
-        assertQuery(predicate: "arrayCol.@avg.${property.colName } > %@", values: [${property.value(0)}], expectedCount: 1) {
-            $0.arrayCol.${property.colName }.avg > ${property.value(0)}
+        assertQuery(predicate: "arrayCol.@avg.${ property.colName } > %@", values: [${property.value(0)}], expectedCount: 1) {
+            $0.arrayCol.${ property.colName }.avg > ${property.value(0)}
         }
 
-        assertQuery(predicate: "arrayCol.@avg.${property.colName } < %@", values: [${property.value(2)}], expectedCount: 1) {
-            $0.arrayCol.${property.colName }.avg < ${property.value(2)}
+        assertQuery(predicate: "arrayCol.@avg.${ property.colName } < %@", values: [${property.value(2)}], expectedCount: 1) {
+            $0.arrayCol.${ property.colName }.avg < ${property.value(2)}
         }
 
-        assertQuery(predicate: "arrayCol.@avg.${property.colName } == %@", values: [${property.value(1)}], expectedCount: 1) {
-            $0.arrayCol.${property.colName }.avg == ${property.value(1)}
+        assertQuery(predicate: "arrayCol.@avg.${ property.colName } == %@", values: [${property.value(1)}], expectedCount: 1) {
+            $0.arrayCol.${ property.colName }.avg == ${property.value(1)}
         }
 
-        assertQuery(predicate: "arrayCol.@avg.${property.colName } >= %@", values: [${property.value(0)}], expectedCount: 1) {
-            $0.arrayCol.${property.colName }.avg >= ${property.value(0)}
+        assertQuery(predicate: "arrayCol.@avg.${ property.colName } >= %@", values: [${property.value(0)}], expectedCount: 1) {
+            $0.arrayCol.${ property.colName }.avg >= ${property.value(0)}
         }
 
-        assertQuery(predicate: "arrayCol.@avg.${property.colName } >= %@", values: [${property.value(1)}], expectedCount: 1) {
-            $0.arrayCol.${property.colName }.avg >= ${property.value(1)}
+        assertQuery(predicate: "arrayCol.@avg.${ property.colName } >= %@", values: [${property.value(1)}], expectedCount: 1) {
+            $0.arrayCol.${ property.colName }.avg >= ${property.value(1)}
         }
 
-        assertQuery(predicate: "arrayCol.@avg.${property.colName } <= %@", values: [${property.value(2)}], expectedCount: 1) {
-            $0.arrayCol.${property.colName }.avg <= ${property.value(2)}
+        assertQuery(predicate: "arrayCol.@avg.${ property.colName } <= %@", values: [${property.value(2)}], expectedCount: 1) {
+            $0.arrayCol.${ property.colName }.avg <= ${property.value(2)}
         }
 
-        assertQuery(predicate: "arrayCol.@avg.${property.colName } <= %@", values: [${property.value(1)}], expectedCount: 1) {
-            $0.arrayCol.${property.colName }.avg <= ${property.value(1)}
+        assertQuery(predicate: "arrayCol.@avg.${ property.colName } <= %@", values: [${property.value(1)}], expectedCount: 1) {
+            $0.arrayCol.${ property.colName }.avg <= ${property.value(1)}
         }
 
         // This includes all ModernAllTypesObject objects beside the one we are populating
-        assertQuery(predicate: "arrayCol.@avg.${property.colName } != %@", values: [${property.value(1)}], expectedCount: 3) {
-            $0.arrayCol.${property.colName }.avg != ${property.value(1)}
+        assertQuery(predicate: "arrayCol.@avg.${ property.colName } != %@", values: [${property.value(1)}], expectedCount: 3) {
+            $0.arrayCol.${ property.colName }.avg != ${property.value(1)}
         }
 
-        assertQuery(predicate: "arrayCol.@avg.${property.colName } != %@", values: [${property.value(0)}], expectedCount: 4) {
-            $0.arrayCol.${property.colName }.avg != ${property.value(0)}
+        assertQuery(predicate: "arrayCol.@avg.${ property.colName } != %@", values: [${property.value(0)}], expectedCount: 4) {
+            $0.arrayCol.${ property.colName }.avg != ${property.value(0)}
         }
         % end
         % end
@@ -2734,47 +2739,48 @@ class QueryTests: TestCase {
         % if property.enumName == None and property.category == 'numeric':
 
         try! realm.write {
-            let modernObj = ModernAllTypesObject(value: ["${property.colName }": ${property.value(0)}])
-            let modernObj1 = ModernAllTypesObject(value: ["${property.colName }": ${property.value(1)}])
-            let modernObj2 = ModernAllTypesObject(value: ["${property.colName }": ${property.value(2)}])
+            let modernObj = ModernAllTypesObject(value: ["${ property.colName }": ${property.value(0)}])
+            let modernObj1 = ModernAllTypesObject(value: ["${ property.colName }": ${property.value(1)}])
+            let modernObj2 = ModernAllTypesObject(value: ["${ property.colName }": ${property.value(2)}])
             realm.delete(object.arrayCol)
             object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
         }
-        assertQuery(predicate: "arrayCol.@min.${property.colName } > %@", values: [${property.value(0)}], expectedCount: 0) {
-            $0.arrayCol.${property.colName }.min > ${property.value(0)}
+
+        assertQuery(predicate: "arrayCol.@min.${ property.colName } > %@", values: [${property.value(0)}], expectedCount: 0) {
+            $0.arrayCol.${ property.colName }.min > ${property.value(0)}
         }
 
-        assertQuery(predicate: "arrayCol.@min.${property.colName } < %@", values: [${property.value(2)}], expectedCount: 1) {
-            $0.arrayCol.${property.colName }.min < ${property.value(2)}
+        assertQuery(predicate: "arrayCol.@min.${ property.colName } < %@", values: [${property.value(2)}], expectedCount: 1) {
+            $0.arrayCol.${ property.colName }.min < ${property.value(2)}
         }
 
-        assertQuery(predicate: "arrayCol.@min.${property.colName } == %@", values: [${property.value(0)}], expectedCount: 1) {
-            $0.arrayCol.${property.colName }.min == ${property.value(0)}
+        assertQuery(predicate: "arrayCol.@min.${ property.colName } == %@", values: [${property.value(0)}], expectedCount: 1) {
+            $0.arrayCol.${ property.colName }.min == ${property.value(0)}
         }
 
-        assertQuery(predicate: "arrayCol.@min.${property.colName } >= %@", values: [${property.value(1)}], expectedCount: 0) {
-            $0.arrayCol.${property.colName }.min >= ${property.value(1)}
+        assertQuery(predicate: "arrayCol.@min.${ property.colName } >= %@", values: [${property.value(1)}], expectedCount: 0) {
+            $0.arrayCol.${ property.colName }.min >= ${property.value(1)}
         }
 
-        assertQuery(predicate: "arrayCol.@min.${property.colName } >= %@", values: [${property.value(0)}], expectedCount: 1) {
-            $0.arrayCol.${property.colName }.min >= ${property.value(0)}
+        assertQuery(predicate: "arrayCol.@min.${ property.colName } >= %@", values: [${property.value(0)}], expectedCount: 1) {
+            $0.arrayCol.${ property.colName }.min >= ${property.value(0)}
         }
 
-        assertQuery(predicate: "arrayCol.@min.${property.colName } <= %@", values: [${property.value(2)}], expectedCount: 1) {
-            $0.arrayCol.${property.colName }.min <= ${property.value(2)}
+        assertQuery(predicate: "arrayCol.@min.${ property.colName } <= %@", values: [${property.value(2)}], expectedCount: 1) {
+            $0.arrayCol.${ property.colName }.min <= ${property.value(2)}
         }
 
-        assertQuery(predicate: "arrayCol.@min.${property.colName } <= %@", values: [${property.value(0)}], expectedCount: 1) {
-            $0.arrayCol.${property.colName }.min <= ${property.value(0)}
+        assertQuery(predicate: "arrayCol.@min.${ property.colName } <= %@", values: [${property.value(0)}], expectedCount: 1) {
+            $0.arrayCol.${ property.colName }.min <= ${property.value(0)}
         }
 
         // This includes all ModernAllTypesObject objects beside the one we are populating
-        assertQuery(predicate: "arrayCol.@min.${property.colName } != %@", values: [${property.value(0)}], expectedCount: 3) {
-            $0.arrayCol.${property.colName }.min != ${property.value(0)}
+        assertQuery(predicate: "arrayCol.@min.${ property.colName } != %@", values: [${property.value(0)}], expectedCount: 3) {
+            $0.arrayCol.${ property.colName }.min != ${property.value(0)}
         }
 
-        assertQuery(predicate: "arrayCol.@min.${property.colName } != %@", values: [${property.value(2)}], expectedCount: 4) {
-            $0.arrayCol.${property.colName }.min != ${property.value(2)}
+        assertQuery(predicate: "arrayCol.@min.${ property.colName } != %@", values: [${property.value(2)}], expectedCount: 4) {
+            $0.arrayCol.${ property.colName }.min != ${property.value(2)}
         }
         % end
         % end
@@ -2787,47 +2793,48 @@ class QueryTests: TestCase {
         % if property.enumName == None and property.category == 'numeric':
 
         try! realm.write {
-            let modernObj = ModernAllTypesObject(value: ["${property.colName }": ${property.value(0)}])
-            let modernObj1 = ModernAllTypesObject(value: ["${property.colName }": ${property.value(1)}])
-            let modernObj2 = ModernAllTypesObject(value: ["${property.colName }": ${property.value(2)}])
+            let modernObj = ModernAllTypesObject(value: ["${ property.colName }": ${property.value(0)}])
+            let modernObj1 = ModernAllTypesObject(value: ["${ property.colName }": ${property.value(1)}])
+            let modernObj2 = ModernAllTypesObject(value: ["${ property.colName }": ${property.value(2)}])
             realm.delete(object.arrayCol)
             object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
         }
-        assertQuery(predicate: "arrayCol.@max.${property.colName } > %@", values: [${property.value(0)}], expectedCount: 1) {
-            $0.arrayCol.${property.colName }.max > ${property.value(0)}
+
+        assertQuery(predicate: "arrayCol.@max.${ property.colName } > %@", values: [${property.value(0)}], expectedCount: 1) {
+            $0.arrayCol.${ property.colName }.max > ${property.value(0)}
         }
 
-        assertQuery(predicate: "arrayCol.@max.${property.colName } < %@", values: [${property.value(2)}], expectedCount: 0) {
-            $0.arrayCol.${property.colName }.max < ${property.value(2)}
+        assertQuery(predicate: "arrayCol.@max.${ property.colName } < %@", values: [${property.value(2)}], expectedCount: 0) {
+            $0.arrayCol.${ property.colName }.max < ${property.value(2)}
         }
 
-        assertQuery(predicate: "arrayCol.@max.${property.colName } == %@", values: [${property.value(2)}], expectedCount: 1) {
-            $0.arrayCol.${property.colName }.max == ${property.value(2)}
+        assertQuery(predicate: "arrayCol.@max.${ property.colName } == %@", values: [${property.value(2)}], expectedCount: 1) {
+            $0.arrayCol.${ property.colName }.max == ${property.value(2)}
         }
 
-        assertQuery(predicate: "arrayCol.@max.${property.colName } >= %@", values: [${property.value(0)}], expectedCount: 1) {
-            $0.arrayCol.${property.colName }.max >= ${property.value(0)}
+        assertQuery(predicate: "arrayCol.@max.${ property.colName } >= %@", values: [${property.value(0)}], expectedCount: 1) {
+            $0.arrayCol.${ property.colName }.max >= ${property.value(0)}
         }
 
-        assertQuery(predicate: "arrayCol.@max.${property.colName } >= %@", values: [${property.value(2)}], expectedCount: 1) {
-            $0.arrayCol.${property.colName }.max >= ${property.value(2)}
+        assertQuery(predicate: "arrayCol.@max.${ property.colName } >= %@", values: [${property.value(2)}], expectedCount: 1) {
+            $0.arrayCol.${ property.colName }.max >= ${property.value(2)}
         }
 
-        assertQuery(predicate: "arrayCol.@max.${property.colName } <= %@", values: [${property.value(1)}], expectedCount: 0) {
-            $0.arrayCol.${property.colName }.max <= ${property.value(1)}
+        assertQuery(predicate: "arrayCol.@max.${ property.colName } <= %@", values: [${property.value(1)}], expectedCount: 0) {
+            $0.arrayCol.${ property.colName }.max <= ${property.value(1)}
         }
 
-        assertQuery(predicate: "arrayCol.@max.${property.colName } <= %@", values: [${property.value(2)}], expectedCount: 1) {
-            $0.arrayCol.${property.colName }.max <= ${property.value(2)}
+        assertQuery(predicate: "arrayCol.@max.${ property.colName } <= %@", values: [${property.value(2)}], expectedCount: 1) {
+            $0.arrayCol.${ property.colName }.max <= ${property.value(2)}
         }
 
         // This includes all ModernAllTypesObject objects beside the one we are populating
-        assertQuery(predicate: "arrayCol.@max.${property.colName } != %@", values: [${property.value(2)}], expectedCount: 3) {
-            $0.arrayCol.${property.colName }.max != ${property.value(2)}
+        assertQuery(predicate: "arrayCol.@max.${ property.colName } != %@", values: [${property.value(2)}], expectedCount: 3) {
+            $0.arrayCol.${ property.colName }.max != ${property.value(2)}
         }
 
-        assertQuery(predicate: "arrayCol.@max.${property.colName } != %@", values: [${property.value(0)}], expectedCount: 4) {
-            $0.arrayCol.${property.colName }.max != ${property.value(0)}
+        assertQuery(predicate: "arrayCol.@max.${ property.colName } != %@", values: [${property.value(0)}], expectedCount: 4) {
+            $0.arrayCol.${ property.colName }.max != ${property.value(0)}
         }
         % end
         % end

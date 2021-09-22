@@ -8628,6 +8628,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
+
         assertQuery(predicate: "objectCol.arrayInt.@avg > %@", values: [1], expectedCount: 1) {
             $0.objectCol.arrayInt.avg > 1
         }
@@ -8672,6 +8673,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
+
         assertQuery(predicate: "objectCol.arrayInt8.@avg > %@", values: [Int8(8)], expectedCount: 1) {
             $0.objectCol.arrayInt8.avg > Int8(8)
         }
@@ -8716,6 +8718,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
+
         assertQuery(predicate: "objectCol.arrayInt16.@avg > %@", values: [Int16(16)], expectedCount: 1) {
             $0.objectCol.arrayInt16.avg > Int16(16)
         }
@@ -8760,6 +8763,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
+
         assertQuery(predicate: "objectCol.arrayInt32.@avg > %@", values: [Int32(32)], expectedCount: 1) {
             $0.objectCol.arrayInt32.avg > Int32(32)
         }
@@ -8804,6 +8808,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
+
         assertQuery(predicate: "objectCol.arrayInt64.@avg > %@", values: [Int64(64)], expectedCount: 1) {
             $0.objectCol.arrayInt64.avg > Int64(64)
         }
@@ -8848,6 +8853,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
+
         assertQuery(predicate: "objectCol.arrayFloat.@avg > %@", values: [Float(5.55444333)], expectedCount: 1) {
             $0.objectCol.arrayFloat.avg > Float(5.55444333)
         }
@@ -8892,6 +8898,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
+
         assertQuery(predicate: "objectCol.arrayDouble.@avg > %@", values: [123.456], expectedCount: 1) {
             $0.objectCol.arrayDouble.avg > 123.456
         }
@@ -8936,6 +8943,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
+
         assertQuery(predicate: "objectCol.arrayDecimal.@avg > %@", values: [Decimal128(123.456)], expectedCount: 1) {
             $0.objectCol.arrayDecimal.avg > Decimal128(123.456)
         }
@@ -8980,6 +8988,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
+
         assertQuery(predicate: "objectCol.arrayOptInt.@avg > %@", values: [1], expectedCount: 1) {
             $0.objectCol.arrayOptInt.avg > 1
         }
@@ -9024,6 +9033,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
+
         assertQuery(predicate: "objectCol.arrayOptInt8.@avg > %@", values: [Int8(8)], expectedCount: 1) {
             $0.objectCol.arrayOptInt8.avg > Int8(8)
         }
@@ -9068,6 +9078,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
+
         assertQuery(predicate: "objectCol.arrayOptInt16.@avg > %@", values: [Int16(16)], expectedCount: 1) {
             $0.objectCol.arrayOptInt16.avg > Int16(16)
         }
@@ -9112,6 +9123,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
+
         assertQuery(predicate: "objectCol.arrayOptInt32.@avg > %@", values: [Int32(32)], expectedCount: 1) {
             $0.objectCol.arrayOptInt32.avg > Int32(32)
         }
@@ -9156,6 +9168,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
+
         assertQuery(predicate: "objectCol.arrayOptInt64.@avg > %@", values: [Int64(64)], expectedCount: 1) {
             $0.objectCol.arrayOptInt64.avg > Int64(64)
         }
@@ -9200,6 +9213,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
+
         assertQuery(predicate: "objectCol.arrayOptFloat.@avg > %@", values: [Float(5.55444333)], expectedCount: 1) {
             $0.objectCol.arrayOptFloat.avg > Float(5.55444333)
         }
@@ -9244,6 +9258,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
+
         assertQuery(predicate: "objectCol.arrayOptDouble.@avg > %@", values: [123.456], expectedCount: 1) {
             $0.objectCol.arrayOptDouble.avg > 123.456
         }
@@ -9288,6 +9303,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
+
         assertQuery(predicate: "objectCol.arrayOptDecimal.@avg > %@", values: [Decimal128(123.456)], expectedCount: 1) {
             $0.objectCol.arrayOptDecimal.avg > Decimal128(123.456)
         }
@@ -10016,6 +10032,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
+        
         assertQuery(predicate: "objectCol.arrayInt.@min > %@", values: [1], expectedCount: 0) {
             $0.objectCol.arrayInt.min > 1
         }
@@ -10059,6 +10076,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
+        
         assertQuery(predicate: "objectCol.arrayInt8.@min > %@", values: [Int8(8)], expectedCount: 0) {
             $0.objectCol.arrayInt8.min > Int8(8)
         }
@@ -10102,6 +10120,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
+        
         assertQuery(predicate: "objectCol.arrayInt16.@min > %@", values: [Int16(16)], expectedCount: 0) {
             $0.objectCol.arrayInt16.min > Int16(16)
         }
@@ -10145,6 +10164,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
+        
         assertQuery(predicate: "objectCol.arrayInt32.@min > %@", values: [Int32(32)], expectedCount: 0) {
             $0.objectCol.arrayInt32.min > Int32(32)
         }
@@ -10188,6 +10208,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
+        
         assertQuery(predicate: "objectCol.arrayInt64.@min > %@", values: [Int64(64)], expectedCount: 0) {
             $0.objectCol.arrayInt64.min > Int64(64)
         }
@@ -10231,6 +10252,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
+        
         assertQuery(predicate: "objectCol.arrayFloat.@min > %@", values: [Float(5.55444333)], expectedCount: 0) {
             $0.objectCol.arrayFloat.min > Float(5.55444333)
         }
@@ -10274,6 +10296,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
+        
         assertQuery(predicate: "objectCol.arrayDouble.@min > %@", values: [123.456], expectedCount: 0) {
             $0.objectCol.arrayDouble.min > 123.456
         }
@@ -10317,6 +10340,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
+        
         assertQuery(predicate: "objectCol.arrayDate.@min > %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 0) {
             $0.objectCol.arrayDate.min > Date(timeIntervalSince1970: 1000000)
         }
@@ -10360,6 +10384,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
+        
         assertQuery(predicate: "objectCol.arrayDecimal.@min > %@", values: [Decimal128(123.456)], expectedCount: 0) {
             $0.objectCol.arrayDecimal.min > Decimal128(123.456)
         }
@@ -10403,6 +10428,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
+        
         assertQuery(predicate: "objectCol.arrayOptInt.@min > %@", values: [1], expectedCount: 0) {
             $0.objectCol.arrayOptInt.min > 1
         }
@@ -10446,6 +10472,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
+        
         assertQuery(predicate: "objectCol.arrayOptInt8.@min > %@", values: [Int8(8)], expectedCount: 0) {
             $0.objectCol.arrayOptInt8.min > Int8(8)
         }
@@ -10489,6 +10516,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
+        
         assertQuery(predicate: "objectCol.arrayOptInt16.@min > %@", values: [Int16(16)], expectedCount: 0) {
             $0.objectCol.arrayOptInt16.min > Int16(16)
         }
@@ -10532,6 +10560,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
+        
         assertQuery(predicate: "objectCol.arrayOptInt32.@min > %@", values: [Int32(32)], expectedCount: 0) {
             $0.objectCol.arrayOptInt32.min > Int32(32)
         }
@@ -10575,6 +10604,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
+        
         assertQuery(predicate: "objectCol.arrayOptInt64.@min > %@", values: [Int64(64)], expectedCount: 0) {
             $0.objectCol.arrayOptInt64.min > Int64(64)
         }
@@ -10618,6 +10648,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
+        
         assertQuery(predicate: "objectCol.arrayOptFloat.@min > %@", values: [Float(5.55444333)], expectedCount: 0) {
             $0.objectCol.arrayOptFloat.min > Float(5.55444333)
         }
@@ -10661,6 +10692,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
+        
         assertQuery(predicate: "objectCol.arrayOptDouble.@min > %@", values: [123.456], expectedCount: 0) {
             $0.objectCol.arrayOptDouble.min > 123.456
         }
@@ -10704,6 +10736,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
+        
         assertQuery(predicate: "objectCol.arrayOptDate.@min > %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 0) {
             $0.objectCol.arrayOptDate.min > Date(timeIntervalSince1970: 1000000)
         }
@@ -10747,6 +10780,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
+        
         assertQuery(predicate: "objectCol.arrayOptDecimal.@min > %@", values: [Decimal128(123.456)], expectedCount: 0) {
             $0.objectCol.arrayOptDecimal.min > Decimal128(123.456)
         }
@@ -10793,6 +10827,7 @@ class QueryTests: TestCase {
             object.mapInt["bar"] = 2
             object.mapInt["baz"] = 3
         }
+
         assertQuery(predicate: "mapInt.@min > %@", values: [1], expectedCount: 0) {
             $0.mapInt.min > 1
         }
@@ -10834,6 +10869,7 @@ class QueryTests: TestCase {
             object.mapInt8["bar"] = Int8(9)
             object.mapInt8["baz"] = Int8(10)
         }
+
         assertQuery(predicate: "mapInt8.@min > %@", values: [Int8(8)], expectedCount: 0) {
             $0.mapInt8.min > Int8(8)
         }
@@ -10875,6 +10911,7 @@ class QueryTests: TestCase {
             object.mapInt16["bar"] = Int16(17)
             object.mapInt16["baz"] = Int16(18)
         }
+
         assertQuery(predicate: "mapInt16.@min > %@", values: [Int16(16)], expectedCount: 0) {
             $0.mapInt16.min > Int16(16)
         }
@@ -10916,6 +10953,7 @@ class QueryTests: TestCase {
             object.mapInt32["bar"] = Int32(33)
             object.mapInt32["baz"] = Int32(34)
         }
+
         assertQuery(predicate: "mapInt32.@min > %@", values: [Int32(32)], expectedCount: 0) {
             $0.mapInt32.min > Int32(32)
         }
@@ -10957,6 +10995,7 @@ class QueryTests: TestCase {
             object.mapInt64["bar"] = Int64(65)
             object.mapInt64["baz"] = Int64(66)
         }
+
         assertQuery(predicate: "mapInt64.@min > %@", values: [Int64(64)], expectedCount: 0) {
             $0.mapInt64.min > Int64(64)
         }
@@ -10998,6 +11037,7 @@ class QueryTests: TestCase {
             object.mapFloat["bar"] = Float(6.5544)
             object.mapFloat["baz"] = Float(7.5544)
         }
+
         assertQuery(predicate: "mapFloat.@min > %@", values: [Float(5.5544)], expectedCount: 0) {
             $0.mapFloat.min > Float(5.5544)
         }
@@ -11039,6 +11079,7 @@ class QueryTests: TestCase {
             object.mapDouble["bar"] = 234.567
             object.mapDouble["baz"] = 345.678
         }
+
         assertQuery(predicate: "mapDouble.@min > %@", values: [123.456], expectedCount: 0) {
             $0.mapDouble.min > 123.456
         }
@@ -11080,6 +11121,7 @@ class QueryTests: TestCase {
             object.mapDate["bar"] = Date(timeIntervalSince1970: 2000000)
             object.mapDate["baz"] = Date(timeIntervalSince1970: 3000000)
         }
+
         assertQuery(predicate: "mapDate.@min > %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 0) {
             $0.mapDate.min > Date(timeIntervalSince1970: 1000000)
         }
@@ -11121,6 +11163,7 @@ class QueryTests: TestCase {
             object.mapDecimal["bar"] = Decimal128(234.567)
             object.mapDecimal["baz"] = Decimal128(345.678)
         }
+
         assertQuery(predicate: "mapDecimal.@min > %@", values: [Decimal128(123.456)], expectedCount: 0) {
             $0.mapDecimal.min > Decimal128(123.456)
         }
@@ -11162,6 +11205,7 @@ class QueryTests: TestCase {
             object.mapOptInt["bar"] = 2
             object.mapOptInt["baz"] = 3
         }
+
         assertQuery(predicate: "mapOptInt.@min > %@", values: [1], expectedCount: 0) {
             $0.mapOptInt.min > 1
         }
@@ -11203,6 +11247,7 @@ class QueryTests: TestCase {
             object.mapOptInt8["bar"] = Int8(9)
             object.mapOptInt8["baz"] = Int8(10)
         }
+
         assertQuery(predicate: "mapOptInt8.@min > %@", values: [Int8(8)], expectedCount: 0) {
             $0.mapOptInt8.min > Int8(8)
         }
@@ -11244,6 +11289,7 @@ class QueryTests: TestCase {
             object.mapOptInt16["bar"] = Int16(17)
             object.mapOptInt16["baz"] = Int16(18)
         }
+
         assertQuery(predicate: "mapOptInt16.@min > %@", values: [Int16(16)], expectedCount: 0) {
             $0.mapOptInt16.min > Int16(16)
         }
@@ -11285,6 +11331,7 @@ class QueryTests: TestCase {
             object.mapOptInt32["bar"] = Int32(33)
             object.mapOptInt32["baz"] = Int32(34)
         }
+
         assertQuery(predicate: "mapOptInt32.@min > %@", values: [Int32(32)], expectedCount: 0) {
             $0.mapOptInt32.min > Int32(32)
         }
@@ -11326,6 +11373,7 @@ class QueryTests: TestCase {
             object.mapOptInt64["bar"] = Int64(65)
             object.mapOptInt64["baz"] = Int64(66)
         }
+
         assertQuery(predicate: "mapOptInt64.@min > %@", values: [Int64(64)], expectedCount: 0) {
             $0.mapOptInt64.min > Int64(64)
         }
@@ -11367,6 +11415,7 @@ class QueryTests: TestCase {
             object.mapOptFloat["bar"] = Float(6.5544)
             object.mapOptFloat["baz"] = Float(7.5544)
         }
+
         assertQuery(predicate: "mapOptFloat.@min > %@", values: [Float(5.5544)], expectedCount: 0) {
             $0.mapOptFloat.min > Float(5.5544)
         }
@@ -11408,6 +11457,7 @@ class QueryTests: TestCase {
             object.mapOptDouble["bar"] = 234.567
             object.mapOptDouble["baz"] = 345.678
         }
+
         assertQuery(predicate: "mapOptDouble.@min > %@", values: [123.456], expectedCount: 0) {
             $0.mapOptDouble.min > 123.456
         }
@@ -11449,6 +11499,7 @@ class QueryTests: TestCase {
             object.mapOptDate["bar"] = Date(timeIntervalSince1970: 2000000)
             object.mapOptDate["baz"] = Date(timeIntervalSince1970: 3000000)
         }
+
         assertQuery(predicate: "mapOptDate.@min > %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 0) {
             $0.mapOptDate.min > Date(timeIntervalSince1970: 1000000)
         }
@@ -11490,6 +11541,7 @@ class QueryTests: TestCase {
             object.mapOptDecimal["bar"] = Decimal128(234.567)
             object.mapOptDecimal["baz"] = Decimal128(345.678)
         }
+
         assertQuery(predicate: "mapOptDecimal.@min > %@", values: [Decimal128(123.456)], expectedCount: 0) {
             $0.mapOptDecimal.min > Decimal128(123.456)
         }
@@ -11540,6 +11592,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
+
         assertQuery(predicate: "objectCol.arrayInt.@max > %@", values: [1], expectedCount: 1) {
             $0.objectCol.arrayInt.max > 1
         }
@@ -11584,6 +11637,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
+
         assertQuery(predicate: "objectCol.arrayInt8.@max > %@", values: [Int8(8)], expectedCount: 1) {
             $0.objectCol.arrayInt8.max > Int8(8)
         }
@@ -11628,6 +11682,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
+
         assertQuery(predicate: "objectCol.arrayInt16.@max > %@", values: [Int16(16)], expectedCount: 1) {
             $0.objectCol.arrayInt16.max > Int16(16)
         }
@@ -11672,6 +11727,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
+
         assertQuery(predicate: "objectCol.arrayInt32.@max > %@", values: [Int32(32)], expectedCount: 1) {
             $0.objectCol.arrayInt32.max > Int32(32)
         }
@@ -11716,6 +11772,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
+
         assertQuery(predicate: "objectCol.arrayInt64.@max > %@", values: [Int64(64)], expectedCount: 1) {
             $0.objectCol.arrayInt64.max > Int64(64)
         }
@@ -11760,6 +11817,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
+
         assertQuery(predicate: "objectCol.arrayFloat.@max > %@", values: [Float(5.55444333)], expectedCount: 1) {
             $0.objectCol.arrayFloat.max > Float(5.55444333)
         }
@@ -11804,6 +11862,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
+
         assertQuery(predicate: "objectCol.arrayDouble.@max > %@", values: [123.456], expectedCount: 1) {
             $0.objectCol.arrayDouble.max > 123.456
         }
@@ -11848,6 +11907,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
+
         assertQuery(predicate: "objectCol.arrayDate.@max > %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
             $0.objectCol.arrayDate.max > Date(timeIntervalSince1970: 1000000)
         }
@@ -11892,6 +11952,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
+
         assertQuery(predicate: "objectCol.arrayDecimal.@max > %@", values: [Decimal128(123.456)], expectedCount: 1) {
             $0.objectCol.arrayDecimal.max > Decimal128(123.456)
         }
@@ -11936,6 +11997,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
+
         assertQuery(predicate: "objectCol.arrayOptInt.@max > %@", values: [1], expectedCount: 1) {
             $0.objectCol.arrayOptInt.max > 1
         }
@@ -11980,6 +12042,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
+
         assertQuery(predicate: "objectCol.arrayOptInt8.@max > %@", values: [Int8(8)], expectedCount: 1) {
             $0.objectCol.arrayOptInt8.max > Int8(8)
         }
@@ -12024,6 +12087,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
+
         assertQuery(predicate: "objectCol.arrayOptInt16.@max > %@", values: [Int16(16)], expectedCount: 1) {
             $0.objectCol.arrayOptInt16.max > Int16(16)
         }
@@ -12068,6 +12132,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
+
         assertQuery(predicate: "objectCol.arrayOptInt32.@max > %@", values: [Int32(32)], expectedCount: 1) {
             $0.objectCol.arrayOptInt32.max > Int32(32)
         }
@@ -12112,6 +12177,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
+
         assertQuery(predicate: "objectCol.arrayOptInt64.@max > %@", values: [Int64(64)], expectedCount: 1) {
             $0.objectCol.arrayOptInt64.max > Int64(64)
         }
@@ -12156,6 +12222,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
+
         assertQuery(predicate: "objectCol.arrayOptFloat.@max > %@", values: [Float(5.55444333)], expectedCount: 1) {
             $0.objectCol.arrayOptFloat.max > Float(5.55444333)
         }
@@ -12200,6 +12267,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
+
         assertQuery(predicate: "objectCol.arrayOptDouble.@max > %@", values: [123.456], expectedCount: 1) {
             $0.objectCol.arrayOptDouble.max > 123.456
         }
@@ -12244,6 +12312,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
+
         assertQuery(predicate: "objectCol.arrayOptDate.@max > %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
             $0.objectCol.arrayOptDate.max > Date(timeIntervalSince1970: 1000000)
         }
@@ -12288,6 +12357,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
+
         assertQuery(predicate: "objectCol.arrayOptDecimal.@max > %@", values: [Decimal128(123.456)], expectedCount: 1) {
             $0.objectCol.arrayOptDecimal.max > Decimal128(123.456)
         }
@@ -12335,6 +12405,7 @@ class QueryTests: TestCase {
             object.mapInt["bar"] = 2
             object.mapInt["baz"] = 3
         }
+
         assertQuery(predicate: "mapInt.@max > %@", values: [1], expectedCount: 1) {
             $0.mapInt.max > 1
         }
@@ -12376,6 +12447,7 @@ class QueryTests: TestCase {
             object.mapInt8["bar"] = Int8(9)
             object.mapInt8["baz"] = Int8(10)
         }
+
         assertQuery(predicate: "mapInt8.@max > %@", values: [Int8(8)], expectedCount: 1) {
             $0.mapInt8.max > Int8(8)
         }
@@ -12417,6 +12489,7 @@ class QueryTests: TestCase {
             object.mapInt16["bar"] = Int16(17)
             object.mapInt16["baz"] = Int16(18)
         }
+
         assertQuery(predicate: "mapInt16.@max > %@", values: [Int16(16)], expectedCount: 1) {
             $0.mapInt16.max > Int16(16)
         }
@@ -12458,6 +12531,7 @@ class QueryTests: TestCase {
             object.mapInt32["bar"] = Int32(33)
             object.mapInt32["baz"] = Int32(34)
         }
+
         assertQuery(predicate: "mapInt32.@max > %@", values: [Int32(32)], expectedCount: 1) {
             $0.mapInt32.max > Int32(32)
         }
@@ -12499,6 +12573,7 @@ class QueryTests: TestCase {
             object.mapInt64["bar"] = Int64(65)
             object.mapInt64["baz"] = Int64(66)
         }
+
         assertQuery(predicate: "mapInt64.@max > %@", values: [Int64(64)], expectedCount: 1) {
             $0.mapInt64.max > Int64(64)
         }
@@ -12540,6 +12615,7 @@ class QueryTests: TestCase {
             object.mapFloat["bar"] = Float(6.5544)
             object.mapFloat["baz"] = Float(7.5544)
         }
+
         assertQuery(predicate: "mapFloat.@max > %@", values: [Float(5.5544)], expectedCount: 1) {
             $0.mapFloat.max > Float(5.5544)
         }
@@ -12581,6 +12657,7 @@ class QueryTests: TestCase {
             object.mapDouble["bar"] = 234.567
             object.mapDouble["baz"] = 345.678
         }
+
         assertQuery(predicate: "mapDouble.@max > %@", values: [123.456], expectedCount: 1) {
             $0.mapDouble.max > 123.456
         }
@@ -12622,6 +12699,7 @@ class QueryTests: TestCase {
             object.mapDate["bar"] = Date(timeIntervalSince1970: 2000000)
             object.mapDate["baz"] = Date(timeIntervalSince1970: 3000000)
         }
+
         assertQuery(predicate: "mapDate.@max > %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
             $0.mapDate.max > Date(timeIntervalSince1970: 1000000)
         }
@@ -12663,6 +12741,7 @@ class QueryTests: TestCase {
             object.mapDecimal["bar"] = Decimal128(234.567)
             object.mapDecimal["baz"] = Decimal128(345.678)
         }
+
         assertQuery(predicate: "mapDecimal.@max > %@", values: [Decimal128(123.456)], expectedCount: 1) {
             $0.mapDecimal.max > Decimal128(123.456)
         }
@@ -12704,6 +12783,7 @@ class QueryTests: TestCase {
             object.mapOptInt["bar"] = 2
             object.mapOptInt["baz"] = 3
         }
+
         assertQuery(predicate: "mapOptInt.@max > %@", values: [1], expectedCount: 1) {
             $0.mapOptInt.max > 1
         }
@@ -12745,6 +12825,7 @@ class QueryTests: TestCase {
             object.mapOptInt8["bar"] = Int8(9)
             object.mapOptInt8["baz"] = Int8(10)
         }
+
         assertQuery(predicate: "mapOptInt8.@max > %@", values: [Int8(8)], expectedCount: 1) {
             $0.mapOptInt8.max > Int8(8)
         }
@@ -12786,6 +12867,7 @@ class QueryTests: TestCase {
             object.mapOptInt16["bar"] = Int16(17)
             object.mapOptInt16["baz"] = Int16(18)
         }
+
         assertQuery(predicate: "mapOptInt16.@max > %@", values: [Int16(16)], expectedCount: 1) {
             $0.mapOptInt16.max > Int16(16)
         }
@@ -12827,6 +12909,7 @@ class QueryTests: TestCase {
             object.mapOptInt32["bar"] = Int32(33)
             object.mapOptInt32["baz"] = Int32(34)
         }
+
         assertQuery(predicate: "mapOptInt32.@max > %@", values: [Int32(32)], expectedCount: 1) {
             $0.mapOptInt32.max > Int32(32)
         }
@@ -12868,6 +12951,7 @@ class QueryTests: TestCase {
             object.mapOptInt64["bar"] = Int64(65)
             object.mapOptInt64["baz"] = Int64(66)
         }
+
         assertQuery(predicate: "mapOptInt64.@max > %@", values: [Int64(64)], expectedCount: 1) {
             $0.mapOptInt64.max > Int64(64)
         }
@@ -12909,6 +12993,7 @@ class QueryTests: TestCase {
             object.mapOptFloat["bar"] = Float(6.5544)
             object.mapOptFloat["baz"] = Float(7.5544)
         }
+
         assertQuery(predicate: "mapOptFloat.@max > %@", values: [Float(5.5544)], expectedCount: 1) {
             $0.mapOptFloat.max > Float(5.5544)
         }
@@ -12950,6 +13035,7 @@ class QueryTests: TestCase {
             object.mapOptDouble["bar"] = 234.567
             object.mapOptDouble["baz"] = 345.678
         }
+
         assertQuery(predicate: "mapOptDouble.@max > %@", values: [123.456], expectedCount: 1) {
             $0.mapOptDouble.max > 123.456
         }
@@ -12991,6 +13077,7 @@ class QueryTests: TestCase {
             object.mapOptDate["bar"] = Date(timeIntervalSince1970: 2000000)
             object.mapOptDate["baz"] = Date(timeIntervalSince1970: 3000000)
         }
+
         assertQuery(predicate: "mapOptDate.@max > %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
             $0.mapOptDate.max > Date(timeIntervalSince1970: 1000000)
         }
@@ -13032,6 +13119,7 @@ class QueryTests: TestCase {
             object.mapOptDecimal["bar"] = Decimal128(234.567)
             object.mapOptDecimal["baz"] = Decimal128(345.678)
         }
+
         assertQuery(predicate: "mapOptDecimal.@max > %@", values: [Decimal128(123.456)], expectedCount: 1) {
             $0.mapOptDecimal.max > Decimal128(123.456)
         }
@@ -13082,6 +13170,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
+
         let sumarrayInt = 1 + 2 + 3
         assertQuery(predicate: "objectCol.arrayInt.@sum > %@", values: [3], expectedCount: 1) {
             $0.objectCol.arrayInt.sum > 3
@@ -13131,6 +13220,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
+
         let sumarrayInt8 = Int8(8) + Int8(9) + Int8(10)
         assertQuery(predicate: "objectCol.arrayInt8.@sum > %@", values: [Int8(10)], expectedCount: 1) {
             $0.objectCol.arrayInt8.sum > Int8(10)
@@ -13180,6 +13270,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
+
         let sumarrayInt16 = Int16(16) + Int16(17) + Int16(18)
         assertQuery(predicate: "objectCol.arrayInt16.@sum > %@", values: [Int16(18)], expectedCount: 1) {
             $0.objectCol.arrayInt16.sum > Int16(18)
@@ -13229,6 +13320,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
+
         let sumarrayInt32 = Int32(32) + Int32(33) + Int32(34)
         assertQuery(predicate: "objectCol.arrayInt32.@sum > %@", values: [Int32(34)], expectedCount: 1) {
             $0.objectCol.arrayInt32.sum > Int32(34)
@@ -13278,6 +13370,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
+
         let sumarrayInt64 = Int64(64) + Int64(65) + Int64(66)
         assertQuery(predicate: "objectCol.arrayInt64.@sum > %@", values: [Int64(66)], expectedCount: 1) {
             $0.objectCol.arrayInt64.sum > Int64(66)
@@ -13327,6 +13420,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
+
         let sumarrayFloat = Float(5.55444333) + Float(6.55444333) + Float(7.55444333)
         assertQuery(predicate: "objectCol.arrayFloat.@sum > %@", values: [Float(7.55444333)], expectedCount: 1) {
             $0.objectCol.arrayFloat.sum > Float(7.55444333)
@@ -13376,6 +13470,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
+
         let sumarrayDouble = 123.456 + 234.567 + 345.678
         assertQuery(predicate: "objectCol.arrayDouble.@sum > %@", values: [345.678], expectedCount: 1) {
             $0.objectCol.arrayDouble.sum > 345.678
@@ -13425,6 +13520,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
+
         let sumarrayDecimal = Decimal128(123.456) + Decimal128(234.567) + Decimal128(345.678)
         assertQuery(predicate: "objectCol.arrayDecimal.@sum > %@", values: [Decimal128(345.678)], expectedCount: 1) {
             $0.objectCol.arrayDecimal.sum > Decimal128(345.678)
@@ -13474,6 +13570,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
+
         let sumarrayOptInt = 1 + 2 + 3
         assertQuery(predicate: "objectCol.arrayOptInt.@sum > %@", values: [3], expectedCount: 1) {
             $0.objectCol.arrayOptInt.sum > 3
@@ -13523,6 +13620,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
+
         let sumarrayOptInt8 = Int8(8) + Int8(9) + Int8(10)
         assertQuery(predicate: "objectCol.arrayOptInt8.@sum > %@", values: [Int8(10)], expectedCount: 1) {
             $0.objectCol.arrayOptInt8.sum > Int8(10)
@@ -13572,6 +13670,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
+
         let sumarrayOptInt16 = Int16(16) + Int16(17) + Int16(18)
         assertQuery(predicate: "objectCol.arrayOptInt16.@sum > %@", values: [Int16(18)], expectedCount: 1) {
             $0.objectCol.arrayOptInt16.sum > Int16(18)
@@ -13621,6 +13720,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
+
         let sumarrayOptInt32 = Int32(32) + Int32(33) + Int32(34)
         assertQuery(predicate: "objectCol.arrayOptInt32.@sum > %@", values: [Int32(34)], expectedCount: 1) {
             $0.objectCol.arrayOptInt32.sum > Int32(34)
@@ -13670,6 +13770,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
+
         let sumarrayOptInt64 = Int64(64) + Int64(65) + Int64(66)
         assertQuery(predicate: "objectCol.arrayOptInt64.@sum > %@", values: [Int64(66)], expectedCount: 1) {
             $0.objectCol.arrayOptInt64.sum > Int64(66)
@@ -13719,6 +13820,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
+
         let sumarrayOptFloat = Float(5.55444333) + Float(6.55444333) + Float(7.55444333)
         assertQuery(predicate: "objectCol.arrayOptFloat.@sum > %@", values: [Float(7.55444333)], expectedCount: 1) {
             $0.objectCol.arrayOptFloat.sum > Float(7.55444333)
@@ -13768,6 +13870,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
+
         let sumarrayOptDouble = 123.456 + 234.567 + 345.678
         assertQuery(predicate: "objectCol.arrayOptDouble.@sum > %@", values: [345.678], expectedCount: 1) {
             $0.objectCol.arrayOptDouble.sum > 345.678
@@ -13817,6 +13920,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
+
         let sumarrayOptDecimal = Decimal128(123.456) + Decimal128(234.567) + Decimal128(345.678)
         assertQuery(predicate: "objectCol.arrayOptDecimal.@sum > %@", values: [Decimal128(345.678)], expectedCount: 1) {
             $0.objectCol.arrayOptDecimal.sum > Decimal128(345.678)
@@ -13869,6 +13973,7 @@ class QueryTests: TestCase {
             object.mapInt["bar"] = 2
             object.mapInt["baz"] = 3
         }
+
         let summapInt = 1 + 2 + 3
         assertQuery(predicate: "mapInt.@sum > %@", values: [3], expectedCount: 1) {
             $0.mapInt.sum > 3
@@ -13915,6 +14020,7 @@ class QueryTests: TestCase {
             object.mapInt8["bar"] = Int8(9)
             object.mapInt8["baz"] = Int8(10)
         }
+
         let summapInt8 = Int8(8) + Int8(9) + Int8(10)
         assertQuery(predicate: "mapInt8.@sum > %@", values: [Int8(10)], expectedCount: 1) {
             $0.mapInt8.sum > Int8(10)
@@ -13961,6 +14067,7 @@ class QueryTests: TestCase {
             object.mapInt16["bar"] = Int16(17)
             object.mapInt16["baz"] = Int16(18)
         }
+
         let summapInt16 = Int16(16) + Int16(17) + Int16(18)
         assertQuery(predicate: "mapInt16.@sum > %@", values: [Int16(18)], expectedCount: 1) {
             $0.mapInt16.sum > Int16(18)
@@ -14007,6 +14114,7 @@ class QueryTests: TestCase {
             object.mapInt32["bar"] = Int32(33)
             object.mapInt32["baz"] = Int32(34)
         }
+
         let summapInt32 = Int32(32) + Int32(33) + Int32(34)
         assertQuery(predicate: "mapInt32.@sum > %@", values: [Int32(34)], expectedCount: 1) {
             $0.mapInt32.sum > Int32(34)
@@ -14053,6 +14161,7 @@ class QueryTests: TestCase {
             object.mapInt64["bar"] = Int64(65)
             object.mapInt64["baz"] = Int64(66)
         }
+
         let summapInt64 = Int64(64) + Int64(65) + Int64(66)
         assertQuery(predicate: "mapInt64.@sum > %@", values: [Int64(66)], expectedCount: 1) {
             $0.mapInt64.sum > Int64(66)
@@ -14099,6 +14208,7 @@ class QueryTests: TestCase {
             object.mapFloat["bar"] = Float(6.5544)
             object.mapFloat["baz"] = Float(7.5544)
         }
+
         let summapFloat = Float(5.5544) + Float(6.5544) + Float(7.5544)
         assertQuery(predicate: "mapFloat.@sum > %@", values: [Float(7.5544)], expectedCount: 1) {
             $0.mapFloat.sum > Float(7.5544)
@@ -14145,6 +14255,7 @@ class QueryTests: TestCase {
             object.mapDouble["bar"] = 234.567
             object.mapDouble["baz"] = 345.678
         }
+
         let summapDouble = 123.456 + 234.567 + 345.678
         assertQuery(predicate: "mapDouble.@sum > %@", values: [345.678], expectedCount: 1) {
             $0.mapDouble.sum > 345.678
@@ -14191,6 +14302,7 @@ class QueryTests: TestCase {
             object.mapDecimal["bar"] = Decimal128(234.567)
             object.mapDecimal["baz"] = Decimal128(345.678)
         }
+
         let summapDecimal = Decimal128(123.456) + Decimal128(234.567) + Decimal128(345.678)
         assertQuery(predicate: "mapDecimal.@sum > %@", values: [Decimal128(345.678)], expectedCount: 1) {
             $0.mapDecimal.sum > Decimal128(345.678)
@@ -14237,6 +14349,7 @@ class QueryTests: TestCase {
             object.mapOptInt["bar"] = 2
             object.mapOptInt["baz"] = 3
         }
+
         let summapOptInt = 1 + 2 + 3
         assertQuery(predicate: "mapOptInt.@sum > %@", values: [3], expectedCount: 1) {
             $0.mapOptInt.sum > 3
@@ -14283,6 +14396,7 @@ class QueryTests: TestCase {
             object.mapOptInt8["bar"] = Int8(9)
             object.mapOptInt8["baz"] = Int8(10)
         }
+
         let summapOptInt8 = Int8(8) + Int8(9) + Int8(10)
         assertQuery(predicate: "mapOptInt8.@sum > %@", values: [Int8(10)], expectedCount: 1) {
             $0.mapOptInt8.sum > Int8(10)
@@ -14329,6 +14443,7 @@ class QueryTests: TestCase {
             object.mapOptInt16["bar"] = Int16(17)
             object.mapOptInt16["baz"] = Int16(18)
         }
+
         let summapOptInt16 = Int16(16) + Int16(17) + Int16(18)
         assertQuery(predicate: "mapOptInt16.@sum > %@", values: [Int16(18)], expectedCount: 1) {
             $0.mapOptInt16.sum > Int16(18)
@@ -14375,6 +14490,7 @@ class QueryTests: TestCase {
             object.mapOptInt32["bar"] = Int32(33)
             object.mapOptInt32["baz"] = Int32(34)
         }
+
         let summapOptInt32 = Int32(32) + Int32(33) + Int32(34)
         assertQuery(predicate: "mapOptInt32.@sum > %@", values: [Int32(34)], expectedCount: 1) {
             $0.mapOptInt32.sum > Int32(34)
@@ -14421,6 +14537,7 @@ class QueryTests: TestCase {
             object.mapOptInt64["bar"] = Int64(65)
             object.mapOptInt64["baz"] = Int64(66)
         }
+
         let summapOptInt64 = Int64(64) + Int64(65) + Int64(66)
         assertQuery(predicate: "mapOptInt64.@sum > %@", values: [Int64(66)], expectedCount: 1) {
             $0.mapOptInt64.sum > Int64(66)
@@ -14467,6 +14584,7 @@ class QueryTests: TestCase {
             object.mapOptFloat["bar"] = Float(6.5544)
             object.mapOptFloat["baz"] = Float(7.5544)
         }
+
         let summapOptFloat = Float(5.5544) + Float(6.5544) + Float(7.5544)
         assertQuery(predicate: "mapOptFloat.@sum > %@", values: [Float(7.5544)], expectedCount: 1) {
             $0.mapOptFloat.sum > Float(7.5544)
@@ -14513,6 +14631,7 @@ class QueryTests: TestCase {
             object.mapOptDouble["bar"] = 234.567
             object.mapOptDouble["baz"] = 345.678
         }
+
         let summapOptDouble = 123.456 + 234.567 + 345.678
         assertQuery(predicate: "mapOptDouble.@sum > %@", values: [345.678], expectedCount: 1) {
             $0.mapOptDouble.sum > 345.678
@@ -14559,6 +14678,7 @@ class QueryTests: TestCase {
             object.mapOptDecimal["bar"] = Decimal128(234.567)
             object.mapOptDecimal["baz"] = Decimal128(345.678)
         }
+
         let summapOptDecimal = Decimal128(123.456) + Decimal128(234.567) + Decimal128(345.678)
         assertQuery(predicate: "mapOptDecimal.@sum > %@", values: [Decimal128(345.678)], expectedCount: 1) {
             $0.mapOptDecimal.sum > Decimal128(345.678)
@@ -16228,6 +16348,7 @@ class QueryTests: TestCase {
             realm.delete(object.arrayCol)
             object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
         }
+
         assertQuery(predicate: "arrayCol.@min.intCol > %@", values: [5], expectedCount: 0) {
             $0.arrayCol.intCol.min > 5
         }
@@ -16272,6 +16393,7 @@ class QueryTests: TestCase {
             realm.delete(object.arrayCol)
             object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
         }
+
         assertQuery(predicate: "arrayCol.@min.int8Col > %@", values: [Int8(8)], expectedCount: 0) {
             $0.arrayCol.int8Col.min > Int8(8)
         }
@@ -16316,6 +16438,7 @@ class QueryTests: TestCase {
             realm.delete(object.arrayCol)
             object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
         }
+
         assertQuery(predicate: "arrayCol.@min.int16Col > %@", values: [Int16(16)], expectedCount: 0) {
             $0.arrayCol.int16Col.min > Int16(16)
         }
@@ -16360,6 +16483,7 @@ class QueryTests: TestCase {
             realm.delete(object.arrayCol)
             object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
         }
+
         assertQuery(predicate: "arrayCol.@min.int32Col > %@", values: [Int32(32)], expectedCount: 0) {
             $0.arrayCol.int32Col.min > Int32(32)
         }
@@ -16404,6 +16528,7 @@ class QueryTests: TestCase {
             realm.delete(object.arrayCol)
             object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
         }
+
         assertQuery(predicate: "arrayCol.@min.int64Col > %@", values: [Int64(64)], expectedCount: 0) {
             $0.arrayCol.int64Col.min > Int64(64)
         }
@@ -16448,6 +16573,7 @@ class QueryTests: TestCase {
             realm.delete(object.arrayCol)
             object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
         }
+
         assertQuery(predicate: "arrayCol.@min.floatCol > %@", values: [Float(5.55444333)], expectedCount: 0) {
             $0.arrayCol.floatCol.min > Float(5.55444333)
         }
@@ -16492,6 +16618,7 @@ class QueryTests: TestCase {
             realm.delete(object.arrayCol)
             object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
         }
+
         assertQuery(predicate: "arrayCol.@min.doubleCol > %@", values: [123.456], expectedCount: 0) {
             $0.arrayCol.doubleCol.min > 123.456
         }
@@ -16536,6 +16663,7 @@ class QueryTests: TestCase {
             realm.delete(object.arrayCol)
             object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
         }
+
         assertQuery(predicate: "arrayCol.@min.dateCol > %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 0) {
             $0.arrayCol.dateCol.min > Date(timeIntervalSince1970: 1000000)
         }
@@ -16580,6 +16708,7 @@ class QueryTests: TestCase {
             realm.delete(object.arrayCol)
             object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
         }
+
         assertQuery(predicate: "arrayCol.@min.decimalCol > %@", values: [Decimal128(123.456)], expectedCount: 0) {
             $0.arrayCol.decimalCol.min > Decimal128(123.456)
         }
@@ -16624,6 +16753,7 @@ class QueryTests: TestCase {
             realm.delete(object.arrayCol)
             object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
         }
+
         assertQuery(predicate: "arrayCol.@min.optIntCol > %@", values: [5], expectedCount: 0) {
             $0.arrayCol.optIntCol.min > 5
         }
@@ -16668,6 +16798,7 @@ class QueryTests: TestCase {
             realm.delete(object.arrayCol)
             object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
         }
+
         assertQuery(predicate: "arrayCol.@min.optInt8Col > %@", values: [Int8(8)], expectedCount: 0) {
             $0.arrayCol.optInt8Col.min > Int8(8)
         }
@@ -16712,6 +16843,7 @@ class QueryTests: TestCase {
             realm.delete(object.arrayCol)
             object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
         }
+
         assertQuery(predicate: "arrayCol.@min.optInt16Col > %@", values: [Int16(16)], expectedCount: 0) {
             $0.arrayCol.optInt16Col.min > Int16(16)
         }
@@ -16756,6 +16888,7 @@ class QueryTests: TestCase {
             realm.delete(object.arrayCol)
             object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
         }
+
         assertQuery(predicate: "arrayCol.@min.optInt32Col > %@", values: [Int32(32)], expectedCount: 0) {
             $0.arrayCol.optInt32Col.min > Int32(32)
         }
@@ -16800,6 +16933,7 @@ class QueryTests: TestCase {
             realm.delete(object.arrayCol)
             object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
         }
+
         assertQuery(predicate: "arrayCol.@min.optInt64Col > %@", values: [Int64(64)], expectedCount: 0) {
             $0.arrayCol.optInt64Col.min > Int64(64)
         }
@@ -16844,6 +16978,7 @@ class QueryTests: TestCase {
             realm.delete(object.arrayCol)
             object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
         }
+
         assertQuery(predicate: "arrayCol.@min.optFloatCol > %@", values: [Float(5.55444333)], expectedCount: 0) {
             $0.arrayCol.optFloatCol.min > Float(5.55444333)
         }
@@ -16888,6 +17023,7 @@ class QueryTests: TestCase {
             realm.delete(object.arrayCol)
             object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
         }
+
         assertQuery(predicate: "arrayCol.@min.optDoubleCol > %@", values: [123.456], expectedCount: 0) {
             $0.arrayCol.optDoubleCol.min > 123.456
         }
@@ -16932,6 +17068,7 @@ class QueryTests: TestCase {
             realm.delete(object.arrayCol)
             object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
         }
+
         assertQuery(predicate: "arrayCol.@min.optDateCol > %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 0) {
             $0.arrayCol.optDateCol.min > Date(timeIntervalSince1970: 1000000)
         }
@@ -16976,6 +17113,7 @@ class QueryTests: TestCase {
             realm.delete(object.arrayCol)
             object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
         }
+
         assertQuery(predicate: "arrayCol.@min.optDecimalCol > %@", values: [Decimal128(123.456)], expectedCount: 0) {
             $0.arrayCol.optDecimalCol.min > Decimal128(123.456)
         }
@@ -17025,6 +17163,7 @@ class QueryTests: TestCase {
             realm.delete(object.arrayCol)
             object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
         }
+
         assertQuery(predicate: "arrayCol.@max.intCol > %@", values: [5], expectedCount: 1) {
             $0.arrayCol.intCol.max > 5
         }
@@ -17069,6 +17208,7 @@ class QueryTests: TestCase {
             realm.delete(object.arrayCol)
             object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
         }
+
         assertQuery(predicate: "arrayCol.@max.int8Col > %@", values: [Int8(8)], expectedCount: 1) {
             $0.arrayCol.int8Col.max > Int8(8)
         }
@@ -17113,6 +17253,7 @@ class QueryTests: TestCase {
             realm.delete(object.arrayCol)
             object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
         }
+
         assertQuery(predicate: "arrayCol.@max.int16Col > %@", values: [Int16(16)], expectedCount: 1) {
             $0.arrayCol.int16Col.max > Int16(16)
         }
@@ -17157,6 +17298,7 @@ class QueryTests: TestCase {
             realm.delete(object.arrayCol)
             object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
         }
+
         assertQuery(predicate: "arrayCol.@max.int32Col > %@", values: [Int32(32)], expectedCount: 1) {
             $0.arrayCol.int32Col.max > Int32(32)
         }
@@ -17201,6 +17343,7 @@ class QueryTests: TestCase {
             realm.delete(object.arrayCol)
             object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
         }
+
         assertQuery(predicate: "arrayCol.@max.int64Col > %@", values: [Int64(64)], expectedCount: 1) {
             $0.arrayCol.int64Col.max > Int64(64)
         }
@@ -17245,6 +17388,7 @@ class QueryTests: TestCase {
             realm.delete(object.arrayCol)
             object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
         }
+
         assertQuery(predicate: "arrayCol.@max.floatCol > %@", values: [Float(5.55444333)], expectedCount: 1) {
             $0.arrayCol.floatCol.max > Float(5.55444333)
         }
@@ -17289,6 +17433,7 @@ class QueryTests: TestCase {
             realm.delete(object.arrayCol)
             object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
         }
+
         assertQuery(predicate: "arrayCol.@max.doubleCol > %@", values: [123.456], expectedCount: 1) {
             $0.arrayCol.doubleCol.max > 123.456
         }
@@ -17333,6 +17478,7 @@ class QueryTests: TestCase {
             realm.delete(object.arrayCol)
             object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
         }
+
         assertQuery(predicate: "arrayCol.@max.dateCol > %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
             $0.arrayCol.dateCol.max > Date(timeIntervalSince1970: 1000000)
         }
@@ -17377,6 +17523,7 @@ class QueryTests: TestCase {
             realm.delete(object.arrayCol)
             object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
         }
+
         assertQuery(predicate: "arrayCol.@max.decimalCol > %@", values: [Decimal128(123.456)], expectedCount: 1) {
             $0.arrayCol.decimalCol.max > Decimal128(123.456)
         }
@@ -17421,6 +17568,7 @@ class QueryTests: TestCase {
             realm.delete(object.arrayCol)
             object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
         }
+
         assertQuery(predicate: "arrayCol.@max.optIntCol > %@", values: [5], expectedCount: 1) {
             $0.arrayCol.optIntCol.max > 5
         }
@@ -17465,6 +17613,7 @@ class QueryTests: TestCase {
             realm.delete(object.arrayCol)
             object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
         }
+
         assertQuery(predicate: "arrayCol.@max.optInt8Col > %@", values: [Int8(8)], expectedCount: 1) {
             $0.arrayCol.optInt8Col.max > Int8(8)
         }
@@ -17509,6 +17658,7 @@ class QueryTests: TestCase {
             realm.delete(object.arrayCol)
             object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
         }
+
         assertQuery(predicate: "arrayCol.@max.optInt16Col > %@", values: [Int16(16)], expectedCount: 1) {
             $0.arrayCol.optInt16Col.max > Int16(16)
         }
@@ -17553,6 +17703,7 @@ class QueryTests: TestCase {
             realm.delete(object.arrayCol)
             object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
         }
+
         assertQuery(predicate: "arrayCol.@max.optInt32Col > %@", values: [Int32(32)], expectedCount: 1) {
             $0.arrayCol.optInt32Col.max > Int32(32)
         }
@@ -17597,6 +17748,7 @@ class QueryTests: TestCase {
             realm.delete(object.arrayCol)
             object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
         }
+
         assertQuery(predicate: "arrayCol.@max.optInt64Col > %@", values: [Int64(64)], expectedCount: 1) {
             $0.arrayCol.optInt64Col.max > Int64(64)
         }
@@ -17641,6 +17793,7 @@ class QueryTests: TestCase {
             realm.delete(object.arrayCol)
             object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
         }
+
         assertQuery(predicate: "arrayCol.@max.optFloatCol > %@", values: [Float(5.55444333)], expectedCount: 1) {
             $0.arrayCol.optFloatCol.max > Float(5.55444333)
         }
@@ -17685,6 +17838,7 @@ class QueryTests: TestCase {
             realm.delete(object.arrayCol)
             object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
         }
+
         assertQuery(predicate: "arrayCol.@max.optDoubleCol > %@", values: [123.456], expectedCount: 1) {
             $0.arrayCol.optDoubleCol.max > 123.456
         }
@@ -17729,6 +17883,7 @@ class QueryTests: TestCase {
             realm.delete(object.arrayCol)
             object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
         }
+
         assertQuery(predicate: "arrayCol.@max.optDateCol > %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
             $0.arrayCol.optDateCol.max > Date(timeIntervalSince1970: 1000000)
         }
@@ -17773,6 +17928,7 @@ class QueryTests: TestCase {
             realm.delete(object.arrayCol)
             object.arrayCol.append(objectsIn: [modernObj, modernObj1, modernObj2])
         }
+
         assertQuery(predicate: "arrayCol.@max.optDecimalCol > %@", values: [Decimal128(123.456)], expectedCount: 1) {
             $0.arrayCol.optDecimalCol.max > Decimal128(123.456)
         }
