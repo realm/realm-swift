@@ -3,8 +3,7 @@ x.y.z Release notes (yyyy-MM-dd)
 ### Enhancements
 * None.
 
-* Add `async` versions for `EmailPasswordAuth.callResetPasswordFunction` and 
-  `User.linkUser` methods.
+* Add `async` versions for `EmailPasswordAuth.callResetPasswordFunction` and  `User.linkUser` methods.
 * Add `async` version for `MongoCollection` methods.
 * Add `async` support for user functions.
 * Add support for multi-user on `@AsyncOpen` and `@AutoOpen`.
