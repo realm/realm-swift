@@ -8584,11 +8584,6 @@ class QueryTests: TestCase {
             ($0.arrayCol.arrayInt.count >= 0 && ($0.arrayCol.intCol != 123).count > 0).count > 0
         }
 
-
-        assertQuery(predicate: "SUBQUERY(arrayCol, $obj2, ($obj2.arrayInt.@count >= %@ && SUBQUERY(arrayCol, $obj1, ($obj1.arrayInt.@count >= %@ && SUBQUERY(arrayCol, $obj0, $obj0.intCol != %@).@count > %@)).@count > %@)).@count > %@", values: [0, 0, 123, 0, 0, 0], expectedCount: 0) {
-            ($0.arrayCol.arrayInt.count >= 0 && (($0.arrayCol.arrayInt.count >= 0 && (($0.arrayCol.intCol != 123).count > 0)).count > 0)).count > 0
-        }
-
         assertQuery(predicate: "SUBQUERY(arrayCol, $obj0, $obj0.intCol != %@).@count > %@", values: [123, 0], expectedCount: 1) {
             ($0.arrayCol.intCol != 123).count > 0
         }
