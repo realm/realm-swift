@@ -881,8 +881,8 @@ private class ObservableAsyncOpenStorage: ObservableObject {
         appCancellable = []
     }
 
-    init(kind: AsyncOpenKind, app: App, configuration: Realm.Configuration?, partitionValue: AnyBSON) {
-        self.asyncOpenType = kind
+    init(asyncOpenKind: AsyncOpenKind, app: App, configuration: Realm.Configuration?, partitionValue: AnyBSON) {
+        self.asyncOpenKind = asyncOpenKind
         self.app = app
         self.configuration = configuration
         self.partitionValue = partitionValue
@@ -894,17 +894,17 @@ private class ObservableAsyncOpenStorage: ObservableObject {
             appState = .loggedOut
             asyncOpenState = .waitingForUser
         }
-        app.objectWillChange.sink {
+        app.objectWillChange.sink { app in
             switch self.appState {
             case .loggedIn(let user):
-                if let newUser = $0.currentUser,
+                if let newUser = app.currentUser,
                     user != newUser {
                     self.appState = .loggedIn(newUser)
-                } else if $0.currentUser == nil {
+                } else if app.currentUser == nil {
                     self.appState = .loggedOut
                 }
             case .loggedOut:
-                if let user = $0.currentUser {
+                if let user = app.currentUser {
                     self.appState = .loggedIn(user)
                 }
             }
@@ -1018,7 +1018,7 @@ private class ObservableAsyncOpenStorage: ObservableObject {
                 timeout: UInt? = nil) {
         let app = ObservableAsyncOpenStorage.configureApp(appId: appId, withTimeout: timeout)
         // Store property wrapper values on the storage
-        storage = ObservableAsyncOpenStorage(kind: .asyncOpen, app: app, configuration: configuration, partitionValue: AnyBSON(partitionValue))
+        storage = ObservableAsyncOpenStorage(asyncOpenKind: .asyncOpen, app: app, configuration: configuration, partitionValue: AnyBSON(partitionValue))
     }
 
     public mutating func update() {
@@ -1126,7 +1126,7 @@ private class ObservableAsyncOpenStorage: ObservableObject {
                 timeout: UInt? = nil) {
         let app = ObservableAsyncOpenStorage.configureApp(appId: appId, withTimeout: timeout)
         // Store property wrapper values on the storage
-        storage = ObservableAsyncOpenStorage(kind: .autoOpen, app: app, configuration: configuration, partitionValue: AnyBSON(partitionValue))
+        storage = ObservableAsyncOpenStorage(asyncOpenKind: .autoOpen, app: app, configuration: configuration, partitionValue: AnyBSON(partitionValue))
     }
 
     public mutating func update() {
