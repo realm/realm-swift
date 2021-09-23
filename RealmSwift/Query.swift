@@ -93,6 +93,31 @@ private enum QueryExpression {
     case special(Special)
 }
 
+private struct QueryContext {
+    // Holds the individual tokens for the query expression.
+    var expression: [QueryExpression] = []
+    // Indicates if we need a closing parentheses after a map subscript expression.
+    var mapSubscriptNeedsResolution = false
+    // Helps give Subquery collection vars a unique name.
+    var count = 0
+    // Indicates if the query builder should use 'self' as the keypath.
+    var isPrimitive = false
+
+    init(expression: [QueryExpression] = [],
+         count: Int,
+         mapSubscriptNeedsResolution: Bool,
+         isPrimitive: Bool) {
+        self.expression = expression
+        self.count = count
+        self.mapSubscriptNeedsResolution = mapSubscriptNeedsResolution
+        self.isPrimitive = isPrimitive
+    }
+
+    init(isPrimitive: Bool) {
+        self.isPrimitive = isPrimitive
+    }
+}
+
 /**
  `Query` is a class used to create type-safe query predicates.
 
@@ -164,58 +189,62 @@ private enum QueryExpression {
 @dynamicMemberLookup
 public struct Query<T: _RealmSchemaDiscoverable> {
 
-    private var expression: [QueryExpression] = []
-    // Indicates if we need a closing parentheses after a map subscript expression.
-    private var mapSubscriptNeedsResolution = false
-
+    private var context: QueryContext
 
     /// Initializes a `Query` object.
     /// - Parameter isPrimitive: States is the query is on 'self' and will have no key path context.
-    public init(isPrimitive: Bool=false) {
-        if isPrimitive {
-            expression.append(.keyPath(name: "self", isCollection: false))
-        }
-    }
-    private init(expression: [QueryExpression],
-                 mapSubscriptNeedsResolution: Bool = false,
-                 isPrimitive: Bool = false) {
-        self.expression = expression
-        self.mapSubscriptNeedsResolution = mapSubscriptNeedsResolution
+    public init(isPrimitive: Bool = false) {
+        self.context = QueryContext(isPrimitive: isPrimitive)
     }
 
-    private func append<V>(expression: [QueryExpression]) -> Query<V> {
+    fileprivate init(context: QueryContext) {
+        self.context = context
+        if self.context.isPrimitive {
+            // Do not insert 'self' where it does not make a logical
+            // predicate expression.
+            if case .special(_) = self.context.expression.first {
+                return
+            }
+            self.context.expression.insert(.keyPath(name: "self", isCollection: false), at: 0)
+        }
+    }
+
+    private func append<V>(expression: [QueryExpression], subqueryCount: Int? = nil) -> Query<V> {
         var copy = expression
-        var needsResolution = mapSubscriptNeedsResolution
+        var needsResolution = context.mapSubscriptNeedsResolution
         var lastTokenIsKeyPath = false
         if case .keyPath = expression.last {
             lastTokenIsKeyPath = true
         }
-        if !lastTokenIsKeyPath, mapSubscriptNeedsResolution {
+        if !lastTokenIsKeyPath, context.mapSubscriptNeedsResolution {
             copy.append(.special(.closeParentheses))
             needsResolution = false
         }
-        return Query<V>(expression: self.expression + copy,
-                        mapSubscriptNeedsResolution: needsResolution)
+
+        return Query<V>(context: QueryContext(expression: context.expression + copy,
+                                              count: (subqueryCount != nil) ? subqueryCount! : context.count,
+                                              mapSubscriptNeedsResolution: needsResolution,
+                                              isPrimitive: context.isPrimitive))
     }
 
     // MARK: Prefix
 
     /// :nodoc:
     public static prefix func ! (_ rhs: Query) -> Query {
-        var expressionCopy = rhs.expression
-        let hasPlaceholder = !expressionCopy.enumerated().reversed().filter {
+        var contextCopy = rhs.context
+        let hasPlaceholder = !contextCopy.expression.enumerated().reversed().filter {
             if case let .special(s) = $0.element, s == .notPlaceholder {
-                expressionCopy.remove(at: $0.offset)
-                expressionCopy.insert(.prefix(.not), at: $0.offset)
+                contextCopy.expression.remove(at: $0.offset)
+                contextCopy.expression.insert(.prefix(.not), at: $0.offset)
                 return true
             } else {
                 return false
             }
         }.isEmpty
         if !hasPlaceholder {
-            expressionCopy.insert(.prefix(.not), at: 0)
+            contextCopy.expression.insert(.prefix(.not), at: 0)
         }
-        return Query(expression: expressionCopy)
+        return Query(context: contextCopy)
     }
 
     // MARK: Comparable
@@ -254,15 +283,17 @@ public struct Query<T: _RealmSchemaDiscoverable> {
     public static func && (_ lhs: Query, _ rhs: Query) -> Query {
         // Wrap the left expression and right expression in parentheses
         var copy = lhs
-        copy.expression.insert(.special(.openParentheses), at: 0)
-        return copy.append(expression: [.compound(.and)] + rhs.expression + [.special(.closeParentheses)])
+        copy.context.expression.insert(.special(.openParentheses), at: 0)
+        return copy.append(expression: [.compound(.and)] + rhs.context.expression + [.special(.closeParentheses)],
+                           subqueryCount: rhs.context.count)
     }
     /// :nodoc:
     public static func || (_ lhs: Query, _ rhs: Query) -> Query {
         // Wrap the left expression and right expression in parentheses
         var copy = lhs
-        copy.expression.insert(.special(.openParentheses), at: 0)
-        return copy.append(expression: [.compound(.or)] + rhs.expression + [.special(.closeParentheses)])
+        copy.context.expression.insert(.special(.openParentheses), at: 0)
+        return copy.append(expression: [.compound(.or)] + rhs.context.expression + [.special(.closeParentheses)],
+                           subqueryCount: rhs.context.count)
     }
 
     // MARK: Subscript
@@ -283,7 +314,7 @@ public struct Query<T: _RealmSchemaDiscoverable> {
     /// Creates an NSPredicate compatibe string.
     /// - Parameter isSubquery: States if expression need to be arraged in a special way to cater to subqueries.
     /// - Returns: A tuple containing the predicate string and an array of arguments.
-    public func _constructPredicate(_ isSubquery: Bool = false) -> (String, [Any]) {
+    public func _constructPredicate(_ isSubquery: Bool = false) -> (String, [Any], Int) {
         var predicateString: [String] = []
         var arguments: [Any] = []
         func optionsStr(_ options: Set<StringOptions>?) -> String {
@@ -301,10 +332,9 @@ public struct Query<T: _RealmSchemaDiscoverable> {
             return str
         }
 
-        // Where an expression is performed on 'self' we need to manually
-        // insert the 'self
+        var subqueryCount = context.count
 
-        for (idx, token) in expression.enumerated() {
+        for (idx, token) in context.expression.enumerated() {
             switch token {
             case let .prefix(op):
                 predicateString.append("\(op.rawValue) ")
@@ -316,7 +346,7 @@ public struct Query<T: _RealmSchemaDiscoverable> {
                     if closedRange {
                         predicateString.append(" BETWEEN {%@, %@}")
                         arguments.append(contentsOf: [low, high])
-                    } else if idx > 0, case let .keyPath(name, _) = expression[idx-1] {
+                    } else if idx > 0, case let .keyPath(name, _) = context.expression[idx-1] {
                         predicateString.append(" >= %@")
                         arguments.append(low)
                         predicateString.append(" && \(name) <\(closedRange ? "=" : "") %@")
@@ -335,11 +365,11 @@ public struct Query<T: _RealmSchemaDiscoverable> {
                 predicateString.append(" \(comp.rawValue) ")
             case let .keyPath(name, isCollection):
                 if isCollection && isSubquery {
-                    predicateString.append("$obj")
+                    predicateString.append("$placeholder")
                     continue
                 }
                 var needsDot = false
-                if idx > 0, case .keyPath = expression[idx-1] {
+                if idx > 0, case .keyPath = context.expression[idx-1] {
                     needsDot = true
                 }
                 if needsDot {
@@ -371,14 +401,22 @@ public struct Query<T: _RealmSchemaDiscoverable> {
                 predicateString.append(" %@")
                 arguments.append(v.objCValue)
             case let .subquery(col, str, args):
-                predicateString.append("SUBQUERY(\(col), $obj, \(str)).@count")
+                // To handle the edge case of a Subquery in a Subquery we need to give
+                // each collection var a unique identifier.
+                let collectionKey = "$obj\(context.count)"
+                let replacedStr = str.replacingOccurrences(of: "$placeholder", with: collectionKey)
+                let subqueryStr = "SUBQUERY(\(col), \(collectionKey), \(replacedStr)).@count"
+                predicateString.append(subqueryStr)
                 arguments.append(contentsOf: args)
+                subqueryCount += 1
             case let .collectionAggregation(agg):
                 predicateString.append(agg.rawValue)
             case let .keypathCollectionAggregation(agg):
                 // Aggregates only work on numeric types if they are used as keypath in a collection.
+                // We take 2 steps back to ensure that from where the aggregation operator is placed
+                // there is a key path to the property.
                 if idx-2 >= 0,
-                   case let .keyPath(_, isCollection) = expression[idx-2],
+                   case let .keyPath(_, isCollection) = context.expression[idx-2],
                    isCollection {
                     predicateString.insert(agg.rawValue, at: predicateString.count-2)
                 } else {
@@ -398,7 +436,7 @@ public struct Query<T: _RealmSchemaDiscoverable> {
             }
         }
 
-        return (predicateString.joined(), arguments)
+        return (predicateString.joined(), arguments, subqueryCount)
     }
 
     internal var predicate: NSPredicate {
@@ -409,7 +447,7 @@ public struct Query<T: _RealmSchemaDiscoverable> {
     private func aggregateContains<U: _QueryNumeric, V>(_ lowerBound: U,
                                                         _ upperBound: U,
                                                         isClosedRange: Bool=false) -> Query<V> {
-        guard let keyPath = expression.first else {
+        guard let keyPath = context.expression.first else {
             throwRealmException("Could not construct aggregate query, key path is missing.")
         }
         return append(expression: [.collectionAggregation(.min),
@@ -424,7 +462,7 @@ public struct Query<T: _RealmSchemaDiscoverable> {
 
     private func doContainsAny<U: Sequence, V>(in collection: U) -> Query<V> {
         var keyPathDepth = 0
-        for token in expression.reversed() {
+        for token in context.expression.reversed() {
             if case .keyPath = token {
                 keyPathDepth += 1
             } else {
@@ -433,7 +471,7 @@ public struct Query<T: _RealmSchemaDiscoverable> {
         }
         precondition(keyPathDepth != 0)
         var copy = self
-        copy.expression.insert(.special(.anyInPrefix), at: expression.count - keyPathDepth)
+        copy.context.expression.insert(.special(.anyInPrefix), at: context.expression.count - keyPathDepth)
         return copy.append(expression: [.comparison(.containsAny(NSArray(array: collection.map(dynamicBridgeCast))))])
     }
 }
@@ -558,18 +596,19 @@ extension Query where T: RealmCollection,
 
 extension Query where T: RealmKeyedCollection {
     private func memberSubscript<U>(_ member: T.Key) -> Query<U> where T.Key: _RealmSchemaDiscoverable {
-        guard let keyPath = expression.first else {
+        guard let keyPath = context.expression.first else {
             throwRealmException("Could not contruct predicate for Map")
         }
-        var copy = expression
-        copy.insert(.special(.openParentheses), at: 0)
-        copy.append(contentsOf: [.collectionAggregation(.allKeys),
-                                 .basicComparison(.equal),
-                                 .rhs(member),
-                                 .compound(.and),
-                                 .special(.notPlaceholder),
-                                 keyPath])
-        return Query<U>(expression: copy, mapSubscriptNeedsResolution: true)
+        var copy = context
+        copy.mapSubscriptNeedsResolution = true
+        copy.expression.insert(.special(.openParentheses), at: 0)
+        copy.expression.append(contentsOf: [.collectionAggregation(.allKeys),
+                                            .basicComparison(.equal),
+                                            .rhs(member),
+                                            .compound(.and),
+                                            .special(.notPlaceholder),
+                                            keyPath])
+        return Query<U>(context: copy)
     }
 
     /// Checks if any elements contained in the given array are present in the map's values.
@@ -908,7 +947,7 @@ extension Query where T == Bool {
     /// ($0.myCollection.age >= 21).count > 0
     /// ```
     public var count: Query<Int> {
-        let collections = Set(expression.filter {
+        let collections = Set(context.expression.filter {
             if case let .keyPath(_, isCollection) = $0 {
                 return isCollection ? true : false
             }
@@ -924,7 +963,13 @@ extension Query where T == Bool {
             throwRealmException("Subquery predicates will only work on one collection at a time.")
         }
         let queryStr = _constructPredicate(true)
-        return Query<Int>(expression: [.subquery(collection: collections.first!, predicate: queryStr.0, args: queryStr.1)])
+        let c = QueryContext(expression: [.subquery(collection: collections.first!,
+                                                    predicate: queryStr.0,
+                                                    args: queryStr.1)],
+                             count: queryStr.2,
+                             mapSubscriptNeedsResolution: false,
+                             isPrimitive: context.isPrimitive)
+        return Query<Int>(context: c)
     }
 }
 
