@@ -794,7 +794,7 @@ private enum AsyncOpenKind {
 
 @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
 private class ObservableAsyncOpenStorage: ObservableObject {
-    private var asyncOpenType: AsyncOpenKind
+    private var asyncOpenKind: AsyncOpenKind
     private var app: App
     var configuration: Realm.Configuration?
     var partitionValue: AnyBSON
@@ -852,7 +852,7 @@ private class ObservableAsyncOpenStorage: ObservableObject {
             }
             .sink { completion in
                 if case .failure(let error) = completion {
-                    switch self.asyncOpenType {
+                    switch self.asyncOpenKind {
                     case .asyncOpen:
                         self.asyncOpenState = .error(error)
                     case .autoOpen:
