@@ -964,6 +964,7 @@ class ObjectTests: TestCase {
 
         // Expect notification for "intCol" keyPath when "intCol" is modified
         var ex = expectation(description: "expect notification")
+        #if swift(>=5.5)
         var token = object.observe(keyPaths: [\.intCol, \.stringCol]) { changes in
             if case .change(_, let properties) = changes {
                 XCTAssertEqual(properties.count, 1)
@@ -971,6 +972,15 @@ class ObjectTests: TestCase {
                 ex.fulfill()
             }
         }
+        #else
+        var token = object.observe(keyPaths: [\SwiftObject.intCol, \SwiftObject.stringCol]) { changes in
+            if case .change(_, let properties) = changes {
+                XCTAssertEqual(properties.count, 1)
+                XCTAssertEqual(properties[0].newValue as! Int, 2)
+                ex.fulfill()
+            }
+        }
+        #endif
         try! realm.write {
             object.intCol = 2
         }
@@ -979,6 +989,7 @@ class ObjectTests: TestCase {
 
         // Expect notification for "stringCol" keyPath when "stringCol" is modified
         ex = expectation(description: "expect notification")
+        #if swift(>=5.5)
         token = object.observe(keyPaths: [\.intCol, \.stringCol]) { changes in
             if case .change(_, let properties) = changes {
                 XCTAssertEqual(properties.count, 1)
@@ -986,6 +997,15 @@ class ObjectTests: TestCase {
                 ex.fulfill()
             }
         }
+        #else
+        token = object.observe(keyPaths: [\SwiftObject.intCol, \SwiftObject.stringCol]) { changes in
+            if case .change(_, let properties) = changes {
+                XCTAssertEqual(properties.count, 1)
+                XCTAssertEqual(properties[0].newValue as! String, "new string")
+                ex.fulfill()
+            }
+        }
+        #endif
         try! realm.write {
             object.stringCol = "new string"
         }
@@ -1003,9 +1023,15 @@ class ObjectTests: TestCase {
         // Expect no notification for "boolCol" keypath when "intCol" is modified
         let ex = expectation(description: "no change")
         ex.isInverted = true
+        #if swift(>=5.5)
         let token = object.observe(keyPaths: [\.boolCol, \.stringCol], { _ in
             ex.fulfill()
         })
+        #else
+        let token = object.observe(keyPaths: [\SwiftObject.boolCol, \SwiftObject.stringCol], { _ in
+            ex.fulfill()
+        })
+        #endif
         try! realm.write {
             object.intCol = 3
         }
