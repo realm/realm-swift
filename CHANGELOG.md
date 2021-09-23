@@ -3,9 +3,16 @@ x.y.z Release notes (yyyy-MM-dd)
 ### Enhancements
 * None.
 
+* Add `async` versions for `EmailPasswordAuth.callResetPasswordFunction` and 
+  `User.linkUser` methods.
+* Add `async` version for `MongoCollection` methods.
+* Add `async` support for user functions.
+* Add support for multi-user on `@AsyncOpen` and `@AutoOpen`.
+
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
-* None.
+* Fix `@AsyncOpen` and `@AutoOpen` using `defaultConfiguration` by default if 
+  the user's doesn't provide one, will set an incorrect path which doesn't 
+  correspond to the users configuration one. (since v10.12.0)
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
