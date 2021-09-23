@@ -359,7 +359,7 @@ public protocol RealmCollection: RealmCollectionBase {
 
      - parameter query: The query to use to filter the objects.
      */
-    func query(_ query: ((Query<Element>) -> Query<Element>)) -> Results<Element>
+    func `where`(_ query: ((Query<Element>) -> Query<Element>)) -> Results<Element>
 
 
     // MARK: Sorting
@@ -1030,7 +1030,7 @@ private class _AnyRealmCollectionBase<T: RealmCollectionValue>: AssistedObjectiv
     func index(matching query: ((Query<Element>) -> Query<Element>)) -> Int? { fatalError() }
     func objects(at indexes: IndexSet) -> [Element] { fatalError() }
     func filter(_ predicate: NSPredicate) -> Results<Element> { fatalError() }
-    func query(_ query: ((Query<Element>) -> Query<Element>)) -> Results<Element> { fatalError() }
+    func `where`(_ query: ((Query<Element>) -> Query<Element>)) -> Results<Element> { fatalError() }
     func sorted(byKeyPath keyPath: String, ascending: Bool) -> Results<Element> { fatalError() }
     func sorted<S: Sequence>(by sortDescriptors: S) -> Results<Element> where S.Iterator.Element == SortDescriptor {
         fatalError()
@@ -1089,8 +1089,8 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
 
     override func filter(_ predicate: NSPredicate) -> Results<C.Element> { return base.filter(predicate) }
 
-    override func query(_ query: ((Query<C.Element>) -> Query<C.Element>)) -> Results<C.Element> {
-        return base.query(query)
+    override func `where`(_ query: ((Query<C.Element>) -> Query<C.Element>)) -> Results<C.Element> {
+        return base.where(query)
     }
 
     // MARK: Sorting
@@ -1294,7 +1294,7 @@ public struct AnyRealmCollection<Element: RealmCollectionValue>: RealmCollection
 
      - parameter query: The query with which to filter the objects.
      */
-    public func query(_ query: ((Query<Element>) -> Query<Element>)) -> Results<Element> { return base.query(query) }
+    public func `where`(_ query: ((Query<Element>) -> Query<Element>)) -> Results<Element> { return base.where(query) }
 
 
     // MARK: Sorting

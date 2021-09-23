@@ -270,7 +270,7 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
 
      - parameter predicate: The predicate with which to filter the objects.
      */
-    public func query(_ query: ((Query<Value>) -> Query<Value>)) -> Results<Value> {
+    public func `where`(_ query: ((Query<Value>) -> Query<Value>)) -> Results<Value> {
         return filter(query(Query()).predicate)
     }
 

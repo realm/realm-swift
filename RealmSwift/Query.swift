@@ -118,6 +118,12 @@ private struct QueryContext {
     }
 }
 
+private struct QueryPredicate {
+    var predicate: String
+    var arguments: [Any]
+    var subqueryCount: Int
+}
+
 /**
  `Query` is a class used to create type-safe query predicates.
 
@@ -126,7 +132,7 @@ private struct QueryContext {
  and should be only used as a paramater within a closure that takes a query expression as an argument.
  Example:
  ```swift
- public func query(_ query: ((Query<Element>) -> Query<Element>)) -> Results<Element>
+ public func where(_ query: ((Query<Element>) -> Query<Element>)) -> Results<Element>
  ```
 
  You would then use the above function like so:
@@ -314,7 +320,7 @@ public struct Query<T: _RealmSchemaDiscoverable> {
     /// Creates an NSPredicate compatibe string.
     /// - Parameter isSubquery: States if expression need to be arraged in a special way to cater to subqueries.
     /// - Returns: A tuple containing the predicate string and an array of arguments.
-    public func _constructPredicate(_ isSubquery: Bool = false) -> (String, [Any], Int) {
+    public func _constructPredicate(_ isSubquery: Bool = false) -> QueryPredicate {
         var predicateString: [String] = []
         var arguments: [Any] = []
         var subqueryCount = context.count
@@ -468,7 +474,7 @@ public struct Query<T: _RealmSchemaDiscoverable> {
             }
         }
 
-        return (predicateString.joined(), arguments, subqueryCount)
+        return QueryPredicate(predicateString.joined(), arguments, subqueryCount)
     }
 
     internal var predicate: NSPredicate {

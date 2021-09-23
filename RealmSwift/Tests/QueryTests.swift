@@ -222,7 +222,7 @@ class QueryTests: TestCase {
                              values: [AnyHashable],
                              expectedCount: Int,
                              _ query: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>)) {
-        let results = objects().query(query)
+        let results = objects().where(query)
         XCTAssertEqual(results.count, expectedCount)
 
         let constructedPredicate = query(Query<ModernAllTypesObject>())._constructPredicate()
@@ -242,7 +242,7 @@ class QueryTests: TestCase {
                                              values: [AnyHashable],
                                              expectedCount: Int,
                                              _ query: ((Query<ModernCollectionObject>) -> Query<ModernCollectionObject>)) {
-        let results = realmWithTestPath().objects(ModernCollectionObject.self).query(query)
+        let results = realmWithTestPath().objects(ModernCollectionObject.self).where(query)
         XCTAssertEqual(results.count, expectedCount)
 
         let constructedPredicate = query(Query<ModernCollectionObject>())._constructPredicate()
@@ -267,9 +267,9 @@ class QueryTests: TestCase {
         let colObj = realmWithTestPath().objects(ModernCollectionObject.self).first!
         var results: Results<ModernAllTypesObject>!
         if isList {
-            results = colObj.list.query(query)
+            results = colObj.list.where(query)
         } else {
-            results = colObj.set.query(query)
+            results = colObj.set.where(query)
         }
         XCTAssertEqual(results.count, expectedCount)
 
@@ -289,7 +289,7 @@ class QueryTests: TestCase {
                                                              query: ((Query<ModernAllTypesObject?>) -> Query<ModernAllTypesObject?>)) {
         let colObj = realmWithTestPath().objects(ModernCollectionObject.self).first!
         var results: Results<ModernAllTypesObject?>!
-        results = colObj.map.query(query)
+        results = colObj.map.where(query)
         XCTAssertEqual(results.count, expectedCount)
 
         let constructedPredicate = query(Query<ModernAllTypesObject?>())._constructPredicate()
@@ -637,14 +637,14 @@ class QueryTests: TestCase {
             realm.add(object)
         }
 
-        let result1 = realm.objects(ModernEmbeddedParentObject.self).query {
+        let result1 = realm.objects(ModernEmbeddedParentObject.self).where {
             $0.object == nestedObject
         }
         XCTAssertEqual(result1.count, 1)
 
         let nestedObject2 = ModernEmbeddedTreeObject1()
         nestedObject2.value = 123
-        let result2 = realm.objects(ModernEmbeddedParentObject.self).query {
+        let result2 = realm.objects(ModernEmbeddedParentObject.self).where {
             $0.object == nestedObject2
         }
         XCTAssertEqual(result2.count, 0)
@@ -972,14 +972,14 @@ class QueryTests: TestCase {
             realm.add(object)
         }
 
-        let result1 = realm.objects(ModernEmbeddedParentObject.self).query {
+        let result1 = realm.objects(ModernEmbeddedParentObject.self).where {
             $0.object != nestedObject
         }
         XCTAssertEqual(result1.count, 0)
 
         let nestedObject2 = ModernEmbeddedTreeObject1()
         nestedObject2.value = 123
-        let result2 = realm.objects(ModernEmbeddedParentObject.self).query {
+        let result2 = realm.objects(ModernEmbeddedParentObject.self).where {
             $0.object != nestedObject2
         }
         XCTAssertEqual(result2.count, 1)
@@ -3288,14 +3288,14 @@ class QueryTests: TestCase {
         let obj = objects().first!
         let colObj = collectionObject()
         let realm = realmWithTestPath()
-        let result1 = realm.objects(ModernCollectionObject.self).query {
+        let result1 = realm.objects(ModernCollectionObject.self).where {
             $0.list.contains(obj)
         }
         XCTAssertEqual(result1.count, 0)
         try! realm.write {
             colObj.list.append(obj)
         }
-        let result2 = realm.objects(ModernCollectionObject.self).query {
+        let result2 = realm.objects(ModernCollectionObject.self).where {
             $0.list.contains(obj)
         }
         XCTAssertEqual(result2.count, 1)
@@ -4249,14 +4249,14 @@ class QueryTests: TestCase {
         let obj = objects().first!
         let colObj = collectionObject()
         let realm = realmWithTestPath()
-        let result1 = realm.objects(ModernCollectionObject.self).query {
+        let result1 = realm.objects(ModernCollectionObject.self).where {
             $0.set.contains(obj)
         }
         XCTAssertEqual(result1.count, 0)
         try! realm.write {
             colObj.set.insert(obj)
         }
-        let result2 = realm.objects(ModernCollectionObject.self).query {
+        let result2 = realm.objects(ModernCollectionObject.self).where {
             $0.set.contains(obj)
         }
         XCTAssertEqual(result2.count, 1)
@@ -6759,14 +6759,14 @@ class QueryTests: TestCase {
         let obj = objects().first!
         let colObj = collectionObject()
         let realm = realmWithTestPath()
-        let result1 = realm.objects(ModernCollectionObject.self).query {
+        let result1 = realm.objects(ModernCollectionObject.self).where {
             $0.map.contains(obj)
         }
         XCTAssertEqual(result1.count, 0)
         try! realm.write {
             colObj.map["foo"] = obj
         }
-        let result2 = realm.objects(ModernCollectionObject.self).query {
+        let result2 = realm.objects(ModernCollectionObject.self).where {
             $0.map.contains(obj)
         }
         XCTAssertEqual(result2.count, 1)
@@ -10040,7 +10040,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
-        
+
         assertQuery(predicate: "objectCol.arrayInt.@min > %@", values: [1], expectedCount: 0) {
             $0.objectCol.arrayInt.min > 1
         }
@@ -10084,7 +10084,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
-        
+
         assertQuery(predicate: "objectCol.arrayInt8.@min > %@", values: [Int8(8)], expectedCount: 0) {
             $0.objectCol.arrayInt8.min > Int8(8)
         }
@@ -10128,7 +10128,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
-        
+
         assertQuery(predicate: "objectCol.arrayInt16.@min > %@", values: [Int16(16)], expectedCount: 0) {
             $0.objectCol.arrayInt16.min > Int16(16)
         }
@@ -10172,7 +10172,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
-        
+
         assertQuery(predicate: "objectCol.arrayInt32.@min > %@", values: [Int32(32)], expectedCount: 0) {
             $0.objectCol.arrayInt32.min > Int32(32)
         }
@@ -10216,7 +10216,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
-        
+
         assertQuery(predicate: "objectCol.arrayInt64.@min > %@", values: [Int64(64)], expectedCount: 0) {
             $0.objectCol.arrayInt64.min > Int64(64)
         }
@@ -10260,7 +10260,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
-        
+
         assertQuery(predicate: "objectCol.arrayFloat.@min > %@", values: [Float(5.55444333)], expectedCount: 0) {
             $0.objectCol.arrayFloat.min > Float(5.55444333)
         }
@@ -10304,7 +10304,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
-        
+
         assertQuery(predicate: "objectCol.arrayDouble.@min > %@", values: [123.456], expectedCount: 0) {
             $0.objectCol.arrayDouble.min > 123.456
         }
@@ -10348,7 +10348,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
-        
+
         assertQuery(predicate: "objectCol.arrayDate.@min > %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 0) {
             $0.objectCol.arrayDate.min > Date(timeIntervalSince1970: 1000000)
         }
@@ -10392,7 +10392,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
-        
+
         assertQuery(predicate: "objectCol.arrayDecimal.@min > %@", values: [Decimal128(123.456)], expectedCount: 0) {
             $0.objectCol.arrayDecimal.min > Decimal128(123.456)
         }
@@ -10436,7 +10436,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
-        
+
         assertQuery(predicate: "objectCol.arrayOptInt.@min > %@", values: [1], expectedCount: 0) {
             $0.objectCol.arrayOptInt.min > 1
         }
@@ -10480,7 +10480,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
-        
+
         assertQuery(predicate: "objectCol.arrayOptInt8.@min > %@", values: [Int8(8)], expectedCount: 0) {
             $0.objectCol.arrayOptInt8.min > Int8(8)
         }
@@ -10524,7 +10524,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
-        
+
         assertQuery(predicate: "objectCol.arrayOptInt16.@min > %@", values: [Int16(16)], expectedCount: 0) {
             $0.objectCol.arrayOptInt16.min > Int16(16)
         }
@@ -10568,7 +10568,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
-        
+
         assertQuery(predicate: "objectCol.arrayOptInt32.@min > %@", values: [Int32(32)], expectedCount: 0) {
             $0.objectCol.arrayOptInt32.min > Int32(32)
         }
@@ -10612,7 +10612,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
-        
+
         assertQuery(predicate: "objectCol.arrayOptInt64.@min > %@", values: [Int64(64)], expectedCount: 0) {
             $0.objectCol.arrayOptInt64.min > Int64(64)
         }
@@ -10656,7 +10656,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
-        
+
         assertQuery(predicate: "objectCol.arrayOptFloat.@min > %@", values: [Float(5.55444333)], expectedCount: 0) {
             $0.objectCol.arrayOptFloat.min > Float(5.55444333)
         }
@@ -10700,7 +10700,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
-        
+
         assertQuery(predicate: "objectCol.arrayOptDouble.@min > %@", values: [123.456], expectedCount: 0) {
             $0.objectCol.arrayOptDouble.min > 123.456
         }
@@ -10744,7 +10744,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
-        
+
         assertQuery(predicate: "objectCol.arrayOptDate.@min > %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 0) {
             $0.objectCol.arrayOptDate.min > Date(timeIntervalSince1970: 1000000)
         }
@@ -10788,7 +10788,7 @@ class QueryTests: TestCase {
             }
             object.objectCol = modernObj
         }
-        
+
         assertQuery(predicate: "objectCol.arrayOptDecimal.@min > %@", values: [Decimal128(123.456)], expectedCount: 0) {
             $0.objectCol.arrayOptDecimal.min > Decimal128(123.456)
         }

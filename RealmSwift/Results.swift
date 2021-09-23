@@ -229,7 +229,7 @@ extension AnyRealmValue: AddableType {}
 
      - parameter query: The query with which to filter the objects.
      */
-    public func query(_ query: ((Query<Element>) -> Query<Element>)) -> Results<Element> {
+    public func `where`(_ query: ((Query<Element>) -> Query<Element>)) -> Results<Element> {
         return filter(query(Query()).predicate)
     }
 
