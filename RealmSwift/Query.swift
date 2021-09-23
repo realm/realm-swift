@@ -118,10 +118,14 @@ private struct QueryContext {
     }
 }
 
-private struct QueryPredicate {
-    var predicate: String
-    var arguments: [Any]
-    var subqueryCount: Int
+/// Contains the components neccessary to construct an NSPredicate.
+public struct QueryPredicate {
+    /// The NSPredicate compatible string.
+    public var predicate: String
+    /// The arguments which should be passed to the NSPredicate.
+    public var arguments: [Any]
+    /// Used internally by the query constructor to keep track of Subqueries inside of Subqueries.
+    fileprivate var subqueryCount: Int
 }
 
 /**
@@ -208,7 +212,7 @@ public struct Query<T: _RealmSchemaDiscoverable> {
         if self.context.isPrimitive {
             // Do not insert 'self' where it does not make a logical
             // predicate expression.
-            if case .special(_) = self.context.expression.first {
+            if case .special = self.context.expression.first {
                 return
             }
             self.context.expression.insert(.keyPath(name: "self", isCollection: false), at: 0)
@@ -474,12 +478,14 @@ public struct Query<T: _RealmSchemaDiscoverable> {
             }
         }
 
-        return QueryPredicate(predicateString.joined(), arguments, subqueryCount)
+        return QueryPredicate(predicate: predicateString.joined(),
+                              arguments: arguments,
+                              subqueryCount: subqueryCount)
     }
 
     internal var predicate: NSPredicate {
-        let predicate = _constructPredicate()
-        return NSPredicate(format: predicate.0, argumentArray: predicate.1)
+        let query = _constructPredicate()
+        return NSPredicate(format: query.predicate, argumentArray: query.arguments)
     }
 
     private func aggregateContains<U: _QueryNumeric, V>(_ lowerBound: U,
@@ -1000,11 +1006,11 @@ extension Query where T == Bool {
         if collections.count > 1 {
             throwRealmException("Subquery predicates will only work on one collection at a time.")
         }
-        let queryStr = _constructPredicate(true)
+        let query = _constructPredicate(true)
         let c = QueryContext(expression: [.subquery(collection: collections.first!,
-                                                    predicate: queryStr.0,
-                                                    args: queryStr.1)],
-                             count: queryStr.2,
+                                                    predicate: query.predicate,
+                                                    args: query.arguments)],
+                             count: query.subqueryCount,
                              mapSubscriptNeedsResolution: false,
                              isPrimitive: context.isPrimitive)
         return Query<Int>(context: c)

@@ -184,9 +184,9 @@ class RealmCollectionTypeTests: TestCase {
         XCTAssertEqual(1, collection.filter("stringCol = '2'").count)
         XCTAssertEqual(0, collection.filter("stringCol = '0'").count)
 
-        XCTAssertEqual(1, collection.query { $0.stringCol == "1" }.count)
-        XCTAssertEqual(1, collection.query { $0.stringCol == "2" }.count)
-        XCTAssertEqual(0, collection.query { $0.stringCol == "0" }.count)
+        XCTAssertEqual(1, collection.where { $0.stringCol == "1" }.count)
+        XCTAssertEqual(1, collection.where { $0.stringCol == "2" }.count)
+        XCTAssertEqual(0, collection.where { $0.stringCol == "0" }.count)
     }
 
     func testIndexOfObject() {
@@ -197,7 +197,7 @@ class RealmCollectionTypeTests: TestCase {
         XCTAssertEqual(0, str1Only.index(of: str1)!)
         XCTAssertNil(str1Only.index(of: str2))
 
-        let str1OnlyQuery = collection.query { $0.stringCol == "1" }
+        let str1OnlyQuery = collection.where { $0.stringCol == "1" }
         XCTAssertEqual(0, str1OnlyQuery.index(of: str1)!)
         XCTAssertNil(str1OnlyQuery.index(of: str2))
     }
@@ -245,8 +245,8 @@ class RealmCollectionTypeTests: TestCase {
         assertEqual(str2, collection.filter("stringCol = '2'").first!)
         XCTAssertNil(collection.filter("stringCol = '3'").first)
 
-        assertEqual(str2, collection.query { $0.stringCol == "2" }.first!)
-        XCTAssertNil(collection.query { $0.stringCol == "3" }.first)
+        assertEqual(str2, collection.where { $0.stringCol == "2" }.first!)
+        XCTAssertNil(collection.where { $0.stringCol == "3" }.first)
     }
 
     func testLast() {
@@ -254,8 +254,8 @@ class RealmCollectionTypeTests: TestCase {
         assertEqual(str2, collection.filter("stringCol = '2'").last!)
         XCTAssertNil(collection.filter("stringCol = '3'").last)
 
-        assertEqual(str2, collection.query { $0.stringCol == "2" }.last!)
-        XCTAssertNil(collection.query { $0.stringCol == "3" }.last)
+        assertEqual(str2, collection.where { $0.stringCol == "2" }.last!)
+        XCTAssertNil(collection.where { $0.stringCol == "3" }.last)
     }
 
     func testValueForKey() {
@@ -285,8 +285,8 @@ class RealmCollectionTypeTests: TestCase {
         XCTAssertEqual(1, collection.filter { $0.stringCol == "2" }.count)
         XCTAssertEqual(0, collection.filter { $0.stringCol == "3" }.count)
 
-        XCTAssertEqual(1, collection.query { $0.stringCol == "1" }.count)
-        XCTAssertEqual(0, collection.query { $0.stringCol == "3" }.count)
+        XCTAssertEqual(1, collection.where { $0.stringCol == "1" }.count)
+        XCTAssertEqual(0, collection.where { $0.stringCol == "3" }.count)
     }
 
     func testFilterWithAnyVarags() {
@@ -297,7 +297,7 @@ class RealmCollectionTypeTests: TestCase {
                                        firstCriterion as Any, secondCriterion as Any, thirdCriterion as Any)
         XCTAssertEqual(2, result.count)
 
-        let queryResult = collection.query { $0.stringCol == firstCriterion || $0.stringCol == secondCriterion || $0.stringCol == thirdCriterion }
+        let queryResult = collection.where { $0.stringCol == firstCriterion || $0.stringCol == secondCriterion || $0.stringCol == thirdCriterion }
         XCTAssertEqual(2, queryResult.count)
     }
 
@@ -311,7 +311,7 @@ class RealmCollectionTypeTests: TestCase {
             realm.add(outerArray)
         }
         XCTAssertEqual(1, outerArray.array.filter("ANY array IN %@", realm.objects(SwiftObject.self)).count)
-        XCTAssertEqual(1, outerArray.array.query { $0.array.containsAny(in: realm.objects(SwiftObject.self)) }.count)
+        XCTAssertEqual(1, outerArray.array.where { $0.array.containsAny(in: realm.objects(SwiftObject.self)) }.count)
     }
 
     func testFilterResults() {
@@ -322,7 +322,7 @@ class RealmCollectionTypeTests: TestCase {
             realm.add(array)
         }
         XCTAssertEqual(1, realm.objects(SwiftListOfSwiftObject.self).filter("ANY array IN %@", realm.objects(SwiftObject.self)).count)
-        XCTAssertEqual(1, realm.objects(SwiftListOfSwiftObject.self).query { $0.array.containsAny(in: realm.objects(SwiftObject.self)) }.count)
+        XCTAssertEqual(1, realm.objects(SwiftListOfSwiftObject.self).where { $0.array.containsAny(in: realm.objects(SwiftObject.self)) }.count)
     }
 
     func testFilterPredicate() {
@@ -564,7 +564,7 @@ class RealmCollectionTypeTests: TestCase {
 
         // Should not throw a type error.
         XCTAssertEqual(0, collection.filter("ANY stringListCol == %@", CTTNullableStringObjectWithLink()).count)
-        XCTAssertEqual(0, collection.query { $0.stringListCol.contains(CTTNullableStringObjectWithLink()) }.count)
+        XCTAssertEqual(0, collection.where { $0.stringListCol.contains(CTTNullableStringObjectWithLink()) }.count)
     }
 
     func testObserve() {
@@ -980,7 +980,7 @@ class RealmCollectionTypeTests: TestCase {
 
         XCTAssertEqual(collection.count, 2) // stringCol "1" and "2"
         XCTAssertEqual(collection.filter("stringCol == %@", "3").count, 0)
-        XCTAssertEqual(collection.query { $0.stringCol == "3" }.count, 0)
+        XCTAssertEqual(collection.where { $0.stringCol == "3" }.count, 0)
 
         dispatchSyncNewThread {
             let realm = try! Realm(configuration: self.collection.realm!.configuration)
@@ -1001,9 +1001,9 @@ class RealmCollectionTypeTests: TestCase {
         XCTAssertEqual(frozen!.filter("stringCol == %@", "2").count, 0)
         XCTAssertEqual(frozen!.filter("stringCol == %@", "3").count, 1)
 
-        XCTAssertEqual(frozen!.query { $0.stringCol == "1" }.count, 0)
-        XCTAssertEqual(frozen!.query { $0.stringCol == "2" }.count, 0)
-        XCTAssertEqual(frozen!.query { $0.stringCol == "3" }.count, 1)
+        XCTAssertEqual(frozen!.where { $0.stringCol == "1" }.count, 0)
+        XCTAssertEqual(frozen!.where { $0.stringCol == "2" }.count, 0)
+        XCTAssertEqual(frozen!.where { $0.stringCol == "3" }.count, 1)
 
         XCTAssertEqual(thawed!.count, 2)
         XCTAssertEqual(thawed!.first?.stringCol, "1")
@@ -1011,9 +1011,9 @@ class RealmCollectionTypeTests: TestCase {
         XCTAssertEqual(thawed!.filter("stringCol == %@", "2").count, 1)
         XCTAssertEqual(thawed!.filter("stringCol == %@", "3").count, 0)
 
-        XCTAssertEqual(thawed!.query { $0.stringCol == "1" }.count, 1)
-        XCTAssertEqual(thawed!.query { $0.stringCol == "2" }.count, 1)
-        XCTAssertEqual(thawed!.query { $0.stringCol == "3" }.count, 0)
+        XCTAssertEqual(thawed!.where { $0.stringCol == "1" }.count, 1)
+        XCTAssertEqual(thawed!.where { $0.stringCol == "2" }.count, 1)
+        XCTAssertEqual(thawed!.where { $0.stringCol == "3" }.count, 0)
 
         XCTAssertEqual(collection.count, 2)
         XCTAssertEqual(collection.first?.stringCol, "1")
@@ -1021,9 +1021,9 @@ class RealmCollectionTypeTests: TestCase {
         XCTAssertEqual(collection.filter("stringCol == %@", "2").count, 1)
         XCTAssertEqual(collection.filter("stringCol == %@", "3").count, 0)
 
-        XCTAssertEqual(collection.query { $0.stringCol == "1" }.count, 1)
-        XCTAssertEqual(collection.query { $0.stringCol == "2" }.count, 1)
-        XCTAssertEqual(collection.query { $0.stringCol == "3" }.count, 0)
+        XCTAssertEqual(collection.where { $0.stringCol == "1" }.count, 1)
+        XCTAssertEqual(collection.where { $0.stringCol == "2" }.count, 1)
+        XCTAssertEqual(collection.where { $0.stringCol == "3" }.count, 0)
 
         let thawedQuery = frozenQuery!.thaw()
         XCTAssertEqual(frozenQuery!.count, 0)
@@ -1032,9 +1032,9 @@ class RealmCollectionTypeTests: TestCase {
         XCTAssertEqual(frozenQuery!.filter("stringCol == %@", "2").count, 0)
         XCTAssertEqual(frozenQuery!.filter("stringCol == %@", "3").count, 0)
 
-        XCTAssertEqual(frozenQuery!.query { $0.stringCol == "1" }.count, 0)
-        XCTAssertEqual(frozenQuery!.query { $0.stringCol == "2" }.count, 0)
-        XCTAssertEqual(frozenQuery!.query { $0.stringCol == "3" }.count, 0)
+        XCTAssertEqual(frozenQuery!.where { $0.stringCol == "1" }.count, 0)
+        XCTAssertEqual(frozenQuery!.where { $0.stringCol == "2" }.count, 0)
+        XCTAssertEqual(frozenQuery!.where { $0.stringCol == "3" }.count, 0)
 
         XCTAssertEqual(thawedQuery!.count, 1)
         XCTAssertEqual(thawedQuery!.first?.stringCol, "1")
@@ -1042,9 +1042,9 @@ class RealmCollectionTypeTests: TestCase {
         XCTAssertEqual(thawedQuery!.filter("stringCol == %@", "2").count, 0)
         XCTAssertEqual(thawedQuery!.filter("stringCol == %@", "3").count, 0)
 
-        XCTAssertEqual(thawedQuery!.query { $0.stringCol == "1" }.count, 1)
-        XCTAssertEqual(thawedQuery!.query { $0.stringCol == "2" }.count, 0)
-        XCTAssertEqual(thawedQuery!.query { $0.stringCol == "3" }.count, 0)
+        XCTAssertEqual(thawedQuery!.where { $0.stringCol == "1" }.count, 1)
+        XCTAssertEqual(thawedQuery!.where { $0.stringCol == "2" }.count, 0)
+        XCTAssertEqual(thawedQuery!.where { $0.stringCol == "3" }.count, 0)
 
         collection.realm!.refresh()
 
@@ -1054,9 +1054,9 @@ class RealmCollectionTypeTests: TestCase {
         XCTAssertEqual(thawed!.filter("stringCol == %@", "2").count, 0)
         XCTAssertEqual(thawed!.filter("stringCol == %@", "3").count, 1)
 
-        XCTAssertEqual(thawed!.query { $0.stringCol == "1" }.count, 0)
-        XCTAssertEqual(thawed!.query { $0.stringCol == "2" }.count, 0)
-        XCTAssertEqual(thawed!.query { $0.stringCol == "3" }.count, 1)
+        XCTAssertEqual(thawed!.where { $0.stringCol == "1" }.count, 0)
+        XCTAssertEqual(thawed!.where { $0.stringCol == "2" }.count, 0)
+        XCTAssertEqual(thawed!.where { $0.stringCol == "3" }.count, 1)
 
         XCTAssertEqual(thawedQuery!.count, 0)
         XCTAssertEqual(thawedQuery!.first?.stringCol, nil)
@@ -1064,9 +1064,9 @@ class RealmCollectionTypeTests: TestCase {
         XCTAssertEqual(thawedQuery!.filter("stringCol == %@", "2").count, 0)
         XCTAssertEqual(thawedQuery!.filter("stringCol == %@", "3").count, 0)
 
-        XCTAssertEqual(thawedQuery!.query { $0.stringCol == "1" }.count, 0)
-        XCTAssertEqual(thawedQuery!.query { $0.stringCol == "2" }.count, 0)
-        XCTAssertEqual(thawedQuery!.query { $0.stringCol == "3" }.count, 0)
+        XCTAssertEqual(thawedQuery!.where { $0.stringCol == "1" }.count, 0)
+        XCTAssertEqual(thawedQuery!.where { $0.stringCol == "2" }.count, 0)
+        XCTAssertEqual(thawedQuery!.where { $0.stringCol == "3" }.count, 0)
 
         XCTAssertEqual(collection.count, 1)
         XCTAssertEqual(collection.first?.stringCol, "3")
@@ -1074,9 +1074,9 @@ class RealmCollectionTypeTests: TestCase {
         XCTAssertEqual(collection.filter("stringCol == %@", "2").count, 0)
         XCTAssertEqual(collection.filter("stringCol == %@", "3").count, 1)
 
-        XCTAssertEqual(collection.query { $0.stringCol == "1" }.count, 0)
-        XCTAssertEqual(collection.query { $0.stringCol == "2" }.count, 0)
-        XCTAssertEqual(collection.query { $0.stringCol == "3" }.count, 1)
+        XCTAssertEqual(collection.where { $0.stringCol == "1" }.count, 0)
+        XCTAssertEqual(collection.where { $0.stringCol == "2" }.count, 0)
+        XCTAssertEqual(collection.where { $0.stringCol == "3" }.count, 1)
     }
 
     func testThawDeletedParent() {
@@ -1119,10 +1119,10 @@ class RealmCollectionTypeTests: TestCase {
         XCTAssertEqual(frozen.filter("stringCol = '3'").count, 0)
         XCTAssertTrue(frozen.filter("stringCol = '3'").isFrozen)
 
-        XCTAssertEqual(frozen.query { $0.stringCol == "1" }.count, 1)
-        XCTAssertEqual(frozen.query { $0.stringCol == "2" }.count, 1)
-        XCTAssertEqual(frozen.query { $0.stringCol == "3" }.count, 0)
-        XCTAssertTrue(frozen.query { $0.stringCol == "3" }.isFrozen)
+        XCTAssertEqual(frozen.where { $0.stringCol == "1" }.count, 1)
+        XCTAssertEqual(frozen.where { $0.stringCol == "2" }.count, 1)
+        XCTAssertEqual(frozen.where { $0.stringCol == "3" }.count, 0)
+        XCTAssertTrue(frozen.where { $0.stringCol == "3" }.isFrozen)
     }
 
     func testFilterWithInt8Property() {
@@ -1136,13 +1136,13 @@ class RealmCollectionTypeTests: TestCase {
         results = realmWithTestPath().objects(CTTAggregateObject.self).filter("int8Col = %d", Int8(3))
         XCTAssertEqual(results.count, 1)
 
-        results = realmWithTestPath().objects(CTTAggregateObject.self).query { $0.int8Col == 0 }
+        results = realmWithTestPath().objects(CTTAggregateObject.self).where { $0.int8Col == 0 }
         XCTAssertEqual(results.count, 0)
-        results = realmWithTestPath().objects(CTTAggregateObject.self).query { $0.int8Col == 1 }
+        results = realmWithTestPath().objects(CTTAggregateObject.self).where { $0.int8Col == 1 }
         XCTAssertEqual(results.count, 1)
-        results = realmWithTestPath().objects(CTTAggregateObject.self).query { $0.int8Col == 2 }
+        results = realmWithTestPath().objects(CTTAggregateObject.self).where { $0.int8Col == 2 }
         XCTAssertEqual(results.count, 1)
-        results = realmWithTestPath().objects(CTTAggregateObject.self).query { $0.int8Col == 3 }
+        results = realmWithTestPath().objects(CTTAggregateObject.self).where { $0.int8Col == 3 }
         XCTAssertEqual(results.count, 1)
     }
 
@@ -1157,13 +1157,13 @@ class RealmCollectionTypeTests: TestCase {
         results = realmWithTestPath().objects(CTTAggregateObject.self).filter("int16Col = %d", Int16(3))
         XCTAssertEqual(results.count, 1)
 
-        results = realmWithTestPath().objects(CTTAggregateObject.self).query { $0.int16Col == 0 }
+        results = realmWithTestPath().objects(CTTAggregateObject.self).where { $0.int16Col == 0 }
         XCTAssertEqual(results.count, 0)
-        results = realmWithTestPath().objects(CTTAggregateObject.self).query { $0.int16Col == 1 }
+        results = realmWithTestPath().objects(CTTAggregateObject.self).where { $0.int16Col == 1 }
         XCTAssertEqual(results.count, 1)
-        results = realmWithTestPath().objects(CTTAggregateObject.self).query { $0.int16Col == 2 }
+        results = realmWithTestPath().objects(CTTAggregateObject.self).where { $0.int16Col == 2 }
         XCTAssertEqual(results.count, 1)
-        results = realmWithTestPath().objects(CTTAggregateObject.self).query { $0.int16Col == 3 }
+        results = realmWithTestPath().objects(CTTAggregateObject.self).where { $0.int16Col == 3 }
         XCTAssertEqual(results.count, 1)
     }
 
@@ -1178,13 +1178,13 @@ class RealmCollectionTypeTests: TestCase {
         results = realmWithTestPath().objects(CTTAggregateObject.self).filter("int32Col = %d", Int32(3))
         XCTAssertEqual(results.count, 1)
 
-        results = realmWithTestPath().objects(CTTAggregateObject.self).query { $0.int32Col == 0 }
+        results = realmWithTestPath().objects(CTTAggregateObject.self).where { $0.int32Col == 0 }
         XCTAssertEqual(results.count, 0)
-        results = realmWithTestPath().objects(CTTAggregateObject.self).query { $0.int32Col == 1 }
+        results = realmWithTestPath().objects(CTTAggregateObject.self).where { $0.int32Col == 1 }
         XCTAssertEqual(results.count, 1)
-        results = realmWithTestPath().objects(CTTAggregateObject.self).query { $0.int32Col == 2 }
+        results = realmWithTestPath().objects(CTTAggregateObject.self).where { $0.int32Col == 2 }
         XCTAssertEqual(results.count, 1)
-        results = realmWithTestPath().objects(CTTAggregateObject.self).query { $0.int32Col == 3 }
+        results = realmWithTestPath().objects(CTTAggregateObject.self).where { $0.int32Col == 3 }
         XCTAssertEqual(results.count, 1)
     }
 
@@ -1199,13 +1199,13 @@ class RealmCollectionTypeTests: TestCase {
         results = realmWithTestPath().objects(CTTAggregateObject.self).filter("int64Col = %d", Int64(3))
         XCTAssertEqual(results.count, 1)
 
-        results = realmWithTestPath().objects(CTTAggregateObject.self).query { $0.int64Col == 0 }
+        results = realmWithTestPath().objects(CTTAggregateObject.self).where { $0.int64Col == 0 }
         XCTAssertEqual(results.count, 0)
-        results = realmWithTestPath().objects(CTTAggregateObject.self).query { $0.int64Col == 1 }
+        results = realmWithTestPath().objects(CTTAggregateObject.self).where { $0.int64Col == 1 }
         XCTAssertEqual(results.count, 1)
-        results = realmWithTestPath().objects(CTTAggregateObject.self).query { $0.int64Col == 2 }
+        results = realmWithTestPath().objects(CTTAggregateObject.self).where { $0.int64Col == 2 }
         XCTAssertEqual(results.count, 1)
-        results = realmWithTestPath().objects(CTTAggregateObject.self).query { $0.int64Col == 3 }
+        results = realmWithTestPath().objects(CTTAggregateObject.self).where { $0.int64Col == 3 }
         XCTAssertEqual(results.count, 1)
     }
 }
@@ -1650,7 +1650,7 @@ class ListUnmanagedRealmCollectionTypeTests: ListRealmCollectionTypeTests {
     override func testFilterFormat() {
         assertThrows(collection.filter("stringCol = '1'"))
         assertThrows(collection.filter("noSuchCol = '1'"))
-        assertThrows(collection.query { $0.stringCol == "1" })
+        assertThrows(collection.where { $0.stringCol == "1" })
     }
 
     override func testFilterPredicate() {

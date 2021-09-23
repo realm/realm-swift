@@ -225,11 +225,11 @@ class QueryTests: TestCase {
         let results = objects().where(query)
         XCTAssertEqual(results.count, expectedCount)
 
-        let constructedPredicate = query(Query<ModernAllTypesObject>())._constructPredicate()
-        XCTAssertEqual(constructedPredicate.0,
+        let constructedQuery = query(Query<ModernAllTypesObject>())._constructPredicate()
+        XCTAssertEqual(constructedQuery.predicate,
                        predicate)
 
-        for (e1, e2) in zip(constructedPredicate.1, values) {
+        for (e1, e2) in zip(constructedQuery.arguments, values) {
             if let e1 = e1 as? Object, let e2 = e2 as? Object {
                 assertEqual(e1, e2)
             } else {
@@ -245,11 +245,11 @@ class QueryTests: TestCase {
         let results = realmWithTestPath().objects(ModernCollectionObject.self).where(query)
         XCTAssertEqual(results.count, expectedCount)
 
-        let constructedPredicate = query(Query<ModernCollectionObject>())._constructPredicate()
-        XCTAssertEqual(constructedPredicate.0,
+        let constructedQuery = query(Query<ModernCollectionObject>())._constructPredicate()
+        XCTAssertEqual(constructedQuery.predicate,
                        predicate)
 
-        for (e1, e2) in zip(constructedPredicate.1, values) {
+        for (e1, e2) in zip(constructedQuery.arguments, values) {
             if let e1 = e1 as? Object, let e2 = e2 as? Object {
                 assertEqual(e1, e2)
             } else {
@@ -273,11 +273,11 @@ class QueryTests: TestCase {
         }
         XCTAssertEqual(results.count, expectedCount)
 
-        let constructedPredicate = query(Query<ModernAllTypesObject>())._constructPredicate()
-        XCTAssertEqual(constructedPredicate.0,
+        let constructedQuery = query(Query<ModernAllTypesObject>())._constructPredicate()
+        XCTAssertEqual(constructedQuery.predicate,
                        predicate)
 
-        for (e1, e2) in zip(constructedPredicate.1, values) {
+        for (e1, e2) in zip(constructedQuery.arguments, values) {
             XCTAssertEqual(e1 as! AnyHashable, e2)
         }
     }
@@ -292,11 +292,11 @@ class QueryTests: TestCase {
         results = colObj.map.where(query)
         XCTAssertEqual(results.count, expectedCount)
 
-        let constructedPredicate = query(Query<ModernAllTypesObject?>())._constructPredicate()
-        XCTAssertEqual(constructedPredicate.0,
+        let constructedQuery = query(Query<ModernAllTypesObject?>())._constructPredicate()
+        XCTAssertEqual(constructedQuery.predicate,
                        predicate)
 
-        for (e1, e2) in zip(constructedPredicate.1, values) {
+        for (e1, e2) in zip(constructedQuery.arguments, values) {
             XCTAssertEqual(e1 as! AnyHashable, e2)
         }
     }
