@@ -317,6 +317,8 @@ public struct Query<T: _RealmSchemaDiscoverable> {
     public func _constructPredicate(_ isSubquery: Bool = false) -> (String, [Any], Int) {
         var predicateString: [String] = []
         var arguments: [Any] = []
+        var subqueryCount = context.count
+
         func optionsStr(_ options: Set<StringOptions>?) -> String {
             guard let o = options, !o.isEmpty else {
                 return ""
@@ -332,7 +334,108 @@ public struct Query<T: _RealmSchemaDiscoverable> {
             return str
         }
 
-        var subqueryCount = context.count
+        func comparison(_ expression: QueryExpression.Comparision, _ idx: Int) {
+            switch expression {
+            case let .between(low, high, closedRange):
+                if closedRange {
+                    predicateString.append(" BETWEEN {%@, %@}")
+                    arguments.append(contentsOf: [low, high])
+                } else if idx > 0, case let .keyPath(name, _) = context.expression[idx-1] {
+                    predicateString.append(" >= %@")
+                    arguments.append(low)
+                    predicateString.append(" && \(name) <\(closedRange ? "=" : "") %@")
+                    arguments.append(high)
+                } else {
+                    throwRealmException("Could not construct .contains(_:) predicate")
+                }
+            case let .contains(val):
+                predicateString.insert("%@ IN ", at: predicateString.count-1)
+                arguments.append(val.objCValue)
+            case let .containsAny(col):
+                predicateString.append(" IN %@")
+                arguments.append(col)
+            }
+        }
+
+        func keyPath(_ name: String,
+                     _ idx: Int,
+                     _ isCollection: Bool,
+                     _ isSubquery: Bool) -> Bool {
+            if isCollection && isSubquery {
+                predicateString.append("$placeholder")
+                return true
+            }
+            var needsDot = false
+            if idx > 0, case .keyPath = context.expression[idx-1] {
+                needsDot = true
+            }
+            if needsDot {
+                predicateString.append(".")
+            }
+            predicateString.append("\(name)")
+            return false
+        }
+
+        func stringSearch(_ expression: QueryExpression.StringSearch) {
+            switch expression {
+            case let .contains(str, options):
+                predicateString.append(" CONTAINS\(optionsStr(options)) %@")
+                arguments.append(str)
+            case let .like(str, options):
+                predicateString.append(" LIKE\(optionsStr(options)) %@")
+                arguments.append(str)
+            case let .beginsWith(str, options):
+                predicateString.append(" BEGINSWITH\(optionsStr(options)) %@")
+                arguments.append(str)
+            case let .endsWith(str, options):
+                predicateString.append(" ENDSWITH\(optionsStr(options)) %@")
+                arguments.append(str)
+            case let .equals(str, options):
+                predicateString.append(" ==\(optionsStr(options)) %@")
+                arguments.append(str)
+            case let .notEquals(str, options):
+                predicateString.append(" !=\(optionsStr(options)) %@")
+                arguments.append(str)
+            }
+        }
+
+        func subquery(_ collectionName: String, _ predicate: String, _ args: [Any]) {
+            // To handle the edge case of a Subquery in a Subquery we need to give
+            // each collection var a unique identifier.
+            let collectionKey = "$obj\(context.count)"
+            let replacedStr = predicate.replacingOccurrences(of: "$placeholder", with: collectionKey)
+            let subqueryStr = "SUBQUERY(\(collectionName), \(collectionKey), \(replacedStr)).@count"
+            predicateString.append(subqueryStr)
+            arguments.append(contentsOf: args)
+            subqueryCount += 1
+        }
+
+        func keyPathCollectionAggregation(_ expression: QueryExpression.CollectionAggregation,
+                                          _ idx: Int) {
+            // Aggregates only work on numeric types if they are used as keypath in a collection.
+            // We take 2 steps back to ensure that from where the aggregation operator is placed
+            // there is a key path to the property.
+            if idx-2 >= 0,
+               case let .keyPath(_, isCollection) = context.expression[idx-2],
+               isCollection {
+                predicateString.insert(expression.rawValue, at: predicateString.count-2)
+            } else {
+                throwRealmException("Could not aggregate `\(expression.rawValue)`, property is not within a collection.")
+            }
+        }
+
+        func special(_ expression: QueryExpression.Special) {
+            switch expression {
+            case .openParentheses:
+                predicateString.append("(")
+            case .closeParentheses:
+                predicateString.append(")")
+            case .notPlaceholder:
+                break
+            case .anyInPrefix:
+                predicateString.append("ANY ")
+            }
+        }
 
         for (idx, token) in context.expression.enumerated() {
             switch token {
@@ -341,98 +444,27 @@ public struct Query<T: _RealmSchemaDiscoverable> {
             case let .basicComparison(op):
                 predicateString.append(" \(op.rawValue)")
             case let .comparison(comp):
-                switch comp {
-                case let .between(low, high, closedRange):
-                    if closedRange {
-                        predicateString.append(" BETWEEN {%@, %@}")
-                        arguments.append(contentsOf: [low, high])
-                    } else if idx > 0, case let .keyPath(name, _) = context.expression[idx-1] {
-                        predicateString.append(" >= %@")
-                        arguments.append(low)
-                        predicateString.append(" && \(name) <\(closedRange ? "=" : "") %@")
-                        arguments.append(high)
-                    } else {
-                        throwRealmException("Could not construct .contains(_:) predicate")
-                    }
-                case let .contains(val):
-                    predicateString.insert("%@ IN ", at: predicateString.count-1)
-                    arguments.append(val.objCValue)
-                case let .containsAny(col):
-                    predicateString.append(" IN %@")
-                    arguments.append(col)
-                }
+                comparison(comp, idx)
             case let .compound(comp):
                 predicateString.append(" \(comp.rawValue) ")
             case let .keyPath(name, isCollection):
-                if isCollection && isSubquery {
-                    predicateString.append("$placeholder")
+                let shouldContinue = keyPath(name, idx, isCollection, isSubquery)
+                if shouldContinue {
                     continue
                 }
-                var needsDot = false
-                if idx > 0, case .keyPath = context.expression[idx-1] {
-                    needsDot = true
-                }
-                if needsDot {
-                    predicateString.append(".")
-                }
-                predicateString.append("\(name)")
             case let .stringSearch(s):
-                switch s {
-                case let .contains(str, options):
-                    predicateString.append(" CONTAINS\(optionsStr(options)) %@")
-                    arguments.append(str)
-                case let .like(str, options):
-                    predicateString.append(" LIKE\(optionsStr(options)) %@")
-                    arguments.append(str)
-                case let .beginsWith(str, options):
-                    predicateString.append(" BEGINSWITH\(optionsStr(options)) %@")
-                    arguments.append(str)
-                case let .endsWith(str, options):
-                    predicateString.append(" ENDSWITH\(optionsStr(options)) %@")
-                    arguments.append(str)
-                case let .equals(str, options):
-                    predicateString.append(" ==\(optionsStr(options)) %@")
-                    arguments.append(str)
-                case let .notEquals(str, options):
-                    predicateString.append(" !=\(optionsStr(options)) %@")
-                    arguments.append(str)
-                }
+                stringSearch(s)
             case let .rhs(v):
                 predicateString.append(" %@")
                 arguments.append(v.objCValue)
             case let .subquery(col, str, args):
-                // To handle the edge case of a Subquery in a Subquery we need to give
-                // each collection var a unique identifier.
-                let collectionKey = "$obj\(context.count)"
-                let replacedStr = str.replacingOccurrences(of: "$placeholder", with: collectionKey)
-                let subqueryStr = "SUBQUERY(\(col), \(collectionKey), \(replacedStr)).@count"
-                predicateString.append(subqueryStr)
-                arguments.append(contentsOf: args)
-                subqueryCount += 1
+                subquery(col, str, args)
             case let .collectionAggregation(agg):
                 predicateString.append(agg.rawValue)
             case let .keypathCollectionAggregation(agg):
-                // Aggregates only work on numeric types if they are used as keypath in a collection.
-                // We take 2 steps back to ensure that from where the aggregation operator is placed
-                // there is a key path to the property.
-                if idx-2 >= 0,
-                   case let .keyPath(_, isCollection) = context.expression[idx-2],
-                   isCollection {
-                    predicateString.insert(agg.rawValue, at: predicateString.count-2)
-                } else {
-                    throwRealmException("Could not aggregate `\(agg.rawValue)`, property is not within a collection.")
-                }
+                keyPathCollectionAggregation(agg, idx)
             case let .special(s):
-                switch s {
-                case .openParentheses:
-                    predicateString.append("(")
-                case .closeParentheses:
-                    predicateString.append(")")
-                case .notPlaceholder:
-                    break
-                case .anyInPrefix:
-                    predicateString.append("ANY ")
-                }
+                special(s)
             }
         }
 
