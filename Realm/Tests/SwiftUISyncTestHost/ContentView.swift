@@ -151,11 +151,12 @@ struct LoginView: View {
 class LoginHelper: ObservableObject {
     var cancellables = Set<AnyCancellable>()
 
+    let appConfig = AppConfiguration(baseURL: "http://localhost:9090",
+                                            transport: nil,
+                                            localAppName: nil,
+                                            localAppVersion: nil)
+
     func login(email: String, password: String, completion: @escaping (User) -> Void) {
-        let appConfig = AppConfiguration(baseURL: "http://localhost:9090",
-                                         transport: nil,
-                                         localAppName: nil,
-                                         localAppVersion: nil)
         let app = RealmSwift.App(id: ProcessInfo.processInfo.environment["app_id"]!, configuration: appConfig)
         app.login(credentials: Credentials.emailPassword(email: email, password: password))
             .receive(on: DispatchQueue.main)
@@ -170,19 +171,11 @@ class LoginHelper: ObservableObject {
     }
 
     func logout() {
-        let appConfig = AppConfiguration(baseURL: "http://localhost:9090",
-                                         transport: nil,
-                                         localAppName: nil,
-                                         localAppVersion: nil)
         let app = RealmSwift.App(id: ProcessInfo.processInfo.environment["app_id"]!, configuration: appConfig)
         app.currentUser?.logOut { _ in }
     }
 
     func logoutAllUsers() {
-        let appConfig = AppConfiguration(baseURL: "http://localhost:9090",
-                                         transport: nil,
-                                         localAppName: nil,
-                                         localAppVersion: nil)
         let app = RealmSwift.App(id: ProcessInfo.processInfo.environment["app_id"]!, configuration: appConfig)
         for (_, user) in app.allUsers {
             user.logOut { _ in }

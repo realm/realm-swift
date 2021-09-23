@@ -78,9 +78,9 @@ class SwiftUISyncTestHostUITests: XCTestCase {
         do {
             let fileManager = FileManager.default
             let applicationSupportDir = try fileManager.url(for: .applicationSupportDirectory,
-                                                               in: .userDomainMask,
-                                                               appropriateFor: nil,
-                                                               create: false)
+                                                            in: .userDomainMask,
+                                                            appropriateFor: nil,
+                                                            create: false)
             let applicationsUrls = try fileManager.contentsOfDirectory(at: applicationSupportDir,
                                                                        includingPropertiesForKeys: nil)
             for applicationUrl in applicationsUrls where applicationUrl.lastPathComponent == "io.realm.TestHost" {
