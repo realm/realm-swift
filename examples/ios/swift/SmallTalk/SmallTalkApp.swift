@@ -76,18 +76,18 @@ struct ChatView: View {
                 Button(action: {
                     $entries.append(ChatEntry(text: draftMessage, user: chatUser))
                     draftMessage = ""
-                }) {
+                }, label: {
                     Image(systemName: "arrow.up.circle.fill")
                         .foregroundColor(draftMessage.isEmpty ? .gray : .blue)
                         .imageScale(.large)
-                }.disabled(draftMessage.isEmpty).padding()
+                }).disabled(draftMessage.isEmpty).padding()
                 Button(action: {
                     Task { try await RealmSwift.App(id: appId).currentUser!.logOut() }
-                }) {
+                }, label: {
                     Image(systemName: "arrow.uturn.down.circle")
                         .foregroundColor(.red)
                         .imageScale(.large)
-                }
+                })
             }
         }
     }
@@ -123,11 +123,11 @@ struct LoginView: View {
                         }
                         self.name = ""
                     }
-                }) {
+                }, label: {
                     Image(systemName: "arrow.uturn.up.circle")
                         .foregroundColor(.green)
                         .imageScale(.large)
-                }.padding()
+                }).padding()
             }.padding()
         }
     }
