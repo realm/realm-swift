@@ -173,7 +173,7 @@ private final class ObservableStoragePublisher<ObjectType>: Publisher where Obje
     public typealias Output = Void
     public typealias Failure = Never
 
-    private var subscribers = [AnySubscriber<Void, Never>]()
+    var subscribers = [AnySubscriber<Void, Never>]()
     private let value: ObjectType
     private let keyPaths: [String]?
 
@@ -216,8 +216,10 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
     @Published var value: ObservedType {
         willSet {
             if newValue != value {
+                objectWillChange.subscribers.forEach {
+                    $0.receive(subscription: ObservationSubscription(token: newValue._observe(keyPaths, $0)))
+                }
                 objectWillChange.send()
-                self.objectWillChange = ObservableStoragePublisher(newValue, self.keyPaths)
             }
         }
     }

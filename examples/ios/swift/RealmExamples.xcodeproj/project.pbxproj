@@ -33,6 +33,13 @@
 		53454CD124EAC43700678E48 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 53454CD024EAC43700678E48 /* Assets.xcassets */; };
 		53454CD424EAC43700678E48 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 53454CD324EAC43700678E48 /* Preview Assets.xcassets */; };
 		53454CEC24EAC45700678E48 /* AppClip.app in Embed App Clips */ = {isa = PBXBuildFile; fileRef = 53454CDD24EAC45500678E48 /* AppClip.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		53C520BF26F299FF0041DCE4 /* SmallTalkApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53C520BE26F299FF0041DCE4 /* SmallTalkApp.swift */; };
+		53C520C326F29A010041DCE4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 53C520C226F29A010041DCE4 /* Assets.xcassets */; };
+		53C520C626F29A010041DCE4 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 53C520C526F29A010041DCE4 /* Preview Assets.xcassets */; };
+		53C520CF26F2AE6A0041DCE4 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C07E5D791B15001500ED625C /* Realm.framework */; };
+		53C520D026F2AE6A0041DCE4 /* Realm.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C07E5D791B15001500ED625C /* Realm.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		53C520D226F2AE6E0041DCE4 /* RealmSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 53C520CA26F29A340041DCE4 /* RealmSwift.framework */; };
+		53C520D326F2AE6E0041DCE4 /* RealmSwift.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 53C520CA26F29A340041DCE4 /* RealmSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		7D46395025C2E2750089EFD9 /* Example_v3.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D46394F25C2E2750089EFD9 /* Example_v3.swift */; };
 		7D46395425C2E7140089EFD9 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 7D46395325C2E7140089EFD9 /* README.md */; };
 		7D46399825C45FF00089EFD9 /* Example_v4.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D46399725C45FF00089EFD9 /* Example_v4.swift */; };
@@ -144,6 +151,18 @@
 				53454CEC24EAC45700678E48 /* AppClip.app in Embed App Clips */,
 			);
 			name = "Embed App Clips";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		53C520D126F2AE6A0041DCE4 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				53C520D326F2AE6E0041DCE4 /* RealmSwift.framework in Embed Frameworks */,
+				53C520D026F2AE6A0041DCE4 /* Realm.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		AC2D0C14269C470900126DCF /* Embed Frameworks */ = {
@@ -286,6 +305,11 @@
 		53454CD324EAC43700678E48 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		53454CD524EAC43700678E48 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		53454CDD24EAC45500678E48 /* AppClip.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AppClip.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		53C520BC26F299FF0041DCE4 /* SmallTalk.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SmallTalk.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		53C520BE26F299FF0041DCE4 /* SmallTalkApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmallTalkApp.swift; sourceTree = "<group>"; };
+		53C520C226F29A010041DCE4 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		53C520C526F29A010041DCE4 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		53C520CA26F29A340041DCE4 /* RealmSwift.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = RealmSwift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7D46394F25C2E2750089EFD9 /* Example_v3.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Example_v3.swift; sourceTree = "<group>"; };
 		7D46395325C2E7140089EFD9 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.markdown; };
 		7D46399725C45FF00089EFD9 /* Example_v4.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Example_v4.swift; sourceTree = "<group>"; };
@@ -376,6 +400,15 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		53C520B926F299FF0041DCE4 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				53C520D226F2AE6E0041DCE4 /* RealmSwift.framework in Frameworks */,
+				53C520CF26F2AE6A0041DCE4 /* Realm.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -511,6 +544,7 @@
 		493759B8230D9F9A0078C28E /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				53C520CA26F29A340041DCE4 /* RealmSwift.framework */,
 				AC2D0C15269C471200126DCF /* Realm.framework */,
 				AC2D0C16269C471200126DCF /* RealmSwift.framework */,
 				AC2D0C0E269C470900126DCF /* Realm.framework */,
@@ -571,6 +605,24 @@
 			isa = PBXGroup;
 			children = (
 				53454CD324EAC43700678E48 /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		53C520BD26F299FF0041DCE4 /* SmallTalk */ = {
+			isa = PBXGroup;
+			children = (
+				53C520BE26F299FF0041DCE4 /* SmallTalkApp.swift */,
+				53C520C226F29A010041DCE4 /* Assets.xcassets */,
+				53C520C426F29A010041DCE4 /* Preview Content */,
+			);
+			path = SmallTalk;
+			sourceTree = "<group>";
+		};
+		53C520C426F29A010041DCE4 /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				53C520C526F29A010041DCE4 /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
 			sourceTree = "<group>";
@@ -647,6 +699,7 @@
 				227D20F01CB609A1008F641B /* Common */,
 				E8CB087F19BA6AEE0018434A /* Encryption */,
 				AC1004A6269C3D30008C482D /* AsyncOpenSwiftUI */,
+				53C520BD26F299FF0041DCE4 /* SmallTalk */,
 				493759B8230D9F9A0078C28E /* Frameworks */,
 				E886FB621A12A73E00CB2D0B /* GroupedTableView */,
 				493759A5230D8CA60078C28E /* ListSwiftUI */,
@@ -677,6 +730,7 @@
 				E8CB083919BA6AC60018434A /* TableView.app */,
 				AC1004AE269C3D31008C482D /* AsyncOpenSwiftUI.app */,
 				AC1004B3269C3D31008C482D /* AsyncOpenSwiftUI.app */,
+				53C520BC26F299FF0041DCE4 /* SmallTalk.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -809,6 +863,24 @@
 			productName = AppClip;
 			productReference = 53454CDD24EAC45500678E48 /* AppClip.app */;
 			productType = "com.apple.product-type.application.on-demand-install-capable";
+		};
+		53C520BB26F299FF0041DCE4 /* SmallTalk */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 53C520C926F29A010041DCE4 /* Build configuration list for PBXNativeTarget "SmallTalk" */;
+			buildPhases = (
+				53C520B826F299FF0041DCE4 /* Sources */,
+				53C520B926F299FF0041DCE4 /* Frameworks */,
+				53C520BA26F299FF0041DCE4 /* Resources */,
+				53C520D126F2AE6A0041DCE4 /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SmallTalk;
+			productName = SmallTalk;
+			productReference = 53C520BC26F299FF0041DCE4 /* SmallTalk.app */;
+			productType = "com.apple.product-type.application";
 		};
 		AC1004AD269C3D31008C482D /* AsyncOpenSwiftUI (iOS) */ = {
 			isa = PBXNativeTarget;
@@ -995,7 +1067,7 @@
 		E805758D19BA55E600376620 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 1200;
+				LastSwiftUpdateCheck = 1300;
 				LastUpgradeCheck = 1300;
 				ORGANIZATIONNAME = Realm;
 				TargetAttributes = {
@@ -1011,6 +1083,11 @@
 					53454CDC24EAC45500678E48 = {
 						CreatedOnToolsVersion = 12.0;
 						LastSwiftMigration = 1300;
+						ProvisioningStyle = Automatic;
+					};
+					53C520BB26F299FF0041DCE4 = {
+						CreatedOnToolsVersion = 13.0;
+						DevelopmentTeam = 2Z8M9MTEVV;
 						ProvisioningStyle = Automatic;
 					};
 					AC1004AD269C3D31008C482D = {
@@ -1073,6 +1150,7 @@
 				53454CDC24EAC45500678E48 /* AppClip */,
 				AC1004AD269C3D31008C482D /* AsyncOpenSwiftUI (iOS) */,
 				AC1004B2269C3D31008C482D /* AsyncOpenSwiftUI (macOS) */,
+				53C520BB26F299FF0041DCE4 /* SmallTalk */,
 			);
 		};
 /* End PBXProject section */
@@ -1124,6 +1202,15 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		53C520BA26F299FF0041DCE4 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				53C520C626F29A010041DCE4 /* Preview Assets.xcassets in Resources */,
+				53C520C326F29A010041DCE4 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1218,6 +1305,14 @@
 				3FA2F300268FCA380015062E /* Constants.swift in Sources */,
 				3FA2F304268FCAC80015062E /* ContentView.swift in Sources */,
 				3FA2F2FF268FCA380015062E /* DemoObject.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		53C520B826F299FF0041DCE4 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				53C520BF26F299FF0041DCE4 /* SmallTalkApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1513,6 +1608,81 @@
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = io.realm.AppClipParent.Clip;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		53C520C726F29A010041DCE4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_ASSET_PATHS = "\"SmallTalk/Preview Content\"";
+				DEVELOPMENT_TEAM = 2Z8M9MTEVV;
+				ENABLE_PREVIEWS = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = io.realm.SmallTalk;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		53C520C826F29A010041DCE4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_ASSET_PATHS = "\"SmallTalk/Preview Content\"";
+				DEVELOPMENT_TEAM = 2Z8M9MTEVV;
+				ENABLE_PREVIEWS = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				MARKETING_VERSION = 1.0;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = io.realm.SmallTalk;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -2087,6 +2257,15 @@
 			buildConfigurations = (
 				53454CEE24EAC45700678E48 /* Debug */,
 				53454CEF24EAC45700678E48 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		53C520C926F29A010041DCE4 /* Build configuration list for PBXNativeTarget "SmallTalk" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				53C520C726F29A010041DCE4 /* Debug */,
+				53C520C826F29A010041DCE4 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

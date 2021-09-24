@@ -94,6 +94,13 @@ These two targets demonstrate how to use Realm to persist data between an App Cl
 
 **Note:** This is only supported for non-synchronized realms.
 
+### SmallTalk
+
+A chat app inspired by [this blog post](https://medium.com/realm/mongodb-realm-and-swiftui-observedresults-bb8822ec305f). Demonstrates the simplicity of sync.
+
+To use, create a free tier app using [MongoDB Realm](https://www.mongodb.com/realm) and turn on
+sync with developer mode enabled. Then add your appId to line 4 in `SmallTalkApp.swift`.   
+
 #### Example Usage
 
 For the purpose of this example, the app clip invocation and parent application download is simulated by running each target.

@@ -249,6 +249,7 @@ import Realm.Private
      */
     @discardableResult
     public func write<Result>(withoutNotifying tokens: [NotificationToken] = [], _ block: (() throws -> Result)) throws -> Result {
+        print(RunLoop.current.hash)
         beginWrite()
         var ret: Result!
         do {
@@ -1049,6 +1050,7 @@ extension Realm {
     public init(configuration: Realm.Configuration = .defaultConfiguration,
                 downloadBeforeOpen: OpenBehavior = .never,
                 queue: DispatchQueue? = nil) async throws {
+        try self.init(RLMRealm(configuration: configuration.rlmConfiguration, queue: queue))
         switch downloadBeforeOpen {
         case .never:
             break
@@ -1067,7 +1069,6 @@ extension Realm {
                 })
             }
         }
-        try self.init(RLMRealm(configuration: configuration.rlmConfiguration, queue: queue))
     }
 }
 #endif // swift(>=5.5)
