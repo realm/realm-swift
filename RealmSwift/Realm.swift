@@ -249,7 +249,6 @@ import Realm.Private
      */
     @discardableResult
     public func write<Result>(withoutNotifying tokens: [NotificationToken] = [], _ block: (() throws -> Result)) throws -> Result {
-        print(RunLoop.current.hash)
         beginWrite()
         var ret: Result!
         do {
