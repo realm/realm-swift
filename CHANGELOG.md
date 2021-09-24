@@ -6,7 +6,6 @@ x.y.z Release notes (yyyy-MM-dd)
 ### Fixed
 * Fix exception in the new `Realm.init(...) async` API when downloading a Realm from the `MainActor`.
 * Fix SwiftUI 3 bug where new values were not being resubscribed to by the views.
-
 * Add `async` versions for `EmailPasswordAuth.callResetPasswordFunction` and `User.linkUser` methods.
 * Add `async` version for `MongoCollection` methods.
 * Add `async` support for user functions.
