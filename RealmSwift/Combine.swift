@@ -1988,7 +1988,7 @@ public enum RealmPublishers {
     /// should always be the first operation in the pipeline.
     ///
     /// Create this publisher using the `projectionChangeset()` function.
-    @frozen public struct ProjectionChangeset<P>: Publisher where P: ProjectionObservable {
+    @frozen public struct ProjectionChangeset<P: ProjectionObservable>: Publisher {
         /// This publisher emits a ProjectionChange<P> indicating which projection and
         /// which properties of that projection have changed each time a Realm is
         /// refreshed after a write transaction which modifies the observed
@@ -2082,7 +2082,7 @@ public enum RealmPublishers {
     /// should always be the first operation in the pipeline.
     ///
     /// Create this publisher using the `objectChangeset()` function.
-    public class ProjectionChangesetWithToken<P: ProjectionObservable, T>: Publisher {
+    public class ProjectionChangesetWithToken<P: Projection<Object>, T>: Publisher {
         /// This publisher emits a ProjectionChange<T> indicating which projection and
         /// which properties of that projection have changed each time a Realm is
         /// refreshed after a write transaction which modifies the observed
@@ -2103,8 +2103,7 @@ public enum RealmPublishers {
                       _ queue: DispatchQueue? = nil,
                       _ tokenParent: TokenParent,
                       _ tokenKeyPath: TokenKeyPath) {
-            let p = projection as! Projection<Object>
-            precondition(!p.isInvalidated, "Projection's object is invalidated or deleted")
+            precondition(!projection.isInvalidated, "Projection's object is invalidated or deleted")
             self.projection = projection
             self.queue = queue
             self.tokenParent = tokenParent
@@ -2169,7 +2168,7 @@ public enum RealmPublishers {
     ///
     /// Create using `.threadSafeReference().receive(on: queue)` on a publisher
     /// that emits `ProjectionChange`.
-    @frozen public struct DeferredHandoverProjectionChangeset<Upstream: Publisher, P: ProjectionObservable, S: Scheduler>: Publisher where Upstream.Output == ProjectionChange<P> {
+    @frozen public struct DeferredHandoverProjectionChangeset<Upstream: Publisher, P: Projection<Object>, S: Scheduler>: Publisher where Upstream.Output == ProjectionChange<P> {
         /// :nodoc:
         public typealias Failure = Upstream.Failure
         /// :nodoc:
