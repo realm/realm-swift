@@ -8,7 +8,11 @@ x.y.z Release notes (yyyy-MM-dd)
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
-* None.
+* A race condition in Realm.asyncOpen() sometimes resulted in subsequent writes
+  from Realm Sync failing to produce notifications
+  ([#7447](https://github.com/realm/realm-cocoa/issues/7447),
+  [#7453](https://github.com/realm/realm-cocoa/issues/7453),
+  [Core #4909](https://github.com/realm/realm-core/issues/4909), since v10.15.0).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
