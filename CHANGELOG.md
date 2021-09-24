@@ -1,7 +1,43 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
+### Breaking Changes
+
+* Disallow key path observation on collections where the Element is not of Object type. Attemping to observe keyPaths on non-object
+  types yields no changes, so this functionality was already broken.
+
 ### Enhancements
 
+* Unlock `Self` for observable types. By moving object observation behind a private protocol, and collection observation
+  cleaned up, key path filtering and Object/CollectionChanges have become more type safe. Previously, keyPath filtering
+  was called as:
+  ```swift
+  person.observe(keyPaths: [\Person.name, \Person.age]) { change in /* do stuff */ }
+  ```
+  Now the class can be dropped, as it is derived from the calling type:
+  ```swift
+  person.observe(keyPaths: [\.name, \.age]) { change in /* do stuff */ }
+  ```
+  Non-keyPath filtering has also been enhanced. Previously:
+  ```swift
+  person.observe { change in
+	  switch change {
+	  case .initial(let object):
+		// type is of ObjectBase and needs to be casted
+		guard let object as? Person else { fatalError() }
+		// do stuff
+	  default: break
+	  }
+  }
+  ```
+  Now:
+  ```swift
+  person.observe { change in
+	  switch change {
+	  case .initial(let person):
+		// person is already of `Person` type
+	  }
+  }
+  ```
 * Add `async` versions for `EmailPasswordAuth.callResetPasswordFunction` and `User.linkUser` methods.
 * Add `async` version for `MongoCollection` methods.
 * Add `async` support for user functions.
