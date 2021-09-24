@@ -661,6 +661,7 @@ import Realm.Private
 
      - returns: A `Results` containing the projections.
      */
+    @available(macOSApplicationExtension 10.15, *)
     public func objects<Root: ObjectBase, T: Projection<Root>>(_ type: T.Type) -> Results<T> {
         return Results(RLMGetObjects(rlmRealm, Root.className(), nil)) {
             T(projecting: $0 as! Root)

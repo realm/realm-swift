@@ -262,6 +262,34 @@ extension Publisher {
         -> RealmPublishers.MakeThreadSafeObjectChangeset<Self, T> where Output == ObjectChange<T> {
         RealmPublishers.MakeThreadSafeObjectChangeset(self)
     }
+    
+    /// Enables passing projection changesets to a different dispatch queue.
+    ///
+    /// Each call to `receive(on:)` on a publisher which emits Realm
+    /// thread-confined projection must be proceeded by a call to
+    /// `.threadSafeReference()`. The returned publisher handles the required
+    /// logic to pass the thread-confined projection to the new queue. Only serial
+    /// dispatch queues are supported and using other schedulers will result in
+    /// a fatal error.
+    ///
+    /// For example, to subscribe on a background thread, do some work there,
+    /// then pass the projection changeset to the main thread you can do:
+    ///
+    ///     let cancellable = changesetPublisher(myProjection)
+    ///         .subscribe(on: DispatchQueue(label: "background queue")
+    ///         .print()
+    ///         .threadSafeReference()
+    ///         .receive(on: DispatchQueue.main)
+    ///         .sink { projectionChange in
+    ///             // Do things with the projection on the main thread
+    ///         }
+    ///
+    /// - returns: A publisher that supports `receive(on:)` for thread-confined objects.
+    public func threadSafeReference<T: ProjectionObservable>()
+        -> RealmPublishers.MakeThreadSafeProjectionChangeset<Self, T> where Output == ProjectionChange<T> {
+        RealmPublishers.MakeThreadSafeProjectionChangeset(self)
+    }
+
 
     /// Enables passing Realm collection changesets to a different dispatch queue.
     ///
@@ -412,6 +440,17 @@ public func valuePublisher<T: RealmCollection>(_ collection: T, keyPaths: [Strin
     RealmPublishers.Value<T>(collection, keyPaths: keyPaths)
 }
 
+/// Creates a publisher that emits the object each time the object changes.
+///
+/// - precondition: The object must be a managed object which has not been invalidated.
+/// - parameter object: A managed object to observe.
+/// - parameter keyPaths: The publisher emits changes on these property keyPaths. If `nil` the publisher emits changes for every property.
+/// - returns: A publisher that emits the object each time it changes.
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+public func valuePublisher<O: ObjectBase, T: Projection<O>>(_ object: T, keyPaths: [String]? = nil) -> RealmPublishers.Value<T> {
+    RealmPublishers.Value<T>(object, keyPaths: keyPaths)
+}
+
 /// Creates a publisher that emits an object changeset each time the object changes.
 ///
 /// - precondition: The object must be a managed object which has not been invalidated.
@@ -421,6 +460,18 @@ public func valuePublisher<T: RealmCollection>(_ collection: T, keyPaths: [Strin
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 public func changesetPublisher<T: Object>(_ object: T, keyPaths: [String]? = nil) -> RealmPublishers.ObjectChangeset<T> {
     RealmPublishers.ObjectChangeset<T>(object, keyPaths: keyPaths)
+}
+
+
+/// Creates a publisher that emits an object changeset each time the object changes.
+///
+/// - precondition: The object must be a projection.
+/// - parameter projection: A projection of Realm Object to observe.
+/// - parameter keyPaths: The publisher emits changes on these property keyPaths. If `nil` the publisher emits changes for every property.
+/// - returns: A publisher that emits an object changeset each time the projection changes.
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+public func changesetPublisher<T>(_ projection: T, keyPaths: [String]? = nil) -> RealmPublishers.ProjectionChangeset<T> where T: ProjectionObservable {
+    RealmPublishers.ProjectionChangeset<T>(projection, keyPaths: keyPaths)
 }
 
 /// Creates a publisher that emits a collection changeset each time the collection changes.
@@ -1928,5 +1979,284 @@ public enum RealmPublishers {
                 .receive(subscriber: subscriber)
         }
     }
+    
+    /// A publisher which emits ObjectChange<T> each time the observed projection is modified
+    ///
+    /// `receive(on:)` and `subscribe(on:)` can be called directly on this
+    /// publisher, and calling `.threadSafeReference()` is only required if
+    /// there is an intermediate transform. If `subscribe(on:)` is used, it
+    /// should always be the first operation in the pipeline.
+    ///
+    /// Create this publisher using the `projectionChangeset()` function.
+    @frozen public struct ProjectionChangeset<P>: Publisher where P: ProjectionObservable {
+        /// This publisher emits a ProjectionChange<P> indicating which projection and
+        /// which properties of that projection have changed each time a Realm is
+        /// refreshed after a write transaction which modifies the observed
+        /// projection.
+        public typealias Output = ProjectionChange<P>
+        /// This publisher reports error via the `.error` case of ProjectionChange.
+        public typealias Failure = Never
+
+        private let projection: P
+        private let keyPaths: [String]?
+        private let queue: DispatchQueue?
+        internal init(_ projection: P, keyPaths: [String]? = nil, queue: DispatchQueue? = nil) {
+//            precondition(!projection.isInvalidated, "Projection's object is invalidated or deleted")
+            self.projection = projection
+            self.keyPaths = keyPaths
+            self.queue = queue
+        }
+
+        /// Captures the `NotificationToken` produced by observing a Realm Collection.
+        ///
+        /// This allows you to do notification skipping when performing a `Realm.write(withoutNotifying:)`. You should use this call if you
+        /// require to write to the Realm database and ignore this specific observation chain.
+        /// The `NotificationToken` will be saved on the specified `KeyPath`from the observation block set up in `receive(subscriber:)`.
+        ///
+        /// - Parameters:
+        ///   - projection: The projection which the `NotificationToken` is written to.
+        ///   - keyPath: The KeyPath which the `NotificationToken` is written to.
+        /// - Returns: A `ProjectionChangesetWithToken` Publisher.
+        public func saveToken<T>(on tokenParent: T, at keyPath: WritableKeyPath<T, NotificationToken?>) -> ProjectionChangesetWithToken<P, T> {
+              return ProjectionChangesetWithToken<P, T>(projection, queue, tokenParent, keyPath)
+        }
+
+        /// :nodoc:
+        public func receive<S>(subscriber: S) where S: Subscriber, S.Failure == Never, Output == S.Input {
+            let token = self.projection.observe(keyPaths: self.keyPaths ?? [], on: self.queue) { change in
+                switch change {
+                case .change(let p, let properties):
+                    _ = subscriber.receive(.change(p, properties))
+                case .error(let error):
+                    _ = subscriber.receive(.error(error))
+                case .deleted:
+                    subscriber.receive(completion: .finished)
+                }
+            }
+            subscriber.receive(subscription: ObservationSubscription(token: token))
+        }
+
+        /// Specifies the scheduler on which to perform subscribe, cancel, and request operations.
+        ///
+        /// For Realm Publishers, this determines which queue the underlying
+        /// change notifications are sent to. If `receive(on:)` is not used
+        /// subsequently, it also will determine which queue elements received
+        /// from the publisher are evaluated on. Currently only serial dispatch
+        /// queues are supported, and the `options:` parameter is not
+        /// supported.
+        ///
+        /// - parameter scheduler: The serial dispatch queue to perform the subscription on.
+        /// - returns: A publisher which subscribes on the given scheduler.
+        public func subscribe<S: Scheduler>(on scheduler: S) -> ProjectionChangeset<P> {
+            guard let queue = scheduler as? DispatchQueue else {
+                fatalError("Cannot subscribe on scheduler \(scheduler): only serial dispatch queues are currently implemented.")
+            }
+            return ProjectionChangeset(projection, keyPaths: self.keyPaths, queue: queue)
+        }
+
+        /// Specifies the scheduler on which to perform downstream operations.
+        ///
+        /// This differs from `subscribe(on:)` in how it is integrated with the
+        /// autorefresh cycle. When using `subscribe(on:)`, the subscription is
+        /// performed on the target scheduler and the publisher will emit the
+        /// collection during the refresh. When using `receive(on:)`, the
+        /// collection is then converted to a `ThreadSafeReference` and
+        /// delivered to the target scheduler with no integration into the
+        /// autorefresh cycle, meaning it may arrive some time after the
+        /// refresh occurs.
+        ///
+        /// When in doubt, you probably want `subscribe(on:)`
+        ///
+        /// - parameter scheduler: The serial dispatch queue to receive values on.
+        /// - returns: A publisher which delivers values to the given scheduler.
+        public func receive<S: Scheduler>(on scheduler: S) -> DeferredHandoverProjectionChangeset<Self, P, S> {
+            DeferredHandoverProjectionChangeset(self, scheduler)
+        }
+    }
+
+    /// A publisher which emits ProjectionChange<P> each time the observed projection is modified
+    ///
+    /// `receive(on:)` and `subscribe(on:)` can be called directly on this
+    /// publisher, and calling `.threadSafeReference()` is only required if
+    /// there is an intermediate transform. If `subscribe(on:)` is used, it
+    /// should always be the first operation in the pipeline.
+    ///
+    /// Create this publisher using the `objectChangeset()` function.
+    public class ProjectionChangesetWithToken<P: ProjectionObservable, T>: Publisher {
+        /// This publisher emits a ProjectionChange<T> indicating which projection and
+        /// which properties of that projection have changed each time a Realm is
+        /// refreshed after a write transaction which modifies the observed
+        /// projection.
+        public typealias Output = ProjectionChange<P>
+        /// This publisher reports error via the `.error` case of ObjectChange.
+        public typealias Failure = Never
+
+        internal typealias TokenParent = T
+        internal typealias TokenKeyPath = WritableKeyPath<T, NotificationToken?>
+
+        private var tokenParent: TokenParent
+        private var tokenKeyPath: TokenKeyPath
+
+        private let projection: P
+        private let queue: DispatchQueue?
+        internal init(_ projection: P,
+                      _ queue: DispatchQueue? = nil,
+                      _ tokenParent: TokenParent,
+                      _ tokenKeyPath: TokenKeyPath) {
+            let p = projection as! Projection<Object>
+            precondition(!p.isInvalidated, "Projection's object is invalidated or deleted")
+            self.projection = projection
+            self.queue = queue
+            self.tokenParent = tokenParent
+            self.tokenKeyPath = tokenKeyPath
+        }
+
+        /// :nodoc:
+        public func receive<S>(subscriber: S) where S: Subscriber, S.Failure == Never, Output == S.Input {
+            let token = self.projection.observe(keyPaths: [String](), on: self.queue) { change in
+                switch change {
+                case .change(let p, let properties):
+                    _ = subscriber.receive(.change(p, properties))
+                case .error(let error):
+                    _ = subscriber.receive(.error(error))
+                case .deleted:
+                    subscriber.receive(completion: .finished)
+                }
+            }
+            tokenParent[keyPath: tokenKeyPath] = token
+            subscriber.receive(subscription: ObservationSubscription(token: token))
+        }
+
+        /// Specifies the scheduler on which to perform subscribe, cancel, and request operations.
+        ///
+        /// For Realm Publishers, this determines which queue the underlying
+        /// change notifications are sent to. If `receive(on:)` is not used
+        /// subsequently, it also will determine which queue elements received
+        /// from the publisher are evaluated on. Currently only serial dispatch
+        /// queues are supported, and the `options:` parameter is not
+        /// supported.
+        ///
+        /// - parameter scheduler: The serial dispatch queue to perform the subscription on.
+        /// - returns: A publisher which subscribes on the given scheduler.
+        public func subscribe<S: Scheduler>(on scheduler: S) -> ProjectionChangesetWithToken<P, T> {
+            guard let queue = scheduler as? DispatchQueue else {
+                fatalError("Cannot subscribe on scheduler \(scheduler): only serial dispatch queues are currently implemented.")
+            }
+            return ProjectionChangesetWithToken(projection, queue, tokenParent, tokenKeyPath)
+        }
+
+        /// Specifies the scheduler on which to perform downstream operations.
+        ///
+        /// This differs from `subscribe(on:)` in how it is integrated with the
+        /// autorefresh cycle. When using `subscribe(on:)`, the subscription is
+        /// performed on the target scheduler and the publisher will emit the
+        /// collection during the refresh. When using `receive(on:)`, the
+        /// collection is then converted to a `ThreadSafeReference` and
+        /// delivered to the target scheduler with no integration into the
+        /// autorefresh cycle, meaning it may arrive some time after the
+        /// refresh occurs.
+        ///
+        /// When in doubt, you probably want `subscribe(on:)`
+        ///
+        /// - parameter scheduler: The serial dispatch queue to receive values on.
+        /// - returns: A publisher which delivers values to the given scheduler.
+        public func receive<S: Scheduler>(on scheduler: S) -> DeferredHandoverProjectionChangeset<ProjectionChangesetWithToken, T, S> {
+            DeferredHandoverProjectionChangeset(self, scheduler)
+        }
+    }
+
+    /// A publisher which delivers thread-confined projection changesets to a serial dispatch queue.
+    ///
+    /// Create using `.threadSafeReference().receive(on: queue)` on a publisher
+    /// that emits `ProjectionChange`.
+    @frozen public struct DeferredHandoverProjectionChangeset<Upstream: Publisher, P: ProjectionObservable, S: Scheduler>: Publisher where Upstream.Output == ProjectionChange<P> {
+        /// :nodoc:
+        public typealias Failure = Upstream.Failure
+        /// :nodoc:
+        public typealias Output = Upstream.Output
+
+        private let upstream: Upstream
+        private let scheduler: S
+
+        internal init(_ upstream: Upstream, _ scheduler: S) {
+            self.upstream = upstream
+            self.scheduler = scheduler
+        }
+
+        private enum Handover {
+            // .error and .change containing a frozen projection can be delivered
+            // without any handover
+            case passthrough(_ change: ProjectionChange<P>)
+            // .change containing a live projection need to be wrapped in a TSR.
+            // We also hold a reference to a frozen Realm to ensure that the
+            // source version remains pinned and we can deliver the projection at
+            // the same version as the change information.
+            case tsr(_ realm: Realm, _ tsr: ThreadSafeReference<P>,
+                     _ properties: [ProjectedPropertyChange])
+        }
+
+        /// :nodoc:
+        public func receive<Sub>(subscriber: Sub) where Sub: Subscriber, Sub.Failure == Failure, Output == Sub.Input {
+            let scheduler = self.scheduler
+            self.upstream
+                .map { (change: Output) -> Handover in
+                    guard case .change(let p, let properties) = change else { return .passthrough(change) }
+                    guard let realm = p.realm, !realm.isFrozen else { return .passthrough(change) }
+                    return .tsr(realm.freeze(), ThreadSafeReference(to: p), properties)
+                }
+                .receive(on: scheduler)
+                .compactMap { (handover: Handover) -> Output? in
+                    switch handover {
+                    case .passthrough(let change):
+                        return change
+                    case .tsr(let frozenRealm, let tsr, let properties):
+                        if let resolved = realm(frozenRealm, scheduler)?.resolve(tsr) {
+                            return .change(resolved, properties)
+                        }
+                        return nil
+                    }
+                }
+                .receive(subscriber: subscriber)
+        }
+    }
+
+    /// A helper publisher created by calling `.threadSafeReference()` on a publisher which emits thread-confined values.
+    @frozen public struct MakeThreadSafeProjectionChangeset<Upstream: Publisher, T: ProjectionObservable>: Publisher where Upstream.Output == ProjectionChange<T> {
+        /// :nodoc:
+        public typealias Failure = Upstream.Failure
+        /// :nodoc:
+        public typealias Output = Upstream.Output
+
+        private let upstream: Upstream
+        internal init(_ upstream: Upstream) {
+            self.upstream = upstream
+        }
+
+        /// :nodoc:
+        public func receive<S>(subscriber: S) where S: Subscriber, S.Failure == Failure, Output == S.Input {
+            self.upstream.receive(subscriber: subscriber)
+        }
+
+        /// Specifies the scheduler to deliver projection changesets to.
+        ///
+        /// This differs from `subscribe(on:)` in how it is integrated with the
+        /// autorefresh cycle. When using `subscribe(on:)`, the subscription is
+        /// performed on the target scheduler and the publisher will emit the
+        /// collection during the refresh. When using `receive(on:)`, the
+        /// collection is then converted to a `ThreadSafeReference` and
+        /// delivered to the target scheduler with no integration into the
+        /// autorefresh cycle, meaning it may arrive some time after the
+        /// refresh occurs.
+        ///
+        /// When in doubt, you probably want `subscribe(on:)`.
+        ///
+        /// - parameter scheduler: The serial dispatch queue to receive values on.
+        /// - returns: A publisher which delivers values to the given scheduler.
+        public func receive<S: Scheduler>(on scheduler: S) -> DeferredHandoverProjectionChangeset<Upstream, T, S> {
+            DeferredHandoverProjectionChangeset(self.upstream, scheduler)
+        }
+    }
+
 }
+
 #endif // canImport(Combine)

@@ -253,6 +253,7 @@ public final class PersonProjection: Projection<Person> {
 
 public class SimpleObject: Object {
     @Persisted var int: Int
+    @Persisted var bool: Bool
 }
 
 public final class SimpleProjection: Projection<SimpleObject> {
@@ -1648,7 +1649,7 @@ class ProjectionTests: TestCase {
 
     func testObserveFrozenObject() {
         let frozen = simpleProjection().freeze()
-        assertThrows(frozen.observe(keyPaths: [], { _ in }), "Frozen Realms do not change and do not have change notifications.")
+        assertThrows(frozen.observe(keyPaths: [String](), { _ in }), "Frozen Realms do not change and do not have change notifications.")
     }
 
     func testFrozenObjectEquality() {

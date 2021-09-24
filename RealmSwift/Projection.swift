@@ -56,6 +56,7 @@ fileprivate protocol AnyProjected {
 ///
 /// let people: [PersonProjection] = realm.objects(PersonProjection.self)
 /// ```
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 @propertyWrapper
 public struct Projected<T: ObjectBase, Value>: AnyProjected {
     fileprivate var _projectedKeyPath: KeyPath<T, Value>!
@@ -110,6 +111,7 @@ public struct Projected<T: ObjectBase, Value>: AnyProjected {
 }
 
 // MARK: Projection Schema
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 fileprivate struct ProjectedMetadata {
     let keyPath: AnyKeyPath
     let originPropertyKeyPathString: String
@@ -121,20 +123,24 @@ fileprivate struct ProjectedMetadata {
     }
 }
 
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 fileprivate struct ProjectionMetadata {
     let propertyMetadatas: [ProjectedMetadata]
     let mirror: Mirror
 }
 
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 private var schema = [ObjectIdentifier: ProjectionMetadata]()
 
 // MARK: ProjectionOservable
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 public protocol ProjectionObservable {
     associatedtype Root: ObjectBase
     var rootObject: Root { get }
     init(projecting object: Root)
 }
 
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 public enum ProjectionChange<P: ProjectionObservable> {
     /**
      If an error occurs, notification blocks are called one time with a `.error`
@@ -152,8 +158,9 @@ public enum ProjectionChange<P: ProjectionObservable> {
     case deleted
 }
 
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 extension ProjectionObservable {
-    private subscript(checkedMirrorDescendant key: String) -> AnyProjected {
+    fileprivate subscript(checkedMirrorDescendant key: String) -> AnyProjected {
         if let mirror = schema[ObjectIdentifier(Self.self)]?.mirror {
             return mirror.descendant(key)! as! AnyProjected
         }
@@ -200,6 +207,13 @@ extension ProjectionObservable {
         case .deleted:
             return .deleted
         }
+    }
+
+    public func observe(keyPaths: [String] = [],
+                        on queue: DispatchQueue? = nil,
+                        _ block: @escaping (ProjectionChange<Self>) -> Void) -> NotificationToken {
+        let kps = keyPaths.compactMap { \Self.[checkedMirrorDescendant: $0] }
+        return observe(keyPaths: kps, on: queue, block)
     }
 
     public func observe(keyPaths: [PartialKeyPath<Self>] = [],
@@ -271,6 +285,7 @@ extension ProjectionObservable {
 ///     @Projected(\Person.friends.projectTo.firstName) var firstFriendsName: ProjectedList<String>
 /// }
 /// ```
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 open class Projection<Root: ObjectBase>: RealmCollectionValue, ProjectionObservable where Root: ThreadConfined {
 
     /// The object being projected
@@ -288,6 +303,7 @@ open class Projection<Root: ObjectBase>: RealmCollectionValue, ProjectionObserva
 /**
  Information about a specific property which changed in an `Object` change notification.
  */
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 @frozen public struct ProjectedPropertyChange {
     /**
      The name of the property which changed.
@@ -315,6 +331,7 @@ open class Projection<Root: ObjectBase>: RealmCollectionValue, ProjectionObserva
 }
 
 // MARK: Notifications
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 public extension Projection {
     func addObserver(_ observer: NSObject,
                      forKeyPath keyPath: String,
@@ -323,7 +340,7 @@ public extension Projection {
         rootObject.addObserver(observer, forKeyPath: keyPath, options: options, context: context)
     }
 
-    @available(macOS 10.7, *)
+//    @available(macOS 10.7, *)
     func removeObserver(_ observer: NSObject,
                         forKeyPath keyPath: String,
                         context: UnsafeMutableRawPointer?) {
@@ -334,7 +351,9 @@ public extension Projection {
         rootObject.removeObserver(observer, forKeyPath: keyPath)
     }
 }
+
 // MARK: ThreadConfined
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 extension Projection: ThreadConfined {
     /**
      The Realm which manages the object, or `nil` if the object is unmanaged.
@@ -385,6 +404,7 @@ extension Projection: ThreadConfined {
     }
 }
 
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 extension Projection {
     public static var _rlmType: PropertyType {
         fatalError()
@@ -419,6 +439,7 @@ extension Projection {
 // MARK: Projected List
 /// ProjectedList is a special type of collection for Projection's properties
 /// You don't need to instantialte this type manually.
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 public struct ProjectedList<NewElement>: RandomAccessCollection where NewElement: RealmCollectionValue {
     public typealias Element = NewElement
     public typealias Index = Int
@@ -501,6 +522,7 @@ public struct ProjectedList<NewElement>: RandomAccessCollection where NewElement
     }
 }
 
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 @dynamicMemberLookup
 public struct ElementMapper<Element> where Element: ObjectBase, Element: RealmCollectionValue {
     var list: List<Element>
@@ -509,12 +531,14 @@ public struct ElementMapper<Element> where Element: ObjectBase, Element: RealmCo
     }
 }
 
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 extension List where Element: ObjectBase, Element: RealmCollectionValue {
     public var projectTo: ElementMapper<Element> {
         ElementMapper(list: self)
     }
 }
 
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 extension Projection: AssistedObjectiveCBridgeable {
     internal static func bridging(from objectiveCValue: Any, with metadata: Any?) -> Self {
         return Self(projecting: Root.bridging(from: objectiveCValue, with: metadata))
@@ -530,6 +554,7 @@ extension Projection: AssistedObjectiveCBridgeable {
 
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 extension Projection: ObservableObject, RealmSubscribable {
+//extension ProjectionObservable {
     /// A publisher that emits Void each time the projection changes.
     ///
     /// Despite the name, this actually emits *after* the projection has changed.
@@ -538,14 +563,26 @@ extension Projection: ObservableObject, RealmSubscribable {
     }
 
     /// :nodoc:
-    public func _observe<S>(_ keyPaths: [String]?, on queue: DispatchQueue?, _ subscriber: S) -> NotificationToken //where Projection<Root> : S.Input, S : Subscriber, S.Failure == Error {
-    where S.Input: Projection<Root>, S: Subscriber, S.Failure == Error {
-        fatalError()
+//    public func _observe<S>(_ keyPaths: [String]?, on queue: DispatchQueue?, _ subscriber: S) -> NotificationToken where S: Subscriber, Self == S.Input, S.Failure == Error {
+    public func _observe<S>(_ keyPaths: [String]?, on queue: DispatchQueue?, _ subscriber: S) -> NotificationToken where S: Subscriber, S.Input: Projection<Root>, S.Failure == Error {
+        return observe(keyPaths: keyPaths ?? [], on: queue) { change in
+            switch change {
+            case .change(let projection, _):
+                _ = subscriber.receive(projection as! S.Input)
+            case .deleted:
+                subscriber.receive(completion: .finished)
+            case .error(let error):
+                subscriber.receive(completion: .failure(error))
+            }
+        }
     }
-    
+
     /// :nodoc:
     public func _observe<S>(_ keyPaths: [String]?, _ subscriber: S) -> NotificationToken where S : Subscriber, S.Failure == Never, S.Input == Void {
-        fatalError()
+        let kps: [PartialKeyPath<Projection<Root>>]? = keyPaths?.compactMap {
+            \Self[checkedMirrorDescendant: $0]
+        }
+        return observe(keyPaths: kps ?? [], on: nil, { _ in _ = subscriber.receive() })
     }
 }
 #endif
