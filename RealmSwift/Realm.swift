@@ -1049,12 +1049,13 @@ extension Realm {
     public init(configuration: Realm.Configuration = .defaultConfiguration,
                 downloadBeforeOpen: OpenBehavior = .never,
                 queue: DispatchQueue? = nil) async throws {
+        let didRealmFileExist = Realm.fileExists(for: configuration)
         try self.init(RLMRealm(configuration: configuration.rlmConfiguration, queue: queue))
         switch downloadBeforeOpen {
         case .never:
             break
         case .once:
-            if !Realm.fileExists(for: configuration) {
+            if !didRealmFileExist {
                 fallthrough
             }
         case .always:
