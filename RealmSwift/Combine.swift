@@ -200,6 +200,38 @@ extension Publisher {
                 }
             }
     }
+    
+    /// Freezes all Realm projection changesets emitted by the upstream publisher.
+    ///
+    /// Freezing a Realm projection changeset makes the included projection reference
+    /// no longer live-update when writes are made to the Realm and makes it
+    /// safe to pass freely between threads without using
+    /// `.threadSafeReference()`. It also guarantees that the frozen projection
+    /// contained in the changset will always match the property changes, which
+    /// is not always the case when using thread-safe references.
+    ///
+    /// ```
+    /// // Get a changeset publisher for an projection
+    /// let cancellable = changesetPublisher(projection)
+    ///    // Convert to frozen changesets
+    ///    .freeze()
+    ///    // Unlike live objects, frozen objects can be sent to a concurrent queue
+    ///    .receive(on: DispatchQueue.global())
+    ///    .sink { changeset in
+    ///        // Do something with the frozen changeset
+    ///    }
+    /// ```
+    ///
+    /// - returns: A publisher that publishes frozen copies of the changesets
+    ///            which the upstream publisher publishes.
+    public func freeze<T: Projection<Object>>() -> Publishers.Map<Self, ProjectionChange<T>> where Output == ProjectionChange<T> {
+        return map {
+            if case .change(let p, let properties) = $0 {
+                return .change(p.freeze(), properties)
+            }
+            return $0
+        }
+    }
 }
 
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
@@ -285,8 +317,8 @@ extension Publisher {
     ///         }
     ///
     /// - returns: A publisher that supports `receive(on:)` for thread-confined objects.
-    public func threadSafeReference<T: ProjectionObservable>()
-        -> RealmPublishers.MakeThreadSafeProjectionChangeset<Self, T> where Output == ProjectionChange<T> {
+    public func threadSafeReference<T: Projection<O>, O>()
+        -> RealmPublishers.MakeThreadSafeProjectionChangeset<Self, T, O> where Output == ProjectionChange<T> {
         RealmPublishers.MakeThreadSafeProjectionChangeset(self)
     }
 
@@ -447,7 +479,7 @@ public func valuePublisher<T: RealmCollection>(_ collection: T, keyPaths: [Strin
 /// - parameter keyPaths: The publisher emits changes on these property keyPaths. If `nil` the publisher emits changes for every property.
 /// - returns: A publisher that emits the object each time it changes.
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
-public func valuePublisher<O: ObjectBase, T: Projection<O>>(_ object: T, keyPaths: [String]? = nil) -> RealmPublishers.Value<T> {
+public func valuePublisher<T, O>(_ object: T, keyPaths: [String]? = nil) -> RealmPublishers.Value<T> where T: Projection<O> {
     RealmPublishers.Value<T>(object, keyPaths: keyPaths)
 }
 
@@ -470,8 +502,8 @@ public func changesetPublisher<T: Object>(_ object: T, keyPaths: [String]? = nil
 /// - parameter keyPaths: The publisher emits changes on these property keyPaths. If `nil` the publisher emits changes for every property.
 /// - returns: A publisher that emits an object changeset each time the projection changes.
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
-public func changesetPublisher<T>(_ projection: T, keyPaths: [String]? = nil) -> RealmPublishers.ProjectionChangeset<T> where T: ProjectionObservable {
-    RealmPublishers.ProjectionChangeset<T>(projection, keyPaths: keyPaths)
+public func changesetPublisher<T, O>(_ projection: T, keyPaths: [String]? = nil) -> RealmPublishers.ProjectionChangeset<T, O> where T: Projection<O> {
+    RealmPublishers.ProjectionChangeset<T, O>(projection, keyPaths: keyPaths)
 }
 
 /// Creates a publisher that emits a collection changeset each time the collection changes.
@@ -1988,7 +2020,7 @@ public enum RealmPublishers {
     /// should always be the first operation in the pipeline.
     ///
     /// Create this publisher using the `projectionChangeset()` function.
-    @frozen public struct ProjectionChangeset<P: ProjectionObservable>: Publisher {
+    @frozen public struct ProjectionChangeset<P, O>: Publisher where P: Projection<O> {
         /// This publisher emits a ProjectionChange<P> indicating which projection and
         /// which properties of that projection have changed each time a Realm is
         /// refreshed after a write transaction which modifies the observed
@@ -2001,7 +2033,7 @@ public enum RealmPublishers {
         private let keyPaths: [String]?
         private let queue: DispatchQueue?
         internal init(_ projection: P, keyPaths: [String]? = nil, queue: DispatchQueue? = nil) {
-//            precondition(!projection.isInvalidated, "Projection's object is invalidated or deleted")
+            precondition(!projection.isInvalidated, "Projection's object is invalidated or deleted")
             self.projection = projection
             self.keyPaths = keyPaths
             self.queue = queue
@@ -2017,8 +2049,8 @@ public enum RealmPublishers {
         ///   - projection: The projection which the `NotificationToken` is written to.
         ///   - keyPath: The KeyPath which the `NotificationToken` is written to.
         /// - Returns: A `ProjectionChangesetWithToken` Publisher.
-        public func saveToken<T>(on tokenParent: T, at keyPath: WritableKeyPath<T, NotificationToken?>) -> ProjectionChangesetWithToken<P, T> {
-              return ProjectionChangesetWithToken<P, T>(projection, queue, tokenParent, keyPath)
+        public func saveToken<T>(on tokenParent: T, at keyPath: WritableKeyPath<T, NotificationToken?>) -> ProjectionChangesetWithToken<P, O, T> {
+              return ProjectionChangesetWithToken<P, O, T>(projection, queue, tokenParent, keyPath)
         }
 
         /// :nodoc:
@@ -2047,7 +2079,7 @@ public enum RealmPublishers {
         ///
         /// - parameter scheduler: The serial dispatch queue to perform the subscription on.
         /// - returns: A publisher which subscribes on the given scheduler.
-        public func subscribe<S: Scheduler>(on scheduler: S) -> ProjectionChangeset<P> {
+        public func subscribe<S: Scheduler>(on scheduler: S) -> ProjectionChangeset<P, O> {
             guard let queue = scheduler as? DispatchQueue else {
                 fatalError("Cannot subscribe on scheduler \(scheduler): only serial dispatch queues are currently implemented.")
             }
@@ -2069,7 +2101,7 @@ public enum RealmPublishers {
         ///
         /// - parameter scheduler: The serial dispatch queue to receive values on.
         /// - returns: A publisher which delivers values to the given scheduler.
-        public func receive<S: Scheduler>(on scheduler: S) -> DeferredHandoverProjectionChangeset<Self, P, S> {
+        public func receive<S: Scheduler>(on scheduler: S) -> DeferredHandoverProjectionChangeset<Self, P, O, S> {
             DeferredHandoverProjectionChangeset(self, scheduler)
         }
     }
@@ -2082,7 +2114,7 @@ public enum RealmPublishers {
     /// should always be the first operation in the pipeline.
     ///
     /// Create this publisher using the `objectChangeset()` function.
-    public class ProjectionChangesetWithToken<P: Projection<Object>, T>: Publisher {
+    public class ProjectionChangesetWithToken<P: Projection<O>, O, T>: Publisher {
         /// This publisher emits a ProjectionChange<T> indicating which projection and
         /// which properties of that projection have changed each time a Realm is
         /// refreshed after a write transaction which modifies the observed
@@ -2137,7 +2169,7 @@ public enum RealmPublishers {
         ///
         /// - parameter scheduler: The serial dispatch queue to perform the subscription on.
         /// - returns: A publisher which subscribes on the given scheduler.
-        public func subscribe<S: Scheduler>(on scheduler: S) -> ProjectionChangesetWithToken<P, T> {
+        public func subscribe<S: Scheduler>(on scheduler: S) -> ProjectionChangesetWithToken<P, O, T> {
             guard let queue = scheduler as? DispatchQueue else {
                 fatalError("Cannot subscribe on scheduler \(scheduler): only serial dispatch queues are currently implemented.")
             }
@@ -2159,7 +2191,7 @@ public enum RealmPublishers {
         ///
         /// - parameter scheduler: The serial dispatch queue to receive values on.
         /// - returns: A publisher which delivers values to the given scheduler.
-        public func receive<S: Scheduler>(on scheduler: S) -> DeferredHandoverProjectionChangeset<ProjectionChangesetWithToken, T, S> {
+        public func receive<S: Scheduler>(on scheduler: S) -> DeferredHandoverProjectionChangeset<ProjectionChangesetWithToken, T, O, S> {
             DeferredHandoverProjectionChangeset(self, scheduler)
         }
     }
@@ -2168,7 +2200,7 @@ public enum RealmPublishers {
     ///
     /// Create using `.threadSafeReference().receive(on: queue)` on a publisher
     /// that emits `ProjectionChange`.
-    @frozen public struct DeferredHandoverProjectionChangeset<Upstream: Publisher, P: Projection<Object>, S: Scheduler>: Publisher where Upstream.Output == ProjectionChange<P> {
+    @frozen public struct DeferredHandoverProjectionChangeset<Upstream: Publisher, P: Projection<O>, O, S: Scheduler>: Publisher where Upstream.Output == ProjectionChange<P> {
         /// :nodoc:
         public typealias Failure = Upstream.Failure
         /// :nodoc:
@@ -2220,7 +2252,7 @@ public enum RealmPublishers {
     }
 
     /// A helper publisher created by calling `.threadSafeReference()` on a publisher which emits thread-confined values.
-    @frozen public struct MakeThreadSafeProjectionChangeset<Upstream: Publisher, T: ProjectionObservable>: Publisher where Upstream.Output == ProjectionChange<T> {
+    @frozen public struct MakeThreadSafeProjectionChangeset<Upstream: Publisher, T: Projection<O>, O>: Publisher where Upstream.Output == ProjectionChange<T> {
         /// :nodoc:
         public typealias Failure = Upstream.Failure
         /// :nodoc:
@@ -2251,11 +2283,10 @@ public enum RealmPublishers {
         ///
         /// - parameter scheduler: The serial dispatch queue to receive values on.
         /// - returns: A publisher which delivers values to the given scheduler.
-        public func receive<S: Scheduler>(on scheduler: S) -> DeferredHandoverProjectionChangeset<Upstream, T, S> {
+        public func receive<S: Scheduler>(on scheduler: S) -> DeferredHandoverProjectionChangeset<Upstream, T, O, S> {
             DeferredHandoverProjectionChangeset(self.upstream, scheduler)
         }
     }
-
 }
 
 #endif // canImport(Combine)

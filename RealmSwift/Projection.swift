@@ -340,7 +340,6 @@ public extension Projection {
         rootObject.addObserver(observer, forKeyPath: keyPath, options: options, context: context)
     }
 
-//    @available(macOS 10.7, *)
     func removeObserver(_ observer: NSObject,
                         forKeyPath keyPath: String,
                         context: UnsafeMutableRawPointer?) {
@@ -554,7 +553,6 @@ extension Projection: AssistedObjectiveCBridgeable {
 
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 extension Projection: ObservableObject, RealmSubscribable {
-//extension ProjectionObservable {
     /// A publisher that emits Void each time the projection changes.
     ///
     /// Despite the name, this actually emits *after* the projection has changed.
@@ -563,7 +561,6 @@ extension Projection: ObservableObject, RealmSubscribable {
     }
 
     /// :nodoc:
-//    public func _observe<S>(_ keyPaths: [String]?, on queue: DispatchQueue?, _ subscriber: S) -> NotificationToken where S: Subscriber, Self == S.Input, S.Failure == Error {
     public func _observe<S>(_ keyPaths: [String]?, on queue: DispatchQueue?, _ subscriber: S) -> NotificationToken where S: Subscriber, S.Input: Projection<Root>, S.Failure == Error {
         return observe(keyPaths: keyPaths ?? [], on: queue) { change in
             switch change {
