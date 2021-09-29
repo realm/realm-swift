@@ -152,12 +152,13 @@ class LoginHelper: ObservableObject {
     var cancellables = Set<AnyCancellable>()
 
     let appConfig = AppConfiguration(baseURL: "http://localhost:9090",
-                                            transport: nil,
-                                            localAppName: nil,
-                                            localAppVersion: nil)
+                                     transport: nil,
+                                     localAppName: nil,
+                                     localAppVersion: nil)
 
     func login(email: String, password: String, completion: @escaping (User) -> Void) {
-        let app = RealmSwift.App(id: ProcessInfo.processInfo.environment["app_id"]!, configuration: appConfig)
+        let documentsPathUrl = URL(fileURLWithPath: NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0])
+        let app = RealmSwift.App(id: ProcessInfo.processInfo.environment["app_id"]!, configuration: appConfig, rootDirectory: documentsPathUrl)
         app.login(credentials: Credentials.emailPassword(email: email, password: password))
             .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { result in
@@ -171,12 +172,14 @@ class LoginHelper: ObservableObject {
     }
 
     func logout() {
-        let app = RealmSwift.App(id: ProcessInfo.processInfo.environment["app_id"]!, configuration: appConfig)
+        let documentsPathUrl = URL(fileURLWithPath: NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0])
+        let app = RealmSwift.App(id: ProcessInfo.processInfo.environment["app_id"]!, configuration: appConfig, rootDirectory: documentsPathUrl)
         app.currentUser?.logOut { _ in }
     }
 
     func logoutAllUsers() {
-        let app = RealmSwift.App(id: ProcessInfo.processInfo.environment["app_id"]!, configuration: appConfig)
+        let documentsPathUrl = URL(fileURLWithPath: NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0])
+        let app = RealmSwift.App(id: ProcessInfo.processInfo.environment["app_id"]!, configuration: appConfig, rootDirectory: documentsPathUrl)
         for (_, user) in app.allUsers {
             user.logOut { _ in }
         }

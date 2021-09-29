@@ -104,7 +104,8 @@ extension SwiftUISyncTestHostUITests {
                                                    localAppVersion: nil,
                                                    defaultRequestTimeoutMS: 60)
         // Create app in current process
-        return App(id: appId!, configuration: appConfiguration)
+        let documentsPathUrl = URL(fileURLWithPath: NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0])
+        return App(id: appId!, configuration: appConfiguration, rootDirectory: documentsPathUrl)
     }
 
     private func resetSyncManager() {
