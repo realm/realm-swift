@@ -136,6 +136,23 @@ public protocol ThreadConfined {
             can pin the source version of the Realm in use. This means that this property
             wrapper is **better suited for function arguments and local variables**
             **that get captured by an aynchronously dispatched block.**
+ - warning: A wrapped property will lose it's context when unwrapping an optional.
+            ```
+            func foo(@ThreadSafe bar?) {
+                guard let bar = bar else { ... } // New reference to foo is no longer thread safe
+                try! Realm().write {
+                    bar.property = value // Error if accessed from wrong thread
+                }
+            }
+            ```
+            Instead:
+            ```
+            func foo(@ThreadSafe foo?) {
+                try! Realm().write {
+                    foo.property? = value // Could execute across threads
+                }
+            }
+            ```
 
  - see: `ThreadSafeReference`
  - see: `ThreadConfined`

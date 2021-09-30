@@ -790,13 +790,13 @@ extension ThreadSafeWrapperTests {
             try! obj?.realm?.write {
                 obj?.stringCol = "middle"
             }
-            if (i == 99) { firstEx.fulfill() }
+            if i == 99 { firstEx.fulfill() }
         }
         DispatchQueue.concurrentPerform(iterations: 100) { i in
             try! obj?.realm?.write {
                 obj?.stringCol = "after"
             }
-            if ( i == 99) { secondEx.fulfill() }
+            if i == 99 { secondEx.fulfill() }
         }
 
         waitForExpectations(timeout: 5, handler: nil)
