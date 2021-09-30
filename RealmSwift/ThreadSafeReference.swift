@@ -143,46 +143,49 @@ public protocol ThreadConfined {
 @propertyWrapper public class ThreadSafe<T: ThreadConfined> {
     private var threadSafeReference: ThreadSafeReference<T>?
     private var rlmConfiguration: RLMRealmConfiguration?
-    private var barrier = DispatchQueue(label: "thread-safe-property-wrapper")
+    private var lock = NSLock()
 
     /// :nodoc:
     public var wrappedValue: T? {
         get {
-            barrier.sync(flags: .barrier) {
-                guard let threadSafeReference = threadSafeReference,
-                      let rlmConfig = rlmConfiguration else { return nil }
-                do {
-                    let rlmRealm = try RLMRealm(configuration: rlmConfig)
-                    let realm = Realm(rlmRealm)
-                    guard let value = threadSafeReference.resolve(in: realm) else {
-                        self.threadSafeReference = nil
-                        return nil
-                    }
-                    self.threadSafeReference = ThreadSafeReference(to: value)
-                    return value
-                    // FIXME: wrappedValue should throw
-                    // As of Swift 5.5 property wrappers can't have throwing accessors.
-                } catch let error as NSError {
-                    throwRealmException(error.localizedDescription)
+            lock.lock()
+            guard let threadSafeReference = threadSafeReference,
+                  let rlmConfig = rlmConfiguration else {
+                lock.unlock()
+                return nil
+            }
+            do {
+                let rlmRealm = try RLMRealm(configuration: rlmConfig)
+                let realm = Realm(rlmRealm)
+                guard let value = threadSafeReference.resolve(in: realm) else {
+                    self.threadSafeReference = nil
+                    lock.unlock()
+                    return nil
                 }
+                self.threadSafeReference = ThreadSafeReference(to: value)
+                lock.unlock()
+                return value
+            // FIXME: wrappedValue should throw
+            // As of Swift 5.5 property wrappers can't have throwing accessors.
+            } catch let error as NSError {
+                lock.unlock()
+                throwRealmException(error.localizedDescription)
             }
         }
         set {
-            var shouldThrow = false
-            barrier.sync(flags: .barrier) {
-                guard let newValue = newValue else {
-                    threadSafeReference = nil
-                    return
-                }
-                guard let rlmConfiguration = newValue.realm?.rlmRealm.configuration else {
-                    return shouldThrow = true
-                }
-                self.rlmConfiguration = rlmConfiguration
-                threadSafeReference = ThreadSafeReference(to: newValue)
+            lock.lock()
+            guard let newValue = newValue else {
+                threadSafeReference = nil
+                lock.unlock()
+                return
             }
-            if shouldThrow {
+            guard let rlmConfiguration = newValue.realm?.rlmRealm.configuration else {
+                lock.unlock()
                 throwRealmException("Only managed objects may be wrapped as thread safe.")
             }
+            self.rlmConfiguration = rlmConfiguration
+            threadSafeReference = ThreadSafeReference(to: newValue)
+            lock.unlock()
         }
     }
 

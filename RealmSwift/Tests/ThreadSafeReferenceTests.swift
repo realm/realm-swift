@@ -750,12 +750,11 @@ extension ThreadSafeWrapperTests {
     }
 
     func mutateStringCol(@ThreadSafe stringObj: SwiftStringObject?) {
-        guard let stringObj = stringObj else {
-            XCTFail("no object found")
-            return
-        }
-        try! stringObj.realm!.write {
-            stringObj.stringCol = "after"
+        dispatchSyncNewThread {
+            let realm = try! Realm()
+            try! realm.write {
+                stringObj?.stringCol = "after"
+            }
         }
     }
 
@@ -764,10 +763,9 @@ extension ThreadSafeWrapperTests {
         @ThreadSafe var stringObj = try! realm.write {
             realm.create(SwiftStringObject.self, value: ["stringCol": "before"])
         }
-        dispatchSyncNewThread {
-            XCTAssertEqual(stringObj!.stringCol, "before")
-            self.mutateStringCol(stringObj: stringObj)
-        }
+
+        XCTAssertEqual(stringObj!.stringCol, "before")
+        self.mutateStringCol(stringObj: stringObj)
         realm.refresh()
         XCTAssertEqual(stringObj!.stringCol, "after")
     }
@@ -785,24 +783,23 @@ extension ThreadSafeWrapperTests {
         @ThreadSafe var obj = try! realm.write {
             realm.create(SwiftStringObject.self, value: ["stringCol": "before"])
         }
-        let backgroundQueue = DispatchQueue(label: "background", attributes: .concurrent)
-        let mainEx = expectation(description: "executes first block")
-        let backgroundEx = expectation(description: "executes second block")
+        let firstEx = expectation(description: "executes first block")
+        let secondEx = expectation(description: "executes second block")
 
-        backgroundQueue.async {
-            XCTAssertEqual(obj?.stringCol, "before")
+        DispatchQueue.concurrentPerform(iterations: 100) { i in
             try! obj?.realm?.write {
                 obj?.stringCol = "middle"
             }
-            mainEx.fulfill()
+            if (i == 99) { firstEx.fulfill() }
         }
-        backgroundQueue.async {
+        DispatchQueue.concurrentPerform(iterations: 100) { i in
             try! obj?.realm?.write {
                 obj?.stringCol = "after"
             }
-            backgroundEx.fulfill()
+            if ( i == 99) { secondEx.fulfill() }
         }
-        waitForExpectations(timeout: 0.1, handler: nil)
+
+        waitForExpectations(timeout: 5, handler: nil)
         XCTAssertNotEqual(obj?.stringCol, "before")
     }
 }
