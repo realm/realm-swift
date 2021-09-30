@@ -4,9 +4,6 @@ x.y.z Release notes (yyyy-MM-dd)
 * Add a new `@ThreadSafe` property wrapper. Objects and collections wrapped by `@ThreadSafe` may be passed between threads. It's
   intended to allow local variables and function parameters to be used across
   threads when needed.
-* Add `async` versions for `EmailPasswordAuth.callResetPasswordFunction` and `User.linkUser` methods.
-* Add `async` version for `MongoCollection` methods.
-* Add `async` support for user functions.
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
