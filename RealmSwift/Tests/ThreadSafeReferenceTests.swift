@@ -783,20 +783,13 @@ extension ThreadSafeWrapperTests {
         @ThreadSafe var obj = try! realm.write {
             realm.create(SwiftStringObject.self, value: ["stringCol": "before"])
         }
-        let firstEx = expectation(description: "executes first block")
-        let secondEx = expectation(description: "executes second block")
+        let ex = expectation(description: "executes first block")
 
         DispatchQueue.concurrentPerform(iterations: 100) { i in
             try! obj?.realm?.write {
                 obj?.stringCol = "middle"
             }
-            if i == 99 { firstEx.fulfill() }
-        }
-        DispatchQueue.concurrentPerform(iterations: 100) { i in
-            try! obj?.realm?.write {
-                obj?.stringCol = "after"
-            }
-            if i == 99 { secondEx.fulfill() }
+            if i == 99 { ex.fulfill() }
         }
 
         waitForExpectations(timeout: 5, handler: nil)
