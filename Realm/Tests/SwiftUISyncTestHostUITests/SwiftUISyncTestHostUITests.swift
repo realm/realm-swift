@@ -23,6 +23,12 @@ class SwiftUISyncTestHostUITests: XCTestCase {
     // Create App only once
     static var appId: String?
 
+    // Realm Directory
+    var clientDataRoot: URL {
+        let applicationSupportDirectory = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
+        return applicationSupportDirectory.appendingPathComponent(Bundle.main.bundleIdentifier!)
+    }
+
     // App Info
     private var appId: String? {
         SwiftUISyncTestHostUITests.appId
@@ -104,8 +110,7 @@ extension SwiftUISyncTestHostUITests {
                                                    localAppVersion: nil,
                                                    defaultRequestTimeoutMS: 60)
         // Create app in current process
-        let documentsPathUrl = URL(fileURLWithPath: NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0])
-        return App(id: appId!, configuration: appConfiguration, rootDirectory: documentsPathUrl)
+        return App(id: appId!, configuration: appConfiguration, rootDirectory: clientDataRoot)
     }
 
     private func resetSyncManager() {
