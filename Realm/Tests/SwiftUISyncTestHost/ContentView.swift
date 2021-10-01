@@ -31,7 +31,7 @@ struct MainView: View {
     let testType: String = ProcessInfo.processInfo.environment["async_view_type"]!
     @State var viewState: LoggingViewState = .initial
     @State var user: User?
-    
+
     var body: some View {
         VStack {
             LoginView(didLogin: { user in
@@ -115,7 +115,7 @@ struct LoginView: View {
     @ObservedObject var loginHelper = LoginHelper()
     var didLogin: (User) -> Void
     var loggingIn: () -> Void
-    
+
     var body: some View {
         VStack {
             Button("Log In User 1") {
@@ -150,17 +150,16 @@ struct LoginView: View {
 
 class LoginHelper: ObservableObject {
     var cancellables = Set<AnyCancellable>()
-    
-    let appConfig = AppConfiguration(baseURL: "http://localhost:9090",
+
+    private let appConfig = AppConfiguration(baseURL: "http://localhost:9090",
                                      transport: nil,
                                      localAppName: nil,
                                      localAppVersion: nil)
-    
-    var clientDataRoot: URL {
+    private var clientDataRoot: URL {
         let applicationSupportDirectory = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
         return applicationSupportDirectory.appendingPathComponent(Bundle.main.bundleIdentifier!)
     }
-    
+
     func login(email: String, password: String, completion: @escaping (User) -> Void) {
         let app = RealmSwift.App(id: ProcessInfo.processInfo.environment["app_id"]!, configuration: appConfig, rootDirectory: clientDataRoot)
         app.login(credentials: Credentials.emailPassword(email: email, password: password))
@@ -174,12 +173,12 @@ class LoginHelper: ObservableObject {
             })
             .store(in: &cancellables)
     }
-    
+
     func logout() {
         let app = RealmSwift.App(id: ProcessInfo.processInfo.environment["app_id"]!, configuration: appConfig, rootDirectory: clientDataRoot)
         app.currentUser?.logOut { _ in }
     }
-    
+
     func logoutAllUsers() {
         let app = RealmSwift.App(id: ProcessInfo.processInfo.environment["app_id"]!, configuration: appConfig, rootDirectory: clientDataRoot)
         for (_, user) in app.allUsers {
@@ -195,7 +194,7 @@ struct AsyncOpenView: View {
                partitionValue: ProcessInfo.processInfo.environment["partition_value"]!,
                timeout: 2000)
     var asyncOpen
-    
+
     var body: some View {
         VStack {
             switch asyncOpen {
@@ -242,7 +241,7 @@ struct AutoOpenView: View {
               partitionValue: ProcessInfo.processInfo.environment["partition_value"]!,
               timeout: 2000)
     var autoOpen
-    
+
     var body: some View {
         VStack {
             switch autoOpen {
@@ -287,7 +286,7 @@ struct AsyncOpenPartitionView: View {
                partitionValue: "wrong_partition_value",
                timeout: 2000)
     var asyncOpen
-    
+
     var body: some View {
         VStack {
             switch asyncOpen {
@@ -312,7 +311,6 @@ struct AsyncOpenPartitionView: View {
                     .transition(AnyTransition.move(edge: .trailing)).animation(.default)
             }
         }
-        
     }
 }
 
@@ -321,7 +319,7 @@ struct AutoOpenPartitionView: View {
               partitionValue: "wrong_partition_value",
               timeout: 2000)
     var autoOpen
-    
+
     var body: some View {
         VStack {
             switch autoOpen {
@@ -346,7 +344,6 @@ struct AutoOpenPartitionView: View {
                     .transition(AnyTransition.move(edge: .trailing)).animation(.default)
             }
         }
-        
     }
 }
 
@@ -363,7 +360,7 @@ struct ErrorView: View {
 
 struct ListView: View {
     @ObservedResults(SwiftPerson.self) var objects
-    
+
     var body: some View {
         List {
             ForEach(objects) { object in
