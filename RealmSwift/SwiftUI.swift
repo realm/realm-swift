@@ -342,13 +342,21 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
 }
 
 // MARK: ObservedResults
+@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+public protocol ObservedResultsValue: RealmCollectionValue & Identifiable { }
+
+@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+extension Object: ObservedResultsValue { }
+
+@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+extension Projection: ObservedResultsValue { }
 
 /// A property wrapper type that retrieves results from a Realm.
 ///
 /// The results use the realm configuration provided by
 /// the environment value `EnvironmentValues/realmConfiguration`.
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-@propertyWrapper public struct ObservedResults<ResultType>: DynamicProperty, BoundCollection where ResultType: Object & Identifiable {
+@propertyWrapper public struct ObservedResults<ResultType>: DynamicProperty, BoundCollection where ResultType: ObservedResultsValue {
     private class Storage: ObservableStorage<Results<ResultType>> {
         var setupHasRun = false
 
@@ -360,7 +368,16 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
 
         func setupValue() {
             /// A base value to reset the state of the query if a user reassigns the `filter` or `sortDescriptor`
-            value = try! Realm(configuration: configuration ?? Realm.Configuration.defaultConfiguration).objects(ResultType.self)
+//            value = try! Realm(configuration: configuration ?? Realm.Configuration.defaultConfiguration).objects(ResultType.self)
+            
+            let realm = try! Realm(configuration: configuration ?? Realm.Configuration.defaultConfiguration)
+            if let type = ResultType.self as? RealmSwiftObject.Type {
+                value = realm.objects(type.self) as! Results<ResultType>
+            } else if let type = ResultType.self as? Projection<Object>.Type {
+                value = realm.objects(type.self) as! Results<ResultType>
+            } else {
+                fatalError("ResultType must be Object or Projection. Actual type - \(ResultType.self)")
+            }
 
             if let sortDescriptor = sortDescriptor {
                 value = value.sorted(byKeyPath: sortDescriptor.keyPath, ascending: sortDescriptor.ascending)

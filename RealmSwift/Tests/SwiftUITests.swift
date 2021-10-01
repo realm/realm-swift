@@ -36,6 +36,10 @@ import Combine
     }
 }
 
+class UIElementsProjection: Projection<SwiftUIObject> {
+    @Projected(\SwiftUIObject.str) var label
+}
+
 class EmbeddedTreeSwiftUIObject1: EmbeddedObject, EmbeddedTreeObject, ObjectKeyIdentifiable {
     @objc dynamic var value = 0
     @objc dynamic var child: EmbeddedTreeObject2?
@@ -388,5 +392,43 @@ class SwiftUITests: TestCase {
         XCTAssertEqual(hit, 2)
     }
 #endif
+    
+    // MARK: - Projection ObservedResults Operations
+    
+    func testResultsAppendProjection() throws {
+        let realm = inMemoryRealm(inMemoryIdentifier)
+        let state = ObservedResults(UIElementsProjection.self,
+                                    configuration: inMemoryRealm(inMemoryIdentifier).configuration)
+        
+        XCTAssertEqual(state.wrappedValue.count, 0)
+        try! realm.write {
+            realm.create(SwiftUIObject.self)
+        }
+//        state.projectedValue.append(object)
+        XCTAssertEqual(state.wrappedValue.count, 1)
+//        state.projectedValue.append(object)
+        try! realm.write {
+            realm.create(SwiftUIObject.self)
+        }
+        XCTAssertEqual(state.wrappedValue.count, 2)
+    }
+    
+    func testResultsRemoveProjection() throws {
+        XCTAssertTrue(false)
+    }
+    
+    // MARK: - Projection Operations
+    func testProjectionModification() throws {
+        XCTAssertTrue(false)
+    }
+    
+    func testProjectionDelete() throws {
+        XCTAssertTrue(false)
+    }
+    
+    // MARK: - Projection Bind
+    func testProjectionBind() {
+        XCTAssertTrue(false)
+    }
 }
 #endif

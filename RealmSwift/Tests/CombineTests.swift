@@ -2195,19 +2195,6 @@ class CombineProjectionPublisherTests: CombinePublisherTestCase {
 
     func testChangeSet() {
         let exp = XCTestExpectation()
-//        object.publisher
-//        let cancellable2 = projection.publisher.assertNoFailure().sink { (change: ProjectionChange<SimpleProjection>) in
-//            if case .change(let p, let properties) = change {
-//                XCTAssertEqual(self.projection, p)
-//                XCTAssertEqual(properties.count, 1)
-//                XCTAssertEqual(properties[0].name, "int")
-//                XCTAssertNil(properties[0].oldValue)
-//                XCTAssertEqual(properties[0].newValue as? Int, 1)
-//            } else {
-//                XCTFail("Expected .change but got \(change)")
-//            }
-//            exp.fulfill()
-//        }
         cancellable = changesetPublisher(projection)
             .assertNoFailure()
             .sink { change in

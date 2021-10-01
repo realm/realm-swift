@@ -57,6 +57,16 @@ extension ObjectKeyIdentifiable {
     }
 }
 
+@available(macOS 10.15, iOS 13, tvOS 13, watchOS 6, *)
+extension Projection: Identifiable {
+    /// A stable identifier for this projection. This  value will be
+    /// the same for all projections of this object
+    /// and for all instances of the projected Object
+    public var id: UInt64 {
+        RLMObjectBaseGetCombineId(self.rootObject)
+    }
+}
+
 // MARK: - Combine
 
 /// A type which can be passed to `valuePublisher()` or `changesetPublisher()`.
@@ -317,8 +327,8 @@ extension Publisher {
     ///         }
     ///
     /// - returns: A publisher that supports `receive(on:)` for thread-confined objects.
-    public func threadSafeReference<T: Projection<O>, O>()
-        -> RealmPublishers.MakeThreadSafeProjectionChangeset<Self, T, O> where Output == ProjectionChange<T> {
+    public func threadSafeReference<T: ProjectionObservable>()
+        -> RealmPublishers.MakeThreadSafeProjectionChangeset<Self, T> where Output == ProjectionChange<T> {
         RealmPublishers.MakeThreadSafeProjectionChangeset(self)
     }
 
@@ -479,8 +489,8 @@ public func valuePublisher<T: RealmCollection>(_ collection: T, keyPaths: [Strin
 /// - parameter keyPaths: The publisher emits changes on these property keyPaths. If `nil` the publisher emits changes for every property.
 /// - returns: A publisher that emits the object each time it changes.
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
-public func valuePublisher<T, O>(_ object: T, keyPaths: [String]? = nil) -> RealmPublishers.Value<T> where T: Projection<O> {
-    RealmPublishers.Value<T>(object, keyPaths: keyPaths)
+public func valuePublisher<T>(_ projection: T, keyPaths: [String]? = nil) -> RealmPublishers.Value<T> where T: ProjectionObservable {
+    RealmPublishers.Value<T>(projection, keyPaths: keyPaths)
 }
 
 /// Creates a publisher that emits an object changeset each time the object changes.
@@ -502,8 +512,8 @@ public func changesetPublisher<T: Object>(_ object: T, keyPaths: [String]? = nil
 /// - parameter keyPaths: The publisher emits changes on these property keyPaths. If `nil` the publisher emits changes for every property.
 /// - returns: A publisher that emits an object changeset each time the projection changes.
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
-public func changesetPublisher<T, O>(_ projection: T, keyPaths: [String]? = nil) -> RealmPublishers.ProjectionChangeset<T, O> where T: Projection<O> {
-    RealmPublishers.ProjectionChangeset<T, O>(projection, keyPaths: keyPaths)
+public func changesetPublisher<T: ProjectionObservable>(_ projection: T, keyPaths: [String]? = nil) -> RealmPublishers.ProjectionChangeset<T> {
+    RealmPublishers.ProjectionChangeset<T>(projection, keyPaths: keyPaths)
 }
 
 /// Creates a publisher that emits a collection changeset each time the collection changes.
@@ -2020,7 +2030,7 @@ public enum RealmPublishers {
     /// should always be the first operation in the pipeline.
     ///
     /// Create this publisher using the `projectionChangeset()` function.
-    @frozen public struct ProjectionChangeset<P, O>: Publisher where P: Projection<O> {
+    @frozen public struct ProjectionChangeset<P: ProjectionObservable>: Publisher {
         /// This publisher emits a ProjectionChange<P> indicating which projection and
         /// which properties of that projection have changed each time a Realm is
         /// refreshed after a write transaction which modifies the observed
@@ -2033,7 +2043,7 @@ public enum RealmPublishers {
         private let keyPaths: [String]?
         private let queue: DispatchQueue?
         internal init(_ projection: P, keyPaths: [String]? = nil, queue: DispatchQueue? = nil) {
-            precondition(!projection.isInvalidated, "Projection's object is invalidated or deleted")
+//            precondition(!projection.isInvalidated, "Projection's object is invalidated or deleted")
             self.projection = projection
             self.keyPaths = keyPaths
             self.queue = queue
@@ -2049,8 +2059,8 @@ public enum RealmPublishers {
         ///   - projection: The projection which the `NotificationToken` is written to.
         ///   - keyPath: The KeyPath which the `NotificationToken` is written to.
         /// - Returns: A `ProjectionChangesetWithToken` Publisher.
-        public func saveToken<T>(on tokenParent: T, at keyPath: WritableKeyPath<T, NotificationToken?>) -> ProjectionChangesetWithToken<P, O, T> {
-              return ProjectionChangesetWithToken<P, O, T>(projection, queue, tokenParent, keyPath)
+        public func saveToken<T>(on tokenParent: T, at keyPath: WritableKeyPath<T, NotificationToken?>) -> ProjectionChangesetWithToken<P, T> {
+              return ProjectionChangesetWithToken<P, T>(projection, queue, tokenParent, keyPath)
         }
 
         /// :nodoc:
@@ -2079,7 +2089,7 @@ public enum RealmPublishers {
         ///
         /// - parameter scheduler: The serial dispatch queue to perform the subscription on.
         /// - returns: A publisher which subscribes on the given scheduler.
-        public func subscribe<S: Scheduler>(on scheduler: S) -> ProjectionChangeset<P, O> {
+        public func subscribe<S: Scheduler>(on scheduler: S) -> ProjectionChangeset<P> {
             guard let queue = scheduler as? DispatchQueue else {
                 fatalError("Cannot subscribe on scheduler \(scheduler): only serial dispatch queues are currently implemented.")
             }
@@ -2101,7 +2111,7 @@ public enum RealmPublishers {
         ///
         /// - parameter scheduler: The serial dispatch queue to receive values on.
         /// - returns: A publisher which delivers values to the given scheduler.
-        public func receive<S: Scheduler>(on scheduler: S) -> DeferredHandoverProjectionChangeset<Self, P, O, S> {
+        public func receive<S: Scheduler>(on scheduler: S) -> DeferredHandoverProjectionChangeset<Self, P, S> {
             DeferredHandoverProjectionChangeset(self, scheduler)
         }
     }
@@ -2114,7 +2124,7 @@ public enum RealmPublishers {
     /// should always be the first operation in the pipeline.
     ///
     /// Create this publisher using the `objectChangeset()` function.
-    public class ProjectionChangesetWithToken<P: Projection<O>, O, T>: Publisher {
+    public class ProjectionChangesetWithToken<P: ProjectionObservable, T>: Publisher {
         /// This publisher emits a ProjectionChange<T> indicating which projection and
         /// which properties of that projection have changed each time a Realm is
         /// refreshed after a write transaction which modifies the observed
@@ -2135,7 +2145,7 @@ public enum RealmPublishers {
                       _ queue: DispatchQueue? = nil,
                       _ tokenParent: TokenParent,
                       _ tokenKeyPath: TokenKeyPath) {
-            precondition(!projection.isInvalidated, "Projection's object is invalidated or deleted")
+//            precondition(!projection.isInvalidated, "Projection's object is invalidated or deleted")
             self.projection = projection
             self.queue = queue
             self.tokenParent = tokenParent
@@ -2169,7 +2179,7 @@ public enum RealmPublishers {
         ///
         /// - parameter scheduler: The serial dispatch queue to perform the subscription on.
         /// - returns: A publisher which subscribes on the given scheduler.
-        public func subscribe<S: Scheduler>(on scheduler: S) -> ProjectionChangesetWithToken<P, O, T> {
+        public func subscribe<S: Scheduler>(on scheduler: S) -> ProjectionChangesetWithToken<P, T> {
             guard let queue = scheduler as? DispatchQueue else {
                 fatalError("Cannot subscribe on scheduler \(scheduler): only serial dispatch queues are currently implemented.")
             }
@@ -2191,7 +2201,7 @@ public enum RealmPublishers {
         ///
         /// - parameter scheduler: The serial dispatch queue to receive values on.
         /// - returns: A publisher which delivers values to the given scheduler.
-        public func receive<S: Scheduler>(on scheduler: S) -> DeferredHandoverProjectionChangeset<ProjectionChangesetWithToken, T, O, S> {
+        public func receive<S: Scheduler>(on scheduler: S) -> DeferredHandoverProjectionChangeset<ProjectionChangesetWithToken, T, S> {
             DeferredHandoverProjectionChangeset(self, scheduler)
         }
     }
@@ -2200,7 +2210,7 @@ public enum RealmPublishers {
     ///
     /// Create using `.threadSafeReference().receive(on: queue)` on a publisher
     /// that emits `ProjectionChange`.
-    @frozen public struct DeferredHandoverProjectionChangeset<Upstream: Publisher, P: Projection<O>, O, S: Scheduler>: Publisher where Upstream.Output == ProjectionChange<P> {
+    @frozen public struct DeferredHandoverProjectionChangeset<Upstream: Publisher, P: ProjectionObservable, S: Scheduler>: Publisher where Upstream.Output == ProjectionChange<P>, P: ThreadConfined {
         /// :nodoc:
         public typealias Failure = Upstream.Failure
         /// :nodoc:
@@ -2252,7 +2262,7 @@ public enum RealmPublishers {
     }
 
     /// A helper publisher created by calling `.threadSafeReference()` on a publisher which emits thread-confined values.
-    @frozen public struct MakeThreadSafeProjectionChangeset<Upstream: Publisher, T: Projection<O>, O>: Publisher where Upstream.Output == ProjectionChange<T> {
+    @frozen public struct MakeThreadSafeProjectionChangeset<Upstream: Publisher, T: ProjectionObservable>: Publisher where Upstream.Output == ProjectionChange<T> {
         /// :nodoc:
         public typealias Failure = Upstream.Failure
         /// :nodoc:
@@ -2283,7 +2293,7 @@ public enum RealmPublishers {
         ///
         /// - parameter scheduler: The serial dispatch queue to receive values on.
         /// - returns: A publisher which delivers values to the given scheduler.
-        public func receive<S: Scheduler>(on scheduler: S) -> DeferredHandoverProjectionChangeset<Upstream, T, O, S> {
+        public func receive<S: Scheduler>(on scheduler: S) -> DeferredHandoverProjectionChangeset<Upstream, T, S> {
             DeferredHandoverProjectionChangeset(self.upstream, scheduler)
         }
     }
