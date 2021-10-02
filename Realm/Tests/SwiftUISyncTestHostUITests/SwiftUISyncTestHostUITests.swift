@@ -55,6 +55,9 @@ class SwiftUISyncTestHostUITests: XCTestCase {
         super.setUp()
         continueAfterFailure = false
 
+        try? FileManager.default.removeItem(at: clientDataRoot)
+        try? FileManager.default.createDirectory(at: clientDataRoot, withIntermediateDirectories: true)
+
         // Create App once for this Test Suite
         if SwiftUISyncTestHostUITests.appId == nil {
             do {
