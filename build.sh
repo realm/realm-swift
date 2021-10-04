@@ -69,7 +69,7 @@ command:
   test-catalyst-swift:  tests RealmSwift Mac Catalyst framework
   test-swiftpm:         tests ObjC and Swift macOS frameworks via SwiftPM
   test-swiftui-ios:         tests SwiftUI framework UI tests
-  test-osx-swiftui-server:  tests Server Sync in SwiftUI
+  test-swiftui-server-osx:  tests Server Sync in SwiftUI
   verify:               verifies docs, osx, osx-swift, ios-static, ios-dynamic, ios-swift, ios-device, swiftui-ios in both Debug and Release configurations, swiftlint
   verify-osx-object-server:  downloads the Realm Object Server and runs the Objective-C and Swift integration tests
   docs:                 builds docs in docs/output
@@ -670,7 +670,7 @@ case "$COMMAND" in
         exit 0
         ;;
 
-    "test-osx-swiftui-server")
+    "test-swiftui-server-osx")
         xctest 'SwiftUISyncTestHost' -configuration "$CONFIGURATION" -sdk macosx -destination 'platform=macOS'
         exit 0
         ;;
@@ -703,7 +703,7 @@ case "$COMMAND" in
         sh build.sh verify-catalyst
         sh build.sh verify-catalyst-swift
         sh build.sh verify-swiftui-ios
-        sh build.sh verify-osx-swiftui-server
+        sh build.sh verify-swiftui-server-osx
         ;;
 
     "verify-cocoapods")
@@ -784,8 +784,8 @@ case "$COMMAND" in
         exit 0
         ;;
 
-    "verify-osx-swiftui-server")
-        sh build.sh test-osx-swiftui-server
+    "verify-swiftui-server-osx")
+        sh build.sh test-swiftui-server-osx
         exit 0
         ;;
 
