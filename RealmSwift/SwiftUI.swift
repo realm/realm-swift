@@ -782,13 +782,8 @@ public enum AsyncOpenState {
     case error(Error)
 }
 
-/**
-An enum representing the type of Async operation `@AsyncOpen` or `@AutoOpen`
-*/
 private enum AsyncOpenKind {
-    /// @AsyncOpen
     case asyncOpen
-    /// @AutoOpen
     case autoOpen
 }
 

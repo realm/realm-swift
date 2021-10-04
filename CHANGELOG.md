@@ -12,6 +12,8 @@ x.y.z Release notes (yyyy-MM-dd)
 * Fix `@AsyncOpen` and `@AutoOpen` using `defaultConfiguration` by default if 
   the user's doesn't provide one, will set an incorrect path which doesn't 
   correspond to the users configuration one. (since v10.12.0)
+* Adding missing subscription completion for `AsyncOpenPublisher` after successfully 
+  returning a realm.
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
