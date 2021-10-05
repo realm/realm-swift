@@ -122,7 +122,7 @@ let package = Package(
             targets: ["Realm", "RealmSwift"]),
     ],
     dependencies: [
-        .package(name: "RealmDatabase", url: "https://github.com/realm/realm-core", .revision("c80d68383fae7f473dc1f54fba33ed0440769fd6"))
+        .package(name: "RealmDatabase", url: "https://github.com/realm/realm-core", .revision("91405353801897f589095360e6c4ece83c3690f8"))
     ],
     targets: [
       .target(
