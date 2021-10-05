@@ -43,6 +43,11 @@ Realm Cloud user registration & password functions
 */
 public typealias EmailPasswordAuth = RLMEmailPasswordAuth
 
+/**
+ An object representing the social profile of a User.
+ */
+public typealias UserProfile = RLMUserProfile
+
 /// A block type used to report an error
 public typealias EmailPasswordAuthOptionalErrorBlock = RLMEmailPasswordAuthOptionalErrorBlock
 extension EmailPasswordAuth {

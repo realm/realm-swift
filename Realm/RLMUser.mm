@@ -293,6 +293,13 @@ using namespace realm;
     return (NSDictionary *)RLMConvertBsonToRLMBSON(*_user->custom_data());
 }
 
+- (RLMUserProfile *)profile {
+    if (!_user) {
+        return [RLMUserProfile new];
+    }
+
+    return [[RLMUserProfile alloc] initWithUserProfile: _user->user_profile()];
+}
 - (std::shared_ptr<SyncUser>)_syncUser {
     return _user;
 }
@@ -320,6 +327,81 @@ using namespace realm;
         _identifier = identifier;
     }
     return self;
+}
+
+@end
+
+#pragma mark - RLMUserProfile
+
+@interface RLMUserProfile () {
+    SyncUserProfile _userProfile;
+}
+@end
+
+@implementation RLMUserProfile
+
+- (instancetype)initWithUserProfile:(SyncUserProfile)userProfile {
+    if (self = [super init]) {
+        _userProfile = userProfile;
+    }
+    return self;
+}
+
+- (NSString *)name {
+    _userProfile.data();
+    if (_userProfile.name() == util::none) {
+        return nil;
+    }
+    return @(_userProfile.name()->c_str());
+}
+
+- (NSString *)email {
+    if (_userProfile.email() == util::none) {
+        return nil;
+    }
+    return @(_userProfile.email()->c_str());
+}
+- (NSString *)pictureURL {
+    if (_userProfile.picture_url() == util::none) {
+        return nil;
+    }
+    return @(_userProfile.picture_url()->c_str());
+}
+- (NSString *)firstName {
+    if (_userProfile.first_name() == util::none) {
+        return nil;
+    }
+    return @(_userProfile.first_name()->c_str());
+}
+- (NSString *)lastName {
+    if (_userProfile.last_name() == util::none) {
+        return nil;
+    }
+    return @(_userProfile.last_name()->c_str());
+}
+- (NSString *)gender {
+    if (_userProfile.gender() == util::none) {
+        return nil;
+    }
+    return @(_userProfile.gender()->c_str());
+}
+- (NSString *)birthday {
+    if (_userProfile.birthday() == util::none) {
+        return nil;
+    }
+    return @(_userProfile.birthday()->c_str());
+}
+- (NSString *)minAge {
+    if (_userProfile.min_age() == util::none) {
+        return nil;
+    }
+    return @(_userProfile.min_age()->c_str());
+}
+- (NSString *)maxAge {
+    if (_userProfile.max_age() == util::none) {
+        return nil;
+    }
+    return @(_userProfile.max_age()->c_str());
 }
 
 @end

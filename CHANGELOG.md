@@ -1,7 +1,7 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+* Add UserProfile to User. This contains metadata from social logins with MongoDB Realm.
 
 ### Fixed
 * `RealmProperty<T?>` would crash when decoding a `null` json value.
