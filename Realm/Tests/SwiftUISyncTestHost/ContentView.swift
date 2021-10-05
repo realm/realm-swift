@@ -152,9 +152,9 @@ class LoginHelper: ObservableObject {
     var cancellables = Set<AnyCancellable>()
 
     private let appConfig = AppConfiguration(baseURL: "http://localhost:9090",
-                                     transport: nil,
-                                     localAppName: nil,
-                                     localAppVersion: nil)
+                                             transport: nil,
+                                             localAppName: nil,
+                                             localAppVersion: nil)
     private var clientDataRoot: URL {
         let applicationSupportDirectory = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
         return applicationSupportDirectory.appendingPathComponent(Bundle.main.bundleIdentifier!)
@@ -162,10 +162,9 @@ class LoginHelper: ObservableObject {
 
     func login(email: String, password: String, completion: @escaping (User) -> Void) {
         let app = RealmSwift.App(id: ProcessInfo.processInfo.environment["app_id"]!, configuration: appConfig, rootDirectory: clientDataRoot)
-        app.login(credentials: Credentials.emailPassword(email: email, password: password))
-            .receive(on: DispatchQueue.main)
+        app.login(credentials: .emailPassword(email: email, password: password))
             .sink(receiveCompletion: { result in
-                if case .failure(let error) = result {
+                if case let .failure(error) = result {
                     print("Login user error \(error)")
                 }
             }, receiveValue: { user in
