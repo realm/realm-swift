@@ -55,6 +55,8 @@ class SwiftUISyncTestHostUITests: XCTestCase {
         super.setUp()
         continueAfterFailure = false
 
+        setenv("REALM_DISABLE_METADATA_ENCRYPTION", "1", 1)
+
         try? FileManager.default.createDirectory(at: clientDataRoot, withIntermediateDirectories: true)
 
         // Create App once for this Test Suite
