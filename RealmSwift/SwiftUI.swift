@@ -359,7 +359,7 @@ extension Projection: ObservedResultsValue { }
 @propertyWrapper public struct ObservedResults<ResultType>: DynamicProperty, BoundCollection where ResultType: ObservedResultsValue {
     private class Storage: ObservableStorage<Results<ResultType>> {
         var setupHasRun = false
-
+        var resultFactory: ((Realm) -> Results<ResultType>)!
         private func didSet() {
             if setupHasRun {
                 setupValue()
@@ -368,23 +368,8 @@ extension Projection: ObservedResultsValue { }
 
         func setupValue() {
             /// A base value to reset the state of the query if a user reassigns the `filter` or `sortDescriptor`
-//            value = try! Realm(configuration: configuration ?? Realm.Configuration.defaultConfiguration).objects(ResultType.self)
-            
             let realm = try! Realm(configuration: configuration ?? Realm.Configuration.defaultConfiguration)
-            if let type = ResultType.self as? RealmSwiftObject.Type {
-                value = realm.objects(type.self) as! Results<ResultType>
-            } else if let type = ResultType.self as? Projection<Object>.Type {
-                value = realm.objects(type.self) as! Results<ResultType>
-            } else {
-                fatalError("ResultType must be Object or Projection. Actual type - \(ResultType.self)")
-            }
-
-            if let sortDescriptor = sortDescriptor {
-                value = value.sorted(byKeyPath: sortDescriptor.keyPath, ascending: sortDescriptor.ascending)
-            }
-            if let filter = filter {
-                value = value.filter(filter)
-            }
+            value = self.resultFactory(realm)
             setupHasRun = true
         }
 
@@ -432,18 +417,35 @@ extension Projection: ObservedResultsValue { }
     public var projectedValue: Self {
         return self
     }
+
     /// :nodoc:
+    public init<ObjectType: ObjectBase>(_ type: ResultType.Type,
+                configuration: Realm.Configuration? = nil,
+                filter: NSPredicate? = nil,
+                keyPaths: [String]? = nil,
+                sortDescriptor: SortDescriptor? = nil) where ResultType: Projection<ObjectType> {
+        self.storage = Storage(Results(RLMResults.emptyDetached()), keyPaths)
+        self.storage.resultFactory = { realm in
+            realm.objects(ResultType.self)
+        }
+        self.storage.configuration = configuration
+        self.filter = filter
+        self.sortDescriptor = sortDescriptor
+        
+    }
     public init(_ type: ResultType.Type,
                 configuration: Realm.Configuration? = nil,
                 filter: NSPredicate? = nil,
                 keyPaths: [String]? = nil,
-                sortDescriptor: SortDescriptor? = nil) {
+                sortDescriptor: SortDescriptor? = nil) where ResultType: ObjectBase {
         self.storage = Storage(Results(RLMResults.emptyDetached()), keyPaths)
+        self.storage.resultFactory = { realm in
+            realm.objects(ResultType.self)
+        }
         self.storage.configuration = configuration
         self.filter = filter
         self.sortDescriptor = sortDescriptor
     }
-
     public mutating func update() {
         // When the view updates, it will inject the @Environment
         // into the propertyWrapper

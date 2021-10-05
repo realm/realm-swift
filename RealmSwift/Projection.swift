@@ -56,7 +56,6 @@ fileprivate protocol AnyProjected {
 ///
 /// let people: [PersonProjection] = realm.objects(PersonProjection.self)
 /// ```
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 @propertyWrapper
 public struct Projected<T: ObjectBase, Value>: AnyProjected {
     fileprivate var _projectedKeyPath: KeyPath<T, Value>!
@@ -111,7 +110,6 @@ public struct Projected<T: ObjectBase, Value>: AnyProjected {
 }
 
 // MARK: Projection Schema
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 fileprivate struct ProjectedMetadata {
     let keyPath: AnyKeyPath
     let originPropertyKeyPathString: String
@@ -123,24 +121,20 @@ fileprivate struct ProjectedMetadata {
     }
 }
 
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 fileprivate struct ProjectionMetadata {
     let propertyMetadatas: [ProjectedMetadata]
     let mirror: Mirror
 }
 
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 private var schema = [ObjectIdentifier: ProjectionMetadata]()
 
 // MARK: ProjectionOservable
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 public protocol ProjectionObservable {
     associatedtype Root: ObjectBase
     var rootObject: Root { get }
     init(projecting object: Root)
 }
 
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 public enum ProjectionChange<P: ProjectionObservable> {
     /**
      If an error occurs, notification blocks are called one time with a `.error`
@@ -158,7 +152,6 @@ public enum ProjectionChange<P: ProjectionObservable> {
     case deleted
 }
 
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 extension ProjectionObservable {
     fileprivate subscript(checkedMirrorDescendant key: String) -> AnyProjected {
         if let mirror = schema[ObjectIdentifier(Self.self)]?.mirror {
@@ -285,7 +278,6 @@ extension ProjectionObservable {
 ///     @Projected(\Person.friends.projectTo.firstName) var firstFriendsName: ProjectedList<String>
 /// }
 /// ```
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 open class Projection<Root: ObjectBase>: RealmCollectionValue, ProjectionObservable where Root: ThreadConfined {
 
     /// The object being projected
@@ -303,7 +295,6 @@ open class Projection<Root: ObjectBase>: RealmCollectionValue, ProjectionObserva
 /**
  Information about a specific property which changed in an `Object` change notification.
  */
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 @frozen public struct ProjectedPropertyChange {
     /**
      The name of the property which changed.
@@ -352,7 +343,6 @@ public extension Projection {
 }
 
 // MARK: ThreadConfined
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 extension Projection: ThreadConfined {
     /**
      The Realm which manages the object, or `nil` if the object is unmanaged.
@@ -403,7 +393,6 @@ extension Projection: ThreadConfined {
     }
 }
 
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 extension Projection {
     public static var _rlmType: PropertyType {
         fatalError()
@@ -438,7 +427,6 @@ extension Projection {
 // MARK: Projected List
 /// ProjectedList is a special type of collection for Projection's properties
 /// You don't need to instantialte this type manually.
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 public struct ProjectedList<NewElement>: RandomAccessCollection where NewElement: RealmCollectionValue {
     public typealias Element = NewElement
     public typealias Index = Int

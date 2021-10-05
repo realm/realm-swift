@@ -642,7 +642,6 @@ import Realm.Private
     }
 
     // MARK: Object Retrieval
-
     /**
      Returns all objects of the given type stored in the Realm.
 
@@ -650,7 +649,7 @@ import Realm.Private
 
      - returns: A `Results` containing the objects.
      */
-    public func objects<Element: Object>(_ type: Element.Type) -> Results<Element> {
+    public func objects<Element: ObjectBase>(_ type: Element.Type) -> Results<Element> {
         return Results(RLMGetObjects(rlmRealm, type.className(), nil))
     }
 
@@ -661,7 +660,6 @@ import Realm.Private
 
      - returns: A `Results` containing the projections.
      */
-    @available(macOSApplicationExtension 10.15, *)
     public func objects<Root: ObjectBase, T: Projection<Root>>(_ type: T.Type) -> Results<T> {
         return Results(RLMGetObjects(rlmRealm, Root.className(), nil)) {
             T(projecting: $0 as! Root)
