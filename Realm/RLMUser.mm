@@ -298,7 +298,7 @@ using namespace realm;
         return [RLMUserProfile new];
     }
 
-    return [[RLMUserProfile alloc] initWithUserProfile: _user->user_profile()];
+    return [[RLMUserProfile alloc] initWithUserProfile:_user->user_profile()];
 }
 - (std::shared_ptr<SyncUser>)_syncUser {
     return _user;
@@ -340,68 +340,50 @@ using namespace realm;
 
 @implementation RLMUserProfile
 
+using UserProfileMember = util::Optional<std::string> (SyncUserProfile::*)() const;
+
 - (instancetype)initWithUserProfile:(SyncUserProfile)userProfile {
     if (self = [super init]) {
-        _userProfile = userProfile;
+        _userProfile = std::move(userProfile);
     }
     return self;
 }
 
-- (NSString *)name {
-    _userProfile.data();
-    if (_userProfile.name() == util::none) {
+- (NSString *)userProfileMember:(UserProfileMember)member {
+    auto field = (_userProfile.*member)();
+    if (field == util::none) {
         return nil;
     }
-    return @(_userProfile.name()->c_str());
+    return @(field->c_str());
+}
+
+- (NSString *)name {
+    return [self userProfileMember:&SyncUserProfile::name];
 }
 
 - (NSString *)email {
-    if (_userProfile.email() == util::none) {
-        return nil;
-    }
-    return @(_userProfile.email()->c_str());
+    return [self userProfileMember:&SyncUserProfile::email];
 }
 - (NSString *)pictureURL {
-    if (_userProfile.picture_url() == util::none) {
-        return nil;
-    }
-    return @(_userProfile.picture_url()->c_str());
+    return [self userProfileMember:&SyncUserProfile::picture_url];
 }
 - (NSString *)firstName {
-    if (_userProfile.first_name() == util::none) {
-        return nil;
-    }
-    return @(_userProfile.first_name()->c_str());
+    return [self userProfileMember:&SyncUserProfile::first_name];
 }
 - (NSString *)lastName {
-    if (_userProfile.last_name() == util::none) {
-        return nil;
-    }
-    return @(_userProfile.last_name()->c_str());
+    return [self userProfileMember:&SyncUserProfile::last_name];
 }
 - (NSString *)gender {
-    if (_userProfile.gender() == util::none) {
-        return nil;
-    }
-    return @(_userProfile.gender()->c_str());
+    return [self userProfileMember:&SyncUserProfile::gender];
 }
 - (NSString *)birthday {
-    if (_userProfile.birthday() == util::none) {
-        return nil;
-    }
-    return @(_userProfile.birthday()->c_str());
+    return [self userProfileMember:&SyncUserProfile::birthday];
 }
 - (NSString *)minAge {
-    if (_userProfile.min_age() == util::none) {
-        return nil;
-    }
-    return @(_userProfile.min_age()->c_str());
+    return [self userProfileMember:&SyncUserProfile::min_age];
 }
 - (NSString *)maxAge {
-    if (_userProfile.max_age() == util::none) {
-        return nil;
-    }
-    return @(_userProfile.max_age()->c_str());
+    return [self userProfileMember:&SyncUserProfile::max_age];
 }
 
 @end
