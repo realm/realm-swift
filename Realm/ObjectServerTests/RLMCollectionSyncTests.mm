@@ -20,6 +20,16 @@
 
 #if TARGET_OS_OSX
 
+// Each of these test suites compares either Person or non-realm-object values
+#define RLMAssertEqual(lft, rgt) do { \
+    if (isObject) { \
+        XCTAssertEqualObjects(lft.firstName, \
+                              ((Person *)rgt).firstName); \
+    } else { \
+        XCTAssertEqualObjects(lft, rgt); \
+    } \
+} while (0)
+
 #pragma mark RLMSet Sync Tests
 
 @interface RLMSetObjectServerTests : RLMSyncTestCase
@@ -33,91 +43,62 @@
                         otherValues:(NSArray *)otherValues
                            isObject:(BOOL)isObject
                          callerName:(NSString *)callerName {
-    try {
-        RLMUser *user = [self logInUserForCredentials:[self basicCredentialsWithName:callerName
-                                                                            register:self.isParent]];
-        RLMRealm *realm = [self openRealmForPartitionValue:callerName user:user];
-        if (self.isParent) {
-            // Add a RLMSetSyncObject to the Realm
-            CHECK_COUNT(0, RLMSetSyncObject, realm);
-            RLMRunChildAndWait();
-            [self waitForDownloadsForRealm:realm];
-            CHECK_COUNT(1, RLMSetSyncObject, realm);
-            // Run the child again to add the values
-            RLMRunChildAndWait();
-            [self waitForDownloadsForRealm:realm];
-            CHECK_COUNT(1, RLMSetSyncObject, realm);
-            RLMResults<RLMSetSyncObject *> *results
-                = [RLMSetSyncObject allObjectsInRealm:realm];
-            RLMSetSyncObject *obj = results.firstObject;
+    RLMUser *readUser = [self logInUserForCredentials:[self basicCredentialsWithName:callerName
+                                                                            register:YES]];
+    RLMUser *writeUser = [self logInUserForCredentials:[self basicCredentialsWithName:[callerName stringByAppendingString:@"Writer"]
+                                                                            register:YES]];
 
-            XCTAssertEqual(propertyGetter(obj).count, values.count);
-            XCTAssertEqual(otherPropertyGetter(obj).count, otherValues.count);
-            // Run the child again to intersect the values
-            RLMRunChildAndWait();
-            [self waitForDownloadsForRealm:realm];
-            CHECK_COUNT(1, RLMSetSyncObject, realm);
+    RLMRealm *readRealm = [self openRealmForPartitionValue:callerName user:readUser];
+    RLMRealm *writeRealm = [self openRealmForPartitionValue:callerName user:writeUser];
+    auto write = [&](auto fn) {
+        [writeRealm transactionWithBlock:^{
+            fn();
+        }];
+        [self waitForUploadsForRealm:writeRealm];
+        [self waitForDownloadsForRealm:readRealm];
+    };
 
-            if (!isObject) {
-                XCTAssertTrue([propertyGetter(obj) intersectsSet:propertyGetter(obj)]);
-                XCTAssertEqual(propertyGetter(obj).count, 1U);
-            }
-            // Run the child again to delete the objects in the sets.
-            RLMRunChildAndWait();
-            [self waitForDownloadsForRealm:realm];
-            XCTAssertEqual(propertyGetter(obj).count, 0U);
-            XCTAssertEqual(otherPropertyGetter(obj).count, 0U);
-            XCTestExpectation *expectation = [self expectationWithDescription:@"should remove user"];
-            [user removeWithCompletion:^(NSError *e){
-                XCTAssertNil(e);
-                [expectation fulfill];
-            }];
-            [self waitForExpectationsWithTimeout:30.0 handler:nil];
+    CHECK_COUNT(0, RLMSetSyncObject, readRealm);
+
+    __block RLMSetSyncObject *writeObj;
+    write(^{
+        writeObj = [RLMSetSyncObject createInRealm:writeRealm
+                                         withValue:@{@"_id": [RLMObjectId objectId]}];
+    });
+    CHECK_COUNT(1, RLMSetSyncObject, readRealm);
+
+    write(^{
+        [propertyGetter(writeObj) addObjects:values];
+        [otherPropertyGetter(writeObj) addObjects:otherValues];
+    });
+    CHECK_COUNT(1, RLMSetSyncObject, readRealm);
+    RLMResults<RLMSetSyncObject *> *results = [RLMSetSyncObject allObjectsInRealm:readRealm];
+    RLMSetSyncObject *obj = results.firstObject;
+    RLMSet<Person *> *set = propertyGetter(obj);
+    RLMSet<Person *> *otherSet = otherPropertyGetter(obj);
+    XCTAssertEqual(set.count, values.count);
+    XCTAssertEqual(otherSet.count, otherValues.count);
+
+    write(^{
+        if (isObject) {
+            [propertyGetter(writeObj) removeAllObjects];
+            [propertyGetter(writeObj) addObject:values[0]];
         } else {
-            RLMResults<RLMSetSyncObject *> *results
-                = [RLMSetSyncObject allObjectsInRealm:realm];
-            if (RLMSetSyncObject *obj = results.firstObject) {
-                CHECK_COUNT(1, RLMSetSyncObject, realm);
-                if (propertyGetter(obj).count == 0 && otherPropertyGetter(obj).count == 0) {
-                    [realm transactionWithBlock:^{
-                        [propertyGetter(obj) addObjects:values];
-                        [otherPropertyGetter(obj) addObjects:otherValues];
-                    }];
-                } else if (propertyGetter(obj).count == 3
-                           && otherPropertyGetter(obj).count == 3) {
-                    if (isObject) {
-                        [realm transactionWithBlock:^{
-                            [propertyGetter(obj) removeAllObjects];
-                            [propertyGetter(obj) addObject:values[0]];
-                        }];
-                    } else {
-                        [realm transactionWithBlock:^{
-                            [propertyGetter(obj) intersectSet:otherPropertyGetter(obj)];
-                        }];
-                    }
-                    XCTAssertEqual(propertyGetter(obj).count, 1U);
-                    XCTAssertEqual(otherPropertyGetter(obj).count, otherValues.count);
-                } else {
-                    [realm transactionWithBlock:^{
-                        [propertyGetter(obj) removeAllObjects];
-                        [otherPropertyGetter(obj) removeAllObjects];
-                    }];
-                    XCTAssertEqual(propertyGetter(obj).count, 0U);
-                    XCTAssertEqual(otherPropertyGetter(obj).count, 0U);
-                }
-            } else {
-                [realm transactionWithBlock:^{
-                    [RLMSetSyncObject createInRealm:realm
-                                          withValue:@{@"_id": [RLMObjectId objectId]}];
-                }];
-            }
-            [self waitForUploadsForRealm:realm];
-            CHECK_COUNT(1, RLMSetSyncObject, realm);
+            [propertyGetter(writeObj) intersectSet:otherPropertyGetter(writeObj)];
         }
-    } catch(NSException *e) {
-        XCTFail(@"Got an error: %@ (isParent: %d)",
-                e, self.isParent);
+    });
+    CHECK_COUNT(1, RLMSetSyncObject, readRealm);
+    if (!isObject) {
+        XCTAssertTrue([propertyGetter(obj) intersectsSet:propertyGetter(obj)]);
+        XCTAssertEqual(propertyGetter(obj).count, 1U);
     }
+
+    write(^{
+        [propertyGetter(writeObj) removeAllObjects];
+        [otherPropertyGetter(writeObj) removeAllObjects];
+    });
+    XCTAssertEqual(propertyGetter(obj).count, 0U);
+    XCTAssertEqual(otherPropertyGetter(obj).count, 0U);
 }
 
 - (void)testIntSet {
@@ -235,80 +216,54 @@
                              values:(NSArray *)values
                            isObject:(BOOL)isObject
                          callerName:(NSString *)callerName {
-    try {
-        RLMUser *user = [self logInUserForCredentials:[self basicCredentialsWithName:callerName
-                                                                            register:self.isParent]];
-        RLMRealm *realm = [self openRealmForPartitionValue:callerName user:user];
-        if (self.isParent) {
-            CHECK_COUNT(0, RLMArraySyncObject, realm);
-            RLMRunChildAndWait();
-            [self waitForDownloadsForRealm:realm];
-            CHECK_COUNT(1, RLMArraySyncObject, realm);
-            // Run the child again to add the values
-            RLMRunChildAndWait();
-            [self waitForDownloadsForRealm:realm];
-            CHECK_COUNT(1, RLMArraySyncObject, realm);
-            RLMResults<RLMArraySyncObject *> *results
-                = [RLMArraySyncObject allObjectsInRealm:realm];
-            RLMArraySyncObject *obj = results.firstObject;
-            XCTAssertEqual(propertyGetter(obj).count, values.count*2);
-            for (NSUInteger i = 0; i < values.count; i++) {
-                if (isObject) {
-                    XCTAssertTrue([((Person *)propertyGetter(results[0])[i]).firstName
-                                   isEqual:((Person *)values[i]).firstName]);
-                } else {
-                    XCTAssertTrue([propertyGetter(results[0])[i] isEqual:values[i]]);
-                }
-            }
-            // Run the child again to delete the last 3 objects
-            RLMRunChildAndWait();
-            [self waitForDownloadsForRealm:realm];
-            XCTAssertEqual(propertyGetter(obj).count, values.count);
-            // Run the child again to modify the first element
-            RLMRunChildAndWait();
-            [self waitForDownloadsForRealm:realm];
-            if (isObject) {
-                XCTAssertTrue([((Person *)propertyGetter(obj)[0]).firstName
-                               isEqual:((Person *)values[1]).firstName]);
-            } else {
-                XCTAssertTrue([propertyGetter(obj)[0] isEqual:values[1]]);
-            }
-        } else {
-            RLMResults<RLMArraySyncObject *> *results
-                = [RLMArraySyncObject allObjectsInRealm:realm];
-            if (RLMArraySyncObject *obj = results.firstObject) {
-                if (propertyGetter(obj).count == 0) {
-                    [realm transactionWithBlock:^{
-                        [propertyGetter(obj) addObjects:values];
-                        [propertyGetter(obj) addObjects:values];
-                    }];
-                } else if (propertyGetter(obj).count == 6) {
-                    [realm transactionWithBlock:^{
-                        [propertyGetter(obj) removeLastObject];
-                        [propertyGetter(obj) removeLastObject];
-                        [propertyGetter(obj) removeLastObject];
-                    }];
-                    XCTAssertEqual(propertyGetter(obj).count, values.count);
-                } else {
-                    [realm transactionWithBlock:^{
-                        [propertyGetter(obj) replaceObjectAtIndex:0
-                                                       withObject:values[1]];
-                    }];
-                    XCTAssertTrue([propertyGetter(obj).firstObject isEqual:values[1]]);
-                }
-            } else {
-                [realm transactionWithBlock:^{
-                    [RLMArraySyncObject createInRealm:realm
-                                            withValue:@{@"_id": [RLMObjectId objectId]}];
-                }];
-            }
-            [self waitForUploadsForRealm:realm];
-            CHECK_COUNT(1, RLMArraySyncObject, realm);
-        }
-    } catch(NSException *e) {
-        XCTFail(@"Got an error: %@ (isParent: %d)",
-                e, self.isParent);
+    RLMUser *readUser = [self logInUserForCredentials:[self basicCredentialsWithName:callerName
+                                                                            register:YES]];
+    RLMUser *writeUser = [self logInUserForCredentials:[self basicCredentialsWithName:[callerName stringByAppendingString:@"Writer"]
+                                                                            register:YES]];
+
+    RLMRealm *readRealm = [self openRealmForPartitionValue:callerName user:readUser];
+    RLMRealm *writeRealm = [self openRealmForPartitionValue:callerName user:writeUser];
+    auto write = [&](auto fn) {
+        [writeRealm transactionWithBlock:^{
+            fn();
+        }];
+        [self waitForUploadsForRealm:writeRealm];
+        [self waitForDownloadsForRealm:readRealm];
+    };
+
+    CHECK_COUNT(0, RLMArraySyncObject, readRealm);
+    __block RLMArraySyncObject *writeObj;
+    write(^{
+        writeObj = [RLMArraySyncObject createInRealm:writeRealm
+                                           withValue:@{@"_id": [RLMObjectId objectId]}];
+    });
+    CHECK_COUNT(1, RLMArraySyncObject, readRealm);
+
+    write(^{
+        [propertyGetter(writeObj) addObjects:values];
+        [propertyGetter(writeObj) addObjects:values];
+    });
+    CHECK_COUNT(1, RLMArraySyncObject, readRealm);
+    RLMResults<RLMArraySyncObject *> *results = [RLMArraySyncObject allObjectsInRealm:readRealm];
+    RLMArraySyncObject *obj = results.firstObject;
+    RLMArray<Person *> *array = propertyGetter(obj);
+    XCTAssertEqual(array.count, values.count*2);
+    for (NSUInteger i = 0; i < values.count; i++) {
+        RLMAssertEqual(array[i], values[i]);
     }
+
+    write(^{
+        [propertyGetter(writeObj) removeLastObject];
+        [propertyGetter(writeObj) removeLastObject];
+        [propertyGetter(writeObj) removeLastObject];
+    });
+    XCTAssertEqual(propertyGetter(obj).count, values.count);
+
+    write(^{
+        [propertyGetter(writeObj) replaceObjectAtIndex:0
+                                            withObject:values[1]];
+    });
+    RLMAssertEqual(array[0], values[1]);
 }
 
 - (void)testIntArray {
@@ -405,100 +360,64 @@
                              values:(NSDictionary *)values
                            isObject:(BOOL)isObject
                          callerName:(NSString *)callerName {
-    try {
-        RLMUser *user = [self logInUserForCredentials:[self basicCredentialsWithName:callerName
-                                                                            register:self.isParent]];
-        RLMRealm *realm = [self openRealmForPartitionValue:callerName user:user];
-        if (self.isParent) {
-            // Add a RLMDictionarySyncObject to the Realm
-            CHECK_COUNT(0, RLMDictionarySyncObject, realm);
-            RLMRunChildAndWait();
-            [self waitForDownloadsForRealm:realm];
-            CHECK_COUNT(1, RLMDictionarySyncObject, realm);
-            
-            // Run the child again to add the values
-            RLMRunChildAndWait();
-            [self waitForDownloadsForRealm:realm];
-            CHECK_COUNT(1, RLMDictionarySyncObject, realm);
-            RLMResults<RLMDictionarySyncObject *> *results = [RLMDictionarySyncObject allObjectsInRealm:realm];
-            RLMDictionarySyncObject *obj = results.firstObject;
-            XCTAssertEqual(propertyGetter(obj).count, values.count);
-            for (NSString *key in values) {
-                if (isObject) {
-                    XCTAssertTrue([((Person *)propertyGetter(obj)[key]).firstName
-                                   isEqual:((Person *)values[key]).firstName]);
-                } else {
-                    XCTAssertTrue([propertyGetter(obj)[key] isEqual:values[key]]);
-                }
-            }
+    RLMUser *readUser = [self logInUserForCredentials:[self basicCredentialsWithName:callerName
+                                                                            register:YES]];
+    RLMUser *writeUser = [self logInUserForCredentials:[self basicCredentialsWithName:[callerName stringByAppendingString:@"Writer"]
+                                                                            register:YES]];
 
-            // Run the child again to delete 3 objects
-            RLMRunChildAndWait();
-            [self waitForDownloadsForRealm:realm];
-            CHECK_COUNT(1, RLMDictionarySyncObject, realm);
-            XCTAssertEqual((int)propertyGetter(obj).count, 2);
-            
-            // Run the child again to modify the first element
-            RLMRunChildAndWait();
-            [self waitForDownloadsForRealm:realm];
-            CHECK_COUNT(1, RLMDictionarySyncObject, realm);
-            XCTAssertEqual((int)propertyGetter(obj).count, 2);
-            id keyA = [propertyGetter(obj) allKeys][0];
-            id keyB = [propertyGetter(obj) allKeys][1];
-            if (isObject) {
-                XCTAssertTrue([((Person *)propertyGetter(obj)[keyA]).firstName
-                               isEqual:((Person *)propertyGetter(obj)[keyB]).firstName]);
-            } else {
-                XCTAssertTrue([propertyGetter(obj)[keyA] isEqual:propertyGetter(obj)[keyB]]);
-            }
-            XCTestExpectation *expectation = [self expectationWithDescription:@"should remove user"];
-            [user removeWithCompletion:^(NSError *e){
-                XCTAssertNil(e);
-                [expectation fulfill];
-            }];
-            [self waitForExpectationsWithTimeout:30.0 handler:nil];
-        } else {
-            RLMResults<RLMDictionarySyncObject *> *results = [RLMDictionarySyncObject allObjectsInRealm:realm];
-            if (RLMDictionarySyncObject *obj = results.firstObject) {
-                CHECK_COUNT(1, RLMDictionarySyncObject, realm);
-                if (propertyGetter(obj).count == 0) {
-                    [realm transactionWithBlock:^{
-                        for (NSString *key in values) {
-                            propertyGetter(obj)[key] = values[key];
-                        }
-                    }];
-                    XCTAssertEqual(propertyGetter(obj).count, values.count);
-                } else if (propertyGetter(obj).count == 5) {
-                    [realm transactionWithBlock:^{
-                        int i = 0;
-                        for (NSString *key in propertyGetter(obj)) {
-                            propertyGetter(obj)[key] = nil;
-                            if (++i >= 3) {
-                                break;
-                            }
-                        }
-                    }];
-                    XCTAssertEqual(propertyGetter(obj).count, 2U);
-                } else {
-                    [realm transactionWithBlock:^{
-                        id keyA = [propertyGetter(obj) allKeys][0];
-                        id keyB = [propertyGetter(obj) allKeys][1];
-                        propertyGetter(obj)[keyA] = propertyGetter(obj)[keyB];
-                    }];
-                    XCTAssertEqual(propertyGetter(obj).count, 2U);
-                }
-            } else {
-                [realm transactionWithBlock:^{
-                    [RLMDictionarySyncObject createInRealm:realm
-                                                 withValue:@{@"_id": [RLMObjectId objectId]}];
-                }];
-            }
-            [self waitForUploadsForRealm:realm];
-            CHECK_COUNT(1, RLMDictionarySyncObject, realm);
-        }
-    } catch(NSException *e) {
-        XCTFail(@"Got an error: %@ (isParent: %d)", e, self.isParent);
+    RLMRealm *readRealm = [self openRealmForPartitionValue:callerName user:readUser];
+    RLMRealm *writeRealm = [self openRealmForPartitionValue:callerName user:writeUser];
+    auto write = [&](auto fn) {
+        [writeRealm transactionWithBlock:^{
+            fn();
+        }];
+        [self waitForUploadsForRealm:writeRealm];
+        [self waitForDownloadsForRealm:readRealm];
+    };
+
+    CHECK_COUNT(0, RLMDictionarySyncObject, readRealm);
+
+    __block RLMDictionarySyncObject *writeObj;
+    write(^{
+        writeObj = [RLMDictionarySyncObject createInRealm:writeRealm
+                                                withValue:@{@"_id": [RLMObjectId objectId]}];
+    });
+    CHECK_COUNT(1, RLMDictionarySyncObject, readRealm);
+
+    write(^{
+        [propertyGetter(writeObj) addEntriesFromDictionary:values];
+    });
+    CHECK_COUNT(1, RLMDictionarySyncObject, readRealm);
+    RLMResults<RLMDictionarySyncObject *> *results = [RLMDictionarySyncObject allObjectsInRealm:readRealm];
+    RLMDictionarySyncObject *obj = results.firstObject;
+    RLMDictionary<NSString *, Person *> *dict = propertyGetter(obj);
+    XCTAssertEqual(dict.count, values.count);
+    for (NSString *key in values) {
+        RLMAssertEqual(dict[key], values[key]);
     }
+
+    write(^{
+        int i = 0;
+        RLMDictionary *dict = propertyGetter(writeObj);
+        for (NSString *key in dict) {
+            dict[key] = nil;
+            if (++i >= 3) {
+                break;
+            }
+        }
+    });
+    CHECK_COUNT(1, RLMDictionarySyncObject, readRealm);
+    XCTAssertEqual(dict.count, 2U);
+
+    write(^{
+        RLMDictionary *dict = propertyGetter(writeObj);
+        NSArray *keys = dict.allKeys;
+        dict[keys[0]] = dict[keys[1]];
+    });
+    CHECK_COUNT(1, RLMDictionarySyncObject, readRealm);
+    XCTAssertEqual(dict.count, 2U);
+    NSArray *keys = dict.allKeys;
+    RLMAssertEqual(dict[keys[0]], dict[keys[1]]);
 }
 
 - (void)testIntDictionary {

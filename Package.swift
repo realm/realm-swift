@@ -3,8 +3,8 @@
 import PackageDescription
 import Foundation
 
-let coreVersionStr = "11.0.4"
-let cocoaVersionStr = "10.10.0"
+let coreVersionStr = "11.4.1"
+let cocoaVersionStr = "10.16.0"
 
 let coreVersionPieces = coreVersionStr.split(separator: ".")
 let coreVersionExtra = coreVersionPieces[2].split(separator: "-")
@@ -260,6 +260,8 @@ let package = Package(
                 "fileformat-pre-null.realm",
                 "mixed_tests.py",
                 "set_tests.py",
+                "SwiftUISyncTestHost",
+                "SwiftUISyncTestHostUITests"
             ],
             cxxSettings: testCxxSettings
         ),
@@ -294,7 +296,8 @@ let package = Package(
                  "SwiftSyncTestCase.swift",
                  "TimeoutProxyServer.swift",
                  "WatchTestUtility.swift",
-                 "RealmServer.swift"
+                 "RealmServer.swift",
+                 "SwiftServerObjects.swift"
             ]
         ),
         objectServerTestTarget(
@@ -303,6 +306,8 @@ let package = Package(
                 "SwiftObjectServerTests.swift",
                 "SwiftCollectionSyncTests.swift",
                 "SwiftObjectServerPartitionTests.swift",
+                "SwiftUIServerTests.swift",
+                "SwiftMongoClientTests.swift"
             ]
         ),
         objectServerTestTarget(
@@ -312,7 +317,7 @@ let package = Package(
                 "RLMCollectionSyncTests.mm",
                 "RLMObjectServerPartitionTests.mm",
                 "RLMObjectServerTests.mm",
-                "RLMWatchTestUtility.m",
+                "RLMWatchTestUtility.m"
             ]
         )
     ],

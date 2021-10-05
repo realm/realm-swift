@@ -368,29 +368,16 @@ static NSMutableArray *resultsToArray(RLMClassInfo& info, realm::Results r) {
     RLMAccessorContext context(*_objectInfo);
     changeDictionary(self, [&] {
         for (id key in keyArray) {
-            try {
-                _backingCollection.erase(context.unbox<realm::StringData>(key));
-            }
-            catch (realm::KeyNotFound const&) {
-                continue;
-            }
+            _backingCollection.try_erase(context.unbox<realm::StringData>(key));
         }
     });
 }
 
 - (void)removeObjectForKey:(id)key {
-    try {
-        changeDictionary(self, ^{
-            RLMAccessorContext context(*_objectInfo);
-            _backingCollection.erase(context.unbox<realm::StringData>(key));
-        });
-    }
-    catch (realm::KeyNotFound const&) {
-        return;
-    }
-    catch (...) {
-        throwError(nil, nil);
-    }
+    changeDictionary(self, ^{
+        RLMAccessorContext context(*_objectInfo);
+        _backingCollection.try_erase(context.unbox<realm::StringData>(key));
+    });
 }
 
 - (void)enumerateKeysAndObjectsUsingBlock:(void (^)(id key, id obj, BOOL *stop))block {
@@ -562,32 +549,27 @@ static NSMutableArray *resultsToArray(RLMClassInfo& info, realm::Results r) {
     return _realm.isFrozen;
 }
 
+- (instancetype)resolveInRealm:(RLMRealm *)realm {
+    auto& parentInfo = _ownerInfo->resolve(realm);
+    return translateRLMResultsErrors([&] {
+        return [[self.class alloc] initWithBackingCollection:_backingCollection.freeze(realm->_realm)
+                                                  parentInfo:&parentInfo
+                                                    property:parentInfo.rlmObjectSchema[_key]];
+    });
+}
+
 - (instancetype)freeze {
     if (self.frozen) {
         return self;
     }
-
-    RLMRealm *frozenRealm = [_realm freeze];
-    auto& parentInfo = _ownerInfo->resolve(frozenRealm);
-    return translateRLMResultsErrors([&] {
-        return [[self.class alloc] initWithBackingCollection:_backingCollection.freeze(frozenRealm->_realm)
-                                                  parentInfo:&parentInfo
-                                                    property:parentInfo.rlmObjectSchema[_key]];
-    });
+    return [self resolveInRealm:_realm.freeze];
 }
 
 - (instancetype)thaw {
     if (!self.frozen) {
         return self;
     }
-
-    RLMRealm *liveRealm = [_realm thaw];
-    auto& parentInfo = _ownerInfo->resolve(liveRealm);
-    return translateRLMResultsErrors([&] {
-        return [[self.class alloc] initWithBackingCollection:_backingCollection.freeze(liveRealm->_realm)
-                                                  parentInfo:&parentInfo
-                                                    property:parentInfo.rlmObjectSchema[_key]];
-    });
+    return [self resolveInRealm:_realm.thaw];
 }
 
 // The compiler complains about the method's argument type not matching due to
@@ -597,10 +579,21 @@ static NSMutableArray *resultsToArray(RLMClassInfo& info, realm::Results r) {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmismatched-parameter-types"
 - (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMDictionary *, RLMDictionaryChange *, NSError *))block {
-    return RLMAddNotificationBlock(self, block, nil);
+    return RLMAddNotificationBlock(self, block, nil, nil);
 }
 - (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMDictionary *, RLMDictionaryChange *, NSError *))block queue:(dispatch_queue_t)queue {
-    return RLMAddNotificationBlock(self, block, queue);
+    return RLMAddNotificationBlock(self, block, nil, queue);
+}
+
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMDictionary *, RLMDictionaryChange *, NSError *))block
+                                      keyPaths:(nullable NSArray<NSString *> *)keyPaths
+                                         queue:(dispatch_queue_t)queue {
+    return RLMAddNotificationBlock(self, block, keyPaths, queue);
+}
+
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMDictionary *, RLMDictionaryChange *, NSError *))block
+                                      keyPaths:(nullable NSArray<NSString *> *)keyPaths {
+    return RLMAddNotificationBlock(self, block, keyPaths, nil);
 }
 #pragma clang diagnostic pop
 
@@ -636,14 +629,18 @@ realm::object_store::Dictionary& RLMGetBackingCollection(RLMManagedDictionary *s
 
 static RLMNotificationToken *RLMAddNotificationBlock(RLMManagedDictionary *collection,
                                                      void (^block)(id, RLMDictionaryChange *, NSError *),
+                                                     NSArray<NSString *> *keyPaths,
                                                      dispatch_queue_t queue) {
     RLMRealm *realm = collection.realm;
     auto token = [[RLMCancellationToken alloc] init];
 
+    RLMClassInfo *info = collection.objectInfo;
+    realm::KeyPathArray keyPathArray = RLMKeyPathArrayFromStringArray(realm, info, keyPaths);
+
     if (!queue) {
         [realm verifyNotificationsAreSupported:true];
         token->_realm = realm;
-        token->_token = RLMGetBackingCollection(collection).add_key_based_notification_callback(DictionaryCallbackWrapper{block, collection});
+        token->_token = RLMGetBackingCollection(collection).add_key_based_notification_callback(DictionaryCallbackWrapper{block, collection}, std::move(keyPathArray));
         return token;
     }
 
@@ -662,7 +659,7 @@ static RLMNotificationToken *RLMAddNotificationBlock(RLMManagedDictionary *colle
             return;
         }
         RLMManagedDictionary *collection = [realm resolveThreadSafeReference:tsr];
-        token->_token = RLMGetBackingCollection(collection).add_key_based_notification_callback(DictionaryCallbackWrapper{block, collection});
+        token->_token = RLMGetBackingCollection(collection).add_key_based_notification_callback(DictionaryCallbackWrapper{block, collection}, std::move(keyPathArray));
     });
     return token;
 }

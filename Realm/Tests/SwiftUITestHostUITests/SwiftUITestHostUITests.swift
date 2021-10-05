@@ -32,15 +32,12 @@ class SwiftUITests: XCTestCase {
         // write permissions
         let realmPath = URL(string: "\(FileManager.default.temporaryDirectory)\(UUID())")!
         let configuration = Realm.Configuration(fileURL: realmPath)
+        _ = try Realm.deleteFiles(for: configuration)
         self.realm = try! Realm(configuration: configuration)
 
         app.launchEnvironment = [
             "REALM_PATH": realmPath.absoluteString
         ]
-
-        try realm.write {
-            realm.deleteAll()
-        }
     }
 
     override func tearDownWithError() throws {
@@ -48,7 +45,7 @@ class SwiftUITests: XCTestCase {
         self.realm.invalidate()
         let config = realm.configuration
         self.realm = nil
-        XCTAssert(try Realm.deleteFiles(for: config))
+        XCTAssertTrue(try Realm.deleteFiles(for: config))
     }
 
     private func deleteString(for string: String) -> String {
@@ -81,26 +78,27 @@ class SwiftUITests: XCTestCase {
 
         // add another list, and tap into the ReminderView
         addButton.tap()
-        app.tables.firstMatch.cells.buttons.firstMatch.tap()
+        app.buttons["New List"].tap()
+        XCTAssertTrue(app.navigationBars.staticTexts["New List"].waitForExistence(timeout: 1.0))
         app.buttons["addReminder"].tap()
         // type in a name
-        app.tables.cells.firstMatch.buttons.firstMatch.tap()
+        app.textFields["title"].tap()
         app.textFields["title"].tap()
         app.textFields["title"].typeText("My Reminder")
         // check to see if it is reflected live in the title view
-        XCTAssert(app.navigationBars.staticTexts["My Reminder"].waitForExistence(timeout: 1.0))
+        XCTAssertTrue(app.navigationBars.staticTexts["My Reminder"].waitForExistence(timeout: 1.0))
         let myReminder = realm.objects(ReminderList.self).first!.reminders.first!
         XCTAssertEqual(myReminder.priority, .low)
         app.buttons["picker"].tap()
-        app.buttons["medium"].tap()
+        app.tables.switches["medium"].tap()
         XCTAssertEqual(myReminder.priority, .medium)
-
         app.navigationBars.buttons.element(boundBy: 0).tap()
 
         // MARK: Test Move
         app.buttons["addReminder"].tap()
         XCTAssertEqual(realm.objects(ReminderList.self).first!.reminders.first!.title, "My Reminder")
         XCTAssertEqual(realm.objects(ReminderList.self).first!.reminders[1].title, "")
+        app.navigationBars.buttons.element(boundBy: 0).tap()
 
         app.buttons["Edit"].tap()
         app.buttons.matching(identifier: "Reorder").firstMatch.press(forDuration: 0.5, thenDragTo: app.tables.cells.element(boundBy: 1))
@@ -158,5 +156,53 @@ class SwiftUITests: XCTestCase {
         app.buttons["Delete"].tap()
 
         XCTAssertEqual(app.textFields["name"].value as? String, "test name")
+    }
+
+    func testKeyPathResults() {
+        app.launchEnvironment["test_type"] = "observed_results_key_path"
+        app.launch()
+
+        let addButton = app.buttons["addList"]
+        addButton.tap()
+        addButton.tap()
+
+        // Populate reminders to reminder list.
+        try! realm.write {
+            for obj in realm.objects(ReminderList.self) {
+                obj.reminders.append(Reminder())
+            }
+        }
+        // Change the name of two ReminderList objects.
+        // This is a separate write block because it's testing a change outside
+        // the keypath input.
+        try! realm.write {
+            for obj in realm.objects(ReminderList.self) {
+                obj.name = "changed"
+            }
+        }
+
+        // Expect the ui to still show two cells labelled New List.
+        // The view should've not updated because the name change was
+        // outside keypath input.
+        let cell0 = app.tables.firstMatch.cells.element(boundBy: 0)
+        let cell1 = app.tables.firstMatch.cells.element(boundBy: 1)
+        XCTAssert(cell0.staticTexts["New List"].exists)
+        XCTAssert(cell1.staticTexts["New List"].exists)
+        XCTAssertEqual(realm.objects(ReminderList.self).count, 2)
+        XCTAssertEqual(app.tables.firstMatch.cells.count, 2)
+
+        // Change isFlagged status of a linked reminder.
+        try! realm.write {
+            let first = realm.objects(ReminderList.self).first!
+            first.reminders[0].isFlagged = true
+        }
+
+        // Expect ui to refresh because the "reminders.isFlagged" keypath
+        // has been changed.
+        // Expect 2 cells now displaying "changed".
+        XCTAssert(cell0.staticTexts["changed"].exists)
+        XCTAssert(cell1.staticTexts["changed"].exists)
+        XCTAssertEqual(realm.objects(ReminderList.self).count, 2)
+        XCTAssertEqual(app.tables.firstMatch.cells.count, 2)
     }
 }

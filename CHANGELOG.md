@@ -2,24 +2,319 @@ x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
 * Add UserProfile to User. This contains metadata from social logins with MongoDB Realm.
+* Add a new `@ThreadSafe` property wrapper. Objects and collections wrapped by `@ThreadSafe` may be passed between threads. It's
+  intended to allow local variables and function parameters to be used across
+  threads when needed.
 
 ### Fixed
-* `RealmProperty<T?>` would crash when decoding a `null` json value.
-  ([Cocoa #7323](https://github.com/realm/realm-cocoa/issues/7323), since v10.8.0)
-* `@Persisted<T?>` would crash when decoding a `null` value.
-  ([#7332](https://github.com/realm/realm-cocoa/issues/7332), since v10.10.0).
+* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
+* None.
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
 ### Compatibility
 * Realm Studio: 11.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
-* Carthage release for Swift is built with Xcode 12.5.1.
+* Carthage release for Swift is built with Xcode 13.0.
 * CocoaPods: 1.10 or later.
-* Xcode: 12.2-13.0 beta 2.
+* Xcode: 12.2-13.0.
 
 ### Internal
 * Upgraded realm-core from ? to ?
+
+10.16.0 Release notes (2021-09-29)
+=============================================================
+
+### Enhancements
+
+* Add `async` versions of `EmailPasswordAuth.callResetPasswordFunction` and
+r `User.linkUser` methods.
+* Add `async` version of `MongoCollection` methods.
+* Add `async` support for user functions.
+
+### Fixed
+
+* A race condition in Realm.asyncOpen() sometimes resulted in subsequent writes
+  from Realm Sync failing to produce notifications
+  ([#7447](https://github.com/realm/realm-cocoa/issues/7447),
+  [#7453](https://github.com/realm/realm-cocoa/issues/7453),
+  [Core #4909](https://github.com/realm/realm-core/issues/4909), since v10.15.0).
+
+### Compatibility
+
+* Realm Studio: 11.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 13.0.
+* CocoaPods: 1.10 or later.
+* Xcode: 12.2-13.0.
+
+10.15.1 Release notes (2021-09-15)
+=============================================================
+
+### Enhancements
+
+* Switch to building the Carthage release with Xcode 13.
+
+### Fixed
+
+* Fix compilation error where Swift 5.5 is available but the macOS 12 SDK was
+  not. This was notable for the Xcode 13 RC. This fix adds a #canImport check
+  for the `_Concurrency` module that was not available before the macOS 12 SDK.
+
+### Compatibility
+
+* Realm Studio: 11.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 13.0.
+* CocoaPods: 1.10 or later.
+* Xcode: 12.2-13.0.
+
+10.15.0 Release notes (2021-09-10)
+=============================================================
+
+### Enhancements
+
+* Add `async` versions of the  `Realm.asyncOpen` and `App.login` methods.
+* ThreadSafeReference no longer pins the source transaction version for
+  anything other than a Results created by filtering a collection. This means
+  that holding on to thread-safe references to other things (such as Objects)
+  will no longer cause file size growth.
+* A ThreadSafeReference to a Results backed by a collection can now be created
+  inside a write transaction as long as the collection was not created in the
+  current write transaction.
+* Synchronized Realms are no longer opened twice, cutting the address space and
+  file descriptors used in half.
+  ([Core #4839](https://github.com/realm/realm-core/pull/4839))
+* When using the SwiftUI helper types (@ObservedRealmObject and friends) to
+  bind to an Equatable property, self-assignment no longer performs a pointless
+  write transaction. SwiftUI appears to sometimes call a Binding's set function
+  multiple times for a single UI action, so this results in significantly fewer
+  writes being performed.
+
+### Fixed
+
+* Adding an unmanaged object to a Realm that was declared with
+  `@StateRealmObject` would throw the exception `"Cannot add an object with
+  observers to a Realm"`.
+* The `RealmCollectionChange` docs refered to indicies in modifications as the
+  'new' collection. This is incorrect and the docs now state that modifications
+  refer to the previous version of the collection. ([Cocoa #7390](https://github.com/realm/realm-cocoa/issues/7390))
+* Fix crash in `RLMSyncConfiguration.initWithUser` error mapping when a user is disabled/deleted from MongoDB Realm dashboard.
+  ([Cocoa #7399](https://github.com/realm/realm-cocoa/issues/7399), since v10.0.0)
+* If the application crashed at the wrong point when logging a user in, the
+  next run of the application could hit the assertion failure "m_state ==
+  SyncUser::State::LoggedIn" when a synchronized Realm is opened with that
+  user. ([Core #4875](https://github.com/realm/realm-core/issues/4875), since v10.0.0)
+* The `keyPaths:` parameter to `@ObservedResults` did not work (since v10.12.0).
+
+### Compatibility
+
+* Realm Studio: 11.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 12.5.1.
+* CocoaPods: 1.10 or later.
+* Xcode: 12.2-13.0 beta 5.
+
+### Internal
+
+* Upgraded realm-core from 11.3.1 to 11.4.1
+
+10.14.0 Release notes (2021-09-03)
+=============================================================
+
+### Enhancements
+
+* Add additional `observe` methods for Objects and RealmCollections which take
+  a `PartialKeyPath` type key path parameter.
+* The release package once again contains Xcode 13 binaries.
+* `PersistableEnum` properties can now be indexed or used as the primary key if
+  the RawValue is an indexable or primary key type.
+
+### Fixed
+
+* `Map<Key, Value>` did not conform to `Codable`.
+  ([Cocoa #7418](https://github.com/realm/realm-cocoa/pull/7418), since v10.8.0)
+* Fixed "Invalid data type" assertion failure in the sync client when the
+  client recieved an AddColumn instruction from the server for an AnyRealmValue
+  property when that property already exists locally. ([Core #4873](https://github.com/realm/realm-core/issues/4873), since v10.8.0)
+
+### Compatibility
+
+* Realm Studio: 11.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 12.5.1.
+* CocoaPods: 1.10 or later.
+* Xcode: 12.2-13.0 beta 5.
+
+### Internal
+
+* Upgraded realm-core from 11.3.0 to 11.3.1.
+
+10.13.0 Release notes (2021-08-26)
+=============================================================
+
+### Enhancements
+
+* Sync logs now contain information about what object/changeset was being applied when the exception was thrown. 
+  ([Core #4836](https://github.com/realm/realm-core/issues/4836))
+* Added ServiceErrorCode for wrong username/password when using '`App.login`. 
+  ([Core #7380](https://github.com/realm/realm-cocoa/issues/7380)
+
+### Fixed
+
+* Fix crash in `MongoCollection.findOneDocument(filter:)` that occurred when no results were
+  found for a given filter. 
+  ([Cocoa #7380](https://github.com/realm/realm-cocoa/issues/7380), since v10.0.0)
+* Some of the SwiftUI property wrappers incorrectly required objects to conform
+  to ObjectKeyIdentifiable rather than Identifiable.
+  ([Cocoa #7372](https://github.com/realm/realm-cocoa/issues/7372), since v10.6.0)
+* Work around Xcode 13 beta 3+ shipping a broken swiftinterface file for Combine on 32-bit iOS.
+  ([Cocoa #7368](https://github.com/realm/realm-cocoa/issues/7368))
+* Fixes history corruption when replacing an embedded object in a list.
+  ([Core #4845](https://github.com/realm/realm-core/issues/4845)), since v10.0.0)
+
+### Compatibility
+
+* Realm Studio: 11.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 12.5.1.
+* CocoaPods: 1.10 or later.
+* Xcode: 12.2-13.0 beta 5.
+
+### Internal
+
+* Upgraded realm-core from 11.2.0 to 11.3.0
+
+10.12.0 Release notes (2021-08-03)
+=============================================================
+
+### Enhancements
+
+* `Object.observe()` and `RealmCollection.observe()` now include an optional
+  `keyPaths` parameter which filters change notifications to those only
+  occurring on the provided key path or key paths. See method documentation
+  for extended detail on filtering behavior.
+* `ObservedResults<ResultsType>`  now includes an optional `keyPaths` parameter
+  which filters change notifications to those only occurring on the provided
+  key path or key paths. ex) `@ObservedResults(MyObject.self, keyPaths: ["myList.property"])`
+* Add two new property wrappers for opening a Realm asynchronously in a
+  SwiftUI View:
+    - `AsyncOpen` is a property wrapper that initiates Realm.asyncOpen
+       for the current user, notifying the view when there is a change in Realm asyncOpen state.
+    - `AutoOpen` behaves similarly to `AsyncOpen`, but in the case of no internet
+       connection this will return an opened realm.
+* Add `EnvironmentValues.partitionValue`. This value can be injected into any view using one of
+  our new property wrappers `AsyncOpen` and `AutoOpen`:
+  `MyView().environment(\.partitionValue, "partitionValue")`.
+* Shift more of the work done when first initializing a collection notifier to
+  the background worker thread rather than doing it on the main thread.
+
+### Fixed
+
+* `configuration(partitionValue: AnyBSON)` would always set a nil partition value
+  for the user sync configuration.
+* Decoding a `@Persisted` property would incorrectly throw a `DecodingError.keyNotFound`
+  for an optional property if the key is missing.
+  ([Cocoa #7358](https://github.com/realm/realm-cocoa/issues/7358), since v10.10.0)
+* Fixed a symlink which prevented Realm from building on case sensitive file systems.
+  ([#7344](https://github.com/realm/realm-cocoa/issues/7344), since v10.8.0)
+* Removing a change callback from a Results would sometimes block the calling
+  thread while the query for that Results was running on the background worker
+  thread (since v10.11.0).
+* Object observers did not handle the object being deleted properly, which
+  could result in assertion failures mentioning "m_table" in ObjectNotifier
+  ([Core #4824](https://github.com/realm/realm-core/issues/4824), since v10.11.0).
+* Fixed a crash when delivering notifications over a nested hierarchy of lists
+  of Mixed that contain links. ([Core #4803](https://github.com/realm/realm-core/issues/4803), since v10.8.0)
+* Fixed a crash when an object which is linked to by a Mixed is deleted via
+  sync. ([Core #4828](https://github.com/realm/realm-core/pull/4828), since v10.8.0)
+* Fixed a rare crash when setting a mixed link for the first time which would
+  trigger if the link was to the same table and adding the backlink column
+  caused a BPNode split. ([Core #4828](https://github.com/realm/realm-core/pull/4828), since v10.8.0)
+
+### Compatibility
+
+* Realm Studio: 11.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 12.5.1.
+* CocoaPods: 1.10 or later.
+* Xcode: 12.2-13.0 beta 4. On iOS Xcode 13 beta 2 is the latest supported
+  version due to betas 3 and 4 having a broken Combine.framework.
+
+### Internal
+
+* Upgraded realm-core from v11.1.1 to v11.2.0
+
+10.11.0 Release notes (2021-07-22)
+=============================================================
+
+### Enhancements
+
+* Add type safe methods for:
+    - `RealmCollection.min(of:)`
+    - `RealmCollection.max(of:)`
+    - `RealmCollection.average(of:)`
+    - `RealmCollection.sum(of:)`
+    - `RealmCollection.sorted(by:ascending:)`
+    - `RealmKeyedCollection.min(of:)`
+    - `RealmKeyedCollection.max(of:)`
+    - `RealmKeyedCollection.average(of:)`
+    - `RealmKeyedCollection.sum(of:)`
+    - `RealmKeyedCollection.sorted(by:ascending:)`
+    - `Results.distinct(by:)`
+    - `SortDescriptor(keyPath:ascending:)
+
+  Calling these methods can now be done via Swift keyPaths, like so:
+  ```swift
+  class Person: Object {
+      @Persisted var name: String
+      @Persisted var age: Int
+  }
+
+  let persons = realm.objects(Person.self)
+  persons.min(of: \.age)
+  persons.max(of: \.age)
+  persons.average(of: \.age)
+  persons.sum(of: \.age)
+  persons.sorted(by: \.age)
+  persons.sorted(by: [SortDescriptor(keyPath: \Person.age)])
+  persons.distinct(by: [\Person.age])
+  ```
+* Add `List.objects(at indexes:)` in Swift and `[RLMCollection objectsAtIndexes:]` in Objective-C.
+  This allows you to select elements in a collection with a given IndexSet ([#7298](https://github.com/realm/realm-cocoa/issues/7298)).
+* Add `App.emailPasswordAuth.retryCustomConfirmation(email:completion:)` and `[App.emailPasswordAuth retryCustomConfirmation:completion:]`.
+  These functions support retrying a [custom confirmation](https://docs.mongodb.com/realm/authentication/email-password/#run-a-confirmation-function) function.
+* Improve performance of creating collection notifiers for Realms with a complex schema.
+  This means that the first run of a query or first call to observe() on a collection will
+  do significantly less work on the calling thread.
+* Improve performance of calculating changesets for notifications, particularly
+  for deeply nested object graphs and objects which have List or Set properties
+  with small numbers of objects in the collection.
+
+### Fixed
+
+* `RealmProperty<T?>` would crash when decoding a `null` json value.
+  ([Cocoa #7323](https://github.com/realm/realm-cocoa/issues/7323), since v10.8.0)
+* `@Persisted<T?>` would crash when decoding a `null` value.
+  ([#7332](https://github.com/realm/realm-cocoa/issues/7332), since v10.10.0).
+* Fixed an issue where `Realm.Configuration` would be set after views have been laid out
+  when using `.environment(\.realmConfiguration, ...)` in SwiftUI. This would cause issues if you are
+  required to bump your schema version and are using `@ObservedResults`.
+* Sync user profiles now correctly persist between runs.
+
+### Compatibility
+
+* Realm Studio: 11.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 12.5.1.
+* CocoaPods: 1.10 or later.
+* Xcode: 12.2-13.0 beta 3. Note that this release does not contain Xcode 13
+  beta binaries as beta 3 does not include a working version of
+  Combine.framework for iOS.
+
+### Internal
+
+* Upgraded realm-core from 11.0.4 to 11.1.1
 
 10.10.0 Release notes (2021-07-07)
 =============================================================
@@ -39,8 +334,8 @@ x.y.z Release notes (yyyy-MM-dd)
     - No more overriding class methods like `primaryKey()`,
       `indexedProperties()` or `ignoredProperties()`. The primary key and
       indexed flags are set directly in the property declaration with
-      `@Persisted(primaryKey: true) _id: ObjectId` or `@Persisted(indexed:
-      true) indexedProperty: Int`. If any `@Persisted` properties are present,
+      `@Persisted(primaryKey: true) var _id: ObjectId` or `@Persisted(indexed:
+      true) var indexedProperty: Int`. If any `@Persisted` properties are present,
       all other properties are implicitly ignored.
     - Some performance problems have been fixed. Declaring collection
       properties as `let listProp = List<T>()` resulted in the `List<T>` object

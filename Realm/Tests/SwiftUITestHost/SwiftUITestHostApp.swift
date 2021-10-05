@@ -19,25 +19,8 @@
 import RealmSwift
 import SwiftUI
 
-struct ReminderRowView: View {
-    @ObservedRealmObject var list: ReminderList
-    @ObservedRealmObject var reminder: Reminder
-    @State var hasFocus: Bool
-    @State var showReminderForm = false
-
-    var body: some View {
-        NavigationLink(destination: ReminderFormView(list: list,
-                                                     reminder: reminder,
-                                                     showReminderForm: $showReminderForm), isActive: $showReminderForm) {
-            Text(reminder.title)
-        }.isDetailLink(true)
-    }
-}
-
 struct ReminderFormView: View {
-    @ObservedRealmObject var list: ReminderList
     @ObservedRealmObject var reminder: Reminder
-    @Binding var showReminderForm: Bool
 
     var body: some View {
         Form {
@@ -50,31 +33,22 @@ struct ReminderFormView: View {
             }).accessibilityIdentifier("picker")
         }
         .navigationTitle(reminder.title)
-        .navigationBarItems(trailing: Button("Save") {
-            if reminder.realm == nil {
-                $list.reminders.append(reminder)
-            }
-            showReminderForm.toggle()
-        }.disabled(reminder.title.isEmpty))
     }
 }
 
+
 struct ReminderListView: View {
     @ObservedRealmObject var list: ReminderList
-    @State var newReminderAdded = false
-    @State var showReminderForm = false
-
-    func shouldFocusReminder(_ reminder: Reminder) -> Bool {
-        return newReminderAdded && list.reminders.last == reminder
-    }
+    @State var activeReminder: Reminder.ID?
 
     var body: some View {
         VStack {
             List {
                 ForEach(list.reminders) { reminder in
-                    ReminderRowView(list: list,
-                                    reminder: reminder,
-                                    hasFocus: shouldFocusReminder(reminder))
+                    NavigationLink(destination: ReminderFormView(reminder: reminder),
+                                   tag: reminder.id, selection: $activeReminder) {
+                        Text(reminder.title)
+                    }
                 }
                 .onMove(perform: $list.reminders.move)
                 .onDelete(perform: $list.reminders.remove)
@@ -83,36 +57,41 @@ struct ReminderListView: View {
         .navigationBarItems(trailing: HStack {
             EditButton()
             Button("add") {
-                newReminderAdded = true
-                $list.reminders.append(Reminder())
+                let reminder = Reminder()
+                $list.reminders.append(reminder)
+                activeReminder = reminder.id
             }.accessibility(identifier: "addReminder")
         })
     }
 }
 
-struct ReminderListRowView: View {
-    @ObservedRealmObject var list: ReminderList
-
-    var body: some View {
-        HStack {
-            Image(systemName: list.icon)
-            TextField("List Name", text: $list.name).accessibility(identifier: "listRow")
-            Spacer()
-            Text("\(list.reminders.count)")
-        }.frame(minWidth: 100).accessibility(identifier: "hstack")
-    }
-}
-
 struct ReminderListResultsView: View {
-    @ObservedResults(ReminderList.self) var reminders
+    // Only receive notifications on "name" to work around what appears to be
+    // a SwiftUI bug introduced in iOS 14.5: when we're two levels deep in
+    // NagivationLinks, refreshing this view makes the second NavigationLink pop
+    @ObservedResults(ReminderList.self, keyPaths: ["name", "icon"]) var reminders
     @Binding var searchFilter: String
+    @State var activeList: ReminderList.ID?
+
+    struct Row: View {
+        @ObservedRealmObject var list: ReminderList
+
+        var body: some View {
+            HStack {
+                Image(systemName: list.icon)
+                TextField("List Name", text: $list.name)
+                Spacer()
+                Text("\(list.reminders.count)")
+            }.accessibility(identifier: "hstack")
+        }
+    }
 
     var body: some View {
         List {
             ForEach(reminders) { list in
-                NavigationLink(destination: ReminderListView(list: list)) {
-                    ReminderListRowView(list: list).tag(list)
-                }.accessibilityIdentifier(list.name)
+                NavigationLink(destination: ReminderListView(list: list), tag: list.id, selection: $activeList) {
+                    Row(list: list)
+                }.accessibilityIdentifier(list.name).accessibilityActivationPoint(CGPoint(x: 0, y: 0))
             }.onDelete(perform: $reminders.remove)
         }.onChange(of: searchFilter) { value in
             $reminders.filter = value.isEmpty ? nil : NSPredicate(format: "name CONTAINS[c] %@", value)
@@ -156,12 +135,14 @@ struct SearchView: View {
 }
 
 struct Footer: View {
-    @ObservedResults(ReminderList.self) var lists
+    let realm = try! Realm()
 
     var body: some View {
         HStack {
             Button(action: {
-                $lists.append(ReminderList())
+                try! realm.write {
+                    realm.add(ReminderList())
+                }
             }, label: {
                 HStack {
                     Image(systemName: "plus.circle")
@@ -263,6 +244,34 @@ struct UnmanagedObjectTestView: View {
     }
 }
 
+struct ObservedResultsKeyPathTestView: View {
+    @ObservedResults(ReminderList.self, keyPaths: ["reminders.isFlagged"]) var reminders
+
+    var body: some View {
+        VStack {
+            List {
+                ForEach(reminders) { list in
+                    ObservedResultsKeyPathTestRow(list: list)
+                }.onDelete(perform: $reminders.remove)
+            }
+            .navigationBarItems(trailing: EditButton())
+            .navigationTitle("reminders")
+            Footer()
+        }
+    }
+}
+
+struct ObservedResultsKeyPathTestRow: View {
+    var list: ReminderList
+
+    var body: some View {
+        HStack {
+            Image(systemName: list.icon)
+            Text(list.name)
+        }.frame(minWidth: 100).accessibility(identifier: "hstack")
+    }
+}
+
 @main
 struct App: SwiftUI.App {
     var body: some Scene {
@@ -279,6 +288,8 @@ struct App: SwiftUI.App {
                 return AnyView(MultiRealmContentView())
             case "unmanaged_object_test":
                 return AnyView(UnmanagedObjectTestView())
+            case "observed_results_key_path":
+                return AnyView(ObservedResultsKeyPathTestView())
             default:
                 return AnyView(ContentView())
             }

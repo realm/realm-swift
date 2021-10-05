@@ -112,6 +112,16 @@ NS_ASSUME_NONNULL_BEGIN
 - (RLMObjectType)objectAtIndex:(NSUInteger)index;
 
 /**
+ Returns an array containing the objects in the array at the indexes specified by a given index set.
+ `nil` will be returned if the index set contains an index out of the arrays bounds.
+
+ @param indexes The indexes in the array to retrieve objects from.
+
+ @return The objects at the specified indexes.
+ */
+- (nullable NSArray<RLMObjectType> *)objectsAtIndexes:(NSIndexSet *)indexes;
+
+/**
  Returns the first object in the array.
 
  Returns `nil` if called on an empty array.
@@ -412,6 +422,94 @@ __attribute__((warn_unused_result));
                                                          RLMCollectionChange *_Nullable changes,
                                                          NSError *_Nullable error))block
                                          queue:(nullable dispatch_queue_t)queue
+__attribute__((warn_unused_result));
+
+/**
+ Registers a block to be called each time the array changes.
+
+ The block will be asynchronously called with the initial array, and then
+ called again after each write transaction which changes any of the objects in
+ the array, which objects are in the results, or the order of the objects in the
+ array.
+
+ The `changes` parameter will be `nil` the first time the block is called.
+ For each call after that, it will contain information about
+ which rows in the array were added, removed or modified. If a write transaction
+ did not modify any objects in the array, the block is not called at all.
+ See the `RLMCollectionChange` documentation for information on how the changes
+ are reported and an example of updating a `UITableView`.
+
+ If an error occurs the block will be called with `nil` for the results
+ parameter and a non-`nil` error. Currently the only errors that can occur are
+ when opening the Realm on the background worker thread.
+
+ Notifications are delivered on the given queue. If the queue is blocked and
+ notifications can't be delivered instantly, multiple notifications may be
+ coalesced into a single notification.
+
+ You must retain the returned token for as long as you want updates to continue
+ to be sent to the block. To stop receiving updates, call `-invalidate` on the token.
+
+ @warning This method cannot be called when the containing Realm is read-only or frozen.
+ @warning The queue must be a serial queue.
+
+ @param block The block to be called whenever a change occurs.
+ @param keyPaths The block will be called for changes occuring on these keypaths. If no
+ key paths are given, notifications are delivered for every property key path.
+ @param queue The serial queue to deliver notifications to.
+ @return A token which must be held for as long as you want updates to be delivered.
+ */
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMArray<RLMObjectType> *_Nullable array,
+                                                         RLMCollectionChange *_Nullable changes,
+                                                         NSError *_Nullable error))block
+                                      keyPaths:(nullable NSArray<NSString *> *)keyPaths
+                                         queue:(nullable dispatch_queue_t)queue
+__attribute__((warn_unused_result));
+
+/**
+ Registers a block to be called each time the array changes.
+
+ The block will be asynchronously called with the initial array, and then
+ called again after each write transaction which changes any of the objects in
+ the array, which objects are in the results, or the order of the objects in the
+ array.
+
+ The `changes` parameter will be `nil` the first time the block is called.
+ For each call after that, it will contain information about
+ which rows in the array were added, removed or modified. If a write transaction
+ did not modify any objects in the array, the block is not called at all.
+ See the `RLMCollectionChange` documentation for information on how the changes
+ are reported and an example of updating a `UITableView`.
+
+ If an error occurs the block will be called with `nil` for the results
+ parameter and a non-`nil` error. Currently the only errors that can occur are
+ when opening the Realm on the background worker thread.
+
+ Notifications are delivered via the standard run loop, and so can't be
+ delivered while the run loop is blocked by other activity. When
+ notifications can't be delivered instantly, multiple notifications may be
+ coalesced into a single notification. This can include the notification
+ with the initial results. For example, the following code performs a write
+ transaction immediately after adding the notification block, so there is no
+ opportunity for the initial notification to be delivered first. As a
+ result, the initial notification will reflect the state of the Realm after
+ the write transaction.
+
+ You must retain the returned token for as long as you want updates to continue
+ to be sent to the block. To stop receiving updates, call `-invalidate` on the token.
+
+ @warning This method cannot be called when the containing Realm is read-only or frozen.
+ @warning The queue must be a serial queue.
+
+ @param block The block to be called whenever a change occurs.
+ @param keyPaths The block will be called for changes occuring on these keypaths. If no
+ key paths are given, notifications are delivered for every property key path.
+ @return A token which must be held for as long as you want updates to be delivered.
+ */
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMArray<RLMObjectType> *_Nullable array,
+                                                         RLMCollectionChange *_Nullable changes,
+                                                         NSError *_Nullable error))block
+                                      keyPaths:(nullable NSArray<NSString *> *)keyPaths
 __attribute__((warn_unused_result));
 
 #pragma mark - Aggregating Property Values

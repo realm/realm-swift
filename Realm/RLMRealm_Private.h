@@ -38,6 +38,7 @@ void RLMRealmTranslateException(NSError **error);
 
 // Block until the Realm at the given path is closed.
 FOUNDATION_EXTERN void RLMWaitForRealmToClose(NSString *path);
+BOOL RLMIsRealmCachedAtPath(NSString *path);
 
 // RLMRealm private members
 @interface RLMRealm ()
@@ -56,6 +57,8 @@ FOUNDATION_EXTERN void RLMWaitForRealmToClose(NSString *path);
 - (void)verifyNotificationsAreSupported:(bool)isCollection;
 
 - (RLMRealm *)frozenCopy NS_RETURNS_RETAINED;
++ (RLMAsyncOpenTask *)asyncOpenWithConfiguration:(RLMRealmConfiguration *)configuration
+                                        callback:(void (^)(NSError * _Nullable))callback;
 
 @end
 

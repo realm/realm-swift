@@ -18,9 +18,14 @@
 
 import Realm
 
+/// A tag protocol which marks types that can be used as the partition value
+/// for synchronized Realms.
+public protocol PartitionValue {
+}
+
 /// Protocol representing a BSON value.
 /// - SeeAlso: bsonspec.org
-public protocol BSON: Equatable {
+public protocol BSON: PartitionValue, Equatable {
 }
 
 extension NSNull: BSON {
@@ -62,10 +67,10 @@ extension UUID: BSON {
 /// A Dictionary object representing a `BSON` document.
 public typealias Document = Dictionary<String, AnyBSON?>
 
-extension Dictionary: BSON where Key == String, Value == AnyBSON? {
+extension Dictionary: BSON, PartitionValue where Key == String, Value == AnyBSON? {
 }
 
-extension Array: BSON where Element == AnyBSON? {
+extension Array: BSON, PartitionValue where Element == AnyBSON? {
 }
 
 extension NSRegularExpression: BSON {
@@ -188,6 +193,8 @@ extension MinKey: BSON {
             self = .minKey
         case let val as NSRegularExpression:
             self = .regex(val)
+        case let val as AnyBSON:
+            self = val
         default:
             self = .null
         }
@@ -372,18 +379,20 @@ extension MinKey: BSON {
     /// Return this BSON as a `Decimal128` if possible.
     /// This will coerce numeric cases (e.g. `.double`) into a `Decimal128` if such coercion would be lossless.
     public func asDecimal128() -> Decimal128? {
+        let str: String
         switch self {
         case let .decimal128(d):
             return d
         case let .int64(i):
-            return try? Decimal128(string: String(i))
+            str = String(i)
         case let .int32(i):
-            return try? Decimal128(string: String(i))
+            str = String(i)
         case let .double(d):
-            return try? Decimal128(string: String(d))
+            str = String(d)
         default:
             return nil
         }
+        return try? Decimal128(string: str)
     }
 
     /// Return this BSON as a `T` if possible, otherwise nil.
