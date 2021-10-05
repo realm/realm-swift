@@ -360,7 +360,6 @@ using UserProfileMember = util::Optional<std::string> (SyncUserProfile::*)() con
 - (NSString *)name {
     return [self userProfileMember:&SyncUserProfile::name];
 }
-
 - (NSString *)email {
     return [self userProfileMember:&SyncUserProfile::email];
 }
