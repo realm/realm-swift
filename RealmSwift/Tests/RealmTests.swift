@@ -1019,5 +1019,13 @@ extension RealmTests {
         await waitForExpectations(timeout: 2)
         XCTAssertTrue(boolObject.boolCol)
          */
+
+        let ex = expectation(description: "wait for subtask")
+        Task {
+            assertThrows(boolObject.boolCol)
+            ex.fulfill()
+        }
+
+        await waitForExpectations(timeout: 2)
     }
 }
