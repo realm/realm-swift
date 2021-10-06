@@ -980,3 +980,44 @@ class RealmTests: TestCase {
         XCTAssertEqual(try! Realm().objects(SwiftBoolObject.self).count, 1)
     }
 }
+
+@available(iOS 15.0.0, *)
+extension RealmTests {
+    @Sendable func testAsyncScheduler() async throws {
+        // This works. Which is good for the basic, single task use case.
+        let realm = try! await Realm()
+        let boolObject = try realm.write {
+            realm.create(SwiftBoolObject.self, value: ["boolCol": true])
+        }
+        @Sendable func modifyBoolObject(_ boolObject: SwiftBoolObject) async {
+            boolObject.boolCol = !boolObject.boolCol
+        }
+        try await realm.write {
+            await modifyBoolObject(boolObject)
+        }
+        XCTAssertFalse(boolObject.boolCol)
+
+        /**
+
+         This does not work. You cannot caputre variables in concurrently executed code.
+         This is mostly bad for us, as users will be inclined to pass their `let object`
+         into the Task closure, and cannot pass their `@ThreadSafe var object`s.
+         This brings us back to some implementation of TaskLocals.
+
+        @ThreadSafe var taskLocalBoolObject = boolObject
+        let ex = expectation(description: "wait for subtask")
+        Task {
+            guard let boolObject = taskLocalBoolObject else {
+                return
+            }
+            try! await Realm().write {
+                await modifyBoolObject(boolObject)
+            }
+            ex.fulfill()
+        }
+
+        await waitForExpectations(timeout: 2)
+        XCTAssertTrue(boolObject.boolCol)
+         */
+    }
+}
