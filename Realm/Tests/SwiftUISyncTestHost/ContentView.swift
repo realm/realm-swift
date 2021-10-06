@@ -163,6 +163,7 @@ class LoginHelper: ObservableObject {
     func login(email: String, password: String, completion: @escaping (User) -> Void) {
         let app = RealmSwift.App(id: ProcessInfo.processInfo.environment["app_id"]!, configuration: appConfig, rootDirectory: clientDataRoot)
         app.login(credentials: .emailPassword(email: email, password: password))
+            .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { result in
                 if case let .failure(error) = result {
                     print("Login user error \(error)")

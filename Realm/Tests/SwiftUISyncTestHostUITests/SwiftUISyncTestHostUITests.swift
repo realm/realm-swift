@@ -23,10 +23,15 @@ class SwiftUISyncTestHostUITests: XCTestCase {
     // Create App only once
     static var appId: String?
 
-    // Realm Directory
+    // App Runner Directory
     var clientDataRoot: URL {
         let applicationSupportDirectory = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
         return applicationSupportDirectory.appendingPathComponent(Bundle.main.bundleIdentifier!)
+    }
+    // App Directory
+    var appClientDataRoot: URL {
+        let applicationSupportDirectory = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
+        return applicationSupportDirectory.appendingPathComponent("io.realm.TestHost")
     }
 
     // App Info
@@ -58,6 +63,7 @@ class SwiftUISyncTestHostUITests: XCTestCase {
         setenv("REALM_DISABLE_METADATA_ENCRYPTION", "1", 1)
 
         try? FileManager.default.createDirectory(at: clientDataRoot, withIntermediateDirectories: true)
+        try? FileManager.default.createDirectory(at: appClientDataRoot, withIntermediateDirectories: true)
 
         // Create App once for this Test Suite
         if SwiftUISyncTestHostUITests.appId == nil {
@@ -86,16 +92,8 @@ class SwiftUISyncTestHostUITests: XCTestCase {
 
     override class func tearDown() {
         do {
-            let fileManager = FileManager.default
-            let applicationSupportDir = try fileManager.url(for: .applicationSupportDirectory,
-                                                            in: .userDomainMask,
-                                                            appropriateFor: nil,
-                                                            create: false)
-            let applicationsUrls = try fileManager.contentsOfDirectory(at: applicationSupportDir,
-                                                                       includingPropertiesForKeys: nil)
-            for applicationUrl in applicationsUrls where applicationUrl.lastPathComponent == "io.realm.TestHost" {
-                try fileManager.removeItem(at: applicationUrl)
-            }
+            try FileManager.default.removeItem(at: SwiftUISyncTestHostUITests().clientDataRoot)
+            try FileManager.default.removeItem(at: SwiftUISyncTestHostUITests().appClientDataRoot)
         } catch {
             XCTFail("Error reseting application data")
         }
