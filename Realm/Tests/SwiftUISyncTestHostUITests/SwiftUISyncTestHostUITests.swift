@@ -81,6 +81,18 @@ class SwiftUISyncTestHostUITests: XCTestCase {
         } catch {
             print("Error creating user \(error)")
         }
+
+        addUIInterruptionMonitor(withDescription: "com.apple.loginwindow") { element in
+            print("------------------------------------")
+            print(XCUIApplication().debugDescription)
+            if element.buttons.matching(identifier: "OK").count > 0 {
+                element.buttons["OK"].click()
+                self.application.click()
+                return true
+            } else {
+                return false
+            }
+        }
     }
 
     override func tearDown() {
