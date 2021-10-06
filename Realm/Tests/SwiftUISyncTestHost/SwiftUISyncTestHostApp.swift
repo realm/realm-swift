@@ -24,9 +24,6 @@ struct App: SwiftUI.App {
     var body: some Scene {
         return WindowGroup {
             MainView()
-                .onAppear {
-                    setenv("REALM_DISABLE_METADATA_ENCRYPTION", "1", 1)
-                }
         }
     }
 }

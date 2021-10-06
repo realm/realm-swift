@@ -60,8 +60,6 @@ class SwiftUISyncTestHostUITests: XCTestCase {
         super.setUp()
         continueAfterFailure = false
 
-        setenv("REALM_DISABLE_METADATA_ENCRYPTION", "1", 1)
-
         try? FileManager.default.createDirectory(at: clientDataRoot, withIntermediateDirectories: true)
         try? FileManager.default.createDirectory(at: appClientDataRoot, withIntermediateDirectories: true)
 
@@ -80,19 +78,6 @@ class SwiftUISyncTestHostUITests: XCTestCase {
             app = try getApp()
         } catch {
             print("Error creating user \(error)")
-        }
-
-        addUIInterruptionMonitor(withDescription: "com.apple.loginwindow") { element in
-            print("------------------------------------")
-            print(element.debugDescription)
-            print("------------------------------------")
-            if element.buttons.matching(identifier: "OK").count > 0 {
-                element.buttons["OK"].click()
-                self.application.click()
-                return true
-            } else {
-                return false
-            }
         }
     }
 
