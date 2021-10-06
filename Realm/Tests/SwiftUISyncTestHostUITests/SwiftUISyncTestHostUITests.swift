@@ -84,7 +84,8 @@ class SwiftUISyncTestHostUITests: XCTestCase {
 
         addUIInterruptionMonitor(withDescription: "com.apple.loginwindow") { element in
             print("------------------------------------")
-            print(XCUIApplication().debugDescription)
+            print(element.debugDescription)
+            print("------------------------------------")
             if element.buttons.matching(identifier: "OK").count > 0 {
                 element.buttons["OK"].click()
                 self.application.click()
