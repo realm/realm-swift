@@ -1,14 +1,6 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
-
-* Add `async` versions for `EmailPasswordAuth.callResetPasswordFunction` and `User.linkUser` methods.
-* Add `async` version for `MongoCollection` methods.
-* Add `async` support for user functions.
-* Add a new `@ThreadSafe` property wrapper. Objects and collections wrapped by `@ThreadSafe` may be passed between threads. It's
-  intended to allow local variables and function parameters to be used across
-  threads when needed.
 * Add support for multi-user on `@AsyncOpen` and `@AutoOpen`.
 
 ### Fixed
