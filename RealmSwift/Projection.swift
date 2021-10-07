@@ -116,8 +116,8 @@ fileprivate struct ProjectedMetadata {
     let label: String
 
     /// Cast `keyPath` to its actual KeyPath type.
-    func keyPathAs<P: ProjectionObservable>() -> KeyPath<P, AnyProjected> {
-        keyPath as! KeyPath<P, AnyProjected>
+    func keyPathAs<P>() -> KeyPath<P, AnyProjected> where P: ProjectionObservable {
+        return keyPath as! KeyPath<P, AnyProjected>
     }
 }
 
@@ -135,7 +135,7 @@ public protocol ProjectionObservable {
     init(projecting object: Root)
 }
 
-public enum ProjectionChange<P: ProjectionObservable> {
+public enum ProjectionChange<T: ProjectionObservable> {
     /**
      If an error occurs, notification blocks are called one time with a `.error`
      result and an `NSError` containing details about the error. Currently the
@@ -147,27 +147,18 @@ public enum ProjectionChange<P: ProjectionObservable> {
     /**
      One or more of the properties of the object have been changed.
      */
-    case change(_: P, _: [ProjectedPropertyChange])
+    case change(_: T, _: [ProjectedPropertyChange])
     /// The object has been deleted from the Realm.
     case deleted
-}
 
-extension ProjectionObservable {
-    fileprivate subscript(checkedMirrorDescendant key: String) -> AnyProjected {
-        if let mirror = schema[ObjectIdentifier(Self.self)]?.mirror {
-            return mirror.descendant(key)! as! AnyProjected
-        }
-        return Mirror(reflecting: self).descendant(key)! as! AnyProjected
-    }
-
-    private func processChange(_ objectChange: ObjectChange<Root>) -> ProjectionChange<Self> {
+    fileprivate static func processChange(_ objectChange: ObjectChange<T.Root>, _ schema: ProjectionMetadata) -> ProjectionChange<T> {
         switch objectChange {
         case .error(let error):
             return .error(error)
         case .change(let object, let objectPropertyChanges):
-            let newProjection = Self(projecting: object)
+            let newProjection = T(projecting: object)
             let projectedPropertyChanges: [ProjectedPropertyChange] = objectPropertyChanges.map { propChange in
-                let metadata = _schema
+                let metadata = schema
                 // read the metadata for the property whose origin name matches
                 // the changed property's name
                 let propertyMetadata = metadata.propertyMetadatas.first(where: {
@@ -176,9 +167,9 @@ extension ProjectionObservable {
                 var change: (name: String?, oldValue: Any?, newValue: Any?) = (nil, nil, nil)
                 if let oldValue = propChange.oldValue {
                     // if there is an oldValue in the change, construct an empty Root
-                    let newRoot = Self.Root()
+                    let newRoot = T.Root()
 
-                    let processorProjection = Self(projecting: newRoot)
+                    let processorProjection = T(projecting: newRoot)
 
                     // assign the oldValue to the empty root object
                     processorProjection.rootObject.setValue(oldValue, forKey: propChange.name)
@@ -190,7 +181,7 @@ extension ProjectionObservable {
                                                 newProjection[keyPath: propertyMetadata.keyPathAs()].projectedKeyPath]
                 }
 
-                change.name = propertyMetadata.label
+                change.name = String(propertyMetadata.label.dropFirst()) // this drops the _ from the property wrapper name
 
                 return ProjectedPropertyChange(name: change.name!,
                                                oldValue: change.oldValue,
@@ -201,57 +192,9 @@ extension ProjectionObservable {
             return .deleted
         }
     }
-
-    public func observe(keyPaths: [String] = [],
-                        on queue: DispatchQueue? = nil,
-                        _ block: @escaping (ProjectionChange<Self>) -> Void) -> NotificationToken {
-        let kps = keyPaths.compactMap { \Self.[checkedMirrorDescendant: $0] }
-        return observe(keyPaths: kps, on: queue, block)
-    }
-
-    public func observe(keyPaths: [PartialKeyPath<Self>] = [],
-                        on queue: DispatchQueue? = nil,
-                        _ block: @escaping (ProjectionChange<Self>) -> Void) -> NotificationToken {
-        if keyPaths.isEmpty {
-            let keyPaths = _schema.propertyMetadatas.map { $0.originPropertyKeyPathString }
-            return rootObject._observe(keyPaths: keyPaths,
-                                       on: queue, { change in
-                block(processChange(change))
-            })
-        } else {
-            let emptyRoot = Root()
-            emptyRoot.lastAccessedNames = NSMutableArray()
-            emptyRoot.prepareForRecording()
-            let emptyProjection = Self(projecting: emptyRoot) // tracer time
-            keyPaths.forEach {
-                _ = emptyProjection[keyPath: $0]
-            }
-            let originKeyPathStrings = emptyRoot.lastAccessedNames! as! [String]
-            return rootObject._observe(keyPaths: originKeyPathStrings,
-                                       on: queue, { change in
-                block(processChange(change))
-            })
-        }
-    }
-
-    fileprivate var _schema: ProjectionMetadata {
-        if schema[ObjectIdentifier(Self.self)] == nil {
-            let mirror = Mirror(reflecting: self)
-            let metadatas: [ProjectedMetadata] = mirror.children.compactMap { child in
-                guard let projected = child.value as? AnyProjected else {
-                    return nil
-                }
-                let kp = \Self.[checkedMirrorDescendant: child.label!]
-                return ProjectedMetadata(keyPath: kp,
-                                         originPropertyKeyPathString: _name(for: projected.projectedKeyPath as! PartialKeyPath<Root>),
-                                         label: child.label!)
-            }
-            schema[ObjectIdentifier(Self.self)] = ProjectionMetadata(propertyMetadatas: metadatas,
-                                                                     mirror: mirror)
-        }
-        return schema[ObjectIdentifier(Self.self)]!
-    }
 }
+
+//public protocol ProjectableObject: ObjectBase, ThreadConfined {}
 
 /// Projections are a light weight structure of  the original Realm objects with a minimal effort.
 /// And use them as a model in your application.
@@ -278,7 +221,7 @@ extension ProjectionObservable {
 ///     @Projected(\Person.friends.projectTo.firstName) var firstFriendsName: ProjectedList<String>
 /// }
 /// ```
-open class Projection<Root: ObjectBase>: RealmCollectionValue, ProjectionObservable where Root: ThreadConfined {
+open class Projection<Root: ObjectBase/* & ThreadConfined*/>: RealmCollectionValue, ProjectionObservable {
 
     /// The object being projected
     public var rootObject: Root
@@ -292,6 +235,66 @@ open class Projection<Root: ObjectBase>: RealmCollectionValue, ProjectionObserva
     }
 }
 
+extension ProjectionObservable {
+    public func observe(keyPaths: [String] = [],
+                                             on queue: DispatchQueue? = nil,
+                                             _ block: @escaping (ProjectionChange<Self>) -> Void) -> NotificationToken {
+        let kps = keyPaths.compactMap { \Self.[checkedMirrorDescendant: $0] }
+        return observe(keyPaths: kps, on: queue, block)
+    }
+    
+    public func observe(keyPaths: [PartialKeyPath<Self>] = [],
+                                             on queue: DispatchQueue? = nil,
+                              _ block: @escaping (ProjectionChange<Self>) -> Void) -> NotificationToken {
+        if keyPaths.isEmpty {
+            let keyPaths = _schema.propertyMetadatas.map { $0.originPropertyKeyPathString }
+            return rootObject._observe(keyPaths: keyPaths,
+                                       on: queue, { change in
+                block(ProjectionChange.processChange(change, self._schema))
+            })
+        } else {
+            let emptyRoot = Root()
+            emptyRoot.lastAccessedNames = NSMutableArray()
+            emptyRoot.prepareForRecording()
+            let emptyProjection = Self(projecting: emptyRoot) // tracer time
+            keyPaths.forEach {
+                _ = emptyProjection[keyPath: $0]
+            }
+            let originKeyPathStrings = emptyRoot.lastAccessedNames! as! [String]
+            return rootObject._observe(keyPaths: originKeyPathStrings,
+                                       on: queue, { change in
+                block(ProjectionChange.processChange(change, self._schema))
+            })
+        }
+    }
+
+    fileprivate subscript(checkedMirrorDescendant key: String) -> AnyProjected {
+        // We're dropping _ for user so putting it back here
+        let underscKey = key.first == "_" ? key : "_" + key
+        if let mirror = schema[ObjectIdentifier(Self.self)]?.mirror {
+            return mirror.descendant(underscKey)! as! AnyProjected
+        }
+        return Mirror(reflecting: self).descendant(underscKey)! as! AnyProjected
+    }
+
+    fileprivate var _schema: ProjectionMetadata {
+        if schema[ObjectIdentifier(Self.self)] == nil {
+            let mirror = Mirror(reflecting: self)
+            let metadatas: [ProjectedMetadata] = mirror.children.compactMap { child in
+                guard let projected = child.value as? AnyProjected else {
+                    return nil
+                }
+                let kp = \Self.[checkedMirrorDescendant: child.label!]
+                return ProjectedMetadata(keyPath: kp,
+                                         originPropertyKeyPathString: _name(for: projected.projectedKeyPath as! PartialKeyPath<Root>),
+                                         label: child.label!)
+            }
+            schema[ObjectIdentifier(Self.self)] = ProjectionMetadata(propertyMetadatas: metadatas,
+                                                                     mirror: mirror)
+        }
+        return schema[ObjectIdentifier(Self.self)]!
+    }
+}
 /**
  Information about a specific property which changed in an `Object` change notification.
  */
@@ -343,7 +346,7 @@ public extension Projection {
 }
 
 // MARK: ThreadConfined
-extension Projection: ThreadConfined {
+extension Projection: ThreadConfined where Root: ThreadConfined {
     /**
      The Realm which manages the object, or `nil` if the object is unmanaged.
      Note: Projection can be instantiated for the managed objects only therefore realm will never be nil.
@@ -538,22 +541,14 @@ extension Projection: AssistedObjectiveCBridgeable {
 
 #if canImport(Combine)
 // MARK: - RealmSubscribable
-
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
-extension Projection: ObservableObject, RealmSubscribable {
-    /// A publisher that emits Void each time the projection changes.
-    ///
-    /// Despite the name, this actually emits *after* the projection has changed.
-    public var objectWillChange: RealmPublishers.WillChange<Projection> {
-        RealmPublishers.WillChange(self)
-    }
-
+extension ProjectionObservable {
     /// :nodoc:
-    public func _observe<S>(_ keyPaths: [String]?, on queue: DispatchQueue?, _ subscriber: S) -> NotificationToken where S: Subscriber, S.Input: Projection<Root>, S.Failure == Error {
-        return observe(keyPaths: keyPaths ?? [], on: queue) { change in
+    public func _observe<S>(_ keyPaths: [String]?, on queue: DispatchQueue?, _ subscriber: S) -> NotificationToken where S: Subscriber, S.Input == Self, S.Failure == Error {
+        return observe(keyPaths: keyPaths ?? [], on: queue) { (change: ProjectionChange<S.Input>) in
             switch change {
             case .change(let projection, _):
-                _ = subscriber.receive(projection as! S.Input)
+                _ = subscriber.receive(projection)
             case .deleted:
                 subscriber.receive(completion: .finished)
             case .error(let error):
@@ -564,10 +559,19 @@ extension Projection: ObservableObject, RealmSubscribable {
 
     /// :nodoc:
     public func _observe<S>(_ keyPaths: [String]?, _ subscriber: S) -> NotificationToken where S : Subscriber, S.Failure == Never, S.Input == Void {
-        let kps: [PartialKeyPath<Projection<Root>>]? = keyPaths?.compactMap {
+        let kps: [PartialKeyPath<Self>]? = keyPaths?.compactMap {
             \Self[checkedMirrorDescendant: $0]
         }
-        return observe(keyPaths: kps ?? [], on: nil, { _ in _ = subscriber.receive() })
+        return observe(keyPaths: kps ?? [], { _ in _ = subscriber.receive() })
+    }
+}
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+extension Projection: ObservableObject, RealmSubscribable where Root: ThreadConfined {
+    /// A publisher that emits Void each time the projection changes.
+    ///
+    /// Despite the name, this actually emits *after* the projection has changed.
+    public var objectWillChange: RealmPublishers.WillChange<Projection> {
+        RealmPublishers.WillChange(self)
     }
 }
 #endif

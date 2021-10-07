@@ -234,7 +234,7 @@ extension Publisher {
     ///
     /// - returns: A publisher that publishes frozen copies of the changesets
     ///            which the upstream publisher publishes.
-    public func freeze<T: Projection<Object>>() -> Publishers.Map<Self, ProjectionChange<T>> where Output == ProjectionChange<T> {
+    public func freeze<T: ProjectionObservable>() -> Publishers.Map<Self, ProjectionChange<T>> where Output == ProjectionChange<T>, T: ThreadConfined {
         return map {
             if case .change(let p, let properties) = $0 {
                 return .change(p.freeze(), properties)
@@ -328,7 +328,7 @@ extension Publisher {
     ///
     /// - returns: A publisher that supports `receive(on:)` for thread-confined objects.
     public func threadSafeReference<T: ProjectionObservable>()
-        -> RealmPublishers.MakeThreadSafeProjectionChangeset<Self, T> where Output == ProjectionChange<T> {
+    -> RealmPublishers.MakeThreadSafeProjectionChangeset<Self, T> where Output == ProjectionChange<T>, T: ThreadConfined {
         RealmPublishers.MakeThreadSafeProjectionChangeset(self)
     }
 
@@ -489,7 +489,7 @@ public func valuePublisher<T: RealmCollection>(_ collection: T, keyPaths: [Strin
 /// - parameter keyPaths: The publisher emits changes on these property keyPaths. If `nil` the publisher emits changes for every property.
 /// - returns: A publisher that emits the object each time it changes.
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
-public func valuePublisher<T>(_ projection: T, keyPaths: [String]? = nil) -> RealmPublishers.Value<T> where T: ProjectionObservable {
+public func valuePublisher<T: ProjectionObservable>(_ projection: T, keyPaths: [String]? = nil) -> RealmPublishers.Value<T> {
     RealmPublishers.Value<T>(projection, keyPaths: keyPaths)
 }
 
@@ -2030,7 +2030,7 @@ public enum RealmPublishers {
     /// should always be the first operation in the pipeline.
     ///
     /// Create this publisher using the `projectionChangeset()` function.
-    @frozen public struct ProjectionChangeset<P: ProjectionObservable>: Publisher {
+    @frozen public struct ProjectionChangeset<P: ProjectionObservable>: Publisher where P: ThreadConfined {
         /// This publisher emits a ProjectionChange<P> indicating which projection and
         /// which properties of that projection have changed each time a Realm is
         /// refreshed after a write transaction which modifies the observed
@@ -2043,7 +2043,7 @@ public enum RealmPublishers {
         private let keyPaths: [String]?
         private let queue: DispatchQueue?
         internal init(_ projection: P, keyPaths: [String]? = nil, queue: DispatchQueue? = nil) {
-//            precondition(!projection.isInvalidated, "Projection's object is invalidated or deleted")
+            precondition(!projection.isInvalidated, "Projection's object is invalidated or deleted")
             self.projection = projection
             self.keyPaths = keyPaths
             self.queue = queue
@@ -2059,13 +2059,13 @@ public enum RealmPublishers {
         ///   - projection: The projection which the `NotificationToken` is written to.
         ///   - keyPath: The KeyPath which the `NotificationToken` is written to.
         /// - Returns: A `ProjectionChangesetWithToken` Publisher.
-        public func saveToken<T>(on tokenParent: T, at keyPath: WritableKeyPath<T, NotificationToken?>) -> ProjectionChangesetWithToken<P, T> {
-              return ProjectionChangesetWithToken<P, T>(projection, queue, tokenParent, keyPath)
+        public func saveToken<T>(on tokenParent: T, at keyPath: WritableKeyPath<T, NotificationToken?>) -> ProjectionChangesetWithToken<T, P> {
+              return ProjectionChangesetWithToken<T, P>(projection, queue, tokenParent, keyPath)
         }
 
         /// :nodoc:
         public func receive<S>(subscriber: S) where S: Subscriber, S.Failure == Never, Output == S.Input {
-            let token = self.projection.observe(keyPaths: self.keyPaths ?? [], on: self.queue) { change in
+            let token = self.projection.observe(keyPaths: self.keyPaths ?? [], on: self.queue) { (change: Output) in
                 switch change {
                 case .change(let p, let properties):
                     _ = subscriber.receive(.change(p, properties))
@@ -2124,7 +2124,7 @@ public enum RealmPublishers {
     /// should always be the first operation in the pipeline.
     ///
     /// Create this publisher using the `objectChangeset()` function.
-    public class ProjectionChangesetWithToken<P: ProjectionObservable, T>: Publisher {
+    public class ProjectionChangesetWithToken<T, P: ProjectionObservable>: Publisher where P: ThreadConfined {
         /// This publisher emits a ProjectionChange<T> indicating which projection and
         /// which properties of that projection have changed each time a Realm is
         /// refreshed after a write transaction which modifies the observed
@@ -2145,7 +2145,7 @@ public enum RealmPublishers {
                       _ queue: DispatchQueue? = nil,
                       _ tokenParent: TokenParent,
                       _ tokenKeyPath: TokenKeyPath) {
-//            precondition(!projection.isInvalidated, "Projection's object is invalidated or deleted")
+            precondition(!projection.isInvalidated, "Projection's object is invalidated or deleted")
             self.projection = projection
             self.queue = queue
             self.tokenParent = tokenParent
@@ -2154,7 +2154,7 @@ public enum RealmPublishers {
 
         /// :nodoc:
         public func receive<S>(subscriber: S) where S: Subscriber, S.Failure == Never, Output == S.Input {
-            let token = self.projection.observe(keyPaths: [String](), on: self.queue) { change in
+            let token = self.projection.observe(keyPaths: [String](), on: self.queue) { (change: Output) in
                 switch change {
                 case .change(let p, let properties):
                     _ = subscriber.receive(.change(p, properties))
@@ -2179,7 +2179,7 @@ public enum RealmPublishers {
         ///
         /// - parameter scheduler: The serial dispatch queue to perform the subscription on.
         /// - returns: A publisher which subscribes on the given scheduler.
-        public func subscribe<S: Scheduler>(on scheduler: S) -> ProjectionChangesetWithToken<P, T> {
+        public func subscribe<S: Scheduler>(on scheduler: S) -> ProjectionChangesetWithToken<T, P> {
             guard let queue = scheduler as? DispatchQueue else {
                 fatalError("Cannot subscribe on scheduler \(scheduler): only serial dispatch queues are currently implemented.")
             }
@@ -2210,7 +2210,7 @@ public enum RealmPublishers {
     ///
     /// Create using `.threadSafeReference().receive(on: queue)` on a publisher
     /// that emits `ProjectionChange`.
-    @frozen public struct DeferredHandoverProjectionChangeset<Upstream: Publisher, P: ProjectionObservable, S: Scheduler>: Publisher where Upstream.Output == ProjectionChange<P>, P: ThreadConfined {
+    @frozen public struct DeferredHandoverProjectionChangeset<Upstream: Publisher, T: ProjectionObservable, S: Scheduler>: Publisher where Upstream.Output == ProjectionChange<T>, T: ThreadConfined {
         /// :nodoc:
         public typealias Failure = Upstream.Failure
         /// :nodoc:
@@ -2227,12 +2227,12 @@ public enum RealmPublishers {
         private enum Handover {
             // .error and .change containing a frozen projection can be delivered
             // without any handover
-            case passthrough(_ change: ProjectionChange<P>)
+            case passthrough(_ change: ProjectionChange<T>)
             // .change containing a live projection need to be wrapped in a TSR.
             // We also hold a reference to a frozen Realm to ensure that the
             // source version remains pinned and we can deliver the projection at
             // the same version as the change information.
-            case tsr(_ realm: Realm, _ tsr: ThreadSafeReference<P>,
+            case tsr(_ realm: Realm, _ tsr: ThreadSafeReference<T>,
                      _ properties: [ProjectedPropertyChange])
         }
 

@@ -2406,7 +2406,7 @@ class CombineProjectionPublisherTests: CombinePublisherTestCase {
                 if case .change(let p, let properties) = change {
                     XCTAssertNotEqual(self.projection, p)
                     XCTAssertEqual(properties.count, 1)
-                    XCTAssertEqual(properties[0].name, "intCol")
+                    XCTAssertEqual(properties[0].name, "int")
                     if let prev = prev {
                         XCTAssertEqual(properties[0].oldValue as? Int, prev.int)
                     }
