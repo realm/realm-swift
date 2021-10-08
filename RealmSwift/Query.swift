@@ -15,6 +15,7 @@
 // limitations under the License.
 //
 ////////////////////////////////////////////////////////////////////////////
+
 import Foundation
 import Realm
 
@@ -22,7 +23,7 @@ import Realm
 public enum StringOptions {
     /// A case-insensitive search.
     case caseInsensitive
-    /// Search ignores diacritic marks.
+    /// Query ignores diacritic marks.
     case diacriticInsensitive
 }
 
@@ -96,276 +97,192 @@ public enum StringOptions {
  */
 @dynamicMemberLookup
 public struct Query<T: _RealmSchemaDiscoverable> {
-
-    private var context: QueryContext
-
-    /// Initializes a `Query` object.
-    public init() {
-        self.context = QueryContext()
-    }
-
-    /// Initializes a `Query` object.
-    /// - Parameter isPrimitive: true if `T` is primitive and requires a key path of `SELF`.
+    /// This initaliser should be used from callers who require queries on primitive collections.
+    /// - Parameter isPrimitive: True if performing a query on a primitive collection.
     internal init(isPrimitive: Bool = false) {
         if isPrimitive {
-            self.context = QueryContext(node: ComparisonNode(left: .init(forKeyPath: "SELF")))
+            node = .keyPath(["self"], options: [.isCollection])
         } else {
-            self.context = QueryContext()
+            node = .keyPath([], options: [])
         }
     }
 
-    private init(context: QueryContext) {
-        self.context = context
+    private let node: QueryNode
+
+    /**
+     The `Query` struct works by compunding `QueryNode`s together in a tree structure.
+     Each part of a query expression will be represented by one of the below static methods.
+     For example in the simple expression `stringCol == 'Foo'`:
+
+     The first static method that will be called from inside the query
+     closure is `subscript<V>(dynamicMember member: KeyPath<T, V>)`
+     this will extract the `stringCol` keypath. The last static method to be called in this expression is
+     `func == <V>(_ lhs: Query<V>, _ rhs: V)` where the lhs is a `Query` which holds the `QueryNode`
+     keyPath for `stringCol`. The rhs will be expressed as a constant in `QueryNode` and a tree will be built
+     to represent an equals comparison.
+
+     To build the tree we will do:
+     ```
+     Query(.comparison(operator: .equal, lhs.node, .constant(rhs), options: []))
+     ```
+     This sets the comparison node as the root node for the expression and the new `Query` struct will be returned.
+
+     When it comes time to build the predicate string with its arguments call `_constructPredicate()`. This will
+     recursively traverse the tree and build the NSPredicate compatible string.
+     */
+    private init(_ node: QueryNode) {
+        self.node = node
     }
 
-    /// Appends a key path string to the lhs of the current node and returns the new NSExpression.
-    /// - Parameter keyPath: The key path to append.
-    /// - Returns: A key path NSExpression.
-    private func appendKeyPath(_ keyPath: String) -> NSExpression {
-        if let node = context.node as? ComparisonNode, let left = node.left, left.expressionType == .keyPath {
-            return NSExpression(forKeyPath: "\(left.keyPath).\(keyPath)")
+    private func appendKeyPath(_ keyPath: String, options: KeyPathOptions) -> QueryNode {
+        if case let .keyPath(kp, ops) = node {
+            return .keyPath(kp + [keyPath], options: ops.union(options))
+        } else if case let .mapSubscript(lhs, mapKeyPath, requiresNot) = node, case let .keyPath(kp, ops) = mapKeyPath {
+            return .mapSubscript(lhs, collectionKeyPath: .keyPath(kp + [keyPath], options: ops.subtracting(.requiresAny)),
+                                 requiresNot: requiresNot)
         }
-        return NSExpression(forKeyPath: keyPath)
+        throwRealmException("Cannot apply a keypath to \(buildPredicate(node))")
     }
 
-    /// Creates an aggregate key path for a collection from the lhs of the current node.
-    /// - Parameter aggregate: The aggregate to apply to the key path.
-    /// - Returns: A key path NSExpression.
-    private func buildCollectionAggregateKeyPath(_ aggregate: String) -> NSExpression {
-        guard let node = context.node as? ComparisonNode, let left = node.left, left.expressionType == .keyPath else {
-            throwRealmException("Could not construct predicate. Lhs must be a key path.")
-        }
-        var parts = left.keyPath.components(separatedBy: ".")
-        parts.insert(aggregate, at: parts.index(after: 0))
-        return NSExpression(forKeyPath: parts.joined(separator: "."))
-    }
-
-
-    /// Creates a compound predicate node from the given lhs and rhs nodes.
-    /// - Returns: A Query with the new CompoundNode as the root node.
-    private func applyCompound<V>(lhs: QueryNode,
-                                  rhs: QueryNode,
-                                  op: NSCompoundPredicate.LogicalType,
-                                  subqueryCount: Int? = nil) -> Query<V> {
-        var node = CompoundNode()
-        node.left = lhs
-        node.right = rhs
-        node.compoundOperator = op
-        var copy = context
-        copy.node = node
-        if let subqueryCount = subqueryCount {
-            copy.subqueryCount = subqueryCount
-        }
-        return Query<V>(context: copy)
-    }
-
-
-    /// Apply a lhs expression to a node. If we are applying a lhs to a `Map` subscript expression
-    /// then the `lhs` will be applied to the right side node of the `CompoundNode`.
-    /// - Returns: A Query with the modified expression tree.
-    private func apply<V>(lhs: NSExpression) -> Query<V> {
-        if var compoundNode = context.node as? CompoundNode,
-           compoundNode.isMapSubscriptQuery,
-           var rightNode = compoundNode.right as? ComparisonNode,
-           rightNode.left?.expressionType == .keyPath,
-           let left = rightNode.left {
-            /// We will only enter this condition if the expression is a `Map`
-            /// subscript query. e.g. `myMap["foo"].stringCol == "blah"`.
-            rightNode.left = .init(forKeyPath: "\(left.keyPath).\(lhs.keyPath)")
-            compoundNode.right = rightNode
-            var copy = context
-            copy.node = compoundNode
-            return Query<V>(context: copy)
-        } else {
-            /// Create a new comparison node with the lhs expression and set the node as the root.
-            var node = ComparisonNode()
-            node.left = lhs
-            var copy = context
-            copy.node = node
-            return Query<V>(context: copy)
-        }
-    }
-
-
-    /// Apply a rhs expession and comparison operator to a node.
-    /// This method handles three types of scenarios:
-    /// 1 - Current node is a subquery node and we must apply the rhs to the right most node in the tree.
-    /// 2 - Current node is a compound node and we must apply the rhs to the right most node in the tree.
-    ///   Currently it is only possible to reach this scenario when doing a `Map`
-    ///   subscript query. e.g `myMap["foo"] == "bar"`.
-    /// 3 - If none of the above two conditions are met then our tree is only 1 level deep and we apply
-    ///   the rhs to the right of a comparison node.
-    private func apply<V>(comparison: NSComparisonPredicate.Operator,
-                          rhs: NSExpression,
-                          stringOptions: Set<StringOptions>? = nil,
-                          isCollectionContains: Bool = false,
-                          modifier: NSComparisonPredicate.Modifier? = nil) -> Query<V> {
-        if var subqueryNode = context.node as? SubqueryNode {
-            guard var rightNode = subqueryNode.right as? ComparisonNode else {
-                throwRealmException("Could not construct SUBQUERY. Right node is missing.")
+    private func buildCollectionAggregateKeyPath(_ aggregate: String) -> QueryNode {
+        if case let .keyPath(kp, options) = node {
+            var keyPaths = kp
+            if keyPaths.count > 1 {
+                keyPaths.insert(aggregate, at: 1)
+            } else {
+                keyPaths.append(aggregate)
             }
-            rightNode.comparisonOperator = comparison
-            rightNode.right = rhs
-            rightNode.stringOptions = stringOptions
-            subqueryNode.right = rightNode
-            var contextCopy = context
-            contextCopy.node = subqueryNode
-            return Query<V>(context: contextCopy)
-        } else if var compoundNode = context.node as? CompoundNode,
-                  var rightNode = compoundNode.right as? ComparisonNode {
-            /// We should only enter this path when doing a query
-            /// on a `Map` with a key subscript and checking if that
-            /// `Map` contains a value.
-            rightNode.comparisonOperator = comparison
-            rightNode.right = rhs
-            rightNode.stringOptions = stringOptions
-            compoundNode.right = rightNode
-            var contextCopy = context
-            contextCopy.node = compoundNode
-            return Query<V>(context: contextCopy)
-        } else if var comparisonNode = context.node as? ComparisonNode {
-            comparisonNode.comparisonOperator = comparison
-            comparisonNode.right = rhs
-            comparisonNode.stringOptions = stringOptions
-            comparisonNode.isCollectionContains = isCollectionContains
-            comparisonNode.modifier = modifier
-            var contextCopy = context
-            contextCopy.node = comparisonNode
-            return Query<V>(context: contextCopy)
-        } else {
-            throwRealmException("Could not construct query. Invalid node type.")
+            return .keyPath(keyPaths, options: [options.subtracting(.requiresAny)])
         }
+        throwRealmException("Cannot apply a keypath to \(buildPredicate(node))")
     }
 
-
-    /// Creates a subquery node and sets it as the root in the tree.
-    /// - Returns: A Query with the subquery node as the root of the tree.
-    private func applySubquery<V>() -> Query<V> {
-        var count = context.subqueryCount
-        var node = SubqueryNode(count)
-        node.left = context.node
-        node.right = ComparisonNode(left: .init(forKeyPath: ".@count"))
-        count += 1
-        return Query<V>(context: QueryContext(node: node,
-                                              subqueryCount: count))
+    private func keyPathErasingAnyPrefix(appending keyPath: String? = nil) -> QueryNode {
+        if case let .keyPath(kp, o) = node {
+            if let keyPath = keyPath {
+                return .keyPath(kp + [keyPath], options: [o.subtracting(.requiresAny)])
+            }
+            return .keyPath(kp, options: [o.subtracting(.requiresAny)])
+        }
+        throwRealmException("Cannot apply a keypath to \(buildPredicate(node))")
     }
 
     // MARK: Prefix
 
     /// :nodoc:
     public static prefix func ! (_ query: Query) -> Query {
-        var contextCopy = query.context
-        contextCopy.node.requiresNotPrefix = true
-        return Query(context: contextCopy)
+        // With a `Map` subscript expression we want to put the NOT
+        // on the rhs of the expression. e.g. "mapCol.@allValues == 'Foo' AND NOT mapCol == 'Bar'"
+        if case let .comparison(op, lhs, rhs, options: options) = query.node,
+           case let .mapSubscript(mapLhs, mapName, _) = lhs {
+            return Query(.comparison(operator: op, .mapSubscript(mapLhs, collectionKeyPath: mapName, requiresNot: true),
+                                      rhs,
+                                      options: options))
+        } else {
+            return Query(.not(query.node))
+        }
     }
 
     // MARK: Comparable
 
     /// :nodoc:
     public static func == <V>(_ lhs: Query<V>, _ rhs: V) -> Query where V: _RealmSchemaDiscoverable {
-        return lhs.apply(comparison: .equalTo, rhs: .init(forConstantValue: rhs))
+        Query(.comparison(operator: .equal, lhs.node, .constant(rhs), options: []))
+    }
+    /// :nodoc:
+    public static func == <V>(_ lhs: Query<V>, _ rhs: Query<V>) -> Query where V: _RealmSchemaDiscoverable {
+        Query(.comparison(operator: .equal, lhs.node, rhs.node, options: []))
     }
     /// :nodoc:
     public static func != <V>(_ lhs: Query<V>, _ rhs: V) -> Query where V: _RealmSchemaDiscoverable {
-        return lhs.apply(comparison: .notEqualTo, rhs: .init(forConstantValue: rhs))
+        Query(.comparison(operator: .notEqual, lhs.node, .constant(rhs), options: []))
+    }
+    /// :nodoc:
+    public static func != <V>(_ lhs: Query<V>, _ rhs: Query<V>) -> Query where V: _RealmSchemaDiscoverable {
+        Query(.comparison(operator: .notEqual, lhs.node, rhs.node, options: []))
     }
 
     // MARK: Numerics
 
     /// :nodoc:
     public static func > <V>(_ lhs: Query<V>, _ rhs: V) -> Query where V: _QueryNumeric {
-        return lhs.apply(comparison: .greaterThan, rhs: .init(forConstantValue: rhs))
+        Query(.comparison(operator: .greaterThan, lhs.node, .constant(rhs), options: []))
+    }
+    /// :nodoc:
+    public static func > <V>(_ lhs: Query<V>, _ rhs: Query<V>) -> Query where V: _QueryNumeric {
+        Query(.comparison(operator: .greaterThan, lhs.node, rhs.node, options: []))
     }
     /// :nodoc:
     public static func >= <V>(_ lhs: Query<V>, _ rhs: V) -> Query where V: _QueryNumeric {
-        return lhs.apply(comparison: .greaterThanOrEqualTo, rhs: .init(forConstantValue: rhs))
+        Query(.comparison(operator: .greaterThanEqual, lhs.node, .constant(rhs), options: []))
+    }
+    /// :nodoc:
+    public static func >= <V>(_ lhs: Query<V>, _ rhs: Query<V>) -> Query where V: _QueryNumeric {
+        Query(.comparison(operator: .greaterThanEqual, lhs.node, rhs.node, options: []))
     }
     /// :nodoc:
     public static func < <V>(_ lhs: Query<V>, _ rhs: V) -> Query where V: _QueryNumeric {
-        return lhs.apply(comparison: .lessThan, rhs: .init(forConstantValue: rhs))
-
+        Query(.comparison(operator: .lessThan, lhs.node, .constant(rhs), options: []))
+    }
+    /// :nodoc:
+    public static func < <V>(_ lhs: Query<V>, _ rhs: Query<V>) -> Query where V: _QueryNumeric {
+        Query(.comparison(operator: .lessThan, lhs.node, rhs.node, options: []))
     }
     /// :nodoc:
     public static func <= <V>(_ lhs: Query<V>, _ rhs: V) -> Query where V: _QueryNumeric {
-        return lhs.apply(comparison: .lessThanOrEqualTo, rhs: .init(forConstantValue: rhs))
+        Query(.comparison(operator: .lessThanEqual, lhs.node, .constant(rhs), options: []))
+    }
+    /// :nodoc:
+    public static func <= <V>(_ lhs: Query<V>, _ rhs: Query<V>) -> Query where V: _QueryNumeric {
+        Query(.comparison(operator: .lessThanEqual, lhs.node, rhs.node, options: []))
     }
 
     // MARK: Compound
 
     /// :nodoc:
     public static func && (_ lhs: Query, _ rhs: Query) -> Query {
-        return lhs.applyCompound(lhs: lhs.context.node,
-                                 rhs: rhs.context.node,
-                                 op: .and,
-                                 subqueryCount: rhs.context.subqueryCount)
+        Query(.comparison(operator: .and, lhs.node, rhs.node, options: []))
     }
     /// :nodoc:
     public static func || (_ lhs: Query, _ rhs: Query) -> Query {
-        return lhs.applyCompound(lhs: lhs.context.node,
-                                 rhs: rhs.context.node,
-                                 op: .or,
-                                 subqueryCount: rhs.context.subqueryCount)
+        Query(.comparison(operator: .or, lhs.node, rhs.node, options: []))
     }
 
     // MARK: Subscript
 
     /// :nodoc:
     public subscript<V>(dynamicMember member: KeyPath<T, V>) -> Query<V> where T: ObjectBase {
-        let name = _name(for: member)
-        return apply(lhs: appendKeyPath(name))
+        Query<V>(appendKeyPath(_name(for: member), options: []))
+    }
+    /// :nodoc:
+    public subscript<V: RealmKeyedCollection>(dynamicMember member: KeyPath<T, V>) -> Query<V> where T: ObjectBase {
+        Query<V>(appendKeyPath(_name(for: member), options: [.isCollection, .requiresAny]))
     }
     /// :nodoc:
     public subscript<V: RealmCollectionBase>(dynamicMember member: KeyPath<T, V>) -> Query<V> where T: ObjectBase {
-        let name = _name(for: member)
-        return apply(lhs: appendKeyPath(name))
+        Query<V>(appendKeyPath(_name(for: member), options: [.isCollection, .requiresAny]))
     }
 
     // MARK: Query Construction
 
+    /// For testing purposes only. Do not use directly.
+    public static func _constructForTesting<V>() -> Query<V> {
+        return Query<V>()
+    }
+
+    /// Constructs an NSPredicate compatibe string with its accompanying arguments.
+    /// - Note: This is for internal use only and is exposed for testing purposes.
+    public func _constructPredicate() -> (String, [Any]) {
+        return buildPredicate(node)
+    }
+
     /// Creates an NSPredicate compatibe string.
     /// - Returns: A tuple containing the predicate string and an array of arguments.
-
-    public func _constructPredicate() -> _PredicateData {
-        return context.node.makePredicate(nil)
-    }
 
     /// Creates an NSPredicate from the query expression.
     internal var predicate: NSPredicate {
         let predicate = _constructPredicate()
-        return NSPredicate(format: predicate.string, argumentArray: predicate.args)
-    }
-
-    /// Creates an expression tree that emulates a `BETWEEN` for a collection.
-    /// e.g. `(arrayInt.@min >= lowerBound && arrayInt.@max <= upperBound)`
-    /// - Returns: A `Query` where the `aggregateContains` expression becomes the root node.
-    private func aggregateContains<U: _QueryNumeric, V>(_ lowerBound: U,
-                                                        _ upperBound: U,
-                                                        isClosedRange: Bool=false) -> Query<V> {
-        guard let node = context.node as? ComparisonNode, node.left?.expressionType == .keyPath else {
-            throwRealmException("Could not construct aggregate query, key path is missing.")
-        }
-
-        let leftNode = ComparisonNode(left: appendKeyPath("@min"),
-                                      right: .init(forConstantValue: lowerBound),
-                                      requiresNotPrefix: false,
-                                      comparisonOperator: .greaterThanOrEqualTo)
-        let rightNode = ComparisonNode(left: appendKeyPath("@max"),
-                                       right: .init(forConstantValue: upperBound),
-                                       requiresNotPrefix: false,
-                                       comparisonOperator: isClosedRange ? .lessThanOrEqualTo : .lessThan)
-        let compoundNode = CompoundNode(left: leftNode,
-                                        right: rightNode,
-                                        requiresNotPrefix: node.requiresNotPrefix,
-                                        compoundOperator: .and)
-
-        var contextCopy = context
-        contextCopy.node = compoundNode
-        return Query<V>(context: contextCopy)
-    }
-
-
-    private func doContainsAny<U: Sequence, V>(in collection: U) -> Query<V> {
-        return apply(comparison: .in, rhs: .init(forConstantValue: collection.map(dynamicBridgeCast)), modifier: .any)
+        return NSPredicate(format: predicate.0, argumentArray: predicate.1)
     }
 }
 
@@ -374,8 +291,7 @@ public struct Query<T: _RealmSchemaDiscoverable> {
 extension Query where T: OptionalProtocol {
     /// :nodoc:
     public subscript<V>(dynamicMember member: KeyPath<T.Wrapped, V>) -> Query<V> where T.Wrapped: ObjectBase {
-        let name = _name(for: member)
-        return apply(lhs: appendKeyPath(name))
+        Query<V>(appendKeyPath(_name(for: member), options: []))
     }
 }
 
@@ -384,199 +300,210 @@ extension Query where T: OptionalProtocol {
 extension Query where T: RealmCollection {
     /// :nodoc:
     public subscript<V>(dynamicMember member: KeyPath<T.Element, V>) -> Query<V> where T.Element: ObjectBase {
-        let name = _name(for: member)
-        return apply(lhs: appendKeyPath(name))
+        Query<V>(appendKeyPath(_name(for: member), options: []))
     }
 
     /// Query the count of the objects in the collection.
     public var count: Query<Int> {
-        return apply(lhs: appendKeyPath("@count"))
+        Query<Int>(keyPathErasingAnyPrefix(appending: "@count"))
     }
 }
 
 extension Query where T: RealmCollection {
     /// Checks if an element exists in this collection.
     public func contains<V>(_ value: T.Element) -> Query<V> {
-        return apply(comparison: .in,
-                     rhs: .init(forConstantValue: value),
-                     stringOptions: nil,
-                     isCollectionContains: true)
+        Query<V>(.comparison(operator: .in, .constant(value), keyPathErasingAnyPrefix(), options: []))
     }
 
     /// Checks if any elements contained in the given array are present in the collection.
     public func containsAny<U: Sequence, V>(in collection: U) -> Query<V> where U.Element == T.Element {
-        return doContainsAny(in: collection)
+        Query<V>(.comparison(operator: .in, node, .constant(collection), options: []))
     }
 }
 
 extension Query where T: RealmCollection, T.Element: _QueryNumeric {
     /// Checks for all elements in this collection that are within a given range.
     public func contains<V>(_ range: Range<T.Element>) -> Query<V> {
-        return aggregateContains(range.lowerBound, range.upperBound)
+        Query<V>(.comparison(operator: .and,
+                             .comparison(operator: .greaterThanEqual, keyPathErasingAnyPrefix(appending: "@min"), .constant(range.lowerBound), options: []),
+                             .comparison(operator: .lessThan, keyPathErasingAnyPrefix(appending: "@max"), .constant(range.upperBound), options: []), options: []))
     }
 
     /// Checks for all elements in this collection that are within a given range.
     public func contains<V>(_ range: ClosedRange<T.Element>) -> Query<V> {
-        return aggregateContains(range.lowerBound, range.upperBound, isClosedRange: true)
+        Query<V>(.comparison(operator: .and,
+                             .comparison(operator: .greaterThanEqual, keyPathErasingAnyPrefix(appending: "@min"), .constant(range.lowerBound), options: []),
+                             .comparison(operator: .lessThanEqual, keyPathErasingAnyPrefix(appending: "@max"), .constant(range.upperBound), options: []), options: []))
     }
 }
 
 extension Query where T: RealmCollection, T.Element: OptionalProtocol, T.Element.Wrapped: _QueryNumeric {
     /// Checks for all elements in this collection that are within a given range.
     public func contains<V>(_ range: Range<T.Element.Wrapped>) -> Query<V> {
-        return aggregateContains(range.lowerBound, range.upperBound)
+        Query<V>(.comparison(operator: .and,
+                             .comparison(operator: .greaterThanEqual, keyPathErasingAnyPrefix(appending: "@min"), .constant(range.lowerBound), options: []),
+                             .comparison(operator: .lessThan, keyPathErasingAnyPrefix(appending: "@max"), .constant(range.upperBound), options: []), options: []))
     }
 
     /// Checks for all elements in this collection that are within a given range.
     public func contains<V>(_ range: ClosedRange<T.Element.Wrapped>) -> Query<V> {
-        return aggregateContains(range.lowerBound, range.upperBound, isClosedRange: true)
+        Query<V>(.comparison(operator: .and,
+                             .comparison(operator: .greaterThanEqual, keyPathErasingAnyPrefix(appending: "@min"), .constant(range.lowerBound), options: []),
+                             .comparison(operator: .lessThanEqual, keyPathErasingAnyPrefix(appending: "@max"), .constant(range.upperBound), options: []), options: []))
     }
 }
 
-extension Query where T: RealmCollection, T.Element: _QueryNumeric {
+extension Query where T: RealmCollection {
     /// :nodoc:
     public static func == <V>(_ lhs: Query<T>, _ rhs: T.Element) -> Query<V> {
-        return lhs.apply(comparison: .equalTo, rhs: .init(forConstantValue: rhs))
+        Query<V>(.comparison(operator: .equal, lhs.node, .constant(rhs), options: []))
     }
 
     /// :nodoc:
     public static func != <V>(_ lhs: Query<T>, _ rhs: T.Element) -> Query<V> {
-        return lhs.apply(comparison: .notEqualTo, rhs: .init(forConstantValue: rhs))
+        Query<V>(.comparison(operator: .notEqual, lhs.node, .constant(rhs), options: []))
     }
+}
+
+extension Query where T: RealmCollection, T.Element: _QueryNumeric {
 
     /// :nodoc:
     public static func > <V>(_ lhs: Query<T>, _ rhs: T.Element) -> Query<V> {
-        return lhs.apply(comparison: .greaterThan, rhs: .init(forConstantValue: rhs))
+        Query<V>(.comparison(operator: .greaterThan, lhs.node, .constant(rhs), options: []))
     }
 
     /// :nodoc:
     public static func >= <V>(_ lhs: Query<T>, _ rhs: T.Element) -> Query<V> {
-        return lhs.apply(comparison: .greaterThanOrEqualTo, rhs: .init(forConstantValue: rhs))
+        Query<V>(.comparison(operator: .greaterThanEqual, lhs.node, .constant(rhs), options: []))
     }
 
     /// :nodoc:
     public static func < <V>(_ lhs: Query<T>, _ rhs: T.Element) -> Query<V> {
-        return lhs.apply(comparison: .lessThan, rhs: .init(forConstantValue: rhs))
+        Query<V>(.comparison(operator: .lessThan, lhs.node, .constant(rhs), options: []))
     }
 
     /// :nodoc:
     public static func <= <V>(_ lhs: Query<T>, _ rhs: T.Element) -> Query<V> {
-        return lhs.apply(comparison: .lessThanOrEqualTo, rhs: .init(forConstantValue: rhs))
+        Query<V>(.comparison(operator: .lessThanEqual, lhs.node, .constant(rhs), options: []))
     }
 }
 
 extension Query where T: RealmCollection,
                       T.Element: _QueryNumeric {
     /// Returns the minimum value in the collection.
-    public var min: Query {
-        return apply(lhs: appendKeyPath("@min"))
+    public var min: Query<T.Element> {
+        Query<T.Element>(keyPathErasingAnyPrefix(appending: "@min"))
     }
 
     /// Returns the maximum value in the collection.
-    public var max: Query {
-        return apply(lhs: appendKeyPath("@max"))
+    public var max: Query<T.Element> {
+        Query<T.Element>(keyPathErasingAnyPrefix(appending: "@max"))
     }
 
     /// Returns the average in the collection.
-    public var avg: Query {
-        return apply(lhs: appendKeyPath("@avg"))
+    public var avg: Query<T.Element> {
+        Query<T.Element>(keyPathErasingAnyPrefix(appending: "@avg"))
     }
 
     /// Returns the sum of all the values in the collection.
-    public var sum: Query {
-        return apply(lhs: appendKeyPath("@sum"))
+    public var sum: Query<T.Element> {
+        Query<T.Element>(keyPathErasingAnyPrefix(appending: "@sum"))
     }
 }
 
 // MARK: RealmKeyedCollection
 
 extension Query where T: RealmKeyedCollection {
-    private func memberSubscript<U>(_ member: T.Key) -> Query<U> where T.Key: _RealmSchemaDiscoverable {
-        guard let node = context.node as? ComparisonNode, node.left?.expressionType == .keyPath else {
-            throwRealmException("Could not contruct predicate for Map. Key path is missing.")
+    private func extractCollectionName() -> QueryNode {
+        if case let .keyPath(kp, ops) = node {
+            if !kp.isEmpty {
+                return .keyPath([kp[0]], options: ops.subtracting(.requiresAny))
+            }
         }
+        throwRealmException("Cannot apply a keypath to \(buildPredicate(node))")
+    }
 
-        let left = ComparisonNode(left: appendKeyPath("@allKeys"),
-                                  right: .init(forConstantValue: member),
-                                  comparisonOperator: .equalTo)
-        let right = ComparisonNode(left: node.left,
-                                   requiresNotPrefix: node.requiresNotPrefix)
-
-        let compound = CompoundNode(left: left,
-                                    right: right,
-                                    compoundOperator: .and,
-                                    isMapSubscriptQuery: true)
-        var contextCopy = context
-        contextCopy.node = compound
-        return Query<U>(context: contextCopy)
+    /// Creates an expression that allows an equals comparison on a maps keys on the lhs, and on the rhs
+    /// the ability to compare values in the map. e.g. `((mapString.@allKeys == %@) && NOT mapString CONTAINS %@)`
+    private func mapSubscript<U>(_ member: T.Key) -> Query<U> where T.Key: _RealmSchemaDiscoverable {
+        Query<U>(.mapSubscript(.comparison(operator: .equal, keyPathErasingAnyPrefix(appending: "@allKeys"),
+                                           .constant(member), options: []),
+                               collectionKeyPath: extractCollectionName(),
+                               requiresNot: false))
     }
 
     /// Checks if any elements contained in the given array are present in the map's values.
     public func containsAny<U: Sequence, V>(in collection: U) -> Query<V> where U.Element == T.Value {
-        return doContainsAny(in: collection)
+        Query<V>(.comparison(operator: .in, node, .constant(collection), options: []))
     }
 }
 
 extension Query where T: RealmKeyedCollection, T.Key: _RealmSchemaDiscoverable {
     /// Checks if an element exists in this collection.
     public func contains<V>(_ value: T.Value) -> Query<V> {
-        return apply(comparison: .in,
-                     rhs: .init(forConstantValue: value),
-                     isCollectionContains: true)
+        Query<V>(.comparison(operator: .in, .constant(value), keyPathErasingAnyPrefix(), options: []))
     }
     /// Allows a query over all values in the Map.
     public var values: Query<T.Value> {
-        return apply(lhs: appendKeyPath("@allValues"))
+        Query<T.Value>(keyPathErasingAnyPrefix(appending: "@allValues"))
     }
     /// :nodoc:
     public subscript(member: T.Key) -> Query<T.Value> {
-        return memberSubscript(member)
+        return mapSubscript(member)
     }
 }
 
 extension Query where T: RealmKeyedCollection, T.Key: _RealmSchemaDiscoverable, T.Value: OptionalProtocol, T.Value.Wrapped: _RealmSchemaDiscoverable {
     /// Allows a query over all values in the Map.
     public var values: Query<T.Value.Wrapped> {
-        return apply(lhs: appendKeyPath("@allValues"))
+        Query<T.Value.Wrapped>(keyPathErasingAnyPrefix(appending: "@allValues"))
     }
     /// :nodoc:
     public subscript(member: T.Key) -> Query<T.Value.Wrapped> {
-        return memberSubscript(member)
+        return mapSubscript(member)
     }
     /// :nodoc:
     public subscript(member: T.Key) -> Query<T.Value> where T.Value.Wrapped: ObjectBase {
-        return memberSubscript(member)
+        return mapSubscript(member)
     }
 }
 
 extension Query where T: RealmKeyedCollection, T.Key == String {
     /// Allows a query over all keys in the `Map`.
     public var keys: Query<String> {
-        return apply(lhs: appendKeyPath("@allKeys"))
+        Query<String>(keyPathErasingAnyPrefix(appending: "@allKeys"))
     }
 }
 
 extension Query where T: RealmKeyedCollection, T.Value: _QueryNumeric {
     /// Checks for all elements in this collection that are within a given range.
     public func contains<V>(_ range: Range<T.Value>) -> Query<V> {
-        return aggregateContains(range.lowerBound, range.upperBound)
+        Query<V>(.comparison(operator: .and,
+                             .comparison(operator: .greaterThanEqual, keyPathErasingAnyPrefix(appending: "@min"), .constant(range.lowerBound), options: []),
+                             .comparison(operator: .lessThan, keyPathErasingAnyPrefix(appending: "@max"), .constant(range.upperBound), options: []), options: []))
     }
 
     /// Checks for all elements in this collection that are within a given range.
     public func contains<V>(_ range: ClosedRange<T.Value>) -> Query<V> {
-        return aggregateContains(range.lowerBound, range.upperBound, isClosedRange: true)
+        Query<V>(.comparison(operator: .and,
+                             .comparison(operator: .greaterThanEqual, keyPathErasingAnyPrefix(appending: "@min"), .constant(range.lowerBound), options: []),
+                             .comparison(operator: .lessThanEqual, keyPathErasingAnyPrefix(appending: "@max"), .constant(range.upperBound), options: []), options: []))
     }
 }
 
 extension Query where T: RealmKeyedCollection, T.Value: OptionalProtocol, T.Value.Wrapped: _QueryNumeric {
     /// Checks for all elements in this collection that are within a given range.
     public func contains<V>(_ range: Range<T.Value.Wrapped>) -> Query<V> {
-        return aggregateContains(range.lowerBound, range.upperBound)
+        Query<V>(.comparison(operator: .and,
+                             .comparison(operator: .greaterThanEqual, keyPathErasingAnyPrefix(appending: "@min"), .constant(range.lowerBound), options: []),
+                             .comparison(operator: .lessThan, keyPathErasingAnyPrefix(appending: "@max"), .constant(range.upperBound), options: []), options: []))
     }
 
     /// Checks for all elements in this collection that are within a given range.
     public func contains<V>(_ range: ClosedRange<T.Value.Wrapped>) -> Query<V> {
-        return aggregateContains(range.lowerBound, range.upperBound, isClosedRange: true)
+        Query<V>(.comparison(operator: .and,
+                             .comparison(operator: .greaterThanEqual, keyPathErasingAnyPrefix(appending: "@min"), .constant(range.lowerBound), options: []),
+                             .comparison(operator: .lessThanEqual, keyPathErasingAnyPrefix(appending: "@max"), .constant(range.upperBound), options: []), options: []))
     }
 }
 
@@ -585,27 +512,27 @@ extension Query where T: RealmKeyedCollection,
                       T.Value: _QueryNumeric {
     /// Returns the minimum value in the keyed collection.
     public var min: Query<T.Value> {
-        return apply(lhs: appendKeyPath("@min"))
+        Query<T.Value>(keyPathErasingAnyPrefix(appending: "@min"))
     }
 
     /// Returns the maximum value in the keyed collection.
     public var max: Query<T.Value> {
-        return apply(lhs: appendKeyPath("@max"))
+        Query<T.Value>(keyPathErasingAnyPrefix(appending: "@max"))
     }
 
     /// Returns the average in the keyed collection.
     public var avg: Query<T.Value> {
-        return apply(lhs: appendKeyPath("@avg"))
+        Query<T.Value>(keyPathErasingAnyPrefix(appending: "@avg"))
     }
 
     /// Returns the sum of all the values in the keyed collection.
     public var sum: Query<T.Value> {
-        return apply(lhs: appendKeyPath("@sum"))
+        Query<T.Value>(keyPathErasingAnyPrefix(appending: "@sum"))
     }
 
     /// Returns the count of all the values in the keyed collection.
     public var count: Query<T.Value> {
-        return apply(lhs: appendKeyPath("@count"))
+        Query<T.Value>(keyPathErasingAnyPrefix(appending: "@count"))
     }
 }
 
@@ -614,27 +541,46 @@ extension Query where T: RealmKeyedCollection,
 extension Query where T: PersistableEnum, T.RawValue: _RealmSchemaDiscoverable {
     /// :nodoc:
     public static func == <V>(_ lhs: Query<T>, _ rhs: T) -> Query<V> {
-        lhs.apply(comparison: .equalTo, rhs: .init(forConstantValue: rhs.rawValue))
+        Query<V>(.comparison(operator: .equal, lhs.node, .constant(rhs.rawValue), options: []))
     }
     /// :nodoc:
     public static func != <V>(_ lhs: Query<T>, _ rhs: T) -> Query<V> {
-        lhs.apply(comparison: .notEqualTo, rhs: .init(forConstantValue: rhs.rawValue))
+        Query<V>(.comparison(operator: .notEqual, lhs.node, .constant(rhs.rawValue), options: []))
+    }
+}
+
+extension Query where T: PersistableEnum, T.RawValue: _QueryNumeric {
+    /// :nodoc:
+    public static func > <V>(_ lhs: Query<T>, _ rhs: T) -> Query<V> {
+        Query<V>(.comparison(operator: .greaterThan, lhs.node, .constant(rhs.rawValue), options: []))
     }
     /// :nodoc:
-    public static func > <V>(_ lhs: Query<T>, _ rhs: T) -> Query<V> where T.RawValue: _QueryNumeric {
-        lhs.apply(comparison: .greaterThan, rhs: .init(forConstantValue: rhs.rawValue))
+    public static func > <V>(_ lhs: Query<T>, _ rhs: Query<T>) -> Query<V> {
+        Query<V>(.comparison(operator: .greaterThan, lhs.node, rhs.node, options: []))
     }
     /// :nodoc:
-    public static func >= <V>(_ lhs: Query<T>, _ rhs: T) -> Query<V> where T.RawValue: _QueryNumeric {
-        lhs.apply(comparison: .greaterThanOrEqualTo, rhs: .init(forConstantValue: rhs.rawValue))
+    public static func >= <V>(_ lhs: Query<T>, _ rhs: T) -> Query<V> {
+        Query<V>(.comparison(operator: .greaterThanEqual, lhs.node, .constant(rhs.rawValue), options: []))
     }
     /// :nodoc:
-    public static func < <V>(_ lhs: Query<T>, _ rhs: T) -> Query<V> where T.RawValue: _QueryNumeric {
-        lhs.apply(comparison: .lessThan, rhs: .init(forConstantValue: rhs.rawValue))
+    public static func >= <V>(_ lhs: Query<T>, _ rhs: Query<T>) -> Query<V> {
+        Query<V>(.comparison(operator: .greaterThanEqual, lhs.node, rhs.node, options: []))
     }
     /// :nodoc:
-    public static func <= <V>(_ lhs: Query<T>, _ rhs: T) -> Query<V> where T.RawValue: _QueryNumeric {
-        lhs.apply(comparison: .lessThanOrEqualTo, rhs: .init(forConstantValue: rhs.rawValue))
+    public static func < <V>(_ lhs: Query<T>, _ rhs: T) -> Query<V> {
+        Query<V>(.comparison(operator: .lessThan, lhs.node, .constant(rhs.rawValue), options: []))
+    }
+    /// :nodoc:
+    public static func < <V>(_ lhs: Query<T>, _ rhs: Query<T>) -> Query<V> {
+        Query<V>(.comparison(operator: .lessThan, lhs.node, rhs.node, options: []))
+    }
+    /// :nodoc:
+    public static func <= <V>(_ lhs: Query<T>, _ rhs: T) -> Query<V> {
+        Query<V>(.comparison(operator: .lessThanEqual, lhs.node, .constant(rhs.rawValue), options: []))
+    }
+    /// :nodoc:
+    public static func <= <V>(_ lhs: Query<T>, _ rhs: Query<T>) -> Query<V> {
+        Query<V>(.comparison(operator: .lessThanEqual, lhs.node, rhs.node, options: []))
     }
 }
 
@@ -642,27 +588,27 @@ extension Query where T: PersistableEnum,
                       T.RawValue: _QueryNumeric {
     /// Returns the minimum value in the collection based on the keypath.
     public var min: Query {
-        return apply(lhs: buildCollectionAggregateKeyPath("@min"))
+        Query(buildCollectionAggregateKeyPath("@min"))
     }
 
     /// Returns the maximum value in the collection based on the keypath.
     public var max: Query {
-        return apply(lhs: buildCollectionAggregateKeyPath("@max"))
+        Query(buildCollectionAggregateKeyPath("@max"))
     }
 
     /// Returns the average in the collection based on the keypath.
     public var avg: Query {
-        return apply(lhs: buildCollectionAggregateKeyPath("@avg"))
+        Query(buildCollectionAggregateKeyPath("@avg"))
     }
 
     /// Returns the sum of all the values in the collection based on the keypath.
     public var sum: Query {
-        return apply(lhs: buildCollectionAggregateKeyPath("@sum"))
+        Query(buildCollectionAggregateKeyPath("@sum"))
     }
 
     /// Returns the count of all the values in the collection based on the keypath.
     public var count: Query {
-        return apply(lhs: buildCollectionAggregateKeyPath("@count"))
+        Query(buildCollectionAggregateKeyPath("@count"))
     }
 }
 
@@ -671,41 +617,40 @@ extension Query where T: PersistableEnum,
 extension Query where T: OptionalProtocol,
                       T.Wrapped: PersistableEnum,
                       T.Wrapped.RawValue: _RealmSchemaDiscoverable {
-
-    private func appendOptionalEnum<V>(comparison: NSComparisonPredicate.Operator,
-                                       rhs: T) -> Query<V> {
-        if case Optional<Any>.none = rhs as Any {
-            return apply(comparison: comparison, rhs: .init(forConstantValue: nil))
-        } else {
-            return apply(comparison: comparison, rhs: .init(forConstantValue: rhs._rlmInferWrappedType().rawValue))
-        }
-    }
     /// :nodoc:
     public static func == <V>(_ lhs: Query<T>, _ rhs: T) -> Query<V> {
-        lhs.appendOptionalEnum(comparison: .equalTo, rhs: rhs)
+        Query<V>(.comparison(operator: .equal, lhs.node, lhs.enumValue(rhs), options: []))
     }
     /// :nodoc:
     public static func != <V>(_ lhs: Query<T>, _ rhs: T) -> Query<V> {
-        lhs.appendOptionalEnum(comparison: .notEqualTo, rhs: rhs)
+        Query<V>(.comparison(operator: .notEqual, lhs.node, lhs.enumValue(rhs), options: []))
+    }
+
+    private func enumValue(_ rhs: T) -> QueryNode {
+        if case Optional<Any>.none = rhs as Any {
+            return .constant(nil)
+        } else {
+            return .constant(rhs._rlmInferWrappedType().rawValue)
+        }
     }
 }
 
 extension Query where T: OptionalProtocol, T.Wrapped: PersistableEnum, T.Wrapped.RawValue: _QueryNumeric {
     /// :nodoc:
     public static func > <V>(_ lhs: Query<T>, _ rhs: T) -> Query<V> {
-        lhs.appendOptionalEnum(comparison: .greaterThan, rhs: rhs)
+        Query<V>(.comparison(operator: .greaterThan, lhs.node, lhs.enumValue(rhs), options: []))
     }
     /// :nodoc:
     public static func >= <V>(_ lhs: Query<T>, _ rhs: T) -> Query<V> {
-        lhs.appendOptionalEnum(comparison: .greaterThanOrEqualTo, rhs: rhs)
+        Query<V>(.comparison(operator: .greaterThanEqual, lhs.node, lhs.enumValue(rhs), options: []))
     }
     /// :nodoc:
     public static func < <V>(_ lhs: Query<T>, _ rhs: T) -> Query<V> {
-        lhs.appendOptionalEnum(comparison: .lessThan, rhs: rhs)
+        Query<V>(.comparison(operator: .lessThan, lhs.node, lhs.enumValue(rhs), options: []))
     }
     /// :nodoc:
     public static func <= <V>(_ lhs: Query<T>, _ rhs: T) -> Query<V> {
-        lhs.appendOptionalEnum(comparison: .lessThanOrEqualTo, rhs: rhs)
+        Query<V>(.comparison(operator: .lessThanEqual, lhs.node, lhs.enumValue(rhs), options: []))
     }
 }
 
@@ -714,22 +659,22 @@ extension Query where T: OptionalProtocol,
                       T.Wrapped.RawValue: _QueryNumeric {
     /// Returns the minimum value in the collection based on the keypath.
     public var min: Query {
-        return apply(lhs: buildCollectionAggregateKeyPath("@min"))
+        Query(buildCollectionAggregateKeyPath("@min"))
     }
 
     /// Returns the maximum value in the collection based on the keypath.
     public var max: Query {
-        return apply(lhs: buildCollectionAggregateKeyPath("@max"))
+        Query(buildCollectionAggregateKeyPath("@max"))
     }
 
     /// Returns the average in the collection based on the keypath.
     public var avg: Query {
-        return apply(lhs: buildCollectionAggregateKeyPath("@avg"))
+        Query(buildCollectionAggregateKeyPath("@avg"))
     }
 
     /// Returns the sum of all the value in the collection based on the keypath.
     public var sum: Query {
-        return apply(lhs: buildCollectionAggregateKeyPath("@sum"))
+        Query(buildCollectionAggregateKeyPath("@sum"))
     }
 }
 
@@ -738,22 +683,16 @@ extension Query where T: OptionalProtocol,
 extension Query where T: _QueryNumeric {
     /// Checks for all elements in this collection that are within a given range.
     public func contains<V>(_ range: Range<T>) -> Query<V> {
-        let leftNode: Query<V> = apply(comparison: .greaterThanOrEqualTo,
-                                       rhs: .init(forConstantValue: range.lowerBound))
-        let rightNode: Query<V> = apply(comparison: .lessThan,
-                                        rhs: .init(forConstantValue: range.upperBound))
-        return applyCompound(lhs: leftNode.context.node,
-                             rhs: rightNode.context.node,
-                             op: .and,
-                             subqueryCount: context.subqueryCount)
+        Query<V>(.comparison(operator: .and,
+                             .comparison(operator: .greaterThanEqual, node, .constant(range.lowerBound), options: []),
+                             .comparison(operator: .lessThan, node, .constant(range.upperBound), options: []), options: []))
     }
 
     /// Checks for all elements in this collection that are within a given range.
     public func contains<V>(_ range: ClosedRange<T>) -> Query<V> {
-        let args = [dynamicBridgeCast(fromSwift: range.lowerBound),
-                    dynamicBridgeCast(fromSwift: range.upperBound)]
-        return apply(comparison: .between,
-                     rhs: .init(format: "{%@, %@}", argumentArray: args))
+        Query<V>(.between(node,
+                          lowerBound: .constant(range.lowerBound),
+                          upperBound: .constant(range.upperBound)))
     }
 }
 
@@ -767,8 +706,17 @@ extension Query where T: _QueryString {
      - parameter caseInsensitive: `true` if it is a case-insensitive search.
      */
     public func like<V>(_ value: T, caseInsensitive: Bool = false) -> Query<V> {
-        return apply(comparison: .like, rhs: .init(forConstantValue: value),
-                     stringOptions: caseInsensitive ? [.caseInsensitive] : nil)
+        Query<V>(.comparison(operator: .like, node, .constant(value), options: caseInsensitive ? [.caseInsensitive] : []))
+    }
+
+    /**
+     Checks for all elements in this collection that equal the given value.
+     `?` and `*` are allowed as wildcard characters, where `?` matches 1 character and `*` matches 0 or more characters.
+     - parameter value: value used.
+     - parameter caseInsensitive: `true` if it is a case-insensitive search.
+     */
+    public func like<U, V>(_ column: Query<U>, caseInsensitive: Bool = false) -> Query<V> {
+        Query<V>(.comparison(operator: .like, node, column.node, options: caseInsensitive ? [.caseInsensitive] : []))
     }
 }
 
@@ -778,73 +726,107 @@ extension Query where T: _QueryBinary {
     /**
      Checks for all elements in this collection that contains the given value.
      - parameter value: value used.
-     - parameter options: A Set of options used to evaluate the Search query.
+     - parameter options: A Set of options used to evaluate the search query.
      */
-    public func contains<V>(_ value: T, options: Set<StringOptions>? = nil) -> Query<V> {
-        return apply(comparison: .contains, rhs: .init(forConstantValue: value),
-                     stringOptions: options)
+    public func contains<V>(_ value: T, options: Set<StringOptions> = []) -> Query<V> {
+        Query<V>(.comparison(operator: .contains, node, .constant(value), options: options))
+    }
+
+    /**
+     Compares that this column contains a value in another column.
+     - parameter column: The other column.
+     - parameter options: A Set of options used to evaluate the search query.
+     */
+    public func contains<U, V>(_ column: Query<U>, options: Set<StringOptions> = []) -> Query<V> where U: _QueryBinary {
+        Query<V>(.comparison(operator: .contains, node, column.node, options: options))
     }
 
     /**
      Checks for all elements in this collection that starts with the given value.
      - parameter value: value used.
-     - parameter options: A Set of options used to evaluate the Search query.
+     - parameter options: A Set of options used to evaluate the search query.
      */
-    public func starts<V>(with value: T, options: Set<StringOptions>? = nil) -> Query<V> {
-        return apply(comparison: .beginsWith, rhs: .init(forConstantValue: value),
-                     stringOptions: options)
+    public func starts<V>(with value: T, options: Set<StringOptions> = []) -> Query<V> {
+        Query<V>(.comparison(operator: .beginsWith, node, .constant(value), options: options))
+    }
+
+    /**
+     Compares that this column starts with a value in another column.
+     - parameter column: The other column.
+     - parameter options: A Set of options used to evaluate the search query.
+     */
+    public func starts<U, V>(with column: Query<U>, options: Set<StringOptions> = []) -> Query<V> {
+        Query<V>(.comparison(operator: .beginsWith, node, column.node, options: options))
     }
 
     /**
      Checks for all elements in this collection that ends with the given value.
      - parameter value: value used.
-     - parameter options: A Set of options used to evaluate the Search query.
+     - parameter options: A Set of options used to evaluate the search query.
      */
-    public func ends<V>(with value: T, options: Set<StringOptions>? = nil) -> Query<V> {
-        return apply(comparison: .endsWith, rhs: .init(forConstantValue: value),
-                     stringOptions: options)
+    public func ends<V>(with value: T, options: Set<StringOptions> = []) -> Query<V> {
+        Query<V>(.comparison(operator: .endsWith, node, .constant(value), options: options))
+    }
+
+    /**
+     Compares that this column ends with a value in another column.
+     - parameter column: The other column.
+     - parameter options: A Set of options used to evaluate the search query.
+     */
+    public func ends<U, V>(with column: Query<U>, options: Set<StringOptions> = []) -> Query<V> {
+        Query<V>(.comparison(operator: .endsWith, node, column.node, options: options))
     }
 
     /**
      Checks for all elements in this collection that equals the given value.
      - parameter value: value used.
-     - parameter options: A Set of options used to evaluate the Search query.
+     - parameter options: A Set of options used to evaluate the search query.
      */
-    public func equals<V>(_ value: T, options: Set<StringOptions>? = nil) -> Query<V> {
-        return apply(comparison: .equalTo, rhs: .init(forConstantValue: value),
-                     stringOptions: options)
+    public func equals<V>(_ value: T, options: Set<StringOptions> = []) -> Query<V> {
+        Query<V>(.comparison(operator: .equal, node, .constant(value), options: options))
+    }
+
+    /**
+     Compares that this column is equal to the value in another given column.
+     - parameter column: The other column.
+     - parameter options: A Set of options used to evaluate the search query.
+     */
+    public func equals<U, V>(_ column: Query<U>, options: Set<StringOptions> = []) -> Query<V> {
+        Query<V>(.comparison(operator: .equal, node, column.node, options: options))
     }
 
     /**
      Checks for all elements in this collection that are not equal to the given value.
      - parameter value: value used.
-     - parameter options: A Set of options used to evaluate the Search query.
+     - parameter options: A Set of options used to evaluate the search query.
      */
-    public func notEquals<V>(_ value: T, options: Set<StringOptions>? = nil) -> Query<V> {
-        return apply(comparison: .notEqualTo, rhs: .init(forConstantValue: value),
-                     stringOptions: options)
+    public func notEquals<V>(_ value: T, options: Set<StringOptions> = []) -> Query<V> {
+        Query<V>(.comparison(operator: .notEqual, node, .constant(value), options: options))
+    }
+
+    /**
+     Compares that this column is not equal to the value in another given column.
+     - parameter column: The other column.
+     - parameter options: A Set of options used to evaluate the search query.
+     */
+    public func notEquals<U, V>(_ column: Query<U>, options: Set<StringOptions> = []) -> Query<V> {
+        Query<V>(.comparison(operator: .notEqual, node, column.node, options: options))
     }
 }
 
 extension Query where T: OptionalProtocol, T.Wrapped: _QueryNumeric {
     /// Checks for all elements in this collection that are within a given range.
     public func contains<V>(_ range: Range<T.Wrapped>) -> Query<V> {
-        let leftNode: Query<V> = apply(comparison: .greaterThanOrEqualTo,
-                                       rhs: .init(forConstantValue: range.lowerBound))
-        let rightNode: Query<V> = apply(comparison: .lessThan,
-                                        rhs: .init(forConstantValue: range.upperBound))
-        return applyCompound(lhs: leftNode.context.node,
-                             rhs: rightNode.context.node,
-                             op: .and,
-                             subqueryCount: context.subqueryCount)
+        Query<V>(.comparison(operator: .and,
+                             .comparison(operator: .greaterThanEqual, node, .constant(range.lowerBound), options: []),
+                             .comparison(operator: .lessThan, node, .constant(range.upperBound), options: []), options: []))
     }
 
     /// Checks for all elements in this collection that are within a given range.
     public func contains<V>(_ range: ClosedRange<T.Wrapped>) -> Query<V> {
-        let args = [dynamicBridgeCast(fromSwift: range.lowerBound),
-                    dynamicBridgeCast(fromSwift: range.upperBound)]
-        return apply(comparison: .between,
-                     rhs: .init(format: "{%@, %@}", argumentArray: args))
+        Query<V>(.between(node,
+                          lowerBound: .constant(range.lowerBound),
+                          upperBound: .constant(range.upperBound)))
     }
 }
 
@@ -852,21 +834,25 @@ extension Query where T: OptionalProtocol, T.Wrapped: _QueryNumeric {
 
 extension Query where T == Bool {
     /// Completes a subquery expression.
+    /// - Usage:
     /// ```
-    /// ($0.myCollection.age >= 21).count > 0
+    /// (($0.myCollection.age >= 21) && ($0.myCollection.siblings == 4))).count >= 5
     /// ```
+    /// - Note:
+    /// Do not mix collections within a subquery expression. It is
+    /// only permitted to reference a single collection per each subquery.
     public var count: Query<Int> {
-        return applySubquery()
+        Query<Int>(.subqueryCount(node))
     }
 }
 
 // MARK: Keypath Collection Aggregates
 
 /**
- You can use only use aggregates in numeric types as a keypath on a collection.
+ You can use only use aggregates in numeric types where the root keypath is a collection.
  ```swift
  let results = realm.objects(Person.self).query {
- !$0.dogs.age.avg >= 0
+    !$0.dogs.age.avg >= 0
  }
  ```
  Where `dogs` is an array of objects.
@@ -874,22 +860,22 @@ extension Query where T == Bool {
 extension Query where T: _QueryNumeric {
     /// Returns the minimum value of the objects in the collection based on the keypath.
     public var min: Query {
-        return apply(lhs: buildCollectionAggregateKeyPath("@min"))
+        Query(buildCollectionAggregateKeyPath("@min"))
     }
 
     /// Returns the maximum value of the objects in the collection based on the keypath.
     public var max: Query {
-        return apply(lhs: buildCollectionAggregateKeyPath("@max"))
+        Query(buildCollectionAggregateKeyPath("@max"))
     }
 
     /// Returns the average of the objects in the collection based on the keypath.
     public var avg: Query {
-        return apply(lhs: buildCollectionAggregateKeyPath("@avg"))
+        Query(buildCollectionAggregateKeyPath("@avg"))
     }
 
     /// Returns the sum of the objects in the collection based on the keypath.
     public var sum: Query {
-        return apply(lhs: buildCollectionAggregateKeyPath("@sum"))
+        Query(buildCollectionAggregateKeyPath("@sum"))
     }
 }
 
@@ -917,293 +903,182 @@ public protocol _QueryBinary { }
 extension Data: _QueryBinary { }
 extension Optional: _QueryBinary where Wrapped: _QueryBinary { }
 
-/// A type for boxing the required data used for constructing an NSPredicate.
-public struct _PredicateData {
-    /// The format string of the NSPredicate.
-    public var string: String
-    /// The arguments of the NSPredicate.
-    public var args: [Any]
-    ///  Used for storing the name of the collection if this predicate is a subquery.
-    internal var collectionName: String?
+// MARK: QueryNode -
 
-    internal init(string: String, args: [Any], collectionName: String? = nil) {
-        self.string = string
-        self.args = args
-        self.collectionName = collectionName
+fileprivate indirect enum QueryNode {
+
+    enum Operator: String {
+        case or = "||"
+        case and = "&&"
+        case equal = "=="
+        case notEqual = "!="
+        case lessThan = "<"
+        case lessThanEqual = "<="
+        case greaterThan = ">"
+        case greaterThanEqual = ">="
+        case `in` = "IN"
+        case contains = "CONTAINS"
+        case beginsWith = "BEGINSWITH"
+        case endsWith = "ENDSWITH"
+        case like = "LIKE"
     }
 
-    internal mutating func applyOpeningParenthesis() {
-        string.insert("(", at: string.startIndex)
-    }
+    case not(_ child: QueryNode)
+    case constant(_ value: Any?)
 
-    internal mutating func applyClosingParenthesis() {
-        string.append(")")
-    }
+    case keyPath(_ value: [String], options: KeyPathOptions)
 
-    internal mutating func applyNotPrefix() {
-        string.insert(contentsOf: "NOT ", at: string.startIndex)
-    }
+    case comparison(operator: Operator, _ lhs: QueryNode, _ rhs: QueryNode, options: Set<StringOptions>)
+    case between(_ lhs: QueryNode, lowerBound: QueryNode, upperBound: QueryNode)
 
-    internal static func + (lhs: _PredicateData, rhs: _PredicateData) -> _PredicateData {
-        let collectionName = lhs.collectionName != nil ? lhs.collectionName : rhs.collectionName
-        let seperator = lhs.string.isEmpty ? "" : " "
-        return _PredicateData(string: lhs.string + seperator + rhs.string,
-                              args: lhs.args + rhs.args,
-                              collectionName: collectionName)
-    }
+    case subqueryCount(_ child: QueryNode)
+    case mapSubscript(_ lhs: QueryNode, collectionKeyPath: QueryNode, requiresNot: Bool)
 }
 
-/// A protocol which defines a node used to represent a query expression.
-private protocol QueryNode {
-    /// If the query wishes to prefix `NOT` to a predicate string this must be set to `true`.
-    var requiresNotPrefix: Bool { get set }
-    /// Creates a NSPredicate compatible string with its accompanying arguments.
-    /// - Returns: An instance of `_PredicateData` that contains the parts to construct an NSPredicate.
-    func makePredicate(_ subqueryName: String?) -> _PredicateData
-}
+private func buildPredicate(_ root: QueryNode, subqueryCount: Int = 0) -> (String, [Any]) {
+    let formatStr = NSMutableString()
+    let arguments = NSMutableArray()
+    var subqueryCounter = subqueryCount
 
-extension QueryNode {
-    /// Creates a key path for use in a subquery expression.
-    /// - Parameters:
-    ///   - keyPath: The key path to produce a subquery friendly key path from.
-    ///   - colName: The unique identifier used for the collection in the subquery.
-    /// - Returns: A tuple containing the subquery key path and the name of the collection.
-    internal func subqueryKeyPath(_ keyPath: String, colName: String) -> (keyPath: String, collectionName: String) {
-        var keyPaths = keyPath.components(separatedBy: ".")
-        let collectionName = keyPaths.removeFirst()
-        keyPaths.insert(colName, at: 0)
-        return (keyPath: keyPaths.joined(separator: "."), collectionName: collectionName)
-    }
-}
+    func buildExpression(_ lhs: QueryNode,
+                         _ op: String,
+                         _ rhs: QueryNode,
+                         prefix: String? = nil) {
 
-private struct SubqueryNode: QueryNode {
-    /// The query that represents the predicate inside the SUBQUERY expression.
-    var left: QueryNode?
-    /// The query that represents the right side if the SUBQUERY expression. e.g `.@count > 0`
-    var right: QueryNode?
-    /// If there is a scenario of a subquery inside a subquery we need to keep track of the depth so
-    /// a unique identifier can be created.
-    var subqueryCount: Int
-    /// Unused in this context.
-    var requiresNotPrefix: Bool = false
-
-    init(_ count: Int) {
-        self.subqueryCount = count
+        if case let .keyPath(_, lhsOptions) = lhs,
+           case let .keyPath(_, rhsOptions) = rhs,
+           lhsOptions.contains(.isCollection), rhsOptions.contains(.isCollection) {
+            throwRealmException("Comparing two collection columns is not permitted.")
+        }
+        formatStr.append("(")
+        if let prefix = prefix {
+            formatStr.append(prefix)
+        }
+        build(lhs)
+        formatStr.append(" \(op) ")
+        build(rhs)
+        formatStr.append(")")
     }
 
-    func makePredicate(_ subqueryName: String?) -> _PredicateData {
-        var leftPredicate: _PredicateData!
-        var rightPredicate: _PredicateData!
-
-        let col = "$col\(subqueryCount)"
-        if let left = left {
-            leftPredicate = left.makePredicate(col)
+    func buildCompoundExpression(_ lhs: QueryNode,
+                                 _ op: String,
+                                 _ rhs: QueryNode,
+                                 prefix: String? = nil) {
+        if let prefix = prefix {
+            formatStr.append(prefix)
         }
-
-        if let right = right {
-            rightPredicate = right.makePredicate(nil)
-        }
-
-        guard let collectionName = leftPredicate.collectionName else {
-            throwRealmException("Could not construct SUBQUERY predicate.")
-        }
-
-        let format = "SUBQUERY(\(collectionName), \(col), \(leftPredicate.string))" + rightPredicate.string
-        return _PredicateData(string: format, args: leftPredicate.args + rightPredicate.args)
+        formatStr.append("(")
+        build(lhs)
+        formatStr.append(" \(op) ")
+        build(rhs)
+        formatStr.append(")")
     }
-}
 
-private struct CompoundNode: QueryNode {
-    /// The left node.
-    var left: QueryNode?
-    /// The right node.
-    var right: QueryNode?
-    /// Used to apply `NOT` to the generated string.
-    var requiresNotPrefix: Bool = false
-    /// The compound operator for this node.
-    var compoundOperator: NSCompoundPredicate.LogicalType?
-    /// Used to apply the `NOT` operator in the correct place given a `Map`
-    /// subscript query.
-    var isMapSubscriptQuery: Bool = false
+    func buildBetween(_ lowerBound: QueryNode, _ upperBound: QueryNode) {
+        formatStr.append(" BETWEEN {")
+        build(lowerBound)
+        formatStr.append(", ")
+        build(upperBound)
+        formatStr.append("}")
+    }
 
-    func makePredicate(_ subqueryName: String?) -> _PredicateData {
-        var predicates: [_PredicateData] = []
-
-        if requiresNotPrefix && !isMapSubscriptQuery {
-            predicates.append(_PredicateData(string: "NOT", args: []))
+    func strOptions(_ options: Set<StringOptions>) -> String {
+        if options == [] {
+            return ""
         }
+        return "[\(options.contains(.caseInsensitive) ? "c" : "")\(options.contains(.diacriticInsensitive) ? "d" : "")]"
+    }
 
-        if let leftLeaf = left {
-            var predicate = leftLeaf.makePredicate(subqueryName)
-            predicate.applyOpeningParenthesis()
-            predicates.append(predicate)
-        }
-
-        if let op = compoundOperator {
+    func build(_ node: QueryNode, prefix: String? = nil) {
+        switch node {
+        case .constant(let value):
+            formatStr.append("%@")
+            arguments.add(value ?? NSNull())
+        case .keyPath(let kp, let options):
+            if options.contains(.requiresAny) {
+                formatStr.append("ANY ")
+            }
+            formatStr.append(kp.joined(separator: "."))
+        case .not(let child):
+            build(child, prefix: "NOT ")
+        case .comparison(operator: let op, let lhs, let rhs, let options):
             switch op {
-            case .and:
-                predicates.append(_PredicateData(string: "&&", args: []))
-            case .or:
-                predicates.append(_PredicateData(string: "||", args: []))
+            case .and, .or:
+                buildCompoundExpression(lhs, op.rawValue, rhs, prefix: prefix)
             default:
-                throwRealmException("Could not construct predicate. Unsupported compound operator present.")
+                buildExpression(lhs, "\(op.rawValue)\(strOptions(options))", rhs, prefix: prefix)
             }
-        }
-
-        if let rightLeft = right {
-            var predicate = rightLeft.makePredicate(subqueryName)
-            if requiresNotPrefix && isMapSubscriptQuery {
-                /// A `NOT` operator should only be applied to the right node of a comparison query.
-                /// This is because we only wish to apply the `NOT` to the value comparison and not
-                /// the entire compound node.
-                predicate.applyNotPrefix()
+        case .between(let lhs, let lowerBound, let upperBound):
+            formatStr.append("(")
+            build(lhs)
+            buildBetween(lowerBound, upperBound)
+            formatStr.append(")")
+        case .subqueryCount(let inner):
+            subqueryCounter += 1
+            let (collectionName, node) = SubqueryRewriter.rewrite(inner, subqueryCounter)
+            formatStr.append("SUBQUERY(\(collectionName), $col\(subqueryCounter), ")
+            build(node)
+            formatStr.append(").@count")
+        case .mapSubscript(let lhs, let collectionKeyPath, let requiresNot):
+            build(lhs)
+            formatStr.append(" && ")
+            if requiresNot {
+                formatStr.append("NOT ")
             }
-            predicate.applyClosingParenthesis()
-            predicates.append(predicate)
-        }
-
-        return predicates.reduce(_PredicateData(string: "", args: []), +)
-    }
-}
-
-private struct ComparisonNode: QueryNode {
-    /// The lhs of this predicate expression.
-    var left: NSExpression?
-    /// The rhs of this predicate expression.
-    var right: NSExpression?
-    /// A flag used to insert a `NOT` prefix to the format string.
-    var requiresNotPrefix: Bool = false
-    /// The comparison operator this node wants to perform.
-    var comparisonOperator: NSComparisonPredicate.Operator?
-    /// An options set for string / binary queries.
-    var stringOptions: Set<StringOptions>?
-    /// A flag to help identify an `"%@ IN myCol"` type predicate.
-    var isCollectionContains: Bool = false
-    /// Modifier for this node. This is only used to prefix `ANY` to an expression.
-    var modifier: NSComparisonPredicate.Modifier?
-
-    func makePredicate(_ subqueryName: String?) -> _PredicateData {
-        guard let left = left, let comparisonOperator = comparisonOperator, let right = right else {
-            throwRealmException("Could not construct predicate. Node is missing a lhs, rhs or comparisonOperator.")
-        }
-
-        func buildLeft() -> _PredicateData {
-            switch left.expressionType {
-            case .keyPath:
-                if let subqueryName = subqueryName {
-                    let subqueryKeyPath = subqueryKeyPath(left.keyPath, colName: subqueryName)
-                    return _PredicateData(string: subqueryKeyPath.keyPath,
-                                          args: [],
-                                          collectionName: subqueryKeyPath.collectionName)
-                } else {
-                    return _PredicateData(string: left.keyPath, args: [])
-                }
-            default:
-                throwRealmException("Could not construct predicate. Unsupported expression type.")
-            }
-        }
-
-        func buildComparison() -> _PredicateData {
-            var formatString = ""
-            switch comparisonOperator {
-            case .equalTo:
-                formatString += "=="
-            case .notEqualTo:
-                formatString += "!="
-            case .greaterThan:
-                formatString += ">"
-            case .greaterThanOrEqualTo:
-                formatString += ">="
-            case .lessThan:
-                formatString += "<"
-            case .lessThanOrEqualTo:
-                formatString += "<="
-            case .between:
-                formatString += "BETWEEN"
-            case .like:
-                formatString += "LIKE"
-            case .beginsWith:
-                formatString += "BEGINSWITH"
-            case .endsWith:
-                formatString += "ENDSWITH"
-            case .contains:
-                formatString += "CONTAINS"
-            case .in:
-                formatString += "IN"
-            default:
-                throwRealmException("Could not create predicate. Unsupported predicate operator.")
-            }
-
-            if let stringOptions = stringOptions, !stringOptions.isEmpty {
-                formatString += "["
-
-                if stringOptions.contains(.caseInsensitive) {
-                    formatString += "c"
-                }
-
-                if stringOptions.contains(.diacriticInsensitive) {
-                    formatString += "d"
-                }
-
-                formatString += "]"
-            }
-
-            return _PredicateData(string: formatString, args: [])
-        }
-
-        func buildRight() -> _PredicateData {
-            switch right.expressionType {
-            case .constantValue:
-                return _PredicateData(string: "%@",
-                                      args: [right.constantValue.objCValue])
-            case .aggregate:
-                guard let arguments = right.collection as? [NSExpression] else {
-                    throwRealmException("Could not construct predicate. Invalid collection argument.")
-                }
-                return _PredicateData(string: "{%@, %@}",
-                                      args: arguments.map { $0.constantValue.objCValue })
-            default:
-                throwRealmException("Could not construct predicate. Unsupported expression type.")
-            }
-        }
-
-        func buildPrefix() -> _PredicateData {
-            var strs: [String] = []
-
-            if requiresNotPrefix {
-                strs.append("NOT")
-            }
-
-            if let modifier = modifier, modifier == .any {
-                strs.append("ANY")
-            }
-
-            return _PredicateData(string: strs.joined(separator: " "), args: [])
-        }
-
-        if isCollectionContains {
-            // An `IN` query for checking if an element exists in an array
-            // requires that the rhs be placed on the lhs of the expression.
-            return buildPrefix() + buildRight() + buildComparison() + buildLeft()
-        } else {
-            return buildPrefix() + buildLeft() + buildComparison() + buildRight()
+            build(collectionKeyPath)
         }
     }
+    build(root)
+    return (formatStr as String, (arguments as! [Any]))
 }
 
-private struct QueryContext {
-    /// The root node of the expression tree.
-    var node: QueryNode = ComparisonNode()
-    /// Helps give Subquery collection vars a unique name.
-    var subqueryCount = 0
+private struct KeyPathOptions: OptionSet {
+    let rawValue: Int8
+    init(rawValue: RawValue) {
+        self.rawValue = rawValue
+    }
 
-    /// Creates a `QueryContext` with a node that will be set as the root of the
-    /// expression tree.
-    /// - Parameters:
-    ///   - node: The node to be set as the root of the expression tree.
-    ///   - subqueryCount: The count used to give subqueries a unique identifier.
-    init(node: QueryNode = ComparisonNode(), subqueryCount: Int = 0) {
-        self.node = node
-        self.subqueryCount = subqueryCount
+    static let isCollection = KeyPathOptions(rawValue: 1)
+    static let requiresAny = KeyPathOptions(rawValue: 2)
+}
+
+
+private struct SubqueryRewriter {
+    private var collectionName: String?
+    private var counter: Int
+    private mutating func rewrite(_ node: QueryNode) -> QueryNode {
+
+        switch node {
+        case .keyPath(let kp, let options):
+            if options.contains(.isCollection) {
+                precondition(kp.count > 0)
+                collectionName = kp[0]
+                var copy = kp
+                copy[0] = "$col\(counter)"
+                return .keyPath(copy, options: [.isCollection])
+            }
+            return node
+        case .not(let child):
+            return .not(rewrite(child))
+        case .comparison(operator: let op, let lhs, let rhs, options: let options):
+            return .comparison(operator: op, rewrite(lhs), rewrite(rhs), options: options)
+        case .between(let lhs, let lowerBound, let upperBound):
+            return .between(rewrite(lhs), lowerBound: rewrite(lowerBound), upperBound: rewrite(upperBound))
+        case .subqueryCount(let inner):
+            return .subqueryCount(inner)
+        case .constant:
+            return node
+        case .mapSubscript:
+            throwRealmException("Subqueries do not support map subscripts.")
+        }
+    }
+
+    static fileprivate func rewrite(_ node: QueryNode, _ counter: Int) -> (String, QueryNode) {
+        var rewriter = SubqueryRewriter(counter: counter)
+        let rewritten = rewriter.rewrite(node)
+        guard let collectionName = rewriter.collectionName else {
+            throwRealmException("Subquery's must contain a keypath starting with a collection.")
+        }
+        return (collectionName, rewritten)
     }
 }

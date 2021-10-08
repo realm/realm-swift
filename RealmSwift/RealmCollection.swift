@@ -314,9 +314,18 @@ public protocol RealmCollection: RealmCollectionBase {
     /**
      Returns the index of the first object matching the query, or `nil` if no objects match.
 
-     - parameter query: The query to use to filter the objects.
+     - Note: This should only be used with classes using the `@Persistable` property declaration.
+
+     - Usage:
+     ```
+     obj.index(matching: { $0.fooCol < 456 })
+     ```
+
+     - Note: See `Query` for more information on what query operations are available.
+
+     - parameter isIncluded: The query closure to use to filter the objects.
      */
-    func index(matching query: ((Query<Element>) -> Query<Element>)) -> Int?
+    func index(matching isIncluded: ((Query<Element>) -> Query<Element>)) -> Int?
 
     /**
      Returns the index of the first object matching the predicate, or `nil` if no objects match.
@@ -357,9 +366,20 @@ public protocol RealmCollection: RealmCollectionBase {
     /**
      Returns a `Results` containing all objects matching the given query in the collection.
 
-     - parameter query: The query to use to filter the objects.
+     - Note: This should only be used with classes using the `@Persistable` property declaration.
+
+     - Usage:
+     ```
+     myCol.where {
+        ($0.fooCol > 5) && ($0.barCol == "foobar")
+     }
+     ```
+
+     - Note: See `Query` for more information on what query operations are available.
+
+     - parameter isIncluded: The query closure to use to filter the objects.
      */
-    func `where`(_ query: ((Query<Element>) -> Query<Element>)) -> Results<Element>
+    func `where`(_ isIncluded: ((Query<Element>) -> Query<Element>)) -> Results<Element>
 
 
     // MARK: Sorting
@@ -1260,9 +1280,18 @@ public struct AnyRealmCollection<Element: RealmCollectionValue>: RealmCollection
     /**
      Returns the index of the first object matching the given query, or `nil` if no objects match.
 
-     - parameter query: The query with which to filter the objects.
+     - Note: This should only be used with classes using the `@Persistable` property declaration.
+
+     - Usage:
+     ```
+     obj.index(matching: { $0.fooCol < 456 })
+     ```
+
+     - Note: See `Query` for more information on what query operations are available.
+
+     - parameter isIncluded: The query closure with which to filter the objects.
      */
-    public func index(matching query: ((Query<Element>) -> Query<Element>)) -> Int? { return base.index(matching: query) }
+    public func index(matching isIncluded: ((Query<Element>) -> Query<Element>)) -> Int? { return base.index(matching: isIncluded) }
 
     // MARK: Object Retrieval
 
@@ -1292,9 +1321,18 @@ public struct AnyRealmCollection<Element: RealmCollectionValue>: RealmCollection
 
      - Note: This should only be used with classes using the `@Persistable` property declaration.
 
-     - parameter query: The query with which to filter the objects.
+     - Usage:
+     ```
+     myCol.where {
+        ($0.fooCol > 5) && ($0.barCol == "foobar")
+     }
+     ```
+
+     - Note: See `Query` for more information on what query operations are available.
+
+     - parameter isIncluded: The query closure with which to filter the objects.
      */
-    public func `where`(_ query: ((Query<Element>) -> Query<Element>)) -> Results<Element> { return base.where(query) }
+    public func `where`(_ isIncluded: ((Query<Element>) -> Query<Element>)) -> Results<Element> { return base.where(isIncluded) }
 
 
     // MARK: Sorting

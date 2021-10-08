@@ -140,10 +140,19 @@ extension AnyRealmValue: AddableType {}
     /**
      Returns the index of the first object matching the query, or `nil` if no objects match.
 
-     - parameter query: The query with which to filter the objects.
+     - Note: This should only be used with classes using the `@Persistable` property declaration.
+
+     - Usage:
+     ```
+     obj.index(matching: { $0.fooCol < 456 })
+     ```
+
+     - Note: See `Query` for more information on what query operations are available.
+
+     - parameter isIncluded: The query closure with which to filter the objects.
     */
-    public func index(matching query: ((Query<Element>) -> Query<Element>)) -> Int? {
-        return index(matching: query(Query()).predicate)
+    public func index(matching isIncluded: ((Query<Element>) -> Query<Element>)) -> Int? {
+        return index(matching: isIncluded(Query<Element>()).predicate)
     }
 
     // MARK: Object Retrieval
@@ -227,10 +236,19 @@ extension AnyRealmValue: AddableType {}
 
      - Note: This should only be used with classes using the `@Persistable` property declaration.
 
-     - parameter query: The query with which to filter the objects.
+     - Usage:
+     ```
+     myResults.where {
+        ($0.fooCol > 5) && ($0.barCol == "foobar")
+     }
+     ```
+
+     - Note: See `Query` for more information on what query operations are available.
+
+     - parameter isIncluded: The query closure with which to filter the objects.
      */
-    public func `where`(_ query: ((Query<Element>) -> Query<Element>)) -> Results<Element> {
-        return filter(query(Query()).predicate)
+    public func `where`(_ isIncluded: ((Query<Element>) -> Query<Element>)) -> Results<Element> {
+        return filter(isIncluded(Query()).predicate)
     }
 
     // MARK: Sorting

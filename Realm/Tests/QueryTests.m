@@ -199,16 +199,16 @@
     // These are things which are valid predicates, but which we do not support
 
     // Aggregate operators on non-arrays
-    RLMAssertThrowsWithReasonMatching([PersonObject objectsWhere:@"ANY age > 5"], @"Aggregate operations can only.*array property");
+    RLMAssertThrowsWithReasonMatching([PersonObject objectsWhere:@"ANY age > 5"], @"Aggregate operations can only.*collection property");
     RLMAssertThrowsWithReasonMatching([PersonObject objectsWhere:@"ALL age > 5"], @"ALL modifier not supported");
-    RLMAssertThrowsWithReasonMatching([PersonObject objectsWhere:@"SOME age > 5"], @"Aggregate operations can only.*array property");
-    RLMAssertThrowsWithReasonMatching([PersonObject objectsWhere:@"NONE age > 5"], @"Aggregate operations can only.*array property");
-    RLMAssertThrowsWithReasonMatching([PersonLinkObject objectsWhere:@"ANY person.age > 5"], @"Aggregate operations can only.*array property");
+    RLMAssertThrowsWithReasonMatching([PersonObject objectsWhere:@"SOME age > 5"], @"Aggregate operations can only.*collection property");
+    RLMAssertThrowsWithReasonMatching([PersonObject objectsWhere:@"NONE age > 5"], @"Aggregate operations can only.*collection property");
+    RLMAssertThrowsWithReasonMatching([PersonLinkObject objectsWhere:@"ANY person.age > 5"], @"Aggregate operations can only.*collection property");
     RLMAssertThrowsWithReasonMatching([PersonLinkObject objectsWhere:@"ALL person.age > 5"], @"ALL modifier not supported");
-    RLMAssertThrowsWithReasonMatching([PersonLinkObject objectsWhere:@"SOME person.age > 5"], @"Aggregate operations can only.*array property");
-    RLMAssertThrowsWithReasonMatching([PersonLinkObject objectsWhere:@"NONE person.age > 5"], @"Aggregate operations can only.*array property");
-    RLMAssertThrowsWithReasonMatching([PersonObject objectsWhere:@"age.@count > 5"], @"Aggregate operations can only.*array property");
-    RLMAssertThrowsWithReasonMatching([PersonObject objectsWhere:@"age.@sum > 5"], @"Aggregate operations can only.*array property");
+    RLMAssertThrowsWithReasonMatching([PersonLinkObject objectsWhere:@"SOME person.age > 5"], @"Aggregate operations can only.*collection property");
+    RLMAssertThrowsWithReasonMatching([PersonLinkObject objectsWhere:@"NONE person.age > 5"], @"Aggregate operations can only.*collection property");
+    RLMAssertThrowsWithReasonMatching([PersonObject objectsWhere:@"age.@count > 5"], @"Aggregate operations can only.*collection property");
+    RLMAssertThrowsWithReasonMatching([PersonObject objectsWhere:@"age.@sum > 5"], @"Aggregate operations can only.*collection property");
 
     // comparing two constants
     RLMAssertThrowsWithReason([PersonObject objectsWhere:@"5 = 5"],
@@ -2145,6 +2145,7 @@
     RLMAssertCount(CircleDictionaryObject, 1U, @"ANY circles.next.data = '3'");
     RLMAssertCount(CircleDictionaryObject, 1U, @"ANY circles.data = '3'");
     RLMAssertCount(CircleDictionaryObject, 1U, @"NONE circles.next.data = '4'");
+    RLMAssertCount(CircleDictionaryObject, 1U, @"circles.data = '2'");
 
     RLMAssertCount(CircleDictionaryObject, 0U, @"ANY circles.next.next.data = '3'");
     RLMAssertCount(CircleDictionaryObject, 1U, @"ANY circles.next.next.data = '2'");
@@ -2239,6 +2240,9 @@
     RLMAssertCount(DictionaryOfAllTypesObject, 3U, @"ANY dictionary != %@", obj1);
     RLMAssertCount(DictionaryOfAllTypesObject, 2U, @"NONE dictionary = %@", obj0);
     RLMAssertCount(DictionaryOfAllTypesObject, 1U, @"NONE dictionary != %@", obj1);
+
+    RLMAssertCount(DictionaryOfAllTypesObject, 2U, @"dictionary = %@", obj0);
+    RLMAssertCount(DictionaryOfAllTypesObject, 3U, @"dictionary != %@", obj1);
 }
 
 - (void)testCompoundOrQuery {
