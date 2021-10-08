@@ -226,10 +226,10 @@ class QueryTests: TestCase {
         XCTAssertEqual(results.count, expectedCount)
 
         let constructedQuery = query(Query<ModernAllTypesObject>())._constructPredicate()
-        XCTAssertEqual(constructedQuery.predicate,
+        XCTAssertEqual(constructedQuery.string,
                        predicate)
 
-        for (e1, e2) in zip(constructedQuery.arguments, values) {
+        for (e1, e2) in zip(constructedQuery.args, values) {
             if let e1 = e1 as? Object, let e2 = e2 as? Object {
                 assertEqual(e1, e2)
             } else {
@@ -246,10 +246,10 @@ class QueryTests: TestCase {
         XCTAssertEqual(results.count, expectedCount)
 
         let constructedQuery = query(Query<ModernCollectionObject>())._constructPredicate()
-        XCTAssertEqual(constructedQuery.predicate,
+        XCTAssertEqual(constructedQuery.string,
                        predicate)
 
-        for (e1, e2) in zip(constructedQuery.arguments, values) {
+        for (e1, e2) in zip(constructedQuery.args, values) {
             if let e1 = e1 as? Object, let e2 = e2 as? Object {
                 assertEqual(e1, e2)
             } else {
@@ -274,10 +274,10 @@ class QueryTests: TestCase {
         XCTAssertEqual(results.count, expectedCount)
 
         let constructedQuery = query(Query<ModernAllTypesObject>())._constructPredicate()
-        XCTAssertEqual(constructedQuery.predicate,
+        XCTAssertEqual(constructedQuery.string,
                        predicate)
 
-        for (e1, e2) in zip(constructedQuery.arguments, values) {
+        for (e1, e2) in zip(constructedQuery.args, values) {
             XCTAssertEqual(e1 as! AnyHashable, e2)
         }
     }
@@ -293,10 +293,10 @@ class QueryTests: TestCase {
         XCTAssertEqual(results.count, expectedCount)
 
         let constructedQuery = query(Query<ModernAllTypesObject?>())._constructPredicate()
-        XCTAssertEqual(constructedQuery.predicate,
+        XCTAssertEqual(constructedQuery.string,
                        predicate)
 
-        for (e1, e2) in zip(constructedQuery.arguments, values) {
+        for (e1, e2) in zip(constructedQuery.args, values) {
             XCTAssertEqual(e1 as! AnyHashable, e2)
         }
     }
