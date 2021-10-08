@@ -421,6 +421,27 @@ public struct ProjectedList<NewElement>: RandomAccessCollection where NewElement
         })
     }
 
+    public func observe(keyPaths: [String]? = nil, on queue: DispatchQueue? = nil,
+                        _ block: @escaping (RealmCollectionChange<ProjectedList<NewElement>>) -> Void)
+        -> NotificationToken {
+            return backingList._observe(keyPaths, queue) {
+                switch $0 {
+                case .initial(let collection):
+                    block(.initial(anyCtor(collection as! List<Object>)))
+                case .update(let collection,
+                             deletions: let deletions,
+                             insertions: let insertions,
+                             modifications: let modifications):
+                    block(.update(anyCtor(collection as! List<Object>),
+                                  deletions: deletions,
+                                  insertions: insertions,
+                                  modifications: modifications))
+                case .error(let error):
+                    block(.error(error))
+                }
+            }
+        }
+
     public subscript(position: Int) -> NewElement {
         get {
             backingList[position][keyPath: keyPath] as! NewElement
