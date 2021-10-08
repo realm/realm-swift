@@ -1832,17 +1832,12 @@ PersonProjection<Person> <0x[0-9a-f]+> {
         XCTAssertEqual(johnProjection.lastNameCaps, "SNOW")
 
         let ex = expectation(description: "values will be observed")
-        let token = johnProjection.observe(keyPaths: [\.lastNameCaps]) { change in
-            switch change {
-            case .error(_):
-                break
-            case .change(_, let change):
+        let token = johnProjection.observe(keyPaths: [\.lastNameCaps]) {
+            if case let .change(_, change) = $0 {
                 XCTAssertEqual(change.first!.name, "lastNameCaps")
                 XCTAssertEqual(change.first!.oldValue as! String, "SNOW")
                 XCTAssertEqual(change.first!.newValue as! String, "ALI")
                 ex.fulfill()
-            case .deleted:
-                break
             }
         }
 
@@ -1854,7 +1849,6 @@ PersonProjection<Person> <0x[0-9a-f]+> {
             }
         }
 
-//        realm.refresh()
         waitForExpectations(timeout: 2)
         token.invalidate()
     }
