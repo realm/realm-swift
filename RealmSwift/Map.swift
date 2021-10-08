@@ -278,7 +278,7 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
      - parameter queryFn: The query closure with which to filter the objects.
      */
     public func `where`(_ queryFn: ((Query<Value>) -> Query<Value>)) -> Results<Value> {
-        return filter(query(Query()).predicate)
+        return filter(queryFn(Query()).predicate)
     }
 
     /**
