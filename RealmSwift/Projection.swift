@@ -22,7 +22,7 @@ import Realm.Private
 import Combine
 #endif
 
-fileprivate protocol AnyProjected {
+private protocol AnyProjected {
     var projectedKeyPath: AnyKeyPath { get }
 }
 
@@ -101,13 +101,13 @@ public struct Projected<T: ObjectBase, Value>: AnyProjected {
 }
 
 // MARK: Projection Schema
-fileprivate struct ProjectedMetadata {
+private struct ProjectedMetadata {
     let projectedKeyPath: AnyKeyPath
     let originPropertyKeyPathString: String
     let label: String
 }
 
-fileprivate struct ProjectionMetadata {
+private struct ProjectionMetadata {
     let propertyMetadatas: [ProjectedMetadata]
     let mirror: Mirror
 }
@@ -231,7 +231,7 @@ extension ProjectionObservable {
             emptyRoot.prepareForRecording()
             let emptyProjection = Self(projecting: emptyRoot) // tracer time
             keyPaths.forEach {
-                emptyProjection[keyPath: $0]
+                _ = emptyProjection[keyPath: $0]
             }
             kps = emptyRoot.lastAccessedNames! as! [String]
         }
@@ -363,7 +363,7 @@ extension Projection {
     public static var _rlmType: PropertyType {
         fatalError()
     }
-    
+
     public static var _rlmOptional: Bool {
         fatalError()
     }
@@ -371,7 +371,7 @@ extension Projection {
         fatalError()
     }
     public static var _rlmRequireObjc: Bool { false }
-    
+
     public func _rlmPopulateProperty(_ prop: RLMProperty) {
         fatalError()
     }
@@ -379,14 +379,21 @@ extension Projection {
     public static func _rlmPopulateProperty(_ prop: RLMProperty) {
         fatalError()
     }
-    
-    public static func ==(lhs: Projection, rhs: Projection) -> Bool {
+
+    public static func == (lhs: Projection, rhs: Projection) -> Bool {
         RLMObjectBaseAreEqual(lhs.rootObject, rhs.rootObject)
     }
 
     public func hash(into hasher: inout Hasher) {
         let hashVal = rootObject.hashValue
         hasher.combine(hashVal)
+    }
+
+    open var description: String {
+        return "\(type(of: self))<\(type(of: rootObject))> <\(Unmanaged.passUnretained(self).toOpaque())> {\n" +
+        "\(_schema.propertyMetadatas.map({"\t@Projected(\\\(type(of: rootObject)).\($0.originPropertyKeyPathString)) -> \(String($0.label.dropFirst())): \(String(describing: rootObject[keyPath: $0.projectedKeyPath]!))"}).joined(separator: "\n"))\n" +
+        "\n\trootObject: \(rootObject)\n" +
+        "}"
     }
 }
 
@@ -464,9 +471,11 @@ public struct ProjectedList<NewElement>: RandomAccessCollection where NewElement
     }
 
     public var description: String {
-//        return RLMDescriptionWithMaxDepth("ProjectedList", backingList.rlmArray, RLMDescriptionMaxDepth)
-        backingList.map({$0[keyPath: self.keyPath] as! Element}).description
+        return "\(type(of: self))<\(Element.self))> <\(self))> {\n" +
+        "\(RLMDescriptionWithMaxDepth("ProjectedList", backingList.rlmArray, RLMDescriptionMaxDepth))\n" +
+        "}"
     }
+
     public func index(of object: Element) -> Int? {
         backingList.map({$0[keyPath: self.keyPath] as! Element}).firstIndex(of: object)
     }
@@ -488,27 +497,25 @@ public struct ProjectedList<NewElement>: RandomAccessCollection where NewElement
     private let propertyName: String
     private let anyCtor: (List<Object>) -> Self
 
-    init<OriginalElement>(_ list: List<OriginalElement>,
-                                      keyPathToNewElement: KeyPath<OriginalElement, NewElement>) where OriginalElement: ObjectBase {
-        self.backingList = ObjectiveCSupport.convert(object: list.rlmArray)
+    init<OriginalElement>(_ list: List<Object>,
+                          keyPathToNewElement: KeyPath<OriginalElement, NewElement>) where OriginalElement: ObjectBase {
+        self.backingList = list
         self.keyPath = keyPathToNewElement
         self.propertyName = _name(for: keyPathToNewElement)
         self.anyCtor = {
-            return Self($0 as! List<OriginalElement>, keyPathToNewElement: keyPathToNewElement)
+            return Self(ObjectiveCSupport.convert(object: $0.rlmArray), keyPathToNewElement: keyPathToNewElement)
         }
     }
 }
 
-extension ProjectedList: ThreadConfined {
-    
-}
+extension ProjectedList: ThreadConfined { }
 
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 @dynamicMemberLookup
 public struct ElementMapper<Element> where Element: ObjectBase, Element: RealmCollectionValue {
     var list: List<Element>
     public subscript<V>(dynamicMember member: KeyPath<Element, V>) -> ProjectedList<V> {
-        ProjectedList(list, keyPathToNewElement: member)
+        ProjectedList(ObjectiveCSupport.convert(object: list.rlmArray), keyPathToNewElement: member)
     }
 }
 
@@ -549,7 +556,7 @@ extension ProjectionObservable {
     }
 
     /// :nodoc:
-    public func _observe<S>(_ keyPaths: [String]?, _ subscriber: S) -> NotificationToken where S : Subscriber, S.Failure == Never, S.Input == Void {
+    public func _observe<S>(_ keyPaths: [String]?, _ subscriber: S) -> NotificationToken where S: Subscriber, S.Failure == Never, S.Input == Void {
         return observe(keyPaths: [PartialKeyPath<Self>](), { _ in _ = subscriber.receive() })
     }
 }

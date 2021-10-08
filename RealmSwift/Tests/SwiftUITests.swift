@@ -392,14 +392,14 @@ class SwiftUITests: TestCase {
         XCTAssertEqual(hit, 2)
     }
 #endif
-    
+
     // MARK: - Projection ObservedResults Operations
-    
+
     func testResultsAppendProjection() throws {
         let realm = inMemoryRealm(inMemoryIdentifier)
         let state = ObservedResults(UIElementsProjection.self,
                                     configuration: inMemoryRealm(inMemoryIdentifier).configuration)
-        
+
         XCTAssertEqual(state.wrappedValue.count, 0)
         try! realm.write {
             realm.create(SwiftUIObject.self)
@@ -412,20 +412,20 @@ class SwiftUITests: TestCase {
         }
         XCTAssertEqual(state.wrappedValue.count, 2)
     }
-    
+
     func testResultsRemoveProjection() throws {
         XCTAssertTrue(false)
     }
-    
+
     // MARK: - Projection Operations
     func testProjectionModification() throws {
         XCTAssertTrue(false)
     }
-    
+
     func testProjectionDelete() throws {
         XCTAssertTrue(false)
     }
-    
+
     // MARK: - Projection Bind
     func testProjectionBind() {
         XCTAssertTrue(false)

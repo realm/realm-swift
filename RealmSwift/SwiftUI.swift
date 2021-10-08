@@ -420,10 +420,10 @@ extension Projection: ObservedResultsValue { }
 
     /// :nodoc:
     public init<ObjectType: ObjectBase>(_ type: ResultType.Type,
-                configuration: Realm.Configuration? = nil,
-                filter: NSPredicate? = nil,
-                keyPaths: [String]? = nil,
-                sortDescriptor: SortDescriptor? = nil) where ResultType: Projection<ObjectType>, ObjectType: ThreadConfined {
+                                        configuration: Realm.Configuration? = nil,
+                                        filter: NSPredicate? = nil,
+                                        keyPaths: [String]? = nil,
+                                        sortDescriptor: SortDescriptor? = nil) where ResultType: Projection<ObjectType>, ObjectType: ThreadConfined {
         self.storage = Storage(Results(RLMResults.emptyDetached()), keyPaths)
         self.storage.resultFactory = { realm in
             realm.objects(ResultType.self)
@@ -431,7 +431,6 @@ extension Projection: ObservedResultsValue { }
         self.storage.configuration = configuration
         self.filter = filter
         self.sortDescriptor = sortDescriptor
-        
     }
     public init(_ type: ResultType.Type,
                 configuration: Realm.Configuration? = nil,

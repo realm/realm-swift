@@ -2493,7 +2493,7 @@ class CombineProjectionPublisherTests: CombinePublisherTestCase {
             .receive(on: subscribeOnQueue)
             .freeze()
             .assertNoFailure()
-            .sink{ change in
+            .sink { change in
                 print(change)
                 exp.fulfill()
             }

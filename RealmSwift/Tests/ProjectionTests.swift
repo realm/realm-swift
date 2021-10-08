@@ -232,7 +232,7 @@ public class Person: Object {
     @Persisted var firstName: String
     @Persisted var lastName = ""
     @Persisted var birthday: Date
-    @Persisted var address: Address? = nil
+    @Persisted var address: Address?
     @Persisted public var friends = List<Person>()
     @Persisted var reviews = List<String>()
     @Persisted var money: Decimal128
@@ -289,161 +289,152 @@ class ProjectionTests: TestCase {
     }
 
     var allTypeValues: [String: Any] {
-        get {
-            return [
-                "boolCol": true,
-                "intCol": 10,
-                "int8Col": 11 as Int8,
-                "int16Col": 12 as Int16,
-                "int32Col": 13 as Int32,
-                "int64Col": 14 as Int64,
-                "floatCol": 15 as Float,
-                "doubleCol": 16 as Double,
-                "stringCol": "a",
-                "binaryCol": "b".data(using: .utf8)!,
-                "dateCol": Date(timeIntervalSince1970: 17),
-                "decimalCol": 18 as Decimal128,
-                "objectIdCol": ObjectId("6058f12b957ba06156586a7c"),
-                "objectCol": ModernAllTypesObject(value: ["intCol": 1]),
-                "arrayCol": [
-                    ModernAllTypesObject(value: ["pk": ObjectId("6058f12682b2fbb1f334ef1d"), "intCol": 2]),
-                    ModernAllTypesObject(value: ["pk": ObjectId("6058f12d42e5a393e67538d0"), "intCol": 3])
-                ],
-                "setCol": [
-                    ModernAllTypesObject(value: ["pk": ObjectId("6058f12d42e5a393e67538d1"), "intCol": 4]),
-                    ModernAllTypesObject(value: ["pk": ObjectId("6058f12682b2fbb1f334ef1f"), "intCol": 5]),
-                    ModernAllTypesObject(value: ["pk": ObjectId("507f1f77bcf86cd799439011"), "intCol": 6])
-                ],
-                "anyCol": AnyRealmValue.int(20),
-                "uuidCol": UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90fd")!,
-                "intEnumCol": ModernIntEnum.value2,
-                "stringEnumCol": ModernStringEnum.value3,
-                
-                "optBoolCol": false,
-                "optIntCol": 30,
-                "optInt8Col": 31 as Int8,
-                "optInt16Col": 32 as Int16,
-                "optInt32Col": 33 as Int32,
-                "optInt64Col": 34 as Int64,
-                "optFloatCol": 35 as Float,
-                "optDoubleCol": 36 as Double,
-                "optStringCol": "c",
-                "optBinaryCol": "d".data(using: .utf8)!,
-                "optDateCol": Date(timeIntervalSince1970: 37),
-                "optDecimalCol": 38 as Decimal128,
-                "optObjectIdCol": ObjectId("6058f12b957ba06156586a7c"),
-                "optUuidCol": UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90fd")!,
-                "optIntEnumCol": ModernIntEnum.value1,
-                "optStringEnumCol": ModernStringEnum.value1,
-
-                "arrayBool": [true, false] as [Bool],
-                "arrayInt": [1, 1, 2, 3] as [Int],
-                "arrayInt8": [1, 2, 3, 1] as [Int8],
-                "arrayInt16": [1, 2, 3, 1] as [Int16],
-                "arrayInt32": [1, 2, 3, 1] as [Int32],
-                "arrayInt64": [1, 2, 3, 1] as [Int64],
-                "arrayFloat": [1 as Float, 2 as Float, 3 as Float, 1 as Float],
-                "arrayDouble": [1 as Double, 2 as Double, 3 as Double, 1 as Double],
-                "arrayString": ["a", "b", "c"] as [String],
-                "arrayBinary": ["a".data(using: .utf8)!] as [Data],
-                "arrayDate": [Date(timeIntervalSince1970: 0), Date(timeIntervalSince1970: 1)] as [Date],
-                "arrayDecimal": [1 as Decimal128, 2 as Decimal128],
-                "arrayObjectId": [ObjectId("6058f12b957ba06156586a7c"), ObjectId("6058f12682b2fbb1f334ef1d")],
-                "arrayAny": [.none, .int(1), .string("a"), .none] as [AnyRealmValue],
-                "arrayUuid": [UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90fd")!, UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90fe")!],
-                
-                "arrayOptBool": [true, false, nil] as [Bool?],
-                "arrayOptInt": [1, 1, 2, 3, nil] as [Int?],
-                "arrayOptInt8": [1, 2, 3, 1, nil] as [Int8?],
-                "arrayOptInt16": [1, 2, 3, 1, nil] as [Int16?],
-                "arrayOptInt32": [1, 2, 3, 1, nil] as [Int32?],
-                "arrayOptInt64": [1, 2, 3, 1, nil] as [Int64?],
-                "arrayOptFloat": [1 as Float, 2 as Float, 3 as Float, 1 as Float, nil],
-                "arrayOptDouble": [1 as Double, 2 as Double, 3 as Double, 1 as Double, nil],
-                "arrayOptString": ["a", "b", "c", nil],
-                "arrayOptBinary": ["a".data(using: .utf8)!, nil],
-                "arrayOptDate": [Date(timeIntervalSince1970: 0), Date(timeIntervalSince1970: 1), nil],
-                "arrayOptDecimal": [1 as Decimal128, 2 as Decimal128, nil],
-                "arrayOptObjectId": [ObjectId("6058f12b957ba06156586a7c"), ObjectId("6058f12682b2fbb1f334ef1d"), nil],
-                "arrayOptUuid": [UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90fd")!, UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90fe")!, nil],
-                
-                "setBool": [true] as [Bool],
-                "setInt": [1, 1, 2, 3] as [Int],
-                "setInt8": [1, 2, 3, 1] as [Int8],
-                "setInt16": [1, 2, 3, 1] as [Int16],
-                "setInt32": [1, 2, 3, 1] as [Int32],
-                "setInt64": [1, 2, 3, 1] as [Int64],
-                "setFloat": [1 as Float, 2 as Float, 3 as Float, 1 as Float],
-                "setDouble": [1 as Double, 2 as Double, 3 as Double, 1 as Double],
-                "setString": ["a", "b", "c"] as [String],
-                "setBinary": ["a".data(using: .utf8)!] as [Data],
-                "setDate": [Date(timeIntervalSince1970: 1), Date(timeIntervalSince1970: 2)] as [Date],
-                "setDecimal": [1 as Decimal128, 2 as Decimal128],
-                "setObjectId": [ObjectId("6058f12b957ba06156586a7c"),
-                                ObjectId("6058f12682b2fbb1f334ef1d")],
-                "setAny": [.none, .int(1), .string("a"), .none] as [AnyRealmValue],
-                "setUuid": [UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90fd")!,
-                            UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90fe")!,
-                            UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90ff")!],
-                
-                "setOptBool": [true, false, nil] as [Bool?],
-                "setOptInt": [1, 1, 2, 3, nil] as [Int?],
-                "setOptInt8": [1, 2, 3, 1, nil] as [Int8?],
-                "setOptInt16": [1, 2, 3, 1, nil] as [Int16?],
-                "setOptInt32": [1, 2, 3, 1, nil] as [Int32?],
-                "setOptInt64": [1, 2, 3, 1, nil] as [Int64?],
-                "setOptFloat": [1 as Float, 2 as Float, 3 as Float, 1 as Float, nil],
-                "setOptDouble": [1 as Double, 2 as Double, 3 as Double, 1 as Double, nil],
-                "setOptString": ["a", "b", "c", nil],
-                "setOptBinary": ["a".data(using: .utf8)!, nil],
-                "setOptDate": [Date(timeIntervalSince1970: 1), Date(timeIntervalSince1970: 2), nil],
-                "setOptDecimal": [1 as Decimal128, 2 as Decimal128, nil],
-                "setOptObjectId": [ObjectId("6058f12b957ba06156586a7c"), ObjectId("6058f12682b2fbb1f334ef1d"), nil],
-                "setOptUuid": [UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90fd")!,
-                               UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90fe")!,
-                               UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90ff")!,
-                               nil],
-                
-                "mapBool": ["1": true, "2": false] as [String: Bool],
-                "mapInt": ["1": 1, "2": 1, "3": 2, "4": 3] as [String: Int],
-                "mapInt8": ["1": 1, "2": 2, "3": 3, "4": 1] as [String: Int8],
-                "mapInt16": ["1": 1, "2": 2, "3": 3, "4": 1] as [String: Int16],
-                "mapInt32": ["1": 1, "2": 2, "3": 3, "4": 1] as [String: Int32],
-                "mapInt64": ["1": 1, "2": 2, "3": 3, "4": 1] as [String: Int64],
-                "mapFloat": ["1": 1 as Float, "2": 2 as Float, "3": 3 as Float, "4": 1 as Float],
-                "mapDouble": ["1": 1 as Double, "2": 2 as Double, "3": 3 as Double, "4": 1 as Double],
-                "mapString": ["1": "a", "2": "b", "3": "c"] as [String: String],
-                "mapBinary": ["1": "a".data(using: .utf8)!] as [String: Data],
-                "mapDate": ["1": Date(timeIntervalSince1970: 1), "2": Date(timeIntervalSince1970: 2)] as [String: Date],
-                "mapDecimal": ["1": 1 as Decimal128, "2": 2 as Decimal128],
-                "mapObjectId": ["1": ObjectId("6058f12b957ba06156586a7c"),
-                                "2": ObjectId("6058f12682b2fbb1f334ef1d")],
-                "mapAny": ["1": .none, "2": .int(1), "3": .string("a"), "4": .none] as [String: AnyRealmValue],
-                "mapUuid": ["1": UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90fd")!,
-                            "2": UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90fe")!,
-                            "3": UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90ff")!],
-                
-                "mapOptBool": ["1": true, "2": false, "3": nil] as [String: Bool?],
-                "mapOptInt": ["1": 1, "2": 1, "3": 2, "4": 3, "5": nil] as [String: Int?],
-                "mapOptInt8": ["1": 1, "2": 2, "3": 3, "4": 1, "5": nil] as [String: Int8?],
-                "mapOptInt16": ["1": 1, "2": 2, "3": 3, "4": 1, "5": nil] as [String: Int16?],
-                "mapOptInt32": ["1": 1, "2": 2, "3": 3, "4": 1, "5": nil] as [String: Int32?],
-                "mapOptInt64": ["1": 1, "2": 2, "3": 3, "4": 1, "5": nil] as [String: Int64?],
-                "mapOptFloat": ["1": 1 as Float, "2": 2 as Float, "3": 3 as Float, "4": 1 as Float, "5": nil],
-                "mapOptDouble": ["1": 1 as Double, "2": 2 as Double, "3": 3 as Double, "4": 1 as Double, "5": nil],
-                "mapOptString": ["1": "a", "2": "b", "3": "c", "4": nil],
-                "mapOptBinary": ["1": "a".data(using: .utf8)!, "2": nil],
-                "mapOptDate": ["1": Date(timeIntervalSince1970: 1), "2": Date(timeIntervalSince1970: 2), "3": nil],
-                "mapOptDecimal": ["1": 1 as Decimal128, "2": 2 as Decimal128, "3": nil],
-                "mapOptObjectId": ["1": ObjectId("6058f12b957ba06156586a7c"),
-                                   "2": ObjectId("6058f12682b2fbb1f334ef1d"),
-                                   "3": nil],
-                "mapOptUuid": ["1": UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90fd")!,
-                               "2": UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90fe")!,
-                               "3": UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90ff")!,
-                               "4": nil],
-            ] as [String : Any]
-        }
+        return [
+            "boolCol": true,
+            "intCol": 10,
+            "int8Col": 11 as Int8,
+            "int16Col": 12 as Int16,
+            "int32Col": 13 as Int32,
+            "int64Col": 14 as Int64,
+            "floatCol": 15 as Float,
+            "doubleCol": 16 as Double,
+            "stringCol": "a",
+            "binaryCol": "b".data(using: .utf8)!,
+            "dateCol": Date(timeIntervalSince1970: 17),
+            "decimalCol": 18 as Decimal128,
+            "objectIdCol": ObjectId("6058f12b957ba06156586a7c"),
+            "objectCol": ModernAllTypesObject(value: ["intCol": 1]),
+            "arrayCol": [
+                ModernAllTypesObject(value: ["pk": ObjectId("6058f12682b2fbb1f334ef1d"), "intCol": 2]),
+                ModernAllTypesObject(value: ["pk": ObjectId("6058f12d42e5a393e67538d0"), "intCol": 3])
+            ],
+            "setCol": [
+                ModernAllTypesObject(value: ["pk": ObjectId("6058f12d42e5a393e67538d1"), "intCol": 4]),
+                ModernAllTypesObject(value: ["pk": ObjectId("6058f12682b2fbb1f334ef1f"), "intCol": 5]),
+                ModernAllTypesObject(value: ["pk": ObjectId("507f1f77bcf86cd799439011"), "intCol": 6])
+            ],
+            "anyCol": AnyRealmValue.int(20),
+            "uuidCol": UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90fd")!,
+            "intEnumCol": ModernIntEnum.value2,
+            "stringEnumCol": ModernStringEnum.value3,
+            "optBoolCol": false,
+            "optIntCol": 30,
+            "optInt8Col": 31 as Int8,
+            "optInt16Col": 32 as Int16,
+            "optInt32Col": 33 as Int32,
+            "optInt64Col": 34 as Int64,
+            "optFloatCol": 35 as Float,
+            "optDoubleCol": 36 as Double,
+            "optStringCol": "c",
+            "optBinaryCol": "d".data(using: .utf8)!,
+            "optDateCol": Date(timeIntervalSince1970: 37),
+            "optDecimalCol": 38 as Decimal128,
+            "optObjectIdCol": ObjectId("6058f12b957ba06156586a7c"),
+            "optUuidCol": UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90fd")!,
+            "optIntEnumCol": ModernIntEnum.value1,
+            "optStringEnumCol": ModernStringEnum.value1,
+            "arrayBool": [true, false] as [Bool],
+            "arrayInt": [1, 1, 2, 3] as [Int],
+            "arrayInt8": [1, 2, 3, 1] as [Int8],
+            "arrayInt16": [1, 2, 3, 1] as [Int16],
+            "arrayInt32": [1, 2, 3, 1] as [Int32],
+            "arrayInt64": [1, 2, 3, 1] as [Int64],
+            "arrayFloat": [1 as Float, 2 as Float, 3 as Float, 1 as Float],
+            "arrayDouble": [1 as Double, 2 as Double, 3 as Double, 1 as Double],
+            "arrayString": ["a", "b", "c"] as [String],
+            "arrayBinary": ["a".data(using: .utf8)!] as [Data],
+            "arrayDate": [Date(timeIntervalSince1970: 0), Date(timeIntervalSince1970: 1)] as [Date],
+            "arrayDecimal": [1 as Decimal128, 2 as Decimal128],
+            "arrayObjectId": [ObjectId("6058f12b957ba06156586a7c"), ObjectId("6058f12682b2fbb1f334ef1d")],
+            "arrayAny": [.none, .int(1), .string("a"), .none] as [AnyRealmValue],
+            "arrayUuid": [UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90fd")!, UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90fe")!],
+            "arrayOptBool": [true, false, nil] as [Bool?],
+            "arrayOptInt": [1, 1, 2, 3, nil] as [Int?],
+            "arrayOptInt8": [1, 2, 3, 1, nil] as [Int8?],
+            "arrayOptInt16": [1, 2, 3, 1, nil] as [Int16?],
+            "arrayOptInt32": [1, 2, 3, 1, nil] as [Int32?],
+            "arrayOptInt64": [1, 2, 3, 1, nil] as [Int64?],
+            "arrayOptFloat": [1 as Float, 2 as Float, 3 as Float, 1 as Float, nil],
+            "arrayOptDouble": [1 as Double, 2 as Double, 3 as Double, 1 as Double, nil],
+            "arrayOptString": ["a", "b", "c", nil],
+            "arrayOptBinary": ["a".data(using: .utf8)!, nil],
+            "arrayOptDate": [Date(timeIntervalSince1970: 0), Date(timeIntervalSince1970: 1), nil],
+            "arrayOptDecimal": [1 as Decimal128, 2 as Decimal128, nil],
+            "arrayOptObjectId": [ObjectId("6058f12b957ba06156586a7c"), ObjectId("6058f12682b2fbb1f334ef1d"), nil],
+            "arrayOptUuid": [UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90fd")!, UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90fe")!, nil],
+            "setBool": [true] as [Bool],
+            "setInt": [1, 1, 2, 3] as [Int],
+            "setInt8": [1, 2, 3, 1] as [Int8],
+            "setInt16": [1, 2, 3, 1] as [Int16],
+            "setInt32": [1, 2, 3, 1] as [Int32],
+            "setInt64": [1, 2, 3, 1] as [Int64],
+            "setFloat": [1 as Float, 2 as Float, 3 as Float, 1 as Float],
+            "setDouble": [1 as Double, 2 as Double, 3 as Double, 1 as Double],
+            "setString": ["a", "b", "c"] as [String],
+            "setBinary": ["a".data(using: .utf8)!] as [Data],
+            "setDate": [Date(timeIntervalSince1970: 1), Date(timeIntervalSince1970: 2)] as [Date],
+            "setDecimal": [1 as Decimal128, 2 as Decimal128],
+            "setObjectId": [ObjectId("6058f12b957ba06156586a7c"),
+                            ObjectId("6058f12682b2fbb1f334ef1d")],
+            "setAny": [.none, .int(1), .string("a"), .none] as [AnyRealmValue],
+            "setUuid": [UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90fd")!,
+                        UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90fe")!,
+                        UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90ff")!],
+            "setOptBool": [true, false, nil] as [Bool?],
+            "setOptInt": [1, 1, 2, 3, nil] as [Int?],
+            "setOptInt8": [1, 2, 3, 1, nil] as [Int8?],
+            "setOptInt16": [1, 2, 3, 1, nil] as [Int16?],
+            "setOptInt32": [1, 2, 3, 1, nil] as [Int32?],
+            "setOptInt64": [1, 2, 3, 1, nil] as [Int64?],
+            "setOptFloat": [1 as Float, 2 as Float, 3 as Float, 1 as Float, nil],
+            "setOptDouble": [1 as Double, 2 as Double, 3 as Double, 1 as Double, nil],
+            "setOptString": ["a", "b", "c", nil],
+            "setOptBinary": ["a".data(using: .utf8)!, nil],
+            "setOptDate": [Date(timeIntervalSince1970: 1), Date(timeIntervalSince1970: 2), nil],
+            "setOptDecimal": [1 as Decimal128, 2 as Decimal128, nil],
+            "setOptObjectId": [ObjectId("6058f12b957ba06156586a7c"), ObjectId("6058f12682b2fbb1f334ef1d"), nil],
+            "setOptUuid": [UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90fd")!,
+                           UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90fe")!,
+                           UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90ff")!,
+                           nil],
+            "mapBool": ["1": true, "2": false] as [String: Bool],
+            "mapInt": ["1": 1, "2": 1, "3": 2, "4": 3] as [String: Int],
+            "mapInt8": ["1": 1, "2": 2, "3": 3, "4": 1] as [String: Int8],
+            "mapInt16": ["1": 1, "2": 2, "3": 3, "4": 1] as [String: Int16],
+            "mapInt32": ["1": 1, "2": 2, "3": 3, "4": 1] as [String: Int32],
+            "mapInt64": ["1": 1, "2": 2, "3": 3, "4": 1] as [String: Int64],
+            "mapFloat": ["1": 1 as Float, "2": 2 as Float, "3": 3 as Float, "4": 1 as Float],
+            "mapDouble": ["1": 1 as Double, "2": 2 as Double, "3": 3 as Double, "4": 1 as Double],
+            "mapString": ["1": "a", "2": "b", "3": "c"] as [String: String],
+            "mapBinary": ["1": "a".data(using: .utf8)!] as [String: Data],
+            "mapDate": ["1": Date(timeIntervalSince1970: 1), "2": Date(timeIntervalSince1970: 2)] as [String: Date],
+            "mapDecimal": ["1": 1 as Decimal128, "2": 2 as Decimal128],
+            "mapObjectId": ["1": ObjectId("6058f12b957ba06156586a7c"),
+                            "2": ObjectId("6058f12682b2fbb1f334ef1d")],
+            "mapAny": ["1": .none, "2": .int(1), "3": .string("a"), "4": .none] as [String: AnyRealmValue],
+            "mapUuid": ["1": UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90fd")!,
+                        "2": UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90fe")!,
+                        "3": UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90ff")!],
+            "mapOptBool": ["1": true, "2": false, "3": nil] as [String: Bool?],
+            "mapOptInt": ["1": 1, "2": 1, "3": 2, "4": 3, "5": nil] as [String: Int?],
+            "mapOptInt8": ["1": 1, "2": 2, "3": 3, "4": 1, "5": nil] as [String: Int8?],
+            "mapOptInt16": ["1": 1, "2": 2, "3": 3, "4": 1, "5": nil] as [String: Int16?],
+            "mapOptInt32": ["1": 1, "2": 2, "3": 3, "4": 1, "5": nil] as [String: Int32?],
+            "mapOptInt64": ["1": 1, "2": 2, "3": 3, "4": 1, "5": nil] as [String: Int64?],
+            "mapOptFloat": ["1": 1 as Float, "2": 2 as Float, "3": 3 as Float, "4": 1 as Float, "5": nil],
+            "mapOptDouble": ["1": 1 as Double, "2": 2 as Double, "3": 3 as Double, "4": 1 as Double, "5": nil],
+            "mapOptString": ["1": "a", "2": "b", "3": "c", "4": nil],
+            "mapOptBinary": ["1": "a".data(using: .utf8)!, "2": nil],
+            "mapOptDate": ["1": Date(timeIntervalSince1970: 1), "2": Date(timeIntervalSince1970: 2), "3": nil],
+            "mapOptDecimal": ["1": 1 as Decimal128, "2": 2 as Decimal128, "3": nil],
+            "mapOptObjectId": ["1": ObjectId("6058f12b957ba06156586a7c"),
+                               "2": ObjectId("6058f12682b2fbb1f334ef1d"),
+                               "3": nil],
+            "mapOptUuid": ["1": UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90fd")!,
+                           "2": UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90fe")!,
+                           "3": UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90ff")!,
+                           "4": nil],
+        ] as [String: Any]
     }
 
     override func setUp() {
@@ -481,7 +472,7 @@ class ProjectionTests: TestCase {
         XCTAssertEqual(pp.birthdayAsEpochtime, Date(timeIntervalSince1970: 10).timeIntervalSince1970)
         XCTAssertEqual(pp.firstFriendsName.first!, "Daenerys")
     }
-    
+
     func testProjectionFromResult() {
         let realm = realmWithTestPath()
         let johnSnow: PersonProjection = realm.objects(PersonProjection.self).first!
@@ -489,7 +480,7 @@ class ProjectionTests: TestCase {
         XCTAssertEqual(johnSnow.birthdayAsEpochtime, Date(timeIntervalSince1970: 10).timeIntervalSince1970)
         XCTAssertEqual(johnSnow.firstFriendsName.first!, "Daenerys")
     }
-    
+
     func testProjectionFromResultFiltered() {
         let realm = realmWithTestPath()
         let johnSnow: PersonProjection = realm.objects(PersonProjection.self).filter("lastName == 'Snow'").first!
@@ -507,18 +498,106 @@ class ProjectionTests: TestCase {
         XCTAssertEqual(dany.birthdayAsEpochtime, Date(timeIntervalSince1970: 0).timeIntervalSince1970)
         XCTAssertEqual(dany.firstFriendsName.first!, "John")
     }
-    
+
     func testProjectionEquality() {
         let realm = realmWithTestPath()
         let johnObject = realm.objects(Person.self).filter("lastName == 'Snow'").first!
         let johnDefaultInit = PersonProjection(projecting: johnObject)
         let johnMapped = realm.objects(PersonProjection.self).filter("lastName == 'Snow'").first!
         let notJohn = realm.objects(PersonProjection.self).filter("lastName != 'Snow'").first!
-        
+
         XCTAssertEqual(johnMapped, johnDefaultInit)
         XCTAssertNotEqual(johnMapped, notJohn)
     }
+
+    // swiftlint:disable trailing_whitespace
+    func testDescription() {
+        let actual = realmWithTestPath().objects(PersonProjection.self).filter("lastName == 'Snow'").first!.description
+        let expected = """
+PersonProjection<Person> <0x[0-9a-f]+> {
+    @Projected(\\Person.firstName) -> firstName: John
+    @Projected(\\Person.lastName) -> lastNameCaps: SNOW
+    @Projected(\\Person.birthday) -> birthdayAsEpochtime: 10.0
+    @Projected(\\Person.address.city) -> homeCity: Optional("Winterfell")
+    @Projected(\\Person.friends) -> firstFriendsName: ProjectedList<String>(backingList: List<Person> <0x[0-9a-f]+> (
+    [0] Person {
+        firstName = Daenerys;
+        lastName = Targaryen;
+        birthday = 1970-01-01 00:00:00 +0000;
+        address = Address {
+            city = King's Landing;
+            country = Westeros;
+        };
+        friends = List<Person> <0x[0-9a-f]+> (
+            [0] Person {
+                firstName = John;
+                lastName = Snow;
+                birthday = 1970-01-01 00:00:10 +0000;
+                address = Address {
+                    city = Winterfell;
+                    country = Kingdom in the North;
+                };
+                friends = List<Person> <0x[0-9a-f]+> (
+                    [0] <Maximum depth exceeded>
+                );
+                reviews = List<string> <0x[0-9a-f]+> (
+                
+                );
+                money = 2.22;
+            }
+        );
+        reviews = List<string> <0x[0-9a-f]+> (
+        
+        );
+        money = 2.22;
+    }
+), keyPath: Swift.ReferenceWritableKeyPath<RealmSwift_Tests.Person, Swift.String>, propertyName: "firstName", anyCtor: (Function))
+
+    rootObject: Person {
+    firstName = John;
+    lastName = Snow;
+    birthday = 1970-01-01 00:00:10 +0000;
+    address = Address {
+        city = Winterfell;
+        country = Kingdom in the North;
+    };
+    friends = List<Person> <0x[0-9a-f]+> (
+        [0] Person {
+            firstName = Daenerys;
+            lastName = Targaryen;
+            birthday = 1970-01-01 00:00:00 +0000;
+            address = Address {
+                city = King's Landing;
+                country = Westeros;
+            };
+            friends = List<Person> <0x[0-9a-f]+> (
+                [0] Person {
+                    firstName = John;
+                    lastName = Snow;
+                    birthday = 1970-01-01 00:00:10 +0000;
+                    address = <Maximum depth exceeded>;
+                    friends = <Maximum depth exceeded>;
+                    reviews = <Maximum depth exceeded>;
+                    money = 2.22;
+                }
+            );
+            reviews = List<string> <0x[0-9a-f]+> (
+            
+            );
+            money = 2.22;
+        }
+    );
+    reviews = List<string> <0x[0-9a-f]+> (
     
+    );
+    money = 2.22;
+}
+}
+"""
+        assertMatches(actual, expected.replacingOccurrences(of: "    ", with: "\t"))
+    }
+    // swiftlint:enable trailing_whitespace
+
     func testProjectionsRealmShouldNotBeNil() {
         XCTAssertNotNil(realmWithTestPath().objects(PersonProjection.self).first!.realm)
         XCTAssertNotNil(realmWithTestPath().objects(AddressProjection.self).first!.realm)
@@ -526,7 +605,6 @@ class ProjectionTests: TestCase {
 
     func testProjectionFromResultSortedBirthday() {
         let realm = realmWithTestPath()
-//        let dany: PersonProjection = realm.objects(PersonProjection.self).sorted(byKeyPath: "birthdayAsEpochtime").first!
         let dany: PersonProjection = realm.objects(PersonProjection.self).sorted(byKeyPath: "birthday").first!
 
         XCTAssertEqual(dany.homeCity, "King's Landing")
@@ -670,10 +748,10 @@ class ProjectionTests: TestCase {
         assertMapEquals(allTypesModel.mapOptObjectId, allTypeValues["mapOptObjectId"] as! [String: ObjectId?])
         assertMapEquals(allTypesModel.mapOptUuid, allTypeValues["mapOptUuid"] as! [String: UUID?])
     }
-    
+
     func observeKeyPathChange<Root: ObjectBase, P: Projection<Root>, E: Equatable>(_ obj: Object, _ obs: P, _ keyPath: PartialKeyPath<P>,
-                                             _ old: E?, _ new: E?,
-                                             fileName: StaticString = #file, lineNumber: UInt = #line,_ block: () -> Void) {
+                                                                                   _ old: E?, _ new: E?,
+                                                                                   fileName: StaticString = #file, lineNumber: UInt = #line, _ block: () -> Void) {
         let ex = expectation(description: "observeKeyPathChange")
         let token = obs.observe(keyPaths: [keyPath]) { changes in
             ex.fulfill()
@@ -682,7 +760,7 @@ class ProjectionTests: TestCase {
 
                 let actualOld = properties[0].oldValue as? E
                 let actualNew = properties[0].newValue as? E
-                
+
                 XCTAssert(actualOld != actualNew, "Old value \(String(describing: actualOld)) should not be equal to New value \(String(describing: actualNew))",
                           file: (fileName), line: lineNumber)
                 XCTAssert(new == actualNew,
@@ -697,17 +775,17 @@ class ProjectionTests: TestCase {
                 XCTFail("Expected .change but got \(changes)")
             }
         }
-        
+
         try! obj.realm!.write {
             block()
         }
         waitForExpectations(timeout: 2, handler: nil)
         token.invalidate()
     }
-    
+
     func observeArrayKeyPathChange<Root: ObjectBase, P: Projection<Root>, E: Equatable & RealmCollectionValue>(_ obj: Object, _ obs: P, _ keyPath: PartialKeyPath<P>,
-                                                                _ new: [E]?,
-                                                                fileName: StaticString = #file, lineNumber: UInt = #line,_ block: () -> Void) {
+                                                                                                               _ new: [E]?,
+                                                                                                               fileName: StaticString = #file, lineNumber: UInt = #line, _ block: () -> Void) {
         let ex = expectation(description: "observeKeyPathChange")
         let token = obs.observe(keyPaths: [keyPath]) { changes in
             ex.fulfill()
@@ -727,8 +805,7 @@ class ProjectionTests: TestCase {
 
                 if projectedNew.count != new.count {
                     XCTAssertEqual(projectedNew.count, new.count, "Expected \(projectedNew) and \(new) to be equal", file: (fileName), line: lineNumber)
-                }
-                else {
+                } else {
                     for (index, element) in projectedNew.enumerated() {
                         XCTAssertEqual(element, new[index], "Element \(element) at index \(index) should be equal to \(new[index])", file: (fileName), line: lineNumber)
                     }
@@ -737,7 +814,7 @@ class ProjectionTests: TestCase {
                 XCTFail("Expected .change but got \(changes)", file: (fileName), line: lineNumber)
             }
         }
-        
+
         try! obj.realm!.write {
             block()
         }
@@ -746,8 +823,8 @@ class ProjectionTests: TestCase {
     }
 
     func observeSetKeyPathChange<Root: ObjectBase, P: Projection<Root>, E: Equatable & RealmCollectionValue>(_ obj: Object, _ obs: P, _ keyPath: PartialKeyPath<P>,
-                                                                                     _ new: [E],
-                                                                                     fileName: StaticString = #file, lineNumber: UInt = #line,_ block: () -> Void) {
+                                                                                                             _ new: [E],
+                                                                                                             fileName: StaticString = #file, lineNumber: UInt = #line, _ block: () -> Void) {
         let ex = expectation(description: "observeKeyPathChange")
         let token = obs.observe(keyPaths: [keyPath]) { changes in
             ex.fulfill()
@@ -757,29 +834,29 @@ class ProjectionTests: TestCase {
                 let observedNew = properties[0].newValue as? Set<E>
                 XCTAssertNil(observedOld)
                 XCTAssertNil(observedNew)
-                
+
                 guard let projectedNew = object[keyPath: keyPath] as? MutableSet<E> else {
                           XCTFail("Expected new set to be \(String(describing: Set<E>.self)) and projected set to be \(String(describing: MutableSet<E>.self)), got \(String(describing: new)) and \(String(describing: obs[keyPath: keyPath]))",
                                   file: (fileName), line: lineNumber)
                           return
                       }
-                
+
                 self.assertSetEquals(projectedNew, new)
             } else {
                 XCTFail("Expected .change but got \(changes)", file: (fileName), line: lineNumber)
             }
         }
-        
+
         try! obj.realm!.write {
             block()
         }
         waitForExpectations(timeout: 2, handler: nil)
         token.invalidate()
     }
-    
+
     func observeMapKeyPathChange<Root: ObjectBase, P: Projection<Root>, E: Equatable & RealmCollectionValue>(_ obj: Object, _ obs: P, _ keyPath: PartialKeyPath<P>,
-                                                                                     _ new: Dictionary<String, E>,
-                                                                                     fileName: StaticString = #file, lineNumber: UInt = #line,_ block: () -> Void) {
+                                                                                                             _ new: Dictionary<String, E>,
+                                                                                                             fileName: StaticString = #file, lineNumber: UInt = #line, _ block: () -> Void) {
         let ex = expectation(description: "observeKeyPathChange")
         let token = obs.observe(keyPaths: [keyPath]) { changes in
             ex.fulfill()
@@ -789,7 +866,7 @@ class ProjectionTests: TestCase {
                 let observedNew = properties[0].newValue as? MutableSet<E>
                 XCTAssertNil(observedOld)
                 XCTAssertNil(observedNew)
-                
+
                 guard let projectedNew = object[keyPath: keyPath] as? Map<String, E> else {
                     XCTFail("Expected new set to be \(String(describing: Dictionary<String, E>.self)) and projected set to be \(String(describing: Map<String, E>.self)), got \(String(describing: new)) and \(String(describing: obs[keyPath: keyPath]))",
                             file: (fileName), line: lineNumber)
@@ -797,8 +874,7 @@ class ProjectionTests: TestCase {
                 }
                 if projectedNew.count != new.count {
                     XCTAssertEqual(projectedNew.count, new.count, "Expected \(projectedNew) and \(new) to be equal", file: (fileName), line: lineNumber)
-                }
-                else {
+                } else {
                     for (key, value) in new {
                         XCTAssertEqual(projectedNew[key], value, "Projected set should contain (\(key), \(value))", file: (fileName), line: lineNumber)
                     }
@@ -814,7 +890,7 @@ class ProjectionTests: TestCase {
         waitForExpectations(timeout: 2, handler: nil)
         token.invalidate()
     }
-    
+
     func testAllPropertyTypesNotifications() {
         let realm = realmWithTestPath()
         let obj = realm.objects(ModernAllTypesObject.self).first!
@@ -1013,39 +1089,34 @@ class ProjectionTests: TestCase {
     }
 
     func testObserveKeyPath() {
-//        let realm = realmWithTestPath()
-//        let johnProjection = realm.objects(PersonProjection.self).filter("lastName == 'Snow'").first!
-//
-//        var ex = expectation(description: "testProjectionNotificationSentInitially")
-//        let token = johnProjection.observe(keyPaths: ["lastName"], on: nil) { change in
-//            print(change)
-//            ex.fulfill()
-//        }
-//        waitForExpectations(timeout: 1, handler: nil)
-//
-//        // Expect notification on lastName key path when it is
-//        ex = expectation(description: "testProjectionNotificationSentOnChange")
-//        dispatchSyncNewThread {
-//            let realm = self.realmWithTestPath()
-//            try! realm.write {
-//                let johnObject = realm.objects(Person.self).filter("lastName == 'Snow'").first!
-//                johnObject.lastName = "Targaryen"
-//            }
-//        }
-//        waitForExpectations(timeout: 1, handler: nil)
-//        token.invalidate()
+        let realm = realmWithTestPath()
+        let johnProjection = realm.objects(PersonProjection.self).filter("lastName == 'Snow'").first!
+
+        let ex = expectation(description: "testProjectionNotification")
+        let token = johnProjection.observe(keyPaths: ["lastName"], on: nil) { _ in
+            ex.fulfill()
+        }
+        dispatchSyncNewThread {
+            let realm = self.realmWithTestPath()
+            try! realm.write {
+                let johnObject = realm.objects(Person.self).filter("lastName == 'Snow'").first!
+                johnObject.lastName = "Targaryen"
+            }
+        }
+        waitForExpectations(timeout: 1, handler: nil)
+        token.invalidate()
     }
-    
+
     var changeDictionary: [NSKeyValueChangeKey: Any]?
 
     override class func observeValue(forKeyPath keyPath: String?,
                                      of object: Any?,
-                                     change: [NSKeyValueChangeKey : Any]?,
+                                     change: [NSKeyValueChangeKey: Any]?,
                                      context: UnsafeMutableRawPointer?) {
         // noop
     }
 
-    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
         // noop
         changeDictionary = change
     }
@@ -1105,7 +1176,7 @@ class ProjectionTests: TestCase {
         try! realm.commitWrite()
         return (obj, obs)
     }
-    
+
     func observeSetChange(_ obj: AllTypesProjection, _ key: String,
                           fileName: StaticString = #file, lineNumber: UInt = #line, _ block: () -> Void) {
         obj.addObserver(self, forKeyPath: key, options: [], context: nil)
@@ -1277,7 +1348,6 @@ class ProjectionTests: TestCase {
         observeListChange(obs, "arrayOptDecimal", .insertion) { obj.arrayOptDecimal.insert(nil, at: 0) }
         observeListChange(obs, "arrayOptObjectId", .insertion) { obj.arrayOptObjectId.insert(nil, at: 0) }
         observeListChange(obs, "arrayOptUuid", .insertion) { obj.arrayOptUuid.insert(nil, at: 0) }
-        
         // .replacement
         observeListChange(obs, "arrayBool", .replacement) { obj.arrayBool[0] = true }
         observeListChange(obs, "arrayInt", .replacement) { obj.arrayInt[0] = 10 }
@@ -1520,7 +1590,6 @@ class ProjectionTests: TestCase {
         observeSetChange(obs, "setOptDecimal") { obj.setOptDecimal.remove(nil) }
         observeSetChange(obs, "setOptObjectId") { obj.setOptObjectId.remove(nil) }
         observeSetChange(obs, "setOptUuid") { obj.setOptUuid.remove(nil) }
-        
         // delete all
         observeSetChange(obs, "setBool") { obj.setBool.removeAll() }
         observeSetChange(obs, "setInt") { obj.setInt.removeAll() }
@@ -1624,7 +1693,7 @@ class ProjectionTests: TestCase {
         })
         assertThrows(projection.freeze(), "Object has been deleted or invalidated.")
     }
-    
+
     func testFreezeFromWrongThread() {
         let projection = simpleProjection()
         dispatchSyncNewThread {
@@ -1694,7 +1763,7 @@ class ProjectionTests: TestCase {
         let projection = simpleProjection()
         let frozen = projection.freeze()
         let realm = realmWithTestPath()
-        
+
         XCTAssertTrue(frozen.isFrozen)
         try! realm.write {
             realm.deleteAll()
@@ -1724,7 +1793,7 @@ class ProjectionTests: TestCase {
         let projection = simpleProjection()
         let tsr = ThreadSafeReference(to: projection)
         var frozen: SimpleProjection!
-        
+
         dispatchSyncNewThread {
             let realm = self.realmWithTestPath()
             let resolvedProjection: SimpleProjection = realm.resolve(tsr)!
@@ -1757,41 +1826,35 @@ class ProjectionTests: TestCase {
     }
 
     func testObserveComputedChange() throws {
-        let realm = try Realm()
-        let person: Person = try realm.write {
-            let person = Person()
-            person.lastName = "Clay"
-            realm.add(person)
-            return person
-        }
+        let realm = realmWithTestPath()
+        let johnProjection = realm.objects(PersonProjection.self).first!
 
-        let pp = PersonProjection(projecting: person)
-
-        XCTAssertEqual(pp.lastNameCaps, "CLAY")
+        XCTAssertEqual(johnProjection.lastNameCaps, "SNOW")
 
         let ex = expectation(description: "values will be observed")
-        let token = pp.observe(keyPaths: [\.lastNameCaps]) { change in
+        let token = johnProjection.observe(keyPaths: [\.lastNameCaps]) { change in
             switch change {
             case .error(_):
                 break
             case .change(_, let change):
                 XCTAssertEqual(change.first!.name, "lastNameCaps")
-                XCTAssertEqual(change.first!.oldValue as! String, "CLAY")
+                XCTAssertEqual(change.first!.oldValue as! String, "SNOW")
                 XCTAssertEqual(change.first!.newValue as! String, "ALI")
                 ex.fulfill()
             case .deleted:
                 break
             }
         }
-        let tsr = ThreadSafeReference(to: person)
+
         dispatchSyncNewThread {
-            let realm = try! Realm()
-            let person = realm.resolve(tsr)!
+            let realm = self.realmWithTestPath()
+            let johnObject = realm.objects(Person.self).filter("lastName == 'Snow'").first!
             try! realm.write {
-                person.lastName = "Ali"
+                johnObject.lastName = "Ali"
             }
         }
 
+//        realm.refresh()
         waitForExpectations(timeout: 2)
         token.invalidate()
     }

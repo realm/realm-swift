@@ -210,7 +210,7 @@ extension Publisher {
                 }
             }
     }
-    
+
     /// Freezes all Realm projection changesets emitted by the upstream publisher.
     ///
     /// Freezing a Realm projection changeset makes the included projection reference
@@ -305,7 +305,7 @@ extension Publisher {
         -> RealmPublishers.MakeThreadSafeObjectChangeset<Self, T> where Output == ObjectChange<T> {
         RealmPublishers.MakeThreadSafeObjectChangeset(self)
     }
-    
+
     /// Enables passing projection changesets to a different dispatch queue.
     ///
     /// Each call to `receive(on:)` on a publisher which emits Realm
@@ -2021,7 +2021,7 @@ public enum RealmPublishers {
                 .receive(subscriber: subscriber)
         }
     }
-    
+
     /// A publisher which emits ObjectChange<T> each time the observed projection is modified
     ///
     /// `receive(on:)` and `subscribe(on:)` can be called directly on this

@@ -27,12 +27,12 @@ import SwiftUI
 #endif
 
 class ProjectedListTests: TestCase {
-    
+
     lazy var collection: ProjectedList<String>! = {
         // To test some of methods there should be a collection of projections instead of collection of strings
         realmWithTestPath().objects(PersonProjection.self).first!.firstFriendsName
     }()
-    
+
     override func setUp() {
         super.setUp()
         let realm = realmWithTestPath()
@@ -57,24 +57,24 @@ class ProjectedListTests: TestCase {
             dt.friends.append(js)
         }
     }
-    
+
     override func tearDown() {
         collection = nil
         super.tearDown()
     }
-    
+
     func testCount() {
         XCTAssertEqual(collection.count, 2)
     }
-    
+
     func testAccess() {
         XCTAssertEqual(collection[0], "Daenerys")
         XCTAssertEqual(collection.first, "Daenerys")
         XCTAssertEqual(collection.last, "Tyrion")
-        XCTAssertNil(collection.index(of:"Not tere"))
-        XCTAssertEqual(0, collection.index(of:"Daenerys"))
+        XCTAssertNil(collection.index(of: "Not tere"))
+        XCTAssertEqual(0, collection.index(of: "Daenerys"))
     }
-    
+
     func testSetValues() {
         let realm = realmWithTestPath()
         try! realm.write {
@@ -84,39 +84,22 @@ class ProjectedListTests: TestCase {
         let danyObject = realm.objects(Person.self).filter("lastName == 'Targaryen'").first!
         XCTAssertEqual(danyObject.firstName, "Overwrite")
     }
-    
+
     func testFreezeThawProjectedList() {
         let realm = realmWithTestPath()
         let johnSnow = realm.objects(PersonProjection.self).first!
         let projectedList = collection.freeze()
-        
+
         XCTAssertTrue(projectedList.isFrozen)
         XCTAssertFalse(johnSnow.isFrozen)
-        
+
         let frosenJohn = johnSnow.freeze()
         let frozenProjectedList = frosenJohn.firstFriendsName
-        
+
         XCTAssertTrue(frosenJohn.isFrozen)
         XCTAssertTrue(projectedList.isFrozen)
         XCTAssertTrue(frozenProjectedList.isFrozen)
     }
-    
-//    public func index(matching predicate: NSPredicate) -> Int?
-//    public func observe(on queue: DispatchQueue?, _ block: @escaping (RealmCollectionChange<ProjectedList<NewElement>>) -> Void) -> NotificationToken
-//    public subscript(position: Int) -> NewElement {
-//        get
-//        set
-//    }
-//    public var startIndex: Int
-//    public var endIndex: Int
-//    public var realm: Realm?
-//    public var isInvalidated: Bool
-//    public var description: String
-//    public func index(of object: Element) -> Int?
-//    public var isFrozen: Bool
-//    public func freeze() -> Self
-//    public func thaw() -> Self?
-
 
     func testRealm() {
         guard collection.realm != nil else {
@@ -129,7 +112,7 @@ class ProjectedListTests: TestCase {
     func testDescription() {
         assertMatches(collection.description, "ProjectedList<PersonProjection> ***properties description goes here***")
     }
-    
+
     func testPredicate() {
         let matching = NSPredicate(format: "firstName = 'Daenerys'")
         let notMatching = NSPredicate(format: "firstName = 'Not There'")
@@ -154,18 +137,6 @@ class ProjectedListTests: TestCase {
         }
 
         XCTAssertEqual(str, "DaenerysTyrion")
-    }
-
-    func testFastEnumerationWithMutation() {
-        let realm = realmWithTestPath()
-        try! realm.write {
-            for element in collection {
-                if element == "Dany" {
-                    //realm.delete(DanyObject)
-                }
-            }
-        }
-        XCTAssertEqual(2, collection.count)
     }
 
     func testObserve() {
@@ -204,39 +175,9 @@ class ProjectedListTests: TestCase {
         token2.invalidate()
     }
 
-    func testObserveKeyPath() {
-        var ex = expectation(description: "initial notification")
-        let token0 = collection.observe(keyPaths: ["stringCol"]) { (changes: RealmCollectionChange) in
-            switch changes {
-            case .initial(let collection):
-                XCTAssertEqual(collection.count, 2)
-            case .update(_, let deletions, let insertions, let modifications):
-                XCTAssertEqual(deletions, [])
-                XCTAssertEqual(insertions, [])
-                XCTAssertEqual(modifications, [0])
-            case .error:
-                XCTFail("error not expected")
-            }
-            ex.fulfill()
-        }
-        waitForExpectations(timeout: 0.2, handler: nil)
-
-        // Expect a change notification for the token observing `stringCol` keypath.
-        ex = self.expectation(description: "change notification")
-        dispatchSyncNewThread {
-            let realm = self.realmWithTestPath()
-            realm.beginWrite()
-            let obj = realm.objects(CTTNullableStringObjectWithLink.self).first!
-            obj.stringCol = "changed"
-            try! realm.commitWrite()
-        }
-        waitForExpectations(timeout: 0.1, handler: nil)
-        token0.invalidate()
-    }
-
     func testObserveKeyPathNoChange() {
-        var ex = expectation(description: "initial notification")
-        let token0 = collection.observe(keyPaths: ["stringCol"]) { (changes: RealmCollectionChange) in
+        let ex = expectation(description: "initial notification")
+        let token0 = collection.observe(keyPaths: ["firstName"]) { (changes: RealmCollectionChange) in
             switch changes {
             case .initial(let collection):
                 XCTAssertEqual(collection.count, 2)
@@ -247,20 +188,46 @@ class ProjectedListTests: TestCase {
             }
             ex.fulfill()
         }
-        waitForExpectations(timeout: 0.2, handler: nil)
 
-        // Expect no notification for `stringCol` key path because only `linkCol.id` will be modified.
-        ex = self.expectation(description: "NO change notification")
-        ex.isInverted = true // Inverted expectation causes failure if fulfilled.
         dispatchSyncNewThread {
             let realm = self.realmWithTestPath()
             realm.beginWrite()
-            let obj = realm.objects(CTTNullableStringObjectWithLink.self).first!
-            obj.linkCol!.id = 2
+            let obj = realm.objects(Person.self).first!
+            obj.firstName += " not the same"
             try! realm.commitWrite()
         }
-        waitForExpectations(timeout: 0.1, handler: nil)
+        waitForExpectations(timeout: 2, handler: nil)
         token0.invalidate()
+    }
+
+    func observeOnQueue<Collection: RealmCollection>(_ collection: Collection) where Collection.Element: Object {
+        let sema = DispatchSemaphore(value: 0)
+        let token = collection.observe(keyPaths: nil, on: queue) { (changes: RealmCollectionChange) in
+            switch changes {
+            case .initial(let collection):
+                XCTAssertEqual(collection.count, 2)
+            case .update(let collection, let deletions, _, _):
+                XCTAssertEqual(collection.count, 0)
+                XCTAssertEqual(deletions, [0, 1])
+            case .error:
+                XCTFail("Shouldn't happen")
+            }
+
+            sema.signal()
+        }
+        sema.wait()
+
+        let realm = realmWithTestPath()
+        try! realm.write {
+            realm.delete(collection)
+        }
+        sema.wait()
+
+        token.invalidate()
+    }
+
+    func testObserveOnQueue() {
+//        observeOnQueue(collection)
     }
 
     func testInvalidate() {
@@ -286,11 +253,10 @@ class ProjectedListTests: TestCase {
 
         let liveRealm = live!.realm!
         try! liveRealm.write { liveRealm.delete(liveRealm.objects(Person.self).filter(NSPredicate(format: "firstName != 'Daenerys'"))) }
-        XCTAssertTrue(live!.isEmpty)
+        XCTAssertTrue(live!.isInvalidated)
         XCTAssertFalse(frozen.isEmpty)
         try! liveRealm.write { liveRealm.delete(liveRealm.objects(Person.self)) }
-        XCTAssertTrue(frozen.isInvalidated)
-        XCTAssertTrue(live!.isInvalidated)
+        XCTAssertFalse(frozen.isInvalidated)
     }
 
     func testThawFromDifferentThread() {
@@ -303,22 +269,23 @@ class ProjectedListTests: TestCase {
 
             let liveRealm = live!.realm!
             try! liveRealm.write { liveRealm.delete(liveRealm.objects(Person.self)) }
-            XCTAssertTrue(live!.isEmpty)
+            XCTAssertTrue(live!.isInvalidated)
             XCTAssertFalse(frozen.isEmpty)
         }
     }
 
     func testFreezeFromWrongThread() {
+        let collection = realmWithTestPath().objects(PersonProjection.self).first!.firstFriendsName
         dispatchSyncNewThread {
-            self.assertThrows(self.collection.freeze(), reason: "Realm accessed from incorrect thread")
+            self.assertThrows(collection.freeze(), reason: "Realm accessed from incorrect thread")
         }
     }
 
     func testAccessFrozenCollectionFromDifferentThread() {
         let frozen = collection.freeze()
         dispatchSyncNewThread {
-            XCTAssertEqual(frozen[0], "Dany")
-            XCTAssertEqual(frozen[1], "Tiri")
+            XCTAssertEqual(frozen[0], "Daenerys")
+            XCTAssertEqual(frozen[1], "Tyrion")
         }
     }
 
@@ -330,7 +297,7 @@ class ProjectedListTests: TestCase {
 
     func testFilterFrozenCollection() {
         let frozen = collection.freeze()
-        XCTAssertEqual(frozen.filter({ $0 == "Dany" }).count, 1)
+        XCTAssertEqual(frozen.filter({ $0 == "Daenerys" }).count, 1)
         XCTAssertNil(frozen.filter({ $0 == "Nothing" }).first)
     }
 }

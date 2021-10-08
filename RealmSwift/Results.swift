@@ -85,11 +85,11 @@ extension AnyRealmValue: AddableType {}
 @frozen public struct Results<Element: RealmCollectionValue>: Equatable {
 
     internal let rlmResults: RLMResults<AnyObject>
-    
+
     public static func == (lhs: Results<Element>, rhs: Results<Element>) -> Bool {
         lhs.rlmResults.isEqual(to: rhs.rlmResults)
     }
-    
+
     /// A human-readable description of the objects represented by the results.
     public var description: String {
         return RLMDescriptionWithMaxDepth("Results", rlmResults, RLMDescriptionMaxDepth)
@@ -129,7 +129,7 @@ extension AnyRealmValue: AddableType {}
         self.projector = projector
     }
 
-    private var projector: ((ObjectBase) -> Element)? = nil
+    private var projector: ((ObjectBase) -> Element)?
 
     // MARK: Index Retrieval
 
