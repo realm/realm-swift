@@ -2168,11 +2168,6 @@ class QueryTests: TestCase {
             ($0.intCol == 6) &&
             (((($0.setCol.intCol == 5) && ($0.setCol.stringCol != "Blah"))).count == 1)
         }
-
-        let query: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>) = {
-            ($0.setCol.intCol == 1 && $0.arrayCol.intCol == 1).count > 0
-        }
-        assertThrows(query(Query<ModernAllTypesObject>())._constructPredicate(), reason: "Subquery predicates will only work on one collection at a time.")
     }
 
     // MARK: - Collection Aggregations
@@ -3003,24 +2998,20 @@ class QueryTests: TestCase {
     }
 
     func testAggregateNotSupported() {
-        let queryAvg: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>) = {
+        assertThrows(assertQuery(predicate: "", values: [], expectedCount: 0) {
             $0.intCol.avg == 1
-        }
-        assertThrows(queryAvg(Query<ModernAllTypesObject>())._constructPredicate(), reason: "Could not aggregate `.@avg`, property is not within a collection.")
+        }, reason: "Aggregate operations can only be used on key paths that include an collection property")
 
-        let queryMax: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>) = {
+        assertThrows(assertQuery(predicate: "", values: [], expectedCount: 0) {
             $0.doubleCol.max != 1
-        }
-        assertThrows(queryMax(Query<ModernAllTypesObject>())._constructPredicate(), reason: "Could not aggregate `.@max`, property is not within a collection.")
+        }, reason: "Aggregate operations can only be used on key paths that include an collection property")
 
-        let queryMin: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>) = {
+        assertThrows(assertQuery(predicate: "", values: [], expectedCount: 0) {
             $0.dateCol.min > Date()
-        }
-        assertThrows(queryMin(Query<ModernAllTypesObject>())._constructPredicate(), reason: "Could not aggregate `.@min`, property is not within a collection.")
+        }, reason: "Aggregate operations can only be used on key paths that include an collection property")
 
-        let querySum: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>) = {
+        assertThrows(assertQuery(predicate: "", values: [], expectedCount: 0) {
             $0.decimalCol.sum < 1
-        }
-        assertThrows(querySum(Query<ModernAllTypesObject>())._constructPredicate(), reason: "Could not aggregate `.@sum`, property is not within a collection.")
+        }, reason: "Aggregate operations can only be used on key paths that include an collection property")
     }
 }
