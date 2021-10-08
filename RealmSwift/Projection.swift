@@ -58,9 +58,7 @@ fileprivate protocol AnyProjected {
 /// ```
 @propertyWrapper
 public struct Projected<T: ObjectBase, Value>: AnyProjected {
-//    func bind(ptr: UnsafeMutableRawPointer) -> AnyKeyPath {
-//        ptr.assumingMemoryBound(to: Self.self).pointee.projectedKeyPath
-//    }
+
     fileprivate var _projectedKeyPath: KeyPath<T, Value>!
     var projectedKeyPath: AnyKeyPath {
         _projectedKeyPath

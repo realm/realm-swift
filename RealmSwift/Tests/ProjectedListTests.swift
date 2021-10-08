@@ -58,14 +58,19 @@ class ProjectedListTests: TestCase {
         }
     }
     
+    override func tearDown() {
+        collection = nil
+        super.tearDown()
+    }
+    
     func testCount() {
-        XCTAssertEqual(collection.count, 1)
+        XCTAssertEqual(collection.count, 2)
     }
     
     func testAccess() {
         XCTAssertEqual(collection[0], "Daenerys")
         XCTAssertEqual(collection.first, "Daenerys")
-        XCTAssertEqual(collection.last, "Daenerys")
+        XCTAssertEqual(collection.last, "Tyrion")
         XCTAssertNil(collection.index(of:"Not tere"))
         XCTAssertEqual(0, collection.index(of:"Daenerys"))
     }
@@ -85,22 +90,17 @@ class ProjectedListTests: TestCase {
         let johnSnow = realm.objects(PersonProjection.self).first!
         let projectedList = collection.freeze()
         
-        XCTAssertFalse(projectedList.isFrozen)
+        XCTAssertTrue(projectedList.isFrozen)
         XCTAssertFalse(johnSnow.isFrozen)
         
         let frosenJohn = johnSnow.freeze()
         let frozenProjectedList = frosenJohn.firstFriendsName
         
         XCTAssertTrue(frosenJohn.isFrozen)
-        XCTAssertFalse(projectedList.isFrozen)
+        XCTAssertTrue(projectedList.isFrozen)
         XCTAssertTrue(frozenProjectedList.isFrozen)
-
-//        let thawedJohnProjectionA = frozenJohnProjection.thaw()!
-//        let thawedJohnProjectionB = johnProjectionFromFrozen.thaw()!
-//        XCTAssertFalse(thawedJohnProjectionA.isFrozen)
-//        XCTAssertFalse(thawedJohnProjectionB.isFrozen)
-//        XCTAssertEqual(thawedJohnProjectionA, thawedJohnProjectionB)
     }
+    
 //    public func index(matching predicate: NSPredicate) -> Int?
 //    public func observe(on queue: DispatchQueue?, _ block: @escaping (RealmCollectionChange<ProjectedList<NewElement>>) -> Void) -> NotificationToken
 //    public subscript(position: Int) -> NewElement {
@@ -131,20 +131,20 @@ class ProjectedListTests: TestCase {
     }
     
     func testPredicate() {
-        let matching = NSPredicate(format: "value = 'Daenerys'")
-        let notMatching = NSPredicate(format: "value = 'Not There'")
+        let matching = NSPredicate(format: "firstName = 'Daenerys'")
+        let notMatching = NSPredicate(format: "firstName = 'Not There'")
         XCTAssertEqual(0, collection.index(matching: matching)!)
         XCTAssertNil(collection.index(matching: notMatching))
     }
 
     func testFilterFormat() {
         XCTAssertNotNil(collection.filter { $0 == "Daenerys" }.first!)
-        XCTAssertNil(collection.filter { $0 == "Not There" }.first!)
+        XCTAssertNil(collection.filter { $0 == "Not There" }.first)
     }
 
     func testSortWithProperty() {
-        XCTAssertEqual("A", collection.sorted { $0 > $1 }.first!)
-        XCTAssertEqual("B", collection.sorted { $0 > $1 }.last!)
+        XCTAssertEqual("Tyrion", collection.sorted { $0 > $1 }.first!)
+        XCTAssertEqual("Daenerys", collection.sorted { $0 > $1 }.last!)
     }
 
     func testFastEnumeration() {
@@ -153,7 +153,7 @@ class ProjectedListTests: TestCase {
             str += element
         }
 
-        XCTAssertEqual(str, "longstring")
+        XCTAssertEqual(str, "DaenerysTyrion")
     }
 
     func testFastEnumerationWithMutation() {
@@ -168,41 +168,41 @@ class ProjectedListTests: TestCase {
         XCTAssertEqual(2, collection.count)
     }
 
-//    func testObserve() {
-//        let ex = expectation(description: "initial notification")
-//        let token = collection.observe(on: nil) { (changes: RealmCollectionChange) in
-//            switch changes {
-//            case .initial(let collection):
-//                XCTAssertEqual(collection.count, 2)
-//            case .update:
-//                XCTFail("Shouldn't happen")
-//            case .error:
-//                XCTFail("Shouldn't happen")
-//            }
-//
-//            ex.fulfill()
-//        }
-//        waitForExpectations(timeout: 1, handler: nil)
-//
-//        // add a second notification and wait for it
-//        var ex2 = expectation(description: "second initial notification")
-//        let token2 = collection.observe(on: nil) { _ in
-//            ex2.fulfill()
-//        }
-//        waitForExpectations(timeout: 1, handler: nil)
-//
-//        // make a write and implicitly verify that only the unskipped
-//        // notification is called (the first would error on .update)
-//        ex2 = expectation(description: "change notification")
-//        let realm = realmWithTestPath()
-//        realm.beginWrite()
-//        realm.delete(collection)
-//        try! realm.commitWrite(withoutNotifying: [token])
-//        waitForExpectations(timeout: 1, handler: nil)
-//
-//        token.invalidate()
-//        token2.invalidate()
-//    }
+    func testObserve() {
+        let ex = expectation(description: "initial notification")
+        let token = collection.observe(on: nil) { (changes: RealmCollectionChange) in
+            switch changes {
+            case .initial(let collection):
+                XCTAssertEqual(collection.count, 2)
+            case .update:
+                XCTFail("Shouldn't happen")
+            case .error:
+                XCTFail("Shouldn't happen")
+            }
+
+            ex.fulfill()
+        }
+        waitForExpectations(timeout: 1, handler: nil)
+
+        // add a second notification and wait for it
+        var ex2 = expectation(description: "second initial notification")
+        let token2 = collection.observe(on: nil) { _ in
+            ex2.fulfill()
+        }
+        waitForExpectations(timeout: 1, handler: nil)
+
+        // make a write and implicitly verify that only the unskipped
+        // notification is called (the first would error on .update)
+        ex2 = expectation(description: "change notification")
+        let realm = realmWithTestPath()
+        realm.beginWrite()
+        realm.delete(realm.objects(Person.self))
+        try! realm.commitWrite(withoutNotifying: [token])
+        waitForExpectations(timeout: 1, handler: nil)
+
+        token.invalidate()
+        token2.invalidate()
+    }
 //
 //    func testObserveKeyPath() {
 //        var ex = expectation(description: "initial notification")

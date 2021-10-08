@@ -303,16 +303,16 @@ class ProjectionTests: TestCase {
                 "binaryCol": "b".data(using: .utf8)!,
                 "dateCol": Date(timeIntervalSince1970: 17),
                 "decimalCol": 18 as Decimal128,
-                "objectIdCol": ObjectId.generate(),
+                "objectIdCol": ObjectId("6058f12b957ba06156586a7c"),
                 "objectCol": ModernAllTypesObject(value: ["intCol": 1]),
                 "arrayCol": [
-                    ModernAllTypesObject(value: ["intCol": 2]),
-                    ModernAllTypesObject(value: ["intCol": 3])
+                    ModernAllTypesObject(value: ["pk": ObjectId("6058f12682b2fbb1f334ef1d"), "intCol": 2]),
+                    ModernAllTypesObject(value: ["pk": ObjectId("6058f12d42e5a393e67538d0"), "intCol": 3])
                 ],
                 "setCol": [
-                    ModernAllTypesObject(value: ["intCol": 4]),
-                    ModernAllTypesObject(value: ["intCol": 5]),
-                    ModernAllTypesObject(value: ["intCol": 6])
+                    ModernAllTypesObject(value: ["pk": ObjectId("6058f12d42e5a393e67538d1"), "intCol": 4]),
+                    ModernAllTypesObject(value: ["pk": ObjectId("6058f12682b2fbb1f334ef1f"), "intCol": 5]),
+                    ModernAllTypesObject(value: ["pk": ObjectId("507f1f77bcf86cd799439011"), "intCol": 6])
                 ],
                 "anyCol": AnyRealmValue.int(20),
                 "uuidCol": UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90fd")!,
@@ -1099,6 +1099,7 @@ class ProjectionTests: TestCase {
     func newObjects(_ defaultValues: [String: Any] = [:]) -> (ModernAllTypesObject, AllTypesProjection) {
         let realm = realmWithTestPath()
         realm.beginWrite()
+        realm.delete( realm.objects(ModernAllTypesObject.self))
         let obj = realm.create(ModernAllTypesObject.self, value: defaultValues)
         let obs = AllTypesProjection(projecting: obj)
         try! realm.commitWrite()
@@ -1726,7 +1727,7 @@ class ProjectionTests: TestCase {
         
         dispatchSyncNewThread {
             let realm = self.realmWithTestPath()
-            var resolvedProjection: SimpleProjection = realm.resolve(tsr)!
+            let resolvedProjection: SimpleProjection = realm.resolve(tsr)!
             try! realm.write {
                 resolvedProjection.int = 1
             }
@@ -1774,6 +1775,7 @@ class ProjectionTests: TestCase {
             case .error(_):
                 break
             case .change(_, let change):
+                XCTAssertEqual(change.first!.name, "lastNameCaps")
                 XCTAssertEqual(change.first!.oldValue as! String, "CLAY")
                 XCTAssertEqual(change.first!.newValue as! String, "ALI")
                 ex.fulfill()
