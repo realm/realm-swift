@@ -237,35 +237,48 @@ open class Projection<Root: ObjectBase/* & ThreadConfined*/>: RealmCollectionVal
 
 extension ProjectionObservable {
     public func observe(keyPaths: [String] = [],
-                                             on queue: DispatchQueue? = nil,
-                                             _ block: @escaping (ProjectionChange<Self>) -> Void) -> NotificationToken {
-        let kps = keyPaths.compactMap { \Self.[checkedMirrorDescendant: $0] }
-        return observe(keyPaths: kps, on: queue, block)
-    }
-    
-    public func observe(keyPaths: [PartialKeyPath<Self>] = [],
-                                             on queue: DispatchQueue? = nil,
-                              _ block: @escaping (ProjectionChange<Self>) -> Void) -> NotificationToken {
+                        on queue: DispatchQueue? = nil,
+                        _ block: @escaping (ProjectionChange<Self>) -> Void) -> NotificationToken {
+        let kps: [String]
         if keyPaths.isEmpty {
-            let keyPaths = _schema.propertyMetadatas.map { $0.originPropertyKeyPathString }
-            return rootObject._observe(keyPaths: keyPaths,
-                                       on: queue, { change in
-                block(ProjectionChange.processChange(change, self._schema))
+            kps = _schema.propertyMetadatas.map { $0.originPropertyKeyPathString }
+        } else {
+            let emptyRoot = Root()
+            emptyRoot.lastAccessedNames = NSMutableArray()
+            emptyRoot.prepareForRecording()
+            let emptyProjection = Self(projecting: emptyRoot) // tracer time
+            keyPaths.forEach({ keyPath in
+                let kp = \Self.[checkedMirrorDescendant: keyPath]
+                emptyProjection[keyPath: kp]
             })
+            kps = emptyRoot.lastAccessedNames! as! [String]
+        }
+        return rootObject._observe(keyPaths: kps,
+                                   on: queue, { change in
+            block(ProjectionChange.processChange(change, self._schema))
+        })
+    }
+
+    public func observe(keyPaths: [PartialKeyPath<Self>] = [],
+                        on queue: DispatchQueue? = nil,
+                        _ block: @escaping (ProjectionChange<Self>) -> Void) -> NotificationToken {
+        let kps: [String]
+        if keyPaths.isEmpty {
+            kps = _schema.propertyMetadatas.map { $0.originPropertyKeyPathString }
         } else {
             let emptyRoot = Root()
             emptyRoot.lastAccessedNames = NSMutableArray()
             emptyRoot.prepareForRecording()
             let emptyProjection = Self(projecting: emptyRoot) // tracer time
             keyPaths.forEach {
-                _ = emptyProjection[keyPath: $0]
+                emptyProjection[keyPath: $0]
             }
-            let originKeyPathStrings = emptyRoot.lastAccessedNames! as! [String]
-            return rootObject._observe(keyPaths: originKeyPathStrings,
-                                       on: queue, { change in
-                block(ProjectionChange.processChange(change, self._schema))
-            })
+            kps = emptyRoot.lastAccessedNames! as! [String]
         }
+        return rootObject._observe(keyPaths: kps,
+                                   on: queue, { change in
+            block(ProjectionChange.processChange(change, self._schema))
+        })
     }
 
     fileprivate subscript(checkedMirrorDescendant key: String) -> AnyProjected {

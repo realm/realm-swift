@@ -2316,10 +2316,9 @@ class CombineProjectionPublisherTests: CombinePublisherTestCase {
     }
 
     func testChangeSetSubscribeOnKeyPath() {
-        let object = try! realm.write { realm.create(SimpleObject.self, value: ["int": 0, "bool": false]) }
         let sema = DispatchSemaphore(value: 0)
 
-        var prev: SimpleProjection?
+        var prevProj: SimpleProjection?
         cancellable = changesetPublisher(projection, keyPaths: ["int"])
             .subscribe(on: subscribeOnQueue)
             .assertNoFailure()
@@ -2328,12 +2327,12 @@ class CombineProjectionPublisherTests: CombinePublisherTestCase {
                     XCTAssertNotEqual(self.projection, p)
                     XCTAssertEqual(properties.count, 1)
                     XCTAssertEqual(properties[0].name, "int")
-                    if let prev = prev {
-                        XCTAssertEqual(properties[0].oldValue as? Int, prev.int)
+                    if let prevProj = prevProj {
+                        XCTAssertEqual(properties[0].oldValue as? Int, prevProj.int)
                     }
                     XCTAssertEqual(properties[0].newValue as? Int, p.int)
-                    prev = p.freeze()
-                    XCTAssertEqual(prev!.int, p.int)
+                    prevProj = p.freeze()
+                    XCTAssertEqual(prevProj!.int, p.int)
 
                     if p.int >= 100 {
                         sema.signal()
@@ -2360,8 +2359,8 @@ class CombineProjectionPublisherTests: CombinePublisherTestCase {
         try! realm.write { realm.delete(object) }
         sema.wait()
 
-        XCTAssertNotNil(prev)
-        XCTAssertEqual(prev!.int, 101)
+        XCTAssertNotNil(prevProj)
+        XCTAssertEqual(prevProj!.int, 101)
     }
 
     func testChangeSetReceiveOn() {
@@ -2496,7 +2495,7 @@ class CombineProjectionPublisherTests: CombinePublisherTestCase {
             .assertNoFailure()
             .sink { arr in
                 print("here \(arr)")
-
+                XCTFail()
 //                var prev: SimpleProjection?
 //                for change in arr {
 //                    guard case .change(let p, let properties) = change else {
@@ -2572,6 +2571,7 @@ class CombineProjectionPublisherTests: CombinePublisherTestCase {
 //                }
 //                exp.fulfill()
         }
+        XCTFail()
 
         for _ in 0..<100 {
             try! realm.write { object.int += 1 }
@@ -2581,6 +2581,8 @@ class CombineProjectionPublisherTests: CombinePublisherTestCase {
     }
 
     func testFrozenChangeSetSubscribeOnAndReceiveOn() {
+        XCTFail()
+
         let sema = DispatchSemaphore(value: 0)
         cancellable = changesetPublisher(projection)
 //            .subscribe(on: subscribeOnQueue)
@@ -2644,7 +2646,9 @@ class CombineProjectionPublisherTests: CombinePublisherTestCase {
         wait(for: [exp], timeout: 1)
     }
 
-//    func testUnmanagedMakeThreadSafe() {
+    func testUnmanagedMakeThreadSafe() {
+        XCTFail()
+
 //        let objects = [SwiftIntObject(value: [1]), SwiftIntObject(value: [2]), SwiftIntObject(value: [3])]
 //
 //        let exp = XCTestExpectation()
@@ -2658,7 +2662,7 @@ class CombineProjectionPublisherTests: CombinePublisherTestCase {
 //                exp.fulfill()
 //        }
 //        wait(for: [exp], timeout: 1)
-//    }
+    }
 
     func testManagedMakeThreadSafe() {
         let projections = try! realm.write {
