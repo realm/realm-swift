@@ -58,13 +58,13 @@ fileprivate protocol AnyProjected {
 /// ```
 @propertyWrapper
 public struct Projected<T: ObjectBase, Value>: AnyProjected {
+//    func bind(ptr: UnsafeMutableRawPointer) -> AnyKeyPath {
+//        ptr.assumingMemoryBound(to: Self.self).pointee.projectedKeyPath
+//    }
     fileprivate var _projectedKeyPath: KeyPath<T, Value>!
     var projectedKeyPath: AnyKeyPath {
         _projectedKeyPath
     }
-
-    private var get: ((T) -> Value)!
-    private var set: ((T, Value) -> ())!
 
     /// :nodoc:
     @available(*, unavailable, message: "@Persisted can only be used as a property on a Realm object")
@@ -87,38 +87,26 @@ public struct Projected<T: ObjectBase, Value>: AnyProjected {
             if let lastAccessedNames = observed.rootObject.lastAccessedNames {
                 lastAccessedNames.add(_name(for: storage._projectedKeyPath!))
             }
-            return storage.get(observed.rootObject)
+            return observed.rootObject[keyPath: storage._projectedKeyPath]
         }
         set {
-//            precondition(observed[keyPath: storageKeyPath].projectedKeyPath is WritableKeyPath<T, Value>,
-//                         "KeyPath to property \(observed[keyPath: storageKeyPath].keyPathString!) is not writable")
-            observed[keyPath: storageKeyPath].set(observed.rootObject, newValue)
+            precondition(observed[keyPath: storageKeyPath].projectedKeyPath is WritableKeyPath<T, Value>,
+                         "KeyPath is not writable")
+            observed.rootObject[keyPath: observed[keyPath: storageKeyPath].projectedKeyPath as! WritableKeyPath<T, Value>] = newValue
         }
     }
 
     /// Declares a property which is lazily initialized to the type's default value.
     public init(_ projectedKeyPath: KeyPath<T, Value>) {
         self._projectedKeyPath = projectedKeyPath
-        self.get = {
-            return $0[keyPath: projectedKeyPath]
-        }
-        self.set = {
-            var ref = $0
-            ref[keyPath: projectedKeyPath as! WritableKeyPath<T, Value>] = $1
-        }
     }
 }
 
 // MARK: Projection Schema
 fileprivate struct ProjectedMetadata {
-    let keyPath: AnyKeyPath
+    let projectedKeyPath: AnyKeyPath
     let originPropertyKeyPathString: String
     let label: String
-
-    /// Cast `keyPath` to its actual KeyPath type.
-    func keyPathAs<P>() -> KeyPath<P, AnyProjected> where P: ProjectionObservable {
-        return keyPath as! KeyPath<P, AnyProjected>
-    }
 }
 
 fileprivate struct ProjectionMetadata {
@@ -129,7 +117,7 @@ fileprivate struct ProjectionMetadata {
 private var schema = [ObjectIdentifier: ProjectionMetadata]()
 
 // MARK: ProjectionOservable
-public protocol ProjectionObservable {
+public protocol ProjectionObservable: AnyObject {
     associatedtype Root: ObjectBase
     var rootObject: Root { get }
     init(projecting object: Root)
@@ -173,16 +161,13 @@ public enum ProjectionChange<T: ProjectionObservable> {
 
                     // assign the oldValue to the empty root object
                     processorProjection.rootObject.setValue(oldValue, forKey: propChange.name)
-                    change.oldValue = newRoot[keyPath: processorProjection[keyPath: propertyMetadata.keyPathAs()].projectedKeyPath]
+                    change.oldValue = processorProjection.rootObject[keyPath: propertyMetadata.projectedKeyPath]
                 }
                 if propChange.newValue != nil {
-                    change.newValue =
-                    newProjection.rootObject[keyPath:
-                                                newProjection[keyPath: propertyMetadata.keyPathAs()].projectedKeyPath]
+                    change.newValue = newProjection.rootObject[keyPath: propertyMetadata.projectedKeyPath]
                 }
 
                 change.name = String(propertyMetadata.label.dropFirst()) // this drops the _ from the property wrapper name
-
                 return ProjectedPropertyChange(name: change.name!,
                                                oldValue: change.oldValue,
                                                newValue: change.newValue)
@@ -193,8 +178,6 @@ public enum ProjectionChange<T: ProjectionObservable> {
         }
     }
 }
-
-//public protocol ProjectableObject: ObjectBase, ThreadConfined {}
 
 /// Projections are a light weight structure of  the original Realm objects with a minimal effort.
 /// And use them as a model in your application.
@@ -221,7 +204,7 @@ public enum ProjectionChange<T: ProjectionObservable> {
 ///     @Projected(\Person.friends.projectTo.firstName) var firstFriendsName: ProjectedList<String>
 /// }
 /// ```
-open class Projection<Root: ObjectBase/* & ThreadConfined*/>: RealmCollectionValue, ProjectionObservable {
+open class Projection<Root: ObjectBase>: RealmCollectionValue, ProjectionObservable {
 
     /// The object being projected
     public var rootObject: Root
@@ -241,17 +224,9 @@ extension ProjectionObservable {
                         _ block: @escaping (ProjectionChange<Self>) -> Void) -> NotificationToken {
         let kps: [String]
         if keyPaths.isEmpty {
-            kps = _schema.propertyMetadatas.map { $0.originPropertyKeyPathString }
+            kps = _schema.propertyMetadatas.map(\.originPropertyKeyPathString)
         } else {
-            let emptyRoot = Root()
-            emptyRoot.lastAccessedNames = NSMutableArray()
-            emptyRoot.prepareForRecording()
-            let emptyProjection = Self(projecting: emptyRoot) // tracer time
-            keyPaths.forEach({ keyPath in
-                let kp = \Self.[checkedMirrorDescendant: keyPath]
-                emptyProjection[keyPath: kp]
-            })
-            kps = emptyRoot.lastAccessedNames! as! [String]
+            kps = _schema.propertyMetadatas.filter { keyPaths.contains($0.originPropertyKeyPathString) }.map(\.originPropertyKeyPathString)
         }
         return rootObject._observe(keyPaths: kps,
                                    on: queue, { change in
@@ -281,15 +256,6 @@ extension ProjectionObservable {
         })
     }
 
-    fileprivate subscript(checkedMirrorDescendant key: String) -> AnyProjected {
-        // We're dropping _ for user so putting it back here
-        let underscKey = key.first == "_" ? key : "_" + key
-        if let mirror = schema[ObjectIdentifier(Self.self)]?.mirror {
-            return mirror.descendant(underscKey)! as! AnyProjected
-        }
-        return Mirror(reflecting: self).descendant(underscKey)! as! AnyProjected
-    }
-
     fileprivate var _schema: ProjectionMetadata {
         if schema[ObjectIdentifier(Self.self)] == nil {
             let mirror = Mirror(reflecting: self)
@@ -297,8 +263,7 @@ extension ProjectionObservable {
                 guard let projected = child.value as? AnyProjected else {
                     return nil
                 }
-                let kp = \Self.[checkedMirrorDescendant: child.label!]
-                return ProjectedMetadata(keyPath: kp,
+                return ProjectedMetadata(projectedKeyPath: projected.projectedKeyPath,
                                          originPropertyKeyPathString: _name(for: projected.projectedKeyPath as! PartialKeyPath<Root>),
                                          label: child.label!)
             }
@@ -572,10 +537,7 @@ extension ProjectionObservable {
 
     /// :nodoc:
     public func _observe<S>(_ keyPaths: [String]?, _ subscriber: S) -> NotificationToken where S : Subscriber, S.Failure == Never, S.Input == Void {
-        let kps: [PartialKeyPath<Self>]? = keyPaths?.compactMap {
-            \Self[checkedMirrorDescendant: $0]
-        }
-        return observe(keyPaths: kps ?? [], { _ in _ = subscriber.receive() })
+        return observe(keyPaths: [PartialKeyPath<Self>](), { _ in _ = subscriber.receive() })
     }
 }
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)

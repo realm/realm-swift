@@ -2486,59 +2486,47 @@ class CombineProjectionPublisherTests: CombinePublisherTestCase {
         wait(for: [exp], timeout: 1)
     }
 
+    func testFrozenPublisherSubscribeOn() {
+        let exp = XCTestExpectation()
+        cancellable = projection.publisher
+            .subscribe(on: subscribeOnQueue)
+            .freeze()
+            .assertNoFailure()
+            .sink{ change in
+                print(change)
+                exp.fulfill()
+            }
+        try! realm.write { object.int += 1 }
+        wait(for: [exp], timeout: 1)
+    }
+
     func testFrozenChangeSetSubscribeOn() {
         let sema = DispatchSemaphore(value: 0)
-        cancellable = projection.publisher
+        cancellable = changesetPublisher(projection)
             .subscribe(on: subscribeOnQueue)
             .freeze()
             .collect()
             .assertNoFailure()
             .sink { arr in
-                print("here \(arr)")
-                XCTFail()
-//                var prev: SimpleProjection?
-//                for change in arr {
-//                    guard case .change(let p, let properties) = change else {
-//                        XCTFail("Expected .change, got(\(change)")
-//                        sema.signal()
-//                        return
-//                    }
-//
-//                    XCTAssertEqual(properties.count, 1)
-//                    XCTAssertEqual(properties[0].name, "int")
-//                    XCTAssertEqual(properties[0].newValue as? Int, p.int)
-//                    if let prev = prev {
-//                        XCTAssertEqual(properties[0].oldValue as? Int, prev.int)
-//                    }
-//                    prev = p
-//                }
+                var prev: SimpleProjection?
+                for change in arr {
+                    print(change)
+                    guard case .change(let p, let properties) = change else {
+                        XCTFail("Expected .change, got(\(change)")
+                        sema.signal()
+                        return
+                    }
+
+                    XCTAssertEqual(properties.count, 1)
+                    XCTAssertEqual(properties[0].name, "int")
+                    XCTAssertEqual(properties[0].newValue as? Int, p.int)
+                    if let prev = prev {
+                        XCTAssertEqual(properties[0].oldValue as? Int, prev.int)
+                    }
+                    prev = p
+                }
                 sema.signal()
             }
-
-//        cancellable = changesetPublisher(projection)
-//            .subscribe(on: subscribeOnQueue)
-//            .freeze()
-//            .collect()
-//            .assertNoFailure()
-//            .sink { arr in
-//                var prev: SimpleProjection?
-//                for change in arr {
-//                    guard case .change(let p, let properties) = change else {
-//                        XCTFail("Expected .change, got(\(change)")
-//                        sema.signal()
-//                        return
-//                    }
-//
-//                    XCTAssertEqual(properties.count, 1)
-//                    XCTAssertEqual(properties[0].name, "int")
-//                    XCTAssertEqual(properties[0].newValue as? Int, p.int)
-//                    if let prev = prev {
-//                        XCTAssertEqual(properties[0].oldValue as? Int, prev.int)
-//                    }
-//                    prev = p
-//                }
-//                sema.signal()
-//            }
 
         for _ in 0..<100 {
             try! realm.write { object.int += 1 }
@@ -2550,28 +2538,27 @@ class CombineProjectionPublisherTests: CombinePublisherTestCase {
     func testFrozenChangeSetReceiveOn() {
         let exp = XCTestExpectation(description: "sink complete")
         cancellable = changesetPublisher(projection)
-//            .freeze()
-//            .receive(on: receiveOnQueue)
-//            .collect()
-//            .assertNoFailure()
+            .freeze()
+            .receive(on: receiveOnQueue)
+            .collect()
+            .assertNoFailure()
             .sink { arr in
-//                for change in arr {
-//                    guard case .change(let p, let properties) = change else {
-//                        XCTFail("Expected .change, got(\(change)")
-//                        exp.fulfill()
-//                        return
-//                    }
-//
-//                    XCTAssertEqual(properties.count, 1)
-//                    XCTAssertEqual(properties[0].name, "int")
-//                    XCTAssertEqual(properties[0].newValue as? Int, p.int)
-//                    // subscribing on the thread making writes means that oldValue
-//                    // is always nil
-//                    XCTAssertNil(properties[0].oldValue)
-//                }
-//                exp.fulfill()
+                for change in arr {
+                    guard case .change(let p, let properties) = change else {
+                        XCTFail("Expected .change, got(\(change)")
+                        exp.fulfill()
+                        return
+                    }
+
+                    XCTAssertEqual(properties.count, 1)
+                    XCTAssertEqual(properties[0].name, "int")
+                    XCTAssertEqual(properties[0].newValue as? Int, p.int)
+                    // subscribing on the thread making writes means that oldValue
+                    // is always nil
+                    XCTAssertNil(properties[0].oldValue)
+                }
+                exp.fulfill()
         }
-        XCTFail()
 
         for _ in 0..<100 {
             try! realm.write { object.int += 1 }
@@ -2581,33 +2568,31 @@ class CombineProjectionPublisherTests: CombinePublisherTestCase {
     }
 
     func testFrozenChangeSetSubscribeOnAndReceiveOn() {
-        XCTFail()
-
         let sema = DispatchSemaphore(value: 0)
         cancellable = changesetPublisher(projection)
-//            .subscribe(on: subscribeOnQueue)
-//            .freeze()
-//            .receive(on: receiveOnQueue)
-//            .collect()
-//            .assertNoFailure()
+            .subscribe(on: subscribeOnQueue)
+            .freeze()
+            .receive(on: receiveOnQueue)
+            .collect()
+            .assertNoFailure()
             .sink { arr in
-//                var prev: SimpleProjection?
-//                for change in arr {
-//                    guard case .change(let p, let properties) = change else {
-//                        XCTFail("Expected .change, got(\(change)")
-//                        sema.signal()
-//                        return
-//                    }
-//
-//                    XCTAssertEqual(properties.count, 1)
-//                    XCTAssertEqual(properties[0].name, "int")
-//                    XCTAssertEqual(properties[0].newValue as? Int, p.int)
-//                    if let prev = prev {
-//                        XCTAssertEqual(properties[0].oldValue as? Int, prev.int)
-//                    }
-//                    prev = p
-//                }
-//                sema.signal()
+                var prev: SimpleProjection?
+                for change in arr {
+                    guard case .change(let p, let properties) = change else {
+                        XCTFail("Expected .change, got(\(change)")
+                        sema.signal()
+                        return
+                    }
+
+                    XCTAssertEqual(properties.count, 1)
+                    XCTAssertEqual(properties[0].name, "int")
+                    XCTAssertEqual(properties[0].newValue as? Int, p.int)
+                    if let prev = prev {
+                        XCTAssertEqual(properties[0].oldValue as? Int, prev.int)
+                    }
+                    prev = p
+                }
+                sema.signal()
         }
 
         for _ in 0..<100 {
@@ -2647,21 +2632,24 @@ class CombineProjectionPublisherTests: CombinePublisherTestCase {
     }
 
     func testUnmanagedMakeThreadSafe() {
-        XCTFail()
-
-//        let objects = [SwiftIntObject(value: [1]), SwiftIntObject(value: [2]), SwiftIntObject(value: [3])]
-//
-//        let exp = XCTestExpectation()
-//        cancellable = objects.publisher
-//            .threadSafeReference()
-//            .receive(on: receiveOnQueue)
-//            .map { $0.int }
-//            .collect()
-//            .sink { (arr: [Int]) in
-//                XCTAssertEqual(arr, [1, 2, 3])
-//                exp.fulfill()
-//        }
-//        wait(for: [exp], timeout: 1)
+        let projections = try! realm.write {
+            return [
+                SimpleProjection(projecting: realm.create(SimpleObject.self, value: [1])),
+                SimpleProjection(projecting: realm.create(SimpleObject.self, value: [2])),
+                SimpleProjection(projecting: realm.create(SimpleObject.self, value: [3]))
+            ]
+        }
+        let exp = XCTestExpectation()
+        cancellable = projections.publisher
+            .threadSafeReference()
+            .receive(on: receiveOnQueue)
+            .map { $0.int }
+            .collect()
+            .sink { (arr: [Int]) in
+                XCTAssertEqual(arr, [1, 2, 3])
+                exp.fulfill()
+            }
+        wait(for: [exp], timeout: 1)
     }
 
     func testManagedMakeThreadSafe() {

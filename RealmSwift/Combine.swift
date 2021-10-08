@@ -234,7 +234,8 @@ extension Publisher {
     ///
     /// - returns: A publisher that publishes frozen copies of the changesets
     ///            which the upstream publisher publishes.
-    public func freeze<T: ProjectionObservable>() -> Publishers.Map<Self, ProjectionChange<T>> where Output == ProjectionChange<T>, T: ThreadConfined {
+    public func freeze<T: ProjectionObservable>()
+    -> Publishers.Map<Self, ProjectionChange<T>> where Output == ProjectionChange<T>, T: ThreadConfined {
         return map {
             if case .change(let p, let properties) = $0 {
                 return .change(p.freeze(), properties)
