@@ -257,7 +257,7 @@ static RLMAsyncOpenTask *openAsync(RLMRealmConfiguration *configuration, void (^
 + (RLMAsyncOpenTask *)asyncOpenWithConfiguration:(RLMRealmConfiguration *)configuration
                                    callbackQueue:(dispatch_queue_t)callbackQueue
                                         callback:(RLMAsyncOpenRealmCallback)callback {
-    return openAsync(configuration, [=](ThreadSafeReference, std::exception_ptr err) {
+    return openAsync(configuration, [=](ThreadSafeReference ref, std::exception_ptr err) {
         @autoreleasepool {
             if (err) {
                 try {
@@ -272,12 +272,18 @@ static RLMAsyncOpenTask *openAsync(RLMRealmConfiguration *configuration, void (^
                 }
                 return;
             }
-            dispatch_async(callbackQueue, ^{
+            // Ensure that we keep the Realm open until we've initialized the
+            // RLMRealm on the target queue. This ensures that the existing
+            // RealmCoordinator and DB are reused rather than being reopened.
+            // We can't just capture the ThreadSafeReference as dispatch_async()
+            // requires a copyable block.
+            dispatch_async(callbackQueue, [=, ref = ref.resolve<std::shared_ptr<Realm>>(nullptr)]() mutable {
                 @autoreleasepool {
                     NSError *error;
                     RLMRealm *localRealm = [RLMRealm realmWithConfiguration:configuration
                                                                       queue:callbackQueue
                                                                       error:&error];
+                    ref.reset();
                     callback(localRealm, error);
                 }
             });
