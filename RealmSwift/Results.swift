@@ -140,10 +140,15 @@ extension AnyRealmValue: AddableType {}
     /**
      Returns the index of the first object matching the query, or `nil` if no objects match.
 
-     - parameter query: The query with which to filter the objects.
+     - Usage:
+     ```
+     obj.index(matching: { $0.fooCol == 7 && $0.fooCol < 456 })
+     ```
+
+     - parameter queryFn: The query closure with which to filter the objects.
     */
-    public func index(matching query: ((Query<Element>) -> Query<Element>)) -> Int? {
-        return index(matching: query(Query()).predicate)
+    public func index(matching queryFn: ((Query<Element>) -> Query<Element>)) -> Int? {
+        return index(matching: queryFn(Query()).predicate)
     }
 
     // MARK: Object Retrieval
@@ -227,10 +232,17 @@ extension AnyRealmValue: AddableType {}
 
      - Note: This should only be used with classes using the `@Persistable` property declaration.
 
-     - parameter query: The query with which to filter the objects.
+     - Usage:
+     ```
+     myResults.where {
+        ($0.fooCol > 5) && ($0.barCol == "foobar")
+     }
+     ```
+
+     - parameter queryFn: The query closure with which to filter the objects.
      */
-    public func `where`(_ query: ((Query<Element>) -> Query<Element>)) -> Results<Element> {
-        return filter(query(Query()).predicate)
+    public func `where`(_ queryFn: ((Query<Element>) -> Query<Element>)) -> Results<Element> {
+        return filter(queryFn(Query()).predicate)
     }
 
     // MARK: Sorting

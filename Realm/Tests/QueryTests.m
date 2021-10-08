@@ -2145,6 +2145,7 @@
     RLMAssertCount(CircleDictionaryObject, 1U, @"ANY circles.next.data = '3'");
     RLMAssertCount(CircleDictionaryObject, 1U, @"ANY circles.data = '3'");
     RLMAssertCount(CircleDictionaryObject, 1U, @"NONE circles.next.data = '4'");
+    RLMAssertCount(CircleDictionaryObject, 1U, @"circles.data = '2'");
 
     RLMAssertCount(CircleDictionaryObject, 0U, @"ANY circles.next.next.data = '3'");
     RLMAssertCount(CircleDictionaryObject, 1U, @"ANY circles.next.next.data = '2'");

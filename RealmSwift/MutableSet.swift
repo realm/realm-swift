@@ -117,10 +117,17 @@ public final class MutableSet<Element: RealmCollectionValue>: RLMSwiftCollection
 
      - Note: This should only be used with classes using the `@Persistable` property declaration.
 
-     - parameter query: The query with which to filter the objects.
+     - Usage:
+     ```
+     mySet.where {
+        ($0.fooCol > 5) && ($0.barCol == "foobar")
+     }
+     ```
+
+     - parameter queryFn: The query with which to filter the objects.
      */
-    public func `where`(_ query: ((Query<Element>) -> Query<Element>)) -> Results<Element> {
-        return filter(query(Query()).predicate)
+    public func `where`(_ queryFn: ((Query<Element>) -> Query<Element>)) -> Results<Element> {
+        return filter(queryFn(Query()).predicate)
     }
 
     /**
@@ -749,7 +756,7 @@ extension MutableSet: RealmCollection {
     }
 
     /// :nodoc:
-    public func index(matching query: ((Query<Element>) -> Query<Element>)) -> Int? {
+    public func index(matching queryFn: ((Query<Element>) -> Query<Element>)) -> Int? {
         fatalError("index(matching:) is not available on MutableSet")
     }
 
