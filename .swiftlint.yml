@@ -12,7 +12,7 @@ identifier_name:
     warning: 0
     error: 0
   excluded:
-    - _constructPredicate(_:)
+    - _constructPredicate()
     - _id
     - _name(for:)
     - _nilValue()
@@ -46,6 +46,7 @@ identifier_name:
 type_name:
   excluded:
     - _RealmValue
+    - _PredicateData
 disabled_rules:
   - block_based_kvo
   # SwiftLint expects a space following a double slash comment: "//".

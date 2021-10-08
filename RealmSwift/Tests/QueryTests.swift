@@ -226,10 +226,10 @@ class QueryTests: TestCase {
         XCTAssertEqual(results.count, expectedCount)
 
         let constructedQuery = query(Query<ModernAllTypesObject>())._constructPredicate()
-        XCTAssertEqual(constructedQuery.predicate,
+        XCTAssertEqual(constructedQuery.string,
                        predicate)
 
-        for (e1, e2) in zip(constructedQuery.arguments, values) {
+        for (e1, e2) in zip(constructedQuery.args, values) {
             if let e1 = e1 as? Object, let e2 = e2 as? Object {
                 assertEqual(e1, e2)
             } else {
@@ -246,10 +246,10 @@ class QueryTests: TestCase {
         XCTAssertEqual(results.count, expectedCount)
 
         let constructedQuery = query(Query<ModernCollectionObject>())._constructPredicate()
-        XCTAssertEqual(constructedQuery.predicate,
+        XCTAssertEqual(constructedQuery.string,
                        predicate)
 
-        for (e1, e2) in zip(constructedQuery.arguments, values) {
+        for (e1, e2) in zip(constructedQuery.args, values) {
             if let e1 = e1 as? Object, let e2 = e2 as? Object {
                 assertEqual(e1, e2)
             } else {
@@ -274,10 +274,10 @@ class QueryTests: TestCase {
         XCTAssertEqual(results.count, expectedCount)
 
         let constructedQuery = query(Query<ModernAllTypesObject>())._constructPredicate()
-        XCTAssertEqual(constructedQuery.predicate,
+        XCTAssertEqual(constructedQuery.string,
                        predicate)
 
-        for (e1, e2) in zip(constructedQuery.arguments, values) {
+        for (e1, e2) in zip(constructedQuery.args, values) {
             XCTAssertEqual(e1 as! AnyHashable, e2)
         }
     }
@@ -293,10 +293,10 @@ class QueryTests: TestCase {
         XCTAssertEqual(results.count, expectedCount)
 
         let constructedQuery = query(Query<ModernAllTypesObject?>())._constructPredicate()
-        XCTAssertEqual(constructedQuery.predicate,
+        XCTAssertEqual(constructedQuery.string,
                        predicate)
 
-        for (e1, e2) in zip(constructedQuery.arguments, values) {
+        for (e1, e2) in zip(constructedQuery.args, values) {
             XCTAssertEqual(e1 as! AnyHashable, e2)
         }
     }
@@ -1498,12 +1498,12 @@ class QueryTests: TestCase {
     }
 
     func testNumericContains() {
-        assertQuery(predicate: "intCol >= %@ && intCol < %@",
+        assertQuery(predicate: "(intCol >= %@ && intCol < %@)",
                     values: [5, 7], expectedCount: 1) {
             $0.intCol.contains(5..<7)
         }
 
-        assertQuery(predicate: "intCol >= %@ && intCol < %@",
+        assertQuery(predicate: "(intCol >= %@ && intCol < %@)",
                     values: [5, 6], expectedCount: 0) {
             $0.intCol.contains(5..<6)
         }
@@ -1518,12 +1518,12 @@ class QueryTests: TestCase {
             $0.intCol.contains(5...6)
         }
 
-        assertQuery(predicate: "int8Col >= %@ && int8Col < %@",
+        assertQuery(predicate: "(int8Col >= %@ && int8Col < %@)",
                     values: [Int8(8), Int8(10)], expectedCount: 1) {
             $0.int8Col.contains(Int8(8)..<Int8(10))
         }
 
-        assertQuery(predicate: "int8Col >= %@ && int8Col < %@",
+        assertQuery(predicate: "(int8Col >= %@ && int8Col < %@)",
                     values: [Int8(8), Int8(9)], expectedCount: 0) {
             $0.int8Col.contains(Int8(8)..<Int8(9))
         }
@@ -1538,12 +1538,12 @@ class QueryTests: TestCase {
             $0.int8Col.contains(Int8(8)...Int8(9))
         }
 
-        assertQuery(predicate: "int16Col >= %@ && int16Col < %@",
+        assertQuery(predicate: "(int16Col >= %@ && int16Col < %@)",
                     values: [Int16(16), Int16(18)], expectedCount: 1) {
             $0.int16Col.contains(Int16(16)..<Int16(18))
         }
 
-        assertQuery(predicate: "int16Col >= %@ && int16Col < %@",
+        assertQuery(predicate: "(int16Col >= %@ && int16Col < %@)",
                     values: [Int16(16), Int16(17)], expectedCount: 0) {
             $0.int16Col.contains(Int16(16)..<Int16(17))
         }
@@ -1558,12 +1558,12 @@ class QueryTests: TestCase {
             $0.int16Col.contains(Int16(16)...Int16(17))
         }
 
-        assertQuery(predicate: "int32Col >= %@ && int32Col < %@",
+        assertQuery(predicate: "(int32Col >= %@ && int32Col < %@)",
                     values: [Int32(32), Int32(34)], expectedCount: 1) {
             $0.int32Col.contains(Int32(32)..<Int32(34))
         }
 
-        assertQuery(predicate: "int32Col >= %@ && int32Col < %@",
+        assertQuery(predicate: "(int32Col >= %@ && int32Col < %@)",
                     values: [Int32(32), Int32(33)], expectedCount: 0) {
             $0.int32Col.contains(Int32(32)..<Int32(33))
         }
@@ -1578,12 +1578,12 @@ class QueryTests: TestCase {
             $0.int32Col.contains(Int32(32)...Int32(33))
         }
 
-        assertQuery(predicate: "int64Col >= %@ && int64Col < %@",
+        assertQuery(predicate: "(int64Col >= %@ && int64Col < %@)",
                     values: [Int64(64), Int64(66)], expectedCount: 1) {
             $0.int64Col.contains(Int64(64)..<Int64(66))
         }
 
-        assertQuery(predicate: "int64Col >= %@ && int64Col < %@",
+        assertQuery(predicate: "(int64Col >= %@ && int64Col < %@)",
                     values: [Int64(64), Int64(65)], expectedCount: 0) {
             $0.int64Col.contains(Int64(64)..<Int64(65))
         }
@@ -1598,12 +1598,12 @@ class QueryTests: TestCase {
             $0.int64Col.contains(Int64(64)...Int64(65))
         }
 
-        assertQuery(predicate: "floatCol >= %@ && floatCol < %@",
+        assertQuery(predicate: "(floatCol >= %@ && floatCol < %@)",
                     values: [Float(5.55444333), Float(7.55444333)], expectedCount: 1) {
             $0.floatCol.contains(Float(5.55444333)..<Float(7.55444333))
         }
 
-        assertQuery(predicate: "floatCol >= %@ && floatCol < %@",
+        assertQuery(predicate: "(floatCol >= %@ && floatCol < %@)",
                     values: [Float(5.55444333), Float(6.55444333)], expectedCount: 0) {
             $0.floatCol.contains(Float(5.55444333)..<Float(6.55444333))
         }
@@ -1618,12 +1618,12 @@ class QueryTests: TestCase {
             $0.floatCol.contains(Float(5.55444333)...Float(6.55444333))
         }
 
-        assertQuery(predicate: "doubleCol >= %@ && doubleCol < %@",
+        assertQuery(predicate: "(doubleCol >= %@ && doubleCol < %@)",
                     values: [123.456, 345.678], expectedCount: 1) {
             $0.doubleCol.contains(123.456..<345.678)
         }
 
-        assertQuery(predicate: "doubleCol >= %@ && doubleCol < %@",
+        assertQuery(predicate: "(doubleCol >= %@ && doubleCol < %@)",
                     values: [123.456, 234.567], expectedCount: 0) {
             $0.doubleCol.contains(123.456..<234.567)
         }
@@ -1638,12 +1638,12 @@ class QueryTests: TestCase {
             $0.doubleCol.contains(123.456...234.567)
         }
 
-        assertQuery(predicate: "dateCol >= %@ && dateCol < %@",
+        assertQuery(predicate: "(dateCol >= %@ && dateCol < %@)",
                     values: [Date(timeIntervalSince1970: 1000000), Date(timeIntervalSince1970: 3000000)], expectedCount: 1) {
             $0.dateCol.contains(Date(timeIntervalSince1970: 1000000)..<Date(timeIntervalSince1970: 3000000))
         }
 
-        assertQuery(predicate: "dateCol >= %@ && dateCol < %@",
+        assertQuery(predicate: "(dateCol >= %@ && dateCol < %@)",
                     values: [Date(timeIntervalSince1970: 1000000), Date(timeIntervalSince1970: 2000000)], expectedCount: 0) {
             $0.dateCol.contains(Date(timeIntervalSince1970: 1000000)..<Date(timeIntervalSince1970: 2000000))
         }
@@ -1658,12 +1658,12 @@ class QueryTests: TestCase {
             $0.dateCol.contains(Date(timeIntervalSince1970: 1000000)...Date(timeIntervalSince1970: 2000000))
         }
 
-        assertQuery(predicate: "decimalCol >= %@ && decimalCol < %@",
+        assertQuery(predicate: "(decimalCol >= %@ && decimalCol < %@)",
                     values: [Decimal128(123.456), Decimal128(345.678)], expectedCount: 1) {
             $0.decimalCol.contains(Decimal128(123.456)..<Decimal128(345.678))
         }
 
-        assertQuery(predicate: "decimalCol >= %@ && decimalCol < %@",
+        assertQuery(predicate: "(decimalCol >= %@ && decimalCol < %@)",
                     values: [Decimal128(123.456), Decimal128(234.567)], expectedCount: 0) {
             $0.decimalCol.contains(Decimal128(123.456)..<Decimal128(234.567))
         }
@@ -1678,12 +1678,12 @@ class QueryTests: TestCase {
             $0.decimalCol.contains(Decimal128(123.456)...Decimal128(234.567))
         }
 
-        assertQuery(predicate: "optIntCol >= %@ && optIntCol < %@",
+        assertQuery(predicate: "(optIntCol >= %@ && optIntCol < %@)",
                     values: [5, 7], expectedCount: 1) {
             $0.optIntCol.contains(5..<7)
         }
 
-        assertQuery(predicate: "optIntCol >= %@ && optIntCol < %@",
+        assertQuery(predicate: "(optIntCol >= %@ && optIntCol < %@)",
                     values: [5, 6], expectedCount: 0) {
             $0.optIntCol.contains(5..<6)
         }
@@ -1698,12 +1698,12 @@ class QueryTests: TestCase {
             $0.optIntCol.contains(5...6)
         }
 
-        assertQuery(predicate: "optInt8Col >= %@ && optInt8Col < %@",
+        assertQuery(predicate: "(optInt8Col >= %@ && optInt8Col < %@)",
                     values: [Int8(8), Int8(10)], expectedCount: 1) {
             $0.optInt8Col.contains(Int8(8)..<Int8(10))
         }
 
-        assertQuery(predicate: "optInt8Col >= %@ && optInt8Col < %@",
+        assertQuery(predicate: "(optInt8Col >= %@ && optInt8Col < %@)",
                     values: [Int8(8), Int8(9)], expectedCount: 0) {
             $0.optInt8Col.contains(Int8(8)..<Int8(9))
         }
@@ -1718,12 +1718,12 @@ class QueryTests: TestCase {
             $0.optInt8Col.contains(Int8(8)...Int8(9))
         }
 
-        assertQuery(predicate: "optInt16Col >= %@ && optInt16Col < %@",
+        assertQuery(predicate: "(optInt16Col >= %@ && optInt16Col < %@)",
                     values: [Int16(16), Int16(18)], expectedCount: 1) {
             $0.optInt16Col.contains(Int16(16)..<Int16(18))
         }
 
-        assertQuery(predicate: "optInt16Col >= %@ && optInt16Col < %@",
+        assertQuery(predicate: "(optInt16Col >= %@ && optInt16Col < %@)",
                     values: [Int16(16), Int16(17)], expectedCount: 0) {
             $0.optInt16Col.contains(Int16(16)..<Int16(17))
         }
@@ -1738,12 +1738,12 @@ class QueryTests: TestCase {
             $0.optInt16Col.contains(Int16(16)...Int16(17))
         }
 
-        assertQuery(predicate: "optInt32Col >= %@ && optInt32Col < %@",
+        assertQuery(predicate: "(optInt32Col >= %@ && optInt32Col < %@)",
                     values: [Int32(32), Int32(34)], expectedCount: 1) {
             $0.optInt32Col.contains(Int32(32)..<Int32(34))
         }
 
-        assertQuery(predicate: "optInt32Col >= %@ && optInt32Col < %@",
+        assertQuery(predicate: "(optInt32Col >= %@ && optInt32Col < %@)",
                     values: [Int32(32), Int32(33)], expectedCount: 0) {
             $0.optInt32Col.contains(Int32(32)..<Int32(33))
         }
@@ -1758,12 +1758,12 @@ class QueryTests: TestCase {
             $0.optInt32Col.contains(Int32(32)...Int32(33))
         }
 
-        assertQuery(predicate: "optInt64Col >= %@ && optInt64Col < %@",
+        assertQuery(predicate: "(optInt64Col >= %@ && optInt64Col < %@)",
                     values: [Int64(64), Int64(66)], expectedCount: 1) {
             $0.optInt64Col.contains(Int64(64)..<Int64(66))
         }
 
-        assertQuery(predicate: "optInt64Col >= %@ && optInt64Col < %@",
+        assertQuery(predicate: "(optInt64Col >= %@ && optInt64Col < %@)",
                     values: [Int64(64), Int64(65)], expectedCount: 0) {
             $0.optInt64Col.contains(Int64(64)..<Int64(65))
         }
@@ -1778,12 +1778,12 @@ class QueryTests: TestCase {
             $0.optInt64Col.contains(Int64(64)...Int64(65))
         }
 
-        assertQuery(predicate: "optFloatCol >= %@ && optFloatCol < %@",
+        assertQuery(predicate: "(optFloatCol >= %@ && optFloatCol < %@)",
                     values: [Float(5.55444333), Float(7.55444333)], expectedCount: 1) {
             $0.optFloatCol.contains(Float(5.55444333)..<Float(7.55444333))
         }
 
-        assertQuery(predicate: "optFloatCol >= %@ && optFloatCol < %@",
+        assertQuery(predicate: "(optFloatCol >= %@ && optFloatCol < %@)",
                     values: [Float(5.55444333), Float(6.55444333)], expectedCount: 0) {
             $0.optFloatCol.contains(Float(5.55444333)..<Float(6.55444333))
         }
@@ -1798,12 +1798,12 @@ class QueryTests: TestCase {
             $0.optFloatCol.contains(Float(5.55444333)...Float(6.55444333))
         }
 
-        assertQuery(predicate: "optDoubleCol >= %@ && optDoubleCol < %@",
+        assertQuery(predicate: "(optDoubleCol >= %@ && optDoubleCol < %@)",
                     values: [123.456, 345.678], expectedCount: 1) {
             $0.optDoubleCol.contains(123.456..<345.678)
         }
 
-        assertQuery(predicate: "optDoubleCol >= %@ && optDoubleCol < %@",
+        assertQuery(predicate: "(optDoubleCol >= %@ && optDoubleCol < %@)",
                     values: [123.456, 234.567], expectedCount: 0) {
             $0.optDoubleCol.contains(123.456..<234.567)
         }
@@ -1818,12 +1818,12 @@ class QueryTests: TestCase {
             $0.optDoubleCol.contains(123.456...234.567)
         }
 
-        assertQuery(predicate: "optDateCol >= %@ && optDateCol < %@",
+        assertQuery(predicate: "(optDateCol >= %@ && optDateCol < %@)",
                     values: [Date(timeIntervalSince1970: 1000000), Date(timeIntervalSince1970: 3000000)], expectedCount: 1) {
             $0.optDateCol.contains(Date(timeIntervalSince1970: 1000000)..<Date(timeIntervalSince1970: 3000000))
         }
 
-        assertQuery(predicate: "optDateCol >= %@ && optDateCol < %@",
+        assertQuery(predicate: "(optDateCol >= %@ && optDateCol < %@)",
                     values: [Date(timeIntervalSince1970: 1000000), Date(timeIntervalSince1970: 2000000)], expectedCount: 0) {
             $0.optDateCol.contains(Date(timeIntervalSince1970: 1000000)..<Date(timeIntervalSince1970: 2000000))
         }
@@ -1838,12 +1838,12 @@ class QueryTests: TestCase {
             $0.optDateCol.contains(Date(timeIntervalSince1970: 1000000)...Date(timeIntervalSince1970: 2000000))
         }
 
-        assertQuery(predicate: "optDecimalCol >= %@ && optDecimalCol < %@",
+        assertQuery(predicate: "(optDecimalCol >= %@ && optDecimalCol < %@)",
                     values: [Decimal128(123.456), Decimal128(345.678)], expectedCount: 1) {
             $0.optDecimalCol.contains(Decimal128(123.456)..<Decimal128(345.678))
         }
 
-        assertQuery(predicate: "optDecimalCol >= %@ && optDecimalCol < %@",
+        assertQuery(predicate: "(optDecimalCol >= %@ && optDecimalCol < %@)",
                     values: [Decimal128(123.456), Decimal128(234.567)], expectedCount: 0) {
             $0.optDecimalCol.contains(Decimal128(123.456)..<Decimal128(234.567))
         }
@@ -3302,164 +3302,164 @@ class QueryTests: TestCase {
     }
 
     func testListContainsRange() {
-        assertQuery(predicate: "arrayInt.@min >= %@ && arrayInt.@max <= %@",
+        assertQuery(predicate: "(arrayInt.@min >= %@ && arrayInt.@max <= %@)",
                     values: [1, 2], expectedCount: 1) {
             $0.arrayInt.contains(1...2)
         }
-        assertQuery(predicate: "arrayInt.@min >= %@ && arrayInt.@max < %@",
+        assertQuery(predicate: "(arrayInt.@min >= %@ && arrayInt.@max < %@)",
                     values: [1, 2], expectedCount: 0) {
             $0.arrayInt.contains(1..<2)
         }
 
-        assertQuery(predicate: "arrayInt8.@min >= %@ && arrayInt8.@max <= %@",
+        assertQuery(predicate: "(arrayInt8.@min >= %@ && arrayInt8.@max <= %@)",
                     values: [Int8(8), Int8(9)], expectedCount: 1) {
             $0.arrayInt8.contains(Int8(8)...Int8(9))
         }
-        assertQuery(predicate: "arrayInt8.@min >= %@ && arrayInt8.@max < %@",
+        assertQuery(predicate: "(arrayInt8.@min >= %@ && arrayInt8.@max < %@)",
                     values: [Int8(8), Int8(9)], expectedCount: 0) {
             $0.arrayInt8.contains(Int8(8)..<Int8(9))
         }
 
-        assertQuery(predicate: "arrayInt16.@min >= %@ && arrayInt16.@max <= %@",
+        assertQuery(predicate: "(arrayInt16.@min >= %@ && arrayInt16.@max <= %@)",
                     values: [Int16(16), Int16(17)], expectedCount: 1) {
             $0.arrayInt16.contains(Int16(16)...Int16(17))
         }
-        assertQuery(predicate: "arrayInt16.@min >= %@ && arrayInt16.@max < %@",
+        assertQuery(predicate: "(arrayInt16.@min >= %@ && arrayInt16.@max < %@)",
                     values: [Int16(16), Int16(17)], expectedCount: 0) {
             $0.arrayInt16.contains(Int16(16)..<Int16(17))
         }
 
-        assertQuery(predicate: "arrayInt32.@min >= %@ && arrayInt32.@max <= %@",
+        assertQuery(predicate: "(arrayInt32.@min >= %@ && arrayInt32.@max <= %@)",
                     values: [Int32(32), Int32(33)], expectedCount: 1) {
             $0.arrayInt32.contains(Int32(32)...Int32(33))
         }
-        assertQuery(predicate: "arrayInt32.@min >= %@ && arrayInt32.@max < %@",
+        assertQuery(predicate: "(arrayInt32.@min >= %@ && arrayInt32.@max < %@)",
                     values: [Int32(32), Int32(33)], expectedCount: 0) {
             $0.arrayInt32.contains(Int32(32)..<Int32(33))
         }
 
-        assertQuery(predicate: "arrayInt64.@min >= %@ && arrayInt64.@max <= %@",
+        assertQuery(predicate: "(arrayInt64.@min >= %@ && arrayInt64.@max <= %@)",
                     values: [Int64(64), Int64(65)], expectedCount: 1) {
             $0.arrayInt64.contains(Int64(64)...Int64(65))
         }
-        assertQuery(predicate: "arrayInt64.@min >= %@ && arrayInt64.@max < %@",
+        assertQuery(predicate: "(arrayInt64.@min >= %@ && arrayInt64.@max < %@)",
                     values: [Int64(64), Int64(65)], expectedCount: 0) {
             $0.arrayInt64.contains(Int64(64)..<Int64(65))
         }
 
-        assertQuery(predicate: "arrayFloat.@min >= %@ && arrayFloat.@max <= %@",
+        assertQuery(predicate: "(arrayFloat.@min >= %@ && arrayFloat.@max <= %@)",
                     values: [Float(5.55444333), Float(6.55444333)], expectedCount: 1) {
             $0.arrayFloat.contains(Float(5.55444333)...Float(6.55444333))
         }
-        assertQuery(predicate: "arrayFloat.@min >= %@ && arrayFloat.@max < %@",
+        assertQuery(predicate: "(arrayFloat.@min >= %@ && arrayFloat.@max < %@)",
                     values: [Float(5.55444333), Float(6.55444333)], expectedCount: 0) {
             $0.arrayFloat.contains(Float(5.55444333)..<Float(6.55444333))
         }
 
-        assertQuery(predicate: "arrayDouble.@min >= %@ && arrayDouble.@max <= %@",
+        assertQuery(predicate: "(arrayDouble.@min >= %@ && arrayDouble.@max <= %@)",
                     values: [123.456, 234.567], expectedCount: 1) {
             $0.arrayDouble.contains(123.456...234.567)
         }
-        assertQuery(predicate: "arrayDouble.@min >= %@ && arrayDouble.@max < %@",
+        assertQuery(predicate: "(arrayDouble.@min >= %@ && arrayDouble.@max < %@)",
                     values: [123.456, 234.567], expectedCount: 0) {
             $0.arrayDouble.contains(123.456..<234.567)
         }
 
-        assertQuery(predicate: "arrayDate.@min >= %@ && arrayDate.@max <= %@",
+        assertQuery(predicate: "(arrayDate.@min >= %@ && arrayDate.@max <= %@)",
                     values: [Date(timeIntervalSince1970: 1000000), Date(timeIntervalSince1970: 2000000)], expectedCount: 1) {
             $0.arrayDate.contains(Date(timeIntervalSince1970: 1000000)...Date(timeIntervalSince1970: 2000000))
         }
-        assertQuery(predicate: "arrayDate.@min >= %@ && arrayDate.@max < %@",
+        assertQuery(predicate: "(arrayDate.@min >= %@ && arrayDate.@max < %@)",
                     values: [Date(timeIntervalSince1970: 1000000), Date(timeIntervalSince1970: 2000000)], expectedCount: 0) {
             $0.arrayDate.contains(Date(timeIntervalSince1970: 1000000)..<Date(timeIntervalSince1970: 2000000))
         }
 
-        assertQuery(predicate: "arrayDecimal.@min >= %@ && arrayDecimal.@max <= %@",
+        assertQuery(predicate: "(arrayDecimal.@min >= %@ && arrayDecimal.@max <= %@)",
                     values: [Decimal128(123.456), Decimal128(234.567)], expectedCount: 1) {
             $0.arrayDecimal.contains(Decimal128(123.456)...Decimal128(234.567))
         }
-        assertQuery(predicate: "arrayDecimal.@min >= %@ && arrayDecimal.@max < %@",
+        assertQuery(predicate: "(arrayDecimal.@min >= %@ && arrayDecimal.@max < %@)",
                     values: [Decimal128(123.456), Decimal128(234.567)], expectedCount: 0) {
             $0.arrayDecimal.contains(Decimal128(123.456)..<Decimal128(234.567))
         }
 
-        assertQuery(predicate: "arrayOptInt.@min >= %@ && arrayOptInt.@max <= %@",
+        assertQuery(predicate: "(arrayOptInt.@min >= %@ && arrayOptInt.@max <= %@)",
                     values: [1, 2], expectedCount: 1) {
             $0.arrayOptInt.contains(1...2)
         }
-        assertQuery(predicate: "arrayOptInt.@min >= %@ && arrayOptInt.@max < %@",
+        assertQuery(predicate: "(arrayOptInt.@min >= %@ && arrayOptInt.@max < %@)",
                     values: [1, 2], expectedCount: 0) {
             $0.arrayOptInt.contains(1..<2)
         }
 
-        assertQuery(predicate: "arrayOptInt8.@min >= %@ && arrayOptInt8.@max <= %@",
+        assertQuery(predicate: "(arrayOptInt8.@min >= %@ && arrayOptInt8.@max <= %@)",
                     values: [Int8(8), Int8(9)], expectedCount: 1) {
             $0.arrayOptInt8.contains(Int8(8)...Int8(9))
         }
-        assertQuery(predicate: "arrayOptInt8.@min >= %@ && arrayOptInt8.@max < %@",
+        assertQuery(predicate: "(arrayOptInt8.@min >= %@ && arrayOptInt8.@max < %@)",
                     values: [Int8(8), Int8(9)], expectedCount: 0) {
             $0.arrayOptInt8.contains(Int8(8)..<Int8(9))
         }
 
-        assertQuery(predicate: "arrayOptInt16.@min >= %@ && arrayOptInt16.@max <= %@",
+        assertQuery(predicate: "(arrayOptInt16.@min >= %@ && arrayOptInt16.@max <= %@)",
                     values: [Int16(16), Int16(17)], expectedCount: 1) {
             $0.arrayOptInt16.contains(Int16(16)...Int16(17))
         }
-        assertQuery(predicate: "arrayOptInt16.@min >= %@ && arrayOptInt16.@max < %@",
+        assertQuery(predicate: "(arrayOptInt16.@min >= %@ && arrayOptInt16.@max < %@)",
                     values: [Int16(16), Int16(17)], expectedCount: 0) {
             $0.arrayOptInt16.contains(Int16(16)..<Int16(17))
         }
 
-        assertQuery(predicate: "arrayOptInt32.@min >= %@ && arrayOptInt32.@max <= %@",
+        assertQuery(predicate: "(arrayOptInt32.@min >= %@ && arrayOptInt32.@max <= %@)",
                     values: [Int32(32), Int32(33)], expectedCount: 1) {
             $0.arrayOptInt32.contains(Int32(32)...Int32(33))
         }
-        assertQuery(predicate: "arrayOptInt32.@min >= %@ && arrayOptInt32.@max < %@",
+        assertQuery(predicate: "(arrayOptInt32.@min >= %@ && arrayOptInt32.@max < %@)",
                     values: [Int32(32), Int32(33)], expectedCount: 0) {
             $0.arrayOptInt32.contains(Int32(32)..<Int32(33))
         }
 
-        assertQuery(predicate: "arrayOptInt64.@min >= %@ && arrayOptInt64.@max <= %@",
+        assertQuery(predicate: "(arrayOptInt64.@min >= %@ && arrayOptInt64.@max <= %@)",
                     values: [Int64(64), Int64(65)], expectedCount: 1) {
             $0.arrayOptInt64.contains(Int64(64)...Int64(65))
         }
-        assertQuery(predicate: "arrayOptInt64.@min >= %@ && arrayOptInt64.@max < %@",
+        assertQuery(predicate: "(arrayOptInt64.@min >= %@ && arrayOptInt64.@max < %@)",
                     values: [Int64(64), Int64(65)], expectedCount: 0) {
             $0.arrayOptInt64.contains(Int64(64)..<Int64(65))
         }
 
-        assertQuery(predicate: "arrayOptFloat.@min >= %@ && arrayOptFloat.@max <= %@",
+        assertQuery(predicate: "(arrayOptFloat.@min >= %@ && arrayOptFloat.@max <= %@)",
                     values: [Float(5.55444333), Float(6.55444333)], expectedCount: 1) {
             $0.arrayOptFloat.contains(Float(5.55444333)...Float(6.55444333))
         }
-        assertQuery(predicate: "arrayOptFloat.@min >= %@ && arrayOptFloat.@max < %@",
+        assertQuery(predicate: "(arrayOptFloat.@min >= %@ && arrayOptFloat.@max < %@)",
                     values: [Float(5.55444333), Float(6.55444333)], expectedCount: 0) {
             $0.arrayOptFloat.contains(Float(5.55444333)..<Float(6.55444333))
         }
 
-        assertQuery(predicate: "arrayOptDouble.@min >= %@ && arrayOptDouble.@max <= %@",
+        assertQuery(predicate: "(arrayOptDouble.@min >= %@ && arrayOptDouble.@max <= %@)",
                     values: [123.456, 234.567], expectedCount: 1) {
             $0.arrayOptDouble.contains(123.456...234.567)
         }
-        assertQuery(predicate: "arrayOptDouble.@min >= %@ && arrayOptDouble.@max < %@",
+        assertQuery(predicate: "(arrayOptDouble.@min >= %@ && arrayOptDouble.@max < %@)",
                     values: [123.456, 234.567], expectedCount: 0) {
             $0.arrayOptDouble.contains(123.456..<234.567)
         }
 
-        assertQuery(predicate: "arrayOptDate.@min >= %@ && arrayOptDate.@max <= %@",
+        assertQuery(predicate: "(arrayOptDate.@min >= %@ && arrayOptDate.@max <= %@)",
                     values: [Date(timeIntervalSince1970: 1000000), Date(timeIntervalSince1970: 2000000)], expectedCount: 1) {
             $0.arrayOptDate.contains(Date(timeIntervalSince1970: 1000000)...Date(timeIntervalSince1970: 2000000))
         }
-        assertQuery(predicate: "arrayOptDate.@min >= %@ && arrayOptDate.@max < %@",
+        assertQuery(predicate: "(arrayOptDate.@min >= %@ && arrayOptDate.@max < %@)",
                     values: [Date(timeIntervalSince1970: 1000000), Date(timeIntervalSince1970: 2000000)], expectedCount: 0) {
             $0.arrayOptDate.contains(Date(timeIntervalSince1970: 1000000)..<Date(timeIntervalSince1970: 2000000))
         }
 
-        assertQuery(predicate: "arrayOptDecimal.@min >= %@ && arrayOptDecimal.@max <= %@",
+        assertQuery(predicate: "(arrayOptDecimal.@min >= %@ && arrayOptDecimal.@max <= %@)",
                     values: [Decimal128(123.456), Decimal128(234.567)], expectedCount: 1) {
             $0.arrayOptDecimal.contains(Decimal128(123.456)...Decimal128(234.567))
         }
-        assertQuery(predicate: "arrayOptDecimal.@min >= %@ && arrayOptDecimal.@max < %@",
+        assertQuery(predicate: "(arrayOptDecimal.@min >= %@ && arrayOptDecimal.@max < %@)",
                     values: [Decimal128(123.456), Decimal128(234.567)], expectedCount: 0) {
             $0.arrayOptDecimal.contains(Decimal128(123.456)..<Decimal128(234.567))
         }
@@ -4081,164 +4081,164 @@ class QueryTests: TestCase {
     }
 
     func testSetContainsRange() {
-        assertQuery(predicate: "setInt.@min >= %@ && setInt.@max <= %@",
+        assertQuery(predicate: "(setInt.@min >= %@ && setInt.@max <= %@)",
                     values: [1, 2], expectedCount: 1) {
             $0.setInt.contains(1...2)
         }
-        assertQuery(predicate: "setInt.@min >= %@ && setInt.@max < %@",
+        assertQuery(predicate: "(setInt.@min >= %@ && setInt.@max < %@)",
                     values: [1, 2], expectedCount: 0) {
             $0.setInt.contains(1..<2)
         }
 
-        assertQuery(predicate: "setInt8.@min >= %@ && setInt8.@max <= %@",
+        assertQuery(predicate: "(setInt8.@min >= %@ && setInt8.@max <= %@)",
                     values: [Int8(8), Int8(9)], expectedCount: 1) {
             $0.setInt8.contains(Int8(8)...Int8(9))
         }
-        assertQuery(predicate: "setInt8.@min >= %@ && setInt8.@max < %@",
+        assertQuery(predicate: "(setInt8.@min >= %@ && setInt8.@max < %@)",
                     values: [Int8(8), Int8(9)], expectedCount: 0) {
             $0.setInt8.contains(Int8(8)..<Int8(9))
         }
 
-        assertQuery(predicate: "setInt16.@min >= %@ && setInt16.@max <= %@",
+        assertQuery(predicate: "(setInt16.@min >= %@ && setInt16.@max <= %@)",
                     values: [Int16(16), Int16(17)], expectedCount: 1) {
             $0.setInt16.contains(Int16(16)...Int16(17))
         }
-        assertQuery(predicate: "setInt16.@min >= %@ && setInt16.@max < %@",
+        assertQuery(predicate: "(setInt16.@min >= %@ && setInt16.@max < %@)",
                     values: [Int16(16), Int16(17)], expectedCount: 0) {
             $0.setInt16.contains(Int16(16)..<Int16(17))
         }
 
-        assertQuery(predicate: "setInt32.@min >= %@ && setInt32.@max <= %@",
+        assertQuery(predicate: "(setInt32.@min >= %@ && setInt32.@max <= %@)",
                     values: [Int32(32), Int32(33)], expectedCount: 1) {
             $0.setInt32.contains(Int32(32)...Int32(33))
         }
-        assertQuery(predicate: "setInt32.@min >= %@ && setInt32.@max < %@",
+        assertQuery(predicate: "(setInt32.@min >= %@ && setInt32.@max < %@)",
                     values: [Int32(32), Int32(33)], expectedCount: 0) {
             $0.setInt32.contains(Int32(32)..<Int32(33))
         }
 
-        assertQuery(predicate: "setInt64.@min >= %@ && setInt64.@max <= %@",
+        assertQuery(predicate: "(setInt64.@min >= %@ && setInt64.@max <= %@)",
                     values: [Int64(64), Int64(65)], expectedCount: 1) {
             $0.setInt64.contains(Int64(64)...Int64(65))
         }
-        assertQuery(predicate: "setInt64.@min >= %@ && setInt64.@max < %@",
+        assertQuery(predicate: "(setInt64.@min >= %@ && setInt64.@max < %@)",
                     values: [Int64(64), Int64(65)], expectedCount: 0) {
             $0.setInt64.contains(Int64(64)..<Int64(65))
         }
 
-        assertQuery(predicate: "setFloat.@min >= %@ && setFloat.@max <= %@",
+        assertQuery(predicate: "(setFloat.@min >= %@ && setFloat.@max <= %@)",
                     values: [Float(5.55444333), Float(6.55444333)], expectedCount: 1) {
             $0.setFloat.contains(Float(5.55444333)...Float(6.55444333))
         }
-        assertQuery(predicate: "setFloat.@min >= %@ && setFloat.@max < %@",
+        assertQuery(predicate: "(setFloat.@min >= %@ && setFloat.@max < %@)",
                     values: [Float(5.55444333), Float(6.55444333)], expectedCount: 0) {
             $0.setFloat.contains(Float(5.55444333)..<Float(6.55444333))
         }
 
-        assertQuery(predicate: "setDouble.@min >= %@ && setDouble.@max <= %@",
+        assertQuery(predicate: "(setDouble.@min >= %@ && setDouble.@max <= %@)",
                     values: [123.456, 234.567], expectedCount: 1) {
             $0.setDouble.contains(123.456...234.567)
         }
-        assertQuery(predicate: "setDouble.@min >= %@ && setDouble.@max < %@",
+        assertQuery(predicate: "(setDouble.@min >= %@ && setDouble.@max < %@)",
                     values: [123.456, 234.567], expectedCount: 0) {
             $0.setDouble.contains(123.456..<234.567)
         }
 
-        assertQuery(predicate: "setDate.@min >= %@ && setDate.@max <= %@",
+        assertQuery(predicate: "(setDate.@min >= %@ && setDate.@max <= %@)",
                     values: [Date(timeIntervalSince1970: 1000000), Date(timeIntervalSince1970: 2000000)], expectedCount: 1) {
             $0.setDate.contains(Date(timeIntervalSince1970: 1000000)...Date(timeIntervalSince1970: 2000000))
         }
-        assertQuery(predicate: "setDate.@min >= %@ && setDate.@max < %@",
+        assertQuery(predicate: "(setDate.@min >= %@ && setDate.@max < %@)",
                     values: [Date(timeIntervalSince1970: 1000000), Date(timeIntervalSince1970: 2000000)], expectedCount: 0) {
             $0.setDate.contains(Date(timeIntervalSince1970: 1000000)..<Date(timeIntervalSince1970: 2000000))
         }
 
-        assertQuery(predicate: "setDecimal.@min >= %@ && setDecimal.@max <= %@",
+        assertQuery(predicate: "(setDecimal.@min >= %@ && setDecimal.@max <= %@)",
                     values: [Decimal128(123.456), Decimal128(234.567)], expectedCount: 1) {
             $0.setDecimal.contains(Decimal128(123.456)...Decimal128(234.567))
         }
-        assertQuery(predicate: "setDecimal.@min >= %@ && setDecimal.@max < %@",
+        assertQuery(predicate: "(setDecimal.@min >= %@ && setDecimal.@max < %@)",
                     values: [Decimal128(123.456), Decimal128(234.567)], expectedCount: 0) {
             $0.setDecimal.contains(Decimal128(123.456)..<Decimal128(234.567))
         }
 
-        assertQuery(predicate: "setOptInt.@min >= %@ && setOptInt.@max <= %@",
+        assertQuery(predicate: "(setOptInt.@min >= %@ && setOptInt.@max <= %@)",
                     values: [1, 2], expectedCount: 1) {
             $0.setOptInt.contains(1...2)
         }
-        assertQuery(predicate: "setOptInt.@min >= %@ && setOptInt.@max < %@",
+        assertQuery(predicate: "(setOptInt.@min >= %@ && setOptInt.@max < %@)",
                     values: [1, 2], expectedCount: 0) {
             $0.setOptInt.contains(1..<2)
         }
 
-        assertQuery(predicate: "setOptInt8.@min >= %@ && setOptInt8.@max <= %@",
+        assertQuery(predicate: "(setOptInt8.@min >= %@ && setOptInt8.@max <= %@)",
                     values: [Int8(8), Int8(9)], expectedCount: 1) {
             $0.setOptInt8.contains(Int8(8)...Int8(9))
         }
-        assertQuery(predicate: "setOptInt8.@min >= %@ && setOptInt8.@max < %@",
+        assertQuery(predicate: "(setOptInt8.@min >= %@ && setOptInt8.@max < %@)",
                     values: [Int8(8), Int8(9)], expectedCount: 0) {
             $0.setOptInt8.contains(Int8(8)..<Int8(9))
         }
 
-        assertQuery(predicate: "setOptInt16.@min >= %@ && setOptInt16.@max <= %@",
+        assertQuery(predicate: "(setOptInt16.@min >= %@ && setOptInt16.@max <= %@)",
                     values: [Int16(16), Int16(17)], expectedCount: 1) {
             $0.setOptInt16.contains(Int16(16)...Int16(17))
         }
-        assertQuery(predicate: "setOptInt16.@min >= %@ && setOptInt16.@max < %@",
+        assertQuery(predicate: "(setOptInt16.@min >= %@ && setOptInt16.@max < %@)",
                     values: [Int16(16), Int16(17)], expectedCount: 0) {
             $0.setOptInt16.contains(Int16(16)..<Int16(17))
         }
 
-        assertQuery(predicate: "setOptInt32.@min >= %@ && setOptInt32.@max <= %@",
+        assertQuery(predicate: "(setOptInt32.@min >= %@ && setOptInt32.@max <= %@)",
                     values: [Int32(32), Int32(33)], expectedCount: 1) {
             $0.setOptInt32.contains(Int32(32)...Int32(33))
         }
-        assertQuery(predicate: "setOptInt32.@min >= %@ && setOptInt32.@max < %@",
+        assertQuery(predicate: "(setOptInt32.@min >= %@ && setOptInt32.@max < %@)",
                     values: [Int32(32), Int32(33)], expectedCount: 0) {
             $0.setOptInt32.contains(Int32(32)..<Int32(33))
         }
 
-        assertQuery(predicate: "setOptInt64.@min >= %@ && setOptInt64.@max <= %@",
+        assertQuery(predicate: "(setOptInt64.@min >= %@ && setOptInt64.@max <= %@)",
                     values: [Int64(64), Int64(65)], expectedCount: 1) {
             $0.setOptInt64.contains(Int64(64)...Int64(65))
         }
-        assertQuery(predicate: "setOptInt64.@min >= %@ && setOptInt64.@max < %@",
+        assertQuery(predicate: "(setOptInt64.@min >= %@ && setOptInt64.@max < %@)",
                     values: [Int64(64), Int64(65)], expectedCount: 0) {
             $0.setOptInt64.contains(Int64(64)..<Int64(65))
         }
 
-        assertQuery(predicate: "setOptFloat.@min >= %@ && setOptFloat.@max <= %@",
+        assertQuery(predicate: "(setOptFloat.@min >= %@ && setOptFloat.@max <= %@)",
                     values: [Float(5.55444333), Float(6.55444333)], expectedCount: 1) {
             $0.setOptFloat.contains(Float(5.55444333)...Float(6.55444333))
         }
-        assertQuery(predicate: "setOptFloat.@min >= %@ && setOptFloat.@max < %@",
+        assertQuery(predicate: "(setOptFloat.@min >= %@ && setOptFloat.@max < %@)",
                     values: [Float(5.55444333), Float(6.55444333)], expectedCount: 0) {
             $0.setOptFloat.contains(Float(5.55444333)..<Float(6.55444333))
         }
 
-        assertQuery(predicate: "setOptDouble.@min >= %@ && setOptDouble.@max <= %@",
+        assertQuery(predicate: "(setOptDouble.@min >= %@ && setOptDouble.@max <= %@)",
                     values: [123.456, 234.567], expectedCount: 1) {
             $0.setOptDouble.contains(123.456...234.567)
         }
-        assertQuery(predicate: "setOptDouble.@min >= %@ && setOptDouble.@max < %@",
+        assertQuery(predicate: "(setOptDouble.@min >= %@ && setOptDouble.@max < %@)",
                     values: [123.456, 234.567], expectedCount: 0) {
             $0.setOptDouble.contains(123.456..<234.567)
         }
 
-        assertQuery(predicate: "setOptDate.@min >= %@ && setOptDate.@max <= %@",
+        assertQuery(predicate: "(setOptDate.@min >= %@ && setOptDate.@max <= %@)",
                     values: [Date(timeIntervalSince1970: 1000000), Date(timeIntervalSince1970: 2000000)], expectedCount: 1) {
             $0.setOptDate.contains(Date(timeIntervalSince1970: 1000000)...Date(timeIntervalSince1970: 2000000))
         }
-        assertQuery(predicate: "setOptDate.@min >= %@ && setOptDate.@max < %@",
+        assertQuery(predicate: "(setOptDate.@min >= %@ && setOptDate.@max < %@)",
                     values: [Date(timeIntervalSince1970: 1000000), Date(timeIntervalSince1970: 2000000)], expectedCount: 0) {
             $0.setOptDate.contains(Date(timeIntervalSince1970: 1000000)..<Date(timeIntervalSince1970: 2000000))
         }
 
-        assertQuery(predicate: "setOptDecimal.@min >= %@ && setOptDecimal.@max <= %@",
+        assertQuery(predicate: "(setOptDecimal.@min >= %@ && setOptDecimal.@max <= %@)",
                     values: [Decimal128(123.456), Decimal128(234.567)], expectedCount: 1) {
             $0.setOptDecimal.contains(Decimal128(123.456)...Decimal128(234.567))
         }
-        assertQuery(predicate: "setOptDecimal.@min >= %@ && setOptDecimal.@max < %@",
+        assertQuery(predicate: "(setOptDecimal.@min >= %@ && setOptDecimal.@max < %@)",
                     values: [Decimal128(123.456), Decimal128(234.567)], expectedCount: 0) {
             $0.setOptDecimal.contains(Decimal128(123.456)..<Decimal128(234.567))
         }
@@ -6591,164 +6591,164 @@ class QueryTests: TestCase {
     }
 
     func testMapContainsRange() {
-        assertQuery(predicate: "mapInt.@min >= %@ && mapInt.@max <= %@",
+        assertQuery(predicate: "(mapInt.@min >= %@ && mapInt.@max <= %@)",
                     values: [1, 2], expectedCount: 1) {
             $0.mapInt.contains(1...2)
         }
-        assertQuery(predicate: "mapInt.@min >= %@ && mapInt.@max < %@",
+        assertQuery(predicate: "(mapInt.@min >= %@ && mapInt.@max < %@)",
                     values: [1, 2], expectedCount: 0) {
             $0.mapInt.contains(1..<2)
         }
 
-        assertQuery(predicate: "mapInt8.@min >= %@ && mapInt8.@max <= %@",
+        assertQuery(predicate: "(mapInt8.@min >= %@ && mapInt8.@max <= %@)",
                     values: [Int8(8), Int8(9)], expectedCount: 1) {
             $0.mapInt8.contains(Int8(8)...Int8(9))
         }
-        assertQuery(predicate: "mapInt8.@min >= %@ && mapInt8.@max < %@",
+        assertQuery(predicate: "(mapInt8.@min >= %@ && mapInt8.@max < %@)",
                     values: [Int8(8), Int8(9)], expectedCount: 0) {
             $0.mapInt8.contains(Int8(8)..<Int8(9))
         }
 
-        assertQuery(predicate: "mapInt16.@min >= %@ && mapInt16.@max <= %@",
+        assertQuery(predicate: "(mapInt16.@min >= %@ && mapInt16.@max <= %@)",
                     values: [Int16(16), Int16(17)], expectedCount: 1) {
             $0.mapInt16.contains(Int16(16)...Int16(17))
         }
-        assertQuery(predicate: "mapInt16.@min >= %@ && mapInt16.@max < %@",
+        assertQuery(predicate: "(mapInt16.@min >= %@ && mapInt16.@max < %@)",
                     values: [Int16(16), Int16(17)], expectedCount: 0) {
             $0.mapInt16.contains(Int16(16)..<Int16(17))
         }
 
-        assertQuery(predicate: "mapInt32.@min >= %@ && mapInt32.@max <= %@",
+        assertQuery(predicate: "(mapInt32.@min >= %@ && mapInt32.@max <= %@)",
                     values: [Int32(32), Int32(33)], expectedCount: 1) {
             $0.mapInt32.contains(Int32(32)...Int32(33))
         }
-        assertQuery(predicate: "mapInt32.@min >= %@ && mapInt32.@max < %@",
+        assertQuery(predicate: "(mapInt32.@min >= %@ && mapInt32.@max < %@)",
                     values: [Int32(32), Int32(33)], expectedCount: 0) {
             $0.mapInt32.contains(Int32(32)..<Int32(33))
         }
 
-        assertQuery(predicate: "mapInt64.@min >= %@ && mapInt64.@max <= %@",
+        assertQuery(predicate: "(mapInt64.@min >= %@ && mapInt64.@max <= %@)",
                     values: [Int64(64), Int64(65)], expectedCount: 1) {
             $0.mapInt64.contains(Int64(64)...Int64(65))
         }
-        assertQuery(predicate: "mapInt64.@min >= %@ && mapInt64.@max < %@",
+        assertQuery(predicate: "(mapInt64.@min >= %@ && mapInt64.@max < %@)",
                     values: [Int64(64), Int64(65)], expectedCount: 0) {
             $0.mapInt64.contains(Int64(64)..<Int64(65))
         }
 
-        assertQuery(predicate: "mapFloat.@min >= %@ && mapFloat.@max <= %@",
+        assertQuery(predicate: "(mapFloat.@min >= %@ && mapFloat.@max <= %@)",
                     values: [Float(5.5544), Float(6.5544)], expectedCount: 1) {
             $0.mapFloat.contains(Float(5.5544)...Float(6.5544))
         }
-        assertQuery(predicate: "mapFloat.@min >= %@ && mapFloat.@max < %@",
+        assertQuery(predicate: "(mapFloat.@min >= %@ && mapFloat.@max < %@)",
                     values: [Float(5.5544), Float(6.5544)], expectedCount: 0) {
             $0.mapFloat.contains(Float(5.5544)..<Float(6.5544))
         }
 
-        assertQuery(predicate: "mapDouble.@min >= %@ && mapDouble.@max <= %@",
+        assertQuery(predicate: "(mapDouble.@min >= %@ && mapDouble.@max <= %@)",
                     values: [123.456, 234.567], expectedCount: 1) {
             $0.mapDouble.contains(123.456...234.567)
         }
-        assertQuery(predicate: "mapDouble.@min >= %@ && mapDouble.@max < %@",
+        assertQuery(predicate: "(mapDouble.@min >= %@ && mapDouble.@max < %@)",
                     values: [123.456, 234.567], expectedCount: 0) {
             $0.mapDouble.contains(123.456..<234.567)
         }
 
-        assertQuery(predicate: "mapDate.@min >= %@ && mapDate.@max <= %@",
+        assertQuery(predicate: "(mapDate.@min >= %@ && mapDate.@max <= %@)",
                     values: [Date(timeIntervalSince1970: 1000000), Date(timeIntervalSince1970: 2000000)], expectedCount: 1) {
             $0.mapDate.contains(Date(timeIntervalSince1970: 1000000)...Date(timeIntervalSince1970: 2000000))
         }
-        assertQuery(predicate: "mapDate.@min >= %@ && mapDate.@max < %@",
+        assertQuery(predicate: "(mapDate.@min >= %@ && mapDate.@max < %@)",
                     values: [Date(timeIntervalSince1970: 1000000), Date(timeIntervalSince1970: 2000000)], expectedCount: 0) {
             $0.mapDate.contains(Date(timeIntervalSince1970: 1000000)..<Date(timeIntervalSince1970: 2000000))
         }
 
-        assertQuery(predicate: "mapDecimal.@min >= %@ && mapDecimal.@max <= %@",
+        assertQuery(predicate: "(mapDecimal.@min >= %@ && mapDecimal.@max <= %@)",
                     values: [Decimal128(123.456), Decimal128(234.567)], expectedCount: 1) {
             $0.mapDecimal.contains(Decimal128(123.456)...Decimal128(234.567))
         }
-        assertQuery(predicate: "mapDecimal.@min >= %@ && mapDecimal.@max < %@",
+        assertQuery(predicate: "(mapDecimal.@min >= %@ && mapDecimal.@max < %@)",
                     values: [Decimal128(123.456), Decimal128(234.567)], expectedCount: 0) {
             $0.mapDecimal.contains(Decimal128(123.456)..<Decimal128(234.567))
         }
 
-        assertQuery(predicate: "mapOptInt.@min >= %@ && mapOptInt.@max <= %@",
+        assertQuery(predicate: "(mapOptInt.@min >= %@ && mapOptInt.@max <= %@)",
                     values: [1, 2], expectedCount: 1) {
             $0.mapOptInt.contains(1...2)
         }
-        assertQuery(predicate: "mapOptInt.@min >= %@ && mapOptInt.@max < %@",
+        assertQuery(predicate: "(mapOptInt.@min >= %@ && mapOptInt.@max < %@)",
                     values: [1, 2], expectedCount: 0) {
             $0.mapOptInt.contains(1..<2)
         }
 
-        assertQuery(predicate: "mapOptInt8.@min >= %@ && mapOptInt8.@max <= %@",
+        assertQuery(predicate: "(mapOptInt8.@min >= %@ && mapOptInt8.@max <= %@)",
                     values: [Int8(8), Int8(9)], expectedCount: 1) {
             $0.mapOptInt8.contains(Int8(8)...Int8(9))
         }
-        assertQuery(predicate: "mapOptInt8.@min >= %@ && mapOptInt8.@max < %@",
+        assertQuery(predicate: "(mapOptInt8.@min >= %@ && mapOptInt8.@max < %@)",
                     values: [Int8(8), Int8(9)], expectedCount: 0) {
             $0.mapOptInt8.contains(Int8(8)..<Int8(9))
         }
 
-        assertQuery(predicate: "mapOptInt16.@min >= %@ && mapOptInt16.@max <= %@",
+        assertQuery(predicate: "(mapOptInt16.@min >= %@ && mapOptInt16.@max <= %@)",
                     values: [Int16(16), Int16(17)], expectedCount: 1) {
             $0.mapOptInt16.contains(Int16(16)...Int16(17))
         }
-        assertQuery(predicate: "mapOptInt16.@min >= %@ && mapOptInt16.@max < %@",
+        assertQuery(predicate: "(mapOptInt16.@min >= %@ && mapOptInt16.@max < %@)",
                     values: [Int16(16), Int16(17)], expectedCount: 0) {
             $0.mapOptInt16.contains(Int16(16)..<Int16(17))
         }
 
-        assertQuery(predicate: "mapOptInt32.@min >= %@ && mapOptInt32.@max <= %@",
+        assertQuery(predicate: "(mapOptInt32.@min >= %@ && mapOptInt32.@max <= %@)",
                     values: [Int32(32), Int32(33)], expectedCount: 1) {
             $0.mapOptInt32.contains(Int32(32)...Int32(33))
         }
-        assertQuery(predicate: "mapOptInt32.@min >= %@ && mapOptInt32.@max < %@",
+        assertQuery(predicate: "(mapOptInt32.@min >= %@ && mapOptInt32.@max < %@)",
                     values: [Int32(32), Int32(33)], expectedCount: 0) {
             $0.mapOptInt32.contains(Int32(32)..<Int32(33))
         }
 
-        assertQuery(predicate: "mapOptInt64.@min >= %@ && mapOptInt64.@max <= %@",
+        assertQuery(predicate: "(mapOptInt64.@min >= %@ && mapOptInt64.@max <= %@)",
                     values: [Int64(64), Int64(65)], expectedCount: 1) {
             $0.mapOptInt64.contains(Int64(64)...Int64(65))
         }
-        assertQuery(predicate: "mapOptInt64.@min >= %@ && mapOptInt64.@max < %@",
+        assertQuery(predicate: "(mapOptInt64.@min >= %@ && mapOptInt64.@max < %@)",
                     values: [Int64(64), Int64(65)], expectedCount: 0) {
             $0.mapOptInt64.contains(Int64(64)..<Int64(65))
         }
 
-        assertQuery(predicate: "mapOptFloat.@min >= %@ && mapOptFloat.@max <= %@",
+        assertQuery(predicate: "(mapOptFloat.@min >= %@ && mapOptFloat.@max <= %@)",
                     values: [Float(5.5544), Float(6.5544)], expectedCount: 1) {
             $0.mapOptFloat.contains(Float(5.5544)...Float(6.5544))
         }
-        assertQuery(predicate: "mapOptFloat.@min >= %@ && mapOptFloat.@max < %@",
+        assertQuery(predicate: "(mapOptFloat.@min >= %@ && mapOptFloat.@max < %@)",
                     values: [Float(5.5544), Float(6.5544)], expectedCount: 0) {
             $0.mapOptFloat.contains(Float(5.5544)..<Float(6.5544))
         }
 
-        assertQuery(predicate: "mapOptDouble.@min >= %@ && mapOptDouble.@max <= %@",
+        assertQuery(predicate: "(mapOptDouble.@min >= %@ && mapOptDouble.@max <= %@)",
                     values: [123.456, 234.567], expectedCount: 1) {
             $0.mapOptDouble.contains(123.456...234.567)
         }
-        assertQuery(predicate: "mapOptDouble.@min >= %@ && mapOptDouble.@max < %@",
+        assertQuery(predicate: "(mapOptDouble.@min >= %@ && mapOptDouble.@max < %@)",
                     values: [123.456, 234.567], expectedCount: 0) {
             $0.mapOptDouble.contains(123.456..<234.567)
         }
 
-        assertQuery(predicate: "mapOptDate.@min >= %@ && mapOptDate.@max <= %@",
+        assertQuery(predicate: "(mapOptDate.@min >= %@ && mapOptDate.@max <= %@)",
                     values: [Date(timeIntervalSince1970: 1000000), Date(timeIntervalSince1970: 2000000)], expectedCount: 1) {
             $0.mapOptDate.contains(Date(timeIntervalSince1970: 1000000)...Date(timeIntervalSince1970: 2000000))
         }
-        assertQuery(predicate: "mapOptDate.@min >= %@ && mapOptDate.@max < %@",
+        assertQuery(predicate: "(mapOptDate.@min >= %@ && mapOptDate.@max < %@)",
                     values: [Date(timeIntervalSince1970: 1000000), Date(timeIntervalSince1970: 2000000)], expectedCount: 0) {
             $0.mapOptDate.contains(Date(timeIntervalSince1970: 1000000)..<Date(timeIntervalSince1970: 2000000))
         }
 
-        assertQuery(predicate: "mapOptDecimal.@min >= %@ && mapOptDecimal.@max <= %@",
+        assertQuery(predicate: "(mapOptDecimal.@min >= %@ && mapOptDecimal.@max <= %@)",
                     values: [Decimal128(123.456), Decimal128(234.567)], expectedCount: 1) {
             $0.mapOptDecimal.contains(Decimal128(123.456)...Decimal128(234.567))
         }
-        assertQuery(predicate: "mapOptDecimal.@min >= %@ && mapOptDecimal.@max < %@",
+        assertQuery(predicate: "(mapOptDecimal.@min >= %@ && mapOptDecimal.@max < %@)",
                     values: [Decimal128(123.456), Decimal128(234.567)], expectedCount: 0) {
             $0.mapOptDecimal.contains(Decimal128(123.456)..<Decimal128(234.567))
         }
@@ -8545,11 +8545,11 @@ class QueryTests: TestCase {
         // List
 
         // Count of results will be 0 because there are no `ModernAllTypesObject`s in the list.
-        assertQuery(predicate: "SUBQUERY(arrayCol, $obj0, $obj0.intCol != %@).@count > %@", values: [123, 0], expectedCount: 0) {
+        assertQuery(predicate: "SUBQUERY(arrayCol, $col0, $col0.intCol != %@).@count > %@", values: [123, 0], expectedCount: 0) {
             ($0.arrayCol.intCol != 123).count > 0
         }
 
-        assertQuery(predicate: "(intCol == %@ && SUBQUERY(arrayCol, $obj0, $obj0.stringCol == %@).@count == %@)", values: [5, "Bar", 0], expectedCount: 0) {
+        assertQuery(predicate: "(intCol == %@ && SUBQUERY(arrayCol, $col0, $col0.stringCol == %@).@count == %@)", values: [5, "Bar", 0], expectedCount: 0) {
             $0.intCol == 5 &&
             ($0.arrayCol.stringCol == "Bar").count == 0
         }
@@ -8557,11 +8557,11 @@ class QueryTests: TestCase {
         // Set
 
         // Will be 0 results because there are no `ModernAllTypesObject`s in the set.
-        assertQuery(predicate: "SUBQUERY(arrayCol, $obj0, $obj0.intCol != %@).@count > %@", values: [123, 0], expectedCount: 0) {
+        assertQuery(predicate: "SUBQUERY(arrayCol, $col0, $col0.intCol != %@).@count > %@", values: [123, 0], expectedCount: 0) {
             ($0.arrayCol.intCol != 123).count > 0
         }
 
-        assertQuery(predicate: "(intCol == %@ && SUBQUERY(setCol, $obj0, $obj0.stringCol == %@).@count == %@)", values: [5, "Bar", 0], expectedCount: 0) {
+        assertQuery(predicate: "(intCol == %@ && SUBQUERY(setCol, $col0, $col0.stringCol == %@).@count == %@)", values: [5, "Bar", 0], expectedCount: 0) {
             $0.intCol == 5 &&
             ($0.setCol.stringCol == "Bar").count == 0
         }
@@ -8575,24 +8575,24 @@ class QueryTests: TestCase {
         }
 
         // Results count should now be 1
-        assertQuery(predicate: "SUBQUERY(arrayCol, $obj0, $obj0.arrayInt.@count >= %@).@count > %@", values: [0, 0], expectedCount: 1) {
+        assertQuery(predicate: "SUBQUERY(arrayCol, $col0, $col0.arrayInt.@count >= %@).@count > %@", values: [0, 0], expectedCount: 1) {
             ($0.arrayCol.arrayInt.count >= 0).count > 0
         }
 
         // Subquery in a subquery
-        assertQuery(predicate: "SUBQUERY(arrayCol, $obj1, ($obj1.arrayInt.@count >= %@ && SUBQUERY(arrayCol, $obj0, $obj0.intCol != %@).@count > %@)).@count > %@", values: [0, 123, 0, 0], expectedCount: 0) {
+        assertQuery(predicate: "SUBQUERY(arrayCol, $col1, ($col1.arrayInt.@count >= %@ && SUBQUERY(arrayCol, $col0, $col0.intCol != %@).@count > %@)).@count > %@", values: [0, 123, 0, 0], expectedCount: 0) {
             ($0.arrayCol.arrayInt.count >= 0 && ($0.arrayCol.intCol != 123).count > 0).count > 0
         }
 
-        assertQuery(predicate: "SUBQUERY(arrayCol, $obj0, $obj0.intCol != %@).@count > %@", values: [123, 0], expectedCount: 1) {
+        assertQuery(predicate: "SUBQUERY(arrayCol, $col0, $col0.intCol != %@).@count > %@", values: [123, 0], expectedCount: 1) {
             ($0.arrayCol.intCol != 123).count > 0
         }
 
-        assertQuery(predicate: "SUBQUERY(arrayCol, $obj0, ($obj0.intCol > %@ && $obj0.intCol <= %@)).@count > %@", values: [0, 5, 0], expectedCount: 1) {
+        assertQuery(predicate: "SUBQUERY(arrayCol, $col0, ($col0.intCol > %@ && $col0.intCol <= %@)).@count > %@", values: [0, 5, 0], expectedCount: 1) {
             ($0.arrayCol.intCol > 0 && $0.arrayCol.intCol <= 5 ).count > 0
         }
 
-        assertQuery(predicate: "((intCol == %@ && SUBQUERY(arrayCol, $obj0, $obj0.intCol == %@).@count == %@) && SUBQUERY(arrayCol, $obj0, $obj0.stringCol == %@).@count == %@)", values: [6, 5, 1, "Bar", 0], expectedCount: 1) {
+        assertQuery(predicate: "((intCol == %@ && SUBQUERY(arrayCol, $col0, $col0.intCol == %@).@count == %@) && SUBQUERY(arrayCol, $col0, $col0.stringCol == %@).@count == %@)", values: [6, 5, 1, "Bar", 0], expectedCount: 1) {
             ($0.intCol == 6) &&
             ($0.arrayCol.intCol == 5).count == 1 &&
             ($0.arrayCol.stringCol == "Bar").count == 0
@@ -8601,24 +8601,19 @@ class QueryTests: TestCase {
         // Set
 
         // Will be 0 results because there are no `ModernAllTypesObject`s in the set.
-        assertQuery(predicate: "SUBQUERY(arrayCol, $obj0, $obj0.intCol != %@).@count > %@", values: [123, 0], expectedCount: 1) {
+        assertQuery(predicate: "SUBQUERY(arrayCol, $col0, $col0.intCol != %@).@count > %@", values: [123, 0], expectedCount: 1) {
             ($0.arrayCol.intCol != 123).count > 0
         }
 
-        assertQuery(predicate: "(intCol == %@ && SUBQUERY(setCol, $obj0, $obj0.stringCol == %@).@count == %@)", values: [6, "Bar", 0], expectedCount: 1) {
+        assertQuery(predicate: "(intCol == %@ && SUBQUERY(setCol, $col0, $col0.stringCol == %@).@count == %@)", values: [6, "Bar", 0], expectedCount: 1) {
             ($0.intCol == 6) &&
             ($0.setCol.stringCol == "Bar").count == 0
         }
 
-        assertQuery(predicate: "(intCol == %@ && SUBQUERY(setCol, $obj0, ($obj0.intCol == %@ && $obj0.stringCol != %@)).@count == %@)", values: [6, 5, "Blah", 1], expectedCount: 1) {
+        assertQuery(predicate: "(intCol == %@ && SUBQUERY(setCol, $col0, ($col0.intCol == %@ && $col0.stringCol != %@)).@count == %@)", values: [6, 5, "Blah", 1], expectedCount: 1) {
             ($0.intCol == 6) &&
             (((($0.setCol.intCol == 5) && ($0.setCol.stringCol != "Blah"))).count == 1)
         }
-
-        let query: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>) = {
-            ($0.setCol.intCol == 1 && $0.arrayCol.intCol == 1).count > 0
-        }
-        assertThrows(query(Query<ModernAllTypesObject>())._constructPredicate(), reason: "Subquery predicates will only work on one collection at a time.")
     }
 
     // MARK: - Collection Aggregations
@@ -19437,24 +19432,20 @@ class QueryTests: TestCase {
     }
 
     func testAggregateNotSupported() {
-        let queryAvg: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>) = {
+        assertThrows(assertQuery(predicate: "", values: [], expectedCount: 0) {
             $0.intCol.avg == 1
-        }
-        assertThrows(queryAvg(Query<ModernAllTypesObject>())._constructPredicate(), reason: "Could not aggregate `.@avg`, property is not within a collection.")
+        }, reason: "Aggregate operations can only be used on key paths that include an collection property")
 
-        let queryMax: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>) = {
+        assertThrows(assertQuery(predicate: "", values: [], expectedCount: 0) {
             $0.doubleCol.max != 1
-        }
-        assertThrows(queryMax(Query<ModernAllTypesObject>())._constructPredicate(), reason: "Could not aggregate `.@max`, property is not within a collection.")
+        }, reason: "Aggregate operations can only be used on key paths that include an collection property")
 
-        let queryMin: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>) = {
+        assertThrows(assertQuery(predicate: "", values: [], expectedCount: 0) {
             $0.dateCol.min > Date()
-        }
-        assertThrows(queryMin(Query<ModernAllTypesObject>())._constructPredicate(), reason: "Could not aggregate `.@min`, property is not within a collection.")
+        }, reason: "Aggregate operations can only be used on key paths that include an collection property")
 
-        let querySum: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>) = {
+        assertThrows(assertQuery(predicate: "", values: [], expectedCount: 0) {
             $0.decimalCol.sum < 1
-        }
-        assertThrows(querySum(Query<ModernAllTypesObject>())._constructPredicate(), reason: "Could not aggregate `.@sum`, property is not within a collection.")
+        }, reason: "Aggregate operations can only be used on key paths that include an collection property")
     }
 }

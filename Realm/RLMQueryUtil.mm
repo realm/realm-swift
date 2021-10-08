@@ -1381,7 +1381,7 @@ ColumnReference QueryBuilder::column_reference_from_key_path(RLMObjectSchema *ob
 
     if (isAggregate && !keyPath.containsToManyRelationship) {
         throwException(@"Invalid predicate",
-                       @"Aggregate operations can only be used on key paths that include an array property");
+                       @"Aggregate operations can only be used on key paths that include an collection property");
     } else if (!isAggregate && keyPath.containsToManyRelationship && !keyPath.isDictionary) {
         throwException(@"Invalid predicate",
                        @"Key paths that include a collection property must use aggregate operations");
