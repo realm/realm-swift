@@ -406,14 +406,12 @@ public struct ProjectedList<NewElement>: RandomAccessCollection where NewElement
         backingList.observe(on: queue, {
             switch $0 {
             case .initial(let collection):
-                block(.initial(Self(collection,
-                                    keyPathToNewElement: self.keyPath as! KeyPath<Object, NewElement>)))
+                block(.initial(anyCtor(collection)))
             case .update(let collection,
                          deletions: let deletions,
                          insertions: let insertions,
                          modifications: let modifications):
-                block(.update(Self(collection,
-                                   keyPathToNewElement: self.keyPath as! KeyPath<Object, NewElement>),
+                block(.update(anyCtor(collection),
                               deletions: deletions,
                               insertions: insertions,
                               modifications: modifications))
@@ -437,12 +435,15 @@ public struct ProjectedList<NewElement>: RandomAccessCollection where NewElement
     public var endIndex: Int {
         backingList.endIndex
     }
-    public var realm: Realm?
+    public var realm: Realm? {
+        backingList.realm
+    }
     public var isInvalidated: Bool {
         backingList.isInvalidated
     }
 
     public var description: String {
+//        return RLMDescriptionWithMaxDepth("ProjectedList", backingList.rlmArray, RLMDescriptionMaxDepth)
         backingList.map({$0[keyPath: self.keyPath] as! Element}).description
     }
     public func index(of object: Element) -> Int? {
@@ -451,28 +452,34 @@ public struct ProjectedList<NewElement>: RandomAccessCollection where NewElement
     public var isFrozen: Bool {
         backingList.isFrozen
     }
-    public mutating func freeze() -> Self {
-        backingList = backingList.freeze()
-        return self
+    public func freeze() -> Self {
+        anyCtor(backingList.freeze())
     }
-    public mutating func thaw() -> Self? {
+    public func thaw() -> Self? {
         guard let backingList = backingList.thaw() else {
             return nil
         }
-        self.backingList = backingList
-        return self
+        return anyCtor(backingList)
     }
 
     private var backingList: List<Object>
     private let keyPath: AnyKeyPath
     private let propertyName: String
+    private let anyCtor: (List<Object>) -> Self
 
-    init<OriginalElement: ObjectBase>(_ list: List<OriginalElement>,
-                                      keyPathToNewElement: KeyPath<OriginalElement, NewElement>) {
+    init<OriginalElement>(_ list: List<OriginalElement>,
+                                      keyPathToNewElement: KeyPath<OriginalElement, NewElement>) where OriginalElement: ObjectBase {
         self.backingList = ObjectiveCSupport.convert(object: list.rlmArray)
         self.keyPath = keyPathToNewElement
         self.propertyName = _name(for: keyPathToNewElement)
+        self.anyCtor = {
+            return Self($0 as! List<OriginalElement>, keyPathToNewElement: keyPathToNewElement)
+        }
     }
+}
+
+extension ProjectedList: ThreadConfined {
+    
 }
 
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
