@@ -235,7 +235,7 @@ extension Publisher {
     /// - returns: A publisher that publishes frozen copies of the changesets
     ///            which the upstream publisher publishes.
     public func freeze<T: ProjectionObservable>()
-    -> Publishers.Map<Self, ProjectionChange<T>> where Output == ProjectionChange<T>, T: ThreadConfined {
+    -> Publishers.Map<Self, ObjectChange<T>> where Output == ObjectChange<T>, T: ThreadConfined {
         return map {
             if case .change(let p, let properties) = $0 {
                 return .change(p.freeze(), properties)
@@ -329,10 +329,9 @@ extension Publisher {
     ///
     /// - returns: A publisher that supports `receive(on:)` for thread-confined objects.
     public func threadSafeReference<T: ProjectionObservable>()
-    -> RealmPublishers.MakeThreadSafeProjectionChangeset<Self, T> where Output == ProjectionChange<T>, T: ThreadConfined {
+    -> RealmPublishers.MakeThreadSafeProjectionChangeset<Self, T> where Output == ObjectChange<T>, T: ThreadConfined {
         RealmPublishers.MakeThreadSafeProjectionChangeset(self)
     }
-
 
     /// Enables passing Realm collection changesets to a different dispatch queue.
     ///
@@ -2036,7 +2035,7 @@ public enum RealmPublishers {
         /// which properties of that projection have changed each time a Realm is
         /// refreshed after a write transaction which modifies the observed
         /// projection.
-        public typealias Output = ProjectionChange<P>
+        public typealias Output = ObjectChange<P>
         /// This publisher reports error via the `.error` case of ProjectionChange.
         public typealias Failure = Never
 
@@ -2130,7 +2129,7 @@ public enum RealmPublishers {
         /// which properties of that projection have changed each time a Realm is
         /// refreshed after a write transaction which modifies the observed
         /// projection.
-        public typealias Output = ProjectionChange<P>
+        public typealias Output = ObjectChange<P>
         /// This publisher reports error via the `.error` case of ObjectChange.
         public typealias Failure = Never
 
@@ -2211,7 +2210,7 @@ public enum RealmPublishers {
     ///
     /// Create using `.threadSafeReference().receive(on: queue)` on a publisher
     /// that emits `ProjectionChange`.
-    @frozen public struct DeferredHandoverProjectionChangeset<Upstream: Publisher, T: ProjectionObservable, S: Scheduler>: Publisher where Upstream.Output == ProjectionChange<T>, T: ThreadConfined {
+    @frozen public struct DeferredHandoverProjectionChangeset<Upstream: Publisher, T: ProjectionObservable, S: Scheduler>: Publisher where Upstream.Output == ObjectChange<T>, T: ThreadConfined {
         /// :nodoc:
         public typealias Failure = Upstream.Failure
         /// :nodoc:
@@ -2228,13 +2227,13 @@ public enum RealmPublishers {
         private enum Handover {
             // .error and .change containing a frozen projection can be delivered
             // without any handover
-            case passthrough(_ change: ProjectionChange<T>)
+            case passthrough(_ change: ObjectChange<T>)
             // .change containing a live projection need to be wrapped in a TSR.
             // We also hold a reference to a frozen Realm to ensure that the
             // source version remains pinned and we can deliver the projection at
             // the same version as the change information.
             case tsr(_ realm: Realm, _ tsr: ThreadSafeReference<T>,
-                     _ properties: [ProjectedPropertyChange])
+                     _ properties: [PropertyChange])
         }
 
         /// :nodoc:
@@ -2263,7 +2262,7 @@ public enum RealmPublishers {
     }
 
     /// A helper publisher created by calling `.threadSafeReference()` on a publisher which emits thread-confined values.
-    @frozen public struct MakeThreadSafeProjectionChangeset<Upstream: Publisher, T: ProjectionObservable>: Publisher where Upstream.Output == ProjectionChange<T> {
+    @frozen public struct MakeThreadSafeProjectionChangeset<Upstream: Publisher, T: ProjectionObservable>: Publisher where Upstream.Output == ObjectChange<T> {
         /// :nodoc:
         public typealias Failure = Upstream.Failure
         /// :nodoc:

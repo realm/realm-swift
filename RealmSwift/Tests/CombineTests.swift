@@ -2489,7 +2489,8 @@ class CombineProjectionPublisherTests: CombinePublisherTestCase {
     func testFrozenPublisherSubscribeOn() {
         let exp = XCTestExpectation()
         cancellable = projection.publisher
-            .subscribe(on: subscribeOnQueue)
+            .threadSafeReference()
+            .receive(on: subscribeOnQueue)
             .freeze()
             .assertNoFailure()
             .sink{ change in

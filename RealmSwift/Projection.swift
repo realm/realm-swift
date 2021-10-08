@@ -123,29 +123,16 @@ public protocol ProjectionObservable: AnyObject {
     init(projecting object: Root)
 }
 
-public enum ProjectionChange<T: ProjectionObservable> {
-    /**
-     If an error occurs, notification blocks are called one time with a `.error`
-     result and an `NSError` containing details about the error. Currently the
-     only errors which can occur are when opening the Realm on a background
-     worker thread to calculate the change set. The callback will never be
-     called again after `.error` is delivered.
-     */
-    case error(_ error: Error)
-    /**
-     One or more of the properties of the object have been changed.
-     */
-    case change(_: T, _: [ProjectedPropertyChange])
-    /// The object has been deleted from the Realm.
-    case deleted
-
-    fileprivate static func processChange(_ objectChange: ObjectChange<T.Root>, _ schema: ProjectionMetadata) -> ProjectionChange<T> {
+extension ObjectChange {
+    fileprivate static func processChange(_ objectChange: ObjectChange<T.Root>,
+                                          _ projection: T) -> ObjectChange<T> where T: ProjectionObservable {
+        let schema = projection._schema
         switch objectChange {
         case .error(let error):
             return .error(error)
         case .change(let object, let objectPropertyChanges):
             let newProjection = T(projecting: object)
-            let projectedPropertyChanges: [ProjectedPropertyChange] = objectPropertyChanges.map { propChange in
+            let projectedPropertyChanges: [PropertyChange] = objectPropertyChanges.map { propChange in
                 let metadata = schema
                 // read the metadata for the property whose origin name matches
                 // the changed property's name
@@ -168,9 +155,9 @@ public enum ProjectionChange<T: ProjectionObservable> {
                 }
 
                 change.name = String(propertyMetadata.label.dropFirst()) // this drops the _ from the property wrapper name
-                return ProjectedPropertyChange(name: change.name!,
-                                               oldValue: change.oldValue,
-                                               newValue: change.newValue)
+                return PropertyChange(name: change.name!,
+                                      oldValue: change.oldValue,
+                                      newValue: change.newValue)
             }
             return .change(newProjection, projectedPropertyChanges)
         case .deleted:
@@ -221,7 +208,7 @@ open class Projection<Root: ObjectBase>: RealmCollectionValue, ProjectionObserva
 extension ProjectionObservable {
     public func observe(keyPaths: [String] = [],
                         on queue: DispatchQueue? = nil,
-                        _ block: @escaping (ProjectionChange<Self>) -> Void) -> NotificationToken {
+                        _ block: @escaping (ObjectChange<Self>) -> Void) -> NotificationToken {
         let kps: [String]
         if keyPaths.isEmpty {
             kps = _schema.propertyMetadatas.map(\.originPropertyKeyPathString)
@@ -230,13 +217,13 @@ extension ProjectionObservable {
         }
         return rootObject._observe(keyPaths: kps,
                                    on: queue, { change in
-            block(ProjectionChange.processChange(change, self._schema))
+            block(ObjectChange<Self>.processChange(change, self))
         })
     }
 
     public func observe(keyPaths: [PartialKeyPath<Self>] = [],
                         on queue: DispatchQueue? = nil,
-                        _ block: @escaping (ProjectionChange<Self>) -> Void) -> NotificationToken {
+                        _ block: @escaping (ObjectChange<Self>) -> Void) -> NotificationToken {
         let kps: [String]
         if keyPaths.isEmpty {
             kps = _schema.propertyMetadatas.map { $0.originPropertyKeyPathString }
@@ -252,7 +239,7 @@ extension ProjectionObservable {
         }
         return rootObject._observe(keyPaths: kps,
                                    on: queue, { change in
-            block(ProjectionChange.processChange(change, self._schema))
+            block(ObjectChange<Self>.processChange(change, self))
         })
     }
 
@@ -523,7 +510,7 @@ extension Projection: AssistedObjectiveCBridgeable {
 extension ProjectionObservable {
     /// :nodoc:
     public func _observe<S>(_ keyPaths: [String]?, on queue: DispatchQueue?, _ subscriber: S) -> NotificationToken where S: Subscriber, S.Input == Self, S.Failure == Error {
-        return observe(keyPaths: keyPaths ?? [], on: queue) { (change: ProjectionChange<S.Input>) in
+        return observe(keyPaths: keyPaths ?? [], on: queue) { (change: ObjectChange<S.Input>) in
             switch change {
             case .change(let projection, _):
                 _ = subscriber.receive(projection)
