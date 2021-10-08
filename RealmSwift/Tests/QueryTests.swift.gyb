@@ -284,10 +284,10 @@ class QueryTests: TestCase {
         XCTAssertEqual(results.count, expectedCount)
 
         let constructedQuery = query(Query<ModernAllTypesObject>())._constructPredicate()
-        XCTAssertEqual(constructedQuery.predicate,
+        XCTAssertEqual(constructedQuery.string,
                        predicate)
 
-        for (e1, e2) in zip(constructedQuery.arguments, values) {
+        for (e1, e2) in zip(constructedQuery.args, values) {
             if let e1 = e1 as? Object, let e2 = e2 as? Object {
                 assertEqual(e1, e2)
             } else {
@@ -304,10 +304,10 @@ class QueryTests: TestCase {
         XCTAssertEqual(results.count, expectedCount)
 
         let constructedQuery = query(Query<ModernCollectionObject>())._constructPredicate()
-        XCTAssertEqual(constructedQuery.predicate,
+        XCTAssertEqual(constructedQuery.string,
                        predicate)
 
-        for (e1, e2) in zip(constructedQuery.arguments, values) {
+        for (e1, e2) in zip(constructedQuery.args, values) {
             if let e1 = e1 as? Object, let e2 = e2 as? Object {
                 assertEqual(e1, e2)
             } else {
@@ -332,10 +332,10 @@ class QueryTests: TestCase {
         XCTAssertEqual(results.count, expectedCount)
 
         let constructedQuery = query(Query<ModernAllTypesObject>())._constructPredicate()
-        XCTAssertEqual(constructedQuery.predicate,
+        XCTAssertEqual(constructedQuery.string,
                        predicate)
 
-        for (e1, e2) in zip(constructedQuery.arguments, values) {
+        for (e1, e2) in zip(constructedQuery.args, values) {
             XCTAssertEqual(e1 as! AnyHashable, e2)
         }
     }
@@ -351,10 +351,10 @@ class QueryTests: TestCase {
         XCTAssertEqual(results.count, expectedCount)
 
         let constructedQuery = query(Query<ModernAllTypesObject?>())._constructPredicate()
-        XCTAssertEqual(constructedQuery.predicate,
+        XCTAssertEqual(constructedQuery.string,
                        predicate)
 
-        for (e1, e2) in zip(constructedQuery.arguments, values) {
+        for (e1, e2) in zip(constructedQuery.args, values) {
             XCTAssertEqual(e1 as! AnyHashable, e2)
         }
     }
@@ -695,12 +695,12 @@ class QueryTests: TestCase {
     func testNumericContains() {
         % for property in properties + optProperties:
         % if property.enumName == None and property.category == 'numeric':
-        assertQuery(predicate: "${ property.colName } >= %@ && ${ property.colName } < %@",
+        assertQuery(predicate: "(${ property.colName } >= %@ && ${ property.colName } < %@)",
                     values: [${ property.foundationValue(0) }, ${ property.foundationValue(2) }], expectedCount: 1) {
             $0.${ property.colName }.contains(${ property.value(0) }..<${ property.value(2) })
         }
 
-        assertQuery(predicate: "${ property.colName } >= %@ && ${ property.colName } < %@",
+        assertQuery(predicate: "(${ property.colName } >= %@ && ${ property.colName } < %@)",
                     values: [${ property.foundationValue(0) }, ${ property.foundationValue(1) }], expectedCount: 0) {
             $0.${ property.colName }.contains(${ property.value(0) }..<${ property.value(1) })
         }
@@ -1272,11 +1272,11 @@ class QueryTests: TestCase {
     func testListContainsRange() {
         % for property in listProperties + optListProperties:
         % if property.category == 'numeric':
-        assertQuery(predicate: "${ property.colName }.@min >= %@ && ${ property.colName }.@max <= %@",
+        assertQuery(predicate: "(${ property.colName }.@min >= %@ && ${ property.colName }.@max <= %@)",
                     values: [${ property.foundationValue(0) }, ${ property.foundationValue(1) }], expectedCount: 1) {
             $0.${ property.colName }.contains(${ property.value(0) }...${ property.value(1) })
         }
-        assertQuery(predicate: "${ property.colName }.@min >= %@ && ${ property.colName }.@max < %@",
+        assertQuery(predicate: "(${ property.colName }.@min >= %@ && ${ property.colName }.@max < %@)",
                     values: [${ property.foundationValue(0) }, ${ property.foundationValue(1) }], expectedCount: 0) {
             $0.${ property.colName }.contains(${ property.value(0) }..<${ property.value(1) })
         }
@@ -1354,11 +1354,11 @@ class QueryTests: TestCase {
     func testSetContainsRange() {
         % for property in setProperties:
         % if property.category == 'numeric':
-        assertQuery(predicate: "${ property.colName }.@min >= %@ && ${ property.colName }.@max <= %@",
+        assertQuery(predicate: "(${ property.colName }.@min >= %@ && ${ property.colName }.@max <= %@)",
                     values: [${ property.foundationValue(0) }, ${ property.foundationValue(1) }], expectedCount: 1) {
             $0.${ property.colName }.contains(${ property.value(0) }...${ property.value(1) })
         }
-        assertQuery(predicate: "${ property.colName }.@min >= %@ && ${ property.colName }.@max < %@",
+        assertQuery(predicate: "(${ property.colName }.@min >= %@ && ${ property.colName }.@max < %@)",
                     values: [${ property.foundationValue(0) }, ${ property.foundationValue(1) }], expectedCount: 0) {
             $0.${ property.colName }.contains(${ property.value(0) }..<${ property.value(1) })
         }
@@ -1367,11 +1367,11 @@ class QueryTests: TestCase {
         % end
         % for property in optSetProperties:
         % if property.category == 'numeric':
-        assertQuery(predicate: "${ property.colName }.@min >= %@ && ${ property.colName }.@max <= %@",
+        assertQuery(predicate: "(${ property.colName }.@min >= %@ && ${ property.colName }.@max <= %@)",
                     values: [${ property.foundationValue(0) }, ${ property.foundationValue(1) }], expectedCount: 1) {
             $0.${ property.colName }.contains(${ property.value(0) }...${ property.value(1) })
         }
-        assertQuery(predicate: "${ property.colName }.@min >= %@ && ${ property.colName }.@max < %@",
+        assertQuery(predicate: "(${ property.colName }.@min >= %@ && ${ property.colName }.@max < %@)",
                     values: [${ property.foundationValue(0) }, ${ property.foundationValue(1) }], expectedCount: 0) {
             $0.${ property.colName }.contains(${ property.value(0) }..<${ property.value(1) })
         }
@@ -1576,11 +1576,11 @@ class QueryTests: TestCase {
     func testMapContainsRange() {
         % for property in mapProperties + optMapProperties:
         % if property.category == 'numeric':
-        assertQuery(predicate: "${ property.colName }.@min >= %@ && ${ property.colName }.@max <= %@",
+        assertQuery(predicate: "(${ property.colName }.@min >= %@ && ${ property.colName }.@max <= %@)",
                     values: [${ property.foundationValue(0) }, ${ property.foundationValue(1) }], expectedCount: 1) {
             $0.${ property.colName }.contains(${ property.value(0) }...${ property.value(1) })
         }
-        assertQuery(predicate: "${ property.colName }.@min >= %@ && ${ property.colName }.@max < %@",
+        assertQuery(predicate: "(${ property.colName }.@min >= %@ && ${ property.colName }.@max < %@)",
                     values: [${ property.foundationValue(0) }, ${ property.foundationValue(1) }], expectedCount: 0) {
             $0.${ property.colName }.contains(${ property.value(0) }..<${ property.value(1) })
         }
@@ -2099,11 +2099,11 @@ class QueryTests: TestCase {
         // List
 
         // Count of results will be 0 because there are no `ModernAllTypesObject`s in the list.
-        assertQuery(predicate: "SUBQUERY(arrayCol, $obj0, $obj0.intCol != %@).@count > %@", values: [123, 0], expectedCount: 0) {
+        assertQuery(predicate: "SUBQUERY(arrayCol, $col0, $col0.intCol != %@).@count > %@", values: [123, 0], expectedCount: 0) {
             ($0.arrayCol.intCol != 123).count > 0
         }
 
-        assertQuery(predicate: "(intCol == %@ && SUBQUERY(arrayCol, $obj0, $obj0.stringCol == %@).@count == %@)", values: [5, "Bar", 0], expectedCount: 0) {
+        assertQuery(predicate: "(intCol == %@ && SUBQUERY(arrayCol, $col0, $col0.stringCol == %@).@count == %@)", values: [5, "Bar", 0], expectedCount: 0) {
             $0.intCol == 5 &&
             ($0.arrayCol.stringCol == "Bar").count == 0
         }
@@ -2111,11 +2111,11 @@ class QueryTests: TestCase {
         // Set
 
         // Will be 0 results because there are no `ModernAllTypesObject`s in the set.
-        assertQuery(predicate: "SUBQUERY(arrayCol, $obj0, $obj0.intCol != %@).@count > %@", values: [123, 0], expectedCount: 0) {
+        assertQuery(predicate: "SUBQUERY(arrayCol, $col0, $col0.intCol != %@).@count > %@", values: [123, 0], expectedCount: 0) {
             ($0.arrayCol.intCol != 123).count > 0
         }
 
-        assertQuery(predicate: "(intCol == %@ && SUBQUERY(setCol, $obj0, $obj0.stringCol == %@).@count == %@)", values: [5, "Bar", 0], expectedCount: 0) {
+        assertQuery(predicate: "(intCol == %@ && SUBQUERY(setCol, $col0, $col0.stringCol == %@).@count == %@)", values: [5, "Bar", 0], expectedCount: 0) {
             $0.intCol == 5 &&
             ($0.setCol.stringCol == "Bar").count == 0
         }
@@ -2129,24 +2129,24 @@ class QueryTests: TestCase {
         }
 
         // Results count should now be 1
-        assertQuery(predicate: "SUBQUERY(arrayCol, $obj0, $obj0.arrayInt.@count >= %@).@count > %@", values: [0, 0], expectedCount: 1) {
+        assertQuery(predicate: "SUBQUERY(arrayCol, $col0, $col0.arrayInt.@count >= %@).@count > %@", values: [0, 0], expectedCount: 1) {
             ($0.arrayCol.arrayInt.count >= 0).count > 0
         }
 
         // Subquery in a subquery
-        assertQuery(predicate: "SUBQUERY(arrayCol, $obj1, ($obj1.arrayInt.@count >= %@ && SUBQUERY(arrayCol, $obj0, $obj0.intCol != %@).@count > %@)).@count > %@", values: [0, 123, 0, 0], expectedCount: 0) {
+        assertQuery(predicate: "SUBQUERY(arrayCol, $col1, ($col1.arrayInt.@count >= %@ && SUBQUERY(arrayCol, $col0, $col0.intCol != %@).@count > %@)).@count > %@", values: [0, 123, 0, 0], expectedCount: 0) {
             ($0.arrayCol.arrayInt.count >= 0 && ($0.arrayCol.intCol != 123).count > 0).count > 0
         }
 
-        assertQuery(predicate: "SUBQUERY(arrayCol, $obj0, $obj0.intCol != %@).@count > %@", values: [123, 0], expectedCount: 1) {
+        assertQuery(predicate: "SUBQUERY(arrayCol, $col0, $col0.intCol != %@).@count > %@", values: [123, 0], expectedCount: 1) {
             ($0.arrayCol.intCol != 123).count > 0
         }
 
-        assertQuery(predicate: "SUBQUERY(arrayCol, $obj0, ($obj0.intCol > %@ && $obj0.intCol <= %@)).@count > %@", values: [0, 5, 0], expectedCount: 1) {
+        assertQuery(predicate: "SUBQUERY(arrayCol, $col0, ($col0.intCol > %@ && $col0.intCol <= %@)).@count > %@", values: [0, 5, 0], expectedCount: 1) {
             ($0.arrayCol.intCol > 0 && $0.arrayCol.intCol <= 5 ).count > 0
         }
 
-        assertQuery(predicate: "((intCol == %@ && SUBQUERY(arrayCol, $obj0, $obj0.intCol == %@).@count == %@) && SUBQUERY(arrayCol, $obj0, $obj0.stringCol == %@).@count == %@)", values: [6, 5, 1, "Bar", 0], expectedCount: 1) {
+        assertQuery(predicate: "((intCol == %@ && SUBQUERY(arrayCol, $col0, $col0.intCol == %@).@count == %@) && SUBQUERY(arrayCol, $col0, $col0.stringCol == %@).@count == %@)", values: [6, 5, 1, "Bar", 0], expectedCount: 1) {
             ($0.intCol == 6) &&
             ($0.arrayCol.intCol == 5).count == 1 &&
             ($0.arrayCol.stringCol == "Bar").count == 0
@@ -2155,16 +2155,16 @@ class QueryTests: TestCase {
         // Set
 
         // Will be 0 results because there are no `ModernAllTypesObject`s in the set.
-        assertQuery(predicate: "SUBQUERY(arrayCol, $obj0, $obj0.intCol != %@).@count > %@", values: [123, 0], expectedCount: 1) {
+        assertQuery(predicate: "SUBQUERY(arrayCol, $col0, $col0.intCol != %@).@count > %@", values: [123, 0], expectedCount: 1) {
             ($0.arrayCol.intCol != 123).count > 0
         }
 
-        assertQuery(predicate: "(intCol == %@ && SUBQUERY(setCol, $obj0, $obj0.stringCol == %@).@count == %@)", values: [6, "Bar", 0], expectedCount: 1) {
+        assertQuery(predicate: "(intCol == %@ && SUBQUERY(setCol, $col0, $col0.stringCol == %@).@count == %@)", values: [6, "Bar", 0], expectedCount: 1) {
             ($0.intCol == 6) &&
             ($0.setCol.stringCol == "Bar").count == 0
         }
 
-        assertQuery(predicate: "(intCol == %@ && SUBQUERY(setCol, $obj0, ($obj0.intCol == %@ && $obj0.stringCol != %@)).@count == %@)", values: [6, 5, "Blah", 1], expectedCount: 1) {
+        assertQuery(predicate: "(intCol == %@ && SUBQUERY(setCol, $col0, ($col0.intCol == %@ && $col0.stringCol != %@)).@count == %@)", values: [6, 5, "Blah", 1], expectedCount: 1) {
             ($0.intCol == 6) &&
             (((($0.setCol.intCol == 5) && ($0.setCol.stringCol != "Blah"))).count == 1)
         }
