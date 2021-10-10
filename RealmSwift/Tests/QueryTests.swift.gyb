@@ -284,10 +284,10 @@ class QueryTests: TestCase {
         XCTAssertEqual(results.count, expectedCount)
 
         let constructedQuery = query(Query<ModernAllTypesObject>())._constructPredicate()
-        XCTAssertEqual(constructedQuery.string,
+        XCTAssertEqual(constructedQuery.0,
                        predicate)
 
-        for (e1, e2) in zip(constructedQuery.args, values) {
+        for (e1, e2) in zip(constructedQuery.1, values) {
             if let e1 = e1 as? Object, let e2 = e2 as? Object {
                 assertEqual(e1, e2)
             } else {
@@ -304,10 +304,10 @@ class QueryTests: TestCase {
         XCTAssertEqual(results.count, expectedCount)
 
         let constructedQuery = query(Query<ModernCollectionObject>())._constructPredicate()
-        XCTAssertEqual(constructedQuery.string,
+        XCTAssertEqual(constructedQuery.0,
                        predicate)
 
-        for (e1, e2) in zip(constructedQuery.args, values) {
+        for (e1, e2) in zip(constructedQuery.1, values) {
             if let e1 = e1 as? Object, let e2 = e2 as? Object {
                 assertEqual(e1, e2)
             } else {
@@ -332,10 +332,10 @@ class QueryTests: TestCase {
         XCTAssertEqual(results.count, expectedCount)
 
         let constructedQuery = query(Query<ModernAllTypesObject>())._constructPredicate()
-        XCTAssertEqual(constructedQuery.string,
+        XCTAssertEqual(constructedQuery.0,
                        predicate)
 
-        for (e1, e2) in zip(constructedQuery.args, values) {
+        for (e1, e2) in zip(constructedQuery.1, values) {
             XCTAssertEqual(e1 as! AnyHashable, e2)
         }
     }
@@ -351,10 +351,10 @@ class QueryTests: TestCase {
         XCTAssertEqual(results.count, expectedCount)
 
         let constructedQuery = query(Query<ModernAllTypesObject?>())._constructPredicate()
-        XCTAssertEqual(constructedQuery.string,
+        XCTAssertEqual(constructedQuery.0,
                        predicate)
 
-        for (e1, e2) in zip(constructedQuery.args, values) {
+        for (e1, e2) in zip(constructedQuery.1, values) {
             XCTAssertEqual(e1 as! AnyHashable, e2)
         }
     }
@@ -705,12 +705,12 @@ class QueryTests: TestCase {
             $0.${ property.colName }.contains(${ property.value(0) }..<${ property.value(1) })
         }
 
-        assertQuery(predicate: "${ property.colName } BETWEEN {%@, %@}",
+        assertQuery(predicate: "(${ property.colName } BETWEEN {%@, %@})",
                     values: [${ property.foundationValue(0) }, ${ property.foundationValue(2) }], expectedCount: 1) {
             $0.${ property.colName }.contains(${ property.value(0) }...${ property.value(2) })
         }
 
-        assertQuery(predicate: "${ property.colName } BETWEEN {%@, %@}",
+        assertQuery(predicate: "(${ property.colName } BETWEEN {%@, %@})",
                     values: [${ property.foundationValue(0) }, ${ property.foundationValue(1) }], expectedCount: 1) {
             $0.${ property.colName }.contains(${ property.value(0) }...${ property.value(1) })
         }

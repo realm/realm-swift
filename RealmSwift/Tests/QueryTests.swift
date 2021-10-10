@@ -226,10 +226,10 @@ class QueryTests: TestCase {
         XCTAssertEqual(results.count, expectedCount)
 
         let constructedQuery = query(Query<ModernAllTypesObject>())._constructPredicate()
-        XCTAssertEqual(constructedQuery.string,
+        XCTAssertEqual(constructedQuery.0,
                        predicate)
 
-        for (e1, e2) in zip(constructedQuery.args, values) {
+        for (e1, e2) in zip(constructedQuery.1, values) {
             if let e1 = e1 as? Object, let e2 = e2 as? Object {
                 assertEqual(e1, e2)
             } else {
@@ -246,10 +246,10 @@ class QueryTests: TestCase {
         XCTAssertEqual(results.count, expectedCount)
 
         let constructedQuery = query(Query<ModernCollectionObject>())._constructPredicate()
-        XCTAssertEqual(constructedQuery.string,
+        XCTAssertEqual(constructedQuery.0,
                        predicate)
 
-        for (e1, e2) in zip(constructedQuery.args, values) {
+        for (e1, e2) in zip(constructedQuery.1, values) {
             if let e1 = e1 as? Object, let e2 = e2 as? Object {
                 assertEqual(e1, e2)
             } else {
@@ -274,10 +274,10 @@ class QueryTests: TestCase {
         XCTAssertEqual(results.count, expectedCount)
 
         let constructedQuery = query(Query<ModernAllTypesObject>())._constructPredicate()
-        XCTAssertEqual(constructedQuery.string,
+        XCTAssertEqual(constructedQuery.0,
                        predicate)
 
-        for (e1, e2) in zip(constructedQuery.args, values) {
+        for (e1, e2) in zip(constructedQuery.1, values) {
             XCTAssertEqual(e1 as! AnyHashable, e2)
         }
     }
@@ -293,10 +293,10 @@ class QueryTests: TestCase {
         XCTAssertEqual(results.count, expectedCount)
 
         let constructedQuery = query(Query<ModernAllTypesObject?>())._constructPredicate()
-        XCTAssertEqual(constructedQuery.string,
+        XCTAssertEqual(constructedQuery.0,
                        predicate)
 
-        for (e1, e2) in zip(constructedQuery.args, values) {
+        for (e1, e2) in zip(constructedQuery.1, values) {
             XCTAssertEqual(e1 as! AnyHashable, e2)
         }
     }
@@ -1508,12 +1508,12 @@ class QueryTests: TestCase {
             $0.intCol.contains(5..<6)
         }
 
-        assertQuery(predicate: "intCol BETWEEN {%@, %@}",
+        assertQuery(predicate: "(intCol BETWEEN {%@, %@})",
                     values: [5, 7], expectedCount: 1) {
             $0.intCol.contains(5...7)
         }
 
-        assertQuery(predicate: "intCol BETWEEN {%@, %@}",
+        assertQuery(predicate: "(intCol BETWEEN {%@, %@})",
                     values: [5, 6], expectedCount: 1) {
             $0.intCol.contains(5...6)
         }
@@ -1528,12 +1528,12 @@ class QueryTests: TestCase {
             $0.int8Col.contains(Int8(8)..<Int8(9))
         }
 
-        assertQuery(predicate: "int8Col BETWEEN {%@, %@}",
+        assertQuery(predicate: "(int8Col BETWEEN {%@, %@})",
                     values: [Int8(8), Int8(10)], expectedCount: 1) {
             $0.int8Col.contains(Int8(8)...Int8(10))
         }
 
-        assertQuery(predicate: "int8Col BETWEEN {%@, %@}",
+        assertQuery(predicate: "(int8Col BETWEEN {%@, %@})",
                     values: [Int8(8), Int8(9)], expectedCount: 1) {
             $0.int8Col.contains(Int8(8)...Int8(9))
         }
@@ -1548,12 +1548,12 @@ class QueryTests: TestCase {
             $0.int16Col.contains(Int16(16)..<Int16(17))
         }
 
-        assertQuery(predicate: "int16Col BETWEEN {%@, %@}",
+        assertQuery(predicate: "(int16Col BETWEEN {%@, %@})",
                     values: [Int16(16), Int16(18)], expectedCount: 1) {
             $0.int16Col.contains(Int16(16)...Int16(18))
         }
 
-        assertQuery(predicate: "int16Col BETWEEN {%@, %@}",
+        assertQuery(predicate: "(int16Col BETWEEN {%@, %@})",
                     values: [Int16(16), Int16(17)], expectedCount: 1) {
             $0.int16Col.contains(Int16(16)...Int16(17))
         }
@@ -1568,12 +1568,12 @@ class QueryTests: TestCase {
             $0.int32Col.contains(Int32(32)..<Int32(33))
         }
 
-        assertQuery(predicate: "int32Col BETWEEN {%@, %@}",
+        assertQuery(predicate: "(int32Col BETWEEN {%@, %@})",
                     values: [Int32(32), Int32(34)], expectedCount: 1) {
             $0.int32Col.contains(Int32(32)...Int32(34))
         }
 
-        assertQuery(predicate: "int32Col BETWEEN {%@, %@}",
+        assertQuery(predicate: "(int32Col BETWEEN {%@, %@})",
                     values: [Int32(32), Int32(33)], expectedCount: 1) {
             $0.int32Col.contains(Int32(32)...Int32(33))
         }
@@ -1588,12 +1588,12 @@ class QueryTests: TestCase {
             $0.int64Col.contains(Int64(64)..<Int64(65))
         }
 
-        assertQuery(predicate: "int64Col BETWEEN {%@, %@}",
+        assertQuery(predicate: "(int64Col BETWEEN {%@, %@})",
                     values: [Int64(64), Int64(66)], expectedCount: 1) {
             $0.int64Col.contains(Int64(64)...Int64(66))
         }
 
-        assertQuery(predicate: "int64Col BETWEEN {%@, %@}",
+        assertQuery(predicate: "(int64Col BETWEEN {%@, %@})",
                     values: [Int64(64), Int64(65)], expectedCount: 1) {
             $0.int64Col.contains(Int64(64)...Int64(65))
         }
@@ -1608,12 +1608,12 @@ class QueryTests: TestCase {
             $0.floatCol.contains(Float(5.55444333)..<Float(6.55444333))
         }
 
-        assertQuery(predicate: "floatCol BETWEEN {%@, %@}",
+        assertQuery(predicate: "(floatCol BETWEEN {%@, %@})",
                     values: [Float(5.55444333), Float(7.55444333)], expectedCount: 1) {
             $0.floatCol.contains(Float(5.55444333)...Float(7.55444333))
         }
 
-        assertQuery(predicate: "floatCol BETWEEN {%@, %@}",
+        assertQuery(predicate: "(floatCol BETWEEN {%@, %@})",
                     values: [Float(5.55444333), Float(6.55444333)], expectedCount: 1) {
             $0.floatCol.contains(Float(5.55444333)...Float(6.55444333))
         }
@@ -1628,12 +1628,12 @@ class QueryTests: TestCase {
             $0.doubleCol.contains(123.456..<234.567)
         }
 
-        assertQuery(predicate: "doubleCol BETWEEN {%@, %@}",
+        assertQuery(predicate: "(doubleCol BETWEEN {%@, %@})",
                     values: [123.456, 345.678], expectedCount: 1) {
             $0.doubleCol.contains(123.456...345.678)
         }
 
-        assertQuery(predicate: "doubleCol BETWEEN {%@, %@}",
+        assertQuery(predicate: "(doubleCol BETWEEN {%@, %@})",
                     values: [123.456, 234.567], expectedCount: 1) {
             $0.doubleCol.contains(123.456...234.567)
         }
@@ -1648,12 +1648,12 @@ class QueryTests: TestCase {
             $0.dateCol.contains(Date(timeIntervalSince1970: 1000000)..<Date(timeIntervalSince1970: 2000000))
         }
 
-        assertQuery(predicate: "dateCol BETWEEN {%@, %@}",
+        assertQuery(predicate: "(dateCol BETWEEN {%@, %@})",
                     values: [Date(timeIntervalSince1970: 1000000), Date(timeIntervalSince1970: 3000000)], expectedCount: 1) {
             $0.dateCol.contains(Date(timeIntervalSince1970: 1000000)...Date(timeIntervalSince1970: 3000000))
         }
 
-        assertQuery(predicate: "dateCol BETWEEN {%@, %@}",
+        assertQuery(predicate: "(dateCol BETWEEN {%@, %@})",
                     values: [Date(timeIntervalSince1970: 1000000), Date(timeIntervalSince1970: 2000000)], expectedCount: 1) {
             $0.dateCol.contains(Date(timeIntervalSince1970: 1000000)...Date(timeIntervalSince1970: 2000000))
         }
@@ -1668,12 +1668,12 @@ class QueryTests: TestCase {
             $0.decimalCol.contains(Decimal128(123.456)..<Decimal128(234.567))
         }
 
-        assertQuery(predicate: "decimalCol BETWEEN {%@, %@}",
+        assertQuery(predicate: "(decimalCol BETWEEN {%@, %@})",
                     values: [Decimal128(123.456), Decimal128(345.678)], expectedCount: 1) {
             $0.decimalCol.contains(Decimal128(123.456)...Decimal128(345.678))
         }
 
-        assertQuery(predicate: "decimalCol BETWEEN {%@, %@}",
+        assertQuery(predicate: "(decimalCol BETWEEN {%@, %@})",
                     values: [Decimal128(123.456), Decimal128(234.567)], expectedCount: 1) {
             $0.decimalCol.contains(Decimal128(123.456)...Decimal128(234.567))
         }
@@ -1688,12 +1688,12 @@ class QueryTests: TestCase {
             $0.optIntCol.contains(5..<6)
         }
 
-        assertQuery(predicate: "optIntCol BETWEEN {%@, %@}",
+        assertQuery(predicate: "(optIntCol BETWEEN {%@, %@})",
                     values: [5, 7], expectedCount: 1) {
             $0.optIntCol.contains(5...7)
         }
 
-        assertQuery(predicate: "optIntCol BETWEEN {%@, %@}",
+        assertQuery(predicate: "(optIntCol BETWEEN {%@, %@})",
                     values: [5, 6], expectedCount: 1) {
             $0.optIntCol.contains(5...6)
         }
@@ -1708,12 +1708,12 @@ class QueryTests: TestCase {
             $0.optInt8Col.contains(Int8(8)..<Int8(9))
         }
 
-        assertQuery(predicate: "optInt8Col BETWEEN {%@, %@}",
+        assertQuery(predicate: "(optInt8Col BETWEEN {%@, %@})",
                     values: [Int8(8), Int8(10)], expectedCount: 1) {
             $0.optInt8Col.contains(Int8(8)...Int8(10))
         }
 
-        assertQuery(predicate: "optInt8Col BETWEEN {%@, %@}",
+        assertQuery(predicate: "(optInt8Col BETWEEN {%@, %@})",
                     values: [Int8(8), Int8(9)], expectedCount: 1) {
             $0.optInt8Col.contains(Int8(8)...Int8(9))
         }
@@ -1728,12 +1728,12 @@ class QueryTests: TestCase {
             $0.optInt16Col.contains(Int16(16)..<Int16(17))
         }
 
-        assertQuery(predicate: "optInt16Col BETWEEN {%@, %@}",
+        assertQuery(predicate: "(optInt16Col BETWEEN {%@, %@})",
                     values: [Int16(16), Int16(18)], expectedCount: 1) {
             $0.optInt16Col.contains(Int16(16)...Int16(18))
         }
 
-        assertQuery(predicate: "optInt16Col BETWEEN {%@, %@}",
+        assertQuery(predicate: "(optInt16Col BETWEEN {%@, %@})",
                     values: [Int16(16), Int16(17)], expectedCount: 1) {
             $0.optInt16Col.contains(Int16(16)...Int16(17))
         }
@@ -1748,12 +1748,12 @@ class QueryTests: TestCase {
             $0.optInt32Col.contains(Int32(32)..<Int32(33))
         }
 
-        assertQuery(predicate: "optInt32Col BETWEEN {%@, %@}",
+        assertQuery(predicate: "(optInt32Col BETWEEN {%@, %@})",
                     values: [Int32(32), Int32(34)], expectedCount: 1) {
             $0.optInt32Col.contains(Int32(32)...Int32(34))
         }
 
-        assertQuery(predicate: "optInt32Col BETWEEN {%@, %@}",
+        assertQuery(predicate: "(optInt32Col BETWEEN {%@, %@})",
                     values: [Int32(32), Int32(33)], expectedCount: 1) {
             $0.optInt32Col.contains(Int32(32)...Int32(33))
         }
@@ -1768,12 +1768,12 @@ class QueryTests: TestCase {
             $0.optInt64Col.contains(Int64(64)..<Int64(65))
         }
 
-        assertQuery(predicate: "optInt64Col BETWEEN {%@, %@}",
+        assertQuery(predicate: "(optInt64Col BETWEEN {%@, %@})",
                     values: [Int64(64), Int64(66)], expectedCount: 1) {
             $0.optInt64Col.contains(Int64(64)...Int64(66))
         }
 
-        assertQuery(predicate: "optInt64Col BETWEEN {%@, %@}",
+        assertQuery(predicate: "(optInt64Col BETWEEN {%@, %@})",
                     values: [Int64(64), Int64(65)], expectedCount: 1) {
             $0.optInt64Col.contains(Int64(64)...Int64(65))
         }
@@ -1788,12 +1788,12 @@ class QueryTests: TestCase {
             $0.optFloatCol.contains(Float(5.55444333)..<Float(6.55444333))
         }
 
-        assertQuery(predicate: "optFloatCol BETWEEN {%@, %@}",
+        assertQuery(predicate: "(optFloatCol BETWEEN {%@, %@})",
                     values: [Float(5.55444333), Float(7.55444333)], expectedCount: 1) {
             $0.optFloatCol.contains(Float(5.55444333)...Float(7.55444333))
         }
 
-        assertQuery(predicate: "optFloatCol BETWEEN {%@, %@}",
+        assertQuery(predicate: "(optFloatCol BETWEEN {%@, %@})",
                     values: [Float(5.55444333), Float(6.55444333)], expectedCount: 1) {
             $0.optFloatCol.contains(Float(5.55444333)...Float(6.55444333))
         }
@@ -1808,12 +1808,12 @@ class QueryTests: TestCase {
             $0.optDoubleCol.contains(123.456..<234.567)
         }
 
-        assertQuery(predicate: "optDoubleCol BETWEEN {%@, %@}",
+        assertQuery(predicate: "(optDoubleCol BETWEEN {%@, %@})",
                     values: [123.456, 345.678], expectedCount: 1) {
             $0.optDoubleCol.contains(123.456...345.678)
         }
 
-        assertQuery(predicate: "optDoubleCol BETWEEN {%@, %@}",
+        assertQuery(predicate: "(optDoubleCol BETWEEN {%@, %@})",
                     values: [123.456, 234.567], expectedCount: 1) {
             $0.optDoubleCol.contains(123.456...234.567)
         }
@@ -1828,12 +1828,12 @@ class QueryTests: TestCase {
             $0.optDateCol.contains(Date(timeIntervalSince1970: 1000000)..<Date(timeIntervalSince1970: 2000000))
         }
 
-        assertQuery(predicate: "optDateCol BETWEEN {%@, %@}",
+        assertQuery(predicate: "(optDateCol BETWEEN {%@, %@})",
                     values: [Date(timeIntervalSince1970: 1000000), Date(timeIntervalSince1970: 3000000)], expectedCount: 1) {
             $0.optDateCol.contains(Date(timeIntervalSince1970: 1000000)...Date(timeIntervalSince1970: 3000000))
         }
 
-        assertQuery(predicate: "optDateCol BETWEEN {%@, %@}",
+        assertQuery(predicate: "(optDateCol BETWEEN {%@, %@})",
                     values: [Date(timeIntervalSince1970: 1000000), Date(timeIntervalSince1970: 2000000)], expectedCount: 1) {
             $0.optDateCol.contains(Date(timeIntervalSince1970: 1000000)...Date(timeIntervalSince1970: 2000000))
         }
@@ -1848,12 +1848,12 @@ class QueryTests: TestCase {
             $0.optDecimalCol.contains(Decimal128(123.456)..<Decimal128(234.567))
         }
 
-        assertQuery(predicate: "optDecimalCol BETWEEN {%@, %@}",
+        assertQuery(predicate: "(optDecimalCol BETWEEN {%@, %@})",
                     values: [Decimal128(123.456), Decimal128(345.678)], expectedCount: 1) {
             $0.optDecimalCol.contains(Decimal128(123.456)...Decimal128(345.678))
         }
 
-        assertQuery(predicate: "optDecimalCol BETWEEN {%@, %@}",
+        assertQuery(predicate: "(optDecimalCol BETWEEN {%@, %@})",
                     values: [Decimal128(123.456), Decimal128(234.567)], expectedCount: 1) {
             $0.optDecimalCol.contains(Decimal128(123.456)...Decimal128(234.567))
         }

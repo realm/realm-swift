@@ -148,7 +148,7 @@ extension AnyRealmValue: AddableType {}
      - parameter queryFn: The query closure with which to filter the objects.
     */
     public func index(matching queryFn: ((Query<Element>) -> Query<Element>)) -> Int? {
-        return index(matching: queryFn(Query()).predicate)
+        return index(matching: queryFn(Query<Element>()).predicate)
     }
 
     // MARK: Object Retrieval

@@ -2240,6 +2240,9 @@
     RLMAssertCount(DictionaryOfAllTypesObject, 3U, @"ANY dictionary != %@", obj1);
     RLMAssertCount(DictionaryOfAllTypesObject, 2U, @"NONE dictionary = %@", obj0);
     RLMAssertCount(DictionaryOfAllTypesObject, 1U, @"NONE dictionary != %@", obj1);
+
+    RLMAssertCount(DictionaryOfAllTypesObject, 2U, @"dictionary = %@", obj0);
+    RLMAssertCount(DictionaryOfAllTypesObject, 3U, @"dictionary != %@", obj1);
 }
 
 - (void)testCompoundOrQuery {

@@ -107,7 +107,7 @@ public final class List<Element: RealmCollectionValue>: RLMSwiftCollectionBase {
     */
     public func index(matching queryFn: ((Query<Element>) -> Query<Element>)) -> Int? {
         let isPrimitive = rlmArray.type != .object
-        return index(matching: queryFn(Query(isPrimitive: isPrimitive)).predicate)
+        return index(matching: queryFn(Query<Element>(isPrimitive: isPrimitive)).predicate)
     }
 
     // MARK: Object Retrieval

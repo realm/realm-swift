@@ -204,7 +204,7 @@ import Realm
      - parameter queryFn: The query closure with which to filter the objects.
      */
     public func `where`(_ queryFn: ((Query<Element>) -> Query<Element>)) -> Results<Element> {
-        return filter(queryFn(Query()).predicate)
+        return filter(queryFn(Query(isPrimitive: false)).predicate)
     }
 
     // MARK: Sorting
