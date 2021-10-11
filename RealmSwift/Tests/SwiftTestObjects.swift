@@ -20,7 +20,7 @@ import Foundation
 import RealmSwift
 import Realm
 
-class SwiftStringObject: Object {
+final class SwiftStringObject: Object {
     @objc dynamic var stringCol = ""
 }
 

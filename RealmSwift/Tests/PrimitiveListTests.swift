@@ -16,492 +16,35 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-// swiftlint:disable type_name identifier_name cyclomatic_complexity
-
-import XCTest
 import RealmSwift
+import XCTest
 
-protocol ObjectFactory {
-    static func isManaged() -> Bool
-}
-
-struct ManagedObjectFactory: ObjectFactory {
-    static func isManaged() -> Bool { return true }
-}
-struct UnmanagedObjectFactory: ObjectFactory {
-    static func isManaged() -> Bool { return false }
-}
-
-protocol ValueFactory {
-    associatedtype T: RealmCollectionValue
-    associatedtype W: RealmCollectionValue = T
-    associatedtype AverageType: AddableType = Double
-    static func array(_ obj: SwiftListObject) -> List<T>
-    static func mutableSet(_ obj: SwiftMutableSetObject) -> MutableSet<T>
-    static func values() -> [T]
-    static func doubleValue(_ value: AverageType) -> Double
-    static func doubleValue(t value: T) -> Double
-    static func doubleValue(w value: W) -> Double
-}
-extension ValueFactory {
-    static func doubleValue(_ value: Double) -> Double {
-        return value
-    }
-    static func doubleValue(t value: T) -> Double {
-        return (value as! NSNumber).doubleValue
-    }
-    static func doubleValue(w value: W) -> Double {
-        return (value as! NSNumber).doubleValue
-    }
-}
-
-struct IntFactory: ValueFactory {
-    static func array(_ obj: SwiftListObject) -> List<Int> {
-        return obj.int
-    }
-
-    static func mutableSet(_ obj: SwiftMutableSetObject) -> MutableSet<Int> {
-        return obj.int
-    }
-
-    static func values() -> [Int] {
-        return [1, 2, 3]
-    }
-}
-
-struct Int8Factory: ValueFactory {
-    static func array(_ obj: SwiftListObject) -> List<Int8> {
-        return obj.int8
-    }
-
-    static func mutableSet(_ obj: SwiftMutableSetObject) -> MutableSet<Int8> {
-        return obj.int8
-    }
-
-    static func values() -> [Int8] {
-        return [1, 2, 3]
-    }
-}
-
-struct Int16Factory: ValueFactory {
-    static func array(_ obj: SwiftListObject) -> List<Int16> {
-        return obj.int16
-    }
-
-    static func mutableSet(_ obj: SwiftMutableSetObject) -> MutableSet<Int16> {
-        return obj.int16
-    }
-
-    static func values() -> [Int16] {
-        return [1, 2, 3]
-    }
-}
-
-struct Int32Factory: ValueFactory {
-    static func array(_ obj: SwiftListObject) -> List<Int32> {
-        return obj.int32
-    }
-
-    static func mutableSet(_ obj: SwiftMutableSetObject) -> MutableSet<Int32> {
-        return obj.int32
-    }
-
-    static func values() -> [Int32] {
-        return [1, 2, 3]
-    }
-}
-
-struct Int64Factory: ValueFactory {
-    static func array(_ obj: SwiftListObject) -> List<Int64> {
-        return obj.int64
-    }
-
-    static func mutableSet(_ obj: SwiftMutableSetObject) -> MutableSet<Int64> {
-        return obj.int64
-    }
-
-    static func values() -> [Int64] {
-        return [1, 2, 3]
-    }
-}
-
-struct FloatFactory: ValueFactory {
-    static func array(_ obj: SwiftListObject) -> List<Float> {
-        return obj.float
-    }
-
-    static func mutableSet(_ obj: SwiftMutableSetObject) -> MutableSet<Float> {
-        return obj.float
-    }
-
-    static func values() -> [Float] {
-        return [1.1, 2.2, 3.3]
-    }
-}
-
-struct DoubleFactory: ValueFactory {
-    static func array(_ obj: SwiftListObject) -> List<Double> {
-        return obj.double
-    }
-
-    static func mutableSet(_ obj: SwiftMutableSetObject) -> MutableSet<Double> {
-        return obj.double
-    }
-
-    static func values() -> [Double] {
-        return [1.1, 2.2, 3.3]
-    }
-}
-
-struct StringFactory: ValueFactory {
-    static func array(_ obj: SwiftListObject) -> List<String> {
-        return obj.string
-    }
-
-    static func mutableSet(_ obj: SwiftMutableSetObject) -> MutableSet<String> {
-        return obj.string
-    }
-
-    static func values() -> [String] {
-        return ["a", "b", "c"]
-    }
-}
-
-struct DataFactory: ValueFactory {
-    static func array(_ obj: SwiftListObject) -> List<Data> {
-        return obj.data
-    }
-
-    static func mutableSet(_ obj: SwiftMutableSetObject) -> MutableSet<Data> {
-        return obj.data
-    }
-
-    static func values() -> [Data] {
-        return ["a".data(using: .utf8)!, "b".data(using: .utf8)!, "c".data(using: .utf8)!]
-    }
-}
-
-struct DateFactory: ValueFactory {
-    static func array(_ obj: SwiftListObject) -> List<Date> {
-        return obj.date
-    }
-
-    static func mutableSet(_ obj: SwiftMutableSetObject) -> MutableSet<Date> {
-        return obj.date
-    }
-
-    static func values() -> [Date] {
-        return [Date(), Date().addingTimeInterval(10), Date().addingTimeInterval(20)]
-    }
-}
-
-struct DecimalFactory: ValueFactory {
-    typealias AverageType = Decimal128
-
-    static func array(_ obj: SwiftListObject) -> List<Decimal128> {
-        return obj.decimal
-    }
-
-    static func mutableSet(_ obj: SwiftMutableSetObject) -> MutableSet<Decimal128> {
-        return obj.decimal
-    }
-
-    static func values() -> [Decimal128] {
-        return [Decimal128(number: 1), Decimal128(number: 2), Decimal128(number: 3)]
-    }
-
-    static func doubleValue(_ value: Decimal128) -> Double {
-        return value.doubleValue
-    }
-    static func doubleValue(t value: Decimal128) -> Double {
-        return value.doubleValue
-    }
-    static func doubleValue(w value: Decimal128) -> Double {
-        return value.doubleValue
-    }
-}
-
-struct ObjectIdFactory: ValueFactory {
-    static func array(_ obj: SwiftListObject) -> List<ObjectId> {
-        return obj.objectId
-    }
-
-    static func mutableSet(_ obj: SwiftMutableSetObject) -> MutableSet<ObjectId> {
-        return obj.objectId
-    }
-
-    static private let _values = [ObjectId.generate(), ObjectId.generate(), ObjectId.generate()]
-    static func values() -> [ObjectId] {
-        return _values
-    }
-}
-
-struct UUIDFactory: ValueFactory {
-    static func array(_ obj: SwiftListObject) -> List<UUID> {
-        return obj.uuid
-    }
-
-    static func mutableSet(_ obj: SwiftMutableSetObject) -> MutableSet<UUID> {
-        return obj.uuid
-    }
-
-    static private let _values = [UUID(), UUID(), UUID()]
-    static func values() -> [UUID] {
-        return _values
-    }
-}
-
-struct OptionalIntFactory: ValueFactory {
-    typealias W = Int
-
-    static func array(_ obj: SwiftListObject) -> List<Int?> {
-        return obj.intOpt
-    }
-
-    static func mutableSet(_ obj: SwiftMutableSetObject) -> MutableSet<Int?> {
-        return obj.intOpt
-    }
-
-    static func values() -> [Int?] {
-        return [nil, 1, 3]
-    }
-}
-
-struct OptionalInt8Factory: ValueFactory {
-    typealias W = Int8
-
-    static func array(_ obj: SwiftListObject) -> List<Int8?> {
-        return obj.int8Opt
-    }
-
-    static func mutableSet(_ obj: SwiftMutableSetObject) -> MutableSet<Int8?> {
-        return obj.int8Opt
-    }
-
-    static func values() -> [Int8?] {
-        return [nil, 1, 3]
-    }
-}
-
-struct OptionalInt16Factory: ValueFactory {
-    typealias W = Int16
-
-    static func array(_ obj: SwiftListObject) -> List<Int16?> {
-        return obj.int16Opt
-    }
-
-    static func mutableSet(_ obj: SwiftMutableSetObject) -> MutableSet<Int16?> {
-        return obj.int16Opt
-    }
-
-    static func values() -> [Int16?] {
-        return [nil, 1, 3]
-    }
-}
-
-struct OptionalInt32Factory: ValueFactory {
-    typealias W = Int32
-
-    static func array(_ obj: SwiftListObject) -> List<Int32?> {
-        return obj.int32Opt
-    }
-
-    static func mutableSet(_ obj: SwiftMutableSetObject) -> MutableSet<Int32?> {
-        return obj.int32Opt
-    }
-
-    static func values() -> [Int32?] {
-        return [nil, 1, 3]
-    }
-}
-
-struct OptionalInt64Factory: ValueFactory {
-    typealias W = Int64
-
-    static func array(_ obj: SwiftListObject) -> List<Int64?> {
-        return obj.int64Opt
-    }
-
-    static func mutableSet(_ obj: SwiftMutableSetObject) -> MutableSet<Int64?> {
-        return obj.int64Opt
-    }
-
-    static func values() -> [Int64?] {
-        return [nil, 1, 3]
-    }
-}
-
-struct OptionalFloatFactory: ValueFactory {
-    typealias W = Float
-
-    static func array(_ obj: SwiftListObject) -> List<Float?> {
-        return obj.floatOpt
-    }
-
-    static func mutableSet(_ obj: SwiftMutableSetObject) -> MutableSet<Float?> {
-        return obj.floatOpt
-    }
-
-    static func values() -> [Float?] {
-        return [nil, 1.1, 3.3]
-    }
-}
-
-struct OptionalDoubleFactory: ValueFactory {
-    typealias W = Double
-
-    static func array(_ obj: SwiftListObject) -> List<Double?> {
-        return obj.doubleOpt
-    }
-
-    static func mutableSet(_ obj: SwiftMutableSetObject) -> MutableSet<Double?> {
-        return obj.doubleOpt
-    }
-
-    static func values() -> [Double?] {
-        return [nil, 1.1, 3.3]
-    }
-}
-
-struct OptionalStringFactory: ValueFactory {
-    typealias W = String
-
-    static func array(_ obj: SwiftListObject) -> List<String?> {
-        return obj.stringOpt
-    }
-
-    static func mutableSet(_ obj: SwiftMutableSetObject) -> MutableSet<String?> {
-        return obj.stringOpt
-    }
-
-    static func values() -> [String?] {
-        return [nil, "a", "c"]
-    }
-}
-
-struct OptionalDataFactory: ValueFactory {
-    typealias W = Data
-
-    static func array(_ obj: SwiftListObject) -> List<Data?> {
-        return obj.dataOpt
-    }
-
-    static func mutableSet(_ obj: SwiftMutableSetObject) -> MutableSet<Data?> {
-        return obj.dataOpt
-    }
-
-    static func values() -> [Data?] {
-        return [nil, "a".data(using: .utf8), "c".data(using: .utf8)]
-    }
-}
-
-struct OptionalDateFactory: ValueFactory {
-    typealias W = Date
-
-    static func array(_ obj: SwiftListObject) -> List<Date?> {
-        return obj.dateOpt
-    }
-
-    static func mutableSet(_ obj: SwiftMutableSetObject) -> MutableSet<Date?> {
-        return obj.dateOpt
-    }
-
-    static func values() -> [Date?] {
-        return [nil, Date(), Date().addingTimeInterval(20)]
-    }
-}
-
-struct OptionalDecimalFactory: ValueFactory {
-    typealias W = Decimal128
-    typealias AverageType = Decimal128
-
-    static func array(_ obj: SwiftListObject) -> List<Decimal128?> {
-        return obj.decimalOpt
-    }
-
-    static func mutableSet(_ obj: SwiftMutableSetObject) -> MutableSet<Decimal128?> {
-        return obj.decimalOpt
-    }
-
-    static func values() -> [Decimal128?] {
-        return [nil] + DecimalFactory.values().dropLast()
-    }
-
-    static func doubleValue(_ value: Decimal128) -> Double {
-        return value.doubleValue
-    }
-    static func doubleValue(t value: Decimal128?) -> Double {
-        return value!.doubleValue
-    }
-    static func doubleValue(w value: Decimal128) -> Double {
-        return value.doubleValue
-    }
-}
-
-struct OptionalObjectIdFactory: ValueFactory {
-    typealias W = ObjectId
-
-    static func array(_ obj: SwiftListObject) -> List<ObjectId?> {
-        return obj.objectIdOpt
-    }
-
-    static func mutableSet(_ obj: SwiftMutableSetObject) -> MutableSet<ObjectId?> {
-        return obj.objectIdOpt
-    }
-
-    static func values() -> [ObjectId?] {
-        return [nil] + ObjectIdFactory.values().dropLast()
-    }
-}
-
-struct OptionalUUIDFactory: ValueFactory {
-    typealias W = UUID
-
-    static func array(_ obj: SwiftListObject) -> List<UUID?> {
-        return obj.uuidOpt
-    }
-
-    static func mutableSet(_ obj: SwiftMutableSetObject) -> MutableSet<UUID?> {
-        return obj.uuidOpt
-    }
-
-    static func values() -> [UUID?] {
-        return [nil] + UUIDFactory.values().dropLast()
-    }
-}
-
-class PrimitiveListTestsBase<O: ObjectFactory, V: ValueFactory>: TestCase {
+class PrimitiveListTestsBase<O: ObjectFactory, V: ListValueFactory>: TestCase {
     var realm: Realm?
-    var obj: SwiftListObject!
-    var array: List<V.T>!
-    var values: [V.T]!
+    var obj: V.ListRoot!
+    var array: List<V>!
+    var values: [V]!
 
     class func _defaultTestSuite() -> XCTestSuite {
         return defaultTestSuite
     }
 
     override func setUp() {
-        obj = SwiftListObject()
-        if O.isManaged() {
-            let config = Realm.Configuration(inMemoryIdentifier: "test",
-                                             objectTypes: [SwiftListObject.self, SwiftStringObject.self])
-            realm = try! Realm(configuration: config)
-            realm!.beginWrite()
-            realm!.add(obj)
-        }
-        array = V.array(obj)
+        obj = O.get()
+        realm = obj.realm
+        array = obj[keyPath: V.array]
         values = V.values()
     }
 
     override func tearDown() {
         realm?.cancelWrite()
-        realm = nil
         array = nil
         obj = nil
+        realm = nil
     }
 }
 
-class PrimitiveListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTestsBase<O, V> {
+class PrimitiveListTests<O: ObjectFactory, V: ListValueFactory>: PrimitiveListTestsBase<O, V> {
     func testInvalidated() {
         XCTAssertFalse(array.isInvalidated)
         if let realm = obj.realm {
@@ -568,7 +111,7 @@ class PrimitiveListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTestsB
     func testValueForKey() {
         XCTAssertEqual(array.value(forKey: "self").count, 0)
         array.append(objectsIn: values)
-        XCTAssertEqual(values!, array.value(forKey: "self").map { dynamicBridgeCast(fromObjectiveC: $0) as V.T })
+        XCTAssertEqual(values!, array.value(forKey: "self").map { dynamicBridgeCast(fromObjectiveC: $0) as V })
 
         assertThrows(array.value(forKey: "not self"), named: "NSUnknownKeyException")
     }
@@ -717,7 +260,7 @@ class PrimitiveListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTestsB
     }
 }
 
-class MinMaxPrimitiveListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTestsBase<O, V> where V.T: MinMaxType {
+class MinMaxPrimitiveListTests<O: ObjectFactory, V: ListValueFactory>: PrimitiveListTestsBase<O, V> where V: MinMaxType {
     func testMin() {
         XCTAssertNil(array.min())
         array.append(objectsIn: values.reversed())
@@ -731,31 +274,31 @@ class MinMaxPrimitiveListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveList
     }
 }
 
-class OptionalMinMaxPrimitiveListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTestsBase<O, V> where V.W: MinMaxType, V.W: _DefaultConstructible {
-    // V.T and V.W? are the same thing, but the type system doesn't know that
-    // and the protocol constraint is on V.W
-    var array2: List<V.W?> {
-        return unsafeDowncast(array!, to: List<V.W?>.self)
+class OptionalMinMaxPrimitiveListTests<O: ObjectFactory, V: ListValueFactory>: PrimitiveListTestsBase<O, V> where V.Wrapped: MinMaxType, V.Wrapped: _DefaultConstructible {
+    // V and V.Wrapped? are the same thing, but the type system doesn't know that
+    // and the protocol constraint is on V.Wrapped
+    var array2: List<V.Wrapped?> {
+        return unsafeDowncast(array!, to: List<V.Wrapped?>.self)
     }
 
     func testMin() {
         XCTAssertNil(array2.min())
         array.append(objectsIn: values.reversed())
-        let expected = values[1] as! V.W
+        let expected = values[1] as! V.Wrapped
         XCTAssertEqual(array2.min(), expected)
     }
 
     func testMax() {
         XCTAssertNil(array2.max())
         array.append(objectsIn: values.reversed())
-        let expected = values[2] as! V.W
+        let expected = values[2] as! V.Wrapped
         XCTAssertEqual(array2.max(), expected)
     }
 }
 
-class AddablePrimitiveListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTestsBase<O, V> where V.T: AddableType {
+class AddablePrimitiveListTests<O: ObjectFactory, V: ListValueFactory>: PrimitiveListTestsBase<O, V> where V: AddableType {
     func testSum() {
-        XCTAssertEqual(array.sum(), V.T())
+        XCTAssertEqual(array.sum(), V())
         array.append(objectsIn: values)
 
         // Expressing "can be added and converted to a floating point type" as
@@ -773,15 +316,15 @@ class AddablePrimitiveListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveLis
     }
 }
 
-class OptionalAddablePrimitiveListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTestsBase<O, V> where V.W: AddableType, V.W: _DefaultConstructible {
-    // V.T and V.W? are the same thing, but the type system doesn't know that
-    // and the protocol constraint is on V.W
-    var array2: List<V.W?> {
-        return unsafeDowncast(array!, to: List<V.W?>.self)
+class OptionalAddablePrimitiveListTests<O: ObjectFactory, V: ListValueFactory>: PrimitiveListTestsBase<O, V> where V.Wrapped: AddableType, V.Wrapped: _DefaultConstructible {
+    // V.T and V.Wrapped? are the same thing, but the type system doesn't know that
+    // and the protocol constraint is on V.Wrapped
+    var array2: List<V.Wrapped?> {
+        return unsafeDowncast(array!, to: List<V.Wrapped?>.self)
     }
 
     func testSum() {
-        XCTAssertEqual(array2.sum(), V.W())
+        XCTAssertEqual(array2.sum(), V.Wrapped())
         array.append(objectsIn: values)
 
         var nonNil = values!
@@ -805,7 +348,7 @@ class OptionalAddablePrimitiveListTests<O: ObjectFactory, V: ValueFactory>: Prim
     }
 }
 
-class SortablePrimitiveListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTestsBase<O, V> where V.T: Comparable {
+class SortablePrimitiveListTests<O: ObjectFactory, V: ListValueFactory>: PrimitiveListTestsBase<O, V> where V: Comparable {
     func testSorted() {
         var shuffled = values!
         shuffled.removeFirst()
@@ -817,86 +360,86 @@ class SortablePrimitiveListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveLi
     }
 }
 
-class OptionalSortablePrimitiveListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTestsBase<O, V> where V.W: Comparable, V.W: _DefaultConstructible {
+class OptionalSortablePrimitiveListTests<O: ObjectFactory, V: ListValueFactory>: PrimitiveListTestsBase<O, V> where V.Wrapped: Comparable, V.Wrapped: _DefaultConstructible {
     func testSorted() {
         var shuffled = values!
         shuffled.removeFirst()
         shuffled.append(values!.first!)
         array.append(objectsIn: shuffled)
 
-        let array2 = unsafeDowncast(array!, to: List<V.W?>.self)
-        let values2 = unsafeBitCast(values!, to: Array<V.W?>.self)
+        let array2 = unsafeDowncast(array!, to: List<V.Wrapped?>.self)
+        let values2 = unsafeBitCast(values!, to: Array<V.Wrapped?>.self)
         assertEqual(Array(array2.sorted(ascending: true)), values2)
         assertEqual(Array(array2.sorted(ascending: false)), values2.reversed())
     }
 }
 
 func addTests<OF: ObjectFactory>(_ suite: XCTestSuite, _ type: OF.Type) {
-    _ = PrimitiveListTests<OF, IntFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = PrimitiveListTests<OF, Int8Factory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = PrimitiveListTests<OF, Int16Factory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = PrimitiveListTests<OF, Int32Factory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = PrimitiveListTests<OF, Int64Factory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = PrimitiveListTests<OF, FloatFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = PrimitiveListTests<OF, DoubleFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = PrimitiveListTests<OF, StringFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = PrimitiveListTests<OF, DataFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = PrimitiveListTests<OF, DateFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = PrimitiveListTests<OF, DecimalFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = PrimitiveListTests<OF, ObjectIdFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = PrimitiveListTests<OF, UUIDFactory>._defaultTestSuite().tests.map(suite.addTest)
+    PrimitiveListTests<OF, Int>._defaultTestSuite().tests.forEach(suite.addTest)
+    PrimitiveListTests<OF, Int8>._defaultTestSuite().tests.forEach(suite.addTest)
+    PrimitiveListTests<OF, Int16>._defaultTestSuite().tests.forEach(suite.addTest)
+    PrimitiveListTests<OF, Int32>._defaultTestSuite().tests.forEach(suite.addTest)
+    PrimitiveListTests<OF, Int64>._defaultTestSuite().tests.forEach(suite.addTest)
+    PrimitiveListTests<OF, Float>._defaultTestSuite().tests.forEach(suite.addTest)
+    PrimitiveListTests<OF, Double>._defaultTestSuite().tests.forEach(suite.addTest)
+    PrimitiveListTests<OF, String>._defaultTestSuite().tests.forEach(suite.addTest)
+    PrimitiveListTests<OF, Data>._defaultTestSuite().tests.forEach(suite.addTest)
+    PrimitiveListTests<OF, Date>._defaultTestSuite().tests.forEach(suite.addTest)
+    PrimitiveListTests<OF, Decimal128>._defaultTestSuite().tests.forEach(suite.addTest)
+    PrimitiveListTests<OF, ObjectId>._defaultTestSuite().tests.forEach(suite.addTest)
+    PrimitiveListTests<OF, UUID>._defaultTestSuite().tests.forEach(suite.addTest)
 
-    _ = MinMaxPrimitiveListTests<OF, IntFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = MinMaxPrimitiveListTests<OF, Int8Factory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = MinMaxPrimitiveListTests<OF, Int16Factory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = MinMaxPrimitiveListTests<OF, Int32Factory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = MinMaxPrimitiveListTests<OF, Int64Factory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = MinMaxPrimitiveListTests<OF, FloatFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = MinMaxPrimitiveListTests<OF, DoubleFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = MinMaxPrimitiveListTests<OF, DateFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = MinMaxPrimitiveListTests<OF, DecimalFactory>._defaultTestSuite().tests.map(suite.addTest)
+    MinMaxPrimitiveListTests<OF, Int>._defaultTestSuite().tests.forEach(suite.addTest)
+    MinMaxPrimitiveListTests<OF, Int8>._defaultTestSuite().tests.forEach(suite.addTest)
+    MinMaxPrimitiveListTests<OF, Int16>._defaultTestSuite().tests.forEach(suite.addTest)
+    MinMaxPrimitiveListTests<OF, Int32>._defaultTestSuite().tests.forEach(suite.addTest)
+    MinMaxPrimitiveListTests<OF, Int64>._defaultTestSuite().tests.forEach(suite.addTest)
+    MinMaxPrimitiveListTests<OF, Float>._defaultTestSuite().tests.forEach(suite.addTest)
+    MinMaxPrimitiveListTests<OF, Double>._defaultTestSuite().tests.forEach(suite.addTest)
+    MinMaxPrimitiveListTests<OF, Date>._defaultTestSuite().tests.forEach(suite.addTest)
+    MinMaxPrimitiveListTests<OF, Decimal128>._defaultTestSuite().tests.forEach(suite.addTest)
 
-    _ = AddablePrimitiveListTests<OF, IntFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = AddablePrimitiveListTests<OF, Int8Factory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = AddablePrimitiveListTests<OF, Int16Factory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = AddablePrimitiveListTests<OF, Int32Factory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = AddablePrimitiveListTests<OF, Int64Factory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = AddablePrimitiveListTests<OF, FloatFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = AddablePrimitiveListTests<OF, DoubleFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = AddablePrimitiveListTests<OF, DecimalFactory>._defaultTestSuite().tests.map(suite.addTest)
+    AddablePrimitiveListTests<OF, Int>._defaultTestSuite().tests.forEach(suite.addTest)
+    AddablePrimitiveListTests<OF, Int8>._defaultTestSuite().tests.forEach(suite.addTest)
+    AddablePrimitiveListTests<OF, Int16>._defaultTestSuite().tests.forEach(suite.addTest)
+    AddablePrimitiveListTests<OF, Int32>._defaultTestSuite().tests.forEach(suite.addTest)
+    AddablePrimitiveListTests<OF, Int64>._defaultTestSuite().tests.forEach(suite.addTest)
+    AddablePrimitiveListTests<OF, Float>._defaultTestSuite().tests.forEach(suite.addTest)
+    AddablePrimitiveListTests<OF, Double>._defaultTestSuite().tests.forEach(suite.addTest)
+    AddablePrimitiveListTests<OF, Decimal128>._defaultTestSuite().tests.forEach(suite.addTest)
 
-    _ = PrimitiveListTests<OF, OptionalIntFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = PrimitiveListTests<OF, OptionalInt8Factory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = PrimitiveListTests<OF, OptionalInt16Factory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = PrimitiveListTests<OF, OptionalInt32Factory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = PrimitiveListTests<OF, OptionalInt64Factory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = PrimitiveListTests<OF, OptionalFloatFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = PrimitiveListTests<OF, OptionalDoubleFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = PrimitiveListTests<OF, OptionalStringFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = PrimitiveListTests<OF, OptionalDataFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = PrimitiveListTests<OF, OptionalDateFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = PrimitiveListTests<OF, OptionalDecimalFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = PrimitiveListTests<OF, OptionalObjectIdFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = PrimitiveListTests<OF, OptionalUUIDFactory>._defaultTestSuite().tests.map(suite.addTest)
+    PrimitiveListTests<OF, Int?>._defaultTestSuite().tests.forEach(suite.addTest)
+    PrimitiveListTests<OF, Int8?>._defaultTestSuite().tests.forEach(suite.addTest)
+    PrimitiveListTests<OF, Int16?>._defaultTestSuite().tests.forEach(suite.addTest)
+    PrimitiveListTests<OF, Int32?>._defaultTestSuite().tests.forEach(suite.addTest)
+    PrimitiveListTests<OF, Int64?>._defaultTestSuite().tests.forEach(suite.addTest)
+    PrimitiveListTests<OF, Float?>._defaultTestSuite().tests.forEach(suite.addTest)
+    PrimitiveListTests<OF, Double?>._defaultTestSuite().tests.forEach(suite.addTest)
+    PrimitiveListTests<OF, String?>._defaultTestSuite().tests.forEach(suite.addTest)
+    PrimitiveListTests<OF, Data?>._defaultTestSuite().tests.forEach(suite.addTest)
+    PrimitiveListTests<OF, Date?>._defaultTestSuite().tests.forEach(suite.addTest)
+    PrimitiveListTests<OF, Decimal128?>._defaultTestSuite().tests.forEach(suite.addTest)
+    PrimitiveListTests<OF, ObjectId?>._defaultTestSuite().tests.forEach(suite.addTest)
+    PrimitiveListTests<OF, UUID?>._defaultTestSuite().tests.forEach(suite.addTest)
 
-    _ = OptionalMinMaxPrimitiveListTests<OF, OptionalIntFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = OptionalMinMaxPrimitiveListTests<OF, OptionalInt8Factory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = OptionalMinMaxPrimitiveListTests<OF, OptionalInt16Factory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = OptionalMinMaxPrimitiveListTests<OF, OptionalInt32Factory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = OptionalMinMaxPrimitiveListTests<OF, OptionalInt64Factory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = OptionalMinMaxPrimitiveListTests<OF, OptionalFloatFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = OptionalMinMaxPrimitiveListTests<OF, OptionalDoubleFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = OptionalMinMaxPrimitiveListTests<OF, OptionalDateFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = OptionalMinMaxPrimitiveListTests<OF, OptionalDecimalFactory>._defaultTestSuite().tests.map(suite.addTest)
+    OptionalMinMaxPrimitiveListTests<OF, Int?>._defaultTestSuite().tests.forEach(suite.addTest)
+    OptionalMinMaxPrimitiveListTests<OF, Int8?>._defaultTestSuite().tests.forEach(suite.addTest)
+    OptionalMinMaxPrimitiveListTests<OF, Int16?>._defaultTestSuite().tests.forEach(suite.addTest)
+    OptionalMinMaxPrimitiveListTests<OF, Int32?>._defaultTestSuite().tests.forEach(suite.addTest)
+    OptionalMinMaxPrimitiveListTests<OF, Int64?>._defaultTestSuite().tests.forEach(suite.addTest)
+    OptionalMinMaxPrimitiveListTests<OF, Float?>._defaultTestSuite().tests.forEach(suite.addTest)
+    OptionalMinMaxPrimitiveListTests<OF, Double?>._defaultTestSuite().tests.forEach(suite.addTest)
+    OptionalMinMaxPrimitiveListTests<OF, Date?>._defaultTestSuite().tests.forEach(suite.addTest)
+    OptionalMinMaxPrimitiveListTests<OF, Decimal128?>._defaultTestSuite().tests.forEach(suite.addTest)
 
-    _ = OptionalAddablePrimitiveListTests<OF, OptionalIntFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = OptionalAddablePrimitiveListTests<OF, OptionalInt8Factory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = OptionalAddablePrimitiveListTests<OF, OptionalInt16Factory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = OptionalAddablePrimitiveListTests<OF, OptionalInt32Factory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = OptionalAddablePrimitiveListTests<OF, OptionalInt64Factory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = OptionalAddablePrimitiveListTests<OF, OptionalFloatFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = OptionalAddablePrimitiveListTests<OF, OptionalDoubleFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = OptionalAddablePrimitiveListTests<OF, OptionalDecimalFactory>._defaultTestSuite().tests.map(suite.addTest)
+    OptionalAddablePrimitiveListTests<OF, Int?>._defaultTestSuite().tests.forEach(suite.addTest)
+    OptionalAddablePrimitiveListTests<OF, Int8?>._defaultTestSuite().tests.forEach(suite.addTest)
+    OptionalAddablePrimitiveListTests<OF, Int16?>._defaultTestSuite().tests.forEach(suite.addTest)
+    OptionalAddablePrimitiveListTests<OF, Int32?>._defaultTestSuite().tests.forEach(suite.addTest)
+    OptionalAddablePrimitiveListTests<OF, Int64?>._defaultTestSuite().tests.forEach(suite.addTest)
+    OptionalAddablePrimitiveListTests<OF, Float?>._defaultTestSuite().tests.forEach(suite.addTest)
+    OptionalAddablePrimitiveListTests<OF, Double?>._defaultTestSuite().tests.forEach(suite.addTest)
+    OptionalAddablePrimitiveListTests<OF, Decimal128?>._defaultTestSuite().tests.forEach(suite.addTest)
 }
 
 class UnmanagedPrimitiveListTests: TestCase {
@@ -916,25 +459,25 @@ class ManagedPrimitiveListTests: TestCase {
         let suite = XCTestSuite(name: "Managed Primitive Lists")
         addTests(suite, ManagedObjectFactory.self)
 
-        _ = SortablePrimitiveListTests<ManagedObjectFactory, IntFactory>._defaultTestSuite().tests.map(suite.addTest)
-        _ = SortablePrimitiveListTests<ManagedObjectFactory, Int8Factory>._defaultTestSuite().tests.map(suite.addTest)
-        _ = SortablePrimitiveListTests<ManagedObjectFactory, Int16Factory>._defaultTestSuite().tests.map(suite.addTest)
-        _ = SortablePrimitiveListTests<ManagedObjectFactory, Int32Factory>._defaultTestSuite().tests.map(suite.addTest)
-        _ = SortablePrimitiveListTests<ManagedObjectFactory, Int64Factory>._defaultTestSuite().tests.map(suite.addTest)
-        _ = SortablePrimitiveListTests<ManagedObjectFactory, FloatFactory>._defaultTestSuite().tests.map(suite.addTest)
-        _ = SortablePrimitiveListTests<ManagedObjectFactory, DoubleFactory>._defaultTestSuite().tests.map(suite.addTest)
-        _ = SortablePrimitiveListTests<ManagedObjectFactory, StringFactory>._defaultTestSuite().tests.map(suite.addTest)
-        _ = SortablePrimitiveListTests<ManagedObjectFactory, DateFactory>._defaultTestSuite().tests.map(suite.addTest)
+        SortablePrimitiveListTests<ManagedObjectFactory, Int>._defaultTestSuite().tests.forEach(suite.addTest)
+        SortablePrimitiveListTests<ManagedObjectFactory, Int8>._defaultTestSuite().tests.forEach(suite.addTest)
+        SortablePrimitiveListTests<ManagedObjectFactory, Int16>._defaultTestSuite().tests.forEach(suite.addTest)
+        SortablePrimitiveListTests<ManagedObjectFactory, Int32>._defaultTestSuite().tests.forEach(suite.addTest)
+        SortablePrimitiveListTests<ManagedObjectFactory, Int64>._defaultTestSuite().tests.forEach(suite.addTest)
+        SortablePrimitiveListTests<ManagedObjectFactory, Float>._defaultTestSuite().tests.forEach(suite.addTest)
+        SortablePrimitiveListTests<ManagedObjectFactory, Double>._defaultTestSuite().tests.forEach(suite.addTest)
+        SortablePrimitiveListTests<ManagedObjectFactory, String>._defaultTestSuite().tests.forEach(suite.addTest)
+        SortablePrimitiveListTests<ManagedObjectFactory, Date>._defaultTestSuite().tests.forEach(suite.addTest)
 
-        _ = OptionalSortablePrimitiveListTests<ManagedObjectFactory, OptionalIntFactory>._defaultTestSuite().tests.map(suite.addTest)
-        _ = OptionalSortablePrimitiveListTests<ManagedObjectFactory, OptionalInt8Factory>._defaultTestSuite().tests.map(suite.addTest)
-        _ = OptionalSortablePrimitiveListTests<ManagedObjectFactory, OptionalInt16Factory>._defaultTestSuite().tests.map(suite.addTest)
-        _ = OptionalSortablePrimitiveListTests<ManagedObjectFactory, OptionalInt32Factory>._defaultTestSuite().tests.map(suite.addTest)
-        _ = OptionalSortablePrimitiveListTests<ManagedObjectFactory, OptionalInt64Factory>._defaultTestSuite().tests.map(suite.addTest)
-        _ = OptionalSortablePrimitiveListTests<ManagedObjectFactory, OptionalFloatFactory>._defaultTestSuite().tests.map(suite.addTest)
-        _ = OptionalSortablePrimitiveListTests<ManagedObjectFactory, OptionalDoubleFactory>._defaultTestSuite().tests.map(suite.addTest)
-        _ = OptionalSortablePrimitiveListTests<ManagedObjectFactory, OptionalStringFactory>._defaultTestSuite().tests.map(suite.addTest)
-        _ = OptionalSortablePrimitiveListTests<ManagedObjectFactory, OptionalDateFactory>._defaultTestSuite().tests.map(suite.addTest)
+        OptionalSortablePrimitiveListTests<ManagedObjectFactory, Int?>._defaultTestSuite().tests.forEach(suite.addTest)
+        OptionalSortablePrimitiveListTests<ManagedObjectFactory, Int8?>._defaultTestSuite().tests.forEach(suite.addTest)
+        OptionalSortablePrimitiveListTests<ManagedObjectFactory, Int16?>._defaultTestSuite().tests.forEach(suite.addTest)
+        OptionalSortablePrimitiveListTests<ManagedObjectFactory, Int32?>._defaultTestSuite().tests.forEach(suite.addTest)
+        OptionalSortablePrimitiveListTests<ManagedObjectFactory, Int64?>._defaultTestSuite().tests.forEach(suite.addTest)
+        OptionalSortablePrimitiveListTests<ManagedObjectFactory, Float?>._defaultTestSuite().tests.forEach(suite.addTest)
+        OptionalSortablePrimitiveListTests<ManagedObjectFactory, Double?>._defaultTestSuite().tests.forEach(suite.addTest)
+        OptionalSortablePrimitiveListTests<ManagedObjectFactory, String?>._defaultTestSuite().tests.forEach(suite.addTest)
+        OptionalSortablePrimitiveListTests<ManagedObjectFactory, Date?>._defaultTestSuite().tests.forEach(suite.addTest)
 
         return suite
     }
