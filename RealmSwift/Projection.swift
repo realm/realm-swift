@@ -82,9 +82,6 @@ public struct Projected<T: ObjectBase, Value>: AnyProjected {
         ) -> Value {
         get {
             let storage = observed[keyPath: storageKeyPath]
-            if let lastAccessedNames = observed.rootObject.lastAccessedNames {
-                lastAccessedNames.add(_name(for: storage._projectedKeyPath!))
-            }
             return observed.rootObject[keyPath: storage._projectedKeyPath]
         }
         set {
@@ -224,7 +221,7 @@ extension ProjectionObservable {
                         _ block: @escaping (ObjectChange<Self>) -> Void) -> NotificationToken {
         let kps: [String]
         if keyPaths.isEmpty {
-            kps = _schema.propertyMetadatas.map { $0.originPropertyKeyPathString }
+            kps = _schema.propertyMetadatas.map(\.originPropertyKeyPathString)
         } else {
             let emptyRoot = Root()
             emptyRoot.lastAccessedNames = NSMutableArray()
@@ -471,7 +468,7 @@ public struct ProjectedList<NewElement>: RandomAccessCollection where NewElement
     }
 
     public var description: String {
-        return "\(type(of: self))<\(Element.self))> <\(self))> {\n" +
+        return "\(type(of: self))<\(Element.self)> <\(self)> {\n" +
         "\(RLMDescriptionWithMaxDepth("ProjectedList", backingList.rlmArray, RLMDescriptionMaxDepth))\n" +
         "}"
     }
