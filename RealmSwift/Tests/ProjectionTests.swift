@@ -513,8 +513,7 @@ class ProjectionTests: TestCase {
     func testDescription() {
         let actual = realmWithTestPath().objects(PersonProjection.self).filter("lastName == 'Snow'").first!.description.replacingOccurrences(of: "    ", with: "\t")
         let expected = "PersonProjection<Person> <0x[0-9a-f]+> \\{\n\t@Projected\\(\\\\Person\\.firstName\\) -> firstName: John\n\t@Projected\\(\\\\Person\\.lastName\\) -> lastNameCaps: SNOW\n\t@Projected\\(\\\\Person\\.birthday\\) -> birthdayAsEpochtime: 10\\.0\n\t@Projected\\(\\\\Person\\.address\\.city\\) -> homeCity: Optional\\(\"Winterfell\"\\)\n\t@Projected\\(\\\\Person\\.friends\\) -> firstFriendsName: ProjectedList<String>\\(backingList: List<Person> <0x[0-9a-f]+> \\(\n\t\\[0\\] Person \\{\n\t\tfirstName = Daenerys;\n\t\tlastName = Targaryen;\n\t\tbirthday = 1970-01-01 00:00:00 \\+0000;\n\t\taddress = Address \\{\n\t\t\tcity = King's Landing;\n\t\t\tcountry = Westeros;\n\t\t\\};\n\t\tfriends = List<Person> <0x[0-9a-f]+> \\(\n\t\t\t\\[0\\] Person \\{\n\t\t\t\tfirstName = John;\n\t\t\t\tlastName = Snow;\n\t\t\t\tbirthday = 1970-01-01 00:00:10 \\+0000;\n\t\t\t\taddress = Address \\{\n\t\t\t\t\tcity = Winterfell;\n\t\t\t\t\tcountry = Kingdom in the North;\n\t\t\t\t\\};\n\t\t\t\tfriends = List<Person> <0x[0-9a-f]+> \\(\n\t\t\t\t\t\\[0\\] <Maximum depth exceeded>\n\t\t\t\t\\);\n\t\t\t\treviews = List<string> <0x[0-9a-f]+> \\(\n\t\t\t\t\n\t\t\t\t\\);\n\t\t\t\tmoney = 2\\.22;\n\t\t\t\\}\n\t\t\\);\n\t\treviews = List<string> <0x[0-9a-f]+> \\(\n\t\t\n\t\t\\);\n\t\tmoney = 2\\.22;\n\t\\}\n\\), keyPath: Swift\\.ReferenceWritableKeyPath<RealmSwift_Tests\\.Person, Swift\\.String>, propertyName: \"firstName\", anyCtor: \\(Function\\)\\)\n\n\trootObject: Person \\{\n\tfirstName = John;\n\tlastName = Snow;\n\tbirthday = 1970-01-01 00:00:10 \\+0000;\n\taddress = Address \\{\n\t\tcity = Winterfell;\n\t\tcountry = Kingdom in the North;\n\t\\};\n\tfriends = List<Person> <0x[0-9a-f]+> \\(\n\t\t\\[0\\] Person \\{\n\t\t\tfirstName = Daenerys;\n\t\t\tlastName = Targaryen;\n\t\t\tbirthday = 1970-01-01 00:00:00 \\+0000;\n\t\t\taddress = Address \\{\n\t\t\t\tcity = King's Landing;\n\t\t\t\tcountry = Westeros;\n\t\t\t\\};\n\t\t\tfriends = List<Person> <0x[0-9a-f]+> \\(\n\t\t\t\t\\[0\\] Person \\{\n\t\t\t\t\tfirstName = John;\n\t\t\t\t\tlastName = Snow;\n\t\t\t\t\tbirthday = 1970-01-01 00:00:10 \\+0000;\n\t\t\t\t\taddress = <Maximum depth exceeded>;\n\t\t\t\t\tfriends = <Maximum depth exceeded>;\n\t\t\t\t\treviews = <Maximum depth exceeded>;\n\t\t\t\t\tmoney = 2\\.22;\n\t\t\t\t\\}\n\t\t\t\\);\n\t\t\treviews = List<string> <0x[0-9a-f]+> \\(\n\t\t\t\n\t\t\t\\);\n\t\t\tmoney = 2\\.22;\n\t\t\\}\n\t\\);\n\treviews = List<string> <0x[0-9a-f]+> \\(\n\t\n\t\\);\n\tmoney = 2\\.22;\n\\}\n\\}"
-
-      assertMatches(actual, expected)
+        assertMatches(actual, expected)
     }
 
     func testProjectionsRealmShouldNotBeNil() {
@@ -1751,8 +1750,8 @@ class ProjectionTests: TestCase {
         XCTAssertEqual(johnProjection.lastNameCaps, "SNOW")
 
         let ex = expectation(description: "values will be observed")
-        let token = johnProjection.observe(keyPaths: [\.lastNameCaps]) {
-            if case let .change(_, change) = $0 {
+        let token = johnProjection.observe(keyPaths: [\.lastNameCaps]) { chg in
+            if case let .change(_, change) = chg {
                 XCTAssertEqual(change.first!.name, "lastNameCaps")
                 XCTAssertEqual(change.first!.oldValue as! String, "SNOW")
                 XCTAssertEqual(change.first!.newValue as! String, "ALI")

@@ -342,12 +342,17 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
 }
 
 // MARK: ObservedResults
+/**
+ A type which can be used with @ObservedResults propperty wrapper. Children class of Realm Object or Projection.
+ */
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 public protocol ObservedResultsValue: RealmCollectionValue & Identifiable { }
 
+/// :nodoc:
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 extension Object: ObservedResultsValue { }
 
+/// :nodoc:
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 extension Projection: ObservedResultsValue { }
 

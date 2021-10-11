@@ -112,9 +112,20 @@ private struct ProjectionMetadata {
 private var schema = [ObjectIdentifier: ProjectionMetadata]()
 
 // MARK: ProjectionOservable
+/**
+  A type erased Projection.
+ 
+ ProjectionObservable is a Combine publisher
+ */
 public protocol ProjectionObservable: AnyObject {
+    /**
+     Projecrtion's underlying type - a child of Realm Object or EmbeddedObject.
+     */
     associatedtype Root: ObjectBase
+    
+    /// The object being projected
     var rootObject: Root { get }
+    /// :nodoc:
     init(projecting object: Root)
 }
 
@@ -201,6 +212,83 @@ open class Projection<Root: ObjectBase>: RealmCollectionValue, ProjectionObserva
 }
 
 extension ProjectionObservable {
+    /**
+     Registers a block to be called each time the projection's underlying object changes.
+
+     The block will be asynchronously called after each write transaction which
+     deletes the underlying object or modifies any of the projected properties of the object,
+     including self-assignments that set a property to its existing value.
+
+     For write transactions performed on different threads or in different
+     processes, the block will be called when the managing Realm is
+     (auto)refreshed to a version including the changes, while for local write
+     transactions it will be called at some point in the future after the write
+     transaction is committed.
+
+     If no key paths are given, the block will be executed on any insertion,
+     modification, or deletion for all projected  properties, including projected properties of
+     any nested, linked objects. If a key path or key paths are provided,
+     then the block will be called for changes which occur only on the
+     provided key paths. For example, if:
+     ```swift
+     
+     class Person: Object {
+         @Persisted var firstName: String
+         @Persisted var lastName = ""
+         @Persisted public var friends = List<Person>()
+     }
+
+     class PersonProjection: Projection<Person> {
+         @Projected(\Person.firstName) var name
+         @Projected(\Person.lastName.localizedUppercase) var lastNameCaps
+         @Projected(\Person.friends.projectTo.firstName) var firstFriendsName: ProjectedList<String>
+     }
+
+     let token = projectedPerson.observe(keyPaths: ["name"], { changes in
+        // ...
+     })
+     ```
+     - The above notification block fires for changes to the
+     `firstName` property of the Object, but not for any changes
+     made to `lastName` or `friends` list.
+     - If the observed key path were `["firstFriendsName"]`, then any insertion,
+     deletion, or modification of the `firstName` of the `friends` list will trigger the block. A change to
+     `someFriend.lastName` would not trigger the block (where `someFriend`
+     is an element contained in `friends`)
+
+     - note: Multiple notification tokens on the same object which filter for
+     separate key paths *do not* filter exclusively. If one key path
+     change is satisfied for one notification token, then all notification
+     token blocks for that object will execute.
+
+     If no queue is given, notifications are delivered via the standard run
+     loop, and so can't be delivered while the run loop is blocked by other
+     activity. If a queue is given, notifications are delivered to that queue
+     instead. When notifications can't be delivered instantly, multiple
+     notifications may be coalesced into a single notification.
+
+     Unlike with `List` and `Results`, there is no "initial" callback made after
+     you add a new notification block.
+
+     You must retain the returned token for as long as you want updates to be sent
+     to the block. To stop receiving updates, call `invalidate()` on the token.
+
+     It is safe to capture a strong reference to the observed object within the
+     callback block. There is no retain cycle due to that the callback is
+     retained by the returned token and not by the object itself.
+
+     - warning: This method cannot be called during a write transaction, or when
+                the containing Realm is read-only.
+     - parameter keyPaths: Only properties contained in the key paths array will trigger
+                           the block when they are modified. If `nil`, notifications
+                           will be delivered for any projected property change on the object.
+                           String key paths which do not correspond to a valid projected property
+                           will throw an exception.
+     - parameter queue: The serial dispatch queue to receive notification on. If
+                        `nil`, notifications are delivered to the current thread.
+     - parameter block: The block to call with information about changes to the object.
+     - returns: A token which must be held for as long as you want updates to be delivered.
+     */
     public func observe(keyPaths: [String] = [],
                         on queue: DispatchQueue? = nil,
                         _ block: @escaping (ObjectChange<Self>) -> Void) -> NotificationToken {
@@ -216,6 +304,83 @@ extension ProjectionObservable {
         })
     }
 
+    /**
+     Registers a block to be called each time the projection's underlying object changes.
+
+     The block will be asynchronously called after each write transaction which
+     deletes the underlying object or modifies any of the projected properties of the object,
+     including self-assignments that set a property to its existing value.
+
+     For write transactions performed on different threads or in different
+     processes, the block will be called when the managing Realm is
+     (auto)refreshed to a version including the changes, while for local write
+     transactions it will be called at some point in the future after the write
+     transaction is committed.
+
+     If no key paths are given, the block will be executed on any insertion,
+     modification, or deletion for all projected  properties, including projected properties of
+     any nested, linked objects. If a key path or key paths are provided,
+     then the block will be called for changes which occur only on the
+     provided key paths. For example, if:
+     ```swift
+     
+     class Person: Object {
+         @Persisted var firstName: String
+         @Persisted var lastName = ""
+         @Persisted public var friends = List<Person>()
+     }
+
+     class PersonProjection: Projection<Person> {
+         @Projected(\Person.firstName) var name
+         @Projected(\Person.lastName.localizedUppercase) var lastNameCaps
+         @Projected(\Person.friends.projectTo.firstName) var firstFriendsName: ProjectedList<String>
+     }
+
+     let token = projectedPerson.observe(keyPaths: [\PersonProjection.name], { changes in
+        // ...
+     })
+     ```
+     - The above notification block fires for changes to the
+     `firstName` property of the Object, but not for any changes
+     made to `lastName` or `friends` list.
+     - If the observed key path were `[\PersonProjection.firstFriendsName]`, then any insertion,
+     deletion, or modification of the `firstName` of the `friends` list will trigger the block. A change to
+     `someFriend.lastName` would not trigger the block (where `someFriend`
+     is an element contained in `friends`)
+
+     - note: Multiple notification tokens on the same object which filter for
+     separate key paths *do not* filter exclusively. If one key path
+     change is satisfied for one notification token, then all notification
+     token blocks for that object will execute.
+
+     If no queue is given, notifications are delivered via the standard run
+     loop, and so can't be delivered while the run loop is blocked by other
+     activity. If a queue is given, notifications are delivered to that queue
+     instead. When notifications can't be delivered instantly, multiple
+     notifications may be coalesced into a single notification.
+
+     Unlike with `List` and `Results`, there is no "initial" callback made after
+     you add a new notification block.
+
+     You must retain the returned token for as long as you want updates to be sent
+     to the block. To stop receiving updates, call `invalidate()` on the token.
+
+     It is safe to capture a strong reference to the observed object within the
+     callback block. There is no retain cycle due to that the callback is
+     retained by the returned token and not by the object itself.
+
+     - warning: This method cannot be called during a write transaction, or when
+                the containing Realm is read-only.
+     - parameter keyPaths: Only properties contained in the key paths array will trigger
+                           the block when they are modified. If `nil`, notifications
+                           will be delivered for any projected property change on the object.
+                           String key paths which do not correspond to a valid projected property
+                           will throw an exception.
+     - parameter queue: The serial dispatch queue to receive notification on. If
+                        `nil`, notifications are delivered to the current thread.
+     - parameter block: The block to call with information about changes to the object.
+     - returns: A token which must be held for as long as you want updates to be delivered.
+     */
     public func observe(keyPaths: [PartialKeyPath<Self>] = [],
                         on queue: DispatchQueue? = nil,
                         _ block: @escaping (ObjectChange<Self>) -> Void) -> NotificationToken {
