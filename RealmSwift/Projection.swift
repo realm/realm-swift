@@ -909,7 +909,6 @@ extension List where Element: ObjectBase, Element: RealmCollectionValue {
     }
 }
 
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 extension Projection: AssistedObjectiveCBridgeable {
     internal static func bridging(from objectiveCValue: Any, with metadata: Any?) -> Self {
         return Self(projecting: Root.bridging(from: objectiveCValue, with: metadata))
