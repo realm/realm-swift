@@ -118,11 +118,8 @@ private var schema = [ObjectIdentifier: ProjectionMetadata]()
  ProjectionObservable is a Combine publisher
  */
 public protocol ProjectionObservable: AnyObject {
-    /**
-     Projecrtion's underlying type - a child of Realm Object or EmbeddedObject.
-     */
+    /// Projecrtion's underlying type - a child of Realm `Object` or `EmbeddedObject`.
     associatedtype Root: ObjectBase
-    
     /// The object being projected
     var rootObject: Root { get }
     /// :nodoc:
@@ -230,8 +227,8 @@ extension ProjectionObservable {
      any nested, linked objects. If a key path or key paths are provided,
      then the block will be called for changes which occur only on the
      provided key paths. For example, if:
-     ```swift
      
+     ```swift
      class Person: Object {
          @Persisted var firstName: String
          @Persisted var lastName = ""
@@ -322,8 +319,8 @@ extension ProjectionObservable {
      any nested, linked objects. If a key path or key paths are provided,
      then the block will be called for changes which occur only on the
      provided key paths. For example, if:
-     ```swift
      
+     ```swift
      class Person: Object {
          @Persisted var firstName: String
          @Persisted var lastName = ""
@@ -452,6 +449,7 @@ extension ProjectionObservable {
 // MARK: Notifications
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 public extension Projection {
+    /// :nodoc:
     func addObserver(_ observer: NSObject,
                      forKeyPath keyPath: String,
                      options: NSKeyValueObservingOptions = [],
@@ -459,12 +457,14 @@ public extension Projection {
         rootObject.addObserver(observer, forKeyPath: keyPath, options: options, context: context)
     }
 
+    /// :nodoc:
     func removeObserver(_ observer: NSObject,
                         forKeyPath keyPath: String,
                         context: UnsafeMutableRawPointer?) {
         rootObject.removeObserver(observer, forKeyPath: keyPath, context: context)
     }
 
+    /// :nodoc:
     func removeObserver(_ observer: NSObject, forKeyPath keyPath: String) {
         rootObject.removeObserver(observer, forKeyPath: keyPath)
     }
@@ -521,36 +521,40 @@ extension Projection: ThreadConfined where Root: ThreadConfined {
     }
 }
 
+// - MARK: _RealmSchemaDiscoverable
 extension Projection {
+    /// :nodoc:
     public static var _rlmType: PropertyType {
         fatalError()
     }
-
+    /// :nodoc:
     public static var _rlmOptional: Bool {
         fatalError()
     }
+    /// :nodoc:
     public static func _rlmDefaultValue(_ forceDefaultInitialization: Bool) -> Self {
         fatalError()
     }
+    /// :nodoc:
     public static var _rlmRequireObjc: Bool { false }
 
     public func _rlmPopulateProperty(_ prop: RLMProperty) {
         fatalError()
     }
-
+    /// :nodoc:
     public static func _rlmPopulateProperty(_ prop: RLMProperty) {
         fatalError()
     }
-
+    /// :nodoc:
     public static func == (lhs: Projection, rhs: Projection) -> Bool {
         RLMObjectBaseAreEqual(lhs.rootObject, rhs.rootObject)
     }
-
+    /// :nodoc:
     public func hash(into hasher: inout Hasher) {
         let hashVal = rootObject.hashValue
         hasher.combine(hashVal)
     }
-
+    /// :nodoc:
     open var description: String {
         return "\(type(of: self))<\(type(of: rootObject))> <\(Unmanaged.passUnretained(self).toOpaque())> {\n" +
         "\(_schema.propertyMetadatas.map({"\t@Projected(\\\(type(of: rootObject)).\($0.originPropertyKeyPathString)) -> \(String($0.label.dropFirst())): \(String(describing: rootObject[keyPath: $0.projectedKeyPath]!))"}).joined(separator: "\n"))\n" +
@@ -566,10 +570,80 @@ public struct ProjectedList<NewElement>: RandomAccessCollection where NewElement
     public typealias Element = NewElement
     public typealias Index = Int
 
+    /**
+     Returns the index of the first object in the list matching the predicate, or `nil` if no objects match.
+
+     - parameter predicate: The predicate with which to filter the objects.
+    */
     public func index(matching predicate: NSPredicate) -> Int? {
         backingList.index(matching: predicate)
     }
 
+    /**
+     Registers a block to be called each time the collection changes.
+
+     The block will be asynchronously called with the initial results, and then called again after each write
+     transaction which changes either any of the objects in the collection, or which objects are in the collection.
+
+     The `change` parameter that is passed to the block reports, in the form of indices within the collection, which of
+     the objects were added, removed, or modified during each write transaction. See the `RealmCollectionChange`
+     documentation for more information on the change information supplied and an example of how to use it to update a
+     `UITableView`.
+
+     At the time when the block is called, the collection will be fully evaluated and up-to-date, and as long as you do
+     not perform a write transaction on the same thread or explicitly call `realm.refresh()`, accessing it will never
+     perform blocking work.
+
+     If no queue is given, notifications are delivered via the standard run loop, and so can't be delivered while the
+     run loop is blocked by other activity. If a queue is given, notifications are delivered to that queue instead. When
+     notifications can't be delivered instantly, multiple notifications may be coalesced into a single notification.
+     This can include the notification with the initial collection.
+
+     For example, the following code performs a write transaction immediately after adding the notification block, so
+     there is no opportunity for the initial notification to be delivered first. As a result, the initial notification
+     will reflect the state of the Realm after the write transaction.
+
+     ```swift
+     class Person: Object {
+         @Persisted var dogs: List<Dog>
+     }
+     class PersonProjection: Projection<Person> {
+         @Projected(\Person.dogs.projectTo.name) var dogsNames: ProjectedList<String>
+     }
+     // ...
+     let dogsNames = personProjection.dogsNames
+     print("dogsNames.count: \(dogsNames?.count)") // => 0
+     let token = dogsNames.observe { changes in
+         switch changes {
+         case .initial(let dogsNames):
+             // Will print "dogsNames.count: 1"
+             print("dogsNames.count: \(dogsNames.count)")
+             break
+         case .update:
+             // Will not be hit in this example
+             break
+         case .error:
+             break
+         }
+     }
+     try! realm.write {
+         let dog = Dog()
+         dog.name = "Rex"
+         person.dogs.append(dog)
+     }
+     // end of run loop execution context
+     ```
+
+     You must retain the returned token for as long as you want updates to be sent to the block. To stop receiving
+     updates, call `invalidate()` on the token.
+
+     - warning: This method cannot be called during a write transaction, or when the containing Realm is read-only.
+
+     - parameter queue: The serial dispatch queue to receive notification on. If
+                        `nil`, notifications are delivered to the current thread.
+     - parameter block: The block to be called whenever a change occurs.
+     - returns: A token which must be held for as long as you want updates to be delivered.
+     */
     public func observe(on queue: DispatchQueue?,
                         _ block: @escaping (RealmCollectionChange<ProjectedList<NewElement>>) -> Void) -> NotificationToken {
         backingList.observe(on: queue, {
@@ -589,7 +663,121 @@ public struct ProjectedList<NewElement>: RandomAccessCollection where NewElement
             }
         })
     }
+    /**
+     Registers a block to be called each time the collection changes.
 
+     The block will be asynchronously called with the initial results, and then called again after each write
+     transaction which changes either any of the objects in the collection, or which objects are in the collection.
+
+     The `change` parameter that is passed to the block reports, in the form of indices within the collection, which of
+     the objects were added, removed, or modified during each write transaction. See the `RealmCollectionChange`
+     documentation for more information on the change information supplied and an example of how to use it to update a
+     `UITableView`.
+
+     At the time when the block is called, the collection will be fully evaluated and up-to-date, and as long as you do
+     not perform a write transaction on the same thread or explicitly call `realm.refresh()`, accessing it will never
+     perform blocking work.
+
+     If no queue is given, notifications are delivered via the standard run loop, and so can't be delivered while the
+     run loop is blocked by other activity. If a queue is given, notifications are delivered to that queue instead. When
+     notifications can't be delivered instantly, multiple notifications may be coalesced into a single notification.
+     This can include the notification with the initial collection.
+
+     For example, the following code performs a write transaction immediately after adding the notification block, so
+     there is no opportunity for the initial notification to be delivered first. As a result, the initial notification
+     will reflect the state of the Realm after the write transaction.
+
+     ```swift
+     class Person: Object {
+         @Persisted var dogs: List<Dog>
+     }
+     class PersonProjection: Projection<Person> {
+         @Projected(\Person.dogs.projectTo.name) var dogNames: ProjectedList<String>
+     }
+     // ...
+     let dogNames = personProjection.dogNames
+     print("dogNames.count: \(dogNames?.count)") // => 0
+     let token = dogs.observe { changes in
+         switch changes {
+         case .initial(let dogNames):
+             // Will print "dogNames.count: 1"
+             print("dogNames.count: \(dogNames.count)")
+             break
+         case .update:
+             // Will not be hit in this example
+             break
+         case .error:
+             break
+         }
+     }
+     try! realm.write {
+         let dog = Dog()
+         dog.name = "Rex"
+         person.dogs.append(dog)
+     }
+     // end of run loop execution context
+     ```
+
+     If no key paths are given, the block will be executed on any insertion,
+     modification, or deletion for all object properties and the properties of
+     any nested, linked objects. If a key path or key paths are provided,
+     then the block will be called for changes which occur only on the
+     provided key paths. For example, if:
+     ```swift
+     class Person: Object {
+         @Persisted var dogs: List<Dog>
+     }
+     class PersonProjection: Projection<Person> {
+         @Projected(\Person.dogs.projectTo.name) var dogNames: ProjectedList<String>
+     }
+     // ...
+     let dogNames = personProjection.dogNames
+     let token = dogNames.observe(keyPaths: ["name"]) { changes in
+         switch changes {
+         case .initial(let dogNames):
+            // ...
+         case .update:
+            // This case is hit:
+            // - after the token is intialized
+            // - when the name property of an object in the
+            // collection is modified
+            // - when an element is inserted or removed
+            //   from the collection.
+            // This block is not triggered:
+            // - when a value other than name is modified on
+            //   one of the elements.
+         case .error:
+             // ...
+         }
+     }
+     // end of run loop execution context
+     ```
+     Changes to any other value that is linked to a `Dog` in this collection
+     would *not* trigger the block.
+     Any insertion or removal to the `Dog` type collection being observed
+     would still trigger a notification.
+
+     - note: Multiple notification tokens on the same object which filter for
+     separate key paths *do not* filter exclusively. If one key path
+     change is satisfied for one notification token, then all notification
+     token blocks for that object will execute.
+
+     You must retain the returned token for as long as you want updates to be sent to the block. To stop receiving
+     updates, call `invalidate()` on the token.
+
+     - warning: This method cannot be called during a write transaction, or when the containing Realm is read-only.
+
+     - parameter keyPaths: Only properties contained in the key paths array will trigger
+                           the block when they are modified. If `nil`, notifications
+                           will be delivered for any property change on the object.
+                           String key paths which do not correspond to a valid a property
+                           will throw an exception.
+                           See description above for more detail on linked properties.
+     - parameter queue: The serial dispatch queue to receive notification on. If
+                        `nil`, notifications are delivered to the current thread.
+     - parameter block: The block to be called whenever a change occurs.
+     - returns: A token which must be held for as long as you want updates to be delivered.
+     */
     public func observe(keyPaths: [String]? = nil, on queue: DispatchQueue? = nil,
                         _ block: @escaping (RealmCollectionChange<ProjectedList<NewElement>>) -> Void)
         -> NotificationToken {
@@ -619,9 +807,15 @@ public struct ProjectedList<NewElement>: RandomAccessCollection where NewElement
             backingList[position].setValue(newValue, forKeyPath: propertyName)
         }
     }
+
+    /// The position of the first element in a non-empty collection.
+    /// Identical to endIndex in an empty collection.
     public var startIndex: Int {
         backingList.startIndex
     }
+    /// The collection's "past the end" position.
+    /// endIndex is not a valid argument to subscript, and is always reachable from startIndex by
+    /// zero or more applications of successor().
     public var endIndex: Int {
         backingList.endIndex
     }
@@ -672,10 +866,24 @@ public struct ProjectedList<NewElement>: RandomAccessCollection where NewElement
 
 extension ProjectedList: ThreadConfined { }
 
+/**
+ `ElementMapper` transforms the actual `List` of `Objects` or `List` of `EmbeddedObjects` in to ProjectedList.
+ For example:
+ ```swift
+ class Person: Object {
+     @Persisted var dogs: List<Dog>
+ }
+ class PersonProjection: Projection<Person> {
+     @Projected(\Person.dogs.projectTo.name) var dogNames: ProjectedList<String>
+ }
+```
+ In this code the `Person`'s dogs list will be prijected to the list of dogs names via `projectTo`
+ */
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 @dynamicMemberLookup
 public struct ElementMapper<Element> where Element: ObjectBase, Element: RealmCollectionValue {
     var list: List<Element>
+    /// :nodoc:
     public subscript<V>(dynamicMember member: KeyPath<Element, V>) -> ProjectedList<V> {
         ProjectedList(ObjectiveCSupport.convert(object: list.rlmArray), keyPathToNewElement: member)
     }
@@ -683,6 +891,19 @@ public struct ElementMapper<Element> where Element: ObjectBase, Element: RealmCo
 
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 extension List where Element: ObjectBase, Element: RealmCollectionValue {
+    /**
+     `projectTo` will map the original `List` of `Objects` or `List` of `EmbeddedObjects` in to ProjectedList.
+     For example:
+     ```swift
+     class Person: Object {
+         @Persisted var dogs: List<Dog>
+     }
+     class PersonProjection: Projection<Person> {
+         @Projected(\Person.dogs.projectTo.name) var dogNames: ProjectedList<String>
+     }
+    ```
+     In this code the `Person`'s dogs list will be prijected to the list of dogs names via `projectTo`
+     */
     public var projectTo: ElementMapper<Element> {
         ElementMapper(list: self)
     }
