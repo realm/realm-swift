@@ -537,7 +537,7 @@ extension Projection {
     }
     /// :nodoc:
     public static var _rlmRequireObjc: Bool { false }
-
+    /// :nodoc:
     public func _rlmPopulateProperty(_ prop: RLMProperty) {
         fatalError()
     }
@@ -799,6 +799,13 @@ public struct ProjectedList<NewElement>: RandomAccessCollection where NewElement
             }
         }
 
+    /**
+     Returns the object at the given index (get), or replaces the object at the given index (set).
+
+     - warning: You can only set an object during a write transaction.
+
+     - parameter index: The index of the object to retrieve or replace.
+     */
     public subscript(position: Int) -> NewElement {
         get {
             backingList[position][keyPath: keyPath] as! NewElement
@@ -819,19 +826,25 @@ public struct ProjectedList<NewElement>: RandomAccessCollection where NewElement
     public var endIndex: Int {
         backingList.endIndex
     }
+    /// The Realm which manages the object.
     public var realm: Realm? {
         backingList.realm
     }
+    /// Indicates if the collection can no longer be accessed.
     public var isInvalidated: Bool {
         backingList.isInvalidated
     }
-
+    /// A human-readable description of the object.
     public var description: String {
         return "\(type(of: self))<\(Element.self)> <\(self)> {\n" +
         "\(RLMDescriptionWithMaxDepth("ProjectedList", backingList.rlmArray, RLMDescriptionMaxDepth))\n" +
         "}"
     }
+    /**
+     Returns the index of an object in the linking objects, or `nil` if the object is not present.
 
+     - parameter object: The object whose index is being queried.
+     */
     public func index(of object: Element) -> Int? {
         backingList.map({$0[keyPath: self.keyPath] as! Element}).firstIndex(of: object)
     }

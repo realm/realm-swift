@@ -423,7 +423,19 @@ extension Projection: ObservedResultsValue { }
         return self
     }
 
-    /// :nodoc:
+    /**
+     Initialize a `ObservedResults` struct for a given `Projection` type.
+     - parameter type: Observed type
+     - parameter configuration: The `Realm.Configuration` used when creating the Realm,
+     user's sync configuration for the given partition value will be set as the `syncConfiguration`,
+     if empty the configuration is set to the `defaultConfiguration`
+     - parameter filter: Observations will be made only for passing objects.
+     If no filter given - all objects will be observed
+     - parameter keyPaths: Only properties contained in the key paths array will be observed.
+     If `nil`, notifications will be delivered for any property change on the object.
+     String key paths which do not correspond to a valid a property will throw an exception.
+     - parameter sortDescriptor: A sequence of `SortDescriptor`s to sort by
+     */
     public init<ObjectType: ObjectBase>(_ type: ResultType.Type,
                                         configuration: Realm.Configuration? = nil,
                                         filter: NSPredicate? = nil,
@@ -437,6 +449,19 @@ extension Projection: ObservedResultsValue { }
         self.filter = filter
         self.sortDescriptor = sortDescriptor
     }
+    /**
+     Initialize a `ObservedResults` struct for a given `Object` or `EmbeddedObject` type.
+     - parameter type: Observed type
+     - parameter configuration: The `Realm.Configuration` used when creating the Realm,
+     user's sync configuration for the given partition value will be set as the `syncConfiguration`,
+     if empty the configuration is set to the `defaultConfiguration`
+     - parameter filter: Observations will be made only for passing objects.
+     If no filter given - all objects will be observed
+     - parameter keyPaths: Only properties contained in the key paths array will be observed.
+     If `nil`, notifications will be delivered for any property change on the object.
+     String key paths which do not correspond to a valid a property will throw an exception.
+     - parameter sortDescriptor: A sequence of `SortDescriptor`s to sort by
+     */
     public init(_ type: ResultType.Type,
                 configuration: Realm.Configuration? = nil,
                 filter: NSPredicate? = nil,
