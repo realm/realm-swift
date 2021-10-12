@@ -2,6 +2,8 @@ x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
 * Conform `@ThreadSafe` and `ThreadSafeReference` to `Sendable`.
+* Allow using Swift enums which conform to `PersistableEnum` as the value type
+  for all Realm collections.
 
 ### Fixed
 * Allow `@AutoOpen` to return a realm for any server error on synchronisation.

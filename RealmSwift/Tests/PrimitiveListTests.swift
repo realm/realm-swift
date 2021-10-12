@@ -19,6 +19,8 @@
 import RealmSwift
 import XCTest
 
+// swiftlint:disable identifier_name
+
 class PrimitiveListTestsBase<O: ObjectFactory, V: ListValueFactory>: TestCase {
     var realm: Realm?
     var obj: V.ListRoot!
@@ -440,6 +442,40 @@ func addTests<OF: ObjectFactory>(_ suite: XCTestSuite, _ type: OF.Type) {
     OptionalAddablePrimitiveListTests<OF, Float?>._defaultTestSuite().tests.forEach(suite.addTest)
     OptionalAddablePrimitiveListTests<OF, Double?>._defaultTestSuite().tests.forEach(suite.addTest)
     OptionalAddablePrimitiveListTests<OF, Decimal128?>._defaultTestSuite().tests.forEach(suite.addTest)
+
+    PrimitiveListTests<OF, EnumInt>._defaultTestSuite().tests.forEach(suite.addTest)
+    PrimitiveListTests<OF, EnumInt8>._defaultTestSuite().tests.forEach(suite.addTest)
+    PrimitiveListTests<OF, EnumInt16>._defaultTestSuite().tests.forEach(suite.addTest)
+    PrimitiveListTests<OF, EnumInt32>._defaultTestSuite().tests.forEach(suite.addTest)
+    PrimitiveListTests<OF, EnumInt64>._defaultTestSuite().tests.forEach(suite.addTest)
+    PrimitiveListTests<OF, EnumFloat>._defaultTestSuite().tests.forEach(suite.addTest)
+    PrimitiveListTests<OF, EnumDouble>._defaultTestSuite().tests.forEach(suite.addTest)
+    PrimitiveListTests<OF, EnumString>._defaultTestSuite().tests.forEach(suite.addTest)
+
+    MinMaxPrimitiveListTests<OF, EnumInt>._defaultTestSuite().tests.forEach(suite.addTest)
+    MinMaxPrimitiveListTests<OF, EnumInt8>._defaultTestSuite().tests.forEach(suite.addTest)
+    MinMaxPrimitiveListTests<OF, EnumInt16>._defaultTestSuite().tests.forEach(suite.addTest)
+    MinMaxPrimitiveListTests<OF, EnumInt32>._defaultTestSuite().tests.forEach(suite.addTest)
+    MinMaxPrimitiveListTests<OF, EnumInt64>._defaultTestSuite().tests.forEach(suite.addTest)
+    MinMaxPrimitiveListTests<OF, EnumFloat>._defaultTestSuite().tests.forEach(suite.addTest)
+    MinMaxPrimitiveListTests<OF, EnumDouble>._defaultTestSuite().tests.forEach(suite.addTest)
+
+    PrimitiveListTests<OF, EnumInt?>._defaultTestSuite().tests.forEach(suite.addTest)
+    PrimitiveListTests<OF, EnumInt8?>._defaultTestSuite().tests.forEach(suite.addTest)
+    PrimitiveListTests<OF, EnumInt16?>._defaultTestSuite().tests.forEach(suite.addTest)
+    PrimitiveListTests<OF, EnumInt32?>._defaultTestSuite().tests.forEach(suite.addTest)
+    PrimitiveListTests<OF, EnumInt64?>._defaultTestSuite().tests.forEach(suite.addTest)
+    PrimitiveListTests<OF, EnumFloat?>._defaultTestSuite().tests.forEach(suite.addTest)
+    PrimitiveListTests<OF, EnumDouble?>._defaultTestSuite().tests.forEach(suite.addTest)
+    PrimitiveListTests<OF, EnumString?>._defaultTestSuite().tests.forEach(suite.addTest)
+
+    OptionalMinMaxPrimitiveListTests<OF, EnumInt?>._defaultTestSuite().tests.forEach(suite.addTest)
+    OptionalMinMaxPrimitiveListTests<OF, EnumInt8?>._defaultTestSuite().tests.forEach(suite.addTest)
+    OptionalMinMaxPrimitiveListTests<OF, EnumInt16?>._defaultTestSuite().tests.forEach(suite.addTest)
+    OptionalMinMaxPrimitiveListTests<OF, EnumInt32?>._defaultTestSuite().tests.forEach(suite.addTest)
+    OptionalMinMaxPrimitiveListTests<OF, EnumInt64?>._defaultTestSuite().tests.forEach(suite.addTest)
+    OptionalMinMaxPrimitiveListTests<OF, EnumFloat?>._defaultTestSuite().tests.forEach(suite.addTest)
+    OptionalMinMaxPrimitiveListTests<OF, EnumDouble?>._defaultTestSuite().tests.forEach(suite.addTest)
 }
 
 class UnmanagedPrimitiveListTests: TestCase {
@@ -478,6 +514,24 @@ class ManagedPrimitiveListTests: TestCase {
         OptionalSortablePrimitiveListTests<ManagedObjectFactory, Double?>._defaultTestSuite().tests.forEach(suite.addTest)
         OptionalSortablePrimitiveListTests<ManagedObjectFactory, String?>._defaultTestSuite().tests.forEach(suite.addTest)
         OptionalSortablePrimitiveListTests<ManagedObjectFactory, Date?>._defaultTestSuite().tests.forEach(suite.addTest)
+
+        SortablePrimitiveListTests<ManagedObjectFactory, EnumInt>._defaultTestSuite().tests.forEach(suite.addTest)
+        SortablePrimitiveListTests<ManagedObjectFactory, EnumInt8>._defaultTestSuite().tests.forEach(suite.addTest)
+        SortablePrimitiveListTests<ManagedObjectFactory, EnumInt16>._defaultTestSuite().tests.forEach(suite.addTest)
+        SortablePrimitiveListTests<ManagedObjectFactory, EnumInt32>._defaultTestSuite().tests.forEach(suite.addTest)
+        SortablePrimitiveListTests<ManagedObjectFactory, EnumInt64>._defaultTestSuite().tests.forEach(suite.addTest)
+        SortablePrimitiveListTests<ManagedObjectFactory, EnumFloat>._defaultTestSuite().tests.forEach(suite.addTest)
+        SortablePrimitiveListTests<ManagedObjectFactory, EnumDouble>._defaultTestSuite().tests.forEach(suite.addTest)
+        SortablePrimitiveListTests<ManagedObjectFactory, EnumString>._defaultTestSuite().tests.forEach(suite.addTest)
+
+        OptionalSortablePrimitiveListTests<ManagedObjectFactory, EnumInt?>._defaultTestSuite().tests.forEach(suite.addTest)
+        OptionalSortablePrimitiveListTests<ManagedObjectFactory, EnumInt8?>._defaultTestSuite().tests.forEach(suite.addTest)
+        OptionalSortablePrimitiveListTests<ManagedObjectFactory, EnumInt16?>._defaultTestSuite().tests.forEach(suite.addTest)
+        OptionalSortablePrimitiveListTests<ManagedObjectFactory, EnumInt32?>._defaultTestSuite().tests.forEach(suite.addTest)
+        OptionalSortablePrimitiveListTests<ManagedObjectFactory, EnumInt64?>._defaultTestSuite().tests.forEach(suite.addTest)
+        OptionalSortablePrimitiveListTests<ManagedObjectFactory, EnumFloat?>._defaultTestSuite().tests.forEach(suite.addTest)
+        OptionalSortablePrimitiveListTests<ManagedObjectFactory, EnumDouble?>._defaultTestSuite().tests.forEach(suite.addTest)
+        OptionalSortablePrimitiveListTests<ManagedObjectFactory, EnumString?>._defaultTestSuite().tests.forEach(suite.addTest)
 
         return suite
     }

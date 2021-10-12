@@ -20,7 +20,7 @@ import XCTest
 import Realm
 import RealmSwift
 
-// swiftlint:disable type_name identifier_name cyclomatic_complexity
+// swiftlint:disable identifier_name cyclomatic_complexity
 
 class PrimitiveMapTestsBase<O: ObjectFactory, V: MapValueFactory>: TestCase {
     var realm: Realm?
@@ -79,8 +79,8 @@ class PrimitiveMapTests<O: ObjectFactory, V: MapValueFactory>: PrimitiveMapTests
         let key = values[0].key
         XCTAssertNil(map.value(forKey: key))
         map.setValue(values[0].value, forKey: key)
-        let kvc: AnyObject? = map.value(forKey: key)
-        XCTAssertEqual(kvc as! V, values[0].value)
+        let kvc: AnyObject = map.value(forKey: key)!
+        XCTAssertEqual(dynamicBridgeCast(fromObjectiveC: kvc) as V, values[0].value)
     }
 
     func testInsert() {
@@ -181,7 +181,7 @@ class PrimitiveMapTests<O: ObjectFactory, V: MapValueFactory>: PrimitiveMapTests
     func testObjectForKey() {
         XCTAssertEqual(0, map.count)
         map[values[0].key] = values[0].value
-        XCTAssertEqual(values[0].value, map.object(forKey: values[0].key as AnyObject) as! V)
+        XCTAssertEqual(values[0].value, dynamicBridgeCast(fromObjectiveC: map.object(forKey: values[0].key as AnyObject)!) as V)
     }
 }
 
@@ -369,6 +369,40 @@ func addPrimitiveMapTests<OF: ObjectFactory>(_ suite: XCTestSuite, _ type: OF.Ty
     OptionalAddablePrimitiveMapTests<OF, Float?>._defaultTestSuite().tests.forEach(suite.addTest)
     OptionalAddablePrimitiveMapTests<OF, Double?>._defaultTestSuite().tests.forEach(suite.addTest)
     OptionalAddablePrimitiveMapTests<OF, Decimal128?>._defaultTestSuite().tests.forEach(suite.addTest)
+
+    PrimitiveMapTests<OF, EnumInt>._defaultTestSuite().tests.forEach(suite.addTest)
+    PrimitiveMapTests<OF, EnumInt8>._defaultTestSuite().tests.forEach(suite.addTest)
+    PrimitiveMapTests<OF, EnumInt16>._defaultTestSuite().tests.forEach(suite.addTest)
+    PrimitiveMapTests<OF, EnumInt32>._defaultTestSuite().tests.forEach(suite.addTest)
+    PrimitiveMapTests<OF, EnumInt64>._defaultTestSuite().tests.forEach(suite.addTest)
+    PrimitiveMapTests<OF, EnumFloat>._defaultTestSuite().tests.forEach(suite.addTest)
+    PrimitiveMapTests<OF, EnumDouble>._defaultTestSuite().tests.forEach(suite.addTest)
+    PrimitiveMapTests<OF, EnumString>._defaultTestSuite().tests.forEach(suite.addTest)
+
+    MinMaxPrimitiveMapTests<OF, EnumInt>._defaultTestSuite().tests.forEach(suite.addTest)
+    MinMaxPrimitiveMapTests<OF, EnumInt8>._defaultTestSuite().tests.forEach(suite.addTest)
+    MinMaxPrimitiveMapTests<OF, EnumInt16>._defaultTestSuite().tests.forEach(suite.addTest)
+    MinMaxPrimitiveMapTests<OF, EnumInt32>._defaultTestSuite().tests.forEach(suite.addTest)
+    MinMaxPrimitiveMapTests<OF, EnumInt64>._defaultTestSuite().tests.forEach(suite.addTest)
+    MinMaxPrimitiveMapTests<OF, EnumFloat>._defaultTestSuite().tests.forEach(suite.addTest)
+    MinMaxPrimitiveMapTests<OF, EnumDouble>._defaultTestSuite().tests.forEach(suite.addTest)
+
+    PrimitiveMapTests<OF, EnumInt?>._defaultTestSuite().tests.forEach(suite.addTest)
+    PrimitiveMapTests<OF, EnumInt8?>._defaultTestSuite().tests.forEach(suite.addTest)
+    PrimitiveMapTests<OF, EnumInt16?>._defaultTestSuite().tests.forEach(suite.addTest)
+    PrimitiveMapTests<OF, EnumInt32?>._defaultTestSuite().tests.forEach(suite.addTest)
+    PrimitiveMapTests<OF, EnumInt64?>._defaultTestSuite().tests.forEach(suite.addTest)
+    PrimitiveMapTests<OF, EnumFloat?>._defaultTestSuite().tests.forEach(suite.addTest)
+    PrimitiveMapTests<OF, EnumDouble?>._defaultTestSuite().tests.forEach(suite.addTest)
+    PrimitiveMapTests<OF, EnumString?>._defaultTestSuite().tests.forEach(suite.addTest)
+
+    OptionalMinMaxPrimitiveMapTests<OF, EnumInt?>._defaultTestSuite().tests.forEach(suite.addTest)
+    OptionalMinMaxPrimitiveMapTests<OF, EnumInt8?>._defaultTestSuite().tests.forEach(suite.addTest)
+    OptionalMinMaxPrimitiveMapTests<OF, EnumInt16?>._defaultTestSuite().tests.forEach(suite.addTest)
+    OptionalMinMaxPrimitiveMapTests<OF, EnumInt32?>._defaultTestSuite().tests.forEach(suite.addTest)
+    OptionalMinMaxPrimitiveMapTests<OF, EnumInt64?>._defaultTestSuite().tests.forEach(suite.addTest)
+    OptionalMinMaxPrimitiveMapTests<OF, EnumFloat?>._defaultTestSuite().tests.forEach(suite.addTest)
+    OptionalMinMaxPrimitiveMapTests<OF, EnumDouble?>._defaultTestSuite().tests.forEach(suite.addTest)
 }
 
 class UnmanagedPrimitiveMapTests: TestCase {
@@ -407,6 +441,24 @@ class ManagedPrimitiveMapTests: TestCase {
         OptionalSortablePrimitiveMapTests<ManagedObjectFactory, Double?>._defaultTestSuite().tests.forEach(suite.addTest)
         OptionalSortablePrimitiveMapTests<ManagedObjectFactory, String?>._defaultTestSuite().tests.forEach(suite.addTest)
         OptionalSortablePrimitiveMapTests<ManagedObjectFactory, Date?>._defaultTestSuite().tests.forEach(suite.addTest)
+
+        SortablePrimitiveMapTests<ManagedObjectFactory, EnumInt>._defaultTestSuite().tests.forEach(suite.addTest)
+        SortablePrimitiveMapTests<ManagedObjectFactory, EnumInt8>._defaultTestSuite().tests.forEach(suite.addTest)
+        SortablePrimitiveMapTests<ManagedObjectFactory, EnumInt16>._defaultTestSuite().tests.forEach(suite.addTest)
+        SortablePrimitiveMapTests<ManagedObjectFactory, EnumInt32>._defaultTestSuite().tests.forEach(suite.addTest)
+        SortablePrimitiveMapTests<ManagedObjectFactory, EnumInt64>._defaultTestSuite().tests.forEach(suite.addTest)
+        SortablePrimitiveMapTests<ManagedObjectFactory, EnumFloat>._defaultTestSuite().tests.forEach(suite.addTest)
+        SortablePrimitiveMapTests<ManagedObjectFactory, EnumDouble>._defaultTestSuite().tests.forEach(suite.addTest)
+        SortablePrimitiveMapTests<ManagedObjectFactory, EnumString>._defaultTestSuite().tests.forEach(suite.addTest)
+
+        OptionalSortablePrimitiveMapTests<ManagedObjectFactory, EnumInt?>._defaultTestSuite().tests.forEach(suite.addTest)
+        OptionalSortablePrimitiveMapTests<ManagedObjectFactory, EnumInt8?>._defaultTestSuite().tests.forEach(suite.addTest)
+        OptionalSortablePrimitiveMapTests<ManagedObjectFactory, EnumInt16?>._defaultTestSuite().tests.forEach(suite.addTest)
+        OptionalSortablePrimitiveMapTests<ManagedObjectFactory, EnumInt32?>._defaultTestSuite().tests.forEach(suite.addTest)
+        OptionalSortablePrimitiveMapTests<ManagedObjectFactory, EnumInt64?>._defaultTestSuite().tests.forEach(suite.addTest)
+        OptionalSortablePrimitiveMapTests<ManagedObjectFactory, EnumFloat?>._defaultTestSuite().tests.forEach(suite.addTest)
+        OptionalSortablePrimitiveMapTests<ManagedObjectFactory, EnumDouble?>._defaultTestSuite().tests.forEach(suite.addTest)
+        OptionalSortablePrimitiveMapTests<ManagedObjectFactory, EnumString?>._defaultTestSuite().tests.forEach(suite.addTest)
 
         return suite
     }

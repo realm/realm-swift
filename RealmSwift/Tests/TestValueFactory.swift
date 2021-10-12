@@ -67,6 +67,11 @@ extension ValueFactory {
         return (value as! NSNumber).doubleValue
     }
 }
+extension ValueFactory where Self: PersistableEnum {
+    static func values() -> [Self] {
+        return Array(Self.allCases)
+    }
+}
 
 protocol ListValueFactory: ValueFactory {
     associatedtype ListRoot: Object
@@ -430,4 +435,204 @@ extension UUID: SetValueFactory {
 extension UUID: MapValueFactory {
     static var map: KeyPath<ModernAllTypesObject, Map<String, UUID>> { \.mapUuid }
     static var optMap: KeyPath<ModernAllTypesObject, Map<String, UUID?>> { \.mapOptUuid }
+}
+
+// MARK: - EnumInt
+
+enum EnumInt: Int, PersistableEnum {
+    case value1 = 1
+    case value2 = 2
+    case value3 = 3
+}
+extension EnumInt: ValueFactory {
+    static func values() -> [EnumInt] {
+        return EnumInt.allCases
+    }
+}
+extension EnumInt: ListValueFactory {
+    static var array: KeyPath<ModernCollectionsOfEnums, List<EnumInt>> { \.listInt }
+    static var optArray: KeyPath<ModernCollectionsOfEnums, List<EnumInt?>> { \.listIntOpt }
+}
+extension EnumInt: SetValueFactory {
+    static var mutableSet: KeyPath<ModernCollectionsOfEnums, MutableSet<EnumInt>> { \.setInt }
+    static var optMutableSet: KeyPath<ModernCollectionsOfEnums, MutableSet<EnumInt?>> { \.setIntOpt }
+}
+extension EnumInt: MapValueFactory {
+    static var map: KeyPath<ModernCollectionsOfEnums, Map<String, EnumInt>> { \.mapInt }
+    static var optMap: KeyPath<ModernCollectionsOfEnums, Map<String, EnumInt?>> { \.mapIntOpt }
+}
+
+// MARK: - EnumInt8
+
+enum EnumInt8: Int8, PersistableEnum {
+    case value1 = 1
+    case value2 = 2
+    case value3 = 3
+}
+extension EnumInt8: ValueFactory {
+    static func values() -> [EnumInt8] {
+        return EnumInt8.allCases
+    }
+}
+extension EnumInt8: ListValueFactory {
+    static var array: KeyPath<ModernCollectionsOfEnums, List<EnumInt8>> { \.listInt8 }
+    static var optArray: KeyPath<ModernCollectionsOfEnums, List<EnumInt8?>> { \.listInt8Opt }
+}
+extension EnumInt8: SetValueFactory {
+    static var mutableSet: KeyPath<ModernCollectionsOfEnums, MutableSet<EnumInt8>> { \.setInt8 }
+    static var optMutableSet: KeyPath<ModernCollectionsOfEnums, MutableSet<EnumInt8?>> { \.setInt8Opt }
+}
+extension EnumInt8: MapValueFactory {
+    static var map: KeyPath<ModernCollectionsOfEnums, Map<String, EnumInt8>> { \.mapInt8 }
+    static var optMap: KeyPath<ModernCollectionsOfEnums, Map<String, EnumInt8?>> { \.mapInt8Opt }
+}
+
+// MARK: - EnumInt16
+
+enum EnumInt16: Int16, PersistableEnum {
+    case value1 = 1
+    case value2 = 2
+    case value3 = 3
+}
+extension EnumInt16: ValueFactory {
+    static func values() -> [EnumInt16] {
+        return EnumInt16.allCases
+    }
+}
+extension EnumInt16: ListValueFactory {
+    static var array: KeyPath<ModernCollectionsOfEnums, List<EnumInt16>> { \.listInt16 }
+    static var optArray: KeyPath<ModernCollectionsOfEnums, List<EnumInt16?>> { \.listInt16Opt }
+}
+extension EnumInt16: SetValueFactory {
+    static var mutableSet: KeyPath<ModernCollectionsOfEnums, MutableSet<EnumInt16>> { \.setInt16 }
+    static var optMutableSet: KeyPath<ModernCollectionsOfEnums, MutableSet<EnumInt16?>> { \.setInt16Opt }
+}
+extension EnumInt16: MapValueFactory {
+    static var map: KeyPath<ModernCollectionsOfEnums, Map<String, EnumInt16>> { \.mapInt16 }
+    static var optMap: KeyPath<ModernCollectionsOfEnums, Map<String, EnumInt16?>> { \.mapInt16Opt }
+}
+
+// MARK: - EnumInt32
+
+enum EnumInt32: Int32, PersistableEnum {
+    case value1 = 1
+    case value2 = 2
+    case value3 = 3
+}
+extension EnumInt32: ValueFactory {
+    static func values() -> [EnumInt32] {
+        return EnumInt32.allCases
+    }
+}
+extension EnumInt32: ListValueFactory {
+    static var array: KeyPath<ModernCollectionsOfEnums, List<EnumInt32>> { \.listInt32 }
+    static var optArray: KeyPath<ModernCollectionsOfEnums, List<EnumInt32?>> { \.listInt32Opt }
+}
+extension EnumInt32: SetValueFactory {
+    static var mutableSet: KeyPath<ModernCollectionsOfEnums, MutableSet<EnumInt32>> { \.setInt32 }
+    static var optMutableSet: KeyPath<ModernCollectionsOfEnums, MutableSet<EnumInt32?>> { \.setInt32Opt }
+}
+extension EnumInt32: MapValueFactory {
+    static var map: KeyPath<ModernCollectionsOfEnums, Map<String, EnumInt32>> { \.mapInt32 }
+    static var optMap: KeyPath<ModernCollectionsOfEnums, Map<String, EnumInt32?>> { \.mapInt32Opt }
+}
+
+// MARK: - EnumInt64
+
+enum EnumInt64: Int64, PersistableEnum {
+    case value1 = 1
+    case value2 = 2
+    case value3 = 3
+}
+extension EnumInt64: ValueFactory {
+    static func values() -> [EnumInt64] {
+        return EnumInt64.allCases
+    }
+}
+extension EnumInt64: ListValueFactory {
+    static var array: KeyPath<ModernCollectionsOfEnums, List<EnumInt64>> { \.listInt64 }
+    static var optArray: KeyPath<ModernCollectionsOfEnums, List<EnumInt64?>> { \.listInt64Opt }
+}
+extension EnumInt64: SetValueFactory {
+    static var mutableSet: KeyPath<ModernCollectionsOfEnums, MutableSet<EnumInt64>> { \.setInt64 }
+    static var optMutableSet: KeyPath<ModernCollectionsOfEnums, MutableSet<EnumInt64?>> { \.setInt64Opt }
+}
+extension EnumInt64: MapValueFactory {
+    static var map: KeyPath<ModernCollectionsOfEnums, Map<String, EnumInt64>> { \.mapInt64 }
+    static var optMap: KeyPath<ModernCollectionsOfEnums, Map<String, EnumInt64?>> { \.mapInt64Opt }
+}
+
+// MARK: - EnumFloat
+
+enum EnumFloat: Float, PersistableEnum {
+    case value1 = 1.1
+    case value2 = 2.2
+    case value3 = 3.3
+}
+extension EnumFloat: ValueFactory {
+    static func values() -> [EnumFloat] {
+        return EnumFloat.allCases
+    }
+}
+extension EnumFloat: ListValueFactory {
+    static var array: KeyPath<ModernCollectionsOfEnums, List<EnumFloat>> { \.listFloat }
+    static var optArray: KeyPath<ModernCollectionsOfEnums, List<EnumFloat?>> { \.listFloatOpt }
+}
+extension EnumFloat: SetValueFactory {
+    static var mutableSet: KeyPath<ModernCollectionsOfEnums, MutableSet<EnumFloat>> { \.setFloat }
+    static var optMutableSet: KeyPath<ModernCollectionsOfEnums, MutableSet<EnumFloat?>> { \.setFloatOpt }
+}
+extension EnumFloat: MapValueFactory {
+    static var map: KeyPath<ModernCollectionsOfEnums, Map<String, EnumFloat>> { \.mapFloat }
+    static var optMap: KeyPath<ModernCollectionsOfEnums, Map<String, EnumFloat?>> { \.mapFloatOpt }
+}
+
+// MARK: - EnumDouble
+
+enum EnumDouble: Double, PersistableEnum {
+    case value1 = 1.1
+    case value2 = 2.2
+    case value3 = 3.3
+}
+extension EnumDouble: ValueFactory {
+    static func values() -> [EnumDouble] {
+        return EnumDouble.allCases
+    }
+}
+extension EnumDouble: ListValueFactory {
+    static var array: KeyPath<ModernCollectionsOfEnums, List<EnumDouble>> { \.listDouble }
+    static var optArray: KeyPath<ModernCollectionsOfEnums, List<EnumDouble?>> { \.listDoubleOpt }
+}
+extension EnumDouble: SetValueFactory {
+    static var mutableSet: KeyPath<ModernCollectionsOfEnums, MutableSet<EnumDouble>> { \.setDouble }
+    static var optMutableSet: KeyPath<ModernCollectionsOfEnums, MutableSet<EnumDouble?>> { \.setDoubleOpt }
+}
+extension EnumDouble: MapValueFactory {
+    static var map: KeyPath<ModernCollectionsOfEnums, Map<String, EnumDouble>> { \.mapDouble }
+    static var optMap: KeyPath<ModernCollectionsOfEnums, Map<String, EnumDouble?>> { \.mapDoubleOpt }
+}
+
+// MARK: - EnumString
+
+enum EnumString: String, PersistableEnum {
+    case value1 = "a"
+    case value2 = "b"
+    case value3 = "c"
+}
+extension EnumString: ValueFactory {
+    static func values() -> [EnumString] {
+        return EnumString.allCases
+    }
+}
+extension EnumString: ListValueFactory {
+    static var array: KeyPath<ModernCollectionsOfEnums, List<EnumString>> { \.listString }
+    static var optArray: KeyPath<ModernCollectionsOfEnums, List<EnumString?>> { \.listStringOpt }
+}
+extension EnumString: SetValueFactory {
+    static var mutableSet: KeyPath<ModernCollectionsOfEnums, MutableSet<EnumString>> { \.setString }
+    static var optMutableSet: KeyPath<ModernCollectionsOfEnums, MutableSet<EnumString?>> { \.setStringOpt }
+}
+extension EnumString: MapValueFactory {
+    static var map: KeyPath<ModernCollectionsOfEnums, Map<String, EnumString>> { \.mapString }
+    static var optMap: KeyPath<ModernCollectionsOfEnums, Map<String, EnumString?>> { \.mapStringOpt }
 }

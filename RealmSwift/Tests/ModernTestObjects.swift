@@ -454,3 +454,59 @@ class ModernAllIndexableButNotIndexedObject: Object {
     @Persisted(indexed: false) var optIntEnumCol: ModernIntEnum?
     @Persisted(indexed: false) var optStringEnumCol: ModernStringEnum?
 }
+
+class ModernCollectionsOfEnums: Object {
+    @Persisted var listInt: List<EnumInt>
+    @Persisted var listInt8: List<EnumInt8>
+    @Persisted var listInt16: List<EnumInt16>
+    @Persisted var listInt32: List<EnumInt32>
+    @Persisted var listInt64: List<EnumInt64>
+    @Persisted var listFloat: List<EnumFloat>
+    @Persisted var listDouble: List<EnumDouble>
+    @Persisted var listString: List<EnumString>
+
+    @Persisted var listIntOpt: List<EnumInt?>
+    @Persisted var listInt8Opt: List<EnumInt8?>
+    @Persisted var listInt16Opt: List<EnumInt16?>
+    @Persisted var listInt32Opt: List<EnumInt32?>
+    @Persisted var listInt64Opt: List<EnumInt64?>
+    @Persisted var listFloatOpt: List<EnumFloat?>
+    @Persisted var listDoubleOpt: List<EnumDouble?>
+    @Persisted var listStringOpt: List<EnumString?>
+
+    @Persisted var setInt: MutableSet<EnumInt>
+    @Persisted var setInt8: MutableSet<EnumInt8>
+    @Persisted var setInt16: MutableSet<EnumInt16>
+    @Persisted var setInt32: MutableSet<EnumInt32>
+    @Persisted var setInt64: MutableSet<EnumInt64>
+    @Persisted var setFloat: MutableSet<EnumFloat>
+    @Persisted var setDouble: MutableSet<EnumDouble>
+    @Persisted var setString: MutableSet<EnumString>
+
+    @Persisted var setIntOpt: MutableSet<EnumInt?>
+    @Persisted var setInt8Opt: MutableSet<EnumInt8?>
+    @Persisted var setInt16Opt: MutableSet<EnumInt16?>
+    @Persisted var setInt32Opt: MutableSet<EnumInt32?>
+    @Persisted var setInt64Opt: MutableSet<EnumInt64?>
+    @Persisted var setFloatOpt: MutableSet<EnumFloat?>
+    @Persisted var setDoubleOpt: MutableSet<EnumDouble?>
+    @Persisted var setStringOpt: MutableSet<EnumString?>
+
+    @Persisted var mapInt: Map<String, EnumInt>
+    @Persisted var mapInt8: Map<String, EnumInt8>
+    @Persisted var mapInt16: Map<String, EnumInt16>
+    @Persisted var mapInt32: Map<String, EnumInt32>
+    @Persisted var mapInt64: Map<String, EnumInt64>
+    @Persisted var mapFloat: Map<String, EnumFloat>
+    @Persisted var mapDouble: Map<String, EnumDouble>
+    @Persisted var mapString: Map<String, EnumString>
+
+    @Persisted var mapIntOpt: Map<String, EnumInt?>
+    @Persisted var mapInt8Opt: Map<String, EnumInt8?>
+    @Persisted var mapInt16Opt: Map<String, EnumInt16?>
+    @Persisted var mapInt32Opt: Map<String, EnumInt32?>
+    @Persisted var mapInt64Opt: Map<String, EnumInt64?>
+    @Persisted var mapFloatOpt: Map<String, EnumFloat?>
+    @Persisted var mapDoubleOpt: Map<String, EnumDouble?>
+    @Persisted var mapStringOpt: Map<String, EnumString?>
+}

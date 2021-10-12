@@ -16,10 +16,10 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-// swiftlint:disable identifier_name
-
 import XCTest
 import RealmSwift
+
+// swiftlint:disable identifier_name
 
 class PrimitiveMutableSetTestsBase<O: ObjectFactory, V: SetValueFactory>: TestCase {
     var realm: Realm?
@@ -374,6 +374,40 @@ func addMutableSetTests<OF: ObjectFactory>(_ suite: XCTestSuite, _ type: OF.Type
     OptionalAddablePrimitiveMutableSetTests<OF, Float?>._defaultTestSuite().tests.forEach(suite.addTest)
     OptionalAddablePrimitiveMutableSetTests<OF, Double?>._defaultTestSuite().tests.forEach(suite.addTest)
     OptionalAddablePrimitiveMutableSetTests<OF, Decimal128?>._defaultTestSuite().tests.forEach(suite.addTest)
+
+    PrimitiveMutableSetTests<OF, EnumInt>._defaultTestSuite().tests.forEach(suite.addTest)
+    PrimitiveMutableSetTests<OF, EnumInt8>._defaultTestSuite().tests.forEach(suite.addTest)
+    PrimitiveMutableSetTests<OF, EnumInt16>._defaultTestSuite().tests.forEach(suite.addTest)
+    PrimitiveMutableSetTests<OF, EnumInt32>._defaultTestSuite().tests.forEach(suite.addTest)
+    PrimitiveMutableSetTests<OF, EnumInt64>._defaultTestSuite().tests.forEach(suite.addTest)
+    PrimitiveMutableSetTests<OF, EnumFloat>._defaultTestSuite().tests.forEach(suite.addTest)
+    PrimitiveMutableSetTests<OF, EnumDouble>._defaultTestSuite().tests.forEach(suite.addTest)
+    PrimitiveMutableSetTests<OF, EnumString>._defaultTestSuite().tests.forEach(suite.addTest)
+
+    MinMaxPrimitiveMutableSetTests<OF, EnumInt>._defaultTestSuite().tests.forEach(suite.addTest)
+    MinMaxPrimitiveMutableSetTests<OF, EnumInt8>._defaultTestSuite().tests.forEach(suite.addTest)
+    MinMaxPrimitiveMutableSetTests<OF, EnumInt16>._defaultTestSuite().tests.forEach(suite.addTest)
+    MinMaxPrimitiveMutableSetTests<OF, EnumInt32>._defaultTestSuite().tests.forEach(suite.addTest)
+    MinMaxPrimitiveMutableSetTests<OF, EnumInt64>._defaultTestSuite().tests.forEach(suite.addTest)
+    MinMaxPrimitiveMutableSetTests<OF, EnumFloat>._defaultTestSuite().tests.forEach(suite.addTest)
+    MinMaxPrimitiveMutableSetTests<OF, EnumDouble>._defaultTestSuite().tests.forEach(suite.addTest)
+
+    PrimitiveMutableSetTests<OF, EnumInt?>._defaultTestSuite().tests.forEach(suite.addTest)
+    PrimitiveMutableSetTests<OF, EnumInt8?>._defaultTestSuite().tests.forEach(suite.addTest)
+    PrimitiveMutableSetTests<OF, EnumInt16?>._defaultTestSuite().tests.forEach(suite.addTest)
+    PrimitiveMutableSetTests<OF, EnumInt32?>._defaultTestSuite().tests.forEach(suite.addTest)
+    PrimitiveMutableSetTests<OF, EnumInt64?>._defaultTestSuite().tests.forEach(suite.addTest)
+    PrimitiveMutableSetTests<OF, EnumFloat?>._defaultTestSuite().tests.forEach(suite.addTest)
+    PrimitiveMutableSetTests<OF, EnumDouble?>._defaultTestSuite().tests.forEach(suite.addTest)
+    PrimitiveMutableSetTests<OF, EnumString?>._defaultTestSuite().tests.forEach(suite.addTest)
+
+    OptionalMinMaxPrimitiveMutableSetTests<OF, EnumInt?>._defaultTestSuite().tests.forEach(suite.addTest)
+    OptionalMinMaxPrimitiveMutableSetTests<OF, EnumInt8?>._defaultTestSuite().tests.forEach(suite.addTest)
+    OptionalMinMaxPrimitiveMutableSetTests<OF, EnumInt16?>._defaultTestSuite().tests.forEach(suite.addTest)
+    OptionalMinMaxPrimitiveMutableSetTests<OF, EnumInt32?>._defaultTestSuite().tests.forEach(suite.addTest)
+    OptionalMinMaxPrimitiveMutableSetTests<OF, EnumInt64?>._defaultTestSuite().tests.forEach(suite.addTest)
+    OptionalMinMaxPrimitiveMutableSetTests<OF, EnumFloat?>._defaultTestSuite().tests.forEach(suite.addTest)
+    OptionalMinMaxPrimitiveMutableSetTests<OF, EnumDouble?>._defaultTestSuite().tests.forEach(suite.addTest)
 }
 
 class UnmanagedPrimitiveMutableSetTests: TestCase {
@@ -412,6 +446,24 @@ class ManagedPrimitiveMutableSetTests: TestCase {
         OptionalSortablePrimitiveMutableSetTests<ManagedObjectFactory, Double?>._defaultTestSuite().tests.forEach(suite.addTest)
         OptionalSortablePrimitiveMutableSetTests<ManagedObjectFactory, String?>._defaultTestSuite().tests.forEach(suite.addTest)
         OptionalSortablePrimitiveMutableSetTests<ManagedObjectFactory, Date?>._defaultTestSuite().tests.forEach(suite.addTest)
+
+        SortablePrimitiveMutableSetTests<ManagedObjectFactory, EnumInt>._defaultTestSuite().tests.forEach(suite.addTest)
+        SortablePrimitiveMutableSetTests<ManagedObjectFactory, EnumInt8>._defaultTestSuite().tests.forEach(suite.addTest)
+        SortablePrimitiveMutableSetTests<ManagedObjectFactory, EnumInt16>._defaultTestSuite().tests.forEach(suite.addTest)
+        SortablePrimitiveMutableSetTests<ManagedObjectFactory, EnumInt32>._defaultTestSuite().tests.forEach(suite.addTest)
+        SortablePrimitiveMutableSetTests<ManagedObjectFactory, EnumInt64>._defaultTestSuite().tests.forEach(suite.addTest)
+        SortablePrimitiveMutableSetTests<ManagedObjectFactory, EnumFloat>._defaultTestSuite().tests.forEach(suite.addTest)
+        SortablePrimitiveMutableSetTests<ManagedObjectFactory, EnumDouble>._defaultTestSuite().tests.forEach(suite.addTest)
+        SortablePrimitiveMutableSetTests<ManagedObjectFactory, EnumString>._defaultTestSuite().tests.forEach(suite.addTest)
+
+        OptionalSortablePrimitiveMutableSetTests<ManagedObjectFactory, EnumInt?>._defaultTestSuite().tests.forEach(suite.addTest)
+        OptionalSortablePrimitiveMutableSetTests<ManagedObjectFactory, EnumInt8?>._defaultTestSuite().tests.forEach(suite.addTest)
+        OptionalSortablePrimitiveMutableSetTests<ManagedObjectFactory, EnumInt16?>._defaultTestSuite().tests.forEach(suite.addTest)
+        OptionalSortablePrimitiveMutableSetTests<ManagedObjectFactory, EnumInt32?>._defaultTestSuite().tests.forEach(suite.addTest)
+        OptionalSortablePrimitiveMutableSetTests<ManagedObjectFactory, EnumInt64?>._defaultTestSuite().tests.forEach(suite.addTest)
+        OptionalSortablePrimitiveMutableSetTests<ManagedObjectFactory, EnumFloat?>._defaultTestSuite().tests.forEach(suite.addTest)
+        OptionalSortablePrimitiveMutableSetTests<ManagedObjectFactory, EnumDouble?>._defaultTestSuite().tests.forEach(suite.addTest)
+        OptionalSortablePrimitiveMutableSetTests<ManagedObjectFactory, EnumString?>._defaultTestSuite().tests.forEach(suite.addTest)
 
         return suite
     }
