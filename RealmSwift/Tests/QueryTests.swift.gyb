@@ -283,6 +283,10 @@ class QueryTests: TestCase {
         for (e1, e2) in zip(constructedQuery.1, values) {
             if let e1 = e1 as? Object, let e2 = e2 as? Object {
                 assertEqual(e1, e2)
+            } else if let r1 = e1 as? Results<ModernAllTypesObject>, let r2 = e2 as? [ModernAllTypesObject] {
+                for (o1, o2) in zip(r1, r2) {
+                    assertEqual(o1, o2)
+                }
             } else {
                 XCTAssertEqual(e1 as! AnyHashable, e2)
             }
