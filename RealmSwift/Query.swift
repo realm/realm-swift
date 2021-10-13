@@ -137,7 +137,7 @@ public struct Query<T: _RealmSchemaDiscoverable> {
             } else if isCollection {
                 flags.insert(.finalIsCollection)
             }
-            
+
             return .keyPath(kp + [keyPath], collection: flags)
         } else if case let .mapSubscript(lhs, mapKeyPath, requiresNot) = node, case let .keyPath(kp, c) = mapKeyPath {
             return .mapSubscript(lhs, collectionKeyPath: .keyPath(kp + [keyPath], collection: c),
@@ -834,7 +834,7 @@ private func buildPredicate(_ root: QueryNode, subqueryCount: Int = 0) -> (Strin
         formatStr.append("}")
     }
 
-    func strOptions(_ options: StringOptions) -> String{
+    func strOptions(_ options: StringOptions) -> String {
         if options == [] {
             return ""
         }
