@@ -204,8 +204,8 @@ static RLMSyncConnectionState convertConnectionState(SyncSession::ConnectionStat
     if (auto session = _session.lock()) {
         dispatch_queue_t queue = RLMSyncSession.notificationsQueue;
         auto notifier_direction = (direction == RLMSyncProgressDirectionUpload
-                                   ? SyncSession::NotifierType::upload
-                                   : SyncSession::NotifierType::download);
+                                   ? realm::_impl::SyncProgressNotifier::NotifierType::upload
+                                   : realm::_impl::SyncProgressNotifier::NotifierType::download);
         bool is_streaming = (mode == RLMSyncProgressModeReportIndefinitely);
         uint64_t token = session->register_progress_notifier([=](uint64_t transferred, uint64_t transferrable) {
             dispatch_async(queue, ^{

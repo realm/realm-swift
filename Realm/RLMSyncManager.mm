@@ -78,13 +78,11 @@ struct CocoaSyncLogger : public realm::util::RootLogger {
     }
 };
 
-struct CocoaSyncLoggerFactory : public realm::SyncLoggerFactory {
-    std::unique_ptr<realm::util::Logger> make_logger(realm::util::Logger::Level level) override {
-        auto logger = std::make_unique<CocoaSyncLogger>();
-        logger->set_level_threshold(level);
-        return std::move(logger);
-    }
-} s_syncLoggerFactory;
+std::unique_ptr<realm::util::Logger> make_logger(realm::util::Logger::Level level) {
+    auto logger = std::make_unique<CocoaSyncLogger>();
+    logger->set_level_threshold(level);
+    return std::move(logger);
+}
 
 struct CallbackLogger : public realm::util::RootLogger {
     RLMSyncLogFunction logFn;
@@ -94,9 +92,10 @@ struct CallbackLogger : public realm::util::RootLogger {
         }
     }
 };
-struct CallbackLoggerFactory : public realm::SyncLoggerFactory {
+
+struct CallbackLoggerFactory {
     RLMSyncLogFunction logFn;
-    std::unique_ptr<realm::util::Logger> make_logger(realm::util::Logger::Level level) override {
+    std::unique_ptr<realm::util::Logger> make_logger(realm::util::Logger::Level level) {
         auto logger = std::make_unique<CallbackLogger>();
         logger->logFn = logFn;
         logger->set_level_threshold(level);
@@ -133,7 +132,7 @@ struct CallbackLoggerFactory : public realm::SyncLoggerFactory {
 + (SyncClientConfig)configurationWithRootDirectory:(NSURL *)rootDirectory appId:(NSString *)appId {
     SyncClientConfig config;
     bool should_encrypt = !getenv("REALM_DISABLE_METADATA_ENCRYPTION") && !RLMIsRunningInPlayground();
-    config.logger_factory = &s_syncLoggerFactory;
+    config.logger_factory = make_logger;
     config.metadata_mode = should_encrypt ? SyncManager::MetadataMode::Encryption
                                           : SyncManager::MetadataMode::NoEncryption;
     @autoreleasepool {
@@ -184,12 +183,13 @@ struct CallbackLoggerFactory : public realm::SyncLoggerFactory {
 - (void)setLogger:(RLMSyncLogFunction)logFn {
     _logger = logFn;
     if (_logger) {
-        _loggerFactory = std::make_unique<CallbackLoggerFactory>(logFn);
-        _syncManager->set_logger_factory(*_loggerFactory);
+        _syncManager->set_logger_factory([logFn](auto log_level){
+            return CallbackLoggerFactory(logFn).make_logger(log_level);
+        });
     }
     else {
         _loggerFactory = nullptr;
-        _syncManager->set_logger_factory(s_syncLoggerFactory);
+        _syncManager->set_logger_factory(make_logger);
     }
 }
 

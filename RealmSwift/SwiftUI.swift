@@ -349,7 +349,7 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
 /// the environment value `EnvironmentValues/realmConfiguration`.
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 @propertyWrapper public struct ObservedResults<ResultType>: DynamicProperty, BoundCollection where ResultType: Object & Identifiable {
-    private class Storage: ObservableStorage<Results<ResultType>> {
+    fileprivate class Storage: ObservableStorage<Results<ResultType>> {
         var setupHasRun = false
 
         private func didSet() {
@@ -391,7 +391,7 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
     }
 
     @Environment(\.realmConfiguration) var configuration
-    @ObservedObject private var storage: Storage
+    @ObservedObject fileprivate var storage: Storage
     /// :nodoc:
     @State public var filter: NSPredicate? {
         willSet {
@@ -1118,6 +1118,7 @@ extension SwiftUIKVO {
         }
     }
 }
+
 #else
 @objc(RLMSwiftUIKVO) internal final class SwiftUIKVO: NSObject {
     @objc(removeObserversFromObject:) public static func removeObservers(object: NSObject) -> Bool {

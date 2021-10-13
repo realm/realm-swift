@@ -152,18 +152,14 @@ namespace {
 }
 
 - (id<RLMNetworkTransport>)transport {
-    return static_cast<CocoaNetworkTransport*>(_config.transport_generator().get())->transport();
+    return static_cast<CocoaNetworkTransport*>(_config.transport.get())->transport();
 }
 
 - (void)setTransport:(id<RLMNetworkTransport>)transport {
     if (transport) {
-        _config.transport_generator = [transport]{
-            return std::make_unique<CocoaNetworkTransport>(transport);
-        };
+        _config.transport = std::make_unique<CocoaNetworkTransport>(transport);
     } else {
-        _config.transport_generator = []{
-            return std::make_unique<CocoaNetworkTransport>([RLMNetworkTransport new]);
-        };
+        _config.transport = std::make_unique<CocoaNetworkTransport>([RLMNetworkTransport new]);
     }
 }
 
