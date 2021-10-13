@@ -237,6 +237,8 @@ public struct Query<T: _RealmSchemaDiscoverable> {
 
     // MARK: Query Construction
 
+    /// Constructs an NSPredicate compatibe string with its accompanying arguments.
+    /// - Note: This is for internal use only and is exposed for testing purposes.
     public func _constructPredicate() -> (String, [Any]) {
         return buildPredicate(node)
     }
