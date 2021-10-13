@@ -18,6 +18,29 @@
 import Foundation
 import Realm
 
+/// Enum representing an option for `String` queries.
+public struct StringOptions: OptionSet {
+    /// :nodoc:
+    public let rawValue: Int8
+    /// :nodoc:
+    public init(rawValue: Int8) {
+        self.rawValue = rawValue
+    }
+    /// A case-insensitive search.
+    public static let caseInsensitive = StringOptions(rawValue: 1)
+    /// Query ignores diacritic marks.
+    public static let diacriticInsensitive = StringOptions(rawValue: 2)
+}
+
+private struct CollectionFlags: OptionSet {
+    public let rawValue: Int8
+    public init(rawValue: Int8) {
+        self.rawValue = rawValue
+    }
+    static let rootIsCollection = CollectionFlags(rawValue: 1)
+    static let finalIsCollection = CollectionFlags(rawValue: 1)
+}
+
 /**
  `Query` is a class used to create type-safe query predicates.
 
@@ -86,28 +109,6 @@ import Realm
  - Subquery `($0.fooList.intCol >= 5).count > n`
 
  */
-
-/// Enum representing an option for `String` queries.
-public struct StringOptions: OptionSet {
-    public let rawValue: Int8
-    public init(rawValue: Int8) {
-        self.rawValue = rawValue
-    }
-    /// A case-insensitive search.
-    public static let caseInsensitive = StringOptions(rawValue: 1)
-    /// Search ignores diacritic marks.
-    public static let diacriticInsensitive = StringOptions(rawValue: 2)
-}
-
-private struct CollectionFlags: OptionSet {
-    public let rawValue: Int8
-    public init(rawValue: Int8) {
-        self.rawValue = rawValue
-    }
-    static let rootIsCollection = CollectionFlags(rawValue: 1)
-    static let finalIsCollection = CollectionFlags(rawValue: 1)
-}
-
 @dynamicMemberLookup
 public struct Query<T: _RealmSchemaDiscoverable> {
 
@@ -776,7 +777,7 @@ extension Optional: _QueryBinary where Wrapped: _QueryBinary { }
 
 // MARK: QueryNode -
 
-private indirect enum QueryNode {
+fileprivate indirect enum QueryNode {
     case any(_ child: QueryNode)
     case constant(_ value: Any?)
 
@@ -804,7 +805,7 @@ private indirect enum QueryNode {
     case mapSubscript(_ lhs: QueryNode, collectionKeyPath: QueryNode, requiresNot: Bool)
 }
 
-private func buildPredicate(_ root: QueryNode, subqueryCount: Int = 0) -> (String, [Any]) {
+fileprivate func buildPredicate(_ root: QueryNode, subqueryCount: Int = 0) -> (String, [Any]) {
     let formatStr = NSMutableString()
     let arguments = NSMutableArray()
     var subqueryCounter = subqueryCount
@@ -908,7 +909,7 @@ private func buildPredicate(_ root: QueryNode, subqueryCount: Int = 0) -> (Strin
     return (formatStr as String, (arguments as! [Any]))
 }
 
-struct SubqueryRewriter {
+fileprivate struct SubqueryRewriter {
     private var collectionName: String?
     private var counter: Int
     private mutating func rewrite(_ node: QueryNode) -> QueryNode {
