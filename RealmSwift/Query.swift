@@ -805,7 +805,7 @@ fileprivate indirect enum QueryNode {
     case mapSubscript(_ lhs: QueryNode, collectionKeyPath: QueryNode, requiresNot: Bool)
 }
 
-fileprivate func buildPredicate(_ root: QueryNode, subqueryCount: Int = 0) -> (String, [Any]) {
+private func buildPredicate(_ root: QueryNode, subqueryCount: Int = 0) -> (String, [Any]) {
     let formatStr = NSMutableString()
     let arguments = NSMutableArray()
     var subqueryCounter = subqueryCount
@@ -909,7 +909,7 @@ fileprivate func buildPredicate(_ root: QueryNode, subqueryCount: Int = 0) -> (S
     return (formatStr as String, (arguments as! [Any]))
 }
 
-fileprivate struct SubqueryRewriter {
+private struct SubqueryRewriter {
     private var collectionName: String?
     private var counter: Int
     private mutating func rewrite(_ node: QueryNode) -> QueryNode {
