@@ -104,12 +104,7 @@ private struct ProjectedMetadata {
     let label: String
 }
 
-private struct ProjectionMetadata {
-    let propertyMetadatas: [ProjectedMetadata]
-    let mirror: Mirror
-}
-
-private var schema = [ObjectIdentifier: ProjectionMetadata]()
+private var schema = [ObjectIdentifier: [ProjectedMetadata]]()
 
 // MARK: ProjectionOservable
 /**
@@ -136,10 +131,9 @@ extension ObjectChange {
         case .change(let object, let objectPropertyChanges):
             let newProjection = T(projecting: object)
             let projectedPropertyChanges: [PropertyChange] = objectPropertyChanges.map { propChange in
-                let metadata = schema
                 // read the metadata for the property whose origin name matches
                 // the changed property's name
-                let propertyMetadata = metadata.propertyMetadatas.first(where: {
+                let propertyMetadata = schema.first(where: {
                     $0.originPropertyKeyPathString == propChange.name
                 })!
                 var change: (name: String?, oldValue: Any?, newValue: Any?) = (nil, nil, nil)
@@ -291,9 +285,9 @@ extension ProjectionObservable {
                         _ block: @escaping (ObjectChange<Self>) -> Void) -> NotificationToken {
         let kps: [String]
         if keyPaths.isEmpty {
-            kps = _schema.propertyMetadatas.map(\.originPropertyKeyPathString)
+            kps = _schema.map(\.originPropertyKeyPathString)
         } else {
-            kps = _schema.propertyMetadatas.filter { keyPaths.contains($0.originPropertyKeyPathString) }.map(\.originPropertyKeyPathString)
+            kps = _schema.filter { keyPaths.contains($0.originPropertyKeyPathString) }.map(\.originPropertyKeyPathString)
         }
         return rootObject._observe(keyPaths: kps,
                                    on: queue, { change in
@@ -383,7 +377,7 @@ extension ProjectionObservable {
                         _ block: @escaping (ObjectChange<Self>) -> Void) -> NotificationToken {
         let kps: [String]
         if keyPaths.isEmpty {
-            kps = _schema.propertyMetadatas.map(\.originPropertyKeyPathString)
+            kps = _schema.map(\.originPropertyKeyPathString)
         } else {
             let emptyRoot = Root()
             emptyRoot.lastAccessedNames = NSMutableArray()
@@ -400,7 +394,7 @@ extension ProjectionObservable {
         })
     }
 
-    fileprivate var _schema: ProjectionMetadata {
+    fileprivate var _schema: [ProjectedMetadata] {
         if schema[ObjectIdentifier(Self.self)] == nil {
             let mirror = Mirror(reflecting: self)
             let metadatas: [ProjectedMetadata] = mirror.children.compactMap { child in
@@ -411,8 +405,7 @@ extension ProjectionObservable {
                                          originPropertyKeyPathString: _name(for: projected.projectedKeyPath as! PartialKeyPath<Root>),
                                          label: child.label!)
             }
-            schema[ObjectIdentifier(Self.self)] = ProjectionMetadata(propertyMetadatas: metadatas,
-                                                                     mirror: mirror)
+            schema[ObjectIdentifier(Self.self)] = metadatas
         }
         return schema[ObjectIdentifier(Self.self)]!
     }
@@ -557,7 +550,7 @@ extension Projection {
     /// :nodoc:
     open var description: String {
         return "\(type(of: self))<\(type(of: rootObject))> <\(Unmanaged.passUnretained(self).toOpaque())> {\n" +
-        "\(_schema.propertyMetadatas.map({"\t@Projected(\\\(type(of: rootObject)).\($0.originPropertyKeyPathString)) -> \(String($0.label.dropFirst())): \(String(describing: rootObject[keyPath: $0.projectedKeyPath]!))"}).joined(separator: "\n"))\n" +
+        "\(_schema.map({"\t@Projected(\\\(type(of: rootObject)).\($0.originPropertyKeyPathString)) -> \(String($0.label.dropFirst())): \(String(describing: rootObject[keyPath: $0.projectedKeyPath]!))"}).joined(separator: "\n"))\n" +
         "\n\trootObject: \(rootObject)\n" +
         "}"
     }

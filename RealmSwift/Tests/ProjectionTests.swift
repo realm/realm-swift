@@ -1630,9 +1630,8 @@ class ProjectionTests: TestCase {
     func testMutateFrozenObject() {
         let projection = simpleProjection()
         let frozen = projection.freeze()
-        let realm = frozen.realm!
-        assertThrows(try! realm.write { }, "Can't perform transactions on a frozen Realm")
-        assertThrows(frozen.int = 1)
+        XCTAssertTrue(frozen.isFrozen)
+        assertThrows(try! frozen.realm!.write { }, "Can't perform transactions on a frozen Realm")
     }
 
     func testObserveFrozenObject() {
@@ -1669,7 +1668,7 @@ class ProjectionTests: TestCase {
     func testThaw() {
         let frozen = simpleProjection().freeze()
         XCTAssertTrue(frozen.isFrozen)
-        var live = frozen.thaw()!
+        let live = frozen.thaw()!
         XCTAssertFalse(live.isFrozen)
         try! live.realm!.write {
             live.int = 2
@@ -1691,7 +1690,7 @@ class ProjectionTests: TestCase {
     }
 
     func testThawPreviousVersion() {
-        var projection = simpleProjection()
+        let projection = simpleProjection()
         let frozen = projection.freeze()
 
         XCTAssertTrue(frozen.isFrozen)
