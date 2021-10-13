@@ -316,7 +316,7 @@ public protocol RealmCollection: RealmCollectionBase {
 
      - Usage:
      ```
-     obj.index(matching: { $0.fooCol == 7 && $0.fooCol < 456 })
+     obj.index(matching: { $0.fooCol < 456 })
      ```
 
      - parameter queryFn: The query closure to use to filter the objects.
@@ -1274,7 +1274,7 @@ public struct AnyRealmCollection<Element: RealmCollectionValue>: RealmCollection
 
      - Usage:
      ```
-     obj.index(matching: { $0.fooCol == 7 && $0.fooCol < 456 })
+     obj.index(matching: { $0.fooCol < 456 })
      ```
 
      - parameter queryFn: The query closure with which to filter the objects.

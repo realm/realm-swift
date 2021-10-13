@@ -32,15 +32,6 @@ public struct StringOptions: OptionSet {
     public static let diacriticInsensitive = StringOptions(rawValue: 2)
 }
 
-private struct CollectionFlags: OptionSet {
-    public let rawValue: Int8
-    public init(rawValue: Int8) {
-        self.rawValue = rawValue
-    }
-    static let rootIsCollection = CollectionFlags(rawValue: 1)
-    static let finalIsCollection = CollectionFlags(rawValue: 1)
-}
-
 /**
  `Query` is a class used to create type-safe query predicates.
 
@@ -777,6 +768,15 @@ extension Data: _QueryBinary { }
 extension Optional: _QueryBinary where Wrapped: _QueryBinary { }
 
 // MARK: QueryNode -
+
+private struct CollectionFlags: OptionSet {
+    public let rawValue: Int8
+    public init(rawValue: Int8) {
+        self.rawValue = rawValue
+    }
+    static let rootIsCollection = CollectionFlags(rawValue: 1)
+    static let finalIsCollection = CollectionFlags(rawValue: 1)
+}
 
 fileprivate indirect enum QueryNode {
     case any(_ child: QueryNode)

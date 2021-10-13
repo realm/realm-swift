@@ -142,7 +142,7 @@ extension AnyRealmValue: AddableType {}
 
      - Usage:
      ```
-     obj.index(matching: { $0.fooCol == 7 && $0.fooCol < 456 })
+     obj.index(matching: { $0.fooCol < 456 })
      ```
 
      - parameter queryFn: The query closure with which to filter the objects.
