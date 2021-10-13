@@ -111,7 +111,8 @@ private struct CollectionFlags: OptionSet {
  */
 @dynamicMemberLookup
 public struct Query<T: _RealmSchemaDiscoverable> {
-
+    /// This initaliser should be used from callers who require queries on primitive collections.
+    /// - Parameter isPrimitive: True if performing a query on a primitive collection.
     public init(isPrimitive: Bool = false) {
         if isPrimitive {
             node = .keyPath(["self"], collection: [.rootIsCollection, .finalIsCollection])
@@ -120,7 +121,7 @@ public struct Query<T: _RealmSchemaDiscoverable> {
         }
     }
 
-    fileprivate let node: QueryNode
+    private let node: QueryNode
 
     private init(_ node: QueryNode) {
         self.node = node
