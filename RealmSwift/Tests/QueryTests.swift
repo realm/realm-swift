@@ -553,65 +553,66 @@ class QueryTests: TestCase {
     }
 
     func testEqualAnyRealmValue() {
-
-        setAnyRealmValueCol(with: AnyRealmValue.none, object: objects()[0])
-        assertQuery(predicate: "anyCol == %@", values: [NSNull()], expectedCount: 1) {
-            $0.anyCol == .none
+        var value: AnyRealmValue = .none
+        value = AnyRealmValue.none
+        setAnyRealmValueCol(with: value, object: objects()[0])
+        assertQuery(predicate: "anyCol == %@", values: [value], expectedCount: 1) {
+            $0.anyCol == value
         }
-
-        setAnyRealmValueCol(with: AnyRealmValue.int(123), object: objects()[0])
-        assertQuery(predicate: "anyCol == %@", values: [123], expectedCount: 1) {
-            $0.anyCol == .int(123)
+        value = AnyRealmValue.int(123)
+        setAnyRealmValueCol(with: value, object: objects()[0])
+        assertQuery(predicate: "anyCol == %@", values: [value], expectedCount: 1) {
+            $0.anyCol == value
         }
-
-        setAnyRealmValueCol(with: AnyRealmValue.bool(true), object: objects()[0])
-        assertQuery(predicate: "anyCol == %@", values: [true], expectedCount: 1) {
-            $0.anyCol == .bool(true)
+        value = AnyRealmValue.bool(true)
+        setAnyRealmValueCol(with: value, object: objects()[0])
+        assertQuery(predicate: "anyCol == %@", values: [value], expectedCount: 1) {
+            $0.anyCol == value
         }
-
-        setAnyRealmValueCol(with: AnyRealmValue.float(123.456), object: objects()[0])
-        assertQuery(predicate: "anyCol == %@", values: [Float(123.456)], expectedCount: 1) {
-            $0.anyCol == .float(123.456)
+        value = AnyRealmValue.float(123.456)
+        setAnyRealmValueCol(with: value, object: objects()[0])
+        assertQuery(predicate: "anyCol == %@", values: [value], expectedCount: 1) {
+            $0.anyCol == value
         }
-
-        setAnyRealmValueCol(with: AnyRealmValue.double(123.456), object: objects()[0])
-        assertQuery(predicate: "anyCol == %@", values: [123.456], expectedCount: 1) {
-            $0.anyCol == .double(123.456)
+        value = AnyRealmValue.double(123.456)
+        setAnyRealmValueCol(with: value, object: objects()[0])
+        assertQuery(predicate: "anyCol == %@", values: [value], expectedCount: 1) {
+            $0.anyCol == value
         }
-
-        setAnyRealmValueCol(with: AnyRealmValue.string("FooBar"), object: objects()[0])
-        assertQuery(predicate: "anyCol == %@", values: ["FooBar"], expectedCount: 1) {
-            $0.anyCol == .string("FooBar")
+        value = AnyRealmValue.string("FooBar")
+        setAnyRealmValueCol(with: value, object: objects()[0])
+        assertQuery(predicate: "anyCol == %@", values: [value], expectedCount: 1) {
+            $0.anyCol == value
         }
-
-        setAnyRealmValueCol(with: AnyRealmValue.data(Data(count: 64)), object: objects()[0])
-        assertQuery(predicate: "anyCol == %@", values: [Data(count: 64)], expectedCount: 1) {
-            $0.anyCol == .data(Data(count: 64))
+        value = AnyRealmValue.data(Data(count: 64))
+        setAnyRealmValueCol(with: value, object: objects()[0])
+        assertQuery(predicate: "anyCol == %@", values: [value], expectedCount: 1) {
+            $0.anyCol == value
         }
-
-        setAnyRealmValueCol(with: AnyRealmValue.date(Date(timeIntervalSince1970: 1000000)), object: objects()[0])
-        assertQuery(predicate: "anyCol == %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
-            $0.anyCol == .date(Date(timeIntervalSince1970: 1000000))
+        value = AnyRealmValue.date(Date(timeIntervalSince1970: 1000000))
+        setAnyRealmValueCol(with: value, object: objects()[0])
+        assertQuery(predicate: "anyCol == %@", values: [value], expectedCount: 1) {
+            $0.anyCol == value
         }
-
-        setAnyRealmValueCol(with: AnyRealmValue.object(circleObject), object: objects()[0])
-        assertQuery(predicate: "anyCol == %@", values: [circleObject], expectedCount: 1) {
-            $0.anyCol == .object(circleObject)
+        value = AnyRealmValue.object(circleObject)
+        setAnyRealmValueCol(with: value, object: objects()[0])
+        assertQuery(predicate: "anyCol == %@", values: [value], expectedCount: 1) {
+            $0.anyCol == value
         }
-
-        setAnyRealmValueCol(with: AnyRealmValue.objectId(ObjectId("61184062c1d8f096a3695046")), object: objects()[0])
-        assertQuery(predicate: "anyCol == %@", values: [ObjectId("61184062c1d8f096a3695046")], expectedCount: 1) {
-            $0.anyCol == .objectId(ObjectId("61184062c1d8f096a3695046"))
+        value = AnyRealmValue.objectId(ObjectId("61184062c1d8f096a3695046"))
+        setAnyRealmValueCol(with: value, object: objects()[0])
+        assertQuery(predicate: "anyCol == %@", values: [value], expectedCount: 1) {
+            $0.anyCol == value
         }
-
-        setAnyRealmValueCol(with: AnyRealmValue.decimal128(123.456), object: objects()[0])
-        assertQuery(predicate: "anyCol == %@", values: [Decimal128(123.456)], expectedCount: 1) {
-            $0.anyCol == .decimal128(123.456)
+        value = AnyRealmValue.decimal128(123.456)
+        setAnyRealmValueCol(with: value, object: objects()[0])
+        assertQuery(predicate: "anyCol == %@", values: [value], expectedCount: 1) {
+            $0.anyCol == value
         }
-
-        setAnyRealmValueCol(with: AnyRealmValue.uuid(UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!), object: objects()[0])
-        assertQuery(predicate: "anyCol == %@", values: [UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!], expectedCount: 1) {
-            $0.anyCol == .uuid(UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!)
+        value = AnyRealmValue.uuid(UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!)
+        setAnyRealmValueCol(with: value, object: objects()[0])
+        assertQuery(predicate: "anyCol == %@", values: [value], expectedCount: 1) {
+            $0.anyCol == value
         }
     }
 
@@ -899,53 +900,66 @@ class QueryTests: TestCase {
     }
 
     func testNotEqualAnyRealmValue() {
-        setAnyRealmValueCol(with: AnyRealmValue.none, object: objects()[0])
-        assertQuery(predicate: "anyCol != %@", values: [NSNull()], expectedCount: 0) {
-            $0.anyCol != .none
+        var value: AnyRealmValue = .none
+        value = AnyRealmValue.none
+        setAnyRealmValueCol(with: value, object: objects()[0])
+        assertQuery(predicate: "anyCol != %@", values: [value], expectedCount: 0) {
+            $0.anyCol != value
         }
-        setAnyRealmValueCol(with: AnyRealmValue.int(123), object: objects()[0])
-        assertQuery(predicate: "anyCol != %@", values: [123], expectedCount: 0) {
-            $0.anyCol != .int(123)
+        value = AnyRealmValue.int(123)
+        setAnyRealmValueCol(with: value, object: objects()[0])
+        assertQuery(predicate: "anyCol != %@", values: [value], expectedCount: 0) {
+            $0.anyCol != value
         }
-        setAnyRealmValueCol(with: AnyRealmValue.bool(true), object: objects()[0])
-        assertQuery(predicate: "anyCol != %@", values: [true], expectedCount: 0) {
-            $0.anyCol != .bool(true)
+        value = AnyRealmValue.bool(true)
+        setAnyRealmValueCol(with: value, object: objects()[0])
+        assertQuery(predicate: "anyCol != %@", values: [value], expectedCount: 0) {
+            $0.anyCol != value
         }
-        setAnyRealmValueCol(with: AnyRealmValue.float(123.456), object: objects()[0])
-        assertQuery(predicate: "anyCol != %@", values: [Float(123.456)], expectedCount: 0) {
-            $0.anyCol != .float(123.456)
+        value = AnyRealmValue.float(123.456)
+        setAnyRealmValueCol(with: value, object: objects()[0])
+        assertQuery(predicate: "anyCol != %@", values: [value], expectedCount: 0) {
+            $0.anyCol != value
         }
-        setAnyRealmValueCol(with: AnyRealmValue.double(123.456), object: objects()[0])
-        assertQuery(predicate: "anyCol != %@", values: [123.456], expectedCount: 0) {
-            $0.anyCol != .double(123.456)
+        value = AnyRealmValue.double(123.456)
+        setAnyRealmValueCol(with: value, object: objects()[0])
+        assertQuery(predicate: "anyCol != %@", values: [value], expectedCount: 0) {
+            $0.anyCol != value
         }
-        setAnyRealmValueCol(with: AnyRealmValue.string("FooBar"), object: objects()[0])
-        assertQuery(predicate: "anyCol != %@", values: ["FooBar"], expectedCount: 0) {
-            $0.anyCol != .string("FooBar")
+        value = AnyRealmValue.string("FooBar")
+        setAnyRealmValueCol(with: value, object: objects()[0])
+        assertQuery(predicate: "anyCol != %@", values: [value], expectedCount: 0) {
+            $0.anyCol != value
         }
-        setAnyRealmValueCol(with: AnyRealmValue.data(Data(count: 64)), object: objects()[0])
-        assertQuery(predicate: "anyCol != %@", values: [Data(count: 64)], expectedCount: 0) {
-            $0.anyCol != .data(Data(count: 64))
+        value = AnyRealmValue.data(Data(count: 64))
+        setAnyRealmValueCol(with: value, object: objects()[0])
+        assertQuery(predicate: "anyCol != %@", values: [value], expectedCount: 0) {
+            $0.anyCol != value
         }
-        setAnyRealmValueCol(with: AnyRealmValue.date(Date(timeIntervalSince1970: 1000000)), object: objects()[0])
-        assertQuery(predicate: "anyCol != %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 0) {
-            $0.anyCol != .date(Date(timeIntervalSince1970: 1000000))
+        value = AnyRealmValue.date(Date(timeIntervalSince1970: 1000000))
+        setAnyRealmValueCol(with: value, object: objects()[0])
+        assertQuery(predicate: "anyCol != %@", values: [value], expectedCount: 0) {
+            $0.anyCol != value
         }
-        setAnyRealmValueCol(with: AnyRealmValue.object(circleObject), object: objects()[0])
-        assertQuery(predicate: "anyCol != %@", values: [circleObject], expectedCount: 0) {
-            $0.anyCol != .object(circleObject)
+        value = AnyRealmValue.object(circleObject)
+        setAnyRealmValueCol(with: value, object: objects()[0])
+        assertQuery(predicate: "anyCol != %@", values: [value], expectedCount: 0) {
+            $0.anyCol != value
         }
-        setAnyRealmValueCol(with: AnyRealmValue.objectId(ObjectId("61184062c1d8f096a3695046")), object: objects()[0])
-        assertQuery(predicate: "anyCol != %@", values: [ObjectId("61184062c1d8f096a3695046")], expectedCount: 0) {
-            $0.anyCol != .objectId(ObjectId("61184062c1d8f096a3695046"))
+        value = AnyRealmValue.objectId(ObjectId("61184062c1d8f096a3695046"))
+        setAnyRealmValueCol(with: value, object: objects()[0])
+        assertQuery(predicate: "anyCol != %@", values: [value], expectedCount: 0) {
+            $0.anyCol != value
         }
-        setAnyRealmValueCol(with: AnyRealmValue.decimal128(123.456), object: objects()[0])
-        assertQuery(predicate: "anyCol != %@", values: [Decimal128(123.456)], expectedCount: 0) {
-            $0.anyCol != .decimal128(123.456)
+        value = AnyRealmValue.decimal128(123.456)
+        setAnyRealmValueCol(with: value, object: objects()[0])
+        assertQuery(predicate: "anyCol != %@", values: [value], expectedCount: 0) {
+            $0.anyCol != value
         }
-        setAnyRealmValueCol(with: AnyRealmValue.uuid(UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!), object: objects()[0])
-        assertQuery(predicate: "anyCol != %@", values: [UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!], expectedCount: 0) {
-            $0.anyCol != .uuid(UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!)
+        value = AnyRealmValue.uuid(UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!)
+        setAnyRealmValueCol(with: value, object: objects()[0])
+        assertQuery(predicate: "anyCol != %@", values: [value], expectedCount: 0) {
+            $0.anyCol != value
         }
     }
 
@@ -1205,39 +1219,39 @@ class QueryTests: TestCase {
 
     func testGreaterThanAnyRealmValue() {
         setAnyRealmValueCol(with: AnyRealmValue.int(123), object: objects()[0])
-        assertQuery(predicate: "anyCol > %@", values: [123], expectedCount: 0) {
-            $0.anyCol > .int(123)
+        assertQuery(predicate: "anyCol > %@", values: [AnyRealmValue.int(123)], expectedCount: 0) {
+            $0.anyCol > AnyRealmValue.int(123)
         }
-        assertQuery(predicate: "anyCol >= %@", values: [123], expectedCount: 1) {
-            $0.anyCol >= .int(123)
+        assertQuery(predicate: "anyCol >= %@", values: [AnyRealmValue.int(123)], expectedCount: 1) {
+            $0.anyCol >= AnyRealmValue.int(123)
         }
         setAnyRealmValueCol(with: AnyRealmValue.float(123.456), object: objects()[0])
-        assertQuery(predicate: "anyCol > %@", values: [Float(123.456)], expectedCount: 0) {
-            $0.anyCol > .float(123.456)
+        assertQuery(predicate: "anyCol > %@", values: [AnyRealmValue.float(123.456)], expectedCount: 0) {
+            $0.anyCol > AnyRealmValue.float(123.456)
         }
-        assertQuery(predicate: "anyCol >= %@", values: [Float(123.456)], expectedCount: 1) {
-            $0.anyCol >= .float(123.456)
+        assertQuery(predicate: "anyCol >= %@", values: [AnyRealmValue.float(123.456)], expectedCount: 1) {
+            $0.anyCol >= AnyRealmValue.float(123.456)
         }
         setAnyRealmValueCol(with: AnyRealmValue.double(123.456), object: objects()[0])
-        assertQuery(predicate: "anyCol > %@", values: [123.456], expectedCount: 0) {
-            $0.anyCol > .double(123.456)
+        assertQuery(predicate: "anyCol > %@", values: [AnyRealmValue.double(123.456)], expectedCount: 0) {
+            $0.anyCol > AnyRealmValue.double(123.456)
         }
-        assertQuery(predicate: "anyCol >= %@", values: [123.456], expectedCount: 1) {
-            $0.anyCol >= .double(123.456)
+        assertQuery(predicate: "anyCol >= %@", values: [AnyRealmValue.double(123.456)], expectedCount: 1) {
+            $0.anyCol >= AnyRealmValue.double(123.456)
         }
         setAnyRealmValueCol(with: AnyRealmValue.date(Date(timeIntervalSince1970: 1000000)), object: objects()[0])
-        assertQuery(predicate: "anyCol > %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 0) {
-            $0.anyCol > .date(Date(timeIntervalSince1970: 1000000))
+        assertQuery(predicate: "anyCol > %@", values: [AnyRealmValue.date(Date(timeIntervalSince1970: 1000000))], expectedCount: 0) {
+            $0.anyCol > AnyRealmValue.date(Date(timeIntervalSince1970: 1000000))
         }
-        assertQuery(predicate: "anyCol >= %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
-            $0.anyCol >= .date(Date(timeIntervalSince1970: 1000000))
+        assertQuery(predicate: "anyCol >= %@", values: [AnyRealmValue.date(Date(timeIntervalSince1970: 1000000))], expectedCount: 1) {
+            $0.anyCol >= AnyRealmValue.date(Date(timeIntervalSince1970: 1000000))
         }
         setAnyRealmValueCol(with: AnyRealmValue.decimal128(123.456), object: objects()[0])
-        assertQuery(predicate: "anyCol > %@", values: [Decimal128(123.456)], expectedCount: 0) {
-            $0.anyCol > .decimal128(123.456)
+        assertQuery(predicate: "anyCol > %@", values: [AnyRealmValue.decimal128(123.456)], expectedCount: 0) {
+            $0.anyCol > AnyRealmValue.decimal128(123.456)
         }
-        assertQuery(predicate: "anyCol >= %@", values: [Decimal128(123.456)], expectedCount: 1) {
-            $0.anyCol >= .decimal128(123.456)
+        assertQuery(predicate: "anyCol >= %@", values: [AnyRealmValue.decimal128(123.456)], expectedCount: 1) {
+            $0.anyCol >= AnyRealmValue.decimal128(123.456)
         }
     }
 
@@ -1461,39 +1475,39 @@ class QueryTests: TestCase {
 
     func testLessThanAnyRealmValue() {
         setAnyRealmValueCol(with: AnyRealmValue.int(123), object: objects()[0])
-        assertQuery(predicate: "anyCol < %@", values: [123], expectedCount: 0) {
-            $0.anyCol < .int(123)
+        assertQuery(predicate: "anyCol < %@", values: [AnyRealmValue.int(123)], expectedCount: 0) {
+            $0.anyCol < AnyRealmValue.int(123)
         }
-        assertQuery(predicate: "anyCol <= %@", values: [123], expectedCount: 1) {
-            $0.anyCol <= .int(123)
+        assertQuery(predicate: "anyCol <= %@", values: [AnyRealmValue.int(123)], expectedCount: 1) {
+            $0.anyCol <= AnyRealmValue.int(123)
         }
         setAnyRealmValueCol(with: AnyRealmValue.float(123.456), object: objects()[0])
-        assertQuery(predicate: "anyCol < %@", values: [Float(123.456)], expectedCount: 0) {
-            $0.anyCol < .float(123.456)
+        assertQuery(predicate: "anyCol < %@", values: [AnyRealmValue.float(123.456)], expectedCount: 0) {
+            $0.anyCol < AnyRealmValue.float(123.456)
         }
-        assertQuery(predicate: "anyCol <= %@", values: [Float(123.456)], expectedCount: 1) {
-            $0.anyCol <= .float(123.456)
+        assertQuery(predicate: "anyCol <= %@", values: [AnyRealmValue.float(123.456)], expectedCount: 1) {
+            $0.anyCol <= AnyRealmValue.float(123.456)
         }
         setAnyRealmValueCol(with: AnyRealmValue.double(123.456), object: objects()[0])
-        assertQuery(predicate: "anyCol < %@", values: [123.456], expectedCount: 0) {
-            $0.anyCol < .double(123.456)
+        assertQuery(predicate: "anyCol < %@", values: [AnyRealmValue.double(123.456)], expectedCount: 0) {
+            $0.anyCol < AnyRealmValue.double(123.456)
         }
-        assertQuery(predicate: "anyCol <= %@", values: [123.456], expectedCount: 1) {
-            $0.anyCol <= .double(123.456)
+        assertQuery(predicate: "anyCol <= %@", values: [AnyRealmValue.double(123.456)], expectedCount: 1) {
+            $0.anyCol <= AnyRealmValue.double(123.456)
         }
         setAnyRealmValueCol(with: AnyRealmValue.date(Date(timeIntervalSince1970: 1000000)), object: objects()[0])
-        assertQuery(predicate: "anyCol < %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 0) {
-            $0.anyCol < .date(Date(timeIntervalSince1970: 1000000))
+        assertQuery(predicate: "anyCol < %@", values: [AnyRealmValue.date(Date(timeIntervalSince1970: 1000000))], expectedCount: 0) {
+            $0.anyCol < AnyRealmValue.date(Date(timeIntervalSince1970: 1000000))
         }
-        assertQuery(predicate: "anyCol <= %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
-            $0.anyCol <= .date(Date(timeIntervalSince1970: 1000000))
+        assertQuery(predicate: "anyCol <= %@", values: [AnyRealmValue.date(Date(timeIntervalSince1970: 1000000))], expectedCount: 1) {
+            $0.anyCol <= AnyRealmValue.date(Date(timeIntervalSince1970: 1000000))
         }
         setAnyRealmValueCol(with: AnyRealmValue.decimal128(123.456), object: objects()[0])
-        assertQuery(predicate: "anyCol < %@", values: [Decimal128(123.456)], expectedCount: 0) {
-            $0.anyCol < .decimal128(123.456)
+        assertQuery(predicate: "anyCol < %@", values: [AnyRealmValue.decimal128(123.456)], expectedCount: 0) {
+            $0.anyCol < AnyRealmValue.decimal128(123.456)
         }
-        assertQuery(predicate: "anyCol <= %@", values: [Decimal128(123.456)], expectedCount: 1) {
-            $0.anyCol <= .decimal128(123.456)
+        assertQuery(predicate: "anyCol <= %@", values: [AnyRealmValue.decimal128(123.456)], expectedCount: 1) {
+            $0.anyCol <= AnyRealmValue.decimal128(123.456)
         }
     }
 
@@ -2859,10 +2873,10 @@ class QueryTests: TestCase {
             $0.arrayUuid.contains(UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d08e")!)
         }
 
-        assertQuery(predicate: "%@ IN arrayAny", values: [ObjectId("61184062c1d8f096a3695046")], expectedCount: 1) {
+        assertQuery(predicate: "%@ IN arrayAny", values: [AnyRealmValue.objectId(ObjectId("61184062c1d8f096a3695046"))], expectedCount: 1) {
             $0.arrayAny.contains(AnyRealmValue.objectId(ObjectId("61184062c1d8f096a3695046")))
         }
-        assertQuery(predicate: "%@ IN arrayAny", values: [123], expectedCount: 0) {
+        assertQuery(predicate: "%@ IN arrayAny", values: [AnyRealmValue.int(123)], expectedCount: 0) {
             $0.arrayAny.contains(AnyRealmValue.int(123))
         }
 
@@ -3121,10 +3135,10 @@ class QueryTests: TestCase {
             !$0.arrayUuid.contains(UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d08e")!)
         }
 
-        assertQuery(predicate: "NOT %@ IN arrayAny", values: [ObjectId("61184062c1d8f096a3695046")], expectedCount: 0) {
+        assertQuery(predicate: "NOT %@ IN arrayAny", values: [AnyRealmValue.objectId(ObjectId("61184062c1d8f096a3695046"))], expectedCount: 0) {
             !$0.arrayAny.contains(AnyRealmValue.objectId(ObjectId("61184062c1d8f096a3695046")))
         }
-        assertQuery(predicate: "NOT %@ IN arrayAny", values: [123], expectedCount: 1) {
+        assertQuery(predicate: "NOT %@ IN arrayAny", values: [AnyRealmValue.int(123)], expectedCount: 1) {
             !$0.arrayAny.contains(AnyRealmValue.int(123))
         }
 
@@ -3524,7 +3538,7 @@ class QueryTests: TestCase {
             $0.arrayUuid.containsAny(in: [UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!, UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!])
         }
         assertQuery(predicate: "ANY arrayAny IN %@",
-                    values: [NSArray(array: [ObjectId("61184062c1d8f096a3695046"), "Hello"])], expectedCount: 1) {
+                    values: [NSArray(array: [AnyRealmValue.objectId(ObjectId("61184062c1d8f096a3695046")), AnyRealmValue.string("Hello")])], expectedCount: 1) {
             $0.arrayAny.containsAny(in: [AnyRealmValue.objectId(ObjectId("61184062c1d8f096a3695046")), AnyRealmValue.string("Hello")])
         }
         assertQuery(predicate: "ANY arrayOptBool IN %@",
@@ -3931,10 +3945,10 @@ class QueryTests: TestCase {
             $0.setUuid.contains(UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d08e")!)
         }
 
-        assertQuery(predicate: "%@ IN setAny", values: [ObjectId("61184062c1d8f096a3695046")], expectedCount: 1) {
+        assertQuery(predicate: "%@ IN setAny", values: [AnyRealmValue.objectId(ObjectId("61184062c1d8f096a3695046"))], expectedCount: 1) {
             $0.setAny.contains(AnyRealmValue.objectId(ObjectId("61184062c1d8f096a3695046")))
         }
-        assertQuery(predicate: "%@ IN setAny", values: [123], expectedCount: 0) {
+        assertQuery(predicate: "%@ IN setAny", values: [AnyRealmValue.int(123)], expectedCount: 0) {
             $0.setAny.contains(AnyRealmValue.int(123))
         }
 
@@ -4320,7 +4334,7 @@ class QueryTests: TestCase {
             $0.setUuid.containsAny(in: [UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!, UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!])
         }
         assertQuery(predicate: "ANY setAny IN %@",
-                    values: [NSArray(array: [ObjectId("61184062c1d8f096a3695046"), "Hello"])], expectedCount: 1) {
+                    values: [NSArray(array: [AnyRealmValue.objectId(ObjectId("61184062c1d8f096a3695046")), AnyRealmValue.string("Hello")])], expectedCount: 1) {
             $0.setAny.containsAny(in: [AnyRealmValue.objectId(ObjectId("61184062c1d8f096a3695046")), AnyRealmValue.string("Hello")])
         }
         assertQuery(predicate: "ANY setOptBool IN %@",
@@ -4729,10 +4743,10 @@ class QueryTests: TestCase {
             $0.mapUuid.contains(UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d08e")!)
         }
 
-        assertQuery(predicate: "%@ IN mapAny", values: [ObjectId("61184062c1d8f096a3695046")], expectedCount: 1) {
+        assertQuery(predicate: "%@ IN mapAny", values: [AnyRealmValue.objectId(ObjectId("61184062c1d8f096a3695046"))], expectedCount: 1) {
             $0.mapAny.contains(AnyRealmValue.objectId(ObjectId("61184062c1d8f096a3695046")))
         }
-        assertQuery(predicate: "%@ IN mapAny", values: [123], expectedCount: 0) {
+        assertQuery(predicate: "%@ IN mapAny", values: [AnyRealmValue.int(123)], expectedCount: 0) {
             $0.mapAny.contains(AnyRealmValue.int(123))
         }
 
@@ -6311,11 +6325,11 @@ class QueryTests: TestCase {
             $0.mapUuid.values != UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!
         }
 
-        assertQuery(predicate: "mapAny.@allValues == %@", values: [ObjectId("61184062c1d8f096a3695046")], expectedCount: 1) {
+        assertQuery(predicate: "mapAny.@allValues == %@", values: [AnyRealmValue.objectId(ObjectId("61184062c1d8f096a3695046"))], expectedCount: 1) {
             $0.mapAny.values == AnyRealmValue.objectId(ObjectId("61184062c1d8f096a3695046"))
         }
 
-        assertQuery(predicate: "mapAny.@allValues != %@", values: [ObjectId("61184062c1d8f096a3695046")], expectedCount: 1) {
+        assertQuery(predicate: "mapAny.@allValues != %@", values: [AnyRealmValue.objectId(ObjectId("61184062c1d8f096a3695046"))], expectedCount: 1) {
             $0.mapAny.values != AnyRealmValue.objectId(ObjectId("61184062c1d8f096a3695046"))
         }
 
@@ -7046,11 +7060,11 @@ class QueryTests: TestCase {
             $0.mapUuid["foo"] != UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!
         }
 
-        assertQuery(predicate: "(mapAny.@allKeys == %@ && mapAny == %@)", values: ["foo", ObjectId("61184062c1d8f096a3695046")], expectedCount: 1) {
+        assertQuery(predicate: "(mapAny.@allKeys == %@ && mapAny == %@)", values: ["foo", AnyRealmValue.objectId(ObjectId("61184062c1d8f096a3695046"))], expectedCount: 1) {
             $0.mapAny["foo"] == AnyRealmValue.objectId(ObjectId("61184062c1d8f096a3695046"))
         }
 
-        assertQuery(predicate: "(mapAny.@allKeys == %@ && mapAny != %@)", values: ["foo", ObjectId("61184062c1d8f096a3695046")], expectedCount: 1) {
+        assertQuery(predicate: "(mapAny.@allKeys == %@ && mapAny != %@)", values: ["foo", AnyRealmValue.objectId(ObjectId("61184062c1d8f096a3695046"))], expectedCount: 1) {
             $0.mapAny["foo"] != AnyRealmValue.objectId(ObjectId("61184062c1d8f096a3695046"))
         }
 
@@ -7594,7 +7608,7 @@ class QueryTests: TestCase {
             $0.mapUuid.containsAny(in: [UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!, UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!])
         }
         assertQuery(predicate: "ANY mapAny IN %@",
-                    values: [NSArray(array: [ObjectId("61184062c1d8f096a3695046"), "Hello"])], expectedCount: 1) {
+                    values: [NSArray(array: [AnyRealmValue.objectId(ObjectId("61184062c1d8f096a3695046")), AnyRealmValue.string("Hello")])], expectedCount: 1) {
             $0.mapAny.containsAny(in: [AnyRealmValue.objectId(ObjectId("61184062c1d8f096a3695046")), AnyRealmValue.string("Hello")])
         }
         assertQuery(predicate: "ANY mapOptBool IN %@",
@@ -8545,11 +8559,11 @@ class QueryTests: TestCase {
         // List
 
         // Count of results will be 0 because there are no `ModernAllTypesObject`s in the list.
-        assertQuery(predicate: "SUBQUERY(arrayCol, $col0, $col0.intCol != %@).@count > %@", values: [123, 0], expectedCount: 0) {
+        assertQuery(predicate: "SUBQUERY(arrayCol, $col1, $col1.intCol != %@).@count > %@", values: [123, 0], expectedCount: 0) {
             ($0.arrayCol.intCol != 123).count > 0
         }
 
-        assertQuery(predicate: "(intCol == %@ && SUBQUERY(arrayCol, $col0, $col0.stringCol == %@).@count == %@)", values: [5, "Bar", 0], expectedCount: 0) {
+        assertQuery(predicate: "(intCol == %@ && SUBQUERY(arrayCol, $col1, $col1.stringCol == %@).@count == %@)", values: [5, "Bar", 0], expectedCount: 0) {
             $0.intCol == 5 &&
             ($0.arrayCol.stringCol == "Bar").count == 0
         }
@@ -8557,11 +8571,11 @@ class QueryTests: TestCase {
         // Set
 
         // Will be 0 results because there are no `ModernAllTypesObject`s in the set.
-        assertQuery(predicate: "SUBQUERY(arrayCol, $col0, $col0.intCol != %@).@count > %@", values: [123, 0], expectedCount: 0) {
+        assertQuery(predicate: "SUBQUERY(arrayCol, $col1, $col1.intCol != %@).@count > %@", values: [123, 0], expectedCount: 0) {
             ($0.arrayCol.intCol != 123).count > 0
         }
 
-        assertQuery(predicate: "(intCol == %@ && SUBQUERY(setCol, $col0, $col0.stringCol == %@).@count == %@)", values: [5, "Bar", 0], expectedCount: 0) {
+        assertQuery(predicate: "(intCol == %@ && SUBQUERY(setCol, $col1, $col1.stringCol == %@).@count == %@)", values: [5, "Bar", 0], expectedCount: 0) {
             $0.intCol == 5 &&
             ($0.setCol.stringCol == "Bar").count == 0
         }
@@ -8575,24 +8589,24 @@ class QueryTests: TestCase {
         }
 
         // Results count should now be 1
-        assertQuery(predicate: "SUBQUERY(arrayCol, $col0, $col0.arrayInt.@count >= %@).@count > %@", values: [0, 0], expectedCount: 1) {
+        assertQuery(predicate: "SUBQUERY(arrayCol, $col1, $col1.arrayInt.@count >= %@).@count > %@", values: [0, 0], expectedCount: 1) {
             ($0.arrayCol.arrayInt.count >= 0).count > 0
         }
 
         // Subquery in a subquery
-        assertQuery(predicate: "SUBQUERY(arrayCol, $col1, ($col1.arrayInt.@count >= %@ && SUBQUERY(arrayCol, $col0, $col0.intCol != %@).@count > %@)).@count > %@", values: [0, 123, 0, 0], expectedCount: 0) {
+        assertQuery(predicate: "SUBQUERY(arrayCol, $col1, ($col1.arrayInt.@count >= %@ && SUBQUERY(arrayCol, $col2, $col2.intCol != %@).@count > %@)).@count > %@", values: [0, 123, 0, 0], expectedCount: 0) {
             ($0.arrayCol.arrayInt.count >= 0 && ($0.arrayCol.intCol != 123).count > 0).count > 0
         }
 
-        assertQuery(predicate: "SUBQUERY(arrayCol, $col0, $col0.intCol != %@).@count > %@", values: [123, 0], expectedCount: 1) {
+        assertQuery(predicate: "SUBQUERY(arrayCol, $col1, $col1.intCol != %@).@count > %@", values: [123, 0], expectedCount: 1) {
             ($0.arrayCol.intCol != 123).count > 0
         }
 
-        assertQuery(predicate: "SUBQUERY(arrayCol, $col0, ($col0.intCol > %@ && $col0.intCol <= %@)).@count > %@", values: [0, 5, 0], expectedCount: 1) {
+        assertQuery(predicate: "SUBQUERY(arrayCol, $col1, ($col1.intCol > %@ && $col1.intCol <= %@)).@count > %@", values: [0, 5, 0], expectedCount: 1) {
             ($0.arrayCol.intCol > 0 && $0.arrayCol.intCol <= 5 ).count > 0
         }
 
-        assertQuery(predicate: "((intCol == %@ && SUBQUERY(arrayCol, $col0, $col0.intCol == %@).@count == %@) && SUBQUERY(arrayCol, $col0, $col0.stringCol == %@).@count == %@)", values: [6, 5, 1, "Bar", 0], expectedCount: 1) {
+        assertQuery(predicate: "((intCol == %@ && SUBQUERY(arrayCol, $col1, $col1.intCol == %@).@count == %@) && SUBQUERY(arrayCol, $col2, $col2.stringCol == %@).@count == %@)", values: [6, 5, 1, "Bar", 0], expectedCount: 1) {
             ($0.intCol == 6) &&
             ($0.arrayCol.intCol == 5).count == 1 &&
             ($0.arrayCol.stringCol == "Bar").count == 0
@@ -8601,16 +8615,16 @@ class QueryTests: TestCase {
         // Set
 
         // Will be 0 results because there are no `ModernAllTypesObject`s in the set.
-        assertQuery(predicate: "SUBQUERY(arrayCol, $col0, $col0.intCol != %@).@count > %@", values: [123, 0], expectedCount: 1) {
+        assertQuery(predicate: "SUBQUERY(arrayCol, $col1, $col1.intCol != %@).@count > %@", values: [123, 0], expectedCount: 1) {
             ($0.arrayCol.intCol != 123).count > 0
         }
 
-        assertQuery(predicate: "(intCol == %@ && SUBQUERY(setCol, $col0, $col0.stringCol == %@).@count == %@)", values: [6, "Bar", 0], expectedCount: 1) {
+        assertQuery(predicate: "(intCol == %@ && SUBQUERY(setCol, $col1, $col1.stringCol == %@).@count == %@)", values: [6, "Bar", 0], expectedCount: 1) {
             ($0.intCol == 6) &&
             ($0.setCol.stringCol == "Bar").count == 0
         }
 
-        assertQuery(predicate: "(intCol == %@ && SUBQUERY(setCol, $col0, ($col0.intCol == %@ && $col0.stringCol != %@)).@count == %@)", values: [6, 5, "Blah", 1], expectedCount: 1) {
+        assertQuery(predicate: "(intCol == %@ && SUBQUERY(setCol, $col1, ($col1.intCol == %@ && $col1.stringCol != %@)).@count == %@)", values: [6, 5, "Blah", 1], expectedCount: 1) {
             ($0.intCol == 6) &&
             (((($0.setCol.intCol == 5) && ($0.setCol.stringCol != "Blah"))).count == 1)
         }

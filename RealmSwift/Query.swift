@@ -108,201 +108,6 @@ private struct CollectionFlags: OptionSet {
     static let finalIsCollection = CollectionFlags(rawValue: 1)
 }
 
-private indirect enum QueryNode {
-    case any(_ child: QueryNode)
-    case constant(_ value: Any?)
-    case keyPath(_ value: [String], collection: CollectionFlags)
-
-    case not(_ child: QueryNode)
-    case and(_ lhs: QueryNode, _ rhs: QueryNode)
-    case or(_ lhs: QueryNode, _ rhs: QueryNode)
-
-    case equal(_ lhs: QueryNode, _ rhs: QueryNode, options: StringOptions)
-    case notEqual(_ lhs: QueryNode, _ rhs: QueryNode, options: StringOptions)
-    case lessThan(_ lhs: QueryNode, _ rhs: QueryNode)
-    case lessThanEqual(_ lhs: QueryNode, _ rhs: QueryNode)
-    case greaterThan(_ lhs: QueryNode, _ rhs: QueryNode)
-    case greaterThanEqual(_ lhs: QueryNode, _ rhs: QueryNode)
-    case `in`(_ lhs: QueryNode, _ rhs: QueryNode)
-    case between(_ lhs: QueryNode, lowerBound: QueryNode, upperBound: QueryNode)
-
-    case like(_ lhs: QueryNode, _ rhs: QueryNode, options: StringOptions)
-    case strContains(_ lhs: QueryNode, _ rhs: QueryNode, options: StringOptions)
-    case beginsWith(_ lhs: QueryNode, _ rhs: QueryNode, options: StringOptions)
-    case endsWith(_ lhs: QueryNode, _ rhs: QueryNode, options: StringOptions)
-
-    case subqueryCount(_ child: QueryNode)
-    case mapSubscript(_ lhs: QueryNode, collectionKeyPath: QueryNode, requiresNot: Bool)
-}
-
-private func buildPredicate(_ root: QueryNode) -> (String, [Any]) {
-    let formatStr = NSMutableString()
-    let arguments = NSMutableArray()
-    var subqueryCounter = 0
-
-    func buildComparison(_ lhs: QueryNode, _ op: String, _ rhs: QueryNode) {
-        build(lhs)
-        formatStr.append(" \(op) ")
-        build(rhs)
-    }
-
-    func buildCompound(_ lhs: QueryNode, _ op: String, _ rhs: QueryNode) {
-        formatStr.append("(")
-        build(lhs)
-        formatStr.append(" \(op) ")
-        build(rhs)
-        formatStr.append(")")
-    }
-
-    func buildBetween(_ lowerBound: QueryNode, _ upperBound: QueryNode) {
-        formatStr.append(" BETWEEN {")
-        build(lowerBound)
-        formatStr.append(", ")
-        build(upperBound)
-        formatStr.append("}")
-    }
-
-    func strOptions(_ options: StringOptions) -> String{
-        if options == [] {
-            return ""
-        }
-        return "[\(options.contains(.caseInsensitive) ? "c" : "")\(options.contains(.diacriticInsensitive) ? "d" : "")]"
-    }
-
-    func build(_ node: QueryNode) {
-        switch node {
-        case .any(let child):
-            formatStr.append("ANY ")
-            build(child)
-        case .constant(let value):
-            formatStr.append("%@")
-            arguments.add(value.objCValue)
-        case .keyPath(let kp, _):
-            formatStr.append(kp.joined(separator: "."))
-        case .not(let child):
-            formatStr.append("NOT ")
-            build(child)
-        case .and(let lhs, let rhs):
-            buildCompound(lhs, "&&", rhs)
-        case .or(let lhs, let rhs):
-            buildCompound(lhs, "||", rhs)
-        case .equal(let lhs, let rhs, let options):
-            buildComparison(lhs, "==\(strOptions(options))", rhs)
-        case .notEqual(let lhs, let rhs, let options):
-            buildComparison(lhs, "!=\(strOptions(options))", rhs)
-        case .lessThan(let lhs, let rhs):
-            buildComparison(lhs, "<", rhs)
-        case .lessThanEqual(let lhs, let rhs):
-            buildComparison(lhs, "<=", rhs)
-        case .greaterThan(let lhs, let rhs):
-            buildComparison(lhs, ">", rhs)
-        case .greaterThanEqual(let lhs, let rhs):
-            buildComparison(lhs, ">=", rhs)
-        case .`in`(let lhs, let rhs):
-            buildComparison(lhs, "IN", rhs)
-        case .between(let lhs, let lowerBound, let upperBound):
-            formatStr.append("(")
-            build(lhs)
-            buildBetween(lowerBound, upperBound)
-            formatStr.append(")")
-        case .strContains(let lhs, let rhs, let options):
-            buildComparison(lhs, "CONTAINS\(strOptions(options))", rhs)
-        case .beginsWith(let lhs, let rhs, let options):
-            buildComparison(lhs, "BEGINSWITH\(strOptions(options))", rhs)
-        case .endsWith(let lhs, let rhs, let options):
-            buildComparison(lhs, "ENDSWITH\(strOptions(options))", rhs)
-        case .like(let lhs, let rhs, let options):
-            buildComparison(lhs, "LIKE\(strOptions(options))", rhs)
-        case .subqueryCount(let inner):
-            subqueryCounter += 1
-            let (collectionName, node) = SubqueryRewriter.rewrite(inner, subqueryCounter)
-            formatStr.append("SUBQUERY(\(collectionName), $col\(subqueryCounter), ")
-            build(node)
-            formatStr.append(").@count")
-        case .mapSubscript(let lhs, let collectionKeyPath, let requiresNot):
-            build(lhs)
-            formatStr.append(" && ")
-            if requiresNot {
-                formatStr.append("NOT ")
-            }
-            build(collectionKeyPath)
-        }
-    }
-    build(root)
-    return (formatStr as String, (arguments as! [Any]))
-}
-
-struct SubqueryRewriter {
-    private var collectionName: String?
-    private let counter: Int
-    private mutating func rewrite(_ node: QueryNode) -> QueryNode {
-        // TODO validate only one collection in a subquery
-//        if collectionName != nil {
-//            return node
-//        }
-
-        switch node {
-        case .any(let child):
-            return .any(rewrite(child))
-        case .keyPath(let kp, let collectionFlags):
-            if collectionFlags.contains(.rootIsCollection) {
-                precondition(kp.count > 0)
-                collectionName = kp[0]
-                var copy = kp
-                copy[0] = "$col\(counter)"
-                return .keyPath(copy, collection: collectionFlags.intersection([.finalIsCollection]))
-            }
-            return node
-        case .not(let child):
-            return .not(rewrite(child))
-        case .and(let lhs, let rhs):
-            return .and(rewrite(lhs), rewrite(rhs))
-        case .or(let lhs, let rhs):
-            return .or(rewrite(lhs), rewrite(rhs))
-        case .equal(let lhs, let rhs, let options):
-            return .equal(rewrite(lhs), rewrite(rhs), options: options)
-        case .notEqual(let lhs, let rhs, let options):
-            return .notEqual(rewrite(lhs), rewrite(rhs), options: options)
-        case .lessThan(let lhs, let rhs):
-            return .lessThan(rewrite(lhs), rewrite(rhs))
-        case .lessThanEqual(let lhs, let rhs):
-            return .lessThanEqual(rewrite(lhs), rewrite(rhs))
-        case .greaterThan(let lhs, let rhs):
-            return .greaterThan(rewrite(lhs), rewrite(rhs))
-        case .greaterThanEqual(let lhs, let rhs):
-            return .greaterThanEqual(rewrite(lhs), rewrite(rhs))
-        case .`in`(let lhs, let rhs):
-            return .`in`(rewrite(lhs), rewrite(rhs))
-        case .between(let lhs, let lowerBound, let upperBound):
-            return .between(rewrite(lhs), lowerBound: rewrite(lowerBound), upperBound: rewrite(upperBound))
-        case .strContains(let lhs, let rhs, let options):
-            return .strContains(rewrite(lhs), rewrite(rhs), options: options)
-        case .beginsWith(let lhs, let rhs, let options):
-            return .beginsWith(rewrite(lhs), rewrite(rhs), options: options)
-        case .endsWith(let lhs, let rhs, let options):
-            return .endsWith(rewrite(lhs), rewrite(rhs), options: options)
-        case .subqueryCount:
-            throwRealmException("Nested subqueries are not supported")
-        case .constant:
-            return node
-        case let .like(lhs, rhs, options):
-            return .like(rewrite(lhs), rewrite(rhs), options: options)
-        case .mapSubscript:
-            throwRealmException("Subqueries do not support map subscripts.")
-        }
-    }
-
-    static fileprivate func rewrite(_ node: QueryNode, _ counter: Int) -> (String, QueryNode) {
-        var rewriter = SubqueryRewriter(counter: counter)
-        let rewritten = rewriter.rewrite(node)
-        guard let collectionName = rewriter.collectionName else {
-            throwRealmException("Subquery must contain keypath starting with a collection")
-        }
-        return (collectionName, rewritten)
-    }
-}
-
-
 @dynamicMemberLookup
 public struct Query<T: _RealmSchemaDiscoverable> {
 
@@ -334,6 +139,9 @@ public struct Query<T: _RealmSchemaDiscoverable> {
             }
             
             return .keyPath(kp + [keyPath], collection: flags)
+        } else if case let .mapSubscript(lhs, mapKeyPath, requiresNot) = node, case let .keyPath(kp, c) = mapKeyPath {
+            return .mapSubscript(lhs, collectionKeyPath: .keyPath(kp + [keyPath], collection: c),
+                                 requiresNot: requiresNot)
         }
         throwRealmException("Cannot apply a keypath to \(buildPredicate(node))")
     }
@@ -474,7 +282,7 @@ extension Query where T: RealmCollection {
 
     /// Checks if any elements contained in the given array are present in the collection.
     public func containsAny<U: Sequence, V>(in collection: U) -> Query<V> where U.Element == T.Element {
-        Query<V>(.in(.constant(collection), node))
+        Query<V>(.any(.in(node, .constant(collection))))
     }
 }
 
@@ -737,18 +545,18 @@ extension Query where T: OptionalProtocol,
                       T.Wrapped.RawValue: _RealmSchemaDiscoverable {
     /// :nodoc:
     public static func == <V>(_ lhs: Query<T>, _ rhs: T) -> Query<V> {
-        if case Optional<Any>.none = rhs as Any {
-            return Query<V>(.equal(lhs.node, .constant(nil), options: []))
-        } else {
-            return Query<V>(.equal(lhs.node, .constant(rhs._rlmInferWrappedType().rawValue), options: []))
-        }
+        return Query<V>(.equal(lhs.node, lhs.enumValue(rhs), options: []))
     }
     /// :nodoc:
     public static func != <V>(_ lhs: Query<T>, _ rhs: T) -> Query<V> {
+        return Query<V>(.notEqual(lhs.node, lhs.enumValue(rhs), options: []))
+    }
+
+    private func enumValue(_ rhs: T) -> QueryNode {
         if case Optional<Any>.none = rhs as Any {
-            return Query<V>(.notEqual(lhs.node, .constant(nil), options: []))
+            return .constant(nil)
         } else {
-            return Query<V>(.notEqual(lhs.node, .constant(rhs._rlmInferWrappedType().rawValue), options: []))
+            return .constant(rhs._rlmInferWrappedType().rawValue)
         }
     }
 }
@@ -756,19 +564,19 @@ extension Query where T: OptionalProtocol,
 extension Query where T: OptionalProtocol, T.Wrapped: PersistableEnum, T.Wrapped.RawValue: _QueryNumeric {
     /// :nodoc:
     public static func > <V>(_ lhs: Query<T>, _ rhs: T) -> Query<V> {
-        Query<V>(.greaterThan(lhs.node, .constant(rhs)))
+        Query<V>(.greaterThan(lhs.node, lhs.enumValue(rhs)))
     }
     /// :nodoc:
     public static func >= <V>(_ lhs: Query<T>, _ rhs: T) -> Query<V> {
-        Query<V>(.greaterThanEqual(lhs.node, .constant(rhs)))
+        Query<V>(.greaterThanEqual(lhs.node, lhs.enumValue(rhs)))
     }
     /// :nodoc:
     public static func < <V>(_ lhs: Query<T>, _ rhs: T) -> Query<V> {
-        Query<V>(.lessThan(lhs.node, .constant(rhs)))
+        Query<V>(.lessThan(lhs.node, lhs.enumValue(rhs)))
     }
     /// :nodoc:
     public static func <= <V>(_ lhs: Query<T>, _ rhs: T) -> Query<V> {
-        Query<V>(.lessThanEqual(lhs.node, .constant(rhs)))
+        Query<V>(.lessThanEqual(lhs.node, lhs.enumValue(rhs)))
     }
 }
 
@@ -777,22 +585,22 @@ extension Query where T: OptionalProtocol,
                       T.Wrapped.RawValue: _QueryNumeric {
     /// Returns the minimum value in the collection based on the keypath.
     public var min: Query {
-        Query(appendKeyPath("@min", isCollection: false))
+        Query(buildCollectionAggregateKeyPath("@min"))
     }
 
     /// Returns the maximum value in the collection based on the keypath.
     public var max: Query {
-        Query(appendKeyPath("@max", isCollection: false))
+        Query(buildCollectionAggregateKeyPath("@max"))
     }
 
     /// Returns the average in the collection based on the keypath.
     public var avg: Query {
-        Query(appendKeyPath("@avg", isCollection: false))
+        Query(buildCollectionAggregateKeyPath("@avg"))
     }
 
     /// Returns the sum of all the value in the collection based on the keypath.
     public var sum: Query {
-        Query(appendKeyPath("@sum", isCollection: false))
+        Query(buildCollectionAggregateKeyPath("@sum"))
     }
 }
 
@@ -895,9 +703,13 @@ extension Query where T: OptionalProtocol, T.Wrapped: _QueryNumeric {
 
 extension Query where T == Bool {
     /// Completes a subquery expression.
+    /// - Usage:
     /// ```
     /// ($0.myCollection.age >= 21).count > 0
     /// ```
+    /// - Note:
+    /// Do not mix collections within a subquery expression. It is
+    /// only permitted to reference a single collection per each subquery.
     public var count: Query<Int> {
         Query<Int>(.subqueryCount(node))
     }
@@ -959,3 +771,203 @@ extension Optional: _QueryString where Wrapped: _QueryString { }
 public protocol _QueryBinary { }
 extension Data: _QueryBinary { }
 extension Optional: _QueryBinary where Wrapped: _QueryBinary { }
+
+// MARK: QueryNode -
+
+private indirect enum QueryNode {
+    case any(_ child: QueryNode)
+    case constant(_ value: Any?)
+
+    case keyPath(_ value: [String], collection: CollectionFlags)
+
+    case not(_ child: QueryNode)
+    case and(_ lhs: QueryNode, _ rhs: QueryNode)
+    case or(_ lhs: QueryNode, _ rhs: QueryNode)
+
+    case equal(_ lhs: QueryNode, _ rhs: QueryNode, options: StringOptions)
+    case notEqual(_ lhs: QueryNode, _ rhs: QueryNode, options: StringOptions)
+    case lessThan(_ lhs: QueryNode, _ rhs: QueryNode)
+    case lessThanEqual(_ lhs: QueryNode, _ rhs: QueryNode)
+    case greaterThan(_ lhs: QueryNode, _ rhs: QueryNode)
+    case greaterThanEqual(_ lhs: QueryNode, _ rhs: QueryNode)
+    case `in`(_ lhs: QueryNode, _ rhs: QueryNode)
+    case between(_ lhs: QueryNode, lowerBound: QueryNode, upperBound: QueryNode)
+
+    case like(_ lhs: QueryNode, _ rhs: QueryNode, options: StringOptions)
+    case strContains(_ lhs: QueryNode, _ rhs: QueryNode, options: StringOptions)
+    case beginsWith(_ lhs: QueryNode, _ rhs: QueryNode, options: StringOptions)
+    case endsWith(_ lhs: QueryNode, _ rhs: QueryNode, options: StringOptions)
+
+    case subqueryCount(_ child: QueryNode)
+    case mapSubscript(_ lhs: QueryNode, collectionKeyPath: QueryNode, requiresNot: Bool)
+}
+
+private func buildPredicate(_ root: QueryNode, subqueryCount: Int = 0) -> (String, [Any]) {
+    let formatStr = NSMutableString()
+    let arguments = NSMutableArray()
+    var subqueryCounter = subqueryCount
+    var mapRequiresClosingParenthesis = false
+
+    func buildComparison(_ lhs: QueryNode, _ op: String, _ rhs: QueryNode) {
+        build(lhs)
+        formatStr.append(" \(op) ")
+        build(rhs)
+        if mapRequiresClosingParenthesis {
+            formatStr.append(")")
+            mapRequiresClosingParenthesis = false
+        }
+    }
+
+    func buildCompound(_ lhs: QueryNode, _ op: String, _ rhs: QueryNode) {
+        formatStr.append("(")
+        build(lhs)
+        formatStr.append(" \(op) ")
+        build(rhs)
+        formatStr.append(")")
+    }
+
+    func buildBetween(_ lowerBound: QueryNode, _ upperBound: QueryNode) {
+        formatStr.append(" BETWEEN {")
+        build(lowerBound)
+        formatStr.append(", ")
+        build(upperBound)
+        formatStr.append("}")
+    }
+
+    func strOptions(_ options: StringOptions) -> String{
+        if options == [] {
+            return ""
+        }
+        return "[\(options.contains(.caseInsensitive) ? "c" : "")\(options.contains(.diacriticInsensitive) ? "d" : "")]"
+    }
+
+    func build(_ node: QueryNode) {
+        switch node {
+        case .any(let child):
+            formatStr.append("ANY ")
+            build(child)
+        case .constant(let value):
+            formatStr.append("%@")
+            arguments.add(value ?? NSNull())
+        case .keyPath(let kp, _):
+            formatStr.append(kp.joined(separator: "."))
+        case .not(let child):
+            formatStr.append("NOT ")
+            build(child)
+        case .and(let lhs, let rhs):
+            buildCompound(lhs, "&&", rhs)
+        case .or(let lhs, let rhs):
+            buildCompound(lhs, "||", rhs)
+        case .equal(let lhs, let rhs, let options):
+            buildComparison(lhs, "==\(strOptions(options))", rhs)
+        case .notEqual(let lhs, let rhs, let options):
+            buildComparison(lhs, "!=\(strOptions(options))", rhs)
+        case .lessThan(let lhs, let rhs):
+            buildComparison(lhs, "<", rhs)
+        case .lessThanEqual(let lhs, let rhs):
+            buildComparison(lhs, "<=", rhs)
+        case .greaterThan(let lhs, let rhs):
+            buildComparison(lhs, ">", rhs)
+        case .greaterThanEqual(let lhs, let rhs):
+            buildComparison(lhs, ">=", rhs)
+        case .`in`(let lhs, let rhs):
+            buildComparison(lhs, "IN", rhs)
+        case .between(let lhs, let lowerBound, let upperBound):
+            formatStr.append("(")
+            build(lhs)
+            buildBetween(lowerBound, upperBound)
+            formatStr.append(")")
+        case .strContains(let lhs, let rhs, let options):
+            buildComparison(lhs, "CONTAINS\(strOptions(options))", rhs)
+        case .beginsWith(let lhs, let rhs, let options):
+            buildComparison(lhs, "BEGINSWITH\(strOptions(options))", rhs)
+        case .endsWith(let lhs, let rhs, let options):
+            buildComparison(lhs, "ENDSWITH\(strOptions(options))", rhs)
+        case .like(let lhs, let rhs, let options):
+            buildComparison(lhs, "LIKE\(strOptions(options))", rhs)
+        case .subqueryCount(let inner):
+            subqueryCounter += 1
+            let (collectionName, node) = SubqueryRewriter.rewrite(inner, subqueryCounter)
+            formatStr.append("SUBQUERY(\(collectionName), $col\(subqueryCounter), ")
+            build(node)
+            formatStr.append(").@count")
+        case .mapSubscript(let lhs, let collectionKeyPath, let requiresNot):
+            formatStr.append("(")
+            build(lhs)
+            formatStr.append(" && ")
+            if requiresNot {
+                formatStr.append("NOT ")
+            }
+            build(collectionKeyPath)
+            mapRequiresClosingParenthesis = true
+        }
+    }
+    build(root)
+    return (formatStr as String, (arguments as! [Any]))
+}
+
+struct SubqueryRewriter {
+    private var collectionName: String?
+    private var counter: Int
+    private mutating func rewrite(_ node: QueryNode) -> QueryNode {
+
+        switch node {
+        case .any(let child):
+            return .any(rewrite(child))
+        case .keyPath(let kp, let collectionFlags):
+            if collectionFlags.contains(.rootIsCollection) {
+                precondition(kp.count > 0)
+                collectionName = kp[0]
+                var copy = kp
+                copy[0] = "$col\(counter)"
+                return .keyPath(copy, collection: collectionFlags.intersection([.finalIsCollection]))
+            }
+            return node
+        case .not(let child):
+            return .not(rewrite(child))
+        case .and(let lhs, let rhs):
+            return .and(rewrite(lhs), rewrite(rhs))
+        case .or(let lhs, let rhs):
+            return .or(rewrite(lhs), rewrite(rhs))
+        case .equal(let lhs, let rhs, let options):
+            return .equal(rewrite(lhs), rewrite(rhs), options: options)
+        case .notEqual(let lhs, let rhs, let options):
+            return .notEqual(rewrite(lhs), rewrite(rhs), options: options)
+        case .lessThan(let lhs, let rhs):
+            return .lessThan(rewrite(lhs), rewrite(rhs))
+        case .lessThanEqual(let lhs, let rhs):
+            return .lessThanEqual(rewrite(lhs), rewrite(rhs))
+        case .greaterThan(let lhs, let rhs):
+            return .greaterThan(rewrite(lhs), rewrite(rhs))
+        case .greaterThanEqual(let lhs, let rhs):
+            return .greaterThanEqual(rewrite(lhs), rewrite(rhs))
+        case .`in`(let lhs, let rhs):
+            return .`in`(rewrite(lhs), rewrite(rhs))
+        case .between(let lhs, let lowerBound, let upperBound):
+            return .between(rewrite(lhs), lowerBound: rewrite(lowerBound), upperBound: rewrite(upperBound))
+        case .strContains(let lhs, let rhs, let options):
+            return .strContains(rewrite(lhs), rewrite(rhs), options: options)
+        case .beginsWith(let lhs, let rhs, let options):
+            return .beginsWith(rewrite(lhs), rewrite(rhs), options: options)
+        case .endsWith(let lhs, let rhs, let options):
+            return .endsWith(rewrite(lhs), rewrite(rhs), options: options)
+        case .subqueryCount(let inner):
+            return .subqueryCount(inner)
+        case .constant:
+            return node
+        case let .like(lhs, rhs, options):
+            return .like(rewrite(lhs), rewrite(rhs), options: options)
+        case .mapSubscript:
+            throwRealmException("Subqueries do not support map subscripts.")
+        }
+    }
+
+    static fileprivate func rewrite(_ node: QueryNode, _ counter: Int) -> (String, QueryNode) {
+        var rewriter = SubqueryRewriter(counter: counter)
+        let rewritten = rewriter.rewrite(node)
+        guard let collectionName = rewriter.collectionName else {
+            throwRealmException("Subquery must contain keypath starting with a collection")
+        }
+        return (collectionName, rewritten)
+    }
+}

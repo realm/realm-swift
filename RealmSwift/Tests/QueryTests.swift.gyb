@@ -40,17 +40,10 @@ import RealmSwift
             self.enumName = enumName
 
         def foundationValue(self, index):
-          if self.category == 'any':
-            return self.values[index][1]
-          else:
             return self.values[index]
 
         def value(self, index):
-          if self.category == 'any':
-            return 'AnyRealmValue' + self.values[index][0] + '(' + str(self.values[index][1]) + ')'
-          else:
             return self.values[index]
-
 
     properties = [
         Property('boolCol', ['true', 'false'], 'Bool', 'bool'),
@@ -105,7 +98,7 @@ import RealmSwift
         Property('arrayDecimal', ['Decimal128(123.456)', 'Decimal128(234.567)', 'Decimal128(345.678)'], 'Decimal128', 'numeric'),
         Property('arrayObjectId', ['ObjectId("61184062c1d8f096a3695046")', 'ObjectId("61184062c1d8f096a3695045")', 'ObjectId("61184062c1d8f096a3695044")'], 'ObjectId', 'objectId'),
         Property('arrayUuid', ['UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!', 'UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!', 'UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d08e")!'], 'UUID', 'uuid'),
-        Property('arrayAny', [['.objectId', 'ObjectId("61184062c1d8f096a3695046")'], ['.string', '"Hello"'], ['.int', 123]], 'AnyRealmValue', 'any'),
+        Property('arrayAny', ['AnyRealmValue.objectId(ObjectId("61184062c1d8f096a3695046"))', 'AnyRealmValue.string("Hello")', 'AnyRealmValue.int(123)'], 'AnyRealmValue', 'any'),
     ]
 
     optListProperties = [
@@ -140,7 +133,7 @@ import RealmSwift
         Property('setDecimal', ['Decimal128(123.456)', 'Decimal128(234.567)', 'Decimal128(345.678)'], 'Decimal128', 'numeric'),
         Property('setObjectId', ['ObjectId("61184062c1d8f096a3695046")', 'ObjectId("61184062c1d8f096a3695045")', 'ObjectId("61184062c1d8f096a3695044")'], 'ObjectId', 'objectId'),
         Property('setUuid', ['UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!', 'UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!', 'UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d08e")!'], 'UUID', 'uuid'),
-        Property('setAny', [['.objectId', 'ObjectId("61184062c1d8f096a3695046")'], ['.string', '"Hello"'], ['.int', 123]], 'AnyRealmValue', 'any'),
+        Property('setAny', ['AnyRealmValue.objectId(ObjectId("61184062c1d8f096a3695046"))', 'AnyRealmValue.string("Hello")', 'AnyRealmValue.int(123)'], 'AnyRealmValue', 'any'),
     ]
 
     optSetProperties = [
@@ -175,7 +168,7 @@ import RealmSwift
         Property('mapDecimal', ['Decimal128(123.456)', 'Decimal128(234.567)', 'Decimal128(345.678)'], 'Decimal128', 'numeric'),
         Property('mapObjectId', ['ObjectId("61184062c1d8f096a3695046")', 'ObjectId("61184062c1d8f096a3695045")', 'ObjectId("61184062c1d8f096a3695044")'], 'ObjectId', 'objectId'),
         Property('mapUuid', ['UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!', 'UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!', 'UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d08e")!'], 'UUID', 'uuid'),
-        Property('mapAny', [['.objectId', 'ObjectId("61184062c1d8f096a3695046")'], ['.string', '"Hello"'], ['.int', 123]], 'AnyRealmValue', 'any'),
+        Property('mapAny', ['AnyRealmValue.objectId(ObjectId("61184062c1d8f096a3695046"))', 'AnyRealmValue.string("Hello")', 'AnyRealmValue.int(123)'], 'AnyRealmValue', 'any'),
     ]
 
     optMapProperties = [
@@ -196,18 +189,18 @@ import RealmSwift
     ]
 
     anyRealmValues = [
-        ('.none', 'NSNull()', 'null'),
-        ('.int(123)', '123', 'numeric'),
-        ('.bool(true)', 'true', 'bool'),
-        ('.float(123.456)', 'Float(123.456)', 'numeric'),
-        ('.double(123.456)', '123.456', 'numeric'),
-        ('.string("FooBar")', '"FooBar"', 'string'),
-        ('.data(Data(count: 64))', 'Data(count: 64)', 'binary'),
-        ('.date(Date(timeIntervalSince1970: 1000000))', 'Date(timeIntervalSince1970: 1000000)', 'numeric'),
-        ('.object(circleObject)', 'circleObject', 'object'),
-        ('.objectId(ObjectId("61184062c1d8f096a3695046"))', 'ObjectId("61184062c1d8f096a3695046")', 'objectId'),
-        ('.decimal128(123.456)', 'Decimal128(123.456)', 'numeric'),
-        ('.uuid(UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!)', 'UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!', 'uuid'),
+        ('AnyRealmValue.none', 'null'),
+        ('AnyRealmValue.int(123)', 'numeric'),
+        ('AnyRealmValue.bool(true)', 'bool'),
+        ('AnyRealmValue.float(123.456)', 'numeric'),
+        ('AnyRealmValue.double(123.456)', 'numeric'),
+        ('AnyRealmValue.string("FooBar")', 'string'),
+        ('AnyRealmValue.data(Data(count: 64))', 'binary'),
+        ('AnyRealmValue.date(Date(timeIntervalSince1970: 1000000))', 'numeric'),
+        ('AnyRealmValue.object(circleObject)', 'object'),
+        ('AnyRealmValue.objectId(ObjectId("61184062c1d8f096a3695046"))', 'objectId'),
+        ('AnyRealmValue.decimal128(123.456)', 'numeric'),
+        ('AnyRealmValue.uuid(UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!)', 'uuid'),
     ]
 }%
 /// This file is generated from a template. Do not edit directly.
@@ -404,11 +397,12 @@ class QueryTests: TestCase {
     }
 
     func testEqualAnyRealmValue() {
+        var value: AnyRealmValue = .none
         % for value in anyRealmValues:
-
-        setAnyRealmValueCol(with: AnyRealmValue${ value[0] }, object: objects()[0])
-        assertQuery(predicate: "anyCol == %@", values: [${ value[1] }], expectedCount: 1) {
-            $0.anyCol == ${ value[0]}
+        value = ${ value[0] }
+        setAnyRealmValueCol(with: value, object: objects()[0])
+        assertQuery(predicate: "anyCol == %@", values: [value], expectedCount: 1) {
+            $0.anyCol == value
         }
         % end
     }
@@ -490,10 +484,12 @@ class QueryTests: TestCase {
     }
 
     func testNotEqualAnyRealmValue() {
+        var value: AnyRealmValue = .none
         % for value in anyRealmValues:
-        setAnyRealmValueCol(with: AnyRealmValue${ value[0] }, object: objects()[0])
-        assertQuery(predicate: "anyCol != %@", values: [${ value[1] }], expectedCount: 0) {
-            $0.anyCol != ${ value[0]}
+        value = ${ value[0] }
+        setAnyRealmValueCol(with: value, object: objects()[0])
+        assertQuery(predicate: "anyCol != %@", values: [value], expectedCount: 0) {
+            $0.anyCol != value
         }
         % end
     }
@@ -601,12 +597,12 @@ class QueryTests: TestCase {
 
     func testGreaterThanAnyRealmValue() {
         % for value in anyRealmValues:
-        % if value[2] == 'numeric':
-        setAnyRealmValueCol(with: AnyRealmValue${ value[0] }, object: objects()[0])
-        assertQuery(predicate: "anyCol > %@", values: [${ value[1] }], expectedCount: 0) {
+        % if value[1] == 'numeric':
+        setAnyRealmValueCol(with: ${ value[0] }, object: objects()[0])
+        assertQuery(predicate: "anyCol > %@", values: [${ value[0] }], expectedCount: 0) {
             $0.anyCol > ${ value[0]}
         }
-        assertQuery(predicate: "anyCol >= %@", values: [${ value[1] }], expectedCount: 1) {
+        assertQuery(predicate: "anyCol >= %@", values: [${ value[0] }], expectedCount: 1) {
             $0.anyCol >= ${ value[0]}
         }
         % end
@@ -680,12 +676,12 @@ class QueryTests: TestCase {
 
     func testLessThanAnyRealmValue() {
         % for value in anyRealmValues:
-        % if value[2] == 'numeric':
-        setAnyRealmValueCol(with: AnyRealmValue${ value[0] }, object: objects()[0])
-        assertQuery(predicate: "anyCol < %@", values: [${ value[1] }], expectedCount: 0) {
+        % if value[1] == 'numeric':
+        setAnyRealmValueCol(with: ${ value[0] }, object: objects()[0])
+        assertQuery(predicate: "anyCol < %@", values: [${ value[0] }], expectedCount: 0) {
             $0.anyCol < ${ value[0]}
         }
-        assertQuery(predicate: "anyCol <= %@", values: [${ value[1] }], expectedCount: 1) {
+        assertQuery(predicate: "anyCol <= %@", values: [${ value[0] }], expectedCount: 1) {
             $0.anyCol <= ${ value[0]}
         }
         % end
@@ -2099,11 +2095,11 @@ class QueryTests: TestCase {
         // List
 
         // Count of results will be 0 because there are no `ModernAllTypesObject`s in the list.
-        assertQuery(predicate: "SUBQUERY(arrayCol, $col0, $col0.intCol != %@).@count > %@", values: [123, 0], expectedCount: 0) {
+        assertQuery(predicate: "SUBQUERY(arrayCol, $col1, $col1.intCol != %@).@count > %@", values: [123, 0], expectedCount: 0) {
             ($0.arrayCol.intCol != 123).count > 0
         }
 
-        assertQuery(predicate: "(intCol == %@ && SUBQUERY(arrayCol, $col0, $col0.stringCol == %@).@count == %@)", values: [5, "Bar", 0], expectedCount: 0) {
+        assertQuery(predicate: "(intCol == %@ && SUBQUERY(arrayCol, $col1, $col1.stringCol == %@).@count == %@)", values: [5, "Bar", 0], expectedCount: 0) {
             $0.intCol == 5 &&
             ($0.arrayCol.stringCol == "Bar").count == 0
         }
@@ -2111,11 +2107,11 @@ class QueryTests: TestCase {
         // Set
 
         // Will be 0 results because there are no `ModernAllTypesObject`s in the set.
-        assertQuery(predicate: "SUBQUERY(arrayCol, $col0, $col0.intCol != %@).@count > %@", values: [123, 0], expectedCount: 0) {
+        assertQuery(predicate: "SUBQUERY(arrayCol, $col1, $col1.intCol != %@).@count > %@", values: [123, 0], expectedCount: 0) {
             ($0.arrayCol.intCol != 123).count > 0
         }
 
-        assertQuery(predicate: "(intCol == %@ && SUBQUERY(setCol, $col0, $col0.stringCol == %@).@count == %@)", values: [5, "Bar", 0], expectedCount: 0) {
+        assertQuery(predicate: "(intCol == %@ && SUBQUERY(setCol, $col1, $col1.stringCol == %@).@count == %@)", values: [5, "Bar", 0], expectedCount: 0) {
             $0.intCol == 5 &&
             ($0.setCol.stringCol == "Bar").count == 0
         }
@@ -2129,24 +2125,24 @@ class QueryTests: TestCase {
         }
 
         // Results count should now be 1
-        assertQuery(predicate: "SUBQUERY(arrayCol, $col0, $col0.arrayInt.@count >= %@).@count > %@", values: [0, 0], expectedCount: 1) {
+        assertQuery(predicate: "SUBQUERY(arrayCol, $col1, $col1.arrayInt.@count >= %@).@count > %@", values: [0, 0], expectedCount: 1) {
             ($0.arrayCol.arrayInt.count >= 0).count > 0
         }
 
         // Subquery in a subquery
-        assertQuery(predicate: "SUBQUERY(arrayCol, $col1, ($col1.arrayInt.@count >= %@ && SUBQUERY(arrayCol, $col0, $col0.intCol != %@).@count > %@)).@count > %@", values: [0, 123, 0, 0], expectedCount: 0) {
+        assertQuery(predicate: "SUBQUERY(arrayCol, $col1, ($col1.arrayInt.@count >= %@ && SUBQUERY(arrayCol, $col2, $col2.intCol != %@).@count > %@)).@count > %@", values: [0, 123, 0, 0], expectedCount: 0) {
             ($0.arrayCol.arrayInt.count >= 0 && ($0.arrayCol.intCol != 123).count > 0).count > 0
         }
 
-        assertQuery(predicate: "SUBQUERY(arrayCol, $col0, $col0.intCol != %@).@count > %@", values: [123, 0], expectedCount: 1) {
+        assertQuery(predicate: "SUBQUERY(arrayCol, $col1, $col1.intCol != %@).@count > %@", values: [123, 0], expectedCount: 1) {
             ($0.arrayCol.intCol != 123).count > 0
         }
 
-        assertQuery(predicate: "SUBQUERY(arrayCol, $col0, ($col0.intCol > %@ && $col0.intCol <= %@)).@count > %@", values: [0, 5, 0], expectedCount: 1) {
+        assertQuery(predicate: "SUBQUERY(arrayCol, $col1, ($col1.intCol > %@ && $col1.intCol <= %@)).@count > %@", values: [0, 5, 0], expectedCount: 1) {
             ($0.arrayCol.intCol > 0 && $0.arrayCol.intCol <= 5 ).count > 0
         }
 
-        assertQuery(predicate: "((intCol == %@ && SUBQUERY(arrayCol, $col0, $col0.intCol == %@).@count == %@) && SUBQUERY(arrayCol, $col0, $col0.stringCol == %@).@count == %@)", values: [6, 5, 1, "Bar", 0], expectedCount: 1) {
+        assertQuery(predicate: "((intCol == %@ && SUBQUERY(arrayCol, $col1, $col1.intCol == %@).@count == %@) && SUBQUERY(arrayCol, $col2, $col2.stringCol == %@).@count == %@)", values: [6, 5, 1, "Bar", 0], expectedCount: 1) {
             ($0.intCol == 6) &&
             ($0.arrayCol.intCol == 5).count == 1 &&
             ($0.arrayCol.stringCol == "Bar").count == 0
@@ -2155,16 +2151,16 @@ class QueryTests: TestCase {
         // Set
 
         // Will be 0 results because there are no `ModernAllTypesObject`s in the set.
-        assertQuery(predicate: "SUBQUERY(arrayCol, $col0, $col0.intCol != %@).@count > %@", values: [123, 0], expectedCount: 1) {
+        assertQuery(predicate: "SUBQUERY(arrayCol, $col1, $col1.intCol != %@).@count > %@", values: [123, 0], expectedCount: 1) {
             ($0.arrayCol.intCol != 123).count > 0
         }
 
-        assertQuery(predicate: "(intCol == %@ && SUBQUERY(setCol, $col0, $col0.stringCol == %@).@count == %@)", values: [6, "Bar", 0], expectedCount: 1) {
+        assertQuery(predicate: "(intCol == %@ && SUBQUERY(setCol, $col1, $col1.stringCol == %@).@count == %@)", values: [6, "Bar", 0], expectedCount: 1) {
             ($0.intCol == 6) &&
             ($0.setCol.stringCol == "Bar").count == 0
         }
 
-        assertQuery(predicate: "(intCol == %@ && SUBQUERY(setCol, $col0, ($col0.intCol == %@ && $col0.stringCol != %@)).@count == %@)", values: [6, 5, "Blah", 1], expectedCount: 1) {
+        assertQuery(predicate: "(intCol == %@ && SUBQUERY(setCol, $col1, ($col1.intCol == %@ && $col1.stringCol != %@)).@count == %@)", values: [6, 5, "Blah", 1], expectedCount: 1) {
             ($0.intCol == 6) &&
             (((($0.setCol.intCol == 5) && ($0.setCol.stringCol != "Blah"))).count == 1)
         }
