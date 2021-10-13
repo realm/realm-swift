@@ -169,7 +169,7 @@ private func createEquatableBinding<T: ThreadConfined, V: Equatable>(
 
 // MARK: - ObservableStorage
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-private final class ObservableStoragePublisher<ObjectType>: Publisher where ObjectType: ThreadConfined & RealmSubscribable {
+internal final class ObservableStoragePublisher<ObjectType>: Publisher where ObjectType: ThreadConfined & RealmSubscribable {
     public typealias Output = Void
     public typealias Failure = Never
 
@@ -212,7 +212,7 @@ private final class ObservableStoragePublisher<ObjectType>: Publisher where Obje
     }
 }
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-private class ObservableStorage<ObservedType>: ObservableObject where ObservedType: RealmSubscribable & ThreadConfined & Equatable {
+internal class ObservableStorage<ObservedType>: ObservableObject where ObservedType: RealmSubscribable & ThreadConfined & Equatable {
     @Published var value: ObservedType {
         willSet {
             if newValue != value {
@@ -349,8 +349,9 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
 /// the environment value `EnvironmentValues/realmConfiguration`.
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 @propertyWrapper public struct ObservedResults<ResultType>: DynamicProperty, BoundCollection where ResultType: Object & Identifiable {
-    private class Storage: ObservableStorage<Results<ResultType>> {
+    internal class Storage: ObservableStorage<Results<ResultType>> {
         var setupHasRun = false
+        var cancellables = [AnyCancellable]()
 
         private func didSet() {
             if setupHasRun {
@@ -369,9 +370,9 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
                 value = value.filter(filter)
             }
 
-            if let searchPredicate = searchPredicate {
-                value = value.filter(searchPredicate)
-            }
+//            if let searchQuery = searchQuery {
+//                value = value.where(searchQuery)
+//            }
 
             setupHasRun = true
         }
@@ -394,16 +395,16 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
             }
         }
 
-        var searchString: String?
-        var searchPredicate: NSPredicate? {
-            didSet {
-                didSet()
-            }
-        }
+//        var searchString: String?
+//        var searchQuery: ((Query<Results<ResultType>.Element>) -> Query<Results<ResultType>.Element>)? {
+//            didSet {
+//                didSet()
+//            }
+//        }
     }
 
     @Environment(\.realmConfiguration) var configuration
-    @ObservedObject private var storage: Storage
+    @ObservedObject internal var storage: Storage
     /// :nodoc:
     @State public var filter: NSPredicate? {
         willSet {
@@ -417,23 +418,34 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
         }
     }
 
-    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
-    public func searchByKeypathString(_ keyPathStrings: [String]) -> Binding<String> {
-        return Binding {
-            storage.searchString ?? ""
-        } set: { newValue in
-            storage.searchString = newValue
-            guard !newValue.isEmpty else {
-                storage.searchPredicate = nil
-                return
-            }
-            let predicates = keyPathStrings.compactMap {
-                return NSPredicate(format: "%K CONTAINS[c] %@", $0, newValue)
-            }
-            let predicateCompound = NSCompoundPredicate.init(type: .or, subpredicates: predicates)
-            storage.searchPredicate = predicateCompound
-        }
-    }
+//    public typealias SearchQueryCompletionHandler = (Query<ResultType>.Element>, String) -> ((Query<Results<ResultType>.Element>) -> Query<Results<ResultType>.Element>)
+
+    /// Returns a binding to the search string, which can be used on `.searchable(text:)` component in SwiftUI
+    /// Using this binding in a searchable component would search for the given value on the provided key paths, if
+    /// the value type doesn't correspond to the key path type,
+    ///
+    ///     List {
+    ///         ForEach(reminders) { reminder in
+    ///             ReminderRowView(reminder: reminder)
+    ///         }
+    ///     }
+    ///     .searchable(text: $reminders.searchIn([\.title]))
+    ///
+    /// - Parameter keyPaths  : An array of key paths to search by, if empty it would no add any filter.
+    /// - Returns: A new binding..
+//    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
+//    public func searchWhere(_ query: @escaping SearchQueryCompletionHandler) -> Binding<String> {
+//        return Binding {
+//            storage.searchString ?? ""
+//        } set: { newValue in
+//            storage.searchString = newValue
+//            guard !newValue.isEmpty else {
+//                storage.searchQuery = nil
+//                return
+//            }
+//            storage.searchQuery = query(Query(), newValue)
+//        }
+//    }
 
         /// :nodoc:
     public var wrappedValue: Results<ResultType> {
@@ -1149,6 +1161,24 @@ extension SwiftUIKVO {
         }
     }
 }
+
+@available(iOS 15.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+extension SwiftUI.List {
+    public func searchable<S, T: ObjectBase, V: StringProtocol & _RealmSchemaDiscoverable>(
+        text: Binding<String>,
+        collection: ObservedResults<T>,
+        keyPath: KeyPath<T, V>,
+        placement: SearchFieldPlacement = .automatic,
+        prompt: S) -> some View where S : StringProtocol {
+            collection.storage.cancellables.append(text.wrappedValue.publisher.sink { str in
+                var query: Query<V> = Query<T>()[dynamicMember: keyPath]
+                query = query == (str as! V)
+                collection.filter = query.predicate
+            })
+            return self
+    }
+}
+
 #else
 @objc(RLMSwiftUIKVO) internal final class SwiftUIKVO: NSObject {
     @objc(removeObserversFromObject:) public static func removeObservers(object: NSObject) -> Bool {

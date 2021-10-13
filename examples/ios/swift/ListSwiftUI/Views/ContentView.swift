@@ -190,7 +190,9 @@ struct ReminderListResultsView: View {
                     }.accessibilityIdentifier(list.name)
                 }.onDelete(perform: $reminders.remove)
             }
-            .searchable(text: $reminders.searchByKeypathString(["name"])) {
+            .searchable(text: $reminders.searchWhere { reminder, searchString in
+                reminder.title.contains(searchString)
+            }) {
                 ForEach(reminders) { remindersFiltered in
                     Text(remindersFiltered.name).searchCompletion(remindersFiltered.name)
                 }
