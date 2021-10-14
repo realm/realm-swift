@@ -715,6 +715,7 @@ public enum RealmPublishers {
             subscriber.receive(subscription: AsyncOpenSubscription(task: Realm.AsyncOpenTask(rlmTask: RLMRealm.asyncOpen(with: configuration.rlmConfiguration, callbackQueue: callbackQueue, callback: { rlmRealm, error in
                 if let realm = rlmRealm.flatMap(Realm.init) {
                     _ = subscriber.receive(realm)
+                    subscriber.receive(completion: .finished)
                 } else {
                     subscriber.receive(completion: .failure(error ?? Realm.Error.callFailed))
                 }

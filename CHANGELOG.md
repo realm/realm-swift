@@ -1,11 +1,14 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+* Add support for multi-user on `@AsyncOpen` and `@AutoOpen`.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
-* None.
+* Fix `@AsyncOpen` and `@AutoOpen` using `defaultConfiguration` by default if 
+  the user's doesn't provide one, will set an incorrect path which doesn't 
+  correspond to the users configuration one. (since v10.12.0)
+* Adding missing subscription completion for `AsyncOpenPublisher` after successfully 
+  returning a realm.
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
