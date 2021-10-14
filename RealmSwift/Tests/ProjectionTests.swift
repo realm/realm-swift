@@ -994,8 +994,18 @@ class ProjectionTests: TestCase {
         observeMapKeyPathChange(obj, obs, \AllTypesProjection.mapOptDecimal, newValues["mapOptDecimal"] as! Dictionary<String, Decimal128?>, { obj.mapOptDecimal["1"] = decimal })
         observeMapKeyPathChange(obj, obs, \AllTypesProjection.mapOptObjectId, newValues["mapOptObjectId"] as! Dictionary<String, ObjectId?>, { obj.mapOptObjectId["1"] = objectId })
         observeMapKeyPathChange(obj, obs, \AllTypesProjection.mapOptUuid, newValues["mapOptUuid"] as! Dictionary<String, UUID?>, { obj.mapOptUuid["1"] = uuid })
+    }
 
-        observeKeyPathChange(obj, obs, \AllTypesProjection.linkingObjects, obj.objectCol!.linkingObjects.first!.pk, newObj.pk, { obj.objectCol = newObj })
+    func testLinkongObjectObservation() {
+        let realm = realmWithTestPath()
+        let obj = realm.objects(ModernAllTypesObject.self).first!
+        let obs = realm.objects(AllTypesProjection.self).first!
+
+        let newObj = ModernAllTypesObject()
+        let oldPk = obj.objectCol!.linkingObjects.first!.pk
+        let newPk = newObj.pk
+        observeKeyPathChange(obj, obs, \AllTypesProjection.linkingObjects, oldPk, newObj.pk, { newObj.objectCol = obj })//obj.objectCol = newObj })
+        XCTAssertEqual(newObj.objectCol, obj)
     }
 
     func testObserveKeyPath() {
