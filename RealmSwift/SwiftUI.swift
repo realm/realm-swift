@@ -334,6 +334,16 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
         self._storage = StateObject(wrappedValue: ObservableStorage(wrappedValue))
         defaultValue = T()
     }
+    /**
+     Initialize a RealmState struct for a given Projection type.
+     - parameter wrappedValue The Projection reference to wrap and observe.
+     */
+    @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
+    public init(wrappedValue: T) where T: ProjectionObservable {
+        self._storage = StateObject(wrappedValue: ObservableStorage(wrappedValue))
+        defaultValue = T(projecting: T.Root())
+    }
+
 
     /// :nodoc:
     public var _publisher: some Publisher {
@@ -375,6 +385,13 @@ extension Projection: ObservedResultsValue { }
             /// A base value to reset the state of the query if a user reassigns the `filter` or `sortDescriptor`
             let realm = try! Realm(configuration: configuration ?? Realm.Configuration.defaultConfiguration)
             value = self.resultFactory(realm)
+            if let sortDescriptor = sortDescriptor {
+                value = value.sorted(byKeyPath: sortDescriptor.keyPath, ascending: sortDescriptor.ascending)
+            }
+            if let filter = filter {
+                value = value.filter(filter)
+            }
+
             setupHasRun = true
         }
 
@@ -441,7 +458,10 @@ extension Projection: ObservedResultsValue { }
                                         filter: NSPredicate? = nil,
                                         keyPaths: [String]? = nil,
                                         sortDescriptor: SortDescriptor? = nil) where ResultType: Projection<ObjectType>, ObjectType: ThreadConfined {
-        self.storage = Storage(Results(RLMResults.emptyDetached()), keyPaths)
+        let results = Results(RLMResults.emptyDetached(), {
+            ResultType(projecting: $0 as! ObjectType)
+        })
+        self.storage = Storage(results, keyPaths)
         self.storage.resultFactory = { realm in
             realm.objects(ResultType.self)
         }
@@ -664,6 +684,15 @@ public extension BoundCollection where Value: RealmCollection {
             results.realm?.add(value)
         }
     }
+    /// :nodoc:
+    func append<V>(_ value: Value.Element) where Value == Results<V>, V: ProjectionObservable & ThreadConfined, V.Root: Object {
+        if value.realm == nil && self.wrappedValue.realm != nil {
+            SwiftUIKVO.observedObjects[value.rootObject]?.cancel()
+        }
+        safeWrite(self.wrappedValue) { results in
+            results.realm?.add(value.rootObject)
+        }
+    }
 }
 @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
 extension Binding: BoundCollection where Value: RealmCollection {
@@ -740,6 +769,54 @@ extension Binding where Value: Object & Identifiable {
         safeWrite(wrappedValue) { object in
             object.realm?.delete(self.wrappedValue)
         }
+    }
+}
+
+@available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
+extension Binding where Value: ProjectionObservable, Value.Root: ThreadConfined {//} & ThreadConfined {
+    /// :nodoc:
+    public func delete() {
+        safeWrite(wrappedValue.rootObject) { object in
+            object.realm?.delete(object)
+        }
+    }
+}
+
+@available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
+extension Binding where Value: ProjectionObservable & ThreadConfined {
+//    /// :nodoc:
+//    public subscript<V>(dynamicMember member: ReferenceWritableKeyPath<Value, V>) -> Binding<V> where V: _Persistable {
+//        createBinding(wrappedValue, forKeyPath: member)
+//    }
+//    /// :nodoc:
+//    public subscript<V>(dynamicMember member: ReferenceWritableKeyPath<Value, V>) -> Binding<V> where V: _Persistable & RLMSwiftCollectionBase & ThreadConfined {
+//        createCollectionBinding(wrappedValue, forKeyPath: member)
+//    }
+    /// :nodoc:
+    public subscript<V>(dynamicMember member: ReferenceWritableKeyPath<Value, V>) -> Binding<V> where V: _Persistable & Equatable {
+        createEquatableBinding(wrappedValue, forKeyPath: member)
+    }
+}
+
+@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+extension ThreadConfined where Self: ProjectionObservable {
+    /**
+     Create a `Binding` for a given property, allowing for
+     automatically transacted reads and writes behind the scenes.
+
+     This is a convenience method for SwiftUI views (e.g., TextField, DatePicker)
+     that require a `Binding` to be passed in. SwiftUI will automatically read/write
+     from the binding.
+
+     - parameter keyPath The key path to the member property.
+     - returns A `Binding` to the member property.
+     */
+    public func bind<V: _Persistable & Equatable>(_ keyPath: ReferenceWritableKeyPath<Self, V>) -> Binding<V> {
+        createEquatableBinding(self, forKeyPath: keyPath)
+    }
+    /// :nodoc:
+    public func bind<V: _Persistable & RLMSwiftCollectionBase & ThreadConfined>(_ keyPath: ReferenceWritableKeyPath<Self, V>) -> Binding<V> {
+        createCollectionBinding(self, forKeyPath: keyPath)
     }
 }
 

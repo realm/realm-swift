@@ -22,13 +22,13 @@ import RealmSwift
 import SwiftUI
 import Combine
 
-@objcMembers class SwiftUIObject: Object, ObjectKeyIdentifiable {
-    var list = RealmSwift.List<SwiftBoolObject>()
-    var map = Map<String, SwiftBoolObject?>()
-    var primitiveList = RealmSwift.List<Int>()
-    var primitiveMap = Map<String, Int>()
-    dynamic var str = "foo"
-    dynamic var int = 0
+class SwiftUIObject: Object, ObjectKeyIdentifiable {
+    @Persisted var list: RealmSwift.List<SwiftBoolObject>
+    @Persisted var map: Map<String, SwiftBoolObject?>
+    @Persisted var primitiveList: RealmSwift.List<Int>
+    @Persisted var primitiveMap: Map<String, Int>
+    @Persisted var str = "foo"
+    @Persisted var int = 0
 
     convenience init(str: String = "foo") {
         self.init()
@@ -394,41 +394,77 @@ class SwiftUITests: TestCase {
 #endif
 
     // MARK: - Projection ObservedResults Operations
-
     func testResultsAppendProjection() throws {
         let realm = inMemoryRealm(inMemoryIdentifier)
         let state = ObservedResults(UIElementsProjection.self,
                                     configuration: inMemoryRealm(inMemoryIdentifier).configuration)
-
         XCTAssertEqual(state.wrappedValue.count, 0)
         try! realm.write {
             realm.create(SwiftUIObject.self)
         }
-//        state.projectedValue.append(object)
         XCTAssertEqual(state.wrappedValue.count, 1)
-//        state.projectedValue.append(object)
-        try! realm.write {
-            realm.create(SwiftUIObject.self)
-        }
-        XCTAssertEqual(state.wrappedValue.count, 2)
     }
 
     func testResultsRemoveProjection() throws {
-        XCTAssertTrue(false)
+        let realm = inMemoryRealm(inMemoryIdentifier)
+        let state = ObservedResults(UIElementsProjection.self,
+                                    configuration: inMemoryRealm(inMemoryIdentifier).configuration)
+        var object: SwiftUIObject!
+        try! realm.write {
+            object = realm.create(SwiftUIObject.self)
+        }
+        XCTAssertEqual(state.wrappedValue.count, 1)
+        try! realm.write {
+            realm.delete(object)
+        }
+        XCTAssertEqual(state.wrappedValue.count, 0)
     }
 
     // MARK: - Projection Operations
-    func testProjectionModification() throws {
-        XCTAssertTrue(false)
+    func testStateProjectionModification() throws {
+        let projection = UIElementsProjection(projecting: SwiftUIObject())
+        let state = StateRealmObject(wrappedValue: projection)
+        ObservedResults(UIElementsProjection.self,
+                        configuration: inMemoryRealm(inMemoryIdentifier).configuration)
+            .projectedValue.append(state.wrappedValue)
+
+        assertThrows(state.wrappedValue.label = "bar")
+        state.projectedValue.label.wrappedValue = "bar"
+        XCTAssertEqual(state.projectedValue.wrappedValue.label, "bar")
     }
 
     func testProjectionDelete() throws {
-        XCTAssertTrue(false)
+        let results = ObservedResults(UIElementsProjection.self,
+                                      configuration: inMemoryRealm(inMemoryIdentifier).configuration)
+        let projection = UIElementsProjection(projecting: SwiftUIObject())
+        let state = StateRealmObject(wrappedValue: projection)
+
+        XCTAssertEqual(results.wrappedValue.count, 0)
+        state.projectedValue.delete()
+        XCTAssertEqual(results.wrappedValue.count, 0)
+        results.projectedValue.append(state.wrappedValue)
+        XCTAssertEqual(results.wrappedValue.count, 1)
+        state.projectedValue.delete()
     }
 
     // MARK: - Projection Bind
     func testProjectionBind() {
-        XCTAssertTrue(false)
+        let projection = UIElementsProjection(projecting: SwiftUIObject())
+        let binding = projection.bind(\.label)
+        XCTAssertEqual(projection.label, "foo")
+        XCTAssertEqual(binding.wrappedValue, "foo")
+        binding.wrappedValue = "bar"
+        XCTAssertEqual(binding.wrappedValue, "bar")
+
+        let realm = inMemoryRealm(inMemoryIdentifier)
+        try? realm.write { realm.add(projection.rootObject) }
+
+        let managedBinding = projection.bind(\.label)
+        XCTAssertEqual(projection.label, "bar")
+        XCTAssertEqual(binding.wrappedValue, "bar")
+        managedBinding.wrappedValue = "baz"
+        XCTAssertEqual(projection.label, "baz")
+        XCTAssertEqual(binding.wrappedValue, "baz")
     }
 }
 #endif

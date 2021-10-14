@@ -233,8 +233,8 @@ public class Person: Object {
     @Persisted var lastName = ""
     @Persisted var birthday: Date
     @Persisted var address: Address?
-    @Persisted public var friends = List<Person>()
-    @Persisted var reviews = List<String>()
+    @Persisted public var friends: List<Person>
+    @Persisted var reviews: List<String>
     @Persisted var money: Decimal128
 }
 
@@ -715,17 +715,17 @@ class ProjectionTests: TestCase {
                 XCTAssertNil(observedNew)
 
                 guard let projectedNew = object[keyPath: keyPath] as? List<E>,
-                      let new = new else {
+                      let newVals = new else {
                           XCTFail("Expected new array to be [\(String(describing: E.self))] and projected array to be \(String(describing: List<E>.self)), got \(String(describing: new)) and \(String(describing: obs[keyPath: keyPath]))",
                                   file: (fileName), line: lineNumber)
                           return
                       }
 
-                if projectedNew.count != new.count {
-                    XCTAssertEqual(projectedNew.count, new.count, "Expected \(projectedNew) and \(new) to be equal", file: (fileName), line: lineNumber)
+                if projectedNew.count != newVals.count {
+                    XCTAssertEqual(projectedNew.count, newVals.count, "Expected \(projectedNew) and \(newVals) to be equal", file: (fileName), line: lineNumber)
                 } else {
                     for (index, element) in projectedNew.enumerated() {
-                        XCTAssertEqual(element, new[index], "Element \(element) at index \(index) should be equal to \(new[index])", file: (fileName), line: lineNumber)
+                        XCTAssertEqual(element, newVals[index], "Element \(element) at index \(index) should be equal to \(newVals[index])", file: (fileName), line: lineNumber)
                     }
                 }
             } else {
@@ -1106,7 +1106,6 @@ class ProjectionTests: TestCase {
         XCTAssert(changeDictionary != nil, "Did not get a notification", file: (fileName), line: lineNumber)
         guard changeDictionary != nil else { return }
 
-        let kind = NSKeyValueChange.setting
         let actualKind = NSKeyValueChange(rawValue: (changeDictionary![NSKeyValueChangeKey.kindKey] as! NSNumber).uintValue)!
         XCTAssert(actualKind == NSKeyValueChange.setting, "Change kind: expected NSKeyValueChange.setting, got \(actualKind)", file: (fileName),
             line: lineNumber)

@@ -317,7 +317,7 @@ extension AnyRealmValue: AddableType {}
      */
     public func distinct<S: Sequence>(by keyPaths: S) -> Results<Element>
         where S.Iterator.Element == String {
-            return Results<Element>(rlmResults.distinctResults(usingKeyPaths: Array(keyPaths)))
+            return Results<Element>(rlmResults.distinctResults(usingKeyPaths: Array(keyPaths)), projector)
     }
 
     // MARK: Aggregate Operations
@@ -682,11 +682,11 @@ extension AnyRealmValue: AddableType {}
     }
 
     public func freeze() -> Results {
-        return Results(rlmResults.freeze())
+        return Results(rlmResults.freeze(), projector)
     }
 
     public func thaw() -> Results? {
-        return Results(rlmResults.thaw())
+        return Results(rlmResults.thaw(), projector)
     }
 }
 
@@ -754,6 +754,6 @@ extension Results where Element: ObjectBase {
      */
     public func distinct<S: Sequence>(by keyPaths: S) -> Results<Element>
         where S.Iterator.Element == PartialKeyPath<Element> {
-            return Results<Element>(rlmResults.distinctResults(usingKeyPaths: keyPaths.map(_name(for:))))
+            return Results<Element>(rlmResults.distinctResults(usingKeyPaths: keyPaths.map(_name(for:))), projector)
     }
 }
