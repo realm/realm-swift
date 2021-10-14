@@ -1749,7 +1749,7 @@ class ProjectionTests: TestCase {
         XCTAssertEqual(johnProjection.lastNameCaps, "SNOW")
 
         let ex = expectation(description: "values will be observed")
-        let token = johnProjection.observe(keyPaths: [\.lastNameCaps]) { chg in
+        let token = johnProjection.observe(keyPaths: [\PersonProjection.lastNameCaps]) { chg in
             if case let .change(_, change) = chg {
                 XCTAssertEqual(change.first!.name, "lastNameCaps")
                 XCTAssertEqual(change.first!.oldValue as! String, "SNOW")
