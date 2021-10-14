@@ -99,11 +99,13 @@ namespace {
 - (instancetype)initWithBaseURL:(nullable NSString *)baseURL
                       transport:(nullable id<RLMNetworkTransport>)transport
                    localAppName:(nullable NSString *)localAppName
-                localAppVersion:(nullable NSString *)localAppVersion {
+                localAppVersion:(nullable NSString *)localAppVersion
+                     sharedPath:(nullable NSString *)sharedPath {
     return [self initWithBaseURL:baseURL
                        transport:transport
                     localAppName:localAppName
                  localAppVersion:localAppVersion
+                      sharedPath:sharedPath
          defaultRequestTimeoutMS:6000];
 }
 
@@ -111,6 +113,7 @@ namespace {
                       transport:(nullable id<RLMNetworkTransport>)transport
                    localAppName:(NSString *)localAppName
                 localAppVersion:(nullable NSString *)localAppVersion
+                     sharedPath:(nullable NSString *)sharedPath
         defaultRequestTimeoutMS:(NSUInteger)defaultRequestTimeoutMS {
     if (self = [super init]) {
         self.baseURL = baseURL;
@@ -118,9 +121,9 @@ namespace {
         self.localAppName = localAppName;
         self.localAppVersion = localAppVersion;
         self.defaultRequestTimeoutMS = defaultRequestTimeoutMS;
+        self.sharedPath = sharedPath;
 
         _config.platform = "Realm Cocoa";
-
         RLMNSStringToStdString(_config.platform_version, [[NSProcessInfo processInfo] operatingSystemVersionString]);
         RLMNSStringToStdString(_config.sdk_version, REALM_COCOA_VERSION);
         return self;
@@ -148,6 +151,21 @@ namespace {
     std::string base_url;
     RLMNSStringToStdString(base_url, baseURL);
     _config.base_url = base_url.empty() ? util::none : util::Optional(base_url);
+    return;
+}
+
+- (NSString *)sharedPath {
+    if (_config.shared_path) {
+        return @(_config.shared_path->c_str());
+    }
+
+    return nil;
+}
+
+- (void)setSharedPath:(nullable NSString *)sharedPath {
+    std::string shared_path;
+    RLMNSStringToStdString(shared_path, sharedPath);
+    _config.shared_path = shared_path.empty() ? util::none : util::Optional(shared_path);
     return;
 }
 
@@ -236,6 +254,9 @@ NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
 @interface RLMApp() <ASAuthorizationControllerDelegate> {
     std::shared_ptr<realm::app::App> _app;
     __weak id<RLMASLoginDelegate> _authorizationDelegate API_AVAILABLE(ios(13.0), macos(10.15), tvos(13.0), watchos(6.0));
+    id tokenSuspension;
+    id tokenTermination;
+    id tokenActive;
 }
 
 @end
@@ -269,13 +290,38 @@ NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
         }
         _configuration = configuration;
         [_configuration setAppId:appId];
-
+        if (configuration.sharedPath) {
+            rootDirectory = [NSURL fileURLWithPath:configuration.sharedPath];
+        }
         _app = RLMTranslateError([&] {
             return app::App::get_shared_app(configuration.config,
                                             [RLMSyncManager configurationWithRootDirectory:rootDirectory appId:appId]);
         });
 
         _syncManager = [[RLMSyncManager alloc] initWithSyncManager:_app->sync_manager()];
+        if (configuration.sharedPath) {
+            id suspensionBlock = ^(NSNotification * _Nonnull note) {
+                if (_app->sync_manager()->has_existing_sessions()) {
+                    _app->sync_manager()->suspend();
+                }
+            };
+            tokenSuspension = [[NSNotificationCenter defaultCenter] addObserverForName:UIApplicationWillResignActiveNotification
+
+                                                              object:nil
+                                                               queue:nil
+                                                          usingBlock:suspensionBlock];
+            tokenTermination = [[NSNotificationCenter defaultCenter] addObserverForName:UIApplicationWillTerminateNotification
+
+                                                              object:nil
+                                                               queue:nil
+                                                          usingBlock:suspensionBlock];
+            tokenActive = [[NSNotificationCenter defaultCenter] addObserverForName:UIApplicationDidBecomeActiveNotification
+                                                              object:nil
+                                                               queue:nil
+                                                          usingBlock:^(NSNotification * _Nonnull note) {
+                _app->sync_manager()->resume();
+            }];
+        }
         return self;
     }
     return nil;
