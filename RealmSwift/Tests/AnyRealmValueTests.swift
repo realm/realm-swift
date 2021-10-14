@@ -19,7 +19,6 @@
 import XCTest
 import Realm
 import RealmSwift
-// swiftlint:disable identifier_name
 
 class AnyRealmTypeObject: Object {
     let anyValue = RealmProperty<AnyRealmValue>()
@@ -228,10 +227,6 @@ class AnyRealmValueListTestsBase<O: ObjectFactory, V: AnyValueFactory>: TestCase
     var obj: ModernAllTypesObject!
     var array: List<AnyRealmValue>!
     var values: [AnyRealmValue]!
-
-    class func _defaultTestSuite() -> XCTestSuite {
-        return defaultTestSuite
-    }
 
     override func setUp() {
         obj = O.get()
@@ -529,51 +524,43 @@ class AddableAnyRealmValueListTests<O: ObjectFactory, V: AnyValueFactory>: AnyRe
 }
 
 func addAnyRealmValueTests<OF: ObjectFactory>(_ suite: XCTestSuite, _ type: OF.Type) {
-    AnyRealmValueListTests<OF, Int>._defaultTestSuite().tests.forEach(suite.addTest)
-    AnyRealmValueListTests<OF, Bool>._defaultTestSuite().tests.forEach(suite.addTest)
-    AnyRealmValueListTests<OF, Float>._defaultTestSuite().tests.forEach(suite.addTest)
-    AnyRealmValueListTests<OF, Double>._defaultTestSuite().tests.forEach(suite.addTest)
-    AnyRealmValueListTests<OF, String>._defaultTestSuite().tests.forEach(suite.addTest)
-    AnyRealmValueListTests<OF, Data>._defaultTestSuite().tests.forEach(suite.addTest)
-    AnyRealmValueListTests<OF, Date>._defaultTestSuite().tests.forEach(suite.addTest)
-    AnyRealmValueListTests<OF, SwiftStringObject>._defaultTestSuite().tests.forEach(suite.addTest)
-    AnyRealmValueListTests<OF, ObjectId>._defaultTestSuite().tests.forEach(suite.addTest)
-    AnyRealmValueListTests<OF, Decimal128>._defaultTestSuite().tests.forEach(suite.addTest)
-    AnyRealmValueListTests<OF, UUID>._defaultTestSuite().tests.forEach(suite.addTest)
+    AnyRealmValueListTests<OF, Int>.defaultTestSuite.tests.forEach(suite.addTest)
+    AnyRealmValueListTests<OF, Bool>.defaultTestSuite.tests.forEach(suite.addTest)
+    AnyRealmValueListTests<OF, Float>.defaultTestSuite.tests.forEach(suite.addTest)
+    AnyRealmValueListTests<OF, Double>.defaultTestSuite.tests.forEach(suite.addTest)
+    AnyRealmValueListTests<OF, String>.defaultTestSuite.tests.forEach(suite.addTest)
+    AnyRealmValueListTests<OF, Data>.defaultTestSuite.tests.forEach(suite.addTest)
+    AnyRealmValueListTests<OF, Date>.defaultTestSuite.tests.forEach(suite.addTest)
+    AnyRealmValueListTests<OF, SwiftStringObject>.defaultTestSuite.tests.forEach(suite.addTest)
+    AnyRealmValueListTests<OF, ObjectId>.defaultTestSuite.tests.forEach(suite.addTest)
+    AnyRealmValueListTests<OF, Decimal128>.defaultTestSuite.tests.forEach(suite.addTest)
+    AnyRealmValueListTests<OF, UUID>.defaultTestSuite.tests.forEach(suite.addTest)
 
-    MinMaxAnyRealmValueListTests<OF, Int>._defaultTestSuite().tests.forEach(suite.addTest)
-    MinMaxAnyRealmValueListTests<OF, Float>._defaultTestSuite().tests.forEach(suite.addTest)
-    MinMaxAnyRealmValueListTests<OF, Double>._defaultTestSuite().tests.forEach(suite.addTest)
-    MinMaxAnyRealmValueListTests<OF, Date>._defaultTestSuite().tests.forEach(suite.addTest)
-    MinMaxAnyRealmValueListTests<OF, Decimal128>._defaultTestSuite().tests.forEach(suite.addTest)
+    MinMaxAnyRealmValueListTests<OF, Int>.defaultTestSuite.tests.forEach(suite.addTest)
+    MinMaxAnyRealmValueListTests<OF, Float>.defaultTestSuite.tests.forEach(suite.addTest)
+    MinMaxAnyRealmValueListTests<OF, Double>.defaultTestSuite.tests.forEach(suite.addTest)
+    MinMaxAnyRealmValueListTests<OF, Date>.defaultTestSuite.tests.forEach(suite.addTest)
+    MinMaxAnyRealmValueListTests<OF, Decimal128>.defaultTestSuite.tests.forEach(suite.addTest)
 
-    AddableAnyRealmValueListTests<OF, Int>._defaultTestSuite().tests.forEach(suite.addTest)
-    AddableAnyRealmValueListTests<OF, Float>._defaultTestSuite().tests.forEach(suite.addTest)
-    AddableAnyRealmValueListTests<OF, Double>._defaultTestSuite().tests.forEach(suite.addTest)
-    AddableAnyRealmValueListTests<OF, Decimal128>._defaultTestSuite().tests.forEach(suite.addTest)
+    AddableAnyRealmValueListTests<OF, Int>.defaultTestSuite.tests.forEach(suite.addTest)
+    AddableAnyRealmValueListTests<OF, Float>.defaultTestSuite.tests.forEach(suite.addTest)
+    AddableAnyRealmValueListTests<OF, Double>.defaultTestSuite.tests.forEach(suite.addTest)
+    AddableAnyRealmValueListTests<OF, Decimal128>.defaultTestSuite.tests.forEach(suite.addTest)
 }
 
 class UnmanagedAnyRealmValueListTests: TestCase {
-    class func _defaultTestSuite() -> XCTestSuite {
+    override class var defaultTestSuite: XCTestSuite {
         let suite = XCTestSuite(name: "Unmanaged AnyRealmValue Lists")
         addAnyRealmValueTests(suite, UnmanagedObjectFactory.self)
         return suite
     }
-
-    override class var defaultTestSuite: XCTestSuite {
-        return _defaultTestSuite()
-    }
 }
 
 class ManagedAnyRealmValueListTests: TestCase {
-    class func _defaultTestSuite() -> XCTestSuite {
+    override class var defaultTestSuite: XCTestSuite {
         let suite = XCTestSuite(name: "Managed AnyRealmValue Lists")
         addAnyRealmValueTests(suite, ManagedObjectFactory.self)
         return suite
-    }
-
-    override class var defaultTestSuite: XCTestSuite {
-        return _defaultTestSuite()
     }
 }
 
@@ -586,10 +573,6 @@ class AnyRealmValueSetTestsBase<O: ObjectFactory, V: AnyValueFactory>: TestCase 
     var mutableSet: MutableSet<AnyRealmValue>!
     var otherMutableSet: MutableSet<AnyRealmValue>!
     var values: [AnyRealmValue]!
-
-    class func _defaultTestSuite() -> XCTestSuite {
-        return defaultTestSuite
-    }
 
     override func setUp() {
         obj = O.get()
@@ -865,51 +848,43 @@ class AddableAnyRealmValueMutableSetTests<O: ObjectFactory, V: AnyValueFactory>:
 }
 
 func addAnyRealmValueMutableSetTests<OF: ObjectFactory>(_ suite: XCTestSuite, _ type: OF.Type) {
-    AnyRealmValueMutableSetTests<OF, Int>._defaultTestSuite().tests.forEach(suite.addTest)
-    AnyRealmValueMutableSetTests<OF, Bool>._defaultTestSuite().tests.forEach(suite.addTest)
-    AnyRealmValueMutableSetTests<OF, Float>._defaultTestSuite().tests.forEach(suite.addTest)
-    AnyRealmValueMutableSetTests<OF, Double>._defaultTestSuite().tests.forEach(suite.addTest)
-    AnyRealmValueMutableSetTests<OF, String>._defaultTestSuite().tests.forEach(suite.addTest)
-    AnyRealmValueMutableSetTests<OF, Data>._defaultTestSuite().tests.forEach(suite.addTest)
-    AnyRealmValueMutableSetTests<OF, Date>._defaultTestSuite().tests.forEach(suite.addTest)
-    AnyRealmValueMutableSetTests<OF, SwiftStringObject>._defaultTestSuite().tests.forEach(suite.addTest)
-    AnyRealmValueMutableSetTests<OF, ObjectId>._defaultTestSuite().tests.forEach(suite.addTest)
-    AnyRealmValueMutableSetTests<OF, Decimal128>._defaultTestSuite().tests.forEach(suite.addTest)
-    AnyRealmValueMutableSetTests<OF, UUID>._defaultTestSuite().tests.forEach(suite.addTest)
+    AnyRealmValueMutableSetTests<OF, Int>.defaultTestSuite.tests.forEach(suite.addTest)
+    AnyRealmValueMutableSetTests<OF, Bool>.defaultTestSuite.tests.forEach(suite.addTest)
+    AnyRealmValueMutableSetTests<OF, Float>.defaultTestSuite.tests.forEach(suite.addTest)
+    AnyRealmValueMutableSetTests<OF, Double>.defaultTestSuite.tests.forEach(suite.addTest)
+    AnyRealmValueMutableSetTests<OF, String>.defaultTestSuite.tests.forEach(suite.addTest)
+    AnyRealmValueMutableSetTests<OF, Data>.defaultTestSuite.tests.forEach(suite.addTest)
+    AnyRealmValueMutableSetTests<OF, Date>.defaultTestSuite.tests.forEach(suite.addTest)
+    AnyRealmValueMutableSetTests<OF, SwiftStringObject>.defaultTestSuite.tests.forEach(suite.addTest)
+    AnyRealmValueMutableSetTests<OF, ObjectId>.defaultTestSuite.tests.forEach(suite.addTest)
+    AnyRealmValueMutableSetTests<OF, Decimal128>.defaultTestSuite.tests.forEach(suite.addTest)
+    AnyRealmValueMutableSetTests<OF, UUID>.defaultTestSuite.tests.forEach(suite.addTest)
 
-    MinMaxAnyRealmValueMutableSetTests<OF, Int>._defaultTestSuite().tests.forEach(suite.addTest)
-    MinMaxAnyRealmValueMutableSetTests<OF, Float>._defaultTestSuite().tests.forEach(suite.addTest)
-    MinMaxAnyRealmValueMutableSetTests<OF, Double>._defaultTestSuite().tests.forEach(suite.addTest)
-    MinMaxAnyRealmValueMutableSetTests<OF, Date>._defaultTestSuite().tests.forEach(suite.addTest)
-    MinMaxAnyRealmValueMutableSetTests<OF, Decimal128>._defaultTestSuite().tests.forEach(suite.addTest)
+    MinMaxAnyRealmValueMutableSetTests<OF, Int>.defaultTestSuite.tests.forEach(suite.addTest)
+    MinMaxAnyRealmValueMutableSetTests<OF, Float>.defaultTestSuite.tests.forEach(suite.addTest)
+    MinMaxAnyRealmValueMutableSetTests<OF, Double>.defaultTestSuite.tests.forEach(suite.addTest)
+    MinMaxAnyRealmValueMutableSetTests<OF, Date>.defaultTestSuite.tests.forEach(suite.addTest)
+    MinMaxAnyRealmValueMutableSetTests<OF, Decimal128>.defaultTestSuite.tests.forEach(suite.addTest)
 
-    AddableAnyRealmValueMutableSetTests<OF, Int>._defaultTestSuite().tests.forEach(suite.addTest)
-    AddableAnyRealmValueMutableSetTests<OF, Float>._defaultTestSuite().tests.forEach(suite.addTest)
-    AddableAnyRealmValueMutableSetTests<OF, Double>._defaultTestSuite().tests.forEach(suite.addTest)
-    AddableAnyRealmValueMutableSetTests<OF, Decimal128>._defaultTestSuite().tests.forEach(suite.addTest)
+    AddableAnyRealmValueMutableSetTests<OF, Int>.defaultTestSuite.tests.forEach(suite.addTest)
+    AddableAnyRealmValueMutableSetTests<OF, Float>.defaultTestSuite.tests.forEach(suite.addTest)
+    AddableAnyRealmValueMutableSetTests<OF, Double>.defaultTestSuite.tests.forEach(suite.addTest)
+    AddableAnyRealmValueMutableSetTests<OF, Decimal128>.defaultTestSuite.tests.forEach(suite.addTest)
 }
 
 class UnmanagedAnyRealmValueMutableSetTests: TestCase {
-    class func _defaultTestSuite() -> XCTestSuite {
+    override class var defaultTestSuite: XCTestSuite {
         let suite = XCTestSuite(name: "Unmanaged Primitive Sets")
         addAnyRealmValueMutableSetTests(suite, UnmanagedObjectFactory.self)
         return suite
     }
-
-    override class var defaultTestSuite: XCTestSuite {
-        return _defaultTestSuite()
-    }
 }
 
 class ManagedAnyRealmValueMutableSetTests: TestCase {
-    class func _defaultTestSuite() -> XCTestSuite {
+    override class var defaultTestSuite: XCTestSuite {
         let suite = XCTestSuite(name: "Managed Primitive Sets")
         addAnyRealmValueMutableSetTests(suite, ManagedObjectFactory.self)
         return suite
-    }
-
-    override class var defaultTestSuite: XCTestSuite {
-        return _defaultTestSuite()
     }
 }
 
@@ -920,10 +895,6 @@ class AnyRealmValueMapTestsBase<O: ObjectFactory, V: AnyValueFactory>: TestCase 
     var obj: ModernAllTypesObject!
     var map: Map<String, AnyRealmValue>!
     var values: [(key: String, value: AnyRealmValue)]!
-
-    class func _defaultTestSuite() -> XCTestSuite {
-        return defaultTestSuite
-    }
 
     override func setUp() {
         obj = O.get()
@@ -1129,50 +1100,42 @@ class AddableAnyRealmValueMapTests<O: ObjectFactory, V: AnyValueFactory>: AnyRea
 }
 
 func addAnyRealmValueMapTests<OF: ObjectFactory>(_ suite: XCTestSuite, _ type: OF.Type) {
-    AnyRealmValueMapTests<OF, Int>._defaultTestSuite().tests.forEach(suite.addTest)
-    AnyRealmValueMapTests<OF, Bool>._defaultTestSuite().tests.forEach(suite.addTest)
-    AnyRealmValueMapTests<OF, Float>._defaultTestSuite().tests.forEach(suite.addTest)
-    AnyRealmValueMapTests<OF, Double>._defaultTestSuite().tests.forEach(suite.addTest)
-    AnyRealmValueMapTests<OF, String>._defaultTestSuite().tests.forEach(suite.addTest)
-    AnyRealmValueMapTests<OF, Data>._defaultTestSuite().tests.forEach(suite.addTest)
-    AnyRealmValueMapTests<OF, Date>._defaultTestSuite().tests.forEach(suite.addTest)
-    AnyRealmValueMapTests<OF, SwiftStringObject>._defaultTestSuite().tests.forEach(suite.addTest)
-    AnyRealmValueMapTests<OF, ObjectId>._defaultTestSuite().tests.forEach(suite.addTest)
-    AnyRealmValueMapTests<OF, Decimal128>._defaultTestSuite().tests.forEach(suite.addTest)
-    AnyRealmValueMapTests<OF, UUID>._defaultTestSuite().tests.forEach(suite.addTest)
+    AnyRealmValueMapTests<OF, Int>.defaultTestSuite.tests.forEach(suite.addTest)
+    AnyRealmValueMapTests<OF, Bool>.defaultTestSuite.tests.forEach(suite.addTest)
+    AnyRealmValueMapTests<OF, Float>.defaultTestSuite.tests.forEach(suite.addTest)
+    AnyRealmValueMapTests<OF, Double>.defaultTestSuite.tests.forEach(suite.addTest)
+    AnyRealmValueMapTests<OF, String>.defaultTestSuite.tests.forEach(suite.addTest)
+    AnyRealmValueMapTests<OF, Data>.defaultTestSuite.tests.forEach(suite.addTest)
+    AnyRealmValueMapTests<OF, Date>.defaultTestSuite.tests.forEach(suite.addTest)
+    AnyRealmValueMapTests<OF, SwiftStringObject>.defaultTestSuite.tests.forEach(suite.addTest)
+    AnyRealmValueMapTests<OF, ObjectId>.defaultTestSuite.tests.forEach(suite.addTest)
+    AnyRealmValueMapTests<OF, Decimal128>.defaultTestSuite.tests.forEach(suite.addTest)
+    AnyRealmValueMapTests<OF, UUID>.defaultTestSuite.tests.forEach(suite.addTest)
 
-    MinMaxAnyRealmValueMapTests<OF, Int>._defaultTestSuite().tests.forEach(suite.addTest)
-    MinMaxAnyRealmValueMapTests<OF, Float>._defaultTestSuite().tests.forEach(suite.addTest)
-    MinMaxAnyRealmValueMapTests<OF, Double>._defaultTestSuite().tests.forEach(suite.addTest)
-    MinMaxAnyRealmValueMapTests<OF, Date>._defaultTestSuite().tests.forEach(suite.addTest)
-    MinMaxAnyRealmValueMapTests<OF, Decimal128>._defaultTestSuite().tests.forEach(suite.addTest)
+    MinMaxAnyRealmValueMapTests<OF, Int>.defaultTestSuite.tests.forEach(suite.addTest)
+    MinMaxAnyRealmValueMapTests<OF, Float>.defaultTestSuite.tests.forEach(suite.addTest)
+    MinMaxAnyRealmValueMapTests<OF, Double>.defaultTestSuite.tests.forEach(suite.addTest)
+    MinMaxAnyRealmValueMapTests<OF, Date>.defaultTestSuite.tests.forEach(suite.addTest)
+    MinMaxAnyRealmValueMapTests<OF, Decimal128>.defaultTestSuite.tests.forEach(suite.addTest)
 
-    AddableAnyRealmValueMapTests<OF, Int>._defaultTestSuite().tests.forEach(suite.addTest)
-    AddableAnyRealmValueMapTests<OF, Float>._defaultTestSuite().tests.forEach(suite.addTest)
-    AddableAnyRealmValueMapTests<OF, Double>._defaultTestSuite().tests.forEach(suite.addTest)
-    AddableAnyRealmValueMapTests<OF, Decimal128>._defaultTestSuite().tests.forEach(suite.addTest)
+    AddableAnyRealmValueMapTests<OF, Int>.defaultTestSuite.tests.forEach(suite.addTest)
+    AddableAnyRealmValueMapTests<OF, Float>.defaultTestSuite.tests.forEach(suite.addTest)
+    AddableAnyRealmValueMapTests<OF, Double>.defaultTestSuite.tests.forEach(suite.addTest)
+    AddableAnyRealmValueMapTests<OF, Decimal128>.defaultTestSuite.tests.forEach(suite.addTest)
 }
 
 class UnmanagedAnyRealmValueMapTests: TestCase {
-    class func _defaultTestSuite() -> XCTestSuite {
+    override class var defaultTestSuite: XCTestSuite {
         let suite = XCTestSuite(name: "Unmanaged AnyRealmValue Maps")
         addAnyRealmValueMapTests(suite, UnmanagedObjectFactory.self)
         return suite
     }
-
-    override class var defaultTestSuite: XCTestSuite {
-        return _defaultTestSuite()
-    }
 }
 
 class ManagedAnyRealmValueMapTests: TestCase {
-    class func _defaultTestSuite() -> XCTestSuite {
+    override class var defaultTestSuite: XCTestSuite {
         let suite = XCTestSuite(name: "Managed AnyRealmValue Maps")
         addAnyRealmValueMapTests(suite, ManagedObjectFactory.self)
         return suite
-    }
-
-    override class var defaultTestSuite: XCTestSuite {
-        return _defaultTestSuite()
     }
 }
