@@ -52,9 +52,7 @@ class SwiftUIServerTests: SwiftSyncTestCase {
                                   configuration: configuration,
                                   timeout: timeout)
         asyncOpen.projectedValue
-            .sink { asyncOpenState in
-                handler(asyncOpenState)
-            }
+            .sink(receiveValue: handler)
             .store(in: &cancellables)
         waitForExpectations(timeout: 10.0)
         asyncOpen.cancel()
