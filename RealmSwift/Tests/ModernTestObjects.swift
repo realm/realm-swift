@@ -160,6 +160,13 @@ class ModernAllTypesObject: Object {
     var linkingObjects: LinkingObjects<ModernAllTypesObject>
 }
 
+class LinkToModernAllTypesObject: Object {
+    @Persisted var object: ModernAllTypesObject?
+    @Persisted var list: List<ModernAllTypesObject>
+    @Persisted var set: MutableSet<ModernAllTypesObject>
+    @Persisted var map: Map<String, ModernAllTypesObject?>
+}
+
 enum ModernIntEnum: Int, Codable, PersistableEnum {
     case value1 = 1
     case value2 = 3
@@ -378,6 +385,10 @@ class ModernEmbeddedTreeObject3: EmbeddedObject, ModernEmbeddedTreeObject {
     var parent4: LinkingObjects<ModernEmbeddedTreeObject2>
 }
 
+class ModernEmbeddedObject: EmbeddedObject {
+    @Persisted var value = 0
+}
+
 class SetterObservers: Object {
     @Persisted var value: Int {
         willSet {
@@ -516,7 +527,10 @@ class ModernCollectionsOfEnums: Object {
 }
 
 class LinkToModernCollectionsOfEnums: Object {
-    @Persisted var objectCol: ModernCollectionsOfEnums?
+    @Persisted var object: ModernCollectionsOfEnums?
+    @Persisted var list: List<ModernCollectionsOfEnums>
+    @Persisted var set: MutableSet<ModernCollectionsOfEnums>
+    @Persisted var map: Map<String, ModernCollectionsOfEnums?>
 }
 
 class ModernListAnyRealmValueObject: Object {

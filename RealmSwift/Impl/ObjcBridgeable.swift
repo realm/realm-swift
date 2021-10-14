@@ -23,14 +23,23 @@ import Realm
 ///
 /// Do not use this protocol or the functions it adds directly.
 public protocol _ObjcBridgeable {
-    static func _rlmFromObjc(_ value: Any) -> Self?
+    static func _rlmFromObjc(_ value: Any, insideOptional: Bool) -> Self?
     var _rlmObjcValue: Any { get }
 }
 /// A type where the default logic suffices for bridging and we don't need to do anything special.
 internal protocol DefaultObjcBridgeable: _ObjcBridgeable {}
 extension DefaultObjcBridgeable {
-    public static func _rlmFromObjc(_ value: Any) -> Self? { value as? Self }
+    public static func _rlmFromObjc(_ value: Any, insideOptional: Bool) -> Self? { value as? Self }
     public var _rlmObjcValue: Any { self }
+}
+/// A type which needs custom logic, but doesn't care if it's being bridged inside an Optional
+internal protocol BuiltInObjcBridgeable: _ObjcBridgeable {
+    static func _rlmFromObjc(_ value: Any) -> Self?
+}
+extension BuiltInObjcBridgeable {
+    public static func _rlmFromObjc(_ value: Any, insideOptional: Bool) -> Self? {
+        return _rlmFromObjc(value)
+    }
 }
 
 extension Bool: DefaultObjcBridgeable {}
@@ -44,7 +53,7 @@ extension UUID: DefaultObjcBridgeable {}
 extension NSNumber: DefaultObjcBridgeable {}
 extension NSDate: DefaultObjcBridgeable {}
 
-extension ObjectBase: _ObjcBridgeable {
+extension ObjectBase: BuiltInObjcBridgeable {
     public class func _rlmFromObjc(_ value: Any) -> Self? {
         if let value = value as? Self {
             return value
@@ -62,7 +71,7 @@ extension ObjectBase: _ObjcBridgeable {
 // `NSNumber as? T` coerces values which can't be exact represented for some
 // types and fails for others. We want to always coerce, for backwards
 // compatiblity if nothing else.
-extension Float: _ObjcBridgeable {
+extension Float: BuiltInObjcBridgeable {
     public static func _rlmFromObjc(_ value: Any) -> Self? {
         return (value as? NSNumber)?.floatValue
     }
@@ -70,7 +79,7 @@ extension Float: _ObjcBridgeable {
         return NSNumber(value: self)
     }
 }
-extension Int8: _ObjcBridgeable {
+extension Int8: BuiltInObjcBridgeable {
     public static func _rlmFromObjc(_ value: Any) -> Self? {
         return (value as? NSNumber)?.int8Value
     }
@@ -80,7 +89,7 @@ extension Int8: _ObjcBridgeable {
         return NSNumber(value: Int16(self))
     }
 }
-extension Int16: _ObjcBridgeable {
+extension Int16: BuiltInObjcBridgeable {
     public static func _rlmFromObjc(_ value: Any) -> Self? {
         return (value as? NSNumber)?.int16Value
     }
@@ -88,7 +97,7 @@ extension Int16: _ObjcBridgeable {
         return NSNumber(value: self)
     }
 }
-extension Int32: _ObjcBridgeable {
+extension Int32: BuiltInObjcBridgeable {
     public static func _rlmFromObjc(_ value: Any) -> Self? {
         return (value as? NSNumber)?.int32Value
     }
@@ -96,7 +105,7 @@ extension Int32: _ObjcBridgeable {
         return NSNumber(value: self)
     }
 }
-extension Int64: _ObjcBridgeable {
+extension Int64: BuiltInObjcBridgeable {
     public static func _rlmFromObjc(_ value: Any) -> Self? {
         return (value as? NSNumber)?.int64Value
     }
@@ -105,10 +114,10 @@ extension Int64: _ObjcBridgeable {
     }
 }
 
-extension Optional: _ObjcBridgeable where Wrapped: _ObjcBridgeable {
+extension Optional: BuiltInObjcBridgeable, _ObjcBridgeable where Wrapped: _ObjcBridgeable {
     public static func _rlmFromObjc(_ value: Any) -> Self? {
         // ?? here gives the nonsensical error "Left side of nil coalescing operator '??' has non-optional type 'Wrapped?', so the right side is never used"
-        if let value = Wrapped._rlmFromObjc(value) {
+        if let value = Wrapped._rlmFromObjc(value, insideOptional: true) {
             return .some(value)
         }
         // We have a double-optional here and need to explicitly specify that we
@@ -122,7 +131,7 @@ extension Optional: _ObjcBridgeable where Wrapped: _ObjcBridgeable {
         return NSNull()
     }
 }
-extension Decimal128: _ObjcBridgeable {
+extension Decimal128: BuiltInObjcBridgeable {
     public static func _rlmFromObjc(_ value: Any) -> Decimal128? {
         if let value = value as? Decimal128 {
             return .some(value)
@@ -139,7 +148,7 @@ extension Decimal128: _ObjcBridgeable {
         return self
     }
 }
-extension AnyRealmValue: _ObjcBridgeable {
+extension AnyRealmValue: BuiltInObjcBridgeable {
     public static func _rlmFromObjc(_ value: Any) -> Self? {
         if let any = value as? Self {
             return any
@@ -156,7 +165,7 @@ extension AnyRealmValue: _ObjcBridgeable {
 
 // MARK: - Collections
 
-extension Map: _ObjcBridgeable {
+extension Map: BuiltInObjcBridgeable {
     public var _rlmObjcValue: Any { _rlmCollection }
     public static func _rlmFromObjc(_ value: Any) -> Self? {
         (value as? RLMCollection).map(Self.init(collection:))
@@ -164,7 +173,7 @@ extension Map: _ObjcBridgeable {
 }
 extension RealmCollectionImpl {
     public var _rlmObjcValue: Any { self.collection }
-    public static func _rlmFromObjc(_ value: Any) -> Self? {
+    public static func _rlmFromObjc(_ value: Any, insideOptional: Bool) -> Self? {
         (value as? RLMCollection).map(Self.init(collection:))
     }
 }
@@ -180,7 +189,8 @@ extension RLMSwiftCollectionBase: Equatable {
         return lhs.isEqual(rhs)
     }
 }
-extension Projection: _ObjcBridgeable {
+
+extension Projection: BuiltInObjcBridgeable {
     public static func _rlmFromObjc(_ value: Any) -> Self? {
         return (value as? Root).map(Self.init(projecting:))
     }
@@ -189,3 +199,9 @@ extension Projection: _ObjcBridgeable {
         self.rootObject
     }
 }
+
+public protocol _PossiblyAggregateable: _ObjcBridgeable {
+    associatedtype PersistedType
+}
+extension NSDate: _PossiblyAggregateable {}
+extension NSNumber: _PossiblyAggregateable {}

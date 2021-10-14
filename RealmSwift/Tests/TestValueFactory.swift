@@ -29,6 +29,8 @@ struct ManagedObjectFactory: ObjectFactory {
         let config = Realm.Configuration(inMemoryIdentifier: "test",
                                          objectTypes: [ModernAllTypesObject.self,
                                                        ModernCollectionsOfEnums.self,
+                                                       ModernEmbeddedObject.self,
+                                                       CustomPersistableCollections.self,
                                                        SwiftStringObject.self])
         let realm = try! Realm(configuration: config)
         if !realm.isInWriteTransaction {
@@ -92,6 +94,11 @@ extension NumericValueFactory where PersistedType == Self {
 extension NumericValueFactory where Self: PersistableEnum {
     static func doubleValue(_ value: Self) -> Double {
         return (value as! NSNumber).doubleValue
+    }
+}
+extension NumericValueFactory where Self: CustomPersistable, PersistedType: NumericValueFactory {
+    static func sum(_ values: [Self]) -> Double {
+        return PersistedType.sum(values.map { $0.persistableValue })
     }
 }
 
@@ -659,4 +666,113 @@ extension EnumString: SetValueFactoryOptional {
 extension EnumString: MapValueFactoryOptional {
     static var map: KeyPath<ModernCollectionsOfEnums, Map<String, EnumString>> { \.mapString }
     static var optMap: KeyPath<ModernCollectionsOfEnums, Map<String, EnumString?>> { \.mapStringOpt }
+}
+
+// MARK: - Custom Persistable
+
+extension CustomPersistable where PersistedType: ValueFactory {
+    typealias Wrapped = Self
+    static func values() -> [Self] { PersistedType.values().map(Self.init) }
+}
+extension CustomPersistable where PersistedType: NumericValueFactory {
+    typealias AverageType = PersistedType.AverageType
+    static func doubleValue(_ value: Self) -> Double { PersistedType.doubleValue(value.persistableValue) }
+    static var zero: Self { Self(persistedValue: PersistedType.zero) }
+}
+
+extension BoolWrapper: ValueFactory {}
+extension BoolWrapper: ListValueFactoryOptional {
+    static var array: KeyPath<CustomPersistableCollections, List<BoolWrapper>> { \.listBool }
+    static var optArray: KeyPath<CustomPersistableCollections, List<BoolWrapper?>> { \.listOptBool }
+}
+
+extension IntWrapper: NumericValueFactory {}
+extension IntWrapper: ListValueFactoryOptional {
+    static var array: KeyPath<CustomPersistableCollections, List<IntWrapper>> { \.listInt }
+    static var optArray: KeyPath<CustomPersistableCollections, List<IntWrapper?>> { \.listOptInt }
+}
+
+extension Int8Wrapper: NumericValueFactory {}
+extension Int8Wrapper: ListValueFactoryOptional {
+    static var array: KeyPath<CustomPersistableCollections, List<Int8Wrapper>> { \.listInt8 }
+    static var optArray: KeyPath<CustomPersistableCollections, List<Int8Wrapper?>> { \.listOptInt8 }
+}
+
+extension Int16Wrapper: NumericValueFactory {}
+extension Int16Wrapper: ListValueFactoryOptional {
+    static var array: KeyPath<CustomPersistableCollections, List<Int16Wrapper>> { \.listInt16 }
+    static var optArray: KeyPath<CustomPersistableCollections, List<Int16Wrapper?>> { \.listOptInt16 }
+}
+
+extension Int32Wrapper: NumericValueFactory {}
+extension Int32Wrapper: ListValueFactoryOptional {
+    static var array: KeyPath<CustomPersistableCollections, List<Int32Wrapper>> { \.listInt32 }
+    static var optArray: KeyPath<CustomPersistableCollections, List<Int32Wrapper?>> { \.listOptInt32 }
+}
+
+extension Int64Wrapper: NumericValueFactory {}
+extension Int64Wrapper: ListValueFactoryOptional {
+    static var array: KeyPath<CustomPersistableCollections, List<Int64Wrapper>> { \.listInt64 }
+    static var optArray: KeyPath<CustomPersistableCollections, List<Int64Wrapper?>> { \.listOptInt64 }
+}
+
+extension FloatWrapper: NumericValueFactory {}
+extension FloatWrapper: ListValueFactoryOptional {
+    static var array: KeyPath<CustomPersistableCollections, List<FloatWrapper>> { \.listFloat }
+    static var optArray: KeyPath<CustomPersistableCollections, List<FloatWrapper?>> { \.listOptFloat }
+}
+
+extension DoubleWrapper: NumericValueFactory {}
+extension DoubleWrapper: ListValueFactoryOptional {
+    static var array: KeyPath<CustomPersistableCollections, List<DoubleWrapper>> { \.listDouble }
+    static var optArray: KeyPath<CustomPersistableCollections, List<DoubleWrapper?>> { \.listOptDouble }
+}
+
+extension StringWrapper: ValueFactory {}
+extension StringWrapper: ListValueFactoryOptional {
+    static var array: KeyPath<CustomPersistableCollections, List<StringWrapper>> { \.listString }
+    static var optArray: KeyPath<CustomPersistableCollections, List<StringWrapper?>> { \.listOptString }
+}
+
+extension DataWrapper: ValueFactory {}
+extension DataWrapper: ListValueFactoryOptional {
+    static var array: KeyPath<CustomPersistableCollections, List<DataWrapper>> { \.listBinary }
+    static var optArray: KeyPath<CustomPersistableCollections, List<DataWrapper?>> { \.listOptBinary }
+}
+
+extension DateWrapper: ValueFactory {}
+extension DateWrapper: ListValueFactoryOptional {
+    static var array: KeyPath<CustomPersistableCollections, List<DateWrapper>> { \.listDate }
+    static var optArray: KeyPath<CustomPersistableCollections, List<DateWrapper?>> { \.listOptDate }
+}
+
+extension Decimal128Wrapper: NumericValueFactory {
+    static func doubleValue(_ value: Decimal128Wrapper) -> Double {
+        return value.persistableValue.doubleValue
+    }
+}
+extension Decimal128Wrapper: ListValueFactoryOptional {
+    static var array: KeyPath<CustomPersistableCollections, List<Decimal128Wrapper>> { \.listDecimal }
+    static var optArray: KeyPath<CustomPersistableCollections, List<Decimal128Wrapper?>> { \.listOptDecimal }
+}
+
+extension ObjectIdWrapper: ValueFactory {}
+extension ObjectIdWrapper: ListValueFactoryOptional {
+    static var array: KeyPath<CustomPersistableCollections, List<ObjectIdWrapper>> { \.listObjectId }
+    static var optArray: KeyPath<CustomPersistableCollections, List<ObjectIdWrapper?>> { \.listOptObjectId }
+}
+
+extension UUIDWrapper: ValueFactory {}
+extension UUIDWrapper: ListValueFactoryOptional {
+    static var array: KeyPath<CustomPersistableCollections, List<UUIDWrapper>> { \.listUuid }
+    static var optArray: KeyPath<CustomPersistableCollections, List<UUIDWrapper?>> { \.listOptUuid }
+}
+
+extension EmbeddedObjectWrapper: ValueFactory {
+    static func values() -> [EmbeddedObjectWrapper] {
+        Int.values().map { EmbeddedObjectWrapper(value: $0) }
+    }
+}
+extension EmbeddedObjectWrapper: ListValueFactory {
+    static var array: KeyPath<CustomPersistableCollections, List<EmbeddedObjectWrapper>> { \.listObject }
 }
