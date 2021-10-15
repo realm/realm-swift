@@ -87,7 +87,7 @@ extension AnyRealmValue: AddableType {}
     internal let rlmResults: RLMResults<AnyObject>
 
     public static func == (lhs: Results<Element>, rhs: Results<Element>) -> Bool {
-        lhs.rlmResults.isEqual(to: rhs.rlmResults)
+        lhs.rlmResults.isEqual(rhs.rlmResults)
     }
 
     /// A human-readable description of the objects represented by the results.

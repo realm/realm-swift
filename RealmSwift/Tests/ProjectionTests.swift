@@ -996,7 +996,7 @@ class ProjectionTests: TestCase {
         observeMapKeyPathChange(obj, obs, \AllTypesProjection.mapOptUuid, newValues["mapOptUuid"] as! Dictionary<String, UUID?>, { obj.mapOptUuid["1"] = uuid })
     }
 
-    func testLinkongObjectObservation() {
+    func testLinkingObjectObservation() {
         let realm = realmWithTestPath()
         let obj = realm.objects(ModernAllTypesObject.self).first!
         let obs = realm.objects(AllTypesProjection.self).first!

@@ -189,7 +189,6 @@ extension ObjectChange {
 /// }
 /// ```
 open class Projection<Root: ObjectBase>: RealmCollectionValue, ProjectionObservable {
-
     /// The object being projected
     public var rootObject: Root
 
@@ -948,6 +947,7 @@ extension ProjectionObservable {
         return observe(keyPaths: [PartialKeyPath<Self>](), { _ in _ = subscriber.receive() })
     }
 }
+
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 extension Projection: ObservableObject, RealmSubscribable where Root: ThreadConfined {
     /// A publisher that emits Void each time the projection changes.

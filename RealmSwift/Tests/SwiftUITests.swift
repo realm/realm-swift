@@ -422,8 +422,7 @@ class SwiftUITests: TestCase {
 
     // MARK: - Projection Operations
     func testStateProjectionModification() throws {
-        let projection = UIElementsProjection(projecting: SwiftUIObject())
-        let state = StateRealmObject(wrappedValue: projection)
+        let state = StateRealmObject(wrappedValue: UIElementsProjection(projecting: SwiftUIObject()))
         ObservedResults(UIElementsProjection.self,
                         configuration: inMemoryRealm(inMemoryIdentifier).configuration)
             .projectedValue.append(state.wrappedValue)
