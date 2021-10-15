@@ -51,10 +51,10 @@ class SwiftAllTypesObject: Object {
     @Persisted var objectIdCol: ObjectId
     @Persisted var objectCol: SwiftBoolObject?
     @Persisted var uuidCol: UUID
-    @Persisted var arrayCol: List<SwiftBoolObject>
+    @Persisted var arrayCol: RealmSwift.List<SwiftBoolObject>
     @Persisted var setCol: MutableSet<SwiftBoolObject>
     @Persisted var mapCol: Map<String, SwiftBoolObject?>
-    @Persisted var relationCol: List<SwiftAllTypesObject>
+    @Persisted var relationCol: RealmSwift.List<SwiftAllTypesObject>
     @Persisted(originProperty: "relationCol") var backlink: LinkingObjects<SwiftAllTypesObject>
 
     class func defaultValues() -> [String: Any] {
@@ -233,8 +233,8 @@ public class Person: Object {
     @Persisted var lastName = ""
     @Persisted var birthday: Date
     @Persisted var address: Address?
-    @Persisted public var friends: List<Person>
-    @Persisted var reviews: List<String>
+    @Persisted public var friends: RealmSwift.List<Person>
+    @Persisted var reviews: RealmSwift.List<String>
     @Persisted var money: Decimal128
 }
 
@@ -262,6 +262,7 @@ public final class SimpleProjection: Projection<SimpleObject> {
 
 // MARK: Tests
 
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 class ProjectionTests: TestCase {
     func assertSetEquals<T: RealmCollectionValue>(_ set: MutableSet<T>, _ expected: Array<T>) {
         XCTAssertEqual(set.count, Set(expected).count)
@@ -714,9 +715,9 @@ class ProjectionTests: TestCase {
                 XCTAssertNil(observedOld)
                 XCTAssertNil(observedNew)
 
-                guard let projectedNew = object[keyPath: keyPath] as? List<E>,
+                guard let projectedNew = object[keyPath: keyPath] as? RealmSwift.List<E>,
                       let newVals = new else {
-                          XCTFail("Expected new array to be [\(String(describing: E.self))] and projected array to be \(String(describing: List<E>.self)), got \(String(describing: new)) and \(String(describing: obs[keyPath: keyPath]))",
+                          XCTFail("Expected new array to be [\(String(describing: E.self))] and projected array to be \(String(describing: RealmSwift.List<E>.self)), got \(String(describing: new)) and \(String(describing: obs[keyPath: keyPath]))",
                                   file: (fileName), line: lineNumber)
                           return
                       }
@@ -1003,8 +1004,7 @@ class ProjectionTests: TestCase {
 
         let newObj = ModernAllTypesObject()
         let oldPk = obj.objectCol!.linkingObjects.first!.pk
-        let newPk = newObj.pk
-        observeKeyPathChange(obj, obs, \AllTypesProjection.linkingObjects, oldPk, newObj.pk, { newObj.objectCol = obj })//obj.objectCol = newObj })
+        observeKeyPathChange(obj, obs, \AllTypesProjection.linkingObjects, oldPk, newObj.pk, { newObj.objectCol = obj })
         XCTAssertEqual(newObj.objectCol, obj)
     }
 
