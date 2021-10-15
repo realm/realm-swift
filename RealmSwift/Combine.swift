@@ -2029,7 +2029,7 @@ public enum RealmPublishers {
     /// there is an intermediate transform. If `subscribe(on:)` is used, it
     /// should always be the first operation in the pipeline.
     ///
-    /// Create this publisher using the `projectionChangeset()` function.
+    /// Create this publisher using the `changesetPublisher()` function.
     @frozen public struct ProjectionChangeset<P: ProjectionObservable>: Publisher where P: ThreadConfined {
         /// This publisher emits a ProjectionChange<P> indicating which projection and
         /// which properties of that projection have changed each time a Realm is

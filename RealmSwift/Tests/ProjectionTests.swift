@@ -223,32 +223,33 @@ class FailedProjection: Projection<ModernAllTypesObject> {
     @Projected(\ModernAllTypesObject.ignored) var ignored
 }
 
-public class Address: EmbeddedObject {
+public class AddressSwift: EmbeddedObject {
     @Persisted var city: String = ""
     @Persisted var country = ""
 }
 
-public class Person: Object {
+public class SwiftPerson: Object {
     @Persisted var firstName: String
     @Persisted var lastName = ""
     @Persisted var birthday: Date
-    @Persisted var address: Address?
-    @Persisted public var friends: RealmSwift.List<Person>
+    @Persisted var address: AddressSwift?
+    @Persisted public var friends: RealmSwift.List<SwiftPerson>
     @Persisted var reviews: RealmSwift.List<String>
     @Persisted var money: Decimal128
 }
 
-public final class AddressProjection: Projection<Address> {
-    @Projected(\Address.city) var city
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+public final class AddressProjection: Projection<AddressSwift> {
+    @Projected(\AddressSwift.city) var city
 }
 
-public final class PersonProjection: Projection<Person> {
-
-    @Projected(\Person.firstName) var firstName
-    @Projected(\Person.lastName.localizedUppercase) var lastNameCaps
-    @Projected(\Person.birthday.timeIntervalSince1970) var birthdayAsEpochtime
-    @Projected(\Person.address?.city) var homeCity
-    @Projected(\Person.friends.projectTo.firstName) var firstFriendsName: ProjectedList<String>
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+public final class PersonProjection: Projection<SwiftPerson> {
+    @Projected(\SwiftPerson.firstName) var firstName
+    @Projected(\SwiftPerson.lastName.localizedUppercase) var lastNameCaps
+    @Projected(\SwiftPerson.birthday.timeIntervalSince1970) var birthdayAsEpochtime
+    @Projected(\SwiftPerson.address?.city) var homeCity
+    @Projected(\SwiftPerson.friends.projectTo.firstName) var firstFriendsName: ProjectedList<String>
 }
 
 public class SimpleObject: Object {
@@ -256,6 +257,7 @@ public class SimpleObject: Object {
     @Persisted var bool: Bool
 }
 
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 public final class SimpleProjection: Projection<SimpleObject> {
     @Projected(\SimpleObject.int) var int
 }
@@ -442,16 +444,16 @@ class ProjectionTests: TestCase {
         super.setUp()
         let realm = realmWithTestPath()
         try! realm.write {
-            let js = realm.create(Person.self, value: ["firstName": "John",
-                                                       "lastName": "Snow",
-                                                       "birthday": Date(timeIntervalSince1970: 10),
-                                                       "address": ["Winterfell", "Kingdom in the North"],
-                                                       "money": Decimal128("2.22")])
-            let dt = realm.create(Person.self, value: ["firstName": "Daenerys",
-                                                       "lastName": "Targaryen",
-                                                       "birthday": Date(timeIntervalSince1970: 0),
-                                                       "address": ["King's Landing", "Westeros"],
-                                                       "money": Decimal128("2.22")])
+            let js = realm.create(SwiftPerson.self, value: ["firstName": "John",
+                                                            "lastName": "Snow",
+                                                            "birthday": Date(timeIntervalSince1970: 10),
+                                                            "address": ["Winterfell", "Kingdom in the North"],
+                                                            "money": Decimal128("2.22")])
+            let dt = realm.create(SwiftPerson.self, value: ["firstName": "Daenerys",
+                                                            "lastName": "Targaryen",
+                                                            "birthday": Date(timeIntervalSince1970: 0),
+                                                            "address": ["King's Landing", "Westeros"],
+                                                            "money": Decimal128("2.22")])
             js.friends.append(dt)
             dt.friends.append(js)
 
@@ -466,7 +468,7 @@ class ProjectionTests: TestCase {
 
     func testProjectionManualInit() {
         let realm = realmWithTestPath()
-        let johnSnow = realm.objects(Person.self).filter("lastName == 'Snow'").first!
+        let johnSnow = realm.objects(SwiftPerson.self).filter("lastName == 'Snow'").first!
         // this step will happen under the hood
         let pp = PersonProjection(projecting: johnSnow)
         XCTAssertEqual(pp.homeCity, "Winterfell")
@@ -502,7 +504,7 @@ class ProjectionTests: TestCase {
 
     func testProjectionEquality() {
         let realm = realmWithTestPath()
-        let johnObject = realm.objects(Person.self).filter("lastName == 'Snow'").first!
+        let johnObject = realm.objects(SwiftPerson.self).filter("lastName == 'Snow'").first!
         let johnDefaultInit = PersonProjection(projecting: johnObject)
         let johnMapped = realm.objects(PersonProjection.self).filter("lastName == 'Snow'").first!
         let notJohn = realm.objects(PersonProjection.self).filter("lastName != 'Snow'").first!
@@ -513,7 +515,7 @@ class ProjectionTests: TestCase {
 
     func testDescription() {
         let actual = realmWithTestPath().objects(PersonProjection.self).filter("lastName == 'Snow'").first!.description.replacingOccurrences(of: "    ", with: "\t")
-        let expected = "PersonProjection<Person> <0x[0-9a-f]+> \\{\n\t@Projected\\(\\\\Person\\.firstName\\) -> firstName: John\n\t@Projected\\(\\\\Person\\.lastName\\) -> lastNameCaps: SNOW\n\t@Projected\\(\\\\Person\\.birthday\\) -> birthdayAsEpochtime: 10\\.0\n\t@Projected\\(\\\\Person\\.address\\.city\\) -> homeCity: Optional\\(\"Winterfell\"\\)\n\t@Projected\\(\\\\Person\\.friends\\) -> firstFriendsName: ProjectedList<String>\\(backingList: List<Person> <0x[0-9a-f]+> \\(\n\t\\[0\\] Person \\{\n\t\tfirstName = Daenerys;\n\t\tlastName = Targaryen;\n\t\tbirthday = 1970-01-01 00:00:00 \\+0000;\n\t\taddress = Address \\{\n\t\t\tcity = King's Landing;\n\t\t\tcountry = Westeros;\n\t\t\\};\n\t\tfriends = List<Person> <0x[0-9a-f]+> \\(\n\t\t\t\\[0\\] Person \\{\n\t\t\t\tfirstName = John;\n\t\t\t\tlastName = Snow;\n\t\t\t\tbirthday = 1970-01-01 00:00:10 \\+0000;\n\t\t\t\taddress = Address \\{\n\t\t\t\t\tcity = Winterfell;\n\t\t\t\t\tcountry = Kingdom in the North;\n\t\t\t\t\\};\n\t\t\t\tfriends = List<Person> <0x[0-9a-f]+> \\(\n\t\t\t\t\t\\[0\\] <Maximum depth exceeded>\n\t\t\t\t\\);\n\t\t\t\treviews = List<string> <0x[0-9a-f]+> \\(\n\t\t\t\t\n\t\t\t\t\\);\n\t\t\t\tmoney = 2\\.22;\n\t\t\t\\}\n\t\t\\);\n\t\treviews = List<string> <0x[0-9a-f]+> \\(\n\t\t\n\t\t\\);\n\t\tmoney = 2\\.22;\n\t\\}\n\\), keyPath: Swift\\.ReferenceWritableKeyPath<RealmSwift_Tests\\.Person, Swift\\.String>, propertyName: \"firstName\", anyCtor: \\(Function\\)\\)\n\n\trootObject: Person \\{\n\tfirstName = John;\n\tlastName = Snow;\n\tbirthday = 1970-01-01 00:00:10 \\+0000;\n\taddress = Address \\{\n\t\tcity = Winterfell;\n\t\tcountry = Kingdom in the North;\n\t\\};\n\tfriends = List<Person> <0x[0-9a-f]+> \\(\n\t\t\\[0\\] Person \\{\n\t\t\tfirstName = Daenerys;\n\t\t\tlastName = Targaryen;\n\t\t\tbirthday = 1970-01-01 00:00:00 \\+0000;\n\t\t\taddress = Address \\{\n\t\t\t\tcity = King's Landing;\n\t\t\t\tcountry = Westeros;\n\t\t\t\\};\n\t\t\tfriends = List<Person> <0x[0-9a-f]+> \\(\n\t\t\t\t\\[0\\] Person \\{\n\t\t\t\t\tfirstName = John;\n\t\t\t\t\tlastName = Snow;\n\t\t\t\t\tbirthday = 1970-01-01 00:00:10 \\+0000;\n\t\t\t\t\taddress = <Maximum depth exceeded>;\n\t\t\t\t\tfriends = <Maximum depth exceeded>;\n\t\t\t\t\treviews = <Maximum depth exceeded>;\n\t\t\t\t\tmoney = 2\\.22;\n\t\t\t\t\\}\n\t\t\t\\);\n\t\t\treviews = List<string> <0x[0-9a-f]+> \\(\n\t\t\t\n\t\t\t\\);\n\t\t\tmoney = 2\\.22;\n\t\t\\}\n\t\\);\n\treviews = List<string> <0x[0-9a-f]+> \\(\n\t\n\t\\);\n\tmoney = 2\\.22;\n\\}\n\\}"
+        let expected = "PersonProjection<SwiftPerson> <0x[0-9a-f]+> \\{\n\t@Projected\\(\\\\SwiftPerson\\.firstName\\) -> firstName: John\n\t@Projected\\(\\\\SwiftPerson\\.lastName\\) -> lastNameCaps: SNOW\n\t@Projected\\(\\\\SwiftPerson\\.birthday\\) -> birthdayAsEpochtime: 10\\.0\n\t@Projected\\(\\\\SwiftPerson\\.address\\.city\\) -> homeCity: Optional\\(\"Winterfell\"\\)\n\t@Projected\\(\\\\SwiftPerson\\.friends\\) -> firstFriendsName: ProjectedList<String>\\(backingList: List<SwiftPerson> <0x[0-9a-f]+> \\(\n\t\\[0\\] SwiftPerson \\{\n\t\tfirstName = Daenerys;\n\t\tlastName = Targaryen;\n\t\tbirthday = 1970-01-01 00:00:00 \\+0000;\n\t\taddress = AddressSwift \\{\n\t\t\tcity = King's Landing;\n\t\t\tcountry = Westeros;\n\t\t\\};\n\t\tfriends = List<SwiftPerson> <0x[0-9a-f]+> \\(\n\t\t\t\\[0\\] SwiftPerson \\{\n\t\t\t\tfirstName = John;\n\t\t\t\tlastName = Snow;\n\t\t\t\tbirthday = 1970-01-01 00:00:10 \\+0000;\n\t\t\t\taddress = AddressSwift \\{\n\t\t\t\t\tcity = Winterfell;\n\t\t\t\t\tcountry = Kingdom in the North;\n\t\t\t\t\\};\n\t\t\t\tfriends = List<SwiftPerson> <0x[0-9a-f]+> \\(\n\t\t\t\t\t\\[0\\] <Maximum depth exceeded>\n\t\t\t\t\\);\n\t\t\t\treviews = List<string> <0x[0-9a-f]+> \\(\n\t\t\t\t\n\t\t\t\t\\);\n\t\t\t\tmoney = 2\\.22;\n\t\t\t\\}\n\t\t\\);\n\t\treviews = List<string> <0x[0-9a-f]+> \\(\n\t\t\n\t\t\\);\n\t\tmoney = 2\\.22;\n\t\\}\n\\), keyPath: Swift\\.ReferenceWritableKeyPath<RealmSwift_Tests\\.SwiftPerson, Swift\\.String>, propertyName: \"firstName\", anyCtor: \\(Function\\)\\)\n\n\trootObject: SwiftPerson \\{\n\tfirstName = John;\n\tlastName = Snow;\n\tbirthday = 1970-01-01 00:00:10 \\+0000;\n\taddress = AddressSwift \\{\n\t\tcity = Winterfell;\n\t\tcountry = Kingdom in the North;\n\t\\};\n\tfriends = List<SwiftPerson> <0x[0-9a-f]+> \\(\n\t\t\\[0\\] SwiftPerson \\{\n\t\t\tfirstName = Daenerys;\n\t\t\tlastName = Targaryen;\n\t\t\tbirthday = 1970-01-01 00:00:00 \\+0000;\n\t\t\taddress = AddressSwift \\{\n\t\t\t\tcity = King's Landing;\n\t\t\t\tcountry = Westeros;\n\t\t\t\\};\n\t\t\tfriends = List<SwiftPerson> <0x[0-9a-f]+> \\(\n\t\t\t\t\\[0\\] SwiftPerson \\{\n\t\t\t\t\tfirstName = John;\n\t\t\t\t\tlastName = Snow;\n\t\t\t\t\tbirthday = 1970-01-01 00:00:10 \\+0000;\n\t\t\t\t\taddress = <Maximum depth exceeded>;\n\t\t\t\t\tfriends = <Maximum depth exceeded>;\n\t\t\t\t\treviews = <Maximum depth exceeded>;\n\t\t\t\t\tmoney = 2\\.22;\n\t\t\t\t\\}\n\t\t\t\\);\n\t\t\treviews = List<string> <0x[0-9a-f]+> \\(\n\t\t\t\n\t\t\t\\);\n\t\t\tmoney = 2\\.22;\n\t\t\\}\n\t\\);\n\treviews = List<string> <0x[0-9a-f]+> \\(\n\t\n\t\\);\n\tmoney = 2\\.22;\n\\}\n\\}"
         assertMatches(actual, expected)
     }
 
@@ -1019,7 +1021,7 @@ class ProjectionTests: TestCase {
         dispatchSyncNewThread {
             let realm = self.realmWithTestPath()
             try! realm.write {
-                let johnObject = realm.objects(Person.self).filter("lastName == 'Snow'").first!
+                let johnObject = realm.objects(SwiftPerson.self).filter("lastName == 'Snow'").first!
                 johnObject.lastName = "Targaryen"
             }
         }
@@ -1797,7 +1799,7 @@ class ProjectionTests: TestCase {
 
         dispatchSyncNewThread {
             let realm = self.realmWithTestPath()
-            let johnObject = realm.objects(Person.self).filter("lastName == 'Snow'").first!
+            let johnObject = realm.objects(SwiftPerson.self).filter("lastName == 'Snow'").first!
             try! realm.write {
                 johnObject.lastName = "Ali"
             }

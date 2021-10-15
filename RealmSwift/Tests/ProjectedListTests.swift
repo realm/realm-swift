@@ -37,21 +37,21 @@ class ProjectedListTests: TestCase {
         super.setUp()
         let realm = realmWithTestPath()
         try! realm.write {
-            let js = realm.create(Person.self, value: ["firstName": "John",
-                                                       "lastName": "Snow",
-                                                       "birthday": Date(timeIntervalSince1970: 10),
-                                                       "address": ["Winterfell", "Kingdom in the North"],
-                                                       "money": Decimal128("2.22")])
-            let dt = realm.create(Person.self, value: ["firstName": "Daenerys",
-                                                       "lastName": "Targaryen",
-                                                       "birthday": Date(timeIntervalSince1970: 0),
-                                                       "address": ["King's Landing", "Westeros"],
-                                                       "money": Decimal128("2.22")])
-            let tl = realm.create(Person.self, value: ["firstName": "Tyrion",
-                                                       "lastName": "Lannister",
-                                                       "birthday": Date(timeIntervalSince1970: 20),
-                                                       "address": ["Casterly Rock", "Westeros"],
-                                                       "money": Decimal128("9999.95")])
+            let js = realm.create(SwiftPerson.self, value: ["firstName": "John",
+                                                            "lastName": "Snow",
+                                                            "birthday": Date(timeIntervalSince1970: 10),
+                                                            "address": ["Winterfell", "Kingdom in the North"],
+                                                            "money": Decimal128("2.22")])
+            let dt = realm.create(SwiftPerson.self, value: ["firstName": "Daenerys",
+                                                            "lastName": "Targaryen",
+                                                            "birthday": Date(timeIntervalSince1970: 0),
+                                                            "address": ["King's Landing", "Westeros"],
+                                                            "money": Decimal128("2.22")])
+            let tl = realm.create(SwiftPerson.self, value: ["firstName": "Tyrion",
+                                                            "lastName": "Lannister",
+                                                            "birthday": Date(timeIntervalSince1970: 20),
+                                                            "address": ["Casterly Rock", "Westeros"],
+                                                            "money": Decimal128("9999.95")])
             js.friends.append(dt)
             js.friends.append(tl)
             dt.friends.append(js)
@@ -81,7 +81,7 @@ class ProjectedListTests: TestCase {
             collection[0] = "Overwrite"
         }
         XCTAssertEqual(collection.first, "Overwrite")
-        let danyObject = realm.objects(Person.self).filter("lastName == 'Targaryen'").first!
+        let danyObject = realm.objects(SwiftPerson.self).filter("lastName == 'Targaryen'").first!
         XCTAssertEqual(danyObject.firstName, "Overwrite")
     }
 
@@ -168,7 +168,7 @@ class ProjectedListTests: TestCase {
         ex2 = expectation(description: "change notification")
         let realm = realmWithTestPath()
         realm.beginWrite()
-        realm.delete(realm.objects(Person.self))
+        realm.delete(realm.objects(SwiftPerson.self))
         try! realm.commitWrite(withoutNotifying: [token])
         waitForExpectations(timeout: 1, handler: nil)
 
@@ -193,7 +193,7 @@ class ProjectedListTests: TestCase {
         dispatchSyncNewThread {
             let realm = self.realmWithTestPath()
             realm.beginWrite()
-            let obj = realm.objects(Person.self).first!
+            let obj = realm.objects(SwiftPerson.self).first!
             obj.firstName += " not the same"
             try! realm.commitWrite()
         }
@@ -253,10 +253,10 @@ class ProjectedListTests: TestCase {
         XCTAssertFalse(live!.isFrozen)
 
         let liveRealm = live!.realm!
-        try! liveRealm.write { liveRealm.delete(liveRealm.objects(Person.self).filter(NSPredicate(format: "firstName != 'Daenerys'"))) }
+        try! liveRealm.write { liveRealm.delete(liveRealm.objects(SwiftPerson.self).filter(NSPredicate(format: "firstName != 'Daenerys'"))) }
         XCTAssertTrue(live!.isInvalidated)
         XCTAssertFalse(frozen.isEmpty)
-        try! liveRealm.write { liveRealm.delete(liveRealm.objects(Person.self)) }
+        try! liveRealm.write { liveRealm.delete(liveRealm.objects(SwiftPerson.self)) }
         XCTAssertFalse(frozen.isInvalidated)
     }
 
@@ -269,7 +269,7 @@ class ProjectedListTests: TestCase {
             XCTAssertFalse(live!.isFrozen)
 
             let liveRealm = live!.realm!
-            try! liveRealm.write { liveRealm.delete(liveRealm.objects(Person.self)) }
+            try! liveRealm.write { liveRealm.delete(liveRealm.objects(SwiftPerson.self)) }
             XCTAssertTrue(live!.isInvalidated)
             XCTAssertFalse(frozen.isEmpty)
         }

@@ -586,6 +586,14 @@ extension Projection: ObservedResultsValue { }
         _storage = ObservedObject(wrappedValue: ObservableStorage(wrappedValue))
         defaultValue = List()
     }
+    /**
+     Initialize a RealmState struct for a given thread confined type.
+     - parameter wrappedValue The RealmSubscribable value to wrap and observe.
+     */
+    public init(wrappedValue: ObjectType) where ObjectType: ProjectionObservable {
+        _storage = ObservedObject(wrappedValue: ObservableStorage(wrappedValue))
+        defaultValue = ObjectType(projecting: ObjectType.Root())
+    }
 }
 
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
