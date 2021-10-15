@@ -205,4 +205,38 @@ class SwiftUITests: XCTestCase {
         XCTAssertEqual(realm.objects(ReminderList.self).count, 2)
         XCTAssertEqual(app.tables.firstMatch.cells.count, 2)
     }
+
+    func testUpdateResultsWithSearchable() {
+        app.launchEnvironment["test_type"] = "observed_results_searchable"
+        app.launch()
+
+        let addButton = app.buttons["addList"]
+        (1...20).forEach { _ in
+            addButton.tap()
+        }
+
+        // Name every reminders list for search
+        try! realm.write {
+            for (index, obj) in (realm.objects(ReminderList.self)).enumerated() {
+                obj.name = "reminder list \(index)"
+            }
+        }
+
+        let searchBar = app.searchFields.firstMatch
+        let table = app.tables.firstMatch
+
+        searchBar.tap()
+
+//        searchBar.typeText("reminder")
+//        XCTAssertEqual(table.cells.count, 20)
+//
+//        searchBar.typeText(" list 1")
+//        XCTAssertEqual(table.cells.count, 11)
+//
+//        searchBar.typeText("8")
+//        XCTAssertEqual(table.cells.count, 1)
+//
+//        let deleteString = String(repeating: XCUIKeyboardKey.delete.rawValue, count: (searchBar.value as? String)!.count)
+//        searchBar.typeText(deleteString)
+    }
 }

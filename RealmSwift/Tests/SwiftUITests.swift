@@ -315,32 +315,55 @@ class SwiftUITests: TestCase {
     }
     // MARK: - ObservedResults Search
     @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
-    func testSearchObservedResults() {
-        let fullResults = ObservedResults(SwiftUIObject.self,
-                                          configuration: inMemoryRealm(inMemoryIdentifier).configuration)
-        XCTAssertEqual(fullResults.wrappedValue.count, 0)
+    func testSearchableObservedResults() {
+        let observedResults = ObservedResults(SwiftUIObject.self,
+                                              configuration: inMemoryRealm(inMemoryIdentifier).configuration)
         (1...20).forEach { index in
-            let object = SwiftUIObject()
-            object.str = "str_\(index)"
-            fullResults.projectedValue.append(object)
+            let object = SwiftUIObject(str: "str_\(index)")
+            observedResults.projectedValue.append(object)
         }
-        XCTAssertEqual(fullResults.wrappedValue.count, 20)
+        XCTAssertEqual(observedResults.wrappedValue.count, 20)
 
-//        let searchBinding = fullResults.searchWhere { (object, searchString) in
-//            object.str.contains(searchString, options: [.caseInsensitive])
-//        }
+        var searchText = ""
+        let stringBinding = Binding {
+            searchText
+        } set: {
+            searchText = $0
+        }
 
-//        searchBinding.wrappedValue = "str"
-//        XCTAssertEqual(fullResults.wrappedValue.count, 20)
-//
-//        searchBinding.wrappedValue = "str_5"
-//        XCTAssertEqual(fullResults.wrappedValue.count, 1)
-//
-//        searchBinding.wrappedValue = "str_1"
-//        XCTAssertEqual(fullResults.wrappedValue.count, 11)
-//
-//        searchBinding.wrappedValue = ""
-//        XCTAssertEqual(fullResults.wrappedValue.count, 20)
+        func loadList<V: _QueryString & _RealmSchemaDiscoverable>(keyPath: KeyPath<SwiftUIObject, V>) {
+            _ = SwiftUI.List {
+                ForEach(observedResults.wrappedValue) { _ in }
+            }
+            .searchable(text: stringBinding,
+                        collection: observedResults,
+                        keyPath: keyPath,
+                        suggestions: "")
+        }
+
+        searchText = "str"
+        loadList(keyPath: \.str)
+        XCTAssertEqual(observedResults.wrappedValue.count, 20)
+
+        searchText = "str_5"
+        loadList(keyPath: \.str)
+        XCTAssertEqual(observedResults.wrappedValue.count, 1)
+
+        searchText = "str_1"
+        loadList(keyPath: \.str)
+        XCTAssertEqual(observedResults.wrappedValue.count, 11)
+
+        searchText = "5"
+        loadList(keyPath: \.str)
+        XCTAssertEqual(observedResults.wrappedValue.count, 2)
+
+        searchText = "1"
+        loadList(keyPath: \.str)
+        XCTAssertEqual(observedResults.wrappedValue.count, 11)
+
+//        searchText = ""
+//        loadList(keyPath: \.str)
+//        XCTAssertEqual(observedResults.wrappedValue.count, 20)
     }
     // MARK: Bind
     func testUnmanagedManagedObjectBind() {

@@ -349,7 +349,7 @@ internal class ObservableStorage<ObservedType>: ObservableObject where ObservedT
 /// the environment value `EnvironmentValues/realmConfiguration`.
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 @propertyWrapper public struct ObservedResults<ResultType>: DynamicProperty, BoundCollection where ResultType: Object & Identifiable {
-    internal class Storage: ObservableStorage<Results<ResultType>> {
+    fileprivate class Storage: ObservableStorage<Results<ResultType>> {
         var setupHasRun = false
         var cancellables = [AnyCancellable]()
 
@@ -369,10 +369,6 @@ internal class ObservableStorage<ObservedType>: ObservableObject where ObservedT
             if let filter = filter {
                 value = value.filter(filter)
             }
-
-//            if let searchQuery = searchQuery {
-//                value = value.where(searchQuery)
-//            }
 
             setupHasRun = true
         }
@@ -394,17 +390,10 @@ internal class ObservableStorage<ObservedType>: ObservableObject where ObservedT
                 didSet()
             }
         }
-
-//        var searchString: String?
-//        var searchQuery: ((Query<Results<ResultType>.Element>) -> Query<Results<ResultType>.Element>)? {
-//            didSet {
-//                didSet()
-//            }
-//        }
     }
 
     @Environment(\.realmConfiguration) var configuration
-    @ObservedObject internal var storage: Storage
+    @ObservedObject fileprivate var storage: Storage
     /// :nodoc:
     @State public var filter: NSPredicate? {
         willSet {
@@ -417,35 +406,6 @@ internal class ObservableStorage<ObservedType>: ObservableObject where ObservedT
             storage.sortDescriptor = newValue
         }
     }
-
-//    public typealias SearchQueryCompletionHandler = (Query<ResultType>.Element>, String) -> ((Query<Results<ResultType>.Element>) -> Query<Results<ResultType>.Element>)
-
-    /// Returns a binding to the search string, which can be used on `.searchable(text:)` component in SwiftUI
-    /// Using this binding in a searchable component would search for the given value on the provided key paths, if
-    /// the value type doesn't correspond to the key path type,
-    ///
-    ///     List {
-    ///         ForEach(reminders) { reminder in
-    ///             ReminderRowView(reminder: reminder)
-    ///         }
-    ///     }
-    ///     .searchable(text: $reminders.searchIn([\.title]))
-    ///
-    /// - Parameter keyPaths  : An array of key paths to search by, if empty it would no add any filter.
-    /// - Returns: A new binding..
-//    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
-//    public func searchWhere(_ query: @escaping SearchQueryCompletionHandler) -> Binding<String> {
-//        return Binding {
-//            storage.searchString ?? ""
-//        } set: { newValue in
-//            storage.searchString = newValue
-//            guard !newValue.isEmpty else {
-//                storage.searchQuery = nil
-//                return
-//            }
-//            storage.searchQuery = query(Query(), newValue)
-//        }
-//    }
 
         /// :nodoc:
     public var wrappedValue: Results<ResultType> {
@@ -1162,20 +1122,48 @@ extension SwiftUIKVO {
     }
 }
 
-@available(iOS 15.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-extension SwiftUI.List {
-    public func searchable<S, T: ObjectBase, V: StringProtocol & _RealmSchemaDiscoverable>(
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
+public extension View {
+    /// Doctring
+    ///
+    ///     @State var searchString: String
+    ///     @StObservedResults(Reminder.self) var reminders
+    ///
+    ///     List {
+    ///         ForEach(reminders) { reminder in
+    ///             ReminderRowView(reminder: reminder)
+    ///         }
+    ///     }
+    ///     .searchable(text: $0searchString,
+    ///                 collection: reminders,
+    ///                 keyPath: \.title)
+    ///
+    /// - Parameter text: The text to display and edit in the search field.
+    /// - Parameter collection:
+    /// - Parameter keyPath : The keyPath to the property to  search by.
+    /// - Parameter placement : The preferred placement of the search field within the
+    ///     containing view hierarchy.
+    /// - Parameter prompt: A `Text` representing the prompt of the search field
+    ///     which provides users with guidance on what to search for.
+    func searchable<T: ObjectBase, V: _QueryString & _RealmSchemaDiscoverable>(
         text: Binding<String>,
         collection: ObservedResults<T>,
         keyPath: KeyPath<T, V>,
         placement: SearchFieldPlacement = .automatic,
-        prompt: S) -> some View where S : StringProtocol {
-            collection.storage.cancellables.append(text.wrappedValue.publisher.sink { str in
+        prompt: Text? = nil) -> some View {
+            let tempText = text
+            collection.storage.cancellables.append(tempText.wrappedValue.publisher.sink { _ in
+                guard !text.wrappedValue.isEmpty && text.wrappedValue != "" else {
+                    collection.filter = nil
+                    return
+                }
                 var query: Query<V> = Query<T>()[dynamicMember: keyPath]
-                query = query == (str as! V)
+                query = query.contains(text.wrappedValue as! V)
                 collection.filter = query.predicate
             })
-            return self
+            return searchable(text: text,
+                              placement: placement,
+                              prompt: prompt)
     }
 }
 
