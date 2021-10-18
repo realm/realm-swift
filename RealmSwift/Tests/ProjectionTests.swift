@@ -1004,10 +1004,35 @@ class ProjectionTests: TestCase {
         let obj = realm.objects(ModernAllTypesObject.self).first!
         let obs = realm.objects(AllTypesProjection.self).first!
 
-        let newObj = ModernAllTypesObject()
-        let oldPk = obj.objectCol!.linkingObjects.first!.pk
-        observeKeyPathChange(obj, obs, \AllTypesProjection.linkingObjects, oldPk, newObj.pk, { newObj.objectCol = obj })
-        XCTAssertEqual(newObj.objectCol, obj)
+//        let newObj = ModernAllTypesObject()
+        var newObj: ModernAllTypesObject!
+        try! realm.write {
+            newObj = realm.create(ModernAllTypesObject.self)
+        }
+//        let oldPk = obj.objectCol!.linkingObjects.first!.pk
+//        observeKeyPathChange(obj, obs, \AllTypesProjection.linkingObjects, oldPk, newObj.pk, { newObj.objectCol = obj })
+//        XCTAssertEqual(newObj.objectCol, obj)
+
+        let ex = expectation(description: "linkingObjects should change")
+        let a = obj.observe(keyPaths: [\ModernAllTypesObject.linkingObjects]) { change in
+            print(change)
+            ex.fulfill()
+        }
+        let b = newObj.observe(keyPaths: [\ModernAllTypesObject.objectCol]) { change in
+            print(change)
+        }
+        let c = obs.linkingObjects.observe { change in
+            print(change)
+            ex.fulfill()
+        }
+        try! realm.write {
+            newObj.objectCol = obj
+        }
+
+        waitForExpectations(timeout: 2, handler: nil)
+        a.invalidate()
+        b.invalidate()
+        c.invalidate()
     }
 
     func testObserveKeyPath() {
