@@ -1011,7 +1011,6 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     try {
         RLMRealm *realm = [[RLMRealm alloc] initPrivate];
         realm->_realm = _realm->freeze();
-        realm->_realm->set_schema_subset(_realm->schema());
         realm->_realm->read_group();
         realm->_dynamic = _dynamic;
         realm->_schema = _schema;
