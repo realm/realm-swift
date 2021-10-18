@@ -603,7 +603,7 @@ extension Projection: _ObservedResultsValue { }
     public mutating func update() {
         // When the view updates, it will inject the @Environment
         // into the propertyWrapper
-        if storage.configuration == nil || storage.configuration != configuration {
+        if storage.configuration == nil {
             storage.configuration = configuration
         }
     }
