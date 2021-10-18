@@ -344,7 +344,6 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
         defaultValue = T(projecting: T.Root())
     }
 
-
     /// :nodoc:
     public var _publisher: some Publisher {
         self.storage.objectWillChange
@@ -787,22 +786,6 @@ extension Binding where Value: ProjectionObservable, Value.Root: ThreadConfined 
         safeWrite(wrappedValue.rootObject) { object in
             object.realm?.delete(object)
         }
-    }
-}
-
-@available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
-extension Binding where Value: ProjectionObservable & ThreadConfined {
-//    /// :nodoc:
-//    public subscript<V>(dynamicMember member: ReferenceWritableKeyPath<Value, V>) -> Binding<V> where V: _Persistable {
-//        createBinding(wrappedValue, forKeyPath: member)
-//    }
-//    /// :nodoc:
-//    public subscript<V>(dynamicMember member: ReferenceWritableKeyPath<Value, V>) -> Binding<V> where V: _Persistable & RLMSwiftCollectionBase & ThreadConfined {
-//        createCollectionBinding(wrappedValue, forKeyPath: member)
-//    }
-    /// :nodoc:
-    public subscript<V>(dynamicMember member: ReferenceWritableKeyPath<Value, V>) -> Binding<V> where V: _Persistable & Equatable {
-        createEquatableBinding(wrappedValue, forKeyPath: member)
     }
 }
 

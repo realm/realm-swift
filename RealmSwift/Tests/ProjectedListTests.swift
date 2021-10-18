@@ -37,21 +37,21 @@ class ProjectedListTests: TestCase {
         super.setUp()
         let realm = realmWithTestPath()
         try! realm.write {
-            let js = realm.create(SwiftPerson.self, value: ["firstName": "John",
-                                                            "lastName": "Snow",
-                                                            "birthday": Date(timeIntervalSince1970: 10),
-                                                            "address": ["Winterfell", "Kingdom in the North"],
-                                                            "money": Decimal128("2.22")])
-            let dt = realm.create(SwiftPerson.self, value: ["firstName": "Daenerys",
-                                                            "lastName": "Targaryen",
-                                                            "birthday": Date(timeIntervalSince1970: 0),
-                                                            "address": ["King's Landing", "Westeros"],
-                                                            "money": Decimal128("2.22")])
-            let tl = realm.create(SwiftPerson.self, value: ["firstName": "Tyrion",
-                                                            "lastName": "Lannister",
-                                                            "birthday": Date(timeIntervalSince1970: 20),
-                                                            "address": ["Casterly Rock", "Westeros"],
-                                                            "money": Decimal128("9999.95")])
+            let js = realm.create(CommonPerson.self, value: ["firstName": "John",
+                                                             "lastName": "Snow",
+                                                             "birthday": Date(timeIntervalSince1970: 10),
+                                                             "address": ["Winterfell", "Kingdom in the North"],
+                                                             "money": Decimal128("2.22")])
+            let dt = realm.create(CommonPerson.self, value: ["firstName": "Daenerys",
+                                                             "lastName": "Targaryen",
+                                                             "birthday": Date(timeIntervalSince1970: 0),
+                                                             "address": ["King's Landing", "Westeros"],
+                                                             "money": Decimal128("2.22")])
+            let tl = realm.create(CommonPerson.self, value: ["firstName": "Tyrion",
+                                                             "lastName": "Lannister",
+                                                             "birthday": Date(timeIntervalSince1970: 20),
+                                                             "address": ["Casterly Rock", "Westeros"],
+                                                             "money": Decimal128("9999.95")])
             js.friends.append(dt)
             js.friends.append(tl)
             dt.friends.append(js)
@@ -81,7 +81,7 @@ class ProjectedListTests: TestCase {
             collection[0] = "Overwrite"
         }
         XCTAssertEqual(collection.first, "Overwrite")
-        let danyObject = realm.objects(SwiftPerson.self).filter("lastName == 'Targaryen'").first!
+        let danyObject = realm.objects(CommonPerson.self).filter("lastName == 'Targaryen'").first!
         XCTAssertEqual(danyObject.firstName, "Overwrite")
     }
 
@@ -110,7 +110,7 @@ class ProjectedListTests: TestCase {
     }
 
     func testDescription() {
-    let expected = "ProjectedList<String><String> <ProjectedList<String>\\(backingList: List<Person> <0x[0-9a-f]+> \\(\n\t\\[0\\] Person \\{\n\t\tfirstName = Daenerys;\n\t\tlastName = Targaryen;\n\t\tbirthday = 1970-01-01 00:00:00 \\+0000;\n\t\taddress = Address \\{\n\t\t\tcity = King's Landing;\n\t\t\tcountry = Westeros;\n\t\t\\};\n\t\tfriends = List<Person> <0x[0-9a-f]+> \\(\n\t\t\t\\[0\\] Person \\{\n\t\t\t\tfirstName = John;\n\t\t\t\tlastName = Snow;\n\t\t\t\tbirthday = 1970-01-01 00:00:10 \\+0000;\n\t\t\t\taddress = Address \\{\n\t\t\t\t\tcity = Winterfell;\n\t\t\t\t\tcountry = Kingdom in the North;\n\t\t\t\t\\};\n\t\t\t\tfriends = List<Person> <0x[0-9a-f]+> \\(\n\t\t\t\t\t\\[0\\] <Maximum depth exceeded>,\n\t\t\t\t\t\\[1\\] <Maximum depth exceeded>\n\t\t\t\t\\);\n\t\t\t\treviews = List<string> <0x[0-9a-f]+> \\(\n\t\t\t\t\n\t\t\t\t\\);\n\t\t\t\tmoney = 2\\.22;\n\t\t\t\\}\n\t\t\\);\n\t\treviews = List<string> <0x[0-9a-f]+> \\(\n\t\t\n\t\t\\);\n\t\tmoney = 2\\.22;\n\t\\},\n\t\\[1\\] Person \\{\n\t\tfirstName = Tyrion;\n\t\tlastName = Lannister;\n\t\tbirthday = 1970-01-01 00:00:20 \\+0000;\n\t\taddress = Address \\{\n\t\t\tcity = Casterly Rock;\n\t\t\tcountry = Westeros;\n\t\t\\};\n\t\tfriends = List<Person> <0x[0-9a-f]+> \\(\n\t\t\n\t\t\\);\n\t\treviews = List<string> <0x[0-9a-f]+> \\(\n\t\t\n\t\t\\);\n\t\tmoney = 9999\\.95;\n\t\\}\n\\), keyPath: Swift\\.ReferenceWritableKeyPath<RealmSwift_Tests\\.Person, Swift\\.String>, propertyName: \"firstName\", anyCtor: \\(Function\\)\\)> \\{\nProjectedList<Person> <0x[0-9a-f]+> \\(\n\t\\[0\\] Person \\{\n\t\tfirstName = Daenerys;\n\t\tlastName = Targaryen;\n\t\tbirthday = 1970-01-01 00:00:00 \\+0000;\n\t\taddress = Address \\{\n\t\t\tcity = King's Landing;\n\t\t\tcountry = Westeros;\n\t\t\\};\n\t\tfriends = List<Person> <0x[0-9a-f]+> \\(\n\t\t\t\\[0\\] Person \\{\n\t\t\t\tfirstName = John;\n\t\t\t\tlastName = Snow;\n\t\t\t\tbirthday = 1970-01-01 00:00:10 \\+0000;\n\t\t\t\taddress = Address \\{\n\t\t\t\t\tcity = Winterfell;\n\t\t\t\t\tcountry = Kingdom in the North;\n\t\t\t\t\\};\n\t\t\t\tfriends = List<Person> <0x[0-9a-f]+> \\(\n\t\t\t\t\t\\[0\\] <Maximum depth exceeded>,\n\t\t\t\t\t\\[1\\] <Maximum depth exceeded>\n\t\t\t\t\\);\n\t\t\t\treviews = List<string> <0x[0-9a-f]+> \\(\n\t\t\t\t\n\t\t\t\t\\);\n\t\t\t\tmoney = 2\\.22;\n\t\t\t\\}\n\t\t\\);\n\t\treviews = List<string> <0x[0-9a-f]+> \\(\n\t\t\n\t\t\\);\n\t\tmoney = 2\\.22;\n\t\\},\n\t\\[1\\] Person \\{\n\t\tfirstName = Tyrion;\n\t\tlastName = Lannister;\n\t\tbirthday = 1970-01-01 00:00:20 \\+0000;\n\t\taddress = Address \\{\n\t\t\tcity = Casterly Rock;\n\t\t\tcountry = Westeros;\n\t\t\\};\n\t\tfriends = List<Person> <0x[0-9a-f]+> \\(\n\t\t\n\t\t\\);\n\t\treviews = List<string> <0x[0-9a-f]+> \\(\n\t\t\n\t\t\\);\n\t\tmoney = 9999\\.95;\n\t\\}\n\\)\n\\}"
+    let expected = "ProjectedList<String><String> <ProjectedList<String>\\(backingList: List<CommonPerson> <0x[0-9a-f]+> \\(\n\t\\[0\\] CommonPerson \\{\n\t\tfirstName = Daenerys;\n\t\tlastName = Targaryen;\n\t\tbirthday = 1970-01-01 00:00:00 \\+0000;\n\t\taddress = Address \\{\n\t\t\tcity = King's Landing;\n\t\t\tcountry = Westeros;\n\t\t\\};\n\t\tfriends = List<CommonPerson> <0x[0-9a-f]+> \\(\n\t\t\t\\[0\\] CommonPerson \\{\n\t\t\t\tfirstName = John;\n\t\t\t\tlastName = Snow;\n\t\t\t\tbirthday = 1970-01-01 00:00:10 \\+0000;\n\t\t\t\taddress = Address \\{\n\t\t\t\t\tcity = Winterfell;\n\t\t\t\t\tcountry = Kingdom in the North;\n\t\t\t\t\\};\n\t\t\t\tfriends = List<CommonPerson> <0x[0-9a-f]+> \\(\n\t\t\t\t\t\\[0\\] <Maximum depth exceeded>,\n\t\t\t\t\t\\[1\\] <Maximum depth exceeded>\n\t\t\t\t\\);\n\t\t\t\treviews = List<string> <0x[0-9a-f]+> \\(\n\t\t\t\t\n\t\t\t\t\\);\n\t\t\t\tmoney = 2\\.22;\n\t\t\t\\}\n\t\t\\);\n\t\treviews = List<string> <0x[0-9a-f]+> \\(\n\t\t\n\t\t\\);\n\t\tmoney = 2\\.22;\n\t\\},\n\t\\[1\\] CommonPerson \\{\n\t\tfirstName = Tyrion;\n\t\tlastName = Lannister;\n\t\tbirthday = 1970-01-01 00:00:20 \\+0000;\n\t\taddress = Address \\{\n\t\t\tcity = Casterly Rock;\n\t\t\tcountry = Westeros;\n\t\t\\};\n\t\tfriends = List<CommonPerson> <0x[0-9a-f]+> \\(\n\t\t\n\t\t\\);\n\t\treviews = List<string> <0x[0-9a-f]+> \\(\n\t\t\n\t\t\\);\n\t\tmoney = 9999\\.95;\n\t\\}\n\\), keyPath: Swift\\.ReferenceWritableKeyPath<RealmSwift_Tests\\.CommonPerson, Swift\\.String>, propertyName: \"firstName\", anyCtor: \\(Function\\)\\)> \\{\nProjectedList<CommonPerson> <0x[0-9a-f]+> \\(\n\t\\[0\\] CommonPerson \\{\n\t\tfirstName = Daenerys;\n\t\tlastName = Targaryen;\n\t\tbirthday = 1970-01-01 00:00:00 \\+0000;\n\t\taddress = Address \\{\n\t\t\tcity = King's Landing;\n\t\t\tcountry = Westeros;\n\t\t\\};\n\t\tfriends = List<CommonPerson> <0x[0-9a-f]+> \\(\n\t\t\t\\[0\\] CommonPerson \\{\n\t\t\t\tfirstName = John;\n\t\t\t\tlastName = Snow;\n\t\t\t\tbirthday = 1970-01-01 00:00:10 \\+0000;\n\t\t\t\taddress = Address \\{\n\t\t\t\t\tcity = Winterfell;\n\t\t\t\t\tcountry = Kingdom in the North;\n\t\t\t\t\\};\n\t\t\t\tfriends = List<CommonPerson> <0x[0-9a-f]+> \\(\n\t\t\t\t\t\\[0\\] <Maximum depth exceeded>,\n\t\t\t\t\t\\[1\\] <Maximum depth exceeded>\n\t\t\t\t\\);\n\t\t\t\treviews = List<string> <0x[0-9a-f]+> \\(\n\t\t\t\t\n\t\t\t\t\\);\n\t\t\t\tmoney = 2\\.22;\n\t\t\t\\}\n\t\t\\);\n\t\treviews = List<string> <0x[0-9a-f]+> \\(\n\t\t\n\t\t\\);\n\t\tmoney = 2\\.22;\n\t\\},\n\t\\[1\\] CommonPerson \\{\n\t\tfirstName = Tyrion;\n\t\tlastName = Lannister;\n\t\tbirthday = 1970-01-01 00:00:20 \\+0000;\n\t\taddress = Address \\{\n\t\t\tcity = Casterly Rock;\n\t\t\tcountry = Westeros;\n\t\t\\};\n\t\tfriends = List<CommonPerson> <0x[0-9a-f]+> \\(\n\t\t\n\t\t\\);\n\t\treviews = List<string> <0x[0-9a-f]+> \\(\n\t\t\n\t\t\\);\n\t\tmoney = 9999\\.95;\n\t\\}\n\\)\n\\}"
         assertMatches(collection.description.replacingOccurrences(of: "    ", with: "\t"), expected)
     }
 
@@ -168,7 +168,7 @@ class ProjectedListTests: TestCase {
         ex2 = expectation(description: "change notification")
         let realm = realmWithTestPath()
         realm.beginWrite()
-        realm.delete(realm.objects(SwiftPerson.self))
+        realm.delete(realm.objects(CommonPerson.self))
         try! realm.commitWrite(withoutNotifying: [token])
         waitForExpectations(timeout: 1, handler: nil)
 
@@ -193,7 +193,7 @@ class ProjectedListTests: TestCase {
         dispatchSyncNewThread {
             let realm = self.realmWithTestPath()
             realm.beginWrite()
-            let obj = realm.objects(SwiftPerson.self).first!
+            let obj = realm.objects(CommonPerson.self).first!
             obj.firstName += " not the same"
             try! realm.commitWrite()
         }
@@ -253,10 +253,10 @@ class ProjectedListTests: TestCase {
         XCTAssertFalse(live!.isFrozen)
 
         let liveRealm = live!.realm!
-        try! liveRealm.write { liveRealm.delete(liveRealm.objects(SwiftPerson.self).filter(NSPredicate(format: "firstName != 'Daenerys'"))) }
+        try! liveRealm.write { liveRealm.delete(liveRealm.objects(CommonPerson.self).filter(NSPredicate(format: "firstName != 'Daenerys'"))) }
         XCTAssertTrue(live!.isInvalidated)
         XCTAssertFalse(frozen.isEmpty)
-        try! liveRealm.write { liveRealm.delete(liveRealm.objects(SwiftPerson.self)) }
+        try! liveRealm.write { liveRealm.delete(liveRealm.objects(CommonPerson.self)) }
         XCTAssertFalse(frozen.isInvalidated)
     }
 
@@ -269,7 +269,7 @@ class ProjectedListTests: TestCase {
             XCTAssertFalse(live!.isFrozen)
 
             let liveRealm = live!.realm!
-            try! liveRealm.write { liveRealm.delete(liveRealm.objects(SwiftPerson.self)) }
+            try! liveRealm.write { liveRealm.delete(liveRealm.objects(CommonPerson.self)) }
             XCTAssertTrue(live!.isInvalidated)
             XCTAssertFalse(frozen.isEmpty)
         }
