@@ -176,7 +176,7 @@ private final class ObservableStoragePublisher<ObjectType>: Publisher where Obje
     private var subscribers = [AnySubscriber<Void, Never>]()
     private let value: ObjectType
     private let keyPaths: [String]?
-    private let unwrappedValue: ()->(ObjectBase?)
+    private let unwrappedValue: () -> (ObjectBase?)
 
     init(_ value: ObjectType, _ keyPaths: [String]? = nil) {
         self.value = value
@@ -518,6 +518,7 @@ extension Projection: ObservedResultsValue { }
         self.filter = filter
         self.sortDescriptor = sortDescriptor
     }
+
     public mutating func update() {
         // When the view updates, it will inject the @Environment
         // into the propertyWrapper
