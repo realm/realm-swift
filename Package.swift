@@ -122,7 +122,7 @@ let package = Package(
             targets: ["Realm", "RealmSwift"]),
     ],
     dependencies: [
-        .package(name: "RealmDatabase", url: "https://github.com/realm/realm-core", .branch("jf/multiprocess-sync"))
+        .package(name: "RealmDatabase", path: "../core-multiprocess-sync")
     ],
     targets: [
       .target(
@@ -304,6 +304,7 @@ let package = Package(
             name: "SwiftObjectServerTests",
             sources: [
                 "SwiftObjectServerTests.swift",
+                "SwiftMultiprocessSyncTests.swift",
                 "SwiftCollectionSyncTests.swift",
                 "SwiftObjectServerPartitionTests.swift",
                 "SwiftUIServerTests.swift",

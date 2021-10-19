@@ -96,6 +96,14 @@ namespace {
     return nil;
 }
 
+- (instancetype)initWithBaseURL:(NSString *)baseURL transport:(id<RLMNetworkTransport>)transport localAppName:(NSString *)localAppName localAppVersion:(NSString *)localAppVersion {
+    return [self initWithBaseURL:baseURL
+                       transport:transport
+                    localAppName:localAppName
+                 localAppVersion:localAppVersion
+                      sharedPath:nil];
+}
+
 - (instancetype)initWithBaseURL:(nullable NSString *)baseURL
                       transport:(nullable id<RLMNetworkTransport>)transport
                    localAppName:(nullable NSString *)localAppName
@@ -305,20 +313,27 @@ NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
                     _app->sync_manager()->suspend();
                 }
             };
-            tokenSuspension = [[NSNotificationCenter defaultCenter] addObserverForName:UIApplicationWillResignActiveNotification
-
-                                                              object:nil
-                                                               queue:nil
-                                                          usingBlock:suspensionBlock];
-            tokenTermination = [[NSNotificationCenter defaultCenter] addObserverForName:UIApplicationWillTerminateNotification
-
-                                                              object:nil
-                                                               queue:nil
-                                                          usingBlock:suspensionBlock];
-            tokenActive = [[NSNotificationCenter defaultCenter] addObserverForName:UIApplicationDidBecomeActiveNotification
-                                                              object:nil
-                                                               queue:nil
-                                                          usingBlock:^(NSNotification * _Nonnull note) {
+#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+            NSNotificationName willResign = UIApplicationWillResignActiveNotification;
+            NSNotificationName willTerminate = UIApplicationWillTerminateNotification;
+            NSNotificationName didBecomeActive = UIApplicationWillTerminateNotification;
+#elif TARGET_OS_MAC
+            NSNotificationName willResign = NSApplicationWillResignActiveNotification;
+            NSNotificationName willTerminate = NSApplicationWillTerminateNotification;
+            NSNotificationName didBecomeActive = NSApplicationWillTerminateNotification;
+#endif
+            tokenSuspension = [[NSNotificationCenter defaultCenter] addObserverForName:willResign
+                                                                                object:nil
+                                                                                 queue:nil
+                                                                            usingBlock:suspensionBlock];
+            tokenTermination = [[NSNotificationCenter defaultCenter] addObserverForName:willTerminate
+                                                                                 object:nil
+                                                                                  queue:nil
+                                                                             usingBlock:suspensionBlock];
+            tokenActive = [[NSNotificationCenter defaultCenter] addObserverForName:didBecomeActive
+                                                                            object:nil
+                                                                             queue:nil
+                                                                        usingBlock:^(NSNotification * _Nonnull note) {
                 _app->sync_manager()->resume();
             }];
         }

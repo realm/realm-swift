@@ -1729,6 +1729,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
                                                                      transport:[AsyncOpenConnectionTimeoutTransport new]
                                                                   localAppName:nil
                                                                localAppVersion:nil
+                                                                    sharedPath:nil
                                                        defaultRequestTimeoutMS:60];
     NSString *appId = [RealmServer.shared createAppAndReturnError:nil];
     RLMApp *app = [RLMApp appWithId:appId configuration:config];

@@ -167,6 +167,7 @@ static RLMSyncConnectionState convertConnectionState(SyncSession::ConnectionStat
 - (void)resume {
     if (auto session = _session.lock()) {
         session->revive_if_needed();
+        session->user()->sync_manager()->resume();
     }
 }
 
