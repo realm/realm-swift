@@ -265,6 +265,8 @@ NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
     id tokenSuspension;
     id tokenTermination;
     id tokenActive;
+    id tokenForeground;
+    NSTimer *timer;
 }
 
 @end
@@ -309,6 +311,7 @@ NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
         _syncManager = [[RLMSyncManager alloc] initWithSyncManager:_app->sync_manager()];
         if (configuration.sharedPath) {
             id suspensionBlock = ^(NSNotification * _Nonnull note) {
+                [timer invalidate];
                 if (_app->sync_manager()->has_existing_sessions()) {
                     _app->sync_manager()->suspend();
                 }
@@ -317,6 +320,7 @@ NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
             NSNotificationName willResign = UIApplicationWillResignActiveNotification;
             NSNotificationName willTerminate = UIApplicationWillTerminateNotification;
             NSNotificationName didBecomeActive = UIApplicationWillTerminateNotification;
+            NSNotificationName willEnterForeground = UIApplicationWillEnterForegroundNotification;
 #elif TARGET_OS_MAC
             NSNotificationName willResign = NSApplicationWillResignActiveNotification;
             NSNotificationName willTerminate = NSApplicationWillTerminateNotification;
@@ -334,8 +338,30 @@ NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
                                                                             object:nil
                                                                              queue:nil
                                                                         usingBlock:^(NSNotification * _Nonnull note) {
-                _app->sync_manager()->resume();
+                timer = [NSTimer scheduledTimerWithTimeInterval:0.1 repeats:YES block:^(NSTimer * _Nonnull timer) {
+                    if (_app->sync_manager()->can_claim_sync_agent() ) {
+                        _app->sync_manager()->resume();
+                    }
+                }];
+//                _app->sync_manager()->resume();
             }];
+            tokenForeground = [[NSNotificationCenter defaultCenter] addObserverForName:willEnterForeground
+                                                                            object:nil
+                                                                             queue:nil
+                                                                        usingBlock:^(NSNotification * _Nonnull note) {
+                timer = [NSTimer scheduledTimerWithTimeInterval:0.1 repeats:YES block:^(NSTimer * _Nonnull timer) {
+                    if (_app->sync_manager()->can_claim_sync_agent() ) {
+                        _app->sync_manager()->resume();
+                    }
+                }];
+//                _app->sync_manager()->resume();
+            }];
+            timer = [NSTimer scheduledTimerWithTimeInterval:0.1 repeats:YES block:^(NSTimer * _Nonnull timer) {
+                if (_app->sync_manager()->can_claim_sync_agent() ) {
+                    _app->sync_manager()->resume();
+                }
+            }];
+            [timer fire];
         }
         return self;
     }

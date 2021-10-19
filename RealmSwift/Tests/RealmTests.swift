@@ -981,7 +981,7 @@ class RealmTests: TestCase {
     }
 }
 
-@available(iOS 15.0.0, *)
+@available(iOS 15.0.0, macOS 12.0, *)
 extension RealmTests {
     @Sendable func testAsyncScheduler() async throws {
         // This works. Which is good for the basic, single task use case.

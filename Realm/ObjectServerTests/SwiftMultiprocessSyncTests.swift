@@ -176,8 +176,11 @@ class SwiftMultiprocessSyncTests: SwiftSyncTestCase {
                                                                            password: environment.password!))
                 var userConfiguration = user.configuration(partitionValue: "mps")
                 userConfiguration.objectTypes = [SwiftPerson.self]
-                let realm = try await Realm(configuration: userConfiguration)
+
                 group.addTask {
+                    var userConfiguration = user.configuration(partitionValue: "mps")
+                    userConfiguration.objectTypes = [SwiftPerson.self]
+                    let realm = try await Realm(configuration: userConfiguration)
                     for await event in stream {
                         switch event {
                         case .agentsCheckedIn:
@@ -186,6 +189,7 @@ class SwiftMultiprocessSyncTests: SwiftSyncTestCase {
                                 self.send(event: .downloadedParentData)
                             }
                         case .downloadedParentData:
+                            realm.refresh()
                             let persons = realm.objects(SwiftPerson.self)
                             XCTAssertEqual(persons[0].firstName, "Miles")
                             XCTAssertEqual(persons[0].lastName, "O'Brien")
@@ -218,6 +222,7 @@ class SwiftMultiprocessSyncTests: SwiftSyncTestCase {
                     }
                 }
                 var token: NSKeyValueObservation? = nil
+                let realm = try await Realm(configuration: userConfiguration)
                 if realm.syncSession == nil {
                     send(event: .nonSyncAgentCheckIn)
                 } else if let session = realm.syncSession {
