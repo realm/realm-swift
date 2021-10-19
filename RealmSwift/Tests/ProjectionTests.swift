@@ -1014,16 +1014,16 @@ class ProjectionTests: TestCase {
 //        XCTAssertEqual(newObj.objectCol, obj)
 
 //        let ex = expectation(description: "linkingObjects projection should change")
-//        let token = obs.observe(keyPaths: [\AllTypesProjection.linkingObjects]) { change in
+//        let token = obs.observe(keyPaths: [\AllTypesProjection.linkingObjects]) { _ in
 //            ex.fulfill()
 //        }
 //        let ex1 = expectation(description: "linkingObjects should change")
         let ex2 = expectation(description: "objectCol should change")
         let ex3 = expectation(description: "linkingObjects property should change")
-//        let a = obj.observe(keyPaths: [\ModernAllTypesObject.linkingObjects]) { change in
+//        let a = obj.observe(keyPaths: [\ModernAllTypesObject.linkingObjects]) { _ in
 //            ex1.fulfill()
 //        }
-        let b = newObj.observe(keyPaths: [\ModernAllTypesObject.objectCol]) { change in
+        let b = newObj.observe(keyPaths: [\ModernAllTypesObject.objectCol]) { _ in
             ex2.fulfill()
         }
         let c = obs.linkingObjects.observe { change in
