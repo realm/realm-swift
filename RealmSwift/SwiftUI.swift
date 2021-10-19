@@ -176,10 +176,24 @@ private final class ObservableStoragePublisher<ObjectType>: Publisher where Obje
     private var subscribers = [AnySubscriber<Void, Never>]()
     private let value: ObjectType
     private let keyPaths: [String]?
+    private let unwrappedValue: ()->(ObjectBase?)
 
     init(_ value: ObjectType, _ keyPaths: [String]? = nil) {
         self.value = value
         self.keyPaths = keyPaths
+        self.unwrappedValue = { nil }
+    }
+
+    init(_ value: ObjectType, _ keyPaths: [String]? = nil) where ObjectType: ObjectBase {
+        self.value = value
+        self.keyPaths = keyPaths
+        self.unwrappedValue = { value }
+    }
+
+    init(_ value: ObjectType, _ keyPaths: [String]? = nil) where ObjectType: ProjectionObservable {
+        self.value = value
+        self.keyPaths = keyPaths
+        self.unwrappedValue = { value.rootObject }
     }
 
     func send() {
@@ -195,7 +209,7 @@ private final class ObservableStoragePublisher<ObjectType>: Publisher where Obje
             // unmanaged object becomes managed it will continue to use KVO.
             let token =  value._observe(keyPaths, subscriber)
             subscriber.receive(subscription: ObservationSubscription(token: token))
-        } else if let value = value as? ObjectBase, !value.isInvalidated {
+        } else if let value = unwrappedValue(), !value.isInvalidated {
             // else if the value is unmanaged
             let schema = ObjectSchema(RLMObjectBaseObjectSchema(value)!)
             let kvo = SwiftUIKVO(subscriber: subscriber)
@@ -211,24 +225,34 @@ private final class ObservableStoragePublisher<ObjectType>: Publisher where Obje
         }
     }
 }
+
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 private class ObservableStorage<ObservedType>: ObservableObject where ObservedType: RealmSubscribable & ThreadConfined & Equatable {
     @Published var value: ObservedType {
         willSet {
             if newValue != value {
                 objectWillChange.send()
-                self.objectWillChange = ObservableStoragePublisher(newValue, self.keyPaths)
+                self.objectWillChange = instance()
             }
         }
     }
 
+    let instance: ()->(ObservableStoragePublisher<ObservedType>)
     var objectWillChange: ObservableStoragePublisher<ObservedType>
     var keyPaths: [String]?
 
     init(_ value: ObservedType, _ keyPaths: [String]? = nil) {
         self.value = value.realm != nil && !value.isInvalidated ? value.thaw() ?? value : value
-        self.objectWillChange = ObservableStoragePublisher(value, keyPaths)
+        self.instance = { ObservableStoragePublisher(value, keyPaths) }
         self.keyPaths = keyPaths
+        self.objectWillChange = instance()
+    }
+
+    init(_ value: ObservedType, _ keyPaths: [String]? = nil) where ObservedType: ProjectionObservable {
+        self.value = value.realm != nil && !value.isInvalidated ? value.thaw() ?? value : value
+        self.instance = { ObservableStoragePublisher(value, keyPaths) }
+        self.keyPaths = keyPaths
+        self.objectWillChange = instance()
     }
 }
 
