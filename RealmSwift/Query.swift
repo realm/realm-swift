@@ -20,11 +20,17 @@ import Foundation
 import Realm
 
 /// Enum representing an option for `String` queries.
-public enum StringOptions {
+public struct StringOptions: OptionSet {
+    /// :doc:
+    public let rawValue: Int8
+    /// :doc:
+    public init(rawValue: Int8) {
+        self.rawValue = rawValue
+    }
     /// A case-insensitive search.
-    case caseInsensitive
+    public static let caseInsensitive = StringOptions(rawValue: 1)
     /// Query ignores diacritic marks.
-    case diacriticInsensitive
+    public static let diacriticInsensitive = StringOptions(rawValue: 2)
 }
 
 /**
@@ -137,9 +143,8 @@ public struct Query<T: _RealmSchemaDiscoverable> {
     private func appendKeyPath(_ keyPath: String, options: KeyPathOptions) -> QueryNode {
         if case let .keyPath(kp, ops) = node {
             return .keyPath(kp + [keyPath], options: ops.union(options))
-        } else if case let .mapSubscript(lhs, mapKeyPath, requiresNot) = node, case let .keyPath(kp, ops) = mapKeyPath {
-            return .mapSubscript(lhs, collectionKeyPath: .keyPath(kp + [keyPath], options: ops.subtracting(.requiresAny)),
-                                 requiresNot: requiresNot)
+        } else if case .mapSubscript = node {
+            throwRealmException("Cannot apply key path to Map subscripts.")
         }
         throwRealmException("Cannot apply a keypath to \(buildPredicate(node))")
     }
@@ -171,16 +176,7 @@ public struct Query<T: _RealmSchemaDiscoverable> {
 
     /// :nodoc:
     public static prefix func ! (_ query: Query) -> Query {
-        // With a `Map` subscript expression we want to put the NOT
-        // on the rhs of the expression. e.g. "mapCol.@allValues == 'Foo' AND NOT mapCol == 'Bar'"
-        if case let .comparison(op, lhs, rhs, options: options) = query.node,
-           case let .mapSubscript(mapLhs, mapName, _) = lhs {
-            return Query(.comparison(operator: op, .mapSubscript(mapLhs, collectionKeyPath: mapName, requiresNot: true),
-                                      rhs,
-                                      options: options))
-        } else {
-            return Query(.not(query.node))
-        }
+        Query(.not(query.node))
     }
 
     // MARK: Comparable
@@ -414,24 +410,6 @@ extension Query where T: RealmCollection,
 // MARK: RealmKeyedCollection
 
 extension Query where T: RealmKeyedCollection {
-    private func extractCollectionName() -> QueryNode {
-        if case let .keyPath(kp, ops) = node {
-            if !kp.isEmpty {
-                return .keyPath([kp[0]], options: ops.subtracting(.requiresAny))
-            }
-        }
-        throwRealmException("Cannot apply a keypath to \(buildPredicate(node))")
-    }
-
-    /// Creates an expression that allows an equals comparison on a maps keys on the lhs, and on the rhs
-    /// the ability to compare values in the map. e.g. `((mapString.@allKeys == %@) && NOT mapString CONTAINS %@)`
-    private func mapSubscript<U>(_ member: T.Key) -> Query<U> where T.Key: _RealmSchemaDiscoverable {
-        Query<U>(.mapSubscript(.comparison(operator: .equal, keyPathErasingAnyPrefix(appending: "@allKeys"),
-                                           .constant(member), options: []),
-                               collectionKeyPath: extractCollectionName(),
-                               requiresNot: false))
-    }
-
     /// Checks if any elements contained in the given array are present in the map's values.
     public func containsAny<U: Sequence, V>(in collection: U) -> Query<V> where U.Element == T.Value {
         Query<V>(.comparison(operator: .in, node, .constant(collection), options: []))
@@ -449,7 +427,7 @@ extension Query where T: RealmKeyedCollection, T.Key: _RealmSchemaDiscoverable {
     }
     /// :nodoc:
     public subscript(member: T.Key) -> Query<T.Value> {
-        return mapSubscript(member)
+        Query<T.Value>(.mapSubscript(keyPathErasingAnyPrefix(), key: member))
     }
 }
 
@@ -460,11 +438,11 @@ extension Query where T: RealmKeyedCollection, T.Key: _RealmSchemaDiscoverable, 
     }
     /// :nodoc:
     public subscript(member: T.Key) -> Query<T.Value.Wrapped> {
-        return mapSubscript(member)
+        Query<T.Value.Wrapped>(.mapSubscript(keyPathErasingAnyPrefix(), key: member))
     }
     /// :nodoc:
     public subscript(member: T.Key) -> Query<T.Value> where T.Value.Wrapped: ObjectBase {
-        return mapSubscript(member)
+        Query<T.Value>(.mapSubscript(keyPathErasingAnyPrefix(), key: member))
     }
 }
 
@@ -728,7 +706,7 @@ extension Query where T: _QueryBinary {
      - parameter value: value used.
      - parameter options: A Set of options used to evaluate the search query.
      */
-    public func contains<V>(_ value: T, options: Set<StringOptions> = []) -> Query<V> {
+    public func contains<V>(_ value: T, options: StringOptions = []) -> Query<V> {
         Query<V>(.comparison(operator: .contains, node, .constant(value), options: options))
     }
 
@@ -737,7 +715,7 @@ extension Query where T: _QueryBinary {
      - parameter column: The other column.
      - parameter options: A Set of options used to evaluate the search query.
      */
-    public func contains<U, V>(_ column: Query<U>, options: Set<StringOptions> = []) -> Query<V> where U: _QueryBinary {
+    public func contains<U, V>(_ column: Query<U>, options: StringOptions = []) -> Query<V> where U: _QueryBinary {
         Query<V>(.comparison(operator: .contains, node, column.node, options: options))
     }
 
@@ -746,7 +724,7 @@ extension Query where T: _QueryBinary {
      - parameter value: value used.
      - parameter options: A Set of options used to evaluate the search query.
      */
-    public func starts<V>(with value: T, options: Set<StringOptions> = []) -> Query<V> {
+    public func starts<V>(with value: T, options: StringOptions = []) -> Query<V> {
         Query<V>(.comparison(operator: .beginsWith, node, .constant(value), options: options))
     }
 
@@ -755,7 +733,7 @@ extension Query where T: _QueryBinary {
      - parameter column: The other column.
      - parameter options: A Set of options used to evaluate the search query.
      */
-    public func starts<U, V>(with column: Query<U>, options: Set<StringOptions> = []) -> Query<V> {
+    public func starts<U, V>(with column: Query<U>, options: StringOptions = []) -> Query<V> {
         Query<V>(.comparison(operator: .beginsWith, node, column.node, options: options))
     }
 
@@ -764,7 +742,7 @@ extension Query where T: _QueryBinary {
      - parameter value: value used.
      - parameter options: A Set of options used to evaluate the search query.
      */
-    public func ends<V>(with value: T, options: Set<StringOptions> = []) -> Query<V> {
+    public func ends<V>(with value: T, options: StringOptions = []) -> Query<V> {
         Query<V>(.comparison(operator: .endsWith, node, .constant(value), options: options))
     }
 
@@ -773,7 +751,7 @@ extension Query where T: _QueryBinary {
      - parameter column: The other column.
      - parameter options: A Set of options used to evaluate the search query.
      */
-    public func ends<U, V>(with column: Query<U>, options: Set<StringOptions> = []) -> Query<V> {
+    public func ends<U, V>(with column: Query<U>, options: StringOptions = []) -> Query<V> {
         Query<V>(.comparison(operator: .endsWith, node, column.node, options: options))
     }
 
@@ -782,7 +760,7 @@ extension Query where T: _QueryBinary {
      - parameter value: value used.
      - parameter options: A Set of options used to evaluate the search query.
      */
-    public func equals<V>(_ value: T, options: Set<StringOptions> = []) -> Query<V> {
+    public func equals<V>(_ value: T, options: StringOptions = []) -> Query<V> {
         Query<V>(.comparison(operator: .equal, node, .constant(value), options: options))
     }
 
@@ -791,7 +769,7 @@ extension Query where T: _QueryBinary {
      - parameter column: The other column.
      - parameter options: A Set of options used to evaluate the search query.
      */
-    public func equals<U, V>(_ column: Query<U>, options: Set<StringOptions> = []) -> Query<V> {
+    public func equals<U, V>(_ column: Query<U>, options: StringOptions = []) -> Query<V> {
         Query<V>(.comparison(operator: .equal, node, column.node, options: options))
     }
 
@@ -800,7 +778,7 @@ extension Query where T: _QueryBinary {
      - parameter value: value used.
      - parameter options: A Set of options used to evaluate the search query.
      */
-    public func notEquals<V>(_ value: T, options: Set<StringOptions> = []) -> Query<V> {
+    public func notEquals<V>(_ value: T, options: StringOptions = []) -> Query<V> {
         Query<V>(.comparison(operator: .notEqual, node, .constant(value), options: options))
     }
 
@@ -809,7 +787,7 @@ extension Query where T: _QueryBinary {
      - parameter column: The other column.
      - parameter options: A Set of options used to evaluate the search query.
      */
-    public func notEquals<U, V>(_ column: Query<U>, options: Set<StringOptions> = []) -> Query<V> {
+    public func notEquals<U, V>(_ column: Query<U>, options: StringOptions = []) -> Query<V> {
         Query<V>(.comparison(operator: .notEqual, node, column.node, options: options))
     }
 }
@@ -928,11 +906,11 @@ fileprivate indirect enum QueryNode {
 
     case keyPath(_ value: [String], options: KeyPathOptions)
 
-    case comparison(operator: Operator, _ lhs: QueryNode, _ rhs: QueryNode, options: Set<StringOptions>)
+    case comparison(operator: Operator, _ lhs: QueryNode, _ rhs: QueryNode, options: StringOptions)
     case between(_ lhs: QueryNode, lowerBound: QueryNode, upperBound: QueryNode)
 
     case subqueryCount(_ child: QueryNode)
-    case mapSubscript(_ lhs: QueryNode, collectionKeyPath: QueryNode, requiresNot: Bool)
+    case mapSubscript(_ keyPath: QueryNode, key: Any)
 }
 
 private func buildPredicate(_ root: QueryNode, subqueryCount: Int = 0) -> (String, [Any]) {
@@ -982,7 +960,7 @@ private func buildPredicate(_ root: QueryNode, subqueryCount: Int = 0) -> (Strin
         formatStr.append("}")
     }
 
-    func strOptions(_ options: Set<StringOptions>) -> String {
+    func strOptions(_ options: StringOptions) -> String {
         if options == [] {
             return ""
         }
@@ -1019,13 +997,10 @@ private func buildPredicate(_ root: QueryNode, subqueryCount: Int = 0) -> (Strin
             formatStr.append("SUBQUERY(\(collectionName), $col\(subqueryCounter), ")
             build(node)
             formatStr.append(").@count")
-        case .mapSubscript(let lhs, let collectionKeyPath, let requiresNot):
-            build(lhs)
-            formatStr.append(" && ")
-            if requiresNot {
-                formatStr.append("NOT ")
-            }
-            build(collectionKeyPath)
+        case .mapSubscript(let keyPath, let key):
+            build(keyPath)
+            formatStr.append("[%@]")
+            arguments.add(key)
         }
     }
     build(root)

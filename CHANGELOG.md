@@ -1,72 +1,35 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
+* Add support for multi-user on `@AsyncOpen` and `@AutoOpen`.
 
+### Fixed
+* Fix `@AsyncOpen` and `@AutoOpen` using `defaultConfiguration` by default if 
+  the user's doesn't provide one, will set an incorrect path which doesn't 
+  correspond to the users configuration one. (since v10.12.0)
+* Adding missing subscription completion for `AsyncOpenPublisher` after successfully 
+  returning a realm.
 * Add an api for a type safe query syntax. This allows you to filter a Realm and collections managed by a Realm
   with Swift style expressions. Here is a brief example:
   ```swift
+  class Person: Object {
+    @Persisted var name: Dog
+    @Persisted var hobbies: List<String>
+    @Persisted var dogs: List<Dog>
+  }
   class Dog: Object {
     @Persisted var name: String
     @Persisted var age: String
   }
-  class Person: Object {
-    @Persisted var stringList: List<String>
-    @Persisted var dogList: List<Dog>
-    @Persisted var dog: Dog
-  }
 
   let persons = realm.objects(Person.self).where {
-    $0.stringList.contains("bar") || $0.stringList.contains("foo")
+    $0.hobbies.contains("music") || $0.hobbies.contains("baseball")
   }
 
   persons = realm.objects(Person.self).where {
-    ($0.dogList.age >= 21) && $0.dog.name.starts(with: "L")
+    ($0.dogs.age >= 2) && $0.dogs.name.starts(with: "L")
   }
-  ```([Cocoa #7419](https://github.com/realm/realm-cocoa/pull/7419), since v10.?)
-* None.
-* Add support for multi-user on `@AsyncOpen` and `@AutoOpen`.
-
-### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
-* None.
-
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
-
-### Compatibility
-* Realm Studio: 11.0.0 or later.
-* APIs are backwards compatible with all previous releases in the 10.x.y series.
-* Carthage release for Swift is built with Xcode 13.0.
-* CocoaPods: 1.10 or later.
-* Xcode: 12.2-13.0.
-
-* Add `async` versions for `EmailPasswordAuth.callResetPasswordFunction` and `User.linkUser` methods.
-* Add `async` version for `MongoCollection` methods.
-* Add `async` support for user functions.
-* Add an api for a type safe query syntax. This allows you to filter a Realm and collections managed by a Realm
-  with Swift style expressions. Here is a brief example:
-  ```swift
-  class Foo: Object {
-    @Persisted var name: String
-    @Persisted var age: String
-  }
-  class Person: Object {
-    @Persisted var stringList: List<String>
-    @Persisted var fooList: List<Foo>
-    @Persisted var foo: Foo
-  }
-
-  let persons = realm.objects(Person.self).where {
-    $0.stringList.contains("bar") || $0.stringList.contains("foo")
-  }
-
-  persons = realm.objects(Person.self).where {
-    (($0.fooList.age >= 21).count > 0) && $0.foo.name.starts(with: "L")
-  }
-  ```([Cocoa #7419](https://github.com/realm/realm-cocoa/pull/7419), since v10.?)
-
-### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
-* None.
+  ```([Cocoa #7419](https://github.com/realm/realm-cocoa/pull/7419))
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
@@ -79,6 +42,52 @@ x.y.z Release notes (yyyy-MM-dd)
 
 ### Internal
 * Upgraded realm-core from ? to ?
+
+10.17.0 Release notes (2021-10-06)
+=============================================================
+### Enhancements
+
+* Add a new `@ThreadSafe` property wrapper. Objects and collections wrapped by `@ThreadSafe` may be passed between threads. It's
+  intended to allow local variables and function parameters to be used across
+  threads when needed.
+
+### Fixed
+
+* None.
+
+### Compatibility
+
+* Realm Studio: 11.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 13.0.
+* CocoaPods: 1.10 or later.
+* Xcode: 12.2-13.0.
+
+10.16.0 Release notes (2021-09-29)
+=============================================================
+
+### Enhancements
+
+* Add `async` versions of `EmailPasswordAuth.callResetPasswordFunction` and
+r `User.linkUser` methods.
+* Add `async` version of `MongoCollection` methods.
+* Add `async` support for user functions.
+
+### Fixed
+
+* A race condition in Realm.asyncOpen() sometimes resulted in subsequent writes
+  from Realm Sync failing to produce notifications
+  ([#7447](https://github.com/realm/realm-cocoa/issues/7447),
+  [#7453](https://github.com/realm/realm-cocoa/issues/7453),
+  [Core #4909](https://github.com/realm/realm-core/issues/4909), since v10.15.0).
+
+### Compatibility
+
+* Realm Studio: 11.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 13.0.
+* CocoaPods: 1.10 or later.
+* Xcode: 12.2-13.0.
 
 10.15.1 Release notes (2021-09-15)
 =============================================================

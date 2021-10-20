@@ -1608,65 +1608,65 @@ class QueryTests: TestCase {
 
     func testMapAllKeysAllValuesSubscript() {
         % for property in mapProperties + optMapProperties:
-        assertQuery(predicate: "((${ property.colName }.@allKeys == %@) && ${ property.colName } == %@)", values: ["foo", ${ property.foundationValue(0) }], expectedCount: 1) {
+        assertQuery(predicate: "(${ property.colName }[%@] == %@)", values: ["foo", ${ property.foundationValue(0) }], expectedCount: 1) {
             $0.${ property.colName }["foo"] == ${ property.value(0) }
         }
 
         % count = 0 if property.category == 'bool' else 1
-        assertQuery(predicate: "((${ property.colName }.@allKeys == %@) && ${ property.colName } != %@)", values: ["foo", ${ property.foundationValue(0) }], expectedCount: ${ count}) {
+        assertQuery(predicate: "(${ property.colName }[%@] != %@)", values: ["foo", ${ property.foundationValue(0) }], expectedCount: 0) {
             $0.${ property.colName }["foo"] != ${ property.value(0) }
         }
         % if property.category == 'numeric':
-        assertQuery(predicate: "((${ property.colName }.@allKeys == %@) && ${ property.colName } > %@)", values: ["foo", ${ property.foundationValue(0) }], expectedCount: 1) {
+        assertQuery(predicate: "(${ property.colName }[%@] > %@)", values: ["foo", ${ property.foundationValue(0) }], expectedCount: 0) {
             $0.${ property.colName }["foo"] > ${ property.value(0) }
         }
 
-        assertQuery(predicate: "((${ property.colName }.@allKeys == %@) && ${ property.colName } >= %@)", values: ["foo", ${ property.foundationValue(0) }], expectedCount: 1) {
+        assertQuery(predicate: "(${ property.colName }[%@] >= %@)", values: ["foo", ${ property.foundationValue(0) }], expectedCount: 1) {
             $0.${ property.colName }["foo"] >= ${ property.value(0) }
         }
-        assertQuery(predicate: "((${ property.colName }.@allKeys == %@) && ${ property.colName } < %@)", values: ["foo", ${ property.foundationValue(0) }], expectedCount: 0) {
+        assertQuery(predicate: "(${ property.colName }[%@] < %@)", values: ["foo", ${ property.foundationValue(0) }], expectedCount: 0) {
             $0.${ property.colName }["foo"] < ${ property.value(0) }
         }
 
-        assertQuery(predicate: "((${ property.colName }.@allKeys == %@) && ${ property.colName } <= %@)", values: ["foo", ${ property.foundationValue(0) }], expectedCount: 1) {
+        assertQuery(predicate: "(${ property.colName }[%@] <= %@)", values: ["foo", ${ property.foundationValue(0) }], expectedCount: 1) {
             $0.${ property.colName }["foo"] <= ${ property.value(0) }
         }
         % end
 
         % if property.category == 'string':
-        assertQuery(predicate: "((${ property.colName }.@allKeys == %@) && ${ property.colName } CONTAINS[cd] %@)", values: ["foo", ${ property.foundationValue(0) }], expectedCount: 1) {
+        assertQuery(predicate: "(${ property.colName }[%@] CONTAINS[cd] %@)", values: ["foo", ${ property.foundationValue(0) }], expectedCount: 1) {
             $0.${ property.colName }["foo"].contains(${ property.value(0) }, options: [.caseInsensitive, .diacriticInsensitive])
         }
 
-        assertQuery(predicate: "((${ property.colName }.@allKeys == %@) && ${ property.colName } CONTAINS %@)", values: ["foo", ${ property.foundationValue(0) }], expectedCount: 1) {
+        assertQuery(predicate: "(${ property.colName }[%@] CONTAINS %@)", values: ["foo", ${ property.foundationValue(0) }], expectedCount: 1) {
             $0.${ property.colName }["foo"].contains(${ property.value(0) })
         }
 
-        assertQuery(predicate: "((${ property.colName }.@allKeys == %@) && NOT ${ property.colName } CONTAINS %@)", values: ["foo", ${ property.foundationValue(0) }], expectedCount: 0) {
+        assertQuery(predicate: "(NOT ${ property.colName }[%@] CONTAINS %@)", values: ["foo", ${ property.foundationValue(0) }], expectedCount: 0) {
             !$0.${ property.colName }["foo"].contains(${ property.value(0) })
         }
 
-        assertQuery(predicate: "((${ property.colName }.@allKeys == %@) && ${ property.colName } BEGINSWITH[cd] %@)", values: ["foo", ${ property.foundationValue(0) }], expectedCount: 1) {
+        assertQuery(predicate: "(${ property.colName }[%@] BEGINSWITH[cd] %@)", values: ["foo", ${ property.foundationValue(0) }], expectedCount: 1) {
             $0.${ property.colName }["foo"].starts(with: ${ property.value(0) }, options: [.caseInsensitive, .diacriticInsensitive])
         }
 
-        assertQuery(predicate: "((${ property.colName }.@allKeys == %@) && ${ property.colName } BEGINSWITH %@)", values: ["foo", ${ property.foundationValue(0) }], expectedCount: 1) {
+        assertQuery(predicate: "(${ property.colName }[%@] BEGINSWITH %@)", values: ["foo", ${ property.foundationValue(0) }], expectedCount: 1) {
             $0.${ property.colName }["foo"].starts(with: ${ property.value(0) })
         }
 
-        assertQuery(predicate: "((${ property.colName }.@allKeys == %@) && ${ property.colName } ENDSWITH[cd] %@)", values: ["foo", ${ property.foundationValue(0) }], expectedCount: 1) {
+        assertQuery(predicate: "(${ property.colName }[%@] ENDSWITH[cd] %@)", values: ["foo", ${ property.foundationValue(0) }], expectedCount: 1) {
             $0.${ property.colName }["foo"].ends(with: ${ property.value(0) }, options: [.caseInsensitive, .diacriticInsensitive])
         }
 
-        assertQuery(predicate: "((${ property.colName }.@allKeys == %@) && ${ property.colName } ENDSWITH %@)", values: ["foo", ${ property.foundationValue(0) }], expectedCount: 1) {
+        assertQuery(predicate: "(${ property.colName }[%@] ENDSWITH %@)", values: ["foo", ${ property.foundationValue(0) }], expectedCount: 1) {
             $0.${ property.colName }["foo"].ends(with: ${ property.value(0) })
         }
 
-        assertQuery(predicate: "((${ property.colName }.@allKeys == %@) && ${ property.colName } LIKE[c] %@)", values: ["foo", ${ property.foundationValue(0) }], expectedCount: 1) {
+        assertQuery(predicate: "(${ property.colName }[%@] LIKE[c] %@)", values: ["foo", ${ property.foundationValue(0) }], expectedCount: 1) {
             $0.${ property.colName }["foo"].like(${ property.value(0) }, caseInsensitive: true)
         }
 
-        assertQuery(predicate: "((${ property.colName }.@allKeys == %@) && ${ property.colName } LIKE %@)", values: ["foo", ${ property.foundationValue(0) }], expectedCount: 1) {
+        assertQuery(predicate: "(${ property.colName }[%@] LIKE %@)", values: ["foo", ${ property.foundationValue(0) }], expectedCount: 1) {
             $0.${ property.colName }["foo"].like(${ property.value(0) })
         }
         % end
@@ -1674,38 +1674,9 @@ class QueryTests: TestCase {
     }
 
     func testMapSubscriptObject() {
-        let obj = objects().first!
-        let colObj = collectionObject()
-        let realm = realmWithTestPath()
-        try! realm.write {
-            colObj.map["foo"] = obj
-        }
-        % for property in properties + optProperties:
-        % value = property.enumName if property.enumName != None else property.foundationValue(0)
-        % if property.enumName == None:
-        % equalsCount = 0 if property.category == 'bool' else 0
-        assertCollectionObjectQuery(predicate: "((map.@allKeys == %@) && map.${ property.colName } == %@)", values: ["foo", ${ value }], expectedCount: ${ equalsCount}) {
-            $0.map["foo"].${ property.colName } == ${ property.value(0) }
-        }
-        % notEqualsCount = 1 if property.category == 'bool' else 1
-        assertCollectionObjectQuery(predicate: "((map.@allKeys == %@) && map.${ property.colName } != %@)", values: ["foo", ${ value }], expectedCount: ${ notEqualsCount}) {
-            $0.map["foo"].${ property.colName } != ${ property.value(0) }
-        }
-        % else:
-        assertCollectionObjectQuery(predicate: "((map.@allKeys == %@) && map.${ property.colName } == %@)", values: ["foo", ${ value }], expectedCount: 1) {
-            $0.map["foo"].${ property.colName } == ${ property.value(1) }
-        }
-        assertCollectionObjectQuery(predicate: "((map.@allKeys == %@) && map.${ property.colName } != %@)", values: ["foo", ${ value }], expectedCount: 0) {
-            $0.map["foo"].${ property.colName } != ${ property.value(1) }
-        }
-        % end
-        % end
-        try! realm.write {
-            colObj.map["foo"]??.objectCol = obj
-        }
-        assertCollectionObjectQuery(predicate: "((map.@allKeys == %@) && map.objectCol.intCol == %@)", values: ["foo", 6], expectedCount: 1) {
-            $0.map["foo"].objectCol.intCol == 6
-        }
+        assertThrows(assertCollectionObjectQuery(predicate: "", values: [], expectedCount: 0) {
+            $0.map["foo"].objectCol.intCol == 5
+        }, reason: "Cannot apply key path to Map subscripts.")
     }
 
     func testMapContainsAnyInObject() {
@@ -1841,18 +1812,18 @@ class QueryTests: TestCase {
             $0.${ property.colName } == ${ property.value(1) } && $0.${ mapProperty.colName }.contains(${ mapProperty.value(1) })
         }
         % if property.enumName == None:
-        assertQuery(predicate: "((${ property.colName } != %@) && ((${ mapProperty.colName }.@allKeys == %@) && ${ mapProperty.colName } == %@))",
+        assertQuery(predicate: "((${ property.colName } != %@) && (${ mapProperty.colName }[%@] == %@))",
                     values: [${ wrongValue }, "foo", ${ value2 }], expectedCount: 1) {
             ($0.${ property.colName } != ${ property.value(0) }) && ($0.${ mapProperty.colName }["foo"] == ${ mapProperty.value(1) })
         }
-        assertQuery(predicate: "(((${ property.colName } != %@) && ((${ mapProperty.colName }.@allKeys == %@) && ${ mapProperty.colName } == %@)) && ((${ mapProperty.colName }.@allKeys == %@) && ${ mapProperty.colName } == %@))",
+        assertQuery(predicate: "(((${ property.colName } != %@) && (${ mapProperty.colName }[%@] == %@)) && (${ mapProperty.colName }[%@] == %@))",
                     values: [${ wrongValue }, "foo", ${ mapProperty.foundationValue(0) }, "bar", ${ mapProperty.foundationValue(1) }], expectedCount: 1) {
             ($0.${ property.colName } != ${ property.value(0) }) &&
             ($0.${ mapProperty.colName }["foo"] == ${ mapProperty.value(0) }) &&
             ($0.${ mapProperty.colName }["bar"] == ${ mapProperty.value(1) })
         }
         % else:
-        assertQuery(predicate: "((${ property.colName } != %@) && ((${ mapProperty.colName }.@allKeys == %@) && ${ mapProperty.colName } == %@))",
+        assertQuery(predicate: "((${ property.colName } != %@) && (${ mapProperty.colName }[%@] == %@))",
                     values: [${ value1 }, "foo", ${ value2 }], expectedCount: 0) {
             ($0.${ property.colName } != ${ property.value(1) }) && ($0.${ mapProperty.colName }["foo"] == ${ mapProperty.value(1) })
         }
@@ -1972,18 +1943,18 @@ class QueryTests: TestCase {
             $0.${ property.colName } == ${ property.value(1) } || $0.${ mapProperty.colName }.contains(${ mapProperty.value(1) })
         }
         % if property.enumName == None:
-        assertQuery(predicate: "((${ property.colName } != %@) || ((${ mapProperty.colName }.@allKeys == %@) && ${ mapProperty.colName } == %@))",
+        assertQuery(predicate: "((${ property.colName } != %@) || (${ mapProperty.colName }[%@] == %@))",
                     values: [${ wrongValue }, "foo", ${ value2 }], expectedCount: 1) {
             ($0.${ property.colName } != ${ property.value(0) }) || ($0.${ mapProperty.colName }["foo"] == ${ mapProperty.value(1) })
         }
-        assertQuery(predicate: "(((${ property.colName } != %@) || ((${ mapProperty.colName }.@allKeys == %@) && ${ mapProperty.colName } == %@)) || ((${ mapProperty.colName }.@allKeys == %@) && ${ mapProperty.colName } == %@))",
+        assertQuery(predicate: "(((${ property.colName } != %@) || (${ mapProperty.colName }[%@] == %@)) || (${ mapProperty.colName }[%@] == %@))",
                     values: [${ wrongValue }, "foo", ${ mapProperty.foundationValue(0) }, "bar", ${ mapProperty.foundationValue(1) }], expectedCount: 1) {
             ($0.${ property.colName } != ${ property.value(0) }) ||
             ($0.${ mapProperty.colName }["foo"] == ${ mapProperty.value(0) }) ||
             ($0.${ mapProperty.colName }["bar"] == ${ mapProperty.value(1) })
         }
         % else:
-        assertQuery(predicate: "(${ property.colName } != %@ || (${ mapProperty.colName }.@allKeys == %@ && ${ mapProperty.colName } == %@))",
+        assertQuery(predicate: "(${ property.colName } != %@ || (${ mapProperty.colName }[%@] == %@))",
                     values: [${ value1 }, "foo", ${ value2 }], expectedCount: 1) {
             ($0.${ property.colName } != ${ property.value(1) }) || ($0.${ mapProperty.colName }["foo"] == ${ mapProperty.value(1) })
         }

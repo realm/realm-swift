@@ -516,6 +516,9 @@ public:
     void apply_column_expression(RLMObjectSchema *desc, NSString *leftKeyPath, NSString *rightKeyPath, NSComparisonPredicate *predicate);
     void apply_function_expression(RLMObjectSchema *objectSchema, NSExpression *functionExpression,
                                    NSPredicateOperatorType operatorType, NSExpression *right);
+    void apply_map_expression(RLMObjectSchema *objectSchema, NSExpression *functionExpression,
+                              NSComparisonPredicateOptions options, NSPredicateOperatorType operatorType,
+                              NSExpression *right);
 
     template <typename A, typename B>
     void add_numeric_constraint(RLMPropertyType datatype,
@@ -1868,6 +1871,26 @@ NSExpression *simplify_self_value_for_key_path_function_expression(NSExpression 
     return expression;
 }
 
+void QueryBuilder::apply_map_expression(RLMObjectSchema *objectSchema, NSExpression *functionExpression,
+                                        NSComparisonPredicateOptions options, NSPredicateOperatorType operatorType,
+                                        NSExpression *right) {
+    NSExpression *keyPathExpression;
+    NSString *mapKey;
+    if (functionExpression.operand.expressionType == NSKeyPathExpressionType) {
+        NSExpression *mapItems = [functionExpression.arguments firstObject];
+        NSExpression *linkCol = [[functionExpression.operand arguments] firstObject];
+        NSExpression *mapCol = [mapItems.arguments firstObject];
+        mapKey = [mapItems.arguments[1] constantValue];
+        keyPathExpression = [NSExpression expressionForKeyPath:[NSString stringWithFormat:@"%@.%@", linkCol.keyPath, mapCol.keyPath]];
+    } else {
+        keyPathExpression = functionExpression.arguments.firstObject;
+        mapKey = [functionExpression.arguments[1] constantValue];
+    }
+
+    ColumnReference collectionColumn = column_reference_from_key_path(objectSchema, [keyPathExpression keyPath], true);
+    add_mixed_constraint(operatorType, options, collectionColumn.resolve<Dictionary>().key([mapKey UTF8String]), [right constantValue]);
+}
+
 void QueryBuilder::apply_function_expression(RLMObjectSchema *objectSchema, NSExpression *functionExpression,
                                              NSPredicateOperatorType operatorType, NSExpression *right) {
     RLMPrecondition(functionExpression.operand.expressionType == NSSubqueryExpressionType,
@@ -1991,8 +2014,12 @@ void QueryBuilder::apply_predicate(NSPredicate *predicate, RLMObjectSchema *obje
             // comparing value to keypath
             apply_value_expression(objectSchema, compp.rightExpression.keyPath, compp.leftExpression.constantValue, compp);
         }
-        else if (exp1Type == NSFunctionExpressionType) {
-            apply_function_expression(objectSchema, compp.leftExpression, compp.predicateOperatorType, compp.rightExpression);
+        else if (exp1Type == NSFunctionExpressionType || compp.rightExpression.constantValue) {
+            if (compp.leftExpression.operand.expressionType == NSSubqueryExpressionType) {
+                apply_function_expression(objectSchema, compp.leftExpression, compp.predicateOperatorType, compp.rightExpression);
+            } else {
+                apply_map_expression(objectSchema, compp.leftExpression, compp.options, compp.predicateOperatorType, compp.rightExpression);
+            }
         }
         else if (exp1Type == NSSubqueryExpressionType) {
             // The subquery expressions that we support are handled by the NSFunctionExpressionType case above.
