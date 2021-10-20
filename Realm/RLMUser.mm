@@ -338,6 +338,13 @@ using namespace realm;
 }
 @end
 
+static NSString* userProfileMemberToNSString(util::Optional<std::string> member) {
+    if (member == util::none) {
+        return nil;
+    }
+    return @(member->c_str());
+}
+
 @implementation RLMUserProfile
 
 using UserProfileMember = util::Optional<std::string> (SyncUserProfile::*)() const;
@@ -349,40 +356,32 @@ using UserProfileMember = util::Optional<std::string> (SyncUserProfile::*)() con
     return self;
 }
 
-- (NSString *)userProfileMember:(UserProfileMember)member {
-    auto field = (_userProfile.*member)();
-    if (field == util::none) {
-        return nil;
-    }
-    return @(field->c_str());
-}
-
 - (NSString *)name {
-    return [self userProfileMember:&SyncUserProfile::name];
+    return userProfileMemberToNSString(_userProfile.name());
 }
 - (NSString *)email {
-    return [self userProfileMember:&SyncUserProfile::email];
+    return userProfileMemberToNSString(_userProfile.email());
 }
 - (NSString *)pictureURL {
-    return [self userProfileMember:&SyncUserProfile::picture_url];
+    return userProfileMemberToNSString(_userProfile.picture_url());
 }
 - (NSString *)firstName {
-    return [self userProfileMember:&SyncUserProfile::first_name];
+    return userProfileMemberToNSString(_userProfile.first_name());
 }
 - (NSString *)lastName {
-    return [self userProfileMember:&SyncUserProfile::last_name];
+    return userProfileMemberToNSString(_userProfile.last_name());;
 }
 - (NSString *)gender {
-    return [self userProfileMember:&SyncUserProfile::gender];
+    return userProfileMemberToNSString(_userProfile.gender());
 }
 - (NSString *)birthday {
-    return [self userProfileMember:&SyncUserProfile::birthday];
+    return userProfileMemberToNSString(_userProfile.birthday());
 }
 - (NSString *)minAge {
-    return [self userProfileMember:&SyncUserProfile::min_age];
+    return userProfileMemberToNSString(_userProfile.min_age());
 }
 - (NSString *)maxAge {
-    return [self userProfileMember:&SyncUserProfile::max_age];
+    return userProfileMemberToNSString(_userProfile.max_age());
 }
 
 @end
