@@ -338,7 +338,7 @@ using namespace realm;
 }
 @end
 
-static NSString* userProfileMemberToNSString(util::Optional<std::string> member) {
+static NSString* userProfileMemberToNSString(const util::Optional<std::string>& member) {
     if (member == util::none) {
         return nil;
     }
