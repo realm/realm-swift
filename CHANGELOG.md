@@ -157,6 +157,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * Add a new `@ThreadSafe` property wrapper. Objects and collections wrapped by `@ThreadSafe` may be passed between threads. It's
   intended to allow local variables and function parameters to be used across
   threads when needed.
+* Add class Projection to allow creation of light weight view models out of Realm Objects.
 
 ### Fixed
 

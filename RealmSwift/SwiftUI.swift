@@ -248,6 +248,13 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
         self.objectWillChange = instance()
     }
 
+    init(_ value: ObservedType, _ keyPaths: [String]? = nil) where ObservedType: ObjectBase {
+        self.value = value.realm != nil && !value.isInvalidated ? value.thaw() ?? value : value
+        self.instance = { ObservableStoragePublisher(value, keyPaths) }
+        self.keyPaths = keyPaths
+        self.objectWillChange = instance()
+    }
+
     init(_ value: ObservedType, _ keyPaths: [String]? = nil) where ObservedType: ProjectionObservable {
         self.value = value.realm != nil && !value.isInvalidated ? value.thaw() ?? value : value
         self.instance = { ObservableStoragePublisher(value, keyPaths) }
@@ -255,7 +262,6 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
         self.objectWillChange = instance()
     }
 }
-
 
 // MARK: - StateRealmObject
 
@@ -418,23 +424,11 @@ extension Projection: ObservedResultsValue { }
             setupHasRun = true
         }
 
-        var sortDescriptor: SortDescriptor? {
-            didSet {
-                didSet()
-            }
-        }
+        var sortDescriptor: SortDescriptor?
 
-        var filter: NSPredicate? {
-            didSet {
-                didSet()
-            }
-        }
+        var filter: NSPredicate?
 
-        var configuration: Realm.Configuration? {
-            didSet {
-                didSet()
-            }
-        }
+        var configuration: Realm.Configuration?
     }
 
     @Environment(\.realmConfiguration) var configuration
