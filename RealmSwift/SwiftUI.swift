@@ -1252,5 +1252,3 @@ extension View {
     }
 }
 #endif
-
-
