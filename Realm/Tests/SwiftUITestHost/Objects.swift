@@ -42,6 +42,7 @@ class Reminder: EmbeddedObject, Identifiable {
 }
 
 class ReminderList: Object, Identifiable {
+    @Persisted(primaryKey: true) var id = ObjectId.generate()
     @Persisted var name = "New List"
     @Persisted var icon: String = "list.bullet"
     @Persisted var reminders = RealmSwift.List<Reminder>()

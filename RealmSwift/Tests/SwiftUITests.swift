@@ -337,8 +337,7 @@ class SwiftUITests: TestCase {
             }
             .searchable(text: stringBinding,
                         collection: observedResults,
-                        keyPath: keyPath,
-                        suggestions: "")
+                        keyPath: keyPath)
         }
 
         searchText = "str"

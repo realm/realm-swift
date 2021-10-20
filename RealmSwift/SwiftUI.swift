@@ -1152,7 +1152,9 @@ public extension View {
         placement: SearchFieldPlacement = .automatic,
         prompt: Text? = nil) -> some View {
             let tempText = text
-            collection.storage.cancellables.append(tempText.wrappedValue.publisher.sink { _ in
+            collection.storage.cancellables.append(tempText.wrappedValue.publisher
+                                                    .debounce(for: .milliseconds(1), scheduler: RunLoop.main)
+                                                    .sink { _ in
                 guard !text.wrappedValue.isEmpty && text.wrappedValue != "" else {
                     collection.filter = nil
                     return
@@ -1177,3 +1179,5 @@ public extension View {
     }
 }
 #endif
+
+
