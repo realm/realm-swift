@@ -286,7 +286,11 @@ struct ObservedResultsSearchableTestView: View {
             }
             .searchable(text: $searchFilter,
                         collection: $reminders,
-                        keyPath: \.name)
+                        keyPath: \.name) {
+                ForEach(reminders) { remindersFiltered in
+                    Text(remindersFiltered.name).searchCompletion(remindersFiltered.name)
+                }
+            }
             .navigationTitle("Reminders")
             .navigationBarItems(trailing:
                 Button("add") {

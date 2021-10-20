@@ -1122,50 +1122,82 @@ extension SwiftUIKVO {
     }
 }
 
+/// all methods in this extension allows to filter @ObservedResult data from .searchable()
+/// component search field.
+///
+///     @State var searchString: String
+///     @StObservedResults(Reminder.self) var reminders
+///
+///     List {
+///         ForEach(reminders) { reminder in
+///             ReminderRowView(reminder: reminder)
+///         }
+///     }
+///     .searchable(text: $searchFilter,
+///                 collection: $reminders,
+///                 keyPath: \.name) {
+///         ForEach(reminders) { remindersFiltered in
+///             Text(remindersFiltered.name).searchCompletion(remindersFiltered.name)
+///         }
+///     }
+///
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
-public extension View {
-    /// Doctring
-    ///
-    ///     @State var searchString: String
-    ///     @StObservedResults(Reminder.self) var reminders
-    ///
-    ///     List {
-    ///         ForEach(reminders) { reminder in
-    ///             ReminderRowView(reminder: reminder)
-    ///         }
-    ///     }
-    ///     .searchable(text: $0searchString,
-    ///                 collection: reminders,
-    ///                 keyPath: \.title)
-    ///
-    /// - Parameter text: The text to display and edit in the search field.
-    /// - Parameter collection:
-    /// - Parameter keyPath : The keyPath to the property to  search by.
-    /// - Parameter placement : The preferred placement of the search field within the
-    ///     containing view hierarchy.
-    /// - Parameter prompt: A `Text` representing the prompt of the search field
-    ///     which provides users with guidance on what to search for.
-    func searchable<T: ObjectBase, V: _QueryString & _RealmSchemaDiscoverable>(
-        text: Binding<String>,
-        collection: ObservedResults<T>,
-        keyPath: KeyPath<T, V>,
-        placement: SearchFieldPlacement = .automatic,
-        prompt: Text? = nil) -> some View {
-            let tempText = text
-            collection.storage.cancellables.append(tempText.wrappedValue.publisher
-                                                    .debounce(for: .milliseconds(1), scheduler: RunLoop.main)
-                                                    .sink { _ in
-                guard !text.wrappedValue.isEmpty && text.wrappedValue != "" else {
-                    collection.filter = nil
-                    return
-                }
-                var query: Query<V> = Query<T>()[dynamicMember: keyPath]
-                query = query.contains(text.wrappedValue as! V)
+extension View {
+    public func searchable<T: ObjectBase, P: _QueryString & _RealmSchemaDiscoverable>(text: Binding<String>, collection: ObservedResults<T>, keyPath: KeyPath<T, P>, placement: SearchFieldPlacement = .automatic, prompt: Text? = nil) -> some View {
+        filterCollection(collection, for: text.wrappedValue, on: keyPath)
+        return searchable(text: text,
+                          placement: placement,
+                          prompt: prompt)
+    }
+
+    public func searchable<T: ObjectBase, P: _QueryString & _RealmSchemaDiscoverable>(text: Binding<String>, collection: ObservedResults<T>, keyPath: KeyPath<T, P>, placement: SearchFieldPlacement = .automatic, prompt: LocalizedStringKey) -> some View {
+        filterCollection(collection, for: text.wrappedValue, on: keyPath)
+        return searchable(text: text,
+                          placement: placement,
+                          prompt: prompt)
+    }
+
+    public func searchable<T: ObjectBase, P: _QueryString & _RealmSchemaDiscoverable, S>(text: Binding<String>, collection: ObservedResults<T>, keyPath: KeyPath<T, P>, placement: SearchFieldPlacement = .automatic, prompt: S) -> some View where S : StringProtocol {
+        filterCollection(collection, for: text.wrappedValue, on: keyPath)
+        return searchable(text: text,
+                          placement: placement,
+                          prompt: prompt)
+    }
+
+    public func searchable<T: ObjectBase, P: _QueryString & _RealmSchemaDiscoverable, S>(text: Binding<String>, collection: ObservedResults<T>, keyPath: KeyPath<T, P>, placement: SearchFieldPlacement = .automatic, prompt: Text? = nil, @ViewBuilder suggestions: () -> S) -> some View where S : View {
+        filterCollection(collection, for: text.wrappedValue, on: keyPath)
+        return searchable(text: text,
+                          placement: placement,
+                          prompt: prompt,
+                          suggestions: suggestions)
+    }
+
+    public func searchable<T: ObjectBase, P: _QueryString & _RealmSchemaDiscoverable, S>(text: Binding<String>, collection: ObservedResults<T>, keyPath: KeyPath<T, P>, placement: SearchFieldPlacement = .automatic, prompt: LocalizedStringKey, @ViewBuilder suggestions: () -> S) -> some View where S : View {
+        filterCollection(collection, for: text.wrappedValue, on: keyPath)
+        return searchable(text: text,
+                          placement: placement,
+                          prompt: prompt,
+                          suggestions: suggestions)
+    }
+
+    public func searchable<T: ObjectBase, P: _QueryString & _RealmSchemaDiscoverable, V, S>(text: Binding<String>, collection: ObservedResults<T>, keyPath: KeyPath<T, P>, placement: SearchFieldPlacement = .automatic, prompt: S, @ViewBuilder suggestions: () -> V) -> some View where V : View, S : StringProtocol {
+        filterCollection(collection, for: text.wrappedValue, on: keyPath)
+        return searchable(text: text,
+                          placement: placement,
+                          prompt: prompt,
+                          suggestions: suggestions)
+    }
+
+    private func filterCollection<T: ObjectBase, P: _QueryString & _RealmSchemaDiscoverable>(_ collection: ObservedResults<T>, for text: String, on keyPath: KeyPath<T, P>) {
+        DispatchQueue.main.async {
+            if text.isEmpty {
+                collection.filter = nil
+            } else {
+                var query: Query<P> = Query<T>()[dynamicMember: keyPath]
+                query = query.contains(text as! P)
                 collection.filter = query.predicate
-            })
-            return searchable(text: text,
-                              placement: placement,
-                              prompt: prompt)
+            }
+        }
     }
 }
 

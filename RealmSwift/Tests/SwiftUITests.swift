@@ -313,56 +313,19 @@ class SwiftUITests: TestCase {
         XCTAssertEqual(results.wrappedValue.count, 1)
         state.projectedValue.delete()
     }
-    // MARK: - ObservedResults Search
+
     @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
-    func testSearchableObservedResults() {
-        let observedResults = ObservedResults(SwiftUIObject.self,
-                                              configuration: inMemoryRealm(inMemoryIdentifier).configuration)
-        (1...20).forEach { index in
-            let object = SwiftUIObject(str: "str_\(index)")
-            observedResults.projectedValue.append(object)
-        }
-        XCTAssertEqual(observedResults.wrappedValue.count, 20)
-
-        var searchText = ""
-        let stringBinding = Binding {
-            searchText
-        } set: {
-            searchText = $0
-        }
-
-        func loadList<V: _QueryString & _RealmSchemaDiscoverable>(keyPath: KeyPath<SwiftUIObject, V>) {
-            _ = SwiftUI.List {
-                ForEach(observedResults.wrappedValue) { _ in }
+    struct ContentView: View {
+        @State var searchString: String
+        @ObservedResults(SwiftUIObject.self) var observedResults
+        var body: some View {
+            List {
+                ForEach(observedResults) { _ in }
             }
-            .searchable(text: stringBinding,
-                        collection: observedResults,
-                        keyPath: keyPath)
+            .searchable(text: $searchString,
+                        collection: $observedResults,
+                        keyPath: \.str)
         }
-
-        searchText = "str"
-        loadList(keyPath: \.str)
-        XCTAssertEqual(observedResults.wrappedValue.count, 20)
-
-        searchText = "str_5"
-        loadList(keyPath: \.str)
-        XCTAssertEqual(observedResults.wrappedValue.count, 1)
-
-        searchText = "str_1"
-        loadList(keyPath: \.str)
-        XCTAssertEqual(observedResults.wrappedValue.count, 11)
-
-        searchText = "5"
-        loadList(keyPath: \.str)
-        XCTAssertEqual(observedResults.wrappedValue.count, 2)
-
-        searchText = "1"
-        loadList(keyPath: \.str)
-        XCTAssertEqual(observedResults.wrappedValue.count, 11)
-
-//        searchText = ""
-//        loadList(keyPath: \.str)
-//        XCTAssertEqual(observedResults.wrappedValue.count, 20)
     }
     // MARK: Bind
     func testUnmanagedManagedObjectBind() {
