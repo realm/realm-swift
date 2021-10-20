@@ -169,7 +169,7 @@ private func createEquatableBinding<T: ThreadConfined, V: Equatable>(
 
 // MARK: - ObservableStorage
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-private final class ObservableStoragePublisher<ObjectType>: Publisher where ObjectType: ThreadConfined & RealmSubscribable {
+internal final class ObservableStoragePublisher<ObjectType>: Publisher where ObjectType: ThreadConfined & RealmSubscribable {
     public typealias Output = Void
     public typealias Failure = Never
 
@@ -212,7 +212,7 @@ private final class ObservableStoragePublisher<ObjectType>: Publisher where Obje
     }
 }
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-private class ObservableStorage<ObservedType>: ObservableObject where ObservedType: RealmSubscribable & ThreadConfined & Equatable {
+internal class ObservableStorage<ObservedType>: ObservableObject where ObservedType: RealmSubscribable & ThreadConfined & Equatable {
     @Published var value: ObservedType {
         willSet {
             if newValue != value {
@@ -349,8 +349,9 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
 /// the environment value `EnvironmentValues/realmConfiguration`.
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 @propertyWrapper public struct ObservedResults<ResultType>: DynamicProperty, BoundCollection where ResultType: Object & Identifiable {
-    private class Storage: ObservableStorage<Results<ResultType>> {
+    fileprivate class Storage: ObservableStorage<Results<ResultType>> {
         var setupHasRun = false
+        var cancellables = [AnyCancellable]()
 
         private func didSet() {
             if setupHasRun {
@@ -367,10 +368,6 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
             }
             if let filter = filter {
                 value = value.filter(filter)
-            }
-
-            if let searchPredicate = searchPredicate {
-                value = value.filter(searchPredicate)
             }
 
             setupHasRun = true
@@ -393,17 +390,10 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
                 didSet()
             }
         }
-
-        var searchString: String?
-        var searchPredicate: NSPredicate? {
-            didSet {
-                didSet()
-            }
-        }
     }
 
     @Environment(\.realmConfiguration) var configuration
-    @ObservedObject private var storage: Storage
+    @ObservedObject fileprivate var storage: Storage
     /// :nodoc:
     @State public var filter: NSPredicate? {
         willSet {
@@ -414,24 +404,6 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
     @State public var sortDescriptor: SortDescriptor? {
         willSet {
             storage.sortDescriptor = newValue
-        }
-    }
-
-    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
-    public func searchByKeypathString(_ keyPathStrings: [String]) -> Binding<String> {
-        return Binding {
-            storage.searchString ?? ""
-        } set: { newValue in
-            storage.searchString = newValue
-            guard !newValue.isEmpty else {
-                storage.searchPredicate = nil
-                return
-            }
-            let predicates = keyPathStrings.compactMap {
-                return NSPredicate(format: "%K CONTAINS[c] %@", $0, newValue)
-            }
-            let predicateCompound = NSCompoundPredicate.init(type: .or, subpredicates: predicates)
-            storage.searchPredicate = predicateCompound
         }
     }
 
@@ -1193,6 +1165,86 @@ extension SwiftUIKVO {
         }
     }
 }
+
+/// all methods in this extension allows to filter @ObservedResult data from .searchable()
+/// component search field.
+///
+///     @State var searchString: String
+///     @StObservedResults(Reminder.self) var reminders
+///
+///     List {
+///         ForEach(reminders) { reminder in
+///             ReminderRowView(reminder: reminder)
+///         }
+///     }
+///     .searchable(text: $searchFilter,
+///                 collection: $reminders,
+///                 keyPath: \.name) {
+///         ForEach(reminders) { remindersFiltered in
+///             Text(remindersFiltered.name).searchCompletion(remindersFiltered.name)
+///         }
+///     }
+///
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
+extension View {
+    public func searchable<T: ObjectBase, P: _QueryString & _RealmSchemaDiscoverable>(text: Binding<String>, collection: ObservedResults<T>, keyPath: KeyPath<T, P>, placement: SearchFieldPlacement = .automatic, prompt: Text? = nil) -> some View {
+        filterCollection(collection, for: text.wrappedValue, on: keyPath)
+        return searchable(text: text,
+                          placement: placement,
+                          prompt: prompt)
+    }
+
+    public func searchable<T: ObjectBase, P: _QueryString & _RealmSchemaDiscoverable>(text: Binding<String>, collection: ObservedResults<T>, keyPath: KeyPath<T, P>, placement: SearchFieldPlacement = .automatic, prompt: LocalizedStringKey) -> some View {
+        filterCollection(collection, for: text.wrappedValue, on: keyPath)
+        return searchable(text: text,
+                          placement: placement,
+                          prompt: prompt)
+    }
+
+    public func searchable<T: ObjectBase, P: _QueryString & _RealmSchemaDiscoverable, S>(text: Binding<String>, collection: ObservedResults<T>, keyPath: KeyPath<T, P>, placement: SearchFieldPlacement = .automatic, prompt: S) -> some View where S : StringProtocol {
+        filterCollection(collection, for: text.wrappedValue, on: keyPath)
+        return searchable(text: text,
+                          placement: placement,
+                          prompt: prompt)
+    }
+
+    public func searchable<T: ObjectBase, P: _QueryString & _RealmSchemaDiscoverable, S>(text: Binding<String>, collection: ObservedResults<T>, keyPath: KeyPath<T, P>, placement: SearchFieldPlacement = .automatic, prompt: Text? = nil, @ViewBuilder suggestions: () -> S) -> some View where S : View {
+        filterCollection(collection, for: text.wrappedValue, on: keyPath)
+        return searchable(text: text,
+                          placement: placement,
+                          prompt: prompt,
+                          suggestions: suggestions)
+    }
+
+    public func searchable<T: ObjectBase, P: _QueryString & _RealmSchemaDiscoverable, S>(text: Binding<String>, collection: ObservedResults<T>, keyPath: KeyPath<T, P>, placement: SearchFieldPlacement = .automatic, prompt: LocalizedStringKey, @ViewBuilder suggestions: () -> S) -> some View where S : View {
+        filterCollection(collection, for: text.wrappedValue, on: keyPath)
+        return searchable(text: text,
+                          placement: placement,
+                          prompt: prompt,
+                          suggestions: suggestions)
+    }
+
+    public func searchable<T: ObjectBase, P: _QueryString & _RealmSchemaDiscoverable, V, S>(text: Binding<String>, collection: ObservedResults<T>, keyPath: KeyPath<T, P>, placement: SearchFieldPlacement = .automatic, prompt: S, @ViewBuilder suggestions: () -> V) -> some View where V : View, S : StringProtocol {
+        filterCollection(collection, for: text.wrappedValue, on: keyPath)
+        return searchable(text: text,
+                          placement: placement,
+                          prompt: prompt,
+                          suggestions: suggestions)
+    }
+
+    private func filterCollection<T: ObjectBase, P: _QueryString & _RealmSchemaDiscoverable>(_ collection: ObservedResults<T>, for text: String, on keyPath: KeyPath<T, P>) {
+        DispatchQueue.main.async {
+            if text.isEmpty {
+                collection.filter = nil
+            } else {
+                var query: Query<P> = Query<T>()[dynamicMember: keyPath]
+                query = query.contains(text as! P)
+                collection.filter = query.predicate
+            }
+        }
+    }
+}
+
 #else
 @objc(RLMSwiftUIKVO) internal final class SwiftUIKVO: NSObject {
     @objc(removeObserversFromObject:) public static func removeObservers(object: NSObject) -> Bool {
@@ -1203,3 +1255,5 @@ extension SwiftUIKVO {
     }
 }
 #endif
+
+

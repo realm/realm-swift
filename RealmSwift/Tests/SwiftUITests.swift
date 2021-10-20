@@ -22,13 +22,13 @@ import RealmSwift
 import SwiftUI
 import Combine
 
-@objcMembers class SwiftUIObject: Object, ObjectKeyIdentifiable {
-    var list = RealmSwift.List<SwiftBoolObject>()
-    var map = Map<String, SwiftBoolObject?>()
-    var primitiveList = RealmSwift.List<Int>()
-    var primitiveMap = Map<String, Int>()
-    dynamic var str = "foo"
-    dynamic var int = 0
+class SwiftUIObject: Object, ObjectKeyIdentifiable {
+    @Persisted var list = RealmSwift.List<SwiftBoolObject>()
+    @Persisted var map = Map<String, SwiftBoolObject?>()
+    @Persisted var primitiveList = RealmSwift.List<Int>()
+    @Persisted var primitiveMap = Map<String, Int>()
+    @Persisted var str = "foo"
+    @Persisted var int = 0
 
     convenience init(str: String = "foo") {
         self.init()
@@ -313,32 +313,19 @@ class SwiftUITests: TestCase {
         XCTAssertEqual(results.wrappedValue.count, 1)
         state.projectedValue.delete()
     }
-    // MARK: - ObservedResults Search
+
     @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
-    func testSearchObservedResults() {
-        let fullResults = ObservedResults(SwiftUIObject.self,
-                                          configuration: inMemoryRealm(inMemoryIdentifier).configuration)
-        XCTAssertEqual(fullResults.wrappedValue.count, 0)
-        (1...20).forEach { index in
-            let object = SwiftUIObject()
-            object.str = "str_\(index)"
-            fullResults.projectedValue.append(object)
+    struct ContentView: View {
+        @State var searchString: String
+        @ObservedResults(SwiftUIObject.self) var observedResults
+        var body: some View {
+            List {
+                ForEach(observedResults) { _ in }
+            }
+            .searchable(text: $searchString,
+                        collection: $observedResults,
+                        keyPath: \.str)
         }
-        XCTAssertEqual(fullResults.wrappedValue.count, 20)
-
-        let searchBinding = fullResults.searchByKeypathString(["str"])
-
-        searchBinding.wrappedValue = "str"
-        XCTAssertEqual(fullResults.wrappedValue.count, 20)
-
-        searchBinding.wrappedValue = "str_5"
-        XCTAssertEqual(fullResults.wrappedValue.count, 1)
-
-        searchBinding.wrappedValue = "str_1"
-        XCTAssertEqual(fullResults.wrappedValue.count, 11)
-
-        searchBinding.wrappedValue = ""
-        XCTAssertEqual(fullResults.wrappedValue.count, 20)
     }
     // MARK: Bind
     func testUnmanagedManagedObjectBind() {
