@@ -169,7 +169,7 @@ private func createEquatableBinding<T: ThreadConfined, V: Equatable>(
 
 // MARK: - ObservableStorage
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-internal final class ObservableStoragePublisher<ObjectType>: Publisher where ObjectType: ThreadConfined & RealmSubscribable {
+private final class ObservableStoragePublisher<ObjectType>: Publisher where ObjectType: ThreadConfined & RealmSubscribable {
     public typealias Output = Void
     public typealias Failure = Never
 
@@ -212,7 +212,7 @@ internal final class ObservableStoragePublisher<ObjectType>: Publisher where Obj
     }
 }
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-internal class ObservableStorage<ObservedType>: ObservableObject where ObservedType: RealmSubscribable & ThreadConfined & Equatable {
+private class ObservableStorage<ObservedType>: ObservableObject where ObservedType: RealmSubscribable & ThreadConfined & Equatable {
     @Published var value: ObservedType {
         willSet {
             if newValue != value {
@@ -351,7 +351,6 @@ internal class ObservableStorage<ObservedType>: ObservableObject where ObservedT
 @propertyWrapper public struct ObservedResults<ResultType>: DynamicProperty, BoundCollection where ResultType: Object & Identifiable {
     fileprivate class Storage: ObservableStorage<Results<ResultType>> {
         var setupHasRun = false
-        var cancellables = [AnyCancellable]()
 
         private func didSet() {
             if setupHasRun {
@@ -369,7 +368,6 @@ internal class ObservableStorage<ObservedType>: ObservableObject where ObservedT
             if let filter = filter {
                 value = value.filter(filter)
             }
-
             setupHasRun = true
         }
 

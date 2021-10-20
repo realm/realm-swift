@@ -313,20 +313,6 @@ class SwiftUITests: TestCase {
         XCTAssertEqual(results.wrappedValue.count, 1)
         state.projectedValue.delete()
     }
-
-    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
-    struct ContentView: View {
-        @State var searchString: String
-        @ObservedResults(SwiftUIObject.self) var observedResults
-        var body: some View {
-            List {
-                ForEach(observedResults) { _ in }
-            }
-            .searchable(text: $searchString,
-                        collection: $observedResults,
-                        keyPath: \.str)
-        }
-    }
     // MARK: Bind
     func testUnmanagedManagedObjectBind() {
         let object = SwiftUIObject()
