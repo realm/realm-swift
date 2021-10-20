@@ -404,8 +404,7 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
             storage.sortDescriptor = newValue
         }
     }
-
-        /// :nodoc:
+    /// :nodoc:
     public var wrappedValue: Results<ResultType> {
         if !storage.setupHasRun {
             storage.setupValue()
