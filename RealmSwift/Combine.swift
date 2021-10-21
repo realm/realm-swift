@@ -59,7 +59,7 @@ extension ObjectKeyIdentifiable {
 
 @available(macOS 10.15, iOS 13, tvOS 13, watchOS 6, *)
 extension Projection: Identifiable {
-    /// A stable identifier for this projection. This  value will be
+    /// A stable identifier for this projection. This value will be
     /// the same for all projections of this object
     /// and for all instances of the projected Object
     public var id: UInt64 {
