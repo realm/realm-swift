@@ -2060,7 +2060,7 @@ public enum RealmPublishers {
         ///   - keyPath: The KeyPath which the `NotificationToken` is written to.
         /// - Returns: A `ProjectionChangesetWithToken` Publisher.
         public func saveToken<T>(on tokenParent: T, at keyPath: WritableKeyPath<T, NotificationToken?>) -> ProjectionChangesetWithToken<T, P> {
-              return ProjectionChangesetWithToken<T, P>(projection, queue, tokenParent, keyPath)
+            return ProjectionChangesetWithToken<T, P>(projection, queue, tokenParent, keyPath)
         }
 
         /// :nodoc:

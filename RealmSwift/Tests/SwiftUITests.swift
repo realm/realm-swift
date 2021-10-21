@@ -421,18 +421,6 @@ class SwiftUITests: TestCase {
         XCTAssertEqual(state.wrappedValue.count, 0)
     }
 
-    // MARK: - Projection Operations
-//    func testStateProjectionModification() throws {
-//        let state = StateRealmObject(wrappedValue: UIElementsProjection(projecting: SwiftUIObject()))
-//        ObservedResults(UIElementsProjection.self,
-//                        configuration: inMemoryRealm(inMemoryIdentifier).configuration)
-//            .projectedValue.append(state.wrappedValue)
-//
-//        assertThrows(state.wrappedValue.label = "bar")
-//        state.projectedValue.label.wrappedValue = "bar"
-//        XCTAssertEqual(state.projectedValue.wrappedValue.label, "bar")
-//    }
-
 #if swift(>=5.5)
     func testProjectionStateRealmObjectKVO() throws {
         @StateRealmObject var projection = UIElementsProjection(projecting: SwiftUIObject())

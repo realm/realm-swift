@@ -33,55 +33,6 @@ enum IntegerEnum: Int, PersistableEnum {
     case value2 = 3
 }
 
-class SwiftAllTypesObject: Object {
-    @Persisted(primaryKey: true) var pk: String
-    @Persisted var boolCol: Bool
-    @Persisted var intCol: Int
-    @Persisted var int8Col: Int8
-    @Persisted var int16Col: Int16
-    @Persisted var int32Col: Int32
-    @Persisted var int64Col: Int64
-    @Persisted var intEnumCol: IntegerEnum
-    @Persisted var floatCol: Float
-    @Persisted var doubleCol: Double
-    @Persisted var stringCol: String
-    @Persisted var binaryCol: Data
-    @Persisted var dateCol: Date
-    @Persisted var decimalCol: Decimal128
-    @Persisted var objectIdCol: ObjectId
-    @Persisted var objectCol: SwiftBoolObject?
-    @Persisted var uuidCol: UUID
-    @Persisted var arrayCol: RealmSwift.List<SwiftBoolObject>
-    @Persisted var setCol: MutableSet<SwiftBoolObject>
-    @Persisted var mapCol: Map<String, SwiftBoolObject?>
-    @Persisted var relationCol: RealmSwift.List<SwiftAllTypesObject>
-    @Persisted(originProperty: "relationCol") var backlink: LinkingObjects<SwiftAllTypesObject>
-
-    class func defaultValues() -> [String: Any] {
-        return  [
-            "pk": UUID().uuidString,
-            "boolCol": true,
-            "intCol": 123,
-            "int8Col": 123 as Int8,
-            "int16Col": 123 as Int16,
-            "int32Col": 123 as Int32,
-            "int64Col": 123 as Int64,
-            "floatCol": 1.23 as Float,
-            "doubleCol": 12.3,
-            "stringCol": "a",
-            "binaryCol": "a".data(using: String.Encoding.utf8)!,
-            "dateCol": Date(timeIntervalSince1970: 1),
-            "decimalCol": Decimal128("123e4"),
-            "objectIdCol": ObjectId("1234567890ab1234567890ab"),
-            "objectCol": [false],
-            "uuidCol": UUID(uuidString: "137decc8-b300-4954-a233-f89909f4fd89")!,
-            "arrayCol": [[true]],
-            "setCol": [[true]],
-            "mapCol": ["true": [true]]
-        ]
-    }
-}
-
 class AllTypesProjection: Projection<ModernAllTypesObject> {
     @Projected(\ModernAllTypesObject.pk) var pk
     @Projected(\ModernAllTypesObject.boolCol) var boolCol
@@ -456,11 +407,6 @@ class ProjectionTests: TestCase {
                                                              "money": Decimal128("2.22")])
             js.friends.append(dt)
             dt.friends.append(js)
-
-            let a = realm.create(SwiftAllTypesObject.self, value: SwiftAllTypesObject.defaultValues())
-            let b = realm.create(SwiftAllTypesObject.self, value: SwiftAllTypesObject.defaultValues())
-            a.relationCol.append(b)
-            b.relationCol.append(a)
 
             realm.create(ModernAllTypesObject.self, value: allTypeValues)
         }
@@ -1071,7 +1017,6 @@ class ProjectionTests: TestCase {
     }
 
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
-        // noop
         changeDictionary = change
     }
 
