@@ -385,22 +385,22 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
  A type which can be used with @ObservedResults propperty wrapper. Children class of Realm Object or Projection.
  */
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-public protocol ObservedResultsValue: RealmCollectionValue & Identifiable { }
+public protocol _ObservedResultsValue: RealmCollectionValue & Identifiable { }
 
 /// :nodoc:
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-extension Object: ObservedResultsValue { }
+extension Object: _ObservedResultsValue { }
 
 /// :nodoc:
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-extension Projection: ObservedResultsValue { }
+extension Projection: _ObservedResultsValue { }
 
 /// A property wrapper type that retrieves results from a Realm.
 ///
 /// The results use the realm configuration provided by
 /// the environment value `EnvironmentValues/realmConfiguration`.
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-@propertyWrapper public struct ObservedResults<ResultType>: DynamicProperty, BoundCollection where ResultType: ObservedResultsValue {
+@propertyWrapper public struct ObservedResults<ResultType>: DynamicProperty, BoundCollection where ResultType: _ObservedResultsValue {
     private class Storage: ObservableStorage<Results<ResultType>> {
         var setupHasRun = false
         var resultFactory: ((Realm) -> Results<ResultType>)!
@@ -424,11 +424,23 @@ extension Projection: ObservedResultsValue { }
             setupHasRun = true
         }
 
-        var sortDescriptor: SortDescriptor?
+        var sortDescriptor: SortDescriptor? {
+            didSet {
+                didSet()
+            }
+        }
 
-        var filter: NSPredicate?
+        var filter: NSPredicate? {
+            didSet {
+                didSet()
+            }
+        }
 
-        var configuration: Realm.Configuration?
+        var configuration: Realm.Configuration? {
+            didSet {
+                didSet()
+            }
+        }
     }
 
     @Environment(\.realmConfiguration) var configuration

@@ -227,10 +227,6 @@ class ProjectedListTests: TestCase {
         token.invalidate()
     }
 
-    func testObserveOnQueue() {
-//        observeOnQueue(collection)
-    }
-
     func testInvalidate() {
         XCTAssertFalse(collection.isInvalidated)
         realmWithTestPath().invalidate()

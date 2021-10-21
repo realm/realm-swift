@@ -642,6 +642,7 @@ import Realm.Private
     }
 
     // MARK: Object Retrieval
+
     /**
      Returns all objects of the given type stored in the Realm.
 

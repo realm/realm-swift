@@ -113,7 +113,7 @@ private var schema = [ObjectIdentifier: [ProjectedMetadata]]()
  ProjectionObservable is a Combine publisher
  */
 public protocol ProjectionObservable: AnyObject {
-    /// Projecrtion's underlying type - a child of Realm `Object` or `EmbeddedObject`.
+    /// The Projection's underlying type - a child of Realm `Object` or `EmbeddedObject`.
     associatedtype Root: ObjectBase
     /// The object being projected
     var rootObject: Root { get }
@@ -140,7 +140,6 @@ extension ObjectChange {
                 if let oldValue = propChange.oldValue {
                     // if there is an oldValue in the change, construct an empty Root
                     let newRoot = T.Root()
-
                     let processorProjection = T(projecting: newRoot)
 
                     // assign the oldValue to the empty root object
