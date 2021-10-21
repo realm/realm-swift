@@ -945,49 +945,6 @@ class ProjectionTests: TestCase {
         observeMapKeyPathChange(obj, obs, \AllTypesProjection.mapOptUuid, newValues["mapOptUuid"] as! Dictionary<String, UUID?>, { obj.mapOptUuid["1"] = uuid })
     }
 
-    func testLinkingObjectObservation() {
-        let realm = realmWithTestPath()
-        let obj = realm.objects(ModernAllTypesObject.self).first!
-        let obs = realm.objects(AllTypesProjection.self).first!
-
-//        let newObj = ModernAllTypesObject()
-        var newObj: ModernAllTypesObject!
-        try! realm.write {
-            newObj = realm.create(ModernAllTypesObject.self)
-        }
-//        let oldPk = obj.objectCol!.linkingObjects.first!.pk
-//        observeKeyPathChange(obj, obs, \AllTypesProjection.linkingObjects, oldPk, newObj.pk, { newObj.objectCol = obj })
-//        XCTAssertEqual(newObj.objectCol, obj)
-
-//        let ex = expectation(description: "linkingObjects projection should change")
-//        let token = obs.observe(keyPaths: [\AllTypesProjection.linkingObjects]) { _ in
-//            ex.fulfill()
-//        }
-//        let ex1 = expectation(description: "linkingObjects should change")
-        let ex2 = expectation(description: "objectCol should change")
-        let ex3 = expectation(description: "linkingObjects property should change")
-//        let a = obj.observe(keyPaths: [\ModernAllTypesObject.linkingObjects]) { _ in
-//            ex1.fulfill()
-//        }
-        let b = newObj.observe(keyPaths: [\ModernAllTypesObject.objectCol]) { _ in
-            ex2.fulfill()
-        }
-        let c = obs.linkingObjects.observe { change in
-            if case .update = change {
-                ex3.fulfill()
-            }
-        }
-        try! realm.write {
-            newObj.objectCol = obj
-        }
-
-        waitForExpectations(timeout: 2, handler: nil)
-//        token.invalidate()
-//        a.invalidate()
-        b.invalidate()
-        c.invalidate()
-    }
-
     func testObserveKeyPath() {
         let realm = realmWithTestPath()
         let johnProjection = realm.objects(PersonProjection.self).filter("lastName == 'Snow'").first!
