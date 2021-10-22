@@ -2,8 +2,8 @@ x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
 * Add support for multi-user on `@AsyncOpen` and `@AutoOpen`.
-* Add several `.searchable()` extensions which allows us to filter 
-  `@ObservedResult` results from serachable component search field
+* Add `.searchable()` methods which allows us to filter 
+  `@ObservedResult` results from searchable component search field
   by a key path.
   ```swift
   List {
