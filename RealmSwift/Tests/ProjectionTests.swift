@@ -448,6 +448,13 @@ class ProjectionTests: TestCase {
         XCTAssertEqual(dany.firstFriendsName.first!, "John")
     }
 
+    func testProjectionEnumeration() {
+        let realm = realmWithTestPath()
+        for proj in realm.objects(PersonProjection.self) {
+            _ = proj
+        }
+    }
+    
     func testProjectionEquality() {
         let realm = realmWithTestPath()
         let johnObject = realm.objects(CommonPerson.self).filter("lastName == 'Snow'").first!

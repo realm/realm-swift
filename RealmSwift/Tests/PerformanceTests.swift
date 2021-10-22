@@ -788,4 +788,52 @@ class SwiftPerformanceTests: TestCase {
             _ = objects.value(forKeyPath: "optStringCol") as! [String]
         }
     }
+    
+    // MARK: Test Projections
+    func testCastSingleProjection() {
+        let realm = copyRealmToTestPath(mediumRealm)
+        try! realm.write({
+            for obj in realm.objects(SwiftStringObject.self) {
+                realm.create(ModernSwiftStringObject.self, value: [obj.stringCol])
+            }
+        })
+
+        let objects = realm.objects(ModernSwiftStringObject.self)
+        measure {
+            for obj in objects {
+                _ = ModernSwiftStringProjection(projecting: obj)
+            }
+        }
+    }
+    
+    func testCastResultsToProjection() {
+        let realm = copyRealmToTestPath(mediumRealm)
+        try! realm.write({
+            for obj in realm.objects(SwiftStringObject.self) {
+                realm.create(ModernSwiftStringObject.self, value: [obj.stringCol])
+            }
+        })
+
+        measure {
+            for _ in 0..<500 {
+                _ = realm.objects(ModernSwiftStringProjection.self)
+            }
+        }
+    }
+
+    func testAccessProjectionProperty() {
+        let realm = copyRealmToTestPath(mediumRealm)
+        try! realm.write({
+            for obj in realm.objects(SwiftStringObject.self) {
+                realm.create(ModernSwiftStringObject.self, value: [obj.stringCol])
+            }
+        })
+
+        let projections = realm.objects(ModernSwiftStringProjection.self)
+        measure {
+            for proj in projections {
+                _ = proj.string
+            }
+        }
+    }
 }

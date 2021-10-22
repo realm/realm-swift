@@ -695,7 +695,7 @@ extension Results: RealmCollection {
 
     /// Returns a `RLMIterator` that yields successive elements in the results.
     public func makeIterator() -> RLMIterator<Element> {
-        return RLMIterator(collection: rlmResults)
+        return RLMIterator(collection: rlmResults, projector)
     }
 
     // MARK: Collection Support

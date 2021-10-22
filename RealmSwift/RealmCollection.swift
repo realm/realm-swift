@@ -24,15 +24,20 @@ import Realm
  */
 @frozen public struct RLMIterator<Element: RealmCollectionValue>: IteratorProtocol {
     private var generatorBase: NSFastEnumerationIterator
+    private var projector: ((ObjectBase) -> Element)?
 
-    init(collection: RLMCollection) {
+    init(collection: RLMCollection, _ projector: ((ObjectBase) -> Element)? = nil) {
         generatorBase = NSFastEnumerationIterator(collection)
+        self.projector = projector
     }
 
     /// Advance to the next element and return it, or `nil` if no next element exists.
     public mutating func next() -> Element? {
         guard let next = generatorBase.next() else { return nil }
-        if let value = next as? Element {
+        if let projector = projector, let value = next as? ObjectBase {
+            return projector(value)
+        }
+        else if let value = next as? Element {
             return value
         }
         if next is NSNull {
