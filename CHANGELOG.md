@@ -13,13 +13,13 @@ x.y.z Release notes (yyyy-MM-dd)
   with Swift style expressions. Here is a brief example:
   ```swift
   class Person: Object {
-    @Persisted var name: Dog
-    @Persisted var hobbies: List<String>
-    @Persisted var dogs: List<Dog>
-  }
-  class Dog: Object {
     @Persisted var name: String
-    @Persisted var age: String
+    @Persisted var hobbies: MutableSet<String>
+    @Persisted var pets: List<Pet>
+  }
+  class Pet: Object {
+    @Persisted var name: String
+    @Persisted var age: Int
   }
 
   let persons = realm.objects(Person.self).where {
@@ -27,7 +27,7 @@ x.y.z Release notes (yyyy-MM-dd)
   }
 
   persons = realm.objects(Person.self).where {
-    ($0.dogs.age >= 2) && $0.dogs.name.starts(with: "L")
+    ($0.pets.age >= 2) && $0.pets.name.starts(with: "L")
   }
   ```([Cocoa #7419](https://github.com/realm/realm-cocoa/pull/7419))
 
