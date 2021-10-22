@@ -1163,11 +1163,11 @@ extension SwiftUIKVO {
     }
 }
 
-/// all methods in this extension allows to filter @ObservedResult data from .searchable()
+/// All methods on this extension allows us to filter @ObservedResult results from .searchable()
 /// component search field.
 ///
 ///     @State var searchString: String
-///     @StObservedResults(Reminder.self) var reminders
+///     @ObservedResults(Reminder.self) var reminders
 ///
 ///     List {
 ///         ForEach(reminders) { reminder in
@@ -1184,6 +1184,7 @@ extension SwiftUIKVO {
 ///
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
 extension View {
+    /// :nodoc:
     public func searchable<T: ObjectBase, P: _QueryString & _RealmSchemaDiscoverable>(text: Binding<String>, collection: ObservedResults<T>, keyPath: KeyPath<T, P>, placement: SearchFieldPlacement = .automatic, prompt: Text? = nil) -> some View {
         filterCollection(collection, for: text.wrappedValue, on: keyPath)
         return searchable(text: text,
@@ -1191,6 +1192,7 @@ extension View {
                           prompt: prompt)
     }
 
+    /// :nodoc:
     public func searchable<T: ObjectBase, P: _QueryString & _RealmSchemaDiscoverable>(text: Binding<String>, collection: ObservedResults<T>, keyPath: KeyPath<T, P>, placement: SearchFieldPlacement = .automatic, prompt: LocalizedStringKey) -> some View {
         filterCollection(collection, for: text.wrappedValue, on: keyPath)
         return searchable(text: text,
@@ -1198,6 +1200,7 @@ extension View {
                           prompt: prompt)
     }
 
+    /// :nodoc:
     public func searchable<T: ObjectBase, P: _QueryString & _RealmSchemaDiscoverable, S>(text: Binding<String>, collection: ObservedResults<T>, keyPath: KeyPath<T, P>, placement: SearchFieldPlacement = .automatic, prompt: S) -> some View where S : StringProtocol {
         filterCollection(collection, for: text.wrappedValue, on: keyPath)
         return searchable(text: text,
@@ -1205,6 +1208,7 @@ extension View {
                           prompt: prompt)
     }
 
+    /// :nodoc:
     public func searchable<T: ObjectBase, P: _QueryString & _RealmSchemaDiscoverable, S>(text: Binding<String>, collection: ObservedResults<T>, keyPath: KeyPath<T, P>, placement: SearchFieldPlacement = .automatic, prompt: Text? = nil, @ViewBuilder suggestions: () -> S) -> some View where S : View {
         filterCollection(collection, for: text.wrappedValue, on: keyPath)
         return searchable(text: text,
@@ -1213,6 +1217,7 @@ extension View {
                           suggestions: suggestions)
     }
 
+    /// :nodoc:
     public func searchable<T: ObjectBase, P: _QueryString & _RealmSchemaDiscoverable, S>(text: Binding<String>, collection: ObservedResults<T>, keyPath: KeyPath<T, P>, placement: SearchFieldPlacement = .automatic, prompt: LocalizedStringKey, @ViewBuilder suggestions: () -> S) -> some View where S : View {
         filterCollection(collection, for: text.wrappedValue, on: keyPath)
         return searchable(text: text,
@@ -1221,6 +1226,7 @@ extension View {
                           suggestions: suggestions)
     }
 
+    /// :nodoc:
     public func searchable<T: ObjectBase, P: _QueryString & _RealmSchemaDiscoverable, V, S>(text: Binding<String>, collection: ObservedResults<T>, keyPath: KeyPath<T, P>, placement: SearchFieldPlacement = .automatic, prompt: S, @ViewBuilder suggestions: () -> V) -> some View where V : View, S : StringProtocol {
         filterCollection(collection, for: text.wrappedValue, on: keyPath)
         return searchable(text: text,
