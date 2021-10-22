@@ -788,8 +788,9 @@ class SwiftPerformanceTests: TestCase {
             _ = objects.value(forKeyPath: "optStringCol") as! [String]
         }
     }
-    
+
     // MARK: Test Projections
+
     func testCastSingleProjection() {
         let realm = copyRealmToTestPath(mediumRealm)
         try! realm.write({
@@ -805,7 +806,7 @@ class SwiftPerformanceTests: TestCase {
             }
         }
     }
-    
+
     func testCastResultsToProjection() {
         let realm = copyRealmToTestPath(mediumRealm)
         try! realm.write({

@@ -36,8 +36,7 @@ import Realm
         guard let next = generatorBase.next() else { return nil }
         if let projector = projector, let value = next as? ObjectBase {
             return projector(value)
-        }
-        else if let value = next as? Element {
+        } else if let value = next as? Element {
             return value
         }
         if next is NSNull {

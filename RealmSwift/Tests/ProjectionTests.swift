@@ -454,7 +454,7 @@ class ProjectionTests: TestCase {
             _ = proj
         }
     }
-    
+
     func testProjectionEquality() {
         let realm = realmWithTestPath()
         let johnObject = realm.objects(CommonPerson.self).filter("lastName == 'Snow'").first!
