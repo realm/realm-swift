@@ -2014,7 +2014,7 @@ void QueryBuilder::apply_predicate(NSPredicate *predicate, RLMObjectSchema *obje
             // comparing value to keypath
             apply_value_expression(objectSchema, compp.rightExpression.keyPath, compp.leftExpression.constantValue, compp);
         }
-        else if (exp1Type == NSFunctionExpressionType || compp.rightExpression.constantValue) {
+        else if (exp1Type == NSFunctionExpressionType) {
             if (compp.leftExpression.operand.expressionType == NSSubqueryExpressionType) {
                 apply_function_expression(objectSchema, compp.leftExpression, compp.predicateOperatorType, compp.rightExpression);
             } else {
