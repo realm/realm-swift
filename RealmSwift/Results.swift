@@ -147,7 +147,7 @@ extension AnyRealmValue: AddableType {}
      obj.index(matching: { $0.fooCol < 456 })
      ```
 
-     - Note: See `Query` for more information on what query operations are available.
+     - Note: See ``Query`` for more information on what query operations are available.
 
      - parameter isIncluded: The query closure with which to filter the objects.
     */
@@ -243,7 +243,7 @@ extension AnyRealmValue: AddableType {}
      }
      ```
 
-     - Note: See `Query` for more information on what query operations are available.
+     - Note: See ``Query`` for more information on what query operations are available.
 
      - parameter isIncluded: The query closure with which to filter the objects.
      */

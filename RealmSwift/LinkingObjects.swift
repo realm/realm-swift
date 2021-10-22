@@ -106,7 +106,7 @@ import Realm
      obj.index(matching: { $0.fooCol < 456 })
      ```
 
-     - Note: See `Query` for more information on what query operations are available.
+     - Note: See ``Query`` for more information on what query operations are available.
 
      - parameter isIncluded: The query closure with which to filter the objects.
      */
@@ -205,7 +205,7 @@ import Realm
      }
      ```
 
-     - Note: See `Query` for more information on what query operations are available.
+     - Note: See ``Query`` for more information on what query operations are available.
 
      - parameter isIncluded: The query closure with which to filter the objects.
      */

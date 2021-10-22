@@ -321,7 +321,7 @@ public protocol RealmCollection: RealmCollectionBase {
      obj.index(matching: { $0.fooCol < 456 })
      ```
 
-     - Note: See `Query` for more information on what query operations are available.
+     - Note: See ``Query`` for more information on what query operations are available.
 
      - parameter isIncluded: The query closure to use to filter the objects.
      */
@@ -375,7 +375,7 @@ public protocol RealmCollection: RealmCollectionBase {
      }
      ```
 
-     - Note: See `Query` for more information on what query operations are available.
+     - Note: See ``Query`` for more information on what query operations are available.
 
      - parameter isIncluded: The query closure to use to filter the objects.
      */
@@ -1287,7 +1287,7 @@ public struct AnyRealmCollection<Element: RealmCollectionValue>: RealmCollection
      obj.index(matching: { $0.fooCol < 456 })
      ```
 
-     - Note: See `Query` for more information on what query operations are available.
+     - Note: See ``Query`` for more information on what query operations are available.
 
      - parameter isIncluded: The query closure with which to filter the objects.
      */
@@ -1328,7 +1328,7 @@ public struct AnyRealmCollection<Element: RealmCollectionValue>: RealmCollection
      }
      ```
 
-     - Note: See `Query` for more information on what query operations are available.
+     - Note: See ``Query`` for more information on what query operations are available.
 
      - parameter isIncluded: The query closure with which to filter the objects.
      */

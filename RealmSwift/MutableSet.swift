@@ -124,7 +124,7 @@ public final class MutableSet<Element: RealmCollectionValue>: RLMSwiftCollection
      }
      ```
 
-     - Note: See `Query` for more information on what query operations are available.
+     - Note: See ``Query`` for more information on what query operations are available.
 
      - parameter isIncluded: The query with which to filter the objects.
      */
