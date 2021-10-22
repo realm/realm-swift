@@ -1,6 +1,31 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
+* Add support for multi-user on `@AsyncOpen` and `@AutoOpen`.
+* Add several `.searchable()` extensions which allows us to filter 
+  `@ObservedResult` results from serachable component search field
+  by a key path.
+  ```swift
+  List {
+      ForEach(reminders) { reminder in
+        ReminderRowView(reminder: reminder)
+      }
+  }
+  .searchable(text: $searchFilter,
+              collection: $reminders,
+              keyPath: \.name) {
+    ForEach(reminders) { remindersFiltered in
+      Text(remindersFiltered.name).searchCompletion(remindersFiltered.name)
+    }
+  }
+  ```
+
+### Fixed
+* Fix `@AsyncOpen` and `@AutoOpen` using `defaultConfiguration` by default if 
+  the user's doesn't provide one, will set an incorrect path which doesn't 
+  correspond to the users configuration one. (since v10.12.0)
+* Adding missing subscription completion for `AsyncOpenPublisher` after successfully 
+  returning a realm.
 * Add an api for a type safe query syntax. This allows you to filter a Realm and collections managed by a Realm
   with Swift style expressions. Here is a brief example:
   ```swift

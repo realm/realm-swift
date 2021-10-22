@@ -1164,7 +1164,7 @@ extension SwiftUIKVO {
 }
 
 /// All methods on this extension allows us to filter @ObservedResult results from .searchable()
-/// component search field.
+/// component search field by a key path.
 ///
 ///     @State var searchString: String
 ///     @ObservedResults(Reminder.self) var reminders
