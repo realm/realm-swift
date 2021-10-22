@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 # A script to generate the .jenkins.yml file for the CI pull request job
-XCODE_VERSIONS = %w(12.2 12.4 12.5.1 13.0)
+XCODE_VERSIONS = %w(12.2 12.4 12.5.1 13.0 13.1)
 
 all = ->(v) { true }
 latest_only = ->(v) { v == XCODE_VERSIONS.last }
@@ -15,10 +15,10 @@ targets = {
   'swiftlint' => latest_only,
 
   'osx' => all,
-  'osx-encryption' => oldest_and_latest,
+  'osx-encryption' => latest_only,
   'osx-object-server' => oldest_and_latest,
 
-  'swiftpm' => all,
+  'swiftpm' => oldest_and_latest,
   'swiftpm-debug' => all,
   'swiftpm-address' => latest_only,
   'swiftpm-thread' => latest_only,

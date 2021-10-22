@@ -23,7 +23,7 @@ import RealmSwift
 struct App: SwiftUI.App {
     var body: some Scene {
         return WindowGroup {
-            LoginView()
+            MainView()
         }
     }
 }

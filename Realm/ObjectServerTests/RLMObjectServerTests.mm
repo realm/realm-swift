@@ -831,6 +831,35 @@ static NSString *randomEmail() {
     }
 }
 
+- (void)testIncomingSyncWritesTriggerNotifications {
+    NSString *baseName = NSStringFromSelector(_cmd);
+    auto user = [&] {
+        NSString *name = [baseName stringByAppendingString:[NSUUID UUID].UUIDString];
+        return [self logInUserForCredentials:[self basicCredentialsWithName:name register:YES]];
+    };
+    RLMRealm *syncRealm = [self openRealmWithConfiguration:[user() configurationWithTestSelector:_cmd]];
+    RLMRealm *asyncRealm = [self asyncOpenRealmWithConfiguration:[user() configurationWithTestSelector:_cmd]];
+    RLMRealm *writeRealm = [self asyncOpenRealmWithConfiguration:[user() configurationWithTestSelector:_cmd]];
+
+    __block XCTestExpectation *ex = [self expectationWithDescription:@"got initial notification"];
+    ex.expectedFulfillmentCount = 2;
+    id token1 = [[Person allObjectsInRealm:syncRealm] addNotificationBlock:^(RLMResults *, RLMCollectionChange *, NSError *) {
+        [ex fulfill];
+    }];
+    id token2 = [[Person allObjectsInRealm:asyncRealm] addNotificationBlock:^(RLMResults *, RLMCollectionChange *, NSError *) {
+        [ex fulfill];
+    }];
+    [self waitForExpectations:@[ex] timeout:5.0];
+
+    ex = [self expectationWithDescription:@"got update notification"];
+    ex.expectedFulfillmentCount = 2;
+    [self addPersonsToRealm:writeRealm persons:@[[Person john]]];
+    [self waitForExpectations:@[ex] timeout:5.0];
+
+    [token1 invalidate];
+    [token2 invalidate];
+}
+
 #pragma mark - RLMValue Sync with missing schema -
 
 - (void)testMissingSchema {
