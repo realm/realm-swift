@@ -131,4 +131,25 @@ class ObjectiveCSupportTests: TestCase {
         }
         expected.forEach { testObjCSupport($0.0, value: $0.1) }
     }
+
+    func testArraySupport() {
+        let list = List<SwiftObject>()
+        let obj = SwiftObject()
+        list.append(obj)
+        obj.doubleCol = 42.42
+        let rlmArray = ObjectiveCSupport.convert(object: list)
+        XCTAssert(rlmArray.isKind(of: RLMArray<AnyObject>.self))
+        for object in rlmArray {
+            XCTAssertEqual(obj.doubleCol, object.value(forKey: "doubleCol") as? Double)
+        }
+
+        let primitiveList = List<Double>()
+        let double = 42.42
+        primitiveList.append(double)
+        let primitiveRLMArray = ObjectiveCSupport.convert(object: primitiveList)
+        XCTAssert(primitiveRLMArray.isKind(of: RLMArray<AnyObject>.self))
+        for object in primitiveRLMArray {
+            XCTAssertEqual(double, object as? Double)
+        }
+    }
 }
