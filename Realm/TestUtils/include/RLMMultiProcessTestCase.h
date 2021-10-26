@@ -32,6 +32,7 @@
 
 - (NSTask *)childTask;
 - (NSTask *)childTaskWithAppIds:(NSArray *)appIds;
+- (NSTask * _Nonnull)childTaskWithEnvironment:(RLMChildProcessEnvironment *)environment;
 
 @end
 

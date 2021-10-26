@@ -52,6 +52,9 @@ typedef void(^RLMOptionalErrorBlock)(NSError * _Nullable);
 /// The default timeout for network requests.
 @property (nonatomic, assign) NSUInteger defaultRequestTimeoutMS;
 
+/// The path to use for App Groups that share synced Realms.
+@property (nonatomic, strong, nullable) NSString *sharedPath;
+
 /**
 Create a new Realm App configuration.
 
@@ -66,6 +69,20 @@ Create a new Realm App configuration.
                 localAppVersion:(nullable NSString *)localAppVersion;
 
 /**
+Create a new Realm App configuration.
+
+@param baseURL A custom base URL to request against.
+@param transport A custom network transport.
+@param localAppName A custom app name.
+@param localAppVersion A custom app version.
+*/
+- (instancetype)initWithBaseURL:(nullable NSString *)baseURL
+                      transport:(nullable id<RLMNetworkTransport>)transport
+                   localAppName:(nullable NSString *)localAppName
+                localAppVersion:(nullable NSString *)localAppVersion
+                     sharedPath:(nullable NSString *)sharedPath;
+
+/**
  Create a new Realm App configuration.
 
  @param baseURL A custom base URL to request against.
@@ -78,6 +95,7 @@ Create a new Realm App configuration.
                       transport:(nullable id<RLMNetworkTransport>)transport
                    localAppName:(nullable NSString *) localAppName
                 localAppVersion:(nullable NSString *)localAppVersion
+                     sharedPath:(nullable NSString *)sharedPath
         defaultRequestTimeoutMS:(NSUInteger)defaultRequestTimeoutMS;
 
 @end

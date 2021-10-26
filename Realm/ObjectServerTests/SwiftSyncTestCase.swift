@@ -134,8 +134,34 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
         waitForUploads(for: ObjectiveCSupport.convert(object: realm))
     }
 
+    @available(macOS 12.0.0, *)
+    public func waitForUploads(for realm: Realm) async throws {
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+            waitForUploads(for: ObjectiveCSupport.convert(object: realm)) { error in
+                if let error = error {
+                    continuation.resume(with: .failure(error))
+                } else {
+                    continuation.resume()
+                }
+            }
+        }
+    }
+
     public func waitForDownloads(for realm: Realm) {
         waitForDownloads(for: ObjectiveCSupport.convert(object: realm))
+    }
+
+    @available(macOS 12.0.0, *)
+    public func waitForDownloads(for realm: Realm) async throws {
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+            waitForDownloads(for: ObjectiveCSupport.convert(object: realm)) { error in
+                if let error = error {
+                    continuation.resume(with: .failure(error))
+                } else {
+                    continuation.resume()
+                }
+            }
+        }
     }
 
     public func checkCount<T: Object>(expected: Int,

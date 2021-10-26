@@ -46,7 +46,7 @@
     return self;
 }
 
-- (NSString *)_appId {
+- (NSString *)appId {
     return self.appIds == nil ? nil : [self.appIds firstObject];
 }
 

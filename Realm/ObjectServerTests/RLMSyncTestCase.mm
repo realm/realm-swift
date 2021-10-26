@@ -435,6 +435,7 @@ static NSURL *syncDirectoryForChildProcess() {
                                                transport:nil
                                             localAppName:nil
                                          localAppVersion:nil
+                                              sharedPath:[RLMChildProcessEnvironment current].appId && !self.isParent ? syncDirectoryForChildProcess().path : nil
                                  defaultRequestTimeoutMS:60];
 }
 
@@ -579,6 +580,12 @@ static NSURL *syncDirectoryForChildProcess() {
     [self waitForDownloadsForRealm:realm error:nil];
 }
 
+- (void)waitForDownloadsForRealm:(RLMRealm *)realm block:(void (^)(NSError * _Nullable))block {
+    NSError *error;
+    [self waitForDownloadsForRealm:realm error:&error];
+    block(error);
+}
+
 - (void)waitForUploadsForRealm:(RLMRealm *)realm {
     [self waitForUploadsForRealm:realm error:nil];
 }
@@ -591,7 +598,7 @@ static NSURL *syncDirectoryForChildProcess() {
     NSAssert(session, @"Cannot call with invalid partition value");
     XCTestExpectation *ex = expectation ?: [self expectationWithDescription:@"Wait for download completion"];
     __block NSError *theError = nil;
-    BOOL queued = [session waitForDownloadCompletionOnQueue:nil callback:^(NSError *err) {
+    BOOL queued = [session waitForDownloadCompletionOnQueue:dispatch_queue_create(nil, nil) callback:^(NSError *err) {
         theError = err;
         [ex fulfill];
     }];
@@ -610,7 +617,8 @@ static NSURL *syncDirectoryForChildProcess() {
     NSAssert(session, @"Cannot call with invalid Realm");
     XCTestExpectation *ex = [self expectationWithDescription:@"Wait for upload completion"];
     __block NSError *completionError;
-    BOOL queued = [session waitForUploadCompletionOnQueue:nil callback:^(NSError *error) {
+    dispatch_queue_t dq = dispatch_queue_create(nil, nil);
+    BOOL queued = [session waitForUploadCompletionOnQueue:dq callback:^(NSError *error) {
         completionError = error;
         [ex fulfill];
     }];
@@ -623,11 +631,18 @@ static NSURL *syncDirectoryForChildProcess() {
         *error = completionError;
 }
 
+- (void)waitForUploadsForRealm:(RLMRealm *)realm block:(void (^)(NSError * _Nullable))block {
+    NSError *error;
+    [self waitForUploadsForRealm:realm error:&error];
+    block(error);
+}
+
 - (void)waitForDownloadsForRealm:(RLMRealm *)realm error:(NSError **)error {
     RLMSyncSession *session = realm.syncSession;
     NSAssert(session, @"Cannot call with invalid Realm");
     XCTestExpectation *ex = [self expectationWithDescription:@"Wait for download completion"];
     __block NSError *completionError;
+    dispatch_queue_t dq = dispatch_queue_create(nil, nil);
     BOOL queued = [session waitForDownloadCompletionOnQueue:nil callback:^(NSError *error) {
         completionError = error;
         [ex fulfill];

@@ -2142,7 +2142,7 @@ class AsyncAwaitObjectServerTests: SwiftSyncTestCase {
                 realm.add(SwiftHugeSyncObject.create())
                 realm.add(SwiftHugeSyncObject.create())
             }
-            waitForUploads(for: realm)
+            try await waitForUploads(for: realm)
             executeChild()
         } else {
             let user = try await app.login(credentials: .anonymous)
@@ -2168,7 +2168,7 @@ class AsyncAwaitObjectServerTests: SwiftSyncTestCase {
                 user1Realm.add(SwiftHugeSyncObject.create())
                 user1Realm.add(SwiftHugeSyncObject.create())
             }
-            waitForUploads(for: user1Realm)
+            try await waitForUploads(for: user1Realm)
 
             let (email2, password2) = (randomString(10), "password")
             self.runChildAndWait(with: ChildProcessEnvironment(appIds: self.appIds,
@@ -2205,7 +2205,7 @@ class AsyncAwaitObjectServerTests: SwiftSyncTestCase {
                 user1Realm.add(SwiftHugeSyncObject.create())
                 user1Realm.add(SwiftHugeSyncObject.create())
             }
-            waitForUploads(for: user1Realm)
+            try await waitForUploads(for: user1Realm)
 
             let (email2, password2) = (randomString(10), "password")
             self.runChildAndWait(with: ChildProcessEnvironment(appIds: self.appIds,
@@ -2217,7 +2217,7 @@ class AsyncAwaitObjectServerTests: SwiftSyncTestCase {
                 user1Realm.add(SwiftHugeSyncObject.create())
                 user1Realm.add(SwiftHugeSyncObject.create())
             }
-            waitForUploads(for: user1Realm)
+            try await waitForUploads(for: user1Realm)
 
             self.runChildAndWait(with: ChildProcessEnvironment(appIds: self.appIds,
                                                                email: email2,
@@ -2249,7 +2249,7 @@ class AsyncAwaitObjectServerTests: SwiftSyncTestCase {
                 user1Realm.add(SwiftHugeSyncObject.create())
                 user1Realm.add(SwiftHugeSyncObject.create())
             }
-            waitForUploads(for: user1Realm)
+            try await waitForUploads(for: user1Realm)
 
             let (email2, password2) = (randomString(10), "password")
             self.runChildAndWait(with: ChildProcessEnvironment(appIds: self.appIds,
@@ -2262,7 +2262,7 @@ class AsyncAwaitObjectServerTests: SwiftSyncTestCase {
                 user1Realm.add(SwiftHugeSyncObject.create())
                 user1Realm.add(SwiftHugeSyncObject.create())
             }
-            waitForUploads(for: user1Realm)
+            try await waitForUploads(for: user1Realm)
 
             self.runChildAndWait(with: ChildProcessEnvironment(appIds: self.appIds,
                                                                email: email2,
@@ -2411,6 +2411,7 @@ class AsyncAwaitObjectServerTests: SwiftSyncTestCase {
         XCTAssertEqual(app.currentUser?.customData["favourite_colour"], .string("green"))
         XCTAssertEqual(app.currentUser?.customData["apples"], .int64(10))
     }
+
 }
 
 #endif // swift(>=5.5)

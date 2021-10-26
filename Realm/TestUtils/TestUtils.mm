@@ -193,7 +193,7 @@ RLMUser *RLMDummyUser() {
     // Add a fake user to the metadata Realm
     @autoreleasepool {
         auto config = [RLMSyncManager configurationWithRootDirectory:nil appId:@"dummy"];
-        realm::SyncFileManager sfm(config.base_file_path, "dummy");
+        realm::SyncFileManager sfm(config.base_file_path, "dummy", "");
         realm::util::Optional<std::vector<char>> encryption_key;
         if (config.metadata_mode == realm::SyncClientConfig::MetadataMode::Encryption) {
             encryption_key = realm::keychain::metadata_realm_encryption_key(false);

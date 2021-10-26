@@ -61,6 +61,39 @@
 using namespace realm;
 using util::File;
 
+struct CocoaScheduler : util::Scheduler {
+    CocoaScheduler(id<RLMScheduler> scheduler)
+    : m_scheduler(scheduler)
+    {
+    }
+
+    bool is_same_as(const Scheduler *other) const noexcept override {
+        return true;
+    }
+
+    bool can_deliver_notifications() const noexcept override {
+        return m_scheduler.canDeliverNotifications;
+    }
+
+    bool is_on_thread() const noexcept override {
+        return m_scheduler.isOnThread;
+    }
+
+    void notify() noexcept override {
+        [m_scheduler notify];
+    }
+
+    void set_notify_callback(std::function<void ()> callback) noexcept override {
+        [m_scheduler setNotifyCallback:^{
+            callback();
+        }];
+    }
+
+
+private:
+    id<RLMScheduler> m_scheduler;
+};
+
 @interface RLMRealmNotificationToken : RLMNotificationToken
 @property (nonatomic, strong) RLMRealm *realm;
 @property (nonatomic, copy) RLMNotificationBlock block;
@@ -396,6 +429,143 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
 
 + (instancetype)realmWithConfiguration:(RLMRealmConfiguration *)configuration error:(NSError **)error {
     return [self realmWithConfiguration:configuration queue:nil error:error];
+}
+
++ (nullable instancetype)realmWithConfiguration:(RLMRealmConfiguration *)configuration
+                                      scheduler:(id<RLMScheduler>)scheduler
+                                          error:(NSError **)error {
+    bool dynamic = configuration.dynamic;
+    bool cache = configuration.cache;
+    bool readOnly = configuration.readOnly;
+
+    // The main thread and main queue share a cache key of 1 so that they give
+    // the same instance. Other Realms are keyed on either the thread or the queue.
+    // Note that despite being a void* the cache key is not actually a pointer;
+    // this is just an artifact of NSMapTable's strange API.
+    void *cacheKey = reinterpret_cast<void *>(1);
+    if (!pthread_main_np()) {
+        cacheKey = pthread_self();
+    }
+    {
+        Realm::Config const& config = configuration.config;
+
+        // try to reuse existing realm first
+        if (cache || dynamic) {
+            if (RLMRealm *realm = RLMGetThreadLocalCachedRealmForPath(config.path, cacheKey)) {
+                auto const& old_config = realm->_realm->config();
+                if (old_config.immutable() != config.immutable()
+                    || old_config.read_only_alternative() != config.read_only_alternative()) {
+                    @throw RLMException(@"Realm at path '%s' already opened with different read permissions", config.path.c_str());
+                }
+                if (old_config.in_memory != config.in_memory) {
+                    @throw RLMException(@"Realm at path '%s' already opened with different inMemory settings", config.path.c_str());
+                }
+                if (realm->_dynamic != dynamic) {
+                    @throw RLMException(@"Realm at path '%s' already opened with different dynamic settings", config.path.c_str());
+                }
+                if (old_config.encryption_key != config.encryption_key) {
+                    @throw RLMException(@"Realm at path '%s' already opened with different encryption key", config.path.c_str());
+                }
+                return RLMAutorelease(realm);
+            }
+        }
+    }
+
+    configuration = [configuration copy];
+    Realm::Config& config = configuration.config;
+
+    RLMRealm *realm = [[self alloc] initPrivate];
+    realm->_dynamic = dynamic;
+
+    // protects the realm cache and accessors cache
+    static std::mutex& initLock = *new std::mutex();
+    std::lock_guard<std::mutex> lock(initLock);
+
+    try {
+        // If the source config was read from a Realm it may already have a
+        // scheduler, and we don't want to reuse it.
+        config.scheduler = std::make_unique<CocoaScheduler>(CocoaScheduler(scheduler));
+        realm->_realm = Realm::get_shared_realm(config);
+    }
+    catch (...) {
+        RLMRealmTranslateException(error);
+        return nil;
+    }
+
+    // if we have a cached realm on another thread we can skip a few steps and
+    // just grab its schema
+    @autoreleasepool {
+        // ensure that cachedRealm doesn't end up in this thread's autorelease pool
+        if (auto cachedRealm = RLMGetAnyCachedRealmForPath(config.path)) {
+            realm->_realm->set_schema_subset(cachedRealm->_realm->schema());
+            realm->_schema = cachedRealm.schema;
+            realm->_info = cachedRealm->_info.clone(cachedRealm->_realm->schema(), realm);
+        }
+    }
+
+    if (realm->_schema) { }
+    else if (dynamic) {
+        realm->_schema = [RLMSchema dynamicSchemaFromObjectStoreSchema:realm->_realm->schema()];
+        realm->_info = RLMSchemaInfo(realm);
+    }
+    else {
+        // set/align schema or perform migration if needed
+        RLMSchema *schema = configuration.customSchema ?: RLMSchema.sharedSchema;
+
+        Realm::MigrationFunction migrationFunction;
+        auto migrationBlock = configuration.migrationBlock;
+        if (migrationBlock && configuration.schemaVersion > 0) {
+            migrationFunction = [=](SharedRealm old_realm, SharedRealm realm, Schema& mutableSchema) {
+                RLMSchema *oldSchema = [RLMSchema dynamicSchemaFromObjectStoreSchema:old_realm->schema()];
+                RLMRealm *oldRealm = [RLMRealm realmWithSharedRealm:old_realm schema:oldSchema];
+
+                // The destination RLMRealm can't just use the schema from the
+                // SharedRealm because it doesn't have information about whether or
+                // not a class was defined in Swift, which effects how new objects
+                // are created
+                RLMRealm *newRealm = [RLMRealm realmWithSharedRealm:realm schema:schema.copy];
+
+                [[[RLMMigration alloc] initWithRealm:newRealm oldRealm:oldRealm schema:mutableSchema] execute:migrationBlock];
+
+                oldRealm->_realm = nullptr;
+                newRealm->_realm = nullptr;
+            };
+        }
+
+        try {
+            realm->_realm->update_schema(schema.objectStoreCopy, config.schema_version,
+                                         std::move(migrationFunction));
+        }
+        catch (...) {
+            RLMRealmTranslateException(error);
+            return nil;
+        }
+
+        realm->_schema = schema;
+        realm->_info = RLMSchemaInfo(realm);
+        RLMRealmCreateAccessors(realm.schema);
+
+        if (!readOnly) {
+            REALM_ASSERT(!realm->_realm->is_in_read_transaction());
+
+            if (s_set_skip_backup_attribute) {
+                RLMAddSkipBackupAttributeToItemAtPath(config.path + ".management");
+                RLMAddSkipBackupAttributeToItemAtPath(config.path + ".lock");
+                RLMAddSkipBackupAttributeToItemAtPath(config.path + ".note");
+            }
+        }
+    }
+
+    if (cache) {
+        RLMCacheRealm(config.path, cacheKey, realm);
+    }
+
+    if (!readOnly) {
+        realm->_realm->m_binding_context = RLMCreateBindingContext(realm);
+        realm->_realm->m_binding_context->realm = realm->_realm;
+    }
+
+    return RLMAutorelease(realm);
 }
 
 + (instancetype)realmWithConfiguration:(RLMRealmConfiguration *)configuration

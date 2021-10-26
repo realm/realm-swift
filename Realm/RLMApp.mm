@@ -96,14 +96,24 @@ namespace {
     return nil;
 }
 
-- (instancetype)initWithBaseURL:(nullable NSString *)baseURL
-                      transport:(nullable id<RLMNetworkTransport>)transport
-                   localAppName:(nullable NSString *)localAppName
-                localAppVersion:(nullable NSString *)localAppVersion {
+- (instancetype)initWithBaseURL:(NSString *)baseURL transport:(id<RLMNetworkTransport>)transport localAppName:(NSString *)localAppName localAppVersion:(NSString *)localAppVersion {
     return [self initWithBaseURL:baseURL
                        transport:transport
                     localAppName:localAppName
                  localAppVersion:localAppVersion
+                      sharedPath:nil];
+}
+
+- (instancetype)initWithBaseURL:(nullable NSString *)baseURL
+                      transport:(nullable id<RLMNetworkTransport>)transport
+                   localAppName:(nullable NSString *)localAppName
+                localAppVersion:(nullable NSString *)localAppVersion
+                     sharedPath:(nullable NSString *)sharedPath {
+    return [self initWithBaseURL:baseURL
+                       transport:transport
+                    localAppName:localAppName
+                 localAppVersion:localAppVersion
+                      sharedPath:sharedPath
          defaultRequestTimeoutMS:6000];
 }
 
@@ -111,6 +121,7 @@ namespace {
                       transport:(nullable id<RLMNetworkTransport>)transport
                    localAppName:(NSString *)localAppName
                 localAppVersion:(nullable NSString *)localAppVersion
+                     sharedPath:(nullable NSString *)sharedPath
         defaultRequestTimeoutMS:(NSUInteger)defaultRequestTimeoutMS {
     if (self = [super init]) {
         self.baseURL = baseURL;
@@ -118,9 +129,9 @@ namespace {
         self.localAppName = localAppName;
         self.localAppVersion = localAppVersion;
         self.defaultRequestTimeoutMS = defaultRequestTimeoutMS;
+        self.sharedPath = sharedPath;
 
         _config.platform = "Realm Cocoa";
-
         RLMNSStringToStdString(_config.platform_version, [[NSProcessInfo processInfo] operatingSystemVersionString]);
         RLMNSStringToStdString(_config.sdk_version, REALM_COCOA_VERSION);
         return self;
@@ -151,19 +162,30 @@ namespace {
     return;
 }
 
+- (NSString *)sharedPath {
+    if (_config.shared_path) {
+        return @(_config.shared_path->c_str());
+    }
+
+    return nil;
+}
+
+- (void)setSharedPath:(nullable NSString *)sharedPath {
+    std::string shared_path;
+    RLMNSStringToStdString(shared_path, sharedPath);
+    _config.shared_path = shared_path.empty() ? util::none : util::Optional(shared_path);
+    return;
+}
+
 - (id<RLMNetworkTransport>)transport {
-    return static_cast<CocoaNetworkTransport*>(_config.transport_generator().get())->transport();
+    return static_cast<CocoaNetworkTransport*>(_config.transport.get())->transport();
 }
 
 - (void)setTransport:(id<RLMNetworkTransport>)transport {
     if (transport) {
-        _config.transport_generator = [transport]{
-            return std::make_unique<CocoaNetworkTransport>(transport);
-        };
+        _config.transport = std::make_unique<CocoaNetworkTransport>(transport);
     } else {
-        _config.transport_generator = []{
-            return std::make_unique<CocoaNetworkTransport>([RLMNetworkTransport new]);
-        };
+        _config.transport = std::make_unique<CocoaNetworkTransport>([RLMNetworkTransport new]);
     }
 }
 
@@ -240,6 +262,11 @@ NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
 @interface RLMApp() <ASAuthorizationControllerDelegate> {
     std::shared_ptr<realm::app::App> _app;
     __weak id<RLMASLoginDelegate> _authorizationDelegate API_AVAILABLE(ios(13.0), macos(10.15), tvos(13.0), watchos(6.0));
+    id tokenSuspension;
+    id tokenTermination;
+    id tokenActive;
+    id tokenForeground;
+    NSTimer *timer;
 }
 
 @end
@@ -273,13 +300,69 @@ NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
         }
         _configuration = configuration;
         [_configuration setAppId:appId];
-
+        if (configuration.sharedPath) {
+            rootDirectory = [NSURL fileURLWithPath:configuration.sharedPath];
+        }
         _app = RLMTranslateError([&] {
             return app::App::get_shared_app(configuration.config,
                                             [RLMSyncManager configurationWithRootDirectory:rootDirectory appId:appId]);
         });
 
         _syncManager = [[RLMSyncManager alloc] initWithSyncManager:_app->sync_manager()];
+        if (configuration.sharedPath) {
+            id suspensionBlock = ^(NSNotification * _Nonnull note) {
+                [timer invalidate];
+                if (_app->sync_manager()->has_existing_sessions()) {
+                    _app->sync_manager()->suspend();
+                }
+            };
+#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+            NSNotificationName willResign = UIApplicationWillResignActiveNotification;
+            NSNotificationName willTerminate = UIApplicationWillTerminateNotification;
+            NSNotificationName didBecomeActive = UIApplicationWillTerminateNotification;
+            NSNotificationName willEnterForeground = UIApplicationWillEnterForegroundNotification;
+#elif TARGET_OS_MAC
+            NSNotificationName willResign = NSApplicationWillResignActiveNotification;
+            NSNotificationName willTerminate = NSApplicationWillTerminateNotification;
+            NSNotificationName didBecomeActive = NSApplicationWillTerminateNotification;
+#endif
+            tokenSuspension = [[NSNotificationCenter defaultCenter] addObserverForName:willResign
+                                                                                object:nil
+                                                                                 queue:nil
+                                                                            usingBlock:suspensionBlock];
+            tokenTermination = [[NSNotificationCenter defaultCenter] addObserverForName:willTerminate
+                                                                                 object:nil
+                                                                                  queue:nil
+                                                                             usingBlock:suspensionBlock];
+            tokenActive = [[NSNotificationCenter defaultCenter] addObserverForName:didBecomeActive
+                                                                            object:nil
+                                                                             queue:nil
+                                                                        usingBlock:^(NSNotification * _Nonnull note) {
+                timer = [NSTimer scheduledTimerWithTimeInterval:0.1 repeats:YES block:^(NSTimer * _Nonnull timer) {
+                    if (_app->sync_manager()->can_claim_sync_agent() ) {
+                        _app->sync_manager()->resume();
+                    }
+                }];
+//                _app->sync_manager()->resume();
+            }];
+            tokenForeground = [[NSNotificationCenter defaultCenter] addObserverForName:willEnterForeground
+                                                                            object:nil
+                                                                             queue:nil
+                                                                        usingBlock:^(NSNotification * _Nonnull note) {
+                timer = [NSTimer scheduledTimerWithTimeInterval:0.1 repeats:YES block:^(NSTimer * _Nonnull timer) {
+                    if (_app->sync_manager()->can_claim_sync_agent() ) {
+                        _app->sync_manager()->resume();
+                    }
+                }];
+//                _app->sync_manager()->resume();
+            }];
+            timer = [NSTimer scheduledTimerWithTimeInterval:0.1 repeats:YES block:^(NSTimer * _Nonnull timer) {
+                if (_app->sync_manager()->can_claim_sync_agent() ) {
+                    _app->sync_manager()->resume();
+                }
+            }];
+            [timer fire];
+        }
         return self;
     }
     return nil;

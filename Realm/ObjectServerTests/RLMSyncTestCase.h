@@ -213,10 +213,12 @@ RLM_COLLECTION_TYPE(Person);
 /// Wait for downloads to complete; drop any error.
 - (void)waitForDownloadsForRealm:(RLMRealm *)realm;
 - (void)waitForDownloadsForRealm:(RLMRealm *)realm error:(NSError **)error;
+- (void)waitForDownloadsForRealm:(RLMRealm *)realm block:(void (^)(NSError * _Nullable))block;
 
 /// Wait for uploads to complete; drop any error.
 - (void)waitForUploadsForRealm:(RLMRealm *)realm;
 - (void)waitForUploadsForRealm:(RLMRealm *)realm error:(NSError **)error;
+- (void)waitForUploadsForRealm:(RLMRealm *)realm block:(void (^)(NSError * _Nullable))block;
 
 /// Wait for downloads to complete while spinning the runloop. This method uses expectations.
 - (void)waitForDownloadsForUser:(RLMUser *)user

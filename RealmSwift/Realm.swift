@@ -261,6 +261,7 @@ import Realm.Private
         return ret
     }
 
+
     /**
      Begins a write transaction on the Realm.
 
@@ -1067,7 +1068,58 @@ extension Realm {
                 })
             }
         }
-        try self.init(RLMRealm(configuration: configuration.rlmConfiguration, queue: queue))
+
+        try self.init(RLMRealm(configuration: configuration.rlmConfiguration, scheduler: AsyncScheduler(taskId: withUnsafeCurrentTask { task in
+            task!.hashValue
+        })))
+    }
+
+    @discardableResult
+    public func write<Result>(withoutNotifying tokens: [NotificationToken] = [], _ block: (() async throws -> Result)) async throws -> Result {
+        beginWrite()
+        var ret: Result!
+        do {
+            ret = try await block()
+        } catch let error {
+            if isInWriteTransaction { cancelWrite() }
+            throw error
+        }
+        if isInWriteTransaction { try commitWrite(withoutNotifying: tokens) }
+        return ret
+    }
+}
+
+@available(macOS 12.0, tvOS 15.0, iOS 15.0, watchOS 8.0, *)
+@objc private class AsyncScheduler: NSObject, RLMScheduler {
+    func canDeliverNotifications() -> Bool {
+        false
+    }
+
+    override func isEqual(_ object: Any?) -> Bool {
+        return true
+    }
+
+    private let taskId: Int
+    init(taskId: Int) {
+        self.taskId = taskId
+    }
+
+    func notify() {
+
+    }
+
+    func setNotifyCallback(_ callback: @escaping () -> Void) {
+
+    }
+
+    func isOnThread() -> Bool {
+        withUnsafeCurrentTask { task in
+            return task?.hashValue == self.taskId
+        }
+    }
+
+    func isEqual(to scheduler: RLMScheduler) -> Bool {
+        fatalError()
     }
 }
 #endif // swift(>=5.5)
