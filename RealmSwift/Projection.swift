@@ -197,6 +197,8 @@ open class Projection<Root: ObjectBase>: RealmCollectionValue, ProjectionObserva
      */
     public required init(projecting object: Root) {
         self.rootObject = object
+        // Initialize schema for projection class
+        _ = _schema
     }
 }
 
@@ -393,19 +395,23 @@ extension ProjectionObservable {
     }
 
     fileprivate var _schema: [ProjectedMetadata] {
-        if schema[ObjectIdentifier(Self.self)] == nil {
+        if schema[ObjectIdentifier(type(of: self))] == nil {
             let mirror = Mirror(reflecting: self)
             let metadatas: [ProjectedMetadata] = mirror.children.compactMap { child in
                 guard let projected = child.value as? AnyProjected else {
                     return nil
                 }
+                let originPropertyLabel = _name(for: projected.projectedKeyPath as! PartialKeyPath<Root>)
+                guard !originPropertyLabel.isEmpty else {
+                    throwRealmException("@Projected property '\(child.label!)' must be a part of Realm object")
+                }
                 return ProjectedMetadata(projectedKeyPath: projected.projectedKeyPath,
-                                         originPropertyKeyPathString: _name(for: projected.projectedKeyPath as! PartialKeyPath<Root>),
+                                         originPropertyKeyPathString: originPropertyLabel,
                                          label: child.label!)
             }
-            schema[ObjectIdentifier(Self.self)] = metadatas
+            schema[ObjectIdentifier(type(of: self))] = metadatas
         }
-        return schema[ObjectIdentifier(Self.self)]!
+        return schema[ObjectIdentifier(type(of: self))]!
     }
 }
 /**

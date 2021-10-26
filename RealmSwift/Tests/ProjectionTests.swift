@@ -170,7 +170,6 @@ class AllTypesProjection: Projection<ModernAllTypesObject> {
 }
 
 class FailedProjection: Projection<ModernAllTypesObject> {
-
     @Projected(\ModernAllTypesObject.ignored) var ignored
 }
 
@@ -1749,5 +1748,11 @@ class ProjectionTests: TestCase {
 
         waitForExpectations(timeout: 2)
         token.invalidate()
+    }
+
+    func testFailedProjection() {
+        let realm = self.realmWithTestPath()
+        XCTAssertGreaterThan(realm.objects(FailedProjection.self).count, 0)
+        assertThrows(realm.objects(FailedProjection.self).first, reason: "@Projected property")
     }
 }
