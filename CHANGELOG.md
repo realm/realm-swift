@@ -1,7 +1,6 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* Add support for multi-user on `@AsyncOpen` and `@AutoOpen`.
 * Add `.searchable()` methods which allows us to filter 
   `@ObservedResult` results from searchable component search field
   by a key path.
@@ -21,11 +20,6 @@ x.y.z Release notes (yyyy-MM-dd)
   ```
 
 ### Fixed
-* Fix `@AsyncOpen` and `@AutoOpen` using `defaultConfiguration` by default if 
-  the user's doesn't provide one, will set an incorrect path which doesn't 
-  correspond to the users configuration one. (since v10.12.0)
-* Adding missing subscription completion for `AsyncOpenPublisher` after successfully 
-  returning a realm.
 * Add an api for a type safe query syntax. This allows you to filter a Realm and collections managed by a Realm
   with Swift style expressions. Here is a brief example:
   ```swift
