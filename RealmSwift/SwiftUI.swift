@@ -1287,7 +1287,7 @@ extension View {
     - parameter prompt: A string representing the prompt of the search field
                 which provides users with guidance on what to search for.
      */
-    public func searchable<T: ObjectBase, P: _QueryString & _RealmSchemaDiscoverable, S>(text: Binding<String>, collection: ObservedResults<T>, keyPath: KeyPath<T, P>, placement: SearchFieldPlacement = .automatic, prompt: S) -> some View where S : StringProtocol {
+    public func searchable<T: ObjectBase, P: _QueryString & _RealmSchemaDiscoverable, S>(text: Binding<String>, collection: ObservedResults<T>, keyPath: KeyPath<T, P>, placement: SearchFieldPlacement = .automatic, prompt: S) -> some View where S: StringProtocol {
         filterCollection(collection, for: text.wrappedValue, on: keyPath)
         return searchable(text: text,
                           placement: placement,
@@ -1331,7 +1331,7 @@ extension View {
     - parameter suggestions: A view builder that produces content that
                 populates a list of suggestions.
      */
-    public func searchable<T: ObjectBase, P: _QueryString & _RealmSchemaDiscoverable, S>(text: Binding<String>, collection: ObservedResults<T>, keyPath: KeyPath<T, P>, placement: SearchFieldPlacement = .automatic, prompt: Text? = nil, @ViewBuilder suggestions: () -> S) -> some View where S : View {
+    public func searchable<T: ObjectBase, P: _QueryString & _RealmSchemaDiscoverable, S>(text: Binding<String>, collection: ObservedResults<T>, keyPath: KeyPath<T, P>, placement: SearchFieldPlacement = .automatic, prompt: Text? = nil, @ViewBuilder suggestions: () -> S) -> some View where S: View {
         filterCollection(collection, for: text.wrappedValue, on: keyPath)
         return searchable(text: text,
                           placement: placement,
@@ -1376,7 +1376,7 @@ extension View {
     - parameter suggestions: A view builder that produces content that
                 populates a list of suggestions.
      */
-    public func searchable<T: ObjectBase, P: _QueryString & _RealmSchemaDiscoverable, S>(text: Binding<String>, collection: ObservedResults<T>, keyPath: KeyPath<T, P>, placement: SearchFieldPlacement = .automatic, prompt: LocalizedStringKey, @ViewBuilder suggestions: () -> S) -> some View where S : View {
+    public func searchable<T: ObjectBase, P: _QueryString & _RealmSchemaDiscoverable, S>(text: Binding<String>, collection: ObservedResults<T>, keyPath: KeyPath<T, P>, placement: SearchFieldPlacement = .automatic, prompt: LocalizedStringKey, @ViewBuilder suggestions: () -> S) -> some View where S: View {
         filterCollection(collection, for: text.wrappedValue, on: keyPath)
         return searchable(text: text,
                           placement: placement,
@@ -1421,7 +1421,7 @@ extension View {
     - parameter suggestions: A view builder that produces content that
                 populates a list of suggestions.
      */
-    public func searchable<T: ObjectBase, P: _QueryString & _RealmSchemaDiscoverable, V, S>(text: Binding<String>, collection: ObservedResults<T>, keyPath: KeyPath<T, P>, placement: SearchFieldPlacement = .automatic, prompt: S, @ViewBuilder suggestions: () -> V) -> some View where V : View, S : StringProtocol {
+    public func searchable<T: ObjectBase, P: _QueryString & _RealmSchemaDiscoverable, V, S>(text: Binding<String>, collection: ObservedResults<T>, keyPath: KeyPath<T, P>, placement: SearchFieldPlacement = .automatic, prompt: S, @ViewBuilder suggestions: () -> V) -> some View where V: View, S: StringProtocol {
         filterCollection(collection, for: text.wrappedValue, on: keyPath)
         return searchable(text: text,
                           placement: placement,
