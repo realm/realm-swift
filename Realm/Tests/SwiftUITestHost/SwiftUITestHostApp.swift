@@ -325,7 +325,6 @@ struct App: SwiftUI.App {
                 } else {
                     return AnyView(EmptyView())
                 }
-
             default:
                 return AnyView(ContentView())
             }

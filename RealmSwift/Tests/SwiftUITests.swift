@@ -22,13 +22,13 @@ import RealmSwift
 import SwiftUI
 import Combine
 
-class SwiftUIObject: Object, ObjectKeyIdentifiable {
-    @Persisted var list = RealmSwift.List<SwiftBoolObject>()
-    @Persisted var map = Map<String, SwiftBoolObject?>()
-    @Persisted var primitiveList = RealmSwift.List<Int>()
-    @Persisted var primitiveMap = Map<String, Int>()
-    @Persisted var str = "foo"
-    @Persisted var int = 0
+@objcMembers class SwiftUIObject: Object, ObjectKeyIdentifiable {
+    var list = RealmSwift.List<SwiftBoolObject>()
+    var map = Map<String, SwiftBoolObject?>()
+    var primitiveList = RealmSwift.List<Int>()
+    var primitiveMap = Map<String, Int>()
+    dynamic var str = "foo"
+    dynamic var int = 0
 
     convenience init(str: String = "foo") {
         self.init()

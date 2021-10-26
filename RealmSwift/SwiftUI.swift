@@ -1163,128 +1163,12 @@ extension SwiftUIKVO {
     }
 }
 
-/// All methods on this extension allows us to filter @ObservedResult results from .searchable()
-/// component search field by a key path.
-///
-///     @State var searchString: String
-///     @ObservedResults(Reminder.self) var reminders
-///
-///     List {
-///         ForEach(reminders) { reminder in
-///             ReminderRowView(reminder: reminder)
-///         }
-///     }
-///     .searchable(text: $searchFilter,
-///                 collection: $reminders,
-///                 keyPath: \.name) {
-///         ForEach(reminders) { remindersFiltered in
-///             Text(remindersFiltered.name).searchCompletion(remindersFiltered.name)
-///         }
-///     }
-///
+// Adding `_Concurrency` flag is the only way to verify
+// if the BASE SDK contains latest framework updates
+#if swift(>=5.5) && canImport(_Concurrency)
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
 extension View {
-    /// Marks this view as searchable, which configures the display of a
-    /// search field.
-    ///
-    /// Use this modifier to create a user interface appropriate for searching.
-    ///
-    /// Wrapping a navigation view results in a column of the navigation
-    /// view displaying a search field. On iOS and iPadOS, the first or second
-    /// column displays the search field in a double, or triple column
-    /// navigation view respectively. On macOS, the search field is
-    /// placed in the trailing-most position of the toolbar.
-    ///
-    ///     var body: some View {
-    ///         NavigationView {
-    ///             PrimaryView()
-    ///             SecondaryView()
-    ///             Text("Select a primary and secondary item")
-    ///         }
-    ///         .searchable(text: $text)
-    ///     }
-    ///
-    /// On iOS, iPadOS, or watchOS, wrapping a specific column of a navigation view
-    /// results in that column displaying a search field.
-    ///
-    ///     struct DestinationPageView: View {
-    ///         @State private var text = ""
-    ///         var body: some View {
-    ///             Text("Destination Page")
-    ///                 .searchable(text: $text)
-    ///         }
-    ///     }
-    ///
-    ///     var body: some View {
-    ///         NavigationView {
-    ///             List {
-    ///                 NavigationLink(
-    ///                     "Destination Page",
-    ///                     destination: DestinationPageView()
-    ///                 )
-    ///             }
-    ///             Text("Select a destination")
-    ///         }
-    ///     }
-    ///
-    /// You can query the ``EnvironmentValues/isSearching`` property to
-    /// adjust the view hierarchy within the searchable modifier.
-    /// You can also provide search suggestions using the suggestions parameter
-    /// of searchable modifiers.
-    ///
-    /// Use the ``View/searchCompletion(_:)`` modifier to associate strings
-    /// to the views provided to the suggestions view. The system
-    /// uses these strings to replace the partial text being currently
-    /// edited of the associated search field. If a view has no
-    /// completion modifier, it's displayed as is.
-    ///
-    ///     SearchPlaceholderView()
-    ///         .searchable(text: $text) {
-    ///             Text("🍎").searchCompletion("apple")
-    ///             Text("🍐").searchCompletion("pear")
-    ///             Text("🍌").searchCompletion("banana")
-    ///         }
-    ///
-    /// The presentation of the suggestions depends on whether any
-    /// content is provided to the `suggestions` parameter.
-    ///
-    ///     SearchPlaceholderView()
-    ///         .searchable(text: $text) {
-    ///             ForEach(viewModel.suggestedSearches) { suggestion in
-    ///                 Label(suggestion.title,  image: suggestion.image)
-    ///                     .searchCompletion(suggestion.text)
-    ///             }
-    ///         }
-    ///
-    /// If `viewModel.suggestedSearches` begins as an empty array, then
-    /// the suggestions aren't initially displayed. When the array
-    /// becomes populated, the suggestions are presented. Note that
-    /// the suggestions may be dismissed based on a user's action, like
-    /// moving the window of the app on macOS for example.
-    ///
-    /// > Note: On tvOS, searchable modifiers only support suggestions of type
-    /// ``Text``.
-    ///
-    /// You can associate an action to be invoked upon submission of the current
-    /// search query by using an ``View/onSubmit(of:_:)`` modifier in
-    /// conjunction with the a searchable modifier.
-    ///
-    ///     @StateObject private var viewModel = ViewModel()
-    ///
-    ///     NavigationView {
-    ///         SidebarView()
-    ///         DetailView()
-    ///     }
-    ///     .searchable(
-    ///         text: $viewModel.searchText,
-    ///         placement: .sidebar
-    ///     ) {
-    ///         SuggestionsView()
-    ///     }
-    ///     .onSubmit(of: .search) {
-    ///         viewModel.submitCurrentSearchQuery()
-    ///     }
-    ///
+    /// Marks this view as searchable, which configures the display of a search field.
     /// You can provide a collection and a key path to be filtered using the search
     /// field string provided by the searchable component, this will result in the collection
     /// querying for all items containing the search field string for the given key path.
@@ -1304,7 +1188,12 @@ extension View {
     ///             Text(remindersFiltered.name).searchCompletion(remindersFiltered.name)
     ///         }
     ///     }
+    ///
     /**
+    - Note: See ``SwiftUI/View/searchable(text:placement:prompt)``
+            <https://developer.apple.com/documentation/swiftui/form/searchable(text:placement:prompt:)-6royb>
+            for more information on searchable view modifier.
+
     - parameter text: The text to display and edit in the search field.
     - parameter collection: The collection to be filtered.
     - parameter keyPath: The key path to the property which will be used to filter
@@ -1321,107 +1210,7 @@ extension View {
                           prompt: prompt)
     }
 
-    /// Marks this view as searchable, which configures the display of a
-    /// search field.
-    ///
-    /// Use this modifier to create a user interface appropriate for searching.
-    ///
-    /// Wrapping a navigation view results in a column of the navigation
-    /// view displaying a search field. On iOS and iPadOS, the first or second
-    /// column displays the search field in a double, or triple column
-    /// navigation view respectively. On macOS, the search field is
-    /// placed in the trailing-most position of the toolbar.
-    ///
-    ///     var body: some View {
-    ///         NavigationView {
-    ///             PrimaryView()
-    ///             SecondaryView()
-    ///             Text("Select a primary and secondary item")
-    ///         }
-    ///         .searchable(text: $text)
-    ///     }
-    ///
-    /// On iOS, iPadOS, or watchOS, wrapping a specific column of a navigation view
-    /// results in that column displaying a search field.
-    ///
-    ///     struct DestinationPageView: View {
-    ///         @State private var text = ""
-    ///         var body: some View {
-    ///             Text("Destination Page")
-    ///                 .searchable(text: $text)
-    ///         }
-    ///     }
-    ///
-    ///     var body: some View {
-    ///         NavigationView {
-    ///             List {
-    ///                 NavigationLink(
-    ///                     "Destination Page",
-    ///                     destination: DestinationPageView()
-    ///                 )
-    ///             }
-    ///             Text("Select a destination")
-    ///         }
-    ///     }
-    ///
-    /// You can query the ``EnvironmentValues/isSearching`` property to
-    /// adjust the view hierarchy within the searchable modifier.
-    /// You can also provide search suggestions using the suggestions parameter
-    /// of searchable modifiers.
-    ///
-    /// Use the ``View/searchCompletion(_:)`` modifier to associate strings
-    /// to the views provided to the suggestions view. The system
-    /// uses these strings to replace the partial text being currently
-    /// edited of the associated search field. If a view has no
-    /// completion modifier, it's displayed as is.
-    ///
-    ///     SearchPlaceholderView()
-    ///         .searchable(text: $text) {
-    ///             Text("🍎").searchCompletion("apple")
-    ///             Text("🍐").searchCompletion("pear")
-    ///             Text("🍌").searchCompletion("banana")
-    ///         }
-    ///
-    /// The presentation of the suggestions depends on whether any
-    /// content is provided to the `suggestions` parameter.
-    ///
-    ///     SearchPlaceholderView()
-    ///         .searchable(text: $text) {
-    ///             ForEach(viewModel.suggestedSearches) { suggestion in
-    ///                 Label(suggestion.title,  image: suggestion.image)
-    ///                     .searchCompletion(suggestion.text)
-    ///             }
-    ///         }
-    ///
-    /// If `viewModel.suggestedSearches` begins as an empty array, then
-    /// the suggestions aren't initially displayed. When the array
-    /// becomes populated, the suggestions are presented. Note that
-    /// the suggestions may be dismissed based on a user's action, like
-    /// moving the window of the app on macOS for example.
-    ///
-    /// > Note: On tvOS, searchable modifiers only support suggestions of type
-    /// ``Text``.
-    ///
-    /// You can associate an action to be invoked upon submission of the current
-    /// search query by using an ``View/onSubmit(of:_:)`` modifier in
-    /// conjunction with the a searchable modifier.
-    ///
-    ///     @StateObject private var viewModel = ViewModel()
-    ///
-    ///     NavigationView {
-    ///         SidebarView()
-    ///         DetailView()
-    ///     }
-    ///     .searchable(
-    ///         text: $viewModel.searchText,
-    ///         placement: .sidebar
-    ///     ) {
-    ///         SuggestionsView()
-    ///     }
-    ///     .onSubmit(of: .search) {
-    ///         viewModel.submitCurrentSearchQuery()
-    ///     }
-    ///
+    /// Marks this view as searchable, which configures the display of a search field.
     /// You can provide a collection and a key path to be filtered using the search
     /// field string provided by the searchable component, this will result in the collection
     /// querying for all items containing the search field string for the given key path.
@@ -1441,7 +1230,12 @@ extension View {
     ///             Text(remindersFiltered.name).searchCompletion(remindersFiltered.name)
     ///         }
     ///     }
+    ///
     /**
+    - Note: See ``SwiftUI/View/searchable(text:placement:prompt)``
+            <https://developer.apple.com/documentation/swiftui/form/searchable(text:placement:prompt:)-2ed8t>
+            for more information on searchable view modifier.
+
     - parameter text: The text to display and edit in the search field.
     - parameter collection: The collection to be filtered.
     - parameter keyPath: The key path to the property which will be used to filter
@@ -1458,107 +1252,7 @@ extension View {
                           prompt: prompt)
     }
 
-    /// Marks this view as searchable, which configures the display of a
-    /// search field.
-    ///
-    /// Use this modifier to create a user interface appropriate for searching.
-    ///
-    /// Wrapping a navigation view results in a column of the navigation
-    /// view displaying a search field. On iOS and iPadOS, the first or second
-    /// column displays the search field in a double, or triple column
-    /// navigation view respectively. On macOS, the search field is
-    /// placed in the trailing-most position of the toolbar.
-    ///
-    ///     var body: some View {
-    ///         NavigationView {
-    ///             PrimaryView()
-    ///             SecondaryView()
-    ///             Text("Select a primary and secondary item")
-    ///         }
-    ///         .searchable(text: $text)
-    ///     }
-    ///
-    /// On iOS, iPadOS, or watchOS, wrapping a specific column of a navigation view
-    /// results in that column displaying a search field.
-    ///
-    ///     struct DestinationPageView: View {
-    ///         @State private var text = ""
-    ///         var body: some View {
-    ///             Text("Destination Page")
-    ///                 .searchable(text: $text)
-    ///         }
-    ///     }
-    ///
-    ///     var body: some View {
-    ///         NavigationView {
-    ///             List {
-    ///                 NavigationLink(
-    ///                     "Destination Page",
-    ///                     destination: DestinationPageView()
-    ///                 )
-    ///             }
-    ///             Text("Select a destination")
-    ///         }
-    ///     }
-    ///
-    /// You can query the ``EnvironmentValues/isSearching`` property to
-    /// adjust the view hierarchy within the searchable modifier.
-    /// You can also provide search suggestions using the suggestions parameter
-    /// of searchable modifiers.
-    ///
-    /// Use the ``View/searchCompletion(_:)`` modifier to associate strings
-    /// to the views provided to the suggestions view. The system
-    /// uses these strings to replace the partial text being currently
-    /// edited of the associated search field. If a view has no
-    /// completion modifier, it's displayed as is.
-    ///
-    ///     SearchPlaceholderView()
-    ///         .searchable(text: $text) {
-    ///             Text("🍎").searchCompletion("apple")
-    ///             Text("🍐").searchCompletion("pear")
-    ///             Text("🍌").searchCompletion("banana")
-    ///         }
-    ///
-    /// The presentation of the suggestions depends on whether any
-    /// content is provided to the `suggestions` parameter.
-    ///
-    ///     SearchPlaceholderView()
-    ///         .searchable(text: $text) {
-    ///             ForEach(viewModel.suggestedSearches) { suggestion in
-    ///                 Label(suggestion.title,  image: suggestion.image)
-    ///                     .searchCompletion(suggestion.text)
-    ///             }
-    ///         }
-    ///
-    /// If `viewModel.suggestedSearches` begins as an empty array, then
-    /// the suggestions aren't initially displayed. When the array
-    /// becomes populated, the suggestions are presented. Note that
-    /// the suggestions may be dismissed based on a user's action, like
-    /// moving the window of the app on macOS for example.
-    ///
-    /// > Note: On tvOS, searchable modifiers only support suggestions of type
-    /// ``Text``.
-    ///
-    /// You can associate an action to be invoked upon submission of the current
-    /// search query by using an ``View/onSubmit(of:_:)`` modifier in
-    /// conjunction with the a searchable modifier.
-    ///
-    ///     @StateObject private var viewModel = ViewModel()
-    ///
-    ///     NavigationView {
-    ///         SidebarView()
-    ///         DetailView()
-    ///     }
-    ///     .searchable(
-    ///         text: $viewModel.searchText,
-    ///         placement: .sidebar
-    ///     ) {
-    ///         SuggestionsView()
-    ///     }
-    ///     .onSubmit(of: .search) {
-    ///         viewModel.submitCurrentSearchQuery()
-    ///     }
-    ///
+    /// Marks this view as searchable, which configures the display of a search field.
     /// You can provide a collection and a key path to be filtered using the search
     /// field string provided by the searchable component, this will result in the collection
     /// querying for all items containing the search field string for the given key path.
@@ -1578,7 +1272,12 @@ extension View {
     ///             Text(remindersFiltered.name).searchCompletion(remindersFiltered.name)
     ///         }
     ///     }
+    ///
     /**
+    - Note: See ``SwiftUI/View/searchable(text:placement:prompt)``
+            <https://developer.apple.com/documentation/swiftui/form/searchable(text:placement:prompt:)-58egp>
+            for more information on searchable view modifier.
+
     - parameter text: The text to display and edit in the search field.
     - parameter collection: The collection to be filtered.
     - parameter keyPath: The key path to the property which will be used to filter
@@ -1595,107 +1294,7 @@ extension View {
                           prompt: prompt)
     }
 
-    /// Marks this view as searchable, which configures the display of a
-    /// search field.
-    ///
-    /// Use this modifier to create a user interface appropriate for searching.
-    ///
-    /// Wrapping a navigation view results in a column of the navigation
-    /// view displaying a search field. On iOS and iPadOS, the first or second
-    /// column displays the search field in a double, or triple column
-    /// navigation view respectively. On macOS, the search field is
-    /// placed in the trailing-most position of the toolbar.
-    ///
-    ///     var body: some View {
-    ///         NavigationView {
-    ///             PrimaryView()
-    ///             SecondaryView()
-    ///             Text("Select a primary and secondary item")
-    ///         }
-    ///         .searchable(text: $text)
-    ///     }
-    ///
-    /// On iOS, iPadOS, or watchOS, wrapping a specific column of a navigation view
-    /// results in that column displaying a search field.
-    ///
-    ///     struct DestinationPageView: View {
-    ///         @State private var text = ""
-    ///         var body: some View {
-    ///             Text("Destination Page")
-    ///                 .searchable(text: $text)
-    ///         }
-    ///     }
-    ///
-    ///     var body: some View {
-    ///         NavigationView {
-    ///             List {
-    ///                 NavigationLink(
-    ///                     "Destination Page",
-    ///                     destination: DestinationPageView()
-    ///                 )
-    ///             }
-    ///             Text("Select a destination")
-    ///         }
-    ///     }
-    ///
-    /// You can query the ``EnvironmentValues/isSearching`` property to
-    /// adjust the view hierarchy within the searchable modifier.
-    /// You can also provide search suggestions using the suggestions parameter
-    /// of searchable modifiers.
-    ///
-    /// Use the ``View/searchCompletion(_:)`` modifier to associate strings
-    /// to the views provided to the suggestions view. The system
-    /// uses these strings to replace the partial text being currently
-    /// edited of the associated search field. If a view has no
-    /// completion modifier, it's displayed as is.
-    ///
-    ///     SearchPlaceholderView()
-    ///         .searchable(text: $text) {
-    ///             Text("🍎").searchCompletion("apple")
-    ///             Text("🍐").searchCompletion("pear")
-    ///             Text("🍌").searchCompletion("banana")
-    ///         }
-    ///
-    /// The presentation of the suggestions depends on whether any
-    /// content is provided to the `suggestions` parameter.
-    ///
-    ///     SearchPlaceholderView()
-    ///         .searchable(text: $text) {
-    ///             ForEach(viewModel.suggestedSearches) { suggestion in
-    ///                 Label(suggestion.title,  image: suggestion.image)
-    ///                     .searchCompletion(suggestion.text)
-    ///             }
-    ///         }
-    ///
-    /// If `viewModel.suggestedSearches` begins as an empty array, then
-    /// the suggestions aren't initially displayed. When the array
-    /// becomes populated, the suggestions are presented. Note that
-    /// the suggestions may be dismissed based on a user's action, like
-    /// moving the window of the app on macOS for example.
-    ///
-    /// > Note: On tvOS, searchable modifiers only support suggestions of type
-    /// ``Text``.
-    ///
-    /// You can associate an action to be invoked upon submission of the current
-    /// search query by using an ``View/onSubmit(of:_:)`` modifier in
-    /// conjunction with the a searchable modifier.
-    ///
-    ///     @StateObject private var viewModel = ViewModel()
-    ///
-    ///     NavigationView {
-    ///         SidebarView()
-    ///         DetailView()
-    ///     }
-    ///     .searchable(
-    ///         text: $viewModel.searchText,
-    ///         placement: .sidebar
-    ///     ) {
-    ///         SuggestionsView()
-    ///     }
-    ///     .onSubmit(of: .search) {
-    ///         viewModel.submitCurrentSearchQuery()
-    ///     }
-    ///
+    /// Marks this view as searchable, which configures the display of a search field.
     /// You can provide a collection and a key path to be filtered using the search
     /// field string provided by the searchable component, this will result in the collection
     /// querying for all items containing the search field string for the given key path.
@@ -1715,7 +1314,12 @@ extension View {
     ///             Text(remindersFiltered.name).searchCompletion(remindersFiltered.name)
     ///         }
     ///     }
+    ///
     /**
+    - Note: See ``SwiftUI/View/searchable(text:placement:prompt:suggestions)``
+            <https://developer.apple.com/documentation/swiftui/form/searchable(text:placement:prompt:suggestions:)-94bdu>
+            for more information on searchable view modifier.
+
     - parameter text: The text to display and edit in the search field.
     - parameter collection: The collection to be filtered.
     - parameter keyPath: The key path to the property which will be used to filter
@@ -1735,107 +1339,7 @@ extension View {
                           suggestions: suggestions)
     }
 
-    /// Marks this view as searchable, which configures the display of a
-    /// search field.
-    ///
-    /// Use this modifier to create a user interface appropriate for searching.
-    ///
-    /// Wrapping a navigation view results in a column of the navigation
-    /// view displaying a search field. On iOS and iPadOS, the first or second
-    /// column displays the search field in a double, or triple column
-    /// navigation view respectively. On macOS, the search field is
-    /// placed in the trailing-most position of the toolbar.
-    ///
-    ///     var body: some View {
-    ///         NavigationView {
-    ///             PrimaryView()
-    ///             SecondaryView()
-    ///             Text("Select a primary and secondary item")
-    ///         }
-    ///         .searchable(text: $text)
-    ///     }
-    ///
-    /// On iOS, iPadOS, or watchOS, wrapping a specific column of a navigation view
-    /// results in that column displaying a search field.
-    ///
-    ///     struct DestinationPageView: View {
-    ///         @State private var text = ""
-    ///         var body: some View {
-    ///             Text("Destination Page")
-    ///                 .searchable(text: $text)
-    ///         }
-    ///     }
-    ///
-    ///     var body: some View {
-    ///         NavigationView {
-    ///             List {
-    ///                 NavigationLink(
-    ///                     "Destination Page",
-    ///                     destination: DestinationPageView()
-    ///                 )
-    ///             }
-    ///             Text("Select a destination")
-    ///         }
-    ///     }
-    ///
-    /// You can query the ``EnvironmentValues/isSearching`` property to
-    /// adjust the view hierarchy within the searchable modifier.
-    /// You can also provide search suggestions using the suggestions parameter
-    /// of searchable modifiers.
-    ///
-    /// Use the ``View/searchCompletion(_:)`` modifier to associate strings
-    /// to the views provided to the suggestions view. The system
-    /// uses these strings to replace the partial text being currently
-    /// edited of the associated search field. If a view has no
-    /// completion modifier, it's displayed as is.
-    ///
-    ///     SearchPlaceholderView()
-    ///         .searchable(text: $text) {
-    ///             Text("🍎").searchCompletion("apple")
-    ///             Text("🍐").searchCompletion("pear")
-    ///             Text("🍌").searchCompletion("banana")
-    ///         }
-    ///
-    /// The presentation of the suggestions depends on whether any
-    /// content is provided to the `suggestions` parameter.
-    ///
-    ///     SearchPlaceholderView()
-    ///         .searchable(text: $text) {
-    ///             ForEach(viewModel.suggestedSearches) { suggestion in
-    ///                 Label(suggestion.title,  image: suggestion.image)
-    ///                     .searchCompletion(suggestion.text)
-    ///             }
-    ///         }
-    ///
-    /// If `viewModel.suggestedSearches` begins as an empty array, then
-    /// the suggestions aren't initially displayed. When the array
-    /// becomes populated, the suggestions are presented. Note that
-    /// the suggestions may be dismissed based on a user's action, like
-    /// moving the window of the app on macOS for example.
-    ///
-    /// > Note: On tvOS, searchable modifiers only support suggestions of type
-    /// ``Text``.
-    ///
-    /// You can associate an action to be invoked upon submission of the current
-    /// search query by using an ``View/onSubmit(of:_:)`` modifier in
-    /// conjunction with the a searchable modifier.
-    ///
-    ///     @StateObject private var viewModel = ViewModel()
-    ///
-    ///     NavigationView {
-    ///         SidebarView()
-    ///         DetailView()
-    ///     }
-    ///     .searchable(
-    ///         text: $viewModel.searchText,
-    ///         placement: .sidebar
-    ///     ) {
-    ///         SuggestionsView()
-    ///     }
-    ///     .onSubmit(of: .search) {
-    ///         viewModel.submitCurrentSearchQuery()
-    ///     }
-    ///
+    /// Marks this view as searchable, which configures the display of a search field.
     /// You can provide a collection and a key path to be filtered using the search
     /// field string provided by the searchable component, this will result in the collection
     /// querying for all items containing the search field string for the given key path.
@@ -1855,7 +1359,12 @@ extension View {
     ///             Text(remindersFiltered.name).searchCompletion(remindersFiltered.name)
     ///         }
     ///     }
+    ///
     /**
+    - Note: See ``SwiftUI/View/searchable(text:placement:prompt:suggestions)``
+            <https://developer.apple.com/documentation/swiftui/form/searchable(text:placement:prompt:suggestions:)-1mw1m>
+            for more information on searchable view modifier.
+
     - parameter text: The text to display and edit in the search field.
     - parameter collection: The collection to be filtered.
     - parameter keyPath: The key path to the property which will be used to filter
@@ -1875,107 +1384,7 @@ extension View {
                           suggestions: suggestions)
     }
 
-    /// Marks this view as searchable, which configures the display of a
-    /// search field.
-    ///
-    /// Use this modifier to create a user interface appropriate for searching.
-    ///
-    /// Wrapping a navigation view results in a column of the navigation
-    /// view displaying a search field. On iOS and iPadOS, the first or second
-    /// column displays the search field in a double, or triple column
-    /// navigation view respectively. On macOS, the search field is
-    /// placed in the trailing-most position of the toolbar.
-    ///
-    ///     var body: some View {
-    ///         NavigationView {
-    ///             PrimaryView()
-    ///             SecondaryView()
-    ///             Text("Select a primary and secondary item")
-    ///         }
-    ///         .searchable(text: $text)
-    ///     }
-    ///
-    /// On iOS, iPadOS, or watchOS, wrapping a specific column of a navigation view
-    /// results in that column displaying a search field.
-    ///
-    ///     struct DestinationPageView: View {
-    ///         @State private var text = ""
-    ///         var body: some View {
-    ///             Text("Destination Page")
-    ///                 .searchable(text: $text)
-    ///         }
-    ///     }
-    ///
-    ///     var body: some View {
-    ///         NavigationView {
-    ///             List {
-    ///                 NavigationLink(
-    ///                     "Destination Page",
-    ///                     destination: DestinationPageView()
-    ///                 )
-    ///             }
-    ///             Text("Select a destination")
-    ///         }
-    ///     }
-    ///
-    /// You can query the ``EnvironmentValues/isSearching`` property to
-    /// adjust the view hierarchy within the searchable modifier.
-    /// You can also provide search suggestions using the suggestions parameter
-    /// of searchable modifiers.
-    ///
-    /// Use the ``View/searchCompletion(_:)`` modifier to associate strings
-    /// to the views provided to the suggestions view. The system
-    /// uses these strings to replace the partial text being currently
-    /// edited of the associated search field. If a view has no
-    /// completion modifier, it's displayed as is.
-    ///
-    ///     SearchPlaceholderView()
-    ///         .searchable(text: $text) {
-    ///             Text("🍎").searchCompletion("apple")
-    ///             Text("🍐").searchCompletion("pear")
-    ///             Text("🍌").searchCompletion("banana")
-    ///         }
-    ///
-    /// The presentation of the suggestions depends on whether any
-    /// content is provided to the `suggestions` parameter.
-    ///
-    ///     SearchPlaceholderView()
-    ///         .searchable(text: $text) {
-    ///             ForEach(viewModel.suggestedSearches) { suggestion in
-    ///                 Label(suggestion.title,  image: suggestion.image)
-    ///                     .searchCompletion(suggestion.text)
-    ///             }
-    ///         }
-    ///
-    /// If `viewModel.suggestedSearches` begins as an empty array, then
-    /// the suggestions aren't initially displayed. When the array
-    /// becomes populated, the suggestions are presented. Note that
-    /// the suggestions may be dismissed based on a user's action, like
-    /// moving the window of the app on macOS for example.
-    ///
-    /// > Note: On tvOS, searchable modifiers only support suggestions of type
-    /// ``Text``.
-    ///
-    /// You can associate an action to be invoked upon submission of the current
-    /// search query by using an ``View/onSubmit(of:_:)`` modifier in
-    /// conjunction with the a searchable modifier.
-    ///
-    ///     @StateObject private var viewModel = ViewModel()
-    ///
-    ///     NavigationView {
-    ///         SidebarView()
-    ///         DetailView()
-    ///     }
-    ///     .searchable(
-    ///         text: $viewModel.searchText,
-    ///         placement: .sidebar
-    ///     ) {
-    ///         SuggestionsView()
-    ///     }
-    ///     .onSubmit(of: .search) {
-    ///         viewModel.submitCurrentSearchQuery()
-    ///     }
-    ///
+    /// Marks this view as searchable, which configures the display of a search field.
     /// You can provide a collection and a key path to be filtered using the search
     /// field string provided by the searchable component, this will result in the collection
     /// querying for all items containing the search field string for the given key path.
@@ -1995,7 +1404,12 @@ extension View {
     ///             Text(remindersFiltered.name).searchCompletion(remindersFiltered.name)
     ///         }
     ///     }
+    ///
     /**
+    - Note: See ``SwiftUI/View/searchable(text:placement:prompt:suggestions)``
+            <https://developer.apple.com/documentation/swiftui/form/searchable(text:placement:prompt:suggestions:)-6h6qo>
+            for more information on searchable view modifier.
+     
     - parameter text: The text to display and edit in the search field.
     - parameter collection: The collection to be filtered.
     - parameter keyPath: The key path to the property which will be used to filter
@@ -2027,7 +1441,7 @@ extension View {
         }
     }
 }
-
+#endif
 #else
 @objc(RLMSwiftUIKVO) internal final class SwiftUIKVO: NSObject {
     @objc(removeObserversFromObject:) public static func removeObservers(object: NSObject) -> Bool {

@@ -19,7 +19,7 @@
 import RealmSwift
 import Foundation
 
-class Reminder: EmbeddedObject, Identifiable {
+class Reminder: EmbeddedObject, ObjectKeyIdentifiable {
      enum Priority: Int, PersistableEnum, CaseIterable, Identifiable, CustomStringConvertible {
         var id: Int { self.rawValue }
 
@@ -41,9 +41,8 @@ class Reminder: EmbeddedObject, Identifiable {
     @Persisted var priority: Priority = .low
 }
 
-class ReminderList: Object, Identifiable {
-    @Persisted(primaryKey: true) var id = ObjectId.generate()
+class ReminderList: Object, ObjectKeyIdentifiable {
     @Persisted var name = "New List"
-    @Persisted var icon: String = "list.bullet"
+    @Persisted var icon = "list.bullet"
     @Persisted var reminders = RealmSwift.List<Reminder>()
 }
