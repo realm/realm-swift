@@ -734,7 +734,7 @@ import Combine
 
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 extension Publishers {
-    class WatchSubscription<S: Subscriber>: ChangeEventDelegate, Subscription where S.Input == AnyBSON, S.Failure == Error {
+    class WatchSubscription<S: Subscriber>: ChangeEventDelegate, Combine.Subscription where S.Input == AnyBSON, S.Failure == Error {
         private let collection: MongoCollection
         private var changeStream: ChangeStream?
         private var subscriber: S?

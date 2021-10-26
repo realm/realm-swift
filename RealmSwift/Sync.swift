@@ -636,7 +636,7 @@ public extension User {
 
 /// :nodoc:
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, macCatalyst 13.0, macCatalystApplicationExtension 13.0, *)
-@frozen public struct UserSubscription: Subscription {
+@frozen public struct UserSubscription: Combine.Subscription {
     private let user: User
     private let token: RLMUserSubscriptionToken
 
@@ -710,3 +710,42 @@ public extension User {
         }
     }
 }
+
+#if swift(>=5.5) && canImport(_Concurrency)
+@available(macOS 12.0, tvOS 15.0, iOS 15.0, watchOS 8.0, *)
+public extension User {
+    /// Links the currently authenticated user with a new identity, where the identity is defined by the credential
+    /// specified as a parameter. This will only be successful if this `User` is the currently authenticated
+    /// with the client from which it was created. On success a new user will be returned with the new linked credentials.
+    /// - Parameters:
+    ///   - credentials: The `Credentials` used to link the user to a new identity.
+    /// - Returns:A `User` after successfully update its identity.
+    func linkUser(credentials: Credentials) async throws -> User {
+        return try await withCheckedThrowingContinuation { continuation in
+            linkUser(credentials: credentials, continuation.resume)
+        }
+    }
+}
+
+@available(macOS 12.0, tvOS 15.0, iOS 15.0, watchOS 8.0, *)
+extension FunctionCallable {
+    /// The implementation of @dynamicMemberLookup that allows  for `async await` callable return.
+    ///
+    ///     guard case let .int32(sum) = try await user.functions.sum([1, 2, 3, 4, 5]) else {
+    ///        return
+    ///     }
+    ///
+    public func dynamicallyCall(withArguments args: [[AnyBSON]]) async throws -> AnyBSON {
+        try await withCheckedThrowingContinuation { continuation in
+            let objcArgs = args.first!.map(ObjectiveCSupport.convertBson)
+            self.user.__callFunctionNamed(name, arguments: objcArgs) { (bson: RLMBSON?, error: Error?) in
+                if let b = bson.map(ObjectiveCSupport.convertBson), let bson = b {
+                    continuation.resume(returning: bson)
+                } else {
+                    continuation.resume(throwing: error ?? Realm.Error.callFailed)
+                }
+            }
+        }
+    }
+}
+#endif // swift(>=5.5)
