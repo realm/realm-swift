@@ -1,14 +1,6 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* Add support for multi-user on `@AsyncOpen` and `@AutoOpen`.
-
-### Fixed
-* Fix `@AsyncOpen` and `@AutoOpen` using `defaultConfiguration` by default if 
-  the user's doesn't provide one, will set an incorrect path which doesn't 
-  correspond to the users configuration one. (since v10.12.0)
-* Adding missing subscription completion for `AsyncOpenPublisher` after successfully 
-  returning a realm.
 * Add an api for a type safe query syntax. This allows you to filter a Realm and collections managed by a Realm
   with Swift style expressions. Here is a brief example:
   ```swift
@@ -30,6 +22,9 @@ x.y.z Release notes (yyyy-MM-dd)
     ($0.pets.age >= 2) && $0.pets.name.starts(with: "L")
   }
   ```([Cocoa #7419](https://github.com/realm/realm-cocoa/pull/7419))
+  
+### Fixed
+* None.
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
@@ -38,10 +33,35 @@ x.y.z Release notes (yyyy-MM-dd)
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 13.0.
 * CocoaPods: 1.10 or later.
-* Xcode: 12.2-13.0.
+* Xcode: 12.2-13.1.
 
 ### Internal
 * Upgraded realm-core from ? to ?
+
+10.18.0 Release notes (2021-10-25)
+=============================================================
+
+### Enhancements
+* Add support for using multiple users with `@AsyncOpen` and `@AutoOpen`.
+  Setting the current user to a new user will now automatically reopen the
+  Realm with the new user.
+* Add prebuilt binary for Xcode 13.1 to the release package.
+
+### Fixed
+
+* Fix `@AsyncOpen` and `@AutoOpen` using `defaultConfiguration` by default if
+  the user's doesn't provide one, will set an incorrect path which doesn't
+  correspond to the users configuration one. (since v10.12.0)
+* Adding missing subscription completion for `AsyncOpenPublisher` after
+  successfully returning a realm.
+
+### Compatibility
+
+* Realm Studio: 11.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 13.1.
+* CocoaPods: 1.10 or later.
+* Xcode: 12.2-13.1.
 
 10.17.0 Release notes (2021-10-06)
 =============================================================
