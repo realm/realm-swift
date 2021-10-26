@@ -2,6 +2,28 @@ x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
 * Conform `@ThreadSafe` and `ThreadSafeReference` to `Sendable`.
+* Add class `Projection` to allow creation of light weight view models out of Realm Objects.  
+```swift
+public class Person: Object {
+    @Persisted var firstName = ""
+    @Persisted var lastName = ""
+    @Persisted var address: Address? = nil
+    @Persisted var friends = List<Person>()
+}
+
+public class Address: EmbeddedObject {
+    @Persisted var city: String = ""
+    @Persisted var country = ""
+}
+
+struct PersonProjection: Projection {
+    @Projected(\Person.firstName) var firstName         // `Person.firstName` will have same name and type
+    @Projected(\Person.address.city) var homeCity       // There will be the only String for `city` of the original object `Address` 
+    @Projected(\Person.friends.projectTo.firstName) var firstFriendsName: ProjectedList<String>     // List<Person> will be mapped to list of firstNames
+}
+
+let people: [PersonProjection] = realm.objects(PersonProjection.self) // `people` will contain projections for every `Person` object in the `realm`
+```
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
@@ -157,28 +179,6 @@ x.y.z Release notes (yyyy-MM-dd)
 * Add a new `@ThreadSafe` property wrapper. Objects and collections wrapped by `@ThreadSafe` may be passed between threads. It's
   intended to allow local variables and function parameters to be used across
   threads when needed.
-* Add class Projection to allow creation of light weight view models out of Realm Objects.  
-  ```swift
-public class Person: Object {
-    @Persisted var firstName = ""
-    @Persisted var lastName = ""
-    @Persisted var address: Address? = nil
-    @Persisted var friends = List<Person>()
-}
-
-public class Address: EmbeddedObject {
-    @Persisted var city: String = ""
-    @Persisted var country = ""
-}
-
-struct PersonProjection: Projection {
-    @Projected(\Person.firstName) var firstName         // `Person.firstName` will have same name and type
-    @Projected(\Person.address.city) var homeCity       // There will be the only String for `city` of the original object `Address` 
-    @Projected(\Person.friends.projectTo.firstName) var firstFriendsName: ProjectedList<String>     // List<Person> will be mapped to list of firstNames
-}
-
-let people: [PersonProjection] = realm.objects(PersonProjection.self) // `people` will contain projections for every `Person` object in the `realm`
-  ```
 
 ### Fixed
 

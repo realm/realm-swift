@@ -450,6 +450,7 @@ class ProjectionTests: TestCase {
 
     func testProjectionEnumeration() {
         let realm = realmWithTestPath()
+        XCTAssertGreaterThan(realm.objects(PersonProjection.self).count, 0)
         for proj in realm.objects(PersonProjection.self) {
             _ = proj
         }
