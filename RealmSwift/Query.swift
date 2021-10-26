@@ -73,8 +73,6 @@ public struct StringOptions: OptionSet {
  ### Collections
  - IN `.contains(_ element:)`
  - Between `.contains(_ range:)`
- - ANY ... IN `.containsAnyIn(_ collection:)`
-
 
  ### Map
  - @allKeys `.keys`
