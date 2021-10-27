@@ -1336,7 +1336,6 @@ struct KeyPath {
     std::vector<RLMProperty *> links;
     RLMProperty *property;
     bool containsToManyRelationship;
-    bool isDictionary;
 };
 
 KeyPath key_path_from_string(RLMSchema *schema, RLMObjectSchema *objectSchema, NSString *keyPath)
@@ -1345,7 +1344,6 @@ KeyPath key_path_from_string(RLMSchema *schema, RLMObjectSchema *objectSchema, N
     std::vector<RLMProperty *> links;
 
     bool keyPathContainsToManyRelationship = false;
-    bool isDictionary = false;
 
     NSUInteger start = 0, length = keyPath.length, end = NSNotFound;
     do {
@@ -1358,8 +1356,6 @@ KeyPath key_path_from_string(RLMSchema *schema, RLMObjectSchema *objectSchema, N
 
         if (property.collection)
             keyPathContainsToManyRelationship = true;
-        if (property.dictionary)
-            isDictionary = true;
 
         if (end != NSNotFound) {
             RLMPrecondition(property.type == RLMPropertyTypeObject || property.type == RLMPropertyTypeLinkingObjects,
@@ -1374,7 +1370,7 @@ KeyPath key_path_from_string(RLMSchema *schema, RLMObjectSchema *objectSchema, N
         start = end + 1;
     } while (end != NSNotFound);
 
-    return {std::move(links), property, keyPathContainsToManyRelationship, isDictionary};
+    return {std::move(links), property, keyPathContainsToManyRelationship};
 }
 
 ColumnReference QueryBuilder::column_reference_from_key_path(RLMObjectSchema *objectSchema,
@@ -1385,7 +1381,7 @@ ColumnReference QueryBuilder::column_reference_from_key_path(RLMObjectSchema *ob
     if (isAggregate && !keyPath.containsToManyRelationship) {
         throwException(@"Invalid predicate",
                        @"Aggregate operations can only be used on key paths that include an collection property");
-    } else if (!isAggregate && keyPath.containsToManyRelationship && !keyPath.isDictionary) {
+    } else if (!isAggregate && keyPath.containsToManyRelationship) {
         throwException(@"Invalid predicate",
                        @"Key paths that include a collection property must use aggregate operations");
     }
@@ -1874,20 +1870,22 @@ NSExpression *simplify_self_value_for_key_path_function_expression(NSExpression 
 void QueryBuilder::apply_map_expression(RLMObjectSchema *objectSchema, NSExpression *functionExpression,
                                         NSComparisonPredicateOptions options, NSPredicateOperatorType operatorType,
                                         NSExpression *right) {
-    NSExpression *keyPathExpression;
+    NSString *keyPath;
     NSString *mapKey;
     if (functionExpression.operand.expressionType == NSKeyPathExpressionType) {
         NSExpression *mapItems = [functionExpression.arguments firstObject];
         NSExpression *linkCol = [[functionExpression.operand arguments] firstObject];
         NSExpression *mapCol = [mapItems.arguments firstObject];
         mapKey = [mapItems.arguments[1] constantValue];
-        keyPathExpression = [NSExpression expressionForKeyPath:[NSString stringWithFormat:@"%@.%@", linkCol.keyPath, mapCol.keyPath]];
+        keyPath = [NSString stringWithFormat:@"%@.%@", linkCol.keyPath, mapCol.keyPath];
     } else {
-        keyPathExpression = functionExpression.arguments.firstObject;
+        keyPath = [functionExpression.arguments.firstObject keyPath];
         mapKey = [functionExpression.arguments[1] constantValue];
     }
 
-    ColumnReference collectionColumn = column_reference_from_key_path(objectSchema, [keyPathExpression keyPath], true);
+    ColumnReference collectionColumn = column_reference_from_key_path(objectSchema, keyPath, true);
+    RLMPrecondition(collectionColumn.property().dictionary,
+                    @"Invalid predicate", @"Only dictionaries support subscript predicates.");
     add_mixed_constraint(operatorType, options, collectionColumn.resolve<Dictionary>().key([mapKey UTF8String]), [right constantValue]);
 }
 

@@ -22,8 +22,10 @@ x.y.z Release notes (yyyy-MM-dd)
     ($0.pets.age >= 2) && $0.pets.name.starts(with: "L")
   }
   ```([Cocoa #7419](https://github.com/realm/realm-cocoa/pull/7419))
+* Add support for dictionary subscript expressions (e.g. `"phoneNumbers['Jane'] == '123-3456-123'"`) when querying with an NSPredicate.
   
 ### Fixed
+* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
 * None.
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
@@ -42,6 +44,7 @@ x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 
 ### Enhancements
+
 * Add support for using multiple users with `@AsyncOpen` and `@AutoOpen`.
   Setting the current user to a new user will now automatically reopen the
   Realm with the new user.

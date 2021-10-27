@@ -2152,7 +2152,6 @@
     RLMAssertCount(CircleDictionaryObject, 1U, @"ANY circles.next.data = '3'");
     RLMAssertCount(CircleDictionaryObject, 1U, @"ANY circles.data = '3'");
     RLMAssertCount(CircleDictionaryObject, 1U, @"NONE circles.next.data = '4'");
-    RLMAssertCount(CircleDictionaryObject, 1U, @"circles.data = '2'");
 
     RLMAssertCount(CircleDictionaryObject, 0U, @"ANY circles.next.next.data = '3'");
     RLMAssertCount(CircleDictionaryObject, 1U, @"ANY circles.next.next.data = '2'");
@@ -2164,6 +2163,7 @@
     XCTAssertThrows([CircleDictionaryObject objectsInRealm:realm where:@"ANY circles.next = '2'"]);
     XCTAssertThrows([CircleDictionaryObject objectsInRealm:realm where:@"ANY data.circles = '2'"]);
     XCTAssertThrows([CircleDictionaryObject objectsInRealm:realm where:@"NONE data.circles = '2'"]);
+    XCTAssertThrows([CircleDictionaryObject objectsInRealm:realm where:@"circles.data = '2'"]);
 }
 
 - (void)testMultiLevelBackLinkQuery
@@ -2247,9 +2247,8 @@
     RLMAssertCount(DictionaryOfAllTypesObject, 3U, @"ANY dictionary != %@", obj1);
     RLMAssertCount(DictionaryOfAllTypesObject, 2U, @"NONE dictionary = %@", obj0);
     RLMAssertCount(DictionaryOfAllTypesObject, 1U, @"NONE dictionary != %@", obj1);
-
-    RLMAssertCount(DictionaryOfAllTypesObject, 2U, @"dictionary = %@", obj0);
-    RLMAssertCount(DictionaryOfAllTypesObject, 3U, @"dictionary != %@", obj1);
+    XCTAssertThrows(([DictionaryOfAllTypesObject objectsWhere:@"dictionary = %@", obj0].count));
+    XCTAssertThrows(([DictionaryOfAllTypesObject objectsWhere:@"dictionary != %@", obj0].count));
 }
 
 - (void)testCompoundOrQuery {
@@ -3803,6 +3802,12 @@ static NSData *data(const char *str) {
     RLMAssertCount(DictionaryParentObject, 1U, @"%K['aKey'] = %@", @"objectCol.stringDict", @"blah");
 }
 
+- (void)testDictionarySubscriptThrowsException {
+    RLMRealm *realm = [self realm];
+    RLMAssertThrowsWithReasonMatching(([realm objects:@"ArrayPropertyObject" where:@"array['invalid'] = NULL"]), @"Only dictionaries support subscript predicates.");
+    RLMAssertThrowsWithReasonMatching(([realm objects:@"SetPropertyObject" where:@"set['invalid'] = NULL"]), @"Only dictionaries support subscript predicates.");
+    RLMAssertThrowsWithReasonMatching(([realm objects:@"OwnerObject" where:@"dog['dogName'] = NULL"]), @"Aggregate operations can only be used on key paths that include an collection property");
+}
 
 - (void)testCollectionsQueryAllValuesAllKeys {
     RLMRealm *realm = [self realm];
