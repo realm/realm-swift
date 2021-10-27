@@ -134,24 +134,30 @@ class ObjectiveCSupportTests: TestCase {
 
 #if !SWIFT_PACKAGE
     func testArraySupport() {
-        let list = List<SwiftObject>()
-        let obj = SwiftObject()
-        list.append(obj)
-        obj.doubleCol = 42.42
-        let rlmArray = ObjectiveCSupport.convert(object: list)
-        XCTAssert(rlmArray.isKind(of: RLMArray<AnyObject>.self))
-        for object in rlmArray {
-            XCTAssertEqual(obj.doubleCol, object.value(forKey: "doubleCol") as? Double)
+        func testType<T: RealmCollectionValue>(_ firstValue: T) {
+            let list = List<T>()
+            list.append(firstValue)
+            let rlmArray = ObjectiveCSupport.convert(object: list)
+            XCTAssert(rlmArray.isKind(of: RLMArray<AnyObject>.self))
+            for object in rlmArray {
+                XCTAssertEqual(firstValue, object as? T)
+            }
         }
+        testType(SwiftObject())
+        testType(42.42)
+        testType("hello")
+        testType(EmbeddedTreeObject1())
+    }
 
-        let primitiveList = List<Double>()
-        let double = 42.42
-        primitiveList.append(double)
-        let primitiveRLMArray = ObjectiveCSupport.convert(object: primitiveList)
-        XCTAssert(primitiveRLMArray.isKind(of: RLMArray<AnyObject>.self))
-        for object in primitiveRLMArray {
-            XCTAssertEqual(double, object as? Double)
+    func testRLMArrayIterationForRLMEmbeddedObject() {
+        let rlmArrayEmbedded = RLMArray<EmbeddedIntObject>(objectClassName: EmbeddedIntObject.className())
+        let obj = EmbeddedIntObject()
+        obj.intCol = 42
+        rlmArrayEmbedded.add(obj)
+        for obj in rlmArrayEmbedded {
+            XCTAssertEqual(obj.intCol, 42)
         }
     }
 #endif
 }
+
