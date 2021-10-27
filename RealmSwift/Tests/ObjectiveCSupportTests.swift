@@ -132,6 +132,7 @@ class ObjectiveCSupportTests: TestCase {
         expected.forEach { testObjCSupport($0.0, value: $0.1) }
     }
 
+#if !SWIFT_PACKAGE
     func testArraySupport() {
         let list = List<SwiftObject>()
         let obj = SwiftObject()
@@ -152,4 +153,5 @@ class ObjectiveCSupportTests: TestCase {
             XCTAssertEqual(double, object as? Double)
         }
     }
+#endif
 }
