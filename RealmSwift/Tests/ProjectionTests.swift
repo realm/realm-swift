@@ -189,11 +189,6 @@ public class CommonPerson: Object {
 }
 
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
-public final class AddressProjection: Projection<AddressSwift> {
-    @Projected(\AddressSwift.city) var city
-}
-
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 public final class PersonProjection: Projection<CommonPerson> {
     @Projected(\CommonPerson.firstName) var firstName
     @Projected(\CommonPerson.lastName.localizedUppercase) var lastNameCaps
@@ -474,7 +469,6 @@ class ProjectionTests: TestCase {
 
     func testProjectionsRealmShouldNotBeNil() {
         XCTAssertNotNil(realmWithTestPath().objects(PersonProjection.self).first!.realm)
-        XCTAssertNotNil(realmWithTestPath().objects(AddressProjection.self).first!.realm)
     }
 
     func testProjectionFromResultSortedBirthday() {
