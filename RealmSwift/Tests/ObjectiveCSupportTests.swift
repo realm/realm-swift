@@ -160,4 +160,3 @@ class ObjectiveCSupportTests: TestCase {
     }
 #endif
 }
-
