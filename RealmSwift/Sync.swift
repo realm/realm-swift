@@ -749,3 +749,287 @@ extension FunctionCallable {
     }
 }
 #endif // swift(>=5.5)
+
+//Flexible Sync Configuration
+ //Same as with partition-based sync we get the configuration from the user
+ public extension User {
+     // Returns a flexible sync configuration to open the realm
+     func flexibleSyncConfiguration() -> Realm.Configuration {
+         fatalError()
+     }
+ }
+
+ public protocol AnySubscription {
+ }
+
+ public class Subscription<Element: Object>: AnySubscription {
+     public typealias QueryFunction = (Query<Element>) -> Query<Element>
+
+     // When the subscription was created. Recorded automatically.
+     public var createdAt: Date = Date()
+
+     // When the subscription was last updated. Recorded automatically.
+     public var updatedAt: Date = Date()
+
+     // Name of the subscription, if not specified it will return the value in Query
+     public var name: String = ""
+
+     #if swift(>=5.5) && canImport(_Concurrency)
+     // Async Unsubscribe query, this will return an error if we cannot unsubscribe
+     // this query
+     @available(macOS 12.0, tvOS 15.0, iOS 15.0, watchOS 8.0, *)
+     public func unsubscribe() async throws {
+         fatalError()
+     }
+
+     @available(macOS 12.0, tvOS 15.0, iOS 15.0, watchOS 8.0, *)
+     // Async Update query, this will return an error if the we cannot update
+     // the subscription
+     public func update(to: @escaping QueryFunction) async throws {
+         fatalError()
+     }
+     #endif // swift(>=5.5)
+     // Unsubscribe query, this will return success or an error
+     public func unsubscribe(callback: @escaping (Result<Void, Error>) -> Void) -> SubscriptionTask {
+         fatalError()
+     }
+
+     // Update query, this will return success or an error
+     public func update(to: @escaping QueryFunction, callback: @escaping (Result<Void, Error>) -> Void) {
+         fatalError()
+     }
+
+     private(set) public var query: QueryFunction
+     init(name: String = "", query: @escaping QueryFunction) {
+         self.name = name
+         self.query = query
+     }
+ }
+
+ @frozen public struct SubscriptionTask {
+     public func onStateChange(_ block: @escaping (SubscriptionState) -> Void) {
+        fatalError()
+     }
+ }
+
+
+ protocol QueryBuilderComponent {}
+
+ @resultBuilder struct QueryBuilder {
+     static func buildBlock(_ components: AnySubscription...) -> [AnySubscription] {
+         return components
+     }
+ }
+
+ protocol AnyQueryBuilderComponent {}
+
+ // Realm operations
+ // Realm will only allow getting all the subscriptions and subscribe to a query
+ extension Realm {
+     // Get all subscriptions for this Realm. SDKs that care deeply about queries
+     // on the main thread may also expose an async version of this API
+ //    public typealias Element = Object
+     /*private(set)*/ public var subscriptions: [AnySubscription] {
+         fatalError()
+     }
+
+     #if swift(>=5.5) && canImport(_Concurrency)
+     // Async await
+     // Adds a query to the list of subscriptions, optional name can be provided
+     // This method will throw an error in case we cannot subscribe the query
+     @available(macOS 12.0, tvOS 15.0, iOS 15.0, watchOS 8.0, *)
+     func subscribe<Element: Object>(@QueryBuilder _ to: () -> ([AnySubscription])) async throws -> Subscription<Element> {
+             // core subscribe
+             fatalError()
+     }
+     #endif // swift(>=5.5)
+     // Non-Async await
+     // Adds a query to the list of subscriptions, optional name can be provided
+     // This method contains a callblack block, if the subscription was successfully
+     // added then it will return  the subscription, if not it will return an error
+     @discardableResult
+     public func subscribe<Element: Object>(@QueryBuilder _ to: () -> ([AnySubscription]), callback: @escaping (Result<Subscription<Element>, Swift.Error>) -> Void) -> SubscriptionTask {
+         fatalError()
+     }
+
+     func findSubscription<Element: Object>(ofType type: Element.Type, for name: String) -> Subscription<Element>? {
+         fatalError()
+     }
+
+     func findSubscription<Element: Object>(ofType type: Element.Type, where: (Query<Element>) -> Query<Element>) -> Subscription<Element>? {
+         fatalError()
+     }
+ }
+
+
+ // Remove all subscriptions
+ // Will be able to unsubscribe to all subscriptions
+ extension Array where Element == AnySubscription {
+
+     #if swift(>=5.5) && canImport(_Concurrency)
+     // Removes all the the subscriptions
+     @available(macOS 12.0, tvOS 15.0, iOS 15.0, watchOS 8.0, *)
+     func unsubscribeAll() async throws {
+         fatalError()
+     }
+     #endif // swift(>=5.5)
+
+     func unsubscribeAll(callback: @escaping (Result<Void, Swift.Error>) -> Void) -> SubscriptionTask {
+         fatalError()
+     }
+ }
+
+ // State Updates
+ // Some operations will return a `SubscriptionTask` which can be used to get state updates (There will be a Combine API as well not described here)
+ public enum SubscriptionState: Equatable {
+     public static func == (lhs: SubscriptionState, rhs: SubscriptionState) -> Bool {
+         true
+     }
+
+     // Subscription is complete and the server is in "steady-state" synchronization.
+     case complete
+     // The Subscription encountered an error.
+     case error(Error)
+     // The server is processing the subscription and updating the Realm data
+     // with new matches
+     case bootstrapping
+     // Sent to the server but not acknowledged
+     case sent
+     // Subscription is persisted locally but not yet processed by the server.
+     case pending
+     // Subscription has been invalidated - i.e. replaced by a call to
+     // Realm.UpdateSubscriptions()
+     case invalidated
+ }
+
+ class Contact: Object {
+     @Persisted var name: String
+     @Persisted var address: Address
+     @Persisted var userId: String
+     @Persisted var age: Int
+ }
+
+ class Address: Object {
+     @Persisted var state: String
+ }
+
+ class Author: Object {
+     @Persisted var id: String
+     @Persisted var name: String
+ }
+
+ @available(macOS 12.0, tvOS 15.0, iOS 15.0, watchOS 8.0, *)
+ func test() async throws {
+     // Examples
+     // Open Realm with a Flexible Configuration
+     do {
+         let app = App(id: "")
+         let user = try await app.login(credentials: Credentials.emailPassword(email: "email", password: "password"))
+         let config = user.flexibleSyncConfiguration()
+         let realm = try await Realm.init(configuration: config, downloadBeforeOpen: .always)
+
+
+         // Async Await
+         // Example code 1 - Add 3 different subscriptions, second one without name
+         if realm.subscriptions.isEmpty {
+             let subscriptions = try await realm.subscribe {
+                 Subscription<Contact>(name: "contacts-ny") {
+                     $0.address.state == "NY" && $0.age > 10
+                 }
+                 Subscription<Author> {
+                     $0.name == "Joe Doe"
+                 }
+             }
+         }
+
+         // Example code 2 - Update Subscription
+         if let subscription = realm.findSubscription(ofType: Contact.self, where: { $0.address.state == "NY" && $0.age > 10 }) {
+             try await subscription.update(to: { $0.address.state == "TX" && $0.age > 21 })
+         }
+
+         // Example code 3 - Remove a subscription
+         if let subscription = realm.findSubscription(ofType: Contact.self, for: "contacts-ny") {
+             try await subscription.unsubscribe()
+         }
+
+         // Example code 4 - Unsubscribe all subscriptions
+         try await realm.subscriptions.unsubscribeAll()
+
+
+         // Non-Async Await
+         // Example code 1 - Add 2 different subscriptions, second one without name
+         if realm.subscriptions.isEmpty {
+             realm.subscribe({
+                 Subscription<Contact>(name: "contacts-ny") {
+                     $0.address.state == "NY" && $0.age > 10
+                 }
+                 Subscription<Author> {
+                     $0.name == "Joe Doe"
+                 }
+             }, callback: { results in
+                 switch results {
+                 case .success(let subscription):
+                     // Return subscription
+                     break
+                 case .failure(let error):
+                     // Do something if there is an error
+                     break
+                 }
+             })
+             .onStateChange { subscriptionState in
+                 // Do something on states changes
+                 if subscriptionState == .bootstrapping {
+                     // Do something
+                 }
+             }
+         }
+ //
+ //        // Example code 2 - Remove subscription
+ //        if let subscription = realm.subscriptions.first(where: { $0.name == "contacts-tx" }) {
+ //            subscription.unsubscribe { results in
+ //                switch results {
+ //                case .success(let subscription):
+ //                    // Return subscription
+ //                    break
+ //                case .failure(let error):
+ //                    // Do something if there is an error
+ //                    break
+ //                }
+ //            }
+ //            .onStateChange { subscriptionState in
+ //                // Do something on states changes
+ //                if case let .error(error) = subscriptionState {
+ //                    // Do something for error
+ //                }
+ //            }
+ //        }
+ //
+ //        // Example code 3 - Update subscription
+ //        if let subscription = realm.subscriptions.first(where: { $0.name == "contacts-tx" }) {
+ //            subscription.update(to: Contact.self, where: { $0.address.state == "FL" }) { results in
+ //                switch results {
+ //                case .success(let subscription):
+ //                    // Return subscription
+ //                    break
+ //                case .failure(let error):
+ //                    // Do something if there is an error
+ //                    break
+ //                }
+ //            }
+ //        }
+ //
+ //        // Example code 4 - Unsubscribe all subscriptions in the array
+ //        realm.subscriptions.unsubscribeAll { results in
+ //            switch results {
+ //            case .success(let subscription):
+ //                // Return subscription
+ //                break
+ //            case .failure(let error):
+ //                // Do something if there is an error
+ //                break
+ //            }
+ //        }
+     } catch {
+
+     }
+ }

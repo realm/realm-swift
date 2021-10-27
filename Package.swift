@@ -122,7 +122,7 @@ let package = Package(
             targets: ["Realm", "RealmSwift"]),
     ],
     dependencies: [
-        .package(name: "RealmDatabase", url: "https://github.com/realm/realm-core", .branch("jbr/flx_api_wip"))
+        .package(name: "RealmDatabase", url: "https://github.com/realm/realm-core", .branch("master"))
     ],
     targets: [
       .target(
@@ -303,6 +303,9 @@ let package = Package(
                 "SwiftObjectServerTests.swift",
                 "SwiftCollectionSyncTests.swift",
                 "SwiftObjectServerPartitionTests.swift",
+                "SwiftUIServerTests.swift",
+                "SwiftMongoClientTests.swift",
+                "SwiftFlexibleSyncServerTests.swift"
             ]
         ),
         objectServerTestTarget(
