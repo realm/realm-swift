@@ -6,6 +6,7 @@ x.y.z Release notes (yyyy-MM-dd)
 ### Fixed
 * Fix `RLMCollectionIterator` where `RLMCollectionIterator` contents were not RLMObject.
   This is for users using the optional `RLMSupport.swift` file.
+* Change default request timeout for `RLMApp` from 6 seconds to 60 seconds.
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
