@@ -277,6 +277,6 @@ extension ObjectBase: AssistedObjectiveCBridgeable {
     }
 
     var bridged: (objectiveCValue: Any, metadata: Any?) {
-        return (objectiveCValue: self.unsafeCastToRLMObject(), metadata: nil)
+        return (objectiveCValue: unsafeCastToRLMObject(), metadata: nil)
     }
 }

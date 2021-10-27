@@ -111,7 +111,7 @@ public protocol ThreadConfined {
              constructor.
      */
     public init(to threadConfined: Confined) {
-        let bridged: (objectiveCValue: Any, metadata: Any?) = (threadConfined as! AssistedObjectiveCBridgeable).bridged
+        let bridged = (threadConfined as! AssistedObjectiveCBridgeable).bridged
         swiftMetadata = bridged.metadata
         objectiveCReference = RLMThreadSafeReference(threadConfined: bridged.objectiveCValue as! RLMThreadConfined)
     }

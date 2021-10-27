@@ -58,7 +58,7 @@ extension ObjectKeyIdentifiable {
 }
 
 @available(macOS 10.15, iOS 13, tvOS 13, watchOS 6, *)
-extension Projection: Identifiable {
+extension Projection: Identifiable, Hashable {
     /// A stable identifier for this projection. This value will be
     /// the same for all projections of this object
     /// and for all instances of the projected Object
@@ -225,7 +225,7 @@ extension Publisher {
     /// let cancellable = changesetPublisher(projection)
     ///    // Convert to frozen changesets
     ///    .freeze()
-    ///    // Unlike live objects, frozen objects can be sent to a concurrent queue
+    ///    // Unlike live projections, frozen projections can be sent to a concurrent queue
     ///    .receive(on: DispatchQueue.global())
     ///    .sink { changeset in
     ///        // Do something with the frozen changeset
@@ -237,8 +237,8 @@ extension Publisher {
     public func freeze<T: ProjectionObservable>()
     -> Publishers.Map<Self, ObjectChange<T>> where Output == ObjectChange<T>, T: ThreadConfined {
         return map {
-            if case .change(let p, let properties) = $0 {
-                return .change(p.freeze(), properties)
+            if case .change(let projection, let properties) = $0 {
+                return .change(projection.freeze(), properties)
             }
             return $0
         }
