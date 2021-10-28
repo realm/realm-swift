@@ -2722,6 +2722,24 @@ class CombineProjectionPublisherTests: CombinePublisherTestCase {
         }
         wait(for: [exp], timeout: 1)
     }
+
+    func testIdentifiable() {
+        let realm = realmWithTestPath()
+        let object = try! realm.write {
+            realm.create(SimpleObject.self, value: [1])
+        }
+        let projection = realm.objects(SimpleProjection.self).first!//(projecting: object)
+        XCTAssertNotEqual(projection.id, object.id)
+        let projection2 = SimpleProjection(projecting: object)
+        XCTAssertEqual(projection.id, projection2.id)
+        let altProjection = AltSimpleProjection(projecting: object)
+        XCTAssertNotEqual(projection.id, altProjection.id)
+        let storeId = projection.id
+        try! realm.write {
+            projection.int += 1
+        }
+        XCTAssertEqual(storeId, projection.id)
+    }
 }
 
 #endif // canImport(Combine)

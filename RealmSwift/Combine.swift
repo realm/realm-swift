@@ -63,7 +63,7 @@ extension Projection: Identifiable, Hashable {
     /// the same for all projections of this object
     /// and for all instances of the projected Object
     public var id: UInt64 {
-        RLMObjectBaseGetCombineId(self.rootObject)
+        UInt64(ObjectIdentifier(type(of: self)).hashValue)
     }
 }
 

@@ -1304,4 +1304,3 @@ public struct ProjectedMutableSet<NewElement>: RandomAccessCollection where NewE
 }
 
 extension ProjectedMutableSet: ThreadConfined { }
-
