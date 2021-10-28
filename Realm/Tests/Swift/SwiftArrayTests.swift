@@ -513,4 +513,29 @@ class SwiftRLMArrayTests: RLMTestCase {
         XCTAssertEqual(Int32(20), (sortedByAge[0] as! EmployeeObject).age)
         XCTAssertEqual(Int32(40), (sortedByName[0] as! EmployeeObject).age)
     }
+
+    func testRLMArrayIterationForObjectAndNonObjectTypes() {
+        let rlmArrayEmbedded = RLMArray<EmbeddedIntObject>(objectClassName: EmbeddedIntObject.className())
+        let obj = EmbeddedIntObject()
+        obj.intCol = 42
+        rlmArrayEmbedded.add(obj)
+        for obj in rlmArrayEmbedded {
+            XCTAssertEqual(obj.intCol, 42)
+        }
+
+        let rlmArrayObject = RLMArray<IntObject>(objectClassName: IntObject.className())
+        let intObject = IntObject()
+        intObject.intCol = 42
+        rlmArrayObject.add(intObject)
+        for obj in rlmArrayObject {
+            XCTAssertEqual(obj.intCol, 42)
+        }
+
+        let rlmArrayPrimitive = RLMArray<NSString>(objectClassName: NSString.className())
+        let str = "foo"
+        rlmArrayPrimitive.add(str as NSString)
+        for obj in rlmArrayPrimitive {
+            XCTAssertEqual(obj as! NSString, "foo" as NSString)
+        }
+    }
 }

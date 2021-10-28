@@ -131,32 +131,4 @@ class ObjectiveCSupportTests: TestCase {
         }
         expected.forEach { testObjCSupport($0.0, value: $0.1) }
     }
-
-#if !SWIFT_PACKAGE
-    func testArraySupport() {
-        func testType<T: RealmCollectionValue>(_ firstValue: T) {
-            let list = List<T>()
-            list.append(firstValue)
-            let rlmArray = ObjectiveCSupport.convert(object: list)
-            XCTAssert(rlmArray.isKind(of: RLMArray<AnyObject>.self))
-            for object in rlmArray {
-                XCTAssertEqual(firstValue, object as? T)
-            }
-        }
-        testType(SwiftObject())
-        testType(42.42)
-        testType("hello")
-        testType(EmbeddedTreeObject1())
-    }
-
-    func testRLMArrayIterationForRLMEmbeddedObject() {
-        let rlmArrayEmbedded = RLMArray<EmbeddedIntObject>(objectClassName: EmbeddedIntObject.className())
-        let obj = EmbeddedIntObject()
-        obj.intCol = 42
-        rlmArrayEmbedded.add(obj)
-        for obj in rlmArrayEmbedded {
-            XCTAssertEqual(obj.intCol, 42)
-        }
-    }
-#endif
 }
