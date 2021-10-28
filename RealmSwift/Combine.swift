@@ -61,7 +61,6 @@ extension ObjectKeyIdentifiable {
 extension Projection: Identifiable, Hashable {
     /// A stable identifier for this projection. This value will be
     /// the same for all projections of this object
-    /// and for all instances of the projected Object
     public var id: UInt64 {
         UInt64(ObjectIdentifier(type(of: self)).hashValue)
     }
