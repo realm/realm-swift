@@ -755,8 +755,6 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
     // MARK: - App tests
 
-    let appName = "translate-utwuv"
-
     private func appConfig() -> AppConfiguration {
         return AppConfiguration(baseURL: "http://localhost:9090",
                                 transport: nil,
@@ -765,6 +763,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     }
 
     func testAppInit() {
+        let appName = "translate-utwuv"
+
         let appWithNoConfig = App(id: appName)
         XCTAssertEqual(appWithNoConfig.allUsers.count, 0)
 
@@ -2148,157 +2148,97 @@ class AsyncAwaitObjectServerTests: SwiftSyncTestCase {
         XCTAssertEqual(realm.objects(SwiftPerson.self).count, 10)
     }
 
-    func testAsyncOpenSync() async throws {
-        if isParent {
-            let user = try await self.app.login(credentials: basicCredentials())
-            let realm = try await Realm(configuration: user.configuration(testName: #function))
-            try! realm.write {
-                realm.add(SwiftHugeSyncObject.create())
-                realm.add(SwiftHugeSyncObject.create())
-            }
-            waitForUploads(for: realm)
-            executeChild()
-        } else {
-            let user = try await app.login(credentials: .anonymous)
-            let realm = try await Realm(configuration: user.configuration(testName: #function),
-                                        downloadBeforeOpen: .once)
-            XCTAssertEqual(realm.objects(SwiftHugeSyncObject.self).count, 2)
+    @MainActor func testAsyncOpenSync() async throws {
+        let user = try await self.app.login(credentials: basicCredentials())
+        let realm = try await Realm(configuration: user.configuration(testName: #function))
+        try! realm.write {
+            realm.add(SwiftHugeSyncObject.create())
+            realm.add(SwiftHugeSyncObject.create())
         }
+        waitForUploads(for: realm)
+
+        let user2 = try await app.login(credentials: .anonymous)
+        let realm2 = try await Realm(configuration: user2.configuration(testName: #function),
+                                    downloadBeforeOpen: .once)
+        XCTAssertEqual(realm2.objects(SwiftHugeSyncObject.self).count, 2)
     }
 
-    func testAsyncOpenDownloadBehaviorNever() async throws {
-        // this test will test how the `never` behavior responds
-        // on first open and second open. a different child process
-        // will spawn to test the opening kind. on second open,
-        // it should not download the latest dataset
-        enum OpenKind: Int {
-            case first
+    @MainActor func testAsyncOpenDownloadBehaviorNever() async throws {
+        // Populate the Realm on the server
+        let user1 = try await self.app.login(credentials: basicCredentials())
+        let realm1 = try await Realm(configuration: user1.configuration(testName: #function))
+        try! realm1.write {
+            realm1.add(SwiftHugeSyncObject.create())
+            realm1.add(SwiftHugeSyncObject.create())
         }
-        switch ProcessKind.current {
-        case .parent:
-            let user = try await self.app.login(credentials: basicCredentials())
-            let user1Realm = try await Realm(configuration: user.configuration(testName: #function))
-            try! user1Realm.write {
-                user1Realm.add(SwiftHugeSyncObject.create())
-                user1Realm.add(SwiftHugeSyncObject.create())
-            }
-            waitForUploads(for: user1Realm)
+        waitForUploads(for: realm1)
 
-            let (email2, password2) = (randomString(10), "password")
-            self.runChildAndWait(with: ChildProcessEnvironment(appIds: self.appIds,
-                                                               email: email2,
-                                                               password: password2,
-                                                               identifer: OpenKind.first.rawValue,
-                                                               shouldCleanUpOnTermination: true))
-        case .child(let environment):
-            switch OpenKind(rawValue: environment.identifier)! {
-            case .first:
-                let user = try await app
-                    .login(credentials: .emailPassword(email: environment.email!,
-                                                       password: environment.password!))
-                let realm = try await Realm(configuration: user.configuration(testName: #function),
-                                            downloadBeforeOpen: .never)
-                XCTAssertEqual(realm.objects(SwiftHugeSyncObject.self).count, 0)
-            }
-        }
+        // Should not have any objects as it just opens immediately without waiting
+        let user2 = try await app.login(credentials: .anonymous)
+        let realm2 = try await Realm(configuration: user2.configuration(testName: #function),
+                                    downloadBeforeOpen: .never)
+        XCTAssertEqual(realm2.objects(SwiftHugeSyncObject.self).count, 0)
     }
 
-    func testAsyncOpenDownloadBehaviorOnce() async throws {
-        // this test will test how the `once` behavior responds
-        // on first open and second open. a different child process
-        // will spawn to test the opening kind. on second open,
-        // it should not download the latest dataset
-        enum OpenKind: Int {
-            case first, second
+    @MainActor func testAsyncOpenDownloadBehaviorOnce() async throws {
+        // Populate the Realm on the server
+        let user1 = try await self.app.login(credentials: basicCredentials())
+        let realm1 = try await Realm(configuration: user1.configuration(testName: #function))
+        try! realm1.write {
+            realm1.add(SwiftHugeSyncObject.create())
+            realm1.add(SwiftHugeSyncObject.create())
         }
-        switch ProcessKind.current {
-        case .parent:
-            let user = try await self.app.login(credentials: basicCredentials())
-            let user1Realm = try await Realm(configuration: user.configuration(testName: #function))
-            try! user1Realm.write {
-                user1Realm.add(SwiftHugeSyncObject.create())
-                user1Realm.add(SwiftHugeSyncObject.create())
-            }
-            waitForUploads(for: user1Realm)
+        waitForUploads(for: realm1)
 
-            let (email2, password2) = (randomString(10), "password")
-            self.runChildAndWait(with: ChildProcessEnvironment(appIds: self.appIds,
-                                                               email: email2,
-                                                               password: password2,
-                                                               identifer: OpenKind.first.rawValue,
-                                                               shouldCleanUpOnTermination: false))
-            try! user1Realm.write {
-                user1Realm.add(SwiftHugeSyncObject.create())
-                user1Realm.add(SwiftHugeSyncObject.create())
-            }
-            waitForUploads(for: user1Realm)
+        // Should have the objects
+        let user2 = try await app.login(credentials: .anonymous)
+        let realm2 = try await Realm(configuration: user2.configuration(testName: #function),
+                                     downloadBeforeOpen: .once)
+        XCTAssertEqual(realm2.objects(SwiftHugeSyncObject.self).count, 2)
+        realm2.syncSession?.suspend()
 
-            self.runChildAndWait(with: ChildProcessEnvironment(appIds: self.appIds,
-                                                               email: email2,
-                                                               password: password2,
-                                                               identifer: OpenKind.second.rawValue,
-                                                               shouldCleanUpOnTermination: true))
-        case .child(let environment):
-            let user = try await app
-                .login(credentials: .emailPassword(email: environment.email!,
-                                                   password: environment.password!))
-            let realm = try await Realm(configuration: user.configuration(testName: #function),
-                                        downloadBeforeOpen: .once)
-            XCTAssertEqual(realm.objects(SwiftHugeSyncObject.self).count, 2)
+        // Add some more objects
+        try! realm1.write {
+            realm1.add(SwiftHugeSyncObject.create())
+            realm1.add(SwiftHugeSyncObject.create())
         }
+        waitForUploads(for: realm1)
+
+        // Will not wait for the new objects to download
+        let realm3 = try await Realm(configuration: user2.configuration(testName: #function),
+                                     downloadBeforeOpen: .once)
+        XCTAssertEqual(realm3.objects(SwiftHugeSyncObject.self).count, 2)
     }
 
-    func testAsyncOpenDownloadBehaviorAlways() async throws {
-        // this test will test how the `always` behavior responds
-        // on first open and second open. a different child process
-        // will spawn to test the opening kind
-        enum OpenKind: Int {
-            case first, second
+
+    @MainActor func testAsyncOpenDownloadBehaviorAlways() async throws {
+        // Populate the Realm on the server
+        let user1 = try await self.app.login(credentials: basicCredentials())
+        let realm1 = try await Realm(configuration: user1.configuration(testName: #function))
+        try! realm1.write {
+            realm1.add(SwiftHugeSyncObject.create())
+            realm1.add(SwiftHugeSyncObject.create())
         }
-        switch ProcessKind.current {
-        case .parent:
-            let user = try await self.app.login(credentials: basicCredentials())
-            let user1Realm = try await Realm(configuration: user.configuration(testName: #function))
-            try! user1Realm.write {
-                user1Realm.add(SwiftHugeSyncObject.create())
-                user1Realm.add(SwiftHugeSyncObject.create())
-            }
-            waitForUploads(for: user1Realm)
+        waitForUploads(for: realm1)
 
-            let (email2, password2) = (randomString(10), "password")
-            self.runChildAndWait(with: ChildProcessEnvironment(appIds: self.appIds,
-                                                               email: email2,
-                                                               password: password2,
-                                                               identifer: OpenKind.first.rawValue,
-                                                               shouldCleanUpOnTermination: false))
+        // Should have the objects
+        let user2 = try await app.login(credentials: .anonymous)
+        let realm2 = try await Realm(configuration: user2.configuration(testName: #function),
+                                     downloadBeforeOpen: .always)
+        XCTAssertEqual(realm2.objects(SwiftHugeSyncObject.self).count, 2)
+        realm2.syncSession?.suspend()
 
-            try! user1Realm.write {
-                user1Realm.add(SwiftHugeSyncObject.create())
-                user1Realm.add(SwiftHugeSyncObject.create())
-            }
-            waitForUploads(for: user1Realm)
-
-            self.runChildAndWait(with: ChildProcessEnvironment(appIds: self.appIds,
-                                                               email: email2,
-                                                               password: password2,
-                                                               identifer: OpenKind.second.rawValue,
-                                                               shouldCleanUpOnTermination: true))
-        case .child(let environment):
-            let user = try await app
-                .login(credentials: .emailPassword(email: environment.email!,
-                                                   password: environment.password!))
-            switch OpenKind(rawValue: environment.identifier)! {
-            case .first:
-                let realm = try await Realm(configuration: user.configuration(testName: #function),
-                                            downloadBeforeOpen: .always)
-                XCTAssertEqual(realm.objects(SwiftHugeSyncObject.self).count, 2)
-            case .second:
-                XCTAssertTrue(Realm.fileExists(for: user.configuration(testName: #function)))
-                let realm = try await Realm(configuration: user.configuration(testName: #function),
-                                            downloadBeforeOpen: .always)
-                XCTAssertEqual(realm.objects(SwiftHugeSyncObject.self).count, 4)
-            }
+        // Add some more objects
+        try! realm1.write {
+            realm1.add(SwiftHugeSyncObject.create())
+            realm1.add(SwiftHugeSyncObject.create())
         }
+        waitForUploads(for: realm1)
+
+        // Should wait for the new objects to download
+        let realm3 = try await Realm(configuration: user2.configuration(testName: #function),
+                                     downloadBeforeOpen: .always)
+        XCTAssertEqual(realm3.objects(SwiftHugeSyncObject.self).count, 4)
     }
 
     func testCallResetPasswordAsyncAwait() async throws {
