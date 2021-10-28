@@ -26,8 +26,13 @@ x.y.z Release notes (yyyy-MM-dd)
 * Add support for dictionary subscript expressions (e.g. `"phoneNumbers['Jane'] == '123-3456-123'"`) when querying with an NSPredicate.
 * Add UserProfile to User. This contains metadata from social logins with MongoDB Realm.
 
+
 ### Fixed
 * Change default request timeout for `RLMApp` from 6 seconds to 60 seconds.
+* Async `Realm` init would often give a Realm instance which could not actually
+  be used and would throw incorrect thread exceptions. It now is `@MainActor`
+  and gives a Realm instance which always works on the main actor. The
+  non-functional `queue:` parameter has been removed (since v10.15.0).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
