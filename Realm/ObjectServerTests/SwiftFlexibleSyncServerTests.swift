@@ -157,11 +157,8 @@ extension SwiftFlexibleSyncServerTests {
         }
 
         // Example code 2 - Update Subscription
-        if let subscription = realm.subscriptions.findSubscription({
-            Subscription<Contact> {
-                $0.address.state == "NY" && $0.age > 10
-            }
-        }) {
+        let query = { Subscription<Contact> { $0.address.state == "NY" && $0.age > 10 } }
+        if let subscription = realm.subscriptions.findSubscription(query) {
             try await subscription.update {
                 Subscription<Contact>(name: "contacts-ny") {
                     $0.address.state == "TX" && $0.age > 21
