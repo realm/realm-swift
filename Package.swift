@@ -4,7 +4,7 @@ import PackageDescription
 import Foundation
 
 let coreVersionStr = "11.4.1"
-let cocoaVersionStr = "10.16.0"
+let cocoaVersionStr = "10.18.0"
 
 let coreVersionPieces = coreVersionStr.split(separator: ".")
 let coreVersionExtra = coreVersionPieces[2].split(separator: "-")
@@ -276,7 +276,10 @@ let package = Package(
             name: "RealmSwiftTests",
             dependencies: ["RealmSwift", "RealmTestSupport"],
             path: "RealmSwift/Tests",
-            exclude: ["RealmSwiftTests-Info.plist"],
+            exclude: [
+                "RealmSwiftTests-Info.plist",
+                "QueryTests.swift.gyb"
+            ],
             swiftSettings: testSwiftSettings
         ),
 

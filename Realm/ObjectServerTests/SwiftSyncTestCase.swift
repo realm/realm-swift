@@ -27,7 +27,7 @@ import RealmSyncTestSupport
 #endif
 
 public extension User {
-    func configuration(testName: String) -> Realm.Configuration {
+    func configuration<T: BSON>(testName: T) -> Realm.Configuration {
         var config = self.configuration(partitionValue: testName)
         config.objectTypes = [SwiftPerson.self, SwiftHugeSyncObject.self, SwiftTypesSyncObject.self]
         return config
@@ -181,10 +181,11 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
     }
 
     public static let bigObjectCount = 2
-    public func populateRealm(user: User? = nil, partitionValue: String) {
+    public func populateRealm<T: BSON>(user: User? = nil, partitionValue: T) {
         do {
             let user = try (user ?? logInUser(for: basicCredentials()))
             let config = user.configuration(testName: partitionValue)
+
             let realm = try openRealm(configuration: config)
             try! realm.write {
                 for _ in 0..<SwiftSyncTestCase.bigObjectCount {

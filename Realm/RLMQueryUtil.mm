@@ -516,6 +516,9 @@ public:
     void apply_column_expression(RLMObjectSchema *desc, NSString *leftKeyPath, NSString *rightKeyPath, NSComparisonPredicate *predicate);
     void apply_function_expression(RLMObjectSchema *objectSchema, NSExpression *functionExpression,
                                    NSPredicateOperatorType operatorType, NSExpression *right);
+    void apply_map_expression(RLMObjectSchema *objectSchema, NSExpression *functionExpression,
+                              NSComparisonPredicateOptions options, NSPredicateOperatorType operatorType,
+                              NSExpression *right);
 
     template <typename A, typename B>
     void add_numeric_constraint(RLMPropertyType datatype,
@@ -1377,7 +1380,7 @@ ColumnReference QueryBuilder::column_reference_from_key_path(RLMObjectSchema *ob
 
     if (isAggregate && !keyPath.containsToManyRelationship) {
         throwException(@"Invalid predicate",
-                       @"Aggregate operations can only be used on key paths that include an array property");
+                       @"Aggregate operations can only be used on key paths that include an collection property");
     } else if (!isAggregate && keyPath.containsToManyRelationship) {
         throwException(@"Invalid predicate",
                        @"Key paths that include a collection property must use aggregate operations");
@@ -1864,6 +1867,28 @@ NSExpression *simplify_self_value_for_key_path_function_expression(NSExpression 
     return expression;
 }
 
+void QueryBuilder::apply_map_expression(RLMObjectSchema *objectSchema, NSExpression *functionExpression,
+                                        NSComparisonPredicateOptions options, NSPredicateOperatorType operatorType,
+                                        NSExpression *right) {
+    NSString *keyPath;
+    NSString *mapKey;
+    if (functionExpression.operand.expressionType == NSKeyPathExpressionType) {
+        NSExpression *mapItems = [functionExpression.arguments firstObject];
+        NSExpression *linkCol = [[functionExpression.operand arguments] firstObject];
+        NSExpression *mapCol = [mapItems.arguments firstObject];
+        mapKey = [mapItems.arguments[1] constantValue];
+        keyPath = [NSString stringWithFormat:@"%@.%@", linkCol.keyPath, mapCol.keyPath];
+    } else {
+        keyPath = [functionExpression.arguments.firstObject keyPath];
+        mapKey = [functionExpression.arguments[1] constantValue];
+    }
+
+    ColumnReference collectionColumn = column_reference_from_key_path(objectSchema, keyPath, true);
+    RLMPrecondition(collectionColumn.property().dictionary,
+                    @"Invalid predicate", @"Only dictionaries support subscript predicates.");
+    add_mixed_constraint(operatorType, options, collectionColumn.resolve<Dictionary>().key([mapKey UTF8String]), [right constantValue]);
+}
+
 void QueryBuilder::apply_function_expression(RLMObjectSchema *objectSchema, NSExpression *functionExpression,
                                              NSPredicateOperatorType operatorType, NSExpression *right) {
     RLMPrecondition(functionExpression.operand.expressionType == NSSubqueryExpressionType,
@@ -1988,7 +2013,11 @@ void QueryBuilder::apply_predicate(NSPredicate *predicate, RLMObjectSchema *obje
             apply_value_expression(objectSchema, compp.rightExpression.keyPath, compp.leftExpression.constantValue, compp);
         }
         else if (exp1Type == NSFunctionExpressionType) {
-            apply_function_expression(objectSchema, compp.leftExpression, compp.predicateOperatorType, compp.rightExpression);
+            if (compp.leftExpression.operand.expressionType == NSSubqueryExpressionType) {
+                apply_function_expression(objectSchema, compp.leftExpression, compp.predicateOperatorType, compp.rightExpression);
+            } else {
+                apply_map_expression(objectSchema, compp.leftExpression, compp.options, compp.predicateOperatorType, compp.rightExpression);
+            }
         }
         else if (exp1Type == NSSubqueryExpressionType) {
             // The subquery expressions that we support are handled by the NSFunctionExpressionType case above.

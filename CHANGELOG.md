@@ -1,14 +1,32 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
+* Add an api for a type safe query syntax. This allows you to filter a Realm and collections managed by a Realm
+  with Swift style expressions. Here is a brief example:
+  ```swift
+  class Person: Object {
+    @Persisted var name: String
+    @Persisted var hobbies: MutableSet<String>
+    @Persisted var pets: List<Pet>
+  }
+  class Pet: Object {
+    @Persisted var name: String
+    @Persisted var age: Int
+  }
+
+  let persons = realm.objects(Person.self).where {
+    $0.hobbies.contains("music") || $0.hobbies.contains("baseball")
+  }
+
+  persons = realm.objects(Person.self).where {
+    ($0.pets.age >= 2) && $0.pets.name.starts(with: "L")
+  }
+  ```([Cocoa #7419](https://github.com/realm/realm-cocoa/pull/7419))
+* Add support for dictionary subscript expressions (e.g. `"phoneNumbers['Jane'] == '123-3456-123'"`) when querying with an NSPredicate.
 * Add UserProfile to User. This contains metadata from social logins with MongoDB Realm.
-* Add a new `@ThreadSafe` property wrapper. Objects and collections wrapped by `@ThreadSafe` may be passed between threads. It's
-  intended to allow local variables and function parameters to be used across
-  threads when needed.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
-* None.
+* Change default request timeout for `RLMApp` from 6 seconds to 60 seconds.
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
@@ -17,10 +35,56 @@ x.y.z Release notes (yyyy-MM-dd)
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 13.0.
 * CocoaPods: 1.10 or later.
-* Xcode: 12.2-13.0.
+* Xcode: 12.2-13.1.
 
 ### Internal
 * Upgraded realm-core from ? to ?
+
+10.18.0 Release notes (2021-10-25)
+=============================================================
+
+### Enhancements
+
+* Add support for using multiple users with `@AsyncOpen` and `@AutoOpen`.
+  Setting the current user to a new user will now automatically reopen the
+  Realm with the new user.
+* Add prebuilt binary for Xcode 13.1 to the release package.
+
+### Fixed
+
+* Fix `@AsyncOpen` and `@AutoOpen` using `defaultConfiguration` by default if
+  the user's doesn't provide one, will set an incorrect path which doesn't
+  correspond to the users configuration one. (since v10.12.0)
+* Adding missing subscription completion for `AsyncOpenPublisher` after
+  successfully returning a realm.
+
+### Compatibility
+
+* Realm Studio: 11.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 13.1.
+* CocoaPods: 1.10 or later.
+* Xcode: 12.2-13.1.
+
+10.17.0 Release notes (2021-10-06)
+=============================================================
+### Enhancements
+
+* Add a new `@ThreadSafe` property wrapper. Objects and collections wrapped by `@ThreadSafe` may be passed between threads. It's
+  intended to allow local variables and function parameters to be used across
+  threads when needed.
+
+### Fixed
+
+* None.
+
+### Compatibility
+
+* Realm Studio: 11.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 13.0.
+* CocoaPods: 1.10 or later.
+* Xcode: 12.2-13.0.
 
 10.16.0 Release notes (2021-09-29)
 =============================================================
