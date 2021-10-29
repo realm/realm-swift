@@ -171,8 +171,8 @@ class AllTypesPrimitiveProjection: Projection<ModernAllTypesObject> {
 
 class AdvancedObject: Object {
     @Persisted(primaryKey: true) var pk: ObjectId
-    @Persisted var commonArray: List<Int>
-    @Persisted var objectsArray: List<SimpleObject>
+    @Persisted var commonArray: RealmSwift.List<Int>
+    @Persisted var objectsArray: RealmSwift.List<SimpleObject>
     @Persisted var commonSet: MutableSet<Int>
     @Persisted var objectsSet: MutableSet<SimpleObject>
 }

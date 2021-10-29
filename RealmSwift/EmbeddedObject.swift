@@ -270,13 +270,3 @@ extension EmbeddedObject: ThreadConfined {
 private func forceCastToInferred<T, V>(_ x: T) -> V {
     return x as! V
 }
-
-extension ObjectBase: AssistedObjectiveCBridgeable {
-    static func bridging(from objectiveCValue: Any, with metadata: Any?) -> Self {
-        return forceCastToInferred(objectiveCValue)
-    }
-
-    var bridged: (objectiveCValue: Any, metadata: Any?) {
-        return (objectiveCValue: unsafeCastToRLMObject(), metadata: nil)
-    }
-}

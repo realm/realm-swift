@@ -2066,8 +2066,8 @@ public enum RealmPublishers {
         public func receive<S>(subscriber: S) where S: Subscriber, S.Failure == Never, Output == S.Input {
             let token = self.projection.observe(keyPaths: self.keyPaths ?? [], on: self.queue) { (change: Output) in
                 switch change {
-                case .change(let p, let properties):
-                    _ = subscriber.receive(.change(p, properties))
+                case .change(let projection, let properties):
+                    _ = subscriber.receive(.change(projection, properties))
                 case .error(let error):
                     _ = subscriber.receive(.error(error))
                 case .deleted:
