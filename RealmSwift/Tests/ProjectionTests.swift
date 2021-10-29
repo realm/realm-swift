@@ -33,7 +33,7 @@ enum IntegerEnum: Int, PersistableEnum {
     case value2 = 3
 }
 
-class AllTypesProjection: Projection<ModernAllTypesObject> {
+class AllTypesPrimitiveProjection: Projection<ModernAllTypesObject> {
     @Projected(\ModernAllTypesObject.pk) var pk
     @Projected(\ModernAllTypesObject.boolCol) var boolCol
     @Projected(\ModernAllTypesObject.intCol) var intCol
@@ -167,6 +167,28 @@ class AllTypesProjection: Projection<ModernAllTypesObject> {
     @Projected(\ModernAllTypesObject.mapOptUuid) var mapOptUuid
 
     @Projected(\ModernAllTypesObject.linkingObjects) var linkingObjects
+}
+
+class AdvancedObject: Object {
+    @Persisted(primaryKey: true) var pk: ObjectId
+    @Persisted var commonArray: List<Int>
+    @Persisted var objectsArray: List<SimpleObject>
+    @Persisted var commonSet: MutableSet<Int>
+    @Persisted var objectsSet: MutableSet<SimpleObject>
+}
+
+extension SimpleObject {
+    var stringify: String {
+        "\(int) - \(bool)"
+    }
+}
+
+class AdvancedProjection: Projection<AdvancedObject> {
+    @Projected(\AdvancedObject.commonArray.count) var arrayLen
+    @Projected(\AdvancedObject.commonArray) var renamedArray
+    @Projected(\AdvancedObject.objectsArray.projectTo.stringify) var projectedArray: ProjectedList<String>
+    @Projected(\AdvancedObject.commonSet.first) var firstElement
+    @Projected(\AdvancedObject.objectsSet.projectTo.bool) var projectedSet: ProjectedMutableSet<Bool>
 }
 
 class FailedProjection: Projection<ModernAllTypesObject> {
@@ -408,6 +430,7 @@ class ProjectionTests: TestCase {
             dt.friends.append(js)
 
             realm.create(ModernAllTypesObject.self, value: allTypeValues)
+            realm.create(AdvancedObject.self, value: ["pk": ObjectId.generate(), "commonArray": [1, 2, 3], "objectsArray": [[1, true], [2, false]], "commonSet": [1, 2, 3], "objectsSet": [[1, true], [2, false]]])
         }
     }
 
@@ -486,7 +509,7 @@ class ProjectionTests: TestCase {
     }
 
     func testProjectionForAllRealmTypes() {
-        let allTypesModel = realmWithTestPath().objects(AllTypesProjection.self).first!
+        let allTypesModel = realmWithTestPath().objects(AllTypesPrimitiveProjection.self).first!
 
         XCTAssertEqual(allTypesModel.boolCol, allTypeValues["boolCol"] as! Bool)
         XCTAssertEqual(allTypesModel.intCol, allTypeValues["intCol"] as! Int)
@@ -767,7 +790,7 @@ class ProjectionTests: TestCase {
     func testAllPropertyTypesNotifications() {
         let realm = realmWithTestPath()
         let obj = realm.objects(ModernAllTypesObject.self).first!
-        let obs = realm.objects(AllTypesProjection.self).first!
+        let obs = realm.objects(AllTypesPrimitiveProjection.self).first!
 
         let data = "b".data(using: String.Encoding.utf8)!
         let date = Date(timeIntervalSince1970: 7)
@@ -777,70 +800,70 @@ class ProjectionTests: TestCase {
         let object = ModernAllTypesObject(value: ["intCol": 2])
         let anyValue = AnyRealmValue.int(22)
 
-        observeKeyPathChange(obj, obs, \AllTypesProjection.boolCol, obj.boolCol, false, { obj.boolCol = false })
-        observeKeyPathChange(obj, obs, \AllTypesProjection.intCol, obj.intCol, 2, { obj.intCol = 2 })
-        observeKeyPathChange(obj, obs, \AllTypesProjection.int8Col, obj.int8Col, 2, { obj.int8Col = 2 })
-        observeKeyPathChange(obj, obs, \AllTypesProjection.int16Col, obj.int16Col, 2, { obj.int16Col = 2 })
-        observeKeyPathChange(obj, obs, \AllTypesProjection.int32Col, obj.int32Col, 2, { obj.int32Col = 2 })
-        observeKeyPathChange(obj, obs, \AllTypesProjection.int64Col, obj.int64Col, 2, { obj.int64Col = 2 })
-        observeKeyPathChange(obj, obs, \AllTypesProjection.floatCol, obj.floatCol, 2.0, { obj.floatCol = 2.0 })
-        observeKeyPathChange(obj, obs, \AllTypesProjection.doubleCol, obj.doubleCol, 2.0, { obj.doubleCol = 2.0 })
-        observeKeyPathChange(obj, obs, \AllTypesProjection.stringCol, obj.stringCol, "def", { obj.stringCol = "def" })
-        observeKeyPathChange(obj, obs, \AllTypesProjection.binaryCol, obj.binaryCol, data, { obj.binaryCol = data })
-        observeKeyPathChange(obj, obs, \AllTypesProjection.dateCol, obj.dateCol, date, { obj.dateCol = date })
-        observeKeyPathChange(obj, obs, \AllTypesProjection.decimalCol, obj.decimalCol, decimal, { obj.decimalCol = decimal })
-        observeKeyPathChange(obj, obs, \AllTypesProjection.objectIdCol, obj.objectIdCol, objectId, { obj.objectIdCol = objectId })
-        observeKeyPathChange(obj, obs, \AllTypesProjection.objectCol, obj.objectCol, object, { obj.objectCol = object })
-        observeKeyPathChange(obj, obs, \AllTypesProjection.anyCol, obj.anyCol, anyValue, { obj.anyCol = anyValue })
-        observeKeyPathChange(obj, obs, \AllTypesProjection.uuidCol, obj.uuidCol, uuid, { obj.uuidCol = uuid })
-        observeKeyPathChange(obj, obs, \AllTypesProjection.intEnumCol, obj.intEnumCol, .value2, { obj.intEnumCol = .value2 })
-        observeKeyPathChange(obj, obs, \AllTypesProjection.stringEnumCol, obj.stringEnumCol, .value2, { obj.stringEnumCol = .value2 })
-        observeKeyPathChange(obj, obs, \AllTypesProjection.optIntCol, obj.optIntCol, 2, { obj.optIntCol = 2 })
-        observeKeyPathChange(obj, obs, \AllTypesProjection.optInt8Col, obj.optInt8Col, 2, { obj.optInt8Col = 2 })
-        observeKeyPathChange(obj, obs, \AllTypesProjection.optInt16Col, obj.optInt16Col, 2, { obj.optInt16Col = 2 })
-        observeKeyPathChange(obj, obs, \AllTypesProjection.optInt32Col, obj.optInt32Col, 2, { obj.optInt32Col = 2 })
-        observeKeyPathChange(obj, obs, \AllTypesProjection.optInt64Col, obj.optInt64Col, 2, { obj.optInt64Col = 2 })
-        observeKeyPathChange(obj, obs, \AllTypesProjection.optFloatCol, obj.optFloatCol, 2.0, { obj.optFloatCol = 2.0 })
-        observeKeyPathChange(obj, obs, \AllTypesProjection.optDoubleCol, obj.optDoubleCol, 2.0, { obj.optDoubleCol = 2.0 })
-        observeKeyPathChange(obj, obs, \AllTypesProjection.optBoolCol, obj.optBoolCol, false, { obj.optBoolCol = false })
-        observeKeyPathChange(obj, obs, \AllTypesProjection.optStringCol, obj.optStringCol, "def", { obj.optStringCol = "def" })
-        observeKeyPathChange(obj, obs, \AllTypesProjection.optBinaryCol, obj.optBinaryCol, data, { obj.optBinaryCol = data })
-        observeKeyPathChange(obj, obs, \AllTypesProjection.optDateCol, obj.optDateCol, date, { obj.optDateCol = date })
-        observeKeyPathChange(obj, obs, \AllTypesProjection.optDecimalCol, obj.optDecimalCol, decimal, { obj.optDecimalCol = decimal })
-        observeKeyPathChange(obj, obs, \AllTypesProjection.optObjectIdCol, obj.optObjectIdCol, objectId, { obj.optObjectIdCol = objectId })
-        observeKeyPathChange(obj, obs, \AllTypesProjection.optUuidCol, obj.optUuidCol, uuid, { obj.optUuidCol = uuid })
-        observeKeyPathChange(obj, obs, \AllTypesProjection.optIntEnumCol, obj.optIntEnumCol, .value2, { obj.optIntEnumCol = .value2 })
-        observeKeyPathChange(obj, obs, \AllTypesProjection.optStringEnumCol, obj.optStringEnumCol, .value2, { obj.optStringEnumCol = .value2 })
+        observeKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.boolCol, obj.boolCol, false, { obj.boolCol = false })
+        observeKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.intCol, obj.intCol, 2, { obj.intCol = 2 })
+        observeKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.int8Col, obj.int8Col, 2, { obj.int8Col = 2 })
+        observeKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.int16Col, obj.int16Col, 2, { obj.int16Col = 2 })
+        observeKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.int32Col, obj.int32Col, 2, { obj.int32Col = 2 })
+        observeKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.int64Col, obj.int64Col, 2, { obj.int64Col = 2 })
+        observeKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.floatCol, obj.floatCol, 2.0, { obj.floatCol = 2.0 })
+        observeKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.doubleCol, obj.doubleCol, 2.0, { obj.doubleCol = 2.0 })
+        observeKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.stringCol, obj.stringCol, "def", { obj.stringCol = "def" })
+        observeKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.binaryCol, obj.binaryCol, data, { obj.binaryCol = data })
+        observeKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.dateCol, obj.dateCol, date, { obj.dateCol = date })
+        observeKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.decimalCol, obj.decimalCol, decimal, { obj.decimalCol = decimal })
+        observeKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.objectIdCol, obj.objectIdCol, objectId, { obj.objectIdCol = objectId })
+        observeKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.objectCol, obj.objectCol, object, { obj.objectCol = object })
+        observeKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.anyCol, obj.anyCol, anyValue, { obj.anyCol = anyValue })
+        observeKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.uuidCol, obj.uuidCol, uuid, { obj.uuidCol = uuid })
+        observeKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.intEnumCol, obj.intEnumCol, .value2, { obj.intEnumCol = .value2 })
+        observeKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.stringEnumCol, obj.stringEnumCol, .value2, { obj.stringEnumCol = .value2 })
+        observeKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.optIntCol, obj.optIntCol, 2, { obj.optIntCol = 2 })
+        observeKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.optInt8Col, obj.optInt8Col, 2, { obj.optInt8Col = 2 })
+        observeKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.optInt16Col, obj.optInt16Col, 2, { obj.optInt16Col = 2 })
+        observeKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.optInt32Col, obj.optInt32Col, 2, { obj.optInt32Col = 2 })
+        observeKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.optInt64Col, obj.optInt64Col, 2, { obj.optInt64Col = 2 })
+        observeKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.optFloatCol, obj.optFloatCol, 2.0, { obj.optFloatCol = 2.0 })
+        observeKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.optDoubleCol, obj.optDoubleCol, 2.0, { obj.optDoubleCol = 2.0 })
+        observeKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.optBoolCol, obj.optBoolCol, false, { obj.optBoolCol = false })
+        observeKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.optStringCol, obj.optStringCol, "def", { obj.optStringCol = "def" })
+        observeKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.optBinaryCol, obj.optBinaryCol, data, { obj.optBinaryCol = data })
+        observeKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.optDateCol, obj.optDateCol, date, { obj.optDateCol = date })
+        observeKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.optDecimalCol, obj.optDecimalCol, decimal, { obj.optDecimalCol = decimal })
+        observeKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.optObjectIdCol, obj.optObjectIdCol, objectId, { obj.optObjectIdCol = objectId })
+        observeKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.optUuidCol, obj.optUuidCol, uuid, { obj.optUuidCol = uuid })
+        observeKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.optIntEnumCol, obj.optIntEnumCol, .value2, { obj.optIntEnumCol = .value2 })
+        observeKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.optStringEnumCol, obj.optStringEnumCol, .value2, { obj.optStringEnumCol = .value2 })
 
-        observeArrayKeyPathChange(obj, obs, \AllTypesProjection.arrayBool, allTypeValues["arrayBool"] as! [Bool] + [false]) { obj.arrayBool.append(false) }
-        observeArrayKeyPathChange(obj, obs, \AllTypesProjection.arrayInt, allTypeValues["arrayInt"] as! [Int] + [4], { obj.arrayInt.append(4) })
-        observeArrayKeyPathChange(obj, obs, \AllTypesProjection.arrayInt8, allTypeValues["arrayInt8"] as! [Int8] + [4], { obj.arrayInt8.append(4) })
-        observeArrayKeyPathChange(obj, obs, \AllTypesProjection.arrayInt16, allTypeValues["arrayInt16"] as! [Int16] + [4], { obj.arrayInt16.append(4) })
-        observeArrayKeyPathChange(obj, obs, \AllTypesProjection.arrayInt32, allTypeValues["arrayInt32"] as! [Int32] + [4], { obj.arrayInt32.append(4) })
-        observeArrayKeyPathChange(obj, obs, \AllTypesProjection.arrayInt64, allTypeValues["arrayInt64"] as! [Int64] + [4], { obj.arrayInt64.append(4) })
-        observeArrayKeyPathChange(obj, obs, \AllTypesProjection.arrayFloat, allTypeValues["arrayFloat"] as! [Float] + [4], { obj.arrayFloat.append(4) })
-        observeArrayKeyPathChange(obj, obs, \AllTypesProjection.arrayDouble, allTypeValues["arrayDouble"] as! [Double] + [4], { obj.arrayDouble.append(4) })
-        observeArrayKeyPathChange(obj, obs, \AllTypesProjection.arrayString, allTypeValues["arrayString"] as! [String] + ["d"], { obj.arrayString.append("d") })
-        observeArrayKeyPathChange(obj, obs, \AllTypesProjection.arrayBinary, allTypeValues["arrayBinary"] as! [Data] + [data], { obj.arrayBinary.append(data) })
-        observeArrayKeyPathChange(obj, obs, \AllTypesProjection.arrayDate, allTypeValues["arrayDate"] as! [Date] + [date], { obj.arrayDate.append(date) })
-        observeArrayKeyPathChange(obj, obs, \AllTypesProjection.arrayDecimal, allTypeValues["arrayDecimal"] as! [Decimal128] + [decimal], { obj.arrayDecimal.append(decimal) })
-        observeArrayKeyPathChange(obj, obs, \AllTypesProjection.arrayObjectId, allTypeValues["arrayObjectId"] as! [ObjectId] + [objectId], { obj.arrayObjectId.append(objectId) })
-        observeArrayKeyPathChange(obj, obs, \AllTypesProjection.arrayAny, allTypeValues["arrayAny"] as! [AnyRealmValue] + [anyValue], { obj.arrayAny.append(anyValue) })
-        observeArrayKeyPathChange(obj, obs, \AllTypesProjection.arrayUuid, allTypeValues["arrayUuid"] as! [UUID] + [uuid], { obj.arrayUuid.append(uuid) })
-        observeArrayKeyPathChange(obj, obs, \AllTypesProjection.arrayOptBool, allTypeValues["arrayOptBool"] as! [Bool?] + [true], { obj.arrayOptBool.append(true) })
-        observeArrayKeyPathChange(obj, obs, \AllTypesProjection.arrayOptInt, allTypeValues["arrayOptInt"] as! [Int?] + [4], { obj.arrayOptInt.append(4) })
-        observeArrayKeyPathChange(obj, obs, \AllTypesProjection.arrayOptInt8, allTypeValues["arrayOptInt8"] as! [Int8?] + [4], { obj.arrayOptInt8.append(4) })
-        observeArrayKeyPathChange(obj, obs, \AllTypesProjection.arrayOptInt16, allTypeValues["arrayOptInt16"] as! [Int16?] + [4], { obj.arrayOptInt16.append(4) })
-        observeArrayKeyPathChange(obj, obs, \AllTypesProjection.arrayOptInt32, allTypeValues["arrayOptInt32"] as! [Int32?] + [4], { obj.arrayOptInt32.append(4) })
-        observeArrayKeyPathChange(obj, obs, \AllTypesProjection.arrayOptInt64, allTypeValues["arrayOptInt64"] as! [Int64?] + [4], { obj.arrayOptInt64.append(4) })
-        observeArrayKeyPathChange(obj, obs, \AllTypesProjection.arrayOptFloat, allTypeValues["arrayOptFloat"] as! [Float?] + [4], { obj.arrayOptFloat.append(4) })
-        observeArrayKeyPathChange(obj, obs, \AllTypesProjection.arrayOptDouble, allTypeValues["arrayOptDouble"] as! [Double?] + [4], { obj.arrayOptDouble.append(4) })
-        observeArrayKeyPathChange(obj, obs, \AllTypesProjection.arrayOptString, allTypeValues["arrayOptString"] as! [String?] + ["d"], { obj.arrayOptString.append("d") })
-        observeArrayKeyPathChange(obj, obs, \AllTypesProjection.arrayOptBinary, allTypeValues["arrayOptBinary"] as! [Data?] + [data], { obj.arrayOptBinary.append(data) })
-        observeArrayKeyPathChange(obj, obs, \AllTypesProjection.arrayOptDate, allTypeValues["arrayOptDate"] as! [Date?] + [date], { obj.arrayOptDate.append(date) })
-        observeArrayKeyPathChange(obj, obs, \AllTypesProjection.arrayOptDecimal, allTypeValues["arrayOptDecimal"] as! [Decimal128?] + [decimal], { obj.arrayOptDecimal.append(decimal) })
-        observeArrayKeyPathChange(obj, obs, \AllTypesProjection.arrayOptObjectId, allTypeValues["arrayOptObjectId"] as! [ObjectId?] + [objectId], { obj.arrayOptObjectId.append(objectId) })
-        observeArrayKeyPathChange(obj, obs, \AllTypesProjection.arrayOptUuid, allTypeValues["arrayOptUuid"] as! [UUID?] + [uuid], { obj.arrayOptUuid.append(uuid) })
+        observeArrayKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.arrayBool, allTypeValues["arrayBool"] as! [Bool] + [false]) { obj.arrayBool.append(false) }
+        observeArrayKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.arrayInt, allTypeValues["arrayInt"] as! [Int] + [4], { obj.arrayInt.append(4) })
+        observeArrayKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.arrayInt8, allTypeValues["arrayInt8"] as! [Int8] + [4], { obj.arrayInt8.append(4) })
+        observeArrayKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.arrayInt16, allTypeValues["arrayInt16"] as! [Int16] + [4], { obj.arrayInt16.append(4) })
+        observeArrayKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.arrayInt32, allTypeValues["arrayInt32"] as! [Int32] + [4], { obj.arrayInt32.append(4) })
+        observeArrayKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.arrayInt64, allTypeValues["arrayInt64"] as! [Int64] + [4], { obj.arrayInt64.append(4) })
+        observeArrayKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.arrayFloat, allTypeValues["arrayFloat"] as! [Float] + [4], { obj.arrayFloat.append(4) })
+        observeArrayKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.arrayDouble, allTypeValues["arrayDouble"] as! [Double] + [4], { obj.arrayDouble.append(4) })
+        observeArrayKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.arrayString, allTypeValues["arrayString"] as! [String] + ["d"], { obj.arrayString.append("d") })
+        observeArrayKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.arrayBinary, allTypeValues["arrayBinary"] as! [Data] + [data], { obj.arrayBinary.append(data) })
+        observeArrayKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.arrayDate, allTypeValues["arrayDate"] as! [Date] + [date], { obj.arrayDate.append(date) })
+        observeArrayKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.arrayDecimal, allTypeValues["arrayDecimal"] as! [Decimal128] + [decimal], { obj.arrayDecimal.append(decimal) })
+        observeArrayKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.arrayObjectId, allTypeValues["arrayObjectId"] as! [ObjectId] + [objectId], { obj.arrayObjectId.append(objectId) })
+        observeArrayKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.arrayAny, allTypeValues["arrayAny"] as! [AnyRealmValue] + [anyValue], { obj.arrayAny.append(anyValue) })
+        observeArrayKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.arrayUuid, allTypeValues["arrayUuid"] as! [UUID] + [uuid], { obj.arrayUuid.append(uuid) })
+        observeArrayKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.arrayOptBool, allTypeValues["arrayOptBool"] as! [Bool?] + [true], { obj.arrayOptBool.append(true) })
+        observeArrayKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.arrayOptInt, allTypeValues["arrayOptInt"] as! [Int?] + [4], { obj.arrayOptInt.append(4) })
+        observeArrayKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.arrayOptInt8, allTypeValues["arrayOptInt8"] as! [Int8?] + [4], { obj.arrayOptInt8.append(4) })
+        observeArrayKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.arrayOptInt16, allTypeValues["arrayOptInt16"] as! [Int16?] + [4], { obj.arrayOptInt16.append(4) })
+        observeArrayKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.arrayOptInt32, allTypeValues["arrayOptInt32"] as! [Int32?] + [4], { obj.arrayOptInt32.append(4) })
+        observeArrayKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.arrayOptInt64, allTypeValues["arrayOptInt64"] as! [Int64?] + [4], { obj.arrayOptInt64.append(4) })
+        observeArrayKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.arrayOptFloat, allTypeValues["arrayOptFloat"] as! [Float?] + [4], { obj.arrayOptFloat.append(4) })
+        observeArrayKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.arrayOptDouble, allTypeValues["arrayOptDouble"] as! [Double?] + [4], { obj.arrayOptDouble.append(4) })
+        observeArrayKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.arrayOptString, allTypeValues["arrayOptString"] as! [String?] + ["d"], { obj.arrayOptString.append("d") })
+        observeArrayKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.arrayOptBinary, allTypeValues["arrayOptBinary"] as! [Data?] + [data], { obj.arrayOptBinary.append(data) })
+        observeArrayKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.arrayOptDate, allTypeValues["arrayOptDate"] as! [Date?] + [date], { obj.arrayOptDate.append(date) })
+        observeArrayKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.arrayOptDecimal, allTypeValues["arrayOptDecimal"] as! [Decimal128?] + [decimal], { obj.arrayOptDecimal.append(decimal) })
+        observeArrayKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.arrayOptObjectId, allTypeValues["arrayOptObjectId"] as! [ObjectId?] + [objectId], { obj.arrayOptObjectId.append(objectId) })
+        observeArrayKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.arrayOptUuid, allTypeValues["arrayOptUuid"] as! [UUID?] + [uuid], { obj.arrayOptUuid.append(uuid) })
 
         try! realmWithTestPath().write {
             obj.setBool.removeAll()
@@ -849,35 +872,35 @@ class ProjectionTests: TestCase {
             obj.setOptBool.insert(objectsIn: [true, nil])
         }
 
-        observeSetKeyPathChange(obj, obs, \AllTypesProjection.setBool, allTypeValues["setBool"] as! [Bool] + [false], { obj.setBool.insert(false) })
-        observeSetKeyPathChange(obj, obs, \AllTypesProjection.setInt, allTypeValues["setInt"] as! [Int] + [4], { obj.setInt.insert(4) })
-        observeSetKeyPathChange(obj, obs, \AllTypesProjection.setInt8, allTypeValues["setInt8"] as! [Int8] + [4], { obj.setInt8.insert(4) })
-        observeSetKeyPathChange(obj, obs, \AllTypesProjection.setInt16, allTypeValues["setInt16"] as! [Int16] + [4], { obj.setInt16.insert(4) })
-        observeSetKeyPathChange(obj, obs, \AllTypesProjection.setInt32, allTypeValues["setInt32"] as! [Int32] + [4], { obj.setInt32.insert(4) })
-        observeSetKeyPathChange(obj, obs, \AllTypesProjection.setInt64, allTypeValues["setInt64"] as! [Int64] + [4], { obj.setInt64.insert(4) })
-        observeSetKeyPathChange(obj, obs, \AllTypesProjection.setFloat, allTypeValues["setFloat"] as! [Float] + [4], { obj.setFloat.insert(4) })
-        observeSetKeyPathChange(obj, obs, \AllTypesProjection.setDouble, allTypeValues["setDouble"] as! [Double] + [4], { obj.setDouble.insert(4) })
-        observeSetKeyPathChange(obj, obs, \AllTypesProjection.setString, allTypeValues["setString"] as! [String] + ["d"], { obj.setString.insert("d") })
-        observeSetKeyPathChange(obj, obs, \AllTypesProjection.setBinary, allTypeValues["setBinary"] as! [Data] + [data], { obj.setBinary.insert(data) })
-        observeSetKeyPathChange(obj, obs, \AllTypesProjection.setDate, allTypeValues["setDate"] as! [Date] + [date], { obj.setDate.insert(date) })
-        observeSetKeyPathChange(obj, obs, \AllTypesProjection.setDecimal, allTypeValues["setDecimal"] as! [Decimal128] + [decimal], { obj.setDecimal.insert(decimal) })
-        observeSetKeyPathChange(obj, obs, \AllTypesProjection.setObjectId, allTypeValues["setObjectId"] as! [ObjectId] + [objectId], { obj.setObjectId.insert(objectId) })
-        observeSetKeyPathChange(obj, obs, \AllTypesProjection.setAny, allTypeValues["setAny"] as! [AnyRealmValue] + [anyValue], { obj.setAny.insert(anyValue) })
-        observeSetKeyPathChange(obj, obs, \AllTypesProjection.setUuid, allTypeValues["setUuid"] as! [UUID] + [uuid], { obj.setUuid.insert(uuid) })
-        observeSetKeyPathChange(obj, obs, \AllTypesProjection.setOptBool, allTypeValues["setOptBool"] as! [Bool?] + [false], { obj.setOptBool.insert(false) })
-        observeSetKeyPathChange(obj, obs, \AllTypesProjection.setOptInt, allTypeValues["setOptInt"] as! [Int?] + [4], { obj.setOptInt.insert(4) })
-        observeSetKeyPathChange(obj, obs, \AllTypesProjection.setOptInt8, allTypeValues["setOptInt8"] as! [Int8?] + [4], { obj.setOptInt8.insert(4) })
-        observeSetKeyPathChange(obj, obs, \AllTypesProjection.setOptInt16, allTypeValues["setOptInt16"] as! [Int16?] + [4], { obj.setOptInt16.insert(4) })
-        observeSetKeyPathChange(obj, obs, \AllTypesProjection.setOptInt32, allTypeValues["setOptInt32"] as! [Int32?] + [4], { obj.setOptInt32.insert(4) })
-        observeSetKeyPathChange(obj, obs, \AllTypesProjection.setOptInt64, allTypeValues["setOptInt64"] as! [Int64?] + [4], { obj.setOptInt64.insert(4) })
-        observeSetKeyPathChange(obj, obs, \AllTypesProjection.setOptFloat, allTypeValues["setOptFloat"] as! [Float?] + [4], { obj.setOptFloat.insert(4) })
-        observeSetKeyPathChange(obj, obs, \AllTypesProjection.setOptDouble, allTypeValues["setOptDouble"] as! [Double?] + [4], { obj.setOptDouble.insert(4) })
-        observeSetKeyPathChange(obj, obs, \AllTypesProjection.setOptString, allTypeValues["setOptString"] as! [String?] + ["d"], { obj.setOptString.insert("d") })
-        observeSetKeyPathChange(obj, obs, \AllTypesProjection.setOptBinary, allTypeValues["setOptBinary"] as! [Data?] + [data], { obj.setOptBinary.insert(data) })
-        observeSetKeyPathChange(obj, obs, \AllTypesProjection.setOptDate, allTypeValues["setOptDate"] as! [Date?] + [date], { obj.setOptDate.insert(date) })
-        observeSetKeyPathChange(obj, obs, \AllTypesProjection.setOptDecimal, allTypeValues["setOptDecimal"] as! [Decimal128?] + [decimal], { obj.setOptDecimal.insert(decimal) })
-        observeSetKeyPathChange(obj, obs, \AllTypesProjection.setOptObjectId, allTypeValues["setOptObjectId"] as! [ObjectId?] + [objectId], { obj.setOptObjectId.insert(objectId) })
-        observeSetKeyPathChange(obj, obs, \AllTypesProjection.setOptUuid, allTypeValues["setOptUuid"] as! [UUID?] + [uuid], { obj.setOptUuid.insert(uuid) })
+        observeSetKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.setBool, allTypeValues["setBool"] as! [Bool] + [false], { obj.setBool.insert(false) })
+        observeSetKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.setInt, allTypeValues["setInt"] as! [Int] + [4], { obj.setInt.insert(4) })
+        observeSetKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.setInt8, allTypeValues["setInt8"] as! [Int8] + [4], { obj.setInt8.insert(4) })
+        observeSetKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.setInt16, allTypeValues["setInt16"] as! [Int16] + [4], { obj.setInt16.insert(4) })
+        observeSetKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.setInt32, allTypeValues["setInt32"] as! [Int32] + [4], { obj.setInt32.insert(4) })
+        observeSetKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.setInt64, allTypeValues["setInt64"] as! [Int64] + [4], { obj.setInt64.insert(4) })
+        observeSetKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.setFloat, allTypeValues["setFloat"] as! [Float] + [4], { obj.setFloat.insert(4) })
+        observeSetKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.setDouble, allTypeValues["setDouble"] as! [Double] + [4], { obj.setDouble.insert(4) })
+        observeSetKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.setString, allTypeValues["setString"] as! [String] + ["d"], { obj.setString.insert("d") })
+        observeSetKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.setBinary, allTypeValues["setBinary"] as! [Data] + [data], { obj.setBinary.insert(data) })
+        observeSetKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.setDate, allTypeValues["setDate"] as! [Date] + [date], { obj.setDate.insert(date) })
+        observeSetKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.setDecimal, allTypeValues["setDecimal"] as! [Decimal128] + [decimal], { obj.setDecimal.insert(decimal) })
+        observeSetKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.setObjectId, allTypeValues["setObjectId"] as! [ObjectId] + [objectId], { obj.setObjectId.insert(objectId) })
+        observeSetKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.setAny, allTypeValues["setAny"] as! [AnyRealmValue] + [anyValue], { obj.setAny.insert(anyValue) })
+        observeSetKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.setUuid, allTypeValues["setUuid"] as! [UUID] + [uuid], { obj.setUuid.insert(uuid) })
+        observeSetKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.setOptBool, allTypeValues["setOptBool"] as! [Bool?] + [false], { obj.setOptBool.insert(false) })
+        observeSetKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.setOptInt, allTypeValues["setOptInt"] as! [Int?] + [4], { obj.setOptInt.insert(4) })
+        observeSetKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.setOptInt8, allTypeValues["setOptInt8"] as! [Int8?] + [4], { obj.setOptInt8.insert(4) })
+        observeSetKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.setOptInt16, allTypeValues["setOptInt16"] as! [Int16?] + [4], { obj.setOptInt16.insert(4) })
+        observeSetKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.setOptInt32, allTypeValues["setOptInt32"] as! [Int32?] + [4], { obj.setOptInt32.insert(4) })
+        observeSetKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.setOptInt64, allTypeValues["setOptInt64"] as! [Int64?] + [4], { obj.setOptInt64.insert(4) })
+        observeSetKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.setOptFloat, allTypeValues["setOptFloat"] as! [Float?] + [4], { obj.setOptFloat.insert(4) })
+        observeSetKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.setOptDouble, allTypeValues["setOptDouble"] as! [Double?] + [4], { obj.setOptDouble.insert(4) })
+        observeSetKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.setOptString, allTypeValues["setOptString"] as! [String?] + ["d"], { obj.setOptString.insert("d") })
+        observeSetKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.setOptBinary, allTypeValues["setOptBinary"] as! [Data?] + [data], { obj.setOptBinary.insert(data) })
+        observeSetKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.setOptDate, allTypeValues["setOptDate"] as! [Date?] + [date], { obj.setOptDate.insert(date) })
+        observeSetKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.setOptDecimal, allTypeValues["setOptDecimal"] as! [Decimal128?] + [decimal], { obj.setOptDecimal.insert(decimal) })
+        observeSetKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.setOptObjectId, allTypeValues["setOptObjectId"] as! [ObjectId?] + [objectId], { obj.setOptObjectId.insert(objectId) })
+        observeSetKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.setOptUuid, allTypeValues["setOptUuid"] as! [UUID?] + [uuid], { obj.setOptUuid.insert(uuid) })
 
         let newValues: [String: Any] = [
             "mapBool": ["1": false, "2": false] as [String: Bool],
@@ -920,35 +943,35 @@ class ProjectionTests: TestCase {
                            "4": nil],
         ]
 
-        observeMapKeyPathChange(obj, obs, \AllTypesProjection.mapBool, newValues["mapBool"] as! Dictionary<String, Bool>, { obj.mapBool["1"] = false })
-        observeMapKeyPathChange(obj, obs, \AllTypesProjection.mapInt, newValues["mapInt"] as! Dictionary<String, Int>, { obj.mapInt["1"] = 4 })
-        observeMapKeyPathChange(obj, obs, \AllTypesProjection.mapInt8, newValues["mapInt8"] as! Dictionary<String, Int8>, { obj.mapInt8["1"] = 4 })
-        observeMapKeyPathChange(obj, obs, \AllTypesProjection.mapInt16, newValues["mapInt16"] as! Dictionary<String, Int16>, { obj.mapInt16["1"] = 4 })
-        observeMapKeyPathChange(obj, obs, \AllTypesProjection.mapInt32, newValues["mapInt32"] as! Dictionary<String, Int32>, { obj.mapInt32["1"] = 4 })
-        observeMapKeyPathChange(obj, obs, \AllTypesProjection.mapInt64, newValues["mapInt64"] as! Dictionary<String, Int64>, { obj.mapInt64["1"] = 4 })
-        observeMapKeyPathChange(obj, obs, \AllTypesProjection.mapFloat, newValues["mapFloat"] as! Dictionary<String, Float>, { obj.mapFloat["1"] = 4 })
-        observeMapKeyPathChange(obj, obs, \AllTypesProjection.mapDouble, newValues["mapDouble"] as! Dictionary<String, Double>, { obj.mapDouble["1"] = 4 })
-        observeMapKeyPathChange(obj, obs, \AllTypesProjection.mapString, newValues["mapString"] as! Dictionary<String, String>, { obj.mapString["1"] = "d" })
-        observeMapKeyPathChange(obj, obs, \AllTypesProjection.mapBinary, newValues["mapBinary"] as! Dictionary<String, Data>, { obj.mapBinary["1"] = data })
-        observeMapKeyPathChange(obj, obs, \AllTypesProjection.mapDate, newValues["mapDate"] as! Dictionary<String, Date>, { obj.mapDate["1"] = date })
-        observeMapKeyPathChange(obj, obs, \AllTypesProjection.mapDecimal, newValues["mapDecimal"] as! Dictionary<String, Decimal128>, { obj.mapDecimal["1"] = decimal })
-        observeMapKeyPathChange(obj, obs, \AllTypesProjection.mapObjectId, newValues["mapObjectId"] as! Dictionary<String, ObjectId>, { obj.mapObjectId["1"] = objectId })
-        observeMapKeyPathChange(obj, obs, \AllTypesProjection.mapAny, newValues["mapAny"] as! Dictionary<String, AnyRealmValue>, { obj.mapAny["1"] = anyValue })
-        observeMapKeyPathChange(obj, obs, \AllTypesProjection.mapUuid, newValues["mapUuid"] as! Dictionary<String, UUID>, { obj.mapUuid["1"] = uuid })
-        observeMapKeyPathChange(obj, obs, \AllTypesProjection.mapOptBool, newValues["mapOptBool"] as! Dictionary<String, Bool?>, { obj.mapOptBool["1"] = false })
-        observeMapKeyPathChange(obj, obs, \AllTypesProjection.mapOptInt, newValues["mapOptInt"] as! Dictionary<String, Int?>, { obj.mapOptInt["1"] = 4 })
-        observeMapKeyPathChange(obj, obs, \AllTypesProjection.mapOptInt8, newValues["mapOptInt8"] as! Dictionary<String, Int8?>, { obj.mapOptInt8["1"] = 4 })
-        observeMapKeyPathChange(obj, obs, \AllTypesProjection.mapOptInt16, newValues["mapOptInt16"] as! Dictionary<String, Int16?>, { obj.mapOptInt16["1"] = 4 })
-        observeMapKeyPathChange(obj, obs, \AllTypesProjection.mapOptInt32, newValues["mapOptInt32"] as! Dictionary<String, Int32?>, { obj.mapOptInt32["1"] = 4 })
-        observeMapKeyPathChange(obj, obs, \AllTypesProjection.mapOptInt64, newValues["mapOptInt64"] as! Dictionary<String, Int64?>, { obj.mapOptInt64["1"] = 4 })
-        observeMapKeyPathChange(obj, obs, \AllTypesProjection.mapOptFloat, newValues["mapOptFloat"] as! Dictionary<String, Float?>, { obj.mapOptFloat["1"] = 4 })
-        observeMapKeyPathChange(obj, obs, \AllTypesProjection.mapOptDouble, newValues["mapOptDouble"] as! Dictionary<String, Double?>, { obj.mapOptDouble["1"] = 4 })
-        observeMapKeyPathChange(obj, obs, \AllTypesProjection.mapOptString, newValues["mapOptString"] as! Dictionary<String, String?>, { obj.mapOptString["1"] = "d" })
-        observeMapKeyPathChange(obj, obs, \AllTypesProjection.mapOptBinary, newValues["mapOptBinary"] as! Dictionary<String, Data?>, { obj.mapOptBinary["1"] = data })
-        observeMapKeyPathChange(obj, obs, \AllTypesProjection.mapOptDate, newValues["mapOptDate"] as! Dictionary<String, Date?>, { obj.mapOptDate["1"] = date })
-        observeMapKeyPathChange(obj, obs, \AllTypesProjection.mapOptDecimal, newValues["mapOptDecimal"] as! Dictionary<String, Decimal128?>, { obj.mapOptDecimal["1"] = decimal })
-        observeMapKeyPathChange(obj, obs, \AllTypesProjection.mapOptObjectId, newValues["mapOptObjectId"] as! Dictionary<String, ObjectId?>, { obj.mapOptObjectId["1"] = objectId })
-        observeMapKeyPathChange(obj, obs, \AllTypesProjection.mapOptUuid, newValues["mapOptUuid"] as! Dictionary<String, UUID?>, { obj.mapOptUuid["1"] = uuid })
+        observeMapKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.mapBool, newValues["mapBool"] as! Dictionary<String, Bool>, { obj.mapBool["1"] = false })
+        observeMapKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.mapInt, newValues["mapInt"] as! Dictionary<String, Int>, { obj.mapInt["1"] = 4 })
+        observeMapKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.mapInt8, newValues["mapInt8"] as! Dictionary<String, Int8>, { obj.mapInt8["1"] = 4 })
+        observeMapKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.mapInt16, newValues["mapInt16"] as! Dictionary<String, Int16>, { obj.mapInt16["1"] = 4 })
+        observeMapKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.mapInt32, newValues["mapInt32"] as! Dictionary<String, Int32>, { obj.mapInt32["1"] = 4 })
+        observeMapKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.mapInt64, newValues["mapInt64"] as! Dictionary<String, Int64>, { obj.mapInt64["1"] = 4 })
+        observeMapKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.mapFloat, newValues["mapFloat"] as! Dictionary<String, Float>, { obj.mapFloat["1"] = 4 })
+        observeMapKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.mapDouble, newValues["mapDouble"] as! Dictionary<String, Double>, { obj.mapDouble["1"] = 4 })
+        observeMapKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.mapString, newValues["mapString"] as! Dictionary<String, String>, { obj.mapString["1"] = "d" })
+        observeMapKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.mapBinary, newValues["mapBinary"] as! Dictionary<String, Data>, { obj.mapBinary["1"] = data })
+        observeMapKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.mapDate, newValues["mapDate"] as! Dictionary<String, Date>, { obj.mapDate["1"] = date })
+        observeMapKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.mapDecimal, newValues["mapDecimal"] as! Dictionary<String, Decimal128>, { obj.mapDecimal["1"] = decimal })
+        observeMapKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.mapObjectId, newValues["mapObjectId"] as! Dictionary<String, ObjectId>, { obj.mapObjectId["1"] = objectId })
+        observeMapKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.mapAny, newValues["mapAny"] as! Dictionary<String, AnyRealmValue>, { obj.mapAny["1"] = anyValue })
+        observeMapKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.mapUuid, newValues["mapUuid"] as! Dictionary<String, UUID>, { obj.mapUuid["1"] = uuid })
+        observeMapKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.mapOptBool, newValues["mapOptBool"] as! Dictionary<String, Bool?>, { obj.mapOptBool["1"] = false })
+        observeMapKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.mapOptInt, newValues["mapOptInt"] as! Dictionary<String, Int?>, { obj.mapOptInt["1"] = 4 })
+        observeMapKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.mapOptInt8, newValues["mapOptInt8"] as! Dictionary<String, Int8?>, { obj.mapOptInt8["1"] = 4 })
+        observeMapKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.mapOptInt16, newValues["mapOptInt16"] as! Dictionary<String, Int16?>, { obj.mapOptInt16["1"] = 4 })
+        observeMapKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.mapOptInt32, newValues["mapOptInt32"] as! Dictionary<String, Int32?>, { obj.mapOptInt32["1"] = 4 })
+        observeMapKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.mapOptInt64, newValues["mapOptInt64"] as! Dictionary<String, Int64?>, { obj.mapOptInt64["1"] = 4 })
+        observeMapKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.mapOptFloat, newValues["mapOptFloat"] as! Dictionary<String, Float?>, { obj.mapOptFloat["1"] = 4 })
+        observeMapKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.mapOptDouble, newValues["mapOptDouble"] as! Dictionary<String, Double?>, { obj.mapOptDouble["1"] = 4 })
+        observeMapKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.mapOptString, newValues["mapOptString"] as! Dictionary<String, String?>, { obj.mapOptString["1"] = "d" })
+        observeMapKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.mapOptBinary, newValues["mapOptBinary"] as! Dictionary<String, Data?>, { obj.mapOptBinary["1"] = data })
+        observeMapKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.mapOptDate, newValues["mapOptDate"] as! Dictionary<String, Date?>, { obj.mapOptDate["1"] = date })
+        observeMapKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.mapOptDecimal, newValues["mapOptDecimal"] as! Dictionary<String, Decimal128?>, { obj.mapOptDecimal["1"] = decimal })
+        observeMapKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.mapOptObjectId, newValues["mapOptObjectId"] as! Dictionary<String, ObjectId?>, { obj.mapOptObjectId["1"] = objectId })
+        observeMapKeyPathChange(obj, obs, \AllTypesPrimitiveProjection.mapOptUuid, newValues["mapOptUuid"] as! Dictionary<String, UUID?>, { obj.mapOptUuid["1"] = uuid })
     }
 
     func testObserveKeyPath() {
@@ -984,7 +1007,7 @@ class ProjectionTests: TestCase {
     }
 
     // swiftlint:disable:next cyclomatic_complexity
-    func observeChange<T: Equatable>(_ obj: AllTypesProjection, _ key: String, _ old: T?, _ new: T?,
+    func observeChange<T: Equatable>(_ obj: AllTypesPrimitiveProjection, _ key: String, _ old: T?, _ new: T?,
                                      fileName: StaticString = #file, lineNumber: UInt = #line, _ block: () -> Void) {
         let kvoOptions: NSKeyValueObservingOptions = [.old, .new]
         obj.addObserver(self, forKeyPath: key, options: kvoOptions, context: nil)
@@ -1009,7 +1032,7 @@ class ProjectionTests: TestCase {
         changeDictionary = nil
     }
 
-    func observeListChange(_ obj: AllTypesProjection, _ key: String, _ kind: NSKeyValueChange, _ indexes: NSIndexSet = NSIndexSet(index: 0),
+    func observeListChange(_ obj: AllTypesPrimitiveProjection, _ key: String, _ kind: NSKeyValueChange, _ indexes: NSIndexSet = NSIndexSet(index: 0),
                            fileName: StaticString = #file, lineNumber: UInt = #line, _ block: () -> Void) {
         obj.addObserver(self, forKeyPath: key, options: [.old, .new], context: nil)
         obj.realm?.beginWrite()
@@ -1029,17 +1052,17 @@ class ProjectionTests: TestCase {
         changeDictionary = nil
     }
 
-    func newObjects(_ defaultValues: [String: Any] = [:]) -> (ModernAllTypesObject, AllTypesProjection) {
+    func newObjects(_ defaultValues: [String: Any] = [:]) -> (ModernAllTypesObject, AllTypesPrimitiveProjection) {
         let realm = realmWithTestPath()
         realm.beginWrite()
         realm.delete( realm.objects(ModernAllTypesObject.self))
         let obj = realm.create(ModernAllTypesObject.self, value: defaultValues)
-        let obs = AllTypesProjection(projecting: obj)
+        let obs = AllTypesPrimitiveProjection(projecting: obj)
         try! realm.commitWrite()
         return (obj, obs)
     }
 
-    func observeSetChange(_ obj: AllTypesProjection, _ key: String,
+    func observeSetChange(_ obj: AllTypesPrimitiveProjection, _ key: String,
                           fileName: StaticString = #file, lineNumber: UInt = #line, _ block: () -> Void) {
         obj.addObserver(self, forKeyPath: key, options: [], context: nil)
         obj.realm!.beginWrite()
@@ -1561,10 +1584,11 @@ class ProjectionTests: TestCase {
 
     func simpleProjection() -> SimpleProjection {
         let realm = realmWithTestPath()
+        var obj: SimpleObject!
         try! realm.write {
-            realm.create(SimpleObject.self)
+            obj = realm.create(SimpleObject.self)
         }
-        return realm.objects(SimpleProjection.self).first!
+        return SimpleProjection(projecting: obj)
     }
 
     func testIsFrozen() {
@@ -1584,7 +1608,7 @@ class ProjectionTests: TestCase {
 
     func testFreezingDeletedObject() {
         let projection = simpleProjection()
-        let object = projection.realm!.objects(SimpleObject.self).first!
+        let object = projection.rootObject
         try! projection.realm!.write({
             projection.realm!.delete(object)
         })
@@ -1750,8 +1774,19 @@ class ProjectionTests: TestCase {
     }
 
     func testFailedProjection() {
-        let realm = self.realmWithTestPath()
+        let realm = realmWithTestPath()
         XCTAssertGreaterThan(realm.objects(FailedProjection.self).count, 0)
         assertThrows(realm.objects(FailedProjection.self).first, reason: "@Projected property")
+    }
+    
+    func testAdvancedProjection() throws {
+        let realm = realmWithTestPath()
+        let proj = realm.objects(AdvancedProjection.self).first!
+
+        XCTAssertEqual(proj.arrayLen, 3)
+        XCTAssertTrue(proj.projectedArray.elementsEqual(["1 - true", "2 - false"]), "'\(proj.projectedArray)' should be equal to '[\"1 - true\", \"2 - false\"]'")
+        XCTAssertTrue(proj.renamedArray.elementsEqual([1, 2, 3]))
+        XCTAssertEqual(proj.firstElement, 1)
+        XCTAssertTrue(proj.projectedSet.elementsEqual([true, false]), "'\(proj.projectedArray)' should be equal to '[true, false]'")
     }
 }

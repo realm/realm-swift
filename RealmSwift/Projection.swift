@@ -28,11 +28,11 @@ private protocol AnyProjected {
 
 // MARK: Projection
 
-/// `@Projected` is used to declare properties on ``Projection`` protocols which should be
+/// ``@Projected`` is used to declare properties on ``Projection`` protocols which should be
 /// managed by Realm.
 ///
 /// Example of usage:
-/// ```
+/// ```swift
 /// public class Person: Object {
 ///     @Persisted var firstName = ""
 ///     @Persisted var lastName = ""
@@ -41,15 +41,9 @@ private protocol AnyProjected {
 ///     @Persisted var reviews = List<String>()
 /// }
 ///
-/// public class Address: EmbeddedObject {
-///     @Persisted var city: String = ""
-///     @Persisted var country = ""
-/// }
-///
-/// struct PersonProjection: Projection {
-///     typealias Root = Person
-///
+/// class PersonProjection: Projection<Person> {
 ///     @Projected(\Person.firstName) var firstName
+///     @Projected(\Person.lastName.localizedUppercase) var lastNameCaps
 ///     @Projected(\Person.address.city) var homeCity
 ///     @Projected(\Person.friends.projectTo.firstName) var firstFriendsName: ProjectedList<String>
 /// }
@@ -162,11 +156,11 @@ extension ObjectChange {
     }
 }
 
-/// Projections are a light weight structure of  the original Realm objects with a minimal effort.
-/// And use them as a model in your application.
+/// ``Projection`` is a light weight model of  the original Realm ``Object`` or ``EmbeddedObject``.
+/// You can use `Projection` as a view model to minimize boilerplate.
 ///
 /// Example of usage:
-/// ```
+/// ```swift
 /// public class Person: Object {
 ///     @Persisted var firstName = ""
 ///     @Persisted var lastName = ""
@@ -184,8 +178,29 @@ extension ObjectChange {
 ///     @Projected(\Person.firstName) var firstName
 ///     @Projected(\Person.lastName.localizedUppercase) var lastNameCaps
 ///     @Projected(\Person.address.city) var homeCity
-///     @Projected(\Person.friends.projectTo.firstName) var firstFriendsName: ProjectedList<String>
+///     @Projected(\Person.friends.projectTo.firstName) var friendsFirstName: ProjectedList<String>
 /// }
+/// ```
+///  ### Supported property types
+/// Projection can transform the original `@Persisted` properties in several ways:
+/// - `Passthrough` - `Projection`'s property will have same name and type as original object. See `PersonProjection.firstName`.
+/// - `Rename` - Projection's property will have same type as original object just with the new name.
+/// - `Keypath resolution` - you can access the certain properties of the projected `Object`. See `PersonProjection.lastNameCaps` and `PersonProjection.homeCity`.
+/// - `Collection mapping` - `List` and `MutableSet`of `Object`s or `EmbeddedObject`s  can be projected as a collection of primitive values.
+///     See `PersonProjection.friendsFirstName`.
+/// - `Exclusion` - all properties of the original Realm object that were not defined in the projection model will be excluded from projection.
+///     Any changes happened on those properties will not trigger a change notification for the `Projection`.
+///     You still can access the original `Object` or `EmbeddedObject` and observe notifications directly on it.
+/// - note: each `@Persisted` property can be `@Projected` in different ways in the same Projection class.
+/// Each `Object` or `EmbeddedObject` can have sevaral projections of same or different classes at once.
+///
+/// ### Querying
+/// You can retrieve all Projections of a given type from a Realm by calling the `objects(_:)` of Realm or `init(projecting:)`
+/// of Projection's class:
+/// ```swift
+/// let projections = realm.object(PersonProjection.self)
+/// let personObject = realm.create(Person.self)
+/// let singleProjection = PersonProjection(projecting: personObject)
 /// ```
 open class Projection<Root: ObjectBase>: RealmCollectionValue, ProjectionObservable {
     /// The object being projected
@@ -835,8 +850,12 @@ public struct ProjectedList<NewElement>: RandomAccessCollection where NewElement
     }
     /// A human-readable description of the object.
     public var description: String {
+        var elements = ""
+        for (i, o) in self.enumerated() {
+            elements += "\t[\(i)] \(o)\n"
+        }
         return "\(type(of: self))<\(Element.self)> <\(self)> {\n" +
-        "\(RLMDescriptionWithMaxDepth("ProjectedList", backingList.rlmArray, RLMDescriptionMaxDepth))\n" +
+        elements +
         "}"
     }
     /**
@@ -921,6 +940,19 @@ extension List where Element: ObjectBase, Element: RealmCollectionValue {
     }
 }
 
+/**
+ `SetElementMapper` transforms the actual `MutableSet` of `Objects` or `MutableSet` of `EmbeddedObjects` in to ProjectedMutableSet.
+ For example:
+ ```swift
+ class Person: Object {
+     @Persisted var dogs: MutableSet<Dog>
+ }
+ class PersonProjection: Projection<Person> {
+     @Projected(\Person.dogs.projectTo.name) var dogNames: ProjectedMutableSet<String>
+ }
+```
+ In this code the `Person`'s dogs set will be prijected to the projected set of dogs names via `projectTo`
+ */
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 @dynamicMemberLookup
 public struct SetElementMapper<Element> where Element: ObjectBase, Element: RealmCollectionValue {
@@ -1262,8 +1294,12 @@ public struct ProjectedMutableSet<NewElement>: RandomAccessCollection where NewE
     }
     /// A human-readable description of the object.
     public var description: String {
+        var elements = ""
+        for (i, o) in self.enumerated() {
+            elements += "\t[\(i)] \(o)\n"
+        }
         return "\(type(of: self))<\(Element.self)> <\(self)> {\n" +
-        "\(RLMDescriptionWithMaxDepth("ProjectedMutableSet", backingSet.rlmSet, RLMDescriptionMaxDepth))\n" +
+        elements +
         "}"
     }
     /**

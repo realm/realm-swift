@@ -2728,7 +2728,7 @@ class CombineProjectionPublisherTests: CombinePublisherTestCase {
         let object = try! realm.write {
             realm.create(SimpleObject.self, value: [1])
         }
-        let projection = realm.objects(SimpleProjection.self).first!//(projecting: object)
+        let projection = realm.objects(SimpleProjection.self).first!
         XCTAssertNotEqual(projection.id, object.id)
         let projection2 = SimpleProjection(projecting: object)
         XCTAssertEqual(projection.id, projection2.id)
