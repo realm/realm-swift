@@ -21,9 +21,10 @@ x.y.z Release notes (yyyy-MM-dd)
   persons = realm.objects(Person.self).where {
     ($0.pets.age >= 2) && $0.pets.name.starts(with: "L")
   }
-  ```([Cocoa #7419](https://github.com/realm/realm-cocoa/pull/7419))
+  ```
+  ([Cocoa #7419](https://github.com/realm/realm-cocoa/pull/7419))
 * Add support for dictionary subscript expressions (e.g. `"phoneNumbers['Jane'] == '123-3456-123'"`) when querying with an NSPredicate.
-  
+
 ### Fixed
 * Change default request timeout for `RLMApp` from 6 seconds to 60 seconds.
 
