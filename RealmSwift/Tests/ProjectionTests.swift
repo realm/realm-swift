@@ -1778,7 +1778,7 @@ class ProjectionTests: TestCase {
         XCTAssertGreaterThan(realm.objects(FailedProjection.self).count, 0)
         assertThrows(realm.objects(FailedProjection.self).first, reason: "@Projected property")
     }
-    
+
     func testAdvancedProjection() throws {
         let realm = realmWithTestPath()
         let proj = realm.objects(AdvancedProjection.self).first!
