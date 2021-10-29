@@ -182,16 +182,13 @@ struct ReminderListResultsView: View {
     @Binding var searchFilter: String
 
     var body: some View {
-        let list = {
-            List {
-                ForEach(reminders) { list in
-                    NavigationLink(destination: ReminderListView(list: list)) {
-                        ReminderListRowView(list: list).tag(list)
-                    }.accessibilityIdentifier(list.name)
-                }.onDelete(perform: $reminders.remove)
-            }
-        }()
-        
+        let list = List {
+            ForEach(reminders) { list in
+                NavigationLink(destination: ReminderListView(list: list)) {
+                    ReminderListRowView(list: list).tag(list)
+                }.accessibilityIdentifier(list.name)
+            }.onDelete(perform: $reminders.remove)
+        }
         if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *) {
             list
                 .searchable(text: $searchFilter,
