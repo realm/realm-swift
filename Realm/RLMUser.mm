@@ -25,6 +25,8 @@
 #import "RLMMongoClient_Private.hpp"
 #import "RLMRealmConfiguration+Sync.h"
 #import "RLMSyncConfiguration_Private.hpp"
+#import "RLMFlexibleSyncConfiguration_Private.hpp"
+
 #import "RLMSyncSession_Private.hpp"
 
 #import <realm/object-store/sync/sync_manager.hpp>
@@ -87,6 +89,13 @@ using namespace realm;
                                                       stopPolicy:RLMSyncStopPolicyAfterChangesUploaded];
     RLMRealmConfiguration *config = [[RLMRealmConfiguration alloc] init];
     config.syncConfiguration = syncConfig;
+    return config;
+}
+
+- (RLMRealmConfiguration *)flexibleSyncConfiguration {
+    // TODO: Flexible Sync - Add real implementation
+    auto flexibleSyncConfig = [[RLMFlexibleSyncConfiguration alloc] initWithUser:self];
+    RLMRealmConfiguration *config = [[RLMRealmConfiguration alloc] init];
     return config;
 }
 

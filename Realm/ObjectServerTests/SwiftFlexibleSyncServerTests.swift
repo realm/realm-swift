@@ -51,84 +51,80 @@ class SwiftFlexibleSyncTestCase: SwiftSyncTestCase {
 }
 
 // MARK: - Completion Block
+@available(macOS 12.0.0, *)
 class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
-    func testFlexibleSyncDownload() throws {
-//
-//        // Non-Async Await
-//        // Example code 1 - Add 2 different subscriptions, second one without name
-//        if realm.subscriptions.isEmpty {
-//            realm.subscribe({
-//                Subscription<Contact>(name: "contacts-ny") {
-//                    $0.address.state == "NY" && $0.age > 10
-//                }
-//                Subscription<Author> {
-//                    $0.name == "Joe Doe"
-//                }
-//            }, callback: { results in
-//                switch results {
-//                case .success(let subscription):
-//                    // Return subscription
-//                    break
-//                case .failure(let error):
-//                    // Do something if there is an error
-//                    break
-//                }
-//            })
-//                .onStateChange { subscriptionState in
-//                    // Do something on states changes
-//                    if subscriptionState == .bootstrapping {
-//                        // Do something
-//                    }
-//                }
-//        }
-        //
-        //        // Example code 2 - Remove subscription
-        //        if let subscription = realm.subscriptions.first(where: { $0.name == "contacts-tx" }) {
-        //            subscription.unsubscribe { results in
-        //                switch results {
-        //                case .success(let subscription):
-        //                    // Return subscription
-        //                    break
-        //                case .failure(let error):
-        //                    // Do something if there is an error
-        //                    break
-        //                }
-        //            }
-        //            .onStateChange { subscriptionState in
-        //                // Do something on states changes
-        //                if case let .error(error) = subscriptionState {
-        //                    // Do something for error
-        //                }
-        //            }
-        //        }
-        //
-        //        // Example code 3 - Update subscription
-        //        if let subscription = realm.subscriptions.first(where: { $0.name == "contacts-tx" }) {
-        //            subscription.update(to: Contact.self, where: { $0.address.state == "FL" }) { results in
-        //                switch results {
-        //                case .success(let subscription):
-        //                    // Return subscription
-        //                    break
-        //                case .failure(let error):
-        //                    // Do something if there is an error
-        //                    break
-        //                }
-        //            }
-        //        }
-        //
-        //        // Example code 4 - Unsubscribe all subscriptions in the array
-        //        realm.subscriptions.unsubscribeAll { results in
-        //            switch results {
-        //            case .success(let subscription):
-        //                // Return subscription
-        //                break
-        //            case .failure(let error):
-        //                // Do something if there is an error
-        //                break
-        //            }
-        //        }
-    }
+    func testFlexibleSyncDownload() async throws {
+        //// Examples
+        // Open Realm with a Flexible Configuration
+        let app = App(id: "")
+        let user = try await app.login(credentials: Credentials.emailPassword(email: "email", password: "password"))
+        let config = user.flexibleSyncConfiguration()
+        let realm = try await Realm.init(configuration: config, downloadBeforeOpen: .always)
 
+        // Example code 1 - Add 2 different subscriptions, second one without name
+        let subscriptions = realm.subscriptions
+        if subscriptions.isEmpty {
+            try subscriptions.write {
+                try subscriptions.add {
+                    Subscription<Contact>(name: "contacts-ny") {
+                        $0.address.state == "NY" && $0.age > 10
+                    }
+                    Subscription<Author> {
+                        $0.name == "Joe Doe"
+                    }
+                }
+            }
+            try subscriptions.waitForSync(completion: { result in
+                switch result {
+                case .success(()):
+                    // Sync succesful
+                    break
+                case .failure(let error):
+                    print(error)
+                }
+            })
+        }
+
+        // Example code 2 - Find a subscription by name and remove a subscription
+        let subscriptions2 = realm.subscriptions
+        if let subscription = subscriptions2.findSubscription(name: "contacts-ny") {
+            try subscriptions2.write {
+                try subscriptions2.remove(subscription)
+            }
+            .onStateChange({ state in
+                // Notify state changes
+                print(state)
+            })
+        }
+
+        // Example code 3 - Find a subscription by query and update the subscription
+        let subscriptions3 = realm.subscriptions
+        let query = { Subscription<Contact> { $0.address.state == "NY" && $0.age > 10 } }
+        if let subscription = subscriptions3.findSubscription(query) {
+            try subscriptions3.write {
+                try subscription.update {
+                    Subscription<Contact>(name: "contacts-ny") {
+                        $0.address.state == "TX" && $0.age > 21
+                    }
+                }
+            }
+        }
+
+        // Example code 4 - Remove all subscriptions for a type
+        let subscriptions4 = realm.subscriptions
+        try subscriptions4.write {
+            try subscriptions4.removeAll(ofType: Contact.self)
+        }
+        try subscriptions4.waitForSync(completion: { result in
+            switch result {
+            case .success(()):
+                // Sync succesful
+                break
+            case .failure(let error):
+                print(error)
+            }
+        })
+    }
 }
 
 // MARK: - Async Await
@@ -142,40 +138,50 @@ extension SwiftFlexibleSyncServerTests {
         let config = user.flexibleSyncConfiguration()
         let realm = try await Realm.init(configuration: config, downloadBeforeOpen: .always)
 
+        // Example code 1 - Add 2 different subscriptions, second one without name
+        let subscriptions = realm.subscriptions
+        if subscriptions.isEmpty {
+            try await subscriptions.writeAsync {
+                try subscriptions.add {
+                    Subscription<Contact>(name: "contacts-ny") {
+                        $0.address.state == "NY" && $0.age > 10
+                    }
+                    Subscription<Author> {
+                        $0.name == "Joe Doe"
+                    }
+                }
+            }
+            try await subscriptions.waitForSync()
+        }
 
-        // Async Await
-        // Example code 1 - Add 3 different subscriptions, second one without name
-        if realm.subscriptions.isEmpty {
-            let subscriptions = try await realm.subscribe {
-                Subscription<Contact>(name: "contacts-ny") {
-                    $0.address.state == "NY" && $0.age > 10
-                }
-                Subscription<Author> {
-                    $0.name == "Joe Doe"
-                }
+        // Example code 2 - Find a subscription by name and remove a subscription
+        let subscriptions2 = realm.subscriptions
+        if let subscription = subscriptions2.findSubscription(name: "contacts-ny") {
+            try await subscriptions2.writeAsync {
+                try subscriptions2.remove(subscription)
             }
         }
 
-        // Example code 2 - Update Subscription
+        // Example code 3 - Find a subscription by query and update the subscription
+        let subscriptions3 = realm.subscriptions
         let query = { Subscription<Contact> { $0.address.state == "NY" && $0.age > 10 } }
-        if let subscription = realm.subscriptions.findSubscription(query) {
-            try await subscription.update {
-                Subscription<Contact>(name: "contacts-ny") {
-                    $0.address.state == "TX" && $0.age > 21
-
+        if let subscription = subscriptions3.findSubscription(query) {
+            try await subscriptions3.writeAsync {
+                try subscription.update {
+                    Subscription<Contact>(name: "contacts-ny") {
+                        $0.address.state == "TX" && $0.age > 21
+                    }
                 }
             }
         }
 
-        // Example code 3 - Remove a subscription
-        if let subscription = realm.subscriptions.findSubscription(name: "contacts-ny") {
-            try await subscription.unsubscribe()
+        // Example code 4 - Remove all subscriptions for a type
+        let subscriptions4 = realm.subscriptions
+        try await subscriptions4.writeAsync {
+            try subscriptions4.removeAll(ofType: Contact.self)
         }
-
-        // Example code 4 - Unsubscribe all subscriptions
-        try await realm.subscriptions.unsubscribeAll()
+        try await subscriptions4.waitForSync()
     }
-
 }
 #endif // swift(>=5.5)
 #endif

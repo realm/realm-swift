@@ -750,15 +750,15 @@ extension FunctionCallable {
 }
 #endif // swift(>=5.5)
 
-//Flexible Sync Configuration
-//Same as with partition-based sync we get the configuration from the user
-extension User {
-    // Returns a flexible sync configuration to open the realm
-    public func flexibleSyncConfiguration() -> Realm.Configuration {
-        fatalError()
+public extension User {
+    // TODO: Flexible Sync - Add docstrings
+    func flexibleSyncConfiguration() -> Realm.Configuration {
+        let config = self.__flexibleSyncConfiguration()
+        return ObjectiveCSupport.convert(object: config)
     }
 }
 
+// FLEXIBLE SYNC
 public protocol AnySubscription {
 }
 
@@ -774,29 +774,8 @@ public class Subscription<Element: Object>: AnySubscription {
     // Name of the subscription, if not specified it will return the value in Query
     public var name: String = ""
 
-    #if swift(>=5.5) && canImport(_Concurrency)
-    // Async Unsubscribe query, this will return an error if we cannot unsubscribe
-    // this query
-    @available(macOS 12.0, tvOS 15.0, iOS 15.0, watchOS 8.0, *)
-    public func unsubscribe() async throws {
-        fatalError()
-    }
-
-    @available(macOS 12.0, tvOS 15.0, iOS 15.0, watchOS 8.0, *)
-    // Async Update query, this will return an error if the we cannot update
-    // the subscription
-    public func update(@QueryBuilder _ to: () -> (AnySubscription)) async throws {
-        fatalError()
-    }
-    #endif // swift(>=5.5)
-
-    // Unsubscribe query, this will return success or an error
-    public func unsubscribe(callback: @escaping (Result<Void, Error>) -> Void) -> SubscriptionTask {
-        fatalError()
-    }
-
-    // Update query, this will return success or an error
-    public func update(@QueryBuilder _ to: () -> (AnySubscription), callback: @escaping (Result<Void, Error>) -> Void) {
+    // Update query for subscription
+    public func update(@QueryBuilder _ to: () -> (AnySubscription)) throws {
         fatalError()
     }
 
@@ -806,13 +785,6 @@ public class Subscription<Element: Object>: AnySubscription {
         self.query = query
     }
 }
-
-@frozen public struct SubscriptionTask {
-    public func onStateChange(_ block: @escaping (SubscriptionState) -> Void) {
-       fatalError()
-    }
-}
-
 
 public protocol QueryBuilderComponent {}
 
@@ -832,57 +804,95 @@ public protocol AnyQueryBuilderComponent {}
 // Realm operations
 // Realm will only allow getting all the subscriptions and subscribe to a query
 extension Realm {
-    // Get all subscriptions for this Realm. SDKs that care deeply about queries
-    // on the main thread may also expose an async version of this API
-//    public typealias Element = Object
+    // Get all subscriptions for this Realm.
     /*private(set)*/ public var subscriptions: [AnySubscription] {
-        fatalError()
-    }
-
-    #if swift(>=5.5) && canImport(_Concurrency)
-    // Async await
-    // Adds a query to the list of subscriptions, optional name can be provided
-    // This method will throw an error in case we cannot subscribe the query
-    @available(macOS 12.0, tvOS 15.0, iOS 15.0, watchOS 8.0, *)
-    public func subscribe(@QueryBuilder _ to: () -> ([AnySubscription])) async throws -> [AnySubscription] {
-            // core subscribe
-            fatalError()
-    }
-    #endif // swift(>=5.5)
-
-    // Non-Async await
-    // Adds a query to the list of subscriptions, optional name can be provided
-    // This method contains a callblack block, if the subscription was successfully
-    // added then it will return  the subscription, if not it will return an error
-    @discardableResult
-    public func subscribe(@QueryBuilder _ to: () -> ([AnySubscription]), callback: @escaping (Result<[AnySubscription], Swift.Error>) -> Void) -> SubscriptionTask {
         fatalError()
     }
 }
 
+// TODO: Can we observer changes on the subscription set?
+// Task to get state changes from the write transaction
+@frozen public struct SubscriptionTask {
+    // Notifies state changes for the write subscription transaction
+    public func onStateChange(_ block: @escaping (SubscriptionState) -> Void) {
+       fatalError()
+    }
+}
 
-// Remove all subscriptions
-// Will be able to unsubscribe to all subscriptions
+// SubscriptionSet
 extension Array where Element == AnySubscription {
 
+    // TODO: Do we want to expose this??
+    // The state on this subscription set - is it acknowledged by the server and
+    // has the data been downloaded locally.
+    public var state: SubscriptionState {
+        fatalError()
+    }
+
+    // TODO: Do we want to expose this??
+    // The exception containing information for why this collection is in the
+    // Error state. If State is not Error, this will be null.
+    public var error: Error {
+        fatalError()
+    }
+
+    @discardableResult
+    public func write(_ block: (() throws -> ())) throws -> SubscriptionTask {
+        fatalError()
+    }
+
+    public func waitForSync(completion: @escaping (Result<Void, Error>) -> Void) throws {
+        fatalError()
+    }
+
     #if swift(>=5.5) && canImport(_Concurrency)
-    // Removes all the the subscriptions
-    @available(macOS 12.0, tvOS 15.0, iOS 15.0, watchOS 8.0, *)
-    public func unsubscribeAll() async throws {
+    @discardableResult
+    public func writeAsync(_ block: (() throws -> ())) async throws -> SubscriptionTask {
+        fatalError()
+    }
+
+    public func waitForSync() async throws {
         fatalError()
     }
     #endif // swift(>=5.5)
 
-
-    public func unsubscribeAll(callback: @escaping (Result<Void, Swift.Error>) -> Void) -> SubscriptionTask {
-        fatalError()
-    }
-
+    // Find subscription in the subscription set by name
     public func findSubscription<Element: Object>(name: String) -> Subscription<Element>? {
         fatalError()
     }
 
+    // Find subscription in the subscription set by query
     public func findSubscription<Element: Object>(@QueryBuilder _ `where`: () -> (AnySubscription)) -> Subscription<Element>? {
+        fatalError()
+    }
+
+    // Add a query or queries to the subscription set, this has to be done within a write block
+    public func add(@QueryBuilder _ to: () -> ([AnySubscription])) throws {
+        fatalError()
+    }
+
+    // Remove subscription of subscription set by query, this has to be done within a write block
+    public func remove(@QueryBuilder _ to: () -> ([AnySubscription])) throws {
+        fatalError()
+    }
+
+    // Remove a subscription from the subscription set, this has to be done within a write block
+    public func remove(_ subscription: AnySubscription) throws {
+        fatalError()
+    }
+
+    // Remove subscription of subscription set by name, this has to be done within a write block
+    public func remove(_ name: String) throws {
+        fatalError()
+    }
+
+    // Remove all subscriptions from the subscriptions set
+    public func removeAll() throws {
+        fatalError()
+    }
+
+    // Remove all subscriptions from the subscriptions set by type
+    public func removeAll<Element: Object>(ofType type: Element.Type) throws {
         fatalError()
     }
 }
