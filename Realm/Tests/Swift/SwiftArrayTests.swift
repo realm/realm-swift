@@ -531,7 +531,7 @@ class SwiftRLMArrayTests: RLMTestCase {
             XCTAssertEqual(obj.intCol, 42)
         }
 
-        let rlmArrayPrimitive = RLMArray<NSString>(objectClassName: NSString.className())
+        let rlmArrayPrimitive = RLMArray<NSString>(objectClassName: "NSString")
         let str = "foo"
         rlmArrayPrimitive.add(str as NSString)
         for obj in rlmArrayPrimitive {
