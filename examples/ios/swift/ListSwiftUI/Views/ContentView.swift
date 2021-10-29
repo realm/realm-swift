@@ -182,31 +182,30 @@ struct ReminderListResultsView: View {
     @Binding var searchFilter: String
 
     var body: some View {
+        let list = {
+            List {
+                ForEach(reminders) { list in
+                    NavigationLink(destination: ReminderListView(list: list)) {
+                        ReminderListRowView(list: list).tag(list)
+                    }.accessibilityIdentifier(list.name)
+                }.onDelete(perform: $reminders.remove)
+            }
+        }()
+        
         if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *) {
-            List {
-                ForEach(reminders) { list in
-                    NavigationLink(destination: ReminderListView(list: list)) {
-                        ReminderListRowView(list: list).tag(list)
-                    }.accessibilityIdentifier(list.name)
-                }.onDelete(perform: $reminders.remove)
-            }
-            .searchable(text: $searchFilter,
-                        collection: $reminders,
-                        keyPath: \.name) {
-                ForEach(reminders) { remindersFiltered in
-                    Text(remindersFiltered.name).searchCompletion(remindersFiltered.name)
+            list
+                .searchable(text: $searchFilter,
+                            collection: $reminders,
+                            keyPath: \.name) {
+                    ForEach(reminders) { remindersFiltered in
+                        Text(remindersFiltered.name).searchCompletion(remindersFiltered.name)
+                    }
                 }
-            }
         } else {
-            List {
-                ForEach(reminders) { list in
-                    NavigationLink(destination: ReminderListView(list: list)) {
-                        ReminderListRowView(list: list).tag(list)
-                    }.accessibilityIdentifier(list.name)
-                }.onDelete(perform: $reminders.remove)
-            }.onChange(of: searchFilter) { value in
-                $reminders.filter = value.isEmpty ? nil : NSPredicate(format: "name CONTAINS[c] %@", value)
-            }
+            list
+                .onChange(of: searchFilter) { value in
+                    $reminders.filter = value.isEmpty ? nil : NSPredicate(format: "name CONTAINS[c] %@", value)
+                }
         }
     }
 }
@@ -273,6 +272,7 @@ struct ContentView: View {
         NavigationView {
             VStack {
                 if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *) {
+                    // Don't add a SearchView in case searchable is available
                 } else {
                     SearchView(searchFilter: $searchFilter)
                 }
