@@ -1309,6 +1309,20 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         XCTAssertEqual(app.currentUser?.customData["favourite_colour"], .string("green"))
         XCTAssertEqual(app.currentUser?.customData["apples"], .int64(10))
     }
+
+    // MARK: User Profile
+
+    func testUserProfileInitialization() {
+        let profile = UserProfile()
+        XCTAssertNil(profile.name)
+        XCTAssertNil(profile.maxAge)
+        XCTAssertNil(profile.minAge)
+        XCTAssertNil(profile.birthday)
+        XCTAssertNil(profile.gender)
+        XCTAssertNil(profile.firstName)
+        XCTAssertNil(profile.lastName)
+        XCTAssertNil(profile.pictureURL)
+    }
 }
 
 class AnyRealmValueSyncTests: SwiftSyncTestCase {
