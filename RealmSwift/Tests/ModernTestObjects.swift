@@ -40,6 +40,7 @@ class ModernAllTypesObject: Object {
     @Persisted var objectCol: ModernAllTypesObject?
     @Persisted var arrayCol: List<ModernAllTypesObject>
     @Persisted var setCol: MutableSet<ModernAllTypesObject>
+    @Persisted var mapCol: Map<String, ModernAllTypesObject?>
     @Persisted var anyCol: AnyRealmValue
     @Persisted var uuidCol: UUID
     @Persisted var intEnumCol: ModernIntEnum

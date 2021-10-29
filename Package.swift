@@ -276,7 +276,10 @@ let package = Package(
             name: "RealmSwiftTests",
             dependencies: ["RealmSwift", "RealmTestSupport"],
             path: "RealmSwift/Tests",
-            exclude: ["RealmSwiftTests-Info.plist"],
+            exclude: [
+                "RealmSwiftTests-Info.plist",
+                "QueryTests.swift.gyb"
+            ],
             swiftSettings: testSwiftSettings
         ),
 

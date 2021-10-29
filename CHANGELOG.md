@@ -1,8 +1,29 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+* Add an api for a type safe query syntax. This allows you to filter a Realm and collections managed by a Realm
+  with Swift style expressions. Here is a brief example:
+  ```swift
+  class Person: Object {
+    @Persisted var name: String
+    @Persisted var hobbies: MutableSet<String>
+    @Persisted var pets: List<Pet>
+  }
+  class Pet: Object {
+    @Persisted var name: String
+    @Persisted var age: Int
+  }
 
+  let persons = realm.objects(Person.self).where {
+    $0.hobbies.contains("music") || $0.hobbies.contains("baseball")
+  }
+
+  persons = realm.objects(Person.self).where {
+    ($0.pets.age >= 2) && $0.pets.name.starts(with: "L")
+  }
+  ```([Cocoa #7419](https://github.com/realm/realm-cocoa/pull/7419))
+* Add support for dictionary subscript expressions (e.g. `"phoneNumbers['Jane'] == '123-3456-123'"`) when querying with an NSPredicate.
+  
 ### Fixed
 * Change default request timeout for `RLMApp` from 6 seconds to 60 seconds.
 

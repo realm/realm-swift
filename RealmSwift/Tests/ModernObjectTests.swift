@@ -48,7 +48,7 @@ class ModernObjectTests: TestCase {
                        ["pk", "boolCol", "intCol", "int8Col", "int16Col",
                         "int32Col", "int64Col", "floatCol", "doubleCol",
                         "stringCol", "binaryCol", "dateCol", "decimalCol",
-                        "objectIdCol", "objectCol", "arrayCol", "setCol",
+                        "objectIdCol", "objectCol", "arrayCol", "setCol", "mapCol",
                         "anyCol", "uuidCol", "intEnumCol", "stringEnumCol",
                         "optIntCol", "optInt8Col", "optInt16Col",
                         "optInt32Col", "optInt64Col", "optFloatCol",
