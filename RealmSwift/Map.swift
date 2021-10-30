@@ -75,7 +75,10 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
     public override init() {
         super.init()
     }
-
+    /// :nodoc:
+    public override init(collection: RLMCollection) {
+        super.init(collection: collection)
+    }
     internal init(objc rlmDictionary: RLMDictionary<AnyObject, AnyObject>) {
         super.init(collection: rlmDictionary)
     }
@@ -736,19 +739,6 @@ extension Map: Encodable where Key: Encodable, Value: Encodable {
         try container.encode(self.reduce(into: [Key: Value]()) { map, element in
             map[element.key] = element.value
         })
-    }
-}
-
-// MARK: - AssistedObjectiveCBridgeable
-
-extension Map: AssistedObjectiveCBridgeable {
-    internal static func bridging(from objectiveCValue: Any, with metadata: Any?) -> Map {
-        guard let objectiveCValue = objectiveCValue as? RLMDictionary<AnyObject, AnyObject> else { preconditionFailure() }
-        return Map(objc: objectiveCValue)
-    }
-
-    internal var bridged: (objectiveCValue: Any, metadata: Any?) {
-        return (objectiveCValue: _rlmCollection, metadata: nil)
     }
 }
 

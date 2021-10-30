@@ -214,6 +214,6 @@ extension AnyRealmValue: CustomObjectiveCBridgeable {
 // MARK: AssistedObjectiveCBridgeable
 
 internal protocol AssistedObjectiveCBridgeable {
-    static func bridging(from objectiveCValue: Any, with metadata: Any?) -> Self
-    var bridged: (objectiveCValue: Any, metadata: Any?) { get }
+    static func bridging(from objectiveCValue: Any) -> Self
+    var bridged: Any { get }
 }

@@ -272,11 +272,11 @@ private func forceCastToInferred<T, V>(_ x: T) -> V {
 }
 
 extension EmbeddedObject: AssistedObjectiveCBridgeable {
-    static func bridging(from objectiveCValue: Any, with metadata: Any?) -> Self {
+    static func bridging(from objectiveCValue: Any) -> Self {
         return forceCastToInferred(objectiveCValue)
     }
 
-    var bridged: (objectiveCValue: Any, metadata: Any?) {
-        return (objectiveCValue: unsafeBitCast(self, to: RLMObject.self), metadata: nil)
+    var bridged: Any {
+        return unsafeBitCast(self, to: RLMObject.self)
     }
 }

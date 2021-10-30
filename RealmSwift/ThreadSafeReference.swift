@@ -92,8 +92,6 @@ public protocol ThreadConfined {
  - see: `Realm.resolve(_:)`
  */
 @frozen public struct ThreadSafeReference<Confined: ThreadConfined> {
-    private let swiftMetadata: Any?
-
     /**
      Indicates if the reference can no longer be resolved because an attempt to resolve it has
      already occurred. References can only be resolved once.
@@ -111,14 +109,12 @@ public protocol ThreadConfined {
              constructor.
      */
     public init(to threadConfined: Confined) {
-        let bridged = (threadConfined as! AssistedObjectiveCBridgeable).bridged
-        swiftMetadata = bridged.metadata
-        objectiveCReference = RLMThreadSafeReference(threadConfined: bridged.objectiveCValue as! RLMThreadConfined)
+        objectiveCReference = RLMThreadSafeReference(threadConfined: (threadConfined as! AssistedObjectiveCBridgeable).bridged as! RLMThreadConfined)
     }
 
     internal func resolve(in realm: Realm) -> Confined? {
         guard let objectiveCValue = realm.rlmRealm.__resolve(objectiveCReference) else { return nil }
-        return ((Confined.self as! AssistedObjectiveCBridgeable.Type).bridging(from: objectiveCValue, with: swiftMetadata) as! Confined)
+        return ((Confined.self as! AssistedObjectiveCBridgeable.Type).bridging(from: objectiveCValue) as! Confined)
     }
 }
 
@@ -140,7 +136,7 @@ public protocol ThreadConfined {
  - see: `ThreadSafeReference`
  - see: `ThreadConfined`
 */
-@propertyWrapper public class ThreadSafe<T: ThreadConfined> {
+@propertyWrapper public final class ThreadSafe<T: ThreadConfined> {
     private var threadSafeReference: ThreadSafeReference<T>?
     private var rlmConfiguration: RLMRealmConfiguration?
     private let lock = NSLock()
@@ -221,3 +217,12 @@ extension Realm {
         return reference.resolve(in: self)
     }
 }
+
+#if swift(>=5.5) && canImport(_Concurrency)
+extension ThreadSafeReference: Sendable {
+}
+extension RLMThreadSafeReference: @unchecked Sendable {
+}
+extension ThreadSafe: @unchecked Sendable {
+}
+#endif

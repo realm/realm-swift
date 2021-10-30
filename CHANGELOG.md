@@ -1,6 +1,7 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
+* Conform `@ThreadSafe` and `ThreadSafeReference` to `Sendable`.
 * Add an api for a type safe query syntax. This allows you to filter a Realm and collections managed by a Realm
   with Swift style expressions. Here is a brief example:
   ```swift
