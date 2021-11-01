@@ -1,9 +1,8 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* Add `.searchable()` methods which allows us to filter 
-  `@ObservedResult` results from searchable component search field
-  by a key path.
+* Add `.searchable()` SwiftUI View Modifier which allows us to filter 
+  `@ObservedResult` results from a search field component by a key path.
   ```swift
   List {
       ForEach(reminders) { reminder in
