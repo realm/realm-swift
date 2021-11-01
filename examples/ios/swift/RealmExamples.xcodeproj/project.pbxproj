@@ -7,6 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0CF50F83272FF6330048A358 /* ProjectionsApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF50F82272FF6330048A358 /* ProjectionsApp.swift */; };
+		0CF50F85272FF6330048A358 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF50F84272FF6330048A358 /* ContentView.swift */; };
+		0CF50F87272FF6340048A358 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0CF50F86272FF6340048A358 /* Assets.xcassets */; };
+		0CF50F8A272FF6340048A358 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0CF50F89272FF6340048A358 /* Preview Assets.xcassets */; };
+		0CF50F9B273008DF0048A358 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0CF50F99273008DF0048A358 /* Realm.framework */; };
+		0CF50F9C273008DF0048A358 /* Realm.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0CF50F99273008DF0048A358 /* Realm.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		0CF50F9D273008DF0048A358 /* RealmSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0CF50F9A273008DF0048A358 /* RealmSwift.framework */; };
+		0CF50F9E273008DF0048A358 /* RealmSwift.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0CF50F9A273008DF0048A358 /* RealmSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		227D20F21CB609A1008F641B /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 227D20F11CB609A1008F641B /* LaunchScreen.xib */; };
 		227D20F31CB609A1008F641B /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 227D20F11CB609A1008F641B /* LaunchScreen.xib */; };
 		227D20F41CB609A1008F641B /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 227D20F11CB609A1008F641B /* LaunchScreen.xib */; };
@@ -123,6 +131,18 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		0CF50F9F273008DF0048A358 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				0CF50F9E273008DF0048A358 /* RealmSwift.framework in Embed Frameworks */,
+				0CF50F9C273008DF0048A358 /* Realm.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		493759BC230D9F9A0078C28E /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -263,6 +283,14 @@
 
 /* Begin PBXFileReference section */
 		0A73D4411B1443A700E1E8EE /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../../README.md; sourceTree = SOURCE_ROOT; };
+		0CF50F80272FF6330048A358 /* Projections.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Projections.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		0CF50F82272FF6330048A358 /* ProjectionsApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectionsApp.swift; sourceTree = "<group>"; };
+		0CF50F84272FF6330048A358 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		0CF50F86272FF6340048A358 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		0CF50F89272FF6340048A358 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		0CF50F98273008BF0048A358 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		0CF50F99273008DF0048A358 /* Realm.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Realm.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		0CF50F9A273008DF0048A358 /* RealmSwift.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = RealmSwift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		227D20F11CB609A1008F641B /* LaunchScreen.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LaunchScreen.xib; sourceTree = "<group>"; };
 		3FA2F2FD268FCA380015062E /* DemoObject.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = DemoObject.swift; path = AppClipParent/DemoObject.swift; sourceTree = SOURCE_ROOT; };
 		3FA2F2FE268FCA380015062E /* Constants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Constants.swift; path = AppClipParent/Constants.swift; sourceTree = SOURCE_ROOT; };
@@ -356,6 +384,15 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		0CF50F7D272FF6330048A358 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0CF50F9D273008DF0048A358 /* RealmSwift.framework in Frameworks */,
+				0CF50F9B273008DF0048A358 /* Realm.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		493759A1230D8CA60078C28E /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -481,6 +518,26 @@
 			name = RealmSwift;
 			sourceTree = "<group>";
 		};
+		0CF50F81272FF6330048A358 /* Projections */ = {
+			isa = PBXGroup;
+			children = (
+				0CF50F98273008BF0048A358 /* Info.plist */,
+				0CF50F82272FF6330048A358 /* ProjectionsApp.swift */,
+				0CF50F84272FF6330048A358 /* ContentView.swift */,
+				0CF50F86272FF6340048A358 /* Assets.xcassets */,
+				0CF50F88272FF6340048A358 /* Preview Content */,
+			);
+			path = Projections;
+			sourceTree = "<group>";
+		};
+		0CF50F88272FF6340048A358 /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				0CF50F89272FF6340048A358 /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
 		227D20F01CB609A1008F641B /* Common */ = {
 			isa = PBXGroup;
 			children = (
@@ -511,6 +568,8 @@
 		493759B8230D9F9A0078C28E /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				0CF50F99273008DF0048A358 /* Realm.framework */,
+				0CF50F9A273008DF0048A358 /* RealmSwift.framework */,
 				AC2D0C15269C471200126DCF /* Realm.framework */,
 				AC2D0C16269C471200126DCF /* RealmSwift.framework */,
 				AC2D0C0E269C470900126DCF /* Realm.framework */,
@@ -647,6 +706,7 @@
 				227D20F01CB609A1008F641B /* Common */,
 				E8CB087F19BA6AEE0018434A /* Encryption */,
 				AC1004A6269C3D30008C482D /* AsyncOpenSwiftUI */,
+				0CF50F81272FF6330048A358 /* Projections */,
 				493759B8230D9F9A0078C28E /* Frameworks */,
 				E886FB621A12A73E00CB2D0B /* GroupedTableView */,
 				493759A5230D8CA60078C28E /* ListSwiftUI */,
@@ -677,6 +737,7 @@
 				E8CB083919BA6AC60018434A /* TableView.app */,
 				AC1004AE269C3D31008C482D /* AsyncOpenSwiftUI.app */,
 				AC1004B3269C3D31008C482D /* AsyncOpenSwiftUI.app */,
+				0CF50F80272FF6330048A358 /* Projections.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -756,6 +817,24 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		0CF50F7F272FF6330048A358 /* Projections */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 0CF50F8B272FF6340048A358 /* Build configuration list for PBXNativeTarget "Projections" */;
+			buildPhases = (
+				0CF50F7C272FF6330048A358 /* Sources */,
+				0CF50F7D272FF6330048A358 /* Frameworks */,
+				0CF50F7E272FF6330048A358 /* Resources */,
+				0CF50F9F273008DF0048A358 /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Projections;
+			productName = Projections;
+			productReference = 0CF50F80272FF6330048A358 /* Projections.app */;
+			productType = "com.apple.product-type.application";
+		};
 		493759A3230D8CA60078C28E /* ListSwiftUI */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 493759B7230D8CAA0078C28E /* Build configuration list for PBXNativeTarget "ListSwiftUI" */;
@@ -995,10 +1074,15 @@
 		E805758D19BA55E600376620 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 1200;
+				LastSwiftUpdateCheck = 1310;
 				LastUpgradeCheck = 1300;
 				ORGANIZATIONNAME = Realm;
 				TargetAttributes = {
+					0CF50F7F272FF6330048A358 = {
+						CreatedOnToolsVersion = 13.1;
+						DevelopmentTeam = QX5CR2FTN2;
+						ProvisioningStyle = Automatic;
+					};
 					493759A3230D8CA60078C28E = {
 						CreatedOnToolsVersion = 11.0;
 						DevelopmentTeam = 2Z8M9MTEVV;
@@ -1073,11 +1157,21 @@
 				53454CDC24EAC45500678E48 /* AppClip */,
 				AC1004AD269C3D31008C482D /* AsyncOpenSwiftUI (iOS) */,
 				AC1004B2269C3D31008C482D /* AsyncOpenSwiftUI (macOS) */,
+				0CF50F7F272FF6330048A358 /* Projections */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		0CF50F7E272FF6330048A358 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0CF50F8A272FF6340048A358 /* Preview Assets.xcassets in Resources */,
+				0CF50F87272FF6340048A358 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		227D20911CB4EB18008F641B /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1190,6 +1284,15 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		0CF50F7C272FF6330048A358 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0CF50F85272FF6330048A358 /* ContentView.swift in Sources */,
+				0CF50F83272FF6330048A358 /* ProjectionsApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		493759A0230D8CA60078C28E /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1336,6 +1439,83 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		0CF50F8C272FF6340048A358 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_ASSET_PATHS = "\"Projections/Preview Content\"";
+				DEVELOPMENT_TEAM = QX5CR2FTN2;
+				ENABLE_PREVIEWS = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Projections/Info.plist;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = io.realm.Projections;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		0CF50F8D272FF6340048A358 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_ASSET_PATHS = "\"Projections/Preview Content\"";
+				DEVELOPMENT_TEAM = QX5CR2FTN2;
+				ENABLE_PREVIEWS = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Projections/Info.plist;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				MARKETING_VERSION = 1.0;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = io.realm.Projections;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 		493759B5230D8CAA0078C28E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -2064,6 +2244,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		0CF50F8B272FF6340048A358 /* Build configuration list for PBXNativeTarget "Projections" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0CF50F8C272FF6340048A358 /* Debug */,
+				0CF50F8D272FF6340048A358 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		493759B7230D8CAA0078C28E /* Build configuration list for PBXNativeTarget "ListSwiftUI" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
