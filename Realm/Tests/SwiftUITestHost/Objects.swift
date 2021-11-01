@@ -19,8 +19,8 @@
 import RealmSwift
 import Foundation
 
-@objcMembers class Reminder: EmbeddedObject, ObjectKeyIdentifiable {
-    @objc enum Priority: Int, RealmEnum, CaseIterable, Identifiable, CustomStringConvertible {
+class Reminder: EmbeddedObject, ObjectKeyIdentifiable {
+     enum Priority: Int, PersistableEnum, CaseIterable, Identifiable, CustomStringConvertible {
         var id: Int { self.rawValue }
 
         case low, medium, high
@@ -33,16 +33,16 @@ import Foundation
             }
         }
     }
-    dynamic var title = ""
-    dynamic var notes = ""
-    dynamic var isFlagged = false
-    dynamic var date = Date()
-    dynamic var isComplete = false
-    dynamic var priority: Priority = .low
+    @Persisted var title = ""
+    @Persisted var notes = ""
+    @Persisted var isFlagged = false
+    @Persisted var date = Date()
+    @Persisted var isComplete = false
+    @Persisted var priority: Priority = .low
 }
 
-@objcMembers class ReminderList: Object, ObjectKeyIdentifiable {
-    dynamic var name = "New List"
-    dynamic var icon: String = "list.bullet"
-    var reminders = RealmSwift.List<Reminder>()
+class ReminderList: Object, ObjectKeyIdentifiable {
+    @Persisted var name = "New List"
+    @Persisted var icon = "list.bullet"
+    @Persisted var reminders = RealmSwift.List<Reminder>()
 }

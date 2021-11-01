@@ -272,6 +272,35 @@ struct ObservedResultsKeyPathTestRow: View {
     }
 }
 
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
+struct ObservedResultsSearchableTestView: View {
+    @ObservedResults(ReminderList.self) var reminders
+    @State var searchFilter: String = ""
+
+    var body: some View {
+        NavigationView {
+            List {
+                ForEach(reminders) { reminder in
+                    Text(reminder.name)
+                }
+            }
+            .searchable(text: $searchFilter,
+                        collection: $reminders,
+                        keyPath: \.name) {
+                ForEach(reminders) { remindersFiltered in
+                    Text(remindersFiltered.name).searchCompletion(remindersFiltered.name)
+                }
+            }
+            .navigationTitle("Reminders")
+            .navigationBarItems(trailing:
+                Button("add") {
+                    let reminder = ReminderList()
+                    $reminders.append(reminder)
+                }.accessibility(identifier: "addList"))
+        }
+    }
+}
+
 @main
 struct App: SwiftUI.App {
     var body: some Scene {
@@ -290,6 +319,12 @@ struct App: SwiftUI.App {
                 return AnyView(UnmanagedObjectTestView())
             case "observed_results_key_path":
                 return AnyView(ObservedResultsKeyPathTestView())
+            case "observed_results_searchable":
+                if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *) {
+                    return AnyView(ObservedResultsSearchableTestView())
+                } else {
+                    return AnyView(EmptyView())
+                }
             default:
                 return AnyView(ContentView())
             }
