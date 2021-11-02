@@ -48,7 +48,7 @@ private protocol AnyProjected {
 ///     @Projected(\Person.friends.projectTo.firstName) var firstFriendsName: ProjectedList<String>
 /// }
 ///
-/// let people: [PersonProjection] = realm.objects(PersonProjection.self)
+/// let people: Results<PersonProjection> = realm.objects(PersonProjection.self)
 /// ```
 @propertyWrapper
 public struct Projected<T: ObjectBase, Value>: AnyProjected {
@@ -167,11 +167,6 @@ extension ObjectChange {
 ///     @Persisted var address: Address? = nil
 ///     @Persisted var friends = List<Person>()
 ///     @Persisted var reviews = List<String>()
-/// }
-///
-/// public class Address: EmbeddedObject {
-///     @Persisted var city: String = ""
-///     @Persisted var country = ""
 /// }
 ///
 /// class PersonProjection: Projection<Person> {

@@ -11,18 +11,13 @@ public class Person: Object {
     @Persisted var friends = List<Person>()
 }
 
-public class Address: EmbeddedObject {
-    @Persisted var city: String = ""
-    @Persisted var country = ""
-}
-
-struct PersonProjection: Projection {
+class PersonProjection: Projection<Person> {
     @Projected(\Person.firstName) var firstName         // `Person.firstName` will have same name and type
     @Projected(\Person.address.city) var homeCity       // There will be the only String for `city` of the original object `Address` 
     @Projected(\Person.friends.projectTo.firstName) var firstFriendsName: ProjectedList<String>     // List<Person> will be mapped to list of firstNames
 }
 
-let people: [PersonProjection] = realm.objects(PersonProjection.self) // `people` will contain projections for every `Person` object in the `realm`
+let people: Results<PersonProjection> = realm.objects(PersonProjection.self) // `people` will contain projections for every `Person` object in the `realm`
 ```
 
 ### Fixed
