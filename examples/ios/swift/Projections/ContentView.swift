@@ -101,7 +101,7 @@ struct ContentView: View {
         .navigationTitle("Movies")
         .onAppear(perform: fillData)
     }
-    
+
     // Add records to display in the view
     func fillData() {
         if realm.objects(Movie.self).count == 0 {
