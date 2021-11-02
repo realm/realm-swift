@@ -169,6 +169,11 @@ extension ObjectChange {
 ///     @Persisted var reviews = List<String>()
 /// }
 ///
+/// public class Address: EmbeddedObject {
+///     @Persisted var city: String = ""
+///     @Persisted var country = ""
+/// }
+///
 /// class PersonProjection: Projection<Person> {
 ///     @Projected(\Person.firstName) var firstName
 ///     @Projected(\Person.lastName.localizedUppercase) var lastNameCaps
