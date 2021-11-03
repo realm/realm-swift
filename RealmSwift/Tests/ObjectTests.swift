@@ -1798,7 +1798,7 @@ class ObjectTests: TestCase {
         XCTAssertEqual(obj.dateCol, frozenObj.dateCol)
         XCTAssertEqual(obj.objectCol?.boolCol, frozenObj.objectCol?.boolCol)
         XCTAssertEqual(obj.uuidCol, frozenObj.uuidCol)
-        XCTAssertEqual(obj.anyCol.value, frozenObj.anyCol.value)
+        XCTAssertEqual(obj.anyCol, frozenObj.anyCol)
 
         let frozenOptObj = optObj.freeze()
         XCTAssertEqual(optObj.optNSStringCol, frozenOptObj.optNSStringCol)

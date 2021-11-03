@@ -285,7 +285,7 @@ class MigrationTests: TestCase {
             autoreleasepool {
                 let realm = try! Realm()
                 try! realm.write {
-                    realm.objects(SwiftObject.self).first!.anyCol.value = value()
+                    realm.objects(SwiftObject.self).first!.anyCol = value()
                 }
             }
             migrateAndTestDefaultRealm(version) { migration, _ in
@@ -813,20 +813,63 @@ class MigrationTests: TestCase {
     // test getting/setting all property types
     func testMigrationObject() {
         autoreleasepool {
+            let date = Date(timeIntervalSince1970: 100000)
+            let uuid = UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!
+            let objectId = try! ObjectId(string: "000123450000ffbeef91906c")
             try! Realm().write {
                 let object = SwiftObject()
-                object.anyCol.value = .string("hello!")
+                object.anyCol = .string("hello!")
                 object.boolCol = true
                 object.objectCol = SwiftBoolObject(value: [true])
                 object.arrayCol.append(SwiftBoolObject(value: [false]))
                 object.setCol.insert(SwiftBoolObject(value: [false]))
                 object.mapCol["key"] = SwiftBoolObject(value: [false])
+
+                object.intArrayCol.append(1)
+                object.boolArrayCol.append(true)
+                object.floatArrayCol.append(1.0)
+                object.doubleArrayCol.append(1.0)
+                object.stringArrayCol.append("foo")
+                object.anyArrayCol.append(.int(1))
+                object.dataArrayCol.append(Data(repeating: 1, count: 16))
+                object.dateArrayCol.append(date)
+                object.uuidArrayCol.append(uuid)
+                object.decimal128ArrayCol.append(123.456)
+                object.objectIdArrayCol.append(objectId)
+
+                object.intSetCol.insert(1)
+                object.boolSetCol.insert(true)
+                object.floatSetCol.insert(1.0)
+                object.doubleSetCol.insert(1.0)
+                object.stringSetCol.insert("foo")
+                object.anySetCol.insert(.int(1))
+                object.dataSetCol.insert(Data(repeating: 1, count: 16))
+                object.dateSetCol.insert(date)
+                object.uuidSetCol.insert(uuid)
+                object.decimal128SetCol.insert(123.456)
+                object.objectIdSetCol.insert(objectId)
+
+                object.intMapCol["key"] = 1
+                object.boolMapCol["key"] = true
+                object.floatMapCol["key"] = 1.0
+                object.doubleMapCol["key"] = 1.0
+                object.stringMapCol["key"] = "foo"
+                object.anyMapCol["key"] = .int(1)
+                object.dataMapCol["key"] = Data(repeating: 1, count: 16)
+                object.dateMapCol["key"] = date
+                object.uuidMapCol["key"] = uuid
+                object.decimal128MapCol["key"] = 123.456
+                object.objectIdMapCol["key"] = objectId
+
                 try! Realm().add(object)
                 return
             }
         }
 
         migrateAndTestDefaultRealm { migration, _ in
+            let date = Date(timeIntervalSince1970: 100000)
+            let uuid = UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!
+            let objectId = try! ObjectId(string: "000123450000ffbeef91906c")
             var enumerated = false
             migration.enumerateObjects(ofType: "SwiftObject", { oldObj, newObj in
                 XCTAssertEqual((oldObj!["boolCol"] as! Bool), true)
@@ -871,13 +914,9 @@ class MigrationTests: TestCase {
                 XCTAssertEqual((newObj!["arrayCol"] as! List<MigrationObject>).count, 1)
                 XCTAssertEqual(((newObj!["arrayCol"] as! List<MigrationObject>)[0]["boolCol"] as! Bool), false)
 
-                XCTAssertEqual(((newObj!["arrayCol"] as! List<MigrationObject>)[0]["boolCol"] as! Bool), false)
-
                 XCTAssertEqual((oldObj!["setCol"] as! MutableSet<MigrationObject>).count, 1)
                 XCTAssertEqual(((oldObj!["setCol"] as! MutableSet<MigrationObject>)[0]["boolCol"] as! Bool), false)
                 XCTAssertEqual((newObj!["setCol"] as! MutableSet<MigrationObject>).count, 1)
-                XCTAssertEqual(((newObj!["setCol"] as! MutableSet<MigrationObject>)[0]["boolCol"] as! Bool), false)
-
                 XCTAssertEqual(((newObj!["setCol"] as! MutableSet<MigrationObject>)[0]["boolCol"] as! Bool), false)
 
                 XCTAssertEqual((oldObj!["mapCol"] as! Map<String, MigrationObject>).count, 1)
@@ -885,7 +924,75 @@ class MigrationTests: TestCase {
                 XCTAssertEqual((newObj!["mapCol"] as! Map<String, MigrationObject>).count, 1)
                 XCTAssertEqual(((newObj!["mapCol"] as! Map<String, MigrationObject>)["key"]?["boolCol"] as! Bool), false)
 
-                XCTAssertEqual(((newObj!["mapCol"] as! Map<String, MigrationObject>)["key"]?["boolCol"] as! Bool), false)
+                XCTAssertEqual((oldObj!["intArrayCol"] as! List<Int>).count, 1)
+                XCTAssertEqual(((oldObj!["intArrayCol"] as! List<Int>)[0]), 1)
+                XCTAssertEqual((oldObj!["boolArrayCol"] as! List<Bool>).count, 1)
+                XCTAssertEqual(((oldObj!["boolArrayCol"] as! List<Bool>)[0]), true)
+                XCTAssertEqual((oldObj!["doubleArrayCol"] as! List<Double>).count, 1)
+                XCTAssertEqual(((oldObj!["doubleArrayCol"] as! List<Double>)[0]), 1.0)
+                XCTAssertEqual((oldObj!["floatArrayCol"] as! List<Float>).count, 1)
+                XCTAssertEqual(((oldObj!["floatArrayCol"] as! List<Float>)[0]), 1.0)
+                XCTAssertEqual((oldObj!["stringArrayCol"] as! List<String>).count, 1)
+                XCTAssertEqual(((oldObj!["stringArrayCol"] as! List<String>)[0]), "foo")
+                XCTAssertEqual((oldObj!["stringArrayCol"] as! List<String>).count, 1)
+                XCTAssertEqual(((oldObj!["anyArrayCol"] as! List<AnyRealmValue>)[0]), .int(1))
+                XCTAssertEqual((oldObj!["anyArrayCol"] as! List<AnyRealmValue>).count, 1)
+                XCTAssertEqual(((oldObj!["dataArrayCol"] as! List<Data>)[0]), Data(repeating: 1, count: 16))
+                XCTAssertEqual((oldObj!["dataArrayCol"] as! List<Data>).count, 1)
+                XCTAssertEqual(((oldObj!["dateArrayCol"] as! List<Date>)[0]), date)
+                XCTAssertEqual((oldObj!["dateArrayCol"] as! List<Date>).count, 1)
+                XCTAssertEqual(((oldObj!["uuidArrayCol"] as! List<UUID>)[0]), uuid)
+                XCTAssertEqual((oldObj!["uuidArrayCol"] as! List<UUID>).count, 1)
+                XCTAssertEqual(((oldObj!["decimal128ArrayCol"] as! List<Decimal128>)[0]), 123.456)
+                XCTAssertEqual((oldObj!["decimal128ArrayCol"] as! List<Decimal128>).count, 1)
+                XCTAssertEqual(((oldObj!["objectIdArrayCol"] as! List<ObjectId>)[0]), objectId)
+                XCTAssertEqual((oldObj!["objectIdArrayCol"] as! List<ObjectId>).count, 1)
+
+                XCTAssertEqual((oldObj!["intSetCol"] as! MutableSet<Int>).count, 1)
+                XCTAssertEqual(((oldObj!["intSetCol"] as! MutableSet<Int>)[0]), 1)
+                XCTAssertEqual((oldObj!["boolSetCol"] as! MutableSet<Bool>).count, 1)
+                XCTAssertEqual(((oldObj!["boolSetCol"] as! MutableSet<Bool>)[0]), true)
+                XCTAssertEqual((oldObj!["doubleSetCol"] as! MutableSet<Double>).count, 1)
+                XCTAssertEqual(((oldObj!["doubleSetCol"] as! MutableSet<Double>)[0]), 1.0)
+                XCTAssertEqual((oldObj!["floatSetCol"] as! MutableSet<Float>).count, 1)
+                XCTAssertEqual(((oldObj!["floatSetCol"] as! MutableSet<Float>)[0]), 1.0)
+                XCTAssertEqual((oldObj!["stringSetCol"] as! MutableSet<String>).count, 1)
+                XCTAssertEqual(((oldObj!["stringSetCol"] as! MutableSet<String>)[0]), "foo")
+                XCTAssertEqual((oldObj!["anySetCol"] as! MutableSet<AnyRealmValue>).count, 1)
+                XCTAssertEqual(((oldObj!["anySetCol"] as! MutableSet<AnyRealmValue>)[0]), .int(1))
+                XCTAssertEqual((oldObj!["dataSetCol"] as! MutableSet<Data>).count, 1)
+                XCTAssertEqual(((oldObj!["dataSetCol"] as! MutableSet<Data>)[0]), Data(repeating: 1, count: 16))
+                XCTAssertEqual((oldObj!["dateSetCol"] as! MutableSet<Date>).count, 1)
+                XCTAssertEqual(((oldObj!["dateSetCol"] as! MutableSet<Date>)[0]), date)
+                XCTAssertEqual((oldObj!["uuidSetCol"] as! MutableSet<UUID>).count, 1)
+                XCTAssertEqual(((oldObj!["uuidSetCol"] as! MutableSet<UUID>)[0]), uuid)
+                XCTAssertEqual((oldObj!["decimal128SetCol"] as! MutableSet<Decimal128>).count, 1)
+                XCTAssertEqual(((oldObj!["decimal128SetCol"] as! MutableSet<Decimal128>)[0]), 123.456)
+                XCTAssertEqual((oldObj!["objectIdSetCol"] as! MutableSet<ObjectId>).count, 1)
+                XCTAssertEqual(((oldObj!["objectIdSetCol"] as! MutableSet<ObjectId>)[0]), objectId)
+
+                XCTAssertEqual((oldObj!["intMapCol"] as! Map<String, Int>).count, 1)
+                XCTAssertEqual(((oldObj!["intMapCol"] as! Map<String, Int>)["key"]), 1)
+                XCTAssertEqual((oldObj!["boolMapCol"] as! Map<String, Bool>).count, 1)
+                XCTAssertEqual(((oldObj!["boolMapCol"] as! Map<String, Bool>)["key"]), true)
+                XCTAssertEqual((oldObj!["doubleMapCol"] as! Map<String, Double>).count, 1)
+                XCTAssertEqual(((oldObj!["doubleMapCol"] as! Map<String, Double>)["key"]), 1.0)
+                XCTAssertEqual((oldObj!["floatMapCol"] as! Map<String, Float>).count, 1)
+                XCTAssertEqual(((oldObj!["floatMapCol"] as! Map<String, Float>)["key"]), 1.0)
+                XCTAssertEqual((oldObj!["stringMapCol"] as! Map<String, String>).count, 1)
+                XCTAssertEqual(((oldObj!["stringMapCol"] as! Map<String, String>)["key"]), "foo")
+                XCTAssertEqual((oldObj!["anyMapCol"] as! Map<String, AnyRealmValue>).count, 1)
+                XCTAssertEqual(((oldObj!["anyMapCol"] as! Map<String, AnyRealmValue>)["key"]), .int(1))
+                XCTAssertEqual((oldObj!["dataMapCol"] as! Map<String, Data>).count, 1)
+                XCTAssertEqual(((oldObj!["dataMapCol"] as! Map<String, Data>)["key"]), Data(repeating: 1, count: 16))
+                XCTAssertEqual((oldObj!["dateMapCol"] as! Map<String, Date>).count, 1)
+                XCTAssertEqual(((oldObj!["dateMapCol"] as! Map<String, Date>)["key"]), date)
+                XCTAssertEqual((oldObj!["uuidMapCol"] as! Map<String, UUID>).count, 1)
+                XCTAssertEqual(((oldObj!["uuidMapCol"] as! Map<String, UUID>)["key"]), uuid)
+                XCTAssertEqual((oldObj!["decimal128MapCol"] as! Map<String, Decimal128>).count, 1)
+                XCTAssertEqual(((oldObj!["decimal128MapCol"] as! Map<String, Decimal128>)["key"]), 123.456)
+                XCTAssertEqual((oldObj!["objectIdMapCol"] as! Map<String, ObjectId>).count, 1)
+                XCTAssertEqual(((oldObj!["objectIdMapCol"] as! Map<String, ObjectId>)["key"]), objectId)
 
                 let uuidCol: UUID = UUID(uuidString: "137decc8-b300-4954-a233-f89909f4fd89")!
                 XCTAssertEqual((newObj!["uuidCol"] as! UUID), uuidCol)
@@ -984,7 +1091,144 @@ class MigrationTests: TestCase {
                 XCTAssertEqual(map.count, 1)
                 XCTAssertEqual((map["key"]?["boolCol"] as! Bool), false)
 
-                self.assertMatches(newObj!.description, "SwiftObject \\{\n\tboolCol = 0;\n\tintCol = 1;\n\tint8Col = 1;\n\tint16Col = 1;\n\tint32Col = 1;\n\tint64Col = 1;\n\tintEnumCol = 3;\n\tfloatCol = 1;\n\tdoubleCol = 10;\n\tstringCol = a;\n\tbinaryCol = <.*62.*>;\n\tdateCol = 1970-01-01 00:00:02 \\+0000;\n\tdecimalCol = 5.67E10;\n\tobjectIdCol = abcdef123456abcdef123456;\n\tobjectCol = SwiftBoolObject \\{\n\t\tboolCol = 0;\n\t\\};\n\tuuidCol = 137DECC8-B300-4954-A233-F89909F4FD89;\n\tanyCol = 12345;\n\tarrayCol = List<SwiftBoolObject> <0x[0-9a-f]+> \\(\n\t\t\\[0\\] SwiftBoolObject \\{\n\t\t\tboolCol = 0;\n\t\t\\}\n\t\\);\n\tsetCol = MutableSet<SwiftBoolObject> <0x[0-9a-f]+> \\(\n\t\t\\[0\\] SwiftBoolObject \\{\n\t\t\tboolCol = 0;\n\t\t\\}\n\t\\);\n\tmapCol = Map<string, SwiftBoolObject> <0x[0-9a-f]+> \\(\n\t\\[key\\]: SwiftBoolObject \\{\n\t\t\tboolCol = 0;\n\t\t\\}\n\t\\);\n\\}")
+                let expected = """
+                SwiftObject \\{
+                    boolCol = 0;
+                    intCol = 1;
+                    int8Col = 1;
+                    int16Col = 1;
+                    int32Col = 1;
+                    int64Col = 1;
+                    intEnumCol = 3;
+                    floatCol = 1;
+                    doubleCol = 10;
+                    stringCol = a;
+                    binaryCol = <.*62.*>;
+                    dateCol = 1970-01-01 00:00:02 \\+0000;
+                    decimalCol = 5.67E10;
+                    objectIdCol = abcdef123456abcdef123456;
+                    objectCol = SwiftBoolObject \\{
+                        boolCol = 0;
+                    \\};
+                    uuidCol = 137DECC8-B300-4954-A233-F89909F4FD89;
+                    anyCol = 12345;
+                    arrayCol = List<SwiftBoolObject> <0x[0-9a-f]+> \\(
+                        \\[0\\] SwiftBoolObject \\{
+                            boolCol = 0;
+                        \\}
+                    \\);
+                    setCol = MutableSet<SwiftBoolObject> <0x[0-9a-f]+> \\(
+                        \\[0\\] SwiftBoolObject \\{
+                            boolCol = 0;
+                        \\}
+                    \\);
+                    mapCol = Map<string, SwiftBoolObject> <0x[0-9a-f]+> \\(
+                    \\[key\\]: SwiftBoolObject \\{
+                            boolCol = 0;
+                        \\}
+                    \\);
+                    intArrayCol = List<int> <0x[0-9a-f]+> \\(
+                        \\[0\\] 1
+                    \\);
+                    doubleArrayCol = List<double> <0x[0-9a-f]+> \\(
+                        \\[0\\] 1
+                    \\);
+                    floatArrayCol = List<float> <0x[0-9a-f]+> \\(
+                        \\[0\\] 1
+                    \\);
+                    decimal128ArrayCol = List<decimal128> <0x[0-9a-f]+> \\(
+                        \\[0\\] 123.456
+                    \\);
+                    boolArrayCol = List<bool> <0x[0-9a-f]+> \\(
+                        \\[0\\] 1
+                    \\);
+                    uuidArrayCol = List<uuid> <0x[0-9a-f]+> \\(
+                        \\[0\\] 33041937-05B2-464A-98AD-3910CBE0D09E
+                    \\);
+                    stringArrayCol = List<string> <0x[0-9a-f]+> \\(
+                        \\[0\\] foo
+                    \\);
+                    dataArrayCol = List<data> <0x[0-9a-f]+> \\(
+                        \\[0\\] \\{length = 16, bytes = 0x01010101010101010101010101010101\\}
+                    \\);
+                    dateArrayCol = List<date> <0x[0-9a-f]+> \\(
+                        \\[0\\] 1970-01-02 03:46:40 \\+0000
+                    \\);
+                    anyArrayCol = List<mixed> <0x[0-9a-f]+> \\(
+                        \\[0\\] 1
+                    \\);
+                    objectIdArrayCol = List<object id> <0x[0-9a-f]+> \\(
+                        \\[0\\] 000123450000ffbeef91906c
+                    \\);
+                    intSetCol = MutableSet<int> <0x[0-9a-f]+> \\(
+                        \\[0\\] 1
+                    \\);
+                    doubleSetCol = MutableSet<double> <0x[0-9a-f]+> \\(
+                        \\[0\\] 1
+                    \\);
+                    floatSetCol = MutableSet<float> <0x[0-9a-f]+> \\(
+                        \\[0\\] 1
+                    \\);
+                    decimal128SetCol = MutableSet<decimal128> <0x[0-9a-f]+> \\(
+                        \\[0\\] 123.456
+                    \\);
+                    boolSetCol = MutableSet<bool> <0x[0-9a-f]+> \\(
+                        \\[0\\] 1
+                    \\);
+                    uuidSetCol = MutableSet<uuid> <0x[0-9a-f]+> \\(
+                        \\[0\\] 33041937-05B2-464A-98AD-3910CBE0D09E
+                    \\);
+                    stringSetCol = MutableSet<string> <0x[0-9a-f]+> \\(
+                        \\[0\\] foo
+                    \\);
+                    dataSetCol = MutableSet<data> <0x[0-9a-f]+> \\(
+                        \\[0\\] \\{length = 16, bytes = 0x01010101010101010101010101010101\\}
+                    \\);
+                    dateSetCol = MutableSet<date> <0x[0-9a-f]+> \\(
+                        \\[0\\] 1970-01-02 03:46:40 \\+0000
+                    \\);
+                    anySetCol = MutableSet<mixed> <0x[0-9a-f]+> \\(
+                        \\[0\\] 1
+                    \\);
+                    objectIdSetCol = MutableSet<object id> <0x[0-9a-f]+> \\(
+                        \\[0\\] 000123450000ffbeef91906c
+                    \\);
+                    intMapCol = Map<string, int> <0x[0-9a-f]+> \\(
+                    \\[key\\]: 1
+                    \\);
+                    doubleMapCol = Map<string, double> <0x[0-9a-f]+> \\(
+                    \\[key\\]: 1
+                    \\);
+                    floatMapCol = Map<string, float> <0x[0-9a-f]+> \\(
+                    \\[key\\]: 1
+                    \\);
+                    decimal128MapCol = Map<string, decimal128> <0x[0-9a-f]+> \\(
+                    \\[key\\]: 123.456
+                    \\);
+                    boolMapCol = Map<string, bool> <0x[0-9a-f]+> \\(
+                    \\[key\\]: 1
+                    \\);
+                    uuidMapCol = Map<string, uuid> <0x[0-9a-f]+> \\(
+                    \\[key\\]: 33041937-05B2-464A-98AD-3910CBE0D09E
+                    \\);
+                    stringMapCol = Map<string, string> <0x[0-9a-f]+> \\(
+                    \\[key\\]: foo
+                    \\);
+                    dataMapCol = Map<string, data> <0x[0-9a-f]+> \\(
+                    \\[key\\]: \\{length = 16, bytes = 0x01010101010101010101010101010101\\}
+                    \\);
+                    dateMapCol = Map<string, date> <0x[0-9a-f]+> \\(
+                    \\[key\\]: 1970-01-02 03:46:40 \\+0000
+                    \\);
+                    anyMapCol = Map<string, mixed> <0x[0-9a-f]+> \\(
+                    \\[key\\]: 1
+                    \\);
+                    objectIdMapCol = Map<string, object id> <0x[0-9a-f]+> \\(
+                    \\[key\\]: 000123450000ffbeef91906c
+                    \\);
+                \\}
+                """
+                self.assertMatches(newObj!.description, expected.replacingOccurrences(of: "    ", with: "\t"))
 
                 enumerated = true
             })
@@ -992,8 +1236,138 @@ class MigrationTests: TestCase {
 
             let newObj = migration.create(SwiftObject.className())
             newObj["anyCol"] = "Some String"
-            // swiftlint:next:disable line_length
-            self.assertMatches(newObj.description, "SwiftObject \\{\n\tboolCol = 0;\n\tintCol = 123;\n\tint8Col = 123;\n\tint16Col = 123;\n\tint32Col = 123;\n\tint64Col = 123;\n\tintEnumCol = 1;\n\tfloatCol = 1\\.23;\n\tdoubleCol = 12\\.3;\n\tstringCol = a;\n\tbinaryCol = <.*61.*>;\n\tdateCol = 1970-01-01 00:00:01 \\+0000;\n\tdecimalCol = 1.23E6;\n\tobjectIdCol = 1234567890ab1234567890ab;\n\tobjectCol = SwiftBoolObject \\{\n\t\tboolCol = 0;\n\t\\};\n\tuuidCol = 137DECC8-B300-4954-A233-F89909F4FD89;\n\tanyCol = Some String;\n\tarrayCol = List<SwiftBoolObject> <0x[0-9a-f]+> \\(\n\t\n\t\\);\n\tsetCol = MutableSet<SwiftBoolObject> <0x[0-9a-f]+> \\(\n\t\n\t\\);\n\tmapCol = Map<string, SwiftBoolObject> <0x[0-9a-f]+> \\(\n\t\n\t\\);\n\\}")
+            let expected = """
+            SwiftObject \\{
+                boolCol = 0;
+                intCol = 123;
+                int8Col = 123;
+                int16Col = 123;
+                int32Col = 123;
+                int64Col = 123;
+                intEnumCol = 1;
+                floatCol = 1.23;
+                doubleCol = 12.3;
+                stringCol = a;
+                binaryCol = <.*61.*>;
+                dateCol = 1970-01-01 00:00:01 \\+0000;
+                decimalCol = 1.23E6;
+                objectIdCol = 1234567890ab1234567890ab;
+                objectCol = SwiftBoolObject \\{
+                    boolCol = 0;
+                \\};
+                uuidCol = 137DECC8-B300-4954-A233-F89909F4FD89;
+                anyCol = Some String;
+                arrayCol = List<SwiftBoolObject> <0x[0-9a-f]+> \\(
+                \\
+                \\);
+                setCol = MutableSet<SwiftBoolObject> <0x[0-9a-f]+> \\(
+                \\
+                \\);
+                mapCol = Map<string, SwiftBoolObject> <0x[0-9a-f]+> \\(
+                \\
+                \\);
+                intArrayCol = List<int> <0x[0-9a-f]+> \\(
+                \\
+                \\);
+                doubleArrayCol = List<double> <0x[0-9a-f]+> \\(
+                \\
+                \\);
+                floatArrayCol = List<float> <0x[0-9a-f]+> \\(
+                \\
+                \\);
+                decimal128ArrayCol = List<decimal128> <0x[0-9a-f]+> \\(
+                \\
+                \\);
+                boolArrayCol = List<bool> <0x[0-9a-f]+> \\(
+                \\
+                \\);
+                uuidArrayCol = List<uuid> <0x[0-9a-f]+> \\(
+                \\
+                \\);
+                stringArrayCol = List<string> <0x[0-9a-f]+> \\(
+                \\
+                \\);
+                dataArrayCol = List<data> <0x[0-9a-f]+> \\(
+                \\
+                \\);
+                dateArrayCol = List<date> <0x[0-9a-f]+> \\(
+                \\
+                \\);
+                anyArrayCol = List<mixed> <0x[0-9a-f]+> \\(
+                \\
+                \\);
+                objectIdArrayCol = List<object id> <0x[0-9a-f]+> \\(
+                \\
+                \\);
+                intSetCol = MutableSet<int> <0x[0-9a-f]+> \\(
+                \\
+                \\);
+                doubleSetCol = MutableSet<double> <0x[0-9a-f]+> \\(
+                \\
+                \\);
+                floatSetCol = MutableSet<float> <0x[0-9a-f]+> \\(
+                \\
+                \\);
+                decimal128SetCol = MutableSet<decimal128> <0x[0-9a-f]+> \\(
+                \\
+                \\);
+                boolSetCol = MutableSet<bool> <0x[0-9a-f]+> \\(
+                \\
+                \\);
+                uuidSetCol = MutableSet<uuid> <0x[0-9a-f]+> \\(
+                \\
+                \\);
+                stringSetCol = MutableSet<string> <0x[0-9a-f]+> \\(
+                \\
+                \\);
+                dataSetCol = MutableSet<data> <0x[0-9a-f]+> \\(
+                \\
+                \\);
+                dateSetCol = MutableSet<date> <0x[0-9a-f]+> \\(
+                \\
+                \\);
+                anySetCol = MutableSet<mixed> <0x[0-9a-f]+> \\(
+                \\
+                \\);
+                objectIdSetCol = MutableSet<object id> <0x[0-9a-f]+> \\(
+                \\
+                \\);
+                intMapCol = Map<string, int> <0x[0-9a-f]+> \\(
+                \\
+                \\);
+                doubleMapCol = Map<string, double> <0x[0-9a-f]+> \\(
+                \\
+                \\);
+                floatMapCol = Map<string, float> <0x[0-9a-f]+> \\(
+                \\
+                \\);
+                decimal128MapCol = Map<string, decimal128> <0x[0-9a-f]+> \\(
+                \\
+                \\);
+                boolMapCol = Map<string, bool> <0x[0-9a-f]+> \\(
+                \\
+                \\);
+                uuidMapCol = Map<string, uuid> <0x[0-9a-f]+> \\(
+                \\
+                \\);
+                stringMapCol = Map<string, string> <0x[0-9a-f]+> \\(
+                \\
+                \\);
+                dataMapCol = Map<string, data> <0x[0-9a-f]+> \\(
+                \\
+                \\);
+                dateMapCol = Map<string, date> <0x[0-9a-f]+> \\(
+                \\
+                \\);
+                anyMapCol = Map<string, mixed> <0x[0-9a-f]+> \\(
+                \\
+                \\);
+                objectIdMapCol = Map<string, object id> <0x[0-9a-f]+> \\(
+                \\
+                \\);
+            \\}
+            """
+            self.assertMatches(newObj.description, expected.replacingOccurrences(of: "    ", with: "\t"))
         }
 
         // refresh to update realm

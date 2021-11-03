@@ -58,27 +58,63 @@ class SwiftLongObject: Object {
 }
 
 class SwiftObject: Object {
-    @objc dynamic var boolCol = false
-    @objc dynamic var intCol = 123
-    @objc dynamic var int8Col: Int8 = 123
-    @objc dynamic var int16Col: Int16 = 123
-    @objc dynamic var int32Col: Int32 = 123
-    @objc dynamic var int64Col: Int64 = 123
-    @objc dynamic var intEnumCol = IntEnum.value1
-    @objc dynamic var floatCol = 1.23 as Float
-    @objc dynamic var doubleCol = 12.3
-    @objc dynamic var stringCol = "a"
-    @objc dynamic var binaryCol = "a".data(using: String.Encoding.utf8)!
-    @objc dynamic var dateCol = Date(timeIntervalSince1970: 1)
-    @objc dynamic var decimalCol = Decimal128("123e4")
-    @objc dynamic var objectIdCol = ObjectId("1234567890ab1234567890ab")
-    @objc dynamic var objectCol: SwiftBoolObject? = SwiftBoolObject()
-    @objc dynamic var uuidCol: UUID = UUID(uuidString: "137decc8-b300-4954-a233-f89909f4fd89")!
-    let anyCol = RealmProperty<AnyRealmValue>()
+    @Persisted var boolCol = false
+    @Persisted var intCol = 123
+    @Persisted var int8Col: Int8 = 123
+    @Persisted var int16Col: Int16 = 123
+    @Persisted var int32Col: Int32 = 123
+    @Persisted var int64Col: Int64 = 123
+    @Persisted var intEnumCol = ModernIntEnum.value1
+    @Persisted var floatCol = 1.23 as Float
+    @Persisted var doubleCol = 12.3
+    @Persisted var stringCol = "a"
+    @Persisted var binaryCol = "a".data(using: String.Encoding.utf8)!
+    @Persisted var dateCol = Date(timeIntervalSince1970: 1)
+    @Persisted var decimalCol = Decimal128("123e4")
+    @Persisted var objectIdCol = ObjectId("1234567890ab1234567890ab")
+    @Persisted var objectCol: SwiftBoolObject? = SwiftBoolObject()
+    @Persisted var uuidCol: UUID = UUID(uuidString: "137decc8-b300-4954-a233-f89909f4fd89")!
+    @Persisted var anyCol: AnyRealmValue
 
-    let arrayCol = List<SwiftBoolObject>()
-    let setCol = MutableSet<SwiftBoolObject>()
-    let mapCol = Map<String, SwiftBoolObject?>()
+    @Persisted var arrayCol: List<SwiftBoolObject>
+    @Persisted var setCol: MutableSet<SwiftBoolObject>
+    @Persisted var mapCol: Map<String, SwiftBoolObject?>
+
+    @Persisted var intArrayCol: List<Int>
+    @Persisted var doubleArrayCol: List<Double>
+    @Persisted var floatArrayCol: List<Float>
+    @Persisted var decimal128ArrayCol: List<Decimal128>
+    @Persisted var boolArrayCol: List<Bool>
+    @Persisted var uuidArrayCol: List<UUID>
+    @Persisted var stringArrayCol: List<String>
+    @Persisted var dataArrayCol: List<Data>
+    @Persisted var dateArrayCol: List<Date>
+    @Persisted var anyArrayCol: List<AnyRealmValue>
+    @Persisted var objectIdArrayCol: List<ObjectId>
+
+    @Persisted var intSetCol: MutableSet<Int>
+    @Persisted var doubleSetCol: MutableSet<Double>
+    @Persisted var floatSetCol: MutableSet<Float>
+    @Persisted var decimal128SetCol: MutableSet<Decimal128>
+    @Persisted var boolSetCol: MutableSet<Bool>
+    @Persisted var uuidSetCol: MutableSet<UUID>
+    @Persisted var stringSetCol: MutableSet<String>
+    @Persisted var dataSetCol: MutableSet<Data>
+    @Persisted var dateSetCol: MutableSet<Date>
+    @Persisted var anySetCol: MutableSet<AnyRealmValue>
+    @Persisted var objectIdSetCol: MutableSet<ObjectId>
+
+    @Persisted var intMapCol: Map<String, Int>
+    @Persisted var doubleMapCol: Map<String, Double>
+    @Persisted var floatMapCol: Map<String, Float>
+    @Persisted var decimal128MapCol: Map<String, Decimal128>
+    @Persisted var boolMapCol: Map<String, Bool>
+    @Persisted var uuidMapCol: Map<String, UUID>
+    @Persisted var stringMapCol: Map<String, String>
+    @Persisted var dataMapCol: Map<String, Data>
+    @Persisted var dateMapCol: Map<String, Date>
+    @Persisted var anyMapCol: Map<String, AnyRealmValue>
+    @Persisted var objectIdMapCol: Map<String, ObjectId>
 
     class func defaultValues() -> [String: Any] {
         return  [
@@ -99,7 +135,40 @@ class SwiftObject: Object {
             "uuidCol": UUID(uuidString: "137decc8-b300-4954-a233-f89909f4fd89")!,
             "arrayCol": [],
             "setCol": [],
-            "mapCol": [:]
+            "mapCol": [:],
+            "intArrayCol": [],
+            "doubleArrayCol": [],
+            "floatArrayCol": [],
+            "decimal128ArrayCol": [],
+            "boolArrayCol": [],
+            "uuidArrayCol": [],
+            "stringArrayCol": [],
+            "dataArrayCol": [],
+            "dateArrayCol": [],
+            "anyArrayCol": [],
+            "objectIdArrayCol": [],
+            "intSetCol": [],
+            "doubleSetCol": [],
+            "floatSetCol": [],
+            "decimal128SetCol": [],
+            "boolSetCol": [],
+            "uuidSetCol": [],
+            "stringSetCol": [],
+            "dataSetCol": [],
+            "dateSetCol": [],
+            "anySetCol": [],
+            "objectIdSetCol": [],
+            "intMapCol": [:],
+            "doubleMapCol": [:],
+            "floatMapCol": [:],
+            "decimal128MapCol": [:],
+            "boolMapCol": [:],
+            "uuidMapCol": [:],
+            "stringMapCol": [:],
+            "dataMapCol": [:],
+            "dateMapCol": [:],
+            "anyMapCol": [:],
+            "objectIdMapCol": [:],
         ]
     }
 }

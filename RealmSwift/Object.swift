@@ -542,13 +542,13 @@ public final class DynamicObject: Object {
         get {
             let value = RLMDynamicGetByName(self, key).flatMap(coerceToNil)
             if let array = value as? RLMArray<AnyObject> {
-                return List<DynamicObject>(objc: array)
+                return list(from: array)
             }
             if let set = value as? RLMSet<AnyObject> {
-                return MutableSet<DynamicObject>(objc: set)
+                return mutableSet(from: set)
             }
             if let dictionary = value as? RLMDictionary<AnyObject, AnyObject> {
-                return Map<String, DynamicObject>(objc: dictionary)
+                return map(from: dictionary)
             }
             return value
         }
@@ -583,6 +583,99 @@ public final class DynamicObject: Object {
 
     override public class func sharedSchema() -> RLMObjectSchema? {
         nil
+    }
+
+    private func list(from array: RLMArray<AnyObject>) -> Any {
+        switch array.type {
+        case .int:
+            return List<Int>(objc: array)
+        case .double:
+            return List<Double>(objc: array)
+        case .float:
+            return List<Float>(objc: array)
+        case .decimal128:
+            return List<Decimal128>(objc: array)
+        case .bool:
+            return List<Bool>(objc: array)
+        case .UUID:
+            return List<UUID>(objc: array)
+        case .string:
+            return List<String>(objc: array)
+        case .data:
+            return List<Data>(objc: array)
+        case .date:
+            return List<Date>(objc: array)
+        case .any:
+            return List<AnyRealmValue>(objc: array)
+        case .linkingObjects:
+            throwRealmException("Unsupported migration type of 'LinkingObjects' for type 'List'.")
+        case .objectId:
+            return List<ObjectId>(objc: array)
+        case .object:
+            return List<DynamicObject>(objc: array)
+        }
+    }
+
+    private func mutableSet(from set: RLMSet<AnyObject>) -> Any {
+        switch set.type {
+        case .int:
+            return MutableSet<Int>(objc: set)
+        case .double:
+            return MutableSet<Double>(objc: set)
+        case .float:
+            return MutableSet<Float>(objc: set)
+        case .decimal128:
+            return MutableSet<Decimal128>(objc: set)
+        case .bool:
+            return MutableSet<Bool>(objc: set)
+        case .UUID:
+            return MutableSet<UUID>(objc: set)
+        case .string:
+            return MutableSet<String>(objc: set)
+        case .data:
+            return MutableSet<Data>(objc: set)
+        case .date:
+            return MutableSet<Date>(objc: set)
+        case .any:
+            return MutableSet<AnyRealmValue>(objc: set)
+        case .linkingObjects:
+            throwRealmException("Unsupported migration type of 'LinkingObjects' for type 'MutableSet'.")
+        case .objectId:
+            return MutableSet<ObjectId>(objc: set)
+        case .object:
+            return MutableSet<DynamicObject>(objc: set)
+        }
+    }
+
+    private func map(from dictionary: RLMDictionary<AnyObject, AnyObject>) -> Any {
+        switch dictionary.type {
+        case .int:
+            return Map<String, Int>(objc: dictionary)
+        case .double:
+            return Map<String, Double>(objc: dictionary)
+        case .float:
+            return Map<String, Float>(objc: dictionary)
+        case .decimal128:
+            return Map<String, Decimal128>(objc: dictionary)
+        case .bool:
+            return Map<String, Bool>(objc: dictionary)
+        case .UUID:
+            return Map<String, UUID>(objc: dictionary)
+        case .string:
+            return Map<String, String>(objc: dictionary)
+        case .data:
+            return Map<String, Data>(objc: dictionary)
+        case .date:
+            return Map<String, Date>(objc: dictionary)
+        case .any:
+            return Map<String, AnyRealmValue>(objc: dictionary)
+        case .linkingObjects:
+            throwRealmException("Unsupported migration type of 'LinkingObjects' for type 'Map'.")
+        case .objectId:
+            return Map<String, ObjectId>(objc: dictionary)
+        case .object:
+            return Map<String, DynamicObject>(objc: dictionary)
+        }
     }
 }
 
