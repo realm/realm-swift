@@ -1310,7 +1310,7 @@ class ObjectCreationTests: TestCase {
         XCTAssertEqual(object.int16Col, (array[3] as! Int16))
         XCTAssertEqual(object.int32Col, (array[4] as! Int32))
         XCTAssertEqual(object.int64Col, (array[5] as! Int64))
-        XCTAssertEqual(object.intEnumCol, ModernIntEnum(rawValue: array[6] as! Int))
+        XCTAssertEqual(object.intEnumCol, IntEnum(rawValue: array[6] as! Int))
         XCTAssertEqual(object.floatCol, (array[7] as! NSNumber).floatValue)
         XCTAssertEqual(object.doubleCol, (array[8] as! Double))
         XCTAssertEqual(object.stringCol, (array[9] as! String))

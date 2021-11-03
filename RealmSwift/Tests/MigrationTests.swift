@@ -285,7 +285,7 @@ class MigrationTests: TestCase {
             autoreleasepool {
                 let realm = try! Realm()
                 try! realm.write {
-                    realm.objects(SwiftObject.self).first!.anyCol = value()
+                    realm.objects(SwiftObject.self).first!.anyCol.value = value()
                 }
             }
             migrateAndTestDefaultRealm(version) { migration, _ in
@@ -813,53 +813,14 @@ class MigrationTests: TestCase {
     // test getting/setting all property types
     func testMigrationObject() {
         autoreleasepool {
-            let date = Date(timeIntervalSince1970: 100000)
-            let uuid = UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!
-            let objectId = try! ObjectId(string: "000123450000ffbeef91906c")
             try! Realm().write {
                 let object = SwiftObject()
-                object.anyCol = .string("hello!")
+                object.anyCol.value = .string("hello!")
                 object.boolCol = true
                 object.objectCol = SwiftBoolObject(value: [true])
                 object.arrayCol.append(SwiftBoolObject(value: [false]))
                 object.setCol.insert(SwiftBoolObject(value: [false]))
                 object.mapCol["key"] = SwiftBoolObject(value: [false])
-
-                object.intArrayCol.append(1)
-                object.boolArrayCol.append(true)
-                object.floatArrayCol.append(1.0)
-                object.doubleArrayCol.append(1.0)
-                object.stringArrayCol.append("foo")
-                object.anyArrayCol.append(.int(1))
-                object.dataArrayCol.append(Data(repeating: 1, count: 16))
-                object.dateArrayCol.append(date)
-                object.uuidArrayCol.append(uuid)
-                object.decimal128ArrayCol.append(123.456)
-                object.objectIdArrayCol.append(objectId)
-
-                object.intSetCol.insert(1)
-                object.boolSetCol.insert(true)
-                object.floatSetCol.insert(1.0)
-                object.doubleSetCol.insert(1.0)
-                object.stringSetCol.insert("foo")
-                object.anySetCol.insert(.int(1))
-                object.dataSetCol.insert(Data(repeating: 1, count: 16))
-                object.dateSetCol.insert(date)
-                object.uuidSetCol.insert(uuid)
-                object.decimal128SetCol.insert(123.456)
-                object.objectIdSetCol.insert(objectId)
-
-                object.intMapCol["key"] = 1
-                object.boolMapCol["key"] = true
-                object.floatMapCol["key"] = 1.0
-                object.doubleMapCol["key"] = 1.0
-                object.stringMapCol["key"] = "foo"
-                object.anyMapCol["key"] = .int(1)
-                object.dataMapCol["key"] = Data(repeating: 1, count: 16)
-                object.dateMapCol["key"] = date
-                object.uuidMapCol["key"] = uuid
-                object.decimal128MapCol["key"] = 123.456
-                object.objectIdMapCol["key"] = objectId
 
                 try! Realm().add(object)
                 return
@@ -867,9 +828,6 @@ class MigrationTests: TestCase {
         }
 
         migrateAndTestDefaultRealm { migration, _ in
-            let date = Date(timeIntervalSince1970: 100000)
-            let uuid = UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!
-            let objectId = try! ObjectId(string: "000123450000ffbeef91906c")
             var enumerated = false
             migration.enumerateObjects(ofType: "SwiftObject", { oldObj, newObj in
                 XCTAssertEqual((oldObj!["boolCol"] as! Bool), true)
@@ -923,76 +881,6 @@ class MigrationTests: TestCase {
                 XCTAssertEqual(((oldObj!["mapCol"] as! Map<String, MigrationObject>)["key"]?["boolCol"] as! Bool), false)
                 XCTAssertEqual((newObj!["mapCol"] as! Map<String, MigrationObject>).count, 1)
                 XCTAssertEqual(((newObj!["mapCol"] as! Map<String, MigrationObject>)["key"]?["boolCol"] as! Bool), false)
-
-                XCTAssertEqual((oldObj!["intArrayCol"] as! List<Int>).count, 1)
-                XCTAssertEqual(((oldObj!["intArrayCol"] as! List<Int>)[0]), 1)
-                XCTAssertEqual((oldObj!["boolArrayCol"] as! List<Bool>).count, 1)
-                XCTAssertEqual(((oldObj!["boolArrayCol"] as! List<Bool>)[0]), true)
-                XCTAssertEqual((oldObj!["doubleArrayCol"] as! List<Double>).count, 1)
-                XCTAssertEqual(((oldObj!["doubleArrayCol"] as! List<Double>)[0]), 1.0)
-                XCTAssertEqual((oldObj!["floatArrayCol"] as! List<Float>).count, 1)
-                XCTAssertEqual(((oldObj!["floatArrayCol"] as! List<Float>)[0]), 1.0)
-                XCTAssertEqual((oldObj!["stringArrayCol"] as! List<String>).count, 1)
-                XCTAssertEqual(((oldObj!["stringArrayCol"] as! List<String>)[0]), "foo")
-                XCTAssertEqual((oldObj!["stringArrayCol"] as! List<String>).count, 1)
-                XCTAssertEqual(((oldObj!["anyArrayCol"] as! List<AnyRealmValue>)[0]), .int(1))
-                XCTAssertEqual((oldObj!["anyArrayCol"] as! List<AnyRealmValue>).count, 1)
-                XCTAssertEqual(((oldObj!["dataArrayCol"] as! List<Data>)[0]), Data(repeating: 1, count: 16))
-                XCTAssertEqual((oldObj!["dataArrayCol"] as! List<Data>).count, 1)
-                XCTAssertEqual(((oldObj!["dateArrayCol"] as! List<Date>)[0]), date)
-                XCTAssertEqual((oldObj!["dateArrayCol"] as! List<Date>).count, 1)
-                XCTAssertEqual(((oldObj!["uuidArrayCol"] as! List<UUID>)[0]), uuid)
-                XCTAssertEqual((oldObj!["uuidArrayCol"] as! List<UUID>).count, 1)
-                XCTAssertEqual(((oldObj!["decimal128ArrayCol"] as! List<Decimal128>)[0]), 123.456)
-                XCTAssertEqual((oldObj!["decimal128ArrayCol"] as! List<Decimal128>).count, 1)
-                XCTAssertEqual(((oldObj!["objectIdArrayCol"] as! List<ObjectId>)[0]), objectId)
-                XCTAssertEqual((oldObj!["objectIdArrayCol"] as! List<ObjectId>).count, 1)
-
-                XCTAssertEqual((oldObj!["intSetCol"] as! MutableSet<Int>).count, 1)
-                XCTAssertEqual(((oldObj!["intSetCol"] as! MutableSet<Int>)[0]), 1)
-                XCTAssertEqual((oldObj!["boolSetCol"] as! MutableSet<Bool>).count, 1)
-                XCTAssertEqual(((oldObj!["boolSetCol"] as! MutableSet<Bool>)[0]), true)
-                XCTAssertEqual((oldObj!["doubleSetCol"] as! MutableSet<Double>).count, 1)
-                XCTAssertEqual(((oldObj!["doubleSetCol"] as! MutableSet<Double>)[0]), 1.0)
-                XCTAssertEqual((oldObj!["floatSetCol"] as! MutableSet<Float>).count, 1)
-                XCTAssertEqual(((oldObj!["floatSetCol"] as! MutableSet<Float>)[0]), 1.0)
-                XCTAssertEqual((oldObj!["stringSetCol"] as! MutableSet<String>).count, 1)
-                XCTAssertEqual(((oldObj!["stringSetCol"] as! MutableSet<String>)[0]), "foo")
-                XCTAssertEqual((oldObj!["anySetCol"] as! MutableSet<AnyRealmValue>).count, 1)
-                XCTAssertEqual(((oldObj!["anySetCol"] as! MutableSet<AnyRealmValue>)[0]), .int(1))
-                XCTAssertEqual((oldObj!["dataSetCol"] as! MutableSet<Data>).count, 1)
-                XCTAssertEqual(((oldObj!["dataSetCol"] as! MutableSet<Data>)[0]), Data(repeating: 1, count: 16))
-                XCTAssertEqual((oldObj!["dateSetCol"] as! MutableSet<Date>).count, 1)
-                XCTAssertEqual(((oldObj!["dateSetCol"] as! MutableSet<Date>)[0]), date)
-                XCTAssertEqual((oldObj!["uuidSetCol"] as! MutableSet<UUID>).count, 1)
-                XCTAssertEqual(((oldObj!["uuidSetCol"] as! MutableSet<UUID>)[0]), uuid)
-                XCTAssertEqual((oldObj!["decimal128SetCol"] as! MutableSet<Decimal128>).count, 1)
-                XCTAssertEqual(((oldObj!["decimal128SetCol"] as! MutableSet<Decimal128>)[0]), 123.456)
-                XCTAssertEqual((oldObj!["objectIdSetCol"] as! MutableSet<ObjectId>).count, 1)
-                XCTAssertEqual(((oldObj!["objectIdSetCol"] as! MutableSet<ObjectId>)[0]), objectId)
-
-                XCTAssertEqual((oldObj!["intMapCol"] as! Map<String, Int>).count, 1)
-                XCTAssertEqual(((oldObj!["intMapCol"] as! Map<String, Int>)["key"]), 1)
-                XCTAssertEqual((oldObj!["boolMapCol"] as! Map<String, Bool>).count, 1)
-                XCTAssertEqual(((oldObj!["boolMapCol"] as! Map<String, Bool>)["key"]), true)
-                XCTAssertEqual((oldObj!["doubleMapCol"] as! Map<String, Double>).count, 1)
-                XCTAssertEqual(((oldObj!["doubleMapCol"] as! Map<String, Double>)["key"]), 1.0)
-                XCTAssertEqual((oldObj!["floatMapCol"] as! Map<String, Float>).count, 1)
-                XCTAssertEqual(((oldObj!["floatMapCol"] as! Map<String, Float>)["key"]), 1.0)
-                XCTAssertEqual((oldObj!["stringMapCol"] as! Map<String, String>).count, 1)
-                XCTAssertEqual(((oldObj!["stringMapCol"] as! Map<String, String>)["key"]), "foo")
-                XCTAssertEqual((oldObj!["anyMapCol"] as! Map<String, AnyRealmValue>).count, 1)
-                XCTAssertEqual(((oldObj!["anyMapCol"] as! Map<String, AnyRealmValue>)["key"]), .int(1))
-                XCTAssertEqual((oldObj!["dataMapCol"] as! Map<String, Data>).count, 1)
-                XCTAssertEqual(((oldObj!["dataMapCol"] as! Map<String, Data>)["key"]), Data(repeating: 1, count: 16))
-                XCTAssertEqual((oldObj!["dateMapCol"] as! Map<String, Date>).count, 1)
-                XCTAssertEqual(((oldObj!["dateMapCol"] as! Map<String, Date>)["key"]), date)
-                XCTAssertEqual((oldObj!["uuidMapCol"] as! Map<String, UUID>).count, 1)
-                XCTAssertEqual(((oldObj!["uuidMapCol"] as! Map<String, UUID>)["key"]), uuid)
-                XCTAssertEqual((oldObj!["decimal128MapCol"] as! Map<String, Decimal128>).count, 1)
-                XCTAssertEqual(((oldObj!["decimal128MapCol"] as! Map<String, Decimal128>)["key"]), 123.456)
-                XCTAssertEqual((oldObj!["objectIdMapCol"] as! Map<String, ObjectId>).count, 1)
-                XCTAssertEqual(((oldObj!["objectIdMapCol"] as! Map<String, ObjectId>)["key"]), objectId)
 
                 let uuidCol: UUID = UUID(uuidString: "137decc8-b300-4954-a233-f89909f4fd89")!
                 XCTAssertEqual((newObj!["uuidCol"] as! UUID), uuidCol)
@@ -1127,105 +1015,6 @@ class MigrationTests: TestCase {
                             boolCol = 0;
                         \\}
                     \\);
-                    intArrayCol = List<int> <0x[0-9a-f]+> \\(
-                        \\[0\\] 1
-                    \\);
-                    doubleArrayCol = List<double> <0x[0-9a-f]+> \\(
-                        \\[0\\] 1
-                    \\);
-                    floatArrayCol = List<float> <0x[0-9a-f]+> \\(
-                        \\[0\\] 1
-                    \\);
-                    decimal128ArrayCol = List<decimal128> <0x[0-9a-f]+> \\(
-                        \\[0\\] 123.456
-                    \\);
-                    boolArrayCol = List<bool> <0x[0-9a-f]+> \\(
-                        \\[0\\] 1
-                    \\);
-                    uuidArrayCol = List<uuid> <0x[0-9a-f]+> \\(
-                        \\[0\\] 33041937-05B2-464A-98AD-3910CBE0D09E
-                    \\);
-                    stringArrayCol = List<string> <0x[0-9a-f]+> \\(
-                        \\[0\\] foo
-                    \\);
-                    dataArrayCol = List<data> <0x[0-9a-f]+> \\(
-                        \\[0\\] \\{length = 16, bytes = 0x01010101010101010101010101010101\\}
-                    \\);
-                    dateArrayCol = List<date> <0x[0-9a-f]+> \\(
-                        \\[0\\] 1970-01-02 03:46:40 \\+0000
-                    \\);
-                    anyArrayCol = List<mixed> <0x[0-9a-f]+> \\(
-                        \\[0\\] 1
-                    \\);
-                    objectIdArrayCol = List<object id> <0x[0-9a-f]+> \\(
-                        \\[0\\] 000123450000ffbeef91906c
-                    \\);
-                    intSetCol = MutableSet<int> <0x[0-9a-f]+> \\(
-                        \\[0\\] 1
-                    \\);
-                    doubleSetCol = MutableSet<double> <0x[0-9a-f]+> \\(
-                        \\[0\\] 1
-                    \\);
-                    floatSetCol = MutableSet<float> <0x[0-9a-f]+> \\(
-                        \\[0\\] 1
-                    \\);
-                    decimal128SetCol = MutableSet<decimal128> <0x[0-9a-f]+> \\(
-                        \\[0\\] 123.456
-                    \\);
-                    boolSetCol = MutableSet<bool> <0x[0-9a-f]+> \\(
-                        \\[0\\] 1
-                    \\);
-                    uuidSetCol = MutableSet<uuid> <0x[0-9a-f]+> \\(
-                        \\[0\\] 33041937-05B2-464A-98AD-3910CBE0D09E
-                    \\);
-                    stringSetCol = MutableSet<string> <0x[0-9a-f]+> \\(
-                        \\[0\\] foo
-                    \\);
-                    dataSetCol = MutableSet<data> <0x[0-9a-f]+> \\(
-                        \\[0\\] \\{length = 16, bytes = 0x01010101010101010101010101010101\\}
-                    \\);
-                    dateSetCol = MutableSet<date> <0x[0-9a-f]+> \\(
-                        \\[0\\] 1970-01-02 03:46:40 \\+0000
-                    \\);
-                    anySetCol = MutableSet<mixed> <0x[0-9a-f]+> \\(
-                        \\[0\\] 1
-                    \\);
-                    objectIdSetCol = MutableSet<object id> <0x[0-9a-f]+> \\(
-                        \\[0\\] 000123450000ffbeef91906c
-                    \\);
-                    intMapCol = Map<string, int> <0x[0-9a-f]+> \\(
-                    \\[key\\]: 1
-                    \\);
-                    doubleMapCol = Map<string, double> <0x[0-9a-f]+> \\(
-                    \\[key\\]: 1
-                    \\);
-                    floatMapCol = Map<string, float> <0x[0-9a-f]+> \\(
-                    \\[key\\]: 1
-                    \\);
-                    decimal128MapCol = Map<string, decimal128> <0x[0-9a-f]+> \\(
-                    \\[key\\]: 123.456
-                    \\);
-                    boolMapCol = Map<string, bool> <0x[0-9a-f]+> \\(
-                    \\[key\\]: 1
-                    \\);
-                    uuidMapCol = Map<string, uuid> <0x[0-9a-f]+> \\(
-                    \\[key\\]: 33041937-05B2-464A-98AD-3910CBE0D09E
-                    \\);
-                    stringMapCol = Map<string, string> <0x[0-9a-f]+> \\(
-                    \\[key\\]: foo
-                    \\);
-                    dataMapCol = Map<string, data> <0x[0-9a-f]+> \\(
-                    \\[key\\]: \\{length = 16, bytes = 0x01010101010101010101010101010101\\}
-                    \\);
-                    dateMapCol = Map<string, date> <0x[0-9a-f]+> \\(
-                    \\[key\\]: 1970-01-02 03:46:40 \\+0000
-                    \\);
-                    anyMapCol = Map<string, mixed> <0x[0-9a-f]+> \\(
-                    \\[key\\]: 1
-                    \\);
-                    objectIdMapCol = Map<string, object id> <0x[0-9a-f]+> \\(
-                    \\[key\\]: 000123450000ffbeef91906c
-                    \\);
                 \\}
                 """
                 self.assertMatches(newObj!.description, expected.replacingOccurrences(of: "    ", with: "\t"))
@@ -1266,105 +1055,6 @@ class MigrationTests: TestCase {
                 mapCol = Map<string, SwiftBoolObject> <0x[0-9a-f]+> \\(
                 \\
                 \\);
-                intArrayCol = List<int> <0x[0-9a-f]+> \\(
-                \\
-                \\);
-                doubleArrayCol = List<double> <0x[0-9a-f]+> \\(
-                \\
-                \\);
-                floatArrayCol = List<float> <0x[0-9a-f]+> \\(
-                \\
-                \\);
-                decimal128ArrayCol = List<decimal128> <0x[0-9a-f]+> \\(
-                \\
-                \\);
-                boolArrayCol = List<bool> <0x[0-9a-f]+> \\(
-                \\
-                \\);
-                uuidArrayCol = List<uuid> <0x[0-9a-f]+> \\(
-                \\
-                \\);
-                stringArrayCol = List<string> <0x[0-9a-f]+> \\(
-                \\
-                \\);
-                dataArrayCol = List<data> <0x[0-9a-f]+> \\(
-                \\
-                \\);
-                dateArrayCol = List<date> <0x[0-9a-f]+> \\(
-                \\
-                \\);
-                anyArrayCol = List<mixed> <0x[0-9a-f]+> \\(
-                \\
-                \\);
-                objectIdArrayCol = List<object id> <0x[0-9a-f]+> \\(
-                \\
-                \\);
-                intSetCol = MutableSet<int> <0x[0-9a-f]+> \\(
-                \\
-                \\);
-                doubleSetCol = MutableSet<double> <0x[0-9a-f]+> \\(
-                \\
-                \\);
-                floatSetCol = MutableSet<float> <0x[0-9a-f]+> \\(
-                \\
-                \\);
-                decimal128SetCol = MutableSet<decimal128> <0x[0-9a-f]+> \\(
-                \\
-                \\);
-                boolSetCol = MutableSet<bool> <0x[0-9a-f]+> \\(
-                \\
-                \\);
-                uuidSetCol = MutableSet<uuid> <0x[0-9a-f]+> \\(
-                \\
-                \\);
-                stringSetCol = MutableSet<string> <0x[0-9a-f]+> \\(
-                \\
-                \\);
-                dataSetCol = MutableSet<data> <0x[0-9a-f]+> \\(
-                \\
-                \\);
-                dateSetCol = MutableSet<date> <0x[0-9a-f]+> \\(
-                \\
-                \\);
-                anySetCol = MutableSet<mixed> <0x[0-9a-f]+> \\(
-                \\
-                \\);
-                objectIdSetCol = MutableSet<object id> <0x[0-9a-f]+> \\(
-                \\
-                \\);
-                intMapCol = Map<string, int> <0x[0-9a-f]+> \\(
-                \\
-                \\);
-                doubleMapCol = Map<string, double> <0x[0-9a-f]+> \\(
-                \\
-                \\);
-                floatMapCol = Map<string, float> <0x[0-9a-f]+> \\(
-                \\
-                \\);
-                decimal128MapCol = Map<string, decimal128> <0x[0-9a-f]+> \\(
-                \\
-                \\);
-                boolMapCol = Map<string, bool> <0x[0-9a-f]+> \\(
-                \\
-                \\);
-                uuidMapCol = Map<string, uuid> <0x[0-9a-f]+> \\(
-                \\
-                \\);
-                stringMapCol = Map<string, string> <0x[0-9a-f]+> \\(
-                \\
-                \\);
-                dataMapCol = Map<string, data> <0x[0-9a-f]+> \\(
-                \\
-                \\);
-                dateMapCol = Map<string, date> <0x[0-9a-f]+> \\(
-                \\
-                \\);
-                anyMapCol = Map<string, mixed> <0x[0-9a-f]+> \\(
-                \\
-                \\);
-                objectIdMapCol = Map<string, object id> <0x[0-9a-f]+> \\(
-                \\
-                \\);
             \\}
             """
             self.assertMatches(newObj.description, expected.replacingOccurrences(of: "    ", with: "\t"))
@@ -1395,6 +1085,120 @@ class MigrationTests: TestCase {
 
         // make sure we added new bool objects as object property and in the list
         XCTAssertEqual(try! Realm().objects(SwiftBoolObject.self).count, 10)
+    }
+
+    func testCollectionAccess() {
+        autoreleasepool {
+            let realm = try! Realm()
+            try! realm.write {
+                realm.add(ModernAllTypesObject())
+            }
+        }
+        migrateAndTestDefaultRealm { migration, _ in
+            var enumerated = false
+            migration.enumerateObjects(ofType: "ModernAllTypesObject", { oldObj, _ in
+
+                XCTAssertEqual((oldObj!["arrayCol"] as! List<MigrationObject>).count, 0)
+                XCTAssertEqual((oldObj!["setCol"] as! MutableSet<MigrationObject>).count, 0)
+                XCTAssertEqual((oldObj!["mapCol"] as! Map<String, MigrationObject>).count, 0)
+
+                XCTAssertEqual((oldObj!["arrayBool"] as! List<Bool>).count, 0)
+                XCTAssertEqual((oldObj!["arrayInt"] as! List<Int>).count, 0)
+                XCTAssertEqual((oldObj!["arrayInt8"] as! List<Int>).count, 0)
+                XCTAssertEqual((oldObj!["arrayInt16"] as! List<Int>).count, 0)
+                XCTAssertEqual((oldObj!["arrayInt32"] as! List<Int>).count, 0)
+                XCTAssertEqual((oldObj!["arrayInt64"] as! List<Int>).count, 0)
+                XCTAssertEqual((oldObj!["arrayFloat"] as! List<Float>).count, 0)
+                XCTAssertEqual((oldObj!["arrayDouble"] as! List<Double>).count, 0)
+                XCTAssertEqual((oldObj!["arrayString"] as! List<String>).count, 0)
+                XCTAssertEqual((oldObj!["arrayBinary"] as! List<Data>).count, 0)
+                XCTAssertEqual((oldObj!["arrayDate"] as! List<Date>).count, 0)
+                XCTAssertEqual((oldObj!["arrayDecimal"] as! List<Decimal128>).count, 0)
+                XCTAssertEqual((oldObj!["arrayObjectId"] as! List<ObjectId>).count, 0)
+                XCTAssertEqual((oldObj!["arrayAny"] as! List<AnyRealmValue>).count, 0)
+                XCTAssertEqual((oldObj!["arrayUuid"] as! List<UUID>).count, 0)
+
+                XCTAssertEqual((oldObj!["arrayOptBool"] as! List<Bool?>).count, 0)
+                XCTAssertEqual((oldObj!["arrayOptInt"] as! List<Int?>).count, 0)
+                XCTAssertEqual((oldObj!["arrayOptInt8"] as! List<Int?>).count, 0)
+                XCTAssertEqual((oldObj!["arrayOptInt16"] as! List<Int?>).count, 0)
+                XCTAssertEqual((oldObj!["arrayOptInt32"] as! List<Int?>).count, 0)
+                XCTAssertEqual((oldObj!["arrayOptInt64"] as! List<Int?>).count, 0)
+                XCTAssertEqual((oldObj!["arrayOptFloat"] as! List<Float?>).count, 0)
+                XCTAssertEqual((oldObj!["arrayOptDouble"] as! List<Double?>).count, 0)
+                XCTAssertEqual((oldObj!["arrayOptString"] as! List<String?>).count, 0)
+                XCTAssertEqual((oldObj!["arrayOptBinary"] as! List<Data?>).count, 0)
+                XCTAssertEqual((oldObj!["arrayOptDate"] as! List<Date?>).count, 0)
+                XCTAssertEqual((oldObj!["arrayOptDecimal"] as! List<Decimal128?>).count, 0)
+                XCTAssertEqual((oldObj!["arrayOptObjectId"] as! List<ObjectId?>).count, 0)
+                XCTAssertEqual((oldObj!["arrayOptUuid"] as! List<UUID?>).count, 0)
+
+                XCTAssertEqual((oldObj!["setBool"] as! MutableSet<Bool>).count, 0)
+                XCTAssertEqual((oldObj!["setInt"] as! MutableSet<Int>).count, 0)
+                XCTAssertEqual((oldObj!["setInt8"] as! MutableSet<Int>).count, 0)
+                XCTAssertEqual((oldObj!["setInt16"] as! MutableSet<Int>).count, 0)
+                XCTAssertEqual((oldObj!["setInt32"] as! MutableSet<Int>).count, 0)
+                XCTAssertEqual((oldObj!["setInt64"] as! MutableSet<Int>).count, 0)
+                XCTAssertEqual((oldObj!["setFloat"] as! MutableSet<Float>).count, 0)
+                XCTAssertEqual((oldObj!["setDouble"] as! MutableSet<Double>).count, 0)
+                XCTAssertEqual((oldObj!["setString"] as! MutableSet<String>).count, 0)
+                XCTAssertEqual((oldObj!["setBinary"] as! MutableSet<Data>).count, 0)
+                XCTAssertEqual((oldObj!["setDate"] as! MutableSet<Date>).count, 0)
+                XCTAssertEqual((oldObj!["setDecimal"] as! MutableSet<Decimal128>).count, 0)
+                XCTAssertEqual((oldObj!["setObjectId"] as! MutableSet<ObjectId>).count, 0)
+                XCTAssertEqual((oldObj!["setAny"] as! MutableSet<AnyRealmValue>).count, 0)
+                XCTAssertEqual((oldObj!["setUuid"] as! MutableSet<UUID>).count, 0)
+
+                XCTAssertEqual((oldObj!["setOptBool"] as! MutableSet<Bool?>).count, 0)
+                XCTAssertEqual((oldObj!["setOptInt"] as! MutableSet<Int?>).count, 0)
+                XCTAssertEqual((oldObj!["setOptInt8"] as! MutableSet<Int?>).count, 0)
+                XCTAssertEqual((oldObj!["setOptInt16"] as! MutableSet<Int?>).count, 0)
+                XCTAssertEqual((oldObj!["setOptInt32"] as! MutableSet<Int?>).count, 0)
+                XCTAssertEqual((oldObj!["setOptInt64"] as! MutableSet<Int?>).count, 0)
+                XCTAssertEqual((oldObj!["setOptFloat"] as! MutableSet<Float?>).count, 0)
+                XCTAssertEqual((oldObj!["setOptDouble"] as! MutableSet<Double?>).count, 0)
+                XCTAssertEqual((oldObj!["setOptString"] as! MutableSet<String?>).count, 0)
+                XCTAssertEqual((oldObj!["setOptBinary"] as! MutableSet<Data?>).count, 0)
+                XCTAssertEqual((oldObj!["setOptDate"] as! MutableSet<Date?>).count, 0)
+                XCTAssertEqual((oldObj!["setOptDecimal"] as! MutableSet<Decimal128?>).count, 0)
+                XCTAssertEqual((oldObj!["setOptObjectId"] as! MutableSet<ObjectId?>).count, 0)
+                XCTAssertEqual((oldObj!["setOptUuid"] as! MutableSet<UUID?>).count, 0)
+
+                XCTAssertEqual((oldObj!["mapBool"] as! Map<String, Bool>).count, 0)
+                XCTAssertEqual((oldObj!["mapInt"] as! Map<String, Int>).count, 0)
+                XCTAssertEqual((oldObj!["mapInt8"] as! Map<String, Int>).count, 0)
+                XCTAssertEqual((oldObj!["mapInt16"] as! Map<String, Int>).count, 0)
+                XCTAssertEqual((oldObj!["mapInt32"] as! Map<String, Int>).count, 0)
+                XCTAssertEqual((oldObj!["mapInt64"] as! Map<String, Int>).count, 0)
+                XCTAssertEqual((oldObj!["mapFloat"] as! Map<String, Float>).count, 0)
+                XCTAssertEqual((oldObj!["mapDouble"] as! Map<String, Double>).count, 0)
+                XCTAssertEqual((oldObj!["mapString"] as! Map<String, String>).count, 0)
+                XCTAssertEqual((oldObj!["mapBinary"] as! Map<String, Data>).count, 0)
+                XCTAssertEqual((oldObj!["mapDate"] as! Map<String, Date>).count, 0)
+                XCTAssertEqual((oldObj!["mapDecimal"] as! Map<String, Decimal128>).count, 0)
+                XCTAssertEqual((oldObj!["mapObjectId"] as! Map<String, ObjectId>).count, 0)
+                XCTAssertEqual((oldObj!["mapAny"] as! Map<String, AnyRealmValue>).count, 0)
+                XCTAssertEqual((oldObj!["mapUuid"] as! Map<String, UUID>).count, 0)
+
+                XCTAssertEqual((oldObj!["mapOptBool"] as! Map<String, Bool?>).count, 0)
+                XCTAssertEqual((oldObj!["mapOptInt"] as! Map<String, Int?>).count, 0)
+                XCTAssertEqual((oldObj!["mapOptInt8"] as! Map<String, Int?>).count, 0)
+                XCTAssertEqual((oldObj!["mapOptInt16"] as! Map<String, Int?>).count, 0)
+                XCTAssertEqual((oldObj!["mapOptInt32"] as! Map<String, Int?>).count, 0)
+                XCTAssertEqual((oldObj!["mapOptInt64"] as! Map<String, Int?>).count, 0)
+                XCTAssertEqual((oldObj!["mapOptFloat"] as! Map<String, Float?>).count, 0)
+                XCTAssertEqual((oldObj!["mapOptDouble"] as! Map<String, Double?>).count, 0)
+                XCTAssertEqual((oldObj!["mapOptString"] as! Map<String, String?>).count, 0)
+                XCTAssertEqual((oldObj!["mapOptBinary"] as! Map<String, Data?>).count, 0)
+                XCTAssertEqual((oldObj!["mapOptDate"] as! Map<String, Date?>).count, 0)
+                XCTAssertEqual((oldObj!["mapOptDecimal"] as! Map<String, Decimal128?>).count, 0)
+                XCTAssertEqual((oldObj!["mapOptObjectId"] as! Map<String, ObjectId?>).count, 0)
+                XCTAssertEqual((oldObj!["mapOptUuid"] as! Map<String, UUID?>).count, 0)
+
+                enumerated = true
+            })
+            XCTAssertTrue(enumerated)
+        }
     }
 
     func testFailOnSchemaMismatch() {

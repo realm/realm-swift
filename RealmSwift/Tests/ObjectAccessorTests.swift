@@ -116,8 +116,8 @@ class ObjectAccessorTests: TestCase {
         object.objectIdCol = oid2
         XCTAssertEqual(object.objectIdCol, oid2)
 
-        object.anyCol = .string("hello")
-        XCTAssertEqual(object.anyCol.stringValue, "hello")
+        object.anyCol.value = .string("hello")
+        XCTAssertEqual(object.anyCol.value.stringValue, "hello")
 
         // Optional properties
 

@@ -209,7 +209,7 @@ class AnyRealmValueObjectTests: TestCase {
         guard let object = realm.objects(SwiftObject.self).first else {
             return XCTFail("SwiftObject does not exist")
         }
-        guard let dynamicObject = object.anyCol.dynamicObject else {
+        guard let dynamicObject = object.anyCol.value.dynamicObject else {
             return XCTFail("dynamicObject does not exist")
         }
         XCTAssertEqual(dynamicObject.stringCol as! String, "some string...")

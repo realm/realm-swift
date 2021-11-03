@@ -588,29 +588,29 @@ public final class DynamicObject: Object {
     private func list(from array: RLMArray<AnyObject>) -> Any {
         switch array.type {
         case .int:
-            return List<Int>(objc: array)
+            return array.isOptional ? List<Int?>(objc: array) : List<Int>(objc: array)
         case .double:
-            return List<Double>(objc: array)
+            return array.isOptional ? List<Double?>(objc: array) : List<Double>(objc: array)
         case .float:
-            return List<Float>(objc: array)
+            return array.isOptional ? List<Float?>(objc: array) : List<Float>(objc: array)
         case .decimal128:
-            return List<Decimal128>(objc: array)
+            return array.isOptional ? List<Decimal128?>(objc: array) : List<Decimal128>(objc: array)
         case .bool:
-            return List<Bool>(objc: array)
+            return array.isOptional ? List<Bool?>(objc: array) : List<Bool>(objc: array)
         case .UUID:
-            return List<UUID>(objc: array)
+            return array.isOptional ? List<UUID?>(objc: array) : List<UUID>(objc: array)
         case .string:
-            return List<String>(objc: array)
+            return array.isOptional ? List<String?>(objc: array) : List<String>(objc: array)
         case .data:
-            return List<Data>(objc: array)
+            return array.isOptional ? List<Data?>(objc: array) : List<Data>(objc: array)
         case .date:
-            return List<Date>(objc: array)
+            return array.isOptional ? List<Date?>(objc: array) : List<Date>(objc: array)
         case .any:
             return List<AnyRealmValue>(objc: array)
         case .linkingObjects:
             throwRealmException("Unsupported migration type of 'LinkingObjects' for type 'List'.")
         case .objectId:
-            return List<ObjectId>(objc: array)
+            return array.isOptional ? List<ObjectId?>(objc: array) : List<ObjectId>(objc: array)
         case .object:
             return List<DynamicObject>(objc: array)
         }
@@ -619,29 +619,29 @@ public final class DynamicObject: Object {
     private func mutableSet(from set: RLMSet<AnyObject>) -> Any {
         switch set.type {
         case .int:
-            return MutableSet<Int>(objc: set)
+            return set.isOptional ? MutableSet<Int?>(objc: set) : MutableSet<Int>(objc: set)
         case .double:
-            return MutableSet<Double>(objc: set)
+            return set.isOptional ? MutableSet<Double?>(objc: set) : MutableSet<Double>(objc: set)
         case .float:
-            return MutableSet<Float>(objc: set)
+            return set.isOptional ? MutableSet<Float?>(objc: set) : MutableSet<Float>(objc: set)
         case .decimal128:
-            return MutableSet<Decimal128>(objc: set)
+            return set.isOptional ? MutableSet<Decimal128?>(objc: set) : MutableSet<Decimal128>(objc: set)
         case .bool:
-            return MutableSet<Bool>(objc: set)
+            return set.isOptional ? MutableSet<Bool?>(objc: set) : MutableSet<Bool>(objc: set)
         case .UUID:
-            return MutableSet<UUID>(objc: set)
+            return set.isOptional ? MutableSet<UUID?>(objc: set) : MutableSet<UUID>(objc: set)
         case .string:
-            return MutableSet<String>(objc: set)
+            return set.isOptional ? MutableSet<String?>(objc: set) : MutableSet<String>(objc: set)
         case .data:
-            return MutableSet<Data>(objc: set)
+            return set.isOptional ? MutableSet<Data?>(objc: set) : MutableSet<Data>(objc: set)
         case .date:
-            return MutableSet<Date>(objc: set)
+            return set.isOptional ? MutableSet<Date?>(objc: set) : MutableSet<Date>(objc: set)
         case .any:
             return MutableSet<AnyRealmValue>(objc: set)
         case .linkingObjects:
             throwRealmException("Unsupported migration type of 'LinkingObjects' for type 'MutableSet'.")
         case .objectId:
-            return MutableSet<ObjectId>(objc: set)
+            return set.isOptional ? MutableSet<ObjectId?>(objc: set) : MutableSet<ObjectId>(objc: set)
         case .object:
             return MutableSet<DynamicObject>(objc: set)
         }
@@ -650,29 +650,29 @@ public final class DynamicObject: Object {
     private func map(from dictionary: RLMDictionary<AnyObject, AnyObject>) -> Any {
         switch dictionary.type {
         case .int:
-            return Map<String, Int>(objc: dictionary)
+            return dictionary.isOptional ? Map<String, Int?>(objc: dictionary) : Map<String, Int>(objc: dictionary)
         case .double:
-            return Map<String, Double>(objc: dictionary)
+            return dictionary.isOptional ? Map<String, Double?>(objc: dictionary) : Map<String, Double>(objc: dictionary)
         case .float:
-            return Map<String, Float>(objc: dictionary)
+            return dictionary.isOptional ? Map<String, Float?>(objc: dictionary) : Map<String, Float>(objc: dictionary)
         case .decimal128:
-            return Map<String, Decimal128>(objc: dictionary)
+            return dictionary.isOptional ? Map<String, Decimal128?>(objc: dictionary) : Map<String, Decimal128>(objc: dictionary)
         case .bool:
-            return Map<String, Bool>(objc: dictionary)
+            return dictionary.isOptional ? Map<String, Bool?>(objc: dictionary) : Map<String, Bool>(objc: dictionary)
         case .UUID:
-            return Map<String, UUID>(objc: dictionary)
+            return dictionary.isOptional ? Map<String, UUID?>(objc: dictionary) : Map<String, UUID>(objc: dictionary)
         case .string:
-            return Map<String, String>(objc: dictionary)
+            return dictionary.isOptional ? Map<String, String?>(objc: dictionary) : Map<String, String>(objc: dictionary)
         case .data:
-            return Map<String, Data>(objc: dictionary)
+            return dictionary.isOptional ? Map<String, Data?>(objc: dictionary) : Map<String, Data>(objc: dictionary)
         case .date:
-            return Map<String, Date>(objc: dictionary)
+            return dictionary.isOptional ? Map<String, Date?>(objc: dictionary) : Map<String, Date>(objc: dictionary)
         case .any:
             return Map<String, AnyRealmValue>(objc: dictionary)
         case .linkingObjects:
             throwRealmException("Unsupported migration type of 'LinkingObjects' for type 'Map'.")
         case .objectId:
-            return Map<String, ObjectId>(objc: dictionary)
+            return dictionary.isOptional ? Map<String, ObjectId?>(objc: dictionary) : Map<String, ObjectId>(objc: dictionary)
         case .object:
             return Map<String, DynamicObject>(objc: dictionary)
         }
