@@ -769,7 +769,7 @@ extension EnvironmentValues {
 /**
 An enum representing different states from `AsyncOpen` and `AutoOpen` process
 */
-public enum AsyncOpenState: Equatable {
+public enum AsyncOpenState {
     /// Starting the Realm.asyncOpen process.
     case connecting
     /// Waiting for a user to be logged in before executing Realm.asyncOpen.
@@ -780,18 +780,6 @@ public enum AsyncOpenState: Equatable {
     case progress(Progress)
     /// Opening the Realm failed.
     case error(Error)
-
-    // Returns if the states are equal
-    public static func == (lhs: AsyncOpenState, rhs: AsyncOpenState) -> Bool {
-        switch (lhs, rhs) {
-        case (.open(let lhsRealm), .open(let rhsRealm)):
-            return lhsRealm == rhsRealm
-        case (.progress(let lhsProgress), .progress(let rhsProgress)):
-            return lhsProgress == rhsProgress
-        default:
-            return true
-        }
-    }
 }
 
 private enum AsyncOpenKind {
@@ -878,32 +866,6 @@ private class ObservableAsyncOpenStorage: ObservableObject {
             } receiveValue: { realm in
                 self.asyncOpenState = .open(realm)
             }.store(in: &self.asyncOpenCancellable)
-
-//        Realm.asyncOpen(configuration: config) { result in
-//            switch result {
-//            case .success(let realm):
-//                self.asyncOpenState = .open(realm)
-//            case .failure(let error):
-//                switch self.asyncOpenKind {
-//                case .asyncOpen:
-//                    self.asyncOpenState = .error(error)
-//                case .autoOpen:
-//                    if let error = error as NSError?,
-//                       (error.code == Int(ETIMEDOUT) && error.domain == NSPOSIXErrorDomain) ||
-//                        (error.code == 1 && error.domain == "io.realm.unknown"),
-//                       let realm = try? Realm(configuration: config) {
-//                        self.asyncOpenState = .open(realm)
-//                    } else {
-//                        self.asyncOpenState = .error(error)
-//                    }
-//                }
-//            }
-//        }.addProgressNotification { asyncProgress in
-//            let progress = Progress(totalUnitCount: Int64(asyncProgress.transferredBytes))
-//            progress.completedUnitCount = Int64(asyncProgress.transferredBytes)
-//            self.asyncOpenState = .progress(progress)
-//        }
-
     }
 
     private func cancelAsyncOpen() {
