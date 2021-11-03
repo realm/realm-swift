@@ -49,6 +49,9 @@ x.y.z Release notes (yyyy-MM-dd)
   be used and would throw incorrect thread exceptions. It now is `@MainActor`
   and gives a Realm instance which always works on the main actor. The
   non-functional `queue:` parameter has been removed (since v10.15.0).
+* Allow `@AutoOpen` to return a realm for any server error on synchronisation.
+* Do not allow `progress` state changes for `@AutoOpen` and `@AsyncOpen` after
+  changing state to `open(let realm)` or `error(let error)`. 
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
