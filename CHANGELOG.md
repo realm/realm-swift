@@ -33,6 +33,7 @@ x.y.z Release notes (yyyy-MM-dd)
   be used and would throw incorrect thread exceptions. It now is `@MainActor`
   and gives a Realm instance which always works on the main actor. The
   non-functional `queue:` parameter has been removed (since v10.15.0).
+* Accessing a non object collection inside a migration would cause a crash [#5633](https://github.com/realm/realm-cocoa/issues/5633).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
