@@ -971,6 +971,7 @@ static NSString *randomEmail() {
                                                 stopPolicy:RLMSyncStopPolicyImmediately];
         path = realm.configuration.pathOnDisk;
     }
+    [user.app.syncManager waitForSessionTermination];
 
     RLMRealmConfiguration *c = [RLMRealmConfiguration defaultConfiguration];
     c.fileURL = [NSURL fileURLWithPath:path];
