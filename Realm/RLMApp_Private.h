@@ -41,6 +41,10 @@ typedef void(^RLMAppNotificationBlock)(RLMApp *);
 /// Unsubscribe to notifications for this RLMApp.
 - (void)unsubscribe:(RLMAppSubscriptionToken *)token;
 
++ (instancetype)appWithId:(NSString *)appId
+            configuration:(nullable RLMAppConfiguration *)configuration
+            rootDirectory:(nullable NSURL *)rootDirectory;
+
 @end
 
 NS_ASSUME_NONNULL_END

@@ -591,7 +591,7 @@ static NSURL *syncDirectoryForChildProcess() {
     NSAssert(session, @"Cannot call with invalid partition value");
     XCTestExpectation *ex = expectation ?: [self expectationWithDescription:@"Wait for download completion"];
     __block NSError *theError = nil;
-    BOOL queued = [session waitForDownloadCompletionOnQueue:nil callback:^(NSError *err) {
+    BOOL queued = [session waitForDownloadCompletionOnQueue:dispatch_get_global_queue(0, 0) callback:^(NSError *err) {
         theError = err;
         [ex fulfill];
     }];
@@ -610,7 +610,7 @@ static NSURL *syncDirectoryForChildProcess() {
     NSAssert(session, @"Cannot call with invalid Realm");
     XCTestExpectation *ex = [self expectationWithDescription:@"Wait for upload completion"];
     __block NSError *completionError;
-    BOOL queued = [session waitForUploadCompletionOnQueue:nil callback:^(NSError *error) {
+    BOOL queued = [session waitForUploadCompletionOnQueue:dispatch_get_global_queue(0, 0) callback:^(NSError *error) {
         completionError = error;
         [ex fulfill];
     }];

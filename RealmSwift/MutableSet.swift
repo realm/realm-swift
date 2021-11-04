@@ -113,6 +113,26 @@ public final class MutableSet<Element: RealmCollectionValue>: RLMSwiftCollection
     }
 
     /**
+     Returns a `Results` containing all objects matching the given query in the set.
+
+     - Note: This should only be used with classes using the `@Persistable` property declaration.
+
+     - Usage:
+     ```
+     mySet.where {
+        ($0.fooCol > 5) && ($0.barCol == "foobar")
+     }
+     ```
+
+     - Note: See ``Query`` for more information on what query operations are available.
+
+     - parameter isIncluded: The query with which to filter the objects.
+     */
+    public func `where`(_ isIncluded: ((Query<Element>) -> Query<Element>)) -> Results<Element> {
+        return filter(isIncluded(Query()).predicate)
+    }
+
+    /**
      Returns a Boolean value indicating whether the Set contains the
      given object.
 
@@ -734,6 +754,11 @@ extension MutableSet: RealmCollection {
 
     /// :nodoc:
     public func index(matching predicate: NSPredicate) -> Int? {
+        fatalError("index(matching:) is not available on MutableSet")
+    }
+
+    /// :nodoc:
+    public func index(matching isIncluded: ((Query<Element>) -> Query<Element>)) -> Int? {
         fatalError("index(matching:) is not available on MutableSet")
     }
 

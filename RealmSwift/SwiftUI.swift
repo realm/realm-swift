@@ -766,13 +766,53 @@ extension EnvironmentValues {
     }
 }
 
+/**
+An enum representing different states from `AsyncOpen` and `AutoOpen` process
+*/
+public enum AsyncOpenState {
+    /// Starting the Realm.asyncOpen process.
+    case connecting
+    /// Waiting for a user to be logged in before executing Realm.asyncOpen.
+    case waitingForUser
+    /// The Realm has been opened and is ready for use. For AsyncOpen this means that the Realm has been fully downloaded, but for AutoOpen the existing local file may have been used if the device is offline.
+    case open(Realm)
+    /// The Realm is currently being downloaded from the server.
+    case progress(Progress)
+    /// Opening the Realm failed.
+    case error(Error)
+}
+
+private enum AsyncOpenKind {
+    case asyncOpen
+    case autoOpen
+}
+
 @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
 private class ObservableAsyncOpenStorage: ObservableObject {
+    private var asyncOpenKind: AsyncOpenKind
     private var app: App
-    var configuration: Realm.Configuration
+    var configuration: Realm.Configuration?
     var partitionValue: AnyBSON
 
-    var cancellables = [AnyCancellable]()
+    // Tracks User State for App for Multi-User Support
+    enum AppState {
+        case loggedIn(User)
+        case loggedOut
+    }
+    private var appState: AppState {
+        didSet {
+            switch appState {
+            case .loggedIn(let user):
+                self.asyncOpenForUser(user)
+            case .loggedOut:
+                asyncOpenState = .waitingForUser
+            }
+        }
+    }
+
+    // Cancellables
+    private var appCancellable = [AnyCancellable]()
+    private var asyncOpenCancellable = [AnyCancellable]()
 
     @Published var asyncOpenState: AsyncOpenState = .connecting {
         willSet {
@@ -780,37 +820,90 @@ private class ObservableAsyncOpenStorage: ObservableObject {
         }
     }
 
-    func asyncOpen() -> AnyPublisher<RealmPublishers.AsyncOpenPublisher.Output, RealmPublishers.AsyncOpenPublisher.Failure> {
-        if let currentUser = app.currentUser,
-           currentUser.isLoggedIn {
-            return asyncOpenForUser(app.currentUser!, partitionValue: partitionValue, configuration: configuration)
-        } else {
-            asyncOpenState = .waitingForUser
-            return app.objectWillChange
-                .compactMap(\.currentUser)
-                .flatMap { self.asyncOpenForUser($0, partitionValue: self.partitionValue, configuration: self.configuration) }
-                .eraseToAnyPublisher()
+    func asyncOpen() {
+        if case let .loggedIn(user) = appState {
+            asyncOpenForUser(user)
         }
     }
 
-    private func asyncOpenForUser(_ user: User, partitionValue: AnyBSON, configuration: Realm.Configuration) -> AnyPublisher<RealmPublishers.AsyncOpenPublisher.Output, RealmPublishers.AsyncOpenPublisher.Failure> {
-        let userConfig = user.configuration(partitionValue: partitionValue, cancelAsyncOpenOnNonFatalErrors: true)
-        let userSyncConfig = userConfig.syncConfiguration
-        var configuration = configuration
-        configuration.syncConfiguration = userSyncConfig
-        return Realm.asyncOpen(configuration: configuration)
+    private func asyncOpenForUser(_ user: User) {
+        asyncOpenState = .connecting
+
+        // Use the user configuration by default or set configuration with current user `syncConfiguration`.
+        var config = user.configuration(partitionValue: partitionValue, cancelAsyncOpenOnNonFatalErrors: true)
+        if var configuration = configuration {
+            let userSyncConfig = config.syncConfiguration
+            configuration.syncConfiguration = userSyncConfig
+            config = configuration
+        }
+
+        // Cancel any current subscriptions to asyncOpen if there is one
+        cancelAsyncOpen()
+        return Realm.asyncOpen(configuration: config)
             .onProgressNotification { asyncProgress in
                 let progress = Progress(totalUnitCount: Int64(asyncProgress.transferredBytes))
                 progress.completedUnitCount = Int64(asyncProgress.transferredBytes)
                 self.asyncOpenState = .progress(progress)
             }
-            .eraseToAnyPublisher()
+            .sink { completion in
+                if case .failure(let error) = completion {
+                    switch self.asyncOpenKind {
+                    case .asyncOpen:
+                        self.asyncOpenState = .error(error)
+                    case .autoOpen:
+                        if let error = error as NSError?,
+                           error.code == Int(ETIMEDOUT) && error.domain == NSPOSIXErrorDomain,
+                           let realm = try? Realm(configuration: config) {
+                            self.asyncOpenState = .open(realm)
+                        } else {
+                            self.asyncOpenState = .error(error)
+                        }
+                    }
+                }
+            } receiveValue: { realm in
+                self.asyncOpenState = .open(realm)
+            }.store(in: &self.asyncOpenCancellable)
     }
 
-    init(app: App, configuration: Realm.Configuration, partitionValue: AnyBSON) {
+    private func cancelAsyncOpen() {
+        asyncOpenCancellable.forEach { $0.cancel() }
+        asyncOpenCancellable = []
+    }
+
+    func cancel() {
+        cancelAsyncOpen()
+        appCancellable.forEach { $0.cancel() }
+        appCancellable = []
+    }
+
+    init(asyncOpenKind: AsyncOpenKind, app: App, configuration: Realm.Configuration?, partitionValue: AnyBSON) {
+        self.asyncOpenKind = asyncOpenKind
         self.app = app
         self.configuration = configuration
         self.partitionValue = partitionValue
+
+        if let user = app.currentUser {
+            appState = .loggedIn(user)
+            asyncOpenForUser(user)
+        } else {
+            appState = .loggedOut
+            asyncOpenState = .waitingForUser
+        }
+        app.objectWillChange.sink { app in
+            switch self.appState {
+            case .loggedIn(let user):
+                if let newUser = app.currentUser,
+                    user != newUser {
+                    self.appState = .loggedIn(newUser)
+                } else if app.currentUser == nil {
+                    self.appState = .loggedOut
+                }
+            case .loggedOut:
+                if let user = app.currentUser {
+                    self.appState = .loggedIn(user)
+                }
+            }
+        }.store(in: &appCancellable)
     }
 
     // MARK: - AutoOpen & AsyncOpen Helper
@@ -828,6 +921,7 @@ private class ObservableAsyncOpenStorage: ObservableObject {
         } else {
             throwRealmException("Cannot AsyncOpen the Realm because no appId was found. You must either explicitly pass an appId or initialize an App before displaying your View.")
         }
+
         // Setup timeout if needed
         if let timeout = timeout {
             let syncTimeoutOptions = SyncTimeoutOptions()
@@ -836,22 +930,6 @@ private class ObservableAsyncOpenStorage: ObservableObject {
         }
         return app
     }
-}
-
-/**
-An enum representing different states from `AsyncOpen` and `AutoOpen` process
-*/
-public enum AsyncOpenState {
-    /// Starting the Realm.asyncOpen process.
-    case connecting
-    /// Waiting for a user to be logged in before executing Realm.asyncOpen.
-    case waitingForUser
-    /// The Realm has been opened and is ready for use. For AsyncOpen this means that the Realm has been fully downloaded, but for AutoOpen the existing local file may have been used if the device is offline.
-    case open(Realm)
-    /// The Realm is currently being downloaded from the server.
-    case progress(Progress)
-    /// Opening the Realm failed.
-    case error(Error)
 }
 
 // MARK: - AsyncOpen
@@ -900,17 +978,6 @@ public enum AsyncOpenState {
     @Environment(\.partitionValue) var partitionValue
     @ObservedObject private var storage: ObservableAsyncOpenStorage
 
-    private func asyncOpen() {
-        storage.asyncOpen()
-            .sink { completion in
-                if case .failure(let error) = completion {
-                    self.storage.asyncOpenState = .error(error)
-                }
-            } receiveValue: { realm in
-                self.storage.asyncOpenState = .open(realm)
-            }.store(in: &storage.cancellables)
-    }
-
     /**
      A Publisher for `AsyncOpenState`, emits a state each time the asyncOpen state changes.
      */
@@ -927,8 +994,7 @@ public enum AsyncOpenState {
      This will cancel any notification from the property wrapper states
      */
     public func cancel() {
-        storage.cancellables.forEach { $0.cancel() }
-        storage.cancellables = []
+        storage.cancel()
     }
 
     /**
@@ -937,18 +1003,17 @@ public enum AsyncOpenState {
      - parameter partitionValue: The `BSON` value the Realm is partitioned on.
      - parameter configuration: The `Realm.Configuration` used when creating the Realm,
                  user's sync configuration for the given partition value will be set as the `syncConfiguration`,
-                 if empty the configuration is set to the `defaultConfiguration`
+                 if empty the user configuration will be used.
      - parameter timeout: The maximum number of milliseconds to allow for a connection to
                  become fully established., if empty or `nil` no connection timeout is set.
      */
     public init(appId: String? = nil,
                 partitionValue: Partition,
-                configuration: Realm.Configuration = Realm.Configuration.defaultConfiguration,
+                configuration: Realm.Configuration? = nil,
                 timeout: UInt? = nil) {
         let app = ObservableAsyncOpenStorage.configureApp(appId: appId, withTimeout: timeout)
         // Store property wrapper values on the storage
-        storage = ObservableAsyncOpenStorage(app: app, configuration: configuration, partitionValue: AnyBSON(partitionValue))
-        asyncOpen()
+        storage = ObservableAsyncOpenStorage(asyncOpenKind: .asyncOpen, app: app, configuration: configuration, partitionValue: AnyBSON(partitionValue))
     }
 
     public mutating func update() {
@@ -956,19 +1021,18 @@ public enum AsyncOpenState {
             let bsonValue = AnyBSON(partitionValue)
             if storage.partitionValue != bsonValue {
                 storage.partitionValue = bsonValue
-                cancel()
-                asyncOpen()
+                storage.asyncOpen()
             }
         }
 
-        if storage.configuration != configuration {
-            storage.configuration = configuration
+        // We don't want to use the `defaultConfiguration` from the environment, we only want to use this environment value in @AsyncOpen if is not the default one
+        if configuration != .defaultConfiguration,
+           storage.configuration != configuration {
             if let partitionValue = configuration.syncConfiguration?.partitionValue {
                 storage.partitionValue = partitionValue
             }
-
-            cancel()
-            asyncOpen()
+            storage.configuration = configuration
+            storage.asyncOpen()
         }
     }
 }
@@ -1022,23 +1086,6 @@ public enum AsyncOpenState {
     @Environment(\.partitionValue) var partitionValue
     @ObservedObject private var storage: ObservableAsyncOpenStorage
 
-    private func asyncOpen() {
-        storage.asyncOpen()
-            .sink { completion in
-                if case .failure(let error) = completion {
-                    if let error = error as NSError?,
-                       error.code == Int(ETIMEDOUT) && error.domain == NSPOSIXErrorDomain,
-                       let realm = try? Realm(configuration: configuration) {
-                        self.storage.asyncOpenState = .open(realm)
-                    } else {
-                        self.storage.asyncOpenState = .error(error)
-                    }
-                }
-            } receiveValue: { realm in
-                self.storage.asyncOpenState = .open(realm)
-            }.store(in: &storage.cancellables)
-    }
-
     /**
      A Publisher for `AsyncOpenState`, emits a state each time the asyncOpen state changes.
      */
@@ -1055,8 +1102,7 @@ public enum AsyncOpenState {
      This will cancel any notification from the property wrapper states
      */
     public func cancel() {
-        storage.cancellables.forEach { $0.cancel() }
-        storage.cancellables = []
+        storage.cancel()
     }
 
     /**
@@ -1065,18 +1111,17 @@ public enum AsyncOpenState {
      - parameter partitionValue: The `BSON` value the Realm is partitioned on.
      - parameter configuration: The `Realm.Configuration` used when creating the Realm,
                  user's sync configuration for the given partition value will be set as the `syncConfiguration`,
-                 if empty the configuration is set to the `defaultConfiguration`.
+                 if empty the user configuration will be used.
      - parameter timeout: The maximum number of milliseconds to allow for a connection to
                  become fully established, if empty or `nil` no connection timeout is set.
      */
     public init(appId: String? = nil,
                 partitionValue: Partition,
-                configuration: Realm.Configuration = Realm.Configuration.defaultConfiguration,
+                configuration: Realm.Configuration? = nil,
                 timeout: UInt? = nil) {
         let app = ObservableAsyncOpenStorage.configureApp(appId: appId, withTimeout: timeout)
         // Store property wrapper values on the storage
-        storage = ObservableAsyncOpenStorage(app: app, configuration: configuration, partitionValue: AnyBSON(partitionValue))
-        asyncOpen()
+        storage = ObservableAsyncOpenStorage(asyncOpenKind: .autoOpen, app: app, configuration: configuration, partitionValue: AnyBSON(partitionValue))
     }
 
     public mutating func update() {
@@ -1084,19 +1129,18 @@ public enum AsyncOpenState {
             let bsonValue = AnyBSON(partitionValue)
             if storage.partitionValue != bsonValue {
                 storage.partitionValue = bsonValue
-                cancel()
-                asyncOpen()
+                storage.asyncOpen()
             }
         }
 
-        if storage.configuration != configuration {
+        // We don't want to use the `defaultConfiguration` from the environment, we only want to use this environment value in @AsyncOpen if is not the default one
+        if configuration != .defaultConfiguration,
+           storage.configuration != configuration {
             if let partitionValue = configuration.syncConfiguration?.partitionValue {
                 storage.partitionValue = partitionValue
             }
             storage.configuration = configuration
-
-            cancel()
-            asyncOpen()
+            storage.asyncOpen()
         }
     }
 }
@@ -1118,6 +1162,286 @@ extension SwiftUIKVO {
         }
     }
 }
+
+// Adding `_Concurrency` flag is the only way to verify
+// if the BASE SDK contains latest framework updates
+#if swift(>=5.5) && canImport(_Concurrency)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
+extension View {
+    /// Marks this view as searchable, which configures the display of a search field.
+    /// You can provide a collection and a key path to be filtered using the search
+    /// field string provided by the searchable component, this will result in the collection
+    /// querying for all items containing the search field string for the given key path.
+    ///
+    ///     @State var searchString: String
+    ///     @ObservedResults(Reminder.self) var reminders
+    ///
+    ///     List {
+    ///         ForEach(reminders) { reminder in
+    ///             ReminderRowView(reminder: reminder)
+    ///         }
+    ///     }
+    ///     .searchable(text: $searchFilter,
+    ///                 collection: $reminders,
+    ///                 keyPath: \.name) {
+    ///         ForEach(reminders) { remindersFiltered in
+    ///             Text(remindersFiltered.name).searchCompletion(remindersFiltered.name)
+    ///         }
+    ///     }
+    ///
+    /**
+    - Note: See ``SwiftUI/View/searchable(text:placement:prompt)``
+            <https://developer.apple.com/documentation/swiftui/form/searchable(text:placement:prompt:)-6royb>
+            for more information on searchable view modifier.
+
+    - parameter text: The text to display and edit in the search field.
+    - parameter collection: The collection to be filtered.
+    - parameter keyPath: The key path to the property which will be used to filter
+                the collection, only key paths with `String` type are allowed.
+    - parameter placement: The preferred placement of the search field within the
+                containing view hierarchy.
+    - parameter prompt: A `Text` representing the prompt of the search field
+                which provides users with guidance on what to search for.
+     */
+    public func searchable<T: ObjectBase>(text: Binding<String>, collection: ObservedResults<T>, keyPath: KeyPath<T, String>, placement: SearchFieldPlacement = .automatic, prompt: Text? = nil) -> some View {
+        filterCollection(collection, for: text.wrappedValue, on: keyPath)
+        return searchable(text: text,
+                          placement: placement,
+                          prompt: prompt)
+    }
+
+    /// Marks this view as searchable, which configures the display of a search field.
+    /// You can provide a collection and a key path to be filtered using the search
+    /// field string provided by the searchable component, this will result in the collection
+    /// querying for all items containing the search field string for the given key path.
+    ///
+    ///     @State var searchString: String
+    ///     @ObservedResults(Reminder.self) var reminders
+    ///
+    ///     List {
+    ///         ForEach(reminders) { reminder in
+    ///             ReminderRowView(reminder: reminder)
+    ///         }
+    ///     }
+    ///     .searchable(text: $searchFilter,
+    ///                 collection: $reminders,
+    ///                 keyPath: \.name) {
+    ///         ForEach(reminders) { remindersFiltered in
+    ///             Text(remindersFiltered.name).searchCompletion(remindersFiltered.name)
+    ///         }
+    ///     }
+    ///
+    /**
+    - Note: See ``SwiftUI/View/searchable(text:placement:prompt)``
+            <https://developer.apple.com/documentation/swiftui/form/searchable(text:placement:prompt:)-2ed8t>
+            for more information on searchable view modifier.
+
+    - parameter text: The text to display and edit in the search field.
+    - parameter collection: The collection to be filtered.
+    - parameter keyPath: The key path to the property which will be used to filter
+                the collection.
+    - parameter placement: The preferred placement of the search field within the
+                containing view hierarchy.
+    - parameter prompt: The key for the localized prompt of the search field
+                which provides users with guidance on what to search for.
+     */
+    public func searchable<T: ObjectBase>(text: Binding<String>, collection: ObservedResults<T>, keyPath: KeyPath<T, String>, placement: SearchFieldPlacement = .automatic, prompt: LocalizedStringKey) -> some View {
+        filterCollection(collection, for: text.wrappedValue, on: keyPath)
+        return searchable(text: text,
+                          placement: placement,
+                          prompt: prompt)
+    }
+
+    /// Marks this view as searchable, which configures the display of a search field.
+    /// You can provide a collection and a key path to be filtered using the search
+    /// field string provided by the searchable component, this will result in the collection
+    /// querying for all items containing the search field string for the given key path.
+    ///
+    ///     @State var searchString: String
+    ///     @ObservedResults(Reminder.self) var reminders
+    ///
+    ///     List {
+    ///         ForEach(reminders) { reminder in
+    ///             ReminderRowView(reminder: reminder)
+    ///         }
+    ///     }
+    ///     .searchable(text: $searchFilter,
+    ///                 collection: $reminders,
+    ///                 keyPath: \.name) {
+    ///         ForEach(reminders) { remindersFiltered in
+    ///             Text(remindersFiltered.name).searchCompletion(remindersFiltered.name)
+    ///         }
+    ///     }
+    ///
+    /**
+    - Note: See ``SwiftUI/View/searchable(text:placement:prompt)``
+            <https://developer.apple.com/documentation/swiftui/form/searchable(text:placement:prompt:)-58egp>
+            for more information on searchable view modifier.
+
+    - parameter text: The text to display and edit in the search field.
+    - parameter collection: The collection to be filtered.
+    - parameter keyPath: The key path to the property which will be used to filter
+                the collection.
+    - parameter placement: The preferred placement of the search field within the
+                containing view hierarchy.
+    - parameter prompt: A string representing the prompt of the search field
+                which provides users with guidance on what to search for.
+     */
+    public func searchable<T: ObjectBase, S>(text: Binding<String>, collection: ObservedResults<T>, keyPath: KeyPath<T, String>, placement: SearchFieldPlacement = .automatic, prompt: S) -> some View where S: StringProtocol {
+        filterCollection(collection, for: text.wrappedValue, on: keyPath)
+        return searchable(text: text,
+                          placement: placement,
+                          prompt: prompt)
+    }
+
+    /// Marks this view as searchable, which configures the display of a search field.
+    /// You can provide a collection and a key path to be filtered using the search
+    /// field string provided by the searchable component, this will result in the collection
+    /// querying for all items containing the search field string for the given key path.
+    ///
+    ///     @State var searchString: String
+    ///     @ObservedResults(Reminder.self) var reminders
+    ///
+    ///     List {
+    ///         ForEach(reminders) { reminder in
+    ///             ReminderRowView(reminder: reminder)
+    ///         }
+    ///     }
+    ///     .searchable(text: $searchFilter,
+    ///                 collection: $reminders,
+    ///                 keyPath: \.name) {
+    ///         ForEach(reminders) { remindersFiltered in
+    ///             Text(remindersFiltered.name).searchCompletion(remindersFiltered.name)
+    ///         }
+    ///     }
+    ///
+    /**
+    - Note: See ``SwiftUI/View/searchable(text:placement:prompt:suggestions)``
+            <https://developer.apple.com/documentation/swiftui/form/searchable(text:placement:prompt:suggestions:)-94bdu>
+            for more information on searchable view modifier.
+
+    - parameter text: The text to display and edit in the search field.
+    - parameter collection: The collection to be filtered.
+    - parameter keyPath: The key path to the property which will be used to filter
+                the collection.
+    - parameter placement: The preferred placement of the search field within the
+                containing view hierarchy.
+    - parameter prompt: A `Text` representing the prompt of the search field
+                which provides users with guidance on what to search for.
+    - parameter suggestions: A view builder that produces content that
+                populates a list of suggestions.
+     */
+    public func searchable<T: ObjectBase, S>(text: Binding<String>, collection: ObservedResults<T>, keyPath: KeyPath<T, String>, placement: SearchFieldPlacement = .automatic, prompt: Text? = nil, @ViewBuilder suggestions: () -> S) -> some View where S: View {
+        filterCollection(collection, for: text.wrappedValue, on: keyPath)
+        return searchable(text: text,
+                          placement: placement,
+                          prompt: prompt,
+                          suggestions: suggestions)
+    }
+
+    /// Marks this view as searchable, which configures the display of a search field.
+    /// You can provide a collection and a key path to be filtered using the search
+    /// field string provided by the searchable component, this will result in the collection
+    /// querying for all items containing the search field string for the given key path.
+    ///
+    ///     @State var searchString: String
+    ///     @ObservedResults(Reminder.self) var reminders
+    ///
+    ///     List {
+    ///         ForEach(reminders) { reminder in
+    ///             ReminderRowView(reminder: reminder)
+    ///         }
+    ///     }
+    ///     .searchable(text: $searchFilter,
+    ///                 collection: $reminders,
+    ///                 keyPath: \.name) {
+    ///         ForEach(reminders) { remindersFiltered in
+    ///             Text(remindersFiltered.name).searchCompletion(remindersFiltered.name)
+    ///         }
+    ///     }
+    ///
+    /**
+    - Note: See ``SwiftUI/View/searchable(text:placement:prompt:suggestions)``
+            <https://developer.apple.com/documentation/swiftui/form/searchable(text:placement:prompt:suggestions:)-1mw1m>
+            for more information on searchable view modifier.
+
+    - parameter text: The text to display and edit in the search field.
+    - parameter collection: The collection to be filtered.
+    - parameter keyPath: The key path to the property which will be used to filter
+                the collection.
+    - parameter placement: The preferred placement of the search field within the
+                containing view hierarchy.
+    - parameter prompt: The key for the localized prompt of the search field
+                which provides users with guidance on what to search for.
+    - parameter suggestions: A view builder that produces content that
+                populates a list of suggestions.
+     */
+    public func searchable<T: ObjectBase, S>(text: Binding<String>, collection: ObservedResults<T>, keyPath: KeyPath<T, String>, placement: SearchFieldPlacement = .automatic, prompt: LocalizedStringKey, @ViewBuilder suggestions: () -> S) -> some View where S: View {
+        filterCollection(collection, for: text.wrappedValue, on: keyPath)
+        return searchable(text: text,
+                          placement: placement,
+                          prompt: prompt,
+                          suggestions: suggestions)
+    }
+
+    /// Marks this view as searchable, which configures the display of a search field.
+    /// You can provide a collection and a key path to be filtered using the search
+    /// field string provided by the searchable component, this will result in the collection
+    /// querying for all items containing the search field string for the given key path.
+    ///
+    ///     @State var searchString: String
+    ///     @ObservedResults(Reminder.self) var reminders
+    ///
+    ///     List {
+    ///         ForEach(reminders) { reminder in
+    ///             ReminderRowView(reminder: reminder)
+    ///         }
+    ///     }
+    ///     .searchable(text: $searchFilter,
+    ///                 collection: $reminders,
+    ///                 keyPath: \.name) {
+    ///         ForEach(reminders) { remindersFiltered in
+    ///             Text(remindersFiltered.name).searchCompletion(remindersFiltered.name)
+    ///         }
+    ///     }
+    ///
+    /**
+    - Note: See ``SwiftUI/View/searchable(text:placement:prompt:suggestions)``
+            <https://developer.apple.com/documentation/swiftui/form/searchable(text:placement:prompt:suggestions:)-6h6qo>
+            for more information on searchable view modifier.
+     
+    - parameter text: The text to display and edit in the search field.
+    - parameter collection: The collection to be filtered.
+    - parameter keyPath: The key path to the property which will be used to filter
+                the collection.
+    - parameter placement: The preferred placement of the search field within the
+                containing view hierarchy.
+    - parameter prompt: A string representing the prompt of the search field
+                which provides users with guidance on what to search for.
+    - parameter suggestions: A view builder that produces content that
+                populates a list of suggestions.
+     */
+    public func searchable<T: ObjectBase, V, S>(text: Binding<String>, collection: ObservedResults<T>, keyPath: KeyPath<T, String>, placement: SearchFieldPlacement = .automatic, prompt: S, @ViewBuilder suggestions: () -> V) -> some View where V: View, S: StringProtocol {
+        filterCollection(collection, for: text.wrappedValue, on: keyPath)
+        return searchable(text: text,
+                          placement: placement,
+                          prompt: prompt,
+                          suggestions: suggestions)
+    }
+
+    private func filterCollection<T: ObjectBase>(_ collection: ObservedResults<T>, for text: String, on keyPath: KeyPath<T, String>) {
+        DispatchQueue.main.async {
+            if text.isEmpty {
+                collection.filter = nil
+            } else {
+                var query: Query<String> = Query<T>()[dynamicMember: keyPath]
+                query = query.contains(text)
+                collection.filter = query.predicate
+            }
+        }
+    }
+}
+#endif
 #else
 @objc(RLMSwiftUIKVO) internal final class SwiftUIKVO: NSObject {
     @objc(removeObserversFromObject:) public static func removeObservers(object: NSObject) -> Bool {

@@ -264,6 +264,26 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
     }
 
     /**
+     Returns a `Results` containing all matching values in the map with the given query.
+
+     - Note: This should only be used with classes using the `@Persistable` property declaration.
+
+     - Usage:
+     ```
+     myMap.where {
+        ($0.fooCol > 5) && ($0.barCol == "foobar")
+     }
+     ```
+
+     - Note: See ``Query`` for more information on what query operations are available.
+
+     - parameter isIncluded: The query closure with which to filter the objects.
+     */
+    public func `where`(_ isIncluded: ((Query<Value>) -> Query<Value>)) -> Results<Value> {
+        return filter(isIncluded(Query()).predicate)
+    }
+
+    /**
      Returns a Boolean value indicating whether the Map contains the key-value pair
      satisfies the given predicate
 
