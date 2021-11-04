@@ -49,6 +49,8 @@ x.y.z Release notes (yyyy-MM-dd)
   be used and would throw incorrect thread exceptions. It now is `@MainActor`
   and gives a Realm instance which always works on the main actor. The
   non-functional `queue:` parameter has been removed (since v10.15.0).
+* Restore the pre-v10.12.0 of calling `writeCopy()` on a synchronized Realm
+  which produced a local non-synchronized Realm ([#7513](https://github.com/realm/realm-cocoa/issues/7513)).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
