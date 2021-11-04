@@ -232,6 +232,10 @@ struct CallbackLoggerFactory : public realm::SyncLoggerFactory {
 - (std::shared_ptr<realm::SyncManager>)syncManager {
     return _syncManager;
 }
+
+- (void)waitForSessionTermination {
+    _syncManager->wait_for_sessions_to_terminate();
+}
 @end
 
 #pragma mark - RLMSyncTimeoutOptions
