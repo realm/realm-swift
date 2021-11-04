@@ -1857,6 +1857,26 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     XCTAssertLessThanOrEqual(finalSize, usedSize + realm::util::page_size());
 }
 
+- (void)testWriteCopy {
+    RLMUser *user = [self userForTest:_cmd];
+    NSString *partitionValue = NSStringFromSelector(_cmd);
+    RLMRealm *syncRealm = [self openRealmForPartitionValue:partitionValue user:user];
+    [self addPersonsToRealm:syncRealm persons:@[[Person john]]];
+
+    NSError *writeError;
+    XCTAssertTrue([syncRealm writeCopyToURL:RLMTestRealmURL()
+                              encryptionKey:syncRealm.configuration.encryptionKey
+                                      error:&writeError]);
+    XCTAssertNil(writeError);
+
+    RLMRealmConfiguration *localConfig = [RLMRealmConfiguration new];
+    localConfig.fileURL = RLMTestRealmURL();
+    localConfig.schemaVersion = 1;
+
+    RLMRealm *localCopy = [RLMRealm realmWithConfiguration:localConfig error:nil];
+    XCTAssertEqual(1U, [Person allObjectsInRealm:localCopy].count);
+}
+
 #pragma mark - Read Only
 
 - (void)testOpenSynchronouslyInReadOnlyBeforeRemoteSchemaIsInitialized {
