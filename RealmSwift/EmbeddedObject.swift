@@ -264,19 +264,19 @@ extension EmbeddedObject: ThreadConfined {
 }
 
 
-// MARK: AssistedObjectiveCBridgeable
+// MARK: CustomObjectiveCBridgeable
 
 // FIXME: Remove when `as! Self` can be written
 private func forceCastToInferred<T, V>(_ x: T) -> V {
     return x as! V
 }
 
-extension EmbeddedObject: AssistedObjectiveCBridgeable {
-    static func bridging(from objectiveCValue: Any) -> Self {
+extension EmbeddedObject: CustomObjectiveCBridgeable {
+    static func bridging(objCValue objectiveCValue: Any) -> Self {
         return forceCastToInferred(objectiveCValue)
     }
 
-    var bridged: Any {
+    var objCValue: Any {
         return unsafeBitCast(self, to: RLMObject.self)
     }
 }

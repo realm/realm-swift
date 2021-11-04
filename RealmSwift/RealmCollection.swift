@@ -274,7 +274,7 @@ public protocol RealmCollectionBase: RandomAccessCollection, LazyCollectionProto
  A homogenous collection of `Object`s which can be retrieved, filtered, sorted, and operated upon.
 */
 public protocol RealmCollection: RealmCollectionBase {
-    // Must also conform to `AssistedObjectiveCBridgeable`
+    // Must also conform to `CustomObjectiveCBridgeable`
 
     // MARK: Properties
 
@@ -1038,7 +1038,7 @@ public extension RealmCollection where Element: OptionalProtocol, Element.Wrappe
     }
 }
 
-private class _AnyRealmCollectionBase<T: RealmCollectionValue>: AssistedObjectiveCBridgeable {
+private class _AnyRealmCollectionBase<T: RealmCollectionValue>: CustomObjectiveCBridgeable {
     typealias Wrapper = AnyRealmCollection<Element>
     typealias Element = T
     var realm: Realm? { fatalError() }
@@ -1071,8 +1071,8 @@ private class _AnyRealmCollectionBase<T: RealmCollectionValue>: AssistedObjectiv
     func _observe(_ keyPaths: [String]?, _ queue: DispatchQueue?, _ block: @escaping (RealmCollectionChange<Wrapper>) -> Void)
         -> NotificationToken { fatalError() }
     func _observe<T: ObjectBase>(_ keyPaths: [PartialKeyPath<T>], _ queue: DispatchQueue?, _ block: @escaping (RealmCollectionChange<Wrapper>) -> Void) -> NotificationToken { fatalError() }
-    class func bridging(from objectiveCValue: Any) -> Self { fatalError() }
-    var bridged: Any { fatalError() }
+    class func bridging(objCValue objectiveCValue: Any) -> Self { fatalError() }
+    var objCValue: Any { fatalError() }
     func asNSFastEnumerator() -> Any { fatalError() }
     var isFrozen: Bool { fatalError() }
     func freeze() -> AnyRealmCollection<T> { fatalError() }
@@ -1193,14 +1193,14 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
         return base._observe(keyPaths.map(_name(for:)), queue, block)
     }
 
-    // MARK: AssistedObjectiveCBridgeable
-    override class func bridging(from objectiveCValue: Any) -> _AnyRealmCollection {
+    // MARK: CustomObjectiveCBridgeable
+    override class func bridging(objCValue objectiveCValue: Any) -> _AnyRealmCollection {
         return _AnyRealmCollection(
-            base: (C.self as! AssistedObjectiveCBridgeable.Type).bridging(from: objectiveCValue) as! C)
+            base: (C.self as! CustomObjectiveCBridgeable.Type).bridging(objCValue: objectiveCValue) as! C)
     }
 
-    override var bridged: Any {
-        return (base as! AssistedObjectiveCBridgeable).bridged
+    override var objCValue: Any {
+        return (base as! CustomObjectiveCBridgeable).objCValue
     }
 
     override var isFrozen: Bool {
@@ -1834,15 +1834,15 @@ public struct AnyRealmCollection<Element: RealmCollectionValue>: RealmCollection
     public func thaw() -> AnyRealmCollection? { return base.thaw() }
 }
 
-// MARK: AssistedObjectiveCBridgeable
+// MARK: CustomObjectiveCBridgeable
 
-extension AnyRealmCollection: AssistedObjectiveCBridgeable {
-    internal static func bridging(from objectiveCValue: Any) -> AnyRealmCollection {
+extension AnyRealmCollection: CustomObjectiveCBridgeable {
+    internal static func bridging(objCValue objectiveCValue: Any) -> AnyRealmCollection {
         return AnyRealmCollection(rlmCollection: objectiveCValue as! RLMCollection)
     }
 
-    internal var bridged: Any {
-        base.bridged
+    internal var objCValue: Any {
+        base.objCValue
     }
 }
 

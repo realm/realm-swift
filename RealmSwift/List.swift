@@ -20,12 +20,12 @@ import Foundation
 import Realm
 import Realm.Private
 
-extension RLMSwiftCollectionBase: Equatable, AssistedObjectiveCBridgeable {
-    static func bridging(from objectiveCValue: Any) -> Self {
+extension RLMSwiftCollectionBase: Equatable, CustomObjectiveCBridgeable {
+    static func bridging(objCValue objectiveCValue: Any) -> Self {
         Self(collection: objectiveCValue as! RLMCollection)
     }
 
-    var bridged: Any {
+    var objCValue: Any {
         _rlmCollection
     }
 

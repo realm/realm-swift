@@ -730,15 +730,15 @@ extension LinkingObjects: RealmCollection {
     }
 }
 
-// MARK: AssistedObjectiveCBridgeable
+// MARK: CustomObjectiveCBridgeable
 
-extension LinkingObjects: AssistedObjectiveCBridgeable {
-    internal static func bridging(from objectiveCValue: Any) -> LinkingObjects {
+extension LinkingObjects: CustomObjectiveCBridgeable {
+    internal static func bridging(objCValue objectiveCValue: Any) -> LinkingObjects {
         guard let object = objectiveCValue as? RLMResults<Element> else { preconditionFailure() }
         return LinkingObjects<Element>(objc: object as! RLMResults<AnyObject>)
     }
 
-    internal var bridged: Any {
+    internal var objCValue: Any {
         handle!.results
     }
 }

@@ -644,19 +644,19 @@ internal func dynamicSet(object: ObjectBase, key: String, value: Any?) {
     }
 }
 
-// MARK: AssistedObjectiveCBridgeable
+// MARK: CustomObjectiveCBridgeable
 
 // FIXME: Remove when `as! Self` can be written
 private func forceCastToInferred<T, V>(_ x: T) -> V {
     return x as! V
 }
 
-extension Object: AssistedObjectiveCBridgeable {
-    internal static func bridging(from objectiveCValue: Any) -> Self {
+extension Object: CustomObjectiveCBridgeable {
+    internal static func bridging(objCValue objectiveCValue: Any) -> Self {
         return forceCastToInferred(objectiveCValue)
     }
 
-    internal var bridged: Any {
+    internal var objCValue: Any {
         unsafeCastToRLMObject()
     }
 }

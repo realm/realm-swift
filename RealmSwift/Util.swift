@@ -210,10 +210,3 @@ extension AnyRealmValue: CustomObjectiveCBridgeable {
         return ObjectiveCSupport.convert(value: self) ?? NSNull()
     }
 }
-
-// MARK: AssistedObjectiveCBridgeable
-
-internal protocol AssistedObjectiveCBridgeable {
-    static func bridging(from objectiveCValue: Any) -> Self
-    var bridged: Any { get }
-}

@@ -30,7 +30,7 @@ import Realm
  classes which attempt to conform to it will not make them work with `ThreadSafeReference`.
  */
 public protocol ThreadConfined {
-    // Must also conform to `AssistedObjectiveCBridgeable`
+    // Must also conform to `CustomObjectiveCBridgeable`
 
     /**
      The Realm which manages the object, or `nil` if the object is unmanaged.
@@ -109,12 +109,12 @@ public protocol ThreadConfined {
              constructor.
      */
     public init(to threadConfined: Confined) {
-        objectiveCReference = RLMThreadSafeReference(threadConfined: (threadConfined as! AssistedObjectiveCBridgeable).bridged as! RLMThreadConfined)
+        objectiveCReference = RLMThreadSafeReference(threadConfined: (threadConfined as! CustomObjectiveCBridgeable).objCValue as! RLMThreadConfined)
     }
 
     internal func resolve(in realm: Realm) -> Confined? {
         guard let objectiveCValue = realm.rlmRealm.__resolve(objectiveCReference) else { return nil }
-        return ((Confined.self as! AssistedObjectiveCBridgeable.Type).bridging(from: objectiveCValue) as! Confined)
+        return ((Confined.self as! CustomObjectiveCBridgeable.Type).bridging(objCValue: objectiveCValue) as! Confined)
     }
 }
 
