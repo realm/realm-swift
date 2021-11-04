@@ -122,7 +122,7 @@ let package = Package(
             targets: ["Realm", "RealmSwift"]),
     ],
     dependencies: [
-        .package(name: "RealmDatabase", url: "https://github.com/realm/realm-core", .branch("jbr/flx_api_wip"))
+        .package(name: "RealmDatabase", url: "https://github.com/realm/realm-core", .branch("jbr/flx_subscripton_store"))
     ],
     targets: [
       .target(

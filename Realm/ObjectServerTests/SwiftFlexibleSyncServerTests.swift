@@ -17,7 +17,6 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #if os(macOS)
-
 import RealmSwift
 import XCTest
 
@@ -44,25 +43,38 @@ class Author: Object {
     @Persisted var name: String
 }
 
-#if swift(>=5.5) && canImport(_Concurrency)
-@available(macOS 12.0, *)
 class SwiftFlexibleSyncTestCase: SwiftSyncTestCase {
 
 }
 
 // MARK: - Completion Block
-@available(macOS 12.0.0, *)
 class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
-    func testFlexibleSyncDownload() async throws {
-        //// Examples
+    func testFlexibleSyncDownload() throws {
         // Open Realm with a Flexible Configuration
         let app = App(id: "")
-        let user = try await app.login(credentials: Credentials.emailPassword(email: "email", password: "password"))
-        let config = user.flexibleSyncConfiguration()
-        let realm = try await Realm.init(configuration: config, downloadBeforeOpen: .always)
+        var syncUser: User!
+        app.login(credentials: Credentials.emailPassword(email: "email", password: "password"), { result in
+            switch result {
+            case .success(let user):
+                syncUser = user
+            case .failure(let error):
+                XCTFail("Should login user \(error)")
+            }
+
+        })
+        let config = syncUser.flexibleSyncConfiguration()
+        var syncedRealm: Realm!
+        Realm.asyncOpen(configuration: config, callback: { result in
+            switch result {
+            case .success(let realm):
+                syncedRealm = realm
+            case .failure(let error):
+                XCTFail("Should return a realm \(error)")
+            }
+        })
 
         // Example code 1 - Add 2 different subscriptions, second one without name
-        let subscriptions = realm.subscriptions
+        let subscriptions = syncedRealm.subscriptions
         if subscriptions.isEmpty {
             try subscriptions.write {
                 try subscriptions.add {
@@ -74,7 +86,7 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
                     }
                 }
             }
-            try subscriptions.waitForSync(completion: { result in
+            subscriptions.waitForSync(completion: { result in
                 switch result {
                 case .success(()):
                     // Sync succesful
@@ -86,19 +98,15 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
         }
 
         // Example code 2 - Find a subscription by name and remove a subscription
-        let subscriptions2 = realm.subscriptions
+        let subscriptions2 = syncedRealm.subscriptions
         if let subscription = subscriptions2.findSubscription(name: "contacts-ny") {
             try subscriptions2.write {
                 try subscriptions2.remove(subscription)
             }
-            .onStateChange({ state in
-                // Notify state changes
-                print(state)
-            })
         }
 
         // Example code 3 - Find a subscription by query and update the subscription
-        let subscriptions3 = realm.subscriptions
+        let subscriptions3 = syncedRealm.subscriptions
         let query = { Subscription<Contact> { $0.address.state == "NY" && $0.age > 10 } }
         if let subscription = subscriptions3.findSubscription(query) {
             try subscriptions3.write {
@@ -111,11 +119,11 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
         }
 
         // Example code 4 - Remove all subscriptions for a type
-        let subscriptions4 = realm.subscriptions
+        let subscriptions4 = syncedRealm.subscriptions
         try subscriptions4.write {
             try subscriptions4.removeAll(ofType: Contact.self)
         }
-        try subscriptions4.waitForSync(completion: { result in
+        subscriptions4.waitForSync(completion: { result in
             switch result {
             case .success(()):
                 // Sync succesful
@@ -124,10 +132,25 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
                 print(error)
             }
         })
+
+        // Example code 5 - Monitor state changes on this subscription set write
+        let subscriptions5 = syncedRealm.subscriptions
+        try subscriptions5.write {
+            try subscriptions4.remove {
+                Subscription<Author> {
+                    $0.name == "Joe Doe"
+                }
+            }
+        }
+        .onStateChange({ state in
+            // Notify state changes
+            print(state)
+        })
     }
 }
 
 // MARK: - Async Await
+#if swift(>=5.5) && canImport(_Concurrency)
 @available(macOS 12.0.0, *)
 extension SwiftFlexibleSyncServerTests {
     func testFlexibleSyncDownloadAsyncAwait() async throws {
@@ -141,7 +164,7 @@ extension SwiftFlexibleSyncServerTests {
         // Example code 1 - Add 2 different subscriptions, second one without name
         let subscriptions = realm.subscriptions
         if subscriptions.isEmpty {
-            try await subscriptions.writeAsync {
+            try await subscriptions.write {
                 try subscriptions.add {
                     Subscription<Contact>(name: "contacts-ny") {
                         $0.address.state == "NY" && $0.age > 10
@@ -157,7 +180,7 @@ extension SwiftFlexibleSyncServerTests {
         // Example code 2 - Find a subscription by name and remove a subscription
         let subscriptions2 = realm.subscriptions
         if let subscription = subscriptions2.findSubscription(name: "contacts-ny") {
-            try await subscriptions2.writeAsync {
+            try await subscriptions2.write {
                 try subscriptions2.remove(subscription)
             }
         }
@@ -166,7 +189,7 @@ extension SwiftFlexibleSyncServerTests {
         let subscriptions3 = realm.subscriptions
         let query = { Subscription<Contact> { $0.address.state == "NY" && $0.age > 10 } }
         if let subscription = subscriptions3.findSubscription(query) {
-            try await subscriptions3.writeAsync {
+            try await subscriptions3.write {
                 try subscription.update {
                     Subscription<Contact>(name: "contacts-ny") {
                         $0.address.state == "TX" && $0.age > 21
@@ -177,11 +200,25 @@ extension SwiftFlexibleSyncServerTests {
 
         // Example code 4 - Remove all subscriptions for a type
         let subscriptions4 = realm.subscriptions
-        try await subscriptions4.writeAsync {
+        try await subscriptions4.write {
             try subscriptions4.removeAll(ofType: Contact.self)
         }
         try await subscriptions4.waitForSync()
+
+        // Example code 5 - Monitor state changes on this subscription set write
+        let subscriptions5 = realm.subscriptions
+        try await subscriptions5.write {
+            try subscriptions4.remove {
+                Subscription<Author> {
+                    $0.name == "Joe Doe"
+                }
+            }
+        }
+        for await state in subscriptions4.state {
+            // Notify state changes
+            print(state)
+        }
     }
 }
-#endif // swift(>=5.5)
-#endif
+#endif // canImport(_Concurrency)
+#endif // os(macOS)

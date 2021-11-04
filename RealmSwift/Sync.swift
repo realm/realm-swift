@@ -796,7 +796,6 @@ public protocol QueryBuilderComponent {}
     public static func buildBlock(_ component: AnySubscription) -> AnySubscription {
         return component
     }
-
 }
 
 public protocol AnyQueryBuilderComponent {}
@@ -821,40 +820,21 @@ extension Realm {
 
 // SubscriptionSet
 extension Array where Element == AnySubscription {
-
-    // TODO: Do we want to expose this??
-    // The state on this subscription set - is it acknowledged by the server and
-    // has the data been downloaded locally.
-    public var state: SubscriptionState {
-        fatalError()
-    }
-
-    // TODO: Do we want to expose this??
-    // The exception containing information for why this collection is in the
-    // Error state. If State is not Error, this will be null.
-    public var error: Error {
-        fatalError()
-    }
-
+    // Creates a write transaction and updates the subscription set, this will not wait
+    // for the server to acknowledge and see all the data associated with this collection of
+    // subscriptions
     @discardableResult
     public func write(_ block: (() throws -> ())) throws -> SubscriptionTask {
         fatalError()
     }
 
-    public func waitForSync(completion: @escaping (Result<Void, Error>) -> Void) throws {
+    // Wait for the server to acknowledge and send all the data associated with this
+    // subscription set, if state is complete this will return immediately, will
+    // throw an error if someone updates the subscription set will waiting
+    // Completion block version
+    public func waitForSync(completion: @escaping (Result<Void, Error>) -> Void) {
         fatalError()
     }
-
-    #if swift(>=5.5) && canImport(_Concurrency)
-    @discardableResult
-    public func writeAsync(_ block: (() throws -> ())) async throws -> SubscriptionTask {
-        fatalError()
-    }
-
-    public func waitForSync() async throws {
-        fatalError()
-    }
-    #endif // swift(>=5.5)
 
     // Find subscription in the subscription set by name
     public func findSubscription<Element: Object>(name: String) -> Subscription<Element>? {
@@ -871,13 +851,21 @@ extension Array where Element == AnySubscription {
         fatalError()
     }
 
-    // Remove subscription of subscription set by query, this has to be done within a write block
-    public func remove(@QueryBuilder _ to: () -> ([AnySubscription])) throws {
+    public func add(@QueryBuilder _ to: () -> (AnySubscription)) throws {
         fatalError()
     }
 
     // Remove a subscription from the subscription set, this has to be done within a write block
     public func remove(_ subscription: AnySubscription) throws {
+        fatalError()
+    }
+
+    // Remove subscription of subscription set by query, this has to be done within a write block
+    public func remove(@QueryBuilder _ to: () -> ([AnySubscription])) throws {
+        fatalError()
+    }
+
+    public func remove(@QueryBuilder _ to: () -> (AnySubscription)) throws {
         fatalError()
     }
 
@@ -896,6 +884,45 @@ extension Array where Element == AnySubscription {
         fatalError()
     }
 }
+
+#if swift(>=5.5) && canImport(_Concurrency)
+@available(macOS 12.0, tvOS 15.0, iOS 15.0, watchOS 8.0, *)
+extension Array where Element == AnySubscription {
+    // The state on this subscription set
+    // TODO: Make this KVO Compliant ??
+    public var state: AsyncStream<SubscriptionState> {
+        fatalError()
+    }
+    // Asynchronously creates and commit a write transaction and updates the subscription set,
+    // this will not wait for the server to acknowledge and see all the data associated with this
+    // collection of subscription
+    public func write(_ block: (() throws -> ())) async throws -> Void {
+        fatalError()
+    }
+
+    // Wait for the server to acknowledge and send all the data associated with this
+    // subscription set, if state is complete this will return immediately, will
+    // throw an error if someone updates the subscription set will waiting
+    public func waitForSync() async throws {
+        fatalError()
+    }
+}
+#endif // swift(>=5.5)
+//
+//#if !(os(iOS) && (arch(i386) || arch(arm)))
+//import Combine
+//
+//@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, macCatalyst 13.0, macCatalystApplicationExtension 13.0, *)
+//extension Array where Element == AnySubscription {
+//    // Wait for the server to acknowledge and send all the data associated with this
+//    // subscription set, if state is complete this will return immediately, will
+//    // throw an error if someone updates the subscription set will waiting
+//    public func waitForSync() -> Future<Void, Error> {
+//        return Future { self.waitForSync(completion: $0) }
+//    }
+//}
+//#endif // canImport(Combine)
+    
 
 // State Updates
 // Some operations will return a `SubscriptionTask` which can be used to get state updates (There will be a Combine API as well not described here)
