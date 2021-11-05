@@ -20,20 +20,6 @@ import Foundation
 import Realm
 import Realm.Private
 
-extension RLMSwiftCollectionBase: Equatable, CustomObjectiveCBridgeable {
-    static func bridging(objCValue objectiveCValue: Any) -> Self {
-        Self(collection: objectiveCValue as! RLMCollection)
-    }
-
-    var objCValue: Any {
-        _rlmCollection
-    }
-
-    public static func == (lhs: RLMSwiftCollectionBase, rhs: RLMSwiftCollectionBase) -> Bool {
-        return lhs.isEqual(rhs)
-    }
-}
-
 /**
  `List` is the container type in Realm used to define to-many relationships.
 
@@ -94,7 +80,7 @@ public final class List<Element: RealmCollectionValue>: RLMSwiftCollectionBase {
      - parameter object: An object to find.
      */
     public func index(of object: Element) -> Int? {
-        return notFoundToNil(index: rlmArray.index(of: dynamicBridgeCast(fromSwift: object) as AnyObject))
+        return notFoundToNil(index: rlmArray.index(of: staticBridgeCast(fromSwift: object) as AnyObject))
     }
 
     /**
@@ -140,21 +126,21 @@ public final class List<Element: RealmCollectionValue>: RLMSwiftCollectionBase {
                 return Element._rlmKeyPathRecorder(with: lastAccessedNames)
             }
             throwForNegativeIndex(position)
-            return dynamicBridgeCast(fromObjectiveC: _rlmCollection.object(at: UInt(position)))
+            return staticBridgeCast(fromObjectiveC: _rlmCollection.object(at: UInt(position)))
         }
         set {
             throwForNegativeIndex(position)
-            rlmArray.replaceObject(at: UInt(position), with: dynamicBridgeCast(fromSwift: newValue) as AnyObject)
+            rlmArray.replaceObject(at: UInt(position), with: staticBridgeCast(fromSwift: newValue) as AnyObject)
         }
     }
 
     /// Returns the first object in the list, or `nil` if the list is empty.
     public var first: Element? {
-        return rlmArray.firstObject().map(dynamicBridgeCast)
+        return rlmArray.firstObject().map(staticBridgeCast)
     }
 
     /// Returns the last object in the list, or `nil` if the list is empty.
-    public var last: Element? { return rlmArray.lastObject().map(dynamicBridgeCast) }
+    public var last: Element? { return rlmArray.lastObject().map(staticBridgeCast) }
 
     /**
      Returns an array containing the objects in the array at the indexes specified by a given index set.
@@ -167,7 +153,7 @@ public final class List<Element: RealmCollectionValue>: RLMSwiftCollectionBase {
         guard let r = rlmArray.objects(at: indexes) else {
             throwRealmException("Indexes for List are out of bounds.")
         }
-        return r.map(dynamicBridgeCast)
+        return r.map(staticBridgeCast)
     }
 
     // MARK: KVC
@@ -276,7 +262,7 @@ public final class List<Element: RealmCollectionValue>: RLMSwiftCollectionBase {
      - parameter property: The name of a property whose minimum value is desired.
      */
     public func min<T: MinMaxType>(ofProperty property: String) -> T? {
-        return _rlmCollection.min(ofProperty: property).map(dynamicBridgeCast)
+        return _rlmCollection.min(ofProperty: property).map(staticBridgeCast)
     }
 
     /**
@@ -288,7 +274,7 @@ public final class List<Element: RealmCollectionValue>: RLMSwiftCollectionBase {
      - parameter property: The name of a property whose maximum value is desired.
      */
     public func max<T: MinMaxType>(ofProperty property: String) -> T? {
-        return _rlmCollection.max(ofProperty: property).map(dynamicBridgeCast)
+        return _rlmCollection.max(ofProperty: property).map(staticBridgeCast)
     }
 
     /**
@@ -299,7 +285,7 @@ public final class List<Element: RealmCollectionValue>: RLMSwiftCollectionBase {
      - parameter property: The name of a property whose values should be summed.
      */
     public func sum<T: AddableType>(ofProperty property: String) -> T {
-        return dynamicBridgeCast(fromObjectiveC: _rlmCollection.sum(ofProperty: property))
+        return staticBridgeCast(fromObjectiveC: _rlmCollection.sum(ofProperty: property))
     }
 
     /**
@@ -310,7 +296,7 @@ public final class List<Element: RealmCollectionValue>: RLMSwiftCollectionBase {
      - parameter property: The name of a property whose average value should be calculated.
      */
     public func average<T: AddableType>(ofProperty property: String) -> T? {
-        return _rlmCollection.average(ofProperty: property).map(dynamicBridgeCast)
+        return _rlmCollection.average(ofProperty: property).map(staticBridgeCast)
     }
 
     // MARK: Mutation
@@ -326,7 +312,7 @@ public final class List<Element: RealmCollectionValue>: RLMSwiftCollectionBase {
      - parameter object: An object.
      */
     public func append(_ object: Element) {
-        rlmArray.add(dynamicBridgeCast(fromSwift: object) as AnyObject)
+        rlmArray.add(staticBridgeCast(fromSwift: object) as AnyObject)
     }
 
     /**
@@ -336,7 +322,7 @@ public final class List<Element: RealmCollectionValue>: RLMSwiftCollectionBase {
     */
     public func append<S: Sequence>(objectsIn objects: S) where S.Iterator.Element == Element {
         for obj in objects {
-            rlmArray.add(dynamicBridgeCast(fromSwift: obj) as AnyObject)
+            rlmArray.add(staticBridgeCast(fromSwift: obj) as AnyObject)
         }
     }
 
@@ -352,7 +338,7 @@ public final class List<Element: RealmCollectionValue>: RLMSwiftCollectionBase {
      */
     public func insert(_ object: Element, at index: Int) {
         throwForNegativeIndex(index)
-        rlmArray.insert(dynamicBridgeCast(fromSwift: object) as AnyObject, at: UInt(index))
+        rlmArray.insert(staticBridgeCast(fromSwift: object) as AnyObject, at: UInt(index))
     }
 
     /**
@@ -390,7 +376,7 @@ public final class List<Element: RealmCollectionValue>: RLMSwiftCollectionBase {
      */
     public func replace(index: Int, object: Element) {
         throwForNegativeIndex(index)
-        rlmArray.replaceObject(at: UInt(index), with: dynamicBridgeCast(fromSwift: object) as AnyObject)
+        rlmArray.replaceObject(at: UInt(index), with: staticBridgeCast(fromSwift: object) as AnyObject)
     }
 
     /**
@@ -797,14 +783,14 @@ extension List where Element: MinMaxType {
      Returns the minimum (lowest) value in the list, or `nil` if the list is empty.
      */
     public func min() -> Element? {
-        return _rlmCollection.min(ofProperty: "self").map(dynamicBridgeCast)
+        return _rlmCollection.min(ofProperty: "self").map(staticBridgeCast)
     }
 
     /**
      Returns the maximum (highest) value in the list, or `nil` if the list is empty.
      */
     public func max() -> Element? {
-        return _rlmCollection.max(ofProperty: "self").map(dynamicBridgeCast)
+        return _rlmCollection.max(ofProperty: "self").map(staticBridgeCast)
     }
 }
 
@@ -850,26 +836,6 @@ extension List: RealmCollection {
             for x in newElements.reversed() {
                 insert(x, at: subrange.lowerBound)
             }
-    }
-
-    /// The position of the first element in a non-empty collection.
-    /// Identical to endIndex in an empty collection.
-    public var startIndex: Int { return 0 }
-
-    /// The collection's "past the end" position.
-    /// endIndex is not a valid argument to subscript, and is always reachable from startIndex by
-    /// zero or more applications of successor().
-    public var endIndex: Int { return count }
-
-    public func index(after i: Int) -> Int { return i + 1 }
-    public func index(before i: Int) -> Int { return i - 1 }
-
-    /// :nodoc:
-    public func _observe(_ keyPaths: [String]?,
-                         _ queue: DispatchQueue?,
-                         _ block: @escaping (RealmCollectionChange<AnyRealmCollection<Element>>) -> Void)
-        -> NotificationToken {
-            return rlmArray.addNotificationBlock(wrapObserveBlock(block), keyPaths: keyPaths, queue: queue)
     }
 }
 

@@ -606,21 +606,21 @@ public final class DynamicObject: Object {
  ```
  */
 public protocol RealmEnum: RealmOptionalType, _RealmSchemaDiscoverable {
-    /// :nodoc:
-    static func _rlmToRawValue(_ value: Any) -> Any
-    /// :nodoc:
-    static func _rlmFromRawValue(_ value: Any) -> Any?
 }
 
 // MARK: - Implementation
 
 /// :nodoc:
-public extension RealmEnum where Self: RawRepresentable, Self.RawValue: _RealmSchemaDiscoverable {
-    static func _rlmToRawValue(_ value: Any) -> Any {
-        return (value as! Self).rawValue
-    }
-    static func _rlmFromRawValue(_ value: Any) -> Any? {
-        return Self(rawValue: value as! RawValue)
+public extension RealmEnum where Self: RawRepresentable, Self.RawValue: _RealmSchemaDiscoverable & _ObjcBridgeable {
+    var _rlmObjcValue: Any { rawValue._rlmObjcValue }
+    static func _rlmFromObjc(_ value: Any) -> Self? {
+        if let value = value as? Self {
+            return value
+        }
+        if let value = value as? RawValue {
+            return Self(rawValue: value)
+        }
+        return nil
     }
     static func _rlmPopulateProperty(_ prop: RLMProperty) {
         RawValue._rlmPopulateProperty(prop)
@@ -630,10 +630,8 @@ public extension RealmEnum where Self: RawRepresentable, Self.RawValue: _RealmSc
 
 internal func dynamicSet(object: ObjectBase, key: String, value: Any?) {
     let bridgedValue: Any?
-    if let v1 = value, let v2 = v1 as? CustomObjectiveCBridgeable {
-        bridgedValue = v2.objCValue
-    } else if let v1 = value, let v2 = v1 as? RealmEnum {
-        bridgedValue = type(of: v2)._rlmToRawValue(v2)
+    if let v1 = value, let v2 = v1 as? _ObjcBridgeable {
+        bridgedValue = v2._rlmObjcValue
     } else {
         bridgedValue = value
     }
@@ -641,23 +639,6 @@ internal func dynamicSet(object: ObjectBase, key: String, value: Any?) {
         object.setValue(bridgedValue, forKey: key)
     } else {
         RLMDynamicValidatedSet(object, key, bridgedValue)
-    }
-}
-
-// MARK: CustomObjectiveCBridgeable
-
-// FIXME: Remove when `as! Self` can be written
-private func forceCastToInferred<T, V>(_ x: T) -> V {
-    return x as! V
-}
-
-extension Object: CustomObjectiveCBridgeable {
-    internal static func bridging(objCValue objectiveCValue: Any) -> Self {
-        return forceCastToInferred(objectiveCValue)
-    }
-
-    internal var objCValue: Any {
-        unsafeCastToRLMObject()
     }
 }
 

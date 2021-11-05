@@ -142,7 +142,7 @@ public final class MutableSet<Element: RealmCollectionValue>: RLMSwiftCollection
      - parameter object: The element to find in the MutableSet.
      */
     public func contains(_ object: Element) -> Bool {
-        return rlmSet.contains(dynamicBridgeCast(fromSwift: object) as AnyObject)
+        return rlmSet.contains(staticBridgeCast(fromSwift: object) as AnyObject)
     }
 
     /**
@@ -208,7 +208,7 @@ public final class MutableSet<Element: RealmCollectionValue>: RLMSwiftCollection
      - parameter property: The name of a property whose minimum value is desired.
      */
     public func min<T: MinMaxType>(ofProperty property: String) -> T? {
-        return rlmSet.min(ofProperty: property).map(dynamicBridgeCast)
+        return rlmSet.min(ofProperty: property).map(staticBridgeCast)
     }
 
     /**
@@ -220,7 +220,7 @@ public final class MutableSet<Element: RealmCollectionValue>: RLMSwiftCollection
      - parameter property: The name of a property whose maximum value is desired.
      */
     public func max<T: MinMaxType>(ofProperty property: String) -> T? {
-        return rlmSet.max(ofProperty: property).map(dynamicBridgeCast)
+        return rlmSet.max(ofProperty: property).map(staticBridgeCast)
     }
 
     /**
@@ -231,7 +231,7 @@ public final class MutableSet<Element: RealmCollectionValue>: RLMSwiftCollection
      - parameter property: The name of a property whose values should be summed.
      */
     public func sum<T: AddableType>(ofProperty property: String) -> T {
-        return dynamicBridgeCast(fromObjectiveC: rlmSet.sum(ofProperty: property))
+        return staticBridgeCast(fromObjectiveC: rlmSet.sum(ofProperty: property))
     }
 
     /**
@@ -242,7 +242,7 @@ public final class MutableSet<Element: RealmCollectionValue>: RLMSwiftCollection
      - parameter property: The name of a property whose average value should be calculated.
      */
     public func average<T: AddableType>(ofProperty property: String) -> T? {
-        return rlmSet.average(ofProperty: property).map(dynamicBridgeCast)
+        return rlmSet.average(ofProperty: property).map(staticBridgeCast)
     }
 
     // MARK: Mutation
@@ -255,7 +255,7 @@ public final class MutableSet<Element: RealmCollectionValue>: RLMSwiftCollection
      - parameter object: An object.
      */
     public func insert(_ object: Element) {
-        rlmSet.add(dynamicBridgeCast(fromSwift: object) as AnyObject)
+        rlmSet.add(staticBridgeCast(fromSwift: object) as AnyObject)
     }
 
     /**
@@ -265,7 +265,7 @@ public final class MutableSet<Element: RealmCollectionValue>: RLMSwiftCollection
     */
     public func insert<S: Sequence>(objectsIn objects: S) where S.Iterator.Element == Element {
         for obj in objects {
-            rlmSet.add(dynamicBridgeCast(fromSwift: obj) as AnyObject)
+            rlmSet.add(staticBridgeCast(fromSwift: obj) as AnyObject)
         }
     }
 
@@ -277,7 +277,7 @@ public final class MutableSet<Element: RealmCollectionValue>: RLMSwiftCollection
      - parameter object: The object to remove.
      */
     public func remove(_ object: Element) {
-        rlmSet.remove(dynamicBridgeCast(fromSwift: object) as AnyObject)
+        rlmSet.remove(staticBridgeCast(fromSwift: object) as AnyObject)
     }
 
     /**
@@ -678,14 +678,14 @@ extension MutableSet where Element: MinMaxType {
      Returns the minimum (lowest) value in the set, or `nil` if the set is empty.
      */
     public func min() -> Element? {
-        return rlmSet.min(ofProperty: "self").map(dynamicBridgeCast)
+        return rlmSet.min(ofProperty: "self").map(staticBridgeCast)
     }
 
     /**
      Returns the maximum (highest) value in the set, or `nil` if the set is empty.
      */
     public func max() -> Element? {
-        return rlmSet.max(ofProperty: "self").map(dynamicBridgeCast)
+        return rlmSet.max(ofProperty: "self").map(staticBridgeCast)
     }
 }
 
@@ -716,26 +716,6 @@ extension MutableSet: RealmCollection {
         return RLMIterator(collection: rlmSet)
     }
 
-    /// The position of the first element in a non-empty collection.
-    /// Identical to endIndex in an empty collection.
-    public var startIndex: Int { return 0 }
-
-    /// The collection's "past the end" position.
-    /// endIndex is not a valid argument to subscript, and is always reachable from startIndex by
-    /// zero or more applications of successor().
-    public var endIndex: Int { return count }
-
-    public func index(after i: Int) -> Int { return i + 1 }
-    public func index(before i: Int) -> Int { return i - 1 }
-
-    /// :nodoc:
-    public func _observe(_ keyPaths: [String]?,
-                         _ queue: DispatchQueue?,
-                         _ block: @escaping (RealmCollectionChange<AnyRealmCollection<Element>>) -> Void)
-        -> NotificationToken {
-            return rlmSet.addNotificationBlock(wrapObserveBlock(block), keyPaths: keyPaths, queue: queue)
-    }
-
     // MARK: Object Retrieval
 
     /**
@@ -747,7 +727,7 @@ extension MutableSet: RealmCollection {
             return Element._rlmKeyPathRecorder(with: lastAccessedNames)
         }
         throwForNegativeIndex(position)
-        return dynamicBridgeCast(fromObjectiveC: rlmSet.object(at: UInt(position)))
+        return staticBridgeCast(fromObjectiveC: rlmSet.object(at: UInt(position)))
     }
 
     /// :nodoc:

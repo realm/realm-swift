@@ -27,6 +27,11 @@ class PersonProjection: Projection<Person> {
 // `people` will contain projections for every `Person` object in the `realm`
 let people: Results<PersonProjection> = realm.objects(PersonProjection.self)
 ```
+* Greatly improve performance of reading AnyRealmValue and enum types from
+  Realm collections.
+* Allow using Swift enums which conform to `PersistableEnum` as the value type
+  for all Realm collections.
+* `AnyRealmCollection` now conforms to `Encodable`.
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
@@ -74,8 +79,6 @@ Xcode 12.4 is now the minimum supported version of Xcode.
 ### Enhancements
 
 * Conform `@ThreadSafe` and `ThreadSafeReference` to `Sendable`.
-* Allow using Swift enums which conform to `PersistableEnum` as the value type
-  for all Realm collections.
 
 ### Fixed
 

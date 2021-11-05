@@ -327,8 +327,7 @@ extension ProjectionObservable {
         } else {
             kps = _schema.filter { keyPaths.contains($0.originPropertyKeyPathString) }.map(\.originPropertyKeyPathString)
         }
-        return rootObject._observe(keyPaths: kps,
-                                   on: queue, { change in
+        return rootObject._observe(keyPaths: kps, on: queue, { change in
             block(ObjectChange<Self>.processChange(change, self))
         })
     }
@@ -561,50 +560,6 @@ extension Projection: ThreadConfined where Root: ThreadConfined {
             return Self(projecting: thawedObject)
         }
         return nil
-    }
-}
-
-// - MARK: _RealmSchemaDiscoverable
-/// Conformance to RealmCollectionValue needs conformance to _RealmSchemaDiscoverable
-extension Projection {
-    /// :nodoc:
-    public static var _rlmType: PropertyType {
-        fatalError()
-    }
-    /// :nodoc:
-    public static var _rlmOptional: Bool {
-        fatalError()
-    }
-    /// :nodoc:
-    public static func _rlmDefaultValue(_ forceDefaultInitialization: Bool) -> Self {
-        fatalError()
-    }
-    /// :nodoc:
-    public static var _rlmRequireObjc: Bool { false }
-    /// :nodoc:
-    public func _rlmPopulateProperty(_ prop: RLMProperty) {
-        fatalError()
-    }
-    /// :nodoc:
-    public static func _rlmPopulateProperty(_ prop: RLMProperty) {
-        fatalError()
-    }
-}
-
-// MARK: CustomObjectiveCBridgeable
-
-// FIXME: Remove when `as! Self` can be written
-private func forceCastToInferred<T, V>(_ x: T) -> V {
-    return x as! V
-}
-
-extension Projection: CustomObjectiveCBridgeable {
-    internal static func bridging(objCValue objectiveCValue: Any) -> Self {
-        return Self(projecting: forceCastToInferred(objectiveCValue))
-    }
-
-    internal var objCValue: Any {
-        self.rootObject.unsafeCastToRLMObject()
     }
 }
 

@@ -21,7 +21,7 @@ import Realm
 import Realm.Private
 
 /// :nodoc:
-public protocol _MapKey: Hashable {
+public protocol _MapKey: Hashable, _ObjcBridgeable {
     static var _rlmType: RLMPropertyType { get }
 }
 extension String: _MapKey { }
@@ -61,12 +61,12 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
 
     /// Returns all of the keys in this map.
     public var keys: [Key] {
-        return rlmDictionary.allKeys.map(dynamicBridgeCast)
+        return rlmDictionary.allKeys.map(staticBridgeCast)
     }
 
     /// Returns all of the values in this map.
     public var values: [Value] {
-        return rlmDictionary.allValues.map(dynamicBridgeCast)
+        return rlmDictionary.allValues.map(staticBridgeCast)
     }
 
     // MARK: Initializers
@@ -102,7 +102,7 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
      - parameter forKey: The direction to sort in.
      */
     public func updateValue(_ value: Value, forKey key: Key) {
-        rlmDictionary[objcKey(from: key)] = dynamicBridgeCast(fromSwift: value) as AnyObject
+        rlmDictionary[objcKey(from: key)] = staticBridgeCast(fromSwift: value) as AnyObject
     }
 
     /**
@@ -130,11 +130,11 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
             let key = objcKey(from: key)
             var selectedValue: Value
             if let existing = rlmDictionary[key] {
-                selectedValue = try combine(dynamicBridgeCast(fromObjectiveC: existing), value)
+                selectedValue = try combine(staticBridgeCast(fromObjectiveC: existing), value)
             } else {
                 selectedValue = value
             }
-            rlmDictionary[key] = dynamicBridgeCast(fromSwift: selectedValue) as AnyObject
+            rlmDictionary[key] = staticBridgeCast(fromSwift: selectedValue) as AnyObject
         }
     }
 
@@ -197,13 +197,13 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
             if let lastAccessedNames = lastAccessedNames {
                 return Value._rlmKeyPathRecorder(with: lastAccessedNames)
             }
-            return rlmDictionary[objcKey(from: key)].map(dynamicBridgeCast)
+            return rlmDictionary[objcKey(from: key)].map(staticBridgeCast)
         }
         set {
             if newValue == nil {
                 rlmDictionary.removeObject(forKey: key as AnyObject)
             } else {
-                rlmDictionary[objcKey(from: key)] = dynamicBridgeCast(fromSwift: newValue) as AnyObject
+                rlmDictionary[objcKey(from: key)] = staticBridgeCast(fromSwift: newValue) as AnyObject
             }
         }
     }
@@ -238,7 +238,7 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
      */
     @nonobjc public func value(forKeyPath keyPath: String) -> AnyObject? {
         return rlmDictionary.value(forKeyPath: keyPath)
-            .map { dynamicBridgeCast(fromObjectiveC: $0) }
+            .map(dynamicBridgeCast)
     }
 
     /**
@@ -295,7 +295,7 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
     public func contains(where predicate: @escaping (_ key: Key, _ value: Value) -> Bool) -> Bool {
         var found = false
         rlmDictionary.enumerateKeysAndObjects { (k, v, shouldStop) in
-            if predicate(dynamicBridgeCast(fromObjectiveC: k), dynamicBridgeCast(fromObjectiveC: v)) {
+            if predicate(staticBridgeCast(fromObjectiveC: k), staticBridgeCast(fromObjectiveC: v)) {
                 found = true
                 shouldStop.pointee = true
             }
@@ -358,7 +358,7 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
      - parameter property: The name of a property whose minimum value is desired.
      */
     public func min<T: MinMaxType>(ofProperty property: String) -> T? {
-        return rlmDictionary.min(ofProperty: property).map(dynamicBridgeCast)
+        return rlmDictionary.min(ofProperty: property).map(staticBridgeCast)
     }
 
     /**
@@ -370,7 +370,7 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
      - parameter property: The name of a property whose minimum value is desired.
      */
     public func max<T: MinMaxType>(ofProperty property: String) -> T? {
-        return rlmDictionary.max(ofProperty: property).map(dynamicBridgeCast)
+        return rlmDictionary.max(ofProperty: property).map(staticBridgeCast)
     }
 
     /**
@@ -381,7 +381,7 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
     - parameter property: The name of a property conforming to `AddableType` to calculate sum on.
     */
     public func sum<T: AddableType>(ofProperty property: String) -> T {
-        return dynamicBridgeCast(fromObjectiveC: rlmDictionary.sum(ofProperty: property))
+        return staticBridgeCast(fromObjectiveC: rlmDictionary.sum(ofProperty: property))
     }
 
     /**
@@ -393,7 +393,7 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
      - parameter property: The name of a property whose values should be summed.
      */
     public func average<T: AddableType>(ofProperty property: String) -> T? {
-        return rlmDictionary.average(ofProperty: property).map(dynamicBridgeCast)
+        return rlmDictionary.average(ofProperty: property).map(staticBridgeCast)
     }
 
     // MARK: Notifications
@@ -664,14 +664,14 @@ extension Map where Value: MinMaxType {
      Returns the minimum (lowest) value in the map, or `nil` if the map is empty.
      */
     public func min() -> Value? {
-        return _rlmCollection.min(ofProperty: "self").map(dynamicBridgeCast)
+        return _rlmCollection.min(ofProperty: "self").map(staticBridgeCast)
     }
 
     /**
      Returns the maximum (highest) value in the map, or `nil` if the map is empty.
      */
     public func max() -> Value? {
-        return _rlmCollection.max(ofProperty: "self").map(dynamicBridgeCast)
+        return _rlmCollection.max(ofProperty: "self").map(staticBridgeCast)
     }
 }
 
@@ -680,13 +680,13 @@ extension Map where Value: OptionalProtocol, Value.Wrapped: MinMaxType {
      Returns the minimum (lowest) value of the map, or `nil` if the map is empty.
      */
     public func min() -> Value.Wrapped? {
-        return _rlmCollection.min(ofProperty: "self").map(dynamicBridgeCast)
+        return _rlmCollection.min(ofProperty: "self").map(staticBridgeCast)
     }
     /**
      Returns the maximum (highest) value of the map, or `nil` if the map is empty.
      */
     public func max() -> Value.Wrapped? {
-        return _rlmCollection.max(ofProperty: "self").map(dynamicBridgeCast)
+        return _rlmCollection.max(ofProperty: "self").map(staticBridgeCast)
     }
 }
 
