@@ -41,7 +41,7 @@ class SeriesModel: Projection<Series> {
 
 extension String {
     var quoted: String {
-        "\"" + self + "\""
+        "\"\(self)\""
     }
 }
 

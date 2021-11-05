@@ -237,7 +237,7 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
         }
     }
 
-    let instance: ()->(ObservableStoragePublisher<ObservedType>)
+    let instance: () -> (ObservableStoragePublisher<ObservedType>)
     var objectWillChange: ObservableStoragePublisher<ObservedType>
     var keyPaths: [String]?
 
@@ -383,9 +383,10 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
 // MARK: ObservedResults
 /**
  A type which can be used with @ObservedResults propperty wrapper. Children class of Realm Object or Projection.
+ It's made to specialize the init methods of ObservedResults.
  */
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-public protocol _ObservedResultsValue: RealmCollectionValue & Identifiable { }
+public protocol _ObservedResultsValue: RealmCollectionValue, Identifiable { }
 
 /// :nodoc:
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
@@ -515,7 +516,7 @@ extension Projection: _ObservedResultsValue { }
                 configuration: Realm.Configuration? = nil,
                 filter: NSPredicate? = nil,
                 keyPaths: [String]? = nil,
-                sortDescriptor: SortDescriptor? = nil) where ResultType: ObjectBase {
+                sortDescriptor: SortDescriptor? = nil) where ResultType: Object {
         self.storage = Storage(Results(RLMResults.emptyDetached()), keyPaths)
         self.storage.resultFactory = { realm in
             realm.objects(ResultType.self)

@@ -94,20 +94,20 @@ class ProjectedMutableSetTests: TestCase {
         XCTAssertNotNil(chandedObject)
     }
 
-    func testFreezeThawProjectedList() {
+    func testFreezeThawProjectedMutableSet() {
         let realm = realmWithTestPath()
         let johnSnow = realm.objects(PersonProjection.self).first!
-        let projectedList = collection.freeze()
+        let projectedSet = collection.freeze()
 
-        XCTAssertTrue(projectedList.isFrozen)
+        XCTAssertTrue(projectedSet.isFrozen)
         XCTAssertFalse(johnSnow.isFrozen)
 
         let frosenJohn = johnSnow.freeze()
-        let frozenProjectedList = frosenJohn.firstFriendsName
+        let frozenProjectedSet = frosenJohn.firstFriendsName
 
         XCTAssertTrue(frosenJohn.isFrozen)
-        XCTAssertTrue(projectedList.isFrozen)
-        XCTAssertTrue(frozenProjectedList.isFrozen)
+        XCTAssertTrue(projectedSet.isFrozen)
+        XCTAssertTrue(frozenProjectedSet.isFrozen)
     }
 
     func testRealm() {

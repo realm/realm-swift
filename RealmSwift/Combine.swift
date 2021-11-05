@@ -62,6 +62,9 @@ extension Projection: Identifiable, Hashable {
     /// A stable identifier for this projection. This value will be
     /// the same for all projections of this object
     public var id: UInt64 {
+        // UInt64(bitPattern:) to properly cast negative Int64 values
+        // It will use the same memory representation, the numeric value
+        // may be different which is fine in this case
         UInt64(bitPattern: Int64(ObjectIdentifier(type(of: self)).hashValue))
     }
 }

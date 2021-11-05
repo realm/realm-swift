@@ -156,7 +156,7 @@ extension ObjectChange {
     }
 }
 
-/// ``Projection`` is a light weight model of  the original Realm ``Object`` or ``EmbeddedObject``.
+/// ``Projection`` is a light weight model of the original Realm ``Object`` or ``EmbeddedObject``.
 /// You can use `Projection` as a view model to minimize boilerplate.
 ///
 /// Example of usage:
@@ -898,7 +898,7 @@ public struct ProjectedList<NewElement>: RandomAccessCollection where NewElement
 extension ProjectedList: ThreadConfined { }
 
 /**
- `ElementMapper` transforms the actual `List` of `Objects` or `List` of `EmbeddedObjects` in to ProjectedList.
+ `ListElementMapper` transforms the actual `List` of `Objects` or `List` of `EmbeddedObjects` in to ProjectedList.
  For example:
  ```swift
  class Person: Object {
@@ -912,7 +912,7 @@ extension ProjectedList: ThreadConfined { }
  */
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 @dynamicMemberLookup
-public struct ElementMapper<Element> where Element: ObjectBase, Element: RealmCollectionValue {
+public struct ListElementMapper<Element> where Element: ObjectBase, Element: RealmCollectionValue {
     var list: List<Element>
     /// :nodoc:
     public subscript<V>(dynamicMember member: KeyPath<Element, V>) -> ProjectedList<V> {
@@ -935,13 +935,13 @@ extension List where Element: ObjectBase, Element: RealmCollectionValue {
     ```
      In this code the `Person`'s dogs list will be prijected to the list of dogs names via `projectTo`
      */
-    public var projectTo: ElementMapper<Element> {
-        ElementMapper(list: self)
+    public var projectTo: ListElementMapper<Element> {
+        ListElementMapper(list: self)
     }
 }
 
 /**
- `SetElementMapper` transforms the actual `MutableSet` of `Objects` or `MutableSet` of `EmbeddedObjects` in to ProjectedMutableSet.
+ `MutableSetElementMapper` transforms the actual `MutableSet` of `Objects` or `MutableSet` of `EmbeddedObjects` in to ProjectedMutableSet.
  For example:
  ```swift
  class Person: Object {
@@ -955,7 +955,7 @@ extension List where Element: ObjectBase, Element: RealmCollectionValue {
  */
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 @dynamicMemberLookup
-public struct SetElementMapper<Element> where Element: ObjectBase, Element: RealmCollectionValue {
+public struct MutableSetElementMapper<Element> where Element: ObjectBase, Element: RealmCollectionValue {
     var set: MutableSet<Element>
     /// :nodoc:
     public subscript<V>(dynamicMember member: KeyPath<Element, V>) -> ProjectedMutableSet<V> {
@@ -978,8 +978,8 @@ extension MutableSet where Element: ObjectBase, Element: RealmCollectionValue {
     ```
      In this code the `Person`'s dogs set will be prijected to the list of dogs names via `projectTo`
      */
-    public var projectTo: SetElementMapper<Element> {
-        SetElementMapper(set: self)
+    public var projectTo: MutableSetElementMapper<Element> {
+        MutableSetElementMapper(set: self)
     }
 }
 
@@ -1031,6 +1031,7 @@ extension Projection: ObservableObject, RealmSubscribable where Root: ThreadConf
 #endif // canImport(Combine)
 
 // MARK: Projected Mutable Set
+
 /// ProjectedMutableSet is a special type of collection for Projection's properties
 /// You don't need to instantiate this type manually.
 public struct ProjectedMutableSet<NewElement>: RandomAccessCollection where NewElement: RealmCollectionValue {
@@ -1087,7 +1088,7 @@ public struct ProjectedMutableSet<NewElement>: RandomAccessCollection where NewE
      try! realm.write {
          let dog = Dog()
          dog.name = "Rex"
-         person.dogs.append(dog)
+         person.dogs.insert(dog)
      }
      // end of run loop execution context
      ```
@@ -1301,14 +1302,6 @@ public struct ProjectedMutableSet<NewElement>: RandomAccessCollection where NewE
         return "\(type(of: self))<\(Element.self)> <\(self)> {\n" +
         elements +
         "}"
-    }
-    /**
-     Returns the index of an object in the linking objects, or `nil` if the object is not present.
-
-     - parameter object: The object whose index is being queried.
-     */
-    public func index(of object: Element) -> Int? {
-        backingSet.map({$0[keyPath: self.keyPath] as! Element}).firstIndex(of: object)
     }
     public var isFrozen: Bool {
         backingSet.isFrozen

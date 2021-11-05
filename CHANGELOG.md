@@ -17,12 +17,16 @@ public class Address: EmbeddedObject {
 }
 
 class PersonProjection: Projection<Person> {
-    @Projected(\Person.firstName) var firstName         // `Person.firstName` will have same name and type
-    @Projected(\Person.address.city) var homeCity       // There will be the only String for `city` of the original object `Address` 
-    @Projected(\Person.friends.projectTo.firstName) var firstFriendsName: ProjectedList<String>     // List<Person> will be mapped to list of firstNames
+    // `Person.firstName` will have same name and type
+    @Projected(\Person.firstName) var firstName
+    // There will be the only String for `city` of the original object `Address`
+    @Projected(\Person.address.city) var homeCity 
+    // List<Person> will be mapped to list of firstNames
+    @Projected(\Person.friends.projectTo.firstName) var firstFriendsName: ProjectedList<String>
 }
 
-let people: Results<PersonProjection> = realm.objects(PersonProjection.self) // `people` will contain projections for every `Person` object in the `realm`
+// `people` will contain projections for every `Person` object in the `realm`
+let people: Results<PersonProjection> = realm.objects(PersonProjection.self)
 ```
 
 ### Fixed

@@ -262,11 +262,3 @@ extension EmbeddedObject: ThreadConfined {
         return realm?.thaw(self)
     }
 }
-
-
-// MARK: AssistedObjectiveCBridgeable
-
-// FIXME: Remove when `as! Self` can be written
-private func forceCastToInferred<T, V>(_ x: T) -> V {
-    return x as! V
-}
