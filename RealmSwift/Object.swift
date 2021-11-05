@@ -416,12 +416,12 @@ extension Object: RealmCollectionValue {
 
      :nodoc:
      */
-    public func dynamicMap<Key: _MapKey>(_ propertyName: String) -> Map<Key, DynamicObject> {
+    public func dynamicMap<Key: _MapKey>(_ propertyName: String) -> Map<Key, DynamicObject?> {
         if let dynamic = self as? DynamicObject {
-            return dynamic[propertyName] as! Map<Key, DynamicObject>
+            return dynamic[propertyName] as! Map<Key, DynamicObject?>
         }
         let base = RLMDynamicGetByName(self, propertyName) as! RLMSwiftCollectionBase
-        return Map<Key, DynamicObject>(objc: base._rlmCollection as! RLMDictionary<AnyObject, AnyObject>)
+        return Map<Key, DynamicObject?>(objc: base._rlmCollection as! RLMDictionary<AnyObject, AnyObject>)
     }
 
     // MARK: Comparison
@@ -674,7 +674,7 @@ public final class DynamicObject: Object {
         case .objectId:
             return dictionary.isOptional ? Map<String, ObjectId?>(objc: dictionary) : Map<String, ObjectId>(objc: dictionary)
         case .object:
-            return Map<String, DynamicObject>(objc: dictionary)
+            return Map<String, DynamicObject?>(objc: dictionary)
         }
     }
 }

@@ -218,8 +218,8 @@ class MigrationTests: TestCase {
             migration.enumerateObjects(ofType: "SwiftMapPropertyObject") { oldObject, newObject in
                 XCTAssertTrue(oldObject! as AnyObject is MigrationObject)
                 XCTAssertTrue(newObject! as AnyObject is MigrationObject)
-                XCTAssertTrue(oldObject!["map"]! is Map<String, MigrationObject>)
-                XCTAssertTrue(newObject!["map"]! is Map<String, MigrationObject>)
+                XCTAssertTrue(oldObject!["map"]! is Map<String, MigrationObject?>)
+                XCTAssertTrue(newObject!["map"]! is Map<String, MigrationObject?>)
             }
         }
     }
@@ -813,7 +813,9 @@ class MigrationTests: TestCase {
     // test getting/setting all property types
     func testMigrationObject() {
         autoreleasepool {
-            try! Realm().write {
+            let realm = try! Realm()
+            let nulledMapObj = SwiftBoolObject(value: [false])
+            try! realm.write {
                 let object = SwiftObject()
                 object.anyCol.value = .string("hello!")
                 object.boolCol = true
@@ -821,9 +823,13 @@ class MigrationTests: TestCase {
                 object.arrayCol.append(SwiftBoolObject(value: [false]))
                 object.setCol.insert(SwiftBoolObject(value: [false]))
                 object.mapCol["key"] = SwiftBoolObject(value: [false])
+                object.mapCol["nulledObj"] = nulledMapObj
 
-                try! Realm().add(object)
-                return
+                realm.add(object)
+            }
+
+            try! realm.write {
+                realm.delete(nulledMapObj)
             }
         }
 
@@ -877,10 +883,10 @@ class MigrationTests: TestCase {
                 XCTAssertEqual((newObj!["setCol"] as! MutableSet<MigrationObject>).count, 1)
                 XCTAssertEqual(((newObj!["setCol"] as! MutableSet<MigrationObject>)[0]["boolCol"] as! Bool), false)
 
-                XCTAssertEqual((oldObj!["mapCol"] as! Map<String, MigrationObject>).count, 1)
-                XCTAssertEqual(((oldObj!["mapCol"] as! Map<String, MigrationObject>)["key"]?["boolCol"] as! Bool), false)
-                XCTAssertEqual((newObj!["mapCol"] as! Map<String, MigrationObject>).count, 1)
-                XCTAssertEqual(((newObj!["mapCol"] as! Map<String, MigrationObject>)["key"]?["boolCol"] as! Bool), false)
+                XCTAssertEqual((oldObj!["mapCol"] as! Map<String, MigrationObject?>).count, 2)
+                XCTAssertEqual(((oldObj!["mapCol"] as! Map<String, MigrationObject?>)["key"]?!["boolCol"] as! Bool), false)
+                XCTAssertEqual((newObj!["mapCol"] as! Map<String, MigrationObject?>).count, 2)
+                XCTAssertEqual(((newObj!["mapCol"] as! Map<String, MigrationObject?>)["key"]?!["boolCol"] as! Bool), false)
 
                 let uuidCol: UUID = UUID(uuidString: "137decc8-b300-4954-a233-f89909f4fd89")!
                 XCTAssertEqual((newObj!["uuidCol"] as! UUID), uuidCol)
@@ -948,14 +954,14 @@ class MigrationTests: TestCase {
                 XCTAssertEqual((set[2]["boolCol"] as! Bool), true)
 
                 // verify map property
-                var map = newObj!["mapCol"] as! Map<String, MigrationObject>
-                XCTAssertEqual(map["key"]!["boolCol"] as! Bool, false)
-                XCTAssertEqual(map.count, 1)
+                var map = newObj!["mapCol"] as! Map<String, MigrationObject?>
+                XCTAssertEqual(map["key"]?!["boolCol"] as! Bool, false)
+                XCTAssertEqual(map.count, 2)
 
-                map["key"]!["boolCol"] = true
+                map["key"]?!["boolCol"] = true
                 map = newObj!.dynamicMap("mapCol")
-                XCTAssertEqual(map.count, 1)
-                XCTAssertEqual((map["key"]!["boolCol"] as! Bool), true)
+                XCTAssertEqual(map.count, 2)
+                XCTAssertEqual((map["key"]?!["boolCol"] as! Bool), true)
 
                 self.assertThrows(newObj!.value(forKey: "noSuchKey"))
                 self.assertThrows(newObj!.setValue(1, forKey: "noSuchKey"))
@@ -975,9 +981,13 @@ class MigrationTests: TestCase {
                 XCTAssertEqual(set.count, 1)
                 XCTAssertEqual((set[0]["boolCol"] as! Bool), false)
 
+                // test null in Map
+                XCTAssertEqual(map.count, 2)
+                XCTAssertEqual(map["nulledObj"], Optional<MigrationObject?>.some(nil))
+
                 newObj!["mapCol"] = ["key": SwiftBoolObject(value: [false])]
                 XCTAssertEqual(map.count, 1)
-                XCTAssertEqual((map["key"]?["boolCol"] as! Bool), false)
+                XCTAssertEqual((map["key"]?!["boolCol"] as! Bool), false)
 
                 let expected = """
                 SwiftObject \\{
@@ -1100,7 +1110,7 @@ class MigrationTests: TestCase {
 
                 XCTAssertEqual((oldObj!["arrayCol"] as! List<MigrationObject>).count, 0)
                 XCTAssertEqual((oldObj!["setCol"] as! MutableSet<MigrationObject>).count, 0)
-                XCTAssertEqual((oldObj!["mapCol"] as! Map<String, MigrationObject>).count, 0)
+                XCTAssertEqual((oldObj!["mapCol"] as! Map<String, MigrationObject?>).count, 0)
 
                 XCTAssertEqual((oldObj!["arrayBool"] as! List<Bool>).count, 0)
                 XCTAssertEqual((oldObj!["arrayInt"] as! List<Int>).count, 0)
