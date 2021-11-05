@@ -88,7 +88,7 @@ class SwiftFlexibleSyncTestCase: SwiftSyncTestCase {
              }
              subscriptions.observe { result in
                  switch result {
-                 case .success(()):
+                 case .success:
                      // Sync succesful
                      break
                  case .failure(let error):
@@ -125,7 +125,7 @@ class SwiftFlexibleSyncTestCase: SwiftSyncTestCase {
          }
          subscriptions4.observe { result in
              switch result {
-             case .success(()):
+             case .success:
                  // Sync succesful
                  break
              case .failure(let error):

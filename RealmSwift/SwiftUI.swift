@@ -15,6 +15,7 @@
  // limitations under the License.
  //
  ////////////////////////////////////////////////////////////////////////////
+
 import Foundation
 
 #if !(os(iOS) && (arch(i386) || arch(arm)))
@@ -107,6 +108,7 @@ private func createEquatableBinding<T: ThreadConfined, V: Equatable>(
 }
 
 // MARK: SwiftUIKVO
+
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 @objc(RLMSwiftUIKVO) internal final class SwiftUIKVO: NSObject {
     /// Objects must have observers removed before being added to a realm.
@@ -232,6 +234,7 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
 
 
 // MARK: - StateRealmObject
+
 /// A property wrapper type that instantiates an observable object.
 ///
 /// Create a state realm object in a ``SwiftUI/View``, ``SwiftUI/App``, or
@@ -339,6 +342,7 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
 }
 
 // MARK: ObservedResults
+
 /// A property wrapper type that retrieves results from a Realm.
 ///
 /// The results use the realm configuration provided by
@@ -433,6 +437,7 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
 }
 
 // MARK: ObservedRealmObject
+
 /// A property wrapper type that subscribes to an observable Realm `Object` or `List` and
 /// invalidates a view whenever the observable object changes.
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
@@ -532,6 +537,7 @@ extension Binding where Value: ObjectBase & ThreadConfined {
 }
 
 // MARK: - BoundCollection
+
 /// :nodoc:
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 public protocol BoundCollection {
@@ -616,6 +622,7 @@ extension Binding: BoundCollection where Value: RealmCollection {
 }
 
 // MARK: - BoundMap
+
 /// :nodoc:
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 public protocol BoundMap {
@@ -703,9 +710,11 @@ extension ThreadConfined where Self: ObjectBase {
     /**
      Create a `Binding` for a given property, allowing for
      automatically transacted reads and writes behind the scenes.
+
      This is a convenience method for SwiftUI views (e.g., TextField, DatePicker)
      that require a `Binding` to be passed in. SwiftUI will automatically read/write
      from the binding.
+
      - parameter keyPath The key path to the member property.
      - returns A `Binding` to the member property.
      */
@@ -898,20 +907,19 @@ private class ObservableAsyncOpenStorage: ObservableObject {
     }
 
     // MARK: - AutoOpen & AsyncOpen Helper
+
     class func configureApp(appId: String? = nil, withTimeout timeout: UInt? = nil) -> App {
         var app: App
+        let appsIds = RLMApp.appIds()
         if let appId = appId {
             app = App(id: appId)
+        } else if appsIds.count == 1, // Check if there is a singular cached app
+            let cachedAppId = appsIds.first as? String {
+            app = App(id: cachedAppId)
+        } else if appsIds.count > 1 {
+            throwRealmException("Cannot AsyncOpen the Realm because more than one appId was found. When using multiple Apps you must explicitly pass an appId to indicate which to use.")
         } else {
-            // Check if there is a singular cached app
-            let cachedApps = RLMApp.allApps()
-            if cachedApps.count > 1 {
-                throwRealmException("Cannot AsyncOpen the Realm because more than one appId was found. When using multiple Apps you must explicitly pass an appId to indicate which to use.")
-            }
-            guard let cachedApp = cachedApps.first else {
-                throwRealmException("Cannot AsyncOpen the Realm because no appId was found. You must either explicitly pass an appId or initialize an App before displaying your View.")
-            }
-            app = cachedApp
+            throwRealmException("Cannot AsyncOpen the Realm because no appId was found. You must either explicitly pass an appId or initialize an App before displaying your View.")
         }
 
         // Setup timeout if needed
@@ -925,6 +933,7 @@ private class ObservableAsyncOpenStorage: ObservableObject {
 }
 
 // MARK: - AsyncOpen
+
 /// A property wrapper type that initiates a `Realm.asyncOpen()` for the current user which asynchronously open a Realm,
 /// and notifies states for the given process
 ///
@@ -1029,8 +1038,10 @@ private class ObservableAsyncOpenStorage: ObservableObject {
 }
 
 // MARK: - AutoOpen
+
 /// `AutoOpen` will try once to asynchronously open a Realm, but in case of no internet connection will return an opened realm
 /// for the given appId and partitionValue which can be used within our view.
+
 /// Add AutoOpen to your ``SwiftUI/View`` or ``SwiftUI/App``,  after a user is already logged in
 /// or if a user is going to be logged in
 ///
@@ -1182,6 +1193,7 @@ extension View {
     - Note: See ``SwiftUI/View/searchable(text:placement:prompt)``
             <https://developer.apple.com/documentation/swiftui/form/searchable(text:placement:prompt:)-6royb>
             for more information on searchable view modifier.
+
     - parameter text: The text to display and edit in the search field.
     - parameter collection: The collection to be filtered.
     - parameter keyPath: The key path to the property which will be used to filter
@@ -1223,6 +1235,7 @@ extension View {
     - Note: See ``SwiftUI/View/searchable(text:placement:prompt)``
             <https://developer.apple.com/documentation/swiftui/form/searchable(text:placement:prompt:)-2ed8t>
             for more information on searchable view modifier.
+
     - parameter text: The text to display and edit in the search field.
     - parameter collection: The collection to be filtered.
     - parameter keyPath: The key path to the property which will be used to filter
@@ -1264,6 +1277,7 @@ extension View {
     - Note: See ``SwiftUI/View/searchable(text:placement:prompt)``
             <https://developer.apple.com/documentation/swiftui/form/searchable(text:placement:prompt:)-58egp>
             for more information on searchable view modifier.
+
     - parameter text: The text to display and edit in the search field.
     - parameter collection: The collection to be filtered.
     - parameter keyPath: The key path to the property which will be used to filter
@@ -1305,6 +1319,7 @@ extension View {
     - Note: See ``SwiftUI/View/searchable(text:placement:prompt:suggestions)``
             <https://developer.apple.com/documentation/swiftui/form/searchable(text:placement:prompt:suggestions:)-94bdu>
             for more information on searchable view modifier.
+
     - parameter text: The text to display and edit in the search field.
     - parameter collection: The collection to be filtered.
     - parameter keyPath: The key path to the property which will be used to filter
@@ -1349,6 +1364,7 @@ extension View {
     - Note: See ``SwiftUI/View/searchable(text:placement:prompt:suggestions)``
             <https://developer.apple.com/documentation/swiftui/form/searchable(text:placement:prompt:suggestions:)-1mw1m>
             for more information on searchable view modifier.
+
     - parameter text: The text to display and edit in the search field.
     - parameter collection: The collection to be filtered.
     - parameter keyPath: The key path to the property which will be used to filter

@@ -876,7 +876,7 @@ extension FunctionCallable {
      // for the server to acknowledge and see all the data associated with this collection of
      // subscriptions
      @discardableResult
-     public func write(_ block: (() throws -> ())) throws -> SubscriptionTask {
+     public func write(_ block: (() throws -> Void)) throws -> SubscriptionTask {
          fatalError()
      }
 
@@ -944,7 +944,7 @@ extension FunctionCallable {
      // this will not wait for the server to acknowledge and see all the data associated with this
      // collection of subscription
      @discardableResult
-     public func write(_ block: (() throws -> ())) async throws -> SubscriptionTask {
+     public func write(_ block: (() throws -> Void)) async throws -> SubscriptionTask {
          fatalError()
      }
  }
