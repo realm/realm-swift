@@ -34,6 +34,7 @@ x.y.z Release notes (yyyy-MM-dd)
   and gives a Realm instance which always works on the main actor. The
   non-functional `queue:` parameter has been removed (since v10.15.0).
 * Accessing a non object collection inside a migration would cause a crash [#5633](https://github.com/realm/realm-cocoa/issues/5633).
+* Accessing a `Map` of objects dynamically would not handle nulled values correctly (since v10.8.0).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
