@@ -30,16 +30,13 @@
 @property (nonatomic, readonly, nullable) NSString *password;
 /// A unique identifier set by the user (this differs from the PID).
 @property (nonatomic, readonly) NSInteger identifier;
-/// Whether or not the child process should delete the client root and reset the sync manager. True by default.
-@property (nonatomic, readonly) BOOL shouldCleanUpOnTermination;
 
 - (nonnull instancetype)init;
 
 - (nonnull instancetype)initWithAppIds:(NSArray<NSString *> * _Nullable)appIds
                                  email:(NSString * _Nullable)email
                               password:(NSString * _Nullable)password
-                             identifer:(NSInteger)identifier
-            shouldCleanUpOnTermination:(BOOL)shouldCleanUpOnTermination;
+                             identifer:(NSInteger)identifier;
 
 - (NSDictionary<NSString *, NSString *> * _Nonnull)dictionaryValue;
 

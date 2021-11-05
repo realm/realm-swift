@@ -1,8 +1,47 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* Add an api for a type safe query syntax. This allows you to filter a Realm and collections managed by a Realm
-  with Swift style expressions. Here is a brief example:
+* None.
+
+### Fixed
+* Accessing a non object collection inside a migration would cause a crash [#5633](https://github.com/realm/realm-cocoa/issues/5633).
+* Accessing a `Map` of objects dynamically would not handle nulled values correctly (since v10.8.0).
+
+<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+
+### Compatibility
+* Realm Studio: 11.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 13.1.
+* CocoaPods: 1.10 or later.
+* Xcode: 12.2-13.1.
+
+### Internal
+* Upgraded realm-core from ? to ?
+
+10.19.0 Release notes (2021-11-04)
+=============================================================
+
+### Enhancements
+
+* Add `.searchable()` SwiftUI View Modifier which allows filtering
+  `@ObservedResult` results from a search field component by a key path.
+  ```swift
+  List {
+      ForEach(reminders) { reminder in
+        ReminderRowView(reminder: reminder)
+      }
+  }.searchable(text: $searchFilter,
+               collection: $reminders,
+               keyPath: \.name) {
+    ForEach(reminders) { remindersFiltered in
+      Text(remindersFiltered.name).searchCompletion(remindersFiltered.name)
+    }
+  }
+  ```
+* Add an api for a type safe query syntax. This allows you to filter a Realm
+  and collections managed by a Realm with Swift style expressions. Here is a
+  brief example:
   ```swift
   class Person: Object {
     @Persisted var name: String
@@ -22,31 +61,70 @@ x.y.z Release notes (yyyy-MM-dd)
     ($0.pets.age >= 2) && $0.pets.name.starts(with: "L")
   }
   ```
-  ([Cocoa #7419](https://github.com/realm/realm-cocoa/pull/7419))
-* Add support for dictionary subscript expressions (e.g. `"phoneNumbers['Jane'] == '123-3456-123'"`) when querying with an NSPredicate.
+  ([#7419](https://github.com/realm/realm-cocoa/pull/7419))
+* Add support for dictionary subscript expressions
+  (e.g. `"phoneNumbers['Jane'] == '123-3456-123'"`) when querying with an
+  NSPredicate.
 * Add UserProfile to User. This contains metadata from social logins with MongoDB Realm.
-
+* Slightly reduce the peak memory usage when processing sync changesets.
 
 ### Fixed
+
 * Change default request timeout for `RLMApp` from 6 seconds to 60 seconds.
 * Async `Realm` init would often give a Realm instance which could not actually
   be used and would throw incorrect thread exceptions. It now is `@MainActor`
   and gives a Realm instance which always works on the main actor. The
   non-functional `queue:` parameter has been removed (since v10.15.0).
-* Accessing a non object collection inside a migration would cause a crash [#5633](https://github.com/realm/realm-cocoa/issues/5633).
-* Accessing a `Map` of objects dynamically would not handle nulled values correctly (since v10.8.0).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+* Restore the pre-v10.12.0 behavior of calling `writeCopy()` on a synchronized
+  Realm which produced a local non-synchronized Realm
+  ([#7513](https://github.com/realm/realm-cocoa/issues/7513)).
+* Decimal128 did not properly normalize the value before hashing and so could
+  have multiple values which are equal but had different hash values (since v10.8.0).
+* Fix a rare assertion failure or deadlock when a sync session is racing to
+  close at the same time that external reference to the Realm is being
+  released. ([Core #4931](https://github.com/realm/realm-core/issues/4931))
+* Fix a assertion failure when opening a sync Realm with a user who had been
+  removed. Instead an exception will be thrown. ([Core #4937](https://github.com/realm/realm-core/issues/4937), since v10.0.0)
+* Fixed a rare segfault which could trigger if a user was being logged out
+  while the access token refresh response comes in.
+  ([Core #4944](https://github.com/realm/realm-core/issues/4944), since v10.0.0)
+* Fixed a bug where progress notifiers on an AsyncOpenTask could be called
+  after the open completed. ([Core #4919](https://github.com/realm/realm-core/issues/4919))
+* SecureTransport was not enabled for macCatalyst builds when installing via
+  SPM, resulting in `'SSL/TLS protocol not supported'` exceptions when using
+  Realm Sync. ([#7474](https://github.com/realm/realm-cocoa/issues/7474))
+* Users were left in the logged in state when their refresh token expired.
+  ([Core #4882](https://github.com/realm/realm-core/issues/4882), since v10)
+* Calling `.count` on a distinct collection would return the total number of
+  objects in the collection rather than the distinct count the first time it is
+  called. ([#7481](https://github.com/realm/realm-cocoa/issues/7481), since v10.8.0).
+* `realm.delete(collection.distinct(...))` would delete all objects in the
+  collection rather than just the first object with each distinct value in the
+  property being distincted on, unless the distinct Results were read from at
+  least once first (since v10.8.0).
+* Calling `.distinct()` on a collection, accessing the Results, then passing
+  the Results to `realm.delete()` would delete the correct objects, but
+  afterwards report a count of zero even if there were still objects in the
+  Results (since v10.8.0).
+* Download compaction could result in non-streaming sync download notifiers
+  never reporting completion (since v10.0.0,
+  [Core #4989](https://github.com/realm/realm-core/pull/4989)).
+* Fix a deadlock in SyncManager that was probably not possible to hit in
+  real-world code (since v10.0.0).
 
 ### Compatibility
+
 * Realm Studio: 11.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
-* Carthage release for Swift is built with Xcode 13.0.
+* Carthage release for Swift is built with Xcode 13.1.
 * CocoaPods: 1.10 or later.
 * Xcode: 12.2-13.1.
 
 ### Internal
-* Upgraded realm-core from ? to ?
+
+* Upgraded realm-core from v11.4.1 to v11.6.0
 
 10.18.0 Release notes (2021-10-25)
 =============================================================

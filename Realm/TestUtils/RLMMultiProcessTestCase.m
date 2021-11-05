@@ -152,8 +152,7 @@
     return [self childTaskWithEnvironment:[[RLMChildProcessEnvironment new] initWithAppIds:appIds
                                                                                      email:nil
                                                                                   password:nil
-                                                                                 identifer:0
-                                                                shouldCleanUpOnTermination:YES]];
+                                                                                 identifer:0]];
 }
 
 - (NSTask *)childTask {
@@ -193,7 +192,7 @@
 }
 
 - (int)runChildAndWaitWithAppIds:(NSArray *)appIds {
-    return [self runChildAndWaitWithEnvironment:[[RLMChildProcessEnvironment new] initWithAppIds:appIds email:nil password:nil identifer:0 shouldCleanUpOnTermination:YES]];
+    return [self runChildAndWaitWithEnvironment:[[RLMChildProcessEnvironment new] initWithAppIds:appIds email:nil password:nil identifer:0]];
 }
 
 - (int)runChildAndWait {
