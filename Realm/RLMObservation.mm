@@ -484,7 +484,7 @@ std::vector<realm::BindingContext::ObserverState> RLMGetObservedRows(RLMSchemaIn
                 continue;
             observers.push_back({
                 row.get_table()->get_key(),
-                row.get_key().value,
+                row.get_key(),
                 info});
         }
     }
