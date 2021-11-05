@@ -1,24 +1,26 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.19.0 Release notes (2021-11-04)
 =============================================================
+
 ### Enhancements
-* Add `.searchable()` SwiftUI View Modifier which allows us to filter 
+
+* Add `.searchable()` SwiftUI View Modifier which allows filtering
   `@ObservedResult` results from a search field component by a key path.
   ```swift
   List {
       ForEach(reminders) { reminder in
         ReminderRowView(reminder: reminder)
       }
-  }
-  .searchable(text: $searchFilter,
-              collection: $reminders,
-              keyPath: \.name) {
+  }.searchable(text: $searchFilter,
+               collection: $reminders,
+               keyPath: \.name) {
     ForEach(reminders) { remindersFiltered in
       Text(remindersFiltered.name).searchCompletion(remindersFiltered.name)
     }
   }
   ```
-* Add an api for a type safe query syntax. This allows you to filter a Realm and collections managed by a Realm
-  with Swift style expressions. Here is a brief example:
+* Add an api for a type safe query syntax. This allows you to filter a Realm
+  and collections managed by a Realm with Swift style expressions. Here is a
+  brief example:
   ```swift
   class Person: Object {
     @Persisted var name: String
@@ -38,19 +40,23 @@ x.y.z Release notes (yyyy-MM-dd)
     ($0.pets.age >= 2) && $0.pets.name.starts(with: "L")
   }
   ```
-  ([Cocoa #7419](https://github.com/realm/realm-cocoa/pull/7419))
-* Add support for dictionary subscript expressions (e.g. `"phoneNumbers['Jane'] == '123-3456-123'"`) when querying with an NSPredicate.
+  ([#7419](https://github.com/realm/realm-cocoa/pull/7419))
+* Add support for dictionary subscript expressions
+  (e.g. `"phoneNumbers['Jane'] == '123-3456-123'"`) when querying with an
+  NSPredicate.
 * Add UserProfile to User. This contains metadata from social logins with MongoDB Realm.
 * Slightly reduce the peak memory usage when processing sync changesets.
 
 ### Fixed
+
 * Change default request timeout for `RLMApp` from 6 seconds to 60 seconds.
 * Async `Realm` init would often give a Realm instance which could not actually
   be used and would throw incorrect thread exceptions. It now is `@MainActor`
   and gives a Realm instance which always works on the main actor. The
   non-functional `queue:` parameter has been removed (since v10.15.0).
-* Restore the pre-v10.12.0 of calling `writeCopy()` on a synchronized Realm
-  which produced a local non-synchronized Realm ([#7513](https://github.com/realm/realm-cocoa/issues/7513)).
+* Restore the pre-v10.12.0 behavior of calling `writeCopy()` on a synchronized
+  Realm which produced a local non-synchronized Realm
+  ([#7513](https://github.com/realm/realm-cocoa/issues/7513)).
 * Decimal128 did not properly normalize the value before hashing and so could
   have multiple values which are equal but had different hash values (since v10.8.0).
 * Fix a rare assertion failure or deadlock when a sync session is racing to
@@ -83,9 +89,10 @@ x.y.z Release notes (yyyy-MM-dd)
   never reporting completion (since v10.0.0,
   [Core #4989](https://github.com/realm/realm-core/pull/4989)).
 * Fix a deadlock in SyncManager that was probably not possible to hit in
-  real-world code.
+  real-world code (since v10.0.0).
 
 ### Compatibility
+
 * Realm Studio: 11.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 13.1.
@@ -93,6 +100,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * Xcode: 12.2-13.1.
 
 ### Internal
+
 * Upgraded realm-core from v11.4.1 to v11.6.0
 
 10.18.0 Release notes (2021-10-25)
