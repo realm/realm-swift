@@ -968,6 +968,35 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     return NO;
 }
 
+- (BOOL)writeCopyWithConfiguration:(RLMRealmConfiguration *)configuration error:(NSError **)error {
+    // 'File at path ... already exists' will be thrown if the Realm is currently open.
+    if (RLMIsRealmCachedAtPath(configuration.fileURL.path)) {
+        if (error) {
+            RLMSetErrorOrThrow(RLMMakeError(RLMErrorFail, @"Cannot perform copy while destination Realm is open."), error);
+        }
+        return NO;
+    }
+    try {
+        // If we are handing a sync to sync case use write_copy as it will apply the history
+        // to the destination realm.
+        if (configuration.syncConfiguration && self.configuration.syncConfiguration) {
+            NSString *path = configuration.fileURL.path;
+            _realm->write_copy(path.UTF8String,
+                               {static_cast<const char *>(configuration.encryptionKey.bytes), configuration.encryptionKey.length});
+        }
+        else {
+            _realm->export_to(configuration.config);
+        }
+    }
+    catch (...) {
+        if (error) {
+            RLMRealmTranslateException(error);
+        }
+        return NO;
+    }
+    return YES;
+}
+
 + (BOOL)fileExistsForConfiguration:(RLMRealmConfiguration *)config {
     return [NSFileManager.defaultManager fileExistsAtPath:config.pathOnDisk];
 }

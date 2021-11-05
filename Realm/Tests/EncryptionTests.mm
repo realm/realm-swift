@@ -161,6 +161,28 @@
     }
 }
 
+- (void)testWriteCopyWithConfigurationAndKey {
+    NSData *key1 = RLMGenerateKey();
+    NSData *key2 = RLMGenerateKey();
+
+    RLMRealmConfiguration *destinationConfig = [self configurationWithKey:key2];
+    destinationConfig.encryptionKey = key2;
+    destinationConfig.fileURL = RLMTestRealmURL();
+
+    @autoreleasepool {
+        RLMRealm *realm = [self realmWithKey:key1];
+        [realm transactionWithBlock:^{
+            [IntObject createInRealm:realm withValue:@[@1]];
+        }];
+        [realm writeCopyWithConfiguration:destinationConfig error:nil];
+    }
+
+    @autoreleasepool {
+        RLMRealm *realm = [RLMRealm realmWithConfiguration:destinationConfig error:nil];
+        XCTAssertEqual(1U, [IntObject allObjectsInRealm:realm].count);
+    }
+}
+
 #pragma mark - Migrations
 
 - (void)createRealmRequiringMigrationWithKey:(NSData *)key migrationRun:(BOOL *)migrationRun {

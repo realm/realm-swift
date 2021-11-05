@@ -44,6 +44,7 @@ __attribute__((format(NSString, 1, 2)))
 NSException *RLMException(NSString *fmt, ...);
 NSException *RLMException(std::exception const& exception);
 
+NSError *RLMMakeError(RLMError code, NSString *msg);
 NSError *RLMMakeError(RLMError code, std::exception const& exception);
 NSError *RLMMakeError(RLMError code, const realm::util::File::AccessError&);
 NSError *RLMMakeError(RLMError code, const realm::RealmFileException&);

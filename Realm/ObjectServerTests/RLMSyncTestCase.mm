@@ -298,9 +298,7 @@ static NSURL *syncDirectoryForChildProcess() {
     };
 
     NSData *jsonHeader = [NSJSONSerialization  dataWithJSONObject:header options:0 error:nil];
-    NSString *headerString = [[NSString alloc] initWithData:jsonHeader encoding:NSUTF8StringEncoding];
     NSData *jsonPayload = [NSJSONSerialization  dataWithJSONObject:payload options:0 error:nil];
-    NSString *payloadString = [[NSString alloc] initWithData:jsonPayload encoding:NSUTF8StringEncoding];
 
     NSString *base64EncodedHeader = [jsonHeader base64EncodedStringWithOptions:0];
     NSString *base64EncodedPayload = [jsonPayload base64EncodedStringWithOptions:0];

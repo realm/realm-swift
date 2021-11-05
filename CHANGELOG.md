@@ -1,7 +1,16 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+* Add `Realm.writeCopy(configuration:)`/`[RLMRealm writeCopyWithConfiguration:]` which gives the
+  following functionality:
+    - Export a local non-sync Realm to be used with MongoDB Realm Sync 
+      when the configuration is derived from a sync `RLMUser`/`User`.
+    - Copy values from one synced Realm to another synced Realm.
+    - Copy values from one local Realm to another local Realm.
+
+  If a Realm does not exist at the destination specified in the configuration
+  then a copy of the Realm will be written to disk. If a Realm does exist at the destination
+  then the values from the origin Realm will be copied to the destination Realm in a transaction.
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
@@ -17,7 +26,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * Xcode: 12.4-13.2.1.
 
 ### Internal
-* Upgraded realm-core from ? to ?
+* Upgraded realm-core from 10.8.0 to 10.9.0
 
 10.22.0 Release notes (2022-01-25)
 =============================================================

@@ -1328,6 +1328,293 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         XCTAssertNil(profile.pictureURL)
         XCTAssertEqual(profile.metadata, [:])
     }
+
+    // MARK: Write Copy with Sync
+
+    func testWriteCopyLocalRealmToSync() {
+        do {
+            var localConfig = Realm.Configuration()
+            localConfig.objectTypes = [SwiftPerson.self]
+            localConfig.fileURL = realmURLForFile("test.realm")
+
+            let user = try logInUser(for: basicCredentials())
+            var syncConfig = user.configuration(partitionValue: #function)
+            syncConfig.objectTypes = [SwiftPerson.self]
+
+            let localRealm = try Realm(configuration: localConfig)
+            try localRealm.write {
+                localRealm.add(SwiftPerson(firstName: "John", lastName: "Doe"))
+            }
+
+            try localRealm.writeCopy(configuration: syncConfig)
+
+            let syncedRealm = try Realm(configuration: syncConfig)
+            XCTAssertEqual(syncedRealm.objects(SwiftPerson.self).count, 1)
+            waitForDownloads(for: syncedRealm)
+
+            try syncedRealm.write {
+                syncedRealm.add(SwiftPerson(firstName: "Jane", lastName: "Doe"))
+            }
+
+            waitForUploads(for: syncedRealm)
+            let syncedResults = syncedRealm.objects(SwiftPerson.self)
+            XCTAssertEqual(syncedResults.where { $0.firstName == "John" }.count, 1)
+            XCTAssertEqual(syncedResults.where { $0.firstName == "Jane" }.count, 1)
+        } catch {
+            XCTFail("Got an error \(error.localizedDescription)")
+        }
+    }
+
+    func testWriteCopyLocalRealmForSyncWithExistingData() {
+        do {
+            let initialUser = try logInUser(for: basicCredentials())
+            var initialSyncConfig = initialUser.configuration(partitionValue: #function)
+            initialSyncConfig.objectTypes = [SwiftPerson.self]
+
+            // Make sure objects with confliciting primary keys sync ok.
+            let conflictingObjectId = ObjectId.generate()
+            let person = SwiftPerson(value: ["_id": conflictingObjectId,
+                                             "firstName": "Foo", "lastName": "Bar"])
+            let initialRealm = try Realm(configuration: initialSyncConfig)
+            try initialRealm.write {
+                initialRealm.add(person)
+                initialRealm.add(SwiftPerson(firstName: "Foo2", lastName: "Bar2"))
+            }
+            waitForUploads(for: initialRealm)
+
+            var localConfig = Realm.Configuration()
+            localConfig.objectTypes = [SwiftPerson.self]
+            localConfig.fileURL = realmURLForFile("test.realm")
+
+            let user = try logInUser(for: basicCredentials())
+            var syncConfig = user.configuration(partitionValue: #function)
+            syncConfig.objectTypes = [SwiftPerson.self]
+
+            let localRealm = try Realm(configuration: localConfig)
+            // `person2` will override what was previously stored on the server.
+            let person2 = SwiftPerson(value: ["_id": conflictingObjectId,
+                                              "firstName": "John", "lastName": "Doe"])
+            try localRealm.write {
+                localRealm.add(person2)
+                localRealm.add(SwiftPerson(firstName: "Foo3", lastName: "Bar3"))
+            }
+
+            try localRealm.writeCopy(configuration: syncConfig)
+
+            let syncedRealm = try Realm(configuration: syncConfig)
+            waitForDownloads(for: syncedRealm)
+            XCTAssertTrue(syncedRealm.objects(SwiftPerson.self).count == 3)
+
+            try syncedRealm.write {
+                syncedRealm.add(SwiftPerson(firstName: "Jane", lastName: "Doe"))
+            }
+
+            waitForUploads(for: syncedRealm)
+            let syncedResults = syncedRealm.objects(SwiftPerson.self)
+            XCTAssertEqual(syncedResults.where {
+                $0.firstName == "John" &&
+                $0.lastName == "Doe" &&
+                $0._id == conflictingObjectId
+            }.count, 1)
+            XCTAssertTrue(syncedRealm.objects(SwiftPerson.self).count == 4)
+        } catch {
+            XCTFail("Got an error \(error.localizedDescription)")
+        }
+    }
+
+    func testWriteCopySyncedRealm() {
+        do {
+            // user1 creates and writeCopies a realm to be opened by another user
+            let user1 = try logInUser(for: basicCredentials())
+            var config = user1.configuration(testName: #function)
+
+            config.objectTypes = [SwiftHugeSyncObject.self]
+            let syncedRealm = try Realm(configuration: config)
+            try! syncedRealm.write {
+                for _ in 0..<SwiftSyncTestCase.bigObjectCount {
+                    syncedRealm.add(SwiftHugeSyncObject.create())
+                }
+            }
+            waitForUploads(for: syncedRealm)
+
+            // user2 creates a configuration that will use user1's realm as a seed
+            let user2 = try logInUser(for: basicCredentials())
+            var destinationConfig = user2.configuration(partitionValue: #function)
+            destinationConfig.objectTypes = [SwiftHugeSyncObject.self]
+            destinationConfig.fileURL = RLMTestRealmURL()
+            try syncedRealm.writeCopy(configuration: destinationConfig)
+
+            // Open the realm and immediately check data
+            let destinationRealm = try Realm(configuration: destinationConfig)
+            checkCount(expected: SwiftSyncTestCase.bigObjectCount, destinationRealm, SwiftHugeSyncObject.self)
+
+            // Create an object in the destination realm which does not exist in the original realm.
+            let obj1 = SwiftHugeSyncObject.create()
+            try destinationRealm.write {
+                destinationRealm.add(obj1)
+            }
+
+            waitForUploads(for: destinationRealm)
+            waitForDownloads(for: syncedRealm)
+
+            // Check if the object created in the destination realm is synced to the original realm
+            let obj2 = syncedRealm.objects(SwiftHugeSyncObject.self).where { $0._id == obj1._id }.first
+            XCTAssertNotNil(obj2)
+            XCTAssertEqual(obj1.data, obj2?.data)
+
+            // Create an object in the original realm which does not exist in the destination realm.
+            let obj3 = SwiftHugeSyncObject.create()
+            try syncedRealm.write {
+                syncedRealm.add(obj3)
+            }
+
+            waitForUploads(for: syncedRealm)
+            waitForDownloads(for: destinationRealm)
+
+            // Check if the object created in the original realm is synced to the destination realm
+            let obj4 = destinationRealm.objects(SwiftHugeSyncObject.self).where { $0._id == obj3._id }.first
+            XCTAssertNotNil(obj4)
+            XCTAssertEqual(obj3.data, obj4?.data)
+        } catch {
+            XCTFail("Got an error \(error.localizedDescription)")
+        }
+    }
+
+    func testWriteCopyLocalChangesMergedToExistingSyncRealm() {
+        do {
+            let user1 = try logInUser(for: basicCredentials())
+            var destinationConfig = user1.configuration(partitionValue: #function)
+            destinationConfig.objectTypes = [SwiftPerson.self]
+
+            try autoreleasepool {
+                let destinationRealm = try Realm(configuration: destinationConfig)
+                // Create an object in the destination realm which does not exist in the original realm.
+                try destinationRealm.write {
+                    destinationRealm.add(SwiftPerson(firstName: "Mary", lastName: "Poppins"))
+                }
+                waitForUploads(for: destinationRealm)
+                XCTAssertEqual(destinationRealm.objects(SwiftPerson.self).count, 1)
+            }
+
+            var config = Realm.Configuration()
+            config.objectTypes = [SwiftPerson.self]
+            let localRealm = try Realm(configuration: config)
+            try localRealm.write {
+                localRealm.add(SwiftPerson(firstName: "Tony", lastName: "Stark"))
+                localRealm.add(SwiftPerson(firstName: "Willy", lastName: "Wonka"))
+            }
+            XCTAssertEqual(localRealm.objects(SwiftPerson.self).count, 2)
+            try localRealm.writeCopy(configuration: destinationConfig)
+
+            let destinationRealm = try Realm(configuration: destinationConfig)
+            XCTAssertEqual(destinationRealm.objects(SwiftPerson.self).count, 3)
+            XCTAssertEqual(destinationRealm.objects(SwiftPerson.self).where { $0.firstName == "Willy" && $0.lastName == "Wonka" }.count, 1)
+            XCTAssertEqual(destinationRealm.objects(SwiftPerson.self).where { $0.firstName == "Tony" && $0.lastName == "Stark" }.count, 1)
+            XCTAssertEqual(destinationRealm.objects(SwiftPerson.self).where { $0.firstName == "Mary" && $0.lastName == "Poppins" }.count, 1)
+        } catch {
+            XCTFail("Got an error \(error.localizedDescription)")
+        }
+    }
+
+    func testWriteCopyFailBeforeSynced() {
+        var didFail = false
+        do {
+            let user1 = try logInUser(for: basicCredentials())
+            var user1Config = user1.configuration(partitionValue: #function)
+            user1Config.objectTypes = [SwiftPerson.self]
+            let user1Realm = try Realm(configuration: user1Config)
+            // Suspend the session so that changes cannot be uploaded
+            user1Realm.syncSession?.suspend()
+            try user1Realm.write {
+                user1Realm.add(SwiftPerson())
+            }
+
+            let user2 = try logInUser(for: basicCredentials())
+            XCTAssertNotEqual(user1.id, user2.id)
+            var user2Config = user2.configuration(partitionValue: #function)
+            user2Config.objectTypes = [SwiftPerson.self]
+            let pathOnDisk = ObjectiveCSupport.convert(object: user2Config).pathOnDisk
+            XCTAssertFalse(FileManager.default.fileExists(atPath: pathOnDisk))
+
+            let realm = try Realm(configuration: user1Config)
+            realm.syncSession?.suspend()
+            try realm.write {
+                realm.add(SwiftPerson())
+            }
+            // Changes have yet to be uploaded so expect an exception
+            try realm.writeCopy(configuration: user2Config)
+        } catch {
+            XCTAssertEqual(error.localizedDescription, "Could not write file as not all client changes are integrated in server")
+            didFail = true
+        }
+        XCTAssertTrue(didFail)
+    }
+
+    func testWriteCopySyncToLocalRealm() {
+        var didFail = false
+        do {
+            // Create realm with sync user
+            let user1 = try logInUser(for: basicCredentials())
+            var config = user1.configuration(testName: #function)
+            config.objectTypes = [SwiftPerson.self]
+
+            let syncedRealm = try Realm(configuration: config)
+            try! syncedRealm.write {
+                syncedRealm.add(SwiftPerson())
+            }
+            waitForUploads(for: syncedRealm)
+
+            // Set up local config where realm will be copied
+            var localConfig = Realm.Configuration()
+            localConfig.fileURL = RLMTestRealmURL()
+            let pathOnDisk = ObjectiveCSupport.convert(object: localConfig).pathOnDisk
+            XCTAssertFalse(FileManager.default.fileExists(atPath: pathOnDisk))
+
+            try syncedRealm.writeCopy(configuration: localConfig)
+
+            // Opening  copied sync realm will result in an error due to incompatible histories.
+            _ = try Realm(configuration: localConfig)
+        } catch {
+            XCTAssert(error.localizedDescription.contains("Realm file's history format is incompatible with the settings in the configuration object being used to open the Realm."))
+            XCTAssert(error.localizedDescription.contains(RLMTestRealmURL().path))
+            didFail = true
+        }
+        XCTAssertTrue(didFail)
+    }
+
+    func testWriteCopyWhileDestinationIsOpen() {
+        var didFail = false
+        do {
+            // Create realm with sync user
+            let user1 = try logInUser(for: basicCredentials())
+            var config1 = user1.configuration(testName: #function)
+            config1.objectTypes = [SwiftPerson.self]
+
+            let syncedRealm1 = try Realm(configuration: config1)
+            try! syncedRealm1.write {
+                syncedRealm1.add(SwiftPerson())
+            }
+            waitForUploads(for: syncedRealm1)
+
+            let user2 = try logInUser(for: basicCredentials())
+            var config2 = user2.configuration(testName: #function)
+            config2.objectTypes = [SwiftPerson.self]
+
+            let syncedRealm2 = try Realm(configuration: config2)
+            try! syncedRealm2.write {
+                syncedRealm2.add(SwiftPerson())
+            }
+            waitForUploads(for: syncedRealm2)
+
+            try syncedRealm1.writeCopy(configuration: config2)
+
+            _ = try Realm(configuration: config2)
+        } catch {
+            XCTAssertEqual(error.localizedDescription, "Cannot perform copy while destination Realm is open.")
+            didFail = true
+        }
+        XCTAssertTrue(didFail)
+    }
 }
 
 class AnyRealmValueSyncTests: SwiftSyncTestCase {

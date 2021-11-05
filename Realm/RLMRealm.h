@@ -240,6 +240,27 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)writeCopyToURL:(NSURL *)fileURL encryptionKey:(nullable NSData *)key error:(NSError **)error;
 
 /**
+ Writes a copy of the Realm to a given location specified by a given configuration.
+
+ If the configuration supplied is derived from a `User` then this Realm will be copied with
+ sync functionality enabled.
+
+ Note that if a Realm does not exist at the destination specified in the configuration
+ then a copy of the Realm will be written to disk. If a Realm does exist at the destination
+ then the values from the origin Realm will be copied to the destination Realm in a transaction.
+
+ Note that copying data from a synced Realm to a local non synced Realm is not supported.
+
+ @param configuration A Realm Configuration.
+ @param error   If an error occurs, upon return contains an `NSError` object
+ that describes the problem. If you are not interested in
+ possible errors, pass in `NULL`.
+
+ @return `YES` if the Realm was successfully written to copied, `NO` if an error occurred.
+ */
+- (BOOL)writeCopyWithConfiguration:(RLMRealmConfiguration *)configuration error:(NSError **)error;
+
+/**
  Checks if the Realm file for the given configuration exists locally on disk.
 
  For non-synchronized, non-in-memory Realms, this is equivalent to
