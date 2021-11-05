@@ -263,6 +263,64 @@ struct UnmanagedObjectTestView: View {
     }
 }
 
+enum ViewState {
+     case initial
+     case pending
+     case error(Error)
+     case complete
+ }
+
+ @available(macOS 12.0, tvOS 15.0, iOS 15.0, watchOS 8.0, *)
+ struct FlexibleSyncView: View {
+     @ObservedResults(ReminderList.self) var reminders
+     @Environment(\.realm) var realm //Realm with flexible sync configuration
+     @State var viewState: ViewState = .initial
+
+     var body: some View {
+         VStack {
+             switch viewState {
+             case .initial:
+                 EmptyView()
+             case .pending:
+                 ProgressView()
+             case .error(let error):
+                 Text("Error on Flexible Sync \(error.localizedDescription)")
+             case .complete:
+                 List {
+                     ForEach(reminders) { reminder in
+                         Text("\(reminder.name) list: Has \(reminder.reminders.count) reminders")
+                     }
+                 }
+             }
+         }.task {
+             do {
+                 let subscriptions = realm.subscriptions
+                 let task = try await subscriptions.write {
+                     try subscriptions.add {
+                         Subscription<ReminderList> { reminderList in
+                             reminderList.reminders.count > 0
+                         }
+                     }
+                 }
+
+                 // You can get notifications for state changes and trigger UI changes
+                 for await state in task.observe() {
+                     switch state {
+                     case .complete:
+                         viewState = .complete
+                     case .error(let error):
+                         viewState = .error(error)
+                     case .pending:
+                         viewState = .pending
+                     }
+                 }
+             } catch {
+                 viewState = .error(error)
+             }
+         }
+     }
+ }
+
 @main
 struct App: SwiftUI.App {
     var body: some Scene {

@@ -304,8 +304,6 @@ let package = Package(
                 "SwiftObjectServerTests.swift",
                 "SwiftCollectionSyncTests.swift",
                 "SwiftObjectServerPartitionTests.swift",
-                "SwiftUIServerTests.swift",
-                "SwiftMongoClientTests.swift",
                 "SwiftFlexibleSyncServerTests.swift"
             ]
         ),
