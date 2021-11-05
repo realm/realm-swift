@@ -55,8 +55,7 @@ template<> struct equal_to<NSString *> {
 // reference, handles table column lookups, and tracks observed objects
 class RLMClassInfo {
 public:
-    RLMClassInfo(RLMRealm *, RLMObjectSchema *,
-                 const realm::ObjectSchema *);
+    RLMClassInfo(RLMRealm *, RLMObjectSchema *, const realm::ObjectSchema *);
 
     RLMClassInfo(RLMRealm *realm, RLMObjectSchema *rlmObjectSchema,
                  std::unique_ptr<realm::ObjectSchema> objectSchema);
@@ -85,6 +84,13 @@ public:
     // persisted property.
     realm::ColKey tableColumn(NSString *propertyName) const;
     realm::ColKey tableColumn(RLMProperty *property) const;
+    // Get the table column key for the given computed property. The property
+    // must be a valid computed property.
+    // Subscripting a `realm::ObjectSchema->computed_properties[property.index]`
+    // does not return a valid colKey, unlike subscripting persisted_properties.
+    // This method retrieves a valid column key for computed properties by
+    // getting the opposite table column of the origin's "forward" link.
+    realm::ColKey computedTableColumn(RLMProperty *property) const;
 
     // Get the info for the target of the link at the given property index.
     RLMClassInfo &linkTargetType(size_t propertyIndex);
@@ -96,18 +102,22 @@ public:
     RLMClassInfo &resolve(RLMRealm *);
 
     // Return true if the RLMObjectSchema is for a Swift class
-    bool isSwiftClass();
+    bool isSwiftClass() const noexcept;
+
+    // Returns true if this was a dynamically added type
+    bool isDynamic() const noexcept;
 
 private:
     // If the ObjectSchema is not owned by the realm instance
     // we need to manually manage the ownership of the object.
     std::unique_ptr<realm::ObjectSchema> dynamicObjectSchema;
-    [[maybe_unused]] __strong RLMObjectSchema * dynamicRLMObjectSchema;
+    [[maybe_unused]] RLMObjectSchema *_Nullable dynamicRLMObjectSchema;
 };
 
 // A per-RLMRealm object schema map which stores RLMClassInfo keyed on the name
 class RLMSchemaInfo {
     using impl = std::unordered_map<NSString *, RLMClassInfo>;
+
 public:
     RLMSchemaInfo() = default;
     RLMSchemaInfo(RLMRealm *realm);
@@ -130,6 +140,7 @@ public:
     impl::iterator end() noexcept;
     impl::const_iterator begin() const noexcept;
     impl::const_iterator end() const noexcept;
+
 private:
     std::unordered_map<NSString *, RLMClassInfo> m_objects;
 };

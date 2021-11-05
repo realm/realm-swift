@@ -20,24 +20,17 @@ import UIKit
 import RealmSwift
 
 class Dog: Object {
-    @objc dynamic var name = ""
-    @objc dynamic var age = 0
+    @Persisted var name: String
+    @Persisted var age: Int
 }
 
 class Person: Object {
-    @objc dynamic var name = ""
-    let dogs = List<Dog>()
+    @Persisted var name: String
+    @Persisted var dogs: List<Dog>
 }
-
-#if !swift(>=4.2)
-extension UIApplication {
-    typealias LaunchOptionsKey = UIApplicationLaunchOptionsKey
-}
-#endif
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
-
     var window: UIWindow?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
@@ -45,9 +38,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window?.rootViewController = UIViewController()
         window?.makeKeyAndVisible()
 
-        do {
-            try FileManager.default.removeItem(at: Realm.Configuration.defaultConfiguration.fileURL!)
-        } catch {}
+        _ = try! Realm.deleteFiles(for: Realm.Configuration.defaultConfiguration)
 
         // Create a standalone object
         let mydog = Dog()
@@ -66,7 +57,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         try! realm.commitWrite()
 
         // Query
-        let results = realm.objects(Dog.self).filter(NSPredicate(format: "name contains 'x'"))
+        let results = realm.objects(Dog.self).filter("name contains 'x'")
 
         // Queries are chainable!
         let results2 = results.filter("age > 8")
@@ -86,7 +77,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         DispatchQueue.global().async {
             autoreleasepool {
                 let otherRealm = try! Realm()
-                let otherResults = otherRealm.objects(Dog.self).filter(NSPredicate(format: "name contains 'Rex'"))
+                let otherResults = otherRealm.objects(Dog.self).filter("name contains 'Rex'")
                 print("Number of dogs \(otherResults.count)")
             }
         }

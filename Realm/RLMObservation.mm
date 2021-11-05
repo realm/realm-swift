@@ -23,7 +23,9 @@
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObject_Private.hpp"
 #import "RLMProperty_Private.h"
+#import "RLMQueryUtil.hpp"
 #import "RLMRealm_Private.hpp"
+#import "RLMSchema_Private.h"
 #import "RLMSet_Private.hpp"
 #import "RLMSwiftCollectionBase.h"
 #import "RLMSwiftValueStorage.h"
@@ -482,7 +484,7 @@ std::vector<realm::BindingContext::ObserverState> RLMGetObservedRows(RLMSchemaIn
                 continue;
             observers.push_back({
                 row.get_table()->get_key(),
-                row.get_key().value,
+                row.get_key(),
                 info});
         }
     }
@@ -550,3 +552,48 @@ void RLMDidChange(std::vector<realm::BindingContext::ObserverState> const& obser
         static_cast<RLMObservationInfo *>(info)->didChange(RLMInvalidatedKey);
     }
 }
+
+static KeyPath keyPathFromString(RLMRealm *realm,
+                                 RLMSchema *schema,
+                                 RLMClassInfo *info,
+                                 RLMObjectSchema *rlmObjectSchema,
+                                 NSString *keyPath) {
+    RLMProperty *property;
+    KeyPath keyPairs;
+
+    NSArray<NSString *> *keyPathComponents = [keyPath componentsSeparatedByString:@"."];
+    for (NSString *component in keyPathComponents) {
+        property = rlmObjectSchema[component];
+        if (!property) {
+            throw RLMException(@"Invalid property name. Property '%@' not found in object of type '%@'", component, rlmObjectSchema.className);
+        }
+
+        TableKey tk = info->objectSchema->table_key;
+        ColKey ck;
+        if (property.type == RLMPropertyTypeObject) {
+            ck = info->tableColumn(property.columnName);
+            info = &realm->_info[property.objectClassName];
+            rlmObjectSchema = schema[property.objectClassName];
+        } else if (property.type == RLMPropertyTypeLinkingObjects) {
+            ck = info->computedTableColumn(property);
+            info = &realm->_info[property.objectClassName];
+            rlmObjectSchema = schema[property.objectClassName];
+        } else {
+            ck = info->tableColumn(property.columnName);
+        }
+
+        keyPairs.push_back(std::make_pair(tk, ck));
+    }
+    return keyPairs;
+}
+
+KeyPathArray RLMKeyPathArrayFromStringArray(RLMRealm *realm,
+                                            RLMClassInfo *info,
+                                            NSArray<NSString *> *keyPaths) {
+    KeyPathArray keyPathArray;
+    for (NSString *keyPath in keyPaths) {
+        keyPathArray.push_back(keyPathFromString(realm , realm.schema, info, info->rlmObjectSchema, keyPath));
+    }
+    return keyPathArray;
+}
+

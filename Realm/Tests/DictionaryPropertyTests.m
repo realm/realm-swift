@@ -496,7 +496,7 @@
     XCTAssertEqual([[unmanObj.embeddedDictionary valueForKey:@"two"][@"intCol"] integerValue], unmanChild2.intCol);
 
     unmanObj.intDictionary[@"one"] = @1;
-    XCTAssertEqualObjects([unmanObj.intDictionary valueForKey:@"@invalidated"], @NO);
+    XCTAssertEqualObjects([unmanObj.intDictionary valueForKey:@"invalidated"], @NO);
 
     // managed
     RLMRealm *realm = [self realmWithTestPath];
@@ -512,7 +512,7 @@
     XCTAssertEqual([[obj.embeddedDictionary valueForKey:@"two"][@"intCol"] integerValue], child2.intCol);
 
     [realm commitWriteTransaction];
-    XCTAssertEqualObjects([obj.stringDictionary valueForKey:@"@invalidated"], @NO);
+    XCTAssertEqualObjects([obj.stringDictionary valueForKey:@"invalidated"], @NO);
 }
 
 - (void)testObjectAggregate {

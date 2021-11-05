@@ -19,74 +19,304 @@
 import Realm
 import Realm.Private
 
-extension Int: _RealmSchemaDiscoverable {
+// MARK: - Property Types
+
+extension Int: SchemaDiscoverable {
     public static var _rlmType: PropertyType { .int }
 }
 
-extension Int8: _RealmSchemaDiscoverable {
+extension Int8: SchemaDiscoverable {
     public static var _rlmType: PropertyType { .int }
 }
 
-extension Int16: _RealmSchemaDiscoverable {
+extension Int16: SchemaDiscoverable {
     public static var _rlmType: PropertyType { .int }
 }
 
-extension Int32: _RealmSchemaDiscoverable {
+extension Int32: SchemaDiscoverable {
     public static var _rlmType: PropertyType { .int }
 }
 
-extension Int64: _RealmSchemaDiscoverable {
+extension Int64: SchemaDiscoverable {
     public static var _rlmType: PropertyType { .int }
 }
 
-extension Bool: _RealmSchemaDiscoverable {
+extension Bool: SchemaDiscoverable {
     public static var _rlmType: PropertyType { .bool }
 }
 
-extension Float: _RealmSchemaDiscoverable {
+extension Float: SchemaDiscoverable {
     public static var _rlmType: PropertyType { .float }
 }
 
-extension Double: _RealmSchemaDiscoverable {
+extension Double: SchemaDiscoverable {
     public static var _rlmType: PropertyType { .double }
 }
 
-extension String: _RealmSchemaDiscoverable {
+extension String: SchemaDiscoverable {
     public static var _rlmType: PropertyType { .string }
 }
 
-extension Data: _RealmSchemaDiscoverable {
+extension Data: SchemaDiscoverable {
     public static var _rlmType: PropertyType { .data }
 }
 
-extension ObjectId: _RealmSchemaDiscoverable {
+extension ObjectId: SchemaDiscoverable {
     public static var _rlmType: PropertyType { .objectId }
 }
 
-extension Decimal128: _RealmSchemaDiscoverable {
+extension Decimal128: SchemaDiscoverable {
     public static var _rlmType: PropertyType { .decimal128 }
 }
 
-extension Date: _RealmSchemaDiscoverable {
+extension Date: SchemaDiscoverable {
     public static var _rlmType: PropertyType { .date }
 }
 
-extension UUID: _RealmSchemaDiscoverable {
+extension UUID: SchemaDiscoverable {
     public static var _rlmType: PropertyType { .UUID }
 }
 
-extension AnyRealmValue: _RealmSchemaDiscoverable {
+extension AnyRealmValue: SchemaDiscoverable {
     public static var _rlmType: PropertyType { .any }
+    public static func _rlmPopulateProperty(_ prop: RLMProperty) {
+        if prop.optional {
+            var type = "AnyRealmValue"
+            if prop.array {
+                type = "List<AnyRealmValue>"
+            } else if prop.set {
+                type = "MutableSet<AnyRealmValue>"
+            } else if prop.dictionary {
+                type = "Map<String, AnyRealmValue>"
+            }
+            throwRealmException("\(type) property '\(prop.name)' must not be marked as optional: nil values are represented as AnyRealmValue.none")
+        }
+    }
 }
 
-extension NSString: _RealmSchemaDiscoverable {
+extension NSString: SchemaDiscoverable {
     public static var _rlmType: PropertyType { .string }
 }
 
-extension NSData: _RealmSchemaDiscoverable {
+extension NSData: SchemaDiscoverable {
     public static var _rlmType: PropertyType { .data }
 }
 
-extension NSDate: _RealmSchemaDiscoverable {
+extension NSDate: SchemaDiscoverable {
     public static var _rlmType: PropertyType { .date }
+}
+
+// MARK: - Modern property getters/setters
+
+private protocol _Int: BinaryInteger, _OptionalPersistable, _BuiltInPersistable, _PrimaryKey, _Indexable {
+}
+
+extension _Int {
+    @inlinable
+    public static func _rlmGetProperty(_ obj: ObjectBase, _ key: PropertyKey) -> Self {
+        return Self(RLMGetSwiftPropertyInt64(obj, key))
+    }
+
+    @inlinable
+    public static func _rlmGetPropertyOptional(_ obj: ObjectBase, _ key: PropertyKey) -> Self? {
+        var gotValue = false
+        let ret = RLMGetSwiftPropertyInt64Optional(obj, key, &gotValue)
+        return gotValue ? Self(ret) : nil
+    }
+
+    @inlinable
+    public static func _rlmSetProperty(_ obj: ObjectBase, _ key: PropertyKey, _ value: Self) {
+        RLMSetSwiftPropertyInt64(obj, key, Int64(value))
+    }
+}
+
+extension Int: _Int {}
+extension Int8: _Int {}
+extension Int16: _Int {}
+extension Int32: _Int {}
+extension Int64: _Int {}
+
+extension Bool: _OptionalPersistable, _BuiltInPersistable, _DefaultConstructible, _PrimaryKey, _Indexable {
+    @inlinable
+    public static func _rlmGetProperty(_ obj: ObjectBase, _ key: PropertyKey) -> Bool {
+        return RLMGetSwiftPropertyBool(obj, key)
+    }
+
+    @inlinable
+    public static func _rlmGetPropertyOptional(_ obj: ObjectBase, _ key: PropertyKey) -> Bool? {
+        var gotValue = false
+        let ret = RLMGetSwiftPropertyBoolOptional(obj, key, &gotValue)
+        return gotValue ? ret : nil
+    }
+
+    @inlinable
+    public static func _rlmSetProperty(_ obj: ObjectBase, _ key: PropertyKey, _ value: Bool) {
+        RLMSetSwiftPropertyBool(obj, key, (value))
+    }
+}
+
+extension Float: _OptionalPersistable, _BuiltInPersistable, _DefaultConstructible {
+    @inlinable
+    public static func _rlmGetProperty(_ obj: ObjectBase, _ key: PropertyKey) -> Float {
+        return RLMGetSwiftPropertyFloat(obj, key)
+    }
+
+    @inlinable
+    public static func _rlmGetPropertyOptional(_ obj: ObjectBase, _ key: PropertyKey) -> Float? {
+        var gotValue = false
+        let ret = RLMGetSwiftPropertyFloatOptional(obj, key, &gotValue)
+        return gotValue ? ret : nil
+    }
+
+    @inlinable
+    public static func _rlmSetProperty(_ obj: ObjectBase, _ key: PropertyKey, _ value: Float) {
+        RLMSetSwiftPropertyFloat(obj, key, (value))
+    }
+}
+
+extension Double: _OptionalPersistable, _BuiltInPersistable, _DefaultConstructible {
+    @inlinable
+    public static func _rlmGetProperty(_ obj: ObjectBase, _ key: PropertyKey) -> Double {
+        return RLMGetSwiftPropertyDouble(obj, key)
+    }
+
+    @inlinable
+    public static func _rlmGetPropertyOptional(_ obj: ObjectBase, _ key: PropertyKey) -> Double? {
+        var gotValue = false
+        let ret = RLMGetSwiftPropertyDoubleOptional(obj, key, &gotValue)
+        return gotValue ? ret : nil
+    }
+
+    @inlinable
+    public static func _rlmSetProperty(_ obj: ObjectBase, _ key: PropertyKey, _ value: Double) {
+        RLMSetSwiftPropertyDouble(obj, key, (value))
+    }
+}
+
+extension String: _OptionalPersistable, _BuiltInPersistable, _DefaultConstructible, _PrimaryKey, _Indexable {
+    @inlinable
+    public static func _rlmGetProperty(_ obj: ObjectBase, _ key: PropertyKey) -> String {
+        return RLMGetSwiftPropertyString(obj, key)!
+    }
+
+    @inlinable
+    public static func _rlmGetPropertyOptional(_ obj: ObjectBase, _ key: PropertyKey) -> String? {
+        return RLMGetSwiftPropertyString(obj, key)
+    }
+
+    @inlinable
+    public static func _rlmSetProperty(_ obj: ObjectBase, _ key: PropertyKey, _ value: String) {
+        RLMSetSwiftPropertyString(obj, key, value)
+    }
+}
+
+extension Data: _OptionalPersistable, _BuiltInPersistable, _DefaultConstructible {
+    @inlinable
+    public static func _rlmGetProperty(_ obj: ObjectBase, _ key: PropertyKey) -> Data {
+        return RLMGetSwiftPropertyData(obj, key)!
+    }
+
+    @inlinable
+    public static func _rlmGetPropertyOptional(_ obj: ObjectBase, _ key: PropertyKey) -> Data? {
+        return RLMGetSwiftPropertyData(obj, key)
+    }
+
+    @inlinable
+    public static func _rlmSetProperty(_ obj: ObjectBase, _ key: PropertyKey, _ value: Data) {
+        RLMSetSwiftPropertyData(obj, key, value)
+    }
+}
+
+extension ObjectId: _OptionalPersistable, _BuiltInPersistable, _DefaultConstructible, _PrimaryKey, _Indexable {
+    @inlinable
+    public static func _rlmGetProperty(_ obj: ObjectBase, _ key: PropertyKey) -> ObjectId {
+        return RLMGetSwiftPropertyObjectId(obj, key) as! ObjectId
+    }
+
+    @inlinable
+    public static func _rlmGetPropertyOptional(_ obj: ObjectBase, _ key: PropertyKey) -> ObjectId? {
+        return RLMGetSwiftPropertyObjectId(obj, key).flatMap(failableDynamicBridgeCast)
+    }
+
+    @inlinable
+    public static func _rlmSetProperty(_ obj: ObjectBase, _ key: PropertyKey, _ value: ObjectId) {
+        RLMSetSwiftPropertyObjectId(obj, key, (value))
+    }
+
+    public static func _rlmDefaultValue(_ forceDefaultInitialization: Bool) -> ObjectId {
+        return Self.generate()
+    }
+}
+
+extension Decimal128: _OptionalPersistable, _BuiltInPersistable, _DefaultConstructible {
+    @inlinable
+    public static func _rlmGetProperty(_ obj: ObjectBase, _ key: PropertyKey) -> Decimal128 {
+        return RLMGetSwiftPropertyDecimal128(obj, key) as! Decimal128
+    }
+
+    @inlinable
+    public static func _rlmGetPropertyOptional(_ obj: ObjectBase, _ key: PropertyKey) -> Decimal128? {
+        return RLMGetSwiftPropertyDecimal128(obj, key).flatMap(failableDynamicBridgeCast)
+    }
+
+    @inlinable
+    public static func _rlmSetProperty(_ obj: ObjectBase, _ key: PropertyKey, _ value: Decimal128) {
+        RLMSetSwiftPropertyDecimal128(obj, key, value)
+    }
+}
+
+extension Date: _OptionalPersistable, _BuiltInPersistable, _DefaultConstructible, _Indexable {
+    @inlinable
+    public static func _rlmGetProperty(_ obj: ObjectBase, _ key: PropertyKey) -> Date {
+        return RLMGetSwiftPropertyDate(obj, key)!
+    }
+
+    @inlinable
+    public static func _rlmGetPropertyOptional(_ obj: ObjectBase, _ key: PropertyKey) -> Date? {
+        return RLMGetSwiftPropertyDate(obj, key)
+    }
+
+    @inlinable
+    public static func _rlmSetProperty(_ obj: ObjectBase, _ key: PropertyKey, _ value: Date) {
+        RLMSetSwiftPropertyDate(obj, key, value)
+    }
+}
+
+extension UUID: _OptionalPersistable, _BuiltInPersistable, _DefaultConstructible, _PrimaryKey {
+    @inlinable
+    public static func _rlmGetProperty(_ obj: ObjectBase, _ key: PropertyKey) -> UUID {
+        return RLMGetSwiftPropertyUUID(obj, key)!
+    }
+
+    @inlinable
+    public static func _rlmGetPropertyOptional(_ obj: ObjectBase, _ key: PropertyKey) -> UUID? {
+        return RLMGetSwiftPropertyUUID(obj, key)
+    }
+
+    @inlinable
+    public static func _rlmSetProperty(_ obj: ObjectBase, _ key: PropertyKey, _ value: UUID) {
+        RLMSetSwiftPropertyUUID(obj, key, value)
+    }
+}
+
+extension AnyRealmValue: _Persistable, _DefaultConstructible {
+    public typealias _RealmValue = AnyRealmValue
+
+    @inlinable
+    public static func _rlmGetProperty(_ obj: ObjectBase, _ key: PropertyKey) -> AnyRealmValue {
+        return ObjectiveCSupport.convert(value: RLMGetSwiftPropertyAny(obj, key))
+    }
+
+    @inlinable
+    public static func _rlmGetPropertyOptional(_ obj: ObjectBase, _ key: PropertyKey) -> AnyRealmValue? {
+        fatalError()
+    }
+
+    public static func _rlmSetProperty(_ obj: ObjectBase, _ key: PropertyKey, _ value: AnyRealmValue) {
+        RLMSetSwiftPropertyAny(obj, key, value.objCValue as! RLMValue)
+    }
+
+    public static func _rlmSetAccessor(_ prop: RLMProperty) {
+        prop.swiftAccessor = BridgedPersistedPropertyAccessor<Self>.self
+    }
 }

@@ -19,6 +19,10 @@
 import Realm
 import Realm.Private
 
+#if !(os(iOS) && (arch(i386) || arch(arm)))
+import Combine
+#endif
+
 /**
  An object representing a MongoDB Realm user.
 
@@ -44,7 +48,7 @@ public extension User {
 }
 
 /**
- A singleton which configures and manages MongoDB Realm synchronization-related
+ A manager which configures and manages MongoDB Realm synchronization-related
  functionality.
 
  - see: `RLMSyncManager`
@@ -248,10 +252,6 @@ public typealias Provider = RLMIdentityProvider
     }
 }
 
-#if canImport(Combine)
-import Combine
-#endif
-
 /// Structure providing an interface to call a MongoDB Realm function with the provided name and arguments.
 ///
 ///     user.functions.sum([1, 2, 3, 4, 5]) { sum, error in
@@ -297,7 +297,7 @@ import Combine
     /// A closure type for the dynamic remote function type.
     public typealias ResultFunction = ([AnyBSON], @escaping ResultFunctionCompletionHandler) -> Void
 
-    /// The implementation of @dynamicMemberLookup that allows for dynamic remote function calls.
+    /// The implementation of @dynamicMemberLookup that allows for dynamic remote function calls with a `ResultFunctionCompletionHandler` completion.
     public subscript(dynamicMember string: String) -> ResultFunction {
         return { (arguments: [AnyBSON], completionHandler: @escaping ResultFunctionCompletionHandler) in
             let objcArgs = arguments.map(ObjectiveCSupport.convertBson)
@@ -311,13 +311,51 @@ import Combine
         }
     }
 
-    #if canImport(Combine)
-    /// The implementation of @dynamicMemberLookup that allows for dynamic remote function calls.
+    /// The implementation of @dynamicMemberLookup that allows for dynamic remote function calls with a `callable` return.
+    public subscript(dynamicMember string: String) -> FunctionCallable {
+        FunctionCallable(name: string, user: user)
+    }
+}
+
+/// Structure enabling the following syntactic sugar for user functions:
+///
+///     guard case let .int32(sum) = try await user.functions.sum([1, 2, 3, 4, 5]) else {
+///        return
+///     }
+///
+/// The dynamic member name (`sum` in the above example) is provided by `@dynamicMemberLookup`
+/// which is directly associated with the function name.
+@dynamicCallable
+public struct FunctionCallable {
+    fileprivate let name: String
+    fileprivate let user: User
+
+    #if !(os(iOS) && (arch(i386) || arch(arm)))
+    /// The implementation of @dynamicCallable that allows  for `Future<AnyBSON, Error>` callable return.
+    ///
+    ///     let cancellable = user.functions.sum([1, 2, 3, 4, 5])
+    ///        .sink(receiveCompletion: { result in
+    ///     }, receiveValue: { value in
+    ///        // Returned value from function
+    ///     })
+    ///
     @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, macCatalyst 13.0, macCatalystApplicationExtension 13.0, *)
-    public subscript(dynamicMember string: String) -> ([AnyBSON]) -> Future<AnyBSON, Error> {
-        return { (arguments: [AnyBSON]) in
-            return Future<AnyBSON, Error> { self[dynamicMember: string](arguments, $0) }
+    public func dynamicallyCall(withArguments args: [[AnyBSON]]) -> Future<AnyBSON, Error> {
+        return Future<AnyBSON, Error> { promise in
+            let objcArgs = args.first!.map(ObjectiveCSupport.convertBson)
+            self.user.__callFunctionNamed(name, arguments: objcArgs) { (bson: RLMBSON?, error: Error?) in
+                if let b = bson.map(ObjectiveCSupport.convertBson), let bson = b {
+                    promise(.success(bson))
+                } else {
+                    promise(.failure(error ?? Realm.Error.callFailed))
+                }
+            }
         }
+    }
+    #else
+    /// :nodoc:
+    public func dynamicallyCall(withArguments args: [Never]) {
+        //   noop
     }
     #endif
 }
@@ -354,7 +392,7 @@ public extension User {
      */
     func configuration(partitionValue: AnyBSON,
                        cancelAsyncOpenOnNonFatalErrors: Bool = false) -> Realm.Configuration {
-        let config = self.__configuration(withPartitionValue: ObjectiveCSupport.convert(object: AnyBSON(partitionValue)))
+        let config = self.__configuration(withPartitionValue: ObjectiveCSupport.convert(object: partitionValue))
         let syncConfig = config.syncConfiguration!
         syncConfig.cancelAsyncOpenOnNonFatalErrors = cancelAsyncOpenOnNonFatalErrors
         config.syncConfiguration = syncConfig
@@ -583,7 +621,7 @@ extension Realm {
     }
 }
 
-#if canImport(Combine)
+#if !(os(iOS) && (arch(i386) || arch(arm)))
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, macCatalyst 13.0, macCatalystApplicationExtension 13.0, *)
 public extension User {
     /// Refresh a user's custom data. This will, in effect, refresh the user's auth session.
@@ -636,7 +674,7 @@ public extension User {
 
 /// :nodoc:
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, macCatalyst 13.0, macCatalystApplicationExtension 13.0, *)
-@frozen public struct UserSubscription: Combine.Subscription {
+@frozen public struct UserSubscription: Subscription {
     private let user: User
     private let token: RLMUserSubscriptionToken
 
@@ -750,233 +788,193 @@ extension FunctionCallable {
 }
 #endif // swift(>=5.5)
 
-#if swift(>=5.5) && canImport(_Concurrency)
- @available(macOS 12.0, tvOS 15.0, iOS 15.0, watchOS 8.0, *)
- public extension User {
-     /// Links the currently authenticated user with a new identity, where the identity is defined by the credential
-     /// specified as a parameter. This will only be successful if this `User` is the currently authenticated
-     /// with the client from which it was created. On success a new user will be returned with the new linked credentials.
-     /// - Parameters:
-     ///   - credentials: The `Credentials` used to link the user to a new identity.
-     /// - Returns:A `User` after successfully update its identity.
-     func linkUser(credentials: Credentials) async throws -> User {
-         return try await withCheckedThrowingContinuation { continuation in
-             linkUser(credentials: credentials, continuation.resume)
-         }
-     }
- }
+public extension User {
+      // TODO: Flexible Sync - Add docstrings
+      func flexibleSyncConfiguration() -> Realm.Configuration {
+          let config = self.__flexibleSyncConfiguration()
+          return ObjectiveCSupport.convert(object: config)
+      }
+  }
 
- @available(macOS 12.0, tvOS 15.0, iOS 15.0, watchOS 8.0, *)
- extension FunctionCallable {
-     /// The implementation of @dynamicMemberLookup that allows  for `async await` callable return.
-     ///
-     ///     guard case let .int32(sum) = try await user.functions.sum([1, 2, 3, 4, 5]) else {
-     ///        return
-     ///     }
-     ///
-     public func dynamicallyCall(withArguments args: [[AnyBSON]]) async throws -> AnyBSON {
-         try await withCheckedThrowingContinuation { continuation in
-             let objcArgs = args.first!.map(ObjectiveCSupport.convertBson)
-             self.user.__callFunctionNamed(name, arguments: objcArgs) { (bson: RLMBSON?, error: Error?) in
-                 if let b = bson.map(ObjectiveCSupport.convertBson), let bson = b {
-                     continuation.resume(returning: bson)
-                 } else {
-                     continuation.resume(throwing: error ?? Realm.Error.callFailed)
-                 }
-             }
-         }
-     }
- }
- #endif // swift(>=5.5)
+  // FLEXIBLE SYNC
+  public protocol AnySubscription {
+  }
 
- public extension User {
-     // TODO: Flexible Sync - Add docstrings
-     func flexibleSyncConfiguration() -> Realm.Configuration {
-         let config = self.__flexibleSyncConfiguration()
-         return ObjectiveCSupport.convert(object: config)
-     }
- }
+  public class Subscription<Element: Object>: AnySubscription {
+      public typealias QueryFunction = (Query<Element>) -> Query<Element>
 
- // FLEXIBLE SYNC
- public protocol AnySubscription {
- }
+      // When the subscription was created. Recorded automatically.
+      public var createdAt: Date = Date()
 
- public class Subscription<Element: Object>: AnySubscription {
-     public typealias QueryFunction = (Query<Element>) -> Query<Element>
+      // When the subscription was last updated. Recorded automatically.
+      public var updatedAt: Date = Date()
 
-     // When the subscription was created. Recorded automatically.
-     public var createdAt: Date = Date()
+      // Name of the subscription, if not specified it will return the value in Query
+      public var name: String = ""
 
-     // When the subscription was last updated. Recorded automatically.
-     public var updatedAt: Date = Date()
+      // Update query for subscription
+      public func update(@QueryBuilder _ to: () -> (AnySubscription)) throws {
+          fatalError()
+      }
 
-     // Name of the subscription, if not specified it will return the value in Query
-     public var name: String = ""
+      private(set) public var query: QueryFunction
+      public init(name: String = "", query: @escaping QueryFunction) {
+          self.name = name
+          self.query = query
+      }
+  }
 
-     // Update query for subscription
-     public func update(@QueryBuilder _ to: () -> (AnySubscription)) throws {
+  public protocol QueryBuilderComponent {}
+
+  @resultBuilder public struct QueryBuilder {
+      public static func buildBlock(_ components: AnySubscription...) -> [AnySubscription] {
+          return components
+      }
+
+      public static func buildBlock(_ component: AnySubscription) -> AnySubscription {
+          return component
+      }
+  }
+
+  public protocol AnyQueryBuilderComponent {}
+
+  // Realm operations
+  // Realm will only allow getting all the subscriptions and subscribe to a query
+  extension Realm {
+      // Get all subscriptions for this Realm.
+      /*private(set)*/ public var subscriptions: [AnySubscription] {
+          fatalError()
+      }
+  }
+
+  // TODO: Can we observer changes on the subscription set?
+  // Task to get state changes from the write transaction
+  @frozen public struct SubscriptionTask {
+      // Notifies state changes for the write subscription transaction
+      // if state is complete this will return complete, will
+      // throw an error if someone updates the subscription set while waiting
+      public func observe(_ block: @escaping (SubscriptionState) -> Void) {
          fatalError()
-     }
+      }
+  }
 
-     private(set) public var query: QueryFunction
-     public init(name: String = "", query: @escaping QueryFunction) {
-         self.name = name
-         self.query = query
-     }
- }
-
- public protocol QueryBuilderComponent {}
-
- @resultBuilder public struct QueryBuilder {
-     public static func buildBlock(_ components: AnySubscription...) -> [AnySubscription] {
-         return components
-     }
-
-     public static func buildBlock(_ component: AnySubscription) -> AnySubscription {
-         return component
-     }
- }
-
- public protocol AnyQueryBuilderComponent {}
-
- // Realm operations
- // Realm will only allow getting all the subscriptions and subscribe to a query
- extension Realm {
-     // Get all subscriptions for this Realm.
-     /*private(set)*/ public var subscriptions: [AnySubscription] {
+  #if swift(>=5.5) && canImport(_Concurrency)
+  @available(macOS 12.0, tvOS 15.0, iOS 15.0, watchOS 8.0, *)
+  extension SubscriptionTask {
+      // Notifies state changes for the write subscription transaction
+      // if state is complete this will return complete, will
+      // throw an error if someone updates the subscription set while waiting
+      public func observe() -> AsyncStream<SubscriptionState> {
          fatalError()
-     }
- }
+      }
+  }
+  #endif // swift(>=5.5)
+  // SubscriptionSet
+  extension Array where Element == AnySubscription {
+      // Creates a write transaction and updates the subscription set, this will not wait
+      // for the server to acknowledge and see all the data associated with this collection of
+      // subscriptions
+      @discardableResult
+      public func write(_ block: (() throws -> ())) throws -> SubscriptionTask {
+          fatalError()
+      }
 
- // TODO: Can we observer changes on the subscription set?
- // Task to get state changes from the write transaction
- @frozen public struct SubscriptionTask {
-     // Notifies state changes for the write subscription transaction
-     // if state is complete this will return complete, will
-     // throw an error if someone updates the subscription set while waiting
-     public func observe(_ block: @escaping (SubscriptionState) -> Void) {
-        fatalError()
-     }
- }
+      // Wait for the server to acknowledge and send all the data associated with this
+      // subscription set, if state is complete this will return immediately, will
+      // throw an error if someone updates the subscription set will waiting
+      // Completion block version
+      public func `observe`(completion: @escaping (Result<Void, Error>) -> Void) {
+          fatalError()
+      }
 
- #if swift(>=5.5) && canImport(_Concurrency)
- @available(macOS 12.0, tvOS 15.0, iOS 15.0, watchOS 8.0, *)
- extension SubscriptionTask {
-     // Notifies state changes for the write subscription transaction
-     // if state is complete this will return complete, will
-     // throw an error if someone updates the subscription set while waiting
-     public func observe() -> AsyncStream<SubscriptionState> {
-        fatalError()
-     }
- }
- #endif // swift(>=5.5)
- // SubscriptionSet
- extension Array where Element == AnySubscription {
-     // Creates a write transaction and updates the subscription set, this will not wait
-     // for the server to acknowledge and see all the data associated with this collection of
-     // subscriptions
-     @discardableResult
-     public func write(_ block: (() throws -> Void)) throws -> SubscriptionTask {
-         fatalError()
-     }
+      // Find subscription in the subscription set by subscription properties
+      public func first<Element: Object>(`where`: @escaping (Subscription<Element>) -> Bool) -> Subscription<Element>? {
+          fatalError()
+      }
 
-     // Wait for the server to acknowledge and send all the data associated with this
-     // subscription set, if state is complete this will return immediately, will
-     // throw an error if someone updates the subscription set will waiting
-     // Completion block version
-     public func `observe`(completion: @escaping (Result<Void, Error>) -> Void) {
-         fatalError()
-     }
+      // Find subscription in the subscription set by query
+      public func first<Element: Object>(@QueryBuilder _ `where`: () -> (AnySubscription)) -> Subscription<Element>? {
+          fatalError()
+      }
 
-     // Find subscription in the subscription set by subscription properties
-     public func first<Element: Object>(`where`: @escaping (Subscription<Element>) -> Bool) -> Subscription<Element>? {
-         fatalError()
-     }
+      // Add a query or queries to the subscription set, this has to be done within a write block
+      public func `append`(@QueryBuilder _ to: () -> ([AnySubscription])) throws {
+          fatalError()
+      }
 
-     // Find subscription in the subscription set by query
-     public func first<Element: Object>(@QueryBuilder _ `where`: () -> (AnySubscription)) -> Subscription<Element>? {
-         fatalError()
-     }
+      public func `append`(@QueryBuilder _ to: () -> (AnySubscription)) throws {
+          fatalError()
+      }
 
-     // Add a query or queries to the subscription set, this has to be done within a write block
-     public func `append`(@QueryBuilder _ to: () -> ([AnySubscription])) throws {
-         fatalError()
-     }
+      // Remove a subscription from the subscription set, this has to be done within a write block
+      public func remove(_ subscription: AnySubscription) throws {
+          fatalError()
+      }
 
-     public func `append`(@QueryBuilder _ to: () -> (AnySubscription)) throws {
-         fatalError()
-     }
+      // Remove subscription of subscription set by query, this has to be done within a write block
+      public func remove(@QueryBuilder _ to: () -> ([AnySubscription])) throws {
+          fatalError()
+      }
 
-     // Remove a subscription from the subscription set, this has to be done within a write block
-     public func remove(_ subscription: AnySubscription) throws {
-         fatalError()
-     }
+      public func remove(@QueryBuilder _ to: () -> (AnySubscription)) throws {
+          fatalError()
+      }
 
-     // Remove subscription of subscription set by query, this has to be done within a write block
-     public func remove(@QueryBuilder _ to: () -> ([AnySubscription])) throws {
-         fatalError()
-     }
+      // Remove subscription of subscription set by name, this has to be done within a write block
+      public func remove(_ name: String) throws {
+          fatalError()
+      }
 
-     public func remove(@QueryBuilder _ to: () -> (AnySubscription)) throws {
-         fatalError()
-     }
+      // Remove all subscriptions from the subscriptions set
+      public func removeAll() throws {
+          fatalError()
+      }
 
-     // Remove subscription of subscription set by name, this has to be done within a write block
-     public func remove(_ name: String) throws {
-         fatalError()
-     }
+      // Remove all subscriptions from the subscriptions set by type
+      public func removeAll<Element: Object>(ofType type: Element.Type) throws {
+          fatalError()
+      }
+  }
 
-     // Remove all subscriptions from the subscriptions set
-     public func removeAll() throws {
-         fatalError()
-     }
+  #if swift(>=5.5) && canImport(_Concurrency)
+  @available(macOS 12.0, tvOS 15.0, iOS 15.0, watchOS 8.0, *)
+  extension Array where Element == AnySubscription {
+      // Asynchronously creates and commit a write transaction and updates the subscription set,
+      // this will not wait for the server to acknowledge and see all the data associated with this
+      // collection of subscription
+      @discardableResult
+      public func write(_ block: (() throws -> ())) async throws -> SubscriptionTask {
+          fatalError()
+      }
+  }
+  #endif // swift(>=5.5)
+  //
+  //#if !(os(iOS) && (arch(i386) || arch(arm)))
+  //import Combine
+  //
+  //@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, macCatalyst 13.0, macCatalystApplicationExtension 13.0, *)
+  //extension Array where Element == AnySubscription {
+  //    // Wait for the server to acknowledge and send all the data associated with this
+  //    // subscription set, if state is complete this will return immediately, will
+  //    // throw an error if someone updates the subscription set will waiting
+  //    public func waitForSync() -> Future<Void, Error> {
+  //        return Future { self.waitForSync(completion: $0) }
+  //    }
+  //}
+  //#endif // canImport(Combine)
 
-     // Remove all subscriptions from the subscriptions set by type
-     public func removeAll<Element: Object>(ofType type: Element.Type) throws {
-         fatalError()
-     }
- }
+  // State Updates
+  // Some operations will return a `SubscriptionTask` which can be used to get state updates (There will be a Combine API as well not described here)
+  public enum SubscriptionState: Equatable {
+      public static func == (lhs: SubscriptionState, rhs: SubscriptionState) -> Bool {
+          true
+      }
 
- #if swift(>=5.5) && canImport(_Concurrency)
- @available(macOS 12.0, tvOS 15.0, iOS 15.0, watchOS 8.0, *)
- extension Array where Element == AnySubscription {
-     // Asynchronously creates and commit a write transaction and updates the subscription set,
-     // this will not wait for the server to acknowledge and see all the data associated with this
-     // collection of subscription
-     @discardableResult
-     public func write(_ block: (() throws -> Void)) async throws -> SubscriptionTask {
-         fatalError()
-     }
- }
- #endif // swift(>=5.5)
- //
- //#if !(os(iOS) && (arch(i386) || arch(arm)))
- //import Combine
- //
- //@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, macCatalyst 13.0, macCatalystApplicationExtension 13.0, *)
- //extension Array where Element == AnySubscription {
- //    // Wait for the server to acknowledge and send all the data associated with this
- //    // subscription set, if state is complete this will return immediately, will
- //    // throw an error if someone updates the subscription set will waiting
- //    public func waitForSync() -> Future<Void, Error> {
- //        return Future { self.waitForSync(completion: $0) }
- //    }
- //}
- //#endif // canImport(Combine)
-
-
- // State Updates
- // Some operations will return a `SubscriptionTask` which can be used to get state updates (There will be a Combine API as well not described here)
- public enum SubscriptionState: Equatable {
-     public static func == (lhs: SubscriptionState, rhs: SubscriptionState) -> Bool {
-         true
-     }
-
-     // Subscription is complete and the server is in "steady-state" synchronization.
-     case complete
-     // The Subscription encountered an error.
-     case error(Error)
-     // The server is processing the subscription and updating the Realm data
-     // with new matches
-     case pending
- }
+      // Subscription is complete and the server is in "steady-state" synchronization.
+      case complete
+      // The Subscription encountered an error.
+      case error(Error)
+      // The server is processing the subscription and updating the Realm data
+      // with new matches
+      case pending
+  }

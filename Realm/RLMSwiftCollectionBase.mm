@@ -31,6 +31,10 @@
 - (NSArray *)objectsAtIndexes:(__unused NSIndexSet *)indexes;
 @end
 
+// Some of the things declared in the interface are handled by the proxy forwarding
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wincomplete-implementation"
+
 @implementation RLMSwiftCollectionBase
 
 + (id<RLMCollection>)_unmanagedCollection {
@@ -42,14 +46,11 @@
 }
 
 - (instancetype)init {
-    return self = [super init];
+    return self;
 }
 
 - (instancetype)initWithCollection:(id<RLMCollection>)collection {
-    self = [super init];
-    if (self) {
-        __rlmCollection = collection;
-    }
+    __rlmCollection = collection;
     return self;
 }
 
@@ -60,40 +61,47 @@
     return __rlmCollection;
 }
 
-- (id)valueForKey:(NSString *)key {
-    return [self._rlmCollection valueForKey:key];
+- (BOOL)isKindOfClass:(Class)aClass {
+    return [self._rlmCollection isKindOfClass:aClass] || RLMIsKindOfClass(object_getClass(self), aClass);
 }
 
-- (id)valueForKeyPath:(NSString *)keyPath {
-    return [(NSObject *)self._rlmCollection valueForKeyPath:keyPath];
+- (NSMethodSignature *)methodSignatureForSelector:(SEL)sel {
+    return [(id)self._rlmCollection methodSignatureForSelector:sel];
 }
 
-- (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state
-                                  objects:(id __unsafe_unretained [])buffer
-                                    count:(NSUInteger)len {
-    return [self._rlmCollection countByEnumeratingWithState:state objects:buffer count:len];
+- (void)forwardInvocation:(NSInvocation *)invocation {
+    [invocation invokeWithTarget:self._rlmCollection];
 }
 
-// Only in use for RLMArray
-- (NSArray *)objectsAtIndexes:(NSIndexSet *)indexes {
-    return [(RLMArray *)self._rlmCollection objectsAtIndexes:indexes];
+- (id)forwardingTargetForSelector:(__unused SEL)sel {
+    return self._rlmCollection;
 }
 
-// Only in use for RLMDictionary
-- (id)objectForKeyedSubscript:(id)key {
-    return [(RLMDictionary *)self._rlmCollection objectForKeyedSubscript:key];
+- (BOOL)respondsToSelector:(SEL)aSelector {
+    return [self._rlmCollection respondsToSelector:aSelector];
+}
+
+- (void)doesNotRecognizeSelector:(SEL)aSelector {
+    [(id)self._rlmCollection doesNotRecognizeSelector:aSelector];
 }
 
 - (BOOL)isEqual:(id)object {
-    if (auto base = RLMDynamicCast<RLMSwiftCollectionBase>(object)) {
-        return !base._rlmCollection.realm
-        && ((self._rlmCollection.count == 0 && base._rlmCollection.count == 0) ||
-            [self._rlmCollection isEqual:base._rlmCollection]);
+    if (auto collection = RLMDynamicCast<RLMSwiftCollectionBase>(object)) {
+        if (!__rlmCollection) {
+            return !collection->__rlmCollection.realm && collection->__rlmCollection.count == 0;
+        }
+        return  [__rlmCollection isEqual:collection->__rlmCollection];
     }
     return NO;
 }
 
+- (BOOL)conformsToProtocol:(Protocol *)aProtocol {
+    return aProtocol == @protocol(NSFastEnumeration) || [self._rlmCollection conformsToProtocol:aProtocol];
+}
+
 @end
+
+#pragma clang diagnostic pop
 
 @implementation RLMLinkingObjectsHandle {
     realm::TableKey _tableKey;
@@ -109,11 +117,15 @@
     if (!(self = [super init])) {
         return nil;
     }
-    auto& obj = object->_row;
-    _tableKey = obj.get_table()->get_key();
-    _objKey = obj.get_key();
-    _info = object->_info;
-    _realm = object->_realm;
+    // KeyPath strings will invoke this initializer with an unmanaged object
+    // so guard against that.
+    if (object->_realm) {
+        auto& obj = object->_row;
+        _tableKey = obj.get_table()->get_key();
+        _objKey = obj.get_key();
+        _info = object->_info;
+        _realm = object->_realm;
+    }
     _property = prop;
 
     return self;
@@ -160,6 +172,14 @@
     _results = [RLMLinkingObjects resultsWithObjectInfo:objectInfo results:std::move(results)];
     _realm = nil;
     return _results;
+}
+
+- (NSString *)_propertyKey {
+    return _property.name;
+}
+
+- (BOOL)_isLegacyProperty {
+    return _property.isLegacy;
 }
 
 @end

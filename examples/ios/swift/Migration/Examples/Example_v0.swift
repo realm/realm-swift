@@ -26,9 +26,9 @@ import RealmSwift
 let schemaVersion = 0
 
 class Person: Object {
-    @objc dynamic var firstName = ""
-    @objc dynamic var lastName = ""
-    @objc dynamic var age = 0
+    @Persisted var firstName = ""
+    @Persisted var lastName = ""
+    @Persisted var age = 0
     convenience init(firstName: String, lastName: String, age: Int) {
         self.init()
         self.firstName = firstName

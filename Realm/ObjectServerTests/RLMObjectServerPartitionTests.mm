@@ -39,69 +39,65 @@
 
 @implementation RLMObjectServerPartitionTests
 
-- (void)roundTripForPartitionValue:(id<RLMBSON>)value  {
-    NSString *appId;
-    if (self.isParent) {
-        NSError *error;
-        appId = [RealmServer.shared createAppForBSONType:[self partitionBsonType:value] error:&error];
+- (void)roundTripForPartitionValue:(id<RLMBSON>)value testName:(SEL)callerName {
+    NSError *error;
+    NSString *appId = [RealmServer.shared createAppForBSONType:[self partitionBsonType:value] error:&error];
 
-        if (error) {
-            XCTFail(@"Could not create app for partition value %@d", value);
-            return;
-        }
-    } else {
-        appId = self.appIds[0];
+    if (error) {
+        XCTFail(@"Could not create app for partition value %@d", value);
+        return;
     }
 
+    NSString *name = NSStringFromSelector(callerName);
     RLMApp *app = [RLMApp appWithId:appId
-                      configuration:[self defaultAppConfiguration]
-                      rootDirectory:[self clientDataRoot]];
-    RLMCredentials *credentials = [self basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                        register:self.isParent
-                                                             app:app];
+                      configuration:self.defaultAppConfiguration
+                      rootDirectory:self.clientDataRoot];
+    RLMCredentials *credentials = [self basicCredentialsWithName:name register:YES app:app];
     RLMUser *user = [self logInUserForCredentials:credentials app:app];
     RLMRealm *realm = [self openRealmForPartitionValue:value user:user];
-    if (self.isParent) {
-        [realm beginWriteTransaction];
-        [realm deleteAllObjects];
-        [realm commitWriteTransaction];
-        CHECK_COUNT(0, Person, realm);
+    CHECK_COUNT(0, Person, realm);
 
-        int code1 = [self runChildAndWaitWithAppIds:@[appId]];
-        XCTAssertEqual(0, code1);
-        [self waitForDownloadsForRealm:realm];
-        CHECK_COUNT(3, Person, realm);
-        XCTAssertEqual([Person objectsInRealm:realm where:@"firstName = 'John'"].count, 1UL);
+    RLMCredentials *writeCredentials = [self basicCredentialsWithName:[name stringByAppendingString:@"Writer"]
+                                                             register:YES app:app];
+    RLMUser *writeUser = [self logInUserForCredentials:writeCredentials app:app];
+    RLMRealm *writeRealm = [self openRealmForPartitionValue:value user:writeUser];
 
-        int code2 = [self runChildAndWaitWithAppIds:@[appId]];
-        XCTAssertEqual(0, code2);
-        [self waitForDownloadsForRealm:realm];
-        CHECK_COUNT(6, Person, realm);
-        XCTAssertEqual([Person objectsInRealm:realm where:@"firstName = 'John'"].count, 2UL);
-    } else {
-        // Add objects.
-        [self addPersonsToRealm:realm
+    auto write = [&]() {
+        [self addPersonsToRealm:writeRealm
                         persons:@[[Person john],
                                   [Person paul],
                                   [Person ringo]]];
-        [self waitForUploadsForRealm:realm];
-    }
+        [self waitForUploadsForRealm:writeRealm];
+        [self waitForDownloadsForRealm:realm];
+    };
+
+    write();
+    CHECK_COUNT(3, Person, realm);
+    XCTAssertEqual([Person objectsInRealm:realm where:@"firstName = 'John'"].count, 1UL);
+
+    write();
+    CHECK_COUNT(6, Person, realm);
+    XCTAssertEqual([Person objectsInRealm:realm where:@"firstName = 'John'"].count, 2UL);
 }
 
 - (void)testRoundTripForObjectIdPartitionValue {
-    [self roundTripForPartitionValue:[[RLMObjectId alloc] initWithString:@"1234567890ab1234567890ab" error:nil]];
+    [self roundTripForPartitionValue:[[RLMObjectId alloc] initWithString:@"1234567890ab1234567890ab" error:nil]
+                            testName:_cmd];
 }
 
 - (void)testRoundTripForUUIDPartitionValue {
-    [self roundTripForPartitionValue:[[NSUUID alloc] initWithUUIDString:@"85d4fbee-6ec6-47df-bfa1-615931903d7e"]];
+    [self roundTripForPartitionValue:[[NSUUID alloc] initWithUUIDString:@"85d4fbee-6ec6-47df-bfa1-615931903d7e"]
+                            testName:_cmd];
 }
 
 - (void)testRoundTripForStringPartitionValue {
-    [self roundTripForPartitionValue:@"1234567890ab1234567890ab"];
+    [self roundTripForPartitionValue:@"1234567890ab1234567890ab"
+                            testName:_cmd];
 }
 
 - (void)testRoundTripForIntPartitionValue {
-    [self roundTripForPartitionValue:@1234567890];
+    [self roundTripForPartitionValue:@1234567890
+                            testName:_cmd];
 }
 
 @end

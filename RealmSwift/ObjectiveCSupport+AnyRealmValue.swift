@@ -49,7 +49,7 @@ public extension ObjectiveCSupport {
         case let .uuid(u):
             return u as NSUUID
         case let .object(o):
-            return o.unsafeCastToRLMObject()
+            return o
         default:
             return nil
         }

@@ -222,6 +222,11 @@ static void RLMRegisterClassLocalNames(Class *classes, NSUInteger count) {
         if (s_sharedSchemaState == SharedSchemaState::Initializing) {
             return nil;
         }
+        // Don't register the base classes in the schema even if someone calls
+        // sharedSchema on them directly
+        if (cls == [RLMObjectBase class] || class_getSuperclass(cls) == [RLMObjectBase class]) {
+            return nil;
+        }
 
         RLMRegisterClassLocalNames(&cls, 1);
         RLMObjectSchema *objectSchema = RLMRegisterClass(cls);

@@ -30,10 +30,9 @@
 #import "RLMResults_Private.hpp"
 #import "RLMSchema_Private.h"
 #import "RLMSet_Private.hpp"
-#import "RLMSwiftCollectionBase.h"
-#import "RLMUtil.hpp"
+#import "RLMSwiftProperty.h"
 #import "RLMUUID_Private.hpp"
-#import "RLMSwiftValueStorage.h"
+#import "RLMUtil.hpp"
 
 #import <realm/object-store/results.hpp>
 #import <realm/object-store/property.hpp>
@@ -41,7 +40,7 @@
 #import <objc/runtime.h>
 #import <objc/message.h>
 
-#pragma mark - Helper functions
+#pragma mark Helper functions
 
 using realm::ColKey;
 
@@ -55,12 +54,12 @@ Obj Obj::get<Obj>(ColKey col) const {
 } // namespace realm
 
 namespace {
-realm::Property const& get_property(__unsafe_unretained RLMObjectBase *const obj, NSUInteger index) {
+realm::Property const& getProperty(__unsafe_unretained RLMObjectBase *const obj, NSUInteger index) {
     return obj->_info->objectSchema->persisted_properties[index];
 }
 
-realm::Property const& get_property(__unsafe_unretained RLMObjectBase *const obj,
-                                    __unsafe_unretained RLMProperty *const prop) {
+realm::Property const& getProperty(__unsafe_unretained RLMObjectBase *const obj,
+                                   __unsafe_unretained RLMProperty *const prop) {
     if (prop.linkOriginPropertyName) {
         return obj->_info->objectSchema->computed_properties[prop.index];
     }
@@ -95,16 +94,25 @@ bool isNull(realm::UUID const&) {
 template<typename T>
 T get(__unsafe_unretained RLMObjectBase *const obj, NSUInteger index) {
     RLMVerifyAttached(obj);
-    return obj->_row.get<T>(get_property(obj, index).column_key);
+    return obj->_row.get<T>(getProperty(obj, index).column_key);
 }
 
 template<typename T>
 id getBoxed(__unsafe_unretained RLMObjectBase *const obj, NSUInteger index) {
     RLMVerifyAttached(obj);
-    auto& prop = get_property(obj, index);
+    auto& prop = getProperty(obj, index);
     RLMAccessorContext ctx(obj, &prop);
     auto value = obj->_row.get<T>(prop.column_key);
     return isNull(value) ? nil : ctx.box(std::move(value));
+}
+
+template<typename T>
+T getOptional(__unsafe_unretained RLMObjectBase *const obj, uint16_t key, bool *gotValue) {
+    auto ret = get<realm::util::Optional<T>>(obj, key);
+    if (ret) {
+        *gotValue = true;
+    }
+    return ret.value_or(T{});
 }
 
 template<typename T>
@@ -198,11 +206,12 @@ id<RLMCollection> getCollection(__unsafe_unretained RLMObjectBase *const obj, NS
 }
 
 template <typename Collection>
-void assign_value(Collection&& collection,
-                  RLMClassInfo *info,
-                  __unsafe_unretained RLMObjectBase *const obj,
-                  __unsafe_unretained RLMProperty *const prop,
-                  __unsafe_unretained id<NSFastEnumeration> const value) {
+void assignValue(__unsafe_unretained RLMObjectBase *const obj,
+                 __unsafe_unretained RLMProperty *const prop,
+                 ColKey key,
+                 __unsafe_unretained id<NSFastEnumeration> const value) {
+    auto info = obj->_info;
+    Collection collection(obj->_realm->_realm, obj->_row, key);
     if (collection.get_type() == realm::PropertyType::Object) {
         info = &obj->_info->linkTargetType(prop.index);
     }
@@ -218,27 +227,13 @@ void setValue(__unsafe_unretained RLMObjectBase *const obj, ColKey key,
     RLMValidateValueForProperty(value, obj->_info->rlmObjectSchema, prop, true);
 
     if (prop.array) {
-        assign_value(realm::List(obj->_realm->_realm, obj->_row, key),
-                     obj->_info,
-                     obj,
-                     prop,
-                     value);
+        assignValue<realm::List>(obj, prop, key, value);
     }
     else if (prop.set) {
-        assign_value(realm::object_store::Set(obj->_realm->_realm,
-                                              obj->_row, key),
-                     obj->_info,
-                     obj,
-                     prop,
-                     value);
+        assignValue<realm::object_store::Set>(obj, prop, key, value);
     }
     else if (prop.dictionary) {
-        assign_value(realm::object_store::Dictionary(obj->_realm->_realm,
-                                                     obj->_row, key),
-                     obj->_info,
-                     obj,
-                     prop,
-                     value);
+        assignValue<realm::object_store::Dictionary>(obj, prop, key, value);
     }
 }
 
@@ -390,7 +385,10 @@ id managedGetter(RLMProperty *prop, const char *type) {
 static realm::ColKey willChange(RLMObservationTracker& tracker,
                                 __unsafe_unretained RLMObjectBase *const obj, NSUInteger index) {
     RLMVerifyInWriteTransaction(obj);
-    auto& prop = get_property(obj, index);
+    auto& prop = getProperty(obj, index);
+    if (prop.is_primary) {
+        @throw RLMException(@"Primary key can't be changed after an object is inserted.");
+    }
     tracker.willChange(RLMGetObservationInfo(obj->_observationInfo, obj->_row.get_key(), *obj->_info),
                        obj->_objectSchema.properties[index].name);
     return prop.column_key;
@@ -633,19 +631,20 @@ Class RLMUnmanagedAccessorClassForObjectClass(Class objectClass, RLMObjectSchema
 // base object
 void RLMReplaceClassNameMethod(Class accessorClass, NSString *className) {
     Class metaClass = object_getClass(accessorClass);
-    IMP imp = imp_implementationWithBlock(^(Class){ return className; });
+    IMP imp = imp_implementationWithBlock(^(Class) { return className; });
     class_addMethod(metaClass, @selector(className), imp, "@@:");
 }
 
 // implement the shared schema method
 void RLMReplaceSharedSchemaMethod(Class accessorClass, RLMObjectSchema *schema) {
+    REALM_ASSERT(accessorClass != [RealmSwiftObject class]);
     Class metaClass = object_getClass(accessorClass);
     IMP imp = imp_implementationWithBlock(^(Class cls) {
         if (cls == accessorClass) {
             return schema;
         }
 
-        // If we aren't being called directly on the class this was overriden
+        // If we aren't being called directly on the class this was overridden
         // for, the class is either a subclass which we haven't initialized yet,
         // or it's a runtime-generated class which should use the parent's
         // schema. We check for the latter by checking if the immediate
@@ -694,16 +693,23 @@ void RLMDynamicSet(__unsafe_unretained RLMObjectBase *const obj,
     realm::Object o(obj->_info->realm->_realm, *obj->_info->objectSchema, obj->_row);
     RLMAccessorContext c(obj);
     RLMTranslateError([&] {
-        o.set_property_value(c, get_property(obj, prop).name, val ?: NSNull.null);
+        o.set_property_value(c, getProperty(obj, prop).name, val ?: NSNull.null);
     });
 }
 
 id RLMDynamicGet(__unsafe_unretained RLMObjectBase *const obj, __unsafe_unretained RLMProperty *const prop) {
+    if (auto accessor = prop.swiftAccessor; accessor && [obj isKindOfClass:obj->_objectSchema.objectClass]) {
+        return RLMCoerceToNil([accessor get:prop on:obj]);
+    }
+    if (!obj->_realm) {
+        return [obj valueForKey:prop.name];
+    }
+
     realm::Object o(obj->_realm->_realm, *obj->_info->objectSchema, obj->_row);
     RLMAccessorContext c(obj);
     c.currentProperty = prop;
     return RLMTranslateError([&] {
-        return RLMCoerceToNil(o.get_property_value<id>(c, get_property(obj, prop)));
+        return RLMCoerceToNil(o.get_property_value<id>(c, getProperty(obj, prop)));
     });
 }
 
@@ -716,6 +722,95 @@ id RLMDynamicGetByName(__unsafe_unretained RLMObjectBase *const obj,
     }
     return RLMDynamicGet(obj, prop);
 }
+
+#pragma mark - Swift property getters and setter
+
+#define REALM_SWIFT_PROPERTY_ACCESSOR(objc, swift, rlmtype) \
+    objc RLMGetSwiftProperty##swift(__unsafe_unretained RLMObjectBase *const obj, uint16_t key) { \
+        return get<objc>(obj, key); \
+    } \
+    objc RLMGetSwiftProperty##swift##Optional(__unsafe_unretained RLMObjectBase *const obj, uint16_t key, bool *gotValue) { \
+        return getOptional<objc>(obj, key, gotValue); \
+    } \
+    void RLMSetSwiftProperty##swift(__unsafe_unretained RLMObjectBase *const obj, uint16_t key, objc value) { \
+        RLMVerifyAttached(obj); \
+        kvoSetValue(obj, key, value); \
+    }
+REALM_FOR_EACH_SWIFT_PRIMITIVE_TYPE(REALM_SWIFT_PROPERTY_ACCESSOR)
+#undef REALM_SWIFT_PROPERTY_ACCESSOR
+
+#define REALM_SWIFT_PROPERTY_ACCESSOR(objc, swift, rlmtype) \
+    void RLMSetSwiftProperty##swift(__unsafe_unretained RLMObjectBase *const obj, uint16_t key, objc *value) { \
+        RLMVerifyAttached(obj); \
+        kvoSetValue(obj, key, value); \
+    }
+REALM_FOR_EACH_SWIFT_OBJECT_TYPE(REALM_SWIFT_PROPERTY_ACCESSOR)
+#undef REALM_SWIFT_PROPERTY_ACCESSOR
+
+NSString *RLMGetSwiftPropertyString(__unsafe_unretained RLMObjectBase *const obj, uint16_t key) {
+    return getBoxed<realm::StringData>(obj, key);
+}
+
+NSData *RLMGetSwiftPropertyData(__unsafe_unretained RLMObjectBase *const obj, uint16_t key) {
+    return getBoxed<realm::BinaryData>(obj, key);
+}
+
+NSDate *RLMGetSwiftPropertyDate(__unsafe_unretained RLMObjectBase *const obj, uint16_t key) {
+    return getBoxed<realm::Timestamp>(obj, key);
+}
+
+NSUUID *RLMGetSwiftPropertyUUID(__unsafe_unretained RLMObjectBase *const obj, uint16_t key) {
+    return getBoxed<realm::util::Optional<realm::UUID>>(obj, key);
+}
+
+RLMObjectId *RLMGetSwiftPropertyObjectId(__unsafe_unretained RLMObjectBase *const obj, uint16_t key) {
+    return getBoxed<realm::util::Optional<realm::ObjectId>>(obj, key);
+}
+
+RLMDecimal128 *RLMGetSwiftPropertyDecimal128(__unsafe_unretained RLMObjectBase *const obj, uint16_t key) {
+    return getBoxed<realm::Decimal128>(obj, key);
+}
+
+RLMArray *RLMGetSwiftPropertyArray(__unsafe_unretained RLMObjectBase *const obj, uint16_t key) {
+    return getCollection(obj, key);
+}
+RLMSet *RLMGetSwiftPropertySet(__unsafe_unretained RLMObjectBase *const obj, uint16_t key) {
+    return getCollection(obj, key);
+}
+RLMDictionary *RLMGetSwiftPropertyMap(__unsafe_unretained RLMObjectBase *const obj, uint16_t key) {
+    return getCollection(obj, key);
+}
+
+void RLMSetSwiftPropertyNil(__unsafe_unretained RLMObjectBase *const obj, uint16_t key) {
+    RLMVerifyInWriteTransaction(obj);
+    if (getProperty(obj, key).type == realm::PropertyType::Object) {
+        kvoSetValue(obj, key, (RLMObjectBase *)nil);
+    }
+    else {
+        // The type used here is arbitrary; it simply needs to be any non-object type
+        kvoSetValue(obj, key, (NSNumber<RLMInt> *)nil);
+    }
+}
+
+void RLMSetSwiftPropertyObject(__unsafe_unretained RLMObjectBase *const obj, uint16_t key,
+                               __unsafe_unretained RLMObjectBase *const target) {
+    kvoSetValue(obj, key, target);
+}
+
+RLMObjectBase *RLMGetSwiftPropertyObject(__unsafe_unretained RLMObjectBase *const obj, uint16_t key) {
+    return getBoxed<realm::Obj>(obj, key);
+}
+
+void RLMSetSwiftPropertyAny(__unsafe_unretained RLMObjectBase *const obj, uint16_t key,
+                            __unsafe_unretained id<RLMValue> const value) {
+    kvoSetValue(obj, key, value);
+}
+
+id<RLMValue> RLMGetSwiftPropertyAny(__unsafe_unretained RLMObjectBase *const obj, uint16_t key) {
+    return getBoxed<realm::Mixed>(obj, key);
+}
+
+#pragma mark - RLMAccessorContext
 
 RLMAccessorContext::~RLMAccessorContext() = default;
 
@@ -838,39 +933,42 @@ id RLMAccessorContext::box(realm::Results&& r) {
 using realm::ObjKey;
 using realm::CreatePolicy;
 
-#pragma mark - unboxing -
+template<typename T>
+static T *bridged(__unsafe_unretained id const value) {
+    return [value isKindOfClass:[T class]] ? value : RLMBridgeSwiftValue(value);
+}
 
 template<>
 realm::Timestamp RLMStatelessAccessorContext::unbox(__unsafe_unretained id const value) {
     id v = RLMCoerceToNil(value);
-    return RLMTimestampForNSDate(v);
+    return RLMTimestampForNSDate(bridged<NSDate>(v));
 }
 
 template<>
 bool RLMStatelessAccessorContext::unbox(__unsafe_unretained id const v) {
-    return [v boolValue];
+    return [bridged<NSNumber>(v) boolValue];
 }
 template<>
 double RLMStatelessAccessorContext::unbox(__unsafe_unretained id const v) {
-    return [v doubleValue];
+    return [bridged<NSNumber>(v) doubleValue];
 }
 template<>
 float RLMStatelessAccessorContext::unbox(__unsafe_unretained id const v) {
-    return [v floatValue];
+    return [bridged<NSNumber>(v) floatValue];
 }
 template<>
 long long RLMStatelessAccessorContext::unbox(__unsafe_unretained id const v) {
-    return [v longLongValue];
+    return [bridged<NSNumber>(v) longLongValue];
 }
 template<>
 realm::BinaryData RLMStatelessAccessorContext::unbox(id v) {
     v = RLMCoerceToNil(v);
-    return RLMBinaryDataForNSData(v);
+    return RLMBinaryDataForNSData(bridged<NSData>(v));
 }
 template<>
 realm::StringData RLMStatelessAccessorContext::unbox(id v) {
     v = RLMCoerceToNil(v);
-    return RLMStringDataWithNSString(v);
+    return RLMStringDataWithNSString(bridged<NSString>(v));
 }
 template<>
 realm::Decimal128 RLMStatelessAccessorContext::unbox(id v) {
@@ -878,49 +976,48 @@ realm::Decimal128 RLMStatelessAccessorContext::unbox(id v) {
 }
 template<>
 realm::ObjectId RLMStatelessAccessorContext::unbox(id v) {
-    return static_cast<RLMObjectId *>(v).value;
+    return bridged<RLMObjectId>(v).value;
 }
 template<>
 realm::UUID RLMStatelessAccessorContext::unbox(id v) {
-    return RLMObjcToUUID(v);
+    return RLMObjcToUUID(bridged<NSUUID>(v));
 }
 template<>
 realm::Mixed RLMAccessorContext::unbox(__unsafe_unretained id v, CreatePolicy p, ObjKey) {
     return RLMObjcToMixed(v, _realm, p);
 }
 
-template<typename Fn>
-static auto to_optional(__unsafe_unretained id const value, Fn&& fn) {
+template<typename T>
+static auto toOptional(__unsafe_unretained id const value) {
     id v = RLMCoerceToNil(value);
-    return v && v != NSNull.null ? realm::util::make_optional(fn(v)) : realm::util::none;
+    return v ? realm::util::make_optional(RLMStatelessAccessorContext::unbox<T>(v))
+             : realm::util::none;
 }
 
 template<>
 realm::util::Optional<bool> RLMStatelessAccessorContext::unbox(__unsafe_unretained id const v) {
-    return to_optional(v, [](__unsafe_unretained id v) { return (bool)[v boolValue]; });
+    return toOptional<bool>(v);
 }
 template<>
 realm::util::Optional<double> RLMStatelessAccessorContext::unbox(__unsafe_unretained id const v) {
-    return to_optional(v, [](__unsafe_unretained id v) { return [v doubleValue]; });
+    return toOptional<double>(v);
 }
 template<>
 realm::util::Optional<float> RLMStatelessAccessorContext::unbox(__unsafe_unretained id const v) {
-    return to_optional(v, [](__unsafe_unretained id v) { return [v floatValue]; });
+    return toOptional<float>(v);
 }
 template<>
 realm::util::Optional<int64_t> RLMStatelessAccessorContext::unbox(__unsafe_unretained id const v) {
-    return to_optional(v, [](__unsafe_unretained id v) { return [v longLongValue]; });
+    return toOptional<int64_t>(v);
 }
 template<>
 realm::util::Optional<realm::ObjectId> RLMStatelessAccessorContext::unbox(__unsafe_unretained id const v) {
-    return to_optional(v, [](__unsafe_unretained RLMObjectId *v) { return v.value; });
+    return toOptional<realm::ObjectId>(v);
 }
 template<>
 realm::util::Optional<realm::UUID> RLMStatelessAccessorContext::unbox(__unsafe_unretained id const v) {
-    return to_optional(v, [](__unsafe_unretained NSUUID *v) { return [v rlm_uuidValue]; });
+    return toOptional<realm::UUID>(v);
 }
-
-#pragma mark - Helper Methods -
 
 std::pair<realm::Obj, bool>
 RLMAccessorContext::createObject(id value, realm::CreatePolicy policy,
@@ -937,6 +1034,7 @@ RLMAccessorContext::createObject(id value, realm::CreatePolicy policy,
 
     RLMObjectBase *objBase = RLMDynamicCast<RLMObjectBase>(value);
     realm::Obj obj, *outObj = nullptr;
+    bool requiresSwiftUIObservers = false;
     if (objBase) {
         if (objBase.isInvalidated) {
             if (policy.create && !policy.copy) {
@@ -970,7 +1068,10 @@ RLMAccessorContext::createObject(id value, realm::CreatePolicy policy,
                 @throw RLMException(@"Object is already managed by another Realm. Use create instead to copy it into this Realm.");
             }
             if (objBase->_observationInfo && objBase->_observationInfo->hasObservers()) {
-                @throw RLMException(@"Cannot add an object with observers to a Realm");
+                requiresSwiftUIObservers = [RLMSwiftUIKVO removeObserversFromObject:objBase];
+                if (!requiresSwiftUIObservers) {
+                    @throw RLMException(@"Cannot add an object with observers to a Realm");
+                }
             }
 
             REALM_ASSERT([objBase->_objectSchema.className isEqualToString:_info.rlmObjectSchema.className]);
@@ -1009,7 +1110,11 @@ RLMAccessorContext::createObject(id value, realm::CreatePolicy policy,
         }
 
         object_setClass(objBase, _info.rlmObjectSchema.accessorClass);
-        RLMInitializeSwiftAccessorGenerics(objBase);
+        RLMInitializeSwiftAccessor(objBase, true);
+    }
+
+    if (requiresSwiftUIObservers) {
+        [RLMSwiftUIKVO addObserversToObject:objBase];
     }
 
     return {*outObj, false};
@@ -1071,8 +1176,13 @@ bool RLMStatelessAccessorContext::is_same_dictionary(realm::object_store::Dictio
                                                      __unsafe_unretained id const v) noexcept {
     return [v respondsToSelector:@selector(isBackedByDictionary:)] && [v isBackedByDictionary:dict];
 }
+
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wincomplete-implementation"
 @implementation RLMManagedPropertyAccessor
+// Most types don't need to distinguish between promote and init so provide a default
++ (void)promote:(RLMProperty *)property on:(RLMObjectBase *)parent {
+    [self initialize:property on:parent];
+}
 @end
 #pragma clang diagnostic pop

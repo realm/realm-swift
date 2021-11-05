@@ -9,19 +9,19 @@ import RealmSwift
 
 //: I. Define the data entities
 
-@objcMembers class Person: Object {
-    dynamic var name = ""
-    dynamic var age = 0
-    dynamic var spouse: Person?
-    let cars = List<Car>()
+class Person: Object {
+    @Persisted var name: String
+    @Persisted var age: Int
+    @Persisted var spouse: Person?
+    @Persisted var cars: List<Car>
 
     override var description: String { return "Person {\(name), \(age), \(spouse?.name ?? "nil")}" }
 }
 
-@objcMembers class Car: Object {
-    dynamic var brand = ""
-    dynamic var name: String?
-    dynamic var year = 0
+class Car: Object {
+    @Persisted var brand: String
+    @Persisted var name: String?
+    @Persisted var year: Int
 
     override var description: String { return "Car {\(brand), \(name), \(year)}" }
 }

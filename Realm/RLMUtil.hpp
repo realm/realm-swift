@@ -56,8 +56,8 @@ BOOL RLMIsObjectValidForProperty(id obj, RLMProperty *prop);
 // throw an exception if the object is not a valid value for the property
 void RLMValidateValueForProperty(id obj, RLMObjectSchema *objectSchema,
                                  RLMProperty *prop, bool validateObjects=false);
-BOOL RLMValidateValue(id value, RLMPropertyType type, bool optional, bool collection,
-                      NSString *objectClassName);
+id RLMValidateValue(id value, RLMPropertyType type, bool optional, bool collection,
+                    NSString *objectClassName);
 
 void RLMThrowTypeError(id obj, RLMObjectSchema *objectSchema, RLMProperty *prop);
 
@@ -101,6 +101,7 @@ static inline T RLMCoerceToNil(__unsafe_unretained T obj) {
 }
 
 id<NSFastEnumeration> RLMAsFastEnumeration(id obj);
+id RLMBridgeSwiftValue(id obj);
 
 bool RLMIsSwiftObjectClass(Class cls);
 

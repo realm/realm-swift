@@ -39,6 +39,7 @@ NS_ASSUME_NONNULL_BEGIN
 #define RLM_ERROR_ENUM(type, name, domain) NS_ENUM(type, name)
 #endif
 
+#define REALM_HIDDEN __attribute__((visibility("hidden")))
 
 #pragma mark - Enums
 

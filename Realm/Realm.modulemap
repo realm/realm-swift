@@ -22,6 +22,7 @@ framework module Realm {
         header "RLMSchema_Private.h"
         header "RLMSet_Private.h"
         header "RLMSwiftCollectionBase.h"
+        header "RLMSwiftProperty.h"
         header "RLMSwiftValueStorage.h"
         header "RLMSyncConfiguration_Private.h"
         header "RLMSyncUtil_Private.h"

@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#if canImport(Combine)
+#if !(os(iOS) && (arch(i386) || arch(arm)))
 import XCTest
 import Combine
 import RealmSwift
@@ -355,6 +355,55 @@ class CombineObjectPublisherTests: CombinePublisherTestCase {
         sema.wait()
         XCTAssertNotNil(prev)
         XCTAssertEqual(prev!.intCol, 100)
+    }
+
+    func testChangeSetSubscribeOnKeyPath() {
+        let obj = try! realm.write { realm.create(SwiftObject.self, value: ["intCol": 0, "boolCol": false]) }
+        let sema = DispatchSemaphore(value: 0)
+
+        var prev: SwiftObject?
+        cancellable = changesetPublisher(obj, keyPaths: ["intCol"])
+            .subscribe(on: subscribeOnQueue)
+            .assertNoFailure()
+            .sink(receiveCompletion: { _ in sema.signal() }, receiveValue: { change in
+                if case .change(let o, let properties) = change {
+                    XCTAssertNotEqual(self.obj, o)
+                    XCTAssertEqual(properties.count, 1)
+                    XCTAssertEqual(properties[0].name, "intCol")
+                    if let prev = prev {
+                        XCTAssertEqual(properties[0].oldValue as? Int, prev.intCol)
+                    }
+                    XCTAssertEqual(properties[0].newValue as? Int, o.intCol)
+                    prev = o.freeze()
+                    XCTAssertEqual(prev!.intCol, o.intCol)
+
+                    if o.intCol >= 100 {
+                        sema.signal()
+                    }
+                } else {
+                    XCTFail("Expected .change but got \(change)")
+                }
+            })
+
+        for _ in 0..<100 {
+            try! realm.write { obj.intCol += 1 }
+        }
+        sema.wait()
+
+        // The following two lines check if a write outside of
+        // the intended keyPath does *not* publish a
+        // change.
+        // If a changeset is published for boolCol, the test would fail
+        // above when checking for property name "intCol".
+        try! realm.write { obj.boolCol = true }
+        try! realm.write { obj.intCol += 1 }
+        sema.wait()
+
+        try! realm.write { realm.delete(obj) }
+        sema.wait()
+
+        XCTAssertNotNil(prev)
+        XCTAssertEqual(prev!.intCol, 101)
     }
 
     func testChangeSetReceiveOn() {
@@ -700,6 +749,11 @@ class CombineObjectPublisherTests: CombinePublisherTestCase {
 private protocol CombineTestCollection {
     static func getCollection(_ realm: Realm) -> Self
     func appendObject()
+    func modifyObject()
+    // Keypath which is modified by `modifyObject`
+    var includedKeyPath: [String] { get }
+    // Keypath which is not modified by `modifyObject`
+    var excludedKeyPath: [String] { get }
 }
 
 // MARK: - List, MutableSet
@@ -881,6 +935,45 @@ private class CombineCollectionPublisherTests<Collection: RealmCollection>: Comb
             sema.wait()
         }
     }
+    func testSubscribeOnKeyPath() {
+        var ex = expectation(description: "initial notification")
+
+        cancellable = collection.collectionPublisher(keyPaths: collection.includedKeyPath)
+            .subscribe(on: subscribeOnQueue)
+            .assertNoFailure()
+            .sink { _ in
+                ex.fulfill()
+        }
+        waitForExpectations(timeout: 0.1, handler: nil)
+
+        ex = expectation(description: "change notification")
+        try! realm.write { collection.appendObject() }
+        waitForExpectations(timeout: 0.1, handler: nil)
+
+        ex = expectation(description: "change notification")
+        try! realm.write { collection.modifyObject() }
+        waitForExpectations(timeout: 0.1, handler: nil)
+    }
+    func testSubscribeOnKeyPathNoChange() {
+        var ex = expectation(description: "initial notification")
+
+        cancellable = collection.collectionPublisher(keyPaths: collection.excludedKeyPath)
+            .subscribe(on: subscribeOnQueue)
+            .assertNoFailure()
+            .sink { _ in
+                ex.fulfill()
+        }
+        waitForExpectations(timeout: 0.1, handler: nil)
+
+        ex = expectation(description: "change notification")
+        try! realm.write { collection.appendObject() }
+        waitForExpectations(timeout: 0.1, handler: nil)
+
+        ex = expectation(description: "no change notification")
+        ex.isInverted = true
+        try! realm.write { collection.modifyObject() }
+        waitForExpectations(timeout: 0.1, handler: nil)
+    }
 
     func testSubscribeOnWithToken() {
         let sema = DispatchSemaphore(value: 0)
@@ -963,6 +1056,45 @@ private class CombineCollectionPublisherTests<Collection: RealmCollection>: Comb
             try! realm.write { collection.appendObject() }
             sema.wait()
         }
+    }
+
+    func testChangeSetSubscribeOnKeyPath() {
+        var ex = expectation(description: "initial notification")
+
+        cancellable = collection.changesetPublisher(keyPaths: collection.includedKeyPath)
+            .subscribe(on: subscribeOnQueue)
+            .sink { _ in
+                ex.fulfill()
+        }
+        waitForExpectations(timeout: 0.1, handler: nil)
+
+        ex = expectation(description: "change notification")
+        try! realm.write { collection.appendObject() }
+        waitForExpectations(timeout: 0.1, handler: nil)
+
+        ex = expectation(description: "change notification")
+        try! realm.write { collection.modifyObject() }
+        waitForExpectations(timeout: 0.1, handler: nil)
+    }
+
+    func testChangeSetSubscribeOnKeyPathNoChange() {
+        var ex = expectation(description: "initial notification")
+
+        cancellable = collection.changesetPublisher(keyPaths: collection.excludedKeyPath)
+            .subscribe(on: subscribeOnQueue)
+            .sink { _ in
+                ex.fulfill()
+        }
+        waitForExpectations(timeout: 0.1, handler: nil)
+
+        ex = expectation(description: "change notification")
+        try! realm.write { collection.appendObject() }
+        waitForExpectations(timeout: 0.1, handler: nil)
+
+        ex = expectation(description: "no change notification")
+        ex.isInverted = true
+        try! realm.write { collection.modifyObject() }
+        waitForExpectations(timeout: 0.1, handler: nil)
     }
 
     func testChangeSetSubscribeOnWithToken() {
@@ -1229,7 +1361,7 @@ private class CombineCollectionPublisherTests<Collection: RealmCollection>: Comb
     }
 }
 
-extension Results: CombineTestCollection where Element: Object {
+extension Results: CombineTestCollection where Element == SwiftObject {
     static func getCollection(_ realm: Realm) -> Results<Element> {
         return realm.objects(Element.self)
     }
@@ -1237,22 +1369,46 @@ extension Results: CombineTestCollection where Element: Object {
     func appendObject() {
         realm?.create(Element.self, value: [])
     }
+
+    func modifyObject() {
+        self.first!.intCol += 1
+    }
+
+    var includedKeyPath: [String] {
+        return ["intCol"]
+    }
+
+    var excludedKeyPath: [String] {
+        return ["stringCol"]
+    }
 }
 
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 class ResultsPublisherTests: TestCase {
     override class var defaultTestSuite: XCTestSuite {
-        return CombineCollectionPublisherTests<Results<SwiftIntObject>>.testSuite("Results")
+        return CombineCollectionPublisherTests<Results<SwiftObject>>.testSuite("Results")
     }
 }
 
-extension List: CombineTestCollection where Element == SwiftIntObject {
+extension List: CombineTestCollection where Element == SwiftObject {
     static func getCollection(_ realm: Realm) -> List<Element> {
-        return try! realm.write { realm.create(SwiftArrayPropertyObject.self, value: []).intArray }
+        return try! realm.write { realm.create(SwiftArrayPropertyObject.self, value: []).swiftObjArray }
     }
 
     func appendObject() {
         append(realm!.create(Element.self, value: []))
+    }
+
+    func modifyObject() {
+        self.first!.intCol += 1
+    }
+
+    var includedKeyPath: [String] {
+        return ["intCol"]
+    }
+
+    var excludedKeyPath: [String] {
+        return ["stringCol"]
     }
 }
 
@@ -1260,24 +1416,36 @@ extension List: CombineTestCollection where Element == SwiftIntObject {
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 class ManagedListPublisherTests: TestCase {
     override class var defaultTestSuite: XCTestSuite {
-        return CombineCollectionPublisherTests<List<SwiftIntObject>>.testSuite("List")
+        return CombineCollectionPublisherTests<List<SwiftObject>>.testSuite("List")
     }
 }
 
-extension MutableSet: CombineTestCollection where Element == SwiftIntObject {
+extension MutableSet: CombineTestCollection where Element == SwiftObject {
     static func getCollection(_ realm: Realm) -> MutableSet<Element> {
-        return try! realm.write { realm.create(SwiftMutableSetPropertyObject.self, value: []).intSet }
+        return try! realm.write { realm.create(SwiftMutableSetPropertyObject.self, value: []).swiftObjSet }
     }
 
     func appendObject() {
         insert(realm!.create(Element.self, value: []))
+    }
+
+    func modifyObject() {
+        self.first!.intCol += 1
+    }
+
+    var includedKeyPath: [String] {
+        return ["intCol"]
+    }
+
+    var excludedKeyPath: [String] {
+        return ["stringCol"]
     }
 }
 
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 class ManagedMutableSetPublisherTests: TestCase {
     override class var defaultTestSuite: XCTestSuite {
-        return CombineCollectionPublisherTests<MutableSet<SwiftIntObject>>.testSuite("MutableSet")
+        return CombineCollectionPublisherTests<MutableSet<SwiftObject>>.testSuite("MutableSet")
     }
 }
 
@@ -1289,6 +1457,18 @@ extension LinkingObjects: CombineTestCollection where Element == SwiftOwnerObjec
     func appendObject() {
         realm!.create(SwiftOwnerObject.self, value: ["", realm!.objects(SwiftDogObject.self).first!])
     }
+
+    func modifyObject() {
+        self.first!.name += "concat"
+    }
+
+    var includedKeyPath: [String] {
+        return ["name"]
+    }
+
+    var excludedKeyPath: [String] {
+        return ["dog"]
+    }
 }
 
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
@@ -1298,7 +1478,7 @@ class LinkingObjectsPublisherTests: TestCase {
     }
 }
 
-extension AnyRealmCollection: CombineTestCollection where Element == SwiftIntObject {
+extension AnyRealmCollection: CombineTestCollection where Element == SwiftObject {
     static func getCollection(_ realm: Realm) -> AnyRealmCollection<Element> {
         return AnyRealmCollection(realm.objects(Element.self))
     }
@@ -1306,12 +1486,24 @@ extension AnyRealmCollection: CombineTestCollection where Element == SwiftIntObj
     func appendObject() {
         realm?.create(Element.self, value: [])
     }
+
+    func modifyObject() {
+        self.first!.intCol += 1
+    }
+
+    var includedKeyPath: [String] {
+        return ["intCol"]
+    }
+
+    var excludedKeyPath: [String] {
+        return ["stringCol"]
+    }
 }
 
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 class AnyRealmCollectionPublisherTests: TestCase {
     override class var defaultTestSuite: XCTestSuite {
-        return CombineCollectionPublisherTests<AnyRealmCollection<SwiftIntObject>>.testSuite("AnyRealmCollection")
+        return CombineCollectionPublisherTests<AnyRealmCollection<SwiftObject>>.testSuite("AnyRealmCollection")
     }
 }
 
@@ -1495,6 +1687,47 @@ private class CombineMapPublisherTests<Collection: RealmKeyedCollection>: Combin
         }
     }
 
+    func testSubscribeOnKeyPath() {
+        var ex = expectation(description: "initial notification")
+
+        cancellable = collection.collectionPublisher(keyPaths: collection.includedKeyPath)
+            .subscribe(on: subscribeOnQueue)
+            .assertNoFailure()
+            .sink { _ in
+                ex.fulfill()
+        }
+        waitForExpectations(timeout: 0.1, handler: nil)
+
+        ex = expectation(description: "change notification")
+        try! realm.write { collection.appendObject() }
+        waitForExpectations(timeout: 0.1, handler: nil)
+
+        ex = expectation(description: "change notification")
+        try! realm.write { collection.modifyObject() }
+        waitForExpectations(timeout: 0.1, handler: nil)
+    }
+
+    func testSubscribeOnKeyPathNoChange() {
+        var ex = expectation(description: "initial notification")
+
+        cancellable = collection.collectionPublisher(keyPaths: collection.excludedKeyPath)
+            .subscribe(on: subscribeOnQueue)
+            .assertNoFailure()
+            .sink { _ in
+                ex.fulfill()
+        }
+        waitForExpectations(timeout: 0.1, handler: nil)
+
+        ex = expectation(description: "change notification")
+        try! realm.write { collection.appendObject() }
+        waitForExpectations(timeout: 0.1, handler: nil)
+
+        ex = expectation(description: "no change notification")
+        ex.isInverted = true
+        try! realm.write { collection.modifyObject() }
+        waitForExpectations(timeout: 0.1, handler: nil)
+    }
+
     func testSubscribeOnWithToken() {
         let sema = DispatchSemaphore(value: 0)
         var calls = 0
@@ -1576,6 +1809,45 @@ private class CombineMapPublisherTests<Collection: RealmKeyedCollection>: Combin
             try! realm.write { collection.appendObject() }
             sema.wait()
         }
+    }
+
+    func testChangeSetSubscribeOnKeyPath() {
+        var ex = expectation(description: "initial notification")
+
+        cancellable = collection.changesetPublisher(keyPaths: collection.includedKeyPath)
+            .subscribe(on: subscribeOnQueue)
+            .sink { _ in
+                ex.fulfill()
+        }
+        waitForExpectations(timeout: 0.1, handler: nil)
+
+        ex = expectation(description: "change notification")
+        try! realm.write { collection.appendObject() }
+        waitForExpectations(timeout: 0.1, handler: nil)
+
+        ex = expectation(description: "change notification")
+        try! realm.write { collection.modifyObject() }
+        waitForExpectations(timeout: 0.1, handler: nil)
+    }
+
+    func testChangeSetSubscribeOnKeyPathNoChange() {
+        var ex = expectation(description: "initial notification")
+
+        cancellable = collection.changesetPublisher(keyPaths: collection.excludedKeyPath)
+            .subscribe(on: subscribeOnQueue)
+            .sink { _ in
+                ex.fulfill()
+        }
+        waitForExpectations(timeout: 0.1, handler: nil)
+
+        ex = expectation(description: "change notification")
+        try! realm.write { collection.appendObject() }
+        waitForExpectations(timeout: 0.1, handler: nil)
+
+        ex = expectation(description: "no change notification")
+        ex.isInverted = true
+        try! realm.write { collection.modifyObject() }
+        waitForExpectations(timeout: 0.1, handler: nil)
     }
 
     func testChangeSetSubscribeOnWithToken() {
@@ -1842,21 +2114,33 @@ private class CombineMapPublisherTests<Collection: RealmKeyedCollection>: Combin
     }
 }
 
-extension Map: CombineTestCollection where Key == String, Value == SwiftIntObject? {
+extension Map: CombineTestCollection where Key == String, Value == SwiftObject? {
     static func getCollection(_ realm: Realm) -> Map<Key, Value> {
-        return try! realm.write { realm.create(SwiftMapPropertyObject.self, value: []).intMap }
+        return try! realm.write { realm.create(SwiftMapPropertyObject.self, value: []).swiftObjectMap }
     }
 
     func appendObject() {
         let key = UUID().uuidString
-        self[key] = realm!.create(SwiftIntObject.self, value: [])
+        self[key] = realm!.create(SwiftObject.self, value: [])
+    }
+
+    func modifyObject() {
+        self.values.first!!.intCol += 1
+    }
+
+    var includedKeyPath: [String] {
+        return ["intCol"]
+    }
+
+    var excludedKeyPath: [String] {
+        return ["stringCol"]
     }
 }
 
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 class ManagedMapPublisherTests: TestCase {
     override class var defaultTestSuite: XCTestSuite {
-        return CombineMapPublisherTests<Map<String, SwiftIntObject?>>.testSuite("Map")
+        return CombineMapPublisherTests<Map<String, SwiftObject?>>.testSuite("Map")
     }
 }
 

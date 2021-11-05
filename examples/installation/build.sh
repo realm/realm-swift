@@ -106,7 +106,7 @@ xctest() {
         )
     elif [[ $NAME == SwiftPackageManager* ]]; then
         if [ -n "$sha" ]; then
-            sed -i '' 's@branch = "master"@branch = "'"$sha"'"@' "$DIRECTORY/$NAME.xcodeproj/project.pbxproj"
+            ex '+%s@branch = "master"@branch = "'"$sha"'"@' -scwq "$DIRECTORY/$NAME.xcodeproj/project.pbxproj"
         fi
     elif [[ $LANG == swift* ]]; then
         download_zip_if_needed swift
@@ -133,7 +133,9 @@ xctest() {
     local scheme=(-scheme "$NAME")
 
     # Ensure that dynamic framework tests try to use the correct version of the prebuilt libraries.
-    sed -i '' 's@/realm-swift-latest@/realm-swift-latest/'"${REALM_XCODE_VERSION}"'@' "$DIRECTORY/$NAME.xcodeproj/project.pbxproj"
+    if grep '/realm-swift-latest' "$DIRECTORY/$NAME.xcodeproj/project.pbxproj"; then
+        ex '+%s@/realm-swift-latest@/realm-swift-latest/'"${REALM_XCODE_VERSION}"'@' -scwq "$DIRECTORY/$NAME.xcodeproj/project.pbxproj"
+    fi
 
     xcodebuild "${project[@]}" "${scheme[@]}" clean build "${destination[@]}" "${code_signing_flags[@]}"
     if [[ $PLATFORM != watchos ]]; then

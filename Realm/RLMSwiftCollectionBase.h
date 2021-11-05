@@ -22,12 +22,16 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface RLMSwiftCollectionBase : NSObject <NSFastEnumeration>
+@interface RLMSwiftCollectionBase : NSProxy <NSFastEnumeration>
 @property (nonatomic, strong) id<RLMCollection> _rlmCollection;
 
 - (instancetype)init;
 + (Class)_backingCollectionType;
 - (instancetype)initWithCollection:(id<RLMCollection>)collection;
+
+- (nullable id)valueForKey:(NSString *)key;
+- (nullable id)valueForKeyPath:(NSString *)keyPath;
+- (BOOL)isEqual:(nullable id)object;
 @end
 
 @interface RLMLinkingObjectsHandle : NSObject
@@ -37,6 +41,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)thaw;
 
 @property (nonatomic, readonly) RLMLinkingObjects *results;
+@property (nonatomic, readonly) NSString *_propertyKey;
+@property (nonatomic, readonly) BOOL _isLegacyProperty;
 @end
 
 NS_ASSUME_NONNULL_END

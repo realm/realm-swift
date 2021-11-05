@@ -3,8 +3,8 @@
 import PackageDescription
 import Foundation
 
-let coreVersionStr = "11.0.3"
-let cocoaVersionStr = "10.8.1"
+let coreVersionStr = "11.6.0"
+let cocoaVersionStr = "10.19.0"
 
 let coreVersionPieces = coreVersionStr.split(separator: ".")
 let coreVersionExtra = coreVersionPieces[2].split(separator: "-")
@@ -261,6 +261,8 @@ let package = Package(
                 "fileformat-pre-null.realm",
                 "mixed_tests.py",
                 "set_tests.py",
+                "SwiftUISyncTestHost",
+                "SwiftUISyncTestHostUITests"
             ],
             cxxSettings: testCxxSettings
         ),
@@ -275,7 +277,10 @@ let package = Package(
             name: "RealmSwiftTests",
             dependencies: ["RealmSwift", "RealmTestSupport"],
             path: "RealmSwift/Tests",
-            exclude: ["RealmSwiftTests-Info.plist"],
+            exclude: [
+                "RealmSwiftTests-Info.plist",
+                "QueryTests.swift.gyb"
+            ],
             swiftSettings: testSwiftSettings
         ),
 
@@ -295,7 +300,8 @@ let package = Package(
                  "SwiftSyncTestCase.swift",
                  "TimeoutProxyServer.swift",
                  "WatchTestUtility.swift",
-                 "RealmServer.swift"
+                 "RealmServer.swift",
+                 "SwiftServerObjects.swift"
             ]
         ),
         objectServerTestTarget(
@@ -304,7 +310,9 @@ let package = Package(
                 "SwiftObjectServerTests.swift",
                 "SwiftCollectionSyncTests.swift",
                 "SwiftObjectServerPartitionTests.swift",
-                "SwiftFlexibleSyncServerTests.swift"
+                "SwiftFlexibleSyncServerTests.swift",
+                "SwiftUIServerTests.swift",
+                "SwiftMongoClientTests.swift"
             ]
         ),
         objectServerTestTarget(
@@ -314,7 +322,7 @@ let package = Package(
                 "RLMCollectionSyncTests.mm",
                 "RLMObjectServerPartitionTests.mm",
                 "RLMObjectServerTests.mm",
-                "RLMWatchTestUtility.m",
+                "RLMWatchTestUtility.m"
             ]
         )
     ],

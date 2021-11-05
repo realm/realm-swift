@@ -29,6 +29,7 @@ namespace {
 struct SwiftValueStorageBase {
     virtual id get() = 0;
     virtual void set(id) = 0;
+    virtual NSString *propertyName() = 0;
     virtual ~SwiftValueStorageBase() = default;
 };
 
@@ -54,6 +55,10 @@ public:
         }
     }
 
+    NSString *propertyName() override {
+        return _property;
+    }
+
 private:
     id _value;
     NSString *_property;
@@ -77,6 +82,11 @@ public:
 
     void set(__unsafe_unretained id const value) override {
         _object.set_property_value(_ctx, _propertyName, value ?: NSNull.null);
+    }
+
+    NSString *propertyName() override {
+        // Should never be called on a managed object.
+        REALM_UNREACHABLE();
     }
 
 private:
@@ -164,4 +174,9 @@ void RLMInitializeUnmanagedSwiftValueStorage(__unsafe_unretained RLMSwiftValueSt
     }
     static_cast<UnmanagedSwiftValueStorage&>(*self->_impl).attach(parent, prop.name);
 }
+
+NSString *RLMSwiftValueStorageGetPropertyName(RLMSwiftValueStorage *const self) {
+    return self->_impl->propertyName();
+}
+
 @end

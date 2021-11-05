@@ -41,8 +41,8 @@
 @end
 
 @implementation RLMArray {
-@public
     // Backing array when this instance is unmanaged
+    @public
     NSMutableArray *_backingCollection;
 }
 #pragma mark - Initializers
@@ -78,6 +78,7 @@
 - (void)setParent:(RLMObjectBase *)parentObject property:(RLMProperty *)property {
     _parentObject = parentObject;
     _key = property.name;
+    _isLegacyProperty = property.isLegacy;
 }
 
 #pragma mark - Convenience wrappers used for all RLMArray types
@@ -362,6 +363,22 @@ static void validateArrayBounds(__unsafe_unretained RLMArray *const ar,
     });
 }
 
+- (void)replaceAllObjectsWithObjects:(NSArray *)objects {
+    if (_backingCollection.count) {
+        changeArray(self, NSKeyValueChangeRemoval, NSMakeRange(0, _backingCollection.count), ^{
+            [_backingCollection removeAllObjects];
+        });
+    }
+    if (![objects respondsToSelector:@selector(count)] || !objects.count) {
+        return;
+    }
+    changeArray(self, NSKeyValueChangeInsertion, NSMakeRange(0, objects.count), ^{
+        for (id object in objects) {
+            [_backingCollection addObject:object];
+        }
+    });
+}
+
 - (RLMResults *)objectsWhere:(NSString *)predicateFormat, ... {
     va_list args;
     va_start(args, predicateFormat);
@@ -509,6 +526,19 @@ static void validateArrayBounds(__unsafe_unretained RLMArray *const ar,
 }
 
 - (NSArray *)objectsAtIndexes:(NSIndexSet *)indexes {
+    NSUInteger count = self.count;
+    __block BOOL didStop = NO;
+    [indexes enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL * _Nonnull stop) {
+        if (idx < 0 || idx >= count || count == 0) {
+            *stop = YES;
+            didStop = YES;
+        }
+    }];
+
+    if (didStop) {
+        return nil;
+    }
+
     if (!_backingCollection) {
         _backingCollection = [NSMutableArray new];
     }
@@ -517,9 +547,12 @@ static void validateArrayBounds(__unsafe_unretained RLMArray *const ar,
 
 - (BOOL)isEqual:(id)object {
     if (auto array = RLMDynamicCast<RLMArray>(object)) {
-        return !array.realm
-        && ((_backingCollection.count == 0 && array->_backingCollection.count == 0)
-            || [_backingCollection isEqual:array->_backingCollection]);
+        if (array.realm) {
+            return NO;
+        }
+        NSArray *otherCollection = array->_backingCollection;
+        return (_backingCollection.count == 0 && otherCollection.count == 0)
+            || [_backingCollection isEqual:otherCollection];
     }
     return NO;
 }
@@ -560,6 +593,17 @@ static void validateArrayBounds(__unsafe_unretained RLMArray *const ar,
     @throw RLMException(@"This method may only be called on RLMArray instances retrieved from an RLMRealm");
 }
 
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMArray *, RLMCollectionChange *, NSError *))block
+                                      keyPaths:(NSArray<NSString *> *)keyPaths
+                                         queue:(nullable dispatch_queue_t)queue {
+    @throw RLMException(@"This method may only be called on RLMArray instances retrieved from an RLMRealm");
+}
+
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMArray *, RLMCollectionChange *, NSError *))block
+                                      keyPaths:(NSArray<NSString *> *)keyPaths {
+    @throw RLMException(@"This method may only be called on RLMArray instances retrieved from an RLMRealm");
+}
+
 - (instancetype)freeze {
     @throw RLMException(@"This method may only be called on RLMArray instances retrieved from an RLMRealm");
 }
@@ -595,6 +639,13 @@ static void validateArrayBounds(__unsafe_unretained RLMArray *const ar,
 - (NSString *)descriptionWithMaxDepth:(NSUInteger)depth {
     return RLMDescriptionWithMaxDepth(@"RLMArray", self, depth);
 }
+
+#pragma mark - Key Path Strings
+
+- (NSString *)propertyKey {
+    return _key;
+}
+
 @end
 
 @implementation RLMSortDescriptor

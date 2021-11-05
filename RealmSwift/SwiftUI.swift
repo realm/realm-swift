@@ -910,16 +910,18 @@ private class ObservableAsyncOpenStorage: ObservableObject {
 
     class func configureApp(appId: String? = nil, withTimeout timeout: UInt? = nil) -> App {
         var app: App
-        let appsIds = RLMApp.appIds()
         if let appId = appId {
             app = App(id: appId)
-        } else if appsIds.count == 1, // Check if there is a singular cached app
-            let cachedAppId = appsIds.first as? String {
-            app = App(id: cachedAppId)
-        } else if appsIds.count > 1 {
-            throwRealmException("Cannot AsyncOpen the Realm because more than one appId was found. When using multiple Apps you must explicitly pass an appId to indicate which to use.")
         } else {
-            throwRealmException("Cannot AsyncOpen the Realm because no appId was found. You must either explicitly pass an appId or initialize an App before displaying your View.")
+            // Check if there is a singular cached app
+            let cachedApps = RLMApp.allApps()
+            if cachedApps.count > 1 {
+                throwRealmException("Cannot AsyncOpen the Realm because more than one appId was found. When using multiple Apps you must explicitly pass an appId to indicate which to use.")
+            }
+            guard let cachedApp = cachedApps.first else {
+                throwRealmException("Cannot AsyncOpen the Realm because no appId was found. You must either explicitly pass an appId or initialize an App before displaying your View.")
+            }
+            app = cachedApp
         }
 
         // Setup timeout if needed
@@ -1409,7 +1411,7 @@ extension View {
     - Note: See ``SwiftUI/View/searchable(text:placement:prompt:suggestions)``
             <https://developer.apple.com/documentation/swiftui/form/searchable(text:placement:prompt:suggestions:)-6h6qo>
             for more information on searchable view modifier.
-
+     
     - parameter text: The text to display and edit in the search field.
     - parameter collection: The collection to be filtered.
     - parameter keyPath: The key path to the property which will be used to filter

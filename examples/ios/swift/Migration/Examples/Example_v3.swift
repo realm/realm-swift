@@ -37,15 +37,15 @@ let schemaVersion = 3
 // Here we create `Pet` and migrate its data from `Dog` so simulate renaming the table.
 
 class Pet: Object {
-    @objc enum Kind: Int, RealmEnum {
+    enum Kind: Int, PersistableEnum {
         case unspecified
         case dog
         case chicken
         case cow
     }
 
-    @objc dynamic var name = ""
-    @objc dynamic var kind = Kind.unspecified
+    @Persisted var name = ""
+    @Persisted var kind = Kind.unspecified
 
     convenience init(name: String, kind: Kind) {
         self.init()
@@ -55,9 +55,9 @@ class Pet: Object {
 }
 
 class Person: Object {
-    @objc dynamic var fullName = ""
-    @objc dynamic var age = 0
-    let pets = List<Pet>()
+    @Persisted var fullName = ""
+    @Persisted var age = 0
+    @Persisted var pets: List<Pet>
     convenience init(fullName: String, age: Int) {
         self.init()
         self.fullName = fullName

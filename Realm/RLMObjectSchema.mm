@@ -40,7 +40,7 @@ using namespace realm;
 @end
 
 @implementation RLMObjectSchema {
-    NSArray *_swiftGenericProperties;
+    std::string _objectStoreName;
 }
 
 - (instancetype)initWithClassName:(NSString *)objectClassName objectClass:(Class)objectClass properties:(NSArray *)properties {
@@ -70,13 +70,18 @@ using namespace realm;
 }
 
 - (void)_propertiesDidChange {
+    _primaryKeyProperty = nil;
     NSMutableDictionary *map = [NSMutableDictionary dictionaryWithCapacity:_properties.count + _computedProperties.count];
     NSUInteger index = 0;
     for (RLMProperty *prop in _properties) {
         prop.index = index++;
         map[prop.name] = prop;
         if (prop.isPrimary) {
-            self.primaryKeyProperty = prop;
+            if (_primaryKeyProperty) {
+                @throw RLMException(@"Properties '%@' and '%@' are both marked as the primary key of '%@'",
+                                    prop.name, _primaryKeyProperty.name, _className);
+            }
+            _primaryKeyProperty = prop;
         }
     }
     index = 0;
@@ -85,6 +90,24 @@ using namespace realm;
         map[prop.name] = prop;
     }
     _allPropertiesByName = map;
+
+    if (RLMIsSwiftObjectClass(_accessorClass)) {
+        NSMutableArray *genericProperties = [NSMutableArray new];
+        for (RLMProperty *prop in _properties) {
+            if (prop.swiftAccessor) {
+                [genericProperties addObject:prop];
+            }
+        }
+        // Currently all computed properties are Swift generics
+        [genericProperties addObjectsFromArray:_computedProperties];
+
+        if (genericProperties.count) {
+            _swiftGenericProperties = genericProperties;
+        }
+        else {
+            _swiftGenericProperties = nil;
+        }
+    }
 }
 
 
@@ -302,9 +325,16 @@ using namespace realm;
     return [self.objectClass _realmObjectName] ?: _className;
 }
 
+- (std::string const&)objectStoreName {
+    if (_objectStoreName.empty()) {
+        _objectStoreName = self.objectName.UTF8String;
+    }
+    return _objectStoreName;
+}
+
 - (realm::ObjectSchema)objectStoreCopy:(RLMSchema *)schema {
     ObjectSchema objectSchema;
-    objectSchema.name = self.objectName.UTF8String;
+    objectSchema.name = self.objectStoreName;
     objectSchema.primary_key = _primaryKeyProperty ? _primaryKeyProperty.columnName.UTF8String : "";
     objectSchema.is_embedded = ObjectSchema::IsEmbedded(_isEmbedded);
     for (RLMProperty *prop in _properties) {
@@ -353,28 +383,6 @@ using namespace realm;
     schema.unmanagedClass = RLMObject.class;
 
     return schema;
-}
-
-- (NSArray *)swiftGenericProperties {
-    if (_swiftGenericProperties) {
-        return _swiftGenericProperties;
-    }
-
-    // Check if it's a swift class using the obj-c API
-    if (!RLMIsSwiftObjectClass(_accessorClass)) {
-        return _swiftGenericProperties = @[];
-    }
-
-    NSMutableArray *genericProperties = [NSMutableArray new];
-    for (RLMProperty *prop in _properties) {
-        if (prop.swiftAccessor) {
-            [genericProperties addObject:prop];
-        }
-    }
-    // Currently all computed properties are Swift generics
-    [genericProperties addObjectsFromArray:_computedProperties];
-
-    return _swiftGenericProperties = genericProperties;
 }
 
 @end

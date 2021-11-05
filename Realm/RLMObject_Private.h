@@ -57,9 +57,13 @@ typedef void (^RLMObjectNotificationCallback)(RLMObjectBase *_Nullable object,
                                               NSError *_Nullable error);
 
 FOUNDATION_EXTERN RLMNotificationToken *RLMObjectBaseAddNotificationBlock(RLMObjectBase *obj,
+                                                                          NSArray<NSString *> *_Nullable key_paths,
                                                                           dispatch_queue_t _Nullable queue,
                                                                           RLMObjectNotificationCallback block);
-RLMNotificationToken *RLMObjectAddNotificationBlock(RLMObjectBase *obj, RLMObjectChangeBlock block,
+
+RLMNotificationToken *RLMObjectAddNotificationBlock(RLMObjectBase *obj,
+                                                    RLMObjectChangeBlock block,
+                                                    NSArray<NSString *> *_Nullable key_paths,
                                                     dispatch_queue_t _Nullable queue);
 
 // Returns whether the class is a descendent of RLMObjectBase
@@ -80,13 +84,15 @@ FOUNDATION_EXTERN uint64_t RLMObjectBaseGetCombineId(RLMObjectBase *);
 
 // An accessor object which is used to interact with Swift properties from obj-c
 @interface RLMManagedPropertyAccessor : NSObject
-// Initialize the given property on a *managed* object
-+ (void)initialize:(RLMProperty *)property on:(RLMObjectBase *)parent;
 // Perform any initialization required for KVO on a *unmanaged* object
 + (void)observe:(RLMProperty *)property on:(RLMObjectBase *)parent;
-// Read the value of the property
+// Initialize the given property on a *managed* object which previous was unmanaged
++ (void)promote:(RLMProperty *)property on:(RLMObjectBase *)parent;
+// Initialize the given property on a newly created *managed* object
++ (void)initialize:(RLMProperty *)property on:(RLMObjectBase *)parent;
+// Read the value of the property, on either kind of object
 + (id)get:(RLMProperty *)property on:(RLMObjectBase *)parent;
-// Set the property to the given value
+// Set the property to the given value, on either kind of object
 + (void)set:(RLMProperty *)property on:(RLMObjectBase *)parent to:(id)value;
 @end
 

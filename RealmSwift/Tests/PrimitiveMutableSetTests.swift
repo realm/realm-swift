@@ -215,7 +215,7 @@ class MinMaxPrimitiveMutableSetTests<O: ObjectFactory, V: ValueFactory>: Primiti
     }
 }
 
-class OptionalMinMaxPrimitiveMutableSetTests<O: ObjectFactory, V: ValueFactory>: PrimitiveMutableSetTestsBase<O, V> where V.W: MinMaxType {
+class OptionalMinMaxPrimitiveMutableSetTests<O: ObjectFactory, V: ValueFactory>: PrimitiveMutableSetTestsBase<O, V> where V.W: MinMaxType, V.W: _DefaultConstructible {
     // V.T and V.W? are the same thing, but the type system doesn't know that
     // and the protocol constraint is on V.W
     var mutableSet2: MutableSet<V.W?> {
@@ -257,7 +257,7 @@ class AddablePrimitiveMutableSetTests<O: ObjectFactory, V: ValueFactory>: Primit
     }
 }
 
-class OptionalAddablePrimitiveMutableSetTests<O: ObjectFactory, V: ValueFactory>: PrimitiveMutableSetTestsBase<O, V> where V.W: AddableType {
+class OptionalAddablePrimitiveMutableSetTests<O: ObjectFactory, V: ValueFactory>: PrimitiveMutableSetTestsBase<O, V> where V.W: AddableType, V.W: _DefaultConstructible {
     // V.T and V.W? are the same thing, but the type system doesn't know that
     // and the protocol constraint is on V.W
     var mutableSet2: MutableSet<V.W?> {
@@ -301,7 +301,7 @@ class SortablePrimitiveMutableSetTests<O: ObjectFactory, V: ValueFactory>: Primi
     }
 }
 
-class OptionalSortablePrimitiveMutableSetTests<O: ObjectFactory, V: ValueFactory>: PrimitiveMutableSetTestsBase<O, V> where V.W: Comparable {
+class OptionalSortablePrimitiveMutableSetTests<O: ObjectFactory, V: ValueFactory>: PrimitiveMutableSetTestsBase<O, V> where V.W: Comparable, V.W: _DefaultConstructible {
     func testSorted() {
         var shuffled = values!
         shuffled.removeFirst()

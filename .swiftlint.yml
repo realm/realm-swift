@@ -12,23 +12,41 @@ identifier_name:
     warning: 0
     error: 0
   excluded:
+    - _constructForTesting()
+    - _constructPredicate()
     - _id
+    - _name(for:)
     - _nilValue()
     - _nsError
     - _nsErrorDomain
     - _observe(_:)
+    - _observe(_:_:)
+    - _observe(_:_:_:)
+    - _observe(_:on:_:)
+    - _publisher
     - _realmColumnNames()
     - _realmObjectName()
+    - _rlmCollection
     - _rlmCollection()
+    - _rlmDefaultValue(_:)
     - _rlmFromRawValue(_:)
+    - _rlmGetProperty(_:_:)
+    - _rlmGetPropertyOptional(_:_:)
+    - _rlmKeyPathRecorder(with:)
     - _rlmOptional
     - _rlmPopulateProperty(_:)
     - _rlmRequireObjc
+    - _rlmRequiresCaching
+    - _rlmSetAccessor(_:)
+    - _rlmSetProperty(_:_:_:)
     - _rlmToRawValue(_:)
     - _rlmType
     - id
     - pk
     - to
+type_name:
+  excluded:
+    - _RealmValue
 disabled_rules:
   - block_based_kvo
   # SwiftLint expects a space following a double slash comment: "//".
@@ -42,6 +60,7 @@ disabled_rules:
   - force_cast
   - force_try
   - function_body_length
+  - function_parameter_count
   - line_length
   - nesting
   - syntactic_sugar

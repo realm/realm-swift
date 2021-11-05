@@ -50,7 +50,7 @@ struct ContentViewRow: View {
 
     var body: some View {
         VStack {
-            Text(verbatim: object.uuid).fixedSize()
+            Text(verbatim: object.uuid.uuidString).fixedSize()
             Text(object.date.description).font(.footnote).frame(alignment: .leading)
         }
     }

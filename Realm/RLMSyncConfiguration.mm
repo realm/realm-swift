@@ -145,8 +145,9 @@ RLMSyncSystemErrorKind errorKindForSyncError(SyncError error) {
             s.str()
         );
         _config->stop_policy = translateStopPolicy(stopPolicy);
-        RLMApp *app = user.app;
-        _config->error_handler = [app](std::shared_ptr<SyncSession> errored_session, SyncError error) {
+        RLMSyncManager *manager = [user.app syncManager];
+        __weak RLMSyncManager *weakManager = manager;
+        _config->error_handler = [weakManager](std::shared_ptr<SyncSession> errored_session, SyncError error) {
             NSString *recoveryPath;
             RLMSyncErrorActionToken *token;
             for (auto& pair : error.user_info) {
@@ -169,7 +170,9 @@ RLMSyncSystemErrorKind errorKindForSyncError(SyncError error) {
                     break;
                 }
                 case RLMSyncSystemErrorKindPermissionDenied: {
-                    custom = @{kRLMSyncErrorActionTokenKey: token};
+                    if (token) {
+                        custom = @{kRLMSyncErrorActionTokenKey: token};
+                    }
                     break;
                 }
                 case RLMSyncSystemErrorKindUser:
@@ -183,8 +186,10 @@ RLMSyncSystemErrorKind errorKindForSyncError(SyncError error) {
                     break;
             }
 
-            RLMSyncManager *manager = [app syncManager];
-            auto errorHandler = manager.errorHandler;
+            RLMSyncErrorReportingBlock errorHandler;
+            @autoreleasepool {
+                errorHandler = weakManager.errorHandler;
+            }
             if (!shouldMakeError || !errorHandler) {
                 return;
             }
@@ -196,7 +201,6 @@ RLMSyncSystemErrorKind errorKindForSyncError(SyncError error) {
         };
         _config->client_resync_mode = realm::ClientResyncMode::Manual;
 
-        RLMSyncManager *manager = [user.app syncManager];
         if (NSString *authorizationHeaderName = manager.authorizationHeaderName) {
             _config->authorization_header_name.emplace(authorizationHeaderName.UTF8String);
         }

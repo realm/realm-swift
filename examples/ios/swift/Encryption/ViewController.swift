@@ -23,7 +23,7 @@ import UIKit
 
 // Model definition
 class EncryptionObject: Object {
-    @objc dynamic var stringProp = ""
+    @Persisted var stringProp: String
 }
 
 class ViewController: UIViewController {
@@ -55,14 +55,14 @@ class ViewController: UIViewController {
         // Opening with wrong key fails since it decrypts to the wrong thing
         autoreleasepool {
             do {
-                let configuration = Realm.Configuration(encryptionKey: "1234567890123456789012345678901234567890123456789012345678901234".data(using: String.Encoding.utf8, allowLossyConversion: false))
+                let configuration = Realm.Configuration(encryptionKey: "1234567890123456789012345678901234567890123456789012345678901234".data(using: .utf8, allowLossyConversion: false))
                 _ = try Realm(configuration: configuration)
             } catch {
                 log(text: "Open with wrong key: \(error)")
             }
         }
 
-        // Opening wihout supplying a key at all fails
+        // Opening without supplying a key at all fails
         autoreleasepool {
             do {
                 _ = try Realm()

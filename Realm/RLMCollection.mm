@@ -24,6 +24,7 @@
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObjectStore.h"
 #import "RLMObject_Private.hpp"
+#import "RLMObservation.hpp"
 #import "RLMProperty_Private.h"
 #import "RLMSet_Private.hpp"
 #import "RLMSwiftCollectionBase.h"
@@ -216,11 +217,11 @@ NSArray *RLMCollectionValueForKey(Collection& collection, NSString *key, RLMClas
     }
 
     RLMObject *accessor = RLMCreateManagedAccessor(info.rlmObjectSchema.accessorClass, &info);
+    auto prop = info.rlmObjectSchema[key];
 
-    // List properties need to be handled specially since we need to create a
-    // new List each time
+    // Collection properties need to be handled specially since we need to create
+    // a new collection each time
     if (info.rlmObjectSchema.isSwiftClass) {
-        auto prop = info.rlmObjectSchema[key];
         if (prop.collection && prop.swiftAccessor) {
             // Grab the actual class for the generic collection from an instance of it
             // so that we can make instances of the collection without creating a new
@@ -236,9 +237,12 @@ NSArray *RLMCollectionValueForKey(Collection& collection, NSString *key, RLMClas
         }
     }
 
+    auto swiftAccessor = prop.swiftAccessor;
     for (size_t i = 0; i < count; i++) {
         accessor->_row = collection.get(i);
-        RLMInitializeSwiftAccessorGenerics(accessor);
+        if (swiftAccessor) {
+            [swiftAccessor initialize:prop on:accessor];
+        }
         [array addObject:[accessor valueForKey:key] ?: NSNull.null];
     }
     return array;
@@ -285,9 +289,13 @@ void RLMCollectionSetValueForKey(id<RLMFastEnumerable> collection, NSString *key
     RLMObject *accessor = RLMCreateManagedAccessor(info->rlmObjectSchema.accessorClass, info);
     for (size_t i = 0; i < tv.size(); i++) {
         accessor->_row = tv[i];
-        RLMInitializeSwiftAccessorGenerics(accessor);
+        RLMInitializeSwiftAccessor(accessor, false);
         [accessor setValue:value forKey:key];
     }
+}
+
+void RLMAssignToCollection(id<RLMCollection> collection, id value) {
+    [(id)collection replaceAllObjectsWithObjects:value];
 }
 
 NSString *RLMDescriptionWithMaxDepth(NSString *name,
@@ -461,6 +469,7 @@ struct CollectionCallbackWrapper {
 template<typename RLMCollection>
 RLMNotificationToken *RLMAddNotificationBlock(RLMCollection *collection,
                                               void (^block)(id, RLMCollectionChange *, NSError *),
+                                              NSArray<NSString *> *keyPaths,
                                               dispatch_queue_t queue) {
     RLMRealm *realm = collection.realm;
     if (!realm) {
@@ -468,11 +477,14 @@ RLMNotificationToken *RLMAddNotificationBlock(RLMCollection *collection,
     }
     bool skipFirst = std::is_same_v<RLMCollection, RLMResults>;
     auto token = [[RLMCancellationToken alloc] init];
+    
+    RLMClassInfo *info = collection.objectInfo;
+    realm::KeyPathArray keyPathArray = RLMKeyPathArrayFromStringArray(realm, info, keyPaths);
 
     if (!queue) {
         [realm verifyNotificationsAreSupported:true];
         token->_realm = realm;
-        token->_token = RLMGetBackingCollection(collection).add_notification_callback(CollectionCallbackWrapper{block, collection, skipFirst});
+        token->_token = RLMGetBackingCollection(collection).add_notification_callback(CollectionCallbackWrapper{block, collection, skipFirst}, std::move(keyPathArray));
         return token;
     }
 
@@ -491,7 +503,7 @@ RLMNotificationToken *RLMAddNotificationBlock(RLMCollection *collection,
             return;
         }
         RLMCollection *collection = [realm resolveThreadSafeReference:tsr];
-        token->_token = RLMGetBackingCollection(collection).add_notification_callback(CollectionCallbackWrapper{block, collection, skipFirst});
+        token->_token = RLMGetBackingCollection(collection).add_notification_callback(CollectionCallbackWrapper{block, collection, skipFirst}, std::move(keyPathArray));
     });
     return token;
 }
@@ -499,6 +511,6 @@ RLMNotificationToken *RLMAddNotificationBlock(RLMCollection *collection,
 @end
 
 // Explicitly instantiate the templated function for the two types we'll use it on
-template RLMNotificationToken *RLMAddNotificationBlock<>(RLMManagedArray *, void (^)(id, RLMCollectionChange *, NSError *), dispatch_queue_t);
-template RLMNotificationToken *RLMAddNotificationBlock<>(RLMManagedSet *, void (^)(id, RLMCollectionChange *, NSError *), dispatch_queue_t);
-template RLMNotificationToken *RLMAddNotificationBlock<>(RLMResults *, void (^)(id, RLMCollectionChange *, NSError *), dispatch_queue_t);
+template RLMNotificationToken *RLMAddNotificationBlock<>(RLMManagedArray *, void (^)(id, RLMCollectionChange *, NSError *),  NSArray<NSString *> *, dispatch_queue_t);
+template RLMNotificationToken *RLMAddNotificationBlock<>(RLMManagedSet *, void (^)(id, RLMCollectionChange *, NSError *), NSArray<NSString *> *, dispatch_queue_t);
+template RLMNotificationToken *RLMAddNotificationBlock<>(RLMResults *, void (^)(id, RLMCollectionChange *, NSError *),  NSArray<NSString *> *, dispatch_queue_t);

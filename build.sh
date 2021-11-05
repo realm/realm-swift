@@ -69,6 +69,7 @@ command:
   test-catalyst-swift:  tests RealmSwift Mac Catalyst framework
   test-swiftpm:         tests ObjC and Swift macOS frameworks via SwiftPM
   test-swiftui-ios:         tests SwiftUI framework UI tests
+  test-swiftui-server-osx:  tests Server Sync in SwiftUI
   verify:               verifies docs, osx, osx-swift, ios-static, ios-dynamic, ios-swift, ios-device, swiftui-ios in both Debug and Release configurations, swiftlint
   verify-osx-object-server:  downloads the Realm Object Server and runs the Objective-C and Swift integration tests
   docs:                 builds docs in docs/output
@@ -648,8 +649,7 @@ case "$COMMAND" in
             export ASAN_OPTIONS='check_initialization_order=true:detect_stack_use_after_return=true'
         fi
         xcrun swift package resolve
-        find .build -name views.cpp -delete
-        xcrun swift test --configuration "$(echo "$CONFIGURATION" | tr "[:upper:]" "[:lower:]")" $SANITIZER
+        xcrun swift test -Xcc -g0 --configuration "$(echo "$CONFIGURATION" | tr "[:upper:]" "[:lower:]")" $SANITIZER
         exit 0
         ;;
 
@@ -667,6 +667,11 @@ case "$COMMAND" in
     "test-catalyst-swift")
         export REALM_SDKROOT=iphoneos
         xctest RealmSwift -configuration "$CONFIGURATION" -destination 'platform=macOS,variant=Mac Catalyst' CODE_SIGN_IDENTITY=''
+        exit 0
+        ;;
+
+    "test-swiftui-server-osx")
+        xctest 'SwiftUISyncTestHost' -configuration "$CONFIGURATION" -sdk macosx -destination 'platform=macOS'
         exit 0
         ;;
 
@@ -698,6 +703,7 @@ case "$COMMAND" in
         sh build.sh verify-catalyst
         sh build.sh verify-catalyst-swift
         sh build.sh verify-swiftui-ios
+        sh build.sh verify-swiftui-server-osx
         ;;
 
     "verify-cocoapods")
@@ -775,6 +781,11 @@ case "$COMMAND" in
 
     "verify-swiftui-ios")
         sh build.sh test-swiftui-ios
+        exit 0
+        ;;
+
+    "verify-swiftui-server-osx")
+        sh build.sh test-swiftui-server-osx
         exit 0
         ;;
 
@@ -941,7 +952,7 @@ case "$COMMAND" in
             workspace="${workspace/swift/swift-$REALM_XCODE_VERSION}"
         fi
 
-        examples="Simple TableView Migration Backlink GroupedTableView Encryption"
+        examples="Simple TableView Migration Backlink GroupedTableView Encryption AppClip AppClipParent"
         versions="0 1 2 3 4 5"
         for example in $examples; do
             if [ "$example" = "Migration" ]; then
@@ -1351,11 +1362,11 @@ x.y.z Release notes (yyyy-MM-dd)
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
 ### Compatibility
-* Realm Studio: 10.0.0 or later.
+* Realm Studio: 11.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
-* Carthage release for Swift is built with Xcode 12.5.1.
+* Carthage release for Swift is built with Xcode 13.1.
 * CocoaPods: 1.10 or later.
-* Xcode: 12.2-13.0 beta 1.
+* Xcode: 12.2-13.1.
 
 ### Internal
 * Upgraded realm-core from ? to ?

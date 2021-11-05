@@ -19,20 +19,16 @@
 import Foundation
 import RealmSwift
 
-class DemoObject: Object {
-    @objc dynamic var uuid = UUID().uuidString
-    @objc dynamic var date = NSDate()
-    @objc dynamic var title = ""
+final class DemoObject: Object {
+    @Persisted var uuid: UUID
+    @Persisted var date: Date
+    @Persisted var title: String
 }
 
 /*
  For a more detailed example of SwiftUI List updating, see the ListSwiftUI example target.
  */
 final class DemoObjects: Object {
-    @objc var id = 0
-    let list = RealmSwift.List<DemoObject>()
-
-    override class func primaryKey() -> String? {
-        "id"
-    }
+    @Persisted(primaryKey: true) var id: Int
+    @Persisted var list: List<DemoObject>
 }

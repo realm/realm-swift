@@ -18,7 +18,6 @@
 
 import Foundation
 import SwiftUI
-import RealmSwift
 
 @main
 struct App: SwiftUI.App {

@@ -19,28 +19,20 @@
 import UIKit
 import RealmSwift
 
-
 class Dog: Object {
-    @objc dynamic var name = ""
-    @objc dynamic var age = 0
+    @Persisted var name: String
+    @Persisted var age: Int
     // Define "owners" as the inverse relationship to Person.dogs
-    let owners = LinkingObjects(fromType: Person.self, property: "dogs")
+    @Persisted(originProperty: "dogs") var owners: LinkingObjects<Person>
 }
 
 class Person: Object {
-    @objc dynamic var name = ""
-    let dogs = List<Dog>()
+    @Persisted var name: String
+    @Persisted var dogs: List<Dog>
 }
-
-#if !swift(>=4.2)
-extension UIApplication {
-    typealias LaunchOptionsKey = UIApplicationLaunchOptionsKey
-}
-#endif
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
-
     var window: UIWindow?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
@@ -48,9 +40,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window?.rootViewController = UIViewController()
         window?.makeKeyAndVisible()
 
-        do {
-            try FileManager.default.removeItem(at: Realm.Configuration.defaultConfiguration.fileURL!)
-        } catch {}
+        _ = try! Realm.deleteFiles(for: Realm.Configuration.defaultConfiguration)
 
         let realm = try! Realm()
         try! realm.write {
@@ -61,7 +51,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Log all dogs and their owners using the "owners" inverse relationship
         let allDogs = realm.objects(Dog.self)
         for dog in allDogs {
-            let ownerNames = dog.owners.map { $0.name }
+            let ownerNames = Array(dog.owners.map(\.name))
             print("\(dog.name) has \(ownerNames.count) owners (\(ownerNames))")
         }
         return true

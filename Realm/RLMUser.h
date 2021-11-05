@@ -21,7 +21,7 @@
 #import <Realm/RLMCredentials.h>
 #import <Realm/RLMRealmConfiguration.h>
 
-@class RLMUser, RLMSyncSession, RLMRealm, RLMUserIdentity, RLMAPIKeyAuth, RLMMongoClient, RLMMongoDatabase, RLMMongoCollection;
+@class RLMUser, RLMSyncSession, RLMRealm, RLMUserIdentity, RLMAPIKeyAuth, RLMMongoClient, RLMMongoDatabase, RLMMongoCollection, RLMUserProfile;
 @protocol RLMBSON;
 
 /**
@@ -130,6 +130,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) NSDictionary *customData NS_REFINED_FOR_SWIFT;
 
 /**
+ The profile of the user.
+ */
+@property (nonatomic, readonly) RLMUserProfile *profile;
+
+/**
  Refresh a user's custom data. This will, in effect, refresh the user's auth session.
  */
 - (void)refreshCustomDataWithCompletion:(RLMUserCustomDataBlock)completion;
@@ -228,3 +233,29 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 NS_ASSUME_NONNULL_END
+
+/**
+ A profile for a given User.
+ */
+@interface RLMUserProfile : NSObject
+
+/// The full name of the user.
+@property (nonatomic, readonly, nullable) NSString *name;
+/// The email address of the user.
+@property (nonatomic, readonly, nullable) NSString *email;
+/// A URL to the user's profile picture.
+@property (nonatomic, readonly, nullable) NSString *pictureURL;
+/// The first name of the user.
+@property (nonatomic, readonly, nullable) NSString *firstName;
+/// The last name of the user.
+@property (nonatomic, readonly, nullable) NSString *lastName;
+/// The gender of the user.
+@property (nonatomic, readonly, nullable) NSString *gender;
+/// The birthdate of the user.
+@property (nonatomic, readonly, nullable) NSString *birthday;
+/// The minimum age of the user.
+@property (nonatomic, readonly, nullable) NSString *minAge;
+/// The maximum age of the user.
+@property (nonatomic, readonly, nullable) NSString *maxAge;
+
+@end

@@ -28,6 +28,7 @@
 #import "RLMSyncConfiguration_Private.h"
 #import "RLMUtil.hpp"
 #import "RLMApp_Private.hpp"
+#import "RLMChildProcessEnvironment.h"
 
 #import <realm/object-store/sync/sync_manager.hpp>
 #import <realm/object-store/sync/sync_session.hpp>
@@ -590,7 +591,7 @@ static NSURL *syncDirectoryForChildProcess() {
     NSAssert(session, @"Cannot call with invalid partition value");
     XCTestExpectation *ex = expectation ?: [self expectationWithDescription:@"Wait for download completion"];
     __block NSError *theError = nil;
-    BOOL queued = [session waitForDownloadCompletionOnQueue:nil callback:^(NSError *err) {
+    BOOL queued = [session waitForDownloadCompletionOnQueue:dispatch_get_global_queue(0, 0) callback:^(NSError *err) {
         theError = err;
         [ex fulfill];
     }];
@@ -609,7 +610,7 @@ static NSURL *syncDirectoryForChildProcess() {
     NSAssert(session, @"Cannot call with invalid Realm");
     XCTestExpectation *ex = [self expectationWithDescription:@"Wait for upload completion"];
     __block NSError *completionError;
-    BOOL queued = [session waitForUploadCompletionOnQueue:nil callback:^(NSError *error) {
+    BOOL queued = [session waitForUploadCompletionOnQueue:dispatch_get_global_queue(0, 0) callback:^(NSError *error) {
         completionError = error;
         [ex fulfill];
     }];
@@ -674,9 +675,12 @@ static NSURL *syncDirectoryForChildProcess() {
     if (auto ids = NSProcessInfo.processInfo.environment[@"RLMParentAppIds"]) {
         _appIds = [ids componentsSeparatedByString:@","];   //take the one array for split the string
     }
-    [NSFileManager.defaultManager removeItemAtURL:self.clientDataRoot error:nil];
-    [NSFileManager.defaultManager createDirectoryAtURL:self.clientDataRoot
-                           withIntermediateDirectories:YES attributes:nil error:nil];
+    NSURL *clientDataRoot = self.clientDataRoot;
+    [NSFileManager.defaultManager removeItemAtURL:clientDataRoot error:nil];
+    NSError *error;
+    [NSFileManager.defaultManager createDirectoryAtURL:clientDataRoot
+                           withIntermediateDirectories:YES attributes:nil error:&error];
+    XCTAssertNil(error);
 }
 
 - (void)tearDown {
@@ -684,72 +688,71 @@ static NSURL *syncDirectoryForChildProcess() {
     [super tearDown];
 }
 
-- (void)setupSyncManager {
-    static NSString *s_appId;
-    if (self.isParent && s_appId) {
-        _appId = s_appId;
-    }
-    else {
-        NSError *error;
-        _appId = NSProcessInfo.processInfo.environment[@"RLMParentAppId"] ?: [RealmServer.shared createAppAndReturnError:&error];
-        if (error) {
-            NSLog(@"Failed to create app: %@", error);
-            abort();
-        }
-
-        if (self.isParent) {
-            s_appId = _appId;
-        }
-    }
-
-    _app = [RLMApp appWithId:_appId configuration:self.defaultAppConfiguration rootDirectory:self.clientDataRoot];
-
-    RLMSyncManager *syncManager = self.app.syncManager;
-    syncManager.logLevel = RLMSyncLogLevelTrace;
-    syncManager.userAgent = self.name;
-}
-
 - (NSString *)appId {
     if (!_appId) {
-        [self setupSyncManager];
+        static NSString *s_appId;
+        if (self.isParent && s_appId) {
+            _appId = s_appId;
+        }
+        else {
+            NSError *error;
+            _appId = NSProcessInfo.processInfo.environment[@"RLMParentAppId"] ?: [RealmServer.shared createAppAndReturnError:&error];
+            if (error) {
+                NSLog(@"Failed to create app: %@", error);
+                abort();
+            }
+
+            if (self.isParent) {
+                s_appId = _appId;
+            }
+        }
     }
     return _appId;
 }
 
 - (RLMApp *)app {
     if (!_app) {
-        [self setupSyncManager];
+        _app = [RLMApp appWithId:self.appId configuration:self.defaultAppConfiguration rootDirectory:self.clientDataRoot];
+        RLMSyncManager *syncManager = self.app.syncManager;
+        syncManager.logLevel = RLMSyncLogLevelTrace;
+        syncManager.userAgent = self.name;
     }
     return _app;
 }
 
 - (void)resetSyncManager {
-    if (!_appId) {
-        return;
-    }
+    _app = nil;
+    [self resetAppCache];
+}
 
+- (void)resetAppCache {
+    NSArray<RLMApp *> *apps = [RLMApp allApps];
     NSMutableArray<XCTestExpectation *> *exs = [NSMutableArray new];
-    [self.app.allUsers enumerateKeysAndObjectsUsingBlock:^(NSString *, RLMUser *user, BOOL *) {
-        XCTestExpectation *ex = [self expectationWithDescription:@"Wait for logout"];
-        [exs addObject:ex];
-        [user logOutWithCompletion:^(NSError *) {
-            [ex fulfill];
-        }];
+    for (RLMApp *app : apps) @autoreleasepool {
+        [app.allUsers enumerateKeysAndObjectsUsingBlock:^(NSString *, RLMUser *user, BOOL *) {
+            XCTestExpectation *ex = [self expectationWithDescription:@"Wait for logout"];
+            [exs addObject:ex];
+            [user logOutWithCompletion:^(NSError *) {
+                [ex fulfill];
+            }];
 
-        // Sessions are removed from the user asynchronously after a logout.
-        // We need to wait for this to happen before calling resetForTesting as
-        // that expects all sessions to be cleaned up first.
-        if (user.allSessions.count) {
-            [exs addObject:[self expectationForPredicate:[NSPredicate predicateWithFormat:@"allSessions.@count == 0"]
-                                     evaluatedWithObject:user handler:nil]];
-        }
-    }];
+            // Sessions are removed from the user asynchronously after a logout.
+            // We need to wait for this to happen before calling resetForTesting as
+            // that expects all sessions to be cleaned up first.
+            if (user.allSessions.count) {
+                [exs addObject:[self expectationForPredicate:[NSPredicate predicateWithFormat:@"allSessions.@count == 0"]
+                                         evaluatedWithObject:user handler:nil]];
+            }
+        }];
+    }
 
     if (exs.count) {
         [self waitForExpectations:exs timeout:60.0];
     }
 
-    [self.app.syncManager resetForTesting];
+    for (RLMApp *app : apps) {
+        [app.syncManager resetForTesting];
+    }
     [RLMApp resetAppCache];
 }
 

@@ -80,6 +80,7 @@
 - (void)setParent:(RLMObjectBase *)parentObject property:(RLMProperty *)property {
     _parentObject = parentObject;
     _key = property.name;
+    _isLegacyProperty = property.isLegacy;
 }
 
 #pragma mark - Convenience wrappers used for all RLMSet types
@@ -256,6 +257,18 @@ static void validateSetBounds(__unsafe_unretained RLMSet *const set,
     RLMSetValidateMatchingObjectType(self, object);
     changeSet(self, ^{
         [_backingCollection removeObject:object];
+    });
+}
+
+- (void)replaceAllObjectsWithObjects:(NSArray *)objects {
+    changeSet(self, ^{
+        [_backingCollection removeAllObjects];
+        if (!objects || (id)objects == NSNull.null) {
+            return;
+        }
+        for (id object in objects) {
+            [_backingCollection addObject:object];
+        }
     });
 }
 
@@ -449,6 +462,12 @@ void RLMSetValidateMatchingObjectType(__unsafe_unretained RLMSet *const set,
     }
 }
 
+#pragma mark - Key Path Strings
+
+- (NSString *)propertyKey {
+    return _key;
+}
+
 #pragma mark - Methods unsupported on unmanaged RLMSet instances
 
 #pragma clang diagnostic push
@@ -474,8 +493,20 @@ void RLMSetValidateMatchingObjectType(__unsafe_unretained RLMSet *const set,
 - (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMSet *, RLMCollectionChange *, NSError *))block {
     return [self addNotificationBlock:block queue:nil];
 }
+
 - (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMSet *, RLMCollectionChange *, NSError *))block
                                          queue:(nullable dispatch_queue_t)queue {
+    @throw RLMException(@"This method may only be called on RLMSet instances retrieved from an RLMRealm");
+}
+
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMSet *, RLMCollectionChange *, NSError *))block
+                                      keyPaths:(nullable NSArray<NSString *> *)keyPaths
+                                         queue:(nullable dispatch_queue_t)queue {
+    @throw RLMException(@"This method may only be called on RLMSet instances retrieved from an RLMRealm");
+}
+
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMSet *, RLMCollectionChange *, NSError *))block
+                                      keyPaths:(nullable NSArray<NSString *> *)keyPaths {
     @throw RLMException(@"This method may only be called on RLMSet instances retrieved from an RLMRealm");
 }
 

@@ -19,8 +19,8 @@
 import RealmSwift
 import SwiftUI
 
-@objcMembers class Reminder: EmbeddedObject, ObjectKeyIdentifiable {
-    @objc enum Priority: Int, RealmEnum, CaseIterable, Identifiable, CustomStringConvertible {
+class Reminder: EmbeddedObject, ObjectKeyIdentifiable {
+    enum Priority: Int, PersistableEnum, CaseIterable, Identifiable, CustomStringConvertible {
         var id: Int { self.rawValue }
 
         case low, medium, high
@@ -33,18 +33,18 @@ import SwiftUI
             }
         }
     }
-    dynamic var title = ""
-    dynamic var notes = ""
-    dynamic var isFlagged = false
-    dynamic var date = Date()
-    dynamic var isComplete = false
-    dynamic var priority: Priority = .low
+    @Persisted var title: String
+    @Persisted var notes: String
+    @Persisted var isFlagged: Bool
+    @Persisted var date: Date
+    @Persisted var isComplete: Bool
+    @Persisted var priority: Priority = .low
 }
 
-@objcMembers class ReminderList: Object, ObjectKeyIdentifiable {
-    dynamic var name = "New List"
-    dynamic var icon: String = "list.bullet"
-    var reminders = RealmSwift.List<Reminder>()
+class ReminderList: Object, ObjectKeyIdentifiable {
+    @Persisted var name = "New List"
+    @Persisted var icon: String = "list.bullet"
+    @Persisted var reminders: RealmSwift.List<Reminder>
 }
 
 struct FocusableTextField: UIViewRepresentable {
@@ -182,14 +182,27 @@ struct ReminderListResultsView: View {
     @Binding var searchFilter: String
 
     var body: some View {
-        List {
+        let list = List {
             ForEach(reminders) { list in
                 NavigationLink(destination: ReminderListView(list: list)) {
                     ReminderListRowView(list: list).tag(list)
                 }.accessibilityIdentifier(list.name)
             }.onDelete(perform: $reminders.remove)
-        }.onChange(of: searchFilter) { value in
-            $reminders.filter = value.isEmpty ? nil : NSPredicate(format: "name CONTAINS[c] %@", value)
+        }
+        if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *) {
+            list
+                .searchable(text: $searchFilter,
+                            collection: $reminders,
+                            keyPath: \.name) {
+                    ForEach(reminders) { remindersFiltered in
+                        Text(remindersFiltered.name).searchCompletion(remindersFiltered.name)
+                    }
+                }
+        } else {
+            list
+                .onChange(of: searchFilter) { value in
+                    $reminders.filter = value.isEmpty ? nil : NSPredicate(format: "name CONTAINS[c] %@", value)
+                }
         }
     }
 }
@@ -255,7 +268,11 @@ struct ContentView: View {
     var body: some View {
         NavigationView {
             VStack {
-                SearchView(searchFilter: $searchFilter)
+                if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *) {
+                    // Don't add a SearchView in case searchable is available
+                } else {
+                    SearchView(searchFilter: $searchFilter)
+                }
                 ReminderListResultsView(searchFilter: $searchFilter)
                 Spacer()
                 Footer()

@@ -426,6 +426,77 @@ __attribute__((warn_unused_result));
                                          queue:(nullable dispatch_queue_t)queue
 __attribute__((warn_unused_result));
 
+/**
+ Registers a block to be called each time the dictionary changes.
+
+ The block will be asynchronously called with the initial dictionary, and then
+ called again after each write transaction which changes any of the key-value in
+ the dictionary or which objects are in the results.
+
+ The `changes` parameter will be `nil` the first time the block is called.
+ For each call after that, it will contain information about
+ which keys in the dictionary were added or modified. If a write transaction
+ did not modify any objects in the dictionary, the block is not called at all.
+
+ If an error occurs the block will be called with `nil` for the results
+ parameter and a non-`nil` error. Currently the only errors that can occur are
+ when opening the Realm on the background worker thread.
+
+ Notifications are delivered on the given queue. If the queue is blocked and
+ notifications can't be delivered instantly, multiple notifications may be
+ coalesced into a single notification.
+
+ You must retain the returned token for as long as you want updates to continue
+ to be sent to the block. To stop receiving updates, call `-invalidate` on the token.
+
+ @warning This method cannot be called when the containing Realm is read-only or frozen.
+ @warning The queue must be a serial queue.
+
+ @param block The block to be called whenever a change occurs.
+ @param keyPaths The block will be called for changes occuring on these keypaths. If no
+ key paths are given, notifications are delivered for every property key path.
+ @return A token which must be held for as long as you want updates to be delivered.
+ */
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMDictionary<RLMKeyType, RLMObjectType> *_Nullable dictionary,
+                                                         RLMDictionaryChange *_Nullable changes,
+                                                         NSError *_Nullable error))block
+                                      keyPaths:(nullable NSArray<NSString *> *)keyPaths
+                                         queue:(nullable dispatch_queue_t)queue
+__attribute__((warn_unused_result));
+
+/**
+ Registers a block to be called each time the dictionary changes.
+
+ The block will be asynchronously called with the initial dictionary, and then
+ called again after each write transaction which changes any of the key-value in
+ the dictionary or which objects are in the results.
+
+ The `changes` parameter will be `nil` the first time the block is called.
+ For each call after that, it will contain information about
+ which keys in the dictionary were added or modified. If a write transaction
+ did not modify any objects in the dictionary, the block is not called at all.
+
+ If an error occurs the block will be called with `nil` for the results
+ parameter and a non-`nil` error. Currently the only errors that can occur are
+ when opening the Realm on the background worker thread.
+
+ You must retain the returned token for as long as you want updates to continue
+ to be sent to the block. To stop receiving updates, call `-invalidate` on the token.
+
+ @warning This method cannot be called when the containing Realm is read-only or frozen.
+ @warning The queue must be a serial queue.
+
+ @param block The block to be called whenever a change occurs.
+ @param keyPaths The block will be called for changes occuring on these keypaths. If no
+ key paths are given, notifications are delivered for every property key path.
+ @return A token which must be held for as long as you want updates to be delivered.
+ */
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMDictionary<RLMKeyType, RLMObjectType> *_Nullable dictionary,
+                                                         RLMDictionaryChange *_Nullable changes,
+                                                         NSError *_Nullable error))block
+                                      keyPaths:(nullable NSArray<NSString *> *)keyPaths
+__attribute__((warn_unused_result));
+
 #pragma mark - Freeze
 
 /**

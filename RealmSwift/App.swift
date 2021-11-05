@@ -43,6 +43,11 @@ Realm Cloud user registration & password functions
 */
 public typealias EmailPasswordAuth = RLMEmailPasswordAuth
 
+/**
+ An object representing the social profile of a User.
+ */
+public typealias UserProfile = RLMUserProfile
+
 /// A block type used to report an error
 public typealias EmailPasswordAuthOptionalErrorBlock = RLMEmailPasswordAuthOptionalErrorBlock
 extension EmailPasswordAuth {
@@ -156,7 +161,7 @@ extension App {
     }
 }
 
-#if canImport(Combine)
+#if !(os(iOS) && (arch(i386) || arch(arm)))
 import Combine
 
 /// :nodoc:
@@ -541,3 +546,40 @@ public extension APIKeyAuth {
         }
     }
 }
+
+#if swift(>=5.5) && canImport(_Concurrency)
+@available(macOS 12.0, tvOS 15.0, iOS 15.0, watchOS 8.0, *)
+extension EmailPasswordAuth {
+    /// Resets the password of an email identity using the
+    /// password reset function set up in the application.
+    /// - Parameters:
+    ///   - email: The email address of the user.
+    ///   - password: The desired new password.
+    ///   - args: A list of arguments passed in as a BSON array.
+    public func callResetPasswordFunction(email: String,
+                                          password: String,
+                                          args: [AnyBSON]) async throws {
+        return try await withCheckedThrowingContinuation { continuation in
+            callResetPasswordFunction(email: email, password: password, args: args) { error in
+                if let error = error {
+                    continuation.resume(with: .failure(error))
+                } else {
+                    continuation.resume(with: .success(()))
+                }
+            }
+        }
+    }
+}
+
+@available(macOS 12.0, tvOS 15.0, iOS 15.0, watchOS 8.0, *)
+extension App {
+    /// Login to a user for the Realm app.
+    /// @param credentials The credentials identifying the user.
+    /// @returns A publisher that eventually return `User` or `Error`.
+    public func login(credentials: Credentials) async throws -> User {
+        return try await withCheckedThrowingContinuation { continuation in
+            self.login(credentials: credentials, continuation.resume)
+        }
+    }
+}
+#endif
