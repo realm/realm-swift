@@ -15,7 +15,6 @@
  // limitations under the License.
  //
  ////////////////////////////////////////////////////////////////////////////
-
 import Foundation
 
 #if !(os(iOS) && (arch(i386) || arch(arm)))
@@ -108,7 +107,6 @@ private func createEquatableBinding<T: ThreadConfined, V: Equatable>(
 }
 
 // MARK: SwiftUIKVO
-
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 @objc(RLMSwiftUIKVO) internal final class SwiftUIKVO: NSObject {
     /// Objects must have observers removed before being added to a realm.
@@ -234,7 +232,6 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
 
 
 // MARK: - StateRealmObject
-
 /// A property wrapper type that instantiates an observable object.
 ///
 /// Create a state realm object in a ``SwiftUI/View``, ``SwiftUI/App``, or
@@ -342,7 +339,6 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
 }
 
 // MARK: ObservedResults
-
 /// A property wrapper type that retrieves results from a Realm.
 ///
 /// The results use the realm configuration provided by
@@ -437,7 +433,6 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
 }
 
 // MARK: ObservedRealmObject
-
 /// A property wrapper type that subscribes to an observable Realm `Object` or `List` and
 /// invalidates a view whenever the observable object changes.
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
@@ -537,7 +532,6 @@ extension Binding where Value: ObjectBase & ThreadConfined {
 }
 
 // MARK: - BoundCollection
-
 /// :nodoc:
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 public protocol BoundCollection {
@@ -622,7 +616,6 @@ extension Binding: BoundCollection where Value: RealmCollection {
 }
 
 // MARK: - BoundMap
-
 /// :nodoc:
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 public protocol BoundMap {
@@ -710,11 +703,9 @@ extension ThreadConfined where Self: ObjectBase {
     /**
      Create a `Binding` for a given property, allowing for
      automatically transacted reads and writes behind the scenes.
-
      This is a convenience method for SwiftUI views (e.g., TextField, DatePicker)
      that require a `Binding` to be passed in. SwiftUI will automatically read/write
      from the binding.
-
      - parameter keyPath The key path to the member property.
      - returns A `Binding` to the member property.
      */
@@ -907,19 +898,20 @@ private class ObservableAsyncOpenStorage: ObservableObject {
     }
 
     // MARK: - AutoOpen & AsyncOpen Helper
-
     class func configureApp(appId: String? = nil, withTimeout timeout: UInt? = nil) -> App {
         var app: App
-        let appsIds = RLMApp.appIds()
         if let appId = appId {
             app = App(id: appId)
-        } else if appsIds.count == 1, // Check if there is a singular cached app
-            let cachedAppId = appsIds.first {
-            app = App(id: cachedAppId)
-        } else if appsIds.count > 1 {
-            throwRealmException("Cannot AsyncOpen the Realm because more than one appId was found. When using multiple Apps you must explicitly pass an appId to indicate which to use.")
         } else {
-            throwRealmException("Cannot AsyncOpen the Realm because no appId was found. You must either explicitly pass an appId or initialize an App before displaying your View.")
+            // Check if there is a singular cached app
+            let cachedApps = RLMApp.allApps()
+            if cachedApps.count > 1 {
+                throwRealmException("Cannot AsyncOpen the Realm because more than one appId was found. When using multiple Apps you must explicitly pass an appId to indicate which to use.")
+            }
+            guard let cachedApp = cachedApps.first else {
+                throwRealmException("Cannot AsyncOpen the Realm because no appId was found. You must either explicitly pass an appId or initialize an App before displaying your View.")
+            }
+            app = cachedApp
         }
 
         // Setup timeout if needed
@@ -933,7 +925,6 @@ private class ObservableAsyncOpenStorage: ObservableObject {
 }
 
 // MARK: - AsyncOpen
-
 /// A property wrapper type that initiates a `Realm.asyncOpen()` for the current user which asynchronously open a Realm,
 /// and notifies states for the given process
 ///
@@ -1038,10 +1029,8 @@ private class ObservableAsyncOpenStorage: ObservableObject {
 }
 
 // MARK: - AutoOpen
-
 /// `AutoOpen` will try once to asynchronously open a Realm, but in case of no internet connection will return an opened realm
 /// for the given appId and partitionValue which can be used within our view.
-
 /// Add AutoOpen to your ``SwiftUI/View`` or ``SwiftUI/App``,  after a user is already logged in
 /// or if a user is going to be logged in
 ///
@@ -1162,6 +1151,281 @@ extension SwiftUIKVO {
         }
     }
 }
+
+// Adding `_Concurrency` flag is the only way to verify
+// if the BASE SDK contains latest framework updates
+#if swift(>=5.5) && canImport(_Concurrency)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
+extension View {
+    /// Marks this view as searchable, which configures the display of a search field.
+    /// You can provide a collection and a key path to be filtered using the search
+    /// field string provided by the searchable component, this will result in the collection
+    /// querying for all items containing the search field string for the given key path.
+    ///
+    ///     @State var searchString: String
+    ///     @ObservedResults(Reminder.self) var reminders
+    ///
+    ///     List {
+    ///         ForEach(reminders) { reminder in
+    ///             ReminderRowView(reminder: reminder)
+    ///         }
+    ///     }
+    ///     .searchable(text: $searchFilter,
+    ///                 collection: $reminders,
+    ///                 keyPath: \.name) {
+    ///         ForEach(reminders) { remindersFiltered in
+    ///             Text(remindersFiltered.name).searchCompletion(remindersFiltered.name)
+    ///         }
+    ///     }
+    ///
+    /**
+    - Note: See ``SwiftUI/View/searchable(text:placement:prompt)``
+            <https://developer.apple.com/documentation/swiftui/form/searchable(text:placement:prompt:)-6royb>
+            for more information on searchable view modifier.
+    - parameter text: The text to display and edit in the search field.
+    - parameter collection: The collection to be filtered.
+    - parameter keyPath: The key path to the property which will be used to filter
+                the collection, only key paths with `String` type are allowed.
+    - parameter placement: The preferred placement of the search field within the
+                containing view hierarchy.
+    - parameter prompt: A `Text` representing the prompt of the search field
+                which provides users with guidance on what to search for.
+     */
+    public func searchable<T: ObjectBase>(text: Binding<String>, collection: ObservedResults<T>, keyPath: KeyPath<T, String>, placement: SearchFieldPlacement = .automatic, prompt: Text? = nil) -> some View {
+        filterCollection(collection, for: text.wrappedValue, on: keyPath)
+        return searchable(text: text,
+                          placement: placement,
+                          prompt: prompt)
+    }
+
+    /// Marks this view as searchable, which configures the display of a search field.
+    /// You can provide a collection and a key path to be filtered using the search
+    /// field string provided by the searchable component, this will result in the collection
+    /// querying for all items containing the search field string for the given key path.
+    ///
+    ///     @State var searchString: String
+    ///     @ObservedResults(Reminder.self) var reminders
+    ///
+    ///     List {
+    ///         ForEach(reminders) { reminder in
+    ///             ReminderRowView(reminder: reminder)
+    ///         }
+    ///     }
+    ///     .searchable(text: $searchFilter,
+    ///                 collection: $reminders,
+    ///                 keyPath: \.name) {
+    ///         ForEach(reminders) { remindersFiltered in
+    ///             Text(remindersFiltered.name).searchCompletion(remindersFiltered.name)
+    ///         }
+    ///     }
+    ///
+    /**
+    - Note: See ``SwiftUI/View/searchable(text:placement:prompt)``
+            <https://developer.apple.com/documentation/swiftui/form/searchable(text:placement:prompt:)-2ed8t>
+            for more information on searchable view modifier.
+    - parameter text: The text to display and edit in the search field.
+    - parameter collection: The collection to be filtered.
+    - parameter keyPath: The key path to the property which will be used to filter
+                the collection.
+    - parameter placement: The preferred placement of the search field within the
+                containing view hierarchy.
+    - parameter prompt: The key for the localized prompt of the search field
+                which provides users with guidance on what to search for.
+     */
+    public func searchable<T: ObjectBase>(text: Binding<String>, collection: ObservedResults<T>, keyPath: KeyPath<T, String>, placement: SearchFieldPlacement = .automatic, prompt: LocalizedStringKey) -> some View {
+        filterCollection(collection, for: text.wrappedValue, on: keyPath)
+        return searchable(text: text,
+                          placement: placement,
+                          prompt: prompt)
+    }
+
+    /// Marks this view as searchable, which configures the display of a search field.
+    /// You can provide a collection and a key path to be filtered using the search
+    /// field string provided by the searchable component, this will result in the collection
+    /// querying for all items containing the search field string for the given key path.
+    ///
+    ///     @State var searchString: String
+    ///     @ObservedResults(Reminder.self) var reminders
+    ///
+    ///     List {
+    ///         ForEach(reminders) { reminder in
+    ///             ReminderRowView(reminder: reminder)
+    ///         }
+    ///     }
+    ///     .searchable(text: $searchFilter,
+    ///                 collection: $reminders,
+    ///                 keyPath: \.name) {
+    ///         ForEach(reminders) { remindersFiltered in
+    ///             Text(remindersFiltered.name).searchCompletion(remindersFiltered.name)
+    ///         }
+    ///     }
+    ///
+    /**
+    - Note: See ``SwiftUI/View/searchable(text:placement:prompt)``
+            <https://developer.apple.com/documentation/swiftui/form/searchable(text:placement:prompt:)-58egp>
+            for more information on searchable view modifier.
+    - parameter text: The text to display and edit in the search field.
+    - parameter collection: The collection to be filtered.
+    - parameter keyPath: The key path to the property which will be used to filter
+                the collection.
+    - parameter placement: The preferred placement of the search field within the
+                containing view hierarchy.
+    - parameter prompt: A string representing the prompt of the search field
+                which provides users with guidance on what to search for.
+     */
+    public func searchable<T: ObjectBase, S>(text: Binding<String>, collection: ObservedResults<T>, keyPath: KeyPath<T, String>, placement: SearchFieldPlacement = .automatic, prompt: S) -> some View where S: StringProtocol {
+        filterCollection(collection, for: text.wrappedValue, on: keyPath)
+        return searchable(text: text,
+                          placement: placement,
+                          prompt: prompt)
+    }
+
+    /// Marks this view as searchable, which configures the display of a search field.
+    /// You can provide a collection and a key path to be filtered using the search
+    /// field string provided by the searchable component, this will result in the collection
+    /// querying for all items containing the search field string for the given key path.
+    ///
+    ///     @State var searchString: String
+    ///     @ObservedResults(Reminder.self) var reminders
+    ///
+    ///     List {
+    ///         ForEach(reminders) { reminder in
+    ///             ReminderRowView(reminder: reminder)
+    ///         }
+    ///     }
+    ///     .searchable(text: $searchFilter,
+    ///                 collection: $reminders,
+    ///                 keyPath: \.name) {
+    ///         ForEach(reminders) { remindersFiltered in
+    ///             Text(remindersFiltered.name).searchCompletion(remindersFiltered.name)
+    ///         }
+    ///     }
+    ///
+    /**
+    - Note: See ``SwiftUI/View/searchable(text:placement:prompt:suggestions)``
+            <https://developer.apple.com/documentation/swiftui/form/searchable(text:placement:prompt:suggestions:)-94bdu>
+            for more information on searchable view modifier.
+    - parameter text: The text to display and edit in the search field.
+    - parameter collection: The collection to be filtered.
+    - parameter keyPath: The key path to the property which will be used to filter
+                the collection.
+    - parameter placement: The preferred placement of the search field within the
+                containing view hierarchy.
+    - parameter prompt: A `Text` representing the prompt of the search field
+                which provides users with guidance on what to search for.
+    - parameter suggestions: A view builder that produces content that
+                populates a list of suggestions.
+     */
+    public func searchable<T: ObjectBase, S>(text: Binding<String>, collection: ObservedResults<T>, keyPath: KeyPath<T, String>, placement: SearchFieldPlacement = .automatic, prompt: Text? = nil, @ViewBuilder suggestions: () -> S) -> some View where S: View {
+        filterCollection(collection, for: text.wrappedValue, on: keyPath)
+        return searchable(text: text,
+                          placement: placement,
+                          prompt: prompt,
+                          suggestions: suggestions)
+    }
+
+    /// Marks this view as searchable, which configures the display of a search field.
+    /// You can provide a collection and a key path to be filtered using the search
+    /// field string provided by the searchable component, this will result in the collection
+    /// querying for all items containing the search field string for the given key path.
+    ///
+    ///     @State var searchString: String
+    ///     @ObservedResults(Reminder.self) var reminders
+    ///
+    ///     List {
+    ///         ForEach(reminders) { reminder in
+    ///             ReminderRowView(reminder: reminder)
+    ///         }
+    ///     }
+    ///     .searchable(text: $searchFilter,
+    ///                 collection: $reminders,
+    ///                 keyPath: \.name) {
+    ///         ForEach(reminders) { remindersFiltered in
+    ///             Text(remindersFiltered.name).searchCompletion(remindersFiltered.name)
+    ///         }
+    ///     }
+    ///
+    /**
+    - Note: See ``SwiftUI/View/searchable(text:placement:prompt:suggestions)``
+            <https://developer.apple.com/documentation/swiftui/form/searchable(text:placement:prompt:suggestions:)-1mw1m>
+            for more information on searchable view modifier.
+    - parameter text: The text to display and edit in the search field.
+    - parameter collection: The collection to be filtered.
+    - parameter keyPath: The key path to the property which will be used to filter
+                the collection.
+    - parameter placement: The preferred placement of the search field within the
+                containing view hierarchy.
+    - parameter prompt: The key for the localized prompt of the search field
+                which provides users with guidance on what to search for.
+    - parameter suggestions: A view builder that produces content that
+                populates a list of suggestions.
+     */
+    public func searchable<T: ObjectBase, S>(text: Binding<String>, collection: ObservedResults<T>, keyPath: KeyPath<T, String>, placement: SearchFieldPlacement = .automatic, prompt: LocalizedStringKey, @ViewBuilder suggestions: () -> S) -> some View where S: View {
+        filterCollection(collection, for: text.wrappedValue, on: keyPath)
+        return searchable(text: text,
+                          placement: placement,
+                          prompt: prompt,
+                          suggestions: suggestions)
+    }
+
+    /// Marks this view as searchable, which configures the display of a search field.
+    /// You can provide a collection and a key path to be filtered using the search
+    /// field string provided by the searchable component, this will result in the collection
+    /// querying for all items containing the search field string for the given key path.
+    ///
+    ///     @State var searchString: String
+    ///     @ObservedResults(Reminder.self) var reminders
+    ///
+    ///     List {
+    ///         ForEach(reminders) { reminder in
+    ///             ReminderRowView(reminder: reminder)
+    ///         }
+    ///     }
+    ///     .searchable(text: $searchFilter,
+    ///                 collection: $reminders,
+    ///                 keyPath: \.name) {
+    ///         ForEach(reminders) { remindersFiltered in
+    ///             Text(remindersFiltered.name).searchCompletion(remindersFiltered.name)
+    ///         }
+    ///     }
+    ///
+    /**
+    - Note: See ``SwiftUI/View/searchable(text:placement:prompt:suggestions)``
+            <https://developer.apple.com/documentation/swiftui/form/searchable(text:placement:prompt:suggestions:)-6h6qo>
+            for more information on searchable view modifier.
+
+    - parameter text: The text to display and edit in the search field.
+    - parameter collection: The collection to be filtered.
+    - parameter keyPath: The key path to the property which will be used to filter
+                the collection.
+    - parameter placement: The preferred placement of the search field within the
+                containing view hierarchy.
+    - parameter prompt: A string representing the prompt of the search field
+                which provides users with guidance on what to search for.
+    - parameter suggestions: A view builder that produces content that
+                populates a list of suggestions.
+     */
+    public func searchable<T: ObjectBase, V, S>(text: Binding<String>, collection: ObservedResults<T>, keyPath: KeyPath<T, String>, placement: SearchFieldPlacement = .automatic, prompt: S, @ViewBuilder suggestions: () -> V) -> some View where V: View, S: StringProtocol {
+        filterCollection(collection, for: text.wrappedValue, on: keyPath)
+        return searchable(text: text,
+                          placement: placement,
+                          prompt: prompt,
+                          suggestions: suggestions)
+    }
+
+    private func filterCollection<T: ObjectBase>(_ collection: ObservedResults<T>, for text: String, on keyPath: KeyPath<T, String>) {
+        DispatchQueue.main.async {
+            if text.isEmpty {
+                collection.filter = nil
+            } else {
+                var query: Query<String> = Query<T>()[dynamicMember: keyPath]
+                query = query.contains(text)
+                collection.filter = query.predicate
+            }
+        }
+    }
+}
+#endif
 #else
 @objc(RLMSwiftUIKVO) internal final class SwiftUIKVO: NSObject {
     @objc(removeObserversFromObject:) public static func removeObservers(object: NSObject) -> Bool {
