@@ -1,7 +1,7 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+* Conform `@ThreadSafe` and `ThreadSafeReference` to `Sendable`.
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
@@ -39,7 +39,7 @@ x.y.z Release notes (yyyy-MM-dd)
     }
   }
   ```
-* Add an api for a type safe query syntax. This allows you to filter a Realm
+* Add an API for a type safe query syntax. This allows you to filter a Realm
   and collections managed by a Realm with Swift style expressions. Here is a
   brief example:
   ```swift
