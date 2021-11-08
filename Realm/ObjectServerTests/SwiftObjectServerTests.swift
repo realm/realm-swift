@@ -692,6 +692,176 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         XCTAssertEqual(ObjectiveCSupport.convert(object: Credentials.anonymous),
                        RLMCredentials.anonymous())
     }
+    // MARK: - Bundled Sync Realm
+    // TODO test with encryption keys
+
+    // DELETE: Can probably delete this. testWriteCopySynchronizeData covers it.
+    func testWriteCopyNoRedownload() {
+        do {
+            let user1 = try logInUser(for: basicCredentials())
+            if !isParent {
+                populateRealm(user: user1, partitionValue: #function)
+                return
+            }
+
+            // Wait for the child process to upload all the data.
+            // DELETE COMMENT: Does this need to be a child process? I doubt it.
+            executeChild()
+
+            let config = user1.configuration(partitionValue: #function)
+            let realm = try Realm(configuration: config)
+
+            // TODO: remove comments below
+            // Removing these two waits will crash like realm-cocoa#7486
+            // Should the method be updated to do this for the developer?
+            waitForUploads(for: realm)
+            waitForDownloads(for: realm)
+
+            // Create config for where the sync realm will be copied to.
+            // Using a different user to simulate data created by an Admin, which is then copied by other users.
+            let user2 = try logInUser(for: basicCredentials())
+            XCTAssertNotEqual(user1.id, user2.id)
+            let copiedConfig = user2.configuration(partitionValue: #function)
+            try realm.writeCopy(toFile: copiedConfig.fileURL!)
+
+            // Open the copied realm then immediately check count
+            let copiedRealm = try Realm(configuration: copiedConfig)
+            checkCount(expected: SwiftSyncTestCase.bigObjectCount, copiedRealm, SwiftHugeSyncObject.self)
+        } catch {
+            XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
+        }
+    }
+
+    // DELETE: Fails after https://github.com/realm/realm-cocoa/issues/7513
+    func testWriteCopySynchronizeData() {
+        do {
+            let user1 = try logInUser(for: basicCredentials())
+            if !isParent {
+                populateRealm(user: user1, partitionValue: #function)
+                return
+            }
+
+            // Wait for the child process to upload all the data.
+            // DELETE COMMENT: Does this need to be a child process? I doubt it.
+            executeChild()
+
+            // Create config for where the sync realm will be copied to.
+            // Using a different user to simulate data created by an Admin, which is then copied by other users.
+            let user2 = try logInUser(for: basicCredentials())
+            XCTAssertNotEqual(user1.id, user2.id)
+            let copiedConfig = user2.configuration(partitionValue: #function)
+
+            let config = user1.configuration(partitionValue: #function)
+            let realm = try Realm(configuration: config)
+            // TODO: remove comments below
+            // Removing these two waits will crash like realm-cocoa#7486
+            // Should the method be updated to do this for the developer?
+            waitForUploads(for: realm)
+            waitForDownloads(for: realm)
+
+            let pathOnDisk = ObjectiveCSupport.convert(object: copiedConfig).pathOnDisk
+            XCTAssertFalse(FileManager.default.fileExists(atPath: pathOnDisk))
+            try realm.writeCopy(toFile: copiedConfig.fileURL!)
+
+            // Open the copied realm then immediately check count
+            let copiedRealm = try Realm(configuration: copiedConfig)
+            checkCount(expected: SwiftSyncTestCase.bigObjectCount, copiedRealm, SwiftHugeSyncObject.self)
+
+            // Create an object in the copied realm which does not exist in the original realm.
+            copiedRealm.beginWrite()
+            let obj1 = SwiftHugeSyncObject.create()
+            copiedRealm.add(obj1)
+            try copiedRealm.commitWrite()
+
+            // Check if the object created in the copied realm is synced to the original realm
+            waitForUploads(for: copiedRealm)
+            waitForDownloads(for: realm)
+
+            let obj2 = realm.objects(SwiftHugeSyncObject.self).filter("_id == %@", obj1._id).first
+            XCTAssertNotNil(obj2)
+            XCTAssertEqual(obj1.data, obj2?.data)
+
+            // Create an object in the original realm which does not exist in the copied realm.
+            realm.beginWrite()
+            let obj3 = SwiftHugeSyncObject.create()
+            realm.add(obj3)
+            try realm.commitWrite()
+
+            waitForUploads(for: realm)
+            waitForDownloads(for: copiedRealm)
+
+            // Check if the object created in the original realm is synced to the copied realm
+            let obj4 = copiedRealm.objects(SwiftHugeSyncObject.self).filter("_id == %@", obj3._id).first
+            XCTAssertNotNil(obj4)
+            XCTAssertEqual(obj3.data, obj4?.data)
+        } catch {
+            XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
+        }
+    }
+
+    // Bundling a sync realm and opening it with a different partition woubld not be supported
+    // But writeCopy takes a file path, not a configuration. So in theory someone could copy a realm, then
+    // open the new path with a configuration that has a different partition. But there's no way to check if partitions
+    // are different when writeCopy is called with .writeCopy alone(?)
+    func testWriteCopyDifferentPartition() {
+        do {
+            let user1 = try logInUser(for: basicCredentials())
+            if !isParent {
+                populateRealm(user: user1, partitionValue: #function)
+                return
+            }
+
+            // Wait for the child process to upload all the data.
+            // DELETE COMMENT: Does this need to be a child process? I doubt it.
+            executeChild()
+
+            let config = user1.configuration(partitionValue: #function)
+            let realm = try Realm(configuration: config)
+
+            waitForUploads(for: realm)
+            waitForDownloads(for: realm)
+
+            // Create copied config but a different partition
+            var copiedConfig = user1.configuration(partitionValue: "different-partition-value")
+            XCTAssertNotEqual(realm.configuration.syncConfiguration?.partitionValue,
+                              copiedConfig.syncConfiguration?.partitionValue)
+
+            let pathOnDisk = ObjectiveCSupport.convert(object: copiedConfig).pathOnDisk
+            XCTAssertFalse(FileManager.default.fileExists(atPath: pathOnDisk))
+            XCTAssertThrowsError(try realm.writeCopy(toFile: copiedConfig.fileURL!))
+        } catch {
+            XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
+        }
+    }
+
+    // DELETE: We should probably check the state of client changes for the developer
+    func testWriteFailBeforeSynced() {
+        do {
+            let user1 = try logInUser(for: basicCredentials())
+            if !isParent {
+                populateRealm(user: user1, partitionValue: #function)
+                return
+            }
+            // Wait for the child process to upload all the data.
+            executeChild()
+
+            // Create config for where the sync realm will be copied to.
+            // Using a different user to simulate data created by an Admin, which is then copied by other users.
+            let user2 = try logInUser(for: basicCredentials())
+            XCTAssertNotEqual(user1.id, user2.id)
+            let copiedConfig = user2.configuration(partitionValue: #function)
+            let pathOnDisk = ObjectiveCSupport.convert(object: copiedConfig).pathOnDisk
+            XCTAssertFalse(FileManager.default.fileExists(atPath: pathOnDisk))
+
+            let config = user1.configuration(partitionValue: #function)
+            let realm = try Realm(configuration: config)
+
+            // Write copy is called before original realm is fully synced
+            XCTAssertThrowsError(try realm.writeCopy(toFile: copiedConfig.fileURL!), "Could not write file as not all client changes are integrated in server")
+        } catch {
+            XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
+        }
+    }
 
     // MARK: - Authentication
 

@@ -943,18 +943,38 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     return (RLMObject *)RLMCreateObjectInRealmWithValue(self, className, value, RLMUpdatePolicyError);
 }
 
+// CURENT (after 7513)
+//- (BOOL)writeCopyToURL:(NSURL *)fileURL encryptionKey:(NSData *)key error:(NSError **)error {
+//    key = RLMRealmValidatedEncryptionKey(key);
+//    NSString *path = fileURL.path;
+//
+//    try {
+//        _realm->verify_thread();
+//        try {
+//            _realm->read_group().write(path.UTF8String, static_cast<const char *>(key.bytes));
+//        }
+//        catch (...) {
+//            _impl::translate_file_exception(path.UTF8String);
+//        }
+//        return YES;
+//    }
+//    catch (...) {
+//        if (error) {
+//            RLMRealmTranslateException(error);
+//        }
+//        return NO;
+//    }
+//
+//    return NO;
+//}
+
+// BEFORE (the breaking change)
 - (BOOL)writeCopyToURL:(NSURL *)fileURL encryptionKey:(NSData *)key error:(NSError **)error {
     key = RLMRealmValidatedEncryptionKey(key);
     NSString *path = fileURL.path;
 
     try {
-        _realm->verify_thread();
-        try {
-            _realm->read_group().write(path.UTF8String, static_cast<const char *>(key.bytes));
-        }
-        catch (...) {
-            _impl::translate_file_exception(path.UTF8String);
-        }
+        _realm->write_copy(path.UTF8String, {static_cast<const char *>(key.bytes), key.length});
         return YES;
     }
     catch (...) {
