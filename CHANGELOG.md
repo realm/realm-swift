@@ -45,6 +45,10 @@ x.y.z Release notes (yyyy-MM-dd)
   be invoked with `User.delete()`/`[RLMUser deleteWithCompletion:]`.
 * Add `NSCopying` conformance to `RLMDecimal128` and `RLMObjectId`.
 * Add Xcode 13.3 binaries to the release package (and remove 13.0).
+* Conform `@ThreadSafe` and `ThreadSafeReference` to `Sendable`.
+* Add ability to use Swift Query syntax in `@ObservedResults`.
+* Add ability to use Swift Query syntax in `@ObservedResults`, which allows you 
+  to filter results using the where parameter.
 
 ### Fixed
 

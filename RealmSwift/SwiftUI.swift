@@ -425,7 +425,9 @@ extension Projection: _ObservedResultsValue { }
             if let filter = filter {
                 value = value.filter(filter)
             }
-
+            if let `where` = `where` {
+                value = value.where(`where`)
+            }
             setupHasRun = true
         }
 
@@ -436,6 +438,12 @@ extension Projection: _ObservedResultsValue { }
         }
 
         var filter: NSPredicate? {
+            didSet {
+                didSet()
+            }
+        }
+
+        var `where`: ((Query<ResultType>) -> Query<Bool>)? {
             didSet {
                 didSet()
             }
@@ -463,11 +471,18 @@ extension Projection: _ObservedResultsValue { }
         }
         storage.searchString = text
     }
-
-    /// :nodoc:
+    /// Stores an NSPredicate used for filtering the Results. This is mutually exclusive
+    /// to the `where` parameter.
     @State public var filter: NSPredicate? {
         willSet {
             storage.filter = newValue
+        }
+    }
+    /// Stores a type safe query used for filtering the Results. This is mutually exclusive
+    /// to the `filter` parameter.
+    @State public var `where`: ((Query<ResultType>) -> Query<Bool>)? {
+        willSet {
+            storage.where = newValue
         }
     }
     /// :nodoc:
@@ -533,6 +548,38 @@ extension Projection: _ObservedResultsValue { }
         self.storage = Storage(Results(RLMResults<ResultType>.emptyDetached()), keyPaths)
         self.storage.configuration = configuration
         self.filter = filter
+        self.sortDescriptor = sortDescriptor
+    }
+    /**
+     Initialize a `ObservedResults` struct for a given `Object` or `EmbeddedObject` type.
+     - parameter type: Observed type
+     - parameter configuration: The `Realm.Configuration` used when creating the Realm,
+     user's sync configuration for the given partition value will be set as the `syncConfiguration`,
+     if empty the configuration is set to the `defaultConfiguration`
+     - parameter where: Observations will be made only for passing objects.
+     If no type safe query given - all objects will be observed
+     - parameter keyPaths: Only properties contained in the key paths array will be observed.
+     If `nil`, notifications will be delivered for any property change on the object.
+     String key paths which do not correspond to a valid a property will throw an exception.
+     - parameter sortDescriptor: A sequence of `SortDescriptor`s to sort by
+     */
+    public init(_ type: ResultType.Type,
+                configuration: Realm.Configuration? = nil,
+                where: ((Query<ResultType>) -> Query<Bool>)? = nil,
+                keyPaths: [String]? = nil,
+                sortDescriptor: SortDescriptor? = nil) where ResultType: Object {
+        self.storage = Storage(Results(RLMResults<ResultType>.emptyDetached()), keyPaths)
+        self.storage.configuration = configuration
+        self.where = `where`
+        self.sortDescriptor = sortDescriptor
+    }
+    /// :nodoc:
+    public init(_ type: ResultType.Type,
+                keyPaths: [String]? = nil,
+                configuration: Realm.Configuration? = nil,
+                sortDescriptor: SortDescriptor? = nil) where ResultType: Object {
+        self.storage = Storage(Results(RLMResults<ResultType>.emptyDetached()), keyPaths)
+        self.storage.configuration = configuration
         self.sortDescriptor = sortDescriptor
     }
 
