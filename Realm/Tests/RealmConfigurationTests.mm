@@ -20,8 +20,10 @@
 
 #import "TestUtils.h"
 
+#import "RLMApp_Private.h"
 #import "RLMRealmConfiguration_Private.hpp"
 #import "RLMTestObjects.h"
+#import "RLMUser_Private.h"
 #import "RLMUtil.hpp"
 
 @interface RealmConfigurationTests : RLMTestCase
@@ -107,7 +109,8 @@
     configuration.deleteRealmIfMigrationNeeded = false;
     XCTAssertEqual(configuration.schemaMode, realm::SchemaMode::Automatic);
 
-    configuration.syncConfiguration = [RLMDummyUser() configurationWithPartitionValue:@"dummy"].syncConfiguration;
+    RLMUser *user = RLMDummyUser();
+    configuration.syncConfiguration = [user configurationWithPartitionValue:@"dummy"].syncConfiguration;
     XCTAssertEqual(configuration.schemaMode, realm::SchemaMode::AdditiveDiscovered);
     configuration.objectClasses = @[];
     XCTAssertEqual(configuration.schemaMode, realm::SchemaMode::AdditiveExplicit);
@@ -123,6 +126,10 @@
     XCTAssertEqual(configuration.schemaMode, realm::SchemaMode::ReadOnlyAlternative);
     configuration.readOnly = false;
     XCTAssertEqual(configuration.schemaMode, realm::SchemaMode::AdditiveExplicit);
+
+    [user logOut];
+    [RLMApp resetAppCache];
+
 }
 
 #pragma mark - Default Configuration

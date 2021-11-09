@@ -606,6 +606,40 @@ static NSString *randomEmail() {
     [self waitForExpectationsWithTimeout:10.0 handler:nil];
 }
 
+#pragma mark - User Profile
+
+- (void)testUserProfileInitialization {
+    RLMUserProfile *profile = [[RLMUserProfile alloc] initWithUserProfile:realm::SyncUserProfile()];
+    XCTAssertNil(profile.name);
+    XCTAssertNil(profile.maxAge);
+    XCTAssertNil(profile.minAge);
+    XCTAssertNil(profile.birthday);
+    XCTAssertNil(profile.gender);
+    XCTAssertNil(profile.firstName);
+    XCTAssertNil(profile.lastName);
+    XCTAssertNil(profile.pictureURL);
+
+    profile = [[RLMUserProfile alloc] initWithUserProfile:realm::SyncUserProfile(realm::bson::BsonDocument({
+        {"name", "Jane"},
+        {"max_age", "40"},
+        {"min_age", "30"},
+        {"birthday", "October 10th"},
+        {"gender", "unknown"},
+        {"first_name", "Jane"},
+        {"last_name", "Jannson"},
+        {"picture_url", "SomeURL"}
+    }))];
+
+    XCTAssert([profile.name isEqualToString: @"Jane"]);
+    XCTAssert([profile.maxAge isEqualToString: @"40"]);
+    XCTAssert([profile.minAge isEqualToString: @"30"]);
+    XCTAssert([profile.birthday isEqualToString: @"October 10th"]);
+    XCTAssert([profile.gender isEqualToString: @"unknown"]);
+    XCTAssert([profile.firstName isEqualToString: @"Jane"]);
+    XCTAssert([profile.lastName isEqualToString: @"Jannson"]);
+    XCTAssert([profile.pictureURL isEqualToString: @"SomeURL"]);
+}
+
 #pragma mark - Basic Sync
 
 /// It should be possible to successfully open a Realm configured for sync with a normal user.
@@ -937,6 +971,7 @@ static NSString *randomEmail() {
                                                 stopPolicy:RLMSyncStopPolicyImmediately];
         path = realm.configuration.pathOnDisk;
     }
+    [user.app.syncManager waitForSessionTermination];
 
     RLMRealmConfiguration *c = [RLMRealmConfiguration defaultConfiguration];
     c.fileURL = [NSURL fileURLWithPath:path];
@@ -1821,6 +1856,26 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     auto finalSize = [[fileManager attributesOfItemAtPath:path error:nil][NSFileSize] unsignedLongLongValue];
     XCTAssertLessThan(finalSize, initialSize);
     XCTAssertLessThanOrEqual(finalSize, usedSize + realm::util::page_size());
+}
+
+- (void)testWriteCopy {
+    RLMUser *user = [self userForTest:_cmd];
+    NSString *partitionValue = NSStringFromSelector(_cmd);
+    RLMRealm *syncRealm = [self openRealmForPartitionValue:partitionValue user:user];
+    [self addPersonsToRealm:syncRealm persons:@[[Person john]]];
+
+    NSError *writeError;
+    XCTAssertTrue([syncRealm writeCopyToURL:RLMTestRealmURL()
+                              encryptionKey:syncRealm.configuration.encryptionKey
+                                      error:&writeError]);
+    XCTAssertNil(writeError);
+
+    RLMRealmConfiguration *localConfig = [RLMRealmConfiguration new];
+    localConfig.fileURL = RLMTestRealmURL();
+    localConfig.schemaVersion = 1;
+
+    RLMRealm *localCopy = [RLMRealm realmWithConfiguration:localConfig error:nil];
+    XCTAssertEqual(1U, [Person allObjectsInRealm:localCopy].count);
 }
 
 #pragma mark - Read Only

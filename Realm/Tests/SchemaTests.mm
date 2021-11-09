@@ -22,6 +22,7 @@
 #import "TestUtils.h"
 
 #import "RLMAccessor.h"
+#import "RLMApp_Private.h"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObject_Private.h"
 #import "RLMProperty_Private.h"
@@ -29,6 +30,7 @@
 #import "RLMRealm_Dynamic.h"
 #import "RLMRealm_Private.hpp"
 #import "RLMSchema_Private.hpp"
+#import "RLMUser_Private.h"
 #import "RLMUtil.hpp"
 
 #import <realm/object-store/schema.hpp>
@@ -1224,6 +1226,9 @@ RLM_COLLECTION_TYPE(NotARealClass)
     config.syncConfiguration = [user configurationWithPartitionValue:@"dummy"].syncConfiguration;
     RLMAssertThrowsWithReason([RLMRealm realmWithConfiguration:config error:nil],
                               @"Embedded object 'OrphanObject' is unreachable by any link path from top level objects.");
+
+    [user logOut];
+    [RLMApp resetAppCache];
 }
 
 - (void)testExplicitlyIncludedEmbeddedOrphanIsAllowedForLocalRealm {

@@ -130,6 +130,13 @@
 @implementation NullQueryObject
 @end
 
+@interface DictionaryParentObject : RLMObject
+@property (nonatomic, copy) AllDictionariesObject *objectCol;
+@end
+
+@implementation DictionaryParentObject
+@end
+
 #pragma mark - Tests
 
 #define RLMAssertCount(cls, expectedCount, ...) \
@@ -199,16 +206,16 @@
     // These are things which are valid predicates, but which we do not support
 
     // Aggregate operators on non-arrays
-    RLMAssertThrowsWithReasonMatching([PersonObject objectsWhere:@"ANY age > 5"], @"Aggregate operations can only.*array property");
+    RLMAssertThrowsWithReasonMatching([PersonObject objectsWhere:@"ANY age > 5"], @"Aggregate operations can only.*collection property");
     RLMAssertThrowsWithReasonMatching([PersonObject objectsWhere:@"ALL age > 5"], @"ALL modifier not supported");
-    RLMAssertThrowsWithReasonMatching([PersonObject objectsWhere:@"SOME age > 5"], @"Aggregate operations can only.*array property");
-    RLMAssertThrowsWithReasonMatching([PersonObject objectsWhere:@"NONE age > 5"], @"Aggregate operations can only.*array property");
-    RLMAssertThrowsWithReasonMatching([PersonLinkObject objectsWhere:@"ANY person.age > 5"], @"Aggregate operations can only.*array property");
+    RLMAssertThrowsWithReasonMatching([PersonObject objectsWhere:@"SOME age > 5"], @"Aggregate operations can only.*collection property");
+    RLMAssertThrowsWithReasonMatching([PersonObject objectsWhere:@"NONE age > 5"], @"Aggregate operations can only.*collection property");
+    RLMAssertThrowsWithReasonMatching([PersonLinkObject objectsWhere:@"ANY person.age > 5"], @"Aggregate operations can only.*collection property");
     RLMAssertThrowsWithReasonMatching([PersonLinkObject objectsWhere:@"ALL person.age > 5"], @"ALL modifier not supported");
-    RLMAssertThrowsWithReasonMatching([PersonLinkObject objectsWhere:@"SOME person.age > 5"], @"Aggregate operations can only.*array property");
-    RLMAssertThrowsWithReasonMatching([PersonLinkObject objectsWhere:@"NONE person.age > 5"], @"Aggregate operations can only.*array property");
-    RLMAssertThrowsWithReasonMatching([PersonObject objectsWhere:@"age.@count > 5"], @"Aggregate operations can only.*array property");
-    RLMAssertThrowsWithReasonMatching([PersonObject objectsWhere:@"age.@sum > 5"], @"Aggregate operations can only.*array property");
+    RLMAssertThrowsWithReasonMatching([PersonLinkObject objectsWhere:@"SOME person.age > 5"], @"Aggregate operations can only.*collection property");
+    RLMAssertThrowsWithReasonMatching([PersonLinkObject objectsWhere:@"NONE person.age > 5"], @"Aggregate operations can only.*collection property");
+    RLMAssertThrowsWithReasonMatching([PersonObject objectsWhere:@"age.@count > 5"], @"Aggregate operations can only.*collection property");
+    RLMAssertThrowsWithReasonMatching([PersonObject objectsWhere:@"age.@sum > 5"], @"Aggregate operations can only.*collection property");
 
     // comparing two constants
     RLMAssertThrowsWithReason([PersonObject objectsWhere:@"5 = 5"],
@@ -2155,8 +2162,8 @@
     XCTAssertThrows([CircleDictionaryObject objectsInRealm:realm where:@"ANY data = '2'"]);
     XCTAssertThrows([CircleDictionaryObject objectsInRealm:realm where:@"ANY circles.next = '2'"]);
     XCTAssertThrows([CircleDictionaryObject objectsInRealm:realm where:@"ANY data.circles = '2'"]);
-    XCTAssertThrows([CircleDictionaryObject objectsInRealm:realm where:@"circles.data = '2'"]);
     XCTAssertThrows([CircleDictionaryObject objectsInRealm:realm where:@"NONE data.circles = '2'"]);
+    XCTAssertThrows([CircleDictionaryObject objectsInRealm:realm where:@"circles.data = '2'"]);
 }
 
 - (void)testMultiLevelBackLinkQuery
@@ -3707,6 +3714,99 @@ static NSData *data(const char *str) {
     test(@"boolDict", @[@NO, @NO, @YES]);
     test(@"decimalDict", @[[RLMDecimal128 decimalWithNumber:@456.123], [RLMDecimal128 decimalWithNumber:@123.123], [RLMDecimal128 decimalWithNumber:@789.123]]);
     test(@"dateDict", @[[NSDate dateWithTimeIntervalSince1970:4000], [NSDate dateWithTimeIntervalSince1970:2000], [NSDate dateWithTimeIntervalSince1970:8000]]);
+}
+
+- (void)testDictionaryQueryKeySubscript {
+    void (^test)(NSString *, NSArray *, BOOL) = ^(NSString *property, NSArray *values, BOOL isNumeric) {
+        RLMRealm *realm = [self realm];
+        [realm beginWriteTransaction];
+        [AllDictionariesObject createInRealm:realm withValue:@{property: @{@"aKey": values[0]}}];
+        [AllDictionariesObject createInRealm:realm withValue:@{property: @{@"aKey2": values[1]}}];
+        [AllDictionariesObject createInRealm:realm withValue:@{property: @{@"aKey3": values[2]}}];
+        [realm commitWriteTransaction];
+
+        RLMAssertCount(AllDictionariesObject, 1U, @"%K['aKey'] = %@", property, values[0]);
+        RLMAssertCount(AllDictionariesObject, 2U, @"%K['aKey'] != %@", property, values[0]);
+        RLMAssertCount(AllDictionariesObject, 1U, @"%K['aKey'] =[c] %@", property, values[0]);
+        RLMAssertCount(AllDictionariesObject, 2U, @"%K['aKey'] !=[c] %@", property, values[0]);
+        RLMAssertCount(AllDictionariesObject, 1U, @"%K['aKey'] =[cd] %@", property, values[0]);
+
+        if (isNumeric) {
+            RLMAssertCount(AllDictionariesObject, 0U, @"%K['aKey'] > %@", property, values[0]);
+            RLMAssertCount(AllDictionariesObject, 3U, @"NOT %K['aKey'] > %@", property, values[0]);
+            RLMAssertCount(AllDictionariesObject, 0U, @"%K['aKey'] >[c] %@", property, values[0]);
+            RLMAssertCount(AllDictionariesObject, 0U, @"%K['aKey'] >[cd] %@", property, values[0]);
+
+            RLMAssertCount(AllDictionariesObject, 0U, @"%K['aKey'] < %@", property, values[0]);
+            RLMAssertCount(AllDictionariesObject, 3U, @"NOT %K['aKey'] < %@", property, values[0]);
+            RLMAssertCount(AllDictionariesObject, 0U, @"%K['aKey'] <[c] %@", property, values[0]);
+            RLMAssertCount(AllDictionariesObject, 0U, @"%K['aKey'] <[cd] %@", property, values[0]);
+        } else {
+
+            RLMAssertCount(AllDictionariesObject, 1U, @"%K['aKey'] = %@", property, values[0]);
+            RLMAssertCount(AllDictionariesObject, 2U, @"%K['aKey'] != %@", property, values[0]);
+            RLMAssertCount(AllDictionariesObject, 1U, @"%K['aKey'] =[c] %@", property, values[0]);
+            RLMAssertCount(AllDictionariesObject, 2U, @"%K['aKey'] !=[c] %@", property, values[0]);
+            RLMAssertCount(AllDictionariesObject, 1U, @"%K['aKey'] =[cd] %@", property, values[0]);
+            RLMAssertCount(AllDictionariesObject, 2U, @"%K['aKey'] !=[cd] %@", property, values[0]);
+            // BEGINSWITH
+            RLMAssertCount(AllDictionariesObject, 1U, @"%K['aKey'] BEGINSWITH 'he'", property);
+            RLMAssertCount(AllDictionariesObject, 2U, @"NOT %K['aKey'] BEGINSWITH 'he'", property);
+            RLMAssertCount(AllDictionariesObject, 1U, @"%K['aKey'] BEGINSWITH[c] 'he'", property);
+            RLMAssertCount(AllDictionariesObject, 1U, @"%K['aKey'] BEGINSWITH[cd] 'he'", property);
+            RLMAssertCount(AllDictionariesObject, 0U, @"%K['aKey'] BEGINSWITH NULL", property);
+            // CONTAINS
+            RLMAssertCount(AllDictionariesObject, 1U, @"%K['aKey'] CONTAINS 'el'", property);
+            RLMAssertCount(AllDictionariesObject, 1U, @"%K['aKey'] CONTAINS[c] 'el'", property);
+            RLMAssertCount(AllDictionariesObject, 1U, @"%K['aKey'] CONTAINS[cd] 'el'", property);
+            RLMAssertCount(AllDictionariesObject, 0U, @"%K['aKey'] CONTAINS NULL", property);
+            // ENDSWITH
+            RLMAssertCount(AllDictionariesObject, 1U, @"%K['aKey'] ENDSWITH 'lo'", property);
+            RLMAssertCount(AllDictionariesObject, 1U, @"%K['aKey'] ENDSWITH[c] 'lo'", property);
+            RLMAssertCount(AllDictionariesObject, 1U, @"%K['aKey'] ENDSWITH[cd] 'lo'", property);
+            RLMAssertCount(AllDictionariesObject, 0U, @"%K['aKey'] ENDSWITH NULL", property);
+            // LIKE
+            RLMAssertCount(AllDictionariesObject, 1U, @"%K['aKey'] LIKE 'hel*'", property);
+            RLMAssertCount(AllDictionariesObject, 1U, @"%K['aKey'] LIKE[c] 'hel*'", property);
+            RLMAssertCount(AllDictionariesObject, 2U, @"%K['aKey'] LIKE NULL", property);
+            RLMAssertCount(AllDictionariesObject, 2U, @"NOT %K['aKey'] LIKE 'hel*'", property);
+            RLMAssertCount(AllDictionariesObject, 2U, @"NOT %K['aKey'] LIKE[c] 'hel*'", property);
+            RLMAssertCount(AllDictionariesObject, 1U, @"NOT %K['aKey'] LIKE NULL", property);
+            RLMAssertThrowsWithReasonMatching(([realm objects:@"AllDictionariesObject" where:@"%K['aKey'] LIKE[cd] 'hel*'", property]), @"not supported");
+        }
+
+        [realm beginWriteTransaction];
+        [realm deleteAllObjects];
+        [realm commitWriteTransaction];
+    };
+    test(@"intDict", @[@456, @123, @789], YES);
+    test(@"doubleDict", @[@456.123, @123.123, @789.123], YES);
+    test(@"boolDict", @[@NO, @NO, @YES], YES);
+    test(@"decimalDict", @[[RLMDecimal128 decimalWithNumber:@456.123], [RLMDecimal128 decimalWithNumber:@123.123], [RLMDecimal128 decimalWithNumber:@789.123]], YES);
+    test(@"dateDict", @[[NSDate dateWithTimeIntervalSince1970:4000], [NSDate dateWithTimeIntervalSince1970:2000], [NSDate dateWithTimeIntervalSince1970:8000]], YES);
+    test(@"dataDict", @[[NSData dataWithBytes:"hello" length:5],
+                        [NSData dataWithBytes:"Héllo" length:5],
+                        [NSData dataWithBytes:"HELLO" length:5]], NO);
+    test(@"objectIdDict", @[[[RLMObjectId alloc] initWithString:@"60425fff91d7a195d5ddac1b" error:nil],
+                            [[RLMObjectId alloc] initWithString:@"60425fff91d7a195d5ddac1a" error:nil],
+                            [[RLMObjectId alloc] initWithString:@"60425fff91d7a195d5ddac1c" error:nil]], YES);
+    test(@"stringDict", @[@"hello", @"Héllo", @"HELLO"], NO);
+}
+
+- (void)testDictionaryQueryKeySubscriptWithObjectCol {
+    RLMRealm *realm = [self realm];
+    [realm beginWriteTransaction];
+    [DictionaryParentObject createInRealm:realm withValue:@{@"objectCol": @{@"stringDict": @{@"aKey": @"blah"}}}];
+    [realm commitWriteTransaction];
+    // This test checks that we can use a link col keypath to the dictionary and subscript it.
+    RLMAssertCount(DictionaryParentObject, 1U, @"%K['aKey'] = %@", @"objectCol.stringDict", @"blah");
+}
+
+- (void)testDictionarySubscriptThrowsException {
+    RLMRealm *realm = [self realm];
+    RLMAssertThrowsWithReasonMatching(([realm objects:@"ArrayPropertyObject" where:@"array['invalid'] = NULL"]), @"Only dictionaries support subscript predicates.");
+    RLMAssertThrowsWithReasonMatching(([realm objects:@"SetPropertyObject" where:@"set['invalid'] = NULL"]), @"Only dictionaries support subscript predicates.");
+    RLMAssertThrowsWithReasonMatching(([realm objects:@"OwnerObject" where:@"dog['dogName'] = NULL"]), @"Aggregate operations can only be used on key paths that include an collection property");
 }
 
 - (void)testCollectionsQueryAllValuesAllKeys {
