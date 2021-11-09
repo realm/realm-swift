@@ -225,21 +225,40 @@ NS_ASSUME_NONNULL_BEGIN
 
  The destination file cannot already exist.
 
- Note that if this method is called from within a write transaction, the
- *current* data is written, not the data from the point when the previous write
+ Note that if this method is called from within a write transaction,
+ the *current* data is written, not the data from the point when the previous write
  transaction was committed.
 
  @param fileURL Local URL to save the Realm to.
  @param key     Optional 64-byte encryption key to encrypt the new file with.
- @param error   If an error occurs, upon return contains an `NSError` object
- that describes the problem. If you are not interested in
- possible errors, pass in `NULL`.
+ @param error  If an error occurs, upon return contains an `NSError` object
+              that describes the problem. If you are not interested in
+              possible errors, pass in `NULL`.
 
  @return `YES` if the Realm was successfully written to disk, `NO` if an error occurred.
  */
 - (BOOL)writeCopyToURL:(NSURL *)fileURL encryptionKey:(nullable NSData *)key error:(NSError **)error;
 
-// TODO: Docs
+/**
+ Writes a compacted and optionally encrypted copy of thre Realm to the given local URL.
+
+ The destination file cannot already exist.
+
+ Note that if this method is called from within a write transaction,
+ the *current* data is written, not the data from the point when the previous write
+ transaction was committed.
+
+ @param fileURL Local URL to save the Realm to.
+ @param key     Optional 64-byte encryption key to encrypt the new file with.
+ @param enableHistory  Indicates whether the copied Realm will have sync history enabled
+                      and synchronize data with the Realm server. All changes from the
+                      original realm must be uploaded to the server prior to calling
+                      `writeCopyToURL`, otherwise and error is thrown. If `enableHistory`
+                      is false, the copied Realm functions as a local realm.
+ @param error  If an error occurs, upon return contains an `NSError` object
+              that describes the problem. If you are not interested in
+              possible errors, pass in `NULL`.
+ */
 - (BOOL)writeCopyToURL:(NSURL *)fileURL encryptionKey:(nullable NSData *)key enableHistory:(BOOL)enableHistory error:(NSError **)error;
 /**
  Checks if the Realm file for the given configuration exists locally on disk.
