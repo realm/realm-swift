@@ -96,6 +96,7 @@ using namespace realm;
     // TODO: Flexible Sync - Add real implementation
     auto flexibleSyncConfig = [[RLMFlexibleSyncConfiguration alloc] initWithUser:self];
     RLMRealmConfiguration *config = [[RLMRealmConfiguration alloc] init];
+    // TODO: Add configuration
     return config;
 }
 

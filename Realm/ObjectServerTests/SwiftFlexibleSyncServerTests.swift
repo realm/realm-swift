@@ -77,7 +77,7 @@ class SwiftFlexibleSyncTestCase: SwiftSyncTestCase {
          let subscriptions = syncedRealm.subscriptions
          if subscriptions.isEmpty {
              try subscriptions.write {
-                 try subscriptions.append {
+                 subscriptions.append {
                      Subscription<Contact>(name: "contacts-ny") {
                          $0.address.state == "NY" && $0.age > 10
                      }
@@ -165,7 +165,7 @@ class SwiftFlexibleSyncTestCase: SwiftSyncTestCase {
          let subscriptions = realm.subscriptions
          if subscriptions.isEmpty {
              let task = try await subscriptions.write {
-                 try subscriptions.append {
+                 subscriptions.append {
                      Subscription<Contact>(name: "contacts-ny") {
                          $0.address.state == "NY" && $0.age > 10
                      }

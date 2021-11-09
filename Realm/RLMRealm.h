@@ -19,7 +19,7 @@
 #import <Foundation/Foundation.h>
 #import <Realm/RLMConstants.h>
 
-@class RLMRealmConfiguration, RLMRealm, RLMObject, RLMSchema, RLMMigration, RLMNotificationToken, RLMThreadSafeReference, RLMAsyncOpenTask;
+@class RLMRealmConfiguration, RLMRealm, RLMObject, RLMSchema, RLMMigration, RLMNotificationToken, RLMThreadSafeReference, RLMAsyncOpenTask, RLMSubscriptionSet;
 
 /**
  A callback block for opening Realms asynchronously.
@@ -736,6 +736,11 @@ NS_REFINED_FOR_SWIFT;
  @see                 RLMMigration
  */
 + (BOOL)performMigrationForConfiguration:(RLMRealmConfiguration *)configuration error:(NSError **)error;
+
+// TODO: Flexible Sync - Add doctrings
+#pragma mark - Getting Flexible Sync Subscriptions
+
+- (RLMSubscriptionSet *)allSubscriptions;
 
 #pragma mark - Unavailable Methods
 

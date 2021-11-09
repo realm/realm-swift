@@ -1043,4 +1043,10 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     _collectionEnumerators = nil;
 }
 
+// TODO: Flexible Sync - Add doctrings
+
+- (RLMSubscriptionSet *)allSubscriptions {
+
+}
+
 @end

@@ -16,16 +16,10 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMFlexibleSyncConfiguration_Private.hpp"
+#import "RLMSubscriptionSet.h"
 
-#import "RLMUser_Private.hpp"
+// TODO: Flexible Sync - Add docstrings
 
-@implementation RLMFlexibleSyncConfiguration
-
-- (instancetype)initWithUser:(RLMUser *)user {
-    // TODO: Flexible Sync - Add initialiser implementation
-    [NSException raise:@"NotImplemented" format:@"Needs Impmentation"];
-    return NULL;
-}
+@implementation RLMSubscriptionSet
 
 @end

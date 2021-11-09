@@ -16,16 +16,28 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMFlexibleSyncConfiguration_Private.hpp"
+#import <Foundation/Foundation.h>
 
-#import "RLMUser_Private.hpp"
+NS_ASSUME_NONNULL_BEGIN
 
-@implementation RLMFlexibleSyncConfiguration
+// TODO: Flexible Sync - Add docstrings
 
-- (instancetype)initWithUser:(RLMUser *)user {
-    // TODO: Flexible Sync - Add initialiser implementation
-    [NSException raise:@"NotImplemented" format:@"Needs Impmentation"];
-    return NULL;
-}
+@interface RLMSubscription : NSObject
+
+#pragma mark - Properties
+
+@property (nonatomic, readonly) NSDate *createdAt;
+
+@property (nonatomic, readonly) NSDate *updatedAt;
+
+@property (nonatomic, readonly) NSString *name;
+
+//- (instancetype)initWithName:(nullable NSString *)name
+//                   predicate:(NSPredicate *)predicate;
+
+- (void)updateSubscriptionWithPredicate:(NSPredicate *)predicate
+                                  error:(NSError **)error;
 
 @end
+
+NS_ASSUME_NONNULL_END
