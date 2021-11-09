@@ -910,8 +910,9 @@ import Realm.Private
 
      - throws: An `NSError` if the copy could not be written.
      */
-    public func writeCopy(toFile fileURL: URL, encryptionKey: Data? = nil) throws {
-        try rlmRealm.writeCopy(to: fileURL, encryptionKey: encryptionKey)
+    // TODO: DOCS update
+    public func writeCopy(toFile fileURL: URL, encryptionKey: Data? = nil, enableHistory: Bool = false) throws {
+        try rlmRealm.writeCopy(to: fileURL, encryptionKey: encryptionKey, enableHistory: enableHistory)
     }
 
     /**

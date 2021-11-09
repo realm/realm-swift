@@ -693,46 +693,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                        RLMCredentials.anonymous())
     }
     // MARK: - Bundled Sync Realm
-    // TODO test with encryption keys
 
-    // DELETE: Can probably delete this. testWriteCopySynchronizeData covers it.
-    func testWriteCopyNoRedownload() {
-        do {
-            let user1 = try logInUser(for: basicCredentials())
-            if !isParent {
-                populateRealm(user: user1, partitionValue: #function)
-                return
-            }
-
-            // Wait for the child process to upload all the data.
-            // DELETE COMMENT: Does this need to be a child process? I doubt it.
-            executeChild()
-
-            let config = user1.configuration(partitionValue: #function)
-            let realm = try Realm(configuration: config)
-
-            // TODO: remove comments below
-            // Removing these two waits will crash like realm-cocoa#7486
-            // Should the method be updated to do this for the developer?
-            waitForUploads(for: realm)
-            waitForDownloads(for: realm)
-
-            // Create config for where the sync realm will be copied to.
-            // Using a different user to simulate data created by an Admin, which is then copied by other users.
-            let user2 = try logInUser(for: basicCredentials())
-            XCTAssertNotEqual(user1.id, user2.id)
-            let copiedConfig = user2.configuration(partitionValue: #function)
-            try realm.writeCopy(toFile: copiedConfig.fileURL!)
-
-            // Open the copied realm then immediately check count
-            let copiedRealm = try Realm(configuration: copiedConfig)
-            checkCount(expected: SwiftSyncTestCase.bigObjectCount, copiedRealm, SwiftHugeSyncObject.self)
-        } catch {
-            XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
-        }
-    }
-
-    // DELETE: Fails after https://github.com/realm/realm-cocoa/issues/7513
     func testWriteCopySynchronizeData() {
         do {
             let user1 = try logInUser(for: basicCredentials())
@@ -742,7 +703,6 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             }
 
             // Wait for the child process to upload all the data.
-            // DELETE COMMENT: Does this need to be a child process? I doubt it.
             executeChild()
 
             // Create config for where the sync realm will be copied to.
@@ -753,15 +713,13 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
             let config = user1.configuration(partitionValue: #function)
             let realm = try Realm(configuration: config)
-            // TODO: remove comments below
-            // Removing these two waits will crash like realm-cocoa#7486
-            // Should the method be updated to do this for the developer?
+
             waitForUploads(for: realm)
             waitForDownloads(for: realm)
 
             let pathOnDisk = ObjectiveCSupport.convert(object: copiedConfig).pathOnDisk
             XCTAssertFalse(FileManager.default.fileExists(atPath: pathOnDisk))
-            try realm.writeCopy(toFile: copiedConfig.fileURL!)
+            try realm.writeCopy(toFile: copiedConfig.fileURL!, enableHistory: true)
 
             // Open the copied realm then immediately check count
             let copiedRealm = try Realm(configuration: copiedConfig)
@@ -799,42 +757,41 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
     }
 
-    // Bundling a sync realm and opening it with a different partition woubld not be supported
+    // Bundling a sync realm and opening it with a different partition isn't supported
     // But writeCopy takes a file path, not a configuration. So in theory someone could copy a realm, then
-    // open the new path with a configuration that has a different partition. But there's no way to check if partitions
+    // open the new path with a configuration that has a different partition.
+    // There's no way to check if partitions
     // are different when writeCopy is called with .writeCopy alone(?)
-    func testWriteCopyDifferentPartition() {
-        do {
-            let user1 = try logInUser(for: basicCredentials())
-            if !isParent {
-                populateRealm(user: user1, partitionValue: #function)
-                return
-            }
+//    func testWriteCopyDifferentPartition() {
+//        do {
+//            let user1 = try logInUser(for: basicCredentials())
+//            if !isParent {
+//                populateRealm(user: user1, partitionValue: #function)
+//                return
+//            }
+//
+//            // Wait for the child process to upload all the data.
+//            executeChild()
+//
+//            let config = user1.configuration(partitionValue: #function)
+//            let realm = try Realm(configuration: config)
+//
+//            waitForUploads(for: realm)
+//            waitForDownloads(for: realm)
+//
+//            // Create copied config but a different partition
+//            let copiedConfig = user1.configuration(partitionValue: "different-partition-value")
+//            XCTAssertNotEqual(realm.configuration.syncConfiguration?.partitionValue,
+//                              copiedConfig.syncConfiguration?.partitionValue)
+//
+//            let pathOnDisk = ObjectiveCSupport.convert(object: copiedConfig).pathOnDisk
+//            XCTAssertFalse(FileManager.default.fileExists(atPath: pathOnDisk))
+//            XCTAssertThrowsError(try realm.writeCopy(toFile: copiedConfig.fileURL!))
+//        } catch {
+//            XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
+//        }
+//    }
 
-            // Wait for the child process to upload all the data.
-            // DELETE COMMENT: Does this need to be a child process? I doubt it.
-            executeChild()
-
-            let config = user1.configuration(partitionValue: #function)
-            let realm = try Realm(configuration: config)
-
-            waitForUploads(for: realm)
-            waitForDownloads(for: realm)
-
-            // Create copied config but a different partition
-            var copiedConfig = user1.configuration(partitionValue: "different-partition-value")
-            XCTAssertNotEqual(realm.configuration.syncConfiguration?.partitionValue,
-                              copiedConfig.syncConfiguration?.partitionValue)
-
-            let pathOnDisk = ObjectiveCSupport.convert(object: copiedConfig).pathOnDisk
-            XCTAssertFalse(FileManager.default.fileExists(atPath: pathOnDisk))
-            XCTAssertThrowsError(try realm.writeCopy(toFile: copiedConfig.fileURL!))
-        } catch {
-            XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
-        }
-    }
-
-    // DELETE: We should probably check the state of client changes for the developer
     func testWriteFailBeforeSynced() {
         do {
             let user1 = try logInUser(for: basicCredentials())
@@ -856,10 +813,10 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             let config = user1.configuration(partitionValue: #function)
             let realm = try Realm(configuration: config)
 
-            // Write copy is called before original realm is fully synced
-            XCTAssertThrowsError(try realm.writeCopy(toFile: copiedConfig.fileURL!), "Could not write file as not all client changes are integrated in server")
+            try realm.writeCopy(toFile: copiedConfig.fileURL!, enableHistory: true)
+
         } catch {
-            XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
+            XCTAssertEqual(error.localizedDescription, "Could not write file as not all client changes are integrated in server")
         }
     }
 

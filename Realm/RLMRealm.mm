@@ -30,6 +30,7 @@
 #import "RLMProperty.h"
 #import "RLMProperty_Private.h"
 #import "RLMQueryUtil.hpp"
+#import "RLMRealm+Sync.h"
 #import "RLMRealmConfiguration+Sync.h"
 #import "RLMRealmConfiguration_Private.hpp"
 #import "RLMRealmUtil.hpp"
@@ -943,18 +944,25 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     return (RLMObject *)RLMCreateObjectInRealmWithValue(self, className, value, RLMUpdatePolicyError);
 }
 
-// CURENT (after 7513)
 - (BOOL)writeCopyToURL:(NSURL *)fileURL encryptionKey:(NSData *)key error:(NSError **)error {
+    return [self writeCopyToURL:fileURL encryptionKey:key enableHistory:NO error:error];
+}
+
+- (BOOL)writeCopyToURL:(NSURL *)fileURL encryptionKey:(NSData *)key enableHistory:(BOOL)enableHistory error:(NSError **)error {
     key = RLMRealmValidatedEncryptionKey(key);
     NSString *path = fileURL.path;
 
     try {
-        _realm->verify_thread();
-        try {
-            _realm->read_group().write(path.UTF8String, static_cast<const char *>(key.bytes));
-        }
-        catch (...) {
-            _impl::translate_file_exception(path.UTF8String);
+        if (enableHistory) {
+            _realm->write_copy(path.UTF8String, {static_cast<const char *>(key.bytes), key.length});
+        } else {
+            _realm->verify_thread();
+            try {
+                _realm->read_group().write(path.UTF8String, static_cast<const char *>(key.bytes));
+            }
+            catch (...) {
+                _impl::translate_file_exception(path.UTF8String);
+            }
         }
         return YES;
     }
@@ -967,25 +975,6 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
 
     return NO;
 }
-
-//// BEFORE (the breaking change)
-//- (BOOL)writeCopyToURL:(NSURL *)fileURL encryptionKey:(NSData *)key error:(NSError **)error {
-//    key = RLMRealmValidatedEncryptionKey(key);
-//    NSString *path = fileURL.path;
-//
-//    try {
-//        _realm->write_copy(path.UTF8String, {static_cast<const char *>(key.bytes), key.length});
-//        return YES;
-//    }
-//    catch (...) {
-//        if (error) {
-//            RLMRealmTranslateException(error);
-//        }
-//        return NO;
-//    }
-//
-//    return NO;
-//}
 
 + (BOOL)fileExistsForConfiguration:(RLMRealmConfiguration *)config {
     return [NSFileManager.defaultManager fileExistsAtPath:config.pathOnDisk];

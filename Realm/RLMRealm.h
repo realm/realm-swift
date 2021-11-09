@@ -239,6 +239,8 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (BOOL)writeCopyToURL:(NSURL *)fileURL encryptionKey:(nullable NSData *)key error:(NSError **)error;
 
+// TODO: Docs
+- (BOOL)writeCopyToURL:(NSURL *)fileURL encryptionKey:(nullable NSData *)key enableHistory:(BOOL)enableHistory error:(NSError **)error;
 /**
  Checks if the Realm file for the given configuration exists locally on disk.
 
