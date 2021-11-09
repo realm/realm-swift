@@ -275,6 +275,86 @@ extension Object: RealmCollectionValue {
         return _observe(keyPaths: keyPaths, on: queue, block)
     }
 
+    /**
+     Registers a block to be called each time the object changes.
+
+     The block will be asynchronously called after each write transaction which
+     deletes the object or modifies any of the managed properties of the object,
+     including self-assignments that set a property to its existing value.
+
+     For write transactions performed on different threads or in different
+     processes, the block will be called when the managing Realm is
+     (auto)refreshed to a version including the changes, while for local write
+     transactions it will be called at some point in the future after the write
+     transaction is committed.
+
+     If no key paths are given, the block will be executed on any insertion,
+     modification, or deletion for all object properties and the properties of
+     any nested, linked objects. If a key path or key paths are provided,
+     then the block will be called for changes which occur only on the
+     provided key paths. For example, if:
+     ```swift
+     class Dog: Object {
+         @Persisted var name: String
+         @Persisted var adopted: Bool
+         @Persisted var siblings: List<Dog>
+     }
+
+     // ... where `dog` is a managed Dog object.
+     dog.observe(keyPaths: [\Dog.adopted], { changes in
+        // ...
+     })
+     ```
+     - The above notification block fires for changes to the
+     `adopted` property, but not for any changes made to `name`.
+     - If the observed key path were `[\Dog.siblings]`, then any insertion,
+     deletion, or modification to the `siblings` list will trigger the block. A change to
+     `someSibling.name` would not trigger the block (where `someSibling`
+     is an element contained in `siblings`)
+     - If the observed key path were `[\Dog.siblings.name]`, then any insertion or
+     deletion to the `siblings` list would trigger the block. For objects
+     contained in the `siblings` list, only modifications to their `name` property
+     will trigger the block.
+
+     - note: Multiple notification tokens on the same object which filter for
+     separate key paths *do not* filter exclusively. If one key path
+     change is satisfied for one notification token, then all notification
+     token blocks for that object will execute.
+
+     If no queue is given, notifications are delivered via the standard run
+     loop, and so can't be delivered while the run loop is blocked by other
+     activity. If a queue is given, notifications are delivered to that queue
+     instead. When notifications can't be delivered instantly, multiple
+     notifications may be coalesced into a single notification.
+
+     Unlike with `List` and `Results`, there is no "initial" callback made after
+     you add a new notification block.
+
+     Only objects which are managed by a Realm can be observed in this way. You
+     must retain the returned token for as long as you want updates to be sent
+     to the block. To stop receiving updates, call `invalidate()` on the token.
+
+     It is safe to capture a strong reference to the observed object within the
+     callback block. There is no retain cycle due to that the callback is
+     retained by the returned token and not by the object itself.
+
+     - warning: This method cannot be called during a write transaction, or when
+                the containing Realm is read-only.
+     - parameter keyPaths: Only properties contained in the key paths array will trigger
+                           the block when they are modified. If `nil`, notifications
+                           will be delivered for any property change on the object.
+                           See description above for more detail on linked properties.
+     - parameter queue: The serial dispatch queue to receive notification on. If
+                        `nil`, notifications are delivered to the current thread.
+     - parameter block: The block to call with information about changes to the object.
+     - returns: A token which must be held for as long as you want updates to be delivered.
+     */
+    public func observe<T: ObjectBase>(keyPaths: [PartialKeyPath<T>],
+                                       on queue: DispatchQueue? = nil,
+                                       _ block: @escaping (ObjectChange<T>) -> Void) -> NotificationToken {
+        return _observe(keyPaths: keyPaths.map(_name(for:)), on: queue, block)
+    }
+
     // MARK: Dynamic list
 
     /**
@@ -564,21 +644,21 @@ internal func dynamicSet(object: ObjectBase, key: String, value: Any?) {
     }
 }
 
-// MARK: AssistedObjectiveCBridgeable
-
-extension ObjectBase: AssistedObjectiveCBridgeable {
-    static func bridging(from objectiveCValue: Any, with metadata: Any?) -> Self {
-        return forceCastToInferred(objectiveCValue)
-    }
-
-    var bridged: (objectiveCValue: Any, metadata: Any?) {
-        return (objectiveCValue: unsafeCastToRLMObject(), metadata: nil)
-    }
-}
+// MARK: CustomObjectiveCBridgeable
 
 // FIXME: Remove when `as! Self` can be written
 private func forceCastToInferred<T, V>(_ x: T) -> V {
     return x as! V
+}
+
+extension Object: CustomObjectiveCBridgeable {
+    internal static func bridging(objCValue objectiveCValue: Any) -> Self {
+        return forceCastToInferred(objectiveCValue)
+    }
+
+    internal var objCValue: Any {
+        unsafeCastToRLMObject()
+    }
 }
 
 // MARK: Key Path Strings

@@ -1,7 +1,6 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* Conform `@ThreadSafe` and `ThreadSafeReference` to `Sendable`.
 * Add class `Projection` to allow creation of light weight view models out of Realm Objects.  
 ```swift
 public class Person: Object {
@@ -28,6 +27,8 @@ class PersonProjection: Projection<Person> {
 // `people` will contain projections for every `Person` object in the `realm`
 let people: Results<PersonProjection> = realm.objects(PersonProjection.self)
 ```
+* Add `.searchable()` SwiftUI View Modifier which allows us to filter 
+* Conform `@ThreadSafe` and `ThreadSafeReference` to `Sendable`.
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
@@ -475,8 +476,6 @@ r `User.linkUser` methods.
   when using `.environment(\.realmConfiguration, ...)` in SwiftUI. This would cause issues if you are
   required to bump your schema version and are using `@ObservedResults`.
 * Sync user profiles now correctly persist between runs.
-
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
 ### Compatibility
 

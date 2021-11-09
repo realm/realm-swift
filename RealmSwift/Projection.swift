@@ -983,13 +983,20 @@ extension MutableSet where Element: ObjectBase, Element: RealmCollectionValue {
     }
 }
 
-extension Projection: AssistedObjectiveCBridgeable {
-    internal static func bridging(from objectiveCValue: Any, with metadata: Any?) -> Self {
-        return Self(projecting: Root.bridging(from: objectiveCValue, with: metadata))
+// MARK: CustomObjectiveCBridgeable
+
+// FIXME: Remove when `as! Self` can be written
+private func forceCastToInferred<T, V>(_ x: T) -> V {
+    return x as! V
+}
+
+extension Projection: CustomObjectiveCBridgeable {
+    internal static func bridging(objCValue objectiveCValue: Any) -> Self {
+        return Self(projecting: forceCastToInferred(objectiveCValue))
     }
 
-    internal var bridged: (objectiveCValue: Any, metadata: Any?) {
-        return self.rootObject.bridged
+    internal var objCValue: Any {
+        self.rootObject.unsafeCastToRLMObject()
     }
 }
 
