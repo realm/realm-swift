@@ -254,5 +254,7 @@ NS_ASSUME_NONNULL_END
 @property (nonatomic, readonly, nullable) NSString *minAge;
 /// The maximum age of the user.
 @property (nonatomic, readonly, nullable) NSString *maxAge;
+/// The BSON dictionary of metadata associated with this user.
+@property (nonatomic, readonly) NSDictionary *metadata NS_REFINED_FOR_SWIFT;
 
 @end

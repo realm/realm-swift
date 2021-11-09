@@ -18,6 +18,7 @@
 
 #import "RLMSyncTestCase.h"
 
+#import <CommonCrypto/CommonHMAC.h>
 #import <XCTest/XCTest.h>
 #import <Realm/Realm.h>
 
@@ -30,6 +31,9 @@
 #import "RLMApp_Private.hpp"
 #import "RLMChildProcessEnvironment.h"
 
+#import <external/json/json.hpp>
+
+#import <realm/util/base64.hpp>
 #import <realm/object-store/sync/sync_manager.hpp>
 #import <realm/object-store/sync/sync_session.hpp>
 #import <realm/object-store/sync/sync_user.hpp>
@@ -573,6 +577,65 @@ static NSURL *syncDirectoryForChildProcess() {
     }];
     [self waitForExpectations:@[expectation] timeout:4.0];
     XCTAssertTrue(user.state == RLMUserStateLoggedOut, @"User should have been logged out, but wasn't");
+}
+
+static std::string HMAC_SHA256(std::string_view key, std::string_view data) {
+    std::string ret;
+    ret.resize(CC_SHA256_DIGEST_LENGTH);
+    CCHmac(kCCHmacAlgSHA256, key.data(), key.size(), data.data(), data.size(),
+           reinterpret_cast<uint8_t*>(const_cast<char*>(ret.data())));
+    return ret;
+}
+
+std::string create_jwt(const std::string appId) {
+    nlohmann::json header = {{"alg", "HS256"}, {"typ", "JWT"}};
+    nlohmann::json payload = {{"aud", appId}, {"sub", "someUserId"}, {"exp", 1661896476}};
+
+    payload["user_data"]["name"] = "Foo Bar";
+    payload["user_data"]["occupation"] = "firefighter";
+
+    payload["my_metadata"]["name"] = "Bar Foo";
+    payload["my_metadata"]["occupation"] = "stock analyst";
+
+    std::string headerStr = header.dump();
+    std::string payloadStr = payload.dump();
+
+    realm::util::StringBuffer header_buffer;
+    header_buffer.resize(realm::util::base64_encoded_size(headerStr.length()));
+    realm::util::base64_encode(headerStr.data(), headerStr.length(), header_buffer.data(), header_buffer.size());
+
+    realm::util::StringBuffer payload_buffer;
+    payload_buffer.resize(realm::util::base64_encoded_size(payloadStr.length()));
+    realm::util::base64_encode(payloadStr.data(), payloadStr.length(), payload_buffer.data(), payload_buffer.size());
+
+    // Remove padding characters.
+
+    std::string encodedHeaderStr = header_buffer.str();
+    encodedHeaderStr.erase(remove(encodedHeaderStr.begin(), encodedHeaderStr.end(), '='), encodedHeaderStr.end());
+
+    std::string encodedPayloadStr = payload_buffer.str();
+    encodedPayloadStr.erase(remove(encodedPayloadStr.begin(), encodedPayloadStr.end(), '='), encodedPayloadStr.end());
+
+    std::string jwtPayload = encodedHeaderStr + "." + encodedPayloadStr;
+
+    auto mac = HMAC_SHA256("My_very_confidential_secretttttt", jwtPayload);
+
+    realm::util::StringBuffer signature_buffer;
+    signature_buffer.resize(realm::util::base64_encoded_size(mac.length()));
+    realm::util::base64_encode(mac.data(), mac.length(), signature_buffer.data(), signature_buffer.size());
+
+    std::string encodedSignatureStr = signature_buffer.str();
+    encodedSignatureStr.erase(remove(encodedSignatureStr.begin(), encodedSignatureStr.end(), '='),
+                              encodedSignatureStr.end());
+    std::replace(encodedSignatureStr.begin(), encodedSignatureStr.end(), '+', '-');
+    std::replace(encodedSignatureStr.begin(), encodedSignatureStr.end(), '/', '_');
+
+    return jwtPayload + "." + encodedSignatureStr;
+}
+
+- (RLMCredentials *)jwtCredentialWithAppId:(NSString *)appId {
+    auto jwt = create_jwt([appId UTF8String]);
+    return [RLMCredentials credentialsWithJWT:@(jwt.c_str())];
 }
 
 - (void)waitForDownloadsForRealm:(RLMRealm *)realm {

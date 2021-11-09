@@ -2,6 +2,7 @@ x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
 * Conform `@ThreadSafe` and `ThreadSafeReference` to `Sendable`.
+* Add `metadata` property to `RLMUserProfile`/`UserProfile`.
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
