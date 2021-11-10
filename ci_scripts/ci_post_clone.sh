@@ -4,7 +4,6 @@
 # a non-zero exit code.
 set -e
 
-if [[ $CI_WORKFLOW == "SwiftLint" ]]
-then
+if [ "$CI_WORKFLOW" = "SwiftLint" ]; then
     brew install swiftlint
 fi
