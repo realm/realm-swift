@@ -16,28 +16,10 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
+#import "RLMSyncTestCase.h"
 
-NS_ASSUME_NONNULL_BEGIN
-
-// TODO: Flexible Sync - Add docstrings
-
-@interface RLMSubscription : NSObject
-
-#pragma mark - Properties
-
-@property (nonatomic, readonly) NSDate *createdAt;
-
-@property (nonatomic, readonly) NSDate *updatedAt;
-
-@property (nonatomic, readonly) NSString *name;
-
-//- (instancetype)initWithName:(nullable NSString *)name
-//                   predicate:(NSPredicate *)predicate;
-
-- (void)updateSubscriptionWithPredicate:(NSPredicate *)predicate
-                                  error:(NSError **)error;
-
+@interface RLMFlexibleSyncServerTests : RLMSyncTestCase
 @end
 
-NS_ASSUME_NONNULL_END
+@implementation RLMFlexibleSyncServerTests
+@end

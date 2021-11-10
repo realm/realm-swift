@@ -122,7 +122,7 @@ let package = Package(
             targets: ["Realm", "RealmSwift"]),
     ],
     dependencies: [
-        .package(name: "RealmDatabase", url: "https://github.com/realm/realm-core", .branch("master"))
+        .package(name: "RealmDatabase", url: "https://github.com/realm/realm-core", .revision("ab194792f3c3dcf886397fa40729e3bcfceb0a55"))
     ],
     targets: [
       .target(
@@ -222,8 +222,7 @@ let package = Package(
                 "Realm/RLMUser.mm",
                 "Realm/RLMUserAPIKey.mm",
                 "Realm/RLMFlexibleSyncConfiguration.mm",
-                "Realm/RLMSubscriptionSet.mm",
-                "Realm/RLMSubscription.mm"
+                "Realm/RLMSyncSubscription.mm"
             ],
             publicHeadersPath: "include",
             cxxSettings: cxxSettings
@@ -312,9 +311,9 @@ let package = Package(
                 "SwiftObjectServerTests.swift",
                 "SwiftCollectionSyncTests.swift",
                 "SwiftObjectServerPartitionTests.swift",
-                "SwiftFlexibleSyncServerTests.swift",
                 "SwiftUIServerTests.swift",
-                "SwiftMongoClientTests.swift"
+                "SwiftMongoClientTests.swift",
+                "SwiftFlexibleSyncServerTests.swift"
             ]
         ),
         objectServerTestTarget(
@@ -324,7 +323,8 @@ let package = Package(
                 "RLMCollectionSyncTests.mm",
                 "RLMObjectServerPartitionTests.mm",
                 "RLMObjectServerTests.mm",
-                "RLMWatchTestUtility.m"
+                "RLMWatchTestUtility.m",
+                "RLMFlexibleSyncServerTests.mm"
             ]
         )
     ],

@@ -737,9 +737,6 @@ public enum RealmPublishers {
         }
     }
 
-    /// A publisher which emits Void each time the Realm is refreshed.
-    ///
-    /// Despite the name, this actually emits *after* the Realm is refreshed.
     @frozen public struct RealmWillChange: Publisher {
         /// This publisher cannot fail.
         public typealias Failure = Never

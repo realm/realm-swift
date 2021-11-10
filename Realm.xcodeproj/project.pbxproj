@@ -444,11 +444,12 @@
 		AC88478626888CEE00DF4A65 /* SwiftUISyncTestHostUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC8846902686573D00DF4A65 /* SwiftUISyncTestHostUITests.swift */; };
 		AC8847A9268926B500DF4A65 /* RealmServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537130C724A9E417001FDBBC /* RealmServer.swift */; };
 		AC8AE64B26BAD4B00037D4E5 /* SwiftMongoClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC8AE64A26BAD4B00037D4E5 /* SwiftMongoClientTests.swift */; };
-		ACB6FD24273A8FB70009712F /* RLMSubscription.mm in Sources */ = {isa = PBXBuildFile; fileRef = ACB6FD20273A8FB70009712F /* RLMSubscription.mm */; };
-		ACB6FD25273A8FB70009712F /* RLMSubscriptionSet.h in Headers */ = {isa = PBXBuildFile; fileRef = ACB6FD21273A8FB70009712F /* RLMSubscriptionSet.h */; };
-		ACB6FD26273A8FB70009712F /* RLMSubscription.h in Headers */ = {isa = PBXBuildFile; fileRef = ACB6FD22273A8FB70009712F /* RLMSubscription.h */; };
-		ACB6FD27273A8FB70009712F /* RLMSubscriptionSet.mm in Sources */ = {isa = PBXBuildFile; fileRef = ACB6FD23273A8FB70009712F /* RLMSubscriptionSet.mm */; };
-		ACB6FD29273A8FD80009712F /* Subscription.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACB6FD28273A8FD80009712F /* Subscription.swift */; };
+		ACB6FD2D273C60590009712F /* RLMSyncSubscription.h in Headers */ = {isa = PBXBuildFile; fileRef = ACB6FD2A273C60590009712F /* RLMSyncSubscription.h */; };
+		ACB6FD2E273C60590009712F /* RLMSyncSubscription_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = ACB6FD2B273C60590009712F /* RLMSyncSubscription_Private.h */; };
+		ACB6FD2F273C60590009712F /* RLMSyncSubscription.mm in Sources */ = {isa = PBXBuildFile; fileRef = ACB6FD2C273C60590009712F /* RLMSyncSubscription.mm */; };
+		ACB6FD35273C60CC0009712F /* SyncSubscription.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACB6FD34273C60CC0009712F /* SyncSubscription.swift */; };
+		ACB6FD36273C60FD0009712F /* SwiftFlexibleSyncServerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACB6FD31273C60920009712F /* SwiftFlexibleSyncServerTests.swift */; };
+		ACB6FD37273C61040009712F /* RLMFlexibleSyncServerTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = ACB6FD30273C60920009712F /* RLMFlexibleSyncServerTests.mm */; };
 		ACF08B6726DD936200686CBC /* Query.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACF08B6626DD936200686CBC /* Query.swift */; };
 		C042A48D1B7522A900771ED2 /* RealmConfigurationTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = C042A48C1B7522A900771ED2 /* RealmConfigurationTests.mm */; };
 		C042A48E1B7522A900771ED2 /* RealmConfigurationTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = C042A48C1B7522A900771ED2 /* RealmConfigurationTests.mm */; };
@@ -1007,11 +1008,12 @@
 		AC8847492687E0BD00DF4A65 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		AC88478126888C6300DF4A65 /* SwiftUISyncTestHostUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SwiftUISyncTestHostUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		AC8AE64A26BAD4B00037D4E5 /* SwiftMongoClientTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SwiftMongoClientTests.swift; path = Realm/ObjectServerTests/SwiftMongoClientTests.swift; sourceTree = "<group>"; };
-		ACB6FD20273A8FB70009712F /* RLMSubscription.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMSubscription.mm; sourceTree = "<group>"; };
-		ACB6FD21273A8FB70009712F /* RLMSubscriptionSet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMSubscriptionSet.h; sourceTree = "<group>"; };
-		ACB6FD22273A8FB70009712F /* RLMSubscription.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMSubscription.h; sourceTree = "<group>"; };
-		ACB6FD23273A8FB70009712F /* RLMSubscriptionSet.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMSubscriptionSet.mm; sourceTree = "<group>"; };
-		ACB6FD28273A8FD80009712F /* Subscription.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Subscription.swift; sourceTree = "<group>"; };
+		ACB6FD2A273C60590009712F /* RLMSyncSubscription.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMSyncSubscription.h; sourceTree = "<group>"; };
+		ACB6FD2B273C60590009712F /* RLMSyncSubscription_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMSyncSubscription_Private.h; sourceTree = "<group>"; };
+		ACB6FD2C273C60590009712F /* RLMSyncSubscription.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMSyncSubscription.mm; sourceTree = "<group>"; };
+		ACB6FD30273C60920009712F /* RLMFlexibleSyncServerTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = RLMFlexibleSyncServerTests.mm; path = Realm/ObjectServerTests/RLMFlexibleSyncServerTests.mm; sourceTree = "<group>"; };
+		ACB6FD31273C60920009712F /* SwiftFlexibleSyncServerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SwiftFlexibleSyncServerTests.swift; path = Realm/ObjectServerTests/SwiftFlexibleSyncServerTests.swift; sourceTree = "<group>"; };
+		ACB6FD34273C60CC0009712F /* SyncSubscription.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncSubscription.swift; sourceTree = "<group>"; };
 		ACF08B6626DD936200686CBC /* Query.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Query.swift; sourceTree = "<group>"; };
 		C042A48C1B7522A900771ED2 /* RealmConfigurationTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RealmConfigurationTests.mm; sourceTree = "<group>"; };
 		C073E1201AE9B705002C0A30 /* RLMObject_Private.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RLMObject_Private.hpp; sourceTree = "<group>"; };
@@ -1470,9 +1472,9 @@
 				5D660FED1BE98D670021E04F /* Results.swift */,
 				5D660FEE1BE98D670021E04F /* Schema.swift */,
 				5D660FEF1BE98D670021E04F /* SortDescriptor.swift */,
-				ACB6FD28273A8FD80009712F /* Subscription.swift */,
 				535EA9E125B0919800DBF3CD /* SwiftUI.swift */,
 				1A7DE7021D38460B0029F0AE /* Sync.swift */,
+				ACB6FD34273C60CC0009712F /* SyncSubscription.swift */,
 				3F222C4D1E26F51300CA0713 /* ThreadSafeReference.swift */,
 				5D660FF01BE98D670021E04F /* Util.swift */,
 			);
@@ -1679,6 +1681,7 @@
 				5346E7312487AC9D00595C68 /* RLMBSONTests.mm */,
 				CFA3A23D260B8427002C3266 /* RLMCollectionSyncTests.mm */,
 				CF08757C260B98E100B9BE60 /* RLMCollectionSyncTests.mm */,
+				ACB6FD30273C60920009712F /* RLMFlexibleSyncServerTests.mm */,
 				AC7D182B261F2F560080E1D2 /* RLMObjectServerPartitionTests.mm */,
 				E8267FF01D90B8E700E001C7 /* RLMObjectServerTests.mm */,
 				1AA5AE9D1D98A6D800ED8C27 /* RLMSyncTestCase.h */,
@@ -1687,6 +1690,7 @@
 				3F73BC8B1E3A876600FE80B6 /* RLMTestUtils.m */,
 				49D9DFC4246C8E48003AD31D /* setup_baas.rb */,
 				3F9ADA9326E7E87B007349A5 /* SwiftCollectionSyncTests.swift */,
+				ACB6FD31273C60920009712F /* SwiftFlexibleSyncServerTests.swift */,
 				AC8AE64A26BAD4B00037D4E5 /* SwiftMongoClientTests.swift */,
 				AC7D182C261F2F560080E1D2 /* SwiftObjectServerPartitionTests.swift */,
 				1AA5AE9F1D98C99500ED8C27 /* SwiftObjectServerTests.swift */,
@@ -1840,12 +1844,11 @@
 				CF986D1B25AE3B080039D287 /* RLMSet.mm */,
 				CF986D1A25AE3B080039D287 /* RLMSet_Private.h */,
 				CF986D1C25AE3B090039D287 /* RLMSet_Private.hpp */,
-				ACB6FD22273A8FB70009712F /* RLMSubscription.h */,
-				ACB6FD20273A8FB70009712F /* RLMSubscription.mm */,
-				ACB6FD21273A8FB70009712F /* RLMSubscriptionSet.h */,
-				ACB6FD23273A8FB70009712F /* RLMSubscriptionSet.mm */,
 				023B19551A3BA90D0067FB81 /* RLMSwiftCollectionBase.h */,
 				023B19561A3BA90D0067FB81 /* RLMSwiftCollectionBase.mm */,
+				ACB6FD2B273C60590009712F /* RLMSyncSubscription_Private.h */,
+				ACB6FD2A273C60590009712F /* RLMSyncSubscription.h */,
+				ACB6FD2C273C60590009712F /* RLMSyncSubscription.mm */,
 				3F83E9A22630A14800FC9623 /* RLMSwiftProperty.h */,
 				3FE79FF719BA6A5900780C9A /* RLMSwiftSupport.h */,
 				3F452EC519C2279800AFC154 /* RLMSwiftSupport.m */,
@@ -1914,8 +1917,6 @@
 				CFAEF761242B5F9A00EAF721 /* RLMAPIKeyAuth.h in Headers */,
 				4993221224129DCE00A0EC8E /* RLMApp.h in Headers */,
 				53CCC6C4257EC8A300A8FC50 /* RLMApp_Private.h in Headers */,
-				ACB6FD26273A8FB70009712F /* RLMSubscription.h in Headers */,
-				ACB6FD25273A8FB70009712F /* RLMSubscriptionSet.h in Headers */,
 				5D659EA91BE04556006515A0 /* RLMArray.h in Headers */,
 				AC74E38E27355BC0008294A4 /* RLMFlexibleSyncConfiguration_Private.h in Headers */,
 				5D659EAA1BE04556006515A0 /* RLMArray_Private.h in Headers */,
@@ -1950,6 +1951,7 @@
 				5D659EB81BE04556006515A0 /* RLMObjectStore.h in Headers */,
 				5D659EBC1BE04556006515A0 /* RLMProperty.h in Headers */,
 				5D659EBD1BE04556006515A0 /* RLMProperty_Private.h in Headers */,
+				ACB6FD2E273C60590009712F /* RLMSyncSubscription_Private.h in Headers */,
 				CF6E0486242A321200DB7F14 /* RLMProviderClient.h in Headers */,
 				6807E64A2487E8660096066F /* RLMPushClient.h in Headers */,
 				6807E64F2487F9210096066F /* RLMPushClient_Private.hpp in Headers */,
@@ -1976,6 +1978,7 @@
 				1AD3870C1D4A7FBB00479110 /* RLMSyncSession.h in Headers */,
 				3F3BBAF324B8FD32009D8D51 /* RLMSyncUtil.h in Headers */,
 				E8C6EAF51DD66C0C00EC1A03 /* RLMSyncUtil_Private.h in Headers */,
+				ACB6FD2D273C60590009712F /* RLMSyncSubscription.h in Headers */,
 				3F67DB3C1E26D69C0024533D /* RLMThreadSafeReference.h in Headers */,
 				CF76F7DF24816AAB00890DD2 /* RLMUpdateResult.h in Headers */,
 				1ABDCDAE1D792FEB003489E3 /* RLMUser.h in Headers */,
@@ -2358,7 +2361,7 @@
 						TestTargetID = 53124AB725B71AF600771CE4;
 					};
 					5D659E7D1BE04556006515A0 = {
-						LastSwiftMigration = 1170;
+						LastSwiftMigration = 1320;
 						ProvisioningStyle = Automatic;
 					};
 					5D660FCB1BE98C560021E04F = {
@@ -2690,7 +2693,6 @@
 			files = (
 				3F73BC961E3A878500FE80B6 /* NSError+RLMSync.m in Sources */,
 				5D659E851BE04556006515A0 /* RLMAccessor.mm in Sources */,
-				ACB6FD24273A8FB70009712F /* RLMSubscription.mm in Sources */,
 				5D659E861BE04556006515A0 /* RLMAnalytics.mm in Sources */,
 				CFAEF762242B5F9A00EAF721 /* RLMAPIKeyAuth.mm in Sources */,
 				4993220E24129DCE00A0EC8E /* RLMApp.mm in Sources */,
@@ -2698,7 +2700,6 @@
 				49E12CF0245DB7CC00359DF1 /* RLMBSON.mm in Sources */,
 				3F9863BB1D36876B00641C98 /* RLMClassInfo.mm in Sources */,
 				3FBEF67B1C63D66100F6935B /* RLMCollection.mm in Sources */,
-				ACB6FD27273A8FB70009712F /* RLMSubscriptionSet.mm in Sources */,
 				5D659E891BE04556006515A0 /* RLMConstants.m in Sources */,
 				4993220C24129DCE00A0EC8E /* RLMCredentials.mm in Sources */,
 				3F4F3AD523F71C790048DB43 /* RLMDecimal128.mm in Sources */,
@@ -2737,6 +2738,7 @@
 				5D659E8A1BE04556006515A0 /* RLMSwiftCollectionBase.mm in Sources */,
 				5D659E991BE04556006515A0 /* RLMSwiftSupport.m in Sources */,
 				3F1D90BC265C08F800593ABA /* RLMSwiftValueStorage.mm in Sources */,
+				ACB6FD2F273C60590009712F /* RLMSyncSubscription.mm in Sources */,
 				1A3623681D8384BA00945A54 /* RLMSyncConfiguration.mm in Sources */,
 				1AF7EA971D340AF70001A9B5 /* RLMSyncManager.mm in Sources */,
 				1AD3870D1D4A7FBB00479110 /* RLMSyncSession.mm in Sources */,
@@ -2780,7 +2782,6 @@
 				494566A9246E8C59000FD07F /* ObjectiveCSupport+BSON.swift in Sources */,
 				3FE5818622C2B4B900BA10E7 /* ObjectiveCSupport+Sync.swift in Sources */,
 				5B77EACE1DCC5614006AB51D /* ObjectiveCSupport.swift in Sources */,
-				ACB6FD29273A8FD80009712F /* Subscription.swift in Sources */,
 				5D660FF51BE98D670021E04F /* ObjectSchema.swift in Sources */,
 				5D660FF61BE98D670021E04F /* Optional.swift in Sources */,
 				3FE267D8264308680030F83C /* Persistable.swift in Sources */,
@@ -2789,6 +2790,7 @@
 				3FE267D9264308680030F83C /* PropertyAccessors.swift in Sources */,
 				5D660FF81BE98D670021E04F /* Realm.swift in Sources */,
 				1AB605D31D495927007F53DE /* RealmCollection.swift in Sources */,
+				ACB6FD35273C60CC0009712F /* SyncSubscription.swift in Sources */,
 				5D660FFA1BE98D670021E04F /* RealmConfiguration.swift in Sources */,
 				CFE9CE3326555BBD00BF96D6 /* RealmKeyedCollection.swift in Sources */,
 				CF44461E26121C6800BAFDB4 /* RealmProperty.swift in Sources */,
@@ -2958,6 +2960,8 @@
 				E8267FF11D90B8E700E001C7 /* RLMObjectServerTests.mm in Sources */,
 				1AA5AE9C1D98A68E00ED8C27 /* RLMSyncTestCase.mm in Sources */,
 				3F558C9022C29A03002F0F30 /* RLMTestCase.m in Sources */,
+				ACB6FD36273C60FD0009712F /* SwiftFlexibleSyncServerTests.swift in Sources */,
+				ACB6FD37273C61040009712F /* RLMFlexibleSyncServerTests.mm in Sources */,
 				AC8AE64B26BAD4B00037D4E5 /* SwiftMongoClientTests.swift in Sources */,
 				3F73BC921E3A877300FE80B6 /* RLMTestUtils.m in Sources */,
 				1A1536481DB0408A00C0EC93 /* RLMUser+ObjectServerTests.mm in Sources */,
@@ -3292,6 +3296,15 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5D659E761BE03E0D006515A0 /* Realm.xcconfig */;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				DEFINES_MODULE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
@@ -3299,6 +3312,14 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5D659E761BE03E0D006515A0 /* Realm.xcconfig */;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				DEFINES_MODULE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};
@@ -3406,6 +3427,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 3FB56E7E250D457A00A6216B /* ObjectServerTests.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				COPY_PHASE_STRIP = NO;
 				INFOPLIST_FILE = "Realm/ObjectServerTests/ObjectServerTests-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -3417,6 +3439,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 3FB56E7E250D457A00A6216B /* ObjectServerTests.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				COPY_PHASE_STRIP = NO;
 				INFOPLIST_FILE = "Realm/ObjectServerTests/ObjectServerTests-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";

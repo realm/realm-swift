@@ -16,26 +16,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMSubscription.h"
+#import <Foundation/Foundation.h>
 
-// TODO: Flexible Sync - Add docstrings
+// TODO: Add RLMSyncSubscription interface when public exposed
 
-@implementation RLMSubscriptionTask
 
-@end
-
-@implementation RLMSubscription
-
-- (instancetype)initWithName:(nullable NSString *)name
-                   predicate:(NSPredicate *)predicate {
-    // TODO: Flexible Sync - Add initialiser implementation
-    [NSException raise:@"NotImplemented" format:@"Needs Impmentation"];
-    return NULL;
-}
-
-- (void)updateSubscriptionWithPredicate:(NSPredicate *)predicate
-                                  error:(NSError **)error {
-    [NSException raise:@"NotImplemented" format:@"Needs Impmentation"];
-}
-
-@end

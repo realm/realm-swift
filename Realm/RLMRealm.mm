@@ -1043,10 +1043,10 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     _collectionEnumerators = nil;
 }
 
-// TODO: Flexible Sync - Add doctrings
-
+// TODO: Flexible Sync - Add Implementation
 - (RLMSubscriptionSet *)allSubscriptions {
-
+    [NSException raise:@"NotImplemented" format:@"Needs Impmentation"];
+    return NULL;
 }
 
 @end
