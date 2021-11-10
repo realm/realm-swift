@@ -103,7 +103,7 @@
 }
 
 - (NSUInteger)hash {
-    return std::hash<realm::Decimal128>()(_value);
+    return @(self.doubleValue).hash;
 }
 
 - (NSString *)description {

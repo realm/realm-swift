@@ -44,7 +44,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithApp:(std::shared_ptr<realm::app::App>)app;
 
-+ (void)resetAppCache;
 @end
 
 NSError * RLMAppErrorToNSError(realm::app::AppError const& appError);
