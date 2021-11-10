@@ -19,5 +19,3 @@
 #import <Foundation/Foundation.h>
 
 // TODO: Add RLMSyncSubscription interface when public exposed
-
-

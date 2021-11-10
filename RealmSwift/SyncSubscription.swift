@@ -113,7 +113,7 @@ extension Array where Element == AnySyncSubscription {
     // for the server to acknowledge and see all the data associated with this collection of
     // subscriptions
     @discardableResult
-    internal func write(_ block: (() throws -> ())) throws -> SyncSubscriptionTask {
+    internal func write(_ block: (() throws -> Void)) throws -> SyncSubscriptionTask {
         fatalError()
     }
 
@@ -183,7 +183,7 @@ extension Array where Element == AnySyncSubscription {
     // this will not wait for the server to acknowledge and see all the data associated with this
     // collection of subscription
     @discardableResult
-    internal func write(_ block: (() throws -> ())) async throws -> SyncSubscriptionTask {
+    internal func write(_ block: (() throws -> Void)) async throws -> SyncSubscriptionTask {
         fatalError()
     }
 }
@@ -198,7 +198,7 @@ extension Array where Element == AnySyncSubscription {
     // this will not wait for the server to acknowledge and see all the data associated with this
     // collection of subscription
     @discardableResult
-    internal func writeAsync(_ block: @escaping (() throws -> ())) -> RealmPublishers.SyncSubscriptionPublisher {
+    internal func writeAsync(_ block: @escaping (() throws -> Void)) -> RealmPublishers.SyncSubscriptionPublisher {
         return RealmPublishers.SyncSubscriptionPublisher(block)
     }
 }
@@ -207,7 +207,7 @@ extension Array where Element == AnySyncSubscription {
 extension RealmPublishers {
     //@frozen
     internal struct SyncSubscriptionPublisher: Publisher {
-        internal func receive<S>(subscriber: S) where S : Subscriber, Error == S.Failure, Void == S.Input {
+        internal func receive<S>(subscriber: S) where S: Subscriber, Error == S.Failure, Void == S.Input {
             fatalError()
         }
 
@@ -216,9 +216,9 @@ extension RealmPublishers {
         /// This publisher emits when the operations on the write block are committed
         internal typealias Output = Void
 
-        private let block: (() throws -> ())
+        private let block: (() throws -> Void)
 
-        internal init(_ block: @escaping (() throws -> ())) {
+        internal init(_ block: @escaping (() throws -> Void)) {
             self.block = block
         }
 
