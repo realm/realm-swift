@@ -31,7 +31,8 @@ import Realm
 
     /// Advance to the next element and return it, or `nil` if no next element exists.
     public mutating func next() -> Element? {
-        return generatorBase.next().flatMap(staticBridgeCast(fromObjectiveC:))
+        guard let next = generatorBase.next() else { return nil }
+        return staticBridgeCast(fromObjectiveC: next) as Element
     }
 }
 
@@ -47,7 +48,6 @@ public protocol _RealmMapValue {
  An iterator for a `RealmKeyedCollection` instance.
  */
 @frozen public struct RLMMapIterator<Element: _RealmMapValue>: IteratorProtocol {
-
     private var generatorBase: NSFastEnumerationIterator
     private var collection: RLMDictionary<AnyObject, AnyObject>
 
@@ -244,10 +244,12 @@ public protocol RealmCollectionBase: RandomAccessCollection, LazyCollectionProto
     typealias ElementType = Element
 }
 
+// MARK: - RealmCollection protocol
+
 /**
  A homogenous collection of `Object`s which can be retrieved, filtered, sorted, and operated upon.
 */
-public protocol RealmCollection: RealmCollectionBase {
+public protocol RealmCollection: RealmCollectionBase, Equatable {
     // MARK: Properties
 
     /// The Realm which manages the collection, or `nil` for unmanaged collections.
@@ -266,6 +268,13 @@ public protocol RealmCollection: RealmCollectionBase {
     /// A human-readable description of the objects contained in the collection.
     var description: String { get }
 
+    // MARK: Object Retrieval
+
+    /// Returns the first object in the collection, or `nil` if the collection is empty.
+    var first: Element? { get }
+
+    /// Returns the last object in the collection, or `nil` if the collection is empty.
+    var last: Element? { get }
 
     // MARK: Index Retrieval
 
@@ -279,33 +288,20 @@ public protocol RealmCollection: RealmCollectionBase {
     /**
      Returns the index of the first object matching the predicate, or `nil` if no objects match.
 
+     This is only applicable to ordered collections, and will abort if the collection is unordered.
+
      - parameter predicate: The predicate to use to filter the objects.
      */
     func index(matching predicate: NSPredicate) -> Int?
 
     /**
-     Returns the index of the first object matching the query, or `nil` if no objects match.
-
-     - Note: This should only be used with classes using the `@Persistable` property declaration.
-
-     - Usage:
-     ```
-     obj.index(matching: { $0.fooCol < 456 })
-     ```
-
-     - Note: See ``Query`` for more information on what query operations are available.
-
-     - parameter isIncluded: The query closure to use to filter the objects.
-     */
-    func index(matching isIncluded: ((Query<Element>) -> Query<Element>)) -> Int?
-
-    /**
      Returns the index of the first object matching the predicate, or `nil` if no objects match.
+
+     This is only applicable to ordered collections, and will abort if the collection is unordered.
 
      - parameter predicateFormat: A predicate format string, optionally followed by a variable number of arguments.
      */
     func index(matching predicateFormat: String, _ args: Any...) -> Int?
-
 
     // MARK: Object Retrieval
 
@@ -317,7 +313,6 @@ public protocol RealmCollection: RealmCollectionBase {
      - parameter indexes: The indexes in the collection to select objects from.
      */
     func objects(at indexes: IndexSet) -> [Element]
-
 
     // MARK: Filtering
 
@@ -335,41 +330,7 @@ public protocol RealmCollection: RealmCollectionBase {
      */
     func filter(_ predicate: NSPredicate) -> Results<Element>
 
-    /**
-     Returns a `Results` containing all objects matching the given query in the collection.
-
-     - Note: This should only be used with classes using the `@Persistable` property declaration.
-
-     - Usage:
-     ```
-     myCol.where {
-        ($0.fooCol > 5) && ($0.barCol == "foobar")
-     }
-     ```
-
-     - Note: See ``Query`` for more information on what query operations are available.
-
-     - parameter isIncluded: The query closure to use to filter the objects.
-     */
-    func `where`(_ isIncluded: ((Query<Element>) -> Query<Element>)) -> Results<Element>
-
-
     // MARK: Sorting
-
-    /**
-     Returns a `Results` containing the objects in the collection, but sorted.
-
-     Objects are sorted based on the values of the given key path. For example, to sort a collection of `Student`s from
-     youngest to oldest based on their `age` property, you might call
-     `students.sorted(byKeyPath: "age", ascending: true)`.
-
-     - warning: Collections may only be sorted by properties of boolean, `Date`, `NSDate`, single and double-precision
-                floating point, integer, and string types.
-
-     - parameter keyPath:   The key path to sort by.
-     - parameter ascending: The direction to sort in.
-     */
-    func sorted(byKeyPath keyPath: String, ascending: Bool) -> Results<Element>
 
     /**
      Returns a `Results` containing the objects in the collection, but sorted.
@@ -382,6 +343,13 @@ public protocol RealmCollection: RealmCollectionBase {
      - parameter sortDescriptors: A sequence of `SortDescriptor`s to sort by.
      */
     func sorted<S: Sequence>(by sortDescriptors: S) -> Results<Element> where S.Iterator.Element == SortDescriptor
+
+    /**
+     Returns a `Results` containing distinct objects based on the specified key paths.
+
+     - parameter keyPaths:  The key paths to distinct on.
+     */
+    func distinct<S: Sequence>(by keyPaths: S) -> Results<Element> where S.Iterator.Element == String
 
     // MARK: Aggregate Operations
 
@@ -503,66 +471,6 @@ public protocol RealmCollection: RealmCollectionBase {
      // end of run loop execution context
      ```
 
-     You must retain the returned token for as long as you want updates to be sent to the block. To stop receiving
-     updates, call `invalidate()` on the token.
-
-     - warning: This method cannot be called during a write transaction, or when the containing Realm is read-only.
-
-     - parameter queue: The serial dispatch queue to receive notification on. If
-                        `nil`, notifications are delivered to the current thread.
-     - parameter block: The block to be called whenever a change occurs.
-     - returns: A token which must be held for as long as you want updates to be delivered.
-     */
-    func observe(on queue: DispatchQueue?, _ block: @escaping (RealmCollectionChange<Self>) -> Void) -> NotificationToken
-
-    /**
-     Registers a block to be called each time the collection changes.
-
-     The block will be asynchronously called with the initial results, and then called again after each write
-     transaction which changes either any of the objects in the collection, or which objects are in the collection.
-
-     The `change` parameter that is passed to the block reports, in the form of indices within the collection, which of
-     the objects were added, removed, or modified during each write transaction. See the `RealmCollectionChange`
-     documentation for more information on the change information supplied and an example of how to use it to update a
-     `UITableView`.
-
-     At the time when the block is called, the collection will be fully evaluated and up-to-date, and as long as you do
-     not perform a write transaction on the same thread or explicitly call `realm.refresh()`, accessing it will never
-     perform blocking work.
-
-     If no queue is given, notifications are delivered via the standard run loop, and so can't be delivered while the
-     run loop is blocked by other activity. If a queue is given, notifications are delivered to that queue instead. When
-     notifications can't be delivered instantly, multiple notifications may be coalesced into a single notification.
-     This can include the notification with the initial collection.
-
-     For example, the following code performs a write transaction immediately after adding the notification block, so
-     there is no opportunity for the initial notification to be delivered first. As a result, the initial notification
-     will reflect the state of the Realm after the write transaction.
-
-     ```swift
-     let dogs = realm.objects(Dog.self)
-     print("dogs.count: \(dogs?.count)") // => 0
-     let token = dogs.observe { changes in
-         switch changes {
-         case .initial(let dogs):
-             // Will print "dogs.count: 1"
-             print("dogs.count: \(dogs.count)")
-             break
-         case .update:
-             // Will not be hit in this example
-             break
-         case .error:
-             break
-         }
-     }
-     try! realm.write {
-         let dog = Dog()
-         dog.name = "Rex"
-         person.dogs.append(dog)
-     }
-     // end of run loop execution context
-     ```
-
      If no key paths are given, the block will be executed on any insertion,
      modification, or deletion for all object properties and the properties of
      any nested, linked objects. If a key path or key paths are provided,
@@ -626,8 +534,8 @@ public protocol RealmCollection: RealmCollectionBase {
                            the block when they are modified. If `nil`, notifications
                            will be delivered for any property change on the object.
                            String key paths which do not correspond to a valid a property
-                           will throw an exception.
-                           See description above for more detail on linked properties.
+                           will throw an exception. See description above for
+                           more detail on linked properties.
      - parameter queue: The serial dispatch queue to receive notification on. If
                         `nil`, notifications are delivered to the current thread.
      - parameter block: The block to be called whenever a change occurs.
@@ -636,126 +544,6 @@ public protocol RealmCollection: RealmCollectionBase {
     func observe(keyPaths: [String]?,
                  on queue: DispatchQueue?,
                  _ block: @escaping (RealmCollectionChange<Self>) -> Void) -> NotificationToken
-
-    /**
-     Registers a block to be called each time the collection changes.
-
-     The block will be asynchronously called with the initial results, and then called again after each write
-     transaction which changes either any of the objects in the collection, or which objects are in the collection.
-
-     The `change` parameter that is passed to the block reports, in the form of indices within the collection, which of
-     the objects were added, removed, or modified during each write transaction. See the `RealmCollectionChange`
-     documentation for more information on the change information supplied and an example of how to use it to update a
-     `UITableView`.
-
-     At the time when the block is called, the collection will be fully evaluated and up-to-date, and as long as you do
-     not perform a write transaction on the same thread or explicitly call `realm.refresh()`, accessing it will never
-     perform blocking work.
-
-     If no queue is given, notifications are delivered via the standard run loop, and so can't be delivered while the
-     run loop is blocked by other activity. If a queue is given, notifications are delivered to that queue instead. When
-     notifications can't be delivered instantly, multiple notifications may be coalesced into a single notification.
-     This can include the notification with the initial collection.
-
-     For example, the following code performs a write transaction immediately after adding the notification block, so
-     there is no opportunity for the initial notification to be delivered first. As a result, the initial notification
-     will reflect the state of the Realm after the write transaction.
-
-     ```swift
-     let dogs = realm.objects(Dog.self)
-     print("dogs.count: \(dogs?.count)") // => 0
-     let token = dogs.observe { changes in
-         switch changes {
-         case .initial(let dogs):
-             // Will print "dogs.count: 1"
-             print("dogs.count: \(dogs.count)")
-             break
-         case .update:
-             // Will not be hit in this example
-             break
-         case .error:
-             break
-         }
-     }
-     try! realm.write {
-         let dog = Dog()
-         dog.name = "Rex"
-         person.dogs.append(dog)
-     }
-     // end of run loop execution context
-     ```
-
-     If no key paths are given, the block will be executed on any insertion,
-     modification, or deletion for all object properties and the properties of
-     any nested, linked objects. If a key path or key paths are provided,
-     then the block will be called for changes which occur only on the
-     provided key paths. For example, if:
-     ```swift
-     class Dog: Object {
-         @Persisted var name: String
-         @Persisted var age: Int
-         @Persisted var toys: List<Toy>
-     }
-     // ...
-     let dogs = realm.objects(Dog.self)
-
-     let token = dogs.observe(keyPaths: [\Dog.name]) { changes in
-         switch changes {
-         case .initial(let dogs):
-            // ...
-         case .update:
-            // This case is hit:
-            // - after the token is intialized
-            // - when the name property of an object in the
-            // collection is modified
-            // - when an element is inserted or removed
-            //   from the collection.
-            // This block is not triggered:
-            // - when a value other than name is modified on
-            //   one of the elements.
-         case .error:
-             // ...
-         }
-     }
-     // end of run loop execution context
-     ```
-     - If the observed key path were `[\Dog.toys.brand]`, then any insertion or
-     deletion to the `toys` list on any of the collection's elements would trigger the block.
-     Changes to the `brand` value on any `Toy` that is linked to a `Dog` in this
-     collection will trigger the block. Changes to a value other than `brand` on any `Toy` that
-     is linked to a `Dog` in this collection would not trigger the block.
-     Any insertion or removal to the `Dog` type collection being observed
-     would also trigger a notification.
-     - If the above example observed the `[\Dog.toys]` key path, then any insertion,
-     deletion, or modification to the `toys` list for any element in the collection
-     would trigger the block.
-     Changes to any value on any `Toy` that is linked to a `Dog` in this collection
-     would *not* trigger the block.
-     Any insertion or removal to the `Dog` type collection being observed
-     would still trigger a notification.
-
-     - note: Multiple notification tokens on the same object which filter for
-     separate key paths *do not* filter exclusively. If one key path
-     change is satisfied for one notification token, then all notification
-     token blocks for that object will execute.
-
-     You must retain the returned token for as long as you want updates to be sent to the block. To stop receiving
-     updates, call `invalidate()` on the token.
-
-     - warning: This method cannot be called during a write transaction, or when the containing Realm is read-only.
-
-     - parameter keyPaths: Only properties contained in the key paths array will trigger
-                           the block when they are modified. If `nil`, notifications
-                           will be delivered for any property change on the object.
-                           See description above for more detail on linked properties.
-     - parameter queue: The serial dispatch queue to receive notification on. If
-                        `nil`, notifications are delivered to the current thread.
-     - parameter block: The block to be called whenever a change occurs.
-     - returns: A token which must be held for as long as you want updates to be delivered.
-     */
-    func observe<T: ObjectBase>(keyPaths: [PartialKeyPath<T>],
-                                on queue: DispatchQueue?,
-                                _ block: @escaping (RealmCollectionChange<Self>) -> Void) -> NotificationToken
 
     // MARK: Frozen Objects
 
@@ -786,7 +574,65 @@ public protocol RealmCollection: RealmCollectionBase {
     func thaw() -> Self?
 }
 
-// MARK: Collection support
+// MARK: - Codable
+
+extension RealmCollection where Element: Encodable {
+    /// Encodes the contents of this collection into the given encoder.
+    /// - parameter encoder The encoder to write data to.
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.unkeyedContainer()
+        for value in self {
+            try container.encode(value)
+        }
+    }
+}
+
+// MARK: - Type-safe queries
+
+public extension RealmCollection {
+    /**
+     Returns the index of the first object matching the query, or `nil` if no objects match.
+
+     This is only applicable to ordered collections, and will abort if the collection is unordered.
+
+     - Note: This should only be used with classes using the `@Persistable` property declaration.
+
+     - Usage:
+     ```
+     obj.index(matching: { $0.fooCol < 456 })
+     ```
+
+     - Note: See ``Query`` for more information on what query operations are available.
+
+     - parameter isIncluded: The query closure to use to filter the objects.
+     */
+    func index(matching isIncluded: ((Query<Element>) -> Query<Element>)) -> Int? {
+        let isPrimitive = Element._rlmType != .object
+        return index(matching: isIncluded(Query<Element>(isPrimitive: isPrimitive)).predicate)
+    }
+
+    /**
+     Returns a `Results` containing all objects matching the given query in the collection.
+
+     - Note: This should only be used with classes using the `@Persistable` property declaration.
+
+     - Usage:
+     ```
+     myCol.where {
+        ($0.fooCol > 5) && ($0.barCol == "foobar")
+     }
+     ```
+
+     - Note: See ``Query`` for more information on what query operations are available.
+
+     - parameter isIncluded: The query closure to use to filter the objects.
+     */
+    func `where`(_ isIncluded: ((Query<Element>) -> Query<Element>)) -> Results<Element> {
+        return filter(isIncluded(Query()).predicate)
+    }
+}
+
+// MARK: Collection protocol
 
 public extension RealmCollection {
     /// The position of the first element in a non-empty collection.
@@ -798,11 +644,15 @@ public extension RealmCollection {
     /// zero or more applications of successor().
     var endIndex: Int { count }
 
+    /// Returns the position immediately after the given index.
+    /// - parameter i: A valid index of the collection. `i` must be less than `endIndex`.
     func index(after i: Int) -> Int { return i + 1 }
+    /// Returns the position immediately before the given index.
+    /// - parameter i: A valid index of the collection. `i` must be greater than `startIndex`.
     func index(before i: Int) -> Int { return i - 1 }
 }
 
-// MARK: Aggregatable
+// MARK: - Aggregation
 
 /**
  Extension for RealmCollections where the Value is of an Object type that
@@ -856,84 +706,6 @@ public extension RealmCollection where Element: ObjectBase {
         average(ofProperty: _name(for: keyPath))
     }
 }
-
-// MARK: Sortable
-
-/**
- Extension for RealmCollections where the Value is of an Object type that
- enables sortable operations.
- */
-public extension RealmCollection where Element: ObjectBase {
-    /**
-     Returns a `Results` containing the objects in the collection, but sorted.
-
-     Objects are sorted based on the values of the given key path. For example, to sort a collection of `Student`s from
-     youngest to oldest based on their `age` property, you might call
-     `students.sorted(byKeyPath: "age", ascending: true)`.
-
-     - warning: Collections may only be sorted by properties of boolean, `Date`, `NSDate`, single and double-precision
-                floating point, integer, and string types.
-
-     - parameter keyPath:   The key path to sort by.
-     - parameter ascending: The direction to sort in.
-     */
-    func sorted<T: Comparable>(by keyPath: KeyPath<Element, T>, ascending: Bool) -> Results<Element> {
-        sorted(byKeyPath: _name(for: keyPath), ascending: ascending)
-    }
-
-    /**
-     Returns a `Results` containing the objects in the collection, but sorted.
-
-     Objects are sorted based on the values of the given key path. For example, to sort a collection of `Student`s from
-     youngest to oldest based on their `age` property, you might call
-     `students.sorted(byKeyPath: "age", ascending: true)`.
-
-     - warning: Collections may only be sorted by properties of boolean, `Date`, `NSDate`, single and double-precision
-                floating point, integer, and string types.
-
-     - parameter keyPath:   The key path to sort by.
-     - parameter ascending: The direction to sort in.
-     */
-    func sorted<T: Comparable>(by keyPath: KeyPath<Element, Optional<T>>, ascending: Bool) -> Results<Element> {
-        sorted(byKeyPath: _name(for: keyPath), ascending: ascending)
-    }
-}
-
-public extension RealmCollection {
-    /**
-     Returns the index of the first object matching the given predicate, or `nil` if no objects match.
-
-     - parameter predicateFormat: A predicate format string, optionally followed by a variable number of arguments.
-     */
-    func index(matching predicateFormat: String, _ args: Any...) -> Int? {
-        return index(matching: NSPredicate(format: predicateFormat, argumentArray: unwrapOptionals(in: args)))
-    }
-
-    /**
-     Returns a `Results` containing all objects matching the given predicate in the collection.
-
-     - parameter predicateFormat: A predicate format string, optionally followed by a variable number of arguments.
-     */
-    func filter(_ predicateFormat: String, _ args: Any...) -> Results<Element> {
-        return filter(NSPredicate(format: predicateFormat, argumentArray: unwrapOptionals(in: args)))
-    }
-}
-
-
-/// :nodoc:
-public protocol OptionalProtocol {
-    associatedtype Wrapped
-    /// :nodoc:
-    // swiftlint:disable:next identifier_name
-    func _rlmInferWrappedType() -> Wrapped
-}
-
-extension Optional: OptionalProtocol {
-    /// :nodoc:
-    // swiftlint:disable:next identifier_name
-    public func _rlmInferWrappedType() -> Wrapped { return self! }
-}
-
 
 public extension RealmCollection where Element: MinMaxType {
     /**
@@ -995,6 +767,78 @@ public extension RealmCollection where Element: OptionalProtocol, Element.Wrappe
     }
 }
 
+
+// MARK: Sort and distinct
+
+/**
+ Extension for RealmCollections where the Value is of an Object type that
+ enables sortable operations.
+ */
+public extension RealmCollection where Element: KeypathSortable {
+    /**
+     Returns a `Results` containing the objects in the collection, but sorted.
+
+     Objects are sorted based on the values of the given key path. For example, to sort a collection of `Student`s from
+     youngest to oldest based on their `age` property, you might call
+     `students.sorted(byKeyPath: "age", ascending: true)`.
+
+     - warning: Collections may only be sorted by properties of boolean, `Date`, `NSDate`, single and double-precision
+                floating point, integer, and string types.
+
+     - parameter keyPath:   The key path to sort by.
+     - parameter ascending: The direction to sort in.
+     */
+    func sorted(byKeyPath keyPath: String, ascending: Bool = true) -> Results<Element> {
+        sorted(by: [SortDescriptor(keyPath: keyPath, ascending: ascending)])
+    }
+
+    /**
+     Returns a `Results` containing distinct objects based on the specified key paths
+
+     - parameter keyPaths: The key paths used produce distinct results
+     */
+    func distinct<S: Sequence>(by keyPaths: S) -> Results<Element>
+        where S.Iterator.Element == PartialKeyPath<Element>, Element: ObjectBase {
+            return distinct(by: keyPaths.map(_name(for:)))
+    }
+}
+
+public extension RealmCollection where Element: ObjectBase {
+    /**
+     Returns a `Results` containing the objects in the collection, but sorted.
+
+     Objects are sorted based on the values of the given key path. For example, to sort a collection of `Student`s from
+     youngest to oldest based on their `age` property, you might call
+     `students.sorted(byKeyPath: "age", ascending: true)`.
+
+     - warning: Collections may only be sorted by properties of boolean, `Date`, `NSDate`, single and double-precision
+                floating point, integer, and string types.
+
+     - parameter keyPath:   The key path to sort by.
+     - parameter ascending: The direction to sort in.
+     */
+    func sorted<T: Comparable>(by keyPath: KeyPath<Element, T>, ascending: Bool = true) -> Results<Element> {
+        sorted(by: [SortDescriptor(keyPath: keyPath, ascending: ascending)])
+    }
+
+    /**
+     Returns a `Results` containing the objects in the collection, but sorted.
+
+     Objects are sorted based on the values of the given key path. For example, to sort a collection of `Student`s from
+     youngest to oldest based on their `age` property, you might call
+     `students.sorted(byKeyPath: "age", ascending: true)`.
+
+     - warning: Collections may only be sorted by properties of boolean, `Date`, `NSDate`, single and double-precision
+                floating point, integer, and string types.
+
+     - parameter keyPath:   The key path to sort by.
+     - parameter ascending: The direction to sort in.
+     */
+    func sorted<T: Comparable>(by keyPath: KeyPath<Element, Optional<T>>, ascending: Bool = true) -> Results<Element> {
+        sorted(by: [SortDescriptor(keyPath: keyPath, ascending: ascending)])
+    }
+}
+
 public extension RealmCollection where Element: Comparable {
     /**
      Returns a `Results` containing the objects in the collection, but sorted.
@@ -1005,7 +849,14 @@ public extension RealmCollection where Element: Comparable {
      - parameter ascending: The direction to sort in.
      */
     func sorted(ascending: Bool = true) -> Results<Element> {
-        return sorted(byKeyPath: "self", ascending: ascending)
+        sorted(by: [SortDescriptor(keyPath: "self", ascending: ascending)])
+    }
+
+    /**
+     Returns a `Results` containing the distinct values in the collection.
+     */
+    func distinct() -> Results<Element> {
+        return distinct(by: ["self"])
     }
 }
 
@@ -1019,288 +870,42 @@ public extension RealmCollection where Element: OptionalProtocol, Element.Wrappe
      - parameter ascending: The direction to sort in.
      */
     func sorted(ascending: Bool = true) -> Results<Element> {
-        return sorted(byKeyPath: "self", ascending: ascending)
+        sorted(by: [SortDescriptor(keyPath: "self", ascending: ascending)])
+    }
+
+    /**
+     Returns a `Results` containing the distinct values in the collection.
+     */
+    func distinct() -> Results<Element> {
+        return distinct(by: ["self"])
     }
 }
 
-extension RealmCollection where Self: _ObjcBridgeable {
-    public var realm: Realm? {
-        (_rlmObjcValue as! RLMCollection).realm.map(Realm.init)
+// MARK: - NSPredicate builders
+
+public extension RealmCollection {
+    /**
+     Returns the index of the first object matching the given predicate, or `nil` if no objects match.
+
+     - parameter predicateFormat: A predicate format string, optionally followed by a variable number of arguments.
+     */
+    func index(matching predicateFormat: String, _ args: Any...) -> Int? {
+        return index(matching: NSPredicate(format: predicateFormat, argumentArray: unwrapOptionals(in: args)))
+    }
+
+    /**
+     Returns a `Results` containing all objects matching the given predicate in the collection.
+
+     - parameter predicateFormat: A predicate format string, optionally followed by a variable number of arguments.
+     */
+    func filter(_ predicateFormat: String, _ args: Any...) -> Results<Element> {
+        return filter(NSPredicate(format: predicateFormat, argumentArray: unwrapOptionals(in: args)))
     }
 }
 
-/**
- A type-erased `RealmCollection`.
+// MARK: - Observation
 
- Instances of `RealmCollection` forward operations to an opaque underlying collection having the same `Element` type.
- */
-public struct AnyRealmCollection<Element: RealmCollectionValue>: RealmCollection {
-    /// The type of the objects contained within the collection.
-    public typealias ElementType = Element
-
-    private var lastAccessedNames: NSMutableArray?
-    internal let base: RLMCollection
-    internal init(objc: RLMCollection) {
-        base = objc
-    }
-
-    /// Creates an `AnyRealmCollection` wrapping `base`.
-    public init<C: RealmCollection & _ObjcBridgeable>(_ base: C) where C.Element == Element {
-        self.base = base._rlmObjcValue as! RLMCollection
-    }
-
-    // MARK: Properties
-
-    /// The Realm which manages the collection, or `nil` if the collection is unmanaged.
-//    public var realm: Realm? { base.realm.map(Realm.init) }
-
-    /**
-     Indicates if the collection can no longer be accessed.
-
-     The collection can no longer be accessed if `invalidate()` is called on the containing `realm`.
-     */
-    public var isInvalidated: Bool { base.isInvalidated }
-
-    /// The number of objects in the collection.
-    public var count: Int { Int(base.count) }
-
-    /// A human-readable description of the objects contained in the collection.
-    public var description: String { base.description }
-
-
-    // MARK: Index Retrieval
-
-    /**
-     Returns the index of an object in the list, or `nil` if the object is not present.
-
-     - parameter object: An object to find.
-     */
-    public func index(of object: Element) -> Int? {
-        if let indexOf = base.index(of:) {
-            return notFoundToNil(index: indexOf(staticBridgeCast(fromSwift: object) as AnyObject))
-        }
-        fatalError("Collection does not support index(of:)")
-    }
-
-    /**
-     Returns the index of the first object in the list matching the predicate, or `nil` if no objects match.
-
-     - parameter predicate: The predicate with which to filter the objects.
-    */
-    public func index(matching predicate: NSPredicate) -> Int? {
-        if let indexMatching = base.indexOfObject(with:) {
-            return notFoundToNil(index: indexMatching(predicate))
-        }
-        fatalError("Collection does not support index(matching:)")
-    }
-
-    /**
-     Returns the index of the first object in the list matching the query, or `nil` if no objects match.
-
-     - Note: This should only be used with classes using the `@Persistable` property declaration.
-
-     - Usage:
-     ```
-     obj.index(matching: { $0.fooCol < 456 })
-     ```
-
-     - Note: See ``Query`` for more information on what query operations are available.
-
-     - parameter isIncluded: The query closure with which to filter the objects.
-    */
-    public func index(matching isIncluded: ((Query<Element>) -> Query<Element>)) -> Int? {
-        let isPrimitive = base.type != .object
-        return index(matching: isIncluded(Query<Element>(isPrimitive: isPrimitive)).predicate)
-    }
-
-    // MARK: Object Retrieval
-
-    /**
-     Returns the object at the given index (get), or replaces the object at the given index (set).
-
-     - warning: You can only set an object during a write transaction.
-
-     - parameter index: The index of the object to retrieve or replace.
-     */
-    public subscript(position: Int) -> Element {
-        get {
-            if let lastAccessedNames = lastAccessedNames {
-                return Element._rlmKeyPathRecorder(with: lastAccessedNames)
-            }
-            throwForNegativeIndex(position)
-            return staticBridgeCast(fromObjectiveC: base.object(at: UInt(position)))
-        }
-    }
-
-    /// Returns the first object in the list, or `nil` if the list is empty.
-    public var first: Element? {
-        return base.firstObject().map(staticBridgeCast)
-    }
-
-    /// Returns the last object in the list, or `nil` if the list is empty.
-    public var last: Element? {
-        return base.lastObject().map(staticBridgeCast)
-    }
-
-    /**
-     Returns an array containing the objects in the array at the indexes specified by a given index set.
-
-     - warning Throws if an index supplied in the IndexSet is out of bounds.
-
-     - parameter indexes: The indexes in the list to select objects from.
-     */
-    public func objects(at indexes: IndexSet) -> [Element] {
-        guard let r = base.objects(at: indexes) else {
-            throwRealmException("Indexes for collection are out of bounds.")
-        }
-        return r.map(staticBridgeCast)
-    }
-
-    // MARK: KVC
-
-    /**
-     Returns an `Array` containing the results of invoking `valueForKey(_:)` using `key` on each of the collection's
-     objects.
-     */
-    public func value(forKey key: String) -> Any? {
-        return base.value(forKey: key)
-    }
-
-    /**
-     Returns an `Array` containing the results of invoking `valueForKeyPath(_:)` using `keyPath` on each of the
-     collection's objects.
-
-     - parameter keyPath: The key path to the property whose values are desired.
-     */
-    public func value(forKeyPath keyPath: String) -> Any? {
-        return base.value(forKeyPath: keyPath)
-    }
-
-    /**
-     Invokes `setValue(_:forKey:)` on each of the collection's objects using the specified `value` and `key`.
-
-     - warning: This method can only be called during a write transaction.
-
-     - parameter value: The object value.
-     - parameter key:   The name of the property whose value should be set on each object.
-    */
-    public func setValue(_ value: Any?, forKey key: String) {
-        return base.setValue(value, forKeyPath: key)
-    }
-
-    // MARK: Filtering
-
-    /**
-     Returns a `Results` containing all objects matching the given predicate in the list.
-
-     - parameter predicate: The predicate with which to filter the objects.
-     */
-    public func filter(_ predicate: NSPredicate) -> Results<Element> {
-        return Results<Element>(base.objects(with: predicate))
-    }
-
-    /**
-     Returns a `Results` containing all objects matching the given query in the list.
-
-     - Note: This should only be used with classes using the `@Persistable` property declaration.
-
-     - Usage:
-     ```
-     myList.where {
-        ($0.fooCol > 5) && ($0.barCol == "foobar")
-     }
-     ```
-
-     - Note: See ``Query`` for more information on what query operations are available.
-
-     - parameter isIncluded: The query with which to filter the objects.
-     */
-    public func `where`(_ isIncluded: ((Query<Element>) -> Query<Element>)) -> Results<Element> {
-        return filter(isIncluded(Query()).predicate)
-    }
-
-    // MARK: Sorting
-
-    /**
-     Returns a `Results` containing the objects in the list, but sorted.
-
-     Objects are sorted based on the values of the given key path. For example, to sort a list of `Student`s from
-     youngest to oldest based on their `age` property, you might call
-     `students.sorted(byKeyPath: "age", ascending: true)`.
-
-     - warning: Lists may only be sorted by properties of boolean, `Date`, `NSDate`, single and double-precision
-                floating point, integer, and string types.
-
-     - parameter keyPath:  The key path to sort by.
-     - parameter ascending: The direction to sort in.
-     */
-    public func sorted(byKeyPath keyPath: String, ascending: Bool = true) -> Results<Element> {
-        return sorted(by: [SortDescriptor(keyPath: keyPath, ascending: ascending)])
-    }
-
-    /**
-     Returns a `Results` containing the objects in the list, but sorted.
-
-     - warning: Lists may only be sorted by properties of boolean, `Date`, `NSDate`, single and double-precision
-                floating point, integer, and string types.
-
-     - see: `sorted(byKeyPath:ascending:)`
-    */
-    public func sorted<S: Sequence>(by sortDescriptors: S) -> Results<Element>
-        where S.Iterator.Element == SortDescriptor {
-            return Results<Element>(base.sortedResults(using: sortDescriptors.map { $0.rlmSortDescriptorValue }))
-    }
-
-    // MARK: Aggregate Operations
-
-    /**
-     Returns the minimum (lowest) value of the given property among all the objects in the list, or `nil` if the list is
-     empty.
-
-     - warning: Only a property whose type conforms to the `MinMaxType` protocol can be specified.
-
-     - parameter property: The name of a property whose minimum value is desired.
-     */
-    public func min<T: MinMaxType>(ofProperty property: String) -> T? {
-        return base.min(ofProperty: property).map(staticBridgeCast)
-    }
-
-    /**
-     Returns the maximum (highest) value of the given property among all the objects in the list, or `nil` if the list
-     is empty.
-
-     - warning: Only a property whose type conforms to the `MinMaxType` protocol can be specified.
-
-     - parameter property: The name of a property whose maximum value is desired.
-     */
-    public func max<T: MinMaxType>(ofProperty property: String) -> T? {
-        return base.max(ofProperty: property).map(staticBridgeCast)
-    }
-
-    /**
-     Returns the sum of the values of a given property over all the objects in the list.
-
-     - warning: Only a property whose type conforms to the `AddableType` protocol can be specified.
-
-     - parameter property: The name of a property whose values should be summed.
-     */
-    public func sum<T: AddableType>(ofProperty property: String) -> T {
-        return staticBridgeCast(fromObjectiveC: base.sum(ofProperty: property))
-    }
-
-    /**
-     Returns the average value of a given property over all the objects in the list, or `nil` if the list is empty.
-
-     - warning: Only a property whose type conforms to the `AddableType` protocol can be specified.
-
-     - parameter property: The name of a property whose average value should be calculated.
-     */
-    public func average<T: AddableType>(ofProperty property: String) -> T? {
-        return base.average(ofProperty: property).map(staticBridgeCast)
-    }
-
-    // MARK: Notifications
-
+public extension RealmCollection {
     /**
      Registers a block to be called each time the collection changes.
 
@@ -1326,11 +931,7 @@ public struct AnyRealmCollection<Element: RealmCollectionValue>: RealmCollection
      will reflect the state of the Realm after the write transaction.
 
      ```swift
-     class Person: Object {
-         @Persisted var dogs: List<Dog>
-     }
-     // ...
-     let dogs = person.dogs
+     let dogs = realm.objects(Dog.self)
      print("dogs.count: \(dogs?.count)") // => 0
      let token = dogs.observe { changes in
          switch changes {
@@ -1359,17 +960,15 @@ public struct AnyRealmCollection<Element: RealmCollectionValue>: RealmCollection
      then the block will be called for changes which occur only on the
      provided key paths. For example, if:
      ```swift
-     class Person: Object {
-         @Persisted var dogs: List<Dog>
-     }
      class Dog: Object {
          @Persisted var name: String
          @Persisted var age: Int
          @Persisted var toys: List<Toy>
      }
      // ...
-     let dogs = person.dogs
-     let token = dogs.observe(keyPaths: ["name"]) { changes in
+     let dogs = realm.objects(Dog.self)
+
+     let token = dogs.observe(keyPaths: [\Dog.name]) { changes in
          switch changes {
          case .initial(let dogs):
             // ...
@@ -1389,14 +988,14 @@ public struct AnyRealmCollection<Element: RealmCollectionValue>: RealmCollection
      }
      // end of run loop execution context
      ```
-     - If the observed key path were `["toys.brand"]`, then any insertion or
+     - If the observed key path were `[\Dog.toys.brand]`, then any insertion or
      deletion to the `toys` list on any of the collection's elements would trigger the block.
      Changes to the `brand` value on any `Toy` that is linked to a `Dog` in this
      collection will trigger the block. Changes to a value other than `brand` on any `Toy` that
      is linked to a `Dog` in this collection would not trigger the block.
      Any insertion or removal to the `Dog` type collection being observed
      would also trigger a notification.
-     - If the above example observed the `["toys"]` key path, then any insertion,
+     - If the above example observed the `[\Dog.toys]` key path, then any insertion,
      deletion, or modification to the `toys` list for any element in the collection
      would trigger the block.
      Changes to any value on any `Toy` that is linked to a `Dog` in this collection
@@ -1415,25 +1014,16 @@ public struct AnyRealmCollection<Element: RealmCollectionValue>: RealmCollection
      - warning: This method cannot be called during a write transaction, or when the containing Realm is read-only.
 
      - parameter keyPaths: Only properties contained in the key paths array will trigger
-                           the block when they are modified. If `nil`, notifications
-                           will be delivered for any property change on the object.
-                           String key paths which do not correspond to a valid a property
-                           will throw an exception.
-                           See description above for more detail on linked properties.
+                           the block when they are modified. See description above for more detail on linked properties.
      - parameter queue: The serial dispatch queue to receive notification on. If
                         `nil`, notifications are delivered to the current thread.
      - parameter block: The block to be called whenever a change occurs.
      - returns: A token which must be held for as long as you want updates to be delivered.
      */
-    public func observe(keyPaths: [String]? = nil,
-                        on queue: DispatchQueue? = nil,
-                        _ block: @escaping (RealmCollectionChange<AnyRealmCollection>) -> Void) -> NotificationToken {
-        return base.addNotificationBlock(wrapObserveBlock(block), keyPaths: keyPaths, queue: queue)
-    }
-    public func observe(
-                        on queue: DispatchQueue? = nil,
-                        _ block: @escaping (RealmCollectionChange<AnyRealmCollection>) -> Void) -> NotificationToken {
-        return base.addNotificationBlock(wrapObserveBlock(block), keyPaths: nil, queue: queue)
+    func observe<T: ObjectBase>(keyPaths: [PartialKeyPath<T>],
+                                on queue: DispatchQueue? = nil,
+                                _ block: @escaping (RealmCollectionChange<Self>) -> Void) -> NotificationToken {
+        return self.observe(keyPaths: keyPaths.map(_name(for:)), on: queue, block)
     }
 
     /**
@@ -1461,11 +1051,7 @@ public struct AnyRealmCollection<Element: RealmCollectionValue>: RealmCollection
      will reflect the state of the Realm after the write transaction.
 
      ```swift
-     class Person: Object {
-         @Persisted var dogs: List<Dog>
-     }
-     // ...
-     let dogs = person.dogs
+     let dogs = realm.objects(Dog.self)
      print("dogs.count: \(dogs?.count)") // => 0
      let token = dogs.observe { changes in
          switch changes {
@@ -1494,16 +1080,14 @@ public struct AnyRealmCollection<Element: RealmCollectionValue>: RealmCollection
      then the block will be called for changes which occur only on the
      provided key paths. For example, if:
      ```swift
-     class Person: Object {
-         @Persisted var dogs: List<Dog>
-     }
      class Dog: Object {
          @Persisted var name: String
          @Persisted var age: Int
          @Persisted var toys: List<Toy>
      }
      // ...
-     let dogs = person.dogs
+     let dogs = realm.objects(Dog.self)
+
      let token = dogs.observe(keyPaths: [\Dog.name]) { changes in
          switch changes {
          case .initial(let dogs):
@@ -1558,148 +1142,50 @@ public struct AnyRealmCollection<Element: RealmCollectionValue>: RealmCollection
      - parameter block: The block to be called whenever a change occurs.
      - returns: A token which must be held for as long as you want updates to be delivered.
      */
-    public func observe<T: ObjectBase>(keyPaths: [PartialKeyPath<T>],
-                                       on queue: DispatchQueue? = nil,
-                                       _ block: @escaping (RealmCollectionChange<AnyRealmCollection>) -> Void) -> NotificationToken {
-        return base.addNotificationBlock(wrapObserveBlock(block), keyPaths: keyPaths.map(_name(for:)), queue: queue)
+    func observe(keyPaths: [String]? = nil,
+                 on queue: DispatchQueue? = nil,
+                 _ block: @escaping (RealmCollectionChange<Self>) -> Void) -> NotificationToken {
+        return self.observe(keyPaths: keyPaths, on: queue, block)
+    }
+}
+
+/**
+ A type-erased `RealmCollection`.
+
+ Instances of `RealmCollection` forward operations to an opaque underlying
+ collection having the same `Element` type. This type can be used to write
+ non-generic code which can operate on or store multiple types of Realm
+ collections. It does not have any runtime overhead over using the original
+ collection directly.
+ */
+@frozen public struct AnyRealmCollection<Element: RealmCollectionValue>: RealmCollectionImpl {
+    internal let collection: RLMCollection
+    internal var lastAccessedNames: NSMutableArray?
+    internal init(collection: RLMCollection) {
+        self.collection = collection
     }
 
-    // MARK: Frozen Objects
-
-    public var isFrozen: Bool {
-        return base.isFrozen
-    }
-
-    public func freeze() -> Self {
-        return Self(objc: base.freeze())
-    }
-
-    public func thaw() -> Self? {
-        return Self(objc: base.thaw())
+    /// Creates an `AnyRealmCollection` wrapping `base`.
+    public init<C: RealmCollection & _ObjcBridgeable>(_ base: C) where C.Element == Element {
+        self.collection = base._rlmObjcValue as! RLMCollection
     }
 
     /**
-     Returns the minimum (lowest) value in the list, or `nil` if the list is empty.
+     Returns the object at the given `index`.
+     - parameter index: The index.
      */
-    public func min() -> Element? {
-        return base.min(ofProperty: "self").map(staticBridgeCast)
+    public subscript(position: Int) -> Element {
+        throwForNegativeIndex(position)
+        return staticBridgeCast(fromObjectiveC: collection.object(at: UInt(position)))
     }
 
-    /**
-     Returns the maximum (highest) value in the list, or `nil` if the list is empty.
-     */
-    public func max() -> Element? {
-        return base.max(ofProperty: "self").map(staticBridgeCast)
-    }
-    /**
-     Returns the sum of the values in the list.
-     */
-//    public func sum() -> Element {
-//        return sum(ofProperty: "self")
-//    }
-
-    /**
-     Returns the average of the values in the list, or `nil` if the list is empty.
-     */
-    public func average<T: AddableType>() -> T? {
-        return average(ofProperty: "self")
-    }
-
-    // MARK: Sequence Support
-
-    /// Returns a `RLMIterator` that yields successive elements in the `List`.
-    public func makeIterator() -> RLMIterator<Element> {
-        return RLMIterator(collection: base)
+    /// A human-readable description of the objects represented by the linking objects.
+    public var description: String {
+        return RLMDescriptionWithMaxDepth("AnyRealmCollection", collection, RLMDescriptionMaxDepth)
     }
 }
 
-// MARK: Collection observation helpers
-
-internal protocol ObservableCollection {
-    associatedtype BackingObjcCollection
-    func isSameObjcCollection(_ objc: BackingObjcCollection) -> Bool
-    init(objc: BackingObjcCollection)
-}
-
-extension ObservableCollection where Self: RealmCollection {
-    // We want to pass the same object instance to the change callback each time.
-    // If the callback is being called on the source thread the instance should
-    // be `self`, but if it's on a different thread it needs to be a new Swift
-    // wrapper for the obj-c type, which we'll construct the first time the
-    // callback is called.
-    internal typealias ObjcCollectionChange = (BackingObjcCollection?, RLMCollectionChange?, Error?) -> Void
-
-    internal func wrapObserveBlock(_ block: @escaping (RealmCollectionChange<Self>) -> Void) -> ObjcCollectionChange {
-        var col: Self?
-        return { collection, change, error in
-            if col == nil, let collection = collection {
-                col = self.isSameObjcCollection(collection) ? self : Self(objc: collection)
-            }
-            block(RealmCollectionChange.fromObjc(value: col, change: change, error: error))
-        }
-    }
-}
-
-extension ObservableCollection where Self: RealmKeyedCollection {
-    // We want to pass the same object instance to the change callback each time.
-    // If the callback is being called on the source thread the instance should
-    // be `self`, but if it's on a different thread it needs to be a new Swift
-    // wrapper for the obj-c type, which we'll construct the first time the
-    // callback is called.
-    internal typealias ObjcChange = (RLMDictionary<AnyObject, AnyObject>?, RLMDictionaryChange?, Error?) -> Void
-
-    internal func wrapDictionaryObserveBlock(_ block: @escaping (RealmMapChange<Self>) -> Void) -> ObjcChange {
-        var col: Self?
-        return { collection, change, error in
-            if col == nil, let collection = collection as? Self.BackingObjcCollection {
-                col = self.isSameObjcCollection(collection) ? self : Self(objc: collection)
-            }
-            block(RealmMapChange.fromObjc(value: col, change: change, error: error))
-        }
-    }
-}
-
-extension List: ObservableCollection {
-    internal typealias BackingObjcCollection = RLMArray<AnyObject>
-    internal func isSameObjcCollection(_ rlmArray: BackingObjcCollection) -> Bool {
-        return _rlmCollection === rlmArray
-    }
-}
-
-extension MutableSet: ObservableCollection {
-    internal typealias BackingObjcCollection = RLMSet<AnyObject>
-    internal func isSameObjcCollection(_ rlmSet: BackingObjcCollection) -> Bool {
-        return _rlmCollection === rlmSet
-    }
-}
-
-extension Map: ObservableCollection {
-    internal typealias BackingObjcCollection = RLMDictionary<AnyObject, AnyObject>
-    internal func isSameObjcCollection(_ rlmDictionary: BackingObjcCollection) -> Bool {
-        return _rlmCollection === rlmDictionary
-    }
-}
-
-extension Results: ObservableCollection {
-    internal typealias BackingObjcCollection = RLMResults<AnyObject>
-    internal func isSameObjcCollection(_ objc: RLMResults<AnyObject>) -> Bool {
-        return objc === rlmResults
-    }
-}
-
-extension LinkingObjects: ObservableCollection {
-    internal typealias BackingObjcCollection = RLMResults<AnyObject>
-    internal func isSameObjcCollection(_ objc: RLMResults<AnyObject>) -> Bool {
-        return objc === rlmResults
-    }
-}
-
-extension AnyRealmCollection: ObservableCollection {
-    internal typealias BackingObjcCollection = RLMCollection
-    internal func isSameObjcCollection(_ objc: RLMCollection) -> Bool {
-        return objc === base
-    }
-}
+extension AnyRealmCollection: Encodable where Element: Encodable {}
 
 // MARK: Key Path Strings
 
@@ -1726,8 +1212,7 @@ internal protocol PropertyNameConvertible {
  }
  ```
 */
-public struct ProjectedCollection<NewElement>: RandomAccessCollection, ThreadConfined where NewElement: RealmCollectionValue {
-    public typealias Element = NewElement
+public struct ProjectedCollection<Element>: RandomAccessCollection, CustomStringConvertible, ThreadConfined where Element: RealmCollectionValue {
     public typealias Index = Int
     /**
      Returns the index of the first object in the list matching the predicate, or `nil` if no objects match.
@@ -1804,16 +1289,16 @@ public struct ProjectedCollection<NewElement>: RandomAccessCollection, ThreadCon
      - returns: A token which must be held for as long as you want updates to be delivered.
      */
     public func observe(on queue: DispatchQueue?,
-                        _ block: @escaping (RealmCollectionChange<ProjectedCollection<NewElement>>) -> Void) -> NotificationToken {
+                        _ block: @escaping (RealmCollectionChange<ProjectedCollection<Element>>) -> Void) -> NotificationToken {
         backingCollection.observe(on: queue, {
             switch $0 {
             case .initial(let collection):
-                block(.initial(Self(collection, keyPath: keyPath, propertyName: propertyName)))
+                block(.initial(Self(collection.collection, keyPath: keyPath, propertyName: propertyName)))
             case .update(let collection,
                          deletions: let deletions,
                          insertions: let insertions,
                          modifications: let modifications):
-                block(.update(Self(collection, keyPath: keyPath, propertyName: propertyName),
+                block(.update(Self(collection.collection, keyPath: keyPath, propertyName: propertyName),
                               deletions: deletions,
                               insertions: insertions,
                               modifications: modifications))
@@ -1938,17 +1423,17 @@ public struct ProjectedCollection<NewElement>: RandomAccessCollection, ThreadCon
      - returns: A token which must be held for as long as you want updates to be delivered.
      */
     public func observe(keyPaths: [String]? = nil, on queue: DispatchQueue? = nil,
-                        _ block: @escaping (RealmCollectionChange<ProjectedCollection<NewElement>>) -> Void)
+                        _ block: @escaping (RealmCollectionChange<ProjectedCollection<Element>>) -> Void)
         -> NotificationToken {
             backingCollection.observe(keyPaths: keyPaths, on: queue) {
                 switch $0 {
                 case .initial(let collection):
-                    block(.initial(Self(collection, keyPath: keyPath, propertyName: propertyName)))
+                    block(.initial(Self(collection.collection, keyPath: keyPath, propertyName: propertyName)))
                 case .update(let collection,
                              deletions: let deletions,
                              insertions: let insertions,
                              modifications: let modifications):
-                    block(.update(Self(collection, keyPath: keyPath, propertyName: propertyName),
+                    block(.update(Self(collection.collection, keyPath: keyPath, propertyName: propertyName),
                                   deletions: deletions,
                                   insertions: insertions,
                                   modifications: modifications))
@@ -1965,9 +1450,9 @@ public struct ProjectedCollection<NewElement>: RandomAccessCollection, ThreadCon
 
      - parameter index: The index of the object to retrieve or replace.
      */
-    public subscript(position: Int) -> NewElement {
+    public subscript(position: Int) -> Element {
         get {
-            backingCollection[position][keyPath: keyPath] as! NewElement
+            backingCollection[position][keyPath: keyPath] as! Element
         }
         set {
             backingCollection[position].setValue(newValue, forKeyPath: propertyName)
@@ -1995,11 +1480,11 @@ public struct ProjectedCollection<NewElement>: RandomAccessCollection, ThreadCon
     }
     /// A human-readable description of the object.
     public var description: String {
-        var elements = ""
-        for (i, o) in self.enumerated() {
-            elements += "\t[\(i)] \(o)\n"
+        var description = "ProjectedCollection<\(Element.self)> {\n"
+        for (i, v) in self.enumerated() {
+            description += "\t[\(i)] \(v)\n"
         }
-        return "\(type(of: self))<\(Element.self)> <\(self)> {\n\(elements)}"
+        return description + "}"
     }
     /**
      Returns the index of an object in the linking objects, or `nil` if the object is not present.
@@ -2013,42 +1498,29 @@ public struct ProjectedCollection<NewElement>: RandomAccessCollection, ThreadCon
         backingCollection.isFrozen
     }
     public func freeze() -> Self {
-        Self(backingCollection.freeze(), keyPath: keyPath, propertyName: propertyName)
+        Self(backingCollection.freeze().collection, keyPath: keyPath, propertyName: propertyName)
     }
     public func thaw() -> Self? {
         guard let backingCollection = backingCollection.thaw() else {
             return nil
         }
-        return Self(backingCollection, keyPath: keyPath, propertyName: propertyName)
+        return Self(backingCollection.collection, keyPath: keyPath, propertyName: propertyName)
     }
 
-    private var backingCollection: AnyRealmCollection<Object>
+    private let backingCollection: AnyRealmCollection<Object>
     private let keyPath: AnyKeyPath
     private let propertyName: String
 
-    init<OriginalElement>(_ list: List<Object>,
-                          keyPathToNewElement: KeyPath<OriginalElement, NewElement>) where OriginalElement: ObjectBase {
-        self.backingCollection = AnyRealmCollection(list)
-        self.keyPath = keyPathToNewElement
-        self.propertyName = _name(for: keyPathToNewElement)
-    }
-
-    init<OriginalElement>(_ set: MutableSet<Object>,
-                          keyPathToNewElement: KeyPath<OriginalElement, NewElement>) where OriginalElement: ObjectBase {
-        self.backingCollection = AnyRealmCollection(set)
-        self.keyPath = keyPathToNewElement
-        self.propertyName = _name(for: keyPathToNewElement)
-    }
-
-    private init(_ collection: AnyRealmCollection<Object>, keyPath: AnyKeyPath, propertyName: String) {
-        self.backingCollection = collection
+    init(_ collection: RLMCollection, keyPath: AnyKeyPath, propertyName: String) {
+        self.backingCollection = AnyRealmCollection(collection: collection)
         self.keyPath = keyPath
         self.propertyName = propertyName
     }
 }
 
 /**
- `ListElementMapper` transforms the actual `List` of `Objects` or `List` of `EmbeddedObjects` in to `ProjectedCollection`.
+ `CollectionElementMapper` transforms the actual collection objects into a `ProjectedCollection`.
+
  For example:
  ```swift
  class Person: Object {
@@ -2060,20 +1532,19 @@ public struct ProjectedCollection<NewElement>: RandomAccessCollection, ThreadCon
 ```
  In this code the `Person`'s dogs list will be prijected to the list of dogs names via `projectTo`
  */
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 @dynamicMemberLookup
-public struct ListElementMapper<Element> where Element: ObjectBase, Element: RealmCollectionValue {
-    var list: List<Element>
+public struct CollectionElementMapper<Element> where Element: ObjectBase & RealmCollectionValue {
+    let collection: RLMCollection
     /// :nodoc:
     public subscript<V>(dynamicMember member: KeyPath<Element, V>) -> ProjectedCollection<V> {
-        ProjectedCollection(ObjectiveCSupport.convert(object: list.rlmArray), keyPathToNewElement: member)
+        ProjectedCollection(collection, keyPath: member, propertyName: _name(for: member))
     }
 }
 
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
-extension List where Element: ObjectBase, Element: RealmCollectionValue {
+extension List where Element: ObjectBase & RealmCollectionValue {
     /**
      `projectTo` will map the original `List` of `Objects` or `List` of `EmbeddedObjects` in to `ProjectedCollection`.
+
      For example:
      ```swift
      class Person: Object {
@@ -2085,39 +1556,15 @@ extension List where Element: ObjectBase, Element: RealmCollectionValue {
     ```
      In this code the `Person`'s dogs list will be prijected to the list of dogs names via `projectTo`
      */
-    public var projectTo: ListElementMapper<Element> {
-        ListElementMapper(list: self)
+    public var projectTo: CollectionElementMapper<Element> {
+        CollectionElementMapper(collection: collection)
     }
 }
 
-/**
- `MutableSetElementMapper` transforms the actual `MutableSet` of `Objects` or `MutableSet` of `EmbeddedObjects` in to `ProjectedCollection`.
- For example:
- ```swift
- class Person: Object {
-     @Persisted var dogs: MutableSet<Dog>
- }
- class PersonProjection: Projection<Person> {
-     @Projected(\Person.dogs.projectTo.name) var dogNames: ProjectedCollection<String>
- }
-```
- In this code the `Person`'s dogs set will be prijected to the projected set of dogs names via `projectTo`
- Note: This is not the actual *set* data type therefore projected elements can contain duplicates.
- */
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
-@dynamicMemberLookup
-public struct MutableSetElementMapper<Element> where Element: ObjectBase, Element: RealmCollectionValue {
-    var set: MutableSet<Element>
-    /// :nodoc:
-    public subscript<V>(dynamicMember member: KeyPath<Element, V>) -> ProjectedCollection<V> {
-        ProjectedCollection(ObjectiveCSupport.convert(object: set.rlmSet), keyPathToNewElement: member)
-    }
-}
-
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
-extension MutableSet where Element: ObjectBase, Element: RealmCollectionValue {
+extension MutableSet where Element: ObjectBase & RealmCollectionValue {
     /**
      `MutableSetElementMapper` transforms the actual `MutableSet` of `Objects` or `MutableSet` of `EmbeddedObjects` in to `ProjectedCollection`.
+
      For example:
      ```swift
      class Person: Object {
@@ -2130,7 +1577,7 @@ extension MutableSet where Element: ObjectBase, Element: RealmCollectionValue {
      In this code the `Person`'s dogs set will be prijected to the projected set of dogs names via `projectTo`
      Note: This is not the actual *set* data type therefore projected elements can contain duplicates.
      */
-    public var projectTo: MutableSetElementMapper<Element> {
-        MutableSetElementMapper(set: self)
+    public var projectTo: CollectionElementMapper<Element> {
+        CollectionElementMapper(collection: collection)
     }
 }

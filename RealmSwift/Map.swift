@@ -583,6 +583,22 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
         return rlmDictionary.addNotificationBlock(wrapDictionaryObserveBlock(block), keyPaths: keyPaths, queue: queue)
     }
 
+    // We want to pass the same object instance to the change callback each time.
+    // If the callback is being called on the source thread the instance should
+    // be `self`, but if it's on a different thread it needs to be a new Swift
+    // wrapper for the obj-c type, which we'll construct the first time the
+    // callback is called.
+    private typealias ObjcChange = (RLMDictionary<AnyObject, AnyObject>?, RLMDictionaryChange?, Error?) -> Void
+    private func wrapDictionaryObserveBlock(_ block: @escaping (RealmMapChange<Map>) -> Void) -> ObjcChange {
+        var col: Map?
+        return { collection, change, error in
+            if col == nil, let collection = collection {
+                col = collection === self._rlmCollection ? self : Self(objc: collection)
+            }
+            block(RealmMapChange.fromObjc(value: col, change: change, error: error))
+        }
+    }
+
     // MARK: Frozen Objects
 
     /**

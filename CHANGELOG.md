@@ -79,6 +79,12 @@ Xcode 12.4 is now the minimum supported version of Xcode.
 ### Enhancements
 
 * Conform `@ThreadSafe` and `ThreadSafeReference` to `Sendable`.
+* Allow using Swift enums which conform to `PersistableEnum` as the value type
+  for all Realm collections.
+* `AnyRealmCollection` now conforms to `Encodable`.
+* Greatly improve performance of reading AnyRealmValue and enum types from
+  Realm collections.
+* `AnyRealmCollection` now conforms to `Encodable`.
 
 ### Fixed
 

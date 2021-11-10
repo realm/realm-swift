@@ -203,7 +203,7 @@ extension EmbeddedObject: RealmCollectionValue {
      */
     public func dynamicList(_ propertyName: String) -> List<DynamicObject> {
         let list = RLMDynamicGetByName(self, propertyName) as! RLMSwiftCollectionBase
-        return List<DynamicObject>(objc: list._rlmCollection as! RLMArray<AnyObject>)
+        return List<DynamicObject>(collection: list._rlmCollection as! RLMArray<AnyObject>)
     }
 
     // MARK: Comparison

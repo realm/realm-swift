@@ -207,6 +207,7 @@
 		3F98162B2317763600C3543D /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A7B82391D51259F00750296 /* libz.tbd */; };
 		3F9863BB1D36876B00641C98 /* RLMClassInfo.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3F9863B91D36876B00641C98 /* RLMClassInfo.mm */; };
 		3F9863BC1D36876B00641C98 /* RLMClassInfo.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3F9863B91D36876B00641C98 /* RLMClassInfo.mm */; };
+		3F997773273E23D300AA9E13 /* RealmCollectionImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F997772273E23D300AA9E13 /* RealmCollectionImpl.swift */; };
 		3F9ADA9426E7E87B007349A5 /* SwiftCollectionSyncTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F9ADA9326E7E87B007349A5 /* SwiftCollectionSyncTests.swift */; };
 		3F9B4A6624CF8C0E00C72A4A /* realm-monorepo.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3FE5B4D424CF3F06004D4EF3 /* realm-monorepo.xcframework */; };
 		3F9D91822152D42F00474F09 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E8839B2D19E31FD90047B1A8 /* main.m */; };
@@ -864,6 +865,7 @@
 		3F9816292317763000C3543D /* libc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; };
 		3F9863B91D36876B00641C98 /* RLMClassInfo.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMClassInfo.mm; sourceTree = "<group>"; };
 		3F9863BA1D36876B00641C98 /* RLMClassInfo.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = RLMClassInfo.hpp; sourceTree = "<group>"; };
+		3F997772273E23D300AA9E13 /* RealmCollectionImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealmCollectionImpl.swift; sourceTree = "<group>"; };
 		3F9ADA9326E7E87B007349A5 /* SwiftCollectionSyncTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SwiftCollectionSyncTests.swift; path = Realm/ObjectServerTests/SwiftCollectionSyncTests.swift; sourceTree = "<group>"; };
 		3F9D91872152D42F00474F09 /* TestHost static.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "TestHost static.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3FA5E94C266064C4008F1345 /* ModernObjectCreationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ModernObjectCreationTests.swift; sourceTree = "<group>"; };
@@ -1343,6 +1345,7 @@
 				3F3411A5273433B300EC9D25 /* ObjcBridgeable.swift */,
 				3FE267D2264308680030F83C /* Persistable.swift */,
 				3FE267D3264308680030F83C /* PropertyAccessors.swift */,
+				3F997772273E23D300AA9E13 /* RealmCollectionImpl.swift */,
 				3FE267D4264308680030F83C /* SchemaDiscovery.swift */,
 			);
 			path = Impl;
@@ -2770,6 +2773,7 @@
 				ACF08B6726DD936200686CBC /* Query.swift in Sources */,
 				5D660FF81BE98D670021E04F /* Realm.swift in Sources */,
 				1AB605D31D495927007F53DE /* RealmCollection.swift in Sources */,
+				3F997773273E23D300AA9E13 /* RealmCollectionImpl.swift in Sources */,
 				5D660FFA1BE98D670021E04F /* RealmConfiguration.swift in Sources */,
 				CFE9CE3326555BBD00BF96D6 /* RealmKeyedCollection.swift in Sources */,
 				CF44461E26121C6800BAFDB4 /* RealmProperty.swift in Sources */,

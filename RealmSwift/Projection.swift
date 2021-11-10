@@ -52,7 +52,6 @@ private protocol AnyProjected {
 /// ```
 @propertyWrapper
 public struct Projected<T: ObjectBase, Value>: AnyProjected {
-
     fileprivate var _projectedKeyPath: KeyPath<T, Value>
     var projectedKeyPath: AnyKeyPath {
         _projectedKeyPath
@@ -82,7 +81,8 @@ public struct Projected<T: ObjectBase, Value>: AnyProjected {
             guard let keyPath = observed[keyPath: storageKeyPath].projectedKeyPath as? WritableKeyPath<T, Value> else {
                 preconditionFailure("KeyPath is not writable")
             }
-            observed.rootObject[keyPath: keyPath] = newValue
+            var obj = observed.rootObject
+            obj[keyPath: keyPath] = newValue
         }
     }
 
@@ -209,7 +209,7 @@ extension ObjectChange {
 /// ```
 open class Projection<Root: ObjectBase>: RealmCollectionValue, ProjectionObservable {
     /// The object being projected
-    public fileprivate(set) var rootObject: Root
+    public let rootObject: Root
 
     /**
      Create a new projection.
@@ -231,10 +231,13 @@ open class Projection<Root: ObjectBase>: RealmCollectionValue, ProjectionObserva
     }
     /// :nodoc:
     open var description: String {
-        return "\(type(of: self))<\(type(of: rootObject))> <\(Unmanaged.passUnretained(self).toOpaque())> {\n" +
-        "\(_schema.map({"\t@Projected(\\\(type(of: rootObject)).\($0.originPropertyKeyPathString)) -> \(String($0.label.dropFirst())): \(String(describing: rootObject[keyPath: $0.projectedKeyPath]!))"}).joined(separator: "\n"))\n" +
-        "\n\trootObject: \(rootObject)\n" +
-        "}"
+        return """
+\(type(of: self))<\(type(of: rootObject))> <\(Unmanaged.passUnretained(rootObject).toOpaque())> {
+\t\(_schema.map {
+    "\t\(String($0.label.dropFirst()))(\\.\($0.originPropertyKeyPathString)) = \(rootObject[keyPath: $0.projectedKeyPath]!);"
+}.joined(separator: "\n"))
+}
+"""
     }
 }
 

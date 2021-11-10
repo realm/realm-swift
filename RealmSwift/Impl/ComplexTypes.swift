@@ -94,7 +94,7 @@ extension List: _Persistable, _DefaultConstructible where Element: _Persistable 
     public static var _rlmRequiresCaching: Bool { true }
 
     public static func _rlmGetProperty(_ obj: ObjectBase, _ key: UInt16) -> Self {
-        return Self(objc: RLMGetSwiftPropertyArray(obj, key))
+        return Self(collection: RLMGetSwiftPropertyArray(obj, key))
     }
 
     public static func _rlmGetPropertyOptional(_ obj: ObjectBase, _ key: UInt16) -> Self? {
@@ -129,7 +129,7 @@ extension MutableSet: _Persistable, _DefaultConstructible where Element: _Persis
     public static var _rlmRequiresCaching: Bool { true }
 
     public static func _rlmGetProperty(_ obj: ObjectBase, _ key: UInt16) -> Self {
-        return Self(objc: RLMGetSwiftPropertySet(obj, key))
+        return Self(collection: RLMGetSwiftPropertySet(obj, key))
     }
 
     public static func _rlmGetPropertyOptional(_ obj: ObjectBase, _ key: UInt16) -> Self? {

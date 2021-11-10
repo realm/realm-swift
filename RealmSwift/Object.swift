@@ -375,7 +375,7 @@ extension Object: RealmCollectionValue {
             return dynamic[propertyName] as! List<DynamicObject>
         }
         let list = RLMDynamicGetByName(self, propertyName) as! RLMSwiftCollectionBase
-        return List<DynamicObject>(objc: list._rlmCollection as! RLMArray<AnyObject>)
+        return List<DynamicObject>(collection: list._rlmCollection as! RLMArray<AnyObject>)
     }
 
     // MARK: Dynamic set
@@ -398,7 +398,7 @@ extension Object: RealmCollectionValue {
             return dynamic[propertyName] as! MutableSet<DynamicObject>
         }
         let set = RLMDynamicGetByName(self, propertyName) as! RLMSwiftCollectionBase
-        return MutableSet<DynamicObject>(objc: set._rlmCollection as! RLMSet<AnyObject>)
+        return MutableSet<DynamicObject>(collection: set._rlmCollection as! RLMSet<AnyObject>)
     }
 
     // MARK: Dynamic map
@@ -542,10 +542,10 @@ public final class DynamicObject: Object {
         get {
             let value = RLMDynamicGetByName(self, key).flatMap(coerceToNil)
             if let array = value as? RLMArray<AnyObject> {
-                return List<DynamicObject>(objc: array)
+                return List<DynamicObject>(collection: array)
             }
             if let set = value as? RLMSet<AnyObject> {
-                return MutableSet<DynamicObject>(objc: set)
+                return MutableSet<DynamicObject>(collection: set)
             }
             if let dictionary = value as? RLMDictionary<AnyObject, AnyObject> {
                 return Map<String, DynamicObject>(objc: dictionary)
