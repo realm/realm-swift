@@ -31,9 +31,6 @@
 #import "RLMApp_Private.hpp"
 #import "RLMChildProcessEnvironment.h"
 
-#import <external/json/json.hpp>
-
-#import <realm/util/base64.hpp>
 #import <realm/object-store/sync/sync_manager.hpp>
 #import <realm/object-store/sync/sync_session.hpp>
 #import <realm/object-store/sync/sync_user.hpp>
@@ -579,63 +576,60 @@ static NSURL *syncDirectoryForChildProcess() {
     XCTAssertTrue(user.state == RLMUserStateLoggedOut, @"User should have been logged out, but wasn't");
 }
 
-static std::string HMAC_SHA256(std::string_view key, std::string_view data) {
-    std::string ret;
-    ret.resize(CC_SHA256_DIGEST_LENGTH);
-    CCHmac(kCCHmacAlgSHA256, key.data(), key.size(), data.data(), data.size(),
-           reinterpret_cast<uint8_t*>(const_cast<char*>(ret.data())));
-    return ret;
-}
+- (NSString *)createJWTWithAppId:(NSString *)appId {
+    NSDictionary *header = @{@"alg": @"HS256", @"typ": @"JWT"};
+    NSDictionary *payload = @{
+        @"aud": appId,
+        @"sub": @"someUserId",
+        @"exp": @1661896476,
+        @"user_data": @{
+            @"name": @"Foo Bar",
+            @"occupation": @"firefighter"
+        },
+        @"my_metadata": @{
+            @"name": @"Bar Foo",
+            @"occupation": @"stock analyst"
+        }
+    };
 
-std::string create_jwt(const std::string appId) {
-    nlohmann::json header = {{"alg", "HS256"}, {"typ", "JWT"}};
-    nlohmann::json payload = {{"aud", appId}, {"sub", "someUserId"}, {"exp", 1661896476}};
+    NSData *jsonHeader = [NSJSONSerialization  dataWithJSONObject:header options:0 error:nil];
+    NSString *headerString = [[NSString alloc] initWithData:jsonHeader encoding:NSUTF8StringEncoding];
+    NSData *jsonPayload = [NSJSONSerialization  dataWithJSONObject:payload options:0 error:nil];
+    NSString *payloadString = [[NSString alloc] initWithData:jsonPayload encoding:NSUTF8StringEncoding];
 
-    payload["user_data"]["name"] = "Foo Bar";
-    payload["user_data"]["occupation"] = "firefighter";
 
-    payload["my_metadata"]["name"] = "Bar Foo";
-    payload["my_metadata"]["occupation"] = "stock analyst";
-
-    std::string headerStr = header.dump();
-    std::string payloadStr = payload.dump();
-
-    realm::util::StringBuffer header_buffer;
-    header_buffer.resize(realm::util::base64_encoded_size(headerStr.length()));
-    realm::util::base64_encode(headerStr.data(), headerStr.length(), header_buffer.data(), header_buffer.size());
-
-    realm::util::StringBuffer payload_buffer;
-    payload_buffer.resize(realm::util::base64_encoded_size(payloadStr.length()));
-    realm::util::base64_encode(payloadStr.data(), payloadStr.length(), payload_buffer.data(), payload_buffer.size());
+    NSString *base64EncodedHeader = [jsonHeader base64EncodedStringWithOptions:0];
+    NSString *base64EncodedPayload = [jsonPayload base64EncodedStringWithOptions:0];
 
     // Remove padding characters.
+    base64EncodedHeader = [base64EncodedHeader stringByReplacingOccurrencesOfString:@"=" withString:@""];
+    base64EncodedPayload = [base64EncodedPayload stringByReplacingOccurrencesOfString:@"=" withString:@""];
 
-    std::string encodedHeaderStr = header_buffer.str();
-    encodedHeaderStr.erase(remove(encodedHeaderStr.begin(), encodedHeaderStr.end(), '='), encodedHeaderStr.end());
+    std::string jwtPayload = [[NSString stringWithFormat:@"%@.%@", base64EncodedHeader, base64EncodedPayload] UTF8String];
+    std::string jwtKey = [@"My_very_confidential_secretttttt" UTF8String];
 
-    std::string encodedPayloadStr = payload_buffer.str();
-    encodedPayloadStr.erase(remove(encodedPayloadStr.begin(), encodedPayloadStr.end(), '='), encodedPayloadStr.end());
+    NSString *key = @"My_very_confidential_secretttttt";
+    NSString *data = @(jwtPayload.c_str());
 
-    std::string jwtPayload = encodedHeaderStr + "." + encodedPayloadStr;
+    const char *cKey  = [key cStringUsingEncoding:NSASCIIStringEncoding];
+    const char *cData = [data cStringUsingEncoding:NSASCIIStringEncoding];
 
-    auto mac = HMAC_SHA256("My_very_confidential_secretttttt", jwtPayload);
+    unsigned char cHMAC[CC_SHA256_DIGEST_LENGTH];
+    CCHmac(kCCHmacAlgSHA256, cKey, strlen(cKey), cData, strlen(cData), cHMAC);
 
-    realm::util::StringBuffer signature_buffer;
-    signature_buffer.resize(realm::util::base64_encoded_size(mac.length()));
-    realm::util::base64_encode(mac.data(), mac.length(), signature_buffer.data(), signature_buffer.size());
+    NSData *HMAC = [[NSData alloc] initWithBytes:cHMAC
+                                          length:sizeof(cHMAC)];
+    NSString *hmac = [HMAC base64EncodedStringWithOptions:0];
 
-    std::string encodedSignatureStr = signature_buffer.str();
-    encodedSignatureStr.erase(remove(encodedSignatureStr.begin(), encodedSignatureStr.end(), '='),
-                              encodedSignatureStr.end());
-    std::replace(encodedSignatureStr.begin(), encodedSignatureStr.end(), '+', '-');
-    std::replace(encodedSignatureStr.begin(), encodedSignatureStr.end(), '/', '_');
+    hmac = [hmac stringByReplacingOccurrencesOfString:@"=" withString:@""];
+    hmac = [hmac stringByReplacingOccurrencesOfString:@"+" withString:@"-"];
+    hmac = [hmac stringByReplacingOccurrencesOfString:@"/" withString:@"_"];
 
-    return jwtPayload + "." + encodedSignatureStr;
+    return [NSString stringWithFormat:@"%@.%@", @(jwtPayload.c_str()), hmac];
 }
 
 - (RLMCredentials *)jwtCredentialWithAppId:(NSString *)appId {
-    auto jwt = create_jwt([appId UTF8String]);
-    return [RLMCredentials credentialsWithJWT:@(jwt.c_str())];
+    return [RLMCredentials credentialsWithJWT:[self createJWTWithAppId:appId]];
 }
 
 - (void)waitForDownloadsForRealm:(RLMRealm *)realm {
