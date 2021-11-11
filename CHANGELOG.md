@@ -1,11 +1,14 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+* Conform `@ThreadSafe` and `ThreadSafeReference` to `Sendable`.
 
 ### Fixed
 * Accessing a non object collection inside a migration would cause a crash [#5633](https://github.com/realm/realm-cocoa/issues/5633).
 * Accessing a `Map` of objects dynamically would not handle nulled values correctly (since v10.8.0).
+* Allow `@AutoOpen` to return a realm for any server error on synchronisation.
+* Do not allow `progress` state changes for `@AutoOpen` and `@AsyncOpen` after
+  changing state to `open(let realm)` or `error(let error)`.
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
@@ -39,7 +42,7 @@ x.y.z Release notes (yyyy-MM-dd)
     }
   }
   ```
-* Add an api for a type safe query syntax. This allows you to filter a Realm
+* Add an API for a type safe query syntax. This allows you to filter a Realm
   and collections managed by a Realm with Swift style expressions. Here is a
   brief example:
   ```swift

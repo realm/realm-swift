@@ -59,7 +59,10 @@ public final class MutableSet<Element: RealmCollectionValue>: RLMSwiftCollection
     public override init() {
         super.init()
     }
-
+    /// :nodoc:
+    public override init(collection: RLMCollection) {
+        super.init(collection: collection)
+    }
     internal init(objc rlmSet: RLMSet<AnyObject>) {
         super.init(collection: rlmSet)
     }
@@ -797,19 +800,6 @@ extension MutableSet: Encodable where Element: Encodable {
         for value in self {
             try container.encode(value)
         }
-    }
-}
-
-// MARK: - AssistedObjectiveCBridgeable
-
-extension MutableSet: AssistedObjectiveCBridgeable {
-    internal static func bridging(from objectiveCValue: Any, with metadata: Any?) -> MutableSet {
-        guard let objectiveCValue = objectiveCValue as? RLMSet<AnyObject> else { preconditionFailure() }
-        return MutableSet(objc: objectiveCValue)
-    }
-
-    internal var bridged: (objectiveCValue: Any, metadata: Any?) {
-        return (objectiveCValue: rlmSet, metadata: nil)
     }
 }
 
