@@ -102,7 +102,7 @@ Pod::Spec.new do |s|
                               'include/RLMSyncUtil_Private.h',
                               'include/RLMUpdateResult_Private.h',
                               'include/RLMUser_Private.h',
-                              'include/RLMSyncSubscription.h,
+                              'include/RLMSyncSubscription.h',
 
 
   s.frameworks              = 'Security'
