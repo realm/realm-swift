@@ -662,9 +662,7 @@ import Realm.Private
      - returns: A `Results` containing the projections.
      */
     public func objects<Root, T: Projection<Root>>(_ type: T.Type) -> Results<T> where Root: ThreadConfined {
-        return Results(RLMGetObjects(rlmRealm, Root.className(), nil)) {
-            T(projecting: $0 as! Root)
-        }
+        return Results(RLMGetObjects(rlmRealm, Root.className(), nil))
     }
 
     /**

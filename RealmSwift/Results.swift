@@ -124,13 +124,6 @@ extension AnyRealmValue: AddableType {}
         self.rlmResults = rlmResults
     }
 
-    internal init(_ rlmResults: RLMResults<AnyObject>, _ projector: ((ObjectBase) -> Element)?) {
-        self.rlmResults = rlmResults
-        self.projector = projector
-    }
-
-    private var projector: ((ObjectBase) -> Element)?
-
     // MARK: Index Retrieval
 
     /**
@@ -176,25 +169,16 @@ extension AnyRealmValue: AddableType {}
      */
     public subscript(position: Int) -> Element {
         throwForNegativeIndex(position)
-        if let projector = projector {
-            return projector(dynamicBridgeCast(fromObjectiveC: rlmResults.object(at: UInt(position))))
-        }
         return dynamicBridgeCast(fromObjectiveC: rlmResults.object(at: UInt(position)))
     }
 
     /// Returns the first object in the results, or `nil` if the results are empty.
     public var first: Element? {
-        if let projector = projector, let object = rlmResults.firstObject().map(dynamicBridgeCast) as? ObjectBase {
-            return projector(object)
-        }
         return rlmResults.firstObject().map(dynamicBridgeCast)
     }
 
     /// Returns the last object in the results, or `nil` if the results are empty.
     public var last: Element? {
-        if let projector = projector, let object = rlmResults.lastObject().map(dynamicBridgeCast) as? ObjectBase {
-            return projector(object)
-        }
         return rlmResults.lastObject().map(dynamicBridgeCast)
     }
 
@@ -253,7 +237,7 @@ extension AnyRealmValue: AddableType {}
      - parameter predicate: The predicate with which to filter the objects.
      */
     public func filter(_ predicate: NSPredicate) -> Results<Element> {
-        return Results<Element>(rlmResults.objects(with: predicate), projector)
+        return Results<Element>(rlmResults.objects(with: predicate))
     }
 
     /**
@@ -307,7 +291,7 @@ extension AnyRealmValue: AddableType {}
      */
     public func sorted<S: Sequence>(by sortDescriptors: S) -> Results<Element>
         where S.Iterator.Element == SortDescriptor {
-            return Results<Element>(rlmResults.sortedResults(using: sortDescriptors.map { $0.rlmSortDescriptorValue }), projector)
+            return Results<Element>(rlmResults.sortedResults(using: sortDescriptors.map { $0.rlmSortDescriptorValue }))
     }
 
     /**
@@ -317,7 +301,7 @@ extension AnyRealmValue: AddableType {}
      */
     public func distinct<S: Sequence>(by keyPaths: S) -> Results<Element>
         where S.Iterator.Element == String {
-            return Results<Element>(rlmResults.distinctResults(usingKeyPaths: Array(keyPaths)), projector)
+            return Results<Element>(rlmResults.distinctResults(usingKeyPaths: Array(keyPaths)))
     }
 
     // MARK: Aggregate Operations
@@ -682,11 +666,11 @@ extension AnyRealmValue: AddableType {}
     }
 
     public func freeze() -> Results {
-        return Results(rlmResults.freeze(), projector)
+        return Results(rlmResults.freeze())
     }
 
     public func thaw() -> Results? {
-        return Results(rlmResults.thaw(), projector)
+        return Results(rlmResults.thaw())
     }
 }
 
@@ -695,7 +679,7 @@ extension Results: RealmCollection {
 
     /// Returns a `RLMIterator` that yields successive elements in the results.
     public func makeIterator() -> RLMIterator<Element> {
-        return RLMIterator(collection: rlmResults, projector)
+        return RLMIterator(collection: rlmResults)
     }
 
     // MARK: Collection Support
@@ -754,6 +738,6 @@ extension Results where Element: ObjectBase {
      */
     public func distinct<S: Sequence>(by keyPaths: S) -> Results<Element>
         where S.Iterator.Element == PartialKeyPath<Element> {
-            return Results<Element>(rlmResults.distinctResults(usingKeyPaths: keyPaths.map(_name(for:))), projector)
+            return Results<Element>(rlmResults.distinctResults(usingKeyPaths: keyPaths.map(_name(for:))))
     }
 }

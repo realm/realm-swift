@@ -488,9 +488,7 @@ extension Projection: _ObservedResultsValue { }
                                         filter: NSPredicate? = nil,
                                         keyPaths: [String]? = nil,
                                         sortDescriptor: SortDescriptor? = nil) where ResultType: Projection<ObjectType>, ObjectType: ThreadConfined {
-        let results = Results(RLMResults.emptyDetached(), {
-            ResultType(projecting: $0 as! ObjectType)
-        })
+        let results = Results(RLMResults.emptyDetached()) as Results<ResultType>
         self.storage = Storage(results, keyPaths)
         self.storage.resultFactory = { realm in
             realm.objects(ResultType.self)

@@ -37,7 +37,7 @@ import Realm.Private
 /// You can also manually conform to `Identifiable` if you wish, but note that
 /// using the object's memory address does *not* work for managed objects.
 @available(macOS 10.15, iOS 13, tvOS 13, watchOS 6, *)
-public protocol ObjectKeyIdentifiable: Identifiable, ObjectBase {
+public protocol ObjectKeyIdentifiable: Identifiable {
     /// The stable identity of the entity associated with `self`.
     var id: UInt64 { get }
 }
@@ -48,7 +48,7 @@ public protocol ObjectKeyIdentifiable: Identifiable, ObjectBase {
 public typealias ObjectKeyIdentifable = ObjectKeyIdentifiable
 
 @available(macOS 10.15, iOS 13, tvOS 13, watchOS 6, *)
-extension ObjectKeyIdentifiable {
+extension ObjectKeyIdentifiable where Self: ObjectBase {
     /// A stable identifier for this object. For managed Realm objects, this
     /// value will be the same for all object instances which refer to the same
     /// object (i.e. for which `Object.isSameObject(as:)` returns true).
@@ -57,15 +57,15 @@ extension ObjectKeyIdentifiable {
     }
 }
 
+/// :nodoc:
 @available(macOS 10.15, iOS 13, tvOS 13, watchOS 6, *)
-extension Projection: Identifiable, Hashable {
-    /// A stable identifier for this projection. This value will be
-    /// the same for all projections of this object
+extension ObjectKeyIdentifiable where Self: ProjectionObservable {
+    /// A stable identifier for this projection.
     public var id: UInt64 {
         // UInt64(bitPattern:) to properly cast negative Int64 values
         // It will use the same memory representation, the numeric value
         // may be different which is fine in this case
-        UInt64(bitPattern: Int64(ObjectIdentifier(type(of: self)).hashValue))
+        UInt64(withUnsafePointer(to: self, { UInt(bitPattern: $0) }))
     }
 }
 

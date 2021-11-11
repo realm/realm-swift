@@ -215,6 +215,22 @@ open class Projection<Root: ObjectBase>: RealmCollectionValue, ProjectionObserva
         // Initialize schema for projection class
         _ = _schema
     }
+    /// :nodoc:
+    public static func == (lhs: Projection, rhs: Projection) -> Bool {
+        RLMObjectBaseAreEqual(lhs.rootObject, rhs.rootObject)
+    }
+    /// :nodoc:
+    public func hash(into hasher: inout Hasher) {
+        let hashVal = rootObject.hashValue
+        hasher.combine(hashVal)
+    }
+    /// :nodoc:
+    open var description: String {
+        return "\(type(of: self))<\(type(of: rootObject))> <\(Unmanaged.passUnretained(self).toOpaque())> {\n" +
+        "\(_schema.map({"\t@Projected(\\\(type(of: rootObject)).\($0.originPropertyKeyPathString)) -> \(String($0.label.dropFirst())): \(String(describing: rootObject[keyPath: $0.projectedKeyPath]!))"}).joined(separator: "\n"))\n" +
+        "\n\trootObject: \(rootObject)\n" +
+        "}"
+    }
 }
 
 extension ProjectionObservable {
@@ -536,6 +552,7 @@ extension Projection: ThreadConfined where Root: ThreadConfined {
 }
 
 // - MARK: _RealmSchemaDiscoverable
+/// Conformance to RealmCollectionValue needs conformance to _RealmSchemaDiscoverable
 extension Projection {
     /// :nodoc:
     public static var _rlmType: PropertyType {
@@ -559,27 +576,24 @@ extension Projection {
     public static func _rlmPopulateProperty(_ prop: RLMProperty) {
         fatalError()
     }
-    /// :nodoc:
-    public static func == (lhs: Projection, rhs: Projection) -> Bool {
-        RLMObjectBaseAreEqual(lhs.rootObject, rhs.rootObject)
-    }
-    /// :nodoc:
-    public func hash(into hasher: inout Hasher) {
-        let hashVal = rootObject.hashValue
-        hasher.combine(hashVal)
-    }
-    /// :nodoc:
-    open var description: String {
-        return "\(type(of: self))<\(type(of: rootObject))> <\(Unmanaged.passUnretained(self).toOpaque())> {\n" +
-        "\(_schema.map({"\t@Projected(\\\(type(of: rootObject)).\($0.originPropertyKeyPathString)) -> \(String($0.label.dropFirst())): \(String(describing: rootObject[keyPath: $0.projectedKeyPath]!))"}).joined(separator: "\n"))\n" +
-        "\n\trootObject: \(rootObject)\n" +
-        "}"
-    }
 }
 
 // MARK: Projected List
-/// ProjectedList is a special type of collection for Projection's properties
-/// You don't need to instantiate this type manually.
+
+/**
+ ProjectedList is a special type of collection for Projection's properties which
+ should be used when you want to project a `List` of Realm Objects to a list of values.
+ You don't need to instantiate this type manually. Use it by calling `projectTo` on a `List` property:
+ ```swift
+ class PersistedListObject: Object {
+     @Persisted public var people: List<CommonPerson>
+ }
+
+ class ListProjection: Projection<PersistedListObject> {
+     @Projected(\PersistedListObject.people.projectTo.firstName) var strings: ProjectedList<String>
+ }
+ ```
+*/
 public struct ProjectedList<NewElement>: RandomAccessCollection where NewElement: RealmCollectionValue {
     public typealias Element = NewElement
     public typealias Index = Int
@@ -663,12 +677,12 @@ public struct ProjectedList<NewElement>: RandomAccessCollection where NewElement
         backingList.observe(on: queue, {
             switch $0 {
             case .initial(let collection):
-                block(.initial(anyCtor(collection)))
+                block(.initial(Self(collection, keyPath: keyPath, propertyName: propertyName)))
             case .update(let collection,
                          deletions: let deletions,
                          insertions: let insertions,
                          modifications: let modifications):
-                block(.update(anyCtor(collection),
+                block(.update(Self(collection, keyPath: keyPath, propertyName: propertyName),
                               deletions: deletions,
                               insertions: insertions,
                               modifications: modifications))
@@ -798,12 +812,12 @@ public struct ProjectedList<NewElement>: RandomAccessCollection where NewElement
             backingList.observe(keyPaths: keyPaths, on: queue) {
                 switch $0 {
                 case .initial(let collection):
-                    block(.initial(anyCtor(collection)))
+                    block(.initial(Self(collection, keyPath: keyPath, propertyName: propertyName)))
                 case .update(let collection,
                              deletions: let deletions,
                              insertions: let insertions,
                              modifications: let modifications):
-                    block(.update(anyCtor(collection),
+                    block(.update(Self(collection, keyPath: keyPath, propertyName: propertyName),
                                   deletions: deletions,
                                   insertions: insertions,
                                   modifications: modifications))
@@ -870,28 +884,30 @@ public struct ProjectedList<NewElement>: RandomAccessCollection where NewElement
         backingList.isFrozen
     }
     public func freeze() -> Self {
-        anyCtor(backingList.freeze())
+        Self(backingList.freeze(), keyPath: keyPath, propertyName: propertyName)
     }
     public func thaw() -> Self? {
         guard let backingList = backingList.thaw() else {
             return nil
         }
-        return anyCtor(backingList)
+        return Self(backingList, keyPath: keyPath, propertyName: propertyName)
     }
 
     private var backingList: List<Object>
     private let keyPath: AnyKeyPath
     private let propertyName: String
-    private let anyCtor: (List<Object>) -> Self
 
     init<OriginalElement>(_ list: List<Object>,
                           keyPathToNewElement: KeyPath<OriginalElement, NewElement>) where OriginalElement: ObjectBase {
         self.backingList = list
         self.keyPath = keyPathToNewElement
         self.propertyName = _name(for: keyPathToNewElement)
-        self.anyCtor = {
-            return Self(ObjectiveCSupport.convert(object: $0.rlmArray), keyPathToNewElement: keyPathToNewElement)
-        }
+    }
+
+    private init(_ list: List<Object>, keyPath: AnyKeyPath, propertyName: String) {
+        self.backingList = list
+        self.keyPath = keyPath
+        self.propertyName = propertyName
     }
 }
 
@@ -1039,8 +1055,24 @@ extension Projection: ObservableObject, RealmSubscribable where Root: ThreadConf
 
 // MARK: Projected Mutable Set
 
-/// ProjectedMutableSet is a special type of collection for Projection's properties
-/// You don't need to instantiate this type manually.
+/**
+ ProjectedMutableSet is a special type of collection for Projection's properties which
+ should be used when you want to project a `MutableSet` of Realm Objects to a list of values.
+ You don't need to instantiate this type manually. Use it by calling `projectTo` on a `MutableSet`:
+ ```swift
+ class PersistedMutableSetObject: Object {
+     @Persisted public var people: MutableSet<CommonPerson>
+ }
+
+ class MutableSetProjection: Projection<PersistedMutableSetObject> {
+     @Projected(\PersistedMutableSetObject.people.projectTo.firstName) var strings: ProjectedMutableSet<String>
+ }
+ ```
+ Note: Unlike Realm MutableSet this type reflects the content of another collection,
+ therefore it may contain not distinct values. MutableSet of [John Foo, John Bar]
+ can be projected by first names as [John, John]. You will have access to the values
+ of the original object.
+*/
 public struct ProjectedMutableSet<NewElement>: RandomAccessCollection where NewElement: RealmCollectionValue {
     public typealias Element = NewElement
     public typealias Index = Int
@@ -1115,12 +1147,12 @@ public struct ProjectedMutableSet<NewElement>: RandomAccessCollection where NewE
         backingSet.observe(on: queue, {
             switch $0 {
             case .initial(let collection):
-                block(.initial(anyCtor(collection)))
+                block(.initial(Self(collection, keyPath: keyPath, propertyName: propertyName)))
             case .update(let collection,
                          deletions: let deletions,
                          insertions: let insertions,
                          modifications: let modifications):
-                block(.update(anyCtor(collection),
+                block(.update(Self(collection, keyPath: keyPath, propertyName: propertyName),
                               deletions: deletions,
                               insertions: insertions,
                               modifications: modifications))
@@ -1250,12 +1282,12 @@ public struct ProjectedMutableSet<NewElement>: RandomAccessCollection where NewE
             backingSet.observe(keyPaths: keyPaths, on: queue) {
                 switch $0 {
                 case .initial(let collection):
-                    block(.initial(anyCtor(collection)))
+                    block(.initial(Self(collection, keyPath: keyPath, propertyName: propertyName)))
                 case .update(let collection,
                              deletions: let deletions,
                              insertions: let insertions,
                              modifications: let modifications):
-                    block(.update(anyCtor(collection),
+                    block(.update(Self(collection, keyPath: keyPath, propertyName: propertyName),
                                   deletions: deletions,
                                   insertions: insertions,
                                   modifications: modifications))
@@ -1314,28 +1346,30 @@ public struct ProjectedMutableSet<NewElement>: RandomAccessCollection where NewE
         backingSet.isFrozen
     }
     public func freeze() -> Self {
-        anyCtor(backingSet.freeze())
+        return Self(backingSet.freeze(), keyPath: keyPath, propertyName: propertyName)
     }
     public func thaw() -> Self? {
         guard let backingSet = backingSet.thaw() else {
             return nil
         }
-        return anyCtor(backingSet)
+        return Self(backingSet, keyPath: keyPath, propertyName: propertyName)
     }
 
     private var backingSet: MutableSet<Object>
     private let keyPath: AnyKeyPath
     private let propertyName: String
-    private let anyCtor: (MutableSet<Object>) -> Self
 
     init<OriginalElement>(_ set: MutableSet<Object>,
                           keyPathToNewElement: KeyPath<OriginalElement, NewElement>) where OriginalElement: ObjectBase {
         self.backingSet = set
         self.keyPath = keyPathToNewElement
         self.propertyName = _name(for: keyPathToNewElement)
-        self.anyCtor = {
-            return Self(ObjectiveCSupport.convert(object: $0.rlmSet), keyPathToNewElement: keyPathToNewElement)
-        }
+    }
+
+    private init(_ set: MutableSet<Object>, keyPath: AnyKeyPath, propertyName: String) {
+        self.backingSet = set
+        self.keyPath = keyPath
+        self.propertyName = propertyName
     }
 }
 
