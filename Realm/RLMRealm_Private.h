@@ -18,7 +18,7 @@
 
 #import <Realm/RLMRealm.h>
 
-@class RLMFastEnumerator, RLMSyncSubscription;
+@class RLMFastEnumerator, RLMAnySyncSubscription;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -59,6 +59,7 @@ BOOL RLMIsRealmCachedAtPath(NSString *path);
 - (RLMRealm *)frozenCopy NS_RETURNS_RETAINED;
 + (RLMAsyncOpenTask *)asyncOpenWithConfiguration:(RLMRealmConfiguration *)configuration
                                         callback:(void (^)(NSError * _Nullable))callback;
+- (NSArray<RLMAnySyncSubscription *> *)allSubscriptions;
 
 @end
 
