@@ -4,8 +4,9 @@ x.y.z Release notes (yyyy-MM-dd)
 * Conform `@ThreadSafe` and `ThreadSafeReference` to `Sendable`.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
-* None.
+* Allow `@AutoOpen` to return a realm for any server error on synchronisation.
+* Do not allow `progress` state changes for `@AutoOpen` and `@AsyncOpen` after
+  changing state to `open(let realm)` or `error(let error)`.
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
