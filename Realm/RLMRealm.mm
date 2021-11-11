@@ -945,15 +945,15 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
 }
 
 - (BOOL)writeCopyToURL:(NSURL *)fileURL encryptionKey:(NSData *)key error:(NSError **)error {
-    return [self writeCopyToURL:fileURL encryptionKey:key enableHistory:NO error:error];
+    return [self writeCopyToURL:fileURL encryptionKey:key enableSync:NO error:error];
 }
 
-- (BOOL)writeCopyToURL:(NSURL *)fileURL encryptionKey:(NSData *)key enableHistory:(BOOL)enableHistory error:(NSError **)error {
+- (BOOL)writeCopyToURL:(NSURL *)fileURL encryptionKey:(NSData *)key enableSync:(BOOL)enableSync error:(NSError **)error {
     key = RLMRealmValidatedEncryptionKey(key);
     NSString *path = fileURL.path;
 
     try {
-        if (enableHistory) {
+        if (enableSync) {
             _realm->write_copy(path.UTF8String, {static_cast<const char *>(key.bytes), key.length});
         } else {
             _realm->verify_thread();

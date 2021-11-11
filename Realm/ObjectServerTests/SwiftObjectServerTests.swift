@@ -697,21 +697,19 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     func testWriteCopySynchronizeData() {
         do {
             let user1 = try logInUser(for: basicCredentials())
-            if !isParent {
-                populateRealm(user: user1, partitionValue: #function)
-                return
-            }
-
-            // Wait for the child process to upload all the data.
-            executeChild()
+            populateRealm(user: user1, partitionValue: #function)
 
             // Create config for where the sync realm will be copied to.
-            // Using a different user to simulate data created by an Admin, which is then copied by other users.
+            // Using a different user to simulate data created by an admin, which is then copied by other users.
             let user2 = try logInUser(for: basicCredentials())
             XCTAssertNotEqual(user1.id, user2.id)
             let copiedConfig = user2.configuration(partitionValue: #function)
 
-            let config = user1.configuration(partitionValue: #function)
+            // Open the original realm with the second user because end user device wouldn't
+            // have access to the realm's original user.
+            let originalPath = user1.configuration(partitionValue: #function).fileURL
+            var config = user2.configuration(partitionValue: #function)
+            config.fileURL = originalPath
             let realm = try Realm(configuration: config)
 
             waitForUploads(for: realm)
@@ -719,7 +717,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
             let pathOnDisk = ObjectiveCSupport.convert(object: copiedConfig).pathOnDisk
             XCTAssertFalse(FileManager.default.fileExists(atPath: pathOnDisk))
-            try realm.writeCopy(toFile: copiedConfig.fileURL!, enableHistory: true)
+            try realm.writeCopy(toFile: copiedConfig.fileURL!, enableSync: true)
 
             // Open the copied realm then immediately check count
             let copiedRealm = try Realm(configuration: copiedConfig)
@@ -757,41 +755,6 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
     }
 
-    // Bundling a sync realm and opening it with a different partition isn't supported
-    // But writeCopy takes a file path, not a configuration. So in theory someone could copy a realm, then
-    // open the new path with a configuration that has a different partition.
-    // There's no way to check if partitions
-    // are different when writeCopy is called with .writeCopy alone(?)
-//    func testWriteCopyDifferentPartition() {
-//        do {
-//            let user1 = try logInUser(for: basicCredentials())
-//            if !isParent {
-//                populateRealm(user: user1, partitionValue: #function)
-//                return
-//            }
-//
-//            // Wait for the child process to upload all the data.
-//            executeChild()
-//
-//            let config = user1.configuration(partitionValue: #function)
-//            let realm = try Realm(configuration: config)
-//
-//            waitForUploads(for: realm)
-//            waitForDownloads(for: realm)
-//
-//            // Create copied config but a different partition
-//            let copiedConfig = user1.configuration(partitionValue: "different-partition-value")
-//            XCTAssertNotEqual(realm.configuration.syncConfiguration?.partitionValue,
-//                              copiedConfig.syncConfiguration?.partitionValue)
-//
-//            let pathOnDisk = ObjectiveCSupport.convert(object: copiedConfig).pathOnDisk
-//            XCTAssertFalse(FileManager.default.fileExists(atPath: pathOnDisk))
-//            XCTAssertThrowsError(try realm.writeCopy(toFile: copiedConfig.fileURL!))
-//        } catch {
-//            XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
-//        }
-//    }
-
     func testWriteFailBeforeSynced() {
         do {
             let user1 = try logInUser(for: basicCredentials())
@@ -813,7 +776,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             let config = user1.configuration(partitionValue: #function)
             let realm = try Realm(configuration: config)
 
-            try realm.writeCopy(toFile: copiedConfig.fileURL!, enableHistory: true)
+            try realm.writeCopy(toFile: copiedConfig.fileURL!, enableSync: true)
 
         } catch {
             XCTAssertEqual(error.localizedDescription, "Could not write file as not all client changes are integrated in server")

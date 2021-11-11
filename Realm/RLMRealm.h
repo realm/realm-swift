@@ -232,8 +232,8 @@ NS_ASSUME_NONNULL_BEGIN
  @param fileURL Local URL to save the Realm to.
  @param key     Optional 64-byte encryption key to encrypt the new file with.
  @param error  If an error occurs, upon return contains an `NSError` object
-              that describes the problem. If you are not interested in
-              possible errors, pass in `NULL`.
+               that describes the problem. If you are not interested in
+               possible errors, pass in `NULL`.
 
  @return `YES` if the Realm was successfully written to disk, `NO` if an error occurred.
  */
@@ -250,16 +250,16 @@ NS_ASSUME_NONNULL_BEGIN
 
  @param fileURL Local URL to save the Realm to.
  @param key     Optional 64-byte encryption key to encrypt the new file with.
- @param enableHistory  Indicates whether the copied Realm will have sync history enabled
-                      and synchronize data with the Realm server. All changes from the
-                      original realm must be uploaded to the server prior to calling
-                      `writeCopyToURL`, otherwise and error is thrown. If `enableHistory`
-                      is false, the copied Realm functions as a local realm.
+ @param enableSync  Indicates whether the copied Realm will have sync history enabled
+                    and synchronize data with the Realm server. All changes from the
+                    original realm must be uploaded to the server prior to calling
+                    `writeCopyToURL`, otherwise an error is thrown. If `enableSync`
+                    is false, the copied Realm functions as a local realm.
  @param error  If an error occurs, upon return contains an `NSError` object
-              that describes the problem. If you are not interested in
-              possible errors, pass in `NULL`.
+               that describes the problem. If you are not interested in
+               possible errors, pass in `NULL`.
  */
-- (BOOL)writeCopyToURL:(NSURL *)fileURL encryptionKey:(nullable NSData *)key enableHistory:(BOOL)enableHistory error:(NSError **)error;
+- (BOOL)writeCopyToURL:(NSURL *)fileURL encryptionKey:(nullable NSData *)key enableSync:(BOOL)enableSync error:(NSError **)error;
 /**
  Checks if the Realm file for the given configuration exists locally on disk.
 
