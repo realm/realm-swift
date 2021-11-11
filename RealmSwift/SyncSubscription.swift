@@ -237,7 +237,7 @@ extension RealmPublishers {
 
     //@frozen
     internal struct SyncSubscriptionStatePublisher: Publisher {
-        internal func receive<S>(subscriber: S) where S : Subscriber, Error == S.Failure, SyncSubscriptionState == S.Input {
+        internal func receive<S>(subscriber: S) where S: Subscriber, Error == S.Failure, SyncSubscriptionState == S.Input {
             fatalError()
         }
 

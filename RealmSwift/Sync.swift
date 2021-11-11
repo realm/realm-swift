@@ -788,9 +788,9 @@ extension FunctionCallable {
 }
 #endif // swift(>=5.5)
 
-public extension User {
+extension User {
     // TODO: Flexible Sync - Add docstrings
-    func flexibleSyncConfiguration() -> Realm.Configuration {
+    internal func flexibleSyncConfiguration() -> Realm.Configuration {
         let config = self.__flexibleSyncConfiguration()
         return ObjectiveCSupport.convert(object: config)
     }
