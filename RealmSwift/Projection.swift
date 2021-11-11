@@ -127,9 +127,11 @@ extension ObjectChange {
             let projectedPropertyChanges: [PropertyChange] = objectPropertyChanges.map { propChange in
                 // read the metadata for the property whose origin name matches
                 // the changed property's name
-                let propertyMetadata = schema.first(where: {
-                    $0.originPropertyKeyPathString == propChange.name
-                })!
+                let propertyMetadata = DispatchQueue(label: "schema.serial.queue").sync {
+                    schema.first(where: {
+                        $0.originPropertyKeyPathString == propChange.name
+                    })!
+                }
                 var change: (name: String?, oldValue: Any?, newValue: Any?) = (nil, nil, nil)
                 if let oldValue = propChange.oldValue {
                     // if there is an oldValue in the change, construct an empty Root
@@ -428,23 +430,25 @@ extension ProjectionObservable {
     }
 
     fileprivate var _schema: [ProjectedMetadata] {
-        if schema[ObjectIdentifier(type(of: self))] == nil {
-            let mirror = Mirror(reflecting: self)
-            let metadatas: [ProjectedMetadata] = mirror.children.compactMap { child in
-                guard let projected = child.value as? AnyProjected else {
-                    return nil
+        return DispatchQueue(label: "schema.serial.queue").sync {
+            if schema[ObjectIdentifier(type(of: self))] == nil {
+                let mirror = Mirror(reflecting: self)
+                let metadatas: [ProjectedMetadata] = mirror.children.compactMap { child in
+                    guard let projected = child.value as? AnyProjected else {
+                        return nil
+                    }
+                    let originPropertyLabel = _name(for: projected.projectedKeyPath as! PartialKeyPath<Root>)
+                    guard !originPropertyLabel.isEmpty else {
+                        throwRealmException("@Projected property '\(child.label!)' must be a part of Realm object")
+                    }
+                    return ProjectedMetadata(projectedKeyPath: projected.projectedKeyPath,
+                                             originPropertyKeyPathString: originPropertyLabel,
+                                             label: child.label!)
                 }
-                let originPropertyLabel = _name(for: projected.projectedKeyPath as! PartialKeyPath<Root>)
-                guard !originPropertyLabel.isEmpty else {
-                    throwRealmException("@Projected property '\(child.label!)' must be a part of Realm object")
-                }
-                return ProjectedMetadata(projectedKeyPath: projected.projectedKeyPath,
-                                         originPropertyKeyPathString: originPropertyLabel,
-                                         label: child.label!)
+                schema[ObjectIdentifier(type(of: self))] = metadatas
             }
-            schema[ObjectIdentifier(type(of: self))] = metadatas
+            return schema[ObjectIdentifier(type(of: self))]!
         }
-        return schema[ObjectIdentifier(type(of: self))]!
     }
 }
 /**
