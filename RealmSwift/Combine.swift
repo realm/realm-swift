@@ -610,7 +610,7 @@ extension RealmKeyedCollection {
 
 /// A subscription which wraps a Realm notification.
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
-@frozen public struct ObservationSubscription: Combine.Subscription {
+@frozen public struct ObservationSubscription: Subscription {
     private var token: NotificationToken
     internal init(token: NotificationToken) {
         self.token = token
@@ -635,7 +635,7 @@ extension RealmKeyedCollection {
 
 /// A subscription which wraps a Realm AsyncOpenTask.
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
-@frozen public struct AsyncOpenSubscription: Combine.Subscription {
+@frozen public struct AsyncOpenSubscription: Subscription {
     private let task: Realm.AsyncOpenTask
 
     internal init(task: Realm.AsyncOpenTask,
@@ -737,6 +737,9 @@ public enum RealmPublishers {
         }
     }
 
+    /// A publisher which emits Void each time the Realm is refreshed.
+    ///
+    /// Despite the name, this actually emits *after* the Realm is refreshed.
     @frozen public struct RealmWillChange: Publisher {
         /// This publisher cannot fail.
         public typealias Failure = Never

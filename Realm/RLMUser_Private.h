@@ -42,6 +42,9 @@ typedef void(^RLMUserNotificationBlock)(RLMUser *);
 
 - (void)logOut;
 
+// TODO: Flexible Sync - Add doctrings
+- (RLMRealmConfiguration *)flexibleSyncConfiguration NS_REFINED_FOR_SWIFT;
+
 @end
 
 NS_ASSUME_NONNULL_END

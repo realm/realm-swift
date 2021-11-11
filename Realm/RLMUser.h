@@ -107,9 +107,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (RLMRealmConfiguration *)configurationWithPartitionValue:(nullable id<RLMBSON>)partitionValue NS_REFINED_FOR_SWIFT;
 
-// TODO: Flexible Sync - Add doctrings
-- (RLMRealmConfiguration *)flexibleSyncConfiguration NS_REFINED_FOR_SWIFT;
-
 #pragma mark - Sessions
 
 /**
