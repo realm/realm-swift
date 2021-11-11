@@ -48,10 +48,12 @@ internal class SyncSubscription<Element: Object>: AnySyncSubscription {
     // Name of the subscription, if not specified it will return the value in Query
     internal var name: String = ""
 
+    #if swift(>=5.4)
     // Update query for subscription
     internal func update(@QueryBuilder _ to: () -> (AnySyncSubscription)) throws {
         fatalError()
     }
+    #endif // swift(>=5.4)
 
     private(set) internal var query: QueryFunction
     internal init(name: String = "", query: @escaping QueryFunction) {
@@ -60,6 +62,7 @@ internal class SyncSubscription<Element: Object>: AnySyncSubscription {
     }
 }
 
+#if swift(>=5.4)
 internal protocol QueryBuilderComponent {}
 
 @resultBuilder internal struct QueryBuilder {
@@ -73,6 +76,7 @@ internal protocol QueryBuilderComponent {}
 }
 
 internal protocol AnyQueryBuilderComponent {}
+#endif // swift(>=5.4)
 
 // Realm operations
 // Realm will only allow getting all the subscriptions and subscribe to a query
@@ -125,6 +129,7 @@ extension Array where Element == AnySyncSubscription {
         fatalError()
     }
 
+    #if swift(>=5.4)
     // Find subscription in the subscription set by subscription properties
     internal func first<Element: Object>(`where`: @escaping (SyncSubscription<Element>) -> Bool) -> SyncSubscription<Element>? {
         fatalError()
@@ -145,11 +150,6 @@ extension Array where Element == AnySyncSubscription {
         fatalError()
     }
 
-    // Remove a subscription from the subscription set, this has to be done within a write block
-    internal func remove(_ subscription: AnySyncSubscription) throws {
-        fatalError()
-    }
-
     // Remove subscriptions of subscription set by query, this has to be done within a write block
     internal func remove(@QueryBuilder _ to: () -> ([AnySyncSubscription])) throws {
         fatalError()
@@ -157,6 +157,12 @@ extension Array where Element == AnySyncSubscription {
 
     // Remove subscription of subscription set by query, this has to be done within a write block
     internal func remove(@QueryBuilder _ to: () -> (AnySyncSubscription)) throws {
+        fatalError()
+    }
+    #endif // swift(>=5.4)
+
+    // Remove a subscription from the subscription set, this has to be done within a write block
+    internal func remove(_ subscription: AnySyncSubscription) throws {
         fatalError()
     }
 
