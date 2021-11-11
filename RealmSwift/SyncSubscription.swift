@@ -20,11 +20,7 @@ import Foundation
 
 // State Updates
 // Some operations will return a `SubscriptionTask` which can be used to get state updates (There will be a Combine API as well not described here)
-internal enum SyncSubscriptionState: Equatable {
-    internal static func == (lhs: SyncSubscriptionState, rhs: SyncSubscriptionState) -> Bool {
-        true
-    }
-
+internal enum SyncSubscriptionState {
     // Subscription is complete and the server is in "steady-state" synchronization.
     case complete
     // The Subscription encountered an error.
@@ -32,6 +28,12 @@ internal enum SyncSubscriptionState: Equatable {
     // The server is processing the subscription and updating the Realm data
     // with new matches
     case pending
+}
+
+extension SyncSubscriptionState: Equatable {
+    static func == (lhs: SyncSubscriptionState, rhs: SyncSubscriptionState) -> Bool {
+        true
+    }
 }
 
 internal protocol AnySyncSubscription {}
