@@ -1044,7 +1044,7 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
 }
 
 // TODO: Flexible Sync - Add Implementation
-- (RLMSubscriptionSet *)allSubscriptions {
+- (NSArray<RLMAnySyncSubscription *> *)allSubscriptions {
     [NSException raise:@"NotImplemented" format:@"Needs Impmentation"];
     return NULL;
 }
