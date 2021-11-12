@@ -79,9 +79,10 @@ public struct Projected<T: ObjectBase, Value>: AnyProjected {
             return observed.rootObject[keyPath: storage._projectedKeyPath]
         }
         set {
-            precondition(observed[keyPath: storageKeyPath].projectedKeyPath is WritableKeyPath<T, Value>,
-                         "KeyPath is not writable")
-            observed.rootObject[keyPath: observed[keyPath: storageKeyPath].projectedKeyPath as! WritableKeyPath<T, Value>] = newValue
+            guard let keyPath = observed[keyPath: storageKeyPath].projectedKeyPath as? WritableKeyPath<T, Value> else {
+                preconditionFailure("KeyPath is not writable")
+            }
+            observed.rootObject[keyPath: keyPath] = newValue
         }
     }
 

@@ -232,34 +232,30 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
         willSet {
             if newValue != value {
                 objectWillChange.send()
-                self.objectWillChange = instance()
+                self.objectWillChange = ObservableStoragePublisher(newValue, self.keyPaths)
             }
         }
     }
 
-    let instance: () -> (ObservableStoragePublisher<ObservedType>)
     var objectWillChange: ObservableStoragePublisher<ObservedType>
     var keyPaths: [String]?
 
     init(_ value: ObservedType, _ keyPaths: [String]? = nil) {
         self.value = value.realm != nil && !value.isInvalidated ? value.thaw() ?? value : value
-        self.instance = { ObservableStoragePublisher(value, keyPaths) }
+        self.objectWillChange = ObservableStoragePublisher(value, keyPaths)
         self.keyPaths = keyPaths
-        self.objectWillChange = instance()
     }
 
     init(_ value: ObservedType, _ keyPaths: [String]? = nil) where ObservedType: ObjectBase {
         self.value = value.realm != nil && !value.isInvalidated ? value.thaw() ?? value : value
-        self.instance = { ObservableStoragePublisher(value, keyPaths) }
+        self.objectWillChange = ObservableStoragePublisher(value, keyPaths)
         self.keyPaths = keyPaths
-        self.objectWillChange = instance()
     }
 
     init(_ value: ObservedType, _ keyPaths: [String]? = nil) where ObservedType: ProjectionObservable {
         self.value = value.realm != nil && !value.isInvalidated ? value.thaw() ?? value : value
-        self.instance = { ObservableStoragePublisher(value, keyPaths) }
+        self.objectWillChange = ObservableStoragePublisher(value, keyPaths)
         self.keyPaths = keyPaths
-        self.objectWillChange = instance()
     }
 }
 
@@ -414,7 +410,7 @@ extension Projection: _ObservedResultsValue { }
         func setupValue() {
             /// A base value to reset the state of the query if a user reassigns the `filter` or `sortDescriptor`
             let realm = try! Realm(configuration: configuration ?? Realm.Configuration.defaultConfiguration)
-            value = self.resultFactory(realm)
+            value = resultFactory(realm)
             if let sortDescriptor = sortDescriptor {
                 value = value.sorted(byKeyPath: sortDescriptor.keyPath, ascending: sortDescriptor.ascending)
             }
