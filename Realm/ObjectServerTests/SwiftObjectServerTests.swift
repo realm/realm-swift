@@ -693,46 +693,35 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                        RLMCredentials.anonymous())
     }
     // MARK: - Bundled Sync Realm
-
-    func testWriteCopySynchronizeData() {
+    func testseedFilePathOpen() {
         do {
+            // user1 creates, and writeCopies a realm to be opened by another user
             let user1 = try logInUser(for: basicCredentials())
             populateRealm(user: user1, partitionValue: #function)
+            let config = user1.configuration(partitionValue: #function)
+            let realm = try Realm(configuration: config)
+            try realm.writeCopy(toFile: RLMTestRealmURL(), enableSync: true)
 
-            // Create config for where the sync realm will be copied to.
-            // Using a different user to simulate data created by an admin, which is then copied by other users.
+            // user2 creates a configuration that will use user1's realm as a seed
             let user2 = try logInUser(for: basicCredentials())
             XCTAssertNotEqual(user1.id, user2.id)
-            let copiedConfig = user2.configuration(partitionValue: #function)
+            var destinationConfig = user2.configuration(partitionValue: #function)
+            destinationConfig.seedFilePath = RLMTestRealmURL()
 
-            // Open the original realm with the second user because end user device wouldn't
-            // have access to the realm's original user.
-            let originalPath = user1.configuration(partitionValue: #function).fileURL
-            var config = user2.configuration(partitionValue: #function)
-            config.fileURL = originalPath
-            let realm = try Realm(configuration: config)
+            // Open the realm and immediately check data
+            let destinationRealm = try Realm(configuration: destinationConfig)
+            checkCount(expected: SwiftSyncTestCase.bigObjectCount, destinationRealm, SwiftHugeSyncObject.self)
 
-            waitForUploads(for: realm)
-            waitForDownloads(for: realm)
-
-            let pathOnDisk = ObjectiveCSupport.convert(object: copiedConfig).pathOnDisk
-            XCTAssertFalse(FileManager.default.fileExists(atPath: pathOnDisk))
-            try realm.writeCopy(toFile: copiedConfig.fileURL!, enableSync: true)
-
-            // Open the copied realm then immediately check count
-            let copiedRealm = try Realm(configuration: copiedConfig)
-            checkCount(expected: SwiftSyncTestCase.bigObjectCount, copiedRealm, SwiftHugeSyncObject.self)
-
-            // Create an object in the copied realm which does not exist in the original realm.
-            copiedRealm.beginWrite()
+            // Create an object in the destination realm which does not exist in the original realm.
+            destinationRealm.beginWrite()
             let obj1 = SwiftHugeSyncObject.create()
-            copiedRealm.add(obj1)
-            try copiedRealm.commitWrite()
+            destinationRealm.add(obj1)
+            try destinationRealm.commitWrite()
+
+            waitForUploads(for: destinationRealm)
+            waitForDownloads(for: realm)
 
             // Check if the object created in the copied realm is synced to the original realm
-            waitForUploads(for: copiedRealm)
-            waitForDownloads(for: realm)
-
             let obj2 = realm.objects(SwiftHugeSyncObject.self).filter("_id == %@", obj1._id).first
             XCTAssertNotNil(obj2)
             XCTAssertEqual(obj1.data, obj2?.data)
@@ -744,10 +733,10 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             try realm.commitWrite()
 
             waitForUploads(for: realm)
-            waitForDownloads(for: copiedRealm)
+            waitForDownloads(for: destinationRealm)
 
             // Check if the object created in the original realm is synced to the copied realm
-            let obj4 = copiedRealm.objects(SwiftHugeSyncObject.self).filter("_id == %@", obj3._id).first
+            let obj4 = destinationRealm.objects(SwiftHugeSyncObject.self).filter("_id == %@", obj3._id).first
             XCTAssertNotNil(obj4)
             XCTAssertEqual(obj3.data, obj4?.data)
         } catch {
@@ -758,12 +747,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     func testWriteFailBeforeSynced() {
         do {
             let user1 = try logInUser(for: basicCredentials())
-            if !isParent {
-                populateRealm(user: user1, partitionValue: #function)
-                return
-            }
-            // Wait for the child process to upload all the data.
-            executeChild()
+            populateRealm(user: user1, partitionValue: #function)
 
             // Create config for where the sync realm will be copied to.
             // Using a different user to simulate data created by an Admin, which is then copied by other users.

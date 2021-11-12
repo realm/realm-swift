@@ -85,6 +85,7 @@
 
 - (void)testCannotSetMutuallyExclusiveProperties {
     RLMRealmConfiguration *configuration = [[RLMRealmConfiguration alloc] init];
+
     XCTAssertNoThrow(configuration.readOnly = YES);
     XCTAssertNoThrow(configuration.deleteRealmIfMigrationNeeded = NO);
     XCTAssertThrows(configuration.deleteRealmIfMigrationNeeded = YES);

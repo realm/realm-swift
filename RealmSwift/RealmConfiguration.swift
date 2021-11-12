@@ -74,6 +74,7 @@ extension Realm {
                                             The compaction will be skipped if another process is accessing it.
          - parameter objectTypes:        The subset of `Object` and `EmbeddedObject` subclasses persisted in the Realm. 
         */
+        //TODO: docs
         public init(fileURL: URL? = URL(fileURLWithPath: RLMRealmPathForFile("default.realm"), isDirectory: false),
                     inMemoryIdentifier: String? = nil,
                     syncConfiguration: SyncConfiguration? = nil,
@@ -83,7 +84,8 @@ extension Realm {
                     migrationBlock: MigrationBlock? = nil,
                     deleteRealmIfMigrationNeeded: Bool = false,
                     shouldCompactOnLaunch: ((Int, Int) -> Bool)? = nil,
-                    objectTypes: [ObjectBase.Type]? = nil) {
+                    objectTypes: [ObjectBase.Type]? = nil,
+                    seedFilePath: URL? = nil) {
                 self.fileURL = fileURL
                 if let inMemoryIdentifier = inMemoryIdentifier {
                     self.inMemoryIdentifier = inMemoryIdentifier
@@ -98,6 +100,7 @@ extension Realm {
                 self.deleteRealmIfMigrationNeeded = deleteRealmIfMigrationNeeded
                 self.shouldCompactOnLaunch = shouldCompactOnLaunch
                 self.objectTypes = objectTypes
+                self.seedFilePath = seedFilePath
         }
 
         // MARK: Configuration Properties
@@ -243,6 +246,9 @@ extension Realm {
          */
         public var maximumNumberOfActiveVersions: UInt?
 
+        //TODO docs
+        public var seedFilePath: URL?
+
         /// A custom schema to use for the Realm.
         private var customSchema: RLMSchema?
 
@@ -276,6 +282,7 @@ extension Realm {
             configuration.setCustomSchemaWithoutCopying(self.customSchema)
             configuration.disableFormatUpgrade = self.disableFormatUpgrade
             configuration.maximumNumberOfActiveVersions = self.maximumNumberOfActiveVersions ?? 0
+            configuration.seedFilePath = self.seedFilePath
             return configuration
         }
 
@@ -301,6 +308,7 @@ extension Realm {
             configuration.customSchema = rlmConfiguration.customSchema
             configuration.disableFormatUpgrade = rlmConfiguration.disableFormatUpgrade
             configuration.maximumNumberOfActiveVersions = rlmConfiguration.maximumNumberOfActiveVersions
+            configuration.seedFilePath = rlmConfiguration.seedFilePath
             return configuration
         }
     }

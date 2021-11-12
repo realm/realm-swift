@@ -159,9 +159,15 @@ NSString *RLMRealmPathForFile(NSString *fileName) {
         @throw RLMException(@"In-memory identifier must not be empty");
     }
     _config.sync_config = nullptr;
+    _seedFilePath = nil;
 
     RLMNSStringToStdString(_config.path, [NSTemporaryDirectory() stringByAppendingPathComponent:inMemoryIdentifier]);
     _config.in_memory = true;
+}
+
+- (void)setseedFilePath:(NSURL *)seedFilePath {
+    _seedFilePath = seedFilePath;
+    _config.in_memory = false;
 }
 
 - (NSData *)encryptionKey {

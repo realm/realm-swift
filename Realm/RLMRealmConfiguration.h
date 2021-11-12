@@ -70,7 +70,7 @@ typedef BOOL (^RLMShouldCompactOnLaunchBlock)(NSUInteger totalBytes, NSUInteger 
 /// setting one of the two properties will automatically nil out the other.
 @property (nonatomic, copy, nullable) NSURL *fileURL;
 
-/// A string used to identify a particular in-memory Realm. Mutually exclusive with `fileURL` and `syncConfiguration`;
+/// A string used to identify a particular in-memory Realm. Mutually exclusive with `fileURL`,  `seedFilePath`and `syncConfiguration`;
 /// setting any one of the three properties will automatically nil out the other two.
 @property (nonatomic, copy, nullable) NSString *inMemoryIdentifier;
 
@@ -153,6 +153,9 @@ typedef BOOL (^RLMShouldCompactOnLaunchBlock)(NSUInteger totalBytes, NSUInteger 
 
  */
 @property (nonatomic) NSUInteger maximumNumberOfActiveVersions;
+
+// TODO: Docs
+@property (nonatomic, copy, nullable) NSURL* seedFilePath;
 
 @end
 

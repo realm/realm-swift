@@ -447,6 +447,12 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
         }
     }
 
+    if (configuration.seedFilePath && ![RLMRealm fileExistsForConfiguration:configuration]) {
+        [[NSFileManager defaultManager] copyItemAtURL:configuration.seedFilePath
+                                                toURL:[configuration fileURL]
+                                                error:error];
+    }
+
     configuration = [configuration copy];
     Realm::Config& config = configuration.config;
 
@@ -456,7 +462,6 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     // protects the realm cache and accessors cache
     static std::mutex& initLock = *new std::mutex();
     std::lock_guard<std::mutex> lock(initLock);
-
     try {
         if (queue) {
             if (queue == dispatch_get_main_queue()) {
