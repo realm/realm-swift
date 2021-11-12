@@ -1379,4 +1379,3 @@ public struct ProjectedMutableSet<NewElement>: RandomAccessCollection, ThreadCon
         self.propertyName = propertyName
     }
 }
-
