@@ -603,7 +603,7 @@ extension Projection {
  }
  ```
 */
-public struct ProjectedList<NewElement>: RandomAccessCollection where NewElement: RealmCollectionValue {
+public struct ProjectedList<NewElement>: RandomAccessCollection, ThreadConfined where NewElement: RealmCollectionValue {
     public typealias Element = NewElement
     public typealias Index = Int
 
@@ -920,8 +920,6 @@ public struct ProjectedList<NewElement>: RandomAccessCollection where NewElement
     }
 }
 
-extension ProjectedList: ThreadConfined { }
-
 /**
  `ListElementMapper` transforms the actual `List` of `Objects` or `List` of `EmbeddedObjects` in to ProjectedList.
  For example:
@@ -1082,7 +1080,7 @@ extension Projection: ObservableObject, RealmSubscribable where Root: ThreadConf
  can be projected by first names as [John, John]. You will have access to the values
  of the original object.
 */
-public struct ProjectedMutableSet<NewElement>: RandomAccessCollection where NewElement: RealmCollectionValue {
+public struct ProjectedMutableSet<NewElement>: RandomAccessCollection, ThreadConfined where NewElement: RealmCollectionValue {
     public typealias Element = NewElement
     public typealias Index = Int
 
@@ -1382,4 +1380,3 @@ public struct ProjectedMutableSet<NewElement>: RandomAccessCollection where NewE
     }
 }
 
-extension ProjectedMutableSet: ThreadConfined { }
