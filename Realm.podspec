@@ -97,13 +97,9 @@ Pod::Spec.new do |s|
                               'include/RLMSet_Private.h',
                               'include/RLMSwiftProperty.h',
                               'include/RLMSyncConfiguration_Private.h',
-                              'include/RLMFlexibleSyncConfiguration_Private.h',
-                              'include/RLMFlexibleSyncConfiguration.h',
                               'include/RLMSyncUtil_Private.h',
                               'include/RLMUpdateResult_Private.h',
-                              'include/RLMUser_Private.h',
-                              'include/RLMSyncSubscription.h',
-
+                              'include/RLMUser_Private.h'
 
   s.frameworks              = 'Security'
   s.module_map              = 'Realm/Realm.modulemap'

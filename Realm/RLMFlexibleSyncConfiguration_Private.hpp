@@ -19,7 +19,4 @@
 #import "RLMFlexibleSyncConfiguration_Private.h"
 
 @interface RLMFlexibleSyncConfiguration ()
-
-- (instancetype)initWithUser:(RLMUser *)user;
-
 @end
