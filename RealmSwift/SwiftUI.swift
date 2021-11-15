@@ -343,10 +343,17 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
 
 // MARK: ObservedResults
 
-/// A property wrapper type that retrieves results from a Realm.
+/// A property wrapper type that represents the results of a query on a realm.
 ///
 /// The results use the realm configuration provided by
 /// the environment value `EnvironmentValues/realmConfiguration`.
+///
+/// Unlike non-SwiftUI results collections, the ObservedResults is mutable. Writes to an ObservedResults collection implicitly
+/// perform a write transaction. If you add an object to the ObservedResults that the associated query would filter out, the object
+/// is added to the realm but not included in the ObservedResults.
+///
+/// Given `@ObservedResults var v` in SwiftUI, `$v` refers to a `BoundCollection`.
+///
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 @propertyWrapper public struct ObservedResults<ResultType>: DynamicProperty, BoundCollection where ResultType: Object & Identifiable {
     private class Storage: ObservableStorage<Results<ResultType>> {
