@@ -19,7 +19,7 @@
 import Foundation
 
 // State Updates
-// Some operations will return a `SubscriptionTask` which can be used to get state updates (There will be a Combine API as well not described here)
+// Some operations will return a `SubscriptionTask` which can be used to get state updates.
 internal enum SyncSubscriptionState {
     // Subscription is complete and the server is in "steady-state" synchronization.
     case complete
@@ -107,7 +107,7 @@ extension SyncSubscriptionTask {
     // Notifies state changes for the write subscription transaction
     // if state is complete this will return complete, will
     // throw an error if someone updates the subscription set while waiting
-    internal func observe() -> AsyncStream<SyncSubscriptionState> {
+    internal var state: AsyncStream<SyncSubscriptionState> {
         fatalError()
     }
 }
@@ -196,55 +196,3 @@ extension Array where Element == AnySyncSubscription {
     }
 }
 #endif // swift(>=5.5)
-
-#if !(os(iOS) && (arch(i386) || arch(arm)))
-import Combine
-
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
-extension Array where Element == AnySyncSubscription {
-    // Asynchronously creates and commit a write transaction and updates the subscription set,
-    // this will not wait for the server to acknowledge and see all the data associated with this
-    // collection of subscription
-    @discardableResult
-    internal func writeAsync(_ block: @escaping (() throws -> Void)) -> RealmPublishers.SyncSubscriptionPublisher {
-        return RealmPublishers.SyncSubscriptionPublisher(block)
-    }
-}
-
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
-extension RealmPublishers {
-    //@frozen
-    internal struct SyncSubscriptionPublisher: Publisher {
-        internal func receive<S>(subscriber: S) where S: Subscriber, Error == S.Failure, Void == S.Input {
-            fatalError()
-        }
-
-        /// This publisher can fail it cannot commit the subscriptions transactions to the realm
-        internal typealias Failure = Error
-        /// This publisher emits when the operations on the write block are committed
-        internal typealias Output = Void
-
-        private let block: (() throws -> Void)
-
-        internal init(_ block: @escaping (() throws -> Void)) {
-            self.block = block
-        }
-
-        internal func observe() -> SyncSubscriptionStatePublisher {
-            fatalError()
-        }
-    }
-
-    //@frozen
-    internal struct SyncSubscriptionStatePublisher: Publisher {
-        internal func receive<S>(subscriber: S) where S: Subscriber, Error == S.Failure, SyncSubscriptionState == S.Input {
-            fatalError()
-        }
-
-        /// This publisher will fail if there is an error on the state observations
-        internal typealias Failure = Error
-        /// This publisher emits states for the subscription set
-        internal typealias Output = SyncSubscriptionState
-    }
-}
-#endif

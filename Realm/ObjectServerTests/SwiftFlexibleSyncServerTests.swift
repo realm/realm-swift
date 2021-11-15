@@ -27,15 +27,10 @@ import RealmTestSupport
 import SwiftUI
 #endif
 
-#if !(os(iOS) && (arch(i386) || arch(arm)))
-import Combine
-#endif
-
 // TODO: Remove if there is no need to create any helper function for flexible sync tests
 class SwiftFlexibleSyncTestCase: SwiftSyncTestCase {}
 
 class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
-    var cancellables: Set<AnyCancellable> = []
 }
 
 // MARK: - Completion Block
@@ -48,13 +43,4 @@ extension SwiftFlexibleSyncServerTests {
 extension SwiftFlexibleSyncServerTests {
 }
 #endif // canImport(_Concurrency)
-
-// MARK: - Combine
-#if !(os(iOS) && (arch(i386) || arch(arm)))
-import Combine
-
-@available(OSX 10.15, *)
-extension SwiftFlexibleSyncServerTests {
-}
-#endif // canImport(Combine)
 #endif // os(macOS)
