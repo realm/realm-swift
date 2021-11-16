@@ -1871,6 +1871,67 @@
     }];
 }
 
+#pragma mark - SeedFilePath
+
+- (void)testSeedFilePath {
+    // Create a seed realm with two objects
+    RLMRealmConfiguration *seedConfig = [RLMRealmConfiguration defaultConfiguration];
+    seedConfig.fileURL = RLMTestRealmURL();
+    RLMRealm *realm = [RLMRealm realmWithConfiguration:seedConfig error:nil];
+    [realm beginWriteTransaction];
+    [IntObject createInRealm: realm withValue:@[@1]];
+    [IntObject createInRealm: realm withValue:@[@2]];
+    [realm commitWriteTransaction];
+
+    NSURL *fileURL = [NSURL fileURLWithPath:RLMRealmPathForFile(@"filename.realm")];
+    [[NSFileManager defaultManager] removeItemAtPath:fileURL.path error:nil];
+    assert(![[NSFileManager defaultManager] fileExistsAtPath:fileURL.path]);
+
+    // Open realm at destination, expect the objects from seeded path.
+    RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
+    configuration.fileURL = fileURL;
+    configuration.seedFilePath = RLMTestRealmURL();
+    RLMRealm *destinationRealm = [RLMRealm realmWithConfiguration:configuration error:nil];
+    RLMResults *intObjects = [IntObject allObjectsInRealm:destinationRealm];
+    XCTAssertEqual(intObjects.count, 2U, @"Expect 2 objects");
+    XCTAssertEqual([intObjects.firstObject intCol], 1);
+    XCTAssertEqual([intObjects.lastObject intCol], 2);
+}
+
+- (void)testRealmExitsAtPath {
+    // Create a seed realm with two objects
+    RLMRealmConfiguration *seedConfig = [RLMRealmConfiguration defaultConfiguration];
+    seedConfig.fileURL = RLMTestRealmURL();
+    RLMRealm *realm = [RLMRealm realmWithConfiguration:seedConfig error:nil];
+    [realm beginWriteTransaction];
+    [IntObject createInRealm: realm withValue:@[@1]];
+    [IntObject createInRealm: realm withValue:@[@2]];
+    [realm commitWriteTransaction];
+
+    NSURL *fileURL = [NSURL fileURLWithPath:RLMRealmPathForFile(@"filename.realm")];
+    [[NSFileManager defaultManager] removeItemAtPath:fileURL.path error:nil];
+    assert(![[NSFileManager defaultManager] fileExistsAtPath:fileURL.path]);
+
+    // Create a realm at destination path; add one object
+    RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
+    configuration.fileURL = fileURL;
+    {
+        RLMRealm *destinationRealm = [RLMRealm realmWithConfiguration:configuration error:nil];
+        [destinationRealm beginWriteTransaction];
+        [IntObject createInRealm: destinationRealm withValue:@[@3]];
+        [destinationRealm commitWriteTransaction];
+    }
+
+    // Set seed path to seed realm. Open destination realm.
+    // Expect the the seed realm to have not copied because
+    // realm already existed.
+    configuration.seedFilePath = RLMTestRealmURL();
+    RLMRealm *destinationRealm = [RLMRealm realmWithConfiguration:configuration error:nil];
+    RLMResults *intObjects = [IntObject allObjectsInRealm:destinationRealm];
+    XCTAssertEqual(intObjects.count, 1U, @"Expect 1 object");
+    XCTAssertEqual([intObjects.firstObject intCol], 3);
+}
+
 #pragma mark - Frozen Realms
 
 - (void)testIsFrozen {

@@ -93,6 +93,16 @@
     XCTAssertNoThrow(configuration.deleteRealmIfMigrationNeeded = YES);
     XCTAssertNoThrow(configuration.readOnly = NO);
     XCTAssertThrows(configuration.readOnly = YES);
+
+    // Expect setting a seedFilePath to nil out inMemoryIdentifier
+    XCTAssertNoThrow(configuration.inMemoryIdentifier = NSUUID.UUID.UUIDString);
+    XCTAssertNoThrow(configuration.seedFilePath = RLMTestRealmURL());
+    XCTAssertEqual(configuration.inMemoryIdentifier, nil);
+
+    // Expect setting an inMemoryIdentifier to nil out a seefFilePath
+    XCTAssertNoThrow(configuration.inMemoryIdentifier = NSUUID.UUID.UUIDString);
+    XCTAssertEqual(configuration.seedFilePath, nil);
+
 }
 
 - (void)testSchemaModeTransitions {

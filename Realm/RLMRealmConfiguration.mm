@@ -165,7 +165,7 @@ NSString *RLMRealmPathForFile(NSString *fileName) {
     _config.in_memory = true;
 }
 
-- (void)setseedFilePath:(NSURL *)seedFilePath {
+- (void)setSeedFilePath:(NSURL *)seedFilePath {
     _seedFilePath = seedFilePath;
     _config.in_memory = false;
 }
