@@ -176,24 +176,24 @@ private final class ObservableStoragePublisher<ObjectType>: Publisher where Obje
     private var subscribers = [AnySubscriber<Void, Never>]()
     private let value: ObjectType
     private let keyPaths: [String]?
-    private let unwrappedValue: () -> (ObjectBase?)
+    private let unwrappedValue: ObjectBase?
 
     init(_ value: ObjectType, _ keyPaths: [String]? = nil) {
         self.value = value
         self.keyPaths = keyPaths
-        self.unwrappedValue = { nil }
+        self.unwrappedValue = nil
     }
 
     init(_ value: ObjectType, _ keyPaths: [String]? = nil) where ObjectType: ObjectBase {
         self.value = value
         self.keyPaths = keyPaths
-        self.unwrappedValue = { value }
+        self.unwrappedValue = value
     }
 
     init(_ value: ObjectType, _ keyPaths: [String]? = nil) where ObjectType: ProjectionObservable {
         self.value = value
         self.keyPaths = keyPaths
-        self.unwrappedValue = { value.rootObject }
+        self.unwrappedValue = value.rootObject
     }
 
     func send() {
@@ -209,7 +209,7 @@ private final class ObservableStoragePublisher<ObjectType>: Publisher where Obje
             // unmanaged object becomes managed it will continue to use KVO.
             let token =  value._observe(keyPaths, subscriber)
             subscriber.receive(subscription: ObservationSubscription(token: token))
-        } else if let value = unwrappedValue(), !value.isInvalidated {
+        } else if let value = unwrappedValue, !value.isInvalidated {
             // else if the value is unmanaged
             let schema = ObjectSchema(RLMObjectBaseObjectSchema(value)!)
             let kvo = SwiftUIKVO(subscriber: subscriber)
@@ -397,10 +397,9 @@ extension Projection: _ObservedResultsValue { }
 /// The results use the realm configuration provided by
 /// the environment value `EnvironmentValues/realmConfiguration`.
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-@propertyWrapper public struct ObservedResults<ResultType>: DynamicProperty, BoundCollection where ResultType: _ObservedResultsValue {
+@propertyWrapper public struct ObservedResults<ResultType>: DynamicProperty, BoundCollection where ResultType: _ObservedResultsValue, ResultType: RealmFetchable {
     private class Storage: ObservableStorage<Results<ResultType>> {
         var setupHasRun = false
-        var resultFactory: ((Realm) -> Results<ResultType>)!
         private func didSet() {
             if setupHasRun {
                 setupValue()
@@ -410,7 +409,7 @@ extension Projection: _ObservedResultsValue { }
         func setupValue() {
             /// A base value to reset the state of the query if a user reassigns the `filter` or `sortDescriptor`
             let realm = try! Realm(configuration: configuration ?? Realm.Configuration.defaultConfiguration)
-            value = resultFactory(realm)
+            value = realm.objects(ResultType.self)
             if let sortDescriptor = sortDescriptor {
                 value = value.sorted(byKeyPath: sortDescriptor.keyPath, ascending: sortDescriptor.ascending)
             }
@@ -486,9 +485,6 @@ extension Projection: _ObservedResultsValue { }
                                         sortDescriptor: SortDescriptor? = nil) where ResultType: Projection<ObjectType>, ObjectType: ThreadConfined {
         let results = Results(RLMResults.emptyDetached()) as Results<ResultType>
         self.storage = Storage(results, keyPaths)
-        self.storage.resultFactory = { realm in
-            realm.objects(ResultType.self)
-        }
         self.storage.configuration = configuration
         self.filter = filter
         self.sortDescriptor = sortDescriptor
@@ -512,9 +508,6 @@ extension Projection: _ObservedResultsValue { }
                 keyPaths: [String]? = nil,
                 sortDescriptor: SortDescriptor? = nil) where ResultType: Object {
         self.storage = Storage(Results(RLMResults.emptyDetached()), keyPaths)
-        self.storage.resultFactory = { realm in
-            realm.objects(ResultType.self)
-        }
         self.storage.configuration = configuration
         self.filter = filter
         self.sortDescriptor = sortDescriptor

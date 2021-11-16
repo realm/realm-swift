@@ -650,19 +650,8 @@ import Realm.Private
 
      - returns: A `Results` containing the objects.
      */
-    public func objects<Element: Object>(_ type: Element.Type) -> Results<Element> {
+    public func objects<Element: RealmFetchable>(_ type: Element.Type) -> Results<Element> {
         return Results(RLMGetObjects(rlmRealm, type.className(), nil))
-    }
-
-    /**
-     Projects all objects of the projection root type stored in the Realm.
-
-     - parameter type: The type of the projection to be returned.
-
-     - returns: A `Results` containing the projections.
-     */
-    public func objects<Root, T: Projection<Root>>(_ type: T.Type) -> Results<T> where Root: ThreadConfined {
-        return Results(RLMGetObjects(rlmRealm, Root.className(), nil))
     }
 
     /**
@@ -1082,3 +1071,20 @@ extension Realm {
     }
 }
 #endif // swift(>=5.5)
+
+/**
+ Objects which can be feched from the Realm - Object or Projection
+ */
+public protocol RealmFetchable: RealmCollectionValue {
+    /// :nodoc:
+    static func className() -> String
+}
+/// :nodoc:
+extension Object: RealmFetchable {}
+/// :nodoc:
+extension Projection: RealmFetchable {
+    /// :nodoc:
+    public static func className() -> String {
+        return Root.className()
+    }
+}
