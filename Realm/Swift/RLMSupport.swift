@@ -112,8 +112,8 @@ public struct RLMCollectionIterator: IteratorProtocol {
         iteratorBase = NSFastEnumerationIterator(collection)
     }
 
-    public mutating func next() -> RLMObject? {
-        return iteratorBase.next() as! RLMObject?
+    public mutating func next() -> AnyObject? {
+        return iteratorBase.next() as AnyObject?
     }
 }
 

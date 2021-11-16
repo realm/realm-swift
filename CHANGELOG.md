@@ -6,6 +6,9 @@ x.y.z Release notes (yyyy-MM-dd)
   for all Realm collections.
 
 ### Fixed
+* Fix `RLMCollectionIterator` where `RLMCollectionIterator` contents were not RLMObject.
+  This is for users using the optional `RLMSupport.swift` file.
+* Change default request timeout for `RLMApp` from 6 seconds to 60 seconds.
 * Allow `@AutoOpen` to return a realm for any server error on synchronisation.
 * Do not allow `progress` state changes for `@AutoOpen` and `@AsyncOpen` after
   changing state to `open(let realm)` or `error(let error)`.
