@@ -17,6 +17,14 @@ x.y.z Release notes (yyyy-MM-dd)
 * Allow `@AutoOpen` to return a realm for any server error on synchronisation.
 * Do not allow `progress` state changes for `@AutoOpen` and `@AsyncOpen` after
   changing state to `open(let realm)` or `error(let error)`.
+* Logging out a sync user failed to remove the local Realm file for partitions
+  with very long partition values that would have exceeded the maximum path
+  length. ([Core #4187](https://github.com/realm/realm-core/issues/4187), since v10.0.0)
+* Don't keep trying to refresh the access token if the client's clock is more
+  than 30 minutes fast. ([Core #4941](https://github.com/realm/realm-core/issues/4941))
+* Failed auth requests used a fixed long sleep rather than exponential backoff
+  like other sync requests, which could result in very delayed reconnects after
+  a device was offline long enough for the access token to expire (since v10.0.0).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
@@ -28,7 +36,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * Xcode: 12.2-13.1.
 
 ### Internal
-* Upgraded realm-core from ? to ?
+* Upgraded realm-core from 11.6.0 to 11.6.1.
 
 10.19.0 Release notes (2021-11-04)
 =============================================================
