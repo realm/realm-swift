@@ -102,7 +102,6 @@
     // Expect setting an inMemoryIdentifier to nil out a seefFilePath
     XCTAssertNoThrow(configuration.inMemoryIdentifier = NSUUID.UUID.UUIDString);
     XCTAssertEqual(configuration.seedFilePath, nil);
-
 }
 
 - (void)testSchemaModeTransitions {

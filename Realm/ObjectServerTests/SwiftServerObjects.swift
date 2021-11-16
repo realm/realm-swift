@@ -184,8 +184,8 @@ public class SwiftMissingObject: Object {
 }
 
 @objcMembers public class SwiftHugeSyncObject: Object, ObjectKeyIdentifiable {
-    dynamic var _id = ObjectId.generate()
-    dynamic var data: Data?
+    public dynamic var _id = ObjectId.generate()
+    public dynamic var data: Data?
 
     public override class func primaryKey() -> String? {
         return "_id"

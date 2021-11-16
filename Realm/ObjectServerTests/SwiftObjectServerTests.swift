@@ -693,7 +693,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                        RLMCredentials.anonymous())
     }
     // MARK: - Bundled Sync Realm
-    func testseedFilePathOpen() {
+    func testSeedFilePathOpen() {
         do {
             // user1 creates and writeCopies a realm to be opened by another user
             let user1 = try logInUser(for: basicCredentials())
