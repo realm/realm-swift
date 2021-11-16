@@ -281,6 +281,11 @@ extension Realm {
             } else if syncConfiguration == nil {
                 fatalError("A Realm Configuration must specify a path or an in-memory identifier.")
             }
+            if let seedFilePath = seedFilePath {
+                configuration.seedFilePath = seedFilePath
+            } else if let inMemoryIdentifier = inMemoryIdentifier {
+                configuration.inMemoryIdentifier = inMemoryIdentifier
+            }
             configuration.encryptionKey = self.encryptionKey
             configuration.readOnly = self.readOnly
             configuration.schemaVersion = self.schemaVersion
@@ -294,7 +299,6 @@ extension Realm {
             configuration.setCustomSchemaWithoutCopying(self.customSchema)
             configuration.disableFormatUpgrade = self.disableFormatUpgrade
             configuration.maximumNumberOfActiveVersions = self.maximumNumberOfActiveVersions ?? 0
-            configuration.seedFilePath = self.seedFilePath
             return configuration
         }
 
