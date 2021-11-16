@@ -948,7 +948,13 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     NSString *path = fileURL.path;
 
     try {
-        _realm->write_copy(path.UTF8String, {static_cast<const char *>(key.bytes), key.length});
+        _realm->verify_thread();
+        try {
+            _realm->read_group().write(path.UTF8String, static_cast<const char *>(key.bytes));
+        }
+        catch (...) {
+            _impl::translate_file_exception(path.UTF8String);
+        }
         return YES;
     }
     catch (...) {
@@ -1005,7 +1011,6 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     try {
         RLMRealm *realm = [[RLMRealm alloc] initPrivate];
         realm->_realm = _realm->freeze();
-        realm->_realm->set_schema_subset(_realm->schema());
         realm->_realm->read_group();
         realm->_dynamic = _dynamic;
         realm->_schema = _schema;

@@ -25,6 +25,7 @@
 #import "RLMSyncManager_Private.hpp"
 #import "RLMSyncUtil_Private.hpp"
 
+#import <realm/object-store/sync/app.hpp>
 #import <realm/object-store/sync/async_open_task.hpp>
 #import <realm/object-store/sync/sync_session.hpp>
 
@@ -150,7 +151,7 @@ static RLMSyncConnectionState convertConnectionState(SyncSession::ConnectionStat
 
 - (RLMSyncSessionState)state {
     if (auto session = _session.lock()) {
-        if (session->state() == SyncSession::PublicState::Inactive) {
+        if (session->state() == SyncSession::State::Inactive) {
             return RLMSyncSessionStateInactive;
         }
         return RLMSyncSessionStateActive;
@@ -204,8 +205,8 @@ static RLMSyncConnectionState convertConnectionState(SyncSession::ConnectionStat
     if (auto session = _session.lock()) {
         dispatch_queue_t queue = RLMSyncSession.notificationsQueue;
         auto notifier_direction = (direction == RLMSyncProgressDirectionUpload
-                                   ? SyncSession::NotifierType::upload
-                                   : SyncSession::NotifierType::download);
+                                   ? SyncSession::ProgressDirection::upload
+                                   : SyncSession::ProgressDirection::download);
         bool is_streaming = (mode == RLMSyncProgressModeReportIndefinitely);
         uint64_t token = session->register_progress_notifier([=](uint64_t transferred, uint64_t transferrable) {
             dispatch_async(queue, ^{

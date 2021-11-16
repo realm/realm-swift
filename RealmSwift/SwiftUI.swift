@@ -839,11 +839,16 @@ private class ObservableAsyncOpenStorage: ObservableObject {
 
         // Cancel any current subscriptions to asyncOpen if there is one
         cancelAsyncOpen()
-        return Realm.asyncOpen(configuration: config)
+        Realm.asyncOpen(configuration: config)
             .onProgressNotification { asyncProgress in
-                let progress = Progress(totalUnitCount: Int64(asyncProgress.transferredBytes))
-                progress.completedUnitCount = Int64(asyncProgress.transferredBytes)
-                self.asyncOpenState = .progress(progress)
+                // Do not change state to progress if the realm file is already opened or there is an error
+                switch self.asyncOpenState {
+                case .connecting, .waitingForUser, .progress:
+                    let progress = Progress(totalUnitCount: Int64(asyncProgress.transferredBytes))
+                    progress.completedUnitCount = Int64(asyncProgress.transferredBytes)
+                    self.asyncOpenState = .progress(progress)
+                default: break
+                }
             }
             .sink { completion in
                 if case .failure(let error) = completion {
@@ -851,9 +856,7 @@ private class ObservableAsyncOpenStorage: ObservableObject {
                     case .asyncOpen:
                         self.asyncOpenState = .error(error)
                     case .autoOpen:
-                        if let error = error as NSError?,
-                           error.code == Int(ETIMEDOUT) && error.domain == NSPOSIXErrorDomain,
-                           let realm = try? Realm(configuration: config) {
+                        if let realm = try? Realm(configuration: config) {
                             self.asyncOpenState = .open(realm)
                         } else {
                             self.asyncOpenState = .error(error)
@@ -910,16 +913,18 @@ private class ObservableAsyncOpenStorage: ObservableObject {
 
     class func configureApp(appId: String? = nil, withTimeout timeout: UInt? = nil) -> App {
         var app: App
-        let appsIds = RLMApp.appIds()
         if let appId = appId {
             app = App(id: appId)
-        } else if appsIds.count == 1, // Check if there is a singular cached app
-            let cachedAppId = appsIds.first as? String {
-            app = App(id: cachedAppId)
-        } else if appsIds.count > 1 {
-            throwRealmException("Cannot AsyncOpen the Realm because more than one appId was found. When using multiple Apps you must explicitly pass an appId to indicate which to use.")
         } else {
-            throwRealmException("Cannot AsyncOpen the Realm because no appId was found. You must either explicitly pass an appId or initialize an App before displaying your View.")
+            // Check if there is a singular cached app
+            let cachedApps = RLMApp.allApps()
+            if cachedApps.count > 1 {
+                throwRealmException("Cannot AsyncOpen the Realm because more than one appId was found. When using multiple Apps you must explicitly pass an appId to indicate which to use.")
+            }
+            guard let cachedApp = cachedApps.first else {
+                throwRealmException("Cannot AsyncOpen the Realm because no appId was found. You must either explicitly pass an appId or initialize an App before displaying your View.")
+            }
+            app = cachedApp
         }
 
         // Setup timeout if needed

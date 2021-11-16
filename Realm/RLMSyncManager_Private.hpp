@@ -49,6 +49,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)_fireError:(NSError *)error;
 
 - (void)resetForTesting;
+- (void)waitForSessionTermination;
 
 NS_ASSUME_NONNULL_END
 
