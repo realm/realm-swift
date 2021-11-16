@@ -693,13 +693,24 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                        RLMCredentials.anonymous())
     }
     // MARK: - Bundled Sync Realm
+
     func testSeedFilePathOpen() {
         do {
             // user1 creates and writeCopies a realm to be opened by another user
             let user1 = try logInUser(for: basicCredentials())
-            populateRealm(user: user1, partitionValue: #function)
-            let config = user1.configuration(partitionValue: #function)
+            var config = user1.configuration(testName: #function)
+
+            // This test uses the following instead of `populateRealm`
+            // for consistent objectTypes in CI testing.
+            config.objectTypes = [SwiftHugeSyncObject.self]
             let realm = try Realm(configuration: config)
+            try! realm.write {
+                for _ in 0..<SwiftSyncTestCase.bigObjectCount {
+                    realm.add(SwiftHugeSyncObject.create())
+                }
+            }
+            waitForUploads(for: realm)
+
             try realm.writeCopy(toFile: RLMTestRealmURL(), enableSync: true)
 
             // user2 creates a configuration that will use user1's realm as a seed
@@ -707,6 +718,9 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             XCTAssertNotEqual(user1.id, user2.id)
             var destinationConfig = user2.configuration(partitionValue: #function)
             destinationConfig.seedFilePath = RLMTestRealmURL()
+
+            // Set objectTypes to the same that were used whe populating.
+            destinationConfig.objectTypes = [SwiftHugeSyncObject.self]
 
             // Open the realm and immediately check data
             let destinationRealm = try Realm(configuration: destinationConfig)
