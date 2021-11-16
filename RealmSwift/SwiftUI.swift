@@ -974,11 +974,16 @@ private class ObservableAsyncOpenStorage: ObservableObject {
 
         // Cancel any current subscriptions to asyncOpen if there is one
         cancelAsyncOpen()
-        return Realm.asyncOpen(configuration: config)
+        Realm.asyncOpen(configuration: config)
             .onProgressNotification { asyncProgress in
-                let progress = Progress(totalUnitCount: Int64(asyncProgress.transferredBytes))
-                progress.completedUnitCount = Int64(asyncProgress.transferredBytes)
-                self.asyncOpenState = .progress(progress)
+                // Do not change state to progress if the realm file is already opened or there is an error
+                switch self.asyncOpenState {
+                case .connecting, .waitingForUser, .progress:
+                    let progress = Progress(totalUnitCount: Int64(asyncProgress.transferredBytes))
+                    progress.completedUnitCount = Int64(asyncProgress.transferredBytes)
+                    self.asyncOpenState = .progress(progress)
+                default: break
+                }
             }
             .sink { completion in
                 if case .failure(let error) = completion {
@@ -986,9 +991,7 @@ private class ObservableAsyncOpenStorage: ObservableObject {
                     case .asyncOpen:
                         self.asyncOpenState = .error(error)
                     case .autoOpen:
-                        if let error = error as NSError?,
-                           error.code == Int(ETIMEDOUT) && error.domain == NSPOSIXErrorDomain,
-                           let realm = try? Realm(configuration: config) {
+                        if let realm = try? Realm(configuration: config) {
                             self.asyncOpenState = .open(realm)
                         } else {
                             self.asyncOpenState = .error(error)
