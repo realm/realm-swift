@@ -30,7 +30,6 @@
 #import "RLMProperty.h"
 #import "RLMProperty_Private.h"
 #import "RLMQueryUtil.hpp"
-#import "RLMRealm+Sync.h"
 #import "RLMRealmConfiguration+Sync.h"
 #import "RLMRealmConfiguration_Private.hpp"
 #import "RLMRealmUtil.hpp"
@@ -462,6 +461,7 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     // protects the realm cache and accessors cache
     static std::mutex& initLock = *new std::mutex();
     std::lock_guard<std::mutex> lock(initLock);
+
     try {
         if (queue) {
             if (queue == dispatch_get_main_queue()) {

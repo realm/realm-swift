@@ -72,9 +72,11 @@ extension Realm {
 
                                             Return `true ` to indicate that an attempt to compact the file should be made.
                                             The compaction will be skipped if another process is accessing it.
-         - parameter objectTypes:        The subset of `Object` and `EmbeddedObject` subclasses persisted in the Realm. 
+         - parameter objectTypes:        The subset of `Object` and `EmbeddedObject` subclasses persisted in the
+                                         Realm.
+         - parameter seedFilePath:       The path to the realm file that will be copied to the fileURL when opened
+                                         for the first time.
         */
-        //TODO: docs
         public init(fileURL: URL? = URL(fileURLWithPath: RLMRealmPathForFile("default.realm"), isDirectory: false),
                     inMemoryIdentifier: String? = nil,
                     syncConfiguration: SyncConfiguration? = nil,
@@ -246,7 +248,17 @@ extension Realm {
          */
         public var maximumNumberOfActiveVersions: UInt?
 
-        //TODO docs
+        /**
+         When opening the Realm for the first time, instead of creating an empty file,
+         the Realm file will be copied from the provided seed file path and used instead.
+         This can be used to open a Realm file with pre-populated data.
+
+         If a realm file already exists at the confugation's destination path, the seed file
+         will not be copied and the already existing realm will be opened instead.
+
+         This option is mutually exclusive with `inMemoryIdentifier`. Setting a `seedFilePath`
+         will nil out the `inMemoryIdentifier`.
+         */
         public var seedFilePath: URL?
 
         /// A custom schema to use for the Realm.
