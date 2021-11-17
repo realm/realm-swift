@@ -618,6 +618,8 @@ __attribute__((warn_unused_result));
 @interface RLMArray (Swift)
 // for use only in Swift class definitions
 - (instancetype)initWithObjectClassName:(NSString *)objectClassName;
+- (instancetype)initWithObjectType:(RLMPropertyType)type optional:(BOOL)optional;
+
 @end
 
 NS_ASSUME_NONNULL_END
