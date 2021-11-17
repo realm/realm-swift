@@ -1343,11 +1343,10 @@ extension View {
     - parameter prompt: A `Text` representing the prompt of the search field
                 which provides users with guidance on what to search for.
      */
-    public func searchable<T: ObjectBase>(text: Binding<String>, collection: ObservedResults<T>, keyPath: KeyPath<T, String>, placement: SearchFieldPlacement = .automatic, prompt: Text? = nil) -> some View {
+    public func searchable<T: ObjectBase>(text: Binding<String>, collection: ObservedResults<T>, keyPath: KeyPath<T, String>,
+                                          placement: SearchFieldPlacement = .automatic, prompt: Text? = nil) -> some View {
         filterCollection(collection, for: text.wrappedValue, on: keyPath)
-        return searchable(text: text,
-                          placement: placement,
-                          prompt: prompt)
+        return searchable(text: text, placement: placement, prompt: prompt)
     }
 
     /// Marks this view as searchable, which configures the display of a search field.
@@ -1385,7 +1384,9 @@ extension View {
     - parameter prompt: The key for the localized prompt of the search field
                 which provides users with guidance on what to search for.
      */
-    public func searchable<T: ObjectBase>(text: Binding<String>, collection: ObservedResults<T>, keyPath: KeyPath<T, String>, placement: SearchFieldPlacement = .automatic, prompt: LocalizedStringKey) -> some View {
+    public func searchable<T: ObjectBase>(text: Binding<String>, collection: ObservedResults<T>,
+                                          keyPath: KeyPath<T, String>, placement: SearchFieldPlacement = .automatic,
+                                          prompt: LocalizedStringKey) -> some View {
         filterCollection(collection, for: text.wrappedValue, on: keyPath)
         return searchable(text: text,
                           placement: placement,
@@ -1427,11 +1428,10 @@ extension View {
     - parameter prompt: A string representing the prompt of the search field
                 which provides users with guidance on what to search for.
      */
-    public func searchable<T: ObjectBase, S>(text: Binding<String>, collection: ObservedResults<T>, keyPath: KeyPath<T, String>, placement: SearchFieldPlacement = .automatic, prompt: S) -> some View where S: StringProtocol {
+    public func searchable<T: ObjectBase, S>(text: Binding<String>, collection: ObservedResults<T>, keyPath: KeyPath<T, String>,
+                                             placement: SearchFieldPlacement = .automatic, prompt: S) -> some View where S: StringProtocol {
         filterCollection(collection, for: text.wrappedValue, on: keyPath)
-        return searchable(text: text,
-                          placement: placement,
-                          prompt: prompt)
+        return searchable(text: text, placement: placement, prompt: prompt)
     }
 
     /// Marks this view as searchable, which configures the display of a search field.
@@ -1471,7 +1471,9 @@ extension View {
     - parameter suggestions: A view builder that produces content that
                 populates a list of suggestions.
      */
-    public func searchable<T: ObjectBase, S>(text: Binding<String>, collection: ObservedResults<T>, keyPath: KeyPath<T, String>, placement: SearchFieldPlacement = .automatic, prompt: Text? = nil, @ViewBuilder suggestions: () -> S) -> some View where S: View {
+    public func searchable<T: ObjectBase, S>(text: Binding<String>, collection: ObservedResults<T>, keyPath: KeyPath<T, String>,
+                                             placement: SearchFieldPlacement = .automatic, prompt: Text? = nil, @ViewBuilder suggestions: () -> S)
+            -> some View where S: View {
         filterCollection(collection, for: text.wrappedValue, on: keyPath)
         return searchable(text: text,
                           placement: placement,
@@ -1516,7 +1518,9 @@ extension View {
     - parameter suggestions: A view builder that produces content that
                 populates a list of suggestions.
      */
-    public func searchable<T: ObjectBase, S>(text: Binding<String>, collection: ObservedResults<T>, keyPath: KeyPath<T, String>, placement: SearchFieldPlacement = .automatic, prompt: LocalizedStringKey, @ViewBuilder suggestions: () -> S) -> some View where S: View {
+    public func searchable<T: ObjectBase, S>(text: Binding<String>, collection: ObservedResults<T>, keyPath: KeyPath<T, String>,
+                                             placement: SearchFieldPlacement = .automatic, prompt: LocalizedStringKey, @ViewBuilder suggestions: () -> S)
+            -> some View where S: View {
         filterCollection(collection, for: text.wrappedValue, on: keyPath)
         return searchable(text: text,
                           placement: placement,
@@ -1561,7 +1565,9 @@ extension View {
     - parameter suggestions: A view builder that produces content that
                 populates a list of suggestions.
      */
-    public func searchable<T: ObjectBase, V, S>(text: Binding<String>, collection: ObservedResults<T>, keyPath: KeyPath<T, String>, placement: SearchFieldPlacement = .automatic, prompt: S, @ViewBuilder suggestions: () -> V) -> some View where V: View, S: StringProtocol {
+    public func searchable<T: ObjectBase, V, S>(text: Binding<String>, collection: ObservedResults<T>, keyPath: KeyPath<T, String>,
+                                                placement: SearchFieldPlacement = .automatic, prompt: S, @ViewBuilder suggestions: () -> V)
+            -> some View where V: View, S: StringProtocol {
         filterCollection(collection, for: text.wrappedValue, on: keyPath)
         return searchable(text: text,
                           placement: placement,
@@ -1574,9 +1580,7 @@ extension View {
             if text.isEmpty {
                 collection.filter = nil
             } else {
-                var query: Query<String> = Query<T>()[dynamicMember: keyPath]
-                query = query.contains(text)
-                collection.filter = query.predicate
+                collection.filter = Query<T>()[dynamicMember: keyPath].contains(text).predicate
             }
         }
     }

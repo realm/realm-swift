@@ -282,7 +282,7 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
 
      - parameter isIncluded: The query closure with which to filter the objects.
      */
-    public func `where`(_ isIncluded: ((Query<Value>) -> Query<Value>)) -> Results<Value> {
+    public func `where`(_ isIncluded: ((Query<Value>) -> Query<Bool>)) -> Results<Value> {
         return filter(isIncluded(Query()).predicate)
     }
 
