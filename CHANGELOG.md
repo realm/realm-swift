@@ -1,7 +1,14 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+* Add an `enableSync` flag to `[RLMRealm writeCopyToURL:]` and `Realm.writeCopy()`. 
+  This flag indicates whether the copied realm should be able to synchronize data 
+  with the Realm server. This allows for bundling synchronized realms with an application.
+* Add a `seedFilePath` option to `RLMRealmConfiguration` and `Configuration`. If this 
+  option is set then instead of creating an empty, the realm at the `seedFilePath` will 
+  be copied to the `fileURL` of the new realm. If a realm file already exists at the 
+  desitnation path, the seed file will not be copied and the already existing realm 
+  will be opened instead.
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
@@ -27,14 +34,6 @@ x.y.z Release notes (yyyy-MM-dd)
 * Conform `@ThreadSafe` and `ThreadSafeReference` to `Sendable`.
 * Allow using Swift enums which conform to `PersistableEnum` as the value type
   for all Realm collections.
-* Add an `enableSync` flag to `[RLMRealm writeCopyToURL:]` and `Realm.writeCopy()`. 
-  This flag indicates whether the copied realm should be able to synchronize data 
-  with the Realm server. This allows for bundling synchronized realms with an application.
-* Add a `seedFilePath` option to `RLMRealmConfiguration` and `Configuration`. If this 
-  option is set then instead of creating an empty, the realm at the `seedFilePath` will 
-  be copied to the `fileURL` of the new realm. If a realm file already exists at the 
-  desitnation path, the seed file will not be copied and the already existing realm 
-  will be opened instead.
 
 ### Fixed
 
