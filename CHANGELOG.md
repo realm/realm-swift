@@ -1,6 +1,29 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
+* None.
+
+### Fixed
+* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
+* None.
+
+<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+
+### Compatibility
+* Realm Studio: 11.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 13.1.
+* CocoaPods: 1.10 or later.
+* Xcode: 12.2-13.1.
+
+### Internal
+* Upgraded realm-core from ? to ?
+
+10.20.0 Release notes (2021-11-16)
+=============================================================
+
+### Enhancements
+
 * Conform `@ThreadSafe` and `ThreadSafeReference` to `Sendable`.
 * Allow using Swift enums which conform to `PersistableEnum` as the value type
   for all Realm collections.
@@ -14,7 +37,9 @@ x.y.z Release notes (yyyy-MM-dd)
   will be opened instead.
 
 ### Fixed
-* Allow `@AutoOpen` to return a realm for any server error on synchronisation.
+
+* `@AutoOpen` will open the existing local Realm file on any connection error
+  rather than only when the connection specifically times out.
 * Do not allow `progress` state changes for `@AutoOpen` and `@AsyncOpen` after
   changing state to `open(let realm)` or `error(let error)`.
 * Logging out a sync user failed to remove the local Realm file for partitions
@@ -26,9 +51,8 @@ x.y.z Release notes (yyyy-MM-dd)
   like other sync requests, which could result in very delayed reconnects after
   a device was offline long enough for the access token to expire (since v10.0.0).
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
-
 ### Compatibility
+
 * Realm Studio: 11.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 13.1.
@@ -36,6 +60,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * Xcode: 12.2-13.1.
 
 ### Internal
+
 * Upgraded realm-core from 11.6.0 to 11.6.1.
 
 10.19.0 Release notes (2021-11-04)
