@@ -75,7 +75,10 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
     public override init() {
         super.init()
     }
-
+    /// :nodoc:
+    public override init(collection: RLMCollection) {
+        super.init(collection: collection)
+    }
     internal init(objc rlmDictionary: RLMDictionary<AnyObject, AnyObject>) {
         super.init(collection: rlmDictionary)
     }
@@ -261,6 +264,26 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
      */
     public func filter(_ predicate: NSPredicate) -> Results<Value> {
         return Results<Value>(rlmDictionary.objects(with: predicate))
+    }
+
+    /**
+     Returns a `Results` containing all matching values in the map with the given query.
+
+     - Note: This should only be used with classes using the `@Persistable` property declaration.
+
+     - Usage:
+     ```
+     myMap.where {
+        ($0.fooCol > 5) && ($0.barCol == "foobar")
+     }
+     ```
+
+     - Note: See ``Query`` for more information on what query operations are available.
+
+     - parameter isIncluded: The query closure with which to filter the objects.
+     */
+    public func `where`(_ isIncluded: ((Query<Value>) -> Query<Value>)) -> Results<Value> {
+        return filter(isIncluded(Query()).predicate)
     }
 
     /**
@@ -716,19 +739,6 @@ extension Map: Encodable where Key: Encodable, Value: Encodable {
         try container.encode(self.reduce(into: [Key: Value]()) { map, element in
             map[element.key] = element.value
         })
-    }
-}
-
-// MARK: - AssistedObjectiveCBridgeable
-
-extension Map: AssistedObjectiveCBridgeable {
-    internal static func bridging(from objectiveCValue: Any, with metadata: Any?) -> Map {
-        guard let objectiveCValue = objectiveCValue as? RLMDictionary<AnyObject, AnyObject> else { preconditionFailure() }
-        return Map(objc: objectiveCValue)
-    }
-
-    internal var bridged: (objectiveCValue: Any, metadata: Any?) {
-        return (objectiveCValue: _rlmCollection, metadata: nil)
     }
 }
 

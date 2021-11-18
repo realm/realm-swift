@@ -113,7 +113,8 @@ using namespace realm;
         return "";
     }
 
-    auto path = _user->sync_manager()->path_for_realm(*_user, partitionValue);
+    SyncConfig config(_user, "");
+    auto path = _user->sync_manager()->path_for_realm(config, partitionValue);
     if ([NSFileManager.defaultManager fileExistsAtPath:@(path.c_str())]) {
         return path;
     }
@@ -123,7 +124,7 @@ using namespace realm;
     NSString *encodedPartitionValue = [@(partitionValue.data())
                                        stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLPathAllowedCharacterSet]];
     NSString *overEncodedRealmName = [[NSString alloc] initWithFormat:@"%@/%@", self.identifier, encodedPartitionValue];
-    auto legacyPath = _user->sync_manager()->path_for_realm(*_user, overEncodedRealmName.UTF8String);
+    auto legacyPath = _user->sync_manager()->path_for_realm(config, std::string(overEncodedRealmName.UTF8String));
     if ([NSFileManager.defaultManager fileExistsAtPath:@(legacyPath.c_str())]) {
         return legacyPath;
     }
@@ -293,6 +294,13 @@ using namespace realm;
     return (NSDictionary *)RLMConvertBsonToRLMBSON(*_user->custom_data());
 }
 
+- (RLMUserProfile *)profile {
+    if (!_user) {
+        return [RLMUserProfile new];
+    }
+
+    return [[RLMUserProfile alloc] initWithUserProfile:_user->user_profile()];
+}
 - (std::shared_ptr<SyncUser>)_syncUser {
     return _user;
 }
@@ -320,6 +328,61 @@ using namespace realm;
         _identifier = identifier;
     }
     return self;
+}
+
+@end
+
+#pragma mark - RLMUserProfile
+
+@interface RLMUserProfile () {
+    SyncUserProfile _userProfile;
+}
+@end
+
+static NSString* userProfileMemberToNSString(const util::Optional<std::string>& member) {
+    if (member == util::none) {
+        return nil;
+    }
+    return @(member->c_str());
+}
+
+@implementation RLMUserProfile
+
+using UserProfileMember = util::Optional<std::string> (SyncUserProfile::*)() const;
+
+- (instancetype)initWithUserProfile:(SyncUserProfile)userProfile {
+    if (self = [super init]) {
+        _userProfile = std::move(userProfile);
+    }
+    return self;
+}
+
+- (NSString *)name {
+    return userProfileMemberToNSString(_userProfile.name());
+}
+- (NSString *)email {
+    return userProfileMemberToNSString(_userProfile.email());
+}
+- (NSString *)pictureURL {
+    return userProfileMemberToNSString(_userProfile.picture_url());
+}
+- (NSString *)firstName {
+    return userProfileMemberToNSString(_userProfile.first_name());
+}
+- (NSString *)lastName {
+    return userProfileMemberToNSString(_userProfile.last_name());;
+}
+- (NSString *)gender {
+    return userProfileMemberToNSString(_userProfile.gender());
+}
+- (NSString *)birthday {
+    return userProfileMemberToNSString(_userProfile.birthday());
+}
+- (NSString *)minAge {
+    return userProfileMemberToNSString(_userProfile.min_age());
+}
+- (NSString *)maxAge {
+    return userProfileMemberToNSString(_userProfile.max_age());
 }
 
 @end

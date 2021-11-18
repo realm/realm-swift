@@ -137,6 +137,24 @@ extension AnyRealmValue: AddableType {}
         return notFoundToNil(index: rlmResults.indexOfObject(with: predicate))
     }
 
+    /**
+     Returns the index of the first object matching the query, or `nil` if no objects match.
+
+     - Note: This should only be used with classes using the `@Persistable` property declaration.
+
+     - Usage:
+     ```
+     obj.index(matching: { $0.fooCol < 456 })
+     ```
+
+     - Note: See ``Query`` for more information on what query operations are available.
+
+     - parameter isIncluded: The query closure with which to filter the objects.
+    */
+    public func index(matching isIncluded: ((Query<Element>) -> Query<Element>)) -> Int? {
+        return index(matching: isIncluded(Query<Element>()).predicate)
+    }
+
     // MARK: Object Retrieval
 
     /**
@@ -211,6 +229,26 @@ extension AnyRealmValue: AddableType {}
      */
     public func filter(_ predicate: NSPredicate) -> Results<Element> {
         return Results<Element>(rlmResults.objects(with: predicate))
+    }
+
+    /**
+     Returns a `Results` containing all objects matching the given query in the collection.
+
+     - Note: This should only be used with classes using the `@Persistable` property declaration.
+
+     - Usage:
+     ```
+     myResults.where {
+        ($0.fooCol > 5) && ($0.barCol == "foobar")
+     }
+     ```
+
+     - Note: See ``Query`` for more information on what query operations are available.
+
+     - parameter isIncluded: The query closure with which to filter the objects.
+     */
+    public func `where`(_ isIncluded: ((Query<Element>) -> Query<Element>)) -> Results<Element> {
+        return filter(isIncluded(Query()).predicate)
     }
 
     // MARK: Sorting
@@ -658,15 +696,15 @@ extension Results: RealmCollection {
     }
 }
 
-// MARK: AssistedObjectiveCBridgeable
+// MARK: CustomObjectiveCBridgeable
 
-extension Results: AssistedObjectiveCBridgeable {
-    internal static func bridging(from objectiveCValue: Any, with metadata: Any?) -> Results {
+extension Results: CustomObjectiveCBridgeable {
+    internal static func bridging(objCValue objectiveCValue: Any) -> Results {
         return Results(objectiveCValue as! RLMResults)
     }
 
-    internal var bridged: (objectiveCValue: Any, metadata: Any?) {
-        return (objectiveCValue: rlmResults, metadata: nil)
+    internal var objCValue: Any {
+        return rlmResults
     }
 }
 

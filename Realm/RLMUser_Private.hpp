@@ -52,4 +52,8 @@ private:
 
 @end
 
+@interface RLMUserProfile ()
+- (instancetype)initWithUserProfile:(realm::SyncUserProfile)userProfile;
+@end
+
 NS_ASSUME_NONNULL_END

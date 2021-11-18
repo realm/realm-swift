@@ -274,7 +274,7 @@ public protocol RealmCollectionBase: RandomAccessCollection, LazyCollectionProto
  A homogenous collection of `Object`s which can be retrieved, filtered, sorted, and operated upon.
 */
 public protocol RealmCollection: RealmCollectionBase {
-    // Must also conform to `AssistedObjectiveCBridgeable`
+    // Must also conform to `CustomObjectiveCBridgeable`
 
     // MARK: Properties
 
@@ -312,6 +312,22 @@ public protocol RealmCollection: RealmCollectionBase {
     func index(matching predicate: NSPredicate) -> Int?
 
     /**
+     Returns the index of the first object matching the query, or `nil` if no objects match.
+
+     - Note: This should only be used with classes using the `@Persistable` property declaration.
+
+     - Usage:
+     ```
+     obj.index(matching: { $0.fooCol < 456 })
+     ```
+
+     - Note: See ``Query`` for more information on what query operations are available.
+
+     - parameter isIncluded: The query closure to use to filter the objects.
+     */
+    func index(matching isIncluded: ((Query<Element>) -> Query<Element>)) -> Int?
+
+    /**
      Returns the index of the first object matching the predicate, or `nil` if no objects match.
 
      - parameter predicateFormat: A predicate format string, optionally followed by a variable number of arguments.
@@ -346,6 +362,24 @@ public protocol RealmCollection: RealmCollectionBase {
      - parameter predicate: The predicate to use to filter the objects.
      */
     func filter(_ predicate: NSPredicate) -> Results<Element>
+
+    /**
+     Returns a `Results` containing all objects matching the given query in the collection.
+
+     - Note: This should only be used with classes using the `@Persistable` property declaration.
+
+     - Usage:
+     ```
+     myCol.where {
+        ($0.fooCol > 5) && ($0.barCol == "foobar")
+     }
+     ```
+
+     - Note: See ``Query`` for more information on what query operations are available.
+
+     - parameter isIncluded: The query closure to use to filter the objects.
+     */
+    func `where`(_ isIncluded: ((Query<Element>) -> Query<Element>)) -> Results<Element>
 
 
     // MARK: Sorting
@@ -1004,7 +1038,7 @@ public extension RealmCollection where Element: OptionalProtocol, Element.Wrappe
     }
 }
 
-private class _AnyRealmCollectionBase<T: RealmCollectionValue>: AssistedObjectiveCBridgeable {
+private class _AnyRealmCollectionBase<T: RealmCollectionValue>: CustomObjectiveCBridgeable {
     typealias Wrapper = AnyRealmCollection<Element>
     typealias Element = T
     var realm: Realm? { fatalError() }
@@ -1013,8 +1047,10 @@ private class _AnyRealmCollectionBase<T: RealmCollectionValue>: AssistedObjectiv
     var description: String { fatalError() }
     func index(of object: Element) -> Int? { fatalError() }
     func index(matching predicate: NSPredicate) -> Int? { fatalError() }
+    func index(matching query: ((Query<Element>) -> Query<Element>)) -> Int? { fatalError() }
     func objects(at indexes: IndexSet) -> [Element] { fatalError() }
     func filter(_ predicate: NSPredicate) -> Results<Element> { fatalError() }
+    func `where`(_ query: ((Query<Element>) -> Query<Element>)) -> Results<Element> { fatalError() }
     func sorted(byKeyPath keyPath: String, ascending: Bool) -> Results<Element> { fatalError() }
     func sorted<S: Sequence>(by sortDescriptors: S) -> Results<Element> where S.Iterator.Element == SortDescriptor {
         fatalError()
@@ -1035,8 +1071,8 @@ private class _AnyRealmCollectionBase<T: RealmCollectionValue>: AssistedObjectiv
     func _observe(_ keyPaths: [String]?, _ queue: DispatchQueue?, _ block: @escaping (RealmCollectionChange<Wrapper>) -> Void)
         -> NotificationToken { fatalError() }
     func _observe<T: ObjectBase>(_ keyPaths: [PartialKeyPath<T>], _ queue: DispatchQueue?, _ block: @escaping (RealmCollectionChange<Wrapper>) -> Void) -> NotificationToken { fatalError() }
-    class func bridging(from objectiveCValue: Any, with metadata: Any?) -> Self { fatalError() }
-    var bridged: (objectiveCValue: Any, metadata: Any?) { fatalError() }
+    class func bridging(objCValue objectiveCValue: Any) -> Self { fatalError() }
+    var objCValue: Any { fatalError() }
     func asNSFastEnumerator() -> Any { fatalError() }
     var isFrozen: Bool { fatalError() }
     func freeze() -> AnyRealmCollection<T> { fatalError() }
@@ -1063,6 +1099,8 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
 
     override func index(matching predicate: NSPredicate) -> Int? { return base.index(matching: predicate) }
 
+    override func index(matching query: ((Query<Element>) -> Query<Element>)) -> Int? { return base.index(matching: query) }
+
     // MARK: Object Retrieval
 
     override func objects(at indexes: IndexSet) -> [Element] { return base.objects(at: indexes) }
@@ -1070,6 +1108,10 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
     // MARK: Filtering
 
     override func filter(_ predicate: NSPredicate) -> Results<C.Element> { return base.filter(predicate) }
+
+    override func `where`(_ query: ((Query<C.Element>) -> Query<C.Element>)) -> Results<C.Element> {
+        return base.where(query)
+    }
 
     // MARK: Sorting
 
@@ -1151,15 +1193,14 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
         return base._observe(keyPaths.map(_name(for:)), queue, block)
     }
 
-    // MARK: AssistedObjectiveCBridgeable
-
-    override class func bridging(from objectiveCValue: Any, with metadata: Any?) -> _AnyRealmCollection {
+    // MARK: CustomObjectiveCBridgeable
+    override class func bridging(objCValue objectiveCValue: Any) -> _AnyRealmCollection {
         return _AnyRealmCollection(
-            base: (C.self as! AssistedObjectiveCBridgeable.Type).bridging(from: objectiveCValue, with: metadata) as! C)
+            base: (C.self as! CustomObjectiveCBridgeable.Type).bridging(objCValue: objectiveCValue) as! C)
     }
 
-    override var bridged: (objectiveCValue: Any, metadata: Any?) {
-        return (base as! AssistedObjectiveCBridgeable).bridged
+    override var objCValue: Any {
+        return (base as! CustomObjectiveCBridgeable).objCValue
     }
 
     override var isFrozen: Bool {
@@ -1193,6 +1234,17 @@ public struct AnyRealmCollection<Element: RealmCollectionValue>: RealmCollection
 
     fileprivate init(base: _AnyRealmCollectionBase<Element>) {
         self.base = base
+    }
+    fileprivate init(rlmCollection: RLMCollection) {
+        if let rlmCollection = rlmCollection as? RLMArray<AnyObject> {
+            self.base = _AnyRealmCollection(base: List<Element>(objc: rlmCollection))
+        } else if let rlmCollection = rlmCollection as? RLMSet<AnyObject> {
+            self.base = _AnyRealmCollection(base: MutableSet<Element>(objc: rlmCollection))
+        } else if let rlmCollection = rlmCollection as? RLMResults<AnyObject> {
+            self.base = _AnyRealmCollection(base: Results<Element>(objc: rlmCollection))
+        } else {
+            preconditionFailure()
+        }
     }
 
     /// Creates an `AnyRealmCollection` wrapping `base`.
@@ -1235,6 +1287,21 @@ public struct AnyRealmCollection<Element: RealmCollectionValue>: RealmCollection
      */
     public func index(matching predicate: NSPredicate) -> Int? { return base.index(matching: predicate) }
 
+    /**
+     Returns the index of the first object matching the given query, or `nil` if no objects match.
+
+     - Note: This should only be used with classes using the `@Persistable` property declaration.
+
+     - Usage:
+     ```
+     obj.index(matching: { $0.fooCol < 456 })
+     ```
+
+     - Note: See ``Query`` for more information on what query operations are available.
+
+     - parameter isIncluded: The query closure with which to filter the objects.
+     */
+    public func index(matching isIncluded: ((Query<Element>) -> Query<Element>)) -> Int? { return base.index(matching: isIncluded) }
 
     // MARK: Object Retrieval
 
@@ -1258,6 +1325,24 @@ public struct AnyRealmCollection<Element: RealmCollectionValue>: RealmCollection
      - returns: A `Results` containing objects that match the given predicate.
      */
     public func filter(_ predicate: NSPredicate) -> Results<Element> { return base.filter(predicate) }
+
+    /**
+     Returns a `Results` containing all objects matching the given query in the collection.
+
+     - Note: This should only be used with classes using the `@Persistable` property declaration.
+
+     - Usage:
+     ```
+     myCol.where {
+        ($0.fooCol > 5) && ($0.barCol == "foobar")
+     }
+     ```
+
+     - Note: See ``Query`` for more information on what query operations are available.
+
+     - parameter isIncluded: The query closure with which to filter the objects.
+     */
+    public func `where`(_ isIncluded: ((Query<Element>) -> Query<Element>)) -> Results<Element> { return base.where(isIncluded) }
 
 
     // MARK: Sorting
@@ -1749,24 +1834,15 @@ public struct AnyRealmCollection<Element: RealmCollectionValue>: RealmCollection
     public func thaw() -> AnyRealmCollection? { return base.thaw() }
 }
 
-// MARK: AssistedObjectiveCBridgeable
+// MARK: CustomObjectiveCBridgeable
 
-private struct AnyRealmCollectionBridgingMetadata<T: RealmCollectionValue> {
-    var baseMetadata: Any?
-    var baseType: _AnyRealmCollectionBase<T>.Type
-}
-
-extension AnyRealmCollection: AssistedObjectiveCBridgeable {
-    internal static func bridging(from objectiveCValue: Any, with metadata: Any?) -> AnyRealmCollection {
-        guard let metadata = metadata as? AnyRealmCollectionBridgingMetadata<Element> else { preconditionFailure() }
-        return AnyRealmCollection(base: metadata.baseType.bridging(from: objectiveCValue, with: metadata.baseMetadata))
+extension AnyRealmCollection: CustomObjectiveCBridgeable {
+    internal static func bridging(objCValue objectiveCValue: Any) -> AnyRealmCollection {
+        return AnyRealmCollection(rlmCollection: objectiveCValue as! RLMCollection)
     }
 
-    internal var bridged: (objectiveCValue: Any, metadata: Any?) {
-        return (
-            objectiveCValue: base.bridged.objectiveCValue,
-            metadata: AnyRealmCollectionBridgingMetadata(baseMetadata: base.bridged.metadata, baseType: type(of: base))
-        )
+    internal var objCValue: Any {
+        base.objCValue
     }
 }
 

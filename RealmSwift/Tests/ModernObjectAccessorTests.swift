@@ -683,4 +683,25 @@ class ModernObjectAccessorTests: TestCase {
         XCTAssertEqual(obj.mutableCopyValue, "d")
         XCTAssertEqual(obj.newValue, "e")
     }
+
+    func testReadInvalidEnumValue() {
+        let realm = try! Realm()
+        realm.beginWrite()
+
+        let obj = realm.create(ModernAllTypesObject.self)
+        obj["optIntEnumCol"] = 10
+        XCTAssertNil(obj.optIntEnumCol)
+        obj["optStringEnumCol"] = "10"
+        XCTAssertNil(obj.optStringEnumCol)
+
+        let collectionsObj = realm.create(ModernCollectionsOfEnums.self)
+        (collectionsObj.listIntOpt._rlmCollection as! RLMArray<AnyObject>).add(NSNumber(value: 10))
+        XCTAssertNil(collectionsObj.listIntOpt[0])
+        (collectionsObj.setStringOpt._rlmCollection as! RLMSet<AnyObject>).add("abc" as AnyObject)
+        XCTAssertNil(collectionsObj.setStringOpt[0])
+        (collectionsObj.mapStringOpt._rlmCollection as! RLMDictionary<NSString, AnyObject>).setObject("abc" as AnyObject, forKey: "key")
+        XCTAssertEqual(collectionsObj.mapStringOpt["key"], EnumString??.some(nil))
+
+        realm.cancelWrite()
+    }
 }

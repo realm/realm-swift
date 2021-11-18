@@ -59,7 +59,10 @@ public final class MutableSet<Element: RealmCollectionValue>: RLMSwiftCollection
     public override init() {
         super.init()
     }
-
+    /// :nodoc:
+    public override init(collection: RLMCollection) {
+        super.init(collection: collection)
+    }
     internal init(objc rlmSet: RLMSet<AnyObject>) {
         super.init(collection: rlmSet)
     }
@@ -110,6 +113,26 @@ public final class MutableSet<Element: RealmCollectionValue>: RLMSwiftCollection
      */
     public func filter(_ predicate: NSPredicate) -> Results<Element> {
         return Results<Element>(rlmSet.objects(with: predicate))
+    }
+
+    /**
+     Returns a `Results` containing all objects matching the given query in the set.
+
+     - Note: This should only be used with classes using the `@Persistable` property declaration.
+
+     - Usage:
+     ```
+     mySet.where {
+        ($0.fooCol > 5) && ($0.barCol == "foobar")
+     }
+     ```
+
+     - Note: See ``Query`` for more information on what query operations are available.
+
+     - parameter isIncluded: The query with which to filter the objects.
+     */
+    public func `where`(_ isIncluded: ((Query<Element>) -> Query<Element>)) -> Results<Element> {
+        return filter(isIncluded(Query()).predicate)
     }
 
     /**
@@ -738,6 +761,11 @@ extension MutableSet: RealmCollection {
     }
 
     /// :nodoc:
+    public func index(matching isIncluded: ((Query<Element>) -> Query<Element>)) -> Int? {
+        fatalError("index(matching:) is not available on MutableSet")
+    }
+
+    /// :nodoc:
     public func objects(at indexes: IndexSet) -> [Element] {
         fatalError("objects(at indexes:) is not available on MutableSet")
     }
@@ -772,19 +800,6 @@ extension MutableSet: Encodable where Element: Encodable {
         for value in self {
             try container.encode(value)
         }
-    }
-}
-
-// MARK: - AssistedObjectiveCBridgeable
-
-extension MutableSet: AssistedObjectiveCBridgeable {
-    internal static func bridging(from objectiveCValue: Any, with metadata: Any?) -> MutableSet {
-        guard let objectiveCValue = objectiveCValue as? RLMSet<AnyObject> else { preconditionFailure() }
-        return MutableSet(objc: objectiveCValue)
-    }
-
-    internal var bridged: (objectiveCValue: Any, metadata: Any?) {
-        return (objectiveCValue: rlmSet, metadata: nil)
     }
 }
 

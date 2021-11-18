@@ -765,3 +765,257 @@ class ModernObjectCreationTests: TestCase {
         XCTAssertNil(weakObj2)
     }
 }
+
+private func mapValues<T>(_ values: [T]) -> [String: T] {
+    var map = [String: T]()
+    for (i, v) in values.enumerated() {
+        map["\(i)"] = v
+    }
+    return map
+}
+
+class ModernEnumObjectCreationTests: TestCase {
+    let values: [String: Any] = [
+        "listInt": EnumInt.values(),
+        "listInt8": EnumInt8.values(),
+        "listInt16": EnumInt16.values(),
+        "listInt32": EnumInt32.values(),
+        "listInt64": EnumInt64.values(),
+        "listFloat": EnumFloat.values(),
+        "listDouble": EnumDouble.values(),
+        "listString": EnumString.values(),
+
+        "listIntOpt": EnumInt?.values(),
+        "listInt8Opt": EnumInt8?.values(),
+        "listInt16Opt": EnumInt16?.values(),
+        "listInt32Opt": EnumInt32?.values(),
+        "listInt64Opt": EnumInt64?.values(),
+        "listFloatOpt": EnumFloat?.values(),
+        "listDoubleOpt": EnumDouble?.values(),
+        "listStringOpt": EnumString?.values(),
+
+        "setInt": EnumInt.values(),
+        "setInt8": EnumInt8.values(),
+        "setInt16": EnumInt16.values(),
+        "setInt32": EnumInt32.values(),
+        "setInt64": EnumInt64.values(),
+        "setFloat": EnumFloat.values(),
+        "setDouble": EnumDouble.values(),
+        "setString": EnumString.values(),
+
+        "setIntOpt": EnumInt?.values(),
+        "setInt8Opt": EnumInt8?.values(),
+        "setInt16Opt": EnumInt16?.values(),
+        "setInt32Opt": EnumInt32?.values(),
+        "setInt64Opt": EnumInt64?.values(),
+        "setFloatOpt": EnumFloat?.values(),
+        "setDoubleOpt": EnumDouble?.values(),
+        "setStringOpt": EnumString?.values(),
+
+        "mapInt": mapValues(EnumInt.values()),
+        "mapInt8": mapValues(EnumInt8.values()),
+        "mapInt16": mapValues(EnumInt16.values()),
+        "mapInt32": mapValues(EnumInt32.values()),
+        "mapInt64": mapValues(EnumInt64.values()),
+        "mapFloat": mapValues(EnumFloat.values()),
+        "mapDouble": mapValues(EnumDouble.values()),
+        "mapString": mapValues(EnumString.values()),
+
+        "mapIntOpt": mapValues(EnumInt?.values()),
+        "mapInt8Opt": mapValues(EnumInt8?.values()),
+        "mapInt16Opt": mapValues(EnumInt16?.values()),
+        "mapInt32Opt": mapValues(EnumInt32?.values()),
+        "mapInt64Opt": mapValues(EnumInt64?.values()),
+        "mapFloatOpt": mapValues(EnumFloat?.values()),
+        "mapDoubleOpt": mapValues(EnumDouble?.values()),
+        "mapStringOpt": mapValues(EnumString?.values())
+    ]
+
+    func assertMapEqual<T: RealmCollectionValue>(_ actual: Map<String, T>, _ expected: Dictionary<String, T>) {
+        XCTAssertEqual(actual.count, expected.count)
+        for (key, value) in expected {
+            XCTAssertEqual(actual[key], value)
+        }
+    }
+
+    func verifyObject(_ obj: ModernCollectionsOfEnums) {
+        XCTAssertEqual(Array(obj.listInt), EnumInt.values())
+        XCTAssertEqual(Array(obj.listInt8), EnumInt8.values())
+        XCTAssertEqual(Array(obj.listInt16), EnumInt16.values())
+        XCTAssertEqual(Array(obj.listInt32), EnumInt32.values())
+        XCTAssertEqual(Array(obj.listInt64), EnumInt64.values())
+        XCTAssertEqual(Array(obj.listFloat), EnumFloat.values())
+        XCTAssertEqual(Array(obj.listDouble), EnumDouble.values())
+        XCTAssertEqual(Array(obj.listString), EnumString.values())
+
+        XCTAssertEqual(Array(obj.listIntOpt), EnumInt?.values())
+        XCTAssertEqual(Array(obj.listInt8Opt), EnumInt8?.values())
+        XCTAssertEqual(Array(obj.listInt16Opt), EnumInt16?.values())
+        XCTAssertEqual(Array(obj.listInt32Opt), EnumInt32?.values())
+        XCTAssertEqual(Array(obj.listInt64Opt), EnumInt64?.values())
+        XCTAssertEqual(Array(obj.listFloatOpt), EnumFloat?.values())
+        XCTAssertEqual(Array(obj.listDoubleOpt), EnumDouble?.values())
+        XCTAssertEqual(Array(obj.listStringOpt), EnumString?.values())
+
+        XCTAssertEqual(Set(obj.setInt), Set(EnumInt.values()))
+        XCTAssertEqual(Set(obj.setInt8), Set(EnumInt8.values()))
+        XCTAssertEqual(Set(obj.setInt16), Set(EnumInt16.values()))
+        XCTAssertEqual(Set(obj.setInt32), Set(EnumInt32.values()))
+        XCTAssertEqual(Set(obj.setInt64), Set(EnumInt64.values()))
+        XCTAssertEqual(Set(obj.setFloat), Set(EnumFloat.values()))
+        XCTAssertEqual(Set(obj.setDouble), Set(EnumDouble.values()))
+        XCTAssertEqual(Set(obj.setString), Set(EnumString.values()))
+
+        XCTAssertEqual(Set(obj.setIntOpt), Set(EnumInt?.values()))
+        XCTAssertEqual(Set(obj.setInt8Opt), Set(EnumInt8?.values()))
+        XCTAssertEqual(Set(obj.setInt16Opt), Set(EnumInt16?.values()))
+        XCTAssertEqual(Set(obj.setInt32Opt), Set(EnumInt32?.values()))
+        XCTAssertEqual(Set(obj.setInt64Opt), Set(EnumInt64?.values()))
+        XCTAssertEqual(Set(obj.setFloatOpt), Set(EnumFloat?.values()))
+        XCTAssertEqual(Set(obj.setDoubleOpt), Set(EnumDouble?.values()))
+        XCTAssertEqual(Set(obj.setStringOpt), Set(EnumString?.values()))
+
+        assertMapEqual(obj.mapInt, mapValues(EnumInt.values()))
+        assertMapEqual(obj.mapInt8, mapValues(EnumInt8.values()))
+        assertMapEqual(obj.mapInt16, mapValues(EnumInt16.values()))
+        assertMapEqual(obj.mapInt32, mapValues(EnumInt32.values()))
+        assertMapEqual(obj.mapInt64, mapValues(EnumInt64.values()))
+        assertMapEqual(obj.mapFloat, mapValues(EnumFloat.values()))
+        assertMapEqual(obj.mapDouble, mapValues(EnumDouble.values()))
+        assertMapEqual(obj.mapString, mapValues(EnumString.values()))
+
+        assertMapEqual(obj.mapIntOpt, mapValues(EnumInt?.values()))
+        assertMapEqual(obj.mapInt8Opt, mapValues(EnumInt8?.values()))
+        assertMapEqual(obj.mapInt16Opt, mapValues(EnumInt16?.values()))
+        assertMapEqual(obj.mapInt32Opt, mapValues(EnumInt32?.values()))
+        assertMapEqual(obj.mapInt64Opt, mapValues(EnumInt64?.values()))
+        assertMapEqual(obj.mapFloatOpt, mapValues(EnumFloat?.values()))
+        assertMapEqual(obj.mapDoubleOpt, mapValues(EnumDouble?.values()))
+        assertMapEqual(obj.mapStringOpt, mapValues(EnumString?.values()))
+    }
+
+    func verifyDefault(_ obj: ModernCollectionsOfEnums) {
+        XCTAssertEqual(obj.listInt.count, 0)
+        XCTAssertEqual(obj.listInt8.count, 0)
+        XCTAssertEqual(obj.listInt16.count, 0)
+        XCTAssertEqual(obj.listInt32.count, 0)
+        XCTAssertEqual(obj.listInt64.count, 0)
+        XCTAssertEqual(obj.listFloat.count, 0)
+        XCTAssertEqual(obj.listDouble.count, 0)
+        XCTAssertEqual(obj.listString.count, 0)
+
+        XCTAssertEqual(obj.listIntOpt.count, 0)
+        XCTAssertEqual(obj.listInt8Opt.count, 0)
+        XCTAssertEqual(obj.listInt16Opt.count, 0)
+        XCTAssertEqual(obj.listInt32Opt.count, 0)
+        XCTAssertEqual(obj.listInt64Opt.count, 0)
+        XCTAssertEqual(obj.listFloatOpt.count, 0)
+        XCTAssertEqual(obj.listDoubleOpt.count, 0)
+        XCTAssertEqual(obj.listStringOpt.count, 0)
+
+        XCTAssertEqual(obj.setInt.count, 0)
+        XCTAssertEqual(obj.setInt8.count, 0)
+        XCTAssertEqual(obj.setInt16.count, 0)
+        XCTAssertEqual(obj.setInt32.count, 0)
+        XCTAssertEqual(obj.setInt64.count, 0)
+        XCTAssertEqual(obj.setFloat.count, 0)
+        XCTAssertEqual(obj.setDouble.count, 0)
+        XCTAssertEqual(obj.setString.count, 0)
+
+        XCTAssertEqual(obj.setIntOpt.count, 0)
+        XCTAssertEqual(obj.setInt8Opt.count, 0)
+        XCTAssertEqual(obj.setInt16Opt.count, 0)
+        XCTAssertEqual(obj.setInt32Opt.count, 0)
+        XCTAssertEqual(obj.setInt64Opt.count, 0)
+        XCTAssertEqual(obj.setFloatOpt.count, 0)
+        XCTAssertEqual(obj.setDoubleOpt.count, 0)
+        XCTAssertEqual(obj.setStringOpt.count, 0)
+
+        XCTAssertEqual(obj.mapInt.count, 0)
+        XCTAssertEqual(obj.mapInt8.count, 0)
+        XCTAssertEqual(obj.mapInt16.count, 0)
+        XCTAssertEqual(obj.mapInt32.count, 0)
+        XCTAssertEqual(obj.mapInt64.count, 0)
+        XCTAssertEqual(obj.mapFloat.count, 0)
+        XCTAssertEqual(obj.mapDouble.count, 0)
+        XCTAssertEqual(obj.mapString.count, 0)
+
+        XCTAssertEqual(obj.mapIntOpt.count, 0)
+        XCTAssertEqual(obj.mapInt8Opt.count, 0)
+        XCTAssertEqual(obj.mapInt16Opt.count, 0)
+        XCTAssertEqual(obj.mapInt32Opt.count, 0)
+        XCTAssertEqual(obj.mapInt64Opt.count, 0)
+        XCTAssertEqual(obj.mapFloatOpt.count, 0)
+        XCTAssertEqual(obj.mapDoubleOpt.count, 0)
+        XCTAssertEqual(obj.mapStringOpt.count, 0)
+    }
+
+    func testInitDefault() {
+        verifyDefault(ModernCollectionsOfEnums())
+    }
+
+    func testInitWithArray() {
+        let arrayValues = ModernCollectionsOfEnums.sharedSchema()!.properties.map { values[$0.name] }
+        verifyObject(ModernCollectionsOfEnums(value: arrayValues))
+    }
+
+    func testInitWithDictionary() {
+        verifyObject(ModernCollectionsOfEnums(value: values))
+    }
+
+    func testInitWithObject() {
+        let obj = ModernCollectionsOfEnums(value: values)
+        verifyObject(ModernCollectionsOfEnums(value: obj))
+    }
+
+    func testCreateDefault() {
+        let realm = try! Realm()
+        let obj = try! realm.write {
+            return realm.create(ModernCollectionsOfEnums.self)
+        }
+        verifyDefault(obj)
+    }
+
+    func testCreateWithArray() {
+        let realm = try! Realm()
+        let arrayValues = ModernCollectionsOfEnums.sharedSchema()!.properties.map { values[$0.name] }
+        let obj = try! realm.write {
+            return realm.create(ModernCollectionsOfEnums.self, value: arrayValues)
+        }
+        verifyObject(obj)
+    }
+
+    func testCreateWithDictionary() {
+        let realm = try! Realm()
+        let obj = try! realm.write {
+            return realm.create(ModernCollectionsOfEnums.self, value: values)
+        }
+        verifyObject(obj)
+    }
+
+    func testCreateWithObject() {
+        let realm = try! Realm()
+        let obj = try! realm.write {
+            return realm.create(ModernCollectionsOfEnums.self, value: ModernCollectionsOfEnums(value: values))
+        }
+        verifyObject(obj)
+    }
+
+    func testAddDefault() {
+        let obj = ModernCollectionsOfEnums()
+        let realm = try! Realm()
+        try! realm.write {
+            realm.add(obj)
+        }
+        verifyDefault(obj)
+    }
+
+    func testAdd() {
+        let obj = ModernCollectionsOfEnums(value: values)
+        let realm = try! Realm()
+        try! realm.write {
+            realm.add(obj)
+        }
+        verifyObject(obj)
+    }
+}

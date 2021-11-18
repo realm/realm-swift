@@ -24,7 +24,6 @@
     if (self = [super init]) {
         _appIds = @[];
         _identifier = 0;
-        _shouldCleanUpOnTermination = YES;
     }
 
     return self;
@@ -33,14 +32,12 @@
 - (instancetype)initWithAppIds:(NSArray<NSString *> *)appIds
                          email:(NSString *)email
                       password:(NSString *)password
-                     identifer:(NSInteger)identifier
-    shouldCleanUpOnTermination:(BOOL)shouldCleanUpOnTermination {
+                     identifer:(NSInteger)identifier {
     if (self = [super init]) {
         _appIds = appIds ?: @[];
         _email = email;
         _password = password;
         _identifier = identifier;
-        _shouldCleanUpOnTermination = shouldCleanUpOnTermination;
     }
 
     return self;
@@ -63,22 +60,19 @@
         environment[@"RLMChildPassword"] = self.password;
     }
     environment[@"RLMChildIdentifier"] = [@(self.identifier) stringValue];
-    environment[@"RLMChildShouldCleanUpOnTermination"] = self.shouldCleanUpOnTermination ? @"YES" : @"NO";
 
     return environment;
 }
 
 + (RLMChildProcessEnvironment *)current {
     NSDictionary<NSString *, NSString *> *environment = [NSProcessInfo processInfo].environment;
-    NSString *shouldCleanUpOnTermination = [environment objectForKey:@"RLMChildShouldCleanUpOnTermination"] ?: @"YES";
     NSString *identifier = [environment objectForKey:@"RLMChildIdentifier"] ?: @"0";
     NSString *appIds = environment[@"RLMParentAppIds"] ?: @"";
 
     return [[RLMChildProcessEnvironment new] initWithAppIds:[appIds componentsSeparatedByString:@","]
                                                       email:environment[@"RLMChildEmail"]
                                                    password:environment[@"RLMChildPassword"]
-                                                  identifer:[identifier intValue]
-                                 shouldCleanUpOnTermination:[shouldCleanUpOnTermination boolValue]];
+                                                  identifer:[identifier intValue]];
 }
 
 @end

@@ -1734,7 +1734,8 @@
     XCTAssertThrows([results objectAtIndex:0]);
     XCTAssertEqual(NSNotFound, [results indexOfObject:self.nonLiteralNil]);
     XCTAssertEqual(NSNotFound, [results indexOfObjectWhere:@"intCol = 5"]);
-    XCTAssertNoThrow([realm deleteObjects:results]);
+    RLMAssertThrowsWithReason([realm deleteObjects:results],
+                              @"Cannot modify Results outside of a write transaction.");
     XCTAssertNil([results maxOfProperty:@"intCol"]);
     XCTAssertNil([results minOfProperty:@"intCol"]);
     XCTAssertNil([results averageOfProperty:@"intCol"]);

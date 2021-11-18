@@ -104,7 +104,7 @@ namespace {
                        transport:transport
                     localAppName:localAppName
                  localAppVersion:localAppVersion
-         defaultRequestTimeoutMS:6000];
+         defaultRequestTimeoutMS:60000];
 }
 
 - (instancetype)initWithBaseURL:(nullable NSString *)baseURL
@@ -152,19 +152,14 @@ namespace {
 }
 
 - (id<RLMNetworkTransport>)transport {
-    return static_cast<CocoaNetworkTransport*>(_config.transport_generator().get())->transport();
+    return static_cast<CocoaNetworkTransport&>(*_config.transport).transport();
 }
 
 - (void)setTransport:(id<RLMNetworkTransport>)transport {
-    if (transport) {
-        _config.transport_generator = [transport]{
-            return std::make_unique<CocoaNetworkTransport>(transport);
-        };
-    } else {
-        _config.transport_generator = []{
-            return std::make_unique<CocoaNetworkTransport>([RLMNetworkTransport new]);
-        };
+    if (!transport) {
+        transport = [RLMNetworkTransport new];
     }
+    _config.transport = std::make_shared<CocoaNetworkTransport>(transport);
 }
 
 - (NSString *)localAppName {
@@ -198,7 +193,7 @@ namespace {
 }
 
 - (NSUInteger)defaultRequestTimeoutMS {
-    return _config.default_request_timeout_ms.value_or(6000U);
+    return _config.default_request_timeout_ms.value_or(60000U);
 }
 
 - (void)setDefaultRequestTimeoutMS:(NSUInteger)defaultRequestTimeoutMS {
@@ -288,9 +283,9 @@ NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
 static NSMutableDictionary *s_apps = [NSMutableDictionary new];
 static std::mutex& s_appMutex = *new std::mutex();
 
-+ (NSArray *)appIds {
++ (NSArray *)allApps {
     std::lock_guard<std::mutex> lock(s_appMutex);
-    return s_apps.allKeys;
+    return s_apps.allValues;
 }
 
 + (void)resetAppCache {
