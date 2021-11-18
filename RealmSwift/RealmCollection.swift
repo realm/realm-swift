@@ -1946,3 +1946,365 @@ internal protocol PropertyNameConvertible {
     /// `isLegacy` will be true if the property is declared with old property syntax.
     var propertyInformation: (key: String, isLegacy: Bool)? { get }
 }
+
+/**
+ ProjectedCollection is a special type of collection for Projection's properties which
+ should be used when you want to project a `List` of Realm Objects to a list of values.
+ You don't need to instantiate this type manually. Use it by calling `projectTo` on a `List` property:
+ ```swift
+ class PersistedListObject: Object {
+     @Persisted public var people: List<CommonPerson>
+ }
+
+ class ListProjection: Projection<PersistedListObject> {
+     @Projected(\PersistedListObject.people.projectTo.firstName) var strings: ProjectedCollection<String>
+ }
+ ```
+*/
+public struct ProjectedCollection<NewElement>: RandomAccessCollection, ThreadConfined where NewElement: RealmCollectionValue {
+    public typealias Element = NewElement
+    public typealias Index = Int
+/**
+     Returns the index of the first object in the list matching the predicate, or `nil` if no objects match.
+
+     - parameter predicate: The predicate with which to filter the objects.
+    */
+    public func index(matching predicate: NSPredicate) -> Int? {
+        backingCollection.index(matching: predicate)
+    }
+
+    /**
+     Registers a block to be called each time the collection changes.
+
+     The block will be asynchronously called with the initial results, and then called again after each write
+     transaction which changes either any of the objects in the collection, or which objects are in the collection.
+
+     The `change` parameter that is passed to the block reports, in the form of indices within the collection, which of
+     the objects were added, removed, or modified during each write transaction. See the `RealmCollectionChange`
+     documentation for more information on the change information supplied and an example of how to use it to update a
+     `UITableView`.
+
+     At the time when the block is called, the collection will be fully evaluated and up-to-date, and as long as you do
+     not perform a write transaction on the same thread or explicitly call `realm.refresh()`, accessing it will never
+     perform blocking work.
+
+     If no queue is given, notifications are delivered via the standard run loop, and so can't be delivered while the
+     run loop is blocked by other activity. If a queue is given, notifications are delivered to that queue instead. When
+     notifications can't be delivered instantly, multiple notifications may be coalesced into a single notification.
+     This can include the notification with the initial collection.
+
+     For example, the following code performs a write transaction immediately after adding the notification block, so
+     there is no opportunity for the initial notification to be delivered first. As a result, the initial notification
+     will reflect the state of the Realm after the write transaction.
+
+     ```swift
+     class Person: Object {
+         @Persisted var dogs: List<Dog>
+     }
+     class PersonProjection: Projection<Person> {
+         @Projected(\Person.dogs.projectTo.name) var dogsNames: ProjectedCollection<String>
+     }
+     // ...
+     let dogsNames = personProjection.dogsNames
+     print("dogsNames.count: \(dogsNames?.count)") // => 0
+     let token = dogsNames.observe { changes in
+         switch changes {
+         case .initial(let dogsNames):
+             // Will print "dogsNames.count: 1"
+             print("dogsNames.count: \(dogsNames.count)")
+             break
+         case .update:
+             // Will not be hit in this example
+             break
+         case .error:
+             break
+         }
+     }
+     try! realm.write {
+         let dog = Dog()
+         dog.name = "Rex"
+         person.dogs.append(dog)
+     }
+     // end of run loop execution context
+     ```
+
+     You must retain the returned token for as long as you want updates to be sent to the block. To stop receiving
+     updates, call `invalidate()` on the token.
+
+     - warning: This method cannot be called during a write transaction, or when the containing Realm is read-only.
+
+     - parameter queue: The serial dispatch queue to receive notification on. If
+                        `nil`, notifications are delivered to the current thread.
+     - parameter block: The block to be called whenever a change occurs.
+     - returns: A token which must be held for as long as you want updates to be delivered.
+     */
+    public func observe(on queue: DispatchQueue?,
+                        _ block: @escaping (RealmCollectionChange<ProjectedCollection<NewElement>>) -> Void) -> NotificationToken {
+        backingCollection.observe(on: queue, {
+            switch $0 {
+            case .initial(let collection):
+                block(.initial(Self(collection, keyPath: keyPath, propertyName: propertyName)))
+            case .update(let collection,
+                         deletions: let deletions,
+                         insertions: let insertions,
+                         modifications: let modifications):
+                block(.update(Self(collection, keyPath: keyPath, propertyName: propertyName),
+                              deletions: deletions,
+                              insertions: insertions,
+                              modifications: modifications))
+            case .error(let error):
+                block(.error(error))
+            }
+        })
+    }
+    /**
+     Registers a block to be called each time the collection changes.
+
+     The block will be asynchronously called with the initial results, and then called again after each write
+     transaction which changes either any of the objects in the collection, or which objects are in the collection.
+
+     The `change` parameter that is passed to the block reports, in the form of indices within the collection, which of
+     the objects were added, removed, or modified during each write transaction. See the `RealmCollectionChange`
+     documentation for more information on the change information supplied and an example of how to use it to update a
+     `UITableView`.
+
+     At the time when the block is called, the collection will be fully evaluated and up-to-date, and as long as you do
+     not perform a write transaction on the same thread or explicitly call `realm.refresh()`, accessing it will never
+     perform blocking work.
+
+     If no queue is given, notifications are delivered via the standard run loop, and so can't be delivered while the
+     run loop is blocked by other activity. If a queue is given, notifications are delivered to that queue instead. When
+     notifications can't be delivered instantly, multiple notifications may be coalesced into a single notification.
+     This can include the notification with the initial collection.
+
+     For example, the following code performs a write transaction immediately after adding the notification block, so
+     there is no opportunity for the initial notification to be delivered first. As a result, the initial notification
+     will reflect the state of the Realm after the write transaction.
+
+     ```swift
+     class Person: Object {
+         @Persisted var dogs: List<Dog>
+     }
+     class PersonProjection: Projection<Person> {
+         @Projected(\Person.dogs.projectTo.name) var dogNames: ProjectedCollection<String>
+     }
+     // ...
+     let dogNames = personProjection.dogNames
+     print("dogNames.count: \(dogNames?.count)") // => 0
+     let token = dogs.observe { changes in
+         switch changes {
+         case .initial(let dogNames):
+             // Will print "dogNames.count: 1"
+             print("dogNames.count: \(dogNames.count)")
+             break
+         case .update:
+             // Will not be hit in this example
+             break
+         case .error:
+             break
+         }
+     }
+     try! realm.write {
+         let dog = Dog()
+         dog.name = "Rex"
+         person.dogs.append(dog)
+     }
+     // end of run loop execution context
+     ```
+
+     If no key paths are given, the block will be executed on any insertion,
+     modification, or deletion for all object properties and the properties of
+     any nested, linked objects. If a key path or key paths are provided,
+     then the block will be called for changes which occur only on the
+     provided key paths. For example, if:
+     ```swift
+     class Person: Object {
+         @Persisted var dogs: List<Dog>
+     }
+     class PersonProjection: Projection<Person> {
+         @Projected(\Person.dogs.projectTo.name) var dogNames: ProjectedCollection<String>
+     }
+     // ...
+     let dogNames = personProjection.dogNames
+     let token = dogNames.observe(keyPaths: ["name"]) { changes in
+         switch changes {
+         case .initial(let dogNames):
+            // ...
+         case .update:
+            // This case is hit:
+            // - after the token is intialized
+            // - when the name property of an object in the
+            // collection is modified
+            // - when an element is inserted or removed
+            //   from the collection.
+            // This block is not triggered:
+            // - when a value other than name is modified on
+            //   one of the elements.
+         case .error:
+             // ...
+         }
+     }
+     // end of run loop execution context
+     ```
+     Changes to any other value that is linked to a `Dog` in this collection
+     would *not* trigger the block.
+     Any insertion or removal to the `Dog` type collection being observed
+     would still trigger a notification.
+
+     - note: Multiple notification tokens on the same object which filter for
+     separate key paths *do not* filter exclusively. If one key path
+     change is satisfied for one notification token, then all notification
+     token blocks for that object will execute.
+
+     You must retain the returned token for as long as you want updates to be sent to the block. To stop receiving
+     updates, call `invalidate()` on the token.
+
+     - warning: This method cannot be called during a write transaction, or when the containing Realm is read-only.
+
+     - parameter keyPaths: Only properties contained in the key paths array will trigger
+                           the block when they are modified. If `nil`, notifications
+                           will be delivered for any property change on the object.
+                           String key paths which do not correspond to a valid a property
+                           will throw an exception.
+                           See description above for more detail on linked properties.
+     - parameter queue: The serial dispatch queue to receive notification on. If
+                        `nil`, notifications are delivered to the current thread.
+     - parameter block: The block to be called whenever a change occurs.
+     - returns: A token which must be held for as long as you want updates to be delivered.
+     */
+    public func observe(keyPaths: [String]? = nil, on queue: DispatchQueue? = nil,
+                        _ block: @escaping (RealmCollectionChange<ProjectedCollection<NewElement>>) -> Void)
+        -> NotificationToken {
+            backingCollection.observe(keyPaths: keyPaths, on: queue) {
+                switch $0 {
+                case .initial(let collection):
+                    block(.initial(Self(collection, keyPath: keyPath, propertyName: propertyName)))
+                case .update(let collection,
+                             deletions: let deletions,
+                             insertions: let insertions,
+                             modifications: let modifications):
+                    block(.update(Self(collection, keyPath: keyPath, propertyName: propertyName),
+                                  deletions: deletions,
+                                  insertions: insertions,
+                                  modifications: modifications))
+                case .error(let error):
+                    block(.error(error))
+                }
+            }
+        }
+
+    /**
+     Returns the object at the given index (get), or replaces the object at the given index (set).
+
+     - warning: You can only set an object during a write transaction.
+
+     - parameter index: The index of the object to retrieve or replace.
+     */
+    public subscript(position: Int) -> NewElement {
+        get {
+            backingCollection[position][keyPath: keyPath] as! NewElement
+        }
+        set {
+            backingCollection[position].setValue(newValue, forKeyPath: propertyName)
+        }
+    }
+
+    /// The position of the first element in a non-empty collection.
+    /// Identical to endIndex in an empty collection.
+    public var startIndex: Int {
+        backingCollection.startIndex
+    }
+    /// The collection's "past the end" position.
+    /// endIndex is not a valid argument to subscript, and is always reachable from startIndex by
+    /// zero or more applications of successor().
+    public var endIndex: Int {
+        backingCollection.endIndex
+    }
+    /// The Realm which manages the object.
+    public var realm: Realm? {
+        backingCollection.realm
+    }
+    /// Indicates if the collection can no longer be accessed.
+    public var isInvalidated: Bool {
+        backingCollection.isInvalidated
+    }
+    /// A human-readable description of the object.
+    public var description: String {
+        var elements = ""
+        for (i, o) in self.enumerated() {
+            elements += "\t[\(i)] \(o)\n"
+        }
+        return "\(type(of: self))<\(Element.self)> <\(self)> {\n" +
+        elements +
+        "}"
+    }
+    /**
+     Returns the index of an object in the linking objects, or `nil` if the object is not present.
+
+     - parameter object: The object whose index is being queried.
+     */
+    public func index(of object: Element) -> Int? {
+        return backingCollection.objects(at: IndexSet(integersIn: backingCollection.startIndex..<backingCollection.endIndex)).map({$0[keyPath: self.keyPath] as! Element}).firstIndex(of: object)
+    }
+    public var isFrozen: Bool {
+        backingCollection.isFrozen
+    }
+    public func freeze() -> Self {
+        Self(backingCollection.freeze(), keyPath: keyPath, propertyName: propertyName)
+    }
+    public func thaw() -> Self? {
+        return Self(backingCollection.thaw(), keyPath: keyPath, propertyName: propertyName)
+    }
+
+    private var backingCollection: _AnyRealmCollectionBase<Object>
+    private let keyPath: AnyKeyPath
+    private let propertyName: String
+
+    init<OriginalElement>(_ collection: AnyRealmCollection<OriginalElement>,
+                          keyPathToNewElement: KeyPath<OriginalElement, NewElement>) where OriginalElement: Object {
+        self.backingCollection = _AnyRealmCollection(base: collection)
+        self.keyPath = keyPathToNewElement
+        self.propertyName = _name(for: keyPathToNewElement)
+    }
+
+    private init(_ collection: AnyRealmCollection<Object>, keyPath: AnyKeyPath, propertyName: String) {
+        self.backingCollection = _AnyRealmCollection(base: collection)
+        self.keyPath = keyPath
+        self.propertyName = propertyName
+    }
+}
+
+
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+@dynamicMemberLookup
+public struct ListElementMapperV2<Element> where Element: ObjectBase, Element: RealmCollectionValue {
+    var list: List<Element>
+    /// :nodoc:
+    public subscript<V>(dynamicMember member: KeyPath<Element, V>) -> ProjectedCollection<V> {
+        ProjectedCollection(AnyRealmCollection(list), keyPathToNewElement: member)
+    }
+}
+
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+extension List where Element: ObjectBase, Element: RealmCollectionValue {
+    public var projectToV2: ListElementMapperV2<Element> {
+        ListElementMapperV2(list: self)
+    }
+}
+
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+@dynamicMemberLookup
+public struct MutableSetElementMapperV2<Element> where Element: ObjectBase, Element: RealmCollectionValue {
+    var set: MutableSet<Element>
+    /// :nodoc:
+    public subscript<V>(dynamicMember member: KeyPath<Element, V>) -> ProjectedCollection<V> where Element: Object {
+        ProjectedCollection(AnyRealmCollection(set), keyPathToNewElement: member)
+    }
+}
+
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+extension MutableSet where Element: ObjectBase, Element: RealmCollectionValue {
+    public var projectToV2: MutableSetElementMapperV2<Element> {
+        MutableSetElementMapperV2(set: self)
+    }
+}

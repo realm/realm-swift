@@ -186,9 +186,9 @@ extension SimpleObject {
 class AdvancedProjection: Projection<AdvancedObject> {
     @Projected(\AdvancedObject.commonArray.count) var arrayLen
     @Projected(\AdvancedObject.commonArray) var renamedArray
-    @Projected(\AdvancedObject.objectsArray.projectTo.stringify) var projectedArray: ProjectedList<String>
+    @Projected(\AdvancedObject.objectsArray.projectToV2.stringify) var projectedArray: ProjectedCollection<AdvancedObject, String>
     @Projected(\AdvancedObject.commonSet.first) var firstElement
-    @Projected(\AdvancedObject.objectsSet.projectTo.bool) var projectedSet: ProjectedMutableSet<Bool>
+    @Projected(\AdvancedObject.objectsSet.projectToV2.bool) var projectedSet: ProjectedCollection<AdvancedObject, Bool>
 }
 
 class FailedProjection: Projection<ModernAllTypesObject> {
@@ -216,7 +216,7 @@ public final class PersonProjection: Projection<CommonPerson> {
     @Projected(\CommonPerson.lastName.localizedUppercase) var lastNameCaps
     @Projected(\CommonPerson.birthday.timeIntervalSince1970) var birthdayAsEpochtime
     @Projected(\CommonPerson.address?.city) var homeCity
-    @Projected(\CommonPerson.friends.projectTo.firstName) var firstFriendsName: ProjectedList<String>
+    @Projected(\CommonPerson.friends.projectToV2.firstName) var firstFriendsName: ProjectedCollection<CommonPerson, String>
 }
 
 public class SimpleObject: Object {

@@ -31,12 +31,12 @@ class PersistedMutableSetObject: Object {
 }
 
 class MutableSetProjection: Projection<PersistedMutableSetObject> {
-    @Projected(\PersistedMutableSetObject.people.projectTo.firstName) var strings: ProjectedMutableSet<String>
+    @Projected(\PersistedMutableSetObject.people.projectToV2.firstName) var strings: ProjectedCollection<String>
 }
 
 class ProjectedMutableSetTests: TestCase {
 
-    lazy var collection: ProjectedMutableSet<String>! = {
+    lazy var collection: ProjectedCollection<String>! = {
         // To test some of methods there should be a collection of projections instead of collection of strings
         realmWithTestPath().objects(MutableSetProjection.self)[0].strings
     }()
