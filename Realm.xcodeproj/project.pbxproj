@@ -46,7 +46,6 @@
 		02AFB4671A80343600E11938 /* ResultsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 02AFB4621A80343600E11938 /* ResultsTests.m */; };
 		02AFB4681A80343600E11938 /* ResultsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 02AFB4621A80343600E11938 /* ResultsTests.m */; };
 		02E334C31A5F41C7009F8810 /* DynamicTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FBA1955FE0100FDED82 /* DynamicTests.m */; };
-		0C02DCB326DD32A300B1B76F /* ProjectedListTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C02DCB226DD32A300B1B76F /* ProjectedListTests.swift */; };
 		0C3BD4B325C1BDF1007CFDD3 /* RLMDictionary.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0C3BD4B125C1BDF1007CFDD3 /* RLMDictionary.mm */; };
 		0C3BD4B425C1BDF1007CFDD3 /* RLMDictionary.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0C3BD4B125C1BDF1007CFDD3 /* RLMDictionary.mm */; };
 		0C3BD4D325C1C5AB007CFDD3 /* Map.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C3BD4D225C1C5AB007CFDD3 /* Map.swift */; };
@@ -58,7 +57,7 @@
 		0C86B33A25E15B6000775FED /* PrimitiveDictionaryPropertyTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 0C86B33825E15B6000775FED /* PrimitiveDictionaryPropertyTests.m */; };
 		0C9758BF264974660097B48D /* SwiftRLMDictionaryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9758BE264974660097B48D /* SwiftRLMDictionaryTests.swift */; };
 		0C9758C0264974660097B48D /* SwiftRLMDictionaryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9758BE264974660097B48D /* SwiftRLMDictionaryTests.swift */; };
-		0CBF2DB927286FFD00635902 /* ProjectedMutableSetTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CBF2DB827286FFD00635902 /* ProjectedMutableSetTests.swift */; };
+		0CBF2DB927286FFD00635902 /* ProjectedCollectTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CBF2DB827286FFD00635902 /* ProjectedCollectTests.swift */; };
 		0CD1632626D3DD7B0027C49B /* Projection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD1632526D3DD7B0027C49B /* Projection.swift */; };
 		0CD1632826D3DF1D0027C49B /* ProjectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD1632726D3DF1C0027C49B /* ProjectionTests.swift */; };
 		0CED6DB82655087200B80277 /* RLMDictionary_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 0C3BD50125C1DE6F007CFDD3 /* RLMDictionary_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
@@ -749,7 +748,6 @@
 		02B8EF5B19E7048D0045A93D /* RLMCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMCollection.h; sourceTree = "<group>"; };
 		02E334C21A5F3C45009F8810 /* Realm.modulemap */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.module-map"; path = Realm.modulemap; sourceTree = "<group>"; };
 		02E334C41A5F4923009F8810 /* RLMRealm_Private.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RLMRealm_Private.hpp; sourceTree = "<group>"; };
-		0C02DCB226DD32A300B1B76F /* ProjectedListTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectedListTests.swift; sourceTree = "<group>"; };
 		0C3BD4B125C1BDF1007CFDD3 /* RLMDictionary.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMDictionary.mm; sourceTree = "<group>"; };
 		0C3BD4B225C1BDF1007CFDD3 /* RLMDictionary.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMDictionary.h; sourceTree = "<group>"; };
 		0C3BD4D225C1C5AB007CFDD3 /* Map.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Map.swift; sourceTree = "<group>"; };
@@ -758,7 +756,7 @@
 		0C7CA7C225C311DA0098A636 /* RLMManagedDictionary.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMManagedDictionary.mm; sourceTree = "<group>"; };
 		0C86B33825E15B6000775FED /* PrimitiveDictionaryPropertyTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PrimitiveDictionaryPropertyTests.m; sourceTree = "<group>"; };
 		0C9758BE264974660097B48D /* SwiftRLMDictionaryTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftRLMDictionaryTests.swift; sourceTree = "<group>"; };
-		0CBF2DB827286FFD00635902 /* ProjectedMutableSetTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectedMutableSetTests.swift; sourceTree = "<group>"; };
+		0CBF2DB827286FFD00635902 /* ProjectedCollectTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectedCollectTests.swift; sourceTree = "<group>"; };
 		0CD1632526D3DD7B0027C49B /* Projection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Projection.swift; sourceTree = "<group>"; };
 		0CD1632726D3DF1C0027C49B /* ProjectionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProjectionTests.swift; sourceTree = "<group>"; };
 		1A0512731D87413000806AEC /* RLMSyncUtil_Private.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RLMSyncUtil_Private.hpp; sourceTree = "<group>"; };
@@ -1505,8 +1503,7 @@
 				CF040493263DF0A900F9AEE0 /* PrimitiveMapTests.swift */,
 				CF986DF525AE3EDF0039D287 /* PrimitiveMutableSetTests.swift */,
 				0CD1632726D3DF1C0027C49B /* ProjectionTests.swift */,
-				0C02DCB226DD32A300B1B76F /* ProjectedListTests.swift */,
-				0CBF2DB827286FFD00635902 /* ProjectedMutableSetTests.swift */,
+				0CBF2DB827286FFD00635902 /* ProjectedCollectTests.swift */,
 				5D6610081BE98D880021E04F /* PropertyTests.swift */,
 				5D6610091BE98D880021E04F /* RealmCollectionTypeTests.swift */,
 				5D66100A1BE98D880021E04F /* RealmConfigurationTests.swift */,
@@ -2808,7 +2805,6 @@
 				3F8824FE1E5E335000586B35 /* ObjectAccessorTests.swift in Sources */,
 				3F8824FF1E5E335000586B35 /* ObjectCreationTests.swift in Sources */,
 				CFFECBB525078EC40010F585 /* ObjectIdTests.swift in Sources */,
-				0C02DCB326DD32A300B1B76F /* ProjectedListTests.swift in Sources */,
 				3F8825001E5E335000586B35 /* ObjectiveCSupportTests.swift in Sources */,
 				3F8825011E5E335000586B35 /* ObjectSchemaInitializationTests.swift in Sources */,
 				3F8825021E5E335000586B35 /* ObjectSchemaTests.swift in Sources */,
@@ -2829,7 +2825,7 @@
 				3F8825091E5E335000586B35 /* SchemaTests.swift in Sources */,
 				3F88250A1E5E335000586B35 /* SortDescriptorTests.swift in Sources */,
 				3FFB5AF6266ECFC7008EF2E9 /* SwiftBSONTests.swift in Sources */,
-				0CBF2DB927286FFD00635902 /* ProjectedMutableSetTests.swift in Sources */,
+				0CBF2DB927286FFD00635902 /* ProjectedCollectTests.swift in Sources */,
 				3F88250B1E5E335000586B35 /* SwiftLinkTests.swift in Sources */,
 				5D6610251BE98D880021E04F /* SwiftTestObjects.swift in Sources */,
 				0CD1632826D3DF1D0027C49B /* ProjectionTests.swift in Sources */,

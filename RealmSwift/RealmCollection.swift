@@ -2244,7 +2244,7 @@ public struct ProjectedCollection<NewElement>: RandomAccessCollection, ThreadCon
      - parameter object: The object whose index is being queried.
      */
     public func index(of object: Element) -> Int? {
-        return backingCollection.objects(at: IndexSet(integersIn: backingCollection.startIndex..<backingCollection.endIndex)).map({$0[keyPath: self.keyPath] as! Element}).firstIndex(of: object)
+        return backingCollection.map { $0[keyPath: self.keyPath] as! Element }.firstIndex(of: object)
     }
     public var isFrozen: Bool {
         backingCollection.isFrozen
@@ -2253,58 +2253,67 @@ public struct ProjectedCollection<NewElement>: RandomAccessCollection, ThreadCon
         Self(backingCollection.freeze(), keyPath: keyPath, propertyName: propertyName)
     }
     public func thaw() -> Self? {
-        return Self(backingCollection.thaw(), keyPath: keyPath, propertyName: propertyName)
+        guard let backingCollection = backingCollection.thaw() else {
+            return nil
+        }
+        return Self(backingCollection, keyPath: keyPath, propertyName: propertyName)
     }
 
-    private var backingCollection: _AnyRealmCollectionBase<Object>
+    private var backingCollection: AnyRealmCollection<Object>
     private let keyPath: AnyKeyPath
     private let propertyName: String
 
-    init<OriginalElement>(_ collection: AnyRealmCollection<OriginalElement>,
-                          keyPathToNewElement: KeyPath<OriginalElement, NewElement>) where OriginalElement: Object {
-        self.backingCollection = _AnyRealmCollection(base: collection)
+    init<OriginalElement>(_ list: List<Object>,
+                          keyPathToNewElement: KeyPath<OriginalElement, NewElement>) where OriginalElement: ObjectBase {
+        self.backingCollection = AnyRealmCollection(list)
+        self.keyPath = keyPathToNewElement
+        self.propertyName = _name(for: keyPathToNewElement)
+    }
+
+    init<OriginalElement>(_ set: MutableSet<Object>,
+                          keyPathToNewElement: KeyPath<OriginalElement, NewElement>) where OriginalElement: ObjectBase {
+        self.backingCollection = AnyRealmCollection(set)
         self.keyPath = keyPathToNewElement
         self.propertyName = _name(for: keyPathToNewElement)
     }
 
     private init(_ collection: AnyRealmCollection<Object>, keyPath: AnyKeyPath, propertyName: String) {
-        self.backingCollection = _AnyRealmCollection(base: collection)
+        self.backingCollection = collection
         self.keyPath = keyPath
         self.propertyName = propertyName
     }
 }
 
-
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 @dynamicMemberLookup
-public struct ListElementMapperV2<Element> where Element: ObjectBase, Element: RealmCollectionValue {
+public struct ListElementMapper<Element> where Element: ObjectBase, Element: RealmCollectionValue {
     var list: List<Element>
     /// :nodoc:
     public subscript<V>(dynamicMember member: KeyPath<Element, V>) -> ProjectedCollection<V> {
-        ProjectedCollection(AnyRealmCollection(list), keyPathToNewElement: member)
+        ProjectedCollection(ObjectiveCSupport.convert(object: list.rlmArray), keyPathToNewElement: member)
     }
 }
 
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 extension List where Element: ObjectBase, Element: RealmCollectionValue {
-    public var projectToV2: ListElementMapperV2<Element> {
-        ListElementMapperV2(list: self)
+    public var projectTo: ListElementMapper<Element> {
+        ListElementMapper(list: self)
     }
 }
 
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 @dynamicMemberLookup
-public struct MutableSetElementMapperV2<Element> where Element: ObjectBase, Element: RealmCollectionValue {
+public struct MutableSetElementMapper<Element> where Element: ObjectBase, Element: RealmCollectionValue {
     var set: MutableSet<Element>
     /// :nodoc:
-    public subscript<V>(dynamicMember member: KeyPath<Element, V>) -> ProjectedCollection<V> where Element: Object {
-        ProjectedCollection(AnyRealmCollection(set), keyPathToNewElement: member)
+    public subscript<V>(dynamicMember member: KeyPath<Element, V>) -> ProjectedCollection<V> {
+        ProjectedCollection(ObjectiveCSupport.convert(object: set.rlmSet), keyPathToNewElement: member)
     }
 }
 
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 extension MutableSet where Element: ObjectBase, Element: RealmCollectionValue {
-    public var projectToV2: MutableSetElementMapperV2<Element> {
-        MutableSetElementMapperV2(set: self)
+    public var projectTo: MutableSetElementMapper<Element> {
+        MutableSetElementMapper(set: self)
     }
 }
