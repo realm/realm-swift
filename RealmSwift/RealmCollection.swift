@@ -2284,6 +2284,19 @@ public struct ProjectedCollection<NewElement>: RandomAccessCollection, ThreadCon
     }
 }
 
+/**
+ `ListElementMapper` transforms the actual `List` of `Objects` or `List` of `EmbeddedObjects` in to `ProjectedCollection`.
+ For example:
+ ```swift
+ class Person: Object {
+     @Persisted var dogs: List<Dog>
+ }
+ class PersonProjection: Projection<Person> {
+     @Projected(\Person.dogs.projectTo.name) var dogNames: ProjectedCollection<String>
+ }
+```
+ In this code the `Person`'s dogs list will be prijected to the list of dogs names via `projectTo`
+ */
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 @dynamicMemberLookup
 public struct ListElementMapper<Element> where Element: ObjectBase, Element: RealmCollectionValue {
@@ -2296,11 +2309,38 @@ public struct ListElementMapper<Element> where Element: ObjectBase, Element: Rea
 
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 extension List where Element: ObjectBase, Element: RealmCollectionValue {
+    /**
+     `projectTo` will map the original `List` of `Objects` or `List` of `EmbeddedObjects` in to `ProjectedCollection`.
+     For example:
+     ```swift
+     class Person: Object {
+         @Persisted var dogs: List<Dog>
+     }
+     class PersonProjection: Projection<Person> {
+         @Projected(\Person.dogs.projectTo.name) var dogNames: ProjectedCollection<String>
+     }
+    ```
+     In this code the `Person`'s dogs list will be prijected to the list of dogs names via `projectTo`
+     */
     public var projectTo: ListElementMapper<Element> {
         ListElementMapper(list: self)
     }
 }
 
+/**
+ `MutableSetElementMapper` transforms the actual `MutableSet` of `Objects` or `MutableSet` of `EmbeddedObjects` in to `ProjectedCollection`.
+ For example:
+ ```swift
+ class Person: Object {
+     @Persisted var dogs: MutableSet<Dog>
+ }
+ class PersonProjection: Projection<Person> {
+     @Projected(\Person.dogs.projectTo.name) var dogNames: ProjectedMutableSet<String>
+ }
+```
+ In this code the `Person`'s dogs set will be prijected to the projected set of dogs names via `projectTo`
+ Note: This is not the actual *set* data type therefore projected elements can contain duplicates.
+ */
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 @dynamicMemberLookup
 public struct MutableSetElementMapper<Element> where Element: ObjectBase, Element: RealmCollectionValue {
@@ -2313,6 +2353,20 @@ public struct MutableSetElementMapper<Element> where Element: ObjectBase, Elemen
 
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 extension MutableSet where Element: ObjectBase, Element: RealmCollectionValue {
+    /**
+     `MutableSetElementMapper` transforms the actual `MutableSet` of `Objects` or `MutableSet` of `EmbeddedObjects` in to `ProjectedCollection`.
+     For example:
+     ```swift
+     class Person: Object {
+         @Persisted var dogs: MutableSet<Dog>
+     }
+     class PersonProjection: Projection<Person> {
+         @Projected(\Person.dogs.projectTo.name) var dogNames: ProjectedMutableSet<String>
+     }
+    ```
+     In this code the `Person`'s dogs set will be prijected to the projected set of dogs names via `projectTo`
+     Note: This is not the actual *set* data type therefore projected elements can contain duplicates.
+     */
     public var projectTo: MutableSetElementMapper<Element> {
         MutableSetElementMapper(set: self)
     }

@@ -27,8 +27,8 @@ import SwiftUI
 #endif
 
 class PersistedCollections: Object {
-    @Persisted public var list: MutableSet<CommonPerson>
-    @Persisted public var set: List<CommonPerson>
+    @Persisted public var list: List<CommonPerson>
+    @Persisted public var set: MutableSet<CommonPerson>
 }
 
 class ProjectedCollections: Projection<PersistedCollections> {
@@ -36,13 +36,13 @@ class ProjectedCollections: Projection<PersistedCollections> {
     @Projected(\PersistedCollections.set.projectTo.firstName) var set: ProjectedCollection<String>
 }
 
-class ProjectedCollectTestsTemplate: TestCase {
+class ProjectedCollectionsTestsTemplate: TestCase {
 
     // To test some of methods there should be a collection of projections instead of collection of strings
     // set value in subclass
     var collection: ProjectedCollection<String>!
     var expectedDescription: String!
-    
+
     override func setUp() {
         super.setUp()
         let realm = realmWithTestPath()
@@ -300,7 +300,7 @@ class ProjectedCollectTestsTemplate: TestCase {
     }
 }
 
-class ProjectedListTests: ProjectedCollectTestsTemplate {
+class ProjectedListTests: ProjectedCollectionsTestsTemplate {
     override func setUp() {
         super.setUp()
         let realm = realmWithTestPath()
@@ -313,7 +313,7 @@ class ProjectedListTests: ProjectedCollectTestsTemplate {
     }
 }
 
-class ProjectedSetTests: ProjectedCollectTestsTemplate {
+class ProjectedSetTests: ProjectedCollectionsTestsTemplate {
     override func setUp() {
         super.setUp()
         let realm = realmWithTestPath()
