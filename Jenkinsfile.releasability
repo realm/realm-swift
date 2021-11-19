@@ -1,7 +1,7 @@
-xcodeVersions = ['12.2', '12.4', '12.5.1', '13.0', '13.1']
-platforms = ['osx', 'ios', 'watchos', 'tvos', 'catalyst']
-carthagePlatforms = ['osx', 'ios', 'watchos', 'tvos']
-platformNames = ['osx': 'macOS', 'ios': 'iOS', 'watchos': 'watchOS', 'tvos': 'tvOS', 'catalyst': 'Catalyst']
+xcodeVersions = ['13.1'] //['12.2', '12.4', '12.5.1', '13.0', '13.1']
+platforms = ['osx', 'ios'] //['osx', 'ios', 'watchos', 'tvos', 'catalyst']
+carthagePlatforms = ['osx', 'ios'] //['osx', 'ios', 'watchos', 'tvos']
+platformNames = ['osx': 'macOS', 'ios': 'iOS'] //['osx': 'macOS', 'ios': 'iOS', 'watchos': 'watchOS', 'tvos': 'tvOS', 'catalyst': 'Catalyst']
 carthageXcodeVersion = '13.1'
 objcXcodeVersion = '12.2'
 docsSwiftVersion = '5.5'
@@ -72,25 +72,25 @@ def doBuild() {
 
   stage('build') {
     def parallelBuilds = [
-      'Docs': {
-        node('osx') {
-          deleteDir()
-          unstash 'source'
-          sh """
-          hostname
-          export REALM_SWIFT_VERSION=${docsSwiftVersion}
-          export PATH='/Users/realm/.rbenv/bin:/Users/realm/.rbenv/shims:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Users/realm/.gems/bin'
-          ./scripts/reset-simulators.sh
-          ./build.sh docs
-          cd docs
-          zip -r objc-docs.zip objc_output
-          zip -r swift-docs.zip swift_output
-          """
-          dir('docs') {
-            archiveArtifacts artifacts: '*-docs.zip'
-          }
-        }
-      },
+      //'Docs': {
+      //  node('osx') {
+      //    deleteDir()
+      //    unstash 'source'
+      //    sh """
+      //    hostname
+      //    export REALM_SWIFT_VERSION=${docsSwiftVersion}
+      //    export PATH='/Users/realm/.rbenv/bin:/Users/realm/.rbenv/shims:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Users/realm/.gems/bin'
+      //    ./scripts/reset-simulators.sh
+      //    ./build.sh docs
+      //    cd docs
+      //    zip -r objc-docs.zip objc_output
+      //    zip -r swift-docs.zip swift_output
+      //    """
+      //    dir('docs') {
+      //      archiveArtifacts artifacts: '*-docs.zip'
+      //    }
+      //  }
+      //},
 
       'Examples': {
         node('osx') {
