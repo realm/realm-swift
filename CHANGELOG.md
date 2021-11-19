@@ -1,32 +1,6 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
-
-### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
-* None.
-
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
-
-### Compatibility
-* Realm Studio: 11.0.0 or later.
-* APIs are backwards compatible with all previous releases in the 10.x.y series.
-* Carthage release for Swift is built with Xcode 13.1.
-* CocoaPods: 1.10 or later.
-* Xcode: 12.2-13.1.
-
-### Internal
-* Upgraded realm-core from ? to ?
-
-10.20.0 Release notes (2021-11-16)
-=============================================================
-
-### Enhancements
-
-* Conform `@ThreadSafe` and `ThreadSafeReference` to `Sendable`.
-* Allow using Swift enums which conform to `PersistableEnum` as the value type
-  for all Realm collections.
 * Add class `Projection` to allow creation of light weight view models out of Realm Objects.  
 ```swift
 public class Person: Object {
@@ -53,6 +27,31 @@ class PersonProjection: Projection<Person> {
 // `people` will contain projections for every `Person` object in the `realm`
 let people: Results<PersonProjection> = realm.objects(PersonProjection.self)
 ```
+
+### Fixed
+* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
+* None.
+
+<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+
+### Compatibility
+* Realm Studio: 11.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 13.1.
+* CocoaPods: 1.10 or later.
+* Xcode: 12.2-13.1.
+
+### Internal
+* Upgraded realm-core from ? to ?
+
+10.20.0 Release notes (2021-11-16)
+=============================================================
+
+### Enhancements
+
+* Conform `@ThreadSafe` and `ThreadSafeReference` to `Sendable`.
+* Allow using Swift enums which conform to `PersistableEnum` as the value type
+  for all Realm collections.
 
 ### Fixed
 
