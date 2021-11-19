@@ -18,7 +18,33 @@
 
 import Foundation
 
-internal class _AnySyncSubscriptionBox: ISyncSubscription {
+/// A protocol which defines a Subscription for using in a Flexible Sync transactions.
+///
+/// This is used to define a type-erasing wrapper.
+protocol _SyncSubscription {
+    /// When the subscription was created. Recorded automatically.
+    var createdAt: Date { get }
+
+    /// When the subscription was created. Recorded automatically.
+    var updatedAt: Date { get }
+
+    /// Name of the subscription, if not specified it will return the value in Query as a String.
+    var name: String { get }
+
+    #if swift(>=5.4)
+    /**
+     Updates a Flexible Sync's subscription query and/or name.
+
+     - warning: This method may only be called during a write transaction.
+
+     - parameter to: A query builder that produces a subscription which can be used to
+                     update the subscription query and/or name.
+     */
+    func update(@QueryBuilder _ to: () -> (AnySyncSubscription)) throws
+    #endif // swift(>=5.4)
+}
+
+class _AnySyncSubscriptionBox: _SyncSubscription {
     var createdAt: Date {
         fatalError("Must be overriden", file: #file, line: #line)
     }
@@ -38,7 +64,7 @@ internal class _AnySyncSubscriptionBox: ISyncSubscription {
     #endif // swift(>=5.4)
 }
 
-internal final class _SyncSubscriptionBox<S: ISyncSubscription>: _AnySyncSubscriptionBox {
+final class _SyncSubscriptionBox<S: _SyncSubscription>: _AnySyncSubscriptionBox {
     private var _base: S
 
     override var createdAt: Date {
@@ -78,39 +104,12 @@ internal enum SyncSubscriptionState {
 }
 
 // TODO: Change to public
-/// A protocol which defines a Subscription for using in a Flexible Sync transactions.
-///
-/// This is used as well to define a type-erasing wrapper.
-internal protocol ISyncSubscription {
-    /// When the subscription was created. Recorded automatically.
-    var createdAt: Date { get }
-
-    /// When the subscription was created. Recorded automatically.
-    var updatedAt: Date { get }
-
-    /// Name of the subscription, if not specified it will return the value in Query as a String.
-    var name: String { get }
-
-    #if swift(>=5.4)
-    /**
-     Updates a Flexible Sync's subscription query and/or name.
-
-     - warning: This method may only be called during a write transaction.
-
-     - parameter to: A query builder that produces a subscription which can be used to
-                     update the subscription query and/or name.
-     */
-    func update(@QueryBuilder _ to: () -> (AnySyncSubscription)) throws
-    #endif // swift(>=5.4)
-}
-
-// TODO: Change to public
 /// A type-erasing  wrapper over any `ISyncSubscription` conforming object.
 ///
 /// An `AnySyncSubscription` instance forwards its operations to a base struct, hiding
 /// the specifics of the underlying type which allow us to make operations over an array
 /// of `AnySyncSubscriptions`.
-internal struct AnySyncSubscription: ISyncSubscription {
+internal struct AnySyncSubscription: _SyncSubscription {
     private let _box: _AnySyncSubscriptionBox
 
     /// When the subscription was created. Recorded automatically.
@@ -144,7 +143,7 @@ internal struct AnySyncSubscription: ISyncSubscription {
 
     /// Creates a type-erased  `AnySyncSubscription` that wraps any `ISyncSubscription`
     /// conforming object.
-    internal init<S>(_ base: S) where S: ISyncSubscription {
+    internal init<S>(_ base: S) where S: _SyncSubscription {
         self._box = _SyncSubscriptionBox(base)
     }
 }
@@ -155,15 +154,15 @@ internal struct AnySyncSubscription: ISyncSubscription {
  `SyncSubscription` is  used to define a Flexible Sync's subscription, which
  can be added/remove or updated within a write subscription transaction.
  */
-internal struct SyncSubscription<ObjectType: _RealmSchemaDiscoverable>: ISyncSubscription {
+internal struct SyncSubscription<ObjectType: _RealmSchemaDiscoverable>: _SyncSubscription {
     /// When the subscription was created. Recorded automatically.
     private(set) var createdAt: Date = Date()
 
     /// When the subscription was last updated. Recorded automatically.
-    var updatedAt: Date = Date()
+    private(set) var updatedAt: Date = Date()
 
     /// Name of the subscription, if not specified it will return the value in Query as a String.
-    var name: String = ""
+    private(set) var name: String = ""
 
     internal typealias QueryFunction = (Query<ObjectType>) -> Query<ObjectType>
 
@@ -178,7 +177,7 @@ internal struct SyncSubscription<ObjectType: _RealmSchemaDiscoverable>: ISyncSub
     /**
      Updates a Flexible Sync's subscription query and/or name.
 
-     - warning: This method may only be called during a write transaction.
+     - warning: This method may only be called during a write subscription block.
 
      - parameter to: A query builder that produces a subscription which can be used to
                      update the subscription query and/or name.
@@ -198,97 +197,170 @@ internal struct SyncSubscription<ObjectType: _RealmSchemaDiscoverable>: ISyncSub
 }
 #endif // swift(>=5.4)
 
-// TODO: Can we observer changes on the subscription set?
-// Task to get state changes from the write transaction
+// TODO: Change to public
 // TODO: Add when public `@frozen`
+/**
+ A task object which can be used to observe state changes on the subscription set.
+ */
 internal struct SyncSubscriptionTask {
-    // Notifies state changes for the write subscription transaction
-    // if state is complete this will return complete, will
-    // throw an error if someone updates the subscription set while waiting
+    /**
+     Notifies state changes for the subscription set.
+     During a write batch transaction to the server, it will return complete when the server is on
+     "steady-state" synchronization.
+     This will throw an error if someone updates the subscription set while on a write transaction.
+     */
     internal func observe(_ block: @escaping (SyncSubscriptionState) -> Void) {
         fatalError()
     }
 }
 
+// TODO: Change to public
 #if swift(>=5.5) && canImport(_Concurrency)
 @available(macOS 12.0, tvOS 15.0, iOS 15.0, watchOS 8.0, *)
 extension SyncSubscriptionTask {
-    // Notifies state changes for the write subscription transaction
-    // if state is complete this will return complete, will
-    // throw an error if someone updates the subscription set while waiting
+    /**
+     Notifies state changes for the subscription set.
+     During a write batch transaction to the server, it will return complete when the server is on
+     "steady-state" synchronization.
+     This will throw an error if someone updates the subscription set while on a write transaction.
+     */
     internal var state: AsyncStream<SyncSubscriptionState> {
         fatalError()
     }
 }
 #endif // swift(>=5.5)
 
-// SubscriptionSet
+// TODO: Change to public
 extension Array where Element == AnySyncSubscription {
-    // Creates a write transaction and updates the subscription set, this will not wait
-    // for the server to acknowledge and see all the data associated with this collection of
-    // subscriptions
+    /**
+     Create and commit a write transaction and updates the subscription set,
+     this will not wait for the server to acknowledge and see all the data associated with this
+     collection of subscription.
+
+     - parameter block: The block containing the subscriptions transactions to perform.
+     - returns: A task object which can be used to observe the state changes of
+                the subscription set.
+
+     - throws: An `NSError` if the transaction could not be completed successfully.
+               If `block` throws, the function throws the propagated `ErrorType` instead.
+     */
     @discardableResult
     internal func write(_ block: (() throws -> Void)) throws -> SyncSubscriptionTask {
         fatalError()
     }
 
-    // Wait for the server to acknowledge and send all the data associated with this
-    // subscription set, if state is complete this will return immediately, will
-    // throw an error if someone updates the subscription set will waiting
-    // Completion block version
-    internal func `observe`(completion: @escaping (Result<Void, Error>) -> Void) {
-        fatalError()
-    }
-
     #if swift(>=5.4)
-    // Find subscription in the subscription set by subscription properties
+    /**
+     Returns an `AnySyncSubscription` which encapsulates the resulted subscription from
+     the search.
+
+     - parameter named: The name of the subscription searching for.
+     - returns: A `AnySubscription` struct encapsulating the subscription we are searching for.
+     */
     internal func first(named: String) -> AnySyncSubscription? {
         fatalError()
     }
 
-    // Find subscription in the subscription set by query
+    /**
+     Returns an `AnySyncSubscription` which encapsulates the resulted subscription from
+     the search.
+
+     - parameter where: A query builder that produces a subscription which can be used to search
+                        the subscription by query and/or name.
+     - returns: An `AnySyncSubscription` struct encapsulating the subscription we are searching for.
+     */
     internal func first(@QueryBuilder _ `where`: () -> (AnySyncSubscription)) -> AnySyncSubscription? {
         fatalError()
     }
 
-    // Add a query to the subscription set, this has to be done within a write block
+    /**
+     Append an `AnySyncSubscription` to the subscription set which will be sent to the server when
+     committed at the end of a write subscription block.
+
+     - warning: This method may only be called during a write subscription block.
+
+     - parameter to: A query builder that produces a subscription which can be added to the
+                     subscription set.
+     */
     internal func `append`(@QueryBuilder _ to: () -> (AnySyncSubscription)) {
         fatalError()
     }
 
-    // Remove subscription of subscription set by query, this has to be done within a write block
-    internal func remove(@QueryBuilder _ to: () -> (AnySyncSubscription)) throws {
+    /**
+     Remove an `AnySyncSubscription`to the subscription set which will be removed from the server when
+     committed at the end of a write subscription block.
+
+     - warning: This method may only be called during a write subscription block.
+
+     - parameter to: A query builder that produces a subscription which will be removed from the
+                     subscription set.
+     */
+    internal func remove(@QueryBuilder _ to: () -> (AnySyncSubscription)) {
         fatalError()
     }
     #endif // swift(>=5.4)
 
-    // Remove a subscription from the subscription set, this has to be done within a write block
-    internal func remove(_ subscription: AnySyncSubscription) throws {
+    /**
+     Removes an `AnySyncSubscription`to the subscription set which will be removed from the server when
+     committed at the end of a write subscription block.
+
+     - warning: This method may only be called during a write subscription block.
+
+     - parameter subscription: The subscription to be removed from the subscription set.
+     */
+    internal func remove(_ subscription: AnySyncSubscription) {
         fatalError()
     }
 
-    // Remove subscription of subscription set by name, this has to be done within a write block
-    internal func remove(named: String) throws {
+    /**
+     Removes an `AnySyncSubscription`to the subscription set which will be removed from the server when
+     committed at the end of a write subscription block.
+
+     - warning: This method may only be called during a write subscription block.
+
+     - parameter named: The name of the subscription to be removed from the subscription set.
+     */
+    internal func remove(named: String) {
         fatalError()
     }
 
-    // Remove all subscriptions from the subscriptions set
-    internal func removeAll() throws {
+    /**
+     Removes all subscriptions from the subscription set.
+
+     - warning: This method may only be called during a write subscription block.
+     */
+    internal func removeAll() {
         fatalError()
     }
 
-    // Remove all subscriptions from the subscriptions set by type
-    internal func removeAll<T: Object>(ofType type: T.Type) throws {
+    /**
+     Removes zero or none subscriptions of the given type from the subscription set.
+
+     - warning: This method may only be called during a write subscription block.
+
+     - parameter type: The type of the objects to be removed.
+     */
+    internal func removeAll<T: Object>(ofType type: T.Type) {
         fatalError()
     }
 }
 
+// TODO: Change to public
 #if swift(>=5.5) && canImport(_Concurrency)
 @available(macOS 12.0, tvOS 15.0, iOS 15.0, watchOS 8.0, *)
 extension Array where Element == AnySyncSubscription {
-    // Asynchronously creates and commit a write transaction and updates the subscription set,
-    // this will not wait for the server to acknowledge and see all the data associated with this
-    // collection of subscription
+    /**
+     Asynchronously creates and commit a write transaction and updates the subscription set,
+     this will not wait for the server to acknowledge and see all the data associated with this
+     collection of subscription.
+
+     - parameter block: The block containing the subscriptions transactions to perform.
+     - returns: A task object which can be used to observe the state changes of
+                the subscription set.
+
+     - throws: An `NSError` if the transaction could not be completed successfully.
+               If `block` throws, the function throws the propagated `ErrorType` instead.
+     */
     @discardableResult
     internal func write(_ block: (() throws -> Void)) async throws -> SyncSubscriptionTask {
         fatalError()
