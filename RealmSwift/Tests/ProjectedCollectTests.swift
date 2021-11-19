@@ -27,7 +27,7 @@ import SwiftUI
 #endif
 
 class PersistedCollections: Object {
-    @Persisted public var list: List<CommonPerson>
+    @Persisted public var list: RealmSwift.List<CommonPerson>
     @Persisted public var set: MutableSet<CommonPerson>
 }
 
