@@ -960,6 +960,15 @@ import Realm.Private
     }
 }
 
+// MARK: Sync Subscriptions
+
+extension Realm {
+    /// Get all subscriptions for this Realm. 
+    internal var subscriptions: [AnySyncSubscription] {
+        fatalError()
+    }
+}
+
 // MARK: Equatable
 
 extension Realm: Equatable {
