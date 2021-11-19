@@ -20,7 +20,15 @@ import Foundation
 import Realm
 import Realm.Private
 
-extension RLMSwiftCollectionBase: Equatable {
+extension RLMSwiftCollectionBase: Equatable, CustomObjectiveCBridgeable {
+    static func bridging(objCValue objectiveCValue: Any) -> Self {
+        Self(collection: objectiveCValue as! RLMCollection)
+    }
+
+    var objCValue: Any {
+        _rlmCollection
+    }
+
     public static func == (lhs: RLMSwiftCollectionBase, rhs: RLMSwiftCollectionBase) -> Bool {
         return lhs.isEqual(rhs)
     }
@@ -65,7 +73,10 @@ public final class List<Element: RealmCollectionValue>: RLMSwiftCollectionBase {
     public override init() {
         super.init()
     }
-
+    /// :nodoc:
+    public override init(collection: RLMCollection) {
+        super.init(collection: collection)
+    }
     internal init(objc rlmArray: RLMArray<AnyObject>) {
         super.init(collection: rlmArray)
     }
@@ -978,19 +989,6 @@ extension List: Encodable where Element: Encodable {
         for value in self {
             try container.encode(value)
         }
-    }
-}
-
-// MARK: - AssistedObjectiveCBridgeable
-
-extension List: AssistedObjectiveCBridgeable {
-    internal static func bridging(from objectiveCValue: Any, with metadata: Any?) -> List {
-        guard let objectiveCValue = objectiveCValue as? RLMArray<AnyObject> else { preconditionFailure() }
-        return List(objc: objectiveCValue)
-    }
-
-    internal var bridged: (objectiveCValue: Any, metadata: Any?) {
-        return (objectiveCValue: _rlmCollection, metadata: nil)
     }
 }
 

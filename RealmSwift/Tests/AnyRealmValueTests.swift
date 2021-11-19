@@ -19,112 +19,99 @@
 import XCTest
 import Realm
 import RealmSwift
-// swiftlint:disable identifier_name
 
 class AnyRealmTypeObject: Object {
-    var anyValue = RealmProperty<AnyRealmValue>()
-    // required for schema validation, but not used in tests.
-    @objc dynamic var int = 0
+    let anyValue = RealmProperty<AnyRealmValue>()
 }
 
-class AnyRealmValueTests<T: Equatable, V: ValueFactory>: TestCase {
+protocol AnyValueFactory: ValueFactory {
+    static var anyInitializer: (Self) -> AnyRealmValue { get }
+    static func anyValues() -> [AnyRealmValue]
+}
+extension AnyValueFactory {
+    static func anyValues() -> [AnyRealmValue] {
+        return values().map(anyInitializer)
+    }
+}
 
-    var values: [V.T] {
-        V.values()
+extension Int: AnyValueFactory {
+    static var anyInitializer: (Self) -> AnyRealmValue { AnyRealmValue.int }
+}
+extension Bool: AnyValueFactory {
+    static var anyInitializer: (Self) -> AnyRealmValue { AnyRealmValue.bool }
+    static func anyValues() -> [AnyRealmValue] {
+        return [.bool(false), .bool(true), .none]
+    }
+}
+extension Float: AnyValueFactory {
+    static var anyInitializer: (Self) -> AnyRealmValue { AnyRealmValue.float }
+}
+extension Double: AnyValueFactory {
+    static var anyInitializer: (Self) -> AnyRealmValue { AnyRealmValue.double }
+}
+extension String: AnyValueFactory {
+    static var anyInitializer: (Self) -> AnyRealmValue { AnyRealmValue.string }
+}
+extension Data: AnyValueFactory {
+    static var anyInitializer: (Self) -> AnyRealmValue { AnyRealmValue.data }
+}
+extension Date: AnyValueFactory {
+    static var anyInitializer: (Self) -> AnyRealmValue { AnyRealmValue.date }
+}
+extension ObjectId: AnyValueFactory {
+    static var anyInitializer: (ObjectId) -> AnyRealmValue { AnyRealmValue.objectId }
+}
+extension Decimal128: AnyValueFactory {
+    static var anyInitializer: (Decimal128) -> AnyRealmValue { AnyRealmValue.decimal128 }
+}
+extension UUID: AnyValueFactory {
+    static var anyInitializer: (Self) -> AnyRealmValue { AnyRealmValue.uuid }
+}
+
+extension SwiftStringObject: AnyValueFactory {
+    static func values() -> [SwiftStringObject] {
+        return [SwiftStringObject(value: ["a"]), SwiftStringObject(value: ["b"]), SwiftStringObject(value: ["c"])]
     }
 
-    var wrappedValues: [T?] {
-        func cast(_ value: AnyRealmValue) -> T? {
-            switch T.self {
-            case is Int.Type:
-                    return value.intValue as? T
-            case is Bool.Type:
-                    return value.boolValue as? T
-            case is Float.Type:
-                    return value.floatValue as? T
-            case is Double.Type:
-                    return value.floatValue as? T
-            case is String.Type:
-                    return value.stringValue as? T
-            case is Data.Type:
-                    return value.dataValue as? T
-            case is Date.Type:
-                    return value.dateValue as? T
-            case is ObjectId.Type:
-                    return value.objectIdValue as? T
-            case is Decimal128.Type:
-                    return value.decimal128Value as? T
-            case is UUID.Type:
-                    return value.uuidValue as? T
-            default:
-                    return nil
-            }
-        }
-        return (V.values() as! [AnyRealmValue]).map(cast)
-    }
+    static var anyInitializer: (SwiftStringObject) -> AnyRealmValue { AnyRealmValue.object }
+}
 
-    var keyPath: KeyPath<AnyRealmValue, T?> {
-        switch T.self {
-        case is Int.Type:
-                return \AnyRealmValue.intValue as! KeyPath<AnyRealmValue, T?>
-        case is Bool.Type:
-                return \AnyRealmValue.boolValue as! KeyPath<AnyRealmValue, T?>
-        case is Float.Type:
-                return \AnyRealmValue.floatValue as! KeyPath<AnyRealmValue, T?>
-        case is Double.Type:
-                return \AnyRealmValue.floatValue as! KeyPath<AnyRealmValue, T?>
-        case is String.Type:
-                return \AnyRealmValue.stringValue as! KeyPath<AnyRealmValue, T?>
-        case is Data.Type:
-                return \AnyRealmValue.dataValue as! KeyPath<AnyRealmValue, T?>
-        case is Date.Type:
-                return \AnyRealmValue.dateValue as! KeyPath<AnyRealmValue, T?>
-        case is ObjectId.Type:
-                return \AnyRealmValue.objectIdValue as! KeyPath<AnyRealmValue, T?>
-        case is Decimal128.Type:
-                return \AnyRealmValue.decimal128Value as! KeyPath<AnyRealmValue, T?>
-        case is UUID.Type:
-                return \AnyRealmValue.uuidValue as! KeyPath<AnyRealmValue, T?>
-        default:
-                fatalError()
-        }
-    }
-
+class AnyRealmValueTests<T: AnyValueFactory>: TestCase {
     func testAnyRealmValue() {
+        let values = T.anyValues()
         let o = AnyRealmTypeObject()
-        o.anyValue.value = values[0] as! AnyRealmValue
-        XCTAssertEqual(o.anyValue.value[keyPath: keyPath], wrappedValues[0])
-        o.anyValue.value = values[1] as! AnyRealmValue
-        XCTAssertEqual(o.anyValue.value[keyPath: keyPath], wrappedValues[1])
+        o.anyValue.value = values[0]
+        XCTAssertEqual(o.anyValue.value, values[0])
+        o.anyValue.value = values[1]
+        XCTAssertEqual(o.anyValue.value, values[1])
         let realm = realmWithTestPath()
         try! realm.write {
             realm.add(o)
         }
-        XCTAssertEqual(o.anyValue.value[keyPath: keyPath], wrappedValues[1])
+        XCTAssertEqual(o.anyValue.value, values[1])
         try! realm.write {
-            o.anyValue.value = values[2] as! AnyRealmValue
+            o.anyValue.value = values[2]
         }
-        XCTAssertEqual(o.anyValue.value[keyPath: keyPath], wrappedValues[2])
+        XCTAssertEqual(o.anyValue.value, values[2])
     }
 }
 class AnyRealmValuePrimitiveTests: TestCase {
     override class var defaultTestSuite: XCTestSuite {
         let suite = XCTestSuite(name: "Any Realm Value Tests")
-        _ = AnyRealmValueTests<Int, AnyRealmValueIntFactory>.defaultTestSuite.tests.map(suite.addTest)
-        _ = AnyRealmValueTests<Bool, AnyRealmValueBoolFactory>.defaultTestSuite.tests.map(suite.addTest)
-        _ = AnyRealmValueTests<Float, AnyRealmValueFloatFactory>.defaultTestSuite.tests.map(suite.addTest)
-        _ = AnyRealmValueTests<String, AnyRealmValueStringFactory>.defaultTestSuite.tests.map(suite.addTest)
-        _ = AnyRealmValueTests<Data, AnyRealmValueDataFactory>.defaultTestSuite.tests.map(suite.addTest)
-        _ = AnyRealmValueTests<Date, AnyRealmValueDateFactory>.defaultTestSuite.tests.map(suite.addTest)
-        _ = AnyRealmValueTests<ObjectId, AnyRealmValueObjectIdFactory>.defaultTestSuite.tests.map(suite.addTest)
-        _ = AnyRealmValueTests<Decimal128, AnyRealmValueDecimal128Factory>.defaultTestSuite.tests.map(suite.addTest)
-        _ = AnyRealmValueTests<UUID, AnyRealmValueUUIDFactory>.defaultTestSuite.tests.map(suite.addTest)
+        AnyRealmValueTests<Int>.defaultTestSuite.tests.forEach(suite.addTest)
+        AnyRealmValueTests<Bool>.defaultTestSuite.tests.forEach(suite.addTest)
+        AnyRealmValueTests<Float>.defaultTestSuite.tests.forEach(suite.addTest)
+        AnyRealmValueTests<String>.defaultTestSuite.tests.forEach(suite.addTest)
+        AnyRealmValueTests<Data>.defaultTestSuite.tests.forEach(suite.addTest)
+        AnyRealmValueTests<Date>.defaultTestSuite.tests.forEach(suite.addTest)
+        AnyRealmValueTests<ObjectId>.defaultTestSuite.tests.forEach(suite.addTest)
+        AnyRealmValueTests<Decimal128>.defaultTestSuite.tests.forEach(suite.addTest)
+        AnyRealmValueTests<UUID>.defaultTestSuite.tests.forEach(suite.addTest)
         return suite
     }
 }
 
 class AnyRealmValueObjectTests: TestCase {
-
     func testObject() {
         let o = AnyRealmTypeObject()
         let so = SwiftStringObject()
@@ -220,13 +207,9 @@ class AnyRealmValueObjectTests: TestCase {
                                              keyPath: KeyPath<AnyRealmValue, T?>,
                                              expected: T,
                                              realm: Realm?) {
-        if let realm = realm {
-            try! realm.write {
-                object.anyValue.value = value
-            }
-        } else {
-            object.anyValue.value = value
-        }
+        realm?.beginWrite()
+        object.anyValue.value = value
+        try! realm?.commitWrite()
         if let date = expected as? Date {
             XCTAssertEqual(object.anyValue.value.dateValue!.timeIntervalSince1970,
                            date.timeIntervalSince1970,
@@ -237,109 +220,31 @@ class AnyRealmValueObjectTests: TestCase {
     }
 }
 
-// MARK: - Factories
-
-class BaseAnyRealmValueFactory {
-    static func array(_ obj: SwiftListObject) -> List<AnyRealmValue> {
-        return obj.any
-    }
-
-    static func mutableSet(_ obj: SwiftMutableSetObject) -> MutableSet<AnyRealmValue> {
-        return obj.any
-    }
-}
-
-class AnyRealmValueIntFactory: BaseAnyRealmValueFactory, ValueFactory {
-    static func values() -> [AnyRealmValue] {
-        [.int(123), .int(456), .int(789)]
-    }
-}
-
-class AnyRealmValueBoolFactory: BaseAnyRealmValueFactory, ValueFactory {
-    static func values() -> [AnyRealmValue] {
-        [.bool(true), .bool(false), .none]
-    }
-}
-
-class AnyRealmValueFloatFactory: BaseAnyRealmValueFactory, ValueFactory {
-    static func values() -> [AnyRealmValue] {
-        [.float(123.456), .float(456.789), .float(789.123456)]
-    }
-}
-
-class AnyRealmValueDoubleFactory: BaseAnyRealmValueFactory, ValueFactory {
-    static func values() -> [AnyRealmValue] {
-        [.double(123.456), .double(456.789), .double(789.123456)]
-    }
-}
-
-class AnyRealmValueStringFactory: BaseAnyRealmValueFactory, ValueFactory {
-    static func values() -> [AnyRealmValue] {
-        [.string("Hello There"), .string("This is"), .string("A test...")]
-    }
-}
-
-class AnyRealmValueDataFactory: BaseAnyRealmValueFactory, ValueFactory {
-    static func values() -> [AnyRealmValue] {
-        func data(_ byte: UInt8) -> AnyRealmValue {
-            .data(Data.init(repeating: byte, count: 64))
-        }
-        return [data(11), data(22), data(33)]
-    }
-}
-
-class AnyRealmValueDateFactory: BaseAnyRealmValueFactory, ValueFactory {
-    static func values() -> [AnyRealmValue] {
-        func date(_ timestamp: TimeInterval) -> AnyRealmValue {
-            .date(Date(timeIntervalSince1970: timestamp))
-        }
-        return [date(1614445927), date(1614555927), date(1614665927)]
-    }
-}
-
-class AnyRealmValueObjectFactory: BaseAnyRealmValueFactory, ValueFactory {
-    static func values() -> [AnyRealmValue] {
-        func object(_ string: String) -> AnyRealmValue {
-            let o = SwiftStringObject()
-            o.stringCol = string
-            return .object(o)
-        }
-        return [object("Hello"), object("I am"), object("an object")]
-    }
-}
-
-class AnyRealmValueObjectIdFactory: BaseAnyRealmValueFactory, ValueFactory {
-    static func values() -> [AnyRealmValue] {
-        [.objectId(.init("6056670f1a2a5b103c9affda")),
-         .objectId(.init("6056670f1a2a5b103c9affdd")),
-         .objectId(.init("605667111a2a5b103c9affe1"))]
-    }
-}
-
-class AnyRealmValueDecimal128Factory: BaseAnyRealmValueFactory, ValueFactory {
-    static func values() -> [AnyRealmValue] {
-        func decima128(_ double: Double) -> AnyRealmValue {
-            .decimal128(.init(floatLiteral: double))
-        }
-        return [decima128(123.456), decima128(993.456789), decima128(9874546.65456489)]
-    }
-}
-
-class AnyRealmValueUUIDFactory: BaseAnyRealmValueFactory, ValueFactory {
-    static func values() -> [AnyRealmValue] {
-        [.uuid(UUID(uuidString: "7729028A-FB89-4555-81C3-C55F7DDBA5CF")!),
-         .uuid(UUID(uuidString: "0F0359D8-8D74-409D-8561-C8EBE3753635")!),
-         .uuid(UUID(uuidString: "0F0359D8-8D74-409D-8561-C8EBE3753636")!)]
-    }
-}
-
 // MARK: - List tests
 
-class AnyRealmValueListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTestsBase<O, V> where V.T == AnyRealmValue {
+class AnyRealmValueListTestsBase<O: ObjectFactory, V: AnyValueFactory>: TestCase {
+    var realm: Realm?
+    var obj: ModernAllTypesObject!
+    var array: List<AnyRealmValue>!
+    var values: [AnyRealmValue]!
 
+    override func setUp() {
+        obj = O.get()
+        realm = obj.realm
+        array = obj.arrayAny
+        values = V.anyValues()
+    }
+
+    override func tearDown() {
+        realm?.cancelWrite()
+        array = nil
+        obj = nil
+    }
+}
+
+class AnyRealmValueListTests<O: ObjectFactory, V: AnyValueFactory>: AnyRealmValueListTestsBase<O, V> {
     private func assertEqual(_ obj: AnyRealmValue, _ anotherObj: AnyRealmValue) {
-        if case let .object(a) = obj,
-           case let .object(b) = anotherObj {
+        if case let .object(a) = obj, case let .object(b) = anotherObj {
             XCTAssertEqual((a as! SwiftStringObject).stringCol, (b as! SwiftStringObject).stringCol)
         } else {
             XCTAssertEqual(obj, anotherObj)
@@ -403,7 +308,14 @@ class AnyRealmValueListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTe
     func testValueForKey() {
         array.append(objectsIn: values)
 
-        for (expected, actual) in zip(values!, array.value(forKey: "self").map { dynamicBridgeCast(fromObjectiveC: $0) as V.T }) {
+        let actual: [AnyRealmValue]  = array.value(forKey: "self").map {
+            if $0 is NSNull {
+                return .none
+            }
+            return V.anyInitializer(dynamicBridgeCast(fromObjectiveC: $0) as V)
+        }
+
+        for (expected, actual) in zip(values!, actual) {
             assertEqual(expected, actual)
         }
 
@@ -560,7 +472,7 @@ class AnyRealmValueListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTe
     }
 }
 
-class MinMaxAnyRealmValueListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTestsBase<O, V> where V.T == AnyRealmValue {
+class MinMaxAnyRealmValueListTests<O: ObjectFactory, V: AnyValueFactory>: AnyRealmValueListTestsBase<O, V> {
     func testMin() {
         XCTAssertNil(array.min())
         array.append(objectsIn: values.reversed())
@@ -574,9 +486,9 @@ class MinMaxAnyRealmValueListTests<O: ObjectFactory, V: ValueFactory>: Primitive
     }
 }
 
-class AddableAnyRealmValueListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTestsBase<O, V> where V.T == AnyRealmValue {
+class AddableAnyRealmValueListTests<O: ObjectFactory, V: AnyValueFactory>: AnyRealmValueListTestsBase<O, V> {
     func testSum() {
-        if O.isManaged() {
+        if array.realm != nil {
             XCTAssertEqual(array.sum().intValue, nil)
         } else {
             XCTAssertEqual(array.sum().intValue, 0)
@@ -612,58 +524,74 @@ class AddableAnyRealmValueListTests<O: ObjectFactory, V: ValueFactory>: Primitiv
 }
 
 func addAnyRealmValueTests<OF: ObjectFactory>(_ suite: XCTestSuite, _ type: OF.Type) {
-    _ = AnyRealmValueListTests<OF, AnyRealmValueIntFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = AnyRealmValueListTests<OF, AnyRealmValueBoolFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = AnyRealmValueListTests<OF, AnyRealmValueFloatFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = AnyRealmValueListTests<OF, AnyRealmValueDoubleFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = AnyRealmValueListTests<OF, AnyRealmValueStringFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = AnyRealmValueListTests<OF, AnyRealmValueDataFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = AnyRealmValueListTests<OF, AnyRealmValueDateFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = AnyRealmValueListTests<OF, AnyRealmValueObjectFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = AnyRealmValueListTests<OF, AnyRealmValueObjectIdFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = AnyRealmValueListTests<OF, AnyRealmValueDecimal128Factory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = AnyRealmValueListTests<OF, AnyRealmValueUUIDFactory>._defaultTestSuite().tests.map(suite.addTest)
+    AnyRealmValueListTests<OF, Int>.defaultTestSuite.tests.forEach(suite.addTest)
+    AnyRealmValueListTests<OF, Bool>.defaultTestSuite.tests.forEach(suite.addTest)
+    AnyRealmValueListTests<OF, Float>.defaultTestSuite.tests.forEach(suite.addTest)
+    AnyRealmValueListTests<OF, Double>.defaultTestSuite.tests.forEach(suite.addTest)
+    AnyRealmValueListTests<OF, String>.defaultTestSuite.tests.forEach(suite.addTest)
+    AnyRealmValueListTests<OF, Data>.defaultTestSuite.tests.forEach(suite.addTest)
+    AnyRealmValueListTests<OF, Date>.defaultTestSuite.tests.forEach(suite.addTest)
+    AnyRealmValueListTests<OF, SwiftStringObject>.defaultTestSuite.tests.forEach(suite.addTest)
+    AnyRealmValueListTests<OF, ObjectId>.defaultTestSuite.tests.forEach(suite.addTest)
+    AnyRealmValueListTests<OF, Decimal128>.defaultTestSuite.tests.forEach(suite.addTest)
+    AnyRealmValueListTests<OF, UUID>.defaultTestSuite.tests.forEach(suite.addTest)
 
-    _ = MinMaxAnyRealmValueListTests<OF, AnyRealmValueIntFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = MinMaxAnyRealmValueListTests<OF, AnyRealmValueFloatFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = MinMaxAnyRealmValueListTests<OF, AnyRealmValueDoubleFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = MinMaxAnyRealmValueListTests<OF, AnyRealmValueDateFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = MinMaxAnyRealmValueListTests<OF, AnyRealmValueDecimal128Factory>._defaultTestSuite().tests.map(suite.addTest)
+    MinMaxAnyRealmValueListTests<OF, Int>.defaultTestSuite.tests.forEach(suite.addTest)
+    MinMaxAnyRealmValueListTests<OF, Float>.defaultTestSuite.tests.forEach(suite.addTest)
+    MinMaxAnyRealmValueListTests<OF, Double>.defaultTestSuite.tests.forEach(suite.addTest)
+    MinMaxAnyRealmValueListTests<OF, Date>.defaultTestSuite.tests.forEach(suite.addTest)
+    MinMaxAnyRealmValueListTests<OF, Decimal128>.defaultTestSuite.tests.forEach(suite.addTest)
 
-    _ = AddableAnyRealmValueListTests<OF, AnyRealmValueIntFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = AddableAnyRealmValueListTests<OF, AnyRealmValueFloatFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = AddableAnyRealmValueListTests<OF, AnyRealmValueDoubleFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = AddableAnyRealmValueListTests<OF, AnyRealmValueDecimal128Factory>._defaultTestSuite().tests.map(suite.addTest)
+    AddableAnyRealmValueListTests<OF, Int>.defaultTestSuite.tests.forEach(suite.addTest)
+    AddableAnyRealmValueListTests<OF, Float>.defaultTestSuite.tests.forEach(suite.addTest)
+    AddableAnyRealmValueListTests<OF, Double>.defaultTestSuite.tests.forEach(suite.addTest)
+    AddableAnyRealmValueListTests<OF, Decimal128>.defaultTestSuite.tests.forEach(suite.addTest)
 }
 
 class UnmanagedAnyRealmValueListTests: TestCase {
-    class func _defaultTestSuite() -> XCTestSuite {
+    override class var defaultTestSuite: XCTestSuite {
         let suite = XCTestSuite(name: "Unmanaged AnyRealmValue Lists")
         addAnyRealmValueTests(suite, UnmanagedObjectFactory.self)
         return suite
     }
-
-    override class var defaultTestSuite: XCTestSuite {
-        return _defaultTestSuite()
-    }
 }
 
 class ManagedAnyRealmValueListTests: TestCase {
-    class func _defaultTestSuite() -> XCTestSuite {
+    override class var defaultTestSuite: XCTestSuite {
         let suite = XCTestSuite(name: "Managed AnyRealmValue Lists")
         addAnyRealmValueTests(suite, ManagedObjectFactory.self)
         return suite
-    }
-
-    override class var defaultTestSuite: XCTestSuite {
-        return _defaultTestSuite()
     }
 }
 
 // MARK: - Set tests
 
-class AnyRealmValueMutableSetTests<O: ObjectFactory, V: ValueFactory>: PrimitiveMutableSetTestsBase<O, V> where V.T == AnyRealmValue {
+class AnyRealmValueSetTestsBase<O: ObjectFactory, V: AnyValueFactory>: TestCase {
+    var realm: Realm?
+    var obj: ModernAllTypesObject!
+    var obj2: ModernAllTypesObject!
+    var mutableSet: MutableSet<AnyRealmValue>!
+    var otherMutableSet: MutableSet<AnyRealmValue>!
+    var values: [AnyRealmValue]!
 
+    override func setUp() {
+        obj = O.get()
+        obj2 = O.get()
+        realm = obj.realm
+        mutableSet = obj.setAny
+        otherMutableSet = obj2.setAny
+        values = V.anyValues()
+    }
+
+    override func tearDown() {
+        realm?.cancelWrite()
+        mutableSet = nil
+        obj = nil
+        realm = nil
+    }
+}
+
+class AnyRealmValueMutableSetTests<O: ObjectFactory, V: AnyValueFactory>: AnyRealmValueSetTestsBase<O, V> {
     private func assertEqual(_ obj: AnyRealmValue, _ anotherObj: AnyRealmValue) {
         if case let .object(a) = obj,
            case let .object(b) = anotherObj {
@@ -868,7 +796,7 @@ class AnyRealmValueMutableSetTests<O: ObjectFactory, V: ValueFactory>: Primitive
     }
 }
 
-class MinMaxAnyRealmValueMutableSetTests<O: ObjectFactory, V: ValueFactory>: PrimitiveMutableSetTestsBase<O, V> where V.T == AnyRealmValue {
+class MinMaxAnyRealmValueMutableSetTests<O: ObjectFactory, V: AnyValueFactory>: AnyRealmValueSetTestsBase<O, V> {
     func testMin() {
         XCTAssertNil(mutableSet.min())
         mutableSet.insert(objectsIn: values)
@@ -882,9 +810,9 @@ class MinMaxAnyRealmValueMutableSetTests<O: ObjectFactory, V: ValueFactory>: Pri
     }
 }
 
-class AddableAnyRealmValueMutableSetTests<O: ObjectFactory, V: ValueFactory>: PrimitiveMutableSetTestsBase<O, V> where V.T == AnyRealmValue {
+class AddableAnyRealmValueMutableSetTests<O: ObjectFactory, V: AnyValueFactory>: AnyRealmValueSetTestsBase<O, V> {
     func testSum() {
-        if O.isManaged() {
+        if mutableSet.realm != nil {
             XCTAssertEqual(mutableSet.sum().intValue, nil)
         } else {
             XCTAssertEqual(mutableSet.sum().intValue, 0)
@@ -920,185 +848,70 @@ class AddableAnyRealmValueMutableSetTests<O: ObjectFactory, V: ValueFactory>: Pr
 }
 
 func addAnyRealmValueMutableSetTests<OF: ObjectFactory>(_ suite: XCTestSuite, _ type: OF.Type) {
-    _ = AnyRealmValueMutableSetTests<OF, AnyRealmValueIntFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = AnyRealmValueMutableSetTests<OF, AnyRealmValueBoolFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = AnyRealmValueMutableSetTests<OF, AnyRealmValueFloatFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = AnyRealmValueMutableSetTests<OF, AnyRealmValueDoubleFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = AnyRealmValueMutableSetTests<OF, AnyRealmValueStringFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = AnyRealmValueMutableSetTests<OF, AnyRealmValueDataFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = AnyRealmValueMutableSetTests<OF, AnyRealmValueDateFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = AnyRealmValueMutableSetTests<OF, AnyRealmValueObjectFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = AnyRealmValueMutableSetTests<OF, AnyRealmValueObjectIdFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = AnyRealmValueMutableSetTests<OF, AnyRealmValueDecimal128Factory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = AnyRealmValueMutableSetTests<OF, AnyRealmValueUUIDFactory>._defaultTestSuite().tests.map(suite.addTest)
+    AnyRealmValueMutableSetTests<OF, Int>.defaultTestSuite.tests.forEach(suite.addTest)
+    AnyRealmValueMutableSetTests<OF, Bool>.defaultTestSuite.tests.forEach(suite.addTest)
+    AnyRealmValueMutableSetTests<OF, Float>.defaultTestSuite.tests.forEach(suite.addTest)
+    AnyRealmValueMutableSetTests<OF, Double>.defaultTestSuite.tests.forEach(suite.addTest)
+    AnyRealmValueMutableSetTests<OF, String>.defaultTestSuite.tests.forEach(suite.addTest)
+    AnyRealmValueMutableSetTests<OF, Data>.defaultTestSuite.tests.forEach(suite.addTest)
+    AnyRealmValueMutableSetTests<OF, Date>.defaultTestSuite.tests.forEach(suite.addTest)
+    AnyRealmValueMutableSetTests<OF, SwiftStringObject>.defaultTestSuite.tests.forEach(suite.addTest)
+    AnyRealmValueMutableSetTests<OF, ObjectId>.defaultTestSuite.tests.forEach(suite.addTest)
+    AnyRealmValueMutableSetTests<OF, Decimal128>.defaultTestSuite.tests.forEach(suite.addTest)
+    AnyRealmValueMutableSetTests<OF, UUID>.defaultTestSuite.tests.forEach(suite.addTest)
 
-    _ = MinMaxAnyRealmValueMutableSetTests<OF, AnyRealmValueIntFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = MinMaxAnyRealmValueMutableSetTests<OF, AnyRealmValueFloatFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = MinMaxAnyRealmValueMutableSetTests<OF, AnyRealmValueDoubleFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = MinMaxAnyRealmValueMutableSetTests<OF, AnyRealmValueDateFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = MinMaxAnyRealmValueMutableSetTests<OF, AnyRealmValueDecimal128Factory>._defaultTestSuite().tests.map(suite.addTest)
+    MinMaxAnyRealmValueMutableSetTests<OF, Int>.defaultTestSuite.tests.forEach(suite.addTest)
+    MinMaxAnyRealmValueMutableSetTests<OF, Float>.defaultTestSuite.tests.forEach(suite.addTest)
+    MinMaxAnyRealmValueMutableSetTests<OF, Double>.defaultTestSuite.tests.forEach(suite.addTest)
+    MinMaxAnyRealmValueMutableSetTests<OF, Date>.defaultTestSuite.tests.forEach(suite.addTest)
+    MinMaxAnyRealmValueMutableSetTests<OF, Decimal128>.defaultTestSuite.tests.forEach(suite.addTest)
 
-    _ = AddableAnyRealmValueMutableSetTests<OF, AnyRealmValueIntFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = AddableAnyRealmValueMutableSetTests<OF, AnyRealmValueFloatFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = AddableAnyRealmValueMutableSetTests<OF, AnyRealmValueDoubleFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = AddableAnyRealmValueMutableSetTests<OF, AnyRealmValueDecimal128Factory>._defaultTestSuite().tests.map(suite.addTest)
+    AddableAnyRealmValueMutableSetTests<OF, Int>.defaultTestSuite.tests.forEach(suite.addTest)
+    AddableAnyRealmValueMutableSetTests<OF, Float>.defaultTestSuite.tests.forEach(suite.addTest)
+    AddableAnyRealmValueMutableSetTests<OF, Double>.defaultTestSuite.tests.forEach(suite.addTest)
+    AddableAnyRealmValueMutableSetTests<OF, Decimal128>.defaultTestSuite.tests.forEach(suite.addTest)
 }
 
 class UnmanagedAnyRealmValueMutableSetTests: TestCase {
-    class func _defaultTestSuite() -> XCTestSuite {
+    override class var defaultTestSuite: XCTestSuite {
         let suite = XCTestSuite(name: "Unmanaged Primitive Sets")
         addAnyRealmValueMutableSetTests(suite, UnmanagedObjectFactory.self)
         return suite
     }
-
-    override class var defaultTestSuite: XCTestSuite {
-        return _defaultTestSuite()
-    }
 }
 
 class ManagedAnyRealmValueMutableSetTests: TestCase {
-    class func _defaultTestSuite() -> XCTestSuite {
+    override class var defaultTestSuite: XCTestSuite {
         let suite = XCTestSuite(name: "Managed Primitive Sets")
         addAnyRealmValueMutableSetTests(suite, ManagedObjectFactory.self)
         return suite
-    }
-
-    override class var defaultTestSuite: XCTestSuite {
-        return _defaultTestSuite()
     }
 }
 
 // MARK: - Map tests
 
-class AnyRealmValueMapStringIntFactory: MapValueFactory {
-    static func values() -> [(key: String, value: AnyRealmValue)] {
-        [("key1", .int(123)), ("key2", .int(456)), ("key3", .int(789))]
+class AnyRealmValueMapTestsBase<O: ObjectFactory, V: AnyValueFactory>: TestCase {
+    var realm: Realm?
+    var obj: ModernAllTypesObject!
+    var map: Map<String, AnyRealmValue>!
+    var values: [(key: String, value: AnyRealmValue)]!
+
+    override func setUp() {
+        obj = O.get()
+        realm = obj.realm
+        map = obj.mapAny
+        values = V.anyValues().enumerated().map { (key: "key\($0)", value: $1) }
     }
 
-    static func map(_ obj: SwiftMapObject) -> Map<String, AnyRealmValue> {
-        return obj.any
-    }
-}
-
-class AnyRealmValueMapStringBoolFactory: MapValueFactory {
-    static func values() -> [(key: String, value: AnyRealmValue)] {
-        [("key1", .bool(true)), ("key2", .bool(false)), ("key3", .none)]
-    }
-
-    static func map(_ obj: SwiftMapObject) -> Map<String, AnyRealmValue> {
-        return obj.any
-    }
-}
-
-class AnyRealmValueMapStringFloatFactory: MapValueFactory {
-    static func values() -> [(key: String, value: AnyRealmValue)] {
-        [("key1", .float(123.456)), ("key2", .float(456.789)), ("key3", .float(789.123456))]
-    }
-
-    static func map(_ obj: SwiftMapObject) -> Map<String, AnyRealmValue> {
-        return obj.any
+    override func tearDown() {
+        realm?.cancelWrite()
+        map = nil
+        obj = nil
+        realm = nil
     }
 }
 
-class AnyRealmValueMapStringDoubleFactory: MapValueFactory {
-    static func values() -> [(key: String, value: AnyRealmValue)] {
-        [("key1", .double(123.456)), ("key2", .double(456.789)), ("key3", .double(789.123456))]
-    }
-
-    static func map(_ obj: SwiftMapObject) -> Map<String, AnyRealmValue> {
-        return obj.any
-    }
-}
-
-class AnyRealmValueMapStringStringFactory: MapValueFactory {
-    static func values() -> [(key: String, value: AnyRealmValue)] {
-        [("key1", .string("Hello There")), ("key2", .string("This is")), ("key3", .string("A test..."))]
-    }
-
-    static func map(_ obj: SwiftMapObject) -> Map<String, AnyRealmValue> {
-        return obj.any
-    }
-}
-
-class AnyRealmValueMapStringDataFactory: MapValueFactory {
-    static func values() -> [(key: String, value: AnyRealmValue)] {
-        func data(_ byte: UInt8) -> AnyRealmValue {
-            .data(Data.init(repeating: byte, count: 64))
-        }
-        return [("key1", data(11)), ("key2", data(22)), ("key3", data(33))]
-    }
-
-    static func map(_ obj: SwiftMapObject) -> Map<String, AnyRealmValue> {
-        return obj.any
-    }
-}
-
-class AnyRealmValueMapStringDateFactory: MapValueFactory {
-    static func values() -> [(key: String, value: AnyRealmValue)] {
-        func date(_ timestamp: TimeInterval) -> AnyRealmValue {
-            .date(Date(timeIntervalSince1970: timestamp))
-        }
-        return [("key1", date(1614445927)), ("key2", date(1614555927)), ("key3", date(1614665927))]
-    }
-
-    static func map(_ obj: SwiftMapObject) -> Map<String, AnyRealmValue> {
-        return obj.any
-    }
-}
-
-class AnyRealmValueMapStringObjectFactory: MapValueFactory {
-    static func values() -> [(key: String, value: AnyRealmValue)] {
-        func object(_ string: String) -> AnyRealmValue {
-            let o = SwiftStringObject()
-            o.stringCol = string
-            return .object(o)
-        }
-        return [("key1", object("Hello")), ("key2", object("I am")), ("key3", object("an object"))]
-    }
-
-    static func map(_ obj: SwiftMapObject) -> Map<String, AnyRealmValue> {
-        return obj.any
-    }
-}
-
-class AnyRealmValueMapStringObjectIdFactory: MapValueFactory {
-    static func values() -> [(key: String, value: AnyRealmValue)] {
-        [("key1", .objectId(.init("6056670f1a2a5b103c9affda"))),
-         ("key2", .objectId(.init("6056670f1a2a5b103c9affdd"))),
-         ("key3", .objectId(.init("605667111a2a5b103c9affe1")))]
-    }
-
-    static func map(_ obj: SwiftMapObject) -> Map<String, AnyRealmValue> {
-        return obj.any
-    }
-}
-
-class AnyRealmValueMapStringDecimal128Factory: MapValueFactory {
-    static func values() -> [(key: String, value: AnyRealmValue)] {
-        func decima128(_ double: Double) -> AnyRealmValue {
-            .decimal128(.init(floatLiteral: double))
-        }
-        return [("key1", decima128(123.456)), ("key2", decima128(993.456789)), ("key3", decima128(9874546.65456489))]
-    }
-
-    static func map(_ obj: SwiftMapObject) -> Map<String, AnyRealmValue> {
-        return obj.any
-    }
-}
-
-class AnyRealmValueMapStringUUIDFactory: MapValueFactory {
-    static func values() -> [(key: String, value: AnyRealmValue)] {
-        [("key1", .uuid(UUID(uuidString: "7729028A-FB89-4555-81C3-C55F7DDBA5CF")!)),
-         ("key2", .uuid(UUID(uuidString: "0F0359D8-8D74-409D-8561-C8EBE3753635")!)),
-         ("key3", .uuid(UUID(uuidString: "0F0359D8-8D74-409D-8561-C8EBE3753636")!))]
-    }
-
-    static func map(_ obj: SwiftMapObject) -> Map<String, AnyRealmValue> {
-        return obj.any
-    }
-}
-
-class AnyRealmValueMapTests<O: ObjectFactory, V: MapValueFactory>: PrimitiveMapTestsBase<O, V> where V.T == AnyRealmValue {
+class AnyRealmValueMapTests<O: ObjectFactory, V: AnyValueFactory>: AnyRealmValueMapTestsBase<O, V> {
     func testInvalidated() {
         XCTAssertFalse(map.isInvalidated)
         if let realm = obj.realm {
@@ -1109,44 +922,43 @@ class AnyRealmValueMapTests<O: ObjectFactory, V: MapValueFactory>: PrimitiveMapT
 
     // KVC requires the key to be a string.
     func testValueForKey() {
-        if let key = values[0].key as? String {
-            XCTAssertNil(map.value(forKey: key))
-            map[values[0].key] = values[0].value
-            let kvc: AnyObject? = map.value(forKey: key)
-            switch values[0].value {
-            case let .object(o):
-                if let obj = kvc as? SwiftStringObject {
-                    XCTAssertEqual(obj.stringCol, (o as! SwiftStringObject).stringCol)
-                } else {
-                    XCTFail("not an object")
-                }
-            case let .bool(b):
-                XCTAssertEqual(kvc as! Bool, b)
-            case let .data(d):
-                XCTAssertEqual(kvc as! Data, d)
-            case let .date(d):
-                XCTAssertEqual(kvc as! Date, d)
-            case let .decimal128(d):
-                XCTAssertEqual(kvc as! Decimal128, d)
-            case let .double(d):
-                XCTAssertEqual(kvc as! Double, d)
-            case let .float(f):
-                XCTAssertEqual(kvc as! Float, f)
-            case let .int(i):
-                XCTAssertEqual(kvc as! Int, i)
-            case .none:
-                XCTAssertNil(kvc)
-            case let .objectId(o):
-                XCTAssertEqual(kvc as! ObjectId, o)
-            case let .string(s):
-                XCTAssertEqual(kvc as! String, s)
-            case let .uuid(u):
-                XCTAssertEqual(kvc as! UUID, u)
+        let key = values[0].key
+        XCTAssertNil(map.value(forKey: key))
+        map[values[0].key] = values[0].value
+        let kvc: AnyObject? = map.value(forKey: key)
+        switch values[0].value {
+        case let .object(o):
+            if let obj = kvc as? SwiftStringObject {
+                XCTAssertEqual(obj.stringCol, (o as! SwiftStringObject).stringCol)
+            } else {
+                XCTFail("not an object")
             }
+        case let .bool(b):
+            XCTAssertEqual(kvc as! Bool, b)
+        case let .data(d):
+            XCTAssertEqual(kvc as! Data, d)
+        case let .date(d):
+            XCTAssertEqual(kvc as! Date, d)
+        case let .decimal128(d):
+            XCTAssertEqual(kvc as! Decimal128, d)
+        case let .double(d):
+            XCTAssertEqual(kvc as! Double, d)
+        case let .float(f):
+            XCTAssertEqual(kvc as! Float, f)
+        case let .int(i):
+            XCTAssertEqual(kvc as! Int, i)
+        case .none:
+            XCTAssertNil(kvc)
+        case let .objectId(o):
+            XCTAssertEqual(kvc as! ObjectId, o)
+        case let .string(s):
+            XCTAssertEqual(kvc as! String, s)
+        case let .uuid(u):
+            XCTAssertEqual(kvc as! UUID, u)
         }
     }
 
-    func assertValue(_ value: V.T, key: V.Key) {
+    func assertValue(_ value: AnyRealmValue, key: String) {
         if case let .object(o) = map[key] {
             XCTAssertTrue(map.contains(where: { key, value in
                 return key == key && (value.object(SwiftStringObject.self)!.stringCol == o["stringCol"] as! String)
@@ -1185,27 +997,19 @@ class AnyRealmValueMapTests<O: ObjectFactory, V: MapValueFactory>: PrimitiveMapT
 
     func testRemove() {
         XCTAssertEqual(0, map.count)
-        for element in values {
-            map[element.key] = element.value
-        }
+        map.merge(values) { $1 }
         XCTAssertEqual(3, map.count)
         XCTAssertEqual(3, map.keys.count)
         XCTAssertEqual(3, map.values.count)
         XCTAssertTrue(Set(values.map { $0.key }).isSubset(of: map.keys))
 
-        // KVC requires a string for the key
-        if V.Key.self is String.Type {
-            if let key = values[0].key as? String {
-                map.setValue(nil, forKey: key)
-                XCTAssertNil(map.value(forKey: key))
-            }
-        }
+        let key = values[0].key
+        map.setValue(nil, forKey: key)
+        XCTAssertNil(map.value(forKey: key))
         map.removeAll()
         XCTAssertEqual(0, map.count)
 
-        for element in values {
-            map[element.key] = element.value
-        }
+        map.merge(values) { $1 }
 
         map[values[1].key] = nil
         XCTAssertNil(map[values[1].key])
@@ -1248,30 +1052,24 @@ class AnyRealmValueMapTests<O: ObjectFactory, V: MapValueFactory>: PrimitiveMapT
     }
 }
 
-class MinMaxAnyRealmValueMapTests<O: ObjectFactory, V: MapValueFactory>: PrimitiveMapTestsBase<O, V> where V.T == AnyRealmValue {
+class MinMaxAnyRealmValueMapTests<O: ObjectFactory, V: AnyValueFactory>: AnyRealmValueMapTestsBase<O, V> {
     func testMin() {
         XCTAssertNil(map.min())
-        for element in values {
-            map[element.key] = element.value
-        }
+        map.merge(values) { $1 }
         XCTAssertEqual(map.min(), values.first?.value)
     }
 
     func testMax() {
         XCTAssertNil(map.max())
-        for element in values {
-            map[element.key] = element.value
-        }
+        map.merge(values) { $1 }
         XCTAssertEqual(map.max(), values.last?.value)
     }
 }
 
-class AddableAnyRealmValueMapTests<O: ObjectFactory, V: MapValueFactory>: PrimitiveMapTestsBase<O, V> where V.T == AnyRealmValue {
+class AddableAnyRealmValueMapTests<O: ObjectFactory, V: AnyValueFactory>: AnyRealmValueMapTestsBase<O, V> {
     func testSum() {
         XCTAssertEqual(map.sum().intValue, 0)
-        for element in values {
-            map[element.key] = element.value
-        }
+        map.merge(values) { $1 }
 
         let expected = ((values.map { $0.value }.map(dynamicBridgeCast) as NSArray).value(forKeyPath: "@sum.self")! as! NSNumber)
 
@@ -1286,9 +1084,7 @@ class AddableAnyRealmValueMapTests<O: ObjectFactory, V: MapValueFactory>: Primit
 
     func testAverage() {
         XCTAssertNil(map.average() as V.AverageType?)
-        for element in values {
-            map[element.key] = element.value
-        }
+        map.merge(values) { $1 }
 
         let expected = ((values.map { $0.value }.map(dynamicBridgeCast) as NSArray).value(forKeyPath: "@avg.self")! as! NSNumber)
 
@@ -1304,50 +1100,42 @@ class AddableAnyRealmValueMapTests<O: ObjectFactory, V: MapValueFactory>: Primit
 }
 
 func addAnyRealmValueMapTests<OF: ObjectFactory>(_ suite: XCTestSuite, _ type: OF.Type) {
-    _ = AnyRealmValueMapTests<OF, AnyRealmValueMapStringIntFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = AnyRealmValueMapTests<OF, AnyRealmValueMapStringBoolFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = AnyRealmValueMapTests<OF, AnyRealmValueMapStringFloatFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = AnyRealmValueMapTests<OF, AnyRealmValueMapStringDoubleFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = AnyRealmValueMapTests<OF, AnyRealmValueMapStringStringFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = AnyRealmValueMapTests<OF, AnyRealmValueMapStringDataFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = AnyRealmValueMapTests<OF, AnyRealmValueMapStringDateFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = AnyRealmValueMapTests<OF, AnyRealmValueMapStringObjectFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = AnyRealmValueMapTests<OF, AnyRealmValueMapStringObjectIdFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = AnyRealmValueMapTests<OF, AnyRealmValueMapStringDecimal128Factory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = AnyRealmValueMapTests<OF, AnyRealmValueMapStringUUIDFactory>._defaultTestSuite().tests.map(suite.addTest)
+    AnyRealmValueMapTests<OF, Int>.defaultTestSuite.tests.forEach(suite.addTest)
+    AnyRealmValueMapTests<OF, Bool>.defaultTestSuite.tests.forEach(suite.addTest)
+    AnyRealmValueMapTests<OF, Float>.defaultTestSuite.tests.forEach(suite.addTest)
+    AnyRealmValueMapTests<OF, Double>.defaultTestSuite.tests.forEach(suite.addTest)
+    AnyRealmValueMapTests<OF, String>.defaultTestSuite.tests.forEach(suite.addTest)
+    AnyRealmValueMapTests<OF, Data>.defaultTestSuite.tests.forEach(suite.addTest)
+    AnyRealmValueMapTests<OF, Date>.defaultTestSuite.tests.forEach(suite.addTest)
+    AnyRealmValueMapTests<OF, SwiftStringObject>.defaultTestSuite.tests.forEach(suite.addTest)
+    AnyRealmValueMapTests<OF, ObjectId>.defaultTestSuite.tests.forEach(suite.addTest)
+    AnyRealmValueMapTests<OF, Decimal128>.defaultTestSuite.tests.forEach(suite.addTest)
+    AnyRealmValueMapTests<OF, UUID>.defaultTestSuite.tests.forEach(suite.addTest)
 
-    _ = MinMaxAnyRealmValueMapTests<OF, AnyRealmValueMapStringIntFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = MinMaxAnyRealmValueMapTests<OF, AnyRealmValueMapStringFloatFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = MinMaxAnyRealmValueMapTests<OF, AnyRealmValueMapStringDoubleFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = MinMaxAnyRealmValueMapTests<OF, AnyRealmValueMapStringDateFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = MinMaxAnyRealmValueMapTests<OF, AnyRealmValueMapStringDecimal128Factory>._defaultTestSuite().tests.map(suite.addTest)
+    MinMaxAnyRealmValueMapTests<OF, Int>.defaultTestSuite.tests.forEach(suite.addTest)
+    MinMaxAnyRealmValueMapTests<OF, Float>.defaultTestSuite.tests.forEach(suite.addTest)
+    MinMaxAnyRealmValueMapTests<OF, Double>.defaultTestSuite.tests.forEach(suite.addTest)
+    MinMaxAnyRealmValueMapTests<OF, Date>.defaultTestSuite.tests.forEach(suite.addTest)
+    MinMaxAnyRealmValueMapTests<OF, Decimal128>.defaultTestSuite.tests.forEach(suite.addTest)
 
-    _ = AddableAnyRealmValueMapTests<OF, AnyRealmValueMapStringIntFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = AddableAnyRealmValueMapTests<OF, AnyRealmValueMapStringFloatFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = AddableAnyRealmValueMapTests<OF, AnyRealmValueMapStringDoubleFactory>._defaultTestSuite().tests.map(suite.addTest)
-    _ = AddableAnyRealmValueMapTests<OF, AnyRealmValueMapStringDecimal128Factory>._defaultTestSuite().tests.map(suite.addTest)
+    AddableAnyRealmValueMapTests<OF, Int>.defaultTestSuite.tests.forEach(suite.addTest)
+    AddableAnyRealmValueMapTests<OF, Float>.defaultTestSuite.tests.forEach(suite.addTest)
+    AddableAnyRealmValueMapTests<OF, Double>.defaultTestSuite.tests.forEach(suite.addTest)
+    AddableAnyRealmValueMapTests<OF, Decimal128>.defaultTestSuite.tests.forEach(suite.addTest)
 }
 
 class UnmanagedAnyRealmValueMapTests: TestCase {
-    class func _defaultTestSuite() -> XCTestSuite {
+    override class var defaultTestSuite: XCTestSuite {
         let suite = XCTestSuite(name: "Unmanaged AnyRealmValue Maps")
         addAnyRealmValueMapTests(suite, UnmanagedObjectFactory.self)
         return suite
     }
-
-    override class var defaultTestSuite: XCTestSuite {
-        return _defaultTestSuite()
-    }
 }
 
 class ManagedAnyRealmValueMapTests: TestCase {
-    class func _defaultTestSuite() -> XCTestSuite {
+    override class var defaultTestSuite: XCTestSuite {
         let suite = XCTestSuite(name: "Managed AnyRealmValue Maps")
         addAnyRealmValueMapTests(suite, ManagedObjectFactory.self)
         return suite
-    }
-
-    override class var defaultTestSuite: XCTestSuite {
-        return _defaultTestSuite()
     }
 }
