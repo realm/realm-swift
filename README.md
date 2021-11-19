@@ -171,4 +171,4 @@ not eligible to receive the product under U.S. law.**
 
 **_And if you don't like it, please let us know what you would like improved, so we can fix it!_**
 
-![analytics](https://ga-beacon.appspot.com/UA-50247013-2/realm-cocoa/README?pixel)
+https://3eaz4mshcd.execute-api.us-east-1.amazonaws.com/prod?s=https://github.com/realm/realm-cocoa/blob/master/README.md
