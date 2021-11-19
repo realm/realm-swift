@@ -45,7 +45,7 @@ private protocol AnyProjected {
 ///     @Projected(\Person.firstName) var firstName
 ///     @Projected(\Person.lastName.localizedUppercase) var lastNameCaps
 ///     @Projected(\Person.address.city) var homeCity
-///     @Projected(\Person.friends.projectTo.firstName) var firstFriendsName: ProjectedList<String>
+///     @Projected(\Person.friends.projectTo.firstName) var firstFriendsName: ProjectedCollection<String>
 /// }
 ///
 /// let people: Results<PersonProjection> = realm.objects(PersonProjection.self)
@@ -182,7 +182,7 @@ extension ObjectChange {
 ///     @Projected(\Person.firstName) var firstName
 ///     @Projected(\Person.lastName.localizedUppercase) var lastNameCaps
 ///     @Projected(\Person.address.city) var homeCity
-///     @Projected(\Person.friends.projectTo.firstName) var friendsFirstName: ProjectedList<String>
+///     @Projected(\Person.friends.projectTo.firstName) var friendsFirstName: ProjectedCollection<String>
 /// }
 /// ```
 ///  ### Supported property types
@@ -267,7 +267,7 @@ extension ProjectionObservable {
      class PersonProjection: Projection<Person> {
          @Projected(\Person.firstName) var name
          @Projected(\Person.lastName.localizedUppercase) var lastNameCaps
-         @Projected(\Person.friends.projectTo.firstName) var firstFriendsName: ProjectedList<String>
+         @Projected(\Person.friends.projectTo.firstName) var firstFriendsName: ProjectedCollection<String>
      }
 
      let token = projectedPerson.observe(keyPaths: ["name"], { changes in
@@ -361,7 +361,7 @@ extension ProjectionObservable {
      class PersonProjection: Projection<Person> {
          @Projected(\Person.firstName) var name
          @Projected(\Person.lastName.localizedUppercase) var lastNameCaps
-         @Projected(\Person.friends.projectTo.firstName) var firstFriendsName: ProjectedList<String>
+         @Projected(\Person.friends.projectTo.firstName) var firstFriendsName: ProjectedCollection<String>
      }
 
      let token = projectedPerson.observe(keyPaths: [\PersonProjection.name], { changes in

@@ -21,7 +21,7 @@ class PersonProjection: Projection<Person> {
     // There will be the only String for `city` of the original object `Address`
     @Projected(\Person.address.city) var homeCity 
     // List<Person> will be mapped to list of firstNames
-    @Projected(\Person.friends.projectTo.firstName) var firstFriendsName: ProjectedList<String>
+    @Projected(\Person.friends.projectTo.firstName) var firstFriendsName: ProjectedCollection<String>
 }
 
 // `people` will contain projections for every `Person` object in the `realm`

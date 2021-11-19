@@ -2335,7 +2335,7 @@ extension List where Element: ObjectBase, Element: RealmCollectionValue {
      @Persisted var dogs: MutableSet<Dog>
  }
  class PersonProjection: Projection<Person> {
-     @Projected(\Person.dogs.projectTo.name) var dogNames: ProjectedMutableSet<String>
+     @Projected(\Person.dogs.projectTo.name) var dogNames: ProjectedCollection<String>
  }
 ```
  In this code the `Person`'s dogs set will be prijected to the projected set of dogs names via `projectTo`
@@ -2361,7 +2361,7 @@ extension MutableSet where Element: ObjectBase, Element: RealmCollectionValue {
          @Persisted var dogs: MutableSet<Dog>
      }
      class PersonProjection: Projection<Person> {
-         @Projected(\Person.dogs.projectTo.name) var dogNames: ProjectedMutableSet<String>
+         @Projected(\Person.dogs.projectTo.name) var dogNames: ProjectedCollection<String>
      }
     ```
      In this code the `Person`'s dogs set will be prijected to the projected set of dogs names via `projectTo`
