@@ -118,12 +118,12 @@ internal struct AnySyncSubscription: _SyncSubscription {
     }
 
     /// When the subscription was last updated. Recorded automatically.
-    internal var updatedAt: Date  {
+    internal var updatedAt: Date {
         _box.updatedAt
     }
 
     /// Name of the subscription, if not specified it will return the value in Query as a String.
-    internal var name: String  {
+    internal var name: String {
         _box.name
     }
 

@@ -47,6 +47,8 @@ identifier_name:
 type_name:
   excluded:
     - _RealmValue
+    - _AnySyncSubscriptionBox
+    - _SyncSubscriptionBox
 disabled_rules:
   - block_based_kvo
   # SwiftLint expects a space following a double slash comment: "//".
