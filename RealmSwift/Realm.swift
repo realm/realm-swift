@@ -963,7 +963,13 @@ import Realm.Private
 // MARK: Sync Subscriptions
 
 extension Realm {
-    /// Get all subscriptions for this Realm. 
+    // TODO: Change to public
+    /**
+     Get the latest subscription set for this realm. This will return a mutable collection of subscriptions,
+     which can used to perform transactions with the subscription set.
+
+     Add/Remove/Update a subscription can only happen within a write subscription block.
+     */
     internal var subscriptions: [AnySyncSubscription] {
         fatalError()
     }
