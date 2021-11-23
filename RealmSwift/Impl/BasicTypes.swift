@@ -282,7 +282,7 @@ extension Date: _OptionalPersistable, _BuiltInPersistable, _DefaultConstructible
     }
 }
 
-extension UUID: _OptionalPersistable, _BuiltInPersistable, _DefaultConstructible, _PrimaryKey {
+extension UUID: _OptionalPersistable, _BuiltInPersistable, _DefaultConstructible, _PrimaryKey, _Indexable {
     @inlinable
     public static func _rlmGetProperty(_ obj: ObjectBase, _ key: PropertyKey) -> UUID {
         return RLMGetSwiftPropertyUUID(obj, key)!
