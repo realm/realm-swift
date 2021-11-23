@@ -412,6 +412,7 @@ class ModernAllIndexableTypesObject: Object {
     @Persisted(indexed: true) var int64Col: Int64 = 4
     @Persisted(indexed: true) var stringCol: String
     @Persisted(indexed: true) var dateCol: Date
+    @Persisted(indexed: true) var uuidCol: UUID
     @Persisted(indexed: true) var objectIdCol: ObjectId
     @Persisted(indexed: true) var intEnumCol: ModernIntEnum
     @Persisted(indexed: true) var stringEnumCol: ModernStringEnum
@@ -424,6 +425,7 @@ class ModernAllIndexableTypesObject: Object {
     @Persisted(indexed: true) var optBoolCol: Bool?
     @Persisted(indexed: true) var optStringCol: String?
     @Persisted(indexed: true) var optDateCol: Date?
+    @Persisted(indexed: true) var optUuidCol: UUID?
     @Persisted(indexed: true) var optObjectIdCol: ObjectId?
     @Persisted(indexed: true) var optIntEnumCol: ModernIntEnum?
     @Persisted(indexed: true) var optStringEnumCol: ModernStringEnum?
@@ -438,6 +440,7 @@ class ModernAllIndexableButNotIndexedObject: Object {
     @Persisted(indexed: false) var int64Col: Int64 = 4
     @Persisted(indexed: false) var stringCol: String
     @Persisted(indexed: false) var dateCol: Date
+    @Persisted(indexed: false) var uuidCol: UUID
     @Persisted(indexed: false) var objectIdCol: ObjectId
     @Persisted(indexed: false) var intEnumCol: ModernIntEnum
     @Persisted(indexed: false) var stringEnumCol: ModernStringEnum
@@ -450,6 +453,7 @@ class ModernAllIndexableButNotIndexedObject: Object {
     @Persisted(indexed: false) var optBoolCol: Bool?
     @Persisted(indexed: false) var optStringCol: String?
     @Persisted(indexed: false) var optDateCol: Date?
+    @Persisted(indexed: false) var optUuidCol: UUID?
     @Persisted(indexed: false) var optObjectIdCol: ObjectId?
     @Persisted(indexed: false) var optIntEnumCol: ModernIntEnum?
     @Persisted(indexed: false) var optStringEnumCol: ModernStringEnum?
