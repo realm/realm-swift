@@ -725,10 +725,12 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
 }
 
 - (void)asyncTransactionWithBlock:(void(^)())block onComplete:(nullable void (^)())completeBlock {
-//    [self beginAsyncWriteTransaction:block];
-//    if (_realm->is_in_async_transaction()) {
-//        [self commitAsyncWriteTransaction:completeBlock];
-//    }
+    AsyncHandle transaction = [self beginAsyncWriteTransaction: ^{
+        block();
+        if (_realm->is_in_async_transaction()) {
+            [self commitAsyncWriteTransaction:completeBlock];
+        }
+    }];
 }
 
 #endif // REALM_ASYNC_WRITES
