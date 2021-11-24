@@ -706,6 +706,33 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     }
 }
 
+#ifdef REALM_ASYNC_WRITES
+
+- (BOOL)inAsyncWriteTransaction {
+    return _realm->is_in_async_transaction();
+}
+
+- (AsyncHandle)beginAsyncWriteTransaction:(void(^)())block {
+    return _realm->async_begin_transaction(block);
+}
+
+- (AsyncHandle)commitAsyncWriteTransaction:(void(^)())block {
+    return _realm->async_commit_transaction(block);
+}
+
+- (void)cancelAsyncTransaction:(AsyncHandle)handle {
+    _realm->async_cancel_transaction(handle);
+}
+
+- (void)asyncTransactionWithBlock:(void(^)())block onComplete:(nullable void (^)())completeBlock {
+//    [self beginAsyncWriteTransaction:block];
+//    if (_realm->is_in_async_transaction()) {
+//        [self commitAsyncWriteTransaction:completeBlock];
+//    }
+}
+
+#endif // REALM_ASYNC_WRITES
+
 - (void)invalidate {
     if (_realm->is_in_transaction()) {
         NSLog(@"WARNING: An RLMRealm instance was invalidated during a write "

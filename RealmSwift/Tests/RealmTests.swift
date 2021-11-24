@@ -979,4 +979,12 @@ class RealmTests: TestCase {
         realm.refresh()
         XCTAssertEqual(try! Realm().objects(SwiftBoolObject.self).count, 1)
     }
+    
+    // MARK: - Async Transactions
+#if REALM_ASYNC_WRITES
+
+    func testAsyncTransactionShouldWrite() {
+    }
+#endif // REALM_ASYNC_WRITES
+
 }

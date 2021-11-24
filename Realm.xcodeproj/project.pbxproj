@@ -3429,6 +3429,11 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5D659E6E1BE0398E006515A0 /* Debug.xcconfig */;
 			buildSettings = {
+				OTHER_LDFLAGS = (
+					"-D",
+					REALM_ASYNC_WRITES,
+				);
+				OTHER_SWIFT_FLAGS = "-D REALM_ASYNC_WRITES";
 			};
 			name = Debug;
 		};
@@ -3436,6 +3441,11 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5D659E6F1BE0398E006515A0 /* Release.xcconfig */;
 			buildSettings = {
+				OTHER_LDFLAGS = (
+					"-D",
+					REALM_ASYNC_WRITES,
+				);
+				OTHER_SWIFT_FLAGS = "-D REALM_ASYNC_WRITES";
 			};
 			name = Release;
 		};

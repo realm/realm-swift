@@ -366,6 +366,11 @@ import Realm.Private
         return rlmRealm.inWriteTransaction
     }
 
+#if REALM_ASYNC_WRITES
+// MARK: Asynchronous Transactions
+
+    #endif // REALM_ASYNC_WRITES
+    
     // MARK: Adding and Creating objects
 
     /**

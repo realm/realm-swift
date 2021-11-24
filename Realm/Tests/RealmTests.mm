@@ -1455,6 +1455,64 @@
     XCTAssertNotNil(error);
 }
 
+#pragma mark - Async Transactions
+#ifdef REALM_ASYNC_WRITES
+
+
+- (void)testAsyncTransactionShouldWrite {
+    RLMRealm *realm = RLMRealm.defaultRealm;
+    XCTestExpectation *asyncComplete = [self expectationWithDescription:@"async transaction complete"];
+    
+    [realm asyncTransactionWithBlock:^{
+        [realm createObject:StringObject.className withValue:@[@"string"]];
+    }
+                          onComplete:^{
+        StringObject *stringObject = [StringObject allObjectsInRealm:realm].firstObject;
+        XCTAssertEqual(stringObject.stringCol, @"string");
+        [asyncComplete fulfill];
+    }];
+    
+    [self waitForExpectationsWithTimeout:1.0 handler:nil];
+}
+
+- (void)testAsyncTransactionShouldWriteOnCommit {
+    RLMRealm *realm = RLMRealm.defaultRealm;
+    XCTestExpectation *asyncComplete = [self expectationWithDescription:@"async transaction complete"];
+    
+    [realm beginAsyncWriteTransaction:^{
+        [realm createObject:StringObject.className withValue:@[@"string"]];
+        [realm commitAsyncWriteTransaction:^{
+            StringObject *stringObject = [StringObject allObjectsInRealm:realm].firstObject;
+            XCTAssertEqual(stringObject.stringCol, @"string");
+            [asyncComplete fulfill];
+        }];
+    }];
+    
+    [self waitForExpectationsWithTimeout:1.0 handler:nil];
+}
+
+- (void)testAsyncTransactionShouldCancel {
+    RLMRealm *realm = RLMRealm.defaultRealm;
+    XCTestExpectation *asyncComplete = [self expectationWithDescription:@"async transaction complete"];
+    asyncComplete.inverted = YES;
+    
+    [realm asyncTransactionWithBlock:^{
+        [realm createObject:StringObject.className withValue:@[@"string"]];
+//        [realm cancelAsyncTransaction:transaction];
+    }
+                          onComplete:^{
+        // Not called
+        [asyncComplete fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:1.0 handler:nil];
+    
+    StringObject *stringObject = [StringObject allObjectsInRealm:realm].firstObject;
+    XCTAssertNil(stringObject);
+}
+
+#endif // REALM_ASYNC_WRITES
+
 #pragma mark - Threads
 
 - (void)testCrossThreadAccess

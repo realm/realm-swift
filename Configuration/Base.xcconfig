@@ -48,7 +48,7 @@ GCC_WARN_UNUSED_VARIABLE = YES;
 SWIFT_COMPILATION_MODE = wholemodule;
 SWIFT_OPTIMIZATION_LEVEL = -Owholemodule;
 WARNING_CFLAGS = -Wmismatched-tags -Wunused-private-field -Wpartial-availability;
-OTHER_CFLAGS = -fvisibility-inlines-hidden;
+OTHER_CFLAGS = -fvisibility-inlines-hidden -DREALM_ASYNC_WRITES;
 OTHER_CFLAGS[arch=armv7] = -fvisibility-inlines-hidden -fno-aligned-new;
 
 HEADER_SEARCH_PATHS = $(inherited) core/include;
