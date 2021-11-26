@@ -531,6 +531,7 @@ typedef unsigned AsyncHandle;
  */
 - (AsyncHandle)beginAsyncWriteTransaction:(void(^)())block notifyOnly:(bool)notifyOnly;
 - (AsyncHandle)beginAsyncWriteTransaction:(void(^)())block;
+- (AsyncHandle)commitAsyncWriteTransaction;
 - (AsyncHandle)commitAsyncWriteTransaction:(nullable void(^)())block;
 - (AsyncHandle)commitAsyncWriteTransaction:(nullable void(^)())block isGroupingAllowed:(BOOL)isGroupingAllowed;
 //- (void)commitAsyncWriteTransactionWithoutNotifying:error:;

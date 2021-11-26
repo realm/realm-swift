@@ -716,6 +716,10 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     return _realm->async_begin_transaction(block);
 }
 
+- (AsyncHandle)commitAsyncWriteTransaction {
+    return _realm->async_commit_transaction();
+}
+
 - (AsyncHandle)commitAsyncWriteTransaction:(nullable void(^)())block {
     if (block) {
         std::function<void()> f_name = [block]() { block(); };
