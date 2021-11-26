@@ -716,8 +716,20 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     return _realm->async_begin_transaction(block);
 }
 
-- (AsyncHandle)commitAsyncWriteTransaction:(void(^)())block {
-    return _realm->async_commit_transaction(block);
+- (AsyncHandle)commitAsyncWriteTransaction:(nullable void(^)())block {
+    if (block) {
+        std::function<void()> f_name = [block]() { block(); };
+        return _realm->async_commit_transaction(f_name);
+    }
+    return _realm->async_commit_transaction();
+}
+
+- (AsyncHandle)commitAsyncWriteTransaction:(nullable void(^)())block isGroupingAllowed:(BOOL)isGroupingAllowed {
+    if (block) {
+        std::function<void()> f_name = [block]() { block(); };
+        return _realm->async_commit_transaction(f_name, isGroupingAllowed);
+    }
+    return _realm->async_commit_transaction(nil, isGroupingAllowed);
 }
 
 - (void)cancelAsyncTransaction:(AsyncHandle)handle {
