@@ -396,6 +396,12 @@ class Admin {
     }
 }
 
+// Sync mode 
+@objc public enum SyncMode: Int {
+    case pbs // partition based
+    case flx // flexible sync
+}
+
 // MARK: RealmServer
 
 /**
@@ -413,7 +419,7 @@ public class RealmServer: NSObject {
     @objc public static var shared = RealmServer()
 
     /// Log level for the server and mongo processes.
-    public var logLevel = LogLevel.none
+    public var logLevel = LogLevel.error
 
     /// Process that runs the local mongo server. Should be terminated on exit.
     private let mongoProcess = Process()
@@ -641,7 +647,10 @@ public class RealmServer: NSObject {
     }
 
     /// Create a new server app
-    @objc public func createAppForBSONType(_ bsonType: String) throws -> AppId {
+    /// This will create a App with different configuration depending on the SyncMode (partition based sync or flexible sync), partition type is used only in case
+    /// this is partition based sync, and will crash if one is not provided in that mode
+    // TODO: Remove partition property from schema when on flexible sync
+    public func createAppForSyncMode(_ syncMode: SyncMode, bsonType: String = "string") throws -> AppId {
         guard let session = session else {
             throw URLError(.unknown)
         }
@@ -687,26 +696,42 @@ public class RealmServer: NSObject {
             "value": "mongodb://localhost:26000"
         ])
 
-        let serviceResponse = app.services.post([
-            "name": "mongodb1",
-            "type": "mongodb",
-            "config": [
-                "uri": "mongodb://localhost:26000",
-                "sync": [
-                    "state": "enabled",
-                    "database_name": "test_data",
-                    "partition": [
-                        "key": "realm_id",
-                        "type": "\(bsonType)",
-                        "required": false,
-                        "permissions": [
-                            "read": true,
-                            "write": true
+        let serviceResponse: Result<Any?, Error>
+        switch syncMode {
+        case .pbs:
+            serviceResponse = app.services.post([
+                "name": "mongodb1",
+                "type": "mongodb",
+                "config": [
+                    "uri": "mongodb://localhost:26000",
+                    "sync": [
+                        "state": "enabled",
+                        "database_name": "test_data",
+                        "partition": [
+                            "key": "realm_id",
+                            "type": "\(bsonType)",
+                            "required": false,
+                            "permissions": [
+                                "read": true,
+                                "write": true
+                            ]
                         ]
                     ]
                 ]
-            ]
-        ])
+            ])
+        case .flx:
+            serviceResponse = app.services.post([
+                "name": "mongodb1",
+                "type": "mongodb",
+                "config": [
+                    "uri": "mongodb://localhost:26000",
+                    "sync_query": [
+                        "state": "enabled",
+                        "database_name": "test_data",
+                    ]
+                ]
+            ])
+        }
 
         guard let serviceId = (try serviceResponse.get() as? [String: Any])?["_id"] as? String else {
             throw URLError(.badServerResponse)
@@ -820,8 +845,16 @@ public class RealmServer: NSObject {
         return clientAppId
     }
 
+    @objc public func createAppForFlexibleSync() throws -> AppId {
+        try createAppForSyncMode(.flx)
+    }
+
+    @objc public func createAppForBSONType(_ bsonType: String) throws -> AppId {
+        try createAppForSyncMode(.pbs, bsonType: bsonType)
+    }
+
     @objc public func createApp() throws -> AppId {
-        try createAppForBSONType("string")
+        try createAppForSyncMode(.pbs, bsonType: "string")
     }
 
     // Retrieve MongoDB Realm AppId with ClientAppId using the Admin API
