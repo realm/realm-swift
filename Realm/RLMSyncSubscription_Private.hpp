@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2021 Realm Inc.
+// Copyright 2016 Realm Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,10 +16,25 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Realm/RLMFlexibleSyncConfiguration.h>
+#import "RLMSyncSubscription_Private.h"
 
-@interface RLMFlexibleSyncConfiguration ()
+namespace realm::sync {
+class Subscription;
+class SubscriptionSet;
+}
 
-- (instancetype)initWithUser:(RLMUser *)user;
+NS_ASSUME_NONNULL_BEGIN
+
+@interface RLMSyncSubscription ()
+
+- (instancetype)initWithSubscription:(realm::sync::Subscription)subscription subscriptionSet:(realm::sync::SubscriptionSet)subscriptionSet;
 
 @end
+
+@interface RLMSyncSubscriptionSet ()
+
+- (instancetype)initWithSubscriptionSet:(realm::sync::SubscriptionSet)subscriptionSet realm:(RLMRealm *)realm;
+
+@end
+
+NS_ASSUME_NONNULL_END

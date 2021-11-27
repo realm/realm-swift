@@ -27,10 +27,42 @@ import RealmTestSupport
 import SwiftUI
 #endif
 
-// TODO: Remove if there is no need to create any helper function for flexible sync tests
-class SwiftFlexibleSyncTestCase: SwiftSyncTestCase {}
+class SwiftFlexibleSyncTestCase: SwiftSyncTestCase {
+    func openFlexibleSyncRealm(user: User) throws -> Realm {
+        var config = user.flexibleSyncConfiguration()
+        if config.objectTypes == nil {
+            config.objectTypes = [SwiftPerson.self]
+        }
+        let realm = try Realm(configuration: config)
+        waitForDownloads(for: realm)
+        return realm
+    }
+}
 
-class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
+class SwiftFlexibleSyncServerTests: SwiftFlexibleSyncTestCase {
+    func testCreateFlexibleSyncApp() {
+        do {
+            let appId = try RealmServer.shared.createAppForSyncMode(.flx)
+            let app = app(fromAppId: appId)
+            let user = try logInUser(for: basicCredentials(app: app), app: app)
+            XCTAssertNotNil(user)
+        } catch {
+            XCTFail("Got an error: \(error)")
+        }
+    }
+
+    func testBasicFlexibleSyncOpenRealm() {
+        do {
+            let appId = try RealmServer.shared.createAppForSyncMode(.flx)
+            let app = app(fromAppId: appId)
+            let user = try logInUser(for: basicCredentials(app: app), app: app)
+            let realm = try openFlexibleSyncRealm(user: user)
+            XCTAssertNotNil(realm)
+            XCTAssert(realm.isEmpty, "Freshly synced Realm was not empty...")
+        } catch {
+            XCTFail("Got an error: \(error)")
+        }
+    }
 }
 
 // MARK: - Completion Block

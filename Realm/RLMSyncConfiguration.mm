@@ -68,6 +68,8 @@ RLMSyncSystemErrorKind errorKindForSyncError(SyncError error) {
 
 - (instancetype)initWithRawConfig:(realm::SyncConfig)config {
     if (self = [super init]) {
+        //TODO: We should be able to get this is a flexible sync configurations from core
+        _isFlexibleSync = false;
         _config = std::make_unique<realm::SyncConfig>(std::move(config));
     }
     return self;
@@ -120,24 +122,39 @@ RLMSyncSystemErrorKind errorKindForSyncError(SyncError error) {
     return [self initWithUser:user
                partitionValue:partitionValue
                 customFileURL:nil
-                   stopPolicy:RLMSyncStopPolicyAfterChangesUploaded];
+                   stopPolicy:RLMSyncStopPolicyAfterChangesUploaded
+               isFlexibleSync:false];
 }
 
 - (instancetype)initWithUser:(RLMUser *)user
               partitionValue:(nullable id<RLMBSON>)partitionValue
-                  stopPolicy:(RLMSyncStopPolicy)stopPolicy{
+                  stopPolicy:(RLMSyncStopPolicy)stopPolicy {
     auto config = [self initWithUser:user
                       partitionValue:partitionValue
                        customFileURL:nil
-                          stopPolicy:stopPolicy];
+                          stopPolicy:stopPolicy
+                      isFlexibleSync:false];
+    return config;
+}
+
+- (instancetype)initWithUser:(RLMUser *)user
+                  stopPolicy:(RLMSyncStopPolicy)stopPolicy
+              isFlexibleSync:(BOOL)isFlexibleSync {
+    auto config = [self initWithUser:user
+                      partitionValue:@""
+                       customFileURL:nil
+                          stopPolicy:stopPolicy
+                      isFlexibleSync:isFlexibleSync];
     return config;
 }
 
 - (instancetype)initWithUser:(RLMUser *)user
               partitionValue:(id<RLMBSON>)partitionValue
                customFileURL:(nullable NSURL *)customFileURL
-                  stopPolicy:(RLMSyncStopPolicy)stopPolicy {
+                  stopPolicy:(RLMSyncStopPolicy)stopPolicy
+              isFlexibleSync:(BOOL)isFlexibleSync {
     if (self = [super init]) {
+        _isFlexibleSync = isFlexibleSync;
         std::stringstream s;
         s << RLMConvertRLMBSONToBson(partitionValue);
         _config = std::make_unique<SyncConfig>(

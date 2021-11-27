@@ -25,7 +25,6 @@
 #import "RLMMongoClient_Private.hpp"
 #import "RLMRealmConfiguration+Sync.h"
 #import "RLMSyncConfiguration_Private.hpp"
-#import "RLMFlexibleSyncConfiguration_Private.hpp"
 
 #import "RLMSyncSession_Private.hpp"
 
@@ -85,18 +84,18 @@ using namespace realm;
 - (RLMRealmConfiguration *)configurationWithPartitionValue:(nullable id<RLMBSON>)partitionValue {
     auto syncConfig = [[RLMSyncConfiguration alloc] initWithUser:self
                                                   partitionValue:partitionValue
-                                                   customFileURL:nil
                                                       stopPolicy:RLMSyncStopPolicyAfterChangesUploaded];
     RLMRealmConfiguration *config = [[RLMRealmConfiguration alloc] init];
     config.syncConfiguration = syncConfig;
     return config;
 }
 
-// TODO: Flexible Sync - Add real implementation
 - (RLMRealmConfiguration *)flexibleSyncConfiguration {
-    auto flexibleSyncConfig = [[RLMFlexibleSyncConfiguration alloc] initWithUser:self];
+    auto syncConfig = [[RLMSyncConfiguration alloc] initWithUser:self
+                                                      stopPolicy:RLMSyncStopPolicyAfterChangesUploaded
+                                                  isFlexibleSync:true];
     RLMRealmConfiguration *config = [[RLMRealmConfiguration alloc] init];
-    // TODO: Add configuration
+    config.syncConfiguration = syncConfig;
     return config;
 }
 
@@ -118,20 +117,20 @@ using namespace realm;
     _user = nullptr;
 }
 
-- (std::string)pathForPartitionValue:(std::string const&)partitionValue {
+- (std::string)pathForValue:(std::string const&)value {
     if (!_user) {
         return "";
     }
 
     SyncConfig config(_user, "");
-    auto path = _user->sync_manager()->path_for_realm(config, partitionValue);
+    auto path = _user->sync_manager()->path_for_realm(config, value);
     if ([NSFileManager.defaultManager fileExistsAtPath:@(path.c_str())]) {
         return path;
     }
 
     // Previous versions converted the partition value to a path *twice*,
     // so if the file resulting from that exists open it instead
-    NSString *encodedPartitionValue = [@(partitionValue.data())
+    NSString *encodedPartitionValue = [@(value.data())
                                        stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLPathAllowedCharacterSet]];
     NSString *overEncodedRealmName = [[NSString alloc] initWithFormat:@"%@/%@", self.identifier, encodedPartitionValue];
     auto legacyPath = _user->sync_manager()->path_for_realm(config, std::string(overEncodedRealmName.UTF8String));
@@ -149,7 +148,7 @@ using namespace realm;
 
     std::stringstream s;
     s << RLMConvertRLMBSONToBson(partitionValue);
-    auto path = [self pathForPartitionValue:s.str()];
+    auto path = [self pathForValue:s.str()];
     if (auto session = _user->session_for_on_disk_path(path)) {
         return [[RLMSyncSession alloc] initWithSyncSession:session];
     }

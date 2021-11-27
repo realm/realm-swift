@@ -16,88 +16,50 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
+#import <Realm/RLMSyncSubscription.h>
+
+#import <Realm/RLMRealm.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-#pragma mark - Subscription States
-
-typedef NS_ENUM(NSUInteger, RLMSyncSubscriptionState) {
-    RLMSubscriptionStateComplete,
-
-    RLMSubscriptionStatePending,
-
-    RLMSubscriptionStateError
-};
-
-@protocol RLMAnySyncSubscription
-@end
-
 #pragma mark - Subscription
 
-@interface RLMSyncSubscription : NSObject <RLMAnySyncSubscription>
+@interface RLMSyncSubscription ()
 
-@property (nonatomic, readonly) NSDate *createdAt;
-
-@property (nonatomic, readonly) NSDate *updatedAt;
-
-@property (nonatomic, readonly) NSString *name;
-
-- (instancetype)initWithName:(nullable NSString *)name
-                   predicate:(NSPredicate *)predicate;
-
-- (void)updateSubscriptionWithPredicate:(NSPredicate *)predicate
-                                  error:(NSError **)error;
-
-@end
-
-#pragma mark - Subscription Task
-
-@interface RLMSyncSubscriptionTask : NSObject
-
-typedef void(^RLMSyncSubscriptionStateBlock)(RLMSyncSubscriptionState state);
-
-- (void)observe:(RLMSyncSubscriptionStateBlock)block;
+@property (nonatomic, readonly) NSString *queryString;
 
 @end
 
 #pragma mark - SubscriptionSet
 
-@interface NSArray<RLMAnySyncSubscription> (SubscriptionSet)
+@interface RLMSyncSubscriptionSet ()
+
+@property(readonly) uint64_t version;
+
+@property(readonly) uint64_t count;
 
 #pragma mark - Properties
 
-@property (nonatomic, readonly) NSError *error;
+//@property (nonatomic, readonly) NSError *error;
+//
+//
+//
 
-#pragma mark - Batch Update subscriptions
-
--(RLMSyncSubscriptionTask *)write:(__attribute__((noescape)) void(^)(void))block;
-
+//
 typedef void(^RLMSyncSubscriptionCallback)(NSError * _Nullable error);
-
--(RLMSyncSubscriptionTask *)writeAsync:(__attribute__((noescape)) void(^)(void))block
-                              callback:(RLMSyncSubscriptionCallback)callback;
-
-#pragma mark - Find subscription
-
--(nullable RLMSyncSubscription *)subscriptionWithPredicate:(NSPredicate *)predicate;
-
--(nullable RLMSyncSubscription *)subscriptionWithName:(NSString *)name;
-
-#pragma mark - Subscription transactions
-
--(void)addSubscriptionWithName:(nullable NSString *)name
-                     predicate:(NSPredicate *)predicate;
-
--(void)removeSubscriptionWithName:(NSString *)name;
-
--(void)removeSubscriptionWithPredicate:(NSPredicate *)predicate;
-
--(void)removeSubscription:(RLMSyncSubscription *)subscription;
-
--(void)removeAllSubscriptions;
-
--(void)removeSubscriptionsWithClassName:(NSString *)className;
+//
+//-(RLMSyncSubscriptionTask *)writeAsync:(__attribute__((noescape)) void(^)(void))block
+//                              callback:(RLMSyncSubscriptionCallback)callback;
+//
+//-(void)removeSubscriptionWithName:(NSString *)name;
+//
+//-(void)removeSubscriptionWithPredicate:(NSPredicate *)predicate;
+//
+//-(void)removeSubscription:(RLMSyncSubscription *)subscription;
+//
+//-(void)removeAllSubscriptions;
+//
+//-(void)removeSubscriptionsWithClassName:(NSString *)className;
 
 @end
 

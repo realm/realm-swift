@@ -17,6 +17,8 @@
  ////////////////////////////////////////////////////////////////////////////
 
 import Foundation
+import Realm
+import Realm.Private
 
 /// A protocol which defines a Subscription for using in a Flexible Sync transactions.
 ///
@@ -230,8 +232,10 @@ extension SyncSubscriptionTask {
 }
 #endif // swift(>=5.5)
 
+public typealias SubscriptionSet = RLMSyncSubscriptionSet
+
 // TODO: Change to public
-extension Array where Element == AnySyncSubscription {
+extension SubscriptionSet {
     /**
      Create and commit a write transaction and updates the subscription set,
      this will not wait for the server to acknowledge and see all the data associated with this
@@ -348,7 +352,7 @@ extension Array where Element == AnySyncSubscription {
 // TODO: Change to public
 #if swift(>=5.5) && canImport(_Concurrency)
 @available(macOS 12.0, tvOS 15.0, iOS 15.0, watchOS 8.0, *)
-extension Array where Element == AnySyncSubscription {
+extension SubscriptionSet {
     /**
      Asynchronously creates and commit a write transaction and updates the subscription set,
      this will not wait for the server to acknowledge and see all the data associated with this

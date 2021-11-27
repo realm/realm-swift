@@ -160,6 +160,10 @@ RLM_COLLECTION_TYPE(Person);
 /// Any stray app ids passed between processes
 @property (nonatomic, readonly) NSArray<NSString *> *appIds;
 
+- (RLMUser *)userForTest:(SEL)sel;
+
+- (RLMRealm *)realmForTest:(SEL)sel;
+
 - (RLMCredentials *)basicCredentialsWithName:(NSString *)name register:(BOOL)shouldRegister NS_SWIFT_NAME(basicCredentials(name:register:));
 
 - (RLMCredentials *)basicCredentialsWithName:(NSString *)name register:(BOOL)shouldRegister

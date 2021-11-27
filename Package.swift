@@ -221,7 +221,6 @@ let package = Package(
                 "Realm/RLMUpdateResult.mm",
                 "Realm/RLMUser.mm",
                 "Realm/RLMUserAPIKey.mm",
-                "Realm/RLMFlexibleSyncConfiguration.mm",
                 "Realm/RLMSyncSubscription.mm"
             ],
             publicHeadersPath: "include",

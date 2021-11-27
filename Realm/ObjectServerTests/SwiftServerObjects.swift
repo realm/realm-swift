@@ -20,19 +20,15 @@ import Foundation
 import RealmSwift
 
 public class SwiftPerson: Object, ObjectKeyIdentifiable {
-    @objc public dynamic var _id: ObjectId? = ObjectId.generate()
-    @objc public dynamic var firstName: String = ""
-    @objc public dynamic var lastName: String = ""
-    @objc public dynamic var age: Int = 30
+    @Persisted(primaryKey: true) public var _id: ObjectId? = ObjectId.generate()
+    @Persisted public var firstName: String = ""
+    @Persisted public var lastName: String = ""
+    @Persisted public var age: Int = 30
 
     public convenience init(firstName: String, lastName: String) {
         self.init()
         self.firstName = firstName
         self.lastName = lastName
-    }
-
-    public override class func primaryKey() -> String? {
-        return "_id"
     }
 }
 

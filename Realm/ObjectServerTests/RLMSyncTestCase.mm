@@ -408,6 +408,17 @@ static NSURL *syncDirectoryForChildProcess() {
 
 #pragma mark - Helper methods
 
+- (RLMUser *)userForTest:(SEL)sel {
+    return [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(sel)
+                                                               register:self.isParent]];
+}
+
+- (RLMRealm *)realmForTest:(SEL)sel {
+    RLMUser *user = [self userForTest:sel];
+    NSString *realmId = NSStringFromSelector(sel);
+    return [self openRealmForPartitionValue:realmId user:user];
+}
+
 - (RLMUser *)anonymousUser {
     return [self logInUserForCredentials:[RLMCredentials anonymousCredentials]];
 }

@@ -32,11 +32,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface RLMSyncConfiguration ()
 
-- (instancetype)initWithUser:(RLMUser *)user
-              partitionValue:(id<RLMBSON>)partitionValue
-               customFileURL:(nullable NSURL *)customFileURL
-                  stopPolicy:(RLMSyncStopPolicy)stopPolicy;
-
 - (instancetype)initWithRawConfig:(realm::SyncConfig)config;
 
 - (realm::SyncConfig&)rawConfiguration;
