@@ -1,5 +1,8 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
+
+Xcode 12.4 is now the minimum supported version of Xcode.
+
 ### Enhancements
 * None.
 
@@ -14,7 +17,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 13.1.
 * CocoaPods: 1.10 or later.
-* Xcode: 12.2-13.1.
+* Xcode: 12.2-13.2 beta 2.
 
 ### Internal
 * Upgraded realm-core from ? to ?
@@ -154,7 +157,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 13.1.
 * CocoaPods: 1.10 or later.
-* Xcode: 12.2-13.1.
+* Xcode: 12.4-13.2.
 
 ### Internal
 
