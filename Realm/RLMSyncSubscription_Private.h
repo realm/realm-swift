@@ -28,6 +28,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, readonly) NSString *queryString;
 
+@property (nonatomic, readonly) NSString *objectClassName;
+
 @end
 
 #pragma mark - SubscriptionSet
@@ -40,26 +42,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark - Properties
 
-//@property (nonatomic, readonly) NSError *error;
-//
-//
-//
+- (void)verifyInWriteTransaction;
 
-//
+- (void)addSubscriptionWithClassName:(NSString *)objectClassName
+                    subscriptionName:(nullable NSString *)name
+                           predicate:(NSPredicate *)predicate
+                      updateExisting:(BOOL)updateExisting;
+
 typedef void(^RLMSyncSubscriptionCallback)(NSError * _Nullable error);
-//
-//-(RLMSyncSubscriptionTask *)writeAsync:(__attribute__((noescape)) void(^)(void))block
-//                              callback:(RLMSyncSubscriptionCallback)callback;
-//
-//-(void)removeSubscriptionWithName:(NSString *)name;
-//
-//-(void)removeSubscriptionWithPredicate:(NSPredicate *)predicate;
-//
-//-(void)removeSubscription:(RLMSyncSubscription *)subscription;
-//
-//-(void)removeAllSubscriptions;
-//
-//-(void)removeSubscriptionsWithClassName:(NSString *)className;
 
 @end
 

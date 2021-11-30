@@ -30,7 +30,6 @@ typedef NS_ENUM(NSUInteger, RLMSyncSubscriptionState) {
 
 NS_ASSUME_NONNULL_BEGIN
 
-// TODO: Add RLMSyncSubscription interface when public exposed
 @interface RLMSyncSubscription : NSObject
 
 @property (nonatomic, readonly) NSDate *createdAt;
@@ -39,29 +38,45 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, readonly) NSString *name;
 
+- (void)updateSubscriptionWithClassName:(NSString *)objectClassName
+                                  where:(NSString *)predicateFormat, ...;
+
+- (void)updateSubscriptionWithClassName:(NSString *)objectClassName
+                                  where:(NSString *)predicateFormat
+                                   args:(va_list)args;
+
+- (void)updateSubscriptionWithClassName:(NSString *)objectClassName
+                              predicate:(NSPredicate *)predicate;
+
 @end
 
 @interface RLMSyncSubscriptionSet : NSObject
 
 #pragma mark - Batch Update subscriptions
 
--(BOOL)write:(__attribute__((noescape)) void(^)(void))block;
+- (BOOL)write:(__attribute__((noescape)) void(^)(void))block;
 
--(BOOL)write:(__attribute__((noescape)) void(^)(void))block error:(NSError **)error;
+- (BOOL)write:(__attribute__((noescape)) void(^)(void))block error:(NSError **)error;
+
+#pragma mark - Check Subscription State
+
+typedef void(^RLMSyncSubscriptionStateBlock)(RLMSyncSubscriptionState state);
+
+- (void)observe:(RLMSyncSubscriptionStateBlock)block;
 
 #pragma mark - Find subscription
 
--(nullable RLMSyncSubscription *)subscriptionWithName:(NSString *)name;
+- (nullable RLMSyncSubscription *)subscriptionWithName:(NSString *)name;
 
--(nullable RLMSyncSubscription *)subscriptionWithClassName:(NSString *)objectClassName
-                                                     where:(NSString *)predicateFormat, ...;
+- (nullable RLMSyncSubscription *)subscriptionWithClassName:(NSString *)objectClassName
+                                                      where:(NSString *)predicateFormat, ...;
 
--(nullable RLMSyncSubscription *)subscriptionWithClassName:(NSString *)objectClassName
-                                                     where:(NSString *)predicateFormat
-                                                      args:(va_list)args;
+- (nullable RLMSyncSubscription *)subscriptionWithClassName:(NSString *)objectClassName
+                                                      where:(NSString *)predicateFormat
+                                                       args:(va_list)args;
 
--(nullable RLMSyncSubscription *)subscriptionWithClassName:(NSString *)objectClassName
-                                                 predicate:(NSPredicate *)predicate;
+- (nullable RLMSyncSubscription *)subscriptionWithClassName:(NSString *)objectClassName
+                                                  predicate:(NSPredicate *)predicate;
 
 #pragma mark - Add a Subscription
 
@@ -81,12 +96,32 @@ NS_ASSUME_NONNULL_BEGIN
                                where:(NSString *)predicateFormat
                                 args:(va_list)args;
 
--(void)addSubscriptionWithClassName:(NSString *)objectClassName
-                          predicate:(NSPredicate *)predicate;
+- (void)addSubscriptionWithClassName:(NSString *)objectClassName
+                           predicate:(NSPredicate *)predicate;
 
 - (void)addSubscriptionWithClassName:(NSString *)objectClassName
                     subscriptionName:(nullable NSString *)name
                            predicate:(NSPredicate *)predicate;
+
+#pragma mark - Remove Subscription
+
+- (void)removeSubscriptionWithName:(NSString *)name;
+
+- (void)removeSubscriptionWithClassName:(NSString *)objectClassName
+                                  where:(NSString *)predicateFormat, ...;
+
+- (void)removeSubscriptionWithClassName:(NSString *)objectClassName
+                                  where:(NSString *)predicateFormat
+                                   args:(va_list)args;
+
+- (void)removeSubscriptionWithClassName:(NSString *)objectClassName
+                              predicate:(NSPredicate *)predicate;
+
+#pragma mark - Remove Subscriptions
+
+- (void)removeAllSubscriptions;
+
+- (void)removeAllSubscriptionsWithClassName:(NSString *)className;
 
 #pragma mark - Subscription transactions
 

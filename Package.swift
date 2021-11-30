@@ -291,7 +291,9 @@ let package = Package(
         objectServerTestSupportTarget(
             name: "RealmSyncTestSupport",
             dependencies: ["Realm", "RealmSwift", "RealmTestSupport"],
-            sources: ["RLMSyncTestCase.mm", "RLMUser+ObjectServerTests.mm"]
+            sources: ["RLMSyncTestCase.mm",
+                      "RLMUser+ObjectServerTests.mm",
+                      "RLMServerTestObjects.m"]
         ),
         objectServerTestSupportTarget(
             name: "RealmSwiftSyncTestSupport",

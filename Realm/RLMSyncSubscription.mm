@@ -26,14 +26,14 @@
 #pragma mark - Subscription
 
 @interface RLMSyncSubscription () {
-    realm::sync::SubscriptionSet _subscriptionSet;
     realm::sync::Subscription _subscription;
+    RLMSyncSubscriptionSet *_subscriptionSet;
 }
 @end
 
 @implementation RLMSyncSubscription
 
-- (instancetype)initWithSubscription:(realm::sync::Subscription)subscription subscriptionSet:(realm::sync::SubscriptionSet)subscriptionSet {
+- (instancetype)initWithSubscription:(realm::sync::Subscription)subscription subscriptionSet:(RLMSyncSubscriptionSet *)subscriptionSet {
     if (self = [super init]) {
         _subscription = subscription;
         _subscriptionSet = subscriptionSet;
@@ -63,9 +63,35 @@
                               encoding:[NSString defaultCStringEncoding]];
 }
 
-- (void)updateSubscriptionWithPredicate:(NSPredicate *)predicate
-                                  error:(NSError **)error {
-    [NSException raise:@"NotImplemented" format:@"Needs Impmentation"];
+- (NSString *)objectClassName {
+    return [NSString stringWithCString:std::string(_subscription.object_class_name()).c_str()
+                              encoding:[NSString defaultCStringEncoding]];
+}
+
+- (void)updateSubscriptionWithClassName:(NSString *)objectClassName
+                                  where:(NSString *)predicateFormat, ... {
+    va_list args;
+    va_start(args, predicateFormat);
+    [self updateSubscriptionWithClassName:objectClassName
+                                    where:predicateFormat
+                                     args:args];
+}
+
+- (void)updateSubscriptionWithClassName:(NSString *)objectClassName
+                                  where:(NSString *)predicateFormat
+                                   args:(va_list)args {
+    [self updateSubscriptionWithClassName:objectClassName
+                                predicate:[NSPredicate predicateWithFormat:predicateFormat arguments:args]];
+
+}
+
+- (void)updateSubscriptionWithClassName:(NSString *)objectClassName
+                              predicate:(NSPredicate *)predicate {
+    [_subscriptionSet verifyInWriteTransaction];
+    [_subscriptionSet addSubscriptionWithClassName:objectClassName
+                                  subscriptionName:self.name
+                                         predicate:predicate
+                                    updateExisting:true];
 }
 
 @end
@@ -103,16 +129,16 @@
 }
 
 - (NSError *)error {
-//    return _subscriptionSet->error_str();
+    //    return _subscriptionSet->error_str();
 }
 
 #pragma mark - Batch Update subscriptions
 
--(BOOL)write:(__attribute__((noescape)) void(^)(void))block {
+- (BOOL)write:(__attribute__((noescape)) void(^)(void))block {
     [self write:block error:nil];
 }
 
--(BOOL)write:(__attribute__((noescape)) void(^)(void))block error:(NSError **)error {
+- (BOOL)write:(__attribute__((noescape)) void(^)(void))block error:(NSError **)error {
     [self secureWrite];
     auto mutableSubscriptionSet = _subscriptionSet.make_mutable_copy();
     _mutableSubscriptionSet = mutableSubscriptionSet;
@@ -121,6 +147,7 @@
     try {
         mutableSubscriptionSet.commit();
         self->isInWriteTransaction = false;
+        _subscriptionSet = _mutableSubscriptionSet;
         return YES;
     }
     catch (...) {
@@ -130,27 +157,34 @@
     return YES;
 }
 
--(BOOL)writeAsync:(__attribute__((noescape)) void(^)(void))block
-                              callback:(RLMSyncSubscriptionCallback)callback {
-    [NSException raise:@"NotImplemented" format:@"Needs Impmentation"];
+- (BOOL)writeAsync:(__attribute__((noescape)) void(^)(void))block
+          callback:(RLMSyncSubscriptionCallback)callback {
+    [NSException raise:@"NotImplemented" format:@"Needs Implementation"];
     return NULL;
+}
+
+#pragma mark - Check Subscription State
+
+typedef void(^RLMSyncSubscriptionStateBlock)(RLMSyncSubscriptionState state);
+
+- (void)observe:(RLMSyncSubscriptionStateBlock)block {
+
 }
 
 #pragma mark - Find subscription
 
--(nullable RLMSyncSubscription *)subscriptionWithName:(NSString *)name {
+- (nullable RLMSyncSubscription *)subscriptionWithName:(NSString *)name {
     std::string str = std::string([name UTF8String]);
     auto iterator = _subscriptionSet.find(str);
-
     if (iterator != _subscriptionSet.end()) {
         return [[RLMSyncSubscription alloc] initWithSubscription:*iterator
-                                                 subscriptionSet:_subscriptionSet];
+                                                 subscriptionSet:self];
     }
     return NULL;
 }
 
--(nullable RLMSyncSubscription *)subscriptionWithClassName:(NSString *)objectClassName
-                                                     where:(NSString *)predicateFormat, ... {
+- (nullable RLMSyncSubscription *)subscriptionWithClassName:(NSString *)objectClassName
+                                                      where:(NSString *)predicateFormat, ... {
     va_list args;
     va_start(args, predicateFormat);
     return [self subscriptionWithClassName:objectClassName
@@ -159,21 +193,21 @@
 
 }
 
--(nullable RLMSyncSubscription *)subscriptionWithClassName:(NSString *)objectClassName
-                                                     where:(NSString *)predicateFormat
-                                                      args:(va_list)args {
+- (nullable RLMSyncSubscription *)subscriptionWithClassName:(NSString *)objectClassName
+                                                      where:(NSString *)predicateFormat
+                                                       args:(va_list)args {
     return [self subscriptionWithClassName:objectClassName
                                  predicate:[NSPredicate predicateWithFormat:predicateFormat arguments:args]];
 }
 
--(nullable RLMSyncSubscription *)subscriptionWithClassName:(NSString *)objectClassName
-                                                 predicate:(NSPredicate *)predicate {
+- (nullable RLMSyncSubscription *)subscriptionWithClassName:(NSString *)objectClassName
+                                                  predicate:(NSPredicate *)predicate {
     RLMClassInfo& info = _realm->_info[objectClassName];
     auto query = RLMPredicateToQuery(predicate, info.rlmObjectSchema, _realm.schema, _realm.group);
     auto iterator = _subscriptionSet.find(query);
     if (iterator != _subscriptionSet.end()) {
         return [[RLMSyncSubscription alloc] initWithSubscription:*iterator
-                                                 subscriptionSet:_subscriptionSet];
+                                                 subscriptionSet:self];
     }
     return NULL;
 }
@@ -219,8 +253,8 @@
 
 }
 
--(void)addSubscriptionWithClassName:(NSString *)objectClassName
-                          predicate:(NSPredicate *)predicate {
+- (void)addSubscriptionWithClassName:(NSString *)objectClassName
+                           predicate:(NSPredicate *)predicate {
     return [self addSubscriptionWithClassName:objectClassName
                              subscriptionName:nil
                                     predicate:predicate];
@@ -229,6 +263,16 @@
 - (void)addSubscriptionWithClassName:(NSString *)objectClassName
                     subscriptionName:(nullable NSString *)name
                            predicate:(NSPredicate *)predicate {
+    return [self addSubscriptionWithClassName:objectClassName
+                             subscriptionName:name
+                                    predicate:predicate
+                               updateExisting:false];
+}
+
+- (void)addSubscriptionWithClassName:(NSString *)objectClassName
+                    subscriptionName:(nullable NSString *)name
+                           predicate:(NSPredicate *)predicate
+                      updateExisting:(BOOL)updateExisting {
     [self verifyInWriteTransaction];
 
     RLMClassInfo& info = _realm->_info[objectClassName];
@@ -238,7 +282,7 @@
         std::string str = std::string([name UTF8String]);
         auto iterator = _subscriptionSet.find(str);
 
-        if (iterator == _subscriptionSet.end()) {
+        if (iterator == _subscriptionSet.end() || updateExisting) {
             _mutableSubscriptionSet.insert_or_assign(str, query);
         }
         else {
@@ -250,41 +294,96 @@
     }
 }
 
--(void)removeSubscriptionWithName:(NSString *)name {
+#pragma mark - Remove Subscription
+
+- (void)removeSubscriptionWithName:(NSString *)name {
     [self verifyInWriteTransaction];
 
     std::string str = std::string([name UTF8String]);
     auto iterator = _subscriptionSet.find(str);
-
     if (iterator != _subscriptionSet.end()) {
-        _subscriptionSet.erase(iterator);
+        _mutableSubscriptionSet.erase(iterator);
     }
 }
 
--(void)removeSubscriptionWithPredicate:(NSPredicate *)predicate {
-    [self verifyInWriteTransaction];
+- (void)removeSubscriptionWithClassName:(NSString *)objectClassName
+                                  where:(NSString *)predicateFormat, ... {
+    va_list args;
+    va_start(args, predicateFormat);
+    [self removeSubscriptionWithClassName:objectClassName
+                                    where: predicateFormat
+                                     args: args];
 }
 
--(void)removeSubscription:(RLMSyncSubscription *)subscription {
-    [self verifyInWriteTransaction];
+- (void)removeSubscriptionWithClassName:(NSString *)objectClassName
+                                  where:(NSString *)predicateFormat
+                                   args:(va_list)args {
+    [self removeSubscriptionWithClassName:objectClassName
+                                predicate:[NSPredicate predicateWithFormat:predicateFormat arguments:args]];
 }
 
--(void)removeAllSubscriptions {
+- (void)removeSubscriptionWithClassName:(NSString *)objectClassName
+                              predicate:(NSPredicate *)predicate {
     [self verifyInWriteTransaction];
+
+    RLMClassInfo& info = _realm->_info[objectClassName];
+    auto query = RLMPredicateToQuery(predicate, info.rlmObjectSchema, _realm.schema, _realm.group);
+    auto iterator = _subscriptionSet.find(query);
+    if (iterator != _subscriptionSet.end()) {
+        _mutableSubscriptionSet.erase(iterator);
+    }
 }
 
--(void)removeSubscriptionsWithClassName:(NSString *)className {
+- (void)removeSubscription:(RLMSyncSubscription *)subscription {
     [self verifyInWriteTransaction];
+
+    if ([subscription.name length] == 0) {
+        RLMClassInfo& info = _realm->_info[subscription.objectClassName];
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:subscription.queryString];
+        auto query = RLMPredicateToQuery(predicate, info.rlmObjectSchema, _realm.schema, _realm.group);
+        auto iterator = _subscriptionSet.find(query);
+        if (iterator != _subscriptionSet.end()) {
+            _mutableSubscriptionSet.erase(iterator);
+        }
+    }
+    else {
+        std::string nameStr = std::string([subscription.name UTF8String]);
+        auto iterator = _subscriptionSet.find(nameStr);
+        if (iterator != _subscriptionSet.end()) {
+            _mutableSubscriptionSet.erase(iterator);
+        }
+    }
+}
+
+#pragma mark - Remove Subscriptions
+
+- (void)removeAllSubscriptions {
+    [self verifyInWriteTransaction];
+    _mutableSubscriptionSet.clear();
+}
+
+- (void)removeAllSubscriptionsWithClassName:(NSString *)className {
+    [self verifyInWriteTransaction];
+
+    auto iterator = _subscriptionSet.begin();
+    while(iterator != _subscriptionSet.end()) {
+        RLMSyncSubscription *subscription = [[RLMSyncSubscription alloc] initWithSubscription:*iterator
+                                                                              subscriptionSet:self];
+        if (subscription.objectClassName == className) {
+            _mutableSubscriptionSet.erase(iterator);
+        }
+        iterator++;
+    }
 }
 
 #pragma mark - Private
--(void)verifyInWriteTransaction {
+- (void)verifyInWriteTransaction {
     if (!self->isInWriteTransaction) {
         @throw RLMException(@"Can only add, remove, or update subscriptions within a write subscription block.");
     }
 }
 
--(void)secureWrite {
+- (void)secureWrite {
     if (self->isInWriteTransaction) {
         @throw RLMException(@"Cannot initiate a write transaction on subscription set that is already been updated.");
     }

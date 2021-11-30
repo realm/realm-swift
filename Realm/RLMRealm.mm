@@ -482,11 +482,6 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
         return nil;
     }
 
-    //TODO: Force for FLX connection
-    if (configuration.syncConfiguration && configuration.syncConfiguration.isFlexibleSync) {
-        realm->_realm->get_latest_subscription_set();
-    }
-
     // if we have a cached realm on another thread we can skip a few steps and
     // just grab its schema
     @autoreleasepool {

@@ -27,7 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface RLMSyncSubscription ()
 
-- (instancetype)initWithSubscription:(realm::sync::Subscription)subscription subscriptionSet:(realm::sync::SubscriptionSet)subscriptionSet;
+- (instancetype)initWithSubscription:(realm::sync::Subscription)subscription subscriptionSet:(RLMSyncSubscriptionSet *)subscriptionSet;
 
 @end
 

@@ -39,7 +39,7 @@ typedef RLM_CLOSED_ENUM(NSUInteger, RLMSyncStopPolicy) {
               isFlexibleSync:(BOOL)isFlexibleSync;
 
 - (instancetype)initWithUser:(RLMUser *)user
-              partitionValue:(id<RLMBSON>)partitionValue
+              partitionValue:(nullable id<RLMBSON>)partitionValue
                customFileURL:(nullable NSURL *)customFileURL
                   stopPolicy:(RLMSyncStopPolicy)stopPolicy
               isFlexibleSync:(BOOL)isFlexibleSync;

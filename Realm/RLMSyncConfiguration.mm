@@ -141,7 +141,7 @@ RLMSyncSystemErrorKind errorKindForSyncError(SyncError error) {
                   stopPolicy:(RLMSyncStopPolicy)stopPolicy
               isFlexibleSync:(BOOL)isFlexibleSync {
     auto config = [self initWithUser:user
-                      partitionValue:@""
+                      partitionValue:nil
                        customFileURL:nil
                           stopPolicy:stopPolicy
                       isFlexibleSync:isFlexibleSync];
@@ -149,7 +149,7 @@ RLMSyncSystemErrorKind errorKindForSyncError(SyncError error) {
 }
 
 - (instancetype)initWithUser:(RLMUser *)user
-              partitionValue:(id<RLMBSON>)partitionValue
+              partitionValue:(nullable id<RLMBSON>)partitionValue
                customFileURL:(nullable NSURL *)customFileURL
                   stopPolicy:(RLMSyncStopPolicy)stopPolicy
               isFlexibleSync:(BOOL)isFlexibleSync {
