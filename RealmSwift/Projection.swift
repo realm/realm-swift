@@ -134,7 +134,7 @@ extension ObjectChange {
                     $0.originPropertyKeyPathString == propChange.name
                 })!
                 projectionSchemaLock.unlock()
-                var changeOldValue: Any? = nil
+                var changeOldValue: Any?
                 if let oldValue = propChange.oldValue {
                     // if there is an oldValue in the change, construct an empty Root
                     let newRoot = T.Root()
@@ -144,7 +144,7 @@ extension ObjectChange {
                     processorProjection.rootObject.setValue(oldValue, forKey: propChange.name)
                     changeOldValue = processorProjection.rootObject[keyPath: propertyMetadata.projectedKeyPath]
                 }
-                var changeNewValue: Any? = nil
+                var changeNewValue: Any?
                 if propChange.newValue != nil {
                     changeNewValue = newProjection.rootObject[keyPath: propertyMetadata.projectedKeyPath]
                 }
