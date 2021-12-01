@@ -374,7 +374,6 @@
     RLMAssertThrowsWithReason([subs removeSubscriptionWithName:@"person_age_1"], @"Can only add, remove, or update subscriptions within a write subscription block.");
 }
 
-// This is failing because when removing the indexes are not been updated
 - (void)testRemoveSubscriptionByQuery {
     RLMRealm *realm = [self getFlexibleSyncRealm];
     RLMSyncSubscriptionSet *subs = realm.subscriptions;
@@ -402,11 +401,54 @@
     XCTAssertEqual(subs.version, 2);
     XCTAssertEqual(subs.count, 1);
 
-    RLMSyncSubscription *foundSubscription = [subs subscriptionWithName:@"person_age_1"];
-    XCTAssertNil(foundSubscription);
+    RLMSyncSubscription *foundSubscription = [subs subscriptionWithName:@"person_age"];
+    XCTAssertNotNil(foundSubscription);
 
-    RLMSyncSubscription *foundSubscription2 = [subs subscriptionWithName:@"person_age_2"];
+    RLMSyncSubscription *foundSubscription2 = [subs subscriptionWithName:@"person_firstname"];
+    XCTAssertNil(foundSubscription2);
+
+    RLMSyncSubscription *foundSubscription3 = [subs subscriptionWithName:@"person_lastname"];
+    XCTAssertNil(foundSubscription3);
+}
+
+- (void)testRemoveSubscription {
+    RLMRealm *realm = [self getFlexibleSyncRealm];
+    RLMSyncSubscriptionSet *subs = realm.subscriptions;
+
+    [subs write:^{
+        [subs addSubscriptionWithClassName:Person.className
+                          subscriptionName:@"person_age"
+                                     where:@"age > 15"];
+        [subs addSubscriptionWithClassName:Person.className
+                          subscriptionName:@"person_firstname"
+                                     where:@"firstName == '%@'", @"John"];
+        [subs addSubscriptionWithClassName:Person.className
+                          subscriptionName:@"person_lastname"
+                                 predicate:[NSPredicate predicateWithFormat:@"lastName BEGINSWITH %@", @"A"]];
+    }];
+
+    XCTAssertEqual(subs.version, 1);
+    XCTAssertEqual(subs.count, 3);
+
+    RLMSyncSubscription *foundSubscription = [subs subscriptionWithName:@"person_age"];
+    XCTAssertNotNil(foundSubscription);
+
+    [subs write:^{
+        [subs removeSubscription:foundSubscription];
+    }];
+
+    XCTAssertEqual(subs.version, 2);
+    XCTAssertEqual(subs.count, 2);
+
+    RLMSyncSubscription *foundSubscription2 = [subs subscriptionWithName:@"person_firstname"];
     XCTAssertNotNil(foundSubscription2);
+
+    [subs write:^{
+        [subs removeSubscription:foundSubscription2];
+    }];
+
+    XCTAssertEqual(subs.version, 3);
+    XCTAssertEqual(subs.count, 1);
 }
 
 - (void)testRemoveAllSubscription {
@@ -468,6 +510,13 @@
 
     RLMSyncSubscription *foundSubscription = [subs subscriptionWithName:@"dog_name"];
     XCTAssertNotNil(foundSubscription);
+
+    [subs write:^{
+        [subs removeAllSubscriptionsWithClassName:Person.className];
+    }];
+
+    XCTAssertEqual(subs.version, 3);
+    XCTAssertEqual(subs.count, 0);
 }
 
 - (void)testUpdateSubscriptionQueryWithSameClassName {
@@ -547,4 +596,88 @@
     RLMAssertThrowsWithReason([foundSubscription updateSubscriptionWithClassName:Dog.className predicate:[NSPredicate predicateWithFormat:@"name == 'Tomas'"]], @"Can only add, remove, or update subscriptions within a write subscription block.");
 }
 
+- (void)testSubscriptionSetIterate {
+    RLMRealm *realm = [self getFlexibleSyncRealm];
+    RLMSyncSubscriptionSet *subs = realm.subscriptions;
+
+    int numberOfSubs = 100;
+    [subs write:^{
+        for (int i = 0; i < numberOfSubs; ++i) {
+            [subs addSubscriptionWithClassName:Person.className
+                              subscriptionName:[NSString stringWithFormat:@"person_age_%d", i]
+                                         where:[NSString stringWithFormat:@"age > %d", i]];
+        }
+    }];
+
+    XCTAssertEqual(subs.version, 1);
+    XCTAssertEqual(subs.count, numberOfSubs);
+
+    __weak id objects[numberOfSubs];
+    NSInteger count = 0;
+    for(RLMSyncSubscription *sub in subs) {
+        XCTAssertNotNil(sub);
+        objects[count++] = sub;
+    }
+    XCTAssertEqual(count, numberOfSubs);
+}
+
+- (void)testSubscriptionSetFirstAndLast {
+    RLMRealm *realm = [self getFlexibleSyncRealm];
+    RLMSyncSubscriptionSet *subs = realm.subscriptions;
+
+    XCTAssertNil(subs.firstObject);
+    XCTAssertNil(subs.lastObject);
+
+    int numberOfSubs = 20;
+    [subs write:^{
+        for (int i = 1; i <= numberOfSubs; ++i) {
+            [subs addSubscriptionWithClassName:Person.className
+                              subscriptionName:[NSString stringWithFormat:@"person_age_%d", i]
+                                         where:[NSString stringWithFormat:@"age > %d", i]];
+        }
+    }];
+
+    XCTAssertEqual(subs.version, 1);
+    XCTAssertEqual(subs.count, numberOfSubs);
+
+    RLMSyncSubscription *firstSubscription = subs.firstObject;
+    XCTAssertEqualObjects(firstSubscription.name, @"person_age_1");
+    XCTAssertEqualObjects(firstSubscription.queryString, @"age > 1");
+
+    RLMSyncSubscription *lastSubscription = subs.lastObject;
+    XCTAssertEqualObjects(lastSubscription.name, ([NSString stringWithFormat:@"person_age_%d", numberOfSubs]));
+    XCTAssertEqualObjects(lastSubscription.queryString, ([NSString stringWithFormat:@"age > %d", numberOfSubs]));
+}
+
+- (void)testSubscriptionSetSubscript {
+    RLMRealm *realm = [self getFlexibleSyncRealm];
+    RLMSyncSubscriptionSet *subs = realm.subscriptions;
+
+    XCTAssertEqual(subs.count, 0);
+
+    int numberOfSubs = 20;
+    [subs write:^{
+        for (int i = 1; i <= numberOfSubs; ++i) {
+            [subs addSubscriptionWithClassName:Person.className
+                              subscriptionName:[NSString stringWithFormat:@"person_age_%d", i]
+                                         where:[NSString stringWithFormat:@"age > %d", i]];
+        }
+    }];
+
+    XCTAssertEqual(subs.version, 1);
+    XCTAssertEqual(subs.count, numberOfSubs);
+
+    RLMSyncSubscription *firstSubscription = subs[0];
+    XCTAssertEqualObjects(firstSubscription.name, @"person_age_1");
+    XCTAssertEqualObjects(firstSubscription.queryString, @"age > 1");
+
+    RLMSyncSubscription *lastSubscription = subs[numberOfSubs-1];
+    XCTAssertEqualObjects(lastSubscription.name, ([NSString stringWithFormat:@"person_age_%d", numberOfSubs]));
+    XCTAssertEqualObjects(lastSubscription.queryString, ([NSString stringWithFormat:@"age > %d", numberOfSubs]));
+
+    int index = (numberOfSubs/2);
+    RLMSyncSubscription *objectAtIndexSubscription = [subs objectAtIndex:index];
+    XCTAssertEqualObjects(objectAtIndexSubscription.name, ([NSString stringWithFormat:@"person_age_%d", index+1]));
+    XCTAssertEqualObjects(objectAtIndexSubscription.queryString, ([NSString stringWithFormat:@"age > %d", index+1]));
+}
 @end

@@ -20,6 +20,7 @@
 #import "RLMRealm_Private.hpp"
 #import "RLMUtil.hpp"
 #import "RLMQueryUtil.hpp"
+#import "RLMObjectId_Private.hpp"
 
 #import <realm/sync/subscriptions.hpp>
 
@@ -41,13 +42,8 @@
     }
 }
 
-- (NSDate *)createdAt {
-    return RLMTimestampToNSDate(_subscription.created_at());
-
-}
-
-- (NSDate *)updatedAt {
-    return RLMTimestampToNSDate(_subscription.updated_at());
+- (RLMObjectId *)identifier {
+    return [[RLMObjectId alloc]initWithValue:_subscription.id()];
 }
 
 - (NSString *)name {
@@ -56,6 +52,14 @@
     const char * characters = str.c_str();
     return [NSString stringWithCString:characters
                               encoding:[NSString defaultCStringEncoding]];
+}
+
+- (NSDate *)createdAt {
+    return RLMTimestampToNSDate(_subscription.created_at());
+}
+
+- (NSDate *)updatedAt {
+    return RLMTimestampToNSDate(_subscription.updated_at());
 }
 
 - (NSString *)queryString {
@@ -107,6 +111,7 @@
 @implementation RLMSyncSubscriptionSet {
     BOOL isInWriteTransaction;
     RLMRealm *_realm;
+    id _strongBuffer[16];
 }
 
 - (uint64_t)version {
@@ -300,8 +305,8 @@ typedef void(^RLMSyncSubscriptionStateBlock)(RLMSyncSubscriptionState state);
     [self verifyInWriteTransaction];
 
     std::string str = std::string([name UTF8String]);
-    auto iterator = _subscriptionSet.find(str);
-    if (iterator != _subscriptionSet.end()) {
+    auto iterator = _mutableSubscriptionSet.find(str);
+    if (iterator != _mutableSubscriptionSet.end()) {
         _mutableSubscriptionSet.erase(iterator);
     }
 }
@@ -328,8 +333,8 @@ typedef void(^RLMSyncSubscriptionStateBlock)(RLMSyncSubscriptionState state);
 
     RLMClassInfo& info = _realm->_info[objectClassName];
     auto query = RLMPredicateToQuery(predicate, info.rlmObjectSchema, _realm.schema, _realm.group);
-    auto iterator = _subscriptionSet.find(query);
-    if (iterator != _subscriptionSet.end()) {
+    auto iterator = _mutableSubscriptionSet.find(query);
+    if (iterator != _mutableSubscriptionSet.end()) {
         _mutableSubscriptionSet.erase(iterator);
     }
 }
@@ -341,15 +346,15 @@ typedef void(^RLMSyncSubscriptionStateBlock)(RLMSyncSubscriptionState state);
         RLMClassInfo& info = _realm->_info[subscription.objectClassName];
         NSPredicate *predicate = [NSPredicate predicateWithFormat:subscription.queryString];
         auto query = RLMPredicateToQuery(predicate, info.rlmObjectSchema, _realm.schema, _realm.group);
-        auto iterator = _subscriptionSet.find(query);
-        if (iterator != _subscriptionSet.end()) {
+        auto iterator = _mutableSubscriptionSet.find(query);
+        if (iterator != _mutableSubscriptionSet.end()) {
             _mutableSubscriptionSet.erase(iterator);
         }
     }
     else {
         std::string nameStr = std::string([subscription.name UTF8String]);
-        auto iterator = _subscriptionSet.find(nameStr);
-        if (iterator != _subscriptionSet.end()) {
+        auto iterator = _mutableSubscriptionSet.find(nameStr);
+        if (iterator != _mutableSubscriptionSet.end() && iterator->id() == subscription.identifier.value) {
             _mutableSubscriptionSet.erase(iterator);
         }
     }
@@ -365,18 +370,79 @@ typedef void(^RLMSyncSubscriptionStateBlock)(RLMSyncSubscriptionState state);
 - (void)removeAllSubscriptionsWithClassName:(NSString *)className {
     [self verifyInWriteTransaction];
 
-    auto iterator = _subscriptionSet.begin();
-    while(iterator != _subscriptionSet.end()) {
-        RLMSyncSubscription *subscription = [[RLMSyncSubscription alloc] initWithSubscription:*iterator
-                                                                              subscriptionSet:self];
-        if (subscription.objectClassName == className) {
-            _mutableSubscriptionSet.erase(iterator);
+    for (auto it = _mutableSubscriptionSet.begin(); it != _mutableSubscriptionSet.end();) {
+        if (it->object_class_name() == std::string([className UTF8String])) {
+            _mutableSubscriptionSet.erase(it);
         }
-        iterator++;
+        else {
+            it++;
+        }
     }
 }
 
+#pragma mark - NSFastEnumerator
+
+- (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state
+                                  objects:(__unused __unsafe_unretained id [])buffer
+                                    count:(NSUInteger)len {
+    NSUInteger batchCount = 0, count = _subscriptionSet.size();
+    for (NSUInteger index = state->state; index < count && batchCount < len; ++index) {
+        auto iterator = _subscriptionSet.at(size_t(index));
+        RLMSyncSubscription *subscription = [[RLMSyncSubscription alloc]initWithSubscription:iterator
+                                                                              subscriptionSet:self];;
+        _strongBuffer[batchCount] = subscription;
+        batchCount++;
+    }
+
+    for (NSUInteger i = batchCount; i < len; ++i) {
+        _strongBuffer[i] = nil;
+    }
+
+    state->itemsPtr = (__unsafe_unretained id *)(void *)_strongBuffer;
+    state->state += batchCount;
+    state->mutationsPtr = state->extra+1;
+    
+    return batchCount;
+}
+
+#pragma mark - SubscriptionSet Collection
+
+- (RLMSyncSubscription *)objectAtIndex:(NSUInteger)index {
+    auto size = _subscriptionSet.size();
+    if (index >= size) {
+        @throw RLMException(@"Index %llu is out of bounds (must be less than %llu).",
+                            (unsigned long long)index, (unsigned long long)size);
+    }
+
+    return [[RLMSyncSubscription alloc]initWithSubscription:_subscriptionSet.at(size_t(index))
+                                            subscriptionSet:self];
+}
+
+- (RLMSyncSubscription *)firstObject {
+    if (_subscriptionSet.size() < 1) {
+        return 0;
+    }
+    return [[RLMSyncSubscription alloc]initWithSubscription:_subscriptionSet.at(size_t(0))
+                                            subscriptionSet:self];
+}
+
+- (RLMSyncSubscription *)lastObject {
+    if (_subscriptionSet.size() < 1) {
+        return 0;
+    }
+    
+    return [[RLMSyncSubscription alloc]initWithSubscription:_subscriptionSet.at(_subscriptionSet.size()-1)
+                                            subscriptionSet:self];
+}
+
+#pragma mark - Subscript
+
+- (id)objectAtIndexedSubscript:(NSUInteger)index {
+    return [self objectAtIndex:index];
+}
+
 #pragma mark - Private
+
 - (void)verifyInWriteTransaction {
     if (!self->isInWriteTransaction) {
         @throw RLMException(@"Can only add, remove, or update subscriptions within a write subscription block.");
@@ -388,5 +454,4 @@ typedef void(^RLMSyncSubscriptionStateBlock)(RLMSyncSubscriptionState state);
         @throw RLMException(@"Cannot initiate a write transaction on subscription set that is already been updated.");
     }
 }
-
 @end

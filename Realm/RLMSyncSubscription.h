@@ -18,6 +18,8 @@
 
 #import <Foundation/Foundation.h>
 
+@class RLMObjectId;
+
 #pragma mark - Subscription States
 
 typedef NS_ENUM(NSUInteger, RLMSyncSubscriptionState) {
@@ -32,11 +34,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface RLMSyncSubscription : NSObject
 
+@property (nonatomic, readonly) RLMObjectId *identifier;
+
+@property (nonatomic, readonly) NSString *name;
+
 @property (nonatomic, readonly) NSDate *createdAt;
 
 @property (nonatomic, readonly) NSDate *updatedAt;
-
-@property (nonatomic, readonly) NSString *name;
 
 - (void)updateSubscriptionWithClassName:(NSString *)objectClassName
                                   where:(NSString *)predicateFormat, ...;
@@ -50,7 +54,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface RLMSyncSubscriptionSet : NSObject
+@interface RLMSyncSubscriptionSet : NSObject <NSFastEnumeration>
 
 #pragma mark - Batch Update subscriptions
 
@@ -117,6 +121,8 @@ typedef void(^RLMSyncSubscriptionStateBlock)(RLMSyncSubscriptionState state);
 - (void)removeSubscriptionWithClassName:(NSString *)objectClassName
                               predicate:(NSPredicate *)predicate;
 
+- (void)removeSubscription:(RLMSyncSubscription *)subscription;
+
 #pragma mark - Remove Subscriptions
 
 - (void)removeAllSubscriptions;
@@ -128,6 +134,18 @@ typedef void(^RLMSyncSubscriptionStateBlock)(RLMSyncSubscriptionState state);
 typedef void(^RLMSyncSubscriptionStateBlock)(RLMSyncSubscriptionState state);
 
 //- (void)observe:(RLMSyncSubscriptionStateBlock)block;
+
+#pragma mark - SubscriptionSet Collection
+
+- (RLMSyncSubscription *)objectAtIndex:(NSUInteger)index;
+
+- (RLMSyncSubscription *)firstObject;
+
+- (RLMSyncSubscription *)lastObject;
+
+#pragma mark - Subscript
+
+- (id)objectAtIndexedSubscript:(NSUInteger)index;
 
 @end
 
