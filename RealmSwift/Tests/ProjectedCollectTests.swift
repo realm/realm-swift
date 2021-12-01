@@ -75,6 +75,14 @@ class ProjectedCollectionsTestsTemplate: TestCase {
         super.tearDown()
     }
 
+    override class var defaultTestSuite: XCTestSuite {
+        // Don't run tests for the base class
+        if isEqual(ProjectedCollectionsTestsTemplate.self) {
+            return XCTestSuite(name: "empty")
+        }
+        return super.defaultTestSuite
+    }
+
     func testCount() {
         XCTAssertEqual(collection.count, 3)
     }

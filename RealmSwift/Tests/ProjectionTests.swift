@@ -23,7 +23,6 @@ import XCTest
 
 #if canImport(RealmTestSupport)
 import RealmTestSupport
-import SwiftUI
 #endif
 
 // MARK: Test objects definitions
@@ -210,7 +209,6 @@ public class CommonPerson: Object {
     @Persisted var money: Decimal128
 }
 
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 public final class PersonProjection: Projection<CommonPerson> {
     @Projected(\CommonPerson.firstName) var firstName
     @Projected(\CommonPerson.lastName.localizedUppercase) var lastNameCaps
@@ -224,19 +222,16 @@ public class SimpleObject: Object {
     @Persisted var bool: Bool
 }
 
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 public final class SimpleProjection: Projection<SimpleObject> {
     @Projected(\SimpleObject.int) var int
 }
 
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 public final class AltSimpleProjection: Projection<SimpleObject> {
     @Projected(\SimpleObject.int) var int
 }
 
 // MARK: Tests
 
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 class ProjectionTests: TestCase {
     func assertSetEquals<T: RealmCollectionValue>(_ set: MutableSet<T>, _ expected: Array<T>) {
         XCTAssertEqual(set.count, Set(expected).count)

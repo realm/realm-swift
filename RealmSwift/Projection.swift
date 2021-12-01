@@ -53,7 +53,7 @@ private protocol AnyProjected {
 @propertyWrapper
 public struct Projected<T: ObjectBase, Value>: AnyProjected {
 
-    fileprivate var _projectedKeyPath: KeyPath<T, Value>!
+    fileprivate var _projectedKeyPath: KeyPath<T, Value>
     var projectedKeyPath: AnyKeyPath {
         _projectedKeyPath
     }
@@ -100,6 +100,7 @@ private struct ProjectedMetadata {
 }
 
 private var schema = [ObjectIdentifier: [ProjectedMetadata]]()
+private let projectionSchemaLock = NSLock()
 
 // MARK: ProjectionOservable
 /**
@@ -128,13 +129,12 @@ extension ObjectChange {
             let projectedPropertyChanges: [PropertyChange] = objectPropertyChanges.map { propChange in
                 // read the metadata for the property whose origin name matches
                 // the changed property's name
-                let lock = NSLock()
-                lock.lock()
+                projectionSchemaLock.lock()
                 let propertyMetadata = schema.first(where: {
                     $0.originPropertyKeyPathString == propChange.name
                 })!
-                lock.unlock()
-                var change: (name: String?, oldValue: Any?, newValue: Any?) = (nil, nil, nil)
+                projectionSchemaLock.unlock()
+                var changeOldValue: Any? = nil
                 if let oldValue = propChange.oldValue {
                     // if there is an oldValue in the change, construct an empty Root
                     let newRoot = T.Root()
@@ -142,16 +142,17 @@ extension ObjectChange {
 
                     // assign the oldValue to the empty root object
                     processorProjection.rootObject.setValue(oldValue, forKey: propChange.name)
-                    change.oldValue = processorProjection.rootObject[keyPath: propertyMetadata.projectedKeyPath]
+                    changeOldValue = processorProjection.rootObject[keyPath: propertyMetadata.projectedKeyPath]
                 }
+                var changeNewValue: Any? = nil
                 if propChange.newValue != nil {
-                    change.newValue = newProjection.rootObject[keyPath: propertyMetadata.projectedKeyPath]
+                    changeNewValue = newProjection.rootObject[keyPath: propertyMetadata.projectedKeyPath]
                 }
 
-                change.name = String(propertyMetadata.label.dropFirst()) // this drops the _ from the property wrapper name
-                return PropertyChange(name: change.name!,
-                                      oldValue: change.oldValue,
-                                      newValue: change.newValue)
+                let valueName = String(propertyMetadata.label.dropFirst()) // this drops the _ from the property wrapper name
+                return PropertyChange(name: valueName,
+                                      oldValue: changeOldValue,
+                                      newValue: changeNewValue)
             }
             return .change(newProjection, projectedPropertyChanges)
         case .deleted:
@@ -432,10 +433,9 @@ extension ProjectionObservable {
     }
 
     fileprivate var _schema: [ProjectedMetadata] {
-        let lock = NSLock()
-        lock.lock()
+        projectionSchemaLock.lock()
         defer {
-            lock.unlock()
+            projectionSchemaLock.unlock()
         }
         if schema[ObjectIdentifier(type(of: self))] == nil {
             let mirror = Mirror(reflecting: self)
@@ -445,6 +445,7 @@ extension ProjectionObservable {
                 }
                 let originPropertyLabel = _name(for: projected.projectedKeyPath as! PartialKeyPath<Root>)
                 guard !originPropertyLabel.isEmpty else {
+                    projectionSchemaLock.unlock()
                     throwRealmException("@Projected property '\(child.label!)' must be a part of Realm object")
                 }
                 return ProjectedMetadata(projectedKeyPath: projected.projectedKeyPath,

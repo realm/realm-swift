@@ -68,9 +68,6 @@
                <Test
                   Identifier = "ProjectedCollectTestsTemplate">
                </Test>
-               <Test
-                  Identifier = "ProjectedCollectionsTestsTemplate">
-               </Test>
             </SkippedTests>
          </TestableReference>
       </Testables>
