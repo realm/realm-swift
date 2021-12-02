@@ -62,10 +62,7 @@ extension ObjectKeyIdentifiable where Self: ObjectBase {
 extension ObjectKeyIdentifiable where Self: ProjectionObservable {
     /// A stable identifier for this projection.
     public var id: UInt64 {
-        // UInt64(bitPattern:) to properly cast negative Int64 values
-        // It will use the same memory representation, the numeric value
-        // may be different which is fine in this case
-        UInt64(withUnsafePointer(to: self, { UInt(bitPattern: $0) }))
+        RLMObjectBaseGetCombineId(rootObject)
     }
 }
 
