@@ -366,6 +366,50 @@ import Realm.Private
         return rlmRealm.inWriteTransaction
     }
 
+#if REALM_ASYNC_WRITES
+// MARK: Asynchronous Transactions
+
+    /**
+     */
+    public func writeAsync(_ block: (() -> ()), _ onComplete: (() -> ())? = nil) throws {
+        do {
+            beginAsyncWrite(block)
+            if isInAsyncWriteTransaction {
+                try commitAsyncWrite(onComplete)
+            }
+        } catch let error {
+            if isInAsyncWriteTransaction {
+                cancelAsyncWrite()
+            }
+            throw error
+        }
+    }
+
+    /**
+     */
+    public func beginAsyncWrite(_ asyncWriteBlock: () -> ()) {
+        return rlmRealm.beginAsyncWriteTransaction(asyncWriteBlock)
+    }
+
+    /**
+     */
+    public func commitAsyncWrite(_ onComplete: (() -> ())? = nil) throws {
+        try rlmRealm.commitAsyncWriteTransaction(onComplete)
+    }
+
+    /**
+     */
+    public func cancelAsyncWrite() {
+        rlmRealm.cancelAsyncTransaction()
+    }
+
+    /**
+     */
+    public var isInAsyncWriteTransaction: Bool {
+        return rlmRealm.inAsyncWriteTransaction
+    }
+#endif // REALM_ASYNC_WRITES
+
     // MARK: Adding and Creating objects
 
     /**
