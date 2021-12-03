@@ -1546,8 +1546,7 @@
 
     [realm asyncTransactionWithBlock:^{
         [StringObject createInRealm:realm withValue:@[@"string"]];
-    }
-                          onComplete:nil];
+    }];
 
     [self waitForExpectationsWithTimeout:10.0 handler:nil];
 
