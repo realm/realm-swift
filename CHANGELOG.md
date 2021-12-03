@@ -2,6 +2,24 @@ x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
 * Conform `@ThreadSafe` and `ThreadSafeReference` to `Sendable`.
+* Add an API for asynchronous transactions on ObjC.
+The feature can be enabled with the build flag `REALM_ASYNC_WRITES`.
+```
+   [realm asyncTransactionWithBlock:^{
+        [StringObject createInRealm:realm withValue:@[@"string"]];
+    } onComplete:^{
+        // optional handling
+    }];
+
+    AsyncHandle handle = [realm beginAsyncWriteTransaction:^{
+        [StringObject createInRealm:realm withValue:@[@"string"]];
+        [realm commitAsyncWriteTransaction];
+    }];
+
+    AsyncHandle handle = [realm beginAsyncWriteTransaction:^{
+        [realm cancelAsyncTransaction:handle];
+    }];
+```
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
