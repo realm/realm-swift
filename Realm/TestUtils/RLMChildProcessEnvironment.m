@@ -66,7 +66,6 @@
 
 + (RLMChildProcessEnvironment *)current {
     NSDictionary<NSString *, NSString *> *environment = [NSProcessInfo processInfo].environment;
-    NSString *shouldCleanUpOnTermination = [environment objectForKey:@"RLMChildShouldCleanUpOnTermination"] ?: @"YES";
     NSString *identifier = [environment objectForKey:@"RLMChildIdentifier"] ?: @"0";
     NSString *appIds = environment[@"RLMParentAppIds"] ?: @"";
 
