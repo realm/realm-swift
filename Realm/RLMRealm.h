@@ -502,43 +502,66 @@ typedef void (^RLMNotificationBlock)(RLMNotification notification, RLMRealm *rea
 
 #ifdef REALM_ASYNC_WRITES
 
+/**
+ AsyncHandle A handle for asynchronous transaction returned
+ by `beginAsyncWriteTransaction:` or `commitAsyncWriteTransaction:` calls.
+ Can be used to cancel the transaction.
+*/
 typedef unsigned AsyncHandle;
 /**
  Indicates if the Realm is currently engaged in an async write transaction.
-
- @warning   Do not simply check this property and then start a write transaction whenever an object needs to be
-            created, updated, or removed. Doing so might cause a large number of write transactions to be created,
-            degrading performance. Instead, always prefer performing multiple updates during a single transaction.
+ @warning Do not simply check this property and then start a write transaction whenever an object needs to be
+ created, updated, or removed. Doing so might cause a large number of write transactions to be created,
+ degrading performance. Instead, always prefer performing multiple updates during a single transaction.
  */
 @property (nonatomic, readonly) BOOL inAsyncWriteTransaction;
-
 /**
- Asynchronous (write)transaction.
- * 'the_write_block' is queued for execution on the scheduler
-   associated with the current realm. It will run after the write
-   mutex has been acquired.
- * If 'notify_only' is false, 'the_block' should end by calling commit_transaction(),
-   cancel_transaction() or async_commit_transaction().
- * If 'notify_only' is false, returning without one of these calls will be equivalent to calling
-   cancel_transaction().
- * If 'notify_only' is true, 'the_block' should only be used for signalling that
-   a write transaction can proceed, but must not itself call async_commit() or cancel_transaction()
- * The call returns immediately allowing the caller to proceed
-   while the write mutex is held by someone else.
- * Write blocks from multiple calls to async_transaction() will be
-   executed in order.
- * A later call to async_begin_transaction() will wait for any earlier write blocks.
+ Begins asynchronous write transaction.
+ @param block The block containing actions to perform.
+ `block` should end by calling `commitAsyncWriteTransaction`(), `cancelAsyncTransaction:`,
+ `commitWriteTransaction` or `cancelWriteTransaction`.
+ Returning without one of these calls will be equivalent to calling `cancelAsyncTransaction`.
+ @return Asynchronous transaction's handle.
+ @note `block` is queued for execution on the scheduler associated with the current realm.
+ It will run after the write mutex has been acquired.
+ The call returns immediately allowing the caller to proceed while the write mutex is held by someone else.
+ Write blocks from multiple calls to `beginAsyncWriteTransaction:` or `asyncTransactionWithBlock:`
+ will be executed in order.
+ A later call to `beginAsyncWriteTransaction:` or `asyncTransactionWithBlock:` will wait for any earlier
+ write blocks.
  */
-- (AsyncHandle)beginAsyncWriteTransaction:(void(^)())block notifyOnly:(bool)notifyOnly;
 - (AsyncHandle)beginAsyncWriteTransaction:(void(^)())block;
+/** Commit asynchronous transaction.
+ @param doneBlock  is queued for execution on the scheduler associated with
+   the current realm. It will run after the commit has reached stable storage.
+ @param isGroupingAllowed
+ * The call returns immediately allowing the caller to proceed while
+   the I/O is performed on a dedicated background thread.
+ * Callbacks to `doneBlock` will occur in the order of `commitAsyncWriteTransaction`
+ * If `isGroupingAllowed` is set, the next `commitAsyncWriteTransaction` *may* run without an
+   intervening synchronization of stable storage.
+ * Such a sequence of commits form a group. In case of a platform crash,
+   either none or all of the commits in a group will reach stable storage.
+*/
+- (AsyncHandle)commitAsyncWriteTransaction:(nullable void(^)())doneBlock isGroupingAllowed:(BOOL)isGroupingAllowed;
+/// :nodoc:
+- (AsyncHandle)commitAsyncWriteTransaction:(nullable void(^)())doneBlock;
+/// :nodoc:
 - (AsyncHandle)commitAsyncWriteTransaction;
-- (AsyncHandle)commitAsyncWriteTransaction:(nullable void(^)())block;
-- (AsyncHandle)commitAsyncWriteTransaction:(nullable void(^)())block isGroupingAllowed:(BOOL)isGroupingAllowed;
-//- (void)commitAsyncWriteTransactionWithoutNotifying:error:;
+/** Cancel a queued code block (either for an `asyncTransactionWithBlock`
+ or for an `commitAsyncWriteTransaction`)
+ @note Cancelling a commit will not abort the commit, it will only
+ cancel the callback informing of commit completion.
+*/
 - (void)cancelAsyncTransaction:(AsyncHandle)handle;
-- (void)asyncTransactionWithBlock:(void(^)())block onComplete:(nullable void(^)())completeBlock;
-//- (void)asyncWriteTransactionWithoutNotifying:block:;
-//- (void)asyncWriteTransactionWithoutNotifying:block:error:;
+/** Commits a code block to asynchronous transactions queue.
+ @param block  The block containing actions to perform.
+ @param doneBlock  is queued for execution on the scheduler associated with
+ the current realm. It will run after the commit has reached stable storage.
+*/
+- (void)asyncTransactionWithBlock:(void(^)())block onComplete:(nullable void(^)())doneBlock;
+- (void)asyncTransactionWithBlock:(void(^)())block;
+
 #endif // REALM_ASYNC_WRITES
 
 /**

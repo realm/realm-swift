@@ -1668,13 +1668,12 @@
 				3F73BC8B1E3A876600FE80B6 /* RLMTestUtils.m */,
 				49D9DFC4246C8E48003AD31D /* setup_baas.rb */,
 				3F9ADA9326E7E87B007349A5 /* SwiftCollectionSyncTests.swift */,
-                AC8AE64A26BAD4B00037D4E5 /* SwiftMongoClientTests.swift */,
+				AC8AE64A26BAD4B00037D4E5 /* SwiftMongoClientTests.swift */,
 				AC7D182C261F2F560080E1D2 /* SwiftObjectServerPartitionTests.swift */,
 				1AA5AE9F1D98C99500ED8C27 /* SwiftObjectServerTests.swift */,
 				AC2C2A3E268E1ACE00B4DA33 /* SwiftServerObjects.swift */,
 				1AA5AE961D989BE000ED8C27 /* SwiftSyncTestCase.swift */,
 				AC8846B62687BC4100DF4A65 /* SwiftUIServerTests.swift */,
-				AC8AE64826B861E60037D4E5 /* SwiftMongoClientTests.swift */,
 			);
 			name = "Object Server Tests";
 			sourceTree = "<group>";

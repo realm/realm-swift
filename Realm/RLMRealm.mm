@@ -720,18 +720,16 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     return _realm->async_commit_transaction();
 }
 
-- (AsyncHandle)commitAsyncWriteTransaction:(nullable void(^)())block {
-    if (block) {
-        std::function<void()> f_name = [block]() { block(); };
-        return _realm->async_commit_transaction(f_name);
+- (AsyncHandle)commitAsyncWriteTransaction:(nullable void(^)())doneBlock {
+    if (doneBlock) {
+        return _realm->async_commit_transaction(doneBlock);
     }
     return _realm->async_commit_transaction();
 }
 
-- (AsyncHandle)commitAsyncWriteTransaction:(nullable void(^)())block isGroupingAllowed:(BOOL)isGroupingAllowed {
-    if (block) {
-        std::function<void()> f_name = [block]() { block(); };
-        return _realm->async_commit_transaction(f_name, isGroupingAllowed);
+- (AsyncHandle)commitAsyncWriteTransaction:(nullable void(^)())doneBlock isGroupingAllowed:(BOOL)isGroupingAllowed {
+    if (doneBlock) {
+        return _realm->async_commit_transaction(doneBlock, isGroupingAllowed);
     }
     return _realm->async_commit_transaction(nil, isGroupingAllowed);
 }
@@ -740,13 +738,17 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     _realm->async_cancel_transaction(handle);
 }
 
-- (void)asyncTransactionWithBlock:(void(^)())block onComplete:(nullable void (^)())completeBlock {
+- (void)asyncTransactionWithBlock:(void(^)())block onComplete:(nullable void (^)())doneBlock {
     AsyncHandle transaction = [self beginAsyncWriteTransaction: ^{
         block();
         if (_realm->is_in_async_transaction()) {
-            [self commitAsyncWriteTransaction:completeBlock];
+            [self commitAsyncWriteTransaction:doneBlock];
         }
     }];
+}
+
+- (void)asyncTransactionWithBlock:(void(^)())block {
+    [self asyncTransactionWithBlock:block onComplete:nil];
 }
 
 #endif // REALM_ASYNC_WRITES
