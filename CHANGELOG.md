@@ -23,7 +23,6 @@ The feature can be enabled with the build flag `REALM_ASYNC_WRITES`.
         [realm cancelAsyncTransaction:handle];
     }];
 ```
-* None.
 
 ### Fixed
 * Add missing `Indexable` support for UUID. 
