@@ -68,8 +68,6 @@ RLMSyncSystemErrorKind errorKindForSyncError(SyncError error) {
 
 - (instancetype)initWithRawConfig:(realm::SyncConfig)config {
     if (self = [super init]) {
-        //TODO: We should be able to get this is a flexible sync configurations from core
-        _isFlexibleSync = false;
         _config = std::make_unique<realm::SyncConfig>(std::move(config));
     }
     return self;
@@ -117,6 +115,10 @@ RLMSyncSystemErrorKind errorKindForSyncError(SyncError error) {
     _config->cancel_waits_on_nonfatal_error = cancelAsyncOpenOnNonFatalErrors;
 }
 
+- (bool)isFlexibleSync {
+    return _config->flx_sync_requested;
+}
+
 - (instancetype)initWithUser:(RLMUser *)user
               partitionValue:(nullable id<RLMBSON>)partitionValue {
     return [self initWithUser:user
@@ -154,13 +156,16 @@ RLMSyncSystemErrorKind errorKindForSyncError(SyncError error) {
                   stopPolicy:(RLMSyncStopPolicy)stopPolicy
               isFlexibleSync:(BOOL)isFlexibleSync {
     if (self = [super init]) {
-        _isFlexibleSync = isFlexibleSync;
-        std::stringstream s;
-        s << RLMConvertRLMBSONToBson(partitionValue);
-        _config = std::make_unique<SyncConfig>(
-            [user _syncUser],
-            s.str()
-        );
+        if (isFlexibleSync) {
+            _config = std::make_unique<SyncConfig>([user _syncUser], SyncConfig::FLXSyncEnabled{});
+        } else {
+            std::stringstream s;
+            s << RLMConvertRLMBSONToBson(partitionValue);
+            _config = std::make_unique<SyncConfig>(
+                                                   [user _syncUser],
+                                                   s.str()
+                                                   );
+        }
         _config->stop_policy = translateStopPolicy(stopPolicy);
         RLMSyncManager *manager = [user.app syncManager];
         __weak RLMSyncManager *weakManager = manager;

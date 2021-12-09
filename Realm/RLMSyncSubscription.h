@@ -42,6 +42,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, readonly) NSDate *updatedAt;
 
+@property (nonatomic, readonly) NSString *errorMessage;
+
 - (void)updateSubscriptionWithClassName:(NSString *)objectClassName
                                   where:(NSString *)predicateFormat, ...;
 
@@ -56,11 +58,18 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface RLMSyncSubscriptionSet : NSObject <NSFastEnumeration>
 
+@property (readonly) NSUInteger count;
+
 #pragma mark - Batch Update subscriptions
 
-- (BOOL)write:(__attribute__((noescape)) void(^)(void))block;
+- (BOOL)write:(__attribute__((noescape)) void(^)(void))block NS_SWIFT_UNAVAILABLE("");
 
 - (BOOL)write:(__attribute__((noescape)) void(^)(void))block error:(NSError **)error;
+
+typedef void(^RLMSyncSubscriptionCallback)(NSError * _Nullable error);
+
+- (BOOL)writeAsync:(__attribute__((noescape)) void(^)(void))block
+          callback:(RLMSyncSubscriptionCallback)callback;
 
 #pragma mark - Check Subscription State
 

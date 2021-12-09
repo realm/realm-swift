@@ -34,9 +34,9 @@
 @implementation RLMFlexibleSyncTestCase
 - (RLMRealm *)flexibleSyncRealmForUser:(RLMUser *)user {
     RLMRealmConfiguration *config = [user flexibleSyncConfiguration];
-    config.objectClasses = @[Dog.self, Person.self];
+    config.objectClasses = @[Dog.self,
+                             Person.self];
     RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
-    [self waitForDownloadsForRealm:realm];
     return realm;
 }
 
@@ -481,7 +481,6 @@
     XCTAssertNil(foundSubscription);
 }
 
-// This is failing because when removing the indexes are not been updated
 - (void)testRemoveAllSubscriptionForType {
     RLMRealm *realm = [self getFlexibleSyncRealm];
     RLMSyncSubscriptionSet *subs = realm.subscriptions;
@@ -512,7 +511,7 @@
     XCTAssertNotNil(foundSubscription);
 
     [subs write:^{
-        [subs removeAllSubscriptionsWithClassName:Person.className];
+        [subs removeAllSubscriptionsWithClassName:Dog.className];
     }];
 
     XCTAssertEqual(subs.version, 3);

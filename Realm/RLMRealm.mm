@@ -1047,16 +1047,9 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
 
 - (RLMSyncSubscriptionSet *)subscriptions {
     if (_realm->config().sync_config) {
-        // TODO: Review this, it is the best way to identify if the configuration is flx
-        if (self.configuration.syncConfiguration.isFlexibleSync) {
+        if (_realm->config().sync_config->flx_sync_requested) {
 #if REALM_ENABLE_SYNC
-            try {
-                auto subscriptionSet = _realm->get_latest_subscription_set();
-                return [[RLMSyncSubscriptionSet alloc] initWithSubscriptionSet:subscriptionSet realm:self];
-            }
-            catch (std::exception const& e) {
-                @throw RLMException(e);
-            }
+            return [[RLMSyncSubscriptionSet alloc] initWithSubscriptionSet:_realm->get_latest_subscription_set() realm:self];
 #else
             @throw RLMException(@"Realm was not built with sync enabled");
 #endif

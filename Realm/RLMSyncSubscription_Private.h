@@ -30,15 +30,15 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, readonly) NSString *objectClassName;
 
+- (instancetype)initWithSubscription:(RLMSyncSubscription *)subscription;
+
 @end
 
 #pragma mark - SubscriptionSet
 
 @interface RLMSyncSubscriptionSet ()
 
-@property(readonly) uint64_t version;
-
-@property(readonly) uint64_t count;
+@property (readonly) uint64_t version;
 
 #pragma mark - Properties
 
@@ -48,9 +48,6 @@ NS_ASSUME_NONNULL_BEGIN
                     subscriptionName:(nullable NSString *)name
                            predicate:(NSPredicate *)predicate
                       updateExisting:(BOOL)updateExisting;
-
-typedef void(^RLMSyncSubscriptionCallback)(NSError * _Nullable error);
-
 @end
 
 NS_ASSUME_NONNULL_END

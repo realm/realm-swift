@@ -53,8 +53,7 @@
 
     if (syncConfiguration.customFileURL) {
         self.config.path = syncConfiguration.customFileURL.path.UTF8String;
-    } else if (syncConfiguration.isFlexibleSync) {
-        // TODO: Review this, it is the best way to identify if the configuration is flx
+    } else if (self.config.sync_config->flx_sync_requested) {
         std::string str = std::string([@"default" UTF8String]);
         self.config.path = [user pathForValue:str];
     } else {
@@ -69,14 +68,7 @@
         return nil;
     }
     realm::SyncConfig& sync_config = *self.config.sync_config;
-    // TODO: Fix this to not be dependable on the path to be a condition to be flexible sync, 
-    RLMSyncConfiguration *syncConfig = [[RLMSyncConfiguration alloc] initWithRawConfig:sync_config];
-    NSString *path = [NSString stringWithCString:self.config.path.c_str()
-                              encoding:[NSString defaultCStringEncoding]];
-    if ([path hasSuffix:@"default.realm"]) {
-        syncConfig.isFlexibleSync = true;
-    }
-    return syncConfig;
+    return [[RLMSyncConfiguration alloc] initWithRawConfig:sync_config];
 }
 
 @end

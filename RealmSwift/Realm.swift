@@ -970,8 +970,8 @@ extension Realm {
 
      Add/Remove/Update a subscription can only happen within a write subscription block.
      */
-    internal var subscriptions: SubscriptionSet {
-        return rlmRealm.subscriptions
+    public var subscriptions: SyncSubscriptionSet {
+        return SyncSubscriptionSet(rlmRealm.subscriptions)
     }
 }
 

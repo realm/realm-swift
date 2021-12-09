@@ -37,34 +37,64 @@ class SwiftFlexibleSyncTestCase: SwiftSyncTestCase {
         waitForDownloads(for: realm)
         return realm
     }
+
+    func getFlexibleSyncRealm() throws -> Realm {
+        let appId = try RealmServer.shared.createAppForSyncMode(.flx)
+        let app = app(fromAppId: appId)
+        let user = try logInUser(for: basicCredentials(app: app), app: app)
+        return try openFlexibleSyncRealm(user: user)
+    }
 }
 
 class SwiftFlexibleSyncServerTests: SwiftFlexibleSyncTestCase {
-    func testCreateFlexibleSyncApp() {
-        do {
-            let appId = try RealmServer.shared.createAppForSyncMode(.flx)
-            let app = app(fromAppId: appId)
-            let user = try logInUser(for: basicCredentials(app: app), app: app)
-            XCTAssertNotNil(user)
-        } catch {
-            XCTFail("Got an error: \(error)")
-        }
+    func testCreateFlexibleSyncApp() throws {
+        let appId = try RealmServer.shared.createAppForSyncMode(.flx)
+        let app = app(fromAppId: appId)
+        let user = try logInUser(for: basicCredentials(app: app), app: app)
+        XCTAssertNotNil(user)
     }
 
-    func testBasicFlexibleSyncOpenRealm() {
-        do {
-            let appId = try RealmServer.shared.createAppForSyncMode(.flx)
-            let app = app(fromAppId: appId)
-            let user = try logInUser(for: basicCredentials(app: app), app: app)
-            let realm = try openFlexibleSyncRealm(user: user)
-            XCTAssertNotNil(realm)
-            XCTAssert(realm.isEmpty, "Freshly synced Realm was not empty...")
-        } catch {
-            XCTFail("Got an error: \(error)")
-        }
+    func testFlexibleSyncOpenRealm() throws {
+        let realm = try getFlexibleSyncRealm()
+        XCTAssertNotNil(realm)
+    }
+
+    func testGetSubscriptionsWhenLocalRealm() throws {
+        let realm = try Realm()
+        assertThrows(realm.subscriptions,
+                     reason: "Realm was not build for a sync session")
+    }
+
+    func testGetSubscriptionsWhenPbsRealm() throws {
+        let user = try logInUser(for: basicCredentials())
+        let realm = try openRealm(partitionValue: #function, user: user)
+        assertThrows(realm.subscriptions,
+                     reason: "Realm sync session is not Flexible Sync")
+    }
+
+    func testGetSubscriptions() throws {
+        let realm = try getFlexibleSyncRealm()
+        let subscriptions = realm.subscriptions
+        XCTAssertEqual(subscriptions.count, 0)
+    }
+
+    func testAddSubscription() throws {
+//        let realm = try getFlexibleSyncRealm()
+//        let subscriptions = realm.subscriptions
+//        try subscriptions.write {
+////            subscriptions.append {
+//              let subscription1 =  SyncSubscription<SwiftPerson>(name: "person_age") {
+//                    $0.age > 15
+//                }
+//        let subscription2 = SyncSubscription<SwiftPerson>(name: "person_age") {
+//              $0.age > 15
+//          }
+//        let arraySub = [AnySyncSubscription(subscription1), AnySyncSubscription(subscription2)]
+//
+////            }
+////        }
     }
 }
-
 // MARK: - Completion Block
 extension SwiftFlexibleSyncServerTests {
 }

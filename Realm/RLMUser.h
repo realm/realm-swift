@@ -115,7 +115,7 @@ NS_ASSUME_NONNULL_BEGIN
  a realm with a flexible sync configuration, you won't be able to open a realm with a PBS configuration
  and the other way around.
 
- @return A `Realm.Configuration` instance with a flexible sync configuration.
+ @return A `RLMRealmConfiguration` instance with a flexible sync configuration.
  */
 - (RLMRealmConfiguration *)flexibleSyncConfiguration NS_REFINED_FOR_SWIFT;
 
