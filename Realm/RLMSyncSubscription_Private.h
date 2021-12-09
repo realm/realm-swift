@@ -30,8 +30,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, readonly) NSString *objectClassName;
 
-- (instancetype)initWithSubscription:(RLMSyncSubscription *)subscription;
-
 @end
 
 #pragma mark - SubscriptionSet

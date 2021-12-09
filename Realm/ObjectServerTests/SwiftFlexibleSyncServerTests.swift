@@ -31,10 +31,10 @@ class SwiftFlexibleSyncTestCase: SwiftSyncTestCase {
     func openFlexibleSyncRealm(user: User) throws -> Realm {
         var config = user.flexibleSyncConfiguration()
         if config.objectTypes == nil {
-            config.objectTypes = [SwiftPerson.self]
+            config.objectTypes = [SwiftPerson.self,
+                                  SwiftTypesSyncObject.self]
         }
         let realm = try Realm(configuration: config)
-        waitForDownloads(for: realm)
         return realm
     }
 
@@ -78,21 +78,154 @@ class SwiftFlexibleSyncServerTests: SwiftFlexibleSyncTestCase {
         XCTAssertEqual(subscriptions.count, 0)
     }
 
-    func testAddSubscription() throws {
+    func testWriteEmptyBlock() throws {
+        let realm = try getFlexibleSyncRealm()
+        let subscriptions = realm.subscriptions
+        try subscriptions.write {
+        }
+
+        XCTAssertEqual(subscriptions.count, 0)
+    }
+
+    func testAddOneSubscriptionWithoutName() throws {
+        let realm = try getFlexibleSyncRealm()
+        let subscriptions = realm.subscriptions
+        try subscriptions.write {
+            subscriptions.append {
+                SyncSubscription<SwiftPerson> {
+                    $0.age > 15
+                }
+            }
+        }
+
+        XCTAssertEqual(subscriptions.count, 1)
+    }
+
+    func testAddOneSubscriptionWithName() throws {
+        let realm = try getFlexibleSyncRealm()
+        let subscriptions = realm.subscriptions
+        try subscriptions.write {
+            subscriptions.append {
+                SyncSubscription<SwiftPerson>(name: "person_age") {
+                    $0.age > 15
+                }
+            }
+        }
+
+        XCTAssertEqual(subscriptions.count, 1)
+    }
+
+    func testAddSeveralSubscriptionsWithoutName() throws {
+        let realm = try getFlexibleSyncRealm()
+        let subscriptions = realm.subscriptions
+        try subscriptions.write {
+            subscriptions.append {
+                SyncSubscription<SwiftPerson> {
+                    $0.age > 15
+                }
+                SyncSubscription<SwiftPerson> {
+                    $0.age > 20
+                }
+                SyncSubscription<SwiftPerson> {
+                    $0.age > 25
+                }
+            }
+        }
+
+        XCTAssertEqual(subscriptions.count, 3)
+    }
+
+    func testAddSeveralSubscriptionsWithName() throws {
+        let realm = try getFlexibleSyncRealm()
+        let subscriptions = realm.subscriptions
+        try subscriptions.write {
+            subscriptions.append {
+                SyncSubscription<SwiftPerson>(name: "person_age_15") {
+                    $0.age > 15
+                }
+                SyncSubscription<SwiftPerson>(name: "person_age_20") {
+                    $0.age > 20
+                }
+                SyncSubscription<SwiftPerson>(name: "person_age_25") {
+                    $0.age > 25
+                }
+            }
+        }
+        XCTAssertEqual(subscriptions.count, 3)
+    }
+
+    func testAddMixedSubscriptions() throws {
+        let realm = try getFlexibleSyncRealm()
+        let subscriptions = realm.subscriptions
+        try subscriptions.write {
+            subscriptions.append {
+                SyncSubscription<SwiftPerson>(name: "person_age_15") {
+                    $0.age > 15
+                }
+            }
+            subscriptions.append {
+                SyncSubscription<SwiftTypesSyncObject> {
+                    $0.boolCol == true
+                }
+                SyncSubscription<SwiftTypesSyncObject>(name: "object_date_now") {
+                    $0.dateCol <= Date()
+                }
+            }
+        }
+        XCTAssertEqual(subscriptions.count, 3)
+    }
+
+    func testAddDuplicateSubscriptions() throws {
+        let realm = try getFlexibleSyncRealm()
+        let subscriptions = realm.subscriptions
+        try subscriptions.write {
+            subscriptions.append {
+                SyncSubscription<SwiftPerson> {
+                    $0.age > 15
+                }
+                SyncSubscription<SwiftPerson> {
+                    $0.age > 15
+                }
+            }
+        }
+        XCTAssertEqual(subscriptions.count, 1)
+    }
+
+    func testAddDuplicateSubscriptionWithDifferentName() throws {
+        let realm = try getFlexibleSyncRealm()
+        let subscriptions = realm.subscriptions
+        try subscriptions.write {
+            subscriptions.append {
+                SyncSubscription<SwiftPerson>(name: "person_age_1") {
+                    $0.age > 15
+                }
+                SyncSubscription<SwiftPerson>(name: "person_age_2") {
+                    $0.age > 15
+                }
+            }
+        }
+        XCTAssertEqual(subscriptions.count, 2)
+
+        let foundSubscription1 = subscriptions.first(named: "person_age_1")
+        XCTAssertNotNil(foundSubscription1)
+        let foundSubscription2 = subscriptions.first(named: "person_age_2")
+        XCTAssertNotNil(foundSubscription2)
+
+        XCTAssertNotEqual(foundSubscription1!.name, foundSubscription2!.name)
+    }
+
+    // Test duplicate named subscription handle error
+    func testSameNamedSubscriptionThrows() throws {
 //        let realm = try getFlexibleSyncRealm()
 //        let subscriptions = realm.subscriptions
 //        try subscriptions.write {
-////            subscriptions.append {
-//              let subscription1 =  SyncSubscription<SwiftPerson>(name: "person_age") {
+//            subscriptions.append {
+//                SyncSubscription<SwiftPerson>(name: "person_age_1") {
 //                    $0.age > 15
 //                }
-//        let subscription2 = SyncSubscription<SwiftPerson>(name: "person_age") {
-//              $0.age > 15
-//          }
-//        let arraySub = [AnySyncSubscription(subscription1), AnySyncSubscription(subscription2)]
-//
-////            }
-////        }
+//            }
+//        }
+//        XCTAssertEqual(subscriptions.count, 2)
     }
 }
 // MARK: - Completion Block

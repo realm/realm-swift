@@ -160,79 +160,101 @@ private final class _AnySyncSubscription: _AnySyncSubscriptionBase {
      - parameter to: A query builder that produces a subscription which can be used to
                      update the subscription query and/or name.
      */
-    override func update<T>(_ to: () -> (SyncSubscription<T>)) throws where T: _RealmSchemaDiscoverable {
-        fatalError()
-    }
+//    override func update<T>(_ to: () -> (SyncSubscription<T>)) throws where T: _RealmSchemaDiscoverable {
+//        fatalError()
+//    }
     #endif // swift(>=5.4)
 }
 
-//internal protocol _AnySyncSubscriptionBox {
-//    // `Differentiable` requirements.
-//    mutating func _move(by offset: AnyDerivative)
-//
-//    /// The underlying base value, type-erased to `Any`.
-//    var _typeErasedBase: Any { get }
-//
-//    /// Returns the underlying value unboxed to the given type, if possible.
-//    func _unboxed<U: Differentiable>(to type: U.Type) -> U?
-//}
-//
-//internal struct _ConcreteSyncSubscriptionBox<T: _SyncSubscription>: _AnySyncSubscriptionBox
-//{
-//  /// The underlying base value.
-//  var _base: T
-//
-//  init(_ base: T) {
-//    self._base = base
-//  }
-//
-//  /// The underlying base value, type-erased to `Any`.
-//  var _typeErasedBase: Any {
-//    return _base
-//  }
-//}
-//
-//public struct AnySyncSubscription: _SyncSubscription {
-//    internal var _box: _AnySyncSubscriptionBox
-//
-//    internal init(_box: _AnySyncSubscriptionBox) {
-//        self._box = _box
-//    }
-//
-//    /// The underlying base value.
-//    public var base: Any {
-//        return _box._typeErasedBase
-//    }
-//
-//    /// Creates a type-erased derivative from the given derivative.
-//    @differentiable(reverse)
-//    public init<T: Differentiable>(_ base: T) {
-//        self._box = _ConcreteDifferentiableBox<T>(base)
-//    }
-//}
+public protocol _TestSyncSubscription {
+    var name: String? { get }
+    var className: String { get }
+    var predicate: NSPredicate { get }
+}
+
+internal protocol _AnySyncSubscriptionBox {
+    /// The underlying base value, type-erased to `Any`.
+    var _typeErasedBase: Any { get }
+
+    var name: String? { get }
+
+    var className: String { get }
+
+    var predicate: NSPredicate { get }
+}
+
+internal struct _ConcreteSyncSubscriptionBox<T: _TestSyncSubscription>: _AnySyncSubscriptionBox {
+    /// The underlying base value.
+    var _base: T
+
+    init(_ base: T) {
+        self._base = base
+    }
+
+    /// The underlying base value, type-erased to `Any`.
+    var _typeErasedBase: Any {
+        return _base
+    }
+
+    public var name: String? { self._base.name }
+
+    public var className: String { self._base.className }
+
+    public var predicate: NSPredicate { self._base.predicate }
+}
+
+public struct _AnyTestSyncSubscription: _TestSyncSubscription {
+
+    internal var _box: _AnySyncSubscriptionBox
+
+    public init<T: _TestSyncSubscription>(_ base: T) {
+        self._box = _ConcreteSyncSubscriptionBox<T>(base)
+    }
+
+    /// The underlying base value.
+    public var base: Any {
+        return _box._typeErasedBase
+    }
+
+    public var name: String? {
+        return _box.name
+    }
+
+    public var className: String {
+        return _box.className
+    }
+
+    public var predicate: NSPredicate {
+        return _box.predicate
+    }
+}
 
 /**
  `SyncSubscription` is  used to define a Flexible Sync's subscription, which
  can be added/remove or updated within a write subscription transaction.
  */
-@frozen public struct SyncSubscription<ObjectType: _RealmSchemaDiscoverable> {
+@frozen public struct SyncSubscription<ObjectType: _RealmSchemaDiscoverable>: _TestSyncSubscription {
     public typealias QueryFunction = (Query<ObjectType>) -> Query<ObjectType>
-    internal let name: String
-    internal let query: QueryFunction
-    public init(name: String = "", query: @escaping QueryFunction) {
+    public let name: String?
+    public let query: QueryFunction
+    public init(name: String? = nil, query: @escaping QueryFunction) {
         self.name = name
         self.query = query
     }
 
-    internal var classname: String {
+    public var className: String {
         return "\(ObjectType.self)"
+    }
+
+    public var predicate: NSPredicate {
+        return query(Query()).predicate
     }
 }
 
 #if swift(>=5.4)
 @resultBuilder public struct QueryBuilder {
-    public static func buildBlock<T: _RealmSchemaDiscoverable>(_ component: SyncSubscription<T>) -> SyncSubscription<T> {
-        return component
+    public static func buildBlock<T: _RealmSchemaDiscoverable>(_ components: SyncSubscription<T>...) -> [_AnyTestSyncSubscription] {
+        return components.map { _AnyTestSyncSubscription($0) }
     }
 }
 #endif // swift(>=5.4)
@@ -301,10 +323,10 @@ private final class _AnySyncSubscription: _AnySyncSubscriptionBase {
                         the subscription by query and/or name.
      - returns: An `AnySyncSubscription` struct encapsulating the subscription we are searching for.
      */
-    public func first<ObjectType: Object>(@QueryBuilder _ `where`: () -> (SyncSubscription<ObjectType>)) -> AnySyncSubscription? {
+    public func first<T: _RealmSchemaDiscoverable>(`where`: () -> (SyncSubscription<T>)) -> AnySyncSubscription? {
         let subscription = `where`()
-        let predicate = subscription.query(Query()).predicate
-        let rlmSubscription = rlmSyncSubscriptionSet.subscription(withClassName: subscription.classname, predicate: predicate)
+        let rlmSubscription = rlmSyncSubscriptionSet.subscription(withClassName: subscription.className,
+                                                                  predicate: subscription.predicate)
         guard let rlmSubscription = rlmSubscription else {
             return nil
         }
@@ -319,14 +341,15 @@ private final class _AnySyncSubscription: _AnySyncSubscriptionBase {
      - warning: This method may only be called during a write subscription block.
 
      - parameter to: A query builder that produces a subscription which can be added to the
-                     subscription set.
+     subscription set.
      */
-    public func `append`<ObjectType: Object>(@QueryBuilder _ to: () -> (SyncSubscription<ObjectType>)) {
-        let subscription = to()
-        let predicate = subscription.query(Query()).predicate
-        rlmSyncSubscriptionSet.addSubscription(withClassName: subscription.classname,
-                                               subscriptionName: subscription.name,
-                                               predicate: predicate)
+    public func `append`(@QueryBuilder _ subscriptions: () -> ([_AnyTestSyncSubscription])) {
+        let appendableSubscriptions = subscriptions()
+        appendableSubscriptions.forEach { subscription in
+            rlmSyncSubscriptionSet.addSubscription(withClassName: subscription.className,
+                                                   subscriptionName: subscription.name,
+                                                   predicate: subscription.predicate)
+        }
     }
 
     /**
@@ -338,10 +361,12 @@ private final class _AnySyncSubscription: _AnySyncSubscriptionBase {
      - parameter to: A query builder that produces a subscription which will be removed from the
      subscription set.
      */
-    public func remove<ObjectType: Object>(@QueryBuilder _ to: () -> ( SyncSubscription<ObjectType>)) {
-        let subscription = to()
-        let predicate = subscription.query(Query()).predicate
-        rlmSyncSubscriptionSet.removeSubscription(withClassName: subscription.classname, predicate: predicate)
+    public func remove(@QueryBuilder _ subscriptions: () -> ([_AnyTestSyncSubscription])) {
+        let removableSubscriptions = subscriptions()
+        removableSubscriptions.forEach { subscription in
+            rlmSyncSubscriptionSet.removeSubscription(withClassName: subscription.className,
+                                                      predicate: subscription.predicate)
+        }
     }
     #endif // swift(>=5.4)
 
@@ -354,8 +379,8 @@ ion
      - parameter subscription: The subscription to be removed from the subscription set.
      */
     public func remove(_ subscription: AnySyncSubscription) {
-//        rlmSyncSubscriptionSet.remove(subscription)
-        fatalError()
+//        rlmSyncSubscriptionSet.remove(subscription.)
+//        fatalError()
     }
 
     /**

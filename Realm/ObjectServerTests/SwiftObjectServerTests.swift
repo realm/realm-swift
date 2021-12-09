@@ -87,7 +87,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 XCTAssertEqual(obj.dateCol, Date(timeIntervalSince1970: -1))
                 XCTAssertEqual(obj.longCol, Int64(1))
                 XCTAssertEqual(obj.uuidCol, UUID(uuidString: "85d4fbee-6ec6-47df-bfa1-615931903d7e")!)
-                XCTAssertEqual(obj.anyCol.value.intValue, 1)
+                XCTAssertEqual(obj.anyCol.intValue, 1)
                 XCTAssertEqual(obj.objectCol!.firstName, "George")
 
             } else {

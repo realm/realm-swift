@@ -42,14 +42,6 @@
     }
 }
 
-//- (instancetype)initWithSubscription:(RLMSyncSubscription *)subscription {
-//    if (self = [super init]) {
-//        _subscription = subscription->_subscription;
-//        _subscriptionSet = subscription->_subscriptionSet;
-//        return self;
-//    }
-//}
-
 - (RLMObjectId *)identifier {
     return [[RLMObjectId alloc]initWithValue:_subscription->id()];
 }
