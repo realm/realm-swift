@@ -416,7 +416,7 @@ extension Query where T: RealmKeyedCollection {
     }
     /// Allows a query over all values in the Map.
     public var values: Query<T.Value> {
-        .init(keyPathErasingAnyPrefix(appending: "@allValues"))
+        .init(appendKeyPath("@allValues", options: []))
     }
     /// :nodoc:
     public subscript(member: T.Key) -> Query<T.Value> {
@@ -427,7 +427,7 @@ extension Query where T: RealmKeyedCollection {
 extension Query where T: RealmKeyedCollection, T.Value: OptionalProtocol, T.Value.Wrapped: _RealmSchemaDiscoverable {
     /// Allows a query over all values in the Map.
     public var values: Query<T.Value.Wrapped> {
-        .init(keyPathErasingAnyPrefix(appending: "@allValues"))
+        .init(appendKeyPath("@allValues", options: []))
     }
     /// :nodoc:
     public subscript(member: T.Key) -> Query<T.Value.Wrapped> {
@@ -442,7 +442,7 @@ extension Query where T: RealmKeyedCollection, T.Value: OptionalProtocol, T.Valu
 extension Query where T: RealmKeyedCollection, T.Key == String {
     /// Allows a query over all keys in the `Map`.
     public var keys: Query<String> {
-        .init(keyPathErasingAnyPrefix(appending: "@allKeys"))
+        .init(appendKeyPath("@allKeys", options: []))
     }
 }
 

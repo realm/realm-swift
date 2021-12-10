@@ -909,43 +909,43 @@ class QueryTests: TestCase {
 
     private func validateAllKeys<Root: Object, T: RealmKeyedCollection>(_ name: String, _ lhs: (Query<Root>) -> Query<T>)
             where T.Key == String {
-        assertQuery(Root.self, "(\(name).@allKeys == %@)", "foo", count: 1) {
+        assertQuery(Root.self, "(ANY \(name).@allKeys == %@)", "foo", count: 1) {
             lhs($0).keys == "foo"
         }
 
-        assertQuery(Root.self, "(\(name).@allKeys != %@)", "foo", count: 1) {
+        assertQuery(Root.self, "(ANY \(name).@allKeys != %@)", "foo", count: 1) {
             lhs($0).keys != "foo"
         }
 
-        assertQuery(Root.self, "(\(name).@allKeys CONTAINS[cd] %@)", "foo", count: 1) {
+        assertQuery(Root.self, "(ANY \(name).@allKeys CONTAINS[cd] %@)", "foo", count: 1) {
             lhs($0).keys.contains("foo", options: [.caseInsensitive, .diacriticInsensitive])
         }
 
-        assertQuery(Root.self, "(\(name).@allKeys CONTAINS %@)", "foo", count: 1) {
+        assertQuery(Root.self, "(ANY \(name).@allKeys CONTAINS %@)", "foo", count: 1) {
             lhs($0).keys.contains("foo")
         }
 
-        assertQuery(Root.self, "(\(name).@allKeys BEGINSWITH[cd] %@)", "foo", count: 1) {
+        assertQuery(Root.self, "(ANY \(name).@allKeys BEGINSWITH[cd] %@)", "foo", count: 1) {
             lhs($0).keys.starts(with: "foo", options: [.caseInsensitive, .diacriticInsensitive])
         }
 
-        assertQuery(Root.self, "(\(name).@allKeys BEGINSWITH %@)", "foo", count: 1) {
+        assertQuery(Root.self, "(ANY \(name).@allKeys BEGINSWITH %@)", "foo", count: 1) {
             lhs($0).keys.starts(with: "foo")
         }
 
-        assertQuery(Root.self, "(\(name).@allKeys ENDSWITH[cd] %@)", "foo", count: 1) {
+        assertQuery(Root.self, "(ANY \(name).@allKeys ENDSWITH[cd] %@)", "foo", count: 1) {
             lhs($0).keys.ends(with: "foo", options: [.caseInsensitive, .diacriticInsensitive])
         }
 
-        assertQuery(Root.self, "(\(name).@allKeys ENDSWITH %@)", "foo", count: 1) {
+        assertQuery(Root.self, "(ANY \(name).@allKeys ENDSWITH %@)", "foo", count: 1) {
             lhs($0).keys.ends(with: "foo")
         }
 
-        assertQuery(Root.self, "(\(name).@allKeys LIKE[c] %@)", "foo", count: 1) {
+        assertQuery(Root.self, "(ANY \(name).@allKeys LIKE[c] %@)", "foo", count: 1) {
             lhs($0).keys.like("foo", caseInsensitive: true)
         }
 
-        assertQuery(Root.self, "(\(name).@allKeys LIKE %@)", "foo", count: 1) {
+        assertQuery(Root.self, "(ANY \(name).@allKeys LIKE %@)", "foo", count: 1) {
             lhs($0).keys.like("foo")
         }
     }
@@ -958,61 +958,61 @@ class QueryTests: TestCase {
 
     func testMapAllValues() {
         % for property in mapProperties + optMapProperties:
-        assertQuery(${property.className}.self, "(${property.colName}.@allValues == %@)", ${property.enumValue(0)}, count: 1) {
+        assertQuery(${property.className}.self, "(ANY ${property.colName}.@allValues == %@)", ${property.enumValue(0)}, count: 1) {
             $0.${property.colName}.values == ${property.value(0)}
         }
 
         % count = 0 if property.category == 'bool' else 1
-        assertQuery(${property.className}.self, "(${property.colName}.@allValues != %@)", ${property.enumValue(0)}, count: ${count}) {
+        assertQuery(${property.className}.self, "(ANY ${property.colName}.@allValues != %@)", ${property.enumValue(0)}, count: ${count}) {
             $0.${property.colName}.values != ${property.value(0)}
         }
         % if property.category == 'numeric':
-        assertQuery(${property.className}.self, "(${property.colName}.@allValues > %@)", ${property.enumValue(0)}, count: 1) {
+        assertQuery(${property.className}.self, "(ANY ${property.colName}.@allValues > %@)", ${property.enumValue(0)}, count: 1) {
             $0.${property.colName}.values > ${property.value(0)}
         }
 
-        assertQuery(${property.className}.self, "(${property.colName}.@allValues >= %@)", ${property.enumValue(0)}, count: 1) {
+        assertQuery(${property.className}.self, "(ANY ${property.colName}.@allValues >= %@)", ${property.enumValue(0)}, count: 1) {
             $0.${property.colName}.values >= ${property.value(0)}
         }
-        assertQuery(${property.className}.self, "(${property.colName}.@allValues < %@)", ${property.enumValue(0)}, count: 0) {
+        assertQuery(${property.className}.self, "(ANY ${property.colName}.@allValues < %@)", ${property.enumValue(0)}, count: 0) {
             $0.${property.colName}.values < ${property.value(0)}
         }
 
-        assertQuery(${property.className}.self, "(${property.colName}.@allValues <= %@)", ${property.enumValue(0)}, count: 1) {
+        assertQuery(${property.className}.self, "(ANY ${property.colName}.@allValues <= %@)", ${property.enumValue(0)}, count: 1) {
             $0.${property.colName}.values <= ${property.value(0)}
         }
         % end
 
         % if property.category == 'string':
-        assertQuery(${property.className}.self, "(${property.colName}.@allValues CONTAINS[cd] %@)", ${property.enumValue(0)}, count: 1) {
+        assertQuery(${property.className}.self, "(ANY ${property.colName}.@allValues CONTAINS[cd] %@)", ${property.enumValue(0)}, count: 1) {
             $0.${property.colName}.values.contains(${property.value(0)}, options: [.caseInsensitive, .diacriticInsensitive])
         }
 
-        assertQuery(${property.className}.self, "(${property.colName}.@allValues CONTAINS %@)", ${property.enumValue(0)}, count: 1) {
+        assertQuery(${property.className}.self, "(ANY ${property.colName}.@allValues CONTAINS %@)", ${property.enumValue(0)}, count: 1) {
             $0.${property.colName}.values.contains(${property.value(0)})
         }
 
-        assertQuery(${property.className}.self, "(${property.colName}.@allValues BEGINSWITH[cd] %@)", ${property.enumValue(0)}, count: 1) {
+        assertQuery(${property.className}.self, "(ANY ${property.colName}.@allValues BEGINSWITH[cd] %@)", ${property.enumValue(0)}, count: 1) {
             $0.${property.colName}.values.starts(with: ${property.value(0)}, options: [.caseInsensitive, .diacriticInsensitive])
         }
 
-        assertQuery(${property.className}.self, "(${property.colName}.@allValues BEGINSWITH %@)", ${property.enumValue(0)}, count: 1) {
+        assertQuery(${property.className}.self, "(ANY ${property.colName}.@allValues BEGINSWITH %@)", ${property.enumValue(0)}, count: 1) {
             $0.${property.colName}.values.starts(with: ${property.value(0)})
         }
 
-        assertQuery(${property.className}.self, "(${property.colName}.@allValues ENDSWITH[cd] %@)", ${property.enumValue(0)}, count: 1) {
+        assertQuery(${property.className}.self, "(ANY ${property.colName}.@allValues ENDSWITH[cd] %@)", ${property.enumValue(0)}, count: 1) {
             $0.${property.colName}.values.ends(with: ${property.value(0)}, options: [.caseInsensitive, .diacriticInsensitive])
         }
 
-        assertQuery(${property.className}.self, "(${property.colName}.@allValues ENDSWITH %@)", ${property.enumValue(0)}, count: 1) {
+        assertQuery(${property.className}.self, "(ANY ${property.colName}.@allValues ENDSWITH %@)", ${property.enumValue(0)}, count: 1) {
             $0.${property.colName}.values.ends(with: ${property.value(0)})
         }
 
-        assertQuery(${property.className}.self, "(${property.colName}.@allValues LIKE[c] %@)", ${property.enumValue(0)}, count: 1) {
+        assertQuery(${property.className}.self, "(ANY ${property.colName}.@allValues LIKE[c] %@)", ${property.enumValue(0)}, count: 1) {
             $0.${property.colName}.values.like(${property.value(0)}, caseInsensitive: true)
         }
 
-        assertQuery(${property.className}.self, "(${property.colName}.@allValues LIKE %@)", ${property.enumValue(0)}, count: 1) {
+        assertQuery(${property.className}.self, "(ANY ${property.colName}.@allValues LIKE %@)", ${property.enumValue(0)}, count: 1) {
             $0.${property.colName}.values.like(${property.value(0)})
         }
         % end
@@ -1819,16 +1819,16 @@ class QueryTests: TestCase {
     %end
     func testAggregateNotSupported() {
         assertThrows(assertQuery("", count: 0) { $0.intCol.avg == 1 },
-                     reason: "Aggregate operations can only be used on key paths that include an collection property")
+                     reason: "Invalid keypath 'intCol.@avg': Property 'ModernAllTypesObject.intCol' is not a link or collection and can only appear at the end of a keypath.")
 
         assertThrows(assertQuery("", count: 0) { $0.doubleCol.max != 1 },
-                     reason: "Aggregate operations can only be used on key paths that include an collection property")
+                     reason: "Invalid keypath 'doubleCol.@max': Property 'ModernAllTypesObject.doubleCol' is not a link or collection and can only appear at the end of a keypath.")
 
         assertThrows(assertQuery("", count: 0) { $0.dateCol.min > Date() },
-                     reason: "Aggregate operations can only be used on key paths that include an collection property")
+                     reason: "Invalid keypath 'dateCol.@min': Property 'ModernAllTypesObject.dateCol' is not a link or collection and can only appear at the end of a keypath.")
 
         assertThrows(assertQuery("", count: 0) { $0.decimalCol.sum < 1 },
-                     reason: "Aggregate operations can only be used on key paths that include an collection property")
+                     reason: "Invalid keypath 'decimalCol.@sum': Property 'ModernAllTypesObject.decimalCol' is not a link or collection and can only appear at the end of a keypath.")
     }
 
     // MARK: Column comparison
