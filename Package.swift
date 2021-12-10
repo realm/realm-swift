@@ -150,6 +150,7 @@ let package = Package(
                 "RealmSwift.podspec",
                 "SUPPORT.md",
                 "build.sh",
+                "ci_scripts/ci_post_clone.sh",
                 "contrib",
                 "dependencies.list",
                 "docs",
