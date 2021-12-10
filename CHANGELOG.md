@@ -38,6 +38,10 @@ let people: Results<PersonProjection> = realm.objects(PersonProjection.self)
 * Queries on collections of PersistableEnums can now be performed with `where()`.
 * Add support for querying on the rawValue of an enum with `where()`.
 * `.count` is supported for Maps of all types rather than just numeric types in `where()`.
+* Add support for querying on the properties of objects contained in
+  dictionaries (e.g. "dictProperty.@allValues.name CONTAINS 'a'").
+* Improve the error message for many types of invalid predicates in queries.
+* Add support for comparing `@allKeys` to another property on the same object.
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
@@ -45,6 +49,10 @@ let people: Results<PersonProjection> = realm.objects(PersonProjection.self)
 * Add missing `Indexable` support for UUID. 
   ([Cocoa #7545](https://github.com/realm/realm-cocoa/issues/7545), since v10.10.0)
 * `where()` allowed constructing some nonsensical queries due to boolean comparisons returning `Query<T>` rather than `Query<Bool>`.
+* `@allValues` queries on dictionaries accidentally did not require "ANY".
+* Case-insensitive and diacritic-insensitive modifiers were ignored when
+  comparing the result of an aggregate operation to another property in a
+  query.
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 

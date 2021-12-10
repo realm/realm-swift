@@ -2544,43 +2544,43 @@ class QueryTests: TestCase {
 
     private func validateAllKeys<Root: Object, T: RealmKeyedCollection>(_ name: String, _ lhs: (Query<Root>) -> Query<T>)
             where T.Key == String {
-        assertQuery(Root.self, "(\(name).@allKeys == %@)", "foo", count: 1) {
+        assertQuery(Root.self, "(ANY \(name).@allKeys == %@)", "foo", count: 1) {
             lhs($0).keys == "foo"
         }
 
-        assertQuery(Root.self, "(\(name).@allKeys != %@)", "foo", count: 1) {
+        assertQuery(Root.self, "(ANY \(name).@allKeys != %@)", "foo", count: 1) {
             lhs($0).keys != "foo"
         }
 
-        assertQuery(Root.self, "(\(name).@allKeys CONTAINS[cd] %@)", "foo", count: 1) {
+        assertQuery(Root.self, "(ANY \(name).@allKeys CONTAINS[cd] %@)", "foo", count: 1) {
             lhs($0).keys.contains("foo", options: [.caseInsensitive, .diacriticInsensitive])
         }
 
-        assertQuery(Root.self, "(\(name).@allKeys CONTAINS %@)", "foo", count: 1) {
+        assertQuery(Root.self, "(ANY \(name).@allKeys CONTAINS %@)", "foo", count: 1) {
             lhs($0).keys.contains("foo")
         }
 
-        assertQuery(Root.self, "(\(name).@allKeys BEGINSWITH[cd] %@)", "foo", count: 1) {
+        assertQuery(Root.self, "(ANY \(name).@allKeys BEGINSWITH[cd] %@)", "foo", count: 1) {
             lhs($0).keys.starts(with: "foo", options: [.caseInsensitive, .diacriticInsensitive])
         }
 
-        assertQuery(Root.self, "(\(name).@allKeys BEGINSWITH %@)", "foo", count: 1) {
+        assertQuery(Root.self, "(ANY \(name).@allKeys BEGINSWITH %@)", "foo", count: 1) {
             lhs($0).keys.starts(with: "foo")
         }
 
-        assertQuery(Root.self, "(\(name).@allKeys ENDSWITH[cd] %@)", "foo", count: 1) {
+        assertQuery(Root.self, "(ANY \(name).@allKeys ENDSWITH[cd] %@)", "foo", count: 1) {
             lhs($0).keys.ends(with: "foo", options: [.caseInsensitive, .diacriticInsensitive])
         }
 
-        assertQuery(Root.self, "(\(name).@allKeys ENDSWITH %@)", "foo", count: 1) {
+        assertQuery(Root.self, "(ANY \(name).@allKeys ENDSWITH %@)", "foo", count: 1) {
             lhs($0).keys.ends(with: "foo")
         }
 
-        assertQuery(Root.self, "(\(name).@allKeys LIKE[c] %@)", "foo", count: 1) {
+        assertQuery(Root.self, "(ANY \(name).@allKeys LIKE[c] %@)", "foo", count: 1) {
             lhs($0).keys.like("foo", caseInsensitive: true)
         }
 
-        assertQuery(Root.self, "(\(name).@allKeys LIKE %@)", "foo", count: 1) {
+        assertQuery(Root.self, "(ANY \(name).@allKeys LIKE %@)", "foo", count: 1) {
             lhs($0).keys.like("foo")
         }
     }
@@ -2634,936 +2634,936 @@ class QueryTests: TestCase {
     }
 
     func testMapAllValues() {
-        assertQuery(ModernAllTypesObject.self, "(mapBool.@allValues == %@)", true, count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapBool.@allValues == %@)", true, count: 1) {
             $0.mapBool.values == true
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapBool.@allValues != %@)", true, count: 0) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapBool.@allValues != %@)", true, count: 0) {
             $0.mapBool.values != true
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapInt.@allValues == %@)", 5, count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapInt.@allValues == %@)", 5, count: 1) {
             $0.mapInt.values == 5
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapInt.@allValues != %@)", 5, count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapInt.@allValues != %@)", 5, count: 1) {
             $0.mapInt.values != 5
         }
-        assertQuery(ModernAllTypesObject.self, "(mapInt.@allValues > %@)", 5, count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapInt.@allValues > %@)", 5, count: 1) {
             $0.mapInt.values > 5
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapInt.@allValues >= %@)", 5, count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapInt.@allValues >= %@)", 5, count: 1) {
             $0.mapInt.values >= 5
         }
-        assertQuery(ModernAllTypesObject.self, "(mapInt.@allValues < %@)", 5, count: 0) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapInt.@allValues < %@)", 5, count: 0) {
             $0.mapInt.values < 5
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapInt.@allValues <= %@)", 5, count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapInt.@allValues <= %@)", 5, count: 1) {
             $0.mapInt.values <= 5
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapInt8.@allValues == %@)", Int8(8), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapInt8.@allValues == %@)", Int8(8), count: 1) {
             $0.mapInt8.values == Int8(8)
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapInt8.@allValues != %@)", Int8(8), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapInt8.@allValues != %@)", Int8(8), count: 1) {
             $0.mapInt8.values != Int8(8)
         }
-        assertQuery(ModernAllTypesObject.self, "(mapInt8.@allValues > %@)", Int8(8), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapInt8.@allValues > %@)", Int8(8), count: 1) {
             $0.mapInt8.values > Int8(8)
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapInt8.@allValues >= %@)", Int8(8), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapInt8.@allValues >= %@)", Int8(8), count: 1) {
             $0.mapInt8.values >= Int8(8)
         }
-        assertQuery(ModernAllTypesObject.self, "(mapInt8.@allValues < %@)", Int8(8), count: 0) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapInt8.@allValues < %@)", Int8(8), count: 0) {
             $0.mapInt8.values < Int8(8)
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapInt8.@allValues <= %@)", Int8(8), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapInt8.@allValues <= %@)", Int8(8), count: 1) {
             $0.mapInt8.values <= Int8(8)
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapInt16.@allValues == %@)", Int16(16), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapInt16.@allValues == %@)", Int16(16), count: 1) {
             $0.mapInt16.values == Int16(16)
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapInt16.@allValues != %@)", Int16(16), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapInt16.@allValues != %@)", Int16(16), count: 1) {
             $0.mapInt16.values != Int16(16)
         }
-        assertQuery(ModernAllTypesObject.self, "(mapInt16.@allValues > %@)", Int16(16), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapInt16.@allValues > %@)", Int16(16), count: 1) {
             $0.mapInt16.values > Int16(16)
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapInt16.@allValues >= %@)", Int16(16), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapInt16.@allValues >= %@)", Int16(16), count: 1) {
             $0.mapInt16.values >= Int16(16)
         }
-        assertQuery(ModernAllTypesObject.self, "(mapInt16.@allValues < %@)", Int16(16), count: 0) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapInt16.@allValues < %@)", Int16(16), count: 0) {
             $0.mapInt16.values < Int16(16)
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapInt16.@allValues <= %@)", Int16(16), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapInt16.@allValues <= %@)", Int16(16), count: 1) {
             $0.mapInt16.values <= Int16(16)
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapInt32.@allValues == %@)", Int32(32), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapInt32.@allValues == %@)", Int32(32), count: 1) {
             $0.mapInt32.values == Int32(32)
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapInt32.@allValues != %@)", Int32(32), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapInt32.@allValues != %@)", Int32(32), count: 1) {
             $0.mapInt32.values != Int32(32)
         }
-        assertQuery(ModernAllTypesObject.self, "(mapInt32.@allValues > %@)", Int32(32), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapInt32.@allValues > %@)", Int32(32), count: 1) {
             $0.mapInt32.values > Int32(32)
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapInt32.@allValues >= %@)", Int32(32), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapInt32.@allValues >= %@)", Int32(32), count: 1) {
             $0.mapInt32.values >= Int32(32)
         }
-        assertQuery(ModernAllTypesObject.self, "(mapInt32.@allValues < %@)", Int32(32), count: 0) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapInt32.@allValues < %@)", Int32(32), count: 0) {
             $0.mapInt32.values < Int32(32)
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapInt32.@allValues <= %@)", Int32(32), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapInt32.@allValues <= %@)", Int32(32), count: 1) {
             $0.mapInt32.values <= Int32(32)
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapInt64.@allValues == %@)", Int64(64), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapInt64.@allValues == %@)", Int64(64), count: 1) {
             $0.mapInt64.values == Int64(64)
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapInt64.@allValues != %@)", Int64(64), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapInt64.@allValues != %@)", Int64(64), count: 1) {
             $0.mapInt64.values != Int64(64)
         }
-        assertQuery(ModernAllTypesObject.self, "(mapInt64.@allValues > %@)", Int64(64), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapInt64.@allValues > %@)", Int64(64), count: 1) {
             $0.mapInt64.values > Int64(64)
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapInt64.@allValues >= %@)", Int64(64), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapInt64.@allValues >= %@)", Int64(64), count: 1) {
             $0.mapInt64.values >= Int64(64)
         }
-        assertQuery(ModernAllTypesObject.self, "(mapInt64.@allValues < %@)", Int64(64), count: 0) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapInt64.@allValues < %@)", Int64(64), count: 0) {
             $0.mapInt64.values < Int64(64)
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapInt64.@allValues <= %@)", Int64(64), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapInt64.@allValues <= %@)", Int64(64), count: 1) {
             $0.mapInt64.values <= Int64(64)
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapFloat.@allValues == %@)", Float(5.55444333), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapFloat.@allValues == %@)", Float(5.55444333), count: 1) {
             $0.mapFloat.values == Float(5.55444333)
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapFloat.@allValues != %@)", Float(5.55444333), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapFloat.@allValues != %@)", Float(5.55444333), count: 1) {
             $0.mapFloat.values != Float(5.55444333)
         }
-        assertQuery(ModernAllTypesObject.self, "(mapFloat.@allValues > %@)", Float(5.55444333), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapFloat.@allValues > %@)", Float(5.55444333), count: 1) {
             $0.mapFloat.values > Float(5.55444333)
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapFloat.@allValues >= %@)", Float(5.55444333), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapFloat.@allValues >= %@)", Float(5.55444333), count: 1) {
             $0.mapFloat.values >= Float(5.55444333)
         }
-        assertQuery(ModernAllTypesObject.self, "(mapFloat.@allValues < %@)", Float(5.55444333), count: 0) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapFloat.@allValues < %@)", Float(5.55444333), count: 0) {
             $0.mapFloat.values < Float(5.55444333)
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapFloat.@allValues <= %@)", Float(5.55444333), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapFloat.@allValues <= %@)", Float(5.55444333), count: 1) {
             $0.mapFloat.values <= Float(5.55444333)
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapDouble.@allValues == %@)", 123.456, count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapDouble.@allValues == %@)", 123.456, count: 1) {
             $0.mapDouble.values == 123.456
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapDouble.@allValues != %@)", 123.456, count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapDouble.@allValues != %@)", 123.456, count: 1) {
             $0.mapDouble.values != 123.456
         }
-        assertQuery(ModernAllTypesObject.self, "(mapDouble.@allValues > %@)", 123.456, count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapDouble.@allValues > %@)", 123.456, count: 1) {
             $0.mapDouble.values > 123.456
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapDouble.@allValues >= %@)", 123.456, count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapDouble.@allValues >= %@)", 123.456, count: 1) {
             $0.mapDouble.values >= 123.456
         }
-        assertQuery(ModernAllTypesObject.self, "(mapDouble.@allValues < %@)", 123.456, count: 0) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapDouble.@allValues < %@)", 123.456, count: 0) {
             $0.mapDouble.values < 123.456
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapDouble.@allValues <= %@)", 123.456, count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapDouble.@allValues <= %@)", 123.456, count: 1) {
             $0.mapDouble.values <= 123.456
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapString.@allValues == %@)", "Foo", count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapString.@allValues == %@)", "Foo", count: 1) {
             $0.mapString.values == "Foo"
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapString.@allValues != %@)", "Foo", count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapString.@allValues != %@)", "Foo", count: 1) {
             $0.mapString.values != "Foo"
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapString.@allValues CONTAINS[cd] %@)", "Foo", count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapString.@allValues CONTAINS[cd] %@)", "Foo", count: 1) {
             $0.mapString.values.contains("Foo", options: [.caseInsensitive, .diacriticInsensitive])
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapString.@allValues CONTAINS %@)", "Foo", count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapString.@allValues CONTAINS %@)", "Foo", count: 1) {
             $0.mapString.values.contains("Foo")
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapString.@allValues BEGINSWITH[cd] %@)", "Foo", count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapString.@allValues BEGINSWITH[cd] %@)", "Foo", count: 1) {
             $0.mapString.values.starts(with: "Foo", options: [.caseInsensitive, .diacriticInsensitive])
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapString.@allValues BEGINSWITH %@)", "Foo", count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapString.@allValues BEGINSWITH %@)", "Foo", count: 1) {
             $0.mapString.values.starts(with: "Foo")
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapString.@allValues ENDSWITH[cd] %@)", "Foo", count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapString.@allValues ENDSWITH[cd] %@)", "Foo", count: 1) {
             $0.mapString.values.ends(with: "Foo", options: [.caseInsensitive, .diacriticInsensitive])
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapString.@allValues ENDSWITH %@)", "Foo", count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapString.@allValues ENDSWITH %@)", "Foo", count: 1) {
             $0.mapString.values.ends(with: "Foo")
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapString.@allValues LIKE[c] %@)", "Foo", count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapString.@allValues LIKE[c] %@)", "Foo", count: 1) {
             $0.mapString.values.like("Foo", caseInsensitive: true)
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapString.@allValues LIKE %@)", "Foo", count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapString.@allValues LIKE %@)", "Foo", count: 1) {
             $0.mapString.values.like("Foo")
         }
-        assertQuery(ModernAllTypesObject.self, "(mapBinary.@allValues == %@)", Data(count: 64), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapBinary.@allValues == %@)", Data(count: 64), count: 1) {
             $0.mapBinary.values == Data(count: 64)
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapBinary.@allValues != %@)", Data(count: 64), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapBinary.@allValues != %@)", Data(count: 64), count: 1) {
             $0.mapBinary.values != Data(count: 64)
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapDate.@allValues == %@)", Date(timeIntervalSince1970: 1000000), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapDate.@allValues == %@)", Date(timeIntervalSince1970: 1000000), count: 1) {
             $0.mapDate.values == Date(timeIntervalSince1970: 1000000)
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapDate.@allValues != %@)", Date(timeIntervalSince1970: 1000000), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapDate.@allValues != %@)", Date(timeIntervalSince1970: 1000000), count: 1) {
             $0.mapDate.values != Date(timeIntervalSince1970: 1000000)
         }
-        assertQuery(ModernAllTypesObject.self, "(mapDate.@allValues > %@)", Date(timeIntervalSince1970: 1000000), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapDate.@allValues > %@)", Date(timeIntervalSince1970: 1000000), count: 1) {
             $0.mapDate.values > Date(timeIntervalSince1970: 1000000)
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapDate.@allValues >= %@)", Date(timeIntervalSince1970: 1000000), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapDate.@allValues >= %@)", Date(timeIntervalSince1970: 1000000), count: 1) {
             $0.mapDate.values >= Date(timeIntervalSince1970: 1000000)
         }
-        assertQuery(ModernAllTypesObject.self, "(mapDate.@allValues < %@)", Date(timeIntervalSince1970: 1000000), count: 0) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapDate.@allValues < %@)", Date(timeIntervalSince1970: 1000000), count: 0) {
             $0.mapDate.values < Date(timeIntervalSince1970: 1000000)
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapDate.@allValues <= %@)", Date(timeIntervalSince1970: 1000000), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapDate.@allValues <= %@)", Date(timeIntervalSince1970: 1000000), count: 1) {
             $0.mapDate.values <= Date(timeIntervalSince1970: 1000000)
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapDecimal.@allValues == %@)", Decimal128(123.456), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapDecimal.@allValues == %@)", Decimal128(123.456), count: 1) {
             $0.mapDecimal.values == Decimal128(123.456)
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapDecimal.@allValues != %@)", Decimal128(123.456), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapDecimal.@allValues != %@)", Decimal128(123.456), count: 1) {
             $0.mapDecimal.values != Decimal128(123.456)
         }
-        assertQuery(ModernAllTypesObject.self, "(mapDecimal.@allValues > %@)", Decimal128(123.456), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapDecimal.@allValues > %@)", Decimal128(123.456), count: 1) {
             $0.mapDecimal.values > Decimal128(123.456)
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapDecimal.@allValues >= %@)", Decimal128(123.456), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapDecimal.@allValues >= %@)", Decimal128(123.456), count: 1) {
             $0.mapDecimal.values >= Decimal128(123.456)
         }
-        assertQuery(ModernAllTypesObject.self, "(mapDecimal.@allValues < %@)", Decimal128(123.456), count: 0) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapDecimal.@allValues < %@)", Decimal128(123.456), count: 0) {
             $0.mapDecimal.values < Decimal128(123.456)
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapDecimal.@allValues <= %@)", Decimal128(123.456), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapDecimal.@allValues <= %@)", Decimal128(123.456), count: 1) {
             $0.mapDecimal.values <= Decimal128(123.456)
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapObjectId.@allValues == %@)", ObjectId("61184062c1d8f096a3695046"), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapObjectId.@allValues == %@)", ObjectId("61184062c1d8f096a3695046"), count: 1) {
             $0.mapObjectId.values == ObjectId("61184062c1d8f096a3695046")
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapObjectId.@allValues != %@)", ObjectId("61184062c1d8f096a3695046"), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapObjectId.@allValues != %@)", ObjectId("61184062c1d8f096a3695046"), count: 1) {
             $0.mapObjectId.values != ObjectId("61184062c1d8f096a3695046")
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapUuid.@allValues == %@)", UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!, count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapUuid.@allValues == %@)", UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!, count: 1) {
             $0.mapUuid.values == UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapUuid.@allValues != %@)", UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!, count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapUuid.@allValues != %@)", UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!, count: 1) {
             $0.mapUuid.values != UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapAny.@allValues == %@)", AnyRealmValue.objectId(ObjectId("61184062c1d8f096a3695046")), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapAny.@allValues == %@)", AnyRealmValue.objectId(ObjectId("61184062c1d8f096a3695046")), count: 1) {
             $0.mapAny.values == AnyRealmValue.objectId(ObjectId("61184062c1d8f096a3695046"))
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapAny.@allValues != %@)", AnyRealmValue.objectId(ObjectId("61184062c1d8f096a3695046")), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapAny.@allValues != %@)", AnyRealmValue.objectId(ObjectId("61184062c1d8f096a3695046")), count: 1) {
             $0.mapAny.values != AnyRealmValue.objectId(ObjectId("61184062c1d8f096a3695046"))
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapInt.@allValues == %@)", EnumInt.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapInt.@allValues == %@)", EnumInt.value1, count: 1) {
             $0.mapInt.values == .value1
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapInt.@allValues != %@)", EnumInt.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapInt.@allValues != %@)", EnumInt.value1, count: 1) {
             $0.mapInt.values != .value1
         }
-        assertQuery(ModernCollectionsOfEnums.self, "(mapInt.@allValues > %@)", EnumInt.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapInt.@allValues > %@)", EnumInt.value1, count: 1) {
             $0.mapInt.values > .value1
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapInt.@allValues >= %@)", EnumInt.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapInt.@allValues >= %@)", EnumInt.value1, count: 1) {
             $0.mapInt.values >= .value1
         }
-        assertQuery(ModernCollectionsOfEnums.self, "(mapInt.@allValues < %@)", EnumInt.value1, count: 0) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapInt.@allValues < %@)", EnumInt.value1, count: 0) {
             $0.mapInt.values < .value1
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapInt.@allValues <= %@)", EnumInt.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapInt.@allValues <= %@)", EnumInt.value1, count: 1) {
             $0.mapInt.values <= .value1
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapInt8.@allValues == %@)", EnumInt8.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapInt8.@allValues == %@)", EnumInt8.value1, count: 1) {
             $0.mapInt8.values == .value1
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapInt8.@allValues != %@)", EnumInt8.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapInt8.@allValues != %@)", EnumInt8.value1, count: 1) {
             $0.mapInt8.values != .value1
         }
-        assertQuery(ModernCollectionsOfEnums.self, "(mapInt8.@allValues > %@)", EnumInt8.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapInt8.@allValues > %@)", EnumInt8.value1, count: 1) {
             $0.mapInt8.values > .value1
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapInt8.@allValues >= %@)", EnumInt8.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapInt8.@allValues >= %@)", EnumInt8.value1, count: 1) {
             $0.mapInt8.values >= .value1
         }
-        assertQuery(ModernCollectionsOfEnums.self, "(mapInt8.@allValues < %@)", EnumInt8.value1, count: 0) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapInt8.@allValues < %@)", EnumInt8.value1, count: 0) {
             $0.mapInt8.values < .value1
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapInt8.@allValues <= %@)", EnumInt8.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapInt8.@allValues <= %@)", EnumInt8.value1, count: 1) {
             $0.mapInt8.values <= .value1
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapInt16.@allValues == %@)", EnumInt16.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapInt16.@allValues == %@)", EnumInt16.value1, count: 1) {
             $0.mapInt16.values == .value1
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapInt16.@allValues != %@)", EnumInt16.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapInt16.@allValues != %@)", EnumInt16.value1, count: 1) {
             $0.mapInt16.values != .value1
         }
-        assertQuery(ModernCollectionsOfEnums.self, "(mapInt16.@allValues > %@)", EnumInt16.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapInt16.@allValues > %@)", EnumInt16.value1, count: 1) {
             $0.mapInt16.values > .value1
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapInt16.@allValues >= %@)", EnumInt16.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapInt16.@allValues >= %@)", EnumInt16.value1, count: 1) {
             $0.mapInt16.values >= .value1
         }
-        assertQuery(ModernCollectionsOfEnums.self, "(mapInt16.@allValues < %@)", EnumInt16.value1, count: 0) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapInt16.@allValues < %@)", EnumInt16.value1, count: 0) {
             $0.mapInt16.values < .value1
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapInt16.@allValues <= %@)", EnumInt16.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapInt16.@allValues <= %@)", EnumInt16.value1, count: 1) {
             $0.mapInt16.values <= .value1
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapInt32.@allValues == %@)", EnumInt32.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapInt32.@allValues == %@)", EnumInt32.value1, count: 1) {
             $0.mapInt32.values == .value1
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapInt32.@allValues != %@)", EnumInt32.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapInt32.@allValues != %@)", EnumInt32.value1, count: 1) {
             $0.mapInt32.values != .value1
         }
-        assertQuery(ModernCollectionsOfEnums.self, "(mapInt32.@allValues > %@)", EnumInt32.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapInt32.@allValues > %@)", EnumInt32.value1, count: 1) {
             $0.mapInt32.values > .value1
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapInt32.@allValues >= %@)", EnumInt32.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapInt32.@allValues >= %@)", EnumInt32.value1, count: 1) {
             $0.mapInt32.values >= .value1
         }
-        assertQuery(ModernCollectionsOfEnums.self, "(mapInt32.@allValues < %@)", EnumInt32.value1, count: 0) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapInt32.@allValues < %@)", EnumInt32.value1, count: 0) {
             $0.mapInt32.values < .value1
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapInt32.@allValues <= %@)", EnumInt32.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapInt32.@allValues <= %@)", EnumInt32.value1, count: 1) {
             $0.mapInt32.values <= .value1
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapInt64.@allValues == %@)", EnumInt64.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapInt64.@allValues == %@)", EnumInt64.value1, count: 1) {
             $0.mapInt64.values == .value1
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapInt64.@allValues != %@)", EnumInt64.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapInt64.@allValues != %@)", EnumInt64.value1, count: 1) {
             $0.mapInt64.values != .value1
         }
-        assertQuery(ModernCollectionsOfEnums.self, "(mapInt64.@allValues > %@)", EnumInt64.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapInt64.@allValues > %@)", EnumInt64.value1, count: 1) {
             $0.mapInt64.values > .value1
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapInt64.@allValues >= %@)", EnumInt64.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapInt64.@allValues >= %@)", EnumInt64.value1, count: 1) {
             $0.mapInt64.values >= .value1
         }
-        assertQuery(ModernCollectionsOfEnums.self, "(mapInt64.@allValues < %@)", EnumInt64.value1, count: 0) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapInt64.@allValues < %@)", EnumInt64.value1, count: 0) {
             $0.mapInt64.values < .value1
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapInt64.@allValues <= %@)", EnumInt64.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapInt64.@allValues <= %@)", EnumInt64.value1, count: 1) {
             $0.mapInt64.values <= .value1
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapFloat.@allValues == %@)", EnumFloat.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapFloat.@allValues == %@)", EnumFloat.value1, count: 1) {
             $0.mapFloat.values == .value1
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapFloat.@allValues != %@)", EnumFloat.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapFloat.@allValues != %@)", EnumFloat.value1, count: 1) {
             $0.mapFloat.values != .value1
         }
-        assertQuery(ModernCollectionsOfEnums.self, "(mapFloat.@allValues > %@)", EnumFloat.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapFloat.@allValues > %@)", EnumFloat.value1, count: 1) {
             $0.mapFloat.values > .value1
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapFloat.@allValues >= %@)", EnumFloat.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapFloat.@allValues >= %@)", EnumFloat.value1, count: 1) {
             $0.mapFloat.values >= .value1
         }
-        assertQuery(ModernCollectionsOfEnums.self, "(mapFloat.@allValues < %@)", EnumFloat.value1, count: 0) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapFloat.@allValues < %@)", EnumFloat.value1, count: 0) {
             $0.mapFloat.values < .value1
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapFloat.@allValues <= %@)", EnumFloat.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapFloat.@allValues <= %@)", EnumFloat.value1, count: 1) {
             $0.mapFloat.values <= .value1
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapDouble.@allValues == %@)", EnumDouble.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapDouble.@allValues == %@)", EnumDouble.value1, count: 1) {
             $0.mapDouble.values == .value1
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapDouble.@allValues != %@)", EnumDouble.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapDouble.@allValues != %@)", EnumDouble.value1, count: 1) {
             $0.mapDouble.values != .value1
         }
-        assertQuery(ModernCollectionsOfEnums.self, "(mapDouble.@allValues > %@)", EnumDouble.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapDouble.@allValues > %@)", EnumDouble.value1, count: 1) {
             $0.mapDouble.values > .value1
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapDouble.@allValues >= %@)", EnumDouble.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapDouble.@allValues >= %@)", EnumDouble.value1, count: 1) {
             $0.mapDouble.values >= .value1
         }
-        assertQuery(ModernCollectionsOfEnums.self, "(mapDouble.@allValues < %@)", EnumDouble.value1, count: 0) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapDouble.@allValues < %@)", EnumDouble.value1, count: 0) {
             $0.mapDouble.values < .value1
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapDouble.@allValues <= %@)", EnumDouble.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapDouble.@allValues <= %@)", EnumDouble.value1, count: 1) {
             $0.mapDouble.values <= .value1
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapString.@allValues == %@)", EnumString.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapString.@allValues == %@)", EnumString.value1, count: 1) {
             $0.mapString.values == .value1
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapString.@allValues != %@)", EnumString.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapString.@allValues != %@)", EnumString.value1, count: 1) {
             $0.mapString.values != .value1
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapString.@allValues CONTAINS[cd] %@)", EnumString.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapString.@allValues CONTAINS[cd] %@)", EnumString.value1, count: 1) {
             $0.mapString.values.contains(.value1, options: [.caseInsensitive, .diacriticInsensitive])
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapString.@allValues CONTAINS %@)", EnumString.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapString.@allValues CONTAINS %@)", EnumString.value1, count: 1) {
             $0.mapString.values.contains(.value1)
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapString.@allValues BEGINSWITH[cd] %@)", EnumString.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapString.@allValues BEGINSWITH[cd] %@)", EnumString.value1, count: 1) {
             $0.mapString.values.starts(with: .value1, options: [.caseInsensitive, .diacriticInsensitive])
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapString.@allValues BEGINSWITH %@)", EnumString.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapString.@allValues BEGINSWITH %@)", EnumString.value1, count: 1) {
             $0.mapString.values.starts(with: .value1)
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapString.@allValues ENDSWITH[cd] %@)", EnumString.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapString.@allValues ENDSWITH[cd] %@)", EnumString.value1, count: 1) {
             $0.mapString.values.ends(with: .value1, options: [.caseInsensitive, .diacriticInsensitive])
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapString.@allValues ENDSWITH %@)", EnumString.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapString.@allValues ENDSWITH %@)", EnumString.value1, count: 1) {
             $0.mapString.values.ends(with: .value1)
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapString.@allValues LIKE[c] %@)", EnumString.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapString.@allValues LIKE[c] %@)", EnumString.value1, count: 1) {
             $0.mapString.values.like(.value1, caseInsensitive: true)
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapString.@allValues LIKE %@)", EnumString.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapString.@allValues LIKE %@)", EnumString.value1, count: 1) {
             $0.mapString.values.like(.value1)
         }
-        assertQuery(ModernAllTypesObject.self, "(mapOptBool.@allValues == %@)", true, count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapOptBool.@allValues == %@)", true, count: 1) {
             $0.mapOptBool.values == true
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapOptBool.@allValues != %@)", true, count: 0) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapOptBool.@allValues != %@)", true, count: 0) {
             $0.mapOptBool.values != true
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapOptInt.@allValues == %@)", 5, count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapOptInt.@allValues == %@)", 5, count: 1) {
             $0.mapOptInt.values == 5
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapOptInt.@allValues != %@)", 5, count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapOptInt.@allValues != %@)", 5, count: 1) {
             $0.mapOptInt.values != 5
         }
-        assertQuery(ModernAllTypesObject.self, "(mapOptInt.@allValues > %@)", 5, count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapOptInt.@allValues > %@)", 5, count: 1) {
             $0.mapOptInt.values > 5
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapOptInt.@allValues >= %@)", 5, count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapOptInt.@allValues >= %@)", 5, count: 1) {
             $0.mapOptInt.values >= 5
         }
-        assertQuery(ModernAllTypesObject.self, "(mapOptInt.@allValues < %@)", 5, count: 0) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapOptInt.@allValues < %@)", 5, count: 0) {
             $0.mapOptInt.values < 5
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapOptInt.@allValues <= %@)", 5, count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapOptInt.@allValues <= %@)", 5, count: 1) {
             $0.mapOptInt.values <= 5
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapOptInt8.@allValues == %@)", Int8(8), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapOptInt8.@allValues == %@)", Int8(8), count: 1) {
             $0.mapOptInt8.values == Int8(8)
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapOptInt8.@allValues != %@)", Int8(8), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapOptInt8.@allValues != %@)", Int8(8), count: 1) {
             $0.mapOptInt8.values != Int8(8)
         }
-        assertQuery(ModernAllTypesObject.self, "(mapOptInt8.@allValues > %@)", Int8(8), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapOptInt8.@allValues > %@)", Int8(8), count: 1) {
             $0.mapOptInt8.values > Int8(8)
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapOptInt8.@allValues >= %@)", Int8(8), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapOptInt8.@allValues >= %@)", Int8(8), count: 1) {
             $0.mapOptInt8.values >= Int8(8)
         }
-        assertQuery(ModernAllTypesObject.self, "(mapOptInt8.@allValues < %@)", Int8(8), count: 0) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapOptInt8.@allValues < %@)", Int8(8), count: 0) {
             $0.mapOptInt8.values < Int8(8)
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapOptInt8.@allValues <= %@)", Int8(8), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapOptInt8.@allValues <= %@)", Int8(8), count: 1) {
             $0.mapOptInt8.values <= Int8(8)
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapOptInt16.@allValues == %@)", Int16(16), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapOptInt16.@allValues == %@)", Int16(16), count: 1) {
             $0.mapOptInt16.values == Int16(16)
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapOptInt16.@allValues != %@)", Int16(16), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapOptInt16.@allValues != %@)", Int16(16), count: 1) {
             $0.mapOptInt16.values != Int16(16)
         }
-        assertQuery(ModernAllTypesObject.self, "(mapOptInt16.@allValues > %@)", Int16(16), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapOptInt16.@allValues > %@)", Int16(16), count: 1) {
             $0.mapOptInt16.values > Int16(16)
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapOptInt16.@allValues >= %@)", Int16(16), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapOptInt16.@allValues >= %@)", Int16(16), count: 1) {
             $0.mapOptInt16.values >= Int16(16)
         }
-        assertQuery(ModernAllTypesObject.self, "(mapOptInt16.@allValues < %@)", Int16(16), count: 0) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapOptInt16.@allValues < %@)", Int16(16), count: 0) {
             $0.mapOptInt16.values < Int16(16)
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapOptInt16.@allValues <= %@)", Int16(16), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapOptInt16.@allValues <= %@)", Int16(16), count: 1) {
             $0.mapOptInt16.values <= Int16(16)
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapOptInt32.@allValues == %@)", Int32(32), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapOptInt32.@allValues == %@)", Int32(32), count: 1) {
             $0.mapOptInt32.values == Int32(32)
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapOptInt32.@allValues != %@)", Int32(32), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapOptInt32.@allValues != %@)", Int32(32), count: 1) {
             $0.mapOptInt32.values != Int32(32)
         }
-        assertQuery(ModernAllTypesObject.self, "(mapOptInt32.@allValues > %@)", Int32(32), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapOptInt32.@allValues > %@)", Int32(32), count: 1) {
             $0.mapOptInt32.values > Int32(32)
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapOptInt32.@allValues >= %@)", Int32(32), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapOptInt32.@allValues >= %@)", Int32(32), count: 1) {
             $0.mapOptInt32.values >= Int32(32)
         }
-        assertQuery(ModernAllTypesObject.self, "(mapOptInt32.@allValues < %@)", Int32(32), count: 0) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapOptInt32.@allValues < %@)", Int32(32), count: 0) {
             $0.mapOptInt32.values < Int32(32)
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapOptInt32.@allValues <= %@)", Int32(32), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapOptInt32.@allValues <= %@)", Int32(32), count: 1) {
             $0.mapOptInt32.values <= Int32(32)
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapOptInt64.@allValues == %@)", Int64(64), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapOptInt64.@allValues == %@)", Int64(64), count: 1) {
             $0.mapOptInt64.values == Int64(64)
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapOptInt64.@allValues != %@)", Int64(64), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapOptInt64.@allValues != %@)", Int64(64), count: 1) {
             $0.mapOptInt64.values != Int64(64)
         }
-        assertQuery(ModernAllTypesObject.self, "(mapOptInt64.@allValues > %@)", Int64(64), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapOptInt64.@allValues > %@)", Int64(64), count: 1) {
             $0.mapOptInt64.values > Int64(64)
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapOptInt64.@allValues >= %@)", Int64(64), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapOptInt64.@allValues >= %@)", Int64(64), count: 1) {
             $0.mapOptInt64.values >= Int64(64)
         }
-        assertQuery(ModernAllTypesObject.self, "(mapOptInt64.@allValues < %@)", Int64(64), count: 0) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapOptInt64.@allValues < %@)", Int64(64), count: 0) {
             $0.mapOptInt64.values < Int64(64)
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapOptInt64.@allValues <= %@)", Int64(64), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapOptInt64.@allValues <= %@)", Int64(64), count: 1) {
             $0.mapOptInt64.values <= Int64(64)
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapOptFloat.@allValues == %@)", Float(5.55444333), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapOptFloat.@allValues == %@)", Float(5.55444333), count: 1) {
             $0.mapOptFloat.values == Float(5.55444333)
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapOptFloat.@allValues != %@)", Float(5.55444333), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapOptFloat.@allValues != %@)", Float(5.55444333), count: 1) {
             $0.mapOptFloat.values != Float(5.55444333)
         }
-        assertQuery(ModernAllTypesObject.self, "(mapOptFloat.@allValues > %@)", Float(5.55444333), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapOptFloat.@allValues > %@)", Float(5.55444333), count: 1) {
             $0.mapOptFloat.values > Float(5.55444333)
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapOptFloat.@allValues >= %@)", Float(5.55444333), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapOptFloat.@allValues >= %@)", Float(5.55444333), count: 1) {
             $0.mapOptFloat.values >= Float(5.55444333)
         }
-        assertQuery(ModernAllTypesObject.self, "(mapOptFloat.@allValues < %@)", Float(5.55444333), count: 0) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapOptFloat.@allValues < %@)", Float(5.55444333), count: 0) {
             $0.mapOptFloat.values < Float(5.55444333)
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapOptFloat.@allValues <= %@)", Float(5.55444333), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapOptFloat.@allValues <= %@)", Float(5.55444333), count: 1) {
             $0.mapOptFloat.values <= Float(5.55444333)
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapOptDouble.@allValues == %@)", 123.456, count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapOptDouble.@allValues == %@)", 123.456, count: 1) {
             $0.mapOptDouble.values == 123.456
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapOptDouble.@allValues != %@)", 123.456, count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapOptDouble.@allValues != %@)", 123.456, count: 1) {
             $0.mapOptDouble.values != 123.456
         }
-        assertQuery(ModernAllTypesObject.self, "(mapOptDouble.@allValues > %@)", 123.456, count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapOptDouble.@allValues > %@)", 123.456, count: 1) {
             $0.mapOptDouble.values > 123.456
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapOptDouble.@allValues >= %@)", 123.456, count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapOptDouble.@allValues >= %@)", 123.456, count: 1) {
             $0.mapOptDouble.values >= 123.456
         }
-        assertQuery(ModernAllTypesObject.self, "(mapOptDouble.@allValues < %@)", 123.456, count: 0) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapOptDouble.@allValues < %@)", 123.456, count: 0) {
             $0.mapOptDouble.values < 123.456
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapOptDouble.@allValues <= %@)", 123.456, count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapOptDouble.@allValues <= %@)", 123.456, count: 1) {
             $0.mapOptDouble.values <= 123.456
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapOptString.@allValues == %@)", "Foo", count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapOptString.@allValues == %@)", "Foo", count: 1) {
             $0.mapOptString.values == "Foo"
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapOptString.@allValues != %@)", "Foo", count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapOptString.@allValues != %@)", "Foo", count: 1) {
             $0.mapOptString.values != "Foo"
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapOptString.@allValues CONTAINS[cd] %@)", "Foo", count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapOptString.@allValues CONTAINS[cd] %@)", "Foo", count: 1) {
             $0.mapOptString.values.contains("Foo", options: [.caseInsensitive, .diacriticInsensitive])
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapOptString.@allValues CONTAINS %@)", "Foo", count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapOptString.@allValues CONTAINS %@)", "Foo", count: 1) {
             $0.mapOptString.values.contains("Foo")
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapOptString.@allValues BEGINSWITH[cd] %@)", "Foo", count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapOptString.@allValues BEGINSWITH[cd] %@)", "Foo", count: 1) {
             $0.mapOptString.values.starts(with: "Foo", options: [.caseInsensitive, .diacriticInsensitive])
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapOptString.@allValues BEGINSWITH %@)", "Foo", count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapOptString.@allValues BEGINSWITH %@)", "Foo", count: 1) {
             $0.mapOptString.values.starts(with: "Foo")
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapOptString.@allValues ENDSWITH[cd] %@)", "Foo", count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapOptString.@allValues ENDSWITH[cd] %@)", "Foo", count: 1) {
             $0.mapOptString.values.ends(with: "Foo", options: [.caseInsensitive, .diacriticInsensitive])
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapOptString.@allValues ENDSWITH %@)", "Foo", count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapOptString.@allValues ENDSWITH %@)", "Foo", count: 1) {
             $0.mapOptString.values.ends(with: "Foo")
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapOptString.@allValues LIKE[c] %@)", "Foo", count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapOptString.@allValues LIKE[c] %@)", "Foo", count: 1) {
             $0.mapOptString.values.like("Foo", caseInsensitive: true)
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapOptString.@allValues LIKE %@)", "Foo", count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapOptString.@allValues LIKE %@)", "Foo", count: 1) {
             $0.mapOptString.values.like("Foo")
         }
-        assertQuery(ModernAllTypesObject.self, "(mapOptBinary.@allValues == %@)", Data(count: 64), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapOptBinary.@allValues == %@)", Data(count: 64), count: 1) {
             $0.mapOptBinary.values == Data(count: 64)
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapOptBinary.@allValues != %@)", Data(count: 64), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapOptBinary.@allValues != %@)", Data(count: 64), count: 1) {
             $0.mapOptBinary.values != Data(count: 64)
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapOptDate.@allValues == %@)", Date(timeIntervalSince1970: 1000000), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapOptDate.@allValues == %@)", Date(timeIntervalSince1970: 1000000), count: 1) {
             $0.mapOptDate.values == Date(timeIntervalSince1970: 1000000)
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapOptDate.@allValues != %@)", Date(timeIntervalSince1970: 1000000), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapOptDate.@allValues != %@)", Date(timeIntervalSince1970: 1000000), count: 1) {
             $0.mapOptDate.values != Date(timeIntervalSince1970: 1000000)
         }
-        assertQuery(ModernAllTypesObject.self, "(mapOptDate.@allValues > %@)", Date(timeIntervalSince1970: 1000000), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapOptDate.@allValues > %@)", Date(timeIntervalSince1970: 1000000), count: 1) {
             $0.mapOptDate.values > Date(timeIntervalSince1970: 1000000)
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapOptDate.@allValues >= %@)", Date(timeIntervalSince1970: 1000000), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapOptDate.@allValues >= %@)", Date(timeIntervalSince1970: 1000000), count: 1) {
             $0.mapOptDate.values >= Date(timeIntervalSince1970: 1000000)
         }
-        assertQuery(ModernAllTypesObject.self, "(mapOptDate.@allValues < %@)", Date(timeIntervalSince1970: 1000000), count: 0) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapOptDate.@allValues < %@)", Date(timeIntervalSince1970: 1000000), count: 0) {
             $0.mapOptDate.values < Date(timeIntervalSince1970: 1000000)
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapOptDate.@allValues <= %@)", Date(timeIntervalSince1970: 1000000), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapOptDate.@allValues <= %@)", Date(timeIntervalSince1970: 1000000), count: 1) {
             $0.mapOptDate.values <= Date(timeIntervalSince1970: 1000000)
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapOptDecimal.@allValues == %@)", Decimal128(123.456), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapOptDecimal.@allValues == %@)", Decimal128(123.456), count: 1) {
             $0.mapOptDecimal.values == Decimal128(123.456)
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapOptDecimal.@allValues != %@)", Decimal128(123.456), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapOptDecimal.@allValues != %@)", Decimal128(123.456), count: 1) {
             $0.mapOptDecimal.values != Decimal128(123.456)
         }
-        assertQuery(ModernAllTypesObject.self, "(mapOptDecimal.@allValues > %@)", Decimal128(123.456), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapOptDecimal.@allValues > %@)", Decimal128(123.456), count: 1) {
             $0.mapOptDecimal.values > Decimal128(123.456)
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapOptDecimal.@allValues >= %@)", Decimal128(123.456), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapOptDecimal.@allValues >= %@)", Decimal128(123.456), count: 1) {
             $0.mapOptDecimal.values >= Decimal128(123.456)
         }
-        assertQuery(ModernAllTypesObject.self, "(mapOptDecimal.@allValues < %@)", Decimal128(123.456), count: 0) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapOptDecimal.@allValues < %@)", Decimal128(123.456), count: 0) {
             $0.mapOptDecimal.values < Decimal128(123.456)
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapOptDecimal.@allValues <= %@)", Decimal128(123.456), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapOptDecimal.@allValues <= %@)", Decimal128(123.456), count: 1) {
             $0.mapOptDecimal.values <= Decimal128(123.456)
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapOptObjectId.@allValues == %@)", ObjectId("61184062c1d8f096a3695046"), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapOptObjectId.@allValues == %@)", ObjectId("61184062c1d8f096a3695046"), count: 1) {
             $0.mapOptObjectId.values == ObjectId("61184062c1d8f096a3695046")
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapOptObjectId.@allValues != %@)", ObjectId("61184062c1d8f096a3695046"), count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapOptObjectId.@allValues != %@)", ObjectId("61184062c1d8f096a3695046"), count: 1) {
             $0.mapOptObjectId.values != ObjectId("61184062c1d8f096a3695046")
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapOptUuid.@allValues == %@)", UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!, count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapOptUuid.@allValues == %@)", UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!, count: 1) {
             $0.mapOptUuid.values == UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!
         }
 
-        assertQuery(ModernAllTypesObject.self, "(mapOptUuid.@allValues != %@)", UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!, count: 1) {
+        assertQuery(ModernAllTypesObject.self, "(ANY mapOptUuid.@allValues != %@)", UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!, count: 1) {
             $0.mapOptUuid.values != UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapIntOpt.@allValues == %@)", EnumInt.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapIntOpt.@allValues == %@)", EnumInt.value1, count: 1) {
             $0.mapIntOpt.values == .value1
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapIntOpt.@allValues != %@)", EnumInt.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapIntOpt.@allValues != %@)", EnumInt.value1, count: 1) {
             $0.mapIntOpt.values != .value1
         }
-        assertQuery(ModernCollectionsOfEnums.self, "(mapIntOpt.@allValues > %@)", EnumInt.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapIntOpt.@allValues > %@)", EnumInt.value1, count: 1) {
             $0.mapIntOpt.values > .value1
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapIntOpt.@allValues >= %@)", EnumInt.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapIntOpt.@allValues >= %@)", EnumInt.value1, count: 1) {
             $0.mapIntOpt.values >= .value1
         }
-        assertQuery(ModernCollectionsOfEnums.self, "(mapIntOpt.@allValues < %@)", EnumInt.value1, count: 0) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapIntOpt.@allValues < %@)", EnumInt.value1, count: 0) {
             $0.mapIntOpt.values < .value1
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapIntOpt.@allValues <= %@)", EnumInt.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapIntOpt.@allValues <= %@)", EnumInt.value1, count: 1) {
             $0.mapIntOpt.values <= .value1
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapInt8Opt.@allValues == %@)", EnumInt8.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapInt8Opt.@allValues == %@)", EnumInt8.value1, count: 1) {
             $0.mapInt8Opt.values == .value1
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapInt8Opt.@allValues != %@)", EnumInt8.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapInt8Opt.@allValues != %@)", EnumInt8.value1, count: 1) {
             $0.mapInt8Opt.values != .value1
         }
-        assertQuery(ModernCollectionsOfEnums.self, "(mapInt8Opt.@allValues > %@)", EnumInt8.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapInt8Opt.@allValues > %@)", EnumInt8.value1, count: 1) {
             $0.mapInt8Opt.values > .value1
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapInt8Opt.@allValues >= %@)", EnumInt8.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapInt8Opt.@allValues >= %@)", EnumInt8.value1, count: 1) {
             $0.mapInt8Opt.values >= .value1
         }
-        assertQuery(ModernCollectionsOfEnums.self, "(mapInt8Opt.@allValues < %@)", EnumInt8.value1, count: 0) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapInt8Opt.@allValues < %@)", EnumInt8.value1, count: 0) {
             $0.mapInt8Opt.values < .value1
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapInt8Opt.@allValues <= %@)", EnumInt8.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapInt8Opt.@allValues <= %@)", EnumInt8.value1, count: 1) {
             $0.mapInt8Opt.values <= .value1
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapInt16Opt.@allValues == %@)", EnumInt16.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapInt16Opt.@allValues == %@)", EnumInt16.value1, count: 1) {
             $0.mapInt16Opt.values == .value1
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapInt16Opt.@allValues != %@)", EnumInt16.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapInt16Opt.@allValues != %@)", EnumInt16.value1, count: 1) {
             $0.mapInt16Opt.values != .value1
         }
-        assertQuery(ModernCollectionsOfEnums.self, "(mapInt16Opt.@allValues > %@)", EnumInt16.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapInt16Opt.@allValues > %@)", EnumInt16.value1, count: 1) {
             $0.mapInt16Opt.values > .value1
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapInt16Opt.@allValues >= %@)", EnumInt16.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapInt16Opt.@allValues >= %@)", EnumInt16.value1, count: 1) {
             $0.mapInt16Opt.values >= .value1
         }
-        assertQuery(ModernCollectionsOfEnums.self, "(mapInt16Opt.@allValues < %@)", EnumInt16.value1, count: 0) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapInt16Opt.@allValues < %@)", EnumInt16.value1, count: 0) {
             $0.mapInt16Opt.values < .value1
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapInt16Opt.@allValues <= %@)", EnumInt16.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapInt16Opt.@allValues <= %@)", EnumInt16.value1, count: 1) {
             $0.mapInt16Opt.values <= .value1
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapInt32Opt.@allValues == %@)", EnumInt32.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapInt32Opt.@allValues == %@)", EnumInt32.value1, count: 1) {
             $0.mapInt32Opt.values == .value1
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapInt32Opt.@allValues != %@)", EnumInt32.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapInt32Opt.@allValues != %@)", EnumInt32.value1, count: 1) {
             $0.mapInt32Opt.values != .value1
         }
-        assertQuery(ModernCollectionsOfEnums.self, "(mapInt32Opt.@allValues > %@)", EnumInt32.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapInt32Opt.@allValues > %@)", EnumInt32.value1, count: 1) {
             $0.mapInt32Opt.values > .value1
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapInt32Opt.@allValues >= %@)", EnumInt32.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapInt32Opt.@allValues >= %@)", EnumInt32.value1, count: 1) {
             $0.mapInt32Opt.values >= .value1
         }
-        assertQuery(ModernCollectionsOfEnums.self, "(mapInt32Opt.@allValues < %@)", EnumInt32.value1, count: 0) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapInt32Opt.@allValues < %@)", EnumInt32.value1, count: 0) {
             $0.mapInt32Opt.values < .value1
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapInt32Opt.@allValues <= %@)", EnumInt32.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapInt32Opt.@allValues <= %@)", EnumInt32.value1, count: 1) {
             $0.mapInt32Opt.values <= .value1
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapInt64Opt.@allValues == %@)", EnumInt64.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapInt64Opt.@allValues == %@)", EnumInt64.value1, count: 1) {
             $0.mapInt64Opt.values == .value1
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapInt64Opt.@allValues != %@)", EnumInt64.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapInt64Opt.@allValues != %@)", EnumInt64.value1, count: 1) {
             $0.mapInt64Opt.values != .value1
         }
-        assertQuery(ModernCollectionsOfEnums.self, "(mapInt64Opt.@allValues > %@)", EnumInt64.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapInt64Opt.@allValues > %@)", EnumInt64.value1, count: 1) {
             $0.mapInt64Opt.values > .value1
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapInt64Opt.@allValues >= %@)", EnumInt64.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapInt64Opt.@allValues >= %@)", EnumInt64.value1, count: 1) {
             $0.mapInt64Opt.values >= .value1
         }
-        assertQuery(ModernCollectionsOfEnums.self, "(mapInt64Opt.@allValues < %@)", EnumInt64.value1, count: 0) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapInt64Opt.@allValues < %@)", EnumInt64.value1, count: 0) {
             $0.mapInt64Opt.values < .value1
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapInt64Opt.@allValues <= %@)", EnumInt64.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapInt64Opt.@allValues <= %@)", EnumInt64.value1, count: 1) {
             $0.mapInt64Opt.values <= .value1
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapFloatOpt.@allValues == %@)", EnumFloat.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapFloatOpt.@allValues == %@)", EnumFloat.value1, count: 1) {
             $0.mapFloatOpt.values == .value1
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapFloatOpt.@allValues != %@)", EnumFloat.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapFloatOpt.@allValues != %@)", EnumFloat.value1, count: 1) {
             $0.mapFloatOpt.values != .value1
         }
-        assertQuery(ModernCollectionsOfEnums.self, "(mapFloatOpt.@allValues > %@)", EnumFloat.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapFloatOpt.@allValues > %@)", EnumFloat.value1, count: 1) {
             $0.mapFloatOpt.values > .value1
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapFloatOpt.@allValues >= %@)", EnumFloat.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapFloatOpt.@allValues >= %@)", EnumFloat.value1, count: 1) {
             $0.mapFloatOpt.values >= .value1
         }
-        assertQuery(ModernCollectionsOfEnums.self, "(mapFloatOpt.@allValues < %@)", EnumFloat.value1, count: 0) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapFloatOpt.@allValues < %@)", EnumFloat.value1, count: 0) {
             $0.mapFloatOpt.values < .value1
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapFloatOpt.@allValues <= %@)", EnumFloat.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapFloatOpt.@allValues <= %@)", EnumFloat.value1, count: 1) {
             $0.mapFloatOpt.values <= .value1
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapDoubleOpt.@allValues == %@)", EnumDouble.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapDoubleOpt.@allValues == %@)", EnumDouble.value1, count: 1) {
             $0.mapDoubleOpt.values == .value1
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapDoubleOpt.@allValues != %@)", EnumDouble.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapDoubleOpt.@allValues != %@)", EnumDouble.value1, count: 1) {
             $0.mapDoubleOpt.values != .value1
         }
-        assertQuery(ModernCollectionsOfEnums.self, "(mapDoubleOpt.@allValues > %@)", EnumDouble.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapDoubleOpt.@allValues > %@)", EnumDouble.value1, count: 1) {
             $0.mapDoubleOpt.values > .value1
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapDoubleOpt.@allValues >= %@)", EnumDouble.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapDoubleOpt.@allValues >= %@)", EnumDouble.value1, count: 1) {
             $0.mapDoubleOpt.values >= .value1
         }
-        assertQuery(ModernCollectionsOfEnums.self, "(mapDoubleOpt.@allValues < %@)", EnumDouble.value1, count: 0) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapDoubleOpt.@allValues < %@)", EnumDouble.value1, count: 0) {
             $0.mapDoubleOpt.values < .value1
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapDoubleOpt.@allValues <= %@)", EnumDouble.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapDoubleOpt.@allValues <= %@)", EnumDouble.value1, count: 1) {
             $0.mapDoubleOpt.values <= .value1
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapStringOpt.@allValues == %@)", EnumString.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapStringOpt.@allValues == %@)", EnumString.value1, count: 1) {
             $0.mapStringOpt.values == .value1
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapStringOpt.@allValues != %@)", EnumString.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapStringOpt.@allValues != %@)", EnumString.value1, count: 1) {
             $0.mapStringOpt.values != .value1
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapStringOpt.@allValues CONTAINS[cd] %@)", EnumString.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapStringOpt.@allValues CONTAINS[cd] %@)", EnumString.value1, count: 1) {
             $0.mapStringOpt.values.contains(.value1, options: [.caseInsensitive, .diacriticInsensitive])
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapStringOpt.@allValues CONTAINS %@)", EnumString.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapStringOpt.@allValues CONTAINS %@)", EnumString.value1, count: 1) {
             $0.mapStringOpt.values.contains(.value1)
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapStringOpt.@allValues BEGINSWITH[cd] %@)", EnumString.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapStringOpt.@allValues BEGINSWITH[cd] %@)", EnumString.value1, count: 1) {
             $0.mapStringOpt.values.starts(with: .value1, options: [.caseInsensitive, .diacriticInsensitive])
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapStringOpt.@allValues BEGINSWITH %@)", EnumString.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapStringOpt.@allValues BEGINSWITH %@)", EnumString.value1, count: 1) {
             $0.mapStringOpt.values.starts(with: .value1)
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapStringOpt.@allValues ENDSWITH[cd] %@)", EnumString.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapStringOpt.@allValues ENDSWITH[cd] %@)", EnumString.value1, count: 1) {
             $0.mapStringOpt.values.ends(with: .value1, options: [.caseInsensitive, .diacriticInsensitive])
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapStringOpt.@allValues ENDSWITH %@)", EnumString.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapStringOpt.@allValues ENDSWITH %@)", EnumString.value1, count: 1) {
             $0.mapStringOpt.values.ends(with: .value1)
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapStringOpt.@allValues LIKE[c] %@)", EnumString.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapStringOpt.@allValues LIKE[c] %@)", EnumString.value1, count: 1) {
             $0.mapStringOpt.values.like(.value1, caseInsensitive: true)
         }
 
-        assertQuery(ModernCollectionsOfEnums.self, "(mapStringOpt.@allValues LIKE %@)", EnumString.value1, count: 1) {
+        assertQuery(ModernCollectionsOfEnums.self, "(ANY mapStringOpt.@allValues LIKE %@)", EnumString.value1, count: 1) {
             $0.mapStringOpt.values.like(.value1)
         }
     }
@@ -6673,16 +6673,16 @@ class QueryTests: TestCase {
 
     func testAggregateNotSupported() {
         assertThrows(assertQuery("", count: 0) { $0.intCol.avg == 1 },
-                     reason: "Aggregate operations can only be used on key paths that include an collection property")
+                     reason: "Invalid keypath 'intCol.@avg': Property 'ModernAllTypesObject.intCol' is not a link or collection and can only appear at the end of a keypath.")
 
         assertThrows(assertQuery("", count: 0) { $0.doubleCol.max != 1 },
-                     reason: "Aggregate operations can only be used on key paths that include an collection property")
+                     reason: "Invalid keypath 'doubleCol.@max': Property 'ModernAllTypesObject.doubleCol' is not a link or collection and can only appear at the end of a keypath.")
 
         assertThrows(assertQuery("", count: 0) { $0.dateCol.min > Date() },
-                     reason: "Aggregate operations can only be used on key paths that include an collection property")
+                     reason: "Invalid keypath 'dateCol.@min': Property 'ModernAllTypesObject.dateCol' is not a link or collection and can only appear at the end of a keypath.")
 
         assertThrows(assertQuery("", count: 0) { $0.decimalCol.sum < 1 },
-                     reason: "Aggregate operations can only be used on key paths that include an collection property")
+                     reason: "Invalid keypath 'decimalCol.@sum': Property 'ModernAllTypesObject.decimalCol' is not a link or collection and can only appear at the end of a keypath.")
     }
 
     // MARK: Column comparison
