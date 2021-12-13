@@ -1964,11 +1964,11 @@ internal protocol PropertyNameConvertible {
 public struct ProjectedCollection<NewElement>: RandomAccessCollection, ThreadConfined where NewElement: RealmCollectionValue {
     public typealias Element = NewElement
     public typealias Index = Int
-/**
+    /**
      Returns the index of the first object in the list matching the predicate, or `nil` if no objects match.
 
      - parameter predicate: The predicate with which to filter the objects.
-    */
+     */
     public func index(matching predicate: NSPredicate) -> Int? {
         backingCollection.index(matching: predicate)
     }

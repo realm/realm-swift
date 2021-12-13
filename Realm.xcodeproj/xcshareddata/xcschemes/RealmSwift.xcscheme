@@ -64,11 +64,6 @@
                BlueprintName = "RealmSwift Tests"
                ReferencedContainer = "container:Realm.xcodeproj">
             </BuildableReference>
-            <SkippedTests>
-               <Test
-                  Identifier = "ProjectedCollectTestsTemplate">
-               </Test>
-            </SkippedTests>
          </TestableReference>
       </Testables>
    </TestAction>
