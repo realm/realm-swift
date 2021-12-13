@@ -2234,9 +2234,7 @@ public struct ProjectedCollection<NewElement>: RandomAccessCollection, ThreadCon
         for (i, o) in self.enumerated() {
             elements += "\t[\(i)] \(o)\n"
         }
-        return "\(type(of: self))<\(Element.self)> <\(self)> {\n" +
-        elements +
-        "}"
+        return "\(type(of: self))<\(Element.self)> <\(self)> {\n\(elements)}"
     }
     /**
      Returns the index of an object in the linking objects, or `nil` if the object is not present.
