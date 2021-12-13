@@ -437,24 +437,27 @@ extension ProjectionObservable {
         defer {
             projectionSchemaLock.unlock()
         }
-        if schema[ObjectIdentifier(type(of: self))] == nil {
-            let mirror = Mirror(reflecting: self)
-            let metadatas: [ProjectedMetadata] = mirror.children.compactMap { child in
-                guard let projected = child.value as? AnyProjected else {
-                    return nil
-                }
-                let originPropertyLabel = _name(for: projected.projectedKeyPath as! PartialKeyPath<Root>)
-                guard !originPropertyLabel.isEmpty else {
-                    projectionSchemaLock.unlock()
-                    throwRealmException("@Projected property '\(child.label!)' must be a part of Realm object")
-                }
-                return ProjectedMetadata(projectedKeyPath: projected.projectedKeyPath,
-                                         originPropertyKeyPathString: originPropertyLabel,
-                                         label: child.label!)
-            }
-            schema[ObjectIdentifier(type(of: self))] = metadatas
+        let identifier = ObjectIdentifier(type(of: self))
+        if let schema = schema[identifier] {
+            return schema
         }
-        return schema[ObjectIdentifier(type(of: self))]!
+
+        let mirror = Mirror(reflecting: self)
+        let metadatas: [ProjectedMetadata] = mirror.children.compactMap { child in
+            guard let projected = child.value as? AnyProjected else {
+                return nil
+            }
+            let originPropertyLabel = _name(for: projected.projectedKeyPath as! PartialKeyPath<Root>)
+            guard !originPropertyLabel.isEmpty else {
+                projectionSchemaLock.unlock()
+                throwRealmException("@Projected property '\(child.label!)' must be a part of Realm object")
+            }
+            return ProjectedMetadata(projectedKeyPath: projected.projectedKeyPath,
+                                     originPropertyKeyPathString: originPropertyLabel,
+                                     label: child.label!)
+        }
+        schema[identifier] = metadatas
+        return metadatas
     }
 }
 /**
