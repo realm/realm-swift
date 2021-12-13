@@ -370,6 +370,11 @@ import Realm.Private
 // MARK: Asynchronous Transactions
 
     /**
+     Commits transaction block asynchronously.
+     - parameter `block` will be added to the ssynchronous transaction queue.
+     - parameter `onComplete` will be called after commit has reached stable storage.
+     Write  blocks for the multiple calls will be executed in order.
+     - throws An `NSError` if the transaction could not be written due to errors.
      */
     public func writeAsync(_ block: (() -> ()), _ onComplete: (() -> ())? = nil) throws {
         do {
@@ -386,24 +391,48 @@ import Realm.Private
     }
 
     /**
+     Begins asynchronous write transaction.
+     - parameter `block` The block containing actions to perform.
+     `block` should end by calling `commitAsyncWrite`, `cancelAsyncWrite`,
+     `commitWrite` or `cancelWrite`.
+     Returning without one of these calls will be equivalent to calling `commitAsyncWrite`.
+     Return Asynchronous transaction's handle.
+     @note `block` is queued for execution on the scheduler associated with the current realm.
+     It will run after the write mutex has been acquired.
+     The call returns immediately allowing the caller to proceed while the write mutex is held by someone else.
+     Write blocks from multiple calls to `beginAsyncWrite` or `writeAsync`
+     will be executed in order.
+     A later call to `beginAsyncWrite` or `writeAsync` will wait for any earlier
+     write blocks.
      */
     public func beginAsyncWrite(_ asyncWriteBlock: () -> ()) {
         return rlmRealm.beginAsyncWriteTransaction(asyncWriteBlock)
     }
 
-    /**
-     */
-    public func commitAsyncWrite(_ onComplete: (() -> ())? = nil) throws {
+    /** Commit asynchronous transaction.
+     - parameter onComplete  is queued for execution on the scheduler associated with
+     the current realm. It will run after the commit has reached stable storage.
+     - parameter isGroupingAllowed     If `true`, the next `commitAsyncWrite` *may* run without an
+     intervening synchronization of stable storage.  Such a sequence of commits form a group.
+     In case of a platform crash, either none or all of the commits in a group will reach stable storage.
+     - note The call returns immediately allowing the caller to proceed while the I/O is performed on a dedicated background thread.
+     - note Callbacks to `onComplete` will occur in the order of `commitAsyncWriteTransaction`
+    */
+    public func commitAsyncWrite(_ onComplete: (() -> ())? = nil, isGroupingAllowed: BOOL = false) throws {
         try rlmRealm.commitAsyncWriteTransaction(onComplete)
     }
 
-    /**
-     */
-    public func cancelAsyncWrite() {
-        rlmRealm.cancelAsyncTransaction()
+    /** Cancel a queued code block (either for `writeAsync` or for`commitAsyncWrite`)
+     - note Cancelling a commit will not abort the commit, it will only cancel the callback
+     informing of commit completion.
+    */
+    public func cancelAsyncWrite(_  handle: Any) {
+        rlmRealm.cancelAsyncTransaction(handle)
     }
 
     /**
+     Returns true when async transactiona has been created and the result of the last
+     commit has not yet reached permanent storage.
      */
     public var isInAsyncWriteTransaction: Bool {
         return rlmRealm.inAsyncWriteTransaction
