@@ -650,10 +650,6 @@ case "$COMMAND" in
             export ASAN_OPTIONS='check_initialization_order=true:detect_stack_use_after_return=true'
         fi
         xcrun swift package resolve
-        # Xcode 13.2 beta fails to link the concurrency framework without this
-        if [ "$REALM_XCODE_VERSION" = 13.2 ]; then
-          SWIFT_TEST_FLAGS+=(-Xlinker -rpath -Xlinker "$(xcode-select -p)/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift-5.5/macosx")
-        fi
         xcrun swift test --configuration "$(echo "$CONFIGURATION" | tr "[:upper:]" "[:lower:]")" "${SWIFT_TEST_FLAGS[@]}"
         exit 0
         ;;
