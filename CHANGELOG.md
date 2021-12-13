@@ -1,5 +1,8 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
+
+Xcode 12.4 is now the minimum supported version of Xcode.
+
 ### Enhancements
 * Add an `enableSync` flag to `[RLMRealm writeCopyToURL:]` and `Realm.writeCopy()`. 
   This flag indicates whether the copied realm should be able to synchronize data 
@@ -11,8 +14,8 @@ x.y.z Release notes (yyyy-MM-dd)
   will be opened instead.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
-* None.
+* Add missing `Indexable` support for UUID. 
+  ([Cocoa #7545](https://github.com/realm/realm-cocoa/issues/7545), since v10.10.0)
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
@@ -21,7 +24,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 13.1.
 * CocoaPods: 1.10 or later.
-* Xcode: 12.2-13.1.
+* Xcode: 12.2-13.2 beta 2.
 
 ### Internal
 * Upgraded realm-core from ? to ?
@@ -161,7 +164,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 13.1.
 * CocoaPods: 1.10 or later.
-* Xcode: 12.2-13.1.
+* Xcode: 12.4-13.2.
 
 ### Internal
 

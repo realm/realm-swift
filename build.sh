@@ -644,12 +644,13 @@ case "$COMMAND" in
 
     test-swiftpm*)
         SANITIZER=$(echo "$COMMAND" | cut -d - -f 3)
+        SWIFT_TEST_FLAGS=(-Xcc -g0)
         if [ -n "$SANITIZER" ]; then
-            SANITIZER="--sanitize $SANITIZER"
+            SWIFT_TEST_FLAGS+=(--sanitize "$SANITIZER")
             export ASAN_OPTIONS='check_initialization_order=true:detect_stack_use_after_return=true'
         fi
         xcrun swift package resolve
-        xcrun swift test -Xcc -g0 --configuration "$(echo "$CONFIGURATION" | tr "[:upper:]" "[:lower:]")" $SANITIZER
+        xcrun swift test --configuration "$(echo "$CONFIGURATION" | tr "[:upper:]" "[:lower:]")" "${SWIFT_TEST_FLAGS[@]}"
         exit 0
         ;;
 
@@ -1366,7 +1367,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 13.1.
 * CocoaPods: 1.10 or later.
-* Xcode: 12.2-13.1.
+* Xcode: 12.4-13.2.
 
 ### Internal
 * Upgraded realm-core from ? to ?
