@@ -265,7 +265,7 @@ extension ObjectId: _OptionalPersistable, _DefaultConstructible, _PrimaryKey, _I
         RLMSetSwiftPropertyObjectId(obj, key, (value))
     }
 
-    public static func _rlmDefaultValue(_ forceDefaultInitialization: Bool) -> ObjectId {
+    public static func _rlmDefaultValue() -> ObjectId {
         return Self.generate()
     }
 }

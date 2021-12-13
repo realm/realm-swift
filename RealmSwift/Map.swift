@@ -195,7 +195,7 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
     public subscript(key: Key) -> Value? {
         get {
             if let lastAccessedNames = lastAccessedNames {
-                return Value._rlmKeyPathRecorder(with: lastAccessedNames)
+                return ((Value.self as! KeypathRecorder.Type).keyPathRecorder(with: lastAccessedNames) as! Value)
             }
             return rlmDictionary[objcKey(from: key)].map(staticBridgeCast)
         }
@@ -647,7 +647,10 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
         if let type = Value.self as? OptionalObject.Type {
             return RLMDictionary(objectClassName: type.className(), keyType: Key._rlmType)
         }
-        return RLMDictionary(objectType: Value._rlmType, optional: Value._rlmOptional, keyType: Key._rlmType)
+        if let type = Value.self as? _RealmSchemaDiscoverable.Type {
+            return RLMDictionary(objectType: type._rlmType, optional: type._rlmOptional, keyType: Key._rlmType)
+        }
+        fatalError("Collections of projections must be used with @Projected.")
     }
 
     /// :nodoc:
@@ -871,13 +874,5 @@ private protocol OptionalObject {
 extension Optional: OptionalObject where Wrapped: ObjectBase {
     static func className() -> String {
         Wrapped.className()
-    }
-}
-
-// MARK: Key Path Strings
-
-extension Map: PropertyNameConvertible {
-    var propertyInformation: (key: String, isLegacy: Bool)? {
-        return (key: rlmDictionary.propertyKey, isLegacy: rlmDictionary.isLegacyProperty)
     }
 }

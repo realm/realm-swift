@@ -67,7 +67,7 @@ import Realm
      */
     public subscript(index: Int) -> Element {
         if let lastAccessedNames = lastAccessedNames {
-            return Element._rlmKeyPathRecorder(with: lastAccessedNames)
+            return Element.keyPathRecorder(with: lastAccessedNames)
         }
         throwForNegativeIndex(index)
         return collection[UInt(index)] as! Element
@@ -91,15 +91,4 @@ import Realm
     internal var propertyName: String
     internal var handle: RLMLinkingObjectsHandle?
     internal var lastAccessedNames: NSMutableArray?
-}
-
-// MARK: Key Path Strings
-
-extension LinkingObjects: PropertyNameConvertible {
-    var propertyInformation: (key: String, isLegacy: Bool)? {
-        guard let handle = handle else {
-            return nil
-        }
-        return (key: handle._propertyKey, isLegacy: handle._isLegacyProperty)
-    }
 }

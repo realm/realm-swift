@@ -159,19 +159,22 @@ public struct Persisted<Value: _Persistable> {
         case let .unmanaged(value, _, _):
             return value
         case .unmanagedNoDefault:
-            let value = Value._rlmDefaultValue(false)
+            let value = Value._rlmDefaultValue()
             storage = .unmanaged(value: value)
             return value
         case let .unmanagedObserved(value, key):
             if let lastAccessedNames = object.lastAccessedNames {
-                var name: String = ""
+                let name: String
                 if Value._rlmType == .linkingObjects {
                     name = RLMObjectBaseObjectSchema(object)!.computedProperties[Int(key)].name
                 } else {
                     name = RLMObjectBaseObjectSchema(object)!.properties[Int(key)].name
                 }
                 lastAccessedNames.add(name)
-                return Value._rlmKeyPathRecorder(with: lastAccessedNames)
+                if let type = Value.self as? KeypathRecorder.Type {
+                    return type.keyPathRecorder(with: lastAccessedNames) as! Value
+                }
+                return Value._rlmDefaultValue()
             }
             return value
         case let .managed(key):
@@ -214,7 +217,7 @@ public struct Persisted<Value: _Persistable> {
         case let .unmanaged(v, _, _):
             value = v
         case .unmanagedNoDefault:
-            value = Value._rlmDefaultValue(false)
+            value = Value._rlmDefaultValue()
         case .unmanagedObserved, .managed, .managedCached:
             return
         }
@@ -241,7 +244,7 @@ extension Persisted: Encodable where Value: Encodable {
         case .unmanagedObserved(let value, _):
             try value.encode(to: encoder)
         case .unmanagedNoDefault:
-            try Value._rlmDefaultValue(false).encode(to: encoder)
+            try Value._rlmDefaultValue().encode(to: encoder)
         default:
             // We need a reference to the parent object to be able to read from
             // a managed property. There's probably a way to do this with some

@@ -239,6 +239,12 @@ open class Projection<Root: ObjectBase>: RealmCollectionValue, ProjectionObserva
 }
 """
     }
+
+    /// :nodoc:
+    public static func _rlmDefaultValue() -> Self {
+        fatalError()
+    }
+
 }
 
 extension ProjectionObservable {
@@ -415,21 +421,20 @@ extension ProjectionObservable {
     public func observe(keyPaths: [PartialKeyPath<Self>] = [],
                         on queue: DispatchQueue? = nil,
                         _ block: @escaping (ObjectChange<Self>) -> Void) -> NotificationToken {
-        let kps: [String]
+        var kps: [String]
         if keyPaths.isEmpty {
             kps = _schema.map(\.originPropertyKeyPathString)
         } else {
-            let emptyRoot = Root()
-            emptyRoot.lastAccessedNames = NSMutableArray()
-            emptyRoot.prepareForRecording()
-            let emptyProjection = Self(projecting: emptyRoot) // tracer time
-            keyPaths.forEach {
-                _ = emptyProjection[keyPath: $0]
+            kps = []
+            let root = Root.keyPathRecorder(with: [])
+            let projection = Self(projecting: root) // tracer time
+            for keyPath in keyPaths {
+                root.lastAccessedNames = NSMutableArray()
+                _ = projection[keyPath: keyPath]
+                kps.append(root.lastAccessedNames!.componentsJoined(by: "."))
             }
-            kps = emptyRoot.lastAccessedNames! as! [String]
         }
-        return rootObject._observe(keyPaths: kps,
-                                   on: queue, { change in
+        return rootObject._observe(keyPaths: kps, on: queue, { change in
             block(ObjectChange<Self>.processChange(change, self))
         })
     }

@@ -100,7 +100,7 @@ public struct StringOptions: OptionSet {
 
  */
 @dynamicMemberLookup
-public struct Query<T: _RealmSchemaDiscoverable> {
+public struct Query<T> {
     /// This initaliser should be used from callers who require queries on primitive collections.
     /// - Parameter isPrimitive: True if performing a query on a primitive collection.
     internal init(isPrimitive: Bool = false) {

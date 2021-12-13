@@ -72,8 +72,9 @@ public final class MutableSet<Element: RealmCollectionValue>: RLMSwiftCollection
      */
     public subscript(position: Int) -> Element {
         if let lastAccessedNames = lastAccessedNames {
-            return Element._rlmKeyPathRecorder(with: lastAccessedNames)
+            return elementKeyPathRecorder(for: Element.self, with: lastAccessedNames)
         }
+
         throwForNegativeIndex(position)
         return staticBridgeCast(fromObjectiveC: rlmSet.object(at: UInt(position)))
     }
@@ -192,7 +193,10 @@ public final class MutableSet<Element: RealmCollectionValue>: RLMSwiftCollection
         if let type = Element.self as? ObjectBase.Type {
             return RLMSet(objectClassName: type.className())
         }
-        return RLMSet(objectType: Element._rlmType, optional: Element._rlmOptional)
+        if let type = Element.self as? _RealmSchemaDiscoverable.Type {
+            return RLMSet(objectType: type._rlmType, optional: type._rlmOptional)
+        }
+        fatalError("Collections of projections must be used with @Projected.")
     }
 
     /// :nodoc:
@@ -241,11 +245,3 @@ extension MutableSet: Decodable where Element: Decodable {
 }
 
 extension MutableSet: Encodable where Element: Encodable {}
-
-// MARK: Key Path Strings
-
-extension MutableSet: PropertyNameConvertible {
-    var propertyInformation: (key: String, isLegacy: Bool)? {
-        return (key: rlmSet.propertyKey, isLegacy: rlmSet.isLegacyProperty)
-    }
-}
