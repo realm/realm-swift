@@ -7,17 +7,20 @@ Xcode 12.4 is now the minimum supported version of Xcode.
 * None.
 
 ### Fixed
-* Add missing `Indexable` support for UUID. 
+* Add missing `Indexable` support for UUID.
   ([Cocoa #7545](https://github.com/realm/realm-cocoa/issues/7545), since v10.10.0)
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+### Breaking Changes
+* All `async` functions now require Xcode 13.2 to work around an App
+  Store/TestFlight bug that results in apps built with 13.0/13.1 which do not
+  use libConcurrency but link a library which does crashing on startup.
 
 ### Compatibility
 * Realm Studio: 11.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
-* Carthage release for Swift is built with Xcode 13.1.
+* Carthage release for Swift is built with Xcode 13.2.
 * CocoaPods: 1.10 or later.
-* Xcode: 12.2-13.2 beta 2.
+* Xcode: 12.2-13.2.
 
 ### Internal
 * Upgraded realm-core from ? to ?

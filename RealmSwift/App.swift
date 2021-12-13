@@ -547,7 +547,7 @@ public extension APIKeyAuth {
     }
 }
 
-#if swift(>=5.5) && canImport(_Concurrency)
+#if swift(>=5.5.2) && canImport(_Concurrency)
 @available(macOS 12.0, tvOS 15.0, iOS 15.0, watchOS 8.0, *)
 extension EmailPasswordAuth {
     /// Resets the password of an email identity using the
