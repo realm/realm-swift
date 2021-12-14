@@ -218,7 +218,7 @@ extension Realm {
     }
 }
 
-#if swift(>=5.5) && canImport(_Concurrency)
+#if swift(>=5.5.2) && canImport(_Concurrency)
 extension ThreadSafeReference: Sendable {
 }
 extension RLMThreadSafeReference: @unchecked Sendable {
