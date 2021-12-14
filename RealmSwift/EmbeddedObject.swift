@@ -263,7 +263,6 @@ extension EmbeddedObject: ThreadConfined {
     }
 }
 
-
 // MARK: CustomObjectiveCBridgeable
 
 // FIXME: Remove when `as! Self` can be written

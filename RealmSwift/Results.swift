@@ -86,6 +86,10 @@ extension AnyRealmValue: AddableType {}
 
     internal let rlmResults: RLMResults<AnyObject>
 
+    public static func == (lhs: Results<Element>, rhs: Results<Element>) -> Bool {
+        lhs.rlmResults.isEqual(rhs.rlmResults)
+    }
+
     /// A human-readable description of the objects represented by the results.
     public var description: String {
         return RLMDescriptionWithMaxDepth("Results", rlmResults, RLMDescriptionMaxDepth)
@@ -115,6 +119,7 @@ extension AnyRealmValue: AddableType {}
     internal init(_ rlmResults: RLMResults<AnyObject>) {
         self.rlmResults = rlmResults
     }
+
     internal init(objc rlmResults: RLMResults<AnyObject>) {
         self.rlmResults = rlmResults
     }
@@ -168,10 +173,14 @@ extension AnyRealmValue: AddableType {}
     }
 
     /// Returns the first object in the results, or `nil` if the results are empty.
-    public var first: Element? { return rlmResults.firstObject().map(dynamicBridgeCast) }
+    public var first: Element? {
+        return rlmResults.firstObject().map(dynamicBridgeCast)
+    }
 
     /// Returns the last object in the results, or `nil` if the results are empty.
-    public var last: Element? { return rlmResults.lastObject().map(dynamicBridgeCast) }
+    public var last: Element? {
+        return rlmResults.lastObject().map(dynamicBridgeCast)
+    }
 
     /**
      Returns an array containing the objects in the results at the indexes specified by a given index set.

@@ -130,7 +130,12 @@ void (RLMAssertThrowsWithReasonMatching)(XCTestCase *self, __attribute__((noesca
 void (RLMAssertMatches)(XCTestCase *self, __attribute__((noescape)) NSString *(^block)(),
                         NSString *regexString, NSString *message, NSString *fileName, NSUInteger lineNumber) {
     NSString *result = block();
-    NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:regexString options:(NSRegularExpressionOptions)0 error:nil];
+    NSError *err;
+    NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:regexString options:(NSRegularExpressionOptions)0 error:&err];
+    if (err) {
+        recordFailure(self, err.localizedDescription, fileName, lineNumber);
+        return;
+    }
     if ([regex numberOfMatchesInString:result options:(NSMatchingOptions)0 range:NSMakeRange(0, result.length)] == 0) {
         NSString *msg = [NSString stringWithFormat:@"The given expression '%@' did not match '%@'%@",
                          result, regexString, message ? [NSString stringWithFormat:@": %@", message] : @""];

@@ -4,7 +4,32 @@ x.y.z Release notes (yyyy-MM-dd)
 Xcode 12.4 is now the minimum supported version of Xcode.
 
 ### Enhancements
-* None.
+* Add class `Projection` to allow creation of light weight view models out of Realm Objects.  
+```swift
+public class Person: Object {
+    @Persisted var firstName = ""
+    @Persisted var lastName = ""
+    @Persisted var address: Address? = nil
+    @Persisted var friends = List<Person>()
+}
+
+public class Address: EmbeddedObject {
+    @Persisted var city: String = ""
+    @Persisted var country = ""
+}
+
+class PersonProjection: Projection<Person> {
+    // `Person.firstName` will have same name and type
+    @Projected(\Person.firstName) var firstName
+    // There will be the only String for `city` of the original object `Address`
+    @Projected(\Person.address.city) var homeCity 
+    // List<Person> will be mapped to list of firstNames
+    @Projected(\Person.friends.projectTo.firstName) var firstFriendsName: ProjectedCollection<String>
+}
+
+// `people` will contain projections for every `Person` object in the `realm`
+let people: Results<PersonProjection> = realm.objects(PersonProjection.self)
+```
 
 ### Fixed
 * Add missing `Indexable` support for UUID. 

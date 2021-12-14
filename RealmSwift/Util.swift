@@ -105,6 +105,8 @@ internal func failableDynamicBridgeCast<T>(fromObjectiveC x: Any) -> T? {
         return bridgeableType.bridging(objCValue: x) as? T
     } else if let bridgeableType = T.self as? RealmEnum.Type {
         return bridgeableType._rlmFromRawValue(x).flatMap { $0 as? T }
+    } else if let object = x as? ObjectBase, let type = T.self as? Projection<ObjectBase>.Type {
+        return type.init(projecting: object) as? T
     } else {
         return x as? T
     }
