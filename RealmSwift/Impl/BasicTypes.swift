@@ -335,11 +335,6 @@ extension AnyRealmValue: _Persistable, _DefaultConstructible {
         return ObjectiveCSupport.convert(value: RLMGetSwiftPropertyAny(obj, key))
     }
 
-    @inlinable
-    public static func _rlmGetPropertyOptional(_ obj: ObjectBase, _ key: PropertyKey) -> AnyRealmValue? {
-        fatalError() // This should be caught by schema validation
-    }
-
     public static func _rlmSetProperty(_ obj: ObjectBase, _ key: PropertyKey, _ value: AnyRealmValue) {
         RLMSetSwiftPropertyAny(obj, key, value._rlmObjcValue as! RLMValue)
     }

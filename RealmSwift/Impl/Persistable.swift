@@ -47,8 +47,6 @@ extension NSDate: _HasPersistedType {
 public protocol _Persistable: _RealmSchemaDiscoverable, _HasPersistedType where PersistedType: _Persistable {
     // Read a value of this type from the target object
     static func _rlmGetProperty(_ obj: ObjectBase, _ key: PropertyKey) -> Self
-    // Read an optional value of this type from the target object
-    static func _rlmGetPropertyOptional(_ obj: ObjectBase, _ key: PropertyKey) -> Self?
     // Set a value of this type on the target object
     static func _rlmSetProperty(_ obj: ObjectBase, _ key: PropertyKey, _ value: Self)
     // Set the swiftAccessor for this type if the default PersistedPropertyAccessor
@@ -68,7 +66,10 @@ extension _Persistable {
 }
 
 // A type which can appear inside Optional<T> in a @Persisted property
-public protocol _PersistableInsideOptional: _Persistable, _DefaultConstructible where PersistedType: _PersistableInsideOptional { }
+public protocol _PersistableInsideOptional: _Persistable, _DefaultConstructible where PersistedType: _PersistableInsideOptional {
+    // Read an optional value of this type from the target object
+    static func _rlmGetPropertyOptional(_ obj: ObjectBase, _ key: PropertyKey) -> Self?
+}
 
 extension _PersistableInsideOptional {
     public static func _rlmSetAccessor(_ prop: RLMProperty) {

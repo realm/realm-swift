@@ -99,10 +99,6 @@ extension List: _HasPersistedType, _Persistable, _DefaultConstructible where Ele
         return Self(collection: RLMGetSwiftPropertyArray(obj, key))
     }
 
-    public static func _rlmGetPropertyOptional(_ obj: ObjectBase, _ key: UInt16) -> Self? {
-        fatalError("List properties cannot be optional")
-    }
-
     public static func _rlmSetProperty(_ obj: ObjectBase, _ key: UInt16, _ value: List) {
         let array = RLMGetSwiftPropertyArray(obj, key)
         if array.isEqual(value.rlmArray) { return }
@@ -134,10 +130,6 @@ extension MutableSet: _HasPersistedType, _Persistable, _DefaultConstructible whe
         return Self(collection: RLMGetSwiftPropertySet(obj, key))
     }
 
-    public static func _rlmGetPropertyOptional(_ obj: ObjectBase, _ key: UInt16) -> Self? {
-        fatalError("Set properties cannot be optional")
-    }
-
     public static func _rlmSetProperty(_ obj: ObjectBase, _ key: UInt16, _ value: MutableSet) {
         let set = RLMGetSwiftPropertySet(obj, key)
         if set.isEqual(value.rlmSet) { return }
@@ -167,10 +159,6 @@ extension Map: _HasPersistedType, _Persistable, _DefaultConstructible where Valu
     public static var _rlmRequiresCaching: Bool { true }
 
     public static func _rlmGetProperty(_ obj: ObjectBase, _ key: UInt16) -> Self {
-        return Self(objc: RLMGetSwiftPropertyMap(obj, key))
-    }
-
-    public static func _rlmGetPropertyOptional(_ obj: ObjectBase, _ key: UInt16) -> Self? {
         return Self(objc: RLMGetSwiftPropertyMap(obj, key))
     }
 
@@ -224,10 +212,6 @@ extension LinkingObjects: _HasPersistedType, _Persistable where Element: _Persis
         return Self(propertyName: prop.name, handle: RLMLinkingObjectsHandle(object: obj, property: prop))
     }
 
-    public static func _rlmGetPropertyOptional(_ obj: ObjectBase, _ key: UInt16) -> LinkingObjects? {
-        fatalError("LinkingObjects properties cannot be optional")
-    }
-
     public static func _rlmSetProperty(_ obj: ObjectBase, _ key: UInt16, _ value: LinkingObjects) {
         fatalError("LinkingObjects properties are read-only")
     }
@@ -255,9 +239,6 @@ extension Optional: _Persistable where Wrapped: _PersistableInsideOptional {
     }
     public static func _rlmGetProperty(_ obj: ObjectBase, _ key: UInt16) -> Wrapped? {
         return Wrapped._rlmGetPropertyOptional(obj, key)
-    }
-    public static func _rlmGetPropertyOptional(_ obj: ObjectBase, _ key: UInt16) -> Wrapped?? {
-        fatalError("Double-optional properties are not supported")
     }
     public static func _rlmSetProperty(_ obj: ObjectBase, _ key: UInt16, _ value: Wrapped?) {
         if let value = value {
