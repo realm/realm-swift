@@ -207,7 +207,7 @@ extension ObjectChange {
 /// let personObject = realm.create(Person.self)
 /// let singleProjection = PersonProjection(projecting: personObject)
 /// ```
-open class Projection<Root: ObjectBase>: RealmCollectionValue, ProjectionObservable {
+open class Projection<Root: ObjectBase & RealmCollectionValue>: RealmCollectionValue, ProjectionObservable {
     /// :nodoc:
     public typealias PersistedType = Root
 

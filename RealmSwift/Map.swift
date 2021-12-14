@@ -44,7 +44,7 @@ extension String: _MapKey { }
  
  Properties of `Map` type defined on `Object` subclasses must be declared as `let` and cannot be `dynamic`.
 */
-public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, Value: RealmCollectionValue {
+public final class Map<Key: _MapKey, Value: RealmCollectionValue>: RLMSwiftCollectionBase {
 
     // MARK: Properties
 
@@ -357,7 +357,7 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
 
      - parameter property: The name of a property whose minimum value is desired.
      */
-    public func min<T: MinMaxType>(ofProperty property: String) -> T? {
+    public func min<T: _HasPersistedType>(ofProperty property: String) -> T? where T.PersistedType: MinMaxType {
         return rlmDictionary.min(ofProperty: property).map(staticBridgeCast)
     }
 
@@ -369,7 +369,7 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
 
      - parameter property: The name of a property whose minimum value is desired.
      */
-    public func max<T: MinMaxType>(ofProperty property: String) -> T? {
+    public func max<T: _HasPersistedType>(ofProperty property: String) -> T? where T.PersistedType: MinMaxType {
         return rlmDictionary.max(ofProperty: property).map(staticBridgeCast)
     }
 
@@ -380,7 +380,7 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
 
     - parameter property: The name of a property conforming to `AddableType` to calculate sum on.
     */
-    public func sum<T: AddableType>(ofProperty property: String) -> T {
+    public func sum<T: _HasPersistedType>(ofProperty property: String) -> T where T.PersistedType: AddableType {
         return staticBridgeCast(fromObjectiveC: rlmDictionary.sum(ofProperty: property))
     }
 
@@ -392,7 +392,7 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
 
      - parameter property: The name of a property whose values should be summed.
      */
-    public func average<T: AddableType>(ofProperty property: String) -> T? {
+    public func average<T: _HasPersistedType>(ofProperty property: String) -> T? where T.PersistedType: AddableType {
         return rlmDictionary.average(ofProperty: property).map(staticBridgeCast)
     }
 
@@ -644,7 +644,7 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
 
     // swiftlint:disable:next identifier_name
     @objc class func _unmanagedCollection() -> RLMDictionary<AnyObject, AnyObject> {
-        if let type = Value.self as? OptionalObject.Type {
+        if let type = Value.self as? HasClassName.Type ?? Value.PersistedType.self as? HasClassName.Type {
             return RLMDictionary(objectClassName: type.className(), keyType: Key._rlmType)
         }
         if let type = Value.self as? _RealmSchemaDiscoverable.Type {
@@ -675,68 +675,6 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
 
     private func objcKey(from swiftKey: Key) -> AnyObject {
         return swiftKey as AnyObject
-    }
-}
-
-extension Map where Value: MinMaxType {
-    /**
-     Returns the minimum (lowest) value in the map, or `nil` if the map is empty.
-     */
-    public func min() -> Value? {
-        return _rlmCollection.min(ofProperty: "self").map(staticBridgeCast)
-    }
-
-    /**
-     Returns the maximum (highest) value in the map, or `nil` if the map is empty.
-     */
-    public func max() -> Value? {
-        return _rlmCollection.max(ofProperty: "self").map(staticBridgeCast)
-    }
-}
-
-extension Map where Value: OptionalProtocol, Value.Wrapped: MinMaxType {
-    /**
-     Returns the minimum (lowest) value of the map, or `nil` if the map is empty.
-     */
-    public func min() -> Value.Wrapped? {
-        return _rlmCollection.min(ofProperty: "self").map(staticBridgeCast)
-    }
-    /**
-     Returns the maximum (highest) value of the map, or `nil` if the map is empty.
-     */
-    public func max() -> Value.Wrapped? {
-        return _rlmCollection.max(ofProperty: "self").map(staticBridgeCast)
-    }
-}
-
-extension Map where Value: AddableType {
-    /**
-     Returns the sum of the values in the map.
-     */
-    public func sum() -> Value {
-        return sum(ofProperty: "self")
-    }
-
-    /**
-     Returns the average of the values in the map, or `nil` if the map is empty.
-     */
-    public func average<T: AddableType>() -> T? {
-        return average(ofProperty: "self")
-    }
-}
-
-public extension Map where Value: OptionalProtocol, Value.Wrapped: AddableType {
-    /**
-     Returns the sum of the values in the map, or `nil` if the map is empty.
-     */
-    func sum() -> Value.Wrapped {
-        return sum(ofProperty: "self")
-    }
-    /**
-     Returns the average of all of the values in the collection.
-     */
-    func average<T: AddableType>() -> T? {
-        return average(ofProperty: "self")
     }
 }
 
@@ -868,10 +806,11 @@ public struct SingleMapEntry<Key: _MapKey, Value: RealmCollectionValue>: _RealmM
     public var value: Self.Value
 }
 
-private protocol OptionalObject {
+private protocol HasClassName {
     static func className() -> String
 }
-extension Optional: OptionalObject where Wrapped: ObjectBase {
+extension ObjectBase: HasClassName {}
+extension Optional: HasClassName where Wrapped: ObjectBase {
     static func className() -> String {
         Wrapped.className()
     }

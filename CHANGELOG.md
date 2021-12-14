@@ -20,7 +20,7 @@ class PersonProjection: Projection<Person> {
     // `Person.firstName` will have same name and type
     @Projected(\Person.firstName) var firstName
     // There will be the only String for `city` of the original object `Address`
-    @Projected(\Person.address.city) var homeCity 
+    @Projected(\Person.address.city) var homeCity
     // List<Person> will be mapped to list of firstNames
     @Projected(\Person.friends.projectTo.firstName) var firstFriendsName: ProjectedCollection<String>
 }
@@ -43,6 +43,15 @@ let people: Results<PersonProjection> = realm.objects(PersonProjection.self)
   dictionaries (e.g. "dictProperty.@allValues.name CONTAINS 'a'").
 * Improve the error message for many types of invalid predicates in queries.
 * Add support for comparing `@allKeys` to another property on the same object.
+* Add `Numeric` conformance to `Decimal128`.
+* Make some invalid property declarations such as `List<AnyRealmValue?>` a
+  compile-time error instead of a runtime error.
+* Calling `.sorted(byKeyPath:)` on a collection with an Element type which does
+  not support sorting by keypaths is now a compile-time error instead of a
+  runtime error.
+* `RealmCollection.sorted(ascending:)` can now be called on all
+  non-Object/EmbeddedObject collections rather than only ones where the
+  `Element` conforms to `Comparable`.
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
