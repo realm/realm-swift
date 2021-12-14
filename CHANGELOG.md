@@ -32,10 +32,19 @@ let people: Results<PersonProjection> = realm.objects(PersonProjection.self)
 * Allow using Swift enums which conform to `PersistableEnum` as the value type
   for all Realm collections.
 * `AnyRealmCollection` now conforms to `Encodable`.
+* AnyRealmValue and PersistableEnum values can now be passed directly to an
+  NSPredicate used in a filter() call rather than having to pass the rawValue
+  (the rawValue is still allowed).
+* Queries on collections of PersistableEnums can now be performed with `where()`.
+* Add support for querying on the rawValue of an enum with `where()`.
+* `.count` is supported for Maps of all types rather than just numeric types in `where()`.
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
 * None.
+* Add missing `Indexable` support for UUID. 
+  ([Cocoa #7545](https://github.com/realm/realm-cocoa/issues/7545), since v10.10.0)
+* `where()` allowed constructing some nonsensical queries due to boolean comparisons returning `Query<T>` rather than `Query<Bool>`.
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 

@@ -19,7 +19,8 @@
 import Realm
 import Realm.Private
 
-extension Object: SchemaDiscoverable, _OptionalPersistable, _BuiltInPersistable, _DefaultConstructible {
+extension Object: SchemaDiscoverable, _OptionalPersistable, _DefaultConstructible {
+    public typealias PersistedType = Object
     public static var _rlmType: PropertyType { .object }
     public static func _rlmPopulateProperty(_ prop: RLMProperty) {
         if !prop.optional && !prop.collection {
@@ -55,7 +56,8 @@ extension Object: SchemaDiscoverable, _OptionalPersistable, _BuiltInPersistable,
     }
 }
 
-extension EmbeddedObject: SchemaDiscoverable, _OptionalPersistable, _BuiltInPersistable, _DefaultConstructible {
+extension EmbeddedObject: SchemaDiscoverable, _OptionalPersistable, _DefaultConstructible {
+    public typealias PersistedType = EmbeddedObject
     public static var _rlmType: PropertyType { .object }
     public static func _rlmPopulateProperty(_ prop: RLMProperty) {
         Object._rlmPopulateProperty(prop)
@@ -90,7 +92,7 @@ extension List: SchemaDiscoverable where Element: _RealmSchemaDiscoverable {
 }
 
 extension List: _Persistable, _DefaultConstructible where Element: _Persistable {
-    public typealias _RealmValue = List
+    public typealias PersistedType = List
     public static var _rlmRequiresCaching: Bool { true }
 
     public static func _rlmGetProperty(_ obj: ObjectBase, _ key: UInt16) -> Self {
@@ -125,7 +127,7 @@ extension MutableSet: SchemaDiscoverable where Element: _RealmSchemaDiscoverable
 }
 
 extension MutableSet: _Persistable, _DefaultConstructible where Element: _Persistable {
-    public typealias _RealmValue = MutableSet
+    public typealias PersistedType = MutableSet
     public static var _rlmRequiresCaching: Bool { true }
 
     public static func _rlmGetProperty(_ obj: ObjectBase, _ key: UInt16) -> Self {
@@ -161,7 +163,7 @@ extension Map: SchemaDiscoverable where Value: _RealmSchemaDiscoverable {
 }
 
 extension Map: _Persistable, _DefaultConstructible where Value: _Persistable {
-    public typealias _RealmValue = Map
+    public typealias PersistedType = Map
     public static var _rlmRequiresCaching: Bool { true }
 
     public static func _rlmGetProperty(_ obj: ObjectBase, _ key: UInt16) -> Self {
@@ -212,7 +214,7 @@ extension RealmOptional: SchemaDiscoverable, _RealmSchemaDiscoverable where Valu
 }
 
 extension LinkingObjects: _Persistable where Element: _Persistable {
-    public typealias _RealmValue = Self
+    public typealias PersistedType = Self
     public static func _rlmDefaultValue(_ forceDefaultInitialization: Bool) -> Self {
         if forceDefaultInitialization {
             return .init(propertyName: "", handle: nil)
@@ -248,7 +250,7 @@ extension Optional: SchemaDiscoverable, _RealmSchemaDiscoverable where Wrapped: 
 }
 
 extension Optional: _Persistable where Wrapped: _OptionalPersistable {
-    public typealias _RealmValue = Self
+    public typealias PersistedType = Self
 
     public static func _rlmDefaultValue(_ forceDefaultInitialization: Bool) -> Self {
         if forceDefaultInitialization {
@@ -274,8 +276,8 @@ extension Optional: _Persistable where Wrapped: _OptionalPersistable {
     }
 }
 
-extension Optional: _PrimaryKey where Wrapped: _Persistable, Wrapped._RealmValue: _PrimaryKey {}
-extension Optional: _Indexable where Wrapped: _Persistable, Wrapped._RealmValue: _Indexable {}
+extension Optional: _PrimaryKey where Wrapped: _Persistable, Wrapped.PersistedType: _PrimaryKey {}
+extension Optional: _Indexable where Wrapped: _Persistable, Wrapped.PersistedType: _Indexable {}
 
 extension RealmProperty: _RealmSchemaDiscoverable, SchemaDiscoverable where Value: _RealmSchemaDiscoverable {
     public static var _rlmType: PropertyType { Value._rlmType }
@@ -298,7 +300,7 @@ extension RawRepresentable where RawValue: _RealmSchemaDiscoverable {
 }
 
 extension RawRepresentable where Self: _OptionalPersistable, RawValue: _OptionalPersistable {
-    public typealias _RealmValue = RawValue
+    public typealias PersistedType = RawValue
     public static func _rlmGetProperty(_ obj: ObjectBase, _ key: PropertyKey) -> Self {
         return Self(rawValue: RawValue._rlmGetProperty(obj, key))!
     }

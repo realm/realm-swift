@@ -312,7 +312,7 @@ extension PersistableEnum {
 /// to it will simply result in runtime errors rather than compile-time errors.
 public protocol _Indexable {}
 
-extension Persisted where Value._RealmValue: _Indexable {
+extension Persisted where Value.PersistedType: _Indexable {
     /// Declares an indexed property which is lazily initialized to the type's default value.
     public init(indexed: Bool) {
         storage = .unmanagedNoDefault(indexed: indexed)
@@ -329,7 +329,7 @@ extension Persisted where Value._RealmValue: _Indexable {
 /// to it will simply result in runtime errors rather than compile-time errors.
 public protocol _PrimaryKey {}
 
-extension Persisted where Value._RealmValue: _PrimaryKey {
+extension Persisted where Value.PersistedType: _PrimaryKey {
     /// Declares the primary key property which is lazily initialized to the type's default value.
     public init(primaryKey: Bool) {
         storage = .unmanagedNoDefault(primary: primaryKey)

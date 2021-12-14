@@ -307,6 +307,10 @@ class RealmCollectionTests<Collection: RealmCollection, AggregateCollection: Rea
         XCTAssertEqual(1, collection.filter("stringCol = %@", "2").count)
         XCTAssertEqual(0, collection.filter("stringCol = %@", "3").count)
 
+        XCTAssertEqual(1, collection.filter("stringCol = %@", AnyRealmValue.string("1")).count)
+        XCTAssertEqual(1, collection.filter("stringCol = %@", AnyRealmValue.string("2")).count)
+        XCTAssertEqual(0, collection.filter("stringCol = %@", AnyRealmValue.string("3")).count)
+
         XCTAssertEqual(1, collection.filter { $0.stringCol == "1" }.count)
         XCTAssertEqual(1, collection.filter { $0.stringCol == "2" }.count)
         XCTAssertEqual(0, collection.filter { $0.stringCol == "3" }.count)
@@ -355,6 +359,13 @@ class RealmCollectionTests<Collection: RealmCollection, AggregateCollection: Rea
         XCTAssertEqual(1, collection.filter(NSPredicate(format: "stringCol = '1'")).count)
         XCTAssertEqual(1, collection.filter(NSPredicate(format: "stringCol = '2'")).count)
         XCTAssertEqual(0, collection.filter(NSPredicate(format: "stringCol = '3'")).count)
+
+        let pred1 = NSPredicate(format: "stringCol = %@", argumentArray: [AnyRealmValue.string("1")])
+        let pred2 = NSPredicate(format: "stringCol = %@", argumentArray: [AnyRealmValue.string("2")])
+        let pred3 = NSPredicate(format: "stringCol = %@", argumentArray: [AnyRealmValue.string("3")])
+        XCTAssertEqual(1, collection.filter(pred1).count)
+        XCTAssertEqual(1, collection.filter(pred2).count)
+        XCTAssertEqual(0, collection.filter(pred3).count)
     }
 
     func testSortWithProperty() {

@@ -51,19 +51,13 @@ public protocol _Persistable: _RealmSchemaDiscoverable, _ObjcBridgeable {
     static func _rlmKeyPathRecorder(with lastAccessedNames: NSMutableArray) -> Self
     // The type which is actually stored in the Realm. This is Self for types
     // we support directly, but may be a different type for enums and mapped types.
-    associatedtype _RealmValue: _Persistable
+    associatedtype PersistedType: _Persistable
 }
 
 extension _Persistable {
     public static var _rlmRequiresCaching: Bool {
         false
     }
-}
-
-// A helper protocol for types which we support directly rather than via
-// mapping to a supported type.
-public protocol _BuiltInPersistable {
-    associatedtype _RealmValue = Self
 }
 
 extension _RealmSchemaDiscoverable where Self: _Persistable {

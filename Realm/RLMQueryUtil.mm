@@ -18,8 +18,7 @@
 
 #import "RLMQueryUtil.hpp"
 
-#import "RLMDecimal128_Private.hpp"
-#import "RLMObjectId_Private.hpp"
+#import "RLMAccessor.hpp"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObject_Private.hpp"
 #import "RLMPredicateUtil.hpp"
@@ -992,78 +991,19 @@ void process_or_group(Query &query, id array, Func&& func) {
 
 #pragma mark Conversion Helpers
 
-template <typename RequestedType>
-RequestedType convert(id value);
-
-template <>
-Timestamp convert<Timestamp>(id value) {
-    return RLMTimestampForNSDate(value);
-}
-
-template <>
-bool convert<bool>(id value) {
-    return [value boolValue];
-}
-
-template <>
-Double convert<Double>(id value) {
-    return [value doubleValue];
-}
-
-template <>
-Float convert<Float>(id value) {
-    return [value floatValue];
-}
-
-template <>
-Int convert<Int>(id value) {
-    return [value longLongValue];
-}
-
-template <>
-String convert<String>(id value) {
-    return isNSNull(value) ? StringData() : RLMStringDataWithNSString(value);
-}
-
-template <>
-Binary convert<Binary>(id value) {
-    return isNSNull(value) ? BinaryData() : RLMBinaryDataForNSData(value);
-}
-
-template <>
-Decimal128 convert<Decimal128>(id value) {
-    return RLMObjcToDecimal128(value);
-}
-
-template <>
-UUID convert<UUID>(id value) {
-    return RLMObjcToUUID(value);
-}
-
-template <>
-ObjectId convert<ObjectId>(id value) {
-    if (auto objectId = RLMDynamicCast<RLMObjectId>(value)) {
-        return objectId.value;
-    }
-    if (auto string = RLMDynamicCast<NSString>(value)) {
-        return ObjectId(string.UTF8String);
-    }
-    @throw RLMException(@"Cannot convert value '%@' of type '%@' to object id", value, [value class]);
-}
-
-template <>
-Mixed convert<Mixed>(id value) {
-    return RLMObjcToMixed(value, nil, CreatePolicy::Skip);
-}
-
 template <typename>
 realm::null value_of_type(realm::null) {
     return realm::null();
 }
 
 template <typename RequestedType>
-auto value_of_type(id value) {
-    return ::convert<RequestedType>(value);
+auto value_of_type(__unsafe_unretained const id value) {
+    return RLMStatelessAccessorContext::unbox<RequestedType>(value);
+}
+
+template <>
+auto value_of_type<Mixed>(id value) {
+    return RLMObjcToMixed(value, nil, CreatePolicy::Skip);
 }
 
 template <typename RequestedType>
