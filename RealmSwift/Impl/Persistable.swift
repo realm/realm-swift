@@ -29,7 +29,7 @@ public typealias PropertyKey = UInt16
 internal protocol DiscoverablePersistedProperty: _RealmSchemaDiscoverable {}
 
 // A type which can be stored by the @Persisted property wrapper
-public protocol _Persistable: _RealmSchemaDiscoverable {
+public protocol _Persistable: _RealmSchemaDiscoverable, _ObjcBridgeable {
     // Read a value of this type from the target object
     static func _rlmGetProperty(_ obj: ObjectBase, _ key: PropertyKey) -> Self
     // Read an optional value of this type from the target object

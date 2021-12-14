@@ -203,7 +203,7 @@ extension EmbeddedObject: RealmCollectionValue {
      */
     public func dynamicList(_ propertyName: String) -> List<DynamicObject> {
         let list = RLMDynamicGetByName(self, propertyName) as! RLMSwiftCollectionBase
-        return List<DynamicObject>(objc: list._rlmCollection as! RLMArray<AnyObject>)
+        return List<DynamicObject>(collection: list._rlmCollection as! RLMArray<AnyObject>)
     }
 
     // MARK: Comparison
@@ -260,22 +260,5 @@ extension EmbeddedObject: ThreadConfined {
      */
     public func thaw() -> Self? {
         return realm?.thaw(self)
-    }
-}
-
-// MARK: CustomObjectiveCBridgeable
-
-// FIXME: Remove when `as! Self` can be written
-private func forceCastToInferred<T, V>(_ x: T) -> V {
-    return x as! V
-}
-
-extension EmbeddedObject: CustomObjectiveCBridgeable {
-    static func bridging(objCValue objectiveCValue: Any) -> Self {
-        return forceCastToInferred(objectiveCValue)
-    }
-
-    var objCValue: Any {
-        return unsafeBitCast(self, to: RLMObject.self)
     }
 }

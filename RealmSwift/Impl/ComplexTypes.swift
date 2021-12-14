@@ -94,7 +94,7 @@ extension List: _Persistable, _DefaultConstructible where Element: _Persistable 
     public static var _rlmRequiresCaching: Bool { true }
 
     public static func _rlmGetProperty(_ obj: ObjectBase, _ key: UInt16) -> Self {
-        return Self(objc: RLMGetSwiftPropertyArray(obj, key))
+        return Self(collection: RLMGetSwiftPropertyArray(obj, key))
     }
 
     public static func _rlmGetPropertyOptional(_ obj: ObjectBase, _ key: UInt16) -> Self? {
@@ -129,7 +129,7 @@ extension MutableSet: _Persistable, _DefaultConstructible where Element: _Persis
     public static var _rlmRequiresCaching: Bool { true }
 
     public static func _rlmGetProperty(_ obj: ObjectBase, _ key: UInt16) -> Self {
-        return Self(objc: RLMGetSwiftPropertySet(obj, key))
+        return Self(collection: RLMGetSwiftPropertySet(obj, key))
     }
 
     public static func _rlmGetPropertyOptional(_ obj: ObjectBase, _ key: UInt16) -> Self? {
@@ -312,13 +312,18 @@ extension RawRepresentable where Self: _OptionalPersistable, RawValue: _Optional
         if prop.optional {
             prop.swiftAccessor = BridgedPersistedPropertyAccessor<Optional<Self>>.self
         } else {
-            prop.swiftAccessor = PersistedEnumAccessor<Self>.self
+            prop.swiftAccessor = BridgedPersistedPropertyAccessor<Self>.self
         }
     }
 }
 
-extension PersistableEnum {
+// Projections need to be usable in collections, which means they have to be
+// SchemaDiscoverable even though they can't be used with @Persisted
+extension Projection: SchemaDiscoverable {
+    public static var _rlmType: PropertyType {
+        fatalError("Projection types cannot be used with @Persisted and must use @Projected")
+    }
     public static func _rlmDefaultValue(_ forceDefaultInitialization: Bool) -> Self {
-        return self.allCases.first!
+        fatalError()
     }
 }
