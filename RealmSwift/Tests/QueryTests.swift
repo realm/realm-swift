@@ -5464,10 +5464,6 @@ class QueryTests: TestCase {
                     \Query<ModernAllTypesObject>.objectCol.arrayInt32)
         validateAverage("arrayInt64", Int64.average(), Int64(64),
                     \Query<ModernAllTypesObject>.objectCol.arrayInt64)
-        validateAverage("arrayFloat", Float.average(), Float(5.55444333),
-                    \Query<ModernAllTypesObject>.objectCol.arrayFloat)
-        validateAverage("arrayDouble", Double.average(), 123.456,
-                    \Query<ModernAllTypesObject>.objectCol.arrayDouble)
         validateAverage("arrayDecimal", Decimal128.average(), Decimal128(123.456),
                     \Query<ModernAllTypesObject>.objectCol.arrayDecimal)
         validateAverage("listInt", EnumInt.average(), EnumInt.value1.rawValue,
@@ -5480,10 +5476,6 @@ class QueryTests: TestCase {
                     \Query<LinkToModernCollectionsOfEnums>.objectCol.listInt32.rawValue)
         validateAverage("listInt64", EnumInt64.average(), EnumInt64.value1.rawValue,
                     \Query<LinkToModernCollectionsOfEnums>.objectCol.listInt64.rawValue)
-        validateAverage("listFloat", EnumFloat.average(), EnumFloat.value1.rawValue,
-                    \Query<LinkToModernCollectionsOfEnums>.objectCol.listFloat.rawValue)
-        validateAverage("listDouble", EnumDouble.average(), EnumDouble.value1.rawValue,
-                    \Query<LinkToModernCollectionsOfEnums>.objectCol.listDouble.rawValue)
         validateAverage("arrayOptInt", Int?.average(), 5,
                     \Query<ModernAllTypesObject>.objectCol.arrayOptInt)
         validateAverage("arrayOptInt8", Int8?.average(), Int8(8),
@@ -5494,10 +5486,6 @@ class QueryTests: TestCase {
                     \Query<ModernAllTypesObject>.objectCol.arrayOptInt32)
         validateAverage("arrayOptInt64", Int64?.average(), Int64(64),
                     \Query<ModernAllTypesObject>.objectCol.arrayOptInt64)
-        validateAverage("arrayOptFloat", Float?.average(), Float(5.55444333),
-                    \Query<ModernAllTypesObject>.objectCol.arrayOptFloat)
-        validateAverage("arrayOptDouble", Double?.average(), 123.456,
-                    \Query<ModernAllTypesObject>.objectCol.arrayOptDouble)
         validateAverage("arrayOptDecimal", Decimal128?.average(), Decimal128(123.456),
                     \Query<ModernAllTypesObject>.objectCol.arrayOptDecimal)
         validateAverage("listIntOpt", EnumInt?.average(), EnumInt.value1.rawValue,
@@ -5510,10 +5498,6 @@ class QueryTests: TestCase {
                     \Query<LinkToModernCollectionsOfEnums>.objectCol.listInt32Opt.rawValue)
         validateAverage("listInt64Opt", EnumInt64?.average(), EnumInt64.value1.rawValue,
                     \Query<LinkToModernCollectionsOfEnums>.objectCol.listInt64Opt.rawValue)
-        validateAverage("listFloatOpt", EnumFloat?.average(), EnumFloat.value1.rawValue,
-                    \Query<LinkToModernCollectionsOfEnums>.objectCol.listFloatOpt.rawValue)
-        validateAverage("listDoubleOpt", EnumDouble?.average(), EnumDouble.value1.rawValue,
-                    \Query<LinkToModernCollectionsOfEnums>.objectCol.listDoubleOpt.rawValue)
         validateAverage("setInt", Int.average(), 5,
                     \Query<ModernAllTypesObject>.objectCol.setInt)
         validateAverage("setInt8", Int8.average(), Int8(8),
@@ -5524,10 +5508,6 @@ class QueryTests: TestCase {
                     \Query<ModernAllTypesObject>.objectCol.setInt32)
         validateAverage("setInt64", Int64.average(), Int64(64),
                     \Query<ModernAllTypesObject>.objectCol.setInt64)
-        validateAverage("setFloat", Float.average(), Float(5.55444333),
-                    \Query<ModernAllTypesObject>.objectCol.setFloat)
-        validateAverage("setDouble", Double.average(), 123.456,
-                    \Query<ModernAllTypesObject>.objectCol.setDouble)
         validateAverage("setDecimal", Decimal128.average(), Decimal128(123.456),
                     \Query<ModernAllTypesObject>.objectCol.setDecimal)
         validateAverage("setInt", EnumInt.average(), EnumInt.value1.rawValue,
@@ -5540,10 +5520,6 @@ class QueryTests: TestCase {
                     \Query<LinkToModernCollectionsOfEnums>.objectCol.setInt32.rawValue)
         validateAverage("setInt64", EnumInt64.average(), EnumInt64.value1.rawValue,
                     \Query<LinkToModernCollectionsOfEnums>.objectCol.setInt64.rawValue)
-        validateAverage("setFloat", EnumFloat.average(), EnumFloat.value1.rawValue,
-                    \Query<LinkToModernCollectionsOfEnums>.objectCol.setFloat.rawValue)
-        validateAverage("setDouble", EnumDouble.average(), EnumDouble.value1.rawValue,
-                    \Query<LinkToModernCollectionsOfEnums>.objectCol.setDouble.rawValue)
         validateAverage("setOptInt", Int?.average(), 5,
                     \Query<ModernAllTypesObject>.objectCol.setOptInt)
         validateAverage("setOptInt8", Int8?.average(), Int8(8),
@@ -5554,10 +5530,6 @@ class QueryTests: TestCase {
                     \Query<ModernAllTypesObject>.objectCol.setOptInt32)
         validateAverage("setOptInt64", Int64?.average(), Int64(64),
                     \Query<ModernAllTypesObject>.objectCol.setOptInt64)
-        validateAverage("setOptFloat", Float?.average(), Float(5.55444333),
-                    \Query<ModernAllTypesObject>.objectCol.setOptFloat)
-        validateAverage("setOptDouble", Double?.average(), 123.456,
-                    \Query<ModernAllTypesObject>.objectCol.setOptDouble)
         validateAverage("setOptDecimal", Decimal128?.average(), Decimal128(123.456),
                     \Query<ModernAllTypesObject>.objectCol.setOptDecimal)
         validateAverage("setIntOpt", EnumInt?.average(), EnumInt.value1.rawValue,
@@ -5570,10 +5542,6 @@ class QueryTests: TestCase {
                     \Query<LinkToModernCollectionsOfEnums>.objectCol.setInt32Opt.rawValue)
         validateAverage("setInt64Opt", EnumInt64?.average(), EnumInt64.value1.rawValue,
                     \Query<LinkToModernCollectionsOfEnums>.objectCol.setInt64Opt.rawValue)
-        validateAverage("setFloatOpt", EnumFloat?.average(), EnumFloat.value1.rawValue,
-                    \Query<LinkToModernCollectionsOfEnums>.objectCol.setFloatOpt.rawValue)
-        validateAverage("setDoubleOpt", EnumDouble?.average(), EnumDouble.value1.rawValue,
-                    \Query<LinkToModernCollectionsOfEnums>.objectCol.setDoubleOpt.rawValue)
         validateAverage("mapInt", Int.average(), 5,
                     \Query<ModernAllTypesObject>.objectCol.mapInt)
         validateAverage("mapInt8", Int8.average(), Int8(8),
@@ -5584,10 +5552,6 @@ class QueryTests: TestCase {
                     \Query<ModernAllTypesObject>.objectCol.mapInt32)
         validateAverage("mapInt64", Int64.average(), Int64(64),
                     \Query<ModernAllTypesObject>.objectCol.mapInt64)
-        validateAverage("mapFloat", Float.average(), Float(5.55444333),
-                    \Query<ModernAllTypesObject>.objectCol.mapFloat)
-        validateAverage("mapDouble", Double.average(), 123.456,
-                    \Query<ModernAllTypesObject>.objectCol.mapDouble)
         validateAverage("mapDecimal", Decimal128.average(), Decimal128(123.456),
                     \Query<ModernAllTypesObject>.objectCol.mapDecimal)
         validateAverage("mapInt", EnumInt.average(), EnumInt.value1.rawValue,
@@ -5600,10 +5564,6 @@ class QueryTests: TestCase {
                     \Query<LinkToModernCollectionsOfEnums>.objectCol.mapInt32.rawValue)
         validateAverage("mapInt64", EnumInt64.average(), EnumInt64.value1.rawValue,
                     \Query<LinkToModernCollectionsOfEnums>.objectCol.mapInt64.rawValue)
-        validateAverage("mapFloat", EnumFloat.average(), EnumFloat.value1.rawValue,
-                    \Query<LinkToModernCollectionsOfEnums>.objectCol.mapFloat.rawValue)
-        validateAverage("mapDouble", EnumDouble.average(), EnumDouble.value1.rawValue,
-                    \Query<LinkToModernCollectionsOfEnums>.objectCol.mapDouble.rawValue)
         validateAverage("mapOptInt", Int?.average(), 5,
                     \Query<ModernAllTypesObject>.objectCol.mapOptInt)
         validateAverage("mapOptInt8", Int8?.average(), Int8(8),
@@ -5614,10 +5574,6 @@ class QueryTests: TestCase {
                     \Query<ModernAllTypesObject>.objectCol.mapOptInt32)
         validateAverage("mapOptInt64", Int64?.average(), Int64(64),
                     \Query<ModernAllTypesObject>.objectCol.mapOptInt64)
-        validateAverage("mapOptFloat", Float?.average(), Float(5.55444333),
-                    \Query<ModernAllTypesObject>.objectCol.mapOptFloat)
-        validateAverage("mapOptDouble", Double?.average(), 123.456,
-                    \Query<ModernAllTypesObject>.objectCol.mapOptDouble)
         validateAverage("mapOptDecimal", Decimal128?.average(), Decimal128(123.456),
                     \Query<ModernAllTypesObject>.objectCol.mapOptDecimal)
         validateAverage("mapIntOpt", EnumInt?.average(), EnumInt.value1.rawValue,
@@ -5630,10 +5586,6 @@ class QueryTests: TestCase {
                     \Query<LinkToModernCollectionsOfEnums>.objectCol.mapInt32Opt.rawValue)
         validateAverage("mapInt64Opt", EnumInt64?.average(), EnumInt64.value1.rawValue,
                     \Query<LinkToModernCollectionsOfEnums>.objectCol.mapInt64Opt.rawValue)
-        validateAverage("mapFloatOpt", EnumFloat?.average(), EnumFloat.value1.rawValue,
-                    \Query<LinkToModernCollectionsOfEnums>.objectCol.mapFloatOpt.rawValue)
-        validateAverage("mapDoubleOpt", EnumDouble?.average(), EnumDouble.value1.rawValue,
-                    \Query<LinkToModernCollectionsOfEnums>.objectCol.mapDoubleOpt.rawValue)
     }
 
     private func validateSum<Root: Object, T: RealmCollection>(_ name: String, _ sum: T.Element, _ min: T.Element, _ lhs: (Query<Root>) -> Query<T>)
@@ -5687,13 +5639,13 @@ class QueryTests: TestCase {
         assertQuery(Root.self, "(objectCol.\(name).@sum > %@)", min, count: 1) {
             lhs($0).sum > min
         }
-        assertQuery(Root.self, "(objectCol.\(name).@sum < %@)", sum, count: 0 + 1) {
+        assertQuery(Root.self, "(objectCol.\(name).@sum < %@)", sum, count: 0 + 0) {
             lhs($0).sum < sum
         }
         assertQuery(Root.self, "(objectCol.\(name).@sum >= %@)", sum, count: 1) {
             lhs($0).sum >= sum
         }
-        assertQuery(Root.self, "(objectCol.\(name).@sum <= %@)", sum, count: 1 + 1) {
+        assertQuery(Root.self, "(objectCol.\(name).@sum <= %@)", sum, count: 1 + 0) {
             lhs($0).sum <= sum
         }
     }
@@ -5711,10 +5663,6 @@ class QueryTests: TestCase {
                     \Query<ModernAllTypesObject>.objectCol.arrayInt32)
         validateSum("arrayInt64", Int64.sum(), Int64(64),
                     \Query<ModernAllTypesObject>.objectCol.arrayInt64)
-        validateSum("arrayFloat", Float.sum(), Float(5.55444333),
-                    \Query<ModernAllTypesObject>.objectCol.arrayFloat)
-        validateSum("arrayDouble", Double.sum(), 123.456,
-                    \Query<ModernAllTypesObject>.objectCol.arrayDouble)
         validateSum("arrayDecimal", Decimal128.sum(), Decimal128(123.456),
                     \Query<ModernAllTypesObject>.objectCol.arrayDecimal)
         validateSum("listInt", EnumInt.sum(), EnumInt.value1.rawValue,
@@ -5727,10 +5675,6 @@ class QueryTests: TestCase {
                     \Query<LinkToModernCollectionsOfEnums>.objectCol.listInt32.rawValue)
         validateSum("listInt64", EnumInt64.sum(), EnumInt64.value1.rawValue,
                     \Query<LinkToModernCollectionsOfEnums>.objectCol.listInt64.rawValue)
-        validateSum("listFloat", EnumFloat.sum(), EnumFloat.value1.rawValue,
-                    \Query<LinkToModernCollectionsOfEnums>.objectCol.listFloat.rawValue)
-        validateSum("listDouble", EnumDouble.sum(), EnumDouble.value1.rawValue,
-                    \Query<LinkToModernCollectionsOfEnums>.objectCol.listDouble.rawValue)
         validateSum("arrayOptInt", Int?.sum(), 5,
                     \Query<ModernAllTypesObject>.objectCol.arrayOptInt)
         validateSum("arrayOptInt8", Int8?.sum(), Int8(8),
@@ -5741,10 +5685,6 @@ class QueryTests: TestCase {
                     \Query<ModernAllTypesObject>.objectCol.arrayOptInt32)
         validateSum("arrayOptInt64", Int64?.sum(), Int64(64),
                     \Query<ModernAllTypesObject>.objectCol.arrayOptInt64)
-        validateSum("arrayOptFloat", Float?.sum(), Float(5.55444333),
-                    \Query<ModernAllTypesObject>.objectCol.arrayOptFloat)
-        validateSum("arrayOptDouble", Double?.sum(), 123.456,
-                    \Query<ModernAllTypesObject>.objectCol.arrayOptDouble)
         validateSum("arrayOptDecimal", Decimal128?.sum(), Decimal128(123.456),
                     \Query<ModernAllTypesObject>.objectCol.arrayOptDecimal)
         validateSum("listIntOpt", EnumInt?.sum(), EnumInt.value1.rawValue,
@@ -5757,10 +5697,6 @@ class QueryTests: TestCase {
                     \Query<LinkToModernCollectionsOfEnums>.objectCol.listInt32Opt.rawValue)
         validateSum("listInt64Opt", EnumInt64?.sum(), EnumInt64.value1.rawValue,
                     \Query<LinkToModernCollectionsOfEnums>.objectCol.listInt64Opt.rawValue)
-        validateSum("listFloatOpt", EnumFloat?.sum(), EnumFloat.value1.rawValue,
-                    \Query<LinkToModernCollectionsOfEnums>.objectCol.listFloatOpt.rawValue)
-        validateSum("listDoubleOpt", EnumDouble?.sum(), EnumDouble.value1.rawValue,
-                    \Query<LinkToModernCollectionsOfEnums>.objectCol.listDoubleOpt.rawValue)
         validateSum("setInt", Int.sum(), 5,
                     \Query<ModernAllTypesObject>.objectCol.setInt)
         validateSum("setInt8", Int8.sum(), Int8(8),
@@ -5771,10 +5707,6 @@ class QueryTests: TestCase {
                     \Query<ModernAllTypesObject>.objectCol.setInt32)
         validateSum("setInt64", Int64.sum(), Int64(64),
                     \Query<ModernAllTypesObject>.objectCol.setInt64)
-        validateSum("setFloat", Float.sum(), Float(5.55444333),
-                    \Query<ModernAllTypesObject>.objectCol.setFloat)
-        validateSum("setDouble", Double.sum(), 123.456,
-                    \Query<ModernAllTypesObject>.objectCol.setDouble)
         validateSum("setDecimal", Decimal128.sum(), Decimal128(123.456),
                     \Query<ModernAllTypesObject>.objectCol.setDecimal)
         validateSum("setInt", EnumInt.sum(), EnumInt.value1.rawValue,
@@ -5787,10 +5719,6 @@ class QueryTests: TestCase {
                     \Query<LinkToModernCollectionsOfEnums>.objectCol.setInt32.rawValue)
         validateSum("setInt64", EnumInt64.sum(), EnumInt64.value1.rawValue,
                     \Query<LinkToModernCollectionsOfEnums>.objectCol.setInt64.rawValue)
-        validateSum("setFloat", EnumFloat.sum(), EnumFloat.value1.rawValue,
-                    \Query<LinkToModernCollectionsOfEnums>.objectCol.setFloat.rawValue)
-        validateSum("setDouble", EnumDouble.sum(), EnumDouble.value1.rawValue,
-                    \Query<LinkToModernCollectionsOfEnums>.objectCol.setDouble.rawValue)
         validateSum("setOptInt", Int?.sum(), 5,
                     \Query<ModernAllTypesObject>.objectCol.setOptInt)
         validateSum("setOptInt8", Int8?.sum(), Int8(8),
@@ -5801,10 +5729,6 @@ class QueryTests: TestCase {
                     \Query<ModernAllTypesObject>.objectCol.setOptInt32)
         validateSum("setOptInt64", Int64?.sum(), Int64(64),
                     \Query<ModernAllTypesObject>.objectCol.setOptInt64)
-        validateSum("setOptFloat", Float?.sum(), Float(5.55444333),
-                    \Query<ModernAllTypesObject>.objectCol.setOptFloat)
-        validateSum("setOptDouble", Double?.sum(), 123.456,
-                    \Query<ModernAllTypesObject>.objectCol.setOptDouble)
         validateSum("setOptDecimal", Decimal128?.sum(), Decimal128(123.456),
                     \Query<ModernAllTypesObject>.objectCol.setOptDecimal)
         validateSum("setIntOpt", EnumInt?.sum(), EnumInt.value1.rawValue,
@@ -5817,10 +5741,6 @@ class QueryTests: TestCase {
                     \Query<LinkToModernCollectionsOfEnums>.objectCol.setInt32Opt.rawValue)
         validateSum("setInt64Opt", EnumInt64?.sum(), EnumInt64.value1.rawValue,
                     \Query<LinkToModernCollectionsOfEnums>.objectCol.setInt64Opt.rawValue)
-        validateSum("setFloatOpt", EnumFloat?.sum(), EnumFloat.value1.rawValue,
-                    \Query<LinkToModernCollectionsOfEnums>.objectCol.setFloatOpt.rawValue)
-        validateSum("setDoubleOpt", EnumDouble?.sum(), EnumDouble.value1.rawValue,
-                    \Query<LinkToModernCollectionsOfEnums>.objectCol.setDoubleOpt.rawValue)
         validateSum("mapInt", Int.sum(), 5,
                     \Query<ModernAllTypesObject>.objectCol.mapInt)
         validateSum("mapInt8", Int8.sum(), Int8(8),
@@ -5831,10 +5751,6 @@ class QueryTests: TestCase {
                     \Query<ModernAllTypesObject>.objectCol.mapInt32)
         validateSum("mapInt64", Int64.sum(), Int64(64),
                     \Query<ModernAllTypesObject>.objectCol.mapInt64)
-        validateSum("mapFloat", Float.sum(), Float(5.55444333),
-                    \Query<ModernAllTypesObject>.objectCol.mapFloat)
-        validateSum("mapDouble", Double.sum(), 123.456,
-                    \Query<ModernAllTypesObject>.objectCol.mapDouble)
         validateSum("mapDecimal", Decimal128.sum(), Decimal128(123.456),
                     \Query<ModernAllTypesObject>.objectCol.mapDecimal)
         validateSum("mapInt", EnumInt.sum(), EnumInt.value1.rawValue,
@@ -5847,10 +5763,6 @@ class QueryTests: TestCase {
                     \Query<LinkToModernCollectionsOfEnums>.objectCol.mapInt32.rawValue)
         validateSum("mapInt64", EnumInt64.sum(), EnumInt64.value1.rawValue,
                     \Query<LinkToModernCollectionsOfEnums>.objectCol.mapInt64.rawValue)
-        validateSum("mapFloat", EnumFloat.sum(), EnumFloat.value1.rawValue,
-                    \Query<LinkToModernCollectionsOfEnums>.objectCol.mapFloat.rawValue)
-        validateSum("mapDouble", EnumDouble.sum(), EnumDouble.value1.rawValue,
-                    \Query<LinkToModernCollectionsOfEnums>.objectCol.mapDouble.rawValue)
         validateSum("mapOptInt", Int?.sum(), 5,
                     \Query<ModernAllTypesObject>.objectCol.mapOptInt)
         validateSum("mapOptInt8", Int8?.sum(), Int8(8),
@@ -5861,10 +5773,6 @@ class QueryTests: TestCase {
                     \Query<ModernAllTypesObject>.objectCol.mapOptInt32)
         validateSum("mapOptInt64", Int64?.sum(), Int64(64),
                     \Query<ModernAllTypesObject>.objectCol.mapOptInt64)
-        validateSum("mapOptFloat", Float?.sum(), Float(5.55444333),
-                    \Query<ModernAllTypesObject>.objectCol.mapOptFloat)
-        validateSum("mapOptDouble", Double?.sum(), 123.456,
-                    \Query<ModernAllTypesObject>.objectCol.mapOptDouble)
         validateSum("mapOptDecimal", Decimal128?.sum(), Decimal128(123.456),
                     \Query<ModernAllTypesObject>.objectCol.mapOptDecimal)
         validateSum("mapIntOpt", EnumInt?.sum(), EnumInt.value1.rawValue,
@@ -5877,10 +5785,6 @@ class QueryTests: TestCase {
                     \Query<LinkToModernCollectionsOfEnums>.objectCol.mapInt32Opt.rawValue)
         validateSum("mapInt64Opt", EnumInt64?.sum(), EnumInt64.value1.rawValue,
                     \Query<LinkToModernCollectionsOfEnums>.objectCol.mapInt64Opt.rawValue)
-        validateSum("mapFloatOpt", EnumFloat?.sum(), EnumFloat.value1.rawValue,
-                    \Query<LinkToModernCollectionsOfEnums>.objectCol.mapFloatOpt.rawValue)
-        validateSum("mapDoubleOpt", EnumDouble?.sum(), EnumDouble.value1.rawValue,
-                    \Query<LinkToModernCollectionsOfEnums>.objectCol.mapDoubleOpt.rawValue)
     }
 
 
@@ -5953,10 +5857,6 @@ class QueryTests: TestCase {
                     \Query<ModernAllTypesObject>.objectCol.arrayInt32)
         validateMin("arrayInt64", min: Int64(64), max: Int64(66),
                     \Query<ModernAllTypesObject>.objectCol.arrayInt64)
-        validateMin("arrayFloat", min: Float(5.55444333), max: Float(7.55444333),
-                    \Query<ModernAllTypesObject>.objectCol.arrayFloat)
-        validateMin("arrayDouble", min: 123.456, max: 345.678,
-                    \Query<ModernAllTypesObject>.objectCol.arrayDouble)
         validateMin("arrayDecimal", min: Decimal128(123.456), max: Decimal128(345.678),
                     \Query<ModernAllTypesObject>.objectCol.arrayDecimal)
         validateMin("listInt", min: EnumInt.value1.rawValue, max: EnumInt.value3.rawValue,
@@ -5969,10 +5869,6 @@ class QueryTests: TestCase {
                     \Query<LinkToModernCollectionsOfEnums>.objectCol.listInt32.rawValue)
         validateMin("listInt64", min: EnumInt64.value1.rawValue, max: EnumInt64.value3.rawValue,
                     \Query<LinkToModernCollectionsOfEnums>.objectCol.listInt64.rawValue)
-        validateMin("listFloat", min: EnumFloat.value1.rawValue, max: EnumFloat.value3.rawValue,
-                    \Query<LinkToModernCollectionsOfEnums>.objectCol.listFloat.rawValue)
-        validateMin("listDouble", min: EnumDouble.value1.rawValue, max: EnumDouble.value3.rawValue,
-                    \Query<LinkToModernCollectionsOfEnums>.objectCol.listDouble.rawValue)
         validateMin("arrayOptInt", min: 5, max: 7,
                     \Query<ModernAllTypesObject>.objectCol.arrayOptInt)
         validateMin("arrayOptInt8", min: Int8(8), max: Int8(10),
@@ -5983,10 +5879,6 @@ class QueryTests: TestCase {
                     \Query<ModernAllTypesObject>.objectCol.arrayOptInt32)
         validateMin("arrayOptInt64", min: Int64(64), max: Int64(66),
                     \Query<ModernAllTypesObject>.objectCol.arrayOptInt64)
-        validateMin("arrayOptFloat", min: Float(5.55444333), max: Float(7.55444333),
-                    \Query<ModernAllTypesObject>.objectCol.arrayOptFloat)
-        validateMin("arrayOptDouble", min: 123.456, max: 345.678,
-                    \Query<ModernAllTypesObject>.objectCol.arrayOptDouble)
         validateMin("arrayOptDecimal", min: Decimal128(123.456), max: Decimal128(345.678),
                     \Query<ModernAllTypesObject>.objectCol.arrayOptDecimal)
         validateMin("listIntOpt", min: EnumInt.value1.rawValue, max: EnumInt.value3.rawValue,
@@ -5999,10 +5891,6 @@ class QueryTests: TestCase {
                     \Query<LinkToModernCollectionsOfEnums>.objectCol.listInt32Opt.rawValue)
         validateMin("listInt64Opt", min: EnumInt64.value1.rawValue, max: EnumInt64.value3.rawValue,
                     \Query<LinkToModernCollectionsOfEnums>.objectCol.listInt64Opt.rawValue)
-        validateMin("listFloatOpt", min: EnumFloat.value1.rawValue, max: EnumFloat.value3.rawValue,
-                    \Query<LinkToModernCollectionsOfEnums>.objectCol.listFloatOpt.rawValue)
-        validateMin("listDoubleOpt", min: EnumDouble.value1.rawValue, max: EnumDouble.value3.rawValue,
-                    \Query<LinkToModernCollectionsOfEnums>.objectCol.listDoubleOpt.rawValue)
         validateMin("setInt", min: 5, max: 7,
                     \Query<ModernAllTypesObject>.objectCol.setInt)
         validateMin("setInt8", min: Int8(8), max: Int8(10),
@@ -6013,10 +5901,6 @@ class QueryTests: TestCase {
                     \Query<ModernAllTypesObject>.objectCol.setInt32)
         validateMin("setInt64", min: Int64(64), max: Int64(66),
                     \Query<ModernAllTypesObject>.objectCol.setInt64)
-        validateMin("setFloat", min: Float(5.55444333), max: Float(7.55444333),
-                    \Query<ModernAllTypesObject>.objectCol.setFloat)
-        validateMin("setDouble", min: 123.456, max: 345.678,
-                    \Query<ModernAllTypesObject>.objectCol.setDouble)
         validateMin("setDecimal", min: Decimal128(123.456), max: Decimal128(345.678),
                     \Query<ModernAllTypesObject>.objectCol.setDecimal)
         validateMin("setInt", min: EnumInt.value1.rawValue, max: EnumInt.value3.rawValue,
@@ -6029,10 +5913,6 @@ class QueryTests: TestCase {
                     \Query<LinkToModernCollectionsOfEnums>.objectCol.setInt32.rawValue)
         validateMin("setInt64", min: EnumInt64.value1.rawValue, max: EnumInt64.value3.rawValue,
                     \Query<LinkToModernCollectionsOfEnums>.objectCol.setInt64.rawValue)
-        validateMin("setFloat", min: EnumFloat.value1.rawValue, max: EnumFloat.value3.rawValue,
-                    \Query<LinkToModernCollectionsOfEnums>.objectCol.setFloat.rawValue)
-        validateMin("setDouble", min: EnumDouble.value1.rawValue, max: EnumDouble.value3.rawValue,
-                    \Query<LinkToModernCollectionsOfEnums>.objectCol.setDouble.rawValue)
         validateMin("setOptInt", min: 5, max: 7,
                     \Query<ModernAllTypesObject>.objectCol.setOptInt)
         validateMin("setOptInt8", min: Int8(8), max: Int8(10),
@@ -6043,10 +5923,6 @@ class QueryTests: TestCase {
                     \Query<ModernAllTypesObject>.objectCol.setOptInt32)
         validateMin("setOptInt64", min: Int64(64), max: Int64(66),
                     \Query<ModernAllTypesObject>.objectCol.setOptInt64)
-        validateMin("setOptFloat", min: Float(5.55444333), max: Float(7.55444333),
-                    \Query<ModernAllTypesObject>.objectCol.setOptFloat)
-        validateMin("setOptDouble", min: 123.456, max: 345.678,
-                    \Query<ModernAllTypesObject>.objectCol.setOptDouble)
         validateMin("setOptDecimal", min: Decimal128(123.456), max: Decimal128(345.678),
                     \Query<ModernAllTypesObject>.objectCol.setOptDecimal)
         validateMin("setIntOpt", min: EnumInt.value1.rawValue, max: EnumInt.value3.rawValue,
@@ -6059,10 +5935,6 @@ class QueryTests: TestCase {
                     \Query<LinkToModernCollectionsOfEnums>.objectCol.setInt32Opt.rawValue)
         validateMin("setInt64Opt", min: EnumInt64.value1.rawValue, max: EnumInt64.value3.rawValue,
                     \Query<LinkToModernCollectionsOfEnums>.objectCol.setInt64Opt.rawValue)
-        validateMin("setFloatOpt", min: EnumFloat.value1.rawValue, max: EnumFloat.value3.rawValue,
-                    \Query<LinkToModernCollectionsOfEnums>.objectCol.setFloatOpt.rawValue)
-        validateMin("setDoubleOpt", min: EnumDouble.value1.rawValue, max: EnumDouble.value3.rawValue,
-                    \Query<LinkToModernCollectionsOfEnums>.objectCol.setDoubleOpt.rawValue)
         validateMin("mapInt", min: 5, max: 7,
                     \Query<ModernAllTypesObject>.objectCol.mapInt)
         validateMin("mapInt8", min: Int8(8), max: Int8(10),
@@ -6073,10 +5945,6 @@ class QueryTests: TestCase {
                     \Query<ModernAllTypesObject>.objectCol.mapInt32)
         validateMin("mapInt64", min: Int64(64), max: Int64(66),
                     \Query<ModernAllTypesObject>.objectCol.mapInt64)
-        validateMin("mapFloat", min: Float(5.55444333), max: Float(7.55444333),
-                    \Query<ModernAllTypesObject>.objectCol.mapFloat)
-        validateMin("mapDouble", min: 123.456, max: 345.678,
-                    \Query<ModernAllTypesObject>.objectCol.mapDouble)
         validateMin("mapDecimal", min: Decimal128(123.456), max: Decimal128(345.678),
                     \Query<ModernAllTypesObject>.objectCol.mapDecimal)
         validateMin("mapInt", min: EnumInt.value1.rawValue, max: EnumInt.value3.rawValue,
@@ -6089,10 +5957,6 @@ class QueryTests: TestCase {
                     \Query<LinkToModernCollectionsOfEnums>.objectCol.mapInt32.rawValue)
         validateMin("mapInt64", min: EnumInt64.value1.rawValue, max: EnumInt64.value3.rawValue,
                     \Query<LinkToModernCollectionsOfEnums>.objectCol.mapInt64.rawValue)
-        validateMin("mapFloat", min: EnumFloat.value1.rawValue, max: EnumFloat.value3.rawValue,
-                    \Query<LinkToModernCollectionsOfEnums>.objectCol.mapFloat.rawValue)
-        validateMin("mapDouble", min: EnumDouble.value1.rawValue, max: EnumDouble.value3.rawValue,
-                    \Query<LinkToModernCollectionsOfEnums>.objectCol.mapDouble.rawValue)
         validateMin("mapOptInt", min: 5, max: 7,
                     \Query<ModernAllTypesObject>.objectCol.mapOptInt)
         validateMin("mapOptInt8", min: Int8(8), max: Int8(10),
@@ -6103,10 +5967,6 @@ class QueryTests: TestCase {
                     \Query<ModernAllTypesObject>.objectCol.mapOptInt32)
         validateMin("mapOptInt64", min: Int64(64), max: Int64(66),
                     \Query<ModernAllTypesObject>.objectCol.mapOptInt64)
-        validateMin("mapOptFloat", min: Float(5.55444333), max: Float(7.55444333),
-                    \Query<ModernAllTypesObject>.objectCol.mapOptFloat)
-        validateMin("mapOptDouble", min: 123.456, max: 345.678,
-                    \Query<ModernAllTypesObject>.objectCol.mapOptDouble)
         validateMin("mapOptDecimal", min: Decimal128(123.456), max: Decimal128(345.678),
                     \Query<ModernAllTypesObject>.objectCol.mapOptDecimal)
         validateMin("mapIntOpt", min: EnumInt.value1.rawValue, max: EnumInt.value3.rawValue,
@@ -6119,10 +5979,6 @@ class QueryTests: TestCase {
                     \Query<LinkToModernCollectionsOfEnums>.objectCol.mapInt32Opt.rawValue)
         validateMin("mapInt64Opt", min: EnumInt64.value1.rawValue, max: EnumInt64.value3.rawValue,
                     \Query<LinkToModernCollectionsOfEnums>.objectCol.mapInt64Opt.rawValue)
-        validateMin("mapFloatOpt", min: EnumFloat.value1.rawValue, max: EnumFloat.value3.rawValue,
-                    \Query<LinkToModernCollectionsOfEnums>.objectCol.mapFloatOpt.rawValue)
-        validateMin("mapDoubleOpt", min: EnumDouble.value1.rawValue, max: EnumDouble.value3.rawValue,
-                    \Query<LinkToModernCollectionsOfEnums>.objectCol.mapDoubleOpt.rawValue)
     }
 
     private func validateMax<Root: Object, T: RealmCollection>(_ name: String, min: T.Element, max: T.Element, _ lhs: (Query<Root>) -> Query<T>)
@@ -6194,10 +6050,6 @@ class QueryTests: TestCase {
                     \Query<ModernAllTypesObject>.objectCol.arrayInt32)
         validateMax("arrayInt64", min: Int64(64), max: Int64(66),
                     \Query<ModernAllTypesObject>.objectCol.arrayInt64)
-        validateMax("arrayFloat", min: Float(5.55444333), max: Float(7.55444333),
-                    \Query<ModernAllTypesObject>.objectCol.arrayFloat)
-        validateMax("arrayDouble", min: 123.456, max: 345.678,
-                    \Query<ModernAllTypesObject>.objectCol.arrayDouble)
         validateMax("arrayDecimal", min: Decimal128(123.456), max: Decimal128(345.678),
                     \Query<ModernAllTypesObject>.objectCol.arrayDecimal)
         validateMax("listInt", min: EnumInt.value1.rawValue, max: EnumInt.value3.rawValue,
@@ -6210,10 +6062,6 @@ class QueryTests: TestCase {
                     \Query<LinkToModernCollectionsOfEnums>.objectCol.listInt32.rawValue)
         validateMax("listInt64", min: EnumInt64.value1.rawValue, max: EnumInt64.value3.rawValue,
                     \Query<LinkToModernCollectionsOfEnums>.objectCol.listInt64.rawValue)
-        validateMax("listFloat", min: EnumFloat.value1.rawValue, max: EnumFloat.value3.rawValue,
-                    \Query<LinkToModernCollectionsOfEnums>.objectCol.listFloat.rawValue)
-        validateMax("listDouble", min: EnumDouble.value1.rawValue, max: EnumDouble.value3.rawValue,
-                    \Query<LinkToModernCollectionsOfEnums>.objectCol.listDouble.rawValue)
         validateMax("arrayOptInt", min: 5, max: 7,
                     \Query<ModernAllTypesObject>.objectCol.arrayOptInt)
         validateMax("arrayOptInt8", min: Int8(8), max: Int8(10),
@@ -6224,10 +6072,6 @@ class QueryTests: TestCase {
                     \Query<ModernAllTypesObject>.objectCol.arrayOptInt32)
         validateMax("arrayOptInt64", min: Int64(64), max: Int64(66),
                     \Query<ModernAllTypesObject>.objectCol.arrayOptInt64)
-        validateMax("arrayOptFloat", min: Float(5.55444333), max: Float(7.55444333),
-                    \Query<ModernAllTypesObject>.objectCol.arrayOptFloat)
-        validateMax("arrayOptDouble", min: 123.456, max: 345.678,
-                    \Query<ModernAllTypesObject>.objectCol.arrayOptDouble)
         validateMax("arrayOptDecimal", min: Decimal128(123.456), max: Decimal128(345.678),
                     \Query<ModernAllTypesObject>.objectCol.arrayOptDecimal)
         validateMax("listIntOpt", min: EnumInt.value1.rawValue, max: EnumInt.value3.rawValue,
@@ -6240,10 +6084,6 @@ class QueryTests: TestCase {
                     \Query<LinkToModernCollectionsOfEnums>.objectCol.listInt32Opt.rawValue)
         validateMax("listInt64Opt", min: EnumInt64.value1.rawValue, max: EnumInt64.value3.rawValue,
                     \Query<LinkToModernCollectionsOfEnums>.objectCol.listInt64Opt.rawValue)
-        validateMax("listFloatOpt", min: EnumFloat.value1.rawValue, max: EnumFloat.value3.rawValue,
-                    \Query<LinkToModernCollectionsOfEnums>.objectCol.listFloatOpt.rawValue)
-        validateMax("listDoubleOpt", min: EnumDouble.value1.rawValue, max: EnumDouble.value3.rawValue,
-                    \Query<LinkToModernCollectionsOfEnums>.objectCol.listDoubleOpt.rawValue)
         validateMax("setInt", min: 5, max: 7,
                     \Query<ModernAllTypesObject>.objectCol.setInt)
         validateMax("setInt8", min: Int8(8), max: Int8(10),
@@ -6254,10 +6094,6 @@ class QueryTests: TestCase {
                     \Query<ModernAllTypesObject>.objectCol.setInt32)
         validateMax("setInt64", min: Int64(64), max: Int64(66),
                     \Query<ModernAllTypesObject>.objectCol.setInt64)
-        validateMax("setFloat", min: Float(5.55444333), max: Float(7.55444333),
-                    \Query<ModernAllTypesObject>.objectCol.setFloat)
-        validateMax("setDouble", min: 123.456, max: 345.678,
-                    \Query<ModernAllTypesObject>.objectCol.setDouble)
         validateMax("setDecimal", min: Decimal128(123.456), max: Decimal128(345.678),
                     \Query<ModernAllTypesObject>.objectCol.setDecimal)
         validateMax("setInt", min: EnumInt.value1.rawValue, max: EnumInt.value3.rawValue,
@@ -6270,10 +6106,6 @@ class QueryTests: TestCase {
                     \Query<LinkToModernCollectionsOfEnums>.objectCol.setInt32.rawValue)
         validateMax("setInt64", min: EnumInt64.value1.rawValue, max: EnumInt64.value3.rawValue,
                     \Query<LinkToModernCollectionsOfEnums>.objectCol.setInt64.rawValue)
-        validateMax("setFloat", min: EnumFloat.value1.rawValue, max: EnumFloat.value3.rawValue,
-                    \Query<LinkToModernCollectionsOfEnums>.objectCol.setFloat.rawValue)
-        validateMax("setDouble", min: EnumDouble.value1.rawValue, max: EnumDouble.value3.rawValue,
-                    \Query<LinkToModernCollectionsOfEnums>.objectCol.setDouble.rawValue)
         validateMax("setOptInt", min: 5, max: 7,
                     \Query<ModernAllTypesObject>.objectCol.setOptInt)
         validateMax("setOptInt8", min: Int8(8), max: Int8(10),
@@ -6284,10 +6116,6 @@ class QueryTests: TestCase {
                     \Query<ModernAllTypesObject>.objectCol.setOptInt32)
         validateMax("setOptInt64", min: Int64(64), max: Int64(66),
                     \Query<ModernAllTypesObject>.objectCol.setOptInt64)
-        validateMax("setOptFloat", min: Float(5.55444333), max: Float(7.55444333),
-                    \Query<ModernAllTypesObject>.objectCol.setOptFloat)
-        validateMax("setOptDouble", min: 123.456, max: 345.678,
-                    \Query<ModernAllTypesObject>.objectCol.setOptDouble)
         validateMax("setOptDecimal", min: Decimal128(123.456), max: Decimal128(345.678),
                     \Query<ModernAllTypesObject>.objectCol.setOptDecimal)
         validateMax("setIntOpt", min: EnumInt.value1.rawValue, max: EnumInt.value3.rawValue,
@@ -6300,10 +6128,6 @@ class QueryTests: TestCase {
                     \Query<LinkToModernCollectionsOfEnums>.objectCol.setInt32Opt.rawValue)
         validateMax("setInt64Opt", min: EnumInt64.value1.rawValue, max: EnumInt64.value3.rawValue,
                     \Query<LinkToModernCollectionsOfEnums>.objectCol.setInt64Opt.rawValue)
-        validateMax("setFloatOpt", min: EnumFloat.value1.rawValue, max: EnumFloat.value3.rawValue,
-                    \Query<LinkToModernCollectionsOfEnums>.objectCol.setFloatOpt.rawValue)
-        validateMax("setDoubleOpt", min: EnumDouble.value1.rawValue, max: EnumDouble.value3.rawValue,
-                    \Query<LinkToModernCollectionsOfEnums>.objectCol.setDoubleOpt.rawValue)
         validateMax("mapInt", min: 5, max: 7,
                     \Query<ModernAllTypesObject>.objectCol.mapInt)
         validateMax("mapInt8", min: Int8(8), max: Int8(10),
@@ -6314,10 +6138,6 @@ class QueryTests: TestCase {
                     \Query<ModernAllTypesObject>.objectCol.mapInt32)
         validateMax("mapInt64", min: Int64(64), max: Int64(66),
                     \Query<ModernAllTypesObject>.objectCol.mapInt64)
-        validateMax("mapFloat", min: Float(5.55444333), max: Float(7.55444333),
-                    \Query<ModernAllTypesObject>.objectCol.mapFloat)
-        validateMax("mapDouble", min: 123.456, max: 345.678,
-                    \Query<ModernAllTypesObject>.objectCol.mapDouble)
         validateMax("mapDecimal", min: Decimal128(123.456), max: Decimal128(345.678),
                     \Query<ModernAllTypesObject>.objectCol.mapDecimal)
         validateMax("mapInt", min: EnumInt.value1.rawValue, max: EnumInt.value3.rawValue,
@@ -6330,10 +6150,6 @@ class QueryTests: TestCase {
                     \Query<LinkToModernCollectionsOfEnums>.objectCol.mapInt32.rawValue)
         validateMax("mapInt64", min: EnumInt64.value1.rawValue, max: EnumInt64.value3.rawValue,
                     \Query<LinkToModernCollectionsOfEnums>.objectCol.mapInt64.rawValue)
-        validateMax("mapFloat", min: EnumFloat.value1.rawValue, max: EnumFloat.value3.rawValue,
-                    \Query<LinkToModernCollectionsOfEnums>.objectCol.mapFloat.rawValue)
-        validateMax("mapDouble", min: EnumDouble.value1.rawValue, max: EnumDouble.value3.rawValue,
-                    \Query<LinkToModernCollectionsOfEnums>.objectCol.mapDouble.rawValue)
         validateMax("mapOptInt", min: 5, max: 7,
                     \Query<ModernAllTypesObject>.objectCol.mapOptInt)
         validateMax("mapOptInt8", min: Int8(8), max: Int8(10),
@@ -6344,10 +6160,6 @@ class QueryTests: TestCase {
                     \Query<ModernAllTypesObject>.objectCol.mapOptInt32)
         validateMax("mapOptInt64", min: Int64(64), max: Int64(66),
                     \Query<ModernAllTypesObject>.objectCol.mapOptInt64)
-        validateMax("mapOptFloat", min: Float(5.55444333), max: Float(7.55444333),
-                    \Query<ModernAllTypesObject>.objectCol.mapOptFloat)
-        validateMax("mapOptDouble", min: 123.456, max: 345.678,
-                    \Query<ModernAllTypesObject>.objectCol.mapOptDouble)
         validateMax("mapOptDecimal", min: Decimal128(123.456), max: Decimal128(345.678),
                     \Query<ModernAllTypesObject>.objectCol.mapOptDecimal)
         validateMax("mapIntOpt", min: EnumInt.value1.rawValue, max: EnumInt.value3.rawValue,
@@ -6360,10 +6172,6 @@ class QueryTests: TestCase {
                     \Query<LinkToModernCollectionsOfEnums>.objectCol.mapInt32Opt.rawValue)
         validateMax("mapInt64Opt", min: EnumInt64.value1.rawValue, max: EnumInt64.value3.rawValue,
                     \Query<LinkToModernCollectionsOfEnums>.objectCol.mapInt64Opt.rawValue)
-        validateMax("mapFloatOpt", min: EnumFloat.value1.rawValue, max: EnumFloat.value3.rawValue,
-                    \Query<LinkToModernCollectionsOfEnums>.objectCol.mapFloatOpt.rawValue)
-        validateMax("mapDoubleOpt", min: EnumDouble.value1.rawValue, max: EnumDouble.value3.rawValue,
-                    \Query<LinkToModernCollectionsOfEnums>.objectCol.mapDoubleOpt.rawValue)
     }
 
 
@@ -6628,10 +6436,6 @@ class QueryTests: TestCase {
                     \Query<ModernAllTypesObject>.arrayCol.int32Col)
         validateKeypathAverage("int64Col", Int64.average(), Int64(64),
                     \Query<ModernAllTypesObject>.arrayCol.int64Col)
-        validateKeypathAverage("floatCol", Float.average(), Float(5.55444333),
-                    \Query<ModernAllTypesObject>.arrayCol.floatCol)
-        validateKeypathAverage("doubleCol", Double.average(), 123.456,
-                    \Query<ModernAllTypesObject>.arrayCol.doubleCol)
         validateKeypathAverage("decimalCol", Decimal128.average(), Decimal128(123.456),
                     \Query<ModernAllTypesObject>.arrayCol.decimalCol)
         validateKeypathAverage("intEnumCol", ModernIntEnum.average(), ModernIntEnum.value1.rawValue,
@@ -6646,10 +6450,6 @@ class QueryTests: TestCase {
                     \Query<ModernAllTypesObject>.arrayCol.optInt32Col)
         validateKeypathAverage("optInt64Col", Int64?.average(), Int64(64),
                     \Query<ModernAllTypesObject>.arrayCol.optInt64Col)
-        validateKeypathAverage("optFloatCol", Float?.average(), Float(5.55444333),
-                    \Query<ModernAllTypesObject>.arrayCol.optFloatCol)
-        validateKeypathAverage("optDoubleCol", Double?.average(), 123.456,
-                    \Query<ModernAllTypesObject>.arrayCol.optDoubleCol)
         validateKeypathAverage("optDecimalCol", Decimal128?.average(), Decimal128(123.456),
                     \Query<ModernAllTypesObject>.arrayCol.optDecimalCol)
         validateKeypathAverage("optIntEnumCol", ModernIntEnum.average(), ModernIntEnum.value1.rawValue,
@@ -6702,10 +6502,6 @@ class QueryTests: TestCase {
                     \Query<ModernAllTypesObject>.arrayCol.int32Col)
         validateKeypathSum("int64Col", Int64.sum(), Int64(64),
                     \Query<ModernAllTypesObject>.arrayCol.int64Col)
-        validateKeypathSum("floatCol", Float.sum(), Float(5.55444333),
-                    \Query<ModernAllTypesObject>.arrayCol.floatCol)
-        validateKeypathSum("doubleCol", Double.sum(), 123.456,
-                    \Query<ModernAllTypesObject>.arrayCol.doubleCol)
         validateKeypathSum("decimalCol", Decimal128.sum(), Decimal128(123.456),
                     \Query<ModernAllTypesObject>.arrayCol.decimalCol)
         validateKeypathSum("intEnumCol", ModernIntEnum.sum(), ModernIntEnum.value1.rawValue,
@@ -6720,10 +6516,6 @@ class QueryTests: TestCase {
                     \Query<ModernAllTypesObject>.arrayCol.optInt32Col)
         validateKeypathSum("optInt64Col", Int64?.sum(), Int64(64),
                     \Query<ModernAllTypesObject>.arrayCol.optInt64Col)
-        validateKeypathSum("optFloatCol", Float?.sum(), Float(5.55444333),
-                    \Query<ModernAllTypesObject>.arrayCol.optFloatCol)
-        validateKeypathSum("optDoubleCol", Double?.sum(), 123.456,
-                    \Query<ModernAllTypesObject>.arrayCol.optDoubleCol)
         validateKeypathSum("optDecimalCol", Decimal128?.sum(), Decimal128(123.456),
                     \Query<ModernAllTypesObject>.arrayCol.optDecimalCol)
         validateKeypathSum("optIntEnumCol", ModernIntEnum.sum(), ModernIntEnum.value1.rawValue,
