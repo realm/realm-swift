@@ -28,8 +28,23 @@ public typealias PropertyKey = UInt16
 // A tag protocol used in schema discovery to find @Persisted properties
 internal protocol DiscoverablePersistedProperty: _RealmSchemaDiscoverable {}
 
+public protocol _HasPersistedType: _ObjcBridgeable {
+    // The type which is actually stored in the Realm. This is Self for types
+    // we support directly, but may be a different type for enums and mapped types.
+    associatedtype PersistedType: _ObjcBridgeable
+}
+
+// These two types need PersistedType for collection aggregate functions but
+// aren't persistable or valid collection types
+extension NSNumber: _HasPersistedType {
+    public typealias PersistedType = NSNumber
+}
+extension NSDate: _HasPersistedType {
+    public typealias PersistedType = NSDate
+}
+
 // A type which can be stored by the @Persisted property wrapper
-public protocol _Persistable: _RealmSchemaDiscoverable, _ObjcBridgeable {
+public protocol _Persistable: _RealmSchemaDiscoverable, _HasPersistedType where PersistedType: _Persistable {
     // Read a value of this type from the target object
     static func _rlmGetProperty(_ obj: ObjectBase, _ key: PropertyKey) -> Self
     // Read an optional value of this type from the target object
@@ -44,9 +59,6 @@ public protocol _Persistable: _RealmSchemaDiscoverable, _ObjcBridgeable {
     // Get the zero/empty/nil value for this type. Used to supply a default
     // when the user does not declare one in their model.
     static func _rlmDefaultValue() -> Self
-    // The type which is actually stored in the Realm. This is Self for types
-    // we support directly, but may be a different type for enums and mapped types.
-    associatedtype PersistedType: _Persistable
 }
 
 extension _Persistable {
@@ -56,7 +68,7 @@ extension _Persistable {
 }
 
 // A type which can appear inside Optional<T> in a @Persisted property
-public protocol _PersistableInsideOptional: _Persistable, _DefaultConstructible { }
+public protocol _PersistableInsideOptional: _Persistable, _DefaultConstructible where PersistedType: _PersistableInsideOptional { }
 
 extension _PersistableInsideOptional {
     public static func _rlmSetAccessor(_ prop: RLMProperty) {

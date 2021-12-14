@@ -91,7 +91,7 @@ extension List: _RealmSchemaDiscoverable, SchemaDiscoverable where Element: _Rea
     }
 }
 
-extension List: _Persistable, _DefaultConstructible where Element: _Persistable {
+extension List: _HasPersistedType, _Persistable, _DefaultConstructible where Element: _Persistable {
     public typealias PersistedType = List
     public static var _rlmRequiresCaching: Bool { true }
 
@@ -126,7 +126,7 @@ extension MutableSet: _RealmSchemaDiscoverable, SchemaDiscoverable where Element
     }
 }
 
-extension MutableSet: _Persistable, _DefaultConstructible where Element: _Persistable {
+extension MutableSet: _HasPersistedType, _Persistable, _DefaultConstructible where Element: _Persistable {
     public typealias PersistedType = MutableSet
     public static var _rlmRequiresCaching: Bool { true }
 
@@ -162,7 +162,7 @@ extension Map: _RealmSchemaDiscoverable, SchemaDiscoverable where Value: _RealmS
     }
 }
 
-extension Map: _Persistable, _DefaultConstructible where Value: _Persistable {
+extension Map: _HasPersistedType, _Persistable, _DefaultConstructible where Value: _Persistable {
     public typealias PersistedType = Map
     public static var _rlmRequiresCaching: Bool { true }
 
@@ -213,7 +213,7 @@ extension RealmOptional: SchemaDiscoverable, _RealmSchemaDiscoverable where Valu
     }
 }
 
-extension LinkingObjects: _Persistable where Element: _Persistable {
+extension LinkingObjects: _HasPersistedType, _Persistable where Element: _Persistable {
     public typealias PersistedType = Self
     public static func _rlmDefaultValue() -> Self {
         fatalError("LinkingObjects properties must set the origin property name")
@@ -245,9 +245,11 @@ extension Optional: SchemaDiscoverable, _RealmSchemaDiscoverable where Wrapped: 
     }
 }
 
-extension Optional: _Persistable where Wrapped: _PersistableInsideOptional {
-    public typealias PersistedType = Self
+extension Optional: _HasPersistedType where Wrapped: _HasPersistedType {
+    public typealias PersistedType = Wrapped.PersistedType?
+}
 
+extension Optional: _Persistable where Wrapped: _PersistableInsideOptional {
     public static func _rlmDefaultValue() -> Self {
         return .none
     }
