@@ -46,7 +46,7 @@
     return [[RLMObjectId alloc]initWithValue:_subscription->id()];
 }
 
-- (NSString *)name {
+- (nullable NSString *)name {
     const std::string_view str_view = _subscription->name();
     std::string str = std::string(str_view);
     const char * characters = str.c_str();
@@ -338,21 +338,14 @@ typedef void(^RLMSyncSubscriptionStateBlock)(RLMSyncSubscriptionState state);
 
 - (void)removeSubscription:(RLMSyncSubscription *)subscription {
     [self verifyInWriteTransaction];
-    
-    if ([subscription.name length] == 0) {
-        RLMClassInfo& info = _realm->_info[subscription.objectClassName];
-        NSPredicate *predicate = [NSPredicate predicateWithFormat:subscription.queryString];
-        auto query = RLMPredicateToQuery(predicate, info.rlmObjectSchema, _realm.schema, _realm.group);
-        auto iterator = _mutableSubscriptionSet->find(query);
-        if (iterator != _mutableSubscriptionSet->end()) {
-            _mutableSubscriptionSet->erase(iterator);
+
+    for (auto it = _mutableSubscriptionSet->begin(); it != _mutableSubscriptionSet->end();) {
+        if (it->id() == subscription.identifier.value) {
+            it = _mutableSubscriptionSet->erase(it);
+            return;
         }
-    }
-    else {
-        std::string nameStr = std::string([subscription.name UTF8String]);
-        auto iterator = _mutableSubscriptionSet->find(nameStr);
-        if (iterator != _mutableSubscriptionSet->end() && iterator->id() == subscription.identifier.value) {
-            _mutableSubscriptionSet->erase(iterator);
+        else {
+            it++;
         }
     }
 }

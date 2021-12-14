@@ -36,7 +36,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, readonly) RLMObjectId *identifier;
 
-@property (nonatomic, readonly) NSString *name;
+@property (nonatomic, readonly, nullable) NSString *name;
 
 @property (nonatomic, readonly) NSDate *createdAt;
 
@@ -146,11 +146,11 @@ typedef void(^RLMSyncSubscriptionStateBlock)(RLMSyncSubscriptionState state);
 
 #pragma mark - SubscriptionSet Collection
 
-- (RLMSyncSubscription *)objectAtIndex:(NSUInteger)index;
+- (nullable RLMSyncSubscription *)objectAtIndex:(NSUInteger)index;
 
-- (RLMSyncSubscription *)firstObject;
+- (nullable RLMSyncSubscription *)firstObject;
 
-- (RLMSyncSubscription *)lastObject;
+- (nullable RLMSyncSubscription *)lastObject;
 
 #pragma mark - Subscript
 
