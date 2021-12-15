@@ -598,7 +598,7 @@ public final class DynamicObject: Object {
         case .bool:
             return array.isOptional ? List<Bool?>(collection: array) : List<Bool>(collection: array)
         case .UUID:
-            return array.isOptional ? List<UUID?>(collection: array) : List<UUID>(collection jc: array)
+            return array.isOptional ? List<UUID?>(collection: array) : List<UUID>(collection: array)
         case .string:
             return array.isOptional ? List<String?>(collection: array) : List<String>(collection: array)
         case .data:
