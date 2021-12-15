@@ -1,7 +1,6 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* Conform `@ThreadSafe` and `ThreadSafeReference` to `Sendable`.
 * Add `metadata` property to `RLMUserProfile`/`UserProfile`.
 * Add class `Projection` to allow creation of light weight view models out of Realm Objects.  
 ```swift
