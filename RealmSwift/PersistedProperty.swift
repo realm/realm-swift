@@ -271,7 +271,7 @@ extension Persisted: OptionalCodingWrapper where Value: ExpressibleByNilLiteral 
 }
 
 /**
- An enum type which can be used with @Persisted.
+ An enum type which can be used with @Persisted and Realm Collections.
 
  Persisting an enum in Realm requires that it have a raw value and that the raw value by a type which Realm can store.
  The enum also has to be explicitly marked as conforming to this protocol as Swift does not let us do so implicitly.
@@ -294,12 +294,16 @@ extension Persisted: OptionalCodingWrapper where Value: ExpressibleByNilLiteral 
  are valid), optional enum properties will return `nil`, and non-optional
  properties will abort the process.
  */
-public protocol PersistableEnum: _OptionalPersistable, RawRepresentable, CaseIterable, RealmEnum {
+public protocol PersistableEnum: _OptionalPersistable, RawRepresentable, CaseIterable, RealmEnum, RealmCollectionValue, MinMaxType, Comparable where RawValue: Comparable {
 }
 
 extension PersistableEnum {
     /// :nodoc:
     public init() { self = Self.allCases.first! }
+    /// :nodoc:
+    public static func < (lhs: Self, rhs: Self) -> Bool {
+        return lhs.rawValue < rhs.rawValue
+    }
 }
 
 /// A type which can be indexed.
@@ -308,7 +312,7 @@ extension PersistableEnum {
 /// to it will simply result in runtime errors rather than compile-time errors.
 public protocol _Indexable {}
 
-extension Persisted where Value._RealmValue: _Indexable {
+extension Persisted where Value.PersistedType: _Indexable {
     /// Declares an indexed property which is lazily initialized to the type's default value.
     public init(indexed: Bool) {
         storage = .unmanagedNoDefault(indexed: indexed)
@@ -325,7 +329,7 @@ extension Persisted where Value._RealmValue: _Indexable {
 /// to it will simply result in runtime errors rather than compile-time errors.
 public protocol _PrimaryKey {}
 
-extension Persisted where Value._RealmValue: _PrimaryKey {
+extension Persisted where Value.PersistedType: _PrimaryKey {
     /// Declares the primary key property which is lazily initialized to the type's default value.
     public init(primaryKey: Bool) {
         storage = .unmanagedNoDefault(primary: primaryKey)

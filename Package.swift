@@ -3,8 +3,8 @@
 import PackageDescription
 import Foundation
 
-let coreVersionStr = "11.6.0"
-let cocoaVersionStr = "10.19.0"
+let coreVersionStr = "11.6.1"
+let cocoaVersionStr = "10.20.1"
 
 let coreVersionPieces = coreVersionStr.split(separator: ".")
 let coreVersionExtra = coreVersionPieces[2].split(separator: "-")
@@ -150,6 +150,7 @@ let package = Package(
                 "RealmSwift.podspec",
                 "SUPPORT.md",
                 "build.sh",
+                "ci_scripts/ci_post_clone.sh",
                 "contrib",
                 "dependencies.list",
                 "docs",

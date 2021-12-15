@@ -113,7 +113,8 @@ using namespace realm;
         return "";
     }
 
-    auto path = _user->sync_manager()->path_for_realm(*_user, partitionValue);
+    SyncConfig config(_user, "");
+    auto path = _user->sync_manager()->path_for_realm(config, partitionValue);
     if ([NSFileManager.defaultManager fileExistsAtPath:@(path.c_str())]) {
         return path;
     }
@@ -123,7 +124,7 @@ using namespace realm;
     NSString *encodedPartitionValue = [@(partitionValue.data())
                                        stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLPathAllowedCharacterSet]];
     NSString *overEncodedRealmName = [[NSString alloc] initWithFormat:@"%@/%@", self.identifier, encodedPartitionValue];
-    auto legacyPath = _user->sync_manager()->path_for_realm(*_user, overEncodedRealmName.UTF8String);
+    auto legacyPath = _user->sync_manager()->path_for_realm(config, std::string(overEncodedRealmName.UTF8String));
     if ([NSFileManager.defaultManager fileExistsAtPath:@(legacyPath.c_str())]) {
         return legacyPath;
     }

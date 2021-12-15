@@ -526,23 +526,10 @@ static void validateArrayBounds(__unsafe_unretained RLMArray *const ar,
 }
 
 - (NSArray *)objectsAtIndexes:(NSIndexSet *)indexes {
-    NSUInteger count = self.count;
-    __block BOOL didStop = NO;
-    [indexes enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL * _Nonnull stop) {
-        if (idx < 0 || idx >= count || count == 0) {
-            *stop = YES;
-            didStop = YES;
-        }
-    }];
-
-    if (didStop) {
+    if ([indexes indexGreaterThanOrEqualToIndex:self.count] != NSNotFound) {
         return nil;
     }
-
-    if (!_backingCollection) {
-        _backingCollection = [NSMutableArray new];
-    }
-    return [_backingCollection objectsAtIndexes:indexes];
+    return [_backingCollection objectsAtIndexes:indexes] ?: @[];
 }
 
 - (BOOL)isEqual:(id)object {

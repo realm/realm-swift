@@ -2695,8 +2695,8 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 static NSString *newPathForPartitionValue(RLMUser *user, id<RLMBSON> partitionValue) {
     std::stringstream s;
     s << RLMConvertRLMBSONToBson(partitionValue);
-    auto path = user._syncUser->sync_manager()->path_for_realm(*user._syncUser, s.str());
-    return @(path.c_str());
+    realm::SyncConfig config(user._syncUser, "");
+    return @(user._syncUser->sync_manager()->path_for_realm(config, s.str()).c_str());
 }
 
 - (void)testSyncFilePaths {
@@ -2726,9 +2726,9 @@ static NSString *oldPathForPartitionValue(RLMUser *user, id<RLMBSON> partitionVa
     std::stringstream s;
     s << RLMConvertRLMBSONToBson(partitionValue);
     NSString *encodedPartitionValue = [@(s.str().c_str()) stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLPathAllowedCharacterSet]];
-    NSString *encodedRealmName = [[NSString alloc] initWithFormat:@"%@/%@", user.identifier, encodedPartitionValue];
-    auto path = user._syncUser->sync_manager()->path_for_realm(*user._syncUser, encodedRealmName.UTF8String);
-    return @(path.c_str());
+    realm::SyncConfig config(user._syncUser,
+                             [[NSString alloc] initWithFormat:@"%@/%@", user.identifier, encodedPartitionValue].UTF8String);
+    return @(user._syncUser->sync_manager()->path_for_realm(config).c_str());
 }
 
 - (void)testLegacyFilePathsAreUsedIfFilesArePresent {
