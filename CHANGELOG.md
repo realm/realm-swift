@@ -44,8 +44,6 @@ let people: Results<PersonProjection> = realm.objects(PersonProjection.self)
 * Add support for comparing `@allKeys` to another property on the same object.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
-* None.
 * Add missing `Indexable` support for UUID. 
   ([Cocoa #7545](https://github.com/realm/realm-cocoa/issues/7545), since v10.10.0)
 * `where()` allowed constructing some nonsensical queries due to boolean comparisons returning `Query<T>` rather than `Query<Bool>`.
@@ -53,6 +51,9 @@ let people: Results<PersonProjection> = realm.objects(PersonProjection.self)
 * Case-insensitive and diacritic-insensitive modifiers were ignored when
   comparing the result of an aggregate operation to another property in a
   query.
+* @sum and @avg queries on Dictionaries of floats or doubles used too much precision for intermediates, resulting in incorrect rounding
+* Change the exception message for calling refresh on an immutable Realm from "Continuous transaction through DB object without history information." to "Can't refresh a read-only Realm."
+* Queries of the form "link.collection.@sum = 0" where link is null matched when collection was a List or Set, but not a Dictionary
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
@@ -64,7 +65,7 @@ let people: Results<PersonProjection> = realm.objects(PersonProjection.self)
 * Xcode: 12.4-13.2.
 
 ### Internal
-* Upgraded realm-core from ? to ?
+* Upgraded realm-core from 10.6.1 to 10.7.0
 
 10.20.1 Release notes (2021-12-14)
 =============================================================
