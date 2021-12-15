@@ -88,6 +88,10 @@ This simple app shows how to use an encrypted realm.
 
 This simple app demonstrates how to define models with inverse relationships using `linkingObjectsOfClass(_:forProperty:)`.
 
+### Projections
+
+This app demonstrates how to define Projection on Realm Object and how to use it in SwiftUI application.
+
 ### AppClip / AppClipParent
 
 These two targets demonstrate how to use Realm to persist data between an App Clip and its parent.

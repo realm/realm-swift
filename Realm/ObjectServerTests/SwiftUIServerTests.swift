@@ -90,7 +90,7 @@ class SwiftUIServerTests: SwiftSyncTestCase {
 
     func testAsyncOpenWaitingForUserWithoutUserLoggedIn() throws {
         let user = try logInUser(for: basicCredentials())
-        user.logOut { _ in } //Logout current user
+        user.logOut { _ in } // Logout current user
 
         let ex = expectation(description: "download-realm-async-open-not-logged")
         asyncOpen(user: user, appId: appId, partitionValue: #function) { asyncOpenState in
@@ -329,7 +329,7 @@ class SwiftUIServerTests: SwiftSyncTestCase {
 
     func testAutoOpenWaitingForUserWithoutUserLoggedIn() throws {
         let user = try logInUser(for: basicCredentials())
-        user.logOut { _ in } //Logout current user
+        user.logOut { _ in } // Logout current user
 
         let ex = expectation(description: "download-realm-auto-open-not-logged")
         autoOpen(user: user, appId: appId, partitionValue: #function) { autoOpenState in

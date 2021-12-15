@@ -20,8 +20,16 @@ import Foundation
 import RealmSwift
 import Realm
 
-class SwiftStringObject: Object {
+final class SwiftStringObject: Object {
     @objc dynamic var stringCol = ""
+}
+
+class ModernSwiftStringObject: Object {
+    @Persisted var stringCol = ""
+}
+
+class ModernSwiftStringProjection: Projection<ModernSwiftStringObject> {
+    @Projected(\ModernSwiftStringObject.stringCol) var string
 }
 
 class SwiftBoolObject: Object {

@@ -29,7 +29,7 @@ public typealias PropertyKey = UInt16
 internal protocol DiscoverablePersistedProperty: _RealmSchemaDiscoverable {}
 
 // A type which can be stored by the @Persisted property wrapper
-public protocol _Persistable: _RealmSchemaDiscoverable {
+public protocol _Persistable: _RealmSchemaDiscoverable, _ObjcBridgeable {
     // Read a value of this type from the target object
     static func _rlmGetProperty(_ obj: ObjectBase, _ key: PropertyKey) -> Self
     // Read an optional value of this type from the target object
@@ -51,19 +51,13 @@ public protocol _Persistable: _RealmSchemaDiscoverable {
     static func _rlmKeyPathRecorder(with lastAccessedNames: NSMutableArray) -> Self
     // The type which is actually stored in the Realm. This is Self for types
     // we support directly, but may be a different type for enums and mapped types.
-    associatedtype _RealmValue: _Persistable
+    associatedtype PersistedType: _Persistable
 }
 
 extension _Persistable {
     public static var _rlmRequiresCaching: Bool {
         false
     }
-}
-
-// A helper protocol for types which we support directly rather than via
-// mapping to a supported type.
-public protocol _BuiltInPersistable {
-    associatedtype _RealmValue = Self
 }
 
 extension _RealmSchemaDiscoverable where Self: _Persistable {
