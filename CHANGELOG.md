@@ -1,6 +1,7 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
+* Add `metadata` property to `RLMUserProfile`/`UserProfile`.
 * Add class `Projection` to allow creation of light weight view models out of Realm Objects.  
 ```swift
 public class Person: Object {

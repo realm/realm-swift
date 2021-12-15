@@ -650,6 +650,26 @@ public class RealmServer: NSObject {
         let app = session.apps[appId]
         let group = DispatchGroup()
 
+        _ = app.secrets.post([
+            "name": "customTokenKey",
+            "value": "My_very_confidential_secretttttt"
+        ])
+
+        app.authProviders.post(on: group, [
+            "type": "custom-token",
+            "config": [
+                "audience": [],
+                "signingAlgorithm": "HS256",
+                "useJWKURI": false
+            ],
+            "secret_config": ["signingKeys": ["customTokenKey"]],
+            "metadata_fields": [
+                ["required": false, "name": "user_data.name", "field_name": "name"],
+                ["required": false, "name": "user_data.occupation", "field_name": "occupation"],
+                ["required": false, "name": "my_metadata.name", "field_name": "anotherName"]
+            ]
+        ], failOnError)
+
         app.authProviders.post(on: group, ["type": "anon-user"], failOnError)
         app.authProviders.post(on: group, [
             "type": "local-userpass",
