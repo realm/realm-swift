@@ -21,12 +21,21 @@ import Realm
 
 // MARK: MinMaxType
 
+#if swift(>=5.5)
+/**
+ Types of properties which can be used with the minimum and maximum value APIs.
+
+ - see: `min(ofProperty:)`, `max(ofProperty:)`
+ */
+@_marker public protocol MinMaxType {}
+#else
 /**
  Types of properties which can be used with the minimum and maximum value APIs.
 
  - see: `min(ofProperty:)`, `max(ofProperty:)`
  */
 public protocol MinMaxType {}
+#endif
 extension NSNumber: MinMaxType {}
 extension Double: MinMaxType {}
 extension Float: MinMaxType {}
@@ -43,12 +52,21 @@ extension Optional: MinMaxType where Wrapped: MinMaxType {}
 
 // MARK: AddableType
 
+#if swift(>=5.5)
+/**
+ Types of properties which can be used with the sum and average value APIs.
+
+ - see: `sum(ofProperty:)`, `average(ofProperty:)`
+ */
+@_marker public protocol AddableType {}
+#else
 /**
  Types of properties which can be used with the sum and average value APIs.
 
  - see: `sum(ofProperty:)`, `average(ofProperty:)`
  */
 public protocol AddableType {}
+#endif
 extension NSNumber: AddableType {}
 extension Double: AddableType {}
 extension Float: AddableType {}
@@ -61,7 +79,21 @@ extension Decimal128: AddableType {}
 extension AnyRealmValue: AddableType {}
 extension Optional: AddableType where Wrapped: AddableType {}
 
+#if swift(>=5.5)
+/**
+ Types of properties which can be directly sorted or distincted.
+
+ - see: `sum(ascending:)`, `distinct()`
+ */
+@_marker public protocol SortableType {}
+#else
+/**
+ Types of properties which can be directly sorted or distincted.
+
+ - see: `sum(ascending:)`, `distinct()`
+ */
 public protocol SortableType {}
+#endif
 extension AnyRealmValue: SortableType {}
 extension Data: SortableType {}
 extension Date: SortableType {}
