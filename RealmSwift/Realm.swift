@@ -20,6 +20,46 @@ import Foundation
 import Realm
 import Realm.Private
 
+@available(iOSApplicationExtension 15.0, *)
+@objc internal class AsyncScheduler {
+    private let taskHash: Int
+    // Trigger a call to the registered notify callback on the scheduler's event loop.
+    //
+    // This function can be called from any thread.
+    func notify() {
+    }
+    // Check if the caller is currently running on the scheduler's thread.
+    //
+    // This function can be called from any thread.
+    func is_on_thread() -> Bool {
+        withUnsafeCurrentTask {
+            $0?.hashValue == taskHash
+        }
+    }
+
+    // Checks if this scheduler instance wraps the same underlying instance.
+    // This is up to the platforms to define, but if this method returns true,
+    // caching may occur.
+    func is_same_as(other: AsyncScheduler) -> Bool {
+        other.taskHash == taskHash
+    }
+
+    // Check if this scehduler actually can support notify(). Notify may be
+    // either not implemented, not applicable to a scheduler type, or simply not
+    // be possible currently (e.g. if the associated event loop is not actually
+    // running).
+    //
+    // This function is not thread-safe.
+    func can_deliver_notifications() -> Bool {
+        false
+    }
+    // Set the callback function which will be called by notify().
+    //
+    // This function is not thread-safe.
+    func set_notify_callback() {
+
+    }
+};
 /**
  A `Realm` instance (also referred to as "a Realm") represents a Realm database.
 

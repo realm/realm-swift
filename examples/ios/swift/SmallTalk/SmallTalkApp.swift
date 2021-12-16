@@ -137,3 +137,18 @@ struct LoginView: View {
 struct SmallTalkApp: SwiftUI.App {
     var body: some Scene { WindowGroup { LoginView() } }
 }
+
+class Person: Object {
+    @Persisted var name: String
+}
+func mutatePerson(person: Person) async {
+    person.name = "jon"
+}
+
+func main() async {
+    print("hello world")
+    let realm = try! await Realm()
+    let jim = realm.objects(Person.self).first!
+    await mutatePerson(person: jim)
+    assert(jim.name == "jon")
+}
