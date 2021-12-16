@@ -1,8 +1,5 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
-
-Xcode 12.4 is now the minimum supported version of Xcode.
-
 ### Enhancements
 * Add an `enableSync` flag to `[RLMRealm writeCopyToURL:]` and `Realm.writeCopy()`. 
   This flag indicates whether the copied realm should be able to synchronize data 
@@ -12,22 +9,95 @@ Xcode 12.4 is now the minimum supported version of Xcode.
   be copied to the `fileURL` of the new realm. If a realm file already exists at the 
   desitnation path, the seed file will not be copied and the already existing realm 
   will be opened instead.
+* Add `metadata` property to `RLMUserProfile`/`UserProfile`.
+* Add class `Projection` to allow creation of light weight view models out of Realm Objects.  
+```swift
+public class Person: Object {
+    @Persisted var firstName = ""
+    @Persisted var lastName = ""
+    @Persisted var address: Address? = nil
+    @Persisted var friends = List<Person>()
+}
+
+public class Address: EmbeddedObject {
+    @Persisted var city: String = ""
+    @Persisted var country = ""
+}
+
+class PersonProjection: Projection<Person> {
+    // `Person.firstName` will have same name and type
+    @Projected(\Person.firstName) var firstName
+    // There will be the only String for `city` of the original object `Address`
+    @Projected(\Person.address.city) var homeCity 
+    // List<Person> will be mapped to list of firstNames
+    @Projected(\Person.friends.projectTo.firstName) var firstFriendsName: ProjectedCollection<String>
+}
+
+// `people` will contain projections for every `Person` object in the `realm`
+let people: Results<PersonProjection> = realm.objects(PersonProjection.self)
+```
+* Greatly improve performance of reading AnyRealmValue and enum types from
+  Realm collections.
+* Allow using Swift enums which conform to `PersistableEnum` as the value type
+  for all Realm collections.
+* `AnyRealmCollection` now conforms to `Encodable`.
+* AnyRealmValue and PersistableEnum values can now be passed directly to an
+  NSPredicate used in a filter() call rather than having to pass the rawValue
+  (the rawValue is still allowed).
+* Queries on collections of PersistableEnums can now be performed with `where()`.
+* Add support for querying on the rawValue of an enum with `where()`.
+* `.count` is supported for Maps of all types rather than just numeric types in `where()`.
+* Add support for querying on the properties of objects contained in
+  dictionaries (e.g. "dictProperty.@allValues.name CONTAINS 'a'").
+* Improve the error message for many types of invalid predicates in queries.
+* Add support for comparing `@allKeys` to another property on the same object.
 
 ### Fixed
+* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
+* None.
 * Add missing `Indexable` support for UUID. 
   ([Cocoa #7545](https://github.com/realm/realm-cocoa/issues/7545), since v10.10.0)
+* `where()` allowed constructing some nonsensical queries due to boolean comparisons returning `Query<T>` rather than `Query<Bool>`.
+* `@allValues` queries on dictionaries accidentally did not require "ANY".
+* Case-insensitive and diacritic-insensitive modifiers were ignored when
+  comparing the result of an aggregate operation to another property in a
+  query.
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
 ### Compatibility
 * Realm Studio: 11.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
-* Carthage release for Swift is built with Xcode 13.1.
+* Carthage release for Swift is built with Xcode 13.2.
 * CocoaPods: 1.10 or later.
-* Xcode: 12.2-13.2 beta 2.
+* Xcode: 12.4-13.2.
 
 ### Internal
 * Upgraded realm-core from ? to ?
+
+10.20.1 Release notes (2021-12-14)
+=============================================================
+
+Xcode 12.4 is now the minimum supported version of Xcode.
+
+### Fixed
+
+* Add missing `Indexable` support for UUID.
+  ([Cocoa #7545](https://github.com/realm/realm-cocoa/issues/7545), since v10.10.0)
+
+### Breaking Changes
+
+* All `async` functions now require Xcode 13.2 to work around an App
+  Store/TestFlight bug that results in apps built with 13.0/13.1 which do not
+  use libConcurrency but link a library which does crashing on startup.
+
+### Compatibility
+
+* Realm Studio: 11.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 13.2.
+* CocoaPods: 1.10 or later.
+* Xcode: 12.2-13.2.
 
 10.20.0 Release notes (2021-11-16)
 =============================================================
@@ -37,6 +107,10 @@ Xcode 12.4 is now the minimum supported version of Xcode.
 * Conform `@ThreadSafe` and `ThreadSafeReference` to `Sendable`.
 * Allow using Swift enums which conform to `PersistableEnum` as the value type
   for all Realm collections.
+* `AnyRealmCollection` now conforms to `Encodable`.
+* Greatly improve performance of reading AnyRealmValue and enum types from
+  Realm collections.
+* `AnyRealmCollection` now conforms to `Encodable`.
 
 ### Fixed
 

@@ -32,6 +32,10 @@ private func createStringObjects(_ factor: Int) -> Realm {
     return realm
 }
 
+class SwiftIntProjection: Projection<SwiftIntObject> {
+    @Projected(\SwiftIntObject.intCol) var intCol
+}
+
 private var smallRealm: Realm!
 private var mediumRealm: Realm!
 private var largeRealm: Realm!
@@ -296,6 +300,23 @@ class SwiftPerformanceTests: TestCase {
             }
         }
     }
+
+    func testEnumerateAndAccessMixed() {
+        let realm = inMemoryRealm(#function)
+        realm.beginWrite()
+        let list = realm.create(ModernListAnyRealmValueObject.self, value: []).value
+        for i in 0..<500000 {
+            list.append(.int(i))
+        }
+        try! realm.commitWrite()
+
+        measure {
+            for value in list {
+                _ = value.intValue!
+            }
+        }
+    }
+
 
     func testDeleteAll() {
         inMeasureBlock {
@@ -782,6 +803,55 @@ class SwiftPerformanceTests: TestCase {
         let objects = createModernObjects()
         measure {
             _ = objects.value(forKeyPath: "optStringCol") as! [String]
+        }
+    }
+
+    // MARK: Test Projections
+
+    func testCastSingleProjection() {
+        let realm = copyRealmToTestPath(mediumRealm)
+        try! realm.write({
+            for obj in realm.objects(SwiftStringObject.self) {
+                realm.create(ModernSwiftStringObject.self, value: [obj.stringCol])
+            }
+        })
+
+        let objects = realm.objects(ModernSwiftStringObject.self)
+        measure {
+            for obj in objects {
+                _ = ModernSwiftStringProjection(projecting: obj)
+            }
+        }
+    }
+
+    func testCastResultsToProjection() {
+        let realm = copyRealmToTestPath(mediumRealm)
+        try! realm.write({
+            for obj in realm.objects(SwiftStringObject.self) {
+                realm.create(ModernSwiftStringObject.self, value: [obj.stringCol])
+            }
+        })
+
+        measure {
+            for _ in 0..<500 {
+                _ = realm.objects(ModernSwiftStringProjection.self)
+            }
+        }
+    }
+
+    func testAccessProjectionProperty() {
+        let realm = copyRealmToTestPath(mediumRealm)
+        try! realm.write({
+            for obj in realm.objects(SwiftStringObject.self) {
+                realm.create(ModernSwiftStringObject.self, value: [obj.stringCol])
+            }
+        })
+
+        let projections = realm.objects(ModernSwiftStringProjection.self)
+        measure {
+            for proj in projections {
+                _ = proj.string
+            }
         }
     }
 }
