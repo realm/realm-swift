@@ -376,15 +376,18 @@ import Realm.Private
      Write  blocks for the multiple calls will be executed in order.
      - throws An `NSError` if the transaction could not be written due to errors.
      */
-    public func writeAsync(_ block: (() -> ()), _ onComplete: (() -> ())? = nil) throws {
+    public func writeAsync(_ block: @escaping (AsyncHandle) -> (), _ onComplete: (() -> ())? = nil) throws {
+        var handle: AsyncHandle = 0
         do {
-            beginAsyncWrite(block)
+            handle = beginAsyncWrite { handle in
+                block(handle)
+            }
             if isInAsyncWriteTransaction {
                 try commitAsyncWrite(onComplete)
             }
         } catch let error {
             if isInAsyncWriteTransaction {
-                cancelAsyncWrite()
+                cancelAsyncWrite(handle)
             }
             throw error
         }
@@ -405,8 +408,17 @@ import Realm.Private
      A later call to `beginAsyncWrite` or `writeAsync` will wait for any earlier
      write blocks.
      */
-    public func beginAsyncWrite(_ asyncWriteBlock: () -> ()) {
-        return rlmRealm.beginAsyncWriteTransaction(asyncWriteBlock)
+    @discardableResult
+    public func beginAsyncWrite(_ asyncWriteBlock: @escaping (AsyncHandle) -> ()) -> AsyncHandle {
+        var handle: AsyncHandle = 0
+        handle = rlmRealm.beginAsyncWriteTransaction {
+            asyncWriteBlock(handle)
+        }
+        return handle
+    }
+
+    public func beginAsyncWrite(_ asyncWriteBlock: @escaping () -> ()) {
+        rlmRealm.beginAsyncWriteTransaction(asyncWriteBlock)
     }
 
     /** Commit asynchronous transaction.
@@ -418,15 +430,15 @@ import Realm.Private
      - note The call returns immediately allowing the caller to proceed while the I/O is performed on a dedicated background thread.
      - note Callbacks to `onComplete` will occur in the order of `commitAsyncWriteTransaction`
     */
-    public func commitAsyncWrite(_ onComplete: (() -> ())? = nil, isGroupingAllowed: BOOL = false) throws {
-        try rlmRealm.commitAsyncWriteTransaction(onComplete)
+    public func commitAsyncWrite(_ onComplete: (() -> ())? = nil, isGroupingAllowed: Bool = false) throws {
+        rlmRealm.commitAsyncWriteTransaction(onComplete)
     }
 
     /** Cancel a queued code block (either for `writeAsync` or for`commitAsyncWrite`)
      - note Cancelling a commit will not abort the commit, it will only cancel the callback
      informing of commit completion.
     */
-    public func cancelAsyncWrite(_  handle: Any) {
+    public func cancelAsyncWrite(_  handle: AsyncHandle) {
         rlmRealm.cancelAsyncTransaction(handle)
     }
 
