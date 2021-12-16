@@ -8,7 +8,7 @@ Xcode 12.4 is now the minimum supported version of Xcode.
   This flag indicates whether the copied realm should be able to synchronize data 
   with the Realm server. This allows for bundling synchronized realms with an application.
 * Add a `seedFilePath` option to `RLMRealmConfiguration` and `Configuration`. If this 
-  option is set then instead of creating an empty, the realm at the `seedFilePath` will 
+  option is set then instead of creating an empty realm, the realm at the `seedFilePath` will
   be copied to the `fileURL` of the new realm. If a realm file already exists at the 
   desitnation path, the seed file will not be copied and the already existing realm 
   will be opened instead.

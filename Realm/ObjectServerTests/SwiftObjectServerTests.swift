@@ -754,7 +754,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             XCTAssertNotNil(obj4)
             XCTAssertEqual(obj3.data, obj4?.data)
         } catch {
-            XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
+            XCTFail("Got an error: \(error)")
         }
     }
 

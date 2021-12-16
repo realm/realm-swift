@@ -240,7 +240,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)writeCopyToURL:(NSURL *)fileURL encryptionKey:(nullable NSData *)key error:(NSError **)error;
 
 /**
- Writes a compacted and optionally encrypted copy of thre Realm to the given local URL.
+ Writes a compacted and optionally encrypted copy of the Realm to the given local URL.
 
  The destination file cannot already exist.
 
