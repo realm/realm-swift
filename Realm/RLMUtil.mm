@@ -72,7 +72,6 @@ static inline bool checkCollectionType(__unsafe_unretained id<RLMCollection> con
         && (type != RLMPropertyTypeObject || [collection.objectClassName isEqualToString:objectClassName]);
 }
 
-id (*RLMSwiftAsFastEnumeration)(id);
 id<NSFastEnumeration> RLMAsFastEnumeration(__unsafe_unretained id obj) {
     if (!obj) {
         return nil;
@@ -80,8 +79,11 @@ id<NSFastEnumeration> RLMAsFastEnumeration(__unsafe_unretained id obj) {
     if ([obj conformsToProtocol:@protocol(NSFastEnumeration)]) {
         return obj;
     }
-    if (RLMSwiftAsFastEnumeration) {
-        return RLMSwiftAsFastEnumeration(obj);
+    if (RLMSwiftBridgeValue) {
+        id bridged = RLMSwiftBridgeValue(obj);
+        if ([bridged conformsToProtocol:@protocol(NSFastEnumeration)]) {
+            return bridged;
+        }
     }
     return nil;
 }
