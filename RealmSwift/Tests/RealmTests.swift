@@ -982,14 +982,12 @@ class RealmTests: TestCase {
 
     // MARK: - Async Transactions
 #if REALM_ASYNC_WRITES
-#endif // REALM_ASYNC_WRITES
 
     func testAsyncTransactionShouldWrite() {
         let realm = try! Realm()
-
         let asyncComplete = expectation(description: "async transaction complete")
 
-        try! realm.writeAsync({ _ in 
+        realm.writeAsync({ _ in
             realm.create(SwiftStringObject.self, value: ["string"])
         }) {
             let object = realm.objects(SwiftStringObject.self).first
@@ -1003,10 +1001,10 @@ class RealmTests: TestCase {
     func testAsyncTransactionShouldWriteOnCommit() {
         let realm = try! Realm()
         let asyncComplete = expectation(description: "async transaction complete")
-        realm.beginAsyncWrite({ handle in
+        realm.beginAsyncWrite({ [realm] handle in
             realm.create(SwiftStringObject.self, value: ["string"])
 
-            try! realm.commitAsyncWrite {
+            realm.commitAsyncWrite {
                 let object = realm.objects(SwiftStringObject.self).first
                 XCTAssertEqual(object?.stringCol, "string")
                 asyncComplete.fulfill()
@@ -1016,6 +1014,7 @@ class RealmTests: TestCase {
         })
 
         waitForExpectations(timeout: 1, handler: nil)
+        XCTAssertEqual(realm.objects(SwiftStringObject.self).count, 1)
     }
 
     func testAsyncTransactionShouldCancel() {
@@ -1038,4 +1037,5 @@ class RealmTests: TestCase {
         let object = realm.objects(SwiftStringObject.self).first
         XCTAssertNil(object)
     }
+#endif // REALM_ASYNC_WRITES
 }
