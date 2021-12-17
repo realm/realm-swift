@@ -719,6 +719,13 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
     }
 
+    func testCustomTokenAuthentication() {
+        let user = logInUser(for: jwtCredential(withAppId: appId))
+        XCTAssertEqual(user.profile.metadata["anotherName"], "Bar Foo")
+        XCTAssertEqual(user.profile.metadata["name"], "Foo Bar")
+        XCTAssertEqual(user.profile.metadata["occupation"], "firefighter")
+    }
+
     // MARK: - User-specific functionality
 
     func testUserExpirationCallback() {
@@ -1322,6 +1329,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         XCTAssertNil(profile.firstName)
         XCTAssertNil(profile.lastName)
         XCTAssertNil(profile.pictureURL)
+        XCTAssertEqual(profile.metadata, [:])
     }
 }
 
