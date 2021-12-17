@@ -78,7 +78,7 @@ import Realm.Private
 
  ### Relationships
 
- See our [Cocoa guide](http://realm.io/docs/cocoa) for more details.
+ See our [Swift guide](https://docs.mongodb.com/realm/sdk/swift/fundamentals/relationships/) for more details.
  */
 public typealias Object = RealmSwiftObject
 extension Object: RealmCollectionValue {
