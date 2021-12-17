@@ -37,6 +37,7 @@
     config.objectClasses = @[Dog.self,
                              Person.self];
     RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
+    [self waitForDownloadsForRealm:realm];
     return realm;
 }
 
@@ -55,10 +56,10 @@
 }
 @end
 
-@interface RLMFlexibleSyncServerTests: RLMFlexibleSyncTestCase
+@interface RLMFlexibleSyncTests: RLMFlexibleSyncTestCase
 @end
 
-@implementation RLMFlexibleSyncServerTests
+@implementation RLMFlexibleSyncTests
 - (void)testCreateFlexibleSyncApp {
     NSString *appId = [RealmServer.shared createAppForFlexibleSyncAndReturnError:nil];
     RLMApp *app = [RLMApp appWithId:appId
@@ -678,5 +679,49 @@
     RLMSyncSubscription *objectAtIndexSubscription = [subs objectAtIndex:index];
     XCTAssertEqualObjects(objectAtIndexSubscription.name, ([NSString stringWithFormat:@"person_age_%d", index+1]));
     XCTAssertEqualObjects(objectAtIndexSubscription.queryString, ([NSString stringWithFormat:@"age > %d", index+1]));
+}
+@end
+
+@interface RLMFlexibleSyncServerTests: RLMFlexibleSyncTestCase
+@end
+
+@implementation RLMFlexibleSyncServerTests
+- (void)testFlexibleSyncOpenRealm {
+    NSString *appId = [RealmServer.shared createAppForFlexibleSyncAndReturnError:nil];
+    RLMApp *app = [RLMApp appWithId:appId
+                      configuration:[self defaultAppConfiguration]
+                      rootDirectory:[self clientDataRoot]];
+    RLMSyncManager *syncManager = app.syncManager;
+    syncManager.logLevel = RLMSyncLogLevelTrace;
+    RLMUser *user =  [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd)
+                                                                         register:YES
+                                                                              app:app]
+                                               app:app];
+    [app syncManager].errorHandler = ^(__unused NSError *error, __unused RLMSyncSession *session) {
+        XCTAssertTrue([error.domain isEqualToString:RLMSyncErrorDomain]);
+    };
+
+    RLMRealmConfiguration *config = [user flexibleSyncConfiguration];
+//    config.objectClasses = @[Dog.self,
+//                             Person.self];
+
+    XCTestExpectation *ex1 = [self expectationWithDescription:@"async open"];
+    __block RLMRealm *realm;
+    [RLMRealm asyncOpenWithConfiguration:config
+                           callbackQueue:dispatch_get_main_queue()
+                                callback:^(RLMRealm *asyncRealm, NSError *error) {
+        XCTAssertNil(error);
+        XCTAssertNotNil(asyncRealm);
+        realm = asyncRealm;
+        [ex1 fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:300.0 handler:nil];
+    XCTAssertNotNil(realm);
+
+    RLMSyncSubscriptionSet *subs = realm.subscriptions;
+    
+    XCTAssertNotNil(subs);
+    XCTAssertEqual(subs.version, 0);
+    XCTAssertEqual(subs.count, 0);
 }
 @end

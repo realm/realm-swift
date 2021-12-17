@@ -23,11 +23,13 @@
 #pragma mark - Subscription States
 
 typedef NS_ENUM(NSUInteger, RLMSyncSubscriptionState) {
-    RLMSubscriptionStateComplete,
+    RLMSyncSubscriptionStateComplete,
 
-    RLMSubscriptionStatePending,
+    RLMSyncSubscriptionStatePending,
 
-    RLMSubscriptionStateError
+    RLMSyncSubscriptionStateError,
+
+    RLMSyncSubscriptionStateSuperceded
 };
 
 NS_ASSUME_NONNULL_BEGIN

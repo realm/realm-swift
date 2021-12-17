@@ -23,6 +23,7 @@
 #import "RLMObjectId_Private.hpp"
 
 #import <realm/sync/subscriptions.hpp>
+#import <realm/status_with.hpp>
 
 #pragma mark - Subscription
 
@@ -169,8 +170,10 @@
 typedef void(^RLMSyncSubscriptionStateBlock)(RLMSyncSubscriptionState state);
 
 - (void)observe:(RLMSyncSubscriptionStateBlock)block {
-    [NSException raise:@"NotImplemented" format:@"Needs Implementation"];
-    return NULL;
+    _subscriptionSet->get_state_change_notification(realm::sync::SubscriptionSet::State::Complete)
+        .get_async([&](realm::StatusWith<realm::sync::SubscriptionSet::State> state) noexcept {
+            block([self mapState:state.get_value()]);
+        });
 }
 
 #pragma mark - Find subscription
@@ -446,6 +449,21 @@ typedef void(^RLMSyncSubscriptionStateBlock)(RLMSyncSubscriptionState state);
 - (void)secureWrite {
     if (self->isInWriteTransaction) {
         @throw RLMException(@"Cannot initiate a write transaction on subscription set that is already been updated.");
+    }
+}
+
+- (RLMSyncSubscriptionState)mapState:(realm::sync::SubscriptionSet::State)state {
+    switch (state) {
+        case realm::sync::SubscriptionSet::State::Uncommitted:
+        case realm::sync::SubscriptionSet::State::Pending:
+        case realm::sync::SubscriptionSet::State::Bootstrapping:
+            return RLMSyncSubscriptionStatePending;
+        case realm::sync::SubscriptionSet::State::Complete:
+            return RLMSyncSubscriptionStateComplete;
+        case realm::sync::SubscriptionSet::State::Error:
+            return RLMSyncSubscriptionStateError;
+        case realm::sync::SubscriptionSet::State::Superceded:
+            return RLMSyncSubscriptionStateSuperceded;
     }
 }
 @end

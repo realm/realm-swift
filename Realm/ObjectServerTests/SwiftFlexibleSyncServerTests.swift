@@ -407,6 +407,70 @@ class SwiftFlexibleSyncServerTests: SwiftFlexibleSyncTestCase {
         XCTAssertEqual(subscriptions.count, 0)
     }
 
+    func testRemoveSubscriptionByType() throws {
+        let realm = try getFlexibleSyncRealm()
+        let subscriptions = realm.subscriptions
+        try subscriptions.write {
+            subscriptions.append {
+                QuerySubscription<SwiftPerson>(name: "person_name_1") {
+                    $0.firstName.contains("A")
+                }
+                QuerySubscription<SwiftPerson>(name: "person_name_2") {
+                    $0.firstName.contains("B")
+                }
+                QuerySubscription<SwiftPerson>(name: "person_name_3") {
+                    $0.firstName.contains("C")
+                }
+            }
+            subscriptions.append {
+                QuerySubscription<SwiftTypesSyncObject> {
+                    $0.intCol > 0
+                }
+            }
+        }
+        XCTAssertEqual(subscriptions.count, 4)
+
+        try subscriptions.write {
+            subscriptions.removeAll(ofType: SwiftPerson.self)
+        }
+        XCTAssertEqual(subscriptions.count, 1)
+
+        try subscriptions.write {
+            subscriptions.removeAll(ofType: SwiftTypesSyncObject.self)
+        }
+        XCTAssertEqual(subscriptions.count, 0)
+    }
+
+    func testRemoveAllSubscriptions() throws {
+        let realm = try getFlexibleSyncRealm()
+        let subscriptions = realm.subscriptions
+        try subscriptions.write {
+            subscriptions.append {
+                QuerySubscription<SwiftPerson>(name: "person_name_1") {
+                    $0.firstName.contains("A")
+                }
+                QuerySubscription<SwiftPerson>(name: "person_name_2") {
+                    $0.firstName.contains("B")
+                }
+                QuerySubscription<SwiftPerson>(name: "person_name_3") {
+                    $0.firstName.contains("C")
+                }
+            }
+            subscriptions.append {
+                QuerySubscription<SwiftTypesSyncObject> {
+                    $0.intCol > 0
+                }
+            }
+        }
+        XCTAssertEqual(subscriptions.count, 4)
+
+        try subscriptions.write {
+            subscriptions.removeAll()
+        }
+
+        XCTAssertEqual(subscriptions.count, 0)
+    }
+
     func testSubscriptionSetIterate() throws {
         let realm = try getFlexibleSyncRealm()
         let subscriptions = realm.subscriptions

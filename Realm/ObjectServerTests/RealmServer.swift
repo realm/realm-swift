@@ -419,7 +419,7 @@ public class RealmServer: NSObject {
     @objc public static var shared = RealmServer()
 
     /// Log level for the server and mongo processes.
-    public var logLevel = LogLevel.error
+    public var logLevel = LogLevel.info
 
     /// Process that runs the local mongo server. Should be terminated on exit.
     private let mongoProcess = Process()
@@ -446,8 +446,8 @@ public class RealmServer: NSObject {
     private var session: Admin.AdminSession?
 
     /// AWS access key and Id, for local testing
-    private static let awsAccessKeyId = "<AWS_ACCESS_KEY_ID>"
-    private static let awsSecretAccessKey = "<AWS_SECRET_ACCESS_KEY>"
+    private static let awsAccessKeyId = "AKIAVG4A4ZBJIGJ6B5TO"
+    private static let awsSecretAccessKey = "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"
 
     /// Check if the BaaS files are present and we can run the server
     @objc public class func haveServer() -> Bool {
@@ -696,6 +696,9 @@ public class RealmServer: NSObject {
             "value": "mongodb://localhost:26000"
         ])
 
+        // We get the schema in case the configuration is flexible sync and we have to add the queryable fields
+        let schema = ObjectiveCSupport.convert(object: RLMSchema.shared())
+
         let serviceResponse: Result<Any?, Error>
         switch syncMode {
         case .pbs:
@@ -720,6 +723,13 @@ public class RealmServer: NSObject {
                 ]
             ])
         case .flx:
+            let queryableFields = schema.objectSchema.compactMap { object  -> [String]? in
+                guard object.className == "Person" || object.className == "Dog" else { return nil }
+                return object.properties.compactMap { property -> String? in
+                    guard !property.isSet && !property.isMap && !property.isArray && property.type != .object else { return nil }
+                    return property.name
+                }
+            }.flatMap { $0 }
             serviceResponse = app.services.post([
                 "name": "mongodb1",
                 "type": "mongodb",
@@ -727,7 +737,8 @@ public class RealmServer: NSObject {
                     "uri": "mongodb://localhost:26000",
                     "sync_query": [
                         "state": "enabled",
-                        "database_name": "test_data",
+                        "database_name": "test_data_2",
+                        "queryable_fields_names": queryableFields
                     ]
                 ]
             ])
@@ -737,17 +748,18 @@ public class RealmServer: NSObject {
             throw URLError(.badServerResponse)
         }
 
-        let rules = app.services[serviceId].rules
-
         // Creating the rules is a two-step process where we first add all the
         // rules and then add properties to them so that we can add relationships
-        let schema = ObjectiveCSupport.convert(object: RLMSchema.shared())
+        let rules = app.services[serviceId].rules
+
         let syncTypes = schema.objectSchema.filter {
             guard let pk = $0.primaryKeyProperty else { return false }
             return pk.name == "_id"
         }
+
         var ruleCreations = [Result<Any?, Error>]()
         for objectSchema in syncTypes {
+//            guard objectSchema.className == "Person" || objectSchema.className == "Dog" else { break }
             ruleCreations.append(rules.post(objectSchema.stitchRule(bsonType, schema)))
         }
 
@@ -760,6 +772,7 @@ public class RealmServer: NSObject {
             ruleIds[dict["collection"]!] = dict["_id"]!
         }
         for objectSchema in syncTypes {
+//            guard objectSchema.className == "Person" || objectSchema.className == "Dog" else { break }
             let id = ruleIds[objectSchema.className]!
             rules[id].put(on: group, data: objectSchema.stitchRule(bsonType, schema, id: id), failOnError)
         }
