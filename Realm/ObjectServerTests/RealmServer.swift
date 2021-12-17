@@ -445,10 +445,6 @@ public class RealmServer: NSObject {
     /// The current admin session
     private var session: Admin.AdminSession?
 
-    /// AWS access key and Id, for local testing
-    private static let awsAccessKeyId = "AKIAVG4A4ZBJIGJ6B5TO"
-    private static let awsSecretAccessKey = "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"
-
     /// Check if the BaaS files are present and we can run the server
     @objc public class func haveServer() -> Bool {
         let goDir = RealmServer.buildDir.appendingPathComponent("stitch")
@@ -537,11 +533,13 @@ public class RealmServer: NSObject {
         let binDir = Self.buildDir.appendingPathComponent("bin").path
         let libDir = Self.buildDir.appendingPathComponent("lib").path
         let binPath = "$PATH:\(binDir)"
+        let awsAccessKeyId = ProcessInfo.processInfo.environment["AWS_ACCESS_KEY_ID"]!
+        let awsSecretAccessKey = ProcessInfo.processInfo.environment["AWS_SECRET_ACCESS_KEY"]!
         let env = [
             "PATH": binPath,
             "DYLD_LIBRARY_PATH": libDir,
-            "AWS_ACCESS_KEY_ID": Self.awsAccessKeyId,
-            "AWS_SECRET_ACCESS_KEY": Self.awsSecretAccessKey
+            "AWS_ACCESS_KEY_ID": awsAccessKeyId,
+            "AWS_SECRET_ACCESS_KEY": awsSecretAccessKey
         ]
 
         let stitchRoot = RealmServer.buildDir.path + "/go/src/github.com/10gen/stitch"
