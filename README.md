@@ -1,4 +1,4 @@
-![Realm](https://github.com/realm/realm-cocoa/raw/master/logo.png)
+![Realm](https://github.com/realm/realm-swift/raw/master/logo.png)
 
 Realm is a mobile database that runs directly inside phones, tablets or wearables.
 This repository holds the source code for the iOS, macOS, tvOS & watchOS versions of Realm Swift & Realm Objective-C.
@@ -171,4 +171,4 @@ not eligible to receive the product under U.S. law.**
 
 **_And if you don't like it, please let us know what you would like improved, so we can fix it!_**
 
-<img style="width: 0px; height: 0px;" src="https://3eaz4mshcd.execute-api.us-east-1.amazonaws.com/prod?s=https://github.com/realm/realm-cocoa#README.md">
+<img style="width: 0px; height: 0px;" src="https://3eaz4mshcd.execute-api.us-east-1.amazonaws.com/prod?s=https://github.com/realm/realm-swift#README.md">
