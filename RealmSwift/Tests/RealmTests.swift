@@ -1050,5 +1050,25 @@ class RealmTests: TestCase {
         XCTAssertNotNil(realm.objects(SwiftStringObject.self).first { $0.stringCol == "string U" })
         XCTAssertNotNil(realm.objects(SwiftStringObject.self).first { $0.stringCol == "string I" })
     }
+    
+    func testAsyncTransactionShouldChangeExistingObject() {
+        let realm = try! Realm()
+        let asyncComplete = expectation(description: "async transaction complete")
+        try! realm.write({
+            realm.create(SwiftStringObject.self, value: ["string A"])
+        })
+        let objA = realm.objects(SwiftStringObject.self).first(where: { $0.stringCol == "string A" })!
+        
+        realm.beginAsyncWrite({ _ in
+            objA.stringCol = "string B"
+            realm.commitAsyncWrite {
+                asyncComplete.fulfill()
+            }
+        })
+
+        waitForExpectations(timeout: 1, handler: nil)
+        XCTAssertNil(realm.objects(SwiftStringObject.self).first { $0.stringCol == "string A" })
+        XCTAssertNotNil(realm.objects(SwiftStringObject.self).first { $0.stringCol == "string B" })
+    }
 #endif // REALM_ASYNC_WRITES
 }
