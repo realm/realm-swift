@@ -502,64 +502,82 @@ typedef void (^RLMNotificationBlock)(RLMNotification notification, RLMRealm *rea
 
 #ifdef REALM_ASYNC_WRITES
 
-/**
- AsyncHandle A handle for asynchronous transaction returned
- by `beginAsyncWriteTransaction:` or `commitAsyncWriteTransaction:` calls.
- Can be used to cancel the transaction.
-*/
-typedef unsigned AsyncHandle;
+/// The Id of the asynchronous transaction.
+typedef unsigned AsyncTransactionId;
+
 /**
  Indicates if the Realm is currently engaged in an async write transaction.
- @warning Do not simply check this property and then start a write transaction whenever an object needs to be
- created, updated, or removed. Doing so might cause a large number of write transactions to be created,
- degrading performance. Instead, always prefer performing multiple updates during a single transaction.
+ 
+ @warning Do not simply check this property and then start a write transaction whenever an object needs
+          to be created, updated, or removed. Doing so might cause a large number of write transactions
+          to be created, degrading performance. Instead, always prefer performing multiple updates
+          during a single transaction.
  */
 @property (nonatomic, readonly) BOOL inAsyncWriteTransaction;
+
 /**
  Begins asynchronous write transaction.
+ 
  @param block The block containing actions to perform.
- `block` should end by calling `commitAsyncWriteTransaction`, `cancelAsyncTransaction:`,
- `commitWriteTransaction` or `cancelWriteTransaction`.
- Returning without one of these calls will be equivalent to calling `cancelAsyncTransaction`.
- @return Asynchronous transaction's handle.
+             `block` should end by calling `commitAsyncWriteTransaction`, `cancelAsyncTransaction:`,
+             `commitWriteTransaction` or `cancelWriteTransaction`.
+             Returning without one of these calls will be equivalent to calling `cancelAsyncTransaction`.
+ 
+ @return Asynchronous transaction's Id.
+ 
  @note `block` is queued for execution on the scheduler associated with the current realm.
- It will run after the write mutex has been acquired.
- The call returns immediately allowing the caller to proceed while the write mutex is held by someone else.
- Write blocks from multiple calls to `beginAsyncWriteTransaction:` or `asyncTransactionWithBlock:`
- will be executed in order.
- A later call to `beginAsyncWriteTransaction:` or `asyncTransactionWithBlock:` will wait for any earlier
- write blocks.
+       It will run after the write mutex has been acquired.
+       The call returns immediately allowing the caller to proceed while the write mutex is held by someone else.
+       Write blocks from multiple calls to `beginAsyncWriteTransaction:` or `asyncTransactionWithBlock:`
+       will be executed in order.
+       A later call to `beginAsyncWriteTransaction:` or `asyncTransactionWithBlock:` will wait for any earlier
+       write blocks.
  */
-- (AsyncHandle)beginAsyncWriteTransaction:(void(^)())block;
+- (AsyncTransactionId)beginAsyncWriteTransaction:(void(^)())block;
+
 /** Commit asynchronous transaction.
+ 
  @param doneBlock  is queued for execution on the scheduler associated with
-   the current realm. It will run after the commit has reached stable storage.
+                  the current realm. It will run after the commit has reached stable storage.
+ 
  @param isGroupingAllowed If `true`, the next `commitAsyncWriteTransaction` *may* run without an
- intervening synchronization of stable storage.  Such a sequence of commits form a group.
- In case of a platform crash, either none or all of the commits in a group will reach stable storage.
+                         intervening synchronization of stable storage.  Such a sequence of commits
+                         form a group. In case of a platform crash, either none or all of the commits
+                         in a group will reach stable storage.
+
+ @return Asynchronous transaction's Id.
 
  * The call returns immediately allowing the caller to proceed while
    the I/O is performed on a dedicated background thread.
  * Callbacks to `doneBlock` will occur in the order of `commitAsyncWriteTransaction`
 */
-- (AsyncHandle)commitAsyncWriteTransaction:(nullable void(^)())doneBlock isGroupingAllowed:(BOOL)isGroupingAllowed;
+- (AsyncTransactionId)commitAsyncWriteTransaction:(nullable void(^)())doneBlock isGroupingAllowed:(BOOL)isGroupingAllowed;
 /// :nodoc:
-- (AsyncHandle)commitAsyncWriteTransaction:(nullable void(^)())doneBlock;
+- (AsyncTransactionId)commitAsyncWriteTransaction:(nullable void(^)())doneBlock;
 /// :nodoc:
-- (AsyncHandle)commitAsyncWriteTransaction;
+- (AsyncTransactionId)commitAsyncWriteTransaction;
+
 /** Cancel a queued code block (either for an `asyncTransactionWithBlock`
  or for an `commitAsyncWriteTransaction`)
- @note Cancelling a commit will not abort the commit, it will only
- cancel the callback informing of commit completion.
+ 
+ @note Cancelling a commit will not abort the commit, it will only cancel the callback
+       informing of commit completion.
+ 
+ @param asyncTransactionId The transaction Id returned by `beginAsyncWriteTransaction` or  `commitAsyncWriteTransaction`
 */
-- (void)cancelAsyncTransaction:(AsyncHandle)handle;
+- (void)cancelAsyncTransaction:(AsyncTransactionId)asyncTransactionId;
+
 /** Commits a code block to asynchronous transactions queue.
+ 
  @param block  The block containing actions to perform.
+ 
  @param doneBlock  is queued for execution on the scheduler associated with
- the current realm. It will run after the commit has reached stable storage.
-*/
-- (void)asyncTransactionWithBlock:(void(^)())block onComplete:(nullable void(^)())doneBlock;
-- (void)asyncTransactionWithBlock:(void(^)())block;
+                  the current realm. It will run after the commit has reached stable storage.
+
+ @return Asynchronous transaction's Id.
+ */
+- (AsyncTransactionId)asyncTransactionWithBlock:(void(^)())block onComplete:(nullable void(^)())doneBlock;
+- (AsyncTransactionId)asyncTransactionWithBlock:(void(^)())block;
 
 #endif // REALM_ASYNC_WRITES
 

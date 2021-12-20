@@ -14,14 +14,15 @@ The feature can be enabled with the build flag `REALM_ASYNC_WRITES`.
         // optional handling
     }];
 
-    AsyncHandle handle = [realm beginAsyncWriteTransaction:^{
+    [realm beginAsyncWriteTransaction:^{
         [StringObject createInRealm:realm withValue:@[@"string"]];
         [realm commitAsyncWriteTransaction];
     }];
 
-    AsyncHandle handle = [realm beginAsyncWriteTransaction:^{
-        [realm cancelAsyncTransaction:handle];
+    AsyncTransactionId asyncTransactionId = [realm beginAsyncWriteTransaction:^{
+        // ...
     }];
+    [realm cancelAsyncTransaction:asyncTransactionId];
 ```
 
 ### Fixed
