@@ -1,3 +1,17 @@
+10.20.2 Release notes (2021-12-20)
+=============================================================
+
+Rebuild 10.20.1 with Xcode 13.2.1 rather than 13.2.0. This version has no
+changes if you are not using a prebuilt binary for Realm.
+
+### Compatibility
+
+* Realm Studio: 11.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 13.2.1.
+* CocoaPods: 1.10 or later.
+* Xcode: 12.4-13.2.1.
+
 10.20.1 Release notes (2021-12-14)
 =============================================================
 
