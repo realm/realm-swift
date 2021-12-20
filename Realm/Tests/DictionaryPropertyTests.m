@@ -1667,4 +1667,29 @@ static RLMDictionary<NSString *, IntObject *><RLMString, IntObject> *managedTest
     [dict.realm cancelWriteTransaction];
 }
 
+- (void)testInitWithNullLink {
+    id value = @{@"stringDictionary": @{@"1": NSNull.null},
+                 @"intDictionary": @{@"2": NSNull.null},
+                 @"primitiveStringDictionary": @{@"3": NSNull.null},
+                 @"embeddedDictionary": @{@"4": NSNull.null},
+                 @"intObjDictionary": @{@"5": NSNull.null}};
+
+    DictionaryPropertyObject *obj = [[DictionaryPropertyObject alloc] initWithValue:value];
+    XCTAssertEqual(obj.stringDictionary[@"1"], (id)NSNull.null);
+    XCTAssertEqual(obj.intDictionary[@"2"], (id)NSNull.null);
+    XCTAssertEqual(obj.primitiveStringDictionary[@"3"], (id)NSNull.null);
+    XCTAssertEqual(obj.embeddedDictionary[@"4"], (id)NSNull.null);
+    XCTAssertEqual(obj.intObjDictionary[@"5"], (id)NSNull.null);
+
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    obj = [DictionaryPropertyObject createInRealm:realm withValue:value];
+    XCTAssertEqual(obj.stringDictionary[@"1"], (id)NSNull.null);
+    XCTAssertEqual(obj.intDictionary[@"2"], (id)NSNull.null);
+    XCTAssertEqual(obj.primitiveStringDictionary[@"3"], (id)NSNull.null);
+    XCTAssertEqual(obj.embeddedDictionary[@"4"], (id)NSNull.null);
+    XCTAssertEqual(obj.intObjDictionary[@"5"], (id)NSNull.null);
+    [realm cancelWriteTransaction];
+}
+
 @end
