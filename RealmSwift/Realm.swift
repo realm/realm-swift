@@ -1001,7 +1001,7 @@ extension Realm {
 /// The type of a block to run for notification purposes when the data in a Realm is modified.
 public typealias NotificationBlock = (_ notification: Realm.Notification, _ realm: Realm) -> Void
 
-#if swift(>=5.5.2) && canImport(_Concurrency)
+#if swift(>=5.5.2) && canImport(_Concurrency) && REALM_INCLUDE_CONCURRENCY
 @available(macOS 12.0, tvOS 15.0, iOS 15.0, watchOS 8.0, *)
 extension Realm {
     /// Options for when to download all data from the server before opening

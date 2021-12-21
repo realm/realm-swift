@@ -749,7 +749,7 @@ public extension User {
     }
 }
 
-#if swift(>=5.5.2) && canImport(_Concurrency)
+#if swift(>=5.5.2) && canImport(_Concurrency) && REALM_INCLUDE_CONCURRENCY
 @available(macOS 12.0, tvOS 15.0, iOS 15.0, watchOS 8.0, *)
 public extension User {
     /// Links the currently authenticated user with a new identity, where the identity is defined by the credential
