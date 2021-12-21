@@ -780,7 +780,7 @@ public class RealmServer: NSObject {
 //                objectSchema.className == "SwiftHugeSyncObject" ||
                 objectSchema.className == "SwiftMissingObject" {
             print("-----------------> \(objectSchema.className)")
-                ruleCreations.append(rules.post(objectSchema.stitchRule(bsonType, schema, isFlexibleSync: syncMode == .flx ? true : false)))
+                ruleCreations.append(rules.post(objectSchema.stitchRule(bsonType, schema)))
             }
         }
 
@@ -813,7 +813,7 @@ public class RealmServer: NSObject {
 //                objectSchema.className == "SwiftHugeSyncObject" ||
                 objectSchema.className == "SwiftMissingObject" {
                 let id = ruleIds[objectSchema.className]!
-                rules[id].put(on: group, data: objectSchema.stitchRule(bsonType, schema, id: id, isFlexibleSync: syncMode == .flx ? true : false), failOnError)
+                rules[id].put(on: group, data: objectSchema.stitchRule(bsonType, schema, id: id), failOnError)
             }
         }
 
