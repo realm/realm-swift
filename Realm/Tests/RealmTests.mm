@@ -1455,8 +1455,8 @@
     XCTAssertNotNil(error);
 }
 
-#pragma mark - Async Transactions
 #ifdef REALM_ASYNC_WRITES
+#pragma mark - Async Transactions
 
 - (void)testAsyncTransactionShouldWrite {
     RLMRealm *realm = RLMRealm.defaultRealm;

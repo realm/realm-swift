@@ -27,6 +27,7 @@ let cxxSettings: [CXXSetting] = [
     .define("REALM_VERSION_PATCH", to: String(coreVersionExtra[0])),
     .define("REALM_VERSION_EXTRA", to: "\"\(coreVersionExtra.count > 1 ? String(coreVersionExtra[1]) : "")\""),
     .define("REALM_VERSION_STRING", to: "\"\(coreVersionStr)\""),
+    .define("REALM_ASYNC_WRITES", .when(configuration: .debug)),
 ]
 let testCxxSettings: [CXXSetting] = cxxSettings + [
     // Command-line `swift build` resolves header search paths
@@ -34,6 +35,7 @@ let testCxxSettings: [CXXSetting] = cxxSettings + [
     // relative to the target root, so we need both.
     .headerSearchPath("Realm"),
     .headerSearchPath(".."),
+    .define("REALM_ASYNC_WRITES"),
 ]
 
 // Xcode 12.5's xctest crashes when reading obj-c metadata if the Swift tests
