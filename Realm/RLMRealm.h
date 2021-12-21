@@ -553,7 +553,7 @@ typedef unsigned AsyncTransactionId;
 */
 - (AsyncTransactionId)commitAsyncWriteTransaction:(nullable void(^)())doneBlock isGroupingAllowed:(BOOL)isGroupingAllowed;
 /// :nodoc:
-- (AsyncTransactionId)commitAsyncWriteTransaction:(nullable void(^)())doneBlock;
+- (AsyncTransactionId)commitAsyncWriteTransaction:(void(^)())doneBlock;
 /// :nodoc:
 - (AsyncTransactionId)commitAsyncWriteTransaction;
 
@@ -576,7 +576,8 @@ typedef unsigned AsyncTransactionId;
 
  @return Asynchronous transaction's Id.
  */
-- (AsyncTransactionId)asyncTransactionWithBlock:(void(^)())block onComplete:(nullable void(^)())doneBlock;
+- (AsyncTransactionId)asyncTransactionWithBlock:(void(^)())block onComplete:(void(^)())doneBlock;
+/// :nodoc:
 - (AsyncTransactionId)asyncTransactionWithBlock:(void(^)())block;
 
 #endif // REALM_ASYNC_WRITES

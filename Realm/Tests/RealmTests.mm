@@ -1539,7 +1539,7 @@
         RLMRealm *realm = RLMRealm.defaultRealm;
         AsyncTransactionId asyncTransactionId = [realm beginAsyncWriteTransaction:^{
             [realm createObject:StringObject.className withValue:@[@"string"]];
-            [realm commitAsyncWriteTransaction:nil];
+            [realm commitAsyncWriteTransaction];
             [asyncComplete fulfill];
         }];
     }];

@@ -720,11 +720,8 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     return _realm->async_commit_transaction();
 }
 
-- (AsyncTransactionId)commitAsyncWriteTransaction:(nullable void(^)())doneBlock {
-    if (doneBlock) {
-        return _realm->async_commit_transaction(doneBlock);
-    }
-    return _realm->async_commit_transaction();
+- (AsyncTransactionId)commitAsyncWriteTransaction:(void(^)())doneBlock {
+    return _realm->async_commit_transaction(doneBlock);
 }
 
 - (AsyncTransactionId)commitAsyncWriteTransaction:(nullable void(^)())doneBlock isGroupingAllowed:(BOOL)isGroupingAllowed {
@@ -738,7 +735,7 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     _realm->async_cancel_transaction(asyncTransactionId);
 }
 
-- (AsyncTransactionId)asyncTransactionWithBlock:(void(^)())block onComplete:(nullable void (^)())doneBlock {
+- (AsyncTransactionId)asyncTransactionWithBlock:(void(^)())block onComplete:(void (^)())doneBlock {
     AsyncTransactionId asyncTransactionId = [self beginAsyncWriteTransaction: ^{
         block();
         [self commitAsyncWriteTransaction:doneBlock];
@@ -747,7 +744,11 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
 }
 
 - (AsyncTransactionId)asyncTransactionWithBlock:(void(^)())block {
-    return [self asyncTransactionWithBlock:block onComplete:nil];
+    AsyncTransactionId asyncTransactionId = [self beginAsyncWriteTransaction: ^{
+        block();
+        [self commitAsyncWriteTransaction];
+    }];
+    return asyncTransactionId;
 }
 
 #endif // REALM_ASYNC_WRITES
