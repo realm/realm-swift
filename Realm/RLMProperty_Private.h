@@ -106,6 +106,7 @@ static inline NSString *RLMTypeToString(RLMPropertyType type) {
 @property (nonatomic, nullable) SEL setterSel;
 
 - (RLMProperty *)copyWithNewName:(NSString *)name;
+- (NSString *)typeName;
 
 @end
 

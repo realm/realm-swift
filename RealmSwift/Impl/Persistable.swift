@@ -28,12 +28,25 @@ public typealias PropertyKey = UInt16
 // A tag protocol used in schema discovery to find @Persisted properties
 internal protocol DiscoverablePersistedProperty: _RealmSchemaDiscoverable {}
 
+public protocol _HasPersistedType: _ObjcBridgeable {
+    // The type which is actually stored in the Realm. This is Self for types
+    // we support directly, but may be a different type for enums and mapped types.
+    associatedtype PersistedType: _ObjcBridgeable
+}
+
+// These two types need PersistedType for collection aggregate functions but
+// aren't persistable or valid collection types
+extension NSNumber: _HasPersistedType {
+    public typealias PersistedType = NSNumber
+}
+extension NSDate: _HasPersistedType {
+    public typealias PersistedType = NSDate
+}
+
 // A type which can be stored by the @Persisted property wrapper
-public protocol _Persistable: _RealmSchemaDiscoverable {
+public protocol _Persistable: _RealmSchemaDiscoverable, _HasPersistedType where PersistedType: _Persistable {
     // Read a value of this type from the target object
     static func _rlmGetProperty(_ obj: ObjectBase, _ key: PropertyKey) -> Self
-    // Read an optional value of this type from the target object
-    static func _rlmGetPropertyOptional(_ obj: ObjectBase, _ key: PropertyKey) -> Self?
     // Set a value of this type on the target object
     static func _rlmSetProperty(_ obj: ObjectBase, _ key: PropertyKey, _ value: Self)
     // Set the swiftAccessor for this type if the default PersistedPropertyAccessor
@@ -42,16 +55,8 @@ public protocol _Persistable: _RealmSchemaDiscoverable {
     // Do the values of this type need to be cached on the Persisted?
     static var _rlmRequiresCaching: Bool { get }
     // Get the zero/empty/nil value for this type. Used to supply a default
-    // when the user does not declare one in their model. When `forceDefaultInitialization`
-    // is true we *must* return a non-nil, default instance of `Self`. The latter is
-    // used in conjunction with key path string tracing.
-    static func _rlmDefaultValue(_ forceDefaultInitialization: Bool) -> Self
-    // If we are in key path tracing mode, instantiate an empty object and forward
-    // the lastAccessedNames array.
-    static func _rlmKeyPathRecorder(with lastAccessedNames: NSMutableArray) -> Self
-    // The type which is actually stored in the Realm. This is Self for types
-    // we support directly, but may be a different type for enums and mapped types.
-    associatedtype _RealmValue: _Persistable
+    // when the user does not declare one in their model.
+    static func _rlmDefaultValue() -> Self
 }
 
 extension _Persistable {
@@ -60,34 +65,13 @@ extension _Persistable {
     }
 }
 
-// A helper protocol for types which we support directly rather than via
-// mapping to a supported type.
-public protocol _BuiltInPersistable {
-    associatedtype _RealmValue = Self
+// A type which can appear inside Optional<T> in a @Persisted property
+public protocol _PersistableInsideOptional: _Persistable, _DefaultConstructible where PersistedType: _PersistableInsideOptional {
+    // Read an optional value of this type from the target object
+    static func _rlmGetPropertyOptional(_ obj: ObjectBase, _ key: PropertyKey) -> Self?
 }
 
-extension _RealmSchemaDiscoverable where Self: _Persistable {
-    public static func _rlmKeyPathRecorder(with lastAccessedNames: NSMutableArray) -> Self {
-        let value = Self._rlmDefaultValue(true)
-
-        if let value = value as? ObjectBase {
-            value.lastAccessedNames = lastAccessedNames
-            value.prepareForRecording()
-            return value as! Self
-        }
-
-        if var value = value as? PropertyNameConvertible {
-            value.lastAccessedNames = lastAccessedNames
-            return value as! Self
-        }
-        return value
-    }
-}
-
-// A tag protocol for persistable types which can appear inside Optional
-public protocol _OptionalPersistable: _Persistable, _DefaultConstructible { }
-
-extension _OptionalPersistable {
+extension _PersistableInsideOptional {
     public static func _rlmSetAccessor(_ prop: RLMProperty) {
         if prop.optional {
             prop.swiftAccessor = PersistedPropertyAccessor<Optional<Self>>.self
@@ -103,7 +87,7 @@ public protocol _DefaultConstructible {
     init()
 }
 extension _Persistable where Self: _DefaultConstructible {
-    public static func _rlmDefaultValue(_ forceDefaultInitialization: Bool) -> Self {
+    public static func _rlmDefaultValue() -> Self {
         .init()
     }
 }

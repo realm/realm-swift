@@ -258,8 +258,8 @@ build_docs() {
       --clean \
       --author Realm \
       --author_url https://realm.io \
-      --github_url https://github.com/realm/realm-cocoa \
-      --github-file-prefix "https://github.com/realm/realm-cocoa/tree/v${version}" \
+      --github_url https://github.com/realm/realm-swift \
+      --github-file-prefix "https://github.com/realm/realm-swift/tree/v${version}" \
       --module-version "${version}" \
       --xcodebuild-arguments "${xcodebuild_arguments}" \
       --module "${module}" \
@@ -1303,8 +1303,8 @@ EOF
         WORKSPACE="$(cd "$WORKSPACE" && pwd)"
         export WORKSPACE
         cd "$WORKSPACE"
-        git clone --recursive "$REALM_SOURCE" realm-cocoa
-        cd realm-cocoa
+        git clone --recursive "$REALM_SOURCE" realm-swift
+        cd realm-swift
 
         echo 'Packaging iOS'
         sh build.sh package-ios-static
@@ -1332,7 +1332,7 @@ EOF
         sh build.sh package-examples
 
         echo 'Building final release packages'
-        export WORKSPACE="${WORKSPACE}/realm-cocoa"
+        export WORKSPACE="${WORKSPACE}/realm-swift"
         sh build.sh package-release objc
         sh build.sh package-release swift
 
@@ -1357,7 +1357,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * None.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
+* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
 * None.
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
@@ -1365,9 +1365,9 @@ x.y.z Release notes (yyyy-MM-dd)
 ### Compatibility
 * Realm Studio: 11.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
-* Carthage release for Swift is built with Xcode 13.1.
+* Carthage release for Swift is built with Xcode 13.2.1.
 * CocoaPods: 1.10 or later.
-* Xcode: 12.4-13.2.
+* Xcode: 12.4-13.2.1.
 
 ### Internal
 * Upgraded realm-core from ? to ?

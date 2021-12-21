@@ -78,10 +78,10 @@ import Realm.Private
 
  ### Relationships
 
- See our [Cocoa guide](http://realm.io/docs/cocoa) for more details.
+ See our [Swift guide](https://docs.mongodb.com/realm/sdk/swift/fundamentals/relationships/) for more details.
  */
 public typealias Object = RealmSwiftObject
-extension Object: RealmCollectionValue {
+extension Object: _RealmCollectionValueInsideOptional {
     // MARK: Initializers
 
     /**
@@ -375,7 +375,7 @@ extension Object: RealmCollectionValue {
             return dynamic[propertyName] as! List<DynamicObject>
         }
         let list = RLMDynamicGetByName(self, propertyName) as! RLMSwiftCollectionBase
-        return List<DynamicObject>(objc: list._rlmCollection as! RLMArray<AnyObject>)
+        return List<DynamicObject>(collection: list._rlmCollection as! RLMArray<AnyObject>)
     }
 
     // MARK: Dynamic set
@@ -398,7 +398,7 @@ extension Object: RealmCollectionValue {
             return dynamic[propertyName] as! MutableSet<DynamicObject>
         }
         let set = RLMDynamicGetByName(self, propertyName) as! RLMSwiftCollectionBase
-        return MutableSet<DynamicObject>(objc: set._rlmCollection as! RLMSet<AnyObject>)
+        return MutableSet<DynamicObject>(collection: set._rlmCollection as! RLMSet<AnyObject>)
     }
 
     // MARK: Dynamic map
@@ -516,7 +516,7 @@ extension Object: ThreadConfined {
  Information about the changes made to an object which is passed to `Object`'s
  notification blocks.
  */
-@frozen public enum ObjectChange<T: ObjectBase> {
+@frozen public enum ObjectChange<T> {
     /**
      If an error occurs, notification blocks are called one time with a `.error`
      result and an `NSError` containing details about the error. Currently the
@@ -542,10 +542,10 @@ public final class DynamicObject: Object {
         get {
             let value = RLMDynamicGetByName(self, key).flatMap(coerceToNil)
             if let array = value as? RLMArray<AnyObject> {
-                return List<DynamicObject>(objc: array)
+                return List<DynamicObject>(collection: array)
             }
             if let set = value as? RLMSet<AnyObject> {
-                return MutableSet<DynamicObject>(objc: set)
+                return MutableSet<DynamicObject>(collection: set)
             }
             if let dictionary = value as? RLMDictionary<AnyObject, AnyObject> {
                 return Map<String, DynamicObject>(objc: dictionary)
@@ -606,21 +606,21 @@ public final class DynamicObject: Object {
  ```
  */
 public protocol RealmEnum: RealmOptionalType, _RealmSchemaDiscoverable {
-    /// :nodoc:
-    static func _rlmToRawValue(_ value: Any) -> Any
-    /// :nodoc:
-    static func _rlmFromRawValue(_ value: Any) -> Any?
 }
 
 // MARK: - Implementation
 
 /// :nodoc:
-public extension RealmEnum where Self: RawRepresentable, Self.RawValue: _RealmSchemaDiscoverable {
-    static func _rlmToRawValue(_ value: Any) -> Any {
-        return (value as! Self).rawValue
-    }
-    static func _rlmFromRawValue(_ value: Any) -> Any? {
-        return Self(rawValue: value as! RawValue)
+public extension RealmEnum where Self: RawRepresentable, Self.RawValue: _RealmSchemaDiscoverable & _ObjcBridgeable {
+    var _rlmObjcValue: Any { rawValue._rlmObjcValue }
+    static func _rlmFromObjc(_ value: Any) -> Self? {
+        if let value = value as? Self {
+            return value
+        }
+        if let value = value as? RawValue {
+            return Self(rawValue: value)
+        }
+        return nil
     }
     static func _rlmPopulateProperty(_ prop: RLMProperty) {
         RawValue._rlmPopulateProperty(prop)
@@ -630,10 +630,8 @@ public extension RealmEnum where Self: RawRepresentable, Self.RawValue: _RealmSc
 
 internal func dynamicSet(object: ObjectBase, key: String, value: Any?) {
     let bridgedValue: Any?
-    if let v1 = value, let v2 = v1 as? CustomObjectiveCBridgeable {
-        bridgedValue = v2.objCValue
-    } else if let v1 = value, let v2 = v1 as? RealmEnum {
-        bridgedValue = type(of: v2)._rlmToRawValue(v2)
+    if let v1 = value, let v2 = v1 as? _ObjcBridgeable {
+        bridgedValue = v2._rlmObjcValue
     } else {
         bridgedValue = value
     }
@@ -642,67 +640,4 @@ internal func dynamicSet(object: ObjectBase, key: String, value: Any?) {
     } else {
         RLMDynamicValidatedSet(object, key, bridgedValue)
     }
-}
-
-// MARK: CustomObjectiveCBridgeable
-
-// FIXME: Remove when `as! Self` can be written
-private func forceCastToInferred<T, V>(_ x: T) -> V {
-    return x as! V
-}
-
-extension Object: CustomObjectiveCBridgeable {
-    internal static func bridging(objCValue objectiveCValue: Any) -> Self {
-        return forceCastToInferred(objectiveCValue)
-    }
-
-    internal var objCValue: Any {
-        unsafeCastToRLMObject()
-    }
-}
-
-// MARK: Key Path Strings
-
-extension ObjectBase {
-    internal func prepareForRecording() {
-        let objectSchema = ObjectSchema(RLMObjectBaseObjectSchema(self)!)
-        (objectSchema.rlmObjectSchema.properties + objectSchema.rlmObjectSchema.computedProperties)
-            .map { (prop: $0, accessor: $0.swiftAccessor) }
-            .forEach { $0.accessor?.observe($0.prop, on: self) }
-    }
-}
-
-/**
- Gets the components of a given key path as a string.
-
- - warning: Objects that declare properties with the old `@objc dynamic` syntax are not fully supported
- by this function, and it is recommened that you use `@Persisted` to declare your properties if you wish to use
- this function to its full benefit.
-
- Example:
- ```
- let name = ObjectBase._name(for: \Person.dogs[0].name) // "dogs.name"
- // Note that the above KeyPath expression is only supported with properties declared
- // with `@Persisted`.
- let nested = ObjectBase._name(for: \Person.address.city.zip) // "address.city.zip"
- ```
- */
-public func _name<T: ObjectBase>(for keyPath: PartialKeyPath<T>) -> String {
-    if let name = keyPath._kvcKeyPathString {
-        return name
-    }
-    let traceObject = T()
-    traceObject.lastAccessedNames = NSMutableArray()
-    traceObject.prepareForRecording()
-    let value = traceObject[keyPath: keyPath]
-    if let collection = value as? PropertyNameConvertible,
-       let propertyInfo = collection.propertyInformation,
-       propertyInfo.isLegacy {
-        traceObject.lastAccessedNames?.add(propertyInfo.key)
-    }
-
-    if let storage = value as? RLMSwiftValueStorage {
-        traceObject.lastAccessedNames?.add(RLMSwiftValueStorageGetPropertyName(storage))
-    }
-    return traceObject.lastAccessedNames!.componentsJoined(by: ".")
 }
