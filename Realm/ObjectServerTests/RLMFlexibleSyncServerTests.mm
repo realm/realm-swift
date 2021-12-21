@@ -702,8 +702,8 @@
     };
 
     RLMRealmConfiguration *config = [user flexibleSyncConfiguration];
-//    config.objectClasses = @[Dog.self,
-//                             Person.self];
+    config.objectClasses = @[Dog.self,
+                             Person.self];
 
     XCTestExpectation *ex1 = [self expectationWithDescription:@"async open"];
     __block RLMRealm *realm;
@@ -715,7 +715,7 @@
         realm = asyncRealm;
         [ex1 fulfill];
     }];
-    [self waitForExpectationsWithTimeout:300.0 handler:nil];
+    [self waitForExpectationsWithTimeout:40.0 handler:nil];
     XCTAssertNotNil(realm);
 
     RLMSyncSubscriptionSet *subs = realm.subscriptions;
@@ -723,5 +723,23 @@
     XCTAssertNotNil(subs);
     XCTAssertEqual(subs.version, 0);
     XCTAssertEqual(subs.count, 0);
+
+    [subs write:^{
+        [subs addSubscriptionWithClassName:Person.className
+                          subscriptionName:@"person_age"
+                                     where:@"age > 15"];
+    }];
+
+    XCTestExpectation *ex3 = [self expectationWithDescription:@"state changes"];
+    [subs observe:^(RLMSyncSubscriptionState state) {
+        if (state == RLMSyncSubscriptionStateComplete) {
+            [ex3 fulfill];
+        }
+    }];
+    [self waitForExpectationsWithTimeout:20.0 handler:nil];
+
+//    XCTAssertEqual(subs.state, 1);
+    XCTAssertEqual(subs.version, 1);
+    XCTAssertEqual(subs.count, 1);
 }
 @end

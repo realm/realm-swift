@@ -127,7 +127,9 @@ private extension ObjectSchema {
             let pk = primaryKeyProperty!
             stitchProperties[pk.name] = pk.stitchRule(schema)
         } else {
+            var count: Int = 0
             for property in properties {
+                count += 1
                 stitchProperties[property.name] = property.stitchRule(schema)
 
                 if property.type == .object {
@@ -138,6 +140,7 @@ private extension ObjectSchema {
                     ]
                 }
             }
+            print("------------------> Num of properties for \(className): \(count)")
         }
 
         return [
@@ -757,8 +760,28 @@ public class RealmServer: NSObject {
 
         var ruleCreations = [Result<Any?, Error>]()
         for objectSchema in syncTypes {
-//            guard objectSchema.className == "Person" || objectSchema.className == "Dog" else { break }
-            ruleCreations.append(rules.post(objectSchema.stitchRule(bsonType, schema)))
+            if objectSchema.className == "Person" ||
+                objectSchema.className == "Dog" ||
+//                objectSchema.className == "HugeSyncObject" ||
+//                objectSchema.className == "RLMDictionarySyncObject" ||
+//                objectSchema.className == "AllTypesSyncObject" ||
+//                objectSchema.className == "SwiftPerson" ||
+//                objectSchema.className == "SwiftTypesSyncObject" ||
+//                objectSchema.className == "SwiftCollectionSyncObject" ||
+//                objectSchema.className == "SwiftIntPrimaryKeyObject" ||
+//                objectSchema.className == "RLMArraySyncObject" ||
+//                objectSchema.className == "SwiftAnyRealmValueObject" ||
+//                objectSchema.className == "SwiftStringPrimaryKeyObject" ||
+//                objectSchema.className == "UUIDPrimaryKeyObject" ||
+//                objectSchema.className == "StringPrimaryKeyObject" ||
+//                objectSchema.className == "SwiftUUIDPrimaryKeyObject" ||
+//                objectSchema.className == "IntPrimaryKeyObject" ||
+//                objectSchema.className == "RLMSetSyncObject" ||
+//                objectSchema.className == "SwiftHugeSyncObject" ||
+                objectSchema.className == "SwiftMissingObject" {
+            print("-----------------> \(objectSchema.className)")
+                ruleCreations.append(rules.post(objectSchema.stitchRule(bsonType, schema, isFlexibleSync: syncMode == .flx ? true : false)))
+            }
         }
 
         var ruleIds: [String: String] = [:]
@@ -770,9 +793,28 @@ public class RealmServer: NSObject {
             ruleIds[dict["collection"]!] = dict["_id"]!
         }
         for objectSchema in syncTypes {
-//            guard objectSchema.className == "Person" || objectSchema.className == "Dog" else { break }
-            let id = ruleIds[objectSchema.className]!
-            rules[id].put(on: group, data: objectSchema.stitchRule(bsonType, schema, id: id), failOnError)
+            if objectSchema.className == "Person" ||
+                objectSchema.className == "Dog" ||
+//                objectSchema.className == "HugeSyncObject" ||
+//                objectSchema.className == "RLMDictionarySyncObject" ||
+//                objectSchema.className == "AllTypesSyncObject" ||
+//                objectSchema.className == "SwiftPerson" ||
+//                objectSchema.className == "SwiftTypesSyncObject" ||
+//                objectSchema.className == "SwiftCollectionSyncObject" ||
+//                objectSchema.className == "SwiftIntPrimaryKeyObject" ||
+//                objectSchema.className == "RLMArraySyncObject" ||
+//                objectSchema.className == "SwiftAnyRealmValueObject" ||
+//                objectSchema.className == "SwiftStringPrimaryKeyObject" ||
+//                objectSchema.className == "UUIDPrimaryKeyObject" ||
+//                objectSchema.className == "StringPrimaryKeyObject" ||
+//                objectSchema.className == "SwiftUUIDPrimaryKeyObject" ||
+//                objectSchema.className == "IntPrimaryKeyObject" ||
+//                objectSchema.className == "RLMSetSyncObject" ||
+//                objectSchema.className == "SwiftHugeSyncObject" ||
+                objectSchema.className == "SwiftMissingObject" {
+                let id = ruleIds[objectSchema.className]!
+                rules[id].put(on: group, data: objectSchema.stitchRule(bsonType, schema, id: id, isFlexibleSync: syncMode == .flx ? true : false), failOnError)
+            }
         }
 
         app.sync.config.put(on: group, data: [

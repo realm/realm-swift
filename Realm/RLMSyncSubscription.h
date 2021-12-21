@@ -62,6 +62,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (readonly) NSUInteger count;
 
+@property (readonly) RLMSyncSubscriptionState state;
+
 #pragma mark - Batch Update subscriptions
 
 - (BOOL)write:(__attribute__((noescape)) void(^)(void))block NS_SWIFT_UNAVAILABLE("");
@@ -139,12 +141,6 @@ typedef void(^RLMSyncSubscriptionStateBlock)(RLMSyncSubscriptionState state);
 - (void)removeAllSubscriptions;
 
 - (void)removeAllSubscriptionsWithClassName:(NSString *)className;
-
-#pragma mark - Subscription transactions
-
-typedef void(^RLMSyncSubscriptionStateBlock)(RLMSyncSubscriptionState state);
-
-//- (void)observe:(RLMSyncSubscriptionStateBlock)block;
 
 #pragma mark - SubscriptionSet Collection
 

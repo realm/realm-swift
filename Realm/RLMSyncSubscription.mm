@@ -24,6 +24,7 @@
 
 #import <realm/sync/subscriptions.hpp>
 #import <realm/status_with.hpp>
+#import <realm/util/future.hpp>
 
 #pragma mark - Subscription
 
@@ -134,6 +135,10 @@
     return RLMStringDataToNSString(_subscriptionSet->error_str());
 }
 
+- (RLMSyncSubscriptionState)state {
+    return [self mapState:_subscriptionSet->state()];
+}
+
 #pragma mark - Batch Update subscriptions
 
 - (BOOL)write:(__attribute__((noescape)) void(^)(void))block {
@@ -167,12 +172,21 @@
 
 #pragma mark - Check Subscription State
 
-typedef void(^RLMSyncSubscriptionStateBlock)(RLMSyncSubscriptionState state);
-
 - (void)observe:(RLMSyncSubscriptionStateBlock)block {
     _subscriptionSet->get_state_change_notification(realm::sync::SubscriptionSet::State::Complete)
-        .get_async([&](realm::StatusWith<realm::sync::SubscriptionSet::State> state) noexcept {
-            block([self mapState:state.get_value()]);
+        .get_async([self, block](realm::StatusWith<realm::sync::SubscriptionSet::State> state) noexcept {
+            if (state.is_ok()) {
+                auto value = state.get_value();
+                block([self mapState:value]);
+            } else {
+                NSLog(@"%d", state.get_status().code());
+                const std::string_view str_view = state.get_status().reason();
+                std::string str = std::string(str_view);
+                const char * characters = str.c_str();
+                NSLog(@"%s", characters);
+                NSLog(@"%d", state.get_status().code_string());
+                block(RLMSyncSubscriptionStateError);
+            }
         });
 }
 
