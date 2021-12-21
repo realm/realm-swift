@@ -5,14 +5,14 @@ branch = ENV['sha']
 
 target 'CocoaPodsExample' do
   use_frameworks!
-  pod 'Realm', git: 'https://github.com/realm/realm-cocoa.git', branch: branch, submodules: true
-  pod 'RealmSwift', git: 'https://github.com/realm/realm-cocoa.git', branch: branch, submodules: true
+  pod 'Realm', git: 'https://github.com/realm/realm-swift.git', branch: branch, submodules: true
+  pod 'RealmSwift', git: 'https://github.com/realm/realm-swift.git', branch: branch, submodules: true
 end
 
 target 'CocoaPodsExampleTests' do
   use_frameworks!
-  pod 'Realm', git: 'https://github.com/realm/realm-cocoa.git', branch: branch, submodules: true
-  pod 'RealmSwift', git: 'https://github.com/realm/realm-cocoa.git', branch: branch, submodules: true
+  pod 'Realm', git: 'https://github.com/realm/realm-swift.git', branch: branch, submodules: true
+  pod 'RealmSwift', git: 'https://github.com/realm/realm-swift.git', branch: branch, submodules: true
 end
 
 post_install do |installer|

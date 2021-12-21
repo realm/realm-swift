@@ -712,43 +712,43 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     return _realm->is_in_async_transaction();
 }
 
-- (AsyncHandle)beginAsyncWriteTransaction:(void(^)())block {
+- (AsyncTransactionId)beginAsyncWriteTransaction:(void(^)())block {
     return _realm->async_begin_transaction(block);
 }
 
-- (AsyncHandle)commitAsyncWriteTransaction {
+- (AsyncTransactionId)commitAsyncWriteTransaction {
     return _realm->async_commit_transaction();
 }
 
-- (AsyncHandle)commitAsyncWriteTransaction:(nullable void(^)())doneBlock {
-    if (doneBlock) {
-        return _realm->async_commit_transaction(doneBlock);
-    }
-    return _realm->async_commit_transaction();
+- (AsyncTransactionId)commitAsyncWriteTransaction:(void(^)())doneBlock {
+    return _realm->async_commit_transaction(doneBlock);
 }
 
-- (AsyncHandle)commitAsyncWriteTransaction:(nullable void(^)())doneBlock isGroupingAllowed:(BOOL)isGroupingAllowed {
+- (AsyncTransactionId)commitAsyncWriteTransaction:(nullable void(^)())doneBlock isGroupingAllowed:(BOOL)isGroupingAllowed {
     if (doneBlock) {
         return _realm->async_commit_transaction(doneBlock, isGroupingAllowed);
     }
     return _realm->async_commit_transaction(nil, isGroupingAllowed);
 }
 
-- (void)cancelAsyncTransaction:(AsyncHandle)handle {
-    _realm->async_cancel_transaction(handle);
+- (void)cancelAsyncTransaction:(AsyncTransactionId)asyncTransactionId {
+    _realm->async_cancel_transaction(asyncTransactionId);
 }
 
-- (void)asyncTransactionWithBlock:(void(^)())block onComplete:(nullable void (^)())doneBlock {
-    AsyncHandle transaction = [self beginAsyncWriteTransaction: ^{
+- (AsyncTransactionId)asyncTransactionWithBlock:(void(^)())block onComplete:(void (^)())doneBlock {
+    AsyncTransactionId asyncTransactionId = [self beginAsyncWriteTransaction: ^{
         block();
-        if (_realm->is_in_async_transaction()) {
-            [self commitAsyncWriteTransaction:doneBlock];
-        }
+        [self commitAsyncWriteTransaction:doneBlock];
     }];
+    return asyncTransactionId;
 }
 
-- (void)asyncTransactionWithBlock:(void(^)())block {
-    [self asyncTransactionWithBlock:block onComplete:nil];
+- (AsyncTransactionId)asyncTransactionWithBlock:(void(^)())block {
+    AsyncTransactionId asyncTransactionId = [self beginAsyncWriteTransaction: ^{
+        block();
+        [self commitAsyncWriteTransaction];
+    }];
+    return asyncTransactionId;
 }
 
 #endif // REALM_ASYNC_WRITES
