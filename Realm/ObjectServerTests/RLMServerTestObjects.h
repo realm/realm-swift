@@ -23,6 +23,7 @@
 @property RLMObjectId *_id;
 @property NSString *breed;
 @property NSString *name;
+- (instancetype) initWithPrimaryKey:(RLMObjectId *)primaryKey breed:(NSString *)breed name:(NSString *)name;
 @end
 
 @interface Person : RLMObject

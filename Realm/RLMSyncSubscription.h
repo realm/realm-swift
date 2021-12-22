@@ -64,6 +64,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (readonly) RLMSyncSubscriptionState state;
 
+@property (nonatomic, readonly) NSString *errorMessage;
+
 #pragma mark - Batch Update subscriptions
 
 - (BOOL)write:(__attribute__((noescape)) void(^)(void))block NS_SWIFT_UNAVAILABLE("");

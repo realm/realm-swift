@@ -84,50 +84,6 @@ static NSString *generateRandomString(int num) {
     return string;
 }
 
-- (void)writeToConfiguration:(RLMRealmConfiguration *)config block:(void (^)(RLMRealm *))block {
-    @autoreleasepool {
-        RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nullptr];
-        [self waitForDownloadsForRealm:realm];
-        [realm beginWriteTransaction];
-        block(realm);
-        [realm commitWriteTransaction];
-        [self waitForUploadsForRealm:realm];
-    }
-
-    // A synchronized Realm is not closed immediately when we release our last
-    // reference as the sync worker thread also has to clean up, so retry deleting
-    // it until we can, waiting up to one second. This typically takes a single
-    // retry.
-    int retryCount = 0;
-    NSError *error;
-    while (![RLMRealm deleteFilesForConfiguration:config error:&error]) {
-        XCTAssertEqual(error.code, RLMErrorAlreadyOpen);
-        if (++retryCount > 1000) {
-            XCTFail(@"Waiting for Realm to be closed timed out");
-            break;
-        }
-        usleep(1000);
-    }
-}
-
-- (void)writeToPartition:(SEL)testSel block:(void (^)(RLMRealm *))block {
-    NSString *testName = NSStringFromSelector(testSel);
-    [self writeToPartition:testName userName:testName block:block];
-}
-
-- (void)writeToPartition:(NSString *)testName userName:(NSString *)userNameBase block:(void (^)(RLMRealm *))block {
-    @autoreleasepool {
-        NSString *userName = [userNameBase stringByAppendingString:[NSUUID UUID].UUIDString];
-        RLMUser *user = [self logInUserForCredentials:[self basicCredentialsWithName:userName
-                                                                            register:YES]];
-        auto c = [user configurationWithPartitionValue:testName];
-        c.objectClasses = @[Dog.self, Person.self, HugeSyncObject.self, RLMSetSyncObject.self,
-                            RLMArraySyncObject.self, UUIDPrimaryKeyObject.self, StringPrimaryKeyObject.self,
-                            IntPrimaryKeyObject.self, AllTypesSyncObject.self, RLMDictionarySyncObject.self];
-        [self writeToConfiguration:c block:block];
-    }
-}
-
 #pragma mark - Authentication and Tokens
 
 - (void)testAnonymousAuthentication {

@@ -27,10 +27,12 @@ public enum SyncSubscriptionState {
     /// The subscription is complete and the server is in "steady-state" synchronization.
     case complete
     /// The subscription encountered an error.
-    case error(Error)
+    case error(errorMessage: String)
     /// The subscription is persisted locally but not yet processed by the server,
     /// It may or may not have been seen by the server.
     case pending
+
+    case superceded
 }
 
 public protocol _SyncSubscription {
@@ -315,7 +317,23 @@ private final class _AnySyncSubscription<T: SyncSubscription>: _AnySyncSubscript
      This will throw an error if someone updates the subscription set while on a write transaction.
      */
     public func observe(_ block: @escaping (SyncSubscriptionState) -> Void) {
-        fatalError()
+        rlmSyncSubscriptionSet.observe { state in
+            block(mapState(state))
+        }
+    }
+
+    private func mapState(_ state: RLMSyncSubscriptionState) -> SyncSubscriptionState {
+        switch state {
+        case .pending:
+            return .pending
+        case .complete:
+            return .complete
+        case .superceded:
+            return .superceded
+        case .error:
+            let errorMessage = rlmSyncSubscriptionSet.errorMessage
+            return .error(errorMessage: errorMessage)
+        }
     }
 
     #if swift(>=5.4)

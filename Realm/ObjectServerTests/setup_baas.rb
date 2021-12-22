@@ -82,7 +82,7 @@ def setup_stitch
     stitch_dir = "#{BUILD_DIR}/stitch"
     if !Dir.exist?(stitch_dir)
         puts 'cloning stitch'
-        puts `git clone git@github.com:mpobrien/stitch #{stitch_dir}`
+        puts `git clone git@github.com:10gen/baas #{stitch_dir}`
     else
         puts 'stitch dir exists'
     end

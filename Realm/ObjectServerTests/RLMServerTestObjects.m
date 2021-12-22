@@ -35,6 +35,16 @@
     return @{@"_id": [RLMObjectId objectId]};
 }
 
+- (instancetype) initWithPrimaryKey:(RLMObjectId *)primaryKey breed:(NSString *)breed name:(NSString *)name {
+    self = [super init];
+    if (self) {
+        self._id = primaryKey;
+        self.breed = breed;
+        self.name = name;
+    }
+    return self;
+}
+
 @end
 
 #pragma mark Person

@@ -738,7 +738,7 @@ public class RealmServer: NSObject {
                     "uri": "mongodb://localhost:26000",
                     "sync_query": [
                         "state": "enabled",
-                        "database_name": "test_data_2",
+                        "database_name": "test_data",
                         "queryable_fields_names": queryableFields
                     ]
                 ]
@@ -760,8 +760,8 @@ public class RealmServer: NSObject {
 
         var ruleCreations = [Result<Any?, Error>]()
         for objectSchema in syncTypes {
-//            if objectSchema.className == "Person" ||
-//                objectSchema.className == "Dog" ||
+            if objectSchema.className == "Person" ||
+                objectSchema.className == "Dog" {
 //                objectSchema.className == "HugeSyncObject" ||
 //                objectSchema.className == "RLMDictionarySyncObject" ||
 //                objectSchema.className == "AllTypesSyncObject" ||
@@ -781,7 +781,7 @@ public class RealmServer: NSObject {
 //                objectSchema.className == "SwiftMissingObject" {
 //            print("-----------------> \(objectSchema.className)")
                 ruleCreations.append(rules.post(objectSchema.stitchRule(bsonType, schema)))
-//            }
+            }
         }
 
         var ruleIds: [String: String] = [:]
@@ -793,8 +793,8 @@ public class RealmServer: NSObject {
             ruleIds[dict["collection"]!] = dict["_id"]!
         }
         for objectSchema in syncTypes {
-//            if objectSchema.className == "Person" ||
-//                objectSchema.className == "Dog" ||
+            if objectSchema.className == "Person" ||
+                objectSchema.className == "Dog" {
 //                objectSchema.className == "HugeSyncObject" ||
 //                objectSchema.className == "RLMDictionarySyncObject" ||
 //                objectSchema.className == "AllTypesSyncObject" ||
@@ -814,7 +814,7 @@ public class RealmServer: NSObject {
 //                objectSchema.className == "SwiftMissingObject" {
                 let id = ruleIds[objectSchema.className]!
                 rules[id].put(on: group, data: objectSchema.stitchRule(bsonType, schema, id: id), failOnError)
-//            }
+            }
         }
 
         app.sync.config.put(on: group, data: [
