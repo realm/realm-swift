@@ -179,12 +179,6 @@
                 auto value = state.get_value();
                 block([self mapState:value]);
             } else {
-                NSLog(@"%d", state.get_status().code());
-                const std::string_view str_view = state.get_status().reason();
-                std::string str = std::string(str_view);
-                const char * characters = str.c_str();
-                NSLog(@"%s", characters);
-                NSLog(@"%d", state.get_status().code_string());
                 block(RLMSyncSubscriptionStateError);
             }
         });

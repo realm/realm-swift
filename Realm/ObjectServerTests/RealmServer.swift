@@ -140,7 +140,6 @@ private extension ObjectSchema {
                     ]
                 }
             }
-            print("------------------> Num of properties for \(className): \(count)")
         }
 
         return [
@@ -697,53 +696,13 @@ public class RealmServer: NSObject {
             "value": "mongodb://localhost:26000"
         ])
 
-        // We get the schema in case the configuration is flexible sync and we have to add the queryable fields
-        let schema = ObjectiveCSupport.convert(object: RLMSchema.shared())
-
-        let serviceResponse: Result<Any?, Error>
-        switch syncMode {
-        case .pbs:
-            serviceResponse = app.services.post([
-                "name": "mongodb1",
-                "type": "mongodb",
-                "config": [
-                    "uri": "mongodb://localhost:26000",
-                    "sync": [
-                        "state": "enabled",
-                        "database_name": "test_data",
-                        "partition": [
-                            "key": "realm_id",
-                            "type": "\(bsonType)",
-                            "required": false,
-                            "permissions": [
-                                "read": true,
-                                "write": true
-                            ]
-                        ]
-                    ]
-                ]
-            ])
-        case .flx:
-            let queryableFields = schema.objectSchema.compactMap { object  -> [String]? in
-                guard object.className == "Person" || object.className == "Dog" else { return nil }
-                return object.properties.compactMap { property -> String? in
-                    guard !property.isSet && !property.isMap && !property.isArray && property.type != .object else { return nil }
-                    return property.name
-                }
-            }.flatMap { $0 }
-            serviceResponse = app.services.post([
-                "name": "mongodb1",
-                "type": "mongodb",
-                "config": [
-                    "uri": "mongodb://localhost:26000",
-                    "sync_query": [
-                        "state": "enabled",
-                        "database_name": "test_data",
-                        "queryable_fields_names": queryableFields
-                    ]
-                ]
-            ])
-        }
+        let serviceResponse = app.services.post([
+            "name": "mongodb1",
+            "type": "mongodb",
+            "config": [
+                "uri": "mongodb://localhost:26000",
+            ]
+        ])
 
         guard let serviceId = (try serviceResponse.get() as? [String: Any])?["_id"] as? String else {
             throw URLError(.badServerResponse)
@@ -751,6 +710,7 @@ public class RealmServer: NSObject {
 
         // Creating the rules is a two-step process where we first add all the
         // rules and then add properties to them so that we can add relationships
+        let schema = ObjectiveCSupport.convert(object: RLMSchema.shared())
         let rules = app.services[serviceId].rules
 
         let syncTypes = schema.objectSchema.filter {
@@ -760,28 +720,7 @@ public class RealmServer: NSObject {
 
         var ruleCreations = [Result<Any?, Error>]()
         for objectSchema in syncTypes {
-            if objectSchema.className == "Person" ||
-                objectSchema.className == "Dog" {
-//                objectSchema.className == "HugeSyncObject" ||
-//                objectSchema.className == "RLMDictionarySyncObject" ||
-//                objectSchema.className == "AllTypesSyncObject" ||
-//                objectSchema.className == "SwiftPerson" ||
-//                objectSchema.className == "SwiftTypesSyncObject" ||
-//                objectSchema.className == "SwiftCollectionSyncObject" ||
-//                objectSchema.className == "SwiftIntPrimaryKeyObject" ||
-//                objectSchema.className == "RLMArraySyncObject" ||
-//                objectSchema.className == "SwiftAnyRealmValueObject" ||
-//                objectSchema.className == "SwiftStringPrimaryKeyObject" ||
-//                objectSchema.className == "UUIDPrimaryKeyObject" ||
-//                objectSchema.className == "StringPrimaryKeyObject" ||
-//                objectSchema.className == "SwiftUUIDPrimaryKeyObject" ||
-//                objectSchema.className == "IntPrimaryKeyObject" ||
-//                objectSchema.className == "RLMSetSyncObject" ||
-//                objectSchema.className == "SwiftHugeSyncObject" ||
-//                objectSchema.className == "SwiftMissingObject" {
-//            print("-----------------> \(objectSchema.className)")
-                ruleCreations.append(rules.post(objectSchema.stitchRule(bsonType, schema)))
-            }
+            ruleCreations.append(rules.post(objectSchema.stitchRule(bsonType, schema)))
         }
 
         var ruleIds: [String: String] = [:]
@@ -793,29 +732,46 @@ public class RealmServer: NSObject {
             ruleIds[dict["collection"]!] = dict["_id"]!
         }
         for objectSchema in syncTypes {
-            if objectSchema.className == "Person" ||
-                objectSchema.className == "Dog" {
-//                objectSchema.className == "HugeSyncObject" ||
-//                objectSchema.className == "RLMDictionarySyncObject" ||
-//                objectSchema.className == "AllTypesSyncObject" ||
-//                objectSchema.className == "SwiftPerson" ||
-//                objectSchema.className == "SwiftTypesSyncObject" ||
-//                objectSchema.className == "SwiftCollectionSyncObject" ||
-//                objectSchema.className == "SwiftIntPrimaryKeyObject" ||
-//                objectSchema.className == "RLMArraySyncObject" ||
-//                objectSchema.className == "SwiftAnyRealmValueObject" ||
-//                objectSchema.className == "SwiftStringPrimaryKeyObject" ||
-//                objectSchema.className == "UUIDPrimaryKeyObject" ||
-//                objectSchema.className == "StringPrimaryKeyObject" ||
-//                objectSchema.className == "SwiftUUIDPrimaryKeyObject" ||
-//                objectSchema.className == "IntPrimaryKeyObject" ||
-//                objectSchema.className == "RLMSetSyncObject" ||
-//                objectSchema.className == "SwiftHugeSyncObject" ||
-//                objectSchema.className == "SwiftMissingObject" {
-                let id = ruleIds[objectSchema.className]!
-                rules[id].put(on: group, data: objectSchema.stitchRule(bsonType, schema, id: id), failOnError)
-            }
+            let id = ruleIds[objectSchema.className]!
+            rules[id].put(on: group, data: objectSchema.stitchRule(bsonType, schema, id: id), failOnError)
         }
+
+        let syncConfig: Any
+        switch syncMode {
+        case .pbs:
+            syncConfig = [
+                "sync": [
+                    "state": "enabled",
+                    "database_name": "test_data",
+                    "partition": [
+                        "key": "realm_id",
+                        "type": "\(bsonType)",
+                        "required": false,
+                        "permissions": [
+                            "read": true,
+                            "write": true
+                        ]
+                    ]
+                ]
+            ]
+        case .flx:
+            let queryableFields = schema.objectSchema.compactMap { object  -> [String]? in
+                guard object.className == "Person" || object.className == "Dog" else { return nil }
+                return object.properties.compactMap { property -> String? in
+                    guard !property.isSet && !property.isMap && !property.isArray && property.type != .object else { return nil }
+                    return property.name
+                }
+            }.flatMap { $0 }
+            syncConfig = [
+                "sync_query": [
+                    "state": "enabled",
+                    "database_name": "test_data",
+                    "queryable_fields_names": queryableFields
+                ]
+            ]
+        }
+
+        app.services[serviceId].config.patch(on: group, syncConfig, failOnError)
 
         app.sync.config.put(on: group, data: [
             "development_mode_enabled": true

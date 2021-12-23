@@ -2691,7 +2691,6 @@ static NSString *oldPathForPartitionValue(RLMUser *user, id<RLMBSON> partitionVa
     testPartitionValue(@123);
     testPartitionValue(nil);
 }
-
 @end
 
 #endif // TARGET_OS_OSX
