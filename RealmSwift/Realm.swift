@@ -375,19 +375,11 @@ import Realm.Private
      - parameter `onComplete` will be called after commit has reached stable storage.
      Write  blocks for the multiple calls will be executed in order.
      */
-    public func writeAsync(_ block: @escaping (AsyncHandle) -> (), _ onComplete: (() -> ())? = nil) {
+    @discardableResult
+    public func writeAsync(_ block: @escaping (AsyncTransactionId) -> (), _ onComplete: (() -> ())? = nil) -> AsyncTransactionId {
         beginAsyncWrite({ handle in
-            do {
-                block(handle)
-                if isInAsyncWriteTransaction {
-                    try commitAsyncWrite(onComplete)
-                }
-            }
-            catch {
-                if isInAsyncWriteTransaction {
-                    cancelAsyncWrite(handle)
-                }
-            }
+            block(handle)
+            commitAsyncWrite(onComplete)
         })
     }
 
@@ -407,12 +399,12 @@ import Realm.Private
      write blocks.
      */
     @discardableResult
-    public func beginAsyncWrite(_ asyncWriteBlock: @escaping (AsyncHandle) -> ()) -> AsyncHandle {
-        var handle: AsyncHandle = 0
-        handle = rlmRealm.beginAsyncWriteTransaction {
-            asyncWriteBlock(handle)
+    public func beginAsyncWrite(_ asyncWriteBlock: @escaping (AsyncTransactionId) -> ()) -> AsyncTransactionId {
+        var asyncTransactionId: AsyncTransactionId = 0
+        asyncTransactionId = rlmRealm.beginAsyncWriteTransaction {
+            asyncWriteBlock(asyncTransactionId)
         }
-        return handle
+        return asyncTransactionId
     }
 
     /** Commit asynchronous transaction.
@@ -432,8 +424,8 @@ import Realm.Private
      - note Cancelling a commit will not abort the commit, it will only cancel the callback
      informing of commit completion.
     */
-    public func cancelAsyncWrite(_  handle: AsyncHandle) {
-        rlmRealm.cancelAsyncTransaction(handle)
+    public func cancelAsyncWrite(_  asyncTransactionId: AsyncTransactionId) {
+        rlmRealm.cancelAsyncTransaction(asyncTransactionId)
     }
 
     /**
@@ -443,6 +435,17 @@ import Realm.Private
     public var isInAsyncWriteTransaction: Bool {
         return rlmRealm.inAsyncWriteTransaction
     }
+    
+    /**
+     Set the error handler for the asynchronous transactions.
+     Synchronous try/catch hadling will not work with the asynchronous transactions.
+     Asynchronous exceptions will be dispatched to the handler.
+     @note pass `nil` as a parameter to remove the handler
+     */
+    public func setAsyncErrorHandler(_ handler: RLMRealmAsyncErrorHandler?) {
+        rlmRealm.setAsyncErrorHandler(handler)
+    }
+
 #endif // REALM_ASYNC_WRITES
 
     // MARK: Adding and Creating objects
