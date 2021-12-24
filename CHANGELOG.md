@@ -54,7 +54,8 @@ let people: Results<PersonProjection> = realm.objects(PersonProjection.self)
   `Element` conforms to `Comparable`.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
+* Accessing a non object collection inside a migration would cause a crash [#5633](https://github.com/realm/realm-cocoa/issues/5633).
+* Accessing a `Map` of objects dynamically would not handle nulled values correctly (since v10.8.0).
 * Add missing `Indexable` support for UUID.
   ([Cocoa #7545](https://github.com/realm/realm-swift/issues/7545), since v10.10.0)
 * `where()` allowed constructing some nonsensical queries due to boolean comparisons returning `Query<T>` rather than `Query<Bool>`.
@@ -115,9 +116,6 @@ Xcode 12.4 is now the minimum supported version of Xcode.
 * `AnyRealmCollection` now conforms to `Encodable`.
 
 ### Fixed
-* Accessing a non object collection inside a migration would cause a crash [#5633](https://github.com/realm/realm-cocoa/issues/5633).
-* Accessing a `Map` of objects dynamically would not handle nulled values correctly (since v10.8.0).
-* Allow `@AutoOpen` to return a realm for any server error on synchronisation.
 
 * `@AutoOpen` will open the existing local Realm file on any connection error
   rather than only when the connection specifically times out.
@@ -200,8 +198,6 @@ Xcode 12.4 is now the minimum supported version of Xcode.
   be used and would throw incorrect thread exceptions. It now is `@MainActor`
   and gives a Realm instance which always works on the main actor. The
   non-functional `queue:` parameter has been removed (since v10.15.0).
-
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 * Restore the pre-v10.12.0 behavior of calling `writeCopy()` on a synchronized
   Realm which produced a local non-synchronized Realm
   ([#7513](https://github.com/realm/realm-swift/issues/7513)).
