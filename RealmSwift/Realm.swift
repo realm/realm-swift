@@ -20,6 +20,10 @@ import Foundation
 import Realm
 import Realm.Private
 
+#if REALM_ASYNC_WRITES
+public typealias AsyncTransactionId = RLMAsyncTransactionId
+#endif // REALM_ASYNC_WRITES
+
 /**
  A `Realm` instance (also referred to as "a Realm") represents a Realm database.
 
