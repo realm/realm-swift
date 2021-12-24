@@ -1,10 +1,10 @@
-xcodeVersions = ['12.2', '12.4', '12.5.1', '13.0', '13.1']
+xcodeVersions = ['12.4', '12.5.1', '13.0', '13.1', '13.2.1']
 platforms = ['osx', 'ios', 'watchos', 'tvos', 'catalyst']
 carthagePlatforms = ['osx', 'ios', 'watchos', 'tvos']
 platformNames = ['osx': 'macOS', 'ios': 'iOS', 'watchos': 'watchOS', 'tvos': 'tvOS', 'catalyst': 'Catalyst']
-carthageXcodeVersion = '13.1'
-objcXcodeVersion = '12.2'
-docsSwiftVersion = '5.5'
+carthageXcodeVersion = '13.2.1'
+objcXcodeVersion = '12.4'
+docsSwiftVersion = '5.5.1'
 
 def installationTest(platform, test, language) {
   return {
@@ -241,11 +241,11 @@ def doBuild() {
           def sha = params.sha
           sh """
           hostname
-          curl -O https://raw.githubusercontent.com/realm/realm-cocoa/${sha}/build.sh
+          curl -O https://raw.githubusercontent.com/realm/realm-swift/${sha}/build.sh
           mkdir -p scripts
-          curl https://raw.githubusercontent.com/realm/realm-cocoa/${sha}/scripts/swift-version.sh -o scripts/swift-version.sh
-          curl https://raw.githubusercontent.com/realm/realm-cocoa/${sha}/scripts/reset-simulators.sh -o scripts/reset-simulators.sh
-          curl https://raw.githubusercontent.com/realm/realm-cocoa/${sha}/scripts/reset-simulators.rb -o scripts/reset-simulators.rb
+          curl https://raw.githubusercontent.com/realm/realm-swift/${sha}/scripts/swift-version.sh -o scripts/swift-version.sh
+          curl https://raw.githubusercontent.com/realm/realm-swift/${sha}/scripts/reset-simulators.sh -o scripts/reset-simulators.sh
+          curl https://raw.githubusercontent.com/realm/realm-swift/${sha}/scripts/reset-simulators.rb -o scripts/reset-simulators.rb
           chmod +x scripts/reset-simulators.rb
 
           sh build.sh package-test-examples-objc
@@ -262,11 +262,11 @@ def doBuild() {
           def sha = params.sha
           sh """
           hostname
-          curl -O https://raw.githubusercontent.com/realm/realm-cocoa/${sha}/build.sh
+          curl -O https://raw.githubusercontent.com/realm/realm-swift/${sha}/build.sh
           mkdir -p scripts
-          curl https://raw.githubusercontent.com/realm/realm-cocoa/${sha}/scripts/swift-version.sh -o scripts/swift-version.sh
-          curl https://raw.githubusercontent.com/realm/realm-cocoa/${sha}/scripts/reset-simulators.sh -o scripts/reset-simulators.sh
-          curl https://raw.githubusercontent.com/realm/realm-cocoa/${sha}/scripts/reset-simulators.rb -o scripts/reset-simulators.rb
+          curl https://raw.githubusercontent.com/realm/realm-swift/${sha}/scripts/swift-version.sh -o scripts/swift-version.sh
+          curl https://raw.githubusercontent.com/realm/realm-swift/${sha}/scripts/reset-simulators.sh -o scripts/reset-simulators.sh
+          curl https://raw.githubusercontent.com/realm/realm-swift/${sha}/scripts/reset-simulators.rb -o scripts/reset-simulators.rb
           chmod +x scripts/reset-simulators.rb
 
           sh build.sh package-test-examples-swift

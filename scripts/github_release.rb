@@ -16,7 +16,7 @@ SWIFT_ZIP = BUILD + "realm-swift-#{VERSION}.zip"
 CARTHAGE_ZIP = BUILD + 'Carthage.framework.zip'
 CARTHAGE_XCFRAMEWORK_ZIP = BUILD + 'Carthage.xcframework.zip'
 
-REPOSITORY = 'realm/realm-cocoa'
+REPOSITORY = 'realm/realm-swift'
 
 puts 'Creating Carthage XCFramework package'
 FileUtils.rm_f CARTHAGE_XCFRAMEWORK_ZIP

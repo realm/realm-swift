@@ -1,0 +1,9 @@
+name: Issue Needs Attention
+# This workflow is triggered on issue comments.
+on:
+  issue_comment:
+    types: created
+
+jobs:
+  applyNeedsAttentionLabel:
+    uses: realm/ci-actions/.github/workflows/issue-needs-attention.yml@main

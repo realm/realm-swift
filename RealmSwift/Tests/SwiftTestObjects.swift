@@ -24,6 +24,14 @@ final class SwiftStringObject: Object {
     @objc dynamic var stringCol = ""
 }
 
+class ModernSwiftStringObject: Object {
+    @Persisted var stringCol = ""
+}
+
+class ModernSwiftStringProjection: Projection<ModernSwiftStringObject> {
+    @Projected(\ModernSwiftStringObject.stringCol) var string
+}
+
 class SwiftBoolObject: Object {
     @objc dynamic var boolCol = false
 }

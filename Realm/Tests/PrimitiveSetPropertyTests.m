@@ -6964,29 +6964,28 @@ static double average(NSArray *values) {
     [realm deleteAllObjects];
 
     RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"boolObj.@sum = %@", @NO]), 
-                              @"@sum can only be applied to a numeric property.");
+                              @"Invalid keypath 'boolObj.@sum': @sum can only be applied to a collection of numeric values.");
     RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"stringObj.@sum = %@", @"a"]), 
-                              @"@sum can only be applied to a numeric property.");
+                              @"Invalid keypath 'stringObj.@sum': @sum can only be applied to a collection of numeric values.");
     RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"dataObj.@sum = %@", data(1)]), 
-                              @"@sum can only be applied to a numeric property.");
+                              @"Invalid keypath 'dataObj.@sum': @sum can only be applied to a collection of numeric values.");
     RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"objectIdObj.@sum = %@", objectId(1)]), 
-                              @"@sum can only be applied to a numeric property.");
+                              @"Invalid keypath 'objectIdObj.@sum': @sum can only be applied to a collection of numeric values.");
     RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"uuidObj.@sum = %@", uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]), 
-                              @"@sum can only be applied to a numeric property.");
+                              @"Invalid keypath 'uuidObj.@sum': @sum can only be applied to a collection of numeric values.");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveSets objectsInRealm:realm where:@"boolObj.@sum = %@", NSNull.null]), 
-                              @"@sum can only be applied to a numeric property.");
+                              @"Invalid keypath 'boolObj.@sum': @sum can only be applied to a collection of numeric values.");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveSets objectsInRealm:realm where:@"stringObj.@sum = %@", NSNull.null]), 
-                              @"@sum can only be applied to a numeric property.");
+                              @"Invalid keypath 'stringObj.@sum': @sum can only be applied to a collection of numeric values.");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveSets objectsInRealm:realm where:@"dataObj.@sum = %@", NSNull.null]), 
-                              @"@sum can only be applied to a numeric property.");
+                              @"Invalid keypath 'dataObj.@sum': @sum can only be applied to a collection of numeric values.");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveSets objectsInRealm:realm where:@"objectIdObj.@sum = %@", NSNull.null]), 
-                              @"@sum can only be applied to a numeric property.");
+                              @"Invalid keypath 'objectIdObj.@sum': @sum can only be applied to a collection of numeric values.");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveSets objectsInRealm:realm where:@"uuidObj.@sum = %@", NSNull.null]), 
-                              @"@sum can only be applied to a numeric property.");
-    RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"dateObj.@sum = %@", date(2)]), 
+                              @"Invalid keypath 'uuidObj.@sum': @sum can only be applied to a collection of numeric values.");
+    RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"dateObj.@sum = %@", date(1)]), 
                               @"Cannot sum or average date properties");
-    RLMAssertThrowsWithReason(([AllOptionalPrimitiveSets objectsInRealm:realm where:@"dateObj.@sum = %@", date(1)]), 
-                              @"Cannot sum or average date properties");
+
     RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"intObj.@sum = %@", @"a"]), 
                               @"@sum on a property of type int cannot be compared with 'a'");
     RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"floatObj.@sum = %@", @"a"]), 
@@ -7004,29 +7003,21 @@ static double average(NSArray *values) {
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveSets objectsInRealm:realm where:@"decimalObj.@sum = %@", @"a"]), 
                               @"@sum on a property of type decimal128 cannot be compared with 'a'");
     RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"intObj.@sum.prop = %@", @"a"]), 
-                              @"Property 'intObj' is not a link in object of type 'AllPrimitiveSets'");
+                              @"Invalid keypath 'intObj.@sum.prop': @sum on a collection of values must appear at the end of a keypath.");
     RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"floatObj.@sum.prop = %@", @"a"]), 
-                              @"Property 'floatObj' is not a link in object of type 'AllPrimitiveSets'");
+                              @"Invalid keypath 'floatObj.@sum.prop': @sum on a collection of values must appear at the end of a keypath.");
     RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"doubleObj.@sum.prop = %@", @"a"]), 
-                              @"Property 'doubleObj' is not a link in object of type 'AllPrimitiveSets'");
+                              @"Invalid keypath 'doubleObj.@sum.prop': @sum on a collection of values must appear at the end of a keypath.");
     RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"decimalObj.@sum.prop = %@", @"a"]), 
-                              @"Property 'decimalObj' is not a link in object of type 'AllPrimitiveSets'");
-    RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"anyIntObj.@sum.prop = %@", @"a"]), 
-                              @"Property 'anyIntObj' is not a link in object of type 'AllPrimitiveSets'");
-    RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"anyFloatObj.@sum.prop = %@", @"a"]), 
-                              @"Property 'anyFloatObj' is not a link in object of type 'AllPrimitiveSets'");
-    RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"anyDoubleObj.@sum.prop = %@", @"a"]), 
-                              @"Property 'anyDoubleObj' is not a link in object of type 'AllPrimitiveSets'");
-    RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"anyDecimalObj.@sum.prop = %@", @"a"]), 
-                              @"Property 'anyDecimalObj' is not a link in object of type 'AllPrimitiveSets'");
+                              @"Invalid keypath 'decimalObj.@sum.prop': @sum on a collection of values must appear at the end of a keypath.");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveSets objectsInRealm:realm where:@"intObj.@sum.prop = %@", @"a"]), 
-                              @"Property 'intObj' is not a link in object of type 'AllOptionalPrimitiveSets'");
+                              @"Invalid keypath 'intObj.@sum.prop': @sum on a collection of values must appear at the end of a keypath.");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveSets objectsInRealm:realm where:@"floatObj.@sum.prop = %@", @"a"]), 
-                              @"Property 'floatObj' is not a link in object of type 'AllOptionalPrimitiveSets'");
+                              @"Invalid keypath 'floatObj.@sum.prop': @sum on a collection of values must appear at the end of a keypath.");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveSets objectsInRealm:realm where:@"doubleObj.@sum.prop = %@", @"a"]), 
-                              @"Property 'doubleObj' is not a link in object of type 'AllOptionalPrimitiveSets'");
+                              @"Invalid keypath 'doubleObj.@sum.prop': @sum on a collection of values must appear at the end of a keypath.");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveSets objectsInRealm:realm where:@"decimalObj.@sum.prop = %@", @"a"]), 
-                              @"Property 'decimalObj' is not a link in object of type 'AllOptionalPrimitiveSets'");
+                              @"Invalid keypath 'decimalObj.@sum.prop': @sum on a collection of values must appear at the end of a keypath.");
     RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"intObj.@sum = %@", NSNull.null]), 
                               @"@sum on a property of type int cannot be compared with '<null>'");
     RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"floatObj.@sum = %@", NSNull.null]), 
@@ -7200,29 +7191,30 @@ static double average(NSArray *values) {
     [realm deleteAllObjects];
 
     RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"boolObj.@avg = %@", @NO]), 
-                              @"@avg can only be applied to a numeric property.");
+                              @"Invalid keypath 'boolObj.@avg': @avg can only be applied to a collection of numeric values.");
     RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"stringObj.@avg = %@", @"a"]), 
-                              @"@avg can only be applied to a numeric property.");
+                              @"Invalid keypath 'stringObj.@avg': @avg can only be applied to a collection of numeric values.");
     RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"dataObj.@avg = %@", data(1)]), 
-                              @"@avg can only be applied to a numeric property.");
+                              @"Invalid keypath 'dataObj.@avg': @avg can only be applied to a collection of numeric values.");
     RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"objectIdObj.@avg = %@", objectId(1)]), 
-                              @"@avg can only be applied to a numeric property.");
+                              @"Invalid keypath 'objectIdObj.@avg': @avg can only be applied to a collection of numeric values.");
     RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"uuidObj.@avg = %@", uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]), 
-                              @"@avg can only be applied to a numeric property.");
+                              @"Invalid keypath 'uuidObj.@avg': @avg can only be applied to a collection of numeric values.");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveSets objectsInRealm:realm where:@"boolObj.@avg = %@", NSNull.null]), 
-                              @"@avg can only be applied to a numeric property.");
+                              @"Invalid keypath 'boolObj.@avg': @avg can only be applied to a collection of numeric values.");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveSets objectsInRealm:realm where:@"stringObj.@avg = %@", NSNull.null]), 
-                              @"@avg can only be applied to a numeric property.");
+                              @"Invalid keypath 'stringObj.@avg': @avg can only be applied to a collection of numeric values.");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveSets objectsInRealm:realm where:@"dataObj.@avg = %@", NSNull.null]), 
-                              @"@avg can only be applied to a numeric property.");
+                              @"Invalid keypath 'dataObj.@avg': @avg can only be applied to a collection of numeric values.");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveSets objectsInRealm:realm where:@"objectIdObj.@avg = %@", NSNull.null]), 
-                              @"@avg can only be applied to a numeric property.");
+                              @"Invalid keypath 'objectIdObj.@avg': @avg can only be applied to a collection of numeric values.");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveSets objectsInRealm:realm where:@"uuidObj.@avg = %@", NSNull.null]), 
-                              @"@avg can only be applied to a numeric property.");
+                              @"Invalid keypath 'uuidObj.@avg': @avg can only be applied to a collection of numeric values.");
     RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"dateObj.@avg = %@", date(1)]), 
                               @"Cannot sum or average date properties");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveSets objectsInRealm:realm where:@"dateObj.@avg = %@", NSNull.null]), 
                               @"Cannot sum or average date properties");
+
     RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"intObj.@avg = %@", @"a"]), 
                               @"@avg on a property of type int cannot be compared with 'a'");
     RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"floatObj.@avg = %@", @"a"]), 
@@ -7240,21 +7232,21 @@ static double average(NSArray *values) {
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveSets objectsInRealm:realm where:@"decimalObj.@avg = %@", @"a"]), 
                               @"@avg on a property of type decimal128 cannot be compared with 'a'");
     RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"intObj.@avg.prop = %@", @"a"]), 
-                              @"Property 'intObj' is not a link in object of type 'AllPrimitiveSets'");
+                              @"Invalid keypath 'intObj.@avg.prop': @avg on a collection of values must appear at the end of a keypath.");
     RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"floatObj.@avg.prop = %@", @"a"]), 
-                              @"Property 'floatObj' is not a link in object of type 'AllPrimitiveSets'");
+                              @"Invalid keypath 'floatObj.@avg.prop': @avg on a collection of values must appear at the end of a keypath.");
     RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"doubleObj.@avg.prop = %@", @"a"]), 
-                              @"Property 'doubleObj' is not a link in object of type 'AllPrimitiveSets'");
+                              @"Invalid keypath 'doubleObj.@avg.prop': @avg on a collection of values must appear at the end of a keypath.");
     RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"decimalObj.@avg.prop = %@", @"a"]), 
-                              @"Property 'decimalObj' is not a link in object of type 'AllPrimitiveSets'");
+                              @"Invalid keypath 'decimalObj.@avg.prop': @avg on a collection of values must appear at the end of a keypath.");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveSets objectsInRealm:realm where:@"intObj.@avg.prop = %@", @"a"]), 
-                              @"Property 'intObj' is not a link in object of type 'AllOptionalPrimitiveSets'");
+                              @"Invalid keypath 'intObj.@avg.prop': @avg on a collection of values must appear at the end of a keypath.");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveSets objectsInRealm:realm where:@"floatObj.@avg.prop = %@", @"a"]), 
-                              @"Property 'floatObj' is not a link in object of type 'AllOptionalPrimitiveSets'");
+                              @"Invalid keypath 'floatObj.@avg.prop': @avg on a collection of values must appear at the end of a keypath.");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveSets objectsInRealm:realm where:@"doubleObj.@avg.prop = %@", @"a"]), 
-                              @"Property 'doubleObj' is not a link in object of type 'AllOptionalPrimitiveSets'");
+                              @"Invalid keypath 'doubleObj.@avg.prop': @avg on a collection of values must appear at the end of a keypath.");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveSets objectsInRealm:realm where:@"decimalObj.@avg.prop = %@", @"a"]), 
-                              @"Property 'decimalObj' is not a link in object of type 'AllOptionalPrimitiveSets'");
+                              @"Invalid keypath 'decimalObj.@avg.prop': @avg on a collection of values must appear at the end of a keypath.");
 
     [AllPrimitiveSets createInRealm:realm withValue:@{
         @"intObj": @[],
@@ -7411,25 +7403,25 @@ static double average(NSArray *values) {
     [realm deleteAllObjects];
 
     RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"boolObj.@min = %@", @NO]), 
-                              @"@min can only be applied to a numeric property.");
+                              @"Invalid keypath 'boolObj.@min': @min can only be applied to a collection of numeric values.");
     RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"stringObj.@min = %@", @"a"]), 
-                              @"@min can only be applied to a numeric property.");
+                              @"Invalid keypath 'stringObj.@min': @min can only be applied to a collection of numeric values.");
     RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"dataObj.@min = %@", data(1)]), 
-                              @"@min can only be applied to a numeric property.");
+                              @"Invalid keypath 'dataObj.@min': @min can only be applied to a collection of numeric values.");
     RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"objectIdObj.@min = %@", objectId(1)]), 
-                              @"@min can only be applied to a numeric property.");
+                              @"Invalid keypath 'objectIdObj.@min': @min can only be applied to a collection of numeric values.");
     RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"uuidObj.@min = %@", uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]), 
-                              @"@min can only be applied to a numeric property.");
+                              @"Invalid keypath 'uuidObj.@min': @min can only be applied to a collection of numeric values.");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveSets objectsInRealm:realm where:@"boolObj.@min = %@", NSNull.null]), 
-                              @"@min can only be applied to a numeric property.");
+                              @"Invalid keypath 'boolObj.@min': @min can only be applied to a collection of numeric values.");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveSets objectsInRealm:realm where:@"stringObj.@min = %@", NSNull.null]), 
-                              @"@min can only be applied to a numeric property.");
+                              @"Invalid keypath 'stringObj.@min': @min can only be applied to a collection of numeric values.");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveSets objectsInRealm:realm where:@"dataObj.@min = %@", NSNull.null]), 
-                              @"@min can only be applied to a numeric property.");
+                              @"Invalid keypath 'dataObj.@min': @min can only be applied to a collection of numeric values.");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveSets objectsInRealm:realm where:@"objectIdObj.@min = %@", NSNull.null]), 
-                              @"@min can only be applied to a numeric property.");
+                              @"Invalid keypath 'objectIdObj.@min': @min can only be applied to a collection of numeric values.");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveSets objectsInRealm:realm where:@"uuidObj.@min = %@", NSNull.null]), 
-                              @"@min can only be applied to a numeric property.");
+                              @"Invalid keypath 'uuidObj.@min': @min can only be applied to a collection of numeric values.");
     RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"intObj.@min = %@", @"a"]), 
                               @"@min on a property of type int cannot be compared with 'a'");
     RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"floatObj.@min = %@", @"a"]), 
@@ -7451,35 +7443,35 @@ static double average(NSArray *values) {
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveSets objectsInRealm:realm where:@"decimalObj.@min = %@", @"a"]), 
                               @"@min on a property of type decimal128 cannot be compared with 'a'");
     RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"intObj.@min.prop = %@", @"a"]), 
-                              @"Property 'intObj' is not a link in object of type 'AllPrimitiveSets'");
+                              @"Invalid keypath 'intObj.@min.prop': @min on a collection of values must appear at the end of a keypath.");
     RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"floatObj.@min.prop = %@", @"a"]), 
-                              @"Property 'floatObj' is not a link in object of type 'AllPrimitiveSets'");
+                              @"Invalid keypath 'floatObj.@min.prop': @min on a collection of values must appear at the end of a keypath.");
     RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"doubleObj.@min.prop = %@", @"a"]), 
-                              @"Property 'doubleObj' is not a link in object of type 'AllPrimitiveSets'");
+                              @"Invalid keypath 'doubleObj.@min.prop': @min on a collection of values must appear at the end of a keypath.");
     RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"dateObj.@min.prop = %@", @"a"]), 
-                              @"Property 'dateObj' is not a link in object of type 'AllPrimitiveSets'");
+                              @"Invalid keypath 'dateObj.@min.prop': @min on a collection of values must appear at the end of a keypath.");
     RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"decimalObj.@min.prop = %@", @"a"]), 
-                              @"Property 'decimalObj' is not a link in object of type 'AllPrimitiveSets'");
+                              @"Invalid keypath 'decimalObj.@min.prop': @min on a collection of values must appear at the end of a keypath.");
     RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"anyIntObj.@min.prop = %@", @"a"]), 
-                              @"Property 'anyIntObj' is not a link in object of type 'AllPrimitiveSets'");
+                              @"Invalid keypath 'anyIntObj.@min.prop': @min on a collection of values must appear at the end of a keypath.");
     RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"anyFloatObj.@min.prop = %@", @"a"]), 
-                              @"Property 'anyFloatObj' is not a link in object of type 'AllPrimitiveSets'");
+                              @"Invalid keypath 'anyFloatObj.@min.prop': @min on a collection of values must appear at the end of a keypath.");
     RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"anyDoubleObj.@min.prop = %@", @"a"]), 
-                              @"Property 'anyDoubleObj' is not a link in object of type 'AllPrimitiveSets'");
+                              @"Invalid keypath 'anyDoubleObj.@min.prop': @min on a collection of values must appear at the end of a keypath.");
     RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"anyDateObj.@min.prop = %@", @"a"]), 
-                              @"Property 'anyDateObj' is not a link in object of type 'AllPrimitiveSets'");
+                              @"Invalid keypath 'anyDateObj.@min.prop': @min on a collection of values must appear at the end of a keypath.");
     RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"anyDecimalObj.@min.prop = %@", @"a"]), 
-                              @"Property 'anyDecimalObj' is not a link in object of type 'AllPrimitiveSets'");
+                              @"Invalid keypath 'anyDecimalObj.@min.prop': @min on a collection of values must appear at the end of a keypath.");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveSets objectsInRealm:realm where:@"intObj.@min.prop = %@", @"a"]), 
-                              @"Property 'intObj' is not a link in object of type 'AllOptionalPrimitiveSets'");
+                              @"Invalid keypath 'intObj.@min.prop': @min on a collection of values must appear at the end of a keypath.");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveSets objectsInRealm:realm where:@"floatObj.@min.prop = %@", @"a"]), 
-                              @"Property 'floatObj' is not a link in object of type 'AllOptionalPrimitiveSets'");
+                              @"Invalid keypath 'floatObj.@min.prop': @min on a collection of values must appear at the end of a keypath.");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveSets objectsInRealm:realm where:@"doubleObj.@min.prop = %@", @"a"]), 
-                              @"Property 'doubleObj' is not a link in object of type 'AllOptionalPrimitiveSets'");
+                              @"Invalid keypath 'doubleObj.@min.prop': @min on a collection of values must appear at the end of a keypath.");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveSets objectsInRealm:realm where:@"dateObj.@min.prop = %@", @"a"]), 
-                              @"Property 'dateObj' is not a link in object of type 'AllOptionalPrimitiveSets'");
+                              @"Invalid keypath 'dateObj.@min.prop': @min on a collection of values must appear at the end of a keypath.");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveSets objectsInRealm:realm where:@"decimalObj.@min.prop = %@", @"a"]), 
-                              @"Property 'decimalObj' is not a link in object of type 'AllOptionalPrimitiveSets'");
+                              @"Invalid keypath 'decimalObj.@min.prop': @min on a collection of values must appear at the end of a keypath.");
 
     // No objects, so count is zero
     RLMAssertCount(AllPrimitiveSets, 0U, @"intObj.@min == %@", @2);
@@ -7625,25 +7617,25 @@ static double average(NSArray *values) {
     [realm deleteAllObjects];
 
     RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"boolObj.@max = %@", @NO]), 
-                              @"@max can only be applied to a numeric property.");
+                              @"Invalid keypath 'boolObj.@max': @max can only be applied to a collection of numeric values.");
     RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"stringObj.@max = %@", @"a"]), 
-                              @"@max can only be applied to a numeric property.");
+                              @"Invalid keypath 'stringObj.@max': @max can only be applied to a collection of numeric values.");
     RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"dataObj.@max = %@", data(1)]), 
-                              @"@max can only be applied to a numeric property.");
+                              @"Invalid keypath 'dataObj.@max': @max can only be applied to a collection of numeric values.");
     RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"objectIdObj.@max = %@", objectId(1)]), 
-                              @"@max can only be applied to a numeric property.");
+                              @"Invalid keypath 'objectIdObj.@max': @max can only be applied to a collection of numeric values.");
     RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"uuidObj.@max = %@", uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]), 
-                              @"@max can only be applied to a numeric property.");
+                              @"Invalid keypath 'uuidObj.@max': @max can only be applied to a collection of numeric values.");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveSets objectsInRealm:realm where:@"boolObj.@max = %@", NSNull.null]), 
-                              @"@max can only be applied to a numeric property.");
+                              @"Invalid keypath 'boolObj.@max': @max can only be applied to a collection of numeric values.");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveSets objectsInRealm:realm where:@"stringObj.@max = %@", NSNull.null]), 
-                              @"@max can only be applied to a numeric property.");
+                              @"Invalid keypath 'stringObj.@max': @max can only be applied to a collection of numeric values.");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveSets objectsInRealm:realm where:@"dataObj.@max = %@", NSNull.null]), 
-                              @"@max can only be applied to a numeric property.");
+                              @"Invalid keypath 'dataObj.@max': @max can only be applied to a collection of numeric values.");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveSets objectsInRealm:realm where:@"objectIdObj.@max = %@", NSNull.null]), 
-                              @"@max can only be applied to a numeric property.");
+                              @"Invalid keypath 'objectIdObj.@max': @max can only be applied to a collection of numeric values.");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveSets objectsInRealm:realm where:@"uuidObj.@max = %@", NSNull.null]), 
-                              @"@max can only be applied to a numeric property.");
+                              @"Invalid keypath 'uuidObj.@max': @max can only be applied to a collection of numeric values.");
     RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"intObj.@max = %@", @"a"]), 
                               @"@max on a property of type int cannot be compared with 'a'");
     RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"floatObj.@max = %@", @"a"]), 
@@ -7665,35 +7657,35 @@ static double average(NSArray *values) {
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveSets objectsInRealm:realm where:@"decimalObj.@max = %@", @"a"]), 
                               @"@max on a property of type decimal128 cannot be compared with 'a'");
     RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"intObj.@max.prop = %@", @"a"]), 
-                              @"Property 'intObj' is not a link in object of type 'AllPrimitiveSets'");
+                              @"Invalid keypath 'intObj.@max.prop': @max on a collection of values must appear at the end of a keypath.");
     RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"floatObj.@max.prop = %@", @"a"]), 
-                              @"Property 'floatObj' is not a link in object of type 'AllPrimitiveSets'");
+                              @"Invalid keypath 'floatObj.@max.prop': @max on a collection of values must appear at the end of a keypath.");
     RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"doubleObj.@max.prop = %@", @"a"]), 
-                              @"Property 'doubleObj' is not a link in object of type 'AllPrimitiveSets'");
+                              @"Invalid keypath 'doubleObj.@max.prop': @max on a collection of values must appear at the end of a keypath.");
     RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"dateObj.@max.prop = %@", @"a"]), 
-                              @"Property 'dateObj' is not a link in object of type 'AllPrimitiveSets'");
+                              @"Invalid keypath 'dateObj.@max.prop': @max on a collection of values must appear at the end of a keypath.");
     RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"decimalObj.@max.prop = %@", @"a"]), 
-                              @"Property 'decimalObj' is not a link in object of type 'AllPrimitiveSets'");
+                              @"Invalid keypath 'decimalObj.@max.prop': @max on a collection of values must appear at the end of a keypath.");
     RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"anyIntObj.@max.prop = %@", @"a"]), 
-                              @"Property 'anyIntObj' is not a link in object of type 'AllPrimitiveSets'");
+                              @"Invalid keypath 'anyIntObj.@max.prop': @max on a collection of values must appear at the end of a keypath.");
     RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"anyFloatObj.@max.prop = %@", @"a"]), 
-                              @"Property 'anyFloatObj' is not a link in object of type 'AllPrimitiveSets'");
+                              @"Invalid keypath 'anyFloatObj.@max.prop': @max on a collection of values must appear at the end of a keypath.");
     RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"anyDoubleObj.@max.prop = %@", @"a"]), 
-                              @"Property 'anyDoubleObj' is not a link in object of type 'AllPrimitiveSets'");
+                              @"Invalid keypath 'anyDoubleObj.@max.prop': @max on a collection of values must appear at the end of a keypath.");
     RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"anyDateObj.@max.prop = %@", @"a"]), 
-                              @"Property 'anyDateObj' is not a link in object of type 'AllPrimitiveSets'");
+                              @"Invalid keypath 'anyDateObj.@max.prop': @max on a collection of values must appear at the end of a keypath.");
     RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"anyDecimalObj.@max.prop = %@", @"a"]), 
-                              @"Property 'anyDecimalObj' is not a link in object of type 'AllPrimitiveSets'");
+                              @"Invalid keypath 'anyDecimalObj.@max.prop': @max on a collection of values must appear at the end of a keypath.");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveSets objectsInRealm:realm where:@"intObj.@max.prop = %@", @"a"]), 
-                              @"Property 'intObj' is not a link in object of type 'AllOptionalPrimitiveSets'");
+                              @"Invalid keypath 'intObj.@max.prop': @max on a collection of values must appear at the end of a keypath.");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveSets objectsInRealm:realm where:@"floatObj.@max.prop = %@", @"a"]), 
-                              @"Property 'floatObj' is not a link in object of type 'AllOptionalPrimitiveSets'");
+                              @"Invalid keypath 'floatObj.@max.prop': @max on a collection of values must appear at the end of a keypath.");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveSets objectsInRealm:realm where:@"doubleObj.@max.prop = %@", @"a"]), 
-                              @"Property 'doubleObj' is not a link in object of type 'AllOptionalPrimitiveSets'");
+                              @"Invalid keypath 'doubleObj.@max.prop': @max on a collection of values must appear at the end of a keypath.");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveSets objectsInRealm:realm where:@"dateObj.@max.prop = %@", @"a"]), 
-                              @"Property 'dateObj' is not a link in object of type 'AllOptionalPrimitiveSets'");
+                              @"Invalid keypath 'dateObj.@max.prop': @max on a collection of values must appear at the end of a keypath.");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveSets objectsInRealm:realm where:@"decimalObj.@max.prop = %@", @"a"]), 
-                              @"Property 'decimalObj' is not a link in object of type 'AllOptionalPrimitiveSets'");
+                              @"Invalid keypath 'decimalObj.@max.prop': @max on a collection of values must appear at the end of a keypath.");
 
     // No objects, so count is zero
     RLMAssertCount(AllPrimitiveSets, 0U, @"intObj.@max == %@", @2);
@@ -8226,21 +8218,21 @@ static double average(NSArray *values) {
     void (^testNull)(NSString *, NSUInteger) = ^(NSString *operator, NSUInteger count) {
         NSString *query = [NSString stringWithFormat:@"ANY stringObj %@ nil", operator];
         RLMAssertThrowsWithReason([AllPrimitiveSets objectsInRealm:realm where:query],
-                                  @"Expected object of type string for property 'stringObj' on object of type 'AllPrimitiveSets', but received: (null)");
+                                  @"Cannot compare value '(null)' of type '(null)' to property 'stringObj' of type 'string'");
         RLMAssertCount(AllOptionalPrimitiveSets, count, query, NSNull.null);
         query = [NSString stringWithFormat:@"ANY link.stringObj %@ nil", operator];
         RLMAssertThrowsWithReason([LinkToAllPrimitiveSets objectsInRealm:realm where:query],
-                                  @"Expected object of type string for property 'link.stringObj' on object of type 'LinkToAllPrimitiveSets', but received: (null)");
+                                  @"Cannot compare value '(null)' of type '(null)' to property 'stringObj' of type 'string'");
         RLMAssertCount(LinkToAllOptionalPrimitiveSets, count, query, NSNull.null);
 
         query = [NSString stringWithFormat:@"ANY dataObj %@ nil", operator];
         RLMAssertThrowsWithReason([AllPrimitiveSets objectsInRealm:realm where:query],
-                                  @"Expected object of type data for property 'dataObj' on object of type 'AllPrimitiveSets', but received: (null)");
+                                  @"Cannot compare value '(null)' of type '(null)' to property 'dataObj' of type 'data'");
         RLMAssertCount(AllOptionalPrimitiveSets, count, query, NSNull.null);
 
         query = [NSString stringWithFormat:@"ANY link.dataObj %@ nil", operator];
         RLMAssertThrowsWithReason([LinkToAllPrimitiveSets objectsInRealm:realm where:query],
-                                  @"Expected object of type data for property 'link.dataObj' on object of type 'LinkToAllPrimitiveSets', but received: (null)");
+                                  @"Cannot compare value '(null)' of type '(null)' to property 'dataObj' of type 'data'");
         RLMAssertCount(LinkToAllOptionalPrimitiveSets, count, query, NSNull.null);
     };
 

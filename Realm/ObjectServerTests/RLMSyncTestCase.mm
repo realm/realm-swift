@@ -18,6 +18,7 @@
 
 #import "RLMSyncTestCase.h"
 
+#import <CommonCrypto/CommonHMAC.h>
 #import <XCTest/XCTest.h>
 #import <Realm/Realm.h>
 
@@ -275,6 +276,61 @@ static NSURL *syncDirectoryForChildProcess() {
     }];
     [self waitForExpectations:@[expectation] timeout:4.0];
     XCTAssertTrue(user.state == RLMUserStateLoggedOut, @"User should have been logged out, but wasn't");
+}
+
+- (NSString *)createJWTWithAppId:(NSString *)appId {
+    NSDictionary *header = @{@"alg": @"HS256", @"typ": @"JWT"};
+    NSDictionary *payload = @{
+        @"aud": appId,
+        @"sub": @"someUserId",
+        @"exp": @1661896476,
+        @"user_data": @{
+            @"name": @"Foo Bar",
+            @"occupation": @"firefighter"
+        },
+        @"my_metadata": @{
+            @"name": @"Bar Foo",
+            @"occupation": @"stock analyst"
+        }
+    };
+
+    NSData *jsonHeader = [NSJSONSerialization  dataWithJSONObject:header options:0 error:nil];
+    NSString *headerString = [[NSString alloc] initWithData:jsonHeader encoding:NSUTF8StringEncoding];
+    NSData *jsonPayload = [NSJSONSerialization  dataWithJSONObject:payload options:0 error:nil];
+    NSString *payloadString = [[NSString alloc] initWithData:jsonPayload encoding:NSUTF8StringEncoding];
+
+    NSString *base64EncodedHeader = [jsonHeader base64EncodedStringWithOptions:0];
+    NSString *base64EncodedPayload = [jsonPayload base64EncodedStringWithOptions:0];
+
+    // Remove padding characters.
+    base64EncodedHeader = [base64EncodedHeader stringByReplacingOccurrencesOfString:@"=" withString:@""];
+    base64EncodedPayload = [base64EncodedPayload stringByReplacingOccurrencesOfString:@"=" withString:@""];
+
+    std::string jwtPayload = [[NSString stringWithFormat:@"%@.%@", base64EncodedHeader, base64EncodedPayload] UTF8String];
+    std::string jwtKey = [@"My_very_confidential_secretttttt" UTF8String];
+
+    NSString *key = @"My_very_confidential_secretttttt";
+    NSString *data = @(jwtPayload.c_str());
+
+    const char *cKey  = [key cStringUsingEncoding:NSASCIIStringEncoding];
+    const char *cData = [data cStringUsingEncoding:NSASCIIStringEncoding];
+
+    unsigned char cHMAC[CC_SHA256_DIGEST_LENGTH];
+    CCHmac(kCCHmacAlgSHA256, cKey, strlen(cKey), cData, strlen(cData), cHMAC);
+
+    NSData *HMAC = [[NSData alloc] initWithBytes:cHMAC
+                                          length:sizeof(cHMAC)];
+    NSString *hmac = [HMAC base64EncodedStringWithOptions:0];
+
+    hmac = [hmac stringByReplacingOccurrencesOfString:@"=" withString:@""];
+    hmac = [hmac stringByReplacingOccurrencesOfString:@"+" withString:@"-"];
+    hmac = [hmac stringByReplacingOccurrencesOfString:@"/" withString:@"_"];
+
+    return [NSString stringWithFormat:@"%@.%@", @(jwtPayload.c_str()), hmac];
+}
+
+- (RLMCredentials *)jwtCredentialWithAppId:(NSString *)appId {
+    return [RLMCredentials credentialsWithJWT:[self createJWTWithAppId:appId]];
 }
 
 - (void)waitForDownloadsForRealm:(RLMRealm *)realm {

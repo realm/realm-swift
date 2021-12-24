@@ -393,5 +393,8 @@ using UserProfileMember = util::Optional<std::string> (SyncUserProfile::*)() con
 - (NSString *)maxAge {
     return userProfileMemberToNSString(_userProfile.max_age());
 }
+- (NSDictionary *)metadata {
+    return (NSDictionary *)RLMConvertBsonToRLMBSON(_userProfile.data());
+}
 
 @end

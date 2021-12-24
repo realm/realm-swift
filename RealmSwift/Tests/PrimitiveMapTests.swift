@@ -181,96 +181,36 @@ class PrimitiveMapTests<O: ObjectFactory, V: MapValueFactory>: PrimitiveMapTests
     }
 }
 
-class MinMaxPrimitiveMapTests<O: ObjectFactory, V: MapValueFactory>: PrimitiveMapTestsBase<O, V> where V: MinMaxType {
+class MinMaxPrimitiveMapTests<O: ObjectFactory, V: MapValueFactory>: PrimitiveMapTestsBase<O, V> where V.PersistedType: MinMaxType {
     func testMin() {
         XCTAssertNil(map.min())
         map.merge(values) { $1 }
         map.merge(values) { $1 }
-        XCTAssertEqual(map.min(), values.first?.value)
+        XCTAssertEqual(map.min(), V.min())
     }
 
     func testMax() {
         XCTAssertNil(map.max())
         map.merge(values) { $1 }
-        XCTAssertEqual(map.max(), values.last?.value)
+        XCTAssertEqual(map.max(), V.max())
     }
 }
 
-class OptionalMinMaxPrimitiveMapTests<O: ObjectFactory, V: MapValueFactory>: PrimitiveMapTestsBase<O, V> where V.Wrapped: MinMaxType, V.Wrapped: _DefaultConstructible {
-    // V and V.Wrapped? are the same thing, but the type system doesn't know that
-    // and the protocol constraint is on V.Wrapped
-    var map2: Map<String, V.Wrapped?> {
-        return unsafeDowncast(map!, to: Map<String, V.Wrapped?>.self)
-    }
-
-    func testMin() {
-        XCTAssertNil(map2.min())
-        for element in values {
-            map2[element.key] = element.value as? V.Wrapped
-        }
-        let expected = values[1].value as! V.Wrapped
-        XCTAssertEqual(map2.min(), expected)
-    }
-
-    func testMax() {
-        XCTAssertNil(map2.max())
-        for element in values {
-            map2[element.key] = element.value as? V.Wrapped
-        }
-        let expected = values[2].value as! V.Wrapped
-        XCTAssertEqual(map2.max(), expected)
-    }
-}
-
-class AddablePrimitiveMapTests<O: ObjectFactory, V: MapValueFactory>: PrimitiveMapTestsBase<O, V> where V: AddableType {
+class AddablePrimitiveMapTests<O: ObjectFactory, V: MapValueFactory>: PrimitiveMapTestsBase<O, V> where V: NumericValueFactory, V.PersistedType: AddableType {
     func testSum() {
-        XCTAssertEqual(map.sum(), V())
+        XCTAssertEqual(map.sum(), .zero)
         map.merge(values) { $1 }
-
-        let expected = ((values.map { $0.value }.map(dynamicBridgeCast) as NSArray).value(forKeyPath: "@sum.self")! as! NSNumber).doubleValue
-        XCTAssertEqual(V.doubleValue(t: map.sum()), expected, accuracy: 0.01)
+        XCTAssertEqual(V.doubleValue(map.sum()), V.sum(), accuracy: 0.01)
     }
 
     func testAverage() {
         XCTAssertNil(map.average() as V.AverageType?)
         map.merge(values) { $1 }
-
-        let expected = ((values.map { $0.value }.map(dynamicBridgeCast) as NSArray).value(forKeyPath: "@avg.self")! as! NSNumber)
-        XCTAssertEqual(V.doubleValue(map.average()!), expected.doubleValue, accuracy: 0.1)
+        XCTAssertEqual(V.doubleValue(map.average()!), V.average(), accuracy: 0.1)
     }
 }
 
-class OptionalAddablePrimitiveMapTests<O: ObjectFactory, V: MapValueFactory>: PrimitiveMapTestsBase<O, V> where V.Wrapped: AddableType, V.Wrapped: _DefaultConstructible {
-    // V and V.Wrapped? are the same thing, but the type system doesn't know that
-    // and the protocol constraint is on V.Wrapped
-    var map2: Map<String, V.Wrapped?> {
-        return unsafeDowncast(map!, to: Map<String, V.Wrapped?>.self)
-    }
-
-    func testSum() {
-        XCTAssertEqual(map2.sum(), V.Wrapped())
-        map.merge(values) { $1 }
-        var nonNil = values!.map { $0.value }
-        nonNil.remove(at: 0)
-
-        // Expressing "can be added and converted to a floating point type" as
-        // a protocol requirement is awful, so sidestep it all with obj-c
-        let expected = ((nonNil.map(dynamicBridgeCast) as NSArray).value(forKeyPath: "@sum.self")! as! NSNumber).doubleValue
-        XCTAssertEqual(V.doubleValue(w: map2.sum()), expected, accuracy: 0.01)
-    }
-
-    func testAverage() {
-        XCTAssertNil(map2.average() as Double?)
-        map.merge(values) { $1 }
-        var nonNil = values!.map { $0.value }
-        nonNil.remove(at: 0)
-
-        let expected = ((nonNil.map(dynamicBridgeCast) as NSArray).value(forKeyPath: "@avg.self")! as! NSNumber).doubleValue
-        XCTAssertEqual(V.doubleValue(map2.average()!), expected, accuracy: 0.01)
-    }
-}
-
-class SortablePrimitiveMapTests<O: ObjectFactory, V: MapValueFactory>: PrimitiveMapTestsBase<O, V> where V: Comparable {
+class SortablePrimitiveMapTests<O: ObjectFactory, V: MapValueFactory>: PrimitiveMapTestsBase<O, V> where V.PersistedType: SortableType {
     func testSorted() {
         map.merge(values) { $1 }
         XCTAssertEqual(map.count, 3)
@@ -281,21 +221,6 @@ class SortablePrimitiveMapTests<O: ObjectFactory, V: MapValueFactory>: Primitive
         assertEqual(values2.reversed(), Array(map.sorted(ascending: false)))
     }
 }
-
-class OptionalSortablePrimitiveMapTests<O: ObjectFactory, V: MapValueFactory>: PrimitiveMapTestsBase<O, V> where V.Wrapped: Comparable, V.Wrapped: _DefaultConstructible {
-    func testSorted() {
-        map.merge(values) { $1 }
-        XCTAssertEqual(map.count, 3)
-        var values2: [V.Wrapped?] = []
-        values.forEach { values2.append(unsafeBitCast($0.value, to: V.Wrapped?.self)) }
-        let mapAscending = unsafeBitCast(map.sorted(), to: Results<V.Wrapped?>.self)
-
-        assertEqual(values2, Array(mapAscending))
-        assertEqual(values2, Array(mapAscending.sorted(ascending: true)))
-        assertEqual(values2.reversed(), Array(mapAscending.sorted(ascending: false)))
-    }
-}
-
 
 func addPrimitiveMapTests<OF: ObjectFactory>(_ suite: XCTestSuite, _ type: OF.Type) {
     PrimitiveMapTests<OF, Int>.defaultTestSuite.tests.forEach(suite.addTest)
@@ -347,24 +272,24 @@ func addPrimitiveMapTests<OF: ObjectFactory>(_ suite: XCTestSuite, _ type: OF.Ty
     PrimitiveMapTests<OF, Decimal128?>.defaultTestSuite.tests.forEach(suite.addTest)
     PrimitiveMapTests<OF, UUID?>.defaultTestSuite.tests.forEach(suite.addTest)
 
-    OptionalMinMaxPrimitiveMapTests<OF, Int?>.defaultTestSuite.tests.forEach(suite.addTest)
-    OptionalMinMaxPrimitiveMapTests<OF, Int8?>.defaultTestSuite.tests.forEach(suite.addTest)
-    OptionalMinMaxPrimitiveMapTests<OF, Int16?>.defaultTestSuite.tests.forEach(suite.addTest)
-    OptionalMinMaxPrimitiveMapTests<OF, Int32?>.defaultTestSuite.tests.forEach(suite.addTest)
-    OptionalMinMaxPrimitiveMapTests<OF, Int64?>.defaultTestSuite.tests.forEach(suite.addTest)
-    OptionalMinMaxPrimitiveMapTests<OF, Float?>.defaultTestSuite.tests.forEach(suite.addTest)
-    OptionalMinMaxPrimitiveMapTests<OF, Double?>.defaultTestSuite.tests.forEach(suite.addTest)
-    OptionalMinMaxPrimitiveMapTests<OF, Date?>.defaultTestSuite.tests.forEach(suite.addTest)
-    OptionalMinMaxPrimitiveMapTests<OF, Decimal128?>.defaultTestSuite.tests.forEach(suite.addTest)
+    MinMaxPrimitiveMapTests<OF, Int?>.defaultTestSuite.tests.forEach(suite.addTest)
+    MinMaxPrimitiveMapTests<OF, Int8?>.defaultTestSuite.tests.forEach(suite.addTest)
+    MinMaxPrimitiveMapTests<OF, Int16?>.defaultTestSuite.tests.forEach(suite.addTest)
+    MinMaxPrimitiveMapTests<OF, Int32?>.defaultTestSuite.tests.forEach(suite.addTest)
+    MinMaxPrimitiveMapTests<OF, Int64?>.defaultTestSuite.tests.forEach(suite.addTest)
+    MinMaxPrimitiveMapTests<OF, Float?>.defaultTestSuite.tests.forEach(suite.addTest)
+    MinMaxPrimitiveMapTests<OF, Double?>.defaultTestSuite.tests.forEach(suite.addTest)
+    MinMaxPrimitiveMapTests<OF, Date?>.defaultTestSuite.tests.forEach(suite.addTest)
+    MinMaxPrimitiveMapTests<OF, Decimal128?>.defaultTestSuite.tests.forEach(suite.addTest)
 
-    OptionalAddablePrimitiveMapTests<OF, Int?>.defaultTestSuite.tests.forEach(suite.addTest)
-    OptionalAddablePrimitiveMapTests<OF, Int8?>.defaultTestSuite.tests.forEach(suite.addTest)
-    OptionalAddablePrimitiveMapTests<OF, Int16?>.defaultTestSuite.tests.forEach(suite.addTest)
-    OptionalAddablePrimitiveMapTests<OF, Int32?>.defaultTestSuite.tests.forEach(suite.addTest)
-    OptionalAddablePrimitiveMapTests<OF, Int64?>.defaultTestSuite.tests.forEach(suite.addTest)
-    OptionalAddablePrimitiveMapTests<OF, Float?>.defaultTestSuite.tests.forEach(suite.addTest)
-    OptionalAddablePrimitiveMapTests<OF, Double?>.defaultTestSuite.tests.forEach(suite.addTest)
-    OptionalAddablePrimitiveMapTests<OF, Decimal128?>.defaultTestSuite.tests.forEach(suite.addTest)
+    AddablePrimitiveMapTests<OF, Int?>.defaultTestSuite.tests.forEach(suite.addTest)
+    AddablePrimitiveMapTests<OF, Int8?>.defaultTestSuite.tests.forEach(suite.addTest)
+    AddablePrimitiveMapTests<OF, Int16?>.defaultTestSuite.tests.forEach(suite.addTest)
+    AddablePrimitiveMapTests<OF, Int32?>.defaultTestSuite.tests.forEach(suite.addTest)
+    AddablePrimitiveMapTests<OF, Int64?>.defaultTestSuite.tests.forEach(suite.addTest)
+    AddablePrimitiveMapTests<OF, Float?>.defaultTestSuite.tests.forEach(suite.addTest)
+    AddablePrimitiveMapTests<OF, Double?>.defaultTestSuite.tests.forEach(suite.addTest)
+    AddablePrimitiveMapTests<OF, Decimal128?>.defaultTestSuite.tests.forEach(suite.addTest)
 
     PrimitiveMapTests<OF, EnumInt>.defaultTestSuite.tests.forEach(suite.addTest)
     PrimitiveMapTests<OF, EnumInt8>.defaultTestSuite.tests.forEach(suite.addTest)
@@ -392,13 +317,13 @@ func addPrimitiveMapTests<OF: ObjectFactory>(_ suite: XCTestSuite, _ type: OF.Ty
     PrimitiveMapTests<OF, EnumDouble?>.defaultTestSuite.tests.forEach(suite.addTest)
     PrimitiveMapTests<OF, EnumString?>.defaultTestSuite.tests.forEach(suite.addTest)
 
-    OptionalMinMaxPrimitiveMapTests<OF, EnumInt?>.defaultTestSuite.tests.forEach(suite.addTest)
-    OptionalMinMaxPrimitiveMapTests<OF, EnumInt8?>.defaultTestSuite.tests.forEach(suite.addTest)
-    OptionalMinMaxPrimitiveMapTests<OF, EnumInt16?>.defaultTestSuite.tests.forEach(suite.addTest)
-    OptionalMinMaxPrimitiveMapTests<OF, EnumInt32?>.defaultTestSuite.tests.forEach(suite.addTest)
-    OptionalMinMaxPrimitiveMapTests<OF, EnumInt64?>.defaultTestSuite.tests.forEach(suite.addTest)
-    OptionalMinMaxPrimitiveMapTests<OF, EnumFloat?>.defaultTestSuite.tests.forEach(suite.addTest)
-    OptionalMinMaxPrimitiveMapTests<OF, EnumDouble?>.defaultTestSuite.tests.forEach(suite.addTest)
+    MinMaxPrimitiveMapTests<OF, EnumInt?>.defaultTestSuite.tests.forEach(suite.addTest)
+    MinMaxPrimitiveMapTests<OF, EnumInt8?>.defaultTestSuite.tests.forEach(suite.addTest)
+    MinMaxPrimitiveMapTests<OF, EnumInt16?>.defaultTestSuite.tests.forEach(suite.addTest)
+    MinMaxPrimitiveMapTests<OF, EnumInt32?>.defaultTestSuite.tests.forEach(suite.addTest)
+    MinMaxPrimitiveMapTests<OF, EnumInt64?>.defaultTestSuite.tests.forEach(suite.addTest)
+    MinMaxPrimitiveMapTests<OF, EnumFloat?>.defaultTestSuite.tests.forEach(suite.addTest)
+    MinMaxPrimitiveMapTests<OF, EnumDouble?>.defaultTestSuite.tests.forEach(suite.addTest)
 }
 
 class UnmanagedPrimitiveMapTests: TestCase {
@@ -424,15 +349,15 @@ class ManagedPrimitiveMapTests: TestCase {
         SortablePrimitiveMapTests<ManagedObjectFactory, String>.defaultTestSuite.tests.forEach(suite.addTest)
         SortablePrimitiveMapTests<ManagedObjectFactory, Date>.defaultTestSuite.tests.forEach(suite.addTest)
 
-        OptionalSortablePrimitiveMapTests<ManagedObjectFactory, Int?>.defaultTestSuite.tests.forEach(suite.addTest)
-        OptionalSortablePrimitiveMapTests<ManagedObjectFactory, Int8?>.defaultTestSuite.tests.forEach(suite.addTest)
-        OptionalSortablePrimitiveMapTests<ManagedObjectFactory, Int16?>.defaultTestSuite.tests.forEach(suite.addTest)
-        OptionalSortablePrimitiveMapTests<ManagedObjectFactory, Int32?>.defaultTestSuite.tests.forEach(suite.addTest)
-        OptionalSortablePrimitiveMapTests<ManagedObjectFactory, Int64?>.defaultTestSuite.tests.forEach(suite.addTest)
-        OptionalSortablePrimitiveMapTests<ManagedObjectFactory, Float?>.defaultTestSuite.tests.forEach(suite.addTest)
-        OptionalSortablePrimitiveMapTests<ManagedObjectFactory, Double?>.defaultTestSuite.tests.forEach(suite.addTest)
-        OptionalSortablePrimitiveMapTests<ManagedObjectFactory, String?>.defaultTestSuite.tests.forEach(suite.addTest)
-        OptionalSortablePrimitiveMapTests<ManagedObjectFactory, Date?>.defaultTestSuite.tests.forEach(suite.addTest)
+        SortablePrimitiveMapTests<ManagedObjectFactory, Int?>.defaultTestSuite.tests.forEach(suite.addTest)
+        SortablePrimitiveMapTests<ManagedObjectFactory, Int8?>.defaultTestSuite.tests.forEach(suite.addTest)
+        SortablePrimitiveMapTests<ManagedObjectFactory, Int16?>.defaultTestSuite.tests.forEach(suite.addTest)
+        SortablePrimitiveMapTests<ManagedObjectFactory, Int32?>.defaultTestSuite.tests.forEach(suite.addTest)
+        SortablePrimitiveMapTests<ManagedObjectFactory, Int64?>.defaultTestSuite.tests.forEach(suite.addTest)
+        SortablePrimitiveMapTests<ManagedObjectFactory, Float?>.defaultTestSuite.tests.forEach(suite.addTest)
+        SortablePrimitiveMapTests<ManagedObjectFactory, Double?>.defaultTestSuite.tests.forEach(suite.addTest)
+        SortablePrimitiveMapTests<ManagedObjectFactory, String?>.defaultTestSuite.tests.forEach(suite.addTest)
+        SortablePrimitiveMapTests<ManagedObjectFactory, Date?>.defaultTestSuite.tests.forEach(suite.addTest)
 
         SortablePrimitiveMapTests<ManagedObjectFactory, EnumInt>.defaultTestSuite.tests.forEach(suite.addTest)
         SortablePrimitiveMapTests<ManagedObjectFactory, EnumInt8>.defaultTestSuite.tests.forEach(suite.addTest)
@@ -443,14 +368,14 @@ class ManagedPrimitiveMapTests: TestCase {
         SortablePrimitiveMapTests<ManagedObjectFactory, EnumDouble>.defaultTestSuite.tests.forEach(suite.addTest)
         SortablePrimitiveMapTests<ManagedObjectFactory, EnumString>.defaultTestSuite.tests.forEach(suite.addTest)
 
-        OptionalSortablePrimitiveMapTests<ManagedObjectFactory, EnumInt?>.defaultTestSuite.tests.forEach(suite.addTest)
-        OptionalSortablePrimitiveMapTests<ManagedObjectFactory, EnumInt8?>.defaultTestSuite.tests.forEach(suite.addTest)
-        OptionalSortablePrimitiveMapTests<ManagedObjectFactory, EnumInt16?>.defaultTestSuite.tests.forEach(suite.addTest)
-        OptionalSortablePrimitiveMapTests<ManagedObjectFactory, EnumInt32?>.defaultTestSuite.tests.forEach(suite.addTest)
-        OptionalSortablePrimitiveMapTests<ManagedObjectFactory, EnumInt64?>.defaultTestSuite.tests.forEach(suite.addTest)
-        OptionalSortablePrimitiveMapTests<ManagedObjectFactory, EnumFloat?>.defaultTestSuite.tests.forEach(suite.addTest)
-        OptionalSortablePrimitiveMapTests<ManagedObjectFactory, EnumDouble?>.defaultTestSuite.tests.forEach(suite.addTest)
-        OptionalSortablePrimitiveMapTests<ManagedObjectFactory, EnumString?>.defaultTestSuite.tests.forEach(suite.addTest)
+        SortablePrimitiveMapTests<ManagedObjectFactory, EnumInt?>.defaultTestSuite.tests.forEach(suite.addTest)
+        SortablePrimitiveMapTests<ManagedObjectFactory, EnumInt8?>.defaultTestSuite.tests.forEach(suite.addTest)
+        SortablePrimitiveMapTests<ManagedObjectFactory, EnumInt16?>.defaultTestSuite.tests.forEach(suite.addTest)
+        SortablePrimitiveMapTests<ManagedObjectFactory, EnumInt32?>.defaultTestSuite.tests.forEach(suite.addTest)
+        SortablePrimitiveMapTests<ManagedObjectFactory, EnumInt64?>.defaultTestSuite.tests.forEach(suite.addTest)
+        SortablePrimitiveMapTests<ManagedObjectFactory, EnumFloat?>.defaultTestSuite.tests.forEach(suite.addTest)
+        SortablePrimitiveMapTests<ManagedObjectFactory, EnumDouble?>.defaultTestSuite.tests.forEach(suite.addTest)
+        SortablePrimitiveMapTests<ManagedObjectFactory, EnumString?>.defaultTestSuite.tests.forEach(suite.addTest)
 
         return suite
     }

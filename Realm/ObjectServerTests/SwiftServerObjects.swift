@@ -19,7 +19,7 @@
 import Foundation
 import RealmSwift
 
-public class SwiftPerson: Object, ObjectKeyIdentifiable {
+public class SwiftPerson: Object {
     @Persisted(primaryKey: true) public var _id: ObjectId? = ObjectId.generate()
     @Persisted public var firstName: String = ""
     @Persisted public var lastName: String = ""
@@ -31,6 +31,9 @@ public class SwiftPerson: Object, ObjectKeyIdentifiable {
         self.lastName = lastName
     }
 }
+
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+extension SwiftPerson: ObjectKeyIdentifiable {}
 
 public class SwiftTypesSyncObject: Object {
     @Persisted(primaryKey: true) public var _id: ObjectId? = ObjectId.generate()
@@ -179,7 +182,7 @@ public class SwiftMissingObject: Object {
     }
 }
 
-@objcMembers public class SwiftHugeSyncObject: Object, ObjectKeyIdentifiable {
+@objcMembers public class SwiftHugeSyncObject: Object {
     dynamic var _id = ObjectId.generate()
     dynamic var data: Data?
 
