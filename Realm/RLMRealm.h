@@ -29,9 +29,8 @@
 typedef void(^RLMAsyncOpenRealmCallback)(RLMRealm * _Nullable realm, NSError * _Nullable error);
 
 #ifdef REALM_ASYNC_WRITES
-
 /// The Id of the asynchronous transaction.
-typedef unsigned AsyncTransactionId;
+typedef unsigned RLMAsyncTransactionId;
 #endif // REALM_ASYNC_WRITES
 
 NS_ASSUME_NONNULL_BEGIN
@@ -507,6 +506,7 @@ typedef void (^RLMNotificationBlock)(RLMNotification notification, RLMRealm *rea
 - (BOOL)transactionWithoutNotifying:(NSArray<RLMNotificationToken *> *)tokens block:(__attribute__((noescape)) void(^)(void))block error:(NSError **)error;
 
 #ifdef REALM_ASYNC_WRITES
+
 /**
  Indicates if the Realm is currently engaged in an async write transaction.
  
@@ -518,7 +518,7 @@ typedef void (^RLMNotificationBlock)(RLMNotification notification, RLMRealm *rea
 @property (nonatomic, readonly) BOOL inAsyncWriteTransaction;
 
 /// A block type representing a block which can be used to report an async transaction related error to the application.
-typedef void(^RLMRealmAsyncErrorHandler)(AsyncTransactionId, NSError *);
+typedef void(^RLMRealmAsyncErrorHandler)(RLMAsyncTransactionId, NSError *);
 
 /**
  Set the error handler for the asynbhronous transactions.
@@ -546,7 +546,7 @@ typedef void(^RLMRealmAsyncErrorHandler)(AsyncTransactionId, NSError *);
        A later call to `beginAsyncWriteTransaction:` or `asyncTransactionWithBlock:` will wait for any earlier
        write blocks.
  */
-- (AsyncTransactionId)beginAsyncWriteTransaction:(void(^)())block;
+- (RLMAsyncTransactionId)beginAsyncWriteTransaction:(void(^)())block;
 
 /** Commit asynchronous transaction.
  
@@ -564,11 +564,11 @@ typedef void(^RLMRealmAsyncErrorHandler)(AsyncTransactionId, NSError *);
    the I/O is performed on a dedicated background thread.
  * Callbacks to `doneBlock` will occur in the order of `commitAsyncWriteTransaction`
 */
-- (AsyncTransactionId)commitAsyncWriteTransaction:(nullable void(^)())doneBlock isGroupingAllowed:(BOOL)isGroupingAllowed;
+- (RLMAsyncTransactionId)commitAsyncWriteTransaction:(nullable void(^)())doneBlock isGroupingAllowed:(BOOL)isGroupingAllowed;
 /// :nodoc:
-- (AsyncTransactionId)commitAsyncWriteTransaction:(void(^)())doneBlock;
+- (RLMAsyncTransactionId)commitAsyncWriteTransaction:(void(^)())doneBlock;
 /// :nodoc:
-- (AsyncTransactionId)commitAsyncWriteTransaction;
+- (RLMAsyncTransactionId)commitAsyncWriteTransaction;
 
 /** Cancel a queued code block (either for an `asyncTransactionWithBlock`
  or for an `commitAsyncWriteTransaction`)
@@ -576,9 +576,9 @@ typedef void(^RLMRealmAsyncErrorHandler)(AsyncTransactionId, NSError *);
  @note Cancelling a commit will not abort the commit, it will only cancel the callback
        informing of commit completion.
  
- @param AsyncTransactionId The transaction Id returned by `beginAsyncWriteTransaction` or  `commitAsyncWriteTransaction`
+ @param RLMAsyncTransactionId The transaction Id returned by `beginAsyncWriteTransaction` or  `commitAsyncWriteTransaction`
 */
-- (void)cancelAsyncTransaction:(AsyncTransactionId)asyncTransactionId;
+- (void)cancelAsyncTransaction:(RLMAsyncTransactionId)asyncTransactionId;
 
 /** Commits a code block to asynchronous transactions queue.
  
@@ -589,9 +589,9 @@ typedef void(^RLMRealmAsyncErrorHandler)(AsyncTransactionId, NSError *);
 
  @return Asynchronous transaction's Id.
  */
-- (AsyncTransactionId)asyncTransactionWithBlock:(void(^)())block onComplete:(void(^)())doneBlock;
+- (RLMAsyncTransactionId)asyncTransactionWithBlock:(void(^)())block onComplete:(void(^)())doneBlock;
 /// :nodoc:
-- (AsyncTransactionId)asyncTransactionWithBlock:(void(^)())block;
+- (RLMAsyncTransactionId)asyncTransactionWithBlock:(void(^)())block;
 
 #endif // REALM_ASYNC_WRITES
 
