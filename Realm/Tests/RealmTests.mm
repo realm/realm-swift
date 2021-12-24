@@ -1565,6 +1565,7 @@
     [self waitForExpectationsWithTimeout:1.0 handler:nil];
     XCTAssertEqual(0U, [StringObject allObjectsInRealm:realm].count);
 }
+
 - (void)testAsyncTransactionShouldAutorefresh {
     RLMRealm *realm = [self realmWithTestPath];
 
@@ -1882,6 +1883,48 @@
     XCTAssertEqual(2, [StringObject allObjectsInRealm:realm].count);
 }
 
+- (void)testAsyncTransactionHandleError {
+    RLMRealm *realm = RLMRealm.defaultRealm;
+    XCTestExpectation *asyncComplete;
+    [realm transactionWithBlock:^{
+        [PrimaryStringObject createInRealm:realm withValue:@[@"pk", @1]];
+    }];
+    
+    AsyncTransactionId transactionId = 0;
+    
+    [realm setAsyncErrorHandler:^(AsyncTransactionId asyncErrorHandler, NSError *error) {
+        XCTAssertEqual(asyncErrorHandler, transactionId);
+        [asyncComplete fulfill];
+    }];
+
+    asyncComplete = [self expectationWithDescription:@"async transaction error handled"];
+    transactionId = [realm beginAsyncWriteTransaction:^{
+        [realm createObject:PrimaryStringObject.className withValue:@[@"pk", @1]]; // will throw with same PK
+        [realm commitWriteTransaction];
+    }];
+    [self waitForExpectationsWithTimeout:1.0 handler:nil];
+
+    asyncComplete = [self expectationWithDescription:@"async transaction error handled"];
+    transactionId = [realm beginAsyncWriteTransaction:^{
+        [realm createObject:PrimaryStringObject.className withValue:@[@"pk", @1]]; // will throw with same PK
+        [realm cancelAsyncTransaction:transactionId];
+    }];
+    [self waitForExpectationsWithTimeout:1.0 handler:nil];
+
+    asyncComplete = [self expectationWithDescription:@"async transaction error handled"];
+    transactionId = [realm asyncTransactionWithBlock:^{
+        [realm createObject:PrimaryStringObject.className withValue:@[@"pk", @1]]; // will throw with same PK
+    }];
+    [self waitForExpectationsWithTimeout:1.0 handler:nil];
+
+    asyncComplete = [self expectationWithDescription:@"async transaction error handled"];
+    transactionId = [realm asyncTransactionWithBlock:^{
+        [PrimaryStringObject createInRealm:realm withValue:@[@"pk", @1]]; // will throw with same PK
+    }];
+    [self waitForExpectationsWithTimeout:1.0 handler:nil];
+    
+    XCTAssertEqual(1, [PrimaryStringObject allObjects].count);
+}
 #endif // REALM_ASYNC_WRITES
 
 #pragma mark - Threads

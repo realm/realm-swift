@@ -28,6 +28,12 @@
  */
 typedef void(^RLMAsyncOpenRealmCallback)(RLMRealm * _Nullable realm, NSError * _Nullable error);
 
+#ifdef REALM_ASYNC_WRITES
+
+/// The Id of the asynchronous transaction.
+typedef unsigned AsyncTransactionId;
+#endif // REALM_ASYNC_WRITES
+
 NS_ASSUME_NONNULL_BEGIN
 
 /**
@@ -501,10 +507,6 @@ typedef void (^RLMNotificationBlock)(RLMNotification notification, RLMRealm *rea
 - (BOOL)transactionWithoutNotifying:(NSArray<RLMNotificationToken *> *)tokens block:(__attribute__((noescape)) void(^)(void))block error:(NSError **)error;
 
 #ifdef REALM_ASYNC_WRITES
-
-/// The Id of the asynchronous transaction.
-typedef unsigned AsyncTransactionId;
-
 /**
  Indicates if the Realm is currently engaged in an async write transaction.
  
@@ -514,6 +516,17 @@ typedef unsigned AsyncTransactionId;
           during a single transaction.
  */
 @property (nonatomic, readonly) BOOL inAsyncWriteTransaction;
+
+/// A block type representing a block which can be used to report an async transaction related error to the application.
+typedef void(^RLMRealmAsyncErrorHandler)(AsyncTransactionId, NSError *);
+
+/**
+ Set the error handler for the asynbhronous transactions.
+ Synchronous try/catch hadling will not work with the asynchronous transactions.
+ Asynchronous exceptions will be dispatched to the handler as `NSErrors`.
+ @note pass `nil` as a parameter to remove the handler
+ */
+- (void)setAsyncErrorHandler:(nullable RLMRealmAsyncErrorHandler)block;
 
 /**
  Begins asynchronous write transaction.
@@ -563,7 +576,7 @@ typedef unsigned AsyncTransactionId;
  @note Cancelling a commit will not abort the commit, it will only cancel the callback
        informing of commit completion.
  
- @param asyncTransactionId The transaction Id returned by `beginAsyncWriteTransaction` or  `commitAsyncWriteTransaction`
+ @param AsyncTransactionId The transaction Id returned by `beginAsyncWriteTransaction` or  `commitAsyncWriteTransaction`
 */
 - (void)cancelAsyncTransaction:(AsyncTransactionId)asyncTransactionId;
 
