@@ -54,6 +54,17 @@
     XCTAssertNotNil(realm);
     return realm;
 }
+
+-(void)populateInitialDataWithPartition:(SEL)testSel {
+    [self writeToPartition:testSel block:^(RLMRealm *realm) {
+        int numberOfSubs = 21;
+        for (int i = 1; i <= numberOfSubs; ++i) {
+            [realm addObject: [[Person alloc] initWithPrimaryKey:[RLMObjectId objectId] age:i firstName:[NSString stringWithFormat:@"firstname_%d", i] lastName:[NSString stringWithFormat:@"lastname_%d", i]]];
+        }
+
+        [realm addObject:[[Dog alloc] initWithPrimaryKey:[RLMObjectId objectId] breed:@"Labradoodle" name:@"Tom"]];
+    }];
+}
 @end
 
 @interface RLMFlexibleSyncTests: RLMFlexibleSyncTestCase
@@ -686,7 +697,7 @@
 @end
 
 @implementation RLMFlexibleSyncServerTests
-- (void)testFlexibleSyncEmptyDatabase {
+- (void)testFlexibleSyncAddSubscriptionWithEmptyDatabase {
     RLMRealm *realm = [self getFlexibleSyncRealm];
     XCTAssertNotNil(realm);
     CHECK_COUNT(0, Person, realm);
@@ -706,25 +717,37 @@
     XCTAssertEqual(subs.version, 1);
     XCTAssertEqual(subs.count, 1);
 
-    XCTestExpectation *ex3 = [self expectationWithDescription:@"state changes"];
+    XCTestExpectation *ex = [self expectationWithDescription:@"state changes"];
     [subs observe:^(RLMSyncSubscriptionState state) {
         if (state == RLMSyncSubscriptionStateComplete) {
-            [ex3 fulfill];
+            [ex fulfill];
         }
     }];
     [self waitForExpectationsWithTimeout:20.0 handler:nil];
 
     [self waitForDownloadsForRealm:realm];
     CHECK_COUNT(0, Person, realm);
+    CHECK_COUNT(0, Dog, realm);
+}
+
+- (void)testFlexibleSyncWithoutQuery {
+    [self populateInitialDataWithPartition:_cmd];
+    RLMRealm *realm = [self getFlexibleSyncRealm];
+    XCTAssertNotNil(realm);
+    CHECK_COUNT(0, Person, realm);
+
+    RLMSyncSubscriptionSet *subs = realm.subscriptions;
+    XCTAssertNotNil(subs);
+    XCTAssertEqual(subs.version, 0);
+    XCTAssertEqual(subs.count, 0);
+
+    [self waitForDownloadsForRealm:realm];
+    CHECK_COUNT(0, Person, realm);
+    CHECK_COUNT(0, Dog, realm);
 }
 
 - (void)testFlexibleSyncAddQuery {
-    [self writeToPartition:_cmd block:^(RLMRealm *realm) {
-        int numberOfSubs = 21;
-        for (int i = 1; i <= numberOfSubs; ++i) {
-            [realm addObject: [[Person alloc]initWithPrimaryKey:[RLMObjectId objectId] age:i firstName:[NSString stringWithFormat:@"firstname_%d", i] lastName:[NSString stringWithFormat:@"lastname_%d", i]]];
-        }
-    }];
+    [self populateInitialDataWithPartition:_cmd];
 
     RLMRealm *realm = [self getFlexibleSyncRealm];
     XCTAssertNotNil(realm);
@@ -758,14 +781,7 @@
 }
 
 - (void)testFlexibleSyncAddMultipleQuery {
-    [self writeToPartition:_cmd block:^(RLMRealm *realm) {
-        int numberOfSubs = 21;
-        for (int i = 1; i <= numberOfSubs; ++i) {
-            [realm addObject: [[Person alloc] initWithPrimaryKey:[RLMObjectId objectId] age:i firstName:[NSString stringWithFormat:@"firstname_%d", i] lastName:[NSString stringWithFormat:@"lastname_%d", i]]];
-        }
-
-        [realm addObject:[[Dog alloc] initWithPrimaryKey:[RLMObjectId objectId] breed:@"Labradoodle" name:@"Tom"]];
-    }];
+    [self populateInitialDataWithPartition:_cmd];
 
     RLMRealm *realm = [self getFlexibleSyncRealm];
     XCTAssertNotNil(realm);
@@ -800,5 +816,193 @@
     [self waitForDownloadsForRealm:realm];
     CHECK_COUNT(11, Person, realm);
     CHECK_COUNT(1, Dog, realm);
+}
+
+- (void)testFlexibleSyncAddRemoveQuery {
+    [self populateInitialDataWithPartition:_cmd];
+
+    RLMRealm *realm = [self getFlexibleSyncRealm];
+    XCTAssertNotNil(realm);
+    CHECK_COUNT(0, Person, realm);
+
+    RLMSyncSubscriptionSet *subs = realm.subscriptions;
+    XCTAssertNotNil(subs);
+    XCTAssertEqual(subs.version, 0);
+    XCTAssertEqual(subs.count, 0);
+
+    [subs write:^{
+        [subs addSubscriptionWithClassName:Person.className
+                          subscriptionName:@"person_age"
+                                     where:@"age > 10"];
+    }];
+
+    XCTAssertNotNil(subs);
+    XCTAssertEqual(subs.version, 1);
+    XCTAssertEqual(subs.count, 1);
+
+    XCTestExpectation *ex1 = [self expectationWithDescription:@"state changes"];
+    [subs observe:^(RLMSyncSubscriptionState state) {
+        if (state == RLMSyncSubscriptionStateComplete) {
+            [ex1 fulfill];
+        }
+    }];
+    [self waitForExpectationsWithTimeout:20.0 handler:nil];
+
+    [self waitForDownloadsForRealm:realm];
+    CHECK_COUNT(16, Person, realm);
+
+    [subs write:^{
+        [subs removeSubscriptionWithName:@"person_age"];
+    }];
+
+    XCTAssertNotNil(subs);
+    XCTAssertEqual(subs.version, 2);
+    XCTAssertEqual(subs.count, 0);
+
+    XCTestExpectation *ex2 = [self expectationWithDescription:@"state changes"];
+    [subs observe:^(RLMSyncSubscriptionState state) {
+        if (state == RLMSyncSubscriptionStateComplete) {
+            [ex2 fulfill];
+        }
+    }];
+    [self waitForExpectationsWithTimeout:20.0 handler:nil];
+
+    [self waitForDownloadsForRealm:realm];
+    CHECK_COUNT(0, Person, realm);
+}
+
+- (void)testFlexibleSyncAddUpdateQuery {
+    [self populateInitialDataWithPartition:_cmd];
+
+    RLMRealm *realm = [self getFlexibleSyncRealm];
+    XCTAssertNotNil(realm);
+    CHECK_COUNT(0, Person, realm);
+
+    RLMSyncSubscriptionSet *subs = realm.subscriptions;
+    XCTAssertNotNil(subs);
+    XCTAssertEqual(subs.version, 0);
+    XCTAssertEqual(subs.count, 0);
+
+    [subs write:^{
+        [subs addSubscriptionWithClassName:Person.className
+                          subscriptionName:@"person_age"
+                                     where:@"age > 0"];
+    }];
+
+    XCTAssertNotNil(subs);
+    XCTAssertEqual(subs.version, 1);
+    XCTAssertEqual(subs.count, 1);
+
+    XCTestExpectation *ex1 = [self expectationWithDescription:@"state changes"];
+    [subs observe:^(RLMSyncSubscriptionState state) {
+        if (state == RLMSyncSubscriptionStateComplete) {
+            [ex1 fulfill];
+        }
+    }];
+    [self waitForExpectationsWithTimeout:20.0 handler:nil];
+
+    [self waitForDownloadsForRealm:realm];
+    CHECK_COUNT(21, Person, realm);
+
+    [subs write:^{
+        RLMSyncSubscription *foundSub = [subs subscriptionWithName:@"person_age"];
+        [foundSub updateSubscriptionWithClassName:Person.className where:@"age > 20"];
+    }];
+
+    XCTAssertNotNil(subs);
+    XCTAssertEqual(subs.version, 2);
+    XCTAssertEqual(subs.count, 1);
+
+    XCTestExpectation *ex2 = [self expectationWithDescription:@"state changes"];
+    [subs observe:^(RLMSyncSubscriptionState state) {
+        if (state == RLMSyncSubscriptionStateComplete) {
+            [ex2 fulfill];
+        }
+    }];
+    [self waitForExpectationsWithTimeout:20.0 handler:nil];
+
+    [self waitForDownloadsForRealm:realm];
+    CHECK_COUNT(1, Person, realm);
+}
+
+- (void)testFlexibleSyncAddObjectOutsideQuery {
+    [self populateInitialDataWithPartition:_cmd];
+
+    RLMRealm *realm = [self getFlexibleSyncRealm];
+    XCTAssertNotNil(realm);
+    CHECK_COUNT(0, Person, realm);
+
+    RLMSyncSubscriptionSet *subs = realm.subscriptions;
+    XCTAssertNotNil(subs);
+    XCTAssertEqual(subs.version, 0);
+    XCTAssertEqual(subs.count, 0);
+
+    [subs write:^{
+        [subs addSubscriptionWithClassName:Person.className
+                          subscriptionName:@"person_age"
+                                     where:@"age > 18"];
+    }];
+
+    XCTAssertNotNil(subs);
+    XCTAssertEqual(subs.version, 1);
+    XCTAssertEqual(subs.count, 1);
+
+    XCTestExpectation *ex1 = [self expectationWithDescription:@"state changes"];
+    [subs observe:^(RLMSyncSubscriptionState state) {
+        if (state == RLMSyncSubscriptionStateComplete) {
+            [ex1 fulfill];
+        }
+    }];
+    [self waitForExpectationsWithTimeout:20.0 handler:nil];
+
+    [self waitForDownloadsForRealm:realm];
+    CHECK_COUNT(3, Person, realm);
+
+    [realm transactionWithBlock:^{
+        [realm addObject:[[Person alloc] initWithPrimaryKey:[RLMObjectId objectId] age:10 firstName:@"Nic" lastName:@"Cages"]];
+    }];
+    [self waitForUploadsForRealm:realm];
+    CHECK_COUNT(4, Person, realm);
+
+    // Second realm, connecting to another app but same database
+    RLMRealm *realm2 = [self getFlexibleSyncRealm];
+    XCTAssertNotNil(realm2);
+    CHECK_COUNT(0, Person, realm2);
+
+    RLMSyncSubscriptionSet *subs2 = realm2.subscriptions;
+    XCTAssertNotNil(subs2);
+    XCTAssertEqual(subs2.version, 0);
+    XCTAssertEqual(subs2.count, 0);
+
+    [subs2 write:^{
+        [subs2 addSubscriptionWithClassName:Person.className
+                          subscriptionName:@"person_age"
+                                     where:@"age > 18"];
+    }];
+
+    XCTAssertNotNil(subs2);
+    XCTAssertEqual(subs2.version, 1);
+    XCTAssertEqual(subs2.count, 1);
+
+    XCTestExpectation *ex2 = [self expectationWithDescription:@"state changes"];
+    [subs2 observe:^(RLMSyncSubscriptionState state) {
+        if (state == RLMSyncSubscriptionStateComplete) {
+            [ex2 fulfill];
+        }
+    }];
+    [self waitForExpectationsWithTimeout:20.0 handler:nil];
+
+    [self waitForDownloadsForRealm:realm2];
+    CHECK_COUNT(3, Person, realm2);
+
+    [realm transactionWithBlock:^{
+        [realm addObject:[[Person alloc] initWithPrimaryKey:[RLMObjectId objectId] age:45 firstName:@"Steven" lastName:@"Hanks"]];
+        [realm addObject:[[Person alloc] initWithPrimaryKey:[RLMObjectId objectId] age:25 firstName:@"John" lastName:@"Stallone"]];
+    }];
+    [self waitForUploadsForRealm:realm];
+
+    [self waitForDownloadsForRealm:realm2];
+    CHECK_COUNT(5, Person, realm2);
+    CHECK_COUNT(6, Person, realm);
 }
 @end
