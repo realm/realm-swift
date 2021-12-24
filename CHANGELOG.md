@@ -16,7 +16,7 @@ The feature can be enabled with the build flag `REALM_ASYNC_WRITES`.
         [realm commitAsyncWriteTransaction];
     }];
 
-    AsyncTransactionId asyncTransactionId = [realm beginAsyncWriteTransaction:^{
+    RLMAsyncTransactionId asyncTransactionId = [realm beginAsyncWriteTransaction:^{
         // ...
     }];
     [realm cancelAsyncTransaction:asyncTransactionId];
