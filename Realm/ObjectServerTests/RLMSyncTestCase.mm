@@ -364,7 +364,9 @@ static NSURL *syncDirectoryForChildProcess() {
         RLMUser *user = [self logInUserForCredentials:[self basicCredentialsWithName:userName
                                                                             register:YES]];
         auto c = [user configurationWithPartitionValue:testName];
-        c.objectClasses = @[Dog.self, Person.self];
+        c.objectClasses = @[Dog.self, Person.self, HugeSyncObject.self, RLMSetSyncObject.self,
+                            RLMArraySyncObject.self, UUIDPrimaryKeyObject.self, StringPrimaryKeyObject.self,
+                            IntPrimaryKeyObject.self, AllTypesSyncObject.self, RLMDictionarySyncObject.self];
         [self writeToConfiguration:c block:block];
     }
 }

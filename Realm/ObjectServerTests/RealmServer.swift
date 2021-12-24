@@ -740,6 +740,7 @@ public class RealmServer: NSObject {
         switch syncMode {
         case .pbs:
             syncConfig = [
+                "uri": "mongodb://localhost:26000",
                 "sync": [
                     "state": "enabled",
                     "database_name": "test_data",
@@ -756,13 +757,13 @@ public class RealmServer: NSObject {
             ]
         case .flx:
             let queryableFields = schema.objectSchema.compactMap { object  -> [String]? in
-                guard object.className == "Person" || object.className == "Dog" else { return nil }
                 return object.properties.compactMap { property -> String? in
                     guard !property.isSet && !property.isMap && !property.isArray && property.type != .object else { return nil }
                     return property.name
                 }
             }.flatMap { $0 }
             syncConfig = [
+                "uri": "mongodb://localhost:26000",
                 "sync_query": [
                     "state": "enabled",
                     "database_name": "test_data",
@@ -770,7 +771,6 @@ public class RealmServer: NSObject {
                 ]
             ]
         }
-
         app.services[serviceId].config.patch(on: group, syncConfig, failOnError)
 
         app.sync.config.put(on: group, data: [
