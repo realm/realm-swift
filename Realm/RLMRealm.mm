@@ -731,39 +731,39 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     }
 }
 
-- (AsyncTransactionId)beginAsyncWriteTransaction:(void(^)())block {
+- (RLMAsyncTransactionId)beginAsyncWriteTransaction:(void(^)())block {
     return _realm->async_begin_transaction(block);
 }
 
-- (AsyncTransactionId)commitAsyncWriteTransaction {
+- (RLMAsyncTransactionId)commitAsyncWriteTransaction {
     return _realm->async_commit_transaction();
 }
 
-- (AsyncTransactionId)commitAsyncWriteTransaction:(void(^)())doneBlock {
+- (RLMAsyncTransactionId)commitAsyncWriteTransaction:(void(^)())doneBlock {
     return _realm->async_commit_transaction(doneBlock);
 }
 
-- (AsyncTransactionId)commitAsyncWriteTransaction:(nullable void(^)())doneBlock isGroupingAllowed:(BOOL)isGroupingAllowed {
+- (RLMAsyncTransactionId)commitAsyncWriteTransaction:(nullable void(^)())doneBlock isGroupingAllowed:(BOOL)isGroupingAllowed {
     if (doneBlock) {
         return _realm->async_commit_transaction(doneBlock, isGroupingAllowed);
     }
     return _realm->async_commit_transaction(nil, isGroupingAllowed);
 }
 
-- (void)cancelAsyncTransaction:(AsyncTransactionId)asyncTransactionId {
+- (void)cancelAsyncTransaction:(RLMAsyncTransactionId)asyncTransactionId {
     _realm->async_cancel_transaction(asyncTransactionId);
 }
 
-- (AsyncTransactionId)asyncTransactionWithBlock:(void(^)())block onComplete:(void (^)())doneBlock {
-    AsyncTransactionId asyncTransactionId = [self beginAsyncWriteTransaction: ^{
+- (RLMAsyncTransactionId)asyncTransactionWithBlock:(void(^)())block onComplete:(void (^)())doneBlock {
+    RLMAsyncTransactionId asyncTransactionId = [self beginAsyncWriteTransaction: ^{
         block();
         [self commitAsyncWriteTransaction:doneBlock];
     }];
     return asyncTransactionId;
 }
 
-- (AsyncTransactionId)asyncTransactionWithBlock:(void(^)())block {
-    AsyncTransactionId asyncTransactionId = [self beginAsyncWriteTransaction: ^{
+- (RLMAsyncTransactionId)asyncTransactionWithBlock:(void(^)())block {
+    RLMAsyncTransactionId asyncTransactionId = [self beginAsyncWriteTransaction: ^{
         block();
         [self commitAsyncWriteTransaction];
     }];

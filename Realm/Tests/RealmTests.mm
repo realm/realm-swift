@@ -1500,7 +1500,7 @@
 
     XCTAssertEqual(0, [StringObject allObjectsInRealm:realm].count);
 
-    AsyncTransactionId asyncTransactionId = [realm beginAsyncWriteTransaction:^{
+    RLMAsyncTransactionId asyncTransactionId = [realm beginAsyncWriteTransaction:^{
         [realm createObject:StringObject.className withValue:@[@"string"]];
         [realm commitAsyncWriteTransaction:^{
             [asyncComplete fulfill];
@@ -1520,7 +1520,7 @@
 
     XCTAssertEqual(0, [StringObject allObjectsInRealm:realm].count);
 
-    AsyncTransactionId asyncTransactionId = [realm beginAsyncWriteTransaction:^{
+    RLMAsyncTransactionId asyncTransactionId = [realm beginAsyncWriteTransaction:^{
         [realm createObject:StringObject.className withValue:@[@"string"]];
         [realm cancelWriteTransaction];
     }];
@@ -1537,7 +1537,7 @@
 
     [self dispatchAsync:^{
         RLMRealm *realm = RLMRealm.defaultRealm;
-        AsyncTransactionId asyncTransactionId = [realm beginAsyncWriteTransaction:^{
+        RLMAsyncTransactionId asyncTransactionId = [realm beginAsyncWriteTransaction:^{
             [realm createObject:StringObject.className withValue:@[@"string"]];
             [realm commitAsyncWriteTransaction];
             [asyncComplete fulfill];
@@ -1555,7 +1555,7 @@
     XCTestExpectation *asyncComplete = [self expectationWithDescription:@"async transaction complete"];
     asyncComplete.inverted = YES;
 
-    AsyncTransactionId asyncTransactionId = [realm asyncTransactionWithBlock:^{
+    RLMAsyncTransactionId asyncTransactionId = [realm asyncTransactionWithBlock:^{
         [realm createObject:StringObject.className withValue:@[@"string 1"]];
     } onComplete:^{
         [asyncComplete fulfill];
@@ -1820,7 +1820,7 @@
         [realm commitAsyncWriteTransaction];
     }];
 
-    AsyncTransactionId asyncTransactionIdA = [realm beginAsyncWriteTransaction:^{
+    RLMAsyncTransactionId asyncTransactionIdA = [realm beginAsyncWriteTransaction:^{
         [StringObject createInRealm:realm withValue:@[@"string"]];
         [expectation fulfill];
         [realm cancelAsyncTransaction:asyncTransactionIdA];
@@ -1832,7 +1832,7 @@
         [realm commitAsyncWriteTransaction];
     }];
 
-    AsyncTransactionId asyncTransactionIdB = [realm beginAsyncWriteTransaction:^{
+    RLMAsyncTransactionId asyncTransactionIdB = [realm beginAsyncWriteTransaction:^{
         [StringObject createInRealm:realm withValue:@[@"string"]];
         [expectation fulfill];
     }];
@@ -1861,18 +1861,18 @@
     [realm beginAsyncWriteTransaction:^{
         [StringObject createInRealm:realm withValue:@[@"cancel after commit should commit"]];
         [expectation fulfill];
-        AsyncTransactionId asyncTransactionId = [realm commitAsyncWriteTransaction];
+        RLMAsyncTransactionId asyncTransactionId = [realm commitAsyncWriteTransaction];
         [realm cancelAsyncTransaction:asyncTransactionId];
     }];
 
-    AsyncTransactionId asyncTransactionIdA = [realm beginAsyncWriteTransaction:^{
+    RLMAsyncTransactionId asyncTransactionIdA = [realm beginAsyncWriteTransaction:^{
         [StringObject createInRealm:realm withValue:@[@"commit after cancel should not commit"]];
         [expectation fulfill];
         [realm cancelAsyncTransaction:asyncTransactionIdA];
         [realm commitAsyncWriteTransaction];
     }];
 
-    AsyncTransactionId asyncTransactionIdB = [realm beginAsyncWriteTransaction:^{
+    RLMAsyncTransactionId asyncTransactionIdB = [realm beginAsyncWriteTransaction:^{
         [StringObject createInRealm:realm withValue:@[@"cancel should not commit"]];
         [expectation fulfill];
         [realm commitAsyncWriteTransaction];
@@ -1890,9 +1890,9 @@
         [PrimaryStringObject createInRealm:realm withValue:@[@"pk", @1]];
     }];
     
-    AsyncTransactionId transactionId = 0;
+    RLMAsyncTransactionId transactionId = 0;
     
-    [realm setAsyncErrorHandler:^(AsyncTransactionId asyncErrorHandler, NSError *error) {
+    [realm setAsyncErrorHandler:^(RLMAsyncTransactionId asyncErrorHandler, NSError *error) {
         XCTAssertEqual(asyncErrorHandler, transactionId);
         [asyncComplete fulfill];
     }];
