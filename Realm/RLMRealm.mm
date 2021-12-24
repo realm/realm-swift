@@ -712,6 +712,25 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     return _realm->is_in_async_transaction();
 }
 
+- (void)setAsyncErrorHandler:(nullable RLMRealmAsyncErrorHandler)block {
+    if (block == nil) {
+        _realm->set_async_error_handler(nil);
+    }
+    else {
+        _realm->set_async_error_handler(^(RLMAsyncTransactionId asyncTransactionId, std::exception_ptr err) {
+            @autoreleasepool {
+                try {
+                    rethrow_exception(err);
+                } catch (...) {
+                    NSError *error = nil;
+                    RLMRealmTranslateException(&error);
+                    block(asyncTransactionId, error);
+                }
+            }
+        });
+    }
+}
+
 - (AsyncTransactionId)beginAsyncWriteTransaction:(void(^)())block {
     return _realm->async_begin_transaction(block);
 }
