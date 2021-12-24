@@ -145,7 +145,7 @@ RLMMigrationBlock migrationBlock = ^(RLMMigration *migration, uint64_t oldSchema
         // This branch is only relevant for version 2. If we are migration from a previous
         // version, we would not be able to access `dogs` since they did not exist back there.
         // Migration from v0 and v1 to v3 is done in the previous blocks.
-        // Related issue: https://github.com/realm/realm-cocoa/issues/6263
+        // Related issue: https://github.com/realm/realm-swift/issues/6263
         [migration enumerateObjects:Person.className block:^(RLMObject *oldObject, RLMObject *newObject) {
             RLMArray<Pet *><Pet> *pets = newObject[@"pets"];
             for (RLMObject *dog in oldObject[@"dogs"]) {
@@ -155,7 +155,7 @@ RLMMigrationBlock migrationBlock = ^(RLMMigration *migration, uint64_t oldSchema
         }];
         // We migrate over the old dog list to make sure all dogs get added, even those without
         // an owner.
-        // Related issue: https://github.com/realm/realm-cocoa/issues/6734
+        // Related issue: https://github.com/realm/realm-swift/issues/6734
         [migration enumerateObjects:@"Dog" block:^(RLMObject *oldDogObject, RLMObject *newDogObject) {
             __block bool dogFound = false;
             [migration enumerateObjects:Person.className block:^(RLMObject *oldObject, RLMObject *newObject) {
@@ -171,7 +171,7 @@ RLMMigrationBlock migrationBlock = ^(RLMMigration *migration, uint64_t oldSchema
             }
         }];
         // The data cannot be deleted just yet since the table is target of cross-table link columns.
-        // See https://github.com/realm/realm-cocoa/issues/3686
+        // See https://github.com/realm/realm-swift/issues/3686
         // [migration deleteDataForClassName:@"Dog"];
     }
     if (oldSchemaVersion < 4) {

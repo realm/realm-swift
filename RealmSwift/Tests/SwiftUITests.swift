@@ -36,7 +36,7 @@ class SwiftUIObject: Object, ObjectKeyIdentifiable {
     }
 }
 
-class UIElementsProjection: Projection<SwiftUIObject> {
+class UIElementsProjection: Projection<SwiftUIObject>, ObjectKeyIdentifiable {
     @Projected(\SwiftUIObject.str) var label
     @Projected(\SwiftUIObject.int) var counter
 }

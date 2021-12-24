@@ -1,6 +1,7 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
+* Add `metadata` property to `RLMUserProfile`/`UserProfile`.
 * Add class `Projection` to allow creation of light weight view models out of Realm Objects.  
 ```swift
 public class Person: Object {
@@ -19,7 +20,7 @@ class PersonProjection: Projection<Person> {
     // `Person.firstName` will have same name and type
     @Projected(\Person.firstName) var firstName
     // There will be the only String for `city` of the original object `Address`
-    @Projected(\Person.address.city) var homeCity 
+    @Projected(\Person.address.city) var homeCity
     // List<Person> will be mapped to list of firstNames
     @Projected(\Person.friends.projectTo.firstName) var firstFriendsName: ProjectedCollection<String>
 }
@@ -42,17 +43,27 @@ let people: Results<PersonProjection> = realm.objects(PersonProjection.self)
   dictionaries (e.g. "dictProperty.@allValues.name CONTAINS 'a'").
 * Improve the error message for many types of invalid predicates in queries.
 * Add support for comparing `@allKeys` to another property on the same object.
+* Add `Numeric` conformance to `Decimal128`.
+* Make some invalid property declarations such as `List<AnyRealmValue?>` a
+  compile-time error instead of a runtime error.
+* Calling `.sorted(byKeyPath:)` on a collection with an Element type which does
+  not support sorting by keypaths is now a compile-time error instead of a
+  runtime error.
+* `RealmCollection.sorted(ascending:)` can now be called on all
+  non-Object/EmbeddedObject collections rather than only ones where the
+  `Element` conforms to `Comparable`.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
-* None.
-* Add missing `Indexable` support for UUID. 
-  ([Cocoa #7545](https://github.com/realm/realm-cocoa/issues/7545), since v10.10.0)
+* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
+* Add missing `Indexable` support for UUID.
+  ([Cocoa #7545](https://github.com/realm/realm-swift/issues/7545), since v10.10.0)
 * `where()` allowed constructing some nonsensical queries due to boolean comparisons returning `Query<T>` rather than `Query<Bool>`.
 * `@allValues` queries on dictionaries accidentally did not require "ANY".
 * Case-insensitive and diacritic-insensitive modifiers were ignored when
   comparing the result of an aggregate operation to another property in a
   query.
+* `Object.init(value:)` did not allow initializing `RLMDictionary<NSString, RLMObject>`/`Map<String, Object?>`
+  properties with null values for map entries (since v10.8.0).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
@@ -74,7 +85,7 @@ Xcode 12.4 is now the minimum supported version of Xcode.
 ### Fixed
 
 * Add missing `Indexable` support for UUID.
-  ([Cocoa #7545](https://github.com/realm/realm-cocoa/issues/7545), since v10.10.0)
+  ([Cocoa #7545](https://github.com/realm/realm-swift/issues/7545), since v10.10.0)
 
 ### Breaking Changes
 
@@ -175,7 +186,7 @@ Xcode 12.4 is now the minimum supported version of Xcode.
     ($0.pets.age >= 2) && $0.pets.name.starts(with: "L")
   }
   ```
-  ([#7419](https://github.com/realm/realm-cocoa/pull/7419))
+  ([#7419](https://github.com/realm/realm-swift/pull/7419))
 * Add support for dictionary subscript expressions
   (e.g. `"phoneNumbers['Jane'] == '123-3456-123'"`) when querying with an
   NSPredicate.
@@ -193,7 +204,7 @@ Xcode 12.4 is now the minimum supported version of Xcode.
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 * Restore the pre-v10.12.0 behavior of calling `writeCopy()` on a synchronized
   Realm which produced a local non-synchronized Realm
-  ([#7513](https://github.com/realm/realm-cocoa/issues/7513)).
+  ([#7513](https://github.com/realm/realm-swift/issues/7513)).
 * Decimal128 did not properly normalize the value before hashing and so could
   have multiple values which are equal but had different hash values (since v10.8.0).
 * Fix a rare assertion failure or deadlock when a sync session is racing to
@@ -208,12 +219,12 @@ Xcode 12.4 is now the minimum supported version of Xcode.
   after the open completed. ([Core #4919](https://github.com/realm/realm-core/issues/4919))
 * SecureTransport was not enabled for macCatalyst builds when installing via
   SPM, resulting in `'SSL/TLS protocol not supported'` exceptions when using
-  Realm Sync. ([#7474](https://github.com/realm/realm-cocoa/issues/7474))
+  Realm Sync. ([#7474](https://github.com/realm/realm-swift/issues/7474))
 * Users were left in the logged in state when their refresh token expired.
   ([Core #4882](https://github.com/realm/realm-core/issues/4882), since v10)
 * Calling `.count` on a distinct collection would return the total number of
   objects in the collection rather than the distinct count the first time it is
-  called. ([#7481](https://github.com/realm/realm-cocoa/issues/7481), since v10.8.0).
+  called. ([#7481](https://github.com/realm/realm-swift/issues/7481), since v10.8.0).
 * `realm.delete(collection.distinct(...))` would delete all objects in the
   collection rather than just the first object with each distinct value in the
   property being distincted on, unless the distinct Results were read from at
@@ -300,8 +311,8 @@ r `User.linkUser` methods.
 
 * A race condition in Realm.asyncOpen() sometimes resulted in subsequent writes
   from Realm Sync failing to produce notifications
-  ([#7447](https://github.com/realm/realm-cocoa/issues/7447),
-  [#7453](https://github.com/realm/realm-cocoa/issues/7453),
+  ([#7447](https://github.com/realm/realm-swift/issues/7447),
+  [#7453](https://github.com/realm/realm-swift/issues/7453),
   [Core #4909](https://github.com/realm/realm-core/issues/4909), since v10.15.0).
 
 ### Compatibility
@@ -362,9 +373,9 @@ r `User.linkUser` methods.
   observers to a Realm"`.
 * The `RealmCollectionChange` docs refered to indicies in modifications as the
   'new' collection. This is incorrect and the docs now state that modifications
-  refer to the previous version of the collection. ([Cocoa #7390](https://github.com/realm/realm-cocoa/issues/7390))
+  refer to the previous version of the collection. ([Cocoa #7390](https://github.com/realm/realm-swift/issues/7390))
 * Fix crash in `RLMSyncConfiguration.initWithUser` error mapping when a user is disabled/deleted from MongoDB Realm dashboard.
-  ([Cocoa #7399](https://github.com/realm/realm-cocoa/issues/7399), since v10.0.0)
+  ([Cocoa #7399](https://github.com/realm/realm-swift/issues/7399), since v10.0.0)
 * If the application crashed at the wrong point when logging a user in, the
   next run of the application could hit the assertion failure "m_state ==
   SyncUser::State::LoggedIn" when a synchronized Realm is opened with that
@@ -397,7 +408,7 @@ r `User.linkUser` methods.
 ### Fixed
 
 * `Map<Key, Value>` did not conform to `Codable`.
-  ([Cocoa #7418](https://github.com/realm/realm-cocoa/pull/7418), since v10.8.0)
+  ([Cocoa #7418](https://github.com/realm/realm-swift/pull/7418), since v10.8.0)
 * Fixed "Invalid data type" assertion failure in the sync client when the
   client recieved an AddColumn instruction from the server for an AnyRealmValue
   property when that property already exists locally. ([Core #4873](https://github.com/realm/realm-core/issues/4873), since v10.8.0)
@@ -422,18 +433,18 @@ r `User.linkUser` methods.
 * Sync logs now contain information about what object/changeset was being applied when the exception was thrown. 
   ([Core #4836](https://github.com/realm/realm-core/issues/4836))
 * Added ServiceErrorCode for wrong username/password when using '`App.login`. 
-  ([Core #7380](https://github.com/realm/realm-cocoa/issues/7380)
+  ([Core #7380](https://github.com/realm/realm-swift/issues/7380)
 
 ### Fixed
 
 * Fix crash in `MongoCollection.findOneDocument(filter:)` that occurred when no results were
   found for a given filter. 
-  ([Cocoa #7380](https://github.com/realm/realm-cocoa/issues/7380), since v10.0.0)
+  ([Cocoa #7380](https://github.com/realm/realm-swift/issues/7380), since v10.0.0)
 * Some of the SwiftUI property wrappers incorrectly required objects to conform
   to ObjectKeyIdentifiable rather than Identifiable.
-  ([Cocoa #7372](https://github.com/realm/realm-cocoa/issues/7372), since v10.6.0)
+  ([Cocoa #7372](https://github.com/realm/realm-swift/issues/7372), since v10.6.0)
 * Work around Xcode 13 beta 3+ shipping a broken swiftinterface file for Combine on 32-bit iOS.
-  ([Cocoa #7368](https://github.com/realm/realm-cocoa/issues/7368))
+  ([Cocoa #7368](https://github.com/realm/realm-swift/issues/7368))
 * Fixes history corruption when replacing an embedded object in a list.
   ([Core #4845](https://github.com/realm/realm-core/issues/4845)), since v10.0.0)
 
@@ -479,9 +490,9 @@ r `User.linkUser` methods.
   for the user sync configuration.
 * Decoding a `@Persisted` property would incorrectly throw a `DecodingError.keyNotFound`
   for an optional property if the key is missing.
-  ([Cocoa #7358](https://github.com/realm/realm-cocoa/issues/7358), since v10.10.0)
+  ([Cocoa #7358](https://github.com/realm/realm-swift/issues/7358), since v10.10.0)
 * Fixed a symlink which prevented Realm from building on case sensitive file systems.
-  ([#7344](https://github.com/realm/realm-cocoa/issues/7344), since v10.8.0)
+  ([#7344](https://github.com/realm/realm-swift/issues/7344), since v10.8.0)
 * Removing a change callback from a Results would sometimes block the calling
   thread while the query for that Results was running on the background worker
   thread (since v10.11.0).
@@ -545,7 +556,7 @@ r `User.linkUser` methods.
   persons.distinct(by: [\Person.age])
   ```
 * Add `List.objects(at indexes:)` in Swift and `[RLMCollection objectsAtIndexes:]` in Objective-C.
-  This allows you to select elements in a collection with a given IndexSet ([#7298](https://github.com/realm/realm-cocoa/issues/7298)).
+  This allows you to select elements in a collection with a given IndexSet ([#7298](https://github.com/realm/realm-swift/issues/7298)).
 * Add `App.emailPasswordAuth.retryCustomConfirmation(email:completion:)` and `[App.emailPasswordAuth retryCustomConfirmation:completion:]`.
   These functions support retrying a [custom confirmation](https://docs.mongodb.com/realm/authentication/email-password/#run-a-confirmation-function) function.
 * Improve performance of creating collection notifiers for Realms with a complex schema.
@@ -558,9 +569,9 @@ r `User.linkUser` methods.
 ### Fixed
 
 * `RealmProperty<T?>` would crash when decoding a `null` json value.
-  ([Cocoa #7323](https://github.com/realm/realm-cocoa/issues/7323), since v10.8.0)
+  ([Cocoa #7323](https://github.com/realm/realm-swift/issues/7323), since v10.8.0)
 * `@Persisted<T?>` would crash when decoding a `null` value.
-  ([#7332](https://github.com/realm/realm-cocoa/issues/7332), since v10.10.0).
+  ([#7332](https://github.com/realm/realm-swift/issues/7332), since v10.10.0).
 * Fixed an issue where `Realm.Configuration` would be set after views have been laid out
   when using `.environment(\.realmConfiguration, ...)` in SwiftUI. This would cause issues if you are
   required to bump your schema version and are using `@ObservedResults`.
@@ -708,10 +719,10 @@ r `User.linkUser` methods.
 
 * Importing the Realm swift package produced several warnings about excluded
   files not existing. Note that one warning will still remain after this change.
-  ([#7295](https://github.com/realm/realm-cocoa/issues/7295), since v10.8.0).
+  ([#7295](https://github.com/realm/realm-swift/issues/7295), since v10.8.0).
 * Update the root URL for the API docs so that the links go to the place where
   new versions of the docs are being published.
-  ([#7299](https://github.com/realm/realm-cocoa/issues/7299), since v10.6.0).
+  ([#7299](https://github.com/realm/realm-swift/issues/7299), since v10.6.0).
 
 ### Compatibility
 
@@ -859,7 +870,7 @@ Xcode 12.2 is now the minimum supported version.
 * Fix a runtime crash which happens in some Xcode version (Xcode < 12, reported
   in Xcode 12.5), where SwiftUI is not weak linked by default. This fix only
   works for Cocoapods projects.
-  ([#7234](https://github.com/realm/realm-cocoa/issues/7234)
+  ([#7234](https://github.com/realm/realm-swift/issues/7234)
 * Fix warnings when building with Xcode 13 beta 1.
 
 ### Compatibility
@@ -882,7 +893,7 @@ Xcode 12.2 is now the minimum supported version.
 
 * Fix an availability warning when building Realm. The code path which gave the
   warning can not currently be hit, so this did not cause any runtime problems
-  ([#7219](https://github.com/realm/realm-cocoa/issues/7219), since 10.7.3).
+  ([#7219](https://github.com/realm/realm-swift/issues/7219), since 10.7.3).
 * Proactively check the expiry time on the access token and refresh it before
   attempting to initiate a sync session. This prevents some error logs from
   appearing on the client such as: "ERROR: Connection[1]: Websocket: Expected
@@ -909,7 +920,7 @@ Xcode 12.2 is now the minimum supported version.
   discarded but no data being lost.
   [Core #4285](https://github.com/realm/realm-core/pull/4285)
 * Thread-safe references can now be created for read-only Realms.
-  ([#5475](https://github.com/realm/realm-cocoa/issues/5475)).
+  ([#5475](https://github.com/realm/realm-swift/issues/5475)).
 
 ### Compatibility
 
@@ -929,7 +940,7 @@ Xcode 12.2 is now the minimum supported version.
 
 * Iterating over frozen collections on multiple threads at the same time could
   throw a "count underflow" NSInternalInconsistencyException.
-  ([#7237](https://github.com/realm/realm-cocoa/issues/7237), since v5.0.0).
+  ([#7237](https://github.com/realm/realm-swift/issues/7237), since v5.0.0).
 
 ### Compatibility
 
@@ -948,7 +959,7 @@ Xcode 12.2 is now the minimum supported version.
 ### Fixed
 
 * Add the Info.plist file to the XCFrameworks in the Carthage xcframwork
-  package ([#7216](https://github.com/realm/realm-cocoa/issues/7216), since 10.7.3).
+  package ([#7216](https://github.com/realm/realm-swift/issues/7216), since 10.7.3).
 
 ### Compatibility
 
@@ -983,19 +994,19 @@ Xcode 12.2 is now the minimum supported version.
 
 * Adjust the header paths for the podspec to avoid accidentally finding a file
   which isn't part of the pod that produced warnings when importing the
-  framework. ([#7113](https://github.com/realm/realm-cocoa/issues/7113), since 10.5.2).
+  framework. ([#7113](https://github.com/realm/realm-swift/issues/7113), since 10.5.2).
 * Fixed a crash that would occur when observing unmanaged Objects in multiple
   views in SwiftUI. When using `@StateRealmObject` or `@ObservedObject` across
   multiple views with an unmanaged object, each view would subscribe to the
   object. As each view unsubscribed (generally when trailing back through the
   view stack), our propertyWrappers would attempt to remove the KVOs for each
   cancellation, when it should only be done once. We now correctly remove KVOs
-  only once. ([#7131](https://github.com/realm/realm-cocoa/issues/7131))
+  only once. ([#7131](https://github.com/realm/realm-swift/issues/7131))
 * Fixed `isInvalidated` not returning correct value after object deletion from
   Realm when using a custom schema. The object's Object Schema was not updated
   when the object was added to the realm. We now correctly update the object
   schema when adding it to the realm.
-  ([#7181](https://github.com/realm/realm-cocoa/issues/7181))
+  ([#7181](https://github.com/realm/realm-swift/issues/7181))
 * Syncing large Decimal128 values would cause "Assertion failed: cx.w[1] == 0"
   ([Core #4519](https://github.com/realm/realm-core/issues/4519), since v10.0.0).
 * Potential/unconfirmed fix for crashes associated with failure to memory map
@@ -1006,7 +1017,7 @@ Xcode 12.2 is now the minimum supported version.
   writes inside change notification callbacks. Previously refreshing the Realm
   by beginning a write transaction would skip delivering notifications, leaving
   things in an inconsistent state. Notifications are now delivered recursively
-  when needed instead. ([Cocoa #7165](https://github.com/realm/realm-cocoa/issues/7165)).
+  when needed instead. ([Cocoa #7165](https://github.com/realm/realm-swift/issues/7165)).
 * Fix collection notification reporting for modifications. This could be
   observed by receiving the wrong indices of modifications on sorted or
   distinct results, or notification blocks sometimes not being called when only
@@ -1055,7 +1066,7 @@ Xcode 12.2 is now the minimum supported version.
   `c` did not have an index and did not if `c` was indexed. Both will now match
   to align with NSPredicate's behavior. ([Core #4460]https://github.com/realm/realm-core/pull/4460), since 4.3.0).
 * Restore support for upgrading files from file format 5 (Realm Cocoa 1.x).
-  ([Core #7089](https://github.com/realm/realm-cocoa/issues/7089), since v5.0.0)
+  ([Core #7089](https://github.com/realm/realm-swift/issues/7089), since v5.0.0)
 * On 32bit devices you may get exception with "No such object" when upgrading
   to v10.* ([Java #7314](https://github.com/realm/realm-java/issues/7314), since v5.0.0)
 * The notification worker thread would rerun queries after every commit rather
@@ -1065,7 +1076,7 @@ Xcode 12.2 is now the minimum supported version.
 * Fix "Invalid ref translation entry [16045690984833335023, 78187493520]"
   assertion failure which could occur when using sync or multiple processes
   writing to a single Realm file.
-  ([#7086](https://github.com/realm/realm-cocoa/issues/7086), since v5.0.0).
+  ([#7086](https://github.com/realm/realm-swift/issues/7086), since v5.0.0).
 
 ### Compatibility
 
@@ -1098,7 +1109,7 @@ Xcode 12.2 is now the minimum supported version.
   lists (such as "intArray.@sum > 100").
 * Performance of sorting on more than one property has been improved.
   Especially important if many elements match on the first property. Mitigates
-  ([#7092](https://github.com/realm/realm-cocoa/issues/7092))
+  ([#7092](https://github.com/realm/realm-swift/issues/7092))
 
 ### Fixed
 
@@ -1108,7 +1119,7 @@ Xcode 12.2 is now the minimum supported version.
   failure "!skip_version.version" if a write transaction was committed at a
   very specific time (since v10.5.0).
 * Added workaround for a case where upgrading an old file with illegal string
-  would crash ([#7111](https://github.com/realm/realm-cocoa/issues/7111))
+  would crash ([#7111](https://github.com/realm/realm-swift/issues/7111))
 * Fixed a conflict resolution bug related to the ArrayMove instruction, which
   could sometimes cause an "Invalid prior_size" exception to prevent
   synchronization (since v10.5.0).
@@ -1165,7 +1176,7 @@ Xcode 12.2 is now the minimum supported version.
   `realm.object(ClasSName.self)` with no filter/sort/etc.) would give incorrect
   results if the Results was constructed and accessed before creating a new
   object with a primary key less than the smallest primary key which previously
-  existed. ([#7014](https://github.com/realm/realm-cocoa/issues/7014), since v5.0.0).
+  existed. ([#7014](https://github.com/realm/realm-swift/issues/7014), since v5.0.0).
 * During synchronization you might experience crash with
   "Assertion failed: ref + size <= next->first".
   ([Core #4388](https://github.com/realm/realm-core/issues/4388))
@@ -1198,7 +1209,7 @@ Xcode 12.2 is now the minimum supported version.
 * Inserting a date into a synced collection via `AnyBSON.datetime(...)` would
   be of type `Timestamp` and not `Date`. This could break synced objects with a
   `Date` property.
-  ([#6654](https://github.com/realm/realm-cocoa/issues/6654), since v10.0.0).
+  ([#6654](https://github.com/realm/realm-swift/issues/6654), since v10.0.0).
 * Fixed an issue where creating an object after file format upgrade may fail
   with assertion "Assertion failed: lo() <= std::numeric_limits<uint32_t>::max()"
   ([#4295](https://github.com/realm/realm-core/issues/4295), since v5.0.0)
@@ -1208,7 +1219,7 @@ Xcode 12.2 is now the minimum supported version.
   occuring with a poor connection. ([#4188](https://github.com/realm/realm-core/issues/4188))
 * Limit availability of ObjectKeyIdentifiable to platforms which support
   Combine to match the change made in the Xcode 12.5 SDK.
-  ([#7083](https://github.com/realm/realm-cocoa/issues/7083))
+  ([#7083](https://github.com/realm/realm-swift/issues/7083))
 
 ### Compatibility
 
@@ -1297,7 +1308,7 @@ Xcode 12.2 is now the minimum supported version.
 
 * Add Combine support for App and User. These two types now have a
   `objectWillChange` property that emits each time the state of the object has
-  changed (such as due to the user logging in or out). ([PR #6977](https://github.com/realm/realm-cocoa/pull/6977)).
+  changed (such as due to the user logging in or out). ([PR #6977](https://github.com/realm/realm-swift/pull/6977)).
 
 ### Fixed
 
@@ -1306,7 +1317,7 @@ Xcode 12.2 is now the minimum supported version.
   when creating an object with a primary key which previously had been used and
   had incoming links. ([Core PR #4180](https://github.com/realm/realm-core/pull/4180), since v10.0.0).
 * The arm64 simulator slices were not actually included in the XCFramework
-  release package. ([PR #6982](https://github.com/realm/realm-cocoa/pull/6982), since v10.2.0).
+  release package. ([PR #6982](https://github.com/realm/realm-swift/pull/6982), since v10.2.0).
 
 ### Compatibility
 
@@ -1406,7 +1417,7 @@ Xcode 12.2 is now the minimum supported version.
 * Disallow setting
   `RLMRealmConfiguration.deleteRealmIfMigrationNeeded`/`Realm.Config.deleteRealmIfMigrationNeeded`
   when sync is enabled. This did not actually work as it does not delete the
-  relevant server state and broke in confusing ways ([PR #6931](https://github.com/realm/realm-cocoa/pull/6931)).
+  relevant server state and broke in confusing ways ([PR #6931](https://github.com/realm/realm-swift/pull/6931)).
 
 ### Compatibility
 
@@ -1428,9 +1439,9 @@ Xcode 12.2 is now the minimum supported version.
 * One of the Swift packages did not have the minimum deployment target set,
   resulting in errors when archiving an app which imported Realm via SPM.
 * Reenable filelock emulation on watchOS so that the OS does not kill the app
-  when it is suspended while a Realm is open on watchOS 7 ([#6861](https://github.com/realm/realm-cocoa/issues/6861), since v5.4.8
+  when it is suspended while a Realm is open on watchOS 7 ([#6861](https://github.com/realm/realm-swift/issues/6861), since v5.4.8
 * Fix crash in case insensitive query on indexed string columns when nothing
-  matches ([#6836](https://github.com/realm/realm-cocoa/issues/6836), since v5.0.0).
+  matches ([#6836](https://github.com/realm/realm-swift/issues/6836), since v5.0.0).
 * Null values in a `List<Float?>` or `List<Double?>` were incorrectly treated
   as non-null in some places. It is unknown if this caused any functional
   problems when using the public API. ([Core PR #3987](https://github.com/realm/realm-core/pull/3987), since v5.0.0).
@@ -1455,12 +1466,12 @@ Xcode 12.2 is now the minimum supported version.
 ### Enhancements
 
 * Set the minimum CocoaPods version in the podspec so that trying to install
-  with older versions gives a more useful error ([PR #6892](https://github.com/realm/realm-cocoa/pull/6892)).
+  with older versions gives a more useful error ([PR #6892](https://github.com/realm/realm-swift/pull/6892)).
 
 ### Fixed
 
 * Embedded objects could not be marked as `ObjectKeyIdentifable`
-  ([PR #6890](https://github.com/realm/realm-cocoa/pull/6890), since v10.0.0).
+  ([PR #6890](https://github.com/realm/realm-swift/pull/6890), since v10.0.0).
 
 ### Compatibility
 
@@ -1516,11 +1527,11 @@ read by versions older than v10.0.0.
   MongoDB Realm is built on top of MongoDB Atlas, automatically integrating the
   connection to your database.
 * Remove support for Query-based sync, including the configuration parameters
-  and the `RLMSyncSubscription` and `SyncSubscription` types ([#6437](https://github.com/realm/realm-cocoa/pull/6437)).
+  and the `RLMSyncSubscription` and `SyncSubscription` types ([#6437](https://github.com/realm/realm-swift/pull/6437)).
 * Remove everything related to sync permissions, including both the path-based
   permission system and the object-level privileges for query-based sync.
   Permissions are now configured via MongoDB Atlas.
-  ([#6445](https://github.com/realm/realm-cocoa/pulls/6445))
+  ([#6445](https://github.com/realm/realm-swift/pulls/6445))
 * Remove support for Realm Object Server.
 * Non-embedded objects in synchronized Realms must always have a primary key
   named "_id".
@@ -1536,10 +1547,10 @@ read by versions older than v10.0.0.
   opening very large files.
 * Add support for the ObjectId data type. This is an automatically-generated
   unique identifier similar to a GUID or a UUID.
-  ([PR #6450](https://github.com/realm/realm-cocoa/pull/6450)).
+  ([PR #6450](https://github.com/realm/realm-swift/pull/6450)).
 * Add support for the Decimal128 data type. This is a 128-bit IEEE 754 decimal
   floating point number similar to NSDecimalNumber.
-  ([PR #6450](https://github.com/realm/realm-cocoa/pull/6450)).
+  ([PR #6450](https://github.com/realm/realm-swift/pull/6450)).
 * Add support for embedded objects. Embedded objects are objects which are
   owned by a single parent object, and are deleted when that parent object is
   deleted. They are defined by subclassing `EmbeddedObject` /
@@ -1651,11 +1662,11 @@ This release also contains the following changes from 5.4.7 - 5.5.0
   supplied observation blocks would not be skipped when in a write transaction.
   ([Object Store #1103](https://github.com/realm/realm-object-store/pull/1103))
 * Comparing two identical unmanaged `List<>`/`RLMArray` objects would fail.
-  ([#5665](https://github.com/realm/realm-cocoa/issues/5665)).
+  ([#5665](https://github.com/realm/realm-swift/issues/5665)).
 * Case-insensitive equality queries on indexed string properties failed to
   clear some internal state when rerunning the query. This could manifest as
   duplicate results or "key not found" errors.
-  ([#6830](https://github.com/realm/realm-cocoa/issues/6830), [#6694](https://github.com/realm/realm-cocoa/issues/6694), since 5.0.0).
+  ([#6830](https://github.com/realm/realm-swift/issues/6830), [#6694](https://github.com/realm/realm-swift/issues/6694), since 5.0.0).
 * Equality queries on indexed string properties would sometimes throw "key not
   found" exceptions if the hash of the string happened to have bit 62 set.
   ([.NET #2025](https://github.com/realm/realm-dotnet/issues/2025), since v5.0.0).
@@ -1739,41 +1750,41 @@ This release also contains the following changes from 5.4.0 - 5.4.6:
 
 * Upgrading pre-5.x files with string primary keys would result in a file where
   `realm.object(ofType:forPrimaryKey:)` would fail to find the object.
-  ([#6716](https://github.com/realm/realm-cocoa/issues/6716), since 5.2.0)
+  ([#6716](https://github.com/realm/realm-swift/issues/6716), since 5.2.0)
 * A write transaction which modifies an object with more than 16 managed
   properties and causes the Realm file to grow larger than 2 GB could cause an
   assertion failure mentioning "m_has_refs". ([JS #3194](https://github.com/realm/realm-js/issues/3194), since 5.0.0).
 * Objects with more than 32 properties could corrupt the Realm file and result
   in a variety of crashes. ([Java #7057](https://github.com/realm/realm-java/issues/7057), since 5.0.0).
 * Fix deadlocks when opening a Realm file in both the iOS simulator and Realm
-  Studio ([#6743](https://github.com/realm/realm-cocoa/issues/6743), since 5.3.6).
+  Studio ([#6743](https://github.com/realm/realm-swift/issues/6743), since 5.3.6).
 * Fix Springboard deadlocking when an app is unsuspended while it has an open
   Realm file which is stored in an app group on iOS 10-12
-  ([#6749](https://github.com/realm/realm-cocoa/issues/6749), since 5.3.6).
+  ([#6749](https://github.com/realm/realm-swift/issues/6749), since 5.3.6).
 * If you use encryption your application cound crash with a message like
   "Opening Realm files of format version 0 is not supported by this version of
   Realm". ([#6889](https://github.com/realm/realm-java/issues/6889) among others, since 5.0.0)
 * Confining a Realm to a serial queue would throw an error claiming that the
   queue was not a serial queue on iOS versions older than 12.
-  ([#6735](https://github.com/realm/realm-cocoa/issues/6735), since 5.0.0).
+  ([#6735](https://github.com/realm/realm-swift/issues/6735), since 5.0.0).
 * Results would sometimes give stale results inside a write transaction if a
   write which should have updated the Results was made before the first access
   of a pre-existing Results object.
-  ([#6721](https://github.com/realm/realm-cocoa/issues/6721), since 5.0.0)
+  ([#6721](https://github.com/realm/realm-swift/issues/6721), since 5.0.0)
 * Fix Archiving the Realm and RealmSwift frameworks with Xcode 12.
-  ([#6774](https://github.com/realm/realm-cocoa/issues/6774))
-* Fix compilation via Carthage when using Xcode 12 ([#6717](https://github.com/realm/realm-cocoa/issues/6717)).
+  ([#6774](https://github.com/realm/realm-swift/issues/6774))
+* Fix compilation via Carthage when using Xcode 12 ([#6717](https://github.com/realm/realm-swift/issues/6717)).
 * Fix a crash inside `realm::Array(Type)::init_from_mem()` which would
   sometimes occur when running a query over links immediately after creating
   objects of the queried type.
-  ([#6789](https://github.com/realm/realm-cocoa/issues/6789) and possibly others, since 5.0.0).
+  ([#6789](https://github.com/realm/realm-swift/issues/6789) and possibly others, since 5.0.0).
 * Possibly fix problems when changing the type of the primary key of an object
   from optional to non-optional.
 * Rerunning a equality query on an indexed string property would give incorrect
   results if a previous run of the query matched multiple objects and it now
   matches one object. This could manifest as either finding a non-matching
   object or a "key not found" exception being thrown.
-  ([#6536](https://github.com/realm/realm-cocoa/issues/6536), since 5.0.0).
+  ([#6536](https://github.com/realm/realm-swift/issues/6536), since 5.0.0).
 
 ### Compatibility
 
@@ -1972,10 +1983,10 @@ later will be able to open the new file format.
   opening very large files.
 * Add support for the ObjectId data type. This is an automatically-generated
   unique identifier similar to a GUID or a UUID.
-  ([PR #6450](https://github.com/realm/realm-cocoa/pull/6450)).
+  ([PR #6450](https://github.com/realm/realm-swift/pull/6450)).
 * Add support for the Decimal128 data type. This is a 128-bit IEEE 754 decimal
   floating point number similar to NSDecimalNumber.
-  ([PR #6450](https://github.com/realm/realm-cocoa/pull/6450)).
+  ([PR #6450](https://github.com/realm/realm-swift/pull/6450)).
 * Add support for embedded objects. Embedded objects are objects which are
   owned by a single parent object, and are deleted when that parent object is
   deleted. They are defined by subclassing `EmbeddedObject` /
@@ -2019,12 +2030,12 @@ later will be able to open the new file format.
   MongoDB Realm is built on top of MongoDB Atlas, automatically integrating the
   connection to your database.
 * Remove support for Query-based sync, including the configuration parameters
-  and the `RLMSyncSubscription` and `SyncSubscription` types ([#6437](https://github.com/realm/realm-cocoa/pull/6437)).
+  and the `RLMSyncSubscription` and `SyncSubscription` types ([#6437](https://github.com/realm/realm-swift/pull/6437)).
 * Primary key properties are no longer marked as being indexed. This reflects
   an internal change to how primary keys are handled that should not have any
-  other visible effects. ([#6440](https://github.com/realm/realm-cocoa/pull/6440)).
+  other visible effects. ([#6440](https://github.com/realm/realm-swift/pull/6440)).
 * Remove everything related to sync permissions, including both the path-based
-  permission system and the object-level privileges for query-based sync. ([#6445](https://github.com/realm/realm-cocoa/pulls/6445))
+  permission system and the object-level privileges for query-based sync. ([#6445](https://github.com/realm/realm-swift/pulls/6445))
 * Primary key uniqueness is now enforced when creating new objects during
   migrations, rather than only at the end of migrations. Previously new objects
   could be created with duplicate primary keys during a migration as long as
@@ -2059,7 +2070,7 @@ later will be able to open the new file format.
   supplied observation blocks would not be skipped when in a write transaction.
   ([Object Store #1103](https://github.com/realm/realm-object-store/pull/1103))
 * Comparing two identical unmanaged `List<>`/`RLMArray` objects would fail.
-  ([#5665](https://github.com/realm/realm-cocoa/issues/5665)).
+  ([#5665](https://github.com/realm/realm-swift/issues/5665)).
 
 ### Compatibility
 
@@ -2077,7 +2088,7 @@ later will be able to open the new file format.
 * Case-insensitive equality queries on indexed string properties failed to
   clear some internal state when rerunning the query. This could manifest as
   duplicate results or "key not found" errors.
-  ([#6830](https://github.com/realm/realm-cocoa/issues/6830), [#6694](https://github.com/realm/realm-cocoa/issues/6694), since 5.0.0).
+  ([#6830](https://github.com/realm/realm-swift/issues/6830), [#6694](https://github.com/realm/realm-swift/issues/6694), since 5.0.0).
 
 ### Compatibility
 
@@ -2149,7 +2160,7 @@ non-SPM installation methods.
   results if a previous run of the query matched multiple objects and it now
   matches one object. This could manifest as either finding a non-matching
   object or a "key not found" exception being thrown.
-  ([#6536](https://github.com/realm/realm-cocoa/issues/6536), since 5.0.0).
+  ([#6536](https://github.com/realm/realm-swift/issues/6536), since 5.0.0).
 
 ### Compatibility
 
@@ -2176,7 +2187,7 @@ non-SPM installation methods.
 * Fix a crash inside `realm::Array(Type)::init_from_mem()` which would
   sometimes occur when running a query over links immediately after creating
   objects of the queried type.
-  ([#6789](https://github.com/realm/realm-cocoa/issues/6789) and possibly others, since 5.0.0).
+  ([#6789](https://github.com/realm/realm-swift/issues/6789) and possibly others, since 5.0.0).
 * Possibly fix problems when changing the type of the primary key of an object
   from optional to non-optional.
 
@@ -2198,7 +2209,7 @@ non-SPM installation methods.
 
 ### Fixed
 
-* Fix compilation via Carthage when using Xcode 12 ([#6717](https://github.com/realm/realm-cocoa/issues/6717)).
+* Fix compilation via Carthage when using Xcode 12 ([#6717](https://github.com/realm/realm-swift/issues/6717)).
 
 ### Compatibility
 
@@ -2218,7 +2229,7 @@ non-SPM installation methods.
 ### Fixed
 
 * Fix Archiving the Realm and RealmSwift frameworks with Xcode 12.
-  ([#6774](https://github.com/realm/realm-cocoa/issues/6774))
+  ([#6774](https://github.com/realm/realm-swift/issues/6774))
 
 ### Compatibility
 
@@ -2238,20 +2249,20 @@ non-SPM installation methods.
 ### Fixed
 
 * Fix deadlocks when opening a Realm file in both the iOS simulator and Realm
-  Studio ([#6743](https://github.com/realm/realm-cocoa/issues/6743), since 5.3.6).
+  Studio ([#6743](https://github.com/realm/realm-swift/issues/6743), since 5.3.6).
 * Fix Springboard deadlocking when an app is unsuspended while it has an open
   Realm file which is stored in an app group on iOS 10-12
-  ([#6749](https://github.com/realm/realm-cocoa/issues/6749), since 5.3.6).
+  ([#6749](https://github.com/realm/realm-swift/issues/6749), since 5.3.6).
 * If you use encryption your application cound crash with a message like
   "Opening Realm files of format version 0 is not supported by this version of
   Realm". ([#6889](https://github.com/realm/realm-java/issues/6889) among others, since 5.0.0)
 * Confining a Realm to a serial queue would throw an error claiming that the
   queue was not a serial queue on iOS versions older than 12.
-  ([#6735](https://github.com/realm/realm-cocoa/issues/6735), since 5.0.0).
+  ([#6735](https://github.com/realm/realm-swift/issues/6735), since 5.0.0).
 * Results would sometimes give stale results inside a write transaction if a
   write which should have updated the Results was made before the first access
   of a pre-existing Results object.
-  ([#6721](https://github.com/realm/realm-cocoa/issues/6721), since 5.0.0)
+  ([#6721](https://github.com/realm/realm-swift/issues/6721), since 5.0.0)
 
 ### Compatibility
 
@@ -2279,7 +2290,7 @@ upgraded Realms.
 
 * Upgrading pre-5.x files with string primary keys would result in a file where
   `realm.object(ofType:forPrimaryKey:)` would fail to find the object.
-  ([#6716](https://github.com/realm/realm-cocoa/issues/6716), since 5.2.0)
+  ([#6716](https://github.com/realm/realm-swift/issues/6716), since 5.2.0)
 * A write transaction which modifies an object with more than 16 managed
   properties and causes the Realm file to grow larger than 2 GB could cause an
   assertion failure mentioning "m_has_refs". ([JS #3194](https://github.com/realm/realm-js/issues/3194), since 5.0.0).
@@ -2306,13 +2317,13 @@ upgraded Realms.
 
 * Work around iOS 14 no longer allowing the use of file locks in shared
   containers, which resulted in the OS killing an app which entered the
-  background while a Realm was open ([#6671](https://github.com/realm/realm-cocoa/issues/6671)).
+  background while a Realm was open ([#6671](https://github.com/realm/realm-swift/issues/6671)).
 * If an attempt to upgrade a realm has ended with a crash with "migrate_links()"
   in the call stack, the realm was left in an invalid state. The migration
   logic now handles this state and can complete upgrading files which were
   incompletely upgraded by pre-5.3.4 versions.
 * Fix deadlocks when writing to a Realm file on an exFAT partition from macOS.
-  ([#6691](https://github.com/realm/realm-cocoa/issues/6691)).
+  ([#6691](https://github.com/realm/realm-swift/issues/6691)).
 
 ### Compatibility
 
@@ -2335,9 +2346,9 @@ upgraded Realms.
 * Opening Realms on background threads could produce spurious Incorrect Thread
   exceptions when a cached Realm existed for a previously existing thread with
   the same thread ID as the current thread.
-  ([#6659](https://github.com/realm/realm-cocoa/issues/6659),
-  [#6689](https://github.com/realm/realm-cocoa/issues/6689),
-  [#6712](https://github.com/realm/realm-cocoa/issues/6712), since 5.0.0).
+  ([#6659](https://github.com/realm/realm-swift/issues/6659),
+  [#6689](https://github.com/realm/realm-swift/issues/6689),
+  [#6712](https://github.com/realm/realm-swift/issues/6712), since 5.0.0).
 * Upgrading a table with incoming links but no properties would crash. This was
   probably not possible to hit in practice as we reject object types with no
   properties.
@@ -2364,7 +2375,7 @@ upgraded Realms.
 ### Fixed
 
 * Accessing a Realm after calling `deleteAll()` would sometimes throw an
-  exception with the reason 'ConstIterator copy failed'. ([#6597](https://github.com/realm/realm-cocoa/issues/6597), since 5.0.0).
+  exception with the reason 'ConstIterator copy failed'. ([#6597](https://github.com/realm/realm-swift/issues/6597), since 5.0.0).
 * Fix an assertion failure inside the `migrate_links()` function when upgrading
   a pre-5.0 Realm file.
 * Fix a bug in memory mapping management. This bug could result in multiple
@@ -2399,9 +2410,9 @@ upgraded Realms.
 * (RLM)Results objects would incorrectly pin old read transaction versions
   until they were accessed after a Realm was refreshed, resulting in the Realm
   file growing to large sizes if a Results was retained but not accessed after
-  every write. ([#6677](https://github.com/realm/realm-cocoa/issues/6677), since 5.0.0).
+  every write. ([#6677](https://github.com/realm/realm-swift/issues/6677), since 5.0.0).
 * Fix linker errors when using SwiftUI previews with Xcode 12 when Realm was
-  installed via Swift Package Manager. ([#6625](https://github.com/realm/realm-cocoa/issues/6625))
+  installed via Swift Package Manager. ([#6625](https://github.com/realm/realm-swift/issues/6625))
 
 ### Compatibility
 
@@ -2423,16 +2434,16 @@ upgraded Realms.
 
 * Fix a file format upgrade bug when opening older Realm files. Could cause
   assertions like "Assertion failed: ref != 0" during opning of a Realm.
-  ([Core #6644](https://github.com/realm/realm-cocoa/issues/6644), since 5.2.0)
+  ([Core #6644](https://github.com/realm/realm-swift/issues/6644), since 5.2.0)
 * A use-after-free would occur if a Realm was compacted, opened on multiple
   threads prior to the first write, then written to while reads were happening
   on other threads. This could result in a variety of crashes, often inside
   realm::util::EncryptedFileMapping::read_barrier.
-  (Since v5.0.0, [#6626](https://github.com/realm/realm-cocoa/issues/6626),
-  [#6628](https://github.com/realm/realm-cocoa/issues/6628),
-  [#6652](https://github.com/realm/realm-cocoa/issues/6652),
-  [#6655](https://github.com/realm/realm-cocoa/issues/6555),
-  [#6656](https://github.com/realm/realm-cocoa/issues/6656)).
+  (Since v5.0.0, [#6626](https://github.com/realm/realm-swift/issues/6626),
+  [#6628](https://github.com/realm/realm-swift/issues/6628),
+  [#6652](https://github.com/realm/realm-swift/issues/6652),
+  [#6655](https://github.com/realm/realm-swift/issues/6555),
+  [#6656](https://github.com/realm/realm-swift/issues/6656)).
 
 ### Compatibility
 
@@ -2458,7 +2469,7 @@ upgraded Realms.
 
 * Creating an object inside migration which changed that object type's primary
   key would hit an assertion failure mentioning primary_key_col
-  ([#6613](https://github.com/realm/realm-cocoa/issues/6613), since 5.0.0).
+  ([#6613](https://github.com/realm/realm-swift/issues/6613), since 5.0.0).
 * Modifying the value of a string primary key property inside a migration with
   a Realm file which was upgraded from pre-5.0 would corrupt the property's
   index, typically resulting in crashes. ([Core #3765](https://github.com/realm/realm-core/issues/3765), since 5.0.0).
@@ -2494,12 +2505,12 @@ upgraded Realms.
 * Rename `RealmCollection.publisher` to `RealmCollection.collectionPublisher`.
   The old name interacted with the `publisher` defined by `Sequence` in very
   confusing ways, so we need to use a different name. The `publisher` name is
-  still available for compatiblity. ([#6516](https://github.com/realm/realm-cocoa/issues/6516))
+  still available for compatiblity. ([#6516](https://github.com/realm/realm-swift/issues/6516))
 * Work around "xcodebuild timed out while trying to read
   SwiftPackageManagerExample.xcodeproj" errors when installing Realm via
-  Carthage. ([#6549](https://github.com/realm/realm-cocoa/issues/6549)).
+  Carthage. ([#6549](https://github.com/realm/realm-swift/issues/6549)).
 * Fix a performance regression when using change notifications. (Since 5.0.0,
-  [#6629](https://github.com/realm/realm-cocoa/issues/6629)).
+  [#6629](https://github.com/realm/realm-swift/issues/6629)).
 
 ### Compatibility
 
@@ -2626,10 +2637,10 @@ later will be able to open the new file format.
   opening very large files.
 * Add support for the ObjectId data type. This is an automatically-generated
   unique identifier similar to a GUID or a UUID.
-  ([PR #6450](https://github.com/realm/realm-cocoa/pull/6450)).
+  ([PR #6450](https://github.com/realm/realm-swift/pull/6450)).
 * Add support for the Decimal128 data type. This is a 128-bit IEEE 754 decimal
   floating point number similar to NSDecimalNumber.
-  ([PR #6450](https://github.com/realm/realm-cocoa/pull/6450)).
+  ([PR #6450](https://github.com/realm/realm-swift/pull/6450)).
 * Add support for embedded objects. Embedded objects are objects which are
   owned by a single parent object, and are deleted when that parent object is
   deleted. They are defined by subclassing `EmbeddedObject` /
@@ -2673,12 +2684,12 @@ later will be able to open the new file format.
   MongoDB Realm is built on top of MongoDB Atlas, automatically integrating the
   connection to your database.
 * Remove support for Query-based sync, including the configuration parameters
-  and the `RLMSyncSubscription` and `SyncSubscription` types ([#6437](https://github.com/realm/realm-cocoa/pull/6437)).
+  and the `RLMSyncSubscription` and `SyncSubscription` types ([#6437](https://github.com/realm/realm-swift/pull/6437)).
 * Primary key properties are no longer marked as being indexed. This reflects
   an internal change to how primary keys are handled that should not have any
-  other visible effects. ([#6440](https://github.com/realm/realm-cocoa/pull/6440)).
+  other visible effects. ([#6440](https://github.com/realm/realm-swift/pull/6440)).
 * Remove everything related to sync permissions, including both the path-based
-  permission system and the object-level privileges for query-based sync. ([#6445](https://github.com/realm/realm-cocoa/pulls/6445))
+  permission system and the object-level privileges for query-based sync. ([#6445](https://github.com/realm/realm-swift/pulls/6445))
 * Primary key uniqueness is now enforced when creating new objects during
   migrations, rather than only at the end of migrations. Previously new objects
   could be created with duplicate primary keys during a migration as long as
@@ -2693,7 +2704,7 @@ later will be able to open the new file format.
 * APIs are backwards compatible with all previous releases in the 10.0.0-alpha series.
 * `List.index(of:)` would give incorrect results if it was the very first thing
   called on that List after a Realm was refreshed following a write which
-  modified the List. (Since 5.0.0, [#6606](https://github.com/realm/realm-cocoa/issues/6606)).
+  modified the List. (Since 5.0.0, [#6606](https://github.com/realm/realm-swift/issues/6606)).
 * If a ThreadSafeReference was the only remaining reference to a Realm,
   multiple copies of the file could end up mapped into memory at once. This
   probably did not have any symptoms other than increased memory usage. (Since 5.0.0).
@@ -2732,8 +2743,8 @@ later will be able to open the new file format.
 * Opening a Realm using a configuration object read from an existing Realm
   would incorrectly bind the new Realm to the original Realm's thread/queue,
   resulting in "Realm accessed from incorrect thread." exceptions.
-  ([#6574](https://github.com/realm/realm-cocoa/issues/6574),
-  [#6559](https://github.com/realm/realm-cocoa/issues/6559), since 5.0.0).
+  ([#6574](https://github.com/realm/realm-swift/issues/6574),
+  [#6559](https://github.com/realm/realm-swift/issues/6559), since 5.0.0).
 
 ### Compatibility
 
@@ -2748,16 +2759,16 @@ later will be able to open the new file format.
 
 ### Fixed
 
-* `-[RLMObject isFrozen]` always returned false. ([#6568](https://github.com/realm/realm-cocoa/issues/6568), since 5.0.0).
+* `-[RLMObject isFrozen]` always returned false. ([#6568](https://github.com/realm/realm-swift/issues/6568), since 5.0.0).
 * Freezing an object within the write transaction that the object was created
   in now throws an exception rather than crashing when the object is first
   used.
 * The schema for frozen Realms was not properly initialized, leading to crashes
   when accessing a RLMLinkingObjects property.
-  ([#6568](https://github.com/realm/realm-cocoa/issues/6568), since 5.0.0).
+  ([#6568](https://github.com/realm/realm-swift/issues/6568), since 5.0.0).
 * Observing `Object.isInvalidated` via a keypath literal would produce a
   warning in Swift 5.2 due to the property not being marked as @objc.
-  ([#6554](https://github.com/realm/realm-cocoa/issues/6554))
+  ([#6554](https://github.com/realm/realm-swift/issues/6554))
 
 ### Compatibility
 
@@ -2774,10 +2785,10 @@ later will be able to open the new file format.
 
 * Fix errSecDuplicateItem (-25299) errors when opening a synchronized Realm
   when upgrading from pre-5.0 versions of Realm.
-  ([#6538](https://github.com/realm/realm-cocoa/issues/6538), [#6494](https://github.com/realm/realm-cocoa/issues/6494), since 5.0.0).
+  ([#6538](https://github.com/realm/realm-swift/issues/6538), [#6494](https://github.com/realm/realm-swift/issues/6494), since 5.0.0).
 * Opening Realms stored on filesystems which do not support preallocation (such
   as ExFAT) would give "Operation not supported" exceptions.
-  ([#6508](https://github.com/realm/realm-cocoa/issues/6508), since 3.2.0).
+  ([#6508](https://github.com/realm/realm-swift/issues/6508), since 3.2.0).
 * 'NoSuchTable' exceptions would sometimes be thrown after upgrading a Relam
   file to the v10 format. ([Core #3701](https://github.com/realm/realm-core/issues/3701), since 5.0.0)
 * If the upgrade process was interrupted/killed for various reasons, the
@@ -2785,7 +2796,7 @@ later will be able to open the new file format.
   happening were reported to us. (Since 5.0.0).
 * Queries filtering a `List` where the query was on an indexed property over a
   link would sometimes give incomplete results.
-  ([#6540](https://github.com/realm/realm-cocoa/issues/6540), since 4.1.0 but
+  ([#6540](https://github.com/realm/realm-swift/issues/6540), since 4.1.0 but
   more common since 5.0.0)
 * Opening a file in read-only mode would attempt to make a spurious write to
   the file, causing errors if the file was in read-only storage (since 5.0.0).
@@ -2813,12 +2824,12 @@ later will be able to open the new file format.
 ### Fixed
 
 * Fix linker error when building a xcframework for Catalyst.
-  ([#6511](https://github.com/realm/realm-cocoa/issues/6511), since 4.3.1).
+  ([#6511](https://github.com/realm/realm-swift/issues/6511), since 4.3.1).
 * Fix building for iOS devices when using Swift Package Manager
-  ([#6522](https://github.com/realm/realm-cocoa/issues/6522), since 5.0.0).
+  ([#6522](https://github.com/realm/realm-swift/issues/6522), since 5.0.0).
 * `List` and `RealmOptional` properties on frozen objects were not initialized
   correctly and would always report `nil` or an empty list.
-  ([#6527](https://github.com/realm/realm-cocoa/issues/6527), since 5.0.0).
+  ([#6527](https://github.com/realm/realm-swift/issues/6527), since 5.0.0).
 
 ### Compatibility
 
@@ -2850,7 +2861,7 @@ to open the new file format.
   made to the Realm, but creating frozen objects does not actually copy data
   out of the Realm and so can be much faster and use less memory. Frozen
   objects cannot be mutated or observed for changes (as they never change).
-  ([PR #6427](https://github.com/realm/realm-cocoa/pull/6427)).
+  ([PR #6427](https://github.com/realm/realm-swift/pull/6427)).
 * Add the `isFrozen` property to `Realm`, `Results`, `List` and `Object`.
 * Add `Realm.Configuration.maxNumberOfActiveVersions`. Each time a write
   transaction is performed, a new version is created inside the Realm, and then
@@ -2865,9 +2876,9 @@ to open the new file format.
   thread, queue-confined Realms are bound to a serial dispatch queue and can be
   used within blocks dispatched to that queue regardless of what thread they
   happen to run on. In addition, change notifications will be delivered to that
-  queue rather than the thread's run loop. ([PR #6478](https://github.com/realm/realm-cocoa/pull/6478)).
+  queue rather than the thread's run loop. ([PR #6478](https://github.com/realm/realm-swift/pull/6478)).
 * Add an option to deliver object and collection notifications to a specific
-  serial queue rather than the current thread. ([PR #6478](https://github.com/realm/realm-cocoa/pull/6478)).
+  serial queue rather than the current thread. ([PR #6478](https://github.com/realm/realm-swift/pull/6478)).
 * Add Combine publishers for Realm types. Realm collections have a `.publisher`
   property which publishes the collection each time it changes, and a
   `.changesetPublisher` which publishes a `RealmCollectionChange` each time the
@@ -2885,15 +2896,15 @@ to open the new file format.
 * The uploaded bytes in sync progress notifications was sometimes incorrect and
   wouldn't exactly equal the uploadable bytes when the uploaded completed.
 * macOS binaries were built with the incorrect deployment target (10.14 rather
-  than 10.9), resulting in linker warnings. ([#6299](https://github.com/realm/realm-cocoa/issues/6299), since 3.18.0).
+  than 10.9), resulting in linker warnings. ([#6299](https://github.com/realm/realm-swift/issues/6299), since 3.18.0).
 * An internal datastructure for List properties could be double-deleted if the
   last reference was released from a thread other than the one which the List
   was created on at the wrong time. This would typically manifest as
   "pthread_mutex_destroy() failed", but could also result in other kinds of
-  crashes. ([#6333](https://github.com/realm/realm-cocoa/issues/6333)).
+  crashes. ([#6333](https://github.com/realm/realm-swift/issues/6333)).
 * Sorting on float or double properties containing NaN values had inconsistent
   results and would sometimes crash due to out-of-bounds memory accesses.
-  ([#6357](https://github.com/realm/realm-cocoa/issues/6357)).
+  ([#6357](https://github.com/realm/realm-swift/issues/6357)).
 
 ### Breaking Changes
 
@@ -2938,9 +2949,9 @@ to open the new file format.
   thread, queue-confined Realms are bound to a serial dispatch queue and can be
   used within blocks dispatched to that queue regardless of what thread they
   happen to run on. In addition, change notifications will be delivered to that
-  queue rather than the thread's run loop. ([PR #6478](https://github.com/realm/realm-cocoa/pull/6478)).
+  queue rather than the thread's run loop. ([PR #6478](https://github.com/realm/realm-swift/pull/6478)).
 * Add an option to deliver object and collection notifications to a specific
-  serial queue rather than the current thread. ([PR #6478](https://github.com/realm/realm-cocoa/pull/6478)).
+  serial queue rather than the current thread. ([PR #6478](https://github.com/realm/realm-swift/pull/6478)).
 
 ### Fixed
 
@@ -2998,7 +3009,7 @@ Based on 4.3.2 and also includes all changes since 4.3.0.
   made to the Realm, but creating frozen objects does not actually copy data
   out of the Realm and so can be much faster and use less memory. Frozen
   objects cannot be mutated or observed for changes (as they never change).
-  ([PR #6427](https://github.com/realm/realm-cocoa/pull/6427)).
+  ([PR #6427](https://github.com/realm/realm-swift/pull/6427)).
 * Add the `isFrozen` property to `Realm`, `Results`, `List` and `Object`.
 * Add `Realm.Configuration.maxNumberOfActiveVersions`. Each time a write
   transaction is performed, a new version is created inside the Realm, and then
@@ -3064,15 +3075,15 @@ NOTE: This version bumps the Realm file format to version 10. It is not possible
   deleting the object previously at the index being accessed (since
   5.0.0-alpha.1).
 * macOS binaries were built with the incorrect deployment target (10.14 rather
-  than 10.9), resulting in linker warnings. ([#6299](https://github.com/realm/realm-cocoa/issues/6299), since 3.18.0).
+  than 10.9), resulting in linker warnings. ([#6299](https://github.com/realm/realm-swift/issues/6299), since 3.18.0).
 * An internal datastructure for List properties could be double-deleted if the
   last reference was released from a thread other than the one which the List
   was created on at the wrong time. This would typically manifest as
   "pthread_mutex_destroy() failed", but could also result in other kinds of
-  crashes. ([#6333](https://github.com/realm/realm-cocoa/issues/6333)).
+  crashes. ([#6333](https://github.com/realm/realm-swift/issues/6333)).
 * Sorting on float or double properties containing NaN values had inconsistent
   results and would sometimes crash due to out-of-bounds memory accesses.
-  ([#6357](https://github.com/realm/realm-cocoa/issues/6357)).
+  ([#6357](https://github.com/realm/realm-swift/issues/6357)).
 
 ### Known Issues
 
@@ -3144,7 +3155,7 @@ Swift 4.0 and Xcode 10.3 are now the minimum supported versions.
 
 * Allow setting the `fileUrl` for synchronized Realms. An appropriate local
   path based on the sync URL will still be used if it is not overridden.
-  ([PR #6454](https://github.com/realm/realm-cocoa/pull/6454)).
+  ([PR #6454](https://github.com/realm/realm-swift/pull/6454)).
 * Add Xcode 11.4 binaries to the release package.
 
 ### Fixed
@@ -3168,7 +3179,7 @@ Swift 4.0 and Xcode 10.3 are now the minimum supported versions.
 ### Fixed
 
 * Fix a memory leak attributed to `property_copyAttributeList` the first time a
-  Realm is opened when using Realm Swift. ([#6409](https://github.com/realm/realm-cocoa/issues/6409), since 4.0.0).
+  Realm is opened when using Realm Swift. ([#6409](https://github.com/realm/realm-swift/issues/6409), since 4.0.0).
 * Connecting to a `realms:` sync URL would crash at runtime on iOS 11 (and no
   other iOS versions) inside the SSL validation code. (Since 4.3.1).
 
@@ -3193,18 +3204,18 @@ Swift 4.0 and Xcode 10.3 are now the minimum supported versions.
 ### Fixed
 
 * macOS binaries were built with the incorrect deployment target (10.14 rather
-  than 10.9), resulting in linker warnings. ([#6299](https://github.com/realm/realm-cocoa/issues/6299), since 3.18.0).
+  than 10.9), resulting in linker warnings. ([#6299](https://github.com/realm/realm-swift/issues/6299), since 3.18.0).
 * An internal datastructure for List properties could be double-deleted if the
   last reference was released from a thread other than the one which the List
   was created on at the wrong time. This would typically manifest as
   "pthread_mutex_destroy() failed", but could also result in other kinds of
-  crashes. ([#6333](https://github.com/realm/realm-cocoa/issues/6333)).
+  crashes. ([#6333](https://github.com/realm/realm-swift/issues/6333)).
 * Sorting on float or double properties containing NaN values had inconsistent
   results and would sometimes crash due to out-of-bounds memory accesses.
-  ([#6357](https://github.com/realm/realm-cocoa/issues/6357)).
+  ([#6357](https://github.com/realm/realm-swift/issues/6357)).
 * A NOT query on a `List<Object>` which happened to have the objects in a
   different order than the underlying table would sometimes include the object
-  immediately before an object which matches the query. ([#6289](https://github.com/realm/realm-cocoa/issues/6289), since 0.90.0).
+  immediately before an object which matches the query. ([#6289](https://github.com/realm/realm-swift/issues/6289), since 0.90.0).
 
 ### Compatibility
 
@@ -3234,7 +3245,7 @@ Swift 4.0 and Xcode 10.3 are now the minimum supported versions.
 
 * Fix a crash when using value(forKey:) on a LinkingObjects property (including
   when doing so indirectly, such as by querying on that property).
-  ([#6366](https://github.com/realm/realm-cocoa/issues/6366), since 4.0.0).
+  ([#6366](https://github.com/realm/realm-swift/issues/6366), since 4.0.0).
 * Fix a rare crash in `ClientHistoryImpl::integrate_server_changesets()` which
   would only happen in Debug builds (since v3.0.0).
 
@@ -3276,7 +3287,7 @@ Swift 4.0 and Xcode 10.3 are now the minimum supported versions.
 * The UpdatePolicy passed to `realm.add()` or `realm.create()` was not properly
   propagated when adding objects within a `List`, which could result in
   spurious change notifications when using `.modified`.
-  ([#6321](https://github.com/realm/realm-cocoa/issues/6321), since v3.16.0)
+  ([#6321](https://github.com/realm/realm-swift/issues/6321), since v3.16.0)
 * Fix a rare deadlock when a Realm collection or object was observed, then
   `refresh()` was explicitly called, and then the NotificationToken from the
   observation was destroyed on a different thread (since 0.98.0).
@@ -3385,7 +3396,7 @@ Swift 4.0 and Xcode 10.3 are now the minimum supported versions.
 * Add support for custom refresh token authentication. This allows a user to be
   authorized with an externally-issued refresh token when ROS is configured to
   recognize the external issuer as a refresh token validator.
-  ([PR #6311](https://github.com/realm/realm-cocoa/pull/6311)).
+  ([PR #6311](https://github.com/realm/realm-swift/pull/6311)).
 
 ### Compatibility
 
@@ -3407,10 +3418,10 @@ Swift 4.0 and Xcode 10.3 are now the minimum supported versions.
 * Fix a crash when a RLMArray/List of primitives was observed and then the
   containing object was deleted before the first time that the background
   notifier could run.
-  ([Issue #6234](https://github.com/realm/realm-cocoa/issues/6234, since 3.0.0)).
+  ([Issue #6234](https://github.com/realm/realm-swift/issues/6234, since 3.0.0)).
 * Remove an incorrect assertion that would cause crashes inside
   `TableInfoCache::get_table_info()`, with messages like "Assertion failed: info.object_id_index == 0 [3, 0]".
-  (Since 3.18.0, [#6268](https://github.com/realm/realm-cocoa/issues/6268) and [#6257](https://github.com/realm/realm-cocoa/issues/6257)).
+  (Since 3.18.0, [#6268](https://github.com/realm/realm-swift/issues/6268) and [#6257](https://github.com/realm/realm-swift/issues/6257)).
 
 ### Compatibility
 
@@ -3429,9 +3440,9 @@ Swift 4.0 and Xcode 10.3 are now the minimum supported versions.
 
 * Expose ObjectSchema.objectClass in Swift as looking up the class via
   NSClassFromString() can be complicated for Swift types.
-  ([PR #6244](https://github.com/realm/realm-cocoa/pull/6244)).
+  ([PR #6244](https://github.com/realm/realm-swift/pull/6244)).
 * Add support for suppressing notifications using closure-based write/transaction methods.
-  ([PR #6252](https://github.com/realm/realm-cocoa/pull/6252)).
+  ([PR #6252](https://github.com/realm/realm-swift/pull/6252)).
 
 ### Fixed
 
@@ -3471,11 +3482,11 @@ This does not effect non-synchronized Realms.
   is no longer needed. This should reduce file size growth in write-heavy
   workloads. ([Sync #3007](https://github.com/realm/realm-sync/issues/3007)).
 * Add support for building Realm as an xcframework.
-  ([PR #6238](https://github.com/realm/realm-cocoa/pull/6238)).
+  ([PR #6238](https://github.com/realm/realm-swift/pull/6238)).
 * Add prebuilt libraries for Xcode 11 to the release package.
-  ([PR #6248](https://github.com/realm/realm-cocoa/pull/6248)).
+  ([PR #6248](https://github.com/realm/realm-swift/pull/6248)).
 * Add a prebuilt library for Catalyst/UIKit For Mac to the release package
-  ([PR #6248](https://github.com/realm/realm-cocoa/pull/6248)).
+  ([PR #6248](https://github.com/realm/realm-swift/pull/6248)).
 
 ### Fixed
 
@@ -3518,7 +3529,7 @@ This does not effect non-synchronized Realms.
 ### Enhancements
 
 * Add support for canceling asynchronous opens using a new AsyncOpenTask
-  returned from the asyncOpen() call. ([PR #6193](https://github.com/realm/realm-cocoa/pull/6193)).
+  returned from the asyncOpen() call. ([PR #6193](https://github.com/realm/realm-swift/pull/6193)).
 * Importing the Realm SPM package can now be done by pinning to a version
   rather than a branch.
 
@@ -3526,9 +3537,9 @@ This does not effect non-synchronized Realms.
 
 * Queries on a List/RLMArray which checked an indexed int property would
   sometimes give incorrect results.
-  ([#6154](https://github.com/realm/realm-cocoa/issues/6154)), since v3.15.0)
+  ([#6154](https://github.com/realm/realm-swift/issues/6154)), since v3.15.0)
 * Queries involving an indexed int property had a memory leak if run multiple
-  times. ([#6186](https://github.com/realm/realm-cocoa/issues/6186)), since v3.15.0)
+  times. ([#6186](https://github.com/realm/realm-swift/issues/6186)), since v3.15.0)
 * Creating a subscription with `includeLinkingObjects:` performed unneccesary
   comparisons, making it extremely slow when large numbers of objects were
   involved. ([Core #3311](https://github.com/realm/realm-core/issues/3311), since v3.15.0)
@@ -3546,10 +3557,10 @@ This does not effect non-synchronized Realms.
 
 * Add support for including Realm via Swift Package Manager. This currently
   requires depending on the branch "master" rather than pinning to a version
-  (i.e. `.package(url: "https://github.com/realm/realm-cocoa", .branch("master"))`).
-  ([#6187](https://github.com/realm/realm-cocoa/pull/6187)).
+  (i.e. `.package(url: "https://github.com/realm/realm-swift", .branch("master"))`).
+  ([#6187](https://github.com/realm/realm-swift/pull/6187)).
 * Add Codable conformance to RealmOptional and List, and Encodable conformance to Results.
-  ([PR #6172](https://github.com/realm/realm-cocoa/pull/6172)).
+  ([PR #6172](https://github.com/realm/realm-swift/pull/6172)).
 
 ### Fixed
 
@@ -3575,13 +3586,13 @@ This does not effect non-synchronized Realms.
 
 * Add support for Xcode 11 Beta 1. Xcode betas are only supported when building
   from source, and not when using a prebuilt framework.
-  ([PR #6164](https://github.com/realm/realm-cocoa/pull/6164)).
+  ([PR #6164](https://github.com/realm/realm-swift/pull/6164)).
 
 ### Fixed
 
 * Using asyncOpen on query-based Realms which didn't already exist on the local
   device would fail with error 214.
-  ([#6178](https://github.com/realm/realm-cocoa/issues/6178), since 3.16.0).
+  ([#6178](https://github.com/realm/realm-swift/issues/6178), since 3.16.0).
 * asyncOpen on query-based Realms did not wait for the server-created
   permission objects to be downloaded, resulting in crashes if modifications to
   the permissions were made before creating a subscription for the first time (since 3.0.0).
@@ -3605,7 +3616,7 @@ This does not effect non-synchronized Realms.
   primary key rather than the actual type passed at runtime, resulting in
   exceptions like "''RealmSwiftObject' does not have a primary key and can not
   be updated'" being thrown even if the object type being created has a primary
-  key. (since 3.16.0, [#6159](https://github.com/realm/realm-cocoa/issues/6159)).
+  key. (since 3.16.0, [#6159](https://github.com/realm/realm-swift/issues/6159)).
 
 ### Compatibility
 
@@ -3623,14 +3634,14 @@ This does not effect non-synchronized Realms.
   `Realm.create()`/`-[RLMObject createOrUpdateInRealm:withValue:]`. This makes
   notifications report only the properties which have actually changed, and
   improves Object Server performance by reducing the number of operations to
-  merge. (Issue: [#5970](https://github.com/realm/realm-cocoa/issues/5970),
-  PR: [#6149](https://github.com/realm/realm-cocoa/pull/6149)).
+  merge. (Issue: [#5970](https://github.com/realm/realm-swift/issues/5970),
+  PR: [#6149](https://github.com/realm/realm-swift/pull/6149)).
 * Using `-[RLMRealm asyncOpenWithConfiguration:callbackQueue:]`/`Realm.asyncOpen()` to open a
   synchronized Realm which does not exist on the local device now uses an
   optimized transfer method to download the initial data for the Realm, greatly
   speeding up the first start time for applications which use full
   synchronization. This is currently not applicable to query-based
-  synchronization. (PR: [#6106](https://github.com/realm/realm-cocoa/pull/6106)).
+  synchronization. (PR: [#6106](https://github.com/realm/realm-swift/pull/6106)).
 
 ### Compatibility
 
@@ -3733,7 +3744,7 @@ not need to worry about this.
 ### Fixed
 
 * Fix a memory leak whenever Realm makes a HTTP(s) request to the Realm Object
-  Server (Issue [#6058](https://github.com/realm/realm-cocoa/issues/6058), since 3.8.0).
+  Server (Issue [#6058](https://github.com/realm/realm-swift/issues/6058), since 3.8.0).
 * Fix an assertion failure when creating an object in a synchronized Realm
   after creating an object with a null int primary key in the same write
   transaction.
@@ -3761,7 +3772,7 @@ not need to worry about this.
 ### Fixed
 
 * Fix a crash when iterating over `Realm.subscriptions()` using for-in.
-  (Since 3.13.0, PR [#6050](https://github.com/realm/realm-cocoa/pull/6050)).
+  (Since 3.13.0, PR [#6050](https://github.com/realm/realm-swift/pull/6050)).
 
 ### Compatibility
 
@@ -3776,7 +3787,7 @@ not need to worry about this.
 * Add `Realm.subscriptions()`/`-[RLMRealm subscriptions]` and
   `Realm.subscription(named:)`/`-[RLMRealm subscriptionWithName:]` to enable
   looking up existing query-based sync subscriptions.
-  (PR: https://github.com/realm/realm-cocoa/pull/6029).
+  (PR: https://github.com/realm/realm-swift/pull/6029).
 
 ### Compatibility
 
@@ -3793,7 +3804,7 @@ not need to worry about this.
   app's bundle ID. The application identifier can be customized by setting
   `RLMSyncManager.sharedManager.userAgent`/`SyncManager.shared.userAgent` prior
   to opening a synchronized Realm.
-  (PR: https://github.com/realm/realm-cocoa/pull/6007).
+  (PR: https://github.com/realm/realm-swift/pull/6007).
 * Add Xcode 10.1 binary to the prebuilt package.
 
 ### Fixed
@@ -3851,12 +3862,12 @@ not need to worry about this.
 ### Fixed
 
 * Fix `SyncUser.requestEmailConfirmation` not triggering the email confirmation
-  flow on ROS. (PR [#5953](https://github.com/realm/realm-cocoa/pull/5953), since 3.5.0)
+  flow on ROS. (PR [#5953](https://github.com/realm/realm-swift/pull/5953), since 3.5.0)
 * Add some missing validation in the getters and setters of properties on
   managed Realm objects, which would sometimes result in an application
   crashing with a segfault rather than the appropriate exception being thrown
   when trying to write to an object which has been deleted.
-  (PR [#5952](https://github.com/realm/realm-cocoa/pull/5952), since 2.8.0)
+  (PR [#5952](https://github.com/realm/realm-swift/pull/5952), since 2.8.0)
 
 ### Compatibility
 
@@ -3881,7 +3892,7 @@ not need to worry about this.
 * Fix a crash when adding an object with a non-`@objc` `String?` property which
   has not been explicitly ignored to a Realm on watchOS 5 (and possibly other
   platforms when building with Xcode 10).
-  (Issue: [5929](https://github.com/realm/realm-cocoa/issues/5929)).
+  (Issue: [5929](https://github.com/realm/realm-swift/issues/5929)).
 * Fix some merge algorithm bugs which could result in `BadChangesetError`
   being thrown when integrating changes sent by the server.
 
