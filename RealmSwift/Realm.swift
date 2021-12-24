@@ -380,7 +380,7 @@ public typealias AsyncTransactionId = RLMAsyncTransactionId
      Write  blocks for the multiple calls will be executed in order.
      */
     @discardableResult
-    public func writeAsync(_ block: @escaping (AsyncTransactionId) -> (), _ onComplete: (() -> ())? = nil) -> AsyncTransactionId {
+    public func writeAsync(_ block: @escaping (AsyncTransactionId) -> Void, _ onComplete: (() -> Void)? = nil) -> AsyncTransactionId {
         beginAsyncWrite({ handle in
             block(handle)
             commitAsyncWrite(onComplete)
@@ -403,7 +403,7 @@ public typealias AsyncTransactionId = RLMAsyncTransactionId
      write blocks.
      */
     @discardableResult
-    public func beginAsyncWrite(_ asyncWriteBlock: @escaping (AsyncTransactionId) -> ()) -> AsyncTransactionId {
+    public func beginAsyncWrite(_ asyncWriteBlock: @escaping (AsyncTransactionId) -> Void) -> AsyncTransactionId {
         var asyncTransactionId: AsyncTransactionId = 0
         asyncTransactionId = rlmRealm.beginAsyncWriteTransaction {
             asyncWriteBlock(asyncTransactionId)
@@ -420,7 +420,7 @@ public typealias AsyncTransactionId = RLMAsyncTransactionId
      - note The call returns immediately allowing the caller to proceed while the I/O is performed on a dedicated background thread.
      - note Callbacks to `onComplete` will occur in the order of `commitAsyncWriteTransaction`
     */
-    public func commitAsyncWrite(_ onComplete: (() -> ())? = nil, isGroupingAllowed: Bool = false) {
+    public func commitAsyncWrite(_ onComplete: (() -> Void)? = nil, isGroupingAllowed: Bool = false) {
         rlmRealm.commitAsyncWriteTransaction(onComplete, isGroupingAllowed: isGroupingAllowed)
     }
 
@@ -439,7 +439,7 @@ public typealias AsyncTransactionId = RLMAsyncTransactionId
     public var isInAsyncWriteTransaction: Bool {
         return rlmRealm.inAsyncWriteTransaction
     }
-    
+
     /**
      Set the error handler for the asynchronous transactions.
      Synchronous try/catch hadling will not work with the asynchronous transactions.
