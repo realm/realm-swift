@@ -29,7 +29,7 @@
 @interface RealmServer : NSObject
 + (RealmServer *)shared;
 - (NSString *)createAppForBSONType:(NSString *)bsonType
-                             error:(NSError **)error;;
+                             error:(NSError **)error;
 @end
 
 #pragma mark ObjectServer Partition Tests

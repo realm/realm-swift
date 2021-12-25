@@ -38,6 +38,7 @@
 #import "RLMThreadSafeReference_Private.hpp"
 #import "RLMUpdateChecker.hpp"
 #import "RLMUtil.hpp"
+#import "RLMSyncSubscription_Private.hpp"
 
 #import <realm/disable_sync_to_disk.hpp>
 #import <realm/object-store/impl/realm_coordinator.hpp>
@@ -56,6 +57,7 @@
 
 #import <realm/object-store/sync/async_open_task.hpp>
 #import <realm/object-store/sync/sync_session.hpp>
+#import <realm/object-store/shared_realm.hpp>
 #endif
 
 using namespace realm;
@@ -1041,6 +1043,24 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
         [enumerator detach];
     }
     _collectionEnumerators = nil;
+}
+
+- (RLMSyncSubscriptionSet *)subscriptions {
+    if (_realm->config().sync_config) {
+        if (_realm->config().sync_config->flx_sync_requested) {
+#if REALM_ENABLE_SYNC
+            return [[RLMSyncSubscriptionSet alloc] initWithSubscriptionSet:_realm->get_latest_subscription_set() realm:self];
+#else
+            @throw RLMException(@"Realm was not built with sync enabled");
+#endif
+        }
+        else {
+            @throw RLMException(@"Realm sync session is not Flexible Sync");
+        }
+    }
+    else {
+        @throw RLMException(@"Realm was not build for a sync session");
+    }
 }
 
 @end

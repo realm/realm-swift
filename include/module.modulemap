@@ -30,6 +30,7 @@ module Realm {
         header "Realm/RLMSyncConfiguration_Private.h"
         header "Realm/RLMSyncUtil_Private.h"
         header "Realm/RLMUser_Private.h"
+        header "Realm/RLMSyncSubscription_Private.h"
     }
 
     explicit module Dynamic {

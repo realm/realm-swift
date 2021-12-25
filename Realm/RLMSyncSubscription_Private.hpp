@@ -16,25 +16,24 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMSyncConfiguration_Private.h"
+#import "RLMSyncSubscription_Private.h"
 
-#import <functional>
-#import <memory>
-
-namespace realm {
-class SyncSession;
-struct SyncConfig;
-struct SyncError;
-using SyncSessionErrorHandler = void(std::shared_ptr<SyncSession>, SyncError);
+namespace realm::sync {
+class Subscription;
+class SubscriptionSet;
 }
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface RLMSyncConfiguration ()
+@interface RLMSyncSubscription ()
 
-- (instancetype)initWithRawConfig:(realm::SyncConfig)config;
+- (instancetype)initWithSubscription:(realm::sync::Subscription)subscription subscriptionSet:(RLMSyncSubscriptionSet *)subscriptionSet;
 
-- (realm::SyncConfig&)rawConfiguration;
+@end
+
+@interface RLMSyncSubscriptionSet ()
+
+- (instancetype)initWithSubscriptionSet:(realm::sync::SubscriptionSet)subscriptionSet realm:(RLMRealm *)realm;
 
 @end
 

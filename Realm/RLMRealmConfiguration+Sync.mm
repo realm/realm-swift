@@ -53,8 +53,11 @@
 
     if (syncConfiguration.customFileURL) {
         self.config.path = syncConfiguration.customFileURL.path.UTF8String;
+    } else if (self.config.sync_config->flx_sync_requested) {
+        std::string str = std::string([@"default" UTF8String]);
+        self.config.path = [user pathForValue:str];
     } else {
-        self.config.path = [user pathForPartitionValue:self.config.sync_config->partition_value];
+        self.config.path = [user pathForValue:self.config.sync_config->partition_value];
     }
 
     [self updateSchemaMode];

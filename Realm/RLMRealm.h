@@ -19,7 +19,7 @@
 #import <Foundation/Foundation.h>
 #import <Realm/RLMConstants.h>
 
-@class RLMRealmConfiguration, RLMRealm, RLMObject, RLMSchema, RLMMigration, RLMNotificationToken, RLMThreadSafeReference, RLMAsyncOpenTask;
+@class RLMRealmConfiguration, RLMRealm, RLMObject, RLMSchema, RLMMigration, RLMNotificationToken, RLMThreadSafeReference, RLMAsyncOpenTask, RLMSyncSubscriptionSet;
 
 /**
  A callback block for opening Realms asynchronously.
@@ -694,6 +694,18 @@ NS_REFINED_FOR_SWIFT;
  @see `deleteObject:`
  */
 - (void)deleteAllObjects;
+
+#pragma mark - Sync Subscriptions
+
+/**
+ Returns an instance of `RLMSyncSubscriptionSet`, which can be used to add/remove or update your
+ flexible sync subscriptions.
+ Getting the subscriptions from a local or partition-based configured realm will throw
+ an exception.
+
+ @return A mutable `RLMSyncSubscriptionSet`.
+ */
+@property (nonatomic, readonly) RLMSyncSubscriptionSet *subscriptions;
 
 
 #pragma mark - Migrations

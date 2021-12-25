@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2016 Realm Inc.
+// Copyright 2021 Realm Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,26 +16,36 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMSyncConfiguration_Private.h"
+#import <Realm/RLMSyncSubscription.h>
 
-#import <functional>
-#import <memory>
-
-namespace realm {
-class SyncSession;
-struct SyncConfig;
-struct SyncError;
-using SyncSessionErrorHandler = void(std::shared_ptr<SyncSession>, SyncError);
-}
+#import <Realm/RLMRealm.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface RLMSyncConfiguration ()
+#pragma mark - Subscription
 
-- (instancetype)initWithRawConfig:(realm::SyncConfig)config;
+@interface RLMSyncSubscription ()
 
-- (realm::SyncConfig&)rawConfiguration;
+@property (nonatomic, readonly) NSString *queryString;
 
+@property (nonatomic, readonly) NSString *objectClassName;
+
+@end
+
+#pragma mark - SubscriptionSet
+
+@interface RLMSyncSubscriptionSet ()
+
+@property (readonly) uint64_t version;
+
+#pragma mark - Properties
+
+- (void)verifyInWriteTransaction;
+
+- (void)addSubscriptionWithClassName:(NSString *)objectClassName
+                    subscriptionName:(nullable NSString *)name
+                           predicate:(NSPredicate *)predicate
+                      updateExisting:(BOOL)updateExisting;
 @end
 
 NS_ASSUME_NONNULL_END
