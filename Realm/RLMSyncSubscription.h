@@ -64,7 +64,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (readonly) RLMSyncSubscriptionState state;
 
-@property (nonatomic, readonly) NSString *errorMessage;
+@property (nonatomic, readonly) NSError *error;
 
 #pragma mark - Batch Update subscriptions
 

@@ -21,6 +21,7 @@
 #import "RLMUtil.hpp"
 #import "RLMQueryUtil.hpp"
 #import "RLMObjectId_Private.hpp"
+#import "RLMSyncUtil.h"
 
 #import <realm/sync/subscriptions.hpp>
 #import <realm/status_with.hpp>
@@ -131,8 +132,11 @@
     return _subscriptionSet->size();
 }
 
-- (NSString *)errorMessage {
-    return RLMStringDataToNSString(_subscriptionSet->error_str());
+- (NSError *)error {
+    NSError *error = [[NSError alloc]initWithDomain:RLMSyncErrorDomain
+                                               code:0
+                                           userInfo:@{NSLocalizedDescriptionKey : RLMStringDataToNSString(_subscriptionSet->error_str())}];
+    return error;
 }
 
 - (RLMSyncSubscriptionState)state {

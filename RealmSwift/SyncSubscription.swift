@@ -20,18 +20,26 @@ import Foundation
 import Realm
 import Realm.Private
 
-// TODO: Add when public `@frozen`
-// TODO: Change to public
-/// An enum representing different states for the Subscription Set.
-public enum SyncSubscriptionState {
-    /// The subscription is complete and the server is in "steady-state" synchronization.
-    case complete
-    /// The subscription encountered an error.
-    case error(errorMessage: String)
-    /// The subscription is persisted locally but not yet processed by the server,
-    /// It may or may not have been seen by the server.
-    case pending
+enum SyncSubscriptionError: Error {
+    case error(message: String)
+}
 
+/// An enum representing different states for the Subscription Set.
+@frozen public enum SyncSubscriptionState {
+    /// The subscription is complete and the server has sent all the data that matched the subscription
+    /// queries at the time the subscription set was updated. The server is now in a steady-state
+    /// synchronization mode where it will stream update as they come.
+    case complete
+    /// The subscription encountered an error and synchronization is paused for this Realm. You can
+    /// still use the current subscription set to write a subscription.
+    case error(Error)
+    /// The subscription is persisted locally but not yet processed by the server, which means
+    /// the server hasn't yet returned all the data that matched the updated subscription queries.
+    case pending
+    /// The subscription set has been super-ceded by an updated one, this typically means that
+    /// someone is trying to write a subscription on a different instance of the subscription set.
+    /// You should not use a super-ceded subscription set and instead obtain a new instance of
+    /// the subscription set to write a subscription.
     case superceded
 }
 
@@ -84,11 +92,8 @@ internal protocol _AnySyncSubscriptionBox {
 
     /// Returns the underlying value unboxed to the given type, if possible.
     func _unboxed<U: SyncSubscription>(to type: U.Type) -> U?
-
-
 }
 
-// TODO: Change to public
 /// A type-erasing  wrapper over any `ISyncSubscription` conforming object.
 ///
 /// An `AnySyncSubscription` instance forwards its operations to a base struct, hiding
@@ -197,7 +202,7 @@ private final class _AnySyncSubscription<T: SyncSubscription>: _AnySyncSubscript
 }
 
 /**
- `Sypublicion` is  used to define a Flexible Sync's subscription, which
+ `QuerySyncSubscription` is  used to define a Flexible Sync's subscription, which
  can be added/remove or updated within a write subscription transaction.
  */
 @frozen public struct QuerySyncSubscription: SyncSubscription {
@@ -266,7 +271,7 @@ private final class _AnySyncSubscription<T: SyncSubscription>: _AnySyncSubscript
         return query(Query()).predicate
     }
 
-    public typealias QueryFunction = (Query<ObjectType>) -> Query<ObjectType>
+    public typealias QueryFunction = (Query<ObjectType>) -> Query<Bool>
     public init(name: String? = nil, query: @escaping QueryFunction) {
         self.name = name
         self.query = query
@@ -331,8 +336,9 @@ private final class _AnySyncSubscription<T: SyncSubscription>: _AnySyncSubscript
         case .superceded:
             return .superceded
         case .error:
-            let errorMessage = rlmSyncSubscriptionSet.errorMessage
-            return .error(errorMessage: errorMessage)
+            return .error(SyncSubscriptionError.error(message: rlmSyncSubscriptionSet.error.localizedDescription))
+        @unknown default:
+            fatalError()
         }
     }
 
