@@ -54,13 +54,13 @@ public protocol SyncSubscription: _SyncSubscription {
     /// Identifier of the subscription.
     var id: ObjectId { get }
 
-    /// Name of the subscription, if not specified it will return the value in Query as a String.
+    /// Name of the subscription. If not specified it will return nil.
     var name: String? { get }
 
     /// When the subscription was created. Recorded automatically.
     var createdAt: Date { get }
 
-    /// When the subscription was created. Recorded automatically.
+    /// When the subscription was last updated. Recorded automatically.
     var updatedAt: Date { get }
 
     #if swift(>=5.4)

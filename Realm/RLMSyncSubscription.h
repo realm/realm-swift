@@ -23,12 +23,21 @@
 #pragma mark - Subscription States
 
 typedef NS_ENUM(NSUInteger, RLMSyncSubscriptionState) {
+    /// The subscription is complete and the server has sent all the data that matched the subscription
+    /// queries at the time the subscription set was updated. The server is now in a steady-state
+    /// synchronization mode where it will stream update as they come.
     RLMSyncSubscriptionStateComplete,
-
-    RLMSyncSubscriptionStatePending,
-
+    /// The subscription encountered an error and synchronization is paused for this Realm. You can
+    /// find the error calling error in the subscription set to get a description of the error. You can
+    /// still use the current subscription set to write a subscription.
     RLMSyncSubscriptionStateError,
-
+    /// The subscription is persisted locally but not yet processed by the server, which means
+    /// the server hasn't yet returned all the data that matched the updated subscription queries.
+    RLMSyncSubscriptionStatePending,
+    /// The subscription set has been super-ceded by an updated one, this typically means that
+    /// someone is trying to write a subscription on a different instance of the subscription set.
+    /// You should not use a super-ceded subscription set and instead obtain a new instance of
+    /// the subscription set to write a subscription.
     RLMSyncSubscriptionStateSuperceded
 };
 
@@ -36,15 +45,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface RLMSyncSubscription : NSObject
 
+/// Identifier of the subscription.
 @property (nonatomic, readonly) RLMObjectId *identifier;
 
+/// Name of the subscription. If not specified it will return nil.
 @property (nonatomic, readonly, nullable) NSString *name;
 
+/// When the subscription was created. Recorded automatically.
 @property (nonatomic, readonly) NSDate *createdAt;
 
+/// When the subscription was last updated. Recorded automatically.
 @property (nonatomic, readonly) NSDate *updatedAt;
-
-@property (nonatomic, readonly) NSString *errorMessage;
 
 - (void)updateSubscriptionWithClassName:(NSString *)objectClassName
                                   where:(NSString *)predicateFormat, ...;
