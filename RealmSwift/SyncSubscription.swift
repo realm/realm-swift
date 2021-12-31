@@ -358,7 +358,7 @@ private final class _AnySyncSubscription<T: SyncSubscription>: _AnySyncSubscript
         let anySubscription = AnySyncSubscription(QuerySyncSubscription(rlmSubscription))
         return anySubscription
     }
-    
+
     /**
      Returns an `AnySyncSubscription` which encapsulates the resulted subscription from
      the search.

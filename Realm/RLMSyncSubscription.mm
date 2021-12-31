@@ -178,7 +178,7 @@
 
 - (void)observe:(RLMSyncSubscriptionStateBlock)block {
     _subscriptionSet->get_state_change_notification(realm::sync::SubscriptionSet::State::Complete)
-        .get_async([self, block](realm::StatusWith<realm::sync::SubscriptionSet::State> state) noexcept {
+        .get_async([block, self](realm::StatusWith<realm::sync::SubscriptionSet::State> state) mutable noexcept {
             if (state.is_ok()) {
                 auto value = state.get_value();
                 block([self mapState:value]);

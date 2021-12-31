@@ -403,7 +403,7 @@ class SwiftFlexibleSyncServerTests: SwiftFlexibleSyncTestCase {
         try subscriptions.write {
             subscriptions.remove(foundSubscription2!)
         }
-        
+
         XCTAssertEqual(subscriptions.count, 0)
     }
 

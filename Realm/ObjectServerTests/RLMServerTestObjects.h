@@ -23,6 +23,7 @@
 @property RLMObjectId *_id;
 @property NSString *breed;
 @property NSString *name;
+@property NSString *partition;
 - (instancetype) initWithPrimaryKey:(RLMObjectId *)primaryKey breed:(NSString *)breed name:(NSString *)name;
 @end
 
@@ -32,6 +33,7 @@
 @property NSInteger age;
 @property NSString *firstName;
 @property NSString *lastName;
+@property NSString *partition;
 
 - (instancetype) initWithPrimaryKey:(RLMObjectId *)primaryKey age:(NSInteger)strCol firstName:(NSString *)intCol lastName:(NSString *)intCol;
 + (instancetype)john;

@@ -113,29 +113,25 @@ private extension Property {
 }
 
 private extension ObjectSchema {
-    func stitchRule(_ partitionKeyType: String?, _ schema: Schema, id: String? = nil) -> [String: Any] {
-        var stitchProperties: [String: Any] = [:]
-        if let partitionKeyType = partitionKeyType {
-            stitchProperties = [
-                "realm_id": [
-                    "bsonType": "\(partitionKeyType)"
-                ]
+    func stitchRule(_ partitionKeyType: String, _ schema: Schema, id: String? = nil) -> [String: Any] {
+        var stitchProperties: [String: Any] = [
+            "realm_id": [
+                "bsonType": "\(partitionKeyType)"
             ]
-        }
+        ]
         var relationships: [String: Any] = [:]
         for property in properties {
             // First pass we only create the schema and we don't create
             // links until the targets of the links exist
-            stitchProperties[property.name] = property.stitchRule(schema)
-
-            if id != nil {
-                if property.type == .object {
-                    relationships[property.name] = [
-                        "ref": "#/relationship/mongodb1/test_data/\(property.objectClassName!)",
-                        "foreign_key": "_id",
-                        "is_list": property.isArray || property.isSet || property.isMap
-                    ]
-                }
+            if property.type != .object {
+                stitchProperties[property.name] = property.stitchRule(schema)
+            } else if property.type == .object && id != nil {
+                stitchProperties[property.name] = property.stitchRule(schema)
+                relationships[property.name] = [
+                    "ref": "#/relationship/mongodb1/test_data/\(property.objectClassName!)",
+                    "foreign_key": "_id",
+                    "is_list": property.isArray || property.isSet || property.isMap
+                ]
             }
         }
 
@@ -343,6 +339,10 @@ class Admin {
 
             func patch(on group: DispatchGroup, _ data: Any, _ completionHandler: @escaping (Result<Any?, Error>) -> Void) {
                 request(on: group, httpMethod: "PATCH", data: data, completionHandler)
+            }
+
+            func patch(_ data: Any) -> Result<Any?, Error> {
+                request(httpMethod: "PATCH", data: data)
             }
         }
 
@@ -712,65 +712,62 @@ public class RealmServer: NSObject {
             "value": "mongodb://localhost:26000"
         ])
 
-//        let appService: Any
-//        switch syncMode {
-//        case .pbs:
-//            appService = [
-//                "name": "mongodb1",
-//                "type": "mongodb",
-//                "config": [
-//                    "uri": "mongodb://localhost:26000",
-//                    "sync": [
-//                        "state": "enabled",
-//                        "database_name": "test_data",
-//                        "partition": [
-//                            "key": "realm_id",
-//                            "type": "\(bsonType)",
-//                            "required": false,
-//                            "permissions": [
-//                                "read": true,
-//                                "write": true
-//                            ]
-//                        ]
-//                    ]
-//                ]
-//                ]
-//        case .flx:
-//            let queryableFields = schema.objectSchema.compactMap { object  -> [String]? in
-//                return object.properties.compactMap { property -> String? in
-//                    guard !property.isSet && !property.isMap && !property.isArray && property.type != .object else { return nil }
-//                    return property.name
-//                }
-//            }.flatMap { $0 }
-//            appService = [
-//                "name": "mongodb1",
-//                "type": "mongodb",
-//                "config": [
-//                    "uri": "mongodb://localhost:26000",
-//                    "sync_query": [
-//                        "state": "enabled",
-//                        "database_name": "test_data",
-//                        "queryable_fields_names": queryableFields
-//                    ]
-//                ]
-//            ]
-//        }
+        // Creating the rules is a two-step process where we first add all the
+        // rules and then add properties to them so that we can add relationships
+        let schema = ObjectiveCSupport.convert(object: RLMSchema.shared())
 
-        let appService: Any = [
-            "name": "mongodb1",
-            "type": "mongodb",
-            "config": [
-                "uri": "mongodb://localhost:26000"
+        let appService: Any
+        switch syncMode {
+        case .pbs(let bsonType):
+            appService = [
+                "name": "mongodb1",
+                "type": "mongodb",
+                "config": [
+                    "uri": "mongodb://localhost:26000",
+                    "sync": [
+                        "state": "enabled",
+                        "database_name": "test_data",
+                        "partition": [
+                            "key": "realm_id",
+                            "type": "\(bsonType)",
+                            "required": false,
+                            "permissions": [
+                                "read": true,
+                                "write": true
+                            ]
+                        ]
+                    ]
+                ]
+                ]
+        case .flx(let fields):
+            appService = [
+                "name": "mongodb1",
+                "type": "mongodb",
+                "config": [
+                    "uri": "mongodb://localhost:26000",
+                    "sync_query": [
+                        "state": "enabled",
+                        "database_name": "test_data",
+                        "queryable_fields_names": fields,
+                        "permissions": [
+                            "rules": [:],
+                            "defaultRoles": [[
+                                "name": "all",
+                                "applyWhen": [:],
+                                "read": true,
+                                "write": true
+                            ]]
+                        ]
+                    ]
+                ]
             ]
-        ]
+        }
+
         let serviceResponse = app.services.post(appService)
         guard let serviceId = (try serviceResponse.get() as? [String: Any])?["_id"] as? String else {
             throw URLError(.badServerResponse)
         }
 
-        // Creating the rules is a two-step process where we first add all the
-        // rules and then add properties to them so that we can add relationships
-        let schema = ObjectiveCSupport.convert(object: RLMSchema.shared())
         let rules = app.services[serviceId].rules
 
         let syncTypes = schema.objectSchema.filter {
@@ -778,13 +775,14 @@ public class RealmServer: NSObject {
             return pk.name == "_id"
         }
 
-        let partitionKeyType: String?
-        if case .pbs(let bsonType) = syncMode { partitionKeyType = bsonType } else { partitionKeyType = nil }
+        let partitionKeyType: String
+        if case .pbs(let bsonType) = syncMode { partitionKeyType = bsonType } else { partitionKeyType = "string" }
         var ruleCreations = [Result<Any?, Error>]()
         for objectSchema in syncTypes {
-//            if objectSchema.className == "Dog" || objectSchema.className == "Person" {
+            if case .flx(_) = syncMode,
+               objectSchema.className == "Dog" || objectSchema.className == "Person" {
                 ruleCreations.append(rules.post(objectSchema.stitchRule(partitionKeyType, schema)))
-//            }
+            }
         }
 
         var ruleIds: [String: String] = [:]
@@ -796,46 +794,12 @@ public class RealmServer: NSObject {
             ruleIds[dict["collection"]!] = dict["_id"]!
         }
         for objectSchema in syncTypes {
-//            if objectSchema.className == "Dog" || objectSchema.className == "Person" {
+            if case .flx(_) = syncMode,
+               objectSchema.className == "Dog" || objectSchema.className == "Person" {
                 let id = ruleIds[objectSchema.className]!
                 rules[id].put(on: group, data: objectSchema.stitchRule(partitionKeyType, schema, id: id), failOnError)
-//            }
-        }
-
-        let syncConfig: Any
-        switch syncMode {
-        case .pbs(let partitionType):
-            syncConfig = [
-                "uri": "mongodb://localhost:26000",
-                "sync": [
-                    "state": "enabled",
-                    "database_name": "test_data",
-                    "partition": [
-                        "key": "realm_id",
-                        "type": "\(partitionType)",
-                        "required": false,
-                        "permissions": [
-                            "read": true,
-                            "write": true
-                        ]
-                    ]
-                ]
-            ]
-        case .flx(let fields):
-            syncConfig = [
-                "uri": "mongodb://localhost:26000",
-                "sync_query": [
-                    "state": "enabled",
-                    "database_name": "test_data",
-                    "queryable_fields_names": fields
-                ]
-            ]
-        }
-        app.services[serviceId].config.patch(on: group, syncConfig, { result in
-            if case .failure(let error) = result {
-                XCTFail(error.localizedDescription)
             }
-        })
+        }
 
         app.sync.config.put(on: group, data: [
             "development_mode_enabled": true
