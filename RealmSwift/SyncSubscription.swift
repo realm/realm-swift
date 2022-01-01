@@ -20,6 +20,7 @@ import Foundation
 import Realm
 import Realm.Private
 
+/// An error describing the error from the server after a write transaction to the subscription set.
 enum SyncSubscriptionError: Error {
     case error(message: String)
 }
@@ -63,17 +64,15 @@ public protocol SyncSubscription: _SyncSubscription {
     /// When the subscription was last updated. Recorded automatically.
     var updatedAt: Date { get }
 
-    #if swift(>=5.4)
     /**
-     Updates a Flexible Sync's subscription query and/or name.
+     Updates a Flexible Sync's subscription with an allowed query which will be used to bootstrap data
+     from the server when committed.
 
      - warning: This method may only be called during a write transaction.
 
-     - parameter to: A query builder that produces a subscription which can be used to
-                     update the subscription query and/or name.
+     - parameter to: A query builder that produces a subscription which can used to modify the query.
      */
-    func update<U>(_ to: () -> ((Query<U>) -> Query<U>)) throws where U: _RealmSchemaDiscoverable
-    #endif // swift(>=5.4)
+    func update<T: _RealmSchemaDiscoverable>(_ to: () -> (QuerySubscription<T>))
 }
 
 internal protocol _AnySyncSubscriptionBox {
@@ -82,9 +81,7 @@ internal protocol _AnySyncSubscriptionBox {
     var _name: String? { get }
     var _createdAt: Date { get }
     var _updatedAt: Date { get }
-    #if swift(>=5.4)
-    func _update<U>(_ to: () -> ((Query<U>) -> Query<U>)) throws where U: _RealmSchemaDiscoverable
-    #endif // swift(>=5.4)
+    func _update<T: _RealmSchemaDiscoverable>(_ to: () -> (QuerySubscription<T>))
 
     /// The underlying base value, type-erased to `Any`.
     var _typeErasedBase: Any { get }
@@ -141,19 +138,17 @@ public struct AnySyncSubscription: SyncSubscription {
         _box._updatedAt
     }
 
-    #if swift(>=5.4)
     /**
-     Updates a Flexible Sync's subscription query and/or name.
+     Updates a Flexible Sync's subscription with an allowed query which will be used to bootstrap data
+     from the server when committed.
 
      - warning: This method may only be called during a write transaction.
 
-     - parameter to: A query builder that produces a subscription which can be used to
-                     update the subscription query and/or name.
+     - parameter to: A query builder that produces a subscription which can used to modify the query.
      */
-    public func update<U>(_ to: () -> ((Query<U>) -> Query<U>)) throws where U: _RealmSchemaDiscoverable {
-        try _box._update(to)
+    public func update<T: _RealmSchemaDiscoverable>(_ to: () -> (QuerySubscription<T>)) {
+        _box._update(to)
     }
-    #endif // swift(>=5.4)
 }
 
 private final class _AnySyncSubscription<T: SyncSubscription>: _AnySyncSubscriptionBox {
@@ -194,11 +189,9 @@ private final class _AnySyncSubscription<T: SyncSubscription>: _AnySyncSubscript
         _base.updatedAt
     }
 
-    #if swift(>=5.4)
-    func _update<U>(_ to: () -> ((Query<U>) -> Query<U>)) throws where U: _RealmSchemaDiscoverable {
-        try _base.update(to)
+    func _update<T: _RealmSchemaDiscoverable>(_ to: () -> (QuerySubscription<T>)) {
+        _base.update(to)
     }
-    #endif // swift(>=5.4)
 }
 
 /**
@@ -239,23 +232,22 @@ private final class _AnySyncSubscription<T: SyncSubscription>: _AnySyncSubscript
     }
 
     /**
-     Updates a Flexible Sync's subscription query and/or name.
+     Updates a Flexible Sync's subscription with an allowed query which will be used to bootstrap data
+     from the server when committed.
 
      - warning: This method may only be called during a write subscription block.
 
-     - parameter to: A query builder that produces a subscription which can be used to
-                     update the subscription query and/or name.
+     - parameter to: A query builder that produces a subscription which can used to modify the query.
      */
-    public func update<U>(_ to: () -> ((Query<U>) -> Query<U>)) throws where U: _RealmSchemaDiscoverable {
-        let query = to()
-        let predicate = query(Query()).predicate
-        rlmSyncSubscription.update(withClassName: "\(U.self)",
-                                   predicate: predicate)
+    public func update<T: _RealmSchemaDiscoverable>(_ to: () -> (QuerySubscription<T>)) {
+        let subscription = to()
+        rlmSyncSubscription.update(withClassName: subscription.className,
+                                   predicate: subscription.predicate)
     }
 }
 
 /**
- `SubscriptionQuery` is  used to define an named/unamed query subscription query, which
+ `SubscriptionQuery` is  used to define an named/unnamed query subscription query, which
  can be added/remove or updated within a write subscription transaction.
  */
 @frozen public struct QuerySubscription<ObjectType: _RealmSchemaDiscoverable> {
@@ -278,13 +270,11 @@ private final class _AnySyncSubscription<T: SyncSubscription>: _AnySyncSubscript
     }
 }
 
-#if swift(>=5.4)
 @resultBuilder public struct QueryBuilder {
     public static func buildBlock<T: _RealmSchemaDiscoverable>(_ components: QuerySubscription<T>...) -> [QuerySubscription<T>] {
         return components
     }
 }
-#endif // swift(>=5.4)
 
 @frozen public struct SyncSubscriptionSet {
 
@@ -302,9 +292,9 @@ private final class _AnySyncSubscription<T: SyncSubscription>: _AnySyncSubscript
     public var count: Int { return Int(rlmSyncSubscriptionSet.count) }
 
     /**
-     Create and commit a write transaction and updates the subscription set,
-     this will not wait for the server to acknowledge and see all the data associated with this
-     collection of subscription.
+     Synchronously performs any transactions (add/remove/update) to the subscription set within the block,
+     this will not wait for the server to acknowledge and see all the data associated with this collection of subscriptions,
+     and will return after committing the subscription transactions.
 
      - parameter block: The block containing the subscriptions transactions to perform.
 
@@ -319,7 +309,6 @@ private final class _AnySyncSubscription<T: SyncSubscription>: _AnySyncSubscript
      Notifies state changes for the subscription set.
      During a write batch transaction to the server, it will return complete when the server is on
      "steady-state" synchronization.
-     This will throw an error if someone updates the subscription set while on a write transaction.
      */
     public func observe(_ block: @escaping (SyncSubscriptionState) -> Void) {
         rlmSyncSubscriptionSet.observe { state in
@@ -336,19 +325,17 @@ private final class _AnySyncSubscription<T: SyncSubscription>: _AnySyncSubscript
         case .superceded:
             return .superceded
         case .error:
-            return .error(SyncSubscriptionError.error(message: rlmSyncSubscriptionSet.error.localizedDescription))
+            return .error(SyncSubscriptionError.error(message: rlmSyncSubscriptionSet.error?.localizedDescription ?? ""))
         @unknown default:
             fatalError()
         }
     }
 
-    #if swift(>=5.4)
     /**
-     Returns an `AnySyncSubscription` which encapsulates the resulted subscription from
-     the search.
+     Returns a subscription by the specified name.
 
      - parameter named: The name of the subscription searching for.
-     - returns: A `AnySubscription` struct encapsulating the subscription we are searching for.
+     - returns: A subscription for the given name.
      */
     public func first(named: String) -> AnySyncSubscription? {
         let rlmSubscription = rlmSyncSubscriptionSet.subscription(withName: named)
@@ -360,12 +347,11 @@ private final class _AnySyncSubscription<T: SyncSubscription>: _AnySyncSubscript
     }
 
     /**
-     Returns an `AnySyncSubscription` which encapsulates the resulted subscription from
-     the search.
+     Returns a subscription by the specified query.
 
      - parameter where: A query builder that produces a subscription which can be used to search
                         the subscription by query and/or name.
-     - returns: An `AnySyncSubscription` struct encapsulating the subscription we are searching for.
+     - returns: A query builder that produces a subscription which can used to search for the subscription.
      */
     public func first<T: _RealmSchemaDiscoverable>(`where`: () -> (QuerySubscription<T>)) -> AnySyncSubscription? {
         let subscription = `where`()
@@ -379,8 +365,7 @@ private final class _AnySyncSubscription<T: SyncSubscription>: _AnySyncSubscript
     }
 
     /**
-     Append an `AnySyncSubscription` to the subscription set which will be sent to the server when
-     committed at the end of a write subscription block.
+     Append a subscription to the subscription set.
 
      - warning: This method may only be called during a write subscription block.
 
@@ -397,8 +382,7 @@ private final class _AnySyncSubscription<T: SyncSubscription>: _AnySyncSubscript
     }
 
     /**
-     Remove an `AnySyncSubscription`to the subscription set which will be removed from the server when
-     committed at the end of a write subscription block.
+     Removes a subscription with the specified query for the object class from the subscription set.
 
      - warning: This method may only be called during a write subscription block.
 
@@ -412,14 +396,12 @@ private final class _AnySyncSubscription<T: SyncSubscription>: _AnySyncSubscript
                                                       predicate: subscription.predicate)
         }
     }
-    #endif // swift(>=5.4)
 
     /**
-     Removes an `AnySyncSubscription`to the subscription set which will be removed from the server when
-     committed at the end of a write subscription block.
+     Removes a subscription from the subscription set.
 
      - warning: This method may only be called during a write subscription block.
-ion
+
      - parameter subscription: The subscription to be removed from the subscription set.
      */
     public func remove(_ subscription: AnySyncSubscription) {
@@ -427,8 +409,7 @@ ion
     }
 
     /**
-     Removes an `AnySyncSubscription`to the subscription set which will be removed from the server when
-     committed at the end of a write subscription block.
+     Removes a subscription with the specified name from the subscription set.
 
      - warning: This method may only be called during a write subscription block.
 
@@ -442,6 +423,8 @@ ion
      Removes all subscriptions from the subscription set.
 
      - warning: This method may only be called during a write subscription block.
+     - warning: Removing all subscriptions will result in an error if no new subscription is added. Server should
+              acknowledge at least one subscription.
      */
     public func removeAll() {
         rlmSyncSubscriptionSet.removeAllSubscriptions()
@@ -514,7 +497,6 @@ extension SyncSubscriptionSet: Sequence {
     }
 }
 
-// TODO: Change to public
 #if swift(>=5.5) && canImport(_Concurrency)
 @available(macOS 12.0, tvOS 15.0, iOS 15.0, watchOS 8.0, *)
 extension SyncSubscriptionSet {

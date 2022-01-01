@@ -57,13 +57,32 @@ NS_ASSUME_NONNULL_BEGIN
 /// When the subscription was last updated. Recorded automatically.
 @property (nonatomic, readonly) NSDate *updatedAt;
 
+/**
+ Updates a Flexible Sync's subscription query with an allowed query which will be used to bootstrap data
+ from the server when committed.
+
+ @warning This method may only be called during a write subscription block.
+
+ @param objectClassName The class name for the model class to be queried.
+ @param predicateFormat A predicate format string, optionally followed by a variable number of arguments.
+ */
 - (void)updateSubscriptionWithClassName:(NSString *)objectClassName
                                   where:(NSString *)predicateFormat, ...;
 
+/// :nodoc:
 - (void)updateSubscriptionWithClassName:(NSString *)objectClassName
                                   where:(NSString *)predicateFormat
                                    args:(va_list)args;
 
+/**
+ Updates a Flexible Sync's subscription query with an allowed query which will be used to bootstrap data
+ from the server when committed.
+
+ @warning This method may only be called during a write subscription block.
+
+ @param objectClassName The class name for the model class to be queried.
+ @param predicate The predicate with which to filter the objects on the server.
+ */
 - (void)updateSubscriptionWithClassName:(NSString *)objectClassName
                               predicate:(NSPredicate *)predicate;
 
@@ -71,100 +90,248 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface RLMSyncSubscriptionSet : NSObject <NSFastEnumeration>
 
+/// The number of subscriptions in the subscription set.
 @property (readonly) NSUInteger count;
 
-@property (readonly) RLMSyncSubscriptionState state;
-
-@property (nonatomic, readonly) NSError *error;
+/// Gets the error associated to the subscription set, this will return a no nil in case the current
+/// state of the subscription set is `RLMSyncSubscriptionStateError`.
+@property (nonatomic, readonly, nullable) NSError *error;
 
 #pragma mark - Batch Update subscriptions
 
+/**
+ Synchronously performs any transactions (add/remove/update) to the subscription set within the block,
+ this will not wait for the server to acknowledge and see all the data associated with this collection of subscriptions,
+ and will return after committing the subscription transactions.
+
+ @param block The block containing actions to perform to the subscription set.
+ */
 - (BOOL)write:(__attribute__((noescape)) void(^)(void))block NS_SWIFT_UNAVAILABLE("");
 
+/**
+ Synchronously performs any transactions (add/remove/update) to the subscription set within the block,
+ this will not wait for the server to acknowledge and see all the data associated with this collection of subscriptions,
+ and will return after committing the subscription transactions.
+
+ @param block The block containing actions to perform to the subscription set.
+ */
 - (BOOL)write:(__attribute__((noescape)) void(^)(void))block error:(NSError **)error;
-
-typedef void(^RLMSyncSubscriptionCallback)(NSError * _Nullable error);
-
-- (BOOL)writeAsync:(__attribute__((noescape)) void(^)(void))block
-          callback:(RLMSyncSubscriptionCallback)callback;
 
 #pragma mark - Check Subscription State
 
 typedef void(^RLMSyncSubscriptionStateBlock)(RLMSyncSubscriptionState state);
 
+/**
+ Notifies state changes for the subscription set.
+ During a write batch transaction to the server, it will return complete when the server is on
+ "steady-state" synchronization.
+ */
 - (void)observe:(RLMSyncSubscriptionStateBlock)block;
 
 #pragma mark - Find subscription
 
+/**
+ Finds a subscription by the specified name.
+
+ @param name The name used  the identify the subscription.
+
+ @return A subscription for the given name.
+ */
 - (nullable RLMSyncSubscription *)subscriptionWithName:(NSString *)name;
 
+/**
+ Finds a subscription by the query for the specified object class name.
+
+ @param objectClassName The class name for the model class to be queried.
+ @param predicateFormat A predicate format string, optionally followed by a variable number of arguments.
+
+ @return A subscription for the given query..
+ */
 - (nullable RLMSyncSubscription *)subscriptionWithClassName:(NSString *)objectClassName
                                                       where:(NSString *)predicateFormat, ...;
 
+/// :nodoc:
 - (nullable RLMSyncSubscription *)subscriptionWithClassName:(NSString *)objectClassName
                                                       where:(NSString *)predicateFormat
                                                        args:(va_list)args;
 
+/**
+ Finds a subscription by the query for the specified object class name.
+
+ @param objectClassName The class name for the model class to be queried.
+ @param predicate The predicate with which to filter the objects on the server.
+
+ @return A subscription for the given query..
+ */
 - (nullable RLMSyncSubscription *)subscriptionWithClassName:(NSString *)objectClassName
                                                   predicate:(NSPredicate *)predicate;
 
 #pragma mark - Add a Subscription
 
+/**
+ Adds a new subscription to the subscription set which will be sent to the server when
+ committed at the end of a write subscription block.
+
+ @warning This method may only be called during a write subscription block.
+
+ @param objectClassName The class name for the model class to be queried.
+ @param predicateFormat A predicate format string, optionally followed by a variable number of arguments.
+ */
 - (void)addSubscriptionWithClassName:(NSString *)objectClassName
                                where:(NSString *)predicateFormat, ...;
 
+/// :nodoc:
 - (void)addSubscriptionWithClassName:(NSString *)objectClassName
                                where:(NSString *)predicateFormat
                                 args:(va_list)args;
 
+/**
+ Adds a new subscription to the subscription set which will be sent to the server when
+ committed at the end of a write subscription block.
+
+ @warning This method may only be called during a write subscription block.
+
+ @param objectClassName The class name for the model class to be queried.
+ @param name The name used  the identify the subscription.
+ @param predicateFormat A predicate format string, optionally followed by a variable number of arguments.
+ */
 - (void)addSubscriptionWithClassName:(NSString *)objectClassName
                     subscriptionName:(NSString *)name
                                where:(NSString *)predicateFormat, ...;
 
+/// :nodoc:
 - (void)addSubscriptionWithClassName:(NSString *)objectClassName
                     subscriptionName:(NSString *)name
                                where:(NSString *)predicateFormat
                                 args:(va_list)args;
 
+/**
+ Adds a new subscription to the subscription set which will be sent to the server when
+ committed at the end of a write subscription block.
+
+ @warning This method may only be called during a write subscription block.
+
+ @param objectClassName The class name for the model class to be queried.
+ @param predicate The predicate with which to filter the objects on the server.
+ */
 - (void)addSubscriptionWithClassName:(NSString *)objectClassName
                            predicate:(NSPredicate *)predicate;
 
+/**
+ Adds a new subscription to the subscription set which will be sent to the server when
+ committed at the end of a write subscription block.
+
+ @warning This method may only be called during a write subscription block.
+
+ @param objectClassName The class name for the model class to be queried.
+ @param name The name used  the identify the subscription.
+ @param predicate The predicate with which to filter the objects on the server.
+ */
 - (void)addSubscriptionWithClassName:(NSString *)objectClassName
                     subscriptionName:(nullable NSString *)name
                            predicate:(NSPredicate *)predicate;
 
 #pragma mark - Remove Subscription
 
+/**
+ Removes a subscription with the specified name from the subscription set.
+
+ @warning This method may only be called during a write subscription block.
+
+ @param name The name used  the identify the subscription.
+ */
 - (void)removeSubscriptionWithName:(NSString *)name;
 
+/**
+ Removes a subscription with the specified query for the object class from the subscription set.
+
+ @warning This method may only be called during a write subscription block.
+
+ @param objectClassName The class name for the model class to be queried.
+ @param predicateFormat A predicate format string, optionally followed by a variable number of arguments.
+ */
 - (void)removeSubscriptionWithClassName:(NSString *)objectClassName
                                   where:(NSString *)predicateFormat, ...;
 
+/// :nodoc:
 - (void)removeSubscriptionWithClassName:(NSString *)objectClassName
                                   where:(NSString *)predicateFormat
                                    args:(va_list)args;
 
+/**
+ Removes a subscription with the specified query for the object class from the subscription set.
+
+ @warning This method may only be called during a write subscription block.
+
+ @param objectClassName The class name for the model class to be queried.
+ @param predicate The predicate with which to filter the objects on the server.
+ */
 - (void)removeSubscriptionWithClassName:(NSString *)objectClassName
                               predicate:(NSPredicate *)predicate;
 
+/**
+ Removes the subscription from the subscription set.
+
+ @warning This method may only be called during a write subscription block.
+
+ @param subscription An instance of the subscription to be removed.
+ */
 - (void)removeSubscription:(RLMSyncSubscription *)subscription;
 
 #pragma mark - Remove Subscriptions
 
+/**
+ Removes all subscription from the subscription set.
+
+ @warning This method may only be called during a write subscription block.
+ @warning Removing all subscriptions will result in an error if no new subscription is added. Server should
+          acknowledge at least one subscription.
+ */
 - (void)removeAllSubscriptions;
 
+/**
+ Removes all subscription with the specified class name.
+
+ @param objectClassName The class name for the model class to be queried.
+
+ @warning This method may only be called during a write subscription block.
+ */
 - (void)removeAllSubscriptionsWithClassName:(NSString *)className;
 
 #pragma mark - SubscriptionSet Collection
 
+/**
+ Returns the subscription at the given `index`.
+
+ @param index The index.
+
+ @return A subscription for the given index in the subscription set.
+ */
 - (nullable RLMSyncSubscription *)objectAtIndex:(NSUInteger)index;
 
+/**
+ Returns the first object in the subscription set list, or `nil` if the subscriptions are empty.
+
+ @return A subscription.
+ */
 - (nullable RLMSyncSubscription *)firstObject;
 
+/**
+ Returns the last object in the subscription set, or `nil` if the subscriptions are empty.
+
+ @return A subscription.
+ */
 - (nullable RLMSyncSubscription *)lastObject;
 
 #pragma mark - Subscript
 
+/**
+ Returns the subscription at the given `index`.
+
+ @param index The index.
+
+ @return A subscription for the given index in the subscription set.
+ */
 - (id)objectAtIndexedSubscript:(NSUInteger)index;
 
 @end

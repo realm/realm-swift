@@ -53,8 +53,12 @@
     const std::string_view str_view = _subscription->name();
     std::string str = std::string(str_view);
     const char * characters = str.c_str();
-    return [NSString stringWithCString:characters
-                              encoding:[NSString defaultCStringEncoding]];
+    NSString *name = [NSString stringWithCString:characters
+                                        encoding:[NSString defaultCStringEncoding]];
+    if ([name length] == 0) {
+        return NULL;
+    }
+    return name;
 }
 
 - (NSDate *)createdAt {
@@ -132,15 +136,14 @@
     return _subscriptionSet->size();
 }
 
-- (NSError *)error {
-    NSError *error = [[NSError alloc]initWithDomain:RLMSyncErrorDomain
+- (nullable NSError *)error {
+    NSString *errorMessage = RLMStringDataToNSString(_subscriptionSet->error_str());
+    if ([errorMessage length] == 0) {
+        return NULL;
+    }
+    return [[NSError alloc]initWithDomain:RLMSyncErrorDomain
                                                code:0
-                                           userInfo:@{NSLocalizedDescriptionKey : RLMStringDataToNSString(_subscriptionSet->error_str())}];
-    return error;
-}
-
-- (RLMSyncSubscriptionState)state {
-    return [self mapState:_subscriptionSet->state()];
+                                           userInfo:@{NSLocalizedDescriptionKey : errorMessage}];
 }
 
 #pragma mark - Batch Update subscriptions
@@ -167,6 +170,8 @@
     }
     return YES;
 }
+
+typedef void(^RLMSyncSubscriptionCallback)(NSError * _Nullable error);
 
 - (BOOL)writeAsync:(__attribute__((noescape)) void(^)(void))block
           callback:(RLMSyncSubscriptionCallback)callback {

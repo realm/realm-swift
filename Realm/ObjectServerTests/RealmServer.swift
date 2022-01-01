@@ -780,7 +780,7 @@ public class RealmServer: NSObject {
         var ruleCreations = [Result<Any?, Error>]()
         for objectSchema in syncTypes {
             if case .flx(_) = syncMode,
-               objectSchema.className == "Dog" || objectSchema.className == "Person" {
+               objectSchema.className == "Dog" || objectSchema.className == "Person" || objectSchema.className == "SwiftPerson" {
                 ruleCreations.append(rules.post(objectSchema.stitchRule(partitionKeyType, schema)))
             }
         }
@@ -795,7 +795,7 @@ public class RealmServer: NSObject {
         }
         for objectSchema in syncTypes {
             if case .flx(_) = syncMode,
-               objectSchema.className == "Dog" || objectSchema.className == "Person" {
+               objectSchema.className == "Dog" || objectSchema.className == "Person" || objectSchema.className == "SwiftPerson" {
                 let id = ruleIds[objectSchema.className]!
                 rules[id].put(on: group, data: objectSchema.stitchRule(partitionKeyType, schema, id: id), failOnError)
             }

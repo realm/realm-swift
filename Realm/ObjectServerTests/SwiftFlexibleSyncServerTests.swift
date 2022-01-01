@@ -368,7 +368,6 @@ class SwiftFlexibleSyncServerTests: SwiftFlexibleSyncTestCase {
         XCTAssertEqual(subscriptions.count, 1)
     }
 
-
     func testRemoveSubscription() throws {
         let realm = try getFlexibleSyncRealm()
         let subscriptions = realm.subscriptions
@@ -547,6 +546,32 @@ class SwiftFlexibleSyncServerTests: SwiftFlexibleSyncTestCase {
         let lastSubscription = subscriptions[numberOfSubs-1]
         XCTAssertNotNil(lastSubscription!)
         XCTAssertEqual(lastSubscription!.name, "person_age_\(numberOfSubs)")
+    }
+
+    func testUpdateQueries() throws {
+        let realm = try getFlexibleSyncRealm()
+        let subscriptions = realm.subscriptions
+        try subscriptions.write {
+            subscriptions.append {
+                QuerySubscription<SwiftPerson>(name: "person_age_15") {
+                    $0.age > 15
+                }
+                QuerySubscription<SwiftPerson>(name: "person_age_20") {
+                    $0.age > 20
+                }
+            }
+        }
+        XCTAssertEqual(subscriptions.count, 2)
+
+        let foundSubscription1 = subscriptions.first(named: "person_age_15")
+        let foundSubscription2 = subscriptions.first(named: "person_age_20")
+
+        try subscriptions.write {
+            foundSubscription1?.update { QuerySubscription<SwiftPerson> { $0.age > 0 } }
+            foundSubscription2?.update { QuerySubscription<SwiftPerson> { $0.age > 0 } }
+        }
+
+        XCTAssertEqual(subscriptions.count, 2)
     }
 }
 // MARK: - Completion Block
