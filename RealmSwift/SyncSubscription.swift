@@ -270,11 +270,13 @@ private final class _AnySyncSubscription<T: SyncSubscription>: _AnySyncSubscript
     }
 }
 
+#if swift(>=5.5)
 @resultBuilder public struct QueryBuilder {
     public static func buildBlock<T: _RealmSchemaDiscoverable>(_ components: QuerySubscription<T>...) -> [QuerySubscription<T>] {
         return components
     }
 }
+#endif // swift(>=5.5)
 
 @frozen public struct SyncSubscriptionSet {
 

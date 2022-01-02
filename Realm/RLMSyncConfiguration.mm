@@ -115,7 +115,7 @@ RLMSyncSystemErrorKind errorKindForSyncError(SyncError error) {
     _config->cancel_waits_on_nonfatal_error = cancelAsyncOpenOnNonFatalErrors;
 }
 
-- (bool)isFlexibleSync {
+- (BOOL)isFlexibleSync {
     return _config->flx_sync_requested;
 }
 

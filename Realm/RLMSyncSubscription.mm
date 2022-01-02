@@ -43,6 +43,7 @@
         _subscriptionSet = subscriptionSet;
         return self;
     }
+    return nil;
 }
 
 - (RLMObjectId *)identifier {
@@ -149,7 +150,7 @@
 #pragma mark - Batch Update subscriptions
 
 - (BOOL)write:(__attribute__((noescape)) void(^)(void))block {
-    [self write:block error:nil];
+    return [self write:block error:nil];
 }
 
 - (BOOL)write:(__attribute__((noescape)) void(^)(void))block error:(NSError **)error {

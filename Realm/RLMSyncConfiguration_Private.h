@@ -43,7 +43,7 @@ typedef RLM_CLOSED_ENUM(NSUInteger, RLMSyncStopPolicy) {
 // Internal-only APIs
 @property (nullable, nonatomic) NSURL *customFileURL;
 
-@property (readonly) BOOL isFlexibleSync;
+@property (nonatomic, readonly) BOOL isFlexibleSync;
 
 @end
 
