@@ -182,12 +182,12 @@
 
 - (void)testGetSubscriptionsWhenLocalRealm {
     RLMRealm *realm = [RLMRealm defaultRealm];
-    RLMAssertThrowsWithReason(realm.subscriptions, @"Realm was not build for a sync session");
+    XCTAssertNil(realm.subscriptions);
 }
 
 - (void)testGetSubscriptionsWhenPbsRealm {
     RLMRealm *realm = [self realmForTest:_cmd];
-    RLMAssertThrowsWithReason(realm.subscriptions, @"Realm sync session is not Flexible Sync");
+    XCTAssertNil(realm.subscriptions);
 }
 
 - (void)testGetSubscriptionsWhenFlexibleSync {
@@ -248,11 +248,11 @@
     RLMSyncSubscription *foundSubscription = [subs subscriptionWithClassName:Person.className
                                                                        where:@"age > 15"];
     XCTAssertNotNil(foundSubscription);
-    XCTAssert(foundSubscription.name, @"");
+    XCTAssertNil(foundSubscription.name);
     XCTAssert(foundSubscription.queryString, @"age > 15");
 }
 
-- (void)testAddAndFindSubscriptionWithComplexQuery {
+- (void)testAddAndFindSubscriptionWithCompoundQuery {
     RLMRealm *realm = [self openFlexibleSyncRealm:_cmd];
     RLMSyncSubscriptionSet *subs = realm.subscriptions;
     XCTAssertNotNil(subs);
@@ -261,17 +261,17 @@
 
     [subs write:^{
         [subs addSubscriptionWithClassName:Person.className
-                                     where:@"firstName BEGINSWITH %@ and lastName == %@", @"J", @"Doe"];
+                                     where:@"firstName == %@ and lastName == %@", @"John", @"Doe"];
     }];
 
     XCTAssertEqual(subs.version, 1);
     XCTAssertEqual(subs.count, 1);
 
     RLMSyncSubscription *foundSubscription = [subs subscriptionWithClassName:Person.className
-                                                                       where:@"firstName BEGINSWITH %@ and lastName == %@", @"J", @"Doe"];
+                                                                       where:@"firstName == %@ and lastName == %@", @"John", @"Doe"];
     XCTAssertNotNil(foundSubscription);
-    XCTAssert(foundSubscription.name, @"");
-    XCTAssert(foundSubscription.queryString, @"firstName BEGINSWITH 'J' and lastName == 'Doe'");
+    XCTAssertNil(foundSubscription.name);
+    XCTAssert(foundSubscription.queryString, @"firstName == 'John' and lastName == 'Doe'");
 }
 
 - (void)testAddAndFindSubscriptionWithPredicate {
@@ -292,7 +292,7 @@
     RLMSyncSubscription *foundSubscription = [subs subscriptionWithClassName:Person.className
                                                                    predicate:[NSPredicate predicateWithFormat:@"age == %d", 20]];
     XCTAssertNotNil(foundSubscription);
-    XCTAssert(foundSubscription.name, @"");
+    XCTAssertNil(foundSubscription.name);
     XCTAssert(foundSubscription.queryString, @"age == 20");
 }
 
@@ -337,6 +337,30 @@
     XCTAssertEqual(subs.count, 1);
 }
 
+- (void)testAddDuplicateNamedSubscriptionWillNotReplace {
+    RLMRealm *realm = [self openFlexibleSyncRealm:_cmd];
+    RLMSyncSubscriptionSet *subs = realm.subscriptions;
+
+    [subs write:^{
+        [subs addSubscriptionWithClassName:Person.className
+                          subscriptionName:@"person_age"
+                                     where:@"age > 15"];
+        [subs addSubscriptionWithClassName:Person.className
+                          subscriptionName:@"person_age"
+                                     where:@"age > 20"];
+    }];
+
+    XCTAssertEqual(subs.version, 1);
+    XCTAssertEqual(subs.count, 1);
+
+    RLMSyncSubscription *foundSubscription = [subs subscriptionWithName:@"person_age"];
+    XCTAssertNotNil(foundSubscription);
+
+    XCTAssertEqualObjects(foundSubscription.name, @"person_age");
+    XCTAssertEqualObjects(foundSubscription.queryString, @"age > 15");
+    XCTAssertEqualObjects(foundSubscription.objectClassName, @"Person");
+}
+
 - (void)testAddDuplicateSubscriptionWithPredicate {
     RLMRealm *realm = [self openFlexibleSyncRealm:_cmd];
     RLMSyncSubscriptionSet *subs = realm.subscriptions;
@@ -379,7 +403,6 @@
     XCTAssertEqualObjects(foundSubscription.objectClassName, foundSubscription2.objectClassName);
 }
 
-// An unnamed subscription should not override a named one, this should create a subscription with a different name, (there is a bug in core, that's why this is failing)
 - (void)testOverrideNamedWithUnnamedSubscription {
     RLMRealm *realm = [self openFlexibleSyncRealm:_cmd];
     RLMSyncSubscriptionSet *subs = realm.subscriptions;

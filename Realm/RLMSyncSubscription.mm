@@ -308,7 +308,8 @@ typedef void(^RLMSyncSubscriptionCallback)(NSError * _Nullable error);
             _mutableSubscriptionSet->insert_or_assign(str, query);
         }
         else {
-            @throw RLMException(@"Cannot duplicate a subscription, if you meant to update the subscription please use the `update` method.");
+            // Should this throw??
+            NSLog(@"Cannot duplicate a subscription, if you meant to update the subscription please use the `update` method.");
         }
     }
     else {

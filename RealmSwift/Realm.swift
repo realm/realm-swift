@@ -963,15 +963,19 @@ import Realm.Private
 // MARK: Sync Subscriptions
 
 extension Realm {
-    // TODO: Change to public
     /**
-     Get the latest subscription set for this realm. This will return a mutable collection of subscriptions,
-     which can used to perform transactions with the subscription set.
+     Returns an instance of `SyncSubscriptionSet`, representing the active subscriptions
+    for this realm, which can be used to add/remove/update and search flexible sync subscriptions.
+    Getting the subscriptions from a local or partition-based configured realm will return a nil subscription
+    set.
 
-     Add/Remove/Update a subscription can only happen within a write subscription block.
+    - returns: A `SyncSubscriptionSet`.
      */
-    public var subscriptions: SyncSubscriptionSet {
-        return SyncSubscriptionSet(rlmRealm.subscriptions)
+    public var subscriptions: SyncSubscriptionSet? {
+        guard let rlmSubscriptionSet = rlmRealm.subscriptions else {
+            return nil
+        }
+        return SyncSubscriptionSet(rlmSubscriptionSet)
     }
 }
 

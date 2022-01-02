@@ -338,12 +338,10 @@ private final class _AnySyncSubscription<T: SyncSubscription>: _AnySyncSubscript
      - returns: A subscription for the given name.
      */
     public func first(named: String) -> AnySyncSubscription? {
-        let rlmSubscription = rlmSyncSubscriptionSet.subscription(withName: named)
-        guard let rlmSubscription = rlmSubscription else {
+        guard let rlmSubscription = rlmSyncSubscriptionSet.subscription(withName: named) else {
             return nil
         }
-        let anySubscription = AnySyncSubscription(QuerySyncSubscription(rlmSubscription))
-        return anySubscription
+        return AnySyncSubscription(QuerySyncSubscription(rlmSubscription))
     }
 
     /**
@@ -355,17 +353,16 @@ private final class _AnySyncSubscription<T: SyncSubscription>: _AnySyncSubscript
      */
     public func first<T: _RealmSchemaDiscoverable>(`where`: () -> (QuerySubscription<T>)) -> AnySyncSubscription? {
         let subscription = `where`()
-        let rlmSubscription = rlmSyncSubscriptionSet.subscription(withClassName: subscription.className,
-                                                                  predicate: subscription.predicate)
-        guard let rlmSubscription = rlmSubscription else {
+        guard let rlmSubscription =  rlmSyncSubscriptionSet.subscription(withClassName: subscription.className,
+                                                                         predicate: subscription.predicate) else {
             return nil
         }
-        let anySubscription = AnySyncSubscription(QuerySyncSubscription(rlmSubscription))
-        return anySubscription
+        return AnySyncSubscription(QuerySyncSubscription(rlmSubscription))
     }
 
+    #if swift(>=5.5)
     /**
-     Append a subscription to the subscription set.
+     Appends a subscription to the subscription set.
 
      - warning: This method may only be called during a write subscription block.
 
@@ -396,6 +393,34 @@ private final class _AnySyncSubscription<T: SyncSubscription>: _AnySyncSubscript
                                                       predicate: subscription.predicate)
         }
     }
+    #else
+    /**
+     Appends a subscription to the subscription set.
+
+     - warning: This method may only be called during a write subscription block.
+
+     - parameter to: The subscription which can be added to the subscription set.
+     */
+    public func `append`<T: _RealmSchemaDiscoverable>(_ subscription: () -> (QuerySubscription<T>)) {
+        let appendableSubscription = subscription()
+        rlmSyncSubscriptionSet.addSubscription(withClassName: appendableSubscription.className,
+                                               subscriptionName: appendableSubscription.name,
+                                               predicate: appendableSubscription.predicate)
+    }
+
+    /**
+     Removes a subscription with the specified query for the object class from the subscription set.
+
+     - warning: This method may only be called during a write subscription block.
+
+     - parameter to: The subscription which will be removed from the subscription set.
+     */
+    public func remove<T: _RealmSchemaDiscoverable>(_ subscription: () -> (QuerySubscription<T>)) {
+        let removableSubscription = subscription()
+        rlmSyncSubscriptionSet.removeSubscription(withClassName: removableSubscription.className,
+                                                  predicate: removableSubscription.predicate)
+    }
+    #endif // swift(>=5.5)
 
     /**
      Removes a subscription from the subscription set.

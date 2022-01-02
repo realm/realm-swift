@@ -61,26 +61,24 @@ class SwiftFlexibleSyncServerTests: SwiftFlexibleSyncTestCase {
 
     func testGetSubscriptionsWhenLocalRealm() throws {
         let realm = try Realm()
-        assertThrows(realm.subscriptions,
-                     reason: "Realm was not build for a sync session")
+        XCTAssertNil(realm.subscriptions)
     }
 
     func testGetSubscriptionsWhenPbsRealm() throws {
         let user = try logInUser(for: basicCredentials())
         let realm = try openRealm(partitionValue: #function, user: user)
-        assertThrows(realm.subscriptions,
-                     reason: "Realm sync session is not Flexible Sync")
+        XCTAssertNil(realm.subscriptions)
     }
 
     func testGetSubscriptions() throws {
         let realm = try getFlexibleSyncRealm()
-        let subscriptions = realm.subscriptions
+        let subscriptions = realm.subscriptions!
         XCTAssertEqual(subscriptions.count, 0)
     }
 
     func testWriteEmptyBlock() throws {
         let realm = try getFlexibleSyncRealm()
-        let subscriptions = realm.subscriptions
+        let subscriptions = realm.subscriptions!
         try subscriptions.write {
         }
 
@@ -89,7 +87,7 @@ class SwiftFlexibleSyncServerTests: SwiftFlexibleSyncTestCase {
 
     func testAddOneSubscriptionWithoutName() throws {
         let realm = try getFlexibleSyncRealm()
-        let subscriptions = realm.subscriptions
+        let subscriptions = realm.subscriptions!
         try subscriptions.write {
             subscriptions.append {
                 QuerySubscription<SwiftPerson> {
@@ -103,7 +101,7 @@ class SwiftFlexibleSyncServerTests: SwiftFlexibleSyncTestCase {
 
     func testAddOneSubscriptionWithName() throws {
         let realm = try getFlexibleSyncRealm()
-        let subscriptions = realm.subscriptions
+        let subscriptions = realm.subscriptions!
         try subscriptions.write {
             subscriptions.append {
                 QuerySubscription<SwiftPerson>(name: "person_age") {
@@ -118,7 +116,7 @@ class SwiftFlexibleSyncServerTests: SwiftFlexibleSyncTestCase {
 
     func testAddSubscriptionsInDifferentBlocks() throws {
         let realm = try getFlexibleSyncRealm()
-        let subscriptions = realm.subscriptions
+        let subscriptions = realm.subscriptions!
         try subscriptions.write {
             subscriptions.append {
                 QuerySubscription<SwiftPerson>(name: "person_age") {
@@ -139,8 +137,9 @@ class SwiftFlexibleSyncServerTests: SwiftFlexibleSyncTestCase {
 
     func testAddSeveralSubscriptionsWithoutName() throws {
         let realm = try getFlexibleSyncRealm()
-        let subscriptions = realm.subscriptions
+        let subscriptions = realm.subscriptions!
         try subscriptions.write {
+            #if swift(>=5.5)
             subscriptions.append {
                 QuerySubscription<SwiftPerson> {
                     $0.age > 15
@@ -152,6 +151,23 @@ class SwiftFlexibleSyncServerTests: SwiftFlexibleSyncTestCase {
                     $0.age > 25
                 }
             }
+            #else
+            subscriptions.append {
+                QuerySubscription<SwiftPerson> {
+                    $0.age > 15
+                }
+            }
+            subscriptions.append {
+                QuerySubscription<SwiftPerson> {
+                    $0.age > 20
+                }
+            }
+            subscriptions.append {
+                QuerySubscription<SwiftPerson> {
+                    $0.age > 25
+                }
+            }
+            #endif // swift(>=5.5)
         }
 
         XCTAssertEqual(subscriptions.count, 3)
@@ -159,8 +175,9 @@ class SwiftFlexibleSyncServerTests: SwiftFlexibleSyncTestCase {
 
     func testAddSeveralSubscriptionsWithName() throws {
         let realm = try getFlexibleSyncRealm()
-        let subscriptions = realm.subscriptions
+        let subscriptions = realm.subscriptions!
         try subscriptions.write {
+            #if swift(>=5.5)
             subscriptions.append {
                 QuerySubscription<SwiftPerson>(name: "person_age_15") {
                     $0.age > 15
@@ -172,19 +189,37 @@ class SwiftFlexibleSyncServerTests: SwiftFlexibleSyncTestCase {
                     $0.age > 25
                 }
             }
+            #else
+            subscriptions.append {
+                QuerySubscription<SwiftPerson>(name: "person_age_15") {
+                    $0.age > 15
+                }
+            }
+            subscriptions.append {
+                QuerySubscription<SwiftPerson>(name: "person_age_20") {
+                    $0.age > 20
+                }
+            }
+            subscriptions.append {
+                QuerySubscription<SwiftPerson>(name: "person_age_25") {
+                    $0.age > 25
+                }
+            }
+            #endif // swift(>=5.5)
         }
         XCTAssertEqual(subscriptions.count, 3)
     }
 
     func testAddMixedSubscriptions() throws {
         let realm = try getFlexibleSyncRealm()
-        let subscriptions = realm.subscriptions
+        let subscriptions = realm.subscriptions!
         try subscriptions.write {
             subscriptions.append {
                 QuerySubscription<SwiftPerson>(name: "person_age_15") {
                     $0.age > 15
                 }
             }
+            #if swift(>=5.5)
             subscriptions.append {
                 QuerySubscription<SwiftTypesSyncObject> {
                     $0.boolCol == true
@@ -193,14 +228,27 @@ class SwiftFlexibleSyncServerTests: SwiftFlexibleSyncTestCase {
                     $0.dateCol <= Date()
                 }
             }
+            #else
+            subscriptions.append {
+                QuerySubscription<SwiftTypesSyncObject> {
+                    $0.boolCol == true
+                }
+            }
+            subscriptions.append {
+                QuerySubscription<SwiftTypesSyncObject>(name: "object_date_now") {
+                    $0.dateCol <= Date()
+                }
+            }
+            #endif // swift(>=5.5)
         }
         XCTAssertEqual(subscriptions.count, 3)
     }
 
     func testAddDuplicateSubscriptions() throws {
         let realm = try getFlexibleSyncRealm()
-        let subscriptions = realm.subscriptions
+        let subscriptions = realm.subscriptions!
         try subscriptions.write {
+            #if swift(>=5.5)
             subscriptions.append {
                 QuerySubscription<SwiftPerson> {
                     $0.age > 15
@@ -209,14 +257,27 @@ class SwiftFlexibleSyncServerTests: SwiftFlexibleSyncTestCase {
                     $0.age > 15
                 }
             }
+            #else
+            subscriptions.append {
+                QuerySubscription<SwiftPerson> {
+                    $0.age > 15
+                }
+            }
+            subscriptions.append {
+                QuerySubscription<SwiftPerson> {
+                    $0.age > 15
+                }
+            }
+            #endif // swift(>=5.5)
         }
         XCTAssertEqual(subscriptions.count, 1)
     }
 
     func testAddDuplicateSubscriptionWithDifferentName() throws {
         let realm = try getFlexibleSyncRealm()
-        let subscriptions = realm.subscriptions
+        let subscriptions = realm.subscriptions!
         try subscriptions.write {
+            #if swift(>=5.5)
             subscriptions.append {
                 QuerySubscription<SwiftPerson>(name: "person_age_1") {
                     $0.age > 15
@@ -225,28 +286,57 @@ class SwiftFlexibleSyncServerTests: SwiftFlexibleSyncTestCase {
                     $0.age > 15
                 }
             }
+            #else
+            subscriptions.append {
+                QuerySubscription<SwiftPerson>(name: "person_age_1") {
+                    $0.age > 15
+                }
+            }
+            subscriptions.append {
+                QuerySubscription<SwiftPerson>(name: "person_age_2") {
+                    $0.age > 15
+                }
+            }
+            #endif // swift(>=5.5)
         }
         XCTAssertEqual(subscriptions.count, 2)
     }
 
     // Test duplicate named subscription handle error
     func testSameNamedSubscriptionThrows() throws {
-//        let realm = try getFlexibleSyncRealm()
-//        let subscriptions = realm.subscriptions
-//        try subscriptions.write {
-//            subscriptions.append {
-//                SyncSubscription<SwiftPerson>(name: "person_age_1") {
-//                    $0.age > 15
-//                }
-//            }
-//        }
-//        XCTAssertEqual(subscriptions.count, 2)
+        let realm = try getFlexibleSyncRealm()
+        let subscriptions = realm.subscriptions!
+        try subscriptions.write {
+            #if swift(>=5.5)
+            subscriptions.append {
+                QuerySubscription<SwiftPerson>(name: "person_age_1") {
+                    $0.age > 15
+                }
+                QuerySubscription<SwiftPerson>(name: "person_age_1") {
+                    $0.age > 20
+                }
+            }
+            #else
+            subscriptions.append {
+                QuerySubscription<SwiftPerson>(name: "person_age_1") {
+                    $0.age > 15
+                }
+            }
+            subscriptions.append {
+                QuerySubscription<SwiftPerson>(name: "person_age_1") {
+                    $0.age > 20
+                }
+            }
+            #endif // swift(>=5.5)
+        }
+        XCTAssertEqual(subscriptions.count, 1)
     }
 
     func testFindSubscriptionByName() throws {
         let realm = try getFlexibleSyncRealm()
-        let subscriptions = realm.subscriptions
+        let subscriptions = realm.subscriptions!
         try subscriptions.write {
+            #if swift(>=5.5)
             subscriptions.append {
                 QuerySubscription<SwiftPerson>(name: "person_age_15") {
                     $0.age > 15
@@ -255,6 +345,18 @@ class SwiftFlexibleSyncServerTests: SwiftFlexibleSyncTestCase {
                     $0.age > 20
                 }
             }
+            #else
+            subscriptions.append {
+                QuerySubscription<SwiftPerson>(name: "person_age_15") {
+                    $0.age > 15
+                }
+            }
+            subscriptions.append {
+                QuerySubscription<SwiftPerson>(name: "person_age_20") {
+                    $0.age > 20
+                }
+            }
+            #endif // swift(>=5.5)
         }
         XCTAssertEqual(subscriptions.count, 2)
 
@@ -269,7 +371,7 @@ class SwiftFlexibleSyncServerTests: SwiftFlexibleSyncTestCase {
 
     func testFindSubscriptionByQuery() throws {
         let realm = try getFlexibleSyncRealm()
-        let subscriptions = realm.subscriptions
+        let subscriptions = realm.subscriptions!
         try subscriptions.write {
             subscriptions.append {
                 QuerySubscription<SwiftPerson>(name: "person_firstname_contains_j") {
@@ -303,13 +405,14 @@ class SwiftFlexibleSyncServerTests: SwiftFlexibleSyncTestCase {
 
     func testRemoveSubscriptionByName() throws {
         let realm = try getFlexibleSyncRealm()
-        let subscriptions = realm.subscriptions
+        let subscriptions = realm.subscriptions!
         try subscriptions.write {
             subscriptions.append {
                 QuerySubscription<SwiftPerson>(name: "person_firstname_contains_j") {
                     $0.firstName.contains("J")
                 }
             }
+            #if swift(>=5.5)
             subscriptions.append {
                 QuerySubscription<SwiftTypesSyncObject>(name: "object_int_more_than_zero") {
                     $0.intCol > 0
@@ -318,6 +421,18 @@ class SwiftFlexibleSyncServerTests: SwiftFlexibleSyncTestCase {
                     $0.stringCol.starts(with: "J") || $0.stringCol.starts(with: "T")
                 }
             }
+            #else
+            subscriptions.append {
+                QuerySubscription<SwiftTypesSyncObject>(name: "object_int_more_than_zero") {
+                    $0.intCol > 0
+                }
+            }
+            subscriptions.append {
+                QuerySubscription<SwiftTypesSyncObject>(name: "object_string_start") {
+                    $0.stringCol.starts(with: "J") || $0.stringCol.starts(with: "T")
+                }
+            }
+            #endif // swift(>=5.5)
         }
         XCTAssertEqual(subscriptions.count, 3)
 
@@ -329,8 +444,9 @@ class SwiftFlexibleSyncServerTests: SwiftFlexibleSyncTestCase {
 
     func testRemoveSubscriptionByQuery() throws {
         let realm = try getFlexibleSyncRealm()
-        let subscriptions = realm.subscriptions
+        let subscriptions = realm.subscriptions!
         try subscriptions.write {
+            #if swift(>=5.5)
             subscriptions.append {
                 QuerySubscription<SwiftPerson> {
                     $0.firstName.contains("A")
@@ -342,6 +458,23 @@ class SwiftFlexibleSyncServerTests: SwiftFlexibleSyncTestCase {
                     $0.firstName.contains("C")
                 }
             }
+            #else
+            subscriptions.append {
+                QuerySubscription<SwiftPerson> {
+                    $0.firstName.contains("A")
+                }
+            }
+            subscriptions.append {
+                QuerySubscription<SwiftPerson> {
+                    $0.firstName.contains("B")
+                }
+            }
+            subscriptions.append {
+                QuerySubscription<SwiftPerson> {
+                    $0.firstName.contains("C")
+                }
+            }
+            #endif // swift(>=5.5)
             subscriptions.append {
                 QuerySubscription<SwiftTypesSyncObject> {
                     $0.intCol > 0
@@ -351,6 +484,7 @@ class SwiftFlexibleSyncServerTests: SwiftFlexibleSyncTestCase {
         XCTAssertEqual(subscriptions.count, 4)
 
         try subscriptions.write {
+            #if swift(>=5.5)
             subscriptions.remove {
                 QuerySubscription<SwiftPerson> {
                     $0.firstName.contains("A")
@@ -359,6 +493,18 @@ class SwiftFlexibleSyncServerTests: SwiftFlexibleSyncTestCase {
                     $0.firstName.contains("B")
                 }
             }
+            #else
+            subscriptions.remove {
+                QuerySubscription<SwiftPerson> {
+                    $0.firstName.contains("A")
+                }
+            }
+            subscriptions.remove {
+                QuerySubscription<SwiftPerson> {
+                    $0.firstName.contains("B")
+                }
+            }
+            #endif // swift(>=5.5)
             subscriptions.remove {
                 QuerySubscription<SwiftTypesSyncObject> {
                     $0.intCol > 0
@@ -370,7 +516,7 @@ class SwiftFlexibleSyncServerTests: SwiftFlexibleSyncTestCase {
 
     func testRemoveSubscription() throws {
         let realm = try getFlexibleSyncRealm()
-        let subscriptions = realm.subscriptions
+        let subscriptions = realm.subscriptions!
         try subscriptions.write {
             subscriptions.append {
                 QuerySubscription<SwiftPerson>(name: "person_names") {
@@ -408,8 +554,9 @@ class SwiftFlexibleSyncServerTests: SwiftFlexibleSyncTestCase {
 
     func testRemoveSubscriptionByType() throws {
         let realm = try getFlexibleSyncRealm()
-        let subscriptions = realm.subscriptions
+        let subscriptions = realm.subscriptions!
         try subscriptions.write {
+            #if swift(>=5.5)
             subscriptions.append {
                 QuerySubscription<SwiftPerson>(name: "person_name_1") {
                     $0.firstName.contains("A")
@@ -421,6 +568,23 @@ class SwiftFlexibleSyncServerTests: SwiftFlexibleSyncTestCase {
                     $0.firstName.contains("C")
                 }
             }
+            #else
+            subscriptions.append {
+                QuerySubscription<SwiftPerson>(name: "person_name_1") {
+                    $0.firstName.contains("A")
+                }
+            }
+            subscriptions.append {
+                QuerySubscription<SwiftPerson>(name: "person_name_2") {
+                    $0.firstName.contains("B")
+                }
+            }
+            subscriptions.append {
+                QuerySubscription<SwiftPerson>(name: "person_name_3") {
+                    $0.firstName.contains("C")
+                }
+            }
+            #endif // swift(>=5.5)
             subscriptions.append {
                 QuerySubscription<SwiftTypesSyncObject> {
                     $0.intCol > 0
@@ -442,8 +606,9 @@ class SwiftFlexibleSyncServerTests: SwiftFlexibleSyncTestCase {
 
     func testRemoveAllSubscriptions() throws {
         let realm = try getFlexibleSyncRealm()
-        let subscriptions = realm.subscriptions
+        let subscriptions = realm.subscriptions!
         try subscriptions.write {
+            #if swift(>=5.5)
             subscriptions.append {
                 QuerySubscription<SwiftPerson>(name: "person_name_1") {
                     $0.firstName.contains("A")
@@ -455,6 +620,23 @@ class SwiftFlexibleSyncServerTests: SwiftFlexibleSyncTestCase {
                     $0.firstName.contains("C")
                 }
             }
+            #else
+            subscriptions.append {
+                QuerySubscription<SwiftPerson>(name: "person_name_1") {
+                    $0.firstName.contains("A")
+                }
+            }
+            subscriptions.append {
+                QuerySubscription<SwiftPerson>(name: "person_name_2") {
+                    $0.firstName.contains("B")
+                }
+            }
+            subscriptions.append {
+                QuerySubscription<SwiftPerson>(name: "person_name_3") {
+                    $0.firstName.contains("C")
+                }
+            }
+            #endif // swift(>=5.5)
             subscriptions.append {
                 QuerySubscription<SwiftTypesSyncObject> {
                     $0.intCol > 0
@@ -472,7 +654,7 @@ class SwiftFlexibleSyncServerTests: SwiftFlexibleSyncTestCase {
 
     func testSubscriptionSetIterate() throws {
         let realm = try getFlexibleSyncRealm()
-        let subscriptions = realm.subscriptions
+        let subscriptions = realm.subscriptions!
 
         let numberOfSubs = 50
         try subscriptions.write {
@@ -498,7 +680,7 @@ class SwiftFlexibleSyncServerTests: SwiftFlexibleSyncTestCase {
 
     func testSubscriptionSetFirstAndLast() throws {
         let realm = try getFlexibleSyncRealm()
-        let subscriptions = realm.subscriptions
+        let subscriptions = realm.subscriptions!
 
         let numberOfSubs = 20
         try subscriptions.write {
@@ -524,7 +706,7 @@ class SwiftFlexibleSyncServerTests: SwiftFlexibleSyncTestCase {
 
     func testSubscriptionSetSubscript() throws {
         let realm = try getFlexibleSyncRealm()
-        let subscriptions = realm.subscriptions
+        let subscriptions = realm.subscriptions!
 
         let numberOfSubs = 20
         try subscriptions.write {
@@ -550,8 +732,9 @@ class SwiftFlexibleSyncServerTests: SwiftFlexibleSyncTestCase {
 
     func testUpdateQueries() throws {
         let realm = try getFlexibleSyncRealm()
-        let subscriptions = realm.subscriptions
+        let subscriptions = realm.subscriptions!
         try subscriptions.write {
+            #if swift(>=5.5)
             subscriptions.append {
                 QuerySubscription<SwiftPerson>(name: "person_age_15") {
                     $0.age > 15
@@ -560,6 +743,18 @@ class SwiftFlexibleSyncServerTests: SwiftFlexibleSyncTestCase {
                     $0.age > 20
                 }
             }
+            #else
+            subscriptions.append {
+                QuerySubscription<SwiftPerson>(name: "person_age_15") {
+                    $0.age > 15
+                }
+            }
+            subscriptions.append {
+                QuerySubscription<SwiftPerson>(name: "person_age_20") {
+                    $0.age > 20
+                }
+            }
+            #endif // swift(>=5.5)
         }
         XCTAssertEqual(subscriptions.count, 2)
 
