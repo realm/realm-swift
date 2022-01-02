@@ -775,13 +775,14 @@ public class RealmServer: NSObject {
             return pk.name == "_id"
         }
 
-        let partitionKeyType: String
-        if case .pbs(let bsonType) = syncMode { partitionKeyType = bsonType } else { partitionKeyType = "string" }
+        let partitionKeyType: String?
+        if case .pbs(let bsonType) = syncMode { partitionKeyType = bsonType } else { partitionKeyType = nil }
         var ruleCreations = [Result<Any?, Error>]()
         for objectSchema in syncTypes {
-            if case .flx(_) = syncMode,
-               objectSchema.className == "Dog" || objectSchema.className == "Person" || objectSchema.className == "SwiftPerson" {
-                ruleCreations.append(rules.post(objectSchema.stitchRule(partitionKeyType, schema)))
+            if partitionKeyType != nil ||
+                // This is a temporary workaround for not been able to add the complete schema for flx App
+               (objectSchema.className == "Dog" || objectSchema.className == "Person" || objectSchema.className == "SwiftPerson" || objectSchema.className == "SwiftTypesSyncObject") {
+                ruleCreations.append(rules.post(objectSchema.stitchRule(partitionKeyType ?? "string", schema)))
             }
         }
 
@@ -794,10 +795,11 @@ public class RealmServer: NSObject {
             ruleIds[dict["collection"]!] = dict["_id"]!
         }
         for objectSchema in syncTypes {
-            if case .flx(_) = syncMode,
-               objectSchema.className == "Dog" || objectSchema.className == "Person" || objectSchema.className == "SwiftPerson" {
+            if partitionKeyType != nil ||
+               (objectSchema.className == "Dog" || objectSchema.className == "Person" || objectSchema.className == "SwiftPerson" || objectSchema.className == "SwiftTypesSyncObject") {
+                // This is a temporary workaround for not been able to add the complete schema for flx App
                 let id = ruleIds[objectSchema.className]!
-                rules[id].put(on: group, data: objectSchema.stitchRule(partitionKeyType, schema, id: id), failOnError)
+                rules[id].put(on: group, data: objectSchema.stitchRule(partitionKeyType ?? "string", schema, id: id), failOnError)
             }
         }
 
