@@ -40,8 +40,8 @@ class SwiftFlexibleSyncTestCase: SwiftSyncTestCase {
 
     func getFlexibleSyncRealm() throws -> Realm {
         let appId = try RealmServer.shared.createAppForSyncMode(.flx(["age", "breed"]))
-        let app = app(fromAppId: appId)
-        let user = try logInUser(for: basicCredentials(app: app), app: app)
+        let flexibleApp = app(fromAppId: appId)
+        let user = try logInUser(for: basicCredentials(app: flexibleApp), app: flexibleApp)
         return try openFlexibleSyncRealm(user: user)
     }
 }
@@ -49,8 +49,8 @@ class SwiftFlexibleSyncTestCase: SwiftSyncTestCase {
 class SwiftFlexibleSyncServerTests: SwiftFlexibleSyncTestCase {
     func testCreateFlexibleSyncApp() throws {
         let appId = try RealmServer.shared.createAppForSyncMode(.flx(["age", "breed"]))
-        let app = app(fromAppId: appId)
-        let user = try logInUser(for: basicCredentials(app: app), app: app)
+        let flexibleApp = app(fromAppId: appId)
+        let user = try logInUser(for: basicCredentials(app: flexibleApp), app: flexibleApp)
         XCTAssertNotNil(user)
     }
 
