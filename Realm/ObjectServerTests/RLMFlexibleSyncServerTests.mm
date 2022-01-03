@@ -27,143 +27,7 @@
 - (NSString *)createAppWithQueryableFields:(NSArray *)queryableFields error:(NSError **)error;
 @end
 
-@interface RLMFlexibleSyncTestCase: RLMSyncTestCase
-- (RLMRealm *)flexibleSyncRealmForUser:(RLMUser *)user;
-@end
-
-@implementation RLMFlexibleSyncTestCase {
-    NSString *_flexibleSyncAppId;
-    RLMApp *_flexibleSyncApp;
-}
-
-- (NSString *)flexibleSyncAppId {
-    if (!_flexibleSyncAppId) {
-        static NSString *s_appId;
-        if (s_appId) {
-            _flexibleSyncAppId = s_appId;
-        }
-        else {
-            NSError *error;
-            _flexibleSyncAppId = [RealmServer.shared createAppWithQueryableFields:@[@"age", @"breed", @"partition", @"firstName"] error:&error];
-            if (error) {
-                NSLog(@"Failed to create app: %@", error);
-                abort();
-            }
-
-            s_appId = _flexibleSyncAppId;
-        }
-    }
-    return _flexibleSyncAppId;
-}
-
-- (RLMApp *)flexibleSyncApp {
-    if (!_flexibleSyncApp) {
-        _flexibleSyncApp = [RLMApp appWithId:self.flexibleSyncAppId
-                               configuration:self.defaultAppConfiguration
-                               rootDirectory:self.clientDataRoot];
-        RLMSyncManager *syncManager = self.flexibleSyncApp.syncManager;
-        syncManager.logLevel = RLMSyncLogLevelTrace;
-        syncManager.userAgent = self.name;
-    }
-    return _flexibleSyncApp;
-}
-
-- (RLMRealm *)flexibleSyncRealmForUser:(RLMUser *)user {
-    RLMRealmConfiguration *config = [user flexibleSyncConfiguration];
-    config.objectClasses = @[Dog.self,
-                             Person.self];
-    RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
-    [self waitForDownloadsForRealm:realm];
-    return realm;
-}
-
-- (RLMRealm *)getFlexibleSyncRealm:(SEL)testSel {
-    RLMUser *user = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(testSel)
-                                                                        register:YES
-                                                                             app:self.flexibleSyncApp]
-                                              app:self.flexibleSyncApp];
-    RLMRealm *realm = [self flexibleSyncRealmForUser:user];
-    XCTAssertNotNil(realm);
-    return realm;
-}
-
--(RLMRealm *)openFlexibleSyncRealm:(SEL)testSel {
-    RLMUser *user = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(testSel)
-                                                                        register:YES
-                                                                             app:self.flexibleSyncApp]
-                                              app:self.flexibleSyncApp];
-    RLMRealmConfiguration *config = [user flexibleSyncConfiguration];
-    config.objectClasses = @[Dog.self,
-                             Person.self];
-    RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
-    XCTAssertNotNil(realm);
-    return realm;
-}
-
-- (void)populateData:(void (^)(RLMRealm *))block {
-    [self writeToFlxRealm:^(RLMRealm *realm) {
-        [realm beginWriteTransaction];
-        block(realm);
-        [realm commitWriteTransaction];
-        [self waitForUploadsForRealm:realm];
-    }];
-}
-
-- (void)writeToFlxRealm:(void (^)(RLMRealm *))block {
-    NSString *userName = [NSStringFromSelector(_cmd) stringByAppendingString:[NSUUID UUID].UUIDString];
-    RLMUser *user = [self logInUserForCredentials:[self basicCredentialsWithName:userName
-                                                                        register:YES
-                                                                             app:self.flexibleSyncApp]
-                                              app:self.flexibleSyncApp];
-    RLMRealmConfiguration *config = [user flexibleSyncConfiguration];
-    config.objectClasses = @[Dog.self,
-                             Person.self];
-    RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
-
-    RLMSyncSubscriptionSet *subs = realm.subscriptions;
-    [subs write:^{
-        [subs addSubscriptionWithClassName:Person.className
-                          subscriptionName:@"person_all"
-                                     where:@"TRUEPREDICATE"];
-        [subs addSubscriptionWithClassName:Dog.className
-                          subscriptionName:@"dog_all"
-                                     where:@"TRUEPREDICATE"];
-    }];
-
-    XCTAssertNotNil(subs);
-    XCTAssertEqual(subs.version, 1);
-    XCTAssertEqual(subs.count, 2);
-
-    XCTestExpectation *ex = [self expectationWithDescription:@"state changes"];
-    [subs observe:^(RLMSyncSubscriptionState state) {
-        if (state == RLMSyncSubscriptionStateComplete) {
-            [ex fulfill];
-        }
-    }];
-    [self waitForExpectationsWithTimeout:20.0 handler:nil];
-    block(realm);
-}
-- (void)writeQueryAndCompleteForRealm:(RLMRealm *)realm block:(void (^)(RLMSyncSubscriptionSet *))block {
-    RLMSyncSubscriptionSet *subs = realm.subscriptions;
-    XCTAssertNotNil(subs);
-
-    [subs write:^{
-        block(subs);
-    }];
-    XCTAssertNotNil(subs);
-
-    XCTestExpectation *ex = [self expectationWithDescription:@"state changes"];
-    [subs observe:^(RLMSyncSubscriptionState state) {
-        if (state == RLMSyncSubscriptionStateComplete) {
-            [ex fulfill];
-        }
-    }];
-    [self waitForExpectationsWithTimeout:20.0 handler:nil];
-    [self waitForDownloadsForRealm:realm];
-}
-@end
-
-@interface RLMFlexibleSyncTests: RLMFlexibleSyncTestCase
+@interface RLMFlexibleSyncTests: RLMSyncTestCase
 @end
 
 @implementation RLMFlexibleSyncTests
@@ -516,18 +380,18 @@
                                      where:@"age > 15"];
         [subs addSubscriptionWithClassName:Person.className
                           subscriptionName:@"person_firstname"
-                                     where:@"firstName == '%@'", @"John"];
+                                     where:@"firstName == %@", @"John"];
         [subs addSubscriptionWithClassName:Person.className
                           subscriptionName:@"person_lastname"
-                                 predicate:[NSPredicate predicateWithFormat:@"lastName BEGINSWITH %@", @"A"]];
+                                 predicate:[NSPredicate predicateWithFormat:@"lastName == %@", @"Doe"]];
     }];
 
     XCTAssertEqual(subs.version, 1);
     XCTAssertEqual(subs.count, 3);
 
     [subs write:^{
-        [subs removeSubscriptionWithClassName:Person.className where:@"firstName == '%@'", @"John"];
-        [subs removeSubscriptionWithClassName:Person.className predicate:[NSPredicate predicateWithFormat:@"lastName BEGINSWITH %@", @"A"]];
+        [subs removeSubscriptionWithClassName:Person.className where:@"firstName == %@", @"John"];
+        [subs removeSubscriptionWithClassName:Person.className predicate:[NSPredicate predicateWithFormat:@"lastName == %@", @"Doe"]];
     }];
     
     XCTAssertEqual(subs.version, 2);
@@ -556,7 +420,7 @@
                                      where:@"firstName == '%@'", @"John"];
         [subs addSubscriptionWithClassName:Person.className
                           subscriptionName:@"person_lastname"
-                                 predicate:[NSPredicate predicateWithFormat:@"lastName BEGINSWITH %@", @"A"]];
+                                 predicate:[NSPredicate predicateWithFormat:@"lastName == %@", @"Doe"]];
     }];
 
     XCTAssertEqual(subs.version, 1);
@@ -596,7 +460,7 @@
                                      where:@"firstName == '%@'", @"John"];
         [subs addSubscriptionWithClassName:Person.className
                           subscriptionName:@"person_lastname"
-                                 predicate:[NSPredicate predicateWithFormat:@"lastName BEGINSWITH %@", @"A"]];
+                                 predicate:[NSPredicate predicateWithFormat:@"lastName == %@", @"Doe"]];
     }];
 
     XCTAssertEqual(subs.version, 1);
@@ -626,7 +490,7 @@
                                      where:@"name == '%@'", @"Tomas"];
         [subs addSubscriptionWithClassName:Person.className
                           subscriptionName:@"person_lastname"
-                                 predicate:[NSPredicate predicateWithFormat:@"lastName BEGINSWITH %@", @"A"]];
+                                 predicate:[NSPredicate predicateWithFormat:@"lastName == %@", @"Doe"]];
     }];
 
     XCTAssertEqual(subs.version, 1);
@@ -813,7 +677,7 @@
 }
 @end
 
-@interface RLMFlexibleSyncServerTests: RLMFlexibleSyncTestCase
+@interface RLMFlexibleSyncServerTests: RLMSyncTestCase
 @end
 
 @implementation RLMFlexibleSyncServerTests

@@ -28,7 +28,7 @@ import SwiftUI
 #endif
 
 class SwiftFlexibleSyncTestCase: SwiftSyncTestCase {
-    func openFlexibleSyncRealm(user: User) throws -> Realm {
+    func openFlexibleSyncRealmForUser(_ user: User) throws -> Realm {
         var config = user.flexibleSyncConfiguration()
         if config.objectTypes == nil {
             config.objectTypes = [SwiftPerson.self,
@@ -38,24 +38,24 @@ class SwiftFlexibleSyncTestCase: SwiftSyncTestCase {
         return realm
     }
 
-    func getFlexibleSyncRealm() throws -> Realm {
-        let appId = try RealmServer.shared.createAppForSyncMode(.flx(["age", "breed"]))
+    func openFlexibleSyncRealm() throws -> Realm {
+        let appId = try RealmServer.shared.createAppForSyncMode(.flx(["age", "boolCol", "dateCol", "firstName", "lastName", "stringCol", "intCol"]))
         let flexibleApp = app(fromAppId: appId)
         let user = try logInUser(for: basicCredentials(app: flexibleApp), app: flexibleApp)
-        return try openFlexibleSyncRealm(user: user)
+        return try openFlexibleSyncRealmForUser(user)
     }
 }
 
-class SwiftFlexibleSyncServerTests: SwiftFlexibleSyncTestCase {
+class SwiftFlexibleSyncTests: SwiftFlexibleSyncTestCase {
     func testCreateFlexibleSyncApp() throws {
-        let appId = try RealmServer.shared.createAppForSyncMode(.flx(["age", "breed"]))
+        let appId = try RealmServer.shared.createAppForSyncMode(.flx(["age"]))
         let flexibleApp = app(fromAppId: appId)
         let user = try logInUser(for: basicCredentials(app: flexibleApp), app: flexibleApp)
         XCTAssertNotNil(user)
     }
 
     func testFlexibleSyncOpenRealm() throws {
-        let realm = try getFlexibleSyncRealm()
+        let realm = try openFlexibleSyncRealm()
         XCTAssertNotNil(realm)
     }
 
@@ -63,7 +63,7 @@ class SwiftFlexibleSyncServerTests: SwiftFlexibleSyncTestCase {
         let realm = try Realm()
         XCTAssertNil(realm.subscriptions)
     }
-
+ 
     func testGetSubscriptionsWhenPbsRealm() throws {
         let user = try logInUser(for: basicCredentials())
         let realm = try openRealm(partitionValue: #function, user: user)
@@ -71,13 +71,13 @@ class SwiftFlexibleSyncServerTests: SwiftFlexibleSyncTestCase {
     }
 
     func testGetSubscriptions() throws {
-        let realm = try getFlexibleSyncRealm()
+        let realm = try openFlexibleSyncRealm()
         let subscriptions = realm.subscriptions!
         XCTAssertEqual(subscriptions.count, 0)
     }
 
     func testWriteEmptyBlock() throws {
-        let realm = try getFlexibleSyncRealm()
+        let realm = try openFlexibleSyncRealm()
         let subscriptions = realm.subscriptions!
         try subscriptions.write {
         }
@@ -86,7 +86,7 @@ class SwiftFlexibleSyncServerTests: SwiftFlexibleSyncTestCase {
     }
 
     func testAddOneSubscriptionWithoutName() throws {
-        let realm = try getFlexibleSyncRealm()
+        let realm = try openFlexibleSyncRealm()
         let subscriptions = realm.subscriptions!
         try subscriptions.write {
             subscriptions.append {
@@ -100,7 +100,7 @@ class SwiftFlexibleSyncServerTests: SwiftFlexibleSyncTestCase {
     }
 
     func testAddOneSubscriptionWithName() throws {
-        let realm = try getFlexibleSyncRealm()
+        let realm = try openFlexibleSyncRealm()
         let subscriptions = realm.subscriptions!
         try subscriptions.write {
             subscriptions.append {
@@ -115,7 +115,7 @@ class SwiftFlexibleSyncServerTests: SwiftFlexibleSyncTestCase {
 
 
     func testAddSubscriptionsInDifferentBlocks() throws {
-        let realm = try getFlexibleSyncRealm()
+        let realm = try openFlexibleSyncRealm()
         let subscriptions = realm.subscriptions!
         try subscriptions.write {
             subscriptions.append {
@@ -136,7 +136,7 @@ class SwiftFlexibleSyncServerTests: SwiftFlexibleSyncTestCase {
     }
 
     func testAddSeveralSubscriptionsWithoutName() throws {
-        let realm = try getFlexibleSyncRealm()
+        let realm = try openFlexibleSyncRealm()
         let subscriptions = realm.subscriptions!
         try subscriptions.write {
             #if swift(>=5.5)
@@ -174,7 +174,7 @@ class SwiftFlexibleSyncServerTests: SwiftFlexibleSyncTestCase {
     }
 
     func testAddSeveralSubscriptionsWithName() throws {
-        let realm = try getFlexibleSyncRealm()
+        let realm = try openFlexibleSyncRealm()
         let subscriptions = realm.subscriptions!
         try subscriptions.write {
             #if swift(>=5.5)
@@ -211,7 +211,7 @@ class SwiftFlexibleSyncServerTests: SwiftFlexibleSyncTestCase {
     }
 
     func testAddMixedSubscriptions() throws {
-        let realm = try getFlexibleSyncRealm()
+        let realm = try openFlexibleSyncRealm()
         let subscriptions = realm.subscriptions!
         try subscriptions.write {
             subscriptions.append {
@@ -245,7 +245,7 @@ class SwiftFlexibleSyncServerTests: SwiftFlexibleSyncTestCase {
     }
 
     func testAddDuplicateSubscriptions() throws {
-        let realm = try getFlexibleSyncRealm()
+        let realm = try openFlexibleSyncRealm()
         let subscriptions = realm.subscriptions!
         try subscriptions.write {
             #if swift(>=5.5)
@@ -274,7 +274,7 @@ class SwiftFlexibleSyncServerTests: SwiftFlexibleSyncTestCase {
     }
 
     func testAddDuplicateSubscriptionWithDifferentName() throws {
-        let realm = try getFlexibleSyncRealm()
+        let realm = try openFlexibleSyncRealm()
         let subscriptions = realm.subscriptions!
         try subscriptions.write {
             #if swift(>=5.5)
@@ -304,7 +304,7 @@ class SwiftFlexibleSyncServerTests: SwiftFlexibleSyncTestCase {
 
     // Test duplicate named subscription handle error
     func testSameNamedSubscriptionThrows() throws {
-        let realm = try getFlexibleSyncRealm()
+        let realm = try openFlexibleSyncRealm()
         let subscriptions = realm.subscriptions!
         try subscriptions.write {
             #if swift(>=5.5)
@@ -333,7 +333,7 @@ class SwiftFlexibleSyncServerTests: SwiftFlexibleSyncTestCase {
     }
 
     func testFindSubscriptionByName() throws {
-        let realm = try getFlexibleSyncRealm()
+        let realm = try openFlexibleSyncRealm()
         let subscriptions = realm.subscriptions!
         try subscriptions.write {
             #if swift(>=5.5)
@@ -370,12 +370,12 @@ class SwiftFlexibleSyncServerTests: SwiftFlexibleSyncTestCase {
     }
 
     func testFindSubscriptionByQuery() throws {
-        let realm = try getFlexibleSyncRealm()
+        let realm = try openFlexibleSyncRealm()
         let subscriptions = realm.subscriptions!
         try subscriptions.write {
             subscriptions.append {
-                QuerySubscription<SwiftPerson>(name: "person_firstname_contains_j") {
-                    $0.firstName.contains("J")
+                QuerySubscription<SwiftPerson>(name: "person_firstname_james") {
+                    $0.firstName == "James"
                 }
             }
             subscriptions.append {
@@ -392,7 +392,7 @@ class SwiftFlexibleSyncServerTests: SwiftFlexibleSyncTestCase {
             }
         }
         XCTAssertNotNil(foundSubscription1)
-        XCTAssertEqual(foundSubscription1!.name, "person_firstname_contains_j")
+        XCTAssertEqual(foundSubscription1!.name, "person_firstname_james")
 
         let foundSubscription2 = subscriptions.first {
             QuerySubscription<SwiftTypesSyncObject>(name: "object_int_more_than_zero") {
@@ -404,12 +404,12 @@ class SwiftFlexibleSyncServerTests: SwiftFlexibleSyncTestCase {
     }
 
     func testRemoveSubscriptionByName() throws {
-        let realm = try getFlexibleSyncRealm()
+        let realm = try openFlexibleSyncRealm()
         let subscriptions = realm.subscriptions!
         try subscriptions.write {
             subscriptions.append {
-                QuerySubscription<SwiftPerson>(name: "person_firstname_contains_j") {
-                    $0.firstName.contains("J")
+                QuerySubscription<SwiftPerson>(name: "person_firstname_james") {
+                    $0.firstName == "James"
                 }
             }
             #if swift(>=5.5)
@@ -417,8 +417,8 @@ class SwiftFlexibleSyncServerTests: SwiftFlexibleSyncTestCase {
                 QuerySubscription<SwiftTypesSyncObject>(name: "object_int_more_than_zero") {
                     $0.intCol > 0
                 }
-                QuerySubscription<SwiftTypesSyncObject>(name: "object_string_start") {
-                    $0.stringCol.starts(with: "J") || $0.stringCol.starts(with: "T")
+                QuerySubscription<SwiftTypesSyncObject>(name: "object_string") {
+                    $0.stringCol == "John" || $0.stringCol == "Tom"
                 }
             }
             #else
@@ -428,8 +428,8 @@ class SwiftFlexibleSyncServerTests: SwiftFlexibleSyncTestCase {
                 }
             }
             subscriptions.append {
-                QuerySubscription<SwiftTypesSyncObject>(name: "object_string_start") {
-                    $0.stringCol.starts(with: "J") || $0.stringCol.starts(with: "T")
+                QuerySubscription<SwiftTypesSyncObject>(name: "object_string") {
+                    $0.stringCol == "John" || $0.stringCol == "Tom"
                 }
             }
             #endif // swift(>=5.5)
@@ -437,41 +437,41 @@ class SwiftFlexibleSyncServerTests: SwiftFlexibleSyncTestCase {
         XCTAssertEqual(subscriptions.count, 3)
 
         try subscriptions.write {
-            subscriptions.remove(named: "person_firstname_contains_j")
+            subscriptions.remove(named: "person_firstname_james")
         }
         XCTAssertEqual(subscriptions.count, 2)
     }
 
     func testRemoveSubscriptionByQuery() throws {
-        let realm = try getFlexibleSyncRealm()
+        let realm = try openFlexibleSyncRealm()
         let subscriptions = realm.subscriptions!
         try subscriptions.write {
             #if swift(>=5.5)
             subscriptions.append {
                 QuerySubscription<SwiftPerson> {
-                    $0.firstName.contains("A")
+                    $0.firstName == "Alex"
                 }
                 QuerySubscription<SwiftPerson> {
-                    $0.firstName.contains("B")
+                    $0.firstName == "Belle"
                 }
                 QuerySubscription<SwiftPerson> {
-                    $0.firstName.contains("C")
+                    $0.firstName == "Charles"
                 }
             }
             #else
             subscriptions.append {
                 QuerySubscription<SwiftPerson> {
-                    $0.firstName.contains("A")
+                    $0.firstName == "Alex"
                 }
             }
             subscriptions.append {
                 QuerySubscription<SwiftPerson> {
-                    $0.firstName.contains("B")
+                    $0.firstName == "Belle"
                 }
             }
             subscriptions.append {
                 QuerySubscription<SwiftPerson> {
-                    $0.firstName.contains("C")
+                    $0.firstName == "Charles"
                 }
             }
             #endif // swift(>=5.5)
@@ -487,21 +487,21 @@ class SwiftFlexibleSyncServerTests: SwiftFlexibleSyncTestCase {
             #if swift(>=5.5)
             subscriptions.remove {
                 QuerySubscription<SwiftPerson> {
-                    $0.firstName.contains("A")
+                    $0.firstName == "Alex"
                 }
                 QuerySubscription<SwiftPerson> {
-                    $0.firstName.contains("B")
+                    $0.firstName == "Belle"
                 }
             }
             #else
             subscriptions.remove {
                 QuerySubscription<SwiftPerson> {
-                    $0.firstName.contains("A")
+                    $0.firstName == "Alex"
                 }
             }
             subscriptions.remove {
                 QuerySubscription<SwiftPerson> {
-                    $0.firstName.contains("B")
+                    $0.firstName == "Belle"
                 }
             }
             #endif // swift(>=5.5)
@@ -515,12 +515,12 @@ class SwiftFlexibleSyncServerTests: SwiftFlexibleSyncTestCase {
     }
 
     func testRemoveSubscription() throws {
-        let realm = try getFlexibleSyncRealm()
+        let realm = try openFlexibleSyncRealm()
         let subscriptions = realm.subscriptions!
         try subscriptions.write {
             subscriptions.append {
                 QuerySubscription<SwiftPerson>(name: "person_names") {
-                    $0.firstName.starts(with: "A") && $0.lastName.ends(with: "A", options: .diacriticInsensitive)
+                    $0.firstName != "Alex" && $0.lastName != "Roy"
                 }
             }
             subscriptions.append {
@@ -553,35 +553,35 @@ class SwiftFlexibleSyncServerTests: SwiftFlexibleSyncTestCase {
     }
 
     func testRemoveSubscriptionByType() throws {
-        let realm = try getFlexibleSyncRealm()
+        let realm = try openFlexibleSyncRealm()
         let subscriptions = realm.subscriptions!
         try subscriptions.write {
             #if swift(>=5.5)
             subscriptions.append {
-                QuerySubscription<SwiftPerson>(name: "person_name_1") {
-                    $0.firstName.contains("A")
+                QuerySubscription<SwiftPerson> {
+                    $0.firstName == "Alex"
                 }
-                QuerySubscription<SwiftPerson>(name: "person_name_2") {
-                    $0.firstName.contains("B")
+                QuerySubscription<SwiftPerson> {
+                    $0.firstName == "Belle"
                 }
-                QuerySubscription<SwiftPerson>(name: "person_name_3") {
-                    $0.firstName.contains("C")
+                QuerySubscription<SwiftPerson> {
+                    $0.firstName == "Charles"
                 }
             }
             #else
             subscriptions.append {
-                QuerySubscription<SwiftPerson>(name: "person_name_1") {
-                    $0.firstName.contains("A")
+                QuerySubscription<SwiftPerson> {
+                    $0.firstName == "Alex"
                 }
             }
             subscriptions.append {
-                QuerySubscription<SwiftPerson>(name: "person_name_2") {
-                    $0.firstName.contains("B")
+                QuerySubscription<SwiftPerson> {
+                    $0.firstName == "Belle"
                 }
             }
             subscriptions.append {
-                QuerySubscription<SwiftPerson>(name: "person_name_3") {
-                    $0.firstName.contains("C")
+                QuerySubscription<SwiftPerson> {
+                    $0.firstName == "Charles"
                 }
             }
             #endif // swift(>=5.5)
@@ -605,35 +605,35 @@ class SwiftFlexibleSyncServerTests: SwiftFlexibleSyncTestCase {
     }
 
     func testRemoveAllSubscriptions() throws {
-        let realm = try getFlexibleSyncRealm()
+        let realm = try openFlexibleSyncRealm()
         let subscriptions = realm.subscriptions!
         try subscriptions.write {
             #if swift(>=5.5)
             subscriptions.append {
-                QuerySubscription<SwiftPerson>(name: "person_name_1") {
-                    $0.firstName.contains("A")
+                QuerySubscription<SwiftPerson> {
+                    $0.firstName == "Alex"
                 }
-                QuerySubscription<SwiftPerson>(name: "person_name_2") {
-                    $0.firstName.contains("B")
+                QuerySubscription<SwiftPerson> {
+                    $0.firstName == "Belle"
                 }
-                QuerySubscription<SwiftPerson>(name: "person_name_3") {
-                    $0.firstName.contains("C")
+                QuerySubscription<SwiftPerson> {
+                    $0.firstName == "Charles"
                 }
             }
             #else
             subscriptions.append {
-                QuerySubscription<SwiftPerson>(name: "person_name_1") {
-                    $0.firstName.contains("A")
+                QuerySubscription<SwiftPerson> {
+                    $0.firstName == "Alex"
                 }
             }
             subscriptions.append {
-                QuerySubscription<SwiftPerson>(name: "person_name_2") {
-                    $0.firstName.contains("B")
+                QuerySubscription<SwiftPerson> {
+                    $0.firstName == "Belle"
                 }
             }
             subscriptions.append {
-                QuerySubscription<SwiftPerson>(name: "person_name_3") {
-                    $0.firstName.contains("C")
+                QuerySubscription<SwiftPerson> {
+                    $0.firstName == "Charles"
                 }
             }
             #endif // swift(>=5.5)
@@ -653,7 +653,7 @@ class SwiftFlexibleSyncServerTests: SwiftFlexibleSyncTestCase {
     }
 
     func testSubscriptionSetIterate() throws {
-        let realm = try getFlexibleSyncRealm()
+        let realm = try openFlexibleSyncRealm()
         let subscriptions = realm.subscriptions!
 
         let numberOfSubs = 50
@@ -679,7 +679,7 @@ class SwiftFlexibleSyncServerTests: SwiftFlexibleSyncTestCase {
     }
 
     func testSubscriptionSetFirstAndLast() throws {
-        let realm = try getFlexibleSyncRealm()
+        let realm = try openFlexibleSyncRealm()
         let subscriptions = realm.subscriptions!
 
         let numberOfSubs = 20
@@ -705,7 +705,7 @@ class SwiftFlexibleSyncServerTests: SwiftFlexibleSyncTestCase {
     }
 
     func testSubscriptionSetSubscript() throws {
-        let realm = try getFlexibleSyncRealm()
+        let realm = try openFlexibleSyncRealm()
         let subscriptions = realm.subscriptions!
 
         let numberOfSubs = 20
@@ -731,7 +731,7 @@ class SwiftFlexibleSyncServerTests: SwiftFlexibleSyncTestCase {
     }
 
     func testUpdateQueries() throws {
-        let realm = try getFlexibleSyncRealm()
+        let realm = try openFlexibleSyncRealm()
         let subscriptions = realm.subscriptions!
         try subscriptions.write {
             #if swift(>=5.5)
@@ -769,8 +769,12 @@ class SwiftFlexibleSyncServerTests: SwiftFlexibleSyncTestCase {
         XCTAssertEqual(subscriptions.count, 2)
     }
 }
+
 // MARK: - Completion Block
-extension SwiftFlexibleSyncServerTests {
+class SwiftFlexibleSyncServerTests: SwiftFlexibleSyncTestCase {
+    func testFlexibleSyncAppWithoutQuery() {
+        
+    }
 }
 
 // MARK: - Async Await

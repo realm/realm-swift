@@ -131,6 +131,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)resetAppCache;
 
+#pragma mark Flexible Sync App
+
+- (RLMRealm *)openFlexibleSyncRealm:(SEL)testSel;
+- (RLMRealm *)getFlexibleSyncRealm:(SEL)testSel;
+- (void)populateData:(void (^)(RLMRealm *))block;
+- (void)writeQueryAndCompleteForRealm:(RLMRealm *)realm block:(void (^)(RLMSyncSubscriptionSet *))block;
+
 @end
 
 NS_ASSUME_NONNULL_END

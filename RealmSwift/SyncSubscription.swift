@@ -44,161 +44,11 @@ enum SyncSubscriptionError: Error {
     case superceded
 }
 
-public protocol _SyncSubscription {
-    var rlmSyncSubscription: RLMSyncSubscription { get }
-}
-
-/// A protocol which defines a Subscription for using in a Flexible Sync transactions.
-///
-/// This is used to define a type-erasing wrapper.
-public protocol SyncSubscription: _SyncSubscription {
-    /// Identifier of the subscription.
-    var id: ObjectId { get }
-
-    /// Name of the subscription. If not specified it will return nil.
-    var name: String? { get }
-
-    /// When the subscription was created. Recorded automatically.
-    var createdAt: Date { get }
-
-    /// When the subscription was last updated. Recorded automatically.
-    var updatedAt: Date { get }
-
-    /**
-     Updates a Flexible Sync's subscription with an allowed query which will be used to bootstrap data
-     from the server when committed.
-
-     - warning: This method may only be called during a write transaction.
-
-     - parameter to: A query builder that produces a subscription which can used to modify the query.
-     */
-    func update<T: _RealmSchemaDiscoverable>(_ to: () -> (QuerySubscription<T>))
-}
-
-internal protocol _AnySyncSubscriptionBox {
-    /// `_SyncSubscription` requirements.
-    var _id: ObjectId { get }
-    var _name: String? { get }
-    var _createdAt: Date { get }
-    var _updatedAt: Date { get }
-    func _update<T: _RealmSchemaDiscoverable>(_ to: () -> (QuerySubscription<T>))
-
-    /// The underlying base value, type-erased to `Any`.
-    var _typeErasedBase: Any { get }
-    var _rlmSyncSubscription: RLMSyncSubscription { get }
-
-    /// Returns the underlying value unboxed to the given type, if possible.
-    func _unboxed<U: SyncSubscription>(to type: U.Type) -> U?
-}
-
-/// A type-erasing  wrapper over any `ISyncSubscription` conforming object.
-///
-/// An `AnySyncSubscription` instance forwards its operations to a base struct, hiding
-/// the specifics of the underlying type which allow us to make operations over an array
-/// of `AnySyncSubscriptions`.
-public struct AnySyncSubscription: SyncSubscription {
-
-    internal var _box: _AnySyncSubscriptionBox
-
-    internal init(_box: _AnySyncSubscriptionBox) {
-        self._box = _box
-    }
-
-    /// Creates a type-erased derivative from the given derivative.
-    public init<T: SyncSubscription>(_ base: T) {
-        self._box = _AnySyncSubscription<T>(base)
-    }
-
-    /// The underlying base value.
-    public var base: Any {
-        _box._typeErasedBase
-    }
-
-    public var rlmSyncSubscription: RLMSyncSubscription {
-        _box._rlmSyncSubscription
-    }
-
-    /// Identifier of the subscription.
-    public var id: ObjectId {
-        _box._id
-    }
-
-    /// Name of the subscription, if not specified it will return the value in Query as a String.
-    public var name: String? {
-        _box._name
-    }
-
-    /// When the subscription was created. Recorded automatically.
-    public var createdAt: Date {
-        _box._createdAt
-    }
-
-    /// When the subscription was last updated. Recorded automatically.
-    public var updatedAt: Date {
-        _box._updatedAt
-    }
-
-    /**
-     Updates a Flexible Sync's subscription with an allowed query which will be used to bootstrap data
-     from the server when committed.
-
-     - warning: This method may only be called during a write transaction.
-
-     - parameter to: A query builder that produces a subscription which can used to modify the query.
-     */
-    public func update<T: _RealmSchemaDiscoverable>(_ to: () -> (QuerySubscription<T>)) {
-        _box._update(to)
-    }
-}
-
-private final class _AnySyncSubscription<T: SyncSubscription>: _AnySyncSubscriptionBox {
-
-    /// The underlying base value.
-    var _base: T
-
-    init(_ base: T) {
-        self._base = base
-    }
-
-    /// The underlying base value, type-erased to `Any`.
-    var _typeErasedBase: Any {
-        return _base
-    }
-
-    var _rlmSyncSubscription: RLMSyncSubscription {
-        return _base.rlmSyncSubscription
-    }
-
-    func _unboxed<U: SyncSubscription>(to type: U.Type) -> U? {
-        return (self as? _AnySyncSubscription<U>)?._base
-    }
-
-    var _id: ObjectId {
-        _base.id
-    }
-
-    var _name: String? {
-        _base.name
-    }
-
-    var _createdAt: Date {
-        _base.createdAt
-    }
-
-    var _updatedAt: Date {
-        _base.updatedAt
-    }
-
-    func _update<T: _RealmSchemaDiscoverable>(_ to: () -> (QuerySubscription<T>)) {
-        _base.update(to)
-    }
-}
-
 /**
- `QuerySyncSubscription` is  used to define a Flexible Sync's subscription, which
- can be added/remove or updated within a write subscription transaction.
+ `SyncSubscription` is  used to define a Flexible Sync's subscription obtained from querying a
+ subscription set, which can be used to read or remove/update a committed subscription.
  */
-@frozen public struct QuerySyncSubscription: SyncSubscription {
+@frozen public struct SyncSubscription {
 
     // MARK: Initializers
     fileprivate let _rlmSyncSubscription: RLMSyncSubscription
@@ -207,28 +57,24 @@ private final class _AnySyncSubscription<T: SyncSubscription>: _AnySyncSubscript
         self._rlmSyncSubscription = rlmSyncSubscription
     }
 
-    public var rlmSyncSubscription: RLMSyncSubscription {
-        _rlmSyncSubscription
-    }
-
     /// Identifier of the subscription.
     public var id: ObjectId {
-        try! ObjectId(string: rlmSyncSubscription.identifier.stringValue)
+        try! ObjectId(string: _rlmSyncSubscription.identifier.stringValue)
     }
 
     /// Name of the subscription, if not specified it will return the value in Query as a String.
     public var name: String? {
-        rlmSyncSubscription.name
+        _rlmSyncSubscription.name
     }
 
     /// When the subscription was created. Recorded automatically.
     public var createdAt: Date {
-        rlmSyncSubscription.createdAt
+        _rlmSyncSubscription.createdAt
     }
 
     /// When the subscription was last updated. Recorded automatically.
     public var updatedAt: Date {
-        rlmSyncSubscription.updatedAt
+        _rlmSyncSubscription.updatedAt
     }
 
     /**
@@ -241,7 +87,7 @@ private final class _AnySyncSubscription<T: SyncSubscription>: _AnySyncSubscript
      */
     public func update<T: _RealmSchemaDiscoverable>(_ to: () -> (QuerySubscription<T>)) {
         let subscription = to()
-        rlmSyncSubscription.update(withClassName: subscription.className,
+        _rlmSyncSubscription.update(withClassName: subscription.className,
                                    predicate: subscription.predicate)
     }
 }
@@ -339,11 +185,11 @@ private final class _AnySyncSubscription<T: SyncSubscription>: _AnySyncSubscript
      - parameter named: The name of the subscription searching for.
      - returns: A subscription for the given name.
      */
-    public func first(named: String) -> AnySyncSubscription? {
+    public func first(named: String) -> SyncSubscription? {
         guard let rlmSubscription = rlmSyncSubscriptionSet.subscription(withName: named) else {
             return nil
         }
-        return AnySyncSubscription(QuerySyncSubscription(rlmSubscription))
+        return SyncSubscription(rlmSubscription)
     }
 
     /**
@@ -353,13 +199,13 @@ private final class _AnySyncSubscription<T: SyncSubscription>: _AnySyncSubscript
                         the subscription by query and/or name.
      - returns: A query builder that produces a subscription which can used to search for the subscription.
      */
-    public func first<T: _RealmSchemaDiscoverable>(`where`: () -> (QuerySubscription<T>)) -> AnySyncSubscription? {
+    public func first<T: _RealmSchemaDiscoverable>(`where`: () -> (QuerySubscription<T>)) -> SyncSubscription? {
         let subscription = `where`()
         guard let rlmSubscription =  rlmSyncSubscriptionSet.subscription(withClassName: subscription.className,
                                                                          predicate: subscription.predicate) else {
             return nil
         }
-        return AnySyncSubscription(QuerySyncSubscription(rlmSubscription))
+        return SyncSubscription(rlmSubscription)
     }
 
     #if swift(>=5.5)
@@ -431,8 +277,8 @@ private final class _AnySyncSubscription<T: SyncSubscription>: _AnySyncSubscript
 
      - parameter subscription: The subscription to be removed from the subscription set.
      */
-    public func remove(_ subscription: AnySyncSubscription) {
-        rlmSyncSubscriptionSet.remove(subscription.rlmSyncSubscription)
+    public func remove(_ subscription: SyncSubscription) {
+        rlmSyncSubscriptionSet.remove(subscription._rlmSyncSubscription)
     }
 
     /**
@@ -475,19 +321,19 @@ private final class _AnySyncSubscription<T: SyncSubscription>: _AnySyncSubscript
 
      - parameter index: The index.
      */
-    public subscript(position: Int) -> AnySyncSubscription? {
+    public subscript(position: Int) -> SyncSubscription? {
         throwForNegativeIndex(position)
-        return rlmSyncSubscriptionSet.object(at: UInt(position)).map { AnySyncSubscription(QuerySyncSubscription($0)) }
+        return rlmSyncSubscriptionSet.object(at: UInt(position)).map { SyncSubscription($0) }
     }
 
     /// Returns the first object in the SyncSubscription list, or `nil` if the subscriptions are empty.
-    public var first: AnySyncSubscription? {
-        return rlmSyncSubscriptionSet.firstObject().map { AnySyncSubscription(QuerySyncSubscription($0)) }
+    public var first: SyncSubscription? {
+        return rlmSyncSubscriptionSet.firstObject().map { SyncSubscription($0) }
     }
 
     /// Returns the last object in the SyncSubscription list, or `nil` if the subscriptions are empty.
-    public var last: AnySyncSubscription? {
-        return rlmSyncSubscriptionSet.lastObject().map { AnySyncSubscription(QuerySyncSubscription($0)) }
+    public var last: SyncSubscription? {
+        return rlmSyncSubscriptionSet.lastObject().map { SyncSubscription($0) }
     }
 }
 
