@@ -44,7 +44,7 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
         let realm = try Realm()
         XCTAssertNil(realm.subscriptions)
     }
- 
+
     func testGetSubscriptionsWhenPbsRealm() throws {
         let user = try logInUser(for: basicCredentials())
         let realm = try openRealm(partitionValue: #function, user: user)
