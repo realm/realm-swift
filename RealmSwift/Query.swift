@@ -100,7 +100,7 @@ public struct StringOptions: OptionSet {
 
  */
 @dynamicMemberLookup
-public struct Query<T: _RealmSchemaDiscoverable> {
+public struct Query<T> {
     /// This initaliser should be used from callers who require queries on primitive collections.
     /// - Parameter isPrimitive: True if performing a query on a primitive collection.
     internal init(isPrimitive: Bool = false) {
@@ -360,7 +360,7 @@ extension Query where T: RealmCollection {
     }
 }
 
-extension Query where T: RealmCollection, T.Element: _Persistable, T.Element.PersistedType: _QueryNumeric {
+extension Query where T: RealmCollection, T.Element.PersistedType: _QueryNumeric {
     /// :nodoc:
     public static func > (_ lhs: Query<T>, _ rhs: T.Element) -> Query<Bool> {
         .init(.comparison(operator: .greaterThan, lhs.node, .constant(rhs), options: []))
@@ -424,21 +424,6 @@ extension Query where T: RealmKeyedCollection {
     }
 }
 
-extension Query where T: RealmKeyedCollection, T.Value: OptionalProtocol, T.Value.Wrapped: _RealmSchemaDiscoverable {
-    /// Allows a query over all values in the Map.
-    public var values: Query<T.Value.Wrapped> {
-        .init(appendKeyPath("@allValues", options: []))
-    }
-    /// :nodoc:
-    public subscript(member: T.Key) -> Query<T.Value.Wrapped> {
-        .init(.mapSubscript(keyPathErasingAnyPrefix(), key: member))
-    }
-    /// :nodoc:
-    public subscript(member: T.Key) -> Query<T.Value> where T.Value.Wrapped: ObjectBase {
-        .init(.mapSubscript(keyPathErasingAnyPrefix(), key: member))
-    }
-}
-
 extension Query where T: RealmKeyedCollection, T.Key == String {
     /// Allows a query over all keys in the `Map`.
     public var keys: Query<String> {
@@ -478,8 +463,7 @@ extension Query where T: RealmKeyedCollection, T.Value: OptionalProtocol, T.Valu
     }
 }
 
-extension Query where T: RealmKeyedCollection,
-                      T.Value: _Persistable, T.Value.PersistedType: _QueryNumeric {
+extension Query where T: RealmKeyedCollection, T.Value.PersistedType: _QueryNumeric {
     /// Returns the minimum value in the keyed collection.
     public var min: Query<T.Value> {
         .init(keyPathErasingAnyPrefix(appending: "@min"))
@@ -526,25 +510,25 @@ extension Query where T: OptionalProtocol, T.Wrapped: PersistableEnum, T.Wrapped
 // The actual collection type returned in these doesn't matter because it's
 // only used to constrain the set of operations available, and the collections
 // all have the same operations.
-extension Query where T: RealmCollection, T.Element: PersistableEnum, T.Element.RawValue: RealmCollectionValue & _RealmSchemaDiscoverable {
+extension Query where T: RealmCollection, T.Element: PersistableEnum, T.Element.RawValue: RealmCollectionValue {
     /// Query on the rawValue of the Enums in the collection rather than the Enums themselves.
     public var rawValue: Query<List<T.Element.RawValue>> {
         .init(node)
     }
 }
-extension Query where T: RealmKeyedCollection, T.Value: PersistableEnum, T.Value.RawValue: RealmCollectionValue & _RealmSchemaDiscoverable {
+extension Query where T: RealmKeyedCollection, T.Value: PersistableEnum, T.Value.RawValue: RealmCollectionValue {
     /// Query on the rawValue of the Enums in the collection rather than the Enums themselves.
     public var rawValue: Query<Map<T.Key, T.Value.RawValue>> {
         .init(node)
     }
 }
-extension Query where T: RealmCollection, T.Element: OptionalProtocol, T.Element.Wrapped: PersistableEnum, T.Element.Wrapped.RawValue: RealmCollectionValue & _RealmSchemaDiscoverable & _DefaultConstructible {
+extension Query where T: RealmCollection, T.Element: OptionalProtocol, T.Element.Wrapped: PersistableEnum, T.Element.Wrapped.RawValue: _RealmCollectionValueInsideOptional {
     /// Query on the rawValue of the Enums in the collection rather than the Enums themselves.
     public var rawValue: Query<List<T.Element.Wrapped.RawValue?>> {
         .init(node)
     }
 }
-extension Query where T: RealmKeyedCollection, T.Value: OptionalProtocol, T.Value.Wrapped: PersistableEnum, T.Value.Wrapped.RawValue: RealmCollectionValue & _RealmSchemaDiscoverable & _DefaultConstructible {
+extension Query where T: RealmKeyedCollection, T.Value: OptionalProtocol, T.Value.Wrapped: PersistableEnum, T.Value.Wrapped.RawValue: _RealmCollectionValueInsideOptional {
     /// Query on the rawValue of the Enums in the collection rather than the Enums themselves.
     public var rawValue: Query<Map<T.Key, T.Value.Wrapped.RawValue?>> {
         .init(node)
