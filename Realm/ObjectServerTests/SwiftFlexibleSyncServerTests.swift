@@ -368,7 +368,7 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
 
         let foundSubscription1 = subscriptions.first {
             QuerySubscription<SwiftPerson> {
-                $0.firstName.contains("J")
+                $0.firstName == "James"
             }
         }
         XCTAssertNotNil(foundSubscription1)
