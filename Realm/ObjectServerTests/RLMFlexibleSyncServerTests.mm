@@ -715,6 +715,7 @@
                                                             age:i
                                                       firstName:[NSString stringWithFormat:@"firstname_%d", i]
                                                        lastName:[NSString stringWithFormat:@"lastname_%d", i]];
+            // We are using the partition property to filter only the objects for this test
             person.partition = NSStringFromSelector(_cmd);
             [realm addObject: person];
         }

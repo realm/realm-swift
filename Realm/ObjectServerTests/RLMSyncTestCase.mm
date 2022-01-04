@@ -625,7 +625,7 @@ static NSURL *syncDirectoryForChildProcess() {
         }
         else {
             NSError *error;
-            _flexibleSyncAppId = [RealmServer.shared createAppWithQueryableFields:@[@"age", @"breed", @"partition", @"firstName"] error:&error];
+            _flexibleSyncAppId = [RealmServer.shared createAppWithQueryableFields:@[@"age", @"breed", @"partition", @"firstName", @"boolCol", @"intCol", @"stringCol", @"dateCol", @"lastName"] error:&error];
             if (error) {
                 NSLog(@"Failed to create app: %@", error);
                 abort();
@@ -702,6 +702,8 @@ static NSURL *syncDirectoryForChildProcess() {
     RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
 
     RLMSyncSubscriptionSet *subs = realm.subscriptions;
+    XCTAssertNotNil(subs);
+
     [subs write:^{
         [subs addSubscriptionWithClassName:Person.className
                           subscriptionName:@"person_all"
@@ -710,11 +712,9 @@ static NSURL *syncDirectoryForChildProcess() {
                           subscriptionName:@"dog_all"
                                      where:@"TRUEPREDICATE"];
     }];
-
-    XCTAssertNotNil(subs);
     XCTAssertEqual(subs.count, 2);
 
-    XCTestExpectation *ex = [self expectationWithDescription:@"state changes"];
+    XCTestExpectation *ex = [self expectationWithDescription:@"state change complete"];
     [subs observe:^(RLMSyncSubscriptionState state) {
         if (state == RLMSyncSubscriptionStateComplete) {
             [ex fulfill];

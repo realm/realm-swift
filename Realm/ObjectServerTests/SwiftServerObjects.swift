@@ -25,10 +25,11 @@ public class SwiftPerson: Object {
     @Persisted public var lastName: String = ""
     @Persisted public var age: Int = 30
 
-    public convenience init(firstName: String, lastName: String) {
+    public convenience init(firstName: String, lastName: String, age: Int = 30) {
         self.init()
         self.firstName = firstName
         self.lastName = lastName
+        self.age = age
     }
 }
 

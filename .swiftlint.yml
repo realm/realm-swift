@@ -47,8 +47,6 @@ identifier_name:
 type_name:
   excluded:
     - _RealmValue
-    - _AnySyncSubscriptionBox
-    - _SyncSubscriptionBox
 disabled_rules:
   - block_based_kvo
   # SwiftLint considers 'Realm' and 'Realm.Private' to be duplicate imports
