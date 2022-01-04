@@ -913,6 +913,8 @@ import Realm.Private
                              `writeCopyToURL`, otherwise and error is thrown.
                              If `enableSync` is false, the copied Realm functions
                              as a local realm.
+     - warning: Using a local Realm configuration to open a realm that was copied with `enableSync` set to true
+       throws an exception due to incompatible histories.
 
      - throws: An `NSError` if the copy could not be written.
      */

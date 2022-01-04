@@ -4,6 +4,10 @@ x.y.z Release notes (yyyy-MM-dd)
 * Add an `enableSync` flag to `[RLMRealm writeCopyToURL:]` and `Realm.writeCopy()`.
   This flag indicates whether the copied realm should be able to synchronize data
   with the Realm server. This allows for bundling synchronized realms with an application.
+  - Using a local Realm configuration to open a realm that was copied with `enableSync` set to true 
+  throws an exception due to incompatible histories.
+  - Migrations may be required after when using a local realm configuration to open a realm file that
+  was copied from a synchronized realm.
 * Add a `seedFilePath` option to `RLMRealmConfiguration` and `Configuration`. If this
   option is set then instead of creating an empty realm, the realm at the `seedFilePath` will
   be copied to the `fileURL` of the new realm. If a realm file already exists at the

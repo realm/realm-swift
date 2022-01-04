@@ -1897,7 +1897,7 @@
     XCTAssertEqual([intObjects.lastObject intCol], 2);
 }
 
-- (void)testRealmExitsAtPath {
+- (void)testRealmExistsAtPath {
     // Create a seed realm with two objects
     RLMRealmConfiguration *seedConfig = [RLMRealmConfiguration defaultConfiguration];
     seedConfig.fileURL = RLMTestRealmURL();
@@ -1913,7 +1913,8 @@
     // Create a realm at destination path; add one object
     RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
     configuration.fileURL = fileURL;
-    {
+    // Let destination realm go out of scope so that it can be re-opened later
+    @autoreleasepool {
         RLMRealm *destinationRealm = [RLMRealm realmWithConfiguration:configuration error:nil];
         [destinationRealm beginWriteTransaction];
         [IntObject createInRealm: destinationRealm withValue:@[@3]];
