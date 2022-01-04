@@ -1873,7 +1873,7 @@
 
 #pragma mark - SeedFilePath
 
-- (void)testSeedFilePath {
+- (void)testSeedFilePathLocal {
     // Create a seed realm with two objects
     RLMRealmConfiguration *seedConfig = [RLMRealmConfiguration defaultConfiguration];
     seedConfig.fileURL = RLMTestRealmURL();
@@ -1884,6 +1884,7 @@
     [realm commitWriteTransaction];
 
     NSURL *fileURL = [NSURL fileURLWithPath:RLMRealmPathForFile(@"filename.realm")];
+    [[NSFileManager defaultManager] removeItemAtPath:fileURL.path error:nil];
     assert(![[NSFileManager defaultManager] fileExistsAtPath:fileURL.path]);
 
     // Open realm at destination, expect the objects from seeded path.
