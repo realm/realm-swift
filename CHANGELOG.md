@@ -74,7 +74,8 @@ let people: Results<PersonProjection> = realm.objects(PersonProjection.self)
   `Element` conforms to `Comparable`.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
+* Accessing a non object collection inside a migration would cause a crash [#5633](https://github.com/realm/realm-cocoa/issues/5633).
+* Accessing a `Map` of objects dynamically would not handle nulled values correctly (since v10.8.0).
 * Add missing `Indexable` support for UUID.
   ([Cocoa #7545](https://github.com/realm/realm-swift/issues/7545), since v10.10.0)
 * `where()` allowed constructing some nonsensical queries due to boolean comparisons returning `Query<T>` rather than `Query<Bool>`.
