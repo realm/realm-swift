@@ -231,9 +231,9 @@ NS_ASSUME_NONNULL_BEGIN
 
  @param fileURL Local URL to save the Realm to.
  @param key     Optional 64-byte encryption key to encrypt the new file with.
- @param error  If an error occurs, upon return contains an `NSError` object
-               that describes the problem. If you are not interested in
-               possible errors, pass in `NULL`.
+ @param error   If an error occurs, upon return contains an `NSError` object
+                that describes the problem. If you are not interested in
+                possible errors, pass in `NULL`.
 
  @return `YES` if the Realm was successfully written to disk, `NO` if an error occurred.
  */

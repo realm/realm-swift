@@ -907,12 +907,12 @@ import Realm.Private
 
      - parameter fileURL:       Local URL to save the Realm to.
      - parameter encryptionKey: Optional 64-byte encryption key to encrypt the new file with.
-     - parameter enableSync  Indicates whether the copied Realm will have sync history enabled
-                             and synchronize data with the Realm server. All changes from the
-                             original realm must be uploaded to the server prior to calling
-                             `writeCopyToURL`, otherwise and error is thrown.
-                             If `enableSync` is false, the copied Realm functions
-                             as a local realm.
+     - parameter enableSync:    Indicates whether the copied Realm will have sync history enabled
+                                and synchronize data with the Realm server. All changes from the
+                                original realm must be uploaded to the server prior to calling
+                                `writeCopyToURL`, otherwise and error is thrown.
+                                If `enableSync` is false, the copied Realm functions
+                                as a local realm.
      - warning: Using a local Realm configuration to open a realm that was copied with `enableSync` set to true
        throws an exception due to incompatible histories.
 
