@@ -1,8 +1,7 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* Conform `@ThreadSafe` and `ThreadSafeReference` to `Sendable`.
-* Add an API for asynchronous transactions on ObjC.
+* Add Obj-C API for asynchronous transactions
 The feature can be enabled with the build flag `REALM_ASYNC_WRITES`.
 ```
    [realm asyncTransactionWithBlock:^{
