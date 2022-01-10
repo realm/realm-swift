@@ -109,7 +109,7 @@
     configuration.deleteRealmIfMigrationNeeded = false;
     XCTAssertEqual(configuration.schemaMode, realm::SchemaMode::Automatic);
 
-#ifdef REALM_ASYNC_WRITES
+#ifdef REALM_SPM
     RLMUser *user = RLMDummyUser();
     configuration.syncConfiguration = [user configurationWithPartitionValue:@"dummy"].syncConfiguration;
     XCTAssertEqual(configuration.schemaMode, realm::SchemaMode::AdditiveDiscovered);
@@ -145,7 +145,7 @@
     XCTAssertEqual(configuration.schemaMode, realm::SchemaMode::ReadOnlyAlternative);
     configuration.readOnly = false;
     XCTAssertEqual(configuration.schemaMode, realm::SchemaMode::AdditiveExplicit);
-#endif // REALM_ASYNC_WRITES
+#endif // REALM_SPM
 
     [user logOut];
     [RLMApp resetAppCache];
