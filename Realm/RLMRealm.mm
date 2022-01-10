@@ -429,7 +429,11 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
             if (RLMRealm *realm = RLMGetThreadLocalCachedRealmForPath(config.path, cacheKey)) {
                 auto const& old_config = realm->_realm->config();
                 if (old_config.immutable() != config.immutable()
+#ifdef REALM_ASYNC_WRITES
                     || old_config.read_only() != config.read_only()) {
+#else
+                    || old_config.read_only_alternative() != config.read_only_alternative()) {
+#endif // REALM_ASYNC_WRITES
                     @throw RLMException(@"Realm at path '%s' already opened with different read permissions", config.path.c_str());
                 }
                 if (old_config.in_memory != config.in_memory) {
@@ -739,13 +743,13 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     return _realm->async_commit_transaction();
 }
 
-- (RLMAsyncTransactionId)commitAsyncWriteTransaction:(void(^)())doneBlock {
-    return _realm->async_commit_transaction(doneBlock);
+- (RLMAsyncTransactionId)commitAsyncWriteTransaction:(void(^)())completionBlock {
+    return _realm->async_commit_transaction(completionBlock);
 }
 
-- (RLMAsyncTransactionId)commitAsyncWriteTransaction:(nullable void(^)())doneBlock isGroupingAllowed:(BOOL)isGroupingAllowed {
-    if (doneBlock) {
-        return _realm->async_commit_transaction(doneBlock, isGroupingAllowed);
+- (RLMAsyncTransactionId)commitAsyncWriteTransaction:(nullable void(^)())completionBlock isGroupingAllowed:(BOOL)isGroupingAllowed {
+    if (completionBlock) {
+        return _realm->async_commit_transaction(completionBlock, isGroupingAllowed);
     }
     return _realm->async_commit_transaction(nil, isGroupingAllowed);
 }
@@ -754,10 +758,10 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     _realm->async_cancel_transaction(asyncTransactionId);
 }
 
-- (RLMAsyncTransactionId)asyncTransactionWithBlock:(void(^)())block onComplete:(void (^)())doneBlock {
+- (RLMAsyncTransactionId)asyncTransactionWithBlock:(void(^)())block onComplete:(void (^)())completionBlock {
     RLMAsyncTransactionId asyncTransactionId = [self beginAsyncWriteTransaction: ^{
         block();
-        [self commitAsyncWriteTransaction:doneBlock];
+        [self commitAsyncWriteTransaction:completionBlock];
     }];
     return asyncTransactionId;
 }
