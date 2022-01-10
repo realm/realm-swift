@@ -521,8 +521,8 @@ typedef void (^RLMNotificationBlock)(RLMNotification notification, RLMRealm *rea
 typedef void(^RLMRealmAsyncErrorHandler)(RLMAsyncTransactionId, NSError *);
 
 /**
- Set the error handler for the asynbhronous transactions.
- Synchronous try/catch hadling will not work with the asynchronous transactions.
+ Set the error handler for the asynchronous transactions.
+ Synchronous try/catch handling will not work with the asynchronous transactions.
  Asynchronous exceptions will be dispatched to the handler as `NSErrors`.
  @note pass `nil` as a parameter to remove the handler
  */
@@ -532,9 +532,9 @@ typedef void(^RLMRealmAsyncErrorHandler)(RLMAsyncTransactionId, NSError *);
  Begins asynchronous write transaction.
  
  @param block The block containing actions to perform.
-             `block` should end by calling `commitAsyncWriteTransaction`, `cancelAsyncTransaction:`,
-             `commitWriteTransaction` or `cancelWriteTransaction`.
-             Returning without one of these calls will be equivalent to calling `cancelAsyncTransaction`.
+        `block` should end by calling `commitAsyncWriteTransaction`, `cancelAsyncTransaction:`,
+        `commitWriteTransaction` or `cancelWriteTransaction`.
+        Returning without one of these calls will be equivalent to calling `cancelAsyncTransaction`.
  
  @return Asynchronous transaction's Id.
  
@@ -551,12 +551,12 @@ typedef void(^RLMRealmAsyncErrorHandler)(RLMAsyncTransactionId, NSError *);
 /** Commit asynchronous transaction.
  
  @param doneBlock  is queued for execution on the scheduler associated with
-                  the current realm. It will run after the commit has reached stable storage.
+        the current realm. It will run after the commit has reached stable storage.
  
  @param isGroupingAllowed If `true`, the next `commitAsyncWriteTransaction` *may* run without an
-                         intervening synchronization of stable storage.  Such a sequence of commits
-                         form a group. In case of a platform crash, either none or all of the commits
-                         in a group will reach stable storage.
+        intervening synchronization of stable storage.  Such a sequence of commits
+        form a group. In case of a platform crash, either none or all of the commits
+        in a group will reach stable storage. `false` by default.
 
  @return Asynchronous transaction's Id.
 
@@ -585,7 +585,7 @@ typedef void(^RLMRealmAsyncErrorHandler)(RLMAsyncTransactionId, NSError *);
  @param block  The block containing actions to perform.
  
  @param doneBlock  is queued for execution on the scheduler associated with
-                  the current realm. It will run after the commit has reached stable storage.
+        the current realm. It will run after the commit has reached stable storage.
 
  @return Asynchronous transaction's Id.
  */
