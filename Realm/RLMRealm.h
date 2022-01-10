@@ -536,7 +536,7 @@ typedef void(^RLMRealmAsyncErrorHandler)(RLMAsyncTransactionId, NSError *);
         `commitWriteTransaction` or `cancelWriteTransaction`.
         Returning without one of these calls will be equivalent to calling `cancelAsyncTransaction`.
  
- @return Asynchronous transaction's Id.
+ @return The Id for the asynchronous transaction.
  
  @note `block` is queued for execution on the scheduler associated with the current realm.
        It will run after the write mutex has been acquired.
@@ -550,8 +550,12 @@ typedef void(^RLMRealmAsyncErrorHandler)(RLMAsyncTransactionId, NSError *);
 
 /** Commit asynchronous transaction.
  
- @param doneBlock  is queued for execution on the scheduler associated with
+ The call returns immediately allowing the caller to proceed while the I/O is performed
+ on a dedicated background thread.
+ 
+ @param completionBlock  is queued for execution on the scheduler associated with
         the current realm. It will run after the commit has reached stable storage.
+        Callbacks to `completionBlock` will occur in the order of `commitAsyncWriteTransaction`
  
  @param isGroupingAllowed If `true`, the next `commitAsyncWriteTransaction` *may* run without an
         intervening synchronization of stable storage.  Such a sequence of commits
@@ -559,14 +563,10 @@ typedef void(^RLMRealmAsyncErrorHandler)(RLMAsyncTransactionId, NSError *);
         in a group will reach stable storage. `false` by default.
 
  @return Asynchronous transaction's Id.
-
- * The call returns immediately allowing the caller to proceed while
-   the I/O is performed on a dedicated background thread.
- * Callbacks to `doneBlock` will occur in the order of `commitAsyncWriteTransaction`
 */
-- (RLMAsyncTransactionId)commitAsyncWriteTransaction:(nullable void(^)())doneBlock isGroupingAllowed:(BOOL)isGroupingAllowed;
+- (RLMAsyncTransactionId)commitAsyncWriteTransaction:(nullable void(^)())completionBlock isGroupingAllowed:(BOOL)isGroupingAllowed;
 /// :nodoc:
-- (RLMAsyncTransactionId)commitAsyncWriteTransaction:(void(^)())doneBlock;
+- (RLMAsyncTransactionId)commitAsyncWriteTransaction:(void(^)())completionBlock;
 /// :nodoc:
 - (RLMAsyncTransactionId)commitAsyncWriteTransaction;
 
@@ -584,12 +584,12 @@ typedef void(^RLMRealmAsyncErrorHandler)(RLMAsyncTransactionId, NSError *);
  
  @param block  The block containing actions to perform.
  
- @param doneBlock  is queued for execution on the scheduler associated with
+ @param completionBlock  is queued for execution on the scheduler associated with
         the current realm. It will run after the commit has reached stable storage.
 
  @return Asynchronous transaction's Id.
  */
-- (RLMAsyncTransactionId)asyncTransactionWithBlock:(void(^)())block onComplete:(void(^)())doneBlock;
+- (RLMAsyncTransactionId)asyncTransactionWithBlock:(void(^)())block onComplete:(void(^)())completionBlock;
 /// :nodoc:
 - (RLMAsyncTransactionId)asyncTransactionWithBlock:(void(^)())block;
 

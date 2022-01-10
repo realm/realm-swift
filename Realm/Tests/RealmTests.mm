@@ -1532,21 +1532,14 @@
 
 - (void)testAsyncTransactionShouldNotRunTransactionOnClosedRealm {
     RLMRealm *realm = RLMRealm.defaultRealm;
-    XCTestExpectation *asyncComplete = [self expectationWithDescription:@"async transaction complete"];
-    asyncComplete.inverted = YES;
-
     [self dispatchAsync:^{
         RLMRealm *realm = RLMRealm.defaultRealm;
-        RLMAsyncTransactionId asyncTransactionId = [realm beginAsyncWriteTransaction:^{
-            [realm createObject:StringObject.className withValue:@[@"string"]];
-            [realm commitAsyncWriteTransaction];
-            [asyncComplete fulfill];
+        [RLMRealm.defaultRealm beginAsyncWriteTransaction:^{
+            XCTFail("Should not run this block");
         }];
     }];
 
     [realm invalidate];
-
-    [self waitForExpectationsWithTimeout:1.0 handler:nil];
     XCTAssertEqual(0, [StringObject allObjectsInRealm:realm].count);
 }
 
