@@ -1892,8 +1892,8 @@
     
     RLMAsyncTransactionId transactionId = 0;
     
-    [realm setAsyncErrorHandler:^(RLMAsyncTransactionId asyncErrorHandler, NSError *error) {
-        XCTAssertEqual(asyncErrorHandler, transactionId);
+    [realm setAsyncErrorHandler:^(RLMAsyncTransactionId asyncTransactionId, NSError *error) {
+        XCTAssertEqual(asyncTransactionId, transactionId);
         [asyncComplete fulfill];
     }];
 
