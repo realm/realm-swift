@@ -228,7 +228,7 @@ public struct Query<T> {
 }
 
 // MARK: Numerics
-extension Query where T: _Persistable, T.PersistedType: _QueryNumeric {
+extension Query where T: _HasPersistedType, T.PersistedType: _QueryNumeric {
     /// :nodoc:
     public static func > (_ lhs: Query, _ rhs: T) -> Query<Bool> {
         .init(.comparison(operator: .greaterThan, lhs.node, .constant(rhs), options: []))
@@ -496,12 +496,22 @@ extension Query where T: RealmKeyedCollection {
 
 extension Query where T: PersistableEnum, T.RawValue: _RealmSchemaDiscoverable {
     /// Query on the rawValue of the Enum rather than the Enum itself.
+    ///
+    /// This can be used to write queries which can be expressed on the
+    /// RawValue but not the enum. For example, this lets you query for
+    /// `.starts(with:)` on a string enum where the prefix is not a member of
+    /// the enum.
     public var rawValue: Query<T.RawValue> {
         .init(node)
     }
 }
 extension Query where T: OptionalProtocol, T.Wrapped: PersistableEnum, T.Wrapped.RawValue: _RealmSchemaDiscoverable {
     /// Query on the rawValue of the Enum rather than the Enum itself.
+    ///
+    /// This can be used to write queries which can be expressed on the
+    /// RawValue but not the enum. For example, this lets you query for
+    /// `.starts(with:)` on a string enum where the prefix is not a member of
+    /// the enum.
     public var rawValue: Query<T.Wrapped.RawValue?> {
         .init(node)
     }
@@ -512,25 +522,96 @@ extension Query where T: OptionalProtocol, T.Wrapped: PersistableEnum, T.Wrapped
 // all have the same operations.
 extension Query where T: RealmCollection, T.Element: PersistableEnum, T.Element.RawValue: RealmCollectionValue {
     /// Query on the rawValue of the Enums in the collection rather than the Enums themselves.
-    public var rawValue: Query<List<T.Element.RawValue>> {
+    ///
+    /// This can be used to write queries which can be expressed on the
+    /// RawValue but not the enum. For example, this lets you query for
+    /// `.starts(with:)` on a string enum where the prefix is not a member of
+    /// the enum.
+    public var rawValue: Query<AnyRealmCollection<T.Element.RawValue>> {
         .init(node)
     }
 }
 extension Query where T: RealmKeyedCollection, T.Value: PersistableEnum, T.Value.RawValue: RealmCollectionValue {
     /// Query on the rawValue of the Enums in the collection rather than the Enums themselves.
+    ///
+    /// This can be used to write queries which can be expressed on the
+    /// RawValue but not the enum. For example, this lets you query for
+    /// `.starts(with:)` on a string enum where the prefix is not a member of
+    /// the enum.
     public var rawValue: Query<Map<T.Key, T.Value.RawValue>> {
         .init(node)
     }
 }
 extension Query where T: RealmCollection, T.Element: OptionalProtocol, T.Element.Wrapped: PersistableEnum, T.Element.Wrapped.RawValue: _RealmCollectionValueInsideOptional {
     /// Query on the rawValue of the Enums in the collection rather than the Enums themselves.
-    public var rawValue: Query<List<T.Element.Wrapped.RawValue?>> {
+    ///
+    /// This can be used to write queries which can be expressed on the
+    /// RawValue but not the enum. For example, this lets you query for
+    /// `.starts(with:)` on a string enum where the prefix is not a member of
+    /// the enum.
+    public var rawValue: Query<AnyRealmCollection<T.Element.Wrapped.RawValue?>> {
         .init(node)
     }
 }
 extension Query where T: RealmKeyedCollection, T.Value: OptionalProtocol, T.Value.Wrapped: PersistableEnum, T.Value.Wrapped.RawValue: _RealmCollectionValueInsideOptional {
     /// Query on the rawValue of the Enums in the collection rather than the Enums themselves.
+    ///
+    /// This can be used to write queries which can be expressed on the
+    /// RawValue but not the enum. For example, this lets you query for
+    /// `.starts(with:)` on a string enum where the prefix is not a member of
+    /// the enum.
     public var rawValue: Query<Map<T.Key, T.Value.Wrapped.RawValue?>> {
+        .init(node)
+    }
+}
+
+// MARK: - CustomPersistable
+
+extension Query where T: _HasPersistedType {
+    /// Query on the persistableValue of the value rather than the value itself.
+    ///
+    /// This can be used to write queries which can be expressed on the
+    /// persisted type but not on the type itself, such as range queries
+    /// on the persistable value or to query for values which can't be
+    /// converted to the mapped type.
+    ///
+    /// For types which don't conform to PersistableEnum, CustomPersistable or
+    /// FailableCustomPersistable this doesn't do anything useful.
+    public var persistableValue: Query<T.PersistedType> {
+        .init(node)
+    }
+}
+
+// The actual collection type returned in these doesn't matter because it's
+// only used to constrain the set of operations available, and the collections
+// all have the same operations.
+extension Query where T: RealmCollection {
+    /// Query on the persistableValue of the values in the collection rather
+    /// than the values themselves.
+    ///
+    /// This can be used to write queries which can be expressed on the
+    /// persisted type but not on the type itself, such as range queries
+    /// on the persistable value or to query for values which can't be
+    /// converted to the mapped type.
+    ///
+    /// For types which don't conform to PersistableEnum, CustomPersistable or
+    /// FailableCustomPersistable this doesn't do anything useful.
+    public var persistableValue: Query<AnyRealmCollection<T.Element.PersistedType>> {
+        .init(node)
+    }
+}
+extension Query where T: RealmKeyedCollection {
+    /// Query on the persistableValue of the values in the collection rather
+    /// than the values themselves.
+    ///
+    /// This can be used to write queries which can be expressed on the
+    /// persisted type but not on the type itself, such as range queries
+    /// on the persistable value or to query for values which can't be
+    /// converted to the mapped type.
+    ///
+    /// For types which don't conform to PersistableEnum, CustomPersistable or
+    /// FailableCustomPersistable this doesn't do anything useful.
+    public var persistableValue: Query<Map<T.Key, T.Value.PersistedType>> {
         .init(node)
     }
 }
@@ -555,7 +636,7 @@ extension Query where T: Comparable {
 
 // MARK: _QueryString
 
-extension Query where T: _Persistable, T.PersistedType: _QueryString {
+extension Query where T: _HasPersistedType, T.PersistedType: _QueryString {
     /**
      Checks for all elements in this collection that equal the given value.
      `?` and `*` are allowed as wildcard characters, where `?` matches 1 character and `*` matches 0 or more characters.
@@ -579,7 +660,7 @@ extension Query where T: _Persistable, T.PersistedType: _QueryString {
 
 // MARK: _QueryBinary
 
-extension Query where T: _Persistable, T.PersistedType: _QueryBinary {
+extension Query where T: _HasPersistedType, T.PersistedType: _QueryBinary {
     /**
      Checks for all elements in this collection that contains the given value.
      - parameter value: value used.
@@ -714,7 +795,7 @@ extension Query where T == Bool {
  ```
  Where `dogs` is an array of objects.
  */
-extension Query where T: _Persistable, T.PersistedType: _QueryNumeric {
+extension Query where T: _HasPersistedType, T.PersistedType: _QueryNumeric {
     /// Returns the minimum value of the objects in the collection based on the keypath.
     public var min: Query {
         Query(buildCollectionAggregateKeyPath("@min"))

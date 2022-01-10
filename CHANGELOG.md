@@ -52,6 +52,23 @@ let people: Results<PersonProjection> = realm.objects(PersonProjection.self)
 * `RealmCollection.sorted(ascending:)` can now be called on all
   non-Object/EmbeddedObject collections rather than only ones where the
   `Element` conforms to `Comparable`.
+* Add support for using user-defined types with `@Persistable` and in Realm
+  collections by defining a mapping to and from a type which Realm knows how to
+  store. For example, `URL` can be made persistable with:
+  ```
+  extension URL: FailableCustomPersistable {
+      // Store URL values as a String in Realm
+      public typealias PersistedType = String
+      // Convert a String to a URL
+      public init?(persistedValue: String) { self.init(string: persistedValue) }
+      // Convert a URL to a String
+      public var persistableValue: String { self.absoluteString }
+  }
+  ```
+  After doing this, `@Persisted var url: URL` is a valid property declaration
+  on a Realm object. More advanced mappings can be done by mapping to an
+  EmbeddedObject which can store multiple values.
+
 
 ### Fixed
 * Accessing a non object collection inside a migration would cause a crash [#5633](https://github.com/realm/realm-cocoa/issues/5633).

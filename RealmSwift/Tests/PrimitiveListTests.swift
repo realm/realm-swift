@@ -19,7 +19,11 @@
 import RealmSwift
 import XCTest
 
-class PrimitiveListTestsBase<O: ObjectFactory, V: ListValueFactory>: TestCase {
+#if canImport(RealmTestSupport)
+import RealmTestSupport
+#endif
+
+class PrimitiveListTestsBase<O: ObjectFactory, V: ListValueFactory>: RLMTestCaseBase {
     var realm: Realm?
     var obj: V.ListRoot!
     var array: List<V>!
@@ -38,9 +42,31 @@ class PrimitiveListTestsBase<O: ObjectFactory, V: ListValueFactory>: TestCase {
         obj = nil
         realm = nil
     }
+
+    // These test suites run such a large number of very short tests that the
+    // setup/teardown overhead from TestCase ends up being a significant portion
+    // of the runtime, so bypass that and replicate just the bit we need here.
+    override func invokeTest() {
+        autoreleasepool { super.invokeTest() }
+    }
+
+    func assertThrows<T>(_ block: @autoclosure () -> T, named: String? = RLMExceptionName,
+                         _ message: String? = nil, fileName: String = #file, lineNumber: UInt = #line) {
+        RLMAssertThrowsWithName(self, { _ = block() }, named, message, fileName, lineNumber)
+    }
+
+    func assertThrows<T>(_ block: @autoclosure () -> T, reason: String,
+                         _ message: String? = nil, fileName: String = #file, lineNumber: UInt = #line) {
+        RLMAssertThrowsWithReason(self, { _ = block() }, reason, message, fileName, lineNumber)
+    }
+
+    func assertThrows<T>(_ block: @autoclosure () -> T, reasonMatching regexString: String,
+                         _ message: String? = nil, fileName: String = #file, lineNumber: UInt = #line) {
+        RLMAssertThrowsWithReasonMatching(self, { _ = block() }, regexString, message, fileName, lineNumber)
+    }
 }
 
-class PrimitiveListTests<O: ObjectFactory, V: ListValueFactory>: PrimitiveListTestsBase<O, V> {
+class PrimitiveListTests<O: ObjectFactory, V: ListValueFactory & _RealmSchemaDiscoverable>: PrimitiveListTestsBase<O, V> {
     func testInvalidated() {
         XCTAssertFalse(array.isInvalidated)
         if let realm = obj.realm {
@@ -50,6 +76,8 @@ class PrimitiveListTests<O: ObjectFactory, V: ListValueFactory>: PrimitiveListTe
     }
 
     func testIndexOf() {
+        guard V._rlmType != .object else { return }
+
         XCTAssertNil(array.index(of: values[0]))
 
         array.append(values[0])
@@ -400,6 +428,75 @@ func addTests<OF: ObjectFactory>(_ suite: XCTestSuite, _ type: OF.Type) {
     MinMaxPrimitiveListTests<OF, EnumInt64?>.defaultTestSuite.tests.forEach(suite.addTest)
     MinMaxPrimitiveListTests<OF, EnumFloat?>.defaultTestSuite.tests.forEach(suite.addTest)
     MinMaxPrimitiveListTests<OF, EnumDouble?>.defaultTestSuite.tests.forEach(suite.addTest)
+
+    // Custom persistable wrappers
+    PrimitiveListTests<OF, IntWrapper>.defaultTestSuite.tests.forEach(suite.addTest)
+    PrimitiveListTests<OF, Int8Wrapper>.defaultTestSuite.tests.forEach(suite.addTest)
+    PrimitiveListTests<OF, Int16Wrapper>.defaultTestSuite.tests.forEach(suite.addTest)
+    PrimitiveListTests<OF, Int32Wrapper>.defaultTestSuite.tests.forEach(suite.addTest)
+    PrimitiveListTests<OF, Int64Wrapper>.defaultTestSuite.tests.forEach(suite.addTest)
+    PrimitiveListTests<OF, FloatWrapper>.defaultTestSuite.tests.forEach(suite.addTest)
+    PrimitiveListTests<OF, DoubleWrapper>.defaultTestSuite.tests.forEach(suite.addTest)
+    PrimitiveListTests<OF, StringWrapper>.defaultTestSuite.tests.forEach(suite.addTest)
+    PrimitiveListTests<OF, DataWrapper>.defaultTestSuite.tests.forEach(suite.addTest)
+    PrimitiveListTests<OF, DateWrapper>.defaultTestSuite.tests.forEach(suite.addTest)
+    PrimitiveListTests<OF, Decimal128Wrapper>.defaultTestSuite.tests.forEach(suite.addTest)
+    PrimitiveListTests<OF, ObjectIdWrapper>.defaultTestSuite.tests.forEach(suite.addTest)
+    PrimitiveListTests<OF, UUIDWrapper>.defaultTestSuite.tests.forEach(suite.addTest)
+    PrimitiveListTests<OF, EmbeddedObjectWrapper>.defaultTestSuite.tests.forEach(suite.addTest)
+
+    MinMaxPrimitiveListTests<OF, IntWrapper>.defaultTestSuite.tests.forEach(suite.addTest)
+    MinMaxPrimitiveListTests<OF, Int8Wrapper>.defaultTestSuite.tests.forEach(suite.addTest)
+    MinMaxPrimitiveListTests<OF, Int16Wrapper>.defaultTestSuite.tests.forEach(suite.addTest)
+    MinMaxPrimitiveListTests<OF, Int32Wrapper>.defaultTestSuite.tests.forEach(suite.addTest)
+    MinMaxPrimitiveListTests<OF, Int64Wrapper>.defaultTestSuite.tests.forEach(suite.addTest)
+    MinMaxPrimitiveListTests<OF, FloatWrapper>.defaultTestSuite.tests.forEach(suite.addTest)
+    MinMaxPrimitiveListTests<OF, DoubleWrapper>.defaultTestSuite.tests.forEach(suite.addTest)
+    MinMaxPrimitiveListTests<OF, DateWrapper>.defaultTestSuite.tests.forEach(suite.addTest)
+    MinMaxPrimitiveListTests<OF, Decimal128Wrapper>.defaultTestSuite.tests.forEach(suite.addTest)
+
+    AddablePrimitiveListTests<OF, IntWrapper>.defaultTestSuite.tests.forEach(suite.addTest)
+    AddablePrimitiveListTests<OF, Int8Wrapper>.defaultTestSuite.tests.forEach(suite.addTest)
+    AddablePrimitiveListTests<OF, Int16Wrapper>.defaultTestSuite.tests.forEach(suite.addTest)
+    AddablePrimitiveListTests<OF, Int32Wrapper>.defaultTestSuite.tests.forEach(suite.addTest)
+    AddablePrimitiveListTests<OF, Int64Wrapper>.defaultTestSuite.tests.forEach(suite.addTest)
+    AddablePrimitiveListTests<OF, FloatWrapper>.defaultTestSuite.tests.forEach(suite.addTest)
+    AddablePrimitiveListTests<OF, DoubleWrapper>.defaultTestSuite.tests.forEach(suite.addTest)
+    AddablePrimitiveListTests<OF, Decimal128Wrapper>.defaultTestSuite.tests.forEach(suite.addTest)
+
+    // Optional custom persistable wrappers
+    PrimitiveListTests<OF, IntWrapper?>.defaultTestSuite.tests.forEach(suite.addTest)
+    PrimitiveListTests<OF, Int8Wrapper?>.defaultTestSuite.tests.forEach(suite.addTest)
+    PrimitiveListTests<OF, Int16Wrapper?>.defaultTestSuite.tests.forEach(suite.addTest)
+    PrimitiveListTests<OF, Int32Wrapper?>.defaultTestSuite.tests.forEach(suite.addTest)
+    PrimitiveListTests<OF, Int64Wrapper?>.defaultTestSuite.tests.forEach(suite.addTest)
+    PrimitiveListTests<OF, FloatWrapper?>.defaultTestSuite.tests.forEach(suite.addTest)
+    PrimitiveListTests<OF, DoubleWrapper?>.defaultTestSuite.tests.forEach(suite.addTest)
+    PrimitiveListTests<OF, StringWrapper?>.defaultTestSuite.tests.forEach(suite.addTest)
+    PrimitiveListTests<OF, DataWrapper?>.defaultTestSuite.tests.forEach(suite.addTest)
+    PrimitiveListTests<OF, DateWrapper?>.defaultTestSuite.tests.forEach(suite.addTest)
+    PrimitiveListTests<OF, Decimal128Wrapper?>.defaultTestSuite.tests.forEach(suite.addTest)
+    PrimitiveListTests<OF, ObjectIdWrapper?>.defaultTestSuite.tests.forEach(suite.addTest)
+    PrimitiveListTests<OF, UUIDWrapper?>.defaultTestSuite.tests.forEach(suite.addTest)
+
+    MinMaxPrimitiveListTests<OF, IntWrapper?>.defaultTestSuite.tests.forEach(suite.addTest)
+    MinMaxPrimitiveListTests<OF, Int8Wrapper?>.defaultTestSuite.tests.forEach(suite.addTest)
+    MinMaxPrimitiveListTests<OF, Int16Wrapper?>.defaultTestSuite.tests.forEach(suite.addTest)
+    MinMaxPrimitiveListTests<OF, Int32Wrapper?>.defaultTestSuite.tests.forEach(suite.addTest)
+    MinMaxPrimitiveListTests<OF, Int64Wrapper?>.defaultTestSuite.tests.forEach(suite.addTest)
+    MinMaxPrimitiveListTests<OF, FloatWrapper?>.defaultTestSuite.tests.forEach(suite.addTest)
+    MinMaxPrimitiveListTests<OF, DoubleWrapper?>.defaultTestSuite.tests.forEach(suite.addTest)
+    MinMaxPrimitiveListTests<OF, DateWrapper?>.defaultTestSuite.tests.forEach(suite.addTest)
+    MinMaxPrimitiveListTests<OF, Decimal128Wrapper?>.defaultTestSuite.tests.forEach(suite.addTest)
+
+    AddablePrimitiveListTests<OF, IntWrapper?>.defaultTestSuite.tests.forEach(suite.addTest)
+    AddablePrimitiveListTests<OF, Int8Wrapper?>.defaultTestSuite.tests.forEach(suite.addTest)
+    AddablePrimitiveListTests<OF, Int16Wrapper?>.defaultTestSuite.tests.forEach(suite.addTest)
+    AddablePrimitiveListTests<OF, Int32Wrapper?>.defaultTestSuite.tests.forEach(suite.addTest)
+    AddablePrimitiveListTests<OF, Int64Wrapper?>.defaultTestSuite.tests.forEach(suite.addTest)
+    AddablePrimitiveListTests<OF, FloatWrapper?>.defaultTestSuite.tests.forEach(suite.addTest)
+    AddablePrimitiveListTests<OF, DoubleWrapper?>.defaultTestSuite.tests.forEach(suite.addTest)
+    AddablePrimitiveListTests<OF, Decimal128Wrapper?>.defaultTestSuite.tests.forEach(suite.addTest)
 }
 
 class UnmanagedPrimitiveListTests: TestCase {
@@ -452,6 +549,26 @@ class ManagedPrimitiveListTests: TestCase {
         SortablePrimitiveListTests<ManagedObjectFactory, EnumFloat?>.defaultTestSuite.tests.forEach(suite.addTest)
         SortablePrimitiveListTests<ManagedObjectFactory, EnumDouble?>.defaultTestSuite.tests.forEach(suite.addTest)
         SortablePrimitiveListTests<ManagedObjectFactory, EnumString?>.defaultTestSuite.tests.forEach(suite.addTest)
+
+        SortablePrimitiveListTests<ManagedObjectFactory, IntWrapper>.defaultTestSuite.tests.forEach(suite.addTest)
+        SortablePrimitiveListTests<ManagedObjectFactory, Int8Wrapper>.defaultTestSuite.tests.forEach(suite.addTest)
+        SortablePrimitiveListTests<ManagedObjectFactory, Int16Wrapper>.defaultTestSuite.tests.forEach(suite.addTest)
+        SortablePrimitiveListTests<ManagedObjectFactory, Int32Wrapper>.defaultTestSuite.tests.forEach(suite.addTest)
+        SortablePrimitiveListTests<ManagedObjectFactory, Int64Wrapper>.defaultTestSuite.tests.forEach(suite.addTest)
+        SortablePrimitiveListTests<ManagedObjectFactory, FloatWrapper>.defaultTestSuite.tests.forEach(suite.addTest)
+        SortablePrimitiveListTests<ManagedObjectFactory, DoubleWrapper>.defaultTestSuite.tests.forEach(suite.addTest)
+        SortablePrimitiveListTests<ManagedObjectFactory, StringWrapper>.defaultTestSuite.tests.forEach(suite.addTest)
+        SortablePrimitiveListTests<ManagedObjectFactory, DateWrapper>.defaultTestSuite.tests.forEach(suite.addTest)
+
+        SortablePrimitiveListTests<ManagedObjectFactory, IntWrapper?>.defaultTestSuite.tests.forEach(suite.addTest)
+        SortablePrimitiveListTests<ManagedObjectFactory, Int8Wrapper?>.defaultTestSuite.tests.forEach(suite.addTest)
+        SortablePrimitiveListTests<ManagedObjectFactory, Int16Wrapper?>.defaultTestSuite.tests.forEach(suite.addTest)
+        SortablePrimitiveListTests<ManagedObjectFactory, Int32Wrapper?>.defaultTestSuite.tests.forEach(suite.addTest)
+        SortablePrimitiveListTests<ManagedObjectFactory, Int64Wrapper?>.defaultTestSuite.tests.forEach(suite.addTest)
+        SortablePrimitiveListTests<ManagedObjectFactory, FloatWrapper?>.defaultTestSuite.tests.forEach(suite.addTest)
+        SortablePrimitiveListTests<ManagedObjectFactory, DoubleWrapper?>.defaultTestSuite.tests.forEach(suite.addTest)
+        SortablePrimitiveListTests<ManagedObjectFactory, StringWrapper?>.defaultTestSuite.tests.forEach(suite.addTest)
+        SortablePrimitiveListTests<ManagedObjectFactory, DateWrapper?>.defaultTestSuite.tests.forEach(suite.addTest)
 
         return suite
     }

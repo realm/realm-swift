@@ -96,6 +96,7 @@ static id coerceToObjectType(id obj, Class cls, RLMSchema *schema) {
     if ([obj isKindOfClass:cls]) {
         return obj;
     }
+    obj = RLMBridgeSwiftValue(obj) ?: obj;
     id value = [[cls alloc] init];
     RLMInitializeWithValue(value, obj, schema);
     return value;

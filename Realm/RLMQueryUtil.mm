@@ -91,7 +91,14 @@ bool propertyTypeIsLink(RLMPropertyType type) {
 bool isObjectValidForProperty(id value, RLMProperty *prop) {
     if (prop.collection) {
         if (propertyTypeIsLink(prop.type)) {
-            return [RLMObjectBaseObjectSchema(RLMDynamicCast<RLMObjectBase>(value)).className isEqualToString:prop.objectClassName];
+            RLMObjectBase *obj = RLMDynamicCast<RLMObjectBase>(value);
+            if (!obj) {
+                obj = RLMDynamicCast<RLMObjectBase>(RLMBridgeSwiftValue(value));
+            }
+            if (!obj) {
+                return false;
+            }
+            return [RLMObjectBaseObjectSchema(obj).className isEqualToString:prop.objectClassName];
         }
         return RLMValidateValue(value, prop.type, prop.optional, false, nil);
     }
@@ -265,13 +272,18 @@ public:
         m_col = m_link_chain.get_current_table()->get_column_key(m_property.columnName.UTF8String);
     }
 
+    ColumnReference(Query& query, Group& group, RLMSchema *schema)
+    : m_schema(schema), m_group(&group), m_query(&query)
+    {
+    }
+
     template <typename T, typename... SubQuery>
     auto resolve(SubQuery&&... subquery) const
     {
         static_assert(sizeof...(SubQuery) < 2, "resolve() takes at most one subquery");
 
-        // LinkChain::column() doesn't mutate it but isn't marked as const
-        auto& lc = const_cast<LinkChain&>(m_link_chain);
+        // LinkChain::column() mutates it, so we need to make a copy
+        auto lc = m_link_chain;
         if (type() != RLMPropertyTypeLinkingObjects) {
             return lc.column<T>(column(), std::forward<SubQuery>(subquery)...);
         }
@@ -310,6 +322,14 @@ public:
 
     ColumnReference column_ignoring_links(Query& query) const {
         return {query, *m_group, m_schema, m_property};
+    }
+
+    ColumnReference append(RLMProperty *prop) const {
+        auto links = m_links;
+        if (m_property) {
+            links.push_back(m_property);
+        }
+        return ColumnReference(*m_query, *m_group, m_schema, prop, std::move(links));
     }
 
     void validate_comparison(id value) const {
@@ -523,6 +543,8 @@ public:
                            NSComparisonPredicateOptions predicateOptions, ColumnReference const& column, T&& value);
 
     void add_between_constraint(const ColumnReference& column, id value);
+
+    void add_memberwise_equality_constraint(const ColumnReference& column, RLMObjectBase *obj);
 
     void add_link_constraint(NSPredicateOperatorType operatorType, const ColumnReference& column, RLMObjectBase *obj);
     void add_link_constraint(NSPredicateOperatorType operatorType, const ColumnReference& column, realm::null);
@@ -823,8 +845,57 @@ void QueryBuilder::add_between_constraint(const ColumnReference& column, id valu
 
 #pragma mark Link Constraints
 
+void QueryBuilder::add_memberwise_equality_constraint(const ColumnReference& column, RLMObjectBase *obj) {
+    for (RLMProperty *property in obj->_objectSchema.properties) {
+        // Both of these probably are implementable, but are significantly more complicated.
+        RLMPrecondition(!property.collection, @"Invalid predicate",
+                        @"Unsupported property '%@.%@' for memberwise equality query: equality on collections is not implemented.",
+                        obj->_objectSchema.className, property.name);
+        RLMPrecondition(!propertyTypeIsLink(property.type), @"Invalid predicate",
+                        @"Unsupported property '%@.%@' for memberwise equality query: object links are not implemented.",
+                        obj->_objectSchema.className, property.name);
+        add_constraint(NSEqualToPredicateOperatorType, 0, column.append(property), RLMDynamicGet(obj, property));
+    }
+}
+
 void QueryBuilder::add_link_constraint(NSPredicateOperatorType operatorType,
                                        const ColumnReference& column, RLMObjectBase *obj) {
+    // If the value isn't actually a RLMObject then it's something which bridges
+    // to RLMObject, i.e. a custom type mapping to an embedded object. For those
+    // we want to perform memberwise equality rather than equality on the link itself.
+    if (![obj isKindOfClass:[RLMObjectBase class]]) {
+        obj = RLMBridgeSwiftValue(obj);
+        REALM_ASSERT([obj isKindOfClass:[RLMObjectBase class]]);
+
+        // Collections need to use subqueries, but unary links can just use a
+        // group. Unary links could also use a subquery but that has worse performance.
+        if (column.property().collection) {
+            Query subquery = get_table(m_group, column.link_target_object_schema()).where();
+            QueryBuilder(subquery, m_group, m_schema)
+                .add_memberwise_equality_constraint(ColumnReference(subquery, m_group, m_schema), obj);
+            if (operatorType == NSEqualToPredicateOperatorType) {
+                m_query.and_query(column.resolve<Link>(std::move(subquery)).count() > 0);
+            }
+            else {
+                // This strange condition is because "ANY list != x" isn't
+                // "NONE list == x"; there must be an object in the list for
+                // this to match
+                m_query.and_query(column.resolve<Link>().count() > 0 &&
+                                  column.resolve<Link>(std::move(subquery)).count() == 0);
+            }
+        }
+        else {
+            if (operatorType == NSNotEqualToPredicateOperatorType) {
+                m_query.Not();
+            }
+
+            m_query.group();
+            add_memberwise_equality_constraint(column, obj);
+            m_query.end_group();
+        }
+        return;
+    }
+
     if (!obj->_row.is_valid()) {
         // Unmanaged or deleted objects are not equal to any managed objects.
         // For arrays this effectively checks if there are any objects in the

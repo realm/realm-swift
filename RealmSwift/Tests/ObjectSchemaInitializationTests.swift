@@ -262,6 +262,17 @@ class ObjectSchemaInitializationTests: TestCase {
         }
     }
 
+    func testCustomIndexableTypes() {
+        let indexed = CustomAllIndexableTypesObject().objectSchema
+        for property in indexed.properties {
+            XCTAssertTrue(property.isIndexed)
+        }
+        let notIndexed = CustomAllIndexableButNotIndexedObject().objectSchema
+        for property in notIndexed.properties {
+            XCTAssertFalse(property.isIndexed)
+        }
+    }
+
     #if DEBUG // this test depends on @testable import
     func assertType<T: SchemaDiscoverable>(_ value: T, _ propertyType: PropertyType,
                                            optional: Bool = false, list: Bool = false,
@@ -587,6 +598,156 @@ class ObjectSchemaInitializationTests: TestCase {
         XCTAssertTrue(RLMProperty(name: "_property", value: Persisted<Int>(primaryKey: true)).isPrimary)
         XCTAssertTrue(RLMProperty(name: "_property", value: Persisted<Int>(wrappedValue: 1, primaryKey: true)).isPrimary)
     }
+
+    func testCustomPropertyPopulation() {
+        assertType(IntWrapper.self, .int)
+        assertType(Int8Wrapper.self, .int)
+        assertType(Int16Wrapper.self, .int)
+        assertType(Int32Wrapper.self, .int)
+        assertType(Int64Wrapper.self, .int)
+        assertType(BoolWrapper.self, .bool)
+        assertType(FloatWrapper.self, .float)
+        assertType(DoubleWrapper.self, .double)
+        assertType(StringWrapper.self, .string)
+        assertType(DataWrapper.self, .data)
+        assertType(DateWrapper.self, .date)
+        assertType(UUIDWrapper.self, .UUID)
+        assertType(Decimal128Wrapper.self, .decimal128)
+        assertType(ObjectIdWrapper.self, .objectId)
+
+        assertType(IntWrapper?.self, .int, optional: true)
+        assertType(Int8Wrapper?.self, .int, optional: true)
+        assertType(Int16Wrapper?.self, .int, optional: true)
+        assertType(Int32Wrapper?.self, .int, optional: true)
+        assertType(Int64Wrapper?.self, .int, optional: true)
+        assertType(BoolWrapper?.self, .bool, optional: true)
+        assertType(FloatWrapper?.self, .float, optional: true)
+        assertType(DoubleWrapper?.self, .double, optional: true)
+        assertType(StringWrapper?.self, .string, optional: true)
+        assertType(DataWrapper?.self, .data, optional: true)
+        assertType(DateWrapper?.self, .date, optional: true)
+        assertType(UUIDWrapper?.self, .UUID, optional: true)
+        assertType(Decimal128Wrapper?.self, .decimal128, optional: true)
+        assertType(ObjectIdWrapper?.self, .objectId, optional: true)
+        assertType(EmbeddedObjectWrapper?.self, .object, optional: true,
+                   objectType: "ModernEmbeddedObject")
+
+        assertType(List<IntWrapper>.self, .int, list: true)
+        assertType(List<Int8Wrapper>.self, .int, list: true)
+        assertType(List<Int16Wrapper>.self, .int, list: true)
+        assertType(List<Int32Wrapper>.self, .int, list: true)
+        assertType(List<Int64Wrapper>.self, .int, list: true)
+        assertType(List<BoolWrapper>.self, .bool, list: true)
+        assertType(List<FloatWrapper>.self, .float, list: true)
+        assertType(List<DoubleWrapper>.self, .double, list: true)
+        assertType(List<StringWrapper>.self, .string, list: true)
+        assertType(List<DataWrapper>.self, .data, list: true)
+        assertType(List<DateWrapper>.self, .date, list: true)
+        assertType(List<UUIDWrapper>.self, .UUID, list: true)
+        assertType(List<Decimal128Wrapper>.self, .decimal128, list: true)
+        assertType(List<ObjectIdWrapper>.self, .objectId, list: true)
+        assertType(List<EmbeddedObjectWrapper>.self, .object, list: true,
+                   objectType: "ModernEmbeddedObject")
+
+        assertType(List<IntWrapper?>.self, .int, optional: true, list: true)
+        assertType(List<Int8Wrapper?>.self, .int, optional: true, list: true)
+        assertType(List<Int16Wrapper?>.self, .int, optional: true, list: true)
+        assertType(List<Int32Wrapper?>.self, .int, optional: true, list: true)
+        assertType(List<Int64Wrapper?>.self, .int, optional: true, list: true)
+        assertType(List<BoolWrapper?>.self, .bool, optional: true, list: true)
+        assertType(List<FloatWrapper?>.self, .float, optional: true, list: true)
+        assertType(List<DoubleWrapper?>.self, .double, optional: true, list: true)
+        assertType(List<StringWrapper?>.self, .string, optional: true, list: true)
+        assertType(List<DataWrapper?>.self, .data, optional: true, list: true)
+        assertType(List<DateWrapper?>.self, .date, optional: true, list: true)
+        assertType(List<UUIDWrapper?>.self, .UUID, optional: true, list: true)
+        assertType(List<Decimal128Wrapper?>.self, .decimal128, optional: true, list: true)
+        assertType(List<ObjectIdWrapper?>.self, .objectId, optional: true, list: true)
+
+        assertType(MutableSet<IntWrapper>.self, .int, set: true)
+        assertType(MutableSet<Int8Wrapper>.self, .int, set: true)
+        assertType(MutableSet<Int16Wrapper>.self, .int, set: true)
+        assertType(MutableSet<Int32Wrapper>.self, .int, set: true)
+        assertType(MutableSet<Int64Wrapper>.self, .int, set: true)
+        assertType(MutableSet<BoolWrapper>.self, .bool, set: true)
+        assertType(MutableSet<FloatWrapper>.self, .float, set: true)
+        assertType(MutableSet<DoubleWrapper>.self, .double, set: true)
+        assertType(MutableSet<StringWrapper>.self, .string, set: true)
+        assertType(MutableSet<DataWrapper>.self, .data, set: true)
+        assertType(MutableSet<DateWrapper>.self, .date, set: true)
+        assertType(MutableSet<UUIDWrapper>.self, .UUID, set: true)
+        assertType(MutableSet<Decimal128Wrapper>.self, .decimal128, set: true)
+        assertType(MutableSet<ObjectIdWrapper>.self, .objectId, set: true)
+
+        assertType(MutableSet<IntWrapper?>.self, .int, optional: true, set: true)
+        assertType(MutableSet<Int8Wrapper?>.self, .int, optional: true, set: true)
+        assertType(MutableSet<Int16Wrapper?>.self, .int, optional: true, set: true)
+        assertType(MutableSet<Int32Wrapper?>.self, .int, optional: true, set: true)
+        assertType(MutableSet<Int64Wrapper?>.self, .int, optional: true, set: true)
+        assertType(MutableSet<BoolWrapper?>.self, .bool, optional: true, set: true)
+        assertType(MutableSet<FloatWrapper?>.self, .float, optional: true, set: true)
+        assertType(MutableSet<DoubleWrapper?>.self, .double, optional: true, set: true)
+        assertType(MutableSet<StringWrapper?>.self, .string, optional: true, set: true)
+        assertType(MutableSet<DataWrapper?>.self, .data, optional: true, set: true)
+        assertType(MutableSet<DateWrapper?>.self, .date, optional: true, set: true)
+        assertType(MutableSet<UUIDWrapper?>.self, .UUID, optional: true, set: true)
+        assertType(MutableSet<Decimal128Wrapper?>.self, .decimal128, optional: true, set: true)
+        assertType(MutableSet<ObjectIdWrapper?>.self, .objectId, optional: true, set: true)
+
+        assertType(Map<String, IntWrapper>.self, .int, map: true)
+        assertType(Map<String, Int8Wrapper>.self, .int, map: true)
+        assertType(Map<String, Int16Wrapper>.self, .int, map: true)
+        assertType(Map<String, Int32Wrapper>.self, .int, map: true)
+        assertType(Map<String, Int64Wrapper>.self, .int, map: true)
+        assertType(Map<String, BoolWrapper>.self, .bool, map: true)
+        assertType(Map<String, FloatWrapper>.self, .float, map: true)
+        assertType(Map<String, DoubleWrapper>.self, .double, map: true)
+        assertType(Map<String, StringWrapper>.self, .string, map: true)
+        assertType(Map<String, DataWrapper>.self, .data, map: true)
+        assertType(Map<String, DateWrapper>.self, .date, map: true)
+        assertType(Map<String, UUIDWrapper>.self, .UUID, map: true)
+        assertType(Map<String, Decimal128Wrapper>.self, .decimal128, map: true)
+        assertType(Map<String, ObjectIdWrapper>.self, .objectId, map: true)
+        assertType(Map<String, EmbeddedObjectWrapper>.self, .object, optional: true, map: true,
+                   objectType: "ModernEmbeddedObject")
+
+        assertType(Map<String, IntWrapper?>.self, .int, optional: true, map: true)
+        assertType(Map<String, Int8Wrapper?>.self, .int, optional: true, map: true)
+        assertType(Map<String, Int16Wrapper?>.self, .int, optional: true, map: true)
+        assertType(Map<String, Int32Wrapper?>.self, .int, optional: true, map: true)
+        assertType(Map<String, Int64Wrapper?>.self, .int, optional: true, map: true)
+        assertType(Map<String, BoolWrapper?>.self, .bool, optional: true, map: true)
+        assertType(Map<String, FloatWrapper?>.self, .float, optional: true, map: true)
+        assertType(Map<String, DoubleWrapper?>.self, .double, optional: true, map: true)
+        assertType(Map<String, StringWrapper?>.self, .string, optional: true, map: true)
+        assertType(Map<String, DataWrapper?>.self, .data, optional: true, map: true)
+        assertType(Map<String, DateWrapper?>.self, .date, optional: true, map: true)
+        assertType(Map<String, UUIDWrapper?>.self, .UUID, optional: true, map: true)
+        assertType(Map<String, Decimal128Wrapper?>.self, .decimal128, optional: true, map: true)
+        assertType(Map<String, ObjectIdWrapper?>.self, .objectId, optional: true, map: true)
+        assertType(Map<String, EmbeddedObjectWrapper?>.self, .object, optional: true, map: true,
+                   objectType: "ModernEmbeddedObject")
+    }
+
+    func testCustomIndexed() {
+        let v = IntWrapper(persistedValue: 1)
+        XCTAssertFalse(RLMProperty(name: "_property", value: Persisted<IntWrapper>()).indexed)
+        XCTAssertFalse(RLMProperty(name: "_property", value: Persisted<IntWrapper>(wrappedValue: v)).indexed)
+        XCTAssertFalse(RLMProperty(name: "_property", value: Persisted<IntWrapper>(indexed: false)).indexed)
+        XCTAssertFalse(RLMProperty(name: "_property", value: Persisted<IntWrapper>(wrappedValue: v, indexed: false)).indexed)
+        XCTAssertTrue(RLMProperty(name: "_property", value: Persisted<IntWrapper>(indexed: true)).indexed)
+        XCTAssertTrue(RLMProperty(name: "_property", value: Persisted<IntWrapper>(wrappedValue: v, indexed: true)).indexed)
+    }
+
+    func testCustomPrimary() {
+        let v = IntWrapper(persistedValue: 1)
+        XCTAssertFalse(RLMProperty(name: "_property", value: Persisted<IntWrapper>()).isPrimary)
+        XCTAssertFalse(RLMProperty(name: "_property", value: Persisted<IntWrapper>(wrappedValue: v)).isPrimary)
+        XCTAssertFalse(RLMProperty(name: "_property", value: Persisted<IntWrapper>(primaryKey: false)).isPrimary)
+        XCTAssertFalse(RLMProperty(name: "_property", value: Persisted<IntWrapper>(wrappedValue: v, primaryKey: false)).isPrimary)
+        XCTAssertTrue(RLMProperty(name: "_property", value: Persisted<IntWrapper>(primaryKey: true)).isPrimary)
+        XCTAssertTrue(RLMProperty(name: "_property", value: Persisted<IntWrapper>(wrappedValue: v, primaryKey: true)).isPrimary)
+    }
     #endif // DEBUG
 }
 
@@ -646,15 +807,13 @@ class SwiftObjectWithNonOptionalLinkProperty: SwiftFakeObject {
 }
 
 extension Set: RealmOptionalType {
-    public static func _rlmFromObjc(_ value: Any) -> Set<Element>? {
+    public static func _rlmFromObjc(_ value: Any, insideOptional: Bool) -> Set<Element>? {
         fatalError()
     }
 
     public var _rlmObjcValue: Any {
         fatalError()
     }
-
-
 }
 
 @available(*, deprecated) // Silence deprecation warnings for RealmOptional
