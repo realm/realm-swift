@@ -20,13 +20,8 @@ import Foundation
 import Realm
 import Realm.Private
 
-/// An error describing the error from the server after a write transaction to the subscription set.
-enum SyncSubscriptionError: Error {
-    case error(message: String)
-}
-
 /// An enum representing different states for the Subscription Set.
-@frozen public enum SyncSubscriptionState {
+@frozen public enum SyncSubscriptionState: Equatable {
     /// The subscription is complete and the server has sent all the data that matched the subscription
     /// queries at the time the subscription set was updated. The server is now in a steady-state
     /// synchronization mode where it will stream update as they come.
@@ -42,6 +37,19 @@ enum SyncSubscriptionError: Error {
     /// You should not use a super-ceded subscription set and instead obtain a new instance of
     /// the subscription set to write a subscription.
     case superceded
+
+    public static func ==(lhs: SyncSubscriptionState, rhs: SyncSubscriptionState) -> Bool {
+        switch (lhs, rhs) {
+        case (.complete, .complete): fallthrough
+        case (.pending, .pending): fallthrough
+        case (.superceded, .superceded):
+            return true
+        case (.error(let error), .error(let error2)):
+            return error == error2
+        default:
+            return false
+        }
+    }
 }
 
 /**
@@ -88,7 +96,7 @@ enum SyncSubscriptionError: Error {
     public func update<T: _RealmSchemaDiscoverable>(_ to: () -> (QuerySubscription<T>)) {
         let subscription = to()
         _rlmSyncSubscription.update(withClassName: subscription.className,
-                                   predicate: subscription.predicate)
+                                    predicate: subscription.predicate)
     }
 }
 
@@ -149,23 +157,14 @@ enum SyncSubscriptionError: Error {
      - throws: An `NSError` if the transaction could not be completed successfully.
                If `block` throws, the function throws the propagated `ErrorType` instead.
      */
-    public func write(_ block: (() -> Void)) throws {
-        try rlmSyncSubscriptionSet.write(block)
+    public func write(_ block: (() -> Void), onComplete: ((Error?) -> Void)? = nil) {
+        rlmSyncSubscriptionSet.write(block, onComplete: { error in
+            onComplete?(error?.pointee)
+        })
     }
 
-    /**
-     Notifies state changes for the subscription set.
-     During a write batch transaction to the server, it will return complete when the server is on
-     "steady-state" synchronization.
-     */
-    public func observe(_ block: @escaping (SyncSubscriptionState) -> Void) {
-        rlmSyncSubscriptionSet.observe { state in
-            block(mapState(state))
-        }
-    }
-
-    private func mapState(_ state: RLMSyncSubscriptionState) -> SyncSubscriptionState {
-        switch state {
+    public var state: SyncSubscriptionState {
+        switch rlmSyncSubscriptionSet.state {
         case .pending:
             return .pending
         case .complete:
@@ -173,7 +172,7 @@ enum SyncSubscriptionError: Error {
         case .superceded:
             return .superceded
         case .error:
-            return .error(SyncSubscriptionError.error(message: rlmSyncSubscriptionSet.error?.localizedDescription ?? ""))
+            return .error(rlmSyncSubscriptionSet.error!)
         @unknown default:
             fatalError()
         }
@@ -383,18 +382,16 @@ extension SyncSubscriptionSet {
      - throws: An `NSError` if the transaction could not be completed successfully.
                If `block` throws, the function throws the propagated `ErrorType` instead.
      */
-    internal func write(_ block: (() throws -> Void)) async throws {
-        fatalError()
-    }
-
-    /**
-     Notifies state changes for the subscription set.
-     During a write batch transaction to the server, it will return complete when the server is on
-     "steady-state" synchronization.
-     This will throw an error if someone updates the subscription set while on a write transaction.
-     */
-    internal var state: AsyncStream<SyncSubscriptionState> {
-        fatalError()
+    public func write(_ block: (() -> Void)) async throws {
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+            rlmSyncSubscriptionSet.write(block) { error in
+                if let error = error?.pointee {
+                    continuation.resume(throwing: error)
+                } else {
+                    continuation.resume()
+                }
+            }
+        }
     }
 }
 #endif // swift(>=5.5)

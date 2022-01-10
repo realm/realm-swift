@@ -971,9 +971,10 @@ extension Realm {
 
     - returns: A `SyncSubscriptionSet`.
      */
-    public var subscriptions: SyncSubscriptionSet? {
+    @available(*, message: "beta")
+    public var subscriptions: SyncSubscriptionSet {
         guard let rlmSubscriptionSet = rlmRealm.subscriptions else {
-            return nil
+            throwRealmException("Realm is not configured for flexible sync.")
         }
         return SyncSubscriptionSet(rlmSubscriptionSet)
     }

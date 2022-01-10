@@ -704,6 +704,7 @@ static NSURL *syncDirectoryForChildProcess() {
     RLMSyncSubscriptionSet *subs = realm.subscriptions;
     XCTAssertNotNil(subs);
 
+    XCTestExpectation *ex = [self expectationWithDescription:@"state change complete"];
     [subs write:^{
         [subs addSubscriptionWithClassName:Person.className
                           subscriptionName:@"person_all"
@@ -711,15 +712,14 @@ static NSURL *syncDirectoryForChildProcess() {
         [subs addSubscriptionWithClassName:Dog.className
                           subscriptionName:@"dog_all"
                                      where:@"TRUEPREDICATE"];
-    }];
-    XCTAssertEqual(subs.count, 2);
-
-    XCTestExpectation *ex = [self expectationWithDescription:@"state change complete"];
-    [subs observe:^(RLMSyncSubscriptionState state) {
-        if (state == RLMSyncSubscriptionStateComplete) {
+    } onComplete: ^(NSError **error){
+        if (error == nil) {
             [ex fulfill];
+        } else {
+            XCTFail();
         }
     }];
+    XCTAssertEqual(subs.count, 2);
     [self waitForExpectationsWithTimeout:20.0 handler:nil];
     block(realm);
 }
@@ -727,17 +727,17 @@ static NSURL *syncDirectoryForChildProcess() {
     RLMSyncSubscriptionSet *subs = realm.subscriptions;
     XCTAssertNotNil(subs);
 
+    XCTestExpectation *ex = [self expectationWithDescription:@"state changes"];
     [subs write:^{
         block(subs);
-    }];
-    XCTAssertNotNil(subs);
-
-    XCTestExpectation *ex = [self expectationWithDescription:@"state changes"];
-    [subs observe:^(RLMSyncSubscriptionState state) {
-        if (state == RLMSyncSubscriptionStateComplete) {
+    } onComplete:^(NSError** error) {
+        if (error == nil) {
             [ex fulfill];
+        } else {
+            XCTFail();
         }
     }];
+    XCTAssertNotNil(subs);
     [self waitForExpectationsWithTimeout:20.0 handler:nil];
     [self waitForDownloadsForRealm:realm];
 }

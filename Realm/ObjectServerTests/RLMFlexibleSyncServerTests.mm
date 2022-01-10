@@ -966,69 +966,69 @@
 }
 
 // TODO: This test should pass when `https://github.com/10gen/baas/pull/5449` when this pull request gets merged and the server send a request to erase the object when it is not within the query
-//- (void)testFlexibleSyncAddObjectOutsideQuery {
-//    [self populateData:^(RLMRealm *realm) {
-//        int numberOfSubs = 21;
-//        for (int i = 1; i <= numberOfSubs; ++i) {
-//            Person *person = [[Person alloc] initWithPrimaryKey:[RLMObjectId objectId]
-//                                                            age:i
-//                                                      firstName:[NSString stringWithFormat:@"firstname_%d", i]
-//                                                       lastName:[NSString stringWithFormat:@"lastname_%d", i]];
-//            person.partition = NSStringFromSelector(_cmd);
-//            [realm addObject: person];
-//        }
-//    }];
-//
-//    RLMRealm *realm = [self getFlexibleSyncRealm:_cmd];
-//    XCTAssertNotNil(realm);
-//    CHECK_COUNT(0, Person, realm);
-//
-//    [self writeQueryAndCompleteForRealm:realm block:^(RLMSyncSubscriptionSet *subs) {
-//        [subs addSubscriptionWithClassName:Person.className
-//                          subscriptionName:@"person_age"
-//                                     where:@"age > 18"];
-//    }];
-//    CHECK_COUNT(3, Person, realm);
-//
-//    [realm transactionWithBlock:^{
-//        [realm addObject:[[Person alloc] initWithPrimaryKey:[RLMObjectId objectId] age:10 firstName:@"Nic" lastName:@"Cages"]];
-//    }];
-//    [self waitForUploadsForRealm:realm];
-//    [self waitForDownloadsForRealm:realm];
-//    CHECK_COUNT(3, Person, realm);
-//
-//    // Second realm, with different app
-//    NSString *appId = [RealmServer.shared createAppWithQueryableFields:@[@"age"] error:nil];
-//    RLMApp *app = [RLMApp appWithId:appId
-//                      configuration:[self defaultAppConfiguration]
-//                      rootDirectory:[self clientDataRoot]];
-//
-//    RLMUser *user = [self logInUserForCredentials:[self basicCredentialsWithName:@"lmao@10gen.com"
-//                                                                        register:YES
-//                                                                             app:app] app:app];
-//    RLMRealmConfiguration *config = [user flexibleSyncConfiguration];
-//    config.objectClasses = @[Dog.self,
-//                             Person.self];
-//    RLMRealm *realm2 = [RLMRealm realmWithConfiguration:config error:nil];
-//    XCTAssertNotNil(realm2);
-//    CHECK_COUNT(0, Person, realm2);
-//
-//    [self writeQueryAndCompleteForRealm:realm2 block:^(RLMSyncSubscriptionSet *subs) {
-//        [subs addSubscriptionWithClassName:Person.className
-//                          subscriptionName:@"person_age"
-//                                     where:@"age > 18"];
-//    }];
-//    CHECK_COUNT(3, Person, realm2);
-//
-//    [realm transactionWithBlock:^{
-//        [realm addObject:[[Person alloc] initWithPrimaryKey:[RLMObjectId objectId] age:45 firstName:@"Steven" lastName:@"Hanks"]];
-//        [realm addObject:[[Person alloc] initWithPrimaryKey:[RLMObjectId objectId] age:25 firstName:@"John" lastName:@"Stallone"]];
-//    }];
-//    [self waitForUploadsForRealm:realm];
-//    [self waitForDownloadsForRealm:realm];
-//
-//    [self waitForDownloadsForRealm:realm2];
-//    CHECK_COUNT(5, Person, realm2);
-//    CHECK_COUNT(5, Person, realm);
-//}
+- (void)testFlexibleSyncAddObjectOutsideQuery {
+    [self populateData:^(RLMRealm *realm) {
+        int numberOfSubs = 21;
+        for (int i = 1; i <= numberOfSubs; ++i) {
+            Person *person = [[Person alloc] initWithPrimaryKey:[RLMObjectId objectId]
+                                                            age:i
+                                                      firstName:[NSString stringWithFormat:@"firstname_%d", i]
+                                                       lastName:[NSString stringWithFormat:@"lastname_%d", i]];
+            person.partition = NSStringFromSelector(_cmd);
+            [realm addObject: person];
+        }
+    }];
+
+    RLMRealm *realm = [self getFlexibleSyncRealm:_cmd];
+    XCTAssertNotNil(realm);
+    CHECK_COUNT(0, Person, realm);
+
+    [self writeQueryAndCompleteForRealm:realm block:^(RLMSyncSubscriptionSet *subs) {
+        [subs addSubscriptionWithClassName:Person.className
+                          subscriptionName:@"person_age"
+                                     where:@"age > 18"];
+    }];
+    CHECK_COUNT(3, Person, realm);
+
+    [realm transactionWithBlock:^{
+        [realm addObject:[[Person alloc] initWithPrimaryKey:[RLMObjectId objectId] age:10 firstName:@"Nic" lastName:@"Cages"]];
+    }];
+    [self waitForUploadsForRealm:realm];
+    [self waitForDownloadsForRealm:realm];
+    CHECK_COUNT(3, Person, realm);
+
+    // Second realm, with different app
+    NSString *appId = [RealmServer.shared createAppWithQueryableFields:@[@"age"] error:nil];
+    RLMApp *app = [RLMApp appWithId:appId
+                      configuration:[self defaultAppConfiguration]
+                      rootDirectory:[self clientDataRoot]];
+
+    RLMUser *user = [self logInUserForCredentials:[self basicCredentialsWithName:@"lmao@10gen.com"
+                                                                        register:YES
+                                                                             app:app] app:app];
+    RLMRealmConfiguration *config = [user flexibleSyncConfiguration];
+    config.objectClasses = @[Dog.self,
+                             Person.self];
+    RLMRealm *realm2 = [RLMRealm realmWithConfiguration:config error:nil];
+    XCTAssertNotNil(realm2);
+    CHECK_COUNT(0, Person, realm2);
+
+    [self writeQueryAndCompleteForRealm:realm2 block:^(RLMSyncSubscriptionSet *subs) {
+        [subs addSubscriptionWithClassName:Person.className
+                          subscriptionName:@"person_age"
+                                     where:@"age > 18"];
+    }];
+    CHECK_COUNT(3, Person, realm2);
+
+    [realm transactionWithBlock:^{
+        [realm addObject:[[Person alloc] initWithPrimaryKey:[RLMObjectId objectId] age:45 firstName:@"Steven" lastName:@"Hanks"]];
+        [realm addObject:[[Person alloc] initWithPrimaryKey:[RLMObjectId objectId] age:25 firstName:@"John" lastName:@"Stallone"]];
+    }];
+    [self waitForUploadsForRealm:realm];
+    [self waitForDownloadsForRealm:realm];
+
+    [self waitForDownloadsForRealm:realm2];
+    CHECK_COUNT(5, Person, realm2);
+    CHECK_COUNT(5, Person, realm);
+}
 @end

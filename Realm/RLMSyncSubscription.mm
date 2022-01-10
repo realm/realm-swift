@@ -112,7 +112,7 @@
 
 @interface RLMSyncSubscriptionSet () {
     std::unique_ptr<realm::sync::SubscriptionSet> _subscriptionSet;
-    std::unique_ptr<realm::sync::SubscriptionSet> _mutableSubscriptionSet;
+    std::unique_ptr<realm::sync::MutableSubscriptionSet> _mutableSubscriptionSet;
 }
 @end
 
@@ -147,29 +147,52 @@
                                            userInfo:@{NSLocalizedDescriptionKey : errorMessage}];
 }
 
-#pragma mark - Batch Update subscriptions
-
-- (BOOL)write:(__attribute__((noescape)) void(^)(void))block {
-    return [self write:block error:nil];
+- (RLMSyncSubscriptionState)state {
+    switch (_subscriptionSet->state()) {
+        case realm::sync::SubscriptionSet::State::Uncommitted:
+        case realm::sync::SubscriptionSet::State::Pending:
+        case realm::sync::SubscriptionSet::State::Bootstrapping:
+            return RLMSyncSubscriptionStatePending;
+        case realm::sync::SubscriptionSet::State::Complete:
+            return RLMSyncSubscriptionStateComplete;
+        case realm::sync::SubscriptionSet::State::Error:
+            return RLMSyncSubscriptionStateError;
+        case realm::sync::SubscriptionSet::State::Superceded:
+            return RLMSyncSubscriptionStateSuperceded;
+    }
 }
 
-- (BOOL)write:(__attribute__((noescape)) void(^)(void))block error:(NSError **)error {
+#pragma mark - Batch Update subscriptions
+
+- (void)write:(__attribute__((noescape)) void(^)(void))block {
+    return [self write:block onComplete:^(NSError**){}];
+}
+
+- (void)write:(__attribute__((noescape)) void(^)(void))block
+   onComplete:(void(^)(NSError**))completionBlock {
     [self secureWrite];
-    _mutableSubscriptionSet = std::make_unique<realm::sync::SubscriptionSet>(_subscriptionSet->make_mutable_copy());
+    _mutableSubscriptionSet = std::make_unique<realm::sync::MutableSubscriptionSet>(_subscriptionSet->make_mutable_copy());
     self->isInWriteTransaction = true;
     block();
     try {
-        _mutableSubscriptionSet->commit();
-        _subscriptionSet = std::move(_mutableSubscriptionSet);
+        _subscriptionSet = std::make_unique<realm::sync::SubscriptionSet>(std::move(*_mutableSubscriptionSet).commit());
         _mutableSubscriptionSet = nullptr;
         self->isInWriteTransaction = false;
-        return YES;
     }
-    catch (...) {
-        RLMRealmTranslateException(error);
-        return NO;
+    catch (std::exception error) {
+        NSError *err = [[NSError alloc] initWithDomain:@"subscription_set" code:-1 userInfo:@{@"reason":@(error.what())}];
+        completionBlock(&err);
     }
-    return YES;
+    _subscriptionSet->get_state_change_notification(realm::sync::SubscriptionSet::State::Complete)
+        .get_async([completionBlock](realm::StatusWith<realm::sync::SubscriptionSet::State> state) mutable noexcept {
+            if (state.is_ok()) {
+                auto value = state.get_value();
+                completionBlock(nil);
+            } else {
+                NSError* error = [[NSError alloc] initWithDomain:@"sync_subscriptions" code:state.get_status().code() userInfo:@{@"reason": @(state.get_status().reason().c_str())}];
+                completionBlock(&error);
+            }
+        });
 }
 
 typedef void(^RLMSyncSubscriptionCallback)(NSError * _Nullable error);
@@ -178,20 +201,6 @@ typedef void(^RLMSyncSubscriptionCallback)(NSError * _Nullable error);
           callback:(RLMSyncSubscriptionCallback)callback {
     [NSException raise:@"NotImplemented" format:@"Needs Implementation"];
     return NULL;
-}
-
-#pragma mark - Check Subscription State
-
-- (void)observe:(RLMSyncSubscriptionStateBlock)block {
-    _subscriptionSet->get_state_change_notification(realm::sync::SubscriptionSet::State::Complete)
-        .get_async([block, self](realm::StatusWith<realm::sync::SubscriptionSet::State> state) mutable noexcept {
-            if (state.is_ok()) {
-                auto value = state.get_value();
-                block([self mapState:value]);
-            } else {
-                block(RLMSyncSubscriptionStateError);
-            }
-        });
 }
 
 #pragma mark - Find subscription
@@ -471,18 +480,4 @@ typedef void(^RLMSyncSubscriptionCallback)(NSError * _Nullable error);
     }
 }
 
-- (RLMSyncSubscriptionState)mapState:(realm::sync::SubscriptionSet::State)state {
-    switch (state) {
-        case realm::sync::SubscriptionSet::State::Uncommitted:
-        case realm::sync::SubscriptionSet::State::Pending:
-        case realm::sync::SubscriptionSet::State::Bootstrapping:
-            return RLMSyncSubscriptionStatePending;
-        case realm::sync::SubscriptionSet::State::Complete:
-            return RLMSyncSubscriptionStateComplete;
-        case realm::sync::SubscriptionSet::State::Error:
-            return RLMSyncSubscriptionStateError;
-        case realm::sync::SubscriptionSet::State::Superceded:
-            return RLMSyncSubscriptionStateSuperceded;
-    }
-}
 @end

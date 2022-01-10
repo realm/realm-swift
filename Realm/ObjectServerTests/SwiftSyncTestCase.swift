@@ -238,9 +238,10 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
 
     public func writeToFlxRealm(_ block: @escaping (Realm) throws -> Void) throws {
         let realm = try flexibleSyncRealm()
-        let subscriptions = realm.subscriptions!
+        let subscriptions = realm.subscriptions
         XCTAssertNotNil(subscriptions)
-        try subscriptions.write {
+        let ex = expectation(description: "state change complete")
+        subscriptions.write({
             // Using this queries, because unlike Ojective-C we cannot use TRUEPREDICATE to filter all the documents
             subscriptions.append {
                 QuerySubscription<SwiftPerson> {
@@ -252,15 +253,12 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
                     $0.boolCol == true
                 }
             }
-        }
+        }, onComplete: { error in
+            XCTAssertNil(error)
+            ex.fulfill()
+        })
         XCTAssertEqual(subscriptions.count, 2)
 
-        let ex = expectation(description: "state change complete")
-        subscriptions.observe { state in
-            if case .complete = state {
-                ex.fulfill()
-            }
-        }
         waitForExpectations(timeout: 20.0, handler: nil)
         try block(realm)
     }

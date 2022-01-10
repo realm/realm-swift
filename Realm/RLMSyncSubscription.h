@@ -97,6 +97,10 @@ NS_ASSUME_NONNULL_BEGIN
 /// state of the subscription set is `RLMSyncSubscriptionStateError`.
 @property (nonatomic, readonly, nullable) NSError *error;
 
+/// Gets the error associated to the subscription set, this will return a no nil in case the current
+/// state of the subscription set is `RLMSyncSubscriptionStateError`.
+@property (nonatomic, readonly) RLMSyncSubscriptionState state;
+
 #pragma mark - Batch Update subscriptions
 
 /**
@@ -106,7 +110,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @param block The block containing actions to perform to the subscription set.
  */
-- (BOOL)write:(__attribute__((noescape)) void(^)(void))block NS_SWIFT_UNAVAILABLE("");
+- (void)write:(__attribute__((noescape)) void(^)(void))block;
 
 /**
  Synchronously performs any transactions (add/remove/update) to the subscription set within the block,
@@ -115,18 +119,11 @@ NS_ASSUME_NONNULL_BEGIN
 
  @param block The block containing actions to perform to the subscription set.
  */
-- (BOOL)write:(__attribute__((noescape)) void(^)(void))block error:(NSError **)error;
+- (void)write:(__attribute__((noescape)) void(^)(void))block onComplete:(void(^)(NSError**))block;
 
 #pragma mark - Check Subscription State
 
-typedef void(^RLMSyncSubscriptionStateBlock)(RLMSyncSubscriptionState state);
-
-/**
- Notifies state changes for the subscription set.
- During a write batch transaction to the server, it will return complete when the server is on
- "steady-state" synchronization.
- */
-- (void)observe:(RLMSyncSubscriptionStateBlock)block;
+typedef void(^RLMSyncSubscriptionStateBlock)(RLMSyncSubscriptionState state, NSError **);
 
 #pragma mark - Find subscription
 

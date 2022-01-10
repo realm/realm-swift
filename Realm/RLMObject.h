@@ -812,4 +812,6 @@ __attribute__((deprecated("RLM_ARRAY_TYPE has been deprecated. Use RLM_COLLECTIO
 @protocol RLM_OBJECT_SUBCLASS <NSObject>   \
 @end
 
+@protocol RLMAbstract
+@end
 NS_ASSUME_NONNULL_END

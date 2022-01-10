@@ -418,7 +418,7 @@ public class RealmServer: NSObject {
     @objc public static var shared = RealmServer()
 
     /// Log level for the server and mongo processes.
-    public var logLevel = LogLevel.none
+    public var logLevel = LogLevel.info
 
     /// Process that runs the local mongo server. Should be terminated on exit.
     private let mongoProcess = Process()
@@ -603,11 +603,11 @@ public class RealmServer: NSObject {
             print(parts.joined(separator: "\t"))
         }
 
-        if logLevel != .none {
-            serverProcess.standardOutput = pipe
-        } else {
-            serverProcess.standardOutput = nil
-        }
+//        if logLevel != .none {
+//            serverProcess.standardOutput = pipe
+//        } else {
+//            serverProcess.standardOutput = nil
+//        }
 
         try serverProcess.run()
         waitForServerToStart()
@@ -745,7 +745,7 @@ public class RealmServer: NSObject {
                 "type": "mongodb",
                 "config": [
                     "uri": "mongodb://localhost:26000",
-                    "sync_query": [
+                    "flexible_sync": [
                         "state": "enabled",
                         "database_name": "test_data",
                         "queryable_fields_names": fields,
@@ -776,7 +776,11 @@ public class RealmServer: NSObject {
         }
 
         let partitionKeyType: String?
-        if case .pbs(let bsonType) = syncMode { partitionKeyType = bsonType } else { partitionKeyType = nil }
+        if case .pbs(let bsonType) = syncMode {
+            partitionKeyType = bsonType
+        } else {
+            partitionKeyType = nil
+        }
         var ruleCreations = [Result<Any?, Error>]()
         for objectSchema in syncTypes {
             if partitionKeyType != nil ||
