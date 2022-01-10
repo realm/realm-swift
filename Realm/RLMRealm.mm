@@ -367,6 +367,15 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
                 break;
             }
             case RealmFileException::Kind::AccessError:
+                // FIXME: Once object store is correctly throwing IncomptaibleHistories type `Kind`, that case should be used
+                // checking the string is workaround.
+                if (@available(macOS 10.10, *)) {
+                    if ([@(ex.underlying().c_str()) containsString:@"Incompatible histories"]) {
+                        @throw RLMException(@"Cannot open realm at path '%s' with incompatible histories. Synchronized realms must be opened with a Sync configuration", ex.path().c_str());
+                    }
+                } else {
+                    // What should be done here?
+                }
                 RLMSetErrorOrThrow(RLMMakeError(RLMErrorFileAccess, ex), error);
                 break;
             case RealmFileException::Kind::FormatUpgradeRequired:
@@ -959,7 +968,12 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
 
     try {
         if (enableSync) {
-            _realm->write_copy(path.UTF8String, {static_cast<const char *>(key.bytes), key.length});
+            try {
+                _realm->write_copy(path.UTF8String, {static_cast<const char *>(key.bytes), key.length});
+            }
+            catch (...) {
+                _impl::translate_file_exception(path.UTF8String);
+            }
         } else {
             _realm->verify_thread();
             try {
