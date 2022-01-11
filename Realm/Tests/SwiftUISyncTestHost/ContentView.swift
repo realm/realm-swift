@@ -29,6 +29,8 @@ enum LoggingViewState {
 
 struct MainView: View {
     let testType: String = ProcessInfo.processInfo.environment["async_view_type"]!
+    let partitionValue: String? = ProcessInfo.processInfo.environment["partition_value"]
+
     @State var viewState: LoggingViewState = .initial
     @State var user: User?
 
@@ -76,7 +78,7 @@ struct MainView: View {
                         .transition(AnyTransition.move(edge: .leading)).animation(.default)
                 case "async_open_environment_partition":
                     AsyncOpenPartitionView()
-                        .environment(\.partitionValue, user!.id)
+                        .environment(\.partitionValue, partitionValue ?? user!.id)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .background(Color.green)
                         .transition(AnyTransition.move(edge: .leading)).animation(.default)

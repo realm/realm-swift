@@ -9,7 +9,7 @@
 // http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "(aS Is)" BASIS,
+// distributed under the License is distributed on an "(AS IS)" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
@@ -32,22 +32,27 @@ import RealmSwift
 }%
 %{
     import collections
+    import itertools
     import sys
     reload(sys)
     sys.setdefaultencoding('utf-8')
+
+    def lowerFirst(str):
+        return str[0].lower() + str[1:]
 
     class Property(object):
         def __init__(self, colName, values, type, category, enumName=''):
             self.isEnum = enumName != ''
             self.colName = colName
             self.rawValueName = colName if not self.isEnum else colName + '.rawValue'
+            self.comparableName = self.rawValueName
             self.values = values
             self.type = type
             self.category = category
             self.enumName = enumName
             self.typeName = enumName if enumName != '' else type
             self.className = 'ModernAllTypesObject'
-            self.linkingClassName = 'ModernAllTypesObject'
+            self.linkingClassName = 'LinkToModernAllTypesObject'
 
         def value(self, index):
             return self.values[index]
@@ -55,6 +60,46 @@ import RealmSwift
             return self.enumName + self.values[index]
         def rawValue(self, index):
             return self.value(index) if not self.isEnum else self.enumValue(index) + '.rawValue'
+        def comparableValue(self, index):
+            return self.rawValue(index)
+        def wrap(self, value):
+            if '?' in self.type:
+                return '{}.some({})'.format(self.type, value)
+            return value
+
+    class WrapperProperty(object):
+        def __init__(self, base, collection, optional):
+            self.baseName = base.name
+            self.isEnum = False
+            self.colName = (
+                collection +
+                (('Opt' if collection else 'opt') if optional else '') +
+                (base.colName() if collection or optional else lowerFirst(base.colName()))
+            )
+            self.values = [self.wrap(v) for v in (base.collectionValues if collection else base.values)]
+            self.rawValueName = self.colName
+            self.comparableName = self.colName + '.persistableValue'
+            self.type = base.name + 'Wrapper' + ('?' if optional else '')
+            self.category = base.category
+            self.enumName = ''
+            self.typeName = self.type
+            if collection:
+                self.className = 'CustomPersistableCollections'
+                self.linkingClassName = 'LinkToCustomPersistableCollections'
+            else:
+                self.className = 'AllCustomPersistableTypes'
+                self.linkingClassName = 'LinkToAllCustomPersistableTypes'
+
+        def value(self, index):
+            return self.values[index]
+        def enumValue(self, index):
+            return self.values[index]
+        def rawValue(self, index):
+            return self.values[index]
+        def comparableValue(self, index):
+            return self.value(index) + '.persistableValue'
+        def wrap(self, value):
+            return '{}Wrapper(persistedValue: {})'.format(self.baseName, value)
 
     class EnumProperty(Property):
         def __init__(self, type, collection, category, optional=False):
@@ -83,12 +128,9 @@ import RealmSwift
         def hasEnum(self):
             return (self.category == 'numeric' or self.category == 'string') and self.name != 'Decimal128' and self.name != 'Date'
 
-    def lowerFirst(str):
-        return str[0].lower() + str[1:]
-
     types = [
         Type('Bool', 'bool', ['true', 'false'], ['true', 'true', 'false']),
-        Type('Int', 'numeric', ['5', '6', '7']),
+        Type('Int', 'numeric', ['1', '3', '5']),
         Type('Int8', 'numeric', ['Int8(8)', 'Int8(9)', 'Int8(10)']),
         Type('Int16', 'numeric', ['Int16(16)', 'Int16(17)', 'Int16(18)']),
         Type('Int32', 'numeric', ['Int32(32)', 'Int32(33)', 'Int32(34)']),
@@ -152,6 +194,15 @@ import RealmSwift
         EnumProperty(t.name, 'map', t.category, True) for t in types if t.hasEnum()
     ]
 
+    properties += [WrapperProperty(t, '', False) for t in types]
+    optProperties += [WrapperProperty(t, '', True) for t in types]
+    listProperties += [WrapperProperty(t, 'list', False) for t in types]
+    optListProperties += [WrapperProperty(t, 'list', True) for t in types]
+    setProperties += [WrapperProperty(t, 'set', False) for t in types]
+    optSetProperties += [WrapperProperty(t, 'set', True) for t in types]
+    mapProperties += [WrapperProperty(t, 'map', False) for t in types]
+    optMapProperties += [WrapperProperty(t, 'map', True) for t in types]
+
     anyRealmValues = [
         Property('', ['.none'], '', 'null', 'AnyRealmValue'),
         Property('', ['.int(123)'], '', 'numeric', 'AnyRealmValue'),
@@ -167,15 +218,21 @@ import RealmSwift
         Property('', ['.uuid(UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!)'], '', 'uuid', 'AnyRealmValue'),
     ]
 
+    classNames = set((p.className, p.linkingClassName) for p in properties + listProperties)
+
     def numeric(properties):
         return (p for p in properties if p.category == 'numeric')
     def canSum(properties):
         # FIXME: Re-enable Float and Double after updating core.
-        return (p for p in properties if p.category == 'numeric' and not p.type.strip('?') in ['Date', 'Float', 'Double', 'EnumFloat', 'EnumDouble'])
+        return (p for p in properties if p.category == 'numeric' and
+                                         not p.type.strip('?') in ['Date', 'DateWrapper', 'Float', 'FloatWrapper', 'Double', 'DoubleWrapper', 'EnumFloat', 'EnumDouble'])
     def string(properties):
         return (p for p in properties if p.category == 'string')
     def binary(properties):
         return (p for p in properties if p.category == 'binary')
+
+    def groupByClass(properties):
+        return [list(p) for _, p in itertools.groupby(properties, lambda x: x.className)]
 }%
 
 class QueryTests: TestCase {
@@ -215,43 +272,30 @@ class QueryTests: TestCase {
     override func setUp() {
         realm = inMemoryRealm("QueryTests")
         try! realm.write {
-            let object = ModernAllTypesObject()
+            % for className, _ in classNames:
+            let obj${className} = ${className}()
+            % end
 
             % for property in properties + optProperties:
-            object.${property.colName} = ${property.value(1)}
+            obj${property.className}.${property.colName} = ${property.value(1)}
             % end
 
-            % for property in (p for p in listProperties + optListProperties if not p.isEnum):
-            object.${property.colName}.append(objectsIn: [${property.value(0)}, ${property.value(1)}])
+            % for property in (p for p in listProperties + optListProperties):
+            obj${property.className}.${property.colName}.append(objectsIn: [${property.value(0)}, ${property.value(1)}])
             % end
 
-            % for property in (p for p in setProperties + optSetProperties if not p.isEnum):
-            object.${property.colName}.insert(objectsIn: [${property.value(0)}, ${property.value(1)}])
+            % for property in (p for p in setProperties + optSetProperties):
+            obj${property.className}.${property.colName}.insert(objectsIn: [${property.value(0)}, ${property.value(1)}])
             % end
 
-            % for property in (p for p in mapProperties + optMapProperties if not p.isEnum):
-            object.${property.colName}["foo"] = ${property.value(0)}
-            object.${property.colName}["bar"] = ${property.value(1)}
+            % for property in (p for p in mapProperties + optMapProperties):
+            obj${property.className}.${property.colName}["foo"] = ${property.value(0)}
+            obj${property.className}.${property.colName}["bar"] = ${property.value(1)}
             % end
 
-            realm.add(object)
-
-            let collObj = ModernCollectionsOfEnums()
-
-            % for property in (p for p in listProperties + optListProperties if p.isEnum):
-            collObj.${property.colName}.append(objectsIn: [${property.value(0)}, ${property.value(1)}])
+            % for className in set(p.className for p in properties + listProperties):
+            realm.add(obj${className})
             % end
-
-            % for property in (p for p in setProperties + optSetProperties if p.isEnum):
-            collObj.${property.colName}.insert(objectsIn: [${property.value(0)}, ${property.value(1)}])
-            % end
-
-            % for property in (p for p in mapProperties + optMapProperties if p.isEnum):
-            collObj.${property.colName}["foo"] = ${property.value(0)}
-            collObj.${property.colName}["bar"] = ${property.value(1)}
-            % end
-
-            realm.add(collObj)
         }
     }
 
@@ -259,21 +303,27 @@ class QueryTests: TestCase {
         realm = nil
     }
 
-    private func createKeypathCollectionAggregatesObject(_ parent: ModernAllTypesObject) {
-        try! realm.write {
-            realm.delete(parent.arrayCol)
-            let children = [ModernAllTypesObject(), ModernAllTypesObject(), ModernAllTypesObject()]
-            parent.arrayCol.append(objectsIn: children)
+    private func createKeypathCollectionAggregatesObject() {
+        realm.beginWrite()
+        realm.deleteAll()
 
-            % for property in numeric(properties + optProperties):
-            initForKeypathCollectionAggregates(children, \.${property.colName})
-            % end
-        }
+        % for className, linkingClassName in classNames:
+        let parent${linkingClassName} = realm.create(${linkingClassName}.self)
+        let children${className} = [${className}(), ${className}(), ${className}()]
+        parent${linkingClassName}.list.append(objectsIn: children${className})
+
+        % end
+
+        % for property in numeric(properties + optProperties):
+        initForKeypathCollectionAggregates(children${property.className}, \.${property.colName})
+        % end
+
+        try! realm.commitWrite()
     }
 
-    private func initForKeypathCollectionAggregates<T: QueryValue>(
-            _ objects: [ModernAllTypesObject],
-            _ keyPath: ReferenceWritableKeyPath<ModernAllTypesObject, T>) {
+    private func initForKeypathCollectionAggregates<O: Object, T: QueryValue>(
+            _ objects: [O],
+            _ keyPath: ReferenceWritableKeyPath<O, T>) {
         for (obj, value) in zip(objects, T.queryValues()) {
             obj[keyPath: keyPath] = value
         }
@@ -286,9 +336,8 @@ class QueryTests: TestCase {
         % for (parent, child) in set((p.linkingClassName, p.className) for p in listProperties):
         let parent${parent} = realm.create(${parent}.self)
         let obj${child} = ${child}()
-        parent${parent}["objectCol"] = obj${child}
+        parent${parent}["object"] = obj${child}
         % end
-        _ = realm.create(LinkToModernCollectionsOfEnums.self)
 
         % for property in listProperties + optListProperties + setProperties + optSetProperties:
         obj${property.className}["${property.colName}"] = ${property.type}.queryValues()
@@ -355,49 +404,35 @@ class QueryTests: TestCase {
         assertPredicate(predicate, values, query)
     }
 
-    private func assertCollectionQuery(predicate: String,
-                                       value: Any,
-                                       query: ((Query<ModernAllTypesObject>) -> Query<Bool>)) {
-        assertPredicate(predicate, [value], query)
-        XCTAssertEqual(collectionObject().list.where(query).count, 1)
-        XCTAssertEqual(collectionObject().set.where(query).count, 1)
-    }
-
-    private func assertMapQuery(predicate: String,
-                                values: [Any] = [],
-                                count expectedCount: Int,
-                                query: ((Query<ModernAllTypesObject?>) -> Query<Bool>)) {
-        let results = collectionObject().map.where(query)
-        XCTAssertEqual(results.count, expectedCount)
-        assertPredicate(predicate, values, query)
-    }
-
     // MARK: - Basic Comparison
 
-    func validateEquals<T: _Persistable>(_ name: String, _ lhs: (Query<ModernAllTypesObject>) -> Query<T>, _ value: T) {
-        assertQuery("(\(name) == %@)", value, count: 1) {
+    func validateEquals<Root: Object, T: _Persistable>(
+            _ name: String, _ lhs: (Query<Root>) -> Query<T>, _ value: T,
+            equalCount: Int = 1, notEqualCount: Int = 0) {
+        assertQuery(Root.self, "(\(name) == %@)", value, count: equalCount) {
             lhs($0) == value
         }
-        assertQuery("(\(name) != %@)", value, count: 0) {
+        assertQuery(Root.self, "(\(name) != %@)", value, count: notEqualCount) {
             lhs($0) != value
         }
     }
-    func validateEqualsNil<T: _RealmSchemaDiscoverable & ExpressibleByNilLiteral>(_ name: String, _ lhs: (Query<ModernAllTypesObject>) -> Query<T>) {
-        assertQuery("(\(name) == %@)", NSNull(), count: 0) {
+    func validateEqualsNil<Root: Object, T: _RealmSchemaDiscoverable & ExpressibleByNilLiteral>(
+            _ name: String, _ lhs: (Query<Root>) -> Query<T>) {
+        assertQuery(Root.self, "(\(name) == %@)", NSNull(), count: 0) {
             lhs($0) == nil
         }
-        assertQuery("(\(name) != %@)", NSNull(), count: 1) {
+        assertQuery(Root.self, "(\(name) != %@)", NSNull(), count: 1) {
             lhs($0) != nil
         }
     }
 
     func testEquals() {
         % for property in properties + optProperties:
-        validateEquals("${property.colName}", \Query<ModernAllTypesObject>.${property.colName}, ${property.enumValue(1)})
+        validateEquals("${property.colName}", \Query<${property.className}>.${property.colName}, ${property.enumValue(1)})
         % end
 
         % for property in optProperties:
-        validateEqualsNil("${property.colName}", \Query<ModernAllTypesObject>.${property.colName})
+        validateEqualsNil("${property.colName}", \Query<${property.className}>.${property.colName})
         % end
     }
 
@@ -445,6 +480,127 @@ class QueryTests: TestCase {
         XCTAssertEqual(result2.count, 0)
     }
 
+    private func createLinksToMappedEmbeddedObject() {
+        try! realm.write {
+            let obj = realm.objects(AllCustomPersistableTypes.self).first!
+            obj.object = EmbeddedObjectWrapper(value: 2)
+            _ = realm.create(LinkToAllCustomPersistableTypes.self, value: [obj, [obj], [obj], ["1": obj]])
+        }
+    }
+
+    func testEqualMappedToEmbeddedObject() {
+        createLinksToMappedEmbeddedObject()
+
+        assertQuery(AllCustomPersistableTypes.self, "(object.value == %@)", 2, count: 1) {
+            $0.object.persistableValue.value == 2
+        }
+        assertQuery(AllCustomPersistableTypes.self, "(object == %@)", EmbeddedObjectWrapper(value: 2), count: 1) {
+            $0.object == EmbeddedObjectWrapper(value: 2)
+        }
+        assertQuery(AllCustomPersistableTypes.self, "(object.value == %@)", 3, count: 0) {
+            $0.object.persistableValue.value == 3
+        }
+        assertQuery(AllCustomPersistableTypes.self, "(object == %@)", EmbeddedObjectWrapper(value: 3), count: 0) {
+            $0.object == EmbeddedObjectWrapper(value: 3)
+        }
+        % for modifier, path, keyPath in [('', 'object', 'object'), ('ANY ', 'list', 'list'), ('ANY ', 'set', 'set'), ('ANY ', 'map.values', 'map.@allValues')]:
+
+        assertQuery(LinkToAllCustomPersistableTypes.self, "(${modifier}${keyPath}.object.value == %@)", 2, count: 1) {
+            $0.${path}.object.persistableValue.value == 2
+        }
+        assertQuery(LinkToAllCustomPersistableTypes.self, "(${modifier}${keyPath}.object == %@)", EmbeddedObjectWrapper(value: 2), count: 1) {
+            $0.${path}.object == EmbeddedObjectWrapper(value: 2)
+        }
+        assertQuery(LinkToAllCustomPersistableTypes.self, "(${modifier}${keyPath}.object.value == %@)", 3, count: 0) {
+            $0.${path}.object.persistableValue.value == 3
+        }
+        assertQuery(LinkToAllCustomPersistableTypes.self, "(${modifier}${keyPath}.object == %@)", EmbeddedObjectWrapper(value: 3), count: 0) {
+            $0.${path}.object == EmbeddedObjectWrapper(value: 3)
+        }
+        % end
+    }
+
+    func testMemberwiseEquality() {
+        realm.beginWrite()
+        let obj1 = AddressSwiftWrapper(persistedValue: AddressSwift(value: ["a", "b"]))
+        let obj2 = AddressSwiftWrapper(persistedValue: AddressSwift(value: ["a", "c"]))
+        let obj3 = AddressSwiftWrapper(persistedValue: AddressSwift(value: ["b", "b"]))
+        let linkObj1 = realm.create(LinkToAddressSwiftWrapper.self, value: [obj1, obj1])
+        let linkObj2 = realm.create(LinkToAddressSwiftWrapper.self, value: [obj2, obj2])
+        _ = realm.create(LinkToAddressSwiftWrapper.self, value: [obj3, obj3])
+
+        // Test basic equality
+        assertQuery(LinkToAddressSwiftWrapper.self, "(object == %@)", obj1, count: 1) {
+            $0.object == obj1
+        }
+        assertQuery(LinkToAddressSwiftWrapper.self, "(object != %@)", obj1, count: 2) {
+            $0.object != obj1
+        }
+        assertQuery(LinkToAddressSwiftWrapper.self, "(optObject == %@)", obj1, count: 1) {
+            $0.optObject == obj1
+        }
+        assertQuery(LinkToAddressSwiftWrapper.self, "(optObject != %@)", obj1, count: 2) {
+            $0.optObject != obj1
+        }
+
+        // Verify that the expanded comparison nested groups correctly. If it doesn't
+        // start/end a subgroup, it'd end up as ((x or y) and z) instead of (x or (y and z)).
+        assertQuery(LinkToAddressSwiftWrapper.self, "((object.city != %@) || (object == %@))", values: ["c", obj1], count: 3) {
+            $0.object.persistableValue.city != "c" || $0.object == obj1
+        }
+        // Check for ((x and y) or Z) rather than (x and (y or z))
+        assertQuery(LinkToAddressSwiftWrapper.self, "((object == %@) || (object.city != %@))", values: [obj1, "c"], count: 3) {
+             $0.object == obj1 || $0.object.persistableValue.city != "c"
+        }
+
+        // Basic equality in collections
+        linkObj1.list.append(obj1)
+        linkObj1.map["foo"] = obj1
+        linkObj1.optMap["foo"] = obj1
+
+        assertQuery(LinkToAddressSwiftWrapper.self, "(ANY list == %@)", obj1, count: 1) {
+            $0.list == obj1
+        }
+        assertQuery(LinkToAddressSwiftWrapper.self, "(ANY list != %@)", obj1, count: 0) {
+            $0.list != obj1
+        }
+        assertQuery(LinkToAddressSwiftWrapper.self, "(ANY map.@allValues == %@)", obj1, count: 1) {
+            $0.map.values == obj1
+        }
+        assertQuery(LinkToAddressSwiftWrapper.self, "(ANY map.@allValues != %@)", obj1, count: 0) {
+            $0.map.values != obj1
+        }
+        assertQuery(LinkToAddressSwiftWrapper.self, "(ANY optMap.@allValues != %@)", obj1, count: 0) {
+            $0.optMap.values != obj1
+        }
+        assertQuery(LinkToAddressSwiftWrapper.self, "(ANY optMap.@allValues == %@)", obj1, count: 1) {
+            $0.optMap.values == obj1
+        }
+
+        // Verify that collections use a subquery. If they didn't, this object would
+        // now match as it has objects which match each property separately
+        linkObj2.list.append(obj2)
+        linkObj2.list.append(obj3)
+
+        assertQuery(LinkToAddressSwiftWrapper.self, "(ANY list == %@)", obj1, count: 1) {
+            $0.list == obj1
+        }
+        assertQuery(LinkToAddressSwiftWrapper.self, "(ANY list != %@)", obj1, count: 1) {
+            $0.list != obj1
+        }
+
+        realm.cancelWrite()
+    }
+
+    func testInvalidMemberwiseEquality() {
+        assertThrows(assertQuery(LinkToWrapperForTypeWithObjectLink.self, "", count: 0) {
+            $0.link == WrapperForTypeWithObjectLink()
+        }, reason: "Unsupported property 'TypeWithObjectLink.value' for memberwise equality query: object links are not implemented.")
+        assertThrows(assertQuery(LinkToWrapperForTypeWithCollection.self, "", count: 0) {
+            $0.link == WrapperForTypeWithCollection()
+        }, reason: "Unsupported property 'TypeWithCollection.list' for memberwise equality query: equality on collections is not implemented.")
+    }
+
     func testNotEqualAnyRealmValue() {
         let circleObject = self.circleObject
         let object = objects()[0]
@@ -490,29 +646,63 @@ class QueryTests: TestCase {
         XCTAssertEqual(result2.count, 1)
     }
 
-    func validateNumericComparisons<T: _Persistable>(_ name: String, _ lhs: (Query<ModernAllTypesObject>) -> Query<T>,
-                                                     _ value: T, count: Int = 1) where T.PersistedType: _QueryNumeric {
-        assertQuery("(\(name) > %@)", value, count: 0) {
+    func testNotEqualMappedToEmbeddedObject() {
+        createLinksToMappedEmbeddedObject()
+
+        assertQuery(AllCustomPersistableTypes.self, "(object.value != %@)", 2, count: 0) {
+            $0.object.persistableValue.value != 2
+        }
+        assertQuery(AllCustomPersistableTypes.self, "(object != %@)", EmbeddedObjectWrapper(value: 2), count: 0) {
+            $0.object != EmbeddedObjectWrapper(value: 2)
+        }
+        assertQuery(AllCustomPersistableTypes.self, "(object.value != %@)", 3, count: 1) {
+            $0.object.persistableValue.value != 3
+        }
+        assertQuery(AllCustomPersistableTypes.self, "(object != %@)", EmbeddedObjectWrapper(value: 3), count: 1) {
+            $0.object != EmbeddedObjectWrapper(value: 3)
+        }
+
+        % for modifier, path, keyPath in [('', 'object', 'object'), ('ANY ', 'list', 'list'), ('ANY ', 'set', 'set'), ('ANY ', 'map.values', 'map.@allValues')]:
+
+        assertQuery(LinkToAllCustomPersistableTypes.self, "(${modifier}${keyPath}.object.value != %@)", 2, count: 0) {
+            $0.${path}.object.persistableValue.value != 2
+        }
+        assertQuery(LinkToAllCustomPersistableTypes.self, "(${modifier}${keyPath}.object != %@)", EmbeddedObjectWrapper(value: 2), count: 0) {
+            $0.${path}.object != EmbeddedObjectWrapper(value: 2)
+        }
+        assertQuery(LinkToAllCustomPersistableTypes.self, "(${modifier}${keyPath}.object.value != %@)", 3, count: 1) {
+            $0.${path}.object.persistableValue.value != 3
+        }
+        assertQuery(LinkToAllCustomPersistableTypes.self, "(${modifier}${keyPath}.object != %@)", EmbeddedObjectWrapper(value: 3), count: 1) {
+            $0.${path}.object != EmbeddedObjectWrapper(value: 3)
+        }
+        % end
+    }
+
+    func validateNumericComparisons<Root: Object, T: _Persistable>(
+            _ name: String, _ lhs: (Query<Root>) -> Query<T>,
+            _ value: T, count: Int = 1, ltCount: Int = 0, gtCount: Int = 0) where T.PersistedType: _QueryNumeric {
+        assertQuery(Root.self, "(\(name) > %@)", value, count: gtCount) {
             lhs($0) > value
         }
-        assertQuery("(\(name) >= %@)", value, count: count) {
+        assertQuery(Root.self, "(\(name) >= %@)", value, count: count) {
             lhs($0) >= value
         }
-        assertQuery("(\(name) < %@)", value, count: 0) {
+        assertQuery(Root.self, "(\(name) < %@)", value, count: ltCount) {
             lhs($0) < value
         }
-        assertQuery("(\(name) <= %@)", value, count: count) {
+        assertQuery(Root.self, "(\(name) <= %@)", value, count: count) {
             lhs($0) <= value
         }
     }
 
     func testNumericComparisons() {
         % for property in numeric(properties + optProperties):
-        validateNumericComparisons("${property.colName}", \Query<ModernAllTypesObject>.${property.colName}, ${property.value(1)})
+        validateNumericComparisons("${property.colName}", \Query<${property.className}>.${property.colName}, ${property.value(1)})
         % end
 
         % for property in numeric(optProperties):
-        validateNumericComparisons("${property.colName}", \Query<ModernAllTypesObject>.${property.colName}, nil, count: 0)
+        validateNumericComparisons("${property.colName}", \Query<${property.className}>.${property.colName}, nil, count: 0)
         % end
     }
 
@@ -542,42 +732,42 @@ class QueryTests: TestCase {
         % end
     }
 
-    private func validateNumericContains<T: _RealmSchemaDiscoverable & QueryValue & Comparable>(
-            _ name: String, _ lhs: (Query<ModernAllTypesObject>) -> Query<T>) {
+    private func validateNumericContains<Root: Object, T: _RealmSchemaDiscoverable & QueryValue & Comparable>(
+            _ name: String, _ lhs: (Query<Root>) -> Query<T>) {
         let values = T.queryValues()
-        assertQuery("((\(name) >= %@) && (\(name) < %@))", values: [values[0], values[2]], count: 1) {
+        assertQuery(Root.self, "((\(name) >= %@) && (\(name) < %@))", values: [values[0], values[2]], count: 1) {
             lhs($0).contains(values[0]..<values[2])
         }
-        assertQuery("((\(name) >= %@) && (\(name) < %@))", values: [values[0], values[1]], count: 0) {
+        assertQuery(Root.self, "((\(name) >= %@) && (\(name) < %@))", values: [values[0], values[1]], count: 0) {
             lhs($0).contains(values[0]..<values[1])
         }
-        assertQuery("(\(name) BETWEEN {%@, %@})", values: [values[0], values[2]], count: 1) {
+        assertQuery(Root.self, "(\(name) BETWEEN {%@, %@})", values: [values[0], values[2]], count: 1) {
             lhs($0).contains(values[0]...values[2])
         }
-        assertQuery("(\(name) BETWEEN {%@, %@})", values: [values[0], values[1]], count: 1) {
+        assertQuery(Root.self, "(\(name) BETWEEN {%@, %@})", values: [values[0], values[1]], count: 1) {
             lhs($0).contains(values[0]...values[1])
         }
     }
-    private func validateNumericContains<T: _RealmSchemaDiscoverable & OptionalProtocol>(
-            _ name: String, _ lhs: (Query<ModernAllTypesObject>) -> Query<T>) where T.Wrapped: Comparable & QueryValue {
+    private func validateNumericContains<Root: Object, T: _RealmSchemaDiscoverable & OptionalProtocol>(
+            _ name: String, _ lhs: (Query<Root>) -> Query<T>) where T.Wrapped: Comparable & QueryValue {
         let values = T.Wrapped.queryValues()
-        assertQuery("((\(name) >= %@) && (\(name) < %@))", values: [values[0], values[2]], count: 1) {
+        assertQuery(Root.self, "((\(name) >= %@) && (\(name) < %@))", values: [values[0], values[2]], count: 1) {
             lhs($0).contains(values[0]..<values[2])
         }
-        assertQuery("((\(name) >= %@) && (\(name) < %@))", values: [values[0], values[1]], count: 0) {
+        assertQuery(Root.self, "((\(name) >= %@) && (\(name) < %@))", values: [values[0], values[1]], count: 0) {
             lhs($0).contains(values[0]..<values[1])
         }
-        assertQuery("(\(name) BETWEEN {%@, %@})", values: [values[0], values[2]], count: 1) {
+        assertQuery(Root.self, "(\(name) BETWEEN {%@, %@})", values: [values[0], values[2]], count: 1) {
             lhs($0).contains(values[0]...values[2])
         }
-        assertQuery("(\(name) BETWEEN {%@, %@})", values: [values[0], values[1]], count: 1) {
+        assertQuery(Root.self, "(\(name) BETWEEN {%@, %@})", values: [values[0], values[1]], count: 1) {
             lhs($0).contains(values[0]...values[1])
         }
     }
 
     func testNumericContains() {
         % for property in numeric(properties + optProperties):
-        validateNumericContains("${property.colName}", \Query<ModernAllTypesObject>.${property.colName})
+        validateNumericContains("${property.colName}", \Query<${property.className}>.${property.comparableName})
         % end
     }
 
@@ -590,42 +780,45 @@ class QueryTests: TestCase {
         ("[cd]", [.caseInsensitive, .diacriticInsensitive]),
     ]
 
-    private func validateStringOperations<T>(_ name: String, _ lhs: (Query<ModernAllTypesObject>) -> Query<T>,
-                                             _ values: (T, T, T), count: Int)
-            where T: _Persistable, T.PersistedType: _QueryString {
+    private func validateStringOperations<Root: Object, T: _Persistable>(
+            _ name: String, _ lhs: (Query<Root>) -> Query<T>,
+            _ values: (T, T, T), count: (Bool, StringOptions) -> Int)
+            where T.PersistedType: _QueryString {
         let (full, prefix, suffix) = values
         for (modifier, options) in stringModifiers {
-            assertQuery("(\(name) ==\(modifier) %@)", full, count: count) {
+            let matchingCount = count(true, options)
+            let notMatchingCount = count(false, options)
+            assertQuery(Root.self, "(\(name) ==\(modifier) %@)", full, count: matchingCount) {
                 lhs($0).equals(full, options: [options])
             }
-            assertQuery("(NOT \(name) ==\(modifier) %@)", full, count: 1 - count) {
+            assertQuery(Root.self, "(NOT \(name) ==\(modifier) %@)", full, count: 1 - matchingCount) {
                 !lhs($0).equals(full, options: [options])
             }
-            assertQuery("(\(name) !=\(modifier) %@)", full, count: 1 - count) {
+            assertQuery(Root.self, "(\(name) !=\(modifier) %@)", full, count: notMatchingCount) {
                 lhs($0).notEquals(full, options: [options])
             }
-            assertQuery("(NOT \(name) !=\(modifier) %@)", full, count: count) {
+            assertQuery(Root.self, "(NOT \(name) !=\(modifier) %@)", full, count: 1 - notMatchingCount) {
                 !lhs($0).notEquals(full, options: [options])
             }
 
-            assertQuery("(\(name) CONTAINS\(modifier) %@)", full, count: count) {
+            assertQuery(Root.self, "(\(name) CONTAINS\(modifier) %@)", full, count: matchingCount) {
                 lhs($0).contains(full, options: [options])
             }
-            assertQuery("(NOT \(name) CONTAINS\(modifier) %@)", full, count: 1 - count) {
+            assertQuery(Root.self, "(NOT \(name) CONTAINS\(modifier) %@)", full, count: 1 - matchingCount) {
                 !lhs($0).contains(full, options: [options])
             }
 
-            assertQuery("(\(name) BEGINSWITH\(modifier) %@)", prefix, count: count) {
+            assertQuery(Root.self, "(\(name) BEGINSWITH\(modifier) %@)", prefix, count: matchingCount) {
                 lhs($0).starts(with: prefix, options: [options])
             }
-            assertQuery("(NOT \(name) BEGINSWITH\(modifier) %@)", prefix, count: 1 - count) {
+            assertQuery(Root.self, "(NOT \(name) BEGINSWITH\(modifier) %@)", prefix, count: 1 - matchingCount) {
                 !lhs($0).starts(with: prefix, options: [options])
             }
 
-            assertQuery("(\(name) ENDSWITH\(modifier) %@)", suffix, count: count) {
+            assertQuery(Root.self, "(\(name) ENDSWITH\(modifier) %@)", suffix, count: matchingCount) {
                 lhs($0).ends(with: suffix, options: [options])
             }
-            assertQuery("(NOT \(name) ENDSWITH\(modifier) %@)", suffix, count: 1 - count) {
+            assertQuery(Root.self, "(NOT \(name) ENDSWITH\(modifier) %@)", suffix, count: 1 - matchingCount) {
                 !lhs($0).ends(with: suffix, options: [options])
             }
         }
@@ -634,17 +827,19 @@ class QueryTests: TestCase {
     % def ifEnum(p, c1, c2): return c1 if p.isEnum else c2
     func testStringOperations() {
         % for p in string(properties + optProperties):
-        validateStringOperations("${p.colName}", \Query<ModernAllTypesObject>.${p.rawValueName}, ("Foó", "Fo", "oó"), count: ${ifEnum(p, 0, 1)})
+        validateStringOperations("${p.colName}", \Query<${p.className}>.${p.rawValueName},
+                                 (${p.wrap('"Foó"')}, ${p.wrap('"Fo"')}, ${p.wrap('"oó"')}),
+                                 count: { (equals, _) in equals ? ${ifEnum(p, 0, 1)} : ${ifEnum(p, 1, 0)} })
         % end
     }
 
-    private func validateStringLike<T>(_ name: String, _ lhs: (Query<ModernAllTypesObject>) -> Query<T>, _ strings: [(T, Int, Int)], canMatch: Bool)
-            where T: _Persistable, T.PersistedType: _QueryString {
+    private func validateStringLike<Root: Object, T: _Persistable>(
+            _ name: String, _ lhs: (Query<Root>) -> Query<T>, _ strings: [(T, Int, Int)], canMatch: Bool) where T.PersistedType: _QueryString {
         for (str, sensitiveCount, insensitiveCount) in strings {
-            assertQuery("(\(name) LIKE %@)", str, count: canMatch ? sensitiveCount : 0) {
+            assertQuery(Root.self, "(\(name) LIKE %@)", str, count: canMatch ? sensitiveCount : 0) {
                 lhs($0).like(str)
             }
-            assertQuery("(\(name) LIKE[c] %@)", str, count: canMatch ? insensitiveCount : 0) {
+            assertQuery(Root.self, "(\(name) LIKE[c] %@)", str, count: canMatch ? insensitiveCount : 0) {
                 lhs($0).like(str, caseInsensitive: true)
             }
         }
@@ -663,102 +858,101 @@ class QueryTests: TestCase {
             ("?o?", 1, 1),
             ("?O?", 0, 1)
         ]
-        let likeStringsOptional = Array(likeStrings.map { (String?.some($0.0), $0.1, $0.2) })
-        % for property in string(properties):
-        validateStringLike("${property.colName}", \Query<ModernAllTypesObject>.${property.rawValueName}, likeStrings, canMatch: ${ifEnum(property, 'false', 'true')})
-        % end
-        % for property in string(optProperties):
-        validateStringLike("${property.colName}", \Query<ModernAllTypesObject>.${property.rawValueName}, likeStringsOptional, canMatch: ${ifEnum(property, 'false', 'true')})
+        % for property in string(properties + optProperties):
+        validateStringLike("${property.colName}", \Query<${property.className}>.${property.rawValueName},
+                           likeStrings.map { (${property.wrap('$0.0')}, $0.1, $0.2) }, canMatch: ${ifEnum(property, 'false', 'true')})
         % end
     }
 
     // MARK: - Data
 
+    func validateData<Root: Object, T: _Persistable>(_ name: String, _ lhs: (Query<Root>) -> Query<T>,
+                                                     zeroData: T, oneData: T) where T.PersistedType: _QueryBinary {
+        assertQuery(Root.self, "(\(name) BEGINSWITH %@)", zeroData, count: 1) {
+            lhs($0).starts(with: zeroData)
+        }
+
+        assertQuery(Root.self, "(NOT \(name) BEGINSWITH %@)", zeroData, count: 0) {
+            !lhs($0).starts(with: zeroData)
+        }
+
+        assertQuery(Root.self, "(\(name) ENDSWITH %@)", zeroData, count: 1) {
+            lhs($0).ends(with: zeroData)
+        }
+
+        assertQuery(Root.self, "(NOT \(name) ENDSWITH %@)", zeroData, count: 0) {
+            !lhs($0).ends(with: zeroData)
+        }
+
+        assertQuery(Root.self, "(\(name) CONTAINS %@)", zeroData, count: 1) {
+            lhs($0).contains(zeroData)
+        }
+
+        assertQuery(Root.self, "(NOT \(name) CONTAINS %@)", zeroData, count: 0) {
+            !lhs($0).contains(zeroData)
+        }
+
+        assertQuery(Root.self, "(\(name) == %@)", zeroData, count: 0) {
+            lhs($0).equals(zeroData)
+        }
+
+        assertQuery(Root.self, "(NOT \(name) == %@)", zeroData, count: 1) {
+            !lhs($0).equals(zeroData)
+        }
+
+        assertQuery(Root.self, "(\(name) != %@)", zeroData, count: 1) {
+            lhs($0).notEquals(zeroData)
+        }
+
+        assertQuery(Root.self, "(NOT \(name) != %@)", zeroData, count: 0) {
+            !lhs($0).notEquals(zeroData)
+        }
+
+        assertQuery(Root.self, "(\(name) BEGINSWITH %@)", oneData, count: 0) {
+            lhs($0).starts(with: oneData)
+        }
+
+        assertQuery(Root.self, "(\(name) ENDSWITH %@)", oneData, count: 0) {
+            lhs($0).ends(with: oneData)
+        }
+
+        assertQuery(Root.self, "(\(name) CONTAINS %@)", oneData, count: 0) {
+            lhs($0).contains(oneData)
+        }
+
+        assertQuery(Root.self, "(NOT \(name) CONTAINS %@)", oneData, count: 1) {
+            !lhs($0).contains(oneData)
+        }
+
+        assertQuery(Root.self, "(\(name) CONTAINS %@)", oneData, count: 0) {
+            lhs($0).contains(oneData)
+        }
+
+        assertQuery(Root.self, "(NOT \(name) CONTAINS %@)", oneData, count: 1) {
+            !lhs($0).contains(oneData)
+        }
+
+        assertQuery(Root.self, "(\(name) == %@)", oneData, count: 0) {
+            lhs($0).equals(oneData)
+        }
+
+        assertQuery(Root.self, "(NOT \(name) == %@)", oneData, count: 1) {
+            !lhs($0).equals(oneData)
+        }
+
+        assertQuery(Root.self, "(\(name) != %@)", oneData, count: 1) {
+            lhs($0).notEquals(oneData)
+        }
+
+        assertQuery(Root.self, "(NOT \(name) != %@)", oneData, count: 0) {
+            !lhs($0).notEquals(oneData)
+        }
+    }
+
     func testBinarySearchQueries() {
-        let zeroData = Data(count: 28)
-        let oneData = Data(repeating: 1, count: 28)
         % for property in binary(properties + optProperties):
-        % name = property.colName
-        assertQuery("(${name} BEGINSWITH %@)", zeroData, count: 1) {
-            $0.${name}.starts(with: zeroData)
-        }
-
-        assertQuery("(NOT ${name} BEGINSWITH %@)", zeroData, count: 0) {
-            !$0.${name}.starts(with: zeroData)
-        }
-
-        assertQuery("(${name} ENDSWITH %@)", zeroData, count: 1) {
-            $0.${name}.ends(with: zeroData)
-        }
-
-        assertQuery("(NOT ${name} ENDSWITH %@)", zeroData, count: 0) {
-            !$0.${name}.ends(with: zeroData)
-        }
-
-        assertQuery("(${name} CONTAINS %@)", zeroData, count: 1) {
-            $0.${name}.contains(zeroData)
-        }
-
-        assertQuery("(NOT ${name} CONTAINS %@)", zeroData, count: 0) {
-            !$0.${name}.contains(zeroData)
-        }
-
-        assertQuery("(${name} == %@)", zeroData, count: 0) {
-            $0.${name}.equals(zeroData)
-        }
-
-        assertQuery("(NOT ${name} == %@)", zeroData, count: 1) {
-            !$0.${name}.equals(zeroData)
-        }
-
-        assertQuery("(${name} != %@)", zeroData, count: 1) {
-            $0.${name}.notEquals(zeroData)
-        }
-
-        assertQuery("(NOT ${name} != %@)", zeroData, count: 0) {
-            !$0.${name}.notEquals(zeroData)
-        }
-
-        assertQuery("(${name} BEGINSWITH %@)", oneData, count: 0) {
-            $0.${name}.starts(with: oneData)
-        }
-
-        assertQuery("(${name} ENDSWITH %@)", oneData, count: 0) {
-            $0.${name}.ends(with: oneData)
-        }
-
-        assertQuery("(${name} CONTAINS %@)", oneData, count: 0) {
-            $0.${name}.contains(oneData)
-        }
-
-        assertQuery("(NOT ${name} CONTAINS %@)", oneData, count: 1) {
-            !$0.${name}.contains(oneData)
-        }
-
-        assertQuery("(${name} CONTAINS %@)", oneData, count: 0) {
-            $0.${name}.contains(oneData)
-        }
-
-        assertQuery("(NOT ${name} CONTAINS %@)", oneData, count: 1) {
-            !$0.${name}.contains(oneData)
-        }
-
-        assertQuery("(${name} == %@)", oneData, count: 0) {
-            $0.${name}.equals(oneData)
-        }
-
-        assertQuery("(NOT ${name} == %@)", oneData, count: 1) {
-            !$0.${name}.equals(oneData)
-        }
-
-        assertQuery("(${name} != %@)", oneData, count: 1) {
-            $0.${name}.notEquals(oneData)
-        }
-
-        assertQuery("(NOT ${name} != %@)", oneData, count: 0) {
-            !$0.${name}.notEquals(oneData)
-        }
-
+        validateData("${property.colName}", \Query<${property.className}>.${property.colName},
+                     zeroData: ${property.wrap('Data(count: 28)')}, oneData: ${property.wrap('Data(repeating: 1, count: 28)')})
         % end
     }
 
@@ -807,28 +1001,25 @@ class QueryTests: TestCase {
     func testListContainsObject() {
         let obj = objects().first!
         let colObj = collectionObject()
-        let result1 = realm.objects(ModernCollectionObject.self).where {
+        let result = realm.objects(ModernCollectionObject.self).where {
             $0.list.contains(obj)
         }
-        XCTAssertEqual(result1.count, 0)
+        XCTAssertEqual(result.count, 0)
         try! realm.write {
             colObj.list.append(obj)
         }
-        let result2 = realm.objects(ModernCollectionObject.self).where {
-            $0.list.contains(obj)
-        }
-        XCTAssertEqual(result2.count, 1)
+        XCTAssertEqual(result.count, 1)
     }
 
     func testCollectionContainsRange() {
-        % for property in numeric(listProperties + optListProperties + setProperties + optSetProperties):
+        % for property in numeric(listProperties + optListProperties + setProperties + optSetProperties + mapProperties + optMapProperties):
         assertQuery(${property.className}.self, "((${property.colName}.@min >= %@) && (${property.colName}.@max <= %@))",
-                    values: [${property.rawValue(0)}, ${property.rawValue(1)}], count: 1) {
-            $0.${property.rawValueName}.contains(${property.rawValue(0)}...${property.rawValue(1)})
+                    values: [${property.comparableValue(0)}, ${property.comparableValue(1)}], count: 1) {
+            $0.${property.comparableName}.contains(${property.comparableValue(0)}...${property.comparableValue(1)})
         }
         assertQuery(${property.className}.self, "((${property.colName}.@min >= %@) && (${property.colName}.@max < %@))",
-                    values: [${property.rawValue(0)}, ${property.rawValue(1)}], count: 0) {
-            $0.${property.rawValueName}.contains(${property.rawValue(0)}..<${property.rawValue(1)})
+                    values: [${property.comparableValue(0)}, ${property.comparableValue(1)}], count: 0) {
+            $0.${property.comparableName}.contains(${property.comparableValue(0)}..<${property.comparableValue(1)})
         }
         % end
     }
@@ -854,35 +1045,49 @@ class QueryTests: TestCase {
     }
 
     func testCollectionFromProperty() {
-        let colObj = ModernCollectionObject()
-        let obj = objects().first!
-        colObj.set.insert(obj)
-        colObj.list.append(obj)
         try! realm.write {
-            realm.add(colObj)
+            % for className, linkingClassName in classNames:
+            let obj${className} = realm.objects(${className}.self).first!
+            _ = realm.create(${linkingClassName}.self, value: [
+                "list": [obj${className}],
+                "set": [obj${className}],
+                "map": ["foo": obj${className}]
+            ])
+            % end
         }
 
-        % for property in properties + optProperties:
-        assertCollectionQuery(predicate: "(${property.colName} == %@)", value: ${property.enumValue(1)}) {
-            $0.${property.colName} == ${property.value(1)}
+        func test<Root: LinkToTestObject>(
+                _ type: Root.Type, _ predicate: String, _ value: Any,
+                _ q1: ((Query<Root.Child>) -> Query<Bool>), _ q2: ((Query<Root.Child?>) -> Query<Bool>)) {
+            assertPredicate(predicate, [value], q1)
+            assertPredicate(predicate, [value], q2)
+            let obj = realm.objects(Root.self).first!
+            XCTAssertEqual(obj.list.where(q1).count, 1)
+            XCTAssertEqual(obj.set.where(q1).count, 1)
+            XCTAssertEqual(obj.map.where(q2).count, 1)
         }
+
+        // swiftlint:disable opening_brace
+        % for property in properties + optProperties:
+        test(${property.linkingClassName}.self, "(${property.colName} == %@)",
+             ${property.enumValue(1)},
+             { $0.${property.colName} == ${property.value(1)} },
+             { $0.${property.colName} == ${property.value(1)} })
         % end
+        // swiftlint:enable opening_brace
     }
 
     func testSetContainsObject() {
         let obj = objects().first!
         let colObj = collectionObject()
-        let result1 = realm.objects(ModernCollectionObject.self).where {
+        let result = realm.objects(ModernCollectionObject.self).where {
             $0.set.contains(obj)
         }
-        XCTAssertEqual(result1.count, 0)
+        XCTAssertEqual(result.count, 0)
         try! realm.write {
             colObj.set.insert(obj)
         }
-        let result2 = realm.objects(ModernCollectionObject.self).where {
-            $0.set.contains(obj)
-        }
-        XCTAssertEqual(result2.count, 1)
+        XCTAssertEqual(result.count, 1)
     }
 
     func testSetContainsAnyInObject() {
@@ -956,96 +1161,49 @@ class QueryTests: TestCase {
         % end
     }
 
+    // swiftlint:disable unused_closure_parameter
     func testMapAllValues() {
         % for property in mapProperties + optMapProperties:
-        assertQuery(${property.className}.self, "(ANY ${property.colName}.@allValues == %@)", ${property.enumValue(0)}, count: 1) {
-            $0.${property.colName}.values == ${property.value(0)}
-        }
-
-        % count = 0 if property.category == 'bool' else 1
-        assertQuery(${property.className}.self, "(ANY ${property.colName}.@allValues != %@)", ${property.enumValue(0)}, count: ${count}) {
-            $0.${property.colName}.values != ${property.value(0)}
-        }
+        % notEqualCount = ', notEqualCount: 1' if property.category != 'bool' else ''
+        validateEquals("ANY ${property.colName}.@allValues", \Query<${property.className}>.${property.colName}.values, ${property.enumValue(0)}${notEqualCount})
         % if property.category == 'numeric':
-        assertQuery(${property.className}.self, "(ANY ${property.colName}.@allValues > %@)", ${property.enumValue(0)}, count: 1) {
-            $0.${property.colName}.values > ${property.value(0)}
-        }
-
-        assertQuery(${property.className}.self, "(ANY ${property.colName}.@allValues >= %@)", ${property.enumValue(0)}, count: 1) {
-            $0.${property.colName}.values >= ${property.value(0)}
-        }
-        assertQuery(${property.className}.self, "(ANY ${property.colName}.@allValues < %@)", ${property.enumValue(0)}, count: 0) {
-            $0.${property.colName}.values < ${property.value(0)}
-        }
-
-        assertQuery(${property.className}.self, "(ANY ${property.colName}.@allValues <= %@)", ${property.enumValue(0)}, count: 1) {
-            $0.${property.colName}.values <= ${property.value(0)}
-        }
+        validateNumericComparisons("ANY ${property.colName}.@allValues", \Query<${property.className}>.${property.colName}.values, ${property.value(1)}, ltCount: 1)
         % end
-
         % if property.category == 'string':
-        assertQuery(${property.className}.self, "(ANY ${property.colName}.@allValues CONTAINS[cd] %@)", ${property.enumValue(0)}, count: 1) {
-            $0.${property.colName}.values.contains(${property.value(0)}, options: [.caseInsensitive, .diacriticInsensitive])
-        }
-
-        assertQuery(${property.className}.self, "(ANY ${property.colName}.@allValues CONTAINS %@)", ${property.enumValue(0)}, count: 1) {
-            $0.${property.colName}.values.contains(${property.value(0)})
-        }
-
-        assertQuery(${property.className}.self, "(ANY ${property.colName}.@allValues BEGINSWITH[cd] %@)", ${property.enumValue(0)}, count: 1) {
-            $0.${property.colName}.values.starts(with: ${property.value(0)}, options: [.caseInsensitive, .diacriticInsensitive])
-        }
-
-        assertQuery(${property.className}.self, "(ANY ${property.colName}.@allValues BEGINSWITH %@)", ${property.enumValue(0)}, count: 1) {
-            $0.${property.colName}.values.starts(with: ${property.value(0)})
-        }
-
-        assertQuery(${property.className}.self, "(ANY ${property.colName}.@allValues ENDSWITH[cd] %@)", ${property.enumValue(0)}, count: 1) {
-            $0.${property.colName}.values.ends(with: ${property.value(0)}, options: [.caseInsensitive, .diacriticInsensitive])
-        }
-
-        assertQuery(${property.className}.self, "(ANY ${property.colName}.@allValues ENDSWITH %@)", ${property.enumValue(0)}, count: 1) {
-            $0.${property.colName}.values.ends(with: ${property.value(0)})
+        validateStringOperations("ANY ${property.colName}.@allValues", \Query<${property.className}>.${property.colName}.values,
+                                 (${property.value(0)}, ${property.value(0)}, ${property.value(0)})) { equals, options in
+            % if not property.isEnum:
+            // Non-enum maps have the keys Foo and Foó, so !=[d] doesn't match any
+            if options.contains(.diacriticInsensitive) {
+                return equals ? 1 : 0
+            }
+            % end
+            return 1
         }
 
         assertQuery(${property.className}.self, "(ANY ${property.colName}.@allValues LIKE[c] %@)", ${property.enumValue(0)}, count: 1) {
             $0.${property.colName}.values.like(${property.value(0)}, caseInsensitive: true)
         }
-
         assertQuery(${property.className}.self, "(ANY ${property.colName}.@allValues LIKE %@)", ${property.enumValue(0)}, count: 1) {
             $0.${property.colName}.values.like(${property.value(0)})
         }
         % end
-        % end
-    }
 
-    func testMapContainsRange() {
-        % for property in numeric(mapProperties + optMapProperties):
-        assertQuery(${property.className}.self, "((${property.colName}.@min >= %@) && (${property.colName}.@max <= %@))",
-                    values: [${property.rawValue(0)}, ${property.rawValue(1)}], count: 1) {
-            $0.${property.rawValueName}.contains(${property.rawValue(0)}...${property.rawValue(1)})
-        }
-        assertQuery(${property.className}.self, "((${property.colName}.@min >= %@) && (${property.colName}.@max < %@))",
-                    values: [${property.rawValue(0)}, ${property.rawValue(1)}], count: 0) {
-            $0.${property.rawValueName}.contains(${property.rawValue(0)}..<${property.rawValue(1)})
-        }
         % end
     }
+    // swiftlint:enable unused_closure_parameter
 
     func testMapContainsObject() {
         let obj = objects().first!
         let colObj = collectionObject()
-        let result1 = realm.objects(ModernCollectionObject.self).where {
+        let result = realm.objects(ModernCollectionObject.self).where {
             $0.map.contains(obj)
         }
-        XCTAssertEqual(result1.count, 0)
+        XCTAssertEqual(result.count, 0)
         try! realm.write {
             colObj.map["foo"] = obj
         }
-        let result2 = realm.objects(ModernCollectionObject.self).where {
-            $0.map.contains(obj)
-        }
-        XCTAssertEqual(result2.count, 1)
+        XCTAssertEqual(result.count, 1)
     }
 
     private func validateMapSubscriptEquality<Root: Object, T: RealmKeyedCollection>(_ name: String, _ lhs: (Query<Root>) -> Query<T>, value: T.Value)
@@ -1059,7 +1217,7 @@ class QueryTests: TestCase {
     }
 
     private func validateMapSubscriptNumericComparisons<Root: Object, T: RealmKeyedCollection>(_ name: String, _ lhs: (Query<Root>) -> Query<T>, value: T.Value)
-            where T.Value: _Persistable, T.Value.PersistedType: _QueryNumeric, T.Key == String {
+            where T.Value.PersistedType: _QueryNumeric, T.Key == String {
         assertQuery(Root.self, "(\(name)[%@] > %@)", values: ["foo", value], count: 0) {
             lhs($0)["foo"] > value
         }
@@ -1075,7 +1233,7 @@ class QueryTests: TestCase {
     }
 
     private func validateMapSubscriptStringComparisons<Root: Object, T: RealmKeyedCollection>(_ name: String, _ lhs: (Query<Root>) -> Query<T>, value: T.Value)
-            where T.Value: _Persistable, T.Value.PersistedType: _QueryString, T.Key == String {
+            where T.Value.PersistedType: _QueryString, T.Key == String {
         assertQuery(Root.self, "(\(name)[%@] CONTAINS[cd] %@)", values: ["foo", value], count: 1) {
             lhs($0)["foo"].contains(value, options: [.caseInsensitive, .diacriticInsensitive])
         }
@@ -1152,23 +1310,6 @@ class QueryTests: TestCase {
         }
     }
 
-    func testMapFromProperty() {
-        let colObj = ModernCollectionObject()
-        let obj = objects().first!
-        colObj.map["foo"] = obj
-        try! realm.write {
-            realm.add(colObj)
-        }
-
-        % for property in properties + optProperties:
-        assertMapQuery(predicate: "(${property.colName} == %@)",
-                       values: [${property.enumValue(1)}],
-                       count: 1) {
-            $0.${property.colName} == ${property.value(1)}
-        }
-        % end
-    }
-
     // MARK: - Linking Objects
 
     func testLinkingObjects() {
@@ -1193,24 +1334,19 @@ class QueryTests: TestCase {
     // MARK: - Compound
 
     func testCompoundAnd() {
-        % values = [properties[0], optProperties[0]]
-        % for idx, _ in enumerate(values):
-        % if idx != len(values)-1:
-        % value1 = values[idx].enumValue(1)
-        % value2 = values[idx+1].enumValue(1)
-        assertQuery("((${values[idx].colName} == %@) && (${values[idx+1].colName} == %@))", values: [${value1}, ${value2}], count: 1) {
-            $0.${values[idx].colName} == ${values[idx].value(1)} && $0.${values[idx+1].colName} == ${values[idx+1].value(1)}
+        % p1 = properties[0]
+        % p2 = optProperties[0]
+        assertQuery("((${p1.colName} == %@) && (${p2.colName} == %@))", values: [${p1.enumValue(1)}, ${p2.enumValue(1)}], count: 1) {
+            $0.${p1.colName} == ${p1.value(1)} && $0.${p2.colName} == ${p2.value(1)}
         }
-        assertQuery("((${values[idx].colName} == %@) && (${values[idx+1].colName} == %@))", values: [${value1}, ${value2}], count: 1) {
-            ($0.${values[idx].colName} == ${values[idx].value(1)}) && ($0.${values[idx+1].colName} == ${values[idx+1].value(1)})
+        assertQuery("((${p1.colName} == %@) && (${p2.colName} == %@))", values: [${p1.enumValue(1)}, ${p2.enumValue(1)}], count: 1) {
+            ($0.${p1.colName} == ${p1.value(1)}) && ($0.${p2.colName} == ${p2.value(1)})
         }
-        % end
-        % end
 
         // List
 
         % for listProperty in [listProperties[0], optListProperties[0]]:
-        % for property in [properties[0]]:
+        % property = properties[0]
         % value1 = property.enumValue(1)
         % wrongValue = property.enumValue(0)
         % value2 = listProperty.enumValue(1)
@@ -1227,12 +1363,10 @@ class QueryTests: TestCase {
         }
         % end
         % end
-        % end
 
         // Set
 
         % for setProperty in [setProperties[0], optSetProperties[0]]:
-        % for property in [properties[0]]:
         % value1 = property.enumValue(1)
         % wrongValue = property.enumValue(0)
         % value2 = setProperty.enumValue(1)
@@ -1249,12 +1383,10 @@ class QueryTests: TestCase {
         }
         % end
         % end
-        % end
 
         // Map
 
         % for mapProperty in [mapProperties[0], optMapProperties[0]]:
-        % for property in [properties[0]]:
         % value1 = property.enumValue(1)
         % wrongValue = property.enumValue(0)
         % value2 = mapProperty.enumValue(1)
@@ -1279,7 +1411,6 @@ class QueryTests: TestCase {
         }
         % end
         % end
-        % end
 
         // Aggregates
 
@@ -1298,42 +1429,38 @@ class QueryTests: TestCase {
 
         // Keypath Collection Aggregates
 
-        let object = objects().first!
-        createKeypathCollectionAggregatesObject(object)
+        createKeypathCollectionAggregatesObject()
         % for property in [properties[7], optProperties[7]]:
 
         let sum${property.colName} = ${property.value(0)} + ${property.value(1)} + ${property.value(2)}
-        assertQuery("((((((arrayCol.@min.${property.colName} <= %@) && (arrayCol.@max.${property.colName} >= %@)) && (arrayCol.@sum.${property.colName} == %@)) && (arrayCol.@min.${property.colName} != %@)) && (arrayCol.@avg.${property.colName} > %@)) && (arrayCol.@avg.${property.colName} < %@))",
+        assertQuery(LinkToModernAllTypesObject.self, "((((((list.@min.${property.colName} <= %@) && (list.@max.${property.colName} >= %@)) && (list.@sum.${property.colName} == %@)) && (list.@min.${property.colName} != %@)) && (list.@avg.${property.colName} > %@)) && (list.@avg.${property.colName} < %@))",
                     values: [${property.value(0)}, ${property.value(2)}, sum${property.colName}, ${property.value(1)}, ${property.value(0)}, ${property.value(2)}], count: 1) {
-            $0.arrayCol.${property.colName}.min <= ${property.value(0)} &&
-            $0.arrayCol.${property.colName}.max >= ${property.value(2)} &&
-            $0.arrayCol.${property.colName}.sum == sum${property.colName} &&
-            $0.arrayCol.${property.colName}.min != ${property.value(1)} &&
-            $0.arrayCol.${property.colName}.avg > ${property.value(0)} &&
-            $0.arrayCol.${property.colName}.avg < ${property.value(2)}
+            $0.list.${property.colName}.min <= ${property.value(0)} &&
+            $0.list.${property.colName}.max >= ${property.value(2)} &&
+            $0.list.${property.colName}.sum == sum${property.colName} &&
+            $0.list.${property.colName}.min != ${property.value(1)} &&
+            $0.list.${property.colName}.avg > ${property.value(0)} &&
+            $0.list.${property.colName}.avg < ${property.value(2)}
         }
         % end
     }
 
     func testCompoundOr() {
-        % values = [properties[0], optProperties[0]]
-        % for idx, _ in enumerate(values):
-        % if idx != len(values)-1:
-        % value1 = values[idx].enumValue(1)
-        % value2 = values[idx+1].enumValue(1)
-        assertQuery("((${values[idx].colName} == %@) || (${values[idx+1].colName} == %@))", values: [${value1}, ${value2}], count: 1) {
-            $0.${values[idx].colName} == ${values[idx].value(1)} || $0.${values[idx+1].colName} == ${values[idx+1].value(1)}
+        % for props in groupByClass(properties + optProperties):
+        % for p1, p2 in zip(props, props[1:]):
+        assertQuery(${p1.className}.self, "((${p1.colName} == %@) || (${p2.colName} == %@))", values: [${p1.enumValue(1)}, ${p2.enumValue(1)}], count: 1) {
+            $0.${p1.colName} == ${p1.value(1)} || $0.${p2.colName} == ${p2.value(1)}
         }
-        assertQuery("((${values[idx].colName} == %@) || (${values[idx+1].colName} == %@))", values: [${value1}, ${value2}], count: 1) {
-            ($0.${values[idx].colName} == ${values[idx].value(1)}) || ($0.${values[idx+1].colName} == ${values[idx+1].value(1)})
+        assertQuery(${p1.className}.self, "((${p1.colName} == %@) || (${p2.colName} == %@))", values: [${p1.enumValue(1)}, ${p2.enumValue(1)}], count: 1) {
+            ($0.${p1.colName} == ${p1.value(1)}) || ($0.${p2.colName} == ${p2.value(1)})
         }
         % end
         % end
 
-        // List
+        // List / Set
 
-        % for listProperty in [listProperties[0], optListProperties[0]]:
-        % for property in [properties[0]]:
+        % for listProperty in [listProperties[0], optListProperties[0], setProperties[0], optSetProperties[0]]:
+        % property = properties[0]
         % value1 = property.enumValue(1)
         % wrongValue = property.enumValue(0)
         % value2 = listProperty.enumValue(1)
@@ -1350,34 +1477,11 @@ class QueryTests: TestCase {
         }
         % end
         % end
-        % end
-
-        // Set
-
-        % for setProperty in [setProperties[0], optSetProperties[0]]:
-        % for property in [properties[0]]:
-        % value1 = property.enumValue(1)
-        % wrongValue = property.enumValue(0)
-        % value2 = setProperty.enumValue(1)
-        assertQuery("((${property.colName} == %@) || (%@ IN ${setProperty.colName}))", values: [${value1}, ${value2}], count: 1) {
-            $0.${property.colName} == ${property.value(1)} || $0.${setProperty.colName}.contains(${setProperty.value(1)})
-        }
-        % if not property.isEnum:
-        assertQuery("((${property.colName} != %@) || (%@ IN ${setProperty.colName}))", values: [${wrongValue}, ${value2}], count: 1) {
-            $0.${property.colName} != ${property.value(0)} || $0.${setProperty.colName}.contains(${setProperty.value(1)})
-        }
-        % else:
-        assertQuery("((${property.colName} != %@) || (%@ IN ${setProperty.colName}))", values: [${value1}, ${value2}], count: 1) {
-            $0.${property.colName} != ${property.value(1)} || $0.${setProperty.colName}.contains(${setProperty.value(1)})
-        }
-        % end
-        % end
-        % end
 
         // Map
 
         % for mapProperty in [mapProperties[0], optMapProperties[0], mapProperties[1], optMapProperties[1]]:
-        % for property in [properties[0]]:
+        % property = properties[0]
         % value1 = property.enumValue(1)
         % wrongValue = property.enumValue(0)
         % value2 = mapProperty.enumValue(1)
@@ -1402,7 +1506,6 @@ class QueryTests: TestCase {
         }
         % end
         % end
-        % end
 
         // Aggregates
 
@@ -1421,42 +1524,51 @@ class QueryTests: TestCase {
 
         // Keypath Collection Aggregates
 
-        let object = objects().first!
-        createKeypathCollectionAggregatesObject(object)
+        createKeypathCollectionAggregatesObject()
         % for property in [properties[7], optProperties[7]]:
 
         let sum${property.colName} = ${property.value(0)} + ${property.value(1)} + ${property.value(2)}
-        assertQuery("((((((arrayCol.@min.${property.colName} < %@) || (arrayCol.@max.${property.colName} > %@)) || (arrayCol.@sum.${property.colName} != %@)) || (arrayCol.@min.${property.colName} == %@)) || (arrayCol.@avg.${property.colName} >= %@)) || (arrayCol.@avg.${property.colName} <= %@))", values: [${property.value(0)}, ${property.value(2)}, sum${property.colName}, 0, ${property.value(2)}, ${property.value(0)}], count: 3) {
-            $0.arrayCol.${property.colName}.min < ${property.value(0)} ||
-            $0.arrayCol.${property.colName}.max > ${property.value(2)} ||
-            $0.arrayCol.${property.colName}.sum != sum${property.colName} ||
-            $0.arrayCol.${property.colName}.min == 0 ||
-            $0.arrayCol.${property.colName}.avg >= ${property.value(2)} ||
-            $0.arrayCol.${property.colName}.avg <= ${property.value(0)}
+        assertQuery(LinkToModernAllTypesObject.self, "((((((list.@min.${property.colName} < %@) || (list.@max.${property.colName} > %@)) || (list.@sum.${property.colName} != %@)) || (list.@min.${property.colName} == %@)) || (list.@avg.${property.colName} >= %@)) || (list.@avg.${property.colName} <= %@))",
+                    values: [${property.value(0)}, ${property.value(2)}, sum${property.colName}, 0, ${property.value(2)}, ${property.value(0)}], count: 0) {
+            $0.list.${property.colName}.min < ${property.value(0)} ||
+            $0.list.${property.colName}.max > ${property.value(2)} ||
+            $0.list.${property.colName}.sum != sum${property.colName} ||
+            $0.list.${property.colName}.min == 0 ||
+            $0.list.${property.colName}.avg >= ${property.value(2)} ||
+            $0.list.${property.colName}.avg <= ${property.value(0)}
         }
         % end
     }
 
+    func validateCompoundMixed<Root: Object, T: _Persistable, U: _Persistable>(
+            _ name1: String, _ lhs1: (Query<Root>) -> Query<T>, _ value1: T,
+            _ name2: String, _ lhs2: (Query<Root>) -> Query<U>, _ value2: U) {
+        assertQuery(Root.self, "(((\(name1) == %@) || (\(name2) == %@)) && ((\(name1) != %@) || (\(name2) != %@)))",
+                    values: [value1, value2, value1, value2], count: 0) {
+            (lhs1($0) == value1 || lhs2($0) == value2) && (lhs1($0) != value1 || lhs2($0) != value2)
+        }
+        assertQuery(Root.self, "((\(name1) == %@) || (\(name2) == %@))", values: [value1, value2], count: 1) {
+            (lhs1($0) == value1) || (lhs2($0) == value2)
+        }
+    }
+
+    func validateCompoundString<Root: Object, T: _Persistable, U: _Persistable>(
+            _ name1: String, _ lhs1: (Query<Root>) -> Query<T>, _ value1: T,
+            _ name2: String, _ lhs2: (Query<Root>) -> Query<U>, _ value2: U) where U.PersistedType: _QueryBinary {
+        assertQuery(Root.self, "(NOT ((\(name1) == %@) || (\(name2) CONTAINS %@)) && (\(name2) == %@))",
+                    values: [value1, value2, value2], count: 0) {
+            !(lhs1($0) == value1 || lhs2($0).contains(value2)) && (lhs2($0) == value2)
+        }
+    }
+
     func testCompoundMixed() {
-        % values = properties + optProperties
-        % for idx, _ in enumerate(values):
-        % if idx != len(values)-1:
-        % value1 = values[idx].enumValue(1)
-        % value2 = values[idx+1].enumValue(1)
-        assertQuery("(((${values[idx].colName} == %@) || (${values[idx+1].colName} == %@)) && ((${values[idx].colName} != %@) || (${values[idx+1].colName} != %@)))",
-                    values: [${value1}, ${value2}, ${value1}, ${value2}], count: 0) {
-            ($0.${values[idx].colName} == ${values[idx].value(1)} || $0.${values[idx+1].colName} == ${values[idx+1].value(1)}) &&
-            ($0.${values[idx].colName} != ${values[idx].value(1)} || $0.${values[idx+1].colName} != ${values[idx+1].value(1)})
-        }
-        assertQuery("((${values[idx].colName} == %@) || (${values[idx+1].colName} == %@))", values: [${value1}, ${value2}], count: 1) {
-            ($0.${values[idx].colName} == ${values[idx].value(1)}) || ($0.${values[idx+1].colName} == ${values[idx+1].value(1)})
-        }
-        % if values[idx+1].enumName == '' and values[idx+1].category == 'string':
-        assertQuery("(NOT ((${values[idx].colName} == %@) || (${values[idx+1].colName} CONTAINS %@)) && (${values[idx+1].colName} == %@))",
-                    values: [${value1}, ${value2}, ${value2}], count: 0) {
-            !($0.${values[idx].colName} == ${values[idx].value(1)} || $0.${values[idx+1].colName}.contains(${values[idx+1].value(1)})) &&
-            ($0.${values[idx+1].colName} == ${values[idx+1].value(1)})
-        }
+        % for props in groupByClass(properties + optProperties):
+        % for p1, p2 in zip(props, props[1:]):
+        validateCompoundMixed("${p1.colName}", \Query<${p1.className}>.${p1.colName}, ${p1.value(1)},
+                              "${p2.colName}", \Query<${p2.className}>.${p2.colName}, ${p2.value(1)})
+        % if p2.enumName == '' and p2.category == 'string':
+        validateCompoundString("${p1.colName}", \Query<${p1.className}>.${p1.colName}, ${p1.value(1)},
+                               "${p2.colName}", \Query<${p2.className}>.${p2.colName}, ${p2.value(1)})
         % end
         % end
         % end
@@ -1476,16 +1588,15 @@ class QueryTests: TestCase {
 
         // Keypath Collection Aggregates
 
-        let object = objects().first!
-        createKeypathCollectionAggregatesObject(object)
+        createKeypathCollectionAggregatesObject()
         % for property in [properties[7], optProperties[7]]:
 
         let sum${property.colName} = ${property.value(0)} + ${property.value(1)} + ${property.value(2)}
-        assertQuery("(((((arrayCol.@min.${property.colName} <= %@) || (arrayCol.@max.${property.colName} >= %@)) && (arrayCol.@sum.${property.colName} == %@)) && (arrayCol.@sum.${property.colName} != %@)) && ((arrayCol.@avg.${property.colName} > %@) && (arrayCol.@avg.${property.colName} < %@)))", values: [${property.value(0)}, ${property.value(2)}, sum${property.colName}, 0, ${property.value(0)}, ${property.value(2)}], count: 1) {
-            ($0.arrayCol.${property.colName}.min <= ${property.value(0)} || $0.arrayCol.${property.colName}.max >= ${property.value(2)}) &&
-            $0.arrayCol.${property.colName}.sum == sum${property.colName} &&
-            $0.arrayCol.${property.colName}.sum != 0 &&
-            ($0.arrayCol.${property.colName}.avg > ${property.value(0)} && $0.arrayCol.${property.colName}.avg < ${property.value(2)})
+        assertQuery(LinkToModernAllTypesObject.self, "(((((list.@min.${property.colName} <= %@) || (list.@max.${property.colName} >= %@)) && (list.@sum.${property.colName} == %@)) && (list.@sum.${property.colName} != %@)) && ((list.@avg.${property.colName} > %@) && (list.@avg.${property.colName} < %@)))", values: [${property.value(0)}, ${property.value(2)}, sum${property.colName}, 0, ${property.value(0)}, ${property.value(2)}], count: 1) {
+            ($0.list.${property.colName}.min <= ${property.value(0)} || $0.list.${property.colName}.max >= ${property.value(2)}) &&
+            $0.list.${property.colName}.sum == sum${property.colName} &&
+            $0.list.${property.colName}.sum != 0 &&
+            ($0.list.${property.colName}.avg > ${property.value(0)} && $0.list.${property.colName}.avg < ${property.value(2)})
         }
         % end
     }
@@ -1564,13 +1675,13 @@ class QueryTests: TestCase {
             ($0.arrayCol.intCol != 123).count > 0
         }
 
-        assertQuery("((intCol == %@) && (SUBQUERY(setCol, $col1, ($col1.stringCol == %@)).@count == %@))", values: [6, "Bar", 0], count: 1) {
-            ($0.intCol == 6) &&
+        assertQuery("((intCol == %@) && (SUBQUERY(setCol, $col1, ($col1.stringCol == %@)).@count == %@))", values: [3, "Bar", 0], count: 1) {
+            ($0.intCol == 3) &&
             ($0.setCol.stringCol == "Bar").count == 0
         }
 
-        assertQuery("((intCol == %@) && (SUBQUERY(setCol, $col1, (($col1.intCol == %@) && ($col1.stringCol != %@))).@count == %@))", values: [6, 5, "Blah", 1], count: 1) {
-            ($0.intCol == 6) &&
+        assertQuery("((intCol == %@) && (SUBQUERY(setCol, $col1, (($col1.intCol == %@) && ($col1.stringCol != %@))).@count == %@))", values: [3, 5, "Blah", 1], count: 1) {
+            ($0.intCol == 3) &&
             (((($0.setCol.intCol == 5) && ($0.setCol.stringCol != "Blah"))).count == 1)
         }
 
@@ -1587,7 +1698,7 @@ class QueryTests: TestCase {
 
     // MARK: - Collection Aggregations
 
-    % for (short, long, ushort, ulong, emptyMatches) in [('avg', 'average', 'Avg', 'Average', 0), ('sum', 'sum', 'Sum', 'Sum', 1)]:
+    % for (short, long, ushort, ulong) in [('avg', 'average', 'Avg', 'Average'), ('sum', 'sum', 'Sum', 'Sum')]:
     % for (protocol, element) in [('RealmCollection', 'Element'), ('RealmKeyedCollection', 'Value')]:
     %{
     # FIXME: remove this once we update core and sum() on empty Map returns the correct thing
@@ -1595,32 +1706,32 @@ class QueryTests: TestCase {
         emptyMatches = 0
     }%
     private func validate${ulong}<Root: Object, T: ${protocol}>(_ name: String, _ ${long}: T.${element}, _ min: T.${element}, _ lhs: (Query<Root>) -> Query<T>)
-            where T.${element}: _Persistable, T.${element}.PersistedType: _QueryNumeric, T.${element}: QueryValue {
-        assertQuery(Root.self, "(objectCol.\(name).@${short} == %@)", ${long}, count: 1) {
+            where T.${element}.PersistedType: _QueryNumeric, T.${element}: QueryValue {
+        assertQuery(Root.self, "(object.\(name).@${short} == %@)", ${long}, count: 1) {
             lhs($0).${short} == ${long}
         }
-        assertQuery(Root.self, "(objectCol.\(name).@${short} == %@)", min, count: 0) {
+        assertQuery(Root.self, "(object.\(name).@${short} == %@)", min, count: 0) {
             lhs($0).${short} == min
         }
-        assertQuery(Root.self, "(objectCol.\(name).@${short} != %@)", ${long}, count: 1) {
+        assertQuery(Root.self, "(object.\(name).@${short} != %@)", ${long}, count: 0) {
             lhs($0).${short} != ${long}
         }
-        assertQuery(Root.self, "(objectCol.\(name).@${short} != %@)", min, count: 2) {
+        assertQuery(Root.self, "(object.\(name).@${short} != %@)", min, count: 1) {
             lhs($0).${short} != min
         }
-        assertQuery(Root.self, "(objectCol.\(name).@${short} > %@)", ${long}, count: 0) {
+        assertQuery(Root.self, "(object.\(name).@${short} > %@)", ${long}, count: 0) {
             lhs($0).${short} > ${long}
         }
-        assertQuery(Root.self, "(objectCol.\(name).@${short} > %@)", min, count: 1) {
+        assertQuery(Root.self, "(object.\(name).@${short} > %@)", min, count: 1) {
             lhs($0).${short} > min
         }
-        assertQuery(Root.self, "(objectCol.\(name).@${short} < %@)", ${long}, count: 0 + ${emptyMatches}) {
+        assertQuery(Root.self, "(object.\(name).@${short} < %@)", ${long}, count: 0) {
             lhs($0).${short} < ${long}
         }
-        assertQuery(Root.self, "(objectCol.\(name).@${short} >= %@)", ${long}, count: 1) {
+        assertQuery(Root.self, "(object.\(name).@${short} >= %@)", ${long}, count: 1) {
             lhs($0).${short} >= ${long}
         }
-        assertQuery(Root.self, "(objectCol.\(name).@${short} <= %@)", ${long}, count: 1 + ${emptyMatches}) {
+        assertQuery(Root.self, "(object.\(name).@${short} <= %@)", ${long}, count: 1) {
             lhs($0).${short} <= ${long}
         }
     }
@@ -1631,7 +1742,7 @@ class QueryTests: TestCase {
 
         % for property in canSum(listProperties + optListProperties + setProperties + optSetProperties + mapProperties + optMapProperties):
         validate${ulong}("${property.colName}", ${property.type}.${long}(), ${property.rawValue(0)},
-                    \Query<${property.linkingClassName}>.objectCol.${property.rawValueName})
+                    \Query<${property.linkingClassName}>.object.${property.rawValueName})
         % end
     }
 
@@ -1640,29 +1751,29 @@ class QueryTests: TestCase {
     % for (lower, upper, other) in [('min', 'Min', 'max'), ('max', 'Max', 'min')]:
     % for (protocol, element) in [('RealmCollection', 'Element'), ('RealmKeyedCollection', 'Value')]:
     private func validate${upper}<Root: Object, T: ${protocol}>(_ name: String, min: T.${element}, max: T.${element}, _ lhs: (Query<Root>) -> Query<T>)
-            where T.${element}: _Persistable, T.${element}.PersistedType: _QueryNumeric, T.${element}: QueryValue {
-        assertQuery(Root.self, "(objectCol.\(name).@${lower} == %@)", ${lower}, count: 1) {
+            where T.${element}.PersistedType: _QueryNumeric, T.${element}: QueryValue {
+        assertQuery(Root.self, "(object.\(name).@${lower} == %@)", ${lower}, count: 1) {
             lhs($0).${lower} == ${lower}
         }
-        assertQuery(Root.self, "(objectCol.\(name).@${lower} == %@)", ${other}, count: 0) {
+        assertQuery(Root.self, "(object.\(name).@${lower} == %@)", ${other}, count: 0) {
             lhs($0).${lower} == ${other}
         }
-        assertQuery(Root.self, "(objectCol.\(name).@${lower} != %@)", ${lower}, count: 1) {
+        assertQuery(Root.self, "(object.\(name).@${lower} != %@)", ${lower}, count: 0) {
             lhs($0).${lower} != ${lower}
         }
-        assertQuery(Root.self, "(objectCol.\(name).@${lower} != %@)", ${other}, count: 2) {
+        assertQuery(Root.self, "(object.\(name).@${lower} != %@)", ${other}, count: 1) {
             lhs($0).${lower} != ${other}
         }
-        assertQuery(Root.self, "(objectCol.\(name).@${lower} > %@)", ${lower}, count: 0) {
+        assertQuery(Root.self, "(object.\(name).@${lower} > %@)", ${lower}, count: 0) {
             lhs($0).${lower} > ${lower}
         }
-        assertQuery(Root.self, "(objectCol.\(name).@${lower} < %@)", ${lower}, count: 0) {
+        assertQuery(Root.self, "(object.\(name).@${lower} < %@)", ${lower}, count: 0) {
             lhs($0).${lower} < ${lower}
         }
-        assertQuery(Root.self, "(objectCol.\(name).@${lower} >= %@)", ${lower}, count: 1) {
+        assertQuery(Root.self, "(object.\(name).@${lower} >= %@)", ${lower}, count: 1) {
             lhs($0).${lower} >= ${lower}
         }
-        assertQuery(Root.self, "(objectCol.\(name).@${lower} <= %@)", ${lower}, count: 1) {
+        assertQuery(Root.self, "(object.\(name).@${lower} <= %@)", ${lower}, count: 1) {
             lhs($0).${lower} <= ${lower}
         }
     }
@@ -1672,8 +1783,8 @@ class QueryTests: TestCase {
         initLinkedCollectionAggregatesObject()
 
         % for property in canSum(listProperties + optListProperties + setProperties + optSetProperties + mapProperties + optMapProperties):
-        validate${upper}("${property.colName}", min: ${property.rawValue(0)}, max: ${property.rawValue(2)},
-                    \Query<${property.linkingClassName}>.objectCol.${property.rawValueName})
+        validate${upper}("${property.colName}", min: ${property.value(0)}, max: ${property.value(2)},
+                    \Query<${property.linkingClassName}>.object.${property.colName})
         % end
     }
 
@@ -1683,40 +1794,40 @@ class QueryTests: TestCase {
 
     % for (protocol, element) in [('RealmCollection', 'Element'), ('RealmKeyedCollection', 'Value')]:
     private func validateCount<Root: Object, T: ${protocol}>(_ name: String, _ lhs: (Query<Root>) -> Query<T>) {
-        assertQuery(Root.self, "(objectCol.\(name).@count == %@)", 3, count: 1) {
+        assertQuery(Root.self, "(object.\(name).@count == %@)", 3, count: 1) {
             lhs($0).count == 3
         }
-        assertQuery(Root.self, "(objectCol.\(name).@count == %@)", 0, count: 1) {
+        assertQuery(Root.self, "(object.\(name).@count == %@)", 0, count: 0) {
             lhs($0).count == 0
         }
-        assertQuery(Root.self, "(objectCol.\(name).@count != %@)", 3, count: 1) {
+        assertQuery(Root.self, "(object.\(name).@count != %@)", 3, count: 0) {
             lhs($0).count != 3
         }
-        assertQuery(Root.self, "(objectCol.\(name).@count != %@)", 2, count: 2) {
+        assertQuery(Root.self, "(object.\(name).@count != %@)", 2, count: 1) {
             lhs($0).count != 2
         }
-        assertQuery(Root.self, "(objectCol.\(name).@count < %@)", 3, count: 1) {
+        assertQuery(Root.self, "(object.\(name).@count < %@)", 3, count: 0) {
             lhs($0).count < 3
         }
-        assertQuery(Root.self, "(objectCol.\(name).@count < %@)", 4, count: 2) {
+        assertQuery(Root.self, "(object.\(name).@count < %@)", 4, count: 1) {
             lhs($0).count < 4
         }
-        assertQuery(Root.self, "(objectCol.\(name).@count > %@)", 2, count: 1) {
+        assertQuery(Root.self, "(object.\(name).@count > %@)", 2, count: 1) {
             lhs($0).count > 2
         }
-        assertQuery(Root.self, "(objectCol.\(name).@count > %@)", 3, count: 0) {
+        assertQuery(Root.self, "(object.\(name).@count > %@)", 3, count: 0) {
             lhs($0).count > 3
         }
-        assertQuery(Root.self, "(objectCol.\(name).@count <= %@)", 2, count: 1) {
+        assertQuery(Root.self, "(object.\(name).@count <= %@)", 2, count: 0) {
             lhs($0).count <= 2
         }
-        assertQuery(Root.self, "(objectCol.\(name).@count <= %@)", 3, count: 2) {
+        assertQuery(Root.self, "(object.\(name).@count <= %@)", 3, count: 1) {
             lhs($0).count <= 3
         }
-        assertQuery(Root.self, "(objectCol.\(name).@count >= %@)", 3, count: 1) {
+        assertQuery(Root.self, "(object.\(name).@count >= %@)", 3, count: 1) {
             lhs($0).count >= 3
         }
-        assertQuery(Root.self, "(objectCol.\(name).@count >= %@)", 4, count: 0) {
+        assertQuery(Root.self, "(object.\(name).@count >= %@)", 4, count: 0) {
             lhs($0).count >= 4
         }
     }
@@ -1726,52 +1837,50 @@ class QueryTests: TestCase {
         initLinkedCollectionAggregatesObject()
 
         % for property in (p for p in listProperties + optListProperties + setProperties + optSetProperties + mapProperties + optMapProperties if p.category != 'bool'):
-        validateCount("${property.colName}", \Query<${property.linkingClassName}>.objectCol.${property.colName})
+        validateCount("${property.colName}", \Query<${property.linkingClassName}>.object.${property.colName})
         % end
     }
 
     // MARK: - Keypath Collection Aggregations
 
-    % for (short, long, ushort, ulong, emptyMatches) in [('avg', 'average', 'Avg', 'Average', 0), ('sum', 'sum', 'Sum', 'Sum', 1)]:
+    % for (short, long, ushort, ulong) in [('avg', 'average', 'Avg', 'Average'), ('sum', 'sum', 'Sum', 'Sum')]:
     private func validateKeypath${ulong}<Root: Object, T>(_ name: String, _ ${long}: T, _ min: T, _ lhs: (Query<Root>) -> Query<T>)
             where T: _Persistable & QueryValue, T.PersistedType: _QueryNumeric {
-        // Note here that there are four total objects: the parent, and three children, all of the same type
-        assertQuery(Root.self, "(arrayCol.@${short}.\(name) == %@)", ${long}, count: 1) {
+        assertQuery(Root.self, "(list.@${short}.\(name) == %@)", ${long}, count: 1) {
             lhs($0).${short} == ${long}
         }
-        assertQuery(Root.self, "(arrayCol.@${short}.\(name) == %@)", min, count: 0) {
+        assertQuery(Root.self, "(list.@${short}.\(name) == %@)", min, count: 0) {
             lhs($0).${short} == min
         }
-        assertQuery(Root.self, "(arrayCol.@${short}.\(name) != %@)", ${long}, count: 3) {
+        assertQuery(Root.self, "(list.@${short}.\(name) != %@)", ${long}, count: 0) {
             lhs($0).${short} != ${long}
         }
-        assertQuery(Root.self, "(arrayCol.@${short}.\(name) != %@)", min, count: 4) {
+        assertQuery(Root.self, "(list.@${short}.\(name) != %@)", min, count: 1) {
             lhs($0).${short} != min
         }
-        assertQuery(Root.self, "(arrayCol.@${short}.\(name) > %@)", ${long}, count: 0) {
+        assertQuery(Root.self, "(list.@${short}.\(name) > %@)", ${long}, count: 0) {
             lhs($0).${short} > ${long}
         }
-        assertQuery(Root.self, "(arrayCol.@${short}.\(name) > %@)", min, count: 1) {
+        assertQuery(Root.self, "(list.@${short}.\(name) > %@)", min, count: 1) {
             lhs($0).${short} > min
         }
-        assertQuery(Root.self, "(arrayCol.@${short}.\(name) < %@)", ${long}, count: 0 + ${emptyMatches} * 3) {
+        assertQuery(Root.self, "(list.@${short}.\(name) < %@)", ${long}, count: 0) {
             lhs($0).${short} < ${long}
         }
-        assertQuery(Root.self, "(arrayCol.@${short}.\(name) >= %@)", ${long}, count: 1) {
+        assertQuery(Root.self, "(list.@${short}.\(name) >= %@)", ${long}, count: 1) {
             lhs($0).${short} >= ${long}
         }
-        assertQuery(Root.self, "(arrayCol.@${short}.\(name) <= %@)", ${long}, count: 1 + ${emptyMatches} * 3) {
+        assertQuery(Root.self, "(list.@${short}.\(name) <= %@)", ${long}, count: 1) {
             lhs($0).${short} <= ${long}
         }
     }
 
     func testKeypathCollectionAggregates${ushort}() {
-        let object = objects().first!
-        createKeypathCollectionAggregatesObject(object)
+        createKeypathCollectionAggregatesObject()
 
         % for property in canSum(properties + optProperties):
         validateKeypath${ulong}("${property.colName}", ${property.typeName}.${long}(), ${property.rawValue(0)},
-                    \Query<ModernAllTypesObject>.arrayCol.${property.rawValueName})
+                    \Query<${property.linkingClassName}>.list.${property.rawValueName})
         % end
     }
 
@@ -1780,39 +1889,38 @@ class QueryTests: TestCase {
     % for (lower, upper, other) in [('min', 'Min', 'max'), ('max', 'Max', 'min')]:
     private func validateKeypath${upper}<Root: Object, T>(_ name: String, min: T, max: T, _ lhs: (Query<Root>) -> Query<T>)
             where T: _Persistable & QueryValue, T.PersistedType: _QueryNumeric {
-        assertQuery(Root.self, "(arrayCol.@${lower}.\(name) == %@)", ${lower}, count: 1) {
+        assertQuery(Root.self, "(list.@${lower}.\(name) == %@)", ${lower}, count: 1) {
             lhs($0).${lower} == ${lower}
         }
-        assertQuery(Root.self, "(arrayCol.@${lower}.\(name) == %@)", ${other}, count: 0) {
+        assertQuery(Root.self, "(list.@${lower}.\(name) == %@)", ${other}, count: 0) {
             lhs($0).${lower} == ${other}
         }
-        assertQuery(Root.self, "(arrayCol.@${lower}.\(name) != %@)", ${lower}, count: 3) {
+        assertQuery(Root.self, "(list.@${lower}.\(name) != %@)", ${lower}, count: 0) {
             lhs($0).${lower} != ${lower}
         }
-        assertQuery(Root.self, "(arrayCol.@${lower}.\(name) != %@)", ${other}, count: 4) {
+        assertQuery(Root.self, "(list.@${lower}.\(name) != %@)", ${other}, count: 1) {
             lhs($0).${lower} != ${other}
         }
-        assertQuery(Root.self, "(arrayCol.@${lower}.\(name) > %@)", ${lower}, count: 0) {
+        assertQuery(Root.self, "(list.@${lower}.\(name) > %@)", ${lower}, count: 0) {
             lhs($0).${lower} > ${lower}
         }
-        assertQuery(Root.self, "(arrayCol.@${lower}.\(name) < %@)", ${lower}, count: 0) {
+        assertQuery(Root.self, "(list.@${lower}.\(name) < %@)", ${lower}, count: 0) {
             lhs($0).${lower} < ${lower}
         }
-        assertQuery(Root.self, "(arrayCol.@${lower}.\(name) >= %@)", ${lower}, count: 1) {
+        assertQuery(Root.self, "(list.@${lower}.\(name) >= %@)", ${lower}, count: 1) {
             lhs($0).${lower} >= ${lower}
         }
-        assertQuery(Root.self, "(arrayCol.@${lower}.\(name) <= %@)", ${lower}, count: 1) {
+        assertQuery(Root.self, "(list.@${lower}.\(name) <= %@)", ${lower}, count: 1) {
             lhs($0).${lower} <= ${lower}
         }
     }
 
     func testKeypathCollectionAggregates${upper}() {
-        let object = objects().first!
-        createKeypathCollectionAggregatesObject(object)
+        createKeypathCollectionAggregatesObject()
 
         % for property in numeric(properties + optProperties):
         validateKeypath${upper}("${property.colName}", min: ${property.rawValue(0)}, max: ${property.rawValue(2)},
-                    \Query<ModernAllTypesObject>.arrayCol.${property.rawValueName})
+                    \Query<${property.linkingClassName}>.list.${property.rawValueName})
         % end
     }
 
@@ -2064,6 +2172,17 @@ class QueryTests: TestCase {
     }
 }
 
+private protocol LinkToTestObject: Object {
+    associatedtype Child: Object
+    var object: Child? { get }
+    var list: List<Child> { get }
+    var set: MutableSet<Child> { get }
+    var map: Map<String, Child?> { get }
+}
+% for _, linkingClassName in classNames:
+extension ${linkingClassName}: LinkToTestObject {}
+% end
+
 private protocol QueryValue {
     static func queryValues() -> [Self]
 }
@@ -2072,6 +2191,11 @@ private protocol QueryValue {
 extension ${type.name}: QueryValue {
     static func queryValues() -> [${type.name}] {
         return [${type.collectionValues[0]}, ${type.collectionValues[1]}, ${type.collectionValues[2]}]
+    }
+}
+extension ${type.name}Wrapper: QueryValue {
+    static func queryValues() -> [${type.name}Wrapper] {
+        return ${type.name}.queryValues().map(${type.name}Wrapper.init)
     }
 }
 % if type.hasEnum():
@@ -2121,6 +2245,15 @@ extension ${type.name}: AddableQueryValue {
     }
     fileprivate static func average() -> SumType {
         return sum() / 3
+    }
+}
+extension ${type.name}Wrapper: AddableQueryValue {
+    fileprivate typealias SumType = ${type.name}Wrapper
+    fileprivate static func sum() -> SumType {
+        return ${type.name}Wrapper(persistedValue: ${type.name}.sum())
+    }
+    fileprivate static func average() -> SumType {
+        return ${type.name}Wrapper(persistedValue: ${type.name}.average())
     }
 }
 % if type.hasEnum():
