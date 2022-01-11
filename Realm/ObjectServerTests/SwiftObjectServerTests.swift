@@ -783,35 +783,36 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
     func testWriteCopyNoSyncUser() throws {
         do {
-          // Create realm with sync user
-          let user1 = try logInUser(for: basicCredentials())
-          var config = user1.configuration(testName: #function)
+            // Create realm with sync user
+            let user1 = try logInUser(for: basicCredentials())
+            var config = user1.configuration(testName: #function)
+            // This test uses the following instead of `populateRealm`
+            // for consistent objectTypes in CI testing.
+            config.objectTypes = [SwiftHugeSyncObject.self]
 
-          // This test uses the following instead of `populateRealm`
-          // for consistent objectTypes in CI testing.
-          config.objectTypes = [SwiftHugeSyncObject.self]
-          let realm = try Realm(configuration: config)
-          try! realm.write {
-            for _ in 0..<SwiftSyncTestCase.bigObjectCount {
-              realm.add(SwiftHugeSyncObject.create())
+            let realm = try Realm(configuration: config)
+            try! realm.write {
+                for _ in 0..<SwiftSyncTestCase.bigObjectCount {
+                    realm.add(SwiftHugeSyncObject.create())
+                }
             }
-          }
-          waitForUploads(for: realm)
+            waitForUploads(for: realm)
 
-          // Set up config where realm will be copied
-          var copiedConfig = Realm.Configuration()
-          copiedConfig.fileURL = RLMTestRealmURL()
-          let pathOnDisk = ObjectiveCSupport.convert(object: copiedConfig).pathOnDisk
-          XCTAssertFalse(FileManager.default.fileExists(atPath: pathOnDisk))
+            // Set up config where realm will be copied
+            var copiedConfig = Realm.Configuration()
+            copiedConfig.fileURL = RLMTestRealmURL()
+            let pathOnDisk = ObjectiveCSupport.convert(object: copiedConfig).pathOnDisk
+            XCTAssertFalse(FileManager.default.fileExists(atPath: pathOnDisk))
 
-          try realm.writeCopy(toFile: RLMTestRealmURL(), enableSync: true)
+            try realm.writeCopy(toFile: RLMTestRealmURL(), enableSync: true)
 
-          // Open realm locally, though `enableSync` was set to true.
-          _ = try Realm(configuration: copiedConfig)
+            // Open realm locally, though `enableSync` was set to true.
+            _ = try Realm(configuration: copiedConfig)
         } catch {
-            XCTAssertEqual(error.localizedDescription, "Cannot open realm at path '%s' with incompatible histories. Synchronized realms must be opened with a Sync configuration")
+            XCTAssert(error.localizedDescription.contains("Realm file's history format is incompatible with the settings in the configuration object being used to open the Realm."))
+            XCTAssert(error.localizedDescription.contains(RLMTestRealmURL().path))
         }
-      }
+    }
 
     // MARK: - Authentication
 
