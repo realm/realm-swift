@@ -698,12 +698,10 @@ NS_REFINED_FOR_SWIFT;
 #pragma mark - Sync Subscriptions
 
 /**
- Returns an instance of `SyncSubscriptionSet`, representing the active subscriptions
+ Represents the active subscriptions
  for this realm, which can be used to add/remove/update and search flexible sync subscriptions.
  Getting the subscriptions from a local or partition-based configured realm will return a nil subscription
  set.
-
- @return A `RLMSyncSubscriptionSet`.
  */
 @property (nonatomic, readonly, nullable) RLMSyncSubscriptionSet *subscriptions;
 

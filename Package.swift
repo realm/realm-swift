@@ -218,11 +218,11 @@ let package = Package(
                 "Realm/RLMSyncConfiguration.mm",
                 "Realm/RLMSyncManager.mm",
                 "Realm/RLMSyncSession.mm",
+                "Realm/RLMSyncSubscription.mm",
                 "Realm/RLMSyncUtil.mm",
                 "Realm/RLMUpdateResult.mm",
                 "Realm/RLMUser.mm",
-                "Realm/RLMUserAPIKey.mm",
-                "Realm/RLMSyncSubscription.mm"
+                "Realm/RLMUserAPIKey.mm"
             ],
             publicHeadersPath: "include",
             cxxSettings: cxxSettings
