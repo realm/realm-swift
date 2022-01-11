@@ -1,0 +1,21 @@
+SUPPORTED_PLATFORMS = macosx iphonesimulator iphoneos appletvos appletvsimulator;
+SKIP_INSTALL = YES;
+PRODUCT_NAME = $(TARGET_NAME);
+PRODUCT_BUNDLE_IDENTIFIER = io.Realm.${PRODUCT_NAME:rfc1034identifier};
+
+LD_RUNPATH_SEARCH_PATHS[sdk=iphone*] = $(inherited) @executable_path/Frameworks @loader_path/Frameworks;
+LD_RUNPATH_SEARCH_PATHS[sdk=appletv*] = $(inherited) @executable_path/Frameworks @loader_path/Frameworks;
+LD_RUNPATH_SEARCH_PATHS[sdk=macosx*] = $(inherited) @executable_path/../Frameworks @loader_path/../Frameworks;
+
+TEST_HOST[sdk=iphone*] = $(BUILT_PRODUCTS_DIR)/TestHost.app/TestHost;
+TEST_HOST[sdk=appletv*] = $(BUILT_PRODUCTS_DIR)/TestHost.app/TestHost;
+
+MACOSX_DEPLOYMENT_TARGET = 11.0;
+WATCHOS_DEPLOYMENT_TARGET = 7.0;
+TVOS_DEPLOYMENT_TARGET = 14.0;
+
+// Xcode 12.5 miscompiles some of our tests in Release builds when targeting
+// iOS versions below iOS 14. This appears to have been fixed in Xcode 13.
+IPHONEOS_DEPLOYMENT_TARGET_1200 = 14.0;
+IPHONEOS_DEPLOYMENT_TARGET_1300 = 9.0;
+IPHONEOS_DEPLOYMENT_TARGET = $(IPHONEOS_DEPLOYMENT_TARGET_$(XCODE_VERSION_MAJOR));

@@ -723,7 +723,7 @@ public extension RealmEnum where Self: RawRepresentable, Self.RawValue: _RealmSc
 
 internal func dynamicSet(object: ObjectBase, key: String, value: Any?) {
     let bridgedValue: Any?
-    if let v1 = value, let v2 = v1 as? _ObjcBridgeable {
+    if let v1 = value, let v2 = v1 as AnyObject as? _ObjcBridgeable {
         bridgedValue = v2._rlmObjcValue
     } else {
         bridgedValue = value
