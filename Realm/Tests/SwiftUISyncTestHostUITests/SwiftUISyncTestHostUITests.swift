@@ -301,6 +301,70 @@ extension SwiftUISyncTestHostUITests {
         XCTAssertEqual(table.cells.count, 2)
     }
 
+    func testObservedResults() throws {
+        // This test ensures that `@ObservedResults` correctly observes both local
+        // and sync changes to a collection.
+        let partitionValue = "test"
+        let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
+        let email2 = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
+
+        let user1 = try registerAndLoginUser(email: email, password: password)
+        let user2 = try registerAndLoginUser(email: email2, password: password)
+
+        let config1 = user1.configuration(partitionValue: partitionValue)
+        let config2 = user2.configuration(partitionValue: partitionValue)
+
+        let realm = try Realm(configuration: config1)
+        try! realm.write {
+            realm.add(SwiftPerson(firstName: "Joe", lastName: "Blogs"))
+            realm.add(SwiftPerson(firstName: "Jane", lastName: "Doe"))
+        }
+        user1.waitForUpload(toFinish: partitionValue)
+
+        application.launchEnvironment["email1"] = email
+        application.launchEnvironment["email2"] = email2
+        application.launchEnvironment["password"] = password
+        application.launchEnvironment["async_view_type"] = "async_open_environment_partition"
+        application.launchEnvironment["partition_value"] = partitionValue
+        application.launchEnvironment["app_id"] = appId
+        application.launch()
+
+        asyncOpen()
+
+        // Test show ListView after syncing realm
+        let table = application.tables.firstMatch
+        XCTAssertTrue(table.waitForExistence(timeout: 6))
+        XCTAssertEqual(table.cells.count, 2)
+
+        loginUser(.second)
+
+        // Query for button to start syncing
+        let syncButtonView = application.buttons["sync_button"]
+        XCTAssertTrue(syncButtonView.waitForExistence(timeout: 2))
+        syncButtonView.tap()
+
+        // Test show ListView after logging new user
+        XCTAssertTrue(table.waitForExistence(timeout: 6))
+        XCTAssertEqual(table.cells.count, 2)
+
+        let realm2 = try Realm(configuration: config2)
+        user2.waitForDownload(toFinish: partitionValue)
+        try! realm2.write {
+            realm2.add(SwiftPerson(firstName: "Joe2", lastName: "Blogs"))
+            realm2.add(SwiftPerson(firstName: "Jane2", lastName: "Doe"))
+        }
+        user2.waitForUpload(toFinish: partitionValue)
+        XCTAssertEqual(table.cells.count, 4)
+
+        loginUser(.first)
+        user1.waitForDownload(toFinish: partitionValue)
+        // Make sure the first user also has 4 SwiftPerson's
+        XCTAssertTrue(syncButtonView.waitForExistence(timeout: 2))
+        syncButtonView.tap()
+        XCTAssertTrue(table.waitForExistence(timeout: 6))
+        XCTAssertEqual(table.cells.count, 4)
+    }
+
     func testAsyncOpenMultiUser() throws {
         let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
         _ = try createUsers(email: email, password: password, n: 2)
