@@ -1915,27 +1915,3 @@ class ObjectTests: TestCase {
         XCTAssertFalse(thawed.boolCol)
     }
 }
-
-class Tcase : TestCase {
-    func testP() throws {
-        let realm = try Realm()
-
-        try realm.write {
-            let p = Person2()
-            p.role = .vip
-            realm.add(p)
-            realm.add(Person2())
-
-        }
-        realm.objects(Person2.self).where { $0.role == .normal }
-    }
-}
-class Person2: Object {
-    @Persisted(primaryKey: true) var id: ObjectId
-    @Persisted var role: RoleType
-}
-
-enum RoleType: Int, PersistableEnum {
-    case normal
-    case vip
-}
