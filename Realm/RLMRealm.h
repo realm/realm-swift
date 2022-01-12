@@ -703,7 +703,7 @@ NS_REFINED_FOR_SWIFT;
  Getting the subscriptions from a local or partition-based configured realm will return a nil subscription
  set.
  */
-@property (nonatomic, readonly, nullable) RLMSyncSubscriptionSet *subscriptions;
+@property (nonatomic, readonly, nonnull) RLMSyncSubscriptionSet *subscriptions;
 
 
 #pragma mark - Migrations

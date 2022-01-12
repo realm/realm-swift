@@ -92,7 +92,7 @@ using namespace realm;
 - (RLMRealmConfiguration *)flexibleSyncConfiguration {
     auto syncConfig = [[RLMSyncConfiguration alloc] initWithUser:self
                                                       stopPolicy:RLMSyncStopPolicyAfterChangesUploaded
-                                                  isFlexibleSync:true];
+                                              enableFlexibleSync:true];
     RLMRealmConfiguration *config = [[RLMRealmConfiguration alloc] init];
     config.syncConfiguration = syncConfig;
     return config;

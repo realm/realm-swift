@@ -53,7 +53,7 @@ import Realm.Private
 }
 
 /**
- `SyncSubscription` is  used to define a Flexible Sync's subscription obtained from querying a
+ `SyncSubscription` is  used to define a Flexible Sync subscription obtained from querying a
  subscription set, which can be used to read or remove/update a committed subscription.
  */
 @frozen public struct SyncSubscription {
@@ -132,6 +132,10 @@ import Realm.Private
 }
 #endif // swift(>=5.5)
 
+/**
+ `SyncSubscriptionSet` is  a collection of `SyncSubscription`s. This is the entry point
+ for adding and removing `SyncSubscription`s.
+ */
 @frozen public struct SyncSubscriptionSet {
 
     // MARK: Internal

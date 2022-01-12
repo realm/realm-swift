@@ -22,6 +22,9 @@
 
 #pragma mark - Subscription States
 
+/// The current state of the subscription. This can be used for ensuring that
+/// the subscriptions are not errored and that it has been successefully
+/// sync'd to the server.
 typedef NS_ENUM(NSUInteger, RLMSyncSubscriptionState) {
     /// The subscription is complete and the server has sent all the data that matched the subscription
     /// queries at the time the subscription set was updated. The server is now in a steady-state
@@ -43,6 +46,10 @@ typedef NS_ENUM(NSUInteger, RLMSyncSubscriptionState) {
 
 NS_ASSUME_NONNULL_BEGIN
 
+/**
+ `RLMSyncSubscription` is  used to define a Flexible Sync subscription obtained from querying a
+ subscription set, which can be used to read or remove/update a committed subscription.
+ */
 @interface RLMSyncSubscription : NSObject
 
 /// Identifier of the subscription.
@@ -88,12 +95,16 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+/**
+ `RLMSyncSubscriptionSet` is  a collection of `RLMSyncSubscription`s. This is the entry point
+ for adding and removing `RLMSyncSubscription`s.
+ */
 @interface RLMSyncSubscriptionSet : NSObject <NSFastEnumeration>
 
 /// The number of subscriptions in the subscription set.
 @property (readonly) NSUInteger count;
 
-/// Gets the error associated to the subscription set, this will return a no nil in case the current
+/// Gets the error associated to the subscription set. This will be non-nil in case the current
 /// state of the subscription set is `RLMSyncSubscriptionStateError`.
 @property (nonatomic, readonly, nullable) NSError *error;
 
@@ -118,12 +129,13 @@ NS_ASSUME_NONNULL_BEGIN
  and will return after committing the subscription transactions.
 
  @param block The block containing actions to perform to the subscription set.
+ @param onComplete The block called upon synchronization of subscriptions to the server.
  */
-- (void)write:(__attribute__((noescape)) void(^)(void))block onComplete:(void(^)(NSError**))block;
+- (void)write:(__attribute__((noescape)) void(^)(void))block onComplete:(void(^)(NSError*))block;
 
 #pragma mark - Check Subscription State
 
-typedef void(^RLMSyncSubscriptionStateBlock)(RLMSyncSubscriptionState state, NSError **);
+typedef void(^RLMSyncSubscriptionStateBlock)(RLMSyncSubscriptionState state, NSError *);
 
 #pragma mark - Find subscription
 

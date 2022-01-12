@@ -1046,28 +1046,15 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
 }
 
 - (RLMSyncSubscriptionSet *)subscriptions {
-    return [self subscriptionsWithError:nil];
-}
-
-- (RLMSyncSubscriptionSet *)subscriptionsWithError:(NSError **)error {
-    if (_realm->config().sync_config) {
-        if (_realm->config().sync_config->flx_sync_requested) {
 #if REALM_ENABLE_SYNC
-            return [[RLMSyncSubscriptionSet alloc] initWithSubscriptionSet:_realm->get_latest_subscription_set() realm:self];
+    if (_realm->config().sync_config && _realm->config().sync_config->flx_sync_requested) {
+        return [[RLMSyncSubscriptionSet alloc] initWithSubscriptionSet:_realm->get_latest_subscription_set() realm:self];
+    } else {
+        @throw RLMException(@"This Realm was not configured with flexible sync");
+    }
 #else
-            NSLog(@"Realm was not built with sync enabled");
-            return NULL;
+    @throw RLMException(@"Realm was not compiled with sync enabled");
 #endif
-        }
-        else {
-            NSLog(@"Realm sync session is not Flexible Sync");
-            return NULL;
-        }
-    }
-    else {
-        NSLog(@"Realm was not build for a sync session");
-        return NULL;
-    }
 }
 
 @end

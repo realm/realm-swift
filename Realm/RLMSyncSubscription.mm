@@ -47,19 +47,11 @@
 }
 
 - (RLMObjectId *)identifier {
-    return [[RLMObjectId alloc]initWithValue:_subscription->id()];
+    return [[RLMObjectId alloc] initWithValue:_subscription->id()];
 }
 
 - (nullable NSString *)name {
-    const std::string_view str_view = _subscription->name();
-    std::string str = std::string(str_view);
-    const char * characters = str.c_str();
-    NSString *name = [NSString stringWithCString:characters
-                                        encoding:[NSString defaultCStringEncoding]];
-    if ([name length] == 0) {
-        return NULL;
-    }
-    return name;
+    return RLMStringViewToNSString(_subscription->name());
 }
 
 - (NSDate *)createdAt {
@@ -71,13 +63,11 @@
 }
 
 - (NSString *)queryString {
-    return [NSString stringWithCString:std::string(_subscription->query_string()).c_str()
-                              encoding:[NSString defaultCStringEncoding]];
+    return RLMStringViewToNSString(_subscription->query_string());
 }
 
 - (NSString *)objectClassName {
-    return [NSString stringWithCString:std::string(_subscription->object_class_name()).c_str()
-                              encoding:[NSString defaultCStringEncoding]];
+    return RLMStringViewToNSString(_subscription->object_class_name());
 }
 
 - (void)updateSubscriptionWithClassName:(NSString *)objectClassName
@@ -87,6 +77,7 @@
     [self updateSubscriptionWithClassName:objectClassName
                                     where:predicateFormat
                                      args:args];
+    va_end(args);
 }
 
 - (void)updateSubscriptionWithClassName:(NSString *)objectClassName
@@ -94,7 +85,6 @@
                                    args:(va_list)args {
     [self updateSubscriptionWithClassName:objectClassName
                                 predicate:[NSPredicate predicateWithFormat:predicateFormat arguments:args]];
-    
 }
 
 - (void)updateSubscriptionWithClassName:(NSString *)objectClassName
@@ -165,11 +155,11 @@
 #pragma mark - Batch Update subscriptions
 
 - (void)write:(__attribute__((noescape)) void(^)(void))block {
-    return [self write:block onComplete:^(NSError**){}];
+    return [self write:block onComplete:^(NSError*){}];
 }
 
 - (void)write:(__attribute__((noescape)) void(^)(void))block
-   onComplete:(void(^)(NSError**))completionBlock {
+   onComplete:(void(^)(NSError*))completionBlock {
     [self secureWrite];
     _mutableSubscriptionSet = std::make_unique<realm::sync::MutableSubscriptionSet>(_subscriptionSet->make_mutable_copy());
     self->isInWriteTransaction = true;
@@ -181,7 +171,7 @@
     }
     catch (std::exception error) {
         NSError *err = [[NSError alloc] initWithDomain:@"subscription_set" code:-1 userInfo:@{@"reason":@(error.what())}];
-        completionBlock(&err);
+        completionBlock(err);
     }
     _subscriptionSet->get_state_change_notification(realm::sync::SubscriptionSet::State::Complete)
         .get_async([completionBlock](realm::StatusWith<realm::sync::SubscriptionSet::State> state) mutable noexcept {
@@ -190,7 +180,7 @@
                 completionBlock(nil);
             } else {
                 NSError* error = [[NSError alloc] initWithDomain:@"sync_subscriptions" code:state.get_status().code() userInfo:@{@"reason": @(state.get_status().reason().c_str())}];
-                completionBlock(&error);
+                completionBlock(error);
             }
         });
 }
@@ -318,8 +308,7 @@ typedef void(^RLMSyncSubscriptionCallback)(NSError * _Nullable error);
             _mutableSubscriptionSet->insert_or_assign(str, query);
         }
         else {
-            // Should this throw??
-            NSLog(@"Cannot duplicate a subscription, if you meant to update the subscription please use the `update` method.");
+            @throw RLMException(@"Cannot duplicate a subscription, if you meant to update the subscription please use the `update` method.");
         }
     }
     else {
@@ -375,9 +364,7 @@ typedef void(^RLMSyncSubscriptionCallback)(NSError * _Nullable error);
             it = _mutableSubscriptionSet->erase(it);
             return;
         }
-        else {
-            it++;
-        }
+        it++;
     }
 }
 
@@ -392,7 +379,7 @@ typedef void(^RLMSyncSubscriptionCallback)(NSError * _Nullable error);
     [self verifyInWriteTransaction];
     
     for (auto it = _mutableSubscriptionSet->begin(); it != _mutableSubscriptionSet->end();) {
-        if (it->object_class_name() == std::string([className UTF8String])) {
+        if (it->object_class_name() == [className UTF8String]) {
             it = _mutableSubscriptionSet->erase(it);
         }
         else {
@@ -409,8 +396,7 @@ typedef void(^RLMSyncSubscriptionCallback)(NSError * _Nullable error);
     NSUInteger batchCount = 0, count = _subscriptionSet->size();
     for (NSUInteger index = state->state; index < count && batchCount < len; ++index) {
         auto iterator = _subscriptionSet->at(size_t(index));
-        RLMSyncSubscription *subscription = [[RLMSyncSubscription alloc]initWithSubscription:iterator
-                                                                             subscriptionSet:self];;
+        RLMSyncSubscription *subscription = [[RLMSyncSubscription alloc] initWithSubscription:iterator subscriptionSet:self];
         _strongBuffer[batchCount] = subscription;
         batchCount++;
     }

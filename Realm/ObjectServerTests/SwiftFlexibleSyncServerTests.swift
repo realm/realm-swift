@@ -1186,7 +1186,7 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
 }
 
 // MARK: - Async Await
-#if swift(>=5.5) && canImport(_Concurrency)
+#if swift(>=5.5.2) && canImport(_Concurrency)
 @available(macOS 12.0.0, *)
 extension SwiftFlexibleSyncServerTests {
     func testFlexibleSyncAppAddQuery() async throws {
@@ -1254,6 +1254,11 @@ extension SwiftFlexibleSyncServerTests {
             }
         }
     }
+
+
+
 }
+
+
 #endif // canImport(_Concurrency)
 #endif // os(macOS)

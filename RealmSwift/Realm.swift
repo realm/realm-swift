@@ -973,10 +973,7 @@ extension Realm {
      */
     @available(*, message: "This feature is currently in beta.")
     public var subscriptions: SyncSubscriptionSet {
-        guard let rlmSubscriptionSet = rlmRealm.subscriptions else {
-            throwRealmException("Realm is not configured for flexible sync.")
-        }
-        return SyncSubscriptionSet(rlmSubscriptionSet)
+        return SyncSubscriptionSet(rlmRealm.subscriptions)
     }
 }
 

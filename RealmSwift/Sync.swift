@@ -246,13 +246,13 @@ public typealias Provider = RLMIdentityProvider
         self.stopPolicy = config.stopPolicy
         self.partitionValue = ObjectiveCSupport.convert(object: config.partitionValue)
         self.cancelAsyncOpenOnNonFatalErrors = config.cancelAsyncOpenOnNonFatalErrors
-        self.isFlexibleSync = config.isFlexibleSync
+        self.isFlexibleSync = config.enableFlexibleSync
     }
 
     func asConfig() -> RLMSyncConfiguration {
         let syncConfiguration: RLMSyncConfiguration
         if isFlexibleSync {
-            syncConfiguration = RLMSyncConfiguration(user: user, stopPolicy: stopPolicy, isFlexibleSync: isFlexibleSync)
+            syncConfiguration = RLMSyncConfiguration(user: user, stopPolicy: stopPolicy, enableFlexibleSync: isFlexibleSync)
         } else {
             syncConfiguration = RLMSyncConfiguration(user: user,
                                                      partitionValue: partitionValue.map(ObjectiveCSupport.convertBson),
