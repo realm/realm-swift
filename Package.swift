@@ -3,7 +3,7 @@
 import PackageDescription
 import Foundation
 
-let coreVersionStr = "11.6.1"
+let coreVersionStr = "11.8.0"
 let cocoaVersionStr = "10.21.0"
 
 let coreVersionPieces = coreVersionStr.split(separator: ".")
@@ -46,7 +46,7 @@ func hostMachineArch() -> String {
     return String(bytes: machineBytes, encoding: .utf8)!
 }
 let testSwiftSettings: [SwiftSetting]?
-#if swift(>=5.4)
+#if swift(>=5.4) && !swift(>=5.5)
 testSwiftSettings = [.unsafeFlags(["-target", "\(hostMachineArch())-apple-macosx11.0"])]
 #else
 testSwiftSettings = nil

@@ -6695,6 +6695,10 @@ class QueryTests: TestCase {
                     \Query<LinkToModernAllTypesObject>.object.arrayInt32)
         validateAverage("arrayInt64", Int64.average(), Int64(64),
                     \Query<LinkToModernAllTypesObject>.object.arrayInt64)
+        validateAverage("arrayFloat", Float.average(), Float(5.55444333),
+                    \Query<LinkToModernAllTypesObject>.object.arrayFloat)
+        validateAverage("arrayDouble", Double.average(), 123.456,
+                    \Query<LinkToModernAllTypesObject>.object.arrayDouble)
         validateAverage("arrayDecimal", Decimal128.average(), Decimal128(123.456),
                     \Query<LinkToModernAllTypesObject>.object.arrayDecimal)
         validateAverage("listInt", EnumInt.average(), EnumInt.value1.rawValue,
@@ -6707,6 +6711,8 @@ class QueryTests: TestCase {
                     \Query<LinkToModernCollectionsOfEnums>.object.listInt32.rawValue)
         validateAverage("listInt64", EnumInt64.average(), EnumInt64.value1.rawValue,
                     \Query<LinkToModernCollectionsOfEnums>.object.listInt64.rawValue)
+        validateAverage("listDouble", EnumDouble.average(), EnumDouble.value1.rawValue,
+                    \Query<LinkToModernCollectionsOfEnums>.object.listDouble.rawValue)
         validateAverage("listInt", IntWrapper.average(), IntWrapper(persistedValue: 1),
                     \Query<LinkToCustomPersistableCollections>.object.listInt)
         validateAverage("listInt8", Int8Wrapper.average(), Int8Wrapper(persistedValue: Int8(8)),
@@ -6717,6 +6723,10 @@ class QueryTests: TestCase {
                     \Query<LinkToCustomPersistableCollections>.object.listInt32)
         validateAverage("listInt64", Int64Wrapper.average(), Int64Wrapper(persistedValue: Int64(64)),
                     \Query<LinkToCustomPersistableCollections>.object.listInt64)
+        validateAverage("listFloat", FloatWrapper.average(), FloatWrapper(persistedValue: Float(5.55444333)),
+                    \Query<LinkToCustomPersistableCollections>.object.listFloat)
+        validateAverage("listDouble", DoubleWrapper.average(), DoubleWrapper(persistedValue: 123.456),
+                    \Query<LinkToCustomPersistableCollections>.object.listDouble)
         validateAverage("listDecimal", Decimal128Wrapper.average(), Decimal128Wrapper(persistedValue: Decimal128(123.456)),
                     \Query<LinkToCustomPersistableCollections>.object.listDecimal)
         validateAverage("arrayOptInt", Int?.average(), 1,
@@ -6729,6 +6739,10 @@ class QueryTests: TestCase {
                     \Query<LinkToModernAllTypesObject>.object.arrayOptInt32)
         validateAverage("arrayOptInt64", Int64?.average(), Int64(64),
                     \Query<LinkToModernAllTypesObject>.object.arrayOptInt64)
+        validateAverage("arrayOptFloat", Float?.average(), Float(5.55444333),
+                    \Query<LinkToModernAllTypesObject>.object.arrayOptFloat)
+        validateAverage("arrayOptDouble", Double?.average(), 123.456,
+                    \Query<LinkToModernAllTypesObject>.object.arrayOptDouble)
         validateAverage("arrayOptDecimal", Decimal128?.average(), Decimal128(123.456),
                     \Query<LinkToModernAllTypesObject>.object.arrayOptDecimal)
         validateAverage("listIntOpt", EnumInt?.average(), EnumInt.value1.rawValue,
@@ -6741,6 +6755,8 @@ class QueryTests: TestCase {
                     \Query<LinkToModernCollectionsOfEnums>.object.listInt32Opt.rawValue)
         validateAverage("listInt64Opt", EnumInt64?.average(), EnumInt64.value1.rawValue,
                     \Query<LinkToModernCollectionsOfEnums>.object.listInt64Opt.rawValue)
+        validateAverage("listDoubleOpt", EnumDouble?.average(), EnumDouble.value1.rawValue,
+                    \Query<LinkToModernCollectionsOfEnums>.object.listDoubleOpt.rawValue)
         validateAverage("listOptInt", IntWrapper?.average(), IntWrapper(persistedValue: 1),
                     \Query<LinkToCustomPersistableCollections>.object.listOptInt)
         validateAverage("listOptInt8", Int8Wrapper?.average(), Int8Wrapper(persistedValue: Int8(8)),
@@ -6751,6 +6767,10 @@ class QueryTests: TestCase {
                     \Query<LinkToCustomPersistableCollections>.object.listOptInt32)
         validateAverage("listOptInt64", Int64Wrapper?.average(), Int64Wrapper(persistedValue: Int64(64)),
                     \Query<LinkToCustomPersistableCollections>.object.listOptInt64)
+        validateAverage("listOptFloat", FloatWrapper?.average(), FloatWrapper(persistedValue: Float(5.55444333)),
+                    \Query<LinkToCustomPersistableCollections>.object.listOptFloat)
+        validateAverage("listOptDouble", DoubleWrapper?.average(), DoubleWrapper(persistedValue: 123.456),
+                    \Query<LinkToCustomPersistableCollections>.object.listOptDouble)
         validateAverage("listOptDecimal", Decimal128Wrapper?.average(), Decimal128Wrapper(persistedValue: Decimal128(123.456)),
                     \Query<LinkToCustomPersistableCollections>.object.listOptDecimal)
         validateAverage("setInt", Int.average(), 1,
@@ -6763,6 +6783,10 @@ class QueryTests: TestCase {
                     \Query<LinkToModernAllTypesObject>.object.setInt32)
         validateAverage("setInt64", Int64.average(), Int64(64),
                     \Query<LinkToModernAllTypesObject>.object.setInt64)
+        validateAverage("setFloat", Float.average(), Float(5.55444333),
+                    \Query<LinkToModernAllTypesObject>.object.setFloat)
+        validateAverage("setDouble", Double.average(), 123.456,
+                    \Query<LinkToModernAllTypesObject>.object.setDouble)
         validateAverage("setDecimal", Decimal128.average(), Decimal128(123.456),
                     \Query<LinkToModernAllTypesObject>.object.setDecimal)
         validateAverage("setInt", EnumInt.average(), EnumInt.value1.rawValue,
@@ -6775,6 +6799,8 @@ class QueryTests: TestCase {
                     \Query<LinkToModernCollectionsOfEnums>.object.setInt32.rawValue)
         validateAverage("setInt64", EnumInt64.average(), EnumInt64.value1.rawValue,
                     \Query<LinkToModernCollectionsOfEnums>.object.setInt64.rawValue)
+        validateAverage("setDouble", EnumDouble.average(), EnumDouble.value1.rawValue,
+                    \Query<LinkToModernCollectionsOfEnums>.object.setDouble.rawValue)
         validateAverage("setInt", IntWrapper.average(), IntWrapper(persistedValue: 1),
                     \Query<LinkToCustomPersistableCollections>.object.setInt)
         validateAverage("setInt8", Int8Wrapper.average(), Int8Wrapper(persistedValue: Int8(8)),
@@ -6785,6 +6811,10 @@ class QueryTests: TestCase {
                     \Query<LinkToCustomPersistableCollections>.object.setInt32)
         validateAverage("setInt64", Int64Wrapper.average(), Int64Wrapper(persistedValue: Int64(64)),
                     \Query<LinkToCustomPersistableCollections>.object.setInt64)
+        validateAverage("setFloat", FloatWrapper.average(), FloatWrapper(persistedValue: Float(5.55444333)),
+                    \Query<LinkToCustomPersistableCollections>.object.setFloat)
+        validateAverage("setDouble", DoubleWrapper.average(), DoubleWrapper(persistedValue: 123.456),
+                    \Query<LinkToCustomPersistableCollections>.object.setDouble)
         validateAverage("setDecimal", Decimal128Wrapper.average(), Decimal128Wrapper(persistedValue: Decimal128(123.456)),
                     \Query<LinkToCustomPersistableCollections>.object.setDecimal)
         validateAverage("setOptInt", Int?.average(), 1,
@@ -6797,6 +6827,10 @@ class QueryTests: TestCase {
                     \Query<LinkToModernAllTypesObject>.object.setOptInt32)
         validateAverage("setOptInt64", Int64?.average(), Int64(64),
                     \Query<LinkToModernAllTypesObject>.object.setOptInt64)
+        validateAverage("setOptFloat", Float?.average(), Float(5.55444333),
+                    \Query<LinkToModernAllTypesObject>.object.setOptFloat)
+        validateAverage("setOptDouble", Double?.average(), 123.456,
+                    \Query<LinkToModernAllTypesObject>.object.setOptDouble)
         validateAverage("setOptDecimal", Decimal128?.average(), Decimal128(123.456),
                     \Query<LinkToModernAllTypesObject>.object.setOptDecimal)
         validateAverage("setIntOpt", EnumInt?.average(), EnumInt.value1.rawValue,
@@ -6809,6 +6843,8 @@ class QueryTests: TestCase {
                     \Query<LinkToModernCollectionsOfEnums>.object.setInt32Opt.rawValue)
         validateAverage("setInt64Opt", EnumInt64?.average(), EnumInt64.value1.rawValue,
                     \Query<LinkToModernCollectionsOfEnums>.object.setInt64Opt.rawValue)
+        validateAverage("setDoubleOpt", EnumDouble?.average(), EnumDouble.value1.rawValue,
+                    \Query<LinkToModernCollectionsOfEnums>.object.setDoubleOpt.rawValue)
         validateAverage("setOptInt", IntWrapper?.average(), IntWrapper(persistedValue: 1),
                     \Query<LinkToCustomPersistableCollections>.object.setOptInt)
         validateAverage("setOptInt8", Int8Wrapper?.average(), Int8Wrapper(persistedValue: Int8(8)),
@@ -6819,6 +6855,10 @@ class QueryTests: TestCase {
                     \Query<LinkToCustomPersistableCollections>.object.setOptInt32)
         validateAverage("setOptInt64", Int64Wrapper?.average(), Int64Wrapper(persistedValue: Int64(64)),
                     \Query<LinkToCustomPersistableCollections>.object.setOptInt64)
+        validateAverage("setOptFloat", FloatWrapper?.average(), FloatWrapper(persistedValue: Float(5.55444333)),
+                    \Query<LinkToCustomPersistableCollections>.object.setOptFloat)
+        validateAverage("setOptDouble", DoubleWrapper?.average(), DoubleWrapper(persistedValue: 123.456),
+                    \Query<LinkToCustomPersistableCollections>.object.setOptDouble)
         validateAverage("setOptDecimal", Decimal128Wrapper?.average(), Decimal128Wrapper(persistedValue: Decimal128(123.456)),
                     \Query<LinkToCustomPersistableCollections>.object.setOptDecimal)
         validateAverage("mapInt", Int.average(), 1,
@@ -6831,6 +6871,10 @@ class QueryTests: TestCase {
                     \Query<LinkToModernAllTypesObject>.object.mapInt32)
         validateAverage("mapInt64", Int64.average(), Int64(64),
                     \Query<LinkToModernAllTypesObject>.object.mapInt64)
+        validateAverage("mapFloat", Float.average(), Float(5.55444333),
+                    \Query<LinkToModernAllTypesObject>.object.mapFloat)
+        validateAverage("mapDouble", Double.average(), 123.456,
+                    \Query<LinkToModernAllTypesObject>.object.mapDouble)
         validateAverage("mapDecimal", Decimal128.average(), Decimal128(123.456),
                     \Query<LinkToModernAllTypesObject>.object.mapDecimal)
         validateAverage("mapInt", EnumInt.average(), EnumInt.value1.rawValue,
@@ -6843,6 +6887,8 @@ class QueryTests: TestCase {
                     \Query<LinkToModernCollectionsOfEnums>.object.mapInt32.rawValue)
         validateAverage("mapInt64", EnumInt64.average(), EnumInt64.value1.rawValue,
                     \Query<LinkToModernCollectionsOfEnums>.object.mapInt64.rawValue)
+        validateAverage("mapDouble", EnumDouble.average(), EnumDouble.value1.rawValue,
+                    \Query<LinkToModernCollectionsOfEnums>.object.mapDouble.rawValue)
         validateAverage("mapInt", IntWrapper.average(), IntWrapper(persistedValue: 1),
                     \Query<LinkToCustomPersistableCollections>.object.mapInt)
         validateAverage("mapInt8", Int8Wrapper.average(), Int8Wrapper(persistedValue: Int8(8)),
@@ -6853,6 +6899,10 @@ class QueryTests: TestCase {
                     \Query<LinkToCustomPersistableCollections>.object.mapInt32)
         validateAverage("mapInt64", Int64Wrapper.average(), Int64Wrapper(persistedValue: Int64(64)),
                     \Query<LinkToCustomPersistableCollections>.object.mapInt64)
+        validateAverage("mapFloat", FloatWrapper.average(), FloatWrapper(persistedValue: Float(5.55444333)),
+                    \Query<LinkToCustomPersistableCollections>.object.mapFloat)
+        validateAverage("mapDouble", DoubleWrapper.average(), DoubleWrapper(persistedValue: 123.456),
+                    \Query<LinkToCustomPersistableCollections>.object.mapDouble)
         validateAverage("mapDecimal", Decimal128Wrapper.average(), Decimal128Wrapper(persistedValue: Decimal128(123.456)),
                     \Query<LinkToCustomPersistableCollections>.object.mapDecimal)
         validateAverage("mapOptInt", Int?.average(), 1,
@@ -6865,6 +6915,10 @@ class QueryTests: TestCase {
                     \Query<LinkToModernAllTypesObject>.object.mapOptInt32)
         validateAverage("mapOptInt64", Int64?.average(), Int64(64),
                     \Query<LinkToModernAllTypesObject>.object.mapOptInt64)
+        validateAverage("mapOptFloat", Float?.average(), Float(5.55444333),
+                    \Query<LinkToModernAllTypesObject>.object.mapOptFloat)
+        validateAverage("mapOptDouble", Double?.average(), 123.456,
+                    \Query<LinkToModernAllTypesObject>.object.mapOptDouble)
         validateAverage("mapOptDecimal", Decimal128?.average(), Decimal128(123.456),
                     \Query<LinkToModernAllTypesObject>.object.mapOptDecimal)
         validateAverage("mapIntOpt", EnumInt?.average(), EnumInt.value1.rawValue,
@@ -6877,6 +6931,8 @@ class QueryTests: TestCase {
                     \Query<LinkToModernCollectionsOfEnums>.object.mapInt32Opt.rawValue)
         validateAverage("mapInt64Opt", EnumInt64?.average(), EnumInt64.value1.rawValue,
                     \Query<LinkToModernCollectionsOfEnums>.object.mapInt64Opt.rawValue)
+        validateAverage("mapDoubleOpt", EnumDouble?.average(), EnumDouble.value1.rawValue,
+                    \Query<LinkToModernCollectionsOfEnums>.object.mapDoubleOpt.rawValue)
         validateAverage("mapOptInt", IntWrapper?.average(), IntWrapper(persistedValue: 1),
                     \Query<LinkToCustomPersistableCollections>.object.mapOptInt)
         validateAverage("mapOptInt8", Int8Wrapper?.average(), Int8Wrapper(persistedValue: Int8(8)),
@@ -6887,6 +6943,10 @@ class QueryTests: TestCase {
                     \Query<LinkToCustomPersistableCollections>.object.mapOptInt32)
         validateAverage("mapOptInt64", Int64Wrapper?.average(), Int64Wrapper(persistedValue: Int64(64)),
                     \Query<LinkToCustomPersistableCollections>.object.mapOptInt64)
+        validateAverage("mapOptFloat", FloatWrapper?.average(), FloatWrapper(persistedValue: Float(5.55444333)),
+                    \Query<LinkToCustomPersistableCollections>.object.mapOptFloat)
+        validateAverage("mapOptDouble", DoubleWrapper?.average(), DoubleWrapper(persistedValue: 123.456),
+                    \Query<LinkToCustomPersistableCollections>.object.mapOptDouble)
         validateAverage("mapOptDecimal", Decimal128Wrapper?.average(), Decimal128Wrapper(persistedValue: Decimal128(123.456)),
                     \Query<LinkToCustomPersistableCollections>.object.mapOptDecimal)
     }
@@ -6966,6 +7026,10 @@ class QueryTests: TestCase {
                     \Query<LinkToModernAllTypesObject>.object.arrayInt32)
         validateSum("arrayInt64", Int64.sum(), Int64(64),
                     \Query<LinkToModernAllTypesObject>.object.arrayInt64)
+        validateSum("arrayFloat", Float.sum(), Float(5.55444333),
+                    \Query<LinkToModernAllTypesObject>.object.arrayFloat)
+        validateSum("arrayDouble", Double.sum(), 123.456,
+                    \Query<LinkToModernAllTypesObject>.object.arrayDouble)
         validateSum("arrayDecimal", Decimal128.sum(), Decimal128(123.456),
                     \Query<LinkToModernAllTypesObject>.object.arrayDecimal)
         validateSum("listInt", EnumInt.sum(), EnumInt.value1.rawValue,
@@ -6978,6 +7042,8 @@ class QueryTests: TestCase {
                     \Query<LinkToModernCollectionsOfEnums>.object.listInt32.rawValue)
         validateSum("listInt64", EnumInt64.sum(), EnumInt64.value1.rawValue,
                     \Query<LinkToModernCollectionsOfEnums>.object.listInt64.rawValue)
+        validateSum("listDouble", EnumDouble.sum(), EnumDouble.value1.rawValue,
+                    \Query<LinkToModernCollectionsOfEnums>.object.listDouble.rawValue)
         validateSum("listInt", IntWrapper.sum(), IntWrapper(persistedValue: 1),
                     \Query<LinkToCustomPersistableCollections>.object.listInt)
         validateSum("listInt8", Int8Wrapper.sum(), Int8Wrapper(persistedValue: Int8(8)),
@@ -6988,6 +7054,10 @@ class QueryTests: TestCase {
                     \Query<LinkToCustomPersistableCollections>.object.listInt32)
         validateSum("listInt64", Int64Wrapper.sum(), Int64Wrapper(persistedValue: Int64(64)),
                     \Query<LinkToCustomPersistableCollections>.object.listInt64)
+        validateSum("listFloat", FloatWrapper.sum(), FloatWrapper(persistedValue: Float(5.55444333)),
+                    \Query<LinkToCustomPersistableCollections>.object.listFloat)
+        validateSum("listDouble", DoubleWrapper.sum(), DoubleWrapper(persistedValue: 123.456),
+                    \Query<LinkToCustomPersistableCollections>.object.listDouble)
         validateSum("listDecimal", Decimal128Wrapper.sum(), Decimal128Wrapper(persistedValue: Decimal128(123.456)),
                     \Query<LinkToCustomPersistableCollections>.object.listDecimal)
         validateSum("arrayOptInt", Int?.sum(), 1,
@@ -7000,6 +7070,10 @@ class QueryTests: TestCase {
                     \Query<LinkToModernAllTypesObject>.object.arrayOptInt32)
         validateSum("arrayOptInt64", Int64?.sum(), Int64(64),
                     \Query<LinkToModernAllTypesObject>.object.arrayOptInt64)
+        validateSum("arrayOptFloat", Float?.sum(), Float(5.55444333),
+                    \Query<LinkToModernAllTypesObject>.object.arrayOptFloat)
+        validateSum("arrayOptDouble", Double?.sum(), 123.456,
+                    \Query<LinkToModernAllTypesObject>.object.arrayOptDouble)
         validateSum("arrayOptDecimal", Decimal128?.sum(), Decimal128(123.456),
                     \Query<LinkToModernAllTypesObject>.object.arrayOptDecimal)
         validateSum("listIntOpt", EnumInt?.sum(), EnumInt.value1.rawValue,
@@ -7012,6 +7086,8 @@ class QueryTests: TestCase {
                     \Query<LinkToModernCollectionsOfEnums>.object.listInt32Opt.rawValue)
         validateSum("listInt64Opt", EnumInt64?.sum(), EnumInt64.value1.rawValue,
                     \Query<LinkToModernCollectionsOfEnums>.object.listInt64Opt.rawValue)
+        validateSum("listDoubleOpt", EnumDouble?.sum(), EnumDouble.value1.rawValue,
+                    \Query<LinkToModernCollectionsOfEnums>.object.listDoubleOpt.rawValue)
         validateSum("listOptInt", IntWrapper?.sum(), IntWrapper(persistedValue: 1),
                     \Query<LinkToCustomPersistableCollections>.object.listOptInt)
         validateSum("listOptInt8", Int8Wrapper?.sum(), Int8Wrapper(persistedValue: Int8(8)),
@@ -7022,6 +7098,10 @@ class QueryTests: TestCase {
                     \Query<LinkToCustomPersistableCollections>.object.listOptInt32)
         validateSum("listOptInt64", Int64Wrapper?.sum(), Int64Wrapper(persistedValue: Int64(64)),
                     \Query<LinkToCustomPersistableCollections>.object.listOptInt64)
+        validateSum("listOptFloat", FloatWrapper?.sum(), FloatWrapper(persistedValue: Float(5.55444333)),
+                    \Query<LinkToCustomPersistableCollections>.object.listOptFloat)
+        validateSum("listOptDouble", DoubleWrapper?.sum(), DoubleWrapper(persistedValue: 123.456),
+                    \Query<LinkToCustomPersistableCollections>.object.listOptDouble)
         validateSum("listOptDecimal", Decimal128Wrapper?.sum(), Decimal128Wrapper(persistedValue: Decimal128(123.456)),
                     \Query<LinkToCustomPersistableCollections>.object.listOptDecimal)
         validateSum("setInt", Int.sum(), 1,
@@ -7034,6 +7114,10 @@ class QueryTests: TestCase {
                     \Query<LinkToModernAllTypesObject>.object.setInt32)
         validateSum("setInt64", Int64.sum(), Int64(64),
                     \Query<LinkToModernAllTypesObject>.object.setInt64)
+        validateSum("setFloat", Float.sum(), Float(5.55444333),
+                    \Query<LinkToModernAllTypesObject>.object.setFloat)
+        validateSum("setDouble", Double.sum(), 123.456,
+                    \Query<LinkToModernAllTypesObject>.object.setDouble)
         validateSum("setDecimal", Decimal128.sum(), Decimal128(123.456),
                     \Query<LinkToModernAllTypesObject>.object.setDecimal)
         validateSum("setInt", EnumInt.sum(), EnumInt.value1.rawValue,
@@ -7046,6 +7130,8 @@ class QueryTests: TestCase {
                     \Query<LinkToModernCollectionsOfEnums>.object.setInt32.rawValue)
         validateSum("setInt64", EnumInt64.sum(), EnumInt64.value1.rawValue,
                     \Query<LinkToModernCollectionsOfEnums>.object.setInt64.rawValue)
+        validateSum("setDouble", EnumDouble.sum(), EnumDouble.value1.rawValue,
+                    \Query<LinkToModernCollectionsOfEnums>.object.setDouble.rawValue)
         validateSum("setInt", IntWrapper.sum(), IntWrapper(persistedValue: 1),
                     \Query<LinkToCustomPersistableCollections>.object.setInt)
         validateSum("setInt8", Int8Wrapper.sum(), Int8Wrapper(persistedValue: Int8(8)),
@@ -7056,6 +7142,10 @@ class QueryTests: TestCase {
                     \Query<LinkToCustomPersistableCollections>.object.setInt32)
         validateSum("setInt64", Int64Wrapper.sum(), Int64Wrapper(persistedValue: Int64(64)),
                     \Query<LinkToCustomPersistableCollections>.object.setInt64)
+        validateSum("setFloat", FloatWrapper.sum(), FloatWrapper(persistedValue: Float(5.55444333)),
+                    \Query<LinkToCustomPersistableCollections>.object.setFloat)
+        validateSum("setDouble", DoubleWrapper.sum(), DoubleWrapper(persistedValue: 123.456),
+                    \Query<LinkToCustomPersistableCollections>.object.setDouble)
         validateSum("setDecimal", Decimal128Wrapper.sum(), Decimal128Wrapper(persistedValue: Decimal128(123.456)),
                     \Query<LinkToCustomPersistableCollections>.object.setDecimal)
         validateSum("setOptInt", Int?.sum(), 1,
@@ -7068,6 +7158,10 @@ class QueryTests: TestCase {
                     \Query<LinkToModernAllTypesObject>.object.setOptInt32)
         validateSum("setOptInt64", Int64?.sum(), Int64(64),
                     \Query<LinkToModernAllTypesObject>.object.setOptInt64)
+        validateSum("setOptFloat", Float?.sum(), Float(5.55444333),
+                    \Query<LinkToModernAllTypesObject>.object.setOptFloat)
+        validateSum("setOptDouble", Double?.sum(), 123.456,
+                    \Query<LinkToModernAllTypesObject>.object.setOptDouble)
         validateSum("setOptDecimal", Decimal128?.sum(), Decimal128(123.456),
                     \Query<LinkToModernAllTypesObject>.object.setOptDecimal)
         validateSum("setIntOpt", EnumInt?.sum(), EnumInt.value1.rawValue,
@@ -7080,6 +7174,8 @@ class QueryTests: TestCase {
                     \Query<LinkToModernCollectionsOfEnums>.object.setInt32Opt.rawValue)
         validateSum("setInt64Opt", EnumInt64?.sum(), EnumInt64.value1.rawValue,
                     \Query<LinkToModernCollectionsOfEnums>.object.setInt64Opt.rawValue)
+        validateSum("setDoubleOpt", EnumDouble?.sum(), EnumDouble.value1.rawValue,
+                    \Query<LinkToModernCollectionsOfEnums>.object.setDoubleOpt.rawValue)
         validateSum("setOptInt", IntWrapper?.sum(), IntWrapper(persistedValue: 1),
                     \Query<LinkToCustomPersistableCollections>.object.setOptInt)
         validateSum("setOptInt8", Int8Wrapper?.sum(), Int8Wrapper(persistedValue: Int8(8)),
@@ -7090,6 +7186,10 @@ class QueryTests: TestCase {
                     \Query<LinkToCustomPersistableCollections>.object.setOptInt32)
         validateSum("setOptInt64", Int64Wrapper?.sum(), Int64Wrapper(persistedValue: Int64(64)),
                     \Query<LinkToCustomPersistableCollections>.object.setOptInt64)
+        validateSum("setOptFloat", FloatWrapper?.sum(), FloatWrapper(persistedValue: Float(5.55444333)),
+                    \Query<LinkToCustomPersistableCollections>.object.setOptFloat)
+        validateSum("setOptDouble", DoubleWrapper?.sum(), DoubleWrapper(persistedValue: 123.456),
+                    \Query<LinkToCustomPersistableCollections>.object.setOptDouble)
         validateSum("setOptDecimal", Decimal128Wrapper?.sum(), Decimal128Wrapper(persistedValue: Decimal128(123.456)),
                     \Query<LinkToCustomPersistableCollections>.object.setOptDecimal)
         validateSum("mapInt", Int.sum(), 1,
@@ -7102,6 +7202,10 @@ class QueryTests: TestCase {
                     \Query<LinkToModernAllTypesObject>.object.mapInt32)
         validateSum("mapInt64", Int64.sum(), Int64(64),
                     \Query<LinkToModernAllTypesObject>.object.mapInt64)
+        validateSum("mapFloat", Float.sum(), Float(5.55444333),
+                    \Query<LinkToModernAllTypesObject>.object.mapFloat)
+        validateSum("mapDouble", Double.sum(), 123.456,
+                    \Query<LinkToModernAllTypesObject>.object.mapDouble)
         validateSum("mapDecimal", Decimal128.sum(), Decimal128(123.456),
                     \Query<LinkToModernAllTypesObject>.object.mapDecimal)
         validateSum("mapInt", EnumInt.sum(), EnumInt.value1.rawValue,
@@ -7114,6 +7218,8 @@ class QueryTests: TestCase {
                     \Query<LinkToModernCollectionsOfEnums>.object.mapInt32.rawValue)
         validateSum("mapInt64", EnumInt64.sum(), EnumInt64.value1.rawValue,
                     \Query<LinkToModernCollectionsOfEnums>.object.mapInt64.rawValue)
+        validateSum("mapDouble", EnumDouble.sum(), EnumDouble.value1.rawValue,
+                    \Query<LinkToModernCollectionsOfEnums>.object.mapDouble.rawValue)
         validateSum("mapInt", IntWrapper.sum(), IntWrapper(persistedValue: 1),
                     \Query<LinkToCustomPersistableCollections>.object.mapInt)
         validateSum("mapInt8", Int8Wrapper.sum(), Int8Wrapper(persistedValue: Int8(8)),
@@ -7124,6 +7230,10 @@ class QueryTests: TestCase {
                     \Query<LinkToCustomPersistableCollections>.object.mapInt32)
         validateSum("mapInt64", Int64Wrapper.sum(), Int64Wrapper(persistedValue: Int64(64)),
                     \Query<LinkToCustomPersistableCollections>.object.mapInt64)
+        validateSum("mapFloat", FloatWrapper.sum(), FloatWrapper(persistedValue: Float(5.55444333)),
+                    \Query<LinkToCustomPersistableCollections>.object.mapFloat)
+        validateSum("mapDouble", DoubleWrapper.sum(), DoubleWrapper(persistedValue: 123.456),
+                    \Query<LinkToCustomPersistableCollections>.object.mapDouble)
         validateSum("mapDecimal", Decimal128Wrapper.sum(), Decimal128Wrapper(persistedValue: Decimal128(123.456)),
                     \Query<LinkToCustomPersistableCollections>.object.mapDecimal)
         validateSum("mapOptInt", Int?.sum(), 1,
@@ -7136,6 +7246,10 @@ class QueryTests: TestCase {
                     \Query<LinkToModernAllTypesObject>.object.mapOptInt32)
         validateSum("mapOptInt64", Int64?.sum(), Int64(64),
                     \Query<LinkToModernAllTypesObject>.object.mapOptInt64)
+        validateSum("mapOptFloat", Float?.sum(), Float(5.55444333),
+                    \Query<LinkToModernAllTypesObject>.object.mapOptFloat)
+        validateSum("mapOptDouble", Double?.sum(), 123.456,
+                    \Query<LinkToModernAllTypesObject>.object.mapOptDouble)
         validateSum("mapOptDecimal", Decimal128?.sum(), Decimal128(123.456),
                     \Query<LinkToModernAllTypesObject>.object.mapOptDecimal)
         validateSum("mapIntOpt", EnumInt?.sum(), EnumInt.value1.rawValue,
@@ -7148,6 +7262,8 @@ class QueryTests: TestCase {
                     \Query<LinkToModernCollectionsOfEnums>.object.mapInt32Opt.rawValue)
         validateSum("mapInt64Opt", EnumInt64?.sum(), EnumInt64.value1.rawValue,
                     \Query<LinkToModernCollectionsOfEnums>.object.mapInt64Opt.rawValue)
+        validateSum("mapDoubleOpt", EnumDouble?.sum(), EnumDouble.value1.rawValue,
+                    \Query<LinkToModernCollectionsOfEnums>.object.mapDoubleOpt.rawValue)
         validateSum("mapOptInt", IntWrapper?.sum(), IntWrapper(persistedValue: 1),
                     \Query<LinkToCustomPersistableCollections>.object.mapOptInt)
         validateSum("mapOptInt8", Int8Wrapper?.sum(), Int8Wrapper(persistedValue: Int8(8)),
@@ -7158,6 +7274,10 @@ class QueryTests: TestCase {
                     \Query<LinkToCustomPersistableCollections>.object.mapOptInt32)
         validateSum("mapOptInt64", Int64Wrapper?.sum(), Int64Wrapper(persistedValue: Int64(64)),
                     \Query<LinkToCustomPersistableCollections>.object.mapOptInt64)
+        validateSum("mapOptFloat", FloatWrapper?.sum(), FloatWrapper(persistedValue: Float(5.55444333)),
+                    \Query<LinkToCustomPersistableCollections>.object.mapOptFloat)
+        validateSum("mapOptDouble", DoubleWrapper?.sum(), DoubleWrapper(persistedValue: 123.456),
+                    \Query<LinkToCustomPersistableCollections>.object.mapOptDouble)
         validateSum("mapOptDecimal", Decimal128Wrapper?.sum(), Decimal128Wrapper(persistedValue: Decimal128(123.456)),
                     \Query<LinkToCustomPersistableCollections>.object.mapOptDecimal)
     }
@@ -7232,6 +7352,10 @@ class QueryTests: TestCase {
                     \Query<LinkToModernAllTypesObject>.object.arrayInt32)
         validateMin("arrayInt64", min: Int64(64), max: Int64(66),
                     \Query<LinkToModernAllTypesObject>.object.arrayInt64)
+        validateMin("arrayFloat", min: Float(5.55444333), max: Float(7.55444333),
+                    \Query<LinkToModernAllTypesObject>.object.arrayFloat)
+        validateMin("arrayDouble", min: 123.456, max: 345.678,
+                    \Query<LinkToModernAllTypesObject>.object.arrayDouble)
         validateMin("arrayDecimal", min: Decimal128(123.456), max: Decimal128(345.678),
                     \Query<LinkToModernAllTypesObject>.object.arrayDecimal)
         validateMin("listInt", min: .value1, max: .value3,
@@ -7244,6 +7368,8 @@ class QueryTests: TestCase {
                     \Query<LinkToModernCollectionsOfEnums>.object.listInt32)
         validateMin("listInt64", min: .value1, max: .value3,
                     \Query<LinkToModernCollectionsOfEnums>.object.listInt64)
+        validateMin("listDouble", min: .value1, max: .value3,
+                    \Query<LinkToModernCollectionsOfEnums>.object.listDouble)
         validateMin("listInt", min: IntWrapper(persistedValue: 1), max: IntWrapper(persistedValue: 5),
                     \Query<LinkToCustomPersistableCollections>.object.listInt)
         validateMin("listInt8", min: Int8Wrapper(persistedValue: Int8(8)), max: Int8Wrapper(persistedValue: Int8(10)),
@@ -7254,6 +7380,10 @@ class QueryTests: TestCase {
                     \Query<LinkToCustomPersistableCollections>.object.listInt32)
         validateMin("listInt64", min: Int64Wrapper(persistedValue: Int64(64)), max: Int64Wrapper(persistedValue: Int64(66)),
                     \Query<LinkToCustomPersistableCollections>.object.listInt64)
+        validateMin("listFloat", min: FloatWrapper(persistedValue: Float(5.55444333)), max: FloatWrapper(persistedValue: Float(7.55444333)),
+                    \Query<LinkToCustomPersistableCollections>.object.listFloat)
+        validateMin("listDouble", min: DoubleWrapper(persistedValue: 123.456), max: DoubleWrapper(persistedValue: 345.678),
+                    \Query<LinkToCustomPersistableCollections>.object.listDouble)
         validateMin("listDecimal", min: Decimal128Wrapper(persistedValue: Decimal128(123.456)), max: Decimal128Wrapper(persistedValue: Decimal128(345.678)),
                     \Query<LinkToCustomPersistableCollections>.object.listDecimal)
         validateMin("arrayOptInt", min: 1, max: 5,
@@ -7266,6 +7396,10 @@ class QueryTests: TestCase {
                     \Query<LinkToModernAllTypesObject>.object.arrayOptInt32)
         validateMin("arrayOptInt64", min: Int64(64), max: Int64(66),
                     \Query<LinkToModernAllTypesObject>.object.arrayOptInt64)
+        validateMin("arrayOptFloat", min: Float(5.55444333), max: Float(7.55444333),
+                    \Query<LinkToModernAllTypesObject>.object.arrayOptFloat)
+        validateMin("arrayOptDouble", min: 123.456, max: 345.678,
+                    \Query<LinkToModernAllTypesObject>.object.arrayOptDouble)
         validateMin("arrayOptDecimal", min: Decimal128(123.456), max: Decimal128(345.678),
                     \Query<LinkToModernAllTypesObject>.object.arrayOptDecimal)
         validateMin("listIntOpt", min: .value1, max: .value3,
@@ -7278,6 +7412,8 @@ class QueryTests: TestCase {
                     \Query<LinkToModernCollectionsOfEnums>.object.listInt32Opt)
         validateMin("listInt64Opt", min: .value1, max: .value3,
                     \Query<LinkToModernCollectionsOfEnums>.object.listInt64Opt)
+        validateMin("listDoubleOpt", min: .value1, max: .value3,
+                    \Query<LinkToModernCollectionsOfEnums>.object.listDoubleOpt)
         validateMin("listOptInt", min: IntWrapper(persistedValue: 1), max: IntWrapper(persistedValue: 5),
                     \Query<LinkToCustomPersistableCollections>.object.listOptInt)
         validateMin("listOptInt8", min: Int8Wrapper(persistedValue: Int8(8)), max: Int8Wrapper(persistedValue: Int8(10)),
@@ -7288,6 +7424,10 @@ class QueryTests: TestCase {
                     \Query<LinkToCustomPersistableCollections>.object.listOptInt32)
         validateMin("listOptInt64", min: Int64Wrapper(persistedValue: Int64(64)), max: Int64Wrapper(persistedValue: Int64(66)),
                     \Query<LinkToCustomPersistableCollections>.object.listOptInt64)
+        validateMin("listOptFloat", min: FloatWrapper(persistedValue: Float(5.55444333)), max: FloatWrapper(persistedValue: Float(7.55444333)),
+                    \Query<LinkToCustomPersistableCollections>.object.listOptFloat)
+        validateMin("listOptDouble", min: DoubleWrapper(persistedValue: 123.456), max: DoubleWrapper(persistedValue: 345.678),
+                    \Query<LinkToCustomPersistableCollections>.object.listOptDouble)
         validateMin("listOptDecimal", min: Decimal128Wrapper(persistedValue: Decimal128(123.456)), max: Decimal128Wrapper(persistedValue: Decimal128(345.678)),
                     \Query<LinkToCustomPersistableCollections>.object.listOptDecimal)
         validateMin("setInt", min: 1, max: 5,
@@ -7300,6 +7440,10 @@ class QueryTests: TestCase {
                     \Query<LinkToModernAllTypesObject>.object.setInt32)
         validateMin("setInt64", min: Int64(64), max: Int64(66),
                     \Query<LinkToModernAllTypesObject>.object.setInt64)
+        validateMin("setFloat", min: Float(5.55444333), max: Float(7.55444333),
+                    \Query<LinkToModernAllTypesObject>.object.setFloat)
+        validateMin("setDouble", min: 123.456, max: 345.678,
+                    \Query<LinkToModernAllTypesObject>.object.setDouble)
         validateMin("setDecimal", min: Decimal128(123.456), max: Decimal128(345.678),
                     \Query<LinkToModernAllTypesObject>.object.setDecimal)
         validateMin("setInt", min: .value1, max: .value3,
@@ -7312,6 +7456,8 @@ class QueryTests: TestCase {
                     \Query<LinkToModernCollectionsOfEnums>.object.setInt32)
         validateMin("setInt64", min: .value1, max: .value3,
                     \Query<LinkToModernCollectionsOfEnums>.object.setInt64)
+        validateMin("setDouble", min: .value1, max: .value3,
+                    \Query<LinkToModernCollectionsOfEnums>.object.setDouble)
         validateMin("setInt", min: IntWrapper(persistedValue: 1), max: IntWrapper(persistedValue: 5),
                     \Query<LinkToCustomPersistableCollections>.object.setInt)
         validateMin("setInt8", min: Int8Wrapper(persistedValue: Int8(8)), max: Int8Wrapper(persistedValue: Int8(10)),
@@ -7322,6 +7468,10 @@ class QueryTests: TestCase {
                     \Query<LinkToCustomPersistableCollections>.object.setInt32)
         validateMin("setInt64", min: Int64Wrapper(persistedValue: Int64(64)), max: Int64Wrapper(persistedValue: Int64(66)),
                     \Query<LinkToCustomPersistableCollections>.object.setInt64)
+        validateMin("setFloat", min: FloatWrapper(persistedValue: Float(5.55444333)), max: FloatWrapper(persistedValue: Float(7.55444333)),
+                    \Query<LinkToCustomPersistableCollections>.object.setFloat)
+        validateMin("setDouble", min: DoubleWrapper(persistedValue: 123.456), max: DoubleWrapper(persistedValue: 345.678),
+                    \Query<LinkToCustomPersistableCollections>.object.setDouble)
         validateMin("setDecimal", min: Decimal128Wrapper(persistedValue: Decimal128(123.456)), max: Decimal128Wrapper(persistedValue: Decimal128(345.678)),
                     \Query<LinkToCustomPersistableCollections>.object.setDecimal)
         validateMin("setOptInt", min: 1, max: 5,
@@ -7334,6 +7484,10 @@ class QueryTests: TestCase {
                     \Query<LinkToModernAllTypesObject>.object.setOptInt32)
         validateMin("setOptInt64", min: Int64(64), max: Int64(66),
                     \Query<LinkToModernAllTypesObject>.object.setOptInt64)
+        validateMin("setOptFloat", min: Float(5.55444333), max: Float(7.55444333),
+                    \Query<LinkToModernAllTypesObject>.object.setOptFloat)
+        validateMin("setOptDouble", min: 123.456, max: 345.678,
+                    \Query<LinkToModernAllTypesObject>.object.setOptDouble)
         validateMin("setOptDecimal", min: Decimal128(123.456), max: Decimal128(345.678),
                     \Query<LinkToModernAllTypesObject>.object.setOptDecimal)
         validateMin("setIntOpt", min: .value1, max: .value3,
@@ -7346,6 +7500,8 @@ class QueryTests: TestCase {
                     \Query<LinkToModernCollectionsOfEnums>.object.setInt32Opt)
         validateMin("setInt64Opt", min: .value1, max: .value3,
                     \Query<LinkToModernCollectionsOfEnums>.object.setInt64Opt)
+        validateMin("setDoubleOpt", min: .value1, max: .value3,
+                    \Query<LinkToModernCollectionsOfEnums>.object.setDoubleOpt)
         validateMin("setOptInt", min: IntWrapper(persistedValue: 1), max: IntWrapper(persistedValue: 5),
                     \Query<LinkToCustomPersistableCollections>.object.setOptInt)
         validateMin("setOptInt8", min: Int8Wrapper(persistedValue: Int8(8)), max: Int8Wrapper(persistedValue: Int8(10)),
@@ -7356,6 +7512,10 @@ class QueryTests: TestCase {
                     \Query<LinkToCustomPersistableCollections>.object.setOptInt32)
         validateMin("setOptInt64", min: Int64Wrapper(persistedValue: Int64(64)), max: Int64Wrapper(persistedValue: Int64(66)),
                     \Query<LinkToCustomPersistableCollections>.object.setOptInt64)
+        validateMin("setOptFloat", min: FloatWrapper(persistedValue: Float(5.55444333)), max: FloatWrapper(persistedValue: Float(7.55444333)),
+                    \Query<LinkToCustomPersistableCollections>.object.setOptFloat)
+        validateMin("setOptDouble", min: DoubleWrapper(persistedValue: 123.456), max: DoubleWrapper(persistedValue: 345.678),
+                    \Query<LinkToCustomPersistableCollections>.object.setOptDouble)
         validateMin("setOptDecimal", min: Decimal128Wrapper(persistedValue: Decimal128(123.456)), max: Decimal128Wrapper(persistedValue: Decimal128(345.678)),
                     \Query<LinkToCustomPersistableCollections>.object.setOptDecimal)
         validateMin("mapInt", min: 1, max: 5,
@@ -7368,6 +7528,10 @@ class QueryTests: TestCase {
                     \Query<LinkToModernAllTypesObject>.object.mapInt32)
         validateMin("mapInt64", min: Int64(64), max: Int64(66),
                     \Query<LinkToModernAllTypesObject>.object.mapInt64)
+        validateMin("mapFloat", min: Float(5.55444333), max: Float(7.55444333),
+                    \Query<LinkToModernAllTypesObject>.object.mapFloat)
+        validateMin("mapDouble", min: 123.456, max: 345.678,
+                    \Query<LinkToModernAllTypesObject>.object.mapDouble)
         validateMin("mapDecimal", min: Decimal128(123.456), max: Decimal128(345.678),
                     \Query<LinkToModernAllTypesObject>.object.mapDecimal)
         validateMin("mapInt", min: .value1, max: .value3,
@@ -7380,6 +7544,8 @@ class QueryTests: TestCase {
                     \Query<LinkToModernCollectionsOfEnums>.object.mapInt32)
         validateMin("mapInt64", min: .value1, max: .value3,
                     \Query<LinkToModernCollectionsOfEnums>.object.mapInt64)
+        validateMin("mapDouble", min: .value1, max: .value3,
+                    \Query<LinkToModernCollectionsOfEnums>.object.mapDouble)
         validateMin("mapInt", min: IntWrapper(persistedValue: 1), max: IntWrapper(persistedValue: 5),
                     \Query<LinkToCustomPersistableCollections>.object.mapInt)
         validateMin("mapInt8", min: Int8Wrapper(persistedValue: Int8(8)), max: Int8Wrapper(persistedValue: Int8(10)),
@@ -7390,6 +7556,10 @@ class QueryTests: TestCase {
                     \Query<LinkToCustomPersistableCollections>.object.mapInt32)
         validateMin("mapInt64", min: Int64Wrapper(persistedValue: Int64(64)), max: Int64Wrapper(persistedValue: Int64(66)),
                     \Query<LinkToCustomPersistableCollections>.object.mapInt64)
+        validateMin("mapFloat", min: FloatWrapper(persistedValue: Float(5.55444333)), max: FloatWrapper(persistedValue: Float(7.55444333)),
+                    \Query<LinkToCustomPersistableCollections>.object.mapFloat)
+        validateMin("mapDouble", min: DoubleWrapper(persistedValue: 123.456), max: DoubleWrapper(persistedValue: 345.678),
+                    \Query<LinkToCustomPersistableCollections>.object.mapDouble)
         validateMin("mapDecimal", min: Decimal128Wrapper(persistedValue: Decimal128(123.456)), max: Decimal128Wrapper(persistedValue: Decimal128(345.678)),
                     \Query<LinkToCustomPersistableCollections>.object.mapDecimal)
         validateMin("mapOptInt", min: 1, max: 5,
@@ -7402,6 +7572,10 @@ class QueryTests: TestCase {
                     \Query<LinkToModernAllTypesObject>.object.mapOptInt32)
         validateMin("mapOptInt64", min: Int64(64), max: Int64(66),
                     \Query<LinkToModernAllTypesObject>.object.mapOptInt64)
+        validateMin("mapOptFloat", min: Float(5.55444333), max: Float(7.55444333),
+                    \Query<LinkToModernAllTypesObject>.object.mapOptFloat)
+        validateMin("mapOptDouble", min: 123.456, max: 345.678,
+                    \Query<LinkToModernAllTypesObject>.object.mapOptDouble)
         validateMin("mapOptDecimal", min: Decimal128(123.456), max: Decimal128(345.678),
                     \Query<LinkToModernAllTypesObject>.object.mapOptDecimal)
         validateMin("mapIntOpt", min: .value1, max: .value3,
@@ -7414,6 +7588,8 @@ class QueryTests: TestCase {
                     \Query<LinkToModernCollectionsOfEnums>.object.mapInt32Opt)
         validateMin("mapInt64Opt", min: .value1, max: .value3,
                     \Query<LinkToModernCollectionsOfEnums>.object.mapInt64Opt)
+        validateMin("mapDoubleOpt", min: .value1, max: .value3,
+                    \Query<LinkToModernCollectionsOfEnums>.object.mapDoubleOpt)
         validateMin("mapOptInt", min: IntWrapper(persistedValue: 1), max: IntWrapper(persistedValue: 5),
                     \Query<LinkToCustomPersistableCollections>.object.mapOptInt)
         validateMin("mapOptInt8", min: Int8Wrapper(persistedValue: Int8(8)), max: Int8Wrapper(persistedValue: Int8(10)),
@@ -7424,6 +7600,10 @@ class QueryTests: TestCase {
                     \Query<LinkToCustomPersistableCollections>.object.mapOptInt32)
         validateMin("mapOptInt64", min: Int64Wrapper(persistedValue: Int64(64)), max: Int64Wrapper(persistedValue: Int64(66)),
                     \Query<LinkToCustomPersistableCollections>.object.mapOptInt64)
+        validateMin("mapOptFloat", min: FloatWrapper(persistedValue: Float(5.55444333)), max: FloatWrapper(persistedValue: Float(7.55444333)),
+                    \Query<LinkToCustomPersistableCollections>.object.mapOptFloat)
+        validateMin("mapOptDouble", min: DoubleWrapper(persistedValue: 123.456), max: DoubleWrapper(persistedValue: 345.678),
+                    \Query<LinkToCustomPersistableCollections>.object.mapOptDouble)
         validateMin("mapOptDecimal", min: Decimal128Wrapper(persistedValue: Decimal128(123.456)), max: Decimal128Wrapper(persistedValue: Decimal128(345.678)),
                     \Query<LinkToCustomPersistableCollections>.object.mapOptDecimal)
     }
@@ -7497,6 +7677,10 @@ class QueryTests: TestCase {
                     \Query<LinkToModernAllTypesObject>.object.arrayInt32)
         validateMax("arrayInt64", min: Int64(64), max: Int64(66),
                     \Query<LinkToModernAllTypesObject>.object.arrayInt64)
+        validateMax("arrayFloat", min: Float(5.55444333), max: Float(7.55444333),
+                    \Query<LinkToModernAllTypesObject>.object.arrayFloat)
+        validateMax("arrayDouble", min: 123.456, max: 345.678,
+                    \Query<LinkToModernAllTypesObject>.object.arrayDouble)
         validateMax("arrayDecimal", min: Decimal128(123.456), max: Decimal128(345.678),
                     \Query<LinkToModernAllTypesObject>.object.arrayDecimal)
         validateMax("listInt", min: .value1, max: .value3,
@@ -7509,6 +7693,8 @@ class QueryTests: TestCase {
                     \Query<LinkToModernCollectionsOfEnums>.object.listInt32)
         validateMax("listInt64", min: .value1, max: .value3,
                     \Query<LinkToModernCollectionsOfEnums>.object.listInt64)
+        validateMax("listDouble", min: .value1, max: .value3,
+                    \Query<LinkToModernCollectionsOfEnums>.object.listDouble)
         validateMax("listInt", min: IntWrapper(persistedValue: 1), max: IntWrapper(persistedValue: 5),
                     \Query<LinkToCustomPersistableCollections>.object.listInt)
         validateMax("listInt8", min: Int8Wrapper(persistedValue: Int8(8)), max: Int8Wrapper(persistedValue: Int8(10)),
@@ -7519,6 +7705,10 @@ class QueryTests: TestCase {
                     \Query<LinkToCustomPersistableCollections>.object.listInt32)
         validateMax("listInt64", min: Int64Wrapper(persistedValue: Int64(64)), max: Int64Wrapper(persistedValue: Int64(66)),
                     \Query<LinkToCustomPersistableCollections>.object.listInt64)
+        validateMax("listFloat", min: FloatWrapper(persistedValue: Float(5.55444333)), max: FloatWrapper(persistedValue: Float(7.55444333)),
+                    \Query<LinkToCustomPersistableCollections>.object.listFloat)
+        validateMax("listDouble", min: DoubleWrapper(persistedValue: 123.456), max: DoubleWrapper(persistedValue: 345.678),
+                    \Query<LinkToCustomPersistableCollections>.object.listDouble)
         validateMax("listDecimal", min: Decimal128Wrapper(persistedValue: Decimal128(123.456)), max: Decimal128Wrapper(persistedValue: Decimal128(345.678)),
                     \Query<LinkToCustomPersistableCollections>.object.listDecimal)
         validateMax("arrayOptInt", min: 1, max: 5,
@@ -7531,6 +7721,10 @@ class QueryTests: TestCase {
                     \Query<LinkToModernAllTypesObject>.object.arrayOptInt32)
         validateMax("arrayOptInt64", min: Int64(64), max: Int64(66),
                     \Query<LinkToModernAllTypesObject>.object.arrayOptInt64)
+        validateMax("arrayOptFloat", min: Float(5.55444333), max: Float(7.55444333),
+                    \Query<LinkToModernAllTypesObject>.object.arrayOptFloat)
+        validateMax("arrayOptDouble", min: 123.456, max: 345.678,
+                    \Query<LinkToModernAllTypesObject>.object.arrayOptDouble)
         validateMax("arrayOptDecimal", min: Decimal128(123.456), max: Decimal128(345.678),
                     \Query<LinkToModernAllTypesObject>.object.arrayOptDecimal)
         validateMax("listIntOpt", min: .value1, max: .value3,
@@ -7543,6 +7737,8 @@ class QueryTests: TestCase {
                     \Query<LinkToModernCollectionsOfEnums>.object.listInt32Opt)
         validateMax("listInt64Opt", min: .value1, max: .value3,
                     \Query<LinkToModernCollectionsOfEnums>.object.listInt64Opt)
+        validateMax("listDoubleOpt", min: .value1, max: .value3,
+                    \Query<LinkToModernCollectionsOfEnums>.object.listDoubleOpt)
         validateMax("listOptInt", min: IntWrapper(persistedValue: 1), max: IntWrapper(persistedValue: 5),
                     \Query<LinkToCustomPersistableCollections>.object.listOptInt)
         validateMax("listOptInt8", min: Int8Wrapper(persistedValue: Int8(8)), max: Int8Wrapper(persistedValue: Int8(10)),
@@ -7553,6 +7749,10 @@ class QueryTests: TestCase {
                     \Query<LinkToCustomPersistableCollections>.object.listOptInt32)
         validateMax("listOptInt64", min: Int64Wrapper(persistedValue: Int64(64)), max: Int64Wrapper(persistedValue: Int64(66)),
                     \Query<LinkToCustomPersistableCollections>.object.listOptInt64)
+        validateMax("listOptFloat", min: FloatWrapper(persistedValue: Float(5.55444333)), max: FloatWrapper(persistedValue: Float(7.55444333)),
+                    \Query<LinkToCustomPersistableCollections>.object.listOptFloat)
+        validateMax("listOptDouble", min: DoubleWrapper(persistedValue: 123.456), max: DoubleWrapper(persistedValue: 345.678),
+                    \Query<LinkToCustomPersistableCollections>.object.listOptDouble)
         validateMax("listOptDecimal", min: Decimal128Wrapper(persistedValue: Decimal128(123.456)), max: Decimal128Wrapper(persistedValue: Decimal128(345.678)),
                     \Query<LinkToCustomPersistableCollections>.object.listOptDecimal)
         validateMax("setInt", min: 1, max: 5,
@@ -7565,6 +7765,10 @@ class QueryTests: TestCase {
                     \Query<LinkToModernAllTypesObject>.object.setInt32)
         validateMax("setInt64", min: Int64(64), max: Int64(66),
                     \Query<LinkToModernAllTypesObject>.object.setInt64)
+        validateMax("setFloat", min: Float(5.55444333), max: Float(7.55444333),
+                    \Query<LinkToModernAllTypesObject>.object.setFloat)
+        validateMax("setDouble", min: 123.456, max: 345.678,
+                    \Query<LinkToModernAllTypesObject>.object.setDouble)
         validateMax("setDecimal", min: Decimal128(123.456), max: Decimal128(345.678),
                     \Query<LinkToModernAllTypesObject>.object.setDecimal)
         validateMax("setInt", min: .value1, max: .value3,
@@ -7577,6 +7781,8 @@ class QueryTests: TestCase {
                     \Query<LinkToModernCollectionsOfEnums>.object.setInt32)
         validateMax("setInt64", min: .value1, max: .value3,
                     \Query<LinkToModernCollectionsOfEnums>.object.setInt64)
+        validateMax("setDouble", min: .value1, max: .value3,
+                    \Query<LinkToModernCollectionsOfEnums>.object.setDouble)
         validateMax("setInt", min: IntWrapper(persistedValue: 1), max: IntWrapper(persistedValue: 5),
                     \Query<LinkToCustomPersistableCollections>.object.setInt)
         validateMax("setInt8", min: Int8Wrapper(persistedValue: Int8(8)), max: Int8Wrapper(persistedValue: Int8(10)),
@@ -7587,6 +7793,10 @@ class QueryTests: TestCase {
                     \Query<LinkToCustomPersistableCollections>.object.setInt32)
         validateMax("setInt64", min: Int64Wrapper(persistedValue: Int64(64)), max: Int64Wrapper(persistedValue: Int64(66)),
                     \Query<LinkToCustomPersistableCollections>.object.setInt64)
+        validateMax("setFloat", min: FloatWrapper(persistedValue: Float(5.55444333)), max: FloatWrapper(persistedValue: Float(7.55444333)),
+                    \Query<LinkToCustomPersistableCollections>.object.setFloat)
+        validateMax("setDouble", min: DoubleWrapper(persistedValue: 123.456), max: DoubleWrapper(persistedValue: 345.678),
+                    \Query<LinkToCustomPersistableCollections>.object.setDouble)
         validateMax("setDecimal", min: Decimal128Wrapper(persistedValue: Decimal128(123.456)), max: Decimal128Wrapper(persistedValue: Decimal128(345.678)),
                     \Query<LinkToCustomPersistableCollections>.object.setDecimal)
         validateMax("setOptInt", min: 1, max: 5,
@@ -7599,6 +7809,10 @@ class QueryTests: TestCase {
                     \Query<LinkToModernAllTypesObject>.object.setOptInt32)
         validateMax("setOptInt64", min: Int64(64), max: Int64(66),
                     \Query<LinkToModernAllTypesObject>.object.setOptInt64)
+        validateMax("setOptFloat", min: Float(5.55444333), max: Float(7.55444333),
+                    \Query<LinkToModernAllTypesObject>.object.setOptFloat)
+        validateMax("setOptDouble", min: 123.456, max: 345.678,
+                    \Query<LinkToModernAllTypesObject>.object.setOptDouble)
         validateMax("setOptDecimal", min: Decimal128(123.456), max: Decimal128(345.678),
                     \Query<LinkToModernAllTypesObject>.object.setOptDecimal)
         validateMax("setIntOpt", min: .value1, max: .value3,
@@ -7611,6 +7825,8 @@ class QueryTests: TestCase {
                     \Query<LinkToModernCollectionsOfEnums>.object.setInt32Opt)
         validateMax("setInt64Opt", min: .value1, max: .value3,
                     \Query<LinkToModernCollectionsOfEnums>.object.setInt64Opt)
+        validateMax("setDoubleOpt", min: .value1, max: .value3,
+                    \Query<LinkToModernCollectionsOfEnums>.object.setDoubleOpt)
         validateMax("setOptInt", min: IntWrapper(persistedValue: 1), max: IntWrapper(persistedValue: 5),
                     \Query<LinkToCustomPersistableCollections>.object.setOptInt)
         validateMax("setOptInt8", min: Int8Wrapper(persistedValue: Int8(8)), max: Int8Wrapper(persistedValue: Int8(10)),
@@ -7621,6 +7837,10 @@ class QueryTests: TestCase {
                     \Query<LinkToCustomPersistableCollections>.object.setOptInt32)
         validateMax("setOptInt64", min: Int64Wrapper(persistedValue: Int64(64)), max: Int64Wrapper(persistedValue: Int64(66)),
                     \Query<LinkToCustomPersistableCollections>.object.setOptInt64)
+        validateMax("setOptFloat", min: FloatWrapper(persistedValue: Float(5.55444333)), max: FloatWrapper(persistedValue: Float(7.55444333)),
+                    \Query<LinkToCustomPersistableCollections>.object.setOptFloat)
+        validateMax("setOptDouble", min: DoubleWrapper(persistedValue: 123.456), max: DoubleWrapper(persistedValue: 345.678),
+                    \Query<LinkToCustomPersistableCollections>.object.setOptDouble)
         validateMax("setOptDecimal", min: Decimal128Wrapper(persistedValue: Decimal128(123.456)), max: Decimal128Wrapper(persistedValue: Decimal128(345.678)),
                     \Query<LinkToCustomPersistableCollections>.object.setOptDecimal)
         validateMax("mapInt", min: 1, max: 5,
@@ -7633,6 +7853,10 @@ class QueryTests: TestCase {
                     \Query<LinkToModernAllTypesObject>.object.mapInt32)
         validateMax("mapInt64", min: Int64(64), max: Int64(66),
                     \Query<LinkToModernAllTypesObject>.object.mapInt64)
+        validateMax("mapFloat", min: Float(5.55444333), max: Float(7.55444333),
+                    \Query<LinkToModernAllTypesObject>.object.mapFloat)
+        validateMax("mapDouble", min: 123.456, max: 345.678,
+                    \Query<LinkToModernAllTypesObject>.object.mapDouble)
         validateMax("mapDecimal", min: Decimal128(123.456), max: Decimal128(345.678),
                     \Query<LinkToModernAllTypesObject>.object.mapDecimal)
         validateMax("mapInt", min: .value1, max: .value3,
@@ -7645,6 +7869,8 @@ class QueryTests: TestCase {
                     \Query<LinkToModernCollectionsOfEnums>.object.mapInt32)
         validateMax("mapInt64", min: .value1, max: .value3,
                     \Query<LinkToModernCollectionsOfEnums>.object.mapInt64)
+        validateMax("mapDouble", min: .value1, max: .value3,
+                    \Query<LinkToModernCollectionsOfEnums>.object.mapDouble)
         validateMax("mapInt", min: IntWrapper(persistedValue: 1), max: IntWrapper(persistedValue: 5),
                     \Query<LinkToCustomPersistableCollections>.object.mapInt)
         validateMax("mapInt8", min: Int8Wrapper(persistedValue: Int8(8)), max: Int8Wrapper(persistedValue: Int8(10)),
@@ -7655,6 +7881,10 @@ class QueryTests: TestCase {
                     \Query<LinkToCustomPersistableCollections>.object.mapInt32)
         validateMax("mapInt64", min: Int64Wrapper(persistedValue: Int64(64)), max: Int64Wrapper(persistedValue: Int64(66)),
                     \Query<LinkToCustomPersistableCollections>.object.mapInt64)
+        validateMax("mapFloat", min: FloatWrapper(persistedValue: Float(5.55444333)), max: FloatWrapper(persistedValue: Float(7.55444333)),
+                    \Query<LinkToCustomPersistableCollections>.object.mapFloat)
+        validateMax("mapDouble", min: DoubleWrapper(persistedValue: 123.456), max: DoubleWrapper(persistedValue: 345.678),
+                    \Query<LinkToCustomPersistableCollections>.object.mapDouble)
         validateMax("mapDecimal", min: Decimal128Wrapper(persistedValue: Decimal128(123.456)), max: Decimal128Wrapper(persistedValue: Decimal128(345.678)),
                     \Query<LinkToCustomPersistableCollections>.object.mapDecimal)
         validateMax("mapOptInt", min: 1, max: 5,
@@ -7667,6 +7897,10 @@ class QueryTests: TestCase {
                     \Query<LinkToModernAllTypesObject>.object.mapOptInt32)
         validateMax("mapOptInt64", min: Int64(64), max: Int64(66),
                     \Query<LinkToModernAllTypesObject>.object.mapOptInt64)
+        validateMax("mapOptFloat", min: Float(5.55444333), max: Float(7.55444333),
+                    \Query<LinkToModernAllTypesObject>.object.mapOptFloat)
+        validateMax("mapOptDouble", min: 123.456, max: 345.678,
+                    \Query<LinkToModernAllTypesObject>.object.mapOptDouble)
         validateMax("mapOptDecimal", min: Decimal128(123.456), max: Decimal128(345.678),
                     \Query<LinkToModernAllTypesObject>.object.mapOptDecimal)
         validateMax("mapIntOpt", min: .value1, max: .value3,
@@ -7679,6 +7913,8 @@ class QueryTests: TestCase {
                     \Query<LinkToModernCollectionsOfEnums>.object.mapInt32Opt)
         validateMax("mapInt64Opt", min: .value1, max: .value3,
                     \Query<LinkToModernCollectionsOfEnums>.object.mapInt64Opt)
+        validateMax("mapDoubleOpt", min: .value1, max: .value3,
+                    \Query<LinkToModernCollectionsOfEnums>.object.mapDoubleOpt)
         validateMax("mapOptInt", min: IntWrapper(persistedValue: 1), max: IntWrapper(persistedValue: 5),
                     \Query<LinkToCustomPersistableCollections>.object.mapOptInt)
         validateMax("mapOptInt8", min: Int8Wrapper(persistedValue: Int8(8)), max: Int8Wrapper(persistedValue: Int8(10)),
@@ -7689,6 +7925,10 @@ class QueryTests: TestCase {
                     \Query<LinkToCustomPersistableCollections>.object.mapOptInt32)
         validateMax("mapOptInt64", min: Int64Wrapper(persistedValue: Int64(64)), max: Int64Wrapper(persistedValue: Int64(66)),
                     \Query<LinkToCustomPersistableCollections>.object.mapOptInt64)
+        validateMax("mapOptFloat", min: FloatWrapper(persistedValue: Float(5.55444333)), max: FloatWrapper(persistedValue: Float(7.55444333)),
+                    \Query<LinkToCustomPersistableCollections>.object.mapOptFloat)
+        validateMax("mapOptDouble", min: DoubleWrapper(persistedValue: 123.456), max: DoubleWrapper(persistedValue: 345.678),
+                    \Query<LinkToCustomPersistableCollections>.object.mapOptDouble)
         validateMax("mapOptDecimal", min: Decimal128Wrapper(persistedValue: Decimal128(123.456)), max: Decimal128Wrapper(persistedValue: Decimal128(345.678)),
                     \Query<LinkToCustomPersistableCollections>.object.mapOptDecimal)
     }
@@ -8031,6 +8271,10 @@ class QueryTests: TestCase {
                     \Query<LinkToModernAllTypesObject>.list.int32Col)
         validateKeypathAverage("int64Col", Int64.average(), Int64(64),
                     \Query<LinkToModernAllTypesObject>.list.int64Col)
+        validateKeypathAverage("floatCol", Float.average(), Float(5.55444333),
+                    \Query<LinkToModernAllTypesObject>.list.floatCol)
+        validateKeypathAverage("doubleCol", Double.average(), 123.456,
+                    \Query<LinkToModernAllTypesObject>.list.doubleCol)
         validateKeypathAverage("decimalCol", Decimal128.average(), Decimal128(123.456),
                     \Query<LinkToModernAllTypesObject>.list.decimalCol)
         validateKeypathAverage("intEnumCol", ModernIntEnum.average(), ModernIntEnum.value1.rawValue,
@@ -8045,6 +8289,10 @@ class QueryTests: TestCase {
                     \Query<LinkToAllCustomPersistableTypes>.list.int32)
         validateKeypathAverage("int64", Int64Wrapper.average(), Int64Wrapper(persistedValue: Int64(64)),
                     \Query<LinkToAllCustomPersistableTypes>.list.int64)
+        validateKeypathAverage("float", FloatWrapper.average(), FloatWrapper(persistedValue: Float(5.55444333)),
+                    \Query<LinkToAllCustomPersistableTypes>.list.float)
+        validateKeypathAverage("double", DoubleWrapper.average(), DoubleWrapper(persistedValue: 123.456),
+                    \Query<LinkToAllCustomPersistableTypes>.list.double)
         validateKeypathAverage("decimal", Decimal128Wrapper.average(), Decimal128Wrapper(persistedValue: Decimal128(123.456)),
                     \Query<LinkToAllCustomPersistableTypes>.list.decimal)
         validateKeypathAverage("optIntCol", Int?.average(), 1,
@@ -8057,6 +8305,10 @@ class QueryTests: TestCase {
                     \Query<LinkToModernAllTypesObject>.list.optInt32Col)
         validateKeypathAverage("optInt64Col", Int64?.average(), Int64(64),
                     \Query<LinkToModernAllTypesObject>.list.optInt64Col)
+        validateKeypathAverage("optFloatCol", Float?.average(), Float(5.55444333),
+                    \Query<LinkToModernAllTypesObject>.list.optFloatCol)
+        validateKeypathAverage("optDoubleCol", Double?.average(), 123.456,
+                    \Query<LinkToModernAllTypesObject>.list.optDoubleCol)
         validateKeypathAverage("optDecimalCol", Decimal128?.average(), Decimal128(123.456),
                     \Query<LinkToModernAllTypesObject>.list.optDecimalCol)
         validateKeypathAverage("optIntEnumCol", ModernIntEnum.average(), ModernIntEnum.value1.rawValue,
@@ -8071,6 +8323,10 @@ class QueryTests: TestCase {
                     \Query<LinkToAllCustomPersistableTypes>.list.optInt32)
         validateKeypathAverage("optInt64", Int64Wrapper?.average(), Int64Wrapper(persistedValue: Int64(64)),
                     \Query<LinkToAllCustomPersistableTypes>.list.optInt64)
+        validateKeypathAverage("optFloat", FloatWrapper?.average(), FloatWrapper(persistedValue: Float(5.55444333)),
+                    \Query<LinkToAllCustomPersistableTypes>.list.optFloat)
+        validateKeypathAverage("optDouble", DoubleWrapper?.average(), DoubleWrapper(persistedValue: 123.456),
+                    \Query<LinkToAllCustomPersistableTypes>.list.optDouble)
         validateKeypathAverage("optDecimal", Decimal128Wrapper?.average(), Decimal128Wrapper(persistedValue: Decimal128(123.456)),
                     \Query<LinkToAllCustomPersistableTypes>.list.optDecimal)
     }
@@ -8119,6 +8375,10 @@ class QueryTests: TestCase {
                     \Query<LinkToModernAllTypesObject>.list.int32Col)
         validateKeypathSum("int64Col", Int64.sum(), Int64(64),
                     \Query<LinkToModernAllTypesObject>.list.int64Col)
+        validateKeypathSum("floatCol", Float.sum(), Float(5.55444333),
+                    \Query<LinkToModernAllTypesObject>.list.floatCol)
+        validateKeypathSum("doubleCol", Double.sum(), 123.456,
+                    \Query<LinkToModernAllTypesObject>.list.doubleCol)
         validateKeypathSum("decimalCol", Decimal128.sum(), Decimal128(123.456),
                     \Query<LinkToModernAllTypesObject>.list.decimalCol)
         validateKeypathSum("intEnumCol", ModernIntEnum.sum(), ModernIntEnum.value1.rawValue,
@@ -8133,6 +8393,10 @@ class QueryTests: TestCase {
                     \Query<LinkToAllCustomPersistableTypes>.list.int32)
         validateKeypathSum("int64", Int64Wrapper.sum(), Int64Wrapper(persistedValue: Int64(64)),
                     \Query<LinkToAllCustomPersistableTypes>.list.int64)
+        validateKeypathSum("float", FloatWrapper.sum(), FloatWrapper(persistedValue: Float(5.55444333)),
+                    \Query<LinkToAllCustomPersistableTypes>.list.float)
+        validateKeypathSum("double", DoubleWrapper.sum(), DoubleWrapper(persistedValue: 123.456),
+                    \Query<LinkToAllCustomPersistableTypes>.list.double)
         validateKeypathSum("decimal", Decimal128Wrapper.sum(), Decimal128Wrapper(persistedValue: Decimal128(123.456)),
                     \Query<LinkToAllCustomPersistableTypes>.list.decimal)
         validateKeypathSum("optIntCol", Int?.sum(), 1,
@@ -8145,6 +8409,10 @@ class QueryTests: TestCase {
                     \Query<LinkToModernAllTypesObject>.list.optInt32Col)
         validateKeypathSum("optInt64Col", Int64?.sum(), Int64(64),
                     \Query<LinkToModernAllTypesObject>.list.optInt64Col)
+        validateKeypathSum("optFloatCol", Float?.sum(), Float(5.55444333),
+                    \Query<LinkToModernAllTypesObject>.list.optFloatCol)
+        validateKeypathSum("optDoubleCol", Double?.sum(), 123.456,
+                    \Query<LinkToModernAllTypesObject>.list.optDoubleCol)
         validateKeypathSum("optDecimalCol", Decimal128?.sum(), Decimal128(123.456),
                     \Query<LinkToModernAllTypesObject>.list.optDecimalCol)
         validateKeypathSum("optIntEnumCol", ModernIntEnum.sum(), ModernIntEnum.value1.rawValue,
@@ -8159,6 +8427,10 @@ class QueryTests: TestCase {
                     \Query<LinkToAllCustomPersistableTypes>.list.optInt32)
         validateKeypathSum("optInt64", Int64Wrapper?.sum(), Int64Wrapper(persistedValue: Int64(64)),
                     \Query<LinkToAllCustomPersistableTypes>.list.optInt64)
+        validateKeypathSum("optFloat", FloatWrapper?.sum(), FloatWrapper(persistedValue: Float(5.55444333)),
+                    \Query<LinkToAllCustomPersistableTypes>.list.optFloat)
+        validateKeypathSum("optDouble", DoubleWrapper?.sum(), DoubleWrapper(persistedValue: 123.456),
+                    \Query<LinkToAllCustomPersistableTypes>.list.optDouble)
         validateKeypathSum("optDecimal", Decimal128Wrapper?.sum(), Decimal128Wrapper(persistedValue: Decimal128(123.456)),
                     \Query<LinkToAllCustomPersistableTypes>.list.optDecimal)
     }

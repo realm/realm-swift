@@ -709,7 +709,6 @@ class MapTests: TestCase {
         let mapObj = createMap()
         try! mapObj.realm!.commitWrite()
 
-        let queue = DispatchQueue(label: "testNotificationSentInitially", autoreleaseFrequency: .workItem)
         let exp = expectation(description: "does receive notification")
         let token = mapObj.observe(on: queue) { change in
             switch change {
@@ -731,7 +730,6 @@ class MapTests: TestCase {
         let mapObj = createMap()
         try! mapObj.realm!.commitWrite()
 
-        let queue = DispatchQueue(label: "testNotificationSentAfterCommit", autoreleaseFrequency: .workItem)
         var exp = expectation(description: "does receive notification")
         var didInsert = false
         var didModify = false
