@@ -1,9 +1,8 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.21.1 Release notes (2022-01-12)
 =============================================================
-### Enhancements
-* None.
 
 ### Fixed
+
 * The sync client will now drain the receive queue when a send fails with
   ECONNRESET, ensuring that any error message from the server gets received and
   processed. ([#5078](https://github.com/realm/realm-core/pull/5078))
@@ -27,9 +26,8 @@ x.y.z Release notes (yyyy-MM-dd)
   a variety of places on iOS versions older than iOS 14
   ([#7604](https://github.com/realm/realm-swift/issues/7604), since v10.21.0)
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
-
 ### Compatibility
+
 * Realm Studio: 11.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 13.2.1.
@@ -37,6 +35,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * Xcode: 12.4-13.2.1.
 
 ### Internal
+
 * Upgraded realm-core from 11.6.1 to 11.8.0.
 
 10.21.0 Release notes (2022-01-10)
