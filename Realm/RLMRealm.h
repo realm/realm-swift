@@ -171,6 +171,8 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, readonly) RLMSchema *schema;
 
+@property (nonatomic, readonly) NSUInteger numberOfActiveVersions;
+
 /**
  Indicates if the Realm is currently engaged in a write transaction.
 

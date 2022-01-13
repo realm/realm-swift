@@ -127,6 +127,10 @@ BOOL RLMIsRealmCachedAtPath(NSString *path) {
 }
 @end
 
+- (NSUInteger)numberOfActiveVersions {
+    return _realm->get_number_of_versions();
+}
+
 #if !REALM_ENABLE_SYNC
 @interface RLMAsyncOpenTask : NSObject
 @end

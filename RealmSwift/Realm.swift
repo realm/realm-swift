@@ -165,6 +165,10 @@ import Realm.Private
     }
     #endif
 
+    public var numberOfActiveVersions: UInt {
+        rlmRealm.numberOfActiveVersions
+    }
+
     /**
      A task object which can be used to observe or cancel an async open.
 
