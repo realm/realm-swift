@@ -1461,7 +1461,7 @@
 - (void)testAsyncTransactionShouldWrite {
     RLMRealm *realm = RLMRealm.defaultRealm;
     XCTestExpectation *asyncComplete = [self expectationWithDescription:@"async transaction complete"];
-
+    NSError *error = nil;
     XCTAssertEqual(0, [StringObject allObjectsInRealm:realm].count);
 
     [realm asyncTransactionWithBlock:^{
@@ -1470,63 +1470,61 @@
         StringObject *stringObject = [StringObject allObjectsInRealm:realm].firstObject;
         XCTAssertEqualObjects(stringObject.stringCol, @"string");
         [asyncComplete fulfill];
-    }];
-
+    } error:&error];
+    
+    XCTAssertNil(error);
     [self waitForExpectationsWithTimeout:1.0 handler:nil];
 }
 
 - (void)testAsyncTransactionShouldWriteOnCommit {
     RLMRealm *realm = RLMRealm.defaultRealm;
-    XCTestExpectation *asyncComplete = [self expectationWithDescription:@"async transaction complete"];
-
+    XCTestExpectation *waitComplete = [self expectationWithDescription:@"async wait complete"];
+    XCTestExpectation *writeComplete = [self expectationWithDescription:@"async transaction complete"];
     XCTAssertEqual(0, [StringObject allObjectsInRealm:realm].count);
 
-    [realm beginAsyncWriteTransaction:^{
-        [realm createObject:StringObject.className withValue:@[@"string"]];
-        [realm commitAsyncWriteTransaction:^{
-            StringObject *stringObject = [StringObject allObjectsInRealm:realm].firstObject;
-            XCTAssertEqualObjects(stringObject.stringCol, @"string");
-            [asyncComplete fulfill];
+    [self dispatchAsync:^{
+        RLMRealm *realm = RLMRealm.defaultRealm;
+        [realm beginAsyncWriteTransaction:^{
+            NSError *error = nil;
+            [realm createObject:StringObject.className withValue:@[@"string"]];
+            [realm commitAsyncWriteTransaction:^{
+                StringObject *stringObject = [StringObject allObjectsInRealm:realm].firstObject;
+                XCTAssertEqualObjects(stringObject.stringCol, @"string");
+                [writeComplete fulfill];
+            } error:&error];
+            XCTAssertNil(error);
         }];
+        [self waitForExpectations:@[writeComplete] timeout:3];
+        [waitComplete fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:1.0 handler:nil];
+    [self waitForExpectations:@[waitComplete] timeout:3];
+    XCTAssertEqual(1, [StringObject allObjectsInRealm:realm].count);
 }
 
 - (void)testAsyncTransactionShouldCancel {
     RLMRealm *realm = RLMRealm.defaultRealm;
-    XCTestExpectation *asyncComplete = [self expectationWithDescription:@"async transaction complete"];
-    asyncComplete.inverted = YES;
+    XCTestExpectation *waitComplete = [self expectationWithDescription:@"async wait complete"];
+    XCTestExpectation *writeComplete = [self expectationWithDescription:@"async transaction complete"];
+    writeComplete.inverted = YES;
 
     XCTAssertEqual(0, [StringObject allObjectsInRealm:realm].count);
 
-    RLMAsyncTransactionId asyncTransactionId = [realm beginAsyncWriteTransaction:^{
-        [realm createObject:StringObject.className withValue:@[@"string"]];
-        [realm commitAsyncWriteTransaction:^{
-            [asyncComplete fulfill];
+    [self dispatchAsync:^{
+        RLMRealm *realm = RLMRealm.defaultRealm;
+        RLMAsyncTransactionId asyncTransactionId = [realm beginAsyncWriteTransaction:^{
+            [realm createObject:StringObject.className withValue:@[@"string"]];
+            [realm commitAsyncWriteTransaction:^{
+                StringObject *stringObject = [StringObject allObjectsInRealm:realm].firstObject;
+                XCTAssertEqualObjects(stringObject.stringCol, @"string");
+                [writeComplete fulfill];
+            } error:nil];
         }];
-    }];
-    [realm cancelAsyncTransaction:asyncTransactionId];
-
-    [self waitForExpectationsWithTimeout:1.0 handler:nil];
-
-    XCTAssertEqual(0, [StringObject allObjectsInRealm:realm].count);
-}
-
-- (void)testAsyncTransactionShouldCancelInBlock {
-    RLMRealm *realm = RLMRealm.defaultRealm;
-    XCTestExpectation *asyncComplete = [self expectationWithDescription:@"async transaction complete"];
-    asyncComplete.inverted = YES;
-
-    XCTAssertEqual(0, [StringObject allObjectsInRealm:realm].count);
-
-    RLMAsyncTransactionId asyncTransactionId = [realm beginAsyncWriteTransaction:^{
-        [realm createObject:StringObject.className withValue:@[@"string"]];
-        [realm cancelWriteTransaction];
+        [realm cancelAsyncTransaction:asyncTransactionId];
+        [waitComplete fulfill];
     }];
 
     [self waitForExpectationsWithTimeout:1.0 handler:nil];
-
     XCTAssertEqual(0, [StringObject allObjectsInRealm:realm].count);
 }
 
@@ -1545,15 +1543,21 @@
 
 - (void)testAsyncTransactionShouldNotAutoCommitOnCanceledTransaction {
     RLMRealm *realm = RLMRealm.defaultRealm;
-    XCTestExpectation *asyncComplete = [self expectationWithDescription:@"async transaction complete"];
-    asyncComplete.inverted = YES;
+//    XCTestExpectation *asyncComplete = [self expectationWithDescription:@"async transaction complete"];
+    XCTestExpectation *waitComplete = [self expectationWithDescription:@"async wait complete"];
+    XCTestExpectation *writeComplete = [self expectationWithDescription:@"async transaction complete"];
+    writeComplete.inverted = YES;
 
-    RLMAsyncTransactionId asyncTransactionId = [realm asyncTransactionWithBlock:^{
-        [realm createObject:StringObject.className withValue:@[@"string 1"]];
-    } onComplete:^{
-        [asyncComplete fulfill];
+    [self dispatchAsync:^{
+        RLMRealm *realm = RLMRealm.defaultRealm;
+        RLMAsyncTransactionId asyncTransactionId = [realm asyncTransactionWithBlock:^{
+            [realm createObject:StringObject.className withValue:@[@"string 1"]];
+        } onComplete:^{
+            [writeComplete fulfill];
+        } error:nil];
+        [realm cancelAsyncTransaction:asyncTransactionId];
+        [waitComplete fulfill];
     }];
-    [realm cancelAsyncTransaction:asyncTransactionId];
 
     [self waitForExpectationsWithTimeout:1.0 handler:nil];
     XCTAssertEqual(0U, [StringObject allObjectsInRealm:realm].count);
@@ -1593,7 +1597,7 @@
         [realm createObject:StringObject.className withValue:@[@"string"]];
         [realm commitAsyncWriteTransaction:^{
             [asyncComplete fulfill];
-        } isGroupingAllowed:true];
+        } isGroupingAllowed:true error:nil];
     }];
 
     [realm beginAsyncWriteTransaction:^{
@@ -1636,7 +1640,7 @@
     [realm createObject:StringObject.className withValue:@[@"string 2"]];
     [realm commitAsyncWriteTransaction:^{
         [asyncComplete fulfill];
-    }];
+    } error:nil];
 
     [self waitForExpectationsWithTimeout:1.0 handler:nil];
 
@@ -1658,7 +1662,7 @@
         [realm createObject:StringObject.className withValue:@[@"string 2"]];
         [realm commitAsyncWriteTransaction:^{
             [asyncComplete fulfill];
-        }];
+        } error:nil];
     }];
 
     [realm beginWriteTransaction];
@@ -1685,7 +1689,7 @@
         [realm createObject:StringObject.className withValue:@[@"string 2"]];
         [realm commitAsyncWriteTransaction:^{
             [asyncComplete fulfill];
-        }];
+        } error:nil];
     }];
 
     [realm beginWriteTransaction];
@@ -1703,7 +1707,7 @@
     asyncComplete.expectedFulfillmentCount = 4;
 
     RLMResults<RLMObject *> *resultsUnderTest = [StringObject allObjects];
-    RLMNotificationToken *token = [resultsUnderTest addNotificationBlock:^(RLMResults<RLMObject *> * _Nullable results, RLMCollectionChange * _Nullable change, NSError * _Nullable error) {
+    RLMNotificationToken *token = [resultsUnderTest addNotificationBlock:^(RLMResults<RLMObject *> * _Nullable results, RLMCollectionChange * _Nullable change, NSError *error) {
         if (!change)
             return; // ignore initial
         XCTAssertNotNil(change);
@@ -1714,13 +1718,13 @@
         [realm createObject:StringObject.className withValue:@[@"string 1"]];
     } onComplete:^{
         [asyncComplete fulfill];
-    }];
+    } error:nil];
 
     [realm asyncTransactionWithBlock:^{
         [realm createObject:StringObject.className withValue:@[@"string 1"]];
     } onComplete:^{
         [asyncComplete fulfill];
-    }];
+    } error:nil];
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
     [token invalidate];
     XCTAssertEqual(2 , [StringObject allObjectsInRealm:realm].count);
@@ -1742,7 +1746,7 @@
         [StringObject createInRealm:realm withValue:@[@"string"]];
     } onComplete:^{
         [asyncComplete fulfill];
-    }];
+    } error:nil];
 
     [self waitForExpectationsWithTimeout:3.0 handler:nil];
     // notification shouldnt have fired
@@ -1756,6 +1760,7 @@
     XCTestExpectation *transaction2 = [self expectationWithDescription:@"async transaction 2 complete"];
 
     [realm beginAsyncWriteTransaction:^{
+        NSError *error = nil;
         [StringObject createInRealm:realm withValue:@[@"string"]];
         
         [realm beginAsyncWriteTransaction:^{
@@ -1764,12 +1769,15 @@
             [realm commitAsyncWriteTransaction:^{
                 XCTAssertEqual(0, [StringObject allObjects].count);
                 [transaction1 fulfill];
-            }];
+            } error:nil];
         }];
+        XCTAssertNil(error);
+
         [realm commitAsyncWriteTransaction:^{
             XCTAssertEqual(0, [StringObject allObjects].count);
             [transaction2 fulfill];
-        }];
+        } error:&error];
+        XCTAssertNil(error);
     }];
     
     [self waitForExpectationsWithTimeout:3.0 handler:nil];
@@ -1785,11 +1793,13 @@
 
     [realm beginAsyncWriteTransaction:^{
         [StringObject createInRealm:realm withValue:@[@"string"]];
+        NSError *error = nil;
 
         [realm commitAsyncWriteTransaction:^{
             XCTAssertEqual(0, [StringObject allObjects].count);
             [transaction1 fulfill];
-        }];
+        } error:&error];
+        XCTAssertNil(error);
     }];
     [realm commitWriteTransaction];
     
@@ -1876,48 +1886,6 @@
     XCTAssertEqual(2, [StringObject allObjectsInRealm:realm].count);
 }
 
-- (void)testAsyncTransactionHandleError {
-    RLMRealm *realm = RLMRealm.defaultRealm;
-    XCTestExpectation *asyncComplete;
-    [realm transactionWithBlock:^{
-        [PrimaryStringObject createInRealm:realm withValue:@[@"pk", @1]];
-    }];
-    
-    RLMAsyncTransactionId transactionId = 0;
-    
-    [realm setAsyncErrorHandler:^(RLMAsyncTransactionId asyncTransactionId, NSError *error) {
-        XCTAssertEqual(asyncTransactionId, transactionId);
-        [asyncComplete fulfill];
-    }];
-
-    asyncComplete = [self expectationWithDescription:@"async transaction error handled"];
-    transactionId = [realm beginAsyncWriteTransaction:^{
-        [realm createObject:PrimaryStringObject.className withValue:@[@"pk", @1]]; // will throw with same PK
-        [realm commitWriteTransaction];
-    }];
-    [self waitForExpectationsWithTimeout:1.0 handler:nil];
-
-    asyncComplete = [self expectationWithDescription:@"async transaction error handled"];
-    transactionId = [realm beginAsyncWriteTransaction:^{
-        [realm createObject:PrimaryStringObject.className withValue:@[@"pk", @1]]; // will throw with same PK
-        [realm cancelAsyncTransaction:transactionId];
-    }];
-    [self waitForExpectationsWithTimeout:1.0 handler:nil];
-
-    asyncComplete = [self expectationWithDescription:@"async transaction error handled"];
-    transactionId = [realm asyncTransactionWithBlock:^{
-        [realm createObject:PrimaryStringObject.className withValue:@[@"pk", @1]]; // will throw with same PK
-    }];
-    [self waitForExpectationsWithTimeout:1.0 handler:nil];
-
-    asyncComplete = [self expectationWithDescription:@"async transaction error handled"];
-    transactionId = [realm asyncTransactionWithBlock:^{
-        [PrimaryStringObject createInRealm:realm withValue:@[@"pk", @1]]; // will throw with same PK
-    }];
-    [self waitForExpectationsWithTimeout:1.0 handler:nil];
-    
-    XCTAssertEqual(1, [PrimaryStringObject allObjects].count);
-}
 #endif // REALM_ASYNC_WRITES
 
 #pragma mark - Threads

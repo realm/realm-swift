@@ -716,62 +716,69 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     return _realm->is_in_async_transaction();
 }
 
-- (void)setAsyncErrorHandler:(nullable RLMRealmAsyncErrorHandler)block {
-    if (block == nil) {
-        _realm->set_async_error_handler(nil);
-    }
-    else {
-        _realm->set_async_error_handler(^(RLMAsyncTransactionId asyncTransactionId, std::exception_ptr err) {
-            @autoreleasepool {
-                try {
-                    rethrow_exception(err);
-                } catch (...) {
-                    NSError *error = nil;
-                    RLMRealmTranslateException(&error);
-                    block(asyncTransactionId, error);
-                }
-            }
-        });
-    }
-}
-
 - (RLMAsyncTransactionId)beginAsyncWriteTransaction:(void(^)())block {
-    return _realm->async_begin_transaction(block);
+    try {
+        _realm->async_begin_transaction(block);
+    }
+    catch (std::exception &ex) {
+        @throw RLMException(ex);
+    }
 }
 
 - (RLMAsyncTransactionId)commitAsyncWriteTransaction {
-    return _realm->async_commit_transaction();
-}
-
-- (RLMAsyncTransactionId)commitAsyncWriteTransaction:(void(^)())completionBlock {
-    return _realm->async_commit_transaction(completionBlock);
-}
-
-- (RLMAsyncTransactionId)commitAsyncWriteTransaction:(nullable void(^)())completionBlock isGroupingAllowed:(BOOL)isGroupingAllowed {
-    if (completionBlock) {
-        return _realm->async_commit_transaction(completionBlock, isGroupingAllowed);
+    try {
+        return _realm->async_commit_transaction();
     }
-    return _realm->async_commit_transaction(nil, isGroupingAllowed);
+    catch (...) {
+        RLMRealmTranslateException(nil);
+        return 0;
+    }
+}
+
+- (RLMAsyncTransactionId)commitAsyncWriteTransaction:(void(^)())completionBlock error:(NSError **)error {
+    try {
+        return _realm->async_commit_transaction(completionBlock);
+    }
+    catch (...) {
+        RLMRealmTranslateException(error);
+        return 0;
+    }
+}
+
+- (RLMAsyncTransactionId)commitAsyncWriteTransaction:(nullable void(^)())completionBlock isGroupingAllowed:(BOOL)isGroupingAllowed error:(NSError **)error {
+    try {
+        if (completionBlock) {
+            return _realm->async_commit_transaction(completionBlock, isGroupingAllowed);
+        }
+        return _realm->async_commit_transaction(nullptr, isGroupingAllowed);
+    }
+    catch (...) {
+        RLMRealmTranslateException(error);
+        return 0;
+    }
 }
 
 - (void)cancelAsyncTransaction:(RLMAsyncTransactionId)asyncTransactionId {
-    _realm->async_cancel_transaction(asyncTransactionId);
+    try {
+        _realm->async_cancel_transaction(asyncTransactionId);
+    }
+    catch (std::exception &ex) {
+        @throw RLMException(ex);
+    }
 }
 
-- (RLMAsyncTransactionId)asyncTransactionWithBlock:(void(^)())block onComplete:(void (^)())completionBlock {
-    RLMAsyncTransactionId asyncTransactionId = [self beginAsyncWriteTransaction: ^{
+- (RLMAsyncTransactionId)asyncTransactionWithBlock:(void(^)())block onComplete:(nullable void(^)())completionBlock error:(NSError **)error {
+    return [self beginAsyncWriteTransaction:^{
         block();
-        [self commitAsyncWriteTransaction:completionBlock];
+        [self commitAsyncWriteTransaction:completionBlock error:error];
     }];
-    return asyncTransactionId;
 }
 
 - (RLMAsyncTransactionId)asyncTransactionWithBlock:(void(^)())block {
-    RLMAsyncTransactionId asyncTransactionId = [self beginAsyncWriteTransaction: ^{
+    return [self beginAsyncWriteTransaction:^{
         block();
         [self commitAsyncWriteTransaction];
     }];
-    return asyncTransactionId;
 }
 
 #endif // REALM_ASYNC_WRITES
