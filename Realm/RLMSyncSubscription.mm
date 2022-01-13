@@ -225,12 +225,11 @@ typedef void(^RLMSyncSubscriptionCallback)(NSError * _Nullable error);
                                                   predicate:(NSPredicate *)predicate {
     RLMClassInfo& info = _realm->_info[objectClassName];
     auto query = RLMPredicateToQuery(predicate, info.rlmObjectSchema, _realm.schema, _realm.group);
-    auto iterator = _subscriptionSet->find(query);
-    if (iterator != _subscriptionSet->end()) {
-        return [[RLMSyncSubscription alloc] initWithSubscription:*iterator
+    if (auto it = _subscriptionSet->find(query); it != _subscriptionSet->end()) {
+        return [[RLMSyncSubscription alloc] initWithSubscription:*it
                                                  subscriptionSet:self];
     }
-    return NULL;
+    return nil;
 }
 
 
