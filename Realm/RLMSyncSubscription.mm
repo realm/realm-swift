@@ -107,7 +107,7 @@
 @end
 
 @implementation RLMSyncSubscriptionSet {
-    BOOL isInWriteTransaction;
+    BOOL _isInWriteTransaction;
     RLMRealm *_realm;
     id _strongBuffer[16];
 }
@@ -117,7 +117,6 @@
     if (self = [super init]) {
         _subscriptionSet = std::make_unique<realm::sync::SubscriptionSet>(subscriptionSet);
         _realm = realm;
-        self->isInWriteTransaction = false;
         return self;
     }
     return nil;
@@ -148,7 +147,7 @@
         case realm::sync::SubscriptionSet::State::Error:
             return RLMSyncSubscriptionStateError;
         case realm::sync::SubscriptionSet::State::Superceded:
-            return RLMSyncSubscriptionStateSuperceded;
+            return RLMSyncSubscriptionStateSuperseded;
     }
 }
 
@@ -160,16 +159,18 @@
 
 - (void)write:(__attribute__((noescape)) void(^)(void))block
    onComplete:(void(^)(NSError *))completionBlock {
-    [self secureWrite];
+    if (self->_isInWriteTransaction) {
+        @throw RLMException(@"Cannot initiate a write transaction on subscription set that is already been updated.");
+    }
     _mutableSubscriptionSet = std::make_unique<realm::sync::MutableSubscriptionSet>(_subscriptionSet->make_mutable_copy());
-    self->isInWriteTransaction = true;
+    self->_isInWriteTransaction = true;
     block();
     try {
         _subscriptionSet = std::make_unique<realm::sync::SubscriptionSet>(std::move(*_mutableSubscriptionSet).commit());
         _mutableSubscriptionSet = nullptr;
-        self->isInWriteTransaction = false;
+        self->_isInWriteTransaction = false;
     }
-    catch (std::exception error) {
+    catch (const std::exception& error) {
         NSError *err = [[NSError alloc] initWithDomain:@"subscription_set" code:-1 userInfo:@{@"reason":@(error.what())}];
         return completionBlock(err);
     }
@@ -211,7 +212,7 @@ typedef void(^RLMSyncSubscriptionCallback)(NSError * _Nullable error);
     return [self subscriptionWithClassName:objectClassName
                                      where:predicateFormat
                                       args:args];
-    
+    va_end(args);
 }
 
 - (nullable RLMSyncSubscription *)subscriptionWithClassName:(NSString *)objectClassName
@@ -242,6 +243,7 @@ typedef void(^RLMSyncSubscriptionCallback)(NSError * _Nullable error);
     return [self addSubscriptionWithClassName:objectClassName
                                         where:predicateFormat
                                          args:args];
+    va_end(args);
 }
 
 - (void)addSubscriptionWithClassName:(NSString *)objectClassName
@@ -261,6 +263,7 @@ typedef void(^RLMSyncSubscriptionCallback)(NSError * _Nullable error);
                              subscriptionName:name
                                         where:predicateFormat
                                          args:args];
+    va_end(args);
 }
 
 - (void)addSubscriptionWithClassName:(NSString *)objectClassName
@@ -453,14 +456,8 @@ typedef void(^RLMSyncSubscriptionCallback)(NSError * _Nullable error);
 }
 
 - (void)verifyInWriteTransaction {
-    if (!self->isInWriteTransaction) {
+    if (!self->_isInWriteTransaction) {
         @throw RLMException(@"Can only add, remove, or update subscriptions within a write subscription block.");
-    }
-}
-
-- (void)secureWrite {
-    if (self->isInWriteTransaction) {
-        @throw RLMException(@"Cannot initiate a write transaction on subscription set that is already been updated.");
     }
 }
 

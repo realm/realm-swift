@@ -39,9 +39,9 @@ typedef NS_ENUM(NSUInteger, RLMSyncSubscriptionState) {
     RLMSyncSubscriptionStatePending,
     /// The subscription set has been super-ceded by an updated one, this typically means that
     /// someone is trying to write a subscription on a different instance of the subscription set.
-    /// You should not use a super-ceded subscription set and instead obtain a new instance of
+    /// You should not use a superseded subscription set and instead obtain a new instance of
     /// the subscription set to write a subscription.
-    RLMSyncSubscriptionStateSuperceded
+    RLMSyncSubscriptionStateSuperseded
 };
 
 NS_ASSUME_NONNULL_BEGIN
