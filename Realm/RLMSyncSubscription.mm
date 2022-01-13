@@ -129,12 +129,12 @@
 
 - (nullable NSError *)error {
     NSString *errorMessage = RLMStringDataToNSString(_subscriptionSet->error_str());
-    if ([errorMessage length] == 0) {
-        return NULL;
+    if (errorMessage.length == 0) {
+        return nil;
     }
-    return [[NSError alloc]initWithDomain:RLMSyncErrorDomain
-                                               code:0
-                                           userInfo:@{NSLocalizedDescriptionKey : errorMessage}];
+    return [[NSError alloc] initWithDomain:RLMSyncErrorDomain
+                                      code:0
+                                  userInfo:@{NSLocalizedDescriptionKey: errorMessage}];
 }
 
 - (RLMSyncSubscriptionState)state {
