@@ -712,7 +712,7 @@ static NSURL *syncDirectoryForChildProcess() {
         [subs addSubscriptionWithClassName:Dog.className
                           subscriptionName:@"dog_all"
                                      where:@"TRUEPREDICATE"];
-    } onComplete: ^(NSError **error){
+    } onComplete: ^(NSError *error){
         if (error == nil) {
             [ex fulfill];
         } else {
@@ -730,7 +730,7 @@ static NSURL *syncDirectoryForChildProcess() {
     XCTestExpectation *ex = [self expectationWithDescription:@"state changes"];
     [subs write:^{
         block(subs);
-    } onComplete:^(NSError** error) {
+    } onComplete:^(NSError* error) {
         if (error == nil) {
             [ex fulfill];
         } else {

@@ -163,7 +163,7 @@ import Realm.Private
      */
     public func write(_ block: (() -> Void), onComplete: ((Error?) -> Void)? = nil) {
         rlmSyncSubscriptionSet.write(block, onComplete: { error in
-            onComplete?(error?.pointee)
+            onComplete?(error)
         })
     }
 
@@ -389,7 +389,7 @@ extension SyncSubscriptionSet {
     public func write(_ block: (() -> Void)) async throws {
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
             rlmSyncSubscriptionSet.write(block) { error in
-                if let error = error?.pointee {
+                if let error = error {
                     continuation.resume(throwing: error)
                 } else {
                     continuation.resume()

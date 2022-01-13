@@ -131,7 +131,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param block The block containing actions to perform to the subscription set.
  @param onComplete The block called upon synchronization of subscriptions to the server.
  */
-- (void)write:(__attribute__((noescape)) void(^)(void))block onComplete:(void(^)(NSError*))block;
+- (void)write:(__attribute__((noescape)) void(^)(void))block onComplete:(void(^)(NSError * _Nullable))onComplete;
 
 #pragma mark - Check Subscription State
 
@@ -301,7 +301,7 @@ typedef void(^RLMSyncSubscriptionStateBlock)(RLMSyncSubscriptionState state, NSE
 /**
  Removes all subscription with the specified class name.
 
- @param objectClassName The class name for the model class to be queried.
+ @param className The class name for the model class to be queried.
 
  @warning This method may only be called during a write subscription block.
  */

@@ -965,11 +965,12 @@ import Realm.Private
 extension Realm {
     /**
      Returns an instance of `SyncSubscriptionSet`, representing the active subscriptions
-    for this realm, which can be used to add/remove/update and search flexible sync subscriptions.
-    Getting the subscriptions from a local or partition-based configured realm will return a nil subscription
-    set.
+     for this realm, which can be used to add/remove/update and search flexible sync subscriptions.
+     Getting the subscriptions from a local or partition-based configured realm will return a nil subscription
+     set.
 
-    - returns: A `SyncSubscriptionSet`.
+     - returns: A `SyncSubscriptionSet`.
+     - Warning: This feature is currently in beta and its API is subject to change.
      */
     @available(*, message: "This feature is currently in beta.")
     public var subscriptions: SyncSubscriptionSet {

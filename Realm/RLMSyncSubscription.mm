@@ -159,7 +159,7 @@
 }
 
 - (void)write:(__attribute__((noescape)) void(^)(void))block
-   onComplete:(void(^)(NSError*))completionBlock {
+   onComplete:(void(^)(NSError *))completionBlock {
     [self secureWrite];
     _mutableSubscriptionSet = std::make_unique<realm::sync::MutableSubscriptionSet>(_subscriptionSet->make_mutable_copy());
     self->isInWriteTransaction = true;
@@ -171,12 +171,11 @@
     }
     catch (std::exception error) {
         NSError *err = [[NSError alloc] initWithDomain:@"subscription_set" code:-1 userInfo:@{@"reason":@(error.what())}];
-        completionBlock(err);
+        return completionBlock(err);
     }
     _subscriptionSet->get_state_change_notification(realm::sync::SubscriptionSet::State::Complete)
         .get_async([completionBlock](realm::StatusWith<realm::sync::SubscriptionSet::State> state) mutable noexcept {
             if (state.is_ok()) {
-                auto value = state.get_value();
                 completionBlock(nil);
             } else {
                 NSError* error = [[NSError alloc] initWithDomain:@"sync_subscriptions" code:state.get_status().code() userInfo:@{@"reason": @(state.get_status().reason().c_str())}];
