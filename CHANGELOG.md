@@ -18,7 +18,8 @@ x.y.z Release notes (yyyy-MM-dd)
   will be opened instead. Note that to use this parameter with a synced Realm configuration
   the seed Realm must be appropriately copied to a destination with 
   `Realm.writeCopy(configuration:)`/`[RLMRealm writeCopyForConfiguration:]` first.
-
+* Add ability to permanently delete a User from a MongoDB Realm app. This can
+  be invoked with `User.delete()`/`[RLMUser deleteWithCompletion:]`.
 
 ### Fixed
 * Add support of arm64 in Carthage build ([#7154](https://github.com/realm/realm-cocoa/issues/7154)

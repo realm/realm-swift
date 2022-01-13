@@ -921,6 +921,71 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         waitForExpectations(timeout: 10.0, handler: nil)
     }
 
+    func testDeleteUser() {
+        func userExistsOnServer(_ user: User) -> Bool {
+            let serverEx = expectation(description: "server-user")
+            var userExists = false
+            RealmServer.shared.retrieveUser(appId, userId: user.id) { result in
+                switch result {
+                case .success(let u):
+                    let u = u as! [String: Any]
+                    XCTAssertEqual(u["_id"] as! String, user.id)
+                    userExists = true
+                case .failure:
+                    userExists = false
+                }
+                serverEx.fulfill()
+            }
+            wait(for: [serverEx], timeout: 4.0)
+            return userExists
+        }
+
+        let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
+        let password = randomString(10)
+
+        let registerUserEx = expectation(description: "Register user")
+
+        app.emailPasswordAuth.registerUser(email: email, password: password) { (error) in
+            XCTAssertNil(error)
+            registerUserEx.fulfill()
+        }
+        wait(for: [registerUserEx], timeout: 4.0)
+
+        let loginEx = expectation(description: "Login user")
+        var syncUser: User?
+
+        app.login(credentials: Credentials.emailPassword(email: email, password: password)) { result in
+            switch result {
+            case .success(let user):
+                syncUser = user
+            case .failure:
+                XCTFail("Should login user")
+            }
+            loginEx.fulfill()
+        }
+
+        wait(for: [loginEx], timeout: 4.0)
+        XCTAssertTrue(userExistsOnServer(syncUser!))
+
+        XCTAssertEqual(syncUser?.id, app.currentUser?.id)
+        XCTAssertEqual(app.allUsers.count, 1)
+
+        let deleteEx = expectation(description: "Delete user")
+
+        XCTAssertNotNil(syncUser)
+
+        syncUser?.delete { (error) in
+            XCTAssertNil(error)
+            deleteEx.fulfill()
+        }
+
+        wait(for: [deleteEx], timeout: 4.0)
+
+        XCTAssertFalse(userExistsOnServer(syncUser!))
+        XCTAssertNil(app.currentUser)
+        XCTAssertEqual(app.allUsers.count, 0)
+    }
+
     func testAppLinkUser() {
         let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
         let password = randomString(10)
@@ -2190,6 +2255,36 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         XCTAssertEqual(app.currentUser?.customData["apples"], .int64(10))
     }
 
+    func testDeleteUserCombine() {
+        let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
+        let password = randomString(10)
+
+        let deleteEx = expectation(description: "Delete user")
+        let appEx = expectation(description: "App changes triggered")
+        var triggered = 0
+        app.objectWillChange.sink { _ in
+            triggered += 1
+            if triggered == 2 {
+                appEx.fulfill()
+            }
+        }.store(in: &subscriptions)
+
+        app.emailPasswordAuth.registerUser(email: email, password: password)
+            .flatMap { self.app.login(credentials: .emailPassword(email: email, password: password)) }
+            .flatMap { $0.delete() }
+            .sink(receiveCompletion: { completion in
+                if case let .failure(error) = completion {
+                    XCTFail("Should have completed login chain: \(error.localizedDescription)")
+                }
+            }, receiveValue: {
+                deleteEx.fulfill()
+            })
+            .store(in: &subscriptions)
+        wait(for: [deleteEx, appEx], timeout: 30.0)
+        XCTAssertEqual(self.app.allUsers.count, 0)
+        XCTAssertEqual(triggered, 2)
+    }
+
     func testMongoCollectionInsertCombine() {
         let collection = setupMongoCollection()
         let document: Document = ["name": "fido", "breed": "cane corso"]
@@ -2713,6 +2808,22 @@ class AsyncAwaitObjectServerTests: SwiftSyncTestCase {
         try await app.currentUser?.refreshCustomData()
         XCTAssertEqual(app.currentUser?.customData["favourite_colour"], .string("green"))
         XCTAssertEqual(app.currentUser?.customData["apples"], .int64(10))
+    }
+
+    func testDeleteUserAsyncAwait() async throws {
+        let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
+        let password = randomString(10)
+        let credentials: Credentials = .emailPassword(email: email, password: password)
+        try await app.emailPasswordAuth.registerUser(email: email, password: password)
+
+        let user = try await self.app.login(credentials: credentials)
+        XCTAssertNotNil(user)
+
+        XCTAssertNotNil(app.currentUser)
+        try await user.delete()
+
+        XCTAssertNil(app.currentUser)
+        XCTAssertEqual(app.allUsers.count, 0)
     }
 }
 
