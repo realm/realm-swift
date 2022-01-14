@@ -20,6 +20,69 @@ The feature can be enabled with the build flag `REALM_ASYNC_WRITES`.
     }];
     [realm cancelAsyncTransaction:asyncTransactionId];
 ```
+* None.
+
+### Fixed
+* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
+* None.
+
+<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+
+### Compatibility
+* Realm Studio: 11.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 13.2.1.
+* CocoaPods: 1.10 or later.
+* Xcode: 12.4-13.2.1.
+
+### Internal
+* Upgraded realm-core from ? to ?
+
+10.21.1 Release notes (2022-01-12)
+=============================================================
+
+### Fixed
+
+* The sync client will now drain the receive queue when a send fails with
+  ECONNRESET, ensuring that any error message from the server gets received and
+  processed. ([#5078](https://github.com/realm/realm-core/pull/5078))
+* Schema validation was missing for embedded objects in sets, resulting in an
+  unhelpful error being thrown if a Realm object subclass contained one (since v10.0.0).
+* Opening a Realm with a schema that has an orphaned embedded object type
+  performed an extra empty write transaction (since v10.0.0).
+* Freezing a Realm with a schema that has orphaned embedded object types threw
+  a "Wrong transactional state" exception (since v10.19.0).
+* `@sum` and `@avg` queries on Dictionaries of floats or doubles used too much
+  precision for intermediates, resulting in incorrect rounding (since v10.5.0).
+* Change the exception message for calling refresh on an immutable Realm from
+  "Continuous transaction through DB object without history information." to
+  "Can't refresh a read-only Realm."
+  ([#5061](https://github.com/realm/realm-core/issues/5061), since v10.8.0).
+* Queries of the form "link.collection.@sum = 0" where `link` is null matched
+  when `collection` was a List or Set, but not a Dictionary
+  ([#5080](https://github.com/realm/realm-core/pull/5080), since v10.8.0).
+* Types which require custom obj-c bridging (such as `PersistableEnum` or
+  `CustomPersistable`) would crash with exceptions mentioning `__SwiftValue` in
+  a variety of places on iOS versions older than iOS 14
+  ([#7604](https://github.com/realm/realm-swift/issues/7604), since v10.21.0)
+
+### Compatibility
+
+* Realm Studio: 11.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 13.2.1.
+* CocoaPods: 1.10 or later.
+* Xcode: 12.4-13.2.1.
+
+### Internal
+
+* Upgraded realm-core from 11.6.1 to 11.8.0.
+
+10.21.0 Release notes (2022-01-10)
+=============================================================
+
+### Enhancements
+
 * Add `metadata` property to `RLMUserProfile`/`UserProfile`.
 * Add class `Projection` to allow creation of light weight view models out of Realm Objects.  
 ```swift
@@ -71,31 +134,46 @@ let people: Results<PersonProjection> = realm.objects(PersonProjection.self)
 * `RealmCollection.sorted(ascending:)` can now be called on all
   non-Object/EmbeddedObject collections rather than only ones where the
   `Element` conforms to `Comparable`.
+* Add support for using user-defined types with `@Persistable` and in Realm
+  collections by defining a mapping to and from a type which Realm knows how to
+  store. For example, `URL` can be made persistable with:
+  ```swift
+  extension URL: FailableCustomPersistable {
+      // Store URL values as a String in Realm
+      public typealias PersistedType = String
+      // Convert a String to a URL
+      public init?(persistedValue: String) { self.init(string: persistedValue) }
+      // Convert a URL to a String
+      public var persistableValue: String { self.absoluteString }
+  }
+  ```
+  After doing this, `@Persisted var url: URL` is a valid property declaration
+  on a Realm object. More advanced mappings can be done by mapping to an
+  EmbeddedObject which can store multiple values.
 
 ### Fixed
-* Accessing a non object collection inside a migration would cause a crash [#5633](https://github.com/realm/realm-cocoa/issues/5633).
+
+* Accessing a non object collection inside a migration would cause a crash
+* [#5633](https://github.com/realm/realm-cocoa/issues/5633).
 * Accessing a `Map` of objects dynamically would not handle nulled values correctly (since v10.8.0).
-* Add missing `Indexable` support for UUID.
-  ([Cocoa #7545](https://github.com/realm/realm-swift/issues/7545), since v10.10.0)
-* `where()` allowed constructing some nonsensical queries due to boolean comparisons returning `Query<T>` rather than `Query<Bool>`.
+* `where()` allowed constructing some nonsensical queries due to boolean
+  comparisons returning `Query<T>` rather than `Query<Bool>` (since v10.19.0).
 * `@allValues` queries on dictionaries accidentally did not require "ANY".
 * Case-insensitive and diacritic-insensitive modifiers were ignored when
   comparing the result of an aggregate operation to another property in a
   query.
 * `Object.init(value:)` did not allow initializing `RLMDictionary<NSString, RLMObject>`/`Map<String, Object?>`
   properties with null values for map entries (since v10.8.0).
-
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+* `@ObservedResults` did not refresh when changes were made to the observed
+  collection. (since v10.6.0)
 
 ### Compatibility
+
 * Realm Studio: 11.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
-* Carthage release for Swift is built with Xcode 13.2.
+* Carthage release for Swift is built with Xcode 13.2.1.
 * CocoaPods: 1.10 or later.
-* Xcode: 12.4-13.2.
-
-### Internal
-* Upgraded realm-core from ? to ?
+* Xcode: 12.4-13.2.1.
 
 10.20.1 Release notes (2021-12-14)
 =============================================================

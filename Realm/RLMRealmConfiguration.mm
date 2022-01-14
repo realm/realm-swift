@@ -179,11 +179,7 @@ NSString *RLMRealmPathForFile(NSString *fileName) {
 }
 
 - (BOOL)readOnly {
-#ifdef REALM_ASYNC_WRITES
     return _config.immutable() || _config.read_only();
-#else
-    return _config.immutable() || _config.read_only_alternative();
-#endif // REALM_ASYNC_WRITES
 }
 
 static bool isSync(realm::Realm::Config const& config) {
@@ -200,11 +196,7 @@ static bool isSync(realm::Realm::Config const& config) {
         }
     }
     else if (self.readOnly) {
-#ifdef REALM_ASYNC_WRITES
         _config.schema_mode = isSync(_config) ? realm::SchemaMode::ReadOnly : realm::SchemaMode::Immutable;
-#else
-        _config.schema_mode = isSync(_config) ? realm::SchemaMode::ReadOnlyAlternative : realm::SchemaMode::Immutable;
-#endif // REALM_ASYNC_WRITES
     }
     else if (isSync(_config)) {
         if (_customSchema) {
@@ -226,11 +218,7 @@ static bool isSync(realm::Realm::Config const& config) {
         } else if (self.shouldCompactOnLaunch) {
             @throw RLMException(@"Cannot set `readOnly` when `shouldCompactOnLaunch` is set.");
         }
-#ifdef REALM_ASYNC_WRITES
         _config.schema_mode = isSync(_config) ? realm::SchemaMode::ReadOnly : realm::SchemaMode::Immutable;
-#else
-        _config.schema_mode = isSync(_config) ? realm::SchemaMode::ReadOnlyAlternative : realm::SchemaMode::Immutable;
-#endif // REALM_ASYNC_WRITES
     }
     else if (self.readOnly) {
         _config.schema_mode = realm::SchemaMode::Automatic;
