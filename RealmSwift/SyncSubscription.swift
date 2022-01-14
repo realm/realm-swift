@@ -173,7 +173,7 @@ import Realm.Private
             return .pending
         case .complete:
             return .complete
-        case .superceded:
+        case .superseded:
             return .superceded
         case .error:
             return .error(rlmSyncSubscriptionSet.error!)
