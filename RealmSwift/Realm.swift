@@ -381,10 +381,10 @@ public typealias AsyncTransactionId = RLMAsyncTransactionId
      */
     @discardableResult
     public func writeAsync(_ block: @escaping (AsyncTransactionId) -> Void, _ onComplete: (() -> Void)? = nil) -> AsyncTransactionId {
-        beginAsyncWrite({ handle in
-            block(handle)
+        beginAsyncWrite { asyncTransactionId in
+            block(asyncTransactionId)
             commitAsyncWrite(onComplete)
-        })
+        }
     }
 
     /**
@@ -416,12 +416,14 @@ public typealias AsyncTransactionId = RLMAsyncTransactionId
      the current realm. It will run after the commit has reached stable storage.
      - parameter isGroupingAllowed     If `true`, the next `commitAsyncWrite` *may* run without an
      intervening synchronization of stable storage.  Such a sequence of commits form a group.
+     It may help to have a better performance on write.
      In case of a platform crash, either none or all of the commits in a group will reach stable storage.
      - note The call returns immediately allowing the caller to proceed while the I/O is performed on a dedicated background thread.
      - note Callbacks to `onComplete` will occur in the order of `commitAsyncWriteTransaction`
     */
     public func commitAsyncWrite(_ onComplete: (() -> Void)? = nil, isGroupingAllowed: Bool = false) {
-        rlmRealm.commitAsyncWriteTransaction(onComplete, isGroupingAllowed: isGroupingAllowed)
+        var error: NSError?
+        rlmRealm.commitAsyncWriteTransaction(onComplete, isGroupingAllowed: isGroupingAllowed, error: &error)
     }
 
     /** Cancel a queued code block (either for `writeAsync` or for`commitAsyncWrite`)
@@ -438,16 +440,6 @@ public typealias AsyncTransactionId = RLMAsyncTransactionId
      */
     public var isInAsyncWriteTransaction: Bool {
         return rlmRealm.inAsyncWriteTransaction
-    }
-
-    /**
-     Set the error handler for the asynchronous transactions.
-     Synchronous try/catch hadling will not work with the asynchronous transactions.
-     Asynchronous exceptions will be dispatched to the handler.
-     @note pass `nil` as a parameter to remove the handler
-     */
-    public func setAsyncErrorHandler(_ handler: RLMRealmAsyncErrorHandler?) {
-        rlmRealm.setAsyncErrorHandler(handler)
     }
 
 #endif // REALM_ASYNC_WRITES
