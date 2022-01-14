@@ -595,7 +595,7 @@
     RLMRealm *realm = [self openFlexibleSyncRealm:_cmd];
     RLMSyncSubscriptionSet *subs = realm.subscriptions;
 
-    int numberOfSubs = 100;
+    double numberOfSubs = 100;
     [subs write:^{
         for (int i = 0; i < numberOfSubs; ++i) {
             [subs addSubscriptionWithClassName:Person.className
@@ -607,13 +607,16 @@
     XCTAssertEqual(subs.version, 1UL);
     XCTAssertEqual(subs.count, (unsigned long)numberOfSubs);
 
-    __weak id objects[numberOfSubs];
+    __weak id objects[(unsigned long)pow(numberOfSubs, 2.0) + (unsigned long)numberOfSubs];
     NSInteger count = 0;
-    for(RLMSyncSubscription *sub in subs) {
+    for (RLMSyncSubscription *sub in subs) {
         XCTAssertNotNil(sub);
         objects[count++] = sub;
+        for (RLMSyncSubscription *sub in subs) {
+            objects[count++] = sub;
+        }
     }
-    XCTAssertEqual(count, numberOfSubs);
+    XCTAssertEqual(count, pow(numberOfSubs, 2) + numberOfSubs);
 }
 
 - (void)testSubscriptionSetFirstAndLast {

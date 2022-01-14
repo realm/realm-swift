@@ -103,13 +103,81 @@
 @interface RLMSyncSubscriptionSet () {
     std::unique_ptr<realm::sync::SubscriptionSet> _subscriptionSet;
     std::unique_ptr<realm::sync::MutableSubscriptionSet> _mutableSubscriptionSet;
+    NSHashTable<RLMSyncSubscriptionEnumerator *> *_enumerators;
 }
 @end
 
+@interface RLMSyncSubscriptionEnumerator() {
+    // The buffer supplied by fast enumeration does not retain the objects given
+    // to it, but because we create objects on-demand and don't want them
+    // autoreleased (a table can have more rows than the device has memory for
+    // accessor objects) we need a thing to retain them.
+    id _strongBuffer[16];
+}
+@end
+
+@implementation RLMSyncSubscriptionEnumerator
+
+- (instancetype)initWithSubscriptionSet:(RLMSyncSubscriptionSet *)subscriptionSet {
+    if (self = [super init]) {
+        _subscriptionSet = subscriptionSet;
+        [_subscriptionSet registerEnumerator:self];
+        return self;
+    }
+    return nil;
+}
+- (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state
+                                    count:(NSUInteger)len {
+    NSUInteger batchCount = 0, count = [_subscriptionSet count];
+    for (NSUInteger index = state->state; index < count && batchCount < len; ++index) {
+        auto subscription = [_subscriptionSet objectAtIndex:index];
+        _strongBuffer[batchCount] = subscription;
+        batchCount++;
+    }
+
+    for (NSUInteger i = batchCount; i < len; ++i) {
+        _strongBuffer[i] = nil;
+    }
+
+    if (batchCount == 0) {
+        // Release our data if we're done, as we're autoreleased and so may
+        // stick around for a while
+        if (_subscriptionSet) {
+            [_subscriptionSet unregisterEnumerator:self];
+            _subscriptionSet = nil;
+        }
+    }
+
+
+    state->itemsPtr = (__unsafe_unretained id *)(void *)_strongBuffer;
+    state->state += batchCount;
+    state->mutationsPtr = state->extra+1;
+
+    return batchCount;
+}
+
+@end
+
+NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
+                            NSUInteger len,
+                            RLMSyncSubscriptionSet *collection) {
+    __autoreleasing RLMSyncSubscriptionEnumerator *enumerator;
+    if (state->state == 0) {
+        enumerator = collection.fastEnumerator;
+        state->extra[0] = (long)enumerator;
+        state->extra[1] = collection.count;
+    }
+    else {
+        enumerator = (__bridge id)(void *)state->extra[0];
+    }
+
+    return [enumerator countByEnumeratingWithState:state count:len];
+}
+
 @implementation RLMSyncSubscriptionSet {
     BOOL _isInWriteTransaction;
+    std::mutex _collectionEnumeratorMutex;
     RLMRealm *_realm;
-    id _strongBuffer[16];
 }
 
 - (instancetype)initWithSubscriptionSet:(realm::sync::SubscriptionSet)subscriptionSet
@@ -121,6 +189,24 @@
     }
     return nil;
 }
+
+- (RLMSyncSubscriptionEnumerator *)fastEnumerator {
+    return [[RLMSyncSubscriptionEnumerator alloc] initWithSubscriptionSet:self];
+}
+
+- (void)unregisterEnumerator:(RLMSyncSubscriptionEnumerator *)enumerator {
+    std::lock_guard lock(_collectionEnumeratorMutex);
+    [_enumerators removeObject:enumerator];
+}
+
+- (void)registerEnumerator:(RLMSyncSubscriptionEnumerator *)enumerator {
+    std::lock_guard lock(_collectionEnumeratorMutex);
+    if (!_enumerators) {
+        _enumerators = [NSHashTable hashTableWithOptions:NSPointerFunctionsWeakMemory];
+    }
+    [_enumerators addObject:enumerator];
+}
+
 
 - (NSUInteger)count {
     return _subscriptionSet->size();
@@ -391,23 +477,7 @@ typedef void(^RLMSyncSubscriptionCallback)(NSError * _Nullable error);
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state
                                   objects:(__unused __unsafe_unretained id [])buffer
                                     count:(NSUInteger)len {
-    NSUInteger batchCount = 0, count = _subscriptionSet->size();
-    for (NSUInteger index = state->state; index < count && batchCount < len; ++index) {
-        auto iterator = _subscriptionSet->at(size_t(index));
-        RLMSyncSubscription *subscription = [[RLMSyncSubscription alloc] initWithSubscription:iterator subscriptionSet:self];
-        _strongBuffer[batchCount] = subscription;
-        batchCount++;
-    }
-    
-    for (NSUInteger i = batchCount; i < len; ++i) {
-        _strongBuffer[i] = nil;
-    }
-    
-    state->itemsPtr = (__unsafe_unretained id *)(void *)_strongBuffer;
-    state->state += batchCount;
-    state->mutationsPtr = state->extra+1;
-    
-    return batchCount;
+    return RLMFastEnumerate(state, len, self);
 }
 
 #pragma mark - SubscriptionSet Collection

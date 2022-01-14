@@ -34,6 +34,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark - SubscriptionSet
 
+@interface RLMSyncSubscriptionEnumerator : NSObject
+
+@property (nonatomic, readonly) RLMSyncSubscriptionSet *subscriptionSet;
+
+- (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state
+                                    count:(NSUInteger)len;
+
+- (instancetype)initWithSubscriptionSet:(RLMSyncSubscriptionSet *)subscriptionSet;
+
+@end
+
 @interface RLMSyncSubscriptionSet ()
 
 @property (readonly) uint64_t version;
@@ -46,6 +57,11 @@ NS_ASSUME_NONNULL_BEGIN
                     subscriptionName:(nullable NSString *)name
                            predicate:(NSPredicate *)predicate
                       updateExisting:(BOOL)updateExisting;
+
+- (RLMSyncSubscriptionEnumerator *)fastEnumerator;
+- (void)unregisterEnumerator:(RLMSyncSubscriptionEnumerator *)enumerator;
+- (void)registerEnumerator:(RLMSyncSubscriptionEnumerator *)enumerator;
+
 @end
 
 NS_ASSUME_NONNULL_END
