@@ -550,9 +550,10 @@ typedef void (^RLMNotificationBlock)(RLMNotification notification, RLMRealm *rea
         Callbacks to `completionBlock` will occur in the order of `commitAsyncWriteTransaction`
  
  @param isGroupingAllowed If `true`, the next `commitAsyncWriteTransaction` *may* run without an
-        intervening synchronization of stable storage.  Such a sequence of commits
-        form a group. In case of a platform crash, either none or all of the commits
-        in a group will reach stable storage. `false` by default.
+        intervening synchronization of stable storage. Such a sequence of commits
+        form a group. It may help to have a better performance on write.
+        In case of a platform crash, either none or all of the commits in a group will reach stable storage.
+        `false` by default.
 
  @param error If an error occurs, upon return contains an `NSError` object that describes the problem.
         If you are not interested in possible errors, pass in `NULL`.
