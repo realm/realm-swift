@@ -116,7 +116,7 @@ using namespace realm;
     _user = nullptr;
 }
 
-- (std::string)pathForValue:(std::string const&)value {
+- (std::string)pathForPartitionValue:(std::string const&)value {
     if (!_user) {
         return "";
     }
@@ -147,7 +147,7 @@ using namespace realm;
 
     std::stringstream s;
     s << RLMConvertRLMBSONToBson(partitionValue);
-    auto path = [self pathForValue:s.str()];
+    auto path = [self pathForPartitionValue:s.str()];
     if (auto session = _user->session_for_on_disk_path(path)) {
         return [[RLMSyncSession alloc] initWithSyncSession:session];
     }

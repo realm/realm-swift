@@ -418,7 +418,7 @@ public class RealmServer: NSObject {
     @objc public static var shared = RealmServer()
 
     /// Log level for the server and mongo processes.
-    public var logLevel = LogLevel.info
+    public var logLevel = LogLevel.none
 
     /// Process that runs the local mongo server. Should be terminated on exit.
     private let mongoProcess = Process()
@@ -603,11 +603,11 @@ public class RealmServer: NSObject {
             print(parts.joined(separator: "\t"))
         }
 
-//        if logLevel != .none {
-//            serverProcess.standardOutput = pipe
-//        } else {
-//            serverProcess.standardOutput = nil
-//        }
+        if logLevel != .none {
+            serverProcess.standardOutput = pipe
+        } else {
+            serverProcess.standardOutput = nil
+        }
 
         try serverProcess.run()
         waitForServerToStart()
@@ -783,9 +783,10 @@ public class RealmServer: NSObject {
         }
         var ruleCreations = [Result<Any?, Error>]()
         for objectSchema in syncTypes {
+            let validSyncClasses = ["Dog", "Person", "SwiftPerson", "SwiftTypesSyncObject"]
             if partitionKeyType != nil ||
                 // This is a temporary workaround for not been able to add the complete schema for flx App
-               (objectSchema.className == "Dog" || objectSchema.className == "Person" || objectSchema.className == "SwiftPerson" || objectSchema.className == "SwiftTypesSyncObject") {
+                validSyncClasses.contains(objectSchema.className) {
                 ruleCreations.append(rules.post(objectSchema.stitchRule(partitionKeyType ?? "string", schema)))
             }
         }
@@ -799,8 +800,9 @@ public class RealmServer: NSObject {
             ruleIds[dict["collection"]!] = dict["_id"]!
         }
         for objectSchema in syncTypes {
+            let validSyncClasses = ["Dog", "Person", "SwiftPerson", "SwiftTypesSyncObject"]
             if partitionKeyType != nil ||
-               (objectSchema.className == "Dog" || objectSchema.className == "Person" || objectSchema.className == "SwiftPerson" || objectSchema.className == "SwiftTypesSyncObject") {
+                validSyncClasses.contains(objectSchema.className) {
                 // This is a temporary workaround for not been able to add the complete schema for flx App
                 let id = ruleIds[objectSchema.className]!
                 rules[id].put(on: group, data: objectSchema.stitchRule(partitionKeyType ?? "string", schema, id: id), failOnError)

@@ -108,7 +108,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (RLMRealmConfiguration *)configurationWithPartitionValue:(nullable id<RLMBSON>)partitionValue NS_REFINED_FOR_SWIFT;
 
 /**
- Create a flexible sync configuration instance, which can be used to open a realm with a which
+ Create a flexible sync configuration instance, which can be used to open a Realm with a which
  supports flexible sync.
 
  It won't possible to combine flexible and partition sync in the same app, which means if you open

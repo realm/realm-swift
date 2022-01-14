@@ -142,7 +142,7 @@ typedef void(^RLMSyncSubscriptionStateBlock)(RLMSyncSubscriptionState state, NSE
 /**
  Finds a subscription by the specified name.
 
- @param name The name used  the identify the subscription.
+ @param name The name used  to identify the subscription.
 
  @return A subscription for the given name.
  */
@@ -233,7 +233,7 @@ typedef void(^RLMSyncSubscriptionStateBlock)(RLMSyncSubscriptionState state, NSE
  @warning This method may only be called during a write subscription block.
 
  @param objectClassName The class name for the model class to be queried.
- @param name The name used  the identify the subscription.
+ @param name The name used to identify the subscription.
  @param predicate The predicate with which to filter the objects on the server.
  */
 - (void)addSubscriptionWithClassName:(NSString *)objectClassName

@@ -196,8 +196,7 @@ typedef void(^RLMSyncSubscriptionCallback)(NSError * _Nullable error);
 #pragma mark - Find subscription
 
 - (nullable RLMSyncSubscription *)subscriptionWithName:(NSString *)name {
-    std::string str = std::string([name UTF8String]);
-    auto iterator = _subscriptionSet->find(str);
+    auto iterator = _subscriptionSet->find([name UTF8String]);
     if (iterator != _subscriptionSet->end()) {
         return [[RLMSyncSubscription alloc] initWithSubscription:*iterator
                                                  subscriptionSet:self];
@@ -302,11 +301,10 @@ typedef void(^RLMSyncSubscriptionCallback)(NSError * _Nullable error);
     auto query = RLMPredicateToQuery(predicate, info.rlmObjectSchema, _realm.schema, _realm.group);
     
     if (name != nil) {
-        std::string str = std::string([name UTF8String]);
-        auto iterator = _mutableSubscriptionSet->find(str);
+        auto iterator = _mutableSubscriptionSet->find([name UTF8String]);
         
         if (iterator == _mutableSubscriptionSet->end() || updateExisting) {
-            _mutableSubscriptionSet->insert_or_assign(str, query);
+            _mutableSubscriptionSet->insert_or_assign([name UTF8String], query);
         }
         else {
             @throw RLMException(@"Cannot duplicate a subscription, if you meant to update the subscription please use the `update` method.");
@@ -321,9 +319,8 @@ typedef void(^RLMSyncSubscriptionCallback)(NSError * _Nullable error);
 
 - (void)removeSubscriptionWithName:(NSString *)name {
     [self verifyInWriteTransaction];
-    
-    std::string str = std::string([name UTF8String]);
-    auto iterator = _mutableSubscriptionSet->find(str);
+
+    auto iterator = _mutableSubscriptionSet->find([name UTF8String]);
     if (iterator != _mutableSubscriptionSet->end()) {
         _mutableSubscriptionSet->erase(iterator);
     }

@@ -32,17 +32,17 @@ import Realm.Private
     /// The subscription is persisted locally but not yet processed by the server, which means
     /// the server hasn't yet returned all the data that matched the updated subscription queries.
     case pending
-    /// The subscription set has been super-ceded by an updated one, this typically means that
+    /// The subscription set has been superseded by an updated one, this typically means that
     /// someone is trying to write a subscription on a different instance of the subscription set.
-    /// You should not use a super-ceded subscription set and instead obtain a new instance of
+    /// You should not use a superseded subscription set and instead obtain a new instance of
     /// the subscription set to write a subscription.
-    case superceded
+    case superseded
 
     public static func ==(lhs: SyncSubscriptionState, rhs: SyncSubscriptionState) -> Bool {
         switch (lhs, rhs) {
         case (.complete, .complete): fallthrough
         case (.pending, .pending): fallthrough
-        case (.superceded, .superceded):
+        case (.superseded, .superseded):
             return true
         case (.error(let error), .error(let error2)):
             return error == error2
@@ -174,7 +174,7 @@ import Realm.Private
         case .complete:
             return .complete
         case .superseded:
-            return .superceded
+            return .superseded
         case .error:
             return .error(rlmSyncSubscriptionSet.error!)
         @unknown default:
@@ -300,7 +300,7 @@ import Realm.Private
 
      - warning: This method may only be called during a write subscription block.
      - warning: Removing all subscriptions will result in an error if no new subscription is added. Server should
-              acknowledge at least one subscription.
+                acknowledge at least one subscription.
      */
     public func removeAll() {
         rlmSyncSubscriptionSet.removeAllSubscriptions()

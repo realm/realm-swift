@@ -54,9 +54,9 @@
     if (syncConfiguration.customFileURL) {
         self.config.path = syncConfiguration.customFileURL.path.UTF8String;
     } else if (self.config.sync_config->flx_sync_requested) {
-        self.config.path = [user pathForValue:"default"];
+        self.config.path = [user pathForPartitionValue:"default"];
     } else {
-        self.config.path = [user pathForValue:self.config.sync_config->partition_value];
+        self.config.path = [user pathForPartitionValue:self.config.sync_config->partition_value];
     }
 
     [self updateSchemaMode];

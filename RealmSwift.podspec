@@ -26,8 +26,7 @@ Pod::Spec.new do |s|
 
   s.dependency 'Realm', "= #{s.version}"
   s.source_files = 'RealmSwift/*.swift', 'RealmSwift/Impl/*.swift'
-  s.exclude_files = 'RealmSwift/Nonsync.swift',
-                    'RealmSwift/SyncSubscription.swift'
+  s.exclude_files = 'RealmSwift/Nonsync.swift'
 
   s.pod_target_xcconfig = { 'APPLICATION_EXTENSION_API_ONLY' => 'YES' }
 end
