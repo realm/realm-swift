@@ -722,19 +722,23 @@ class MigrationTests: TestCase {
         }
 
         migrateAndTestDefaultRealm { migration, _ in
-            migration.create("SwiftStringObject", value: ["string"])
-            migration.create("SwiftStringObject", value: ["stringCol": "string"])
+            migration.create("SwiftStringObject", value: ["string1"])
+            migration.create("SwiftStringObject", value: ["stringCol": "string2"])
+            migration.create("SwiftStringObject", value: ["stringCol": ModernStringEnum.value1])
+            migration.create("SwiftStringObject", value: ["stringCol": StringWrapper(persistedValue: "string3")])
             migration.create("SwiftStringObject")
 
             self.assertThrows(migration.create("NoSuchObject", value: []))
         }
 
         let objects = try! Realm().objects(SwiftStringObject.self)
-        XCTAssertEqual(objects.count, 3)
+        XCTAssertEqual(objects.count, 5)
 
-        XCTAssertEqual(objects[0].stringCol, "string")
-        XCTAssertEqual(objects[1].stringCol, "string")
-        XCTAssertEqual(objects[2].stringCol, "")
+        XCTAssertEqual(objects[0].stringCol, "string1")
+        XCTAssertEqual(objects[1].stringCol, "string2")
+        XCTAssertEqual(objects[2].stringCol, ModernStringEnum.value1.rawValue)
+        XCTAssertEqual(objects[3].stringCol, "string3")
+        XCTAssertEqual(objects[4].stringCol, "")
     }
 
     func testDelete() {

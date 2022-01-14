@@ -429,11 +429,7 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
             if (RLMRealm *realm = RLMGetThreadLocalCachedRealmForPath(config.path, cacheKey)) {
                 auto const& old_config = realm->_realm->config();
                 if (old_config.immutable() != config.immutable()
-#ifdef REALM_SPM
                     || old_config.read_only() != config.read_only()) {
-#else
-                    || old_config.read_only_alternative() != config.read_only_alternative()) {
-#endif // REALM_SPM
                     @throw RLMException(@"Realm at path '%s' already opened with different read permissions", config.path.c_str());
                 }
                 if (old_config.in_memory != config.in_memory) {
@@ -709,79 +705,6 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
         @throw RLMException(ex);
     }
 }
-
-#ifdef REALM_ASYNC_WRITES
-
-- (BOOL)inAsyncWriteTransaction {
-    return _realm->is_in_async_transaction();
-}
-
-- (RLMAsyncTransactionId)beginAsyncWriteTransaction:(void(^)())block {
-    try {
-        _realm->async_begin_transaction(block);
-    }
-    catch (std::exception &ex) {
-        @throw RLMException(ex);
-    }
-}
-
-- (RLMAsyncTransactionId)commitAsyncWriteTransaction {
-    try {
-        return _realm->async_commit_transaction();
-    }
-    catch (...) {
-        RLMRealmTranslateException(nil);
-        return 0;
-    }
-}
-
-- (RLMAsyncTransactionId)commitAsyncWriteTransaction:(void(^)())completionBlock error:(NSError **)error {
-    try {
-        return _realm->async_commit_transaction(completionBlock);
-    }
-    catch (...) {
-        RLMRealmTranslateException(error);
-        return 0;
-    }
-}
-
-- (RLMAsyncTransactionId)commitAsyncWriteTransaction:(nullable void(^)())completionBlock isGroupingAllowed:(BOOL)isGroupingAllowed error:(NSError **)error {
-    try {
-        if (completionBlock) {
-            return _realm->async_commit_transaction(completionBlock, isGroupingAllowed);
-        }
-        return _realm->async_commit_transaction(nullptr, isGroupingAllowed);
-    }
-    catch (...) {
-        RLMRealmTranslateException(error);
-        return 0;
-    }
-}
-
-- (void)cancelAsyncTransaction:(RLMAsyncTransactionId)asyncTransactionId {
-    try {
-        _realm->async_cancel_transaction(asyncTransactionId);
-    }
-    catch (std::exception &ex) {
-        @throw RLMException(ex);
-    }
-}
-
-- (RLMAsyncTransactionId)asyncTransactionWithBlock:(void(^)())block onComplete:(nullable void(^)())completionBlock error:(NSError **)error {
-    return [self beginAsyncWriteTransaction:^{
-        block();
-        [self commitAsyncWriteTransaction:completionBlock error:error];
-    }];
-}
-
-- (RLMAsyncTransactionId)asyncTransactionWithBlock:(void(^)())block {
-    return [self beginAsyncWriteTransaction:^{
-        block();
-        [self commitAsyncWriteTransaction];
-    }];
-}
-
-#endif // REALM_ASYNC_WRITES
 
 - (void)invalidate {
     if (_realm->is_in_transaction()) {

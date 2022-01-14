@@ -30,6 +30,7 @@ identifier_name:
     - _rlmCollection()
     - _rlmDefaultValue()
     - _rlmFromObjc(_:)
+    - _rlmFromObjc(_:insideOptional:)
     - _rlmGetProperty(_:_:)
     - _rlmGetPropertyOptional(_:_:)
     - _rlmKeyPathRecorder(with:)
@@ -44,9 +45,6 @@ identifier_name:
     - id
     - pk
     - to
-type_name:
-  excluded:
-    - _RealmValue
 disabled_rules:
   - block_based_kvo
   # SwiftLint considers 'Realm' and 'Realm.Private' to be duplicate imports

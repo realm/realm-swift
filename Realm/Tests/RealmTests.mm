@@ -1543,7 +1543,6 @@
 
 - (void)testAsyncTransactionShouldNotAutoCommitOnCanceledTransaction {
     RLMRealm *realm = RLMRealm.defaultRealm;
-//    XCTestExpectation *asyncComplete = [self expectationWithDescription:@"async transaction complete"];
     XCTestExpectation *waitComplete = [self expectationWithDescription:@"async wait complete"];
     XCTestExpectation *writeComplete = [self expectationWithDescription:@"async transaction complete"];
     writeComplete.inverted = YES;
