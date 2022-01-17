@@ -31,6 +31,7 @@
 #import <realm/sync/config.hpp>
 
 NSString *const RLMSyncErrorDomain = @"io.realm.sync";
+NSString *const RLMFlexibleSyncErrorDomain = @"io.realm.sync.flx";
 NSString *const RLMSyncAuthErrorDomain = @"io.realm.sync.auth";
 NSString *const RLMAppErrorDomain = @"io.realm.app";
 

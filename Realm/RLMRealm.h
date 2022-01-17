@@ -702,6 +702,8 @@ NS_REFINED_FOR_SWIFT;
  for this realm, which can be used to add/remove/update and search flexible sync subscriptions.
  Getting the subscriptions from a local or partition-based configured realm will return a nil subscription
  set.
+
+ @warning This feature is currently in beta and its API is subject to change.
  */
 @property (nonatomic, readonly, nonnull) RLMSyncSubscriptionSet *subscriptions;
 

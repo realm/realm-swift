@@ -37,6 +37,11 @@ extern NSString *const kRLMSyncErrorActionTokenKey;
 extern NSString *const RLMSyncErrorDomain;
 
 /**
+ The error domain string for all SDK errors related to flexible sync.
+ */
+extern NSString *const RLMFlexibleSyncErrorDomain;
+
+/**
  The error domain string for all SDK errors related to the authentication
  endpoint.
  */

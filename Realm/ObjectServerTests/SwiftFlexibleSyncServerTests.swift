@@ -1254,11 +1254,7 @@ extension SwiftFlexibleSyncServerTests {
             }
         }
     }
-
-
-
 }
-
 
 #endif // canImport(_Concurrency)
 #endif // os(macOS)

@@ -65,11 +65,6 @@ import Realm.Private
         self._rlmSyncSubscription = rlmSyncSubscription
     }
 
-    /// Identifier of the subscription.
-    public var id: ObjectId {
-        try! ObjectId(string: _rlmSyncSubscription.identifier.stringValue)
-    }
-
     /// Name of the subscription, if not specified it will return the value in Query as a String.
     public var name: String? {
         _rlmSyncSubscription.name
@@ -167,6 +162,7 @@ import Realm.Private
         })
     }
 
+    /// Returns the current state for the subscription set.
     public var state: SyncSubscriptionState {
         switch rlmSyncSubscriptionSet.state {
         case .pending:

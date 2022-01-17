@@ -23,8 +23,8 @@
 #pragma mark - Subscription States
 
 /// The current state of the subscription. This can be used for ensuring that
-/// the subscriptions are not errored and that it has been successefully
-/// sync'd to the server.
+/// the subscriptions are not errored and that it has been successfully
+/// synced to the server.
 typedef NS_ENUM(NSUInteger, RLMSyncSubscriptionState) {
     /// The subscription is complete and the server has sent all the data that matched the subscription
     /// queries at the time the subscription set was updated. The server is now in a steady-state
@@ -51,9 +51,6 @@ NS_ASSUME_NONNULL_BEGIN
  subscription set, which can be used to read or remove/update a committed subscription.
  */
 @interface RLMSyncSubscription : NSObject
-
-/// Identifier of the subscription.
-@property (nonatomic, readonly) RLMObjectId *identifier;
 
 /// Name of the subscription. If not specified it will return nil.
 @property (nonatomic, readonly, nullable) NSString *name;
@@ -108,8 +105,7 @@ NS_ASSUME_NONNULL_BEGIN
 /// state of the subscription set is `RLMSyncSubscriptionStateError`.
 @property (nonatomic, readonly, nullable) NSError *error;
 
-/// Gets the error associated to the subscription set, this will return a no nil in case the current
-/// state of the subscription set is `RLMSyncSubscriptionStateError`.
+/// Gets the state associated to the subscription set.
 @property (nonatomic, readonly) RLMSyncSubscriptionState state;
 
 #pragma mark - Batch Update subscriptions

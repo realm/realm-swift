@@ -26,6 +26,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface RLMSyncSubscription ()
 
+@property (nonatomic, readonly) RLMObjectId *identifier;
+
 @property (nonatomic, readonly) NSString *queryString;
 
 @property (nonatomic, readonly) NSString *objectClassName;
@@ -50,8 +52,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) uint64_t version;
 
 #pragma mark - Properties
-
-- (void)verifyInWriteTransaction;
 
 - (void)addSubscriptionWithClassName:(NSString *)objectClassName
                     subscriptionName:(nullable NSString *)name
