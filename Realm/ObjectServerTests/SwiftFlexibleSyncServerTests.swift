@@ -804,7 +804,7 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
             if error == nil {
                 ex.fulfill()
             } else {
-                XCTFail()
+                XCTFail("Subscription Set could not complete with \(error!)")
             }
         })
 
@@ -851,7 +851,7 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
             if error == nil {
                 ex.fulfill()
             } else {
-                XCTFail()
+                XCTFail("Subscription Set could not complete with \(error!)")
             }
         })
         waitForExpectations(timeout: 20.0, handler: nil)
@@ -894,13 +894,13 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
                     $0.intCol == 1 && $0.stringCol == "\(#function)"
                 }
             }
-        }) { error in
+        }, onComplete: { error in
             if error == nil {
                 ex.fulfill()
             } else {
-                XCTFail()
+                XCTFail("Subscription Set could not complete with \(error!)")
             }
-        }
+        })
         waitForExpectations(timeout: 20.0, handler: nil)
 
         waitForDownloads(for: realm)
@@ -914,7 +914,7 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
             if error == nil {
                 ex2.fulfill()
             } else {
-                XCTFail()
+                XCTFail("Subscription Set could not complete with \(error!)")
             }
         })
         waitForExpectations(timeout: 20.0, handler: nil)
@@ -961,7 +961,7 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
             if error == nil {
                 ex.fulfill()
             } else {
-                XCTFail()
+                XCTFail("Subscription Set could not complete with \(error!)")
             }
         })
 
@@ -983,7 +983,7 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
             if error == nil {
                 ex2.fulfill()
             } else {
-                XCTFail()
+                XCTFail("Subscription Set could not complete with \(error!)")
             }
         })
         waitForExpectations(timeout: 20.0, handler: nil)
@@ -1033,7 +1033,7 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
             if error == nil {
                 ex.fulfill()
             } else {
-                XCTFail()
+                XCTFail("Subscription Set could not complete with \(error!)")
             }
         })
         waitForExpectations(timeout: 20.0, handler: nil)
@@ -1049,7 +1049,7 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
             if error == nil {
                 ex2.fulfill()
             } else {
-                XCTFail()
+                XCTFail("Subscription Set could not complete with \(error!)")
             }
         })
         waitForExpectations(timeout: 20.0, handler: nil)
@@ -1088,7 +1088,7 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
             if error == nil {
                 ex.fulfill()
             } else {
-                XCTFail()
+                XCTFail("Subscription Set could not complete with \(error!)")
             }
         })
         waitForExpectations(timeout: 20.0, handler: nil)
@@ -1110,7 +1110,7 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
             if error == nil {
                 ex2.fulfill()
             } else {
-                XCTFail()
+                XCTFail("Subscription Set could not complete with \(error!)")
             }
         })
         waitForExpectations(timeout: 20.0, handler: nil)
@@ -1151,7 +1151,7 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
             if error == nil {
                 ex.fulfill()
             } else {
-                XCTFail()
+                XCTFail("Subscription Set could not complete with \(error!)")
             }
         })
         waitForExpectations(timeout: 20.0, handler: nil)
@@ -1174,7 +1174,7 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
             if error == nil {
                 ex2.fulfill()
             } else {
-                XCTFail()
+                XCTFail("Subscription Set could not complete with \(error!)")
             }
         })
         waitForExpectations(timeout: 20.0, handler: nil)
@@ -1249,8 +1249,8 @@ extension SwiftFlexibleSyncServerTests {
             }
             XCTFail("Invalid query should have failed")
         } catch {
-            guard case .error(_) = subscriptions.state else {
-                return XCTFail()
+            guard case .error = subscriptions.state else {
+                return XCTFail("Writing a subscription should not failed")
             }
         }
     }

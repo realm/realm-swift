@@ -38,11 +38,9 @@ import Realm.Private
     /// the subscription set to write a subscription.
     case superseded
 
-    public static func ==(lhs: SyncSubscriptionState, rhs: SyncSubscriptionState) -> Bool {
+    public static func == (lhs: SyncSubscriptionState, rhs: SyncSubscriptionState) -> Bool {
         switch (lhs, rhs) {
-        case (.complete, .complete): fallthrough
-        case (.pending, .pending): fallthrough
-        case (.superseded, .superseded):
+        case (.complete, .complete), (.pending, .pending), (.superseded, .superseded):
             return true
         case (.error(let error), .error(let error2)):
             return error == error2
