@@ -177,6 +177,7 @@
     @autoreleasepool { XCTAssertEqualObjects(RLMRealm.defaultRealm.configuration.fileURL, config.fileURL); }
 
     config.inMemoryIdentifier = NSUUID.UUID.UUIDString;
+    config.encryptionKey = nil;
     RLMRealmConfiguration.defaultConfiguration = config;
     @autoreleasepool {
         RLMRealm *realm = RLMRealm.defaultRealm;

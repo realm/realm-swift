@@ -1234,6 +1234,7 @@ private class CombineCollectionPublisherTests<Collection: RealmCollection>: Comb
             .collect()
             .assertNoFailure()
             .sink { arr in
+                XCTAssertEqual(arr.count, 10)
                 for (i, collection) in arr.enumerated() {
                     XCTAssertTrue(collection.isFrozen)
                     XCTAssertEqual(collection.count, i)
@@ -1257,6 +1258,7 @@ private class CombineCollectionPublisherTests<Collection: RealmCollection>: Comb
             .prefix(10)
             .collect()
             .sink { arr in
+                XCTAssertEqual(arr.count, 10)
                 for (i, change) in arr.enumerated() {
                     self.checkChangeset(change, calls: i, frozen: true)
                 }
@@ -1279,6 +1281,7 @@ private class CombineCollectionPublisherTests<Collection: RealmCollection>: Comb
             .collect()
             .assertNoFailure()
             .sink { arr in
+                XCTAssertEqual(arr.count, 10)
                 for (i, change) in arr.enumerated() {
                     self.checkChangeset(change, calls: i, frozen: true)
                 }
