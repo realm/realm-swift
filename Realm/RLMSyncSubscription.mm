@@ -216,7 +216,7 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
     if (errorMessage.length == 0) {
         return nil;
     }
-    return [[NSError alloc] initWithDomain:RLMFlexibleSyncErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey: errorMessage}];
+    return [[NSError alloc] initWithDomain:RLMFlexibleSyncErrorDomain code:RLMFlexibleSyncErrorStatusError userInfo:@{NSLocalizedDescriptionKey: errorMessage}];
 }
 
 - (RLMSyncSubscriptionState)state {
@@ -254,7 +254,7 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
         self->_isInWriteTransaction = false;
     }
     catch (const std::exception& error) {
-        NSError *err = [[NSError alloc] initWithDomain:RLMFlexibleSyncErrorDomain code:-1 userInfo:@{@"reason":@(error.what())}];
+        NSError *err = [[NSError alloc] initWithDomain:RLMFlexibleSyncErrorDomain code:RLMFlexibleSyncErrorCommitSubscriptionError userInfo:@{@"reason":@(error.what())}];
         return completionBlock(err);
     }
     _subscriptionSet->get_state_change_notification(realm::sync::SubscriptionSet::State::Complete)

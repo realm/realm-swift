@@ -54,6 +54,15 @@
     XCTAssertNil(realm.subscriptions);
 }
 
+- (void)testFlexibleSyncRealmFilePath {
+    RLMUser *user = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd)
+                                                                        register:YES
+                                                                             app:self.flexibleSyncApp]
+                                              app:self.flexibleSyncApp];
+    RLMRealmConfiguration *config = [user flexibleSyncConfiguration];
+    XCTAssertTrue([config.fileURL.path hasSuffix:([NSString stringWithFormat:@"mongodb-realm/%@/%@/flx_sync_default.realm", self.flexibleSyncAppId, user.identifier])]);
+}
+
 - (void)testGetSubscriptionsWhenFlexibleSync {
     RLMRealm *realm = [self openFlexibleSyncRealm:_cmd];
     RLMSyncSubscriptionSet *subs = realm.subscriptions;

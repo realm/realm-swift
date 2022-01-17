@@ -132,7 +132,6 @@ struct CallbackLogger : public realm::util::RootLogger {
         config.user_agent_application_info = RLMStringDataWithNSString(appId);
     }
 
-    config.log_level = Level::trace;
     return config;
 }
 

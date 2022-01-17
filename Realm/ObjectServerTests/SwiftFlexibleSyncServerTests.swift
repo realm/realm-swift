@@ -51,6 +51,12 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
         assertThrows(realm.subscriptions)
     }
 
+    func testFlexibleSyncPath() throws {
+        let user = try logInUser(for: basicCredentials(app: flexibleSyncApp), app: flexibleSyncApp)
+        let config = user.flexibleSyncConfiguration()
+        XCTAssertTrue(config.fileURL!.path.hasSuffix("mongodb-realm/\(flexibleSyncAppId)/\(user.id)/flx_sync_default.realm"))
+    }
+
     func testGetSubscriptions() throws {
         let realm = try openFlexibleSyncRealm()
         let subscriptions = realm.subscriptions

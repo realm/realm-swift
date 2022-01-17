@@ -31,6 +31,7 @@
 #import <realm/object-store/sync/sync_session.hpp>
 #import <realm/object-store/sync/sync_user.hpp>
 #import <realm/object-store/util/bson/bson.hpp>
+#import <realm/util/optional.hpp>
 
 using namespace realm;
 
@@ -138,6 +139,15 @@ using namespace realm;
     }
 
     return path;
+}
+
+- (std::string)pathForFlexibleSync {
+    if (!_user) {
+        return "";
+    }
+
+    SyncConfig config(_user, SyncConfig::FLXSyncEnabled{});
+    return _user->sync_manager()->path_for_realm(config, realm::none);
 }
 
 - (nullable RLMSyncSession *)sessionForPartitionValue:(id<RLMBSON>)partitionValue {

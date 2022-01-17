@@ -314,9 +314,9 @@ import Realm.Private
     // MARK: Subscription Retrieval
 
     /**
-     Returns the subscription at the given `index`.
+     Returns the subscription at the given `position`.
 
-     - parameter index: The index.
+     - parameter position: The index for the resulting subscription.
      */
     public subscript(position: Int) -> SyncSubscription? {
         throwForNegativeIndex(position)
