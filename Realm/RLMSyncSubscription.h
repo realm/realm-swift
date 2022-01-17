@@ -129,10 +129,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)write:(__attribute__((noescape)) void(^)(void))block onComplete:(void(^)(NSError * _Nullable))onComplete;
 
-#pragma mark - Check Subscription State
-
-typedef void(^RLMSyncSubscriptionStateBlock)(RLMSyncSubscriptionState state, NSError *);
-
 #pragma mark - Find subscription
 
 /**
