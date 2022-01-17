@@ -98,9 +98,11 @@ import Realm.Private
  can be added/remove or updated within a write subscription transaction.
  */
 @frozen public struct QuerySubscription<ObjectType: _RealmSchemaDiscoverable> {
+    // MARK: Private
+    private let query: QueryFunction
+
     // MARK: Internal
     fileprivate let name: String?
-    private let query: QueryFunction
 
     fileprivate var className: String {
         return "\(ObjectType.self)"
@@ -110,7 +112,15 @@ import Realm.Private
         return query(Query()).predicate
     }
 
+    /// :nodoc:
     public typealias QueryFunction = (Query<ObjectType>) -> Query<Bool>
+
+    /**
+     Creates a `QuerySubscription` for the given type.
+
+     - parameter name: Name of the subscription.
+     - parameter query: The query for the subscription.
+     */
     public init(name: String? = nil, query: @escaping QueryFunction) {
         self.name = name
         self.query = query
@@ -118,7 +128,14 @@ import Realm.Private
 }
 
 #if swift(>=5.5)
+/**
+ Result builder which allows to add more than one query to a subscription,
+ within an `append` or `remove` block.
+ */
 @resultBuilder public struct QueryBuilder {
+    /**
+     /// Builds an array of subscriptions of the same `Object` type, from the block.
+     */
     public static func buildBlock<T: _RealmSchemaDiscoverable>(_ components: QuerySubscription<T>...) -> [QuerySubscription<T>] {
         return components
     }
@@ -343,6 +360,9 @@ extension SyncSubscriptionSet: Sequence {
     }
 }
 
+/**
+ This struct enables sequence-style enumeration for `SyncSubscriptionSet`.
+ */
 @frozen public struct SyncSubscriptionSetIterator: IteratorProtocol {
     private let rlmSubscriptionSet: RLMSyncSubscriptionSet
     private var index: Int = -1
