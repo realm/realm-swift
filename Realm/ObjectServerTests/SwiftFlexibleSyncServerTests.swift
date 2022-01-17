@@ -1022,6 +1022,7 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
 
         let ex = expectation(description: "state change complete")
         subscriptions.write({
+            #if swift(>=5.5)
             subscriptions.append {
                 QuerySubscription<SwiftPerson>(name: "person_age_5") {
                     $0.age > 20 && $0.firstName == "\(#function)"
@@ -1030,6 +1031,18 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
                     $0.lastName == "lastname_1" && $0.firstName == "\(#function)"
                 }
             }
+            #else
+            subscriptions.append {
+                QuerySubscription<SwiftPerson>(name: "person_age_5") {
+                    $0.age > 20 && $0.firstName == "\(#function)"
+                }
+            }
+            subscriptions.append {
+                QuerySubscription<SwiftPerson>(name: "person_age_10") {
+                    $0.lastName == "lastname_1" && $0.firstName == "\(#function)"
+                }
+            }
+            #endif // swift(>=5.5)
             subscriptions.append {
                 QuerySubscription<SwiftTypesSyncObject>(name: "swift_object_equal_1") {
                     $0.intCol == 1 && $0.stringCol == "\(#function)"
