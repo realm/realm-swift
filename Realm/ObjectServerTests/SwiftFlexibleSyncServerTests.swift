@@ -1241,7 +1241,7 @@ extension SwiftFlexibleSyncServerTests {
     func testStates() async throws {
         var config = (try await self.flexibleSyncApp.login(credentials: .anonymous))
             .flexibleSyncConfiguration()
-        config.objectTypes = [SwiftPerson.self, Dog.self]
+        config.objectTypes = [SwiftPerson.self, SwiftTypesSyncObject.self]
         let realm = try await Realm(configuration: config)
         XCTAssertNotNil(realm)
 
@@ -1256,20 +1256,25 @@ extension SwiftFlexibleSyncServerTests {
                 }
             }
         }
-        XCTAssertEqual(subscriptions.state, .pending)
+        XCTAssertEqual(subscriptions.state, .complete)
         // should error
         do {
             try await subscriptions.write {
                 subscriptions.append {
-                    QuerySubscription<SwiftPerson>(name: "person_id") {
-                        $0._id == ObjectId()
+                    QuerySubscription<SwiftTypesSyncObject>(name: "swiftObject_longCol") {
+                        $0.longCol == Int64(1)
                     }
                 }
             }
             XCTFail("Invalid query should have failed")
-        } catch {
+        } catch let error {
+            if let error = error as NSError? {
+                XCTAssertTrue(error.domain == RLMFlexibleSyncErrorDomain)
+                XCTAssertTrue(error.code == 2)
+            }
+
             guard case .error = subscriptions.state else {
-                return XCTFail("Writing a subscription should not failed")
+                return XCTFail("Adding a query for a not queryable field should change the subscription set state to error")
             }
         }
     }

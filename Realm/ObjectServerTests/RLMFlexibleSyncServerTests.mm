@@ -703,7 +703,7 @@
                                                       firstName:[NSString stringWithFormat:@"firstname_%d", i]
                                                        lastName:[NSString stringWithFormat:@"lastname_%d", i]];
             person.partition = NSStringFromSelector(_cmd);
-            [realm addObject: person];
+            [realm addObject:person];
         }
     }];
     RLMRealm *realm = [self getFlexibleSyncRealm:_cmd];
@@ -763,7 +763,7 @@
                                              breed:@"Labradoodle"
                                               name:@"Tom"];
         dog.partition = NSStringFromSelector(_cmd);
-        [realm addObject: dog];
+        [realm addObject:dog];
     }];
 
     RLMRealm *realm = [self getFlexibleSyncRealm:_cmd];
@@ -798,7 +798,7 @@
                                              breed:@"Labradoodle"
                                               name:@"Tom"];
         dog.partition = NSStringFromSelector(_cmd);
-        [realm addObject: dog];
+        [realm addObject:dog];
     }];
 
     RLMRealm *realm = [self getFlexibleSyncRealm:_cmd];
@@ -838,7 +838,7 @@
                                              breed:@"Labradoodle"
                                               name:@"Tom"];
         dog.partition = NSStringFromSelector(_cmd);
-        [realm addObject: dog];
+        [realm addObject:dog];
     }];
 
     RLMRealm *realm = [self getFlexibleSyncRealm:_cmd];
@@ -881,7 +881,7 @@
                                              breed:@"Labradoodle"
                                               name:@"Tom"];
         dog.partition = NSStringFromSelector(_cmd);
-        [realm addObject: dog];
+        [realm addObject:dog];
     }];
 
     RLMRealm *realm = [self getFlexibleSyncRealm:_cmd];
@@ -955,7 +955,7 @@
                                              breed:@"Labradoodle"
                                               name:@"Tom"];
         dog.partition = NSStringFromSelector(_cmd);
-        [realm addObject: dog];
+        [realm addObject:dog];
     }];
 
     RLMRealm *realm = [self getFlexibleSyncRealm:_cmd];

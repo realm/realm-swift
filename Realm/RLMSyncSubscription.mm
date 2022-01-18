@@ -254,16 +254,25 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
         self->_isInWriteTransaction = false;
     }
     catch (const std::exception& error) {
-        NSError *err = [[NSError alloc] initWithDomain:RLMFlexibleSyncErrorDomain code:RLMFlexibleSyncErrorCommitSubscriptionError userInfo:@{@"reason":@(error.what())}];
+        _subscriptionSet->refresh();
+        NSError *err = [[NSError alloc] initWithDomain:RLMFlexibleSyncErrorDomain code:RLMFlexibleSyncErrorCommitSubscriptionSetError userInfo:@{@"reason":@(error.what())}];
         return completionBlock(err);
     }
     _subscriptionSet->get_state_change_notification(realm::sync::SubscriptionSet::State::Complete)
-        .get_async([completionBlock](realm::StatusWith<realm::sync::SubscriptionSet::State> state) mutable noexcept {
-            if (state.is_ok()) {
-                completionBlock(nil);
-            } else {
-                NSError* error = [[NSError alloc] initWithDomain:RLMFlexibleSyncErrorDomain code:state.get_status().code() userInfo:@{@"reason": @(state.get_status().reason().c_str())}];
-                completionBlock(error);
+        .get_async([completionBlock, self](realm::StatusWith<realm::sync::SubscriptionSet::State> state) mutable noexcept {
+            try {
+                _subscriptionSet->refresh();
+                if (state.is_ok()) {
+                    completionBlock(nil);
+                } else {
+                    NSError* error = [[NSError alloc] initWithDomain:RLMFlexibleSyncErrorDomain code:state.get_status().code() userInfo:@{@"reason": @(state.get_status().reason().c_str())}];
+                    completionBlock(error);
+                }
+            }
+            catch (const std::exception& error) {
+                _subscriptionSet->refresh();
+                NSError *err = [[NSError alloc] initWithDomain:RLMFlexibleSyncErrorDomain code:RLMFlexibleSyncErrorRefreshSubscriptionSetError userInfo:@{@"reason":@(error.what())}];
+                return completionBlock(err);
             }
         });
 }

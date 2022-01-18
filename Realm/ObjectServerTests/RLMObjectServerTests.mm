@@ -604,12 +604,6 @@ static NSString *randomEmail() {
     XCTAssertTrue(realm.isEmpty);
 }
 
-- (void)testOpenRealmWithNilPartitionValue {
-    RLMUser *user = [self userForTest:_cmd];
-    RLMRealm *realm = [self openRealmForPartitionValue:nil user:user];
-    XCTAssertTrue(realm.isEmpty);
-}
-
 /// If client B adds objects to a synced Realm, client A should see those objects.
 - (void)testAddObjects {
     RLMRealm *realm = [self realmForTest:_cmd];
@@ -645,18 +639,18 @@ static NSString *randomEmail() {
 - (void)testAddObjectsWithNilPartitionValue {
     RLMRealm *realm = [self openRealmForPartitionValue:nil user:self.anonymousUser];
 
+    // Other tests expect the nil partition to be empty so we need to clean up
+    [realm transactionWithBlock:^{
+        [realm deleteAllObjects];
+    }];
+    [self waitForUploadsForRealm:realm];
+
     CHECK_COUNT(0, Person, realm);
     [self writeToPartition:nil userName:NSStringFromSelector(_cmd) block:^(RLMRealm *realm) {
         [realm addObjects:@[[Person john], [Person paul], [Person george], [Person ringo]]];
     }];
     [self waitForDownloadsForRealm:realm];
     CHECK_COUNT(4, Person, realm);
-
-    // Other tests expect the nil partition to be empty so we need to clean up
-    [realm transactionWithBlock:^{
-        [realm deleteAllObjects];
-    }];
-    [self waitForUploadsForRealm:realm];
 }
 
 - (void)testRountripForDistinctPrimaryKey {

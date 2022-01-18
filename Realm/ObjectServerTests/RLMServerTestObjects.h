@@ -28,7 +28,6 @@
 @end
 
 @interface Person : RLMObject
-
 @property RLMObjectId *_id;
 @property NSInteger age;
 @property NSString *firstName;
@@ -41,7 +40,6 @@
 + (instancetype)ringo;
 + (instancetype)george;
 + (instancetype)stuart;
-
 @end
 
 @interface HugeSyncObject : RLMObject
@@ -127,7 +125,6 @@ RLM_COLLECTION_TYPE(Person);
 @property RLMSet<RLMValue> *otherAnySet;
 @property RLM_GENERIC_SET(Person) *otherObjectSet;
 @end
-
 
 @interface RLMDictionarySyncObject : RLMObject
 @property RLMObjectId *_id;

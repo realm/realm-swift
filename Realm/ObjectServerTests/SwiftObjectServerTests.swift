@@ -54,16 +54,6 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
     }
 
-    func testBasicSwiftSyncWithNilPartitionValue() {
-        do {
-            let user = try logInUser(for: basicCredentials())
-            let realm = try openRealm(partitionValue: .null, user: user)
-            XCTAssert(realm.isEmpty, "Freshly synced Realm was not empty...")
-        } catch {
-            XCTFail("Got an error: \(error)")
-        }
-    }
-
     /// If client B adds objects to a Realm, client A should see those new objects.
     func testSwiftAddObjects() {
         do {

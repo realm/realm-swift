@@ -153,8 +153,11 @@ typedef RLM_ERROR_ENUM(NSInteger, RLMFlexibleSyncError, RLMFlexibleSyncErrorDoma
     /// An error describing why the subscription set synchronization failed.
     RLMFlexibleSyncErrorStatusError     = 1,
 
-    /// An error that indicates an error while committing a subscription write.
-    RLMFlexibleSyncErrorCommitSubscriptionError     = 2,
+    /// An error while committing a subscription write.
+    RLMFlexibleSyncErrorCommitSubscriptionSetError     = 2,
+
+    /// An error while refreshing the subscription set state.
+    RLMFlexibleSyncErrorRefreshSubscriptionSetError     = 3,
 };
 
 /// An error which is related to authentication to MongoDB Realm.
