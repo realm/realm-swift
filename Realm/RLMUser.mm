@@ -26,6 +26,7 @@
 #import "RLMRealmConfiguration+Sync.h"
 #import "RLMSyncConfiguration_Private.hpp"
 #import "RLMSyncSession_Private.hpp"
+#import "RLMUtil.hpp"
 
 #import <realm/object-store/sync/sync_manager.hpp>
 #import <realm/object-store/sync/sync_session.hpp>
@@ -143,7 +144,7 @@ using namespace realm;
 
 - (std::string)pathForFlexibleSync {
     if (!_user) {
-        return "";
+        @throw RLMException(@"This is an exceptional state, `RLMUser` cannot be initialised without a reference to `SyncUser`");
     }
 
     SyncConfig config(_user, SyncConfig::FLXSyncEnabled{});

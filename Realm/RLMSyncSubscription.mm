@@ -268,14 +268,6 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
         });
 }
 
-typedef void(^RLMSyncSubscriptionCallback)(NSError * _Nullable error);
-
-- (BOOL)writeAsync:(__attribute__((noescape)) void(^)(void))block
-          callback:(RLMSyncSubscriptionCallback)callback {
-    [NSException raise:@"NotImplemented" format:@"Needs Implementation"];
-    return NULL;
-}
-
 #pragma mark - Find subscription
 
 - (nullable RLMSyncSubscription *)subscriptionWithName:(NSString *)name {

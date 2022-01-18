@@ -27,7 +27,7 @@
 - (NSString *)createAppWithQueryableFields:(NSArray *)queryableFields error:(NSError **)error;
 @end
 
-@interface RLMFlexibleSyncTests: RLMSyncTestCase
+@interface RLMFlexibleSyncTests : RLMSyncTestCase
 @end
 
 @implementation RLMFlexibleSyncTests
@@ -60,7 +60,8 @@
                                                                              app:self.flexibleSyncApp]
                                               app:self.flexibleSyncApp];
     RLMRealmConfiguration *config = [user flexibleSyncConfiguration];
-    XCTAssertTrue([config.fileURL.path hasSuffix:([NSString stringWithFormat:@"mongodb-realm/%@/%@/flx_sync_default.realm", self.flexibleSyncAppId, user.identifier])]);
+    NSString *expected = [NSString stringWithFormat:@"mongodb-realm/%@/%@/flx_sync_default.realm", self.flexibleSyncAppId, user.identifier];
+    XCTAssertTrue([config.fileURL.path hasSuffix:expected]);
 }
 
 - (void)testGetSubscriptionsWhenFlexibleSync {
@@ -689,7 +690,7 @@
 }
 @end
 
-@interface RLMFlexibleSyncServerTests: RLMSyncTestCase
+@interface RLMFlexibleSyncServerTests : RLMSyncTestCase
 @end
 
 @implementation RLMFlexibleSyncServerTests
