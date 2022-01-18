@@ -48,9 +48,11 @@ func hostMachineArch() -> String {
 }
 let testSwiftSettings: [SwiftSetting]?
 #if swift(>=5.4)
-testSwiftSettings = [.unsafeFlags(["-target", "\(hostMachineArch())-apple-macosx11.0"])]
+testSwiftSettings = [.unsafeFlags(["-target", "\(hostMachineArch())-apple-macosx11.0"]),
+                     .define("REALM_ASYNC_WRITES", .when(configuration: .debug)),
+]
 #else
-testSwiftSettings = nil
+testSwiftSettings = [.define("REALM_ASYNC_WRITES", .when(configuration: .debug))]
 #endif
 
 // SPM requires all targets to explicitly include or exclude every file, which

@@ -706,6 +706,79 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     }
 }
 
+#ifdef REALM_ASYNC_WRITES
+
+- (BOOL)inAsyncWriteTransaction {
+    return _realm->is_in_async_transaction();
+}
+
+- (RLMAsyncTransactionId)beginAsyncWriteTransaction:(void(^)())block {
+    try {
+        _realm->async_begin_transaction(block);
+    }
+    catch (std::exception &ex) {
+        @throw RLMException(ex);
+    }
+}
+
+- (RLMAsyncTransactionId)commitAsyncWriteTransaction {
+    try {
+        return _realm->async_commit_transaction();
+    }
+    catch (...) {
+        RLMRealmTranslateException(nil);
+        return 0;
+    }
+}
+
+- (RLMAsyncTransactionId)commitAsyncWriteTransaction:(void(^)())completionBlock error:(NSError **)error {
+    try {
+        return _realm->async_commit_transaction(completionBlock);
+    }
+    catch (...) {
+        RLMRealmTranslateException(error);
+        return 0;
+    }
+}
+
+- (RLMAsyncTransactionId)commitAsyncWriteTransaction:(nullable void(^)())completionBlock isGroupingAllowed:(BOOL)isGroupingAllowed error:(NSError **)error {
+    try {
+        if (completionBlock) {
+            return _realm->async_commit_transaction(completionBlock, isGroupingAllowed);
+        }
+        return _realm->async_commit_transaction(nullptr, isGroupingAllowed);
+    }
+    catch (...) {
+        RLMRealmTranslateException(error);
+        return 0;
+    }
+}
+
+- (void)cancelAsyncTransaction:(RLMAsyncTransactionId)asyncTransactionId {
+    try {
+        _realm->async_cancel_transaction(asyncTransactionId);
+    }
+    catch (std::exception &ex) {
+        @throw RLMException(ex);
+    }
+}
+
+- (RLMAsyncTransactionId)asyncTransactionWithBlock:(void(^)())block onComplete:(nullable void(^)())completionBlock error:(NSError **)error {
+    return [self beginAsyncWriteTransaction:^{
+        block();
+        [self commitAsyncWriteTransaction:completionBlock error:error];
+    }];
+}
+
+- (RLMAsyncTransactionId)asyncTransactionWithBlock:(void(^)())block {
+    return [self beginAsyncWriteTransaction:^{
+        block();
+        [self commitAsyncWriteTransaction];
+    }];
+}
+
+#endif // REALM_ASYNC_WRITES
+
 - (void)invalidate {
     if (_realm->is_in_transaction()) {
         NSLog(@"WARNING: An RLMRealm instance was invalidated during a write "
