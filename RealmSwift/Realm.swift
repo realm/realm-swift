@@ -380,8 +380,8 @@ public typealias AsyncTransactionId = RLMAsyncTransactionId
      Write  blocks for the multiple calls will be executed in order.
      */
     @discardableResult
-    public func writeAsync(_ block: @escaping (AsyncTransactionId) -> Void, _ onComplete: (() -> Void)? = nil) -> AsyncTransactionId {
-        beginAsyncWrite { asyncTransactionId in
+    public func writeAsync(_ block: @escaping (AsyncTransactionId) -> Void, _ onComplete: (() -> Void)? = nil) throws -> AsyncTransactionId {
+        try beginAsyncWrite { asyncTransactionId in
             block(asyncTransactionId)
             commitAsyncWrite(onComplete)
         }
@@ -403,7 +403,7 @@ public typealias AsyncTransactionId = RLMAsyncTransactionId
      write blocks.
      */
     @discardableResult
-    public func beginAsyncWrite(_ asyncWriteBlock: @escaping (AsyncTransactionId) -> Void) -> AsyncTransactionId {
+    public func beginAsyncWrite(_ asyncWriteBlock: @escaping (AsyncTransactionId) -> Void) throws -> AsyncTransactionId {
         var asyncTransactionId: AsyncTransactionId = 0
         asyncTransactionId = rlmRealm.beginAsyncWriteTransaction {
             asyncWriteBlock(asyncTransactionId)
@@ -430,7 +430,7 @@ public typealias AsyncTransactionId = RLMAsyncTransactionId
      - note Cancelling a commit will not abort the commit, it will only cancel the callback
      informing of commit completion.
     */
-    public func cancelAsyncWrite(_  asyncTransactionId: AsyncTransactionId) {
+    public func cancelAsyncWrite(_  asyncTransactionId: AsyncTransactionId) throws {
         rlmRealm.cancelAsyncTransaction(asyncTransactionId)
     }
 

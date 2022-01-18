@@ -227,7 +227,8 @@ let package = Package(
                 "Realm/RLMUserAPIKey.mm"
             ],
             publicHeadersPath: "include",
-            cxxSettings: cxxSettings
+            cxxSettings: cxxSettings,
+            swiftSettings: testSwiftSettings
         ),
         .target(
             name: "RealmSwift",
@@ -237,7 +238,9 @@ let package = Package(
                 "Nonsync.swift",
                 "RealmSwift-Info.plist",
                 "Tests",
-            ]
+            ],
+            cxxSettings: cxxSettings,
+            swiftSettings: testSwiftSettings
         ),
         .target(
             name: "RealmTestSupport",
@@ -267,7 +270,8 @@ let package = Package(
                 "SwiftUISyncTestHost",
                 "SwiftUISyncTestHostUITests"
             ],
-            cxxSettings: testCxxSettings
+            cxxSettings: testCxxSettings,
+            swiftSettings: testSwiftSettings
         ),
         .testTarget(
             name: "RealmObjcSwiftTests",

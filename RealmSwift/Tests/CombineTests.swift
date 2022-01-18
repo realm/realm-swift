@@ -2768,4 +2768,57 @@ class CombineProjectionPublisherTests: CombinePublisherTestCase {
     }
 }
 
+#if REALM_ASYNC_WRITES
+class CombineAsyncRealmTests: CombinePublisherTestCase {
+    func testWillChangeLocalWrite() {
+        let asyncWaitExpectation = expectation(description: "")
+        var called = false
+        cancellable = realm
+            .objectWillChange
+            .sink {
+                called = true
+                asyncWaitExpectation.fulfill()
+            }
+        
+        try! realm.writeAsync { _ in
+            self.realm.create(SwiftIntObject.self, value: [])
+        }
+        waitForExpectations(timeout: 1, handler: nil)
+        XCTAssertTrue(called)
+    }
+
+    func testWillChangeLocalWriteWithoutNotifying() {
+        var called = false
+        cancellable = realm
+            .objectWillChange
+            .saveToken(on: self, for: \.notificationToken)
+            .sink {
+            called = true
+        }
+
+        XCTAssertNotNil(notificationToken)
+        for _ in 0..<10 {
+            try! realm.writeAsync { _ in
+                self.realm.create(SwiftIntObject.self, value: [])
+            }
+            XCTAssertFalse(called)
+        }
+    }
+
+    func testWillChangeRemoteWrite() {
+        let exp = XCTestExpectation()
+        cancellable = realm.objectWillChange.sink {
+            exp.fulfill()
+        }
+        subscribeOnQueue.async {
+            let backgroundRealm = try! Realm(configuration: self.realm.configuration)
+            try! backgroundRealm.writeAsync { _ in
+                backgroundRealm.create(SwiftIntObject.self, value: [])
+            }
+        }
+        wait(for: [exp], timeout: 3)
+    }
+}
+#endif // REALM_ASYNC_WRITES
+
 #endif // canImport(Combine)
