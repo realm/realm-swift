@@ -38,7 +38,6 @@
 #import "RLMThreadSafeReference_Private.hpp"
 #import "RLMUpdateChecker.hpp"
 #import "RLMUtil.hpp"
-#import "RLMSyncSubscription_Private.hpp"
 
 #import <realm/disable_sync_to_disk.hpp>
 #import <realm/object-store/impl/realm_coordinator.hpp>
@@ -54,6 +53,7 @@
 #import "RLMSyncManager_Private.hpp"
 #import "RLMSyncSession_Private.hpp"
 #import "RLMSyncUtil_Private.hpp"
+#import "RLMSyncSubscription_Private.hpp"
 
 #import <realm/object-store/shared_realm.hpp>
 #import <realm/object-store/sync/async_open_task.hpp>
