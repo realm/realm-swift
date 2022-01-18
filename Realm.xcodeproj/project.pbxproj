@@ -457,6 +457,7 @@
 		ACB6FD35273C60CC0009712F /* SyncSubscription.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACB6FD34273C60CC0009712F /* SyncSubscription.swift */; };
 		ACB6FD36273C60FD0009712F /* SwiftFlexibleSyncServerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACB6FD31273C60920009712F /* SwiftFlexibleSyncServerTests.swift */; };
 		ACB6FD37273C61040009712F /* RLMFlexibleSyncServerTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = ACB6FD30273C60920009712F /* RLMFlexibleSyncServerTests.mm */; };
+		ACC6BEE42796B23D006C1728 /* RLMSyncSession.mm in Sources */ = {isa = PBXBuildFile; fileRef = 531F956927906EF300E497F1 /* RLMSyncSession.mm */; };
 		ACF08B6726DD936200686CBC /* Query.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACF08B6626DD936200686CBC /* Query.swift */; };
 		C042A48D1B7522A900771ED2 /* RealmConfigurationTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = C042A48C1B7522A900771ED2 /* RealmConfigurationTests.mm */; };
 		C042A48E1B7522A900771ED2 /* RealmConfigurationTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = C042A48C1B7522A900771ED2 /* RealmConfigurationTests.mm */; };
@@ -2915,6 +2916,7 @@
 				4993220F24129DCE00A0EC8E /* RLMApp.mm in Sources */,
 				5DD755851BE056DE002800DA /* RLMArray.mm in Sources */,
 				49DF0AA42463286800F7E0B8 /* RLMBSON.mm in Sources */,
+				ACC6BEE42796B23D006C1728 /* RLMSyncSession.mm in Sources */,
 				3F9863BC1D36876B00641C98 /* RLMClassInfo.mm in Sources */,
 				3FBEF67C1C63D66400F6935B /* RLMCollection.mm in Sources */,
 				5DD755871BE056DE002800DA /* RLMConstants.m in Sources */,
