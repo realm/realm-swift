@@ -31,6 +31,46 @@ x.y.z Release notes (yyyy-MM-dd)
 ### Internal
 * Upgraded realm-core from ? to ?
 
+10.21.1 Release notes (2022-01-12)
+=============================================================
+
+### Fixed
+
+* The sync client will now drain the receive queue when a send fails with
+  ECONNRESET, ensuring that any error message from the server gets received and
+  processed. ([#5078](https://github.com/realm/realm-core/pull/5078))
+* Schema validation was missing for embedded objects in sets, resulting in an
+  unhelpful error being thrown if a Realm object subclass contained one (since v10.0.0).
+* Opening a Realm with a schema that has an orphaned embedded object type
+  performed an extra empty write transaction (since v10.0.0).
+* Freezing a Realm with a schema that has orphaned embedded object types threw
+  a "Wrong transactional state" exception (since v10.19.0).
+* `@sum` and `@avg` queries on Dictionaries of floats or doubles used too much
+  precision for intermediates, resulting in incorrect rounding (since v10.5.0).
+* Change the exception message for calling refresh on an immutable Realm from
+  "Continuous transaction through DB object without history information." to
+  "Can't refresh a read-only Realm."
+  ([#5061](https://github.com/realm/realm-core/issues/5061), since v10.8.0).
+* Queries of the form "link.collection.@sum = 0" where `link` is null matched
+  when `collection` was a List or Set, but not a Dictionary
+  ([#5080](https://github.com/realm/realm-core/pull/5080), since v10.8.0).
+* Types which require custom obj-c bridging (such as `PersistableEnum` or
+  `CustomPersistable`) would crash with exceptions mentioning `__SwiftValue` in
+  a variety of places on iOS versions older than iOS 14
+  ([#7604](https://github.com/realm/realm-swift/issues/7604), since v10.21.0)
+
+### Compatibility
+
+* Realm Studio: 11.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 13.2.1.
+* CocoaPods: 1.10 or later.
+* Xcode: 12.4-13.2.1.
+
+### Internal
+
+* Upgraded realm-core from 11.6.1 to 11.8.0.
+
 10.21.0 Release notes (2022-01-10)
 =============================================================
 

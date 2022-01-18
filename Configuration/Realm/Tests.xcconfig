@@ -1,26 +1,11 @@
-SUPPORTED_PLATFORMS = macosx iphonesimulator iphoneos appletvos appletvsimulator;
-SKIP_INSTALL = YES;
+#include "../TestBase.xcconfig"
 
 INFOPLIST_FILE = Realm/Tests/RealmTests-Info.plist;
-PRODUCT_BUNDLE_IDENTIFIER = io.Realm.${PRODUCT_NAME:rfc1034identifier};
-
-LD_RUNPATH_SEARCH_PATHS[sdk=iphone*] = $(inherited) @executable_path/Frameworks @loader_path/Frameworks;
-LD_RUNPATH_SEARCH_PATHS[sdk=appletv*] = $(inherited) @executable_path/Frameworks @loader_path/Frameworks;
-LD_RUNPATH_SEARCH_PATHS[sdk=macosx*] = $(inherited) @executable_path/../Frameworks @loader_path/../Frameworks;
-
 OTHER_CFLAGS = -fobjc-arc-exceptions;
 
 SWIFT_OBJC_BRIDGING_HEADER = Realm/Tests/Swift/Swift-Tests-Bridging-Header.h;
 SWIFT_OPTIMIZATION_LEVEL = -Onone;
 
-TEST_HOST[sdk=iphone*] = $(BUILT_PRODUCTS_DIR)/TestHost.app/TestHost;
-TEST_HOST[sdk=appletv*] = $(BUILT_PRODUCTS_DIR)/TestHost.app/TestHost;
-
 EXCLUDED_SOURCE_FILE_NAMES[sdk=iphone*] = InterprocessTests.m SwiftSchemaTests.swift;
 EXCLUDED_SOURCE_FILE_NAMES[sdk=appletv*] = EncryptionTests.mm InterprocessTests.m SwiftSchemaTests.swift;
 EXCLUDED_SOURCE_FILE_NAMES[sdk=watch*] = *;
-
-MACOSX_DEPLOYMENT_TARGET = 11.0;
-IPHONEOS_DEPLOYMENT_TARGET = 14.0;
-WATCHOS_DEPLOYMENT_TARGET = 7.0;
-TVOS_DEPLOYMENT_TARGET = 14.0;
