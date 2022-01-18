@@ -66,7 +66,6 @@
 		1A0512771D8746CD00806AEC /* RLMSyncConfiguration.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A3623651D8384BA00945A54 /* RLMSyncConfiguration.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1A1536481DB0408A00C0EC93 /* RLMUser+ObjectServerTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1AF64DD11DA304A90081EB15 /* RLMUser+ObjectServerTests.mm */; };
 		1A3623681D8384BA00945A54 /* RLMSyncConfiguration.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1A3623661D8384BA00945A54 /* RLMSyncConfiguration.mm */; };
-		1A7003081D5270C400FD9EE3 /* RLMSyncSession.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1AD3870B1D4A7FBB00479110 /* RLMSyncSession.mm */; };
 		1A7003091D5270C700FD9EE3 /* RLMSyncUtil.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1A84132E1D4BCCE600C5326F /* RLMSyncUtil.mm */; };
 		1A7003111D5270FF00FD9EE3 /* RLMSyncSession.h in Headers */ = {isa = PBXBuildFile; fileRef = 1AD3870A1D4A7FBB00479110 /* RLMSyncSession.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1A7B823A1D51259F00750296 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A7B82391D51259F00750296 /* libz.tbd */; };
@@ -2958,7 +2957,6 @@
 				3F1D903F265C073100593ABA /* RLMSwiftValueStorage.mm in Sources */,
 				1A0512721D873F3300806AEC /* RLMSyncConfiguration.mm in Sources */,
 				1A90FCBB1D3D37F50086A57F /* RLMSyncManager.mm in Sources */,
-				1A7003081D5270C400FD9EE3 /* RLMSyncSession.mm in Sources */,
 				1A7003091D5270C700FD9EE3 /* RLMSyncUtil.mm in Sources */,
 				3F67DB411E26D6AD0024533D /* RLMThreadSafeReference.mm in Sources */,
 				5DD755981BE056DE002800DA /* RLMUpdateChecker.mm in Sources */,
