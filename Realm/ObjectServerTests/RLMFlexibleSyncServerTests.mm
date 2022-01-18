@@ -46,12 +46,12 @@
 
 - (void)testGetSubscriptionsWhenLocalRealm {
     RLMRealm *realm = [RLMRealm defaultRealm];
-    XCTAssertNil(realm.subscriptions);
+    RLMAssertThrowsWithReason(realm.subscriptions, @"This Realm was not configured with flexible sync");
 }
 
 - (void)testGetSubscriptionsWhenPbsRealm {
     RLMRealm *realm = [self realmForTest:_cmd];
-    XCTAssertNil(realm.subscriptions);
+    RLMAssertThrowsWithReason(realm.subscriptions, @"This Realm was not configured with flexible sync");
 }
 
 - (void)testFlexibleSyncRealmFilePath {
@@ -998,7 +998,7 @@
     [self writeQueryAndCompleteForRealm:realm block:^(RLMSyncSubscriptionSet *subs) {
         [subs addSubscriptionWithClassName:Person.className
                           subscriptionName:@"person_age"
-                                     where:@"age > 18"];
+                                     where:@"age > 18 and partition == %@", NSStringFromSelector(_cmd)];
     }];
     CHECK_COUNT(3, Person, realm);
 

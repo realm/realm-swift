@@ -719,7 +719,7 @@ static NSURL *syncDirectoryForChildProcess() {
             XCTFail();
         }
     }];
-    XCTAssertEqual(subs.count, 2);
+
     [self waitForExpectationsWithTimeout:20.0 handler:nil];
     block(realm);
 }
