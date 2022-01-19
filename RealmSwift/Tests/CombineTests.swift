@@ -2777,7 +2777,7 @@ class CombineAsyncRealmTests: CombinePublisherTestCase {
             .sink {
                 asyncWriteExpectation.fulfill()
             }
-        
+
         try! realm.writeAsync { _ in
             self.realm.create(SwiftIntObject.self, value: [])
         }
