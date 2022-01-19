@@ -546,17 +546,15 @@ typedef void (^RLMNotificationBlock)(RLMNotification notification, RLMRealm *rea
  on a dedicated background thread.
  
  @param completionBlock  is queued for execution on the scheduler associated with
-        the current Realm. It will run after the commit has reached stable storage.
+        the current Realm. It will run after the commit has reached stable storage or has fail with error.
         Callbacks to `completionBlock` will occur in the order of `commitAsyncWriteTransaction`
- 
+        If an error occurs, upon return contains an `NSError` object that describes the problem or nil otherwise.
+
  @param isGroupingAllowed If `true`, the next `commitAsyncWriteTransaction` *may* run without an
         intervening synchronization of stable storage. Such a sequence of commits
         form a group. It may help to have a better performance on write.
         In case of a platform crash, either none or all of the commits in a group will reach stable storage.
         `false` by default.
-
- @param error If an error occurs, upon return contains an `NSError` object that describes the problem.
-        If you are not interested in possible errors, pass in `NULL`.
 
  @return The Id for the asynchronous transaction or 0 in case of error.
 
@@ -565,7 +563,7 @@ typedef void (^RLMNotificationBlock)(RLMNotification notification, RLMRealm *rea
 
  @note The immediate return without `error` is not a guarantee of the future successful transaction commit.
 */
-- (RLMAsyncTransactionId)commitAsyncWriteTransaction:(nullable void(^)())completionBlock isGroupingAllowed:(BOOL)isGroupingAllowed error:(NSError **)error;
+- (RLMAsyncTransactionId)commitAsyncWriteTransaction:(nullable void(^)(NSError *))completionBlock isGroupingAllowed:(BOOL)isGroupingAllowed;
 
 /** Commit asynchronous transaction.
  
@@ -575,11 +573,9 @@ typedef void (^RLMNotificationBlock)(RLMNotification notification, RLMRealm *rea
  It's an equivalent to call `commitAsyncWriteTransaction:isGroupingAllowed:` with `isGroupingAllowed` = `false`.
        
  @param completionBlock  is queued for execution on the scheduler associated with
-        the current Realm. It will run after the commit has reached stable storage.
+        the current Realm. It will run after the commit has reached stable storage or has fail with error.
         Callbacks to `completionBlock` will occur in the order of `commitAsyncWriteTransaction`
- 
- @param error If an error occurs, upon return contains an `NSError` object that describes the problem.
-        If you are not interested in possible errors, pass in `NULL`.
+        If an error occurs, upon return contains an `NSError` object that describes the problem or nil otherwise.
 
  @return The Id for the asynchronous transaction or 0 in case of error.
 
@@ -588,7 +584,7 @@ typedef void (^RLMNotificationBlock)(RLMNotification notification, RLMRealm *rea
  @note The Id for the asynchronous transaction can be used to cancel the transaction. You can get it
        as a return from `beginAsyncWriteTransaction`, `commitAsyncWriteTransaction` or `asyncTransactionWithBlock`.
 */
-- (RLMAsyncTransactionId)commitAsyncWriteTransaction:(void(^)())completionBlock error:(NSError **)error;
+- (RLMAsyncTransactionId)commitAsyncWriteTransaction:(void(^)(NSError *))completionBlock;
 
 /** Commit asynchronous transaction.
  
@@ -618,17 +614,15 @@ typedef void (^RLMNotificationBlock)(RLMNotification notification, RLMRealm *rea
  @param block  The block containing actions to perform.
  
  @param completionBlock  is queued for execution on the scheduler associated with
-        the current Realm. It will run after the commit has reached stable storage.
-
- @param error If an error occurs, upon return contains an `NSError` object that describes the problem.
-        If you are not interested in possible errors, pass in `NULL`.
+        the current Realm. It will run after the commit has reached stable storage or has fail with error.
+        If an error occurs, upon return contains an `NSError` object that describes the problem or nil otherwise.
 
  @return The Id for the asynchronous transaction or 0 in case of error.
 
  @note The Id for the asynchronous transaction can be used to cancel the transaction. You can get it
        as a return from `beginAsyncWriteTransaction`, `commitAsyncWriteTransaction` or `asyncTransactionWithBlock`.
 */
-- (RLMAsyncTransactionId)asyncTransactionWithBlock:(void(^)())block onComplete:(nullable void(^)())completionBlock error:(NSError **)error;
+- (RLMAsyncTransactionId)asyncTransactionWithBlock:(void(^)())block onComplete:(nullable void(^)(NSError *))completionBlock;
 /**
  Performs actions contained within the given block inside an asynctonous write transaction.
  
