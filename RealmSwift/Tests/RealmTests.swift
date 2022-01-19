@@ -989,7 +989,7 @@ class RealmTests: TestCase {
 
         try! realm.writeAsync { _ in
             realm.create(SwiftStringObject.self, value: ["string"])
-        } _: {
+        } _: { _ in
             let object = realm.objects(SwiftStringObject.self).first
             XCTAssertEqual(object?.stringCol, "string")
             asyncComplete.fulfill()
@@ -1004,7 +1004,7 @@ class RealmTests: TestCase {
         try! realm.beginAsyncWrite({ _ in
             realm.create(SwiftStringObject.self, value: ["string"])
 
-            realm.commitAsyncWrite {
+            realm.commitAsyncWrite { _ in
                 let object = realm.objects(SwiftStringObject.self).first
                 XCTAssertEqual(object?.stringCol, "string")
                 asyncComplete.fulfill()
@@ -1022,7 +1022,7 @@ class RealmTests: TestCase {
 
         let asyncTransactionId = try! realm.beginAsyncWrite({ _ in
             realm.create(SwiftStringObject.self, value: ["string"])
-            realm.commitAsyncWrite {
+            realm.commitAsyncWrite { _ in
                 asyncComplete.fulfill()
             }
         })
@@ -1058,7 +1058,7 @@ class RealmTests: TestCase {
             let realm = try! Realm()
             let transactionId = try! realm.writeAsync({ _ in
                 realm.create(SwiftStringObject.self, value: ["string"])
-            }, {
+            }, { _ in
                 writeComplete.fulfill()
             })
             try! realm.cancelAsyncWrite(transactionId)
@@ -1107,7 +1107,7 @@ class RealmTests: TestCase {
 
         try! realm.beginAsyncWrite { _ in
             realm.create(SwiftStringObject.self, value: ["string"])
-            realm.commitAsyncWrite({
+            realm.commitAsyncWrite({ _ in
                 asyncComplete.fulfill()
             }, isGroupingAllowed: true)
         }
@@ -1152,7 +1152,7 @@ class RealmTests: TestCase {
 
         realm.beginWrite()
         realm.create(SwiftStringObject.self, value: ["string 2"])
-        realm.commitAsyncWrite {
+        realm.commitAsyncWrite { _ in
             asyncComplete.fulfill()
         }
 
@@ -1172,7 +1172,7 @@ class RealmTests: TestCase {
 
         try! realm.writeAsync { _ in
             realm.create(SwiftStringObject.self, value: ["string 2"])
-        } _: {
+        } _: { _ in
             asyncComplete.fulfill()
         }
 
@@ -1196,7 +1196,7 @@ class RealmTests: TestCase {
 
         try! realm.writeAsync { _ in
             realm.create(SwiftStringObject.self, value: ["string 2"])
-        } _: {
+        } _: { _ in
             asyncComplete.fulfill()
         }
 
@@ -1210,8 +1210,10 @@ class RealmTests: TestCase {
 
     func testAsyncTransactionChangeNotification() {
         let realm = try! Realm()
-        let asyncComplete = expectation(description: "async transaction complete")
-        asyncComplete.expectedFulfillmentCount = 4
+        let asyncWriteComplete = expectation(description: "async write complete")
+        asyncWriteComplete.expectedFulfillmentCount = 2
+        let updateComplete = expectation(description: "update complete")
+        updateComplete.expectedFulfillmentCount = 2
 
         let resultsUnderTest = realm.objects(SwiftStringObject.self)
         let token = resultsUnderTest.observe(on: nil) { change in
@@ -1219,7 +1221,7 @@ class RealmTests: TestCase {
             case .initial:
                 return // ignore
             case .update(_, deletions: _, insertions: _, modifications: _):
-                asyncComplete.fulfill()
+                updateComplete.fulfill()
             case .error:
                 XCTFail("should not get here for this test")
             }
@@ -1227,14 +1229,14 @@ class RealmTests: TestCase {
 
         try! realm.writeAsync { _ in
             realm.create(SwiftStringObject.self, value: ["string 1"])
-        } _: {
-            asyncComplete.fulfill()
+        } _: { _ in
+            asyncWriteComplete.fulfill()
         }
 
         try! realm.writeAsync { _ in
             realm.create(SwiftStringObject.self, value: ["string 2"])
-        } _: {
-            asyncComplete.fulfill()
+        } _: { _ in
+            asyncWriteComplete.fulfill()
         }
 
         waitForExpectations(timeout: 1, handler: nil)
@@ -1253,11 +1255,11 @@ class RealmTests: TestCase {
 
             try! realm.beginAsyncWrite { _ in
                 realm.create(SwiftStringObject.self, value: ["string 2"])
-                realm.commitAsyncWrite {
+                realm.commitAsyncWrite { _ in
                     transaction1.fulfill()
                 }
             }
-            realm.commitAsyncWrite {
+            realm.commitAsyncWrite { _ in
                 transaction2.fulfill()
             }
         }
@@ -1275,7 +1277,7 @@ class RealmTests: TestCase {
 
         try! realm.beginAsyncWrite { _ in
             realm.create(SwiftStringObject.self, value: ["string 2"])
-            realm.commitAsyncWrite {
+            realm.commitAsyncWrite { _ in
                 transaction1.fulfill()
             }
         }
@@ -1322,27 +1324,27 @@ class RealmTests: TestCase {
 
     func testAsyncTransactionCommit() {
         let realm = try! Realm()
-        let expectation = expectation(description: "testAsyncTransactionCommit expectation")
-        expectation.expectedFulfillmentCount = 4
+        let changesAddedExpectation = expectation(description: "testAsyncTransactionCommit expectation")
+        changesAddedExpectation.expectedFulfillmentCount = 4
 
         try! realm.beginAsyncWrite { _ in
             realm.create(SwiftStringObject.self, value: ["with commit should commit"])
             realm.commitAsyncWrite()
-            expectation.fulfill()
+            changesAddedExpectation.fulfill()
         }
         try! realm.beginAsyncWrite { _ in
             realm.create(SwiftStringObject.self, value: ["without commit/cancel should not commit"])
-            expectation.fulfill()
+            changesAddedExpectation.fulfill()
         }
         try! realm.beginAsyncWrite { asyncTransactionId in
             realm.create(SwiftStringObject.self, value: ["cancel after commit should commit"])
             try! realm.cancelAsyncWrite(asyncTransactionId)
-            expectation.fulfill()
+            changesAddedExpectation.fulfill()
         }
         let asyncTransactionId = try! realm.beginAsyncWrite { _ in
             realm.create(SwiftStringObject.self, value: ["cancel outside of the block should not commit"])
             realm.commitAsyncWrite()
-            expectation.fulfill()
+            changesAddedExpectation.fulfill()
         }
         try! realm.cancelAsyncWrite(asyncTransactionId)
 
@@ -1358,7 +1360,7 @@ class RealmTests: TestCase {
         try! realm.beginAsyncWrite({ _ in
             realm.create(SwiftStringObject.self, value: ["string I"])
             realm.add(objU)
-            realm.commitAsyncWrite {
+            realm.commitAsyncWrite { _ in
                 asyncComplete.fulfill()
             }
         })
@@ -1378,7 +1380,7 @@ class RealmTests: TestCase {
 
         try! realm.beginAsyncWrite({ _ in
             objA.stringCol = "string B"
-            realm.commitAsyncWrite {
+            realm.commitAsyncWrite { _ in
                 asyncComplete.fulfill()
             }
         })

@@ -731,7 +731,7 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     }
 }
 
-- (RLMAsyncTransactionId)commitAsyncWriteTransaction:(void(^)(NSError *))completionBlock {
+- (RLMAsyncTransactionId)commitAsyncWriteTransaction:(void(^)(NSError *_Nullable))completionBlock {
     try {
         return _realm->async_commit_transaction(^{ completionBlock(nil); });
     }
@@ -743,7 +743,7 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     }
 }
 
-- (RLMAsyncTransactionId)commitAsyncWriteTransaction:(nullable void(^)(NSError *))completionBlock isGroupingAllowed:(BOOL)isGroupingAllowed {
+- (RLMAsyncTransactionId)commitAsyncWriteTransaction:(nullable void(^)(NSError *_Nullable))completionBlock isGroupingAllowed:(BOOL)isGroupingAllowed {
     try {
         if (completionBlock) {
             return _realm->async_commit_transaction(^{ completionBlock(nil); }, isGroupingAllowed);
@@ -767,7 +767,7 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     }
 }
 
-- (RLMAsyncTransactionId)asyncTransactionWithBlock:(void(^)())block onComplete:(nullable void(^)(NSError *))completionBlock {
+- (RLMAsyncTransactionId)asyncTransactionWithBlock:(void(^)())block onComplete:(nullable void(^)(NSError *_Nullable))completionBlock {
     return [self beginAsyncWriteTransaction:^{
         block();
         [self commitAsyncWriteTransaction:completionBlock];

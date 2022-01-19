@@ -375,13 +375,15 @@ public typealias AsyncTransactionId = RLMAsyncTransactionId
 
     /**
      Commits transaction block asynchronously.
-     - parameter `block` will be added to the ssynchronous transaction queue.
-     - parameter `onComplete` will be called after commit has reached stable storage.
-     Write  blocks for the multiple calls will be executed in order.
+     - parameter `block` will be added to the asynchronous transaction queue.
+     - parameter `onComplete` will be called after commit has reached stable storage or fail.
+     If an error occurs, upon return contains an `Error` object that describes the problem or nil otherwise.
+     - returns The Id for the asynchronous transaction or 0 in case of error.
+     - note Write  blocks for the multiple calls will be executed in order.
      */
     @discardableResult
-    public func writeAsync(_ block: @escaping (AsyncTransactionId) -> Void, _ onComplete: (() -> Void)? = nil) throws -> AsyncTransactionId {
-        try beginAsyncWrite { asyncTransactionId in
+    public func writeAsync(_ block: @escaping (AsyncTransactionId) -> Void, _ onComplete: ((Swift.Error?) -> Void)? = nil) throws -> AsyncTransactionId {
+        return try beginAsyncWrite { asyncTransactionId in
             block(asyncTransactionId)
             commitAsyncWrite(onComplete)
         }
@@ -392,15 +394,12 @@ public typealias AsyncTransactionId = RLMAsyncTransactionId
      - parameter `block` The block containing actions to perform.
      `block` should end by calling `commitAsyncWrite`, `cancelAsyncWrite`,
      `commitWrite` or `cancelWrite`.
-     Returning without one of these calls will be equivalent to calling `commitAsyncWrite`.
-     Return Asynchronous transaction's handle.
-     @note `block` is queued for execution on the scheduler associated with the current realm.
+     Leaving the block without one of these calls will be equivalent to calling `commitAsyncWrite`.
+     - returns The Id for the asynchronous transaction or 0 in case of error.
+     - note `block` is queued for execution on the scheduler associated with the current realm.
      It will run after the write mutex has been acquired.
      The call returns immediately allowing the caller to proceed while the write mutex is held by someone else.
-     Write blocks from multiple calls to `beginAsyncWrite` or `writeAsync`
-     will be executed in order.
-     A later call to `beginAsyncWrite` or `writeAsync` will wait for any earlier
-     write blocks.
+     Write blocks from multiple calls to `beginAsyncWrite` or `writeAsync` will be executed in order.
      */
     @discardableResult
     public func beginAsyncWrite(_ asyncWriteBlock: @escaping (AsyncTransactionId) -> Void) throws -> AsyncTransactionId {
@@ -414,16 +413,17 @@ public typealias AsyncTransactionId = RLMAsyncTransactionId
     /** Commit asynchronous transaction.
      - parameter onComplete  is queued for execution on the scheduler associated with
      the current realm. It will run after the commit has reached stable storage.
-     - parameter isGroupingAllowed     If `true`, the next `commitAsyncWrite` *may* run without an
+     If an error occurs, upon return contains an `Error` object that describes the problem or nil otherwise.
+     - parameter isGroupingAllowed If `true`, the next `commitAsyncWrite` *may* run without an
      intervening synchronization of stable storage.  Such a sequence of commits form a group.
-     It may help to have a better performance on write.
+     `isGroupingAllowed` may help to have a better performance on write.
      In case of a platform crash, either none or all of the commits in a group will reach stable storage.
      - note The call returns immediately allowing the caller to proceed while the I/O is performed on a dedicated background thread.
      - note Callbacks to `onComplete` will occur in the order of `commitAsyncWriteTransaction`
     */
-    public func commitAsyncWrite(_ onComplete: (() -> Void)? = nil, isGroupingAllowed: Bool = false) {
-        var error: NSError?
-        rlmRealm.commitAsyncWriteTransaction(onComplete, isGroupingAllowed: isGroupingAllowed, error: &error)
+    @discardableResult
+    public func commitAsyncWrite(_ onComplete: ((Swift.Error?) -> Void)? = nil, isGroupingAllowed: Bool = false) -> AsyncTransactionId {
+        return rlmRealm.commitAsyncWriteTransaction(onComplete, isGroupingAllowed: isGroupingAllowed)
     }
 
     /** Cancel a queued code block (either for `writeAsync` or for`commitAsyncWrite`)
@@ -435,7 +435,7 @@ public typealias AsyncTransactionId = RLMAsyncTransactionId
     }
 
     /**
-     Returns true when async transactiona has been created and the result of the last
+     Returns true when async transactions has been created and the result of the last
      commit has not yet reached permanent storage.
      */
     public var isInAsyncWriteTransaction: Bool {

@@ -4,13 +4,13 @@ x.y.z Release notes (yyyy-MM-dd)
 * Add Swift API for asynchronous transactions
 The feature can be enabled with the build flag `REALM_ASYNC_WRITES`.
 ```
-    try? realm.writeAsync { _ in
+    try? realm.writeAsync { asyncTransactionId in
         realm.create(SwiftStringObject.self, value: ["string"])
-    } _: {
+    } _: { error in
         // optional handling on write complete
     }
 
-    try? realm.beginAsyncWrite { _ in
+    try? realm.beginAsyncWrite { asyncTransactionId in
         realm.create(SwiftStringObject.self, value: ["string"])
         realm.commitAsyncWrite()
     }

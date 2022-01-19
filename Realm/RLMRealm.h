@@ -563,7 +563,7 @@ typedef void (^RLMNotificationBlock)(RLMNotification notification, RLMRealm *rea
 
  @note The immediate return without `error` is not a guarantee of the future successful transaction commit.
 */
-- (RLMAsyncTransactionId)commitAsyncWriteTransaction:(nullable void(^)(NSError *))completionBlock isGroupingAllowed:(BOOL)isGroupingAllowed;
+- (RLMAsyncTransactionId)commitAsyncWriteTransaction:(nullable void(^)(NSError *_Nullable))completionBlock isGroupingAllowed:(BOOL)isGroupingAllowed;
 
 /** Commit asynchronous transaction.
  
@@ -584,7 +584,7 @@ typedef void (^RLMNotificationBlock)(RLMNotification notification, RLMRealm *rea
  @note The Id for the asynchronous transaction can be used to cancel the transaction. You can get it
        as a return from `beginAsyncWriteTransaction`, `commitAsyncWriteTransaction` or `asyncTransactionWithBlock`.
 */
-- (RLMAsyncTransactionId)commitAsyncWriteTransaction:(void(^)(NSError *))completionBlock;
+- (RLMAsyncTransactionId)commitAsyncWriteTransaction:(void(^)(NSError *_Nullable))completionBlock;
 
 /** Commit asynchronous transaction.
  
@@ -622,7 +622,7 @@ typedef void (^RLMNotificationBlock)(RLMNotification notification, RLMRealm *rea
  @note The Id for the asynchronous transaction can be used to cancel the transaction. You can get it
        as a return from `beginAsyncWriteTransaction`, `commitAsyncWriteTransaction` or `asyncTransactionWithBlock`.
 */
-- (RLMAsyncTransactionId)asyncTransactionWithBlock:(void(^)())block onComplete:(nullable void(^)(NSError *))completionBlock;
+- (RLMAsyncTransactionId)asyncTransactionWithBlock:(void(^)())block onComplete:(nullable void(^)(NSError *_Nullable))completionBlock;
 /**
  Performs actions contained within the given block inside an asynctonous write transaction.
  
