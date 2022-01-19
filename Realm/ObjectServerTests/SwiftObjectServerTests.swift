@@ -157,7 +157,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         do {
             let user = try logInUser(for: basicCredentials())
             let realm = try openRealm(partitionValue: .null, user: user)
-            
+
             if isParent {
                 try realm.write {
                     realm.deleteAll()
