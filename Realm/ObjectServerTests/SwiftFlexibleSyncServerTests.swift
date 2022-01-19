@@ -1236,7 +1236,7 @@ extension SwiftFlexibleSyncServerTests {
         waitForUploads(for: realm)
     }
 
-    @MainActor func testFlexibleSyncAppAddQueryAsync() async throws {
+    @MainActor func testFlexibleSyncAppAddQueryAsyncAwait() async throws {
         try await populateFlexibleSyncData { realm in
             for i in 1...21 {
                 let person = SwiftPerson(firstName: "\(#function)",
@@ -1246,7 +1246,7 @@ extension SwiftFlexibleSyncServerTests {
             }
         }
 
-        var config = (try await self.flexibleSyncApp.login(credentials: .anonymous)).flexibleSyncConfiguration()
+        var config = (try await self.flexibleSyncApp.login(credentials: basicCredentials(app: self.flexibleSyncApp))).flexibleSyncConfiguration()
         config.objectTypes = [SwiftPerson.self, SwiftTypesSyncObject.self]
         let realm = try await Realm(configuration: config)
         XCTAssertNotNil(realm)
