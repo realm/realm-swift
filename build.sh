@@ -524,9 +524,11 @@ case "$COMMAND" in
         rm -rf build/*.xcframework
         find build/DerivedData/Realm/Build/Products -name 'Realm.framework' \
             | grep -v '\-static' \
+            | grep -v 'Tests' \
             | sed 's/.*/-framework &/' \
             | xargs xcodebuild -create-xcframework -allow-internal-distribution -output build/Realm.xcframework
         find build/DerivedData/Realm/Build/Products -name 'RealmSwift.framework' \
+            | grep -v 'Tests' \
             | sed 's/.*/-framework &/' \
             | xargs xcodebuild -create-xcframework -allow-internal-distribution -output build/RealmSwift.xcframework
 
