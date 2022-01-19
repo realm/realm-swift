@@ -25,7 +25,7 @@ The feature can be enabled with the build flag `REALM_ASYNC_WRITES`.
 ```
    [realm asyncTransactionWithBlock:^{
         [StringObject createInRealm:realm withValue:@[@"string"]];
-    } onComplete:^{
+    } onComplete:^(NSError *error) {
         // optional handling
     }];
 

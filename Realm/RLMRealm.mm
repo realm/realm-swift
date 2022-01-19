@@ -731,25 +731,29 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     }
 }
 
-- (RLMAsyncTransactionId)commitAsyncWriteTransaction:(void(^)())completionBlock error:(NSError **)error {
+- (RLMAsyncTransactionId)commitAsyncWriteTransaction:(void(^)(NSError *))completionBlock {
     try {
-        return _realm->async_commit_transaction(completionBlock);
+        return _realm->async_commit_transaction(^{ completionBlock(nil); });
     }
     catch (...) {
-        RLMRealmTranslateException(error);
+        NSError *error = nil;
+        RLMRealmTranslateException(&error);
+        completionBlock(error);
         return 0;
     }
 }
 
-- (RLMAsyncTransactionId)commitAsyncWriteTransaction:(nullable void(^)())completionBlock isGroupingAllowed:(BOOL)isGroupingAllowed error:(NSError **)error {
+- (RLMAsyncTransactionId)commitAsyncWriteTransaction:(nullable void(^)(NSError *))completionBlock isGroupingAllowed:(BOOL)isGroupingAllowed {
     try {
         if (completionBlock) {
-            return _realm->async_commit_transaction(completionBlock, isGroupingAllowed);
+            return _realm->async_commit_transaction(^{ completionBlock(nil); }, isGroupingAllowed);
         }
         return _realm->async_commit_transaction(nullptr, isGroupingAllowed);
     }
     catch (...) {
-        RLMRealmTranslateException(error);
+        NSError *error = nil;
+        RLMRealmTranslateException(&error);
+        completionBlock(error);
         return 0;
     }
 }
@@ -763,10 +767,10 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     }
 }
 
-- (RLMAsyncTransactionId)asyncTransactionWithBlock:(void(^)())block onComplete:(nullable void(^)())completionBlock error:(NSError **)error {
+- (RLMAsyncTransactionId)asyncTransactionWithBlock:(void(^)())block onComplete:(nullable void(^)(NSError *))completionBlock {
     return [self beginAsyncWriteTransaction:^{
         block();
-        [self commitAsyncWriteTransaction:completionBlock error:error];
+        [self commitAsyncWriteTransaction:completionBlock];
     }];
 }
 
