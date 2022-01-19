@@ -1208,8 +1208,8 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
 #if swift(>=5.5.2) && canImport(_Concurrency)
 @available(macOS 12.0.0, *)
 extension SwiftFlexibleSyncServerTests {
-    @MainActor private func populateAsyncRealm() async throws {
-        var config = (try await self.flexibleSyncApp.login(credentials: basicCredentials(app: self.flexibleSyncApp))).flexibleSyncConfiguration()
+    @MainActor private func populateFlexibleSyncData(_ block: @escaping (Realm) -> Void) async throws {
+        var config = (try await self.flexibleSyncApp.login(credentials: .anonymous)).flexibleSyncConfiguration()
         if config.objectTypes == nil {
             config.objectTypes = [SwiftPerson.self,
                                   SwiftTypesSyncObject.self]
@@ -1231,6 +1231,13 @@ extension SwiftFlexibleSyncServerTests {
         }
 
         try realm.write {
+            block(realm)
+        }
+        waitForUploads(for: realm)
+    }
+
+    @MainActor func testFlexibleSyncAppAddQuery() async throws {
+        try await populateFlexibleSyncData { realm in
             for i in 1...21 {
                 let person = SwiftPerson(firstName: "\(#function)",
                                          lastName: "lastname_\(i)",
@@ -1238,12 +1245,7 @@ extension SwiftFlexibleSyncServerTests {
                 realm.add(person)
             }
         }
-        waitForUploads(for: realm)
-    }
-
-    @MainActor func testFlexibleSyncAppAddQuery() async throws {
-        try await populateAsyncRealm()
-
+        
         var config = (try await self.flexibleSyncApp.login(credentials: .anonymous))
             .flexibleSyncConfiguration()
         config.objectTypes = [SwiftPerson.self, SwiftTypesSyncObject.self]
