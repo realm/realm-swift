@@ -1,6 +1,25 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
+* Add Swift API for asynchronous transactions
+The feature can be enabled with the build flag `REALM_ASYNC_WRITES`.
+```
+    try? realm.writeAsync { _ in
+        realm.create(SwiftStringObject.self, value: ["string"])
+    } _: {
+        // optional handling on write complete
+    }
+
+    try? realm.beginAsyncWrite { _ in
+        realm.create(SwiftStringObject.self, value: ["string"])
+        realm.commitAsyncWrite()
+    }
+
+    RLMAsyncTransactionId asyncTransactionId = try? realm.beginAsyncWrite { _ in
+        // ...
+    }
+    try! realm.cancelAsyncWrite(asyncTransactionId)
+```
 * Add Obj-C API for asynchronous transactions
 The feature can be enabled with the build flag `REALM_ASYNC_WRITES`.
 ```
