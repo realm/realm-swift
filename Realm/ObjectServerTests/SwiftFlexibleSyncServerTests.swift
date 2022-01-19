@@ -1240,7 +1240,7 @@ extension SwiftFlexibleSyncServerTests {
         }
         waitForUploads(for: realm)
     }
-    
+
     func testFlexibleSyncAppAddQuery() async throws {
         try await populateAsyncRealm()
 
