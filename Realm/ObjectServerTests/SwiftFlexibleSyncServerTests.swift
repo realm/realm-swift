@@ -1233,7 +1233,6 @@ extension SwiftFlexibleSyncServerTests {
         try realm.write {
             block(realm)
         }
-        waitForUploads(for: realm)
     }
 
     @MainActor func testFlexibleSyncAppAddQueryAsyncAwait() async throws {
@@ -1264,7 +1263,6 @@ extension SwiftFlexibleSyncServerTests {
             }
         }
 
-        waitForDownloads(for: realm)
         checkCount(expected: 6, realm, SwiftPerson.self)
     }
 
