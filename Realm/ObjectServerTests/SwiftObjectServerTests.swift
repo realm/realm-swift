@@ -157,7 +157,13 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         do {
             let user = try logInUser(for: basicCredentials())
             let realm = try openRealm(partitionValue: .null, user: user)
+            
             if isParent {
+                try realm.write {
+                    realm.deleteAll()
+                }
+                waitForUploads(for: realm)
+                
                 checkCount(expected: 0, realm, SwiftPerson.self)
                 executeChild()
                 waitForDownloads(for: realm)
