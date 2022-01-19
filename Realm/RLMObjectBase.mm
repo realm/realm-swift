@@ -96,6 +96,7 @@ static id coerceToObjectType(id obj, Class cls, RLMSchema *schema) {
     if ([obj isKindOfClass:cls]) {
         return obj;
     }
+    obj = RLMBridgeSwiftValue(obj) ?: obj;
     id value = [[cls alloc] init];
     RLMInitializeWithValue(value, obj, schema);
     return value;
@@ -114,8 +115,11 @@ static id validatedObjectForProperty(__unsafe_unretained id const obj,
         if (prop.dictionary) {
             NSMutableDictionary *ret = [[NSMutableDictionary alloc] init];
             for (id key in obj) {
-                id val = coerceToObjectType(obj[key], objectClass, schema);
-                [ret setObject:val forKey:key];
+                id val = RLMCoerceToNil(obj[key]);
+                if (val) {
+                    val = coerceToObjectType(obj[key], objectClass, schema);
+                }
+                [ret setObject:val ?: NSNull.null forKey:key];
             }
             return ret;
         }

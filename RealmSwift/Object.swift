@@ -78,10 +78,10 @@ import Realm.Private
 
  ### Relationships
 
- See our [Cocoa guide](http://realm.io/docs/cocoa) for more details.
+ See our [Swift guide](https://docs.mongodb.com/realm/sdk/swift/fundamentals/relationships/) for more details.
  */
 public typealias Object = RealmSwiftObject
-extension Object: RealmCollectionValue {
+extension Object: _RealmCollectionValueInsideOptional {
     // MARK: Initializers
 
     /**
@@ -375,7 +375,7 @@ extension Object: RealmCollectionValue {
             return dynamic[propertyName] as! List<DynamicObject>
         }
         let list = RLMDynamicGetByName(self, propertyName) as! RLMSwiftCollectionBase
-        return List<DynamicObject>(objc: list._rlmCollection as! RLMArray<AnyObject>)
+        return List<DynamicObject>(collection: list._rlmCollection as! RLMArray<AnyObject>)
     }
 
     // MARK: Dynamic set
@@ -398,7 +398,7 @@ extension Object: RealmCollectionValue {
             return dynamic[propertyName] as! MutableSet<DynamicObject>
         }
         let set = RLMDynamicGetByName(self, propertyName) as! RLMSwiftCollectionBase
-        return MutableSet<DynamicObject>(objc: set._rlmCollection as! RLMSet<AnyObject>)
+        return MutableSet<DynamicObject>(collection: set._rlmCollection as! RLMSet<AnyObject>)
     }
 
     // MARK: Dynamic map
@@ -416,12 +416,12 @@ extension Object: RealmCollectionValue {
 
      :nodoc:
      */
-    public func dynamicMap<Key: _MapKey>(_ propertyName: String) -> Map<Key, DynamicObject> {
+    public func dynamicMap<Key: _MapKey>(_ propertyName: String) -> Map<Key, DynamicObject?> {
         if let dynamic = self as? DynamicObject {
-            return dynamic[propertyName] as! Map<Key, DynamicObject>
+            return dynamic[propertyName] as! Map<Key, DynamicObject?>
         }
         let base = RLMDynamicGetByName(self, propertyName) as! RLMSwiftCollectionBase
-        return Map<Key, DynamicObject>(objc: base._rlmCollection as! RLMDictionary<AnyObject, AnyObject>)
+        return Map<Key, DynamicObject?>(objc: base._rlmCollection as! RLMDictionary<AnyObject, AnyObject>)
     }
 
     // MARK: Comparison
@@ -516,7 +516,7 @@ extension Object: ThreadConfined {
  Information about the changes made to an object which is passed to `Object`'s
  notification blocks.
  */
-@frozen public enum ObjectChange<T: ObjectBase> {
+@frozen public enum ObjectChange<T> {
     /**
      If an error occurs, notification blocks are called one time with a `.error`
      result and an `NSError` containing details about the error. Currently the
@@ -542,13 +542,13 @@ public final class DynamicObject: Object {
         get {
             let value = RLMDynamicGetByName(self, key).flatMap(coerceToNil)
             if let array = value as? RLMArray<AnyObject> {
-                return List<DynamicObject>(objc: array)
+                return list(from: array)
             }
             if let set = value as? RLMSet<AnyObject> {
-                return MutableSet<DynamicObject>(objc: set)
+                return mutableSet(from: set)
             }
             if let dictionary = value as? RLMDictionary<AnyObject, AnyObject> {
-                return Map<String, DynamicObject>(objc: dictionary)
+                return map(from: dictionary)
             }
             return value
         }
@@ -584,6 +584,99 @@ public final class DynamicObject: Object {
     override public class func sharedSchema() -> RLMObjectSchema? {
         nil
     }
+
+    private func list(from array: RLMArray<AnyObject>) -> Any {
+        switch array.type {
+        case .int:
+            return array.isOptional ? List<Int?>(collection: array) : List<Int>(collection: array)
+        case .double:
+            return array.isOptional ? List<Double?>(collection: array) : List<Double>(collection: array)
+        case .float:
+            return array.isOptional ? List<Float?>(collection: array) : List<Float>(collection: array)
+        case .decimal128:
+            return array.isOptional ? List<Decimal128?>(collection: array) : List<Decimal128>(collection: array)
+        case .bool:
+            return array.isOptional ? List<Bool?>(collection: array) : List<Bool>(collection: array)
+        case .UUID:
+            return array.isOptional ? List<UUID?>(collection: array) : List<UUID>(collection: array)
+        case .string:
+            return array.isOptional ? List<String?>(collection: array) : List<String>(collection: array)
+        case .data:
+            return array.isOptional ? List<Data?>(collection: array) : List<Data>(collection: array)
+        case .date:
+            return array.isOptional ? List<Date?>(collection: array) : List<Date>(collection: array)
+        case .any:
+            return List<AnyRealmValue>(collection: array)
+        case .linkingObjects:
+            throwRealmException("Unsupported migration type of 'LinkingObjects' for type 'List'.")
+        case .objectId:
+            return array.isOptional ? List<ObjectId?>(collection: array) : List<ObjectId>(collection: array)
+        case .object:
+            return List<DynamicObject>(collection: array)
+        }
+    }
+
+    private func mutableSet(from set: RLMSet<AnyObject>) -> Any {
+        switch set.type {
+        case .int:
+            return set.isOptional ? MutableSet<Int?>(collection: set) : MutableSet<Int>(collection: set)
+        case .double:
+            return set.isOptional ? MutableSet<Double?>(collection: set) : MutableSet<Double>(collection: set)
+        case .float:
+            return set.isOptional ? MutableSet<Float?>(collection: set) : MutableSet<Float>(collection: set)
+        case .decimal128:
+            return set.isOptional ? MutableSet<Decimal128?>(collection: set) : MutableSet<Decimal128>(collection: set)
+        case .bool:
+            return set.isOptional ? MutableSet<Bool?>(collection: set) : MutableSet<Bool>(collection: set)
+        case .UUID:
+            return set.isOptional ? MutableSet<UUID?>(collection: set) : MutableSet<UUID>(collection: set)
+        case .string:
+            return set.isOptional ? MutableSet<String?>(collection: set) : MutableSet<String>(collection: set)
+        case .data:
+            return set.isOptional ? MutableSet<Data?>(collection: set) : MutableSet<Data>(collection: set)
+        case .date:
+            return set.isOptional ? MutableSet<Date?>(collection: set) : MutableSet<Date>(collection: set)
+        case .any:
+            return MutableSet<AnyRealmValue>(collection: set)
+        case .linkingObjects:
+            throwRealmException("Unsupported migration type of 'LinkingObjects' for type 'MutableSet'.")
+        case .objectId:
+            return set.isOptional ? MutableSet<ObjectId?>(collection: set) : MutableSet<ObjectId>(collection: set)
+        case .object:
+            return MutableSet<DynamicObject>(collection: set)
+        }
+    }
+
+    private func map(from dictionary: RLMDictionary<AnyObject, AnyObject>) -> Any {
+        switch dictionary.type {
+        case .int:
+            return dictionary.isOptional ? Map<String, Int?>(objc: dictionary) : Map<String, Int>(objc: dictionary)
+        case .double:
+            return dictionary.isOptional ? Map<String, Double?>(objc: dictionary) : Map<String, Double>(objc: dictionary)
+        case .float:
+            return dictionary.isOptional ? Map<String, Float?>(objc: dictionary) : Map<String, Float>(objc: dictionary)
+        case .decimal128:
+            return dictionary.isOptional ? Map<String, Decimal128?>(objc: dictionary) : Map<String, Decimal128>(objc: dictionary)
+        case .bool:
+            return dictionary.isOptional ? Map<String, Bool?>(objc: dictionary) : Map<String, Bool>(objc: dictionary)
+        case .UUID:
+            return dictionary.isOptional ? Map<String, UUID?>(objc: dictionary) : Map<String, UUID>(objc: dictionary)
+        case .string:
+            return dictionary.isOptional ? Map<String, String?>(objc: dictionary) : Map<String, String>(objc: dictionary)
+        case .data:
+            return dictionary.isOptional ? Map<String, Data?>(objc: dictionary) : Map<String, Data>(objc: dictionary)
+        case .date:
+            return dictionary.isOptional ? Map<String, Date?>(objc: dictionary) : Map<String, Date>(objc: dictionary)
+        case .any:
+            return Map<String, AnyRealmValue>(objc: dictionary)
+        case .linkingObjects:
+            throwRealmException("Unsupported migration type of 'LinkingObjects' for type 'Map'.")
+        case .objectId:
+            return dictionary.isOptional ? Map<String, ObjectId?>(objc: dictionary) : Map<String, ObjectId>(objc: dictionary)
+        case .object:
+            return Map<String, DynamicObject?>(objc: dictionary)
+        }
+    }
 }
 
 /**
@@ -606,21 +699,21 @@ public final class DynamicObject: Object {
  ```
  */
 public protocol RealmEnum: RealmOptionalType, _RealmSchemaDiscoverable {
-    /// :nodoc:
-    static func _rlmToRawValue(_ value: Any) -> Any
-    /// :nodoc:
-    static func _rlmFromRawValue(_ value: Any) -> Any?
 }
 
 // MARK: - Implementation
 
 /// :nodoc:
-public extension RealmEnum where Self: RawRepresentable, Self.RawValue: _RealmSchemaDiscoverable {
-    static func _rlmToRawValue(_ value: Any) -> Any {
-        return (value as! Self).rawValue
-    }
-    static func _rlmFromRawValue(_ value: Any) -> Any? {
-        return Self(rawValue: value as! RawValue)
+public extension RealmEnum where Self: RawRepresentable, Self.RawValue: _RealmSchemaDiscoverable & _ObjcBridgeable {
+    var _rlmObjcValue: Any { rawValue._rlmObjcValue }
+    static func _rlmFromObjc(_ value: Any, insideOptional: Bool) -> Self? {
+        if let value = value as? Self {
+            return value
+        }
+        if let value = value as? RawValue {
+            return Self(rawValue: value)
+        }
+        return nil
     }
     static func _rlmPopulateProperty(_ prop: RLMProperty) {
         RawValue._rlmPopulateProperty(prop)
@@ -630,10 +723,8 @@ public extension RealmEnum where Self: RawRepresentable, Self.RawValue: _RealmSc
 
 internal func dynamicSet(object: ObjectBase, key: String, value: Any?) {
     let bridgedValue: Any?
-    if let v1 = value, let v2 = v1 as? CustomObjectiveCBridgeable {
-        bridgedValue = v2.objCValue
-    } else if let v1 = value, let v2 = v1 as? RealmEnum {
-        bridgedValue = type(of: v2)._rlmToRawValue(v2)
+    if let v1 = value, let v2 = v1 as AnyObject as? _ObjcBridgeable {
+        bridgedValue = v2._rlmObjcValue
     } else {
         bridgedValue = value
     }
@@ -642,67 +733,4 @@ internal func dynamicSet(object: ObjectBase, key: String, value: Any?) {
     } else {
         RLMDynamicValidatedSet(object, key, bridgedValue)
     }
-}
-
-// MARK: CustomObjectiveCBridgeable
-
-// FIXME: Remove when `as! Self` can be written
-private func forceCastToInferred<T, V>(_ x: T) -> V {
-    return x as! V
-}
-
-extension Object: CustomObjectiveCBridgeable {
-    internal static func bridging(objCValue objectiveCValue: Any) -> Self {
-        return forceCastToInferred(objectiveCValue)
-    }
-
-    internal var objCValue: Any {
-        unsafeCastToRLMObject()
-    }
-}
-
-// MARK: Key Path Strings
-
-extension ObjectBase {
-    internal func prepareForRecording() {
-        let objectSchema = ObjectSchema(RLMObjectBaseObjectSchema(self)!)
-        (objectSchema.rlmObjectSchema.properties + objectSchema.rlmObjectSchema.computedProperties)
-            .map { (prop: $0, accessor: $0.swiftAccessor) }
-            .forEach { $0.accessor?.observe($0.prop, on: self) }
-    }
-}
-
-/**
- Gets the components of a given key path as a string.
-
- - warning: Objects that declare properties with the old `@objc dynamic` syntax are not fully supported
- by this function, and it is recommened that you use `@Persisted` to declare your properties if you wish to use
- this function to its full benefit.
-
- Example:
- ```
- let name = ObjectBase._name(for: \Person.dogs[0].name) // "dogs.name"
- // Note that the above KeyPath expression is only supported with properties declared
- // with `@Persisted`.
- let nested = ObjectBase._name(for: \Person.address.city.zip) // "address.city.zip"
- ```
- */
-public func _name<T: ObjectBase>(for keyPath: PartialKeyPath<T>) -> String {
-    if let name = keyPath._kvcKeyPathString {
-        return name
-    }
-    let traceObject = T()
-    traceObject.lastAccessedNames = NSMutableArray()
-    traceObject.prepareForRecording()
-    let value = traceObject[keyPath: keyPath]
-    if let collection = value as? PropertyNameConvertible,
-       let propertyInfo = collection.propertyInformation,
-       propertyInfo.isLegacy {
-        traceObject.lastAccessedNames?.add(propertyInfo.key)
-    }
-
-    if let storage = value as? RLMSwiftValueStorage {
-        traceObject.lastAccessedNames?.add(RLMSwiftValueStorageGetPropertyName(storage))
-    }
-    return traceObject.lastAccessedNames!.componentsJoined(by: ".")
 }

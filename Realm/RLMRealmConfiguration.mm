@@ -179,7 +179,7 @@ NSString *RLMRealmPathForFile(NSString *fileName) {
 }
 
 - (BOOL)readOnly {
-    return _config.immutable() || _config.read_only_alternative();
+    return _config.immutable() || _config.read_only();
 }
 
 static bool isSync(realm::Realm::Config const& config) {
@@ -196,7 +196,7 @@ static bool isSync(realm::Realm::Config const& config) {
         }
     }
     else if (self.readOnly) {
-        _config.schema_mode = isSync(_config) ? realm::SchemaMode::ReadOnlyAlternative : realm::SchemaMode::Immutable;
+        _config.schema_mode = isSync(_config) ? realm::SchemaMode::ReadOnly : realm::SchemaMode::Immutable;
     }
     else if (isSync(_config)) {
         if (_customSchema) {
@@ -218,7 +218,7 @@ static bool isSync(realm::Realm::Config const& config) {
         } else if (self.shouldCompactOnLaunch) {
             @throw RLMException(@"Cannot set `readOnly` when `shouldCompactOnLaunch` is set.");
         }
-        _config.schema_mode = isSync(_config) ? realm::SchemaMode::ReadOnlyAlternative : realm::SchemaMode::Immutable;
+        _config.schema_mode = isSync(_config) ? realm::SchemaMode::ReadOnly : realm::SchemaMode::Immutable;
     }
     else if (self.readOnly) {
         _config.schema_mode = realm::SchemaMode::Automatic;

@@ -197,6 +197,8 @@ RLM_COLLECTION_TYPE(Person);
 - (RLMUser *)logInUserForCredentials:(RLMCredentials *)credentials;
 - (RLMUser *)logInUserForCredentials:(RLMCredentials *)credentials app:(RLMApp *)app;
 
+- (RLMCredentials *)jwtCredentialWithAppId:(NSString *)appId;
+
 /// Synchronously, log out.
 - (void)logOutUser:(RLMUser *)user;
 

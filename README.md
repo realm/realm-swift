@@ -1,4 +1,4 @@
-![Realm](https://github.com/realm/realm-cocoa/raw/master/logo.png)
+![Realm](https://github.com/realm/realm-swift/raw/master/logo.png)
 
 Realm is a mobile database that runs directly inside phones, tablets or wearables.
 This repository holds the source code for the iOS, macOS, tvOS & watchOS versions of Realm Swift & Realm Objective-C.
@@ -129,8 +129,8 @@ The API reference is located at [docs.mongodb.com/realm-sdks/swift/latest/](http
 ## Getting Help
 
 - **Need help with your code?**: Look for previous questions with the[`realm` tag](https://stackoverflow.com/questions/tagged/realm?sort=newest) on Stack Overflow or [ask a new question](https://stackoverflow.com/questions/ask?tags=realm). For general discussion that might be considered too broad for Stack Overflow, use the [Community Forum](https://developer.mongodb.com/community/forums/tags/c/realm-sdks/58/swift/).
-- **Have a bug to report?** [Open a GitHub issue](https://github.com/realm/realm-cocoa/issues/new). If possible, include the version of Realm, a full log, the Realm file, and a project that shows the issue.
-- **Have a feature request?** [Open a GitHub issue](https://github.com/realm/realm-cocoa/issues/new). Tell us what the feature should do and why you want the feature.
+- **Have a bug to report?** [Open a GitHub issue](https://github.com/realm/realm-swift/issues/new). If possible, include the version of Realm, a full log, the Realm file, and a project that shows the issue.
+- **Have a feature request?** [Open a GitHub issue](https://github.com/realm/realm-swift/issues/new). Tell us what the feature should do and why you want the feature.
 
 ## Building Realm
 
@@ -171,4 +171,4 @@ not eligible to receive the product under U.S. law.**
 
 **_And if you don't like it, please let us know what you would like improved, so we can fix it!_**
 
-<img style="width: 0px; height: 0px;" src="https://3eaz4mshcd.execute-api.us-east-1.amazonaws.com/prod?s=https://github.com/realm/realm-cocoa#README.md">
+<img style="width: 0px; height: 0px;" src="https://3eaz4mshcd.execute-api.us-east-1.amazonaws.com/prod?s=https://github.com/realm/realm-swift#README.md">

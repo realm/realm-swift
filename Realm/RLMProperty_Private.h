@@ -98,6 +98,7 @@ static inline NSString *RLMTypeToString(RLMPropertyType type) {
 @property (nonatomic, assign) ptrdiff_t swiftIvar;
 @property (nonatomic, assign, nullable) Class swiftAccessor;
 @property (nonatomic, readwrite, assign) RLMPropertyType dictionaryKeyType;
+@property (nonatomic, readwrite) BOOL customMappingIsOptional;
 
 // getter and setter names
 @property (nonatomic, copy) NSString *getterName;
@@ -106,6 +107,7 @@ static inline NSString *RLMTypeToString(RLMPropertyType type) {
 @property (nonatomic, nullable) SEL setterSel;
 
 - (RLMProperty *)copyWithNewName:(NSString *)name;
+- (NSString *)typeName;
 
 @end
 

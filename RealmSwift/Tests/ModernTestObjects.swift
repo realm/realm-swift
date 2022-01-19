@@ -160,6 +160,13 @@ class ModernAllTypesObject: Object {
     var linkingObjects: LinkingObjects<ModernAllTypesObject>
 }
 
+class LinkToModernAllTypesObject: Object {
+    @Persisted var object: ModernAllTypesObject?
+    @Persisted var list: List<ModernAllTypesObject>
+    @Persisted var set: MutableSet<ModernAllTypesObject>
+    @Persisted var map: Map<String, ModernAllTypesObject?>
+}
+
 enum ModernIntEnum: Int, Codable, PersistableEnum {
     case value1 = 1
     case value2 = 3
@@ -378,6 +385,10 @@ class ModernEmbeddedTreeObject3: EmbeddedObject, ModernEmbeddedTreeObject {
     var parent4: LinkingObjects<ModernEmbeddedTreeObject2>
 }
 
+class ModernEmbeddedObject: EmbeddedObject {
+    @Persisted var value = 0
+}
+
 class SetterObservers: Object {
     @Persisted var value: Int {
         willSet {
@@ -412,6 +423,7 @@ class ModernAllIndexableTypesObject: Object {
     @Persisted(indexed: true) var int64Col: Int64 = 4
     @Persisted(indexed: true) var stringCol: String
     @Persisted(indexed: true) var dateCol: Date
+    @Persisted(indexed: true) var uuidCol: UUID
     @Persisted(indexed: true) var objectIdCol: ObjectId
     @Persisted(indexed: true) var intEnumCol: ModernIntEnum
     @Persisted(indexed: true) var stringEnumCol: ModernStringEnum
@@ -424,6 +436,7 @@ class ModernAllIndexableTypesObject: Object {
     @Persisted(indexed: true) var optBoolCol: Bool?
     @Persisted(indexed: true) var optStringCol: String?
     @Persisted(indexed: true) var optDateCol: Date?
+    @Persisted(indexed: true) var optUuidCol: UUID?
     @Persisted(indexed: true) var optObjectIdCol: ObjectId?
     @Persisted(indexed: true) var optIntEnumCol: ModernIntEnum?
     @Persisted(indexed: true) var optStringEnumCol: ModernStringEnum?
@@ -438,6 +451,7 @@ class ModernAllIndexableButNotIndexedObject: Object {
     @Persisted(indexed: false) var int64Col: Int64 = 4
     @Persisted(indexed: false) var stringCol: String
     @Persisted(indexed: false) var dateCol: Date
+    @Persisted(indexed: false) var uuidCol: UUID
     @Persisted(indexed: false) var objectIdCol: ObjectId
     @Persisted(indexed: false) var intEnumCol: ModernIntEnum
     @Persisted(indexed: false) var stringEnumCol: ModernStringEnum
@@ -450,6 +464,7 @@ class ModernAllIndexableButNotIndexedObject: Object {
     @Persisted(indexed: false) var optBoolCol: Bool?
     @Persisted(indexed: false) var optStringCol: String?
     @Persisted(indexed: false) var optDateCol: Date?
+    @Persisted(indexed: false) var optUuidCol: UUID?
     @Persisted(indexed: false) var optObjectIdCol: ObjectId?
     @Persisted(indexed: false) var optIntEnumCol: ModernIntEnum?
     @Persisted(indexed: false) var optStringEnumCol: ModernStringEnum?
@@ -509,4 +524,15 @@ class ModernCollectionsOfEnums: Object {
     @Persisted var mapFloatOpt: Map<String, EnumFloat?>
     @Persisted var mapDoubleOpt: Map<String, EnumDouble?>
     @Persisted var mapStringOpt: Map<String, EnumString?>
+}
+
+class LinkToModernCollectionsOfEnums: Object {
+    @Persisted var object: ModernCollectionsOfEnums?
+    @Persisted var list: List<ModernCollectionsOfEnums>
+    @Persisted var set: MutableSet<ModernCollectionsOfEnums>
+    @Persisted var map: Map<String, ModernCollectionsOfEnums?>
+}
+
+class ModernListAnyRealmValueObject: Object {
+    @Persisted var value: List<AnyRealmValue>
 }

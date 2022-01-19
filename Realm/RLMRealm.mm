@@ -429,7 +429,7 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
             if (RLMRealm *realm = RLMGetThreadLocalCachedRealmForPath(config.path, cacheKey)) {
                 auto const& old_config = realm->_realm->config();
                 if (old_config.immutable() != config.immutable()
-                    || old_config.read_only_alternative() != config.read_only_alternative()) {
+                    || old_config.read_only() != config.read_only()) {
                     @throw RLMException(@"Realm at path '%s' already opened with different read permissions", config.path.c_str());
                 }
                 if (old_config.in_memory != config.in_memory) {
