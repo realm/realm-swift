@@ -51,8 +51,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (readonly) uint64_t version;
 
-#pragma mark - Properties
-
 - (void)addSubscriptionWithClassName:(NSString *)objectClassName
                     subscriptionName:(nullable NSString *)name
                            predicate:(NSPredicate *)predicate
@@ -61,6 +59,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (RLMSyncSubscriptionEnumerator *)fastEnumerator;
 - (void)unregisterEnumerator:(RLMSyncSubscriptionEnumerator *)enumerator;
 - (void)registerEnumerator:(RLMSyncSubscriptionEnumerator *)enumerator;
+
+NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
+                            NSUInteger len,
+                            RLMSyncSubscriptionSet *collection);
 
 @end
 

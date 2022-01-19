@@ -163,7 +163,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                     realm.deleteAll()
                 }
                 waitForUploads(for: realm)
-                
+
                 checkCount(expected: 0, realm, SwiftPerson.self)
                 executeChild()
                 waitForDownloads(for: realm)
