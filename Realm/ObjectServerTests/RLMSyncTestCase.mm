@@ -713,11 +713,8 @@ static NSURL *syncDirectoryForChildProcess() {
                           subscriptionName:@"dog_all"
                                      where:@"TRUEPREDICATE"];
     } onComplete: ^(NSError *error){
-        if (error == nil) {
-            [ex fulfill];
-        } else {
-            XCTFail();
-        }
+        XCTAssertNil(error);
+        [ex fulfill];
     }];
 
     [self waitForExpectationsWithTimeout:20.0 handler:nil];
