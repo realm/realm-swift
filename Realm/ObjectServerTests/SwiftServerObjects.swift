@@ -20,7 +20,7 @@ import Foundation
 import RealmSwift
 
 public class SwiftPerson: Object {
-    @Persisted(primaryKey: true) public var _id: ObjectId? = ObjectId.generate()
+    @Persisted(primaryKey: true) public var _id: ObjectId?
     @Persisted public var firstName: String = ""
     @Persisted public var lastName: String = ""
     @Persisted public var age: Int = 30
