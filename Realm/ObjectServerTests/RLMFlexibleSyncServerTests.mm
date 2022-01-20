@@ -211,7 +211,7 @@
     XCTAssertEqual(subs.count, 1UL);
 }
 
-- (void)testAddDuplicateNamedSubscriptionWillNotReplace {
+- (void)testAddDuplicateNamedSubscriptionWillThrow {
     RLMRealm *realm = [self openFlexibleSyncRealm:_cmd];
     RLMSyncSubscriptionSet *subs = realm.subscriptions;
 
@@ -219,9 +219,10 @@
         [subs addSubscriptionWithClassName:Person.className
                           subscriptionName:@"person_age"
                                      where:@"age > 15"];
-        [subs addSubscriptionWithClassName:Person.className
-                          subscriptionName:@"person_age"
-                                     where:@"age > 20"];
+        RLMAssertThrowsWithReason([subs addSubscriptionWithClassName:Person.className
+                                                    subscriptionName:@"person_age"
+                                                               where:@"age > 20"],
+                                  @"Cannot duplicate a subscription, if you meant to update the subscription please use the `update` method.");
     }];
 
     XCTAssertEqual(subs.version, 1UL);

@@ -384,6 +384,9 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
         if (iterator == _mutableSubscriptionSet->end() || updateExisting) {
             _mutableSubscriptionSet->insert_or_assign([name UTF8String], query);
         }
+        else {
+            @throw RLMException(@"Cannot duplicate a subscription, if you meant to update the subscription please use the `update` method.");
+        }
     }
     else {
         _mutableSubscriptionSet->insert_or_assign(query);
