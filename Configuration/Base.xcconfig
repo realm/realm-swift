@@ -61,6 +61,15 @@ IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 WATCHOS_DEPLOYMENT_TARGET = 2.0;
 TVOS_DEPLOYMENT_TARGET = 9.0;
 
+// Disable building the arm64 simulators when using Carthage build
+// Enable for other cases
+REALM_ARM_ARCHS_YES = arm64 arm64e;
+REALM_ARM_ARCHS = $(REALM_ARM_ARCHS_$(REALM_CARTHAGE_ARM_DISABLED))
+
+EXCLUDED_ARCHS[sdk=watchsimulator*] = $(REALM_ARM_ARCHS);
+EXCLUDED_ARCHS[sdk=iphonesimulator*] = $(REALM_ARM_ARCHS);
+EXCLUDED_ARCHS[sdk=appletvsimulator*] = $(REALM_ARM_ARCHS);
+
 SWIFT_VERSION = 5.0;
 TARGETED_DEVICE_FAMILY = 1,2,3,4;
 SDKROOT = $(REALM_SDKROOT);

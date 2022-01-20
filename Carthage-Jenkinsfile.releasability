@@ -1,10 +1,11 @@
-xcodeVersions = ['13.2.1']//['12.4', '12.5.1', '13.0', '13.1', '13.2.1']
-platforms = ['osx', 'ios']//['osx', 'ios', 'watchos', 'tvos', 'catalyst']
-carthagePlatforms = ['osx', 'ios']//['osx', 'ios', 'watchos', 'tvos']
-platformNames = ['osx': 'macOS', 'ios': 'iOS']//['osx': 'macOS', 'ios': 'iOS', 'watchos': 'watchOS', 'tvos': 'tvOS', 'catalyst': 'Catalyst']
-carthageXcodeVersion = '13.2.1'
-objcXcodeVersion = '12.4'
-docsSwiftVersion = '5.5.1'
+xcodeVersions = ['13.1'] //['12.2', '12.4', '12.5.1', '13.0', '13.1']
+platforms = ['osx', 'ios'] //['osx', 'ios', 'watchos', 'tvos', 'catalyst']
+carthagePlatforms = ['osx', 'ios'] //['osx', 'ios', 'watchos', 'tvos']
+platformNames = ['osx': 'macOS', 'ios': 'iOS'] //['osx': 'macOS', 'ios': 'iOS', 'watchos': 'watchOS', 'tvos': 'tvOS', 'catalyst': 'Catalyst']
+carthageXcodeVersion = '13.1'
+objcXcodeVersion = '12.2'
+docsSwiftVersion = '5.5'
+REALM_CARTHAGE_ARM_DISABLED = '1'
 
 def installationTest(platform, test, language) {
   return {
@@ -71,6 +72,7 @@ def doBuild() {
   }
 
   stage('build') {
+
     def parallelBuilds = [
       'Docs': {
         node('osx') {
@@ -113,42 +115,11 @@ def doBuild() {
       }
     ]
 
-  node('osx') {
-    deleteDir()
-    unstash 'source'
-    sh """
-    hostname
-    export REALM_XCODE_VERSION=${carthageXcodeVersion}
-    . ./scripts/swift-version.sh
-    set_xcode_and_swift_versions
-
-    # Carthage scans every xcodeproj in the directory looking for
-    # targets. This can be very slow and even spuriously time out, so
-    # remove the ones we don't want it to build.
-    rm -r examples plugin
-
-    # For whatever reason 'xcodebuild -list' is very slow sometimes which
-    # makes Carthage time out, but it's a lot faster if no simulators
-    # exist, so delete them all first and only create a single simulator
-    # for each platform.
-    ./scripts/reset-simulators.rb -firstOnly
-
-    # Building the iOS static scheme just wastes time, so delete it
-    rm 'Realm.xcodeproj/xcshareddata/xcschemes/Realm iOS static.xcscheme'
-
-    carthage build --no-skip-current --platform ${carthagePlatforms} --derived-data DerivedData
-    carthage archive --output Carthage-${platform}.framework.zip
-
-    stash includes: "Carthage.framework.zip",
-          name: "Carthage-XCFramework"
-
-    """
-  }
     for (def p in carthagePlatforms) {
       def platform = p
       def platformName = platformNames[platform]
       parallelBuilds["${platformName} Carthage"] = {
-        (node('osx') {
+        node('osx') {
           deleteDir()
           unstash 'source'
           sh """
@@ -156,6 +127,7 @@ def doBuild() {
           export REALM_XCODE_VERSION=${carthageXcodeVersion}
           . ./scripts/swift-version.sh
           set_xcode_and_swift_versions
+          export REALM_CARTHAGE_ARM_DISABLED='YES'
 
           # Carthage scans every xcodeproj in the directory looking for
           # targets. This can be very slow and even spuriously time out, so
@@ -243,7 +215,6 @@ def doBuild() {
         node('osx') {
           deleteDir()
 
-          unstash "Carthage-XCFramework"
           for (def platform in carthagePlatforms) {
             unstash "${platform}-carthage"
           }
@@ -255,6 +226,7 @@ def doBuild() {
 
           ditto -ck merged/ Carthage.framework.zip
           '''
+
           archiveArtifacts artifacts: 'Carthage.framework.zip'
         }
       }
@@ -272,11 +244,11 @@ def doBuild() {
           def sha = params.sha
           sh """
           hostname
-          curl -O https://raw.githubusercontent.com/realm/realm-swift/${sha}/build.sh
+          curl -O https://raw.githubusercontent.com/realm/realm-cocoa/${sha}/build.sh
           mkdir -p scripts
-          curl https://raw.githubusercontent.com/realm/realm-swift/${sha}/scripts/swift-version.sh -o scripts/swift-version.sh
-          curl https://raw.githubusercontent.com/realm/realm-swift/${sha}/scripts/reset-simulators.sh -o scripts/reset-simulators.sh
-          curl https://raw.githubusercontent.com/realm/realm-swift/${sha}/scripts/reset-simulators.rb -o scripts/reset-simulators.rb
+          curl https://raw.githubusercontent.com/realm/realm-cocoa/${sha}/scripts/swift-version.sh -o scripts/swift-version.sh
+          curl https://raw.githubusercontent.com/realm/realm-cocoa/${sha}/scripts/reset-simulators.sh -o scripts/reset-simulators.sh
+          curl https://raw.githubusercontent.com/realm/realm-cocoa/${sha}/scripts/reset-simulators.rb -o scripts/reset-simulators.rb
           chmod +x scripts/reset-simulators.rb
 
           sh build.sh package-test-examples-objc
@@ -293,11 +265,11 @@ def doBuild() {
           def sha = params.sha
           sh """
           hostname
-          curl -O https://raw.githubusercontent.com/realm/realm-swift/${sha}/build.sh
+          curl -O https://raw.githubusercontent.com/realm/realm-cocoa/${sha}/build.sh
           mkdir -p scripts
-          curl https://raw.githubusercontent.com/realm/realm-swift/${sha}/scripts/swift-version.sh -o scripts/swift-version.sh
-          curl https://raw.githubusercontent.com/realm/realm-swift/${sha}/scripts/reset-simulators.sh -o scripts/reset-simulators.sh
-          curl https://raw.githubusercontent.com/realm/realm-swift/${sha}/scripts/reset-simulators.rb -o scripts/reset-simulators.rb
+          curl https://raw.githubusercontent.com/realm/realm-cocoa/${sha}/scripts/swift-version.sh -o scripts/swift-version.sh
+          curl https://raw.githubusercontent.com/realm/realm-cocoa/${sha}/scripts/reset-simulators.sh -o scripts/reset-simulators.sh
+          curl https://raw.githubusercontent.com/realm/realm-cocoa/${sha}/scripts/reset-simulators.rb -o scripts/reset-simulators.rb
           chmod +x scripts/reset-simulators.rb
 
           sh build.sh package-test-examples-swift
