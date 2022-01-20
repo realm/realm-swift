@@ -172,9 +172,7 @@ import Realm.Private
                If `block` throws, the function throws the propagated `ErrorType` instead.
      */
     public func write(_ block: (() -> Void), onComplete: ((Error?) -> Void)? = nil) {
-        rlmSyncSubscriptionSet.write(block, onComplete: { error in
-            onComplete?(error)
-        })
+        rlmSyncSubscriptionSet.write(block, onComplete: onComplete ?? { _ in })
     }
 
     /// Returns the current state for the subscription set.
