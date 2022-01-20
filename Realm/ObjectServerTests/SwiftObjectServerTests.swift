@@ -159,6 +159,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             let realm = try openRealm(partitionValue: .null, user: user)
 
             if isParent {
+                // This test needs the database to be empty of any documents with a nil partition
                 try realm.write {
                     realm.deleteAll()
                 }

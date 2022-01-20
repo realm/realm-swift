@@ -639,7 +639,7 @@ static NSString *randomEmail() {
 - (void)testAddObjectsWithNilPartitionValue {
     RLMRealm *realm = [self openRealmForPartitionValue:nil user:self.anonymousUser];
 
-    // Other tests expect the nil partition to be empty so we need to clean up
+    // This test needs the database to be empty of any documents with a nil partition
     [realm transactionWithBlock:^{
         [realm deleteAllObjects];
     }];

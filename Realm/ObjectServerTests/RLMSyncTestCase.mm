@@ -417,7 +417,7 @@ static NSURL *syncDirectoryForChildProcess() {
     [self writeToPartition:testName userName:testName block:block];
 }
 
-- (void)writeToPartition:(NSString *)testName userName:(NSString *)userNameBase block:(void (^)(RLMRealm *))block {
+- (void)writeToPartition:(nullable NSString *)testName userName:(NSString *)userNameBase block:(void (^)(RLMRealm *))block {
     @autoreleasepool {
         NSString *userName = [userNameBase stringByAppendingString:[NSUUID UUID].UUIDString];
         RLMUser *user = [self logInUserForCredentials:[self basicCredentialsWithName:userName
