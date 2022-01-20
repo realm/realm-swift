@@ -32,7 +32,6 @@
 #import <realm/object-store/sync/sync_session.hpp>
 #import <realm/object-store/sync/sync_user.hpp>
 #import <realm/object-store/util/bson/bson.hpp>
-#import <realm/util/optional.hpp>
 
 using namespace realm;
 
