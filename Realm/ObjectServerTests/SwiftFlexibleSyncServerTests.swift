@@ -294,25 +294,25 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
         let subscriptions = realm.subscriptions
         subscriptions.write {
             #if swift(>=5.5)
-            subscriptions.append {
+            assertThrows(subscriptions.append {
                 QuerySubscription<SwiftPerson>(name: "person_age_1") {
                     $0.age > 15
                 }
                 QuerySubscription<SwiftPerson>(name: "person_age_1") {
                     $0.age > 20
                 }
-            }
+            })
             #else
             subscriptions.append {
                 QuerySubscription<SwiftPerson>(name: "person_age_1") {
                     $0.age > 15
                 }
             }
-            subscriptions.append {
+            assertThrows(subscriptions.append {
                 QuerySubscription<SwiftPerson>(name: "person_age_1") {
                     $0.age > 20
                 }
-            }
+            })
             #endif // swift(>=5.5)
         }
         XCTAssertEqual(subscriptions.count, 1)
