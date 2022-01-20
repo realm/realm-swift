@@ -37,7 +37,7 @@ public class SwiftPerson: Object {
 extension SwiftPerson: ObjectKeyIdentifiable {}
 
 public class SwiftTypesSyncObject: Object {
-    @Persisted(primaryKey: true) public var _id: ObjectId? = ObjectId.generate()
+    @Persisted(primaryKey: true) public var _id: ObjectId?
     @Persisted public var boolCol: Bool = true
     @Persisted public var intCol: Int = 1
     @Persisted public var doubleCol: Double = 1.1
