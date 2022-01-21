@@ -121,8 +121,8 @@ private extension ObjectSchema {
         ]
         var relationships: [String: Any] = [:]
         for property in properties {
-            // First pass we only create the schema and we don't create
-            // links until the targets of the links exist
+            // First pass we only add the properties to the schema as we can't add
+            // links until the targets of the links exist.
             if property.type != .object {
                 stitchProperties[property.name] = property.stitchRule(schema)
             } else if property.type == .object && id != nil {
@@ -770,25 +770,25 @@ public class RealmServer: NSObject {
 
         let rules = app.services[serviceId].rules
 
-        let syncTypes = schema.objectSchema.filter {
-            guard let pk = $0.primaryKeyProperty else { return false }
-            return pk.name == "_id"
-        }
-
+        let syncTypes: [ObjectSchema]
         let partitionKeyType: String?
         if case .pbs(let bsonType) = syncMode {
+            syncTypes = schema.objectSchema.filter {
+                guard let pk = $0.primaryKeyProperty else { return false }
+                return pk.name == "_id"
+            }
             partitionKeyType = bsonType
         } else {
+            // This is a temporary workaround for not been able to add the complete schema for a flx App
+            syncTypes = schema.objectSchema.filter {
+                let validSyncClasses = ["Dog", "Person", "SwiftPerson", "SwiftTypesSyncObject"]
+                return validSyncClasses.contains($0.className)
+            }
             partitionKeyType = nil
         }
         var ruleCreations = [Result<Any?, Error>]()
         for objectSchema in syncTypes {
-            let validSyncClasses = ["Dog", "Person", "SwiftPerson", "SwiftTypesSyncObject"]
-            if partitionKeyType != nil ||
-                // This is a temporary workaround for not been able to add the complete schema for flx App
-                validSyncClasses.contains(objectSchema.className) {
-                ruleCreations.append(rules.post(objectSchema.stitchRule(partitionKeyType ?? "string", schema)))
-            }
+            ruleCreations.append(rules.post(objectSchema.stitchRule(partitionKeyType ?? "string", schema)))
         }
 
         var ruleIds: [String: String] = [:]
@@ -800,13 +800,8 @@ public class RealmServer: NSObject {
             ruleIds[dict["collection"]!] = dict["_id"]!
         }
         for objectSchema in syncTypes {
-            let validSyncClasses = ["Dog", "Person", "SwiftPerson", "SwiftTypesSyncObject"]
-            if partitionKeyType != nil ||
-                validSyncClasses.contains(objectSchema.className) {
-                // This is a temporary workaround for not been able to add the complete schema for flx App
-                let id = ruleIds[objectSchema.className]!
-                rules[id].put(on: group, data: objectSchema.stitchRule(partitionKeyType ?? "string", schema, id: id), failOnError)
-            }
+            let id = ruleIds[objectSchema.className]!
+            rules[id].put(on: group, data: objectSchema.stitchRule(partitionKeyType ?? "string", schema, id: id), failOnError)
         }
 
         app.sync.config.put(on: group, data: [

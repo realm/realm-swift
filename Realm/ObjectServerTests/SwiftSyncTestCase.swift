@@ -242,17 +242,8 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
         XCTAssertNotNil(subscriptions)
         let ex = expectation(description: "state change complete")
         subscriptions.write({
-            // Using this queries, because unlike Ojective-C we cannot use TRUEPREDICATE to filter all the documents
-            subscriptions.append {
-                QuerySubscription<SwiftPerson> {
-                    $0.age >= 0
-                }
-            }
-            subscriptions.append {
-                QuerySubscription<SwiftTypesSyncObject> {
-                    $0.boolCol == true
-                }
-            }
+            subscriptions.append(QuerySubscription<SwiftPerson>(where: "TRUEPREDICATE"))
+            subscriptions.append(QuerySubscription<SwiftTypesSyncObject>(where: "TRUEPREDICATE"))
         }, onComplete: { error in
             XCTAssertNil(error)
             ex.fulfill()

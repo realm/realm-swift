@@ -35,7 +35,7 @@
     return @{@"_id": [RLMObjectId objectId]};
 }
 
-- (instancetype) initWithPrimaryKey:(RLMObjectId *)primaryKey breed:(NSString *)breed name:(NSString *)name {
+- (instancetype)initWithPrimaryKey:(RLMObjectId *)primaryKey breed:(NSString *)breed name:(NSString *)name {
     self = [super init];
     if (self) {
         self._id = primaryKey;

@@ -57,8 +57,6 @@ NS_ASSUME_NONNULL_BEGIN
                       updateExisting:(BOOL)updateExisting;
 
 - (RLMSyncSubscriptionEnumerator *)fastEnumerator;
-- (void)unregisterEnumerator:(RLMSyncSubscriptionEnumerator *)enumerator;
-- (void)registerEnumerator:(RLMSyncSubscriptionEnumerator *)enumerator;
 
 NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
                             NSUInteger len,

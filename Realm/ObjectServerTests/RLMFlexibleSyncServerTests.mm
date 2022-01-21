@@ -222,7 +222,7 @@
         RLMAssertThrowsWithReason([subs addSubscriptionWithClassName:Person.className
                                                     subscriptionName:@"person_age"
                                                                where:@"age > 20"],
-                                  @"Cannot duplicate a subscription, if you meant to update the subscription please use the `update` method.");
+                                  @"Cannot duplicate a subscription. If you meant to update the subscription please use the `update` method.");
     }];
 
     XCTAssertEqual(subs.version, 1UL);
@@ -525,7 +525,7 @@
     XCTAssertEqual(subs.count, 0UL);
 }
 
-- (void)testUpdateSubscriptionQueryWithSameClassName {
+- (void)testUpdateSubscriptionQuery {
     RLMRealm *realm = [self openFlexibleSyncRealm:_cmd];
     RLMSyncSubscriptionSet *subs = realm.subscriptions;
 
@@ -542,7 +542,7 @@
     XCTAssertNotNil(foundSubscription);
 
     [subs write:^{
-        [foundSubscription updateSubscriptionWithClassName:Person.className where:@"age > 20"];
+        [foundSubscription updateSubscriptionWhere:@"age > 20"];
     }];
 
     XCTAssertEqual(subs.version, 2UL);
@@ -552,35 +552,6 @@
     XCTAssertNotNil(foundSubscription2);
     XCTAssertEqualObjects(foundSubscription2.queryString, @"age > 20");
     XCTAssertEqualObjects(foundSubscription2.objectClassName, @"Person");
-}
-
-- (void)testUpdateSubscriptionQueryWithDifferentClassName {
-    RLMRealm *realm = [self openFlexibleSyncRealm:_cmd];
-    RLMSyncSubscriptionSet *subs = realm.subscriptions;
-
-    [subs write:^{
-        [subs addSubscriptionWithClassName:Person.className
-                          subscriptionName:@"subscription_1"
-                                     where:@"age > 15"];
-    }];
-
-    XCTAssertEqual(subs.version, 1UL);
-    XCTAssertEqual(subs.count, 1UL);
-
-    RLMSyncSubscription *foundSubscription = [subs subscriptionWithName:@"subscription_1"];
-    XCTAssertNotNil(foundSubscription);
-
-    [subs write:^{
-        [foundSubscription updateSubscriptionWithClassName:Dog.className predicate:[NSPredicate predicateWithFormat:@"name == 'Tomas'"]];
-    }];
-
-    XCTAssertEqual(subs.version, 2UL);
-    XCTAssertEqual(subs.count, 1UL);
-
-    RLMSyncSubscription *foundSubscription2 = [subs subscriptionWithName:@"subscription_1"];
-    XCTAssertNotNil(foundSubscription2);
-    XCTAssertEqualObjects(foundSubscription2.queryString, @"name == \"Tomas\"");
-    XCTAssertEqualObjects(foundSubscription2.objectClassName, @"Dog");
 }
 
 - (void)testUpdateSubscriptionQueryWithoutWriteThrow {
@@ -599,7 +570,7 @@
     RLMSyncSubscription *foundSubscription = [subs subscriptionWithName:@"subscription_1"];
     XCTAssertNotNil(foundSubscription);
 
-    RLMAssertThrowsWithReason([foundSubscription updateSubscriptionWithClassName:Dog.className predicate:[NSPredicate predicateWithFormat:@"name == 'Tomas'"]], @"Can only add, remove, or update subscriptions within a write subscription block.");
+    RLMAssertThrowsWithReason([foundSubscription updateSubscriptionWithPredicate:[NSPredicate predicateWithFormat:@"name == 'Tomas'"]], @"Can only add, remove, or update subscriptions within a write subscription block.");
 }
 
 - (void)testSubscriptionSetIterate {
@@ -936,47 +907,9 @@
 
     [self writeQueryAndCompleteForRealm:realm block:^(RLMSyncSubscriptionSet *subs) {
         RLMSyncSubscription *foundSub = [subs subscriptionWithName:@"person_age"];
-        [foundSub updateSubscriptionWithClassName:Person.className where:@"age > 20 and partition == %@", NSStringFromSelector(_cmd)];
+        [foundSub updateSubscriptionWhere:@"age > 20 and partition == %@", NSStringFromSelector(_cmd)];
     }];
     CHECK_COUNT(1, Person, realm);
-}
-
-- (void)testFlexibleSyncUpdateQueryToDifferentClass {
-    [self populateData:^(RLMRealm *realm) {
-        int numberOfSubs = 21;
-        for (int i = 1; i <= numberOfSubs; ++i) {
-            Person *person = [[Person alloc] initWithPrimaryKey:[RLMObjectId objectId]
-                                                            age:i
-                                                      firstName:[NSString stringWithFormat:@"firstname_%d", i]
-                                                       lastName:[NSString stringWithFormat:@"lastname_%d", i]];
-            person.partition = NSStringFromSelector(_cmd);
-            [realm addObject: person];
-        }
-        Dog *dog = [[Dog alloc] initWithPrimaryKey:[RLMObjectId objectId]
-                                             breed:@"Labradoodle"
-                                              name:@"Tom"];
-        dog.partition = NSStringFromSelector(_cmd);
-        [realm addObject:dog];
-    }];
-
-    RLMRealm *realm = [self getFlexibleSyncRealm:_cmd];
-    XCTAssertNotNil(realm);
-    CHECK_COUNT(0, Person, realm);
-
-    [self writeQueryAndCompleteForRealm:realm block:^(RLMSyncSubscriptionSet *subs) {
-        [subs addSubscriptionWithClassName:Person.className
-                          subscriptionName:@"main_query"
-                                     where:@"age > 0 and partition == %@", NSStringFromSelector(_cmd)];
-    }];
-    CHECK_COUNT(21, Person, realm);
-    CHECK_COUNT(0, Dog, realm);
-
-    [self writeQueryAndCompleteForRealm:realm block:^(RLMSyncSubscriptionSet *subs) {
-        RLMSyncSubscription *foundSub = [subs subscriptionWithName:@"main_query"];
-        [foundSub updateSubscriptionWithClassName:Dog.className where:@"breed == 'Labradoodle' and partition == %@", NSStringFromSelector(_cmd)];
-    }];
-    CHECK_COUNT(0, Person, realm);
-    CHECK_COUNT(1, Dog, realm);
 }
 
 - (void)testFlexibleSyncAddObjectOutsideQuery {

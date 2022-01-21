@@ -55,7 +55,6 @@
 #import "RLMSyncUtil_Private.hpp"
 #import "RLMSyncSubscription_Private.hpp"
 
-#import <realm/object-store/shared_realm.hpp>
 #import <realm/object-store/sync/async_open_task.hpp>
 #import <realm/object-store/sync/sync_session.hpp>
 #endif

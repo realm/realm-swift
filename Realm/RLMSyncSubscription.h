@@ -67,16 +67,13 @@ NS_ASSUME_NONNULL_BEGIN
 
  @warning This method may only be called during a write subscription block.
 
- @param objectClassName The class name for the model class to be queried.
  @param predicateFormat A predicate format string, optionally followed by a variable number of arguments.
  */
-- (void)updateSubscriptionWithClassName:(NSString *)objectClassName
-                                  where:(NSString *)predicateFormat, ...;
+- (void)updateSubscriptionWhere:(NSString *)predicateFormat, ...;
 
 /// :nodoc:
-- (void)updateSubscriptionWithClassName:(NSString *)objectClassName
-                                  where:(NSString *)predicateFormat
-                                   args:(va_list)args;
+- (void)updateSubscriptionWhere:(NSString *)predicateFormat
+                           args:(va_list)args;
 
 /**
  Updates a Flexible Sync's subscription query with an allowed query which will be used to bootstrap data
@@ -84,11 +81,9 @@ NS_ASSUME_NONNULL_BEGIN
 
  @warning This method may only be called during a write subscription block.
 
- @param objectClassName The class name for the model class to be queried.
  @param predicate The predicate with which to filter the objects on the server.
  */
-- (void)updateSubscriptionWithClassName:(NSString *)objectClassName
-                              predicate:(NSPredicate *)predicate;
+- (void)updateSubscriptionWithPredicate:(NSPredicate *)predicate;
 
 @end
 
@@ -125,7 +120,8 @@ NS_ASSUME_NONNULL_BEGIN
  and will return after committing the subscription transactions.
 
  @param block The block containing actions to perform to the subscription set.
- @param onComplete The block called upon synchronization of subscriptions to the server.
+ @param onComplete The block called upon synchronization of subscriptions to the server. Otherwise
+                   an `Error`describing what went wrong will be returned by the block
  */
 - (void)write:(__attribute__((noescape)) void(^)(void))block onComplete:(void(^)(NSError * _Nullable))onComplete;
 
@@ -160,7 +156,7 @@ NS_ASSUME_NONNULL_BEGIN
  Finds a subscription by the query for the specified object class name.
 
  @param objectClassName The class name for the model class to be queried.
- @param predicate The predicate with which to filter the objects on the server.
+ @param predicate The predicate used to  to filter the objects on the server.
 
  @return A subscription for the given query..
  */
@@ -213,7 +209,7 @@ NS_ASSUME_NONNULL_BEGIN
  @warning This method may only be called during a write subscription block.
 
  @param objectClassName The class name for the model class to be queried.
- @param predicate The predicate with which to filter the objects on the server.
+ @param predicate The predicate defining the query for the subscription.
  */
 - (void)addSubscriptionWithClassName:(NSString *)objectClassName
                            predicate:(NSPredicate *)predicate;
@@ -226,7 +222,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @param objectClassName The class name for the model class to be queried.
  @param name The name used to identify the subscription.
- @param predicate The predicate with which to filter the objects on the server.
+ @param predicate The predicate defining the query for the subscription.
  */
 - (void)addSubscriptionWithClassName:(NSString *)objectClassName
                     subscriptionName:(nullable NSString *)name
@@ -265,7 +261,7 @@ NS_ASSUME_NONNULL_BEGIN
  @warning This method may only be called during a write subscription block.
 
  @param objectClassName The class name for the model class to be queried.
- @param predicate The predicate with which to filter the objects on the server.
+ @param predicate  The predicate which will be used to identify the subscription to be removed.
  */
 - (void)removeSubscriptionWithClassName:(NSString *)objectClassName
                               predicate:(NSPredicate *)predicate;

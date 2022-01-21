@@ -799,7 +799,6 @@
 		1ABF256D1D52AB6200BAC441 /* RLMRealmConfiguration+Sync.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "RLMRealmConfiguration+Sync.h"; sourceTree = "<group>"; };
 		1ABF256E1D52AB6200BAC441 /* RLMRealmConfiguration+Sync.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "RLMRealmConfiguration+Sync.mm"; sourceTree = "<group>"; };
 		1AD3870A1D4A7FBB00479110 /* RLMSyncSession.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMSyncSession.h; sourceTree = "<group>"; };
-		1AD3870B1D4A7FBB00479110 /* RLMSyncSession.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMSyncSession.mm; sourceTree = "<group>"; };
 		1AD397CC1F72FFC5002AA897 /* RLMRealm+Sync.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "RLMRealm+Sync.mm"; sourceTree = "<group>"; };
 		1AD397CD1F72FFC6002AA897 /* RLMRealm+Sync.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "RLMRealm+Sync.h"; sourceTree = "<group>"; };
 		1AF64DD01DA304A90081EB15 /* RLMUser+ObjectServerTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "RLMUser+ObjectServerTests.h"; path = "Realm/ObjectServerTests/RLMUser+ObjectServerTests.h"; sourceTree = "<group>"; };
@@ -1134,7 +1133,7 @@
 		E81A1F7F1955FC9300FDED82 /* RLMSchema.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMSchema.mm; sourceTree = "<group>"; };
 		E81A1F811955FC9300FDED82 /* RLMUtil.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = RLMUtil.hpp; sourceTree = "<group>"; };
 		E81A1F821955FC9300FDED82 /* RLMUtil.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMUtil.mm; sourceTree = "<group>"; };
-		E81A1FB31955FCE000FDED82 /* CHANGELOG.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; lineEnding = 0; path = CHANGELOG.md; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.markdown; };
+		E81A1FB31955FCE000FDED82 /* CHANGELOG.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; lineEnding = 0; path = CHANGELOG.md; sourceTree = "<group>"; };
 		E81A1FB41955FCE000FDED82 /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		E81A1FB81955FE0100FDED82 /* ArrayPropertyTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = ArrayPropertyTests.m; sourceTree = "<group>"; };
 		E81A1FBA1955FE0100FDED82 /* DynamicTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DynamicTests.m; sourceTree = "<group>"; };
@@ -1410,14 +1409,6 @@
 				53124AD825B71AF700771CE4 /* SwiftUITestHostUITests.swift */,
 			);
 			path = SwiftUITestHostUITests;
-			sourceTree = "<group>";
-		};
-		531F956D27906F9400E497F1 /* Recovered References */ = {
-			isa = PBXGroup;
-			children = (
-				1AD3870B1D4A7FBB00479110 /* RLMSyncSession.mm */,
-			);
-			name = "Recovered References";
 			sourceTree = "<group>";
 		};
 		53A34E3225CDA0AC00698930 /* SwiftUITestHost */ = {
@@ -1769,7 +1760,6 @@
 				5D660FD91BE98C7C0021E04F /* RealmSwift Tests */,
 				3F558C7D22C299DB002F0F30 /* Test Utils */,
 				E81A1FB31955FCE000FDED82 /* CHANGELOG.md */,
-				531F956D27906F9400E497F1 /* Recovered References */,
 			);
 			indentWidth = 4;
 			sourceTree = "<group>";

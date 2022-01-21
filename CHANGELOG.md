@@ -17,7 +17,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * Xcode: 12.4-13.2.1.
 
 ### Internal
-* Upgraded realm-core from ? to ?
+* Upgraded realm-core from 11.8.0 to 11.9.0
 
 10.21.1 Release notes (2022-01-12)
 =============================================================

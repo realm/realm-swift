@@ -70,29 +70,36 @@
     return RLMStringViewToNSString(_subscription->object_class_name());
 }
 
-- (void)updateSubscriptionWithClassName:(NSString *)objectClassName
-                                  where:(NSString *)predicateFormat, ... {
+- (void)updateSubscriptionWhere:(NSString *)predicateFormat, ... {
     va_list args;
     va_start(args, predicateFormat);
-    [self updateSubscriptionWithClassName:objectClassName
-                                    where:predicateFormat
-                                     args:args];
+    [self updateSubscriptionWhere:predicateFormat
+                             args:args];
     va_end(args);
 }
 
-- (void)updateSubscriptionWithClassName:(NSString *)objectClassName
-                                  where:(NSString *)predicateFormat
-                                   args:(va_list)args {
-    [self updateSubscriptionWithClassName:objectClassName
-                                predicate:[NSPredicate predicateWithFormat:predicateFormat arguments:args]];
+- (void)updateSubscriptionWhere:(NSString *)predicateFormat
+                           args:(va_list)args {
+    [self updateSubscriptionWithPredicate:[NSPredicate predicateWithFormat:predicateFormat arguments:args]];
 }
 
-- (void)updateSubscriptionWithClassName:(NSString *)objectClassName
-                              predicate:(NSPredicate *)predicate {
-    [_subscriptionSet addSubscriptionWithClassName:objectClassName
-                                  subscriptionName:self.name
-                                         predicate:predicate
-                                    updateExisting:true];
+- (void)updateSubscriptionWithPredicate:(NSPredicate *)predicate {
+    if (self.name != nil) {
+        [_subscriptionSet addSubscriptionWithClassName:self.objectClassName
+                                      subscriptionName:self.name
+                                             predicate:predicate
+                                        updateExisting:true];
+    }
+    else {
+        RLMSyncSubscription *foundSubscription = [_subscriptionSet subscriptionWithClassName:self.objectClassName where:self.queryString];
+        if (foundSubscription) {
+            [_subscriptionSet removeSubscription:foundSubscription];
+            [_subscriptionSet addSubscriptionWithClassName:self.objectClassName
+                                                 predicate:predicate];
+        } else {
+            @throw RLMException(@"Cannot update a non-existent subscription.");
+        }
+    }
 }
 
 @end
@@ -120,7 +127,6 @@
 - (instancetype)initWithSubscriptionSet:(RLMSyncSubscriptionSet *)subscriptionSet {
     if (self = [super init]) {
         _subscriptionSet = subscriptionSet;
-        [_subscriptionSet registerEnumerator:self];
         return self;
     }
     return nil;
@@ -142,7 +148,6 @@
         // Release our data if we're done, as we're autoreleased and so may
         // stick around for a while
         if (_subscriptionSet) {
-            [_subscriptionSet unregisterEnumerator:self];
             _subscriptionSet = nil;
         }
     }
@@ -174,7 +179,6 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
 }
 
 @implementation RLMSyncSubscriptionSet {
-    BOOL _isInWriteTransaction;
     std::mutex _collectionEnumeratorMutex;
     RLMRealm *_realm;
 }
@@ -192,20 +196,6 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
 - (RLMSyncSubscriptionEnumerator *)fastEnumerator {
     return [[RLMSyncSubscriptionEnumerator alloc] initWithSubscriptionSet:self];
 }
-
-- (void)unregisterEnumerator:(RLMSyncSubscriptionEnumerator *)enumerator {
-    std::lock_guard lock(_collectionEnumeratorMutex);
-    [_enumerators removeObject:enumerator];
-}
-
-- (void)registerEnumerator:(RLMSyncSubscriptionEnumerator *)enumerator {
-    std::lock_guard lock(_collectionEnumeratorMutex);
-    if (!_enumerators) {
-        _enumerators = [NSHashTable hashTableWithOptions:NSPointerFunctionsWeakMemory];
-    }
-    [_enumerators addObject:enumerator];
-}
-
 
 - (NSUInteger)count {
     return _subscriptionSet->size();
@@ -244,16 +234,14 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
 
 - (void)write:(__attribute__((noescape)) void(^)(void))block
    onComplete:(void(^)(NSError *))completionBlock {
-    if (self->_isInWriteTransaction) {
+    if (_mutableSubscriptionSet != nil) {
         @throw RLMException(@"Cannot initiate a write transaction on subscription set that is already been updated.");
     }
     _mutableSubscriptionSet = std::make_unique<realm::sync::MutableSubscriptionSet>(_subscriptionSet->make_mutable_copy());
-    self->_isInWriteTransaction = true;
     block();
     try {
         _subscriptionSet = std::make_unique<realm::sync::SubscriptionSet>(std::move(*_mutableSubscriptionSet).commit());
         _mutableSubscriptionSet = nullptr;
-        self->_isInWriteTransaction = false;
     }
     catch (const std::exception& error) {
         _subscriptionSet->refresh();
@@ -381,11 +369,14 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
     if (name != nil) {
         auto iterator = _mutableSubscriptionSet->find([name UTF8String]);
         
-        if (iterator == _mutableSubscriptionSet->end() || updateExisting) {
+        if (updateExisting) {
+            _mutableSubscriptionSet->insert_or_assign([name UTF8String], query);
+        }
+        else if (iterator == _mutableSubscriptionSet->end()) {
             _mutableSubscriptionSet->insert_or_assign([name UTF8String], query);
         }
         else {
-            @throw RLMException(@"Cannot duplicate a subscription, if you meant to update the subscription please use the `update` method.");
+            @throw RLMException(@"Cannot duplicate a subscription. If you meant to update the subscription please use the `update` method.");
         }
     }
     else {
@@ -411,6 +402,7 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
     [self removeSubscriptionWithClassName:objectClassName
                                     where: predicateFormat
                                      args: args];
+    va_end(args);
 }
 
 - (void)removeSubscriptionWithClassName:(NSString *)objectClassName
@@ -487,7 +479,7 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
 
 - (RLMSyncSubscription *)firstObject {
     if (_subscriptionSet->size() < 1) {
-        return 0;
+        return nil;
     }
     return [[RLMSyncSubscription alloc]initWithSubscription:_subscriptionSet->at(size_t(0))
                                             subscriptionSet:self];
@@ -495,7 +487,7 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
 
 - (RLMSyncSubscription *)lastObject {
     if (_subscriptionSet->size() < 1) {
-        return 0;
+        return nil;
     }
     
     return [[RLMSyncSubscription alloc]initWithSubscription:_subscriptionSet->at(_subscriptionSet->size()-1)
@@ -515,7 +507,7 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
 }
 
 - (void)verifyInWriteTransaction {
-    if (!self->_isInWriteTransaction) {
+    if (_mutableSubscriptionSet == nil) {
         @throw RLMException(@"Can only add, remove, or update subscriptions within a write subscription block.");
     }
 }

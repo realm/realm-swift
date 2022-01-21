@@ -24,7 +24,7 @@
 @property NSString *breed;
 @property NSString *name;
 @property NSString *partition;
-- (instancetype) initWithPrimaryKey:(RLMObjectId *)primaryKey breed:(NSString *)breed name:(NSString *)name;
+- (instancetype)initWithPrimaryKey:(RLMObjectId *)primaryKey breed:(NSString *)breed name:(NSString *)name;
 @end
 
 @interface Person : RLMObject
@@ -34,7 +34,7 @@
 @property NSString *lastName;
 @property NSString *partition;
 
-- (instancetype) initWithPrimaryKey:(RLMObjectId *)primaryKey age:(NSInteger)strCol firstName:(NSString *)intCol lastName:(NSString *)intCol;
+- (instancetype)initWithPrimaryKey:(RLMObjectId *)primaryKey age:(NSInteger)strCol firstName:(NSString *)intCol lastName:(NSString *)intCol;
 + (instancetype)john;
 + (instancetype)paul;
 + (instancetype)ringo;
@@ -52,21 +52,21 @@
 @property NSUUID *_id;
 @property NSString *strCol;
 @property NSInteger intCol;
-- (instancetype) initWithPrimaryKey:(NSUUID *)primaryKey strCol:(NSString *)strCol intCol:(NSInteger)intCol;
+- (instancetype)initWithPrimaryKey:(NSUUID *)primaryKey strCol:(NSString *)strCol intCol:(NSInteger)intCol;
 @end
 
 @interface StringPrimaryKeyObject : RLMObject
 @property NSString *_id;
 @property NSString *strCol;
 @property NSInteger intCol;
-- (instancetype) initWithPrimaryKey:(NSString *)primaryKey strCol:(NSString *)strCol intCol:(NSInteger)intCol;
+- (instancetype)initWithPrimaryKey:(NSString *)primaryKey strCol:(NSString *)strCol intCol:(NSInteger)intCol;
 @end
 
 @interface IntPrimaryKeyObject : RLMObject
 @property NSInteger _id;
 @property NSString *strCol;
 @property NSInteger intCol;
-- (instancetype) initWithPrimaryKey:(NSInteger)primaryKey strCol:(NSString *)strCol intCol:(NSInteger)intCol;
+- (instancetype)initWithPrimaryKey:(NSInteger)primaryKey strCol:(NSString *)strCol intCol:(NSInteger)intCol;
 @end
 
 @interface AllTypesSyncObject : RLMObject
