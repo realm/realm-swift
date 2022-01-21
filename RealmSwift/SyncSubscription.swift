@@ -177,6 +177,8 @@ import Realm.Private
  for adding and removing `SyncSubscription`s.
  */
 @frozen public struct SyncSubscriptionSet {
+    // MARK: Internal
+    private let lock = NSLock()
 
     // MARK: Internal
 
@@ -441,10 +443,13 @@ extension SyncSubscriptionSet {
      */
     public func write(_ block: (() -> Void)) async throws {
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+            lock.lock()
             write(block) { error in
                 if let error = error {
+                    lock.unlock()
                     continuation.resume(throwing: error)
                 } else {
+                    lock.unlock()
                     continuation.resume()
                 }
             }
