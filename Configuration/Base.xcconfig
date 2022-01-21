@@ -61,8 +61,7 @@ IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 WATCHOS_DEPLOYMENT_TARGET = 2.0;
 TVOS_DEPLOYMENT_TARGET = 9.0;
 
-// Disable building the arm64 simulators when using Carthage build
-// Enable for other cases
+// Disable building the arm64 simulators for some types of Carthage builds
 REALM_ARM_ARCHS_YES = arm64 arm64e;
 REALM_ARM_ARCHS = $(REALM_ARM_ARCHS_$(REALM_CARTHAGE_ARM_DISABLED))
 
