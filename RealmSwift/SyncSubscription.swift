@@ -201,9 +201,7 @@ import Realm.Private
                              an `Error`describing what went wrong will be returned by the block
      */
     public func write(_ block: (() -> Void), onComplete: ((Error?) -> Void)? = nil) {
-        rlmSyncSubscriptionSet.write(block, onComplete: { error in
-            onComplete?(error)
-        })
+        rlmSyncSubscriptionSet.write(block, onComplete: onComplete ?? { _ in })
     }
 
     /// Returns the current state for the subscription set.
