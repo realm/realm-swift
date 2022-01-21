@@ -191,6 +191,7 @@ case "$COMMAND" in
         ;;
 
     test-*-*-carthage)
+        export REALM_CARTHAGE_ARM_DISABLED='YES'
         xctest "$PLATFORM" "$LANGUAGE" CarthageExample
         ;;
 
