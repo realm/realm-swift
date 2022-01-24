@@ -178,9 +178,6 @@ import Realm.Private
  */
 @frozen public struct SyncSubscriptionSet {
     // MARK: Internal
-    private let lock = NSLock()
-
-    // MARK: Internal
 
     internal let rlmSyncSubscriptionSet: RLMSyncSubscriptionSet
 
@@ -441,15 +438,13 @@ extension SyncSubscriptionSet {
      - throws: An `NSError` if the transaction could not be completed successfully.
                If `block` throws, the function throws the propagated `ErrorType` instead.
      */
+    @MainActor
     public func write(_ block: (() -> Void)) async throws {
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
-            lock.lock()
             write(block) { error in
                 if let error = error {
-                    lock.unlock()
                     continuation.resume(throwing: error)
                 } else {
-                    lock.unlock()
                     continuation.resume()
                 }
             }

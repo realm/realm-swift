@@ -4,8 +4,8 @@ x.y.z Release notes (yyyy-MM-dd)
 * Add beta support for flexible sync. See the [backend](https://docs.mongodb.com/realm/sync/data-access-patterns/flexible-sync/) and [SDK](https://docs.mongodb.com/realm/sdk/swift/examples/flexible-sync/) documentation for more information. Please report any issues with the beta through Github.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
-* None.
+* UserIdentity metadata table grows indefinitely. ([#5152](https://github.com/realm/realm-core/issues/5152), since v10.0.0)
+* Improved error messaging when opening a Realm with `IncompatibleHistories` when translating file exceptions ([#5161](https://github.com/realm/realm-core/pull/5161), since v6.0.0).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
