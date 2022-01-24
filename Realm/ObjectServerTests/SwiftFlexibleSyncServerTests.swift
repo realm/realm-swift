@@ -543,24 +543,6 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
         XCTAssertEqual(subscriptions.count, 2)
     }
 
-    func testFlexibleSyncAppUpdateQueryWithDifferentObjectTypeWillThrow() throws {
-        let realm = try openFlexibleSyncRealm()
-        let subscriptions = realm.subscriptions
-        subscriptions.write {
-            subscriptions.append(
-                QuerySubscription<SwiftPerson>(name: "person_age_15") {
-                    $0.age > 15
-                })
-        }
-        XCTAssertEqual(subscriptions.count, 1)
-
-        let foundSubscription1 = subscriptions.first(named: "person_age_15")
-
-        subscriptions.write {
-            assertThrows(foundSubscription1?.update(toType: SwiftTypesSyncObject.self, where: { $0.intCol > 0 }))
-        }
-    }
-
     func testFlexibleSyncTransactionsWithPredicateFormatAndNSPredicate() throws {
         let realm = try openFlexibleSyncRealm()
         let subscriptions = realm.subscriptions
