@@ -258,8 +258,8 @@ build_docs() {
       --clean \
       --author Realm \
       --author_url https://realm.io \
-      --github_url https://github.com/realm/realm-swift \
-      --github-file-prefix "https://github.com/realm/realm-swift/tree/v${version}" \
+      --github_url https://github.com/mkassoff/realm-swift \
+      --github-file-prefix "https://github.com/mkassoff/realm-swift/tree/v${version}" \
       --module-version "${version}" \
       --xcodebuild-arguments "${xcodebuild_arguments}" \
       --module "${module}" \
