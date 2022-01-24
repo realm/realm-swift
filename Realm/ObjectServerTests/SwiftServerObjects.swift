@@ -20,7 +20,7 @@ import Foundation
 import RealmSwift
 
 public class SwiftPerson: Object {
-    @Persisted(primaryKey: true) public var _id: ObjectId?
+    @Persisted(primaryKey: true) public var _id: ObjectId = ObjectId.generate()
     @Persisted public var firstName: String = ""
     @Persisted public var lastName: String = ""
     @Persisted public var age: Int = 30
@@ -37,7 +37,7 @@ public class SwiftPerson: Object {
 extension SwiftPerson: ObjectKeyIdentifiable {}
 
 public class SwiftTypesSyncObject: Object {
-    @Persisted(primaryKey: true) public var _id: ObjectId?
+    @Persisted(primaryKey: true) public var _id: ObjectId = ObjectId.generate()
     @Persisted public var boolCol: Bool = true
     @Persisted public var intCol: Int = 1
     @Persisted public var doubleCol: Double = 1.1
