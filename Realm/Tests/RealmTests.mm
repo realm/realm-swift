@@ -1793,6 +1793,12 @@
     NSString *expectedUnderlying = [NSString stringWithFormat:@"open(\"%@\") failed: file exists", RLMTestRealmURL().path];
     XCTAssertFalse([realm writeCopyToURL:RLMTestRealmURL() encryptionKey:nil error:&writeError]);
     RLMValidateRealmError(writeError, RLMErrorFileExists, expectedError, expectedUnderlying);
+
+    RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
+    configuration.fileURL = RLMTestRealmURL();
+    writeError = nil;
+    XCTAssertFalse([realm writeCopyWithConfiguration:configuration error:&writeError]);
+    RLMValidateRealmError(writeError, RLMErrorFileExists, expectedError, @"");
 }
 
 - (void)testCannotWriteInNonExistentDirectory
@@ -1907,25 +1913,6 @@
     XCTAssertNil(writeError);
     RLMRealm *copy = [RLMRealm realmWithConfiguration:configuration error:nil];
     XCTAssertEqual(1U, [IntObject allObjectsInRealm:copy].count);
-}
-
-- (void)testCannotWriteCopyWithConfigurationWhileOpen
-{
-    RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
-    configuration.fileURL = RLMTestRealmURL();
-
-    RLMRealm *realm = [self realmWithTestPath];
-    [realm transactionWithBlock:^{
-        [IntObject createInRealm:realm withValue:@[@0]];
-    }];
-
-    NSError *writeError;
-    // Does not throw when given a nil error out param
-    XCTAssertFalse([realm writeCopyWithConfiguration:configuration error:nil]);
-
-    NSString *expectedError = @"Cannot perform copy while destination Realm is open.";
-    XCTAssertFalse([realm writeCopyWithConfiguration:configuration error:&writeError]);
-    RLMValidateRealmError(writeError, RLMErrorFail, expectedError, @"");
 }
 
 - (void)testWritingCopyWithConfigurationUsesWriteTransactionInProgress

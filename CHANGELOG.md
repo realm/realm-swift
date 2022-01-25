@@ -5,12 +5,9 @@ x.y.z Release notes (yyyy-MM-dd)
   following functionality:
     - Export a local non-sync Realm to be used with MongoDB Realm Sync 
       when the configuration is derived from a sync `RLMUser`/`User`.
-    - Copy values from one synced Realm to another synced Realm.
-    - Copy values from one local Realm to another local Realm.
+    - Write a copy of a local Realm to a destination specified in the configuration.
 
-  If a Realm does not exist at the destination specified in the configuration
-  then a copy of the Realm will be written to disk. If a Realm does exist at the destination
-  then the values from the origin Realm will be copied to the destination Realm in a transaction.
+  An exception will be thrown if a Realm exists at the destination.
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)

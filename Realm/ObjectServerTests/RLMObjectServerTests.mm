@@ -1951,25 +1951,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     XCTAssertEqual([syncedResults objectsWhere:@"firstName = 'John'"].count, 1U);
 }
 
-- (void)testWriteCopyWithConfigurationLocalToSyncIncorrectly {
-    RLMRealmConfiguration *localConfig = [RLMRealmConfiguration new];
-    localConfig.objectClasses = @[Person.class];
-    localConfig.fileURL = RLMTestRealmURL();
-
-    RLMUser *user = [self userForTest:_cmd];
-    RLMRealmConfiguration *syncConfig = [user configurationWithPartitionValue:NSStringFromSelector(_cmd)];
-    syncConfig.objectClasses = @[Person.class];
-
-    RLMRealm *localRealm = [RLMRealm realmWithConfiguration:localConfig error:nil];
-    [RLMRealm realmWithConfiguration:syncConfig error:nil];
-    // Doing this should cause an error as a synced realm is already open.
-    NSError *error;
-    [localRealm writeCopyWithConfiguration:syncConfig error:&error];
-    XCTAssertEqual(error.code, RLMErrorFail);
-    XCTAssertTrue([error.userInfo[NSLocalizedDescriptionKey] isEqualToString:@"Cannot perform copy while destination Realm is open."]);
-}
-
-- (void)testWriteCopyWithConfigurationSyncToSyncRealm {
+- (void)testWriteCopyWithConfigurationSyncToSyncRealmError {
     RLMUser *user = [self userForTest:_cmd];
     RLMRealmConfiguration *syncConfig = [user configurationWithPartitionValue:NSStringFromSelector(_cmd)];
     syncConfig.objectClasses = @[Person.class];
@@ -2018,7 +2000,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 
     RLMRealm *localRealm = [RLMRealm realmWithConfiguration:localConfig error:nil];
     // `person2` will override what was previously stored on the server.
-    Person *person2 = [Person paul];
+    Person *person2 = [Person new];
     person2._id = conflictingObjectId;
     person2.firstName = @"John";
     person2.lastName = @"Doe";

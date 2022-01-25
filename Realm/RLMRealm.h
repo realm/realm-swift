@@ -245,18 +245,17 @@ NS_ASSUME_NONNULL_BEGIN
  If the configuration supplied is derived from a `User` then this Realm will be copied with
  sync functionality enabled.
 
- Note that if a Realm does not exist at the destination specified in the configuration
- then a copy of the Realm will be written to disk. If a Realm does exist at the destination
- then the values from the origin Realm will be copied to the destination Realm in a transaction.
+ The destination file cannot already exist.
 
- Note that copying data from a synced Realm to a local non synced Realm is not supported.
+ This Realm must not be in use with MongoDB Realm Sync. To write a copy of a synced
+ Realm use `writeCopyToURL`.
 
  @param configuration A Realm Configuration.
  @param error   If an error occurs, upon return contains an `NSError` object
  that describes the problem. If you are not interested in
  possible errors, pass in `NULL`.
 
- @return `YES` if the Realm was successfully written to copied, `NO` if an error occurred.
+ @return `YES` if the Realm was successfully written to disk, `NO` if an error occurred.
  */
 - (BOOL)writeCopyWithConfiguration:(RLMRealmConfiguration *)configuration error:(NSError **)error;
 
