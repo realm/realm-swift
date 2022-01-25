@@ -873,21 +873,12 @@ class ObjectCreationTests: TestCase {
     func testCreateEmbeddedFromManagedObjectInSameRealmCopyingByAdd() {
         let realm = try! Realm()
         try! realm.write {
-            let parent = realm.create(EmbeddedParentObject.self, value: [
-                "object": ["value": 5, "child": ["value": 6], "children": [[7], [8]]],
-                "array": [[9], [10]]
-            ])
+            let parent = realm.create(EmbeddedParentObject.self, value: ["object": ["value": 5]])
             let copy = EmbeddedParentObject(value: parent)
             realm.add(copy)
+
             XCTAssertNotEqual(parent, copy)
             XCTAssertEqual(copy.object!.value, 5)
-            XCTAssertEqual(copy.object!.child!.value, 6)
-            XCTAssertEqual(copy.object!.children.count, 2)
-            XCTAssertEqual(copy.object!.children[0].value, 7)
-            XCTAssertEqual(copy.object!.children[1].value, 8)
-            XCTAssertEqual(copy.array.count, 2)
-            XCTAssertEqual(copy.array[0].value, 9)
-            XCTAssertEqual(copy.array[1].value, 10)
         }
         XCTAssertEqual(realm.objects(EmbeddedParentObject.self).count, 2)
     }
@@ -895,24 +886,13 @@ class ObjectCreationTests: TestCase {
     func testCreateEmbeddedFromManagedObjectInSameRealmCopyingByAssign() {
         let realm = try! Realm()
         try! realm.write {
-            let parent = realm.create(EmbeddedParentObject.self, value: [
-                "object": ["value": 5, "child": ["value": 6], "children": [[7], [8]]],
-                "array": [[9], [10]]
-            ])
-
+            let parent = realm.create(EmbeddedParentObject.self, value: ["object": ["value": 5]])
             let copy = EmbeddedParentObject()
             copy.object = parent.object
             realm.add(copy)
-            
+
             XCTAssertNotEqual(parent, copy)
             XCTAssertEqual(copy.object!.value, 5)
-            XCTAssertEqual(copy.object!.child!.value, 6)
-            XCTAssertEqual(copy.object!.children.count, 2)
-            XCTAssertEqual(copy.object!.children[0].value, 7)
-            XCTAssertEqual(copy.object!.children[1].value, 8)
-            XCTAssertEqual(copy.array.count, 2)
-            XCTAssertEqual(copy.array[0].value, 9)
-            XCTAssertEqual(copy.array[1].value, 10)
         }
         XCTAssertEqual(realm.objects(EmbeddedParentObject.self).count, 2)
     }
