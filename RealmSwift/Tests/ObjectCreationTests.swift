@@ -866,8 +866,7 @@ class ObjectCreationTests: TestCase {
         XCTAssertEqual(copy.array.count, 2)
         XCTAssertEqual(copy.array[0].value, 9)
         XCTAssertEqual(copy.array[1].value, 10)
-        try! realm.commitWrite()
-        XCTAssertEqual(realm.objects(EmbeddedParentObject.self).count, 2)
+        realm.cancelWrite()
     }
 
     func testCreateEmbeddedFromManagedObjectInSameRealmCopyingByAdd() {
