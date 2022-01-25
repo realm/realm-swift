@@ -54,16 +54,6 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
     }
 
-    func testBasicSwiftSyncWithNilPartitionValue() {
-        do {
-            let user = try logInUser(for: basicCredentials())
-            let realm = try openRealm(partitionValue: .null, user: user)
-            XCTAssert(realm.isEmpty, "Freshly synced Realm was not empty...")
-        } catch {
-            XCTFail("Got an error: \(error)")
-        }
-    }
-
     /// If client B adds objects to a Realm, client A should see those new objects.
     func testSwiftAddObjects() {
         do {
@@ -87,7 +77,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 XCTAssertEqual(obj.dateCol, Date(timeIntervalSince1970: -1))
                 XCTAssertEqual(obj.longCol, Int64(1))
                 XCTAssertEqual(obj.uuidCol, UUID(uuidString: "85d4fbee-6ec6-47df-bfa1-615931903d7e")!)
-                XCTAssertEqual(obj.anyCol.value.intValue, 1)
+                XCTAssertEqual(obj.anyCol.intValue, 1)
                 XCTAssertEqual(obj.objectCol!.firstName, "George")
 
             } else {
@@ -167,7 +157,14 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         do {
             let user = try logInUser(for: basicCredentials())
             let realm = try openRealm(partitionValue: .null, user: user)
+
             if isParent {
+                // This test needs the database to be empty of any documents with a nil partition
+                try realm.write {
+                    realm.deleteAll()
+                }
+                waitForUploads(for: realm)
+
                 checkCount(expected: 0, realm, SwiftPerson.self)
                 executeChild()
                 waitForDownloads(for: realm)

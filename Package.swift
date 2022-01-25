@@ -3,7 +3,7 @@
 import PackageDescription
 import Foundation
 
-let coreVersionStr = "11.8.0"
+let coreVersionStr = "11.9.0"
 let cocoaVersionStr = "10.21.1"
 
 let coreVersionPieces = coreVersionStr.split(separator: ".")
@@ -218,6 +218,7 @@ let package = Package(
                 "Realm/RLMSyncConfiguration.mm",
                 "Realm/RLMSyncManager.mm",
                 "Realm/RLMSyncSession.mm",
+                "Realm/RLMSyncSubscription.mm",
                 "Realm/RLMSyncUtil.mm",
                 "Realm/RLMUpdateResult.mm",
                 "Realm/RLMUser.mm",
@@ -291,7 +292,9 @@ let package = Package(
         objectServerTestSupportTarget(
             name: "RealmSyncTestSupport",
             dependencies: ["Realm", "RealmSwift", "RealmTestSupport"],
-            sources: ["RLMSyncTestCase.mm", "RLMUser+ObjectServerTests.mm"]
+            sources: ["RLMSyncTestCase.mm",
+                      "RLMUser+ObjectServerTests.mm",
+                      "RLMServerTestObjects.m"]
         ),
         objectServerTestSupportTarget(
             name: "RealmSwiftSyncTestSupport",
@@ -311,7 +314,8 @@ let package = Package(
                 "SwiftCollectionSyncTests.swift",
                 "SwiftObjectServerPartitionTests.swift",
                 "SwiftUIServerTests.swift",
-                "SwiftMongoClientTests.swift"
+                "SwiftMongoClientTests.swift",
+                "SwiftFlexibleSyncServerTests.swift"
             ]
         ),
         objectServerTestTarget(
@@ -321,7 +325,8 @@ let package = Package(
                 "RLMCollectionSyncTests.mm",
                 "RLMObjectServerPartitionTests.mm",
                 "RLMObjectServerTests.mm",
-                "RLMWatchTestUtility.m"
+                "RLMWatchTestUtility.m",
+                "RLMFlexibleSyncServerTests.mm"
             ]
         )
     ],

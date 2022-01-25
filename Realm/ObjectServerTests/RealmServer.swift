@@ -120,23 +120,18 @@ private extension ObjectSchema {
             ]
         ]
         var relationships: [String: Any] = [:]
-
-        // First pass we only create the primary key property as we can't add
-        // links until the targets of the links exist
-        if id == nil {
-            let pk = primaryKeyProperty!
-            stitchProperties[pk.name] = pk.stitchRule(schema)
-        } else {
-            for property in properties {
+        for property in properties {
+            // First pass we only add the properties to the schema as we can't add
+            // links until the targets of the links exist.
+            if property.type != .object {
                 stitchProperties[property.name] = property.stitchRule(schema)
-
-                if property.type == .object {
-                    relationships[property.name] = [
-                        "ref": "#/relationship/mongodb1/test_data/\(property.objectClassName!)",
-                        "foreign_key": "_id",
-                        "is_list": property.isArray || property.isSet || property.isMap
-                    ]
-                }
+            } else if property.type == .object && id != nil {
+                stitchProperties[property.name] = property.stitchRule(schema)
+                relationships[property.name] = [
+                    "ref": "#/relationship/mongodb1/test_data/\(property.objectClassName!)",
+                    "foreign_key": "_id",
+                    "is_list": property.isArray || property.isSet || property.isMap
+                ]
             }
         }
 
@@ -345,6 +340,10 @@ class Admin {
             func patch(on group: DispatchGroup, _ data: Any, _ completionHandler: @escaping (Result<Any?, Error>) -> Void) {
                 request(on: group, httpMethod: "PATCH", data: data, completionHandler)
             }
+
+            func patch(_ data: Any) -> Result<Any?, Error> {
+                request(httpMethod: "PATCH", data: data)
+            }
         }
 
         /// The initial endpoint to access the admin server
@@ -394,6 +393,12 @@ class Admin {
             }
             .get()
     }
+}
+
+// Sync mode 
+public enum SyncMode {
+    case pbs(String) // partition based
+    case flx([String]) // flexible sync
 }
 
 // MARK: RealmServer
@@ -527,9 +532,13 @@ public class RealmServer: NSObject {
         let binDir = Self.buildDir.appendingPathComponent("bin").path
         let libDir = Self.buildDir.appendingPathComponent("lib").path
         let binPath = "$PATH:\(binDir)"
+        let awsAccessKeyId = ProcessInfo.processInfo.environment["AWS_ACCESS_KEY_ID"]!
+        let awsSecretAccessKey = ProcessInfo.processInfo.environment["AWS_SECRET_ACCESS_KEY"]!
         let env = [
             "PATH": binPath,
-            "DYLD_LIBRARY_PATH": libDir
+            "DYLD_LIBRARY_PATH": libDir,
+            "AWS_ACCESS_KEY_ID": awsAccessKeyId,
+            "AWS_SECRET_ACCESS_KEY": awsSecretAccessKey
         ]
 
         let stitchRoot = RealmServer.buildDir.path + "/go/src/github.com/10gen/stitch"
@@ -635,7 +644,9 @@ public class RealmServer: NSObject {
     }
 
     /// Create a new server app
-    @objc public func createAppForBSONType(_ bsonType: String) throws -> AppId {
+    /// This will create a App with different configuration depending on the SyncMode (partition based sync or flexible sync), partition type is used only in case
+    /// this is partition based sync, and will crash if one is not provided in that mode
+    public func createAppForSyncMode(_ syncMode: SyncMode) throws -> AppId {
         guard let session = session else {
             throw URLError(.unknown)
         }
@@ -701,43 +712,83 @@ public class RealmServer: NSObject {
             "value": "mongodb://localhost:26000"
         ])
 
-        let serviceResponse = app.services.post([
-            "name": "mongodb1",
-            "type": "mongodb",
-            "config": [
-                "uri": "mongodb://localhost:26000",
-                "sync": [
-                    "state": "enabled",
-                    "database_name": "test_data",
-                    "partition": [
-                        "key": "realm_id",
-                        "type": "\(bsonType)",
-                        "required": false,
+        // Creating the rules is a two-step process where we first add all the
+        // rules and then add properties to them so that we can add relationships
+        let schema = ObjectiveCSupport.convert(object: RLMSchema.shared())
+
+        let appService: Any
+        switch syncMode {
+        case .pbs(let bsonType):
+            appService = [
+                "name": "mongodb1",
+                "type": "mongodb",
+                "config": [
+                    "uri": "mongodb://localhost:26000",
+                    "sync": [
+                        "state": "enabled",
+                        "database_name": "test_data",
+                        "partition": [
+                            "key": "realm_id",
+                            "type": "\(bsonType)",
+                            "required": false,
+                            "permissions": [
+                                "read": true,
+                                "write": true
+                            ]
+                        ]
+                    ]
+                ]
+                ]
+        case .flx(let fields):
+            appService = [
+                "name": "mongodb1",
+                "type": "mongodb",
+                "config": [
+                    "uri": "mongodb://localhost:26000",
+                    "flexible_sync": [
+                        "state": "enabled",
+                        "database_name": "test_data",
+                        "queryable_fields_names": fields,
                         "permissions": [
-                            "read": true,
-                            "write": true
+                            "rules": [:],
+                            "defaultRoles": [[
+                                "name": "all",
+                                "applyWhen": [:],
+                                "read": true,
+                                "write": true
+                            ]]
                         ]
                     ]
                 ]
             ]
-        ])
+        }
 
+        let serviceResponse = app.services.post(appService)
         guard let serviceId = (try serviceResponse.get() as? [String: Any])?["_id"] as? String else {
             throw URLError(.badServerResponse)
         }
 
         let rules = app.services[serviceId].rules
 
-        // Creating the rules is a two-step process where we first add all the
-        // rules and then add properties to them so that we can add relationships
-        let schema = ObjectiveCSupport.convert(object: RLMSchema.shared())
-        let syncTypes = schema.objectSchema.filter {
-            guard let pk = $0.primaryKeyProperty else { return false }
-            return pk.name == "_id"
+        let syncTypes: [ObjectSchema]
+        let partitionKeyType: String?
+        if case .pbs(let bsonType) = syncMode {
+            syncTypes = schema.objectSchema.filter {
+                guard let pk = $0.primaryKeyProperty else { return false }
+                return pk.name == "_id"
+            }
+            partitionKeyType = bsonType
+        } else {
+            // This is a temporary workaround for not been able to add the complete schema for a flx App
+            syncTypes = schema.objectSchema.filter {
+                let validSyncClasses = ["Dog", "Person", "SwiftPerson", "SwiftTypesSyncObject"]
+                return validSyncClasses.contains($0.className)
+            }
+            partitionKeyType = nil
         }
         var ruleCreations = [Result<Any?, Error>]()
         for objectSchema in syncTypes {
-            ruleCreations.append(rules.post(objectSchema.stitchRule(bsonType, schema)))
+            ruleCreations.append(rules.post(objectSchema.stitchRule(partitionKeyType ?? "string", schema)))
         }
 
         var ruleIds: [String: String] = [:]
@@ -750,7 +801,7 @@ public class RealmServer: NSObject {
         }
         for objectSchema in syncTypes {
             let id = ruleIds[objectSchema.className]!
-            rules[id].put(on: group, data: objectSchema.stitchRule(bsonType, schema, id: id), failOnError)
+            rules[id].put(on: group, data: objectSchema.stitchRule(partitionKeyType ?? "string", schema, id: id), failOnError)
         }
 
         app.sync.config.put(on: group, data: [
@@ -834,8 +885,16 @@ public class RealmServer: NSObject {
         return clientAppId
     }
 
+    @objc public func createAppWithQueryableFields(_ fields: [String]) throws -> AppId {
+        try createAppForSyncMode(.flx(fields))
+    }
+
+    @objc public func createAppForBSONType(_ bsonType: String) throws -> AppId {
+        try createAppForSyncMode(.pbs(bsonType))
+    }
+
     @objc public func createApp() throws -> AppId {
-        try createAppForBSONType("string")
+        try createAppForSyncMode(.pbs("string"))
     }
 
     // Retrieve MongoDB Realm AppId with ClientAppId using the Admin API
