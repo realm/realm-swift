@@ -224,8 +224,8 @@ def doBuild() {
 
           ditto -ck merged/ Carthage.framework.zip
           '''
-          archiveArtifacts artifacts: 'Carthage.framework.zip'
 
+          archiveArtifacts artifacts: 'Carthage.framework.zip'
         }
       }
     )
