@@ -19,6 +19,7 @@
 #if os(macOS)
 import RealmSwift
 import XCTest
+import Combine
 
 #if canImport(RealmTestSupport)
 import RealmSwiftSyncTestSupport
@@ -596,6 +597,21 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
 
 // MARK: - Completion Block
 class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
+    private var cancellables: Set<AnyCancellable> = []
+
+    override class var defaultTestSuite: XCTestSuite {
+        if hasCombine() {
+            return super.defaultTestSuite
+        }
+        return XCTestSuite(name: "\(type(of: self))")
+    }
+
+    override func tearDown() {
+        cancellables.forEach { $0.cancel() }
+        cancellables = []
+        super.tearDown()
+    }
+
     func testFlexibleSyncAppWithoutQuery() throws {
         try populateFlexibleSyncData { realm in
             for i in 1...21 {
@@ -943,7 +959,7 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
 
 // MARK: - Async Await
 #if swift(>=5.6) && canImport(_Concurrency)
-@available(macOS 12.0.0, *)
+@available(macOS 12.0, *)
 class SwiftAsyncFlexibleSyncTests: SwiftSyncTestCase {
     override class var defaultTestSuite: XCTestSuite {
         // async/await is currently incompatible with thread sanitizer and will
@@ -954,7 +970,10 @@ class SwiftAsyncFlexibleSyncTests: SwiftSyncTestCase {
         }
         return super.defaultTestSuite
     }
+}
 
+@available(macOS 12.0, *)
+extension SwiftFlexibleSyncServerTests {
     @MainActor
     private func populateFlexibleSyncData(_ block: @escaping (Realm) -> Void) async throws {
         var config = (try await self.flexibleSyncApp.login(credentials: .anonymous)).flexibleSyncConfiguration()
@@ -1006,6 +1025,7 @@ class SwiftAsyncFlexibleSyncTests: SwiftSyncTestCase {
             })
         }
 
+        waitForDownloads(for: realm)
         checkCount(expected: 6, realm, SwiftPerson.self)
     }
 
@@ -1047,6 +1067,82 @@ class SwiftAsyncFlexibleSyncTests: SwiftSyncTestCase {
         }
     }
 }
-
 #endif // canImport(_Concurrency)
+
+// MARK: - Combine
+#if !(os(iOS) && (arch(i386) || arch(arm)))
+@available(macOS 10.15, *)
+extension SwiftFlexibleSyncServerTests {
+    func testFlexibleSyncCombineWrite() throws {
+        try populateFlexibleSyncData { realm in
+            for i in 1...21 {
+                let person = SwiftPerson(firstName: "\(#function)",
+                                         lastName: "lastname_\(i)",
+                                         age: i)
+                realm.add(person)
+            }
+        }
+
+        let realm = try flexibleSyncRealm()
+        XCTAssertNotNil(realm)
+        checkCount(expected: 0, realm, SwiftPerson.self)
+
+        let subscriptions = realm.subscriptions
+        XCTAssertNotNil(subscriptions)
+        XCTAssertEqual(subscriptions.count, 0)
+
+        let ex = expectation(description: "state change complete")
+        subscriptions.writeSubscriptions {
+            subscriptions.append(QuerySubscription<SwiftPerson>(name: "person_age_10") {
+                $0.age > 10 && $0.firstName == "\(#function)"
+            })
+        }
+        .sink(receiveCompletion: { _ in },
+              receiveValue: { _ in
+            ex.fulfill()
+        }).store(in: &cancellables)
+
+        waitForExpectations(timeout: 20.0, handler: nil)
+
+        waitForDownloads(for: realm)
+        checkCount(expected: 11, realm, SwiftPerson.self)
+    }
+
+    func testFlexibleSyncCombineWriteFails() throws {
+        let realm = try flexibleSyncRealm()
+        XCTAssertNotNil(realm)
+        checkCount(expected: 0, realm, SwiftPerson.self)
+
+        let subscriptions = realm.subscriptions
+        XCTAssertNotNil(subscriptions)
+        XCTAssertEqual(subscriptions.count, 0)
+
+        let ex = expectation(description: "state change error")
+        subscriptions.writeSubscriptions {
+            subscriptions.append(QuerySubscription<SwiftTypesSyncObject>(name: "swiftObject_longCol") {
+                $0.longCol == Int64(1)
+            })
+        }
+        .sink(receiveCompletion: { result in
+            if case .failure(let error) = result {
+                if let error = error as NSError? {
+                    XCTAssertTrue(error.domain == RLMFlexibleSyncErrorDomain)
+                    XCTAssertTrue(error.code == 2)
+                }
+
+                guard case .error = subscriptions.state else {
+                    return XCTFail("Adding a query for a not queryable field should change the subscription set state to error")
+                }
+                ex.fulfill()
+            }
+        }, receiveValue: { _ in })
+        .store(in: &cancellables)
+
+        waitForExpectations(timeout: 20.0, handler: nil)
+
+        waitForDownloads(for: realm)
+        checkCount(expected: 0, realm, SwiftPerson.self)
+    }
+}
+#endif // canImport(Combine)
 #endif // os(macOS)

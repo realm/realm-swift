@@ -20,6 +20,10 @@ import Foundation
 import Realm
 import Realm.Private
 
+#if !(os(iOS) && (arch(i386) || arch(arm)))
+import Combine
+#endif
+
 /// An enum representing different states for the Subscription Set.
 @frozen public enum SyncSubscriptionState: Equatable {
     /// The subscription is complete and the server has sent all the data that matched the subscription
@@ -192,8 +196,6 @@ import Realm.Private
 
     /**
      Synchronously performs any transactions (add/remove/update) to the subscription set within the block.
-     This will not wait for the server to acknowledge and see all the data associated with this collection of subscriptions,
-     and will return after committing the subscription transactions.
 
      - parameter block:      The block containing the subscriptions transactions to perform.
      - parameter onComplete: The block called upon synchronization of subscriptions to the server. Otherwise
@@ -429,14 +431,13 @@ extension SyncSubscriptionSet: Sequence {
 @available(macOS 10.15, tvOS 13.0, iOS 13.0, watchOS 6.0, *)
 extension SyncSubscriptionSet {
     /**
-     Asynchronously creates and commit a write transaction and updates the subscription set,
-     this will not wait for the server to acknowledge and see all the data associated with this
-     collection of subscription.
+     Synchronously creates and commit a write transaction and updates the subscription set,
+     this will continue when the server acknowledge and all the data associated with this
+     collection of subscriptions is synced.
 
      - parameter block: The block containing the subscriptions transactions to perform.
 
-     - throws: An `NSError` if the transaction could not be completed successfully.
-               If `block` throws, the function throws the propagated `ErrorType` instead.
+     - throws: An `NSError` if the subscription set state changes to an error state or there is and error while                           committing any changes to the subscriptions.
      */
     @MainActor
     public func write(_ block: (() -> Void)) async throws {
@@ -452,3 +453,28 @@ extension SyncSubscriptionSet {
     }
 }
 #endif // swift(>=5.6)
+
+#if !(os(iOS) && (arch(i386) || arch(arm)))
+@available(macOS 10.15, iOS 13, tvOS 13, watchOS 6, *)
+extension SyncSubscriptionSet {
+    /**
+     Synchronously creates and commit a write transaction and updates the subscription set,
+     this will return success when the server acknowledge and all the data associated with this
+     collection of subscriptions is synced.
+
+     - parameter block: The block containing the subscriptions transactions to perform.
+     - returns: A publisher that eventually returns `Result.success` or `Error`.
+     */
+    public func writeSubscriptions(_ block: @escaping (() -> Void)) -> Future<Void, Error> {
+        return Future<Void, Error> { promise in
+            write(block) { error in
+                if let error = error {
+                    promise(.failure(error))
+                } else {
+                    promise(.success(()))
+                }
+            }
+        }
+    }
+}
+#endif // canImport(Combine)

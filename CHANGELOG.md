@@ -43,6 +43,8 @@ allows submitting to the app store with Xcode 12.
 ```
 * Improve performance of opening a Realm with `objectClasses`/`objectTypes` set
   in the configuration.
+* Replace Xcode 13.3 binaries with 13.3.1 binaries.
+* Add Combine API support for flexible sync beta.
 
 ### Fixed
 * Consuming a RealmSwift XCFramework with library evolution enabled would give the error
