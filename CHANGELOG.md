@@ -75,6 +75,7 @@ allows submitting to the app store with Xcode 12.
       subscriptions.append(QuerySubscription<SwiftPerson>(name: "person_age_15"))
    }
 ```
+* Add Combine API support for flexible sync beta.
 
 ### Fixed
 
