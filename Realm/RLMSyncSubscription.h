@@ -113,7 +113,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param block The block containing actions to perform to the subscription set.
  */
 - (void)update:(__attribute__((noescape)) void(^)(void))block;
-
+/// :nodoc:
 - (void)write:(__attribute__((noescape)) void(^)(void))block __attribute__((unavailable("Use update")));
 
 /**
@@ -126,7 +126,7 @@ NS_ASSUME_NONNULL_BEGIN
                    an `Error`describing what went wrong will be returned by the block
  */
 - (void)update:(__attribute__((noescape)) void(^)(void))block onComplete:(void(^)(NSError * _Nullable))onComplete;
-
+/// :nodoc:
 - (void)write:(__attribute__((noescape)) void(^)(void))block onComplete:(void(^)(NSError * _Nullable))onComplete __attribute__((unavailable("Use update")));
 
 #pragma mark - Find subscription
