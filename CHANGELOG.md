@@ -6,6 +6,7 @@ x.y.z Release notes (yyyy-MM-dd)
     - Export a local non-sync Realm to be used with MongoDB Realm Sync 
       when the configuration is derived from a sync `RLMUser`/`User`.
     - Write a copy of a local Realm to a destination specified in the configuration.
+    - Write a copy of a synced Realm in use with user A, and open it with user B.
 
   An exception will be thrown if a Realm exists at the destination.
 

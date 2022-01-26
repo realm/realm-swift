@@ -977,7 +977,16 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
         return NO;
     }
     try {
-        _realm->export_to(configuration.config);
+        // If we are handing a sync to sync case use write_copy as `export_to` should be used in the local
+        // to synced realm case.
+        if (configuration.syncConfiguration && self.configuration.syncConfiguration) {
+            NSString *path = configuration.fileURL.path;
+            _realm->write_copy(path.UTF8String,
+                               {static_cast<const char *>(configuration.encryptionKey.bytes), configuration.encryptionKey.length});
+        }
+        else {
+            _realm->export_to(configuration.config);
+        }
     }
     catch (...) {
         if (error) {

@@ -922,9 +922,6 @@ import Realm.Private
 
      The destination file cannot already exist.
 
-     This Realm must not be in use with MongoDB Realm Sync. To write a copy of a synced
-     Realm use `writeCopyToURL`.
-
      - parameter configuration: A Realm Configuration.
 
      - throws: An `NSError` if the copy could not be written.

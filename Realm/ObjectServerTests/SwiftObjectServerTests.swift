@@ -1331,6 +1331,64 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
     // MARK: Write Copy with Sync
 
+    func testWriteCopySyncedRealm() {
+        do {
+            // user1 creates and writeCopies a realm to be opened by another user
+            let user1 = try logInUser(for: basicCredentials())
+            var config = user1.configuration(testName: #function)
+
+            config.objectTypes = [SwiftHugeSyncObject.self]
+            let syncedRealm = try Realm(configuration: config)
+            try! syncedRealm.write {
+                for _ in 0..<SwiftSyncTestCase.bigObjectCount {
+                    syncedRealm.add(SwiftHugeSyncObject.create())
+                }
+            }
+            waitForUploads(for: syncedRealm)
+
+            // user2 creates a configuration that will use user1's realm as a seed
+            let user2 = try logInUser(for: basicCredentials())
+            var destinationConfig = user2.configuration(partitionValue: #function)
+            destinationConfig.objectTypes = [SwiftHugeSyncObject.self]
+            destinationConfig.fileURL = RLMTestRealmURL()
+            try syncedRealm.writeCopy(configuration: destinationConfig)
+
+            // Open the realm and immediately check data
+            let destinationRealm = try Realm(configuration: destinationConfig)
+            checkCount(expected: SwiftSyncTestCase.bigObjectCount, destinationRealm, SwiftHugeSyncObject.self)
+
+            // Create an object in the destination realm which does not exist in the original realm.
+            let obj1 = SwiftHugeSyncObject.create()
+            try destinationRealm.write {
+                destinationRealm.add(obj1)
+            }
+
+            waitForUploads(for: destinationRealm)
+            waitForDownloads(for: syncedRealm)
+
+            // Check if the object created in the destination realm is synced to the original realm
+            let obj2 = syncedRealm.objects(SwiftHugeSyncObject.self).where { $0._id == obj1._id }.first
+            XCTAssertNotNil(obj2)
+            XCTAssertEqual(obj1.data, obj2?.data)
+
+            // Create an object in the original realm which does not exist in the destination realm.
+            let obj3 = SwiftHugeSyncObject.create()
+            try syncedRealm.write {
+                syncedRealm.add(obj3)
+            }
+
+            waitForUploads(for: syncedRealm)
+            waitForDownloads(for: destinationRealm)
+
+            // Check if the object created in the original realm is synced to the destination realm
+            let obj4 = destinationRealm.objects(SwiftHugeSyncObject.self).where { $0._id == obj3._id }.first
+            XCTAssertNotNil(obj4)
+            XCTAssertEqual(obj3.data, obj4?.data)
+        } catch {
+            XCTFail("Got an error \(error.localizedDescription)")
+        }
+    }
+
     func testWriteCopyLocalRealmToSync() {
         do {
             var localConfig = Realm.Configuration()

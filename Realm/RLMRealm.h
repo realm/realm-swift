@@ -247,9 +247,6 @@ NS_ASSUME_NONNULL_BEGIN
 
  The destination file cannot already exist.
 
- This Realm must not be in use with MongoDB Realm Sync. To write a copy of a synced
- Realm use `writeCopyToURL`.
-
  @param configuration A Realm Configuration.
  @param error   If an error occurs, upon return contains an `NSError` object
  that describes the problem. If you are not interested in
