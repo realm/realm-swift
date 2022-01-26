@@ -119,6 +119,7 @@ private extension ObjectSchema {
                 "bsonType": "\(partitionKeyType)"
             ]
         ]
+
         var relationships: [String: Any] = [:]
         for property in properties {
             // First pass we only add the properties to the schema as we can't add
