@@ -2168,7 +2168,7 @@ class QueryTests: TestCase {
 
     // MARK: -  IN
 
-    func testContainsedIn() {
+    func testContainsIn() {
         % for property in properties + optProperties:
 
         assertQuery(${property.className}.self, "(${property.colName} IN %@)",
