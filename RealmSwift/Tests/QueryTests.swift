@@ -8899,6 +8899,551 @@ class QueryTests: TestCase {
             $0.optStringCol.notEquals($0.stringCol, options: [.caseInsensitive, .diacriticInsensitive])
         }
     }
+
+    // MARK: - ContainsIn
+
+    func testContainsIn() {
+
+        assertQuery(ModernAllTypesObject.self, "(boolCol IN %@)",
+                    values: [NSArray(array: [true, false])], count: 1) {
+            $0.boolCol.in([true, false])
+        }
+        assertQuery(ModernAllTypesObject.self, "(NOT boolCol IN %@)",
+                    values: [NSArray(array: [false])], count: 0) {
+            !$0.boolCol.in([false])
+        }
+
+        assertQuery(ModernAllTypesObject.self, "(intCol IN %@)",
+                    values: [NSArray(array: [1, 3])], count: 1) {
+            $0.intCol.in([1, 3])
+        }
+        assertQuery(ModernAllTypesObject.self, "(NOT intCol IN %@)",
+                    values: [NSArray(array: [3])], count: 0) {
+            !$0.intCol.in([3])
+        }
+
+        assertQuery(ModernAllTypesObject.self, "(int8Col IN %@)",
+                    values: [NSArray(array: [Int8(8), Int8(9)])], count: 1) {
+            $0.int8Col.in([Int8(8), Int8(9)])
+        }
+        assertQuery(ModernAllTypesObject.self, "(NOT int8Col IN %@)",
+                    values: [NSArray(array: [Int8(9)])], count: 0) {
+            !$0.int8Col.in([Int8(9)])
+        }
+
+        assertQuery(ModernAllTypesObject.self, "(int16Col IN %@)",
+                    values: [NSArray(array: [Int16(16), Int16(17)])], count: 1) {
+            $0.int16Col.in([Int16(16), Int16(17)])
+        }
+        assertQuery(ModernAllTypesObject.self, "(NOT int16Col IN %@)",
+                    values: [NSArray(array: [Int16(17)])], count: 0) {
+            !$0.int16Col.in([Int16(17)])
+        }
+
+        assertQuery(ModernAllTypesObject.self, "(int32Col IN %@)",
+                    values: [NSArray(array: [Int32(32), Int32(33)])], count: 1) {
+            $0.int32Col.in([Int32(32), Int32(33)])
+        }
+        assertQuery(ModernAllTypesObject.self, "(NOT int32Col IN %@)",
+                    values: [NSArray(array: [Int32(33)])], count: 0) {
+            !$0.int32Col.in([Int32(33)])
+        }
+
+        assertQuery(ModernAllTypesObject.self, "(int64Col IN %@)",
+                    values: [NSArray(array: [Int64(64), Int64(65)])], count: 1) {
+            $0.int64Col.in([Int64(64), Int64(65)])
+        }
+        assertQuery(ModernAllTypesObject.self, "(NOT int64Col IN %@)",
+                    values: [NSArray(array: [Int64(65)])], count: 0) {
+            !$0.int64Col.in([Int64(65)])
+        }
+
+        assertQuery(ModernAllTypesObject.self, "(floatCol IN %@)",
+                    values: [NSArray(array: [Float(5.55444333), Float(6.55444333)])], count: 1) {
+            $0.floatCol.in([Float(5.55444333), Float(6.55444333)])
+        }
+        assertQuery(ModernAllTypesObject.self, "(NOT floatCol IN %@)",
+                    values: [NSArray(array: [Float(6.55444333)])], count: 0) {
+            !$0.floatCol.in([Float(6.55444333)])
+        }
+
+        assertQuery(ModernAllTypesObject.self, "(doubleCol IN %@)",
+                    values: [NSArray(array: [123.456, 234.567])], count: 1) {
+            $0.doubleCol.in([123.456, 234.567])
+        }
+        assertQuery(ModernAllTypesObject.self, "(NOT doubleCol IN %@)",
+                    values: [NSArray(array: [234.567])], count: 0) {
+            !$0.doubleCol.in([234.567])
+        }
+
+        assertQuery(ModernAllTypesObject.self, "(stringCol IN %@)",
+                    values: [NSArray(array: ["Foo", "Foó"])], count: 1) {
+            $0.stringCol.in(["Foo", "Foó"])
+        }
+        assertQuery(ModernAllTypesObject.self, "(NOT stringCol IN %@)",
+                    values: [NSArray(array: ["Foó"])], count: 0) {
+            !$0.stringCol.in(["Foó"])
+        }
+
+        assertQuery(ModernAllTypesObject.self, "(binaryCol IN %@)",
+                    values: [NSArray(array: [Data(count: 64), Data(count: 128)])], count: 1) {
+            $0.binaryCol.in([Data(count: 64), Data(count: 128)])
+        }
+        assertQuery(ModernAllTypesObject.self, "(NOT binaryCol IN %@)",
+                    values: [NSArray(array: [Data(count: 128)])], count: 0) {
+            !$0.binaryCol.in([Data(count: 128)])
+        }
+
+        assertQuery(ModernAllTypesObject.self, "(dateCol IN %@)",
+                    values: [NSArray(array: [Date(timeIntervalSince1970: 1000000), Date(timeIntervalSince1970: 2000000)])], count: 1) {
+            $0.dateCol.in([Date(timeIntervalSince1970: 1000000), Date(timeIntervalSince1970: 2000000)])
+        }
+        assertQuery(ModernAllTypesObject.self, "(NOT dateCol IN %@)",
+                    values: [NSArray(array: [Date(timeIntervalSince1970: 2000000)])], count: 0) {
+            !$0.dateCol.in([Date(timeIntervalSince1970: 2000000)])
+        }
+
+        assertQuery(ModernAllTypesObject.self, "(decimalCol IN %@)",
+                    values: [NSArray(array: [Decimal128(123.456), Decimal128(234.567)])], count: 1) {
+            $0.decimalCol.in([Decimal128(123.456), Decimal128(234.567)])
+        }
+        assertQuery(ModernAllTypesObject.self, "(NOT decimalCol IN %@)",
+                    values: [NSArray(array: [Decimal128(234.567)])], count: 0) {
+            !$0.decimalCol.in([Decimal128(234.567)])
+        }
+
+        assertQuery(ModernAllTypesObject.self, "(objectIdCol IN %@)",
+                    values: [NSArray(array: [ObjectId("61184062c1d8f096a3695046"), ObjectId("61184062c1d8f096a3695045")])], count: 1) {
+            $0.objectIdCol.in([ObjectId("61184062c1d8f096a3695046"), ObjectId("61184062c1d8f096a3695045")])
+        }
+        assertQuery(ModernAllTypesObject.self, "(NOT objectIdCol IN %@)",
+                    values: [NSArray(array: [ObjectId("61184062c1d8f096a3695045")])], count: 0) {
+            !$0.objectIdCol.in([ObjectId("61184062c1d8f096a3695045")])
+        }
+
+        assertQuery(ModernAllTypesObject.self, "(uuidCol IN %@)",
+                    values: [NSArray(array: [UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!, UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!])], count: 1) {
+            $0.uuidCol.in([UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!, UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!])
+        }
+        assertQuery(ModernAllTypesObject.self, "(NOT uuidCol IN %@)",
+                    values: [NSArray(array: [UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!])], count: 0) {
+            !$0.uuidCol.in([UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!])
+        }
+
+        assertQuery(ModernAllTypesObject.self, "(intEnumCol IN %@)",
+                    values: [NSArray(array: [ModernIntEnum.value1, ModernIntEnum.value2])], count: 1) {
+            $0.intEnumCol.in([ModernIntEnum.value1, ModernIntEnum.value2])
+        }
+        assertQuery(ModernAllTypesObject.self, "(NOT intEnumCol IN %@)",
+                    values: [NSArray(array: [ModernIntEnum.value2])], count: 0) {
+            !$0.intEnumCol.in([ModernIntEnum.value2])
+        }
+
+        assertQuery(ModernAllTypesObject.self, "(stringEnumCol IN %@)",
+                    values: [NSArray(array: [ModernStringEnum.value1, ModernStringEnum.value2])], count: 1) {
+            $0.stringEnumCol.in([ModernStringEnum.value1, ModernStringEnum.value2])
+        }
+        assertQuery(ModernAllTypesObject.self, "(NOT stringEnumCol IN %@)",
+                    values: [NSArray(array: [ModernStringEnum.value2])], count: 0) {
+            !$0.stringEnumCol.in([ModernStringEnum.value2])
+        }
+
+        assertQuery(AllCustomPersistableTypes.self, "(bool IN %@)",
+                    values: [NSArray(array: [BoolWrapper(persistedValue: true), BoolWrapper(persistedValue: false)])], count: 1) {
+            $0.bool.in([BoolWrapper(persistedValue: true), BoolWrapper(persistedValue: false)])
+        }
+        assertQuery(AllCustomPersistableTypes.self, "(NOT bool IN %@)",
+                    values: [NSArray(array: [BoolWrapper(persistedValue: false)])], count: 0) {
+            !$0.bool.in([BoolWrapper(persistedValue: false)])
+        }
+
+        assertQuery(AllCustomPersistableTypes.self, "(int IN %@)",
+                    values: [NSArray(array: [IntWrapper(persistedValue: 1), IntWrapper(persistedValue: 3)])], count: 1) {
+            $0.int.in([IntWrapper(persistedValue: 1), IntWrapper(persistedValue: 3)])
+        }
+        assertQuery(AllCustomPersistableTypes.self, "(NOT int IN %@)",
+                    values: [NSArray(array: [IntWrapper(persistedValue: 3)])], count: 0) {
+            !$0.int.in([IntWrapper(persistedValue: 3)])
+        }
+
+        assertQuery(AllCustomPersistableTypes.self, "(int8 IN %@)",
+                    values: [NSArray(array: [Int8Wrapper(persistedValue: Int8(8)), Int8Wrapper(persistedValue: Int8(9))])], count: 1) {
+            $0.int8.in([Int8Wrapper(persistedValue: Int8(8)), Int8Wrapper(persistedValue: Int8(9))])
+        }
+        assertQuery(AllCustomPersistableTypes.self, "(NOT int8 IN %@)",
+                    values: [NSArray(array: [Int8Wrapper(persistedValue: Int8(9))])], count: 0) {
+            !$0.int8.in([Int8Wrapper(persistedValue: Int8(9))])
+        }
+
+        assertQuery(AllCustomPersistableTypes.self, "(int16 IN %@)",
+                    values: [NSArray(array: [Int16Wrapper(persistedValue: Int16(16)), Int16Wrapper(persistedValue: Int16(17))])], count: 1) {
+            $0.int16.in([Int16Wrapper(persistedValue: Int16(16)), Int16Wrapper(persistedValue: Int16(17))])
+        }
+        assertQuery(AllCustomPersistableTypes.self, "(NOT int16 IN %@)",
+                    values: [NSArray(array: [Int16Wrapper(persistedValue: Int16(17))])], count: 0) {
+            !$0.int16.in([Int16Wrapper(persistedValue: Int16(17))])
+        }
+
+        assertQuery(AllCustomPersistableTypes.self, "(int32 IN %@)",
+                    values: [NSArray(array: [Int32Wrapper(persistedValue: Int32(32)), Int32Wrapper(persistedValue: Int32(33))])], count: 1) {
+            $0.int32.in([Int32Wrapper(persistedValue: Int32(32)), Int32Wrapper(persistedValue: Int32(33))])
+        }
+        assertQuery(AllCustomPersistableTypes.self, "(NOT int32 IN %@)",
+                    values: [NSArray(array: [Int32Wrapper(persistedValue: Int32(33))])], count: 0) {
+            !$0.int32.in([Int32Wrapper(persistedValue: Int32(33))])
+        }
+
+        assertQuery(AllCustomPersistableTypes.self, "(int64 IN %@)",
+                    values: [NSArray(array: [Int64Wrapper(persistedValue: Int64(64)), Int64Wrapper(persistedValue: Int64(65))])], count: 1) {
+            $0.int64.in([Int64Wrapper(persistedValue: Int64(64)), Int64Wrapper(persistedValue: Int64(65))])
+        }
+        assertQuery(AllCustomPersistableTypes.self, "(NOT int64 IN %@)",
+                    values: [NSArray(array: [Int64Wrapper(persistedValue: Int64(65))])], count: 0) {
+            !$0.int64.in([Int64Wrapper(persistedValue: Int64(65))])
+        }
+
+        assertQuery(AllCustomPersistableTypes.self, "(float IN %@)",
+                    values: [NSArray(array: [FloatWrapper(persistedValue: Float(5.55444333)), FloatWrapper(persistedValue: Float(6.55444333))])], count: 1) {
+            $0.float.in([FloatWrapper(persistedValue: Float(5.55444333)), FloatWrapper(persistedValue: Float(6.55444333))])
+        }
+        assertQuery(AllCustomPersistableTypes.self, "(NOT float IN %@)",
+                    values: [NSArray(array: [FloatWrapper(persistedValue: Float(6.55444333))])], count: 0) {
+            !$0.float.in([FloatWrapper(persistedValue: Float(6.55444333))])
+        }
+
+        assertQuery(AllCustomPersistableTypes.self, "(double IN %@)",
+                    values: [NSArray(array: [DoubleWrapper(persistedValue: 123.456), DoubleWrapper(persistedValue: 234.567)])], count: 1) {
+            $0.double.in([DoubleWrapper(persistedValue: 123.456), DoubleWrapper(persistedValue: 234.567)])
+        }
+        assertQuery(AllCustomPersistableTypes.self, "(NOT double IN %@)",
+                    values: [NSArray(array: [DoubleWrapper(persistedValue: 234.567)])], count: 0) {
+            !$0.double.in([DoubleWrapper(persistedValue: 234.567)])
+        }
+
+        assertQuery(AllCustomPersistableTypes.self, "(string IN %@)",
+                    values: [NSArray(array: [StringWrapper(persistedValue: "Foo"), StringWrapper(persistedValue: "Foó")])], count: 1) {
+            $0.string.in([StringWrapper(persistedValue: "Foo"), StringWrapper(persistedValue: "Foó")])
+        }
+        assertQuery(AllCustomPersistableTypes.self, "(NOT string IN %@)",
+                    values: [NSArray(array: [StringWrapper(persistedValue: "Foó")])], count: 0) {
+            !$0.string.in([StringWrapper(persistedValue: "Foó")])
+        }
+
+        assertQuery(AllCustomPersistableTypes.self, "(binary IN %@)",
+                    values: [NSArray(array: [DataWrapper(persistedValue: Data(count: 64)), DataWrapper(persistedValue: Data(count: 128))])], count: 1) {
+            $0.binary.in([DataWrapper(persistedValue: Data(count: 64)), DataWrapper(persistedValue: Data(count: 128))])
+        }
+        assertQuery(AllCustomPersistableTypes.self, "(NOT binary IN %@)",
+                    values: [NSArray(array: [DataWrapper(persistedValue: Data(count: 128))])], count: 0) {
+            !$0.binary.in([DataWrapper(persistedValue: Data(count: 128))])
+        }
+
+        assertQuery(AllCustomPersistableTypes.self, "(date IN %@)",
+                    values: [NSArray(array: [DateWrapper(persistedValue: Date(timeIntervalSince1970: 1000000)), DateWrapper(persistedValue: Date(timeIntervalSince1970: 2000000))])], count: 1) {
+            $0.date.in([DateWrapper(persistedValue: Date(timeIntervalSince1970: 1000000)), DateWrapper(persistedValue: Date(timeIntervalSince1970: 2000000))])
+        }
+        assertQuery(AllCustomPersistableTypes.self, "(NOT date IN %@)",
+                    values: [NSArray(array: [DateWrapper(persistedValue: Date(timeIntervalSince1970: 2000000))])], count: 0) {
+            !$0.date.in([DateWrapper(persistedValue: Date(timeIntervalSince1970: 2000000))])
+        }
+
+        assertQuery(AllCustomPersistableTypes.self, "(decimal IN %@)",
+                    values: [NSArray(array: [Decimal128Wrapper(persistedValue: Decimal128(123.456)), Decimal128Wrapper(persistedValue: Decimal128(234.567))])], count: 1) {
+            $0.decimal.in([Decimal128Wrapper(persistedValue: Decimal128(123.456)), Decimal128Wrapper(persistedValue: Decimal128(234.567))])
+        }
+        assertQuery(AllCustomPersistableTypes.self, "(NOT decimal IN %@)",
+                    values: [NSArray(array: [Decimal128Wrapper(persistedValue: Decimal128(234.567))])], count: 0) {
+            !$0.decimal.in([Decimal128Wrapper(persistedValue: Decimal128(234.567))])
+        }
+
+        assertQuery(AllCustomPersistableTypes.self, "(objectId IN %@)",
+                    values: [NSArray(array: [ObjectIdWrapper(persistedValue: ObjectId("61184062c1d8f096a3695046")), ObjectIdWrapper(persistedValue: ObjectId("61184062c1d8f096a3695045"))])], count: 1) {
+            $0.objectId.in([ObjectIdWrapper(persistedValue: ObjectId("61184062c1d8f096a3695046")), ObjectIdWrapper(persistedValue: ObjectId("61184062c1d8f096a3695045"))])
+        }
+        assertQuery(AllCustomPersistableTypes.self, "(NOT objectId IN %@)",
+                    values: [NSArray(array: [ObjectIdWrapper(persistedValue: ObjectId("61184062c1d8f096a3695045"))])], count: 0) {
+            !$0.objectId.in([ObjectIdWrapper(persistedValue: ObjectId("61184062c1d8f096a3695045"))])
+        }
+
+        assertQuery(AllCustomPersistableTypes.self, "(uuid IN %@)",
+                    values: [NSArray(array: [UUIDWrapper(persistedValue: UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!), UUIDWrapper(persistedValue: UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!)])], count: 1) {
+            $0.uuid.in([UUIDWrapper(persistedValue: UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!), UUIDWrapper(persistedValue: UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!)])
+        }
+        assertQuery(AllCustomPersistableTypes.self, "(NOT uuid IN %@)",
+                    values: [NSArray(array: [UUIDWrapper(persistedValue: UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!)])], count: 0) {
+            !$0.uuid.in([UUIDWrapper(persistedValue: UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!)])
+        }
+
+        assertQuery(ModernAllTypesObject.self, "(optBoolCol IN %@)",
+                    values: [NSArray(array: [true, false])], count: 1) {
+            $0.optBoolCol.in([true, false])
+        }
+        assertQuery(ModernAllTypesObject.self, "(NOT optBoolCol IN %@)",
+                    values: [NSArray(array: [false])], count: 0) {
+            !$0.optBoolCol.in([false])
+        }
+
+        assertQuery(ModernAllTypesObject.self, "(optIntCol IN %@)",
+                    values: [NSArray(array: [1, 3])], count: 1) {
+            $0.optIntCol.in([1, 3])
+        }
+        assertQuery(ModernAllTypesObject.self, "(NOT optIntCol IN %@)",
+                    values: [NSArray(array: [3])], count: 0) {
+            !$0.optIntCol.in([3])
+        }
+
+        assertQuery(ModernAllTypesObject.self, "(optInt8Col IN %@)",
+                    values: [NSArray(array: [Int8(8), Int8(9)])], count: 1) {
+            $0.optInt8Col.in([Int8(8), Int8(9)])
+        }
+        assertQuery(ModernAllTypesObject.self, "(NOT optInt8Col IN %@)",
+                    values: [NSArray(array: [Int8(9)])], count: 0) {
+            !$0.optInt8Col.in([Int8(9)])
+        }
+
+        assertQuery(ModernAllTypesObject.self, "(optInt16Col IN %@)",
+                    values: [NSArray(array: [Int16(16), Int16(17)])], count: 1) {
+            $0.optInt16Col.in([Int16(16), Int16(17)])
+        }
+        assertQuery(ModernAllTypesObject.self, "(NOT optInt16Col IN %@)",
+                    values: [NSArray(array: [Int16(17)])], count: 0) {
+            !$0.optInt16Col.in([Int16(17)])
+        }
+
+        assertQuery(ModernAllTypesObject.self, "(optInt32Col IN %@)",
+                    values: [NSArray(array: [Int32(32), Int32(33)])], count: 1) {
+            $0.optInt32Col.in([Int32(32), Int32(33)])
+        }
+        assertQuery(ModernAllTypesObject.self, "(NOT optInt32Col IN %@)",
+                    values: [NSArray(array: [Int32(33)])], count: 0) {
+            !$0.optInt32Col.in([Int32(33)])
+        }
+
+        assertQuery(ModernAllTypesObject.self, "(optInt64Col IN %@)",
+                    values: [NSArray(array: [Int64(64), Int64(65)])], count: 1) {
+            $0.optInt64Col.in([Int64(64), Int64(65)])
+        }
+        assertQuery(ModernAllTypesObject.self, "(NOT optInt64Col IN %@)",
+                    values: [NSArray(array: [Int64(65)])], count: 0) {
+            !$0.optInt64Col.in([Int64(65)])
+        }
+
+        assertQuery(ModernAllTypesObject.self, "(optFloatCol IN %@)",
+                    values: [NSArray(array: [Float(5.55444333), Float(6.55444333)])], count: 1) {
+            $0.optFloatCol.in([Float(5.55444333), Float(6.55444333)])
+        }
+        assertQuery(ModernAllTypesObject.self, "(NOT optFloatCol IN %@)",
+                    values: [NSArray(array: [Float(6.55444333)])], count: 0) {
+            !$0.optFloatCol.in([Float(6.55444333)])
+        }
+
+        assertQuery(ModernAllTypesObject.self, "(optDoubleCol IN %@)",
+                    values: [NSArray(array: [123.456, 234.567])], count: 1) {
+            $0.optDoubleCol.in([123.456, 234.567])
+        }
+        assertQuery(ModernAllTypesObject.self, "(NOT optDoubleCol IN %@)",
+                    values: [NSArray(array: [234.567])], count: 0) {
+            !$0.optDoubleCol.in([234.567])
+        }
+
+        assertQuery(ModernAllTypesObject.self, "(optStringCol IN %@)",
+                    values: [NSArray(array: ["Foo", "Foó"])], count: 1) {
+            $0.optStringCol.in(["Foo", "Foó"])
+        }
+        assertQuery(ModernAllTypesObject.self, "(NOT optStringCol IN %@)",
+                    values: [NSArray(array: ["Foó"])], count: 0) {
+            !$0.optStringCol.in(["Foó"])
+        }
+
+        assertQuery(ModernAllTypesObject.self, "(optBinaryCol IN %@)",
+                    values: [NSArray(array: [Data(count: 64), Data(count: 128)])], count: 1) {
+            $0.optBinaryCol.in([Data(count: 64), Data(count: 128)])
+        }
+        assertQuery(ModernAllTypesObject.self, "(NOT optBinaryCol IN %@)",
+                    values: [NSArray(array: [Data(count: 128)])], count: 0) {
+            !$0.optBinaryCol.in([Data(count: 128)])
+        }
+
+        assertQuery(ModernAllTypesObject.self, "(optDateCol IN %@)",
+                    values: [NSArray(array: [Date(timeIntervalSince1970: 1000000), Date(timeIntervalSince1970: 2000000)])], count: 1) {
+            $0.optDateCol.in([Date(timeIntervalSince1970: 1000000), Date(timeIntervalSince1970: 2000000)])
+        }
+        assertQuery(ModernAllTypesObject.self, "(NOT optDateCol IN %@)",
+                    values: [NSArray(array: [Date(timeIntervalSince1970: 2000000)])], count: 0) {
+            !$0.optDateCol.in([Date(timeIntervalSince1970: 2000000)])
+        }
+
+        assertQuery(ModernAllTypesObject.self, "(optDecimalCol IN %@)",
+                    values: [NSArray(array: [Decimal128(123.456), Decimal128(234.567)])], count: 1) {
+            $0.optDecimalCol.in([Decimal128(123.456), Decimal128(234.567)])
+        }
+        assertQuery(ModernAllTypesObject.self, "(NOT optDecimalCol IN %@)",
+                    values: [NSArray(array: [Decimal128(234.567)])], count: 0) {
+            !$0.optDecimalCol.in([Decimal128(234.567)])
+        }
+
+        assertQuery(ModernAllTypesObject.self, "(optObjectIdCol IN %@)",
+                    values: [NSArray(array: [ObjectId("61184062c1d8f096a3695046"), ObjectId("61184062c1d8f096a3695045")])], count: 1) {
+            $0.optObjectIdCol.in([ObjectId("61184062c1d8f096a3695046"), ObjectId("61184062c1d8f096a3695045")])
+        }
+        assertQuery(ModernAllTypesObject.self, "(NOT optObjectIdCol IN %@)",
+                    values: [NSArray(array: [ObjectId("61184062c1d8f096a3695045")])], count: 0) {
+            !$0.optObjectIdCol.in([ObjectId("61184062c1d8f096a3695045")])
+        }
+
+        assertQuery(ModernAllTypesObject.self, "(optUuidCol IN %@)",
+                    values: [NSArray(array: [UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!, UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!])], count: 1) {
+            $0.optUuidCol.in([UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!, UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!])
+        }
+        assertQuery(ModernAllTypesObject.self, "(NOT optUuidCol IN %@)",
+                    values: [NSArray(array: [UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!])], count: 0) {
+            !$0.optUuidCol.in([UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!])
+        }
+
+        assertQuery(ModernAllTypesObject.self, "(optIntEnumCol IN %@)",
+                    values: [NSArray(array: [ModernIntEnum.value1, ModernIntEnum.value2])], count: 1) {
+            $0.optIntEnumCol.in([ModernIntEnum.value1, ModernIntEnum.value2])
+        }
+        assertQuery(ModernAllTypesObject.self, "(NOT optIntEnumCol IN %@)",
+                    values: [NSArray(array: [ModernIntEnum.value2])], count: 0) {
+            !$0.optIntEnumCol.in([ModernIntEnum.value2])
+        }
+
+        assertQuery(ModernAllTypesObject.self, "(optStringEnumCol IN %@)",
+                    values: [NSArray(array: [ModernStringEnum.value1, ModernStringEnum.value2])], count: 1) {
+            $0.optStringEnumCol.in([ModernStringEnum.value1, ModernStringEnum.value2])
+        }
+        assertQuery(ModernAllTypesObject.self, "(NOT optStringEnumCol IN %@)",
+                    values: [NSArray(array: [ModernStringEnum.value2])], count: 0) {
+            !$0.optStringEnumCol.in([ModernStringEnum.value2])
+        }
+
+        assertQuery(AllCustomPersistableTypes.self, "(optBool IN %@)",
+                    values: [NSArray(array: [BoolWrapper(persistedValue: true), BoolWrapper(persistedValue: false)])], count: 1) {
+            $0.optBool.in([BoolWrapper(persistedValue: true), BoolWrapper(persistedValue: false)])
+        }
+        assertQuery(AllCustomPersistableTypes.self, "(NOT optBool IN %@)",
+                    values: [NSArray(array: [BoolWrapper(persistedValue: false)])], count: 0) {
+            !$0.optBool.in([BoolWrapper(persistedValue: false)])
+        }
+
+        assertQuery(AllCustomPersistableTypes.self, "(optInt IN %@)",
+                    values: [NSArray(array: [IntWrapper(persistedValue: 1), IntWrapper(persistedValue: 3)])], count: 1) {
+            $0.optInt.in([IntWrapper(persistedValue: 1), IntWrapper(persistedValue: 3)])
+        }
+        assertQuery(AllCustomPersistableTypes.self, "(NOT optInt IN %@)",
+                    values: [NSArray(array: [IntWrapper(persistedValue: 3)])], count: 0) {
+            !$0.optInt.in([IntWrapper(persistedValue: 3)])
+        }
+
+        assertQuery(AllCustomPersistableTypes.self, "(optInt8 IN %@)",
+                    values: [NSArray(array: [Int8Wrapper(persistedValue: Int8(8)), Int8Wrapper(persistedValue: Int8(9))])], count: 1) {
+            $0.optInt8.in([Int8Wrapper(persistedValue: Int8(8)), Int8Wrapper(persistedValue: Int8(9))])
+        }
+        assertQuery(AllCustomPersistableTypes.self, "(NOT optInt8 IN %@)",
+                    values: [NSArray(array: [Int8Wrapper(persistedValue: Int8(9))])], count: 0) {
+            !$0.optInt8.in([Int8Wrapper(persistedValue: Int8(9))])
+        }
+
+        assertQuery(AllCustomPersistableTypes.self, "(optInt16 IN %@)",
+                    values: [NSArray(array: [Int16Wrapper(persistedValue: Int16(16)), Int16Wrapper(persistedValue: Int16(17))])], count: 1) {
+            $0.optInt16.in([Int16Wrapper(persistedValue: Int16(16)), Int16Wrapper(persistedValue: Int16(17))])
+        }
+        assertQuery(AllCustomPersistableTypes.self, "(NOT optInt16 IN %@)",
+                    values: [NSArray(array: [Int16Wrapper(persistedValue: Int16(17))])], count: 0) {
+            !$0.optInt16.in([Int16Wrapper(persistedValue: Int16(17))])
+        }
+
+        assertQuery(AllCustomPersistableTypes.self, "(optInt32 IN %@)",
+                    values: [NSArray(array: [Int32Wrapper(persistedValue: Int32(32)), Int32Wrapper(persistedValue: Int32(33))])], count: 1) {
+            $0.optInt32.in([Int32Wrapper(persistedValue: Int32(32)), Int32Wrapper(persistedValue: Int32(33))])
+        }
+        assertQuery(AllCustomPersistableTypes.self, "(NOT optInt32 IN %@)",
+                    values: [NSArray(array: [Int32Wrapper(persistedValue: Int32(33))])], count: 0) {
+            !$0.optInt32.in([Int32Wrapper(persistedValue: Int32(33))])
+        }
+
+        assertQuery(AllCustomPersistableTypes.self, "(optInt64 IN %@)",
+                    values: [NSArray(array: [Int64Wrapper(persistedValue: Int64(64)), Int64Wrapper(persistedValue: Int64(65))])], count: 1) {
+            $0.optInt64.in([Int64Wrapper(persistedValue: Int64(64)), Int64Wrapper(persistedValue: Int64(65))])
+        }
+        assertQuery(AllCustomPersistableTypes.self, "(NOT optInt64 IN %@)",
+                    values: [NSArray(array: [Int64Wrapper(persistedValue: Int64(65))])], count: 0) {
+            !$0.optInt64.in([Int64Wrapper(persistedValue: Int64(65))])
+        }
+
+        assertQuery(AllCustomPersistableTypes.self, "(optFloat IN %@)",
+                    values: [NSArray(array: [FloatWrapper(persistedValue: Float(5.55444333)), FloatWrapper(persistedValue: Float(6.55444333))])], count: 1) {
+            $0.optFloat.in([FloatWrapper(persistedValue: Float(5.55444333)), FloatWrapper(persistedValue: Float(6.55444333))])
+        }
+        assertQuery(AllCustomPersistableTypes.self, "(NOT optFloat IN %@)",
+                    values: [NSArray(array: [FloatWrapper(persistedValue: Float(6.55444333))])], count: 0) {
+            !$0.optFloat.in([FloatWrapper(persistedValue: Float(6.55444333))])
+        }
+
+        assertQuery(AllCustomPersistableTypes.self, "(optDouble IN %@)",
+                    values: [NSArray(array: [DoubleWrapper(persistedValue: 123.456), DoubleWrapper(persistedValue: 234.567)])], count: 1) {
+            $0.optDouble.in([DoubleWrapper(persistedValue: 123.456), DoubleWrapper(persistedValue: 234.567)])
+        }
+        assertQuery(AllCustomPersistableTypes.self, "(NOT optDouble IN %@)",
+                    values: [NSArray(array: [DoubleWrapper(persistedValue: 234.567)])], count: 0) {
+            !$0.optDouble.in([DoubleWrapper(persistedValue: 234.567)])
+        }
+
+        assertQuery(AllCustomPersistableTypes.self, "(optString IN %@)",
+                    values: [NSArray(array: [StringWrapper(persistedValue: "Foo"), StringWrapper(persistedValue: "Foó")])], count: 1) {
+            $0.optString.in([StringWrapper(persistedValue: "Foo"), StringWrapper(persistedValue: "Foó")])
+        }
+        assertQuery(AllCustomPersistableTypes.self, "(NOT optString IN %@)",
+                    values: [NSArray(array: [StringWrapper(persistedValue: "Foó")])], count: 0) {
+            !$0.optString.in([StringWrapper(persistedValue: "Foó")])
+        }
+
+        assertQuery(AllCustomPersistableTypes.self, "(optBinary IN %@)",
+                    values: [NSArray(array: [DataWrapper(persistedValue: Data(count: 64)), DataWrapper(persistedValue: Data(count: 128))])], count: 1) {
+            $0.optBinary.in([DataWrapper(persistedValue: Data(count: 64)), DataWrapper(persistedValue: Data(count: 128))])
+        }
+        assertQuery(AllCustomPersistableTypes.self, "(NOT optBinary IN %@)",
+                    values: [NSArray(array: [DataWrapper(persistedValue: Data(count: 128))])], count: 0) {
+            !$0.optBinary.in([DataWrapper(persistedValue: Data(count: 128))])
+        }
+
+        assertQuery(AllCustomPersistableTypes.self, "(optDate IN %@)",
+                    values: [NSArray(array: [DateWrapper(persistedValue: Date(timeIntervalSince1970: 1000000)), DateWrapper(persistedValue: Date(timeIntervalSince1970: 2000000))])], count: 1) {
+            $0.optDate.in([DateWrapper(persistedValue: Date(timeIntervalSince1970: 1000000)), DateWrapper(persistedValue: Date(timeIntervalSince1970: 2000000))])
+        }
+        assertQuery(AllCustomPersistableTypes.self, "(NOT optDate IN %@)",
+                    values: [NSArray(array: [DateWrapper(persistedValue: Date(timeIntervalSince1970: 2000000))])], count: 0) {
+            !$0.optDate.in([DateWrapper(persistedValue: Date(timeIntervalSince1970: 2000000))])
+        }
+
+        assertQuery(AllCustomPersistableTypes.self, "(optDecimal IN %@)",
+                    values: [NSArray(array: [Decimal128Wrapper(persistedValue: Decimal128(123.456)), Decimal128Wrapper(persistedValue: Decimal128(234.567))])], count: 1) {
+            $0.optDecimal.in([Decimal128Wrapper(persistedValue: Decimal128(123.456)), Decimal128Wrapper(persistedValue: Decimal128(234.567))])
+        }
+        assertQuery(AllCustomPersistableTypes.self, "(NOT optDecimal IN %@)",
+                    values: [NSArray(array: [Decimal128Wrapper(persistedValue: Decimal128(234.567))])], count: 0) {
+            !$0.optDecimal.in([Decimal128Wrapper(persistedValue: Decimal128(234.567))])
+        }
+
+        assertQuery(AllCustomPersistableTypes.self, "(optObjectId IN %@)",
+                    values: [NSArray(array: [ObjectIdWrapper(persistedValue: ObjectId("61184062c1d8f096a3695046")), ObjectIdWrapper(persistedValue: ObjectId("61184062c1d8f096a3695045"))])], count: 1) {
+            $0.optObjectId.in([ObjectIdWrapper(persistedValue: ObjectId("61184062c1d8f096a3695046")), ObjectIdWrapper(persistedValue: ObjectId("61184062c1d8f096a3695045"))])
+        }
+        assertQuery(AllCustomPersistableTypes.self, "(NOT optObjectId IN %@)",
+                    values: [NSArray(array: [ObjectIdWrapper(persistedValue: ObjectId("61184062c1d8f096a3695045"))])], count: 0) {
+            !$0.optObjectId.in([ObjectIdWrapper(persistedValue: ObjectId("61184062c1d8f096a3695045"))])
+        }
+
+        assertQuery(AllCustomPersistableTypes.self, "(optUuid IN %@)",
+                    values: [NSArray(array: [UUIDWrapper(persistedValue: UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!), UUIDWrapper(persistedValue: UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!)])], count: 1) {
+            $0.optUuid.in([UUIDWrapper(persistedValue: UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!), UUIDWrapper(persistedValue: UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!)])
+        }
+        assertQuery(AllCustomPersistableTypes.self, "(NOT optUuid IN %@)",
+                    values: [NSArray(array: [UUIDWrapper(persistedValue: UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!)])], count: 0) {
+            !$0.optUuid.in([UUIDWrapper(persistedValue: UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!)])
+        }
+    }
 }
 
 private protocol LinkToTestObject: Object {
