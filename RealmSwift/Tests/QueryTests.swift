@@ -8900,9 +8900,9 @@ class QueryTests: TestCase {
         }
     }
 
-    // MARK: - Contains In
+    // MARK: -  IN
 
-    func testContainsedIn() {
+    func testContainsIn() {
 
         assertQuery(ModernAllTypesObject.self, "(boolCol IN %@)",
                     values: [NSArray(array: [true, false])], count: 1) {
