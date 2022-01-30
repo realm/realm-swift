@@ -1919,9 +1919,9 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     XCTAssertNoThrow([localRealmConfiguration setDeleteRealmIfMigrationNeeded:YES]);
 }
 
-#pragma mark - Write Copy With Sync Configuration
+#pragma mark - Write Copy For Configuration
 
-- (void)testWriteCopyWithConfigurationLocalToSync {
+- (void)testWriteCopyForConfigurationLocalToSync {
     RLMRealmConfiguration *localConfig = [RLMRealmConfiguration new];
     localConfig.objectClasses = @[Person.class];
     localConfig.fileURL = RLMTestRealmURL();
@@ -1951,7 +1951,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     XCTAssertEqual([syncedResults objectsWhere:@"firstName = 'John'"].count, 1U);
 }
 
-- (void)testWriteCopyWithConfigurationSyncToSyncRealmError {
+- (void)testWriteCopyForConfigurationSyncToSyncRealmError {
     RLMUser *user = [self userForTest:_cmd];
     RLMRealmConfiguration *syncConfig = [user configurationWithPartitionValue:NSStringFromSelector(_cmd)];
     syncConfig.objectClasses = @[Person.class];
@@ -1972,7 +1972,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     XCTAssertTrue([error.userInfo[NSLocalizedDescriptionKey] isEqualToString:@"Could not write file as not all client changes are integrated in server"]);
 }
 
-- (void)testWriteCopyWithConfigurationLocalRealmForSyncWithExistingData {
+- (void)testWriteCopyForConfigurationLocalRealmForSyncWithExistingData {
     RLMUser *initialUser = [self userForTest:_cmd];
     RLMRealmConfiguration *initialSyncConfig = [initialUser configurationWithPartitionValue:NSStringFromSelector(_cmd)];
     initialSyncConfig.objectClasses = @[Person.class];

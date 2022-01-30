@@ -1329,7 +1329,123 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         XCTAssertEqual(profile.metadata, [:])
     }
 
-    // MARK: Write Copy with Sync
+    // MARK: Seed file path
+
+    func testSeedFilePathOpenLocalToSync() {
+        do {
+            var config = Realm.Configuration()
+            config.fileURL = RLMTestRealmURL()
+            config.objectTypes = [SwiftHugeSyncObject.self]
+            let realm = try Realm(configuration: config)
+            try! realm.write {
+                for _ in 0..<SwiftSyncTestCase.bigObjectCount {
+                    realm.add(SwiftHugeSyncObject.create())
+                }
+            }
+
+            let user = try logInUser(for: basicCredentials())
+            var destinationConfig = user.configuration(partitionValue: #function)
+            destinationConfig.seedFilePath = RLMTestRealmURL()
+            destinationConfig.objectTypes = [SwiftHugeSyncObject.self]
+
+            try realm.writeCopy(configuration: destinationConfig)
+
+            // Open the realm and immediately check data
+            let destinationRealm = try Realm(configuration: destinationConfig)
+            checkCount(expected: SwiftSyncTestCase.bigObjectCount, destinationRealm, SwiftHugeSyncObject.self)
+
+            try destinationRealm.write {
+                destinationRealm.add(SwiftHugeSyncObject.create())
+            }
+            waitForUploads(for: destinationRealm)
+            checkCount(expected: SwiftSyncTestCase.bigObjectCount + 1, destinationRealm, SwiftHugeSyncObject.self)
+        } catch {
+            XCTFail("Got an error: \(error)")
+        }
+    }
+
+    func testSeedFilePathOpenSyncToSync() {
+        do {
+            // user1 creates and writeCopies a realm to be opened by another user
+            let user1 = try logInUser(for: basicCredentials())
+            var config = user1.configuration(testName: #function)
+
+            config.objectTypes = [SwiftHugeSyncObject.self]
+            let realm = try Realm(configuration: config)
+            try! realm.write {
+                for _ in 0..<SwiftSyncTestCase.bigObjectCount {
+                    realm.add(SwiftHugeSyncObject.create())
+                }
+            }
+            waitForUploads(for: realm)
+
+            // user2 creates a configuration that will use user1's realm as a seed
+            let user2 = try logInUser(for: basicCredentials())
+            XCTAssertNotEqual(user1.id, user2.id)
+            var destinationConfig = user2.configuration(partitionValue: #function)
+            let originalFilePath = destinationConfig.fileURL
+            destinationConfig.seedFilePath = RLMTestRealmURL()
+            destinationConfig.objectTypes = [SwiftHugeSyncObject.self]
+            destinationConfig.fileURL = RLMTestRealmURL()
+
+            try realm.writeCopy(configuration: destinationConfig)
+
+            // Reset the fileURL so that we use the users folder to store the realm.
+            destinationConfig.fileURL = originalFilePath
+
+            // Open the realm and immediately check data
+            let destinationRealm = try Realm(configuration: destinationConfig)
+            checkCount(expected: SwiftSyncTestCase.bigObjectCount, destinationRealm, SwiftHugeSyncObject.self)
+
+            try destinationRealm.write {
+                destinationRealm.add(SwiftHugeSyncObject.create())
+            }
+            waitForUploads(for: destinationRealm)
+            checkCount(expected: SwiftSyncTestCase.bigObjectCount + 1, destinationRealm, SwiftHugeSyncObject.self)
+        } catch {
+            XCTFail("Got an error: \(error)")
+        }
+    }
+
+    func testSeedFilePathOpenSyncToLocal() {
+        do {
+            let user1 = try logInUser(for: basicCredentials())
+            var syncConfig = user1.configuration(partitionValue: #function)
+            syncConfig.seedFilePath = RLMTestRealmURL()
+            syncConfig.objectTypes = [SwiftHugeSyncObject.self]
+
+            let syncRealm = try Realm(configuration: syncConfig)
+
+            try syncRealm.write {
+                syncRealm.add(SwiftHugeSyncObject.create())
+            }
+            waitForUploads(for: syncRealm)
+            checkCount(expected: 1, syncRealm, SwiftHugeSyncObject.self)
+
+            var localConfig = Realm.Configuration()
+            localConfig.fileURL = RLMTestRealmURL()
+            localConfig.objectTypes = [SwiftHugeSyncObject.self]
+
+            try syncRealm.writeCopy(configuration: localConfig)
+
+            localConfig.seedFilePath = RLMTestRealmURL()
+            localConfig.fileURL = RLMDefaultRealmURL()
+            localConfig.schemaVersion = 1
+
+            let realm = try Realm(configuration: localConfig)
+            try! realm.write {
+                for _ in 0..<SwiftSyncTestCase.bigObjectCount {
+                    realm.add(SwiftHugeSyncObject.create())
+                }
+            }
+
+            checkCount(expected: SwiftSyncTestCase.bigObjectCount + 1, realm, SwiftHugeSyncObject.self)
+        } catch {
+            XCTFail("Got an error: \(error)")
+        }
+    }
+
+    // MARK: Write Copy For Configuration
 
     func testWriteCopySyncedRealm() {
         do {
@@ -1546,38 +1662,6 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             try realm.writeCopy(configuration: user2Config)
         } catch {
             XCTAssertEqual(error.localizedDescription, "Could not write file as not all client changes are integrated in server")
-            didFail = true
-        }
-        XCTAssertTrue(didFail)
-    }
-
-    func testWriteCopySyncToLocalRealm() {
-        var didFail = false
-        do {
-            // Create realm with sync user
-            let user1 = try logInUser(for: basicCredentials())
-            var config = user1.configuration(testName: #function)
-            config.objectTypes = [SwiftPerson.self]
-
-            let syncedRealm = try Realm(configuration: config)
-            try! syncedRealm.write {
-                syncedRealm.add(SwiftPerson())
-            }
-            waitForUploads(for: syncedRealm)
-
-            // Set up local config where realm will be copied
-            var localConfig = Realm.Configuration()
-            localConfig.fileURL = RLMTestRealmURL()
-            let pathOnDisk = ObjectiveCSupport.convert(object: localConfig).pathOnDisk
-            XCTAssertFalse(FileManager.default.fileExists(atPath: pathOnDisk))
-
-            try syncedRealm.writeCopy(configuration: localConfig)
-
-            // Opening  copied sync realm will result in an error due to incompatible histories.
-            _ = try Realm(configuration: localConfig)
-        } catch {
-            XCTAssert(error.localizedDescription.contains("Realm file's history format is incompatible with the settings in the configuration object being used to open the Realm."))
-            XCTAssert(error.localizedDescription.contains(RLMTestRealmURL().path))
             didFail = true
         }
         XCTAssertTrue(didFail)

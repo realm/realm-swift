@@ -161,7 +161,7 @@
     }
 }
 
-- (void)testWriteCopyWithConfigurationAndKey {
+- (void)testWriteCopyForConfigurationAndKey {
     NSData *key1 = RLMGenerateKey();
     NSData *key2 = RLMGenerateKey();
 

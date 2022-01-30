@@ -1,14 +1,24 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* Add `Realm.writeCopy(configuration:)`/`[RLMRealm writeCopyWithConfiguration:]` which gives the
+* Add `Realm.writeCopy(configuration:)`/`[RLMRealm writeCopyForConfiguration:]` which gives the
   following functionality:
     - Export a local non-sync Realm to be used with MongoDB Realm Sync 
       when the configuration is derived from a sync `RLMUser`/`User`.
     - Write a copy of a local Realm to a destination specified in the configuration.
     - Write a copy of a synced Realm in use with user A, and open it with user B.
-
+    - Note that migrations may be required when using a local realm configuration to open a realm file that
+      was copied from a synchronized realm.
+      
   An exception will be thrown if a Realm exists at the destination.
+* Add a `seedFilePath` option to `RLMRealmConfiguration` and `Configuration`. If this
+  option is set then instead of creating an empty Realm, the realm at the `seedFilePath` will
+  be copied to the `fileURL` of the new Realm. If a Realm file already exists at the
+  desitnation path, the seed file will not be copied and the already existing Realm
+  will be opened instead. Note that to use this parameter with a synced Realm configuration
+  the seed Realm must be appropriately copied to a destination with 
+  `Realm.writeCopy(configuration:)`/`[RLMRealm writeCopyForConfiguration:]` first.
+
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
