@@ -1423,6 +1423,43 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
     }
 
+    func testWriteCopySynedRealmToLocal() {
+        do {
+            let user = try logInUser(for: basicCredentials())
+            var syncConfig = user.configuration(partitionValue: #function)
+            syncConfig.objectTypes = [SwiftPerson.self]
+            let syncedRealm = try Realm(configuration: syncConfig)
+            waitForDownloads(for: syncedRealm)
+
+            try syncedRealm.write {
+                syncedRealm.add(SwiftPerson(firstName: "Jane", lastName: "Doe"))
+            }
+            waitForUploads(for: syncedRealm)
+            XCTAssertEqual(syncedRealm.objects(SwiftPerson.self).count, 1)
+
+            var localConfig = Realm.Configuration()
+            localConfig.objectTypes = [SwiftPerson.self]
+            localConfig.fileURL = realmURLForFile("test.realm")
+            // `realm_id` will be removed in the local realm, so we need to bump
+            // the schema version.
+            localConfig.schemaVersion = 1
+
+            try syncedRealm.writeCopy(configuration: localConfig)
+
+            let localRealm = try Realm(configuration: localConfig)
+            try localRealm.write {
+                localRealm.add(SwiftPerson(firstName: "John", lastName: "Doe"))
+            }
+
+            let results = localRealm.objects(SwiftPerson.self)
+            XCTAssertEqual(results.where { $0.firstName == "John" }.count, 1)
+            XCTAssertEqual(results.where { $0.firstName == "Jane" }.count, 1)
+        } catch {
+            print(error.localizedDescription)
+            XCTFail("Got an error \(error.localizedDescription)")
+        }
+    }
+
     func testWriteCopyLocalRealmForSyncWithExistingData() {
         do {
             let initialUser = try logInUser(for: basicCredentials())

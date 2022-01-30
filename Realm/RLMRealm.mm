@@ -968,7 +968,7 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     return NO;
 }
 
-- (BOOL)writeCopyWithConfiguration:(RLMRealmConfiguration *)configuration error:(NSError **)error {
+- (BOOL)writeCopyForConfiguration:(RLMRealmConfiguration *)configuration error:(NSError **)error {
     if ([RLMRealm fileExistsForConfiguration:configuration]) {
         if (error) {
             NSString *msg = [NSString stringWithFormat:@"File at path '%@' already exists.", configuration.pathOnDisk];
@@ -979,12 +979,12 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     try {
         // If we are handing a sync to sync case use write_copy as `export_to` should be used in the local
         // to synced realm case.
-        if (configuration.syncConfiguration && self.configuration.syncConfiguration) {
-            NSString *path = configuration.fileURL.path;
-            _realm->write_copy(path.UTF8String,
-                               {static_cast<const char *>(configuration.encryptionKey.bytes), configuration.encryptionKey.length});
-        }
-        else {
+        if (configuration.config.sync_config && _realm->config().sync_config) {
+            _realm->write_copy(configuration.config.path,
+                               {static_cast<const char *>(configuration.config.encryption_key.data()), configuration.config.encryption_key.size()});
+        } else if (!configuration.config.sync_config && _realm->config().sync_config) {
+            [self writeCopyToURL:configuration.fileURL encryptionKey:configuration.encryptionKey error:error];
+        } else {
             _realm->export_to(configuration.config);
         }
     }

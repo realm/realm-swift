@@ -927,7 +927,7 @@ import Realm.Private
      - throws: An `NSError` if the copy could not be written.
      */
     public func writeCopy(configuration: Realm.Configuration) throws {
-        try rlmRealm.writeCopy(with: configuration.rlmConfiguration)
+        try rlmRealm.writeCopy(for: configuration.rlmConfiguration)
     }
 
     /**

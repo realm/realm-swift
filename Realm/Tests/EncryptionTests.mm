@@ -174,7 +174,7 @@
         [realm transactionWithBlock:^{
             [IntObject createInRealm:realm withValue:@[@1]];
         }];
-        [realm writeCopyWithConfiguration:destinationConfig error:nil];
+        [realm writeCopyForConfiguration:destinationConfig error:nil];
     }
 
     @autoreleasepool {

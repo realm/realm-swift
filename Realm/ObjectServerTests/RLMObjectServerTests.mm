@@ -1935,7 +1935,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
         [localRealm addObject:[Person ringo]];
     }];
 
-    [localRealm writeCopyWithConfiguration:syncConfig error:nil];
+    [localRealm writeCopyForConfiguration:syncConfig error:nil];
 
     RLMRealm *syncedRealm = [RLMRealm realmWithConfiguration:syncConfig error:nil];
     XCTAssertEqual([[Person allObjectsInRealm:syncedRealm] objectsWhere:@"firstName = 'Ringo'"].count, 1U);
@@ -1967,7 +1967,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     }];
     // Cannot export a synced realm as not all changes have been synced.
     NSError *error;
-    [syncedRealm writeCopyWithConfiguration:syncConfig2 error:&error];
+    [syncedRealm writeCopyForConfiguration:syncConfig2 error:&error];
     XCTAssertEqual(error.code, RLMErrorFail);
     XCTAssertTrue([error.userInfo[NSLocalizedDescriptionKey] isEqualToString:@"Could not write file as not all client changes are integrated in server"]);
 }
@@ -2010,7 +2010,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
         [localRealm addObject:[Person george]];
     }];
 
-    [localRealm writeCopyWithConfiguration:syncConfig error:nil];
+    [localRealm writeCopyForConfiguration:syncConfig error:nil];
 
     RLMRealm *syncedRealm = [RLMRealm realmWithConfiguration:syncConfig error:nil];
     [self waitForDownloadsForRealm:syncedRealm];

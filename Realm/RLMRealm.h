@@ -242,7 +242,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Writes a copy of the Realm to a given location specified by a given configuration.
 
- If the configuration supplied is derived from a `User` then this Realm will be copied with
+ If the configuration supplied is derived from a `RLMUser` then this Realm will be copied with
  sync functionality enabled.
 
  The destination file cannot already exist.
@@ -254,7 +254,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @return `YES` if the Realm was successfully written to disk, `NO` if an error occurred.
  */
-- (BOOL)writeCopyWithConfiguration:(RLMRealmConfiguration *)configuration error:(NSError **)error;
+- (BOOL)writeCopyForConfiguration:(RLMRealmConfiguration *)configuration error:(NSError **)error;
 
 /**
  Checks if the Realm file for the given configuration exists locally on disk.
