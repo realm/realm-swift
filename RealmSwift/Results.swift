@@ -141,6 +141,33 @@ extension Projection: KeypathSortable {}
     public static func == (lhs: Results<Element>, rhs: Results<Element>) -> Bool {
         lhs.collection.isEqual(rhs.collection)
     }
+
+    // MARK: Sectioned Results
+
+    public func sectioned<Key: RealmSectionKey>(by keyPath: KeyPath<Element, Key>,
+                                                ascending: Bool = true) -> SectionedResults<Element, Key> where Element: ObjectBase {
+        let keyPathString = _name(for: keyPath)
+        let sectionedResults = (collection as! RLMResults<AnyObject>).sectionedResultsSorted(usingKeyPath: keyPathString.isEmpty ? "self" : keyPathString,
+                                                                                             ascending: ascending) { value in
+            return (value as! Element)[keyPath: keyPath]._rlmObjcValue as! RLMValue
+        }
+
+        return SectionedResults(rlmSectionedResults: sectionedResults, keyPath: keyPath)
+    }
+
+    public func sectioned<Key: RealmSectionKey>(by keyPath: KeyPath<Element, Key>,
+                                                sortDescriptors: [SortDescriptor]) -> SectionedResults<Element, Key> where Element: ObjectBase {
+        let keyPathString = _name(for: keyPath)
+
+        let sorted = self.sorted(by: sortDescriptors).collection
+
+        let sectionedResults = (sorted as! RLMResults<AnyObject>).sectionedResultsSorted(usingKeyPath: keyPathString.isEmpty ? "self" : keyPathString,
+                                                                                         ascending: true) { value in
+            return (value as! Element)[keyPath: keyPath]._rlmObjcValue as! RLMValue
+        }
+
+        return SectionedResults(rlmSectionedResults: sectionedResults, keyPath: keyPath)
+    }
 }
 
 extension Results: Encodable where Element: Encodable {}

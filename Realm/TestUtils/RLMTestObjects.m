@@ -25,6 +25,11 @@
 #pragma mark OneTypeObjects
 
 @implementation StringObject
+
+- (NSString *)firstLetter {
+    return [self.stringCol substringToIndex:1];
+}
+
 @end
 
 @implementation IntObject

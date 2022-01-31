@@ -23,8 +23,10 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class RLMRealm, RLMResults, RLMSortDescriptor, RLMNotificationToken, RLMCollectionChange;
+@protocol RLMValue;
+@class RLMRealm, RLMResults, RLMSortDescriptor, RLMNotificationToken, RLMCollectionChange, RLMSectionedResults;
 typedef RLM_CLOSED_ENUM(int32_t, RLMPropertyType);
+typedef id<RLMValue> _Nonnull(^RLMSectionedResultsKeyBlock)(id);
 
 /**
  A homogenous collection of Realm-managed objects. Examples of conforming types
@@ -394,6 +396,35 @@ key paths are given, notifications are delivered for every property key path.
                                       keyPaths:(nullable NSArray<NSString *> *)keyPaths
                                          queue:(nullable dispatch_queue_t)queue
 __attribute__((warn_unused_result));
+
+/**
+ Sorts and sections this collection from a given property key path, returning the result
+ as an instance of `RLMSectionedResults`.
+
+ @param keyPath The property key path to sort on.
+ @param ascending The direction to sort in.
+ @param keyBlock A callback which is invoked on each element in the Results collection.
+                This callback is to return the section key for the element in the collection.
+
+ @return An instance of RLMSectionedResults.
+ */
+- (RLMSectionedResults *)sectionedResultsSortedUsingKeyPath:(NSString *)keyPath
+                                                  ascending:(BOOL)ascending
+                                                   keyBlock:(RLMSectionedResultsKeyBlock)keyBlock;
+
+/**
+ Sorts and sections this collection from a given array of sort descriptors, returning the result
+ as an instance of `RLMSectionedResults`.
+
+ @param properties  An array of `RLMSortDescriptor`s to sort by. Note: the primary sort descriptor
+                   will be responsible for determining the section key.
+ @param keyBlock A callback which is invoked on each element in the Results collection.
+                This callback is to return the section key for the element in the collection.
+
+ @return An instance of RLMSectionedResults.
+ */
+- (RLMSectionedResults *)sectionedResultsUsingSortDescriptors:(NSArray<RLMSortDescriptor *> *)properties
+                                                     keyBlock:(RLMSectionedResultsKeyBlock)keyBlock;
 
 #pragma mark - Aggregating Property Values
 

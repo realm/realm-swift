@@ -35,12 +35,10 @@ class Cell: UITableViewCell {
     }
 }
 
-var sectionTitles = ["A", "B", "C"]
-var objectsBySection = [Results<DemoObject>]()
-
 class TableViewController: UITableViewController {
     var notificationToken: NotificationToken?
     var realm: Realm!
+    var sectionedResults: SectionedResults<DemoObject, String>!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -52,11 +50,9 @@ class TableViewController: UITableViewController {
         notificationToken = realm.observe { [unowned self] _, _ in
             self.tableView.reloadData()
         }
-        for section in sectionTitles {
-            let unsortedObjects = realm.objects(DemoObject.self).filter("sectionTitle == %@", section)
-            let sortedObjects = unsortedObjects.sorted(byKeyPath: "date", ascending: true)
-            objectsBySection.append(sortedObjects)
-        }
+        sectionedResults = realm.objects(DemoObject.self)
+            .sorted(by: \.date, ascending: true)
+            .sectioned(by: \DemoObject.sectionTitle, ascending: true)
         tableView.reloadData()
     }
 
@@ -73,23 +69,23 @@ class TableViewController: UITableViewController {
     // Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {
-        return sectionTitles.count
+        return sectionedResults.count
     }
 
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return sectionTitles[section]
+        return sectionedResults[section].key
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return objectsBySection[section].count
+        return sectionedResults[section].count
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! Cell
 
-        let object = objectForIndexPath(indexPath: indexPath)
-        cell.textLabel?.text = object?.title
-        cell.detailTextLabel?.text = object?.date.description
+        let object = sectionedResults[indexPath]
+        cell.textLabel?.text = object.title
+        cell.detailTextLabel?.text = object.date.description
 
         return cell
     }
@@ -97,7 +93,7 @@ class TableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
             try! realm.write {
-                realm.delete(objectForIndexPath(indexPath: indexPath)!)
+                realm.delete(sectionedResults[indexPath])
             }
         }
     }
@@ -129,9 +125,6 @@ class TableViewController: UITableViewController {
 
 // Helpers
 
-func objectForIndexPath(indexPath: IndexPath) -> DemoObject? {
-    return objectsBySection[indexPath.section][indexPath.row]
-}
 
 func randomTitle() -> String {
     return "Title \(Int.random(in: 0..<100))"

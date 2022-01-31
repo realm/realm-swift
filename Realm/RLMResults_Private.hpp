@@ -25,7 +25,7 @@ class RLMClassInfo;
 NS_ASSUME_NONNULL_BEGIN
 
 @interface RLMResults () {
-@protected
+@public
     realm::Results _results;
 }
 

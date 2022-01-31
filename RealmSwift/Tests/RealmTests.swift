@@ -24,8 +24,31 @@ import XCTest
 #endif
 import Foundation
 
+class MyClass: Object {
+   @Persisted var myList = List<AnyRealmValue>()
+}
+
+class DogClass: Object {
+   @Persisted var name = ""
+}
+
+class PersonClass: Object {
+   @Persisted var name = ""
+}
+
+//let dog = DogClass()
+//let person = PersonClass()
+//
+//let obj0: AnyRealmValue = .object(dog) //both of these are objects, even through they are different objects
+//let obj1: AnyRealmValue = .object(person)
+//
+//let m = MyClass()
+//m.myList.append(obj0)
+//m.myList.append(obj1)
+
 @available(*, deprecated) // Silence deprecation warnings for RealmOptional
 class RealmTests: TestCase {
+
     enum TestError: Error {
         case intentional
     }
@@ -1475,4 +1498,113 @@ class RealmTests: TestCase {
         XCTAssertNil(realm.objects(SwiftStringObject.self).first { $0.stringCol == "string A" })
         XCTAssertNotNil(realm.objects(SwiftStringObject.self).first { $0.stringCol == "string B" })
     }
+
+    func testSectioned() {
+
+        let realm = try! Realm()
+
+        let o = ModernAllTypesObject()
+        try! realm.write {
+            o.intCol = 123
+            realm.add(o)
+        }
+
+        var oo = ModernSwiftStringObject(value: ["ahead"])
+
+        try! realm.write {
+            realm.add(oo)
+//            realm.add(ModernSwiftStringObject(value: ["aye"]))
+//            realm.add(ModernSwiftStringObject(value: [""]))
+            realm.add(ModernSwiftStringObject(value: ["coffee"]))
+            realm.add(ModernSwiftStringObject(value: ["bread"]))
+            realm.add(ModernSwiftStringObject(value: ["banana"]))
+//            realm.add(ModernSwiftStringObject(value: ["apple"]))
+        }
+
+
+        let sectionedResults = realm.objects(ModernSwiftStringObject.self)
+            .sectioned(by: \.stringCol.first, ascending: true)
+
+
+        let sectionedResults2 = realm.objects(ModernSwiftStringObject.self)
+            .sectioned(by: \.stringCol, ascending: true)
+
+        for section in sectionedResults {
+            print("Key: \(section.key)")
+            for obj in section {
+                print(obj.stringCol)
+            }
+        }
+
+        let sectionedResults3 = realm.objects(ModernAllTypesObject.self)
+            .sectioned(by: \.intCol, ascending: true)
+
+        for section in sectionedResults3 {
+            print("Key: \(section.key)")
+            for obj in section {
+                print(obj.stringCol)
+            }
+        }
+
+        for section in sectionedResults {
+            print(section.key)
+            for obj in section {
+                print(obj.stringCol)
+            }
+        }
+
+        try! realm.write {
+            realm.add(ModernSwiftStringObject(value: ["aye"]))
+            realm.add(ModernSwiftStringObject(value: [""]))
+            realm.add(ModernSwiftStringObject(value: ["coffee"]))
+            realm.add(ModernSwiftStringObject(value: ["bread"]))
+            realm.add(ModernSwiftStringObject(value: ["banana"]))
+            realm.add(ModernSwiftStringObject(value: ["apple"]))
+        }
+
+        for section in sectionedResults {
+            print(section.key)
+            for obj in section {
+                print(obj.stringCol)
+            }
+        }
+
+        print(sectionedResults)
+
+        try! realm.write {
+            realm.delete(oo)
+        }
+
+        for section in sectionedResults {
+            print(section.key)
+            for obj in section {
+                print(obj.stringCol)
+            }
+        }
+
+        print(sectionedResults)
+
+    }
+
+    /*
+     struct B: View {
+         @ObservedSectionedResults(Person.self, \.lastName.first)
+         var peopleByLastName
+
+         var body: some View {
+             List {
+                 ForEach(peopleByLastName) { section in
+                     Section(section.key) {
+                         ForEach(section.results) { person in
+                             HStack {
+                                 Text(person.firstName)
+                                 Text(person.lastName)
+                             }
+                         }
+                     }
+                 }
+             }
+         }
+     }
+     */
 }

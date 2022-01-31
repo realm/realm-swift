@@ -114,7 +114,8 @@ let package = Package(
             targets: ["Realm", "RealmSwift"]),
     ],
     dependencies: [
-        .package(name: "RealmDatabase", url: "https://github.com/realm/realm-core", .exact(Version(coreVersionStr)!))
+//        .package(name: "RealmDatabase", url: "https://github.com/realm/realm-core", .exact(Version(coreVersionStr)!))
+        .package(name: "RealmDatabase", path: "../realm-core")
     ],
     targets: [
       .target(
@@ -182,6 +183,7 @@ let package = Package(
                 "Realm/RLMRealmUtil.mm",
                 "Realm/RLMResults.mm",
                 "Realm/RLMSchema.mm",
+                "Realm/RLMSectionedResults.mm",
                 "Realm/RLMSet.mm",
                 "Realm/RLMSwiftCollectionBase.mm",
                 "Realm/RLMSwiftSupport.m",
