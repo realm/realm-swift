@@ -20,6 +20,7 @@
 
 #import <Realm/RLMCredentials.h>
 #import <Realm/RLMRealmConfiguration.h>
+#import <Realm/RLMSyncConfiguration.h>
 
 @class RLMUser, RLMSyncSession, RLMRealm, RLMUserIdentity, RLMAPIKeyAuth, RLMMongoClient, RLMMongoDatabase, RLMMongoCollection, RLMUserProfile;
 @protocol RLMBSON;
@@ -106,6 +107,14 @@ NS_ASSUME_NONNULL_BEGIN
  @return A default configuration object with the sync configuration set to use the given partition value.
  */
 - (RLMRealmConfiguration *)configurationWithPartitionValue:(nullable id<RLMBSON>)partitionValue NS_REFINED_FOR_SWIFT;
+
+- (RLMRealmConfiguration *)configurationWithPartitionValue:(nullable id<RLMBSON>)partitionValue
+                                           clientResetMode:(RLMClientResetMode)clientResetMode NS_REFINED_FOR_SWIFT;
+
+- (RLMRealmConfiguration *)configurationWithPartitionValue:(nullable id<RLMBSON>)partitionValue
+                                           clientResetMode:(RLMClientResetMode)clientResetMode
+                                         notifyBeforeReset:(nullable RLMClientResetBeforeBlock)beforeResetBlock
+                                          notifyafterReset:(nullable RLMClientResetAfterBlock)afterResetBlock NS_REFINED_FOR_SWIFT;
 
 /**
  Create a flexible sync configuration instance, which can be used to open a Realm that

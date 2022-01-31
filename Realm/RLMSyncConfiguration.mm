@@ -20,7 +20,9 @@
 
 #import "RLMApp_Private.hpp"
 #import "RLMBSON_Private.hpp"
+#import "RLMRealm_Private.hpp"
 #import "RLMRealmConfiguration+Sync.h"
+#import "RLMSchema_private.hpp"
 #import "RLMSyncManager_Private.hpp"
 #import "RLMSyncSession_Private.hpp"
 #import "RLMSyncUtil_Private.hpp"
@@ -100,6 +102,10 @@ RLMSyncSystemErrorKind errorKindForSyncError(SyncError error) {
     _config->stop_policy = translateStopPolicy(stopPolicy);
 }
 
+- (RLMClientResetMode)clientResetMode {
+    return translateClientResetMode(_config->client_resync_mode);
+}
+
 - (id<RLMBSON>)partitionValue {
     if (!_config->partition_value.empty()) {
         return RLMConvertBsonToRLMBSON(realm::bson::parse(_config->partition_value.c_str()));
@@ -125,17 +131,26 @@ RLMSyncSystemErrorKind errorKindForSyncError(SyncError error) {
                partitionValue:partitionValue
                 customFileURL:nil
                    stopPolicy:RLMSyncStopPolicyAfterChangesUploaded
-           enableFlexibleSync:false];
+           enableFlexibleSync:false
+              clientResetMode:RLMClientResetModeManual
+            notifyBeforeReset:nil 
+             notifyAfterReset:nil];
 }
 
 - (instancetype)initWithUser:(RLMUser *)user
               partitionValue:(nullable id<RLMBSON>)partitionValue
-                  stopPolicy:(RLMSyncStopPolicy)stopPolicy {
+                  stopPolicy:(RLMSyncStopPolicy)stopPolicy
+             clientResetMode:(RLMClientResetMode)clientResetMode
+           notifyBeforeReset:(nullable RLMClientResetBeforeBlock)beforeResetBlock
+            notifyAfterReset:(nullable RLMClientResetAfterBlock)afterResetBlock {
     auto config = [self initWithUser:user
                       partitionValue:partitionValue
                        customFileURL:nil
                           stopPolicy:stopPolicy
-                  enableFlexibleSync:false];
+                  enableFlexibleSync:false
+                     clientResetMode:clientResetMode
+                   notifyBeforeReset:beforeResetBlock
+                    notifyAfterReset:afterResetBlock];
     return config;
 }
 
@@ -146,7 +161,40 @@ RLMSyncSystemErrorKind errorKindForSyncError(SyncError error) {
                       partitionValue:nil
                        customFileURL:nil
                           stopPolicy:stopPolicy
-                  enableFlexibleSync:enableFlexibleSync];
+                  enableFlexibleSync:enableFlexibleSync
+                     clientResetMode:RLMClientResetModeManual
+                   notifyBeforeReset:nil
+                    notifyAfterReset:nil];
+    return config;
+}
+
+
+
+- (instancetype)initWithUser:(RLMUser *)user
+              partitionValue:(nullable id<RLMBSON>)partitionValue
+             clientResetMode:(RLMClientResetMode)clientResetMode {
+    auto config = [self initWithUser:user
+                      partitionValue:partitionValue
+                       customFileURL:nil
+                          stopPolicy:RLMSyncStopPolicyAfterChangesUploaded
+                  enableFlexibleSync:false
+                     clientResetMode:clientResetMode
+                   notifyBeforeReset:nil
+                    notifyAfterReset:nil];
+    return config;
+}
+
+- (instancetype)initWithUser:(RLMUser *)user
+          enableFlexibleSync:(BOOL)enableFlexibleSync
+             clientResetMode:(RLMClientResetMode)clientResetMode {
+    auto config = [self initWithUser:user
+                      partitionValue:nil
+                       customFileURL:nil
+                          stopPolicy:RLMSyncStopPolicyAfterChangesUploaded
+                  enableFlexibleSync:enableFlexibleSync
+                     clientResetMode:clientResetMode
+                   notifyBeforeReset:nil
+                    notifyAfterReset:nil];
     return config;
 }
 
@@ -154,7 +202,10 @@ RLMSyncSystemErrorKind errorKindForSyncError(SyncError error) {
               partitionValue:(nullable id<RLMBSON>)partitionValue
                customFileURL:(nullable NSURL *)customFileURL
                   stopPolicy:(RLMSyncStopPolicy)stopPolicy
-          enableFlexibleSync:(BOOL)enableFlexibleSync {
+          enableFlexibleSync:(BOOL)enableFlexibleSync
+             clientResetMode:(RLMClientResetMode)clientResetMode
+           notifyBeforeReset:(RLMClientResetBeforeBlock)beforeResetBlock
+            notifyAfterReset:(RLMClientResetAfterBlock)afterResetBlock {
     if (self = [super init]) {
         if (enableFlexibleSync) {
             _config = std::make_unique<SyncConfig>([user _syncUser], SyncConfig::FLXSyncEnabled{});
@@ -219,7 +270,29 @@ RLMSyncSystemErrorKind errorKindForSyncError(SyncError error) {
                 errorHandler(nsError, session);
             });
         };
-        _config->client_resync_mode = realm::ClientResyncMode::Manual;
+        // Default to manual mode
+        _config->client_resync_mode = (clientResetMode) ? translateClientResetMode(clientResetMode) : realm::ClientResyncMode::Manual;
+        
+        // TODO: What about setting to nil?
+        if (beforeResetBlock) {
+            _config->notify_before_client_reset = [beforeResetBlock](SharedRealm local) {
+                RLMSchema *schema = [RLMSchema dynamicSchemaFromObjectStoreSchema:local->schema()];
+                RLMRealm *realm = [RLMRealm realmWithSharedRealm:local schema:schema];
+                beforeResetBlock(realm);
+            };
+        }
+
+        // TODO: What about setting to nil?
+        if (afterResetBlock) {
+            _config->notify_after_client_reset = [afterResetBlock](SharedRealm local, SharedRealm remote) {
+                RLMSchema *localSchema = [RLMSchema dynamicSchemaFromObjectStoreSchema:local->schema()];
+                RLMRealm *localRealm = [RLMRealm realmWithSharedRealm:local schema:localSchema];
+
+                RLMSchema *remoteSchema = [RLMSchema dynamicSchemaFromObjectStoreSchema:remote->schema()];
+                RLMRealm *remoteRealm = [RLMRealm realmWithSharedRealm:remote schema:remoteSchema];
+                afterResetBlock(localRealm, remoteRealm);
+            };
+        }
 
         if (NSString *authorizationHeaderName = manager.authorizationHeaderName) {
             _config->authorization_header_name.emplace(authorizationHeaderName.UTF8String);
