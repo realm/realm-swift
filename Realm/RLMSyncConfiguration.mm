@@ -280,6 +280,7 @@ RLMSyncSystemErrorKind errorKindForSyncError(SyncError error) {
                 RLMRealm *realm = [RLMRealm realmWithSharedRealm:local schema:schema];
                 beforeResetBlock(realm);
             };
+            self.beforeClientReset = beforeResetBlock;
         }
 
         // TODO: What about setting to nil?
@@ -292,6 +293,7 @@ RLMSyncSystemErrorKind errorKindForSyncError(SyncError error) {
                 RLMRealm *remoteRealm = [RLMRealm realmWithSharedRealm:remote schema:remoteSchema];
                 afterResetBlock(localRealm, remoteRealm);
             };
+            self.afterClientReset = afterResetBlock;
         }
 
         if (NSString *authorizationHeaderName = manager.authorizationHeaderName) {

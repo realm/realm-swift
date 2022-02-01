@@ -537,11 +537,11 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         do {
             let user = try logInUser(for: basicCredentials())
 //            var configuration = user.configuration(partitionValue: #function, clientResetMode: .discardLocal)
-            var configuration = user.configuration(partitionValue: #function, clientResetMode: .discardLocal) /*{ local in
+            var configuration = user.configuration(partitionValue: #function, clientResetMode: .discardLocal) { local in
             print("hi")
             } notifyAfterReset: { local, remote in
                 print("hi")
-            }*/
+            }
 
 
             // check to make sure that the blocks are making it down in assignment

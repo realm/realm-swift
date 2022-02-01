@@ -284,6 +284,7 @@ extension Realm {
             configuration._path = rlmConfiguration.fileURL?.path
             configuration._inMemoryIdentifier = rlmConfiguration.inMemoryIdentifier
             if let objcSyncConfig = rlmConfiguration.syncConfiguration {
+                // completion block ptrs getting set nil here
                 configuration._syncConfiguration = SyncConfiguration(config: objcSyncConfig)
             } else {
                 configuration._syncConfiguration = nil
