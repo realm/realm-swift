@@ -159,7 +159,6 @@ let package = Package(
                 "logo.png",
                 "plugin",
                 "scripts",
-                "tools",
             ],
             sources: [
                 "Realm/RLMAccessor.mm",
