@@ -537,6 +537,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         do {
             let user = try logInUser(for: basicCredentials())
 //            var configuration = user.configuration(partitionValue: #function, clientResetMode: .discardLocal)
+            // this notation is silly. I'm going to take the callbacks out of the initializer.
             var configuration = user.configuration(partitionValue: #function, clientResetMode: .discardLocal) { local in
             print("hi")
             } notifyAfterReset: { local, remote in

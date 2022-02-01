@@ -22,7 +22,7 @@
 #import "RLMBSON_Private.hpp"
 #import "RLMRealm_Private.hpp"
 #import "RLMRealmConfiguration+Sync.h"
-#import "RLMSchema_private.hpp"
+#import "RLMSchema_Private.hpp"
 #import "RLMSyncManager_Private.hpp"
 #import "RLMSyncSession_Private.hpp"
 #import "RLMSyncUtil_Private.hpp"
@@ -57,6 +57,28 @@ RLMSyncSystemErrorKind errorKindForSyncError(SyncError error) {
     }
 }
 }
+
+// ???: Where should this go?
+struct BeforeClientResetWrapper {
+    RLMClientResetBeforeBlock block;
+    void operator()(std::shared_ptr<Realm> local) {
+        RLMSchema *schema = [RLMSchema dynamicSchemaFromObjectStoreSchema:local->schema()];
+        RLMRealm *realm = [RLMRealm realmWithSharedRealm:local schema:schema];
+        block(realm);
+    }
+};
+
+struct AfterClientResetWrapper {
+    RLMClientResetAfterBlock block;
+    void operator()(std::shared_ptr<Realm> local, std::shared_ptr<Realm> remote) {
+        RLMSchema *localSchema = [RLMSchema dynamicSchemaFromObjectStoreSchema:local->schema()];
+        RLMRealm *localRealm = [RLMRealm realmWithSharedRealm:local schema:localSchema];
+        
+        RLMSchema *remoteSchema = [RLMSchema dynamicSchemaFromObjectStoreSchema:remote->schema()];
+        RLMRealm *remoteRealm = [RLMRealm realmWithSharedRealm:remote schema:remoteSchema];
+        block(localRealm, remoteRealm);
+    }
+};
 
 @interface RLMSyncConfiguration () {
     std::unique_ptr<realm::SyncConfig> _config;
@@ -104,6 +126,43 @@ RLMSyncSystemErrorKind errorKindForSyncError(SyncError error) {
 
 - (RLMClientResetMode)clientResetMode {
     return translateClientResetMode(_config->client_resync_mode);
+}
+
+// TODO: shorten, ternary once it's actually working
+- (RLMClientResetBeforeBlock)beforeClientReset {
+    if (_config->notify_before_client_reset) {
+        auto wrapper = *_config->notify_before_client_reset.target<BeforeClientResetWrapper>();
+        return wrapper.block;
+    } else {
+        return nil;
+    }
+}
+
+// TODO: unify naming
+- (void)setBeforeClientReset:(RLMClientResetBeforeBlock)beforeClientReset {
+    if (!beforeClientReset) {
+        _config->notify_before_client_reset = nullptr;
+    } else {
+        _config->notify_before_client_reset = BeforeClientResetWrapper{beforeClientReset};
+    }
+}
+
+- (RLMClientResetAfterBlock)afterClientReset {
+    if (_config->notify_after_client_reset) {
+        auto wrapper = *_config->notify_after_client_reset.target<AfterClientResetWrapper>(); // here
+        return wrapper.block;
+    } else {
+        return nil;
+    }
+
+}
+
+- (void)setAfterClientReset:(RLMClientResetAfterBlock)afterClientReset {
+    if (!afterClientReset) {
+        _config->notify_after_client_reset = nullptr;
+    } else {
+        _config->notify_after_client_reset = AfterClientResetWrapper{afterClientReset};
+    }
 }
 
 - (id<RLMBSON>)partitionValue {
@@ -272,29 +331,35 @@ RLMSyncSystemErrorKind errorKindForSyncError(SyncError error) {
         };
         // Default to manual mode
         _config->client_resync_mode = (clientResetMode) ? translateClientResetMode(clientResetMode) : realm::ClientResyncMode::Manual;
+        self.beforeClientReset = beforeResetBlock;
+        self.afterClientReset = afterResetBlock;
+//        _beforeClientReset = beforeResetBlock;
+//        _afterClientReset = afterResetBlock;
         
         // TODO: What about setting to nil?
-        if (beforeResetBlock) {
-            _config->notify_before_client_reset = [beforeResetBlock](SharedRealm local) {
-                RLMSchema *schema = [RLMSchema dynamicSchemaFromObjectStoreSchema:local->schema()];
-                RLMRealm *realm = [RLMRealm realmWithSharedRealm:local schema:schema];
-                beforeResetBlock(realm);
-            };
-            self.beforeClientReset = beforeResetBlock;
-        }
+        // use a named struct with call operator overwritten
+        // strcut with explicit poerperties, you can get the strcut back as target.
+        // null case, target returns null pointer.
+        // if nil, set std function to null pointer
+//        if (beforeResetBlock) {
+//            _config->notify_before_client_reset = [beforeResetBlock](SharedRealm local) {
+//                RLMSchema *schema = [RLMSchema dynamicSchemaFromObjectStoreSchema:local->schema()];
+//                RLMRealm *realm = [RLMRealm realmWithSharedRealm:local schema:schema];
+//                beforeResetBlock(realm);
+//            };
+//        }
 
         // TODO: What about setting to nil?
-        if (afterResetBlock) {
-            _config->notify_after_client_reset = [afterResetBlock](SharedRealm local, SharedRealm remote) {
-                RLMSchema *localSchema = [RLMSchema dynamicSchemaFromObjectStoreSchema:local->schema()];
-                RLMRealm *localRealm = [RLMRealm realmWithSharedRealm:local schema:localSchema];
-
-                RLMSchema *remoteSchema = [RLMSchema dynamicSchemaFromObjectStoreSchema:remote->schema()];
-                RLMRealm *remoteRealm = [RLMRealm realmWithSharedRealm:remote schema:remoteSchema];
-                afterResetBlock(localRealm, remoteRealm);
-            };
-            self.afterClientReset = afterResetBlock;
-        }
+//        if (afterResetBlock) {
+//            _config->notify_after_client_reset = [afterResetBlock](SharedRealm local, SharedRealm remote) {
+//                RLMSchema *localSchema = [RLMSchema dynamicSchemaFromObjectStoreSchema:local->schema()];
+//                RLMRealm *localRealm = [RLMRealm realmWithSharedRealm:local schema:localSchema];
+//
+//                RLMSchema *remoteSchema = [RLMSchema dynamicSchemaFromObjectStoreSchema:remote->schema()];
+//                RLMRealm *remoteRealm = [RLMRealm realmWithSharedRealm:remote schema:remoteSchema];
+//                afterResetBlock(localRealm, remoteRealm);
+//            };
+//        }
 
         if (NSString *authorizationHeaderName = manager.authorizationHeaderName) {
             _config->authorization_header_name.emplace(authorizationHeaderName.UTF8String);
