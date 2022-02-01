@@ -235,7 +235,7 @@ public typealias AfterClientResetBlock = RLMClientResetAfterBlock
     // TODO: docs, reorder?
     public let clientResetMode: ClientResetMode
     public var notifyBeforeClientReset: BeforeClientResetBlock?
-    public var noitfyAfterClientReset: AfterClientResetBlock?
+    public var notifyAfterClientReset: AfterClientResetBlock?
 
     /**
      Determines if the sync configuration is flexible sync or not
@@ -257,12 +257,8 @@ public typealias AfterClientResetBlock = RLMClientResetAfterBlock
         self.cancelAsyncOpenOnNonFatalErrors = config.cancelAsyncOpenOnNonFatalErrors
         self.isFlexibleSync = config.enableFlexibleSync
         self.clientResetMode = config.clientResetMode
-        if ((config.beforeClientReset) != nil) {
-            self.notifyBeforeClientReset = config.beforeClientReset
-        }
-        if ((config.afterClientReset) != nil) {
-            self.noitfyAfterClientReset = config.afterClientReset
-        }
+        self.notifyBeforeClientReset = config.beforeClientReset
+        self.notifyAfterClientReset = config.afterClientReset
     }
 
     func asConfig() -> RLMSyncConfiguration {
@@ -275,7 +271,7 @@ public typealias AfterClientResetBlock = RLMClientResetAfterBlock
                                                      stopPolicy: stopPolicy,
                                                      clientResetMode: clientResetMode,
                                                      notifyBeforeReset: notifyBeforeClientReset,
-                                                     notifyAfterReset: noitfyAfterClientReset)
+                                                     notifyAfterReset: notifyAfterClientReset)
         }
         syncConfiguration.cancelAsyncOpenOnNonFatalErrors = cancelAsyncOpenOnNonFatalErrors
         return syncConfiguration
