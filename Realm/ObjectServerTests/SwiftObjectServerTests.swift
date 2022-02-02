@@ -507,6 +507,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
     }
 
+    // test for nil assignment of callbacks
+
     func testClientResetDiscardLocal() {
         // !!!: error handler and cases here while WIP
         // ***
@@ -536,17 +538,19 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         // Seed object, upload to server
         do {
             let user = try logInUser(for: basicCredentials())
-//            var configuration = user.configuration(partitionValue: #function, clientResetMode: .discardLocal)
-            // this notation is silly. I'm going to take the callbacks out of the initializer.
+            // !!!: this notation is silly. I'm going to take the callbacks out of the initializer.
             var configuration = user.configuration(partitionValue: #function, clientResetMode: .discardLocal) { local in
-            print("hi")
+                // Expect there to be 2 objects in the local realm before client reset
+                XCTAssertEqual(local.objects(SwiftHugeSyncObject.self).count, 2)
             } notifyAfterReset: { local, remote in
-                print("hi")
+                // Expect the local realm that was overwritten to have had 2 objects before it was overwritten.
+                XCTAssertEqual(local.objects(SwiftHugeSyncObject.self).count, 2)
+                // Expect the server realm that overwrote the local realm to have had 1 object before client reset.
+                XCTAssertEqual(remote.objects(SwiftHugeSyncObject.self).count, 1)
             }
-
-
-            // check to make sure that the blocks are making it down in assignment
             configuration.objectTypes = [SwiftHugeSyncObject.self]
+
+
 
             try autoreleasepool {
                 let realm = try Realm(configuration: configuration)
@@ -554,9 +558,48 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                     realm.add(SwiftHugeSyncObject.create())
                 }
                 waitForUploads(for: realm)
-                sleep(10) // Wait for uploads isn't a guarantee that the server realm has committed data to server realm.
                 XCTAssertEqual(realm.objects(SwiftHugeSyncObject.self).count, 1)
             }
+
+            // waitForUploads confirms the server received the upload request from the client
+            // It does not guarantee the uploaded objects are persisted to the backing datastore
+            // This expectation queries the server for the documents directly before continuing.
+//            let ex1 = expectation(description: "Object was synced to server, which contains one document")
+            let mongoClient = user.mongoClient("mongodb1")
+            let database = mongoClient.database(named: "test_data")
+            // What does the collection get called?
+            // "SwiftHugeSyncObject"?
+            let collection = database.collection(withName: "SwiftHugeSyncObject")
+
+            var documentCount = 0
+            var requestCount = 0
+            let timeBetweenRequests = 2
+            while (documentCount < 1) {
+                collection.find(filter: [:]) { result in
+                    switch result {
+                    case .success(let documents):
+                        documentCount = documents.count
+
+                    case .failure:
+                        XCTFail("Should find")
+                    }
+                }
+                if documentCount == 0 {
+                    sleep(UInt32(timeBetweenRequests))
+                    if (requestCount * timeBetweenRequests > 300) {
+                        XCTFail("waited longer than five minutes")
+                        break
+                    }
+                    requestCount += 1
+                    print("requests: \(requestCount), time passed: ~ \(requestCount * 2)") // !!!: Delete this line
+
+                }
+                if documentCount > 0 {
+                    XCTAssertEqual(documentCount, 1)
+//                    ex1.fulfill()
+                }
+            }
+//            wait(for: [ex1], timeout: 60)
 
             // Sync is disabled, block executed, sync re-enabled
             clientReset {

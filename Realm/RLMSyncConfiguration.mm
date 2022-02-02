@@ -333,33 +333,6 @@ struct AfterClientResetWrapper {
         _config->client_resync_mode = (clientResetMode) ? translateClientResetMode(clientResetMode) : realm::ClientResyncMode::Manual;
         self.beforeClientReset = beforeResetBlock;
         self.afterClientReset = afterResetBlock;
-//        _beforeClientReset = beforeResetBlock;
-//        _afterClientReset = afterResetBlock;
-        
-        // TODO: What about setting to nil?
-        // use a named struct with call operator overwritten
-        // strcut with explicit poerperties, you can get the strcut back as target.
-        // null case, target returns null pointer.
-        // if nil, set std function to null pointer
-//        if (beforeResetBlock) {
-//            _config->notify_before_client_reset = [beforeResetBlock](SharedRealm local) {
-//                RLMSchema *schema = [RLMSchema dynamicSchemaFromObjectStoreSchema:local->schema()];
-//                RLMRealm *realm = [RLMRealm realmWithSharedRealm:local schema:schema];
-//                beforeResetBlock(realm);
-//            };
-//        }
-
-        // TODO: What about setting to nil?
-//        if (afterResetBlock) {
-//            _config->notify_after_client_reset = [afterResetBlock](SharedRealm local, SharedRealm remote) {
-//                RLMSchema *localSchema = [RLMSchema dynamicSchemaFromObjectStoreSchema:local->schema()];
-//                RLMRealm *localRealm = [RLMRealm realmWithSharedRealm:local schema:localSchema];
-//
-//                RLMSchema *remoteSchema = [RLMSchema dynamicSchemaFromObjectStoreSchema:remote->schema()];
-//                RLMRealm *remoteRealm = [RLMRealm realmWithSharedRealm:remote schema:remoteSchema];
-//                afterResetBlock(localRealm, remoteRealm);
-//            };
-//        }
 
         if (NSString *authorizationHeaderName = manager.authorizationHeaderName) {
             _config->authorization_header_name.emplace(authorizationHeaderName.UTF8String);

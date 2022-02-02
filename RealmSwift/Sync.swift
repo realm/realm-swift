@@ -236,6 +236,9 @@ public typealias AfterClientResetBlock = RLMClientResetAfterBlock
     public let clientResetMode: ClientResetMode
     public var notifyBeforeClientReset: BeforeClientResetBlock?
     public var notifyAfterClientReset: AfterClientResetBlock?
+    // not used, DELETE
+    public var notifyBefore: ((Realm) -> Void)?
+    public var notifyAfter: ((Realm, Realm) -> Void)?
 
     /**
      Determines if the sync configuration is flexible sync or not
@@ -408,11 +411,26 @@ public extension User {
     // but the method signature would be ambiguous with
     // func configuration<T: BSON>(partitionValue: T, cancelAsyncOpenOnNonFatalErrors: Bool = false) // Sync.swift : ~416
     // TODO: Docs
-    func configuration<T: BSON>(partitionValue: T, clientResetMode: ClientResetMode, notifyBeforeReset: BeforeClientResetBlock? = nil, notifyAfterReset: AfterClientResetBlock? = nil) -> Realm.Configuration {
+    func configuration<T: BSON>(partitionValue: T, clientResetMode: ClientResetMode, notifyBeforeReset: ((Realm) -> Void)? = nil, notifyAfterReset: ((Realm, Realm) -> Void)? = nil) -> Realm.Configuration {
+        var rlmNotifyBeforeReset: BeforeClientResetBlock?
+        var rlmNotifyAfterReset: AfterClientResetBlock?
+
+        // This is crazy. But I couldn't make the convert have optionality correctly.
+        // !!!: Figure out a way to do this correctly
+        if ((notifyBeforeReset) != nil) {
+            rlmNotifyBeforeReset = ObjectiveCSupport.convert(object: notifyBeforeReset!)
+        } else {
+            rlmNotifyBeforeReset = nil
+        }
+        if ((notifyAfterReset) != nil) {
+            rlmNotifyAfterReset = ObjectiveCSupport.convert(object: notifyAfterReset!)
+        } else {
+            rlmNotifyBeforeReset = nil
+        }
         let config = self.__configuration(withPartitionValue: ObjectiveCSupport.convert(object: AnyBSON(partitionValue)),
                                           clientResetMode: clientResetMode,
-                                          notifyBeforeReset: notifyBeforeReset,
-                                          notifyafterReset: notifyAfterReset)
+                                          notifyBeforeReset: rlmNotifyBeforeReset,
+                                          notifyafterReset: rlmNotifyAfterReset)
         return ObjectiveCSupport.convert(object: config)
     }
 

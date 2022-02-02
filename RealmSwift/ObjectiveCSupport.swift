@@ -163,4 +163,29 @@ import Realm
             return object(Int(totalBytes), Int(usedBytes))
         }
     }
+
+    public static func convert(object: @escaping RLMClientResetBeforeBlock) -> (Realm) -> Void {
+        return { localRealm in
+            return object(localRealm.rlmRealm)
+        }
+    }
+
+    // TODO: Docs
+    public static func convert(object: @escaping ((Realm) -> Void)) -> RLMClientResetBeforeBlock {
+        return { localRealm in
+            return object(Realm(localRealm))
+        }
+    }
+
+    public static func convert(object: @escaping ((Realm, Realm) -> Void)) -> RLMClientResetAfterBlock {
+        return { localRealm, remoteRealm in
+            return object(Realm(localRealm), Realm(remoteRealm))
+        }
+    }
+
+    public static func convert(object: @escaping RLMClientResetAfterBlock) -> (Realm, Realm) -> Void {
+        return { localRealm, remoteRealm in
+            return object(localRealm.rlmRealm, remoteRealm.rlmRealm)
+        }
+    }
 }
