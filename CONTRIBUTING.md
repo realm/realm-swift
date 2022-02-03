@@ -2,7 +2,7 @@
 
 ## Filing Issues
 
-Whether you find a bug, typo or an API call that could be clarified, please [file an issue](https://github.com/realm/realm-swift/issues) on our GitHub repository.
+Whether you find a bug, typo or an API call that could be clarified, please [file an issue](https://github.com/realm/realm-cocoa/issues) on our GitHub repository.
 
 When filing an issue, please provide as much of the following information as possible in order to help others fix it:
 
@@ -41,7 +41,7 @@ $(which git && git --version)
 
 ## Contributing Enhancements
 
-We love contributions to Realm! If you'd like to contribute code, documentation, or any other improvements, please [file a Pull Request](https://github.com/realm/realm-swift/pulls) on our GitHub repository. Make sure to accept our [CLA](#cla) and to follow our [style guide](https://github.com/realm/realm-swift/wiki/Objective-C-Style-Guide).
+We love contributions to Realm! If you'd like to contribute code, documentation, or any other improvements, please [file a Pull Request](https://github.com/realm/realm-cocoa/pulls) on our GitHub repository. Make sure to accept our [CLA](#cla) and to follow our [style guide](https://github.com/realm/realm-cocoa/wiki/Objective-C-Style-Guide).
 
 ### Commit Messages
 

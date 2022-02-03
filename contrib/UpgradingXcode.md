@@ -13,7 +13,7 @@ We can only fit ~6 Xcode versions in the VM image before the machine which build
 
 Each of these repositories points at a specific major version of Xcode in their Jenkinsfile, which needs to be updated when dropping a major version. Dropping minor versions should not require any changes to them.
 
-## https://github.com/realm/realm-swift
+## https://github.com/realm/realm-cocoa
 
 1. Update `Jenkinsfile.releasability`. Remove the version from xcodeVersions. If removing the version objcXcodeVersion is set to, bump that to the new oldest version.
 2. Remove the old Xcode version from XCODE_VERSIONS `scripts/ci-pr-matrix.rb`. Run `scripts/ci-pr-matrix.rb` to regenerate `.jenkins.yml`.
@@ -24,7 +24,7 @@ Each of these repositories points at a specific major version of Xcode in their 
 
 # Adding new Xcode versions
 
-Download the new Xcode version locally and try to build/run all of the realm-swift tests. Fix anything that doesn't work or produces new warnings. Some things to check:
+Download the new Xcode version locally and try to build/run all of the realm-cocoa tests. Fix anything that doesn't work or produces new warnings. Some things to check:
 
 1. `sh build.sh build`: builds fat frameworks for each platform
 2. `sh build.sh test`: runs the tests on each platform
@@ -37,7 +37,7 @@ Download the new Xcode version locally and try to build/run all of the realm-swi
 2. Add the new Xcode version to config.rb.
 3. Push to a new branch.
 
-## https://github.com/realm/realm-swift
+## https://github.com/realm/realm-cocoa
 
 1. Update `Jenkinsfile.releasability`. Add the version to xcodeVersions and update carthageXcodeVersion. Do not bump objcXcodeVersion; that should always be the oldest version we support. docsSwiftVersion should normally be the latest swift (not Xcode!) version we support.
 2. Add the new version to XCODE_VERSIONS in `scripts/ci-pr-matrix.rb`. Run `scripts/ci-pr-matrix.rb` to regenerate `.jenkins.yml`.
