@@ -115,15 +115,15 @@
     configuration.objectClasses = @[];
     XCTAssertEqual(configuration.schemaMode, realm::SchemaMode::AdditiveExplicit);
     configuration.readOnly = true;
-    XCTAssertEqual(configuration.schemaMode, realm::SchemaMode::ReadOnly);
+    XCTAssertEqual(configuration.schemaMode, realm::SchemaMode::ReadOnlyAlternative);
     configuration.objectClasses = nil;
-    XCTAssertEqual(configuration.schemaMode, realm::SchemaMode::ReadOnly);
+    XCTAssertEqual(configuration.schemaMode, realm::SchemaMode::ReadOnlyAlternative);
     configuration.readOnly = false;
     XCTAssertEqual(configuration.schemaMode, realm::SchemaMode::AdditiveDiscovered);
     configuration.readOnly = true;
-    XCTAssertEqual(configuration.schemaMode, realm::SchemaMode::ReadOnly);
+    XCTAssertEqual(configuration.schemaMode, realm::SchemaMode::ReadOnlyAlternative);
     configuration.objectClasses = @[];
-    XCTAssertEqual(configuration.schemaMode, realm::SchemaMode::ReadOnly);
+    XCTAssertEqual(configuration.schemaMode, realm::SchemaMode::ReadOnlyAlternative);
     configuration.readOnly = false;
     XCTAssertEqual(configuration.schemaMode, realm::SchemaMode::AdditiveExplicit);
 
