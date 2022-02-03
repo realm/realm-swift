@@ -161,6 +161,13 @@
     return [self isEqual:set];
 }
 
+// For use with MutableSet subscripting, NSSet does not support
+// subscripting while its Swift counterpart `Set` does.
+- (id)objectAtIndex:(NSUInteger)index {
+    validateSetBounds(self, index);
+    return _backingCollection.allObjects[index];
+}
+
 - (RLMResults *)sortedResultsUsingKeyPath:(NSString *)keyPath ascending:(BOOL)ascending {
     return [self sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithKeyPath:keyPath ascending:ascending]]];
 }
@@ -177,23 +184,6 @@
 
 - (NSArray<id> *)allObjects {
     return _backingCollection.allObjects;
-}
-
-// For use with MutableSet subscripting, NSSet does not support
-// subscripting while its Swift counterpart `Set` does.
-- (id)objectAtIndex:(NSUInteger)index {
-    validateSetBounds(self, index);
-    return _backingCollection.allObjects[index];
-}
-
-// AnyRealmCollection requires firstObject and lastObject even though they aren't
-// particularly meaningful
-- (id)firstObject {
-    return _backingCollection.anyObject;
-}
-
-- (id)lastObject {
-    return _backingCollection.anyObject;
 }
 
 - (BOOL)isInvalidated {

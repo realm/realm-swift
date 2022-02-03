@@ -32,6 +32,8 @@ typedef RLM_CLOSED_ENUM(int32_t, RLMPropertyType);
  */
 @protocol RLMCollection <NSFastEnumeration, RLMThreadConfined>
 
+@optional
+
 /**
  Returns the first object in the collection.
 
@@ -62,8 +64,6 @@ typedef RLM_CLOSED_ENUM(int32_t, RLMPropertyType);
  @return The objects at the specified indexes.
  */
 - (nullable NSArray *)objectsAtIndexes:(NSIndexSet *)indexes;
-
-@optional
 
 /**
  Returns the index of an object in the collection.
@@ -187,7 +187,6 @@ typedef RLM_CLOSED_ENUM(int32_t, RLMPropertyType);
  @return An `NSArray` containing results.
  */
 - (nullable id)valueForKey:(NSString *)key;
-- (nullable id)valueForKeyPath:(NSString *)key;
 
 /**
  Invokes `setValue:forKey:` on each of the collection's objects using the specified `value` and `key`.
@@ -198,7 +197,6 @@ typedef RLM_CLOSED_ENUM(int32_t, RLMPropertyType);
  @param key   The name of the property.
  */
 - (void)setValue:(nullable id)value forKey:(NSString *)key;
-- (void)setValue:(nullable id)value forKeyPath:(NSString *)key;
 
 #pragma mark - Notifications
 
@@ -262,11 +260,6 @@ typedef RLM_CLOSED_ENUM(int32_t, RLMPropertyType);
 - (RLMNotificationToken *)addNotificationBlock:(void (^)(id<RLMCollection> __nullable collection,
                                                          RLMCollectionChange *__nullable change,
                                                          NSError *__nullable error))block __attribute__((warn_unused_result));
-- (RLMNotificationToken *)addNotificationBlock:(void (^)(id<RLMCollection> __nullable collection,
-                                                         RLMCollectionChange *__nullable change,
-                                                         NSError *__nullable error))block
-                                      keyPaths:(NSArray<NSString *> *__nullable)keyPaths
-                                         queue:(dispatch_queue_t __nullable)queue __attribute__((warn_unused_result));
 
 #pragma mark - Aggregating Property Values
 
@@ -354,7 +347,6 @@ typedef RLM_CLOSED_ENUM(int32_t, RLMPropertyType);
           for more information.
  */
 - (instancetype)freeze;
-- (instancetype)thaw;
 
 @end
 

@@ -380,21 +380,6 @@ static void ensureInWriteTransaction(NSString *message, RLMManagedSet *set, RLMM
     });
 }
 
-- (id)firstObject {
-    return translateErrors([&] {
-        RLMAccessorContext context(*_objectInfo);
-        return _backingSet.size() ? _backingSet.get(context, 0) : nil;
-    });
-}
-
-- (id)lastObject {
-    return translateErrors([&] {
-        RLMAccessorContext context(*_objectInfo);
-        size_t size = _backingSet.size();
-        return size ? _backingSet.get(context, size - 1) : nil;
-    });
-}
-
 - (id)valueForKeyPath:(NSString *)keyPath {
     if ([keyPath hasPrefix:@"@"]) {
         // Delegate KVC collection operators to RLMResults

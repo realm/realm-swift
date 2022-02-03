@@ -146,7 +146,7 @@ import Realm
         guard let r = rlmResults.objects(at: indexes) else {
             throwRealmException("Indexes for Linking Objects are out of bounds.")
         }
-        return r.map(staticBridgeCast)
+        return r.map(dynamicBridgeCast)
     }
 
     // MARK: KVC
@@ -258,7 +258,7 @@ import Realm
      - parameter property: The name of a property whose minimum value is desired.
      */
     public func min<T: MinMaxType>(ofProperty property: String) -> T? {
-        return rlmResults.min(ofProperty: property).map((staticBridgeCast))
+        return rlmResults.min(ofProperty: property).map(dynamicBridgeCast)
     }
 
     /**
@@ -270,7 +270,7 @@ import Realm
      - parameter property: The name of a property whose minimum value is desired.
      */
     public func max<T: MinMaxType>(ofProperty property: String) -> T? {
-        return rlmResults.max(ofProperty: property).map((staticBridgeCast))
+        return rlmResults.max(ofProperty: property).map(dynamicBridgeCast)
     }
 
     /**
@@ -281,7 +281,7 @@ import Realm
      - parameter property: The name of a property whose values should be summed.
      */
     public func sum<T: AddableType>(ofProperty property: String) -> T {
-        return (staticBridgeCast)(fromObjectiveC: rlmResults.sum(ofProperty: property))
+        return dynamicBridgeCast(fromObjectiveC: rlmResults.sum(ofProperty: property))
     }
 
     /**
@@ -293,7 +293,7 @@ import Realm
      - parameter property: The name of a property whose average value should be calculated.
      */
     public func average<T: AddableType>(ofProperty property: String) -> T? {
-        return rlmResults.average(ofProperty: property).map(staticBridgeCast)
+        return rlmResults.average(ofProperty: property).map(dynamicBridgeCast)
     }
 
     // MARK: Notifications
@@ -700,6 +700,46 @@ extension LinkingObjects: RealmCollection {
     /// Returns an iterator that yields successive elements in the linking objects.
     public func makeIterator() -> RLMIterator<Element> {
         return RLMIterator(collection: rlmResults)
+    }
+
+    // MARK: Collection Support
+
+    /// The position of the first element in a non-empty collection.
+    /// Identical to endIndex in an empty collection.
+    public var startIndex: Int { return 0 }
+
+    /// The collection's "past the end" position.
+    /// endIndex is not a valid argument to subscript, and is always reachable from startIndex by
+    /// zero or more applications of successor().
+    public var endIndex: Int { return count }
+
+    public func index(after: Int) -> Int {
+      return after + 1
+    }
+
+    public func index(before: Int) -> Int {
+      return before - 1
+    }
+
+    /// :nodoc:
+    public func _observe(_ keyPaths: [String]?,
+                         _ queue: DispatchQueue?,
+                         _ block: @escaping (RealmCollectionChange<AnyRealmCollection<Element>>) -> Void)
+        -> NotificationToken {
+        return rlmResults.addNotificationBlock(wrapObserveBlock(block), keyPaths: keyPaths, queue: queue)
+    }
+}
+
+// MARK: CustomObjectiveCBridgeable
+
+extension LinkingObjects: CustomObjectiveCBridgeable {
+    internal static func bridging(objCValue objectiveCValue: Any) -> LinkingObjects {
+        guard let object = objectiveCValue as? RLMResults<Element> else { preconditionFailure() }
+        return LinkingObjects<Element>(objc: object as! RLMResults<AnyObject>)
+    }
+
+    internal var objCValue: Any {
+        handle!.results
     }
 }
 
