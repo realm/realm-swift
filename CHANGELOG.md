@@ -65,7 +65,6 @@ let people: Results<PersonProjection> = realm.objects(PersonProjection.self)
   query.
 * `Object.init(value:)` did not allow initializing `RLMDictionary<NSString, RLMObject>`/`Map<String, Object?>`
   properties with null values for map entries (since v10.8.0).
-* `@ObservedResults` did not refresh when changes were made to the observed collection. (since v10.6.0)
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
