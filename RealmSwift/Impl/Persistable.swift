@@ -42,8 +42,13 @@ public protocol _Persistable: _RealmSchemaDiscoverable, _ObjcBridgeable {
     // Do the values of this type need to be cached on the Persisted?
     static var _rlmRequiresCaching: Bool { get }
     // Get the zero/empty/nil value for this type. Used to supply a default
-    // when the user does not declare one in their model.
-    static func _rlmDefaultValue() -> Self
+    // when the user does not declare one in their model. When `forceDefaultInitialization`
+    // is true we *must* return a non-nil, default instance of `Self`. The latter is
+    // used in conjunction with key path string tracing.
+    static func _rlmDefaultValue(_ forceDefaultInitialization: Bool) -> Self
+    // If we are in key path tracing mode, instantiate an empty object and forward
+    // the lastAccessedNames array.
+    static func _rlmKeyPathRecorder(with lastAccessedNames: NSMutableArray) -> Self
     // The type which is actually stored in the Realm. This is Self for types
     // we support directly, but may be a different type for enums and mapped types.
     associatedtype PersistedType: _Persistable
@@ -52,6 +57,24 @@ public protocol _Persistable: _RealmSchemaDiscoverable, _ObjcBridgeable {
 extension _Persistable {
     public static var _rlmRequiresCaching: Bool {
         false
+    }
+}
+
+extension _RealmSchemaDiscoverable where Self: _Persistable {
+    public static func _rlmKeyPathRecorder(with lastAccessedNames: NSMutableArray) -> Self {
+        let value = Self._rlmDefaultValue(true)
+
+        if let value = value as? ObjectBase {
+            value.lastAccessedNames = lastAccessedNames
+            value.prepareForRecording()
+            return value as! Self
+        }
+
+        if var value = value as? PropertyNameConvertible {
+            value.lastAccessedNames = lastAccessedNames
+            return value as! Self
+        }
+        return value
     }
 }
 
@@ -74,7 +97,7 @@ public protocol _DefaultConstructible {
     init()
 }
 extension _Persistable where Self: _DefaultConstructible {
-    public static func _rlmDefaultValue() -> Self {
+    public static func _rlmDefaultValue(_ forceDefaultInitialization: Bool) -> Self {
         .init()
     }
 }
