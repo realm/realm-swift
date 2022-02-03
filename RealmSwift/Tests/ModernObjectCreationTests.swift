@@ -170,78 +170,6 @@ class ModernObjectCreationTests: TestCase {
         super.tearDown()
     }
 
-    func nullValues() -> [String: Any] {
-        return values.merging([
-            "objectCol": NSNull(),
-            "anyCol": AnyRealmValue.none,
-
-            "optBoolCol": NSNull(),
-            "optIntCol": NSNull(),
-            "optInt8Col": NSNull(),
-            "optInt16Col": NSNull(),
-            "optInt32Col": NSNull(),
-            "optInt64Col": NSNull(),
-            "optFloatCol": NSNull(),
-            "optDoubleCol": NSNull(),
-            "optStringCol": NSNull(),
-            "optBinaryCol": NSNull(),
-            "optDateCol": NSNull(),
-            "optDecimalCol": NSNull(),
-            "optObjectIdCol": NSNull(),
-            "optUuidCol": NSNull(),
-            "optIntEnumCol": NSNull(),
-            "optStringEnumCol": NSNull(),
-
-            "arrayAny": [AnyRealmValue.none],
-            "arrayOptBool": [NSNull()],
-            "arrayOptInt": [NSNull()],
-            "arrayOptInt8": [NSNull()],
-            "arrayOptInt16": [NSNull()],
-            "arrayOptInt32": [NSNull()],
-            "arrayOptInt64": [NSNull()],
-            "arrayOptFloat": [NSNull()],
-            "arrayOptDouble": [NSNull()],
-            "arrayOptString": [NSNull()],
-            "arrayOptBinary": [NSNull()],
-            "arrayOptDate": [NSNull()],
-            "arrayOptDecimal": [NSNull()],
-            "arrayOptObjectId": [NSNull()],
-            "arrayOptUuid": [NSNull()],
-
-            "setAny": [AnyRealmValue.none],
-            "setOptBool": [NSNull()],
-            "setOptInt": [NSNull()],
-            "setOptInt8": [NSNull()],
-            "setOptInt16": [NSNull()],
-            "setOptInt32": [NSNull()],
-            "setOptInt64": [NSNull()],
-            "setOptFloat": [NSNull()],
-            "setOptDouble": [NSNull()],
-            "setOptString": [NSNull()],
-            "setOptBinary": [NSNull()],
-            "setOptDate": [NSNull()],
-            "setOptDecimal": [NSNull()],
-            "setOptObjectId": [NSNull()],
-            "setOptUuid": [NSNull()],
-
-            "mapAny": ["1": AnyRealmValue.none],
-            "mapOptBool": ["1": NSNull()],
-            "mapOptInt": ["1": NSNull()],
-            "mapOptInt8": ["1": NSNull()],
-            "mapOptInt16": ["1": NSNull()],
-            "mapOptInt32": ["1": NSNull()],
-            "mapOptInt64": ["1": NSNull()],
-            "mapOptFloat": ["1": NSNull()],
-            "mapOptDouble": ["1": NSNull()],
-            "mapOptString": ["1": NSNull()],
-            "mapOptBinary": ["1": NSNull()],
-            "mapOptDate": ["1": NSNull()],
-            "mapOptDecimal": ["1": NSNull()],
-            "mapOptObjectId": ["1": NSNull()],
-            "mapOptUuid": ["1": NSNull()]
-        ] as [String: Any]) { _, null in null }
-    }
-
     func assertSetEquals<T: RealmCollectionValue>(_ set: MutableSet<T>, _ expected: Array<T>) {
         XCTAssertEqual(set.count, Set(expected).count)
         XCTAssertEqual(Set(set), Set(expected))
@@ -505,76 +433,6 @@ class ModernObjectCreationTests: TestCase {
         XCTAssertEqual(obj.setOptUuid.count, 0)
     }
 
-    func verifyNil(_ obj: ModernAllTypesObject) {
-        // "anyCol": .none,
-
-        XCTAssertNil(obj.objectCol)
-        XCTAssertNil(obj.optBoolCol)
-        XCTAssertNil(obj.optIntCol)
-        XCTAssertNil(obj.optInt8Col)
-        XCTAssertNil(obj.optInt16Col)
-        XCTAssertNil(obj.optInt32Col)
-        XCTAssertNil(obj.optInt64Col)
-        XCTAssertNil(obj.optFloatCol)
-        XCTAssertNil(obj.optDoubleCol)
-        XCTAssertNil(obj.optStringCol)
-        XCTAssertNil(obj.optBinaryCol)
-        XCTAssertNil(obj.optDateCol)
-        XCTAssertNil(obj.optDecimalCol)
-        XCTAssertNil(obj.optObjectIdCol)
-        XCTAssertNil(obj.optUuidCol)
-        XCTAssertNil(obj.optIntEnumCol)
-        XCTAssertNil(obj.optStringEnumCol)
-
-        XCTAssertEqual(obj.arrayAny[0], .none)
-        XCTAssertNil(obj.arrayOptBool[0])
-        XCTAssertNil(obj.arrayOptInt[0])
-        XCTAssertNil(obj.arrayOptInt8[0])
-        XCTAssertNil(obj.arrayOptInt16[0])
-        XCTAssertNil(obj.arrayOptInt32[0])
-        XCTAssertNil(obj.arrayOptInt64[0])
-        XCTAssertNil(obj.arrayOptFloat[0])
-        XCTAssertNil(obj.arrayOptDouble[0])
-        XCTAssertNil(obj.arrayOptString[0])
-        XCTAssertNil(obj.arrayOptBinary[0])
-        XCTAssertNil(obj.arrayOptDate[0])
-        XCTAssertNil(obj.arrayOptDecimal[0])
-        XCTAssertNil(obj.arrayOptObjectId[0])
-        XCTAssertNil(obj.arrayOptUuid[0])
-
-        XCTAssertEqual(obj.setAny.first!, .none)
-        XCTAssertNil(obj.setOptBool.first!)
-        XCTAssertNil(obj.setOptInt.first!)
-        XCTAssertNil(obj.setOptInt8.first!)
-        XCTAssertNil(obj.setOptInt16.first!)
-        XCTAssertNil(obj.setOptInt32.first!)
-        XCTAssertNil(obj.setOptInt64.first!)
-        XCTAssertNil(obj.setOptFloat.first!)
-        XCTAssertNil(obj.setOptDouble.first!)
-        XCTAssertNil(obj.setOptString.first!)
-        XCTAssertNil(obj.setOptBinary.first!)
-        XCTAssertNil(obj.setOptDate.first!)
-        XCTAssertNil(obj.setOptDecimal.first!)
-        XCTAssertNil(obj.setOptObjectId.first!)
-        XCTAssertNil(obj.setOptUuid.first!)
-
-        XCTAssertEqual(obj.mapAny["1"], .some(.none))
-        XCTAssertEqual(obj.mapOptBool["1"], .some(nil))
-        XCTAssertEqual(obj.mapOptInt["1"], .some(nil))
-        XCTAssertEqual(obj.mapOptInt8["1"], .some(nil))
-        XCTAssertEqual(obj.mapOptInt16["1"], .some(nil))
-        XCTAssertEqual(obj.mapOptInt32["1"], .some(nil))
-        XCTAssertEqual(obj.mapOptInt64["1"], .some(nil))
-        XCTAssertEqual(obj.mapOptFloat["1"], .some(nil))
-        XCTAssertEqual(obj.mapOptDouble["1"], .some(nil))
-        XCTAssertEqual(obj.mapOptString["1"], .some(nil))
-        XCTAssertEqual(obj.mapOptBinary["1"], .some(nil))
-        XCTAssertEqual(obj.mapOptDate["1"], .some(nil))
-        XCTAssertEqual(obj.mapOptDecimal["1"], .some(nil))
-        XCTAssertEqual(obj.mapOptObjectId["1"], .some(nil))
-        XCTAssertEqual(obj.mapOptUuid["1"], .some(nil))
-    }
-
     func testInitDefault() {
         verifyDefault(ModernAllTypesObject())
     }
@@ -592,10 +450,6 @@ class ModernObjectCreationTests: TestCase {
     func testInitWithObject() {
         let obj = ModernAllTypesObject(value: values!)
         verifyObject(ModernAllTypesObject(value: obj), expectedShouldBeCopy: false)
-    }
-
-    func testInitNil() {
-        verifyNil(ModernAllTypesObject(value: nullValues()))
     }
 
     func testCreateDefault() {
@@ -632,14 +486,6 @@ class ModernObjectCreationTests: TestCase {
         verifyObject(obj)
     }
 
-    func testCreateNil() {
-        let realm = try! Realm()
-        let obj = try! realm.write {
-            return realm.create(ModernAllTypesObject.self, value: nullValues())
-        }
-        verifyNil(obj)
-    }
-
     func testAddDefault() {
         let obj = ModernAllTypesObject()
         let realm = try! Realm()
@@ -656,15 +502,6 @@ class ModernObjectCreationTests: TestCase {
             realm.add(obj)
         }
         verifyObject(obj, expectedShouldBeCopy: false)
-    }
-
-    func testAddNil() {
-        let obj = ModernAllTypesObject(value: nullValues())
-        let realm = try! Realm()
-        try! realm.write {
-            realm.add(obj)
-        }
-        verifyNil(obj)
     }
 
     func testCreateEmbeddedWithDictionary() {
