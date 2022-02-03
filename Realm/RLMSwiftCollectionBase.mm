@@ -141,6 +141,18 @@
     return self;
 }
 
+- (instancetype)freeze {
+    RLMLinkingObjectsHandle *frozen = [[self.class alloc] init];
+    frozen->_results = [self.results freeze];
+    return frozen;
+}
+
+- (instancetype)thaw {
+    RLMLinkingObjectsHandle *thawed = [[self.class alloc] init];
+    thawed->_results = [self.results thaw];
+    return thawed;
+}
+
 - (RLMResults *)results {
     if (_results) {
         return _results;

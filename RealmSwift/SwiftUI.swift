@@ -397,7 +397,7 @@ extension Projection: _ObservedResultsValue { }
 /// The results use the realm configuration provided by
 /// the environment value `EnvironmentValues/realmConfiguration`.
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-@propertyWrapper public struct ObservedResults<ResultType>: DynamicProperty, BoundCollection where ResultType: _ObservedResultsValue & RealmFetchable & KeypathSortable {
+@propertyWrapper public struct ObservedResults<ResultType>: DynamicProperty, BoundCollection where ResultType: _ObservedResultsValue, ResultType: RealmFetchable {
     private class Storage: ObservableStorage<Results<ResultType>> {
         var setupHasRun = false
         private func didSet() {
@@ -483,7 +483,7 @@ extension Projection: _ObservedResultsValue { }
                                         filter: NSPredicate? = nil,
                                         keyPaths: [String]? = nil,
                                         sortDescriptor: SortDescriptor? = nil) where ResultType: Projection<ObjectType>, ObjectType: ThreadConfined {
-        let results = Results<ResultType>(RLMResults<ResultType>.emptyDetached())
+        let results = Results(RLMResults.emptyDetached()) as Results<ResultType>
         self.storage = Storage(results, keyPaths)
         self.storage.configuration = configuration
         self.filter = filter
@@ -507,7 +507,7 @@ extension Projection: _ObservedResultsValue { }
                 filter: NSPredicate? = nil,
                 keyPaths: [String]? = nil,
                 sortDescriptor: SortDescriptor? = nil) where ResultType: Object {
-        self.storage = Storage(Results(RLMResults<ResultType>.emptyDetached()), keyPaths)
+        self.storage = Storage(Results(RLMResults.emptyDetached()), keyPaths)
         self.storage.configuration = configuration
         self.filter = filter
         self.sortDescriptor = sortDescriptor
@@ -789,7 +789,7 @@ extension Binding: BoundMap where Value: RealmKeyedCollection {
 }
 
 @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
-extension Binding where Value: Object {
+extension Binding where Value: Object & Identifiable {
     /// :nodoc:
     public func delete() {
         safeWrite(wrappedValue) { object in
@@ -799,7 +799,7 @@ extension Binding where Value: Object {
 }
 
 @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
-extension Binding where Value: ProjectionObservable, Value.Root: ThreadConfined {
+extension Binding where Value: ProjectionObservable, Value.Root: ThreadConfined {//} & ThreadConfined {
     /// :nodoc:
     public func delete() {
         safeWrite(wrappedValue.rootObject) { object in

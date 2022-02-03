@@ -37,6 +37,8 @@ NS_ASSUME_NONNULL_BEGIN
 @interface RLMLinkingObjectsHandle : NSObject
 - (instancetype)initWithObject:(RLMObjectBase *)object property:(RLMProperty *)property;
 - (instancetype)initWithLinkingObjects:(RLMResults *)linkingObjects;
+- (instancetype)freeze;
+- (instancetype)thaw;
 
 @property (nonatomic, readonly) RLMLinkingObjects *results;
 @property (nonatomic, readonly) NSString *_propertyKey;

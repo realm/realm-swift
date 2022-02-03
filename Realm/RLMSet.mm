@@ -43,7 +43,7 @@
 @implementation RLMSet {
 @public
     // Backing set when this instance is unmanaged
-    NSMutableOrderedSet *_backingCollection;
+    NSMutableSet *_backingCollection;
 }
 
 #pragma mark - Initializers
@@ -107,8 +107,7 @@
         RLMSetValidateMatchingObjectType(self, obj);
     }
     changeSet(self, ^{
-        [_backingCollection removeAllObjects];
-        [_backingCollection unionOrderedSet:set->_backingCollection];
+        [_backingCollection setSet:set->_backingCollection];
     });
 }
 
@@ -117,7 +116,7 @@
         RLMSetValidateMatchingObjectType(self, obj);
     }
     changeSet(self, ^{
-        [_backingCollection intersectOrderedSet:set->_backingCollection];
+        [_backingCollection intersectSet:set->_backingCollection];
     });
 }
 
@@ -126,7 +125,7 @@
         RLMSetValidateMatchingObjectType(self, obj);
     }
     changeSet(self, ^{
-        [_backingCollection minusOrderedSet:set->_backingCollection];
+        [_backingCollection minusSet:set->_backingCollection];
     });
 }
 
@@ -135,7 +134,7 @@
         RLMSetValidateMatchingObjectType(self, obj);
     }
     changeSet(self, ^{
-        [_backingCollection unionOrderedSet:set->_backingCollection];
+        [_backingCollection unionSet:set->_backingCollection];
     });
 }
 
@@ -143,14 +142,14 @@
     for (id obj in set) {
         RLMSetValidateMatchingObjectType(self, obj);
     }
-    return [_backingCollection isSubsetOfOrderedSet:set->_backingCollection];
+    return [_backingCollection isSubsetOfSet:set->_backingCollection];
 }
 
 - (BOOL)intersectsSet:(RLMSet<id> *)set {
     for (id obj in set) {
         RLMSetValidateMatchingObjectType(self, obj);
     }
-    return [_backingCollection intersectsOrderedSet:set->_backingCollection];
+    return [_backingCollection intersectsSet:set->_backingCollection];
 }
 
 - (BOOL)containsObject:(id)obj {
@@ -162,12 +161,15 @@
     return [self isEqual:set];
 }
 
-- (RLMResults *)sortedResultsUsingKeyPath:(NSString *)keyPath ascending:(BOOL)ascending {
-    return [self sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithKeyPath:keyPath ascending:ascending]]];
+// For use with MutableSet subscripting, NSSet does not support
+// subscripting while its Swift counterpart `Set` does.
+- (id)objectAtIndex:(NSUInteger)index {
+    validateSetBounds(self, index);
+    return _backingCollection.allObjects[index];
 }
 
-- (nonnull id)objectAtIndexedSubscript:(NSUInteger)index {
-    return [self objectAtIndex:index];
+- (RLMResults *)sortedResultsUsingKeyPath:(NSString *)keyPath ascending:(BOOL)ascending {
+    return [self sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithKeyPath:keyPath ascending:ascending]]];
 }
 
 #pragma mark - Unmanaged RLMSet implementation
@@ -181,29 +183,7 @@
 }
 
 - (NSArray<id> *)allObjects {
-    return _backingCollection.array;
-}
-
-// For use with MutableSet subscripting, NSSet does not support
-// subscripting while its Swift counterpart `Set` does.
-- (id)objectAtIndex:(NSUInteger)index {
-    validateSetBounds(self, index);
-    return _backingCollection[index];
-}
-
-- (NSArray *)objectsAtIndexes:(NSIndexSet *)indexes {
-    if ([indexes indexGreaterThanOrEqualToIndex:self.count] != NSNotFound) {
-        return nil;
-    }
-    return [_backingCollection objectsAtIndexes:indexes] ?: @[];
-}
-
-- (id)firstObject {
-    return _backingCollection.firstObject;
-}
-
-- (id)lastObject {
-    return _backingCollection.lastObject;
+    return _backingCollection.allObjects;
 }
 
 - (BOOL)isInvalidated {
@@ -244,7 +224,7 @@
 static void changeSet(__unsafe_unretained RLMSet *const set,
                       dispatch_block_t f) {
     if (!set->_backingCollection) {
-        set->_backingCollection = [NSMutableOrderedSet new];
+        set->_backingCollection = [NSMutableSet new];
     }
 
     if (RLMObjectBase *parent = set->_parentObject) {
@@ -311,7 +291,7 @@ static void validateSetBounds(__unsafe_unretained RLMSet *const set,
 
     RLMObjectSchema *objectSchema;
     if (_backingCollection.count) {
-        objectSchema = [_backingCollection[0] objectSchema];
+        objectSchema = [_backingCollection.allObjects[0] objectSchema];
     }
     else {
         objectSchema = [RLMSchema.partialPrivateSharedSchema schemaForClassName:_objectClassName];
@@ -362,7 +342,7 @@ static void validateSetBounds(__unsafe_unretained RLMSet *const set,
     // issue as the realm::object_store::Set aggregate methods will calculate
     // the result based on each element of a property regardless of uniqueness.
     // To get around this we will need to use the `array` property of the NSMutableOrderedSet
-    NSArray *values = [key isEqualToString:@"self"] ? _backingCollection.array : [_backingCollection.array valueForKey:key];
+    NSArray *values = [key isEqualToString:@"self"] ? _backingCollection.allObjects : [_backingCollection.allObjects valueForKey:key];
     if (_optional) {
         // Filter out NSNull values to match our behavior on managed arrays
         NSIndexSet *nonnull = [values indexesOfObjectsPassingTest:^BOOL(id obj, NSUInteger, BOOL *) {
@@ -377,20 +357,13 @@ static void validateSetBounds(__unsafe_unretained RLMSet *const set,
     return sum && !result ? @0 : result;
 }
 
-static NSSet *toUnorderedSet(id value) {
-    if (auto orderedSet = RLMDynamicCast<NSOrderedSet>(value)) {
-        return orderedSet.set;
-    }
-    return value;
-}
-
 - (id)valueForKeyPath:(NSString *)keyPath {
     if ([keyPath characterAtIndex:0] != '@') {
-        return toUnorderedSet(_backingCollection ? [_backingCollection valueForKeyPath:keyPath] : [super valueForKeyPath:keyPath]);
+        return _backingCollection ? [_backingCollection valueForKeyPath:keyPath] : [super valueForKeyPath:keyPath];
     }
 
     if (!_backingCollection) {
-        _backingCollection = [NSMutableOrderedSet new];
+        _backingCollection = [NSMutableSet new];
     }
 
     NSUInteger dot = [keyPath rangeOfString:@"."].location;
@@ -408,9 +381,9 @@ static NSSet *toUnorderedSet(id value) {
         return @NO; // Unmanaged sets are never invalidated
     }
     if (!_backingCollection) {
-        _backingCollection = [NSMutableOrderedSet new];
+        _backingCollection = [NSMutableSet new];
     }
-    return toUnorderedSet([_backingCollection valueForKey:key]);
+    return [_backingCollection valueForKey:key];
 }
 
 - (void)setValue:(id)value forKey:(NSString *)key {

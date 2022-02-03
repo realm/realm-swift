@@ -29,17 +29,17 @@ identifier_name:
     - _rlmCollection
     - _rlmCollection()
     - _rlmDefaultValue(_:)
-    - _rlmFromObjc(_:)
+    - _rlmFromRawValue(_:)
     - _rlmGetProperty(_:_:)
     - _rlmGetPropertyOptional(_:_:)
     - _rlmKeyPathRecorder(with:)
-    - _rlmObjcValue
     - _rlmOptional
     - _rlmPopulateProperty(_:)
     - _rlmRequireObjc
     - _rlmRequiresCaching
     - _rlmSetAccessor(_:)
     - _rlmSetProperty(_:_:_:)
+    - _rlmToRawValue(_:)
     - _rlmType
     - id
     - pk
@@ -49,6 +49,9 @@ type_name:
     - _RealmValue
 disabled_rules:
   - block_based_kvo
+  # SwiftLint expects a space following a double slash comment: "//".
+  # examples/ios/swift/GettingStarted.playground/Contents.swift includes "//:", which is inentional.
+  - comment_spacing
   # SwiftLint considers 'Realm' and 'Realm.Private' to be duplicate imports
   # because we're using submodules in an unsual way, and normally the parent
   # module re-exports all of its children.

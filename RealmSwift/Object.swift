@@ -375,7 +375,7 @@ extension Object: RealmCollectionValue {
             return dynamic[propertyName] as! List<DynamicObject>
         }
         let list = RLMDynamicGetByName(self, propertyName) as! RLMSwiftCollectionBase
-        return List<DynamicObject>(collection: list._rlmCollection as! RLMArray<AnyObject>)
+        return List<DynamicObject>(objc: list._rlmCollection as! RLMArray<AnyObject>)
     }
 
     // MARK: Dynamic set
@@ -398,7 +398,7 @@ extension Object: RealmCollectionValue {
             return dynamic[propertyName] as! MutableSet<DynamicObject>
         }
         let set = RLMDynamicGetByName(self, propertyName) as! RLMSwiftCollectionBase
-        return MutableSet<DynamicObject>(collection: set._rlmCollection as! RLMSet<AnyObject>)
+        return MutableSet<DynamicObject>(objc: set._rlmCollection as! RLMSet<AnyObject>)
     }
 
     // MARK: Dynamic map
@@ -542,10 +542,10 @@ public final class DynamicObject: Object {
         get {
             let value = RLMDynamicGetByName(self, key).flatMap(coerceToNil)
             if let array = value as? RLMArray<AnyObject> {
-                return List<DynamicObject>(collection: array)
+                return List<DynamicObject>(objc: array)
             }
             if let set = value as? RLMSet<AnyObject> {
-                return MutableSet<DynamicObject>(collection: set)
+                return MutableSet<DynamicObject>(objc: set)
             }
             if let dictionary = value as? RLMDictionary<AnyObject, AnyObject> {
                 return Map<String, DynamicObject>(objc: dictionary)
@@ -606,21 +606,21 @@ public final class DynamicObject: Object {
  ```
  */
 public protocol RealmEnum: RealmOptionalType, _RealmSchemaDiscoverable {
+    /// :nodoc:
+    static func _rlmToRawValue(_ value: Any) -> Any
+    /// :nodoc:
+    static func _rlmFromRawValue(_ value: Any) -> Any?
 }
 
 // MARK: - Implementation
 
 /// :nodoc:
-public extension RealmEnum where Self: RawRepresentable, Self.RawValue: _RealmSchemaDiscoverable & _ObjcBridgeable {
-    var _rlmObjcValue: Any { rawValue._rlmObjcValue }
-    static func _rlmFromObjc(_ value: Any) -> Self? {
-        if let value = value as? Self {
-            return value
-        }
-        if let value = value as? RawValue {
-            return Self(rawValue: value)
-        }
-        return nil
+public extension RealmEnum where Self: RawRepresentable, Self.RawValue: _RealmSchemaDiscoverable {
+    static func _rlmToRawValue(_ value: Any) -> Any {
+        return (value as! Self).rawValue
+    }
+    static func _rlmFromRawValue(_ value: Any) -> Any? {
+        return Self(rawValue: value as! RawValue)
     }
     static func _rlmPopulateProperty(_ prop: RLMProperty) {
         RawValue._rlmPopulateProperty(prop)
@@ -630,8 +630,10 @@ public extension RealmEnum where Self: RawRepresentable, Self.RawValue: _RealmSc
 
 internal func dynamicSet(object: ObjectBase, key: String, value: Any?) {
     let bridgedValue: Any?
-    if let v1 = value, let v2 = v1 as? _ObjcBridgeable {
-        bridgedValue = v2._rlmObjcValue
+    if let v1 = value, let v2 = v1 as? CustomObjectiveCBridgeable {
+        bridgedValue = v2.objCValue
+    } else if let v1 = value, let v2 = v1 as? RealmEnum {
+        bridgedValue = type(of: v2)._rlmToRawValue(v2)
     } else {
         bridgedValue = value
     }
@@ -639,6 +641,23 @@ internal func dynamicSet(object: ObjectBase, key: String, value: Any?) {
         object.setValue(bridgedValue, forKey: key)
     } else {
         RLMDynamicValidatedSet(object, key, bridgedValue)
+    }
+}
+
+// MARK: CustomObjectiveCBridgeable
+
+// FIXME: Remove when `as! Self` can be written
+private func forceCastToInferred<T, V>(_ x: T) -> V {
+    return x as! V
+}
+
+extension Object: CustomObjectiveCBridgeable {
+    internal static func bridging(objCValue objectiveCValue: Any) -> Self {
+        return forceCastToInferred(objectiveCValue)
+    }
+
+    internal var objCValue: Any {
+        unsafeCastToRLMObject()
     }
 }
 

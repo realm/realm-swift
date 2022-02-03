@@ -301,23 +301,6 @@ class SwiftPerformanceTests: TestCase {
         }
     }
 
-    func testEnumerateAndAccessMixed() {
-        let realm = inMemoryRealm(#function)
-        realm.beginWrite()
-        let list = realm.create(ModernListAnyRealmValueObject.self, value: []).value
-        for i in 0..<500000 {
-            list.append(.int(i))
-        }
-        try! realm.commitWrite()
-
-        measure {
-            for value in list {
-                _ = value.intValue!
-            }
-        }
-    }
-
-
     func testDeleteAll() {
         inMeasureBlock {
             let realm = self.copyRealmToTestPath(largeRealm)

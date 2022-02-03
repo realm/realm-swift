@@ -97,7 +97,7 @@ class PrimitiveListTests<O: ObjectFactory, V: ListValueFactory>: PrimitiveListTe
     }
 
     func testObjectsAtIndexes() {
-        assertThrows(array.objects(at: [1, 2, 3]), reason: "Indexes for collection are out of bounds.")
+        assertThrows(array.objects(at: [1, 2, 3]), reason: "Indexes for List are out of bounds.")
         array.append(objectsIn: values)
         let objs = array.objects(at: [2, 1])
         XCTAssertEqual(values[1], objs.first) // this is broke
@@ -344,42 +344,29 @@ class OptionalAddablePrimitiveListTests<O: ObjectFactory, V: ListValueFactory>: 
     }
 }
 
-private func rotate<T>(_ values: Array<T>) -> Array<T> {
-    var shuffled = values
-    shuffled.removeFirst()
-    shuffled.append(values.first!)
-    return shuffled
-}
-
 class SortablePrimitiveListTests<O: ObjectFactory, V: ListValueFactory>: PrimitiveListTestsBase<O, V> where V: Comparable {
     func testSorted() {
-        array.append(objectsIn: rotate(values!))
+        var shuffled = values!
+        shuffled.removeFirst()
+        shuffled.append(values!.first!)
+        array.append(objectsIn: shuffled)
+
         assertEqual(Array(array.sorted(ascending: true)), values)
         assertEqual(Array(array.sorted(ascending: false)), values.reversed())
-    }
-
-    func testDistinct() {
-        array.append(objectsIn: values!)
-        array.append(objectsIn: values!)
-        assertEqual(Array(array.distinct()), values!)
     }
 }
 
 class OptionalSortablePrimitiveListTests<O: ObjectFactory, V: ListValueFactory>: PrimitiveListTestsBase<O, V> where V.Wrapped: Comparable, V.Wrapped: _DefaultConstructible {
     func testSorted() {
-        array.append(objectsIn: rotate(values!))
+        var shuffled = values!
+        shuffled.removeFirst()
+        shuffled.append(values!.first!)
+        array.append(objectsIn: shuffled)
+
         let array2 = unsafeDowncast(array!, to: List<V.Wrapped?>.self)
         let values2 = unsafeBitCast(values!, to: Array<V.Wrapped?>.self)
         assertEqual(Array(array2.sorted(ascending: true)), values2)
         assertEqual(Array(array2.sorted(ascending: false)), values2.reversed())
-    }
-
-    func testDistinct() {
-        array.append(objectsIn: values!)
-        array.append(objectsIn: values!)
-        let array2 = unsafeDowncast(array!, to: List<V.Wrapped?>.self)
-        let values2 = unsafeBitCast(values!, to: Array<V.Wrapped?>.self)
-        assertEqual(Array(array2.distinct()), values2)
     }
 }
 

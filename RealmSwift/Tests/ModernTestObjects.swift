@@ -514,7 +514,3 @@ class ModernCollectionsOfEnums: Object {
     @Persisted var mapDoubleOpt: Map<String, EnumDouble?>
     @Persisted var mapStringOpt: Map<String, EnumString?>
 }
-
-class ModernListAnyRealmValueObject: Object {
-    @Persisted var value: List<AnyRealmValue>
-}

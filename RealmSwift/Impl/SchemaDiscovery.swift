@@ -37,6 +37,16 @@ public protocol _RealmSchemaDiscoverable {
     // without creating an instance of that.
     func _rlmPopulateProperty(_ prop: RLMProperty)
     static func _rlmPopulateProperty(_ prop: RLMProperty)
+    // Iterating over collections requires mapping NSNull to nil, but we can't
+    // just do `nil as T` because of non-nullable collections. RealmProperty also
+    // relies on this for the same reason.
+    static func _nilValue() -> Self
+}
+
+extension _RealmSchemaDiscoverable {
+    public static func _nilValue() -> Self {
+        fatalError("Should never have nil value")
+    }
 }
 
 internal protocol SchemaDiscoverable: _RealmSchemaDiscoverable {}
@@ -114,7 +124,7 @@ private func getLegacyProperties(_ object: ObjectBase, _ cls: ObjectBase.Type) -
         guard let label = prop.label else { return nil }
         var rawValue = prop.value
         if let value = rawValue as? RealmEnum {
-            rawValue = value._rlmObjcValue
+            rawValue = type(of: value)._rlmToRawValue(value)
         }
 
         guard let value = rawValue as? _RealmSchemaDiscoverable else {
@@ -189,9 +199,19 @@ private func getProperties(_ cls: RLMObjectBase.Type) -> [RLMProperty] {
 
 internal class ObjectUtil {
     private static let runOnce: Void = {
+        RLMSwiftAsFastEnumeration = { (obj: Any) -> Any? in
+            // Intermediate cast to AnyObject due to https://bugs.swift.org/browse/SR-8651
+            if let collection = obj as AnyObject as? UntypedCollection {
+                return collection.asNSFastEnumerator()
+            }
+            return nil
+        }
         RLMSwiftBridgeValue = { (value: Any) -> Any? in
-            if let value = value as? _ObjcBridgeable {
-                return value._rlmObjcValue
+            if let value = value as? CustomObjectiveCBridgeable {
+                return value.objCValue
+            }
+            if let value = value as? RealmEnum {
+                return type(of: value)._rlmToRawValue(value)
             }
             return nil
         }

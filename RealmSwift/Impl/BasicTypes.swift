@@ -235,7 +235,7 @@ extension ObjectId: _OptionalPersistable, _BuiltInPersistable, _DefaultConstruct
 
     @inlinable
     public static func _rlmGetPropertyOptional(_ obj: ObjectBase, _ key: PropertyKey) -> ObjectId? {
-        return RLMGetSwiftPropertyObjectId(obj, key).flatMap(failableStaticBridgeCast)
+        return RLMGetSwiftPropertyObjectId(obj, key).flatMap(failableDynamicBridgeCast)
     }
 
     @inlinable
@@ -256,7 +256,7 @@ extension Decimal128: _OptionalPersistable, _BuiltInPersistable, _DefaultConstru
 
     @inlinable
     public static func _rlmGetPropertyOptional(_ obj: ObjectBase, _ key: PropertyKey) -> Decimal128? {
-        return RLMGetSwiftPropertyDecimal128(obj, key).flatMap(failableStaticBridgeCast)
+        return RLMGetSwiftPropertyDecimal128(obj, key).flatMap(failableDynamicBridgeCast)
     }
 
     @inlinable
@@ -309,11 +309,11 @@ extension AnyRealmValue: _Persistable, _DefaultConstructible {
 
     @inlinable
     public static func _rlmGetPropertyOptional(_ obj: ObjectBase, _ key: PropertyKey) -> AnyRealmValue? {
-        fatalError() // This should be caught by schema validation
+        fatalError()
     }
 
     public static func _rlmSetProperty(_ obj: ObjectBase, _ key: PropertyKey, _ value: AnyRealmValue) {
-        RLMSetSwiftPropertyAny(obj, key, value._rlmObjcValue as! RLMValue)
+        RLMSetSwiftPropertyAny(obj, key, value.objCValue as! RLMValue)
     }
 
     public static func _rlmSetAccessor(_ prop: RLMProperty) {

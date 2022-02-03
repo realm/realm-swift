@@ -28,7 +28,7 @@ import Realm
  - Note:
  An `RealmProperty` should not be declared as `@objc dynamic` on a Realm Object. Use `let` instead.
  */
-public final class RealmProperty<Value: RealmPropertyType>: RLMSwiftValueStorage {
+public final class RealmProperty<Value: RealmPropertyType>: RLMSwiftValueStorage where Value: _RealmSchemaDiscoverable {
     /**
      Used for getting / setting the underlying value.
 
@@ -47,10 +47,10 @@ public final class RealmProperty<Value: RealmPropertyType>: RLMSwiftValueStorage
      */
     public var value: Value {
         get {
-            staticBridgeCast(fromObjectiveC: RLMGetSwiftValueStorage(self) ?? NSNull())
+            dynamicBridgeCast(fromObjectiveC: RLMGetSwiftValueStorage(self) ?? NSNull())
         }
         set {
-            RLMSetSwiftValueStorage(self, staticBridgeCast(fromSwift: newValue))
+            RLMSetSwiftValueStorage(self, dynamicBridgeCast(fromSwift: newValue))
         }
     }
 
@@ -66,7 +66,7 @@ extension RealmProperty: Equatable where Value: Equatable {
     }
 }
 
-extension RealmProperty: Codable where Value: Codable {
+extension RealmProperty: Codable where Value: Codable, Value: _RealmSchemaDiscoverable {
     public convenience init(from decoder: Decoder) throws {
         self.init()
         self.value = try decoder.decodeOptional(Value.self)
@@ -78,7 +78,13 @@ extension RealmProperty: Codable where Value: Codable {
 }
 
 /// A protocol describing types that can parameterize a `RealmPropertyType`.
-public protocol RealmPropertyType: _ObjcBridgeable, _RealmSchemaDiscoverable { }
+public protocol RealmPropertyType { }
 
 extension AnyRealmValue: RealmPropertyType { }
-extension Optional: RealmPropertyType where Wrapped: RealmOptionalType & _RealmSchemaDiscoverable { }
+extension Optional: RealmPropertyType where Wrapped: RealmOptionalType { }
+extension Optional {
+    /// :nodoc:
+    public static func _nilValue() -> Self {
+        return .none
+    }
+}

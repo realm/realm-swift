@@ -27,6 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
 void RLMCollectionSetValueForKey(id<RLMFastEnumerable> collection, NSString *key, id _Nullable value);
 FOUNDATION_EXTERN NSString *RLMDescriptionWithMaxDepth(NSString *name, id<RLMCollection> collection, NSUInteger depth);
 FOUNDATION_EXTERN void RLMAssignToCollection(id<RLMCollection> collection, id value);
+FOUNDATION_EXTERN id _Nullable (*_Nullable RLMSwiftAsFastEnumeration)(id);
 FOUNDATION_EXTERN id _Nullable (*_Nullable RLMSwiftBridgeValue)(id);
 
 typedef RLM_CLOSED_ENUM(int32_t, RLMCollectionType) {

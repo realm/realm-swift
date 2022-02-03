@@ -52,6 +52,7 @@ private protocol AnyProjected {
 /// ```
 @propertyWrapper
 public struct Projected<T: ObjectBase, Value>: AnyProjected {
+
     fileprivate var _projectedKeyPath: KeyPath<T, Value>
     var projectedKeyPath: AnyKeyPath {
         _projectedKeyPath
@@ -81,8 +82,7 @@ public struct Projected<T: ObjectBase, Value>: AnyProjected {
             guard let keyPath = observed[keyPath: storageKeyPath].projectedKeyPath as? WritableKeyPath<T, Value> else {
                 preconditionFailure("KeyPath is not writable")
             }
-            var obj = observed.rootObject
-            obj[keyPath: keyPath] = newValue
+            observed.rootObject[keyPath: keyPath] = newValue
         }
     }
 
@@ -209,7 +209,7 @@ extension ObjectChange {
 /// ```
 open class Projection<Root: ObjectBase>: RealmCollectionValue, ProjectionObservable {
     /// The object being projected
-    public let rootObject: Root
+    public fileprivate(set) var rootObject: Root
 
     /**
      Create a new projection.
@@ -231,13 +231,10 @@ open class Projection<Root: ObjectBase>: RealmCollectionValue, ProjectionObserva
     }
     /// :nodoc:
     open var description: String {
-        return """
-\(type(of: self))<\(type(of: rootObject))> <\(Unmanaged.passUnretained(rootObject).toOpaque())> {
-\t\(_schema.map {
-    "\t\(String($0.label.dropFirst()))(\\.\($0.originPropertyKeyPathString)) = \(rootObject[keyPath: $0.projectedKeyPath]!);"
-}.joined(separator: "\n"))
-}
-"""
+        return "\(type(of: self))<\(type(of: rootObject))> <\(Unmanaged.passUnretained(self).toOpaque())> {\n" +
+        "\(_schema.map({"\t@Projected(\\\(type(of: rootObject)).\($0.originPropertyKeyPathString)) -> \(String($0.label.dropFirst())): \(String(describing: rootObject[keyPath: $0.projectedKeyPath]!))"}).joined(separator: "\n"))\n" +
+        "\n\trootObject: \(rootObject)\n" +
+        "}"
     }
 }
 
@@ -330,7 +327,8 @@ extension ProjectionObservable {
         } else {
             kps = _schema.filter { keyPaths.contains($0.originPropertyKeyPathString) }.map(\.originPropertyKeyPathString)
         }
-        return rootObject._observe(keyPaths: kps, on: queue, { change in
+        return rootObject._observe(keyPaths: kps,
+                                   on: queue, { change in
             block(ObjectChange<Self>.processChange(change, self))
         })
     }
@@ -563,6 +561,50 @@ extension Projection: ThreadConfined where Root: ThreadConfined {
             return Self(projecting: thawedObject)
         }
         return nil
+    }
+}
+
+// - MARK: _RealmSchemaDiscoverable
+/// Conformance to RealmCollectionValue needs conformance to _RealmSchemaDiscoverable
+extension Projection {
+    /// :nodoc:
+    public static var _rlmType: PropertyType {
+        fatalError()
+    }
+    /// :nodoc:
+    public static var _rlmOptional: Bool {
+        fatalError()
+    }
+    /// :nodoc:
+    public static func _rlmDefaultValue(_ forceDefaultInitialization: Bool) -> Self {
+        fatalError()
+    }
+    /// :nodoc:
+    public static var _rlmRequireObjc: Bool { false }
+    /// :nodoc:
+    public func _rlmPopulateProperty(_ prop: RLMProperty) {
+        fatalError()
+    }
+    /// :nodoc:
+    public static func _rlmPopulateProperty(_ prop: RLMProperty) {
+        fatalError()
+    }
+}
+
+// MARK: CustomObjectiveCBridgeable
+
+// FIXME: Remove when `as! Self` can be written
+private func forceCastToInferred<T, V>(_ x: T) -> V {
+    return x as! V
+}
+
+extension Projection: CustomObjectiveCBridgeable {
+    internal static func bridging(objCValue objectiveCValue: Any) -> Self {
+        return Self(projecting: forceCastToInferred(objectiveCValue))
+    }
+
+    internal var objCValue: Any {
+        self.rootObject.unsafeCastToRLMObject()
     }
 }
 

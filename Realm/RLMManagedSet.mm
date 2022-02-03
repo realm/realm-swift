@@ -380,34 +380,6 @@ static void ensureInWriteTransaction(NSString *message, RLMManagedSet *set, RLMM
     });
 }
 
-- (NSArray *)objectsAtIndexes:(NSIndexSet *)indexes {
-    size_t count = self.count;
-    NSMutableArray *result = [[NSMutableArray alloc] initWithCapacity:indexes.count];
-    RLMAccessorContext context(*_objectInfo);
-    for (NSUInteger i = indexes.firstIndex; i != NSNotFound; i = [indexes indexGreaterThanIndex:i]) {
-        if (i >= count) {
-            return nil;
-        }
-        [result addObject:_backingSet.get(context, i)];
-    }
-    return result;
-}
-
-- (id)firstObject {
-    return translateErrors([&] {
-        RLMAccessorContext context(*_objectInfo);
-        return _backingSet.size() ? _backingSet.get(context, 0) : nil;
-    });
-}
-
-- (id)lastObject {
-    return translateErrors([&] {
-        RLMAccessorContext context(*_objectInfo);
-        size_t size = _backingSet.size();
-        return size ? _backingSet.get(context, size - 1) : nil;
-    });
-}
-
 - (id)valueForKeyPath:(NSString *)keyPath {
     if ([keyPath hasPrefix:@"@"]) {
         // Delegate KVC collection operators to RLMResults

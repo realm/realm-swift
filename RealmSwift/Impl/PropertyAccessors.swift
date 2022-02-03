@@ -130,15 +130,32 @@ internal class RealmOptionalAccessor<Value: RealmOptionalType>: RLMManagedProper
 
     @objc override class func get(_ property: RLMProperty, on parent: RLMObjectBase) -> Any {
         let value = bound(property, parent).value
-        return value._rlmObjcValue
+        if let value = value as? RealmEnum {
+            return type(of: value)._rlmToRawValue(value)
+        }
+        // RealmOptional does not support any non-enum types which require custom
+        // bridging from swift to objc, so no CustomObjectiveCBridgeable check here
+        return value as Any
     }
 
     @objc override class func set(_ property: RLMProperty, on parent: RLMObjectBase, to value: Any) {
-        bound(property, parent).value = Value._rlmFromObjc(value)
+        let bridged: Value?
+        if coerceToNil(value) == nil {
+            bridged = nil
+        } else if let value = value as? Value {
+            bridged = value
+        } else if let type = Value.self as? CustomObjectiveCBridgeable.Type {
+            bridged = (type.bridging(objCValue: value) as! Value)
+        } else if let type = Value.self as? RealmEnum.Type {
+            bridged = (type._rlmFromRawValue(value) as! Value)
+        } else {
+            fatalError("Unexpected value '\(value)' of type '\(type(of: value))' for '\(Value.self)' property")
+        }
+        bound(property, parent).value = bridged
     }
 }
 
-internal class RealmPropertyAccessor<Value: RealmPropertyType>: RLMManagedPropertyAccessor {
+internal class RealmPropertyAccessor<Value: RealmPropertyType>: RLMManagedPropertyAccessor where Value: _RealmSchemaDiscoverable {
     private static func bound(_ property: RLMProperty, _ obj: RLMObjectBase) -> RealmProperty<Value> {
         return ptr(property, obj).assumingMemoryBound(to: RealmProperty<Value>.self).pointee
     }
@@ -152,11 +169,26 @@ internal class RealmPropertyAccessor<Value: RealmPropertyType>: RLMManagedProper
     }
 
     @objc override class func get(_ property: RLMProperty, on parent: RLMObjectBase) -> Any {
-        return bound(property, parent).value._rlmObjcValue
+        let value = bound(property, parent).value
+        if let value = value as? CustomObjectiveCBridgeable {
+            return value.objCValue
+        }
+        // Not actually reachable as all types which can be stored on a RealmProperty
+        // are CustomObjectiveCBridgeable but we can't express that in the type
+        // system without making CustomObjectiveCBridgeable public
+        return value as Any
     }
 
     @objc override class func set(_ property: RLMProperty, on parent: RLMObjectBase, to value: Any) {
-        bound(property, parent).value = Value._rlmFromObjc(value)!
+        let bridged: Value
+        if let value = value as? Value {
+            bridged = value
+        } else if let type = Value.self as? CustomObjectiveCBridgeable.Type {
+            bridged = (type.bridging(objCValue: value) as! Value)
+        } else {
+            fatalError("Unexpected value '\(value)' of type '\(type(of: value))' for '\(Value.self)' property")
+        }
+        bound(property, parent).value = bridged
     }
 }
 
@@ -180,7 +212,21 @@ internal class PersistedPropertyAccessor<T: _Persistable>: RLMManagedPropertyAcc
     }
 
     @objc override class func set(_ property: RLMProperty, on parent: RLMObjectBase, to value: Any) {
-        bound(property, parent).pointee.set(parent, value: T._rlmFromObjc(value)!)
+        let bridged: T
+        if let value = value as? T {
+            bridged = value
+        } else if let type = T.self as? CustomObjectiveCBridgeable.Type {
+            bridged = type.bridging(objCValue: value) as! T
+        } else {
+            bridged = value as! T
+        }
+        bound(property, parent).pointee.set(parent, value: bridged)
+    }
+}
+
+internal class BridgedPersistedPropertyAccessor<T: _Persistable>: PersistedPropertyAccessor<T> where T: CustomObjectiveCBridgeable {
+    @objc override class func get(_ property: RLMProperty, on parent: RLMObjectBase) -> Any {
+        return bound(property, parent).pointee.get(parent).objCValue
     }
 }
 
@@ -245,11 +291,21 @@ internal class PersistedLinkingObjectsAccessor<Element: ObjectBase>: RLMManagedP
     }
 }
 
-// Dynamic getters return the Swift type for Collections, and the obj-c type
-// for enums and AnyRealmValue. This difference is probably a mistake but it's
-// a breaking change to adjust.
-internal class BridgedPersistedPropertyAccessor<T: _Persistable>: PersistedPropertyAccessor<T> {
+internal class PersistedEnumAccessor<T: _Persistable>: PersistedPropertyAccessor<T>
+        where T: RawRepresentable {
     @objc override class func get(_ property: RLMProperty, on parent: RLMObjectBase) -> Any {
-        return bound(property, parent).pointee.get(parent)._rlmObjcValue
+        return bound(property, parent).pointee.get(parent).rawValue
+    }
+
+    @objc override class func set(_ property: RLMProperty, on parent: RLMObjectBase, to value: Any) {
+        let bridged: T.RawValue
+        if let value = value as? T {
+            bridged = value.rawValue
+        } else if let type = T.RawValue.self as? CustomObjectiveCBridgeable.Type {
+            bridged = type.bridging(objCValue: value) as! T.RawValue
+        } else {
+            bridged = value as! T.RawValue
+        }
+        bound(property, parent).pointee.set(parent, value: T(rawValue: bridged)!)
     }
 }

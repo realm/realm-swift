@@ -19,7 +19,7 @@
 import Realm
 
 /// A protocol describing types that can parameterize a `RealmOptional`.
-public protocol RealmOptionalType: _ObjcBridgeable {
+public protocol RealmOptionalType {
 }
 
 public extension RealmOptionalType {
@@ -48,10 +48,10 @@ public final class RealmOptional<Value: RealmOptionalType>: RLMSwiftValueStorage
     /// The value the optional represents.
     public var value: Value? {
         get {
-            return RLMGetSwiftValueStorage(self).map(staticBridgeCast)
+            return RLMGetSwiftValueStorage(self).map(dynamicBridgeCast)
         }
         set {
-            RLMSetSwiftValueStorage(self, newValue.map(staticBridgeCast))
+            RLMSetSwiftValueStorage(self, newValue.map(dynamicBridgeCast))
         }
     }
 
@@ -94,12 +94,6 @@ extension RealmOptional: RealmOptionalProtocol { }
 internal extension Decoder {
     func decodeOptional<T: _RealmSchemaDiscoverable>(_ type: T.Type) throws -> T where T: Decodable {
         let container = try singleValueContainer()
-        if container.decodeNil() {
-            if let type = T.self as? _ObjcBridgeable.Type, let value = type._rlmFromObjc(NSNull()) {
-                return value as! T
-            }
-            throw DecodingError.typeMismatch(T.self, .init(codingPath: self.codingPath, debugDescription: "Cannot convert nil to \(T.self)"))
-        }
-        return try container.decode(T.self)
+        return container.decodeNil() ? T._nilValue() : try container.decode(T.self)
     }
 }
