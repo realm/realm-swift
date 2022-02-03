@@ -382,7 +382,7 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
  It's made to specialize the init methods of ObservedResults.
  */
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-public protocol _ObservedResultsValue: RealmCollectionValue { }
+public protocol _ObservedResultsValue: RealmCollectionValue, Identifiable { }
 
 /// :nodoc:
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
@@ -404,7 +404,7 @@ extension Projection: _ObservedResultsValue { }
 /// Given `@ObservedResults var v` in SwiftUI, `$v` refers to a `BoundCollection`.
 ///
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-@propertyWrapper public struct ObservedResults<ResultType>: DynamicProperty, BoundCollection where ResultType: _ObservedResultsValue & RealmFetchable & KeypathSortable & Identifiable {
+@propertyWrapper public struct ObservedResults<ResultType>: DynamicProperty, BoundCollection where ResultType: _ObservedResultsValue & RealmFetchable & KeypathSortable {
     private class Storage: ObservableStorage<Results<ResultType>> {
         var setupHasRun = false
         private func didSet() {

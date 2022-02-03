@@ -2725,32 +2725,20 @@ class CombineProjectionPublisherTests: CombinePublisherTestCase {
 
     func testIdentifiable() {
         let realm = realmWithTestPath()
-        try! realm.write {
+        let object = try! realm.write {
             realm.create(SimpleObject.self, value: [1])
-            realm.create(SimpleObject.self, value: [2])
         }
-        let objects = realm.objects(SimpleObject.self)
-        let projections = realm.objects(SimpleProjection.self)
-
-        XCTAssertEqual(objects[0].id, objects[0].id)
-        XCTAssertEqual(objects[1].id, objects[1].id)
-        XCTAssertNotEqual(objects[0].id, objects[1].id)
-
-        XCTAssertEqual(projections[0].id, projections[0].id)
-        XCTAssertEqual(projections[1].id, projections[1].id)
-        XCTAssertNotEqual(projections[0].id, projections[1].id)
-
-        XCTAssertEqual(objects[0].id, projections[0].id)
-        XCTAssertEqual(objects[1].id, projections[1].id)
-
-        let altProjection = AltSimpleProjection(projecting: objects[0])
-        XCTAssertEqual(altProjection.id, projections[0].id)
-
-        let storedId = altProjection.id
+        let projection = realm.objects(SimpleProjection.self).first!
+        XCTAssertNotEqual(projection.id, object.id)
+        let projection2 = SimpleProjection(projecting: object)
+        XCTAssertNotEqual(projection.id, projection2.id)
+        let altProjection = AltSimpleProjection(projecting: object)
+        XCTAssertNotEqual(projection.id, altProjection.id)
+        let storeId = projection.id
         try! realm.write {
-            altProjection.int += 1
+            projection.int += 1
         }
-        XCTAssertEqual(storedId, altProjection.id)
+        XCTAssertEqual(storeId, projection.id)
     }
 }
 

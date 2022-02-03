@@ -19,7 +19,7 @@
 import Foundation
 import RealmSwift
 
-public class SwiftPerson: Object {
+public class SwiftPerson: Object, ObjectKeyIdentifiable {
     @objc public dynamic var _id: ObjectId? = ObjectId.generate()
     @objc public dynamic var firstName: String = ""
     @objc public dynamic var lastName: String = ""
@@ -35,9 +35,6 @@ public class SwiftPerson: Object {
         return "_id"
     }
 }
-
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
-extension SwiftPerson: ObjectKeyIdentifiable {}
 
 public class SwiftTypesSyncObject: Object {
     @objc public dynamic var _id: ObjectId? = ObjectId.generate()
@@ -186,7 +183,7 @@ public class SwiftMissingObject: Object {
     }
 }
 
-@objcMembers public class SwiftHugeSyncObject: Object {
+@objcMembers public class SwiftHugeSyncObject: Object, ObjectKeyIdentifiable {
     dynamic var _id = ObjectId.generate()
     dynamic var data: Data?
 
