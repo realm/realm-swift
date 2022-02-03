@@ -125,7 +125,6 @@ def doBuild() {
           export REALM_XCODE_VERSION=${carthageXcodeVersion}
           . ./scripts/swift-version.sh
           set_xcode_and_swift_versions
-          export REALM_CARTHAGE_ARM_DISABLED='YES'
 
           # Carthage scans every xcodeproj in the directory looking for
           # targets. This can be very slow and even spuriously time out, so
