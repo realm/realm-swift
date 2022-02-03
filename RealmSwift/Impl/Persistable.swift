@@ -55,10 +55,10 @@ extension _Persistable {
     }
 }
 
-// A type which can appear inside Optional<T> in a @Persisted property
-public protocol _PersistableInsideOptional: _Persistable, _DefaultConstructible { }
+// A tag protocol for persistable types which can appear inside Optional
+public protocol _OptionalPersistable: _Persistable, _DefaultConstructible { }
 
-extension _PersistableInsideOptional {
+extension _OptionalPersistable {
     public static func _rlmSetAccessor(_ prop: RLMProperty) {
         if prop.optional {
             prop.swiftAccessor = PersistedPropertyAccessor<Optional<Self>>.self
