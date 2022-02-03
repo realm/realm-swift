@@ -58,6 +58,7 @@
 		0C9758BF264974660097B48D /* SwiftRLMDictionaryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9758BE264974660097B48D /* SwiftRLMDictionaryTests.swift */; };
 		0C9758C0264974660097B48D /* SwiftRLMDictionaryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9758BE264974660097B48D /* SwiftRLMDictionaryTests.swift */; };
 		0CBF2DB927286FFD00635902 /* ProjectedCollectTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CBF2DB827286FFD00635902 /* ProjectedCollectTests.swift */; };
+		0CD1632626D3DD7B0027C49B /* Projection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD1632526D3DD7B0027C49B /* Projection.swift */; };
 		0CD1632826D3DF1D0027C49B /* ProjectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD1632726D3DF1C0027C49B /* ProjectionTests.swift */; };
 		0CED6DB82655087200B80277 /* RLMDictionary_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 0C3BD50125C1DE6F007CFDD3 /* RLMDictionary_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		17051FCE1D93DA0A00EF8E67 /* RLMUser.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1ABDCDAF1D793008003489E3 /* RLMUser.mm */; };
@@ -133,7 +134,6 @@
 		3F3411A6273433B300EC9D25 /* ObjcBridgeable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F3411A5273433B300EC9D25 /* ObjcBridgeable.swift */; };
 		3F34EC53268698BD000087A4 /* RLMSwiftProperty.h in Headers */ = {isa = PBXBuildFile; fileRef = 3F83E9A22630A14800FC9623 /* RLMSwiftProperty.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3F3BBAF324B8FD32009D8D51 /* RLMSyncUtil.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A4FFC971D35A71000B4B65C /* RLMSyncUtil.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		3F40C613276D1B05007FEF1A /* CustomObjectCreationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F40C612276D1B05007FEF1A /* CustomObjectCreationTests.swift */; };
 		3F4657371F27F2EF00456B07 /* RLMTestCaseUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 297FBEFA1C19F696009D1118 /* RLMTestCaseUtils.swift */; };
 		3F4E0FF92654765C008B8C0B /* ModernKVOTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F4E0FF82654765C008B8C0B /* ModernKVOTests.swift */; };
 		3F4E10102655CA33008B8C0B /* ModernObjectAccessorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F4E100E2655CA33008B8C0B /* ModernObjectAccessorTests.swift */; };
@@ -177,7 +177,6 @@
 		3F7556761BE95A0D0058BC7E /* AsyncTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3F7556731BE95A050058BC7E /* AsyncTests.mm */; };
 		3F83E9A42630A14800FC9623 /* RLMSwiftProperty.h in Headers */ = {isa = PBXBuildFile; fileRef = 3F83E9A22630A14800FC9623 /* RLMSwiftProperty.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3F857A482769291800F9B9B1 /* KeyPathStrings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F857A472769291800F9B9B1 /* KeyPathStrings.swift */; };
-		3F857A49276A507200F9B9B1 /* Projection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD1632526D3DD7B0027C49B /* Projection.swift */; };
 		3F8824FD1E5E335000586B35 /* MigrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6610011BE98D880021E04F /* MigrationTests.swift */; };
 		3F8824FE1E5E335000586B35 /* ObjectAccessorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6610021BE98D880021E04F /* ObjectAccessorTests.swift */; };
 		3F8824FF1E5E335000586B35 /* ObjectCreationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6610031BE98D880021E04F /* ObjectCreationTests.swift */; };
@@ -213,8 +212,6 @@
 		3F9ADA9426E7E87B007349A5 /* SwiftCollectionSyncTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F9ADA9326E7E87B007349A5 /* SwiftCollectionSyncTests.swift */; };
 		3F9B4A6624CF8C0E00C72A4A /* realm-monorepo.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3FE5B4D424CF3F06004D4EF3 /* realm-monorepo.xcframework */; };
 		3F9D91822152D42F00474F09 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E8839B2D19E31FD90047B1A8 /* main.m */; };
-		3F9F53D32718B5DA000EEB4A /* CustomPersistable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F9F53D22718B5DA000EEB4A /* CustomPersistable.swift */; };
-		3F9F53D52718E8E6000EEB4A /* CustomPersistableTestObjects.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F9F53D42718E8E6000EEB4A /* CustomPersistableTestObjects.swift */; };
 		3FA5E94D266064C4008F1345 /* ModernObjectCreationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FA5E94C266064C4008F1345 /* ModernObjectCreationTests.swift */; };
 		3FB19069265ECF0C00DA7C76 /* ModernObjectTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FB19068265ECF0C00DA7C76 /* ModernObjectTests.swift */; };
 		3FB1906B265ED23300DA7C76 /* ModernTestObjects.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FB1906A265ED23300DA7C76 /* ModernTestObjects.swift */; };
@@ -831,7 +828,6 @@
 		3F2E66611CA0B9D5004761D5 /* NotificationTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NotificationTests.m; sourceTree = "<group>"; };
 		3F3411A5273433B300EC9D25 /* ObjcBridgeable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjcBridgeable.swift; sourceTree = "<group>"; };
 		3F35027722C43C5200FDC1E5 /* TestHost-static.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "TestHost-static.xcconfig"; sourceTree = "<group>"; };
-		3F40C612276D1B05007FEF1A /* CustomObjectCreationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomObjectCreationTests.swift; sourceTree = "<group>"; };
 		3F452EC519C2279800AFC154 /* RLMSwiftSupport.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMSwiftSupport.m; path = Realm/RLMSwiftSupport.m; sourceTree = SOURCE_ROOT; };
 		3F4E0FF82654765C008B8C0B /* ModernKVOTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModernKVOTests.swift; sourceTree = "<group>"; };
 		3F4E100E2655CA33008B8C0B /* ModernObjectAccessorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ModernObjectAccessorTests.swift; sourceTree = "<group>"; };
@@ -874,8 +870,6 @@
 		3F997772273E23D300AA9E13 /* RealmCollectionImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealmCollectionImpl.swift; sourceTree = "<group>"; };
 		3F9ADA9326E7E87B007349A5 /* SwiftCollectionSyncTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SwiftCollectionSyncTests.swift; path = Realm/ObjectServerTests/SwiftCollectionSyncTests.swift; sourceTree = "<group>"; };
 		3F9D91872152D42F00474F09 /* TestHost static.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "TestHost static.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		3F9F53D22718B5DA000EEB4A /* CustomPersistable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomPersistable.swift; sourceTree = "<group>"; };
-		3F9F53D42718E8E6000EEB4A /* CustomPersistableTestObjects.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomPersistableTestObjects.swift; sourceTree = "<group>"; };
 		3FA5E94C266064C4008F1345 /* ModernObjectCreationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ModernObjectCreationTests.swift; sourceTree = "<group>"; };
 		3FB19068265ECF0C00DA7C76 /* ModernObjectTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ModernObjectTests.swift; sourceTree = "<group>"; };
 		3FB1906A265ED23300DA7C76 /* ModernTestObjects.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ModernTestObjects.swift; sourceTree = "<group>"; };
@@ -1446,7 +1440,6 @@
 				CFB43139243DF87100471C18 /* App.swift */,
 				4996EA9D2465BB8A003A1F51 /* BSON.swift */,
 				3F102CBC23DBC68300108FD2 /* Combine.swift */,
-				3F9F53D22718B5DA000EEB4A /* CustomPersistable.swift */,
 				3FB6ABD82416A27000E318C2 /* Decimal128.swift */,
 				3FC3F9162419B63100E27322 /* EmbeddedObject.swift */,
 				29B7FDF51C0DA6560023224E /* Error.swift */,
@@ -1493,8 +1486,6 @@
 				3FCB1A7422A9B0A2003807FB /* CodableTests.swift */,
 				3FE2BE0223D8CAD1002860E9 /* CombineTests.swift */,
 				E8AE7C251EA436F800CDFF9A /* CompactionTests.swift */,
-				3F40C612276D1B05007FEF1A /* CustomObjectCreationTests.swift */,
-				3F9F53D42718E8E6000EEB4A /* CustomPersistableTestObjects.swift */,
 				CFFECBA8250646750010F585 /* Decimal128Tests.swift */,
 				CF0D04F02693652E0038A058 /* KeyPathTests.swift */,
 				5D660FFF1BE98D880021E04F /* KVOTests.swift */,
@@ -2759,7 +2750,6 @@
 				3FE267D5264308680030F83C /* CollectionAccess.swift in Sources */,
 				3F102CBD23DBC68300108FD2 /* Combine.swift in Sources */,
 				3FE267D6264308680030F83C /* ComplexTypes.swift in Sources */,
-				3F9F53D32718B5DA000EEB4A /* CustomPersistable.swift in Sources */,
 				3FB6ABD92416A27000E318C2 /* Decimal128.swift in Sources */,
 				3FC3F9172419B63200E27322 /* EmbeddedObject.swift in Sources */,
 				29B7FDF61C0DA6560023224E /* Error.swift in Sources */,
@@ -2781,7 +2771,7 @@
 				5D660FF61BE98D670021E04F /* Optional.swift in Sources */,
 				3FE267D8264308680030F83C /* Persistable.swift in Sources */,
 				3F149CCB2668112A00111D65 /* PersistedProperty.swift in Sources */,
-				3F857A49276A507200F9B9B1 /* Projection.swift in Sources */,
+				0CD1632626D3DD7B0027C49B /* Projection.swift in Sources */,
 				5D660FF71BE98D670021E04F /* Property.swift in Sources */,
 				3FE267D9264308680030F83C /* PropertyAccessors.swift in Sources */,
 				ACF08B6726DD936200686CBC /* Query.swift in Sources */,
@@ -2811,8 +2801,6 @@
 				3FCB1A7522A9B0A2003807FB /* CodableTests.swift in Sources */,
 				3FE2BE0323D8CAD1002860E9 /* CombineTests.swift in Sources */,
 				E8AE7C261EA436F800CDFF9A /* CompactionTests.swift in Sources */,
-				3F40C613276D1B05007FEF1A /* CustomObjectCreationTests.swift in Sources */,
-				3F9F53D52718E8E6000EEB4A /* CustomPersistableTestObjects.swift in Sources */,
 				CFFECBAA250646820010F585 /* Decimal128Tests.swift in Sources */,
 				CF0D04F1269365300038A058 /* KeyPathTests.swift in Sources */,
 				3FF3FFAF1F0D6D6400B84599 /* KVOTests.swift in Sources */,

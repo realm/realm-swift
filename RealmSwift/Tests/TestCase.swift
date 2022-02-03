@@ -97,44 +97,6 @@ class TestCase: RLMTestCaseBase {
         queue.sync { }
     }
 
-    func assertThrows<T>(_ block: @autoclosure () -> T, named: String? = RLMExceptionName,
-                         _ message: String? = nil, fileName: String = #file, lineNumber: UInt = #line) {
-        exceptionThrown = true
-        RLMAssertThrowsWithName(self, { _ = block() }, named, message, fileName, lineNumber)
-    }
-
-    func assertThrows<T>(_ block: @autoclosure () -> T, reason: String,
-                         _ message: String? = nil, fileName: String = #file, lineNumber: UInt = #line) {
-        exceptionThrown = true
-        RLMAssertThrowsWithReason(self, { _ = block() }, reason, message, fileName, lineNumber)
-    }
-
-    func assertThrows<T>(_ block: @autoclosure () -> T, reasonMatching regexString: String,
-                         _ message: String? = nil, fileName: String = #file, lineNumber: UInt = #line) {
-        exceptionThrown = true
-        RLMAssertThrowsWithReasonMatching(self, { _ = block() }, regexString, message, fileName, lineNumber)
-    }
-
-    private func realmFilePrefix() -> String {
-        let name: String? = self.name
-        return name!.trimmingCharacters(in: CharacterSet(charactersIn: "-[]"))
-    }
-
-    internal func testRealmURL() -> URL {
-        return realmURLForFile("test.realm")
-    }
-
-    internal func defaultRealmURL() -> URL {
-        return realmURLForFile("default.realm")
-    }
-
-    private func realmURLForFile(_ fileName: String) -> URL {
-        let directory = URL(fileURLWithPath: testDir, isDirectory: true)
-        return directory.appendingPathComponent(fileName, isDirectory: false)
-    }
-}
-
-extension XCTestCase {
     /// Check whether two test objects are equal (refer to the same row in the same Realm), even if their models
     /// don't define a primary key.
     func assertEqual<O: Object>(_ o1: O?, _ o2: O?, fileName: StaticString = #file, lineNumber: UInt = #line) {
@@ -170,6 +132,24 @@ extension XCTestCase {
                 file: (file), line: line)
             return
         }
+    }
+
+    func assertThrows<T>(_ block: @autoclosure () -> T, named: String? = RLMExceptionName,
+                         _ message: String? = nil, fileName: String = #file, lineNumber: UInt = #line) {
+        exceptionThrown = true
+        RLMAssertThrowsWithName(self, { _ = block() }, named, message, fileName, lineNumber)
+    }
+
+    func assertThrows<T>(_ block: @autoclosure () -> T, reason: String,
+                         _ message: String? = nil, fileName: String = #file, lineNumber: UInt = #line) {
+        exceptionThrown = true
+        RLMAssertThrowsWithReason(self, { _ = block() }, reason, message, fileName, lineNumber)
+    }
+
+    func assertThrows<T>(_ block: @autoclosure () -> T, reasonMatching regexString: String,
+                         _ message: String? = nil, fileName: String = #file, lineNumber: UInt = #line) {
+        exceptionThrown = true
+        RLMAssertThrowsWithReasonMatching(self, { _ = block() }, regexString, message, fileName, lineNumber)
     }
 
     func assertSucceeds(message: String? = nil, fileName: StaticString = #file,
@@ -240,5 +220,23 @@ extension XCTestCase {
         }
         // ensure all items are present in the set.
         XCTAssertFalse(itemMap.values.contains(false))
+    }
+
+    private func realmFilePrefix() -> String {
+        let name: String? = self.name
+        return name!.trimmingCharacters(in: CharacterSet(charactersIn: "-[]"))
+    }
+
+    internal func testRealmURL() -> URL {
+        return realmURLForFile("test.realm")
+    }
+
+    internal func defaultRealmURL() -> URL {
+        return realmURLForFile("default.realm")
+    }
+
+    private func realmURLForFile(_ fileName: String) -> URL {
+        let directory = URL(fileURLWithPath: testDir, isDirectory: true)
+        return directory.appendingPathComponent(fileName, isDirectory: false)
     }
 }

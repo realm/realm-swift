@@ -215,10 +215,7 @@ public final class List<Element: RealmCollectionValue>: RLMSwiftCollectionBase, 
         if let type = Element.self as? ObjectBase.Type {
             return RLMArray(objectClassName: type.className())
         }
-        if let type = Element.PersistedType.self as? ObjectBase.Type {
-            return RLMArray(objectClassName: type.className())
-        }
-        if let type = Element.PersistedType.self as? _RealmSchemaDiscoverable.Type {
+        if let type = Element.self as? _RealmSchemaDiscoverable.Type {
             return RLMArray(objectType: type._rlmType, optional: type._rlmOptional)
         }
         fatalError("Collections of projections must be used with @Projected.")

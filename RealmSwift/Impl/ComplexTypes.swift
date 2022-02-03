@@ -65,10 +65,7 @@ extension EmbeddedObject: SchemaDiscoverable, _PersistableInsideOptional, _Defau
     }
 
     public static func _rlmGetProperty(_ obj: ObjectBase, _ key: UInt16) -> Self {
-        if let value = RLMGetSwiftPropertyObject(obj, key) {
-            return value as! Self
-        }
-        return Self()
+        fatalError("Non-optional EmbeddedObject properties are not allowed.")
     }
 
     public static func _rlmGetPropertyOptional(_ obj: ObjectBase, _ key: UInt16) -> Self? {

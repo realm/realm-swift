@@ -180,14 +180,12 @@ internal class PersistedPropertyAccessor<T: _Persistable>: RLMManagedPropertyAcc
     }
 
     @objc override class func set(_ property: RLMProperty, on parent: RLMObjectBase, to value: Any) {
-        guard let v = T._rlmFromObjc(value) else {
-            throwRealmException("Could not convert value '\(value)' to type '\(T.self)'.")
-        }
-        bound(property, parent).pointee.set(parent, value: v)
+        bound(property, parent).pointee.set(parent, value: T._rlmFromObjc(value)!)
     }
 }
 
-internal class PersistedListAccessor<Element: RealmCollectionValue & _Persistable>: PersistedPropertyAccessor<List<Element>> {
+internal class PersistedListAccessor<Element: _Persistable>: PersistedPropertyAccessor<List<Element>>
+        where Element: RealmCollectionValue {
     @objc override class func set(_ property: RLMProperty, on parent: RLMObjectBase, to value: Any) {
         bound(property, parent).pointee.get(parent).assign(value)
     }
@@ -202,7 +200,8 @@ internal class PersistedListAccessor<Element: RealmCollectionValue & _Persistabl
     }
 }
 
-internal class PersistedSetAccessor<Element: RealmCollectionValue & _Persistable>: PersistedPropertyAccessor<MutableSet<Element>> {
+internal class PersistedSetAccessor<Element: _Persistable>: PersistedPropertyAccessor<MutableSet<Element>>
+        where Element: RealmCollectionValue {
     @objc override class func set(_ property: RLMProperty, on parent: RLMObjectBase, to value: Any) {
         bound(property, parent).pointee.get(parent).assign(value)
     }
@@ -214,7 +213,8 @@ internal class PersistedSetAccessor<Element: RealmCollectionValue & _Persistable
     }
 }
 
-internal class PersistedMapAccessor<Key: _MapKey, Value: RealmCollectionValue & _Persistable>: PersistedPropertyAccessor<Map<Key, Value>> {
+internal class PersistedMapAccessor<Key: _MapKey, Value: _Persistable>: PersistedPropertyAccessor<Map<Key, Value>>
+        where Value: RealmCollectionValue {
     @objc override class func set(_ property: RLMProperty, on parent: RLMObjectBase, to value: Any) {
         bound(property, parent).pointee.get(parent).assign(value)
     }
@@ -226,7 +226,8 @@ internal class PersistedMapAccessor<Key: _MapKey, Value: RealmCollectionValue & 
     }
 }
 
-internal class PersistedLinkingObjectsAccessor<Element: ObjectBase & RealmCollectionValue & _Persistable>: RLMManagedPropertyAccessor {
+internal class PersistedLinkingObjectsAccessor<Element: ObjectBase>: RLMManagedPropertyAccessor
+        where Element: RealmCollectionValue, Element: _Persistable {
     private static func bound(_ property: RLMProperty, _ obj: RLMObjectBase) -> UnsafeMutablePointer<Persisted<LinkingObjects<Element>>> {
         return ptr(property, obj).assumingMemoryBound(to: Persisted<LinkingObjects<Element>>.self)
     }
@@ -250,15 +251,5 @@ internal class PersistedLinkingObjectsAccessor<Element: ObjectBase & RealmCollec
 internal class BridgedPersistedPropertyAccessor<T: _Persistable>: PersistedPropertyAccessor<T> {
     @objc override class func get(_ property: RLMProperty, on parent: RLMObjectBase) -> Any {
         return bound(property, parent).pointee.get(parent)._rlmObjcValue
-    }
-}
-
-internal class CustomPersistablePropertyAccessor<T: _Persistable>: BridgedPersistedPropertyAccessor<T> {
-    @objc override class func set(_ property: RLMProperty, on parent: RLMObjectBase, to value: Any) {
-        if coerceToNil(value) == nil {
-            super.set(property, on: parent, to: T._rlmDefaultValue())
-        } else {
-            super.set(property, on: parent, to: value)
-        }
     }
 }

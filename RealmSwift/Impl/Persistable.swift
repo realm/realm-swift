@@ -66,7 +66,7 @@ extension _Persistable {
 }
 
 // A type which can appear inside Optional<T> in a @Persisted property
-public protocol _PersistableInsideOptional: _Persistable where PersistedType: _PersistableInsideOptional {
+public protocol _PersistableInsideOptional: _Persistable, _DefaultConstructible where PersistedType: _PersistableInsideOptional {
     // Read an optional value of this type from the target object
     static func _rlmGetPropertyOptional(_ obj: ObjectBase, _ key: PropertyKey) -> Self?
 }

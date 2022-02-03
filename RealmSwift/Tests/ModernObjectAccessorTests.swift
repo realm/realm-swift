@@ -601,38 +601,6 @@ class ModernObjectAccessorTests: TestCase {
              .decimal128(5), .uuid(uuid))
     }
 
-    func setAndTestFailableCustomMappings(_ obj: FailableCustomObject) {
-        obj["int"] = 2
-        XCTAssertEqual(obj["int"] as! Int, 2)
-        XCTAssertEqual(get(obj, "int") as! Int, 2)
-        XCTAssertEqual(obj.int.persistableValue, 2)
-
-        if obj.realm == nil {
-            // Unmanaged objects convert to the mapped type on set as the value
-            // is stored as the wrapped type
-            let reason = "Could not convert value '1' to type 'IntFailableWrapper'."
-            assertThrows(obj["int"] = 1, reason: reason)
-            assertThrows(set(obj, "int", 1), reason: reason)
-        } else {
-            // Managed objects convert on read
-            obj["int"] = 1
-            let reason = "Failed to convert persisted value '1' to type 'IntFailableWrapper' in a non-optional context."
-            assertThrows(obj["int"] as! Int, reason: reason)
-            assertThrows(get(obj, "int") as! Int, reason: reason)
-            assertThrows(obj.int, reason: reason)
-        }
-
-        obj["optInt"] = 2
-        XCTAssertEqual(obj["optInt"] as! Int, 2)
-        XCTAssertEqual(get(obj, "optInt") as! Int, 2)
-        XCTAssertEqual(obj.optInt!.persistableValue, 2)
-
-        obj["optInt"] = 1
-        XCTAssertNil(obj["optInt"])
-        XCTAssertTrue(get(obj, "optInt") is NSNull)
-        XCTAssertNil(obj.optInt)
-    }
-
     func testUnmanagedAccessors() {
         setAndTestAllPropertiesViaNormalAccess(ModernAllTypesObject())
         setAndTestAllPropertiesViaSubscript(ModernAllTypesObject())
@@ -640,7 +608,6 @@ class ModernObjectAccessorTests: TestCase {
         setAndTestList(ModernAllTypesObject())
         setAndTestSet(ModernAllTypesObject())
         setAndTestMap(ModernAllTypesObject())
-        setAndTestFailableCustomMappings(FailableCustomObject())
     }
 
     func testManagedAccessorsReadFromRealm() {
@@ -653,7 +620,6 @@ class ModernObjectAccessorTests: TestCase {
         setAndTestList(object)
         setAndTestSet(object)
         setAndTestMap(object)
-        setAndTestFailableCustomMappings(realm.create(FailableCustomObject.self))
         realm.cancelWrite()
     }
 

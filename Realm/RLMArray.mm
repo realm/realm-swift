@@ -67,7 +67,6 @@
 }
 
 - (instancetype)initWithObjectType:(RLMPropertyType)type optional:(BOOL)optional {
-    REALM_ASSERT(type != RLMPropertyTypeObject);
     self = [super init];
     if (self) {
         _type = type;
@@ -248,7 +247,8 @@ void RLMArrayValidateMatchingObjectType(__unsafe_unretained RLMArray *const arra
         @throw RLMException(@"Object cannot be inserted unless the schema is initialized. "
                             "This can happen if you try to insert objects into a RLMArray / List from a default value or from an overriden unmanaged initializer (`init()`).");
     }
-    if (![array->_objectClassName isEqualToString:object->_objectSchema.className]) {
+    if (![array->_objectClassName isEqualToString:object->_objectSchema.className]
+        && (array->_type != RLMPropertyTypeAny)) {
         @throw RLMException(@"Object of type '%@' does not match RLMArray type '%@'.",
                             object->_objectSchema.className, array->_objectClassName);
     }

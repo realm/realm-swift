@@ -64,7 +64,6 @@
 
 - (instancetype)initWithObjectType:(RLMPropertyType)type optional:(BOOL)optional keyType:(RLMPropertyType)keyType {
     REALM_ASSERT(RLMValidateKeyType(keyType));
-    REALM_ASSERT(type != RLMPropertyTypeObject);
     self = [super init];
     if (self) {
         _type = type;

@@ -89,9 +89,6 @@ internal func coerceToNil(_ value: Any) -> Any? {
 
 // MARK: CustomObjectiveCBridgeable
 
-internal extension _ObjcBridgeable {
-    static func _rlmFromObjc(_ value: Any) -> Self? { _rlmFromObjc(value, insideOptional: false) }
-}
 /// :nodoc:
 public func dynamicBridgeCast<T>(fromObjectiveC x: Any) -> T {
     if let bridged = failableDynamicBridgeCast(fromObjectiveC: x) as T? {
@@ -129,7 +126,7 @@ internal func staticBridgeCast<T: _ObjcBridgeable>(fromObjectiveC x: Any) -> T {
     if let value = T._rlmFromObjc(x) {
         return value
     }
-    throwRealmException("Could not convert value '\(x)' to type '\(T.self)'.")
+    fatalError("Could not convert value '\(x)' to type '\(T.self)'")
 }
 @usableFromInline
 internal func failableStaticBridgeCast<T: _ObjcBridgeable>(fromObjectiveC x: Any) -> T? {

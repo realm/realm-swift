@@ -311,10 +311,6 @@ class RealmCollectionTests<Collection: RealmCollection, AggregateCollection: Rea
         XCTAssertEqual(1, collection.filter("stringCol = %@", AnyRealmValue.string("2")).count)
         XCTAssertEqual(0, collection.filter("stringCol = %@", AnyRealmValue.string("3")).count)
 
-        XCTAssertEqual(1, collection.filter("stringCol = %@", StringWrapper(persistedValue: "1")).count)
-        XCTAssertEqual(1, collection.filter("stringCol = %@", StringWrapper(persistedValue: "2")).count)
-        XCTAssertEqual(0, collection.filter("stringCol = %@", StringWrapper(persistedValue: "3")).count)
-
         XCTAssertEqual(1, collection.filter { $0.stringCol == "1" }.count)
         XCTAssertEqual(1, collection.filter { $0.stringCol == "2" }.count)
         XCTAssertEqual(0, collection.filter { $0.stringCol == "3" }.count)

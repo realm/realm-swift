@@ -340,10 +340,6 @@ static void RLMInsertObject(RLMManagedArray *ar, id object, NSUInteger index) {
     RLMArrayValidateMatchingObjectType(self, object);
     changeArray(self, NSKeyValueChangeReplacement, index, ^{
         RLMAccessorContext context(*_objectInfo);
-        if (index >= _backingList.size()) {
-            @throw RLMException(@"Index %llu is out of bounds (must be less than %llu).",
-                                (unsigned long long)index, (unsigned long long)_backingList.size());
-        }
         _backingList.set(context, index, object);
     });
 }

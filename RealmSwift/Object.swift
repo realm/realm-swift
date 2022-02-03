@@ -706,7 +706,7 @@ public protocol RealmEnum: RealmOptionalType, _RealmSchemaDiscoverable {
 /// :nodoc:
 public extension RealmEnum where Self: RawRepresentable, Self.RawValue: _RealmSchemaDiscoverable & _ObjcBridgeable {
     var _rlmObjcValue: Any { rawValue._rlmObjcValue }
-    static func _rlmFromObjc(_ value: Any, insideOptional: Bool) -> Self? {
+    static func _rlmFromObjc(_ value: Any) -> Self? {
         if let value = value as? Self {
             return value
         }
