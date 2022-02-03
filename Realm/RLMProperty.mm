@@ -739,24 +739,6 @@ static realm::util::Optional<RLMPropertyType> typeFromProtocolString(const char 
     return p;
 }
 
-- (NSString *)typeName {
-    if (!self.collection) {
-        return RLMTypeToString(_type);
-    }
-    NSString *collectionName;
-    if (_swiftAccessor) {
-        collectionName = _array ? @"List" :
-                         _set   ? @"MutableSet" :
-                                  @"Map";
-    }
-    else {
-        collectionName = _array ? @"RLMArray" :
-                         _set   ? @"RLMSet" :
-                                  @"RLMDictionary";
-    }
-    return [NSString stringWithFormat:@"%@<%@>", collectionName, RLMTypeToString(_type)];
-}
-
 @end
 
 @implementation RLMPropertyDescriptor

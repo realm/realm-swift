@@ -214,10 +214,8 @@
     RLMAssertThrowsWithReasonMatching([PersonLinkObject objectsWhere:@"ALL person.age > 5"], @"ALL modifier not supported");
     RLMAssertThrowsWithReasonMatching([PersonLinkObject objectsWhere:@"SOME person.age > 5"], @"Aggregate operations can only.*collection property");
     RLMAssertThrowsWithReasonMatching([PersonLinkObject objectsWhere:@"NONE person.age > 5"], @"Aggregate operations can only.*collection property");
-    RLMAssertThrowsWithReason([PersonObject objectsWhere:@"age.@count > 5"],
-                              @"Invalid keypath 'age.@count': Property 'PersonObject.age' is not a link or collection and can only appear at the end of a keypath.");
-    RLMAssertThrowsWithReason([PersonObject objectsWhere:@"age.@sum > 5"],
-                              @"Invalid keypath 'age.@sum': Property 'PersonObject.age' is not a link or collection and can only appear at the end of a keypath.");
+    RLMAssertThrowsWithReasonMatching([PersonObject objectsWhere:@"age.@count > 5"], @"Aggregate operations can only.*collection property");
+    RLMAssertThrowsWithReasonMatching([PersonObject objectsWhere:@"age.@sum > 5"], @"Aggregate operations can only.*collection property");
 
     // comparing two constants
     RLMAssertThrowsWithReason([PersonObject objectsWhere:@"5 = 5"],
@@ -252,54 +250,60 @@
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
 
+    NSString *className = PersonObject.className;
+
     // invalid column/property name
-    RLMAssertThrowsWithReason([PersonObject objectsWhere:@"height > 72"],
+    RLMAssertThrowsWithReason([realm objects:className where:@"height > 72"],
                               @"Property 'height' not found in object of type 'PersonObject'");
 
     // wrong/invalid data types
-    RLMAssertThrowsWithReason([PersonObject objectsWhere:@"age != xyz"],
-                                      @"Invalid keypath 'xyz': Property 'xyz' not found in object of type 'PersonObject'");
-    RLMAssertThrowsWithReason([PersonObject objectsWhere:@"name == 3"],
-                                      @"Cannot compare value '3' of type '__NSCFNumber' to property 'name' of type 'string'");
-    RLMAssertThrowsWithReason([PersonObject objectsWhere:@"age IN {'xyz'}"],
-                                      @"Cannot compare value 'xyz' of type 'NSTaggedPointerString' to property 'age' of type 'int'");
-    XCTAssertThrows([PersonObject objectsWhere:@"name IN {3}"], @"asdf");
+    RLMAssertThrowsWithReasonMatching([realm objects:className where:@"age != xyz"],
+                                      @"'xyz' not found in .* 'PersonObject'");
+    RLMAssertThrowsWithReasonMatching([realm objects:className where:@"name == 3"],
+                                      @"type string .* property 'name' .* 'PersonObject'.*: 3");
+    RLMAssertThrowsWithReasonMatching([realm objects:className where:@"age IN {'xyz'}"],
+                                      @"type int .* property 'age' .* 'PersonObject'.*: xyz");
+    XCTAssertThrows([realm objects:className where:@"name IN {3}"], @"invalid type");
+
+    className = AllTypesObject.className;
 
     // compare columns to incorrect type of constant value
-    RLMAssertThrowsWithReason([AllTypesObject objectsWhere:@"boolCol == 'Foo'"],
-                              @"Cannot compare value 'Foo' of type 'NSTaggedPointerString' to property 'boolCol' of type 'bool'");
-    RLMAssertThrowsWithReason([AllTypesObject objectsWhere:@"boolCol == 2"],
-                              @"Cannot compare value '2' of type '__NSCFNumber' to property 'boolCol' of type 'bool'");
-    RLMAssertThrowsWithReason([AllTypesObject objectsWhere:@"dateCol == 7"],
-                              @"Cannot compare value '7' of type '__NSCFNumber' to property 'dateCol' of type 'date'");
-    RLMAssertThrowsWithReason([AllTypesObject objectsWhere:@"doubleCol == 'The'"],
-                              @"Cannot compare value 'The' of type 'NSTaggedPointerString' to property 'doubleCol' of type 'double'");
-    RLMAssertThrowsWithReason([AllTypesObject objectsWhere:@"floatCol == 'Bar'"],
-                              @"Cannot compare value 'Bar' of type 'NSTaggedPointerString' to property 'floatCol' of type 'float'");
-    RLMAssertThrowsWithReason([AllTypesObject objectsWhere:@"intCol == 'Baz'"],
-                              @"Cannot compare value 'Baz' of type 'NSTaggedPointerString' to property 'intCol' of type 'int'");
+    RLMAssertThrowsWithReason([realm objects:className where:@"boolCol == 'Foo'"],
+                              @"Expected object of type bool");
+    RLMAssertThrowsWithReason([realm objects:className where:@"boolCol == 2"],
+                              @"Expected object of type bool");
+    RLMAssertThrowsWithReason([realm objects:className where:@"dateCol == 7"],
+                              @"Expected object of type date");
+    RLMAssertThrowsWithReason([realm objects:className where:@"doubleCol == 'The'"],
+                              @"Expected object of type double");
+    RLMAssertThrowsWithReason([realm objects:className where:@"floatCol == 'Bar'"],
+                              @"Expected object of type float");
+    RLMAssertThrowsWithReason([realm objects:className where:@"intCol == 'Baz'"],
+                              @"Expected object of type int");
+
+    className = PersonObject.className;
 
     // compare two constants
-    XCTAssertThrows([PersonObject objectsWhere:@"3 == 3"], @"comparing 2 constants");
+    XCTAssertThrows([realm objects:className where:@"3 == 3"], @"comparing 2 constants");
 
     // invalid strings
-    RLMAssertThrowsWithReason([PersonObject objectsWhere:@""],
+    RLMAssertThrowsWithReason([realm objects:className where:@""],
                               @"Unable to parse the format string");
-    RLMAssertThrowsWithReason([PersonObject objectsWhere:@"age"],
+    RLMAssertThrowsWithReason([realm objects:className where:@"age"],
                               @"Unable to parse the format string");
-    RLMAssertThrowsWithReason([PersonObject objectsWhere:@"sdlfjasdflj"],
+    RLMAssertThrowsWithReason([realm objects:className where:@"sdlfjasdflj"],
                               @"Unable to parse the format string");
-    RLMAssertThrowsWithReason([PersonObject objectsWhere:@"age * 25"],
+    RLMAssertThrowsWithReason([realm objects:className where:@"age * 25"],
                               @"Unable to parse the format string");
-    RLMAssertThrowsWithReason([PersonObject objectsWhere:@"age === 25"],
+    RLMAssertThrowsWithReason([realm objects:className where:@"age === 25"],
                               @"Unable to parse the format string");
-    RLMAssertThrowsWithReason([PersonObject objectsWhere:@","],
+    RLMAssertThrowsWithReason([realm objects:className where:@","],
                               @"Unable to parse the format string");
-    RLMAssertThrowsWithReason([PersonObject objectsWhere:@"()"],
+    RLMAssertThrowsWithReason([realm objects:className where:@"()"],
                               @"Unable to parse the format string");
 
     // Misspelled keypath (should be %K)
-    RLMAssertThrowsWithReason([PersonObject objectsWhere:@"@K == YES"], @"Unsupported collection operation '@K'");
+    RLMAssertThrowsWithReason([realm objects:className where:@"@K == YES"], @"'@K' is not a valid key path'");
 
     NSPredicate *(^predicateWithKeyPath)(NSString *) = ^(NSString *keyPath) {
         return  [NSComparisonPredicate predicateWithLeftExpression:[NSExpression expressionForKeyPath:keyPath]
@@ -310,65 +314,59 @@
     };
 
     // malformed keypath operators
-    RLMAssertThrowsWithReason([PersonObject objectsWhere:@"@count == 0"],
-                              @"Invalid keypath '@count': collection operation '@count' must be applied to a collection");
+    RLMAssertThrowsWithReason([realm objects:className where:@"@count == 0"],
+                              @"'@count' is not a valid key path");
     NSPredicate *pred = [NSComparisonPredicate predicateWithLeftExpression:[NSExpression expressionForKeyPath:@"name.@"] rightExpression:[NSExpression expressionForConstantValue:@0] modifier:0 type:NSEqualToPredicateOperatorType options:0];
-    RLMAssertThrowsWithReason([PersonObject objectsWithPredicate:predicateWithKeyPath(@"children.@")],
-                              @"Unsupported collection operation '@'");
-    RLMAssertThrowsWithReason([PersonObject objectsWithPredicate:predicateWithKeyPath(@"children@")],
-                              @"Invalid keypath 'children@': Property 'children@' not found in object of type 'PersonObject'");
-    RLMAssertThrowsWithReason([PersonObject objectsWithPredicate:predicateWithKeyPath(@"name@length")],
-                              @"Invalid keypath 'name@length': Property 'name@length' not found in object of type 'PersonObject'");
-    RLMAssertThrowsWithReason([PersonObject objectsWithPredicate:predicateWithKeyPath(@".name")],
-                              @"Invalid keypath '.name': no key name before '.'");
-    RLMAssertThrowsWithReason([PersonObject objectsWithPredicate:predicateWithKeyPath(@"children.")],
-                              @"Invalid keypath 'children.': no key name after last '.'");
+    RLMAssertThrowsWithReason([realm objects:className withPredicate:predicateWithKeyPath(@"name.@")],
+                              @"'name.@' is not a valid key path");
+    RLMAssertThrowsWithReason([realm objects:className withPredicate:predicateWithKeyPath(@"name@")],
+                              @"'name@' is not a valid key path");
+    RLMAssertThrowsWithReason([realm objects:className withPredicate:predicateWithKeyPath(@"name@length")],
+                              @"'name@length' is not a valid key path");
+    RLMAssertThrowsWithReason([realm objects:className withPredicate:predicateWithKeyPath(@".name")],
+                              @"Property '' not found in object of type 'PersonObject'");
+    RLMAssertThrowsWithReason([realm objects:className withPredicate:predicateWithKeyPath(@"children.")],
+                              @"Property '' not found in object of type 'PersonObject'");
 
     // not a link column
-    RLMAssertThrowsWithReason([PersonObject objectsWhere:@"age.age == 25"],
-                              @"Invalid keypath 'age.age': Property 'PersonObject.age' is not a link or collection and can only appear at the end of a keypath.");
-    RLMAssertThrowsWithReason([PersonObject objectsWhere:@"age.age.age == 25"],
-                              @"Invalid keypath 'age.age.age': Property 'PersonObject.age' is not a link or collection and can only appear at the end of a keypath.");
-    RLMAssertThrowsWithReason([AllPrimitiveArrays objectsWhere:@"intObj.foo == 25"],
-                              @"Invalid keypath 'intObj.foo': RLMArray<int> property intObj can only be followed by a collection operation");
-    RLMAssertThrowsWithReason([AllPrimitiveSets objectsWhere:@"intObj.foo == 25"],
-                              @"Invalid keypath 'intObj.foo': RLMSet<int> property intObj can only be followed by a collection operation");
-    RLMAssertThrowsWithReason([AllPrimitiveDictionaries objectsWhere:@"intObj.foo == 25"],
-                              @"Invalid keypath 'intObj.foo': RLMDictionary<int> property intObj can only be followed by a collection operation");
+    RLMAssertThrowsWithReason([realm objects:className where:@"age.age == 25"],
+                              @"Property 'age' is not a link in object of type 'PersonObject'");
+    RLMAssertThrowsWithReason([realm objects:className where:@"age.age.age == 25"],
+                              @"Property 'age' is not a link in object of type 'PersonObject'");
 
     // abuse of BETWEEN
-    RLMAssertThrowsWithReason([PersonObject objectsWhere:@"age BETWEEN 25"], @"type NSArray for BETWEEN");
-    RLMAssertThrowsWithReason([PersonObject objectsWhere:@"age BETWEEN Foo"], @"BETWEEN operator must compare a KeyPath with an aggregate");
-    RLMAssertThrowsWithReason([PersonObject objectsWhere:@"age BETWEEN {age, age}"], @"must be constant values");
-    RLMAssertThrowsWithReason([PersonObject objectsWhere:@"age BETWEEN {age, 0}"], @"must be constant values");
-    RLMAssertThrowsWithReason([PersonObject objectsWhere:@"age BETWEEN {0, age}"], @"must be constant values");
-    RLMAssertThrowsWithReason([PersonObject objectsWhere:@"age BETWEEN {0, {1, 10}}"], @"must be constant values");
+    RLMAssertThrowsWithReason([realm objects:className where:@"age BETWEEN 25"], @"type NSArray for BETWEEN");
+    RLMAssertThrowsWithReason([realm objects:className where:@"age BETWEEN Foo"], @"BETWEEN operator must compare a KeyPath with an aggregate");
+    RLMAssertThrowsWithReason([realm objects:className where:@"age BETWEEN {age, age}"], @"must be constant values");
+    RLMAssertThrowsWithReason([realm objects:className where:@"age BETWEEN {age, 0}"], @"must be constant values");
+    RLMAssertThrowsWithReason([realm objects:className where:@"age BETWEEN {0, age}"], @"must be constant values");
+    RLMAssertThrowsWithReason([realm objects:className where:@"age BETWEEN {0, {1, 10}}"], @"must be constant values");
 
     pred = [NSPredicate predicateWithFormat:@"age BETWEEN %@", @[@1]];
-    RLMAssertThrowsWithReason([PersonObject objectsWithPredicate:pred], @"exactly two objects");
+    RLMAssertThrowsWithReason([realm objects:className withPredicate:pred], @"exactly two objects");
 
     pred = [NSPredicate predicateWithFormat:@"age BETWEEN %@", @[@1, @2, @3]];
-    RLMAssertThrowsWithReason([PersonObject objectsWithPredicate:pred], @"exactly two objects");
+    RLMAssertThrowsWithReason([realm objects:className withPredicate:pred], @"exactly two objects");
 
     pred = [NSPredicate predicateWithFormat:@"age BETWEEN %@", @[@"Foo", @"Bar"]];
-    RLMAssertThrowsWithReason([PersonObject objectsWithPredicate:pred], @"type int for BETWEEN");
+    RLMAssertThrowsWithReason([realm objects:className withPredicate:pred], @"type int for BETWEEN");
 
     pred = [NSPredicate predicateWithFormat:@"age BETWEEN %@", @[@1.5, @2.5]];
-    RLMAssertThrowsWithReason([PersonObject objectsWithPredicate:pred], @"type int for BETWEEN");
+    RLMAssertThrowsWithReason([realm objects:className withPredicate:pred], @"type int for BETWEEN");
 
     pred = [NSPredicate predicateWithFormat:@"age BETWEEN %@", @[@1, @[@2, @3]]];
-    RLMAssertThrowsWithReason([PersonObject objectsWithPredicate:pred], @"type int for BETWEEN");
+    RLMAssertThrowsWithReason([realm objects:className withPredicate:pred], @"type int for BETWEEN");
 
     pred = [NSPredicate predicateWithFormat:@"age BETWEEN %@", @{@25: @35}];
-    RLMAssertThrowsWithReason([PersonObject objectsWithPredicate:pred], @"type NSArray for BETWEEN");
+    RLMAssertThrowsWithReason([realm objects:className withPredicate:pred], @"type NSArray for BETWEEN");
 
     pred = [NSPredicate predicateWithFormat:@"height BETWEEN %@", @[@25, @35]];
-    RLMAssertThrowsWithReason([PersonObject objectsWithPredicate:pred],
+    RLMAssertThrowsWithReason([realm objects:className withPredicate:pred],
                               @"Property 'height' not found in object of type 'PersonObject'");
 
     // bad type in link IN
     RLMAssertThrowsWithReason([PersonLinkObject objectsInRealm:realm where:@"person.age IN {'Tim'}"],
-                              @"Cannot compare value 'Tim' of type 'NSTaggedPointerString' to property 'age' of type 'int'");
+                              @"Expected object of type int in IN clause for property 'person.age' on object of type 'PersonLinkObject'");
 }
 
 - (void)testStringUnsupportedOperations
@@ -1288,49 +1286,49 @@
     [realm commitWriteTransaction];
 
     void (^testBlock)(NSString *, NSString *, Class) = ^(NSString * objectCol, NSString *colName, Class cls) {
-        RLMAssertCount(cls, 1U, @"%K BEGINSWITH 'a'", colName);
-        RLMAssertCount(cls, 1U, @"%K BEGINSWITH 'ab'", colName);
-        RLMAssertCount(cls, 1U, @"%K BEGINSWITH 'abc'", colName);
-        RLMAssertCount(cls, 0U, @"%K BEGINSWITH 'abcd'", colName);
-        RLMAssertCount(cls, 0U, @"%K BEGINSWITH 'abd'", colName);
-        RLMAssertCount(cls, 0U, @"%K BEGINSWITH 'c'", colName);
-        RLMAssertCount(cls, 0U, @"%K BEGINSWITH 'A'", colName);
-        RLMAssertCount(cls, 0U, @"%K BEGINSWITH ''", colName);
-        RLMAssertCount(cls, 1U, @"%K BEGINSWITH[c] 'a'", colName);
-        RLMAssertCount(cls, 1U, @"%K BEGINSWITH[c] 'A'", colName);
-        RLMAssertCount(cls, 0U, @"%K BEGINSWITH[c] ''", colName);
-        RLMAssertCount(cls, 0U, @"%K BEGINSWITH[d] ''", colName);
-        RLMAssertCount(cls, 0U, @"%K BEGINSWITH[cd] ''", colName);
+        RLMAssertCount(cls, 1U, [NSString stringWithFormat:@"%@ BEGINSWITH 'a'", colName]);
+        RLMAssertCount(cls, 1U, [NSString stringWithFormat:@"%@ BEGINSWITH 'ab'", colName]);
+        RLMAssertCount(cls, 1U, [NSString stringWithFormat:@"%@ BEGINSWITH 'abc'", colName]);
+        RLMAssertCount(cls, 0U, [NSString stringWithFormat:@"%@ BEGINSWITH 'abcd'", colName]);
+        RLMAssertCount(cls, 0U, [NSString stringWithFormat:@"%@ BEGINSWITH 'abd'", colName]);
+        RLMAssertCount(cls, 0U, [NSString stringWithFormat:@"%@ BEGINSWITH 'c'", colName]);
+        RLMAssertCount(cls, 0U, [NSString stringWithFormat:@"%@ BEGINSWITH 'A'", colName]);
+        RLMAssertCount(cls, 0U, [NSString stringWithFormat:@"%@ BEGINSWITH ''", colName]);
+        RLMAssertCount(cls, 1U, [NSString stringWithFormat:@"%@ BEGINSWITH[c] 'a'", colName]);
+        RLMAssertCount(cls, 1U, [NSString stringWithFormat:@"%@ BEGINSWITH[c] 'A'", colName]);
+        RLMAssertCount(cls, 0U, [NSString stringWithFormat:@"%@ BEGINSWITH[c] ''", colName]);
+        RLMAssertCount(cls, 0U, [NSString stringWithFormat:@"%@ BEGINSWITH[d] ''", colName]);
+        RLMAssertCount(cls, 0U, [NSString stringWithFormat:@"%@ BEGINSWITH[cd] ''", colName]);
 
-        RLMAssertCount(cls, 1U, @"%K BEGINSWITH 'u'", colName);
-        RLMAssertCount(cls, 1U, @"%K BEGINSWITH[c] 'U'", colName);
-        RLMAssertCount(cls, 3U, @"%K BEGINSWITH[d] 'u'", colName);
-        RLMAssertCount(cls, 3U, @"%K BEGINSWITH[cd] 'U'", colName);
+        RLMAssertCount(cls, 1U, [NSString stringWithFormat:@"%@ BEGINSWITH 'u'", colName]);
+        RLMAssertCount(cls, 1U, [NSString stringWithFormat:@"%@ BEGINSWITH[c] 'U'", colName]);
+        RLMAssertCount(cls, 3U, [NSString stringWithFormat:@"%@ BEGINSWITH[d] 'u'", colName]);
+        RLMAssertCount(cls, 3U, [NSString stringWithFormat:@"%@ BEGINSWITH[cd] 'U'", colName]);
 
-        RLMAssertCount(cls, 1U, @"%K BEGINSWITH 'ü'", colName);
-        RLMAssertCount(cls, 0U, @"%K BEGINSWITH[c] 'Ü'", colName);
-        RLMAssertCount(cls, 3U, @"%K BEGINSWITH[d] 'ü'", colName);
-        RLMAssertCount(cls, 3U, @"%K BEGINSWITH[cd] 'Ü'", colName);
+        RLMAssertCount(cls, 1U, [NSString stringWithFormat:@"%@ BEGINSWITH 'ü'", colName]);
+        RLMAssertCount(cls, 0U, [NSString stringWithFormat:@"%@ BEGINSWITH[c] 'Ü'", colName]);
+        RLMAssertCount(cls, 3U, [NSString stringWithFormat:@"%@ BEGINSWITH[d] 'ü'", colName]);
+        RLMAssertCount(cls, 3U, [NSString stringWithFormat:@"%@ BEGINSWITH[cd] 'Ü'", colName]);
 
-        RLMAssertCount(cls, 0U, @"%K BEGINSWITH NULL", colName);
-        RLMAssertCount(cls, 0U, @"%K BEGINSWITH[c] NULL", colName);
-        RLMAssertCount(cls, 0U, @"%K BEGINSWITH[d] NULL", colName);
-        RLMAssertCount(cls, 0U, @"%K BEGINSWITH[cd] NULL", colName);
+        RLMAssertCount(cls, 0U, [NSString stringWithFormat:@"%@ BEGINSWITH NULL", colName]);
+        RLMAssertCount(cls, 0U, [NSString stringWithFormat:@"%@ BEGINSWITH[c] NULL", colName]);
+        RLMAssertCount(cls, 0U, [NSString stringWithFormat:@"%@ BEGINSWITH[d] NULL", colName]);
+        RLMAssertCount(cls, 0U, [NSString stringWithFormat:@"%@ BEGINSWITH[cd] NULL", colName]);
 
-        RLMAssertCount(AllTypesObject, 1U, @"%K.%K BEGINSWITH 'a'", objectCol, colName);
-        RLMAssertCount(AllTypesObject, 0U, @"%K.%K BEGINSWITH 'c'", objectCol, colName);
-        RLMAssertCount(AllTypesObject, 0U, @"%K.%K BEGINSWITH 'A'", objectCol, colName);
-        RLMAssertCount(AllTypesObject, 0U, @"%K.%K BEGINSWITH ''", objectCol, colName);
-        RLMAssertCount(AllTypesObject, 1U, @"%K.%K BEGINSWITH[c] 'a'", objectCol, colName);
-        RLMAssertCount(AllTypesObject, 1U, @"%K.%K BEGINSWITH[c] 'A'", objectCol, colName);
-        RLMAssertCount(AllTypesObject, 0U, @"%K.%K BEGINSWITH[c] ''", objectCol, colName);
-        RLMAssertCount(AllTypesObject, 0U, @"%K.%K BEGINSWITH[d] ''", objectCol, colName);
-        RLMAssertCount(AllTypesObject, 0U, @"%K.%K BEGINSWITH[cd] ''", objectCol, colName);
+        RLMAssertCount(AllTypesObject, 1U, [NSString stringWithFormat:@"%@.%@ BEGINSWITH 'a'", objectCol, colName]);
+        RLMAssertCount(AllTypesObject, 0U, [NSString stringWithFormat:@"%@.%@ BEGINSWITH 'c'", objectCol, colName]);
+        RLMAssertCount(AllTypesObject, 0U, [NSString stringWithFormat:@"%@.%@ BEGINSWITH 'A'", objectCol, colName]);
+        RLMAssertCount(AllTypesObject, 0U, [NSString stringWithFormat:@"%@.%@ BEGINSWITH ''", objectCol, colName]);
+        RLMAssertCount(AllTypesObject, 1U, [NSString stringWithFormat:@"%@.%@ BEGINSWITH[c] 'a'", objectCol, colName]);
+        RLMAssertCount(AllTypesObject, 1U, [NSString stringWithFormat:@"%@.%@ BEGINSWITH[c] 'A'", objectCol, colName]);
+        RLMAssertCount(AllTypesObject, 0U, [NSString stringWithFormat:@"%@.%@ BEGINSWITH[c] ''", objectCol, colName]);
+        RLMAssertCount(AllTypesObject, 0U, [NSString stringWithFormat:@"%@.%@ BEGINSWITH[d] ''", objectCol, colName]);
+        RLMAssertCount(AllTypesObject, 0U, [NSString stringWithFormat:@"%@.%@ BEGINSWITH[cd] ''", objectCol, colName]);
 
-        RLMAssertCount(AllTypesObject, 0U, @"%K.%K BEGINSWITH NULL", objectCol, colName);
-        RLMAssertCount(AllTypesObject, 0U, @"%K.%K BEGINSWITH[c] NULL", objectCol, colName);
-        RLMAssertCount(AllTypesObject, 0U, @"%K.%K BEGINSWITH[d] NULL", objectCol, colName);
-        RLMAssertCount(AllTypesObject, 0U, @"%K.%K BEGINSWITH[cd] NULL", objectCol, colName);
+        RLMAssertCount(AllTypesObject, 0U, [NSString stringWithFormat:@"%@.%@ BEGINSWITH NULL", objectCol, colName]);
+        RLMAssertCount(AllTypesObject, 0U, [NSString stringWithFormat:@"%@.%@ BEGINSWITH[c] NULL", objectCol, colName]);
+        RLMAssertCount(AllTypesObject, 0U, [NSString stringWithFormat:@"%@.%@ BEGINSWITH[d] NULL", objectCol, colName]);
+        RLMAssertCount(AllTypesObject, 0U, [NSString stringWithFormat:@"%@.%@ BEGINSWITH[cd] NULL", objectCol, colName]);
     };
 
     testBlock(@"objectCol", @"stringCol", [StringObject class]);
@@ -1358,49 +1356,49 @@
     [realm commitWriteTransaction];
 
     void (^testBlock)(NSString *, NSString *, Class) = ^(NSString *objectCol, NSString *colName, Class cls) {
-        RLMAssertCount(cls, 1U, @"%K ENDSWITH 'c'", colName);
-        RLMAssertCount(cls, 1U, @"%K ENDSWITH 'bc'", colName);
-        RLMAssertCount(cls, 1U, @"%K ENDSWITH 'abc'", colName);
-        RLMAssertCount(cls, 0U, @"%K ENDSWITH 'aabc'", colName);
-        RLMAssertCount(cls, 0U, @"%K ENDSWITH 'bbc'", colName);
-        RLMAssertCount(cls, 0U, @"%K ENDSWITH 'a'", colName);
-        RLMAssertCount(cls, 0U, @"%K ENDSWITH 'C'", colName);
-        RLMAssertCount(cls, 0U, @"%K ENDSWITH ''", colName);
-        RLMAssertCount(cls, 1U, @"%K ENDSWITH[c] 'c'", colName);
-        RLMAssertCount(cls, 1U, @"%K ENDSWITH[c] 'C'", colName);
-        RLMAssertCount(cls, 0U, @"%K ENDSWITH[c] ''", colName);
-        RLMAssertCount(cls, 0U, @"%K ENDSWITH[d] ''", colName);
-        RLMAssertCount(cls, 0U, @"%K ENDSWITH[cd] ''", colName);
+        RLMAssertCount(cls, 1U, [NSString stringWithFormat:@"%@ ENDSWITH 'c'", colName]);
+        RLMAssertCount(cls, 1U, [NSString stringWithFormat:@"%@ ENDSWITH 'bc'", colName]);
+        RLMAssertCount(cls, 1U, [NSString stringWithFormat:@"%@ ENDSWITH 'abc'", colName]);
+        RLMAssertCount(cls, 0U, [NSString stringWithFormat:@"%@ ENDSWITH 'aabc'", colName]);
+        RLMAssertCount(cls, 0U, [NSString stringWithFormat:@"%@ ENDSWITH 'bbc'", colName]);
+        RLMAssertCount(cls, 0U, [NSString stringWithFormat:@"%@ ENDSWITH 'a'", colName]);
+        RLMAssertCount(cls, 0U, [NSString stringWithFormat:@"%@ ENDSWITH 'C'", colName]);
+        RLMAssertCount(cls, 0U, [NSString stringWithFormat:@"%@ ENDSWITH ''", colName]);
+        RLMAssertCount(cls, 1U, [NSString stringWithFormat:@"%@ ENDSWITH[c] 'c'", colName]);
+        RLMAssertCount(cls, 1U, [NSString stringWithFormat:@"%@ ENDSWITH[c] 'C'", colName]);
+        RLMAssertCount(cls, 0U, [NSString stringWithFormat:@"%@ ENDSWITH[c] ''", colName]);
+        RLMAssertCount(cls, 0U, [NSString stringWithFormat:@"%@ ENDSWITH[d] ''", colName]);
+        RLMAssertCount(cls, 0U, [NSString stringWithFormat:@"%@ ENDSWITH[cd] ''", colName]);
 
-        RLMAssertCount(cls, 1U, @"%K ENDSWITH 'u'", colName);
-        RLMAssertCount(cls, 1U, @"%K ENDSWITH[c] 'U'", colName);
-        RLMAssertCount(cls, 2U, @"%K ENDSWITH[d] 'u'", colName);
-        RLMAssertCount(cls, 2U, @"%K ENDSWITH[cd] 'U'", colName);
+        RLMAssertCount(cls, 1U, [NSString stringWithFormat:@"%@ ENDSWITH 'u'", colName]);
+        RLMAssertCount(cls, 1U, [NSString stringWithFormat:@"%@ ENDSWITH[c] 'U'", colName]);
+        RLMAssertCount(cls, 2U, [NSString stringWithFormat:@"%@ ENDSWITH[d] 'u'", colName]);
+        RLMAssertCount(cls, 2U, [NSString stringWithFormat:@"%@ ENDSWITH[cd] 'U'", colName]);
 
-        RLMAssertCount(cls, 1U, @"%K ENDSWITH 'ü'", colName);
-        RLMAssertCount(cls, 0U, @"%K ENDSWITH[c] 'Ü'", colName);
-        RLMAssertCount(cls, 2U, @"%K ENDSWITH[d] 'ü'", colName);
-        RLMAssertCount(cls, 2U, @"%K ENDSWITH[cd] 'Ü'", colName);
+        RLMAssertCount(cls, 1U, [NSString stringWithFormat:@"%@ ENDSWITH 'ü'", colName]);
+        RLMAssertCount(cls, 0U, [NSString stringWithFormat:@"%@ ENDSWITH[c] 'Ü'", colName]);
+        RLMAssertCount(cls, 2U, [NSString stringWithFormat:@"%@ ENDSWITH[d] 'ü'", colName]);
+        RLMAssertCount(cls, 2U, [NSString stringWithFormat:@"%@ ENDSWITH[cd] 'Ü'", colName]);
 
-        RLMAssertCount(cls, 0U, @"%K ENDSWITH NULL", colName);
-        RLMAssertCount(cls, 0U, @"%K ENDSWITH[c] NULL", colName);
-        RLMAssertCount(cls, 0U, @"%K ENDSWITH[d] NULL", colName);
-        RLMAssertCount(cls, 0U, @"%K ENDSWITH[cd] NULL", colName);
+        RLMAssertCount(cls, 0U, [NSString stringWithFormat:@"%@ ENDSWITH NULL", colName]);
+        RLMAssertCount(cls, 0U, [NSString stringWithFormat:@"%@ ENDSWITH[c] NULL", colName]);
+        RLMAssertCount(cls, 0U, [NSString stringWithFormat:@"%@ ENDSWITH[d] NULL", colName]);
+        RLMAssertCount(cls, 0U, [NSString stringWithFormat:@"%@ ENDSWITH[cd] NULL", colName]);
 
-        RLMAssertCount(AllTypesObject, 1U, @"%K.%K ENDSWITH 'c'", objectCol, colName);
-        RLMAssertCount(AllTypesObject, 0U, @"%K.%K ENDSWITH 'a'", objectCol, colName);
-        RLMAssertCount(AllTypesObject, 0U, @"%K.%K ENDSWITH 'C'", objectCol, colName);
-        RLMAssertCount(AllTypesObject, 0U, @"%K.%K ENDSWITH ''", objectCol, colName);
-        RLMAssertCount(AllTypesObject, 1U, @"%K.%K ENDSWITH[c] 'c'", objectCol, colName);
-        RLMAssertCount(AllTypesObject, 1U, @"%K.%K ENDSWITH[c] 'C'", objectCol, colName);
-        RLMAssertCount(AllTypesObject, 0U, @"%K.%K ENDSWITH[c] ''", objectCol, colName);
-        RLMAssertCount(AllTypesObject, 0U, @"%K.%K ENDSWITH[d] ''", objectCol, colName);
-        RLMAssertCount(AllTypesObject, 0U, @"%K.%K ENDSWITH[cd] ''", objectCol, colName);
+        RLMAssertCount(AllTypesObject, 1U, [NSString stringWithFormat:@"%@.%@ ENDSWITH 'c'", objectCol, colName]);
+        RLMAssertCount(AllTypesObject, 0U, [NSString stringWithFormat:@"%@.%@ ENDSWITH 'a'", objectCol, colName]);
+        RLMAssertCount(AllTypesObject, 0U, [NSString stringWithFormat:@"%@.%@ ENDSWITH 'C'", objectCol, colName]);
+        RLMAssertCount(AllTypesObject, 0U, [NSString stringWithFormat:@"%@.%@ ENDSWITH ''", objectCol, colName]);
+        RLMAssertCount(AllTypesObject, 1U, [NSString stringWithFormat:@"%@.%@ ENDSWITH[c] 'c'", objectCol, colName]);
+        RLMAssertCount(AllTypesObject, 1U, [NSString stringWithFormat:@"%@.%@ ENDSWITH[c] 'C'", objectCol, colName]);
+        RLMAssertCount(AllTypesObject, 0U, [NSString stringWithFormat:@"%@.%@ ENDSWITH[c] ''", objectCol, colName]);
+        RLMAssertCount(AllTypesObject, 0U, [NSString stringWithFormat:@"%@.%@ ENDSWITH[d] ''", objectCol, colName]);
+        RLMAssertCount(AllTypesObject, 0U, [NSString stringWithFormat:@"%@.%@ ENDSWITH[cd] ''", objectCol, colName]);
 
-        RLMAssertCount(AllTypesObject, 0U, @"%K.%K ENDSWITH NULL", objectCol, colName);
-        RLMAssertCount(AllTypesObject, 0U, @"%K.%K ENDSWITH[c] NULL", objectCol, colName);
-        RLMAssertCount(AllTypesObject, 0U, @"%K.%K ENDSWITH[d] NULL", objectCol, colName);
-        RLMAssertCount(AllTypesObject, 0U, @"%K.%K ENDSWITH[cd] NULL", objectCol, colName);
+        RLMAssertCount(AllTypesObject, 0U, [NSString stringWithFormat:@"%@.%@ ENDSWITH NULL", objectCol, colName]);
+        RLMAssertCount(AllTypesObject, 0U, [NSString stringWithFormat:@"%@.%@ ENDSWITH[c] NULL", objectCol, colName]);
+        RLMAssertCount(AllTypesObject, 0U, [NSString stringWithFormat:@"%@.%@ ENDSWITH[d] NULL", objectCol, colName]);
+        RLMAssertCount(AllTypesObject, 0U, [NSString stringWithFormat:@"%@.%@ ENDSWITH[cd] NULL", objectCol, colName]);
     };
     testBlock(@"objectCol", @"stringCol", [StringObject class]);
     testBlock(@"mixedObjectCol", @"anyCol", [MixedObject class]);
@@ -1425,53 +1423,53 @@
     [realm commitWriteTransaction];
 
     void (^testBlock)(NSString *, NSString *, Class) = ^(NSString *objectCol, NSString *colName, Class cls) {
-        RLMAssertCount(cls, 1U, @"%K CONTAINS 'a'", colName);
-        RLMAssertCount(cls, 1U, @"%K CONTAINS 'b'", colName);
-        RLMAssertCount(cls, 1U, @"%K CONTAINS 'c'", colName);
-        RLMAssertCount(cls, 1U, @"%K CONTAINS 'ab'", colName);
-        RLMAssertCount(cls, 1U, @"%K CONTAINS 'bc'", colName);
-        RLMAssertCount(cls, 1U, @"%K CONTAINS 'abc'", colName);
-        RLMAssertCount(cls, 0U, @"%K CONTAINS 'd'", colName);
-        RLMAssertCount(cls, 0U, @"%K CONTAINS 'aabc'", colName);
-        RLMAssertCount(cls, 0U, @"%K CONTAINS 'bbc'", colName);
-        RLMAssertCount(cls, 0U, @"%K CONTAINS ''", colName);
+        RLMAssertCount(cls, 1U, [NSString stringWithFormat:@"%@ CONTAINS 'a'", colName]);
+        RLMAssertCount(cls, 1U, [NSString stringWithFormat:@"%@ CONTAINS 'b'", colName]);
+        RLMAssertCount(cls, 1U, [NSString stringWithFormat:@"%@ CONTAINS 'c'", colName]);
+        RLMAssertCount(cls, 1U, [NSString stringWithFormat:@"%@ CONTAINS 'ab'", colName]);
+        RLMAssertCount(cls, 1U, [NSString stringWithFormat:@"%@ CONTAINS 'bc'", colName]);
+        RLMAssertCount(cls, 1U, [NSString stringWithFormat:@"%@ CONTAINS 'abc'", colName]);
+        RLMAssertCount(cls, 0U, [NSString stringWithFormat:@"%@ CONTAINS 'd'", colName]);
+        RLMAssertCount(cls, 0U, [NSString stringWithFormat:@"%@ CONTAINS 'aabc'", colName]);
+        RLMAssertCount(cls, 0U, [NSString stringWithFormat:@"%@ CONTAINS 'bbc'", colName]);
+        RLMAssertCount(cls, 0U, [NSString stringWithFormat:@"%@ CONTAINS ''", colName]);
 
-        RLMAssertCount(cls, 0U, @"%K CONTAINS 'C'", colName);
-        RLMAssertCount(cls, 1U, @"%K CONTAINS[c] 'c'", colName);
-        RLMAssertCount(cls, 1U, @"%K CONTAINS[c] 'C'", colName);
-        RLMAssertCount(cls, 0U, @"%K CONTAINS[c] ''", colName);
+        RLMAssertCount(cls, 0U, [NSString stringWithFormat:@"%@ CONTAINS 'C'", colName]);
+        RLMAssertCount(cls, 1U, [NSString stringWithFormat:@"%@ CONTAINS[c] 'c'", colName]);
+        RLMAssertCount(cls, 1U, [NSString stringWithFormat:@"%@ CONTAINS[c] 'C'", colName]);
+        RLMAssertCount(cls, 0U, [NSString stringWithFormat:@"%@ CONTAINS[c] ''", colName]);
 
-        RLMAssertCount(cls, 1U, @"%K CONTAINS 'u'", colName);
-        RLMAssertCount(cls, 1U, @"%K CONTAINS[c] 'U'", colName);
-        RLMAssertCount(cls, 3U, @"%K CONTAINS[d] 'u'", colName);
-        RLMAssertCount(cls, 3U, @"%K CONTAINS[cd] 'U'", colName);
-        RLMAssertCount(cls, 0U, @"%K CONTAINS[d] ''", colName);
-        RLMAssertCount(cls, 0U, @"%K CONTAINS[cd] ''", colName);
+        RLMAssertCount(cls, 1U, [NSString stringWithFormat:@"%@ CONTAINS 'u'", colName]);
+        RLMAssertCount(cls, 1U, [NSString stringWithFormat:@"%@ CONTAINS[c] 'U'", colName]);
+        RLMAssertCount(cls, 3U, [NSString stringWithFormat:@"%@ CONTAINS[d] 'u'", colName]);
+        RLMAssertCount(cls, 3U, [NSString stringWithFormat:@"%@ CONTAINS[cd] 'U'", colName]);
+        RLMAssertCount(cls, 0U, [NSString stringWithFormat:@"%@ CONTAINS[d] ''", colName]);
+        RLMAssertCount(cls, 0U, [NSString stringWithFormat:@"%@ CONTAINS[cd] ''", colName]);
 
-        RLMAssertCount(cls, 1U, @"%K CONTAINS 'ü'", colName);
-        RLMAssertCount(cls, 0U, @"%K CONTAINS[c] 'Ü'", colName);
-        RLMAssertCount(cls, 3U, @"%K CONTAINS[d] 'ü'", colName);
-        RLMAssertCount(cls, 3U, @"%K CONTAINS[cd] 'Ü'", colName);
+        RLMAssertCount(cls, 1U, [NSString stringWithFormat:@"%@ CONTAINS 'ü'", colName]);
+        RLMAssertCount(cls, 0U, [NSString stringWithFormat:@"%@ CONTAINS[c] 'Ü'", colName]);
+        RLMAssertCount(cls, 3U, [NSString stringWithFormat:@"%@ CONTAINS[d] 'ü'", colName]);
+        RLMAssertCount(cls, 3U, [NSString stringWithFormat:@"%@ CONTAINS[cd] 'Ü'", colName]);
 
-        RLMAssertCount(cls, 0U, @"%K CONTAINS NULL", colName);
-        RLMAssertCount(cls, 0U, @"%K CONTAINS[c] NULL", colName);
-        RLMAssertCount(cls, 0U, @"%K CONTAINS[d] NULL", colName);
-        RLMAssertCount(cls, 0U, @"%K CONTAINS[cd] NULL", colName);
+        RLMAssertCount(cls, 0U, [NSString stringWithFormat:@"%@ CONTAINS NULL", colName]);
+        RLMAssertCount(cls, 0U, [NSString stringWithFormat:@"%@ CONTAINS[c] NULL", colName]);
+        RLMAssertCount(cls, 0U, [NSString stringWithFormat:@"%@ CONTAINS[d] NULL", colName]);
+        RLMAssertCount(cls, 0U, [NSString stringWithFormat:@"%@ CONTAINS[cd] NULL", colName]);
 
-        RLMAssertCount(AllTypesObject, 0U, @"%K.%K CONTAINS 'd'", objectCol, colName);
-        RLMAssertCount(AllTypesObject, 1U, @"%K.%K CONTAINS 'c'", objectCol, colName);
-        RLMAssertCount(AllTypesObject, 0U, @"%K.%K CONTAINS 'C'", objectCol, colName);
-        RLMAssertCount(AllTypesObject, 0U, @"%K.%K CONTAINS ''", objectCol, colName);
-        RLMAssertCount(AllTypesObject, 1U, @"%K.%K CONTAINS[c] 'c'", objectCol, colName);
-        RLMAssertCount(AllTypesObject, 1U, @"%K.%K CONTAINS[c] 'C'", objectCol, colName);
-        RLMAssertCount(AllTypesObject, 0U, @"%K.%K CONTAINS[c] ''", objectCol, colName);
-        RLMAssertCount(AllTypesObject, 0U, @"%K.%K CONTAINS[d] ''", objectCol, colName);
-        RLMAssertCount(AllTypesObject, 0U, @"%K.%K CONTAINS[cd] ''", objectCol, colName);
+        RLMAssertCount(AllTypesObject, 0U, [NSString stringWithFormat:@"%@.%@ CONTAINS 'd'", objectCol, colName]);
+        RLMAssertCount(AllTypesObject, 1U, [NSString stringWithFormat:@"%@.%@ CONTAINS 'c'", objectCol, colName]);
+        RLMAssertCount(AllTypesObject, 0U, [NSString stringWithFormat:@"%@.%@ CONTAINS 'C'", objectCol, colName]);
+        RLMAssertCount(AllTypesObject, 0U, [NSString stringWithFormat:@"%@.%@ CONTAINS ''", objectCol, colName]);
+        RLMAssertCount(AllTypesObject, 1U, [NSString stringWithFormat:@"%@.%@ CONTAINS[c] 'c'", objectCol, colName]);
+        RLMAssertCount(AllTypesObject, 1U, [NSString stringWithFormat:@"%@.%@ CONTAINS[c] 'C'", objectCol, colName]);
+        RLMAssertCount(AllTypesObject, 0U, [NSString stringWithFormat:@"%@.%@ CONTAINS[c] ''", objectCol, colName]);
+        RLMAssertCount(AllTypesObject, 0U, [NSString stringWithFormat:@"%@.%@ CONTAINS[d] ''", objectCol, colName]);
+        RLMAssertCount(AllTypesObject, 0U, [NSString stringWithFormat:@"%@.%@ CONTAINS[cd] ''", objectCol, colName]);
 
-        RLMAssertCount(AllTypesObject, 0U, @"%K.%K CONTAINS NULL", objectCol, colName);
-        RLMAssertCount(AllTypesObject, 0U, @"%K.%K CONTAINS[c] NULL", objectCol, colName);
-        RLMAssertCount(AllTypesObject, 0U, @"%K.%K CONTAINS[d] NULL", objectCol, colName);
-        RLMAssertCount(AllTypesObject, 0U, @"%K.%K CONTAINS[cd] NULL", objectCol, colName);
+        RLMAssertCount(AllTypesObject, 0U, [NSString stringWithFormat:@"%@.%@ CONTAINS NULL", objectCol, colName]);
+        RLMAssertCount(AllTypesObject, 0U, [NSString stringWithFormat:@"%@.%@ CONTAINS[c] NULL", objectCol, colName]);
+        RLMAssertCount(AllTypesObject, 0U, [NSString stringWithFormat:@"%@.%@ CONTAINS[d] NULL", objectCol, colName]);
+        RLMAssertCount(AllTypesObject, 0U, [NSString stringWithFormat:@"%@.%@ CONTAINS[cd] NULL", objectCol, colName]);
     };
 
     testBlock(@"objectCol", @"stringCol", [StringObject class]);
@@ -1489,39 +1487,41 @@
     [realm commitWriteTransaction];
 
     void (^testBlock)(NSString *, NSString *, Class) = ^(NSString *objectCol, NSString *colName, Class cls) {
-        RLMAssertCount(cls, 1U, @"%K LIKE '*a*'", colName);
-        RLMAssertCount(cls, 1U, @"%K LIKE '*b*'", colName);
-        RLMAssertCount(cls, 1U, @"%K LIKE '*c'", colName);
-        RLMAssertCount(cls, 1U, @"%K LIKE 'ab*'", colName);
-        RLMAssertCount(cls, 1U, @"%K LIKE '*bc'", colName);
-        RLMAssertCount(cls, 1U, @"%K LIKE 'a*bc'", colName);
-        RLMAssertCount(cls, 1U, @"%K LIKE '*abc*'", colName);
-        RLMAssertCount(cls, 0U, @"%K LIKE '*d*'", colName);
-        RLMAssertCount(cls, 0U, @"%K LIKE 'aabc'", colName);
-        RLMAssertCount(cls, 0U, @"%K LIKE 'b*bc'", colName);
+        RLMAssertCount(cls, 1U, [NSString stringWithFormat:@"%@ LIKE '*a*'", colName]);
+        RLMAssertCount(cls, 1U, [NSString stringWithFormat:@"%@ LIKE '*b*'", colName]);
+        RLMAssertCount(cls, 1U, [NSString stringWithFormat:@"%@ LIKE '*c'", colName]);
+        RLMAssertCount(cls, 1U, [NSString stringWithFormat:@"%@ LIKE 'ab*'", colName]);
+        RLMAssertCount(cls, 1U, [NSString stringWithFormat:@"%@ LIKE '*bc'", colName]);
+        RLMAssertCount(cls, 1U, [NSString stringWithFormat:@"%@ LIKE 'a*bc'", colName]);
+        RLMAssertCount(cls, 1U, [NSString stringWithFormat:@"%@ LIKE '*abc*'", colName]);
+        RLMAssertCount(cls, 0U, [NSString stringWithFormat:@"%@ LIKE '*d*'", colName]);
+        RLMAssertCount(cls, 0U, [NSString stringWithFormat:@"%@ LIKE 'aabc'", colName]);
+        RLMAssertCount(cls, 0U, [NSString stringWithFormat:@"%@ LIKE 'b*bc'", colName]);
 
-        RLMAssertCount(cls, 1U, @"%K LIKE 'a?" "?'", colName);
-        RLMAssertCount(cls, 1U, @"%K LIKE '?b?'", colName);
-        RLMAssertCount(cls, 1U, @"%K LIKE '*?c'", colName);
-        RLMAssertCount(cls, 1U, @"%K LIKE 'ab?'", colName);
-        RLMAssertCount(cls, 1U, @"%K LIKE '?bc'", colName);
-        RLMAssertCount(cls, 0U, @"%K LIKE '?d?'", colName);
-        RLMAssertCount(cls, 0U, @"%K LIKE '?abc'", colName);
-        RLMAssertCount(cls, 0U, @"%K LIKE 'b?bc'", colName);
+        RLMAssertCount(cls, 1U, [NSString stringWithFormat:@"%@ LIKE 'a?" "?'", colName]);
+        RLMAssertCount(cls, 1U, [NSString stringWithFormat:@"%@ LIKE '?b?'", colName]);
+        RLMAssertCount(cls, 1U, [NSString stringWithFormat:@"%@ LIKE '*?c'", colName]);
+        RLMAssertCount(cls, 1U, [NSString stringWithFormat:@"%@ LIKE 'ab?'", colName]);
+        RLMAssertCount(cls, 1U, [NSString stringWithFormat:@"%@ LIKE '?bc'", colName]);
+        RLMAssertCount(cls, 0U, [NSString stringWithFormat:@"%@ LIKE '?d?'", colName]);
+        RLMAssertCount(cls, 0U, [NSString stringWithFormat:@"%@ LIKE '?abc'", colName]);
+        RLMAssertCount(cls, 0U, [NSString stringWithFormat:@"%@ LIKE 'b?bc'", colName]);
 
-        RLMAssertCount(cls, 0U, @"%K LIKE '*C*'", colName);
-        RLMAssertCount(cls, 1U, @"%K LIKE[c] '*c*'", colName);
-        RLMAssertCount(cls, 1U, @"%K LIKE[c] '*C*'", colName);
+        RLMAssertCount(cls, 0U, [NSString stringWithFormat:@"%@ LIKE '*C*'", colName]);
+        RLMAssertCount(cls, 1U, [NSString stringWithFormat:@"%@ LIKE[c] '*c*'", colName]);
+        RLMAssertCount(cls, 1U, [NSString stringWithFormat:@"%@ LIKE[c] '*C*'", colName]);
 
-        RLMAssertCount(AllTypesObject, 0U, @"%K.%K LIKE '*d*'", objectCol, colName);
-        RLMAssertCount(AllTypesObject, 1U, @"%K.%K LIKE '*c*'", objectCol, colName);
-        RLMAssertCount(AllTypesObject, 0U, @"%K.%K LIKE '*C*'", objectCol, colName);
-        RLMAssertCount(AllTypesObject, 1U, @"%K.%K LIKE[c] '*c*'", objectCol, colName);
-        RLMAssertCount(AllTypesObject, 1U, @"%K.%K LIKE[c] '*C*'", objectCol, colName);
+        RLMAssertCount(AllTypesObject, 0U, [NSString stringWithFormat:@"%@.%@ LIKE '*d*'", objectCol, colName]);
+        RLMAssertCount(AllTypesObject, 1U, [NSString stringWithFormat:@"%@.%@ LIKE '*c*'", objectCol, colName]);
+        RLMAssertCount(AllTypesObject, 0U, [NSString stringWithFormat:@"%@.%@ LIKE '*C*'", objectCol, colName]);
+        RLMAssertCount(AllTypesObject, 1U, [NSString stringWithFormat:@"%@.%@ LIKE[c] '*c*'", objectCol, colName]);
+        RLMAssertCount(AllTypesObject, 1U, [NSString stringWithFormat:@"%@.%@ LIKE[c] '*C*'", objectCol, colName]);
 
-        RLMAssertThrowsWithReasonMatching(([cls objectsWhere:@"%K LIKE[d] '*'", colName]),
+        NSString *queryStr = [NSString stringWithFormat:@"%@ LIKE[d] '*'", colName];
+        RLMAssertThrowsWithReasonMatching([cls objectsWhere:queryStr],
                                           @"'LIKE' not supported .* diacritic-insensitive");
-        RLMAssertThrowsWithReasonMatching(([cls objectsWhere:@"%K LIKE[cd] '*'", colName]),
+        queryStr = [NSString stringWithFormat:@"%@ LIKE[cd] '*'", colName];
+        RLMAssertThrowsWithReasonMatching([cls objectsWhere:queryStr],
                                           @"'LIKE' not supported .* diacritic-insensitive");
     };
 
@@ -1548,34 +1548,34 @@
     [realm commitWriteTransaction];
 
     void (^testBlock)(NSString *, NSString *, Class) = ^(NSString *objectCol, NSString *colName, Class cls) {
-        RLMAssertCount(cls, 1U, @"%K == 'abc'", colName);
-        RLMAssertCount(cls, 4U, @"%K != 'def'", colName);
-        RLMAssertCount(cls, 1U, @"%K ==[c] 'abc'", colName);
-        RLMAssertCount(cls, 1U, @"%K ==[c] 'ABC'", colName);
+        RLMAssertCount(cls, 1U, [NSString stringWithFormat:@"%@ == 'abc'", colName]);
+        RLMAssertCount(cls, 4U, [NSString stringWithFormat:@"%@ != 'def'", colName]);
+        RLMAssertCount(cls, 1U, [NSString stringWithFormat:@"%@ ==[c] 'abc'", colName]);
+        RLMAssertCount(cls, 1U, [NSString stringWithFormat:@"%@ ==[c] 'ABC'", colName]);
 
-        RLMAssertCount(cls, 3U, @"%K != 'abc'", colName);
-        RLMAssertCount(cls, 0U, @"%K == 'def'", colName);
-        RLMAssertCount(cls, 0U, @"%K == 'ABC'", colName);
+        RLMAssertCount(cls, 3U, [NSString stringWithFormat:@"%@ != 'abc'", colName]);
+        RLMAssertCount(cls, 0U, [NSString stringWithFormat:@"%@ == 'def'", colName]);
+        RLMAssertCount(cls, 0U, [NSString stringWithFormat:@"%@ == 'ABC'", colName]);
 
-        RLMAssertCount(cls, 1U, @"%K == 'tuv'", colName);
-        RLMAssertCount(cls, 1U, @"%K ==[c] 'TUV'", colName);
-        RLMAssertCount(cls, 3U, @"%K ==[d] 'tuv'", colName);
-        RLMAssertCount(cls, 3U, @"%K ==[cd] 'TUV'", colName);
+        RLMAssertCount(cls, 1U, [NSString stringWithFormat:@"%@ == 'tuv'", colName]);
+        RLMAssertCount(cls, 1U, [NSString stringWithFormat:@"%@ ==[c] 'TUV'", colName]);
+        RLMAssertCount(cls, 3U, [NSString stringWithFormat:@"%@ ==[d] 'tuv'", colName]);
+        RLMAssertCount(cls, 3U, [NSString stringWithFormat:@"%@ ==[cd] 'TUV'", colName]);
 
-        RLMAssertCount(cls, 3U, @"%K != 'tuv'", colName);
-        RLMAssertCount(cls, 3U, @"%K !=[c] 'TUV'", colName);
-        RLMAssertCount(cls, 1U, @"%K !=[d] 'tuv'", colName);
-        RLMAssertCount(cls, 1U, @"%K !=[cd] 'TUV'", colName);
+        RLMAssertCount(cls, 3U, [NSString stringWithFormat:@"%@ != 'tuv'", colName]);
+        RLMAssertCount(cls, 3U, [NSString stringWithFormat:@"%@ !=[c] 'TUV'", colName]);
+        RLMAssertCount(cls, 1U, [NSString stringWithFormat:@"%@ !=[d] 'tuv'", colName]);
+        RLMAssertCount(cls, 1U, [NSString stringWithFormat:@"%@ !=[cd] 'TUV'", colName]);
 
-        RLMAssertCount(AllTypesObject, 1U, @"%K.%K == 'abc'", objectCol, colName);
-        RLMAssertCount(AllTypesObject, 1U, @"%K.%K != 'def'", objectCol, colName);
+        RLMAssertCount(AllTypesObject, 1U, [NSString stringWithFormat:@"%@.%@ == 'abc'", objectCol, colName]);
+        RLMAssertCount(AllTypesObject, 1U, [NSString stringWithFormat:@"%@.%@ != 'def'", objectCol, colName]);
 
-        RLMAssertCount(AllTypesObject, 1U, @"%K.%K ==[c] 'abc'", objectCol, colName);
-        RLMAssertCount(AllTypesObject, 1U, @"%K.%K ==[c] 'ABC'", objectCol, colName);
+        RLMAssertCount(AllTypesObject, 1U, [NSString stringWithFormat:@"%@.%@ ==[c] 'abc'", objectCol, colName]);
+        RLMAssertCount(AllTypesObject, 1U, [NSString stringWithFormat:@"%@.%@ ==[c] 'ABC'", objectCol, colName]);
 
-        RLMAssertCount(AllTypesObject, 0U, @"%K.%K != 'abc'", objectCol, colName);
-        RLMAssertCount(AllTypesObject, 0U, @"%K.%K == 'def'", objectCol, colName);
-        RLMAssertCount(AllTypesObject, 0U, @"%K.%K == 'ABC'", objectCol, colName);
+        RLMAssertCount(AllTypesObject, 0U, [NSString stringWithFormat:@"%@.%@ != 'abc'", objectCol, colName]);
+        RLMAssertCount(AllTypesObject, 0U, [NSString stringWithFormat:@"%@.%@ == 'def'", objectCol, colName]);
+        RLMAssertCount(AllTypesObject, 0U, [NSString stringWithFormat:@"%@.%@ == 'ABC'", objectCol, colName]);
     };
 
     testBlock(@"objectCol", @"stringCol", [StringObject class]);
@@ -1917,9 +1917,9 @@
 
     ArrayPropertyObject *arrPropObj1 = [[ArrayPropertyObject alloc] init];
     arrPropObj1.name = @"Test";
-    for (NSUInteger i=0; i<10; i++) {
+    for(NSUInteger i=0; i<10; i++) {
         StringObject *sobj = [[StringObject alloc] init];
-        sobj.stringCol = @(i).stringValue;
+        sobj.stringCol = [NSString stringWithFormat:@"%lu", (unsigned long)i];
         [arrPropObj1.array addObject:sobj];
         IntObject *iobj = [[IntObject alloc] init];
         iobj.intCol = (int)i;
@@ -1937,9 +1937,9 @@
 
     ArrayPropertyObject *arrPropObj2 = [[ArrayPropertyObject alloc] init];
     arrPropObj2.name = @"Test";
-    for (NSUInteger i=0; i<4; i++) {
+    for(NSUInteger i=0; i<4; i++) {
         StringObject *sobj = [[StringObject alloc] init];
-        sobj.stringCol = @(i).stringValue;
+        sobj.stringCol = [NSString stringWithFormat:@"%lu", (unsigned long)i];
         [arrPropObj2.array addObject:sobj];
         IntObject *iobj = [[IntObject alloc] init];
         iobj.intCol = (int)i;
@@ -1961,9 +1961,9 @@
 
     SetPropertyObject *setPropObj1 = [[SetPropertyObject alloc] init];
     setPropObj1.name = @"Test";
-    for (NSUInteger i=0; i<10; i++) {
+    for(NSUInteger i=0; i<10; i++) {
         StringObject *sobj = [[StringObject alloc] init];
-        sobj.stringCol = @(i).stringValue;
+        sobj.stringCol = [NSString stringWithFormat:@"%lu", (unsigned long)i];
         [setPropObj1.set addObject:sobj];
         IntObject *iobj = [[IntObject alloc] init];
         iobj.intCol = (int)i;
@@ -1982,9 +1982,9 @@
 
     SetPropertyObject *setPropObj2 = [[SetPropertyObject alloc] init];
     setPropObj2.name = @"Test";
-    for (NSUInteger i=0; i<4; i++) {
+    for(NSUInteger i=0; i<4; i++) {
         StringObject *sobj = [[StringObject alloc] init];
-        sobj.stringCol = @(i).stringValue;
+        sobj.stringCol = [NSString stringWithFormat:@"%lu", (unsigned long)i];
         [setPropObj2.set addObject:sobj];
         IntObject *iobj = [[IntObject alloc] init];
         iobj.intCol = (int)i;
@@ -2004,9 +2004,9 @@
     RLMRealm *realm = [self realm];
 
     DictionaryPropertyObject *dpo1 = [[DictionaryPropertyObject alloc] init];
-    for (NSUInteger i=0; i<10; i++) {
+    for(NSUInteger i=0; i<10; i++) {
         StringObject *sobj = [[StringObject alloc] init];
-        sobj.stringCol = @(i).stringValue;
+        sobj.stringCol = [NSString stringWithFormat:@"%lu", (unsigned long)i];
         dpo1.stringDictionary[sobj.stringCol] = sobj;
         IntObject *iobj = [[IntObject alloc] init];
         iobj.intCol = (int)i;
@@ -2023,9 +2023,9 @@
     RLMAssertCount(DictionaryPropertyObject, 1U, @"NONE intObjDictionary.intCol > 10");
 
     DictionaryPropertyObject *dpo2 = [[DictionaryPropertyObject alloc] init];
-    for (NSUInteger i=0; i<4; i++) {
+    for(NSUInteger i=0; i<4; i++) {
         StringObject *sobj = [[StringObject alloc] init];
-        sobj.stringCol = @(i).stringValue;
+        sobj.stringCol = [NSString stringWithFormat:@"%lu", (unsigned long)i];
         dpo2.stringDictionary[sobj.stringCol] = sobj;
         IntObject *iobj = [[IntObject alloc] init];
         iobj.intCol = (int)i;
@@ -2048,7 +2048,7 @@
     [realm beginWriteTransaction];
     CircleObject *circle = nil;
     for (int i = 0; i < 5; ++i) {
-        circle = [CircleObject createInRealm:realm withValue:@{@"data": @(i).stringValue,
+        circle = [CircleObject createInRealm:realm withValue:@{@"data": [NSString stringWithFormat:@"%d", i],
                                                                 @"next": circle ?: NSNull.null}];
     }
     [realm commitWriteTransaction];
@@ -2075,7 +2075,7 @@
     [realm beginWriteTransaction];
     CircleObject *circle = nil;
     for (int i = 0; i < 5; ++i) {
-        circle = [CircleObject createInRealm:realm withValue:@{@"data": @(i).stringValue,
+        circle = [CircleObject createInRealm:realm withValue:@{@"data": [NSString stringWithFormat:@"%d", i],
                                                                 @"next": circle ?: NSNull.null}];
     }
     [CircleArrayObject createInRealm:realm withValue:@[[CircleObject allObjectsInRealm:realm]]];
@@ -2107,7 +2107,7 @@
     [realm beginWriteTransaction];
     CircleObject *circle = nil;
     for (int i = 0; i < 5; ++i) {
-        circle = [CircleObject createInRealm:realm withValue:@{@"data": @(i).stringValue,
+        circle = [CircleObject createInRealm:realm withValue:@{@"data": [NSString stringWithFormat:@"%d", i],
                                                                 @"next": circle ?: NSNull.null}];
     }
     [CircleSetObject createInRealm:realm withValue:@[[CircleObject allObjectsInRealm:realm]]];
@@ -2138,7 +2138,7 @@
     [realm beginWriteTransaction];
     CircleObject *circle = nil;
     for (int i = 0; i < 5; ++i) {
-        circle = [CircleObject createInRealm:realm withValue:@{@"data": @(i).stringValue,
+        circle = [CircleObject createInRealm:realm withValue:@{@"data": [NSString stringWithFormat:@"%d", i],
                                                                 @"next": circle ?: NSNull.null}];
     }
     CircleDictionaryObject *cdo = [CircleDictionaryObject createInRealm:realm withValue:@{}];
@@ -3139,12 +3139,12 @@ static NSData *data(const char *str) {
     RLMAssertThrowsWithReasonMatching(([IntegerArrayPropertyObject objectsWhere:@"array.@count == array.@count"]),
                                       @"aggregate operations cannot be compared with other aggregate operations");
 
-    RLMAssertThrowsWithReason(([IntegerArrayPropertyObject objectsWhere:@"array.@count.foo.bar != 0"]),
-                              @"Invalid keypath 'array.@count.foo.bar': @count must appear at the end of a keypath.");
-    RLMAssertThrowsWithReason(([IntegerArrayPropertyObject objectsWhere:@"array.@count.intCol > 0"]),
-                              @"Invalid keypath 'array.@count.intCol': @count must appear at the end of a keypath.");
-    RLMAssertThrowsWithReason(([IntegerArrayPropertyObject objectsWhere:@"array.@count != 'Hello'"]),
-                              @"@count can only be compared with a numeric value");
+    RLMAssertThrowsWithReasonMatching(([IntegerArrayPropertyObject objectsWhere:@"array.@count.foo.bar != 0"]),
+                                      @"single level key");
+    RLMAssertThrowsWithReasonMatching(([IntegerArrayPropertyObject objectsWhere:@"array.@count.intCol > 0"]),
+                                      @"@count does not have any properties");
+    RLMAssertThrowsWithReasonMatching(([IntegerArrayPropertyObject objectsWhere:@"array.@count != 'Hello'"]),
+                                      @"@count can only be compared with a numeric value");
 }
 
 - (void)testCountOnSetCollection {
@@ -3175,15 +3175,15 @@ static NSData *data(const char *str) {
     RLMAssertCount(IntegerSetPropertyObject, 1U, @"number < set.@count");
 
     // We do not yet handle collection operations on both sides of the comparison.
-    RLMAssertThrowsWithReason(([IntegerSetPropertyObject objectsWhere:@"set.@count == set.@count"]),
-                              @"aggregate operations cannot be compared with other aggregate operations");
+    RLMAssertThrowsWithReasonMatching(([IntegerSetPropertyObject objectsWhere:@"set.@count == set.@count"]),
+                                      @"aggregate operations cannot be compared with other aggregate operations");
 
-    RLMAssertThrowsWithReason(([IntegerSetPropertyObject objectsWhere:@"set.@count.foo.bar != 0"]),
-                              @"Invalid keypath 'set.@count.foo.bar': @count must appear at the end of a keypath.");
-    RLMAssertThrowsWithReason(([IntegerSetPropertyObject objectsWhere:@"set.@count.intCol > 0"]),
-                              @"Invalid keypath 'set.@count.intCol': @count must appear at the end of a keypath.");
-    RLMAssertThrowsWithReason(([IntegerSetPropertyObject objectsWhere:@"set.@count != 'Hello'"]),
-                              @"@count can only be compared with a numeric value");
+    RLMAssertThrowsWithReasonMatching(([IntegerSetPropertyObject objectsWhere:@"set.@count.foo.bar != 0"]),
+                                      @"single level key");
+    RLMAssertThrowsWithReasonMatching(([IntegerSetPropertyObject objectsWhere:@"set.@count.intCol > 0"]),
+                                      @"@count does not have any properties");
+    RLMAssertThrowsWithReasonMatching(([IntegerSetPropertyObject objectsWhere:@"set.@count != 'Hello'"]),
+                                      @"@count can only be compared with a numeric value");
 }
 
 - (void)testCountOnDictionaryCollection {
@@ -3214,15 +3214,15 @@ static NSData *data(const char *str) {
     RLMAssertCount(IntegerDictionaryPropertyObject, 1U, @"number < dictionary.@count");
 
     // We do not yet handle collection operations on both sides of the comparison.
-    RLMAssertThrowsWithReason(([IntegerDictionaryPropertyObject objectsWhere:@"dictionary.@count == dictionary.@count"]),
-                              @"aggregate operations cannot be compared with other aggregate operations");
+    RLMAssertThrowsWithReasonMatching(([IntegerDictionaryPropertyObject objectsWhere:@"dictionary.@count == dictionary.@count"]),
+                                      @"aggregate operations cannot be compared with other aggregate operations");
 
-    RLMAssertThrowsWithReason(([IntegerDictionaryPropertyObject objectsWhere:@"dictionary.@count.foo.bar != 0"]),
-                              @"Invalid keypath 'dictionary.@count.foo.bar': @count must appear at the end of a keypath.");
-    RLMAssertThrowsWithReason(([IntegerDictionaryPropertyObject objectsWhere:@"dictionary.@count.intCol > 0"]),
-                              @"Invalid keypath 'dictionary.@count.intCol': @count must appear at the end of a keypath.");
-    RLMAssertThrowsWithReason(([IntegerDictionaryPropertyObject objectsWhere:@"dictionary.@count != 'Hello'"]),
-                              @"@count can only be compared with a numeric value");
+    RLMAssertThrowsWithReasonMatching(([IntegerDictionaryPropertyObject objectsWhere:@"dictionary.@count.foo.bar != 0"]),
+                                      @"single level key");
+    RLMAssertThrowsWithReasonMatching(([IntegerDictionaryPropertyObject objectsWhere:@"dictionary.@count.intCol > 0"]),
+                                      @"@count does not have any properties");
+    RLMAssertThrowsWithReasonMatching(([IntegerDictionaryPropertyObject objectsWhere:@"dictionary.@count != 'Hello'"]),
+                                      @"@count can only be compared with a numeric value");
 }
 
 - (void)testAggregateArrayCollectionOperators {
@@ -3273,25 +3273,17 @@ static NSData *data(const char *str) {
     RLMAssertCount(IntegerArrayPropertyObject, 2U, @"number > array.@avg.intCol");
 
     // We do not yet handle collection operations on both sides of the comparison.
-    RLMAssertThrowsWithReason(([IntegerArrayPropertyObject objectsWhere:@"array.@min.intCol == array.@min.intCol"]),
-                              @"aggregate operations cannot be compared with other aggregate operations");
+    RLMAssertThrowsWithReasonMatching(([IntegerArrayPropertyObject objectsWhere:@"array.@min.intCol == array.@min.intCol"]), @"aggregate operations cannot be compared with other aggregate operations");
 
-    RLMAssertThrowsWithReason(([IntegerArrayPropertyObject objectsWhere:@"array.@min.intCol.foo.bar == 1.23"]),
-                              @"Invalid keypath 'array.@min.intCol.foo.bar': Property 'IntObject.intCol' is not a link or collection and can only appear at the end of a keypath.");
-    RLMAssertThrowsWithReason(([IntegerArrayPropertyObject objectsWhere:@"array.@max.intCol.foo.bar == 1.23"]),
-                              @"Invalid keypath 'array.@max.intCol.foo.bar': Property 'IntObject.intCol' is not a link or collection and can only appear at the end of a keypath.");
-    RLMAssertThrowsWithReason(([IntegerArrayPropertyObject objectsWhere:@"array.@sum.intCol.foo.bar == 1.23"]),
-                              @"Invalid keypath 'array.@sum.intCol.foo.bar': Property 'IntObject.intCol' is not a link or collection and can only appear at the end of a keypath.");
-    RLMAssertThrowsWithReason(([IntegerArrayPropertyObject objectsWhere:@"array.@avg.intCol.foo.bar == 1.23"]),
-                              @"Invalid keypath 'array.@avg.intCol.foo.bar': Property 'IntObject.intCol' is not a link or collection and can only appear at the end of a keypath.");
+    RLMAssertThrowsWithReasonMatching(([IntegerArrayPropertyObject objectsWhere:@"array.@min.intCol.foo.bar == 1.23"]), @"single level key");
+    RLMAssertThrowsWithReasonMatching(([IntegerArrayPropertyObject objectsWhere:@"array.@max.intCol.foo.bar == 1.23"]), @"single level key");
+    RLMAssertThrowsWithReasonMatching(([IntegerArrayPropertyObject objectsWhere:@"array.@sum.intCol.foo.bar == 1.23"]), @"single level key");
+    RLMAssertThrowsWithReasonMatching(([IntegerArrayPropertyObject objectsWhere:@"array.@avg.intCol.foo.bar == 1.23"]), @"single level key");
 
     // Average is omitted from this test as its result is always a double.
-    RLMAssertThrowsWithReasonMatching(([IntegerArrayPropertyObject objectsWhere:@"array.@min.intCol == 1.23"]),
-                                      @"@min.*type int cannot be compared");
-    RLMAssertThrowsWithReasonMatching(([IntegerArrayPropertyObject objectsWhere:@"array.@max.intCol == 1.23"]),
-                                      @"@max.*type int cannot be compared");
-    RLMAssertThrowsWithReasonMatching(([IntegerArrayPropertyObject objectsWhere:@"array.@sum.intCol == 1.23"]),
-                                      @"@sum.*type int cannot be compared");
+    RLMAssertThrowsWithReasonMatching(([IntegerArrayPropertyObject objectsWhere:@"array.@min.intCol == 1.23"]), @"@min.*type int cannot be compared");
+    RLMAssertThrowsWithReasonMatching(([IntegerArrayPropertyObject objectsWhere:@"array.@max.intCol == 1.23"]), @"@max.*type int cannot be compared");
+    RLMAssertThrowsWithReasonMatching(([IntegerArrayPropertyObject objectsWhere:@"array.@sum.intCol == 1.23"]), @"@sum.*type int cannot be compared");
 }
 
 - (void)testAggregateSetCollectionOperators {
@@ -3342,25 +3334,17 @@ static NSData *data(const char *str) {
     RLMAssertCount(IntegerSetPropertyObject, 2U, @"number > set.@avg.intCol");
 
     // We do not yet handle collection operations on both sides of the comparison.
-    RLMAssertThrowsWithReason(([IntegerSetPropertyObject objectsWhere:@"set.@min.intCol == set.@min.intCol"]),
-                              @"aggregate operations cannot be compared with other aggregate operations");
+    RLMAssertThrowsWithReasonMatching(([IntegerSetPropertyObject objectsWhere:@"set.@min.intCol == set.@min.intCol"]), @"aggregate operations cannot be compared with other aggregate operations");
 
-    RLMAssertThrowsWithReason(([IntegerSetPropertyObject objectsWhere:@"set.@min.intCol.foo.bar == 1.23"]),
-                              @"Invalid keypath 'set.@min.intCol.foo.bar': Property 'IntObject.intCol' is not a link or collection and can only appear at the end of a keypath.");
-    RLMAssertThrowsWithReason(([IntegerSetPropertyObject objectsWhere:@"set.@max.intCol.foo.bar == 1.23"]),
-                              @"Invalid keypath 'set.@max.intCol.foo.bar': Property 'IntObject.intCol' is not a link or collection and can only appear at the end of a keypath.");
-    RLMAssertThrowsWithReason(([IntegerSetPropertyObject objectsWhere:@"set.@sum.intCol.foo.bar == 1.23"]),
-                              @"Invalid keypath 'set.@sum.intCol.foo.bar': Property 'IntObject.intCol' is not a link or collection and can only appear at the end of a keypath.");
-    RLMAssertThrowsWithReason(([IntegerSetPropertyObject objectsWhere:@"set.@avg.intCol.foo.bar == 1.23"]),
-                              @"Invalid keypath 'set.@avg.intCol.foo.bar': Property 'IntObject.intCol' is not a link or collection and can only appear at the end of a keypath.");
+    RLMAssertThrowsWithReasonMatching(([IntegerSetPropertyObject objectsWhere:@"set.@min.intCol.foo.bar == 1.23"]), @"single level key");
+    RLMAssertThrowsWithReasonMatching(([IntegerSetPropertyObject objectsWhere:@"set.@max.intCol.foo.bar == 1.23"]), @"single level key");
+    RLMAssertThrowsWithReasonMatching(([IntegerSetPropertyObject objectsWhere:@"set.@sum.intCol.foo.bar == 1.23"]), @"single level key");
+    RLMAssertThrowsWithReasonMatching(([IntegerSetPropertyObject objectsWhere:@"set.@avg.intCol.foo.bar == 1.23"]), @"single level key");
 
     // Average is omitted from this test as its result is always a double.
-    RLMAssertThrowsWithReasonMatching(([IntegerSetPropertyObject objectsWhere:@"set.@min.intCol == 1.23"]),
-                                      @"@min.*type int cannot be compared");
-    RLMAssertThrowsWithReasonMatching(([IntegerSetPropertyObject objectsWhere:@"set.@max.intCol == 1.23"]),
-                                      @"@max.*type int cannot be compared");
-    RLMAssertThrowsWithReasonMatching(([IntegerSetPropertyObject objectsWhere:@"set.@sum.intCol == 1.23"]),
-                                      @"@sum.*type int cannot be compared");
+    RLMAssertThrowsWithReasonMatching(([IntegerSetPropertyObject objectsWhere:@"set.@min.intCol == 1.23"]), @"@min.*type int cannot be compared");
+    RLMAssertThrowsWithReasonMatching(([IntegerSetPropertyObject objectsWhere:@"set.@max.intCol == 1.23"]), @"@max.*type int cannot be compared");
+    RLMAssertThrowsWithReasonMatching(([IntegerSetPropertyObject objectsWhere:@"set.@sum.intCol == 1.23"]), @"@sum.*type int cannot be compared");
 }
 
 - (void)testAggregateDictionaryCollectionOperators {
@@ -3411,17 +3395,12 @@ static NSData *data(const char *str) {
     RLMAssertCount(IntegerDictionaryPropertyObject, 2U, @"number > dictionary.@avg.intCol");
 
     // We do not yet handle collection operations on both sides of the comparison.
-    RLMAssertThrowsWithReason(([IntegerDictionaryPropertyObject objectsWhere:@"dictionary.@min.intCol == dictionary.@min.intCol"]),
-                              @"aggregate operations cannot be compared with other aggregate operations");
+    RLMAssertThrowsWithReasonMatching(([IntegerDictionaryPropertyObject objectsWhere:@"dictionary.@min.intCol == dictionary.@min.intCol"]), @"aggregate operations cannot be compared with other aggregate operations");
 
-    RLMAssertThrowsWithReason(([IntegerDictionaryPropertyObject objectsWhere:@"dictionary.@min.intCol.foo.bar == 1.23"]),
-                              @"Invalid keypath 'dictionary.@min.intCol.foo.bar': Property 'IntObject.intCol' is not a link or collection and can only appear at the end of a keypath.");
-    RLMAssertThrowsWithReason(([IntegerDictionaryPropertyObject objectsWhere:@"dictionary.@max.intCol.foo.bar == 1.23"]),
-                              @"Invalid keypath 'dictionary.@max.intCol.foo.bar': Property 'IntObject.intCol' is not a link or collection and can only appear at the end of a keypath.");
-    RLMAssertThrowsWithReason(([IntegerDictionaryPropertyObject objectsWhere:@"dictionary.@sum.intCol.foo.bar == 1.23"]),
-                              @"Invalid keypath 'dictionary.@sum.intCol.foo.bar': Property 'IntObject.intCol' is not a link or collection and can only appear at the end of a keypath.");
-    RLMAssertThrowsWithReason(([IntegerDictionaryPropertyObject objectsWhere:@"dictionary.@avg.intCol.foo.bar == 1.23"]),
-                              @"Invalid keypath 'dictionary.@avg.intCol.foo.bar': Property 'IntObject.intCol' is not a link or collection and can only appear at the end of a keypath.");
+    RLMAssertThrowsWithReasonMatching(([IntegerDictionaryPropertyObject objectsWhere:@"dictionary.@min.intCol.foo.bar == 1.23"]), @"single level key");
+    RLMAssertThrowsWithReasonMatching(([IntegerDictionaryPropertyObject objectsWhere:@"dictionary.@max.intCol.foo.bar == 1.23"]), @"single level key");
+    RLMAssertThrowsWithReasonMatching(([IntegerDictionaryPropertyObject objectsWhere:@"dictionary.@sum.intCol.foo.bar == 1.23"]), @"single level key");
+    RLMAssertThrowsWithReasonMatching(([IntegerDictionaryPropertyObject objectsWhere:@"dictionary.@avg.intCol.foo.bar == 1.23"]), @"single level key");
 
     // Average is omitted from this test as its result is always a double.
     RLMAssertThrowsWithReasonMatching(([IntegerDictionaryPropertyObject objectsWhere:@"dictionary.@min.intCol == 1.23"]), @"@min.*type int cannot be compared");
@@ -3443,41 +3422,40 @@ static NSData *data(const char *str) {
         [AllDictionariesObject createInRealm:realm withValue:@{property: @{@"lock1": value}}];
         [realm commitWriteTransaction];
 
-        RLMAssertCount(AllDictionariesObject, 0U, @"ANY %K.@allKeys = 'key'", property);
-        RLMAssertCount(AllDictionariesObject, 2U, @"ANY %K.@allKeys = 'key1'", property);
-        RLMAssertCount(AllDictionariesObject, 1U, @"ANY %K.@allKeys = 'key3'", property);
-        RLMAssertCount(AllDictionariesObject, 7U, @"ANY %K.@allKeys != 'key3'", property);
-        RLMAssertCount(AllDictionariesObject, 2U, @"ANY %K.@allKeys =[c] 'key3'", property);
-        RLMAssertCount(AllDictionariesObject, 6U, @"ANY %K.@allKeys !=[c] 'key3'", property);
-        RLMAssertCount(AllDictionariesObject, 2U, @"ANY %K.@allKeys =[cd] 'key3'", property);
-        RLMAssertCount(AllDictionariesObject, 6U, @"ANY %K.@allKeys !=[cd] 'key3'", property);
-        RLMAssertCount(AllDictionariesObject, 2U, @"NOT ANY %K.@allKeys !=[cd] 'key3'", property);
+        RLMAssertCount(AllDictionariesObject, 0U, [NSString stringWithFormat:@"%@.@allKeys = 'key'", property]);
+        RLMAssertCount(AllDictionariesObject, 2U, [NSString stringWithFormat:@"%@.@allKeys = 'key1'", property]);
+        RLMAssertCount(AllDictionariesObject, 1U, [NSString stringWithFormat:@"ANY %@.@allKeys = 'key3'", property]);
+        RLMAssertCount(AllDictionariesObject, 7U, [NSString stringWithFormat:@"ANY %@.@allKeys != 'key3'", property]);
+        RLMAssertCount(AllDictionariesObject, 2U, [NSString stringWithFormat:@"ANY %@.@allKeys =[c] 'key3'", property]);
+        RLMAssertCount(AllDictionariesObject, 6U, [NSString stringWithFormat:@"ANY %@.@allKeys !=[c] 'key3'", property]);
+        RLMAssertCount(AllDictionariesObject, 2U, [NSString stringWithFormat:@"ANY %@.@allKeys =[cd] 'key3'", property]);
+        RLMAssertCount(AllDictionariesObject, 6U, [NSString stringWithFormat:@"ANY %@.@allKeys !=[cd] 'key3'", property]);
+        RLMAssertCount(AllDictionariesObject, 2U, [NSString stringWithFormat:@"NOT %@.@allKeys !=[cd] 'key3'", property]);
         // BEGINSWITH
-        RLMAssertCount(AllDictionariesObject, 4U, @"ANY %K.@allKeys BEGINSWITH 'ke'", property);
-        RLMAssertCount(AllDictionariesObject, 4U, @"NOT ANY %K.@allKeys BEGINSWITH 'ke'", property);
-        RLMAssertCount(AllDictionariesObject, 6U, @"ANY %K.@allKeys BEGINSWITH[c] 'ke'", property);
-        RLMAssertCount(AllDictionariesObject, 7U, @"ANY %K.@allKeys BEGINSWITH[cd] 'ke'", property);
-        RLMAssertCount(AllDictionariesObject, 0U, @"ANY %K.@allKeys BEGINSWITH NULL", property);
+        RLMAssertCount(AllDictionariesObject, 4U, [NSString stringWithFormat:@"%@.@allKeys BEGINSWITH 'ke'", property]);
+        RLMAssertCount(AllDictionariesObject, 4U, [NSString stringWithFormat:@"NOT %@.@allKeys BEGINSWITH 'ke'", property]);
+        RLMAssertCount(AllDictionariesObject, 6U, [NSString stringWithFormat:@"%@.@allKeys BEGINSWITH[c] 'ke'", property]);
+        RLMAssertCount(AllDictionariesObject, 7U, [NSString stringWithFormat:@"%@.@allKeys BEGINSWITH[cd] 'ke'", property]);
+        RLMAssertCount(AllDictionariesObject, 0U, [NSString stringWithFormat:@"%@.@allKeys BEGINSWITH NULL", property]);
         // CONTAINS
-        RLMAssertCount(AllDictionariesObject, 4U, @"ANY %K.@allKeys CONTAINS 'ey'", property);
-        RLMAssertCount(AllDictionariesObject, 6U, @"ANY %K.@allKeys CONTAINS[c] 'ey'", property);
-        RLMAssertCount(AllDictionariesObject, 7U, @"ANY %K.@allKeys CONTAINS[cd] 'ey'", property);
-        RLMAssertCount(AllDictionariesObject, 0U, @"ANY %K.@allKeys CONTAINS NULL", property);
+        RLMAssertCount(AllDictionariesObject, 4U, [NSString stringWithFormat:@"%@.@allKeys CONTAINS 'ey'", property]);
+        RLMAssertCount(AllDictionariesObject, 6U, [NSString stringWithFormat:@"%@.@allKeys CONTAINS[c] 'ey'", property]);
+        RLMAssertCount(AllDictionariesObject, 7U, [NSString stringWithFormat:@"%@.@allKeys CONTAINS[cd] 'ey'", property]);
+        RLMAssertCount(AllDictionariesObject, 0U, [NSString stringWithFormat:@"%@.@allKeys CONTAINS NULL", property]);
         // ENDSWITH
-        RLMAssertCount(AllDictionariesObject, 1U, @"ANY %K.@allKeys ENDSWITH 'y2'", property);
-        RLMAssertCount(AllDictionariesObject, 2U, @"ANY %K.@allKeys ENDSWITH[c] 'y2'", property);
-        RLMAssertCount(AllDictionariesObject, 3U, @"ANY %K.@allKeys ENDSWITH[cd] 'y2'", property);
-        RLMAssertCount(AllDictionariesObject, 0U, @"ANY %K.@allKeys ENDSWITH NULL", property);
+        RLMAssertCount(AllDictionariesObject, 1U, [NSString stringWithFormat:@"%@.@allKeys ENDSWITH 'y2'", property]);
+        RLMAssertCount(AllDictionariesObject, 2U, [NSString stringWithFormat:@"%@.@allKeys ENDSWITH[c] 'y2'", property]);
+        RLMAssertCount(AllDictionariesObject, 3U, [NSString stringWithFormat:@"%@.@allKeys ENDSWITH[cd] 'y2'", property]);
+        RLMAssertCount(AllDictionariesObject, 0U, [NSString stringWithFormat:@"%@.@allKeys ENDSWITH NULL", property]);
         // LIKE
-        RLMAssertCount(AllDictionariesObject, 4U, @"ANY %K.@allKeys LIKE 'key*'", property);
-        RLMAssertCount(AllDictionariesObject, 6U, @"ANY %K.@allKeys LIKE[c] 'key*'", property);
-        RLMAssertCount(AllDictionariesObject, 0U, @"ANY %K.@allKeys LIKE NULL", property);
-        RLMAssertCount(AllDictionariesObject, 4U, @"NOT ANY %K.@allKeys LIKE 'key*'", property);
-        RLMAssertCount(AllDictionariesObject, 2U, @"NOT ANY %K.@allKeys LIKE[c] 'key*'", property);
-        RLMAssertCount(AllDictionariesObject, 8U, @"NOT ANY %K.@allKeys LIKE NULL", property);
-        RLMAssertThrowsWithReason(([AllDictionariesObject objectsInRealm:realm where:@"ANY %K.@allKeys LIKE[cd] 'key*'", property]),
-                                          @"Operator 'LIKE' not supported with diacritic-insensitive modifier.");
-
+        RLMAssertCount(AllDictionariesObject, 4U, [NSString stringWithFormat:@"%@.@allKeys LIKE 'key*'", property]);
+        RLMAssertCount(AllDictionariesObject, 6U, [NSString stringWithFormat:@"%@.@allKeys LIKE[c] 'key*'", property]);
+        RLMAssertCount(AllDictionariesObject, 0U, [NSString stringWithFormat:@"%@.@allKeys LIKE NULL", property]);
+        RLMAssertCount(AllDictionariesObject, 4U, [NSString stringWithFormat:@"NOT %@.@allKeys LIKE 'key*'", property]);
+        RLMAssertCount(AllDictionariesObject, 2U, [NSString stringWithFormat:@"NOT %@.@allKeys LIKE[c] 'key*'", property]);
+        RLMAssertCount(AllDictionariesObject, 8U, [NSString stringWithFormat:@"NOT %@.@allKeys LIKE NULL", property]);
+        RLMAssertThrowsWithReasonMatching(([realm objects:@"AllDictionariesObject" where:[NSString stringWithFormat:@"%@.@allKeys LIKE[cd] 'key*'", property]]), @"not supported");
+        
         [realm beginWriteTransaction];
         [realm deleteAllObjects];
         [realm commitWriteTransaction];
@@ -3496,176 +3474,182 @@ static NSData *data(const char *str) {
 }
 
 - (void)testDictionaryQueryAllValues_RLMObject {
-    NSString *property = @"stringObjDict";
-    NSArray *values = @[[[StringObject alloc] initWithValue:@[@"hello"]],
-                        [[StringObject alloc] initWithValue:@[@"Héllo"]],
-                        [[StringObject alloc] initWithValue:@[@"HELLO"]]];
+    void (^testObject)(NSString *, NSArray *) = ^(NSString *property, NSArray *values) {
+        RLMRealm *realm = [self realm];
+        [realm beginWriteTransaction];
+        [AllDictionariesObject createInRealm:realm withValue:@{property: @{@"aKey": values[0]}}];
+        [AllDictionariesObject createInRealm:realm withValue:@{property: @{@"aKey2": values[1]}}];
+        [AllDictionariesObject createInRealm:realm withValue:@{property: @{@"aKey3": values[2]}}];
+        [realm commitWriteTransaction];
 
-    RLMRealm *realm = [self realm];
-    [realm beginWriteTransaction];
-    [AllDictionariesObject createInRealm:realm withValue:@{property: @{@"aKey": values[0]}}];
-    [AllDictionariesObject createInRealm:realm withValue:@{property: @{@"aKey2": values[1]}}];
-    [AllDictionariesObject createInRealm:realm withValue:@{property: @{@"aKey3": values[2]}}];
-    [realm commitWriteTransaction];
+        StringObject *obj = [[StringObject objectsInRealm:realm where:@"stringCol = %@", [values[0] stringCol]] firstObject];
+        RLMAssertCount(AllDictionariesObject, 1U, @"ANY %K.@allValues = %@", property, obj);
+        RLMAssertCount(AllDictionariesObject, 2U, @"ANY %K.@allValues != %@", property, obj);
 
-    StringObject *obj = [[StringObject objectsInRealm:realm where:@"stringCol = %@", [values[0] stringCol]] firstObject];
-    RLMAssertCount(AllDictionariesObject, 1U, @"ANY %K.@allValues = %@", property, obj);
-    RLMAssertCount(AllDictionariesObject, 2U, @"ANY %K.@allValues != %@", property, obj);
-    RLMAssertCount(AllDictionariesObject, 1U, @"ANY %K.@allValues IN %@", property, @[obj]);
-    RLMAssertCount(AllDictionariesObject, 0U, @"ANY %K.@allValues IN %@", property, @[]);
+        RLMAssertThrowsWithReasonMatching(([realm objects:@"AllDictionariesObject" where:[NSString stringWithFormat:@"%@.@allValues IN %@", property, @[obj]]]), @"not supported");
+        RLMAssertThrowsWithReasonMatching(([realm objects:@"AllDictionariesObject" where:[NSString stringWithFormat:@"%@.@allValues BETWEEN %@", property, @[obj]]]), @"not supported");
+        RLMAssertThrowsWithReasonMatching(([realm objects:@"AllDictionariesObject" where:[NSString stringWithFormat:@"%@.@allValues BEGINSWITH 'he'", property]]), @"not supported");
+        RLMAssertThrowsWithReasonMatching(([realm objects:@"AllDictionariesObject" where:[NSString stringWithFormat:@"%@.@allValues CONTAINS 'el'", property]]), @"not supported");
+        RLMAssertThrowsWithReasonMatching(([realm objects:@"AllDictionariesObject" where:[NSString stringWithFormat:@"%@.@allValues ENDSWITH 'lo'", property]]), @"not supported");
+        RLMAssertThrowsWithReasonMatching(([realm objects:@"AllDictionariesObject" where:[NSString stringWithFormat:@"%@.@allValues LIKE 'hel*'", property]]), @"not supported");
+        [realm beginWriteTransaction];
+        [realm deleteAllObjects];
+        [realm commitWriteTransaction];
+    };
 
-    RLMAssertCount(AllDictionariesObject, 1U, @"ANY %K.stringCol = %@", property, obj.stringCol);
-    RLMAssertCount(AllDictionariesObject, 2U, @"ANY %K.stringCol != %@", property, obj.stringCol);
-    RLMAssertCount(AllDictionariesObject, 1U, @"ANY %K.stringCol BEGINSWITH %@", property, @"h");
-    RLMAssertCount(AllDictionariesObject, 3U, @"ANY %K.stringCol BEGINSWITH[c] %@", property, @"h");
-    RLMAssertCount(AllDictionariesObject, 2U, @"ANY %K.stringCol BEGINSWITH[c] %@", property, @"he");
-    RLMAssertCount(AllDictionariesObject, 3U, @"ANY %K.stringCol BEGINSWITH[cd] %@", property, @"he");
-
-    RLMAssertThrowsWithReason(([AllDictionariesObject objectsInRealm:realm where:@"ANY %K.@allValues BETWEEN %@", property, @[obj, obj]]),
-                              @"Operator 'BETWEEN' not supported for type 'object'");
-    RLMAssertThrowsWithReason(([AllDictionariesObject objectsInRealm:realm where:@"ANY %K.@allValues BEGINSWITH %@", property, obj]),
-                              @"Operator 'BEGINSWITH' not supported for type 'object'");
-    RLMAssertThrowsWithReason(([AllDictionariesObject objectsInRealm:realm where:@"ANY %K.@allValues CONTAINS %@", property, obj]),
-                              @"Operator 'CONTAINS' not supported for type 'object'");
-    RLMAssertThrowsWithReason(([AllDictionariesObject objectsInRealm:realm where:@"ANY %K.@allValues ENDSWITH %@", property, obj]),
-                              @"Operator 'ENDSWITH' not supported for type 'object'");
-    RLMAssertThrowsWithReason(([AllDictionariesObject objectsInRealm:realm where:@"ANY %K.@allValues LIKE %@", property, obj]),
-                              @"Operator 'LIKE' not supported for type 'object'");
+    testObject(@"stringObjDict", @[[[StringObject alloc] initWithValue:@[@"hello"]],
+                                   [[StringObject alloc] initWithValue:@[@"Héllo"]],
+                                   [[StringObject alloc] initWithValue:@[@"HELLO"]]]);
 }
 
 - (void)testDictionaryQueryAllValues_NSString {
-    NSString *property = @"stringDict";
-    NSArray *values = @[@"hello", @"Héllo", @"HELLO"];
+    void (^test)(NSString *, NSArray *) = ^(NSString *property, NSArray *values) {
+        RLMRealm *realm = [self realm];
+        [realm beginWriteTransaction];
+        [AllDictionariesObject createInRealm:realm withValue:@{property: @{@"aKey": values[0]}}];
+        [AllDictionariesObject createInRealm:realm withValue:@{property: @{@"aKey2": values[1]}}];
+        [AllDictionariesObject createInRealm:realm withValue:@{property: @{@"aKey3": values[2]}}];
+        [realm commitWriteTransaction];
 
-    RLMRealm *realm = [self realm];
-    [realm beginWriteTransaction];
-    [AllDictionariesObject createInRealm:realm withValue:@{property: @{@"aKey": values[0]}}];
-    [AllDictionariesObject createInRealm:realm withValue:@{property: @{@"aKey2": values[1]}}];
-    [AllDictionariesObject createInRealm:realm withValue:@{property: @{@"aKey3": values[2]}}];
-    [realm commitWriteTransaction];
+        RLMAssertCount(AllDictionariesObject, 1U, @"ANY %K.@allValues = %@", property, values[0]);
+        RLMAssertCount(AllDictionariesObject, 2U, @"ANY %K.@allValues != %@", property, values[0]);
+        RLMAssertCount(AllDictionariesObject, 2U, @"ANY %K.@allValues =[c] %@", property, values[0]);
+        RLMAssertCount(AllDictionariesObject, 1U, @"ANY %K.@allValues !=[c] %@", property, values[0]);
+        RLMAssertCount(AllDictionariesObject, 3U, @"ANY %K.@allValues =[cd] %@", property, values[0]);
+        RLMAssertCount(AllDictionariesObject, 0U, @"ANY %K.@allValues !=[cd] %@", property, values[0]);
+        // BEGINSWITH
+        RLMAssertCount(AllDictionariesObject, 1U, @"%K.@allValues BEGINSWITH 'he'", property);
+        RLMAssertCount(AllDictionariesObject, 2U, @"NOT %K.@allValues BEGINSWITH 'he'", property);
+        RLMAssertCount(AllDictionariesObject, 2U, @"%K.@allValues BEGINSWITH[c] 'he'", property);
+        RLMAssertCount(AllDictionariesObject, 3U, @"%K.@allValues BEGINSWITH[cd] 'he'", property);
+        RLMAssertCount(AllDictionariesObject, 0U, @"%K.@allValues BEGINSWITH NULL", property);
+        // CONTAINS
+        RLMAssertCount(AllDictionariesObject, 1U, @"%K.@allValues CONTAINS 'el'", property);
+        RLMAssertCount(AllDictionariesObject, 2U, @"%K.@allValues CONTAINS[c] 'el'", property);
+        RLMAssertCount(AllDictionariesObject, 3U, @"%K.@allValues CONTAINS[cd] 'el'", property);
+        RLMAssertCount(AllDictionariesObject, 0U, @"%K.@allValues CONTAINS NULL", property);
+        // ENDSWITH
+        RLMAssertCount(AllDictionariesObject, 2U, @"%K.@allValues ENDSWITH 'lo'", property);
+        RLMAssertCount(AllDictionariesObject, 3U, @"%K.@allValues ENDSWITH[c] 'lo'", property);
+        RLMAssertCount(AllDictionariesObject, 3U, @"%K.@allValues ENDSWITH[cd] 'lo'", property);
+        RLMAssertCount(AllDictionariesObject, 0U, @"%K.@allValues ENDSWITH NULL", property);
+        // LIKE
+        RLMAssertCount(AllDictionariesObject, 1U, @"%K.@allValues LIKE 'hel*'", property);
+        RLMAssertCount(AllDictionariesObject, 2U, @"%K.@allValues LIKE[c] 'hel*'", property);
+        RLMAssertCount(AllDictionariesObject, 0U, @"%K.@allValues LIKE NULL", property);
+        RLMAssertCount(AllDictionariesObject, 2U, @"NOT %K.@allValues LIKE 'hel*'", property);
+        RLMAssertCount(AllDictionariesObject, 1U, @"NOT %K.@allValues LIKE[c] 'hel*'", property);
+        RLMAssertCount(AllDictionariesObject, 3U, @"NOT %K.@allValues LIKE NULL", property);
+        RLMAssertThrowsWithReasonMatching(([realm objects:@"AllDictionariesObject" where:@"%K.@allValues LIKE[cd] 'hel*'", property]), @"not supported");
 
-    RLMAssertCount(AllDictionariesObject, 1U, @"ANY %K.@allValues = %@", property, values[0]);
-    RLMAssertCount(AllDictionariesObject, 2U, @"ANY %K.@allValues != %@", property, values[0]);
-    RLMAssertCount(AllDictionariesObject, 2U, @"ANY %K.@allValues =[c] %@", property, values[0]);
-    RLMAssertCount(AllDictionariesObject, 1U, @"ANY %K.@allValues !=[c] %@", property, values[0]);
-    RLMAssertCount(AllDictionariesObject, 3U, @"ANY %K.@allValues =[cd] %@", property, values[0]);
-    RLMAssertCount(AllDictionariesObject, 0U, @"ANY %K.@allValues !=[cd] %@", property, values[0]);
-    // BEGINSWITH
-    RLMAssertCount(AllDictionariesObject, 1U, @"ANY %K.@allValues BEGINSWITH 'he'", property);
-    RLMAssertCount(AllDictionariesObject, 2U, @"NOT ANY %K.@allValues BEGINSWITH 'he'", property);
-    RLMAssertCount(AllDictionariesObject, 2U, @"ANY %K.@allValues BEGINSWITH[c] 'he'", property);
-    RLMAssertCount(AllDictionariesObject, 3U, @"ANY %K.@allValues BEGINSWITH[cd] 'he'", property);
-    RLMAssertCount(AllDictionariesObject, 0U, @"ANY %K.@allValues BEGINSWITH NULL", property);
-    // CONTAINS
-    RLMAssertCount(AllDictionariesObject, 1U, @"ANY %K.@allValues CONTAINS 'el'", property);
-    RLMAssertCount(AllDictionariesObject, 2U, @"ANY %K.@allValues CONTAINS[c] 'el'", property);
-    RLMAssertCount(AllDictionariesObject, 3U, @"ANY %K.@allValues CONTAINS[cd] 'el'", property);
-    RLMAssertCount(AllDictionariesObject, 0U, @"ANY %K.@allValues CONTAINS NULL", property);
-    // ENDSWITH
-    RLMAssertCount(AllDictionariesObject, 2U, @"ANY %K.@allValues ENDSWITH 'lo'", property);
-    RLMAssertCount(AllDictionariesObject, 3U, @"ANY %K.@allValues ENDSWITH[c] 'lo'", property);
-    RLMAssertCount(AllDictionariesObject, 3U, @"ANY %K.@allValues ENDSWITH[cd] 'lo'", property);
-    RLMAssertCount(AllDictionariesObject, 0U, @"ANY %K.@allValues ENDSWITH NULL", property);
-    // LIKE
-    RLMAssertCount(AllDictionariesObject, 1U, @"ANY %K.@allValues LIKE 'hel*'", property);
-    RLMAssertCount(AllDictionariesObject, 2U, @"ANY %K.@allValues LIKE[c] 'hel*'", property);
-    RLMAssertCount(AllDictionariesObject, 0U, @"ANY %K.@allValues LIKE NULL", property);
-    RLMAssertCount(AllDictionariesObject, 2U, @"NOT ANY %K.@allValues LIKE 'hel*'", property);
-    RLMAssertCount(AllDictionariesObject, 1U, @"NOT ANY %K.@allValues LIKE[c] 'hel*'", property);
-    RLMAssertCount(AllDictionariesObject, 3U, @"NOT ANY %K.@allValues LIKE NULL", property);
-    RLMAssertThrowsWithReason(([AllDictionariesObject objectsInRealm:realm where:@"ANY %K.@allValues LIKE[cd] 'hel*'", property]),
-                              @"Operator 'LIKE' not supported with diacritic-insensitive modifier.");
+        [realm beginWriteTransaction];
+        [realm deleteAllObjects];
+        [realm commitWriteTransaction];
+    };
+    test(@"stringDict", @[@"hello", @"Héllo", @"HELLO"]);
 }
 
 - (void)testDictionaryQueryAllValues_ObjectId {
-    NSString *property = @"objectIdDict";
-    NSArray *values = @[[[RLMObjectId alloc] initWithString:@"60425fff91d7a195d5ddac1b" error:nil],
-                        [[RLMObjectId alloc] initWithString:@"60425fff91d7a195d5ddac1a" error:nil],
-                        [[RLMObjectId alloc] initWithString:@"60425fff91d7a195d5ddac1c" error:nil]];
+    void (^test)(NSString *, NSArray *) = ^(NSString *property, NSArray *values) {
+        RLMRealm *realm = [self realm];
+        [realm beginWriteTransaction];
+        [AllDictionariesObject createInRealm:realm withValue:@{property: @{@"aKey": values[0]}}];
+        [AllDictionariesObject createInRealm:realm withValue:@{property: @{@"aKey2": values[1]}}];
+        [AllDictionariesObject createInRealm:realm withValue:@{property: @{@"aKey3": values[2]}}];
+        [realm commitWriteTransaction];
 
-    RLMRealm *realm = [self realm];
-    [realm beginWriteTransaction];
-    [AllDictionariesObject createInRealm:realm withValue:@{property: @{@"aKey": values[0]}}];
-    [AllDictionariesObject createInRealm:realm withValue:@{property: @{@"aKey2": values[1]}}];
-    [AllDictionariesObject createInRealm:realm withValue:@{property: @{@"aKey3": values[2]}}];
-    [realm commitWriteTransaction];
+        RLMAssertCount(AllDictionariesObject, 1U, @"%K.@allValues = %@", property, values[0]);
+        RLMAssertCount(AllDictionariesObject, 2U, @"%K.@allValues != %@", property, values[0]);
+        RLMAssertCount(AllDictionariesObject, 1U, @"%K.@allValues =[c] %@", property, values[0]);
+        RLMAssertCount(AllDictionariesObject, 1U, @"%K.@allValues =[cd] %@", property, values[0]);
+        // Unsupported
+        RLMAssertThrowsWithReasonMatching(([realm objects:@"AllDictionariesObject" where:@"%K.@allValues LIKE '*a'", property]), @"not supported");
+        RLMAssertThrowsWithReasonMatching(([realm objects:@"AllDictionariesObject" where:@"%K.@allValues BEGINSWITH 'a'", property]), @"not supported");
+        RLMAssertThrowsWithReasonMatching(([realm objects:@"AllDictionariesObject" where:@"%K.@allValues CONTAINS 'a'", property]), @"not supported");
+        RLMAssertThrowsWithReasonMatching(([realm objects:@"AllDictionariesObject" where:@"%K.@allValues ENDSWITH 'a'", property]), @"not supported");
+        RLMAssertThrowsWithReasonMatching(([realm objects:@"AllDictionariesObject" where:@"%K.@allValues < %@", property, values[0]]), @"not supported");
+        RLMAssertThrowsWithReasonMatching(([realm objects:@"AllDictionariesObject" where:@"%K.@allValues > %@", property, values[0]]), @"not supported");
 
-    RLMAssertCount(AllDictionariesObject, 1U, @"ANY %K.@allValues = %@", property, values[0]);
-    RLMAssertCount(AllDictionariesObject, 2U, @"ANY %K.@allValues != %@", property, values[0]);
-    RLMAssertCount(AllDictionariesObject, 1U, @"ANY %K.@allValues =[c] %@", property, values[0]);
-    RLMAssertCount(AllDictionariesObject, 1U, @"ANY %K.@allValues =[cd] %@", property, values[0]);
+        [realm beginWriteTransaction];
+        [realm deleteAllObjects];
+        [realm commitWriteTransaction];
+    };
 
-    // Unsupported
-    RLMAssertThrowsWithReason(([AllDictionariesObject objectsInRealm:realm where:@"ANY %K.@allValues > %@", property, values[0]]), @"Operator '>' not supported for type 'object id'");
-    RLMAssertThrowsWithReason(([AllDictionariesObject objectsInRealm:realm where:@"ANY %K.@allValues < %@", property, values[0]]), @"Operator '<' not supported for type 'object id'");
-    RLMAssertThrowsWithReason(([AllDictionariesObject objectsInRealm:realm where:@"ANY %K.@allValues LIKE %@", property, values[0]]), @"Operator 'LIKE' not supported for type 'object id'");
-    RLMAssertThrowsWithReason(([AllDictionariesObject objectsInRealm:realm where:@"ANY %K.@allValues BEGINSWITH %@", property, values[0]]), @"Operator 'BEGINSWITH' not supported for type 'object id'");
-    RLMAssertThrowsWithReason(([AllDictionariesObject objectsInRealm:realm where:@"ANY %K.@allValues CONTAINS %@", property, values[0]]), @"Operator 'CONTAINS' not supported for type 'object id'");
-    RLMAssertThrowsWithReason(([AllDictionariesObject objectsInRealm:realm where:@"ANY %K.@allValues ENDSWITH %@", property, values[0]]), @"Operator 'ENDSWITH' not supported for type 'object id'");
+    test(@"objectIdDict", @[[[RLMObjectId alloc] initWithString:@"60425fff91d7a195d5ddac1b" error:nil],
+                            [[RLMObjectId alloc] initWithString:@"60425fff91d7a195d5ddac1a" error:nil],
+                            [[RLMObjectId alloc] initWithString:@"60425fff91d7a195d5ddac1c" error:nil]]);
 }
 
 - (void)testDictionaryQueryAllValues_UUID {
-    NSString *property = @"uuidDict";
-    NSArray *values = @[[[NSUUID alloc] initWithUUIDString:@"137DECC8-B300-4954-A233-F89909F4FD88"],
+    void (^test)(NSString *, NSArray *) = ^(NSString *property, NSArray *values) {
+        RLMRealm *realm = [self realm];
+        [realm beginWriteTransaction];
+        [AllDictionariesObject createInRealm:realm withValue:@{property: @{@"aKey": values[0]}}];
+        [AllDictionariesObject createInRealm:realm withValue:@{property: @{@"aKey2": values[1]}}];
+        [AllDictionariesObject createInRealm:realm withValue:@{property: @{@"aKey3": values[2]}}];
+        [realm commitWriteTransaction];
+
+        RLMAssertCount(AllDictionariesObject, 1U, @"ANY %K.@allValues = %@", property, values[0]);
+        RLMAssertCount(AllDictionariesObject, 1U, @"%K.@allValues = %@", property, values[0]);
+        RLMAssertCount(AllDictionariesObject, 2U, @"ANY %K.@allValues != %@", property, values[0]);
+        RLMAssertCount(AllDictionariesObject, 1U, @"ANY %K.@allValues =[c] %@", property, values[0]);
+        RLMAssertCount(AllDictionariesObject, 2U, @"ANY %K.@allValues !=[c] %@", property, values[0]);
+        RLMAssertCount(AllDictionariesObject, 2U, @"%K.@allValues !=[c] %@", property, values[0]);
+        RLMAssertCount(AllDictionariesObject, 1U, @"ANY %K.@allValues =[cd] %@", property, values[0]);
+        RLMAssertCount(AllDictionariesObject, 2U, @"ANY %K.@allValues !=[cd] %@", property, values[0]);
+
+        // Unsupported
+        RLMAssertThrowsWithReasonMatching(([realm objects:@"AllDictionariesObject" where:@"ANY %K.@allValues > %@", property, values[0]]), @"not supported");
+        RLMAssertThrowsWithReasonMatching(([realm objects:@"AllDictionariesObject" where:@"ANY %K.@allValues < %@", property, values[0]]), @"not supported");
+        RLMAssertThrowsWithReasonMatching(([realm objects:@"AllDictionariesObject" where:@"%K.@allValues LIKE %@", property, values[0]]), @"not supported");
+        RLMAssertThrowsWithReasonMatching(([realm objects:@"AllDictionariesObject" where:@"%K.@allValues BEGINSWITH %@", property, values[0]]), @"not supported");
+        RLMAssertThrowsWithReasonMatching(([realm objects:@"AllDictionariesObject" where:@"%K.@allValues CONTAINS %@", property, values[0]]), @"not supported");
+        RLMAssertThrowsWithReasonMatching(([realm objects:@"AllDictionariesObject" where:@"%K.@allValues ENDSWITH %@", property, values[0]]), @"not supported");
+
+        [realm beginWriteTransaction];
+        [realm deleteAllObjects];
+        [realm commitWriteTransaction];
+    };
+    test(@"uuidDict", @[[[NSUUID alloc] initWithUUIDString:@"137DECC8-B300-4954-A233-F89909F4FD88"],
                         [[NSUUID alloc] initWithUUIDString:@"137DECC8-B300-4954-A233-F89909F4FD87"],
-                        [[NSUUID alloc] initWithUUIDString:@"137DECC8-B300-4954-A233-F89909F4FD89"]];
-    RLMRealm *realm = [self realm];
-    [realm beginWriteTransaction];
-    [AllDictionariesObject createInRealm:realm withValue:@{property: @{@"aKey": values[0]}}];
-    [AllDictionariesObject createInRealm:realm withValue:@{property: @{@"aKey2": values[1]}}];
-    [AllDictionariesObject createInRealm:realm withValue:@{property: @{@"aKey3": values[2]}}];
-    [realm commitWriteTransaction];
-
-    RLMAssertCount(AllDictionariesObject, 1U, @"ANY %K.@allValues = %@", property, values[0]);
-    RLMAssertCount(AllDictionariesObject, 2U, @"ANY %K.@allValues != %@", property, values[0]);
-    RLMAssertCount(AllDictionariesObject, 1U, @"ANY %K.@allValues =[c] %@", property, values[0]);
-    RLMAssertCount(AllDictionariesObject, 2U, @"ANY %K.@allValues !=[c] %@", property, values[0]);
-    RLMAssertCount(AllDictionariesObject, 1U, @"ANY %K.@allValues =[cd] %@", property, values[0]);
-    RLMAssertCount(AllDictionariesObject, 2U, @"ANY %K.@allValues !=[cd] %@", property, values[0]);
-
-    // Unsupported
-    RLMAssertThrowsWithReason(([AllDictionariesObject objectsInRealm:realm where:@"ANY %K.@allValues > %@", property, values[0]]), @"Operator '>' not supported for type 'uuid'");
-    RLMAssertThrowsWithReason(([AllDictionariesObject objectsInRealm:realm where:@"ANY %K.@allValues < %@", property, values[0]]), @"Operator '<' not supported for type 'uuid'");
-    RLMAssertThrowsWithReason(([AllDictionariesObject objectsInRealm:realm where:@"ANY %K.@allValues LIKE %@", property, values[0]]), @"Operator 'LIKE' not supported for type 'uuid'");
-    RLMAssertThrowsWithReason(([AllDictionariesObject objectsInRealm:realm where:@"ANY %K.@allValues BEGINSWITH %@", property, values[0]]), @"Operator 'BEGINSWITH' not supported for type 'uuid'");
-    RLMAssertThrowsWithReason(([AllDictionariesObject objectsInRealm:realm where:@"ANY %K.@allValues CONTAINS %@", property, values[0]]), @"Operator 'CONTAINS' not supported for type 'uuid'");
-    RLMAssertThrowsWithReason(([AllDictionariesObject objectsInRealm:realm where:@"ANY %K.@allValues ENDSWITH %@", property, values[0]]), @"Operator 'ENDSWITH' not supported for type 'uuid'");
+                        [[NSUUID alloc] initWithUUIDString:@"137DECC8-B300-4954-A233-F89909F4FD89"]]);
 }
 
 - (void)testDictionaryQueryAllValues_Data {
-    NSString *property = @"dataDict";
-    NSArray *values = @[[NSData dataWithBytes:"hey" length:3],
+    void (^test)(NSString *, NSArray *) = ^(NSString *property, NSArray *values) {
+        RLMRealm *realm = [self realm];
+        [realm beginWriteTransaction];
+        [AllDictionariesObject createInRealm:realm withValue:@{property: @{@"aKey": values[0]}}];
+        [AllDictionariesObject createInRealm:realm withValue:@{property: @{@"aKey2": values[1]}}];
+        [AllDictionariesObject createInRealm:realm withValue:@{property: @{@"aKey3": values[2]}}];
+        [realm commitWriteTransaction];
+
+        RLMAssertCount(AllDictionariesObject, 1U, @"ANY %K.@allValues = %@", property, values[0]);
+        RLMAssertCount(AllDictionariesObject, 1U, @"%K.@allValues = %@", property, values[0]);
+        RLMAssertCount(AllDictionariesObject, 2U, @"ANY %K.@allValues != %@", property, values[0]);
+        RLMAssertCount(AllDictionariesObject, 1U, @"ANY %K.@allValues =[c] %@", property, values[0]);
+        RLMAssertCount(AllDictionariesObject, 2U, @"ANY %K.@allValues !=[c] %@", property, values[0]);
+        RLMAssertCount(AllDictionariesObject, 2U, @"%K.@allValues !=[c] %@", property, values[0]);
+        RLMAssertCount(AllDictionariesObject, 1U, @"ANY %K.@allValues =[cd] %@", property, values[0]);
+        RLMAssertCount(AllDictionariesObject, 2U, @"ANY %K.@allValues !=[cd] %@", property, values[0]);
+        
+        RLMAssertCount(AllDictionariesObject, 1U, @"%K.@allValues LIKE %@", property, [NSData dataWithBytes:"hello" length:5]);
+        RLMAssertCount(AllDictionariesObject, 2U, @"%K.@allValues LIKE %@", property, [NSData dataWithBytes:"he*" length:3]);
+        RLMAssertCount(AllDictionariesObject, 2U, @"%K.@allValues BEGINSWITH %@", property, [NSData dataWithBytes:"he" length:2]);
+        RLMAssertCount(AllDictionariesObject, 1U, @"%K.@allValues CONTAINS %@", property, [NSData dataWithBytes:"ell" length:3]);
+        RLMAssertCount(AllDictionariesObject, 1U, @"%K.@allValues ENDSWITH %@", property, [NSData dataWithBytes:"lo" length:2]);
+
+        // Unsupported
+        RLMAssertThrowsWithReasonMatching(([realm objects:@"AllDictionariesObject" where:@"ANY %K.@allValues > %@", property, values[0]]), @"not supported");
+        RLMAssertThrowsWithReasonMatching(([realm objects:@"AllDictionariesObject" where:@"ANY %K.@allValues < %@", property, values[0]]), @"not supported");
+
+        [realm beginWriteTransaction];
+        [realm deleteAllObjects];
+        [realm commitWriteTransaction];
+    };
+    test(@"dataDict", @[[NSData dataWithBytes:"hey" length:3],
                         [NSData dataWithBytes:"hi" length:2],
-                        [NSData dataWithBytes:"hello" length:5]];
-
-    RLMRealm *realm = [self realm];
-    [realm beginWriteTransaction];
-    [AllDictionariesObject createInRealm:realm withValue:@{property: @{@"aKey": values[0]}}];
-    [AllDictionariesObject createInRealm:realm withValue:@{property: @{@"aKey2": values[1]}}];
-    [AllDictionariesObject createInRealm:realm withValue:@{property: @{@"aKey3": values[2]}}];
-    [realm commitWriteTransaction];
-
-    RLMAssertCount(AllDictionariesObject, 1U, @"ANY %K.@allValues = %@", property, values[0]);
-    RLMAssertCount(AllDictionariesObject, 2U, @"ANY %K.@allValues != %@", property, values[0]);
-    RLMAssertCount(AllDictionariesObject, 1U, @"ANY %K.@allValues =[c] %@", property, values[0]);
-    RLMAssertCount(AllDictionariesObject, 2U, @"ANY %K.@allValues !=[c] %@", property, values[0]);
-    RLMAssertCount(AllDictionariesObject, 1U, @"ANY %K.@allValues =[cd] %@", property, values[0]);
-    RLMAssertCount(AllDictionariesObject, 2U, @"ANY %K.@allValues !=[cd] %@", property, values[0]);
-
-    RLMAssertCount(AllDictionariesObject, 1U, @"ANY %K.@allValues LIKE %@", property,
-                   [NSData dataWithBytes:"hello" length:5]);
-    RLMAssertCount(AllDictionariesObject, 2U, @"ANY %K.@allValues LIKE %@", property,
-                   [NSData dataWithBytes:"he*" length:3]);
-    RLMAssertCount(AllDictionariesObject, 2U, @"ANY %K.@allValues BEGINSWITH %@", property,
-                   [NSData dataWithBytes:"he" length:2]);
-    RLMAssertCount(AllDictionariesObject, 1U, @"ANY %K.@allValues CONTAINS %@", property,
-                   [NSData dataWithBytes:"ell" length:3]);
-    RLMAssertCount(AllDictionariesObject, 1U, @"ANY %K.@allValues ENDSWITH %@", property,
-                   [NSData dataWithBytes:"lo" length:2]);
-
-    // Unsupported
-    RLMAssertThrowsWithReasonMatching(([AllDictionariesObject objectsInRealm:realm where:@"ANY %K.@allValues > %@", property, values[0]]), @"not supported");
-    RLMAssertThrowsWithReasonMatching(([AllDictionariesObject objectsInRealm:realm where:@"ANY %K.@allValues < %@", property, values[0]]), @"not supported");
+                        [NSData dataWithBytes:"hello" length:5]]);
 }
 
 - (void)testDictionaryQueryAllValues {
@@ -3684,23 +3668,42 @@ static NSData *data(const char *str) {
             RLMAssertCount(AllDictionariesObject, 1U, @"ANY %K.@allValues !=[c] %@", property, values[0]);
             RLMAssertCount(AllDictionariesObject, 2U, @"ANY %K.@allValues =[cd] %@", property, values[0]);
             RLMAssertCount(AllDictionariesObject, 1U, @"ANY %K.@allValues !=[cd] %@", property, values[0]);
+            // Unsupported
+            RLMAssertThrowsWithReasonMatching(([realm objects:@"AllDictionariesObject" where:@"ANY %K.@allValues > %@", property, values[0]]), @"not supported");
+            RLMAssertThrowsWithReasonMatching(([realm objects:@"AllDictionariesObject" where:@"ANY %K.@allValues < %@", property, values[0]]), @"not supported");
+            RLMAssertThrowsWithReasonMatching(([realm objects:@"AllDictionariesObject" where:@"%K.@allValues BEGINSWITH 1", property]), @"not supported");
+            RLMAssertThrowsWithReasonMatching(([realm objects:@"AllDictionariesObject" where:@"%K.@allValues CONTAINS 1", property]), @"not supported");
+            RLMAssertThrowsWithReasonMatching(([realm objects:@"AllDictionariesObject" where:@"%K.@allValues ENDSWITH 1", property]), @"not supported");
+            RLMAssertThrowsWithReasonMatching(([realm objects:@"AllDictionariesObject" where:@"%K.@allValues LIKE 'key*'", property]), @"not supported");
         } else {
             RLMAssertCount(AllDictionariesObject, 1U, @"ANY %K.@allValues = %@", property, values[0]);
+            RLMAssertCount(AllDictionariesObject, 1U, @"%K.@allValues = %@", property, values[0]);
             RLMAssertCount(AllDictionariesObject, 2U, @"ANY %K.@allValues != %@", property, values[0]);
             RLMAssertCount(AllDictionariesObject, 1U, @"ANY %K.@allValues =[c] %@", property, values[0]);
             RLMAssertCount(AllDictionariesObject, 2U, @"ANY %K.@allValues !=[c] %@", property, values[0]);
+            RLMAssertCount(AllDictionariesObject, 2U, @"%K.@allValues !=[c] %@", property, values[0]);
             RLMAssertCount(AllDictionariesObject, 1U, @"ANY %K.@allValues =[cd] %@", property, values[0]);
             RLMAssertCount(AllDictionariesObject, 2U, @"ANY %K.@allValues !=[cd] %@", property, values[0]);
 
             RLMAssertCount(AllDictionariesObject, 1U, @"ANY %K.@allValues > %@", property, values[0]);
+            RLMAssertCount(AllDictionariesObject, 1U, @"%K.@allValues > %@", property, values[0]);
             RLMAssertCount(AllDictionariesObject, 2U, @"NOT ANY %K.@allValues > %@", property, values[0]);
+            RLMAssertCount(AllDictionariesObject, 2U, @"NOT %K.@allValues > %@", property, values[0]);
             RLMAssertCount(AllDictionariesObject, 1U, @"ANY %K.@allValues >[c] %@", property, values[0]);
             RLMAssertCount(AllDictionariesObject, 1U, @"ANY %K.@allValues >[cd] %@", property, values[0]);
 
             RLMAssertCount(AllDictionariesObject, 1U, @"ANY %K.@allValues < %@", property, values[0]);
+            RLMAssertCount(AllDictionariesObject, 1U, @"%K.@allValues < %@", property, values[0]);
             RLMAssertCount(AllDictionariesObject, 2U, @"NOT ANY %K.@allValues < %@", property, values[0]);
+            RLMAssertCount(AllDictionariesObject, 2U, @"NOT %K.@allValues < %@", property, values[0]);
             RLMAssertCount(AllDictionariesObject, 1U, @"ANY %K.@allValues <[c] %@", property, values[0]);
             RLMAssertCount(AllDictionariesObject, 1U, @"ANY %K.@allValues <[cd] %@", property, values[0]);
+
+            // Unsupported
+            RLMAssertThrowsWithReasonMatching(([realm objects:@"AllDictionariesObject" where:@"%K.@allValues LIKE '*1'", property]), @"not supported");
+            RLMAssertThrowsWithReasonMatching(([realm objects:@"AllDictionariesObject" where:@"%K.@allValues BEGINSWITH 1", property]), @"not supported");
+            RLMAssertThrowsWithReasonMatching(([realm objects:@"AllDictionariesObject" where:@"%K.@allValues CONTAINS 1", property]), @"not supported");
+            RLMAssertThrowsWithReasonMatching(([realm objects:@"AllDictionariesObject" where:@"%K.@allValues ENDSWITH 1", property]), @"not supported");
         }
         [realm beginWriteTransaction];
         [realm deleteAllObjects];
@@ -3769,7 +3772,7 @@ static NSData *data(const char *str) {
             RLMAssertCount(AllDictionariesObject, 2U, @"NOT %K['aKey'] LIKE 'hel*'", property);
             RLMAssertCount(AllDictionariesObject, 2U, @"NOT %K['aKey'] LIKE[c] 'hel*'", property);
             RLMAssertCount(AllDictionariesObject, 1U, @"NOT %K['aKey'] LIKE NULL", property);
-            RLMAssertThrowsWithReasonMatching(([AllDictionariesObject objectsInRealm:realm where:@"%K['aKey'] LIKE[cd] 'hel*'", property]), @"not supported");
+            RLMAssertThrowsWithReasonMatching(([realm objects:@"AllDictionariesObject" where:@"%K['aKey'] LIKE[cd] 'hel*'", property]), @"not supported");
         }
 
         [realm beginWriteTransaction];
@@ -3779,12 +3782,8 @@ static NSData *data(const char *str) {
     test(@"intDict", @[@456, @123, @789], YES);
     test(@"doubleDict", @[@456.123, @123.123, @789.123], YES);
     test(@"boolDict", @[@NO, @NO, @YES], YES);
-    test(@"decimalDict", @[[RLMDecimal128 decimalWithNumber:@456.123],
-                           [RLMDecimal128 decimalWithNumber:@123.123],
-                           [RLMDecimal128 decimalWithNumber:@789.123]], YES);
-    test(@"dateDict", @[[NSDate dateWithTimeIntervalSince1970:4000],
-                        [NSDate dateWithTimeIntervalSince1970:2000],
-                        [NSDate dateWithTimeIntervalSince1970:8000]], YES);
+    test(@"decimalDict", @[[RLMDecimal128 decimalWithNumber:@456.123], [RLMDecimal128 decimalWithNumber:@123.123], [RLMDecimal128 decimalWithNumber:@789.123]], YES);
+    test(@"dateDict", @[[NSDate dateWithTimeIntervalSince1970:4000], [NSDate dateWithTimeIntervalSince1970:2000], [NSDate dateWithTimeIntervalSince1970:8000]], YES);
     test(@"dataDict", @[[NSData dataWithBytes:"hello" length:5],
                         [NSData dataWithBytes:"Héllo" length:5],
                         [NSData dataWithBytes:"HELLO" length:5]], NO);
@@ -3805,54 +3804,20 @@ static NSData *data(const char *str) {
 
 - (void)testDictionarySubscriptThrowsException {
     RLMRealm *realm = [self realm];
-    RLMAssertThrowsWithReason(([realm objects:@"ArrayPropertyObject" where:@"array['invalid'] = NULL"]),
-                              @"Invalid keypath 'array[\"invalid\"]': only dictionaries support subscript predicates.");
-    RLMAssertThrowsWithReason(([realm objects:@"SetPropertyObject" where:@"set['invalid'] = NULL"]),
-                              @"Invalid keypath 'set[\"invalid\"]': only dictionaries support subscript predicates.");
-    RLMAssertThrowsWithReason(([realm objects:@"OwnerObject" where:@"dog['dogName'] = NULL"]),
-                              @"Aggregate operations can only be used on key paths that include an collection property");
+    RLMAssertThrowsWithReasonMatching(([realm objects:@"ArrayPropertyObject" where:@"array['invalid'] = NULL"]), @"Only dictionaries support subscript predicates.");
+    RLMAssertThrowsWithReasonMatching(([realm objects:@"SetPropertyObject" where:@"set['invalid'] = NULL"]), @"Only dictionaries support subscript predicates.");
+    RLMAssertThrowsWithReasonMatching(([realm objects:@"OwnerObject" where:@"dog['dogName'] = NULL"]), @"Aggregate operations can only be used on key paths that include an collection property");
 }
 
 - (void)testCollectionsQueryAllValuesAllKeys {
     RLMRealm *realm = [self realm];
     [realm beginWriteTransaction];
     StringObject *so1 = [StringObject createInRealm:realm withValue:@[@"value1"]];
-    RLMAssertThrowsWithReason(([realm objects:@"ArrayPropertyObject" where:@"ANY array.@allValues = %@", so1]),
-                              @"Invalid keypath 'array.@allValues': @allValues must follow a dictionary property.");
-    RLMAssertThrowsWithReason(([realm objects:@"ArrayPropertyObject" where:@"ANY array.@allKeys = %@", so1]),
-                              @"Invalid keypath 'array.@allKeys': @allKeys must follow a dictionary property.");
-    RLMAssertThrowsWithReason(([realm objects:@"SetPropertyObject" where:@"ANY set.@allValues = %@", so1]),
-                              @"Invalid keypath 'set.@allValues': @allValues must follow a dictionary property.");
-    RLMAssertThrowsWithReason(([realm objects:@"SetPropertyObject" where:@"ANY set.@allKeys = %@", so1]),
-                              @"Invalid keypath 'set.@allKeys': @allKeys must follow a dictionary property.");
+    RLMAssertThrowsWithReasonMatching(([realm objects:@"ArrayPropertyObject" where:@"ANY array.@allValues = %@", so1]), @"@allValues is only valid for dictionary");
+    RLMAssertThrowsWithReasonMatching(([realm objects:@"ArrayPropertyObject" where:@"ANY array.@allKeys = %@", so1]), @"@allKeys is only valid for dictionary");
+    RLMAssertThrowsWithReasonMatching(([realm objects:@"SetPropertyObject" where:@"ANY set.@allValues = %@", so1]), @"@allValues is only valid for dictionary");
+    RLMAssertThrowsWithReasonMatching(([realm objects:@"SetPropertyObject" where:@"ANY set.@allKeys = %@", so1]), @"@allKeys is only valid for dictionary");
     [realm cancelWriteTransaction];
-}
-
-- (void)testDictionaryKeyComparedToColumn {
-    RLMRealm *realm = [self realm];
-    [realm beginWriteTransaction];
-    EmployeeObject *eo = [[EmployeeObject alloc] init];
-    [CompanyObject createInRealm:realm withValue:@{@"name": @"a", @"employeeDict": @{@"a": eo}}];
-    [CompanyObject createInRealm:realm withValue:@{@"name": @"a", @"employeeDict": @{@"aa": eo}}];
-    [CompanyObject createInRealm:realm withValue:@{@"name": @"a", @"employeeDict": @{@"A": eo}}];
-    [CompanyObject createInRealm:realm withValue:@{@"name": @"a", @"employeeDict": @{@"AA": eo}}];
-    [realm commitWriteTransaction];
-
-    RLMAssertCount(CompanyObject, 1U, @"ANY employeeDict.@allKeys = name");
-    RLMAssertCount(CompanyObject, 2U, @"ANY employeeDict.@allKeys =[c] name");
-    RLMAssertCount(CompanyObject, 3U, @"ANY employeeDict.@allKeys != name");
-    RLMAssertCount(CompanyObject, 2U, @"ANY employeeDict.@allKeys !=[c] name");
-    RLMAssertCount(CompanyObject, 2U, @"ANY employeeDict.@allKeys BEGINSWITH name");
-    RLMAssertCount(CompanyObject, 4U, @"ANY employeeDict.@allKeys BEGINSWITH[c] name");
-    RLMAssertCount(CompanyObject, 2U, @"ANY employeeDict.@allKeys ENDSWITH name");
-    RLMAssertCount(CompanyObject, 4U, @"ANY employeeDict.@allKeys ENDSWITH[c] name");
-    RLMAssertCount(CompanyObject, 2U, @"ANY employeeDict.@allKeys CONTAINS name");
-    RLMAssertCount(CompanyObject, 4U, @"ANY employeeDict.@allKeys CONTAINS[c] name");
-
-    RLMAssertThrowsWithReason(([CompanyObject objectsInRealm:realm where:@"ANY employeeDict.@allKeys = 1"]),
-                              @"@allKeys can only be compared with a string value.");
-    RLMAssertThrowsWithReason(([IntegerDictionaryPropertyObject objectsInRealm:realm where:@"ANY dictionary.@allKeys = number"]),
-                              @"@allKeys can only be compared with a string value.");
 }
 
 @end
