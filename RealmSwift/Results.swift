@@ -26,7 +26,7 @@ import Realm
 
  - see: `min(ofProperty:)`, `max(ofProperty:)`
  */
-public protocol MinMaxType {}
+public protocol MinMaxType: _ObjcBridgeable {}
 extension NSNumber: MinMaxType {}
 extension Double: MinMaxType {}
 extension Float: MinMaxType {}
@@ -47,7 +47,7 @@ extension AnyRealmValue: MinMaxType {}
 
  - see: `sum(ofProperty:)`, `average(ofProperty:)`
  */
-public protocol AddableType {
+public protocol AddableType: _ObjcBridgeable {
     /// :nodoc:
     init()
 }
@@ -680,40 +680,6 @@ extension Results: RealmCollection {
     /// Returns a `RLMIterator` that yields successive elements in the results.
     public func makeIterator() -> RLMIterator<Element> {
         return RLMIterator(collection: rlmResults)
-    }
-
-    // MARK: Collection Support
-
-    /// The position of the first element in a non-empty collection.
-    /// Identical to endIndex in an empty collection.
-    public var startIndex: Int { return 0 }
-
-    /// The collection's "past the end" position.
-    /// endIndex is not a valid argument to subscript, and is always reachable from startIndex by
-    /// zero or more applications of successor().
-    public var endIndex: Int { return count }
-
-    public func index(after i: Int) -> Int { return i + 1 }
-    public func index(before i: Int) -> Int { return i - 1 }
-
-    /// :nodoc:
-    public func _observe(_ keyPaths: [String]?,
-                         _ queue: DispatchQueue?,
-                         _ block: @escaping (RealmCollectionChange<AnyRealmCollection<Element>>) -> Void)
-        -> NotificationToken {
-            return rlmResults.addNotificationBlock(wrapObserveBlock(block), keyPaths: keyPaths, queue: queue)
-    }
-}
-
-// MARK: CustomObjectiveCBridgeable
-
-extension Results: CustomObjectiveCBridgeable {
-    internal static func bridging(objCValue objectiveCValue: Any) -> Results {
-        return Results(objectiveCValue as! RLMResults)
-    }
-
-    internal var objCValue: Any {
-        return rlmResults
     }
 }
 
