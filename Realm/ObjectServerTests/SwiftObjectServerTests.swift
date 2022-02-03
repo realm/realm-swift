@@ -481,7 +481,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                     XCTFail()
                 }
             }
-            waitForExpectations(timeout: 2, handler: nil)
+            waitForExpectations(timeout: 6, handler: nil)
             XCTAssertFalse(try RealmServer.shared.syncEnabled(appServerId: appServerId, syncServiceId: syncServiceId))
 
             do {
@@ -504,7 +504,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                     XCTFail()
                 }
             }
-            waitForExpectations(timeout: 2, handler: nil)
+            waitForExpectations(timeout: 6, handler: nil)
             XCTAssertTrue(try RealmServer.shared.syncEnabled(appServerId: appServerId, syncServiceId: syncServiceId))
 
             // *******
@@ -524,7 +524,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                     }
                 }
             }
-            waitForExpectations(timeout: 3, handler: nil)
+            waitForExpectations(timeout: 6, handler: nil)
             XCTAssertTrue(try RealmServer.shared.devModeEnabled(appServerId: appServerId, syncServiceId: syncServiceId))
         } catch {
             XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
