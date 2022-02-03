@@ -189,13 +189,6 @@ public struct Query<T> {
         .init(.comparison(operator: .notEqual, lhs.node, rhs.node, options: []))
     }
 
-    // MARK: In
-
-    /// Checks if the value is present in the collection.
-    public func `in`<U: Sequence>(_ collection: U) -> Query<Bool> where U.Element == T {
-        .init(.comparison(operator: .in, node, .constant(collection), options: []))
-    }
-
     // MARK: Subscript
 
     /// :nodoc:

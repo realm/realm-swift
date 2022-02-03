@@ -2165,22 +2165,6 @@ class QueryTests: TestCase {
             $0.optStringCol.notEquals($0.stringCol, options: [.caseInsensitive, .diacriticInsensitive])
         }
     }
-
-    // MARK: - ContainsIn
-
-    func testContainsIn() {
-        % for property in properties + optProperties:
-
-        assertQuery(${property.className}.self, "(${property.colName} IN %@)",
-                    values: [NSArray(array: [${property.enumValue(0)}, ${property.enumValue(1)}])], count: 1) {
-            $0.${property.colName}.in([${property.enumValue(0)}, ${property.enumValue(1)}])
-        }
-        assertQuery(${property.className}.self, "(NOT ${property.colName} IN %@)",
-                    values: [NSArray(array: [${property.enumValue(1)}])], count: 0) {
-            !$0.${property.colName}.in([${property.enumValue(1)}])
-        }
-        % end
-    }
 }
 
 private protocol LinkToTestObject: Object {

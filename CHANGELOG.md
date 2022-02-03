@@ -5,14 +5,6 @@ x.y.z Release notes (yyyy-MM-dd)
 
 ### Fixed
 * Add support of arm64 in Carthage build ([#7154](https://github.com/realm/realm-cocoa/issues/7154)
-* Adding missing support for `IN` queries to primitives types on Type Safe Queries.
-  ```swift
-  let persons = realm.objects(Person.self).where {
-    let acceptableNames = ["Tom", "James", "Tyler"]
-    $0.name.in([acceptableNames])
-  }
-  ```
-  ([Cocoa #7633](https://github.com/realm/realm-swift/issues/7633), since v10.19.0)
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
