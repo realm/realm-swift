@@ -1,0 +1,15 @@
+storage:
+  root_path: 'root_dir'
+auth:
+  public_key_path: 'keys/token-signature.pub'
+  private_key_path: 'keys/token-signature.key'
+  sync_hosts:
+    - 'localhost:9080'
+  providers:
+    password:
+      iterations: 1
+proxy:
+  http:
+    listen_address: '::'
+enterprise:
+  skip_setup: true

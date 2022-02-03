@@ -217,18 +217,21 @@ public final class PersonProjection: Projection<CommonPerson> {
     @Projected(\CommonPerson.friends.projectTo.firstName) var firstFriendsName: ProjectedCollection<String>
 }
 
-public class SimpleObject: Object {
+public class SimpleObject: Object, ObjectKeyIdentifiable {
     @Persisted var int: Int
     @Persisted var bool: Bool
 }
 
-public final class SimpleProjection: Projection<SimpleObject> {
+public final class SimpleProjection: Projection<SimpleObject>, ObjectKeyIdentifiable {
+    @Projected(\SimpleObject.int) var int
+}
+
+public final class AltSimpleProjection: Projection<SimpleObject>, ObjectKeyIdentifiable {
     @Projected(\SimpleObject.int) var int
 }
 
 // MARK: Tests
 
-@available(iOS 13.0, *)
 class ProjectionTests: TestCase {
     func assertSetEquals<T: RealmCollectionValue>(_ set: MutableSet<T>, _ expected: Array<T>) {
         XCTAssertEqual(set.count, Set(expected).count)

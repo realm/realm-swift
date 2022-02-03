@@ -22,10 +22,6 @@ x.y.z Release notes (yyyy-MM-dd)
 * Queries of the form "link.collection.@sum = 0" where `link` is null matched
   when `collection` was a List or Set, but not a Dictionary
   ([#5080](https://github.com/realm/realm-core/pull/5080), since v10.8.0).
-* Types which require custom obj-c bridging (such as `PersistableEnum` or
-  `CustomPersistable`) would crash with exceptions mentioning `__SwiftValue` in
-  a variety of places on iOS versions older than iOS 14
-  ([#7604](https://github.com/realm/realm-swift/issues/7604), since v10.21.0)
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 

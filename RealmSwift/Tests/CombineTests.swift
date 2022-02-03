@@ -2145,20 +2145,6 @@ class ManagedMapPublisherTests: TestCase {
 }
 
 // MARK: - Projection
-
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
-extension SimpleObject: ObjectKeyIdentifiable {
-}
-
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
-extension SimpleProjection: ObjectKeyIdentifiable {
-}
-
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
-public final class AltSimpleProjection: Projection<SimpleObject>, ObjectKeyIdentifiable {
-    @Projected(\SimpleObject.int) var int
-}
-
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 class CombineProjectionPublisherTests: CombinePublisherTestCase {
 

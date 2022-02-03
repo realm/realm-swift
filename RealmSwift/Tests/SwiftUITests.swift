@@ -49,21 +49,8 @@ class EmbeddedTreeSwiftUIObject1: EmbeddedObject, EmbeddedTreeObject, ObjectKeyI
 
 private let inMemoryIdentifier = "swiftui-tests"
 
-func hasSwiftUI() -> Bool {
-    if #available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *) {
-        return true
-    }
-    return false
-}
-
 @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
 class SwiftUITests: TestCase {
-    override class var defaultTestSuite: XCTestSuite {
-        if hasSwiftUI() {
-            return super.defaultTestSuite
-        }
-        return XCTestSuite(name: "\(type(of: self))")
-    }
 
     // MARK: - List Operations
 
