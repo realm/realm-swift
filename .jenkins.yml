@@ -8,7 +8,7 @@ xcode_version:
  - 12.5.1
  - 13.0
  - 13.1
- - 13.2.1
+ - 13.2
 target:
  - docs
  - swiftlint
