@@ -1,6 +1,6 @@
 ## Releasing from master
 
-Follow these steps to release a new version of the Realm Swift SDK.
+Follow these steps to release a new version of the Realm Cocoa SDK.
 
 1. Open the [cocoa-pipeline](https://ci.realm.io/job/cocoa-pipeline/) job in Jenkins and cancel any existing jobs running (optional, but it takes a while).
 2. Update the version number and set the release date in the changelog: `sh build.sh set-version X.Y.Z`

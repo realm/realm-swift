@@ -90,7 +90,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  ### Relationships
 
- See our [Objective-C guide](https://docs.mongodb.com/realm/sdk/swift/fundamentals/relationships/) for more details.
+ See our [Cocoa guide](http://realm.io/docs/cocoa) for more details.
  */
 @interface RealmSwiftObject : RLMObjectBase
 @end
