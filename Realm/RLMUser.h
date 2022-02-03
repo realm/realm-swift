@@ -229,6 +229,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+NS_ASSUME_NONNULL_END
+
 /**
  A profile for a given User.
  */
@@ -256,5 +258,3 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) NSDictionary *metadata NS_REFINED_FOR_SWIFT;
 
 @end
-
-NS_ASSUME_NONNULL_END
