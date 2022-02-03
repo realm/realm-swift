@@ -181,7 +181,7 @@ extension Decimal128: Comparable {
     }
 }
 
-extension Decimal128: Numeric {
+extension Decimal128 {
     /// Creates a new instance from the given integer, if it can be represented
     /// exactly.
     ///
@@ -229,18 +229,6 @@ extension Decimal128: Numeric {
     ///   - rhs: The second value to multiply.
     public static func * (lhs: Decimal128, rhs: Decimal128) -> Decimal128 {
         unsafeDowncast(lhs.decimalNumberByMultiplying(by: rhs), to: Decimal128.self)
-    }
-
-    /// Multiplies two values and stores the result in the left-hand-side
-    /// variable.
-    ///
-    /// - Parameters:
-    ///   - lhs: The first value to multiply.
-    ///   - rhs: The second value to multiply.
-    public static func *= (lhs: inout Decimal128, rhs: Decimal128) {
-        // Swiftlint wants us to use *= but this is the definition of *=
-        // swiftlint:disable:next shorthand_operator
-        lhs = lhs * rhs
     }
 
     /// Returns the quotient of dividing the first Decimal128 value by the second.

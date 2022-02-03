@@ -47,16 +47,25 @@ struct UnmanagedObjectFactory: ObjectFactory {
 
 // MARK: ValueFactory
 
-protocol ValueFactory where Self: RealmCollectionValue {
+protocol ValueFactory: RealmCollectionValue, _DefaultConstructible {
     associatedtype Wrapped: RealmCollectionValue = Self
+    associatedtype AverageType: AddableType = Double
 
     static func values() -> [Self]
-    static func min() -> Self
-    static func max() -> Self
+    static func doubleValue(_ value: AverageType) -> Double
+    static func doubleValue(t value: Self) -> Double
+    static func doubleValue(w value: Wrapped) -> Double
 }
 extension ValueFactory {
-    static func min() -> Self { values().first! }
-    static func max() -> Self { values().last! }
+    static func doubleValue(_ value: Double) -> Double {
+        return value
+    }
+    static func doubleValue(t value: Self) -> Double {
+        return (value as! NSNumber).doubleValue
+    }
+    static func doubleValue(w value: Wrapped) -> Double {
+        return (value as! NSNumber).doubleValue
+    }
 }
 extension ValueFactory where Self: PersistableEnum {
     static func values() -> [Self] {
@@ -64,103 +73,64 @@ extension ValueFactory where Self: PersistableEnum {
     }
 }
 
-protocol NumericValueFactory: ValueFactory {
-    associatedtype AverageType: RealmCollectionValue = Double where AverageType.PersistedType: AddableType
-    static func sum(_ values: [Self]) -> Double
-    static func average() -> Double
-    static func doubleValue(_ value: Self) -> Double
-    static var zero: Self { get }
-}
-extension NumericValueFactory {
-    static func sum() -> Double {
-        return sum(values())
-    }
-    static func average() -> Double {
-        return sum() / 3
-    }
-}
-extension NumericValueFactory where Self: AdditiveArithmetic {
-    static func sum(_ values: [Self]) -> Double {
-        return doubleValue(values.reduce(.zero, +))
-    }
-}
-extension NumericValueFactory where PersistedType == Self {
-    static func doubleValue(_ value: Self) -> Double {
-        return (value as! NSNumber).doubleValue
-    }
-}
-extension NumericValueFactory where Self: PersistableEnum {
-    static func doubleValue(_ value: Self) -> Double {
-        return (value as! NSNumber).doubleValue
-    }
-}
-
 protocol ListValueFactory: ValueFactory {
     associatedtype ListRoot: Object
     static var array: KeyPath<ListRoot, List<Self>> { get }
+    static var optArray: KeyPath<ListRoot, List<Self?>> { get }
 }
 
 protocol SetValueFactory: ValueFactory {
     associatedtype SetRoot: Object
     static var mutableSet: KeyPath<SetRoot, MutableSet<Self>> { get }
+    static var optMutableSet: KeyPath<SetRoot, MutableSet<Self?>> { get }
 }
 
 protocol MapValueFactory: ValueFactory {
     associatedtype MapRoot: Object
     static var map: KeyPath<MapRoot, Map<String, Self>> { get }
-}
-
-protocol ListValueFactoryOptional: ListValueFactory where Self: _RealmCollectionValueInsideOptional {
-    static var optArray: KeyPath<ListRoot, List<Self?>> { get }
-}
-
-protocol SetValueFactoryOptional: SetValueFactory where Self: _RealmCollectionValueInsideOptional {
-    static var optMutableSet: KeyPath<SetRoot, MutableSet<Self?>> { get }
-}
-
-protocol MapValueFactoryOptional: MapValueFactory where Self: _RealmCollectionValueInsideOptional {
     static var optMap: KeyPath<MapRoot, Map<String, Self?>> { get }
 }
 
 // MARK: Optional
 
-extension Optional: ValueFactory where Wrapped: ValueFactory & _RealmCollectionValueInsideOptional {
+extension Optional: _DefaultConstructible where Wrapped: _DefaultConstructible {
+    public init() {
+        self = .none
+    }
+}
+
+extension Optional: ValueFactory where Wrapped: ValueFactory & _DefaultConstructible {
+    typealias AverageType = Wrapped.AverageType
+
+    static func doubleValue(_ value: Wrapped.AverageType) -> Double {
+        Wrapped.doubleValue(value)
+    }
+    static func doubleValue(t value: Self) -> Double {
+        return Wrapped.doubleValue(t: value!)
+    }
+    static func doubleValue(w value: Wrapped) -> Double {
+        return Wrapped.doubleValue(w: value as! Wrapped.Wrapped)
+    }
+
     static func values() -> [Self] {
         var v = Array<Self>(Wrapped.values())
         v.remove(at: 1)
         v.insert(nil, at: 0)
         return v
     }
-
-    static func min() -> Self { Self.some(Wrapped.min()) }
 }
 
-extension Optional: NumericValueFactory where Wrapped: NumericValueFactory & _RealmCollectionValueInsideOptional {
-    typealias AverageType = Wrapped.AverageType
-    static func doubleValue(_ value: Self) -> Double {
-        return Wrapped.doubleValue(value!)
-    }
-
-    static func min() -> Self { Self.some(Wrapped.min()) }
-    static func sum(_ values: [Self]) -> Double {
-        return Wrapped.sum(values.compactMap { $0 })
-    }
-    static func average() -> Double {
-        return sum() / 2
-    }
-    static var zero: Optional<Wrapped> {
-        Wrapped.zero
-    }
-}
-
-extension Optional: ListValueFactory where Wrapped: ListValueFactoryOptional {
+extension Optional: ListValueFactory where Wrapped: ListValueFactory {
     static var array: KeyPath<Wrapped.ListRoot, List<Self>> { Wrapped.optArray }
+    static var optArray: KeyPath<Wrapped.ListRoot, List<Self?>> { fatalError() }
 }
-extension Optional: SetValueFactory where Wrapped: SetValueFactoryOptional {
+extension Optional: SetValueFactory where Wrapped: SetValueFactory {
     static var mutableSet: KeyPath<Wrapped.SetRoot, MutableSet<Self>> { Wrapped.optMutableSet }
+    static var optMutableSet: KeyPath<Wrapped.SetRoot, MutableSet<Self?>> { fatalError() }
 }
-extension Optional: MapValueFactory where Wrapped: MapValueFactoryOptional {
+extension Optional: MapValueFactory where Wrapped: MapValueFactory {
     static var map: KeyPath<Wrapped.MapRoot, Map<String, Self>> { Wrapped.optMap }
+    static var optMap: KeyPath<Wrapped.MapRoot, Map<String, Self?>> { fatalError() }
 }
 
 // MARK: - Bool
@@ -171,162 +141,162 @@ extension Bool: ValueFactory {
         return _values
     }
 }
-extension Bool: ListValueFactoryOptional {
+extension Bool: ListValueFactory {
     static var array: KeyPath<ModernAllTypesObject, List<Bool>> { \.arrayBool }
     static var optArray: KeyPath<ModernAllTypesObject, List<Bool?>> { \.arrayOptBool }
 }
-extension Bool: SetValueFactoryOptional {
+extension Bool: SetValueFactory {
     static var mutableSet: KeyPath<ModernAllTypesObject, MutableSet<Bool>> { \.setBool }
     static var optMutableSet: KeyPath<ModernAllTypesObject, MutableSet<Bool?>> { \.setOptBool }
 }
-extension Bool: MapValueFactoryOptional {
+extension Bool: MapValueFactory {
     static var map: KeyPath<ModernAllTypesObject, Map<String, Bool>> { \.mapBool }
     static var optMap: KeyPath<ModernAllTypesObject, Map<String, Bool?>> { \.mapOptBool }
 }
 
 // MARK: - Int
 
-extension Int: NumericValueFactory {
+extension Int: ValueFactory {
     private static let _values: [Int] = [1, 2, 3]
     static func values() -> [Int] {
         return _values
     }
 }
-extension Int: ListValueFactoryOptional {
+extension Int: ListValueFactory {
     static var array: KeyPath<ModernAllTypesObject, List<Int>> { \.arrayInt }
     static var optArray: KeyPath<ModernAllTypesObject, List<Int?>> { \.arrayOptInt }
 }
-extension Int: SetValueFactoryOptional {
+extension Int: SetValueFactory {
     static var mutableSet: KeyPath<ModernAllTypesObject, MutableSet<Int>> { \.setInt }
     static var optMutableSet: KeyPath<ModernAllTypesObject, MutableSet<Int?>> { \.setOptInt }
 }
-extension Int: MapValueFactoryOptional {
+extension Int: MapValueFactory {
     static var map: KeyPath<ModernAllTypesObject, Map<String, Int>> { \.mapInt }
     static var optMap: KeyPath<ModernAllTypesObject, Map<String, Int?>> { \.mapOptInt }
 }
 
 // MARK: - Int8
 
-extension Int8: NumericValueFactory {
+extension Int8: ValueFactory {
     private static let _values: [Int8] = [1, 2, 3]
     static func values() -> [Int8] {
         return _values
     }
 }
-extension Int8: ListValueFactoryOptional {
+extension Int8: ListValueFactory {
     static var array: KeyPath<ModernAllTypesObject, List<Int8>> { \.arrayInt8 }
     static var optArray: KeyPath<ModernAllTypesObject, List<Int8?>> { \.arrayOptInt8 }
 }
-extension Int8: SetValueFactoryOptional {
+extension Int8: SetValueFactory {
     static var mutableSet: KeyPath<ModernAllTypesObject, MutableSet<Int8>> { \.setInt8 }
     static var optMutableSet: KeyPath<ModernAllTypesObject, MutableSet<Int8?>> { \.setOptInt8 }
 }
-extension Int8: MapValueFactoryOptional {
+extension Int8: MapValueFactory {
     static var map: KeyPath<ModernAllTypesObject, Map<String, Int8>> { \.mapInt8 }
     static var optMap: KeyPath<ModernAllTypesObject, Map<String, Int8?>> { \.mapOptInt8 }
 }
 
 // MARK: - Int16
 
-extension Int16: NumericValueFactory {
+extension Int16: ValueFactory {
     private static let _values: [Int16] = [1, 2, 3]
     static func values() -> [Int16] {
         return _values
     }
 }
-extension Int16: ListValueFactoryOptional {
+extension Int16: ListValueFactory {
     static var array: KeyPath<ModernAllTypesObject, List<Int16>> { \.arrayInt16 }
     static var optArray: KeyPath<ModernAllTypesObject, List<Int16?>> { \.arrayOptInt16 }
 }
-extension Int16: SetValueFactoryOptional {
+extension Int16: SetValueFactory {
     static var mutableSet: KeyPath<ModernAllTypesObject, MutableSet<Int16>> { \.setInt16 }
     static var optMutableSet: KeyPath<ModernAllTypesObject, MutableSet<Int16?>> { \.setOptInt16 }
 }
-extension Int16: MapValueFactoryOptional {
+extension Int16: MapValueFactory {
     static var map: KeyPath<ModernAllTypesObject, Map<String, Int16>> { \.mapInt16 }
     static var optMap: KeyPath<ModernAllTypesObject, Map<String, Int16?>> { \.mapOptInt16 }
 }
 
 // MARK: - Int32
 
-extension Int32: NumericValueFactory {
+extension Int32: ValueFactory {
     private static let _values: [Int32] = [1, 2, 3]
     static func values() -> [Int32] {
         return _values
     }
 }
-extension Int32: ListValueFactoryOptional {
+extension Int32: ListValueFactory {
     static var array: KeyPath<ModernAllTypesObject, List<Int32>> { \.arrayInt32 }
     static var optArray: KeyPath<ModernAllTypesObject, List<Int32?>> { \.arrayOptInt32 }
 }
-extension Int32: SetValueFactoryOptional {
+extension Int32: SetValueFactory {
     static var mutableSet: KeyPath<ModernAllTypesObject, MutableSet<Int32>> { \.setInt32 }
     static var optMutableSet: KeyPath<ModernAllTypesObject, MutableSet<Int32?>> { \.setOptInt32 }
 }
-extension Int32: MapValueFactoryOptional {
+extension Int32: MapValueFactory {
     static var map: KeyPath<ModernAllTypesObject, Map<String, Int32>> { \.mapInt32 }
     static var optMap: KeyPath<ModernAllTypesObject, Map<String, Int32?>> { \.mapOptInt32 }
 }
 
 // MARK: - Int64
 
-extension Int64: NumericValueFactory {
+extension Int64: ValueFactory {
     private static let _values: [Int64] = [1, 2, 3]
     static func values() -> [Int64] {
         return _values
     }
 }
-extension Int64: ListValueFactoryOptional {
+extension Int64: ListValueFactory {
     static var array: KeyPath<ModernAllTypesObject, List<Int64>> { \.arrayInt64 }
     static var optArray: KeyPath<ModernAllTypesObject, List<Int64?>> { \.arrayOptInt64 }
 }
-extension Int64: SetValueFactoryOptional {
+extension Int64: SetValueFactory {
     static var mutableSet: KeyPath<ModernAllTypesObject, MutableSet<Int64>> { \.setInt64 }
     static var optMutableSet: KeyPath<ModernAllTypesObject, MutableSet<Int64?>> { \.setOptInt64 }
 }
-extension Int64: MapValueFactoryOptional {
+extension Int64: MapValueFactory {
     static var map: KeyPath<ModernAllTypesObject, Map<String, Int64>> { \.mapInt64 }
     static var optMap: KeyPath<ModernAllTypesObject, Map<String, Int64?>> { \.mapOptInt64 }
 }
 
 // MARK: - Float
 
-extension Float: NumericValueFactory {
+extension Float: ValueFactory {
     private static let _values: [Float] = [1.1, 2.2, 3.3]
     static func values() -> [Float] {
         return _values
     }
 }
-extension Float: ListValueFactoryOptional {
+extension Float: ListValueFactory {
     static var array: KeyPath<ModernAllTypesObject, List<Float>> { \.arrayFloat }
     static var optArray: KeyPath<ModernAllTypesObject, List<Float?>> { \.arrayOptFloat }
 }
-extension Float: SetValueFactoryOptional {
+extension Float: SetValueFactory {
     static var mutableSet: KeyPath<ModernAllTypesObject, MutableSet<Float>> { \.setFloat }
     static var optMutableSet: KeyPath<ModernAllTypesObject, MutableSet<Float?>> { \.setOptFloat }
 }
-extension Float: MapValueFactoryOptional {
+extension Float: MapValueFactory {
     static var map: KeyPath<ModernAllTypesObject, Map<String, Float>> { \.mapFloat }
     static var optMap: KeyPath<ModernAllTypesObject, Map<String, Float?>> { \.mapOptFloat }
 }
 
 // MARK: - Double
 
-extension Double: NumericValueFactory {
+extension Double: ValueFactory {
     private static let _values: [Double] = [1.1, 2.2, 3.3]
     static func values() -> [Double] {
         return _values
     }
 }
-extension Double: ListValueFactoryOptional {
+extension Double: ListValueFactory {
     static var array: KeyPath<ModernAllTypesObject, List<Double>> { \.arrayDouble }
     static var optArray: KeyPath<ModernAllTypesObject, List<Double?>> { \.arrayOptDouble }
 }
-extension Double: SetValueFactoryOptional {
+extension Double: SetValueFactory {
     static var mutableSet: KeyPath<ModernAllTypesObject, MutableSet<Double>> { \.setDouble }
     static var optMutableSet: KeyPath<ModernAllTypesObject, MutableSet<Double?>> { \.setOptDouble }
 }
-extension Double: MapValueFactoryOptional {
+extension Double: MapValueFactory {
     static var map: KeyPath<ModernAllTypesObject, Map<String, Double>> { \.mapDouble }
     static var optMap: KeyPath<ModernAllTypesObject, Map<String, Double?>> { \.mapOptDouble }
 }
@@ -339,15 +309,15 @@ extension String: ValueFactory {
         return _values
     }
 }
-extension String: ListValueFactoryOptional {
+extension String: ListValueFactory {
     static var array: KeyPath<ModernAllTypesObject, List<String>> { \.arrayString }
     static var optArray: KeyPath<ModernAllTypesObject, List<String?>> { \.arrayOptString }
 }
-extension String: SetValueFactoryOptional {
+extension String: SetValueFactory {
     static var mutableSet: KeyPath<ModernAllTypesObject, MutableSet<String>> { \.setString }
     static var optMutableSet: KeyPath<ModernAllTypesObject, MutableSet<String?>> { \.setOptString }
 }
-extension String: MapValueFactoryOptional {
+extension String: MapValueFactory {
     static var map: KeyPath<ModernAllTypesObject, Map<String, String>> { \.mapString }
     static var optMap: KeyPath<ModernAllTypesObject, Map<String, String?>> { \.mapOptString }
 }
@@ -360,15 +330,15 @@ extension Data: ValueFactory {
         return _values
     }
 }
-extension Data: ListValueFactoryOptional {
+extension Data: ListValueFactory {
     static var array: KeyPath<ModernAllTypesObject, List<Data>> { \.arrayBinary }
     static var optArray: KeyPath<ModernAllTypesObject, List<Data?>> { \.arrayOptBinary }
 }
-extension Data: SetValueFactoryOptional {
+extension Data: SetValueFactory {
     static var mutableSet: KeyPath<ModernAllTypesObject, MutableSet<Data>> { \.setBinary }
     static var optMutableSet: KeyPath<ModernAllTypesObject, MutableSet<Data?>> { \.setOptBinary }
 }
-extension Data: MapValueFactoryOptional {
+extension Data: MapValueFactory {
     static var map: KeyPath<ModernAllTypesObject, Map<String, Data>> { \.mapBinary }
     static var optMap: KeyPath<ModernAllTypesObject, Map<String, Data?>> { \.mapOptBinary }
 }
@@ -381,22 +351,22 @@ extension Date: ValueFactory {
         return _values
     }
 }
-extension Date: ListValueFactoryOptional {
+extension Date: ListValueFactory {
     static var array: KeyPath<ModernAllTypesObject, List<Date>> { \.arrayDate }
     static var optArray: KeyPath<ModernAllTypesObject, List<Date?>> { \.arrayOptDate }
 }
-extension Date: SetValueFactoryOptional {
+extension Date: SetValueFactory {
     static var mutableSet: KeyPath<ModernAllTypesObject, MutableSet<Date>> { \.setDate }
     static var optMutableSet: KeyPath<ModernAllTypesObject, MutableSet<Date?>> { \.setOptDate }
 }
-extension Date: MapValueFactoryOptional {
+extension Date: MapValueFactory {
     static var map: KeyPath<ModernAllTypesObject, Map<String, Date>> { \.mapDate }
     static var optMap: KeyPath<ModernAllTypesObject, Map<String, Date?>> { \.mapOptDate }
 }
 
 // MARK: - Decimal128
 
-extension Decimal128: NumericValueFactory {
+extension Decimal128: ValueFactory {
     private static let _values: [Decimal128] = [Decimal128(number: 1), Decimal128(number: 2), Decimal128(number: 3)]
     static func values() -> [Decimal128] {
         return _values
@@ -405,16 +375,22 @@ extension Decimal128: NumericValueFactory {
     static func doubleValue(_ value: Decimal128) -> Double {
         return value.doubleValue
     }
+    static func doubleValue(t value: Decimal128) -> Double {
+        return value.doubleValue
+    }
+    static func doubleValue(w value: Decimal128) -> Double {
+        return value.doubleValue
+    }
 }
-extension Decimal128: ListValueFactoryOptional {
+extension Decimal128: ListValueFactory {
     static var array: KeyPath<ModernAllTypesObject, List<Decimal128>> { \.arrayDecimal }
     static var optArray: KeyPath<ModernAllTypesObject, List<Decimal128?>> { \.arrayOptDecimal }
 }
-extension Decimal128: SetValueFactoryOptional {
+extension Decimal128: SetValueFactory {
     static var mutableSet: KeyPath<ModernAllTypesObject, MutableSet<Decimal128>> { \.setDecimal }
     static var optMutableSet: KeyPath<ModernAllTypesObject, MutableSet<Decimal128?>> { \.setOptDecimal }
 }
-extension Decimal128: MapValueFactoryOptional {
+extension Decimal128: MapValueFactory {
     static var map: KeyPath<ModernAllTypesObject, Map<String, Decimal128>> { \.mapDecimal }
     static var optMap: KeyPath<ModernAllTypesObject, Map<String, Decimal128?>> { \.mapOptDecimal }
 }
@@ -427,15 +403,15 @@ extension ObjectId: ValueFactory {
         return _values
     }
 }
-extension ObjectId: ListValueFactoryOptional {
+extension ObjectId: ListValueFactory {
     static var array: KeyPath<ModernAllTypesObject, List<ObjectId>> { \.arrayObjectId }
     static var optArray: KeyPath<ModernAllTypesObject, List<ObjectId?>> { \.arrayOptObjectId }
 }
-extension ObjectId: SetValueFactoryOptional {
+extension ObjectId: SetValueFactory {
     static var mutableSet: KeyPath<ModernAllTypesObject, MutableSet<ObjectId>> { \.setObjectId }
     static var optMutableSet: KeyPath<ModernAllTypesObject, MutableSet<ObjectId?>> { \.setOptObjectId }
 }
-extension ObjectId: MapValueFactoryOptional {
+extension ObjectId: MapValueFactory {
     static var map: KeyPath<ModernAllTypesObject, Map<String, ObjectId>> { \.mapObjectId }
     static var optMap: KeyPath<ModernAllTypesObject, Map<String, ObjectId?>> { \.mapOptObjectId }
 }
@@ -448,15 +424,15 @@ extension UUID: ValueFactory {
         return _values
     }
 }
-extension UUID: ListValueFactoryOptional {
+extension UUID: ListValueFactory {
     static var array: KeyPath<ModernAllTypesObject, List<UUID>> { \.arrayUuid }
     static var optArray: KeyPath<ModernAllTypesObject, List<UUID?>> { \.arrayOptUuid }
 }
-extension UUID: SetValueFactoryOptional {
+extension UUID: SetValueFactory {
     static var mutableSet: KeyPath<ModernAllTypesObject, MutableSet<UUID>> { \.setUuid }
     static var optMutableSet: KeyPath<ModernAllTypesObject, MutableSet<UUID?>> { \.setOptUuid }
 }
-extension UUID: MapValueFactoryOptional {
+extension UUID: MapValueFactory {
     static var map: KeyPath<ModernAllTypesObject, Map<String, UUID>> { \.mapUuid }
     static var optMap: KeyPath<ModernAllTypesObject, Map<String, UUID?>> { \.mapOptUuid }
 }
@@ -473,15 +449,15 @@ extension EnumInt: ValueFactory {
         return EnumInt.allCases
     }
 }
-extension EnumInt: ListValueFactoryOptional {
+extension EnumInt: ListValueFactory {
     static var array: KeyPath<ModernCollectionsOfEnums, List<EnumInt>> { \.listInt }
     static var optArray: KeyPath<ModernCollectionsOfEnums, List<EnumInt?>> { \.listIntOpt }
 }
-extension EnumInt: SetValueFactoryOptional {
+extension EnumInt: SetValueFactory {
     static var mutableSet: KeyPath<ModernCollectionsOfEnums, MutableSet<EnumInt>> { \.setInt }
     static var optMutableSet: KeyPath<ModernCollectionsOfEnums, MutableSet<EnumInt?>> { \.setIntOpt }
 }
-extension EnumInt: MapValueFactoryOptional {
+extension EnumInt: MapValueFactory {
     static var map: KeyPath<ModernCollectionsOfEnums, Map<String, EnumInt>> { \.mapInt }
     static var optMap: KeyPath<ModernCollectionsOfEnums, Map<String, EnumInt?>> { \.mapIntOpt }
 }
@@ -498,15 +474,15 @@ extension EnumInt8: ValueFactory {
         return EnumInt8.allCases
     }
 }
-extension EnumInt8: ListValueFactoryOptional {
+extension EnumInt8: ListValueFactory {
     static var array: KeyPath<ModernCollectionsOfEnums, List<EnumInt8>> { \.listInt8 }
     static var optArray: KeyPath<ModernCollectionsOfEnums, List<EnumInt8?>> { \.listInt8Opt }
 }
-extension EnumInt8: SetValueFactoryOptional {
+extension EnumInt8: SetValueFactory {
     static var mutableSet: KeyPath<ModernCollectionsOfEnums, MutableSet<EnumInt8>> { \.setInt8 }
     static var optMutableSet: KeyPath<ModernCollectionsOfEnums, MutableSet<EnumInt8?>> { \.setInt8Opt }
 }
-extension EnumInt8: MapValueFactoryOptional {
+extension EnumInt8: MapValueFactory {
     static var map: KeyPath<ModernCollectionsOfEnums, Map<String, EnumInt8>> { \.mapInt8 }
     static var optMap: KeyPath<ModernCollectionsOfEnums, Map<String, EnumInt8?>> { \.mapInt8Opt }
 }
@@ -523,15 +499,15 @@ extension EnumInt16: ValueFactory {
         return EnumInt16.allCases
     }
 }
-extension EnumInt16: ListValueFactoryOptional {
+extension EnumInt16: ListValueFactory {
     static var array: KeyPath<ModernCollectionsOfEnums, List<EnumInt16>> { \.listInt16 }
     static var optArray: KeyPath<ModernCollectionsOfEnums, List<EnumInt16?>> { \.listInt16Opt }
 }
-extension EnumInt16: SetValueFactoryOptional {
+extension EnumInt16: SetValueFactory {
     static var mutableSet: KeyPath<ModernCollectionsOfEnums, MutableSet<EnumInt16>> { \.setInt16 }
     static var optMutableSet: KeyPath<ModernCollectionsOfEnums, MutableSet<EnumInt16?>> { \.setInt16Opt }
 }
-extension EnumInt16: MapValueFactoryOptional {
+extension EnumInt16: MapValueFactory {
     static var map: KeyPath<ModernCollectionsOfEnums, Map<String, EnumInt16>> { \.mapInt16 }
     static var optMap: KeyPath<ModernCollectionsOfEnums, Map<String, EnumInt16?>> { \.mapInt16Opt }
 }
@@ -548,15 +524,15 @@ extension EnumInt32: ValueFactory {
         return EnumInt32.allCases
     }
 }
-extension EnumInt32: ListValueFactoryOptional {
+extension EnumInt32: ListValueFactory {
     static var array: KeyPath<ModernCollectionsOfEnums, List<EnumInt32>> { \.listInt32 }
     static var optArray: KeyPath<ModernCollectionsOfEnums, List<EnumInt32?>> { \.listInt32Opt }
 }
-extension EnumInt32: SetValueFactoryOptional {
+extension EnumInt32: SetValueFactory {
     static var mutableSet: KeyPath<ModernCollectionsOfEnums, MutableSet<EnumInt32>> { \.setInt32 }
     static var optMutableSet: KeyPath<ModernCollectionsOfEnums, MutableSet<EnumInt32?>> { \.setInt32Opt }
 }
-extension EnumInt32: MapValueFactoryOptional {
+extension EnumInt32: MapValueFactory {
     static var map: KeyPath<ModernCollectionsOfEnums, Map<String, EnumInt32>> { \.mapInt32 }
     static var optMap: KeyPath<ModernCollectionsOfEnums, Map<String, EnumInt32?>> { \.mapInt32Opt }
 }
@@ -573,15 +549,15 @@ extension EnumInt64: ValueFactory {
         return EnumInt64.allCases
     }
 }
-extension EnumInt64: ListValueFactoryOptional {
+extension EnumInt64: ListValueFactory {
     static var array: KeyPath<ModernCollectionsOfEnums, List<EnumInt64>> { \.listInt64 }
     static var optArray: KeyPath<ModernCollectionsOfEnums, List<EnumInt64?>> { \.listInt64Opt }
 }
-extension EnumInt64: SetValueFactoryOptional {
+extension EnumInt64: SetValueFactory {
     static var mutableSet: KeyPath<ModernCollectionsOfEnums, MutableSet<EnumInt64>> { \.setInt64 }
     static var optMutableSet: KeyPath<ModernCollectionsOfEnums, MutableSet<EnumInt64?>> { \.setInt64Opt }
 }
-extension EnumInt64: MapValueFactoryOptional {
+extension EnumInt64: MapValueFactory {
     static var map: KeyPath<ModernCollectionsOfEnums, Map<String, EnumInt64>> { \.mapInt64 }
     static var optMap: KeyPath<ModernCollectionsOfEnums, Map<String, EnumInt64?>> { \.mapInt64Opt }
 }
@@ -598,15 +574,15 @@ extension EnumFloat: ValueFactory {
         return EnumFloat.allCases
     }
 }
-extension EnumFloat: ListValueFactoryOptional {
+extension EnumFloat: ListValueFactory {
     static var array: KeyPath<ModernCollectionsOfEnums, List<EnumFloat>> { \.listFloat }
     static var optArray: KeyPath<ModernCollectionsOfEnums, List<EnumFloat?>> { \.listFloatOpt }
 }
-extension EnumFloat: SetValueFactoryOptional {
+extension EnumFloat: SetValueFactory {
     static var mutableSet: KeyPath<ModernCollectionsOfEnums, MutableSet<EnumFloat>> { \.setFloat }
     static var optMutableSet: KeyPath<ModernCollectionsOfEnums, MutableSet<EnumFloat?>> { \.setFloatOpt }
 }
-extension EnumFloat: MapValueFactoryOptional {
+extension EnumFloat: MapValueFactory {
     static var map: KeyPath<ModernCollectionsOfEnums, Map<String, EnumFloat>> { \.mapFloat }
     static var optMap: KeyPath<ModernCollectionsOfEnums, Map<String, EnumFloat?>> { \.mapFloatOpt }
 }
@@ -623,15 +599,15 @@ extension EnumDouble: ValueFactory {
         return EnumDouble.allCases
     }
 }
-extension EnumDouble: ListValueFactoryOptional {
+extension EnumDouble: ListValueFactory {
     static var array: KeyPath<ModernCollectionsOfEnums, List<EnumDouble>> { \.listDouble }
     static var optArray: KeyPath<ModernCollectionsOfEnums, List<EnumDouble?>> { \.listDoubleOpt }
 }
-extension EnumDouble: SetValueFactoryOptional {
+extension EnumDouble: SetValueFactory {
     static var mutableSet: KeyPath<ModernCollectionsOfEnums, MutableSet<EnumDouble>> { \.setDouble }
     static var optMutableSet: KeyPath<ModernCollectionsOfEnums, MutableSet<EnumDouble?>> { \.setDoubleOpt }
 }
-extension EnumDouble: MapValueFactoryOptional {
+extension EnumDouble: MapValueFactory {
     static var map: KeyPath<ModernCollectionsOfEnums, Map<String, EnumDouble>> { \.mapDouble }
     static var optMap: KeyPath<ModernCollectionsOfEnums, Map<String, EnumDouble?>> { \.mapDoubleOpt }
 }
@@ -648,15 +624,15 @@ extension EnumString: ValueFactory {
         return EnumString.allCases
     }
 }
-extension EnumString: ListValueFactoryOptional {
+extension EnumString: ListValueFactory {
     static var array: KeyPath<ModernCollectionsOfEnums, List<EnumString>> { \.listString }
     static var optArray: KeyPath<ModernCollectionsOfEnums, List<EnumString?>> { \.listStringOpt }
 }
-extension EnumString: SetValueFactoryOptional {
+extension EnumString: SetValueFactory {
     static var mutableSet: KeyPath<ModernCollectionsOfEnums, MutableSet<EnumString>> { \.setString }
     static var optMutableSet: KeyPath<ModernCollectionsOfEnums, MutableSet<EnumString?>> { \.setStringOpt }
 }
-extension EnumString: MapValueFactoryOptional {
+extension EnumString: MapValueFactory {
     static var map: KeyPath<ModernCollectionsOfEnums, Map<String, EnumString>> { \.mapString }
     static var optMap: KeyPath<ModernCollectionsOfEnums, Map<String, EnumString?>> { \.mapStringOpt }
 }

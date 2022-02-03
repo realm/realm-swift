@@ -108,7 +108,7 @@ extension NSDate: SchemaDiscoverable {
 
 // MARK: - Modern property getters/setters
 
-private protocol _Int: BinaryInteger, _PersistableInsideOptional, _PrimaryKey, _Indexable {
+private protocol _Int: BinaryInteger, _OptionalPersistable, _PrimaryKey, _Indexable {
 }
 
 extension _Int {
@@ -146,7 +146,7 @@ extension Int64: _Int {
     public typealias PersistedType = Int64
 }
 
-extension Bool: _PersistableInsideOptional, _DefaultConstructible, _PrimaryKey, _Indexable {
+extension Bool: _OptionalPersistable, _DefaultConstructible, _PrimaryKey, _Indexable {
     public typealias PersistedType = Bool
 
     @inlinable
@@ -167,7 +167,7 @@ extension Bool: _PersistableInsideOptional, _DefaultConstructible, _PrimaryKey, 
     }
 }
 
-extension Float: _PersistableInsideOptional, _DefaultConstructible {
+extension Float: _OptionalPersistable, _DefaultConstructible {
     public typealias PersistedType = Float
 
     @inlinable
@@ -188,7 +188,7 @@ extension Float: _PersistableInsideOptional, _DefaultConstructible {
     }
 }
 
-extension Double: _PersistableInsideOptional, _DefaultConstructible {
+extension Double: _OptionalPersistable, _DefaultConstructible {
     public typealias PersistedType = Double
 
     @inlinable
@@ -209,7 +209,7 @@ extension Double: _PersistableInsideOptional, _DefaultConstructible {
     }
 }
 
-extension String: _PersistableInsideOptional, _DefaultConstructible, _PrimaryKey, _Indexable {
+extension String: _OptionalPersistable, _DefaultConstructible, _PrimaryKey, _Indexable {
     public typealias PersistedType = String
 
     @inlinable
@@ -228,7 +228,7 @@ extension String: _PersistableInsideOptional, _DefaultConstructible, _PrimaryKey
     }
 }
 
-extension Data: _PersistableInsideOptional, _DefaultConstructible {
+extension Data: _OptionalPersistable, _DefaultConstructible {
     public typealias PersistedType = Data
 
     @inlinable
@@ -247,7 +247,7 @@ extension Data: _PersistableInsideOptional, _DefaultConstructible {
     }
 }
 
-extension ObjectId: _PersistableInsideOptional, _DefaultConstructible, _PrimaryKey, _Indexable {
+extension ObjectId: _OptionalPersistable, _DefaultConstructible, _PrimaryKey, _Indexable {
     public typealias PersistedType = ObjectId
 
     @inlinable
@@ -265,12 +265,12 @@ extension ObjectId: _PersistableInsideOptional, _DefaultConstructible, _PrimaryK
         RLMSetSwiftPropertyObjectId(obj, key, (value))
     }
 
-    public static func _rlmDefaultValue() -> ObjectId {
+    public static func _rlmDefaultValue(_ forceDefaultInitialization: Bool) -> ObjectId {
         return Self.generate()
     }
 }
 
-extension Decimal128: _PersistableInsideOptional, _DefaultConstructible {
+extension Decimal128: _OptionalPersistable, _DefaultConstructible {
     public typealias PersistedType = Decimal128
 
     @inlinable
@@ -289,7 +289,7 @@ extension Decimal128: _PersistableInsideOptional, _DefaultConstructible {
     }
 }
 
-extension Date: _PersistableInsideOptional, _DefaultConstructible, _Indexable {
+extension Date: _OptionalPersistable, _DefaultConstructible, _Indexable {
     public typealias PersistedType = Date
 
     @inlinable
@@ -308,7 +308,7 @@ extension Date: _PersistableInsideOptional, _DefaultConstructible, _Indexable {
     }
 }
 
-extension UUID: _PersistableInsideOptional, _DefaultConstructible, _PrimaryKey, _Indexable {
+extension UUID: _OptionalPersistable, _DefaultConstructible, _PrimaryKey, _Indexable {
     public typealias PersistedType = UUID
 
     @inlinable
@@ -333,6 +333,11 @@ extension AnyRealmValue: _Persistable, _DefaultConstructible {
     @inlinable
     public static func _rlmGetProperty(_ obj: ObjectBase, _ key: PropertyKey) -> AnyRealmValue {
         return ObjectiveCSupport.convert(value: RLMGetSwiftPropertyAny(obj, key))
+    }
+
+    @inlinable
+    public static func _rlmGetPropertyOptional(_ obj: ObjectBase, _ key: PropertyKey) -> AnyRealmValue? {
+        fatalError() // This should be caught by schema validation
     }
 
     public static func _rlmSetProperty(_ obj: ObjectBase, _ key: PropertyKey, _ value: AnyRealmValue) {

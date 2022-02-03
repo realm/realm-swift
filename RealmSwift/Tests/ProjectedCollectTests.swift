@@ -17,11 +17,17 @@
 ////////////////////////////////////////////////////////////////////////////
 
 import Foundation
+import Realm
 import RealmSwift
 import XCTest
 
+#if canImport(RealmTestSupport)
+import RealmTestSupport
+import SwiftUI
+#endif
+
 class PersistedCollections: Object {
-    @Persisted public var list: List<CommonPerson>
+    @Persisted public var list: RealmSwift.List<CommonPerson>
     @Persisted public var set: MutableSet<CommonPerson>
 }
 
@@ -31,6 +37,7 @@ class ProjectedCollections: Projection<PersistedCollections> {
 }
 
 class ProjectedCollectionsTestsTemplate: TestCase {
+
     // To test some of methods there should be a collection of projections instead of collection of strings
     // set value in subclass
     var collection: ProjectedCollection<String>!
@@ -143,7 +150,7 @@ class ProjectedCollectionsTestsTemplate: TestCase {
 
     func testObserve() {
         let ex = expectation(description: "initial notification")
-        let token = collection.observe { (changes: RealmCollectionChange) in
+        let token = collection.observe(on: nil) { (changes: RealmCollectionChange) in
             switch changes {
             case .initial(let collection):
                 XCTAssertEqual(collection.count, 3)
@@ -159,7 +166,7 @@ class ProjectedCollectionsTestsTemplate: TestCase {
 
         // add a second notification and wait for it
         var ex2 = expectation(description: "second initial notification")
-        let token2 = collection.observe { _ in
+        let token2 = collection.observe(on: nil) { _ in
             ex2.fulfill()
         }
         waitForExpectations(timeout: 1, handler: nil)
@@ -289,7 +296,7 @@ class ProjectedCollectionsTestsTemplate: TestCase {
 
     func testObserveFrozenCollection() {
         let frozen = collection.freeze()
-        assertThrows(frozen.observe({ _ in }),
+        assertThrows(frozen.observe(on: nil, { _ in }),
                      reason: "Frozen Realms do not change and do not have change notifications.")
     }
 

@@ -28,7 +28,7 @@ identifier_name:
     - _realmObjectName()
     - _rlmCollection
     - _rlmCollection()
-    - _rlmDefaultValue()
+    - _rlmDefaultValue(_:)
     - _rlmFromObjc(_:)
     - _rlmGetProperty(_:_:)
     - _rlmGetPropertyOptional(_:_:)

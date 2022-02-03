@@ -187,7 +187,7 @@ public protocol RealmKeyedCollection: Sequence, ThreadConfined, CustomStringConv
 
      - parameter property: The name of a property whose minimum value is desired.
      */
-    func min<T: _HasPersistedType>(ofProperty property: String) -> T? where T.PersistedType: MinMaxType
+    func min<T: MinMaxType>(ofProperty property: String) -> T?
 
     /**
      Returns the maximum (highest) value of the given property among all the objects in the dictionary, or `nil` if the
@@ -197,7 +197,7 @@ public protocol RealmKeyedCollection: Sequence, ThreadConfined, CustomStringConv
 
      - parameter property: The name of a property whose minimum value is desired.
      */
-    func max<T: _HasPersistedType>(ofProperty property: String) -> T? where T.PersistedType: MinMaxType
+    func max<T: MinMaxType>(ofProperty property: String) -> T?
 
     /**
     Returns the sum of the given property for objects in the dictionary, or `nil` if the dictionary is empty.
@@ -206,7 +206,7 @@ public protocol RealmKeyedCollection: Sequence, ThreadConfined, CustomStringConv
 
     - parameter property: The name of a property conforming to `AddableType` to calculate sum on.
     */
-    func sum<T: _HasPersistedType>(ofProperty property: String) -> T where T.PersistedType: AddableType
+    func sum<T: AddableType>(ofProperty property: String) -> T
 
     /**
      Returns the average value of a given property over all the objects in the dictionary, or `nil` if
@@ -216,7 +216,7 @@ public protocol RealmKeyedCollection: Sequence, ThreadConfined, CustomStringConv
 
      - parameter property: The name of a property whose values should be summed.
      */
-    func average<T: _HasPersistedType>(ofProperty property: String) -> T? where T.PersistedType: AddableType
+    func average<T: AddableType>(ofProperty property: String) -> T?
 
     // MARK: Notifications
 
@@ -431,7 +431,7 @@ public protocol RealmKeyedCollection: Sequence, ThreadConfined, CustomStringConv
  Protocol for RealmKeyedCollections where the Value is of an Object type that
  enables aggregatable operations.
  */
-public extension RealmKeyedCollection where Value: OptionalProtocol, Value.Wrapped: ObjectBase {
+public extension RealmKeyedCollection where Value: OptionalProtocol, Value.Wrapped: ObjectBase, Value.Wrapped: RealmCollectionValue {
     /**
      Returns the minimum (lowest) value of the given property among all the objects in the collection, or `nil` if the
      collection is empty.
@@ -440,7 +440,7 @@ public extension RealmKeyedCollection where Value: OptionalProtocol, Value.Wrapp
 
      - parameter keyPath: The keyPath of a property whose minimum value is desired.
      */
-    func min<T: _HasPersistedType>(of keyPath: KeyPath<Value.Wrapped, T>) -> T? where T.PersistedType: MinMaxType {
+    func min<T: MinMaxType>(of keyPath: KeyPath<Value.Wrapped, T>) -> T? {
         min(ofProperty: _name(for: keyPath))
     }
 
@@ -452,7 +452,7 @@ public extension RealmKeyedCollection where Value: OptionalProtocol, Value.Wrapp
 
      - parameter keyPath: The keyPath of a property whose minimum value is desired.
      */
-    func max<T: _HasPersistedType>(of keyPath: KeyPath<Value.Wrapped, T>) -> T? where T.PersistedType: MinMaxType {
+    func max<T: MinMaxType>(of keyPath: KeyPath<Value.Wrapped, T>) -> T? {
         max(ofProperty: _name(for: keyPath))
     }
 
@@ -463,7 +463,7 @@ public extension RealmKeyedCollection where Value: OptionalProtocol, Value.Wrapp
 
     - parameter keyPath: The keyPath of a property conforming to `AddableType` to calculate sum on.
     */
-    func sum<T: _HasPersistedType>(of keyPath: KeyPath<Value.Wrapped, T>) -> T where T.PersistedType: AddableType {
+    func sum<T: AddableType>(of keyPath: KeyPath<Value.Wrapped, T>) -> T {
         sum(ofProperty: _name(for: keyPath))
     }
 
@@ -475,7 +475,7 @@ public extension RealmKeyedCollection where Value: OptionalProtocol, Value.Wrapp
 
      - parameter keyPath: The keyPath of a property whose values should be summed.
      */
-    func average<T: _HasPersistedType>(of keyPath: KeyPath<Value.Wrapped, T>) -> T? where T.PersistedType: AddableType {
+    func average<T: AddableType>(of keyPath: KeyPath<Value.Wrapped, T>) -> T? {
         average(ofProperty: _name(for: keyPath))
     }
 }
@@ -500,12 +500,12 @@ public extension RealmKeyedCollection where Value: OptionalProtocol, Value.Wrapp
      - parameter keyPath:   The key path to sort by.
      - parameter ascending: The direction to sort in.
      */
-    func sorted<T: _HasPersistedType>(by keyPath: KeyPath<Value.Wrapped, T>, ascending: Bool) -> Results<Value> where T.PersistedType: SortableType {
+    func sorted<T: Comparable>(by keyPath: KeyPath<Value.Wrapped, T>, ascending: Bool) -> Results<Value> {
         sorted(byKeyPath: _name(for: keyPath), ascending: ascending)
     }
 }
 
-public extension RealmKeyedCollection where Value.PersistedType: MinMaxType {
+public extension RealmKeyedCollection where Value: MinMaxType {
     /**
      Returns the minimum (lowest) value of the collection, or `nil` if the collection is empty.
      */
@@ -520,7 +520,22 @@ public extension RealmKeyedCollection where Value.PersistedType: MinMaxType {
     }
 }
 
-public extension RealmKeyedCollection where Value.PersistedType: AddableType {
+public extension RealmKeyedCollection where Value: OptionalProtocol, Value.Wrapped: MinMaxType {
+    /**
+     Returns the minimum (lowest) value of the collection, or `nil` if the collection is empty.
+     */
+    func min() -> Value.Wrapped? {
+        return min(ofProperty: "self")
+    }
+    /**
+     Returns the maximum (highest) value of the collection, or `nil` if the collection is empty.
+     */
+    func max() -> Value.Wrapped? {
+        return max(ofProperty: "self")
+    }
+}
+
+public extension RealmKeyedCollection where Value: AddableType {
     /**
      Returns the sum of the values in the collection, or `nil` if the collection is empty.
      */
@@ -530,12 +545,41 @@ public extension RealmKeyedCollection where Value.PersistedType: AddableType {
     /**
      Returns the average of all of the values in the collection.
      */
-    func average<T: _HasPersistedType>() -> T? where T.PersistedType: AddableType {
+    func average<T: AddableType>() -> T? {
         return average(ofProperty: "self")
     }
 }
 
-public extension RealmKeyedCollection where Value.PersistedType: SortableType {
+public extension RealmKeyedCollection where Value: OptionalProtocol, Value.Wrapped: AddableType {
+    /**
+     Returns the sum of the values in the collection, or `nil` if the collection is empty.
+     */
+    func sum() -> Value.Wrapped {
+        return sum(ofProperty: "self")
+    }
+    /**
+     Returns the average of all of the values in the collection.
+     */
+    func average<T: AddableType>() -> T? {
+        return average(ofProperty: "self")
+    }
+}
+
+public extension RealmKeyedCollection where Value: Comparable {
+    /**
+     Returns a `Results` containing the objects in the collection, but sorted.
+
+     Objects are sorted based on their values. For example, to sort a collection of `Date`s from
+     neweset to oldest based, you might call `dates.sorted(ascending: true)`.
+
+     - parameter ascending: The direction to sort in.
+     */
+    func sorted(ascending: Bool = true) -> Results<Value> {
+        return sorted(byKeyPath: "self", ascending: ascending)
+    }
+}
+
+public extension RealmKeyedCollection where Value: OptionalProtocol, Value.Wrapped: Comparable {
     /**
      Returns a `Results` containing the objects in the collection, but sorted.
 

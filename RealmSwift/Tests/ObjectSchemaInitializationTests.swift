@@ -181,6 +181,13 @@ class ObjectSchemaInitializationTests: TestCase {
                      reason: "Property SwiftObjectWithNSURL.url is declared as NSURL")
         assertThrows(RLMObjectSchema(forObjectClass: SwiftObjectWithNonOptionalLinkProperty.self),
                      reason: "Object property 'objectCol' must be marked as optional.")
+
+        assertThrows(RLMObjectSchema(forObjectClass: OptionalAnyRealmValueList.self),
+                     reason: "List<AnyRealmValue> property 'invalid' must not be marked as optional")
+        assertThrows(RLMObjectSchema(forObjectClass: OptionalAnyRealmValueSet.self),
+                     reason: "MutableSet<AnyRealmValue> property 'invalid' must not be marked as optional")
+        assertThrows(RLMObjectSchema(forObjectClass: OptionalAnyRealmValueDictionary.self),
+                     reason: "Map<String, AnyRealmValue> property 'invalid' must not be marked as optional")
     }
 
     func testPrimaryKey() {
@@ -678,4 +685,14 @@ class SwiftObjectWithDynamicManagedLazyProperty: SwiftFakeObject {
 class SwiftObjectWithMultiplePrimaryKeys: SwiftFakeObject {
     @Persisted(primaryKey: true) var pk1: Int
     @Persisted(primaryKey: true) var pk2: Int
+}
+
+class OptionalAnyRealmValueList: SwiftFakeObject {
+    let invalid = List<AnyRealmValue?>()
+}
+class OptionalAnyRealmValueSet: SwiftFakeObject {
+    let invalid = MutableSet<AnyRealmValue?>()
+}
+class OptionalAnyRealmValueDictionary: SwiftFakeObject {
+    let invalid = Map<String, AnyRealmValue?>()
 }

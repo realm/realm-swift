@@ -19,7 +19,7 @@
 import Realm
 import Realm.Private
 
-extension Object: SchemaDiscoverable, _PersistableInsideOptional, _DefaultConstructible {
+extension Object: SchemaDiscoverable, _OptionalPersistable, _DefaultConstructible {
     public typealias PersistedType = Object
     public static var _rlmType: PropertyType { .object }
     public static func _rlmPopulateProperty(_ prop: RLMProperty) {
@@ -56,7 +56,7 @@ extension Object: SchemaDiscoverable, _PersistableInsideOptional, _DefaultConstr
     }
 }
 
-extension EmbeddedObject: SchemaDiscoverable, _PersistableInsideOptional, _DefaultConstructible {
+extension EmbeddedObject: SchemaDiscoverable, _OptionalPersistable, _DefaultConstructible {
     public typealias PersistedType = EmbeddedObject
     public static var _rlmType: PropertyType { .object }
     public static func _rlmPopulateProperty(_ prop: RLMProperty) {
@@ -80,7 +80,7 @@ extension EmbeddedObject: SchemaDiscoverable, _PersistableInsideOptional, _Defau
     }
 }
 
-extension List: _RealmSchemaDiscoverable, SchemaDiscoverable where Element: _RealmSchemaDiscoverable {
+extension List: SchemaDiscoverable where Element: _RealmSchemaDiscoverable {
     public static var _rlmType: PropertyType { Element._rlmType }
     public static var _rlmOptional: Bool { Element._rlmOptional }
     public static var _rlmRequireObjc: Bool { false }
@@ -91,12 +91,16 @@ extension List: _RealmSchemaDiscoverable, SchemaDiscoverable where Element: _Rea
     }
 }
 
-extension List: _HasPersistedType, _Persistable, _DefaultConstructible where Element: _Persistable {
+extension List: _Persistable, _DefaultConstructible where Element: _Persistable {
     public typealias PersistedType = List
     public static var _rlmRequiresCaching: Bool { true }
 
     public static func _rlmGetProperty(_ obj: ObjectBase, _ key: UInt16) -> Self {
         return Self(collection: RLMGetSwiftPropertyArray(obj, key))
+    }
+
+    public static func _rlmGetPropertyOptional(_ obj: ObjectBase, _ key: UInt16) -> Self? {
+        fatalError("List properties cannot be optional")
     }
 
     public static func _rlmSetProperty(_ obj: ObjectBase, _ key: UInt16, _ value: List) {
@@ -111,7 +115,7 @@ extension List: _HasPersistedType, _Persistable, _DefaultConstructible where Ele
     }
 }
 
-extension MutableSet: _RealmSchemaDiscoverable, SchemaDiscoverable where Element: _RealmSchemaDiscoverable {
+extension MutableSet: SchemaDiscoverable where Element: _RealmSchemaDiscoverable {
     public static var _rlmType: PropertyType { Element._rlmType }
     public static var _rlmOptional: Bool { Element._rlmOptional }
     public static var _rlmRequireObjc: Bool { false }
@@ -122,12 +126,16 @@ extension MutableSet: _RealmSchemaDiscoverable, SchemaDiscoverable where Element
     }
 }
 
-extension MutableSet: _HasPersistedType, _Persistable, _DefaultConstructible where Element: _Persistable {
+extension MutableSet: _Persistable, _DefaultConstructible where Element: _Persistable {
     public typealias PersistedType = MutableSet
     public static var _rlmRequiresCaching: Bool { true }
 
     public static func _rlmGetProperty(_ obj: ObjectBase, _ key: UInt16) -> Self {
         return Self(collection: RLMGetSwiftPropertySet(obj, key))
+    }
+
+    public static func _rlmGetPropertyOptional(_ obj: ObjectBase, _ key: UInt16) -> Self? {
+        fatalError("Set properties cannot be optional")
     }
 
     public static func _rlmSetProperty(_ obj: ObjectBase, _ key: UInt16, _ value: MutableSet) {
@@ -142,7 +150,7 @@ extension MutableSet: _HasPersistedType, _Persistable, _DefaultConstructible whe
     }
 }
 
-extension Map: _RealmSchemaDiscoverable, SchemaDiscoverable where Value: _RealmSchemaDiscoverable {
+extension Map: SchemaDiscoverable where Value: _RealmSchemaDiscoverable {
     public static var _rlmType: PropertyType { Value._rlmType }
     public static var _rlmOptional: Bool { Value._rlmOptional }
     public static var _rlmRequireObjc: Bool { false }
@@ -154,11 +162,15 @@ extension Map: _RealmSchemaDiscoverable, SchemaDiscoverable where Value: _RealmS
     }
 }
 
-extension Map: _HasPersistedType, _Persistable, _DefaultConstructible where Value: _Persistable {
+extension Map: _Persistable, _DefaultConstructible where Value: _Persistable {
     public typealias PersistedType = Map
     public static var _rlmRequiresCaching: Bool { true }
 
     public static func _rlmGetProperty(_ obj: ObjectBase, _ key: UInt16) -> Self {
+        return Self(objc: RLMGetSwiftPropertyMap(obj, key))
+    }
+
+    public static func _rlmGetPropertyOptional(_ obj: ObjectBase, _ key: UInt16) -> Self? {
         return Self(objc: RLMGetSwiftPropertyMap(obj, key))
     }
 
@@ -201,15 +213,23 @@ extension RealmOptional: SchemaDiscoverable, _RealmSchemaDiscoverable where Valu
     }
 }
 
-extension LinkingObjects: _HasPersistedType, _Persistable where Element: _Persistable {
+extension LinkingObjects: _Persistable where Element: _Persistable {
     public typealias PersistedType = Self
-    public static func _rlmDefaultValue() -> Self {
-        fatalError("LinkingObjects properties must set the origin property name")
+    public static func _rlmDefaultValue(_ forceDefaultInitialization: Bool) -> Self {
+        if forceDefaultInitialization {
+            return .init(propertyName: "", handle: nil)
+        } else {
+            fatalError("LinkingObjects properties must set the origin property name")
+        }
     }
 
     public static func _rlmGetProperty(_ obj: ObjectBase, _ key: UInt16) -> LinkingObjects {
         let prop = RLMObjectBaseObjectSchema(obj)!.computedProperties[Int(key)]
         return Self(propertyName: prop.name, handle: RLMLinkingObjectsHandle(object: obj, property: prop))
+    }
+
+    public static func _rlmGetPropertyOptional(_ obj: ObjectBase, _ key: UInt16) -> LinkingObjects? {
+        fatalError("LinkingObjects properties cannot be optional")
     }
 
     public static func _rlmSetProperty(_ obj: ObjectBase, _ key: UInt16, _ value: LinkingObjects) {
@@ -229,16 +249,20 @@ extension Optional: SchemaDiscoverable, _RealmSchemaDiscoverable where Wrapped: 
     }
 }
 
-extension Optional: _HasPersistedType where Wrapped: _HasPersistedType {
-    public typealias PersistedType = Wrapped.PersistedType?
-}
+extension Optional: _Persistable where Wrapped: _OptionalPersistable {
+    public typealias PersistedType = Self
 
-extension Optional: _Persistable where Wrapped: _PersistableInsideOptional {
-    public static func _rlmDefaultValue() -> Self {
+    public static func _rlmDefaultValue(_ forceDefaultInitialization: Bool) -> Self {
+        if forceDefaultInitialization {
+            return Wrapped()
+        }
         return .none
     }
     public static func _rlmGetProperty(_ obj: ObjectBase, _ key: UInt16) -> Wrapped? {
         return Wrapped._rlmGetPropertyOptional(obj, key)
+    }
+    public static func _rlmGetPropertyOptional(_ obj: ObjectBase, _ key: UInt16) -> Wrapped?? {
+        fatalError("Double-optional properties are not supported")
     }
     public static func _rlmSetProperty(_ obj: ObjectBase, _ key: UInt16, _ value: Wrapped?) {
         if let value = value {
@@ -275,7 +299,7 @@ extension RawRepresentable where RawValue: _RealmSchemaDiscoverable {
     }
 }
 
-extension RawRepresentable where Self: _PersistableInsideOptional, RawValue: _PersistableInsideOptional {
+extension RawRepresentable where Self: _OptionalPersistable, RawValue: _OptionalPersistable {
     public typealias PersistedType = RawValue
     public static func _rlmGetProperty(_ obj: ObjectBase, _ key: PropertyKey) -> Self {
         return Self(rawValue: RawValue._rlmGetProperty(obj, key))!
@@ -292,5 +316,16 @@ extension RawRepresentable where Self: _PersistableInsideOptional, RawValue: _Pe
         } else {
             prop.swiftAccessor = BridgedPersistedPropertyAccessor<Self>.self
         }
+    }
+}
+
+// Projections need to be usable in collections, which means they have to be
+// SchemaDiscoverable even though they can't be used with @Persisted
+extension Projection: SchemaDiscoverable {
+    public static var _rlmType: PropertyType {
+        fatalError("Projection types cannot be used with @Persisted and must use @Projected")
+    }
+    public static func _rlmDefaultValue(_ forceDefaultInitialization: Bool) -> Self {
+        fatalError()
     }
 }

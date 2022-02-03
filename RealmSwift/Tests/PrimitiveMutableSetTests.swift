@@ -43,6 +43,7 @@ class PrimitiveMutableSetTestsBase<O: ObjectFactory, V: SetValueFactory>: TestCa
         obj = nil
         obj2 = nil
         realm = nil
+
     }
 }
 
@@ -187,35 +188,95 @@ class PrimitiveMutableSetTests<O: ObjectFactory, V: SetValueFactory>: PrimitiveM
     }
 }
 
-class MinMaxPrimitiveMutableSetTests<O: ObjectFactory, V: SetValueFactory>: PrimitiveMutableSetTestsBase<O, V> where V.PersistedType: MinMaxType {
+class MinMaxPrimitiveMutableSetTests<O: ObjectFactory, V: SetValueFactory>: PrimitiveMutableSetTestsBase<O, V> where V: MinMaxType {
     func testMin() {
         XCTAssertNil(mutableSet.min())
         mutableSet.insert(objectsIn: values)
-        XCTAssertEqual(mutableSet.min(), V.min())
+        XCTAssertEqual(mutableSet.min(), values.first)
     }
 
     func testMax() {
         XCTAssertNil(mutableSet.max())
         mutableSet.insert(objectsIn: values)
-        XCTAssertEqual(mutableSet.max(), V.max())
+        XCTAssertEqual(mutableSet.max(), values.last)
     }
 }
 
-class AddablePrimitiveMutableSetTests<O: ObjectFactory, V: SetValueFactory>: PrimitiveMutableSetTestsBase<O, V> where V: NumericValueFactory, V.PersistedType: AddableType {
-    func testSum() {
-        XCTAssertEqual(mutableSet.sum(), .zero)
+class OptionalMinMaxPrimitiveMutableSetTests<O: ObjectFactory, V: SetValueFactory>: PrimitiveMutableSetTestsBase<O, V> where V.Wrapped: MinMaxType, V.Wrapped: _DefaultConstructible {
+    // V and V.Wrapped? are the same thing, but the type system doesn't know that
+    // and the protocol constraint is on V.Wrapped
+    var mutableSet2: MutableSet<V.Wrapped?> {
+        return unsafeDowncast(mutableSet!, to: MutableSet<V.Wrapped?>.self)
+    }
+
+    func testMin() {
+        XCTAssertNil(mutableSet2.min())
         mutableSet.insert(objectsIn: values)
-        XCTAssertEqual(V.doubleValue(mutableSet.sum()), V.sum(), accuracy: 0.01)
+        let expected = values[1] as! V.Wrapped
+        XCTAssertEqual(mutableSet2.min(), expected)
+    }
+
+    func testMax() {
+        XCTAssertNil(mutableSet2.max())
+        mutableSet.insert(objectsIn: values)
+        let expected = values[2] as! V.Wrapped
+        XCTAssertEqual(mutableSet2.max(), expected)
+    }
+}
+
+class AddablePrimitiveMutableSetTests<O: ObjectFactory, V: SetValueFactory>: PrimitiveMutableSetTestsBase<O, V> where V: AddableType {
+    func testSum() {
+        XCTAssertEqual(mutableSet.sum(), V())
+        mutableSet.insert(objectsIn: values)
+
+        // Expressing "can be added and converted to a floating point type" as
+        // a protocol requirement is awful, so sidestep it all with obj-c
+        let expected = ((values.map(dynamicBridgeCast) as NSArray).value(forKeyPath: "@sum.self")! as! NSNumber).doubleValue
+        XCTAssertEqual(V.doubleValue(t: mutableSet.sum()), expected, accuracy: 0.01)
     }
 
     func testAverage() {
         XCTAssertNil(mutableSet.average() as V.AverageType?)
         mutableSet.insert(objectsIn: values)
-        XCTAssertEqual(V.doubleValue(mutableSet.average()!), V.average(), accuracy: 0.01)
+
+        let expected = ((values.map(dynamicBridgeCast) as NSArray).value(forKeyPath: "@avg.self")! as! NSNumber).doubleValue
+        XCTAssertEqual(V.doubleValue(mutableSet.average()!), expected, accuracy: 0.01)
     }
 }
 
-class SortablePrimitiveMutableSetTests<O: ObjectFactory, V: SetValueFactory>: PrimitiveMutableSetTestsBase<O, V> where V.PersistedType: SortableType {
+class OptionalAddablePrimitiveMutableSetTests<O: ObjectFactory, V: SetValueFactory>: PrimitiveMutableSetTestsBase<O, V> where V.Wrapped: AddableType, V.Wrapped: _DefaultConstructible {
+    // V and V.Wrapped? are the same thing, but the type system doesn't know that
+    // and the protocol constraint is on V.Wrapped
+    var mutableSet2: MutableSet<V.Wrapped?> {
+        return unsafeDowncast(mutableSet!, to: MutableSet<V.Wrapped?>.self)
+    }
+
+    func testSum() {
+        XCTAssertEqual(mutableSet2.sum(), V.Wrapped())
+        mutableSet.insert(objectsIn: values)
+
+        var nonNil = values!
+        nonNil.remove(at: 0)
+
+        // Expressing "can be added and converted to a floating point type" as
+        // a protocol requirement is awful, so sidestep it all with obj-c
+        let expected = ((nonNil.map(dynamicBridgeCast) as NSArray).value(forKeyPath: "@sum.self")! as! NSNumber).doubleValue
+        XCTAssertEqual(V.doubleValue(w: mutableSet2.sum()), expected, accuracy: 0.01)
+    }
+
+    func testAverage() {
+        XCTAssertNil(mutableSet2.average() as Double?)
+        mutableSet.insert(objectsIn: values)
+
+        var nonNil = values!
+        nonNil.remove(at: 0)
+
+        let expected = ((nonNil.map(dynamicBridgeCast) as NSArray).value(forKeyPath: "@avg.self")! as! NSNumber).doubleValue
+        XCTAssertEqual(V.doubleValue(mutableSet2.average()!), expected, accuracy: 0.01)
+    }
+}
+
+class SortablePrimitiveMutableSetTests<O: ObjectFactory, V: SetValueFactory>: PrimitiveMutableSetTestsBase<O, V> where V: Comparable {
     func testSorted() {
         var shuffled = values!
         shuffled.removeFirst()
@@ -224,6 +285,20 @@ class SortablePrimitiveMutableSetTests<O: ObjectFactory, V: SetValueFactory>: Pr
 
         assertEqual(Array(mutableSet.sorted(ascending: true)), values)
         assertEqual(Array(mutableSet.sorted(ascending: false)), values.reversed())
+    }
+}
+
+class OptionalSortablePrimitiveMutableSetTests<O: ObjectFactory, V: SetValueFactory>: PrimitiveMutableSetTestsBase<O, V> where V.Wrapped: Comparable, V.Wrapped: _DefaultConstructible {
+    func testSorted() {
+        var shuffled = values!
+        shuffled.removeFirst()
+        shuffled.append(values!.first!)
+        mutableSet.insert(objectsIn: shuffled)
+
+        let mutableSet2 = unsafeDowncast(mutableSet!, to: MutableSet<V.Wrapped?>.self)
+        let values2 = unsafeBitCast(values!, to: Array<V.Wrapped?>.self)
+        assertEqual(Array(mutableSet2.sorted(ascending: true)), values2)
+        assertEqual(Array(mutableSet2.sorted(ascending: false)), values2.reversed())
     }
 }
 
@@ -275,24 +350,24 @@ func addMutableSetTests<OF: ObjectFactory>(_ suite: XCTestSuite, _ type: OF.Type
     PrimitiveMutableSetTests<OF, ObjectId?>.defaultTestSuite.tests.forEach(suite.addTest)
     PrimitiveMutableSetTests<OF, UUID?>.defaultTestSuite.tests.forEach(suite.addTest)
 
-    MinMaxPrimitiveMutableSetTests<OF, Int?>.defaultTestSuite.tests.forEach(suite.addTest)
-    MinMaxPrimitiveMutableSetTests<OF, Int8?>.defaultTestSuite.tests.forEach(suite.addTest)
-    MinMaxPrimitiveMutableSetTests<OF, Int16?>.defaultTestSuite.tests.forEach(suite.addTest)
-    MinMaxPrimitiveMutableSetTests<OF, Int32?>.defaultTestSuite.tests.forEach(suite.addTest)
-    MinMaxPrimitiveMutableSetTests<OF, Int64?>.defaultTestSuite.tests.forEach(suite.addTest)
-    MinMaxPrimitiveMutableSetTests<OF, Float?>.defaultTestSuite.tests.forEach(suite.addTest)
-    MinMaxPrimitiveMutableSetTests<OF, Double?>.defaultTestSuite.tests.forEach(suite.addTest)
-    MinMaxPrimitiveMutableSetTests<OF, Date?>.defaultTestSuite.tests.forEach(suite.addTest)
-    MinMaxPrimitiveMutableSetTests<OF, Decimal128?>.defaultTestSuite.tests.forEach(suite.addTest)
+    OptionalMinMaxPrimitiveMutableSetTests<OF, Int?>.defaultTestSuite.tests.forEach(suite.addTest)
+    OptionalMinMaxPrimitiveMutableSetTests<OF, Int8?>.defaultTestSuite.tests.forEach(suite.addTest)
+    OptionalMinMaxPrimitiveMutableSetTests<OF, Int16?>.defaultTestSuite.tests.forEach(suite.addTest)
+    OptionalMinMaxPrimitiveMutableSetTests<OF, Int32?>.defaultTestSuite.tests.forEach(suite.addTest)
+    OptionalMinMaxPrimitiveMutableSetTests<OF, Int64?>.defaultTestSuite.tests.forEach(suite.addTest)
+    OptionalMinMaxPrimitiveMutableSetTests<OF, Float?>.defaultTestSuite.tests.forEach(suite.addTest)
+    OptionalMinMaxPrimitiveMutableSetTests<OF, Double?>.defaultTestSuite.tests.forEach(suite.addTest)
+    OptionalMinMaxPrimitiveMutableSetTests<OF, Date?>.defaultTestSuite.tests.forEach(suite.addTest)
+    OptionalMinMaxPrimitiveMutableSetTests<OF, Decimal128?>.defaultTestSuite.tests.forEach(suite.addTest)
 
-    AddablePrimitiveMutableSetTests<OF, Int?>.defaultTestSuite.tests.forEach(suite.addTest)
-    AddablePrimitiveMutableSetTests<OF, Int8?>.defaultTestSuite.tests.forEach(suite.addTest)
-    AddablePrimitiveMutableSetTests<OF, Int16?>.defaultTestSuite.tests.forEach(suite.addTest)
-    AddablePrimitiveMutableSetTests<OF, Int32?>.defaultTestSuite.tests.forEach(suite.addTest)
-    AddablePrimitiveMutableSetTests<OF, Int64?>.defaultTestSuite.tests.forEach(suite.addTest)
-    AddablePrimitiveMutableSetTests<OF, Float?>.defaultTestSuite.tests.forEach(suite.addTest)
-    AddablePrimitiveMutableSetTests<OF, Double?>.defaultTestSuite.tests.forEach(suite.addTest)
-    AddablePrimitiveMutableSetTests<OF, Decimal128?>.defaultTestSuite.tests.forEach(suite.addTest)
+    OptionalAddablePrimitiveMutableSetTests<OF, Int?>.defaultTestSuite.tests.forEach(suite.addTest)
+    OptionalAddablePrimitiveMutableSetTests<OF, Int8?>.defaultTestSuite.tests.forEach(suite.addTest)
+    OptionalAddablePrimitiveMutableSetTests<OF, Int16?>.defaultTestSuite.tests.forEach(suite.addTest)
+    OptionalAddablePrimitiveMutableSetTests<OF, Int32?>.defaultTestSuite.tests.forEach(suite.addTest)
+    OptionalAddablePrimitiveMutableSetTests<OF, Int64?>.defaultTestSuite.tests.forEach(suite.addTest)
+    OptionalAddablePrimitiveMutableSetTests<OF, Float?>.defaultTestSuite.tests.forEach(suite.addTest)
+    OptionalAddablePrimitiveMutableSetTests<OF, Double?>.defaultTestSuite.tests.forEach(suite.addTest)
+    OptionalAddablePrimitiveMutableSetTests<OF, Decimal128?>.defaultTestSuite.tests.forEach(suite.addTest)
 
     PrimitiveMutableSetTests<OF, EnumInt>.defaultTestSuite.tests.forEach(suite.addTest)
     PrimitiveMutableSetTests<OF, EnumInt8>.defaultTestSuite.tests.forEach(suite.addTest)
@@ -320,13 +395,13 @@ func addMutableSetTests<OF: ObjectFactory>(_ suite: XCTestSuite, _ type: OF.Type
     PrimitiveMutableSetTests<OF, EnumDouble?>.defaultTestSuite.tests.forEach(suite.addTest)
     PrimitiveMutableSetTests<OF, EnumString?>.defaultTestSuite.tests.forEach(suite.addTest)
 
-    MinMaxPrimitiveMutableSetTests<OF, EnumInt?>.defaultTestSuite.tests.forEach(suite.addTest)
-    MinMaxPrimitiveMutableSetTests<OF, EnumInt8?>.defaultTestSuite.tests.forEach(suite.addTest)
-    MinMaxPrimitiveMutableSetTests<OF, EnumInt16?>.defaultTestSuite.tests.forEach(suite.addTest)
-    MinMaxPrimitiveMutableSetTests<OF, EnumInt32?>.defaultTestSuite.tests.forEach(suite.addTest)
-    MinMaxPrimitiveMutableSetTests<OF, EnumInt64?>.defaultTestSuite.tests.forEach(suite.addTest)
-    MinMaxPrimitiveMutableSetTests<OF, EnumFloat?>.defaultTestSuite.tests.forEach(suite.addTest)
-    MinMaxPrimitiveMutableSetTests<OF, EnumDouble?>.defaultTestSuite.tests.forEach(suite.addTest)
+    OptionalMinMaxPrimitiveMutableSetTests<OF, EnumInt?>.defaultTestSuite.tests.forEach(suite.addTest)
+    OptionalMinMaxPrimitiveMutableSetTests<OF, EnumInt8?>.defaultTestSuite.tests.forEach(suite.addTest)
+    OptionalMinMaxPrimitiveMutableSetTests<OF, EnumInt16?>.defaultTestSuite.tests.forEach(suite.addTest)
+    OptionalMinMaxPrimitiveMutableSetTests<OF, EnumInt32?>.defaultTestSuite.tests.forEach(suite.addTest)
+    OptionalMinMaxPrimitiveMutableSetTests<OF, EnumInt64?>.defaultTestSuite.tests.forEach(suite.addTest)
+    OptionalMinMaxPrimitiveMutableSetTests<OF, EnumFloat?>.defaultTestSuite.tests.forEach(suite.addTest)
+    OptionalMinMaxPrimitiveMutableSetTests<OF, EnumDouble?>.defaultTestSuite.tests.forEach(suite.addTest)
 }
 
 class UnmanagedPrimitiveMutableSetTests: TestCase {
@@ -352,15 +427,15 @@ class ManagedPrimitiveMutableSetTests: TestCase {
         SortablePrimitiveMutableSetTests<ManagedObjectFactory, String>.defaultTestSuite.tests.forEach(suite.addTest)
         SortablePrimitiveMutableSetTests<ManagedObjectFactory, Date>.defaultTestSuite.tests.forEach(suite.addTest)
 
-        SortablePrimitiveMutableSetTests<ManagedObjectFactory, Int?>.defaultTestSuite.tests.forEach(suite.addTest)
-        SortablePrimitiveMutableSetTests<ManagedObjectFactory, Int8?>.defaultTestSuite.tests.forEach(suite.addTest)
-        SortablePrimitiveMutableSetTests<ManagedObjectFactory, Int16?>.defaultTestSuite.tests.forEach(suite.addTest)
-        SortablePrimitiveMutableSetTests<ManagedObjectFactory, Int32?>.defaultTestSuite.tests.forEach(suite.addTest)
-        SortablePrimitiveMutableSetTests<ManagedObjectFactory, Int64?>.defaultTestSuite.tests.forEach(suite.addTest)
-        SortablePrimitiveMutableSetTests<ManagedObjectFactory, Float?>.defaultTestSuite.tests.forEach(suite.addTest)
-        SortablePrimitiveMutableSetTests<ManagedObjectFactory, Double?>.defaultTestSuite.tests.forEach(suite.addTest)
-        SortablePrimitiveMutableSetTests<ManagedObjectFactory, String?>.defaultTestSuite.tests.forEach(suite.addTest)
-        SortablePrimitiveMutableSetTests<ManagedObjectFactory, Date?>.defaultTestSuite.tests.forEach(suite.addTest)
+        OptionalSortablePrimitiveMutableSetTests<ManagedObjectFactory, Int?>.defaultTestSuite.tests.forEach(suite.addTest)
+        OptionalSortablePrimitiveMutableSetTests<ManagedObjectFactory, Int8?>.defaultTestSuite.tests.forEach(suite.addTest)
+        OptionalSortablePrimitiveMutableSetTests<ManagedObjectFactory, Int16?>.defaultTestSuite.tests.forEach(suite.addTest)
+        OptionalSortablePrimitiveMutableSetTests<ManagedObjectFactory, Int32?>.defaultTestSuite.tests.forEach(suite.addTest)
+        OptionalSortablePrimitiveMutableSetTests<ManagedObjectFactory, Int64?>.defaultTestSuite.tests.forEach(suite.addTest)
+        OptionalSortablePrimitiveMutableSetTests<ManagedObjectFactory, Float?>.defaultTestSuite.tests.forEach(suite.addTest)
+        OptionalSortablePrimitiveMutableSetTests<ManagedObjectFactory, Double?>.defaultTestSuite.tests.forEach(suite.addTest)
+        OptionalSortablePrimitiveMutableSetTests<ManagedObjectFactory, String?>.defaultTestSuite.tests.forEach(suite.addTest)
+        OptionalSortablePrimitiveMutableSetTests<ManagedObjectFactory, Date?>.defaultTestSuite.tests.forEach(suite.addTest)
 
         SortablePrimitiveMutableSetTests<ManagedObjectFactory, EnumInt>.defaultTestSuite.tests.forEach(suite.addTest)
         SortablePrimitiveMutableSetTests<ManagedObjectFactory, EnumInt8>.defaultTestSuite.tests.forEach(suite.addTest)
@@ -371,14 +446,14 @@ class ManagedPrimitiveMutableSetTests: TestCase {
         SortablePrimitiveMutableSetTests<ManagedObjectFactory, EnumDouble>.defaultTestSuite.tests.forEach(suite.addTest)
         SortablePrimitiveMutableSetTests<ManagedObjectFactory, EnumString>.defaultTestSuite.tests.forEach(suite.addTest)
 
-        SortablePrimitiveMutableSetTests<ManagedObjectFactory, EnumInt?>.defaultTestSuite.tests.forEach(suite.addTest)
-        SortablePrimitiveMutableSetTests<ManagedObjectFactory, EnumInt8?>.defaultTestSuite.tests.forEach(suite.addTest)
-        SortablePrimitiveMutableSetTests<ManagedObjectFactory, EnumInt16?>.defaultTestSuite.tests.forEach(suite.addTest)
-        SortablePrimitiveMutableSetTests<ManagedObjectFactory, EnumInt32?>.defaultTestSuite.tests.forEach(suite.addTest)
-        SortablePrimitiveMutableSetTests<ManagedObjectFactory, EnumInt64?>.defaultTestSuite.tests.forEach(suite.addTest)
-        SortablePrimitiveMutableSetTests<ManagedObjectFactory, EnumFloat?>.defaultTestSuite.tests.forEach(suite.addTest)
-        SortablePrimitiveMutableSetTests<ManagedObjectFactory, EnumDouble?>.defaultTestSuite.tests.forEach(suite.addTest)
-        SortablePrimitiveMutableSetTests<ManagedObjectFactory, EnumString?>.defaultTestSuite.tests.forEach(suite.addTest)
+        OptionalSortablePrimitiveMutableSetTests<ManagedObjectFactory, EnumInt?>.defaultTestSuite.tests.forEach(suite.addTest)
+        OptionalSortablePrimitiveMutableSetTests<ManagedObjectFactory, EnumInt8?>.defaultTestSuite.tests.forEach(suite.addTest)
+        OptionalSortablePrimitiveMutableSetTests<ManagedObjectFactory, EnumInt16?>.defaultTestSuite.tests.forEach(suite.addTest)
+        OptionalSortablePrimitiveMutableSetTests<ManagedObjectFactory, EnumInt32?>.defaultTestSuite.tests.forEach(suite.addTest)
+        OptionalSortablePrimitiveMutableSetTests<ManagedObjectFactory, EnumInt64?>.defaultTestSuite.tests.forEach(suite.addTest)
+        OptionalSortablePrimitiveMutableSetTests<ManagedObjectFactory, EnumFloat?>.defaultTestSuite.tests.forEach(suite.addTest)
+        OptionalSortablePrimitiveMutableSetTests<ManagedObjectFactory, EnumDouble?>.defaultTestSuite.tests.forEach(suite.addTest)
+        OptionalSortablePrimitiveMutableSetTests<ManagedObjectFactory, EnumString?>.defaultTestSuite.tests.forEach(suite.addTest)
 
         return suite
     }

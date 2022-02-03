@@ -72,19 +72,8 @@ extension SwiftStringObject: AnyValueFactory {
     static func values() -> [SwiftStringObject] {
         return [SwiftStringObject(value: ["a"]), SwiftStringObject(value: ["b"]), SwiftStringObject(value: ["c"])]
     }
-    static func doubleValue(_ value: SwiftStringObject) -> Double { fatalError() }
 
     static var anyInitializer: (SwiftStringObject) -> AnyRealmValue { AnyRealmValue.object }
-}
-
-func doubleValue(_ value: AnyRealmValue) -> Double {
-    if case let .double(d) = value {
-        return d
-    } else if case let .decimal128(d) = value {
-        return d.doubleValue
-    } else {
-        fatalError("Unexpected mixed value: \(value)")
-    }
 }
 
 class AnyRealmValueTests<T: AnyValueFactory>: TestCase {
@@ -497,7 +486,7 @@ class MinMaxAnyRealmValueListTests<O: ObjectFactory, V: AnyValueFactory>: AnyRea
     }
 }
 
-class AddableAnyRealmValueListTests<O: ObjectFactory, V: AnyValueFactory>: AnyRealmValueListTestsBase<O, V> where V: NumericValueFactory {
+class AddableAnyRealmValueListTests<O: ObjectFactory, V: AnyValueFactory>: AnyRealmValueListTestsBase<O, V> {
     func testSum() {
         if array.realm != nil {
             XCTAssertEqual(array.sum().intValue, nil)
@@ -506,15 +495,31 @@ class AddableAnyRealmValueListTests<O: ObjectFactory, V: AnyValueFactory>: AnyRe
         }
         array.append(objectsIn: values)
 
-        XCTAssertEqual(doubleValue(array.sum()), V.sum(), accuracy: 0.1)
+        let expected = ((values.map(dynamicBridgeCast) as NSArray).value(forKeyPath: "@sum.self")! as! NSNumber)
+
+        // An unmanaged collection will return a double
+        if case let .double(d) = array.sum() {
+            XCTAssertEqual(d, expected.doubleValue)
+        } else if case let .decimal128(d) = array.sum() {
+            // A managed collection of AnyRealmValue will return a Decimal128 for `sum()`
+            XCTAssertEqual(d.doubleValue, expected.doubleValue, accuracy: 0.1)
+        }
     }
 
     func testAverage() {
         XCTAssertNil(array.average() as V.AverageType?)
         array.append(objectsIn: values)
 
-        let v: AnyRealmValue = array.average()!
-        XCTAssertEqual(doubleValue(v), V.average(), accuracy: 0.1)
+        let expected = ((values.map(dynamicBridgeCast) as NSArray).value(forKeyPath: "@avg.self")! as! NSNumber)
+
+        let v: AnyRealmValue? = array.average()
+        // An unmanaged collection will return a double
+        if case let .double(d) = v {
+            XCTAssertEqual(d, expected.doubleValue)
+        } else if case let .decimal128(d) = v {
+            // A managed collection of AnyRealmValue will return a Decimal128 for `avg()`
+            XCTAssertEqual(d.doubleValue, expected.doubleValue, accuracy: 0.1)
+        }
     }
 }
 
@@ -805,7 +810,7 @@ class MinMaxAnyRealmValueMutableSetTests<O: ObjectFactory, V: AnyValueFactory>: 
     }
 }
 
-class AddableAnyRealmValueMutableSetTests<O: ObjectFactory, V: AnyValueFactory>: AnyRealmValueSetTestsBase<O, V> where V: NumericValueFactory {
+class AddableAnyRealmValueMutableSetTests<O: ObjectFactory, V: AnyValueFactory>: AnyRealmValueSetTestsBase<O, V> {
     func testSum() {
         if mutableSet.realm != nil {
             XCTAssertEqual(mutableSet.sum().intValue, nil)
@@ -813,15 +818,32 @@ class AddableAnyRealmValueMutableSetTests<O: ObjectFactory, V: AnyValueFactory>:
             XCTAssertEqual(mutableSet.sum().intValue, 0)
         }
         mutableSet.insert(objectsIn: values)
-        XCTAssertEqual(doubleValue(mutableSet.sum()), V.sum(), accuracy: 0.1)
+
+        let expected = ((values.map(dynamicBridgeCast) as NSArray).value(forKeyPath: "@sum.self")! as! NSNumber)
+
+        // An unmanaged collection will return a double
+        if case let .double(d) = mutableSet.sum() {
+            XCTAssertEqual(d, expected.doubleValue)
+        } else if case let .decimal128(d) = mutableSet.sum() {
+            // A managed collection of AnyRealmValue will return a Decimal128 for `sum()`
+            XCTAssertEqual(d.doubleValue, expected.doubleValue, accuracy: 0.1)
+        }
     }
 
     func testAverage() {
         XCTAssertNil(mutableSet.average() as V.AverageType?)
         mutableSet.insert(objectsIn: values)
 
-        let v: AnyRealmValue = mutableSet.average()!
-        XCTAssertEqual(doubleValue(v), V.average(), accuracy: 0.1)
+        let expected = ((values.map(dynamicBridgeCast) as NSArray).value(forKeyPath: "@avg.self")! as! NSNumber)
+
+        let v: AnyRealmValue? = mutableSet.average()
+        // An unmanaged collection will return a double
+        if case let .double(d) = v {
+            XCTAssertEqual(d, expected.doubleValue)
+        } else if case let .decimal128(d) = v {
+            // A managed collection of AnyRealmValue will return a Decimal128 for `avg()`
+            XCTAssertEqual(d.doubleValue, expected.doubleValue, accuracy: 0.1)
+        }
     }
 }
 
@@ -1044,18 +1066,36 @@ class MinMaxAnyRealmValueMapTests<O: ObjectFactory, V: AnyValueFactory>: AnyReal
     }
 }
 
-class AddableAnyRealmValueMapTests<O: ObjectFactory, V: AnyValueFactory>: AnyRealmValueMapTestsBase<O, V> where V: NumericValueFactory {
+class AddableAnyRealmValueMapTests<O: ObjectFactory, V: AnyValueFactory>: AnyRealmValueMapTestsBase<O, V> {
     func testSum() {
         XCTAssertEqual(map.sum().intValue, 0)
         map.merge(values) { $1 }
-        XCTAssertEqual(doubleValue(map.sum()), V.sum(), accuracy: 0.1)
+
+        let expected = ((values.map { $0.value }.map(dynamicBridgeCast) as NSArray).value(forKeyPath: "@sum.self")! as! NSNumber)
+
+        // An unmanaged collection will return a double
+        if case let .double(d) = map.sum() {
+            XCTAssertEqual(d, expected.doubleValue)
+        } else if case let .decimal128(d) = map.sum() {
+            // A managed collection of AnyRealmValue will return a Decimal128 for `sum()`
+            XCTAssertEqual(d.doubleValue, expected.doubleValue, accuracy: 0.1)
+        }
     }
 
     func testAverage() {
         XCTAssertNil(map.average() as V.AverageType?)
         map.merge(values) { $1 }
-        let v: AnyRealmValue = map.average()!
-        XCTAssertEqual(doubleValue(v), V.average(), accuracy: 0.1)
+
+        let expected = ((values.map { $0.value }.map(dynamicBridgeCast) as NSArray).value(forKeyPath: "@avg.self")! as! NSNumber)
+
+        let v: AnyRealmValue? = map.average()
+        // An unmanaged collection will return a double
+        if case let .double(d) = v {
+            XCTAssertEqual(d, expected.doubleValue)
+        } else if case let .decimal128(d) = v {
+            // A managed collection of AnyRealmValue will return a Decimal128 for `avg()`
+            XCTAssertEqual(d.doubleValue, expected.doubleValue, accuracy: 0.1)
+        }
     }
 }
 

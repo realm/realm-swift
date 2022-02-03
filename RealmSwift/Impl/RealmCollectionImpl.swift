@@ -83,16 +83,17 @@ extension RealmCollectionImpl {
             return Results<Element>(collection.distinctResults(usingKeyPaths: Array(keyPaths)))
     }
 
-    public func min<T: _HasPersistedType>(ofProperty property: String) -> T? where T.PersistedType: MinMaxType {
+
+    public func min<T: MinMaxType>(ofProperty property: String) -> T? {
         return collection.min(ofProperty: property).map(staticBridgeCast)
     }
-    public func max<T: _HasPersistedType>(ofProperty property: String) -> T? where T.PersistedType: MinMaxType {
+    public func max<T: MinMaxType>(ofProperty property: String) -> T? {
         return collection.max(ofProperty: property).map(staticBridgeCast)
     }
-    public func sum<T: _HasPersistedType>(ofProperty property: String) -> T where T.PersistedType: AddableType {
+    public func sum<T: AddableType>(ofProperty property: String) -> T {
         return staticBridgeCast(fromObjectiveC: collection.sum(ofProperty: property))
     }
-    public func average<T: _HasPersistedType>(ofProperty property: String) -> T? where T.PersistedType: AddableType {
+    public func average<T: AddableType>(ofProperty property: String) -> T? {
         return collection.average(ofProperty: property).map(staticBridgeCast)
     }
 

@@ -21,21 +21,12 @@ import Realm
 
 // MARK: MinMaxType
 
-#if swift(>=5.5)
 /**
  Types of properties which can be used with the minimum and maximum value APIs.
 
  - see: `min(ofProperty:)`, `max(ofProperty:)`
  */
-@_marker public protocol MinMaxType {}
-#else
-/**
- Types of properties which can be used with the minimum and maximum value APIs.
-
- - see: `min(ofProperty:)`, `max(ofProperty:)`
- */
-public protocol MinMaxType {}
-#endif
+public protocol MinMaxType: _ObjcBridgeable {}
 extension NSNumber: MinMaxType {}
 extension Double: MinMaxType {}
 extension Float: MinMaxType {}
@@ -48,25 +39,18 @@ extension Date: MinMaxType {}
 extension NSDate: MinMaxType {}
 extension Decimal128: MinMaxType {}
 extension AnyRealmValue: MinMaxType {}
-extension Optional: MinMaxType where Wrapped: MinMaxType {}
 
 // MARK: AddableType
 
-#if swift(>=5.5)
 /**
  Types of properties which can be used with the sum and average value APIs.
 
  - see: `sum(ofProperty:)`, `average(ofProperty:)`
  */
-@_marker public protocol AddableType {}
-#else
-/**
- Types of properties which can be used with the sum and average value APIs.
-
- - see: `sum(ofProperty:)`, `average(ofProperty:)`
- */
-public protocol AddableType {}
-#endif
+public protocol AddableType: _ObjcBridgeable {
+    /// :nodoc:
+    init()
+}
 extension NSNumber: AddableType {}
 extension Double: AddableType {}
 extension Float: AddableType {}
@@ -77,37 +61,6 @@ extension Int32: AddableType {}
 extension Int64: AddableType {}
 extension Decimal128: AddableType {}
 extension AnyRealmValue: AddableType {}
-extension Optional: AddableType where Wrapped: AddableType {}
-
-#if swift(>=5.5)
-/**
- Types of properties which can be directly sorted or distincted.
-
- - see: `sum(ascending:)`, `distinct()`
- */
-@_marker public protocol SortableType {}
-#else
-/**
- Types of properties which can be directly sorted or distincted.
-
- - see: `sum(ascending:)`, `distinct()`
- */
-public protocol SortableType {}
-#endif
-extension AnyRealmValue: SortableType {}
-extension Data: SortableType {}
-extension Date: SortableType {}
-extension Decimal128: SortableType {}
-extension Double: SortableType {}
-extension Float: SortableType {}
-extension Int16: SortableType {}
-extension Int32: SortableType {}
-extension Int64: SortableType {}
-extension Int8: SortableType {}
-extension Int: SortableType {}
-extension String: SortableType {}
-extension Optional: SortableType where Wrapped: SortableType {}
-
 
 #if swift(>=5.5)
 /**

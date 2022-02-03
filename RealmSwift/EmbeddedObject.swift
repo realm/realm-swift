@@ -56,7 +56,7 @@ import Realm.Private
  ```
  */
 public typealias EmbeddedObject = RealmSwiftEmbeddedObject
-extension EmbeddedObject: _RealmCollectionValueInsideOptional {
+extension EmbeddedObject: RealmCollectionValue {
     /// :nodoc:
     public class override final func isEmbedded() -> Bool {
         return true
