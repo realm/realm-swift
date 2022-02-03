@@ -26,7 +26,7 @@ import Realm
 
  - see: `min(ofProperty:)`, `max(ofProperty:)`
  */
-public protocol MinMaxType {}
+public protocol MinMaxType: _ObjcBridgeable {}
 extension NSNumber: MinMaxType {}
 extension Double: MinMaxType {}
 extension Float: MinMaxType {}
@@ -39,7 +39,6 @@ extension Date: MinMaxType {}
 extension NSDate: MinMaxType {}
 extension Decimal128: MinMaxType {}
 extension AnyRealmValue: MinMaxType {}
-extension Optional: MinMaxType where Wrapped: MinMaxType {}
 
 // MARK: AddableType
 
@@ -48,7 +47,10 @@ extension Optional: MinMaxType where Wrapped: MinMaxType {}
 
  - see: `sum(ofProperty:)`, `average(ofProperty:)`
  */
-public protocol AddableType {}
+public protocol AddableType: _ObjcBridgeable {
+    /// :nodoc:
+    init()
+}
 extension NSNumber: AddableType {}
 extension Double: AddableType {}
 extension Float: AddableType {}
@@ -59,23 +61,6 @@ extension Int32: AddableType {}
 extension Int64: AddableType {}
 extension Decimal128: AddableType {}
 extension AnyRealmValue: AddableType {}
-extension Optional: AddableType where Wrapped: AddableType {}
-
-public protocol SortableType {}
-extension AnyRealmValue: SortableType {}
-extension Data: SortableType {}
-extension Date: SortableType {}
-extension Decimal128: SortableType {}
-extension Double: SortableType {}
-extension Float: SortableType {}
-extension Int16: SortableType {}
-extension Int32: SortableType {}
-extension Int64: SortableType {}
-extension Int8: SortableType {}
-extension Int: SortableType {}
-extension String: SortableType {}
-extension Optional: SortableType where Wrapped: SortableType {}
-
 
 #if swift(>=5.5)
 /**
