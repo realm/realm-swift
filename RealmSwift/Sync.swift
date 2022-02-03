@@ -236,9 +236,6 @@ public typealias AfterClientResetBlock = RLMClientResetAfterBlock
     public let clientResetMode: ClientResetMode
     public var notifyBeforeClientReset: BeforeClientResetBlock?
     public var notifyAfterClientReset: AfterClientResetBlock?
-    // not used, DELETE
-    public var notifyBefore: ((Realm) -> Void)?
-    public var notifyAfter: ((Realm, Realm) -> Void)?
 
     /**
      Determines if the sync configuration is flexible sync or not
