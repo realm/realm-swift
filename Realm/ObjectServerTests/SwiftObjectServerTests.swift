@@ -33,6 +33,30 @@ import RealmTestSupport
 @available(OSX 10.14, *)
 @objc(SwiftObjectServerTests)
 class SwiftObjectServerTests: SwiftSyncTestCase {
+    func setupMongoCollection(user: User? = nil, collectionName: String) -> MongoCollection {
+        var unwrapped: User
+        if (user != nil) {
+            unwrapped = user!
+        } else {
+            unwrapped = try! logInUser(for: basicCredentials())
+        }
+        let mongoClient = unwrapped.mongoClient("mongodb1")
+        let database = mongoClient.database(named: "test_data")
+        let collection = database.collection(withName: collectionName)
+        removeAllFromCollection(collection)
+        return collection
+    }
+
+    func removeAllFromCollection(_ collection: MongoCollection) {
+        let ex = expectation(description: "delete objects")
+
+        collection.deleteManyDocuments(filter: [:]) { result in
+            if case .success = result {
+                ex.fulfill()
+            }
+        }
+        wait(for: [ex], timeout: 2.0)
+    }
     /// It should be possible to successfully open a Realm configured for sync.
     func testBasicSwiftSync() {
         do {
@@ -508,6 +532,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     }
 
     // test for nil assignment of callbacks
+    // test for callbacks not firing when they're released (is this possible?)
 
     func testClientResetDiscardLocal() {
         // !!!: error handler and cases here while WIP
@@ -534,43 +559,50 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 print("unknown")
             }
         }
+
         // ***
         // Seed object, upload to server
         do {
             let user = try logInUser(for: basicCredentials())
+            let collection = setupMongoCollection(user: user, collectionName: "SwiftPerson")
             // !!!: this notation is silly. I'm going to take the callbacks out of the initializer.
             var configuration = user.configuration(partitionValue: #function, clientResetMode: .discardLocal) { local in
                 // Expect there to be 2 objects in the local realm before client reset
-                XCTAssertEqual(local.objects(SwiftHugeSyncObject.self).count, 2)
+                let results = local.objects(SwiftPerson.self)
+                XCTAssertEqual(results.count, 2)
+                let paul = results.filter("firstName == 'Paul'")
+                let john = results.filter("firstName == 'John'")
+                XCTAssertNotNil(paul)
+                XCTAssertNotNil(john)
             } notifyAfterReset: { local, remote in
                 // Expect the local realm that was overwritten to have had 2 objects before it was overwritten.
-                XCTAssertEqual(local.objects(SwiftHugeSyncObject.self).count, 2)
+                let results = local.objects(SwiftPerson.self)
+                XCTAssertEqual(results.count, 2)
+                let paul = results.filter("firstName == 'Paul'")
+                let john = results.filter("firstName == 'John'")
+                XCTAssertNotNil(paul)
+                XCTAssertNotNil(john)
                 // Expect the server realm that overwrote the local realm to have had 1 object before client reset.
-                XCTAssertEqual(remote.objects(SwiftHugeSyncObject.self).count, 1)
+                let results2 = remote.objects(SwiftPerson.self)
+                XCTAssertEqual(results2.count, 1)
+                let paul2 = results2.filter("firstName == 'Paul'")
+                let john2 = results2.filter("firstName == 'John'")
+                XCTAssertNotNil(paul2)
+                XCTAssertNil(john2)
             }
-            configuration.objectTypes = [SwiftHugeSyncObject.self]
-
-
+            configuration.objectTypes = [SwiftPerson.self]
 
             try autoreleasepool {
                 let realm = try Realm(configuration: configuration)
                 try realm.write {
-                    realm.add(SwiftHugeSyncObject.create())
+                    realm.add(SwiftPerson(firstName: "Paul", lastName: "M"))
                 }
                 waitForUploads(for: realm)
-                XCTAssertEqual(realm.objects(SwiftHugeSyncObject.self).count, 1)
+                XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1)
             }
-
             // waitForUploads confirms the server received the upload request from the client
             // It does not guarantee the uploaded objects are persisted to the backing datastore
             // This expectation queries the server for the documents directly before continuing.
-//            let ex1 = expectation(description: "Object was synced to server, which contains one document")
-            let mongoClient = user.mongoClient("mongodb1")
-            let database = mongoClient.database(named: "test_data")
-            // What does the collection get called?
-            // "SwiftHugeSyncObject"?
-            let collection = database.collection(withName: "SwiftHugeSyncObject")
-
             var documentCount = 0
             var requestCount = 0
             let timeBetweenRequests = 2
@@ -579,7 +611,11 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                     switch result {
                     case .success(let documents):
                         documentCount = documents.count
-
+                        if documentCount > 0 {
+                            XCTAssertEqual(documentCount, 1)
+                            XCTAssertEqual(documents[0]["firstName"]??.stringValue, "Paul")
+                            break
+                        }
                     case .failure:
                         XCTFail("Should find")
                     }
@@ -592,30 +628,25 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                     }
                     requestCount += 1
                     print("requests: \(requestCount), time passed: ~ \(requestCount * 2)") // !!!: Delete this line
-
-                }
-                if documentCount > 0 {
-                    XCTAssertEqual(documentCount, 1)
-//                    ex1.fulfill()
                 }
             }
-//            wait(for: [ex1], timeout: 60)
 
             // Sync is disabled, block executed, sync re-enabled
             clientReset {
                 try autoreleasepool {
                     let realm = try Realm(configuration: configuration)
                     try realm.write {
-                        realm.add(SwiftHugeSyncObject.create())
+                        let obj =  SwiftPerson(firstName: "John", lastName: "L")
+                        realm.add(obj)
                     }
-                    XCTAssertEqual(realm.objects(SwiftHugeSyncObject.self).count, 2)
+                    XCTAssertEqual(realm.objects(SwiftPerson.self).count, 2)
                 }
             }
             try autoreleasepool {
                 let realm = try Realm(configuration: configuration)
                 waitForDownloads(for: realm)
                 // TODO: Check server logs to figure out why no object is downloaded after reset.
-                XCTAssertEqual(realm.objects(SwiftHugeSyncObject.self).count, 1)
+                XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1)
             }
         } catch {
             XCTFail("Failed: \(error.localizedDescription)")
