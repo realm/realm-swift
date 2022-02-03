@@ -115,55 +115,35 @@ RLMSyncSystemErrorKind errorKindForSyncError(SyncError error) {
     _config->cancel_waits_on_nonfatal_error = cancelAsyncOpenOnNonFatalErrors;
 }
 
-- (BOOL)enableFlexibleSync {
-    return _config->flx_sync_requested;
-}
-
 - (instancetype)initWithUser:(RLMUser *)user
               partitionValue:(nullable id<RLMBSON>)partitionValue {
     return [self initWithUser:user
                partitionValue:partitionValue
                 customFileURL:nil
-                   stopPolicy:RLMSyncStopPolicyAfterChangesUploaded
-           enableFlexibleSync:false];
+                   stopPolicy:RLMSyncStopPolicyAfterChangesUploaded];
 }
 
 - (instancetype)initWithUser:(RLMUser *)user
               partitionValue:(nullable id<RLMBSON>)partitionValue
-                  stopPolicy:(RLMSyncStopPolicy)stopPolicy {
+                  stopPolicy:(RLMSyncStopPolicy)stopPolicy{
     auto config = [self initWithUser:user
                       partitionValue:partitionValue
                        customFileURL:nil
-                          stopPolicy:stopPolicy
-                  enableFlexibleSync:false];
+                          stopPolicy:stopPolicy];
     return config;
 }
 
 - (instancetype)initWithUser:(RLMUser *)user
-                  stopPolicy:(RLMSyncStopPolicy)stopPolicy
-          enableFlexibleSync:(BOOL)enableFlexibleSync {
-    auto config = [self initWithUser:user
-                      partitionValue:nil
-                       customFileURL:nil
-                          stopPolicy:stopPolicy
-                  enableFlexibleSync:enableFlexibleSync];
-    return config;
-}
-
-- (instancetype)initWithUser:(RLMUser *)user
-              partitionValue:(nullable id<RLMBSON>)partitionValue
+              partitionValue:(id<RLMBSON>)partitionValue
                customFileURL:(nullable NSURL *)customFileURL
-                  stopPolicy:(RLMSyncStopPolicy)stopPolicy
-          enableFlexibleSync:(BOOL)enableFlexibleSync {
+                  stopPolicy:(RLMSyncStopPolicy)stopPolicy {
     if (self = [super init]) {
-        if (enableFlexibleSync) {
-            _config = std::make_unique<SyncConfig>([user _syncUser], SyncConfig::FLXSyncEnabled{});
-        } else {
-            std::stringstream s;
-            s << RLMConvertRLMBSONToBson(partitionValue);
-            _config = std::make_unique<SyncConfig>([user _syncUser],
-                                                   s.str());
-        }
+        std::stringstream s;
+        s << RLMConvertRLMBSONToBson(partitionValue);
+        _config = std::make_unique<SyncConfig>(
+            [user _syncUser],
+            s.str()
+        );
         _config->stop_policy = translateStopPolicy(stopPolicy);
         RLMSyncManager *manager = [user.app syncManager];
         __weak RLMSyncManager *weakManager = manager;

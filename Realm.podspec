@@ -70,7 +70,6 @@ Pod::Spec.new do |s|
                               'include/RLMMongoCollection.h',
                               'include/RLMMongoDatabase.h',
                               'include/RLMUpdateResult.h',
-                              'include/RLMSyncSubscription.h',
 
                               # Realm.Dynamic module
                               'include/RLMRealm_Dynamic.h',
@@ -98,7 +97,6 @@ Pod::Spec.new do |s|
                               'include/RLMSet_Private.h',
                               'include/RLMSwiftProperty.h',
                               'include/RLMSyncConfiguration_Private.h',
-                              'include/RLMSyncSubscription_Private.h',
                               'include/RLMSyncUtil_Private.h',
                               'include/RLMUpdateResult_Private.h',
                               'include/RLMUser_Private.h',

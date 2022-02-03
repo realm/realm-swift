@@ -20,6 +20,7 @@
 
 #import "RLMApp_Private.hpp"
 #import "RLMRealmConfiguration+Sync.h"
+#import "RLMSyncConfiguration_Private.hpp"
 #import "RLMSyncSession_Private.hpp"
 #import "RLMUser_Private.hpp"
 #import "RLMSyncUtil_Private.hpp"

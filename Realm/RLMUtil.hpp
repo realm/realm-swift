@@ -119,15 +119,6 @@ static inline NSString * RLMStringDataToNSString(realm::StringData stringData) {
     }
 }
 
-static inline NSString * RLMStringViewToNSString(std::string_view stringView) {
-    if (stringView.size() == 0) {
-        return nil;
-    }
-    return [[NSString alloc] initWithBytes:stringView.data()
-                                    length:stringView.size()
-                                  encoding:NSUTF8StringEncoding];
-}
-
 static inline realm::StringData RLMStringDataWithNSString(__unsafe_unretained NSString *const string) {
     static_assert(sizeof(size_t) >= sizeof(NSUInteger),
                   "Need runtime overflow check for NSUInteger to size_t conversion");

@@ -53,7 +53,6 @@
 #import "RLMSyncManager_Private.hpp"
 #import "RLMSyncSession_Private.hpp"
 #import "RLMSyncUtil_Private.hpp"
-#import "RLMSyncSubscription_Private.hpp"
 
 #import <realm/object-store/sync/async_open_task.hpp>
 #import <realm/object-store/sync/sync_session.hpp>
@@ -1042,18 +1041,6 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
         [enumerator detach];
     }
     _collectionEnumerators = nil;
-}
-
-- (RLMSyncSubscriptionSet *)subscriptions {
-#if REALM_ENABLE_SYNC
-    if (_realm->config().sync_config && _realm->config().sync_config->flx_sync_requested) {
-        return [[RLMSyncSubscriptionSet alloc] initWithSubscriptionSet:_realm->get_latest_subscription_set() realm:self];
-    } else {
-        @throw RLMException(@"This Realm was not configured with flexible sync");
-    }
-#else
-    @throw RLMException(@"Realm was not compiled with sync enabled");
-#endif
 }
 
 @end

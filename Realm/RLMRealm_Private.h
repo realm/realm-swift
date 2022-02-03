@@ -18,7 +18,7 @@
 
 #import <Realm/RLMRealm.h>
 
-@class RLMFastEnumerator;
+@class RLMFastEnumerator, RLMSyncSubscription;
 
 NS_ASSUME_NONNULL_BEGIN
 

@@ -53,8 +53,6 @@
 
     if (syncConfiguration.customFileURL) {
         self.config.path = syncConfiguration.customFileURL.path.UTF8String;
-    } else if (self.config.sync_config->flx_sync_requested) {
-        self.config.path = [user pathForFlexibleSync];
     } else {
         self.config.path = [user pathForPartitionValue:self.config.sync_config->partition_value];
     }
