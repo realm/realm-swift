@@ -149,13 +149,6 @@ static NSString *generateRandomString(int num) {
     XCTAssert([currentUser.accessToken isEqualToString:syncUser.accessToken]);
 }
 
-- (void)testCustomTokenAuthentication {
-    RLMUser *user = [self logInUserForCredentials:[self jwtCredentialWithAppId:self.appId]];
-    XCTAssertTrue([user.profile.metadata[@"anotherName"] isEqualToString:@"Bar Foo"]);
-    XCTAssertTrue([user.profile.metadata[@"name"] isEqualToString:@"Foo Bar"]);
-    XCTAssertTrue([user.profile.metadata[@"occupation"] isEqualToString:@"firefighter"]);
-}
-
 - (void)testCallFunction {
     XCTestExpectation *expectation = [self expectationWithDescription:@"should get sum of arguments from remote function"];
     [self.anonymousUser callFunctionNamed:@"sum"
@@ -626,8 +619,6 @@ static NSString *randomEmail() {
     XCTAssertNil(profile.lastName);
     XCTAssertNil(profile.pictureURL);
 
-    auto metadata = realm::bson::BsonDocument({{"some_key", "some_value"}});
-
     profile = [[RLMUserProfile alloc] initWithUserProfile:realm::SyncUserProfile(realm::bson::BsonDocument({
         {"name", "Jane"},
         {"max_age", "40"},
@@ -636,19 +627,17 @@ static NSString *randomEmail() {
         {"gender", "unknown"},
         {"first_name", "Jane"},
         {"last_name", "Jannson"},
-        {"picture_url", "SomeURL"},
-        {"other_data", metadata}
+        {"picture_url", "SomeURL"}
     }))];
 
-    XCTAssert([profile.name isEqualToString:@"Jane"]);
-    XCTAssert([profile.maxAge isEqualToString:@"40"]);
-    XCTAssert([profile.minAge isEqualToString:@"30"]);
-    XCTAssert([profile.birthday isEqualToString:@"October 10th"]);
-    XCTAssert([profile.gender isEqualToString:@"unknown"]);
-    XCTAssert([profile.firstName isEqualToString:@"Jane"]);
-    XCTAssert([profile.lastName isEqualToString:@"Jannson"]);
-    XCTAssert([profile.pictureURL isEqualToString:@"SomeURL"]);
-    XCTAssertEqualObjects(profile.metadata[@"other_data"], @{@"some_key": @"some_value"});
+    XCTAssert([profile.name isEqualToString: @"Jane"]);
+    XCTAssert([profile.maxAge isEqualToString: @"40"]);
+    XCTAssert([profile.minAge isEqualToString: @"30"]);
+    XCTAssert([profile.birthday isEqualToString: @"October 10th"]);
+    XCTAssert([profile.gender isEqualToString: @"unknown"]);
+    XCTAssert([profile.firstName isEqualToString: @"Jane"]);
+    XCTAssert([profile.lastName isEqualToString: @"Jannson"]);
+    XCTAssert([profile.pictureURL isEqualToString: @"SomeURL"]);
 }
 
 #pragma mark - Basic Sync
