@@ -515,10 +515,6 @@ class ModernCollectionsOfEnums: Object {
     @Persisted var mapStringOpt: Map<String, EnumString?>
 }
 
-class LinkToModernCollectionsOfEnums: Object {
-    @Persisted var objectCol: ModernCollectionsOfEnums?
-}
-
 class ModernListAnyRealmValueObject: Object {
     @Persisted var value: List<AnyRealmValue>
 }

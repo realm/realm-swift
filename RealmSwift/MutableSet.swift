@@ -223,7 +223,7 @@ public final class MutableSet<Element: RealmCollectionValue>: RLMSwiftCollection
     }
 
     /// :nodoc:
-    public func index(matching isIncluded: ((Query<Element>) -> Query<Bool>)) -> Int? {
+    public func index(matching isIncluded: ((Query<Element>) -> Query<Element>)) -> Int? {
         fatalError("index(matching:) is not available on MutableSet")
     }
 }

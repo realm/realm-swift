@@ -606,7 +606,7 @@ public extension RealmCollection {
 
      - parameter isIncluded: The query closure to use to filter the objects.
      */
-    func index(matching isIncluded: ((Query<Element>) -> Query<Bool>)) -> Int? {
+    func index(matching isIncluded: ((Query<Element>) -> Query<Element>)) -> Int? {
         let isPrimitive = Element._rlmType != .object
         return index(matching: isIncluded(Query<Element>(isPrimitive: isPrimitive)).predicate)
     }
@@ -627,7 +627,7 @@ public extension RealmCollection {
 
      - parameter isIncluded: The query closure to use to filter the objects.
      */
-    func `where`(_ isIncluded: ((Query<Element>) -> Query<Bool>)) -> Results<Element> {
+    func `where`(_ isIncluded: ((Query<Element>) -> Query<Element>)) -> Results<Element> {
         return filter(isIncluded(Query()).predicate)
     }
 }
