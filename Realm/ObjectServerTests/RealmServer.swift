@@ -930,37 +930,24 @@ public class RealmServer: NSObject {
         return appId
     }
 
-    // TODO: maybe change this to serviceNamed(String)
     public func retrieveSyncServiceId(appServerId: String) throws -> String {
         guard let session = session else {
             throw URLError(.unknown)
         }
         let app = session.apps[appServerId]
-        // Need to get a list of all services, find the sync service, then get the id.
+        // Get all services
         guard let syncServices = try app.services.get().get() as? [[String: Any]] else {
             throw URLError(.unknown)
         }
+        // Find sync service
         guard let syncService = syncServices.first(where: {
             $0["name"] as? String == "mongodb1"
-        }) else { throw URLError(.unknown) }
+        }) else {
+            throw URLError(.unknown)
+        }
+        // Return sync service id
         guard let serviceId = syncService["_id"] as? String else { throw URLError(.unknown) }
         return serviceId
-    }
-
-    public func syncServiceConfigEndpoint(appId: String, appServerID: String) throws -> Any {
-        guard let appServerId = try? RealmServer.shared.retrieveAppServerId(appId),
-              let session = session else {
-                  throw URLError(.unknown)
-              }
-        let app = session.apps[appServerId]
-        // Need to get a list of all services, find the sync service, then get the id.
-        guard let syncServices = try app.services.get().get() as? [[String: Any]] else { throw URLError(.unknown) }
-        guard let syncService = syncServices.first(where: {
-            $0["name"] as? String == "mongodb1"
-        }) else { throw URLError(.unknown) }
-        guard let serviceId = syncService["_id"] as? String else { throw URLError(.unknown) }
-        let serviceEndpoint = app.services[serviceId].config.get()
-        return serviceEndpoint
     }
 
     public func getSyncServiceConfiguration(appServerId: String, syncServiceId: String) throws -> [String: Any]? {
@@ -978,16 +965,11 @@ public class RealmServer: NSObject {
     public func syncEnabled(appServerId: String, syncServiceId: String) throws -> Bool {
         guard let session = session else { throw URLError(.unknown) }
         let app = session.apps[appServerId]
-        // This should throw error earlier
         let response = try app.services[syncServiceId].config.get().get() as? [String: Any]
-        // !!!: If sync is disabled, then this is coming back as no value. So 930 returns false.
-        // But how is that distinguishable between sync being disabled, and being no response?
-        // I was expecting disableSync to cause "state" == "". NOT that the whole config would be wiped.
         guard let syncInfo = response?["sync"] as? [String: Any] else {
             return false
         }
-        // ???: Shorten use ternary
-        // having "sync" and "state" written out like this seems like a bad idea but I don't know why
+
         if (syncInfo["state"] as? String == "enabled") {
             return true
         } else {
