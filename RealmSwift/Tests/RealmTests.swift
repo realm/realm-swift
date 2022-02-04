@@ -1016,12 +1016,13 @@ class RealmTests: TestCase {
             var localConfig = Realm.Configuration()
             localConfig.fileURL = defaultRealmURL().deletingLastPathComponent().appendingPathComponent("original.realm")
 
-            let realm = try Realm(configuration: localConfig)
-            try! realm.write {
-                realm.add(SwiftBoolObject())
+            try autoreleasepool {
+                let realm = try Realm(configuration: localConfig)
+                try! realm.write {
+                    realm.add(SwiftBoolObject())
+                }
+                XCTAssertEqual(realm.objects(SwiftBoolObject.self).count, 1)
             }
-
-            XCTAssertEqual(realm.objects(SwiftBoolObject.self).count, 1)
 
             var destinationConfig = Realm.Configuration()
             destinationConfig.fileURL = defaultRealmURL().deletingLastPathComponent().appendingPathComponent("destination.realm")

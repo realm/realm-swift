@@ -447,10 +447,23 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
         }
     }
 
-    if (configuration.seedFilePath && ![RLMRealm fileExistsForConfiguration:configuration]) {
-        [[NSFileManager defaultManager] copyItemAtURL:configuration.seedFilePath
-                                                toURL:[configuration fileURL]
-                                                error:error];
+    if (configuration.seedFilePath) {
+        DB::call_with_lock(configuration.config.path,
+                           [&configuration, &error](auto const&) {
+            if (![RLMRealm fileExistsForConfiguration:configuration]) {
+                @autoreleasepool {
+                    bool didCopySeed = false;
+                    NSError *copyError;
+                    didCopySeed = [[NSFileManager defaultManager] copyItemAtURL:configuration.seedFilePath
+                                                                          toURL:configuration.fileURL
+                                                                          error:&copyError];
+                    if (!didCopySeed) {
+                        RLMSetErrorOrThrow(copyError, error);
+                        return nil;
+                    }
+                }
+            }
+        });
     }
 
     configuration = [configuration copy];

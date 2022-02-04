@@ -1409,9 +1409,9 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
     func testSeedFilePathOpenSyncToLocal() {
         do {
+            let seedURL = RLMTestRealmURL().deletingLastPathComponent().appendingPathComponent("seed.realm")
             let user1 = try logInUser(for: basicCredentials())
             var syncConfig = user1.configuration(partitionValue: #function)
-            syncConfig.seedFilePath = RLMTestRealmURL()
             syncConfig.objectTypes = [SwiftHugeSyncObject.self]
 
             let syncRealm = try Realm(configuration: syncConfig)
@@ -1422,13 +1422,14 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             waitForUploads(for: syncRealm)
             checkCount(expected: 1, syncRealm, SwiftHugeSyncObject.self)
 
+            var exportConfig = Realm.Configuration()
+            exportConfig.fileURL = seedURL
+            exportConfig.objectTypes = [SwiftHugeSyncObject.self]
+            // Export for use as a local Realm.
+            try syncRealm.writeCopy(configuration: exportConfig)
+
             var localConfig = Realm.Configuration()
-            localConfig.fileURL = RLMTestRealmURL()
-            localConfig.objectTypes = [SwiftHugeSyncObject.self]
-
-            try syncRealm.writeCopy(configuration: localConfig)
-
-            localConfig.seedFilePath = RLMTestRealmURL()
+            localConfig.seedFilePath = seedURL
             localConfig.fileURL = RLMDefaultRealmURL()
             localConfig.schemaVersion = 1
 
