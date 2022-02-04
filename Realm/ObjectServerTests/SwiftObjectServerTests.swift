@@ -532,11 +532,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     }
 
     // test for nil assignment of callbacks
-    // test for callbacks not firing when they're released (is this possible?)
-
-    func testClientResetDiscardLocal() {
-        // !!!: error handler and cases here while WIP
-        // ***
+    // maybe delete this test since there is a lot of overlap and the test takes a long time to run?
+    func testClientResetNoCallbacks() {
         app.syncManager.errorHandler = { (error, _) in
             guard let syncError = error as? SyncError else {
                  fatalError("Unexpected error type passed to sync error handler! \(error)")
@@ -544,6 +541,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             switch syncError.code {
             case .clientResetError:
                 print("\(error.localizedDescription)")
+                XCTFail("Expect no Error")
                 break
             case .clientSessionError:
                 break
@@ -560,38 +558,12 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             }
         }
 
-        // ***
-        // Seed object, upload to server
         do {
             let user = try logInUser(for: basicCredentials())
             let collection = setupMongoCollection(user: user, collectionName: "SwiftPerson")
-            // !!!: this notation is silly. I'm going to take the callbacks out of the initializer.
-            var configuration = user.configuration(partitionValue: #function, clientResetMode: .discardLocal) { local in
-                // Expect there to be 2 objects in the local realm before client reset
-                let results = local.objects(SwiftPerson.self)
-                XCTAssertEqual(results.count, 2)
-                let paul = results.filter("firstName == 'Paul'")
-                let john = results.filter("firstName == 'John'")
-                XCTAssertNotNil(paul)
-                XCTAssertNotNil(john)
-            } notifyAfterReset: { local, remote in
-                // Expect the local realm that was overwritten to have had 2 objects before it was overwritten.
-                let results = local.objects(SwiftPerson.self)
-                XCTAssertEqual(results.count, 2)
-                let paul = results.filter("firstName == 'Paul'")
-                let john = results.filter("firstName == 'John'")
-                XCTAssertNotNil(paul)
-                XCTAssertNotNil(john)
-                // Expect the server realm that overwrote the local realm to have had 1 object before client reset.
-                let results2 = remote.objects(SwiftPerson.self)
-                XCTAssertEqual(results2.count, 1)
-                let paul2 = results2.filter("firstName == 'Paul'")
-                let john2 = results2.filter("firstName == 'John'")
-                XCTAssertFalse(paul2.isEmpty)
-                XCTAssert(john2.isEmpty)
-            }
-            configuration.objectTypes = [SwiftPerson.self]
+            let configuration = user.configuration(partitionValue: #function, clientResetMode: .discardLocal)
 
+            // Seed one object
             try autoreleasepool {
                 let realm = try Realm(configuration: configuration)
                 try realm.write {
@@ -600,12 +572,13 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 waitForUploads(for: realm)
                 XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1)
             }
+
             // waitForUploads confirms the server received the upload request from the client
             // It does not guarantee the uploaded objects are persisted to the backing datastore
             // This expectation queries the server for the documents directly before continuing.
             var documentCount = 0
             var requestCount = 0
-            var timeBetweenRequests = 2
+            let timeBetweenRequests = 2
             while (documentCount < 1) {
                 collection.find(filter: [:]) { result in
                     switch result {
@@ -671,8 +644,130 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             try autoreleasepool {
                 let realm = try Realm(configuration: configuration)
                 waitForDownloads(for: realm)
-                // TODO: Check server logs to figure out why no object is downloaded after reset.
                 XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1)
+                XCTAssertEqual(realm.objects(SwiftPerson.self)[0].firstName, "Paul")
+            }
+
+        } catch {
+            XCTFail("Failed: \(error.localizedDescription)")
+        }
+    }
+    // test for callbacks not firing when they're released (is this possible?)
+
+    func testClientResetDiscardLocal() {
+        // ***
+        // Seed object, upload to server
+        do {
+            let user = try logInUser(for: basicCredentials())
+            let collection = setupMongoCollection(user: user, collectionName: "SwiftPerson")
+            // !!!: this notation is silly. I'm going to take the callbacks out of the initializer.
+            var configuration = user.configuration(partitionValue: #function, clientResetMode: .discardLocal) { local in
+                // Expect there to be 2 objects in the local realm before client reset
+                let results = local.objects(SwiftPerson.self)
+                XCTAssertEqual(results.count, 2)
+                let paul = results.filter("firstName == 'Paul'")
+                let john = results.filter("firstName == 'John'")
+                XCTAssertNotNil(paul)
+                XCTAssertNotNil(john)
+            } notifyAfterReset: { local, remote in
+                // Expect the local realm that was overwritten to have had 2 objects before it was overwritten.
+                let results = local.objects(SwiftPerson.self)
+                XCTAssertEqual(results.count, 2)
+                let paul = results.filter("firstName == 'Paul'")
+                let john = results.filter("firstName == 'John'")
+                XCTAssertNotNil(paul)
+                XCTAssertNotNil(john)
+                // Expect the server realm that overwrote the local realm to have had 1 object before client reset.
+                let results2 = remote.objects(SwiftPerson.self)
+                XCTAssertEqual(results2.count, 1)
+                let paul2 = results2.filter("firstName == 'Paul'")
+                let john2 = results2.filter("firstName == 'John'")
+                XCTAssertFalse(paul2.isEmpty)
+                XCTAssert(john2.isEmpty)
+            }
+            configuration.objectTypes = [SwiftPerson.self]
+
+            try autoreleasepool {
+                let realm = try Realm(configuration: configuration)
+                try realm.write {
+                    realm.add(SwiftPerson(firstName: "Paul", lastName: "M"))
+                }
+                waitForUploads(for: realm)
+                XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1)
+            }
+            // waitForUploads confirms the server received the upload request from the client
+            // It does not guarantee the uploaded objects are persisted to the backing datastore
+            // This expectation queries the server for the documents directly before continuing.
+            var documentCount = 0
+            var requestCount = 0
+            let timeBetweenRequests = 2
+            while (documentCount < 1) {
+                collection.find(filter: [:]) { result in
+                    switch result {
+                    case .success(let documents):
+                        documentCount = documents.count
+                        if documentCount > 0 {
+                            XCTAssertEqual(documentCount, 1)
+                            XCTAssertEqual(documents[0]["firstName"]??.stringValue, "Paul")
+                            break
+                        }
+                    case .failure:
+                        XCTFail("Should find")
+                    }
+                }
+                if documentCount == 0 {
+                    sleep(UInt32(timeBetweenRequests))
+                    if (requestCount * timeBetweenRequests > 300) {
+                        XCTFail("waited longer than five minutes")
+                        break
+                    }
+                    requestCount += 1
+                    print("requests: \(requestCount), time passed: ~ \(requestCount * 2)") // !!!: Delete this line
+                }
+            }
+
+            // Sync is disabled, block executed, sync re-enabled
+            clientReset {
+                try autoreleasepool {
+                    let realm = try Realm(configuration: configuration)
+                    try realm.write {
+                        let obj =  SwiftPerson(firstName: "John", lastName: "L")
+                        realm.add(obj)
+                    }
+                    XCTAssertEqual(realm.objects(SwiftPerson.self).count, 2)
+                }
+            }
+
+            // TODO: add comments why this is here.
+            try autoreleasepool {
+                var newConfig = user.configuration(partitionValue: #function)
+                newConfig.fileURL = RLMTestRealmURL()
+                XCTAssertNotEqual(newConfig.fileURL, configuration.fileURL)
+                let newRealm = try Realm(configuration: newConfig)
+
+                var runCount = 0
+                while true {
+                    self.waitForDownloads(for: newRealm)
+                    if newRealm.objects(SwiftPerson.self).count > 0 {
+                        XCTAssertEqual(newRealm.objects(SwiftPerson.self).count, 1)
+                        XCTAssertEqual(newRealm.objects(SwiftPerson.self)[0].firstName, "Paul")
+                        break
+                    }
+                    if (runCount * timeBetweenRequests > 300) {
+                        XCTFail("waited longer than five minutes")
+                        break
+                    }
+                    runCount += 1
+                    print("requests: \(runCount), time passed: ~ \(runCount * timeBetweenRequests)") // !!!: Delete this line
+                    sleep(UInt32(timeBetweenRequests))
+                }
+            }
+
+            try autoreleasepool {
+                let realm = try Realm(configuration: configuration)
+                waitForDownloads(for: realm)
+                XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1)
+                XCTAssertEqual(realm.objects(SwiftPerson.self)[0].firstName, "Paul")
             }
         } catch {
             XCTFail("Failed: \(error.localizedDescription)")
