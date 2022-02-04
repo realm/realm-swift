@@ -587,8 +587,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 XCTAssertEqual(results2.count, 1)
                 let paul2 = results2.filter("firstName == 'Paul'")
                 let john2 = results2.filter("firstName == 'John'")
-                XCTAssertNotNil(paul2)
-                XCTAssertNil(john2)
+                XCTAssertFalse(paul2.isEmpty)
+                XCTAssert(john2.isEmpty)
             }
             configuration.objectTypes = [SwiftPerson.self]
 
@@ -605,7 +605,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             // This expectation queries the server for the documents directly before continuing.
             var documentCount = 0
             var requestCount = 0
-            let timeBetweenRequests = 2
+            var timeBetweenRequests = 2
             while (documentCount < 1) {
                 collection.find(filter: [:]) { result in
                     switch result {
@@ -642,6 +642,32 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                     XCTAssertEqual(realm.objects(SwiftPerson.self).count, 2)
                 }
             }
+
+            // TODO: add comments why this is here.
+            try autoreleasepool {
+                var newConfig = user.configuration(partitionValue: #function)
+                newConfig.fileURL = RLMTestRealmURL()
+                XCTAssertNotEqual(newConfig.fileURL, configuration.fileURL)
+                let newRealm = try Realm(configuration: newConfig)
+
+                var runCount = 0
+                while true {
+                    self.waitForDownloads(for: newRealm)
+                    if newRealm.objects(SwiftPerson.self).count > 0 {
+                        XCTAssertEqual(newRealm.objects(SwiftPerson.self).count, 1)
+                        XCTAssertEqual(newRealm.objects(SwiftPerson.self)[0].firstName, "Paul")
+                        break
+                    }
+                    if (runCount * timeBetweenRequests > 300) {
+                        XCTFail("waited longer than five minutes")
+                        break
+                    }
+                    runCount += 1
+                    print("requests: \(runCount), time passed: ~ \(runCount * timeBetweenRequests)") // !!!: Delete this line
+                    sleep(UInt32(timeBetweenRequests))
+                }
+            }
+
             try autoreleasepool {
                 let realm = try Realm(configuration: configuration)
                 waitForDownloads(for: realm)
