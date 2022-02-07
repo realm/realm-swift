@@ -448,22 +448,22 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     }
 
     if (configuration.seedFilePath) {
-        DB::call_with_lock(configuration.config.path,
-                           [&configuration, &error](auto const&) {
-            if (![RLMRealm fileExistsForConfiguration:configuration]) {
-                @autoreleasepool {
-                    bool didCopySeed = false;
-                    NSError *copyError;
+        @autoreleasepool {
+            bool didCopySeed = false;
+            NSError *copyError;
+            DB::call_with_lock(configuration.config.path,
+                               [&configuration, &error, &copyError, &didCopySeed](auto const&) {
+                if (![RLMRealm fileExistsForConfiguration:configuration]) {
                     didCopySeed = [[NSFileManager defaultManager] copyItemAtURL:configuration.seedFilePath
                                                                           toURL:configuration.fileURL
                                                                           error:&copyError];
-                    if (!didCopySeed) {
-                        RLMSetErrorOrThrow(copyError, error);
-                        return nil;
-                    }
                 }
+            });
+            if (!didCopySeed && copyError != nil) {
+                RLMSetErrorOrThrow(copyError, error);
+                return nil;
             }
-        });
+        }
     }
 
     configuration = [configuration copy];

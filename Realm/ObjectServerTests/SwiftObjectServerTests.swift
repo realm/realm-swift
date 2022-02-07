@@ -1343,15 +1343,20 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 }
             }
 
+            let seedURL = RLMTestRealmURL().deletingLastPathComponent().appendingPathComponent("seed.realm")
             let user = try logInUser(for: basicCredentials())
             var destinationConfig = user.configuration(partitionValue: #function)
-            destinationConfig.seedFilePath = RLMTestRealmURL()
+            destinationConfig.fileURL = seedURL
             destinationConfig.objectTypes = [SwiftHugeSyncObject.self]
 
             try realm.writeCopy(configuration: destinationConfig)
 
+            var syncConfig = user.configuration(partitionValue: #function)
+            syncConfig.seedFilePath = seedURL
+            syncConfig.objectTypes = [SwiftHugeSyncObject.self]
+
             // Open the realm and immediately check data
-            let destinationRealm = try Realm(configuration: destinationConfig)
+            let destinationRealm = try Realm(configuration: syncConfig)
             checkCount(expected: SwiftSyncTestCase.bigObjectCount, destinationRealm, SwiftHugeSyncObject.self)
 
             try destinationRealm.write {

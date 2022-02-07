@@ -1037,7 +1037,6 @@ class RealmTests: TestCase {
 
             XCTAssertEqual(destinationRealm.objects(SwiftBoolObject.self).count, 2)
         } catch {
-            print(error.localizedDescription)
             XCTFail("Got an error: \(error)")
         }
     }
