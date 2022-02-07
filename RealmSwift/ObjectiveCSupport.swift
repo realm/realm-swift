@@ -164,26 +164,42 @@ import Realm
         }
     }
 
-    public static func convert(object: @escaping RLMClientResetBeforeBlock) -> (Realm) -> Void {
-        return { localRealm in
-            return object(localRealm.rlmRealm)
+    // ???: Should the swift blocks be a named type?
+    /// Convert a RealmSwift before block to an RLMClientResetBeforeBlock
+    public static func convert(object:((Realm) -> Void)?) -> RLMClientResetBeforeBlock? {
+        guard let object = object else {
+            return nil
         }
-    }
-
-    // TODO: Docs
-    public static func convert(object: @escaping ((Realm) -> Void)) -> RLMClientResetBeforeBlock {
         return { localRealm in
             return object(Realm(localRealm))
         }
     }
 
-    public static func convert(object: @escaping ((Realm, Realm) -> Void)) -> RLMClientResetAfterBlock {
+    /// Convert an RLMClientResetBeforeBlock to a RealmSwift before  block
+    public static func convert(object: RLMClientResetBeforeBlock?) -> ((Realm) -> Void)? {
+        guard let object = object else {
+            return nil
+        }
+        return { localRealm in
+            return object(localRealm.rlmRealm)
+        }
+    }
+
+    /// Convert a RealmSwift after block to an RLMClientResetAfterBlock
+    public static func convert(object: ((Realm, Realm) -> Void)?) -> RLMClientResetAfterBlock? {
+        guard let object = object else {
+            return nil
+        }
         return { localRealm, remoteRealm in
             return object(Realm(localRealm), Realm(remoteRealm))
         }
     }
 
-    public static func convert(object: @escaping RLMClientResetAfterBlock) -> (Realm, Realm) -> Void {
+    /// Convert an RLMClientResetAfterBlock to a RealmSwift after block
+    public static func convert(object: RLMClientResetAfterBlock?) -> ((Realm, Realm) -> Void)? {
+        guard let object = object else {
+            return nil
+        }
         return { localRealm, remoteRealm in
             return object(localRealm.rlmRealm, remoteRealm.rlmRealm)
         }

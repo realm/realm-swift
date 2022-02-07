@@ -128,7 +128,7 @@ struct AfterClientResetWrapper {
     return translateClientResetMode(_config->client_resync_mode);
 }
 
-// TODO: shorten, ternary once it's actually working
+// ???: I couldn't shorten this. I had to wrapper.block on it's own line. Not exactly clear why.
 - (RLMClientResetBeforeBlock)beforeClientReset {
     if (_config->notify_before_client_reset) {
         auto wrapper = *_config->notify_before_client_reset.target<BeforeClientResetWrapper>();
@@ -138,7 +138,15 @@ struct AfterClientResetWrapper {
     }
 }
 
-// TODO: unify naming
+//- (void)notifyBeforeClientReset:(RLMClientResetBeforeBlock)callback {
+//    if (!callback) {
+//        _config->notify_before_client_reset = nullptr;
+//    } else {
+//        _config->notify_before_client_reset = BeforeClientResetWrapper{callback};
+//    }
+//}
+//// ???: I couldn't shorten this. I had to wrapper.block on it's own line. Not exactly clear why.
+//// TODO: Unify names?
 - (void)setBeforeClientReset:(RLMClientResetBeforeBlock)beforeClientReset {
     if (!beforeClientReset) {
         _config->notify_before_client_reset = nullptr;
@@ -147,6 +155,7 @@ struct AfterClientResetWrapper {
     }
 }
 
+
 - (RLMClientResetAfterBlock)afterClientReset {
     if (_config->notify_after_client_reset) {
         auto wrapper = *_config->notify_after_client_reset.target<AfterClientResetWrapper>(); // here
@@ -154,8 +163,15 @@ struct AfterClientResetWrapper {
     } else {
         return nil;
     }
-
 }
+
+//- (void)notifyAfterClientReset:(RLMClientResetAfterBlock)callback {
+//    if (!callback) {
+//        _config->notify_after_client_reset = nullptr;
+//    } else {
+//        _config->notify_after_client_reset = AfterClientResetWrapper{callback};
+//    }
+//}
 
 - (void)setAfterClientReset:(RLMClientResetAfterBlock)afterClientReset {
     if (!afterClientReset) {

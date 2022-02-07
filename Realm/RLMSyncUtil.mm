@@ -64,8 +64,6 @@ RLMSyncStopPolicy translateStopPolicy(SyncSessionStopPolicy stop_policy) {
     REALM_UNREACHABLE();
 }
 
-// ???: "No previous prototype for function 'translateClientResetMode'"
-// Is this warning bad?
 RLMClientResetMode translateClientResetMode(ClientResyncMode mode) {
     switch (mode) {
         case ClientResyncMode::Manual:                      return RLMClientResetModeManual;

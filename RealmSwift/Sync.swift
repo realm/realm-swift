@@ -234,8 +234,43 @@ public typealias AfterClientResetBlock = RLMClientResetAfterBlock
     
     // TODO: docs, reorder?
     public let clientResetMode: ClientResetMode
-    public var notifyBeforeClientReset: BeforeClientResetBlock?
-    public var notifyAfterClientReset: AfterClientResetBlock?
+
+    public var notifyBeforeClientReset: ((Realm) -> Void)?
+    public var notifyAfterClientReset: ((Realm, Realm) -> Void)?
+    
+//    public var notifyBeforeClientReset: ((Realm) -> Void)? {
+//        get {
+//            return ObjectiveCSupport.convert(object: self.asConfig().beforeClientReset)
+//        }
+//        set {
+//            guard let newValue = newValue else {
+//                self.asConfig().afterClientReset = nil
+//                return
+//            }
+//            self.asConfig().beforeClientReset = ObjectiveCSupport.convert(object: newValue)
+//        }
+//    }
+//
+//    public var notifyAfterClientReset: ((Realm, Realm) -> Void)? {
+//        get {
+//            return ObjectiveCSupport.convert(object: self.asConfig().afterClientReset)
+//        }
+//        set {
+//            guard let newValue = newValue else {
+//                self.asConfig().afterClientReset = nil
+//                return
+//            }
+//            self.asConfig().afterClientReset = ObjectiveCSupport.convert(object: newValue)
+//        }
+//    }
+    
+//    public func notifyBeforeClientReset(completion: @escaping (Realm) -> Void) -> Void {
+//        self.asConfig().notify(beforeClientReset: ObjectiveCSupport.convert(object: completion))
+//    }
+//
+//    public func notifyAfterClientReset(completion: @escaping (Realm, Realm) -> Void) -> Void {
+//        self.asConfig().notify(afterClientReset: ObjectiveCSupport.convert(object: completion))
+//    }
 
     /**
      Determines if the sync configuration is flexible sync or not
@@ -257,8 +292,8 @@ public typealias AfterClientResetBlock = RLMClientResetAfterBlock
         self.cancelAsyncOpenOnNonFatalErrors = config.cancelAsyncOpenOnNonFatalErrors
         self.isFlexibleSync = config.enableFlexibleSync
         self.clientResetMode = config.clientResetMode
-        self.notifyBeforeClientReset = config.beforeClientReset
-        self.notifyAfterClientReset = config.afterClientReset
+        self.notifyBeforeClientReset = ObjectiveCSupport.convert(object: config.beforeClientReset)
+        self.notifyAfterClientReset = ObjectiveCSupport.convert(object: config.afterClientReset)
     }
 
     func asConfig() -> RLMSyncConfiguration {
@@ -270,8 +305,8 @@ public typealias AfterClientResetBlock = RLMClientResetAfterBlock
                                                      partitionValue: partitionValue.map(ObjectiveCSupport.convertBson),
                                                      stopPolicy: stopPolicy,
                                                      clientResetMode: clientResetMode,
-                                                     notifyBeforeReset: notifyBeforeClientReset,
-                                                     notifyAfterReset: notifyAfterClientReset)
+                                                     notifyBeforeReset: ObjectiveCSupport.convert(object: notifyBeforeClientReset),
+                                                     notifyAfterReset: ObjectiveCSupport.convert(object: notifyAfterClientReset))
         }
         syncConfiguration.cancelAsyncOpenOnNonFatalErrors = cancelAsyncOpenOnNonFatalErrors
         return syncConfiguration
@@ -404,30 +439,12 @@ public extension User {
         return ObjectiveCSupport.convert(object: config)
     }
     
-    // !!!: I originally tried using a default value for clientResetMode because this has to be a non-breaking change.
     // but the method signature would be ambiguous with
     // func configuration<T: BSON>(partitionValue: T, cancelAsyncOpenOnNonFatalErrors: Bool = false) // Sync.swift : ~416
     // TODO: Docs
-    func configuration<T: BSON>(partitionValue: T, clientResetMode: ClientResetMode, notifyBeforeReset: ((Realm) -> Void)? = nil, notifyAfterReset: ((Realm, Realm) -> Void)? = nil) -> Realm.Configuration {
-        var rlmNotifyBeforeReset: BeforeClientResetBlock?
-        var rlmNotifyAfterReset: AfterClientResetBlock?
-
-        // This is crazy. But I couldn't make the convert have optionality correctly.
-        // !!!: Figure out a way to do this correctly
-        if ((notifyBeforeReset) != nil) {
-            rlmNotifyBeforeReset = ObjectiveCSupport.convert(object: notifyBeforeReset!)
-        } else {
-            rlmNotifyBeforeReset = nil
-        }
-        if ((notifyAfterReset) != nil) {
-            rlmNotifyAfterReset = ObjectiveCSupport.convert(object: notifyAfterReset!)
-        } else {
-            rlmNotifyBeforeReset = nil
-        }
+    func configuration<T: BSON>(partitionValue: T, clientResetMode: ClientResetMode) -> Realm.Configuration {
         let config = self.__configuration(withPartitionValue: ObjectiveCSupport.convert(object: AnyBSON(partitionValue)),
-                                          clientResetMode: clientResetMode,
-                                          notifyBeforeReset: rlmNotifyBeforeReset,
-                                          notifyafterReset: rlmNotifyAfterReset)
+                                          clientResetMode: clientResetMode)
         return ObjectiveCSupport.convert(object: config)
     }
 

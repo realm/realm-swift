@@ -26,7 +26,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-// ???: Docs?
+// TODO: Docs
 typedef NS_ENUM(NSUInteger, RLMClientResetMode) {
   RLMClientResetModeManual,
   RLMClientResetModeDiscardLocal
@@ -57,6 +57,9 @@ typedef void(^RLMClientResetAfterBlock)(RLMRealm * _Nonnull, RLMRealm * _Nonnull
 @property (nonatomic) RLMClientResetMode clientResetMode;
 @property (nonatomic, nullable) RLMClientResetBeforeBlock  beforeClientReset;
 @property (nonatomic, nullable) RLMClientResetAfterBlock  afterClientReset;
+
+//- (void)notifyBeforeClientReset:(RLMClientResetBeforeBlock)callback;
+//- (void)notifyAfterClientReset:(RLMClientResetAfterBlock)callback;
 
 /**
  Whether nonfatal connection errors should cancel async opens.

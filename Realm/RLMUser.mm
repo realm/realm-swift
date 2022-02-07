@@ -105,8 +105,6 @@ using namespace realm;
                                                 notifyAfterReset:afterResetBlock];
     RLMRealmConfiguration *config = [[RLMRealmConfiguration alloc] init];
     config.syncConfiguration = syncConfig;
-//    REALM_ASSERT(syncConfig.beforeClientReset); // DELETE ME
-//    REALM_ASSERT(config.syncConfiguration.beforeClientReset); // DELETE ME
     return config;
 }
 
