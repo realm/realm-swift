@@ -177,6 +177,27 @@ static NSString *generateRandomString(int num) {
     [self waitForExpectationsWithTimeout:60.0 handler:nil];
 }
 
+- (void)testDeleteUser {
+    RLMUser *firstUser = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd)
+                                                                             register:YES]];
+    RLMUser *secondUser = [self logInUserForCredentials:[self basicCredentialsWithName:@"test2@10gen.com"
+                                                                              register:YES]];
+
+    XCTAssert([self.app.currentUser.identifier isEqualToString:secondUser.identifier]);
+
+    XCTestExpectation *deleteUserExpectation = [self expectationWithDescription:@"should delete user"];
+
+    [secondUser deleteWithCompletion:^(NSError *error) {
+        XCTAssert(!error);
+        XCTAssert(self.app.allUsers.count == 1);
+        XCTAssertNil(self.app.currentUser);
+        XCTAssertEqual(secondUser.state, RLMUserStateRemoved);
+        [deleteUserExpectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:60.0 handler:nil];
+}
+
 - (void)testDeviceRegistration {
     RLMPushClient *client = [self.app pushClientWithServiceName:@"gcm"];
     auto expectation = [self expectationWithDescription:@"should register device"];

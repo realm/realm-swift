@@ -172,6 +172,16 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)removeWithCompletion:(RLMUserOptionalErrorBlock)completion;
 
 /**
+ Permanently deletes this user from your MongoDB Realm app.
+
+ The users state will be set to `Removed` and the session will be destroyed.
+ If the delete request fails, the local authentication state will be untouched.
+
+ @param completion A callback invoked on completion
+*/
+- (void)deleteWithCompletion:(RLMUserOptionalErrorBlock)completion;
+
+/**
  Logs out the current user
 
  The users state will be set to `Removed` is they are an anonymous user or `LoggedOut` if they are authenticated by an email / password or third party auth clients

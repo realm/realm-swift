@@ -239,6 +239,12 @@ using namespace realm;
     });
 }
 
+- (void)deleteWithCompletion:(RLMUserOptionalErrorBlock)completion {
+    _app._realmApp->delete_user(_user, ^(realm::util::Optional<app::AppError> error) {
+        [self handleResponse:error completion:completion];
+    });
+}
+
 - (void)logOutWithCompletion:(RLMOptionalErrorBlock)completion {
     _app._realmApp->log_out(_user, ^(realm::util::Optional<app::AppError> error) {
         [self handleResponse:error completion:completion];

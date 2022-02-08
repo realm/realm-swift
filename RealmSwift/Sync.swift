@@ -681,6 +681,22 @@ public extension User {
             }
         }
     }
+
+    /// Permanently deletes this user from your MongoDB Realm app.
+    /// The users state will be set to `Removed` and the session will be destroyed.
+    /// If the delete request fails, the local authentication state will be untouched.
+    /// @returns A publisher that eventually return `Result.success` or `Error`.
+    func delete() -> Future<Void, Error> {
+        return Future<Void, Error> { promise in
+            self.delete { error in
+                if let error = error {
+                    promise(.failure(error))
+                } else {
+                    promise(.success(()))
+                }
+            }
+        }
+    }
 }
 
 /// :nodoc:
