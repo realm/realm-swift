@@ -1793,6 +1793,12 @@
     NSString *expectedUnderlying = [NSString stringWithFormat:@"open(\"%@\") failed: file exists", RLMTestRealmURL().path];
     XCTAssertFalse([realm writeCopyToURL:RLMTestRealmURL() encryptionKey:nil error:&writeError]);
     RLMValidateRealmError(writeError, RLMErrorFileExists, expectedError, expectedUnderlying);
+
+    RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
+    configuration.fileURL = RLMTestRealmURL();
+    writeError = nil;
+    XCTAssertFalse([realm writeCopyForConfiguration:configuration error:&writeError]);
+    RLMValidateRealmError(writeError, RLMErrorFileExists, expectedError, @"");
 }
 
 - (void)testCannotWriteInNonExistentDirectory
@@ -1808,6 +1814,12 @@
     NSString *expectedUnderlying = [NSString stringWithFormat:@"open(\"%@\") failed: no such file or directory", badPath];
     NSError *writeError;
     XCTAssertFalse([realm writeCopyToURL:[NSURL fileURLWithPath:badPath] encryptionKey:nil error:&writeError]);
+    RLMValidateRealmError(writeError, RLMErrorFileNotFound, expectedError, expectedUnderlying);
+
+    RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
+    configuration.fileURL = [NSURL fileURLWithPath:badPath];
+    writeError = nil;
+    XCTAssertFalse([realm writeCopyForConfiguration:configuration error:&writeError]);
     RLMValidateRealmError(writeError, RLMErrorFileNotFound, expectedError, expectedUnderlying);
 }
 
@@ -1825,6 +1837,13 @@
     NSString *expectedUnderlying = [NSString stringWithFormat:@"open(\"%@\") failed: permission denied", RLMTestRealmURL().path];
     NSError *writeError;
     XCTAssertFalse([realm writeCopyToURL:RLMTestRealmURL() encryptionKey:nil error:&writeError]);
+    RLMValidateRealmError(writeError, RLMErrorFilePermissionDenied, expectedError, expectedUnderlying);
+
+    // Test writeCopyForConfiguration
+    RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
+    configuration.fileURL = RLMTestRealmURL();
+    writeError = nil;
+    XCTAssertFalse([realm writeCopyForConfiguration:configuration error:&writeError]);
     RLMValidateRealmError(writeError, RLMErrorFilePermissionDenied, expectedError, expectedUnderlying);
 
     // Restore old permissions
@@ -1851,6 +1870,12 @@
     XCTAssertFalse([realm writeCopyToURL:RLMTestRealmURL() encryptionKey:nil error:&writeError]);
     RLMValidateRealmError(writeError, RLMErrorFileAccess, expectedError, expectedUnderlying);
 
+    RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
+    configuration.fileURL = RLMTestRealmURL();
+    writeError = nil;
+    XCTAssertFalse([realm writeCopyForConfiguration:configuration error:&writeError]);
+    RLMValidateRealmError(writeError, RLMErrorFileAccess, expectedError, expectedUnderlying);
+
     // Restore the old open file limit
     setrlimit(RLIMIT_NOFILE, &oldrl);
 }
@@ -1867,6 +1892,43 @@
                                       error:&writeError]);
         XCTAssertNil(writeError);
         RLMRealm *copy = [self realmWithTestPath];
+        XCTAssertEqual(1U, [IntObject allObjectsInRealm:copy].count);
+    }];
+}
+
+#pragma mark - Write Copy For Configuration
+
+- (void)testWriteCopyForConfiguration
+{
+    RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
+    configuration.fileURL = RLMTestRealmURL();
+
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm transactionWithBlock:^{
+        [IntObject createInRealm:realm withValue:@[@0]];
+    }];
+
+    NSError *writeError;
+    XCTAssertTrue([realm writeCopyForConfiguration:configuration error:&writeError]);
+    XCTAssertNil(writeError);
+    RLMRealm *copy = [RLMRealm realmWithConfiguration:configuration error:nil];
+    XCTAssertEqual(1U, [IntObject allObjectsInRealm:copy].count);
+}
+
+- (void)testWritingCopyWithConfigurationUsesWriteTransactionInProgress
+{
+    RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
+    configuration.fileURL = RLMTestRealmURL();
+
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm transactionWithBlock:^{
+        [IntObject createInRealm:realm withValue:@[@0]];
+
+        NSError *writeError;
+        XCTAssertTrue([realm writeCopyForConfiguration:configuration
+                                                  error:&writeError]);
+        XCTAssertNil(writeError);
+        RLMRealm *copy = [RLMRealm realmWithConfiguration:configuration error:nil];
         XCTAssertEqual(1U, [IntObject allObjectsInRealm:copy].count);
     }];
 }
