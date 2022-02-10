@@ -915,6 +915,22 @@ import Realm.Private
     }
 
     /**
+     Writes a copy of the Realm to a given location specified by a given configuration.
+
+     If the configuration supplied is derived from a `User` then this Realm will be copied with
+     sync functionality enabled.
+
+     The destination file cannot already exist.
+
+     - parameter configuration: A Realm Configuration.
+
+     - throws: An `NSError` if the copy could not be written.
+     */
+    public func writeCopy(configuration: Realm.Configuration) throws {
+        try rlmRealm.writeCopy(for: configuration.rlmConfiguration)
+    }
+
+    /**
      Checks if the Realm file for the given configuration exists locally on disk.
 
      For non-synchronized, non-in-memory Realms, this is equivalent to

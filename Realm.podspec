@@ -8,15 +8,15 @@ Pod::Spec.new do |s|
   s.description             = <<-DESC
                               The Realm Mobile Database, for Objective-C. (If you want to use Realm from Swift, see the “RealmSwift” pod.)
 
-                              The Realm Mobile Database is a fast, easy-to-use replacement for Core Data & SQLite. Use it with the Realm Mobile Platform for realtime, automatic data sync. Works on iOS, macOS, tvOS & watchOS. Learn more and get help at https://realm.io.
+                              The Realm Mobile Database is a fast, easy-to-use replacement for Core Data & SQLite. Use it with MongoDB Realm Sync for realtime, automatic data sync. Works on iOS, macOS, tvOS & watchOS. Learn more and get help at https://realm.io.
                               DESC
   s.homepage                = "https://realm.io"
   s.source                  = { :git => 'https://github.com/realm/realm-swift.git', :tag => "v#{s.version}" }
-  s.author                  = { 'Realm' => 'help@realm.io' }
+  s.author                  = { 'Realm' => 'realm-help@mongodb.com' }
   s.library                 = 'c++', 'z'
   s.requires_arc            = true
   s.social_media_url        = 'https://twitter.com/realm'
-  s.documentation_url       = "https://realm.io/docs/objc/latest"
+  s.documentation_url       = "https://docs.mongodb.com/realm/sdk/swift"
   s.license                 = { :type => 'Apache 2.0', :file => 'LICENSE' }
 
   public_header_files       = 'include/Realm.h',

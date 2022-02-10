@@ -1249,6 +1249,71 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         waitForExpectations(timeout: 10.0, handler: nil)
     }
 
+    func testDeleteUser() {
+        func userExistsOnServer(_ user: User) -> Bool {
+            let serverEx = expectation(description: "server-user")
+            var userExists = false
+            RealmServer.shared.retrieveUser(appId, userId: user.id) { result in
+                switch result {
+                case .success(let u):
+                    let u = u as! [String: Any]
+                    XCTAssertEqual(u["_id"] as! String, user.id)
+                    userExists = true
+                case .failure:
+                    userExists = false
+                }
+                serverEx.fulfill()
+            }
+            wait(for: [serverEx], timeout: 4.0)
+            return userExists
+        }
+
+        let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
+        let password = randomString(10)
+
+        let registerUserEx = expectation(description: "Register user")
+
+        app.emailPasswordAuth.registerUser(email: email, password: password) { (error) in
+            XCTAssertNil(error)
+            registerUserEx.fulfill()
+        }
+        wait(for: [registerUserEx], timeout: 4.0)
+
+        let loginEx = expectation(description: "Login user")
+        var syncUser: User?
+
+        app.login(credentials: Credentials.emailPassword(email: email, password: password)) { result in
+            switch result {
+            case .success(let user):
+                syncUser = user
+            case .failure:
+                XCTFail("Should login user")
+            }
+            loginEx.fulfill()
+        }
+
+        wait(for: [loginEx], timeout: 4.0)
+        XCTAssertTrue(userExistsOnServer(syncUser!))
+
+        XCTAssertEqual(syncUser?.id, app.currentUser?.id)
+        XCTAssertEqual(app.allUsers.count, 1)
+
+        let deleteEx = expectation(description: "Delete user")
+
+        XCTAssertNotNil(syncUser)
+
+        syncUser?.delete { (error) in
+            XCTAssertNil(error)
+            deleteEx.fulfill()
+        }
+
+        wait(for: [deleteEx], timeout: 4.0)
+
+        XCTAssertFalse(userExistsOnServer(syncUser!))
+        XCTAssertNil(app.currentUser)
+        XCTAssertEqual(app.allUsers.count, 0)
+    }
+
     func testAppLinkUser() {
         let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
         let password = randomString(10)
@@ -1655,6 +1720,350 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         XCTAssertNil(profile.lastName)
         XCTAssertNil(profile.pictureURL)
         XCTAssertEqual(profile.metadata, [:])
+    }
+
+    // MARK: Seed file path
+
+    func testSeedFilePathOpenLocalToSync() {
+        do {
+            var config = Realm.Configuration()
+            config.fileURL = RLMTestRealmURL()
+            config.objectTypes = [SwiftHugeSyncObject.self]
+            let realm = try Realm(configuration: config)
+            try! realm.write {
+                for _ in 0..<SwiftSyncTestCase.bigObjectCount {
+                    realm.add(SwiftHugeSyncObject.create())
+                }
+            }
+
+            let seedURL = RLMTestRealmURL().deletingLastPathComponent().appendingPathComponent("seed.realm")
+            let user = try logInUser(for: basicCredentials())
+            var destinationConfig = user.configuration(partitionValue: #function)
+            destinationConfig.fileURL = seedURL
+            destinationConfig.objectTypes = [SwiftHugeSyncObject.self]
+
+            try realm.writeCopy(configuration: destinationConfig)
+
+            var syncConfig = user.configuration(partitionValue: #function)
+            syncConfig.seedFilePath = seedURL
+            syncConfig.objectTypes = [SwiftHugeSyncObject.self]
+
+            // Open the realm and immediately check data
+            let destinationRealm = try Realm(configuration: syncConfig)
+            checkCount(expected: SwiftSyncTestCase.bigObjectCount, destinationRealm, SwiftHugeSyncObject.self)
+
+            try destinationRealm.write {
+                destinationRealm.add(SwiftHugeSyncObject.create())
+            }
+            waitForUploads(for: destinationRealm)
+            checkCount(expected: SwiftSyncTestCase.bigObjectCount + 1, destinationRealm, SwiftHugeSyncObject.self)
+        } catch {
+            XCTFail("Got an error: \(error)")
+        }
+    }
+
+    func testSeedFilePathOpenSyncToSync() {
+        do {
+            // user1 creates and writeCopies a realm to be opened by another user
+            let user1 = try logInUser(for: basicCredentials())
+            var config = user1.configuration(testName: #function)
+
+            config.objectTypes = [SwiftHugeSyncObject.self]
+            let realm = try Realm(configuration: config)
+            try! realm.write {
+                for _ in 0..<SwiftSyncTestCase.bigObjectCount {
+                    realm.add(SwiftHugeSyncObject.create())
+                }
+            }
+            waitForUploads(for: realm)
+
+            // user2 creates a configuration that will use user1's realm as a seed
+            let user2 = try logInUser(for: basicCredentials())
+            XCTAssertNotEqual(user1.id, user2.id)
+            var destinationConfig = user2.configuration(partitionValue: #function)
+            let originalFilePath = destinationConfig.fileURL
+            destinationConfig.seedFilePath = RLMTestRealmURL()
+            destinationConfig.objectTypes = [SwiftHugeSyncObject.self]
+            destinationConfig.fileURL = RLMTestRealmURL()
+
+            try realm.writeCopy(configuration: destinationConfig)
+
+            // Reset the fileURL so that we use the users folder to store the realm.
+            destinationConfig.fileURL = originalFilePath
+
+            // Open the realm and immediately check data
+            let destinationRealm = try Realm(configuration: destinationConfig)
+            checkCount(expected: SwiftSyncTestCase.bigObjectCount, destinationRealm, SwiftHugeSyncObject.self)
+
+            try destinationRealm.write {
+                destinationRealm.add(SwiftHugeSyncObject.create())
+            }
+            waitForUploads(for: destinationRealm)
+            checkCount(expected: SwiftSyncTestCase.bigObjectCount + 1, destinationRealm, SwiftHugeSyncObject.self)
+        } catch {
+            XCTFail("Got an error: \(error)")
+        }
+    }
+
+    func testSeedFilePathOpenSyncToLocal() {
+        do {
+            let seedURL = RLMTestRealmURL().deletingLastPathComponent().appendingPathComponent("seed.realm")
+            let user1 = try logInUser(for: basicCredentials())
+            var syncConfig = user1.configuration(partitionValue: #function)
+            syncConfig.objectTypes = [SwiftHugeSyncObject.self]
+
+            let syncRealm = try Realm(configuration: syncConfig)
+
+            try syncRealm.write {
+                syncRealm.add(SwiftHugeSyncObject.create())
+            }
+            waitForUploads(for: syncRealm)
+            checkCount(expected: 1, syncRealm, SwiftHugeSyncObject.self)
+
+            var exportConfig = Realm.Configuration()
+            exportConfig.fileURL = seedURL
+            exportConfig.objectTypes = [SwiftHugeSyncObject.self]
+            // Export for use as a local Realm.
+            try syncRealm.writeCopy(configuration: exportConfig)
+
+            var localConfig = Realm.Configuration()
+            localConfig.seedFilePath = seedURL
+            localConfig.fileURL = RLMDefaultRealmURL()
+            localConfig.schemaVersion = 1
+
+            let realm = try Realm(configuration: localConfig)
+            try! realm.write {
+                for _ in 0..<SwiftSyncTestCase.bigObjectCount {
+                    realm.add(SwiftHugeSyncObject.create())
+                }
+            }
+
+            checkCount(expected: SwiftSyncTestCase.bigObjectCount + 1, realm, SwiftHugeSyncObject.self)
+        } catch {
+            XCTFail("Got an error: \(error)")
+        }
+    }
+
+    // MARK: Write Copy For Configuration
+
+    func testWriteCopySyncedRealm() {
+        do {
+            // user1 creates and writeCopies a realm to be opened by another user
+            let user1 = try logInUser(for: basicCredentials())
+            var config = user1.configuration(testName: #function)
+
+            config.objectTypes = [SwiftHugeSyncObject.self]
+            let syncedRealm = try Realm(configuration: config)
+            try! syncedRealm.write {
+                for _ in 0..<SwiftSyncTestCase.bigObjectCount {
+                    syncedRealm.add(SwiftHugeSyncObject.create())
+                }
+            }
+            waitForUploads(for: syncedRealm)
+
+            // user2 creates a configuration that will use user1's realm as a seed
+            let user2 = try logInUser(for: basicCredentials())
+            var destinationConfig = user2.configuration(partitionValue: #function)
+            destinationConfig.objectTypes = [SwiftHugeSyncObject.self]
+            destinationConfig.fileURL = RLMTestRealmURL()
+            try syncedRealm.writeCopy(configuration: destinationConfig)
+
+            // Open the realm and immediately check data
+            let destinationRealm = try Realm(configuration: destinationConfig)
+            checkCount(expected: SwiftSyncTestCase.bigObjectCount, destinationRealm, SwiftHugeSyncObject.self)
+
+            // Create an object in the destination realm which does not exist in the original realm.
+            let obj1 = SwiftHugeSyncObject.create()
+            try destinationRealm.write {
+                destinationRealm.add(obj1)
+            }
+
+            waitForUploads(for: destinationRealm)
+            waitForDownloads(for: syncedRealm)
+
+            // Check if the object created in the destination realm is synced to the original realm
+            let obj2 = syncedRealm.objects(SwiftHugeSyncObject.self).where { $0._id == obj1._id }.first
+            XCTAssertNotNil(obj2)
+            XCTAssertEqual(obj1.data, obj2?.data)
+
+            // Create an object in the original realm which does not exist in the destination realm.
+            let obj3 = SwiftHugeSyncObject.create()
+            try syncedRealm.write {
+                syncedRealm.add(obj3)
+            }
+
+            waitForUploads(for: syncedRealm)
+            waitForDownloads(for: destinationRealm)
+
+            // Check if the object created in the original realm is synced to the destination realm
+            let obj4 = destinationRealm.objects(SwiftHugeSyncObject.self).where { $0._id == obj3._id }.first
+            XCTAssertNotNil(obj4)
+            XCTAssertEqual(obj3.data, obj4?.data)
+        } catch {
+            XCTFail("Got an error \(error.localizedDescription)")
+        }
+    }
+
+    func testWriteCopyLocalRealmToSync() {
+        do {
+            var localConfig = Realm.Configuration()
+            localConfig.objectTypes = [SwiftPerson.self]
+            localConfig.fileURL = realmURLForFile("test.realm")
+
+            let user = try logInUser(for: basicCredentials())
+            var syncConfig = user.configuration(partitionValue: #function)
+            syncConfig.objectTypes = [SwiftPerson.self]
+
+            let localRealm = try Realm(configuration: localConfig)
+            try localRealm.write {
+                localRealm.add(SwiftPerson(firstName: "John", lastName: "Doe"))
+            }
+
+            try localRealm.writeCopy(configuration: syncConfig)
+
+            let syncedRealm = try Realm(configuration: syncConfig)
+            XCTAssertEqual(syncedRealm.objects(SwiftPerson.self).count, 1)
+            waitForDownloads(for: syncedRealm)
+
+            try syncedRealm.write {
+                syncedRealm.add(SwiftPerson(firstName: "Jane", lastName: "Doe"))
+            }
+
+            waitForUploads(for: syncedRealm)
+            let syncedResults = syncedRealm.objects(SwiftPerson.self)
+            XCTAssertEqual(syncedResults.where { $0.firstName == "John" }.count, 1)
+            XCTAssertEqual(syncedResults.where { $0.firstName == "Jane" }.count, 1)
+        } catch {
+            XCTFail("Got an error \(error.localizedDescription)")
+        }
+    }
+
+    func testWriteCopySynedRealmToLocal() {
+        do {
+            let user = try logInUser(for: basicCredentials())
+            var syncConfig = user.configuration(partitionValue: #function)
+            syncConfig.objectTypes = [SwiftPerson.self]
+            let syncedRealm = try Realm(configuration: syncConfig)
+            waitForDownloads(for: syncedRealm)
+
+            try syncedRealm.write {
+                syncedRealm.add(SwiftPerson(firstName: "Jane", lastName: "Doe"))
+            }
+            waitForUploads(for: syncedRealm)
+            XCTAssertEqual(syncedRealm.objects(SwiftPerson.self).count, 1)
+
+            var localConfig = Realm.Configuration()
+            localConfig.objectTypes = [SwiftPerson.self]
+            localConfig.fileURL = realmURLForFile("test.realm")
+            // `realm_id` will be removed in the local realm, so we need to bump
+            // the schema version.
+            localConfig.schemaVersion = 1
+
+            try syncedRealm.writeCopy(configuration: localConfig)
+
+            let localRealm = try Realm(configuration: localConfig)
+            try localRealm.write {
+                localRealm.add(SwiftPerson(firstName: "John", lastName: "Doe"))
+            }
+
+            let results = localRealm.objects(SwiftPerson.self)
+            XCTAssertEqual(results.where { $0.firstName == "John" }.count, 1)
+            XCTAssertEqual(results.where { $0.firstName == "Jane" }.count, 1)
+        } catch {
+            print(error.localizedDescription)
+            XCTFail("Got an error \(error.localizedDescription)")
+        }
+    }
+
+    func testWriteCopyLocalRealmForSyncWithExistingData() {
+        do {
+            let initialUser = try logInUser(for: basicCredentials())
+            var initialSyncConfig = initialUser.configuration(partitionValue: #function)
+            initialSyncConfig.objectTypes = [SwiftPerson.self]
+
+            // Make sure objects with confliciting primary keys sync ok.
+            let conflictingObjectId = ObjectId.generate()
+            let person = SwiftPerson(value: ["_id": conflictingObjectId,
+                                             "firstName": "Foo", "lastName": "Bar"])
+            let initialRealm = try Realm(configuration: initialSyncConfig)
+            try initialRealm.write {
+                initialRealm.add(person)
+                initialRealm.add(SwiftPerson(firstName: "Foo2", lastName: "Bar2"))
+            }
+            waitForUploads(for: initialRealm)
+
+            var localConfig = Realm.Configuration()
+            localConfig.objectTypes = [SwiftPerson.self]
+            localConfig.fileURL = realmURLForFile("test.realm")
+
+            let user = try logInUser(for: basicCredentials())
+            var syncConfig = user.configuration(partitionValue: #function)
+            syncConfig.objectTypes = [SwiftPerson.self]
+
+            let localRealm = try Realm(configuration: localConfig)
+            // `person2` will override what was previously stored on the server.
+            let person2 = SwiftPerson(value: ["_id": conflictingObjectId,
+                                              "firstName": "John", "lastName": "Doe"])
+            try localRealm.write {
+                localRealm.add(person2)
+                localRealm.add(SwiftPerson(firstName: "Foo3", lastName: "Bar3"))
+            }
+
+            try localRealm.writeCopy(configuration: syncConfig)
+
+            let syncedRealm = try Realm(configuration: syncConfig)
+            waitForDownloads(for: syncedRealm)
+            XCTAssertTrue(syncedRealm.objects(SwiftPerson.self).count == 3)
+
+            try syncedRealm.write {
+                syncedRealm.add(SwiftPerson(firstName: "Jane", lastName: "Doe"))
+            }
+
+            waitForUploads(for: syncedRealm)
+            let syncedResults = syncedRealm.objects(SwiftPerson.self)
+            XCTAssertEqual(syncedResults.where {
+                $0.firstName == "John" &&
+                $0.lastName == "Doe" &&
+                $0._id == conflictingObjectId
+            }.count, 1)
+            XCTAssertTrue(syncedRealm.objects(SwiftPerson.self).count == 4)
+        } catch {
+            XCTFail("Got an error \(error.localizedDescription)")
+        }
+    }
+
+    func testWriteCopyFailBeforeSynced() {
+        var didFail = false
+        do {
+            let user1 = try logInUser(for: basicCredentials())
+            var user1Config = user1.configuration(partitionValue: #function)
+            user1Config.objectTypes = [SwiftPerson.self]
+            let user1Realm = try Realm(configuration: user1Config)
+            // Suspend the session so that changes cannot be uploaded
+            user1Realm.syncSession?.suspend()
+            try user1Realm.write {
+                user1Realm.add(SwiftPerson())
+            }
+
+            let user2 = try logInUser(for: basicCredentials())
+            XCTAssertNotEqual(user1.id, user2.id)
+            var user2Config = user2.configuration(partitionValue: #function)
+            user2Config.objectTypes = [SwiftPerson.self]
+            let pathOnDisk = ObjectiveCSupport.convert(object: user2Config).pathOnDisk
+            XCTAssertFalse(FileManager.default.fileExists(atPath: pathOnDisk))
+
+            let realm = try Realm(configuration: user1Config)
+            realm.syncSession?.suspend()
+            try realm.write {
+                realm.add(SwiftPerson())
+            }
+            // Changes have yet to be uploaded so expect an exception
+            try realm.writeCopy(configuration: user2Config)
+        } catch {
+            XCTAssertEqual(error.localizedDescription, "Could not write file as not all client changes are integrated in server")
+            didFail = true
+        }
+        XCTAssertTrue(didFail)
     }
 }
 
@@ -2172,6 +2581,36 @@ class CombineObjectServerTests: SwiftSyncTestCase {
 
         XCTAssertEqual(app.currentUser?.customData["favourite_colour"], .string("green"))
         XCTAssertEqual(app.currentUser?.customData["apples"], .int64(10))
+    }
+
+    func testDeleteUserCombine() {
+        let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
+        let password = randomString(10)
+
+        let deleteEx = expectation(description: "Delete user")
+        let appEx = expectation(description: "App changes triggered")
+        var triggered = 0
+        app.objectWillChange.sink { _ in
+            triggered += 1
+            if triggered == 2 {
+                appEx.fulfill()
+            }
+        }.store(in: &subscriptions)
+
+        app.emailPasswordAuth.registerUser(email: email, password: password)
+            .flatMap { self.app.login(credentials: .emailPassword(email: email, password: password)) }
+            .flatMap { $0.delete() }
+            .sink(receiveCompletion: { completion in
+                if case let .failure(error) = completion {
+                    XCTFail("Should have completed login chain: \(error.localizedDescription)")
+                }
+            }, receiveValue: {
+                deleteEx.fulfill()
+            })
+            .store(in: &subscriptions)
+        wait(for: [deleteEx, appEx], timeout: 30.0)
+        XCTAssertEqual(self.app.allUsers.count, 0)
+        XCTAssertEqual(triggered, 2)
     }
 
     func testMongoCollectionInsertCombine() {
@@ -2697,6 +3136,22 @@ class AsyncAwaitObjectServerTests: SwiftSyncTestCase {
         try await app.currentUser?.refreshCustomData()
         XCTAssertEqual(app.currentUser?.customData["favourite_colour"], .string("green"))
         XCTAssertEqual(app.currentUser?.customData["apples"], .int64(10))
+    }
+
+    func testDeleteUserAsyncAwait() async throws {
+        let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
+        let password = randomString(10)
+        let credentials: Credentials = .emailPassword(email: email, password: password)
+        try await app.emailPasswordAuth.registerUser(email: email, password: password)
+
+        let user = try await self.app.login(credentials: credentials)
+        XCTAssertNotNil(user)
+
+        XCTAssertNotNil(app.currentUser)
+        try await user.delete()
+
+        XCTAssertNil(app.currentUser)
+        XCTAssertEqual(app.allUsers.count, 0)
     }
 }
 

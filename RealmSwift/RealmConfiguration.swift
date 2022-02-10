@@ -72,7 +72,9 @@ extension Realm {
 
                                             Return `true ` to indicate that an attempt to compact the file should be made.
                                             The compaction will be skipped if another process is accessing it.
-         - parameter objectTypes:        The subset of `Object` and `EmbeddedObject` subclasses persisted in the Realm. 
+         - parameter objectTypes:        The subset of `Object` and `EmbeddedObject` subclasses persisted in the Realm.
+         - parameter seedFilePath:       The path to the realm file that will be copied to the fileURL when opened
+                                         for the first time.
         */
         public init(fileURL: URL? = URL(fileURLWithPath: RLMRealmPathForFile("default.realm"), isDirectory: false),
                     inMemoryIdentifier: String? = nil,
@@ -83,7 +85,8 @@ extension Realm {
                     migrationBlock: MigrationBlock? = nil,
                     deleteRealmIfMigrationNeeded: Bool = false,
                     shouldCompactOnLaunch: ((Int, Int) -> Bool)? = nil,
-                    objectTypes: [ObjectBase.Type]? = nil) {
+                    objectTypes: [ObjectBase.Type]? = nil,
+                    seedFilePath: URL? = nil) {
                 self.fileURL = fileURL
                 if let inMemoryIdentifier = inMemoryIdentifier {
                     self.inMemoryIdentifier = inMemoryIdentifier
@@ -98,6 +101,7 @@ extension Realm {
                 self.deleteRealmIfMigrationNeeded = deleteRealmIfMigrationNeeded
                 self.shouldCompactOnLaunch = shouldCompactOnLaunch
                 self.objectTypes = objectTypes
+                self.seedFilePath = seedFilePath
         }
 
         // MARK: Configuration Properties
@@ -243,6 +247,23 @@ extension Realm {
          */
         public var maximumNumberOfActiveVersions: UInt?
 
+        /**
+         When opening the Realm for the first time, instead of creating an empty file,
+         the Realm file will be copied from the provided seed file path and used instead.
+         This can be used to open a Realm file with pre-populated data.
+
+         If a realm file already exists at the configurations's destination path, the seed file
+         will not be copied and the already existing realm will be opened instead.
+
+         Note that to use this parameter with a synced Realm configuration
+         the seed Realm must be appropriately copied to a destination with
+         `Realm.writeCopy(configuration:)` first.
+
+         This option is mutually exclusive with `inMemoryIdentifier`. Setting a `seedFilePath`
+         will nil out the `inMemoryIdentifier`.
+         */
+        public var seedFilePath: URL?
+
         /// A custom schema to use for the Realm.
         private var customSchema: RLMSchema?
 
@@ -262,6 +283,11 @@ extension Realm {
                 configuration.inMemoryIdentifier = inMemoryIdentifier
             } else if syncConfiguration == nil {
                 fatalError("A Realm Configuration must specify a path or an in-memory identifier.")
+            }
+            if let seedFilePath = seedFilePath {
+                configuration.seedFilePath = seedFilePath
+            } else if let inMemoryIdentifier = inMemoryIdentifier {
+                configuration.inMemoryIdentifier = inMemoryIdentifier
             }
             configuration.encryptionKey = self.encryptionKey
             configuration.readOnly = self.readOnly

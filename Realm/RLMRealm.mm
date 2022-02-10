@@ -447,6 +447,25 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
         }
     }
 
+    if (configuration.seedFilePath) {
+        @autoreleasepool {
+            bool didCopySeed = false;
+            NSError *copyError;
+            DB::call_with_lock(configuration.config.path,
+                               [&configuration, &error, &copyError, &didCopySeed](auto const&) {
+                if (![RLMRealm fileExistsForConfiguration:configuration]) {
+                    didCopySeed = [[NSFileManager defaultManager] copyItemAtURL:configuration.seedFilePath
+                                                                          toURL:configuration.fileURL
+                                                                          error:&copyError];
+                }
+            });
+            if (!didCopySeed && copyError != nil) {
+                RLMSetErrorOrThrow(copyError, error);
+                return nil;
+            }
+        }
+    }
+
     configuration = [configuration copy];
     Realm::Config& config = configuration.config;
 
@@ -966,6 +985,35 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     }
 
     return NO;
+}
+
+- (BOOL)writeCopyForConfiguration:(RLMRealmConfiguration *)configuration error:(NSError **)error {
+    if ([RLMRealm fileExistsForConfiguration:configuration]) {
+        if (error) {
+            NSString *msg = [NSString stringWithFormat:@"File at path '%@' already exists.", configuration.pathOnDisk];
+            RLMSetErrorOrThrow(RLMMakeError(RLMErrorFileExists, msg), error);
+        }
+        return NO;
+    }
+    try {
+        // If we are handing a sync to sync case use write_copy as `export_to` should be used in the local
+        // to synced realm case.
+        if (configuration.config.sync_config && _realm->config().sync_config) {
+            _realm->write_copy(configuration.config.path,
+                               {static_cast<const char *>(configuration.config.encryption_key.data()), configuration.config.encryption_key.size()});
+        } else if (!configuration.config.sync_config && _realm->config().sync_config) {
+            [self writeCopyToURL:configuration.fileURL encryptionKey:configuration.encryptionKey error:error];
+        } else {
+            _realm->export_to(configuration.config);
+        }
+    }
+    catch (...) {
+        if (error) {
+            RLMRealmTranslateException(error);
+        }
+        return NO;
+    }
+    return YES;
 }
 
 + (BOOL)fileExistsForConfiguration:(RLMRealmConfiguration *)config {

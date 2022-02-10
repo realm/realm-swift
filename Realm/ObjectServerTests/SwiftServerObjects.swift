@@ -183,13 +183,9 @@ public class SwiftMissingObject: Object {
     }
 }
 
-@objcMembers public class SwiftHugeSyncObject: Object {
-    dynamic var _id = ObjectId.generate()
-    dynamic var data: Data?
-
-    public override class func primaryKey() -> String? {
-        return "_id"
-    }
+public class SwiftHugeSyncObject: Object {
+    @Persisted(primaryKey: true) public var _id = ObjectId.generate()
+    @Persisted public var data: Data?
 
     public class func create() -> SwiftHugeSyncObject {
         let fakeDataSize = 1000000
