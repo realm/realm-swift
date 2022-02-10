@@ -338,7 +338,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let exp1 = expectation(description: "disable sync")
         RealmServer.shared.disableSync(appServerId: appServerId, syncServiceId: syncServiceId) { results in
             switch results {
-            case .success(_):
+            case .success():
                 exp1.fulfill()
             case .failure(let error):
                 XCTFail("Error: \(error.localizedDescription)")
@@ -352,7 +352,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let exp2 = expectation(description: "enable sync")
         RealmServer.shared.enableSync(appServerId: appServerId, syncServiceId: syncServiceId, syncServiceConfiguration: syncServiceConfig) { results in
             switch results {
-            case .success(_):
+            case .success():
                 exp2.fulfill()
             case .failure(let error):
                 XCTFail("Error: \(error.localizedDescription)")
@@ -365,15 +365,13 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     func waitForDevModeEnabled(appServerId: String, syncServiceId: String, syncServiceConfig: [String: Any]) {
         let devModeEnabled = try! RealmServer.shared.devModeEnabled(appServerId: appServerId, syncServiceId: syncServiceId)
         let exp3 = expectation(description: "enable dev mode")
-        if (!devModeEnabled) {
+        if !devModeEnabled {
             RealmServer.shared.enableDevMode(appServerId: appServerId, syncServiceId: syncServiceId, syncServiceConfiguration: syncServiceConfig) { results in
                 switch results {
-                case .success(let x):
-                    print("success \(String(describing: x))")
+                case .success():
                     exp3.fulfill()
                 case .failure(let error):
-                    print("error--: \(error.localizedDescription)")
-                    XCTFail()
+                    XCTFail("Error: \(error.localizedDescription)")
                 }
             }
         }
@@ -382,7 +380,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     }
 
     // This function disables sync, executes a block while the sync service is disabled, then re-enables the sync service and dev mode.
-    func executeBlockOffline(block: () throws -> ()) {
+    func executeBlockOffline(block: () throws -> Void) {
         do {
             let appServerId = try RealmServer.shared.retrieveAppServerId(appId)
             let syncServiceId = try RealmServer.shared.retrieveSyncServiceId(appServerId: appServerId)
@@ -465,12 +463,13 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
     }
 
+    // !!!: test manual client reset with callbacks
+
     func testClientResetDiscardLocal() {
         // Set client reset callbacks
         do {
             let user = try logInUser(for: basicCredentials())
             let collection = setupMongoCollection(user: user, collectionName: "SwiftPerson")
-            // !!!: this notation is silly. I'm going to take the callbacks out of the initializer.
             var configuration = user.configuration(partitionValue: #function, clientResetMode: .discardLocal)
 
             // TODO: make the xcode api say "local" and "remote" in the placeholder
@@ -483,7 +482,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 XCTAssertNotNil(paul)
                 XCTAssertNotNil(john)
             }
-            
+
             configuration.syncConfiguration?.notifyAfterClientReset = { local, remote in
                 // Expect the local realm that was overwritten to have had 2 objects before it was overwritten.
                 let results = local.objects(SwiftPerson.self)
@@ -519,7 +518,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             var documentCount = 0
             var requestCount = 0
             let timeBetweenRequests = 1
-            while (documentCount < 1) {
+            while documentCount < 1 {
                 collection.find(filter: [:]) { result in
                     switch result {
                     case .success(let documents):
@@ -534,7 +533,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                     }
                 }
                 if documentCount == 0 {
-                    if (requestCount * timeBetweenRequests > 300) {
+                    if requestCount * timeBetweenRequests > 300 {
                         XCTFail("waited longer than five minutes")
                         break
                     }
@@ -573,8 +572,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                         XCTAssertEqual(newRealm.objects(SwiftPerson.self)[0].firstName, "Paul")
                         break
                     }
-                    if (runCount * timeBetweenRequests > 60) {
-                        XCTFail("waited longer than one minute")
+                    if runCount * timeBetweenRequests > 60 {
+                        XCTFail("Waited longer than one minute for hsitory to resynthesize")
                         break
                     }
                     runCount += 1
@@ -629,7 +628,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             var documentCount = 0
             var requestCount = 0
             let timeBetweenRequests = 2
-            while (documentCount < 1) {
+            while documentCount < 1 {
                 collection.find(filter: [:]) { result in
                     switch result {
                     case .success(let documents):
@@ -645,8 +644,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 }
                 if documentCount == 0 {
                     sleep(UInt32(timeBetweenRequests))
-                    if (requestCount * timeBetweenRequests > 300) {
-                        XCTFail("waited longer than five minutes")
+                    if requestCount * timeBetweenRequests > 300 {
+                        XCTFail("Waited longer than five minutes for document to register")
                         break
                     }
                     requestCount += 1
@@ -681,8 +680,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                         XCTAssertEqual(newRealm.objects(SwiftPerson.self)[0].firstName, "Paul")
                         break
                     }
-                    if (runCount * timeBetweenRequests > 300) {
-                        XCTFail("waited longer than five minutes")
+                    if runCount * timeBetweenRequests > 60 {
+                        XCTFail("Waited longer than one minute for server history to resynthesize")
                         break
                     }
                     runCount += 1

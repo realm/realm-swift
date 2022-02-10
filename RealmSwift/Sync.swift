@@ -207,9 +207,13 @@ public typealias Provider = RLMIdentityProvider
     case pinCertificate(path: URL)
 }
 
-public typealias ClientResetMode = RLMClientResetMode
-public typealias BeforeClientResetBlock = RLMClientResetBeforeBlock
-public typealias AfterClientResetBlock = RLMClientResetAfterBlock
+/**
+ An enum used to determines file recovery behavior in the event of a client reset.
+
+ - see: `RLMClientResetMode`
+ - see: https://docs.mongodb.com/realm/sync/error-handling/client-resets/
+*/
+ public typealias ClientResetMode = RLMClientResetMode
 
 /**
  A `SyncConfiguration` represents configuration parameters for Realms intended to sync with
@@ -232,14 +236,43 @@ public typealias AfterClientResetBlock = RLMClientResetAfterBlock
      */
     internal let stopPolicy: RLMSyncStopPolicy
 
-    // TODO: docs, reorder?
+    /**
+     An enum which determines file recovery behvaior in the event of a client reset.
+     - note: Defaults to `.manual`
+
+     - see: `RLMClientResetMode`
+     - see: https://docs.mongodb.com/realm/sync/error-handling/client-resets/
+    */
     public let clientResetMode: ClientResetMode
 
     // !!!: I had tried making these functions instead of properties.
     // These are also properties in the core sync config type.
     // When making these functions, the getters and setters could stack overflow when converting
     // from swift to objc if the underlying core value was nil.
+
+    /**
+     A callback which notifies prior to  prior to a client reset occurring.
+     The Realm argument contains the local database state prior to client reset.
+     ```
+     configuration.syncConfiguration?.notifyBeforeClientReset = { localRealm in
+        let results = localRealm.objects(MyClass.self)
+        ...
+     }
+     ```
+     */
     public var notifyBeforeClientReset: ((Realm) -> Void)?
+    /**
+     A callback which notifies after a client reset has occurred.
+     The first realm argument contins the local database state prior to client reset.
+     The second argument contains the server database state prior to client reset.
+     ```
+     configuration.syncConfiguration?.notifyBeforeClientReset = { localRealm, remoteRealm in
+        let localResults = localRealm.objects(MyClass.self)
+        let remoteResults = remoteRealm.objects(MyClass.self)
+        ...
+     }
+     ```
+     */
     public var notifyAfterClientReset: ((Realm, Realm) -> Void)?
 
     /**
@@ -401,6 +434,7 @@ public extension User {
 
      `enableSSLValidation` is true by default. It can be disabled for debugging
      purposes.
+     `ClientResetMode` is `.manual` by default.
 
      - warning: NEVER disable SSL validation for a system running in production.
      */
@@ -408,10 +442,24 @@ public extension User {
         let config = self.__configuration(withPartitionValue: ObjectiveCSupport.convert(object: AnyBSON(partitionValue)))
         return ObjectiveCSupport.convert(object: config)
     }
-    
+
     // !!!: Originally tried default value but the method signature would be ambiguous with
     // !!!: func configuration<T: BSON>(partitionValue: T, cancelAsyncOpenOnNonFatalErrors: Bool = false) // Sync.swift : ~416
     // TODO: Docs
+    /**
+     Create a sync configuration instance.
+
+     - parameter partitionValue: The `BSON` value the Realm is partitioned on.
+     - parameter clientResetMode: Determines file recovery behavior during a client reset.
+
+     Additional settings can be optionally specified. Descriptions of these
+     settings follow.
+
+     `enableSSLValidation` is true by default. It can be disabled for debugging
+     purposes.
+
+     - warning: NEVER disable SSL validation for a system running in production.
+     */
     func configuration<T: BSON>(partitionValue: T, clientResetMode: ClientResetMode) -> Realm.Configuration {
         let config = self.__configuration(withPartitionValue: ObjectiveCSupport.convert(object: AnyBSON(partitionValue)),
                                           clientResetMode: clientResetMode)

@@ -970,7 +970,7 @@ public class RealmServer: NSObject {
             return false
         }
 
-        if (syncInfo["state"] as? String == "enabled") {
+        if syncInfo["state"] as? String == "enabled" {
             return true
         } else {
             return false

@@ -26,10 +26,15 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-// TODO: Docs
+/*  Determines file behavior during a client reset.
+
+ - see: https://docs.mongodb.com/realm/sync/error-handling/client-resets/
+*/
 typedef NS_ENUM(NSUInteger, RLMClientResetMode) {
-  RLMClientResetModeManual,
-  RLMClientResetModeDiscardLocal
+    /// The SDK will create a back up of unsynced data.The client reset error handler may be manually overwritten to transfer data from the backup copy. Otherwise no effort to transfer the data from the back up is carried out.
+    RLMClientResetModeManual,
+    /// The SDK will overwrite the client database with the server database. Object accessors remain bound so Realm notifications are not disrupted.
+    RLMClientResetModeDiscardLocal
 };
 
 // TODO: Docs
