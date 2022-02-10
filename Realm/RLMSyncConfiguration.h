@@ -58,9 +58,6 @@ typedef void(^RLMClientResetAfterBlock)(RLMRealm * _Nonnull, RLMRealm * _Nonnull
 @property (nonatomic, nullable) RLMClientResetBeforeBlock  beforeClientReset;
 @property (nonatomic, nullable) RLMClientResetAfterBlock  afterClientReset;
 
-//- (void)notifyBeforeClientReset:(RLMClientResetBeforeBlock)callback;
-//- (void)notifyAfterClientReset:(RLMClientResetAfterBlock)callback;
-
 /**
  Whether nonfatal connection errors should cancel async opens.
  

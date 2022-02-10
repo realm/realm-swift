@@ -138,13 +138,6 @@ struct AfterClientResetWrapper {
     }
 }
 
-//- (void)notifyBeforeClientReset:(RLMClientResetBeforeBlock)callback {
-//    if (!callback) {
-//        _config->notify_before_client_reset = nullptr;
-//    } else {
-//        _config->notify_before_client_reset = BeforeClientResetWrapper{callback};
-//    }
-//}
 //// ???: I couldn't shorten this. I had to wrapper.block on it's own line. Not exactly clear why.
 //// TODO: Unify names?
 - (void)setBeforeClientReset:(RLMClientResetBeforeBlock)beforeClientReset {
@@ -164,14 +157,6 @@ struct AfterClientResetWrapper {
         return nil;
     }
 }
-
-//- (void)notifyAfterClientReset:(RLMClientResetAfterBlock)callback {
-//    if (!callback) {
-//        _config->notify_after_client_reset = nullptr;
-//    } else {
-//        _config->notify_after_client_reset = AfterClientResetWrapper{callback};
-//    }
-//}
 
 - (void)setAfterClientReset:(RLMClientResetAfterBlock)afterClientReset {
     if (!afterClientReset) {

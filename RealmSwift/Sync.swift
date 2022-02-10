@@ -231,46 +231,16 @@ public typealias AfterClientResetBlock = RLMClientResetAfterBlock
      configuration go out of scope.
      */
     internal let stopPolicy: RLMSyncStopPolicy
-    
+
     // TODO: docs, reorder?
     public let clientResetMode: ClientResetMode
 
+    // !!!: I had tried making these functions instead of properties.
+    // These are also properties in the core sync config type.
+    // When making these functions, the getters and setters could stack overflow when converting
+    // from swift to objc if the underlying core value was nil.
     public var notifyBeforeClientReset: ((Realm) -> Void)?
     public var notifyAfterClientReset: ((Realm, Realm) -> Void)?
-    
-//    public var notifyBeforeClientReset: ((Realm) -> Void)? {
-//        get {
-//            return ObjectiveCSupport.convert(object: self.asConfig().beforeClientReset)
-//        }
-//        set {
-//            guard let newValue = newValue else {
-//                self.asConfig().afterClientReset = nil
-//                return
-//            }
-//            self.asConfig().beforeClientReset = ObjectiveCSupport.convert(object: newValue)
-//        }
-//    }
-//
-//    public var notifyAfterClientReset: ((Realm, Realm) -> Void)? {
-//        get {
-//            return ObjectiveCSupport.convert(object: self.asConfig().afterClientReset)
-//        }
-//        set {
-//            guard let newValue = newValue else {
-//                self.asConfig().afterClientReset = nil
-//                return
-//            }
-//            self.asConfig().afterClientReset = ObjectiveCSupport.convert(object: newValue)
-//        }
-//    }
-    
-//    public func notifyBeforeClientReset(completion: @escaping (Realm) -> Void) -> Void {
-//        self.asConfig().notify(beforeClientReset: ObjectiveCSupport.convert(object: completion))
-//    }
-//
-//    public func notifyAfterClientReset(completion: @escaping (Realm, Realm) -> Void) -> Void {
-//        self.asConfig().notify(afterClientReset: ObjectiveCSupport.convert(object: completion))
-//    }
 
     /**
      Determines if the sync configuration is flexible sync or not
@@ -439,8 +409,8 @@ public extension User {
         return ObjectiveCSupport.convert(object: config)
     }
     
-    // but the method signature would be ambiguous with
-    // func configuration<T: BSON>(partitionValue: T, cancelAsyncOpenOnNonFatalErrors: Bool = false) // Sync.swift : ~416
+    // !!!: Originally tried default value but the method signature would be ambiguous with
+    // !!!: func configuration<T: BSON>(partitionValue: T, cancelAsyncOpenOnNonFatalErrors: Bool = false) // Sync.swift : ~416
     // TODO: Docs
     func configuration<T: BSON>(partitionValue: T, clientResetMode: ClientResetMode) -> Realm.Configuration {
         let config = self.__configuration(withPartitionValue: ObjectiveCSupport.convert(object: AnyBSON(partitionValue)),
