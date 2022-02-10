@@ -263,7 +263,7 @@
     XCTAssertEqualObjects([NSData dataWithContentsOfURL:bundledRealmURL],
                           [NSData dataWithContentsOfURL:config.fileURL]);
 }
-#endif // REALM_SPM
+#endif // FIXME
 
 #if TARGET_OS_IPHONE && (!TARGET_IPHONE_SIMULATOR || !TARGET_RT_64_BIT)
 - (void)testExceedingVirtualAddressSpace {
@@ -1011,7 +1011,7 @@
     [token invalidate];
 }
 
-- (void)FIXME_testBeginWriteTransactionFromWithinCollectionChangedNotification {
+- (void)testBeginWriteTransactionFromWithinCollectionChangedNotification {
     RLMRealm *realm = [RLMRealm defaultRealm];
 
     auto createObject = ^{
@@ -1589,6 +1589,7 @@
 - (void)testAsyncTransactionSyncCommit {
     RLMRealm *realm = RLMRealm.defaultRealm;
     XCTestExpectation *asyncComplete = [self expectationWithDescription:@"async transaction complete"];
+    asyncComplete.expectedFulfillmentCount = 2;
 
     XCTAssertEqual(0, [StringObject allObjectsInRealm:realm].count);
 
@@ -1600,7 +1601,19 @@
     }];
 
     [realm beginAsyncWriteTransaction:^{
-        [realm createObject:StringObject.className withValue:@[@"string 2"]];
+        [realm createObject:StringObject.className withValue:@[@"string"]];
+        [realm commitAsyncWriteTransaction:^(NSError *error) {
+            [asyncComplete fulfill];
+        }];
+    }];
+
+    [realm beginAsyncWriteTransaction:^{
+        [realm createObject:StringObject.className withValue:@[@"string"]];
+        [realm commitAsyncWriteTransaction];
+    }];
+
+    [realm beginAsyncWriteTransaction:^{
+        [realm createObject:StringObject.className withValue:@[@"string"]];
         [realm commitWriteTransaction];
     }];
 
@@ -1617,7 +1630,7 @@
     [realm beginAsyncWriteTransaction:^{
         [realm createObject:StringObject.className withValue:@[@"string"]];
     }];
-    
+
     [realm beginWriteTransaction];
     [realm createObject:StringObject.className withValue:@[@"string 2"]];
     [realm commitWriteTransaction];
@@ -1634,7 +1647,7 @@
     [realm beginWriteTransaction];
     [realm createObject:StringObject.className withValue:@[@"string"]];
     [realm commitAsyncWriteTransaction];
-    
+
     [realm beginWriteTransaction];
     [realm createObject:StringObject.className withValue:@[@"string 2"]];
     [realm commitAsyncWriteTransaction:^(NSError *error) {
@@ -1703,15 +1716,20 @@
 - (void)testAsyncTransactionChangeNotification {
     RLMRealm *realm = RLMRealm.defaultRealm;
     __block XCTestExpectation *asyncComplete = [self expectationWithDescription:@"async transaction complete"];
+    auto expectInitial = [self expectationWithDescription:@"initial"];
     asyncComplete.expectedFulfillmentCount = 4;
 
     RLMResults<RLMObject *> *resultsUnderTest = [StringObject allObjects];
     RLMNotificationToken *token = [resultsUnderTest addNotificationBlock:^(RLMResults<RLMObject *> * _Nullable results, RLMCollectionChange * _Nullable change, NSError *error) {
-        if (!change)
-            return; // ignore initial
+        if (!change) { // ignore initial
+            [expectInitial fulfill];
+            return;
+        }
         XCTAssertNotNil(change);
         [asyncComplete fulfill];
     }];
+
+    [self waitForExpectations:@[expectInitial] timeout:1.0];
 
     [realm asyncTransactionWithBlock:^{
         [realm createObject:StringObject.className withValue:@[@"string 1"]];
@@ -1761,7 +1779,7 @@
     [realm beginAsyncWriteTransaction:^{
         NSError *error = nil;
         [StringObject createInRealm:realm withValue:@[@"string"]];
-        
+
         [realm beginAsyncWriteTransaction:^{
             [StringObject createInRealm:realm withValue:@[@"string"]];
             
@@ -1778,7 +1796,7 @@
             XCTAssertNil(error);
         }];
     }];
-    
+
     [self waitForExpectationsWithTimeout:3.0 handler:nil];
     XCTAssertEqual(0, [StringObject allObjects].count);
 }
@@ -1801,7 +1819,7 @@
         }];
     }];
     [realm commitWriteTransaction];
-    
+
     [self waitForExpectationsWithTimeout:3.0 handler:nil];
     XCTAssertEqual(0, [StringObject allObjects].count);
 }
@@ -1818,20 +1836,14 @@
 
     [realm beginAsyncWriteTransaction:^{
         [StringObject createInRealm:realm withValue:@[@"string"]];
-        [expectation fulfill];
         [realm commitAsyncWriteTransaction];
-    }];
-
-    RLMAsyncTransactionId asyncTransactionIdA = [realm beginAsyncWriteTransaction:^{
-        [StringObject createInRealm:realm withValue:@[@"string"]];
         [expectation fulfill];
-        [realm cancelAsyncTransaction:asyncTransactionIdA];
     }];
 
     [realm beginAsyncWriteTransaction:^{
         [StringObject createInRealm:realm withValue:@[@"string"]];
-        [expectation fulfill];
         [realm commitAsyncWriteTransaction];
+        [expectation fulfill];
     }];
 
     RLMAsyncTransactionId asyncTransactionIdB = [realm beginAsyncWriteTransaction:^{
@@ -1854,7 +1866,7 @@
         [expectation fulfill];
         [realm commitAsyncWriteTransaction];
     }];
-    
+
     [realm beginAsyncWriteTransaction:^{
         [StringObject createInRealm:realm withValue:@[@"without commit/cancel should not commit"]];
         [expectation fulfill];
@@ -1863,7 +1875,9 @@
     [realm beginAsyncWriteTransaction:^{
         [StringObject createInRealm:realm withValue:@[@"cancel after commit should commit"]];
         [expectation fulfill];
-        RLMAsyncTransactionId asyncTransactionId = [realm commitAsyncWriteTransaction];
+        RLMAsyncTransactionId asyncTransactionId = [realm commitAsyncWriteTransaction:^(NSError * _Nonnull) {
+            // no op
+        }];
         [realm cancelAsyncTransaction:asyncTransactionId];
     }];
 
@@ -1883,6 +1897,102 @@
 
     [self waitForExpectationsWithTimeout:5.0 handler:nil];
     XCTAssertEqual(2, [StringObject allObjectsInRealm:realm].count);
+}
+
+- (void)FIXME_testAsyncWriteOnQueueConfinedRealm {
+    __block RLMRealm *qRealm;
+    auto q = dispatch_queue_create("queue 1", DISPATCH_QUEUE_SERIAL);
+    auto expectationWrite = [self expectationWithDescription:@""];
+    auto expectationCommit = [self expectationWithDescription:@""];
+
+    dispatch_sync(q, ^{ qRealm = [RLMRealm defaultRealmForQueue:q]; });
+
+    dispatch_sync(q, ^{
+        [qRealm beginAsyncWriteTransaction:^{
+            [StringObject createInRealm:qRealm withValue:@[@"in queue"]];
+            [expectationWrite fulfill];
+            [qRealm commitAsyncWriteTransaction:^(NSError * _Nonnull) {
+                [expectationCommit fulfill];
+            }];
+        }];
+    });
+    
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    XCTAssertEqual(1U, [StringObject allObjectsInRealm:[RLMRealm defaultRealm]].count);
+}
+
+- (void)testAsyncWriteOnReadonlyRealm {
+    @autoreleasepool {  // ensure the Realm exists
+        auto discard = self.realmWithTestPath;
+    }
+    auto realm = [self readOnlyRealmWithURL:RLMTestRealmURL() error:nil];
+    XCTAssertThrows([realm beginAsyncWriteTransaction:^{ }]);
+}
+
+- (void)FIXME_testAsyncCommitAfterTransaction {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    XCTAssertThrows([realm commitWriteTransaction]);
+    [realm beginAsyncWriteTransaction:^{ }];
+    XCTAssertThrows([realm commitAsyncWriteTransaction]);
+}
+
+- (void)FIXME_testAsyncCommitWithoutTransaction {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    XCTAssertThrows([realm commitAsyncWriteTransaction]);
+}
+
+- (void)testAsyncCancelWtongTransaction {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    auto expectation = [self expectationWithDescription:@""];
+
+    RLMAsyncTransactionId transId = [realm beginAsyncWriteTransaction:^{
+        [StringObject createInRealm:realm withValue:@[@"prim"]];
+        [realm commitAsyncWriteTransaction];
+        [expectation fulfill];
+    }];
+
+    [realm cancelAsyncTransaction:transId+1];
+    
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    XCTAssertEqual(1U, [StringObject allObjectsInRealm:[RLMRealm defaultRealm]].count);
+}
+
+- (void)testAsyncCrossSync {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    auto expectation = [self expectationWithDescription:@""];
+    XCTAssertEqual(0U, [StringObject allObjectsInRealm:[RLMRealm defaultRealm]].count);
+
+    [realm beginWriteTransaction];
+    [StringObject createInRealm:realm withValue:@[@"prim"]];
+    [realm commitAsyncWriteTransaction];
+    XCTAssertEqual(1U, [StringObject allObjectsInRealm:[RLMRealm defaultRealm]].count);
+
+    [realm beginAsyncWriteTransaction:^{
+        [StringObject createInRealm:realm withValue:@[@"sec"]];
+        [realm commitWriteTransaction];
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    XCTAssertEqual(2U, [StringObject allObjectsInRealm:[RLMRealm defaultRealm]].count);
+}
+
+- (void)testAsyncIsInTransaction {
+    auto realm = [RLMRealm defaultRealm];
+    auto expectation = [self expectationWithDescription:@""];
+
+    XCTAssertFalse(realm.isPerformingAsynchronousWriteOperations);
+
+    [realm beginWriteTransaction];
+    XCTAssertTrue(realm.isPerformingAsynchronousWriteOperations);
+    [realm cancelWriteTransaction];
+
+    [realm beginAsyncWriteTransaction:^{
+        XCTAssertTrue(realm.isPerformingAsynchronousWriteOperations);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
 }
 
 #endif // REALM_ASYNC_WRITES

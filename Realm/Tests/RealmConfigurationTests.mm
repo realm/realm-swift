@@ -109,7 +109,6 @@
     configuration.deleteRealmIfMigrationNeeded = false;
     XCTAssertEqual(configuration.schemaMode, realm::SchemaMode::Automatic);
 
-#ifdef REALM_SPM
     RLMUser *user = RLMDummyUser();
     configuration.syncConfiguration = [user configurationWithPartitionValue:@"dummy"].syncConfiguration;
     XCTAssertEqual(configuration.schemaMode, realm::SchemaMode::AdditiveDiscovered);
@@ -127,25 +126,6 @@
     XCTAssertEqual(configuration.schemaMode, realm::SchemaMode::ReadOnly);
     configuration.readOnly = false;
     XCTAssertEqual(configuration.schemaMode, realm::SchemaMode::AdditiveExplicit);
-#else
-    RLMUser *user = RLMDummyUser();
-    configuration.syncConfiguration = [user configurationWithPartitionValue:@"dummy"].syncConfiguration;
-    XCTAssertEqual(configuration.schemaMode, realm::SchemaMode::AdditiveDiscovered);
-    configuration.objectClasses = @[];
-    XCTAssertEqual(configuration.schemaMode, realm::SchemaMode::AdditiveExplicit);
-    configuration.readOnly = true;
-    XCTAssertEqual(configuration.schemaMode, realm::SchemaMode::ReadOnly);
-    configuration.objectClasses = nil;
-    XCTAssertEqual(configuration.schemaMode, realm::SchemaMode::ReadOnly);
-    configuration.readOnly = false;
-    XCTAssertEqual(configuration.schemaMode, realm::SchemaMode::AdditiveDiscovered);
-    configuration.readOnly = true;
-    XCTAssertEqual(configuration.schemaMode, realm::SchemaMode::ReadOnly);
-    configuration.objectClasses = @[];
-    XCTAssertEqual(configuration.schemaMode, realm::SchemaMode::ReadOnly);
-    configuration.readOnly = false;
-    XCTAssertEqual(configuration.schemaMode, realm::SchemaMode::AdditiveExplicit);
-#endif // REALM_SPM
 
     [user logOut];
     [RLMApp resetAppCache];

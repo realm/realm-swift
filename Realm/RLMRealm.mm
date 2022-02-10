@@ -708,7 +708,7 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
 
 #ifdef REALM_ASYNC_WRITES
 
-- (BOOL)inAsyncWriteTransaction {
+- (BOOL)isPerformingAsynchronousWriteOperations {
     return _realm->is_in_async_transaction();
 }
 
@@ -721,13 +721,12 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     }
 }
 
-- (RLMAsyncTransactionId)commitAsyncWriteTransaction {
+- (void)commitAsyncWriteTransaction {
     try {
         return _realm->async_commit_transaction();
     }
     catch (...) {
         RLMRealmTranslateException(nil);
-        return 0;
     }
 }
 
