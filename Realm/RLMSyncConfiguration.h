@@ -26,19 +26,30 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-/*  Determines file behavior during a client reset.
+/**  Determines file behavior during a client reset.
 
  - see: https://docs.mongodb.com/realm/sync/error-handling/client-resets/
 */
 typedef NS_ENUM(NSUInteger, RLMClientResetMode) {
-    /// The SDK will create a back up of unsynced data.The client reset error handler may be manually overwritten to transfer data from the backup copy. Otherwise no effort to transfer the data from the back up is carried out.
+    /// The SDK will create a back up of unsynced data.The client reset error handler may be manually overwritten to
+    /// transfer data from the backup copy to a new destination. Otherwise no effort to transfer the data from the backup is carried out.
     RLMClientResetModeManual,
     /// The SDK will overwrite the client database with the server database. Object accessors remain bound so Realm notifications are not disrupted.
     RLMClientResetModeDiscardLocal
 };
 
-// TODO: Docs
+/**
+ A block type used to report before a client reset will occur.
+ The RlMRealm argument contains the local database state prior to client reset.
+ */
 typedef void(^RLMClientResetBeforeBlock)(RLMRealm * _Nonnull);
+
+// ???: Is there really no way to label these arguments?
+/**
+ A block type used to report after a client reset occurred.
+ The first RLMRealm argument contins the local database state prior to client reset.
+ The second RLMRealm argument contains the server database state prior to client reset.
+ */
 typedef void(^RLMClientResetAfterBlock)(RLMRealm * _Nonnull, RLMRealm * _Nonnull);
 
 /**
@@ -57,10 +68,25 @@ typedef void(^RLMClientResetAfterBlock)(RLMRealm * _Nonnull, RLMRealm * _Nonnull
  */
 @property (nonatomic, readonly) id<RLMBSON> partitionValue;
 
-// ???: Should the declaration be readonly?
-// TODO: Docs, reorder
+/**
+ An enum which determines file recovery behvaior in the event of a client reset.
+ - note: Defaults to `RLMClientResetModeManual`
+
+ - see: `RLMClientResetMode`
+ - see: https://docs.mongodb.com/realm/sync/error-handling/client-resets/
+*/
 @property (nonatomic) RLMClientResetMode clientResetMode;
+
+/**
+ A callback which notifies prior to  prior to a client reset occurring.
+ - see: `RLMClientResetBeforeBlock`
+ */
 @property (nonatomic, nullable) RLMClientResetBeforeBlock  beforeClientReset;
+
+/**
+ A callback which notifies after a client reset has occurred.
+ -see: `RLMClientResetAfterBlock`
+ */
 @property (nonatomic, nullable) RLMClientResetAfterBlock  afterClientReset;
 
 /**

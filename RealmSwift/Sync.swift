@@ -246,6 +246,7 @@ public typealias Provider = RLMIdentityProvider
     public let clientResetMode: ClientResetMode
 
     // !!!: I had tried making these functions instead of properties.
+    // !!!: Delete these lines
     // These are also properties in the core sync config type.
     // When making these functions, the getters and setters could stack overflow when converting
     // from swift to objc if the underlying core value was nil.

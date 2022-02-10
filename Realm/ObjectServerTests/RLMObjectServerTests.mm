@@ -1463,6 +1463,8 @@ static NSString *randomEmail() {
     XCTAssertTrue([NSFileManager.defaultManager fileExistsAtPath:pathValue]);
 }
 
+// TODO: add setter/getter tests for objc, at least
+
 #pragma mark - Progress Notifications
 
 static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
