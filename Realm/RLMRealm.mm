@@ -731,21 +731,34 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
 }
 
 - (RLMAsyncTransactionId)commitAsyncWriteTransaction:(void(^)(NSError *))completionBlock {
-    try {
-        return _realm->async_commit_transaction(^{ completionBlock(nil); });
-    }
-    catch (...) {
-        NSError *error = nil;
-        RLMRealmTranslateException(&error);
-        completionBlock(error);
-        return 0;
-    }
+    return [self commitAsyncWriteTransaction:completionBlock isGroupingAllowed:false];
 }
 
 - (RLMAsyncTransactionId)commitAsyncWriteTransaction:(nullable void(^)(NSError *))completionBlock isGroupingAllowed:(BOOL)isGroupingAllowed {
     try {
+        auto completion = [=](std::exception_ptr err) {
+            @autoreleasepool {
+                if (!completionBlock) {
+                    std::rethrow_exception(err);
+                    return;
+                }
+                if (err) {
+                    try {
+                        std::rethrow_exception(err);
+                    }
+                    catch (...) {
+                        NSError *error;
+                        RLMRealmTranslateException(&error);
+                        completionBlock(error);
+                    }
+                } else {
+                    completionBlock(nil);
+                }
+            }
+        };
+
         if (completionBlock) {
-            return _realm->async_commit_transaction(^{ completionBlock(nil); }, isGroupingAllowed);
+            return _realm->async_commit_transaction(completion, isGroupingAllowed);
         }
         return _realm->async_commit_transaction(nullptr, isGroupingAllowed);
     }

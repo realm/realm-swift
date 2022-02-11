@@ -1483,7 +1483,7 @@
     XCTAssertEqual(0, [StringObject allObjectsInRealm:realm].count);
 
     [self dispatchAsync:^{
-        RLMRealm *realm = RLMRealm.defaultRealm;
+        RLMRealm *realm = [RLMRealm defaultRealmForQueue:dispatch_get_current_queue()];
         [realm beginAsyncWriteTransaction:^{
             NSError *error = nil;
             [realm createObject:StringObject.className withValue:@[@"string"]];
@@ -1511,7 +1511,7 @@
     XCTAssertEqual(0, [StringObject allObjectsInRealm:realm].count);
 
     [self dispatchAsync:^{
-        RLMRealm *realm = RLMRealm.defaultRealm;
+        RLMRealm *realm = [RLMRealm defaultRealmForQueue:dispatch_get_current_queue()];
         RLMAsyncTransactionId asyncTransactionId = [realm beginAsyncWriteTransaction:^{
             [realm createObject:StringObject.className withValue:@[@"string"]];
             [realm commitAsyncWriteTransaction:^(NSError *error) {
@@ -1531,8 +1531,8 @@
 - (void)testAsyncTransactionShouldNotRunTransactionOnClosedRealm {
     RLMRealm *realm = RLMRealm.defaultRealm;
     [self dispatchAsync:^{
-        RLMRealm *realm = RLMRealm.defaultRealm;
-        [RLMRealm.defaultRealm beginAsyncWriteTransaction:^{
+        RLMRealm *realm = [RLMRealm defaultRealmForQueue:dispatch_get_current_queue()];
+        [realm beginAsyncWriteTransaction:^{
             XCTFail("Should not run this block");
         }];
     }];
@@ -1548,7 +1548,7 @@
     writeComplete.inverted = YES;
 
     [self dispatchAsync:^{
-        RLMRealm *realm = RLMRealm.defaultRealm;
+        RLMRealm *realm = [RLMRealm defaultRealmForQueue:dispatch_get_current_queue()];
         RLMAsyncTransactionId asyncTransactionId = [realm asyncTransactionWithBlock:^{
             [realm createObject:StringObject.className withValue:@[@"string 1"]];
         } onComplete:^(NSError *error) {
@@ -1771,7 +1771,7 @@
     [token invalidate];
 }
 
-- (void)testBeginAsyncTransactionInAsyncTransaction {
+- (void)testAsyncBeginTransactionInAsyncTransaction {
     RLMRealm *realm = [self realmWithTestPath];
     XCTestExpectation *transaction1 = [self expectationWithDescription:@"async transaction 1 complete"];
     XCTestExpectation *transaction2 = [self expectationWithDescription:@"async transaction 2 complete"];
@@ -1982,13 +1982,16 @@
     auto expectation = [self expectationWithDescription:@""];
 
     XCTAssertFalse(realm.isPerformingAsynchronousWriteOperations);
-
+    XCTAssertFalse(realm.inWriteTransaction);
+    
     [realm beginWriteTransaction];
-    XCTAssertTrue(realm.isPerformingAsynchronousWriteOperations);
+    XCTAssertFalse(realm.isPerformingAsynchronousWriteOperations);
+    XCTAssertTrue(realm.inWriteTransaction);
     [realm cancelWriteTransaction];
 
     [realm beginAsyncWriteTransaction:^{
         XCTAssertTrue(realm.isPerformingAsynchronousWriteOperations);
+        XCTAssertTrue(realm.inWriteTransaction);
         [expectation fulfill];
     }];
 
