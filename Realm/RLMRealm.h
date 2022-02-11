@@ -19,7 +19,7 @@
 #import <Foundation/Foundation.h>
 #import <Realm/RLMConstants.h>
 
-@class RLMRealmConfiguration, RLMRealm, RLMObject, RLMSchema, RLMMigration, RLMNotificationToken, RLMThreadSafeReference, RLMAsyncOpenTask;
+@class RLMRealmConfiguration, RLMRealm, RLMObject, RLMSchema, RLMMigration, RLMNotificationToken, RLMThreadSafeReference, RLMAsyncOpenTask, RLMSyncSubscriptionSet;
 
 /**
  A callback block for opening Realms asynchronously.
@@ -243,6 +243,23 @@ NS_ASSUME_NONNULL_BEGIN
  @return `YES` if the Realm was successfully written to disk, `NO` if an error occurred.
  */
 - (BOOL)writeCopyToURL:(NSURL *)fileURL encryptionKey:(nullable NSData *)key error:(NSError **)error;
+
+/**
+ Writes a copy of the Realm to a given location specified by a given configuration.
+
+ If the configuration supplied is derived from a `RLMUser` then this Realm will be copied with
+ sync functionality enabled.
+
+ The destination file cannot already exist.
+
+ @param configuration A Realm Configuration.
+ @param error   If an error occurs, upon return contains an `NSError` object
+ that describes the problem. If you are not interested in
+ possible errors, pass in `NULL`.
+
+ @return `YES` if the Realm was successfully written to disk, `NO` if an error occurred.
+ */
+- (BOOL)writeCopyForConfiguration:(RLMRealmConfiguration *)configuration error:(NSError **)error;
 
 /**
  Checks if the Realm file for the given configuration exists locally on disk.
@@ -843,6 +860,17 @@ NS_REFINED_FOR_SWIFT;
  @see `deleteObject:`
  */
 - (void)deleteAllObjects;
+
+#pragma mark - Sync Subscriptions
+
+/**
+ Represents the active subscriptions for this realm, which can be used to add/remove/update
+ and search flexible sync subscriptions.
+ Getting the subscriptions from a local or partition-based configured realm will thrown an exception.
+
+ @warning This feature is currently in beta and its API is subject to change.
+ */
+@property (nonatomic, readonly, nonnull) RLMSyncSubscriptionSet *subscriptions;
 
 
 #pragma mark - Migrations

@@ -53,6 +53,7 @@
 #import "RLMSyncManager_Private.hpp"
 #import "RLMSyncSession_Private.hpp"
 #import "RLMSyncUtil_Private.hpp"
+#import "RLMSyncSubscription_Private.hpp"
 
 #import <realm/object-store/sync/async_open_task.hpp>
 #import <realm/object-store/sync/sync_session.hpp>
@@ -442,6 +443,25 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
                     @throw RLMException(@"Realm at path '%s' already opened with different encryption key", config.path.c_str());
                 }
                 return RLMAutorelease(realm);
+            }
+        }
+    }
+
+    if (configuration.seedFilePath) {
+        @autoreleasepool {
+            bool didCopySeed = false;
+            NSError *copyError;
+            DB::call_with_lock(configuration.config.path,
+                               [&configuration, &error, &copyError, &didCopySeed](auto const&) {
+                if (![RLMRealm fileExistsForConfiguration:configuration]) {
+                    didCopySeed = [[NSFileManager defaultManager] copyItemAtURL:configuration.seedFilePath
+                                                                          toURL:configuration.fileURL
+                                                                          error:&copyError];
+                }
+            });
+            if (!didCopySeed && copyError != nil) {
+                RLMSetErrorOrThrow(copyError, error);
+                return nil;
             }
         }
     }
@@ -1056,6 +1076,35 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     return NO;
 }
 
+- (BOOL)writeCopyForConfiguration:(RLMRealmConfiguration *)configuration error:(NSError **)error {
+    if ([RLMRealm fileExistsForConfiguration:configuration]) {
+        if (error) {
+            NSString *msg = [NSString stringWithFormat:@"File at path '%@' already exists.", configuration.pathOnDisk];
+            RLMSetErrorOrThrow(RLMMakeError(RLMErrorFileExists, msg), error);
+        }
+        return NO;
+    }
+    try {
+        // If we are handing a sync to sync case use write_copy as `export_to` should be used in the local
+        // to synced realm case.
+        if (configuration.config.sync_config && _realm->config().sync_config) {
+            _realm->write_copy(configuration.config.path,
+                               {static_cast<const char *>(configuration.config.encryption_key.data()), configuration.config.encryption_key.size()});
+        } else if (!configuration.config.sync_config && _realm->config().sync_config) {
+            [self writeCopyToURL:configuration.fileURL encryptionKey:configuration.encryptionKey error:error];
+        } else {
+            _realm->export_to(configuration.config);
+        }
+    }
+    catch (...) {
+        if (error) {
+            RLMRealmTranslateException(error);
+        }
+        return NO;
+    }
+    return YES;
+}
+
 + (BOOL)fileExistsForConfiguration:(RLMRealmConfiguration *)config {
     return [NSFileManager.defaultManager fileExistsAtPath:config.pathOnDisk];
 }
@@ -1130,6 +1179,18 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
         [enumerator detach];
     }
     _collectionEnumerators = nil;
+}
+
+- (RLMSyncSubscriptionSet *)subscriptions {
+#if REALM_ENABLE_SYNC
+    if (_realm->config().sync_config && _realm->config().sync_config->flx_sync_requested) {
+        return [[RLMSyncSubscriptionSet alloc] initWithSubscriptionSet:_realm->get_latest_subscription_set() realm:self];
+    } else {
+        @throw RLMException(@"This Realm was not configured with flexible sync");
+    }
+#else
+    @throw RLMException(@"Realm was not compiled with sync enabled");
+#endif
 }
 
 @end

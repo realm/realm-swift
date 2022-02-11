@@ -21,10 +21,36 @@ The feature can be enabled with the build flag `REALM_ASYNC_WRITES`.
     [realm cancelAsyncTransaction:asyncTransactionId];
 ```
 * None.
+* Add `Realm.writeCopy(configuration:)`/`[RLMRealm writeCopyForConfiguration:]` which gives the
+  following functionality:
+    - Export a local non-sync Realm to be used with MongoDB Realm Sync 
+      when the configuration is derived from a sync `RLMUser`/`User`.
+    - Write a copy of a local Realm to a destination specified in the configuration.
+    - Write a copy of a synced Realm in use with user A, and open it with user B.
+    - Note that migrations may be required when using a local realm configuration to open a realm file that
+      was copied from a synchronized realm.
+      
+  An exception will be thrown if a Realm exists at the destination.
+* Add a `seedFilePath` option to `RLMRealmConfiguration` and `Configuration`. If this
+  option is set then instead of creating an empty Realm, the realm at the `seedFilePath` will
+  be copied to the `fileURL` of the new Realm. If a Realm file already exists at the
+  desitnation path, the seed file will not be copied and the already existing Realm
+  will be opened instead. Note that to use this parameter with a synced Realm configuration
+  the seed Realm must be appropriately copied to a destination with 
+  `Realm.writeCopy(configuration:)`/`[RLMRealm writeCopyForConfiguration:]` first.
+* Add ability to permanently delete a User from a MongoDB Realm app. This can
+  be invoked with `User.delete()`/`[RLMUser deleteWithCompletion:]`.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
-* None.
+* Add support of arm64 in Carthage build ([#7154](https://github.com/realm/realm-cocoa/issues/7154)
+* Adding missing support for `IN` queries to primitives types on Type Safe Queries.
+  ```swift
+  let persons = realm.objects(Person.self).where {
+    let acceptableNames = ["Tom", "James", "Tyler"]
+    $0.name.in([acceptableNames])
+  }
+  ```
+  ([Cocoa #7633](https://github.com/realm/realm-swift/issues/7633), since v10.19.0)
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
@@ -37,6 +63,29 @@ The feature can be enabled with the build flag `REALM_ASYNC_WRITES`.
 
 ### Internal
 * Upgraded realm-core from ? to ?
+
+10.22.0 Release notes (2022-01-25)
+=============================================================
+### Enhancements
+
+* Add beta support for flexible sync. See the [backend](https://docs.mongodb.com/realm/sync/data-access-patterns/flexible-sync/) and [SDK](https://docs.mongodb.com/realm/sdk/swift/examples/flexible-sync/) documentation for more information. Please report any issues with the beta through Github.
+
+### Fixed
+
+* UserIdentity metadata table grows indefinitely. ([#5152](https://github.com/realm/realm-core/issues/5152), since v10.20.0)
+* We now report a useful error message when opening a sync Realm in non-sync mode or vice-versa.([#5161](https://github.com/realm/realm-core/pull/5161), since v5.0.0).
+
+### Compatibility
+
+* Realm Studio: 11.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 13.2.1.
+* CocoaPods: 1.10 or later.
+* Xcode: 12.4-13.2.1.
+
+### Internal
+
+* Upgraded realm-core from 11.8.0 to 11.9.0
 
 10.21.1 Release notes (2022-01-12)
 =============================================================

@@ -229,6 +229,11 @@ public typealias Provider = RLMIdentityProvider
     internal let stopPolicy: RLMSyncStopPolicy
 
     /**
+     Determines if the sync configuration is flexible sync or not
+     */
+    internal let isFlexibleSync: Bool
+
+    /**
      By default, Realm.asyncOpen() swallows non-fatal connection errors such as
      a connection attempt timing out and simply retries until it succeeds. If
      this is set to `true`, instead the error will be reported to the callback
@@ -241,14 +246,20 @@ public typealias Provider = RLMIdentityProvider
         self.stopPolicy = config.stopPolicy
         self.partitionValue = ObjectiveCSupport.convert(object: config.partitionValue)
         self.cancelAsyncOpenOnNonFatalErrors = config.cancelAsyncOpenOnNonFatalErrors
+        self.isFlexibleSync = config.enableFlexibleSync
     }
 
     func asConfig() -> RLMSyncConfiguration {
-        let c = RLMSyncConfiguration(user: user,
-                                     partitionValue: partitionValue.map(ObjectiveCSupport.convertBson),
-                                     stopPolicy: stopPolicy)
-        c.cancelAsyncOpenOnNonFatalErrors = cancelAsyncOpenOnNonFatalErrors
-        return c
+        let syncConfiguration: RLMSyncConfiguration
+        if isFlexibleSync {
+            syncConfiguration = RLMSyncConfiguration(user: user, stopPolicy: stopPolicy, enableFlexibleSync: isFlexibleSync)
+        } else {
+            syncConfiguration = RLMSyncConfiguration(user: user,
+                                                     partitionValue: partitionValue.map(ObjectiveCSupport.convertBson),
+                                                     stopPolicy: stopPolicy)
+        }
+        syncConfiguration.cancelAsyncOpenOnNonFatalErrors = cancelAsyncOpenOnNonFatalErrors
+        return syncConfiguration
     }
 }
 
@@ -670,6 +681,22 @@ public extension User {
             }
         }
     }
+
+    /// Permanently deletes this user from your MongoDB Realm app.
+    /// The users state will be set to `Removed` and the session will be destroyed.
+    /// If the delete request fails, the local authentication state will be untouched.
+    /// @returns A publisher that eventually return `Result.success` or `Error`.
+    func delete() -> Future<Void, Error> {
+        return Future<Void, Error> { promise in
+            self.delete { error in
+                if let error = error {
+                    promise(.failure(error))
+                } else {
+                    promise(.success(()))
+                }
+            }
+        }
+    }
 }
 
 /// :nodoc:
@@ -787,3 +814,20 @@ extension FunctionCallable {
     }
 }
 #endif // swift(>=5.5)
+
+extension User {
+    /**
+     Create a flexible sync configuration instance, which can be used to open a realm  which
+     supports flexible sync.
+
+     It won't be possible to combine flexible and partition sync in the same app, which means if you open
+     a realm with a flexible sync configuration, you won't be able to open a realm with a PBS configuration
+     and the other way around.
+
+     @return A `Realm.Configuration` instance with a flexible sync configuration.
+     */
+    public func flexibleSyncConfiguration() -> Realm.Configuration {
+        let config = self.__flexibleSyncConfiguration()
+        return ObjectiveCSupport.convert(object: config)
+    }
+}

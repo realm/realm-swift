@@ -14,7 +14,7 @@ When filing an issue, please provide as much of the following information as pos
 6. **Version of Realm / Xcode / macOS**
 7. **Version of involved dependency manager (CocoaPods / Carthage)**
 
-If you'd like to send us sensitive sample code to help troubleshoot your issue, you can email <help@realm.io> directly.
+If you'd like to send us sensitive sample code to help troubleshoot your issue, you can email <help-realm@mongodb.com> directly.
 
 ### Speeding things up :runner:
 
