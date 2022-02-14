@@ -503,6 +503,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             // Seed 1 object, Upload to server
             try autoreleasepool {
                 let realm = try Realm(configuration: configuration)
+                waitForDownloads(for: realm)
+                XCTAssertEqual(realm.objects(SwiftPerson.self).count, 0, "Precondition failure: Realm should be empty.")
                 try realm.write {
                     realm.add(SwiftPerson(firstName: "Paul", lastName: "M"))
                 }
@@ -544,6 +546,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             executeBlockOffline {
                 try autoreleasepool {
                     let realm = try Realm(configuration: configuration)
+                    // Add an object to the local realm that will not be in the server realm (because sync is disabled).
                     try realm.write {
                         let obj =  SwiftPerson(firstName: "John", lastName: "L")
                         realm.add(obj)
@@ -574,7 +577,6 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                         break
                     }
                     runCount += 1
-                    print("requests: \(runCount), time passed: ~ \(runCount * timeBetweenRequests)") // !!!: Delete this line
                     sleep(UInt32(timeBetweenRequests)) // Wait between requests
                 }
             }
