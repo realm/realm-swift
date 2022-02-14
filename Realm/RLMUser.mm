@@ -268,8 +268,10 @@ using namespace realm;
         args.push_back(RLMConvertRLMBSONToBson(argument));
     }
 
-    _app._realmApp->call_function(_user, std::string(name.UTF8String), args,
-                                  [completionBlock](util::Optional<bson::Bson> response, util::Optional<app::AppError> error) {
+    _app._realmApp->call_function(_user,
+                        std::string(name.UTF8String),
+                        args, [completionBlock](util::Optional<app::AppError> error,
+                                                util::Optional<bson::Bson> response) {
         if (error) {
             return completionBlock(nil, RLMAppErrorToNSError(*error));
         }
