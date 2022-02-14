@@ -1802,14 +1802,13 @@
 
     [self dispatchAsync:^{
         RLMRealm *realm = [RLMRealm defaultRealmForQueue:self.bgQueue];
-        
+
         [realm beginWriteTransaction];
         [StringObject createInRealm:realm withValue:@[@"string"]];
         
         [realm beginAsyncWriteTransaction:^{
             [StringObject createInRealm:realm withValue:@[@"string"]];
-            NSError *error = nil;
-            
+
             [realm commitAsyncWriteTransaction:^(NSError *error) {
                 XCTAssertEqual(0, [StringObject allObjects].count);
                 [transaction1 fulfill];
@@ -1818,9 +1817,40 @@
         }];
         [realm commitWriteTransaction];
     }];
-    
+
     [self waitForExpectationsWithTimeout:3.0 handler:nil];
     XCTAssertEqual(0, [StringObject allObjects].count);
+}
+
+- (void)testAsyncNestedWrites {
+    XCTestExpectation *transactionsComplete = [self expectationWithDescription:@"async transaction 1 complete"];
+    transactionsComplete.expectedFulfillmentCount = 3;
+
+    [self dispatchAsync:^{
+        RLMRealm *realm = [RLMRealm defaultRealmForQueue:self.bgQueue];
+        
+        [realm beginAsyncWriteTransaction:^{
+            [StringObject createInRealm:realm withValue:@[@"string 1"]];
+
+            // nested in async block
+            [realm beginAsyncWriteTransaction:^{
+                [StringObject createInRealm:realm withValue:@[@"string 2"]];
+
+                [realm commitAsyncWriteTransaction:^(NSError *error) {
+                    // nested in completion block
+                    XCTAssertThrows([realm beginAsyncWriteTransaction:^{ }]);
+                    [transactionsComplete fulfill];
+                }];
+            }];
+
+            [realm commitAsyncWriteTransaction:^(NSError *error) {
+                [transactionsComplete fulfill];
+            }];
+        }];
+    }];
+
+    [self waitForExpectationsWithTimeout:3.0 handler:nil];
+    XCTAssertEqual(2, [StringObject allObjects].count);
 }
 
 - (void)testAsyncTransactionCancel {
