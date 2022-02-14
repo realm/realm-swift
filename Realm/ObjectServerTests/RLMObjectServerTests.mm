@@ -1473,13 +1473,12 @@ static NSString *randomEmail() {
     config = [user configurationWithPartitionValue:partitionValue];
     XCTAssertEqual(config.syncConfiguration.clientResetMode, RLMClientResetModeManual);
 }
-// !!!: This test fails. Why are the swift callbacks set but not objc?
-// !!!: testClientResetMode also is being set.
+// !!!: This test fails. Why are they set in swift but not objc?
+// !!!: testClientResetMode is being set correctly.
 - (void)/*testS*/etClientResetCallbacks {
     RLMUser *user = [self userForTest:_cmd];
     NSString *partitionValue = NSStringFromSelector(_cmd);
     RLMRealmConfiguration *config = [user configurationWithPartitionValue:partitionValue clientResetMode:RLMClientResetModeDiscardLocal];
-
     XCTAssertNil(config.syncConfiguration.beforeClientReset);
     XCTAssertNil(config.syncConfiguration.beforeClientReset);
     config.syncConfiguration.beforeClientReset = ^(RLMRealm *local __unused) {
@@ -1491,10 +1490,6 @@ static NSString *randomEmail() {
     XCTAssertNotNil(config.syncConfiguration.beforeClientReset);
     XCTAssertNotNil(config.syncConfiguration.afterClientReset);
 }
-
-// TODO: Set callbacks with manual mode, throw error
-
-// TODO: add setter/getter tests for objc, at least
 
 #pragma mark - Progress Notifications
 

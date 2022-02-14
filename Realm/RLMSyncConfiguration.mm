@@ -142,6 +142,8 @@ struct AfterClientResetWrapper {
 - (void)setBeforeClientReset:(RLMClientResetBeforeBlock)beforeClientReset {
     if (!beforeClientReset) {
         _config->notify_before_client_reset = nullptr;
+    } else if (self.clientResetMode == RLMClientResetModeManual) {
+        @throw RLMException(@"Client reset notifications not supported in Manual mode. Use SyncManager.ErrorHandler");
     } else {
         _config->notify_before_client_reset = BeforeClientResetWrapper{beforeClientReset};
     }
@@ -159,6 +161,8 @@ struct AfterClientResetWrapper {
 - (void)setAfterClientReset:(RLMClientResetAfterBlock)afterClientReset {
     if (!afterClientReset) {
         _config->notify_after_client_reset = nullptr;
+    } else if (self.clientResetMode == RLMClientResetModeManual) {
+        @throw RLMException(@"Client reset notifications not supported in Manual mode. Use SyncManager.ErrorHandler");
     } else {
         _config->notify_after_client_reset = AfterClientResetWrapper{afterClientReset};
     }

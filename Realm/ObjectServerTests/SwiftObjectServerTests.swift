@@ -469,7 +469,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             let user = try logInUser(for: basicCredentials())
             let collection = setupMongoCollection(user: user, collectionName: "SwiftPerson")
             var configuration = user.configuration(partitionValue: #function, clientResetMode: .discardLocal)
-
+            XCTAssertEqual(configuration.syncConfiguration?.clientResetMode, .discardLocal)
             configuration.syncConfiguration?.notifyBeforeClientReset = { local in
                 // Expect there to be 2 objects in the local realm before client reset
                 let results = local.objects(SwiftPerson.self)
@@ -588,6 +588,20 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         } catch {
             XCTFail("Failed: \(error.localizedDescription)")
         }
+    }
+
+    func testManualClientResetBeforeCallback() {
+        let user = try! logInUser(for: basicCredentials())
+        var config = user.configuration(partitionValue: #function, clientResetMode: .manual)
+        assertThrows(config.syncConfiguration?.notifyBeforeClientReset = { _ in print("myBlock") },
+                     reason: "Client reset notifications not supported in Manual mode. Use SyncManager.ErrorHandler")
+    }
+
+    func testManualClientResetAfterCallback() {
+        let user = try! logInUser(for: basicCredentials())
+        var config = user.configuration(partitionValue: #function, clientResetMode: .manual)
+        assertThrows(config.syncConfiguration?.notifyAfterClientReset = { _, _ in print("myBlock") },
+                     reason: "Client reset notifications not supported in Manual mode. Use SyncManager.ErrorHandler")
     }
 
     // test for nil assignment of callbacks
