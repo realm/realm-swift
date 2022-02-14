@@ -374,13 +374,21 @@ public typealias AsyncTransactionId = RLMAsyncTransactionId
 // MARK: Asynchronous Transactions
 
     /**
-     Commits transaction block asynchronously.
-     - parameter `block` will be added to the asynchronous transaction queue.
-     - parameter `onComplete` will be called after commit has reached stable storage or fail.
-     If an error occurs, upon return contains an `Error` object that describes the problem or nil otherwise.
-     - returns The Id for the asynchronous transaction or 0 in case of error.
-     - note Write  blocks for the multiple calls will be executed in order.
-     */
+     Asynchronously performs actions contained within the given block inside a write transaction.
+     The write transaction is begun asynchronously as if calling `beginAsyncWrite`,
+     and by default the transaction is commited asynchronously after the block completes.
+     You can also explicitly call `commitWrite` or `cancelWrite` from
+     within the block to synchronously commit or cancel the write transaction.
+
+     @param block The block containing actions to perform.
+
+     @param completionBlock A block which will be called on the source thread or queue
+                        once the commit has either completed or failed with an error.
+
+     @return An id identifying the asynchronous transaction which can be passed to
+             `cancelAsyncWrite` prior to the block being called to cancel
+             the pending invocation of the block.
+    */
     @discardableResult
     public func writeAsync(_ block: @escaping (AsyncTransactionId) -> Void, _ onComplete: ((Swift.Error?) -> Void)? = nil) throws -> AsyncTransactionId {
         return try beginAsyncWrite { asyncTransactionId in
@@ -390,16 +398,24 @@ public typealias AsyncTransactionId = RLMAsyncTransactionId
     }
 
     /**
-     Begins asynchronous write transaction.
-     - parameter `block` The block containing actions to perform.
-     `block` should end by calling `commitAsyncWrite`, `cancelAsyncWrite`,
-     `commitWrite` or `cancelWrite`.
-     Leaving the block without one of these calls will be equivalent to calling `commitAsyncWrite`.
-     - returns The Id for the asynchronous transaction or 0 in case of error.
-     - note `block` is queued for execution on the scheduler associated with the current realm.
-     It will run after the write mutex has been acquired.
-     The call returns immediately allowing the caller to proceed while the write mutex is held by someone else.
-     Write blocks from multiple calls to `beginAsyncWrite` or `writeAsync` will be executed in order.
+     Begins an asynchronous write transaction.
+     This function asynchronously begins a write transaction on a background
+     thread, and then invokes the block on the original thread or queue once the
+     transaction has begun. Unlike `beginWrite`, this does not block the
+     calling thread if another thread is current inside a write transaction, and
+     will always return immediately.
+     Multiple calls to this function (or the other functions which perform
+     asynchronous write transactions) will queue the blocks to be called in the
+     same order as they were queued. This includes calls from inside a write
+     transaction block, which unlike with synchronous transactions are allowed.
+
+     @param asyncWriteBlock The block containing actions to perform inside the write transaction.
+            `asyncWriteBlock` should end by calling `commitAsyncWrite` or `commitWrite`.
+            Returning without one of these calls is equivalent to calling `cancelAsyncWrite`.
+
+     @return An id identifying the asynchronous transaction which can be passed to
+             `cancelAsyncWrite` prior to the block being called to cancel
+             the pending invocation of the block.
      */
     @discardableResult
     public func beginAsyncWrite(_ asyncWriteBlock: @escaping (AsyncTransactionId) -> Void) throws -> AsyncTransactionId {
@@ -410,36 +426,55 @@ public typealias AsyncTransactionId = RLMAsyncTransactionId
         return asyncTransactionId
     }
 
-    /** Commit asynchronous transaction.
-     - parameter onComplete  is queued for execution on the scheduler associated with
-     the current realm. It will run after the commit has reached stable storage.
-     If an error occurs, upon return contains an `Error` object that describes the problem or nil otherwise.
-     - parameter isGroupingAllowed If `true`, the next `commitAsyncWrite` *may* run without an
-     intervening synchronization of stable storage.  Such a sequence of commits form a group.
-     `isGroupingAllowed` may help to have a better performance on write.
-     In case of a platform crash, either none or all of the commits in a group will reach stable storage.
-     - note The call returns immediately allowing the caller to proceed while the I/O is performed on a dedicated background thread.
-     - note Callbacks to `onComplete` will occur in the order of `commitAsyncWriteTransaction`
+    /**
+     Asynchronously commits a write transaction.
+     The call returns immediately allowing the caller to proceed while the I/O is
+     performed on a dedicated background thread. This can be used regardless of if
+     the write transaction was begun with `beginWrite` or `beginAsyncWrite`.
+
+     @param onComplete A block which will be called on the source thread or queue once the commit
+                     has either completed or failed with an error.
+
+     @param isGroupingAllowed If `true`, multiple sequential calls to `commitAsyncWrite` may be
+                          batched together and persisted to stable storage in one group. This
+                          improves write performance, particularly when the individual transactions
+                          being batched are small. In the event of a crash or power failure,
+                          either all of the grouped transactions will be lost or none will, rather
+                          than the usual guarantee that data has been persisted as
+                          soon as a call to commit has returned.
+
+     @return An id identifying the asynchronous transaction commit can be passed to
+             `cancelAsyncWrite` prior to the completion block being called to cancel
+             the pending invocation of the block. Note that this does *not* cancel the commit itself.
     */
     @discardableResult
     public func commitAsyncWrite(_ onComplete: ((Swift.Error?) -> Void)? = nil, isGroupingAllowed: Bool = false) -> AsyncTransactionId {
         return rlmRealm.commitAsyncWriteTransaction(onComplete, isGroupingAllowed: isGroupingAllowed)
     }
 
-    /** Cancel a queued code block (either for `writeAsync` or for`commitAsyncWrite`)
-     - note Cancelling a commit will not abort the commit, it will only cancel the callback
-     informing of commit completion.
+    /**
+     Cancels a queued block for an asynchronous transaction.
+     This can cancel a block passed to either an asynchronous begin or an asynchronous commit.
+     Canceling a begin cancels that transaction entirely, while canceling a commit merely cancels
+     the invocation of the completion callback, and the commit will still happen.
+     Transactions can only be canceled before the block is invoked, and calling `cancelAsyncWrite`
+     from within the block is a no-op.
+
+     @param AsyncTransactionId A transaction id from either `beginAsyncWrite` or `commitAsyncWrite`.
     */
     public func cancelAsyncWrite(_  asyncTransactionId: AsyncTransactionId) throws {
         rlmRealm.cancelAsyncTransaction(asyncTransactionId)
     }
 
     /**
-     Returns true when async transactions has been created and the result of the last
-     commit has not yet reached permanent storage.
+     Indicates if the Realm is currently performing async write operations.
+     This becomes `true` following a call to `beginAsyncWrite`, `commitAsyncWrite`,
+     or `writeAsync`, and remains so until all scheduled async write work has completed.
+
+     @warning If this is `true`, closing or invalidating the Realm will block until scheduled work has completed.
      */
-    public var isInAsyncWriteTransaction: Bool {
-        return rlmRealm.inAsyncWriteTransaction
+    public var isPerformingAsynchronousWriteOperations: Bool {
+        return rlmRealm.isPerformingAsynchronousWriteOperations
     }
 
 #endif // REALM_ASYNC_WRITES

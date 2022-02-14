@@ -548,7 +548,7 @@ typedef void (^RLMNotificationBlock)(RLMNotification notification, RLMRealm *rea
  
  @param block The block containing actions to perform inside the write transaction.
         `block` should end by calling `commitAsyncWriteTransaction`,
-        `commitWriteTransaction` or `cancelWriteTransaction`.
+        `commitWriteTransaction`.
         Returning without one of these calls is equivalent to calling `cancelWriteTransaction`.
  
  @return An id identifying the asynchronous transaction which can be passed to
