@@ -19,7 +19,7 @@
 #import <Foundation/Foundation.h>
 #import <Realm/RLMConstants.h>
 
-@class RLMRealmConfiguration, RLMRealm, RLMObject, RLMSchema, RLMMigration, RLMNotificationToken, RLMThreadSafeReference, RLMAsyncOpenTask;
+@class RLMRealmConfiguration, RLMRealm, RLMObject, RLMSchema, RLMMigration, RLMNotificationToken, RLMThreadSafeReference, RLMAsyncOpenTask, RLMSyncSubscriptionSet;
 
 /**
  A callback block for opening Realms asynchronously.
@@ -243,6 +243,23 @@ NS_ASSUME_NONNULL_BEGIN
  @return `YES` if the Realm was successfully written to disk, `NO` if an error occurred.
  */
 - (BOOL)writeCopyToURL:(NSURL *)fileURL encryptionKey:(nullable NSData *)key error:(NSError **)error;
+
+/**
+ Writes a copy of the Realm to a given location specified by a given configuration.
+
+ If the configuration supplied is derived from a `RLMUser` then this Realm will be copied with
+ sync functionality enabled.
+
+ The destination file cannot already exist.
+
+ @param configuration A Realm Configuration.
+ @param error   If an error occurs, upon return contains an `NSError` object
+ that describes the problem. If you are not interested in
+ possible errors, pass in `NULL`.
+
+ @return `YES` if the Realm was successfully written to disk, `NO` if an error occurred.
+ */
+- (BOOL)writeCopyForConfiguration:(RLMRealmConfiguration *)configuration error:(NSError **)error;
 
 /**
  Checks if the Realm file for the given configuration exists locally on disk.
@@ -508,131 +525,144 @@ typedef void (^RLMNotificationBlock)(RLMNotification notification, RLMRealm *rea
 #ifdef REALM_ASYNC_WRITES
 
 /**
- Indicates if the Realm is currently engaged in an async write transaction.
+ Indicates if the Realm is currently performing async write operations.
+ This becomes YES following a call to `beginAsyncWriteTransaction`,
+ `commitAsyncWriteTransaction`, or `asyncTransactionWithBlock:`, and remains so
+ until all scheduled async write work has completed.
  
- @warning Do not simply check this property and then start a write transaction whenever an object needs
-          to be created, updated, or removed. Doing so might cause a large number of write transactions
-          to be created, degrading performance. Instead, always prefer performing multiple updates
-          during a single transaction.
+ @warning If this is `YES`, closing or invalidating the Realm will block until scheduled work has completed.
  */
-@property (nonatomic, readonly) BOOL inAsyncWriteTransaction;
+@property (nonatomic, readonly) BOOL isPerformingAsynchronousWriteOperations;
 
 /**
- Begins asynchronous write transaction.
+ Begins an asynchronous write transaction.
+ This function asynchronously begins a write transaction on a background
+ thread, and then invokes the block on the original thread or queue once the
+ transaction has begun. Unlike `beginWriteTransaction`, this does not block the
+ calling thread if another thread is current inside a write transaction, and
+ will always return immediately.
+ Multiple calls to this function (or the other functions which perform
+ asynchronous write transactions) will queue the blocks to be called in the
+ same order as they were queued. This includes calls from inside a write
+ transaction block, which unlike with synchronous transactions are allowed.
  
- @param block The block containing actions to perform.
-        `block` should end by calling `commitAsyncWriteTransaction`, `cancelAsyncTransaction:`,
+ @param block The block containing actions to perform inside the write transaction.
+        `block` should end by calling `commitAsyncWriteTransaction`,
         `commitWriteTransaction` or `cancelWriteTransaction`.
-        Returning without one of these calls will be equivalent to calling `cancelAsyncTransaction`.
-
- @return The Id for the asynchronous transaction.
+        Returning without one of these calls is equivalent to calling `cancelWriteTransaction`.
  
- @note `block` is queued for execution on the scheduler associated with the current Realm.
-       It will run after the write transaction has begun.
-       The call returns immediately allowing the caller to proceed while the write mutex is held by someone else.
-       Write blocks from multiple calls to `beginAsyncWriteTransaction:` or `asyncTransactionWithBlock:`
-       will be executed in order.
-       A later call to `beginAsyncWriteTransaction:` or `asyncTransactionWithBlock:` will wait for any earlier
-       write blocks.
- 
- @note The Id for the asynchronous transaction can be used to cancel the transaction. You can get it
-       as a return from `beginAsyncWriteTransaction`, `commitAsyncWriteTransaction` or `asyncTransactionWithBlock`.
+ @return An id identifying the asynchronous transaction which can be passed to
+         `cancelAsyncTransaction:` prior to the block being called to cancel
+         the pending invocation of the block.
  */
 - (RLMAsyncTransactionId)beginAsyncWriteTransaction:(void(^)())block;
 
-/** Commit asynchronous transaction.
+/**
+ Asynchronously commits a write transaction.
+ The call returns immediately allowing the caller to proceed while the I/O is
+ performed on a dedicated background thread. This can be used regardless of if
+ the write transaction was begun with `beginWriteTransaction` or
+ `beginAsyncWriteTransaction`.
  
- The call returns immediately allowing the caller to proceed while the I/O is performed
- on a dedicated background thread.
+ @param completionBlock A block which will be called on the source thread or
+                        queue once the commit has either completed or failed
+                        with an error.
  
- @param completionBlock  is queued for execution on the scheduler associated with
-        the current Realm. It will run after the commit has reached stable storage or has fail with error.
-        Callbacks to `completionBlock` will occur in the order of `commitAsyncWriteTransaction`
-        If an error occurs, upon return contains an `NSError` object that describes the problem or nil otherwise.
-
- @param isGroupingAllowed If `true`, the next `commitAsyncWriteTransaction` *may* run without an
-        intervening synchronization of stable storage. Such a sequence of commits
-        form a group. It may help to have a better performance on write.
-        In case of a platform crash, either none or all of the commits in a group will reach stable storage.
-        `false` by default.
-
- @return The Id for the asynchronous transaction or 0 in case of error.
-
- @note The Id for the asynchronous transaction can be used to cancel the transaction. You can get it
-       as a return from `beginAsyncWriteTransaction`, `commitAsyncWriteTransaction` or `asyncTransactionWithBlock`.
-
- @note The immediate return without `error` is not a guarantee of the future successful transaction commit.
+ @param allowGrouping If `YES`, multiple sequential calls to
+                      `commitAsyncWriteTransaction:` may be batched together
+                      and persisted to stable storage in one group. This
+                      improves write performance, particularly when the
+                      individual transactions being batched are small. In the
+                      event of a crash or power failure, either all of the
+                      grouped transactions will be lost or none will, rather
+                      than the usual guarantee that data has been persisted as
+                      soon as a call to commit has returned.
+ 
+ @return An id identifying the asynchronous transaction commit can be passed to
+         `cancelAsyncTransaction:` prior to the completion block being called
+         to cancel the pending invocation of the block. Note that this does
+         *not* cancel the commit itself.
 */
-- (RLMAsyncTransactionId)commitAsyncWriteTransaction:(nullable void(^)(NSError *_Nullable))completionBlock isGroupingAllowed:(BOOL)isGroupingAllowed;
+- (RLMAsyncTransactionId)commitAsyncWriteTransaction:(nullable void(^)(NSError *_Nullable))completionBlock
+                                   isGroupingAllowed:(BOOL)isGroupingAllowed;
 
-/** Commit asynchronous transaction.
+/**
+ Asynchronously commits a write transaction.
+ The call returns immediately allowing the caller to proceed while the I/O is
+ performed on a dedicated background thread. This can be used regardless of if
+ the write transaction was begun with `beginWriteTransaction` or
+ `beginAsyncWriteTransaction`.
  
- The call returns immediately allowing the caller to proceed while the I/O is performed
- on a dedicated background thread.
+ @param completionBlock A block which will be called on the source thread or
+                        queue once the commit has either completed or failed
+                        with an error.
  
- It's an equivalent to call `commitAsyncWriteTransaction:isGroupingAllowed:` with `isGroupingAllowed` = `false`.
-       
- @param completionBlock  is queued for execution on the scheduler associated with
-        the current Realm. It will run after the commit has reached stable storage or has fail with error.
-        Callbacks to `completionBlock` will occur in the order of `commitAsyncWriteTransaction`
-        If an error occurs, upon return contains an `NSError` object that describes the problem or nil otherwise.
-
- @return The Id for the asynchronous transaction or 0 in case of error.
-
- @note The immediate return without `error` is not a guarantee of the future successful transaction commit.
-
- @note The Id for the asynchronous transaction can be used to cancel the transaction. You can get it
-       as a return from `beginAsyncWriteTransaction`, `commitAsyncWriteTransaction` or `asyncTransactionWithBlock`.
+ @return An id identifying the asynchronous transaction commit can be passed to
+         `cancelAsyncTransaction:` prior to the completion block being called
+         to cancel the pending invocation of the block. Note that this does
+         *not* cancel the commit itself.
 */
 - (RLMAsyncTransactionId)commitAsyncWriteTransaction:(void(^)(NSError *_Nullable))completionBlock;
 
-/** Commit asynchronous transaction.
- 
- The call returns immediately allowing the caller to proceed while the I/O is performed
- on a dedicated background thread.
-  
- @return The Id for the asynchronous transaction.
-
- @note This will be equivalent to call `commitAsyncWriteTransaction:isGroupingAllowed:` with
-       `isGroupingAllowed` = `false` and without completionBlock.
- 
- @note The Id for the asynchronous transaction can be used to cancel the transaction. You can get it
-       as a return from `beginAsyncWriteTransaction`, `commitAsyncWriteTransaction` or `asyncTransactionWithBlock`.
+/**
+ Asynchronously commits a write transaction.
+ The call returns immediately allowing the caller to proceed while the I/O is
+ performed on a dedicated background thread. This can be used regardless of if
+ the write transaction was begun with `beginWriteTransaction` or
+ `beginAsyncWriteTransaction`.
 */
-- (RLMAsyncTransactionId)commitAsyncWriteTransaction;
+- (void)commitAsyncWriteTransaction;
 
-/** Cancel a queued code block (either for an `asyncTransactionWithBlock`
- or for an `commitAsyncWriteTransaction`).
+/**
+ Cancels a queued block for an asynchronous transaction.
+ This can cancel a block passed to either an asynchronous begin or an
+ asynchronous commit. Canceling a begin cancels that transaction entirely,
+ while canceling a commit merely cancels the invocation of the completion
+ callback, and the commit will still happen.
+ Transactions can only be canceled before the block is invoked, and calling
+ `cancelAsyncTransaction:` from within the block is a no-op.
  
- @param RLMAsyncTransactionId The transaction Id returned by `beginAsyncWriteTransaction`, `commitAsyncWriteTransaction` or `asyncTransactionWithBlock:`.
+ @param RLMAsyncTransactionId A transaction id from either `beginAsyncWriteTransaction:` or `commitAsyncWriteTransaction:`.
 */
 - (void)cancelAsyncTransaction:(RLMAsyncTransactionId)asyncTransactionId;
 
 /**
- Performs actions contained within the given block inside an asynctonous write transaction.
+ Asynchronously performs actions contained within the given block inside a
+ write transaction.
+ The write transaction is begun asynchronously as if calling
+ `beginAsyncWriteTransaction:`, and by default the transaction is commited
+ asynchronously after the block completes. You can also explicitly call
+ `commitWriteTransaction` or `cancelWriteTransaction` from within the block to
+ synchronously commit or cancel the write transaction.
  
- @param block  The block containing actions to perform.
+ @param block The block containing actions to perform.
  
- @param completionBlock  is queued for execution on the scheduler associated with
-        the current Realm. It will run after the commit has reached stable storage or has fail with error.
-        If an error occurs, upon return contains an `NSError` object that describes the problem or nil otherwise.
+ @param completionBlock A block which will be called on the source thread or
+                        queue once the commit has either completed or failed
+                        with an error.
 
- @return The Id for the asynchronous transaction or 0 in case of error.
-
- @note The Id for the asynchronous transaction can be used to cancel the transaction. You can get it
-       as a return from `beginAsyncWriteTransaction`, `commitAsyncWriteTransaction` or `asyncTransactionWithBlock`.
+ @return An id identifying the asynchronous transaction which can be passed to
+         `cancelAsyncTransaction:` prior to the block being called to cancel
+         the pending invocation of the block.
 */
-- (RLMAsyncTransactionId)asyncTransactionWithBlock:(void(^)())block onComplete:(nullable void(^)(NSError *_Nullable))completionBlock;
-/**
- Performs actions contained within the given block inside an asynctonous write transaction.
- 
- @param block  The block containing actions to perform.
- 
- @return The Id for the asynchronous transaction or 0 in case of error.
+- (RLMAsyncTransactionId)asyncTransactionWithBlock:(void(^)())block
+                                        onComplete:(nullable void(^)(NSError *_Nullable))completionBlock;
 
- @note The Id for the asynchronous transaction can be used to cancel the transaction. You can get it
-       as a return from `beginAsyncWriteTransaction`, `commitAsyncWriteTransaction` or `asyncTransactionWithBlock`.
- */
+/**
+ Asynchronously performs actions contained within the given block inside a
+ write transaction.
+ The write transaction is begun asynchronously as if calling
+ `beginAsyncWriteTransaction:`, and by default the transaction is commited
+ asynchronously after the block completes. You can also explicitly call
+ `commitWriteTransaction` or `cancelWriteTransaction` from within the block to
+ synchronously commit or cancel the write transaction.
+ 
+ @param block The block containing actions to perform.
+ 
+ @return An id identifying the asynchronous transaction which can be passed to
+         `cancelAsyncTransaction:` prior to the block being called to cancel
+         the pending invocation of the block.
+*/
 - (RLMAsyncTransactionId)asyncTransactionWithBlock:(void(^)())block;
 
 #endif // REALM_ASYNC_WRITES
@@ -831,6 +861,17 @@ NS_REFINED_FOR_SWIFT;
  @see `deleteObject:`
  */
 - (void)deleteAllObjects;
+
+#pragma mark - Sync Subscriptions
+
+/**
+ Represents the active subscriptions for this realm, which can be used to add/remove/update
+ and search flexible sync subscriptions.
+ Getting the subscriptions from a local or partition-based configured realm will thrown an exception.
+
+ @warning This feature is currently in beta and its API is subject to change.
+ */
+@property (nonatomic, readonly, nonnull) RLMSyncSubscriptionSet *subscriptions;
 
 
 #pragma mark - Migrations

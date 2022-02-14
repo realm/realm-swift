@@ -993,6 +993,22 @@ public typealias AsyncTransactionId = RLMAsyncTransactionId
     }
 
     /**
+     Writes a copy of the Realm to a given location specified by a given configuration.
+
+     If the configuration supplied is derived from a `User` then this Realm will be copied with
+     sync functionality enabled.
+
+     The destination file cannot already exist.
+
+     - parameter configuration: A Realm Configuration.
+
+     - throws: An `NSError` if the copy could not be written.
+     */
+    public func writeCopy(configuration: Realm.Configuration) throws {
+        try rlmRealm.writeCopy(for: configuration.rlmConfiguration)
+    }
+
+    /**
      Checks if the Realm file for the given configuration exists locally on disk.
 
      For non-synchronized, non-in-memory Realms, this is equivalent to
@@ -1035,6 +1051,23 @@ public typealias AsyncTransactionId = RLMAsyncTransactionId
 
     internal init(_ rlmRealm: RLMRealm) {
         self.rlmRealm = rlmRealm
+    }
+}
+
+// MARK: Sync Subscriptions
+
+extension Realm {
+    /**
+     Returns an instance of `SyncSubscriptionSet`, representing the active subscriptions
+     for this realm, which can be used to add/remove/update and search flexible sync subscriptions.
+     Getting the subscriptions from a local or partition-based configured realm will thrown an exception.
+
+     - returns: A `SyncSubscriptionSet`.
+     - Warning: This feature is currently in beta and its API is subject to change.
+     */
+    @available(*, message: "This feature is currently in beta.")
+    public var subscriptions: SyncSubscriptionSet {
+        return SyncSubscriptionSet(rlmRealm.subscriptions)
     }
 }
 

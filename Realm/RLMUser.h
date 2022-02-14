@@ -100,12 +100,24 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark - Lifecycle
 
 /**
- Create a query-based configuration instance for the given url.
+ Create a partition-based sync configuration instance for the given partition value.
 
  @param partitionValue The `RLMBSON` value the Realm is partitioned on.
  @return A default configuration object with the sync configuration set to use the given partition value.
  */
 - (RLMRealmConfiguration *)configurationWithPartitionValue:(nullable id<RLMBSON>)partitionValue NS_REFINED_FOR_SWIFT;
+
+/**
+ Create a flexible sync configuration instance, which can be used to open a Realm that
+ supports flexible sync.
+
+ It won't possible to combine flexible and partition sync in the same app, which means if you open
+ a realm with a flexible sync configuration, you won't be able to open a realm with a PBS configuration
+ and the other way around.
+
+ @return A `RLMRealmConfiguration` instance with a flexible sync configuration.
+ */
+- (RLMRealmConfiguration *)flexibleSyncConfiguration NS_REFINED_FOR_SWIFT;
 
 #pragma mark - Sessions
 
@@ -158,6 +170,16 @@ NS_ASSUME_NONNULL_BEGIN
  @param completion A callback invoked on completion
 */
 - (void)removeWithCompletion:(RLMUserOptionalErrorBlock)completion;
+
+/**
+ Permanently deletes this user from your MongoDB Realm app.
+
+ The users state will be set to `Removed` and the session will be destroyed.
+ If the delete request fails, the local authentication state will be untouched.
+
+ @param completion A callback invoked on completion
+*/
+- (void)deleteWithCompletion:(RLMUserOptionalErrorBlock)completion;
 
 /**
  Logs out the current user

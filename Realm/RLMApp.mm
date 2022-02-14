@@ -42,8 +42,8 @@ namespace {
     public:
         CocoaNetworkTransport(id<RLMNetworkTransport> transport) : m_transport(transport) {};
 
-        void send_request_to_server(const app::Request request,
-                                    std::function<void(const app::Response)> completion) override {
+        void send_request_to_server(app::Request&& request,
+                                    util::UniqueFunction<void(const app::Response&)>&& completion) override {
             // Convert the app::Request to an RLMRequest
             auto rlmRequest = [RLMRequest new];
             rlmRequest.url = @(request.url.data());

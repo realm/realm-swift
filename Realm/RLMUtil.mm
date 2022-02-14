@@ -348,6 +348,13 @@ NSException *RLMException(std::exception const& exception) {
     return RLMException(@"%s", exception.what());
 }
 
+NSError *RLMMakeError(RLMError code, NSString *msg) {
+    return [NSError errorWithDomain:RLMErrorDomain
+                               code:code
+                           userInfo:@{NSLocalizedDescriptionKey: msg,
+                                      @"Error Code": @(code)}];
+}
+
 NSError *RLMMakeError(RLMError code, std::exception const& exception) {
     return [NSError errorWithDomain:RLMErrorDomain
                                code:code

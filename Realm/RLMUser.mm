@@ -26,6 +26,7 @@
 #import "RLMRealmConfiguration+Sync.h"
 #import "RLMSyncConfiguration_Private.hpp"
 #import "RLMSyncSession_Private.hpp"
+#import "RLMUtil.hpp"
 
 #import <realm/object-store/sync/sync_manager.hpp>
 #import <realm/object-store/sync/sync_session.hpp>
@@ -83,8 +84,16 @@ using namespace realm;
 - (RLMRealmConfiguration *)configurationWithPartitionValue:(nullable id<RLMBSON>)partitionValue {
     auto syncConfig = [[RLMSyncConfiguration alloc] initWithUser:self
                                                   partitionValue:partitionValue
-                                                   customFileURL:nil
                                                       stopPolicy:RLMSyncStopPolicyAfterChangesUploaded];
+    RLMRealmConfiguration *config = [[RLMRealmConfiguration alloc] init];
+    config.syncConfiguration = syncConfig;
+    return config;
+}
+
+- (RLMRealmConfiguration *)flexibleSyncConfiguration {
+    auto syncConfig = [[RLMSyncConfiguration alloc] initWithUser:self
+                                                      stopPolicy:RLMSyncStopPolicyAfterChangesUploaded
+                                              enableFlexibleSync:true];
     RLMRealmConfiguration *config = [[RLMRealmConfiguration alloc] init];
     config.syncConfiguration = syncConfig;
     return config;
@@ -108,20 +117,20 @@ using namespace realm;
     _user = nullptr;
 }
 
-- (std::string)pathForPartitionValue:(std::string const&)partitionValue {
+- (std::string)pathForPartitionValue:(std::string const&)value {
     if (!_user) {
         return "";
     }
 
     SyncConfig config(_user, "");
-    auto path = _user->sync_manager()->path_for_realm(config, partitionValue);
+    auto path = _user->sync_manager()->path_for_realm(config, value);
     if ([NSFileManager.defaultManager fileExistsAtPath:@(path.c_str())]) {
         return path;
     }
 
     // Previous versions converted the partition value to a path *twice*,
     // so if the file resulting from that exists open it instead
-    NSString *encodedPartitionValue = [@(partitionValue.data())
+    NSString *encodedPartitionValue = [@(value.data())
                                        stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLPathAllowedCharacterSet]];
     NSString *overEncodedRealmName = [[NSString alloc] initWithFormat:@"%@/%@", self.identifier, encodedPartitionValue];
     auto legacyPath = _user->sync_manager()->path_for_realm(config, std::string(overEncodedRealmName.UTF8String));
@@ -130,6 +139,15 @@ using namespace realm;
     }
 
     return path;
+}
+
+- (std::string)pathForFlexibleSync {
+    if (!_user) {
+        @throw RLMException(@"This is an exceptional state, `RLMUser` cannot be initialised without a reference to `SyncUser`");
+    }
+
+    SyncConfig config(_user, SyncConfig::FLXSyncEnabled{});
+    return _user->sync_manager()->path_for_realm(config, realm::none);
 }
 
 - (nullable RLMSyncSession *)sessionForPartitionValue:(id<RLMBSON>)partitionValue {
@@ -221,6 +239,12 @@ using namespace realm;
     });
 }
 
+- (void)deleteWithCompletion:(RLMUserOptionalErrorBlock)completion {
+    _app._realmApp->delete_user(_user, ^(realm::util::Optional<app::AppError> error) {
+        [self handleResponse:error completion:completion];
+    });
+}
+
 - (void)logOutWithCompletion:(RLMOptionalErrorBlock)completion {
     _app._realmApp->log_out(_user, ^(realm::util::Optional<app::AppError> error) {
         [self handleResponse:error completion:completion];
@@ -244,10 +268,8 @@ using namespace realm;
         args.push_back(RLMConvertRLMBSONToBson(argument));
     }
 
-    _app._realmApp->call_function(_user,
-                        std::string(name.UTF8String),
-                        args, [completionBlock](util::Optional<app::AppError> error,
-                                                util::Optional<bson::Bson> response) {
+    _app._realmApp->call_function(_user, std::string(name.UTF8String), args,
+                                  [completionBlock](util::Optional<bson::Bson> response, util::Optional<app::AppError> error) {
         if (error) {
             return completionBlock(nil, RLMAppErrorToNSError(*error));
         }

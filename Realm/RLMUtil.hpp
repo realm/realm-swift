@@ -44,6 +44,7 @@ __attribute__((format(NSString, 1, 2)))
 NSException *RLMException(NSString *fmt, ...);
 NSException *RLMException(std::exception const& exception);
 
+NSError *RLMMakeError(RLMError code, NSString *msg);
 NSError *RLMMakeError(RLMError code, std::exception const& exception);
 NSError *RLMMakeError(RLMError code, const realm::util::File::AccessError&);
 NSError *RLMMakeError(RLMError code, const realm::RealmFileException&);
@@ -117,6 +118,15 @@ static inline NSString * RLMStringDataToNSString(realm::StringData stringData) {
                                         length:stringData.size()
                                       encoding:NSUTF8StringEncoding];
     }
+}
+
+static inline NSString * RLMStringViewToNSString(std::string_view stringView) {
+    if (stringView.size() == 0) {
+        return nil;
+    }
+    return [[NSString alloc] initWithBytes:stringView.data()
+                                    length:stringView.size()
+                                  encoding:NSUTF8StringEncoding];
 }
 
 static inline realm::StringData RLMStringDataWithNSString(__unsafe_unretained NSString *const string) {

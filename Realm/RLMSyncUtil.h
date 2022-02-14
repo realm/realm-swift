@@ -49,6 +49,11 @@ endpoint.
 extern NSString *const RLMAppErrorDomain;
 
 /**
+ The error domain string for all SDK errors related to flexible sync.
+ */
+extern NSString *const RLMFlexibleSyncErrorDomain;
+
+/**
  An error related to a problem that might be reported by the synchronization manager
  error handler, or a callback on a sync-related API that performs asynchronous work.
  */
@@ -139,6 +144,20 @@ typedef RLM_ERROR_ENUM(NSInteger, RLMSyncError, RLMSyncErrorDomain) {
      @see `-[NSError rlmSync_errorActionToken]`
      */
     RLMSyncErrorPermissionDeniedError   = 9,
+};
+
+/**
+ An error which is related to a flexible sync operation.
+ */
+typedef RLM_ERROR_ENUM(NSInteger, RLMFlexibleSyncError, RLMFlexibleSyncErrorDomain) {
+    /// An error describing why the subscription set synchronization failed.
+    RLMFlexibleSyncErrorStatusError     = 1,
+
+    /// An error while committing a subscription write.
+    RLMFlexibleSyncErrorCommitSubscriptionSetError     = 2,
+
+    /// An error while refreshing the subscription set state.
+    RLMFlexibleSyncErrorRefreshSubscriptionSetError     = 3,
 };
 
 /// An error which is related to authentication to MongoDB Realm.
