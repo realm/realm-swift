@@ -15,9 +15,6 @@ set -e
 
 readonly source_root="$(dirname "$0")"
 
-# You can override the version of the core library
-: "${REALM_BASE_URL:="https://static.realm.io/downloads"}" # set it if you need to use a remote repo
-
 : "${REALM_CORE_VERSION:=$(sed -n 's/^REALM_CORE_VERSION=\(.*\)$/\1/p' "${source_root}/dependencies.list")}" # set to "current" to always use the current build
 
 # You can override the xcmode used
@@ -281,93 +278,6 @@ if [ "$#" -eq 0 ] || [ "$#" -gt 3 ]; then
 fi
 
 ######################################
-# Downloading
-######################################
-
-copy_core() {
-    local src="$1"
-    rm -rf core
-    mkdir core
-    ditto "$src" core
-
-    # XCFramework processing only copies the "realm" headers, so put the third-party ones in a known location
-    mkdir -p core/include
-    find "$src" -name external -exec ditto "{}" core/include/external \; -quit
-}
-
-download_common() {
-    local tries_left=3 version url error suffix
-    suffix='-xcframework'
-
-    version=$REALM_CORE_VERSION
-    url="${REALM_BASE_URL}/core/realm-monorepo-xcframework-v${version}.tar.xz"
-
-    # First check if we need to do anything
-    if [ -e core ]; then
-        if [ -e core/version.txt ]; then
-            if [ "$(cat core/version.txt)" == "$version" ]; then
-                echo "Version ${version} already present"
-                exit 0
-            else
-                echo "Switching from version $(cat core/version.txt) to ${version}"
-            fi
-        else
-            if [ "$(find core -name librealm-monorepo.a)" ]; then
-                echo 'Using existing custom core build without checking version'
-                exit 0
-            fi
-        fi
-    fi
-
-    # We may already have this version downloaded and just need to set it as
-    # the active one
-    local versioned_dir="realm-core-${version}${suffix}"
-    if [ -e "$versioned_dir/version.txt" ]; then
-        echo "Setting ${version} as the active version"
-        copy_core "$versioned_dir"
-        exit 0
-    fi
-
-    echo "Downloading dependency: ${version} from ${url}"
-
-    if [ -z "$TMPDIR" ]; then
-        TMPDIR='/tmp'
-    fi
-    local temp_dir=$(dirname "$TMPDIR/waste")/realm-core-tmp
-    mkdir -p "$temp_dir"
-    local tar_path="${temp_dir}/${versioned_dir}.tar.xz"
-    local temp_path="${tar_path}.tmp"
-
-    while [ 0 -lt $tries_left ] && [ ! -f "$tar_path" ]; do
-        if ! error=$(/usr/bin/curl --fail --silent --show-error --location "$url" --output "$temp_path" 2>&1); then
-            tries_left=$((tries_left-1))
-        else
-            mv "$temp_path" "$tar_path"
-        fi
-    done
-
-    if [ ! -f "$tar_path" ]; then
-        printf "Downloading core failed:\n\t%s\n\t%s\n" "$url" "$error"
-        exit 1
-    fi
-
-    (
-        cd "$temp_dir"
-        rm -rf core
-        tar xf "$tar_path" --xz
-        if [ ! -f core/version.txt ]; then
-            printf %s "${version}" > core/version.txt
-        fi
-
-        mv core "${versioned_dir}"
-    )
-
-    rm -rf "${versioned_dir}"
-    mv "${temp_dir}/${versioned_dir}" .
-    copy_core "$versioned_dir"
-}
-
-######################################
 # Variables
 ######################################
 
@@ -406,7 +316,7 @@ case "$COMMAND" in
     # Dependencies
     ######################################
     "download-core")
-        download_common
+        sh scripts/download-core.sh
         exit 0
         ;;
 
@@ -1061,23 +971,6 @@ case "$COMMAND" in
         done
         echo 'Error: Built library does not contain bitcode'
         exit 1
-        ;;
-
-    ######################################
-    # CocoaPods
-    ######################################
-    "cocoapods-setup")
-        if [ ! -f core/version.txt ]; then
-          sh build.sh download-core
-        fi
-
-        rm -rf include
-        mkdir -p include
-        cp -R core/realm-monorepo.xcframework/ios-armv7_arm64/Headers include/core
-
-        mkdir -p include
-        echo '' > Realm/RLMPlatform.h
-        cp Realm/*.h Realm/*.hpp include
         ;;
 
     ######################################
