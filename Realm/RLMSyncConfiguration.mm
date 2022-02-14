@@ -58,7 +58,6 @@ RLMSyncSystemErrorKind errorKindForSyncError(SyncError error) {
 }
 }
 
-// ???: Where should this go?
 struct BeforeClientResetWrapper {
     RLMClientResetBeforeBlock block;
     void operator()(std::shared_ptr<Realm> local) {
@@ -128,7 +127,6 @@ struct AfterClientResetWrapper {
     return translateClientResetMode(_config->client_resync_mode);
 }
 
-// ???: I couldn't shorten this. I had to wrapper.block on it's own line. Not exactly clear why.
 - (RLMClientResetBeforeBlock)beforeClientReset {
     if (_config->notify_before_client_reset) {
         auto wrapper = *_config->notify_before_client_reset.target<BeforeClientResetWrapper>();
@@ -138,10 +136,11 @@ struct AfterClientResetWrapper {
     }
 }
 
-//// ???: I couldn't shorten this. I had to wrapper.block on it's own line. Not exactly clear why.
 - (void)setBeforeClientReset:(RLMClientResetBeforeBlock)beforeClientReset {
     if (!beforeClientReset) {
         _config->notify_before_client_reset = nullptr;
+    } else if (self.clientResetMode == RLMClientResetModeManual) {
+        @throw RLMException(@"Client reset notifications not supported in Manual mode. Use SyncManager.ErrorHandler");
     } else {
         _config->notify_before_client_reset = BeforeClientResetWrapper{beforeClientReset};
     }
@@ -159,6 +158,8 @@ struct AfterClientResetWrapper {
 - (void)setAfterClientReset:(RLMClientResetAfterBlock)afterClientReset {
     if (!afterClientReset) {
         _config->notify_after_client_reset = nullptr;
+    } else if (self.clientResetMode == RLMClientResetModeManual) {
+        @throw RLMException(@"Client reset notifications not supported in Manual mode. Use SyncManager.ErrorHandler");
     } else {
         _config->notify_after_client_reset = AfterClientResetWrapper{afterClientReset};
     }

@@ -245,12 +245,6 @@ public typealias Provider = RLMIdentityProvider
     */
     public let clientResetMode: ClientResetMode
 
-    // !!!: I had tried making these functions instead of properties.
-    // !!!: Delete these lines
-    // These are also properties in the core sync config type.
-    // When making these functions, the getters and setters could stack overflow when converting
-    // from swift to objc if the underlying core value was nil.
-
     /**
      A callback which notifies prior to  prior to a client reset occurring.
      The Realm argument contains the local database state prior to client reset.
@@ -261,7 +255,16 @@ public typealias Provider = RLMIdentityProvider
      }
      ```
      */
-    public var notifyBeforeClientReset: ((Realm) -> Void)?
+    public var notifyBeforeClientReset: ((Realm) -> Void)? {
+        get {
+            return self._notifyBeforeClientReset
+        }
+        set {
+            self.asConfig().beforeClientReset = ObjectiveCSupport.convert(object: newValue)
+            self._notifyBeforeClientReset = newValue
+        }
+    }
+    private var _notifyBeforeClientReset: ((Realm) -> Void)?
     /**
      A callback which notifies after a client reset has occurred.
      The first realm argument contins the local database state prior to client reset.
@@ -274,7 +277,16 @@ public typealias Provider = RLMIdentityProvider
      }
      ```
      */
-    public var notifyAfterClientReset: ((Realm, Realm) -> Void)?
+    public var notifyAfterClientReset: ((Realm, Realm) -> Void)? {
+        get {
+            return self._notifyAfterClientReset
+        }
+        set {
+            self.asConfig().afterClientReset = ObjectiveCSupport.convert(object: newValue)
+            self._notifyAfterClientReset = newValue
+        }
+    }
+    private var _notifyAfterClientReset: ((Realm, Realm) -> Void)?
 
     /**
      Determines if the sync configuration is flexible sync or not
@@ -444,9 +456,6 @@ public extension User {
         return ObjectiveCSupport.convert(object: config)
     }
 
-    // !!!: Originally tried default value but the method signature would be ambiguous with
-    // !!!: func configuration<T: BSON>(partitionValue: T, cancelAsyncOpenOnNonFatalErrors: Bool = false) // Sync.swift : ~416
-    // TODO: Docs
     /**
      Create a sync configuration instance.
 
