@@ -338,7 +338,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let exp1 = expectation(description: "disable sync")
         RealmServer.shared.disableSync(appServerId: appServerId, syncServiceId: syncServiceId) { results in
             switch results {
-            case .success():
+            case .success:
                 exp1.fulfill()
             case .failure(let error):
                 XCTFail("Error: \(error.localizedDescription)")
@@ -352,7 +352,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let exp2 = expectation(description: "enable sync")
         RealmServer.shared.enableSync(appServerId: appServerId, syncServiceId: syncServiceId, syncServiceConfiguration: syncServiceConfig) { results in
             switch results {
-            case .success():
+            case .success:
                 exp2.fulfill()
             case .failure(let error):
                 XCTFail("Error: \(error.localizedDescription)")
@@ -368,7 +368,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         if !devModeEnabled {
             RealmServer.shared.enableDevMode(appServerId: appServerId, syncServiceId: syncServiceId, syncServiceConfiguration: syncServiceConfig) { results in
                 switch results {
-                case .success():
+                case .success:
                     exp3.fulfill()
                 case .failure(let error):
                     XCTFail("Error: \(error.localizedDescription)")
@@ -463,8 +463,6 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
     }
 
-    // !!!: test manual client reset with callbacks
-
     func testClientResetDiscardLocal() {
         // Set client reset callbacks
         do {
@@ -472,7 +470,6 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             let collection = setupMongoCollection(user: user, collectionName: "SwiftPerson")
             var configuration = user.configuration(partitionValue: #function, clientResetMode: .discardLocal)
 
-            // TODO: make the xcode api say "local" and "remote" in the placeholder
             configuration.syncConfiguration?.notifyBeforeClientReset = { local in
                 // Expect there to be 2 objects in the local realm before client reset
                 let results = local.objects(SwiftPerson.self)
@@ -500,10 +497,11 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 XCTAssert(john2.isEmpty)
             }
             configuration.objectTypes = [SwiftPerson.self]
+            XCTAssertNotNil(configuration.syncConfiguration?.notifyBeforeClientReset)
+            XCTAssertNotNil(configuration.syncConfiguration?.notifyAfterClientReset)
 
             // Seed 1 object, Upload to server
             try autoreleasepool {
-                // need to have an internal objc var and public var
                 let realm = try Realm(configuration: configuration)
                 try realm.write {
                     realm.add(SwiftPerson(firstName: "Paul", lastName: "M"))
@@ -539,7 +537,6 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                     }
                     requestCount += 1
                     sleep(UInt32(timeBetweenRequests)) // Wait between requests
-                    print("requests: \(requestCount), time passed: ~ \(requestCount * timeBetweenRequests)") // !!!: Delete this line
                 }
             }
 
@@ -595,7 +592,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
     // test for nil assignment of callbacks
     // Maybe delete this test since there is a lot of overlap and the test takes a long time to run?
-    func /*test*/ClientResetNoCallbacks() { // Test disabled until realm-core release
+    func /*test*/clientResetNoCallbacks() { // Test disabled until realm-core release
         app.syncManager.errorHandler = { (error, _) in
             guard let syncError = error as? SyncError else {
                  fatalError("Unexpected error type passed to sync error handler! \(error)")
@@ -649,7 +646,6 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                         break
                     }
                     requestCount += 1
-                    print("requests: \(requestCount), time passed: ~ \(requestCount * 2)") // !!!: Delete this line
                 }
             }
 
@@ -665,7 +661,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 }
             }
 
-            // TODO: add comments why this is here.
+            // After a sync reset, the sync history translator service needs time to resynthesize the new history from existing objects on the server
+            // The following creates a new realm with the same parition and wait for downloads to ensure the the new history has been created.
             try autoreleasepool {
                 var newConfig = user.configuration(partitionValue: #function)
                 newConfig.fileURL = RLMTestRealmURL()

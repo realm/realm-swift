@@ -139,7 +139,6 @@ struct AfterClientResetWrapper {
 }
 
 //// ???: I couldn't shorten this. I had to wrapper.block on it's own line. Not exactly clear why.
-//// TODO: Unify names?
 - (void)setBeforeClientReset:(RLMClientResetBeforeBlock)beforeClientReset {
     if (!beforeClientReset) {
         _config->notify_before_client_reset = nullptr;
@@ -147,7 +146,6 @@ struct AfterClientResetWrapper {
         _config->notify_before_client_reset = BeforeClientResetWrapper{beforeClientReset};
     }
 }
-
 
 - (RLMClientResetAfterBlock)afterClientReset {
     if (_config->notify_after_client_reset) {

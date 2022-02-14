@@ -1463,6 +1463,37 @@ static NSString *randomEmail() {
     XCTAssertTrue([NSFileManager.defaultManager fileExistsAtPath:pathValue]);
 }
 
+- (void)testSetClientResetMode {
+    RLMUser *user = [self userForTest:_cmd];
+    NSString *partitionValue = NSStringFromSelector(_cmd);
+    RLMRealmConfiguration *config = [user configurationWithPartitionValue:partitionValue clientResetMode:RLMClientResetModeDiscardLocal];
+    XCTAssertEqual(config.syncConfiguration.clientResetMode, RLMClientResetModeDiscardLocal);
+
+    // Default is manual
+    config = [user configurationWithPartitionValue:partitionValue];
+    XCTAssertEqual(config.syncConfiguration.clientResetMode, RLMClientResetModeManual);
+}
+// !!!: This test fails. Why are the swift callbacks set but not objc?
+// !!!: testClientResetMode also is being set.
+- (void)/*testS*/etClientResetCallbacks {
+    RLMUser *user = [self userForTest:_cmd];
+    NSString *partitionValue = NSStringFromSelector(_cmd);
+    RLMRealmConfiguration *config = [user configurationWithPartitionValue:partitionValue clientResetMode:RLMClientResetModeDiscardLocal];
+
+    XCTAssertNil(config.syncConfiguration.beforeClientReset);
+    XCTAssertNil(config.syncConfiguration.beforeClientReset);
+    config.syncConfiguration.beforeClientReset = ^(RLMRealm *local __unused) {
+        NSLog(@"some block");
+    };
+    config.syncConfiguration.afterClientReset = ^(RLMRealm *local __unused, RLMRealm *remote __unused) {
+        NSLog(@"some block");
+    };
+    XCTAssertNotNil(config.syncConfiguration.beforeClientReset);
+    XCTAssertNotNil(config.syncConfiguration.afterClientReset);
+}
+
+// TODO: Set callbacks with manual mode, throw error
+
 // TODO: add setter/getter tests for objc, at least
 
 #pragma mark - Progress Notifications
