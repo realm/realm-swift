@@ -741,7 +741,7 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     }
 }
 
-- (void)commitAsyncWriteTransaction {
+- (RLMAsyncTransactionId)commitAsyncWriteTransaction {
     try {
         return _realm->async_commit_transaction();
     }

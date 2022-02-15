@@ -1508,6 +1508,8 @@
 
     [self dispatchAsync:^{
         RLMRealm *realm = [RLMRealm defaultRealmForQueue:self.bgQueue];
+        [realm beginAsyncWriteTransaction:^{ sleep(10); }];
+        [realm beginAsyncWriteTransaction:^{ sleep(10); }];
         RLMAsyncTransactionId asyncTransactionId = [realm beginAsyncWriteTransaction:^{
             [realm createObject:StringObject.className withValue:@[@"string"]];
             [realm commitAsyncWriteTransaction:^(NSError *error) {
