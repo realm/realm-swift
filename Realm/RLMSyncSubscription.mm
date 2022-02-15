@@ -221,11 +221,11 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
             return RLMSyncSubscriptionStateComplete;
         case realm::sync::SubscriptionSet::State::Error:
             return RLMSyncSubscriptionStateError;
-#ifdef REALM_ASYNC_WRITES
+#if REALM_ASYNC_WRITES && DEBUG
         case realm::sync::SubscriptionSet::State::Superseded:
 #else
         case realm::sync::SubscriptionSet::State::Superceded:
-#endif // REALM_ASYNC_WRITES
+#endif // REALM_ASYNC_WRITES && DEBUG
             return RLMSyncSubscriptionStateSuperseded;
     }
 }

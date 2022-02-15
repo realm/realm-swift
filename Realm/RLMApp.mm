@@ -42,13 +42,13 @@ namespace {
     public:
         CocoaNetworkTransport(id<RLMNetworkTransport> transport) : m_transport(transport) {};
 
-#ifdef REALM_ASYNC_WRITES
+#if REALM_ASYNC_WRITES && DEBUG
         void send_request_to_server(app::Request&& request,
                                     util::UniqueFunction<void(const app::Response&)>&& completion) override {
 #else
         void send_request_to_server(const app::Request request,
                                     std::function<void(const app::Response)> completion) override {
-#endif // #ifdef REALM_ASYNC_WRITES
+#endif // REALM_ASYNC_WRITES && DEBUG
             // Convert the app::Request to an RLMRequest
             auto rlmRequest = [RLMRequest new];
             rlmRequest.url = @(request.url.data());
