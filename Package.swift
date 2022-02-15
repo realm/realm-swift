@@ -126,7 +126,7 @@ let package = Package(
     ],
     dependencies: [
 //        .package(name: "RealmDatabase", url: "https://github.com/realm/realm-core", .exact(Version(coreVersionStr)!))
-        .package(name: "RealmDatabase", url: "https://github.com/realm/realm-core", Package.Dependency.Requirement.branchItem("tg/async-write"))
+        .package(name: "RealmDatabase", url: "https://github.com/realm/realm-core", .branch("tg/async-write"))
     ],
     targets: [
       .target(
