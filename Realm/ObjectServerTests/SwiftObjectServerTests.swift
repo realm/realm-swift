@@ -504,7 +504,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             try autoreleasepool {
                 let realm = try Realm(configuration: configuration)
                 waitForDownloads(for: realm)
-                XCTAssertEqual(realm.objects(SwiftPerson.self).count, 0, "Precondition failure: Realm should be empty.")
+                XCTAssertEqual(realm.objects(SwiftPerson.self).count, 0, "Precondition failure: Realm should be empty.") // Tear down may have not been run if test was cancelled.
                 try realm.write {
                     realm.add(SwiftPerson(firstName: "Paul", lastName: "M"))
                 }

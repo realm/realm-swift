@@ -246,8 +246,8 @@ public typealias Provider = RLMIdentityProvider
     public let clientResetMode: ClientResetMode
 
     /**
-     A callback which notifies prior to  prior to a client reset occurring.
-     The Realm argument contains the local database state prior to client reset.
+     A callback which notifies prior to a client reset occurring.
+     The `Realm` argument contains a frozen copy of the local database state prior to client reset.
      ```
      configuration.syncConfiguration?.notifyBeforeClientReset = { localRealm in
         let results = localRealm.objects(MyClass.self)
@@ -267,12 +267,12 @@ public typealias Provider = RLMIdentityProvider
     private var _notifyBeforeClientReset: ((Realm) -> Void)?
     /**
      A callback which notifies after a client reset has occurred.
-     The first realm argument contins the local database state prior to client reset.
-     The second argument contains the server database state prior to client reset.
+     The first `Realm` argument contains a frozen copy of the local database state prior to client reset.
+     The second `Realm` argument contains the local database state after client reset.
      ```
-     configuration.syncConfiguration?.notifyBeforeClientReset = { localRealm, remoteRealm in
-        let localResults = localRealm.objects(MyClass.self)
-        let remoteResults = remoteRealm.objects(MyClass.self)
+     configuration.syncConfiguration?.notifyBeforeClientReset = { beforeStateFrozen, afterState in
+        let beforeStateFrozen = beforeStateFrozen.objects(MyClass.self)
+        let afterState = afterState.objects(MyClass.self)
         ...
      }
      ```

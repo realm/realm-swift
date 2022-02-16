@@ -31,10 +31,21 @@ NS_ASSUME_NONNULL_BEGIN
  - see: https://docs.mongodb.com/realm/sync/error-handling/client-resets/
 */
 typedef NS_ENUM(NSUInteger, RLMClientResetMode) {
-    /// The SDK will create a back up of unsynced data.The client reset error handler may be manually overwritten to
-    /// transfer data from the backup copy to a new destination. Otherwise no effort to transfer the data from the backup is carried out.
+    /// The local copy of the Realm is copied into a recovery
+    /// directory for safekeeping, and then deleted from the original location. The next time
+    /// the Realm for that partition value is opened, the Realm will automatically be re-downloaded from
+    /// MongoDB Realm, and can be used as normal.
+
+    /// Data written to the Realm after the local copy of the Realm diverged from the backup
+    /// remote copy will be present in the local recovery copy of the Realm file. The
+    /// re-downloaded Realm will initially contain only the data present at the time the Realm
+    /// was backed up on the server.
+    ///
+    /// - see: `SyncError.clientResetInfo()` for more information on accessing the recovery directory.
     RLMClientResetModeManual,
-    /// The SDK will overwrite the client database with the server database. Object accessors remain bound so Realm notifications are not disrupted.
+    /// All unsynchronized local changes are automatically discarded and the local state is
+    /// automatically reverted to the most recent state from the server. Unsynchronized changes
+    /// can then be recovered in the post-client-reset callback block.
     RLMClientResetModeDiscardLocal
 };
 
@@ -81,7 +92,7 @@ typedef void(^RLMClientResetAfterBlock)(RLMRealm * _Nonnull, RLMRealm * _Nonnull
  A callback which notifies prior to  prior to a client reset occurring.
  - see: `RLMClientResetBeforeBlock`
  */
-@property (nonatomic, nullable) RLMClientResetBeforeBlock  beforeClientReset;
+@property (nonatomic, nullable) RLMClientResetBeforeBlock beforeClientReset;
 
 /**
  A callback which notifies after a client reset has occurred.

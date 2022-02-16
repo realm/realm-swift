@@ -46,6 +46,9 @@ NSString *const kRLMSyncUnderlyingErrorKey      = @"underlying_error";
 
 using namespace realm;
 
+static_assert((int)RLMClientResetModeManual == (int)realm::ClientResyncMode::Manual);
+static_assert((int)RLMClientResetModeDiscardLocal == (int)realm::ClientResyncMode::DiscardLocal);
+
 SyncSessionStopPolicy translateStopPolicy(RLMSyncStopPolicy stopPolicy) {
     switch (stopPolicy) {
         case RLMSyncStopPolicyImmediately:              return SyncSessionStopPolicy::Immediately;
@@ -60,22 +63,6 @@ RLMSyncStopPolicy translateStopPolicy(SyncSessionStopPolicy stop_policy) {
         case SyncSessionStopPolicy::Immediately:            return RLMSyncStopPolicyImmediately;
         case SyncSessionStopPolicy::LiveIndefinitely:       return RLMSyncStopPolicyLiveIndefinitely;
         case SyncSessionStopPolicy::AfterChangesUploaded:   return RLMSyncStopPolicyAfterChangesUploaded;
-    }
-    REALM_UNREACHABLE();
-}
-
-RLMClientResetMode translateClientResetMode(ClientResyncMode mode) {
-    switch (mode) {
-        case ClientResyncMode::Manual:                      return RLMClientResetModeManual;
-        case ClientResyncMode::DiscardLocal:                return RLMClientResetModeDiscardLocal;
-    }
-    REALM_UNREACHABLE();
-}
-
-ClientResyncMode translateClientResetMode(RLMClientResetMode mode) {
-    switch (mode) {
-        case RLMClientResetModeManual:                      return ClientResyncMode::Manual;
-        case RLMClientResetModeDiscardLocal:                return ClientResyncMode::DiscardLocal;
     }
     REALM_UNREACHABLE();
 }

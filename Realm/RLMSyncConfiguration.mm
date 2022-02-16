@@ -124,13 +124,13 @@ struct AfterClientResetWrapper {
 }
 
 - (RLMClientResetMode)clientResetMode {
-    return translateClientResetMode(_config->client_resync_mode);
+    return RLMClientResetMode(_config->client_resync_mode);
 }
 
 - (RLMClientResetBeforeBlock)beforeClientReset {
     if (_config->notify_before_client_reset) {
-        auto wrapper = *_config->notify_before_client_reset.target<BeforeClientResetWrapper>();
-        return wrapper.block;
+        auto wrapper = _config->notify_before_client_reset.target<BeforeClientResetWrapper>();
+        return wrapper->block;
     } else {
         return nil;
     }
@@ -148,8 +148,8 @@ struct AfterClientResetWrapper {
 
 - (RLMClientResetAfterBlock)afterClientReset {
     if (_config->notify_after_client_reset) {
-        auto wrapper = *_config->notify_after_client_reset.target<AfterClientResetWrapper>(); // here
-        return wrapper.block;
+        auto wrapper = _config->notify_after_client_reset.target<AfterClientResetWrapper>(); // here
+        return wrapper->block;
     } else {
         return nil;
     }
@@ -330,7 +330,7 @@ struct AfterClientResetWrapper {
             });
         };
         // Default to manual mode
-        _config->client_resync_mode = (clientResetMode) ? translateClientResetMode(clientResetMode) : realm::ClientResyncMode::Manual;
+        _config->client_resync_mode = realm::ClientResyncMode(clientResetMode);
         self.beforeClientReset = beforeResetBlock;
         self.afterClientReset = afterResetBlock;
 
