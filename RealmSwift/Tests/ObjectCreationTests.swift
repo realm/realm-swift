@@ -882,12 +882,12 @@ class ObjectCreationTests: TestCase {
         XCTAssertEqual(realm.objects(EmbeddedParentObject.self).count, 2)
     }
 
-    func testCreateEmbeddedFromManagedObjectInSameRealmCopyingByAssign() {
+    func testCreateEmbeddedFromManagedObjectCopyInSameRealmCopyingByAssign() {
         let realm = try! Realm()
         try! realm.write {
             let parent = realm.create(EmbeddedParentObject.self, value: ["object": ["value": 5]])
             let copy = EmbeddedParentObject()
-            copy.object = parent.object
+            copy.object = EmbeddedTreeObject1(value: parent.object!)
             realm.add(copy)
 
             XCTAssertNotEqual(parent, copy)
@@ -895,6 +895,20 @@ class ObjectCreationTests: TestCase {
         }
         XCTAssertEqual(realm.objects(EmbeddedParentObject.self).count, 2)
     }
+
+//    func testCreateEmbeddedFromManagedObjectInSameRealmCopyingByAssign() {
+//        let realm = try! Realm()
+//        try! realm.write {
+//            let parent = realm.create(EmbeddedParentObject.self, value: ["object": ["value": 5]])
+//            let copy = EmbeddedParentObject()
+//            copy.object = parent.object
+//            XCTAssertThrowsError(realm.add(copy))
+//
+//            XCTAssertNotEqual(parent, copy)
+//            XCTAssertEqual(copy.object!.value, 5)
+//        }
+//        XCTAssertEqual(realm.objects(EmbeddedParentObject.self).count, 2)
+//    }
 
     func testCreateEmbeddedFromManagedObjectInDifferentRealm() {
         let realmA = realmWithTestPath()
