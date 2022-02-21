@@ -884,14 +884,14 @@ class ObjectCreationTests: TestCase {
             XCTAssertEqual(copyA.object!.value, 1)
             XCTAssertEqual(copyA.array.count, 1)
             XCTAssertEqual(copyA.map.values.count, 1)
-            
+
             let copyB = EmbeddedParentObject()
             copyB.object = EmbeddedTreeObject1(value: parent.object!)
             realm.add(copyB)
 
             XCTAssertNotEqual(parent, copyB)
             XCTAssertEqual(copyB.object!.value, 1)
-            
+
             let copyC = EmbeddedParentObject()
             copyC.object = parent.object
             assertThrows(realm.add(copyC), "Cannot set a link to an existing managed embedded object")
