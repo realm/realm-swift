@@ -869,46 +869,35 @@ class ObjectCreationTests: TestCase {
         realm.cancelWrite()
     }
 
-    func testCreateEmbeddedFromManagedObjectInSameRealmCopyingByAdd() {
+    func testCopyEmbeddedObjectFromManagedObjectInSameRealm() {
         let realm = try! Realm()
         try! realm.write {
-            let parent = realm.create(EmbeddedParentObject.self, value: ["object": ["value": 5]])
-            let copy = EmbeddedParentObject(value: parent)
-            realm.add(copy)
+            let parent = realm.create(EmbeddedParentObject.self, value: [
+                "object": ["value": 1],
+                "array": [[2]],
+                "map": ["some": [3]]
+            ])
+            let copyA = EmbeddedParentObject(value: parent)
+            realm.add(copyA)
 
-            XCTAssertNotEqual(parent, copy)
-            XCTAssertEqual(copy.object!.value, 5)
+            XCTAssertNotEqual(parent, copyA)
+            XCTAssertEqual(copyA.object!.value, 1)
+            XCTAssertEqual(copyA.array.count, 1)
+            XCTAssertEqual(copyA.map.values.count, 1)
+            
+            let copyB = EmbeddedParentObject()
+            copyB.object = EmbeddedTreeObject1(value: parent.object!)
+            realm.add(copyB)
+
+            XCTAssertNotEqual(parent, copyB)
+            XCTAssertEqual(copyB.object!.value, 1)
+            
+            let copyC = EmbeddedParentObject()
+            copyC.object = parent.object
+            assertThrows(realm.add(copyC), "Cannot set a link to an existing managed embedded object")
+            realm.cancelWrite()
         }
-        XCTAssertEqual(realm.objects(EmbeddedParentObject.self).count, 2)
     }
-
-    func testCreateEmbeddedFromManagedObjectCopyInSameRealmCopyingByAssign() {
-        let realm = try! Realm()
-        try! realm.write {
-            let parent = realm.create(EmbeddedParentObject.self, value: ["object": ["value": 5]])
-            let copy = EmbeddedParentObject()
-            copy.object = EmbeddedTreeObject1(value: parent.object!)
-            realm.add(copy)
-
-            XCTAssertNotEqual(parent, copy)
-            XCTAssertEqual(copy.object!.value, 5)
-        }
-        XCTAssertEqual(realm.objects(EmbeddedParentObject.self).count, 2)
-    }
-
-//    func testCreateEmbeddedFromManagedObjectInSameRealmCopyingByAssign() {
-//        let realm = try! Realm()
-//        try! realm.write {
-//            let parent = realm.create(EmbeddedParentObject.self, value: ["object": ["value": 5]])
-//            let copy = EmbeddedParentObject()
-//            copy.object = parent.object
-//            XCTAssertThrowsError(realm.add(copy))
-//
-//            XCTAssertNotEqual(parent, copy)
-//            XCTAssertEqual(copy.object!.value, 5)
-//        }
-//        XCTAssertEqual(realm.objects(EmbeddedParentObject.self).count, 2)
-//    }
 
     func testCreateEmbeddedFromManagedObjectInDifferentRealm() {
         let realmA = realmWithTestPath()

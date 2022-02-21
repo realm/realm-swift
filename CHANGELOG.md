@@ -1325,6 +1325,7 @@ no functional changes from 10.24.0.
 
 ### Fixed
 
+* Copying an embedded object to an unmanaged object will not throw ([#6921](https://github.com/realm/realm-cocoa/issues/6921)
 * Add support of arm64 in Carthage build ([#7154](https://github.com/realm/realm-cocoa/issues/7154)
 * Adding missing support for `IN` queries to primitives types on Type Safe Queries.
   ```swift
