@@ -268,7 +268,7 @@ using namespace realm;
         args.push_back(RLMConvertRLMBSONToBson(argument));
     }
 
-#if REALM_ASYNC_WRITES && DEBUG
+#if REALM_ASYNC_WRITES && REALM_SPM
     _app._realmApp->call_function(_user, std::string(name.UTF8String), args,
                                   [completionBlock](util::Optional<bson::Bson> response, util::Optional<app::AppError> error) {
 #else
@@ -276,7 +276,7 @@ using namespace realm;
                                   std::string(name.UTF8String),
                                   args, [completionBlock](util::Optional<app::AppError> error,
                                                           util::Optional<bson::Bson> response) {
-#endif // REALM_ASYNC_WRITES && DEBUG
+#endif // REALM_ASYNC_WRITES && REALM_SPM
         if (error) {
             return completionBlock(nil, RLMAppErrorToNSError(*error));
         }
