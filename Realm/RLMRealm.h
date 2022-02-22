@@ -610,8 +610,13 @@ typedef void (^RLMNotificationBlock)(RLMNotification notification, RLMRealm *rea
  performed on a dedicated background thread. This can be used regardless of if
  the write transaction was begun with `beginWriteTransaction` or
  `beginAsyncWriteTransaction`.
+ 
+ @return An id identifying the asynchronous transaction commit can be passed to
+         `cancelAsyncTransaction:` prior to the completion block being called
+         to cancel the pending invocation of the block. Note that this does
+         *not* cancel the commit itself.
 */
-- (void)commitAsyncWriteTransaction;
+- (RLMAsyncTransactionId)commitAsyncWriteTransaction;
 
 /**
  Cancels a queued block for an asynchronous transaction.
