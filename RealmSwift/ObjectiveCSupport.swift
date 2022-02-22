@@ -164,7 +164,6 @@ import Realm
         }
     }
 
-    // ???: Should the swift blocks be a named type?
     /// Convert a RealmSwift before block to an RLMClientResetBeforeBlock
     public static func convert(object: ((Realm) -> Void)?) -> RLMClientResetBeforeBlock? {
         guard let object = object else {

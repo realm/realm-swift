@@ -247,46 +247,42 @@ public typealias Provider = RLMIdentityProvider
 
     /**
      A callback which notifies prior to a client reset occurring.
-     The `Realm` argument contains a frozen copy of the local database state prior to client reset.
+     The `Realm` argument contains a frozen copy of the Realm state prior to client reset.
      ```
-     configuration.syncConfiguration?.notifyBeforeClientReset = { localRealm in
-        let results = localRealm.objects(MyClass.self)
-        ...
+     user.configuration(paritionValue:"myPartition", clientResetMode: mode) { beforeRealm in
+        var recoveryConfig = Realm.Configuration()
+        recoveryConfig.fileURL = myRecoveryPath
+        do {
+            beforeRealm.writeCopy(configuration: recoveryConfig)
+            // The copied realm could be used later for recovery, debugging, reporting, etc.
+        } catch {
+            // handle error
+        }
+
      }
      ```
      */
-    public var notifyBeforeClientReset: ((Realm) -> Void)? {
-        get {
-            return self._notifyBeforeClientReset
-        }
-        set {
-            self.asConfig().beforeClientReset = ObjectiveCSupport.convert(object: newValue)
-            self._notifyBeforeClientReset = newValue
-        }
-    }
-    private var _notifyBeforeClientReset: ((Realm) -> Void)?
+    public let notifyBeforeClientReset: ((Realm) -> Void)?
+
     /**
      A callback which notifies after a client reset has occurred.
-     The first `Realm` argument contains a frozen copy of the local database state prior to client reset.
-     The second `Realm` argument contains the local database state after client reset.
+     The first `Realm` argument contains a frozen copy of the local Realm state prior to client reset.
+     The second `Realm` argument contains the Realm state after client reset.
      ```
-     configuration.syncConfiguration?.notifyBeforeClientReset = { beforeStateFrozen, afterState in
-        let beforeStateFrozen = beforeStateFrozen.objects(MyClass.self)
-        let afterState = afterState.objects(MyClass.self)
-        ...
+     user.configuration(paritionValue:"myPartition", clientResetMode: mode) { beforeRealm, afterRealm in
+        // This block could be used to add custom recovery logic, back-up a realm file, send reporting, etc.
+        for object in before.objects(myClass.self) {
+            let res = after.objects(myClass.self)
+            if (res.filter("primaryKey == %@", object.primaryKey).first != nil) {
+                // ...custom recovery logic...
+            } else {
+                // ...custom recovery logic...
+            }
+        }
      }
      ```
      */
-    public var notifyAfterClientReset: ((Realm, Realm) -> Void)? {
-        get {
-            return self._notifyAfterClientReset
-        }
-        set {
-            self.asConfig().afterClientReset = ObjectiveCSupport.convert(object: newValue)
-            self._notifyAfterClientReset = newValue
-        }
-    }
-    private var _notifyAfterClientReset: ((Realm, Realm) -> Void)?
+    public let notifyAfterClientReset: ((Realm, Realm) -> Void)?
 
     /**
      Determines if the sync configuration is flexible sync or not
@@ -461,6 +457,9 @@ public extension User {
 
      - parameter partitionValue: The `BSON` value the Realm is partitioned on.
      - parameter clientResetMode: Determines file recovery behavior during a client reset.
+     - parameter notifyBeforeClientReset: A callback which notifies prior to a client reset occurring. See: `notifyBeforeClientReset`.
+     - parameter notifyAfterClientReset: A callback which notifies after a client reset has occurred. See: `notifyAfterClientReset`.
+
 
      Additional settings can be optionally specified. Descriptions of these
      settings follow.
@@ -470,9 +469,14 @@ public extension User {
 
      - warning: NEVER disable SSL validation for a system running in production.
      */
-    func configuration<T: BSON>(partitionValue: T, clientResetMode: ClientResetMode) -> Realm.Configuration {
+    func configuration<T: BSON>(partitionValue: T,
+                                clientResetMode: ClientResetMode,
+                                notifyBeforeClientReset: ((Realm) -> Void)? = nil,
+                                notifyAfterClientReset: ((Realm, Realm) -> Void)? = nil) -> Realm.Configuration {
         let config = self.__configuration(withPartitionValue: ObjectiveCSupport.convert(object: AnyBSON(partitionValue)),
-                                          clientResetMode: clientResetMode)
+                                          clientResetMode: clientResetMode,
+                                          notifyBeforeReset: ObjectiveCSupport.convert(object: notifyBeforeClientReset),
+                                          notifyAfterReset: ObjectiveCSupport.convert(object: notifyAfterClientReset))
         return ObjectiveCSupport.convert(object: config)
     }
 

@@ -90,13 +90,13 @@ using namespace realm;
     return [self configurationWithPartitionValue:partitionValue
                                  clientResetMode:clientResetMode
                                notifyBeforeReset:nil
-                                notifyafterReset:nil];
+                                notifyAfterReset:nil];
 }
 
 - (RLMRealmConfiguration *)configurationWithPartitionValue:(nullable id<RLMBSON>)partitionValue
                                            clientResetMode:(RLMClientResetMode)clientResetMode
                                          notifyBeforeReset:(nullable RLMClientResetBeforeBlock)beforeResetBlock
-                                          notifyafterReset:(nullable RLMClientResetAfterBlock)afterResetBlock {
+                                          notifyAfterReset:(nullable RLMClientResetAfterBlock)afterResetBlock {
     auto syncConfig = [[RLMSyncConfiguration alloc] initWithUser:self
                                                   partitionValue:partitionValue
                                                       stopPolicy:RLMSyncStopPolicyImmediately

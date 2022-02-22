@@ -46,22 +46,25 @@ typedef NS_ENUM(NSUInteger, RLMClientResetMode) {
     /// All unsynchronized local changes are automatically discarded and the local state is
     /// automatically reverted to the most recent state from the server. Unsynchronized changes
     /// can then be recovered in the post-client-reset callback block.
+    ///
+    /// If RLMClientResetModeDiscardLocal is enabled but the client reset operation is unable to complete
+    /// then the client reset process reverts to manual mode. Example) During a destructive schema change this
+    /// mode will fail and invoke the manual client reset handler.
     RLMClientResetModeDiscardLocal
 };
 
 /**
  A block type used to report before a client reset will occur.
- The RlMRealm argument contains the local database state prior to client reset.
+ The `beforeFrozen` is a frozen copy of the local state prior to client reset.
  */
-typedef void(^RLMClientResetBeforeBlock)(RLMRealm * _Nonnull);
+typedef void(^RLMClientResetBeforeBlock)(RLMRealm * _Nonnull beforeFrozen);
 
-// ???: Is there really no way to label these arguments?
 /**
  A block type used to report after a client reset occurred.
- The first RLMRealm argument contins the local database state prior to client reset.
- The second RLMRealm argument contains the server database state prior to client reset.
+ The `beforeFrozen` argument is a frozen copy of the local state prior to client reset.
+ The `after` argument contains the local database state after the client reset occurred.
  */
-typedef void(^RLMClientResetAfterBlock)(RLMRealm * _Nonnull, RLMRealm * _Nonnull);
+typedef void(^RLMClientResetAfterBlock)(RLMRealm * _Nonnull beforeFrozen, RLMRealm * _Nonnull after);
 
 /**
  A configuration object representing configuration state for a Realm which is intended to sync with a Realm Object

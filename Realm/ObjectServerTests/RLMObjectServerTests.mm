@@ -1473,22 +1473,26 @@ static NSString *randomEmail() {
     config = [user configurationWithPartitionValue:partitionValue];
     XCTAssertEqual(config.syncConfiguration.clientResetMode, RLMClientResetModeManual);
 }
-// !!!: This test fails. Why are they set in swift but not objc?
-// !!!: testClientResetMode is being set correctly.
-- (void)/*testS*/etClientResetCallbacks {
+
+- (void)testSetClientResetCallbacks {
     RLMUser *user = [self userForTest:_cmd];
     NSString *partitionValue = NSStringFromSelector(_cmd);
     RLMRealmConfiguration *config = [user configurationWithPartitionValue:partitionValue clientResetMode:RLMClientResetModeDiscardLocal];
     XCTAssertNil(config.syncConfiguration.beforeClientReset);
     XCTAssertNil(config.syncConfiguration.beforeClientReset);
-    config.syncConfiguration.beforeClientReset = ^(RLMRealm *local __unused) {
+
+    RLMClientResetBeforeBlock beforeBlock = ^(RLMRealm *local __unused) {
         NSLog(@"some block");
     };
-    config.syncConfiguration.afterClientReset = ^(RLMRealm *local __unused, RLMRealm *remote __unused) {
+    RLMClientResetAfterBlock afterBlock = ^(RLMRealm *before __unused, RLMRealm *after __unused) {
         NSLog(@"some block");
     };
-    XCTAssertNotNil(config.syncConfiguration.beforeClientReset);
-    XCTAssertNotNil(config.syncConfiguration.afterClientReset);
+    RLMRealmConfiguration *config2 = [user configurationWithPartitionValue:partitionValue
+                                                           clientResetMode:RLMClientResetModeDiscardLocal
+                                                         notifyBeforeReset:beforeBlock
+                                                          notifyAfterReset:afterBlock];
+    XCTAssertNotNil(config2.syncConfiguration.beforeClientReset);
+    XCTAssertNotNil(config2.syncConfiguration.afterClientReset);
 }
 
 #pragma mark - Progress Notifications

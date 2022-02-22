@@ -119,6 +119,20 @@ NS_ASSUME_NONNULL_BEGIN
                                            clientResetMode:(RLMClientResetMode)clientResetMode NS_REFINED_FOR_SWIFT;
 
 /**
+ Create a partition-based sync configuration instance for the given partition value.
+
+ @param partitionValue The `RLMBSON` value the Realm is partitioned on.
+ @param clientResetMode Determines file recovery behavior in the event of a client reset.
+                        See: https://docs.mongodb.com/realm/sync/error-handling/client-resets/
+ @param notifyBeforeReset A callback which notifies prior to a client reset occurring. See: `RLMClientResetBeforeBlock`
+ @param notifyAfterReset A callback which notifies after a client reset has occurred. See: `RLMClientResetAfterBlock`
+ */
+- (RLMRealmConfiguration *)configurationWithPartitionValue:(nullable id<RLMBSON>)partitionValue
+                                           clientResetMode:(RLMClientResetMode)clientResetMode
+                                         notifyBeforeReset:(nullable RLMClientResetBeforeBlock)beforeResetBlock
+                                          notifyAfterReset:(nullable RLMClientResetAfterBlock)afterResetBlock NS_REFINED_FOR_SWIFT;
+
+/**
  Create a flexible sync configuration instance, which can be used to open a Realm that
  supports flexible sync.
 
