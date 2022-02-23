@@ -802,14 +802,18 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
 - (RLMAsyncTransactionId)asyncTransactionWithBlock:(void(^)())block onComplete:(nullable void(^)(NSError *))completionBlock {
     return [self beginAsyncWriteTransaction:^{
         block();
-        [self commitAsyncWriteTransaction:completionBlock];
+        if (_realm->is_in_transaction()) {
+            [self commitAsyncWriteTransaction:completionBlock];
+        }
     }];
 }
 
 - (RLMAsyncTransactionId)asyncTransactionWithBlock:(void(^)())block {
     return [self beginAsyncWriteTransaction:^{
         block();
-        [self commitAsyncWriteTransaction];
+        if (_realm->is_in_transaction()) {
+            [self commitAsyncWriteTransaction];
+        }
     }];
 }
 
