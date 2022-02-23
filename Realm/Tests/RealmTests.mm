@@ -1799,7 +1799,7 @@
     XCTAssertEqual(0, [StringObject allObjects].count);
 }
 
-- (void)testAsyncTransactionFromSyncTransaction {
+- (void)FIXME_testAsyncTransactionFromSyncTransaction {
     XCTestExpectation *transaction1 = [self expectationWithDescription:@"async transaction 1 complete"];
 
     [self dispatchAsync:^{
