@@ -11,7 +11,9 @@ def minimum_version(major)
 end
 
 targets = {
-  'docs' => latest_only,
+  # Switch back to latest_only once jazzy supports Swift 5.6
+  # https://github.com/realm/jazzy/pull/1298
+  'docs' => ->(v) { v == "13.2.1" },
   'swiftlint' => latest_only,
 
   'osx' => all,

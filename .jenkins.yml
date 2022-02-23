@@ -53,7 +53,7 @@ exclude:
   - xcode_version: 13.1
     target: docs
 
-  - xcode_version: 13.2.1
+  - xcode_version: 13.3
     target: docs
 
   - xcode_version: 12.4
