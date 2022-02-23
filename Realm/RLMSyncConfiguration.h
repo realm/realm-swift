@@ -41,7 +41,7 @@ typedef NS_ENUM(NSUInteger, RLMClientResetMode) {
     /// re-downloaded Realm will initially contain only the data present at the time the Realm
     /// was backed up on the server.
     ///
-    /// - see: `SyncError.clientResetInfo()` for more information on accessing the recovery directory.
+    /// - see: `rlmSync_clientResetBackedUpRealmPath` or `SyncError.clientResetInfo()` for more information on accessing the recovery directory.
     RLMClientResetModeManual,
     /// All unsynchronized local changes are automatically discarded and the local state is
     /// automatically reverted to the most recent state from the server. Unsynchronized changes

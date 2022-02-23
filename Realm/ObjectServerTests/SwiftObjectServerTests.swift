@@ -33,11 +33,8 @@ import RealmTestSupport
 @available(OSX 10.14, *)
 @objc(SwiftObjectServerTests)
 class SwiftObjectServerTests: SwiftSyncTestCase {
-    func setupMongoCollection(user: User? = nil, collectionName: String) -> MongoCollection {
-        var unwrapped: User
-        unwrapped = (user != nil) ? user! : try! logInUser(for: basicCredentials())
-
-        let mongoClient = unwrapped.mongoClient("mongodb1")
+    func setupMongoCollection(user: User, collectionName: String) -> MongoCollection {
+        let mongoClient = user.mongoClient("mongodb1")
         let database = mongoClient.database(named: "test_data")
         let collection = database.collection(withName: collectionName)
         removeAllFromCollection(collection)
@@ -335,11 +332,11 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
     func waitForSyncDisabled(appServerId: String, syncServiceId: String) {
         XCTAssertTrue(try RealmServer.shared.syncEnabled(appServerId: appServerId, syncServiceId: syncServiceId))
-        let exp1 = expectation(description: "disable sync")
+        let exp = expectation(description: "disable sync")
         RealmServer.shared.disableSync(appServerId: appServerId, syncServiceId: syncServiceId) { results in
             switch results {
             case .success:
-                exp1.fulfill()
+                exp.fulfill()
             case .failure(let error):
                 XCTFail("Error: \(error.localizedDescription)")
             }
@@ -349,11 +346,11 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     }
 
     func waitForSyncEnabled(appServerId: String, syncServiceId: String, syncServiceConfig: [String: Any]) {
-        let exp2 = expectation(description: "enable sync")
+        let exp = expectation(description: "enable sync")
         RealmServer.shared.enableSync(appServerId: appServerId, syncServiceId: syncServiceId, syncServiceConfiguration: syncServiceConfig) { results in
             switch results {
             case .success:
-                exp2.fulfill()
+                exp.fulfill()
             case .failure(let error):
                 XCTFail("Error: \(error.localizedDescription)")
             }
@@ -364,12 +361,12 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
     func waitForDevModeEnabled(appServerId: String, syncServiceId: String, syncServiceConfig: [String: Any]) {
         let devModeEnabled = try! RealmServer.shared.devModeEnabled(appServerId: appServerId, syncServiceId: syncServiceId)
-        let exp3 = expectation(description: "enable dev mode")
+        let exp = expectation(description: "enable dev mode")
         if !devModeEnabled {
             RealmServer.shared.enableDevMode(appServerId: appServerId, syncServiceId: syncServiceId, syncServiceConfiguration: syncServiceConfig) { results in
                 switch results {
                 case .success:
-                    exp3.fulfill()
+                    exp.fulfill()
                 case .failure(let error):
                     XCTFail("Error: \(error.localizedDescription)")
                 }
@@ -470,7 +467,9 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             let collection = setupMongoCollection(user: user, collectionName: "SwiftPerson")
 
             // Define the blocks that will be passed into the sync configuration initializer.
+            let beforeExpectation = expectation(description: "before client reset block called")
             let beforeClientResetBlock: (Realm) -> Void = { local in
+                beforeExpectation.fulfill()
                 let results = local.objects(SwiftPerson.self)
                 XCTAssertEqual(results.count, 2)
                 let paul = results.filter("firstName == 'Paul'")
@@ -478,7 +477,9 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 XCTAssertNotNil(paul)
                 XCTAssertNotNil(john)
             }
+            let afterExpectation = expectation(description: "after client reset block called")
             let afterClientResetBlock: (Realm, Realm) -> Void = { before, after in
+                afterExpectation.fulfill()
                 // Expect the local realm that was overwritten to have had 2 objects before it was overwritten.
                 let results = before.objects(SwiftPerson.self)
                 XCTAssertEqual(results.count, 2)
@@ -599,13 +600,13 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
     func testManualClientResetBeforeCallback() {
         let user = try! logInUser(for: basicCredentials())
-        assertThrows(user.configuration(partitionValue: #function, clientResetMode: .manual, notifyBeforeClientReset: { _ in print("myBlock") }),
+        assertThrows(user.configuration(partitionValue: #function, clientResetMode: .manual, notifyBeforeClientReset: { _ in }),
                      reason: "Client reset notifications not supported in Manual mode. Use SyncManager.ErrorHandler")
     }
 
     func testManualClientResetAfterCallback() {
         let user = try! logInUser(for: basicCredentials())
-        assertThrows(user.configuration(partitionValue: #function, clientResetMode: .manual, notifyAfterClientReset: { _, _ in print("myBlock") }),
+        assertThrows(user.configuration(partitionValue: #function, clientResetMode: .manual, notifyAfterClientReset: { _, _ in }),
                      reason: "Client reset notifications not supported in Manual mode. Use SyncManager.ErrorHandler")
     }
 

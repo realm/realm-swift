@@ -148,7 +148,7 @@ struct AfterClientResetWrapper {
 
 - (RLMClientResetAfterBlock)afterClientReset {
     if (_config->notify_after_client_reset) {
-        auto wrapper = _config->notify_after_client_reset.target<AfterClientResetWrapper>(); // here
+        auto wrapper = _config->notify_after_client_reset.target<AfterClientResetWrapper>();
         return wrapper->block;
     } else {
         return nil;

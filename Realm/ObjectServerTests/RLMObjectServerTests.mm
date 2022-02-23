@@ -1479,13 +1479,13 @@ static NSString *randomEmail() {
     NSString *partitionValue = NSStringFromSelector(_cmd);
     RLMRealmConfiguration *config = [user configurationWithPartitionValue:partitionValue clientResetMode:RLMClientResetModeDiscardLocal];
     XCTAssertNil(config.syncConfiguration.beforeClientReset);
-    XCTAssertNil(config.syncConfiguration.beforeClientReset);
+    XCTAssertNil(config.syncConfiguration.afterClientReset);
 
     RLMClientResetBeforeBlock beforeBlock = ^(RLMRealm *local __unused) {
-        NSLog(@"some block");
+        XCTAssert(false, @"Should not execute callback");
     };
     RLMClientResetAfterBlock afterBlock = ^(RLMRealm *before __unused, RLMRealm *after __unused) {
-        NSLog(@"some block");
+        XCTAssert(false, @"Should not execute callback");
     };
     RLMRealmConfiguration *config2 = [user configurationWithPartitionValue:partitionValue
                                                            clientResetMode:RLMClientResetModeDiscardLocal
