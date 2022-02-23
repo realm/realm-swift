@@ -20,6 +20,8 @@ x.y.z Release notes (yyyy-MM-dd)
   `Realm.writeCopy(configuration:)`/`[RLMRealm writeCopyForConfiguration:]` first.
 * Add ability to permanently delete a User from a MongoDB Realm app. This can
   be invoked with `User.delete()`/`[RLMUser deleteWithCompletion:]`.
+* Add `NSCopying` conformance to `RLMDecimal128` and `RLMObjectId`.
+* Add Xcode 13.3 binaries to the release package (and remove 13.0).
 
 ### Fixed
 * Add support of arm64 in Carthage build ([#7154](https://github.com/realm/realm-cocoa/issues/7154)
