@@ -44,7 +44,7 @@ extension NSDate: _HasPersistedType {
 }
 
 // A type which can be stored by the @Persisted property wrapper
-public protocol _Persistable: _RealmSchemaDiscoverable, _HasPersistedType where PersistedType: _Persistable {
+public protocol _Persistable: _RealmSchemaDiscoverable, _HasPersistedType where PersistedType: _Persistable, PersistedType.PersistedType.PersistedType == PersistedType.PersistedType {
     // Read a value of this type from the target object
     static func _rlmGetProperty(_ obj: ObjectBase, _ key: PropertyKey) -> Self
     // Set a value of this type on the target object

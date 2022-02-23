@@ -9,7 +9,7 @@ x.y.z Release notes (yyyy-MM-dd)
     - Write a copy of a synced Realm in use with user A, and open it with user B.
     - Note that migrations may be required when using a local realm configuration to open a realm file that
       was copied from a synchronized realm.
-      
+
   An exception will be thrown if a Realm exists at the destination.
 * Add a `seedFilePath` option to `RLMRealmConfiguration` and `Configuration`. If this
   option is set then instead of creating an empty Realm, the realm at the `seedFilePath` will
@@ -31,6 +31,10 @@ x.y.z Release notes (yyyy-MM-dd)
   }
   ```
   ([Cocoa #7633](https://github.com/realm/realm-swift/issues/7633), since v10.19.0)
+* Work around a compiler crash when building with Swift 5.6 / Xcode 13.3.
+  CustomPersistable's PersistedType must now always be a built-in type rather
+  than possibly another CustomPersistable type as Swift 5.6 has removed support
+  for infinitely-recursive associated types ([#7654](https://github.com/realm/realm-swift/issues/7654)).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
@@ -39,7 +43,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 13.2.1.
 * CocoaPods: 1.10 or later.
-* Xcode: 12.4-13.2.1.
+* Xcode: 12.4-13.3 beta 3.
 
 ### Internal
 * Upgraded realm-core from ? to ?
