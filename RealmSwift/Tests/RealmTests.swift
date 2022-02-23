@@ -1268,7 +1268,7 @@ class RealmTests: TestCase {
         XCTAssertEqual(2, realm.objects(SwiftStringObject.self).count)
     }
 
-    func testAsyncTransactionFromSyncTransaction() {
+    func FIXME_testAsyncTransactionFromSyncTransaction() {
         let realm = try! Realm()
         let transaction1 = expectation(description: "async transaction 1 complete")
 
