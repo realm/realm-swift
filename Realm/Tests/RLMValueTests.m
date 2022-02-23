@@ -72,7 +72,7 @@
     id<RLMValue> v1 = @123;
     id<RLMValue> v2 = @123;
 
-    XCTAssertEqual(v1, v2);
+    XCTAssertEqualObjects(v1, v2);
     XCTAssertEqual(v1.rlm_valueType, RLMPropertyTypeInt);
     XCTAssertEqual(v2.rlm_valueType, RLMPropertyTypeInt);
     XCTAssertNotEqual(v2, @456);

@@ -3,7 +3,7 @@ x.y.z Release notes (yyyy-MM-dd)
 ### Enhancements
 * Add `Realm.writeCopy(configuration:)`/`[RLMRealm writeCopyForConfiguration:]` which gives the
   following functionality:
-    - Export a local non-sync Realm to be used with MongoDB Realm Sync 
+    - Export a local non-sync Realm to be used with MongoDB Realm Sync
       when the configuration is derived from a sync `RLMUser`/`User`.
     - Write a copy of a local Realm to a destination specified in the configuration.
     - Write a copy of a synced Realm in use with user A, and open it with user B.

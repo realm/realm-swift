@@ -265,7 +265,7 @@
 }
 #endif // REALM_SPM
 
-#if TARGET_OS_IPHONE && (!TARGET_IPHONE_SIMULATOR || !TARGET_RT_64_BIT)
+#if TARGET_OS_IOS && !TARGET_OS_MACCATALYST && (!TARGET_OS_SIMULATOR || !TARGET_RT_64_BIT)
 - (void)testExceedingVirtualAddressSpace {
     RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
 

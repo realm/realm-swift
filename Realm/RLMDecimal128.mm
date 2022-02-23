@@ -88,6 +88,12 @@
     return [[self alloc] initWithString:number.stringValue error:nil];
 }
 
+- (id)copyWithZone:(NSZone *)zone {
+    RLMDecimal128 *copy = [[self.class allocWithZone:zone] init];
+    copy->_value = _value;
+    return copy;
+}
+
 - (realm::Decimal128)decimal128Value {
     return _value;
 }
