@@ -467,19 +467,20 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             let collection = setupMongoCollection(user: user, collectionName: "SwiftPerson")
 
             // Define the blocks that will be passed into the sync configuration initializer.
-            let beforeExpectation = expectation(description: "before client reset block called")
+            // Use counter instead of an expectation because `waitFor*` methods will prematurely fail an expectation
+            var beforeCalledCount = 0
             let beforeClientResetBlock: (Realm) -> Void = { local in
-                beforeExpectation.fulfill()
                 let results = local.objects(SwiftPerson.self)
                 XCTAssertEqual(results.count, 2)
                 let paul = results.filter("firstName == 'Paul'")
                 let john = results.filter("firstName == 'John'")
                 XCTAssertNotNil(paul)
                 XCTAssertNotNil(john)
+                beforeCalledCount += 1
             }
-            let afterExpectation = expectation(description: "after client reset block called")
+            // Use counter instead of an expectation because `waitFor*` methods will prematurely fail an expectation
+            var afterCalledCount = 0
             let afterClientResetBlock: (Realm, Realm) -> Void = { before, after in
-                afterExpectation.fulfill()
                 // Expect the local realm that was overwritten to have had 2 objects before it was overwritten.
                 let results = before.objects(SwiftPerson.self)
                 XCTAssertEqual(results.count, 2)
@@ -494,6 +495,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 let john2 = results2.filter("firstName == 'John'")
                 XCTAssertFalse(paul2.isEmpty)
                 XCTAssert(john2.isEmpty)
+                afterCalledCount += 1
             }
 
             var configuration = user.configuration(partitionValue: #function,
@@ -592,6 +594,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 waitForDownloads(for: realm) // History is incomptaible with the servers, client reset executed
                 XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1) // Expect the server realm (one object) to have overwritten the local realm (2 objects)
                 XCTAssertEqual(realm.objects(SwiftPerson.self)[0].firstName, "Paul")
+                XCTAssertEqual(beforeCalledCount, 1, "beforeClientReset should be called one time")
+                XCTAssertEqual(afterCalledCount, 1, "afterClientReset should be called one time")
             }
         } catch {
             XCTFail("Failed: \(error.localizedDescription)")
