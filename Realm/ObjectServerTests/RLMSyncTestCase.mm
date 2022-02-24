@@ -47,10 +47,6 @@
 // Set this to 1 if you want the test ROS instance to log its debug messages to console.
 #define LOG_ROS_OUTPUT 0
 
-#if !TARGET_OS_MAC
-#error These tests can only be run on a macOS host.
-#endif
-
 @interface RLMSyncManager ()
 + (void)_setCustomBundleID:(NSString *)customBundleID;
 - (NSArray<RLMUser *> *)_allUsers;
@@ -67,6 +63,10 @@
 
 @interface RLMUser()
 - (std::shared_ptr<realm::SyncUser>)_syncUser;
+@end
+
+@interface TestNetworkTransport : RLMNetworkTransport
+- (void)waitForCompletion;
 @end
 
 #pragma mark AsyncOpenConnectionTimeoutTransport
@@ -139,7 +139,7 @@ static NSURL *syncDirectoryForChildProcess() {
 
 - (RLMAppConfiguration*)defaultAppConfiguration {
     return  [[RLMAppConfiguration alloc] initWithBaseURL:@"http://localhost:9090"
-                                               transport:nil
+                                               transport:[TestNetworkTransport new]
                                             localAppName:nil
                                          localAppVersion:nil
                                  defaultRequestTimeoutMS:60];
@@ -554,6 +554,9 @@ static NSURL *syncDirectoryForChildProcess() {
     }
 
     for (RLMApp *app : apps) {
+        if (auto transport = RLMDynamicCast<TestNetworkTransport>(app.configuration.transport)) {
+            [transport waitForCompletion];
+        }
         [app.syncManager resetForTesting];
     }
     [RLMApp resetAppCache];
@@ -743,6 +746,29 @@ static NSURL *syncDirectoryForChildProcess() {
     [self waitForDownloadsForRealm:realm];
 }
 
+@end
+
+@implementation TestNetworkTransport {
+    dispatch_group_t _group;
+}
+- (instancetype)init {
+    if (self = [super init]) {
+        _group = dispatch_group_create();
+    }
+    return self;
+}
+- (void)sendRequestToServer:(RLMRequest *)request
+                 completion:(RLMNetworkTransportCompletionBlock)completionBlock {
+    dispatch_group_enter(_group);
+    [super sendRequestToServer:request completion:^(RLMResponse *response) {
+        completionBlock(response);
+        dispatch_group_leave(_group);
+    }];
+}
+
+- (void)waitForCompletion {
+    dispatch_group_wait(_group, DISPATCH_TIME_FOREVER);
+}
 @end
 
 #endif // TARGET_OS_OSX
