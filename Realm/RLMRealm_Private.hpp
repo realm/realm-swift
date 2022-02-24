@@ -21,7 +21,8 @@
 #import "RLMClassInfo.hpp"
 
 #import <realm/object-store/object_schema.hpp>
-#import <realm/object-store/shared_realm.hpp>
+
+#import <memory>
 
 namespace realm {
     class Group;
@@ -43,7 +44,7 @@ struct RLMResultsSetInfo {
     std::unique_ptr<RLMResultsSetInfo> _resultsSetInfo;
 }
 
-+ (instancetype)realmWithSharedRealm:(realm::SharedRealm)sharedRealm schema:(RLMSchema *)schema;
++ (instancetype)realmWithSharedRealm:(std::shared_ptr<realm::Realm>)sharedRealm schema:(RLMSchema *)schema;
 
 // FIXME - group should not be exposed
 @property (nonatomic, readonly) realm::Group &group;

@@ -971,12 +971,7 @@ public class RealmServer: NSObject {
         guard let syncInfo = response?["sync"] as? [String: Any] else {
             return false
         }
-
-        if syncInfo["state"] as? String == "enabled" {
-            return true
-        } else {
-            return false
-        }
+        return (syncInfo["state"] as? String == "enabled")
     }
 
     public func devModeEnabled(appServerId: String, syncServiceId: String) throws -> Bool {
