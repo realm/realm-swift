@@ -679,8 +679,8 @@ static NSURL *syncDirectoryForChildProcess() {
     return realm;
 }
 
-- (void)populateData:(void (^)(RLMRealm *))block {
-    [self writeToFlxRealm:^(RLMRealm *realm) {
+- (bool)populateData:(void (^)(RLMRealm *))block {
+    return [self writeToFlxRealm:^(RLMRealm *realm) {
         [realm beginWriteTransaction];
         block(realm);
         [realm commitWriteTransaction];
@@ -688,7 +688,7 @@ static NSURL *syncDirectoryForChildProcess() {
     }];
 }
 
-- (void)writeToFlxRealm:(void (^)(RLMRealm *))block {
+- (bool)writeToFlxRealm:(void (^)(RLMRealm *))block {
     NSString *userName = [NSStringFromSelector(_cmd) stringByAppendingString:[NSUUID UUID].UUIDString];
     RLMUser *user = [self logInUserForCredentials:[self basicCredentialsWithName:userName
                                                                         register:YES
@@ -715,8 +715,14 @@ static NSURL *syncDirectoryForChildProcess() {
         [ex fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:20.0 handler:nil];
-    block(realm);
+    __block bool didComplete = false;
+    [self waitForExpectationsWithTimeout:20.0 handler:^(NSError *error) {
+        didComplete = error == nil;
+    }];
+    if (didComplete) {
+        block(realm);
+    }
+    return didComplete;
 }
 - (void)writeQueryAndCompleteForRealm:(RLMRealm *)realm block:(void (^)(RLMSyncSubscriptionSet *))block {
     RLMSyncSubscriptionSet *subs = realm.subscriptions;

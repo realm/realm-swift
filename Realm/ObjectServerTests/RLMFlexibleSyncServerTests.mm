@@ -666,18 +666,33 @@
 @end
 
 @implementation RLMFlexibleSyncServerTests
+- (void)createPeople:(RLMRealm *)realm partition:(SEL)cmd {
+    const int numberOfSubs = 21;
+    for (int i = 1; i <= numberOfSubs; ++i) {
+        Person *person = [[Person alloc] initWithPrimaryKey:[RLMObjectId objectId]
+                                                        age:i
+                                                  firstName:[NSString stringWithFormat:@"firstname_%d", i]
+                                                   lastName:[NSString stringWithFormat:@"lastname_%d", i]];
+        person.partition = NSStringFromSelector(cmd);
+        [realm addObject:person];
+    }
+}
+- (void)createDog:(RLMRealm *)realm partition:(SEL)cmd {
+    Dog *dog = [[Dog alloc] initWithPrimaryKey:[RLMObjectId objectId]
+                                         breed:@"Labradoodle"
+                                          name:@"Tom"];
+    dog.partition = NSStringFromSelector(cmd);
+    [realm addObject:dog];
+}
+
 - (void)testFlexibleSyncWithoutQuery {
-    [self populateData:^(RLMRealm *realm) {
-        int numberOfSubs = 21;
-        for (int i = 1; i <= numberOfSubs; ++i) {
-            Person *person = [[Person alloc] initWithPrimaryKey:[RLMObjectId objectId]
-                                                            age:i
-                                                      firstName:[NSString stringWithFormat:@"firstname_%d", i]
-                                                       lastName:[NSString stringWithFormat:@"lastname_%d", i]];
-            person.partition = NSStringFromSelector(_cmd);
-            [realm addObject:person];
-        }
+    bool didPopulate = [self populateData:^(RLMRealm *realm) {
+        [self createPeople:realm partition:_cmd];
     }];
+    if (!didPopulate) {
+        return;
+    }
+
     RLMRealm *realm = [self getFlexibleSyncRealm:_cmd];
     XCTAssertNotNil(realm);
     CHECK_COUNT(0, Person, realm);
@@ -693,18 +708,12 @@
 }
 
 - (void)testFlexibleSyncAddQuery {
-    [self populateData:^(RLMRealm *realm) {
-        int numberOfSubs = 21;
-        for (int i = 1; i <= numberOfSubs; ++i) {
-            Person *person = [[Person alloc] initWithPrimaryKey:[RLMObjectId objectId]
-                                                            age:i
-                                                      firstName:[NSString stringWithFormat:@"firstname_%d", i]
-                                                       lastName:[NSString stringWithFormat:@"lastname_%d", i]];
-            // We are using the partition property to filter only the objects for this test
-            person.partition = NSStringFromSelector(_cmd);
-            [realm addObject: person];
-        }
+    bool didPopulate = [self populateData:^(RLMRealm *realm) {
+        [self createPeople:realm partition:_cmd];
     }];
+    if (!didPopulate) {
+        return;
+    }
 
     RLMRealm *realm = [self getFlexibleSyncRealm:_cmd];
     XCTAssertNotNil(realm);
@@ -721,22 +730,13 @@
 }
 
 - (void)testFlexibleSyncAddMultipleQuery {
-    [self populateData:^(RLMRealm *realm) {
-        int numberOfSubs = 21;
-        for (int i = 1; i <= numberOfSubs; ++i) {
-            Person *person = [[Person alloc] initWithPrimaryKey:[RLMObjectId objectId]
-                                                            age:i
-                                                      firstName:[NSString stringWithFormat:@"firstname_%d", i]
-                                                       lastName:[NSString stringWithFormat:@"lastname_%d", i]];
-            person.partition = NSStringFromSelector(_cmd);
-            [realm addObject: person];
-        }
-        Dog *dog = [[Dog alloc] initWithPrimaryKey:[RLMObjectId objectId]
-                                             breed:@"Labradoodle"
-                                              name:@"Tom"];
-        dog.partition = NSStringFromSelector(_cmd);
-        [realm addObject:dog];
+    bool didPopulate = [self populateData:^(RLMRealm *realm) {
+        [self createPeople:realm partition:_cmd];
+        [self createDog:realm partition:_cmd];
     }];
+    if (!didPopulate) {
+        return;
+    }
 
     RLMRealm *realm = [self getFlexibleSyncRealm:_cmd];
     XCTAssertNotNil(realm);
@@ -756,22 +756,13 @@
 }
 
 - (void)testFlexibleSyncRemoveQuery {
-    [self populateData:^(RLMRealm *realm) {
-        int numberOfSubs = 21;
-        for (int i = 1; i <= numberOfSubs; ++i) {
-            Person *person = [[Person alloc] initWithPrimaryKey:[RLMObjectId objectId]
-                                                            age:i
-                                                      firstName:[NSString stringWithFormat:@"firstname_%d", i]
-                                                       lastName:[NSString stringWithFormat:@"lastname_%d", i]];
-            person.partition = NSStringFromSelector(_cmd);
-            [realm addObject: person];
-        }
-        Dog *dog = [[Dog alloc] initWithPrimaryKey:[RLMObjectId objectId]
-                                             breed:@"Labradoodle"
-                                              name:@"Tom"];
-        dog.partition = NSStringFromSelector(_cmd);
-        [realm addObject:dog];
+    bool didPopulate = [self populateData:^(RLMRealm *realm) {
+        [self createPeople:realm partition:_cmd];
+        [self createDog:realm partition:_cmd];
     }];
+    if (!didPopulate) {
+        return;
+    }
 
     RLMRealm *realm = [self getFlexibleSyncRealm:_cmd];
     XCTAssertNotNil(realm);
@@ -796,22 +787,13 @@
 }
 
 - (void)testFlexibleSyncRemoveAllQueries {
-    [self populateData:^(RLMRealm *realm) {
-        int numberOfSubs = 21;
-        for (int i = 1; i <= numberOfSubs; ++i) {
-            Person *person = [[Person alloc] initWithPrimaryKey:[RLMObjectId objectId]
-                                                            age:i
-                                                      firstName:[NSString stringWithFormat:@"firstname_%d", i]
-                                                       lastName:[NSString stringWithFormat:@"lastname_%d", i]];
-            person.partition = NSStringFromSelector(_cmd);
-            [realm addObject: person];
-        }
-        Dog *dog = [[Dog alloc] initWithPrimaryKey:[RLMObjectId objectId]
-                                             breed:@"Labradoodle"
-                                              name:@"Tom"];
-        dog.partition = NSStringFromSelector(_cmd);
-        [realm addObject:dog];
+    bool didPopulate = [self populateData:^(RLMRealm *realm) {
+        [self createPeople:realm partition:_cmd];
+        [self createDog:realm partition:_cmd];
     }];
+    if (!didPopulate) {
+        return;
+    }
 
     RLMRealm *realm = [self getFlexibleSyncRealm:_cmd];
     XCTAssertNotNil(realm);
@@ -839,22 +821,13 @@
 }
 
 - (void)testFlexibleSyncRemoveAllQueriesForType {
-    [self populateData:^(RLMRealm *realm) {
-        int numberOfSubs = 21;
-        for (int i = 1; i <= numberOfSubs; ++i) {
-            Person *person = [[Person alloc] initWithPrimaryKey:[RLMObjectId objectId]
-                                                            age:i
-                                                      firstName:[NSString stringWithFormat:@"firstname_%d", i]
-                                                       lastName:[NSString stringWithFormat:@"lastname_%d", i]];
-            person.partition = NSStringFromSelector(_cmd);
-            [realm addObject: person];
-        }
-        Dog *dog = [[Dog alloc] initWithPrimaryKey:[RLMObjectId objectId]
-                                             breed:@"Labradoodle"
-                                              name:@"Tom"];
-        dog.partition = NSStringFromSelector(_cmd);
-        [realm addObject:dog];
+    bool didPopulate = [self populateData:^(RLMRealm *realm) {
+        [self createPeople:realm partition:_cmd];
+        [self createDog:realm partition:_cmd];
     }];
+    if (!didPopulate) {
+        return;
+    }
 
     RLMRealm *realm = [self getFlexibleSyncRealm:_cmd];
     XCTAssertNotNil(realm);
@@ -882,17 +855,12 @@
 }
 
 - (void)testFlexibleSyncUpdateQuery {
-    [self populateData:^(RLMRealm *realm) {
-        int numberOfSubs = 21;
-        for (int i = 1; i <= numberOfSubs; ++i) {
-            Person *person = [[Person alloc] initWithPrimaryKey:[RLMObjectId objectId]
-                                                            age:i
-                                                      firstName:[NSString stringWithFormat:@"firstname_%d", i]
-                                                       lastName:[NSString stringWithFormat:@"lastname_%d", i]];
-            person.partition = NSStringFromSelector(_cmd);
-            [realm addObject: person];
-        }
+    bool didPopulate = [self populateData:^(RLMRealm *realm) {
+        [self createPeople:realm partition:_cmd];
     }];
+    if (!didPopulate) {
+        return;
+    }
 
     RLMRealm *realm = [self getFlexibleSyncRealm:_cmd];
     XCTAssertNotNil(realm);
@@ -913,17 +881,12 @@
 }
 
 - (void)testFlexibleSyncAddObjectOutsideQuery {
-    [self populateData:^(RLMRealm *realm) {
-        int numberOfSubs = 21;
-        for (int i = 1; i <= numberOfSubs; ++i) {
-            Person *person = [[Person alloc] initWithPrimaryKey:[RLMObjectId objectId]
-                                                            age:i
-                                                      firstName:[NSString stringWithFormat:@"firstname_%d", i]
-                                                       lastName:[NSString stringWithFormat:@"lastname_%d", i]];
-            person.partition = NSStringFromSelector(_cmd);
-            [realm addObject: person];
-        }
+    bool didPopulate = [self populateData:^(RLMRealm *realm) {
+        [self createPeople:realm partition:_cmd];
     }];
+    if (!didPopulate) {
+        return;
+    }
 
     RLMRealm *realm = [self getFlexibleSyncRealm:_cmd];
     XCTAssertNotNil(realm);

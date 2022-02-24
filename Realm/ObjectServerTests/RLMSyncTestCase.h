@@ -138,7 +138,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (RLMRealm *)openFlexibleSyncRealm:(SEL)testSel;
 - (RLMRealm *)getFlexibleSyncRealm:(SEL)testSel;
-- (void)populateData:(void (^)(RLMRealm *))block;
+- (bool)populateData:(void (^)(RLMRealm *))block;
 - (void)writeQueryAndCompleteForRealm:(RLMRealm *)realm block:(void (^)(RLMSyncSubscriptionSet *))block;
 
 @end
