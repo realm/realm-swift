@@ -656,7 +656,7 @@ public class RealmServer: NSObject {
     /// this is partition based sync, and will crash if one is not provided in that mode
     public func createAppForSyncMode(_ syncMode: SyncMode) throws -> AppId {
         guard let session = session else {
-            throw URLError(.unknown)
+            fatalError()
         }
 
         let info = try session.apps.post(["name": "test"]).get()
@@ -908,7 +908,7 @@ public class RealmServer: NSObject {
     // Retrieve MongoDB Realm AppId with ClientAppId using the Admin API
     public func retrieveAppServerId(_ clientAppId: String) throws -> String {
         guard let session = session else {
-            throw URLError(.unknown)
+            fatalError()
         }
 
         let appsListInfo = try session.apps.get().get()
@@ -932,7 +932,7 @@ public class RealmServer: NSObject {
 
     public func retrieveSyncServiceId(appServerId: String) throws -> String {
         guard let session = session else {
-            throw URLError(.unknown)
+            fatalError()
         }
         let app = session.apps[appServerId]
         // Get all services
@@ -952,7 +952,7 @@ public class RealmServer: NSObject {
 
     public func getSyncServiceConfiguration(appServerId: String, syncServiceId: String) throws -> [String: Any]? {
         guard let session = session else {
-            throw URLError(.unknown)
+            fatalError()
         }
         let app = session.apps[appServerId]
         do {
@@ -963,7 +963,9 @@ public class RealmServer: NSObject {
     }
 
     public func syncEnabled(appServerId: String, syncServiceId: String) throws -> Bool {
-        guard let session = session else { throw URLError(.unknown) }
+        guard let session = session else {
+            fatalError()
+        }
         let app = session.apps[appServerId]
         let response = try app.services[syncServiceId].config.get().get() as? [String: Any]
         guard let syncInfo = response?["sync"] as? [String: Any] else {
@@ -978,7 +980,9 @@ public class RealmServer: NSObject {
     }
 
     public func devModeEnabled(appServerId: String, syncServiceId: String) throws -> Bool {
-        guard let session = session else { throw URLError(.unknown) }
+        guard let session = session else {
+            fatalError()
+        }
         let app = session.apps[appServerId]
         let res = try app.sync.config.get().get() as? [String: Any]
         guard let option = res!["development_mode_enabled"] as? Bool else {
