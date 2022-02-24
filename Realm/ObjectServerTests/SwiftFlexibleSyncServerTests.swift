@@ -944,8 +944,19 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
 // MARK: - Async Await
 #if swift(>=5.5.2) && canImport(_Concurrency)
 @available(macOS 12.0.0, *)
-extension SwiftFlexibleSyncServerTests {
-    @MainActor private func populateFlexibleSyncData(_ block: @escaping (Realm) -> Void) async throws {
+class SwiftAsyncFlexibleSyncTests: SwiftSyncTestCase {
+    override class var defaultTestSuite: XCTestSuite {
+        // async/await is currently incompatible with thread sanitizer and will
+        // produce many false positives
+        // https://bugs.swift.org/browse/SR-15444
+        if RLMThreadSanitizerEnabled() {
+            return XCTestSuite(name: "\(type(of: self))")
+        }
+        return super.defaultTestSuite
+    }
+
+    @MainActor
+    private func populateFlexibleSyncData(_ block: @escaping (Realm) -> Void) async throws {
         var config = (try await self.flexibleSyncApp.login(credentials: .anonymous)).flexibleSyncConfiguration()
         if config.objectTypes == nil {
             config.objectTypes = [SwiftPerson.self,
@@ -968,7 +979,8 @@ extension SwiftFlexibleSyncServerTests {
         }
     }
 
-    @MainActor func testFlexibleSyncAppAddQueryAsyncAwait() async throws {
+    @MainActor
+    func testFlexibleSyncAppAddQueryAsyncAwait() async throws {
         try await populateFlexibleSyncData { realm in
             for i in 1...21 {
                 let person = SwiftPerson(firstName: "\(#function)",
@@ -978,7 +990,7 @@ extension SwiftFlexibleSyncServerTests {
             }
         }
 
-        var config = (try await self.flexibleSyncApp.login(credentials: basicCredentials(app: self.flexibleSyncApp))).flexibleSyncConfiguration()
+        var config = try await self.flexibleSyncApp.login(credentials: basicCredentials(app: self.flexibleSyncApp)).flexibleSyncConfiguration()
         config.objectTypes = [SwiftPerson.self, SwiftTypesSyncObject.self]
         let realm = try await Realm(configuration: config)
         XCTAssertNotNil(realm)
@@ -997,6 +1009,7 @@ extension SwiftFlexibleSyncServerTests {
         checkCount(expected: 6, realm, SwiftPerson.self)
     }
 
+    @MainActor
     func testStates() async throws {
         var config = (try await self.flexibleSyncApp.login(credentials: .anonymous))
             .flexibleSyncConfiguration()
