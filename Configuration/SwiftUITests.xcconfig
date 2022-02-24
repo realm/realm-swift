@@ -1,0 +1,6 @@
+#include "SwiftUITestHost.xcconfig"
+
+SDKROOT = iphoneos;
+TEST_TARGET_NAME = SwiftUITestHost;
+TEST_HOST[sdk=appletv*] = ;
+TEST_HOST[sdk=iphone*] = ;
