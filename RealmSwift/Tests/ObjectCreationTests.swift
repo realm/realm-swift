@@ -898,7 +898,7 @@ class ObjectCreationTests: TestCase {
             // Assign of EmbeddedObject
             copyC.object = parent.object
             assertThrows(realm.add(copyC), "Cannot set a link to an existing managed embedded object")
-            
+
             let parentUnmanaged = EmbeddedParentObject(value: [
                 "object": ["value": 4],
                 "array": [[5]],
