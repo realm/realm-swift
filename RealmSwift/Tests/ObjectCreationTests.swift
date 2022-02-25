@@ -877,6 +877,7 @@ class ObjectCreationTests: TestCase {
                 "array": [[2]],
                 "map": ["some": [3]]
             ])
+            // Copy managed object
             let copyA = EmbeddedParentObject(value: parent)
             realm.add(copyA)
 
@@ -886,6 +887,7 @@ class ObjectCreationTests: TestCase {
             XCTAssertEqual(copyA.map.values.count, 1)
 
             let copyB = EmbeddedParentObject()
+            // Explicit copy of object
             copyB.object = EmbeddedTreeObject1(value: parent.object!)
             realm.add(copyB)
 
@@ -893,8 +895,20 @@ class ObjectCreationTests: TestCase {
             XCTAssertEqual(copyB.object!.value, 1)
 
             let copyC = EmbeddedParentObject()
+            // Assign of EmbeddedObject
             copyC.object = parent.object
             assertThrows(realm.add(copyC), "Cannot set a link to an existing managed embedded object")
+            
+            let parentUnmanaged = EmbeddedParentObject(value: [
+                "object": ["value": 4],
+                "array": [[5]],
+                "map": ["some": [6]]
+            ])
+            // Do not copy unmanaged object
+            let copyD = EmbeddedParentObject(value: parentUnmanaged)
+            realm.add(copyD)
+            assertThrows(realm.add(parentUnmanaged), "Cannot set a link to an existing managed embedded object")
+
             realm.cancelWrite()
         }
     }

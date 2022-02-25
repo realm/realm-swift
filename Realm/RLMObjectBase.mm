@@ -93,7 +93,8 @@ static void maybeInitObjectSchemaForUnmanaged(RLMObjectBase *obj) {
 }
 
 static id coerceToObjectType(id obj, Class cls, RLMSchema *schema) {
-    if ([obj isKindOfClass:cls] && ![(id)cls isEmbedded]) {
+    if (([obj isKindOfClass:cls] && ![(id)cls isEmbedded]) ||
+        ([(id)cls isEmbedded] && [obj respondsToSelector:@selector(realm)] && ![obj realm])) {
         return obj;
     }
     obj = RLMBridgeSwiftValue(obj) ?: obj;
