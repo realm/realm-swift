@@ -782,7 +782,7 @@
     [self writeQueryAndCompleteForRealm:realm block:^(RLMSyncSubscriptionSet *subs) {
         [subs removeSubscriptionWithName:@"person_age"];
     }];
-    CHECK_COUNT(0, Person, realm)
+    CHECK_COUNT(0, Person, realm);
     CHECK_COUNT(1, Dog, realm);
 }
 
@@ -816,7 +816,7 @@
                           subscriptionName:@"person_age"
                                      where:@"age > 0 and partition == %@", NSStringFromSelector(_cmd)];
     }];
-    CHECK_COUNT(21, Person, realm)
+    CHECK_COUNT(21, Person, realm);
     CHECK_COUNT(0, Dog, realm);
 }
 
@@ -850,7 +850,7 @@
     [self writeQueryAndCompleteForRealm:realm block:^(RLMSyncSubscriptionSet *subs) {
         [subs removeAllSubscriptionsWithClassName:Person.className];
     }];
-    CHECK_COUNT(0, Person, realm)
+    CHECK_COUNT(0, Person, realm);
     CHECK_COUNT(1, Dog, realm);
 }
 

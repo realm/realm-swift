@@ -145,18 +145,16 @@ NS_ASSUME_NONNULL_BEGIN
 
 NS_ASSUME_NONNULL_END
 
-#define WAIT_FOR_SEMAPHORE(macro_semaphore, macro_timeout) \
-{                                                                                                                      \
+#define WAIT_FOR_SEMAPHORE(macro_semaphore, macro_timeout) do {                                                        \
     int64_t delay_in_ns = (int64_t)(macro_timeout * NSEC_PER_SEC);                                                     \
     BOOL sema_success = dispatch_semaphore_wait(macro_semaphore, dispatch_time(DISPATCH_TIME_NOW, delay_in_ns)) == 0;  \
     XCTAssertTrue(sema_success, @"Semaphore timed out.");                                                              \
-}
+} while (0)
 
-#define CHECK_COUNT(d_count, macro_object_type, macro_realm) \
-{                                                                                                         \
+#define CHECK_COUNT(d_count, macro_object_type, macro_realm) do {                                         \
     [macro_realm refresh];                                                                                \
     RLMResults *r = [macro_object_type allObjectsInRealm:macro_realm];                                    \
     NSInteger c = r.count;                                                                                \
     NSString *w = self.isParent ? @"parent" : @"child";                                                   \
     XCTAssert(d_count == c, @"Expected %@ items, but actually got %@ (%@) (%@)", @(d_count), @(c), r, w); \
-}
+} while (0)
