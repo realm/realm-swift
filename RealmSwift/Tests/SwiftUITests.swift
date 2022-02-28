@@ -306,7 +306,7 @@ class SwiftUITests: TestCase {
     }
     func testSwiftQuerySyntax() throws {
         let realm = inMemoryRealm(inMemoryIdentifier)
-        try! realm.write {
+        try realm.write {
             realm.add(SwiftUIObject(value: ["str": "apple"]))
             realm.add(SwiftUIObject(value: ["str": "antenna"]))
             realm.add(SwiftUIObject(value: ["str": "baz"]))

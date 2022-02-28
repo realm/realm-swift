@@ -424,8 +424,7 @@ extension Projection: _ObservedResultsValue { }
             }
             if let filter = filter {
                 value = value.filter(filter)
-            }
-            if let `where` = `where` {
+            } else if let `where` = `where` {
                 value = value.where(`where`)
             }
             setupHasRun = true
