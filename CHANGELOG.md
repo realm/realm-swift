@@ -37,6 +37,7 @@ x.y.z Release notes (yyyy-MM-dd)
   CustomPersistable's PersistedType must now always be a built-in type rather
   than possibly another CustomPersistable type as Swift 5.6 has removed support
   for infinitely-recursive associated types ([#7654](https://github.com/realm/realm-swift/issues/7654)).
+* Fix redundant call to filter on `@ObservedResults` from `searchable` component, since v10.19.0.
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
