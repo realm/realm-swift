@@ -1,6 +1,8 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.23.0 Release notes (2022-02-28)
 =============================================================
+
 ### Enhancements
+
 * Add `Realm.writeCopy(configuration:)`/`[RLMRealm writeCopyForConfiguration:]` which gives the
   following functionality:
     - Export a local non-sync Realm to be used with MongoDB Realm Sync
@@ -24,6 +26,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * Add Xcode 13.3 binaries to the release package (and remove 13.0).
 
 ### Fixed
+
 * Add support of arm64 in Carthage build ([#7154](https://github.com/realm/realm-cocoa/issues/7154)
 * Adding missing support for `IN` queries to primitives types on Type Safe Queries.
   ```swift
@@ -37,22 +40,20 @@ x.y.z Release notes (yyyy-MM-dd)
   CustomPersistable's PersistedType must now always be a built-in type rather
   than possibly another CustomPersistable type as Swift 5.6 has removed support
   for infinitely-recursive associated types ([#7654](https://github.com/realm/realm-swift/issues/7654)).
-* Fix redundant call to filter on `@ObservedResults` from `searchable` component, since v10.19.0.
-
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+* Fix redundant call to filter on `@ObservedResults` from `searchable`
+  component (since v10.19.0).
 
 ### Compatibility
+
 * Realm Studio: 11.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 13.2.1.
 * CocoaPods: 1.10 or later.
 * Xcode: 12.4-13.3 beta 3.
 
-### Internal
-* Upgraded realm-core from ? to ?
-
 10.22.0 Release notes (2022-01-25)
 =============================================================
+
 ### Enhancements
 
 * Add beta support for flexible sync. See the [backend](https://docs.mongodb.com/realm/sync/data-access-patterns/flexible-sync/) and [SDK](https://docs.mongodb.com/realm/sdk/swift/examples/flexible-sync/) documentation for more information. Please report any issues with the beta through Github.
