@@ -1,3 +1,0 @@
-#include "SwiftUITestHost.xcconfig"
-
-TEST_TARGET_NAME = SwiftUITestHost;

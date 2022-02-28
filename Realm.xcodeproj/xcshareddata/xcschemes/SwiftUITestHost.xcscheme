@@ -52,8 +52,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "53124AD325B71AF700771CE4"
-               BuildableName = "SwiftUITestHostUITests.xctest"
-               BlueprintName = "SwiftUITestHostUITests"
+               BuildableName = "SwiftUITests.xctest"
+               BlueprintName = "SwiftUITests"
                ReferencedContainer = "container:Realm.xcodeproj">
             </BuildableReference>
          </TestableReference>
