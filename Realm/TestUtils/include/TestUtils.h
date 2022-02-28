@@ -36,3 +36,6 @@ FOUNDATION_EXTERN RLMUser *RLMDummyUser(void);
 - (NSComparisonResult)compare:(NSUUID *)other;
 @end
 
+// It appears to be impossible to check this from Swift so we need a helper function
+FOUNDATION_EXTERN bool RLMThreadSanitizerEnabled(void);
+

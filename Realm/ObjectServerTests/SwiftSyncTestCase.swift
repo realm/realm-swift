@@ -143,6 +143,7 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
                                       _ type: T.Type,
                                       file: StaticString = #file,
                                       line: UInt = #line) {
+        realm.refresh()
         let actual = realm.objects(type).count
         XCTAssertEqual(actual, expected,
                        "Error: expected \(expected) items, but got \(actual) (process: \(isParent ? "parent" : "child"))",
