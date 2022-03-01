@@ -1268,6 +1268,26 @@ class RealmTests: TestCase {
         XCTAssertEqual(2, realm.objects(SwiftStringObject.self).count)
     }
 
+    func FIXME_testAsyncTransactionFromSyncTransaction() {
+        let realm = try! Realm()
+        let transaction1 = expectation(description: "async transaction 1 complete")
+
+        realm.beginWrite()
+        realm.create(SwiftStringObject.self, value: ["string"])
+
+        try! realm.beginAsyncWrite { _ in
+            realm.create(SwiftStringObject.self, value: ["string 2"])
+            realm.commitAsyncWrite { _ in
+                transaction1.fulfill()
+            }
+        }
+
+        try! realm.commitWrite()
+
+        waitForExpectations(timeout: 1, handler: nil)
+        XCTAssertEqual(2, realm.objects(SwiftStringObject.self).count)
+    }
+
     func testAsyncTransactionCancel() {
         let realm = try! Realm()
         let expectation = expectation(description: "testAsyncTransactionCancel expectation")
