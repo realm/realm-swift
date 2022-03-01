@@ -34,7 +34,7 @@ NS_ASSUME_NONNULL_BEGIN
  ObjectIds are intended to be fast to generate. Sorting by an ObjectId field
  will typically result in the objects being sorted in creation order.
  */
-@interface RLMObjectId : NSObject
+@interface RLMObjectId : NSObject <NSCopying>
 /// Creates a new randomly-initialized ObjectId.
 + (nonnull instancetype)objectId NS_SWIFT_NAME(generate());
 

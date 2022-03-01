@@ -928,7 +928,7 @@
 		530BA61326DFA1CB008FC550 /* RLMChildProcessEnvironment.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = RLMChildProcessEnvironment.m; path = Realm/TestUtils/RLMChildProcessEnvironment.m; sourceTree = "<group>"; };
 		53124A4F25B714EC00771CE4 /* SwiftUITestHost.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = SwiftUITestHost.xcconfig; sourceTree = "<group>"; };
 		53124AB825B71AF600771CE4 /* SwiftUITestHost.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SwiftUITestHost.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		53124AD425B71AF700771CE4 /* SwiftUITestHostUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SwiftUITestHostUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		53124AD425B71AF700771CE4 /* SwiftUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SwiftUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		53124AD825B71AF700771CE4 /* SwiftUITestHostUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUITestHostUITests.swift; sourceTree = "<group>"; };
 		53124ADA25B71AF700771CE4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		531F956927906EF300E497F1 /* RLMSyncSession.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMSyncSession.mm; sourceTree = "<group>"; };
@@ -940,7 +940,7 @@
 		5346E7312487AC9D00595C68 /* RLMBSONTests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = RLMBSONTests.mm; path = Realm/ObjectServerTests/RLMBSONTests.mm; sourceTree = "<group>"; };
 		535EA9E125B0919800DBF3CD /* SwiftUI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftUI.swift; sourceTree = "<group>"; };
 		535EAA7425B0B02B00DBF3CD /* SwiftUITests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftUITests.swift; sourceTree = "<group>"; };
-		53626A8C25D3172000D9515D /* SwiftUITestHostTests.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = SwiftUITestHostTests.xcconfig; sourceTree = "<group>"; };
+		53626A8C25D3172000D9515D /* SwiftUITests.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = SwiftUITests.xcconfig; sourceTree = "<group>"; };
 		53626AAE25D31CAC00D9515D /* Objects.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Objects.swift; sourceTree = "<group>"; };
 		536B7C0B24A4C223006B535D /* dependencies.list */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = dependencies.list; sourceTree = "<group>"; };
 		537130C724A9E417001FDBBC /* RealmServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = RealmServer.swift; path = Realm/ObjectServerTests/RealmServer.swift; sourceTree = "<group>"; };
@@ -1026,10 +1026,10 @@
 		AC8846B62687BC4100DF4A65 /* SwiftUIServerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SwiftUIServerTests.swift; path = Realm/ObjectServerTests/SwiftUIServerTests.swift; sourceTree = "<group>"; };
 		AC8846B82687BD4D00DF4A65 /* SwiftUISyncTestHostUITests-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SwiftUISyncTestHostUITests-Bridging-Header.h"; sourceTree = "<group>"; };
 		AC8847432687DFE700DF4A65 /* SwiftUISyncTestHost.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = SwiftUISyncTestHost.xcconfig; sourceTree = "<group>"; };
-		AC8847442687DFE700DF4A65 /* SwiftUISyncTestHostTests.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = SwiftUISyncTestHostTests.xcconfig; sourceTree = "<group>"; };
+		AC8847442687DFE700DF4A65 /* SwiftUISyncTests.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = SwiftUISyncTests.xcconfig; sourceTree = "<group>"; };
 		AC8847472687E0AA00DF4A65 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		AC8847492687E0BD00DF4A65 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		AC88478126888C6300DF4A65 /* SwiftUISyncTestHostUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SwiftUISyncTestHostUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		AC88478126888C6300DF4A65 /* SwiftUISyncTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SwiftUISyncTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		AC8AE64A26BAD4B00037D4E5 /* SwiftMongoClientTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SwiftMongoClientTests.swift; path = Realm/ObjectServerTests/SwiftMongoClientTests.swift; sourceTree = "<group>"; };
 		ACB6FD30273C60920009712F /* RLMFlexibleSyncServerTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = RLMFlexibleSyncServerTests.mm; path = Realm/ObjectServerTests/RLMFlexibleSyncServerTests.mm; sourceTree = "<group>"; };
 		ACB6FD31273C60920009712F /* SwiftFlexibleSyncServerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SwiftFlexibleSyncServerTests.swift; path = Realm/ObjectServerTests/SwiftFlexibleSyncServerTests.swift; sourceTree = "<group>"; };
@@ -1443,9 +1443,9 @@
 				3FB56E7E250D457A00A6216B /* ObjectServerTests.xcconfig */,
 				5D659E6F1BE0398E006515A0 /* Release.xcconfig */,
 				AC8847432687DFE700DF4A65 /* SwiftUISyncTestHost.xcconfig */,
-				AC8847442687DFE700DF4A65 /* SwiftUISyncTestHostTests.xcconfig */,
+				AC8847442687DFE700DF4A65 /* SwiftUISyncTests.xcconfig */,
 				53124A4F25B714EC00771CE4 /* SwiftUITestHost.xcconfig */,
-				53626A8C25D3172000D9515D /* SwiftUITestHostTests.xcconfig */,
+				53626A8C25D3172000D9515D /* SwiftUITests.xcconfig */,
 				3F852BE9278E1F000009DF74 /* TestBase.xcconfig */,
 				3F35027722C43C5200FDC1E5 /* TestHost-static.xcconfig */,
 				5D6156F71BE07B6B00A4BD3F /* TestHost.xcconfig */,
@@ -1775,9 +1775,9 @@
 				5D660FD81BE98C7C0021E04F /* RealmSwift Tests.xctest */,
 				5D660FCC1BE98C560021E04F /* RealmSwift.framework */,
 				AC8846732686573B00DF4A65 /* SwiftUISyncTestHost.app */,
-				AC88478126888C6300DF4A65 /* SwiftUISyncTestHostUITests.xctest */,
+				AC88478126888C6300DF4A65 /* SwiftUISyncTests.xctest */,
 				53124AB825B71AF600771CE4 /* SwiftUITestHost.app */,
-				53124AD425B71AF700771CE4 /* SwiftUITestHostUITests.xctest */,
+				53124AD425B71AF700771CE4 /* SwiftUITests.xctest */,
 				3F9D91872152D42F00474F09 /* TestHost static.app */,
 				3F1A5E721992EB7400F45F4C /* TestHost.app */,
 				E8D89BA31955FC6D00CF2B9A /* Tests.xctest */,
@@ -2155,9 +2155,9 @@
 			productReference = 53124AB825B71AF600771CE4 /* SwiftUITestHost.app */;
 			productType = "com.apple.product-type.application";
 		};
-		53124AD325B71AF700771CE4 /* SwiftUITestHostUITests */ = {
+		53124AD325B71AF700771CE4 /* SwiftUITests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 53124AE125B71AF700771CE4 /* Build configuration list for PBXNativeTarget "SwiftUITestHostUITests" */;
+			buildConfigurationList = 53124AE125B71AF700771CE4 /* Build configuration list for PBXNativeTarget "SwiftUITests" */;
 			buildPhases = (
 				53124AD025B71AF700771CE4 /* Sources */,
 				53124AD125B71AF700771CE4 /* Frameworks */,
@@ -2169,9 +2169,9 @@
 				3FF5165226E96D2B00618280 /* PBXTargetDependency */,
 				534DF4D025B86F3A00655AE2 /* PBXTargetDependency */,
 			);
-			name = SwiftUITestHostUITests;
+			name = SwiftUITests;
 			productName = SwiftUITestHostUITests;
-			productReference = 53124AD425B71AF700771CE4 /* SwiftUITestHostUITests.xctest */;
+			productReference = 53124AD425B71AF700771CE4 /* SwiftUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 		5D659E7D1BE04556006515A0 /* Realm */ = {
@@ -2271,9 +2271,9 @@
 			productReference = AC8846732686573B00DF4A65 /* SwiftUISyncTestHost.app */;
 			productType = "com.apple.product-type.application";
 		};
-		AC88475926888C6300DF4A65 /* SwiftUISyncTestHostUITests */ = {
+		AC88475926888C6300DF4A65 /* SwiftUISyncTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = AC88477E26888C6300DF4A65 /* Build configuration list for PBXNativeTarget "SwiftUISyncTestHostUITests" */;
+			buildConfigurationList = AC88477E26888C6300DF4A65 /* Build configuration list for PBXNativeTarget "SwiftUISyncTests" */;
 			buildPhases = (
 				AC88476326888C6300DF4A65 /* Sources */,
 				AC88477726888C6300DF4A65 /* Frameworks */,
@@ -2286,9 +2286,9 @@
 				AC88475A26888C6300DF4A65 /* PBXTargetDependency */,
 				AC88479E26891D4500DF4A65 /* PBXTargetDependency */,
 			);
-			name = SwiftUISyncTestHostUITests;
+			name = SwiftUISyncTests;
 			productName = SwiftUISyncTestHostUITests;
-			productReference = AC88478126888C6300DF4A65 /* SwiftUISyncTestHostUITests.xctest */;
+			productReference = AC88478126888C6300DF4A65 /* SwiftUISyncTests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 		E8267FB11D90B79000E001C7 /* ObjectServerTests */ = {
@@ -2364,7 +2364,7 @@
 				CLASSPREFIX = RLM;
 				LastSwiftUpdateCheck = 1230;
 				LastTestingUpgradeCheck = 0510;
-				LastUpgradeCheck = 1300;
+				LastUpgradeCheck = 1330;
 				ORGANIZATIONNAME = Realm;
 				TargetAttributes = {
 					3F1A5E711992EB7400F45F4C = {
@@ -2456,9 +2456,9 @@
 				3F9D91802152D42F00474F09 /* TestHost static */,
 				49E57A16245C3F31004AF428 /* Download BaaS */,
 				53124AB725B71AF600771CE4 /* SwiftUITestHost */,
-				53124AD325B71AF700771CE4 /* SwiftUITestHostUITests */,
+				53124AD325B71AF700771CE4 /* SwiftUITests */,
 				AC8846722686573B00DF4A65 /* SwiftUISyncTestHost */,
-				AC88475926888C6300DF4A65 /* SwiftUISyncTestHostUITests */,
+				AC88475926888C6300DF4A65 /* SwiftUISyncTests */,
 			);
 		};
 /* End PBXProject section */
@@ -3312,7 +3312,7 @@
 		};
 		53124AE225B71AF700771CE4 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 53626A8C25D3172000D9515D /* SwiftUITestHostTests.xcconfig */;
+			baseConfigurationReference = 53626A8C25D3172000D9515D /* SwiftUITests.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "\"-\"";
 				CODE_SIGN_STYLE = Automatic;
@@ -3324,7 +3324,7 @@
 		};
 		53124AE325B71AF700771CE4 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 53626A8C25D3172000D9515D /* SwiftUITestHostTests.xcconfig */;
+			baseConfigurationReference = 53626A8C25D3172000D9515D /* SwiftUITests.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "\"-\"";
 				CODE_SIGN_STYLE = Automatic;
@@ -3424,7 +3424,7 @@
 		};
 		AC88477F26888C6300DF4A65 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = AC8847442687DFE700DF4A65 /* SwiftUISyncTestHostTests.xcconfig */;
+			baseConfigurationReference = AC8847442687DFE700DF4A65 /* SwiftUISyncTests.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
@@ -3436,7 +3436,7 @@
 		};
 		AC88478026888C6300DF4A65 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = AC8847442687DFE700DF4A65 /* SwiftUISyncTestHostTests.xcconfig */;
+			baseConfigurationReference = AC8847442687DFE700DF4A65 /* SwiftUISyncTests.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
@@ -3573,7 +3573,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		53124AE125B71AF700771CE4 /* Build configuration list for PBXNativeTarget "SwiftUITestHostUITests" */ = {
+		53124AE125B71AF700771CE4 /* Build configuration list for PBXNativeTarget "SwiftUITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				53124AE225B71AF700771CE4 /* Debug */,
@@ -3627,7 +3627,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		AC88477E26888C6300DF4A65 /* Build configuration list for PBXNativeTarget "SwiftUISyncTestHostUITests" */ = {
+		AC88477E26888C6300DF4A65 /* Build configuration list for PBXNativeTarget "SwiftUISyncTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				AC88477F26888C6300DF4A65 /* Debug */,

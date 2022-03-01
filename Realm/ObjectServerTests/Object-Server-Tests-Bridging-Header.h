@@ -20,3 +20,4 @@
 #import "RLMSyncTestCase.h"
 #import "RLMUser+ObjectServerTests.h"
 #import "RLMWatchTestUtility.h"
+#import "TestUtils.h"

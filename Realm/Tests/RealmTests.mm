@@ -265,7 +265,7 @@
 }
 #endif // FIXME
 
-#if TARGET_OS_IPHONE && (!TARGET_IPHONE_SIMULATOR || !TARGET_RT_64_BIT)
+#if TARGET_OS_IOS && !TARGET_OS_MACCATALYST && (!TARGET_OS_SIMULATOR || !TARGET_RT_64_BIT)
 - (void)testExceedingVirtualAddressSpace {
     RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
 
@@ -1801,7 +1801,7 @@
 
 - (void)testAsyncNestedWrites {
     XCTestExpectation *transactionsComplete = [self expectationWithDescription:@"async transaction 1 complete"];
-    transactionsComplete.expectedFulfillmentCount = 3;
+    transactionsComplete.expectedFulfillmentCount = 2;
 
     [self dispatchAsync:^{
         RLMRealm *realm = [RLMRealm defaultRealmForQueue:self.bgQueue];

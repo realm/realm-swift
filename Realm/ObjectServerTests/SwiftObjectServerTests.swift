@@ -2581,6 +2581,16 @@ class CombineObjectServerTests: SwiftSyncTestCase {
 
 @available(macOS 12.0, *)
 class AsyncAwaitObjectServerTests: SwiftSyncTestCase {
+    override class var defaultTestSuite: XCTestSuite {
+        // async/await is currently incompatible with thread sanitizer and will
+        // produce many false positives
+        // https://bugs.swift.org/browse/SR-15444
+        if RLMThreadSanitizerEnabled() {
+            return XCTestSuite(name: "\(type(of: self))")
+        }
+        return super.defaultTestSuite
+    }
+
     func testAsyncOpenStandalone() async throws {
         try autoreleasepool {
             let realm = try Realm()

@@ -260,24 +260,24 @@
     RLMAssertThrowsWithReason([PersonObject objectsWhere:@"age != xyz"],
                                       @"Invalid keypath 'xyz': Property 'xyz' not found in object of type 'PersonObject'");
     RLMAssertThrowsWithReason([PersonObject objectsWhere:@"name == 3"],
-                                      @"Cannot compare value '3' of type '__NSCFNumber' to property 'name' of type 'string'");
-    RLMAssertThrowsWithReason([PersonObject objectsWhere:@"age IN {'xyz'}"],
-                                      @"Cannot compare value 'xyz' of type 'NSTaggedPointerString' to property 'age' of type 'int'");
+                              @"Cannot compare value '3' of type '__NSCFNumber' to property 'name' of type 'string'");
+    RLMAssertThrowsWithReasonMatching([PersonObject objectsWhere:@"age IN {'xyz'}"],
+                                      @"Cannot compare value 'xyz' of type '.*String.*' to property 'age' of type 'int'");
     XCTAssertThrows([PersonObject objectsWhere:@"name IN {3}"], @"asdf");
 
     // compare columns to incorrect type of constant value
-    RLMAssertThrowsWithReason([AllTypesObject objectsWhere:@"boolCol == 'Foo'"],
-                              @"Cannot compare value 'Foo' of type 'NSTaggedPointerString' to property 'boolCol' of type 'bool'");
+    RLMAssertThrowsWithReasonMatching([AllTypesObject objectsWhere:@"boolCol == 'Foo'"],
+                                      @"Cannot compare value 'Foo' of type '.*String.*' to property 'boolCol' of type 'bool'");
     RLMAssertThrowsWithReason([AllTypesObject objectsWhere:@"boolCol == 2"],
                               @"Cannot compare value '2' of type '__NSCFNumber' to property 'boolCol' of type 'bool'");
     RLMAssertThrowsWithReason([AllTypesObject objectsWhere:@"dateCol == 7"],
                               @"Cannot compare value '7' of type '__NSCFNumber' to property 'dateCol' of type 'date'");
-    RLMAssertThrowsWithReason([AllTypesObject objectsWhere:@"doubleCol == 'The'"],
-                              @"Cannot compare value 'The' of type 'NSTaggedPointerString' to property 'doubleCol' of type 'double'");
-    RLMAssertThrowsWithReason([AllTypesObject objectsWhere:@"floatCol == 'Bar'"],
-                              @"Cannot compare value 'Bar' of type 'NSTaggedPointerString' to property 'floatCol' of type 'float'");
-    RLMAssertThrowsWithReason([AllTypesObject objectsWhere:@"intCol == 'Baz'"],
-                              @"Cannot compare value 'Baz' of type 'NSTaggedPointerString' to property 'intCol' of type 'int'");
+    RLMAssertThrowsWithReasonMatching([AllTypesObject objectsWhere:@"doubleCol == 'The'"],
+                                      @"Cannot compare value 'The' of type '.*String.*' to property 'doubleCol' of type 'double'");
+    RLMAssertThrowsWithReasonMatching([AllTypesObject objectsWhere:@"floatCol == 'Bar'"],
+                                      @"Cannot compare value 'Bar' of type '.*String.*' to property 'floatCol' of type 'float'");
+    RLMAssertThrowsWithReasonMatching([AllTypesObject objectsWhere:@"intCol == 'Baz'"],
+                                      @"Cannot compare value 'Baz' of type '.*String.*' to property 'intCol' of type 'int'");
 
     // compare two constants
     XCTAssertThrows([PersonObject objectsWhere:@"3 == 3"], @"comparing 2 constants");
@@ -367,8 +367,8 @@
                               @"Property 'height' not found in object of type 'PersonObject'");
 
     // bad type in link IN
-    RLMAssertThrowsWithReason([PersonLinkObject objectsInRealm:realm where:@"person.age IN {'Tim'}"],
-                              @"Cannot compare value 'Tim' of type 'NSTaggedPointerString' to property 'age' of type 'int'");
+    RLMAssertThrowsWithReasonMatching([PersonLinkObject objectsInRealm:realm where:@"person.age IN {'Tim'}"],
+                                      @"Cannot compare value 'Tim' of type '.*String.*' to property 'age' of type 'int'");
 }
 
 - (void)testStringUnsupportedOperations
