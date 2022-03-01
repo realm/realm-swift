@@ -299,7 +299,6 @@ public:
     }
 
     ~KVORecorder() {
-        id self = _observer;
         @try {
             [_obj removeObserver:_observer forKeyPath:_keyPath context:this];
         }
@@ -307,16 +306,13 @@ public:
             XCTFail(@"%@", e.description);
         }
         XCTAssertEqual(0U, _notifications.count);
-        static_cast<void>(self); // Pre-12 versions of Xcode require the self variable but 12 doesn't use it
     }
 
     // record a single notification
     void operator()(NSString *key, id obj, NSDictionary *changeDictionary) {
-        id self = _observer;
         XCTAssertEqual(obj, _obj);
         XCTAssertEqualObjects(key, _keyPath);
-        [_notifications addObject:changeDictionary.copy];
-        static_cast<void>(self); // Pre-12 versions of Xcode require the self variable but 12 doesn't use it
+        [_notifications addObject:[NSDictionary dictionaryWithDictionary:changeDictionary]];
     }
 
     // ensure that the observed object is updated for any changes made to the
@@ -1532,6 +1528,7 @@ public:
 
     id mutator = [obj mutableSetValueForKey:@"set"];
     id mutator2 = [obj2 mutableSetValueForKey:@"set"];
+    id set2 = [obj2 valueForKey:@"set"];
 
     [mutator addObject:obj.obj];
     AssertCollectionChanged();
@@ -1540,14 +1537,14 @@ public:
     [mutator addObject:obj.obj];
     AssertCollectionChanged();
     [mutator2 addObject:obj2.obj];
-    [mutator setSet:mutator2];
+    [mutator setSet:set2];
     AssertCollectionChanged();
 
-    [mutator intersectSet:mutator2];
+    [mutator intersectSet:set2];
     AssertCollectionChanged();
-    [mutator minusSet:mutator2];
+    [mutator minusSet:set2];
     AssertCollectionChanged();
-    [mutator unionSet:mutator2];
+    [mutator unionSet:set2];
     AssertCollectionChanged();
 }
 

@@ -228,3 +228,11 @@ RLMUser *RLMDummyUser() {
 }
 @end
 #pragma clang diagnostic pop
+
+bool RLMThreadSanitizerEnabled() {
+#if __has_feature(thread_sanitizer)
+    return true;
+#else
+    return false;
+#endif
+}

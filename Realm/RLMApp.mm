@@ -40,7 +40,7 @@ namespace {
     /// Internal transport struct to bridge RLMNetworkingTransporting to the GenericNetworkTransport.
     class CocoaNetworkTransport : public realm::app::GenericNetworkTransport {
     public:
-        CocoaNetworkTransport(id<RLMNetworkTransport> transport) : m_transport(transport) {};
+        CocoaNetworkTransport(id<RLMNetworkTransport> transport) : m_transport(transport) {}
 
         void send_request_to_server(app::Request&& request,
                                     util::UniqueFunction<void(const app::Response&)>&& completion) override {

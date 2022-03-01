@@ -82,6 +82,11 @@
     return self;
 }
 
+- (id)copyWithZone:(NSZone *)zone {
+    // RLMObjectID is immutable so we don't have to actually copy
+    return self;
+}
+
 + (instancetype)objectId {
     return [[RLMObjectId alloc] initWithValue:realm::ObjectId::gen()];
 }
