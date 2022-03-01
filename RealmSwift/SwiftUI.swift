@@ -441,13 +441,11 @@ extension Projection: _ObservedResultsValue { }
                 didSet()
             }
         }
-
         var `where`: ((Query<ResultType>) -> Query<Bool>)? {
             didSet {
                 didSet()
             }
         }
-
         var configuration: Realm.Configuration? {
             didSet {
                 didSet()
@@ -477,13 +475,18 @@ extension Projection: _ObservedResultsValue { }
             storage.filter = newValue
         }
     }
+#if swift(>=5.5)
     /// Stores a type safe query used for filtering the Results. This is mutually exclusive
     /// to the `filter` parameter.
     @State public var `where`: ((Query<ResultType>) -> Query<Bool>)? {
+        // The introduction of this property produces a compiler bug in
+        // Xcode 12.5.1. So Swift Queries are supported on Xcode 13 and above
+        // when used with SwiftUI.
         willSet {
             storage.where = newValue
         }
     }
+#endif
     /// :nodoc:
     @State public var sortDescriptor: SortDescriptor? {
         willSet {
@@ -549,6 +552,7 @@ extension Projection: _ObservedResultsValue { }
         self.filter = filter
         self.sortDescriptor = sortDescriptor
     }
+#if swift(>=5.5)
     /**
      Initialize a `ObservedResults` struct for a given `Object` or `EmbeddedObject` type.
      - parameter type: Observed type
@@ -556,7 +560,7 @@ extension Projection: _ObservedResultsValue { }
      user's sync configuration for the given partition value will be set as the `syncConfiguration`,
      if empty the configuration is set to the `defaultConfiguration`
      - parameter where: Observations will be made only for passing objects.
-     If no type safe query given - all objects will be observed
+     If no type safe query is given - all objects will be observed
      - parameter keyPaths: Only properties contained in the key paths array will be observed.
      If `nil`, notifications will be delivered for any property change on the object.
      String key paths which do not correspond to a valid a property will throw an exception.
@@ -572,6 +576,7 @@ extension Projection: _ObservedResultsValue { }
         self.where = `where`
         self.sortDescriptor = sortDescriptor
     }
+#endif
     /// :nodoc:
     public init(_ type: ResultType.Type,
                 keyPaths: [String]? = nil,

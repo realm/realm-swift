@@ -304,6 +304,7 @@ class SwiftUITests: TestCase {
         state.projectedValue.remove(object)
         XCTAssertEqual(state.wrappedValue.count, 0)
     }
+    #if swift(>=5.5)
     func testSwiftQuerySyntax() throws {
         let realm = inMemoryRealm(inMemoryIdentifier)
         try realm.write {
@@ -319,6 +320,7 @@ class SwiftUITests: TestCase {
         XCTAssertEqual(filteredResults.wrappedValue.count, 2)
         XCTAssertEqual(filteredResults.wrappedValue[0].str, "antenna")
     }
+    #endif
     // MARK: Object Operations
     func testUnmanagedObjectModification() throws {
         let state = StateRealmObject(wrappedValue: SwiftUIObject())

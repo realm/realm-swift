@@ -1,7 +1,8 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+* Add ability to use Swift Query syntax in `@ObservedResults`, which allows you 
+  to filter results using the `where` parameter.
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
@@ -45,8 +46,6 @@ x.y.z Release notes (yyyy-MM-dd)
   be invoked with `User.delete()`/`[RLMUser deleteWithCompletion:]`.
 * Add `NSCopying` conformance to `RLMDecimal128` and `RLMObjectId`.
 * Add Xcode 13.3 binaries to the release package (and remove 13.0).
-* Add ability to use Swift Query syntax in `@ObservedResults`, which allows you 
-  to filter results using the `where` parameter.
 
 ### Fixed
 
