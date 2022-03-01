@@ -1,7 +1,8 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+* Add ability to use Swift Query syntax in `@ObservedResults`, which allows you 
+  to filter results using the `where` parameter.
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
