@@ -93,8 +93,7 @@ static void maybeInitObjectSchemaForUnmanaged(RLMObjectBase *obj) {
 }
 
 static id coerceToObjectType(id obj, Class cls, RLMSchema *schema) {
-    if (([obj isKindOfClass:cls] && ![(id)cls isEmbedded]) ||
-        ([(id)cls isEmbedded] && [obj respondsToSelector:@selector(realm)] && ![obj realm])) {
+    if ([obj isKindOfClass:cls] && (![(id)cls isEmbedded] || ![obj realm])) {
         return obj;
     }
     obj = RLMBridgeSwiftValue(obj) ?: obj;
@@ -538,6 +537,9 @@ id RLMObjectThaw(RLMObjectBase *obj) {
 }
 
 id RLMValidatedValueForProperty(id object, NSString *key, NSString *className) {
+    if (![[[object objectSchema] className] isEqualToString:className]) {
+        @throw RLMException(@"Invalid value: cannot initialize '%@' with value '%@'", className, object);
+    }
     @try {
         return [object valueForKey:key];
     }

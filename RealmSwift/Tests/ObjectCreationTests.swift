@@ -906,6 +906,7 @@ class ObjectCreationTests: TestCase {
             ])
             // Do not copy unmanaged object
             let copyD = EmbeddedParentObject(value: parentUnmanaged)
+            XCTAssertTrue(copyD.object === parentUnmanaged.object)
             realm.add(copyD)
             assertThrows(realm.add(parentUnmanaged), "Cannot set a link to an existing managed embedded object")
 
@@ -935,6 +936,14 @@ class ObjectCreationTests: TestCase {
         XCTAssertEqual(copy.array[0].value, 9)
         XCTAssertEqual(copy.array[1].value, 10)
         realmB.cancelWrite()
+    }
+
+    func testInitEmbeddedProperty() {
+        let failVal: [Any] = [[], ["one": SwiftIntObject()]]
+        assertThrows(SwiftDictionaryObject(value: failVal))
+        
+        let passVal: [Any] = [[], ["one": EmbeddedSwiftIntObject()]]
+        XCTAssertNoThrow(SwiftDictionaryObject(value: passVal))
     }
 
     // test null object

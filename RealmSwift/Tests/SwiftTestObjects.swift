@@ -856,3 +856,12 @@ class EmbeddedTreeObject3: EmbeddedObject, EmbeddedTreeObject {
     let parent3 = LinkingObjects(fromType: EmbeddedTreeObject2.self, property: "child")
     let parent4 = LinkingObjects(fromType: EmbeddedTreeObject2.self, property: "children")
 }
+
+class EmbeddedSwiftIntObject: EmbeddedObject {
+    @objc dynamic var intCol = 0
+}
+
+class SwiftDictionaryObject: Object {
+    let intDict = Map<String, SwiftIntObject?>()
+    let embedIntDict = Map<String, EmbeddedSwiftIntObject?>()
+}
