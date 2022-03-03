@@ -537,7 +537,7 @@ id RLMObjectThaw(RLMObjectBase *obj) {
 }
 
 id RLMValidatedValueForProperty(id object, NSString *key, NSString *className) {
-    if (![[[object objectSchema] className] isEqualToString:className]) {
+    if ([object isKindOfClass:[RLMObjectBase class]] && ![[[object objectSchema] className] isEqualToString:className]) {
         @throw RLMException(@"Invalid value: cannot initialize '%@' with value '%@'", className, object);
     }
     @try {
