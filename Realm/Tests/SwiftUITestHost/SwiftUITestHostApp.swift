@@ -18,6 +18,7 @@
 
 import RealmSwift
 import SwiftUI
+import Realm.Private
 
 struct ReminderFormView: View {
     @ObservedRealmObject var reminder: Reminder
@@ -306,6 +307,27 @@ struct ObservedResultsSearchableTestView: View {
     }
 }
 
+struct ObservedResultsSchemaBumpTestView: View {
+    @ObservedResults(ReminderList.self) var reminders
+    @State var searchFilter: String = ""
+
+    var body: some View {
+        NavigationView {
+            List {
+                ForEach(reminders) { reminder in
+                    Text(reminder.name)
+                }
+            }
+            .navigationTitle("Reminders")
+            .navigationBarItems(trailing:
+                Button("add") {
+                    let reminder = ReminderList()
+                    $reminders.append(reminder)
+                }.accessibility(identifier: "addList"))
+        }
+    }
+}
+
 @main
 struct App: SwiftUI.App {
     var body: some Scene {
@@ -330,6 +352,10 @@ struct App: SwiftUI.App {
                 } else {
                     return AnyView(EmptyView())
                 }
+            case "schema_bump_test":
+                let newconfiguration = configuration
+                return AnyView(ObservedResultsSchemaBumpTestView()
+                                .environment(\.realmConfiguration, newconfiguration))
             default:
                 return AnyView(ContentView())
             }
@@ -337,5 +363,40 @@ struct App: SwiftUI.App {
         return WindowGroup {
             view
         }
+    }
+
+    // we are retrieving different configurations for different schema version to been able to test schema migrations on SwiftUI injecting the configuration as an environment value
+    var configuration: Realm.Configuration {
+        let schemaVersion = UInt64(ProcessInfo.processInfo.environment["schema_version"]!)!
+        let rlmConfiguration = RLMRealmConfiguration()
+        rlmConfiguration.objectClasses = [ReminderList.self, Reminder.self]
+        switch schemaVersion {
+        case 2:
+            let schema = RLMSchema(objectClasses: [ReminderList.classForCoder(), Reminder.classForCoder()])
+            let objectSchema = schema.objectSchema[0]
+            let property = objectSchema.properties[2]
+            property.name = "colorFloat"
+            property.type = .float
+            rlmConfiguration.customSchema = schema
+        default: break
+        }
+
+        // Set the default configuration so we can get a swift configuration with the schema change to force a migration block
+        RLMRealmConfiguration.setDefault(rlmConfiguration)
+        var configuration = Realm.Configuration.defaultConfiguration
+        configuration.schemaVersion = schemaVersion
+        configuration.migrationBlock = { migration, oldSchemaVersion in
+            if oldSchemaVersion < 2 {
+                migration.enumerateObjects(ofType: ReminderList.className()) { oldObject, newObject in
+                    let number = oldObject!["colorNumber"] as? Int ?? 0
+                    newObject!["colorFloat"] = Float(number)
+                }
+            }
+        }
+        configuration.fileURL = URL(string: ProcessInfo.processInfo.environment["schema_bump_path"]!)!
+
+        // Reset the default configuration, so ObservedResults set a clean RLMRealmConfiguration the first time, before injecting the environment configuration
+        RLMRealmConfiguration.setDefault(RLMRealmConfiguration.init())
+        return configuration
     }
 }

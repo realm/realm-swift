@@ -703,14 +703,16 @@ extension RealmKeyedCollection {
 /// A subscription which wraps a Realm notification.
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 @frozen public struct ObservationSubscription: Subscription {
-    private var token: NotificationToken
+    private var token: NotificationToken?
     internal init(token: NotificationToken) {
         self.token = token
     }
 
+    internal init() {}
+
     /// A unique identifier for identifying publisher streams.
     public var combineIdentifier: CombineIdentifier {
-        return CombineIdentifier(token)
+        return token != nil ? CombineIdentifier(token!) : CombineIdentifier(NSNumber(value: 0))
     }
 
     /// This function is not implemented.
@@ -721,7 +723,7 @@ extension RealmKeyedCollection {
 
     /// Stop emitting values on this subscription.
     public func cancel() {
-        token.invalidate()
+        token?.invalidate()
     }
 }
 

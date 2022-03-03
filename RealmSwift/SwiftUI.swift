@@ -207,7 +207,7 @@ private final class ObservableStoragePublisher<ObjectType>: Publisher where Obje
         if value.realm != nil && !value.isInvalidated, let value = value.thaw() {
             // This path is for cases where the object is already managed. If an
             // unmanaged object becomes managed it will continue to use KVO.
-            let token =  value._observe(keyPaths, subscriber)
+            let token = value._observe(keyPaths, subscriber)
             subscriber.receive(subscription: ObservationSubscription(token: token))
         } else if let value = unwrappedValue, !value.isInvalidated {
             // else if the value is unmanaged
@@ -222,6 +222,9 @@ private final class ObservableStoragePublisher<ObjectType>: Publisher where Obje
             let subscription = SwiftUIKVO.Subscription(observer: kvo, value: value, keyPaths: keyPaths)
             subscriber.receive(subscription: subscription)
             SwiftUIKVO.observedObjects[value] = subscription
+        } else {
+            // As SwiftUI calls this method before we setup the value, we create an empty subscription which will trigger an UI update when `send` gets called, which will call call again this method and allow us to observe the updated value.
+            subscriber.receive(subscription: ObservationSubscription())
         }
     }
 }
@@ -231,10 +234,8 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
     @Published var value: ObservedType {
         willSet {
             if newValue != value {
-                objectWillChange.subscribers.forEach {
-                    $0.receive(subscription: ObservationSubscription(token: newValue._observe(keyPaths, $0)))
-                }
                 objectWillChange.send()
+                self.objectWillChange = ObservableStoragePublisher(newValue, keyPaths)
             }
         }
     }
@@ -405,14 +406,12 @@ extension Projection: _ObservedResultsValue { }
 ///
 /// Given `@ObservedResults var v` in SwiftUI, `$v` refers to a `BoundCollection`.
 ///
-@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+@available(iOS 13.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
 @propertyWrapper public struct ObservedResults<ResultType>: DynamicProperty, BoundCollection where ResultType: _ObservedResultsValue & RealmFetchable & KeypathSortable & Identifiable {
     private class Storage: ObservableStorage<Results<ResultType>> {
         var setupHasRun = false
         private func didSet() {
-            if setupHasRun {
-                setupValue()
-            }
+            setupValue()
         }
 
         func setupValue() {
@@ -453,6 +452,30 @@ extension Projection: _ObservedResultsValue { }
         }
 
         var searchString: String = ""
+
+        init(_ results: Results<ResultType>,
+             configuration: Realm.Configuration? = nil,
+             filter: NSPredicate? = nil,
+             where: ((Query<ResultType>) -> Query<Bool>)? = nil,
+             keyPaths: [String]? = nil,
+             sortDescriptor: SortDescriptor? = nil) where ResultType: Object {
+            super.init(results, keyPaths)
+            self.configuration = configuration
+            self.filter = filter
+            self.where = `where`
+            self.sortDescriptor = sortDescriptor
+        }
+
+        init<ObjectType: ObjectBase>(_ results: Results<ResultType>,
+                                     configuration: Realm.Configuration? = nil,
+                                     filter: NSPredicate? = nil,
+                                     keyPaths: [String]? = nil,
+                                     sortDescriptor: SortDescriptor? = nil) where ResultType: Projection<ObjectType>, ObjectType: ThreadConfined {
+            super.init(results, keyPaths)
+            self.configuration = configuration
+            self.filter = filter
+            self.sortDescriptor = sortDescriptor
+        }
     }
 
     @Environment(\.realmConfiguration) var configuration
@@ -524,10 +547,10 @@ extension Projection: _ObservedResultsValue { }
                                         keyPaths: [String]? = nil,
                                         sortDescriptor: SortDescriptor? = nil) where ResultType: Projection<ObjectType>, ObjectType: ThreadConfined {
         let results = Results<ResultType>(RLMResults<ResultType>.emptyDetached())
-        self.storage = Storage(results, keyPaths)
-        self.storage.configuration = configuration
-        self.filter = filter
-        self.sortDescriptor = sortDescriptor
+        self.storage = Storage(results,
+                               configuration: configuration,
+                               filter: filter,
+                               sortDescriptor: sortDescriptor)
     }
     /**
      Initialize a `ObservedResults` struct for a given `Object` or `EmbeddedObject` type.
@@ -547,10 +570,11 @@ extension Projection: _ObservedResultsValue { }
                 filter: NSPredicate? = nil,
                 keyPaths: [String]? = nil,
                 sortDescriptor: SortDescriptor? = nil) where ResultType: Object {
-        self.storage = Storage(Results(RLMResults<ResultType>.emptyDetached()), keyPaths)
-        self.storage.configuration = configuration
-        self.filter = filter
-        self.sortDescriptor = sortDescriptor
+        let results = Results<ResultType>(RLMResults<ResultType>.emptyDetached())
+        self.storage = Storage(results,
+                               configuration: configuration,
+                               filter: filter,
+                               sortDescriptor: sortDescriptor)
     }
 #if swift(>=5.5)
     /**
@@ -571,10 +595,11 @@ extension Projection: _ObservedResultsValue { }
                 where: ((Query<ResultType>) -> Query<Bool>)? = nil,
                 keyPaths: [String]? = nil,
                 sortDescriptor: SortDescriptor? = nil) where ResultType: Object {
-        self.storage = Storage(Results(RLMResults<ResultType>.emptyDetached()), keyPaths)
-        self.storage.configuration = configuration
-        self.where = `where`
-        self.sortDescriptor = sortDescriptor
+        let results = Results<ResultType>(RLMResults<ResultType>.emptyDetached())
+        self.storage = Storage(results,
+                               configuration: configuration,
+                               where: `where`,
+                               sortDescriptor: sortDescriptor)
     }
 #endif
     /// :nodoc:
@@ -582,9 +607,10 @@ extension Projection: _ObservedResultsValue { }
                 keyPaths: [String]? = nil,
                 configuration: Realm.Configuration? = nil,
                 sortDescriptor: SortDescriptor? = nil) where ResultType: Object {
-        self.storage = Storage(Results(RLMResults<ResultType>.emptyDetached()), keyPaths)
-        self.storage.configuration = configuration
-        self.sortDescriptor = sortDescriptor
+        let results = Results<ResultType>(RLMResults<ResultType>.emptyDetached())
+        self.storage = Storage(results,
+                               configuration: configuration,
+                               sortDescriptor: sortDescriptor)
     }
 
     public mutating func update() {
