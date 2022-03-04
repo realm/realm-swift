@@ -20,8 +20,6 @@ The feature can be enabled with the build flag `REALM_ASYNC_WRITES`.
     }];
     [realm cancelAsyncTransaction:asyncTransactionId];
 ```
-* None.
-* None.
 * Add ability to use Swift Query syntax in `@ObservedResults`, which allows you 
   to filter results using the `where` parameter.
 
