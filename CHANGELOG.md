@@ -29,6 +29,8 @@ x.y.z Release notes (yyyy-MM-dd)
 * The Swift package set the linker flags on the wrong target, resulting in
   linker errors when SPM decides to build the core library as a dynamic library
   ([#7266](https://github.com/realm/realm-swift/issues/7266)).
+* The download-core task failed if run in an environment without TMPDIR set
+  ([#7688](https://github.com/realm/realm-swift/issues/7688), since v10.23.0).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
