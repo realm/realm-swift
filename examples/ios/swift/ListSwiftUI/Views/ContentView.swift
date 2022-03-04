@@ -201,7 +201,7 @@ struct ReminderListResultsView: View {
         } else {
             list
                 .onChange(of: searchFilter) { value in
-                    $reminders.filter = value.isEmpty ? nil : NSPredicate(format: "name CONTAINS[c] %@", value)
+                    $reminders.where = { $0.name.contains(value, options: .caseInsensitive) }
                 }
         }
     }

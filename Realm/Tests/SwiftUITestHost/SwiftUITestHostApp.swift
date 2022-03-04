@@ -94,7 +94,11 @@ struct ReminderListResultsView: View {
                 }.accessibilityIdentifier(list.name).accessibilityActivationPoint(CGPoint(x: 0, y: 0))
             }.onDelete(perform: $reminders.remove)
         }.onChange(of: searchFilter) { value in
-            $reminders.filter = value.isEmpty ? nil : NSPredicate(format: "name CONTAINS[c] %@", value)
+            if ProcessInfo.processInfo.environment["query_type"] == "type_safe_query" {
+                $reminders.where = value.isEmpty ? nil : { $0.name.contains(value, options: .caseInsensitive) }
+            } else {
+                $reminders.filter = value.isEmpty ? nil : NSPredicate(format: "name CONTAINS[c] %@", value)
+            }
         }
     }
 }
@@ -127,6 +131,7 @@ struct SearchView: View {
                 TextField("search", text: $searchFilter)
                     .padding(.top, 7)
                     .padding(.bottom, 7)
+                    .accessibility(identifier: "searchField")
             }.background(RoundedRectangle(cornerRadius: 15)
                             .fill(Color.secondarySystemBackground))
             Spacer()
