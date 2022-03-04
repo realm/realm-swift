@@ -1799,6 +1799,30 @@
     XCTAssertEqual(0, [StringObject allObjects].count);
 }
 
+- (void)testAsyncTransactionFromSyncTransaction {
+    XCTestExpectation *transaction1 = [self expectationWithDescription:@"async transaction 1 complete"];
+
+    [self dispatchAsync:^{
+        RLMRealm *realm = [RLMRealm defaultRealmForQueue:self.bgQueue];
+
+        [realm beginWriteTransaction];
+        [StringObject createInRealm:realm withValue:@[@"string"]];
+        
+        [realm beginAsyncWriteTransaction:^{
+            [StringObject createInRealm:realm withValue:@[@"string"]];
+
+            [realm commitAsyncWriteTransaction:^(NSError *error) {
+                [transaction1 fulfill];
+                XCTAssertNil(error);
+            }];
+        }];
+        [realm commitWriteTransaction];
+    }];
+
+    [self waitForExpectationsWithTimeout:3.0 handler:nil];
+    XCTAssertEqual(2, [StringObject allObjects].count);
+}
+
 - (void)testAsyncNestedWrites {
     XCTestExpectation *transactionsComplete = [self expectationWithDescription:@"async transaction 1 complete"];
     transactionsComplete.expectedFulfillmentCount = 2;
