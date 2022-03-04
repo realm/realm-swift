@@ -1799,7 +1799,7 @@
     XCTAssertEqual(0, [StringObject allObjects].count);
 }
 
-- (void)FIXME_testAsyncTransactionFromSyncTransaction {
+- (void)testAsyncTransactionFromSyncTransaction {
     XCTestExpectation *transaction1 = [self expectationWithDescription:@"async transaction 1 complete"];
 
     [self dispatchAsync:^{
@@ -1812,7 +1812,6 @@
             [StringObject createInRealm:realm withValue:@[@"string"]];
 
             [realm commitAsyncWriteTransaction:^(NSError *error) {
-                XCTAssertEqual(0, [StringObject allObjects].count);
                 [transaction1 fulfill];
                 XCTAssertNil(error);
             }];
@@ -1821,7 +1820,7 @@
     }];
 
     [self waitForExpectationsWithTimeout:3.0 handler:nil];
-    XCTAssertEqual(0, [StringObject allObjects].count);
+    XCTAssertEqual(2, [StringObject allObjects].count);
 }
 
 - (void)testAsyncNestedWrites {
