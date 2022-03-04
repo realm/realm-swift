@@ -125,6 +125,39 @@ class SwiftUITests: XCTestCase {
         XCTAssertEqual(realm.objects(ReminderList.self).count, 0)
     }
 
+    func testNSPredicateObservedResults() throws {
+        app.launch()
+        try observedResultsQueryTest()
+    }
+
+    func testSwiftQueryObservedResults() throws {
+        app.launchEnvironment["query_type"] = "type_safe_query"
+        app.launch()
+        try observedResultsQueryTest()
+    }
+
+    private func observedResultsQueryTest() throws {
+        let addButton = app.buttons["addList"]
+        (1...20).forEach { _ in
+            addButton.tap()
+        }
+
+        // Name every reminders list for search
+        try realm.write {
+            for (index, obj) in (realm.objects(ReminderList.self)).enumerated() {
+                obj.name = "reminder list \(index)"
+            }
+        }
+
+        let searchBar = app.textFields["searchField"]
+        let table = app.tables.firstMatch
+
+        searchBar.tap()
+
+        searchBar.typeText("reminder list 1")
+        XCTAssertEqual(table.cells.count, 11)
+    }
+
     func testMultipleEnvironmentRealms() {
         app.launchEnvironment["test_type"] = "multi_realm_test"
         app.launch()
