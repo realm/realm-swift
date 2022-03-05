@@ -543,21 +543,26 @@ public class RealmServer: NSObject {
 
         let stitchRoot = RealmServer.buildDir.path + "/go/src/github.com/10gen/stitch"
 
-        // create the admin user
-        let userProcess = Process()
-        userProcess.environment = env
-        userProcess.launchPath = "\(binDir)/create_user"
-        userProcess.arguments = [
-            "addUser",
-            "-domainID",
-            "000000000000000000000000",
-            "-mongoURI", "mongodb://localhost:26000",
-            "-salt", "DQOWene1723baqD!_@#",
-            "-id", "unique_user@domain.com",
-            "-password", "password"
-        ]
-        try userProcess.run()
-        userProcess.waitUntilExit()
+        for _ in 0..<5 {
+            // create the admin user
+            let userProcess = Process()
+            userProcess.environment = env
+            userProcess.launchPath = "\(binDir)/create_user"
+            userProcess.arguments = [
+                "addUser",
+                "-domainID",
+                "000000000000000000000000",
+                "-mongoURI", "mongodb://localhost:26000",
+                "-salt", "DQOWene1723baqD!_@#",
+                "-id", "unique_user@domain.com",
+                "-password", "password"
+            ]
+            try userProcess.run()
+            userProcess.waitUntilExit()
+            if userProcess.terminationStatus == 0 {
+                break
+            }
+        }
 
         serverProcess.environment = env
         // golang server needs a tmp directory
