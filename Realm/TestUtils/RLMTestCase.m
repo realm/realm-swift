@@ -171,6 +171,7 @@ static BOOL encryptTests() {
 
 - (RLMRealm *)inMemoryRealmWithIdentifier:(NSString *)identifier {
     RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
+    configuration.encryptionKey = nil;
     configuration.inMemoryIdentifier = identifier;
     return [RLMRealm realmWithConfiguration:configuration error:nil];
 }
