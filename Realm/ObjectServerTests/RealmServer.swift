@@ -620,7 +620,7 @@ public class RealmServer: NSObject {
             let session = URLSession(configuration: URLSessionConfiguration.default,
                                      delegate: nil,
                                      delegateQueue: OperationQueue())
-            session.dataTask(with: URL(string: "http://localhost:9090")!) { (_, _, error) in
+            session.dataTask(with: URL(string: "http://localhost:9090/api/admin/v3.0/groups/groupId/apps/appId")!) { (_, _, error) in
                 if error != nil {
                     usleep(50000)
                     pingServer(tries + 1)
@@ -630,7 +630,7 @@ public class RealmServer: NSObject {
             }.resume()
         }
         pingServer()
-        guard case .success = group.wait(timeout: .now() + 10) else {
+        guard case .success = group.wait(timeout: .now() + 20) else {
             return XCTFail("Server did not start")
         }
     }
