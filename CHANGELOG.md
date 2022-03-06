@@ -1,10 +1,13 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.24.0 Release notes (2022-03-05)
 =============================================================
+
 ### Enhancements
+
 * Add ability to use Swift Query syntax in `@ObservedResults`, which allows you 
   to filter results using the `where` parameter.
 
 ### Fixed
+
 * If a list of objects contains links to objects not included in the
   synchronized partition, collection change notifications for that list could
   be incorrect ([Core #5164](https://github.com/realm/realm-core/issues/5164), since v10.0.0).
@@ -32,16 +35,16 @@ x.y.z Release notes (yyyy-MM-dd)
 * The download-core task failed if run in an environment without TMPDIR set
   ([#7688](https://github.com/realm/realm-swift/issues/7688), since v10.23.0).
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
-
 ### Compatibility
+
 * Realm Studio: 11.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 13.2.1.
 * CocoaPods: 1.10 or later.
-* Xcode: 12.4-13.2.1.
+* Xcode: 12.4-13.3 beta 3.
 
 ### Internal
+
 * Upgraded realm-core from 11.9.0 to 11.11.0
 
 10.23.0 Release notes (2022-02-28)

@@ -17,11 +17,11 @@
 	<key>CFBundlePackageType</key>
 	<string>FMWK</string>
 	<key>CFBundleShortVersionString</key>
-	<string>10.23.0</string>
+	<string>10.24.0</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>10.23.0</string>
+	<string>10.24.0</string>
 	<key>NSHumanReadableCopyright</key>
 	<string>Copyright © 2014-2021 Realm. All rights reserved.</string>
 	<key>NSPrincipalClass</key>
