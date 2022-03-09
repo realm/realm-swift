@@ -56,6 +56,7 @@ namespace {
             rlmRequest.method = static_cast<RLMHTTPMethod>(request.method);
             rlmRequest.timeout = request.timeout_ms / 1000.0;
 
+            __block auto blockCompletionBlock = std::move(completion);
             // Send the request through to the Cocoa level transport
             auto completion_ptr = completion.release();
             [m_transport sendRequestToServer:rlmRequest completion:^(RLMResponse *response) {
@@ -67,7 +68,7 @@ namespace {
 
                 // Convert the RLMResponse to an app:Response and pass downstream to
                 // the object store
-                completion(app::Response{
+                blockCompletionBlock(app::Response{
                     .http_status_code = static_cast<int>(response.httpStatusCode),
                     .custom_status_code = static_cast<int>(response.customStatusCode),
                     .headers = bridgingHeaders,

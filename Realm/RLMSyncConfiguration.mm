@@ -35,8 +35,66 @@
 #import <realm/object-store/sync/sync_session.hpp>
 #import <realm/sync/config.hpp>
 #import <realm/sync/protocol.hpp>
+#import <realm/util/ez_websocket.hpp>
 
 using namespace realm;
+
+@interface RLMCocoaSocketDelegate : NSObject<NSURLSessionWebSocketDelegate>
+@property realm::util::websocket::EZObserver* observer;
+@end
+
+@implementation RLMCocoaSocketDelegate
+
+- (void)URLSession:(NSURLSession *)session webSocketTask:(NSURLSessionWebSocketTask *)webSocketTask didOpenWithProtocol:(NSString *)protocol {
+    _observer->websocket_handshake_completion_handler([protocol cString]);
+}
+
+- (void)URLSession:(NSURLSession *)session webSocketTask:(NSURLSessionWebSocketTask *)webSocketTask didCloseWithCode:(NSURLSessionWebSocketCloseCode)closeCode reason:(NSData *)reason {
+    _observer->websocket_close_message_received(std::make_error_code(std::errc::connection_aborted),
+                                                RLMStringDataWithNSString([[NSString alloc] initWithData: reason encoding:NSUTF8StringEncoding]));
+}
+
+@end
+
+namespace realm::util::websocket {
+class CocoaSocketFactory: public EZSocketFactory, public EZSocket {
+public:
+    using EZSocketFactory::EZSocketFactory;
+
+    RLMCocoaSocketDelegate *delegate;
+    NSURLSessionWebSocketTask *task;
+
+    void async_write_binary(const char *data, size_t size, util::UniqueFunction<void ()> &&handler) override
+    {
+
+        [task sendMessage:[[NSURLSessionWebSocketMessage alloc] initWithString:@(data)]
+        completionHandler:^(NSError * _Nullable error) {
+            handler();
+        }];
+    }
+
+    std::unique_ptr<EZSocket> connect(EZObserver* observer, EZEndpoint&& endpoint)
+    {
+        task = [[NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration new] delegate:delegate delegateQueue:nil] webSocketTaskWithURL:[[NSURL alloc] initWithString:@(endpoint.path.data())]];
+        delegate = [RLMCocoaSocketDelegate new];
+        delegate.observer = observer;
+        [task receiveMessageWithCompletionHandler:^(NSURLSessionWebSocketMessage * _Nullable message, NSError * _Nullable error) {
+            switch (message.type) {
+                case NSURLSessionWebSocketMessageTypeData:
+                    observer->websocket_binary_message_received([[[NSString alloc] initWithData:message.data encoding:NSUTF8StringEncoding] UTF8String],
+                                                                [message.data length]);
+                    break;
+                case NSURLSessionWebSocketMessageTypeString:
+                    observer->websocket_binary_message_received([message.string UTF8String],
+                                                                [message.data length]);
+                    break;
+            }
+        }];
+        [task resume];
+        return std::unique_ptr<EZSocket>(this);
+    }
+};
+}
 
 namespace {
 using ProtocolError = realm::sync::ProtocolError;
@@ -381,6 +439,10 @@ void RLMSetConfigInfoForClientResetCallbacks(realm::SyncConfig& syncConfig, RLMR
             }
         }
 
+        using namespace realm::util::websocket;
+        _config->socket_factory = [](EZConfig&& config) mutable {
+            return std::unique_ptr<EZSocketFactory>(new CocoaSocketFactory(std::move(config)));
+        };
         self.customFileURL = customFileURL;
         return self;
     }
