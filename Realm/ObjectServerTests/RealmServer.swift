@@ -656,7 +656,7 @@ public class RealmServer: NSObject {
     /// this is partition based sync, and will crash if one is not provided in that mode
     public func createAppForSyncMode(_ syncMode: SyncMode) throws -> AppId {
         guard let session = session else {
-            fatalError()
+            throw URLError(.unknown)
         }
 
         let info = try session.apps.post(["name": "test"]).get()

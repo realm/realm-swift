@@ -481,6 +481,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             // Use counter instead of an expectation because `waitFor*` methods will prematurely fail an expectation
             var afterCalledCount = 0
             let afterClientResetBlock: (Realm, Realm) -> Void = { before, after in
+                // TODO: Copy the object that was discarded over in reset.
                 // Expect the local realm that was overwritten to have had 2 objects before it was overwritten.
                 let results = before.objects(SwiftPerson.self)
                 XCTAssertEqual(results.count, 2)
@@ -501,8 +502,9 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             var configuration = user.configuration(partitionValue: #function,
                                                    clientResetMode: .discardLocal,
                                                    notifyBeforeClientReset: beforeClientResetBlock,
-                                                   notifyAfterClientReset: afterClientResetBlock)
-            configuration.objectTypes = [SwiftPerson.self]
+//                                                   notifyAfterClientReset: afterClientResetBlock)
+                                                   notifyAfterClientReset: nil)
+            configuration.objectTypes = [SwiftPerson.self] // syncconfiguration created before opening, so the callback wrapper will have a block but no rlmconfig
 
             XCTAssertEqual(configuration.syncConfiguration?.clientResetMode, .discardLocal)
             XCTAssertNotNil(configuration.syncConfiguration?.notifyBeforeClientReset)
@@ -510,7 +512,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
             // Seed 1 object, Upload to server
             try autoreleasepool {
-                let realm = try Realm(configuration: configuration)
+                let realm = try Realm(configuration: configuration) // 1.  2. okay *now* opening realm for first time, now the config is set to wrapper
                 waitForDownloads(for: realm)
                 XCTAssertEqual(realm.objects(SwiftPerson.self).count, 0, "Precondition failure: Realm should be empty.") // Tear down may have not been run if test was cancelled.
                 try realm.write {
@@ -522,7 +524,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
             // waitForUploads confirms the server received the upload request from the client
             // It does not guarantee the uploaded objects are persisted to the backing datastore
-            // This expectation queries the server directly for the documents before continuing.
+            // This expectation queries the server directly for the documents before continuing
             var documentCount = 0
             var requestCount = 0
             let timeBetweenRequests = 1

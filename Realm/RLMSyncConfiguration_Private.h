@@ -28,6 +28,9 @@ typedef RLM_CLOSED_ENUM(NSUInteger, RLMSyncStopPolicy) {
     RLMSyncStopPolicyAfterChangesUploaded,
 };
 
+
+@class RLMSchema;
+
 @interface RLMSyncConfiguration ()
 
 - (instancetype)initWithUser:(RLMUser *)user
@@ -40,6 +43,10 @@ typedef RLM_CLOSED_ENUM(NSUInteger, RLMSyncStopPolicy) {
 - (instancetype)initWithUser:(RLMUser *)user
                   stopPolicy:(RLMSyncStopPolicy)stopPolicy
           enableFlexibleSync:(BOOL)enableFlexibleSync;
+
+// Passes the RLMRealmConfiguration to it's RLMSyncConfiguration so client reset callbacks
+// can access the schema, dynamic, and path.
+- (void)setClientResetConfig:(RLMRealmConfiguration *)config;
 
 @property (nonatomic, readwrite) RLMSyncStopPolicy stopPolicy;
 

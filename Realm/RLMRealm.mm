@@ -34,6 +34,7 @@
 #import "RLMRealmConfiguration_Private.hpp"
 #import "RLMRealmUtil.hpp"
 #import "RLMSchema_Private.hpp"
+#import "RLMSyncConfiguration.h"
 #import "RLMSet_Private.hpp"
 #import "RLMThreadSafeReference_Private.hpp"
 #import "RLMUpdateChecker.hpp"
@@ -469,6 +470,14 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     configuration = [configuration copy];
     Realm::Config& config = configuration.config;
 
+    // Pass the configuration so client reset callbacks can access schema and path information.
+    if (configuration.syncConfiguration.beforeClientReset || configuration.syncConfiguration.afterClientReset) {
+        [configuration.syncConfiguration setClientResetConfig:configuration];
+    }
+    // check if config has syncconfiguration
+    // set RLMSchema on the wrappers after schema has been created
+    // assign new syncconfiguration to config
+    
     RLMRealm *realm = [[self alloc] initPrivate];
     realm->_dynamic = dynamic;
 

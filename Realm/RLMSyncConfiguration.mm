@@ -22,6 +22,9 @@
 #import "RLMBSON_Private.hpp"
 #import "RLMRealm_Private.hpp"
 #import "RLMRealmConfiguration+Sync.h"
+#import "RLMRealmConfiguration_Private.h"
+#import "RLMRealmConfiguration_Private.hpp"
+#import "RLMRealmUtil.hpp"
 #import "RLMSchema_Private.hpp"
 #import "RLMSyncManager_Private.hpp"
 #import "RLMSyncSession_Private.hpp"
@@ -60,21 +63,44 @@ RLMSyncSystemErrorKind errorKindForSyncError(SyncError error) {
 
 struct BeforeClientResetWrapper {
     RLMClientResetBeforeBlock block;
+    RLMRealmConfiguration *rlmConfig;
     void operator()(std::shared_ptr<Realm> local) {
-        RLMSchema *schema = [RLMSchema dynamicSchemaFromObjectStoreSchema:local->schema()];
+        RLMSchema *schema;
+        if (rlmConfig.dynamic) {
+            schema = [RLMSchema dynamicSchemaFromObjectStoreSchema:local->schema()];
+        }
+        if (auto cached = RLMGetAnyCachedRealmForPath(rlmConfig.config.path)) {
+            schema = cached.schema;
+        } else {
+            schema = rlmConfig.customSchema ?: RLMSchema.sharedSchema;
+        }
         RLMRealm *realm = [RLMRealm realmWithSharedRealm:local schema:schema];
+        realm->_realm->set_schema_subset(realm->_realm->schema());
+        realm->_info = realm->_info.clone(realm->_realm->schema(), realm);
         block(realm);
     }
 };
 
 struct AfterClientResetWrapper {
     RLMClientResetAfterBlock block;
+    RLMRealmConfiguration *rlmConfig;
     void operator()(std::shared_ptr<Realm> local, std::shared_ptr<Realm> remote) {
-        RLMSchema *localSchema = [RLMSchema dynamicSchemaFromObjectStoreSchema:local->schema()];
-        RLMRealm *localRealm = [RLMRealm realmWithSharedRealm:local schema:localSchema];
-        
-        RLMSchema *remoteSchema = [RLMSchema dynamicSchemaFromObjectStoreSchema:remote->schema()];
-        RLMRealm *remoteRealm = [RLMRealm realmWithSharedRealm:remote schema:remoteSchema];
+        RLMSchema *schema;
+        if (rlmConfig.dynamic) {
+            schema = [RLMSchema dynamicSchemaFromObjectStoreSchema:local->schema()];
+        }
+        if (auto cached = RLMGetAnyCachedRealmForPath(rlmConfig.config.path)) {
+            schema = cached.schema;
+        } else {
+            schema = rlmConfig.customSchema ?: RLMSchema.sharedSchema;
+        }
+        RLMRealm *localRealm = [RLMRealm realmWithSharedRealm:local schema:schema];
+        localRealm->_realm->set_schema_subset(localRealm->_realm->schema());
+        localRealm->_info = localRealm->_info.clone(localRealm->_realm->schema(), localRealm);
+
+        RLMRealm *remoteRealm = [RLMRealm realmWithSharedRealm:remote schema:schema];
+        remoteRealm->_realm->set_schema_subset(remoteRealm->_realm->schema());
+        remoteRealm->_info = remoteRealm->_info.clone(remoteRealm->_realm->schema(), remoteRealm);
         block(localRealm, remoteRealm);
     }
 };
@@ -92,6 +118,10 @@ struct AfterClientResetWrapper {
 - (instancetype)initWithRawConfig:(realm::SyncConfig)config {
     if (self = [super init]) {
         _config = std::make_unique<realm::SyncConfig>(std::move(config));
+        auto wrapper = _config->notify_before_client_reset.target<BeforeClientResetWrapper>();
+        auto config = wrapper->rlmConfig; // delete
+        auto block = wrapper->block; // delete
+        NSLog(@"log"); // delete
     }
     return self;
 }
@@ -164,6 +194,17 @@ struct AfterClientResetWrapper {
         _config->notify_after_client_reset = AfterClientResetWrapper{afterClientReset};
     }
 }
+
+ - (void)setClientResetConfig:(RLMRealmConfiguration *)config {
+     if (_config->notify_before_client_reset) {
+         _config->notify_before_client_reset.target<BeforeClientResetWrapper>()->rlmConfig = config;
+         auto wrapper = _config->notify_before_client_reset.target<BeforeClientResetWrapper>(); // used for debugging, delete
+         assert(wrapper->rlmConfig != nil); // used for debugging, delete
+     }
+     if (_config->notify_after_client_reset) {
+         _config->notify_after_client_reset.target<AfterClientResetWrapper>()->rlmConfig = config;
+     }
+ }
 
 - (id<RLMBSON>)partitionValue {
     if (!_config->partition_value.empty()) {
