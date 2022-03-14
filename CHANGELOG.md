@@ -1,23 +1,16 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.24.1 Release notes (2022-03-14)
 =============================================================
-### Enhancements
-* None.
 
-### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
-* None.
-
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+Switch to building the Carthage binary with Xcode 13.3. This release contains
+no functional changes from 10.24.0.
 
 ### Compatibility
+
 * Realm Studio: 11.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
-* Carthage release for Swift is built with Xcode 13.2.1.
+* Carthage release for Swift is built with Xcode 13.3.
 * CocoaPods: 1.10 or later.
-* Xcode: 12.4-13.2.1.
-
-### Internal
-* Upgraded realm-core from ? to ?
+* Xcode: 12.4-13.3.
 
 10.24.0 Release notes (2022-03-05)
 =============================================================
