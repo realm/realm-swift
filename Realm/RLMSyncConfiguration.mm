@@ -69,7 +69,7 @@ struct BeforeClientResetWrapper {
         if (rlmConfig.dynamic) {
             schema = [RLMSchema dynamicSchemaFromObjectStoreSchema:local->schema()];
         }
-        if (auto cached = RLMGetAnyCachedRealmForPath(rlmConfig.config.path)) {
+        if (auto cached = RLMGetAnyCachedRealmForPath(rlmConfig.config.path)) { // crash, no rlmConfig, despite being set when realm is open?
             schema = cached.schema;
         } else {
             schema = rlmConfig.customSchema ?: RLMSchema.sharedSchema;
@@ -118,10 +118,6 @@ struct AfterClientResetWrapper {
 - (instancetype)initWithRawConfig:(realm::SyncConfig)config {
     if (self = [super init]) {
         _config = std::make_unique<realm::SyncConfig>(std::move(config));
-        auto wrapper = _config->notify_before_client_reset.target<BeforeClientResetWrapper>();
-        auto config = wrapper->rlmConfig; // delete
-        auto block = wrapper->block; // delete
-        NSLog(@"log"); // delete
     }
     return self;
 }
@@ -137,6 +133,10 @@ struct AfterClientResetWrapper {
 }
 
 - (realm::SyncConfig&)rawConfiguration {
+    if (auto wrapper = _config->notify_before_client_reset.target<BeforeClientResetWrapper>()) { // for debugging
+        auto config = wrapper->rlmConfig; // delete. for debugging.
+        auto block = wrapper->block; // delete. for debugging.
+    }
     return *_config;
 }
 
@@ -195,16 +195,18 @@ struct AfterClientResetWrapper {
     }
 }
 
- - (void)setClientResetConfig:(RLMRealmConfiguration *)config {
-     if (_config->notify_before_client_reset) {
-         _config->notify_before_client_reset.target<BeforeClientResetWrapper>()->rlmConfig = config;
-         auto wrapper = _config->notify_before_client_reset.target<BeforeClientResetWrapper>(); // used for debugging, delete
-         assert(wrapper->rlmConfig != nil); // used for debugging, delete
-     }
-     if (_config->notify_after_client_reset) {
-         _config->notify_after_client_reset.target<AfterClientResetWrapper>()->rlmConfig = config;
-     }
- }
+void RLMSetConfigForClientResetCallbacks(realm::SyncConfig& syncConfig, RLMRealmConfiguration *config) {
+    if (syncConfig.notify_before_client_reset) {
+        syncConfig.notify_before_client_reset.target<BeforeClientResetWrapper>()->rlmConfig = config;
+        auto wrapper = syncConfig.notify_before_client_reset.target<BeforeClientResetWrapper>(); // delete. for debugging.
+        assert(wrapper->rlmConfig); // delete. for debugging
+    }
+    if (syncConfig.notify_after_client_reset) {
+        syncConfig.notify_after_client_reset.target<AfterClientResetWrapper>()->rlmConfig = config;
+        auto wrapper = syncConfig.notify_after_client_reset.target<AfterClientResetWrapper>(); // delete. for debugging.
+        assert(wrapper->rlmConfig); // delete. for debugging.
+    }
+}
 
 - (id<RLMBSON>)partitionValue {
     if (!_config->partition_value.empty()) {

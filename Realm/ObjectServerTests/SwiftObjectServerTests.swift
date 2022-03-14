@@ -504,7 +504,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                                                    notifyBeforeClientReset: beforeClientResetBlock,
 //                                                   notifyAfterClientReset: afterClientResetBlock)
                                                    notifyAfterClientReset: nil)
-            configuration.objectTypes = [SwiftPerson.self] // syncconfiguration created before opening, so the callback wrapper will have a block but no rlmconfig
+            configuration.objectTypes = [SwiftPerson.self]
 
             XCTAssertEqual(configuration.syncConfiguration?.clientResetMode, .discardLocal)
             XCTAssertNotNil(configuration.syncConfiguration?.notifyBeforeClientReset)

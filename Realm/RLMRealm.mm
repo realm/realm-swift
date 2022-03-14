@@ -35,6 +35,7 @@
 #import "RLMRealmUtil.hpp"
 #import "RLMSchema_Private.hpp"
 #import "RLMSyncConfiguration.h"
+#import "RLMSyncConfiguration_Private.hpp"
 #import "RLMSet_Private.hpp"
 #import "RLMThreadSafeReference_Private.hpp"
 #import "RLMUpdateChecker.hpp"
@@ -472,7 +473,7 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
 
     // Pass the configuration so client reset callbacks can access schema and path information.
     if (configuration.syncConfiguration.beforeClientReset || configuration.syncConfiguration.afterClientReset) {
-        [configuration.syncConfiguration setClientResetConfig:configuration];
+        RLMSetConfigForClientResetCallbacks(configuration.syncConfiguration.rawConfiguration, configuration);
     }
     // check if config has syncconfiguration
     // set RLMSchema on the wrappers after schema has been created
