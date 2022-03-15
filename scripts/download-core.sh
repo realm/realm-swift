@@ -8,6 +8,8 @@ readonly source_root
 : "${REALM_BASE_URL:="https://static.realm.io/downloads"}"
 # set to "current" to always use the current build
 : "${REALM_CORE_VERSION:=$(sed -n 's/^REALM_CORE_VERSION=\(.*\)$/\1/p' "${source_root}/dependencies.list")}"
+# Provide a fallback value for TMPDIR, relevant for Xcode Bots
+: "${TMPDIR:=$(getconf DARWIN_USER_TEMP_DIR)}"
 
 readonly dst="$source_root/core"
 copy_core() {

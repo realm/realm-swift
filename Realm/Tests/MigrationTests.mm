@@ -1515,7 +1515,7 @@ RLM_COLLECTION_TYPE(MigrationTestObject);
             XCTAssertNotNil(oldObject);
             XCTAssertNotNil(newObject);
             NSNumber *newIntProperty = newObject[@"object"][@"intCol"];
-            XCTAssertEqual(oldObject[@"object"][@"intCol"], newIntProperty);
+            XCTAssertEqualObjects(oldObject[@"object"][@"intCol"], newIntProperty);
             XCTAssert([newIntProperty isEqual: @42] || [newIntProperty isEqual:@43]);
         }];
         [migration enumerateObjects:EmbeddedIntObject.className block:^(RLMObject *oldObject, RLMObject *newObject) {
@@ -1523,7 +1523,7 @@ RLM_COLLECTION_TYPE(MigrationTestObject);
             XCTAssertNotNil(oldObject);
             XCTAssertNotNil(newObject);
             NSNumber *newIntProperty = newObject[@"intCol"];
-            XCTAssertEqual(oldObject[@"intCol"], newIntProperty);
+            XCTAssertEqualObjects(oldObject[@"intCol"], newIntProperty);
             XCTAssert([newIntProperty isEqual:@42] || [newIntProperty isEqual:@43]);
         }];
     }];

@@ -944,15 +944,15 @@ private class CombineCollectionPublisherTests<Collection: RealmCollection>: Comb
             .sink { _ in
                 ex.fulfill()
         }
-        waitForExpectations(timeout: 0.1, handler: nil)
+        waitForExpectations(timeout: 1.0, handler: nil)
 
         ex = expectation(description: "change notification")
         try! realm.write { collection.appendObject() }
-        waitForExpectations(timeout: 0.1, handler: nil)
+        waitForExpectations(timeout: 1.0, handler: nil)
 
         ex = expectation(description: "change notification")
         try! realm.write { collection.modifyObject() }
-        waitForExpectations(timeout: 0.1, handler: nil)
+        waitForExpectations(timeout: 1.0, handler: nil)
     }
     func testSubscribeOnKeyPathNoChange() {
         var ex = expectation(description: "initial notification")
@@ -963,16 +963,16 @@ private class CombineCollectionPublisherTests<Collection: RealmCollection>: Comb
             .sink { _ in
                 ex.fulfill()
         }
-        waitForExpectations(timeout: 0.1, handler: nil)
+        waitForExpectations(timeout: 1.0, handler: nil)
 
         ex = expectation(description: "change notification")
         try! realm.write { collection.appendObject() }
-        waitForExpectations(timeout: 0.1, handler: nil)
+        waitForExpectations(timeout: 1.0, handler: nil)
 
         ex = expectation(description: "no change notification")
         ex.isInverted = true
         try! realm.write { collection.modifyObject() }
-        waitForExpectations(timeout: 0.1, handler: nil)
+        waitForExpectations(timeout: 1.0, handler: nil)
     }
 
     func testSubscribeOnWithToken() {
@@ -1066,15 +1066,15 @@ private class CombineCollectionPublisherTests<Collection: RealmCollection>: Comb
             .sink { _ in
                 ex.fulfill()
         }
-        waitForExpectations(timeout: 0.1, handler: nil)
+        waitForExpectations(timeout: 1.0, handler: nil)
 
         ex = expectation(description: "change notification")
         try! realm.write { collection.appendObject() }
-        waitForExpectations(timeout: 0.1, handler: nil)
+        waitForExpectations(timeout: 1.0, handler: nil)
 
         ex = expectation(description: "change notification")
         try! realm.write { collection.modifyObject() }
-        waitForExpectations(timeout: 0.1, handler: nil)
+        waitForExpectations(timeout: 1.0, handler: nil)
     }
 
     func testChangeSetSubscribeOnKeyPathNoChange() {
@@ -1085,16 +1085,16 @@ private class CombineCollectionPublisherTests<Collection: RealmCollection>: Comb
             .sink { _ in
                 ex.fulfill()
         }
-        waitForExpectations(timeout: 0.1, handler: nil)
+        waitForExpectations(timeout: 1.0, handler: nil)
 
         ex = expectation(description: "change notification")
         try! realm.write { collection.appendObject() }
-        waitForExpectations(timeout: 0.1, handler: nil)
+        waitForExpectations(timeout: 1.0, handler: nil)
 
         ex = expectation(description: "no change notification")
         ex.isInverted = true
         try! realm.write { collection.modifyObject() }
-        waitForExpectations(timeout: 0.1, handler: nil)
+        waitForExpectations(timeout: 1.0, handler: nil)
     }
 
     func testChangeSetSubscribeOnWithToken() {
@@ -1234,6 +1234,7 @@ private class CombineCollectionPublisherTests<Collection: RealmCollection>: Comb
             .collect()
             .assertNoFailure()
             .sink { arr in
+                XCTAssertEqual(arr.count, 10)
                 for (i, collection) in arr.enumerated() {
                     XCTAssertTrue(collection.isFrozen)
                     XCTAssertEqual(collection.count, i)
@@ -1257,6 +1258,7 @@ private class CombineCollectionPublisherTests<Collection: RealmCollection>: Comb
             .prefix(10)
             .collect()
             .sink { arr in
+                XCTAssertEqual(arr.count, 10)
                 for (i, change) in arr.enumerated() {
                     self.checkChangeset(change, calls: i, frozen: true)
                 }
@@ -1279,6 +1281,7 @@ private class CombineCollectionPublisherTests<Collection: RealmCollection>: Comb
             .collect()
             .assertNoFailure()
             .sink { arr in
+                XCTAssertEqual(arr.count, 10)
                 for (i, change) in arr.enumerated() {
                     self.checkChangeset(change, calls: i, frozen: true)
                 }
@@ -1696,15 +1699,15 @@ private class CombineMapPublisherTests<Collection: RealmKeyedCollection>: Combin
             .sink { _ in
                 ex.fulfill()
         }
-        waitForExpectations(timeout: 0.1, handler: nil)
+        waitForExpectations(timeout: 1.0, handler: nil)
 
         ex = expectation(description: "change notification")
         try! realm.write { collection.appendObject() }
-        waitForExpectations(timeout: 0.1, handler: nil)
+        waitForExpectations(timeout: 1.0, handler: nil)
 
         ex = expectation(description: "change notification")
         try! realm.write { collection.modifyObject() }
-        waitForExpectations(timeout: 0.1, handler: nil)
+        waitForExpectations(timeout: 1.0, handler: nil)
     }
 
     func testSubscribeOnKeyPathNoChange() {
@@ -1716,16 +1719,16 @@ private class CombineMapPublisherTests<Collection: RealmKeyedCollection>: Combin
             .sink { _ in
                 ex.fulfill()
         }
-        waitForExpectations(timeout: 0.1, handler: nil)
+        waitForExpectations(timeout: 1.0, handler: nil)
 
         ex = expectation(description: "change notification")
         try! realm.write { collection.appendObject() }
-        waitForExpectations(timeout: 0.1, handler: nil)
+        waitForExpectations(timeout: 1.0, handler: nil)
 
         ex = expectation(description: "no change notification")
         ex.isInverted = true
         try! realm.write { collection.modifyObject() }
-        waitForExpectations(timeout: 0.1, handler: nil)
+        waitForExpectations(timeout: 1.0, handler: nil)
     }
 
     func testSubscribeOnWithToken() {
@@ -1819,15 +1822,15 @@ private class CombineMapPublisherTests<Collection: RealmKeyedCollection>: Combin
             .sink { _ in
                 ex.fulfill()
         }
-        waitForExpectations(timeout: 0.1, handler: nil)
+        waitForExpectations(timeout: 1.0, handler: nil)
 
         ex = expectation(description: "change notification")
         try! realm.write { collection.appendObject() }
-        waitForExpectations(timeout: 0.1, handler: nil)
+        waitForExpectations(timeout: 1.0, handler: nil)
 
         ex = expectation(description: "change notification")
         try! realm.write { collection.modifyObject() }
-        waitForExpectations(timeout: 0.1, handler: nil)
+        waitForExpectations(timeout: 1.0, handler: nil)
     }
 
     func testChangeSetSubscribeOnKeyPathNoChange() {
@@ -1838,16 +1841,16 @@ private class CombineMapPublisherTests<Collection: RealmKeyedCollection>: Combin
             .sink { _ in
                 ex.fulfill()
         }
-        waitForExpectations(timeout: 0.1, handler: nil)
+        waitForExpectations(timeout: 1.0, handler: nil)
 
         ex = expectation(description: "change notification")
         try! realm.write { collection.appendObject() }
-        waitForExpectations(timeout: 0.1, handler: nil)
+        waitForExpectations(timeout: 1.0, handler: nil)
 
         ex = expectation(description: "no change notification")
         ex.isInverted = true
         try! realm.write { collection.modifyObject() }
-        waitForExpectations(timeout: 0.1, handler: nil)
+        waitForExpectations(timeout: 1.0, handler: nil)
     }
 
     func testChangeSetSubscribeOnWithToken() {

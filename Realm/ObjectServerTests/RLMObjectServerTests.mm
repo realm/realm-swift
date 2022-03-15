@@ -178,8 +178,8 @@ static NSString *generateRandomString(int num) {
 }
 
 - (void)testDeleteUser {
-    RLMUser *firstUser = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                                             register:YES]];
+    [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd)
+                                                        register:YES]];
     RLMUser *secondUser = [self logInUserForCredentials:[self basicCredentialsWithName:@"test2@10gen.com"
                                                                               register:YES]];
 
@@ -630,7 +630,7 @@ static NSString *randomEmail() {
     RLMRealm *realm = [self realmForTest:_cmd];
     NSDictionary *values = [AllTypesSyncObject values:1];
     CHECK_COUNT(0, Person, realm);
-    CHECK_COUNT(0, AllTypesSyncObject, realm)
+    CHECK_COUNT(0, AllTypesSyncObject, realm);
 
     [self writeToPartition:_cmd block:^(RLMRealm *realm) {
         [realm addObjects:@[[Person john], [Person paul], [Person george]]];
@@ -2595,13 +2595,13 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 
     __block RLMChangeStream *changeStream = [collection watchWithDelegate:testUtility delegateQueue:delegateQueue];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        dispatch_semaphore_wait(testUtility.isOpenSemaphore, DISPATCH_TIME_FOREVER);
+        WAIT_FOR_SEMAPHORE(testUtility.isOpenSemaphore, 30.0);
         for (int i = 0; i < 3; i++) {
             [collection insertOneDocument:@{@"name": @"fido"} completion:^(id<RLMBSON> objectId, NSError *error) {
                 XCTAssertNil(error);
                 XCTAssertNotNil(objectId);
             }];
-            dispatch_semaphore_wait(testUtility.semaphore, DISPATCH_TIME_FOREVER);
+            WAIT_FOR_SEMAPHORE(testUtility.semaphore, 30.0);
         }
         [changeStream close];
     });
@@ -2656,7 +2656,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
                                                                delegateQueue:delegateQueue];
 
     dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        dispatch_semaphore_wait(testUtility.isOpenSemaphore, DISPATCH_TIME_FOREVER);
+        WAIT_FOR_SEMAPHORE(testUtility.isOpenSemaphore, 30.0);
         for (int i = 0; i < 3; i++) {
             [collection updateOneDocumentWhere:@{@"_id": objectIds[0]}
                                 updateDocument:@{@"breed": @"king charles", @"name": [NSString stringWithFormat:@"fido-%d", i]}
@@ -2669,7 +2669,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
                                     completion:^(RLMUpdateResult *, NSError *error) {
                 XCTAssertNil(error);
             }];
-            dispatch_semaphore_wait(testUtility.semaphore, DISPATCH_TIME_FOREVER);
+            WAIT_FOR_SEMAPHORE(testUtility.semaphore, 30.0);
         }
         [changeStream close];
     });
@@ -2703,7 +2703,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
                                                              delegateQueue:delegateQueue];
 
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        dispatch_semaphore_wait(testUtility.isOpenSemaphore, DISPATCH_TIME_FOREVER);
+        WAIT_FOR_SEMAPHORE(testUtility.isOpenSemaphore, 30.0);
         for (int i = 0; i < 3; i++) {
             [collection updateOneDocumentWhere:@{@"_id": objectIds[0]}
                                 updateDocument:@{@"breed": @"king charles", @"name": [NSString stringWithFormat:@"fido-%d", i]}
@@ -2716,7 +2716,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
                                     completion:^(RLMUpdateResult *, NSError *error) {
                 XCTAssertNil(error);
             }];
-            dispatch_semaphore_wait(testUtility.semaphore, DISPATCH_TIME_FOREVER);
+            WAIT_FOR_SEMAPHORE(testUtility.semaphore, 30.0);
         }
         [changeStream close];
     });
@@ -2761,8 +2761,8 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
                                                               delegateQueue:delegateQueue];
 
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        dispatch_semaphore_wait(testUtility1.isOpenSemaphore, DISPATCH_TIME_FOREVER);
-        dispatch_semaphore_wait(testUtility2.isOpenSemaphore, DISPATCH_TIME_FOREVER);
+        WAIT_FOR_SEMAPHORE(testUtility1.isOpenSemaphore, 30.0);
+        WAIT_FOR_SEMAPHORE(testUtility2.isOpenSemaphore, 30.0);
         for (int i = 0; i < 3; i++) {
             [collection updateOneDocumentWhere:@{@"_id": objectIds[0]}
                                 updateDocument:@{@"breed": @"king charles", @"name": [NSString stringWithFormat:@"fido-%d", i]}
@@ -2781,8 +2781,8 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
                                     completion:^(RLMUpdateResult *, NSError *error) {
                 XCTAssertNil(error);
             }];
-            dispatch_semaphore_wait(testUtility1.semaphore, DISPATCH_TIME_FOREVER);
-            dispatch_semaphore_wait(testUtility2.semaphore, DISPATCH_TIME_FOREVER);
+            WAIT_FOR_SEMAPHORE(testUtility1.semaphore, 30.0);
+            WAIT_FOR_SEMAPHORE(testUtility2.semaphore, 30.0);
         }
         [changeStream1 close];
         [changeStream2 close];

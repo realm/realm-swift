@@ -49,8 +49,8 @@ class Decimal128Tests: TestCase {
         let addition2 = d3+d4
         let addition3 = d5!+d6!
 
-        XCTAssertEqual(addition1, 6.28888)
-        XCTAssertEqual(addition2.description, "11.111110")
+        XCTAssertEqual(addition1, 6.288888)
+        XCTAssertEqual(addition2.description, "11.11111")
         XCTAssertEqual(d1, 3.144444)
         XCTAssertEqual(d2, 3.144444)
         XCTAssertEqual(d3.description, "1.234567")
@@ -73,7 +73,7 @@ class Decimal128Tests: TestCase {
         let subtraction3 = d5!-d6!
 
         XCTAssertEqual(subtraction1, -1.0)
-        XCTAssertEqual(subtraction2.description, "-1.0")
+        XCTAssertEqual(subtraction2.description, "-1")
         XCTAssertEqual(d1, 2.5)
         XCTAssertEqual(d2, 3.5)
         XCTAssertEqual(d3.description, "2.5")

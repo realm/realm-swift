@@ -551,21 +551,26 @@ public class RealmServer: NSObject {
 
         let stitchRoot = RealmServer.buildDir.path + "/go/src/github.com/10gen/stitch"
 
-        // create the admin user
-        let userProcess = Process()
-        userProcess.environment = env
-        userProcess.launchPath = "\(binDir)/create_user"
-        userProcess.arguments = [
-            "addUser",
-            "-domainID",
-            "000000000000000000000000",
-            "-mongoURI", "mongodb://localhost:26000",
-            "-salt", "DQOWene1723baqD!_@#",
-            "-id", "unique_user@domain.com",
-            "-password", "password"
-        ]
-        try userProcess.run()
-        userProcess.waitUntilExit()
+        for _ in 0..<5 {
+            // create the admin user
+            let userProcess = Process()
+            userProcess.environment = env
+            userProcess.launchPath = "\(binDir)/create_user"
+            userProcess.arguments = [
+                "addUser",
+                "-domainID",
+                "000000000000000000000000",
+                "-mongoURI", "mongodb://localhost:26000",
+                "-salt", "DQOWene1723baqD!_@#",
+                "-id", "unique_user@domain.com",
+                "-password", "password"
+            ]
+            try userProcess.run()
+            userProcess.waitUntilExit()
+            if userProcess.terminationStatus == 0 {
+                break
+            }
+        }
 
         serverProcess.environment = env
         // golang server needs a tmp directory
@@ -628,7 +633,7 @@ public class RealmServer: NSObject {
             let session = URLSession(configuration: URLSessionConfiguration.default,
                                      delegate: nil,
                                      delegateQueue: OperationQueue())
-            session.dataTask(with: URL(string: "http://localhost:9090")!) { (_, _, error) in
+            session.dataTask(with: URL(string: "http://localhost:9090/api/admin/v3.0/groups/groupId/apps/appId")!) { (_, _, error) in
                 if error != nil {
                     usleep(50000)
                     pingServer(tries + 1)
@@ -638,7 +643,7 @@ public class RealmServer: NSObject {
             }.resume()
         }
         pingServer()
-        guard case .success = group.wait(timeout: .now() + 10) else {
+        guard case .success = group.wait(timeout: .now() + 20) else {
             return XCTFail("Server did not start")
         }
     }

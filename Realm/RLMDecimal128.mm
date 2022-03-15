@@ -88,6 +88,12 @@
     return [[self alloc] initWithString:number.stringValue error:nil];
 }
 
+- (id)copyWithZone:(NSZone *)zone {
+    RLMDecimal128 *copy = [[self.class allocWithZone:zone] init];
+    copy->_value = _value;
+    return copy;
+}
+
 - (realm::Decimal128)decimal128Value {
     return _value;
 }
@@ -125,7 +131,29 @@
 }
 
 - (NSString *)stringValue {
-    return @(_value.to_string().c_str());
+    auto str = _value.to_string();
+    // If there's a decimal point, trim trailing zeroes
+    auto decimal_pos = str.find('.');
+    if (decimal_pos != std::string::npos) {
+        // Look specifically at the range between the decimal point and the E
+        // if it's present, and the rest of the string if not
+        std::string_view sv = str;
+        auto e_pos = str.find('E', decimal_pos);
+        if (e_pos != std::string::npos) {
+            sv = sv.substr(0, e_pos);
+        }
+
+        // Remove everything between the character after the final non-zero
+        // and the end of the string (or the E)
+        auto final_non_zero = sv.find_last_not_of('0');
+        REALM_ASSERT(final_non_zero != std::string::npos);
+        if (final_non_zero == decimal_pos) {
+            // Also drop the decimal if there's no non-zero digits after it
+            --final_non_zero;
+        }
+        str.erase(final_non_zero + 1, sv.size() - final_non_zero - 1);
+    }
+    return @(str.c_str());
 }
 
 - (BOOL)isNaN {

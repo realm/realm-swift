@@ -99,17 +99,17 @@ class SwiftBSONTests: XCTestCase {
             "false": false,
             "int": 25,
             "int32": .int32(5),
-            "int64": .int64(10),
+            "int64": .int64(10000000000),
             "double": 15.0,
             "decimal128": .decimal128(Decimal128("1.2E+10")),
             "minkey": .minKey,
             "maxkey": .maxKey,
             "date": .datetime(Date(timeIntervalSince1970: 500.004)),
-            "nestedarray": [[1, 2], [.int32(3), .int32(4)]],
-            "nesteddoc": ["a": 1, "b": 2, "c": false, "d": [3, 4]],
+            "nestedarray": [[.int32(1), .int32(2)], [.int32(3), .int32(4)]],
+            "nesteddoc": ["a": .int32(1), "b": .int32(2), "c": false, "d": [.int32(3), .int32(4)]],
             "oid": .objectId(ObjectId("507f1f77bcf86cd799439011")),
             "regex": .regex(try NSRegularExpression(pattern: "^abc", options: [])),
-            "array1": [1, 2],
+            "array1": [.int32(1), .int32(2)],
             "array2": ["string1", "string2"],
             "null": nil
         ]
@@ -134,27 +134,55 @@ class SwiftBSONTests: XCTestCase {
     }
 
     func testArrayRoundTrip() throws {
+        // NSNumber does not guarantee that it will preserve the input type of
+        // ints if the number fits in a smaller type, and in practice it does
+        // convert everything which fits in Int32 to Int32 on platforms which
+        // use tagged pointers to represent NSNumber. This means that round-tripping
+        // to the correct enum case requires Ints to have values that don't fit
+        // in Int32 on 64-bit platforms, and values which do on 32-bit platforms.
+#if arch(i386) || arch(arm)
         let swiftArray: Array<AnyBSON?> = [
             "test string",
             true,
             false,
             25,
             .int32(5),
-            .int64(10),
+            .int64(5000000000),
             15.0,
             .decimal128(Decimal128("1.2E+10")),
             .minKey,
             .maxKey,
             .datetime(Date(timeIntervalSince1970: 500.004)),
-            [[1, 2], [.int32(3), .int32(4)]],
-            ["a": 1, "b": 2, "c": false, "d": [3, 4]],
+            [[10, 20], [.int32(3), .int32(4)]],
+            ["a": .int32(1), "b": .int32(2), "c": false, "d": [.int32(3), .int32(4)]],
             .objectId(ObjectId("507f1f77bcf86cd799439011")),
             .regex(try NSRegularExpression(pattern: "^abc", options: [])),
-            [1, 2],
+            [10, 20],
             ["string1", "string2"],
             nil
         ]
-
+#else
+        let swiftArray: Array<AnyBSON?> = [
+            "test string",
+            true,
+            false,
+            25,
+            .int32(5),
+            .int64(5000000000),
+            15.0,
+            .decimal128(Decimal128("1.2E+10")),
+            .minKey,
+            .maxKey,
+            .datetime(Date(timeIntervalSince1970: 500.004)),
+            [[10000000000, 20000000000], [.int32(3), .int32(4)]],
+            ["a": .int32(1), "b": .int32(2), "c": false, "d": [.int32(3), .int32(4)]],
+            .objectId(ObjectId("507f1f77bcf86cd799439011")),
+            .regex(try NSRegularExpression(pattern: "^abc", options: [])),
+            [10000000000, 20000000000],
+            ["string1", "string2"],
+            nil
+        ]
+#endif
         let rlmBSON: RLMBSON? = ObjectiveCSupport.convert(object: .array(swiftArray))
         guard let array = rlmBSON as? NSArray else {
             XCTFail("RLMBSON was not of type NSDictionary")
