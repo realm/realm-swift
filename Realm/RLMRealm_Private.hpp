@@ -44,7 +44,10 @@ struct RLMResultsSetInfo {
     std::unique_ptr<RLMResultsSetInfo> _resultsSetInfo;
 }
 
-+ (instancetype)realmWithSharedRealm:(std::shared_ptr<realm::Realm>)sharedRealm schema:(RLMSchema *)schema;
+// rename
++ (instancetype)realmWithSharedRealm:(std::shared_ptr<realm::Realm>)sharedRealm
+                              schema:(RLMSchema *)schema
+                             dynamic:(bool)dynamic;
 
 // FIXME - group should not be exposed
 @property (nonatomic, readonly) realm::Group &group;

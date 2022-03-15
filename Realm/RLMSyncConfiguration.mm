@@ -74,9 +74,9 @@ struct BeforeClientResetWrapper {
         } else {
             schema = rlmConfig.customSchema ?: RLMSchema.sharedSchema;
         }
-        RLMRealm *realm = [RLMRealm realmWithSharedRealm:local schema:schema];
-        realm->_realm->set_schema_subset(realm->_realm->schema());
-        realm->_info = realm->_info.clone(realm->_realm->schema(), realm);
+        RLMRealm *realm = [RLMRealm realmWithSharedRealm:local
+                                                  schema:schema
+                                                 dynamic:false];
         block(realm);
     }
 };
@@ -94,13 +94,13 @@ struct AfterClientResetWrapper {
         } else {
             schema = rlmConfig.customSchema ?: RLMSchema.sharedSchema;
         }
-        RLMRealm *localRealm = [RLMRealm realmWithSharedRealm:local schema:schema];
-        localRealm->_realm->set_schema_subset(localRealm->_realm->schema());
-        localRealm->_info = localRealm->_info.clone(localRealm->_realm->schema(), localRealm);
+        RLMRealm *localRealm = [RLMRealm realmWithSharedRealm:local
+                                                       schema:schema
+                                                      dynamic:false];
 
-        RLMRealm *remoteRealm = [RLMRealm realmWithSharedRealm:remote schema:schema];
-        remoteRealm->_realm->set_schema_subset(remoteRealm->_realm->schema());
-        remoteRealm->_info = remoteRealm->_info.clone(remoteRealm->_realm->schema(), remoteRealm);
+        RLMRealm *remoteRealm = [RLMRealm realmWithSharedRealm:remote
+                                                        schema:schema
+                                                       dynamic:false];
         block(localRealm, remoteRealm);
     }
 };
@@ -133,10 +133,6 @@ struct AfterClientResetWrapper {
 }
 
 - (realm::SyncConfig&)rawConfiguration {
-    if (auto wrapper = _config->notify_before_client_reset.target<BeforeClientResetWrapper>()) { // for debugging
-        auto config = wrapper->rlmConfig; // delete. for debugging.
-        auto block = wrapper->block; // delete. for debugging.
-    }
     return *_config;
 }
 
@@ -198,13 +194,9 @@ struct AfterClientResetWrapper {
 void RLMSetConfigForClientResetCallbacks(realm::SyncConfig& syncConfig, RLMRealmConfiguration *config) {
     if (syncConfig.notify_before_client_reset) {
         syncConfig.notify_before_client_reset.target<BeforeClientResetWrapper>()->rlmConfig = config;
-        auto wrapper = syncConfig.notify_before_client_reset.target<BeforeClientResetWrapper>(); // delete. for debugging.
-        assert(wrapper->rlmConfig); // delete. for debugging
     }
     if (syncConfig.notify_after_client_reset) {
         syncConfig.notify_after_client_reset.target<AfterClientResetWrapper>()->rlmConfig = config;
-        auto wrapper = syncConfig.notify_after_client_reset.target<AfterClientResetWrapper>(); // delete. for debugging.
-        assert(wrapper->rlmConfig); // delete. for debugging.
     }
 }
 

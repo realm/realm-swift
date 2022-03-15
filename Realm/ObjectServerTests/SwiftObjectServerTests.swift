@@ -481,7 +481,6 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             // Use counter instead of an expectation because `waitFor*` methods will prematurely fail an expectation
             var afterCalledCount = 0
             let afterClientResetBlock: (Realm, Realm) -> Void = { before, after in
-                // TODO: Copy the object that was discarded over in reset.
                 // Expect the local realm that was overwritten to have had 2 objects before it was overwritten.
                 let results = before.objects(SwiftPerson.self)
                 XCTAssertEqual(results.count, 2)
@@ -502,8 +501,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             var configuration = user.configuration(partitionValue: #function,
                                                    clientResetMode: .discardLocal,
                                                    notifyBeforeClientReset: beforeClientResetBlock,
-//                                                   notifyAfterClientReset: afterClientResetBlock)
-                                                   notifyAfterClientReset: nil)
+                                                   notifyAfterClientReset: afterClientResetBlock)
             configuration.objectTypes = [SwiftPerson.self]
 
             XCTAssertEqual(configuration.syncConfiguration?.clientResetMode, .discardLocal)
@@ -583,7 +581,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                         break
                     }
                     if runCount * timeBetweenRequests > 60 {
-                        XCTFail("Waited longer than one minute for hsitory to resynthesize")
+                        XCTFail("Waited longer than one minute for history to resynthesize")
                         break
                     }
                     runCount += 1
