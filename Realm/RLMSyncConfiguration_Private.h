@@ -19,7 +19,6 @@
 #import <Realm/RLMSyncConfiguration.h>
 
 #import <Realm/RLMConstants.h>
-//#import <realm/sync/config.hpp>
 
 NS_ASSUME_NONNULL_BEGIN
 

@@ -44,7 +44,6 @@ struct RLMResultsSetInfo {
     std::unique_ptr<RLMResultsSetInfo> _resultsSetInfo;
 }
 
-// rename
 + (instancetype)realmWithSharedRealm:(std::shared_ptr<realm::Realm>)sharedRealm
                               schema:(RLMSchema *)schema
                              dynamic:(bool)dynamic;

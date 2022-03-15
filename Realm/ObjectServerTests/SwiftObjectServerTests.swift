@@ -510,7 +510,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
             // Seed 1 object, Upload to server
             try autoreleasepool {
-                let realm = try Realm(configuration: configuration) // 1.  2. okay *now* opening realm for first time, now the config is set to wrapper
+                let realm = try Realm(configuration: configuration)
                 waitForDownloads(for: realm)
                 XCTAssertEqual(realm.objects(SwiftPerson.self).count, 0, "Precondition failure: Realm should be empty.") // Tear down may have not been run if test was cancelled.
                 try realm.write {
