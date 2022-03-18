@@ -104,7 +104,7 @@
     configuration.readOnly = false;
     XCTAssertEqual(configuration.schemaMode, realm::SchemaMode::Automatic);
     configuration.deleteRealmIfMigrationNeeded = true;
-    XCTAssertEqual(configuration.schemaMode, realm::SchemaMode::ResetFile);
+    XCTAssertEqual(configuration.schemaMode, realm::SchemaMode::SoftResetFile);
 
     configuration.deleteRealmIfMigrationNeeded = false;
     XCTAssertEqual(configuration.schemaMode, realm::SchemaMode::Automatic);
