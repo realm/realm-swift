@@ -9,6 +9,9 @@ x.y.z Release notes (yyyy-MM-dd)
 ### Fixed
 * Adding a Realm Object to a `ObservedResults` or a collections using `StateRealmObject` that is managed by the same Realm 
   would throw if the Object was frozen and not thawed before hand.
+* Fix searchable component filter overriding the initial filter on `@Observedresults`, (since v10.23.0). 
+* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
+* None.
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 

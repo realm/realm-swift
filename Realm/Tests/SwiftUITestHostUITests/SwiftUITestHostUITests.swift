@@ -255,15 +255,22 @@ class SwiftUITests: XCTestCase {
             }
         }
 
+        (1...5).forEach { _ in
+            addButton.tap()
+        }
+
         func clearSearchBar() {
             let searchBar = app.searchFields.firstMatch
             let deleteString = String(repeating: XCUIKeyboardKey.delete.rawValue, count: (searchBar.value as? String)!.count)
             searchBar.typeText(deleteString)
         }
 
-        let searchBar = app.searchFields.firstMatch
         let table = app.tables.firstMatch
 
+        // Observed Results filter, should filter reminders without name.
+        XCTAssertEqual(table.cells.count, 20)
+
+        let searchBar = app.searchFields.firstMatch
         searchBar.tap()
 
         searchBar.typeText("reminder")

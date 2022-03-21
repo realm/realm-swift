@@ -435,10 +435,23 @@ extension Projection: _ObservedResultsValue { }
             if let sortDescriptor = sortDescriptor {
                 value = value.sorted(byKeyPath: sortDescriptor.keyPath, ascending: sortDescriptor.ascending)
             }
-            if let filter = filter {
-                value = value.filter(filter)
-            } else if let `where` = `where` {
-                value = value.where(`where`)
+
+            if let searchFilter = searchFilter {
+                if let filter = filter {
+                    let compoundFilter = NSCompoundPredicate(andPredicateWithSubpredicates: [searchFilter, filter])
+                    value = value.filter(compoundFilter)
+                } else if let `where` = `where` {
+                    let compoundFilter = NSCompoundPredicate(andPredicateWithSubpredicates: [searchFilter, `where`])
+                    value = value.filter(compoundFilter)
+                } else {
+                    value = value.filter(searchFilter)
+                }
+            } else {
+                if let filter = filter {
+                    value = value.filter(filter)
+                } else if let `where` = `where` {
+                    value = value.filter(`where`)
+                }
             }
             setupHasRun = true
         }
@@ -454,7 +467,7 @@ extension Projection: _ObservedResultsValue { }
                 didSet()
             }
         }
-        var `where`: ((Query<ResultType>) -> Query<Bool>)? {
+        var `where`: NSPredicate? {
             didSet {
                 didSet()
             }
@@ -466,6 +479,11 @@ extension Projection: _ObservedResultsValue { }
         }
 
         var searchString: String = ""
+        var searchFilter: NSPredicate? {
+            didSet {
+                didSet()
+            }
+        }
     }
 
     @Environment(\.realmConfiguration) var configuration
@@ -473,11 +491,11 @@ extension Projection: _ObservedResultsValue { }
     /// :nodoc:
     fileprivate func searchText<T: ObjectBase>(_ text: String, on keyPath: KeyPath<T, String>) {
         if text.isEmpty {
-            if storage.filter != nil {
-                storage.filter = nil
+            if storage.searchFilter != nil {
+                storage.searchFilter = nil
             }
         } else if text != storage.searchString {
-            storage.filter = Query<T>()[dynamicMember: keyPath].contains(text).predicate
+            storage.searchFilter = Query<T>()[dynamicMember: keyPath].contains(text).predicate
         }
         storage.searchString = text
     }
@@ -496,7 +514,7 @@ extension Projection: _ObservedResultsValue { }
         // Xcode 12.5.1. So Swift Queries are supported on Xcode 13 and above
         // when used with SwiftUI.
         willSet {
-            storage.where = newValue
+            storage.where = newValue != nil ? newValue!(Query()).predicate : nil
         }
     }
 #endif
