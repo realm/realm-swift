@@ -20,10 +20,6 @@ import Foundation
 import Realm
 import Realm.Private
 
-#if !(os(iOS) && (arch(i386) || arch(arm)))
-import Combine
-#endif
-
 /// An enum representing different states for the Subscription Set.
 @frozen public enum SyncSubscriptionState: Equatable {
     /// The subscription is complete and the server has sent all the data that matched the subscription
@@ -54,117 +50,183 @@ import Combine
     }
 }
 
-/**
- `SyncSubscription` is  used to define a Flexible Sync subscription obtained from querying a
- subscription set, which can be used to read or remove/update a committed subscription.
- */
-@frozen public struct SyncSubscription {
+/// :nodoc:
+public protocol _SyncSubscription {
+    /// :nodoc:
+    associatedtype Element: RealmCollectionValue
 
-    // MARK: Initializers
-    fileprivate let _rlmSyncSubscription: RLMSyncSubscription
+    /// Query string of the subscription.
+    var query: String { get }
 
-    fileprivate init(_ rlmSyncSubscription: RLMSyncSubscription) {
-        self._rlmSyncSubscription = rlmSyncSubscription
-    }
+    /// When the subscription was created. Recorded automatically.
+    var createdAt: Date { get }
 
-    /// Name of the subscription, if not specified it will return the value in Query as a String.
-    public var name: String? {
-        _rlmSyncSubscription.name
+    /// When the subscription was last updated. Recorded automatically.
+    var updatedAt: Date { get}
+
+    #if swift(>=5.6) && canImport(_Concurrency)
+    @available(macOS 10.15, tvOS 13.0, iOS 13.0, watchOS 6.0, *)
+    /**
+     Removes the current subscription from the subscription set, associated to this `QueryResults`.
+
+     - throws: An `NSError` if t
+     */
+    func unsubscribe() async throws
+    #endif // canImport(_Concurrency)
+}
+
+// `SyncSubscription` includes all the common implementation for a subscription.
+internal protocol SyncSubscription: _SyncSubscription {
+    var _rlmSyncSubscription: RLMSyncSubscription? { get }
+    init(_ rlmSyncSubscription: RLMSyncSubscription, _ results: Results<Element>)
+}
+
+extension SyncSubscription {
+    /// Query string of the subscription.
+    public var query: String {
+        _rlmSyncSubscription!.queryString
     }
 
     /// When the subscription was created. Recorded automatically.
     public var createdAt: Date {
-        _rlmSyncSubscription.createdAt
+        _rlmSyncSubscription!.createdAt
     }
 
     /// When the subscription was last updated. Recorded automatically.
     public var updatedAt: Date {
-        _rlmSyncSubscription.updatedAt
+        _rlmSyncSubscription!.updatedAt
     }
+}
 
+#if swift(>=5.6) && canImport(_Concurrency)
+@available(macOS 10.15, tvOS 13.0, iOS 13.0, watchOS 6.0, *)
+extension SyncSubscription {
     /**
-     Updates a Flexible Sync's subscription with an allowed query which will be used to bootstrap data
-     from the server when committed.
-
-     - warning: This method may only be called during a write subscription block.
-
-     - parameter type: The type of the object to be queried.
-     - parameter query: A query which will be used to modify the existing query.
-                        If nil it will set the query to get all documents in the collection.
+     Removes the current subscription from the subscription set, associated to this `QueryResults`.
      */
-    public func updateQuery<T: Object>(toType type: T.Type, where query: ((Query<T>) -> Query<Bool>)? = nil) {
-        guard _rlmSyncSubscription.objectClassName == "\(T.self)" else {
-            throwRealmException("Updating a subscription query of a different Object Type is not allowed.")
+    public func unsubscribe() async throws {
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+            let completion: (Error?) -> Void = { error in
+                if let error = error {
+                    continuation.resume(throwing: error)
+                } else {
+                    continuation.resume()
+                }
+            }
+            _rlmSyncSubscription?.unsubscribe(onComplete: completion)
         }
-        _rlmSyncSubscription.update(with: query?(Query()).predicate ?? NSPredicate(format: "TRUEPREDICATE"))
+    }
+}
+#endif // canImport(_Concurrency)
+
+/**
+ A type-erased `QueryResults`.
+*/
+public struct AnyQueryResults: SyncSubscription, Sequence {
+
+    public typealias Element = DynamicObject
+
+    internal var results: Results<DynamicObject>
+    internal var _rlmSyncSubscription: RLMSyncSubscription?
+
+    init(_ rlmSyncSubscription: RLMSyncSubscription, _ results: Results<DynamicObject>) {
+        self._rlmSyncSubscription = rlmSyncSubscription
+        self.results = results
     }
 
-    /// :nodoc:
-    @available(*, unavailable, renamed: "updateQuery", message: "SyncSubscription update is unavailable, please use `.updateQuery` instead.")
-    public func update<T: Object>(toType type: T.Type, where query: @escaping (Query<T>) -> Query<Bool>) {
-        fatalError("This API is unavailable, , please use `.updateQuery` instead.")
+    /// A human-readable description of the objects represented by the results..
+    public var description: String {
+        return RLMDescriptionWithMaxDepth("AnyQueryResults", results.collection, RLMDescriptionMaxDepth)
+    }
+
+    // MARK: Sequence
+
+    /// Returns an iterator over the elements of this sequence.
+    public func makeIterator() -> Results<Element>.Iterator {
+        results.makeIterator()
     }
 
     /**
-     Updates a Flexible Sync's subscription with an allowed query which will be used to bootstrap data
-     from the server when committed.
-
-     - warning: This method may only be called during a write subscription block.
+    Returns a `QueryResults` for the given type, returns nil if the results doesn't correspond to the given type.
      
-     - parameter predicateFormat: A predicate format string, optionally followed by a variable number of arguments,
-                                  which will be used to modify the query.
+    - parameter type: The type of the results to return.
      */
-    public func updateQuery(to predicateFormat: String, _ args: Any...) {
-        _rlmSyncSubscription.update(with: NSPredicate(format: predicateFormat, argumentArray: unwrapOptionals(in: args)))
-    }
-
-    /// :nodoc:
-    @available(*, unavailable, renamed: "updateQuery", message: "SyncSubscription update is unavailable, please use `.updateQuery` instead.")
-    public func update(to predicateFormat: String, _ args: Any...) {
-        fatalError("This API is unavailable, , please use `.updateQuery` instead.")
-    }
-
-    /**
-     Updates a Flexible Sync's subscription with an allowed query which will be used to bootstrap data
-     from the server when committed.
-
-     - warning: This method may only be called during a write subscription block.
-
-     - parameter predicate: The predicate with which to filter the objects on the server, which
-                            will be used to modify the query.
-     */
-    public func updateQuery(to predicate: NSPredicate) {
-        _rlmSyncSubscription.update(with: predicate)
-    }
-
-    /// :nodoc:
-    @available(*, unavailable, renamed: "updateQuery", message: "SyncSubscription update is unavailable, please use `.updateQuery` instead.")
-    public func update(to predicate: NSPredicate) {
-        fatalError("This API is unavailable, , please use `.updateQuery` instead.")
+    public func `as`<T: Object>(type: T.Type) -> QueryResults<T>? {
+        guard _rlmSyncSubscription!.objectClassName == "\(T.self)" else {
+            return nil
+        }
+        return QueryResults(_rlmSyncSubscription!, results.realm!.objects(T.self).filter(_rlmSyncSubscription!.queryString))
     }
 }
 
 /**
- `SubscriptionQuery` is  used to define an named/unnamed query subscription query, which
- can be added/remove or updated within a write subscription transaction.
- */
-@frozen public struct QuerySubscription<T: Object> {
-    // MARK: Internal
-    fileprivate let name: String?
-    fileprivate var className: String
-    fileprivate var predicate: NSPredicate
+ `QueryResults` wraps a sync subscription and contains the data for the subscription's query,
 
-    /// :nodoc:
-    public typealias QueryFunction = (Query<T>) -> Query<Bool>
+ `QueryResults` works exactly like `Results`and lazily evaluates only the first time it is accessed,
+  and allows all the operations and subqueries over the results.
+ */
+@frozen public struct QueryResults<ElementType>: SyncSubscription, RealmCollectionImpl, Equatable where ElementType: RealmCollectionValue {
+    public typealias Element = ElementType
+
+    internal var _rlmSyncSubscription: RLMSyncSubscription?
+    internal var results: Results<Element>?
+    internal let collection: RLMCollection
+
+    /// A human-readable description of the objects represented by the results.
+    public var description: String {
+        return RLMDescriptionWithMaxDepth("QueryResults", collection, RLMDescriptionMaxDepth)
+    }
+
+    // MARK: Initializers
+
+    init(collection: RLMCollection) {
+        self.collection = collection
+    }
+
+    init(_ rlmSyncSubscription: RLMSyncSubscription, _ results: Results<Element>) {
+        self._rlmSyncSubscription = rlmSyncSubscription
+        self.results = results
+        self.collection = results.collection
+    }
+
+    // MARK: Object Retrieval
+    /**
+     Returns the object at the given `index`.
+     - parameter index: The index.
+     */
+    public subscript(position: Int) -> Element {
+        throwForNegativeIndex(position)
+        return staticBridgeCast(fromObjectiveC: collection.object(at: UInt(position)))
+    }
+
+    // MARK: Equatable
+
+    public static func == (lhs: QueryResults<Element>, rhs: QueryResults<Element>) -> Bool {
+        lhs.collection.isEqual(rhs.collection)
+    }
+}
+
+extension QueryResults: Encodable where Element: Encodable {}
+
+protocol _QuerySubscription {
+    var className: String { get }
+    var predicate: NSPredicate { get }
+}
+
+/**
+ `QuerySubscription` is  used to define a subscription query, used to be able to add a query to a subscription set.
+ */
+@frozen public struct QuerySubscription<T: RealmFetchable>: _QuerySubscription {
+    // MARK: Internal
+    internal var className: String
+    internal var predicate: NSPredicate
 
     /**
      Creates a `QuerySubscription` for the given type.
 
-     - parameter name: Name of the subscription.
-     - parameter query: The query for the subscription, if nil it will set the query to all documents for the collection.
+     - parameter query: The query for the subscription. if nil it will set the query to all documents for the collection.
      */
-    public init(name: String? = nil, query: QueryFunction? = nil) {
-        self.name = name
+    public init(_ query: ((Query<T>) -> Query<Bool>)? = nil) {
         self.className = "\(T.self)"
         self.predicate = query?(Query()).predicate ?? NSPredicate(format: "TRUEPREDICATE")
     }
@@ -172,12 +234,10 @@ import Combine
     /**
      Creates a `QuerySubscription` for the given type.
 
-     - parameter name: Name of the subscription.
      - parameter predicateFormat: A predicate format string, optionally followed by a variable number of arguments,
                                   which will be used to create the subscription.
      */
-    public init(name: String? = nil, where predicateFormat: String, _ args: Any...) {
-        self.name = name
+    public init(_ predicateFormat: String, _ args: Any...) {
         self.className = "\(T.self)"
         self.predicate = NSPredicate(format: predicateFormat, argumentArray: unwrapOptionals(in: args))
     }
@@ -185,11 +245,9 @@ import Combine
     /**
      Creates a `QuerySubscription` for the given type.
 
-     - parameter name: Name of the subscription.
      - parameter predicate: The predicate defining the query used to filter the objects on the server..
      */
-    public init(name: String? = nil, where predicate: NSPredicate) {
-        self.name = name
+    public init(_ predicate: NSPredicate) {
         self.className = "\(T.self)"
         self.predicate = predicate
     }
@@ -197,38 +255,49 @@ import Combine
 
 /**
  `SyncSubscriptionSet` is  a collection of `SyncSubscription`s. This is the entry point
- for adding and removing `SyncSubscription`s.
+ for adding `SyncSubscription`s.
  */
 @frozen public struct SyncSubscriptionSet {
-    // MARK: Internal
+    // MARK: Private
 
-    internal let rlmSyncSubscriptionSet: RLMSyncSubscriptionSet
+    private let rlmSyncSubscriptionSet: RLMSyncSubscriptionSet
+    private let realm: Realm
 
     // MARK: Initializers
 
-    internal init(_ rlmSyncSubscriptionSet: RLMSyncSubscriptionSet) {
+    internal init(_ rlmSyncSubscriptionSet: RLMSyncSubscriptionSet, realm: Realm) {
         self.rlmSyncSubscriptionSet = rlmSyncSubscriptionSet
+        self.realm = realm
     }
 
-    /// The number of subscriptions in the subscription set.
-    public var count: Int { return Int(rlmSyncSubscriptionSet.count) }
+    // MARK: Internal
 
-    /**
-     Synchronously performs any transactions (add/remove/update) to the subscription set within the block.
-
-     - parameter block:      The block containing the subscriptions transactions to perform.
-     - parameter onComplete: The block called upon synchronization of subscriptions to the server. Otherwise
-                             an `Error`describing what went wrong will be returned by the block
-     */
-    public func update(_ block: (() -> Void), onComplete: ((Error?) -> Void)? = nil) {
+    private func write(_ block: (() -> Void), onComplete: ((Error?) -> Void)? = nil) {
         rlmSyncSubscriptionSet.update(block, onComplete: onComplete ?? { _ in })
     }
 
-    /// :nodoc:
-    @available(*, unavailable, renamed: "update", message: "SyncSubscriptionSet write is unavailable, please use `.update` instead.")
-    public func write(_ block: (() -> Void), onComplete: ((Error?) -> Void)? = nil) {
-        fatalError("This API is unavailable, , please use `.update` instead.")
+    private func `append`(_ subscription: _QuerySubscription) {
+        rlmSyncSubscriptionSet.addSubscription(withClassName: subscription.className,
+                                               predicate: subscription.predicate)
     }
+
+    internal func write<T: RealmFetchable>(_ query: ((Query<T>) -> Query<Bool>)? = nil, onComplete: @escaping (QueryResults<T>?, Error?) -> Void) {
+        let querySubscription = QuerySubscription<T>(query)
+        let block = {
+            rlmSyncSubscriptionSet.addSubscription(withClassName: querySubscription.className,
+                                                   predicate: querySubscription.predicate)
+        }
+        rlmSyncSubscriptionSet.update(block, onComplete: { error in
+            if let error = error {
+                onComplete(nil, error)
+            } else {
+                onComplete(QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: querySubscription.className, predicate: querySubscription.predicate)!,
+                                        realm.objects(T.self).filter(querySubscription.predicate)), nil)
+            }
+        })
+    }
+
+    // MARK: Public
 
     /// Returns the current state for the subscription set.
     public var state: SyncSubscriptionState {
@@ -247,172 +316,49 @@ import Combine
     }
 
     /**
-     Returns a subscription by the specified name.
-
-     - parameter named: The name of the subscription searching for.
-     - returns: A subscription for the given name.
-     */
-    public func first(named: String) -> SyncSubscription? {
-        return rlmSyncSubscriptionSet.subscription(withName: named).map(SyncSubscription.init)
-    }
-
-    /**
-     Returns a subscription by the specified query.
+     Returns a `QueryResults` for the specified query.
 
      - parameter type: The type of the object to be queried.
      - parameter where: A query builder that produces a subscription which can be used to search
                         the subscription by query and/or name.
-     - returns: A query builder that produces a subscription which can used to search for the subscription.
+     - returns: `QueryResults` for the given query containing the data for the query.
      */
-    public func first<T: Object>(ofType type: T.Type, `where` query: @escaping (Query<T>) -> Query<Bool>) -> SyncSubscription? {
-        return rlmSyncSubscriptionSet.subscription(withClassName: "\(T.self)", predicate: query(Query()).predicate).map(SyncSubscription.init)
-    }
-
-    /**
-     Returns a subscription by the specified query.
-
-     - parameter type: The type of the object to be queried.
-     - parameter where: A query builder that produces a subscription which can be used to search
-                        the subscription by query and/or name.
-     - returns: A query builder that produces a subscription which can used to search for the subscription.
-     */
-    public func first<T: Object>(ofType type: T.Type, `where` predicateFormat: String, _ args: Any...) -> SyncSubscription? {
-        return rlmSyncSubscriptionSet.subscription(withClassName: "\(T.self)", predicate: NSPredicate(format: predicateFormat, argumentArray: unwrapOptionals(in: args))).map(SyncSubscription.init)
-    }
-
-    /**
-     Returns a subscription by the specified query.
-
-     - parameter type: The type of the object to be queried.
-     - parameter where: A query builder that produces a subscription which can be used to search
-                        the subscription by query and/or name.
-     - returns: A query builder that produces a subscription which can used to search for the subscription.
-     */
-    public func first<T: Object>(ofType type: T.Type, `where` predicate: NSPredicate) -> SyncSubscription? {
-        return rlmSyncSubscriptionSet.subscription(withClassName: "\(T.self)", predicate: predicate).map(SyncSubscription.init)
-    }
-
-    /**
-     Appends one or several subscriptions to the subscription set.
-
-     - warning: This method may only be called during a write subscription block.
-
-     - parameter subscriptions: The subscriptions to be added to the subscription set.
-     */
-    public func `append`<T: Object>(_ subscriptions: QuerySubscription<T>...) {
-        subscriptions.forEach { subscription in
-            rlmSyncSubscriptionSet.addSubscription(withClassName: subscription.className,
-                                                   subscriptionName: subscription.name,
-                                                   predicate: subscription.predicate)
+    public func first<T: Object>(ofType type: T.Type, `where` query: @escaping (Query<T>) -> Query<Bool>) -> QueryResults<T>? {
+        let predicate = query(Query()).predicate
+        return rlmSyncSubscriptionSet.subscription(withClassName: "\(T.self)", predicate: predicate).map {
+            QueryResults($0, realm.objects(T.self).filter(predicate))
         }
     }
 
-    /**
-     Removes a subscription with the specified query.
-
-     - warning: This method may only be called during a write subscription block.
-
-     - parameter type: The type of the object to be removed.
-     - parameter to: A query for the subscription to be removed from the subscription set.
-     */
-    public func remove<T: Object>(ofType type: T.Type, _ query: @escaping (Query<T>) -> Query<Bool>) {
-        rlmSyncSubscriptionSet.removeSubscription(withClassName: "\(T.self)",
-                                                  predicate: query(Query()).predicate)
-    }
-
-    /**
-     Removes a subscription with the specified query.
-
-     - warning: This method may only be called during a write subscription block.
-
-     - parameter type: The type of the object to be removed.
-     - parameter predicateFormat: A predicate format string, optionally followed by a variable number of arguments,
-                                  which will be used to identify the subscription to be removed.
-     */
-    public func remove<T: Object>(ofType type: T.Type, where predicateFormat: String, _ args: Any...) {
-        rlmSyncSubscriptionSet.removeSubscription(withClassName: "\(T.self)",
-                                                  predicate: NSPredicate(format: predicateFormat, argumentArray: unwrapOptionals(in: args)))
-    }
-
-    /**
-     Removes a subscription with the specified query.
-
-     - warning: This method may only be called during a write subscription block.
-
-     - parameter type: The type of the object to be removed.
-     - parameter predicate: The predicate which will be used to identify the subscription to be removed.
-     */
-    public func remove<T: Object>(ofType type: T.Type, where predicate: NSPredicate) {
-        rlmSyncSubscriptionSet.removeSubscription(withClassName: "\(T.self)",
-                                                  predicate: predicate)
-    }
-
-    /**
-     Removes one or several subscriptions from the subscription set.
-
-     - warning: This method may only be called during a write subscription block.
-
-     - parameter subscription: The subscription to be removed from the subscription set.
-     */
-    public func remove(_ subscriptions: SyncSubscription...) {
-        subscriptions.forEach { subscription in
-            rlmSyncSubscriptionSet.remove(subscription._rlmSyncSubscription)
-        }
-    }
-
-    /**
-     Removes a subscription with the specified name from the subscription set.
-
-     - warning: This method may only be called during a write subscription block.
-
-     - parameter named: The name of the subscription to be removed from the subscription set.
-     */
-    public func remove(named: String) {
-        rlmSyncSubscriptionSet.removeSubscription(withName: named)
-    }
-
-    /**
-     Removes all subscriptions from the subscription set.
-
-     - warning: This method may only be called during a write subscription block.
-     - warning: Removing all subscriptions will result in an error if no new subscription is added. Server should
-                acknowledge at least one subscription.
-     */
-    public func removeAll() {
-        rlmSyncSubscriptionSet.removeAllSubscriptions()
-    }
-
-    /**
-     Removes zero or none subscriptions of the given type from the subscription set.
-
-     - warning: This method may only be called during a write subscription block.
-
-     - parameter type: The type of the objects to be removed.
-     */
-    public func removeAll<T: Object>(ofType type: T.Type) {
-        rlmSyncSubscriptionSet.removeAllSubscriptions(withClassName: type.className())
-    }
+    /// The number of subscriptions in the subscription set.
+    public var count: Int { return Int(rlmSyncSubscriptionSet.count) }
 
     // MARK: Subscription Retrieval
 
     /**
-     Returns the subscription at the given `position`.
+     Returns a `AnyQueryResults`representing the query results at the given `position`.
 
      - parameter position: The index for the resulting subscription.
      */
-    public subscript(position: Int) -> SyncSubscription? {
+    public subscript(position: Int) -> AnyQueryResults? {
         throwForNegativeIndex(position)
-        return rlmSyncSubscriptionSet.object(at: UInt(position)).map { SyncSubscription($0) }
+        return rlmSyncSubscriptionSet.object(at: UInt(position)).map {
+            AnyQueryResults($0, realm.dynamicObjects($0.objectClassName))
+        }
     }
 
-    /// Returns the first object in the SyncSubscription list, or `nil` if the subscriptions are empty.
-    public var first: SyncSubscription? {
-        return rlmSyncSubscriptionSet.firstObject().map { SyncSubscription($0) }
+    /// Returns a `AnyQueryResults` representing the first object in the subscription set list, or `nil` if there is no subscriptions.
+    public var first: AnyQueryResults? {
+        return rlmSyncSubscriptionSet.firstObject().map {
+            AnyQueryResults($0, realm.dynamicObjects($0.objectClassName))
+        }
     }
 
-    /// Returns the last object in the SyncSubscription list, or `nil` if the subscriptions are empty.
-    public var last: SyncSubscription? {
-        return rlmSyncSubscriptionSet.lastObject().map { SyncSubscription($0) }
+    /// Returns a `AnyQueryResults` representing the last object in the subscription set list, or `nil` if there is no subscriptions.
+    public var last: AnyQueryResults? {
+        return rlmSyncSubscriptionSet.lastObject().map {
+            AnyQueryResults($0, realm.dynamicObjects($0.objectClassName))
+        }
     }
 }
 
@@ -421,7 +367,7 @@ extension SyncSubscriptionSet: Sequence {
 
     /// Returns a `SyncSubscriptionSetIterator` that yields successive elements in the subscription collection.
     public func makeIterator() -> SyncSubscriptionSetIterator {
-        return SyncSubscriptionSetIterator(rlmSyncSubscriptionSet)
+        return SyncSubscriptionSetIterator(rlmSyncSubscriptionSet, realm)
     }
 }
 
@@ -430,10 +376,12 @@ extension SyncSubscriptionSet: Sequence {
  */
 @frozen public struct SyncSubscriptionSetIterator: IteratorProtocol {
     private let rlmSubscriptionSet: RLMSyncSubscriptionSet
+    private let realm: Realm
     private var index: Int = -1
 
-    init(_ rlmSubscriptionSet: RLMSyncSubscriptionSet) {
+    init(_ rlmSubscriptionSet: RLMSyncSubscriptionSet, _ realm: Realm) {
         self.rlmSubscriptionSet = rlmSubscriptionSet
+        self.realm = realm
     }
 
     private func nextIndex(for index: Int?) -> Int? {
@@ -443,10 +391,12 @@ extension SyncSubscriptionSet: Sequence {
         return nil
     }
 
-    mutating public func next() -> RLMSyncSubscription? {
+    mutating public func next() -> AnyQueryResults? {
         if let index = self.nextIndex(for: self.index) {
             self.index = index
-            return rlmSubscriptionSet.object(at: UInt(index))
+            return rlmSubscriptionSet.object(at: UInt(index)).map {
+                AnyQueryResults($0, realm.dynamicObjects($0.objectClassName))
+            }
         }
         return nil
     }
@@ -456,18 +406,19 @@ extension SyncSubscriptionSet: Sequence {
 @available(macOS 10.15, tvOS 13.0, iOS 13.0, watchOS 6.0, *)
 extension SyncSubscriptionSet {
     /**
-     Creates and commits a transaction, updating the subscription set,
-     this will continue when the server acknowledge and all the data associated with this
-     collection of subscriptions is synced.
+     Asynchronously creates and commit a write transaction and updates the subscription set,
+     this will not wait for the server to acknowledge and see all the data associated with this
+     collection of subscription.
 
      - parameter block: The block containing the subscriptions transactions to perform.
 
-     - throws: An `NSError` if the subscription set state changes to an error state or there is and error while                           committing any changes to the subscriptions.
+     - throws: An `NSError` if the transaction could not be completed successfully.
+               If `block` throws, the function throws the propagated `ErrorType` instead.
      */
     @MainActor
-    public func update(_ block: (() -> Void)) async throws {
+    private func write(_ block: (() -> Void)) async throws {
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
-            update(block) { error in
+            write(block) { error in
                 if let error = error {
                     continuation.resume(throwing: error)
                 } else {
@@ -477,35 +428,485 @@ extension SyncSubscriptionSet {
         }
     }
 
-    /// :nodoc:
-    @available(*, unavailable, renamed: "update", message: "SyncSubscriptionSet write is unavailable, please use `.update` instead.")
-    public func write(_ block: (() -> Void)) async throws {
-        fatalError("This API is unavailable, , please use `.update` instead.")
-    }
-}
-#endif // swift(>=5.6)
-
-#if !(os(iOS) && (arch(i386) || arch(arm)))
-@available(macOS 10.15, iOS 13, tvOS 13, watchOS 6, *)
-extension SyncSubscriptionSet {
-    /**
-     Creates and commit a transaction, updating the subscription set,
-     this will return success when the server acknowledge and all the data associated with this
-     collection of subscriptions is synced.
-
-     - parameter block: The block containing the subscriptions transactions to perform.
-     - returns: A publisher that eventually returns `Result.success` or `Error`.
-     */
-    public func updateSubscriptions(_ block: @escaping (() -> Void)) -> Future<Void, Error> {
-        return Future<Void, Error> { promise in
-            update(block) { error in
-                if let error = error {
-                    promise(.failure(error))
-                } else {
-                    promise(.success(()))
-                }
+    @MainActor
+    private func subscribe(_ subscriptions: _QuerySubscription...) async throws {
+        try await write {
+            subscriptions.forEach { subscription in
+                self.append(subscription)
             }
         }
     }
+
+    /**
+     Appends the query to the current subscription set and wait for the server to acknowledge the subscription,
+     returns a `QueryResults` containing all the data associated to this query.
+
+     - parameter query: The query which will be used for the subscription.
+     - returns: `QueryResults` for the given subscription containing the data for the query.
+
+     - throws: An `NSError` if the subscription couldn't be completed by the client or server.
+     */
+    public func subscribe<T: RealmFetchable>(to query: @escaping ((Query<T>) -> Query<Bool>)) async throws -> QueryResults<T> {
+        let query = QuerySubscription<T>(query)
+        try await subscribe(query)
+        return QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query.className, predicate: query.predicate)!,
+                            realm.objects(T.self).filter(query.predicate))
+    }
+
+    /**
+     Appends the query to the current subscription set and wait for the server to acknowledge the subscription,
+     returns a `QueryResults` containing all the data associated to this object type.
+
+     - parameter type: The type of the object to be queried,.
+     - returns: `QueryResults` for the given subscription containing the data for the query.
+
+     - throws: An `NSError` if the subscription couldn't be completed by the client or server.
+     */
+    public func subscribe<T: RealmFetchable>(to type: T.Type) async throws -> QueryResults<T> {
+        let query = QuerySubscription<T>()
+        try await subscribe(query)
+        return QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query.className, predicate: query.predicate)!,
+                            realm.objects(T.self))
+    }
+
+    /**
+     Appends the query to the current subscription set and wait for the server to acknowledge the subscription,
+     returns a tuple of `QueryResults`s containing all the data associated to this queries.
+
+     - parameter query: A `QuerySubscription` representing the query which will be used for the subscription.
+     - parameter query2: A `QuerySubscription` representing the query which will be used for the subscription.
+     - returns: A tuple of `QueryResults`s for the given subscriptions containing the data for each query.
+
+     - throws: An `NSError` if the subscription couldn't be completed by the client or server.
+     */
+    public func subscribe<T1: RealmFetchable, T2: RealmFetchable>(to query: QuerySubscription<T1>, _ query2: QuerySubscription<T2>) async throws -> (QueryResults<T1>, QueryResults<T2>) {
+        try await subscribe(query, query2)
+        return (QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query.className, predicate: query.predicate)!,
+                             realm.objects(T1.self).filter(query.predicate)),
+                QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query2.className, predicate: query2.predicate)!,
+                             realm.objects(T2.self).filter(query2.predicate)))
+    }
+
+    /**
+     Appends the query to the current subscription set and wait for the server to acknowledge the subscription,
+     returns a tuple of `QueryResults`s containing all the data associated to this queries.
+
+     - parameter query: A `QuerySubscription` representing the query which will be used for the subscription.
+     - parameter query2: A `QuerySubscription` representing the query which will be used for the subscription.
+     - parameter query3: A `QuerySubscription` representing the query which will be used for the subscription.
+     - returns: A tuple of `QueryResults`s for the given subscriptions containing the data for each query.
+
+     - throws: An `NSError` if the subscription couldn't be completed by the client or server.
+     */
+    // swiftlint:disable large_tuple
+    public func subscribe<T1: RealmFetchable, T2: RealmFetchable, T3: RealmFetchable>(to query: QuerySubscription<T1>, _ query2: QuerySubscription<T2>, _ query3: QuerySubscription<T3>) async throws -> (QueryResults<T1>, QueryResults<T2>, QueryResults<T3>) {
+        try await subscribe(query, query2, query3)
+        return (QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query.className, predicate: query.predicate)!,
+                             realm.objects(T1.self).filter(query.predicate)),
+                QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query2.className, predicate: query2.predicate)!,
+                             realm.objects(T2.self).filter(query2.predicate)),
+                QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query3.className, predicate: query3.predicate)!,
+                             realm.objects(T3.self).filter(query3.predicate)))
+    }
+
+    /**
+     Appends the query to the current subscription set and wait for the server to acknowledge the subscription,
+     returns a tuple of `QueryResults`s containing all the data associated to this queries.
+
+     - parameter query: A `QuerySubscription` representing the query which will be used for the subscription.
+     - parameter query2: A `QuerySubscription` representing the query which will be used for the subscription.
+     - parameter query3: A `QuerySubscription` representing the query which will be used for the subscription.
+     - parameter query4: A `QuerySubscription` representing the query which will be used for the subscription.
+     - returns: A tuple of `QueryResults`s for the given subscriptions containing the data for each query.
+
+     - throws: An `NSError` if the subscription couldn't be completed by the client or server.
+     */
+    // swiftlint:disable large_tuple
+    public func subscribe<T1: RealmFetchable, T2: RealmFetchable, T3: RealmFetchable, T4: RealmFetchable>(to query: QuerySubscription<T1>, _ query2: QuerySubscription<T2>, _ query3: QuerySubscription<T3>, _ query4: QuerySubscription<T4>) async throws -> (QueryResults<T1>, QueryResults<T2>, QueryResults<T3>, QueryResults<T4>) {
+        try await subscribe(query, query2, query3, query4)
+        return (QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query.className, predicate: query.predicate)!,
+                             realm.objects(T1.self).filter(query.predicate)),
+                QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query2.className, predicate: query2.predicate)!,
+                             realm.objects(T2.self).filter(query2.predicate)),
+                QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query3.className, predicate: query3.predicate)!,
+                             realm.objects(T3.self).filter(query3.predicate)),
+                QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query4.className, predicate: query4.predicate)!,
+                             realm.objects(T4.self).filter(query4.predicate)))
+    }
+
+    /**
+     Appends the query to the current subscription set and wait for the server to acknowledge the subscription,
+     returns a tuple of `QueryResults`s containing all the data associated to this queries.
+
+     - parameter query: A `QuerySubscription` representing the query which will be used for the subscription.
+     - parameter query2: A `QuerySubscription` representing the query which will be used for the subscription.
+     - parameter query3: A `QuerySubscription` representing the query which will be used for the subscription.
+     - parameter query4: A `QuerySubscription` representing the query which will be used for the subscription.
+     - parameter query5: A `QuerySubscription` representing the query which will be used for the subscription.
+     - returns: A tuple of `QueryResults`s for the given subscriptions containing the data for each query.
+
+     - throws: An `NSError` if the subscription couldn't be completed by the client or server.
+     */
+    // swiftlint:disable large_tuple
+    public func subscribe<T1: RealmFetchable, T2: RealmFetchable, T3: RealmFetchable, T4: RealmFetchable, T5: RealmFetchable>(to query: QuerySubscription<T1>, _ query2: QuerySubscription<T2>, _ query3: QuerySubscription<T3>, _ query4: QuerySubscription<T4>, _ query5: QuerySubscription<T5>) async throws -> (QueryResults<T1>, QueryResults<T2>, QueryResults<T3>, QueryResults<T4>, QueryResults<T5>) {
+        try await subscribe(query, query2, query3, query4, query5)
+        return (QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query.className, predicate: query.predicate)!,
+                             realm.objects(T1.self).filter(query.predicate)),
+                QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query2.className, predicate: query2.predicate)!,
+                             realm.objects(T2.self).filter(query2.predicate)),
+                QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query3.className, predicate: query3.predicate)!,
+                             realm.objects(T3.self).filter(query3.predicate)),
+                QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query4.className, predicate: query4.predicate)!,
+                             realm.objects(T4.self).filter(query4.predicate)),
+                QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query5.className, predicate: query5.predicate)!,
+                             realm.objects(T5.self).filter(query5.predicate)))
+    }
+
+    /**
+     Appends the query to the current subscription set and wait for the server to acknowledge the subscription,
+     returns a tuple of `QueryResults`s containing all the data associated to this queries.
+
+     - parameter query: A `QuerySubscription` representing the query which will be used for the subscription.
+     - parameter query2: A `QuerySubscription` representing the query which will be used for the subscription.
+     - parameter query3: A `QuerySubscription` representing the query which will be used for the subscription.
+     - parameter query4: A `QuerySubscription` representing the query which will be used for the subscription.
+     - parameter query5: A `QuerySubscription` representing the query which will be used for the subscription.
+     - parameter query6: A `QuerySubscription` representing the query which will be used for the subscription.
+     - returns: A tuple of `QueryResults`s for the given subscriptions containing the data for each query.
+
+     - throws: An `NSError` if the subscription couldn't be completed by the client or server.
+     */
+    // swiftlint:disable large_tuple
+    public func subscribe<T1: RealmFetchable, T2: RealmFetchable, T3: RealmFetchable, T4: RealmFetchable, T5: RealmFetchable, T6: RealmFetchable>(to query: QuerySubscription<T1>, _ query2: QuerySubscription<T2>, _ query3: QuerySubscription<T3>, _ query4: QuerySubscription<T4>, _ query5: QuerySubscription<T5>, _ query6: QuerySubscription<T6>) async throws -> (QueryResults<T1>, QueryResults<T2>, QueryResults<T3>, QueryResults<T4>, QueryResults<T5>, QueryResults<T6>) {
+        try await subscribe(query, query2, query3, query4, query5, query6)
+        return (QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query.className, predicate: query.predicate)!,
+                             realm.objects(T1.self).filter(query.predicate)),
+                QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query2.className, predicate: query2.predicate)!,
+                             realm.objects(T2.self).filter(query2.predicate)),
+                QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query3.className, predicate: query3.predicate)!,
+                             realm.objects(T3.self).filter(query3.predicate)),
+                QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query4.className, predicate: query4.predicate)!,
+                             realm.objects(T4.self).filter(query4.predicate)),
+                QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query5.className, predicate: query5.predicate)!,
+                             realm.objects(T5.self).filter(query5.predicate)),
+                QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query6.className, predicate: query6.predicate)!,
+                             realm.objects(T6.self).filter(query6.predicate)))
+    }
+
+    /**
+     Appends the query to the current subscription set and wait for the server to acknowledge the subscription,
+     returns a tuple of `QueryResults`s containing all the data associated to this queries.
+
+     - parameter query: A `QuerySubscription` representing the query which will be used for the subscription.
+     - parameter query2: A `QuerySubscription` representing the query which will be used for the subscription.
+     - parameter query3: A `QuerySubscription` representing the query which will be used for the subscription.
+     - parameter query4: A `QuerySubscription` representing the query which will be used for the subscription.
+     - parameter query5: A `QuerySubscription` representing the query which will be used for the subscription.
+     - parameter query6: A `QuerySubscription` representing the query which will be used for the subscription.
+     - parameter query7: A `QuerySubscription` representing the query which will be used for the subscription.
+     - returns: A tuple of `QueryResults`s for the given subscriptions containing the data for each query.
+
+     - throws: An `NSError` if the subscription couldn't be completed by the client or server.
+     */
+    // swiftlint:disable large_tuple
+    public func subscribe<T1: RealmFetchable, T2: RealmFetchable, T3: RealmFetchable, T4: RealmFetchable, T5: RealmFetchable, T6: RealmFetchable, T7: RealmFetchable>(to query: QuerySubscription<T1>, _ query2: QuerySubscription<T2>, _ query3: QuerySubscription<T3>, _ query4: QuerySubscription<T4>, _ query5: QuerySubscription<T5>, _ query6: QuerySubscription<T6>, _ query7: QuerySubscription<T6>) async throws -> (QueryResults<T1>, QueryResults<T2>, QueryResults<T3>, QueryResults<T4>, QueryResults<T5>, QueryResults<T6>, QueryResults<T7>) {
+        try await subscribe(query, query2, query3, query4, query5, query6, query7)
+        return (QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query.className, predicate: query.predicate)!,
+                             realm.objects(T1.self).filter(query.predicate)),
+                QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query2.className, predicate: query2.predicate)!,
+                             realm.objects(T2.self).filter(query2.predicate)),
+                QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query3.className, predicate: query3.predicate)!,
+                             realm.objects(T3.self).filter(query3.predicate)),
+                QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query4.className, predicate: query4.predicate)!,
+                             realm.objects(T4.self).filter(query4.predicate)),
+                QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query5.className, predicate: query5.predicate)!,
+                             realm.objects(T5.self).filter(query5.predicate)),
+                QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query6.className, predicate: query6.predicate)!,
+                             realm.objects(T6.self).filter(query6.predicate)),
+                QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query7.className, predicate: query7.predicate)!,
+                             realm.objects(T7.self).filter(query7.predicate)))
+    }
+
+    /**
+     Appends the query to the current subscription set and wait for the server to acknowledge the subscription,
+     returns a tuple of `QueryResults`s containing all the data associated to this queries.
+
+     - parameter query: A `QuerySubscription` representing the query which will be used for the subscription.
+     - parameter query2: A `QuerySubscription` representing the query which will be used for the subscription.
+     - parameter query3: A `QuerySubscription` representing the query which will be used for the subscription.
+     - parameter query4: A `QuerySubscription` representing the query which will be used for the subscription.
+     - parameter query5: A `QuerySubscription` representing the query which will be used for the subscription.
+     - parameter query6: A `QuerySubscription` representing the query which will be used for the subscription.
+     - parameter query7: A `QuerySubscription` representing the query which will be used for the subscription.
+     - parameter query8: A `QuerySubscription` representing the query which will be used for the subscription.
+     - returns: A tuple of `QueryResults`s for the given subscriptions containing the data for each query.
+
+     - throws: An `NSError` if the subscription couldn't be completed by the client or server.
+     */
+    // swiftlint:disable large_tuple
+    public func subscribe<T1: RealmFetchable, T2: RealmFetchable, T3: RealmFetchable, T4: RealmFetchable, T5: RealmFetchable, T6: RealmFetchable, T7: RealmFetchable, T8: RealmFetchable>(to query: QuerySubscription<T1>, _ query2: QuerySubscription<T2>, _ query3: QuerySubscription<T3>, _ query4: QuerySubscription<T4>, _ query5: QuerySubscription<T5>, _ query6: QuerySubscription<T6>, _ query7: QuerySubscription<T7>, _ query8: QuerySubscription<T8>) async throws -> (QueryResults<T1>, QueryResults<T2>, QueryResults<T3>, QueryResults<T4>, QueryResults<T5>, QueryResults<T6>, QueryResults<T7>, QueryResults<T8>) {
+        try await subscribe(query, query2, query3, query4, query5, query6, query7, query8)
+        return (QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query.className, predicate: query.predicate)!,
+                             realm.objects(T1.self).filter(query.predicate)),
+                QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query2.className, predicate: query2.predicate)!,
+                             realm.objects(T2.self).filter(query2.predicate)),
+                QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query3.className, predicate: query3.predicate)!,
+                             realm.objects(T3.self).filter(query3.predicate)),
+                QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query4.className, predicate: query4.predicate)!,
+                             realm.objects(T4.self).filter(query4.predicate)),
+                QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query5.className, predicate: query5.predicate)!,
+                             realm.objects(T5.self).filter(query5.predicate)),
+                QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query6.className, predicate: query6.predicate)!,
+                             realm.objects(T6.self).filter(query6.predicate)),
+                QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query7.className, predicate: query7.predicate)!,
+                             realm.objects(T7.self).filter(query7.predicate)),
+                QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query8.className, predicate: query8.predicate)!,
+                             realm.objects(T8.self).filter(query8.predicate)))
+    }
+
+    /**
+     Appends the query to the current subscription set and wait for the server to acknowledge the subscription,
+     returns a tuple of `QueryResults`s containing all the data associated to this queries.
+
+     - parameter query: A `QuerySubscription` representing the query which will be used for the subscription.
+     - parameter query2: A `QuerySubscription` representing the query which will be used for the subscription.
+     - parameter query3: A `QuerySubscription` representing the query which will be used for the subscription.
+     - parameter query4: A `QuerySubscription` representing the query which will be used for the subscription.
+     - parameter query5: A `QuerySubscription` representing the query which will be used for the subscription.
+     - parameter query6: A `QuerySubscription` representing the query which will be used for the subscription.
+     - parameter query7: A `QuerySubscription` representing the query which will be used for the subscription.
+     - parameter query8: A `QuerySubscription` representing the query which will be used for the subscription.
+     - parameter query9: A `QuerySubscription` representing the query which will be used for the subscription.
+     - returns: A tuple of `QueryResults`s for the given subscriptions containing the data for each query.
+
+     - throws: An `NSError` if the subscription couldn't be completed by the client or server.
+     */
+    // swiftlint:disable large_tuple
+    public func subscribe<T1: RealmFetchable, T2: RealmFetchable, T3: RealmFetchable, T4: RealmFetchable, T5: RealmFetchable, T6: RealmFetchable, T7: RealmFetchable, T8: RealmFetchable, T9: RealmFetchable>(to query: QuerySubscription<T1>, _ query2: QuerySubscription<T2>, _ query3: QuerySubscription<T3>, _ query4: QuerySubscription<T4>, _ query5: QuerySubscription<T5>, _ query6: QuerySubscription<T6>, _ query7: QuerySubscription<T7>, _ query8: QuerySubscription<T8>, _ query9: QuerySubscription<T9>) async throws -> (QueryResults<T1>, QueryResults<T2>, QueryResults<T3>, QueryResults<T4>, QueryResults<T5>, QueryResults<T6>, QueryResults<T7>, QueryResults<T8>, QueryResults<T9>) {
+        try await subscribe(query, query2, query3, query4, query5, query6, query7, query8, query9)
+        return (QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query.className, predicate: query.predicate)!,
+                             realm.objects(T1.self).filter(query.predicate)),
+                QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query2.className, predicate: query2.predicate)!,
+                             realm.objects(T2.self).filter(query2.predicate)),
+                QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query3.className, predicate: query3.predicate)!,
+                             realm.objects(T3.self).filter(query3.predicate)),
+                QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query4.className, predicate: query4.predicate)!,
+                             realm.objects(T4.self).filter(query4.predicate)),
+                QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query5.className, predicate: query5.predicate)!,
+                             realm.objects(T5.self).filter(query5.predicate)),
+                QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query6.className, predicate: query6.predicate)!,
+                             realm.objects(T6.self).filter(query6.predicate)),
+                QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query7.className, predicate: query7.predicate)!,
+                             realm.objects(T7.self).filter(query7.predicate)),
+                QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query8.className, predicate: query8.predicate)!,
+                             realm.objects(T8.self).filter(query8.predicate)),
+                QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query9.className, predicate: query9.predicate)!,
+                             realm.objects(T9.self).filter(query9.predicate)))
+    }
+
+    /**
+     Appends the query to the current subscription set and wait for the server to acknowledge the subscription,
+     returns a tuple of `QueryResults`s containing all the data associated to this queries.
+
+     - parameter query: A `QuerySubscription` representing the query which will be used for the subscription.
+     - parameter query2: A `QuerySubscription` representing the query which will be used for the subscription.
+     - parameter query3: A `QuerySubscription` representing the query which will be used for the subscription.
+     - parameter query4: A `QuerySubscription` representing the query which will be used for the subscription.
+     - parameter query5: A `QuerySubscription` representing the query which will be used for the subscription.
+     - parameter query6: A `QuerySubscription` representing the query which will be used for the subscription.
+     - parameter query7: A `QuerySubscription` representing the query which will be used for the subscription.
+     - parameter query8: A `QuerySubscription` representing the query which will be used for the subscription.
+     - parameter query9: A `QuerySubscription` representing the query which will be used for the subscription.
+     - parameter query10: A `QuerySubscription` representing the query which will be used for the subscription.
+     - returns: A tuple of `QueryResults`s for the given subscriptions containing the data for each query.
+
+     - throws: An `NSError` if the subscription couldn't be completed by the client or server.
+     */
+    // swiftlint:disable large_tuple
+    public func subscribe<T1: RealmFetchable, T2: RealmFetchable, T3: RealmFetchable, T4: RealmFetchable, T5: RealmFetchable, T6: RealmFetchable, T7: RealmFetchable, T8: RealmFetchable, T9: RealmFetchable, T10: RealmFetchable>(to query: QuerySubscription<T1>, _ query2: QuerySubscription<T2>, _ query3: QuerySubscription<T3>, _ query4: QuerySubscription<T4>, _ query5: QuerySubscription<T5>, _ query6: QuerySubscription<T6>, _ query7: QuerySubscription<T7>, _ query8: QuerySubscription<T8>, _ query9: QuerySubscription<T9>, _ query10: QuerySubscription<T10>) async throws -> (QueryResults<T1>, QueryResults<T2>, QueryResults<T3>, QueryResults<T4>, QueryResults<T5>, QueryResults<T6>, QueryResults<T7>, QueryResults<T8>, QueryResults<T9>, QueryResults<T10>) {
+        try await subscribe(query, query2, query3, query4, query5, query6, query7, query8, query9, query10)
+        return (QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query.className, predicate: query.predicate)!,
+                             realm.objects(T1.self).filter(query.predicate)),
+                QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query2.className, predicate: query2.predicate)!,
+                             realm.objects(T2.self).filter(query2.predicate)),
+                QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query3.className, predicate: query3.predicate)!,
+                             realm.objects(T3.self).filter(query3.predicate)),
+                QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query4.className, predicate: query4.predicate)!,
+                             realm.objects(T4.self).filter(query4.predicate)),
+                QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query5.className, predicate: query5.predicate)!,
+                             realm.objects(T5.self).filter(query5.predicate)),
+                QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query6.className, predicate: query6.predicate)!,
+                             realm.objects(T6.self).filter(query6.predicate)),
+                QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query7.className, predicate: query7.predicate)!,
+                             realm.objects(T7.self).filter(query7.predicate)),
+                QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query8.className, predicate: query8.predicate)!,
+                             realm.objects(T8.self).filter(query8.predicate)),
+                QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query9.className, predicate: query9.predicate)!,
+                             realm.objects(T9.self).filter(query9.predicate)),
+                QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query10.className, predicate: query10.predicate)!,
+                             realm.objects(T10.self).filter(query10.predicate)))
+    }
+
+    /**
+     Appends the query to the current subscription set and wait for the server to acknowledge the subscription,
+     returns a tuple of `QueryResults`s containing all the data associated to this queries.
+
+     - parameter query: A `QuerySubscription` representing the query which will be used for the subscription.
+     - parameter query2: A `QuerySubscription` representing the query which will be used for the subscription.
+     - parameter query3: A `QuerySubscription` representing the query which will be used for the subscription.
+     - parameter query4: A `QuerySubscription` representing the query which will be used for the subscription.
+     - parameter query5: A `QuerySubscription` representing the query which will be used for the subscription.
+     - parameter query6: A `QuerySubscription` representing the query which will be used for the subscription.
+     - parameter query7: A `QuerySubscription` representing the query which will be used for the subscription.
+     - parameter query8: A `QuerySubscription` representing the query which will be used for the subscription.
+     - parameter query9: A `QuerySubscription` representing the query which will be used for the subscription.
+     - parameter query10: A `QuerySubscription` representing the query which will be used for the subscription.
+     - parameter query11: A `QuerySubscription` representing the query which will be used for the subscription.
+     - returns: A tuple of `QueryResults`s for the given subscriptions containing the data for each query.
+
+     - throws: An `NSError` if the subscription couldn't be completed by the client or server.
+     */
+    // swiftlint:disable large_tuple
+    public func subscribe<T1: RealmFetchable, T2: RealmFetchable, T3: RealmFetchable, T4: RealmFetchable, T5: RealmFetchable, T6: RealmFetchable, T7: RealmFetchable, T8: RealmFetchable, T9: RealmFetchable, T10: RealmFetchable, T11: RealmFetchable>(to query: QuerySubscription<T1>, _ query2: QuerySubscription<T2>, _ query3: QuerySubscription<T3>, _ query4: QuerySubscription<T4>, _ query5: QuerySubscription<T5>, _ query6: QuerySubscription<T6>, _ query7: QuerySubscription<T7>, _ query8: QuerySubscription<T8>, _ query9: QuerySubscription<T9>, _ query10: QuerySubscription<T10>, _ query11: QuerySubscription<T11>) async throws -> (QueryResults<T1>, QueryResults<T2>, QueryResults<T3>, QueryResults<T4>, QueryResults<T5>, QueryResults<T6>, QueryResults<T7>, QueryResults<T8>, QueryResults<T9>, QueryResults<T10>, QueryResults<T11>) {
+        try await subscribe(query, query2, query3, query4, query5, query6, query7, query8, query9, query10, query11)
+        return (QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query.className, predicate: query.predicate)!,
+                             realm.objects(T1.self).filter(query.predicate)),
+                QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query2.className, predicate: query2.predicate)!,
+                             realm.objects(T2.self).filter(query2.predicate)),
+                QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query3.className, predicate: query3.predicate)!,
+                             realm.objects(T3.self).filter(query3.predicate)),
+                QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query4.className, predicate: query4.predicate)!,
+                             realm.objects(T4.self).filter(query4.predicate)),
+                QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query5.className, predicate: query5.predicate)!,
+                             realm.objects(T5.self).filter(query5.predicate)),
+                QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query6.className, predicate: query6.predicate)!,
+                             realm.objects(T6.self).filter(query6.predicate)),
+                QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query7.className, predicate: query7.predicate)!,
+                             realm.objects(T7.self).filter(query7.predicate)),
+                QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query8.className, predicate: query8.predicate)!,
+                             realm.objects(T8.self).filter(query8.predicate)),
+                QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query9.className, predicate: query9.predicate)!,
+                             realm.objects(T9.self).filter(query9.predicate)),
+                QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query10.className, predicate: query10.predicate)!,
+                             realm.objects(T10.self).filter(query10.predicate)),
+                QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query11.className, predicate: query11.predicate)!,
+                             realm.objects(T11.self).filter(query11.predicate)))
+    }
+
+    /**
+     Appends the query to the current subscription set and wait for the server to acknowledge the subscription,
+     returns a tuple of `QueryResults`s containing all the data associated to this queries.
+
+     - parameter query: A `QuerySubscription` representing the query which will be used for the subscription.
+     - parameter query2: A `QuerySubscription` representing the query which will be used for the subscription.
+     - parameter query3: A `QuerySubscription` representing the query which will be used for the subscription.
+     - parameter query4: A `QuerySubscription` representing the query which will be used for the subscription.
+     - parameter query5: A `QuerySubscription` representing the query which will be used for the subscription.
+     - parameter query6: A `QuerySubscription` representing the query which will be used for the subscription.
+     - parameter query7: A `QuerySubscription` representing the query which will be used for the subscription.
+     - parameter query8: A `QuerySubscription` representing the query which will be used for the subscription.
+     - parameter query9: A `QuerySubscription` representing the query which will be used for the subscription.
+     - parameter query10: A `QuerySubscription` representing the query which will be used for the subscription.
+     - parameter query11: A `QuerySubscription` representing the query which will be used for the subscription.
+     - parameter query12: A `QuerySubscription` representing the query which will be used for the subscription.
+     - returns: A tuple of `QueryResults`s for the given subscriptions containing the data for each query.
+
+     - throws: An `NSError` if the subscription couldn't be completed by the client or server.
+     */
+    // swiftlint:disable large_tuple
+    public func subscribe<T1: RealmFetchable, T2: RealmFetchable, T3: RealmFetchable, T4: RealmFetchable, T5: RealmFetchable, T6: RealmFetchable, T7: RealmFetchable, T8: RealmFetchable, T9: RealmFetchable, T10: RealmFetchable, T11: RealmFetchable, T12: RealmFetchable>(to query: QuerySubscription<T1>, _ query2: QuerySubscription<T2>, _ query3: QuerySubscription<T3>, _ query4: QuerySubscription<T4>, _ query5: QuerySubscription<T5>, _ query6: QuerySubscription<T6>, _ query7: QuerySubscription<T7>, _ query8: QuerySubscription<T8>, _ query9: QuerySubscription<T9>, _ query10: QuerySubscription<T10>, _ query11: QuerySubscription<T11>, _ query12: QuerySubscription<T12>) async throws -> (QueryResults<T1>, QueryResults<T2>, QueryResults<T3>, QueryResults<T4>, QueryResults<T5>, QueryResults<T6>, QueryResults<T7>, QueryResults<T8>, QueryResults<T9>, QueryResults<T10>, QueryResults<T11>, QueryResults<T12>) {
+        try await subscribe(query, query2, query3, query4, query5, query6, query7, query8, query9, query10, query11, query12)
+        return (QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query.className, predicate: query.predicate)!,
+                             realm.objects(T1.self).filter(query.predicate)),
+                QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query2.className, predicate: query2.predicate)!,
+                             realm.objects(T2.self).filter(query2.predicate)),
+                QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query3.className, predicate: query3.predicate)!,
+                             realm.objects(T3.self).filter(query3.predicate)),
+                QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query4.className, predicate: query4.predicate)!,
+                             realm.objects(T4.self).filter(query4.predicate)),
+                QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query5.className, predicate: query5.predicate)!,
+                             realm.objects(T5.self).filter(query5.predicate)),
+                QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query6.className, predicate: query6.predicate)!,
+                             realm.objects(T6.self).filter(query6.predicate)),
+                QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query7.className, predicate: query7.predicate)!,
+                             realm.objects(T7.self).filter(query7.predicate)),
+                QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query8.className, predicate: query8.predicate)!,
+                             realm.objects(T8.self).filter(query8.predicate)),
+                QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query9.className, predicate: query9.predicate)!,
+                             realm.objects(T9.self).filter(query9.predicate)),
+                QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query10.className, predicate: query10.predicate)!,
+                             realm.objects(T10.self).filter(query10.predicate)),
+                QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query11.className, predicate: query11.predicate)!,
+                             realm.objects(T11.self).filter(query11.predicate)),
+                QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query12.className, predicate: query12.predicate)!,
+                             realm.objects(T12.self).filter(query12.predicate)))
+    }
+
+    /**
+     Removes all subscriptions from the subscription set.
+     */
+    public func unsubscribeAll() async throws {
+        try await write {
+            rlmSyncSubscriptionSet.removeAllSubscriptions()
+        }
+    }
+
+    /**
+     Removes zero or none subscriptions of the given type from the subscription set.
+
+     - parameter type: The type of the subscriptions to be removed.
+     */
+    public func unsubscribeAll<T: Object>(ofType type: T.Type) async throws {
+        try await write {
+            rlmSyncSubscriptionSet.removeAllSubscriptions(withClassName: type.className())
+        }
+    }
 }
-#endif // canImport(Combine)
+
+#if !(os(iOS) && (arch(i386) || arch(arm)))
+@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+extension ObservedQueryResults {
+    /// Unsubscribe the current `QueryResults`, associated to this property wrapper,
+    /// also will remove the data associated to that subscription from the results.
+    @MainActor
+    public func unsubscribe() async throws {
+        guard let queryResults = storage.queryResults else {
+            return
+        }
+        try await queryResults.unsubscribe()
+    }
+
+}
+#endif
+#endif // canImport(_Concurrency)
+
+extension User {
+    /**
+     Return a `Realm` for the given configuration and injects the sync configuration associated to a flexible sync session.
+
+     - parameter configuration: The configuration for the realm. This can be used if any custom configuration is needed.
+
+     - returns: A `Realm`.
+     */
+    public func realm(configuration: Realm.Configuration = Realm.Configuration()) throws -> Realm {
+        return try Realm(configuration: flexibleSyncConfiguration(configuration))
+    }
+
+    /**
+     Create a flexible sync configuration instance, which can be used to open a realm  which
+     supports flexible sync.
+
+     It won't be possible to combine flexible and partition sync in the same app, which means if you open
+     a realm with a flexible sync configuration, you won't be able to open a realm with a PBS configuration
+     and the other way around.
+
+     - parameter configuration: The configuration for the realm. This can be used if any custom configuration is needed.
+
+     - returns: A `Realm.Configuration` instance with a flexible sync configuration.
+     */
+    public func flexibleSyncConfiguration(_ configuration: Realm.Configuration = Realm.Configuration()) -> Realm.Configuration {
+        let config = configuration.rlmConfiguration
+        config.syncConfiguration = self.__flexibleSyncConfiguration().syncConfiguration
+        return ObjectiveCSupport.convert(object: config)
+    }
+}

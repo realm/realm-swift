@@ -384,33 +384,25 @@ extension SwiftUISyncTestHostUITests {
 
 // MARK: - Flexible Sync
 extension SwiftUISyncTestHostUITests {
-    private func populateFlexibleSyncForEmail(_ email: String, n: Int, _ block: @escaping (Realm) -> Void) throws {
+    @MainActor private func populateFlexibleSyncForEmail(_ email: String, _ block: @escaping (Realm) -> Void) async throws {
         let user = logInUser(for: basicCredentials(name: email, register: true, app: flexibleSyncApp), app: flexibleSyncApp)
 
-        let config = user.flexibleSyncConfiguration()
-        let realm = try Realm(configuration: config)
-        let subs = realm.subscriptions
-        let ex = expectation(description: "state change complete")
-        subs.update({
-            subs.append(QuerySubscription<SwiftPerson>(name: "person_age", where: "TRUEPREDICATE"))
-        }, onComplete: { error in
-            if error == nil {
-                ex.fulfill()
-            } else {
-                XCTFail("Subscription Set could not complete with \(error!)")
-            }
-        })
-        waitForExpectations(timeout: 20.0, handler: nil)
+        var config = user.flexibleSyncConfiguration()
+        config.objectTypes = [SwiftPerson.self]
+        let realm = try await Realm(configuration: config, downloadBeforeOpen: .never)
+        _ = try await realm.subscriptions.subscribe(to: SwiftPerson.self)
 
         try realm.write {
-            block(realm)
+            for index in (1...20) {
+                realm.add(SwiftPerson(firstName: "\(#function)", lastName: "Smith", age: index))
+            }
         }
         waitForUploads(for: realm)
     }
 
-    func testFlexibleSyncAsyncOpenRoundTrip() throws {
+    func testFlexibleSyncAsyncOpenRoundTrip() async throws {
         let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
-        try populateFlexibleSyncForEmail(email, n: 10) { realm in
+        try await populateFlexibleSyncForEmail(email) { realm in
             for index in (1...10) {
                 realm.add(SwiftPerson(firstName: "\(#function)", lastName: "Smith", age: index))
             }
@@ -436,9 +428,9 @@ extension SwiftUISyncTestHostUITests {
         XCTAssertEqual(table.cells.count, 5)
     }
 
-    func testFlexibleSyncAutoOpenRoundTrip() throws {
+    func testFlexibleSyncAutoOpenRoundTrip() async throws {
         let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
-        try populateFlexibleSyncForEmail(email, n: 10) { realm in
+        try await populateFlexibleSyncForEmail(email) { realm in
             for index in (1...20) {
                 realm.add(SwiftPerson(firstName: "\(#function)", lastName: "Smith", age: index))
             }
@@ -462,5 +454,99 @@ extension SwiftUISyncTestHostUITests {
         let table = application.tables.firstMatch
         XCTAssertTrue(table.waitForExistence(timeout: 6))
         XCTAssertEqual(table.cells.count, 18)
+    }
+
+    func testObservedQueryResultsState() async throws {
+        let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
+        try await populateFlexibleSyncForEmail(email) { realm in
+            for i in 1...21 {
+                let person = SwiftPerson(firstName: "\(#function)",
+                                         lastName: "lastname_\(i)",
+                                         age: i)
+                realm.add(person)
+            }
+        }
+
+        application.launchEnvironment["email1"] = email
+        application.launchEnvironment["async_view_type"] = "flexible_sync_observed_query_results_state"
+        // Override appId for flexible app Id
+        application.launchEnvironment["app_id"] = flexibleSyncAppId
+        application.launchEnvironment["firstName"] = "\(#function)"
+        application.launch()
+
+        asyncOpen()
+
+        // Query for button to start syncing
+        let syncButtonView = application.buttons["flexible_sync_button"]
+        XCTAssertTrue(syncButtonView.waitForExistence(timeout: 2))
+        syncButtonView.tap()
+
+        // Test show ListView after syncing realm
+        let table = application.tables.firstMatch
+        XCTAssertTrue(table.waitForExistence(timeout: 10))
+        XCTAssertEqual(table.cells.count, 3)
+
+        try await populateFlexibleSyncForEmail(email) { realm in
+            for i in 22...30 {
+                let person = SwiftPerson(firstName: "\(#function)",
+                                         lastName: "lastname_\(i)",
+                                         age: i)
+                realm.add(person)
+            }
+        }
+
+        XCTAssertTrue(table.waitForExistence(timeout: 6))
+        XCTAssertEqual(table.cells.count, 12)
+
+        // Query for button to unsubscribe from query
+        let unsubscribeButtonView = application.buttons["unsubscribe_button"]
+        XCTAssertTrue(unsubscribeButtonView.waitForExistence(timeout: 2))
+        unsubscribeButtonView.tap()
+
+        XCTAssertTrue(table.waitForExistence(timeout: 6))
+        XCTAssertEqual(table.cells.count, 0)
+    }
+
+    func testObservedQueryResults() async throws {
+        let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
+        try await populateFlexibleSyncForEmail(email) { realm in
+            for i in 1...21 {
+                let person = SwiftPerson(firstName: "\(#function)",
+                                         lastName: "lastname_\(i)",
+                                         age: i)
+                realm.add(person)
+            }
+        }
+
+        application.launchEnvironment["email1"] = email
+        application.launchEnvironment["async_view_type"] = "flexible_sync_observed_query_results"
+        // Override appId for flexible app Id
+        application.launchEnvironment["app_id"] = flexibleSyncAppId
+        application.launchEnvironment["firstName"] = "\(#function)"
+        application.launch()
+
+        asyncOpen()
+
+        // Query for button to start syncing
+        let syncButtonView = application.buttons["flexible_sync_button"]
+        XCTAssertTrue(syncButtonView.waitForExistence(timeout: 2))
+        syncButtonView.tap()
+
+        // Test show ListView after syncing realm
+        let table = application.tables.firstMatch
+        XCTAssertTrue(table.waitForExistence(timeout: 10))
+        XCTAssertEqual(table.cells.count, 7)
+
+        try await populateFlexibleSyncForEmail(email) { realm in
+            for i in 22...30 {
+                let person = SwiftPerson(firstName: "\(#function)",
+                                         lastName: "lastname_\(i)",
+                                         age: i)
+                realm.add(person)
+            }
+        }
+
+        XCTAssertTrue(table.waitForExistence(timeout: 6))
+        XCTAssertEqual(table.cells.count, 16)
     }
 }

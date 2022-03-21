@@ -70,6 +70,18 @@
     return RLMStringViewToNSString(_subscription->object_class_name());
 }
 
+- (void)unsubscribeOnComplete:(void(^)(NSError *))completionBlock {
+    [_subscriptionSet update:^{
+        [_subscriptionSet removeSubscription:self];
+    } onComplete:^(NSError* error) {
+        if (error == nil) {
+            completionBlock(nil);
+        } else {
+            completionBlock(error);
+        }
+    }];
+}
+
 - (void)updateSubscriptionWhere:(NSString *)predicateFormat, ... {
     va_list args;
     va_start(args, predicateFormat);

@@ -173,7 +173,7 @@ private func createEquatableBinding<T: ThreadConfined, V: Equatable>(
 
 // MARK: - ObservableStorage
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-private final class ObservableStoragePublisher<ObjectType>: Publisher where ObjectType: ThreadConfined & RealmSubscribable {
+internal final class ObservableStoragePublisher<ObjectType>: Publisher where ObjectType: ThreadConfined & RealmSubscribable {
     public typealias Output = Void
     public typealias Failure = Never
 
@@ -231,7 +231,7 @@ private final class ObservableStoragePublisher<ObjectType>: Publisher where Obje
 }
 
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-private class ObservableStorage<ObservedType>: ObservableObject where ObservedType: RealmSubscribable & ThreadConfined & Equatable {
+internal class ObservableStorage<ObservedType>: ObservableObject where ObservedType: RealmSubscribable & ThreadConfined & Equatable {
     @Published var value: ObservedType {
         willSet {
             if newValue != value {
@@ -243,7 +243,7 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
         }
     }
 
-    var objectWillChange: ObservableStoragePublisher<ObservedType>
+    internal var objectWillChange: ObservableStoragePublisher<ObservedType>
     var keyPaths: [String]?
 
     init(_ value: ObservedType, _ keyPaths: [String]? = nil) {
@@ -614,6 +614,292 @@ extension Projection: _ObservedResultsValue { }
     }
 }
 
+/// An enum representing different states for the subscription associated to this query results..
+public enum ObservedQueryResultsState {
+    /// Subscription has been added and waiting for data to bootstrap.
+    case pending
+    /// An error has occurred while adding the subscription (client or server side).
+    case error(Error)
+    /// Data has been bootstrapped and query results updated.
+    case completed
+}
+
+// MARK: ObservedQueryResults
+
+/// A property wrapper type that represents the results of a query on a realm resulting from a query subscription.
+///
+/// The results use the realm configuration provided by
+/// the environment value `EnvironmentValues/realmConfiguration`. or the configuration injected on the initializer.
+///
+/// `ObservedQueryResults` is mutable, you can add or remove elements from the results,
+/// if this object are out of the view of the subscription query this will not be included on this results
+///
+@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+@propertyWrapper public struct ObservedQueryResults<ResultType>: DynamicProperty, BoundCollection where ResultType: _ObservedResultsValue & RealmFetchable & KeypathSortable & Identifiable {
+    internal class Storage: ObservableStorage<Results<ResultType>> {
+        var setupHasRun = false
+        private let subscription: ((Query<ResultType>) -> Query<Bool>)?
+        var queryResults: QueryResults<ResultType>?
+
+        private func didSet() {
+            if setupHasRun {
+                setupValue()
+            }
+        }
+
+        func setupValue() {
+            guard let queryResults = queryResults,
+                  let results = queryResults.results else {
+                return
+            }
+
+            value = results
+            if let sortDescriptor = sortDescriptor {
+                value = value.sorted(byKeyPath: sortDescriptor.keyPath, ascending: sortDescriptor.ascending)
+            }
+
+            let filters = [searchFilter, filter ?? `where`].compactMap { $0 }
+            if !filters.isEmpty {
+                let compoundFilter = NSCompoundPredicate(andPredicateWithSubpredicates: filters)
+                value = value.filter(compoundFilter)
+            }
+        }
+
+        var sortDescriptor: SortDescriptor? {
+            didSet {
+                didSet()
+            }
+        }
+
+        var filter: NSPredicate? {
+            didSet {
+                didSet()
+            }
+        }
+        var `where`: NSPredicate? {
+            didSet {
+                didSet()
+            }
+        }
+        var configuration: Realm.Configuration? {
+            didSet {
+                didSet()
+            }
+        }
+
+        var searchString: String = ""
+        var searchFilter: NSPredicate? {
+            didSet {
+                didSet()
+            }
+        }
+
+        func subscribe() {
+            guard let configuration = configuration else {
+                throwRealmException("")
+            }
+
+            guard let syncConfiguration = configuration.syncConfiguration,
+                  syncConfiguration.isFlexibleSync else {
+                throwRealmException("")
+            }
+
+            subscribe(configuration: configuration)
+            setupHasRun = true
+        }
+
+        private func subscribe(configuration: Realm.Configuration) {
+            Realm.asyncOpen(configuration: configuration) { result in
+                switch result {
+                case .success(let realm):
+                    let subscriptions = realm.subscriptions
+                    subscriptions.write(self.subscription, onComplete: { (results, error) in
+                        if let error = error {
+                            self.state = .error(error)
+                        } else {
+                            self.queryResults = results
+                            self.state = .completed
+                        }
+                    })
+                case .failure(let error):
+                    self.state = .error(error)
+                }
+            }
+        }
+
+        @Published var state: ObservedQueryResultsState = .pending {
+            willSet {
+                objectWillChange.send()
+            }
+        }
+
+        init(_ results: Results<ResultType>,
+             _ subscription: ((Query<ResultType>) -> Query<Bool>)? = nil,
+             _ keyPaths: [String]? = nil) {
+            self.subscription = subscription
+            super.init(results, keyPaths)
+        }
+    }
+
+    @Environment(\.realmConfiguration) var configuration
+    @ObservedObject internal var storage: Storage
+    /// :nodoc:
+    fileprivate func searchText<T: ObjectBase>(_ text: String, on keyPath: KeyPath<T, String>) {
+        if text.isEmpty {
+            if storage.searchFilter != nil {
+                storage.searchFilter = nil
+            }
+        } else if text != storage.searchString {
+            storage.searchFilter = Query<T>()[dynamicMember: keyPath].contains(text).predicate
+        }
+        storage.searchString = text
+    }
+    /// Stores an NSPredicate used for filtering the Results. This is mutually exclusive
+    /// to the `where` parameter.
+    @State public var filter: NSPredicate? {
+        willSet {
+            storage.where = nil
+            storage.filter = newValue
+        }
+    }
+#if swift(>=5.5)
+    /// Stores a type safe query used for filtering the Results. This is mutually exclusive
+    /// to the `filter` parameter.
+    @State public var `where`: ((Query<ResultType>) -> Query<Bool>)? {
+        // The introduction of this property produces a compiler bug in
+        // Xcode 12.5.1. So Swift Queries are supported on Xcode 13 and above
+        // when used with SwiftUI.
+        willSet {
+            storage.filter = nil
+            storage.where = newValue?(Query()).predicate
+        }
+    }
+#endif
+    /// :nodoc:
+    @State public var sortDescriptor: SortDescriptor? {
+        willSet {
+            storage.sortDescriptor = newValue
+        }
+    }
+
+    /// :Returns the current state for the subscription, if used this will update in case the state changes.
+    public var state: ObservedQueryResultsState {
+        return storage.state
+    }
+
+    /// :nodoc:
+    public var wrappedValue: Results<ResultType> {
+        if !storage.setupHasRun {
+            storage.subscribe()
+        }
+        return storage.queryResults != nil ? storage.value.freeze() : storage.value
+    }
+    /// :nodoc:
+    public var projectedValue: Self {
+        if !storage.setupHasRun {
+            storage.subscribe()
+        }
+        return self
+    }
+
+    /**
+     Initialize a `ObservedQueryResults` struct for a given `Projection` type.
+     - parameter type: Observed type
+     - parameter subscription: The query used for the subscription.
+     - parameter configuration: The `Realm.Configuration` used when creating the Realm,
+     user's sync configuration for the given partition value will be set as the `syncConfiguration`,
+     if empty the configuration is set to the `defaultConfiguration`
+     - parameter filter: Observations will be made only for passing objects.
+     If no filter given - all objects will be observed
+     - parameter keyPaths: Only properties contained in the key paths array will be observed.
+     If `nil`, notifications will be delivered for any property change on the object.
+     String key paths which do not correspond to a valid a property will throw an exception.
+     - parameter sortDescriptor: A sequence of `SortDescriptor`s to sort by
+     */
+    public init<ObjectType: ObjectBase>(_ type: ResultType.Type,
+                                        subscription: ((Query<ResultType>) -> Query<Bool>)? = nil,
+                                        configuration: Realm.Configuration? = nil,
+                                        filter: NSPredicate? = nil,
+                                        keyPaths: [String]? = nil,
+                                        sortDescriptor: SortDescriptor? = nil) where ResultType: Projection<ObjectType>, ObjectType: ThreadConfined {
+        self.storage = Storage(Results(RLMResults<ResultType>.emptyDetached()), subscription, keyPaths)
+        self.storage.configuration = configuration
+        self.filter = filter
+        self.sortDescriptor = sortDescriptor
+    }
+
+    /**
+     Initialize a `ObservedQueryResults` struct for a given `Object` or `EmbeddedObject` type.
+     - parameter type: Observed type
+     - parameter subscription: The query used for the subscription.
+     - parameter configuration: The `Realm.Configuration` used when creating the Realm,
+     user's sync configuration for the given partition value will be set as the `syncConfiguration`,
+     if empty the configuration is set to the `defaultConfiguration`
+     - parameter filter: Observations will be made only for passing objects.
+     If no filter given - all objects will be observed
+     - parameter keyPaths: Only properties contained in the key paths array will be observed.
+     If `nil`, notifications will be delivered for any property change on the object.
+     String key paths which do not correspond to a valid a property will throw an exception.
+     - parameter sortDescriptor: A sequence of `SortDescriptor`s to sort by
+     */
+    public init(_ type: ResultType.Type,
+                subscription: ((Query<ResultType>) -> Query<Bool>)? = nil,
+                configuration: Realm.Configuration? = nil,
+                filter: NSPredicate? = nil,
+                keyPaths: [String]? = nil,
+                sortDescriptor: SortDescriptor? = nil) where ResultType: Object {
+        self.storage = Storage(Results(RLMResults<ResultType>.emptyDetached()), subscription, keyPaths)
+        self.storage.configuration = configuration
+        self.filter = filter
+        self.sortDescriptor = sortDescriptor
+    }
+#if swift(>=5.5)
+    /**
+     Initialize a `ObservedQueryResults` struct for a given `Object` or `EmbeddedObject` type.
+     - parameter type: Observed type
+     - parameter subscription: The query used for the subscription.
+     - parameter configuration: The `Realm.Configuration` used when creating the Realm,
+     user's sync configuration for the given partition value will be set as the `syncConfiguration`,
+     if empty the configuration is set to the `defaultConfiguration`
+     - parameter where: Observations will be made only for passing objects.
+     If no type safe query is given - all objects will be observed
+     - parameter keyPaths: Only properties contained in the key paths array will be observed.
+     If `nil`, notifications will be delivered for any property change on the object.
+     String key paths which do not correspond to a valid a property will throw an exception.
+     - parameter sortDescriptor: A sequence of `SortDescriptor`s to sort by
+     */
+    public init(_ type: ResultType.Type,
+                subscription: ((Query<ResultType>) -> Query<Bool>)? = nil,
+                configuration: Realm.Configuration? = nil,
+                where: ((Query<ResultType>) -> Query<Bool>)? = nil,
+                keyPaths: [String]? = nil,
+                sortDescriptor: SortDescriptor? = nil) where ResultType: Object {
+        self.storage = Storage(Results(RLMResults<ResultType>.emptyDetached()), subscription, keyPaths)
+        self.storage.configuration = configuration
+        self.where = `where`
+        self.sortDescriptor = sortDescriptor
+    }
+#endif
+    /// :nodoc:
+    public init(_ type: ResultType.Type,
+                subscription: ((Query<ResultType>) -> Query<Bool>)? = nil,
+                keyPaths: [String]? = nil,
+                configuration: Realm.Configuration? = nil,
+                sortDescriptor: SortDescriptor? = nil) where ResultType: Object {
+        self.storage = Storage(Results(RLMResults<ResultType>.emptyDetached()), subscription, keyPaths)
+        self.storage.configuration = configuration
+        self.sortDescriptor = sortDescriptor
+    }
+
+    public mutating func update() {
+        // When the view updates, it will inject the @Environment
+        // into the propertyWrapper
+        if storage.configuration == nil {
+            storage.configuration = configuration
+        }
+    }
+}
+
 // MARK: ObservedRealmObject
 
 /// A property wrapper type that subscribes to an observable Realm `Object` or `List` and
@@ -704,6 +990,10 @@ extension Projection: _ObservedResultsValue { }
         _storage = ObservedObject(wrappedValue: ObservableStorage(wrappedValue))
         defaultValue = ObjectType(projecting: ObjectType.Root())
     }
+
+//    public init<T>(wrappedValue: ObjectType) where ObjectType: QueryResults<T> {
+//        _storage = ObservedObject(wrappedValue: ObservableStorage(wrappedValue))
+//    }
 }
 
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
@@ -1203,33 +1493,33 @@ private class ObservableAsyncOpenStorage: ObservableObject {
             }
         }.store(in: &appCancellable)
     }
+}
 
-    // MARK: - AutoOpen & AsyncOpen Helper
+// MARK: - AutoOpen & AsyncOpen Helper
 
-    class func configureApp(appId: String? = nil, withTimeout timeout: UInt? = nil) -> App {
-        var app: App
-        if let appId = appId {
-            app = App(id: appId)
-        } else {
-            // Check if there is a singular cached app
-            let cachedApps = RLMApp.allApps()
-            if cachedApps.count > 1 {
-                throwRealmException("Cannot AsyncOpen the Realm because more than one appId was found. When using multiple Apps you must explicitly pass an appId to indicate which to use.")
-            }
-            guard let cachedApp = cachedApps.first else {
-                throwRealmException("Cannot AsyncOpen the Realm because no appId was found. You must either explicitly pass an appId or initialize an App before displaying your View.")
-            }
-            app = cachedApp
+private func configureApp(appId: String? = nil, withTimeout timeout: UInt? = nil) -> App {
+    var app: App
+    if let appId = appId {
+        app = App(id: appId)
+    } else {
+        // Check if there is a singular cached app
+        let cachedApps = RLMApp.allApps()
+        if cachedApps.count > 1 {
+            throwRealmException("Cannot AsyncOpen the Realm because more than one appId was found. When using multiple Apps you must explicitly pass an appId to indicate which to use.")
         }
-
-        // Setup timeout if needed
-        if let timeout = timeout {
-            let syncTimeoutOptions = SyncTimeoutOptions()
-            syncTimeoutOptions.connectTimeout = timeout
-            app.syncManager.timeoutOptions = syncTimeoutOptions
+        guard let cachedApp = cachedApps.first else {
+            throwRealmException("Cannot AsyncOpen the Realm because no appId was found. You must either explicitly pass an appId or initialize an App before displaying your View.")
         }
-        return app
+        app = cachedApp
     }
+
+    // Setup timeout if needed
+    if let timeout = timeout {
+        let syncTimeoutOptions = SyncTimeoutOptions()
+        syncTimeoutOptions.connectTimeout = timeout
+        app.syncManager.timeoutOptions = syncTimeoutOptions
+    }
+    return app
 }
 
 // MARK: - AsyncOpen
@@ -1328,7 +1618,7 @@ private class ObservableAsyncOpenStorage: ObservableObject {
     public init(appId: String? = nil,
                 configuration: Realm.Configuration? = nil,
                 timeout: UInt? = nil) {
-        let app = ObservableAsyncOpenStorage.configureApp(appId: appId, withTimeout: timeout)
+        let app = configureApp(appId: appId, withTimeout: timeout)
         // Store property wrapper values on the storage
         storage = ObservableAsyncOpenStorage(asyncOpenKind: .asyncOpen, app: app, configuration: configuration, partitionValue: nil)
     }
@@ -1453,7 +1743,7 @@ private class ObservableAsyncOpenStorage: ObservableObject {
     public init(appId: String? = nil,
                 configuration: Realm.Configuration? = nil,
                 timeout: UInt? = nil) {
-        let app = ObservableAsyncOpenStorage.configureApp(appId: appId, withTimeout: timeout)
+        let app = configureApp(appId: appId, withTimeout: timeout)
         // Store property wrapper values on the storage
         storage = ObservableAsyncOpenStorage(asyncOpenKind: .autoOpen, app: app, configuration: configuration, partitionValue: nil)
     }

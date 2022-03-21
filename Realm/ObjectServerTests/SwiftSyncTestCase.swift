@@ -199,61 +199,6 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
             XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
         }
     }
-
-    // MARK: - Flexible Sync Use Cases
-
-    public func openFlexibleSyncRealmForUser(_ user: User) throws -> Realm {
-        var config = user.flexibleSyncConfiguration()
-        if config.objectTypes == nil {
-            config.objectTypes = [SwiftPerson.self,
-                                  SwiftTypesSyncObject.self]
-        }
-        let realm = try Realm(configuration: config)
-        waitForDownloads(for: realm)
-        return realm
-    }
-
-    public func openFlexibleSyncRealm() throws -> Realm {
-        let user = try logInUser(for: basicCredentials(app: self.flexibleSyncApp), app: self.flexibleSyncApp)
-        var config = user.flexibleSyncConfiguration()
-        if config.objectTypes == nil {
-            config.objectTypes = [SwiftPerson.self,
-                                  SwiftTypesSyncObject.self]
-        }
-        return try Realm(configuration: config)
-    }
-
-    public func flexibleSyncRealm() throws -> Realm {
-        let user = try logInUser(for: basicCredentials(app: self.flexibleSyncApp), app: self.flexibleSyncApp)
-        return try openFlexibleSyncRealmForUser(user)
-    }
-
-    public func populateFlexibleSyncData(_ block: @escaping (Realm) -> Void) throws {
-        try writeToFlxRealm { realm in
-            try realm.write {
-                block(realm)
-            }
-            self.waitForUploads(for: realm)
-        }
-    }
-
-    public func writeToFlxRealm(_ block: @escaping (Realm) throws -> Void) throws {
-        let realm = try flexibleSyncRealm()
-        let subscriptions = realm.subscriptions
-        XCTAssertNotNil(subscriptions)
-        let ex = expectation(description: "state change complete")
-        subscriptions.update({
-            subscriptions.append(QuerySubscription<SwiftPerson>())
-            subscriptions.append(QuerySubscription<SwiftTypesSyncObject>())
-        }, onComplete: { error in
-            XCTAssertNil(error)
-            ex.fulfill()
-        })
-        XCTAssertEqual(subscriptions.count, 2)
-
-        waitForExpectations(timeout: 20.0, handler: nil)
-        try block(realm)
-    }
 }
 
 #if swift(>=5.6) && canImport(_Concurrency)

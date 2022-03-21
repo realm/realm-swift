@@ -42,6 +42,7 @@ identifier_name:
     - _rlmSetAccessor(_:)
     - _rlmSetProperty(_:_:_:)
     - _rlmType
+    - _rlmSyncSubscription
     - id
     - pk
     - to
