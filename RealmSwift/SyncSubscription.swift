@@ -683,6 +683,14 @@ extension QueryResults {
     }
 }
 
+extension User {
+    func subscriptions(configuration: Realm.Configuration = .defaultConfiguration) throws -> SyncSubscriptionSet {
+        var config = configuration
+        config.syncConfiguration = flexibleSyncConfiguration().syncConfiguration
+        return try SyncSubscriptionSet(configuration: config)
+    }
+}
+
 class Person: Object {
     @Persisted var name: String
     @Persisted var age: Int
@@ -692,24 +700,58 @@ class Person: Object {
 
 @available(macOSApplicationExtension 12.0, *)
 public func show() async throws {
+    let app = App(id: "my-app-id")
+    let user = try await app.login(credentials: .anonymous)
+    let subscriptions = try user.subscriptions()
+    let results: QueryResults<Person> = try await subscriptions.subscribe(to: { person in
+        person.age > 18
+    })
+    results.forEach { person in
+        print(person.name)
+    }
+    let newPerson = Person()
+    newPerson.age = 18
+    try results.write {
+        results.append(newPerson)
+    }
+    try results.write {
+        results.remove(newPerson)
+    }
+    try await results.unsubscribe()
+}
+
+import SwiftUI
+
 let app = App(id: "my-app-id")
-let user = try await app.login(credentials: .anonymous)
-let subscriptions = try SyncSubscriptionSet(configuration: user.flexibleSyncConfiguration())
-let results: QueryResults<Person> = try await subscriptions.subscribe(to: { person in
-    person.age > 18
-})
-results.forEach { person in
-    print(person.name)
-}
-let newPerson = Person()
-newPerson.age = 18
-try results.write {
-    results.append(newPerson)
-}
-try results.write {
-    results.remove(newPerson)
-}
-try await results.unsubscribe()
+
+//@available(macOSApplicationExtension 10.15, *)
+//struct PersonSearchView: View {
+//    let subscriptions: SyncSubscriptionSet
+//    @QueryResults(Person.self) var persons
+//
+//    var body: some View {
+//        SwiftUI.List {
+//            ForEach(persons) {
+//
+//            }
+//        }.searchable(text: <#T##Binding<String>#>)
+//    }
+//}
+
+@available(macOSApplicationExtension 10.15, *)
+struct ContentView: View {
+    @State var username: String
+    @State var password: String
+
+    var body: some View {
+        TextField("username", text: $username)
+        TextField("password", text: $password)
+        Button("login") {
+            Task {
+                let user = try await app.login(credentials: .emailPassword(email: username, password: password))
+            }
+        }
+    }
 }
 
 #endif // swift(>=5.5)
