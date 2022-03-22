@@ -19,6 +19,29 @@ x.y.z Release notes (yyyy-MM-dd)
 ### Internal
 * Upgraded realm-core from ? to ?
 
+10.24.2 Release notes (2022-03-18)
+=============================================================
+
+### Fixed
+
+* Application would sometimes crash with exceptions like 'KeyNotFound' or
+  assertion "has_refs()". Other issues indicating file corruption may also be
+  fixed by this. The one mentioned here is the one that lead to solving the
+  problem.
+  ([Core #5283](https://github.com/realm/realm-core/issues/5283), since v5.0.0)
+
+### Compatibility
+
+* Realm Studio: 11.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 13.3.
+* CocoaPods: 1.10 or later.
+* Xcode: 12.4-13.3.
+
+### Internal
+
+* Upgraded realm-core from 11.11.0 to 11.12.0
+
 10.24.1 Release notes (2022-03-14)
 =============================================================
 
