@@ -2,10 +2,13 @@ x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
 * None.
+* Add ability to use Swift Query syntax in `@ObservedResults`, which allows you 
+  to filter results using the `where` parameter.
+* Add ability to use `MutableSet` with `StateRealmObject` in SwiftUI.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
-* None.
+* Adding a Realm Object to a `ObservedResults` or a collections using `StateRealmObject` that is managed by the same Realm 
+  would throw if the Object was frozen and not thawed before hand.
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
