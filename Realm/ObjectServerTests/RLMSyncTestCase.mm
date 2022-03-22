@@ -142,7 +142,7 @@ static NSURL *syncDirectoryForChildProcess() {
                                                transport:[TestNetworkTransport new]
                                             localAppName:nil
                                          localAppVersion:nil
-                                 defaultRequestTimeoutMS:60];
+                                 defaultRequestTimeoutMS:60000];
 }
 
 - (void)addPersonsToRealm:(RLMRealm *)realm persons:(NSArray<Person *> *)persons {

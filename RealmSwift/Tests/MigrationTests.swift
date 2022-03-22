@@ -1007,7 +1007,7 @@ class MigrationTests: TestCase {
                     stringCol = a;
                     binaryCol = <.*62.*>;
                     dateCol = 1970-01-01 00:00:02 \\+0000;
-                    decimalCol = 5.67E10;
+                    decimalCol = 56700000000;
                     objectIdCol = abcdef123456abcdef123456;
                     objectCol = SwiftBoolObject \\{
                         boolCol = 0;

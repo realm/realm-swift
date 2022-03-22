@@ -104,7 +104,7 @@
     configuration.readOnly = false;
     XCTAssertEqual(configuration.schemaMode, realm::SchemaMode::Automatic);
     configuration.deleteRealmIfMigrationNeeded = true;
-    XCTAssertEqual(configuration.schemaMode, realm::SchemaMode::ResetFile);
+    XCTAssertEqual(configuration.schemaMode, realm::SchemaMode::SoftResetFile);
 
     configuration.deleteRealmIfMigrationNeeded = false;
     XCTAssertEqual(configuration.schemaMode, realm::SchemaMode::Automatic);
@@ -177,6 +177,7 @@
     @autoreleasepool { XCTAssertEqualObjects(RLMRealm.defaultRealm.configuration.fileURL, config.fileURL); }
 
     config.inMemoryIdentifier = NSUUID.UUID.UUIDString;
+    config.encryptionKey = nil;
     RLMRealmConfiguration.defaultConfiguration = config;
     @autoreleasepool {
         RLMRealm *realm = RLMRealm.defaultRealm;
