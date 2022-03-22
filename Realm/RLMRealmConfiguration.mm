@@ -244,7 +244,7 @@ static bool isSync(realm::Realm::Config const& config) {
 }
 
 - (BOOL)deleteRealmIfMigrationNeeded {
-    return _config.schema_mode == realm::SchemaMode::ResetFile;
+    return _config.schema_mode == realm::SchemaMode::SoftResetFile;
 }
 
 - (void)setDeleteRealmIfMigrationNeeded:(BOOL)deleteRealmIfMigrationNeeded {
@@ -255,7 +255,7 @@ static bool isSync(realm::Realm::Config const& config) {
         if (isSync(_config)) {
             @throw RLMException(@"Cannot set 'deleteRealmIfMigrationNeeded' when sync is enabled ('syncConfig' is set).");
         }
-        _config.schema_mode = realm::SchemaMode::ResetFile;
+        _config.schema_mode = realm::SchemaMode::SoftResetFile;
     }
     else if (self.deleteRealmIfMigrationNeeded) {
         _config.schema_mode = realm::SchemaMode::Automatic;

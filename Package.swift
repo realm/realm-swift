@@ -3,8 +3,8 @@
 import PackageDescription
 import Foundation
 
-let coreVersionStr = "11.11.0"
-let cocoaVersionStr = "10.22.0"
+let coreVersionStr = "11.12.0"
+let cocoaVersionStr = "10.24.2"
 
 let coreVersionPieces = coreVersionStr.split(separator: ".")
 let coreVersionExtra = coreVersionPieces[2].split(separator: "-")
@@ -27,7 +27,6 @@ let cxxSettings: [CXXSetting] = [
     .define("REALM_VERSION_PATCH", to: String(coreVersionExtra[0])),
     .define("REALM_VERSION_EXTRA", to: "\"\(coreVersionExtra.count > 1 ? String(coreVersionExtra[1]) : "")\""),
     .define("REALM_VERSION_STRING", to: "\"\(coreVersionStr)\""),
-    .define("REALM_ASYNC_WRITES", .when(configuration: .debug)),
 ]
 let testCxxSettings: [CXXSetting] = cxxSettings + [
     // Command-line `swift build` resolves header search paths
@@ -47,12 +46,10 @@ func hostMachineArch() -> String {
     return String(bytes: machineBytes, encoding: .utf8)!
 }
 let testSwiftSettings: [SwiftSetting]?
-#if swift(>=5.4)
-testSwiftSettings = [.unsafeFlags(["-target", "\(hostMachineArch())-apple-macosx11.0"]),
-                     .define("REALM_ASYNC_WRITES", .when(configuration: .debug)),
-]
+#if swift(>=5.4) && !swift(>=5.5)
+testSwiftSettings = [.unsafeFlags(["-target", "\(hostMachineArch())-apple-macosx11.0"])]
 #else
-testSwiftSettings = [.define("REALM_ASYNC_WRITES", .when(configuration: .debug))]
+testSwiftSettings = nil
 #endif
 
 // SPM requires all targets to explicitly include or exclude every file, which
@@ -62,8 +59,10 @@ let objectServerTestSources = [
     "ObjectServerTests-Info.plist",
     "RLMBSONTests.mm",
     "RLMCollectionSyncTests.mm",
+    "RLMFlexibleSyncServerTests.mm",
     "RLMObjectServerPartitionTests.mm",
     "RLMObjectServerTests.mm",
+    "RLMServerTestObjects.m",
     "RLMSyncTestCase.h",
     "RLMSyncTestCase.mm",
     "RLMTestUtils.h",
@@ -74,9 +73,13 @@ let objectServerTestSources = [
     "RLMWatchTestUtility.m",
     "RealmServer.swift",
     "SwiftCollectionSyncTests.swift",
+    "SwiftFlexibleSyncServerTests.swift",
+    "SwiftMongoClientTests.swift",
     "SwiftObjectServerPartitionTests.swift",
     "SwiftObjectServerTests.swift",
+    "SwiftServerObjects.swift",
     "SwiftSyncTestCase.swift",
+    "SwiftUIServerTests.swift",
     "TimeoutProxyServer.swift",
     "WatchTestUtility.swift",
     "certificates",

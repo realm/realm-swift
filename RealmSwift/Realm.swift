@@ -20,9 +20,7 @@ import Foundation
 import Realm
 import Realm.Private
 
-#if REALM_ASYNC_WRITES
 public typealias AsyncTransactionId = RLMAsyncTransactionId
-#endif // REALM_ASYNC_WRITES
 
 /**
  A `Realm` instance (also referred to as "a Realm") represents a Realm database.
@@ -370,7 +368,6 @@ public typealias AsyncTransactionId = RLMAsyncTransactionId
         return rlmRealm.inWriteTransaction
     }
 
-#if REALM_ASYNC_WRITES
 // MARK: Asynchronous Transactions
 
     /**
@@ -390,8 +387,8 @@ public typealias AsyncTransactionId = RLMAsyncTransactionId
              the pending invocation of the block.
     */
     @discardableResult
-    public func writeAsync(_ block: @escaping (AsyncTransactionId) -> Void, _ onComplete: ((Swift.Error?) -> Void)? = nil) throws -> AsyncTransactionId {
-        return try beginAsyncWrite { asyncTransactionId in
+    public func writeAsync(_ block: @escaping (AsyncTransactionId) -> Void, _ onComplete: ((Swift.Error?) -> Void)? = nil) -> AsyncTransactionId {
+        return beginAsyncWrite { asyncTransactionId in
             block(asyncTransactionId)
             commitAsyncWrite(onComplete)
         }
@@ -418,7 +415,7 @@ public typealias AsyncTransactionId = RLMAsyncTransactionId
              the pending invocation of the block.
      */
     @discardableResult
-    public func beginAsyncWrite(_ asyncWriteBlock: @escaping (AsyncTransactionId) -> Void) throws -> AsyncTransactionId {
+    public func beginAsyncWrite(_ asyncWriteBlock: @escaping (AsyncTransactionId) -> Void) -> AsyncTransactionId {
         var asyncTransactionId: AsyncTransactionId = 0
         asyncTransactionId = rlmRealm.beginAsyncWriteTransaction {
             asyncWriteBlock(asyncTransactionId)
@@ -476,8 +473,6 @@ public typealias AsyncTransactionId = RLMAsyncTransactionId
     public var isPerformingAsynchronousWriteOperations: Bool {
         return rlmRealm.isPerformingAsynchronousWriteOperations
     }
-
-#endif // REALM_ASYNC_WRITES
 
     // MARK: Adding and Creating objects
 

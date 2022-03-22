@@ -72,7 +72,7 @@
     RLMDecimal128 *d1 = [[RLMDecimal128 alloc] initWithNumber:@2.5];
     RLMDecimal128 *d2 = [d1 decimalNumberBySubtracting:[[RLMDecimal128 alloc] initWithString:@"5.5" error:nil]];
     XCTAssertEqual(d2.doubleValue, -3.0);
-    XCTAssertTrue([d2.stringValue isEqualToString:@"-3.0"]);
+    XCTAssertTrue([d2.stringValue isEqualToString:@"-3"]);
 }
 
 - (void)testDecimal128Division {

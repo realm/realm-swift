@@ -28,10 +28,8 @@
  */
 typedef void(^RLMAsyncOpenRealmCallback)(RLMRealm * _Nullable realm, NSError * _Nullable error);
 
-#ifdef REALM_ASYNC_WRITES
 /// The Id of the asynchronous transaction.
 typedef unsigned RLMAsyncTransactionId;
-#endif // REALM_ASYNC_WRITES
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -522,8 +520,6 @@ typedef void (^RLMNotificationBlock)(RLMNotification notification, RLMRealm *rea
  */
 - (BOOL)transactionWithoutNotifying:(NSArray<RLMNotificationToken *> *)tokens block:(__attribute__((noescape)) void(^)(void))block error:(NSError **)error;
 
-#ifdef REALM_ASYNC_WRITES
-
 /**
  Indicates if the Realm is currently performing async write operations.
  This becomes YES following a call to `beginAsyncWriteTransaction`,
@@ -555,7 +551,7 @@ typedef void (^RLMNotificationBlock)(RLMNotification notification, RLMRealm *rea
          `cancelAsyncTransaction:` prior to the block being called to cancel
          the pending invocation of the block.
  */
-- (RLMAsyncTransactionId)beginAsyncWriteTransaction:(void(^)())block;
+- (RLMAsyncTransactionId)beginAsyncWriteTransaction:(void(^)(void))block;
 
 /**
  Asynchronously commits a write transaction.
@@ -568,15 +564,15 @@ typedef void (^RLMNotificationBlock)(RLMNotification notification, RLMRealm *rea
                         queue once the commit has either completed or failed
                         with an error.
  
- @param allowGrouping If `YES`, multiple sequential calls to
-                      `commitAsyncWriteTransaction:` may be batched together
-                      and persisted to stable storage in one group. This
-                      improves write performance, particularly when the
-                      individual transactions being batched are small. In the
-                      event of a crash or power failure, either all of the
-                      grouped transactions will be lost or none will, rather
-                      than the usual guarantee that data has been persisted as
-                      soon as a call to commit has returned.
+ @param isGroupingAllowed If `YES`, multiple sequential calls to
+                         `commitAsyncWriteTransaction:` may be batched together
+                         and persisted to stable storage in one group. This
+                         improves write performance, particularly when the
+                         individual transactions being batched are small. In the
+                         event of a crash or power failure, either all of the
+                         grouped transactions will be lost or none will, rather
+                         than the usual guarantee that data has been persisted as
+                         soon as a call to commit has returned.
  
  @return An id identifying the asynchronous transaction commit can be passed to
          `cancelAsyncTransaction:` prior to the completion block being called
@@ -627,7 +623,7 @@ typedef void (^RLMNotificationBlock)(RLMNotification notification, RLMRealm *rea
  Transactions can only be canceled before the block is invoked, and calling
  `cancelAsyncTransaction:` from within the block is a no-op.
  
- @param RLMAsyncTransactionId A transaction id from either `beginAsyncWriteTransaction:` or `commitAsyncWriteTransaction:`.
+ @param asyncTransactionId A transaction id from either `beginAsyncWriteTransaction:` or `commitAsyncWriteTransaction:`.
 */
 - (void)cancelAsyncTransaction:(RLMAsyncTransactionId)asyncTransactionId;
 
@@ -650,7 +646,7 @@ typedef void (^RLMNotificationBlock)(RLMNotification notification, RLMRealm *rea
          `cancelAsyncTransaction:` prior to the block being called to cancel
          the pending invocation of the block.
 */
-- (RLMAsyncTransactionId)asyncTransactionWithBlock:(void(^)())block
+- (RLMAsyncTransactionId)asyncTransactionWithBlock:(void(^)(void))block
                                         onComplete:(nullable void(^)(NSError *_Nullable))completionBlock;
 
 /**
@@ -668,9 +664,7 @@ typedef void (^RLMNotificationBlock)(RLMNotification notification, RLMRealm *rea
          `cancelAsyncTransaction:` prior to the block being called to cancel
          the pending invocation of the block.
 */
-- (RLMAsyncTransactionId)asyncTransactionWithBlock:(void(^)())block;
-
-#endif // REALM_ASYNC_WRITES
+- (RLMAsyncTransactionId)asyncTransactionWithBlock:(void(^)(void))block;
 
 /**
  Updates the Realm and outstanding objects managed by the Realm to point to the

@@ -726,15 +726,13 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     }
 }
 
-#ifdef REALM_ASYNC_WRITES
-
 - (BOOL)isPerformingAsynchronousWriteOperations {
     return _realm->is_in_async_transaction();
 }
 
 - (RLMAsyncTransactionId)beginAsyncWriteTransaction:(void(^)())block {
     try {
-        _realm->async_begin_transaction(block);
+        return _realm->async_begin_transaction(block);
     }
     catch (std::exception &ex) {
         @throw RLMException(ex);
@@ -747,6 +745,7 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     }
     catch (...) {
         RLMRealmTranslateException(nil);
+        return 0;
     }
 }
 
@@ -817,8 +816,6 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
         }
     }];
 }
-
-#endif // REALM_ASYNC_WRITES
 
 - (void)invalidate {
     if (_realm->is_in_transaction()) {

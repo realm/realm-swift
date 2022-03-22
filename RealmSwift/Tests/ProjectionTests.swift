@@ -404,8 +404,7 @@ class ProjectionTests: TestCase {
         ] as [String: Any]
     }
 
-    override func setUp() {
-        super.setUp()
+    func populatedRealm() -> Realm {
         let realm = realmWithTestPath()
         try! realm.write {
             let js = realm.create(CommonPerson.self, value: ["firstName": "John",
@@ -424,10 +423,11 @@ class ProjectionTests: TestCase {
             realm.create(ModernAllTypesObject.self, value: allTypeValues)
             realm.create(AdvancedObject.self, value: ["pk": ObjectId.generate(), "commonArray": [1, 2, 3], "objectsArray": [[1, true], [2, false]], "commonSet": [1, 2, 3], "objectsSet": [[1, true], [2, false]]])
         }
+        return realm
     }
 
     func testProjectionManualInit() {
-        let realm = realmWithTestPath()
+        let realm = populatedRealm()
         let johnSnow = realm.objects(CommonPerson.self).filter("lastName == 'Snow'").first!
         // this step will happen under the hood
         let pp = PersonProjection(projecting: johnSnow)
@@ -437,7 +437,7 @@ class ProjectionTests: TestCase {
     }
 
     func testProjectionFromResult() {
-        let realm = realmWithTestPath()
+        let realm = populatedRealm()
         let johnSnow: PersonProjection = realm.objects(PersonProjection.self).first!
         XCTAssertEqual(johnSnow.homeCity, "Winterfell")
         XCTAssertEqual(johnSnow.birthdayAsEpochtime, Date(timeIntervalSince1970: 10).timeIntervalSince1970)
@@ -445,7 +445,7 @@ class ProjectionTests: TestCase {
     }
 
     func testProjectionFromResultFiltered() {
-        let realm = realmWithTestPath()
+        let realm = populatedRealm()
         let johnSnow: PersonProjection = realm.objects(PersonProjection.self).filter("lastName == 'Snow'").first!
 
         XCTAssertEqual(johnSnow.homeCity, "Winterfell")
@@ -454,7 +454,7 @@ class ProjectionTests: TestCase {
     }
 
     func testProjectionFromResultSorted() {
-        let realm = realmWithTestPath()
+        let realm = populatedRealm()
         let dany: PersonProjection = realm.objects(PersonProjection.self).sorted(byKeyPath: "firstName").first!
 
         XCTAssertEqual(dany.homeCity, "King's Landing")
@@ -463,7 +463,7 @@ class ProjectionTests: TestCase {
     }
 
     func testProjectionEnumeration() {
-        let realm = realmWithTestPath()
+        let realm = populatedRealm()
         XCTAssertGreaterThan(realm.objects(PersonProjection.self).count, 0)
         for proj in realm.objects(PersonProjection.self) {
             _ = proj
@@ -471,7 +471,7 @@ class ProjectionTests: TestCase {
     }
 
     func testProjectionEquality() {
-        let realm = realmWithTestPath()
+        let realm = populatedRealm()
         let johnObject = realm.objects(CommonPerson.self).filter("lastName == 'Snow'").first!
         let johnDefaultInit = PersonProjection(projecting: johnObject)
         let johnMapped = realm.objects(PersonProjection.self).filter("lastName == 'Snow'").first!
@@ -482,17 +482,17 @@ class ProjectionTests: TestCase {
     }
 
     func testDescription() {
-        let actual = realmWithTestPath().objects(PersonProjection.self).filter("lastName == 'Snow'").first!.description
+        let actual = populatedRealm().objects(PersonProjection.self).filter("lastName == 'Snow'").first!.description
         let expected = "PersonProjection<CommonPerson> <0x[0-9a-f]+> \\{\n\t\tfirstName\\(\\\\.firstName\\) = John;\n\tlastNameCaps\\(\\\\.lastName\\) = SNOW;\n\tbirthdayAsEpochtime\\(\\\\.birthday\\) = 10.0;\n\thomeCity\\(\\\\.address.city\\) = Optional\\(\"Winterfell\"\\);\n\tfirstFriendsName\\(\\\\.friends\\) = ProjectedCollection<String> \\{\n\t\\[0\\] Daenerys\n\\};\n\\}"
         assertMatches(actual, expected)
     }
 
     func testProjectionsRealmShouldNotBeNil() {
-        XCTAssertNotNil(realmWithTestPath().objects(PersonProjection.self).first!.realm)
+        XCTAssertNotNil(populatedRealm().objects(PersonProjection.self).first!.realm)
     }
 
     func testProjectionFromResultSortedBirthday() {
-        let realm = realmWithTestPath()
+        let realm = populatedRealm()
         let dany: PersonProjection = realm.objects(PersonProjection.self).sorted(byKeyPath: "birthday").first!
 
         XCTAssertEqual(dany.homeCity, "King's Landing")
@@ -501,7 +501,7 @@ class ProjectionTests: TestCase {
     }
 
     func testProjectionForAllRealmTypes() {
-        let allTypesModel = realmWithTestPath().objects(AllTypesPrimitiveProjection.self).first!
+        let allTypesModel = populatedRealm().objects(AllTypesPrimitiveProjection.self).first!
 
         XCTAssertEqual(allTypesModel.boolCol, allTypeValues["boolCol"] as! Bool)
         XCTAssertEqual(allTypesModel.intCol, allTypeValues["intCol"] as! Int)
@@ -780,7 +780,7 @@ class ProjectionTests: TestCase {
     }
 
     func testAllPropertyTypesNotifications() {
-        let realm = realmWithTestPath()
+        let realm = populatedRealm()
         let obj = realm.objects(ModernAllTypesObject.self).first!
         let obs = realm.objects(AllTypesPrimitiveProjection.self).first!
 
@@ -967,7 +967,7 @@ class ProjectionTests: TestCase {
     }
 
     func testObserveKeyPath() {
-        let realm = realmWithTestPath()
+        let realm = populatedRealm()
         let johnProjection = realm.objects(PersonProjection.self).filter("lastName == 'Snow'").first!
 
         let ex = expectation(description: "testProjectionNotification")
@@ -1047,7 +1047,7 @@ class ProjectionTests: TestCase {
     func newObjects(_ defaultValues: [String: Any] = [:]) -> (ModernAllTypesObject, AllTypesPrimitiveProjection) {
         let realm = realmWithTestPath()
         realm.beginWrite()
-        realm.delete( realm.objects(ModernAllTypesObject.self))
+        realm.delete(realm.objects(ModernAllTypesObject.self))
         let obj = realm.create(ModernAllTypesObject.self, value: defaultValues)
         let obs = AllTypesPrimitiveProjection(projecting: obj)
         try! realm.commitWrite()
@@ -1723,9 +1723,7 @@ class ProjectionTests: TestCase {
 
     func testThawCreatedOnDifferentThread() {
         let realm = realmWithTestPath()
-        try! realm.write {
-            realm.deleteAll()
-        }
+        XCTAssertEqual(realm.objects(SimpleProjection.self).count, 0)
         var frozen: SimpleProjection!
         dispatchSyncNewThread {
             let projection = self.simpleProjection()
@@ -1738,7 +1736,7 @@ class ProjectionTests: TestCase {
     }
 
     func testObserveComputedChange() throws {
-        let realm = realmWithTestPath()
+        let realm = populatedRealm()
         let johnProjection = realm.objects(PersonProjection.self).first!
 
         XCTAssertEqual(johnProjection.lastNameCaps, "SNOW")
@@ -1757,6 +1755,9 @@ class ProjectionTests: TestCase {
             }
         }
 
+        // Wait for the notifier to be registered before we do the write
+        realm.refresh()
+
         dispatchSyncNewThread {
             let realm = self.realmWithTestPath()
             let johnObject = realm.objects(CommonPerson.self).filter("lastName == 'Snow'").first!
@@ -1770,13 +1771,13 @@ class ProjectionTests: TestCase {
     }
 
     func testFailedProjection() {
-        let realm = realmWithTestPath()
+        let realm = populatedRealm()
         XCTAssertGreaterThan(realm.objects(FailedProjection.self).count, 0)
         assertThrows(realm.objects(FailedProjection.self).first, reason: "@Projected property")
     }
 
     func testAdvancedProjection() throws {
-        let realm = realmWithTestPath()
+        let realm = populatedRealm()
         let proj = realm.objects(AdvancedProjection.self).first!
 
         XCTAssertEqual(proj.arrayLen, 3)

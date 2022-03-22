@@ -145,8 +145,8 @@ class ModernObjectAccessorTests: TestCase {
         }
 
         testConversion("decimalCol", 1, 1 as Decimal128)
-        testConversion("decimalCol", 2.2 as Float, 2.2 as Decimal128)
-        testConversion("decimalCol", 3.3 as Double, 3.3 as Decimal128)
+        testConversion("decimalCol", 2.2 as Float, Decimal128(value: 2.2 as Float))
+        testConversion("decimalCol", 3.3 as Double, Decimal128(value: 3.3 as Double))
         testConversion("decimalCol", "4.4", 4.4 as Decimal128)
         testConversion("decimalCol", Decimal(5.5), 5.5 as Decimal128)
 
@@ -156,8 +156,8 @@ class ModernObjectAccessorTests: TestCase {
         testConversion("stringEnumCol", ModernStringEnum.value2, ModernStringEnum.value2.rawValue)
 
         testConversion("optDecimalCol", 1, 1 as Decimal128)
-        testConversion("optDecimalCol", 2.2 as Float, 2.2 as Decimal128)
-        testConversion("optDecimalCol", 3.3 as Double, 3.3 as Decimal128)
+        testConversion("optDecimalCol", 2.2 as Float, Decimal128(value: 2.2 as Float))
+        testConversion("optDecimalCol", 3.3 as Double, Decimal128(value: 3.3 as Double))
         testConversion("optDecimalCol", "4.4", 4.4 as Decimal128)
         testConversion("optDecimalCol", Decimal(5.5), 5.5 as Decimal128)
         testConversion("optDecimalCol", NSNull(), nil as Decimal128?)
@@ -291,8 +291,8 @@ class ModernObjectAccessorTests: TestCase {
         }
 
         testConversion("decimalCol", 1, 1 as Decimal128)
-        testConversion("decimalCol", 2.2 as Float, 2.2 as Decimal128)
-        testConversion("decimalCol", 3.3 as Double, 3.3 as Decimal128)
+        testConversion("decimalCol", 2.2 as Float, Decimal128(value: 2.2 as Float))
+        testConversion("decimalCol", 3.3 as Double, Decimal128(value: 3.3 as Double))
         testConversion("decimalCol", "4.4", 4.4 as Decimal128)
         testConversion("decimalCol", Decimal(5.5), 5.5 as Decimal128)
 
@@ -302,8 +302,8 @@ class ModernObjectAccessorTests: TestCase {
         testConversion("stringEnumCol", ModernStringEnum.value2, ModernStringEnum.value2.rawValue)
 
         testConversion("optDecimalCol", 1, 1 as Decimal128)
-        testConversion("optDecimalCol", 2.2 as Float, 2.2 as Decimal128)
-        testConversion("optDecimalCol", 3.3 as Double, 3.3 as Decimal128)
+        testConversion("optDecimalCol", 2.2 as Float, Decimal128(value: 2.2 as Float))
+        testConversion("optDecimalCol", 3.3 as Double, Decimal128(value: 3.3 as Double))
         testConversion("optDecimalCol", "4.4", 4.4 as Decimal128)
         testConversion("optDecimalCol", Decimal(5.5), 5.5 as Decimal128)
         testConversion("optDecimalCol", NSNull(), nil as Decimal128?)

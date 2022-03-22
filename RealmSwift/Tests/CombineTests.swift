@@ -1234,6 +1234,7 @@ private class CombineCollectionPublisherTests<Collection: RealmCollection>: Comb
             .collect()
             .assertNoFailure()
             .sink { arr in
+                XCTAssertEqual(arr.count, 10)
                 for (i, collection) in arr.enumerated() {
                     XCTAssertTrue(collection.isFrozen)
                     XCTAssertEqual(collection.count, i)
@@ -1257,6 +1258,7 @@ private class CombineCollectionPublisherTests<Collection: RealmCollection>: Comb
             .prefix(10)
             .collect()
             .sink { arr in
+                XCTAssertEqual(arr.count, 10)
                 for (i, change) in arr.enumerated() {
                     self.checkChangeset(change, calls: i, frozen: true)
                 }
@@ -1279,6 +1281,7 @@ private class CombineCollectionPublisherTests<Collection: RealmCollection>: Comb
             .collect()
             .assertNoFailure()
             .sink { arr in
+                XCTAssertEqual(arr.count, 10)
                 for (i, change) in arr.enumerated() {
                     self.checkChangeset(change, calls: i, frozen: true)
                 }
@@ -2768,7 +2771,6 @@ class CombineProjectionPublisherTests: CombinePublisherTestCase {
     }
 }
 
-#if REALM_ASYNC_WRITES
 class CombineAsyncRealmTests: CombinePublisherTestCase {
     func testWillChangeLocalWrite() {
         let asyncWriteExpectation = expectation(description: "Should complete async write")
@@ -2778,7 +2780,7 @@ class CombineAsyncRealmTests: CombinePublisherTestCase {
                 asyncWriteExpectation.fulfill()
             }
 
-        try! realm.writeAsync { _ in
+        realm.writeAsync { _ in
             self.realm.create(SwiftIntObject.self, value: [])
         }
         waitForExpectations(timeout: 1, handler: nil)
@@ -2791,13 +2793,11 @@ class CombineAsyncRealmTests: CombinePublisherTestCase {
         }
         DispatchQueue.main.async {
             let realm = try! Realm(configuration: self.realm.configuration)
-            try! realm.writeAsync { _ in
+            realm.writeAsync { _ in
                 realm.create(SwiftIntObject.self, value: [])
             }
         }
         wait(for: [exp], timeout: 3)
     }
 }
-#endif // REALM_ASYNC_WRITES
-
 #endif // canImport(Combine)

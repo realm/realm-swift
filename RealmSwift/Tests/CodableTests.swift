@@ -466,7 +466,7 @@ class CodableTests: TestCase {
         XCTAssertEqual("2.2", decode(Decimal128.self, "[2.2]"))
         XCTAssertEqual("1234567890e123", decode(Decimal128.self, "[\"1234567890e123\"]"))
         XCTAssertEqual(nil, decode(Decimal128?.self, "[null]"))
-        XCTAssertEqual("[\"1.234567890E132\"]", encode("1234567890e123" as Decimal128))
+        XCTAssertEqual("[\"1.23456789E132\"]", encode("1234567890e123" as Decimal128))
     }
 
     func testNullableRealmProperty() {
