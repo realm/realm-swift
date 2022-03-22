@@ -436,22 +436,10 @@ extension Projection: _ObservedResultsValue { }
                 value = value.sorted(byKeyPath: sortDescriptor.keyPath, ascending: sortDescriptor.ascending)
             }
 
-            if let searchFilter = searchFilter {
-                if let filter = filter {
-                    let compoundFilter = NSCompoundPredicate(andPredicateWithSubpredicates: [searchFilter, filter])
-                    value = value.filter(compoundFilter)
-                } else if let `where` = `where` {
-                    let compoundFilter = NSCompoundPredicate(andPredicateWithSubpredicates: [searchFilter, `where`])
-                    value = value.filter(compoundFilter)
-                } else {
-                    value = value.filter(searchFilter)
-                }
-            } else {
-                if let filter = filter {
-                    value = value.filter(filter)
-                } else if let `where` = `where` {
-                    value = value.filter(`where`)
-                }
+            let filters = [searchFilter, filter ?? `where`].compactMap { $0 }
+            if !filters.isEmpty {
+                let compoundFilter = NSCompoundPredicate(andPredicateWithSubpredicates: filters)
+                value = value.filter(compoundFilter)
             }
             setupHasRun = true
         }
@@ -503,6 +491,7 @@ extension Projection: _ObservedResultsValue { }
     /// to the `where` parameter.
     @State public var filter: NSPredicate? {
         willSet {
+            storage.where = nil
             storage.filter = newValue
         }
     }
@@ -514,6 +503,7 @@ extension Projection: _ObservedResultsValue { }
         // Xcode 12.5.1. So Swift Queries are supported on Xcode 13 and above
         // when used with SwiftUI.
         willSet {
+            storage.filter = nil
             storage.where = newValue != nil ? newValue!(Query()).predicate : nil
         }
     }
