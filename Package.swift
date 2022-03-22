@@ -110,7 +110,7 @@ let package = Package(
             targets: ["Realm", "RealmSwift"]),
     ],
     dependencies: [
-        .package(name: "RealmDatabase", path: "../core-socket-plumbing")
+        .package(name: "RealmDatabase", path: "../realm-core-networking")
     ],
     targets: [
       .target(
