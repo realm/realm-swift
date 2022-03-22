@@ -504,7 +504,7 @@ extension Projection: _ObservedResultsValue { }
         // when used with SwiftUI.
         willSet {
             storage.filter = nil
-            storage.where = newValue != nil ? newValue!(Query()).predicate : nil
+            storage.where = newValue?(Query()).predicate
         }
     }
 #endif
