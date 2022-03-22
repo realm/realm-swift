@@ -213,7 +213,48 @@ public typealias Provider = RLMIdentityProvider
  - see: `RLMClientResetMode`
  - see: https://docs.mongodb.com/realm/sync/error-handling/client-resets/
 */
- public typealias ClientResetMode = RLMClientResetMode
+public enum ClientResetMode {
+    /// - see: `RLMClientResetModeManual`
+    case manual
+    /// - see: `RLMClientResetModeDiscardLocal` for more details on `.discardLocal` behavior
+    ///
+    /// The first function `.discardLocal` argument notifies prior to a client reset occurring.
+    /// This functions `Realm` argument contains a frozen copy of the Realm state prior to client reset.
+    /// ```
+    /// user.configuration(partitionValue: "myPartition", clientResetMode: .discardLocal({ beforeRealm in
+    ///    var recoveryConfig = Realm.Configuration()
+    ///    recoveryConfig.fileURL = myRecoveryPath
+    ///    do {
+    ///        beforeRealm.writeCopy(configuration: recoveryConfig)
+    ///        // The copied realm could be used later for recovery, debugging, reporting, etc.
+    ///    } catch {
+    ///        // handle error
+    ///    }
+    /// }, nil))
+    /// ```
+    ///  For more details on ((Realm) -> Void)? = nil,
+    /// - see: `RLMClientResetBeforeBlock`
+    ///
+    /// The second function `.discardLocal` argument notifies after a client reset has occurred.
+    /// - Within this function, the first `Realm` argument contains a frozen copy of the local Realm state prior to client reset.
+    /// - Within this function, the second `Realm` argument contains the Realm state after client reset.
+    /// ```
+    /// var deleteMe = user.configuration(partitionValue: "myPartition", clientResetMode: .discardLocal( nil, { beforeRealm, afterRealm in
+    /// // This block could be used to add custom recovery logic, back-up a realm file, send reporting, etc.
+    /// for object in before.objects(myClass.self) {
+    ///     let res = after.objects(myClass.self)
+    ///     if (res.filter("primaryKey == %@", object.primaryKey).first != nil) {
+    ///         // ...custom recovery logic...
+    ///     } else {
+    ///         // ...custom recovery logic...
+    ///     }
+    /// }
+    /// }))
+    /// ```
+    ///  For more details on the second block: ((Realm, Realm) -> Void)? = nil,
+    /// - see: `RLMClientResetAfterBlock`
+    case discardLocal(((Realm) -> Void)? = nil, ((Realm, Realm) -> Void)? = nil)
+}
 
 /**
  A `SyncConfiguration` represents configuration parameters for Realms intended to sync with
@@ -246,45 +287,6 @@ public typealias Provider = RLMIdentityProvider
     public let clientResetMode: ClientResetMode
 
     /**
-     A callback which notifies prior to a client reset occurring.
-     The `Realm` argument contains a frozen copy of the Realm state prior to client reset.
-     ```
-     user.configuration(paritionValue:"myPartition", clientResetMode: mode) { beforeRealm in
-        var recoveryConfig = Realm.Configuration()
-        recoveryConfig.fileURL = myRecoveryPath
-        do {
-            beforeRealm.writeCopy(configuration: recoveryConfig)
-            // The copied realm could be used later for recovery, debugging, reporting, etc.
-        } catch {
-            // handle error
-        }
-
-     }
-     ```
-     */
-    public let notifyBeforeClientReset: ((Realm) -> Void)?
-
-    /**
-     A callback which notifies after a client reset has occurred.
-     The first `Realm` argument contains a frozen copy of the local Realm state prior to client reset.
-     The second `Realm` argument contains the Realm state after client reset.
-     ```
-     user.configuration(paritionValue:"myPartition", clientResetMode: mode) { beforeRealm, afterRealm in
-        // This block could be used to add custom recovery logic, back-up a realm file, send reporting, etc.
-        for object in before.objects(myClass.self) {
-            let res = after.objects(myClass.self)
-            if (res.filter("primaryKey == %@", object.primaryKey).first != nil) {
-                // ...custom recovery logic...
-            } else {
-                // ...custom recovery logic...
-            }
-        }
-     }
-     ```
-     */
-    public let notifyAfterClientReset: ((Realm, Realm) -> Void)?
-
-    /**
      Determines if the sync configuration is flexible sync or not
      */
     internal let isFlexibleSync: Bool
@@ -303,9 +305,14 @@ public typealias Provider = RLMIdentityProvider
         self.partitionValue = ObjectiveCSupport.convert(object: config.partitionValue)
         self.cancelAsyncOpenOnNonFatalErrors = config.cancelAsyncOpenOnNonFatalErrors
         self.isFlexibleSync = config.enableFlexibleSync
-        self.clientResetMode = config.clientResetMode
-        self.notifyBeforeClientReset = ObjectiveCSupport.convert(object: config.beforeClientReset)
-        self.notifyAfterClientReset = ObjectiveCSupport.convert(object: config.afterClientReset)
+        switch config.clientResetMode {
+        case .manual:
+            self.clientResetMode = .manual
+        case .discardLocal:
+            self.clientResetMode = .discardLocal(ObjectiveCSupport.convert(object: config.beforeClientReset), ObjectiveCSupport.convert(object: config.afterClientReset))
+        @unknown default:
+            fatalError("what's best in this case?")
+        }
     }
 
     func asConfig() -> RLMSyncConfiguration {
@@ -313,12 +320,23 @@ public typealias Provider = RLMIdentityProvider
         if isFlexibleSync {
             syncConfiguration = RLMSyncConfiguration(user: user, stopPolicy: stopPolicy, enableFlexibleSync: isFlexibleSync)
         } else {
-            syncConfiguration = RLMSyncConfiguration(user: user,
-                                                     partitionValue: partitionValue.map(ObjectiveCSupport.convertBson),
-                                                     stopPolicy: stopPolicy,
-                                                     clientResetMode: clientResetMode,
-                                                     notifyBeforeReset: ObjectiveCSupport.convert(object: notifyBeforeClientReset),
-                                                     notifyAfterReset: ObjectiveCSupport.convert(object: notifyAfterClientReset))
+            switch clientResetMode {
+            case .manual:
+                syncConfiguration = RLMSyncConfiguration(user: user,
+                                                         partitionValue: partitionValue.map(ObjectiveCSupport.convertBson),
+                                                         stopPolicy: stopPolicy,
+                                                         clientResetMode: .manual,
+                                                         notifyBeforeReset: nil,
+                                                         notifyAfterReset: nil)
+            case .discardLocal(let before, let after):
+                syncConfiguration = RLMSyncConfiguration(user: user,
+                                                         partitionValue: partitionValue.map(ObjectiveCSupport.convertBson),
+                                                         stopPolicy: stopPolicy,
+                                                         clientResetMode: .discardLocal,
+                                                         notifyBeforeReset: ObjectiveCSupport.convert(object: before),
+                                                         notifyAfterReset: ObjectiveCSupport.convert(object: after))
+            }
+
         }
         syncConfiguration.cancelAsyncOpenOnNonFatalErrors = cancelAsyncOpenOnNonFatalErrors
         return syncConfiguration
@@ -457,21 +475,20 @@ public extension User {
      - parameter clientResetMode: Determines file recovery behavior during a client reset.
      - parameter notifyBeforeClientReset: A callback which notifies prior to a client reset occurring. See: `notifyBeforeClientReset`.
      - parameter notifyAfterClientReset: A callback which notifies after a client reset has occurred. See: `notifyAfterClientReset`.
-
-
-     Additional settings can be optionally specified. Descriptions of these
-     settings follow.
-
-     - warning: NEVER disable SSL validation for a system running in production.
      */
     func configuration<T: BSON>(partitionValue: T,
-                                clientResetMode: ClientResetMode,
-                                notifyBeforeClientReset: ((Realm) -> Void)? = nil,
-                                notifyAfterClientReset: ((Realm, Realm) -> Void)? = nil) -> Realm.Configuration {
-        let config = self.__configuration(withPartitionValue: ObjectiveCSupport.convert(object: AnyBSON(partitionValue)),
-                                          clientResetMode: clientResetMode,
-                                          notifyBeforeReset: ObjectiveCSupport.convert(object: notifyBeforeClientReset),
-                                          notifyAfterReset: ObjectiveCSupport.convert(object: notifyAfterClientReset))
+                                clientResetMode: ClientResetMode) -> Realm.Configuration {
+        var config: RLMRealmConfiguration
+        switch clientResetMode {
+        case .manual:
+            config = self.__configuration(withPartitionValue: ObjectiveCSupport.convert(object: AnyBSON(partitionValue)),
+                                              clientResetMode: .manual)
+        case .discardLocal(let beforeClientReset, let afterClientReset):
+            config = self.__configuration(withPartitionValue: ObjectiveCSupport.convert(object: AnyBSON(partitionValue)),
+                                              clientResetMode: .discardLocal,
+                                              notifyBeforeReset: ObjectiveCSupport.convert(object: beforeClientReset),
+                                              notifyAfterReset: ObjectiveCSupport.convert(object: afterClientReset))
+        }
         return ObjectiveCSupport.convert(object: config)
     }
 

@@ -501,15 +501,20 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 afterCalledCount += 1
             }
 
-            var configuration = user.configuration(partitionValue: #function,
-                                                   clientResetMode: .discardLocal,
-                                                   notifyBeforeClientReset: beforeClientResetBlock,
-                                                   notifyAfterClientReset: afterClientResetBlock)
+            var configuration = user.configuration(partitionValue: #function, clientResetMode: .discardLocal(beforeClientResetBlock, afterClientResetBlock))
             configuration.objectTypes = [SwiftPerson.self]
 
-            XCTAssertEqual(configuration.syncConfiguration?.clientResetMode, .discardLocal)
-            XCTAssertNotNil(configuration.syncConfiguration?.notifyBeforeClientReset)
-            XCTAssertNotNil(configuration.syncConfiguration?.notifyAfterClientReset)
+            let resetModeEx = expectation(description: "Set clientResetMode to discard local")
+            guard let syncConfig = configuration.syncConfiguration else { fatalError("Test condition failure. SyncConfiguration not set.") }
+            switch syncConfig.clientResetMode {
+            case .manual:
+                XCTFail("Should be set to discardLocal")
+            case .discardLocal(let before, let after):
+                XCTAssertNotNil(before)
+                XCTAssertNotNil(after)
+                resetModeEx.fulfill()
+            }
+            waitForExpectations(timeout: 0.5, handler: nil)
 
             // Seed 1 object, Upload to server
             try autoreleasepool {
@@ -603,18 +608,6 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         } catch {
             XCTFail("Failed: \(error.localizedDescription)")
         }
-    }
-
-    func testManualClientResetBeforeCallback() {
-        let user = try! logInUser(for: basicCredentials())
-        assertThrows(user.configuration(partitionValue: #function, clientResetMode: .manual, notifyBeforeClientReset: { _ in }),
-                     reason: "Client reset notifications not supported in Manual mode. Use SyncManager.ErrorHandler")
-    }
-
-    func testManualClientResetAfterCallback() {
-        let user = try! logInUser(for: basicCredentials())
-        assertThrows(user.configuration(partitionValue: #function, clientResetMode: .manual, notifyAfterClientReset: { _, _ in }),
-                     reason: "Client reset notifications not supported in Manual mode. Use SyncManager.ErrorHandler")
     }
 
     // MARK: - Progress notifiers

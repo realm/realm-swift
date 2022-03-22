@@ -67,19 +67,21 @@ struct BeforeClientResetWrapper {
     std::string path;
     RLMSchema *customSchema;
     void operator()(std::shared_ptr<Realm> local) {
-        RLMSchema *schema;
-        if (dynamic) {
-            schema = [RLMSchema dynamicSchemaFromObjectStoreSchema:local->schema()];
+        @autoreleasepool {
+            RLMSchema *schema;
+            if (dynamic) {
+                schema = [RLMSchema dynamicSchemaFromObjectStoreSchema:local->schema()];
+            }
+            else if (auto cached = RLMGetAnyCachedRealmForPath(path)) {
+                schema = cached.schema;
+            } else {
+                schema = customSchema ?: RLMSchema.sharedSchema;
+            }
+            RLMRealm *realm = [RLMRealm realmWithSharedRealm:local
+                                                      schema:schema
+                                                     dynamic:false];
+            block(realm);
         }
-        if (auto cached = RLMGetAnyCachedRealmForPath(path)) {
-            schema = cached.schema;
-        } else {
-            schema = customSchema ?: RLMSchema.sharedSchema;
-        }
-        RLMRealm *realm = [RLMRealm realmWithSharedRealm:local
-                                                  schema:schema
-                                                 dynamic:false];
-        block(realm);
     }
 };
 
@@ -89,23 +91,25 @@ struct AfterClientResetWrapper {
     std::string path;
     RLMSchema *customSchema;
     void operator()(std::shared_ptr<Realm> local, std::shared_ptr<Realm> remote) {
-        RLMSchema *schema;
-        if (dynamic) {
-            schema = [RLMSchema dynamicSchemaFromObjectStoreSchema:local->schema()];
-        }
-        if (auto cached = RLMGetAnyCachedRealmForPath(path)) {
-            schema = cached.schema;
-        } else {
-            schema = customSchema ?: RLMSchema.sharedSchema;
-        }
-        RLMRealm *localRealm = [RLMRealm realmWithSharedRealm:local
-                                                       schema:schema
-                                                      dynamic:false];
+        @autoreleasepool {
+            RLMSchema *schema;
+            if (dynamic) {
+                schema = [RLMSchema dynamicSchemaFromObjectStoreSchema:local->schema()];
+            }
+            else if (auto cached = RLMGetAnyCachedRealmForPath(path)) {
+                schema = cached.schema;
+            } else {
+                schema = customSchema ?: RLMSchema.sharedSchema;
+            }
+            RLMRealm *localRealm = [RLMRealm realmWithSharedRealm:local
+                                                           schema:schema
+                                                          dynamic:false];
 
-        RLMRealm *remoteRealm = [RLMRealm realmWithSharedRealm:remote
-                                                        schema:schema
-                                                       dynamic:false];
-        block(localRealm, remoteRealm);
+            RLMRealm *remoteRealm = [RLMRealm realmWithSharedRealm:remote
+                                                            schema:schema
+                                                           dynamic:false];
+            block(localRealm, remoteRealm);
+        }
     }
 };
 
@@ -202,9 +206,9 @@ void RLMSetConfigInfoForClientResetCallbacks(realm::SyncConfig& syncConfig, RLMR
         syncConfig.notify_before_client_reset.target<BeforeClientResetWrapper>()->customSchema = config.customSchema;
     }
     if (syncConfig.notify_after_client_reset) {
-        syncConfig.notify_before_client_reset.target<AfterClientResetWrapper>()->dynamic = config.dynamic;
-        syncConfig.notify_before_client_reset.target<AfterClientResetWrapper>()->path = config.config.path;
-        syncConfig.notify_before_client_reset.target<AfterClientResetWrapper>()->customSchema = config.customSchema;
+        syncConfig.notify_after_client_reset.target<AfterClientResetWrapper>()->dynamic = config.dynamic;
+        syncConfig.notify_after_client_reset.target<AfterClientResetWrapper>()->path = config.config.path;
+        syncConfig.notify_after_client_reset.target<AfterClientResetWrapper>()->customSchema = config.customSchema;
     }
 }
 
