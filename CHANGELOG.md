@@ -1,6 +1,9 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
+* Add ability to use Swift Query syntax in `@ObservedResults`, which allows you
+  to filter results using the `where` parameter.
+* Add ability to use `MutableSet` with `StateRealmObject` in SwiftUI.
 * Added new `SyncConfiguration.clientResetMode` and `RLMSyncConfiguration.clientResetMode` properties.
   - The values of these properties will dictate client behavior in the event of a [client reset](https://docs.mongodb.com/realm/sync/error-handling/client-resets/).
   - See below for information on `ClientResetMode` values.
@@ -64,11 +67,6 @@ x.y.z Release notes (yyyy-MM-dd)
                                                            notifyAfterReset:afterBlock];
     ```
     where `beforeBlock` is of type `RLMClientResetBeforeBlock`. And `afterBlock` is of type `RLMClientResetAfterBlock`.
-
-* None.
-* Add ability to use Swift Query syntax in `@ObservedResults`, which allows you 
-  to filter results using the `where` parameter.
-* Add ability to use `MutableSet` with `StateRealmObject` in SwiftUI.
 
 ### Fixed
 * Adding a Realm Object to a `ObservedResults` or a collections using `StateRealmObject` that is managed by the same Realm 
