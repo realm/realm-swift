@@ -218,8 +218,8 @@ public enum ClientResetMode {
     case manual
     /// - see: `RLMClientResetModeDiscardLocal` for more details on `.discardLocal` behavior
     ///
-    /// The first function `.discardLocal` argument notifies prior to a client reset occurring.
-    /// This functions `Realm` argument contains a frozen copy of the Realm state prior to client reset.
+    /// The first `.discardLocal` function argument notifies prior to a client reset occurring.
+    /// The `Realm` argument contains a frozen copy of the Realm state prior to client reset.
     /// ```
     /// user.configuration(partitionValue: "myPartition", clientResetMode: .discardLocal({ beforeRealm in
     ///    var recoveryConfig = Realm.Configuration()
@@ -235,11 +235,11 @@ public enum ClientResetMode {
     ///  For more details on ((Realm) -> Void)? = nil,
     /// - see: `RLMClientResetBeforeBlock`
     ///
-    /// The second function `.discardLocal` argument notifies after a client reset has occurred.
+    /// The second `.discardLocal` function argument notifies after a client reset has occurred.
     /// - Within this function, the first `Realm` argument contains a frozen copy of the local Realm state prior to client reset.
     /// - Within this function, the second `Realm` argument contains the Realm state after client reset.
     /// ```
-    /// var deleteMe = user.configuration(partitionValue: "myPartition", clientResetMode: .discardLocal( nil, { beforeRealm, afterRealm in
+    /// user.configuration(partitionValue: "myPartition", clientResetMode: .discardLocal( nil, { beforeRealm, afterRealm in
     /// // This block could be used to add custom recovery logic, back-up a realm file, send reporting, etc.
     /// for object in before.objects(myClass.self) {
     ///     let res = after.objects(myClass.self)
@@ -281,7 +281,7 @@ public enum ClientResetMode {
      An enum which determines file recovery behvaior in the event of a client reset.
      - note: Defaults to `.manual`
 
-     - see: `RLMClientResetMode`
+     - see: `ClientResetMode` and `RLMClientResetMode`
      - see: https://docs.mongodb.com/realm/sync/error-handling/client-resets/
     */
     public let clientResetMode: ClientResetMode
