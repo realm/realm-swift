@@ -44,8 +44,11 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     func removeAllFromCollection(_ collection: MongoCollection) {
         let ex = expectation(description: "delete objects")
         collection.deleteManyDocuments(filter: [:]) { result in
-            if case .success = result {
+            switch result {
+            case .success:
                 ex.fulfill()
+            case .failure(let error):
+                XCTFail("Error: \(error.localizedDescription)")
             }
         }
         wait(for: [ex], timeout: 10.0)

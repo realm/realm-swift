@@ -63,16 +63,18 @@ RLMSyncSystemErrorKind errorKindForSyncError(SyncError error) {
 
 struct BeforeClientResetWrapper {
     RLMClientResetBeforeBlock block;
-    RLMRealmConfiguration *rlmConfig;
+    bool dynamic;
+    std::string path;
+    RLMSchema *customSchema;
     void operator()(std::shared_ptr<Realm> local) {
         RLMSchema *schema;
-        if (rlmConfig.dynamic) {
+        if (dynamic) {
             schema = [RLMSchema dynamicSchemaFromObjectStoreSchema:local->schema()];
         }
-        if (auto cached = RLMGetAnyCachedRealmForPath(rlmConfig.config.path)) { // crash, no rlmConfig, despite being set when realm is open?
+        if (auto cached = RLMGetAnyCachedRealmForPath(path)) {
             schema = cached.schema;
         } else {
-            schema = rlmConfig.customSchema ?: RLMSchema.sharedSchema;
+            schema = customSchema ?: RLMSchema.sharedSchema;
         }
         RLMRealm *realm = [RLMRealm realmWithSharedRealm:local
                                                   schema:schema
@@ -83,16 +85,18 @@ struct BeforeClientResetWrapper {
 
 struct AfterClientResetWrapper {
     RLMClientResetAfterBlock block;
-    RLMRealmConfiguration *rlmConfig;
+    bool dynamic;
+    std::string path;
+    RLMSchema *customSchema;
     void operator()(std::shared_ptr<Realm> local, std::shared_ptr<Realm> remote) {
         RLMSchema *schema;
-        if (rlmConfig.dynamic) {
+        if (dynamic) {
             schema = [RLMSchema dynamicSchemaFromObjectStoreSchema:local->schema()];
         }
-        if (auto cached = RLMGetAnyCachedRealmForPath(rlmConfig.config.path)) {
+        if (auto cached = RLMGetAnyCachedRealmForPath(path)) {
             schema = cached.schema;
         } else {
-            schema = rlmConfig.customSchema ?: RLMSchema.sharedSchema;
+            schema = customSchema ?: RLMSchema.sharedSchema;
         }
         RLMRealm *localRealm = [RLMRealm realmWithSharedRealm:local
                                                        schema:schema
@@ -191,12 +195,16 @@ struct AfterClientResetWrapper {
     }
 }
 
-void RLMSetConfigForClientResetCallbacks(realm::SyncConfig& syncConfig, RLMRealmConfiguration *config) {
+void RLMSetConfigInfoForClientResetCallbacks(realm::SyncConfig& syncConfig, RLMRealmConfiguration *config) {
     if (syncConfig.notify_before_client_reset) {
-        syncConfig.notify_before_client_reset.target<BeforeClientResetWrapper>()->rlmConfig = config;
+        syncConfig.notify_before_client_reset.target<BeforeClientResetWrapper>()->dynamic = config.dynamic;
+        syncConfig.notify_before_client_reset.target<BeforeClientResetWrapper>()->path = config.config.path;
+        syncConfig.notify_before_client_reset.target<BeforeClientResetWrapper>()->customSchema = config.customSchema;
     }
     if (syncConfig.notify_after_client_reset) {
-        syncConfig.notify_after_client_reset.target<AfterClientResetWrapper>()->rlmConfig = config;
+        syncConfig.notify_before_client_reset.target<AfterClientResetWrapper>()->dynamic = config.dynamic;
+        syncConfig.notify_before_client_reset.target<AfterClientResetWrapper>()->path = config.config.path;
+        syncConfig.notify_before_client_reset.target<AfterClientResetWrapper>()->customSchema = config.customSchema;
     }
 }
 

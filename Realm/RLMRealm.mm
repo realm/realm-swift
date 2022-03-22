@@ -478,7 +478,7 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
 
     // Pass the configuration so client reset callbacks can access schema and path information.
     if (configuration.syncConfiguration.beforeClientReset || configuration.syncConfiguration.afterClientReset) {
-        RLMSetConfigForClientResetCallbacks(*config.sync_config, configuration);
+        RLMSetConfigInfoForClientResetCallbacks(*config.sync_config, configuration);
     }
 
     RLMRealm *realm = [[self alloc] initPrivate];
