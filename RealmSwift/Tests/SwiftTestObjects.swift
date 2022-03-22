@@ -32,7 +32,7 @@ class ModernSwiftStringProjection: Projection<ModernSwiftStringObject> {
     @Projected(\ModernSwiftStringObject.stringCol) var string
 }
 
-class SwiftBoolObject: Object {
+class SwiftBoolObject: Object, Identifiable {
     @objc dynamic var boolCol = false
 }
 
