@@ -65,6 +65,7 @@ extension FindOptions {
     }
 
     /// The order in which to return matching documents.
+    @available(*, deprecated, message: "Use sortDescriptors")
     public var sort: Document? {
         get {
             return __sort.map(ObjectiveCSupport.convertBson)??.documentValue
@@ -74,12 +75,23 @@ extension FindOptions {
         }
     }
 
+    /// The order in which to return matching documents.
+    public var sortDescriptors: [SortDescriptor] {
+        get {
+            __sortDescriptors.map { SortDescriptor(keyPath: $0.keyPath, ascending: $0.ascending) }
+        }
+        set {
+            __sortDescriptors = newValue.compactMap { RLMSortDescriptor(keyPath: $0.keyPath, ascending: $0.ascending) }
+        }
+    }
+
     // NEXT-MAJOR: there's no reason for limit to be optional here
     /// Options to use when executing a `find` command on a `MongoCollection`.
     /// - Parameters:
     ///   - limit: The maximum number of documents to return. Specifying 0 will return all documents.
     ///   - projected: Limits the fields to return for all matching documents.
     ///   - sort: The order in which to return matching documents.
+    @available(*, deprecated, message: "Use init(limit:projection:sortDescriptors:)")
     public convenience init(_ limit: Int?, _ projection: Document?, _ sort: Document?) {
         self.init()
         self.limit = limit ?? 0
@@ -91,10 +103,24 @@ extension FindOptions {
     /// - Parameters:
     ///   - limit: The maximum number of documents to return. Specifying 0 will return all documents.
     ///   - projected: Limits the fields to return for all matching documents.
+    ///   - sortDescriptors: The order in which to return matching documents.
+    public convenience init(_ limit: Int = 0, _ projection: Document?, _ sortDescriptors: [SortDescriptor] = []) {
+        self.init()
+        self.limit = limit
+        self.projection = projection
+        self.sortDescriptors = sortDescriptors
+    }
+
+    /// Options to use when executing a `find` command on a `MongoCollection`.
+    /// - Parameters:
+    ///   - limit: The maximum number of documents to return. Specifying 0 will return all documents.
+    ///   - projected: Limits the fields to return for all matching documents.
     ///   - sort: The order in which to return matching documents.
+    @available(*, deprecated, message: "Use init(limit:projection:sortDescriptors:)")
     public convenience init(limit: Int?, projection: Document?, sort: Document?) {
         self.init(limit, projection, sort)
     }
+
 }
 
 /// Options to use when executing a `findOneAndUpdate`, `findOneAndReplace`,
@@ -113,12 +139,23 @@ extension FindOneAndModifyOptions {
     }
 
     /// The order in which to return matching documents.
+    @available(*, deprecated, message: "Use sortDescriptors")
     public var sort: Document? {
         get {
             return __sort.map(ObjectiveCSupport.convertBson)??.documentValue
         }
         set {
             __sort = newValue.map(AnyBSON.init).map(ObjectiveCSupport.convertBson)
+        }
+    }
+
+    /// The order in which to return matching documents, defined by `SortDescriptor`
+    public var sortDescriptors: [SortDescriptor] {
+        get {
+            __sortDescriptors.map { SortDescriptor(keyPath: $0.keyPath, ascending: $0.ascending) }
+        }
+        set {
+            __sortDescriptors = newValue.compactMap { RLMSortDescriptor(keyPath: $0.keyPath, ascending: $0.ascending) }
         }
     }
 
@@ -132,6 +169,7 @@ extension FindOneAndModifyOptions {
     ///   - shouldReturnNewDocument: When true then the new document is returned,
     ///   Otherwise the old document is returned (default)
     ///   (only available for findOneAndReplace and findOneAndUpdate)
+    @available(*, deprecated, message: "Use init(projection:sortDescriptors:upsert:shouldReturnNewDocument:)")
     public convenience init(_ projection: Document?,
                             _ sort: Document?,
                             _ upsert: Bool=false,
@@ -147,12 +185,34 @@ extension FindOneAndModifyOptions {
     /// or `findOneAndDelete` command on a `MongoCollection`
     /// - Parameters:
     ///   - projection: Limits the fields to return for all matching documents.
+    ///   - sortDescriptors: The order in which to return matching documents.
+    ///   - upsert: Whether or not to perform an upsert, default is false
+    ///   (only available for findOneAndReplace and findOneAndUpdate)
+    ///   - shouldReturnNewDocument: When true then the new document is returned,
+    ///   Otherwise the old document is returned (default)
+    ///   (only available for findOneAndReplace and findOneAndUpdate)
+    public convenience init(_ projection: Document?,
+                            _ sortDescriptors: [SortDescriptor] = [],
+                            _ upsert: Bool=false,
+                            _ shouldReturnNewDocument: Bool=false) {
+        self.init()
+        self.projection = projection
+        self.sortDescriptors = sortDescriptors
+        self.upsert = upsert
+        self.shouldReturnNewDocument = shouldReturnNewDocument
+    }
+
+    /// Options to use when executing a `findOneAndUpdate`, `findOneAndReplace`,
+    /// or `findOneAndDelete` command on a `MongoCollection`
+    /// - Parameters:
+    ///   - projection: Limits the fields to return for all matching documents.
     ///   - sort: The order in which to return matching documents.
     ///   - upsert: Whether or not to perform an upsert, default is false
     ///   (only available for findOneAndReplace and findOneAndUpdate)
     ///   - shouldReturnNewDocument: When true then the new document is returned,
     ///   Otherwise the old document is returned (default)
     ///   (only available for findOneAndReplace and findOneAndUpdate)
+    @available(*, deprecated, message: "Use init(projection:sortDescriptors:upsert:shouldReturnNewDocument:)")
     public convenience init(projection: Document?,
                             sort: Document?,
                             upsert: Bool=false,

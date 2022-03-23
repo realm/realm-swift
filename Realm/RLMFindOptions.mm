@@ -18,6 +18,7 @@
 
 #import "RLMFindOptions_Private.hpp"
 #import "RLMBSON_Private.hpp"
+#import "RLMCollection.h"
 
 @interface RLMFindOptions() {
     realm::app::MongoCollection::FindOptions _options;
@@ -46,6 +47,26 @@
     return self;
 }
 
+- (instancetype)initWithLimit:(NSInteger)limit
+                   projection:(id<RLMBSON> _Nullable)projection
+              sortDescriptors:(NSArray<RLMSortDescriptor *> *)sortDescriptors {
+    if (self = [super init]) {
+        self.projection = projection;
+        self.sortDescriptors = sortDescriptors;
+        self.limit = limit;
+    }
+    return self;
+}
+
+- (instancetype)initWithProjection:(id<RLMBSON> _Nullable)projection
+                   sortDescriptors:(NSArray<RLMSortDescriptor *> *)sortDescriptors {
+    if (self = [super init]) {
+        self.projection = projection;
+        self.sortDescriptors = sortDescriptors;
+    }
+    return self;
+}
+
 - (realm::app::MongoCollection::FindOptions)_findOptions {
     return _options;
 }
@@ -56,6 +77,18 @@
 
 - (id<RLMBSON>)sort {
     return RLMConvertBsonDocumentToRLMBSON(_options.sort_bson);
+}
+
+- (NSArray<RLMSortDescriptor *> *)sortDescriptors {
+    NSMutableArray<RLMSortDescriptor *> *sortDescriptors = [[NSMutableArray alloc] init];
+    for (auto it = _options.sort_bson->begin(); it != _options.sort_bson->end();) {
+        auto entry = *it;
+        RLMSortDescriptor *sortDescriptor = [RLMSortDescriptor sortDescriptorWithKeyPath:@(entry.first.c_str()) ascending:[(NSNumber *)RLMConvertBsonToRLMBSON(entry.second) boolValue]];
+        [sortDescriptors addObject:sortDescriptor];
+        it++;
+    }
+
+    return sortDescriptors;
 }
 
 - (void)setProjection:(id<RLMBSON>)projection {
@@ -74,6 +107,15 @@
     } else {
         _options.sort_bson = realm::util::none;
     }
+}
+
+- (void)setSortDescriptors:(NSArray<RLMSortDescriptor *> *)sortDescriptors {
+    auto bsonDocuments = realm::bson::BsonDocument{};
+    for (RLMSortDescriptor *sortDescriptor in sortDescriptors) {
+        NSNumber *ascending = sortDescriptor.ascending == TRUE ? [[NSNumber alloc]initWithInteger:1] :  [[NSNumber alloc]initWithInteger:-1];
+        bsonDocuments[sortDescriptor.keyPath.UTF8String] = RLMConvertRLMBSONToBson(ascending);
+    }
+    _options.sort_bson = bsonDocuments;
 }
 
 - (NSInteger)limit {

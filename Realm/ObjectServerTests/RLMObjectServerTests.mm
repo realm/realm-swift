@@ -2171,97 +2171,94 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 
 - (void)testFindOneAndModifyOptions {
     NSDictionary<NSString *, id<RLMBSON>> *projection = @{@"name": @1, @"breed": @1};
-    NSDictionary<NSString *, id<RLMBSON>> *sort = @{@"age" : @1, @"coat" : @1};
+    NSArray<RLMSortDescriptor *> *sortDescriptors = @[[RLMSortDescriptor sortDescriptorWithKeyPath:@"age" ascending:true], [RLMSortDescriptor sortDescriptorWithKeyPath:@"coat" ascending:true]];
 
     RLMFindOneAndModifyOptions *findOneAndModifyOptions1 = [[RLMFindOneAndModifyOptions alloc] init];
     XCTAssertNil(findOneAndModifyOptions1.projection);
-    XCTAssertNil(findOneAndModifyOptions1.sort);
+    XCTAssertEqual(findOneAndModifyOptions1.sortDescriptors.count, 0U);
     XCTAssertFalse(findOneAndModifyOptions1.shouldReturnNewDocument);
     XCTAssertFalse(findOneAndModifyOptions1.upsert);
 
     RLMFindOneAndModifyOptions *findOneAndModifyOptions2 = [[RLMFindOneAndModifyOptions alloc] init];
     findOneAndModifyOptions2.projection = projection;
-    findOneAndModifyOptions2.sort = sort;
-    XCTAssertNotNil(findOneAndModifyOptions2.projection);
-    XCTAssertNotNil(findOneAndModifyOptions2.sort);
+    findOneAndModifyOptions2.sortDescriptors = sortDescriptors;
     findOneAndModifyOptions2.shouldReturnNewDocument = YES;
     findOneAndModifyOptions2.upsert = YES;
+    XCTAssertNotNil(findOneAndModifyOptions2.projection);
+    XCTAssertEqual(findOneAndModifyOptions2.sortDescriptors.count, 2U);
     XCTAssertTrue(findOneAndModifyOptions2.shouldReturnNewDocument);
     XCTAssertTrue(findOneAndModifyOptions2.upsert);
-
     XCTAssertFalse([findOneAndModifyOptions2.projection isEqual:@{}]);
     XCTAssertTrue([findOneAndModifyOptions2.projection isEqual:projection]);
-    XCTAssertFalse([findOneAndModifyOptions2.sort isEqual:@{}]);
-    XCTAssertTrue([findOneAndModifyOptions2.sort isEqual:sort]);
+    XCTAssertFalse([findOneAndModifyOptions2.sortDescriptors isEqual:sortDescriptors]);
 
     RLMFindOneAndModifyOptions *findOneAndModifyOptions3 = [[RLMFindOneAndModifyOptions alloc]
                                                             initWithProjection:projection
-                                                            sort:sort
+                                                            sortDescriptors:sortDescriptors
                                                             upsert:YES
                                                             shouldReturnNewDocument:YES];
-
     XCTAssertNotNil(findOneAndModifyOptions3.projection);
-    XCTAssertNotNil(findOneAndModifyOptions3.sort);
+    XCTAssertEqual(findOneAndModifyOptions3.sortDescriptors.count, 2U);
     XCTAssertTrue(findOneAndModifyOptions3.shouldReturnNewDocument);
     XCTAssertTrue(findOneAndModifyOptions3.upsert);
     XCTAssertFalse([findOneAndModifyOptions3.projection isEqual:@{}]);
     XCTAssertTrue([findOneAndModifyOptions3.projection isEqual:projection]);
-    XCTAssertFalse([findOneAndModifyOptions3.sort isEqual:@{}]);
-    XCTAssertTrue([findOneAndModifyOptions3.sort isEqual:sort]);
+    XCTAssertFalse([findOneAndModifyOptions3.sortDescriptors isEqual:sortDescriptors]);
 
     findOneAndModifyOptions3.projection = nil;
-    findOneAndModifyOptions3.sort = nil;
+    findOneAndModifyOptions3.sortDescriptors = @[];
     XCTAssertNil(findOneAndModifyOptions3.projection);
-    XCTAssertNil(findOneAndModifyOptions3.sort);
+    XCTAssertEqual(findOneAndModifyOptions3.sortDescriptors.count, 0U);
 
     RLMFindOneAndModifyOptions *findOneAndModifyOptions4 = [[RLMFindOneAndModifyOptions alloc]
                                                             initWithProjection:nil
-                                                            sort:nil
+                                                            sortDescriptors:@[]
                                                             upsert:NO
                                                             shouldReturnNewDocument:NO];
-
     XCTAssertNil(findOneAndModifyOptions4.projection);
-    XCTAssertNil(findOneAndModifyOptions4.sort);
+    XCTAssertEqual(findOneAndModifyOptions4.sortDescriptors.count, 0U);
     XCTAssertFalse(findOneAndModifyOptions4.upsert);
     XCTAssertFalse(findOneAndModifyOptions4.shouldReturnNewDocument);
 }
 
 - (void)testFindOptions {
     NSDictionary<NSString *, id<RLMBSON>> *projection = @{@"name": @1, @"breed": @1};
-    NSDictionary<NSString *, id<RLMBSON>> *sort = @{@"age" : @1, @"coat" : @1};
+    NSArray<RLMSortDescriptor *> *sortDescriptors = @[[RLMSortDescriptor sortDescriptorWithKeyPath:@"age" ascending:true], [RLMSortDescriptor sortDescriptorWithKeyPath:@"coat" ascending:true]];
 
     RLMFindOptions *findOptions1 = [[RLMFindOptions alloc] init];
-    findOptions1.limit = 37;
     XCTAssertNil(findOptions1.projection);
+    XCTAssertEqual(findOptions1.sortDescriptors.count, 0U);
+    XCTAssertEqual(findOptions1.limit, 0);
+
+    findOptions1.limit = 37;
     findOptions1.projection = projection;
-    XCTAssertTrue([findOptions1.projection isEqual:projection]);
-    XCTAssertNil(findOptions1.sort);
-    findOptions1.sort = sort;
-    XCTAssertTrue([findOptions1.sort isEqual:sort]);
+    findOptions1.sortDescriptors = sortDescriptors;
     XCTAssertEqual(findOptions1.limit, 37);
+    XCTAssertTrue([findOptions1.projection isEqual:projection]);
+    XCTAssertEqual(findOptions1.sortDescriptors.count, 2U);
 
     RLMFindOptions *findOptions2 = [[RLMFindOptions alloc] initWithProjection:projection
-                                                                         sort:sort];
+                                                              sortDescriptors:sortDescriptors];
     XCTAssertTrue([findOptions2.projection isEqual:projection]);
-    XCTAssertTrue([findOptions2.sort isEqual:sort]);
+    XCTAssertEqual(findOptions1.sortDescriptors.count, 2U);
     XCTAssertEqual(findOptions2.limit, 0);
 
     RLMFindOptions *findOptions3 = [[RLMFindOptions alloc] initWithLimit:37
                                                               projection:projection
-                                                                    sort:sort];
+                                                         sortDescriptors:sortDescriptors];
     XCTAssertTrue([findOptions3.projection isEqual:projection]);
-    XCTAssertTrue([findOptions3.sort isEqual:sort]);
+    XCTAssertEqual(findOptions1.sortDescriptors.count, 2U);
     XCTAssertEqual(findOptions3.limit, 37);
 
     findOptions3.projection = nil;
-    findOptions3.sort = nil;
+    findOptions3.sortDescriptors = @[];
     XCTAssertNil(findOptions3.projection);
-    XCTAssertNil(findOptions3.sort);
+    XCTAssertEqual(findOptions3.sortDescriptors.count, 0U);
 
     RLMFindOptions *findOptions4 = [[RLMFindOptions alloc] initWithProjection:nil
-                                                                         sort:nil];
+                                                              sortDescriptors:@[]];
     XCTAssertNil(findOptions4.projection);
-    XCTAssertNil(findOptions4.sort);
+    XCTAssertEqual(findOptions4.sortDescriptors.count, 0U);
     XCTAssertEqual(findOptions4.limit, 0);
 }
 
@@ -2292,7 +2289,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     [self waitForExpectationsWithTimeout:60.0 handler:nil];
 
     XCTestExpectation *findExpectation = [self expectationWithDescription:@"should find documents"];
-    RLMFindOptions *options = [[RLMFindOptions alloc] initWithLimit:0 projection:nil sort:nil];
+    RLMFindOptions *options = [[RLMFindOptions alloc] initWithLimit:0 projection:nil sortDescriptors:@[]];
     [collection findWhere:@{@"name": @"fido", @"breed": @"cane corso"}
                   options:options
                completion:^(NSArray<NSDictionary *> *documents, NSError *error) {
@@ -2321,7 +2318,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     [self waitForExpectationsWithTimeout:60.0 handler:nil];
 
     XCTestExpectation *findExpectation = [self expectationWithDescription:@"should find documents"];
-    RLMFindOptions *options = [[RLMFindOptions alloc] initWithLimit:0 projection:nil sort:nil];
+    RLMFindOptions *options = [[RLMFindOptions alloc] initWithLimit:0 projection:nil sortDescriptors:@[]];
     [collection findWhere:@{@"name": @"fido", @"breed": @"cane corso"}
                   options:options
                completion:^(NSArray<NSDictionary *> *documents, NSError *error) {
@@ -2516,9 +2513,10 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     RLMMongoDatabase *database = [client databaseWithName:@"test_data"];
     RLMMongoCollection *collection = [database collectionWithName:@"Dog"];
 
+    NSArray<RLMSortDescriptor *> *sortDescriptors = @[[RLMSortDescriptor sortDescriptorWithKeyPath:@"name" ascending:true], [RLMSortDescriptor sortDescriptorWithKeyPath:@"breed" ascending:true]];
     RLMFindOneAndModifyOptions *findAndModifyOptions = [[RLMFindOneAndModifyOptions alloc]
                                                         initWithProjection:@{@"name" : @1, @"breed" : @1}
-                                                        sort:@{@"name" : @1, @"breed" : @1}
+                                                        sortDescriptors:sortDescriptors
                                                         upsert:YES
                                                         shouldReturnNewDocument:YES];
 
@@ -2623,10 +2621,10 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 
     XCTestExpectation *findOneAndDeleteExpectation2 = [self expectationWithDescription:@"should find one and delete"];
     NSDictionary<NSString *, id<RLMBSON>> *projection = @{@"name": @1, @"breed": @1};
-    NSDictionary<NSString *, id<RLMBSON>> *sort = @{@"_id" : @1, @"breed" : @1};
+    NSArray<RLMSortDescriptor *> *sortDescriptors = @[[RLMSortDescriptor sortDescriptorWithKeyPath:@"_id" ascending:true], [RLMSortDescriptor sortDescriptorWithKeyPath:@"breed" ascending:true]];
     RLMFindOneAndModifyOptions *findOneAndModifyOptions = [[RLMFindOneAndModifyOptions alloc]
                                                            initWithProjection:projection
-                                                           sort:sort
+                                                           sortDescriptors:sortDescriptors
                                                            upsert:YES
                                                            shouldReturnNewDocument:YES];
 

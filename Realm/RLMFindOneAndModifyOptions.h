@@ -20,6 +20,7 @@
 
 RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 @protocol RLMBSON;
+@class RLMSortDescriptor;
 
 /// Options to use when executing a `findOneAndUpdate`, `findOneAndReplace`,
 /// or `findOneAndDelete` command on a `RLMMongoCollection`.
@@ -29,7 +30,13 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 @property (nonatomic, nullable) id<RLMBSON> projection NS_REFINED_FOR_SWIFT;
 
 /// The order in which to return matching documents.
-@property (nonatomic, nullable) id<RLMBSON> sort NS_REFINED_FOR_SWIFT;
+@property (nonatomic, nullable) id<RLMBSON> sort NS_REFINED_FOR_SWIFT
+__attribute__((deprecated("Use `sortDescriptors` instead, which correctly sort more than one sort attribute", "sortDescriptors")));
+
+/// The order in which to return matching documents.
+/// - seeAlso ``RLMSortDescriptor``
+@property (nonatomic) NSArray<RLMSortDescriptor *>* sortDescriptors NS_REFINED_FOR_SWIFT;
+
 
 /// Whether or not to perform an upsert, default is false
 /// (only available for find_one_and_replace and find_one_and_update)
@@ -52,8 +59,22 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 - (instancetype)initWithProjection:(id<RLMBSON> _Nullable)projection
                               sort:(id<RLMBSON> _Nullable)sort
                             upsert:(BOOL)upsert
-           shouldReturnNewDocument:(BOOL)shouldReturnNewDocument NS_SWIFT_UNAVAILABLE("Please see FindOneAndModifyOptions");
+           shouldReturnNewDocument:(BOOL)shouldReturnNewDocument __deprecated
+     NS_SWIFT_UNAVAILABLE("Please see FindOneAndModifyOptions");
 
+/// Options to use when executing a `findOneAndUpdate`, `findOneAndReplace`,
+/// or `findOneAndDelete` command on a `RLMMongoCollection`.
+/// @param projection Limits the fields to return for all matching documents.
+/// @param sortDescriptors The order in which to return matching documents.
+/// @param upsert Whether or not to perform an upsert, default is false
+/// (only available for findOneAndReplace and findOneAndUpdate)
+/// @param shouldReturnNewDocument When true then the new document is returned,
+/// Otherwise the old document is returned (default),
+/// (only available for findOneAndReplace and findOneAndUpdate)
+- (instancetype)initWithProjection:(id<RLMBSON> _Nullable)projection
+                   sortDescriptors:(NSArray<RLMSortDescriptor *> *)sortDescriptors
+                            upsert:(BOOL)upsert
+           shouldReturnNewDocument:(BOOL)shouldReturnNewDocument;
 @end
 
 RLM_HEADER_AUDIT_END(nullability, sendability)

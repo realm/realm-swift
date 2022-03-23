@@ -18,6 +18,7 @@
 
 #import "RLMFindOneAndModifyOptions_Private.hpp"
 #import "RLMBSON_Private.hpp"
+#import "RLMCollection.h"
 
 @interface RLMFindOneAndModifyOptions() {
     realm::app::MongoCollection::FindOneAndModifyOptions _options;
@@ -39,6 +40,19 @@
     return self;
 }
 
+- (instancetype)initWithProjection:(id<RLMBSON> _Nullable)projection
+                   sortDescriptors:(NSArray<RLMSortDescriptor *> *)sortDescriptors
+                            upsert:(BOOL)upsert
+           shouldReturnNewDocument:(BOOL)shouldReturnNewDocument {
+    if (self = [super init]) {
+        self.upsert = upsert;
+        self.shouldReturnNewDocument = shouldReturnNewDocument;
+        self.projection = projection;
+        self.sortDescriptors = sortDescriptors;
+    }
+    return self;
+}
+
 - (realm::app::MongoCollection::FindOneAndModifyOptions)_findOneAndModifyOptions {
     return _options;
 }
@@ -49,6 +63,18 @@
 
 - (id<RLMBSON>)sort {
     return RLMConvertBsonDocumentToRLMBSON(_options.sort_bson);
+}
+
+- (NSArray<RLMSortDescriptor *> *)sortDescriptors {
+    NSMutableArray<RLMSortDescriptor *> *sortDescriptors = [[NSMutableArray alloc] init];
+    for (auto it = _options.sort_bson->begin(); it != _options.sort_bson->end();) {
+        auto entry = *it;
+        RLMSortDescriptor *sortDescriptor = [RLMSortDescriptor sortDescriptorWithKeyPath:@(entry.first.c_str()) ascending:[(NSNumber *)RLMConvertBsonToRLMBSON(entry.second) boolValue]];
+        [sortDescriptors addObject:sortDescriptor];
+        it++;
+    }
+
+    return sortDescriptors;
 }
 
 - (BOOL)upsert {
@@ -75,6 +101,15 @@
     } else {
         _options.sort_bson = realm::util::none;
     }
+}
+
+- (void)setSortDescriptors:(NSArray<RLMSortDescriptor *> *)sortDescriptors {
+    auto bsonDocuments = realm::bson::BsonDocument{};
+    for (RLMSortDescriptor *sortDescriptor in sortDescriptors) {
+        NSNumber *ascending = sortDescriptor.ascending == TRUE ? [[NSNumber alloc]initWithInteger:1] :  [[NSNumber alloc]initWithInteger:-1];
+        bsonDocuments[sortDescriptor.keyPath.UTF8String] = RLMConvertRLMBSONToBson(ascending);
+    }
+    _options.sort_bson = bsonDocuments;
 }
 
 - (void)setUpsert:(BOOL)upsert {

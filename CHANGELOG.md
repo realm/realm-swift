@@ -141,6 +141,11 @@ x.y.z Release notes (yyyy-MM-dd)
 
 * Improve performance of equality queries on a non-indexed AnyRealmValue
   property by about 30%. ([Core #6506](https://github.com/realm/realm-core/issues/6506))
+* Now you can use sortDescriptors parameter to set an array of `SortDescriptor`s 
+  which can be use to set the order of the matching documents when used within MongoCollection. 
+  This new API fixes the issue where the resulting documents when using more than 
+  one sort parameter were not consistent between calls. 
+  ([#7188](https://github.com/realm/realm-swift/issues/7188), since v10.0.0). 
 
 ### Fixed
 
