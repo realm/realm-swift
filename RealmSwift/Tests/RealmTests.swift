@@ -1289,7 +1289,7 @@ class RealmTests: TestCase {
 
     func testAsyncTransactionCancel() {
         let realm = try! Realm()
-        let expectation = expectation(description: "testAsyncTransactionCancel expectation")
+        let expectation = XCTestExpectation(description: "testAsyncTransactionCancel expectation")
         expectation.expectedFulfillmentCount = 4
         let unexpectation = XCTestExpectation(description: "should not fulfill")
         unexpectation.isInverted = true
