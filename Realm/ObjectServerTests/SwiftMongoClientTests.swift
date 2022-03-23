@@ -873,6 +873,17 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
 #if swift(>=5.5.2) && canImport(_Concurrency)
 @available(macOS 12.0, *)
 class AsyncAwaitMongoClientTests: SwiftSyncTestCase {
+    override class var defaultTestSuite: XCTestSuite {
+        // async/await is currently incompatible with thread sanitizer and will
+        // produce many false positives
+        // https://bugs.swift.org/browse/SR-15444
+        if RLMThreadSanitizerEnabled() {
+            return XCTestSuite(name: "\(type(of: self))")
+        }
+        return super.defaultTestSuite
+
+    }
+
     func setupMongoCollection() async throws -> MongoCollection {
         let user = try await self.app.login(credentials: basicCredentials())
         let mongoClient = user.mongoClient("mongodb1")

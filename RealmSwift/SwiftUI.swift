@@ -35,6 +35,10 @@ private func safeWrite<Value>(_ value: Value, _ block: (Value) -> Void) where Va
     }
 }
 
+private func thawObjectIfFrozen<Value>(_ value: Value) -> Value where Value: ObjectBase & ThreadConfined {
+    return value.realm == nil ? value : value.thaw() ?? value
+}
+
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 private func createBinding<T: ThreadConfined, V>(
     _ value: T,
@@ -346,6 +350,15 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
     }
     /**
      Initialize a RealmState struct for a given thread confined type.
+     - parameter wrappedValue The MutableSet reference to wrap and observe.
+     */
+    @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
+    public init<Value>(wrappedValue: T) where T == MutableSet<Value> {
+        self._storage = StateObject(wrappedValue: ObservableStorage(wrappedValue))
+        defaultValue = T()
+    }
+    /**
+     Initialize a RealmState struct for a given thread confined type.
      - parameter wrappedValue The Map reference to wrap and observe.
      */
     @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
@@ -424,8 +437,9 @@ extension Projection: _ObservedResultsValue { }
             }
             if let filter = filter {
                 value = value.filter(filter)
+            } else if let `where` = `where` {
+                value = value.where(`where`)
             }
-
             setupHasRun = true
         }
 
@@ -440,22 +454,52 @@ extension Projection: _ObservedResultsValue { }
                 didSet()
             }
         }
-
+        var `where`: ((Query<ResultType>) -> Query<Bool>)? {
+            didSet {
+                didSet()
+            }
+        }
         var configuration: Realm.Configuration? {
             didSet {
                 didSet()
             }
         }
+
+        var searchString: String = ""
     }
 
     @Environment(\.realmConfiguration) var configuration
     @ObservedObject private var storage: Storage
     /// :nodoc:
+    fileprivate func searchText<T: ObjectBase>(_ text: String, on keyPath: KeyPath<T, String>) {
+        if text.isEmpty {
+            if storage.filter != nil {
+                storage.filter = nil
+            }
+        } else if text != storage.searchString {
+            storage.filter = Query<T>()[dynamicMember: keyPath].contains(text).predicate
+        }
+        storage.searchString = text
+    }
+    /// Stores an NSPredicate used for filtering the Results. This is mutually exclusive
+    /// to the `where` parameter.
     @State public var filter: NSPredicate? {
         willSet {
             storage.filter = newValue
         }
     }
+#if swift(>=5.5)
+    /// Stores a type safe query used for filtering the Results. This is mutually exclusive
+    /// to the `filter` parameter.
+    @State public var `where`: ((Query<ResultType>) -> Query<Bool>)? {
+        // The introduction of this property produces a compiler bug in
+        // Xcode 12.5.1. So Swift Queries are supported on Xcode 13 and above
+        // when used with SwiftUI.
+        willSet {
+            storage.where = newValue
+        }
+    }
+#endif
     /// :nodoc:
     @State public var sortDescriptor: SortDescriptor? {
         willSet {
@@ -519,6 +563,40 @@ extension Projection: _ObservedResultsValue { }
         self.storage = Storage(Results(RLMResults<ResultType>.emptyDetached()), keyPaths)
         self.storage.configuration = configuration
         self.filter = filter
+        self.sortDescriptor = sortDescriptor
+    }
+#if swift(>=5.5)
+    /**
+     Initialize a `ObservedResults` struct for a given `Object` or `EmbeddedObject` type.
+     - parameter type: Observed type
+     - parameter configuration: The `Realm.Configuration` used when creating the Realm,
+     user's sync configuration for the given partition value will be set as the `syncConfiguration`,
+     if empty the configuration is set to the `defaultConfiguration`
+     - parameter where: Observations will be made only for passing objects.
+     If no type safe query is given - all objects will be observed
+     - parameter keyPaths: Only properties contained in the key paths array will be observed.
+     If `nil`, notifications will be delivered for any property change on the object.
+     String key paths which do not correspond to a valid a property will throw an exception.
+     - parameter sortDescriptor: A sequence of `SortDescriptor`s to sort by
+     */
+    public init(_ type: ResultType.Type,
+                configuration: Realm.Configuration? = nil,
+                where: ((Query<ResultType>) -> Query<Bool>)? = nil,
+                keyPaths: [String]? = nil,
+                sortDescriptor: SortDescriptor? = nil) where ResultType: Object {
+        self.storage = Storage(Results(RLMResults<ResultType>.emptyDetached()), keyPaths)
+        self.storage.configuration = configuration
+        self.where = `where`
+        self.sortDescriptor = sortDescriptor
+    }
+#endif
+    /// :nodoc:
+    public init(_ type: ResultType.Type,
+                keyPaths: [String]? = nil,
+                configuration: Realm.Configuration? = nil,
+                sortDescriptor: SortDescriptor? = nil) where ResultType: Object {
+        self.storage = Storage(Results(RLMResults<ResultType>.emptyDetached()), keyPaths)
+        self.storage.configuration = configuration
         self.sortDescriptor = sortDescriptor
     }
 
@@ -689,6 +767,18 @@ public extension BoundCollection where Value: RealmCollection {
         }
     }
     /// :nodoc:
+    func remove<V>(_ element: V) where Value == MutableSet<V> {
+        safeWrite(self.wrappedValue) { mutableSet in
+            mutableSet.remove(element)
+        }
+    }
+    /// :nodoc:
+    func remove<V>(_ object: V) where Value == MutableSet<V>, V: ObjectBase & ThreadConfined {
+        safeWrite(self.wrappedValue) { mutableSet in
+            mutableSet.remove(thawObjectIfFrozen(object))
+        }
+    }
+    /// :nodoc:
     func move<V>(fromOffsets offsets: IndexSet, toOffset destination: Int) where Value == List<V> {
         safeWrite(self.wrappedValue) { list in
             list.move(fromOffsets: offsets, toOffset: destination)
@@ -701,13 +791,29 @@ public extension BoundCollection where Value: RealmCollection {
         }
     }
     /// :nodoc:
+    func insert<V>(_ value: Value.Element) where Value == MutableSet<V>, Value.Element: ObjectBase & ThreadConfined {
+        // if the value is unmanaged but the set is managed, we are adding this value to the realm
+        if value.realm == nil && self.wrappedValue.realm != nil {
+            SwiftUIKVO.observedObjects[value]?.cancel()
+        }
+        safeWrite(self.wrappedValue) { mutableSet in
+            mutableSet.insert(thawObjectIfFrozen(value))
+        }
+    }
+    /// :nodoc:
+    func insert<V>(_ value: Value.Element) where Value == MutableSet<V> {
+        safeWrite(self.wrappedValue) { mutableSet in
+            mutableSet.insert(value)
+        }
+    }
+    /// :nodoc:
     func append<V>(_ value: Value.Element) where Value == List<V>, Value.Element: ObjectBase & ThreadConfined {
         // if the value is unmanaged but the list is managed, we are adding this value to the realm
         if value.realm == nil && self.wrappedValue.realm != nil {
             SwiftUIKVO.observedObjects[value]?.cancel()
         }
         safeWrite(self.wrappedValue) { list in
-            list.append(value)
+            list.append(thawObjectIfFrozen(value))
         }
     }
     /// :nodoc:
@@ -716,7 +822,7 @@ public extension BoundCollection where Value: RealmCollection {
             SwiftUIKVO.observedObjects[value]?.cancel()
         }
         safeWrite(self.wrappedValue) { results in
-            results.realm?.add(value)
+            results.realm?.add(thawObjectIfFrozen(value))
         }
     }
     /// :nodoc:
@@ -725,7 +831,7 @@ public extension BoundCollection where Value: RealmCollection {
             SwiftUIKVO.observedObjects[value.rootObject]?.cancel()
         }
         safeWrite(self.wrappedValue) { results in
-            results.realm?.add(value.rootObject)
+            results.realm?.add(thawObjectIfFrozen(value.rootObject))
         }
     }
 }
@@ -774,7 +880,7 @@ public extension BoundMap where Value: RealmKeyedCollection {
             SwiftUIKVO.observedObjects[value]?.cancel()
         }
         safeWrite(self.wrappedValue) { map in
-            map[key] = value
+            map[key] = thawObjectIfFrozen(value)
         }
     }
 
@@ -802,7 +908,7 @@ extension Binding where Value: Object {
     /// :nodoc:
     public func delete() {
         safeWrite(wrappedValue) { object in
-            object.realm?.delete(self.wrappedValue)
+            object.realm?.delete(thawObjectIfFrozen(self.wrappedValue))
         }
     }
 }
@@ -812,7 +918,7 @@ extension Binding where Value: ProjectionObservable, Value.Root: ThreadConfined 
     /// :nodoc:
     public func delete() {
         safeWrite(wrappedValue.rootObject) { object in
-            object.realm?.delete(object)
+            object.realm?.delete(thawObjectIfFrozen(object))
         }
     }
 }
@@ -1576,7 +1682,7 @@ extension View {
      */
     public func searchable<T: ObjectBase, V, S>(text: Binding<String>, collection: ObservedResults<T>, keyPath: KeyPath<T, String>,
                                                 placement: SearchFieldPlacement = .automatic, prompt: S, @ViewBuilder suggestions: () -> V)
-            -> some View where V: View, S: StringProtocol {
+    -> some View where V: View, S: StringProtocol {
         filterCollection(collection, for: text.wrappedValue, on: keyPath)
         return searchable(text: text,
                           placement: placement,
@@ -1586,11 +1692,7 @@ extension View {
 
     private func filterCollection<T: ObjectBase>(_ collection: ObservedResults<T>, for text: String, on keyPath: KeyPath<T, String>) {
         DispatchQueue.main.async {
-            if text.isEmpty {
-                collection.filter = nil
-            } else {
-                collection.filter = Query<T>()[dynamicMember: keyPath].contains(text).predicate
-            }
+            collection.searchText(text, on: keyPath)
         }
     }
 }

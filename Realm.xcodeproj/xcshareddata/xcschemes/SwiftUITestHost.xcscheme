@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "1300"
+   LastUpgradeVersion = "1330"
    version = "1.7">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -52,8 +52,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "53124AD325B71AF700771CE4"
-               BuildableName = "SwiftUITestHostUITests.xctest"
-               BlueprintName = "SwiftUITestHostUITests"
+               BuildableName = "SwiftUITests.xctest"
+               BlueprintName = "SwiftUITests"
                ReferencedContainer = "container:Realm.xcodeproj">
             </BuildableReference>
          </TestableReference>

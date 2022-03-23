@@ -439,7 +439,7 @@
     [company.employeeDict enumerateKeysAndObjectsUsingBlock:^(id _Nonnull key,
                                                               EmployeeObject * _Nonnull obj,
                                                               __unused BOOL * _Nonnull stop) {
-        XCTAssertEqual([company.employeeDict[key] name], [obj name]);
+        XCTAssertEqualObjects([company.employeeDict[key] name], [obj name]);
         XCTAssertEqual(((EmployeeObject *)company.employeeDict[key]).age, [obj age]);
         XCTAssertEqual([company.employeeDict[key] hired], [obj hired]);
     }];

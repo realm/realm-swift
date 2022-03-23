@@ -3,8 +3,8 @@
 import PackageDescription
 import Foundation
 
-let coreVersionStr = "11.9.0"
-let cocoaVersionStr = "10.22.0"
+let coreVersionStr = "11.12.0"
+let cocoaVersionStr = "10.24.2"
 
 let coreVersionPieces = coreVersionStr.split(separator: ".")
 let coreVersionExtra = coreVersionPieces[2].split(separator: "-")
@@ -59,8 +59,10 @@ let objectServerTestSources = [
     "ObjectServerTests-Info.plist",
     "RLMBSONTests.mm",
     "RLMCollectionSyncTests.mm",
+    "RLMFlexibleSyncServerTests.mm",
     "RLMObjectServerPartitionTests.mm",
     "RLMObjectServerTests.mm",
+    "RLMServerTestObjects.m",
     "RLMSyncTestCase.h",
     "RLMSyncTestCase.mm",
     "RLMTestUtils.h",
@@ -71,9 +73,13 @@ let objectServerTestSources = [
     "RLMWatchTestUtility.m",
     "RealmServer.swift",
     "SwiftCollectionSyncTests.swift",
+    "SwiftFlexibleSyncServerTests.swift",
+    "SwiftMongoClientTests.swift",
     "SwiftObjectServerPartitionTests.swift",
     "SwiftObjectServerTests.swift",
+    "SwiftServerObjects.swift",
     "SwiftSyncTestCase.swift",
+    "SwiftUIServerTests.swift",
     "TimeoutProxyServer.swift",
     "WatchTestUtility.swift",
     "certificates",
