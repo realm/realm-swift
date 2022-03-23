@@ -18,6 +18,8 @@ x.y.z Release notes (yyyy-MM-dd)
 * Setting a Realm Configuration for @ObservedResults using it's initializer would be overrode by the Realm Configuration stored in
   `.environment(\.realmConfiguration, ...)` if they did not match ([Cocoa #7463](https://github.com/realm/realm-swift/issues/7463), since v10.6.0).
 * Fix searchable component filter overriding the initial filter on `@ObservedResults`, (since v10.23.0).
+* Comparing `Results` or `AnyRealmCollection` when using Realm via XCFramework 
+  would result in compile time errors ([Cocoa #7615](https://github.com/realm/realm-swift/issues/7615), since v10.21.0)
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
