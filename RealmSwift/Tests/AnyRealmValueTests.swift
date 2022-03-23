@@ -387,6 +387,27 @@ class AnyRealmValueListTests<O: ObjectFactory, V: AnyValueFactory>: AnyRealmValu
         assertThrows(array[1])
     }
 
+    func testRemoveWithObject() {
+        assertThrows(array.remove(values[0]))
+
+        array.append(objectsIn: values)
+        assertEqual(values[0], array[0])
+        assertEqual(values[1], array[1])
+        assertEqual(values[2], array[2])
+        assertThrows(array[3])
+
+        array.remove(values[0])
+        assertThrows(array.remove(values[0]))
+        assertEqual(values[1], array[0])
+        assertEqual(values[2], array[1])
+        assertThrows(array[2])
+
+        array.remove(array[1])
+        assertThrows(array.remove(values[2])) // values[2] was already removed in line 406
+        assertEqual(values[1], array[0])
+        assertThrows(array[1])
+    }
+
     func testRemoveLast() {
         assertThrows(array.removeLast())
 

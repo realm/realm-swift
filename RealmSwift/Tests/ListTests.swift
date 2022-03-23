@@ -250,10 +250,38 @@ class ListTests: TestCase {
         }
 
         array.append(objectsIn: [str1, str2, str1])
-        try! array.remove(str2)
+        array.remove(str2)
+
         XCTAssertEqual(array.count, 2)
         assertEqual(array[0], str1)
         assertEqual(array[1], str1)
+        assertThrows(array.remove(str2))
+    }
+
+    func testRemoveWhenDuplicates() {
+        guard let array = array, let str1 = str1, let str2 = str2 else {
+            fatalError("Test precondition failure")
+        }
+
+        array.append(objectsIn: [str1, str2, str1])
+        array.remove(str1)
+
+        XCTAssertEqual(array.count, 2)
+        assertEqual(array[0], str2) // Expect the str1 that was at index 0 to be removed
+        assertEqual(array[1], str1)
+    }
+
+    func testRemoveSequence() {
+        guard let array = array, let str1 = str1, let str2 = str2 else {
+            fatalError("Test precondition failure")
+        }
+
+        array.append(objectsIn: [str1, str2, str1])
+        array.remove(objectsIn: [str2, str1])
+
+        XCTAssertEqual(array.count, 1)
+        assertEqual(array[0], str1)
+        assertThrows(array.remove(str2))
     }
 
     func testRemoveLast() {
