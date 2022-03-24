@@ -354,6 +354,11 @@ extension SwiftUISyncTestHostUITests {
             realm2.add(SwiftPerson(firstName: "Jane2", lastName: "Doe"))
         }
         user2.waitForUpload(toFinish: partitionValue)
+
+        user1.waitForDownload(toFinish: partitionValue)
+        realm.refresh()
+        XCTAssertEqual(realm.objects(SwiftPerson.self).count, 4)
+
         XCTAssertEqual(table.cells.count, 4)
 
         loginUser(.first)

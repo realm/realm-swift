@@ -288,4 +288,26 @@ class SwiftUITests: XCTestCase {
         searchBar.typeText("12")
         XCTAssertEqual(table.cells.count, 1)
     }
+
+    // This test allow us to test database migrations on a SwiftUI context
+    func testObservedResultsSchemaBump() {
+        let realmPath = URL(string: "\(FileManager.default.temporaryDirectory)\(UUID())")!
+        app.launchEnvironment["schema_bump_path"] = realmPath.absoluteString
+        app.launchEnvironment["test_type"] = "schema_bump_test"
+        app.launchEnvironment["schema_version"] = "1"
+        app.launch()
+
+        let addButton = app.buttons["addList"]
+        (1...5).forEach { _ in
+            addButton.tap()
+        }
+
+        XCTAssertEqual(app.tables.firstMatch.cells.count, 5)
+        app.terminate()
+
+        // We bump the schema version and relaunch the app, which should migrate data from the previous version to the current one
+        app.launchEnvironment["schema_version"] = "2"
+        app.launch()
+        XCTAssertEqual(app.tables.firstMatch.cells.count, 5)
+    }
 }

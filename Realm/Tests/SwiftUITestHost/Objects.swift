@@ -44,5 +44,6 @@ class Reminder: EmbeddedObject, ObjectKeyIdentifiable {
 class ReminderList: Object, ObjectKeyIdentifiable {
     @Persisted var name = "New List"
     @Persisted var icon = "list.bullet"
+    @Persisted var colorNumber: Int = 0
     @Persisted var reminders = RealmSwift.List<Reminder>()
 }
