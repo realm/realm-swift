@@ -498,6 +498,23 @@ public struct AnyQueryResults: SyncSubscription, Sequence {
                                    results: realm.objects(T.self))
     }
 
+
+    public func subscribe<T1: Object, T2: Object>(to query: QuerySubscription<T1>, _ query2: QuerySubscription<T2>) -> (QueryResults<T1>, QueryResults<T2>) {
+        rlmSyncSubscriptionSet.addSubscription(withClassName: query.className, predicate: query.predicate)
+        return (QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query.className, predicate: query.predicate)!,
+                                   results: realm.objects(T1.self)), QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query2.className, predicate: query2.predicate)!,
+                                                                                 results: realm.objects(T2.self)))
+    }
+
+
+    public func subscribe<T1: Object, T2: Object, T3: Object>(to query: QuerySubscription<T1>, _ query2: QuerySubscription<T2>, _ query3: QuerySubscription<T3>) -> (QueryResults<T1>, QueryResults<T2>, QueryResults<T3>) {
+        rlmSyncSubscriptionSet.addSubscription(withClassName: query.className, predicate: query.predicate)
+        return (QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query.className, predicate: query.predicate)!,
+                                   results: realm.objects(T1.self)), QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query2.className, predicate: query2.predicate)!,
+                                                                                 results: realm.objects(T2.self)),
+                QueryResults(rlmSyncSubscriptionSet.subscription(withClassName: query3.className, predicate: query3.predicate)!,
+                                                              results: realm.objects(T3.self)))
+    }
     /**
      Removes a subscription with the specified query.
 
@@ -689,6 +706,10 @@ extension User {
         config.syncConfiguration = flexibleSyncConfiguration().syncConfiguration
         return try SyncSubscriptionSet(configuration: config)
     }
+
+    func realm(configuration: Realm.Configuration = .defaultConfiguration) throws -> Realm {
+        fatalError()
+    }
 }
 
 class Person: Object {
@@ -696,42 +717,64 @@ class Person: Object {
     @Persisted var age: Int
 }
 
+class Dog: Object {
+    @Persisted var name: String
+    @Persisted var breed: String
+}
+
+enum BirdSpecies: Int, PersistableEnum {
+    case magpie
+}
+class Bird: Object {
+    @Persisted var species: BirdSpecies
+}
+
 // MARK: EXAMPLE
 
 @available(macOSApplicationExtension 12.0, *)
 public func show() async throws {
-    let app = App(id: "my-app-id")
-    let user = try await app.login(credentials: .anonymous)
-    let subscriptions = try user.subscriptions()
-    let results: QueryResults<Person> = try await subscriptions.subscribe(to: { person in
-        person.age > 18
-    })
-    results.forEach { person in
-        print(person.name)
-    }
-    let newPerson = Person()
-    newPerson.age = 18
-    try results.write {
-        results.append(newPerson)
-    }
-    try results.write {
-        results.remove(newPerson)
-    }
-    try await results.unsubscribe()
+let app = App(id: "my-app-id")
+let user = try await app.login(credentials: .anonymous)
+let realm = try user.realm(configuration: .defaultConfiguration)
+let (persons, dogs, birds) = try await realm.subscriptions.subscribe(to: QuerySubscription<Person> { person in
+    person.age > 18
+}, QuerySubscription<Dog> { dog in
+    dog.breed == "Australian Shepherd"
+}, QuerySubscription<Bird> { bird in
+    bird.species == .magpie
+})
+persons.forEach { person in
+    print(person.name)
+}
+let newPerson = Person()
+newPerson.age = 18
+try realm.write {
+    realm.add(newPerson)
+}
+try realm.write {
+    realm.delete(newPerson)
+}
+try await persons.unsubscribe()
+try await dogs.unsubscribe()
+try await birds.unsubscribe()
 }
 
 import SwiftUI
 
 let app = App(id: "my-app-id")
-
+//
 //@available(macOSApplicationExtension 10.15, *)
 //struct PersonSearchView: View {
 //    let subscriptions: SyncSubscriptionSet
-//    @QueryResults(Person.self) var persons
+//    var persons: QueryResults<Person>
+//
+//    init(subscriptions: SyncSubscriptionSet) {
+//        self.subscriptions = subscriptions
+//    }
 //
 //    var body: some View {
 //        SwiftUI.List {
-//            ForEach(persons) {
+//            ForEach(persons) { person in
 //
 //            }
 //        }.searchable(text: <#T##Binding<String>#>)
@@ -742,6 +785,7 @@ let app = App(id: "my-app-id")
 struct ContentView: View {
     @State var username: String
     @State var password: String
+    @Published var results: Results<Person>
 
     var body: some View {
         TextField("username", text: $username)
