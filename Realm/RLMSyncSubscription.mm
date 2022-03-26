@@ -521,4 +521,16 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
     }
 }
 
+- (void)waitForCompletion:(void(^)(NSError * _Nullable))block {
+    _subscriptionSet->get_state_change_notification(realm::sync::SubscriptionSet::State::Complete)
+        .get_async([block](realm::StatusWith<realm::sync::SubscriptionSet::State> state) mutable noexcept {
+        if (state.is_ok()) {
+            block(nil);
+        } else {
+            NSError* error = [[NSError alloc] initWithDomain:RLMFlexibleSyncErrorDomain code:state.get_status().code() userInfo:@{@"reason": @(state.get_status().reason().c_str())}];
+            block(error);
+        }
+    });
+}
+
 @end

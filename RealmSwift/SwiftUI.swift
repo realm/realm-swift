@@ -420,9 +420,23 @@ extension Projection: _ObservedResultsValue { }
 ///
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 @propertyWrapper public struct ObservedResults<ResultType>: DynamicProperty, BoundCollection where ResultType: _ObservedResultsValue & RealmFetchable & KeypathSortable & Identifiable {
+
     public typealias Element = ResultType
+
+    public enum SubscriptionState {
+        case subscribing
+        case complete
+        case error(Error)
+    }
+
+    public var state: SubscriptionState {
+        storage.state
+    }
+
     private class Storage: ObservableStorage<Results<ResultType>> {
         var setupHasRun = false
+        @State var state: SubscriptionState = .complete
+
         private func didSet() {
             if setupHasRun {
                 setupValue()
@@ -431,18 +445,38 @@ extension Projection: _ObservedResultsValue { }
 
         func setupValue() {
             /// A base value to reset the state of the query if a user reassigns the `filter` or `sortDescriptor`
-            let realm = try! Realm(configuration: configuration ?? Realm.Configuration.defaultConfiguration)
-            value = realm.objects(ResultType.self)
-            if let sortDescriptor = sortDescriptor {
-                value = value.sorted(byKeyPath: sortDescriptor.keyPath, ascending: sortDescriptor.ascending)
+            if configuration?.rlmConfiguration.isFlexibleSyncConfiguration ?? false {
+                Task {
+                    do {
+                        let realm = try await Realm(configuration: configuration ?? Realm.Configuration.defaultConfiguration)
+                        value = try await realm.objects(ResultType.self)
+                        if let sortDescriptor = sortDescriptor {
+                            value = value.sorted(byKeyPath: sortDescriptor.keyPath, ascending: sortDescriptor.ascending)
+                        }
+                        if let filter = filter {
+                            value = try await value.filter(filter)
+                        } else if let `where` = `where` {
+                            value = try await value.where(`where`)
+                        }
+                        setupHasRun = true
+                        self.state = .complete
+                    } catch {
+                        self.state = .error(error)
+                    }
+                }
+            } else {
+                let realm = try! Realm(configuration: configuration ?? Realm.Configuration.defaultConfiguration)
+                value = realm.objects(ResultType.self)
+                if let sortDescriptor = sortDescriptor {
+                    value = value.sorted(byKeyPath: sortDescriptor.keyPath, ascending: sortDescriptor.ascending)
+                }
+                if let filter = filter {
+                    value = value.filter(filter)
+                } else if let `where` = `where` {
+                    value = value.where(`where`)
+                }
+                setupHasRun = true
             }
-
-            let filters = [searchFilter, filter ?? `where`].compactMap { $0 }
-            if !filters.isEmpty {
-                let compoundFilter = NSCompoundPredicate(andPredicateWithSubpredicates: filters)
-                value = value.filter(compoundFilter)
-            }
-            setupHasRun = true
         }
 
         var sortDescriptor: SortDescriptor? {

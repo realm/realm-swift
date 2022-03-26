@@ -111,6 +111,7 @@ extension Projection: KeypathSortable {}
  */
 @frozen public struct Results<Element: RealmCollectionValue>: Equatable, RealmCollectionImpl {
     internal let collection: RLMCollection
+    fileprivate var subscription: SyncSubscription? = nil
 
     /// A human-readable description of the objects represented by the results.
     public var description: String {
@@ -144,3 +145,55 @@ extension Projection: KeypathSortable {}
 }
 
 extension Results: Encodable where Element: Encodable {}
+
+@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+extension Results {
+    internal init(_ collection: RLMCollection,
+                  predicate: NSPredicate = NSPredicate(format: "TRUEPREDICATE")) async throws {
+        self.collection = collection
+        guard let realm = realm else {
+            fatalError()
+        }
+
+        guard realm.rlmRealm.configuration.isFlexibleSyncConfiguration,
+              realm.subscriptions.first(ofType: Element.self, where: predicate) == nil else {
+            return
+        }
+
+        try await realm.subscriptions.write {
+            realm.subscriptions.append(QuerySubscription(where: predicate))
+        }
+        self.subscription = realm.subscriptions.first(ofType: Element.self, where: predicate)
+    }
+
+    public func filter(_ predicate: NSPredicate) async throws -> Results<Element> {
+        return try await Results<Element>(collection.objects(with: predicate), predicate: predicate)
+    }
+
+    func `where`(_ isIncluded: ((Query<Element>) -> Query<Bool>)) async throws -> Results<Element> {
+        return try await filter(isIncluded(Query()).predicate)
+    }
+
+    func unsubscribe() async throws {
+        guard realm?.rlmRealm.configuration.isFlexibleSyncConfiguration ?? false,
+            let subscription = subscription else {
+            return
+        }
+
+        try await realm?.subscriptions.write {
+            realm?.subscriptions.remove(subscription)
+        }
+    }
+
+    public func update(_ isIncluded: ((Query<Element>) -> Query<Bool>)) async throws -> Results<Element> {
+        guard realm?.rlmRealm.configuration.isFlexibleSyncConfiguration ?? false,
+            let subscription = subscription else {
+            return try await Results(collection, predicate: isIncluded(Query()).predicate)
+        }
+
+        try await realm?.subscriptions.write {
+            subscription.update(to: isIncluded(Query()).predicate)
+        }
+        return try await Results(collection, predicate: isIncluded(Query()).predicate)
+    }
+}

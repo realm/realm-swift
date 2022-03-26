@@ -264,7 +264,7 @@ import Combine
                         the subscription by query and/or name.
      - returns: A query builder that produces a subscription which can used to search for the subscription.
      */
-    public func first<T: Object>(ofType type: T.Type, `where` query: @escaping (Query<T>) -> Query<Bool>) -> SyncSubscription? {
+    public func first<T: RealmCollectionValue>(ofType type: T.Type, `where` query: @escaping (Query<T>) -> Query<Bool>) -> SyncSubscription? {
         return rlmSyncSubscriptionSet.subscription(withClassName: "\(T.self)", predicate: query(Query()).predicate).map(SyncSubscription.init)
     }
 
@@ -276,7 +276,7 @@ import Combine
                         the subscription by query and/or name.
      - returns: A query builder that produces a subscription which can used to search for the subscription.
      */
-    public func first<T: Object>(ofType type: T.Type, `where` predicateFormat: String, _ args: Any...) -> SyncSubscription? {
+    public func first<T: RealmCollectionValue>(ofType type: T.Type, `where` predicateFormat: String, _ args: Any...) -> SyncSubscription? {
         return rlmSyncSubscriptionSet.subscription(withClassName: "\(T.self)", predicate: NSPredicate(format: predicateFormat, argumentArray: unwrapOptionals(in: args))).map(SyncSubscription.init)
     }
 
@@ -288,7 +288,7 @@ import Combine
                         the subscription by query and/or name.
      - returns: A query builder that produces a subscription which can used to search for the subscription.
      */
-    public func first<T: Object>(ofType type: T.Type, `where` predicate: NSPredicate) -> SyncSubscription? {
+    public func first<T: RealmCollectionValue>(ofType type: T.Type, `where` predicate: NSPredicate) -> SyncSubscription? {
         return rlmSyncSubscriptionSet.subscription(withClassName: "\(T.self)", predicate: predicate).map(SyncSubscription.init)
     }
 

@@ -1211,6 +1211,16 @@ extension Realm {
         self.init(rlmRealm!)
     }
 }
+
+// MARK: Query Based Sync
+
+@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+extension Realm {
+    public func objects<Element: RealmFetchable>(_ type: Element.Type) async throws -> Results<Element> {
+        return try await Results(RLMGetObjects(rlmRealm, type.className(), nil))
+    }
+}
+
 #endif // swift(>=5.5)
 
 /**
