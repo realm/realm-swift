@@ -5,6 +5,12 @@ x.y.z Release notes (yyyy-MM-dd)
 * Add ability to use Swift Query syntax in `@ObservedResults`, which allows you 
   to filter results using the `where` parameter.
 * Add ability to use `MutableSet` with `StateRealmObject` in SwiftUI.
+* Async/Await extensions are now compatible with iOS 13 and above when building
+  with Xcode 13.3.
+  
+### Breaking Changes
+* Xcode 13.2 is no longer supported when building with Async/Await functions. Use
+  Xcode 13.3 to build with Async/Await functionality.
 
 ### Fixed
 * Adding a Realm Object to a `ObservedResults` or a collections using `StateRealmObject` that is managed by the same Realm 
