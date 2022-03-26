@@ -15,6 +15,8 @@ x.y.z Release notes (yyyy-MM-dd)
 ### Fixed
 * Adding a Realm Object to a `ObservedResults` or a collections using `StateRealmObject` that is managed by the same Realm 
   would throw if the Object was frozen and not thawed before hand.
+* Setting a Realm Configuration for @ObservedResults using it's initializer would be overrode by the Realm Configuration stored in
+  `.environment(\.realmConfiguration, ...)` if they did not match ([Cocoa #7463](https://github.com/realm/realm-swift/issues/7463), since v10.6.0).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
