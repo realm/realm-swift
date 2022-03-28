@@ -435,10 +435,11 @@ extension Projection: _ObservedResultsValue { }
             if let sortDescriptor = sortDescriptor {
                 value = value.sorted(byKeyPath: sortDescriptor.keyPath, ascending: sortDescriptor.ascending)
             }
-            if let filter = filter {
-                value = value.filter(filter)
-            } else if let `where` = `where` {
-                value = value.where(`where`)
+
+            let filters = [searchFilter, filter ?? `where`].compactMap { $0 }
+            if !filters.isEmpty {
+                let compoundFilter = NSCompoundPredicate(andPredicateWithSubpredicates: filters)
+                value = value.filter(compoundFilter)
             }
             setupHasRun = true
         }
@@ -454,7 +455,7 @@ extension Projection: _ObservedResultsValue { }
                 didSet()
             }
         }
-        var `where`: ((Query<ResultType>) -> Query<Bool>)? {
+        var `where`: NSPredicate? {
             didSet {
                 didSet()
             }
@@ -466,6 +467,11 @@ extension Projection: _ObservedResultsValue { }
         }
 
         var searchString: String = ""
+        var searchFilter: NSPredicate? {
+            didSet {
+                didSet()
+            }
+        }
     }
 
     @Environment(\.realmConfiguration) var configuration
@@ -473,11 +479,11 @@ extension Projection: _ObservedResultsValue { }
     /// :nodoc:
     fileprivate func searchText<T: ObjectBase>(_ text: String, on keyPath: KeyPath<T, String>) {
         if text.isEmpty {
-            if storage.filter != nil {
-                storage.filter = nil
+            if storage.searchFilter != nil {
+                storage.searchFilter = nil
             }
         } else if text != storage.searchString {
-            storage.filter = Query<T>()[dynamicMember: keyPath].contains(text).predicate
+            storage.searchFilter = Query<T>()[dynamicMember: keyPath].contains(text).predicate
         }
         storage.searchString = text
     }
@@ -485,6 +491,7 @@ extension Projection: _ObservedResultsValue { }
     /// to the `where` parameter.
     @State public var filter: NSPredicate? {
         willSet {
+            storage.where = nil
             storage.filter = newValue
         }
     }
@@ -496,7 +503,8 @@ extension Projection: _ObservedResultsValue { }
         // Xcode 12.5.1. So Swift Queries are supported on Xcode 13 and above
         // when used with SwiftUI.
         willSet {
-            storage.where = newValue
+            storage.filter = nil
+            storage.where = newValue?(Query()).predicate
         }
     }
 #endif
@@ -603,7 +611,7 @@ extension Projection: _ObservedResultsValue { }
     public mutating func update() {
         // When the view updates, it will inject the @Environment
         // into the propertyWrapper
-        if storage.configuration == nil || storage.configuration != configuration {
+        if storage.configuration == nil {
             storage.configuration = configuration
         }
     }
