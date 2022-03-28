@@ -175,7 +175,7 @@ public final class List<Element: RealmCollectionValue>: RLMSwiftCollectionBase, 
 
      - parameter objects: The objects to remove.
      */
-    public func remove<S: Sequence>(objectsIn objects: S) where S.Iterator.Element == Element{
+    public func remove<S: Sequence>(objectsIn objects: S) where S.Iterator.Element == Element {
         for obj in objects {
             remove(obj)
         }
