@@ -279,7 +279,7 @@ struct ObservedResultsKeyPathTestRow: View {
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
 struct ObservedResultsSearchableTestView: View {
-    @ObservedResults(ReminderList.self) var reminders
+    @ObservedResults(ReminderList.self, where: { $0.name.starts(with: "reminder") }) var reminders
     @State var searchFilter: String = ""
 
     var body: some View {
