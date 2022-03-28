@@ -154,6 +154,13 @@ public final class List<Element: RealmCollectionValue>: RLMSwiftCollectionBase, 
         rlmArray.removeObject(at: UInt(index))
     }
 
+    /**
+     Removes an object in the list if present, otherwise throws an error. The object is not removed from the Realm that manages it.
+
+     - warning: This method may only be called during a write transaction.
+
+     - parameter object: The object to remove.
+     */
     public func remove(_ object: Element) {
         guard let index = self.index(of: object) else {
             throwRealmException("Object does not exist in List") // ???: Is this too harsh? Should method just return a bool or something?
@@ -161,11 +168,19 @@ public final class List<Element: RealmCollectionValue>: RLMSwiftCollectionBase, 
         self.remove(at: index)
     }
 
+    /**
+     Removes a sequence of objects in the list if present, otherwise throws an error. The objects are not removed from the Realm that manages it.
+
+     - warning: This method may only be called during a write transaction.
+
+     - parameter objects: The objects to remove.
+     */
     public func remove<S: Sequence>(objectsIn objects: S) where S.Iterator.Element == Element{
         for obj in objects {
             remove(obj)
         }
     }
+
     /**
      Removes all objects from the list. The objects are not removed from the Realm that manages them.
 
