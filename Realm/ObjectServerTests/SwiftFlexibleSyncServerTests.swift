@@ -942,7 +942,7 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
 }
 
 // MARK: - Async Await
-#if swift(>=5.5.2) && canImport(_Concurrency)
+#if swift(>=5.6) && canImport(_Concurrency)
 @available(macOS 12.0.0, *)
 class SwiftAsyncFlexibleSyncTests: SwiftSyncTestCase {
     override class var defaultTestSuite: XCTestSuite {

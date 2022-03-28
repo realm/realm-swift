@@ -306,6 +306,46 @@ struct ObservedResultsSearchableTestView: View {
     }
 }
 
+struct ObservedResultsConfiguration: View {
+    @ObservedResults(ReminderList.self) var remindersA // config from `.environment`
+    @ObservedResults(ReminderList.self,
+                     configuration: Realm.Configuration(inMemoryIdentifier: "realm_b")) var remindersB
+
+    var body: some View {
+        NavigationView {
+            VStack {
+                Text(remindersA.realm?.configuration.inMemoryIdentifier ?? "no memory identifier")
+                    .accessibility(identifier: "realm_a_label")
+                Text(remindersB.realm?.configuration.inMemoryIdentifier ?? "no memory identifier")
+                    .accessibility(identifier: "realm_b_label")
+                List {
+                    ForEach(remindersA) { reminder in
+                        Text(reminder.name)
+                    }
+                }.accessibility(identifier: "ListA")
+                List {
+                    ForEach(remindersB) { reminder in
+                        Text(reminder.name)
+                    }
+                }.accessibility(identifier: "ListB")
+            }
+            .navigationTitle("Reminders")
+            .navigationBarItems(leading:
+                Button("add A") {
+                    let reminder = ReminderList()
+                    $remindersA.append(reminder)
+                }.accessibility(identifier: "addListA")
+            )
+            .navigationBarItems(trailing:
+                Button("add B") {
+                    let reminder = ReminderList()
+                    $remindersB.append(reminder)
+                }.accessibility(identifier: "addListB")
+            )
+        }
+    }
+}
+
 @main
 struct App: SwiftUI.App {
     var body: some Scene {
@@ -330,6 +370,9 @@ struct App: SwiftUI.App {
                 } else {
                     return AnyView(EmptyView())
                 }
+            case "observed_results_configuration":
+                return AnyView(ObservedResultsConfiguration()
+                                .environment(\.realmConfiguration, Realm.Configuration(inMemoryIdentifier: "realm_a")))
             default:
                 return AnyView(ContentView())
             }

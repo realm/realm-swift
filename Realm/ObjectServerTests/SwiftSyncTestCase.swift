@@ -256,7 +256,7 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
     }
 }
 
-#if swift(>=5.5.2) && canImport(_Concurrency)
+#if swift(>=5.6) && canImport(_Concurrency)
 
 @available(macOS 12.0, *)
 extension SwiftSyncTestCase {
