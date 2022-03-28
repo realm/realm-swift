@@ -1959,6 +1959,33 @@ class LinkingObjectsCollectionTypeTests: RealmCollectionTests<LinkingObjects<CTT
     }
 }
 
+class LinkingObjectsEquatabilityTests: TestCase {
+    func testEquatability() {
+        let realm = realmWithTestPath()
+
+        var parentA: CTTLinkTarget!
+        var parentB: CTTLinkTarget!
+
+        try! realm.write {
+            parentA = realm.create(CTTLinkTarget.self, value: [0])
+            parentB = realm.create(CTTLinkTarget.self, value: [0])
+
+            let targetA = realm.create(CTTNullableStringObjectWithLink.self)
+            let targetB = realm.create(CTTNullableStringObjectWithLink.self)
+
+            targetA.linkCol = parentA
+            targetB.linkCol = parentB
+        }
+
+        XCTAssertNotEqual(parentA.stringObjects, parentA.stringObjects)
+        XCTAssertNotEqual(parentA.stringObjects, parentB.stringObjects)
+
+        let ref = parentA.stringObjects
+        XCTAssertEqual(ref, ref)
+    }
+}
+
+
 class AnyRealmCollectionTests: RealmCollectionTests<AnyRealmCollection<CTTNullableStringObjectWithLink>, AnyRealmCollection<CTTAggregateObject>> {
     override func getCollection(_ realm: Realm) -> AnyRealmCollection<CTTNullableStringObjectWithLink> {
         AnyRealmCollection(realm.create(CTTStringList.self, value: [[str1, str2]]).array)
