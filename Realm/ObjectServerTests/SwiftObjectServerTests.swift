@@ -33,6 +33,26 @@ import RealmTestSupport
 @available(OSX 10.14, *)
 @objc(SwiftObjectServerTests)
 class SwiftObjectServerTests: SwiftSyncTestCase {
+    func setupMongoCollection(user: User, collectionName: String) -> MongoCollection {
+        let mongoClient = user.mongoClient("mongodb1")
+        let database = mongoClient.database(named: "test_data")
+        let collection = database.collection(withName: collectionName)
+        removeAllFromCollection(collection)
+        return collection
+    }
+
+    func removeAllFromCollection(_ collection: MongoCollection) {
+        let ex = expectation(description: "delete objects")
+        collection.deleteManyDocuments(filter: [:]) { result in
+            switch result {
+            case .success:
+                ex.fulfill()
+            case .failure(let error):
+                XCTFail("Error: \(error.localizedDescription)")
+            }
+        }
+        wait(for: [ex], timeout: 10.0)
+    }
     /// It should be possible to successfully open a Realm configured for sync.
     func testBasicSwiftSync() {
         do {
@@ -313,6 +333,74 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
     // MARK: - Client reset
 
+    func waitForSyncDisabled(appServerId: String, syncServiceId: String) {
+        XCTAssertTrue(try RealmServer.shared.syncEnabled(appServerId: appServerId, syncServiceId: syncServiceId))
+        let exp = expectation(description: "disable sync")
+        RealmServer.shared.disableSync(appServerId: appServerId, syncServiceId: syncServiceId) { results in
+            switch results {
+            case .success:
+                exp.fulfill()
+            case .failure(let error):
+                XCTFail("Error: \(error.localizedDescription)")
+            }
+        }
+        waitForExpectations(timeout: 6, handler: nil)
+        XCTAssertFalse(try RealmServer.shared.syncEnabled(appServerId: appServerId, syncServiceId: syncServiceId))
+    }
+
+    func waitForSyncEnabled(appServerId: String, syncServiceId: String, syncServiceConfig: [String: Any]) {
+        let exp = expectation(description: "enable sync")
+        RealmServer.shared.enableSync(appServerId: appServerId, syncServiceId: syncServiceId, syncServiceConfiguration: syncServiceConfig) { results in
+            switch results {
+            case .success:
+                exp.fulfill()
+            case .failure(let error):
+                XCTFail("Error: \(error.localizedDescription)")
+            }
+        }
+        waitForExpectations(timeout: 6, handler: nil)
+        XCTAssertTrue(try RealmServer.shared.syncEnabled(appServerId: appServerId, syncServiceId: syncServiceId))
+    }
+
+    func waitForDevModeEnabled(appServerId: String, syncServiceId: String, syncServiceConfig: [String: Any]) {
+        let devModeEnabled = try! RealmServer.shared.devModeEnabled(appServerId: appServerId, syncServiceId: syncServiceId)
+        let exp = expectation(description: "enable dev mode")
+        if !devModeEnabled {
+            RealmServer.shared.enableDevMode(appServerId: appServerId, syncServiceId: syncServiceId, syncServiceConfiguration: syncServiceConfig) { results in
+                switch results {
+                case .success:
+                    exp.fulfill()
+                case .failure(let error):
+                    XCTFail("Error: \(error.localizedDescription)")
+                }
+            }
+        }
+        waitForExpectations(timeout: 6, handler: nil)
+        XCTAssertTrue(try RealmServer.shared.devModeEnabled(appServerId: appServerId, syncServiceId: syncServiceId))
+    }
+
+    // This function disables sync, executes a block while the sync service is disabled, then re-enables the sync service and dev mode.
+    func executeBlockOffline(block: () throws -> Void) {
+        do {
+            let appServerId = try RealmServer.shared.retrieveAppServerId(appId)
+            let syncServiceId = try RealmServer.shared.retrieveSyncServiceId(appServerId: appServerId)
+            guard let syncServiceConfig = try RealmServer.shared.getSyncServiceConfiguration(appServerId: appServerId, syncServiceId: syncServiceId) else { fatalError("precondition failure: no sync service configuration found") }
+
+            waitForSyncDisabled(appServerId: appServerId, syncServiceId: syncServiceId)
+
+            do {
+                try block()
+            } catch {
+                XCTFail("Block failed: \(error.localizedDescription)")
+            }
+
+            waitForSyncEnabled(appServerId: appServerId, syncServiceId: syncServiceId, syncServiceConfig: syncServiceConfig)
+            waitForDevModeEnabled(appServerId: appServerId, syncServiceId: syncServiceId, syncServiceConfig: syncServiceConfig)
+        } catch {
+            XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
+        }
+    }
+
     func testClientReset() {
         do {
             let user = try logInUser(for: basicCredentials())
@@ -372,6 +460,153 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             XCTAssertTrue(FileManager.default.fileExists(atPath: path))
         } catch {
             XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
+        }
+    }
+
+    func testClientResetDiscardLocal() {
+        // Set client reset callbacks
+        do {
+            let user = try logInUser(for: basicCredentials())
+            let collection = setupMongoCollection(user: user, collectionName: "SwiftPerson")
+
+            // Define the blocks that will be passed into the sync configuration initializer.
+            // Use counter instead of an expectation because `waitFor*` methods will prematurely fail an expectation
+            var beforeCalledCount = 0
+            let beforeClientResetBlock: (Realm) -> Void = { local in
+                let results = local.objects(SwiftPerson.self)
+                XCTAssertEqual(results.count, 2)
+                let paul = results.filter("firstName == 'Paul'")
+                let john = results.filter("firstName == 'John'")
+                XCTAssertNotNil(paul)
+                XCTAssertNotNil(john)
+                beforeCalledCount += 1
+            }
+            // Use counter instead of an expectation because `waitFor*` methods will prematurely fail an expectation
+            var afterCalledCount = 0
+            let afterClientResetBlock: (Realm, Realm) -> Void = { before, after in
+                // Expect the local realm that was overwritten to have had 2 objects before it was overwritten.
+                let results = before.objects(SwiftPerson.self)
+                XCTAssertEqual(results.count, 2)
+                let paul = results.filter("firstName == 'Paul'")
+                let john = results.filter("firstName == 'John'")
+                XCTAssertNotNil(paul)
+                XCTAssertNotNil(john)
+                // Expect the server realm that overwrote the local realm to have had 1 object before client reset.
+                let results2 = after.objects(SwiftPerson.self)
+                XCTAssertEqual(results2.count, 1)
+                let paul2 = results2.filter("firstName == 'Paul'")
+                let john2 = results2.filter("firstName == 'John'")
+                XCTAssertFalse(paul2.isEmpty)
+                XCTAssert(john2.isEmpty)
+                afterCalledCount += 1
+            }
+
+            var configuration = user.configuration(partitionValue: #function, clientResetMode: .discardLocal(beforeClientResetBlock, afterClientResetBlock))
+            configuration.objectTypes = [SwiftPerson.self]
+
+            let resetModeEx = expectation(description: "Set clientResetMode to discard local")
+            guard let syncConfig = configuration.syncConfiguration else { fatalError("Test condition failure. SyncConfiguration not set.") }
+            switch syncConfig.clientResetMode {
+            case .manual:
+                XCTFail("Should be set to discardLocal")
+            case .discardLocal(let before, let after):
+                XCTAssertNotNil(before)
+                XCTAssertNotNil(after)
+                resetModeEx.fulfill()
+            }
+            waitForExpectations(timeout: 0.5, handler: nil)
+
+            // Seed 1 object, Upload to server
+            try autoreleasepool {
+                let realm = try Realm(configuration: configuration)
+                waitForDownloads(for: realm)
+                XCTAssertEqual(realm.objects(SwiftPerson.self).count, 0, "Precondition failure: Realm should be empty.") // Tear down may have not been run if test was cancelled.
+                try realm.write {
+                    realm.add(SwiftPerson(firstName: "Paul", lastName: "M"))
+                }
+                waitForUploads(for: realm)
+                XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1)
+            }
+
+            // waitForUploads confirms the server received the upload request from the client
+            // It does not guarantee the uploaded objects are persisted to the backing datastore
+            // This expectation queries the server directly for the documents before continuing
+            var documentCount = 0
+            var requestCount = 0
+            let timeBetweenRequests = 1
+            while documentCount < 1 {
+                collection.find(filter: [:]) { result in
+                    switch result {
+                    case .success(let documents):
+                        documentCount = documents.count
+                        if documentCount > 0 {
+                            XCTAssertEqual(documentCount, 1)
+                            XCTAssertEqual(documents[0]["firstName"]??.stringValue, "Paul")
+                            break
+                        }
+                    case .failure:
+                        XCTFail("Should find")
+                    }
+                }
+                if documentCount == 0 {
+                    if requestCount * timeBetweenRequests > 300 {
+                        XCTFail("waited longer than five minutes")
+                        break
+                    }
+                    requestCount += 1
+                    sleep(UInt32(timeBetweenRequests)) // Wait between requests
+                }
+            }
+
+            // Sync is disabled, block executed, sync re-enabled
+            executeBlockOffline {
+                try autoreleasepool {
+                    let realm = try Realm(configuration: configuration)
+                    // Add an object to the local realm that will not be in the server realm (because sync is disabled).
+                    try realm.write {
+                        let obj =  SwiftPerson(firstName: "John", lastName: "L")
+                        realm.add(obj)
+                    }
+                    XCTAssertEqual(realm.objects(SwiftPerson.self).count, 2)
+                }
+            }
+
+            // After a sync reset, the sync history translator service needs time to resynthesize the new history from existing objects on the server
+            // The following creates a new realm with the same parition and wait for downloads to ensure the the new history has been created.
+            try autoreleasepool {
+                var newConfig = user.configuration(partitionValue: #function)
+                newConfig.fileURL = RLMTestRealmURL()
+                newConfig.objectTypes = [SwiftPerson.self]
+                XCTAssertNotEqual(newConfig.fileURL, configuration.fileURL)
+                let newRealm = try Realm(configuration: newConfig)
+
+                var runCount = 0
+                while true {
+                    self.waitForDownloads(for: newRealm)
+                    if newRealm.objects(SwiftPerson.self).count > 0 {
+                        XCTAssertEqual(newRealm.objects(SwiftPerson.self).count, 1)
+                        XCTAssertEqual(newRealm.objects(SwiftPerson.self)[0].firstName, "Paul")
+                        break
+                    }
+                    if runCount * timeBetweenRequests > 60 {
+                        XCTFail("Waited longer than one minute for history to resynthesize")
+                        break
+                    }
+                    runCount += 1
+                    sleep(UInt32(timeBetweenRequests)) // Wait between requests
+                }
+            }
+
+            try autoreleasepool {
+                let realm = try Realm(configuration: configuration)
+                waitForDownloads(for: realm) // History is incomptaible with the servers, client reset executed
+                XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1) // Expect the server realm (one object) to have overwritten the local realm (2 objects)
+                XCTAssertEqual(realm.objects(SwiftPerson.self)[0].firstName, "Paul")
+                XCTAssertEqual(beforeCalledCount, 1, "beforeClientReset should be called one time")
+                XCTAssertEqual(afterCalledCount, 1, "afterClientReset should be called one time")
+            }
+        } catch {
+            XCTFail("Failed: \(error.localizedDescription)")
         }
     }
 

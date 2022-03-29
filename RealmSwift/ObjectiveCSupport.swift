@@ -163,4 +163,44 @@ import Realm
             return object(Int(totalBytes), Int(usedBytes))
         }
     }
+
+    /// Convert a RealmSwift before block to an RLMClientResetBeforeBlock
+    public static func convert(object: ((Realm) -> Void)?) -> RLMClientResetBeforeBlock? {
+        guard let object = object else {
+            return nil
+        }
+        return { localRealm in
+            return object(Realm(localRealm))
+        }
+    }
+
+    /// Convert an RLMClientResetBeforeBlock to a RealmSwift before  block
+    public static func convert(object: RLMClientResetBeforeBlock?) -> ((Realm) -> Void)? {
+        guard let object = object else {
+            return nil
+        }
+        return { localRealm in
+            return object(localRealm.rlmRealm)
+        }
+    }
+
+    /// Convert a RealmSwift after block to an RLMClientResetAfterBlock
+    public static func convert(object: ((Realm, Realm) -> Void)?) -> RLMClientResetAfterBlock? {
+        guard let object = object else {
+            return nil
+        }
+        return { localRealm, remoteRealm in
+            return object(Realm(localRealm), Realm(remoteRealm))
+        }
+    }
+
+    /// Convert an RLMClientResetAfterBlock to a RealmSwift after block
+    public static func convert(object: RLMClientResetAfterBlock?) -> ((Realm, Realm) -> Void)? {
+        guard let object = object else {
+            return nil
+        }
+        return { localRealm, remoteRealm in
+            return object(localRealm.rlmRealm, remoteRealm.rlmRealm)
+        }
+    }
 }

@@ -36,6 +36,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (realm::SyncConfig&)rawConfiguration;
 
+// Pass the RLMRealmConfiguration to it's sync configuration so client reset callbacks
+// can access schema, dynamic, and path properties.
+void RLMSetConfigInfoForClientResetCallbacks(realm::SyncConfig& syncConfig, RLMRealmConfiguration *config);
+
 @end
+
+
 
 NS_ASSUME_NONNULL_END
