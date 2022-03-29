@@ -329,6 +329,10 @@ class Admin {
                 request(on: group, httpMethod: "PUT", data: data, completionHandler)
             }
 
+            func put(data: Any? = nil, _ completionHandler: @escaping (Result<Any?, Error>) -> Void) {
+                request(httpMethod: "PUT", data: data, completionHandler: completionHandler)
+            }
+
             func delete(_ completionHandler: @escaping (Result<Any?, Error>) -> Void) {
                 request(httpMethod: "DELETE", completionHandler: completionHandler)
             }
@@ -343,6 +347,10 @@ class Admin {
 
             func patch(_ data: Any) -> Result<Any?, Error> {
                 request(httpMethod: "PATCH", data: data)
+            }
+
+            func patch(_ data: Any, _ completionHandler: @escaping (Result<Any?, Error>) -> Void) {
+                            request(httpMethod: "PATCH", data: data, completionHandler: completionHandler)
             }
         }
 
@@ -903,9 +911,9 @@ public class RealmServer: NSObject {
     }
 
     // Retrieve MongoDB Realm AppId with ClientAppId using the Admin API
-    private func retrieveAppServerId(_ clientAppId: String) throws -> String {
+    public func retrieveAppServerId(_ clientAppId: String) throws -> String {
         guard let session = session else {
-            throw URLError(.unknown)
+            fatalError()
         }
 
         let appsListInfo = try session.apps.get().get()
@@ -925,6 +933,96 @@ public class RealmServer: NSObject {
             throw URLError(.badServerResponse)
         }
         return appId
+    }
+
+    public func retrieveSyncServiceId(appServerId: String) throws -> String {
+        guard let session = session else {
+            fatalError()
+        }
+        let app = session.apps[appServerId]
+        // Get all services
+        guard let syncServices = try app.services.get().get() as? [[String: Any]] else {
+            throw URLError(.unknown)
+        }
+        // Find sync service
+        guard let syncService = syncServices.first(where: {
+            $0["name"] as? String == "mongodb1"
+        }) else {
+            throw URLError(.unknown)
+        }
+        // Return sync service id
+        guard let serviceId = syncService["_id"] as? String else { throw URLError(.unknown) }
+        return serviceId
+    }
+
+    public func getSyncServiceConfiguration(appServerId: String, syncServiceId: String) throws -> [String: Any]? {
+        guard let session = session else {
+            fatalError()
+        }
+        let app = session.apps[appServerId]
+        do {
+            return try app.services[syncServiceId].config.get().get() as? [String: Any]
+        } catch {
+            throw URLError(.unknown)
+        }
+    }
+
+    public func syncEnabled(appServerId: String, syncServiceId: String) throws -> Bool {
+        guard let session = session else {
+            fatalError()
+        }
+        let app = session.apps[appServerId]
+        let response = try app.services[syncServiceId].config.get().get() as? [String: Any]
+        guard let syncInfo = response?["sync"] as? [String: Any] else {
+            return false
+        }
+        return (syncInfo["state"] as? String == "enabled")
+    }
+
+    public func devModeEnabled(appServerId: String, syncServiceId: String) throws -> Bool {
+        guard let session = session else {
+            fatalError()
+        }
+        let app = session.apps[appServerId]
+        let res = try app.sync.config.get().get() as? [String: Any]
+        guard let option = res!["development_mode_enabled"] as? Bool else {
+            return false
+        }
+        return option
+    }
+
+    public func enableDevMode(appServerId: String, syncServiceId: String, syncServiceConfiguration: [String: Any], _ completion: @escaping (Result<Any?, Error>) -> Void) {
+        guard let session = session else {
+            completion(.failure(URLError.unknown as! Error))
+            return
+        }
+        let app = session.apps[appServerId]
+        app.sync.config.put(data: ["development_mode_enabled": true], completion)
+    }
+
+    public func disableSync(appServerId: String, syncServiceId: String, completion: @escaping (Result<Any?, Error>) -> Void) {
+        guard let session = session else {
+            completion(.failure(URLError.unknown as! Error))
+            return
+        }
+        let app = session.apps[appServerId]
+        app.services[syncServiceId].config.patch(["sync": ["state": ""]], completion)
+    }
+
+    public func enableSync(appServerId: String, syncServiceId: String, syncServiceConfiguration: [String: Any], _ completion: @escaping (Result<Any?, Error>) -> Void) {
+        var syncConfig = syncServiceConfiguration
+        guard let session = session else {
+            completion(.failure(URLError.unknown as! Error))
+            return
+        }
+        let app = session.apps[appServerId]
+        guard var syncInfo = syncConfig["sync"] as? [String: Any] else {
+            completion(.failure(URLError.unknown as! Error))
+            return
+        }
+        syncInfo["state"] = "enabled"
+        syncConfig["sync"] = syncInfo
+        app.services[syncServiceId].config.patch(syncConfig, completion)
     }
 
     public func retrieveUser(_ appId: String, userId: String, _ completion: @escaping (Result<Any?, Error>) -> Void) {

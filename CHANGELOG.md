@@ -1,9 +1,74 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
+* Add ability to use Swift Query syntax in `@ObservedResults`, which allows you
+  to filter results using the `where` parameter.
 * Add ability to use `MutableSet` with `StateRealmObject` in SwiftUI.
 * Async/Await extensions are now compatible with iOS 13 and above when building
   with Xcode 13.3.
+* Added new `SyncConfiguration.clientResetMode` and `RLMSyncConfiguration.clientResetMode` properties.
+  - The values of these properties will dictate client behavior in the event of a [client reset](https://docs.mongodb.com/realm/sync/error-handling/client-resets/).
+  - See below for information on `ClientResetMode` values.
+  - `clientResetMode` defaults to `.manual` if not set otherwise.
+* Added new `ClientResetMode` and `RLMClientResetMode` enums.
+  - These enums represent possible client reset behavior for `SyncConfiguration.clientResetMode` and `RLMSyncConfiguration.clientResetMode`, respectively.
+  - `.manual` and `RLMClientResetModeManual`
+    - The local copy of the Realm is copied into a recovery
+      directory for safekeeping, and then deleted from the original location. The next time
+      the Realm for that partition value is opened, the Realm will automatically be re-downloaded from
+      MongoDB Realm, and can be used as normal.
+    - Data written to the Realm after the local copy of the Realm diverged from the backup
+      remote copy will be present in the local recovery copy of the Realm file. The
+      re-downloaded Realm will initially contain only the data present at the time the Realm
+      was backed up on the server.
+    -  `rlmSync_clientResetBackedUpRealmPath` and `SyncError.clientResetInfo()` are used for accessing the recovery directory.
+  - `.discardLocal` and `RLMClientResetDiscardLocal`
+    - All unsynchronized local changes are automatically discarded and the local state is
+      automatically reverted to the most recent state from the server. Unsynchronized changes
+      can then be recovered in a post-client-reset callback block (See changelog below for more details).
+    - If RLMClientResetModeDiscardLocal is enabled but the client reset operation is unable to complete
+      then the client reset process reverts to manual mode.
+    - The realm's underlying object accessors remain bound so the UI may be updated in a non-disruptive way.
+* Added support for client reset notification blocks for `.discardLocal` and `RLMClientResetDiscardLocal`
+  - **RealmSwift implementation**: `discardLocal(((Realm) -> Void)? = nil, ((Realm, Realm) -> Void)? = nil)` 
+    - RealmSwift client reset blocks are set when initializing the user configuration
+    ```swift
+    var configuration = user.configuration(partitionValue: "myPartition", clientResetMode: .discardLocal(beforeClientResetBlock, afterClientResetBlock))
+    ```
+    - The before client reset block -- `((Realm) -> Void)? = nil` -- is executed prior to a client reset. Possible usage includes:
+    ```swift
+    let beforeClientResetBlock: (Realm) -> Void = { beforeRealm in
+      var recoveryConfig = Realm.Configuration()
+        recoveryConfig.fileURL = myRecoveryPath
+        do {
+          beforeRealm.writeCopy(configuration: recoveryConfig)
+            /* The copied realm could be used later for recovery, debugging, reporting, etc. */
+        } catch {
+            /* handle error */
+        }
+    }
+    ```
+    - The after client reset block -- `((Realm, Realm) -> Void)? = nil)` -- is executed after a client reset. Possible usage includes:
+    ```Swift
+    let afterClientResetBlock: (Realm, Realm) -> Void = { before, after in
+    /* This block could be used to add custom recovery logic, back-up a realm file, send reporting, etc. */
+    for object in before.objects(myClass.self) {
+        let res = after.objects(myClass.self)
+        if (res.filter("primaryKey == %@", object.primaryKey).first != nil) {
+             /* ...custom recovery logic... */
+        } else {
+             /* ...custom recovery logic... */
+        }
+    }
+    ```
+  - **Realm Obj-c implementation**: Both before and after client reset callbacks exist as properties on `RLMSyncConfiguration` and are set at initialization.
+    ```objective-c
+      RLMRealmConfiguration *config = [user configurationWithPartitionValue:partitionValue
+                                                            clientResetMode:RLMClientResetModeDiscardLocal
+                                                          notifyBeforeReset:beforeBlock
+                                                           notifyAfterReset:afterBlock];
+    ```
+    where `beforeBlock` is of type `RLMClientResetBeforeBlock`. And `afterBlock` is of type `RLMClientResetAfterBlock`.
   
 ### Breaking Changes
 * Xcode 13.2 is no longer supported when building with Async/Await functions. Use

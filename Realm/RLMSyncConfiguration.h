@@ -18,12 +18,53 @@
 
 #import <Foundation/Foundation.h>
 
+@class RLMRealm;
 @class RLMRealmConfiguration;
 @class RLMUser;
 @class RLMApp;
 @protocol RLMBSON;
 
 NS_ASSUME_NONNULL_BEGIN
+
+/**  Determines file behavior during a client reset.
+
+ - see: https://docs.mongodb.com/realm/sync/error-handling/client-resets/
+*/
+typedef NS_ENUM(NSUInteger, RLMClientResetMode) {
+    /// The local copy of the Realm is copied into a recovery
+    /// directory for safekeeping, and then deleted from the original location. The next time
+    /// the Realm for that partition value is opened, the Realm will automatically be re-downloaded from
+    /// MongoDB Realm, and can be used as normal.
+
+    /// Data written to the Realm after the local copy of the Realm diverged from the backup
+    /// remote copy will be present in the local recovery copy of the Realm file. The
+    /// re-downloaded Realm will initially contain only the data present at the time the Realm
+    /// was backed up on the server.
+    ///
+    /// - see: `rlmSync_clientResetBackedUpRealmPath` or `SyncError.clientResetInfo()` for more information on accessing the recovery directory.
+    RLMClientResetModeManual,
+    /// All unsynchronized local changes are automatically discarded and the local state is
+    /// automatically reverted to the most recent state from the server. Unsynchronized changes
+    /// can then be recovered in the post-client-reset callback block.
+    ///
+    /// If RLMClientResetModeDiscardLocal is enabled but the client reset operation is unable to complete
+    /// then the client reset process reverts to manual mode. Example) During a destructive schema change this
+    /// mode will fail and invoke the manual client reset handler.
+    RLMClientResetModeDiscardLocal
+};
+
+/**
+ A block type used to report before a client reset will occur.
+ The `beforeFrozen` is a frozen copy of the local state prior to client reset.
+ */
+typedef void(^RLMClientResetBeforeBlock)(RLMRealm * _Nonnull beforeFrozen);
+
+/**
+ A block type used to report after a client reset occurred.
+ The `beforeFrozen` argument is a frozen copy of the local state prior to client reset.
+ The `after` argument contains the local database state after the client reset occurred.
+ */
+typedef void(^RLMClientResetAfterBlock)(RLMRealm * _Nonnull beforeFrozen, RLMRealm * _Nonnull after);
 
 /**
  A configuration object representing configuration state for a Realm which is intended to sync with a Realm Object
@@ -40,6 +81,27 @@ NS_ASSUME_NONNULL_BEGIN
  Realm.
  */
 @property (nonatomic, readonly) id<RLMBSON> partitionValue;
+
+/**
+ An enum which determines file recovery behvaior in the event of a client reset.
+ - note: Defaults to `RLMClientResetModeManual`
+
+ - see: `RLMClientResetMode`
+ - see: https://docs.mongodb.com/realm/sync/error-handling/client-resets/
+*/
+@property (nonatomic) RLMClientResetMode clientResetMode;
+
+/**
+ A callback which notifies prior to  prior to a client reset occurring.
+ - see: `RLMClientResetBeforeBlock`
+ */
+@property (nonatomic, nullable) RLMClientResetBeforeBlock beforeClientReset;
+
+/**
+ A callback which notifies after a client reset has occurred.
+ -see: `RLMClientResetAfterBlock`
+ */
+@property (nonatomic, nullable) RLMClientResetAfterBlock  afterClientReset;
 
 /**
  Whether nonfatal connection errors should cancel async opens.
