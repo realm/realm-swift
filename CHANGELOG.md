@@ -1,11 +1,21 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.25.0 Release notes (2022-03-29)
 =============================================================
+
+Synchronized Realm files written by this version cannot be opened by older
+versions of Realm. Existing files will be automatically upgraded when opened.
+
+Non-synchronized Realm files remain backwards-compatible.
+
 ### Enhancements
+
 * Add ability to use Swift Query syntax in `@ObservedResults`, which allows you
   to filter results using the `where` parameter.
 * Add ability to use `MutableSet` with `StateRealmObject` in SwiftUI.
 * Async/Await extensions are now compatible with iOS 13 and above when building
   with Xcode 13.3.
+* Sync changesets waiting to be uploaded to the server are now compressed,
+  reducing the disk space needed when large write transactions are performed
+  while offline or limited in bandwidth.([Core #5260](https://github.com/realm/realm-core/pull/5260)).
 * Added new `SyncConfiguration.clientResetMode` and `RLMSyncConfiguration.clientResetMode` properties.
   - The values of these properties will dictate client behavior in the event of a [client reset](https://docs.mongodb.com/realm/sync/error-handling/client-resets/).
   - See below for information on `ClientResetMode` values.
@@ -69,23 +79,33 @@ x.y.z Release notes (yyyy-MM-dd)
                                                            notifyAfterReset:afterBlock];
     ```
     where `beforeBlock` is of type `RLMClientResetBeforeBlock`. And `afterBlock` is of type `RLMClientResetAfterBlock`.
-  
+
 ### Breaking Changes
+
 * Xcode 13.2 is no longer supported when building with Async/Await functions. Use
   Xcode 13.3 to build with Async/Await functionality.
 
 ### Fixed
-* Adding a Realm Object to a `ObservedResults` or a collections using `StateRealmObject` that is managed by the same Realm 
-  would throw if the Object was frozen and not thawed before hand.
-* Setting a Realm Configuration for @ObservedResults using it's initializer would be overrode by the Realm Configuration stored in
-  `.environment(\.realmConfiguration, ...)` if they did not match ([Cocoa #7463](https://github.com/realm/realm-swift/issues/7463), since v10.6.0).
+
+* Adding a Realm Object to a `ObservedResults` or a collections using
+  `StateRealmObject` that is managed by the same Realm would throw if the
+  Object was frozen and not thawed before hand.
+* Setting a Realm Configuration for @ObservedResults using it's initializer
+  would be overrode by the Realm Configuration stored in
+  `.environment(\.realmConfiguration, ...)` if they did not match
+  ([Cocoa #7463](https://github.com/realm/realm-swift/issues/7463), since v10.6.0).
 * Fix searchable component filter overriding the initial filter on `@ObservedResults`, (since v10.23.0).
 * Comparing `Results`, `LinkingObjects` or `AnyRealmCollection` when using Realm via XCFramework 
   would result in compile time errors ([Cocoa #7615](https://github.com/realm/realm-swift/issues/7615), since v10.21.0)
-
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+* Opening an encrypted Realm while the keychain is locked on macOS would crash
+  ([#7438](https://github.com/realm/realm-swift/issues/7438)).
+* Updating subscriptions while refreshing the access token would crash
+  ([Core #5343](https://github.com/realm/realm-core/issues/5343), since v10.22.0)
+* Fix several race conditions in `SyncSession` related to setting
+  `customRequestHeaders` while using the `SyncSession` on a different thread.
 
 ### Compatibility
+
 * Realm Studio: 11.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 13.3.
@@ -93,7 +113,8 @@ x.y.z Release notes (yyyy-MM-dd)
 * Xcode: 12.4-13.3.
 
 ### Internal
-* Upgraded realm-core from ? to ?
+
+* Upgraded realm-core from v11.12.0 to v11.13.0
 
 10.24.2 Release notes (2022-03-18)
 =============================================================
