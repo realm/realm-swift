@@ -255,15 +255,22 @@ class SwiftUITests: XCTestCase {
             }
         }
 
+        (1...5).forEach { _ in
+            addButton.tap()
+        }
+
         func clearSearchBar() {
             let searchBar = app.searchFields.firstMatch
             let deleteString = String(repeating: XCUIKeyboardKey.delete.rawValue, count: (searchBar.value as? String)!.count)
             searchBar.typeText(deleteString)
         }
 
-        let searchBar = app.searchFields.firstMatch
         let table = app.tables.firstMatch
 
+        // Observed Results filter, should filter reminders without name.
+        XCTAssertEqual(table.cells.count, 20)
+
+        let searchBar = app.searchFields.firstMatch
         searchBar.tap()
 
         searchBar.typeText("reminder")
@@ -287,5 +294,29 @@ class SwiftUITests: XCTestCase {
         clearSearchBar()
         searchBar.typeText("12")
         XCTAssertEqual(table.cells.count, 1)
+    }
+
+    func testObservedResultsConfiguration() {
+        app.launchEnvironment["test_type"] = "observed_results_configuration"
+        app.launch()
+
+        // Check that both @ObservedResults contain the correct configuration.
+        // `remindersA` will get it's config from .environment, while `remindersA`
+        // will get it's Realm config passed in the @ObservedResults initializer.
+        XCTAssertEqual(app.staticTexts["realm_a_label"].label, "realm_a")
+        XCTAssertEqual(app.staticTexts["realm_b_label"].label, "realm_b")
+
+        let addButtonA = app.buttons["addListA"]
+        let addButtonB = app.buttons["addListB"]
+        (1...5).forEach { _ in
+            addButtonA.tap()
+            addButtonB.tap()
+        }
+
+        let tableA = app.tables["ListA"]
+        XCTAssertEqual(tableA.cells.count, 5)
+
+        let tableB = app.tables["ListB"]
+        XCTAssertEqual(tableB.cells.count, 5)
     }
 }

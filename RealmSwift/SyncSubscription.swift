@@ -425,8 +425,8 @@ extension SyncSubscriptionSet: Sequence {
     }
 }
 
-#if swift(>=5.5) && canImport(_Concurrency)
-@available(macOS 12.0, tvOS 15.0, iOS 15.0, watchOS 8.0, *)
+#if swift(>=5.6) && canImport(_Concurrency)
+@available(macOS 10.15, tvOS 13.0, iOS 13.0, watchOS 6.0, *)
 extension SyncSubscriptionSet {
     /**
      Asynchronously creates and commit a write transaction and updates the subscription set,

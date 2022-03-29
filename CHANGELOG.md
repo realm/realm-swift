@@ -25,10 +25,21 @@ x.y.z Release notes (yyyy-MM-dd)
 * Add ability to use Swift Query syntax in `@ObservedResults`, which allows you 
   to filter results using the `where` parameter.
 * Add ability to use `MutableSet` with `StateRealmObject` in SwiftUI.
+* Async/Await extensions are now compatible with iOS 13 and above when building
+  with Xcode 13.3.
+  
+### Breaking Changes
+* Xcode 13.2 is no longer supported when building with Async/Await functions. Use
+  Xcode 13.3 to build with Async/Await functionality.
 
 ### Fixed
 * Adding a Realm Object to a `ObservedResults` or a collections using `StateRealmObject` that is managed by the same Realm 
   would throw if the Object was frozen and not thawed before hand.
+* Setting a Realm Configuration for @ObservedResults using it's initializer would be overrode by the Realm Configuration stored in
+  `.environment(\.realmConfiguration, ...)` if they did not match ([Cocoa #7463](https://github.com/realm/realm-swift/issues/7463), since v10.6.0).
+* Fix searchable component filter overriding the initial filter on `@ObservedResults`, (since v10.23.0).
+* Comparing `Results`, `LinkingObjects` or `AnyRealmCollection` when using Realm via XCFramework 
+  would result in compile time errors ([Cocoa #7615](https://github.com/realm/realm-swift/issues/7615), since v10.21.0)
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
