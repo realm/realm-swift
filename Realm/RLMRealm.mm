@@ -782,10 +782,7 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
         return _realm->async_commit_transaction(nullptr, isGroupingAllowed);
     }
     catch (...) {
-        NSError *error = nil;
-        RLMRealmTranslateException(&error);
-        completionBlock(error);
-        return 0;
+        RLMRealmTranslateException(nil);
     }
 }
 
