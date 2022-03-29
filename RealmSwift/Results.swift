@@ -169,6 +169,12 @@ extension Projection: KeypathSortable {}
         throwForNegativeIndex(position)
         return staticBridgeCast(fromObjectiveC: collection.object(at: UInt(position)))
     }
+
+    // MARK: Equatable
+
+    public static func == (lhs: Results<Element>, rhs: Results<Element>) -> Bool {
+        lhs.collection.isEqual(rhs.collection)
+    }
 }
 
 extension Results: Encodable where Element: Encodable {}

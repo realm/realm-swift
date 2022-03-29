@@ -32,10 +32,6 @@ internal protocol RealmCollectionImpl: RealmCollection where Index == Int, SubSe
     init(collection: RLMCollection)
 }
 extension RealmCollectionImpl {
-    public static func == (lhs: Self, rhs: Self) -> Bool {
-        lhs.collection.isEqual(rhs.collection)
-    }
-
     public var realm: Realm? { collection.realm.map(Realm.init) }
     public var isInvalidated: Bool { collection.isInvalidated }
     public var count: Int { Int(collection.count) }

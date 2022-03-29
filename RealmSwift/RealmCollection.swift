@@ -1094,6 +1094,10 @@ public extension RealmCollection {
     public var description: String {
         return RLMDescriptionWithMaxDepth("AnyRealmCollection", collection, RLMDescriptionMaxDepth)
     }
+
+    public static func == (lhs: AnyRealmCollection<Element>, rhs: AnyRealmCollection<Element>) -> Bool {
+        lhs.collection.isEqual(rhs.collection)
+    }
 }
 
 extension AnyRealmCollection: Encodable where Element: Encodable {}

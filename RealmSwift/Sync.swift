@@ -879,8 +879,8 @@ public extension User {
     }
 }
 
-#if swift(>=5.5.2) && canImport(_Concurrency)
-@available(macOS 12.0, tvOS 15.0, iOS 15.0, watchOS 8.0, *)
+#if swift(>=5.6) && canImport(_Concurrency)
+@available(macOS 10.15, tvOS 13.0, iOS 13.0, watchOS 6.0, *)
 public extension User {
     /// Links the currently authenticated user with a new identity, where the identity is defined by the credential
     /// specified as a parameter. This will only be successful if this `User` is the currently authenticated

@@ -73,6 +73,12 @@ import Realm
         return collection[UInt(index)] as! Element
     }
 
+    // MARK: Equatable
+
+    public static func == (lhs: LinkingObjects<Element>, rhs: LinkingObjects<Element>) -> Bool {
+        lhs.collection.isEqual(rhs.collection)
+    }
+
     // MARK: Implementation
 
     internal init(propertyName: String, handle: RLMLinkingObjectsHandle?) {
