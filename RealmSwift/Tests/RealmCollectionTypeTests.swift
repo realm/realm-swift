@@ -1436,6 +1436,21 @@ class ResultsDistinctTests: TestCase {
     }
 }
 
+class ResultsEquatabilityTests: TestCase {
+    func testEquatability() {
+        let realm = realmWithTestPath()
+        try! realm.write {
+            realm.add(SwiftCustomInitializerObject(stringVal: "A"))
+        }
+
+        let resultsA = realm.objects(SwiftCustomInitializerObject.self)
+        let resultsB = realm.objects(SwiftCustomInitializerObject.self)
+        XCTAssertNotEqual(resultsA, resultsB)
+        XCTAssertEqual(resultsA, resultsA)
+        XCTAssertEqual(resultsB, resultsB)
+    }
+}
+
 class ResultsFromTableTests: ResultsTests {
     override func getCollection(_ realm: Realm) -> Results<CTTNullableStringObjectWithLink> {
         return realm.objects(CTTNullableStringObjectWithLink.self)
@@ -1944,6 +1959,33 @@ class LinkingObjectsCollectionTypeTests: RealmCollectionTests<LinkingObjects<CTT
     }
 }
 
+class LinkingObjectsEquatabilityTests: TestCase {
+    func testEquatability() {
+        let realm = realmWithTestPath()
+
+        var parentA: CTTLinkTarget!
+        var parentB: CTTLinkTarget!
+
+        try! realm.write {
+            parentA = realm.create(CTTLinkTarget.self, value: [0])
+            parentB = realm.create(CTTLinkTarget.self, value: [0])
+
+            let targetA = realm.create(CTTNullableStringObjectWithLink.self)
+            let targetB = realm.create(CTTNullableStringObjectWithLink.self)
+
+            targetA.linkCol = parentA
+            targetB.linkCol = parentB
+        }
+
+        XCTAssertNotEqual(parentA.stringObjects, parentA.stringObjects)
+        XCTAssertNotEqual(parentA.stringObjects, parentB.stringObjects)
+
+        let ref = parentA.stringObjects
+        XCTAssertEqual(ref, ref)
+    }
+}
+
+
 class AnyRealmCollectionTests: RealmCollectionTests<AnyRealmCollection<CTTNullableStringObjectWithLink>, AnyRealmCollection<CTTAggregateObject>> {
     override func getCollection(_ realm: Realm) -> AnyRealmCollection<CTTNullableStringObjectWithLink> {
         AnyRealmCollection(realm.create(CTTStringList.self, value: [[str1, str2]]).array)
@@ -1957,5 +1999,31 @@ class AnyRealmCollectionTests: RealmCollectionTests<AnyRealmCollection<CTTNullab
     override func testDescription() {
         // swiftlint:disable:next line_length
         assertMatches(collection.description, "AnyRealmCollection<CTTNullableStringObjectWithLink> <0x[0-9a-f]+> \\(\n\t\\[0\\] CTTNullableStringObjectWithLink \\{\n\t\tstringCol = 1;\n\t\tlinkCol = CTTLinkTarget \\{\n\t\t\tid = 1;\n\t\t\\};\n\t\\},\n\t\\[1\\] CTTNullableStringObjectWithLink \\{\n\t\tstringCol = 2;\n\t\tlinkCol = CTTLinkTarget \\{\n\t\t\tid = 1;\n\t\t\\};\n\t\\}\n\\)")
+    }
+}
+
+class AnyRealmCollectionEquatabilityTests: TestCase {
+    func testEquatability() {
+        let realm = realmWithTestPath()
+        try! realm.write {
+            realm.add(SwiftCustomInitializerObject(stringVal: "A"))
+            realm.add(SwiftListObject(value: ["int": [1, 2, 3]]))
+            realm.add(SwiftListObject(value: ["int": [1, 2, 3]]))
+        }
+
+        let resultsA = AnyRealmCollection(realm.objects(SwiftCustomInitializerObject.self))
+        let resultsB = AnyRealmCollection(realm.objects(SwiftCustomInitializerObject.self))
+        XCTAssertNotEqual(resultsA, resultsB)
+        XCTAssertEqual(resultsA, resultsA)
+        XCTAssertEqual(resultsB, resultsB)
+
+        let listResultsA = realm.objects(SwiftListObject.self)[0]
+        let listResultsB = realm.objects(SwiftListObject.self)[1]
+
+        let listA = AnyRealmCollection(listResultsA.int)
+        let listB = AnyRealmCollection(listResultsB.int)
+        XCTAssertNotEqual(listA, listB)
+        XCTAssertEqual(listA, listA)
+        XCTAssertEqual(listB, listB)
     }
 }
