@@ -783,6 +783,7 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     }
     catch (...) {
         RLMRealmTranslateException(nil);
+        return 0;
     }
 }
 
