@@ -1288,37 +1288,43 @@ class RealmTests: TestCase {
     }
 
     func testAsyncTransactionCancel() {
-        let realm = try! Realm()
+        let waitComplete = expectation(description: "async wait complete")
         let expectation = XCTestExpectation(description: "testAsyncTransactionCancel expectation")
         expectation.expectedFulfillmentCount = 4
         let unexpectation = XCTestExpectation(description: "should not fulfill")
         unexpectation.isInverted = true
 
-        realm.beginAsyncWrite { _ in
-            realm.create(SwiftStringObject.self, value: ["string"])
-            expectation.fulfill()
+        DispatchQueue.main.async {
+            let realm = try! Realm()
+            realm.beginAsyncWrite { _ in
+                realm.create(SwiftStringObject.self, value: ["string"])
+                expectation.fulfill()
+            }
+            realm.beginAsyncWrite { _ in
+                realm.create(SwiftStringObject.self, value: ["string"])
+                realm.commitAsyncWrite()
+                expectation.fulfill()
+            }
+            realm.beginAsyncWrite { asyncTransactionIdA in
+                realm.create(SwiftStringObject.self, value: ["string"])
+                expectation.fulfill()
+                try! realm.cancelAsyncWrite(asyncTransactionIdA)
+            }
+            realm.beginAsyncWrite { _ in
+                realm.create(SwiftStringObject.self, value: ["string"])
+                expectation.fulfill()
+                realm.commitAsyncWrite()
+            }
+            let asyncTransactionIdB = realm.beginAsyncWrite { _ in
+                unexpectation.fulfill()
+            }
+            try! realm.cancelAsyncWrite(asyncTransactionIdB)
+            self.wait(for: [expectation, unexpectation], timeout: 3)
+            waitComplete.fulfill()
         }
-        realm.beginAsyncWrite { _ in
-            realm.create(SwiftStringObject.self, value: ["string"])
-            realm.commitAsyncWrite()
-            expectation.fulfill()
-        }
-        realm.beginAsyncWrite { asyncTransactionIdA in
-            realm.create(SwiftStringObject.self, value: ["string"])
-            expectation.fulfill()
-            try! realm.cancelAsyncWrite(asyncTransactionIdA)
-        }
-        realm.beginAsyncWrite { _ in
-            realm.create(SwiftStringObject.self, value: ["string"])
-            expectation.fulfill()
-            realm.commitAsyncWrite()
-        }
-        let asyncTransactionIdB = realm.beginAsyncWrite { _ in
-            unexpectation.fulfill()
-        }
-        try! realm.cancelAsyncWrite(asyncTransactionIdB)
 
-        waitForExpectations(timeout: 5, handler: nil)
+        let realm = try! Realm()
+        self.wait(for: [waitComplete], timeout: 4)
         XCTAssertEqual(2, realm.objects(SwiftStringObject.self).count)
     }
 

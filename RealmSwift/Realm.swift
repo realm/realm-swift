@@ -20,6 +20,7 @@ import Foundation
 import Realm
 import Realm.Private
 
+/// The Id of the asynchronous transaction.
 public typealias AsyncTransactionId = RLMAsyncTransactionId
 
 /**
