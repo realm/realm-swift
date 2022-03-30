@@ -1744,10 +1744,14 @@ class ProjectionTests: TestCase {
         let ex = expectation(description: "values will be observed")
         let token = johnProjection.observe(keyPaths: [\PersonProjection.lastNameCaps]) { chg in
             if case let .change(_, change) = chg {
-                XCTAssertEqual(change.first!.name, "lastNameCaps")
-                XCTAssertEqual(change.first!.oldValue as! String, "SNOW")
-                XCTAssertEqual(change.first!.newValue as! String, "ALI")
                 ex.fulfill()
+                guard let value = change.first else {
+                    XCTFail("Change should contain PropertyChange")
+                    return
+                }
+                XCTAssertEqual(value.name, "lastNameCaps")
+                XCTAssertEqual(value.oldValue as? String, "SNOW")
+                XCTAssertEqual(value.newValue as? String, "ALI")
             }
         }
 
