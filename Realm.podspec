@@ -13,7 +13,7 @@ Pod::Spec.new do |s|
   s.homepage                = "https://realm.io"
   s.source                  = { :git => 'https://github.com/realm/realm-swift.git', :tag => "v#{s.version}" }
   s.author                  = { 'Realm' => 'realm-help@mongodb.com' }
-  s.library                 = 'c++', 'z'
+  s.library                 = 'c++', 'z', 'compression'
   s.requires_arc            = true
   s.social_media_url        = 'https://twitter.com/realm'
   s.documentation_url       = "https://docs.mongodb.com/realm/sdk/swift"

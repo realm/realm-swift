@@ -21,6 +21,17 @@
 		227D20E41CB6009D008F641B /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 227D20DD1CB6009D008F641B /* LaunchScreen.xib */; };
 		227D20E51CB6009D008F641B /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 227D20DD1CB6009D008F641B /* LaunchScreen.xib */; };
 		227D20E61CB6009D008F641B /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 227D20DD1CB6009D008F641B /* LaunchScreen.xib */; };
+		3F08725E27F3C95E007A1175 /* libcompression.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F08725D27F3C8CF007A1175 /* libcompression.tbd */; };
+		3F08725F27F3C96A007A1175 /* libcompression.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F08725D27F3C8CF007A1175 /* libcompression.tbd */; };
+		3F08726027F3C971007A1175 /* libcompression.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F08725D27F3C8CF007A1175 /* libcompression.tbd */; };
+		3F08726127F3C977007A1175 /* libcompression.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F08725D27F3C8CF007A1175 /* libcompression.tbd */; };
+		3F08726227F3C97D007A1175 /* libcompression.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F08725D27F3C8CF007A1175 /* libcompression.tbd */; };
+		3F08726327F3C983007A1175 /* libcompression.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F08725D27F3C8CF007A1175 /* libcompression.tbd */; };
+		3F08726427F3C989007A1175 /* libcompression.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F08725D27F3C8CF007A1175 /* libcompression.tbd */; };
+		3F08726527F3C98E007A1175 /* libcompression.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F08725D27F3C8CF007A1175 /* libcompression.tbd */; };
+		3F08726627F3C993007A1175 /* libcompression.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F08725D27F3C8CF007A1175 /* libcompression.tbd */; };
+		3F08726727F3C999007A1175 /* libcompression.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F08725D27F3C8CF007A1175 /* libcompression.tbd */; };
+		3F08726827F3D23B007A1175 /* libcompression.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F08725D27F3C8CF007A1175 /* libcompression.tbd */; };
 		3F78C9BD1B431CF300A0988E /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71AB19BA502500F3EDB4 /* CoreGraphics.framework */; };
 		3F78C9BE1B431CF300A0988E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71A919BA502500F3EDB4 /* Foundation.framework */; };
 		3F78C9BF1B431CF300A0988E /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E8F70ED019BA52E8006F60D5 /* libc++.dylib */; };
@@ -159,6 +170,7 @@
 		0295B8FE19D102880036D6C3 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Realm.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		0A73D4401B1442B200E1E8EE /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../../README.md; sourceTree = SOURCE_ROOT; };
 		227D20DD1CB6009D008F641B /* LaunchScreen.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LaunchScreen.xib; sourceTree = "<group>"; };
+		3F08725D27F3C8CF007A1175 /* libcompression.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libcompression.tbd; path = usr/lib/libcompression.tbd; sourceTree = SDKROOT; };
 		3F78C9AB1B431CDF00A0988E /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = RACTableView/AppDelegate.h; sourceTree = "<group>"; };
 		3F78C9AC1B431CDF00A0988E /* TableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TableViewController.h; path = RACTableView/TableViewController.h; sourceTree = "<group>"; };
 		3F78C9AD1B431CDF00A0988E /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = RACTableView/Images.xcassets; sourceTree = "<group>"; };
@@ -279,6 +291,7 @@
 				3F78C9BD1B431CF300A0988E /* CoreGraphics.framework in Frameworks */,
 				3F78C9BE1B431CF300A0988E /* Foundation.framework in Frameworks */,
 				3F78C9BF1B431CF300A0988E /* libc++.dylib in Frameworks */,
+				3F08726327F3C983007A1175 /* libcompression.tbd in Frameworks */,
 				C895987FDBFA45AF50225642 /* libPods-RACTableView.a in Frameworks */,
 				3F78C9C01B431CF300A0988E /* Realm.framework in Frameworks */,
 				3F78C9C11B431CF300A0988E /* UIKit.framework in Frameworks */,
@@ -292,6 +305,7 @@
 				C0DC41F41A70729D0067156A /* CoreGraphics.framework in Frameworks */,
 				C0DC41F51A70729D0067156A /* Foundation.framework in Frameworks */,
 				C0DC41F61A70729D0067156A /* libc++.dylib in Frameworks */,
+				3F08726027F3C971007A1175 /* libcompression.tbd in Frameworks */,
 				C0DC41F71A70729D0067156A /* Realm.framework in Frameworks */,
 				C0DC41F81A70729D0067156A /* UIKit.framework in Frameworks */,
 			);
@@ -304,6 +318,7 @@
 				C06134E61A71AA5A00D22D12 /* CoreGraphics.framework in Frameworks */,
 				C06134E51A71AA5600D22D12 /* Foundation.framework in Frameworks */,
 				C0DC42191A707BF80067156A /* libc++.dylib in Frameworks */,
+				3F08726127F3C977007A1175 /* libcompression.tbd in Frameworks */,
 				C0DC42081A7079D00067156A /* NotificationCenter.framework in Frameworks */,
 				C06134E41A71AA4E00D22D12 /* Realm.framework in Frameworks */,
 			);
@@ -316,6 +331,7 @@
 				E879D9CF1A12AA120035E2EB /* CoreGraphics.framework in Frameworks */,
 				E879D9D11A12AA120035E2EB /* Foundation.framework in Frameworks */,
 				E879D9CE1A12AA120035E2EB /* libc++.dylib in Frameworks */,
+				3F08726227F3C97D007A1175 /* libcompression.tbd in Frameworks */,
 				E879D9D21A12AA120035E2EB /* Realm.framework in Frameworks */,
 				E879D9D01A12AA120035E2EB /* UIKit.framework in Frameworks */,
 			);
@@ -328,6 +344,7 @@
 				E8AB71DE19BA503500F3EDB4 /* CoreGraphics.framework in Frameworks */,
 				E8AB71DD19BA503500F3EDB4 /* Foundation.framework in Frameworks */,
 				E8F70ED119BA52E8006F60D5 /* libc++.dylib in Frameworks */,
+				3F08726627F3C993007A1175 /* libcompression.tbd in Frameworks */,
 				0295B8FF19D102880036D6C3 /* Realm.framework in Frameworks */,
 				E8AB71DF19BA503500F3EDB4 /* UIKit.framework in Frameworks */,
 			);
@@ -340,6 +357,7 @@
 				E8AB720C19BA503B00F3EDB4 /* CoreGraphics.framework in Frameworks */,
 				E8AB720B19BA503B00F3EDB4 /* Foundation.framework in Frameworks */,
 				E8F70ED519BA530C006F60D5 /* libc++.dylib in Frameworks */,
+				3F08726427F3C989007A1175 /* libcompression.tbd in Frameworks */,
 				0295B90019D102880036D6C3 /* Realm.framework in Frameworks */,
 				E8AB720D19BA503B00F3EDB4 /* UIKit.framework in Frameworks */,
 			);
@@ -352,6 +370,7 @@
 				E8AB723A19BA504000F3EDB4 /* CoreGraphics.framework in Frameworks */,
 				E8AB723919BA504000F3EDB4 /* Foundation.framework in Frameworks */,
 				E8F70ED919BA534E006F60D5 /* libc++.dylib in Frameworks */,
+				3F08725F27F3C96A007A1175 /* libcompression.tbd in Frameworks */,
 				0295B90119D102880036D6C3 /* Realm.framework in Frameworks */,
 				E8AB723B19BA504000F3EDB4 /* UIKit.framework in Frameworks */,
 			);
@@ -364,6 +383,7 @@
 				E8AB726819BA504500F3EDB4 /* CoreGraphics.framework in Frameworks */,
 				E8AB726719BA504500F3EDB4 /* Foundation.framework in Frameworks */,
 				E8F70EDD19BA5380006F60D5 /* libc++.dylib in Frameworks */,
+				3F08726727F3C999007A1175 /* libcompression.tbd in Frameworks */,
 				0295B90219D102880036D6C3 /* Realm.framework in Frameworks */,
 				E8AB726919BA504500F3EDB4 /* UIKit.framework in Frameworks */,
 			);
@@ -376,6 +396,7 @@
 				E8AB729619BA504900F3EDB4 /* CoreGraphics.framework in Frameworks */,
 				E8AB729519BA504900F3EDB4 /* Foundation.framework in Frameworks */,
 				E8D5D6AA19BA53DF0053D333 /* libc++.dylib in Frameworks */,
+				3F08726527F3C98E007A1175 /* libcompression.tbd in Frameworks */,
 				0295B90319D102880036D6C3 /* Realm.framework in Frameworks */,
 				E8AB729719BA504900F3EDB4 /* UIKit.framework in Frameworks */,
 			);
@@ -388,6 +409,7 @@
 				E8BDBFD31A1172BC00450CFF /* CoreGraphics.framework in Frameworks */,
 				E8BDBFD51A1172C300450CFF /* Foundation.framework in Frameworks */,
 				E8BDBFD21A1172B600450CFF /* libc++.dylib in Frameworks */,
+				3F08725E27F3C95E007A1175 /* libcompression.tbd in Frameworks */,
 				E8BDBFD11A1172B200450CFF /* Realm.framework in Frameworks */,
 				E8BDBFD41A1172BF00450CFF /* UIKit.framework in Frameworks */,
 			);
@@ -402,6 +424,7 @@
 				F18464521DC1551200DAB8B9 /* libc++.tbd in Frameworks */,
 				F1506E991DDD1E2A00D319DC /* Realm.framework in Frameworks */,
 				F18464531DC1551700DAB8B9 /* UIKit.framework in Frameworks */,
+				3F08726827F3D23B007A1175 /* libcompression.tbd in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -560,6 +583,7 @@
 				E8AB71A919BA502500F3EDB4 /* Foundation.framework */,
 				E8F70ED019BA52E8006F60D5 /* libc++.dylib */,
 				F18464511DC1551200DAB8B9 /* libc++.tbd */,
+				3F08725D27F3C8CF007A1175 /* libcompression.tbd */,
 				C1FAC448B13A56875E51ABBA /* libPods-RACTableView.a */,
 				C0DC42071A7079D00067156A /* NotificationCenter.framework */,
 				0295B8FE19D102880036D6C3 /* Realm.framework */,
@@ -621,13 +645,13 @@
 		E8F70EAE19BA50A3006F60D5 /* Migration */ = {
 			isa = PBXGroup;
 			children = (
-				7D718BC825DAADB500A74FDD /* README.md */,
-				E8F70EB619BA50A3006F60D5 /* AppDelegate.h */,
-				E8F70EB719BA50A3006F60D5 /* AppDelegate.m */,
 				7D718BED25DAADE400A74FDD /* Examples */,
 				7DD1D7D625DC2CC000E63229 /* RealmTemplates */,
+				E8F70EB619BA50A3006F60D5 /* AppDelegate.h */,
+				E8F70EB719BA50A3006F60D5 /* AppDelegate.m */,
 				E8F70EB419BA50A3006F60D5 /* main.m */,
 				E8F70EB519BA50A3006F60D5 /* Migration-Info.plist */,
+				7D718BC825DAADB500A74FDD /* README.md */,
 			);
 			path = Migration;
 			sourceTree = "<group>";
