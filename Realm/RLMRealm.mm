@@ -765,12 +765,11 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     }
 }
 
-- (RLMAsyncTransactionId)commitAsyncWriteTransaction:(void(^)(NSError *_Nullable))completionBlock {
+- (RLMAsyncTransactionId)commitAsyncWriteTransaction:(void(^)(NSError *))completionBlock {
     return [self commitAsyncWriteTransaction:completionBlock isGroupingAllowed:false];
 }
 
-- (RLMAsyncTransactionId)commitAsyncWriteTransaction:(nullable void(^)(NSError *_Nullable))completionBlock
-                                   isGroupingAllowed:(BOOL)isGroupingAllowed {
+- (RLMAsyncTransactionId)commitAsyncWriteTransaction:(nullable void(^)(NSError *))completionBlock isGroupingAllowed:(BOOL)isGroupingAllowed {
     try {
         auto completion = [=](std::exception_ptr err) {
             @autoreleasepool {
@@ -813,7 +812,7 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     }
 }
 
-- (RLMAsyncTransactionId)asyncTransactionWithBlock:(void(^)())block onComplete:(nullable void(^)(NSError *_Nullable))completionBlock {
+- (RLMAsyncTransactionId)asyncTransactionWithBlock:(void(^)())block onComplete:(nullable void(^)(NSError *))completionBlock {
     return [self beginAsyncWriteTransaction:^{
         block();
         if (_realm->is_in_transaction()) {

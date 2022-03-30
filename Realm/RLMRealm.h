@@ -544,7 +544,7 @@ typedef void (^RLMNotificationBlock)(RLMNotification notification, RLMRealm *rea
  
  @param block The block containing actions to perform inside the write transaction.
         `block` should end by calling `commitAsyncWriteTransaction`,
-        `commitWriteTransaction`.
+        `commitWriteTransaction` or `cancelWriteTransaction`.
         Returning without one of these calls is equivalent to calling `cancelWriteTransaction`.
  
  @return An id identifying the asynchronous transaction which can be passed to
@@ -579,7 +579,7 @@ typedef void (^RLMNotificationBlock)(RLMNotification notification, RLMRealm *rea
          to cancel the pending invocation of the block. Note that this does
          *not* cancel the commit itself.
 */
-- (RLMAsyncTransactionId)commitAsyncWriteTransaction:(nullable void(^)(NSError *_Nullable))completionBlock
+- (RLMAsyncTransactionId)commitAsyncWriteTransaction:(nullable void(^)(NSError *))completionBlock
                                    isGroupingAllowed:(BOOL)isGroupingAllowed;
 
 /**
@@ -598,7 +598,7 @@ typedef void (^RLMNotificationBlock)(RLMNotification notification, RLMRealm *rea
          to cancel the pending invocation of the block. Note that this does
          *not* cancel the commit itself.
 */
-- (RLMAsyncTransactionId)commitAsyncWriteTransaction:(void(^)(NSError *_Nullable))completionBlock;
+- (RLMAsyncTransactionId)commitAsyncWriteTransaction:(void(^)(NSError *))completionBlock;
 
 /**
  Asynchronously commits a write transaction.
@@ -646,8 +646,7 @@ typedef void (^RLMNotificationBlock)(RLMNotification notification, RLMRealm *rea
          `cancelAsyncTransaction:` prior to the block being called to cancel
          the pending invocation of the block.
 */
-- (RLMAsyncTransactionId)asyncTransactionWithBlock:(void(^)(void))block
-                                        onComplete:(nullable void(^)(NSError *_Nullable))completionBlock;
+- (RLMAsyncTransactionId)asyncTransactionWithBlock:(void(^)(void))block onComplete:(nullable void(^)(NSError *))completionBlock;
 
 /**
  Asynchronously performs actions contained within the given block inside a
