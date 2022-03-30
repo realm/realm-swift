@@ -46,6 +46,9 @@ NSString *const kRLMSyncUnderlyingErrorKey      = @"underlying_error";
 
 using namespace realm;
 
+static_assert((int)RLMClientResetModeManual == (int)realm::ClientResyncMode::Manual);
+static_assert((int)RLMClientResetModeDiscardLocal == (int)realm::ClientResyncMode::DiscardLocal);
+
 SyncSessionStopPolicy translateStopPolicy(RLMSyncStopPolicy stopPolicy) {
     switch (stopPolicy) {
         case RLMSyncStopPolicyImmediately:              return SyncSessionStopPolicy::Immediately;

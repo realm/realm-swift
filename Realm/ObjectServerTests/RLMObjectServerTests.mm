@@ -1463,6 +1463,38 @@ static NSString *randomEmail() {
     XCTAssertTrue([NSFileManager.defaultManager fileExistsAtPath:pathValue]);
 }
 
+- (void)testSetClientResetMode {
+    RLMUser *user = [self userForTest:_cmd];
+    NSString *partitionValue = NSStringFromSelector(_cmd);
+    RLMRealmConfiguration *config = [user configurationWithPartitionValue:partitionValue clientResetMode:RLMClientResetModeDiscardLocal];
+    XCTAssertEqual(config.syncConfiguration.clientResetMode, RLMClientResetModeDiscardLocal);
+
+    // Default is manual
+    config = [user configurationWithPartitionValue:partitionValue];
+    XCTAssertEqual(config.syncConfiguration.clientResetMode, RLMClientResetModeManual);
+}
+
+- (void)testSetClientResetCallbacks {
+    RLMUser *user = [self userForTest:_cmd];
+    NSString *partitionValue = NSStringFromSelector(_cmd);
+    RLMRealmConfiguration *config = [user configurationWithPartitionValue:partitionValue clientResetMode:RLMClientResetModeDiscardLocal];
+    XCTAssertNil(config.syncConfiguration.beforeClientReset);
+    XCTAssertNil(config.syncConfiguration.afterClientReset);
+
+    RLMClientResetBeforeBlock beforeBlock = ^(RLMRealm *local __unused) {
+        XCTAssert(false, @"Should not execute callback");
+    };
+    RLMClientResetAfterBlock afterBlock = ^(RLMRealm *before __unused, RLMRealm *after __unused) {
+        XCTAssert(false, @"Should not execute callback");
+    };
+    RLMRealmConfiguration *config2 = [user configurationWithPartitionValue:partitionValue
+                                                           clientResetMode:RLMClientResetModeDiscardLocal
+                                                         notifyBeforeReset:beforeBlock
+                                                          notifyAfterReset:afterBlock];
+    XCTAssertNotNil(config2.syncConfiguration.beforeClientReset);
+    XCTAssertNotNil(config2.syncConfiguration.afterClientReset);
+}
+
 #pragma mark - Progress Notifications
 
 static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;

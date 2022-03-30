@@ -101,6 +101,9 @@
 		29B7FDFB1C0DE8100023224E /* fileformat-pre-null.realm in Resources */ = {isa = PBXBuildFile; fileRef = 29B7FDF71C0DE76B0023224E /* fileformat-pre-null.realm */; };
 		29B7FDFC1C0DE8110023224E /* fileformat-pre-null.realm in Resources */ = {isa = PBXBuildFile; fileRef = 29B7FDF71C0DE76B0023224E /* fileformat-pre-null.realm */; };
 		29EDB8E41A7708E700458D80 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E8839B2D19E31FD90047B1A8 /* main.m */; };
+		3F08725527F3B5E0007A1175 /* libcompression.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F08725427F3B5E0007A1175 /* libcompression.tbd */; };
+		3F08725627F3B5EB007A1175 /* libcompression.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F08725427F3B5E0007A1175 /* libcompression.tbd */; };
+		3F08725727F3B87A007A1175 /* libcompression.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F08725427F3B5E0007A1175 /* libcompression.tbd */; };
 		3F102CBD23DBC68300108FD2 /* Combine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F102CBC23DBC68300108FD2 /* Combine.swift */; };
 		3F149CCB2668112A00111D65 /* PersistedProperty.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F149CCA2668112A00111D65 /* PersistedProperty.swift */; };
 		3F1D8D33265B071000593ABA /* RLMValue.h in Headers */ = {isa = PBXBuildFile; fileRef = 3F1D8D30265B071000593ABA /* RLMValue.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -816,6 +819,7 @@
 		29EDB8E91A7712E500458D80 /* RLMObjectSchema_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMObjectSchema_Private.h; sourceTree = "<group>"; };
 		3F0338491E6F466D00F9E288 /* RLMAccessor.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RLMAccessor.hpp; sourceTree = "<group>"; };
 		3F04EA2D1992BEE400C2CE2E /* PerformanceTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PerformanceTests.m; sourceTree = "<group>"; };
+		3F08725427F3B5E0007A1175 /* libcompression.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libcompression.tbd; path = usr/lib/libcompression.tbd; sourceTree = SDKROOT; };
 		3F0F029D1B6FFE610046A4D5 /* KVOTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = KVOTests.mm; sourceTree = "<group>"; };
 		3F0F02AC1B6FFF3D0046A4D5 /* RLMObservation.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = RLMObservation.hpp; sourceTree = "<group>"; };
 		3F0F02AD1B6FFF3D0046A4D5 /* RLMObservation.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMObservation.mm; sourceTree = "<group>"; };
@@ -1176,6 +1180,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3F08725527F3B5E0007A1175 /* libcompression.tbd in Frameworks */,
 				1A7B823A1D51259F00750296 /* libz.tbd in Frameworks */,
 				3FE5B4D724CF6909004D4EF3 /* realm-monorepo.xcframework in Frameworks */,
 			);
@@ -1192,6 +1197,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3F08725627F3B5EB007A1175 /* libcompression.tbd in Frameworks */,
 				3F9B4A6624CF8C0E00C72A4A /* realm-monorepo.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1262,6 +1268,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3F08725727F3B87A007A1175 /* libcompression.tbd in Frameworks */,
 				1A7B823B1D5126D200750296 /* libz.tbd in Frameworks */,
 				5DD755E21BE05DAF002800DA /* Realm.framework in Frameworks */,
 			);
@@ -1283,6 +1290,7 @@
 			children = (
 				CFAE926A24A0A7F40033CB31 /* AuthenticationServices.framework */,
 				3F9816292317763000C3543D /* libc++.tbd */,
+				3F08725427F3B5E0007A1175 /* libcompression.tbd */,
 				1A7B82391D51259F00750296 /* libz.tbd */,
 				3FE5B4D424CF3F06004D4EF3 /* realm-monorepo.xcframework */,
 			);
@@ -1981,7 +1989,6 @@
 				5D659EBD1BE04556006515A0 /* RLMProperty_Private.h in Headers */,
 				CF6E0486242A321200DB7F14 /* RLMProviderClient.h in Headers */,
 				6807E64A2487E8660096066F /* RLMPushClient.h in Headers */,
-				531F956827906EB200E497F1 /* RLMSyncSubscription.h in Headers */,
 				6807E64F2487F9210096066F /* RLMPushClient_Private.hpp in Headers */,
 				1AD397CF1F72FFC7002AA897 /* RLMRealm+Sync.h in Headers */,
 				5D659EBF1BE04556006515A0 /* RLMRealm.h in Headers */,
@@ -2004,11 +2011,12 @@
 				3F336E8B1DA2FA15006CB5A0 /* RLMSyncConfiguration_Private.h in Headers */,
 				1AF7EA961D340AF70001A9B5 /* RLMSyncManager.h in Headers */,
 				1AD3870C1D4A7FBB00479110 /* RLMSyncSession.h in Headers */,
+				531F956827906EB200E497F1 /* RLMSyncSubscription.h in Headers */,
+				531F956727906DBC00E497F1 /* RLMSyncSubscription_Private.h in Headers */,
 				3F3BBAF324B8FD32009D8D51 /* RLMSyncUtil.h in Headers */,
 				E8C6EAF51DD66C0C00EC1A03 /* RLMSyncUtil_Private.h in Headers */,
 				3F67DB3C1E26D69C0024533D /* RLMThreadSafeReference.h in Headers */,
 				CF76F7DF24816AAB00890DD2 /* RLMUpdateResult.h in Headers */,
-				531F956727906DBC00E497F1 /* RLMSyncSubscription_Private.h in Headers */,
 				1ABDCDAE1D792FEB003489E3 /* RLMUser.h in Headers */,
 				53CCC6E8257EC8C400A8FC50 /* RLMUser_Private.h in Headers */,
 				CFAEF765242B672700EAF721 /* RLMUserAPIKey.h in Headers */,
@@ -2035,7 +2043,6 @@
 				53CCC6C5257EC8A300A8FC50 /* RLMApp_Private.h in Headers */,
 				5DD755A71BE056DE002800DA /* RLMArray.h in Headers */,
 				5DD755A81BE056DE002800DA /* RLMArray_Private.h in Headers */,
-				ACC6BEE62796EA78006C1728 /* RLMSyncSubscription.h in Headers */,
 				49E12CF3245DB7E800359DF1 /* RLMBSON.h in Headers */,
 				49E12CF6245DBF8A00359DF1 /* RLMBSON_Private.hpp in Headers */,
 				5DD755A91BE056DE002800DA /* RLMCollection.h in Headers */,
@@ -2073,7 +2080,6 @@
 				5DD755BD1BE056DE002800DA /* RLMRealm.h in Headers */,
 				5DD755BE1BE056DE002800DA /* RLMRealm_Dynamic.h in Headers */,
 				5DD755BF1BE056DE002800DA /* RLMRealm_Private.h in Headers */,
-				ACC6BEE52796EA23006C1728 /* RLMSyncSubscription_Private.h in Headers */,
 				1AFEF8421D52CD8F00495005 /* RLMRealmConfiguration+Sync.h in Headers */,
 				5DD755C01BE056DE002800DA /* RLMRealmConfiguration.h in Headers */,
 				5DD755C11BE056DE002800DA /* RLMRealmConfiguration_Private.h in Headers */,
@@ -2091,6 +2097,8 @@
 				3F336E8A1DA2FA14006CB5A0 /* RLMSyncConfiguration_Private.h in Headers */,
 				1A7DE7071D38474F0029F0AE /* RLMSyncManager.h in Headers */,
 				1A7003111D5270FF00FD9EE3 /* RLMSyncSession.h in Headers */,
+				ACC6BEE62796EA78006C1728 /* RLMSyncSubscription.h in Headers */,
+				ACC6BEE52796EA23006C1728 /* RLMSyncSubscription_Private.h in Headers */,
 				1A7DE70B1D3847670029F0AE /* RLMSyncUtil.h in Headers */,
 				E8C6EAF41DD66C0C00EC1A03 /* RLMSyncUtil_Private.h in Headers */,
 				3F67DB401E26D6A20024533D /* RLMThreadSafeReference.h in Headers */,
@@ -2727,7 +2735,6 @@
 				4993220E24129DCE00A0EC8E /* RLMApp.mm in Sources */,
 				5D659E871BE04556006515A0 /* RLMArray.mm in Sources */,
 				49E12CF0245DB7CC00359DF1 /* RLMBSON.mm in Sources */,
-				531F956A27906EF300E497F1 /* RLMSyncSession.mm in Sources */,
 				3F9863BB1D36876B00641C98 /* RLMClassInfo.mm in Sources */,
 				3FBEF67B1C63D66100F6935B /* RLMCollection.mm in Sources */,
 				5D659E891BE04556006515A0 /* RLMConstants.m in Sources */,
@@ -2767,9 +2774,10 @@
 				5D659E8A1BE04556006515A0 /* RLMSwiftCollectionBase.mm in Sources */,
 				5D659E991BE04556006515A0 /* RLMSwiftSupport.m in Sources */,
 				3F1D90BC265C08F800593ABA /* RLMSwiftValueStorage.mm in Sources */,
-				531F956C27906F7600E497F1 /* RLMSyncSubscription.mm in Sources */,
 				1A3623681D8384BA00945A54 /* RLMSyncConfiguration.mm in Sources */,
 				1AF7EA971D340AF70001A9B5 /* RLMSyncManager.mm in Sources */,
+				531F956A27906EF300E497F1 /* RLMSyncSession.mm in Sources */,
+				531F956C27906F7600E497F1 /* RLMSyncSubscription.mm in Sources */,
 				1A84132F1D4BCCE600C5326F /* RLMSyncUtil.mm in Sources */,
 				3F67DB3E1E26D69C0024533D /* RLMThreadSafeReference.mm in Sources */,
 				5D659E9A1BE04556006515A0 /* RLMUpdateChecker.mm in Sources */,
@@ -2822,7 +2830,6 @@
 				ACF08B6726DD936200686CBC /* Query.swift in Sources */,
 				5D660FF81BE98D670021E04F /* Realm.swift in Sources */,
 				1AB605D31D495927007F53DE /* RealmCollection.swift in Sources */,
-				ACB6FD35273C60CC0009712F /* SyncSubscription.swift in Sources */,
 				3F997773273E23D300AA9E13 /* RealmCollectionImpl.swift in Sources */,
 				5D660FFA1BE98D670021E04F /* RealmConfiguration.swift in Sources */,
 				CFE9CE3326555BBD00BF96D6 /* RealmKeyedCollection.swift in Sources */,
@@ -2834,6 +2841,7 @@
 				5D660FFD1BE98D670021E04F /* SortDescriptor.swift in Sources */,
 				535EA9E225B0919800DBF3CD /* SwiftUI.swift in Sources */,
 				1AFEF8431D52D2C900495005 /* Sync.swift in Sources */,
+				ACB6FD35273C60CC0009712F /* SyncSubscription.swift in Sources */,
 				3F222C4E1E26F51300CA0713 /* ThreadSafeReference.swift in Sources */,
 				5D660FFE1BE98D670021E04F /* Util.swift in Sources */,
 			);
@@ -2910,7 +2918,6 @@
 				4993220F24129DCE00A0EC8E /* RLMApp.mm in Sources */,
 				5DD755851BE056DE002800DA /* RLMArray.mm in Sources */,
 				49DF0AA42463286800F7E0B8 /* RLMBSON.mm in Sources */,
-				ACC6BEE42796B23D006C1728 /* RLMSyncSession.mm in Sources */,
 				3F9863BC1D36876B00641C98 /* RLMClassInfo.mm in Sources */,
 				3FBEF67C1C63D66400F6935B /* RLMCollection.mm in Sources */,
 				5DD755871BE056DE002800DA /* RLMConstants.m in Sources */,
@@ -2945,7 +2952,6 @@
 				5DD755931BE056DE002800DA /* RLMRealmConfiguration.mm in Sources */,
 				5DD755941BE056DE002800DA /* RLMRealmUtil.mm in Sources */,
 				5DD755951BE056DE002800DA /* RLMResults.mm in Sources */,
-				ACC6BEE72796ED6C006C1728 /* RLMSyncSubscription.mm in Sources */,
 				5DD755961BE056DE002800DA /* RLMSchema.mm in Sources */,
 				CF986D2125AE3B090039D287 /* RLMSet.mm in Sources */,
 				5DD755881BE056DE002800DA /* RLMSwiftCollectionBase.mm in Sources */,
@@ -2953,6 +2959,8 @@
 				3F1D903F265C073100593ABA /* RLMSwiftValueStorage.mm in Sources */,
 				1A0512721D873F3300806AEC /* RLMSyncConfiguration.mm in Sources */,
 				1A90FCBB1D3D37F50086A57F /* RLMSyncManager.mm in Sources */,
+				ACC6BEE42796B23D006C1728 /* RLMSyncSession.mm in Sources */,
+				ACC6BEE72796ED6C006C1728 /* RLMSyncSubscription.mm in Sources */,
 				1A7003091D5270C700FD9EE3 /* RLMSyncUtil.mm in Sources */,
 				3F67DB411E26D6AD0024533D /* RLMThreadSafeReference.mm in Sources */,
 				5DD755981BE056DE002800DA /* RLMUpdateChecker.mm in Sources */,
@@ -2994,18 +3002,18 @@
 				5346E7322487AC9D00595C68 /* RLMBSONTests.mm in Sources */,
 				530BA61626DFA1CB008FC550 /* RLMChildProcessEnvironment.m in Sources */,
 				CF08757D260B98E100B9BE60 /* RLMCollectionSyncTests.mm in Sources */,
+				ACB6FD37273C61040009712F /* RLMFlexibleSyncServerTests.mm in Sources */,
 				3F558C9422C29A03002F0F30 /* RLMMultiProcessTestCase.m in Sources */,
 				AC7D182D261F2F560080E1D2 /* RLMObjectServerPartitionTests.mm in Sources */,
 				E8267FF11D90B8E700E001C7 /* RLMObjectServerTests.mm in Sources */,
-				1AA5AE9C1D98A68E00ED8C27 /* RLMSyncTestCase.mm in Sources */,
 				531F9570279070A900E497F1 /* RLMServerTestObjects.m in Sources */,
+				1AA5AE9C1D98A68E00ED8C27 /* RLMSyncTestCase.mm in Sources */,
 				3F558C9022C29A03002F0F30 /* RLMTestCase.m in Sources */,
-				ACB6FD36273C60FD0009712F /* SwiftFlexibleSyncServerTests.swift in Sources */,
-				ACB6FD37273C61040009712F /* RLMFlexibleSyncServerTests.mm in Sources */,
 				3F73BC921E3A877300FE80B6 /* RLMTestUtils.m in Sources */,
 				1A1536481DB0408A00C0EC93 /* RLMUser+ObjectServerTests.mm in Sources */,
 				CF330BBE24E57D5F00F07EE2 /* RLMWatchTestUtility.m in Sources */,
 				3F9ADA9426E7E87B007349A5 /* SwiftCollectionSyncTests.swift in Sources */,
+				ACB6FD36273C60FD0009712F /* SwiftFlexibleSyncServerTests.swift in Sources */,
 				AC8AE64B26BAD4B00037D4E5 /* SwiftMongoClientTests.swift in Sources */,
 				AC7D182E261F2F560080E1D2 /* SwiftObjectServerPartitionTests.swift in Sources */,
 				1AA5AEA11D98C99800ED8C27 /* SwiftObjectServerTests.swift in Sources */,

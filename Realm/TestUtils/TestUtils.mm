@@ -201,7 +201,7 @@ RLMUser *RLMDummyUser() {
         realm::SyncFileManager sfm(config.base_file_path, "dummy");
         realm::util::Optional<std::vector<char>> encryption_key;
         if (config.metadata_mode == realm::SyncClientConfig::MetadataMode::Encryption) {
-            encryption_key = realm::keychain::metadata_realm_encryption_key(false);
+            encryption_key = realm::keychain::get_existing_metadata_realm_key();
         }
         realm::SyncMetadataManager metadata_manager(sfm.metadata_path(),
                                                     encryption_key != realm::util::none,

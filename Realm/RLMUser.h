@@ -20,6 +20,7 @@
 
 #import <Realm/RLMCredentials.h>
 #import <Realm/RLMRealmConfiguration.h>
+#import <Realm/RLMSyncConfiguration.h>
 
 @class RLMUser, RLMSyncSession, RLMRealm, RLMUserIdentity, RLMAPIKeyAuth, RLMMongoClient, RLMMongoDatabase, RLMMongoCollection, RLMUserProfile;
 @protocol RLMBSON;
@@ -106,6 +107,30 @@ NS_ASSUME_NONNULL_BEGIN
  @return A default configuration object with the sync configuration set to use the given partition value.
  */
 - (RLMRealmConfiguration *)configurationWithPartitionValue:(nullable id<RLMBSON>)partitionValue NS_REFINED_FOR_SWIFT;
+
+/**
+ Create a partition-based sync configuration instance for the given partition value.
+
+ @param partitionValue The `RLMBSON` value the Realm is partitioned on.
+ @param clientResetMode Determines file recovery behavior in the event of a client reset.
+                        See: https://docs.mongodb.com/realm/sync/error-handling/client-resets/
+ */
+- (RLMRealmConfiguration *)configurationWithPartitionValue:(nullable id<RLMBSON>)partitionValue
+                                           clientResetMode:(RLMClientResetMode)clientResetMode NS_REFINED_FOR_SWIFT;
+
+/**
+ Create a partition-based sync configuration instance for the given partition value.
+
+ @param partitionValue The `RLMBSON` value the Realm is partitioned on.
+ @param clientResetMode Determines file recovery behavior in the event of a client reset.
+                        See: https://docs.mongodb.com/realm/sync/error-handling/client-resets/
+ @param beforeResetBlock A callback which notifies prior to a client reset occurring. See: `RLMClientResetBeforeBlock`
+ @param afterResetBlock A callback which notifies after a client reset has occurred. See: `RLMClientResetAfterBlock`
+ */
+- (RLMRealmConfiguration *)configurationWithPartitionValue:(nullable id<RLMBSON>)partitionValue
+                                           clientResetMode:(RLMClientResetMode)clientResetMode
+                                         notifyBeforeReset:(nullable RLMClientResetBeforeBlock)beforeResetBlock
+                                          notifyAfterReset:(nullable RLMClientResetAfterBlock)afterResetBlock NS_REFINED_FOR_SWIFT;
 
 /**
  Create a flexible sync configuration instance, which can be used to open a Realm that
