@@ -200,6 +200,49 @@ extension MinKey: BSON {
         }
     }
 
+    /// Initialize a `BSON` from a type which conforms to `PartitionValue`. If this is not a valid `BSON` type,
+    /// if will be considered `BSON` null type and will return `nil`.
+    public init(_ bson: PartitionValue) {
+        switch bson {
+        case let val as Int:
+            self = .int64(Int64(val))
+        case let val as Int32:
+            self = .int32(val)
+        case let val as Int64:
+            self = .int64(val)
+        case let val as Double:
+            self = .double(val)
+        case let val as String:
+            self = .string(val)
+        case let val as Data:
+            self = .binary(val)
+        case let val as Date:
+            self = .datetime(val)
+        case let val as Decimal128:
+            self = .decimal128(val)
+        case let val as UUID:
+            self = .uuid(val)
+        case let val as ObjectId:
+            self = .objectId(val)
+        case let val as Document:
+            self = .document(val)
+        case let val as Array<AnyBSON?>:
+            self = .array(val)
+        case let val as Bool:
+            self = .bool(val)
+        case is MaxKey:
+            self = .maxKey
+        case is MinKey:
+            self = .minKey
+        case let val as NSRegularExpression:
+            self = .regex(val)
+        case let val as AnyBSON:
+            self = val
+        default:
+            self = .null
+        }
+    }
+
     /// If this `BSON` is an `.int32`, return it as an `Int32`. Otherwise, return nil.
     public var int32Value: Int32? {
         guard case let .int32(i) = self else {

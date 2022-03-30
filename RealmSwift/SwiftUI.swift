@@ -1046,7 +1046,7 @@ private class ObservableAsyncOpenStorage: ObservableObject {
     private var asyncOpenKind: AsyncOpenKind
     private var app: App
     var configuration: Realm.Configuration?
-    var partitionValue: AnyBSON
+    var partitionValue: AnyBSON?
 
     // Tracks User State for App for Multi-User Support
     enum AppState {
@@ -1083,8 +1083,15 @@ private class ObservableAsyncOpenStorage: ObservableObject {
     private func asyncOpenForUser(_ user: User) {
         asyncOpenState = .connecting
 
-        // Use the user configuration by default or set configuration with current user `syncConfiguration`.
-        var config = user.configuration(partitionValue: partitionValue, cancelAsyncOpenOnNonFatalErrors: true)
+        // Set the `syncConfiguration` depending if there is partition value (pbs) or not (flx).
+        var config: Realm.Configuration
+        if let partitionValue = partitionValue {
+            config = user.configuration(partitionValue: partitionValue, cancelAsyncOpenOnNonFatalErrors: true)
+        } else {
+            config = user.flexibleSyncConfiguration()
+        }
+
+        // Use the user configuration by default or set configuration with the current user `syncConfiguration`'s.
         if var configuration = configuration {
             let userSyncConfig = config.syncConfiguration
             configuration.syncConfiguration = userSyncConfig
@@ -1133,7 +1140,7 @@ private class ObservableAsyncOpenStorage: ObservableObject {
         appCancellable = []
     }
 
-    init(asyncOpenKind: AsyncOpenKind, app: App, configuration: Realm.Configuration?, partitionValue: AnyBSON) {
+    init(asyncOpenKind: AsyncOpenKind, app: App, configuration: Realm.Configuration?, partitionValue: AnyBSON?) {
         self.asyncOpenKind = asyncOpenKind
         self.app = app
         self.configuration = configuration
@@ -1232,7 +1239,7 @@ private class ObservableAsyncOpenStorage: ObservableObject {
 ///        .environment(\.realm, realm)
 ///
 @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
-@propertyWrapper public struct AsyncOpen<Partition>: DynamicProperty where Partition: BSON {
+@propertyWrapper public struct AsyncOpen: DynamicProperty {
     @Environment(\.realmConfiguration) var configuration
     @Environment(\.partitionValue) var partitionValue
     @ObservedObject private var storage: ObservableAsyncOpenStorage
@@ -1264,19 +1271,36 @@ private class ObservableAsyncOpenStorage: ObservableObject {
                  user's sync configuration for the given partition value will be set as the `syncConfiguration`,
                  if empty the user configuration will be used.
      - parameter timeout: The maximum number of milliseconds to allow for a connection to
-                 become fully established., if empty or `nil` no connection timeout is set.
+     become fully established., if empty or `nil` no connection timeout is set.
      */
-    public init(appId: String? = nil,
-                partitionValue: Partition,
-                configuration: Realm.Configuration? = nil,
-                timeout: UInt? = nil) {
+    public init<Partition>(appId: String? = nil,
+                           partitionValue: Partition,
+                           configuration: Realm.Configuration? = nil,
+                           timeout: UInt? = nil) where Partition: BSON {
         let app = ObservableAsyncOpenStorage.configureApp(appId: appId, withTimeout: timeout)
         // Store property wrapper values on the storage
         storage = ObservableAsyncOpenStorage(asyncOpenKind: .asyncOpen, app: app, configuration: configuration, partitionValue: AnyBSON(partitionValue))
     }
 
+    /**
+     Initialize the property wrapper for a flexible sync configuration.
+     - parameter appId: The unique identifier of your Realm app, if empty or `nil` will try to retrieve latest singular cached app.
+     - parameter configuration: The `Realm.Configuration` used when creating the Realm,
+                 user's sync configuration for the given partition value will be set as the `syncConfiguration`,
+                 if empty the user configuration will be used.
+     - parameter timeout: The maximum number of milliseconds to allow for a connection to
+                 become fully established., if empty or `nil` no connection timeout is set.
+     */
+    public init(appId: String? = nil,
+                configuration: Realm.Configuration? = nil,
+                timeout: UInt? = nil) {
+        let app = ObservableAsyncOpenStorage.configureApp(appId: appId, withTimeout: timeout)
+        // Store property wrapper values on the storage
+        storage = ObservableAsyncOpenStorage(asyncOpenKind: .asyncOpen, app: app, configuration: configuration, partitionValue: nil)
+    }
+
     public mutating func update() {
-        if let partitionValue = partitionValue as? Partition {
+        if let partitionValue = partitionValue {
             let bsonValue = AnyBSON(partitionValue)
             if storage.partitionValue != bsonValue {
                 storage.partitionValue = bsonValue
@@ -1340,7 +1364,7 @@ private class ObservableAsyncOpenStorage: ObservableObject {
 /// but with the difference of a offline-first approach.
 ///
 @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
-@propertyWrapper public struct AutoOpen<Partition>: DynamicProperty where Partition: BSON {
+@propertyWrapper public struct AutoOpen: DynamicProperty {
     @Environment(\.realmConfiguration) var configuration
     @Environment(\.partitionValue) var partitionValue
     @ObservedObject private var storage: ObservableAsyncOpenStorage
@@ -1374,17 +1398,34 @@ private class ObservableAsyncOpenStorage: ObservableObject {
      - parameter timeout: The maximum number of milliseconds to allow for a connection to
                  become fully established, if empty or `nil` no connection timeout is set.
      */
-    public init(appId: String? = nil,
-                partitionValue: Partition,
-                configuration: Realm.Configuration? = nil,
-                timeout: UInt? = nil) {
+    public init<Partition>(appId: String? = nil,
+                           partitionValue: Partition,
+                           configuration: Realm.Configuration? = nil,
+                           timeout: UInt? = nil) where Partition: BSON {
         let app = ObservableAsyncOpenStorage.configureApp(appId: appId, withTimeout: timeout)
         // Store property wrapper values on the storage
         storage = ObservableAsyncOpenStorage(asyncOpenKind: .autoOpen, app: app, configuration: configuration, partitionValue: AnyBSON(partitionValue))
     }
 
+    /**
+     Initialize the property wrapper for a flexible sync configuration.
+     - parameter appId: The unique identifier of your Realm app, if empty or `nil` will try to retrieve latest singular cached app.
+     - parameter configuration: The `Realm.Configuration` used when creating the Realm,
+                 user's sync configuration for the given partition value will be set as the `syncConfiguration`,
+                 if empty the user configuration will be used.
+     - parameter timeout: The maximum number of milliseconds to allow for a connection to
+                 become fully established., if empty or `nil` no connection timeout is set.
+     */
+    public init(appId: String? = nil,
+                configuration: Realm.Configuration? = nil,
+                timeout: UInt? = nil) {
+        let app = ObservableAsyncOpenStorage.configureApp(appId: appId, withTimeout: timeout)
+        // Store property wrapper values on the storage
+        storage = ObservableAsyncOpenStorage(asyncOpenKind: .asyncOpen, app: app, configuration: configuration, partitionValue: nil)
+    }
+
     public mutating func update() {
-        if let partitionValue = partitionValue as? Partition {
+        if let partitionValue = partitionValue {
             let bsonValue = AnyBSON(partitionValue)
             if storage.partitionValue != bsonValue {
                 storage.partitionValue = bsonValue
