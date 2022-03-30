@@ -124,8 +124,8 @@ NS_ASSUME_NONNULL_BEGIN
  @param partitionValue The `RLMBSON` value the Realm is partitioned on.
  @param clientResetMode Determines file recovery behavior in the event of a client reset.
                         See: https://docs.mongodb.com/realm/sync/error-handling/client-resets/
- @param notifyBeforeReset A callback which notifies prior to a client reset occurring. See: `RLMClientResetBeforeBlock`
- @param notifyAfterReset A callback which notifies after a client reset has occurred. See: `RLMClientResetAfterBlock`
+ @param beforeResetBlock A callback which notifies prior to a client reset occurring. See: `RLMClientResetBeforeBlock`
+ @param afterResetBlock A callback which notifies after a client reset has occurred. See: `RLMClientResetAfterBlock`
  */
 - (RLMRealmConfiguration *)configurationWithPartitionValue:(nullable id<RLMBSON>)partitionValue
                                            clientResetMode:(RLMClientResetMode)clientResetMode
