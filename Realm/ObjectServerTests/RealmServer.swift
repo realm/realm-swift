@@ -293,7 +293,7 @@ class Admin {
                     result = $0
                     group.leave()
                 }
-                guard case .success = group.wait(timeout: .now() + 10) else {
+                guard case .success = group.wait(timeout: .now() + 5) else {
                     return .failure(URLError(.badServerResponse))
                 }
                 return result
@@ -322,10 +322,6 @@ class Admin {
 
             func post(_ data: Any) -> Result<Any?, Error> {
                 request(httpMethod: "POST", data: data)
-            }
-
-            func put(_ data: Any?) -> Result<Any?, Error> {
-                request(httpMethod: "PUT", data: data)
             }
 
             func put(_ completionHandler: @escaping (Result<Any?, Error>) -> Void) {
@@ -734,33 +730,75 @@ public class RealmServer: NSObject {
             "value": "mongodb://localhost:26000"
         ])
 
-        // Create the service with an initial basic configuration, without sync config
-        let appService: Any = [
-            "name": "mongodb1",
-            "type": "mongodb",
-            "config": [
-                "uri": "mongodb://localhost:26000",
+        // Creating the rules is a two-step process where we first add all the
+        // rules and then add properties to them so that we can add relationships
+        let schema = ObjectiveCSupport.convert(object: RLMSchema.shared())
+
+        let appService: Any
+        switch syncMode {
+        case .pbs(let bsonType):
+            appService = [
+                "name": "mongodb1",
+                "type": "mongodb",
+                "config": [
+                    "uri": "mongodb://localhost:26000",
+                    "sync": [
+                        "state": "enabled",
+                        "database_name": "test_data",
+                        "partition": [
+                            "key": "realm_id",
+                            "type": "\(bsonType)",
+                            "required": false,
+                            "permissions": [
+                                "read": true,
+                                "write": true
+                            ]
+                        ]
+                    ]
+                ]
+                ]
+        case .flx(let fields):
+            appService = [
+                "name": "mongodb1",
+                "type": "mongodb",
+                "config": [
+                    "uri": "mongodb://localhost:26000",
+                    "flexible_sync": [
+                        "state": "enabled",
+                        "database_name": "test_data",
+                        "queryable_fields_names": fields,
+                        "permissions": [
+                            "rules": [:],
+                            "defaultRoles": [[
+                                "name": "all",
+                                "applyWhen": [:],
+                                "read": true,
+                                "write": true
+                            ]]
+                        ]
+                    ]
+                ]
             ]
-        ]
+        }
+
         let serviceResponse = app.services.post(appService)
         guard let serviceId = (try serviceResponse.get() as? [String: Any])?["_id"] as? String else {
             throw URLError(.badServerResponse)
         }
 
-        // Creating the rules is a two-step process where we first add all the
-        // rules and then add properties to them so that we can add relationships
-        let schema = ObjectiveCSupport.convert(object: RLMSchema.shared())
-        let syncTypes =  schema.objectSchema.filter {
+        let rules = app.services[serviceId].rules
+
+        let syncTypes: [ObjectSchema]
+        let partitionKeyType: String?
+        syncTypes = schema.objectSchema.filter {
             guard let pk = $0.primaryKeyProperty else { return false }
             return pk.name == "_id"
         }
-        var partitionKeyType: String?
         if case .pbs(let bsonType) = syncMode {
             partitionKeyType = bsonType
+        } else {
+            partitionKeyType = nil
         }
-
-        // Add the schema to the app
-        let rules = app.services[serviceId].rules
         var ruleCreations = [Result<Any?, Error>]()
         for objectSchema in syncTypes {
             ruleCreations.append(rules.post(objectSchema.stitchRule(partitionKeyType, schema)))
@@ -774,56 +812,9 @@ public class RealmServer: NSObject {
             let dict = (data as! [String: String])
             ruleIds[dict["collection"]!] = dict["_id"]!
         }
-
         for objectSchema in syncTypes {
             let id = ruleIds[objectSchema.className]!
-            // Add this to the same DispatchGroup the service calls are using
-            _ = rules[id].put(objectSchema.stitchRule(partitionKeyType, schema, id: id))
-        }
-
-        let appServiceConfig: Any
-        switch syncMode {
-        case .pbs(let bsonType):
-            appServiceConfig = [
-                "uri": "mongodb://localhost:26000",
-                "sync": [
-                    "state": "enabled",
-                    "database_name": "test_data",
-                    "partition": [
-                        "key": "realm_id",
-                        "type": "\(bsonType)",
-                        "required": false,
-                        "permissions": [
-                            "read": true,
-                            "write": true
-                        ]
-                    ]
-                ]
-            ]
-        case .flx(let fields):
-            appServiceConfig = [
-                "uri": "mongodb://localhost:26000",
-                "flexible_sync": [
-                    "state": "enabled",
-                    "database_name": "test_data",
-                    "queryable_fields_names": fields,
-                    "permissions": [
-                        "rules": [:],
-                        "defaultRoles": [[
-                            "name": "all",
-                            "applyWhen": [:],
-                            "read": true,
-                            "write": true
-                        ]]
-                    ]
-                ]
-            ]
-        }
-
-        // Update the service configuration depending if flx or pbs.
-        let serviceConfigResponse = app.services[serviceId].config.patch(appServiceConfig)
-        guard case .success = serviceConfigResponse else {
-            throw URLError(.badServerResponse)
+            rules[id].put(on: group, data: objectSchema.stitchRule(partitionKeyType, schema, id: id), failOnError)
         }
 
         app.sync.config.put(on: group, data: [
