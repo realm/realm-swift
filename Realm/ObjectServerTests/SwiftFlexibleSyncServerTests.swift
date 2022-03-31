@@ -970,10 +970,7 @@ class SwiftAsyncFlexibleSyncTests: SwiftSyncTestCase {
         }
         return super.defaultTestSuite
     }
-}
 
-@available(macOS 12.0, *)
-extension SwiftFlexibleSyncServerTests {
     @MainActor
     private func populateFlexibleSyncData(_ block: @escaping (Realm) -> Void) async throws {
         var config = (try await self.flexibleSyncApp.login(credentials: .anonymous)).flexibleSyncConfiguration()
@@ -1025,7 +1022,6 @@ extension SwiftFlexibleSyncServerTests {
             })
         }
 
-        waitForDownloads(for: realm)
         checkCount(expected: 6, realm, SwiftPerson.self)
     }
 
