@@ -2771,6 +2771,7 @@ class CombineProjectionPublisherTests: CombinePublisherTestCase {
     }
 }
 
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 class CombineAsyncRealmTests: CombinePublisherTestCase {
     func testWillChangeLocalWrite() {
         let asyncWriteExpectation = expectation(description: "Should complete async write")
