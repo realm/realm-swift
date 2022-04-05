@@ -677,7 +677,7 @@ import Realm.Private
 
      - see: `Object.primaryKey()`
 
-     - parameter type: The type of the object to be returned.
+     - parameter type: The type of the object to be returned. You cannot specify a Float or a Double as a Primary Key.
      - parameter key:  The primary key of the desired object.
 
      - returns: An object of type `type`, or `nil` if no instance with the given primary key exists.
