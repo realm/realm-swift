@@ -999,16 +999,20 @@ class RealmTests: TestCase {
 
     func testAsyncTransactionShouldWriteOnCommit() {
         let realm = try! Realm()
-        let asyncComplete = expectation(description: "async transaction complete")
-        realm.beginAsyncWrite({ _ in
-            realm.create(SwiftStringObject.self, value: ["string"])
+        let writeComplete = expectation(description: "async transaction complete")
 
-            realm.commitAsyncWrite { _ in
-                let object = realm.objects(SwiftStringObject.self).first
-                XCTAssertEqual(object?.stringCol, "string")
-                asyncComplete.fulfill()
-            }
-        })
+        DispatchQueue.main.async {
+            let realm = try! Realm()
+            realm.beginAsyncWrite({ _ in
+                realm.create(SwiftStringObject.self, value: ["string"])
+
+                realm.commitAsyncWrite { _ in
+                    let object = realm.objects(SwiftStringObject.self).first
+                    XCTAssertEqual(object?.stringCol, "string")
+                    writeComplete.fulfill()
+                }
+            })
+        }
 
         waitForExpectations(timeout: 1, handler: nil)
         XCTAssertEqual(realm.objects(SwiftStringObject.self).count, 1)
