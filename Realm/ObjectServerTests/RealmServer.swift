@@ -415,7 +415,7 @@ public enum SyncMode {
  A sandboxed server. This singleton launches and maintains all server processes
  and allows for app creation.
  */
-@available(OSX 10.13, *)
+@available(OSX 10.15.4, *)
 @objc(RealmServer)
 public class RealmServer: NSObject {
     public enum LogLevel {
@@ -584,43 +584,58 @@ public class RealmServer: NSObject {
         ]
 
         let pipe = Pipe()
+        let url = FileManager.default.urls(for: .documentDirectory, in: .allDomainsMask).first!.appendingPathComponent("server_logs.txt")
+        if FileManager.default.fileExists(atPath: url.path) {
+            try! FileManager.default.removeItem(atPath: url.path)
+        }
+        guard FileManager.default.createFile(atPath: url.path, contents: Data()) else {
+            fatalError()
+        }
+        let handle = FileHandle(forWritingAtPath: url.path)!
+//        pipe.fileHandleForReading = FileHandle(forWritingAtPath: "~/Desktop/logs.txt")
         pipe.fileHandleForReading.readabilityHandler = { file in
-            guard file.availableData.count > 0,
-                  let available = String(data: file.availableData, encoding: .utf8)?.split(separator: "\t") else {
+            guard file.availableData.count > 0 else {
                 return
             }
-
-            // prettify server output
-            var parts = [String]()
-            for part in available {
-                if part.contains("INFO") {
-                    guard self.logLevel == .info else {
-                        return
-                    }
-                    parts.append("🔵")
-                } else if part.contains("DEBUG") {
-                    guard self.logLevel == .info || self.logLevel == .warn else {
-                        return
-                    }
-                    parts.append("🟡")
-                } else if part.contains("ERROR") {
-                    parts.append("🔴")
-                } else if let json = try? JSONSerialization.jsonObject(with: part.data(using: .utf8)!) {
-                    parts.append(String(data: try! JSONSerialization.data(withJSONObject: json,
-                                                                       options: .prettyPrinted),
-                                  encoding: .utf8)!)
-                } else if !part.isEmpty {
-                    parts.append(String(part))
-                }
-            }
-            print(parts.joined(separator: "\t"))
+            try! handle.write(contentsOf: file.availableData)
+            try! handle.write(contentsOf: "\n".data(using: .utf8)!)
+//            guard file.availableData.count > 0,
+//                  let available = String(data: file.availableData, encoding: .utf8)?.split(separator: "\t") else {
+//                return
+//            }
+//
+//            // prettify server output
+//            var parts = [String]()
+//            for part in available {
+//                if part.contains("INFO") {
+//                    guard self.logLevel == .info else {
+//                        return
+//                    }
+//                    parts.append("🔵")
+//                } else if part.contains("DEBUG") {
+//                    guard self.logLevel == .info || self.logLevel == .warn else {
+//                        return
+//                    }
+//                    parts.append("🟡")
+//                } else if part.contains("ERROR") {
+//                    parts.append("🔴")
+//                } else if let json = try? JSONSerialization.jsonObject(with: part.data(using: .utf8)!) {
+//                    parts.append(String(data: try! JSONSerialization.data(withJSONObject: json,
+//                                                                       options: .prettyPrinted),
+//                                  encoding: .utf8)!)
+//                } else if !part.isEmpty {
+//                    parts.append(String(part))
+//                }
+//            }
+//            print(parts.joined(separator: "\t"))
         }
 
-        if logLevel != .none {
+//        if logLevel != .none {
             serverProcess.standardOutput = pipe
-        } else {
-            serverProcess.standardOutput = nil
-        }
+//        } else {
+
+//        serverProcess.standardOutput =
+//        }
 
         try serverProcess.run()
         waitForServerToStart()
@@ -794,7 +809,7 @@ public class RealmServer: NSObject {
         } else {
             // This is a temporary workaround for not been able to add the complete schema for a flx App
             syncTypes = schema.objectSchema.filter {
-                let validSyncClasses = ["Dog", "Person", "SwiftPerson", "SwiftTypesSyncObject"]
+                let validSyncClasses = ["Dog", "Person", "SwiftPerson", "SwiftTypesSyncObject", "SwiftCollectionSyncObject"]
                 return validSyncClasses.contains($0.className)
             }
             partitionKeyType = nil
