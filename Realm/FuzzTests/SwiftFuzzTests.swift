@@ -267,6 +267,29 @@ extension Object {
     }
 }
 
+extension RLMObject {
+    var primaryKeyValue: String? {
+        if objectSchema.primaryKeyProperty != nil {
+            let pk = RLMDynamicGetByName(self, self.objectSchema.primaryKeyProperty!.name)
+            return {
+                switch self.objectSchema.primaryKeyProperty!.type {
+                case .string:
+                    return pk as? String
+                case .objectId:
+                    return (pk as! ObjectId).stringValue
+                case .UUID:
+                    return (pk as! UUID).uuidString
+                case .int:
+                    return String(pk as! Int)
+                default: fatalError("invalid primary key type")
+                }
+            }()
+        } else {
+            return nil
+        }
+    }
+}
+
 extension AnyRealmValue {
     static var randomValue: AnyRealmValue {
         return [
@@ -590,15 +613,23 @@ func modifyInRealm(with configuration: RLMRealmConfiguration) throws {
                             RLMDynamicValidatedSet(object, property.name, newValue)
                         case .object:
                             let oldValue = RLMDynamicGetByName(object, property.name)
+                            var newValue: Object? = nil
+                            if Bool.random() /* take random element from object type */ {
+                                newValue = realm.dynamicObjects(property.objectClassName!).randomElement()
+                            } else if Bool.random() /* create new object */ {
+                                newValue = realm.dynamicCreate(property.objectClassName!,
+                                                               value: generateObject(for: realm.schema.objectSchema.first { $0.className == property.objectClassName }!, fullSchema: realm.schema.objectSchema),
+                                                               update: .all)
+                            }
                             try! opRealm.write {
                                 opRealm.add(Operation(action: .modify,
                                                       objectName: object.objectSchema.className,
                                                       primaryKey: object.primaryKeyValue,
                                                       propertyModified: property.name,
-                                                      originalValue: oldValue == nil ? .none : .object(oldValue as! Object),
-                                                      newValue: .none))
+                                                      originalValue: oldValue == nil ? .none : .string((oldValue as! RLMObject).primaryKeyValue!),
+                                                      newValue: newValue == nil ? .none : .string(newValue!.primaryKeyValue!)))
                             }
-                            RLMDynamicValidatedSet(object, property.name, nil)
+                            RLMDynamicValidatedSet(object, property.name, newValue)
                         case .date:
                             let oldValue = RLMDynamicGetByName(object, property.name)
                             let newValue = Date()
@@ -670,7 +701,7 @@ class SwiftFuzzTests: SwiftSyncTestCase {
 
     func testCRUD() async throws {
         self.flexibleSyncApp.syncManager.errorHandler = { error, session in
-            fatalError(error.localizedDescription)
+            print(error.localizedDescription)
         }
         FileManager.default.createFile(atPath: Realm.Configuration.defaultConfiguration.fileURL!.deletingLastPathComponent().appendingPathComponent("client_logs.txt").path, contents: Data())
 
