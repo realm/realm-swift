@@ -53,7 +53,7 @@ private func generateObjectSchema(objectSchemas: inout [RLMObjectSchema]) {
 
 func generateSchema() -> RLMSchema {
     var objectSchemas: [RLMObjectSchema] = []
-    (3...Int.random(in: 3...10)).forEach { _ in
+    (3...Int.random(in: 15...30)).forEach { _ in
         generateObjectSchema(objectSchemas: &objectSchemas)
     }
     let schema = RLMSchema()
@@ -332,7 +332,7 @@ func addToRealm(with configuration: RLMRealmConfiguration) throws {
             let strPk: String = {
                 switch schema.primaryKeyProperty!.type {
                 case .string: return pk as! String
-                case .objectId: return (pk as! ObjectId).stringValue
+                case .objectId: return (pk as? ObjectId)?.stringValue ?? "nil"
                 case .UUID: return (pk as! UUID).uuidString
                 case .int: return String(pk as! Int)
                 default: fatalError()
@@ -589,7 +589,9 @@ func modifyInRealm(with configuration: RLMRealmConfiguration) throws {
                     }
 
                     if property.isArray {
-                        modifyArray(realm: &realm, object: object, property: property)
+                        for _ in 0..<Int.random(in: 1...10) {
+                            modifyArray(realm: &realm, object: object, property: property)
+                        }
                     } else if property.isSet {
                         // TODO: Uncomment when #5387 is fixed
                         // modifySet(realm: &realm, object: object, property: property)
@@ -668,11 +670,19 @@ func modifyInRealm(with configuration: RLMRealmConfiguration) throws {
                                                                update: .all)
                             }
                             try! opRealm.write {
+                                let pk: String?
+                                if let oldValue = oldValue as? RLMObject {
+                                    pk = oldValue.primaryKeyValue!
+                                } else if let oldValue = oldValue as? Object {
+                                    pk = oldValue.primaryKeyValue!
+                                } else {
+                                    pk = nil
+                                }
                                 opRealm.add(Operation(action: .modify,
                                                       objectName: object.objectSchema.className,
                                                       primaryKey: object.primaryKeyValue,
                                                       propertyModified: property.name,
-                                                      originalValue: oldValue == nil ? .none : .string((oldValue as! RLMObject).primaryKeyValue!),
+                                                      originalValue: oldValue == nil ? .none : .string(pk!),
                                                       newValue: newValue == nil ? .none : .string(newValue!.primaryKeyValue!)))
                             }
                             RLMDynamicValidatedSet(object, property.name, newValue)
@@ -712,24 +722,13 @@ func modifyInRealm(with configuration: RLMRealmConfiguration) throws {
     }
 }
 
-var workQueues = [
-    DispatchQueue(label: "1"),
-    DispatchQueue(label: "2"),
-    DispatchQueue(label: "3"),
-    DispatchQueue(label: "4"),
-    DispatchQueue(label: "5"),
-    DispatchQueue(label: "6"),
-    DispatchQueue(label: "7"),
-    DispatchQueue(label: "8")
-]
-
 // MARK: Tests
 
 @available(macOS 12.0.0, *)
 class SwiftFuzzTests: SwiftSyncTestCase {
     private let generatedSchema = generateSchema()
     override var schema: RLMSchema {
-        generatedSchema
+        return RLMSchema(objectClasses: [SwiftPerson.self, SwiftCollectionSyncObject.self, SwiftTypesSyncObject.self])
     }
 
     override class var defaultTestSuite: XCTestSuite {
@@ -761,7 +760,7 @@ class SwiftFuzzTests: SwiftSyncTestCase {
             try await self.flexibleSyncApp.emailPasswordAuth.registerUser(email: username, password: "kingkong")
             let config = try await self.flexibleSyncApp.login(credentials: .emailPassword(email: username, password: "kingkong")).flexibleSyncConfiguration()
             let configuration = RLMRealmConfiguration()
-            configuration.customSchema = generatedSchema
+            configuration.customSchema = self.schema
             configuration.syncConfiguration = ObjectiveCSupport.convert(object:  config.syncConfiguration!)
             let rlmRealm = try RLMRealm(configuration: configuration)
             await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
@@ -778,14 +777,18 @@ class SwiftFuzzTests: SwiftSyncTestCase {
             return rlmRealm
         }
 
-        let realm1 = try await flxRealm()
-        let realm2 = try await flxRealm()
-        let realm3 = try await flxRealm()
+        var realms = [RLMRealm]()
+        for _ in (0..<3) { realms.append(try await flxRealm()) }
 
         for i in 0..<1000 {
             print(i)
             print("setting up operations")
-            [realm1, realm2, realm3].map { realm -> [DispatchWorkItem] in
+            var workQueues = realms.map { realm in
+                (0..<2).map { i in // each realm gets 2 work queues
+                    DispatchQueue(label: "\(realm.configuration.syncConfiguration!.user.id).\(i)")
+                }
+            }
+            realms.map { realm -> [DispatchWorkItem] in
                 let workItems = (0..<1000).map { _ in
                     DispatchWorkItem {
                         switch RealmAction.allCases.randomElement()! {
@@ -800,10 +803,78 @@ class SwiftFuzzTests: SwiftSyncTestCase {
                         }
                     }
                 }
+                var queues = workQueues.popLast()!
                 workItems.forEach { item in
-                    let first = workQueues.removeFirst()
+                    let first = queues.removeFirst()
                     first.async(execute: item)
-                    workQueues.append(first)
+                    queues.append(first)
+                }
+                print("waiting")
+                return workItems
+            }.flatMap { $0 }
+            .forEach {
+                $0.wait()
+            }
+        }
+    }
+
+    func testQuickAddAndDelete() async throws {
+        self.flexibleSyncApp.syncManager.errorHandler = { error, session in
+            print(error.localizedDescription)
+        }
+        FileManager.default.createFile(atPath: Realm.Configuration.defaultConfiguration.fileURL!.deletingLastPathComponent().appendingPathComponent("client_logs.txt").path, contents: Data())
+
+        self.flexibleSyncApp.syncManager.logLevel = .all
+        self.flexibleSyncApp.syncManager.logger = { level, message in
+            try! SwiftFuzzTests.handle.write(contentsOf: message.data(using: .utf8)!)
+            try! SwiftFuzzTests.handle.write(contentsOf: "\n".data(using: .utf8)!)
+        }
+        func flxRealm() async throws -> RLMRealm {
+            let username = "\(randomString(of: 24))@icloud.com"
+            try await self.flexibleSyncApp.emailPasswordAuth.registerUser(email: username, password: "kingkong")
+            let config = try await self.flexibleSyncApp.login(credentials: .emailPassword(email: username, password: "kingkong")).flexibleSyncConfiguration()
+            let configuration = RLMRealmConfiguration()
+            configuration.customSchema = self.schema
+            configuration.syncConfiguration = ObjectiveCSupport.convert(object:  config.syncConfiguration!)
+            let rlmRealm = try RLMRealm(configuration: configuration)
+            await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+                let rlmRealm = try! RLMRealm(configuration: configuration)
+                let subscriptions = rlmRealm.subscriptions
+                subscriptions.write({
+                    rlmRealm.schema.objectSchema.forEach {
+                        subscriptions.addSubscription(withClassName: $0.className, predicate: NSPredicate(format: "TRUEPREDICATE"))
+                    }
+                }, onComplete: { _ in
+                    continuation.resume()
+                })
+            }
+            return rlmRealm
+        }
+
+        var realms = [RLMRealm]()
+        for _ in (0..<3) { realms.append(try await flxRealm()) }
+
+        for i in 0..<1000 {
+            print(i)
+            print("setting up operations")
+            var workQueues = realms.map { realm in
+                (0..<2).map { i in // each realm gets 2 work queues
+                    DispatchQueue(label: "\(realm.configuration.syncConfiguration!.user.id).\(i)")
+                }
+            }
+            realms.map { realm -> [DispatchWorkItem] in
+                let workItems = (0..<1000).map { _ in
+                    DispatchWorkItem {
+                        try! addToRealm(with: realm.configuration)
+                        try! modifyInRealm(with: realm.configuration)
+                        try! removeFromRealm(with: realm.configuration)
+                    }
+                }
+                var queues = workQueues.popLast()!
+                workItems.forEach { item in
+                    let first = queues.removeFirst()
+                    first.async(execute: item)
+                    queues.append(first)
                 }
                 print("waiting")
                 return workItems
@@ -840,6 +911,18 @@ class SwiftFuzzTests: SwiftSyncTestCase {
         let realm3 = try await flxRealm()
 
         for i in 0..<1000 {
+
+            var workQueues = [
+                [DispatchQueue(label: "1"),
+                DispatchQueue(label: "2"),
+                DispatchQueue(label: "3")],
+                [DispatchQueue(label: "4"),
+                DispatchQueue(label: "5"),
+                DispatchQueue(label: "6")],
+                [DispatchQueue(label: "7"),
+                DispatchQueue(label: "8"),
+                DispatchQueue(label: "9")],
+            ]
             print(i)
             print("setting up operations")
             [realm1, realm2, realm3].map { realm -> [DispatchWorkItem] in
@@ -857,10 +940,11 @@ class SwiftFuzzTests: SwiftSyncTestCase {
                         }
                     }
                 }
+                var queues = workQueues.popLast()!
                 workItems.forEach { item in
-                    let first = workQueues.removeFirst()
+                    let first = queues.removeFirst()
                     first.async(execute: item)
-                    workQueues.append(first)
+                    queues.append(first)
                 }
                 print("waiting")
                 return workItems
@@ -868,26 +952,6 @@ class SwiftFuzzTests: SwiftSyncTestCase {
             .forEach {
                 $0.wait()
             }
-        }
-    }
-
-    // Bug replication discovered while testing
-    func testSetAddAndDelete() {
-        let realm = try! Realm()
-        let collectionObject = SwiftCollectionSyncObject()
-        let personObject = SwiftPerson()
-        try! realm.write {
-            realm.add(collectionObject)
-            realm.add(personObject)
-        }
-        try! realm.write {
-            collectionObject.objectSet.insert(personObject)
-        }
-        try! realm.write {
-            realm.delete(collectionObject)
-        }
-        try! realm.write {
-            realm.delete(personObject)
         }
     }
 }
