@@ -9,46 +9,116 @@ import XCTest
 import RealmSwiftSyncTestSupport
 import RealmSyncTestSupport
 import RealmTestSupport
-import SwiftUI
 #endif
 
 // MARK: Schemagen
-// TODO: This code is not currently used. Creating an app with RealmServer.swift
-// TODO: needs to support custom schema, which is a trivial amount of work
-// TODO: I just haven't gotten to yet.
 
-func generateProperty(objectSchemas: [RLMObjectSchema]) -> RLMProperty {
-    let type = RLMPropertyType(rawValue: (0...RLMPropertyType.UUID.rawValue).randomElement()!)!
+func generateProperty(objectSchemas: [RLMObjectSchema], objectName: String) -> RLMProperty {
+    var allowedPropertyTypes = (0...RLMPropertyType.UUID.rawValue).map { $0 }
+    // TODO: Re-enable linking objects at later date
+    allowedPropertyTypes.remove(at: Int(RLMPropertyType.linkingObjects.rawValue))
+    let type = RLMPropertyType(rawValue: allowedPropertyTypes.randomElement()!)!
     let isCollection = Bool.random()
     let isIndexable: Bool =
         !isCollection && (type == .int || type == .bool || type == .date ||
         type == .string || type == .objectId || type == .UUID ||
         type == .any)
+    let isOptional = type == .object && !isCollection ? true : isCollection ? false : Bool.random()
     let property = RLMProperty(name: randomString(Int.random(in: 3..<60)),
                                type: type,
-                               objectClassName: type == .object ? objectSchemas.randomElement()!.objectName : nil, linkOriginPropertyName: nil,
+                               objectClassName: type == .object ? objectSchemas.randomElement()?.objectName ?? objectName : nil,
+                               linkOriginPropertyName: nil,
                                indexed: isIndexable ? Bool.random() : false,
-                               optional: type == .object || isCollection ? true : Bool.random())
+                               optional: isOptional)
     property.array = isCollection
     return property
 }
 
-private func generateObject(objectSchemas: inout [RLMObjectSchema]) {
-    objectSchemas.append(
-        RLMObjectSchema(className: randomString(Int.random(in: 3..<60)),
-                        objectClass: RLMObject.self,
-                        properties: (0..<Int.random(in: 1..<30)).map { _ in generateProperty(objectSchemas: objectSchemas) })
-    )
+private func generateObjectSchema(objectSchemas: inout [RLMObjectSchema]) {
+    let name = randomString(Int.random(in: 3..<30))
+    let schema = RLMObjectSchema(className: name,
+                                 objectClass: RLMObject.self,
+                                 properties: (0..<Int.random(in: 1..<30)).map { _ in generateProperty(objectSchemas: objectSchemas, objectName: name) })
+    let pk = RLMProperty(name: "_id",
+                         type: [.int, .string, .objectId, .UUID].randomElement()!,
+                         objectClassName: nil,
+                         linkOriginPropertyName: nil,
+                         indexed: Bool.random(),
+                         optional: false)
+    schema.properties.append(pk)
+    schema.primaryKeyProperty = pk
+
+    objectSchemas.append(schema)
 }
 
 func generateSchema() -> RLMSchema {
     var objectSchemas: [RLMObjectSchema] = []
-    (0..<Int.random(in: 1..<10)).forEach { _ in
-        generateObject(objectSchemas: &objectSchemas)
+    (3...Int.random(in: 3...10)).forEach { _ in
+        generateObjectSchema(objectSchemas: &objectSchemas)
     }
     let schema = RLMSchema()
     schema.objectSchema = objectSchemas
     return schema
+}
+
+func generateList<T: RealmCollectionValue>(_ generator: () -> T) -> List<T> {
+    (0..<256).reduce(into: List<T>()) { partialResult, _ in
+        partialResult.append(generator())
+    }
+}
+
+func generateObject(for schema: ObjectSchema, fullSchema: [ObjectSchema]) -> [String: Any] {
+    schema.properties.reduce(into: [String: Any]()) { dict, property in
+        if !property.isOptional {
+            switch property.type {
+            case .int:
+                dict[property.name] =
+                property.isArray ? generateList {
+                    Int.random(in: Int.min...Int.max)
+                } : Int.random(in: Int.min...Int.max)
+            case .bool:
+                dict[property.name] =
+                property.isArray ? generateList { Bool.random() } : Bool.random()
+            case .float:
+                dict[property.name] =
+                property.isArray ? generateList {
+                    Float.random(in: Float.leastNormalMagnitude...Float.greatestFiniteMagnitude)
+                } : Float.random(in: Float.leastNormalMagnitude...Float.greatestFiniteMagnitude)
+            case .double:
+                dict[property.name] =
+                property.isArray ? generateList {
+                    Double.random(in: Double.leastNormalMagnitude...Double.greatestFiniteMagnitude)
+                } : Double.random(in: Double.leastNormalMagnitude...Double.greatestFiniteMagnitude)
+            case .UUID:
+                dict[property.name] = property.isArray ? generateList { UUID() } : UUID()
+            case .string:
+                dict[property.name] = property.isArray ?
+                    generateList { randomString(of: 256) } : randomString(of: 256)
+            case .data:
+                dict[property.name] = property.isArray ?
+                generateList { randomString(of: 256).data(using: .utf8)! } : randomString(of: 256).data(using: .utf8)!
+            case .any:
+                dict[property.name] = property.isArray ?
+                    generateList { AnyRealmValue.randomValue } : AnyRealmValue.randomValue
+            case .date:
+                dict[property.name] = property.isArray ?
+                    generateList { Date() } : Date()// TODO: make more random
+            case .objectId:
+                dict[property.name] = property.isArray ?
+                    generateList { ObjectId.generate() } : ObjectId.generate()
+            case .decimal128:
+                dict[property.name] = property.isArray ?
+                generateList {
+                    Decimal128(floatLiteral: Double.random(in: Double.leastNormalMagnitude...Double.greatestFiniteMagnitude)) } :
+                Decimal128(floatLiteral: Double.random(in: Double.leastNormalMagnitude...Double.greatestFiniteMagnitude))
+            case .object:
+                dict[property.name] = property.isArray ? [String: Any]() :
+                    Bool.random() ? generateObject(for: fullSchema.first { $0.className == property.objectClassName }!,
+                                                   fullSchema: fullSchema) : nil
+            default: fatalError()
+            }
+        }
+    }
 }
 
 // MARK: OpLog
@@ -165,18 +235,6 @@ func operationRealm(for user: User) -> Realm {
 
 // MARK: Utils
 
-let allSwiftObjectTypes = [
-    SwiftPerson.self,
-    SwiftTypesSyncObject.self,
-    SwiftCollectionSyncObject.self
-]
-
-/// Create an unmanaged object of one of the hardcoded object types.
-// TODO: Have this use the dynamic schema once implemented.
-func randomSwiftObject() -> Object {
-    allSwiftObjectTypes.randomElement()!.init()
-}
-
 func randomString(of length: Int) -> String {
     let letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
     var s = ""
@@ -227,42 +285,53 @@ extension AnyRealmValue {
 // MARK: Operations
 
 /// Read all properties of all objects for a given realm
-func readFromRealm(with configuration: Realm.Configuration) throws {
-    let realm = try Realm(configuration: configuration)
-    for type in allSwiftObjectTypes {
-        realm.objects(type).forEach {
-            Mirror(reflecting: $0).children.forEach {
-                _ = $0.value
+func readFromRealm(with configuration: RLMRealmConfiguration) throws {
+    let realm = ObjectiveCSupport.convert(object: try RLMRealm(configuration: configuration))
+    for type in realm.schema.objectSchema {
+        realm.dynamicObjects(type.className).forEach { object in
+            object.objectSchema.properties.forEach {
+                _ = object[$0.name]
             }
         }
     }
 }
 
 /// Add a new random managed object to a given realm
-func addToRealm(with configuration: Realm.Configuration) throws {
-    let realm = try Realm(configuration: configuration)
+func addToRealm(with configuration: RLMRealmConfiguration) throws {
+    let realm = ObjectiveCSupport.convert(object: try RLMRealm(configuration: configuration))
     try realm.write {
-        let obj = randomSwiftObject()
-        if obj.objectSchema.primaryKeyProperty != nil {
-            realm.add(obj, update: .all)
+        let schema = realm.schema.objectSchema.randomElement()!
+        let object = generateObject(for: schema, fullSchema: realm.schema.objectSchema)
+        if schema.primaryKeyProperty != nil {
             let opRealm = operationRealm(for: configuration.syncConfiguration!.user)
+            let pk = object[schema.primaryKeyProperty!.name]
+            let strPk: String = {
+                switch schema.primaryKeyProperty!.type {
+                case .string: return pk as! String
+                case .objectId: return (pk as! ObjectId).stringValue
+                case .UUID: return (pk as! UUID).uuidString
+                case .int: return String(pk as! Int)
+                default: fatalError()
+                }
+            }()
             try opRealm.write {
                 opRealm.add(Operation(action: .add,
-                                      objectName: obj.objectSchema.className,
-                                      primaryKey: obj.primaryKeyValue))
+                                      objectName: schema.className,
+                                      primaryKey: strPk))
             }
+            realm.dynamicCreate(schema.className, value: object, update: .all)
         } else {
-            realm.add(obj)
+            realm.dynamicCreate(schema.className, value: object)
         }
     }
 }
 
 /// Remove a random object of each type for a given realm
-func removeFromRealm(with configuration: Realm.Configuration) throws {
-    let realm = try Realm(configuration: configuration)
+func removeFromRealm(with configuration: RLMRealmConfiguration) throws {
+    let realm = ObjectiveCSupport.convert(object: try RLMRealm(configuration: configuration))
     try realm.write {
-        for type in allSwiftObjectTypes {
-            if let object = realm.objects(type).randomElement() {
+        for type in realm.schema.objectSchema {
+            if let object = realm.dynamicObjects(type.className).randomElement() {
                 let opRealm = operationRealm(for: configuration.syncConfiguration!.user)
                 try! opRealm.write {
                     opRealm.add(Operation(action: .remove,
@@ -284,13 +353,16 @@ private func modifyArray(realm: inout Realm, object: Object, property: Property)
         case .add:
             let randomElement = realm.dynamicObjects(property.objectClassName!).randomElement()
             if randomElement == nil || Bool.random() {
-                let newObject = realm.dynamicCreate(property.objectClassName!)
+                let generatedObject = generateObject(for: realm.schema.objectSchema.first { $0.className == property.objectClassName! }!,
+                                               fullSchema: realm.schema.objectSchema)
+                let newObject = realm.dynamicCreate(property.objectClassName!, value: generatedObject, update: .all)
                 try! opRealm.write {
                     opRealm.add(Operation(action: .modify,
                                           objectName: object.objectSchema.className,
                                           primaryKey: object.primaryKeyValue,
                                           propertyModified: property.name,
-                                          listOperation: ListOperation(action: .add, affectedObjectPrimaryKeys: [newObject.primaryKeyValue!], didAddExistingObject: false, indicesAffected: [])))
+                                          listOperation: ListOperation(action: .add, affectedObjectPrimaryKeys: [newObject.primaryKeyValue!],
+                                                                       didAddExistingObject: false, indicesAffected: [])))
                 }
                 oldValue.add(newObject)
             } else {
@@ -330,6 +402,51 @@ private func modifyArray(realm: inout Realm, object: Object, property: Property)
                                           primaryKey: object.primaryKeyValue,
                                           propertyModified: property.name,
                                           listOperation: ListOperation(action: .remove, affectedObjectPrimaryKeys: [affectedObject.primaryKeyValue!], didAddExistingObject: false, indicesAffected: [Int(idx)])))
+                }
+                oldValue.removeObject(at: idx)
+            }
+        }
+    case .int:
+        let oldValue = RLMDynamicGetByName(object, property.name) as! RLMArray<NSNumber>
+        switch ListAction.allCases.randomElement()! {
+        case .add:
+            let newObject = Int.random(in: Int.min ... Int.max)
+            try! opRealm.write {
+                opRealm.add(Operation(action: .modify,
+                                      objectName: object.objectSchema.className,
+                                      primaryKey: object.primaryKeyValue,
+                                      propertyModified: property.name,
+                                      listOperation: ListOperation(action: .add,
+                                                                   affectedObjectPrimaryKeys: [],
+                                                                   didAddExistingObject: false,
+                                                                   indicesAffected: [])))
+            }
+            oldValue.add(NSNumber(integerLiteral: newObject))
+        case .move:
+            if oldValue.count > 0 {
+                let idx1 = UInt.random(in: 0..<oldValue.count)
+                let idx2 = UInt.random(in: 0..<oldValue.count)
+                try! opRealm.write {
+                    opRealm.add(Operation(action: .modify,
+                                          objectName: object.objectSchema.className,
+                                          primaryKey: object.primaryKeyValue,
+                                          propertyModified: property.name,
+                                          listOperation: ListOperation(action: .move, affectedObjectPrimaryKeys: [],
+                                                                       didAddExistingObject: false, indicesAffected: [Int(idx1), Int(idx2)])))
+                }
+                oldValue.moveObject(at: idx1,
+                                    to: idx2)
+            }
+        case .remove:
+            if oldValue.count > 0 {
+                let idx = UInt.random(in: 0..<oldValue.count)
+                try! opRealm.write {
+                    opRealm.add(Operation(action: .modify,
+                                          objectName: object.objectSchema.className,
+                                          primaryKey: object.primaryKeyValue,
+                                          propertyModified: property.name,
+                                          listOperation: ListOperation(action: .remove, affectedObjectPrimaryKeys: [],
+                                                                       didAddExistingObject: false, indicesAffected: [Int(idx)])))
                 }
                 oldValue.removeObject(at: idx)
             }
@@ -387,13 +504,13 @@ private func modifySet(realm: inout Realm, object: Object, property: Property) {
 }
 
 /// For each type in a realm, modify all properties of a random object of a given realm
-func modifyInRealm(with configuration: Realm.Configuration) throws {
-    var realm = try Realm(configuration: configuration)
+func modifyInRealm(with configuration: RLMRealmConfiguration) throws {
+    var realm = ObjectiveCSupport.convert(object: try RLMRealm(configuration: configuration))
     // for each type in schema
-    for type in allSwiftObjectTypes {
+    for type in realm.schema.objectSchema {
         try! realm.write {
             // modify all properties of a random object of each type
-            if let object = realm.objects(type).randomElement() {
+            if let object = realm.dynamicObjects(type.className).randomElement() {
                 object.objectSchema.properties.forEach { property in
                     // Modifying the primaryKey is not supported in general,
                     // and modifying a map is not supported by the fuzz suite yet
@@ -419,7 +536,7 @@ func modifyInRealm(with configuration: Realm.Configuration) throws {
                                                       objectName: object.objectSchema.className,
                                                       primaryKey: object.primaryKeyValue,
                                                       propertyModified: property.name,
-                                                      originalValue: .int(oldValue as! Int),
+                                                      originalValue: oldValue == nil ? .none : .int(oldValue as! Int),
                                                       newValue: .int(newValue)))
                             }
                             RLMDynamicValidatedSet(object, property.name, newValue)
@@ -431,7 +548,7 @@ func modifyInRealm(with configuration: Realm.Configuration) throws {
                                                       objectName: object.objectSchema.className,
                                                       primaryKey: object.primaryKeyValue,
                                                       propertyModified: property.name,
-                                                      originalValue: .bool(oldValue as! Bool),
+                                                      originalValue: oldValue == nil ? .none : .bool(oldValue as! Bool),
                                                       newValue: .bool(newValue)))
                             }
                             RLMDynamicValidatedSet(object, property.name, newValue)
@@ -443,7 +560,7 @@ func modifyInRealm(with configuration: Realm.Configuration) throws {
                                                       objectName: object.objectSchema.className,
                                                       primaryKey: object.primaryKeyValue,
                                                       propertyModified: property.name,
-                                                      originalValue: .string(oldValue as! String),
+                                                      originalValue: oldValue == nil ? .none : .string(oldValue as! String),
                                                       newValue: .string(newValue)))
                             }
                             RLMDynamicValidatedSet(object, property.name, newValue)
@@ -455,7 +572,7 @@ func modifyInRealm(with configuration: Realm.Configuration) throws {
                                                       objectName: object.objectSchema.className,
                                                       primaryKey: object.primaryKeyValue,
                                                       propertyModified: property.name,
-                                                      originalValue: .uuid(oldValue as! UUID),
+                                                      originalValue: oldValue == nil ? .none : .uuid(oldValue as! UUID),
                                                       newValue: .uuid(newValue)))
                             }
                             RLMDynamicValidatedSet(object, property.name, newValue)
@@ -467,7 +584,7 @@ func modifyInRealm(with configuration: Realm.Configuration) throws {
                                                       objectName: object.objectSchema.className,
                                                       primaryKey: object.primaryKeyValue,
                                                       propertyModified: property.name,
-                                                      originalValue: .objectId(oldValue as! ObjectId),
+                                                      originalValue: oldValue == nil ? .none : .objectId(oldValue as! ObjectId),
                                                       newValue: .objectId(newValue)))
                             }
                             RLMDynamicValidatedSet(object, property.name, newValue)
@@ -478,7 +595,7 @@ func modifyInRealm(with configuration: Realm.Configuration) throws {
                                                       objectName: object.objectSchema.className,
                                                       primaryKey: object.primaryKeyValue,
                                                       propertyModified: property.name,
-                                                      originalValue: oldValue != nil ? .object(oldValue as! Object) : .none,
+                                                      originalValue: oldValue == nil ? .none : .object(oldValue as! Object),
                                                       newValue: .none))
                             }
                             RLMDynamicValidatedSet(object, property.name, nil)
@@ -490,7 +607,7 @@ func modifyInRealm(with configuration: Realm.Configuration) throws {
                                                       objectName: object.objectSchema.className,
                                                       primaryKey: object.primaryKeyValue,
                                                       propertyModified: property.name,
-                                                      originalValue: .date(oldValue as! Date),
+                                                      originalValue: oldValue != nil ? .date(oldValue as! Date) : .none,
                                                       newValue: .date(newValue)))
                             }
                             RLMDynamicValidatedSet(object, property.name, newValue)
@@ -533,6 +650,11 @@ var workQueues = [
 
 @available(macOS 12.0.0, *)
 class SwiftFuzzTests: SwiftSyncTestCase {
+    private let generatedSchema = generateSchema()
+    override var schema: RLMSchema {
+        generatedSchema
+    }
+
     override class var defaultTestSuite: XCTestSuite {
         // async/await is currently incompatible with thread sanitizer and will
         // produce many false positives
@@ -557,28 +679,26 @@ class SwiftFuzzTests: SwiftSyncTestCase {
             try! SwiftFuzzTests.handle.write(contentsOf: message.data(using: .utf8)!)
             try! SwiftFuzzTests.handle.write(contentsOf: "\n".data(using: .utf8)!)
         }
-        func flxRealm() async throws -> Realm {
+        func flxRealm() async throws -> RLMRealm {
             let username = "\(randomString(of: 24))@icloud.com"
             try await self.flexibleSyncApp.emailPasswordAuth.registerUser(email: username, password: "kingkong")
-            var config = try await self.flexibleSyncApp.login(credentials: .emailPassword(email: username, password: "kingkong")).flexibleSyncConfiguration()
-            if config.objectTypes == nil {
-                config.objectTypes = [SwiftPerson.self,
-                                      SwiftTypesSyncObject.self,
-                                      SwiftCollectionSyncObject.self]
-            }
-            let realm = try await Realm(configuration: config)
-
-            let subscriptions = realm.subscriptions
-            try await subscriptions.write {
-                subscriptions.append(QuerySubscription<SwiftPerson> {
-                    $0.age >= 0 || $0.age <= 0
+            let config = try await self.flexibleSyncApp.login(credentials: .emailPassword(email: username, password: "kingkong")).flexibleSyncConfiguration()
+            let configuration = RLMRealmConfiguration()
+            configuration.customSchema = generatedSchema
+            configuration.syncConfiguration = ObjectiveCSupport.convert(object:  config.syncConfiguration!)
+            let rlmRealm = try RLMRealm(configuration: configuration)
+            await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+                let rlmRealm = try! RLMRealm(configuration: configuration)
+                let subscriptions = rlmRealm.subscriptions
+                subscriptions.write({
+                    rlmRealm.schema.objectSchema.forEach {
+                        subscriptions.addSubscription(withClassName: $0.className, predicate: NSPredicate(format: "TRUEPREDICATE"))
+                    }
+                }, onComplete: { _ in
+                    continuation.resume()
                 })
-                subscriptions.append(QuerySubscription<SwiftTypesSyncObject> {
-                    $0.boolCol == true || $0.boolCol == false
-                })
-                subscriptions.append(QuerySubscription<SwiftCollectionSyncObject>(where: NSPredicate(format: "TRUEPREDICATE")))
             }
-            return realm
+            return rlmRealm
         }
 
         let realm1 = try await flxRealm()
@@ -628,16 +748,14 @@ class SwiftFuzzTests: SwiftSyncTestCase {
             try! SwiftFuzzTests.handle.write(contentsOf: message.data(using: .utf8)!)
             try! SwiftFuzzTests.handle.write(contentsOf: "\n".data(using: .utf8)!)
         }
-        func flxRealm() async throws -> Realm {
+        func flxRealm() async throws -> RLMRealm {
             let username = "\(randomString(of: 24))@icloud.com"
             try await self.app.emailPasswordAuth.registerUser(email: username, password: "kingkong")
-            var config = try await self.app.login(credentials: .emailPassword(email: username, password: "kingkong")).configuration(partitionValue: "foo")
-            if config.objectTypes == nil {
-                config.objectTypes = [SwiftPerson.self,
-                                      SwiftTypesSyncObject.self,
-                                      SwiftCollectionSyncObject.self]
-            }
-            return try await Realm(configuration: config)
+            let config = try await self.app.login(credentials: .emailPassword(email: username, password: "kingkong")).configuration(partitionValue: "foo")
+            let configuration = RLMRealmConfiguration()
+            configuration.customSchema = generatedSchema
+            configuration.syncConfiguration = ObjectiveCSupport.convert(object:  config.syncConfiguration!)
+            return try RLMRealm(configuration: configuration)
         }
 
         let realm1 = try await flxRealm()

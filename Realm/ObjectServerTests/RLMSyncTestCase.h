@@ -34,6 +34,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) RLMApp *app;
 @property (nonatomic, readonly) RLMUser *anonymousUser;
 @property (nonatomic, readonly) RLMAppConfiguration *defaultAppConfiguration;
+@property (nonatomic, readonly) RLMSchema *schema;
 
 /// Any stray app ids passed between processes
 @property (nonatomic, readonly) NSArray<NSString *> *appIds;

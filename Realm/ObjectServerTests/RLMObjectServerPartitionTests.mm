@@ -19,6 +19,7 @@
 #import "RLMSyncTestCase.h"
 
 #import "RLMApp_Private.hpp"
+#import "RLMSchema_Private.h"
 
 #if TARGET_OS_OSX
 
@@ -29,6 +30,7 @@
 @interface RealmServer : NSObject
 + (RealmServer *)shared;
 - (NSString *)createAppForBSONType:(NSString *)bsonType
+                            schema:(RLMSchema *)schema
                              error:(NSError **)error;
 @end
 
@@ -41,7 +43,7 @@
 
 - (void)roundTripForPartitionValue:(id<RLMBSON>)value testName:(SEL)callerName {
     NSError *error;
-    NSString *appId = [RealmServer.shared createAppForBSONType:[self partitionBsonType:value] error:&error];
+    NSString *appId = [RealmServer.shared createAppForBSONType:[self partitionBsonType:value] schema:[RLMSchema sharedSchema] error:&error];
 
     if (error) {
         XCTFail(@"Could not create app for partition value %@d", value);

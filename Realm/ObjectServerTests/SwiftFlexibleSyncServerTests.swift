@@ -29,7 +29,7 @@ import SwiftUI
 
 class SwiftFlexibleSyncTests: SwiftSyncTestCase {
     func testCreateFlexibleSyncApp() throws {
-        let appId = try RealmServer.shared.createAppForSyncMode(.flx(["age"]))
+        let appId = try RealmServer.shared.createAppForSyncMode(.flx(["age"]), schema: ObjectiveCSupport.convert(object: RLMSchema.shared()))
         let flexibleApp = app(fromAppId: appId)
         let user = try logInUser(for: basicCredentials(app: flexibleApp), app: flexibleApp)
         XCTAssertNotNil(user)

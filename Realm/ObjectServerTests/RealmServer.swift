@@ -674,7 +674,7 @@ public class RealmServer: NSObject {
     /// Create a new server app
     /// This will create a App with different configuration depending on the SyncMode (partition based sync or flexible sync), partition type is used only in case
     /// this is partition based sync, and will crash if one is not provided in that mode
-    public func createAppForSyncMode(_ syncMode: SyncMode) throws -> AppId {
+    public func createAppForSyncMode(_ syncMode: SyncMode, schema: Schema) throws -> AppId {
         guard let session = session else {
             throw URLError(.unknown)
         }
@@ -913,16 +913,16 @@ public class RealmServer: NSObject {
         return clientAppId
     }
 
-    @objc public func createAppWithQueryableFields(_ fields: [String]) throws -> AppId {
-        try createAppForSyncMode(.flx(fields))
+    @objc public func createAppWithQueryableFields(_ fields: [String], schema: RLMSchema = RLMSchema.shared()) throws -> AppId {
+        try createAppForSyncMode(.flx(fields), schema: ObjectiveCSupport.convert(object: schema))
     }
 
-    @objc public func createAppForBSONType(_ bsonType: String) throws -> AppId {
-        try createAppForSyncMode(.pbs(bsonType))
+    @objc public func createAppForBSONType(_ bsonType: String, schema: RLMSchema = RLMSchema.shared()) throws -> AppId {
+        try createAppForSyncMode(.pbs(bsonType), schema: ObjectiveCSupport.convert(object: schema))
     }
 
-    @objc public func createApp() throws -> AppId {
-        try createAppForSyncMode(.pbs("string"))
+    @objc public func createApp(schema: RLMSchema = RLMSchema.shared()) throws -> AppId {
+        try createAppForSyncMode(.pbs("string"), schema: ObjectiveCSupport.convert(object: schema))
     }
 
     // Retrieve MongoDB Realm AppId with ClientAppId using the Admin API
