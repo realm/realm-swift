@@ -102,7 +102,8 @@ func generateObject(for schema: ObjectSchema, fullSchema: [ObjectSchema]) -> [St
                     generateList { AnyRealmValue.randomValue } : AnyRealmValue.randomValue
             case .date:
                 dict[property.name] = property.isArray ?
-                    generateList { Date() } : Date()// TODO: make more random
+                generateList { Date(timeIntervalSince1970: Double.random(in: Double.leastNormalMagnitude...Double.greatestFiniteMagnitude)) }
+                : Date(timeIntervalSince1970: Double.random(in: Double.leastNormalMagnitude...Double.greatestFiniteMagnitude))
             case .objectId:
                 dict[property.name] = property.isArray ?
                     generateList { ObjectId.generate() } : ObjectId.generate()
@@ -445,6 +446,51 @@ private func modifyArray(realm: inout Realm, object: Object, property: Property)
                                                                    indicesAffected: [])))
             }
             oldValue.add(NSNumber(integerLiteral: newObject))
+        case .move:
+            if oldValue.count > 0 {
+                let idx1 = UInt.random(in: 0..<oldValue.count)
+                let idx2 = UInt.random(in: 0..<oldValue.count)
+                try! opRealm.write {
+                    opRealm.add(Operation(action: .modify,
+                                          objectName: object.objectSchema.className,
+                                          primaryKey: object.primaryKeyValue,
+                                          propertyModified: property.name,
+                                          listOperation: ListOperation(action: .move, affectedObjectPrimaryKeys: [],
+                                                                       didAddExistingObject: false, indicesAffected: [Int(idx1), Int(idx2)])))
+                }
+                oldValue.moveObject(at: idx1,
+                                    to: idx2)
+            }
+        case .remove:
+            if oldValue.count > 0 {
+                let idx = UInt.random(in: 0..<oldValue.count)
+                try! opRealm.write {
+                    opRealm.add(Operation(action: .modify,
+                                          objectName: object.objectSchema.className,
+                                          primaryKey: object.primaryKeyValue,
+                                          propertyModified: property.name,
+                                          listOperation: ListOperation(action: .remove, affectedObjectPrimaryKeys: [],
+                                                                       didAddExistingObject: false, indicesAffected: [Int(idx)])))
+                }
+                oldValue.removeObject(at: idx)
+            }
+        }
+    case .string:
+        let oldValue = RLMDynamicGetByName(object, property.name) as! RLMArray<NSString>
+        switch ListAction.allCases.randomElement()! {
+        case .add:
+            let newObject = randomString(of: 256)
+            try! opRealm.write {
+                opRealm.add(Operation(action: .modify,
+                                      objectName: object.objectSchema.className,
+                                      primaryKey: object.primaryKeyValue,
+                                      propertyModified: property.name,
+                                      listOperation: ListOperation(action: .add,
+                                                                   affectedObjectPrimaryKeys: [],
+                                                                   didAddExistingObject: false,
+                                                                   indicesAffected: [])))
+            }
+            oldValue.add(newObject as NSString)
         case .move:
             if oldValue.count > 0 {
                 let idx1 = UInt.random(in: 0..<oldValue.count)
