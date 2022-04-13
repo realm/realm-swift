@@ -61,61 +61,137 @@ func generateSchema() -> RLMSchema {
     return schema
 }
 
-func generateList<T: RealmCollectionValue>(_ generator: () -> T) -> List<T> {
-    (0..<256).reduce(into: List<T>()) { partialResult, _ in
+func generateMap<T>(_ generator: () -> T) -> [String: T] {
+    (0..<256).reduce(into: [String: T]()) { partialResult, _ in
+        partialResult[randomString(of: 256)] = generator()
+    }
+}
+
+func generateList<T>(_ generator: () -> T) -> [T] {
+    (0..<256).reduce(into: [T]()) { partialResult, _ in
         partialResult.append(generator())
     }
 }
 
-func generateObject(for schema: ObjectSchema, fullSchema: [ObjectSchema]) -> [String: Any] {
+func generateObject(for schema: ObjectSchema, fullSchema: [ObjectSchema], withDefaultValues: Bool = false) -> [String: Any] {
     schema.properties.reduce(into: [String: Any]()) { dict, property in
         if !property.isOptional {
             switch property.type {
             case .int:
-                dict[property.name] =
-                property.isArray ? generateList {
-                    Int.random(in: Int.min...Int.max)
-                } : Int.random(in: Int.min...Int.max)
+                let intGenerator = { withDefaultValues ? 0 : Int.random(in: Int.min...Int.max) }
+                if property.isArray || property.isSet {
+                    dict[property.name] = withDefaultValues ? [] : generateList(intGenerator)
+                } else if property.isMap {
+                    dict[property.name] = withDefaultValues ? [String:Any]() : generateMap(intGenerator)
+                } else {
+                    dict[property.name] = intGenerator()
+                }
             case .bool:
-                dict[property.name] =
-                property.isArray ? generateList { Bool.random() } : Bool.random()
+                let boolGenerator = { withDefaultValues ? false : Bool.random() }
+                if property.isArray || property.isSet {
+                    dict[property.name] = withDefaultValues ? [] : generateList(boolGenerator)
+                } else if property.isMap {
+                    dict[property.name] = withDefaultValues ? [String:Any]() : generateMap(boolGenerator)
+                } else {
+                    dict[property.name] = boolGenerator()
+                }
             case .float:
-                dict[property.name] =
-                property.isArray ? generateList {
-                    Float.random(in: Float.leastNormalMagnitude...Float.greatestFiniteMagnitude)
-                } : Float.random(in: Float.leastNormalMagnitude...Float.greatestFiniteMagnitude)
+                let floatGenerator = {
+                    withDefaultValues ? 0 : Float.random(in: Float.leastNormalMagnitude...Float.greatestFiniteMagnitude)
+                }
+                if property.isArray || property.isSet {
+                    dict[property.name] = withDefaultValues ? [] : generateList(floatGenerator)
+                } else if property.isMap {
+                    dict[property.name] = withDefaultValues ? [String:Any]() : generateMap(floatGenerator)
+                } else {
+                    dict[property.name] = floatGenerator()
+                }
             case .double:
-                dict[property.name] =
-                property.isArray ? generateList {
-                    Double.random(in: Double.leastNormalMagnitude...Double.greatestFiniteMagnitude)
-                } : Double.random(in: Double.leastNormalMagnitude...Double.greatestFiniteMagnitude)
+                let doubleGenerator = { withDefaultValues ? 0 : Double.random(in: Double.leastNormalMagnitude...Double.greatestFiniteMagnitude) }
+                if property.isArray || property.isSet {
+                    dict[property.name] = withDefaultValues ? [] : generateList(doubleGenerator)
+                } else if property.isMap {
+                    dict[property.name] = withDefaultValues ? [String:Any]() : generateMap(doubleGenerator)
+                } else {
+                    dict[property.name] = doubleGenerator()
+                }
             case .UUID:
-                dict[property.name] = property.isArray ? generateList { UUID() } : UUID()
+                let uuidGenerator = { UUID() }
+                if property.isArray || property.isSet {
+                    dict[property.name] = withDefaultValues ? [] : generateList(uuidGenerator)
+                } else if property.isMap {
+                    dict[property.name] = withDefaultValues ? [String:Any]() : generateMap(uuidGenerator)
+                } else {
+                    dict[property.name] = uuidGenerator()
+                }
             case .string:
-                dict[property.name] = property.isArray ?
-                    generateList { randomString(of: 256) } : randomString(of: 256)
+                let stringGenerator = { withDefaultValues ? "" : randomString(of: 256) }
+                if property.isArray || property.isSet {
+                    dict[property.name] = withDefaultValues ? [] : generateList(stringGenerator)
+                } else if property.isMap {
+                    dict[property.name] = withDefaultValues ? [String:Any]() : generateMap(stringGenerator)
+                } else {
+                    dict[property.name] = stringGenerator()
+                }
             case .data:
-                dict[property.name] = property.isArray ?
-                generateList { randomString(of: 256).data(using: .utf8)! } : randomString(of: 256).data(using: .utf8)!
+                let dataGenerator = { withDefaultValues ? Data() : randomString(of: 256).data(using: .utf8)! }
+                if property.isArray || property.isSet {
+                    dict[property.name] = withDefaultValues ? [] : generateList(dataGenerator)
+                } else if property.isMap {
+                    dict[property.name] = withDefaultValues ? [String:Any]() : generateMap(dataGenerator)
+                } else {
+                    dict[property.name] = dataGenerator()
+                }
             case .any:
-                dict[property.name] = property.isArray ?
-                    generateList { AnyRealmValue.randomValue } : AnyRealmValue.randomValue
+                let anyGenerator = { withDefaultValues ? .none : AnyRealmValue.randomValue }
+                if property.isArray || property.isSet {
+                    dict[property.name] = withDefaultValues ? [] : generateList(anyGenerator)
+                } else if property.isMap {
+                    dict[property.name] = withDefaultValues ? [String:Any]() : generateMap(anyGenerator)
+                } else {
+                    dict[property.name] = anyGenerator()
+                }
             case .date:
-                dict[property.name] = property.isArray ?
-                generateList { Date(timeIntervalSince1970: Double.random(in: Double.leastNormalMagnitude...Double.greatestFiniteMagnitude)) }
-                : Date(timeIntervalSince1970: Double.random(in: Double.leastNormalMagnitude...Double.greatestFiniteMagnitude))
+                let dateGenerator = { withDefaultValues ? Date() : Date(timeIntervalSince1970: Double.random(in: Double.leastNormalMagnitude...Double.greatestFiniteMagnitude)) }
+                if property.isArray || property.isSet {
+                    dict[property.name] = withDefaultValues ? [] : generateList(dateGenerator)
+                } else if property.isMap {
+                    dict[property.name] = withDefaultValues ? [String:Any]() : generateMap(dateGenerator)
+                } else {
+                    dict[property.name] = dateGenerator()
+                }
             case .objectId:
-                dict[property.name] = property.isArray ?
-                    generateList { ObjectId.generate() } : ObjectId.generate()
+                let oidGenerator = { ObjectId.generate() }
+                if property.isArray || property.isSet {
+                    dict[property.name] = withDefaultValues ? [] : generateList(oidGenerator)
+                } else if property.isMap {
+                    dict[property.name] = withDefaultValues ? [String:Any]() : generateMap(oidGenerator)
+                } else {
+                    dict[property.name] = oidGenerator()
+                }
             case .decimal128:
-                dict[property.name] = property.isArray ?
-                generateList {
-                    Decimal128(floatLiteral: Double.random(in: Double.leastNormalMagnitude...Double.greatestFiniteMagnitude)) } :
-                Decimal128(floatLiteral: Double.random(in: Double.leastNormalMagnitude...Double.greatestFiniteMagnitude))
-            case .object:
-                dict[property.name] = property.isArray ? [String: Any]() :
-                    Bool.random() ? generateObject(for: fullSchema.first { $0.className == property.objectClassName }!,
-                                                   fullSchema: fullSchema) : nil
+                let decimalGenerator = { withDefaultValues ? 0 : Decimal128(floatLiteral: Double.random(in: Double.leastNormalMagnitude...Double.greatestFiniteMagnitude)) }
+                if property.isArray || property.isSet {
+                    dict[property.name] = withDefaultValues ? [] : generateList(decimalGenerator)
+                } else if property.isMap {
+                    dict[property.name] = withDefaultValues ? [String:Any]() : generateMap(decimalGenerator)
+                } else {
+                    dict[property.name] = decimalGenerator()
+                }
+            case .object: break
+//                let objectGenerator = {
+//                    withDefaultValues ? nil : generateObject(for: fullSchema.first { $0.className == property.objectClassName }!,
+//                                   fullSchema: fullSchema)
+//                }
+//                if property.isArray || property.isSet {
+//                    dict[property.name] = [] // generateList(objectGenerator)
+//                } else if property.isMap {
+//                    dict[property.name] = withDefaultValues ? [String:Any]() : generateMap {
+//                        Bool.random() ? objectGenerator() : nil
+//                    }
+//                } else {
+//                    dict[property.name] = Bool.random() ? objectGenerator() : nil
+//                }
             default: fatalError()
             }
         }
@@ -154,6 +230,8 @@ class Operation: Object {
     /// the associated list operation if the action `.modify` and the property was of type set
     @Persisted var setOperation: SetOperation?
 
+    @Persisted var addedObject: Map<String, AnyRealmValue>
+
     convenience init(action: RealmAction,
                      objectName: String,
                      primaryKey: String? = nil,
@@ -161,7 +239,8 @@ class Operation: Object {
                      originalValue: AnyRealmValue = .none,
                      newValue: AnyRealmValue = .none,
                      listOperation: ListOperation? = nil,
-                     setOperation: SetOperation? = nil) {
+                     setOperation: SetOperation? = nil,
+                     addedObject: Map<String, AnyRealmValue>? = nil) {
         self.init()
         self.action = action
         self.objectName = objectName
@@ -292,6 +371,23 @@ extension RLMObject {
 }
 
 extension AnyRealmValue {
+    init(value: Any) {
+        switch value {
+        case let value as Int: self = .int(value)
+        case let value as Bool: self = .bool(value)
+        case let value as Float: self = .float(value)
+        case let value as Double: self = .double(value)
+        case let value as String: self = .string(value)
+        case let value as Data: self = .data(value)
+        case let value as Date: self = .date(value)
+        case let value as Object: self = .object(value)
+        case let value as ObjectId: self = .objectId(value)
+        case let value as Decimal128: self = .decimal128(value)
+        case let value as UUID: self = .uuid(value)
+        default: fatalError()
+        }
+    }
+
     static var randomValue: AnyRealmValue {
         return [
             AnyRealmValue.uuid(UUID()),
@@ -303,6 +399,14 @@ extension AnyRealmValue {
             .date(Date()),
             .data(Data())
         ].randomElement()!
+    }
+}
+
+extension Dictionary where Key == String, Value == Any {
+    func toMap() -> Map<String, AnyRealmValue> {
+        self.reduce(into: Map<String, AnyRealmValue>()) { partialResult, next in
+            partialResult[next.key] = AnyRealmValue(value: next.value)
+        }
     }
 }
 
@@ -325,7 +429,7 @@ func addToRealm(with configuration: RLMRealmConfiguration) throws {
     let realm = ObjectiveCSupport.convert(object: try RLMRealm(configuration: configuration))
     try realm.write {
         let schema = realm.schema.objectSchema.randomElement()!
-        let object = generateObject(for: schema, fullSchema: realm.schema.objectSchema)
+        let object = generateObject(for: schema, fullSchema: realm.schema.objectSchema, withDefaultValues: true)
         if schema.primaryKeyProperty != nil {
             let opRealm = operationRealm(for: configuration.syncConfiguration!.user)
             let pk = object[schema.primaryKeyProperty!.name]
@@ -345,6 +449,7 @@ func addToRealm(with configuration: RLMRealmConfiguration) throws {
             }
             realm.dynamicCreate(schema.className, value: object, update: .all)
         } else {
+            fatalError()
             realm.dynamicCreate(schema.className, value: object)
         }
     }
@@ -377,9 +482,12 @@ private func modifyArray(realm: inout Realm, object: Object, property: Property)
         case .add:
             let randomElement = realm.dynamicObjects(property.objectClassName!).randomElement()
             if randomElement == nil || Bool.random() {
-                let generatedObject = generateObject(for: realm.schema.objectSchema.first { $0.className == property.objectClassName! }!,
-                                               fullSchema: realm.schema.objectSchema)
+                let generatedObject =
+                    generateObject(for: realm.schema.objectSchema.first { $0.className == property.objectClassName! }!,
+                                   fullSchema: realm.schema.objectSchema, withDefaultValues: true)
                 let newObject = realm.dynamicCreate(property.objectClassName!, value: generatedObject, update: .all)
+                // TODO: add object add to oplog
+
                 try! opRealm.write {
                     opRealm.add(Operation(action: .modify,
                                           objectName: object.objectSchema.className,
@@ -400,22 +508,23 @@ private func modifyArray(realm: inout Realm, object: Object, property: Property)
                 oldValue.add(randomElement!)
             }
         case .move:
-            if oldValue.count > 0 {
-                let idx1 = UInt.random(in: 0..<oldValue.count)
-                let idx2 = UInt.random(in: 0..<oldValue.count)
-                let affectedObject1 = oldValue.object(at: idx1)
-                let affectedObject2 = oldValue.object(at: idx2)
-                try! opRealm.write {
-                    opRealm.add(Operation(action: .modify,
-                                          objectName: object.objectSchema.className,
-                                          primaryKey: object.primaryKeyValue,
-                                          propertyModified: property.name,
-                                          listOperation: ListOperation(action: .move, affectedObjectPrimaryKeys: [affectedObject1.primaryKeyValue!,
-                                                                                                                  affectedObject2.primaryKeyValue!], didAddExistingObject: false, indicesAffected: [Int(idx1), Int(idx2)])))
-                }
-                oldValue.moveObject(at: idx1,
-                                    to: idx2)
-            }
+            break
+//            if oldValue.count > 0 {
+//                let idx1 = UInt.random(in: 0..<oldValue.count)
+//                let idx2 = UInt.random(in: 0..<oldValue.count)
+//                let affectedObject1 = oldValue.object(at: idx1)
+//                let affectedObject2 = oldValue.object(at: idx2)
+//                try! opRealm.write {
+//                    opRealm.add(Operation(action: .modify,
+//                                          objectName: object.objectSchema.className,
+//                                          primaryKey: object.primaryKeyValue,
+//                                          propertyModified: property.name,
+//                                          listOperation: ListOperation(action: .move, affectedObjectPrimaryKeys: [affectedObject1.primaryKeyValue!,
+//                                                                                                                  affectedObject2.primaryKeyValue!], didAddExistingObject: false, indicesAffected: [Int(idx1), Int(idx2)])))
+//                }
+//                oldValue.moveObject(at: idx1,
+//                                    to: idx2)
+//            }
         case .remove:
             if oldValue.count > 0 {
                 let idx = UInt.random(in: 0..<oldValue.count)
@@ -589,9 +698,9 @@ func modifyInRealm(with configuration: RLMRealmConfiguration) throws {
                     }
 
                     if property.isArray {
-                        for _ in 0..<Int.random(in: 1...10) {
+//                        for _ in 0..<Int.random(in: 1...10) {
                             modifyArray(realm: &realm, object: object, property: property)
-                        }
+//                        }
                     } else if property.isSet {
                         // TODO: Uncomment when #5387 is fixed
                         // modifySet(realm: &realm, object: object, property: property)
@@ -666,7 +775,7 @@ func modifyInRealm(with configuration: RLMRealmConfiguration) throws {
                                 newValue = realm.dynamicObjects(property.objectClassName!).randomElement()
                             } else if Bool.random() /* create new object */ {
                                 newValue = realm.dynamicCreate(property.objectClassName!,
-                                                               value: generateObject(for: realm.schema.objectSchema.first { $0.className == property.objectClassName }!, fullSchema: realm.schema.objectSchema),
+                                                               value: generateObject(for: realm.schema.objectSchema.first { $0.className == property.objectClassName }!, fullSchema: realm.schema.objectSchema, withDefaultValues: true),
                                                                update: .all)
                             }
                             try! opRealm.write {
@@ -722,13 +831,46 @@ func modifyInRealm(with configuration: RLMRealmConfiguration) throws {
     }
 }
 
+func replayOperation(operation: Operation, configuration: RLMRealmConfiguration) throws {
+    let realm = ObjectiveCSupport.convert(object: try RLMRealm(configuration: configuration))
+    switch operation.action {
+    case .add:
+        try realm.write {
+            let schema = realm.schema.objectSchema.first {
+                $0.className == operation.objectName
+            }!
+            var object = generateObject(for: schema, fullSchema: realm.schema.objectSchema)
+            object[schema.primaryKeyProperty!.name] = operation.primaryKey!
+            realm.dynamicCreate(operation.objectName,
+                                value: object,
+                                update: .all)
+        }
+    case .modify:
+        try realm.write {
+            let object = realm.dynamicObject(ofType: operation.className, forPrimaryKey: operation.primaryKey!)!
+            object[operation.propertyModified!] = operation.newValue
+        }
+    case .remove:
+        try realm.write {
+            let object = realm.dynamicObject(ofType: operation.className, forPrimaryKey: operation.primaryKey!)!
+            realm.delete(object)
+        }
+    case .read:
+        try readFromRealm(with: configuration)
+    }
+}
+
 // MARK: Tests
 
 @available(macOS 12.0.0, *)
 class SwiftFuzzTests: SwiftSyncTestCase {
     private let generatedSchema = generateSchema()
     override var schema: RLMSchema {
-        return RLMSchema(objectClasses: [SwiftPerson.self, SwiftCollectionSyncObject.self, SwiftTypesSyncObject.self])
+        return RLMSchema(objectClasses: [
+            SwiftPerson.self,
+            SwiftCollectionSyncObject.self,
+            SwiftTypesSyncObject.self
+        ])
     }
 
     override class var defaultTestSuite: XCTestSuite {
@@ -762,19 +904,29 @@ class SwiftFuzzTests: SwiftSyncTestCase {
             let configuration = RLMRealmConfiguration()
             configuration.customSchema = self.schema
             configuration.syncConfiguration = ObjectiveCSupport.convert(object:  config.syncConfiguration!)
-            let rlmRealm = try RLMRealm(configuration: configuration)
+            var subscriptions: RLMSyncSubscriptionSet! // needed to retain the subscriptions while writing
             await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
-                let rlmRealm = try! RLMRealm(configuration: configuration)
-                let subscriptions = rlmRealm.subscriptions
-                subscriptions.write({
-                    rlmRealm.schema.objectSchema.forEach {
-                        subscriptions.addSubscription(withClassName: $0.className, predicate: NSPredicate(format: "TRUEPREDICATE"))
-                    }
-                }, onComplete: { _ in
-                    continuation.resume()
-                })
+                RLMRealm.asyncOpen(with: configuration, callbackQueue: .init(label: "")) { rlmRealm, error in
+                    subscriptions = rlmRealm!.subscriptions
+                    subscriptions.write({
+                        rlmRealm!.schema.objectSchema.forEach {
+//                            if $0.className == "SwiftPerson" {
+//                                subscriptions.addSubscription(withClassName: $0.className, predicate: NSPredicate(format: "age >= 0 || age <= 0"))
+//                            } else if $0.className == "SwiftTypesSyncObject" {
+//                                subscriptions.addSubscription(withClassName: $0.className, predicate: NSPredicate(format: "boolCol == true || boolCol == false"))
+//                            } else {
+                                subscriptions.addSubscription(withClassName: $0.className, predicate: NSPredicate(format: "TRUEPREDICATE"))
+//                            }
+                        }
+                    }, onComplete: { error in
+                        guard error == nil else {
+                            fatalError("\(error!)")
+                        }
+                        continuation.resume()
+                    })
+                }
             }
-            return rlmRealm
+            return try RLMRealm(configuration: configuration)
         }
 
         var realms = [RLMRealm]()
@@ -784,7 +936,7 @@ class SwiftFuzzTests: SwiftSyncTestCase {
             print(i)
             print("setting up operations")
             var workQueues = realms.map { realm in
-                (0..<2).map { i in // each realm gets 2 work queues
+                (0..<3).map { i in // each realm gets 3 work queues
                     DispatchQueue(label: "\(realm.configuration.syncConfiguration!.user.id).\(i)")
                 }
             }
@@ -818,7 +970,7 @@ class SwiftFuzzTests: SwiftSyncTestCase {
         }
     }
 
-    func testQuickAddAndDelete() async throws {
+    func testReplay() async throws {
         self.flexibleSyncApp.syncManager.errorHandler = { error, session in
             print(error.localizedDescription)
         }
@@ -836,53 +988,34 @@ class SwiftFuzzTests: SwiftSyncTestCase {
             let configuration = RLMRealmConfiguration()
             configuration.customSchema = self.schema
             configuration.syncConfiguration = ObjectiveCSupport.convert(object:  config.syncConfiguration!)
-            let rlmRealm = try RLMRealm(configuration: configuration)
             await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
-                let rlmRealm = try! RLMRealm(configuration: configuration)
-                let subscriptions = rlmRealm.subscriptions
-                subscriptions.write({
-                    rlmRealm.schema.objectSchema.forEach {
-                        subscriptions.addSubscription(withClassName: $0.className, predicate: NSPredicate(format: "TRUEPREDICATE"))
-                    }
-                }, onComplete: { _ in
-                    continuation.resume()
-                })
+                autoreleasepool {
+                    let rlmRealm = try! RLMRealm(configuration: configuration)
+                    let subscriptions = rlmRealm.subscriptions
+                    subscriptions.write({
+                        rlmRealm.schema.objectSchema.forEach {
+                            subscriptions.addSubscription(withClassName: $0.className, predicate: NSPredicate(format: "TRUEPREDICATE"))
+                        }
+                    }, onComplete: { error in
+                        guard error == nil else {
+                            fatalError(error!.localizedDescription)
+                        }
+                        continuation.resume()
+                    })
+                }
+                RLMWaitForRealmToClose(configuration.pathOnDisk)
             }
-            return rlmRealm
+            return try RLMRealm(configuration: configuration)
         }
 
         var realms = [RLMRealm]()
         for _ in (0..<3) { realms.append(try await flxRealm()) }
-
-        for i in 0..<1000 {
-            print(i)
-            print("setting up operations")
-            var workQueues = realms.map { realm in
-                (0..<2).map { i in // each realm gets 2 work queues
-                    DispatchQueue(label: "\(realm.configuration.syncConfiguration!.user.id).\(i)")
-                }
-            }
-            realms.map { realm -> [DispatchWorkItem] in
-                let workItems = (0..<1000).map { _ in
-                    DispatchWorkItem {
-                        try! addToRealm(with: realm.configuration)
-                        try! modifyInRealm(with: realm.configuration)
-                        try! removeFromRealm(with: realm.configuration)
-                    }
-                }
-                var queues = workQueues.popLast()!
-                workItems.forEach { item in
-                    let first = queues.removeFirst()
-                    first.async(execute: item)
-                    queues.append(first)
-                }
-                print("waiting")
-                return workItems
-            }.flatMap { $0 }
-            .forEach {
-                $0.wait()
-            }
-        }
+        let opRealms = [try await Realm(), try await Realm(), try await Realm()]
+//        let sortedOperations = opRealms.map {
+//            ($0.configuration.fileURL, $0.objects(Operation.self))
+//        }.flatMap {
+//            $0
+//        }.sorted(by: { $0.1.date < $1.1.date })
     }
 
     // copypasta from above but for PBS, should DRY it up
@@ -906,26 +1039,18 @@ class SwiftFuzzTests: SwiftSyncTestCase {
             return try RLMRealm(configuration: configuration)
         }
 
-        let realm1 = try await flxRealm()
-        let realm2 = try await flxRealm()
-        let realm3 = try await flxRealm()
+        var realms = [RLMRealm]()
+        for _ in (0..<3) { realms.append(try await flxRealm()) }
 
         for i in 0..<1000 {
-
-            var workQueues = [
-                [DispatchQueue(label: "1"),
-                DispatchQueue(label: "2"),
-                DispatchQueue(label: "3")],
-                [DispatchQueue(label: "4"),
-                DispatchQueue(label: "5"),
-                DispatchQueue(label: "6")],
-                [DispatchQueue(label: "7"),
-                DispatchQueue(label: "8"),
-                DispatchQueue(label: "9")],
-            ]
+            var workQueues = realms.map { realm in
+                (0..<2).map { i in // each realm gets 2 work queues
+                    DispatchQueue(label: "\(realm.configuration.syncConfiguration!.user.id).\(i)")
+                }
+            }
             print(i)
             print("setting up operations")
-            [realm1, realm2, realm3].map { realm -> [DispatchWorkItem] in
+            realms.map { realm -> [DispatchWorkItem] in
                 let workItems = (0..<1000).map { _ in
                     DispatchWorkItem {
                         switch RealmAction.allCases.randomElement()! {

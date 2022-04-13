@@ -244,6 +244,7 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
         _mutableSubscriptionSet = nullptr;
     }
     catch (const std::exception& error) {
+//        _mutableSubscriptionSet = nullptr;
         _subscriptionSet->refresh();
         NSError *err = [[NSError alloc] initWithDomain:RLMFlexibleSyncErrorDomain code:RLMFlexibleSyncErrorCommitSubscriptionSetError userInfo:@{@"reason":@(error.what())}];
         return completionBlock(err);

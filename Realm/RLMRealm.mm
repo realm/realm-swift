@@ -614,6 +614,10 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     }
 }
 
+- (NSNumber *)activeVersions {
+    return [[NSNumber alloc] initWithLong:_realm->get_number_of_versions()];
+}
+
 - (RLMNotificationToken *)addNotificationBlock:(RLMNotificationBlock)block {
     if (!block) {
         @throw RLMException(@"The notification block should not be nil");

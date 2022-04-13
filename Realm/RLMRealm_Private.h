@@ -55,6 +55,7 @@ BOOL RLMIsRealmCachedAtPath(NSString *path);
 - (void)sendNotifications:(RLMNotification)notification;
 - (void)verifyThread;
 - (void)verifyNotificationsAreSupported:(bool)isCollection;
+- (NSNumber *)activeVersions;
 
 - (RLMRealm *)frozenCopy NS_RETURNS_RETAINED;
 + (RLMAsyncOpenTask *)asyncOpenWithConfiguration:(RLMRealmConfiguration *)configuration
