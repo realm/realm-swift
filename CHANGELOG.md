@@ -1,3 +1,18 @@
+10.25.2 Release notes (2022-04-27)
+=============================================================
+
+### Enhancements
+
+* Replace Xcode 13.3 binaries with 13.3.1 binaries.
+
+### Compatibility
+
+* Realm Studio: 11.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 13.3.1.
+* CocoaPods: 1.10 or later.
+* Xcode: 12.4-13.3.1.
+
 10.25.1 Release notes (2022-04-11)
 =============================================================
 
