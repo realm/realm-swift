@@ -134,9 +134,9 @@ func objectForIndexPath(indexPath: IndexPath) -> DemoObject? {
 }
 
 func randomTitle() -> String {
-    return "Title \(arc4random())"
+    return "Title \(Int.random(in: 0..<100))"
 }
 
 func randomSectionTitle() -> String {
-    return sectionTitles[Int(arc4random()) % sectionTitles.count]
+    return sectionTitles[Int.random(0..<sectionTitles.count)]
 }
