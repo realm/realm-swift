@@ -19,6 +19,7 @@ x.y.z Release notes (yyyy-MM-dd)
     }];
     [realm cancelAsyncTransaction:asyncTransactionId];
 ```
+* Replace Xcode 13.3 binaries with 13.3.1 binaries.
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
@@ -29,9 +30,9 @@ x.y.z Release notes (yyyy-MM-dd)
 ### Compatibility
 * Realm Studio: 11.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
-* Carthage release for Swift is built with Xcode 13.3.
+* Carthage release for Swift is built with Xcode 13.3.1.
 * CocoaPods: 1.10 or later.
-* Xcode: 12.4-13.3.
+* Xcode: 12.4-13.3.1.
 
 ### Internal
 * Upgraded realm-core from ? to ?
