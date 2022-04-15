@@ -97,7 +97,7 @@ public class SwiftCollectionSyncObject: Object {
     public let otherUuidSet = MutableSet<UUID>()
     public let otherAnySet = MutableSet<AnyRealmValue>()
     public let otherObjectSet = MutableSet<SwiftPerson>()
-
+//
     public let intMap = Map<String, Int>()
     public let stringMap = Map<String, String>()
     public let dataMap = Map<String, Data>()

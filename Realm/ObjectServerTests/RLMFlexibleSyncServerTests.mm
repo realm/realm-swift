@@ -19,12 +19,15 @@
 #import "RLMSyncTestCase.h"
 #import "RLMSyncSubscription_Private.h"
 #import "RLMApp_Private.hpp"
+#import "RLMSchema_Private.h"
 
 // These are defined in Swift. Importing the auto-generated header doesn't work
 // when building with SPM, so just redeclare the bits we need.
 @interface RealmServer : NSObject
 + (RealmServer *)shared;
-- (NSString *)createAppWithQueryableFields:(NSArray *)queryableFields error:(NSError **)error;
+- (NSString *)createAppWithQueryableFields:(NSArray *)queryableFields
+                                    schema:(RLMSchema *)schema
+                                     error:(NSError **)error;
 @end
 
 @interface RLMFlexibleSyncTests : RLMSyncTestCase
@@ -33,6 +36,7 @@
 @implementation RLMFlexibleSyncTests
 - (void)testCreateFlexibleSyncApp {
     NSString *appId =  [RealmServer.shared createAppWithQueryableFields:@[@"age", @"breed"]
+                                                                 schema:[RLMSchema sharedSchema]
                                                                   error:nil];
     RLMApp *app = [RLMApp appWithId:appId
                       configuration:[self defaultAppConfiguration]

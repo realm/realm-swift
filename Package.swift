@@ -150,6 +150,7 @@ let package = Package(
                 "Realm.podspec",
                 "Realm.xcodeproj",
                 "Realm/ObjectServerTests",
+                "Realm/FuzzTests",
                 "Realm/RLMPlatform.h.in",
                 "Realm/Realm-Info.plist",
                 "Realm/Swift/RLMSupport.swift",
@@ -336,7 +337,15 @@ let package = Package(
                 "RLMWatchTestUtility.m",
                 "RLMFlexibleSyncServerTests.mm"
             ]
-        )
+        ),
+      .testTarget(
+        name: "FuzzTests",
+        dependencies: ["RealmSwift", "RealmTestSupport", "RealmSyncTestSupport", "RealmSwiftSyncTestSupport"],
+        path: "Realm/FuzzTests",
+        sources: ["SwiftFuzzTests.swift"],
+        cxxSettings: testCxxSettings,
+        swiftSettings: testSwiftSettings
+      )
     ],
     cxxLanguageStandard: .cxx1z
 )

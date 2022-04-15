@@ -25,6 +25,7 @@
 #import "RLMRealm_Dynamic.h"
 #import "RLMRealm_Private.hpp"
 #import "RLMRealmConfiguration_Private.h"
+#import "RLMSchema_Private.h"
 #import "RLMSyncManager_Private.hpp"
 #import "RLMSyncConfiguration_Private.h"
 #import "RLMUtil.hpp"
@@ -40,8 +41,11 @@
 @interface RealmServer : NSObject
 + (RealmServer *)shared;
 + (bool)haveServer;
-- (NSString *)createAppAndReturnError:(NSError **)error;
-- (NSString *)createAppWithQueryableFields:(NSArray *)queryableFields error:(NSError **)error;
+- (NSString *)createAppWithSchema:(RLMSchema *)schema error:(NSError **)error;
+- (NSString *)createAppWithQueryableFields:(NSArray *)queryableFields
+                                    schema:(RLMSchema *)schema
+                                     error:(NSError **)error;
+
 @end
 
 // Set this to 1 if you want the test ROS instance to log its debug messages to console.
@@ -491,6 +495,10 @@ static NSURL *syncDirectoryForChildProcess() {
     [super tearDown];
 }
 
+- (RLMSchema *)schema {
+    return [RLMSchema sharedSchema];
+}
+
 - (NSString *)appId {
     if (!_appId) {
         static NSString *s_appId;
@@ -499,7 +507,7 @@ static NSURL *syncDirectoryForChildProcess() {
         }
         else {
             NSError *error;
-            _appId = NSProcessInfo.processInfo.environment[@"RLMParentAppId"] ?: [RealmServer.shared createAppAndReturnError:&error];
+            _appId = NSProcessInfo.processInfo.environment[@"RLMParentAppId"] ?: [RealmServer.shared createAppWithSchema:self.schema error:&error];
             if (error) {
                 NSLog(@"Failed to create app: %@", error);
                 abort();
@@ -626,7 +634,7 @@ static NSURL *syncDirectoryForChildProcess() {
         }
         else {
             NSError *error;
-            _flexibleSyncAppId = [RealmServer.shared createAppWithQueryableFields:@[@"age", @"breed", @"partition", @"firstName", @"boolCol", @"intCol", @"stringCol", @"dateCol", @"lastName"] error:&error];
+            _flexibleSyncAppId = [RealmServer.shared createAppWithQueryableFields:@[@"age", @"breed", @"partition", @"firstName", @"boolCol", @"intCol", @"stringCol", @"dateCol", @"lastName"] schema:self.schema error:&error];
             if (error) {
                 NSLog(@"Failed to create app: %@", error);
                 abort();

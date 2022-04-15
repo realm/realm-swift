@@ -49,7 +49,7 @@
 // when building with SPM, so just redeclare the bits we need.
 @interface RealmServer : NSObject
 + (RealmServer *)shared;
-- (NSString *)createAppAndReturnError:(NSError **)error;
+- (NSString *)createAppWithSchema:(RLMSchema *)schema error:(NSError **)error;
 @end
 
 @interface TimeoutProxyServer : NSObject
@@ -730,8 +730,8 @@ static NSString *randomEmail() {
     NSString *appId1;
     NSString *appId2;
     if (self.isParent) {
-        appId1 = [RealmServer.shared createAppAndReturnError:nil];
-        appId2 = [RealmServer.shared createAppAndReturnError:nil];
+        appId1 = [RealmServer.shared createAppWithSchema:[RLMSchema sharedSchema] error:nil];
+        appId2 = [RealmServer.shared createAppWithSchema:[RLMSchema sharedSchema] error:nil];
 
     } else {
         appId1 = self.appIds[0];
@@ -1768,7 +1768,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
                                                                   localAppName:nil
                                                                localAppVersion:nil
                                                        defaultRequestTimeoutMS:60];
-    NSString *appId = [RealmServer.shared createAppAndReturnError:nil];
+    NSString *appId = [RealmServer.shared createAppWithSchema:[RLMSchema sharedSchema] error:nil];
     RLMApp *app = [RLMApp appWithId:appId configuration:config];
     RLMUser *user = [self logInUserForCredentials:[RLMCredentials anonymousCredentials] app:app];
 
