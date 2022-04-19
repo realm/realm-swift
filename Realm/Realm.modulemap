@@ -8,6 +8,7 @@ framework module Realm {
         header "RLMAccessor.h"
         header "RLMApp_Private.h"
         header "RLMArray_Private.h"
+        header "RLMAudit.h"
         header "RLMCollection_Private.h"
         header "RLMDictionary_Private.h"
         header "RLMObjectBase_Dynamic.h"

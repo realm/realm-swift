@@ -295,6 +295,48 @@ void RLMSetConfigInfoForClientResetCallbacks(realm::SyncConfig& syncConfig, RLMR
     return config;
 }
 
+NSError *RLMTranslateSyncError(SyncError error) {
+    NSString *recoveryPath;
+    RLMSyncErrorActionToken *token;
+    for (auto& pair : error.user_info) {
+        if (pair.first == realm::SyncError::c_original_file_path_key) {
+            token = [[RLMSyncErrorActionToken alloc] initWithOriginalPath:pair.second];
+        }
+        else if (pair.first == realm::SyncError::c_recovery_file_path_key) {
+            recoveryPath = @(pair.second.c_str());
+        }
+    }
+
+    NSDictionary *custom;
+    // Note that certain types of errors are 'interactive'; users have several options
+    // as to how to proceed after the error is reported.
+    auto errorClass = errorKindForSyncError(error);
+    switch (errorClass) {
+        case RLMSyncSystemErrorKindClientReset: {
+            custom = @{kRLMSyncPathOfRealmBackupCopyKey: recoveryPath, kRLMSyncErrorActionTokenKey: token};
+            break;
+        }
+        case RLMSyncSystemErrorKindPermissionDenied: {
+            if (token) {
+                custom = @{kRLMSyncErrorActionTokenKey: token};
+            }
+            break;
+        }
+        case RLMSyncSystemErrorKindUser:
+        case RLMSyncSystemErrorKindSession:
+            break;
+        case RLMSyncSystemErrorKindConnection:
+        case RLMSyncSystemErrorKindClient:
+        case RLMSyncSystemErrorKindUnknown:
+            if (!error.is_fatal) {
+                return nil;
+            }
+            break;
+    }
+
+    return make_sync_error(errorClass, @(error.message.c_str()), error.error_code.value(), custom);
+}
+
 - (instancetype)initWithUser:(RLMUser *)user
               partitionValue:(nullable id<RLMBSON>)partitionValue
                customFileURL:(nullable NSURL *)customFileURL
@@ -316,52 +358,17 @@ void RLMSetConfigInfoForClientResetCallbacks(realm::SyncConfig& syncConfig, RLMR
         RLMSyncManager *manager = [user.app syncManager];
         __weak RLMSyncManager *weakManager = manager;
         _config->error_handler = [weakManager](std::shared_ptr<SyncSession> errored_session, SyncError error) {
-            NSString *recoveryPath;
-            RLMSyncErrorActionToken *token;
-            for (auto& pair : error.user_info) {
-                if (pair.first == realm::SyncError::c_original_file_path_key) {
-                    token = [[RLMSyncErrorActionToken alloc] initWithOriginalPath:pair.second];
-                }
-                else if (pair.first == realm::SyncError::c_recovery_file_path_key) {
-                    recoveryPath = @(pair.second.c_str());
-                }
-            }
-
-            BOOL shouldMakeError = YES;
-            NSDictionary *custom = nil;
-            // Note that certain types of errors are 'interactive'; users have several options
-            // as to how to proceed after the error is reported.
-            auto errorClass = errorKindForSyncError(error);
-            switch (errorClass) {
-                case RLMSyncSystemErrorKindClientReset: {
-                    custom = @{kRLMSyncPathOfRealmBackupCopyKey: recoveryPath, kRLMSyncErrorActionTokenKey: token};
-                    break;
-                }
-                case RLMSyncSystemErrorKindPermissionDenied: {
-                    if (token) {
-                        custom = @{kRLMSyncErrorActionTokenKey: token};
-                    }
-                    break;
-                }
-                case RLMSyncSystemErrorKindUser:
-                case RLMSyncSystemErrorKindSession:
-                    break;
-                case RLMSyncSystemErrorKindConnection:
-                case RLMSyncSystemErrorKindClient:
-                case RLMSyncSystemErrorKindUnknown:
-                    // Report the error. There's nothing the user can do about it, though.
-                    shouldMakeError = error.is_fatal;
-                    break;
-            }
-
             RLMSyncErrorReportingBlock errorHandler;
             @autoreleasepool {
                 errorHandler = weakManager.errorHandler;
             }
-            if (!shouldMakeError || !errorHandler) {
+            if (!errorHandler) {
                 return;
             }
-            NSError *nsError = make_sync_error(errorClass, @(error.message.c_str()), error.error_code.value(), custom);
+            NSError *nsError = RLMTranslateSyncError(std::move(error));
+            if (!nsError) {
+                return;
+            }
             RLMSyncSession *session = [[RLMSyncSession alloc] initWithSyncSession:errored_session];
             dispatch_async(dispatch_get_main_queue(), ^{
                 errorHandler(nsError, session);

@@ -19,7 +19,7 @@
 #import <Foundation/Foundation.h>
 #import <Realm/RLMRealm.h>
 
-@class RLMSyncConfiguration;
+@class RLMAuditConfiguration, RLMSyncConfiguration;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -172,7 +172,7 @@ typedef BOOL (^RLMShouldCompactOnLaunchBlock)(NSUInteger totalBytes, NSUInteger 
  This option is mutually exclusive with `inMemoryIdentifier`. Setting a `seedFilePath`
  will nil out the `inMemoryIdentifier`.
  */
-@property (nonatomic, copy, nullable) NSURL* seedFilePath;
+@property (nonatomic, copy, nullable) NSURL *seedFilePath;
 
 /**
  A configuration object representing configuration state for Realms intended

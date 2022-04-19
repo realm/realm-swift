@@ -18,6 +18,7 @@
 
 #import "RLMRealmConfiguration_Private.h"
 
+#import "RLMAudit.h"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMRealm_Private.h"
 #import "RLMSchema_Private.hpp"
@@ -387,6 +388,9 @@ static bool isSync(realm::Realm::Config const& config) {
 #if REALM_ENABLE_SYNC
     if (config.sync_config) {
         RLMSetConfigInfoForClientResetCallbacks(*config.sync_config, self);
+    }
+    if (_auditConfiguration) {
+        config.audit_config = [_auditConfiguration auditConfigWithRealmConfiguration:self];
     }
 #endif
     return config;

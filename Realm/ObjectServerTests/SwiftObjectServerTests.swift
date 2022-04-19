@@ -1983,14 +1983,14 @@ class AnyRealmValueSyncTests: SwiftSyncTestCase {
 
                     let syncObj2 = SwiftMissingObject()
                     syncObj2.objectCol = so1
-                    syncObj2.anyCol.value = .object(so1)
+                    syncObj2.anyCol = .object(so1)
 
                     let syncObj = SwiftMissingObject()
                     syncObj.objectCol = so1
-                    syncObj.anyCol.value = .object(syncObj2)
+                    syncObj.anyCol = .object(syncObj2)
                     let obj = SwiftAnyRealmValueObject()
-                    obj.anyCol.value = .object(syncObj)
-                    obj.otherAnyCol.value = .object(so2)
+                    obj.anyCol = .object(syncObj)
+                    obj.otherAnyCol = .object(so2)
                     realm.add(obj)
                 }
                 waitForUploads(for: realm)
@@ -2006,13 +2006,13 @@ class AnyRealmValueSyncTests: SwiftSyncTestCase {
             let realm = try openRealm(configuration: config)
             let obj = realm.objects(SwiftAnyRealmValueObject.self).first
             // SwiftMissingObject.anyCol -> SwiftMissingObject.anyCol -> SwiftPerson.firstName
-            let anyCol = ((obj!.anyCol.value.dynamicObject?.anyCol as? Object)?["anyCol"] as? Object)
+            let anyCol = ((obj!.anyCol.dynamicObject?.anyCol as? Object)?["anyCol"] as? Object)
             XCTAssertEqual((anyCol?["firstName"] as? String), "Rick")
             try! realm.write {
                 anyCol?["firstName"] = "Morty"
             }
             XCTAssertEqual((anyCol?["firstName"] as? String), "Morty")
-            let objectCol = (obj!.anyCol.value.dynamicObject?.objectCol as? Object)
+            let objectCol = (obj!.anyCol.dynamicObject?.objectCol as? Object)
             XCTAssertEqual((objectCol?["firstName"] as? String), "Morty")
         } catch {
             XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
@@ -2051,10 +2051,22 @@ extension Publisher {
         cancellable.cancel()
     }
 
-    func awaitFailure(_ testCase: XCTestCase, timeout: TimeInterval = 4.0) {
+    @discardableResult
+    func await(_ testCase: XCTestCase, timeout: TimeInterval = 4.0) -> Self.Output {
+        let expectation = testCase.expectation(description: "Async combine pipeline")
+        var value: Self.Output?
+        let cancellable = self.expectValue(testCase, expectation, receiveValue: { value = $0 })
+        testCase.wait(for: [expectation], timeout: timeout)
+        cancellable.cancel()
+        return value!
+    }
+
+    func awaitFailure(_ testCase: XCTestCase, timeout: TimeInterval = 4.0,
+                      _ errorHandler: ((Self.Failure) -> Void)? = nil) {
         let expectation = testCase.expectation(description: "Async combine pipeline should fail")
         let cancellable = self.sink(receiveCompletion: { result in
-            if case .failure = result {
+            if case .failure(let error) = result {
+                errorHandler?(error)
                 expectation.fulfill()
             }
         }, receiveValue: { value in

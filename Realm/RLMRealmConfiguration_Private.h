@@ -18,7 +18,7 @@
 
 #import <Realm/RLMRealmConfiguration.h>
 
-@class RLMSchema;
+@class RLMSchema, RLMAuditConfiguration;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -29,6 +29,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readwrite) bool disableFormatUpgrade;
 @property (nonatomic, copy, nullable) RLMSchema *customSchema;
 @property (nonatomic, copy) NSString *pathOnDisk;
+@property (nonatomic, retain, nullable) RLMAuditConfiguration *auditConfiguration;
 
 // Get the default confiugration without copying it
 + (RLMRealmConfiguration *)rawDefaultConfiguration;

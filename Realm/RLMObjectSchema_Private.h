@@ -41,6 +41,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readwrite, assign) Class accessorClass;
 @property (nonatomic, readwrite, assign) Class unmanagedClass;
 
+@property (nonatomic, readwrite, assign) bool hasCustomAuditSerialization;
+
 @property (nonatomic, readwrite, nullable) RLMProperty *primaryKeyProperty;
 
 @property (nonatomic, copy) NSArray<RLMProperty *> *computedProperties;

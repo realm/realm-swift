@@ -68,7 +68,7 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
             XCTAssertNil(error)
             ex.fulfill()
         })
-        waitForExpectations(timeout: 4, handler: nil)
+        waitForExpectations(timeout: 40, handler: nil)
         return credentials
     }
 

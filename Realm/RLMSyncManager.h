@@ -56,7 +56,7 @@ typedef RLM_CLOSED_ENUM(NSUInteger, RLMSyncLogLevel) {
 ///
 /// The log function may be called from multiple threads simultaneously, and is
 /// responsible for performing its own synchronization if any is required.
-typedef void (*RLMSyncLogFunction)(RLMSyncLogLevel level, NSString *message);
+typedef void (^RLMSyncLogFunction)(RLMSyncLogLevel level, NSString *message);
 
 /// A block type representing a block which can be used to report a sync-related error to the application. If the error
 /// pertains to a specific session, that session will also be passed into the block.

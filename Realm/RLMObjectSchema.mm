@@ -33,6 +33,9 @@
 
 using namespace realm;
 
+@protocol RLMCustomAuditRepresentable
+@end
+
 // private properties
 @interface RLMObjectSchema ()
 @property (nonatomic, readwrite) NSDictionary<id, RLMProperty *> *allPropertiesByName;
@@ -136,6 +139,7 @@ using namespace realm;
     schema.unmanagedClass = objectClass;
     schema.isSwiftClass = isSwift;
     schema.isEmbedded = [(id)objectClass isEmbedded];
+    schema.hasCustomAuditSerialization = [objectClass conformsToProtocol:@protocol(RLMCustomAuditRepresentable)];
 
     // create array of RLMProperties, inserting properties of superclasses first
     Class cls = objectClass;
