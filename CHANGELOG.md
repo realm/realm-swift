@@ -3,18 +3,18 @@ x.y.z Release notes (yyyy-MM-dd)
 ### Enhancements
 * Add Swift API for asynchronous transactions
 ```
-    try? realm.writeAsync { asyncTransactionId in
+    try? realm.writeAsync {
         realm.create(SwiftStringObject.self, value: ["string"])
-    } _: { error in
+    } onComplete: { error in
         // optional handling on write complete
     }
 
-    try? realm.beginAsyncWrite { asyncTransactionId in
+    try? realm.beginAsyncWrite {
         realm.create(SwiftStringObject.self, value: ["string"])
         realm.commitAsyncWrite()
     }
 
-    RLMAsyncTransactionId asyncTransactionId = try? realm.beginAsyncWrite { _ in
+    let asyncTransactionId = try? realm.beginAsyncWrite {
         // ...
     }
     try! realm.cancelAsyncWrite(asyncTransactionId)

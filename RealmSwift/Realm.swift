@@ -377,6 +377,7 @@ public typealias AsyncTransactionId = RLMAsyncTransactionId
      and by default the transaction is commited asynchronously after the block completes.
      You can also explicitly call `commitWrite` or `cancelWrite` from
      within the block to synchronously commit or cancel the write transaction.
+     Returning without one of these calls is equivalent to calling `commitWrite`.
 
      @param block The block containing actions to perform.
 
@@ -388,9 +389,9 @@ public typealias AsyncTransactionId = RLMAsyncTransactionId
              the pending invocation of the block.
     */
     @discardableResult
-    public func writeAsync(_ block: @escaping (AsyncTransactionId) -> Void, _ onComplete: ((Swift.Error?) -> Void)? = nil) -> AsyncTransactionId {
-        return beginAsyncWrite { asyncTransactionId in
-            block(asyncTransactionId)
+    public func writeAsync(_ block: @escaping () -> Void, onComplete: ((Swift.Error?) -> Void)? = nil) -> AsyncTransactionId {
+        return beginAsyncWrite {
+            block()
             commitAsyncWrite(onComplete)
         }
     }
@@ -416,12 +417,10 @@ public typealias AsyncTransactionId = RLMAsyncTransactionId
              the pending invocation of the block.
      */
     @discardableResult
-    public func beginAsyncWrite(_ asyncWriteBlock: @escaping (AsyncTransactionId) -> Void) -> AsyncTransactionId {
-        var asyncTransactionId: AsyncTransactionId = 0
-        asyncTransactionId = rlmRealm.beginAsyncWriteTransaction {
-            asyncWriteBlock(asyncTransactionId)
+    public func beginAsyncWrite(_ asyncWriteBlock: @escaping () -> Void) -> AsyncTransactionId {
+        return rlmRealm.beginAsyncWriteTransaction {
+            asyncWriteBlock()
         }
-        return asyncTransactionId
     }
 
     /**

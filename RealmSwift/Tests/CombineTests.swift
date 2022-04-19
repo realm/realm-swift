@@ -2781,7 +2781,7 @@ class CombineAsyncRealmTests: CombinePublisherTestCase {
                 asyncWriteExpectation.fulfill()
             }
 
-        realm.writeAsync { _ in
+        realm.writeAsync {
             self.realm.create(SwiftIntObject.self, value: [])
         }
         waitForExpectations(timeout: 1, handler: nil)
@@ -2794,7 +2794,7 @@ class CombineAsyncRealmTests: CombinePublisherTestCase {
         }
         DispatchQueue.main.async {
             let realm = try! Realm(configuration: self.realm.configuration)
-            realm.writeAsync { _ in
+            realm.writeAsync {
                 realm.create(SwiftIntObject.self, value: [])
             }
         }

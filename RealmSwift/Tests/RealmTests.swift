@@ -986,9 +986,9 @@ class RealmTests: TestCase {
         let realm = try! Realm()
         let asyncComplete = expectation(description: "async transaction complete")
 
-        realm.writeAsync { _ in
+        realm.writeAsync {
             realm.create(SwiftStringObject.self, value: ["string"])
-        } _: { _ in
+        } onComplete: { _ in
             let object = realm.objects(SwiftStringObject.self).first
             XCTAssertEqual(object?.stringCol, "string")
             asyncComplete.fulfill()
@@ -1003,7 +1003,7 @@ class RealmTests: TestCase {
 
         DispatchQueue.main.async {
             let realm = try! Realm()
-            realm.beginAsyncWrite({ _ in
+            realm.beginAsyncWrite {
                 realm.create(SwiftStringObject.self, value: ["string"])
 
                 realm.commitAsyncWrite { _ in
@@ -1011,7 +1011,7 @@ class RealmTests: TestCase {
                     XCTAssertEqual(object?.stringCol, "string")
                     writeComplete.fulfill()
                 }
-            })
+            }
         }
 
         waitForExpectations(timeout: 1, handler: nil)
@@ -1023,12 +1023,12 @@ class RealmTests: TestCase {
         let asyncComplete = expectation(description: "async transaction complete")
         asyncComplete.isInverted = true
 
-        let asyncTransactionId = realm.beginAsyncWrite({ _ in
+        let asyncTransactionId = realm.beginAsyncWrite {
             realm.create(SwiftStringObject.self, value: ["string"])
             realm.commitAsyncWrite { _ in
                 asyncComplete.fulfill()
             }
-        })
+        }
 
         try! realm.cancelAsyncWrite(asyncTransactionId)
 
@@ -1042,7 +1042,7 @@ class RealmTests: TestCase {
 
         XCTAssertNil(realm.objects(SwiftStringObject.self).first)
 
-        realm.beginAsyncWrite { _ in
+        realm.beginAsyncWrite {
             realm.create(SwiftStringObject.self, value: ["string"])
             asyncComplete.fulfill()
         }
@@ -1059,9 +1059,9 @@ class RealmTests: TestCase {
 
         DispatchQueue.main.async {
             let realm = try! Realm()
-            let transactionId = realm.writeAsync({ _ in
+            let transactionId = realm.writeAsync({
                 realm.create(SwiftStringObject.self, value: ["string"])
-            }, { _ in
+            }, onComplete: { _ in
                 writeComplete.fulfill()
             })
             try! realm.cancelAsyncWrite(transactionId)
@@ -1089,7 +1089,7 @@ class RealmTests: TestCase {
         let results = realm.objects(SwiftStringObject.self)
         XCTAssertEqual(results.count, 0)
 
-        realm.writeAsync { _ in
+        realm.writeAsync {
             realm.create(SwiftStringObject.self, value: ["string"])
         }
 
@@ -1108,14 +1108,14 @@ class RealmTests: TestCase {
         let asyncComplete = expectation(description: "async transaction complete")
         XCTAssertEqual(0, realm.objects(SwiftStringObject.self).count)
 
-        realm.beginAsyncWrite { _ in
+        realm.beginAsyncWrite {
             realm.create(SwiftStringObject.self, value: ["string"])
             realm.commitAsyncWrite({ _ in
                 asyncComplete.fulfill()
             }, isGroupingAllowed: true)
         }
 
-        realm.beginAsyncWrite { _ in
+        realm.beginAsyncWrite {
             realm.create(SwiftStringObject.self, value: ["string 2"])
             realm.commitAsyncWrite()
         }
@@ -1129,7 +1129,7 @@ class RealmTests: TestCase {
         XCTAssertEqual(0, realm.objects(SwiftStringObject.self).count)
         let asyncComplete = expectation(description: "async transaction complete")
 
-        realm.beginAsyncWrite { _ in
+        realm.beginAsyncWrite {
             realm.create(SwiftStringObject.self, value: ["string"])
             asyncComplete.fulfill()
         }
@@ -1169,13 +1169,13 @@ class RealmTests: TestCase {
 
         XCTAssertEqual(0, realm.objects(SwiftStringObject.self).count)
 
-        realm.writeAsync { _ in
+        realm.writeAsync {
             realm.create(SwiftStringObject.self, value: ["string"])
         }
 
-        realm.writeAsync { _ in
+        realm.writeAsync {
             realm.create(SwiftStringObject.self, value: ["string 2"])
-        } _: { _ in
+        } onComplete: { _ in
             asyncComplete.fulfill()
         }
 
@@ -1193,13 +1193,13 @@ class RealmTests: TestCase {
 
         XCTAssertEqual(0, realm.objects(SwiftStringObject.self).count)
 
-        realm.writeAsync { _ in
+        realm.writeAsync {
             realm.create(SwiftStringObject.self, value: ["string"])
         }
 
-        realm.writeAsync { _ in
+        realm.writeAsync {
             realm.create(SwiftStringObject.self, value: ["string 2"])
-        } _: { _ in
+        } onComplete: { _ in
             asyncComplete.fulfill()
         }
 
@@ -1230,15 +1230,15 @@ class RealmTests: TestCase {
             }
         }
 
-        realm.writeAsync { _ in
+        realm.writeAsync {
             realm.create(SwiftStringObject.self, value: ["string 1"])
-        } _: { _ in
+        } onComplete: { _ in
             asyncWriteComplete.fulfill()
         }
 
-        realm.writeAsync { _ in
+        realm.writeAsync {
             realm.create(SwiftStringObject.self, value: ["string 2"])
-        } _: { _ in
+        } onComplete: { _ in
             asyncWriteComplete.fulfill()
         }
 
@@ -1253,10 +1253,10 @@ class RealmTests: TestCase {
         let transaction2 = expectation(description: "async transaction 2 complete")
         XCTAssertEqual(0, realm.objects(SwiftStringObject.self).count)
 
-        realm.beginAsyncWrite { _ in
+        realm.beginAsyncWrite {
             realm.create(SwiftStringObject.self, value: ["string"])
 
-            realm.beginAsyncWrite { _ in
+            realm.beginAsyncWrite {
                 realm.create(SwiftStringObject.self, value: ["string 2"])
                 realm.commitAsyncWrite { _ in
                     transaction1.fulfill()
@@ -1278,7 +1278,7 @@ class RealmTests: TestCase {
         realm.beginWrite()
         realm.create(SwiftStringObject.self, value: ["string"])
 
-        realm.beginAsyncWrite { _ in
+        realm.beginAsyncWrite {
             realm.create(SwiftStringObject.self, value: ["string 2"])
             realm.commitAsyncWrite { _ in
                 transaction1.fulfill()
@@ -1294,32 +1294,27 @@ class RealmTests: TestCase {
     func testAsyncTransactionCancel() {
         let waitComplete = expectation(description: "async wait complete")
         let expectation = XCTestExpectation(description: "testAsyncTransactionCancel expectation")
-        expectation.expectedFulfillmentCount = 4
+        expectation.expectedFulfillmentCount = 3
         let unexpectation = XCTestExpectation(description: "should not fulfill")
         unexpectation.isInverted = true
 
         DispatchQueue.main.async {
             let realm = try! Realm()
-            realm.beginAsyncWrite { _ in
+            realm.beginAsyncWrite {
                 realm.create(SwiftStringObject.self, value: ["string"])
                 expectation.fulfill()
             }
-            realm.beginAsyncWrite { _ in
+            realm.beginAsyncWrite {
                 realm.create(SwiftStringObject.self, value: ["string"])
                 realm.commitAsyncWrite()
                 expectation.fulfill()
             }
-            realm.beginAsyncWrite { asyncTransactionIdA in
-                realm.create(SwiftStringObject.self, value: ["string"])
-                expectation.fulfill()
-                try! realm.cancelAsyncWrite(asyncTransactionIdA)
-            }
-            realm.beginAsyncWrite { _ in
+            realm.beginAsyncWrite {
                 realm.create(SwiftStringObject.self, value: ["string"])
                 expectation.fulfill()
                 realm.commitAsyncWrite()
             }
-            let asyncTransactionIdB = realm.beginAsyncWrite { _ in
+            let asyncTransactionIdB = realm.beginAsyncWrite {
                 unexpectation.fulfill()
             }
             try! realm.cancelAsyncWrite(asyncTransactionIdB)
@@ -1337,16 +1332,16 @@ class RealmTests: TestCase {
         let changesAddedExpectation = expectation(description: "testAsyncTransactionCommit expectation")
         changesAddedExpectation.expectedFulfillmentCount = 2
 
-        realm.beginAsyncWrite { _ in
+        realm.beginAsyncWrite {
             realm.create(SwiftStringObject.self, value: ["with 'commit' should commit"])
             realm.commitAsyncWrite()
             changesAddedExpectation.fulfill()
         }
-        realm.beginAsyncWrite { _ in
+        realm.beginAsyncWrite {
             realm.create(SwiftStringObject.self, value: ["without 'commit' should not commit"])
             changesAddedExpectation.fulfill()
         }
-        let asyncTransactionId = realm.beginAsyncWrite { _ in
+        let asyncTransactionId = realm.beginAsyncWrite {
             realm.create(SwiftStringObject.self, value: ["'cancel' after 'begin' should not commit"])
             realm.commitAsyncWrite()
             changesAddedExpectation.fulfill()
@@ -1362,13 +1357,13 @@ class RealmTests: TestCase {
         let asyncComplete = expectation(description: "async transaction complete")
         let objU = SwiftStringObject(value: ["string U"])
 
-        realm.beginAsyncWrite({ _ in
+        realm.beginAsyncWrite {
             realm.create(SwiftStringObject.self, value: ["string I"])
             realm.add(objU)
             realm.commitAsyncWrite { _ in
                 asyncComplete.fulfill()
             }
-        })
+        }
 
         waitForExpectations(timeout: 1, handler: nil)
         XCTAssertNotNil(realm.objects(SwiftStringObject.self).first { $0.stringCol == "string U" })
@@ -1383,12 +1378,12 @@ class RealmTests: TestCase {
         })
         let objA = realm.objects(SwiftStringObject.self).first(where: { $0.stringCol == "string A" })!
 
-        realm.beginAsyncWrite({ _ in
+        realm.beginAsyncWrite {
             objA.stringCol = "string B"
             realm.commitAsyncWrite { _ in
                 asyncComplete.fulfill()
             }
-        })
+        }
 
         waitForExpectations(timeout: 1, handler: nil)
         XCTAssertNil(realm.objects(SwiftStringObject.self).first { $0.stringCol == "string A" })
