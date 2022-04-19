@@ -19,6 +19,7 @@ x.y.z Release notes (yyyy-MM-dd)
     }];
     [realm cancelAsyncTransaction:asyncTransactionId];
 ```
+* Replace Xcode 13.3 binaries with 13.3.1 binaries.
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
@@ -29,12 +30,37 @@ x.y.z Release notes (yyyy-MM-dd)
 ### Compatibility
 * Realm Studio: 11.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 13.3.1.
+* CocoaPods: 1.10 or later.
+* Xcode: 12.4-13.3.1.
+
+### Internal
+* Upgraded realm-core from ? to ?
+
+10.25.1 Release notes (2022-04-11)
+=============================================================
+
+### Fixed
+
+* Fixed various memory corruption bugs when encryption is used caused by not
+  locking a mutex when needed.
+  ([#7640](https://github.com/realm/realm-swift/issues/7640), [#7659](https://github.com/realm/realm-swift/issues/7659), since v10.21.1)
+* Changeset upload batching did not calculate the accumulated size correctly,
+  resulting in “error reading body failed to read: read limited at 16777217
+  bytes” errors from the server when writing large amounts of data
+  ([Core #5373](https://github.com/realm/realm-core/pull/5373), since 11.13.0).
+
+### Compatibility
+
+* Realm Studio: 11.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 13.3.
 * CocoaPods: 1.10 or later.
 * Xcode: 12.4-13.3.
 
 ### Internal
-* Upgraded realm-core from ? to ?
+
+* Upgraded realm-core from v11.13.0 to v11.14.0.
 
 10.25.0 Release notes (2022-03-29)
 =============================================================

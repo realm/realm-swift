@@ -127,10 +127,10 @@ class TableViewController: UITableViewController {
     // Helpers
 
     class func randomString() -> String {
-        return "Title \(arc4random())"
+        return "Title \(Int.random(in: 0..<100))"
     }
 
     class func randomDate() -> NSDate {
-        return NSDate(timeIntervalSince1970: TimeInterval(arc4random()))
+        return NSDate(timeIntervalSince1970: TimeInterval.random(in: 0..<TimeInterval.greatestFiniteMagnitude))
     }
 }

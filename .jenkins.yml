@@ -8,7 +8,7 @@ xcode_version:
  - 12.5.1
  - 13.1
  - 13.2.1
- - 13.3
+ - 13.3.1
 target:
  - docs
  - swiftlint
@@ -53,7 +53,7 @@ exclude:
   - xcode_version: 13.1
     target: docs
 
-  - xcode_version: 13.3
+  - xcode_version: 13.3.1
     target: docs
 
   - xcode_version: 12.4

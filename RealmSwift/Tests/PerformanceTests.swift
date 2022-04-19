@@ -400,7 +400,7 @@ class SwiftPerformanceTests: TestCase {
         let realm = realmWithTestPath()
         try! realm.write {
             for _ in 0..<8000 {
-                let randomNumber = Int(arc4random_uniform(UInt32(INT_MAX)))
+                let randomNumber = Int.random(in: 0...Int.max)
                 realm.create(SwiftIntObject.self, value: [randomNumber])
             }
         }
