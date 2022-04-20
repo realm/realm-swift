@@ -44,6 +44,7 @@ Pod::Spec.new do |s|
                               'include/RLMSwiftValueStorage.h',
                               'include/RLMThreadSafeReference.h',
                               'include/RLMValue.h',
+                              'include/RLMOwnableCollection.h',
 
                               # Sync
                               'include/NSError+RLMSync.h',

@@ -464,6 +464,17 @@
 		ACC6BEE62796EA78006C1728 /* RLMSyncSubscription.h in Headers */ = {isa = PBXBuildFile; fileRef = 53E308CA27905794002A8D91 /* RLMSyncSubscription.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		ACC6BEE72796ED6C006C1728 /* RLMSyncSubscription.mm in Sources */ = {isa = PBXBuildFile; fileRef = 531F956B27906F7600E497F1 /* RLMSyncSubscription.mm */; };
 		ACF08B6726DD936200686CBC /* Query.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACF08B6626DD936200686CBC /* Query.swift */; };
+		BA79815D9647D01921938C5A /* RLMOwnableCollection.h in Headers */ = {isa = PBXBuildFile; fileRef = BA798B95AA33448D6A7008A0 /* RLMOwnableCollection.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		BA7983CB4661565356800EDA /* Ownable.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA798EF69698FEF55B403301 /* Ownable.swift */; };
+		BA79851F3F507B88B52A8BE7 /* BusyTown.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA7989238B03E75B5A8A483F /* BusyTown.swift */; };
+		BA79859EEE05196EEFB5331B /* BusyTownTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA7988D3D3663B21BC36581B /* BusyTownTests.swift */; };
+		BA79893551C6DA98CDC294B6 /* RealmProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA798DF10142DDB73AFE15D9 /* RealmProvider.swift */; };
+		BA7989E011BBEE5E788F07BE /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA798E7F2A7899A2719C3954 /* Message.swift */; };
+		BA798A18F33D842D8E8EFD72 /* RLMOwnableCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = BA798C70EDE6781C01F32606 /* RLMOwnableCollection.m */; };
+		BA798B204BEA767074BF3F6D /* OwnableResults.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA7980FE54040A4B84689038 /* OwnableResults.swift */; };
+		BA798EE7176C80CAD69D63CD /* RealmError.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA7986D5AD8A9B811252A459 /* RealmError.swift */; };
+		BA798F8FC9E7554DBD28A423 /* Realm+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA7982B21912163B3CE0F00E /* Realm+Extensions.swift */; };
+		BA798FA37D65BAE3382B2885 /* RLMOwnableCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = BA798C70EDE6781C01F32606 /* RLMOwnableCollection.m */; };
 		C042A48D1B7522A900771ED2 /* RealmConfigurationTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = C042A48C1B7522A900771ED2 /* RealmConfigurationTests.mm */; };
 		C042A48E1B7522A900771ED2 /* RealmConfigurationTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = C042A48C1B7522A900771ED2 /* RealmConfigurationTests.mm */; };
 		C0CDC0821B38DABA00C5716D /* UtilTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 021A88311AAFB5BE00EEAC84 /* UtilTests.mm */; };
@@ -1039,6 +1050,16 @@
 		ACB6FD31273C60920009712F /* SwiftFlexibleSyncServerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SwiftFlexibleSyncServerTests.swift; path = Realm/ObjectServerTests/SwiftFlexibleSyncServerTests.swift; sourceTree = "<group>"; };
 		ACB6FD34273C60CC0009712F /* SyncSubscription.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncSubscription.swift; sourceTree = "<group>"; };
 		ACF08B6626DD936200686CBC /* Query.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Query.swift; sourceTree = "<group>"; };
+		BA7980FE54040A4B84689038 /* OwnableResults.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OwnableResults.swift; sourceTree = "<group>"; };
+		BA7982B21912163B3CE0F00E /* Realm+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Realm+Extensions.swift"; sourceTree = "<group>"; };
+		BA7986D5AD8A9B811252A459 /* RealmError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RealmError.swift; sourceTree = "<group>"; };
+		BA7988D3D3663B21BC36581B /* BusyTownTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BusyTownTests.swift; sourceTree = "<group>"; };
+		BA7989238B03E75B5A8A483F /* BusyTown.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BusyTown.swift; sourceTree = "<group>"; };
+		BA798B95AA33448D6A7008A0 /* RLMOwnableCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMOwnableCollection.h; sourceTree = "<group>"; };
+		BA798C70EDE6781C01F32606 /* RLMOwnableCollection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMOwnableCollection.m; sourceTree = "<group>"; };
+		BA798DF10142DDB73AFE15D9 /* RealmProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RealmProvider.swift; sourceTree = "<group>"; };
+		BA798E7F2A7899A2719C3954 /* Message.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Message.swift; sourceTree = "<group>"; };
+		BA798EF69698FEF55B403301 /* Ownable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Ownable.swift; sourceTree = "<group>"; };
 		C042A48C1B7522A900771ED2 /* RealmConfigurationTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RealmConfigurationTests.mm; sourceTree = "<group>"; };
 		C073E1201AE9B705002C0A30 /* RLMObject_Private.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RLMObject_Private.hpp; sourceTree = "<group>"; };
 		C0D2DD051B6BDEA1004E8919 /* RLMRealmConfiguration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMRealmConfiguration.h; sourceTree = "<group>"; };
@@ -1515,6 +1536,11 @@
 				ACB6FD34273C60CC0009712F /* SyncSubscription.swift */,
 				3F222C4D1E26F51300CA0713 /* ThreadSafeReference.swift */,
 				5D660FF01BE98D670021E04F /* Util.swift */,
+				BA798EF69698FEF55B403301 /* Ownable.swift */,
+				BA7986D5AD8A9B811252A459 /* RealmError.swift */,
+				BA7982B21912163B3CE0F00E /* Realm+Extensions.swift */,
+				BA798DF10142DDB73AFE15D9 /* RealmProvider.swift */,
+				BA7980FE54040A4B84689038 /* OwnableResults.swift */,
 			);
 			path = RealmSwift;
 			sourceTree = "<group>";
@@ -1571,6 +1597,9 @@
 				5D6610121BE98D880021E04F /* TestCase.swift */,
 				3F90C1B12716169C0029000E /* TestValueFactory.swift */,
 				3F73BC841E3A870F00FE80B6 /* ThreadSafeReferenceTests.swift */,
+				BA7989238B03E75B5A8A483F /* BusyTown.swift */,
+				BA7988D3D3663B21BC36581B /* BusyTownTests.swift */,
+				BA798E7F2A7899A2719C3954 /* Message.swift */,
 			);
 			name = "RealmSwift Tests";
 			path = RealmSwift/Tests;
@@ -1903,6 +1932,8 @@
 				3F1D8D32265B071000593ABA /* RLMUUID_Private.hpp */,
 				3F1D8D30265B071000593ABA /* RLMValue.h */,
 				3F1D8D31265B071000593ABA /* RLMValue.mm */,
+				BA798C70EDE6781C01F32606 /* RLMOwnableCollection.m */,
+				BA798B95AA33448D6A7008A0 /* RLMOwnableCollection.h */,
 			);
 			path = Realm;
 			sourceTree = "<group>";
@@ -1951,6 +1982,7 @@
 			files = (
 				3F73BC951E3A878500FE80B6 /* NSError+RLMSync.h in Headers */,
 				5D659EA51BE04556006515A0 /* Realm.h in Headers */,
+				BA79815D9647D01921938C5A /* RLMOwnableCollection.h in Headers */,
 				5D659EA71BE04556006515A0 /* RLMAccessor.h in Headers */,
 				CFAEF761242B5F9A00EAF721 /* RLMAPIKeyAuth.h in Headers */,
 				4993221224129DCE00A0EC8E /* RLMApp.h in Headers */,
@@ -2787,6 +2819,7 @@
 				5D659E9B1BE04556006515A0 /* RLMUtil.mm in Sources */,
 				0C5796A225643D7500744CAE /* RLMUUID.mm in Sources */,
 				3F1D8D35265B071000593ABA /* RLMValue.mm in Sources */,
+				BA798FA37D65BAE3382B2885 /* RLMOwnableCollection.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2844,6 +2877,13 @@
 				ACB6FD35273C60CC0009712F /* SyncSubscription.swift in Sources */,
 				3F222C4E1E26F51300CA0713 /* ThreadSafeReference.swift in Sources */,
 				5D660FFE1BE98D670021E04F /* Util.swift in Sources */,
+				BA7983CB4661565356800EDA /* Ownable.swift in Sources */,
+				BA798EE7176C80CAD69D63CD /* RealmError.swift in Sources */,
+				BA798F8FC9E7554DBD28A423 /* Realm+Extensions.swift in Sources */,
+				BA79893551C6DA98CDC294B6 /* RealmProvider.swift in Sources */,
+				BA79851F3F507B88B52A8BE7 /* BusyTown.swift in Sources */,
+				BA7989E011BBEE5E788F07BE /* Message.swift in Sources */,
+				BA798B204BEA767074BF3F6D /* OwnableResults.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2904,6 +2944,7 @@
 				3F90C1B22716169C0029000E /* TestValueFactory.swift in Sources */,
 				3F88250D1E5E335000586B35 /* ThreadSafeReferenceTests.swift in Sources */,
 				5DBEC9B11F719A9D001233EC /* Util.swift in Sources */,
+				BA79859EEE05196EEFB5331B /* BusyTownTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2970,6 +3011,7 @@
 				5DD755991BE056DE002800DA /* RLMUtil.mm in Sources */,
 				0C5796A325643D7500744CAE /* RLMUUID.mm in Sources */,
 				3F1D8D36265B071000593ABA /* RLMValue.mm in Sources */,
+				BA798A18F33D842D8E8EFD72 /* RLMOwnableCollection.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3358,6 +3400,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5D660FBD1BE98BEF0021E04F /* RealmSwift.xcconfig */;
 			buildSettings = {
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 			};
 			name = Debug;
 		};
@@ -3365,6 +3408,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5D660FBD1BE98BEF0021E04F /* RealmSwift.xcconfig */;
 			buildSettings = {
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 			};
 			name = Release;
 		};
@@ -3373,6 +3417,7 @@
 			baseConfigurationReference = 5D660FC01BE98BEF0021E04F /* Tests.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -3387,6 +3432,7 @@
 			baseConfigurationReference = 5D660FC01BE98BEF0021E04F /* Tests.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

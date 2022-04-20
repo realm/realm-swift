@@ -90,7 +90,7 @@ import Realm
         self.handle = RLMLinkingObjectsHandle(linkingObjects: collection as! RLMResults<AnyObject>)
     }
 
-    internal var collection: RLMCollection {
+    public var collection: RLMCollection {
         return handle?.results ?? RLMResults<AnyObject>.emptyDetached()
     }
 

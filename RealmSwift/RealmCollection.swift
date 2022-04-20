@@ -234,6 +234,8 @@ public protocol RealmCollectionBase: RandomAccessCollection, LazyCollectionProto
 public protocol RealmCollection: RealmCollectionBase, Equatable {
     // MARK: Properties
 
+    var collection: RLMCollection { get }
+
     /// The Realm which manages the collection, or `nil` for unmanaged collections.
     var realm: Realm? { get }
 
@@ -1070,7 +1072,7 @@ public extension RealmCollection {
  collection directly.
  */
 @frozen public struct AnyRealmCollection<Element: RealmCollectionValue>: RealmCollectionImpl {
-    internal let collection: RLMCollection
+    public let collection: RLMCollection
     internal var lastAccessedNames: NSMutableArray?
     internal init(collection: RLMCollection) {
         self.collection = collection

@@ -144,7 +144,7 @@ extension Projection: KeypathSortable {}
  Results instances cannot be directly instantiated.
  */
 @frozen public struct Results<Element: RealmCollectionValue>: Equatable, RealmCollectionImpl {
-    internal let collection: RLMCollection
+    public let collection: RLMCollection
 
     /// A human-readable description of the objects represented by the results.
     public var description: String {
