@@ -19,7 +19,9 @@
 import UIKit
 import RealmSwift
 
-public class MyModel: RealmSwift.Object {}
+public class MyModel: RealmSwift.Object {
+    @Persisted var name: String
+}
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
