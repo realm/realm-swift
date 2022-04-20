@@ -1082,6 +1082,8 @@ private class ObservableAsyncOpenStorage: ObservableObject {
     var configuration: Realm.Configuration?
     var partitionValue: AnyBSON?
 
+    var setupHasRun = false
+
     // Tracks User State for App for Multi-User Support
     enum AppState {
         case loggedIn(User)
@@ -1182,7 +1184,6 @@ private class ObservableAsyncOpenStorage: ObservableObject {
 
         if let user = app.currentUser {
             appState = .loggedIn(user)
-            asyncOpenForUser(user)
         } else {
             appState = .loggedOut
             asyncOpenState = .waitingForUser
@@ -1287,7 +1288,12 @@ private class ObservableAsyncOpenStorage: ObservableObject {
 
     /// :nodoc:
     public var wrappedValue: AsyncOpenState {
-        storage.asyncOpenState
+        if !storage.setupHasRun {
+            storage.asyncOpen()
+            storage.setupHasRun = true
+        }
+        return storage.asyncOpenState
+
     }
 
     /**
@@ -1306,6 +1312,18 @@ private class ObservableAsyncOpenStorage: ObservableObject {
                  if empty the user configuration will be used.
      - parameter timeout: The maximum number of milliseconds to allow for a connection to
      become fully established., if empty or `nil` no connection timeout is set.
+
+     - Note: It is recommend to use the configuration obtained from the user, using  `user.configuration(partitionValue:)` or `user.flexibleSyncConfiguration()`
+             when adding a configuration to this property wrapper, and modify any configuration option from it if needed.
+
+             AsyncOpenView()
+                 .environment(\.realmConfiguration, getConfiguration())
+
+             func getConfiguration() -> Realm.Configuration {
+                 var configuration = user.configuration(partitionValue: "partitionValue")
+                 configuration.encryptionKey =  <ENCRYPYION_KEY>
+                 return configuration
+             }
      */
     public init<Partition>(appId: String? = nil,
                            partitionValue: Partition,
@@ -1324,6 +1342,18 @@ private class ObservableAsyncOpenStorage: ObservableObject {
                  if empty the user configuration will be used.
      - parameter timeout: The maximum number of milliseconds to allow for a connection to
                  become fully established., if empty or `nil` no connection timeout is set.
+
+     - Note: It is recommend to use the configuration obtained from the user, using  `user.configuration(partitionValue:)` or `user.flexibleSyncConfiguration()`
+             when adding a configuration to this property wrapper, and modify any configuration option from it if needed.
+
+             AsyncOpenView()
+                 .environment(\.realmConfiguration, getConfiguration())
+
+             func getConfiguration() -> Realm.Configuration {
+                 var configuration = user.configuration(partitionValue: "partitionValue")
+                 configuration.encryptionKey =  <ENCRYPYION_KEY>
+                 return configuration
+             }
      */
     public init(appId: String? = nil,
                 configuration: Realm.Configuration? = nil,
@@ -1338,7 +1368,6 @@ private class ObservableAsyncOpenStorage: ObservableObject {
             let bsonValue = AnyBSON(partitionValue: partitionValue)
             if storage.partitionValue != bsonValue {
                 storage.partitionValue = bsonValue
-                storage.asyncOpen()
             }
         }
 
@@ -1349,7 +1378,6 @@ private class ObservableAsyncOpenStorage: ObservableObject {
                 storage.partitionValue = partitionValue
             }
             storage.configuration = configuration
-            storage.asyncOpen()
         }
     }
 }
@@ -1412,7 +1440,11 @@ private class ObservableAsyncOpenStorage: ObservableObject {
 
     /// :nodoc:
     public var wrappedValue: AsyncOpenState {
-        storage.asyncOpenState
+        if !storage.setupHasRun {
+            storage.asyncOpen()
+            storage.setupHasRun = true
+        }
+        return storage.asyncOpenState
     }
 
     /**
@@ -1431,6 +1463,18 @@ private class ObservableAsyncOpenStorage: ObservableObject {
                  if empty the user configuration will be used.
      - parameter timeout: The maximum number of milliseconds to allow for a connection to
                  become fully established, if empty or `nil` no connection timeout is set.
+
+     - Note: It is recommend to use the configuration obtained from the user, using  `user.configuration(partitionValue:)` or `user.flexibleSyncConfiguration()`
+             when adding a configuration to this property wrapper, and modify any configuration option from it if needed.
+
+             AsyncOpenView()
+                 .environment(\.realmConfiguration, getConfiguration())
+
+             func getConfiguration() -> Realm.Configuration {
+                 var configuration = user.configuration(partitionValue: "partitionValue")
+                 configuration.encryptionKey =  <ENCRYPYION_KEY>
+                 return configuration
+             }
      */
     public init<Partition>(appId: String? = nil,
                            partitionValue: Partition,
@@ -1449,6 +1493,18 @@ private class ObservableAsyncOpenStorage: ObservableObject {
                  if empty the user configuration will be used.
      - parameter timeout: The maximum number of milliseconds to allow for a connection to
                  become fully established., if empty or `nil` no connection timeout is set.
+
+     - Note: It is recommend to use the configuration obtained from the user, using  `user.configuration(partitionValue:)` or `user.flexibleSyncConfiguration()`
+             when adding a configuration to this property wrapper, and modify any configuration option from it if needed.
+
+             AsyncOpenView()
+                 .environment(\.realmConfiguration, getConfiguration())
+
+             func getConfiguration() -> Realm.Configuration {
+                 var configuration = user.configuration(partitionValue: "partitionValue")
+                 configuration.encryptionKey =  <ENCRYPYION_KEY>
+                 return configuration
+             }
      */
     public init(appId: String? = nil,
                 configuration: Realm.Configuration? = nil,
@@ -1463,7 +1519,6 @@ private class ObservableAsyncOpenStorage: ObservableObject {
             let bsonValue = AnyBSON(partitionValue: partitionValue)
             if storage.partitionValue != bsonValue {
                 storage.partitionValue = bsonValue
-                storage.asyncOpen()
             }
         }
 
@@ -1474,7 +1529,6 @@ private class ObservableAsyncOpenStorage: ObservableObject {
                 storage.partitionValue = partitionValue
             }
             storage.configuration = configuration
-            storage.asyncOpen()
         }
     }
 }

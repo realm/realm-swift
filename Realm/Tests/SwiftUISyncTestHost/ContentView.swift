@@ -76,6 +76,13 @@ struct MainView: View {
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .background(Color.green)
                         .transition(AnyTransition.move(edge: .leading)).animation(.default)
+                case "async_open_custom_configuration":
+                    AsyncOpenPartitionView()
+                        .environment(\.realmConfiguration, getConfiguration())
+                        .environment(\.partitionValue, user!.id)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .background(Color.green)
+                        .transition(AnyTransition.move(edge: .leading)).animation(.default)
                 case "async_open_environment_partition":
                     AsyncOpenPartitionView()
                         .environment(\.partitionValue, partitionValue ?? user!.id)
@@ -94,8 +101,39 @@ struct MainView: View {
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .background(Color.green)
                         .transition(AnyTransition.move(edge: .leading)).animation(.default)
+                case "async_open_flexible_sync_initial_subscriptions":
+                    AsyncOpenFlexibleSyncView()
+                        .environment(\.realmConfiguration, user!.flexibleSyncConfiguration(initialSubscriptions: { subs in
+                            subs.append(QuerySubscription<SwiftPerson>(name: "person_age") {
+                                $0.age > 5 && $0.firstName == ProcessInfo.processInfo.environment["firstName"]!
+                            })
+                        }))
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .background(Color.green)
+                        .transition(AnyTransition.move(edge: .leading)).animation(.default)
+                case "async_open_flexible_sync_initial_subscriptions_rerun_on_open":
+                    AsyncOpenFlexibleSyncView()
+                        .environment(\.realmConfiguration, user!.flexibleSyncConfiguration(initialSubscriptions: { subs in
+                            if let foundSubscription = subs.first(named: "person_age") {
+                                foundSubscription.updateQuery(toType: SwiftPerson.self) { $0.age > 15 && $0.firstName == ProcessInfo.processInfo.environment["firstName"]! }
+                            } else {
+                                subs.append(QuerySubscription<SwiftPerson>(name: "person_age") {
+                                    $0.age > 5 && $0.firstName == ProcessInfo.processInfo.environment["firstName"]!
+                                })
+                            }
+                        }, rerunOnOpen: true))
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .background(Color.green)
+                        .transition(AnyTransition.move(edge: .leading)).animation(.default)
                 case "auto_open":
                     AutoOpenView()
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .background(Color.green)
+                        .transition(AnyTransition.move(edge: .leading)).animation(.default)
+                case "auto_open_custom_configuration":
+                    AutoOpenPartitionView()
+                        .environment(\.realmConfiguration, getConfiguration())
+                        .environment(\.partitionValue, user!.id)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .background(Color.green)
                         .transition(AnyTransition.move(edge: .leading)).animation(.default)
@@ -117,11 +155,48 @@ struct MainView: View {
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .background(Color.green)
                         .transition(AnyTransition.move(edge: .leading)).animation(.default)
+                case "auto_open_flexible_sync_initial_subscriptions":
+                    AutoOpenFlexibleSyncView()
+                        .environment(\.realmConfiguration, user!.flexibleSyncConfiguration(initialSubscriptions: { subs in
+                            if let foundSubscription = subs.first(named: "person_age") {
+                                foundSubscription.updateQuery(toType: SwiftPerson.self) { $0.age > 15 && $0.firstName == ProcessInfo.processInfo.environment["firstName"]! }
+                            } else {
+                                subs.append(QuerySubscription<SwiftPerson>(name: "person_age") {
+                                    $0.age > 5 && $0.firstName == ProcessInfo.processInfo.environment["firstName"]!
+                                })
+                            }
+                        }))
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .background(Color.green)
+                        .transition(AnyTransition.move(edge: .leading)).animation(.default)
+                case "auto_open_flexible_sync_initial_subscriptions_rerun_on_open":
+                    AutoOpenFlexibleSyncView()
+                        .environment(\.realmConfiguration, user!.flexibleSyncConfiguration(initialSubscriptions: { subs in
+                            subs.append(QuerySubscription<SwiftPerson>(name: "person_age") {
+                                $0.age > 5 && $0.firstName == ProcessInfo.processInfo.environment["firstName"]!
+                            })
+                        }, rerunOnOpen: true))
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .background(Color.green)
+                        .transition(AnyTransition.move(edge: .leading)).animation(.default)
                 default:
                     EmptyView()
                 }
             }
         }
+    }
+
+    func getConfiguration() -> Realm.Configuration {
+        var configuration = Realm.Configuration()
+        configuration.encryptionKey = getKey()
+        return configuration
+    }
+
+    func getKey() -> Data {
+        var key = Data(count: 64)
+        _ = key.withUnsafeMutableBytes { (pointer: UnsafeMutableRawBufferPointer) in
+            SecRandomCopyBytes(kSecRandomDefault, 64, pointer.baseAddress!) }
+        return key
     }
 }
 
@@ -219,7 +294,7 @@ struct AsyncOpenView: View {
             case .open(let realm):
                 if canNavigate {
                     ListView()
-                        .environment(\.realm, realm)
+                        .environment(\.realmConfiguration, realm.configuration)
                         .transition(AnyTransition.move(edge: .leading)).animation(.default)
                 } else {
                     VStack {
@@ -266,7 +341,7 @@ struct AutoOpenView: View {
             case .open(let realm):
                 if canNavigate {
                     ListView()
-                        .environment(\.realm, realm)
+                        .environment(\.realmConfiguration, realm.configuration)
                         .transition(AnyTransition.move(edge: .leading)).animation(.default)
                 } else {
                     VStack {
@@ -312,7 +387,7 @@ struct AsyncOpenPartitionView: View {
                 ProgressView("Waiting for user to logged in...")
             case .open(let realm):
                 ListView()
-                    .environment(\.realm, realm)
+                    .environment(\.realmConfiguration, realm.configuration)
                     .transition(AnyTransition.move(edge: .leading)).animation(.default)
             case .error(let error):
                 ErrorView(error: error)
@@ -345,7 +420,7 @@ struct AutoOpenPartitionView: View {
                 ProgressView("Waiting for user to logged in...")
             case .open(let realm):
                 ListView()
-                    .environment(\.realm, realm)
+                    .environment(\.realmConfiguration, realm.configuration)
                     .transition(AnyTransition.move(edge: .leading)).animation(.default)
             case .error(let error):
                 ErrorView(error: error)
@@ -368,6 +443,7 @@ enum SubscriptionState {
 }
 
 struct AsyncOpenFlexibleSyncView: View {
+    let testType: String = ProcessInfo.processInfo.environment["async_view_type"]!
     @State var subscriptionState: SubscriptionState = .initial
     @AsyncOpen(appId: ProcessInfo.processInfo.environment["app_id"]!,
                timeout: 2000)
@@ -385,15 +461,19 @@ struct AsyncOpenFlexibleSyncView: View {
                 case .initial:
                     ProgressView("Subscribing to Query")
                         .onAppear {
-                            Task {
-                                do {
-                                    let subs = realm.subscriptions
-                                    try await subs.update {
-                                        subs.append(QuerySubscription<SwiftPerson>(name: "person_age") {
-                                            $0.age > 5 && $0.firstName == ProcessInfo.processInfo.environment["firstName"]!
-                                        })
+                            if testType != "async_open_flexible_sync" {
+                                subscriptionState = .completed
+                            } else {
+                                Task {
+                                    do {
+                                        let subs = realm.subscriptions
+                                        try await subs.update {
+                                            subs.append(QuerySubscription<SwiftPerson>(name: "person_age") {
+                                                $0.age > 5 && $0.firstName == ProcessInfo.processInfo.environment["firstName"]!
+                                            })
+                                        }
+                                        subscriptionState = .completed
                                     }
-                                    subscriptionState = .completed
                                 }
                             }
                         }
@@ -406,7 +486,7 @@ struct AsyncOpenFlexibleSyncView: View {
                     }
                 case .navigate:
                     ListView()
-                        .environment(\.realm, realm)
+                    .environment(\.realmConfiguration, realm.configuration)
                         .transition(AnyTransition.move(edge: .leading)).animation(.default)
                 }
             case .error(let error):
@@ -424,6 +504,7 @@ struct AsyncOpenFlexibleSyncView: View {
 }
 
 struct AutoOpenFlexibleSyncView: View {
+    let testType: String = ProcessInfo.processInfo.environment["async_view_type"]!
     @State var subscriptionState: SubscriptionState = .initial
     @AutoOpen(appId: ProcessInfo.processInfo.environment["app_id"]!,
               timeout: 2000)
@@ -441,15 +522,19 @@ struct AutoOpenFlexibleSyncView: View {
                 case .initial:
                     ProgressView("Subscribing to Query")
                         .onAppear {
-                            Task {
-                                do {
-                                    let subs = realm.subscriptions
-                                    try await subs.update {
-                                        subs.append(QuerySubscription<SwiftPerson>(name: "person_age") {
-                                            $0.age > 2 && $0.firstName == ProcessInfo.processInfo.environment["firstName"]!
-                                        })
+                            if testType != "auto_open_flexible_sync" {
+                                subscriptionState = .completed
+                            } else {
+                                Task {
+                                    do {
+                                        let subs = realm.subscriptions
+                                        try await subs.update {
+                                            subs.append(QuerySubscription<SwiftPerson>(name: "person_age") {
+                                                $0.age > 5 && $0.firstName == ProcessInfo.processInfo.environment["firstName"]!
+                                            })
+                                        }
+                                        subscriptionState = .completed
                                     }
-                                    subscriptionState = .completed
                                 }
                             }
                         }
@@ -462,7 +547,7 @@ struct AutoOpenFlexibleSyncView: View {
                     }
                 case .navigate:
                     ListView()
-                        .environment(\.realm, realm)
+                        .environment(\.realmConfiguration, realm.configuration)
                         .transition(AnyTransition.move(edge: .leading)).animation(.default)
                 }
             case .error(let error):

@@ -132,7 +132,7 @@ struct AsyncOpenView: View {
                 ProgressView("Waiting for user to logged in...")
             case .open(let realm):
                 ContactsListView()
-                    .environment(\.realm, realm)
+                    .environment(\.realmConfiguration, realm.configuration)
             case .error(let error):
                 ErrorView(error: error)
             case .progress(let progress):
@@ -157,7 +157,7 @@ struct AutoOpenView: View {
                 ProgressView("Waiting for user to logged in...")
             case .open(let realm):
                 ContactsListView()
-                    .environment(\.realm, realm)
+                    .environment(\.realmConfiguration, realm.configuration)
             case .error(let error):
                 ErrorView(error: error)
             case .progress(let progress):

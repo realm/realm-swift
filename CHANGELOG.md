@@ -4,8 +4,9 @@ x.y.z Release notes (yyyy-MM-dd)
 * None.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
-* None.
+* Defer `Realm.asyncOpen` execution on `@AsyncOpen` and `@AutoOpen` property wrappers, 
+  until all the environment values are set. This will guarantee the configuration and partition value
+  are set set before opening the realm.
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
@@ -159,6 +160,8 @@ x.y.z Release notes (yyyy-MM-dd)
   such as `mixed.hpp:165: [realm-core-12.1.0] Assertion failed: m_type` when
   removing the destination link object.
   ([Core #5574](https://github.com/realm/realm-core/pull/5573), since the introduction of AnyRealmValue in v10.8.0)
+
+<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
 ### Compatibility
 

@@ -51,6 +51,7 @@ class SwiftUIServerTests: SwiftSyncTestCase {
                                   partitionValue: partitionValue,
                                   configuration: configuration,
                                   timeout: timeout)
+        _ = asyncOpen.wrappedValue // Retrieving the wrappedValue to simulate a SwiftUI environment where this is called when initialising the view.
         asyncOpen.projectedValue
             .sink(receiveValue: handler)
             .store(in: &cancellables)
@@ -286,6 +287,7 @@ class SwiftUIServerTests: SwiftSyncTestCase {
                                 partitionValue: partitionValue,
                                 configuration: configuration,
                                 timeout: timeout)
+        _ = autoOpen.wrappedValue // Retrieving the wrappedValue to simulate a SwiftUI environment where this is called when initialising the view.
         autoOpen.projectedValue
             .sink { autoOpenState in
                 handler(autoOpenState)
@@ -587,5 +589,118 @@ class SwiftUIServerTests: SwiftSyncTestCase {
                 ex2.fulfill()
             }
         }
+    }
+}
+
+// MARK: - Flexible Sync
+extension SwiftUIServerTests {
+    func testAsyncOpenFlexibleSyncConfiguration() throws {
+        let user = try logInUser(for: basicCredentials(app: flexibleSyncApp), app: flexibleSyncApp)
+        var userConfiguration = user.flexibleSyncConfiguration()
+        userConfiguration.objectTypes = [SwiftHugeSyncObject.self]
+        let asyncOpen = AsyncOpen(appId: flexibleSyncAppId,
+                                  configuration: userConfiguration)
+
+        _ = asyncOpen.wrappedValue // Retrieving the wrappedValue to simulate a SwiftUI environment where this is called when initialising the view.
+
+        let ex = expectation(description: "download-realm-flx-async-open")
+        asyncOpen.projectedValue
+            .sink(receiveValue: { asyncOpenState in
+                if case let .open(realm) = asyncOpenState {
+                    XCTAssertNotNil(realm)
+                    ex.fulfill()
+                }
+            })
+            .store(in: &cancellables)
+        waitForExpectations(timeout: 10.0)
+    }
+
+    func testAsyncOpenFlexibleSyncConfigurationInitialSubscriptions() throws {
+        try populateFlexibleSyncData { realm in
+            for i in 1...10 {
+                realm.add(SwiftPerson(firstName: "\(#function)",
+                                      lastName: "lastname_\(i)",
+                                      age: i))
+            }
+        }
+
+        let user = try logInUser(for: basicCredentials(app: flexibleSyncApp), app: flexibleSyncApp)
+        var userConfiguration = user.flexibleSyncConfiguration(initialSubscriptions: { subs in
+            subs.append(QuerySubscription<SwiftPerson> {
+                $0.age > 5 && $0.firstName == "\(#function)"
+            })
+        })
+        userConfiguration.objectTypes = [SwiftPerson.self]
+        let asyncOpen = AsyncOpen(appId: flexibleSyncAppId,
+                                  configuration: userConfiguration)
+
+        _ = asyncOpen.wrappedValue // Retrieving the wrappedValue to simulate a SwiftUI environment where this is called when initialising the view.
+
+        let ex = expectation(description: "download-realm-flx-async-open")
+        asyncOpen.projectedValue
+            .sink(receiveValue: { asyncOpenState in
+                if case let .open(realm) = asyncOpenState {
+                    XCTAssertNotNil(realm)
+                    self.checkCount(expected: 5, realm, SwiftPerson.self)
+                    ex.fulfill()
+                }
+            })
+            .store(in: &cancellables)
+        waitForExpectations(timeout: 10.0)
+    }
+
+    func testAutoOpenFlexibleSyncConfiguration() throws {
+        let user = try logInUser(for: basicCredentials(app: flexibleSyncApp), app: flexibleSyncApp)
+        var userConfiguration = user.flexibleSyncConfiguration()
+        userConfiguration.objectTypes = [SwiftHugeSyncObject.self]
+        let autoOpen = AutoOpen(appId: flexibleSyncAppId,
+                                configuration: userConfiguration)
+
+        _ = autoOpen.wrappedValue // Retrieving the wrappedValue to simulate a SwiftUI environment where this is called when initialising the view.
+
+        let ex = expectation(description: "download-realm-flx-auto-open")
+        autoOpen.projectedValue
+            .sink(receiveValue: { asyncOpenState in
+                if case let .open(realm) = asyncOpenState {
+                    XCTAssertNotNil(realm)
+                    ex.fulfill()
+                }
+            })
+            .store(in: &cancellables)
+        waitForExpectations(timeout: 10.0)
+    }
+
+    func testAutoOpenFlexibleSyncConfigurationInitialSubscriptions() throws {
+        try populateFlexibleSyncData { realm in
+            for i in 1...7 {
+                realm.add(SwiftPerson(firstName: "\(#function)",
+                                      lastName: "lastname_\(i)",
+                                      age: i))
+            }
+        }
+
+        let user = try logInUser(for: basicCredentials(app: flexibleSyncApp), app: flexibleSyncApp)
+        var userConfiguration = user.flexibleSyncConfiguration(initialSubscriptions: { subs in
+            subs.append(QuerySubscription<SwiftPerson> {
+                $0.age > 5 && $0.firstName == "\(#function)"
+            })
+        })
+        userConfiguration.objectTypes = [SwiftPerson.self]
+        let autoOpen = AutoOpen(appId: flexibleSyncAppId,
+                                configuration: userConfiguration)
+
+        _ = autoOpen.wrappedValue // Retrieving the wrappedValue to simulate a SwiftUI environment where this is called when initialising the view.
+
+        let ex = expectation(description: "download-realm-flx-auto-open")
+        autoOpen.projectedValue
+            .sink(receiveValue: { asyncOpenState in
+                if case let .open(realm) = asyncOpenState {
+                    XCTAssertNotNil(realm)
+                    self.checkCount(expected: 2, realm, SwiftPerson.self)
+                    ex.fulfill()
+                }
+            })
+            .store(in: &cancellables)
+        waitForExpectations(timeout: 10.0)
     }
 }
