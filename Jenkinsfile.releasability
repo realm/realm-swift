@@ -1,5 +1,5 @@
 xcodeVersions = ['12.4', '12.5.1', '13.1', '13.2.1', '13.3.1']
-swiftVersions = ['5.4', '5.4.2', '5.5.1', '5.5.2', '5.6']
+swiftVersions = ['5.3.2', '5.4.2', '5.5.1', '5.5.2', '5.6']
 platforms = ['osx', 'ios', 'watchos', 'tvos', 'catalyst']
 carthagePlatforms = ['osx', 'ios', 'watchos', 'tvos']
 platformNames = ['osx': 'macOS', 'ios': 'iOS', 'watchos': 'watchOS', 'tvos': 'tvOS', 'catalyst': 'Catalyst']

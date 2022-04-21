@@ -445,7 +445,9 @@ case "$COMMAND" in
         # Because we have a module named Realm and a type named Realm we need to manually resolve the naming
         # collisions that are happening. These collisions create a red herring which tells the user the xcframework
         # was compiled with an older Swift version and is not compatible with the current compiler.
-        if [[ "$REALM_EXTRA_BUILD_ARGUMENTS" == *"REALM_BUILD_LIBRARY_FOR_DISTRIBUTION=YES"* ]]; then
+        count=$(find build/RealmSwift.xcframework -name "*.swiftinterface" | wc -l)
+        if [ $count > 0 ]
+        then 
             find build/RealmSwift.xcframework -name "*.swiftinterface" -exec sed -i '' 's/Realm\.//g' {} \;
             find build/RealmSwift.xcframework -name "*.swiftinterface" -exec sed -i '' 's/import Private/import Realm.Private/g' {} \;
             find build/RealmSwift.xcframework -name "*.swiftinterface" -exec sed -i '' 's/RealmSwift.Configuration/RealmSwift.Realm.Configuration/g' {} \;
@@ -458,7 +460,7 @@ case "$COMMAND" in
             find build/RealmSwift.xcframework -name "*.swiftinterface" -exec sed -i '' 's/RealmSwift.Notification,/RealmSwift.Realm.Notification,/g' {} \;
             # Generics will use τ_1_0 which needs to be changed to the correct type name.
             find build/RealmSwift.xcframework -name "*.swiftinterface" -exec sed -i '' 's/τ_1_0/V/g' {} \;
-        fi
+        fi 
 
         exit 0
         ;;
@@ -467,14 +469,14 @@ case "$COMMAND" in
         export REALM_EXTRA_BUILD_ARGUMENTS="$REALM_EXTRA_BUILD_ARGUMENTS REALM_BUILD_LIBRARY_FOR_DISTRIBUTION=YES"
         # set the Xcode version to the oldest
         export REALM_XCODE_VERSION=$REALM_XCODE_OLDEST_VERSION
-        export REALM_SWIFT_VERSION=5.5
+        export REALM_SWIFT_VERSION=$REALM_SWIFT_OLDEST_VERSION
         sh build.sh xcframework ios
         # copy the xcframework to the testing target
         rm -rf examples/installation/xcframework-evolution
         mkdir examples/installation/xcframework-evolution
         cp -r build/*.xcframework examples/installation/xcframework-evolution
         export REALM_XCODE_VERSION=$REALM_XCODE_LATEST_VERSION
-        export REALM_SWIFT_VERSION=5.6
+        export REALM_SWIFT_VERSION=$REALM_SWIFT_LATEST_VERSION
         cd examples/installation
         sh build.sh "test-ios-swift-xcframework"
 
