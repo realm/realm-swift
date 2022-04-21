@@ -26,68 +26,56 @@ import RealmSwiftSyncTestSupport
 @available(OSX 10.14, *)
 @objc(SwiftObjectServerPartitionTests)
 class SwiftObjectServerPartitionTests: SwiftSyncTestCase {
-    func roundTripForPartitionValue<T: BSON>(partitionValue: T) {
-        let partitionType = partitionBsonType(ObjectiveCSupport.convert(object: AnyBSON(partitionValue))!)
-        let appId: String
-        if isParent {
-            appId = try! RealmServer.shared.createAppForBSONType(partitionType)
-        } else {
-            appId = appIds[0]
+    func writeObjects<T: BSON>(_ user: User, _ partitionValue: T) throws {
+        try autoreleasepool {
+            var config = user.configuration(partitionValue: partitionValue)
+            config.objectTypes = [SwiftPerson.self]
+            let realm = try Realm(configuration: config)
+
+            try realm.write {
+                realm.add(SwiftPerson(firstName: "Ringo", lastName: "Starr"))
+                realm.add(SwiftPerson(firstName: "John", lastName: "Lennon"))
+                realm.add(SwiftPerson(firstName: "Paul", lastName: "McCartney"))
+                realm.add(SwiftPerson(firstName: "George", lastName: "Harrison"))
+            }
+            waitForUploads(for: realm)
         }
+    }
+
+    func roundTripForPartitionValue<T: BSON>(partitionValue: T) throws {
+        let partitionType = partitionBsonType(ObjectiveCSupport.convert(object: AnyBSON(partitionValue))!)
+        let appId = try RealmServer.shared.createAppForBSONType(partitionType)
 
         let partitionApp = app(fromAppId: appId)
-        do {
-            let user = try logInUser(for: basicCredentials(usernameSuffix: "", app: partitionApp), app: partitionApp)
-            let realm = try openRealm(partitionValue: partitionValue, user: user)
-            if isParent {
-                try realm.write {
-                    realm.deleteAll()
-                }
-                checkCount(expected: 0, realm, SwiftPerson.self)
-                runChildAndWait(withAppIds: [appId])
-                waitForDownloads(for: realm)
-                checkCount(expected: 4, realm, SwiftPerson.self)
+        let user = try logInUser(for: basicCredentials(app: partitionApp), app: partitionApp)
+        let user2 = try logInUser(for: Credentials.anonymous, app: partitionApp)
+        let realm = try openRealm(partitionValue: partitionValue, user: user)
+        checkCount(expected: 0, realm, SwiftPerson.self)
 
-                XCTAssertEqual(realm.objects(SwiftPerson.self).filter { $0.firstName == "Ringo" }.count, 1)
+        try writeObjects(user2, partitionValue)
+        waitForDownloads(for: realm)
+        checkCount(expected: 4, realm, SwiftPerson.self)
+        XCTAssertEqual(realm.objects(SwiftPerson.self).filter { $0.firstName == "Ringo" }.count, 1)
 
-                runChildAndWait(withAppIds: [appId])
-                waitForDownloads(for: realm)
-                checkCount(expected: 8, realm, SwiftPerson.self)
-
-                XCTAssertEqual(realm.objects(SwiftPerson.self).filter { $0.firstName == "Ringo" }.count, 2)
-
-                try realm.write {
-                    realm.deleteAll()
-                }
-                waitForUploads(for: realm)
-                checkCount(expected: 0, realm, SwiftPerson.self)
-            } else {
-                try realm.write {
-                    realm.add(SwiftPerson(firstName: "Ringo", lastName: "Starr"))
-                    realm.add(SwiftPerson(firstName: "John", lastName: "Lennon"))
-                    realm.add(SwiftPerson(firstName: "Paul", lastName: "McCartney"))
-                    realm.add(SwiftPerson(firstName: "George", lastName: "Harrison"))
-                }
-                waitForUploads(for: realm)
-            }
-        } catch {
-            XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
-        }
+        try writeObjects(user2, partitionValue)
+        waitForDownloads(for: realm)
+        checkCount(expected: 8, realm, SwiftPerson.self)
+        XCTAssertEqual(realm.objects(SwiftPerson.self).filter { $0.firstName == "Ringo" }.count, 2)
     }
 
-    func testSwiftRoundTripForObjectIdPartitionValue() {
-        roundTripForPartitionValue(partitionValue: ObjectId("1234567890ab1234567890ab"))
+    func testSwiftRoundTripForObjectIdPartitionValue() throws {
+        try roundTripForPartitionValue(partitionValue: ObjectId("1234567890ab1234567890ab"))
     }
 
-    func testSwiftRoundTripForUUIDPartitionValue() {
-        roundTripForPartitionValue(partitionValue: UUID(uuidString: "b1c11e54-e719-4275-b631-69ec3f2d616d")!)
+    func testSwiftRoundTripForUUIDPartitionValue() throws {
+        try roundTripForPartitionValue(partitionValue: UUID(uuidString: "b1c11e54-e719-4275-b631-69ec3f2d616d")!)
     }
 
-    func testSwiftRoundTripForStringPartitionValue() {
-        roundTripForPartitionValue(partitionValue: "1234567890ab1234567890ab")
+    func testSwiftRoundTripForStringPartitionValue() throws {
+        try roundTripForPartitionValue(partitionValue: "1234567890ab1234567890ab")
     }
 
-    func testSwiftRoundTripForIntPartitionValue() {
-        roundTripForPartitionValue(partitionValue: 1234567890)
+    func testSwiftRoundTripForIntPartitionValue() throws {
+        try roundTripForPartitionValue(partitionValue: 1234567890)
     }
 }

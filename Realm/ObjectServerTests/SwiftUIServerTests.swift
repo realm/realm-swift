@@ -30,7 +30,7 @@ import RealmSyncTestSupport
 class SwiftUIServerTests: SwiftSyncTestCase {
 
     // Configuration for tests
-    private func configurationFromUser<T: BSON>(_ user: User, and partition: T) -> Realm.Configuration {
+    private func configuration<T: BSON>(user: User, partition: T) -> Realm.Configuration {
         var userConfiguration = user.configuration(partitionValue: partition)
         userConfiguration.objectTypes = [SwiftHugeSyncObject.self]
         return userConfiguration
@@ -46,7 +46,7 @@ class SwiftUIServerTests: SwiftSyncTestCase {
 
     // MARK: - AsyncOpen
     func asyncOpen<T: BSON>(user: User, appId: String? = nil, partitionValue: T, timeout: UInt? = nil, handler: @escaping (AsyncOpenState) -> Void) {
-        let configuration = configurationFromUser(user, and: partitionValue)
+        let configuration = self.configuration(user: user, partition: partitionValue)
         let asyncOpen = AsyncOpen(appId: appId,
                                   partitionValue: partitionValue,
                                   configuration: configuration,
@@ -113,9 +113,9 @@ class SwiftUIServerTests: SwiftSyncTestCase {
         let app = App(id: appId, configuration: appConfig)
         let user = try logInUser(for: basicCredentials(app: app), app: app)
 
-        proxy.delay = 3.0
+        proxy.dropConnections = true
         let ex = expectation(description: "download-realm-async-open-no-connection")
-        asyncOpen(user: user, appId: appId, partitionValue: #function, timeout: 2000) { asyncOpenState in
+        asyncOpen(user: user, appId: appId, partitionValue: #function, timeout: 1000) { asyncOpenState in
             if case let .error(error) = asyncOpenState,
                let nsError = error as NSError? {
                 XCTAssertEqual(nsError.code, Int(ETIMEDOUT))
@@ -123,6 +123,8 @@ class SwiftUIServerTests: SwiftSyncTestCase {
                 ex.fulfill()
             }
         }
+
+        proxy.stop()
     }
 
     func testAsyncOpenProgressNotification() throws {
@@ -169,11 +171,9 @@ class SwiftUIServerTests: SwiftSyncTestCase {
                      reason: "Cannot AsyncOpen the Realm because no appId was found. You must either explicitly pass an appId or initialize an App before displaying your View.")
     }
 
-    func testAsyncOpenThrowExceptionWithoutMoreThanOneCachedApp() throws {
-        let appId1 = try! RealmServer.shared.createApp()
-        let appId2 = try! RealmServer.shared.createApp()
-        _ = App(id: appId1)
-        _ = App(id: appId2)
+    func testAsyncOpenThrowExceptionWithMoreThanOneCachedApp() throws {
+        _ = App(id: "fake 1")
+        _ = App(id: "fake 2")
         assertThrows(AsyncOpen(partitionValue: #function),
                      reason: "Cannot AsyncOpen the Realm because more than one appId was found. When using multiple Apps you must explicitly pass an appId to indicate which to use.")
     }
@@ -250,6 +250,13 @@ class SwiftUIServerTests: SwiftSyncTestCase {
         let partitionValueA = #function
         let partitionValueB = "\(#function)bar"
 
+        let user = try logInUser(for: basicCredentials())
+        if !isParent {
+            populateRealm(user: user, partitionValue: partitionValueB)
+            return
+        }
+        executeChild()
+
         let anonymousUser = try logInUser(for: .anonymous)
         let ex = expectation(description: "download-realm-anonymous-user-async-open")
         asyncOpen(user: anonymousUser, appId: appId, partitionValue: partitionValueA) { asyncOpenState in
@@ -261,14 +268,6 @@ class SwiftUIServerTests: SwiftSyncTestCase {
         }
 
         app.currentUser?.logOut { _ in } // Logout anonymous user
-
-        let user = try logInUser(for: basicCredentials())
-        if !isParent {
-            populateRealm(user: user, partitionValue: partitionValueB)
-            sleep(10)
-            return
-        }
-        executeChild()
 
         let ex2 = expectation(description: "download-realm-after-logout-async-open")
         asyncOpen(user: user, appId: appId, partitionValue: partitionValueB) { asyncOpenState in
@@ -282,7 +281,7 @@ class SwiftUIServerTests: SwiftSyncTestCase {
 
     // MARK: - AutoOpen
     func autoOpen(user: User, appId: String? = nil, partitionValue: String, timeout: UInt? = nil, handler: @escaping (AsyncOpenState) -> Void) {
-        let configuration = configurationFromUser(user, and: partitionValue)
+        let configuration = self.configuration(user: user, partition: partitionValue)
         let autoOpen = AutoOpen(appId: appId,
                                 partitionValue: partitionValue,
                                 configuration: configuration,
@@ -343,20 +342,26 @@ class SwiftUIServerTests: SwiftSyncTestCase {
     func testAutoOpenOpenRealmWithoutInternetConnection() throws {
         let proxy = TimeoutProxyServer(port: 5678, targetPort: 9090)
         try! proxy.start()
-
         let appId = try! RealmServer.shared.createApp()
         let appConfig = AppConfiguration(baseURL: "http://localhost:5678",
                                          transport: AsyncOpenConnectionTimeoutTransport(),
                                          localAppName: nil,
                                          localAppVersion: nil)
+
+        try autoreleasepool {
+            let app = App(id: appId, configuration: appConfig)
+            let user = try logInUser(for: basicCredentials(app: app), app: app)
+            populateRealm(user: user, partitionValue: #function)
+        }
+        App.resetAppCache()
+
         let app = App(id: appId, configuration: appConfig)
         let user = try logInUser(for: basicCredentials(app: app), app: app)
-
-        proxy.delay = 3.0
+        proxy.dropConnections = true
         let ex = expectation(description: "download-realm-auto-open-no-connection")
-        autoOpen(user: user, appId: appId, partitionValue: #function, timeout: 2000) { autoOpenState in
+        autoOpen(user: user, appId: appId, partitionValue: #function, timeout: 1000) { autoOpenState in
             if case let .open(realm) = autoOpenState {
-                XCTAssertNotNil(realm)
+                XCTAssertTrue(realm.isEmpty) // should not have downloaded anything
                 ex.fulfill()
             }
         }
@@ -365,13 +370,12 @@ class SwiftUIServerTests: SwiftSyncTestCase {
     }
 
     func testAutoOpenProgressNotification() throws {
-        let user = try logInUser(for: basicCredentials())
-        if !isParent {
+        try autoreleasepool {
+            let user = try logInUser(for: basicCredentials())
             populateRealm(user: user, partitionValue: #function)
-            return
         }
-        executeChild()
 
+        let user = try logInUser(for: basicCredentials())
         let ex = expectation(description: "progress-auto-open")
         autoOpen(user: user, appId: appId, partitionValue: #function) { autoOpenState in
             if case let .progress(progress) = autoOpenState {
@@ -408,11 +412,9 @@ class SwiftUIServerTests: SwiftSyncTestCase {
                      reason: "Cannot AsyncOpen the Realm because no appId was found. You must either explicitly pass an appId or initialize an App before displaying your View.")
     }
 
-    func testAutoOpenThrowExceptionWithoutMoreThanOneCachedApp() throws {
-        let appId1 = try! RealmServer.shared.createApp()
-        let appId2 = try! RealmServer.shared.createApp()
-        _ = App(id: appId1)
-        _ = App(id: appId2)
+    func testAutoOpenThrowExceptionWithMoreThanOneCachedApp() throws {
+        _ = App(id: "fake 1")
+        _ = App(id: "fake 2")
         assertThrows(AutoOpen(partitionValue: #function),
                      reason: "Cannot AsyncOpen the Realm because more than one appId was found. When using multiple Apps you must explicitly pass an appId to indicate which to use.")
     }
@@ -474,7 +476,6 @@ class SwiftUIServerTests: SwiftSyncTestCase {
         let user = try logInUser(for: basicCredentials())
         if !isParent {
             populateRealm(user: user, partitionValue: partitionValueB)
-            sleep(10)
             return
         }
         executeChild()

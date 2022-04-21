@@ -64,9 +64,7 @@ class CollectionSyncTestCase: SwiftSyncTestCase {
             XCTAssertEqual(left, right, line: line)
         }
     }
-}
 
-class ListSyncTests: CollectionSyncTestCase {
     private func roundTrip<T>(keyPath: KeyPath<SwiftCollectionSyncObject, List<T>>,
                               values: [T], partitionValue: String = #function) throws {
         checkCount(expected: 0, readRealm, SwiftCollectionSyncObject.self)
@@ -110,64 +108,36 @@ class ListSyncTests: CollectionSyncTestCase {
             }
         }
         assertEqual(collection[0], values[1])
+
+        try write { realm in
+            realm.deleteAll()
+        }
     }
 
-    func testIntList() throws {
+    func testLists() throws {
         try roundTrip(keyPath: \.intList, values: [1, 2, 3])
-    }
-
-    func testBoolList() throws {
         try roundTrip(keyPath: \.boolList, values: [true, false, false])
-    }
-
-    func testStringList() throws {
         try roundTrip(keyPath: \.stringList, values: ["Hey", "Hi", "Bye"])
-    }
-
-    func testDataList() throws {
         try roundTrip(keyPath: \.dataList, values: [Data(repeating: 0, count: 64),
                                                     Data(repeating: 1, count: 64),
                                                     Data(repeating: 2, count: 64)])
-    }
-
-    func testDateList() throws {
         try roundTrip(keyPath: \.dateList, values: [Date(timeIntervalSince1970: 10000000),
                                                     Date(timeIntervalSince1970: 20000000),
                                                     Date(timeIntervalSince1970: 30000000)])
-    }
-
-    func testDoubleList() throws {
         try roundTrip(keyPath: \.doubleList, values: [123.456, 234.456, 567.333])
-    }
-
-    func testObjectIdList() throws {
         try roundTrip(keyPath: \.objectIdList, values: [.init("6058f12b957ba06156586a7c"),
                                                         .init("6058f12682b2fbb1f334ef1d"),
                                                         .init("6058f12d42e5a393e67538d0")])
-    }
-
-    func testDecimalList() throws {
         try roundTrip(keyPath: \.decimalList, values: [123.345, 213.345, 321.345])
-    }
-
-    func testUuidList() throws {
         try roundTrip(keyPath: \.uuidList, values: [UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90fd")!,
                                                     UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90fe")!,
                                                     UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90ff")!])
-    }
-
-    func testObjectList() throws {
         try roundTrip(keyPath: \.objectList, values: [SwiftPerson(firstName: "Peter", lastName: "Parker"),
                                                       SwiftPerson(firstName: "Bruce", lastName: "Wayne"),
                                                       SwiftPerson(firstName: "Stephen", lastName: "Strange")])
-    }
-
-    func testAnyList() throws {
         try roundTrip(keyPath: \.anyList, values: [.int(12345), .string("Hello"), .none])
     }
-}
 
-class SetSyncTests: CollectionSyncTestCase {
     private typealias MutableSetKeyPath<T: RealmCollectionValue> = KeyPath<SwiftCollectionSyncObject, MutableSet<T>>
     private typealias MutableSetKeyValues<T: RealmCollectionValue> = (keyPath: MutableSetKeyPath<T>, values: [T])
 
@@ -226,85 +196,60 @@ class SetSyncTests: CollectionSyncTestCase {
         }
         XCTAssertEqual(collection.count, 0)
         XCTAssertEqual(otherCollection.count, 0)
+
+        try write { realm in
+            realm.deleteAll()
+        }
     }
 
-    func testIntSet() throws {
+    func testSets() throws {
         try roundTrip(set: (\.intSet, [1, 2, 3]), otherSet: (\.otherIntSet, [3, 4, 5]))
-    }
-
-    func testStringSet() throws {
         try roundTrip(set: (\.stringSet, ["Who", "What", "When"]),
                       otherSet: (\.otherStringSet, ["When", "Strings", "Collide"]))
-    }
-
-    func testDataSet() throws {
         try roundTrip(set: (\.dataSet, [Data(repeating: 1, count: 64),
                                         Data(repeating: 2, count: 64),
                                         Data(repeating: 3, count: 64)]),
                       otherSet: (\.otherDataSet, [Data(repeating: 3, count: 64),
                                                   Data(repeating: 4, count: 64),
                                                   Data(repeating: 5, count: 64)]))
-    }
-
-    func testDateSet() throws {
         try roundTrip(set: (\.dateSet, [Date(timeIntervalSince1970: 10000000),
                                         Date(timeIntervalSince1970: 20000000),
                                         Date(timeIntervalSince1970: 30000000)]),
                       otherSet: (\.otherDateSet, [Date(timeIntervalSince1970: 30000000),
                                                   Date(timeIntervalSince1970: 40000000),
                                                   Date(timeIntervalSince1970: 50000000)]))
-    }
-
-    func testDoubleSet() throws {
         try roundTrip(set: (\.doubleSet, [123.456, 345.456, 789.456]),
                       otherSet: (\.otherDoubleSet, [789.456,
                                                     888.456,
                                                     987.456]))
-    }
-
-    func testObjectIdSet() throws {
         try roundTrip(set: (\.objectIdSet, [.init("6058f12b957ba06156586a7c"),
                                             .init("6058f12682b2fbb1f334ef1d"),
                                             .init("6058f12d42e5a393e67538d0")]),
                       otherSet: (\.otherObjectIdSet, [.init("6058f12d42e5a393e67538d0"),
                                                       .init("6058f12682b2fbb1f334ef1f"),
                                                       .init("6058f12d42e5a393e67538d1")]))
-    }
-
-    func testDecimalSet() throws {
         try roundTrip(set: (\.decimalSet, [123.345,
                                            213.345,
                                            321.345]),
                       otherSet: (\.otherDecimalSet, [321.345,
                                                      333.345,
                                                      444.345]))
-    }
-
-    func testUuidSet() throws {
         try roundTrip(set: (\.uuidSet, [UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90fd")!,
                                         UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90fe")!,
                                         UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90ff")!]),
                       otherSet: (\.otherUuidSet, [UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90ff")!,
                                                   UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90ae")!,
                                                   UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90bf")!]))
-    }
-
-    func testObjectSet() throws {
         try roundTrip(set: (\.objectSet, [SwiftPerson(firstName: "Peter", lastName: "Parker"),
                                           SwiftPerson(firstName: "Bruce", lastName: "Wayne"),
                                           SwiftPerson(firstName: "Stephen", lastName: "Strange")]),
                       otherSet: (\.otherObjectSet, [SwiftPerson(firstName: "Stephen", lastName: "Strange"),
                                                     SwiftPerson(firstName: "Tony", lastName: "Stark"),
                                                     SwiftPerson(firstName: "Clark", lastName: "Kent")]))
-    }
-
-    func testAnySet() throws {
         try roundTrip(set: (\.anySet, [.int(12345), .none, .string("Hello")]),
                       otherSet: (\.otherAnySet, [.string("Hello"), .double(765.6543), .objectId(.generate())]))
     }
-}
 
-class MapSyncTests: CollectionSyncTestCase {
     private typealias MapKeyPath<T: RealmCollectionValue> = KeyPath<SwiftCollectionSyncObject, Map<String, T>>
 
     private func roundTrip<T>(keyPath: MapKeyPath<T>, values: [T],
@@ -351,72 +296,48 @@ class MapSyncTests: CollectionSyncTestCase {
             collection["3"] = collection["4"]
         }
         assertEqual(collection["3"]!, values[4])
+
+        try write { realm in
+            realm.deleteAll()
+        }
     }
 
-
-    func testIntMap() throws {
+    func testMaps() throws {
         try roundTrip(keyPath: \.intMap, values: [1, 2, 3, 4, 5])
-    }
-
-    func testStringMap() throws {
         try roundTrip(keyPath: \.stringMap, values: ["Who", "What", "When", "Strings", "Collide"])
-    }
-
-    func testDataMap() throws {
         try roundTrip(keyPath: \.dataMap, values: [Data(repeating: 1, count: 64),
                                                    Data(repeating: 2, count: 64),
                                                    Data(repeating: 3, count: 64),
                                                    Data(repeating: 4, count: 64),
                                                    Data(repeating: 5, count: 64)])
-    }
-
-    func testDateMap() throws {
         try roundTrip(keyPath: \.dateMap, values: [Date(timeIntervalSince1970: 10000000),
                                                    Date(timeIntervalSince1970: 20000000),
                                                    Date(timeIntervalSince1970: 30000000),
                                                    Date(timeIntervalSince1970: 40000000),
                                                    Date(timeIntervalSince1970: 50000000)])
-    }
-
-    func testDoubleMap() throws {
         try roundTrip(keyPath: \.doubleMap, values: [123.456, 345.456, 789.456, 888.456, 987.456])
-    }
-
-    func testObjectIdMap() throws {
         try roundTrip(keyPath: \.objectIdMap, values: [ObjectId("6058f12b957ba06156586a7c"),
                                                        ObjectId("6058f12682b2fbb1f334ef1d"),
                                                        ObjectId("6058f12d42e5a393e67538d0"),
                                                        ObjectId("6058f12682b2fbb1f334ef1f"),
                                                        ObjectId("6058f12d42e5a393e67538d1")])
-    }
-
-    func testDecimalMap() throws {
         try roundTrip(keyPath: \.decimalMap, values: [Decimal128(123.345),
                                                       Decimal128(213.345),
                                                       Decimal128(321.345),
                                                       Decimal128(333.345),
                                                       Decimal128(444.345)])
-    }
-
-    func testUuidMap() throws {
         try roundTrip(keyPath: \.uuidMap, values: [UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90fd")!,
                                                    UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90fe")!,
                                                    UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90ff")!,
                                                    UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90ae")!,
                                                    UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90bf")!])
-    }
-
-    // FIXME: We need to add a test where a value in a map of objects is `null`. currently the server
-    // is throwing a bad changeset error when that happens.
-    func testObjectMap() throws {
+        // FIXME: We need to add a test where a value in a map of objects is `null`. currently the server
+        // is throwing a bad changeset error when that happens.
         try roundTrip(keyPath: \.objectMap, values: [SwiftPerson(firstName: "Peter", lastName: "Parker"),
                                                      SwiftPerson(firstName: "Bruce", lastName: "Wayne"),
                                                      SwiftPerson(firstName: "Stephen", lastName: "Strange"),
                                                      SwiftPerson(firstName: "Tony", lastName: "Stark"),
                                                      SwiftPerson(firstName: "Clark", lastName: "Kent")])
-    }
-
-    func testAnyMap() throws {
         try roundTrip(keyPath: \.anyMap, values: [.int(12345), .none, .string("Hello"), .double(765.6543),
                                                   .objectId(ObjectId("507f1f77bcf86cd799439011"))])
     }
