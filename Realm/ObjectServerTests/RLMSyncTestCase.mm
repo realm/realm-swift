@@ -719,7 +719,7 @@ static NSURL *syncDirectoryForChildProcess() {
     }];
 
     __block bool didComplete = false;
-    [self waitForExpectationsWithTimeout:20.0 handler:^(NSError *error) {
+    [self waitForExpectationsWithTimeout:60.0 handler:^(NSError *error) {
         didComplete = error == nil;
     }];
     if (didComplete) {

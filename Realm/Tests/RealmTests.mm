@@ -72,7 +72,7 @@
     RLMRealm *inMemoryRealm = [RLMRealm realmWithConfiguration:config error:nil];
 
     // make sure we can't open disk-realm at same path
-    config.fileURL = [NSURL fileURLWithPath:@(inMemoryRealm.configuration.config.path.c_str())];
+    config.fileURL = [NSURL fileURLWithPath:@(inMemoryRealm.configuration.path.c_str())];
     NSError *error; // passing in a reference to assert that this error can't be catched!
     RLMAssertThrowsWithReasonMatching([RLMRealm realmWithConfiguration:config error:&error],
                                       @"Realm at path '.*' already opened with different inMemory settings");

@@ -219,7 +219,6 @@ let package = Package(
                 "Realm/RLMProviderClient.mm",
                 "Realm/RLMPushClient.mm",
                 "Realm/RLMRealm+Sync.mm",
-                "Realm/RLMRealmConfiguration+Sync.mm",
                 "Realm/RLMSyncConfiguration.mm",
                 "Realm/RLMSyncManager.mm",
                 "Realm/RLMSyncSession.mm",

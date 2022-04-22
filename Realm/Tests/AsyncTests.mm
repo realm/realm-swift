@@ -589,7 +589,7 @@
 - (void)testMultipleSourceVersionsWithNotifiersRemovedBeforeRunning {
     RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
     config.cache = false;
-    config.config.automatic_change_notifications = false;
+    config.configRef.automatic_change_notifications = false;
 
     // Create ten RLMRealm instances, each with a different read version
     RLMRealm *realms[10];
@@ -623,7 +623,7 @@
     }
 
     // Let the background job run now
-    auto coord = realm::_impl::RealmCoordinator::get_coordinator(config.config.path);
+    auto coord = realm::_impl::RealmCoordinator::get_coordinator(config.path);
     coord->on_change();
 
     for (int i = 7; i < 10; ++i) {

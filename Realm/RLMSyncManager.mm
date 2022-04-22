@@ -19,7 +19,6 @@
 #import "RLMSyncManager_Private.hpp"
 
 #import "RLMApp_Private.hpp"
-#import "RLMRealmConfiguration+Sync.h"
 #import "RLMSyncSession_Private.hpp"
 #import "RLMUser_Private.hpp"
 #import "RLMSyncUtil_Private.hpp"

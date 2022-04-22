@@ -37,8 +37,6 @@ typedef NS_ENUM(NSUInteger, RLMClientResetMode);
 RLMClientResetMode translateClientResetMode(realm::ClientResyncMode mode);
 realm::ClientResyncMode translateClientResetMode(RLMClientResetMode mode);
 
-std::shared_ptr<realm::SyncSession> sync_session_for_realm(RLMRealm *realm);
-
 #pragma mark - Get user context
 
 CocoaSyncUserContext& context_for(const std::shared_ptr<realm::SyncUser>& user);

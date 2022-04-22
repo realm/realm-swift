@@ -42,6 +42,13 @@ x.y.z Release notes (yyyy-MM-dd)
 * Consuming a RealmSwift XCFramework with library evolution enabled would give the error
   `'Failed to build module 'RealmSwift'; this SDK is not supported by the compiler'` when the XCFramework was built
   with an older XCode version and is then consumed with a later version. ([#7313](https://github.com/realm/realm-swift/issues/7313), since v3.18.0)
+* A data race would occur when opening a synchronized Realm with the client
+  reset mode set to `discardLocal` on one thread at the same time as a client
+  reset was being processed on another thread. This probably did not cause any
+  functional problems in practice and the broken timing window was very tight (since 10.25.0).
+* If an async open of a Realm triggered a client reset, the callbacks for
+  `discardLocal` could theoretically fail to be called due to a race condition.
+  The timing for this was probably not possible to hit in practice (since 10.25.0).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
