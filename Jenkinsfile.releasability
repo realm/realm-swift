@@ -1,5 +1,4 @@
 xcodeVersions = ['12.4', '12.5.1', '13.1', '13.2.1', '13.3.1']
-swiftVersions = ['5.3.2', '5.4.2', '5.5.1', '5.5.2', '5.6']
 platforms = ['osx', 'ios', 'watchos', 'tvos', 'catalyst']
 carthagePlatforms = ['osx', 'ios', 'watchos', 'tvos']
 platformNames = ['osx': 'macOS', 'ios': 'iOS', 'watchos': 'watchOS', 'tvos': 'tvOS', 'catalyst': 'Catalyst']
@@ -45,10 +44,7 @@ def xcframeworkEvolutionTest() {
       sh """
       hostname
       export REALM_XCODE_OLDEST_VERSION=${xcodeVersions.first()}
-      export REALM_SWIFT_OLDEST_VERSION=${swiftVersions.first()}
       export REALM_XCODE_LATEST_VERSION=${xcodeVersions.last()}
-      export REALM_SWIFT_LATEST_VERSION=${swiftVersions.last()}
-
       ./build.sh verify-xcframework-evolution-mode
       """
     }
