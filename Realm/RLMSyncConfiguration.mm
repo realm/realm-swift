@@ -75,7 +75,7 @@ public:
         }];
     }
 
-    std::unique_ptr<EZSocket> connect(EZObserver* observer, EZEndpoint&& endpoint)
+    std::unique_ptr<EZSocket> connect(EZObserver* observer, EZEndpoint&& endpoint) override
     {
         task = [[NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration new] delegate:delegate delegateQueue:nil] webSocketTaskWithURL:[[NSURL alloc] initWithString:@(endpoint.path.data())]];
         delegate = [RLMCocoaSocketDelegate new];
