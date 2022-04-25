@@ -243,8 +243,8 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
         XCTAssertNotNil(subscriptions)
         let ex = expectation(description: "state change complete")
         subscriptions.update({
-            subscriptions.append(QuerySubscription<SwiftPerson>(where: "TRUEPREDICATE"))
-            subscriptions.append(QuerySubscription<SwiftTypesSyncObject>(where: "TRUEPREDICATE"))
+            subscriptions.append(QuerySubscription<SwiftPerson>())
+            subscriptions.append(QuerySubscription<SwiftTypesSyncObject>())
         }, onComplete: { error in
             XCTAssertNil(error)
             ex.fulfill()
