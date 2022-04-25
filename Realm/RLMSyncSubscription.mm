@@ -369,10 +369,7 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
     if (name != nil) {
         auto iterator = _mutableSubscriptionSet->find([name UTF8String]);
         
-        if (updateExisting) {
-            _mutableSubscriptionSet->insert_or_assign([name UTF8String], query);
-        }
-        else if (iterator == _mutableSubscriptionSet->end()) {
+        if (updateExisting || iterator == _mutableSubscriptionSet->end()) {
             _mutableSubscriptionSet->insert_or_assign([name UTF8String], query);
         }
         else {
