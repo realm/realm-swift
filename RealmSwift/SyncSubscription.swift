@@ -85,13 +85,13 @@ import Realm.Private
      - warning: This method may only be called during a write subscription block.
 
      - parameter type: The type of the object to be queried.
-     - parameter query: A query which will be used to modify the query.
+     - parameter query: A query which will be used to modify the query, if nil it will set the query to all documents for the collection.
      */
-    public func updateQuery<T: Object>(toType type: T.Type, where query: @escaping (Query<T>) -> Query<Bool>) {
+    public func updateQuery<T: Object>(toType type: T.Type, where query: ((Query<T>) -> Query<Bool>)? = nil) {
         guard _rlmSyncSubscription.objectClassName == "\(T.self)" else {
             throwRealmException("Updating a subscription query of a different Object Type is not allowed.")
         }
-        _rlmSyncSubscription.update(with: query(Query()).predicate)
+        _rlmSyncSubscription.update(with: query?(Query()).predicate ?? NSPredicate(format: "TRUEPREDICATE"))
     }
 
     @available(*, deprecated, renamed: "updateQuery", message: "SyncSubscription update is deprecated, please use `.updateQuery` instead.")
@@ -146,19 +146,16 @@ import Realm.Private
     fileprivate var className: String
     fileprivate var predicate: NSPredicate
 
-    /// :nodoc:
-    public typealias QueryFunction = (Query<T>) -> Query<Bool>
-
     /**
      Creates a `QuerySubscription` for the given type.
 
      - parameter name: Name of the subscription.
-     - parameter query: The query for the subscription.
+     - parameter query: The query for the subscription, if nil it will set the query to all documents for the collection.
      */
-    public init(name: String? = nil, query: @escaping QueryFunction) {
+    public init(name: String? = nil, query: ((Query<T>) -> Query<Bool>)? = nil) {
         self.name = name
         self.className = "\(T.self)"
-        self.predicate = query(Query()).predicate
+        self.predicate = query?(Query()).predicate ?? NSPredicate(format: "TRUEPREDICATE")
     }
 
     /**

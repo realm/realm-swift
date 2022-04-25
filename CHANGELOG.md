@@ -68,6 +68,13 @@ allows submitting to the app store with Xcode 12.
   in the configuration.
 * Implement the Realm event recording API for reporting reads and writes on a
   Realm file to Atlas.
+* Replace Xcode 13.3 binaries with 13.3.1 binaries.
+* Allow adding a subscription querying for all documents of a type in swift for flexible sync.
+```
+   try await subscriptions.update {
+      subscriptions.append(QuerySubscription<SwiftPerson>(name: "person_age_15"))
+   }
+```
 
 ### Fixed
 
