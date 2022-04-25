@@ -67,7 +67,7 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
     func testWriteEmptyBlock() throws {
         let realm = try openFlexibleSyncRealm()
         let subscriptions = realm.subscriptions
-        subscriptions.write {
+        subscriptions.update {
         }
 
         XCTAssertEqual(subscriptions.count, 0)
@@ -76,7 +76,7 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
     func testAddOneSubscriptionWithoutName() throws {
         let realm = try openFlexibleSyncRealm()
         let subscriptions = realm.subscriptions
-        subscriptions.write {
+        subscriptions.update {
             subscriptions.append(QuerySubscription<SwiftPerson> {
                 $0.age > 15
             })
@@ -88,7 +88,7 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
     func testAddOneSubscriptionWithName() throws {
         let realm = try openFlexibleSyncRealm()
         let subscriptions = realm.subscriptions
-        subscriptions.write {
+        subscriptions.update {
             subscriptions.append(QuerySubscription<SwiftPerson>(name: "person_age") {
                 $0.age > 15
             })
@@ -100,12 +100,12 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
     func testAddSubscriptionsInDifferentBlocks() throws {
         let realm = try openFlexibleSyncRealm()
         let subscriptions = realm.subscriptions
-        subscriptions.write {
+        subscriptions.update {
             subscriptions.append(QuerySubscription<SwiftPerson>(name: "person_age") {
                 $0.age > 15
             })
         }
-        subscriptions.write {
+        subscriptions.update {
             subscriptions.append(QuerySubscription<SwiftTypesSyncObject> {
                 $0.boolCol == true
             })
@@ -117,7 +117,7 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
     func testAddSeveralSubscriptionsWithoutName() throws {
         let realm = try openFlexibleSyncRealm()
         let subscriptions = realm.subscriptions
-        subscriptions.write {
+        subscriptions.update {
             subscriptions.append(
                 QuerySubscription<SwiftPerson> {
                     $0.age > 15
@@ -136,7 +136,7 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
     func testAddSeveralSubscriptionsWithName() throws {
         let realm = try openFlexibleSyncRealm()
         let subscriptions = realm.subscriptions
-        subscriptions.write {
+        subscriptions.update {
             subscriptions.append(
                 QuerySubscription<SwiftPerson>(name: "person_age_15") {
                     $0.age > 15
@@ -154,7 +154,7 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
     func testAddMixedSubscriptions() throws {
         let realm = try openFlexibleSyncRealm()
         let subscriptions = realm.subscriptions
-        subscriptions.write {
+        subscriptions.update {
             subscriptions.append(QuerySubscription<SwiftPerson>(name: "person_age_15") {
                 $0.age > 15
             })
@@ -172,7 +172,7 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
     func testAddDuplicateSubscriptions() throws {
         let realm = try openFlexibleSyncRealm()
         let subscriptions = realm.subscriptions
-        subscriptions.write {
+        subscriptions.update {
             subscriptions.append(
                 QuerySubscription<SwiftPerson> {
                     $0.age > 15
@@ -187,7 +187,7 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
     func testAddDuplicateSubscriptionWithDifferentName() throws {
         let realm = try openFlexibleSyncRealm()
         let subscriptions = realm.subscriptions
-        subscriptions.write {
+        subscriptions.update {
             subscriptions.append(
                 QuerySubscription<SwiftPerson>(name: "person_age_1") {
                     $0.age > 15
@@ -203,7 +203,7 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
     func skip_testSameNamedSubscriptionThrows() throws {
         let realm = try openFlexibleSyncRealm()
         let subscriptions = realm.subscriptions
-        subscriptions.write {
+        subscriptions.update {
             subscriptions.append(QuerySubscription<SwiftPerson>(name: "person_age_1") {
                 $0.age > 15
             })
@@ -226,7 +226,7 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
     func testFindSubscriptionByName() throws {
         let realm = try openFlexibleSyncRealm()
         let subscriptions = realm.subscriptions
-        subscriptions.write {
+        subscriptions.update {
             subscriptions.append(
                 QuerySubscription<SwiftPerson>(name: "person_age_15") {
                     $0.age > 15
@@ -249,7 +249,7 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
     func testFindSubscriptionByQuery() throws {
         let realm = try openFlexibleSyncRealm()
         let subscriptions = realm.subscriptions
-        subscriptions.write {
+        subscriptions.update {
             subscriptions.append(QuerySubscription<SwiftPerson>(name: "person_firstname_james") {
                 $0.firstName == "James"
             })
@@ -275,7 +275,7 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
     func testRemoveSubscriptionByName() throws {
         let realm = try openFlexibleSyncRealm()
         let subscriptions = realm.subscriptions
-        subscriptions.write {
+        subscriptions.update {
             subscriptions.append(QuerySubscription<SwiftPerson>(name: "person_firstname_james") {
                 $0.firstName == "James"
             })
@@ -289,7 +289,7 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
         }
         XCTAssertEqual(subscriptions.count, 3)
 
-        subscriptions.write {
+        subscriptions.update {
             subscriptions.remove(named: "person_firstname_james")
         }
         XCTAssertEqual(subscriptions.count, 2)
@@ -298,7 +298,7 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
     func testRemoveSubscriptionByQuery() throws {
         let realm = try openFlexibleSyncRealm()
         let subscriptions = realm.subscriptions
-        subscriptions.write {
+        subscriptions.update {
             subscriptions.append(
                 QuerySubscription<SwiftPerson> {
                     $0.firstName == "Alex"
@@ -315,7 +315,7 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
         }
         XCTAssertEqual(subscriptions.count, 4)
 
-        subscriptions.write {
+        subscriptions.update {
             subscriptions.remove(ofType: SwiftPerson.self, {
                 $0.firstName == "Alex"
             })
@@ -332,7 +332,7 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
     func testRemoveSubscription() throws {
         let realm = try openFlexibleSyncRealm()
         let subscriptions = realm.subscriptions
-        subscriptions.write {
+        subscriptions.update {
             subscriptions.append(QuerySubscription<SwiftPerson>(name: "person_names") {
                 $0.firstName != "Alex" && $0.lastName != "Roy"
             })
@@ -344,7 +344,7 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
 
         let foundSubscription1 = subscriptions.first(named: "person_names")
         XCTAssertNotNil(foundSubscription1)
-        subscriptions.write {
+        subscriptions.update {
             subscriptions.remove(foundSubscription1!)
         }
 
@@ -354,7 +354,7 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
             $0.intCol > 0
         })
         XCTAssertNotNil(foundSubscription2)
-        subscriptions.write {
+        subscriptions.update {
             subscriptions.remove(foundSubscription2!)
         }
 
@@ -364,7 +364,7 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
     func testRemoveSubscriptionsByType() throws {
         let realm = try openFlexibleSyncRealm()
         let subscriptions = realm.subscriptions
-        subscriptions.write {
+        subscriptions.update {
             subscriptions.append(
                 QuerySubscription<SwiftPerson> {
                     $0.firstName == "Alex"
@@ -381,12 +381,12 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
         }
         XCTAssertEqual(subscriptions.count, 4)
 
-        subscriptions.write {
+        subscriptions.update {
             subscriptions.removeAll(ofType: SwiftPerson.self)
         }
         XCTAssertEqual(subscriptions.count, 1)
 
-        subscriptions.write {
+        subscriptions.update {
             subscriptions.removeAll(ofType: SwiftTypesSyncObject.self)
         }
         XCTAssertEqual(subscriptions.count, 0)
@@ -395,7 +395,7 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
     func testRemoveAllSubscriptions() throws {
         let realm = try openFlexibleSyncRealm()
         let subscriptions = realm.subscriptions
-        subscriptions.write {
+        subscriptions.update {
             subscriptions.append(
                 QuerySubscription<SwiftPerson> {
                     $0.firstName == "Alex"
@@ -412,7 +412,7 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
         }
         XCTAssertEqual(subscriptions.count, 4)
 
-        subscriptions.write {
+        subscriptions.update {
             subscriptions.removeAll()
         }
 
@@ -424,7 +424,7 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
         let subscriptions = realm.subscriptions
 
         let numberOfSubs = 50
-        subscriptions.write {
+        subscriptions.update {
             for i in 1...numberOfSubs {
                 subscriptions.append(QuerySubscription<SwiftPerson>(name: "person_age_\(i)") {
                     $0.age > i
@@ -448,7 +448,7 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
         let subscriptions = realm.subscriptions
 
         let numberOfSubs = 20
-        subscriptions.write {
+        subscriptions.update {
             for i in 1...numberOfSubs {
                 subscriptions.append(QuerySubscription<SwiftPerson>(name: "person_age_\(i)") {
                     $0.age > i
@@ -472,7 +472,7 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
         let subscriptions = realm.subscriptions
 
         let numberOfSubs = 20
-        subscriptions.write {
+        subscriptions.update {
             for i in 1...numberOfSubs {
                 subscriptions.append(QuerySubscription<SwiftPerson>(name: "person_age_\(i)") {
                     $0.age > i
@@ -494,7 +494,7 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
     func testUpdateQueries() throws {
         let realm = try openFlexibleSyncRealm()
         let subscriptions = realm.subscriptions
-        subscriptions.write {
+        subscriptions.update {
             subscriptions.append(
                 QuerySubscription<SwiftPerson>(name: "person_age_15") {
                     $0.age > 15
@@ -508,9 +508,9 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
         let foundSubscription1 = subscriptions.first(named: "person_age_15")
         let foundSubscription2 = subscriptions.first(named: "person_age_20")
 
-        subscriptions.write {
-            foundSubscription1?.update(toType: SwiftPerson.self, where: { $0.age > 0 })
-            foundSubscription2?.update(toType: SwiftPerson.self, where: { $0.age > 0 })
+        subscriptions.update {
+            foundSubscription1?.updateQuery(toType: SwiftPerson.self, where: { $0.age > 0 })
+            foundSubscription2?.updateQuery(toType: SwiftPerson.self, where: { $0.age > 0 })
         }
 
         XCTAssertEqual(subscriptions.count, 2)
@@ -519,7 +519,7 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
     func testUpdateQueriesWithoutName() throws {
         let realm = try openFlexibleSyncRealm()
         let subscriptions = realm.subscriptions
-        subscriptions.write {
+        subscriptions.update {
             subscriptions.append(
                 QuerySubscription<SwiftPerson> {
                     $0.age > 15
@@ -537,9 +537,9 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
             $0.age > 20
         })
 
-        subscriptions.write {
-            foundSubscription1?.update(toType: SwiftPerson.self, where: { $0.age > 0 })
-            foundSubscription2?.update(toType: SwiftPerson.self, where: { $0.age > 5 })
+        subscriptions.update {
+            foundSubscription1?.updateQuery(toType: SwiftPerson.self, where: { $0.age > 0 })
+            foundSubscription2?.updateQuery(toType: SwiftPerson.self, where: { $0.age > 5 })
         }
 
         XCTAssertEqual(subscriptions.count, 2)
@@ -549,7 +549,7 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
     func skip_testFlexibleSyncAppUpdateQueryWithDifferentObjectTypeWillThrow() throws {
         let realm = try openFlexibleSyncRealm()
         let subscriptions = realm.subscriptions
-        subscriptions.write {
+        subscriptions.update {
             subscriptions.append(
                 QuerySubscription<SwiftPerson>(name: "person_age_15") {
                     $0.age > 15
@@ -559,8 +559,8 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
 
         let foundSubscription1 = subscriptions.first(named: "person_age_15")
 
-        subscriptions.write {
-            assertThrows(foundSubscription1?.update(toType: SwiftTypesSyncObject.self, where: { $0.intCol > 0 }))
+        subscriptions.update {
+            assertThrows(foundSubscription1?.updateQuery(toType: SwiftTypesSyncObject.self, where: { $0.intCol > 0 }))
         }
     }
 
@@ -568,7 +568,7 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
     func testFlexibleSyncTransactionsWithPredicateFormatAndNSPredicate() throws {
         let realm = try openFlexibleSyncRealm()
         let subscriptions = realm.subscriptions
-        subscriptions.write {
+        subscriptions.update {
             subscriptions.append(
                 QuerySubscription<SwiftPerson>(name: "name_alex", where: "firstName == %@", "Alex"),
                 QuerySubscription<SwiftPerson>(name: "name_charles", where: "firstName == %@", "Charles"),
@@ -582,12 +582,12 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
         let foundSubscription2 = subscriptions.first(ofType: SwiftTypesSyncObject.self, where: NSPredicate(format: "intCol > 0"))
         XCTAssertNotNil(foundSubscription2)
 
-        subscriptions.write {
+        subscriptions.update {
             subscriptions.remove(ofType: SwiftPerson.self, where: NSPredicate(format: "firstName == 'Belle'"))
             subscriptions.remove(ofType: SwiftPerson.self, where: "firstName == %@", "Charles")
 
-            foundSubscription1?.update(to: NSPredicate(format: "lastName == 'Wightman'"))
-            foundSubscription2?.update(to: "stringCol == %@", "string")
+            foundSubscription1?.updateQuery(to: NSPredicate(format: "lastName == 'Wightman'"))
+            foundSubscription2?.updateQuery(to: "stringCol == %@", "string")
         }
 
         XCTAssertEqual(subscriptions.count, 2)
@@ -638,7 +638,7 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
         XCTAssertEqual(subscriptions.count, 0)
 
         let ex = expectation(description: "state change complete")
-        subscriptions.write({
+        subscriptions.update({
             subscriptions.append(QuerySubscription<SwiftPerson>(name: "person_age_15") {
                 $0.age > 15 && $0.firstName == "\(#function)"
             })
@@ -678,7 +678,7 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
         XCTAssertEqual(subscriptions.count, 0)
 
         let ex = expectation(description: "state change complete")
-        subscriptions.write({
+        subscriptions.update({
             subscriptions.append(QuerySubscription<SwiftPerson>(name: "person_age_10") {
                 $0.age > 10 && $0.firstName == "\(#function)"
             })
@@ -721,7 +721,7 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
         XCTAssertEqual(subscriptions.count, 0)
 
         let ex = expectation(description: "state change complete")
-        subscriptions.write({
+        subscriptions.update({
             subscriptions.append(QuerySubscription<SwiftPerson>(name: "person_age_5") {
                 $0.age > 5 && $0.firstName == "\(#function)"
             })
@@ -742,7 +742,7 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
         checkCount(expected: 1, realm, SwiftTypesSyncObject.self)
 
         let ex2 = expectation(description: "state change complete")
-        subscriptions.write({
+        subscriptions.update({
             subscriptions.remove(named: "person_age_5")
         }, onComplete: { error in
             if error == nil {
@@ -780,7 +780,7 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
         XCTAssertEqual(subscriptions.count, 0)
 
         let ex = expectation(description: "state change complete")
-        subscriptions.write({
+        subscriptions.update({
             subscriptions.append(QuerySubscription<SwiftPerson>(name: "person_age_5") {
                 $0.age > 5 && $0.firstName == "\(#function)"
             })
@@ -802,7 +802,7 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
         checkCount(expected: 1, realm, SwiftTypesSyncObject.self)
 
         let ex2 = expectation(description: "state change complete")
-        subscriptions.write({
+        subscriptions.update({
             subscriptions.removeAll()
             subscriptions.append(QuerySubscription<SwiftPerson>(name: "person_age_20") {
                 $0.age > 20 && $0.firstName == "\(#function)"
@@ -843,7 +843,7 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
         XCTAssertEqual(subscriptions.count, 0)
 
         let ex = expectation(description: "state change complete")
-        subscriptions.write({
+        subscriptions.update({
             subscriptions.append(
                 QuerySubscription<SwiftPerson>(name: "person_age_5") {
                     $0.age > 20 && $0.firstName == "\(#function)"
@@ -868,7 +868,7 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
         checkCount(expected: 1, realm, SwiftTypesSyncObject.self)
 
         let ex2 = expectation(description: "state change complete")
-        subscriptions.write({
+        subscriptions.update({
             subscriptions.removeAll(ofType: SwiftPerson.self)
         }, onComplete: { error in
             if error == nil {
@@ -903,7 +903,7 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
         XCTAssertEqual(subscriptions.count, 0)
 
         let ex = expectation(description: "state change complete")
-        subscriptions.write({
+        subscriptions.update({
             subscriptions.append(QuerySubscription<SwiftPerson>(name: "person_age") {
                 $0.age > 20 && $0.firstName == "\(#function)"
             })
@@ -923,8 +923,8 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
         XCTAssertNotNil(foundSubscription)
 
         let ex2 = expectation(description: "state change complete")
-        subscriptions.write({
-            foundSubscription?.update(toType: SwiftPerson.self, where: {
+        subscriptions.update({
+            foundSubscription?.updateQuery(toType: SwiftPerson.self, where: {
                 $0.age > 5 && $0.firstName == "\(#function)"
             })
         }, onComplete: { error in
@@ -965,7 +965,7 @@ class SwiftAsyncFlexibleSyncTests: SwiftSyncTestCase {
         let realm = try await Realm(configuration: config)
 
         let subscriptions = realm.subscriptions
-        try await subscriptions.write {
+        try await subscriptions.update {
             subscriptions.append(QuerySubscription<SwiftPerson> {
                 $0.age >= 0
             })
@@ -1000,7 +1000,7 @@ class SwiftAsyncFlexibleSyncTests: SwiftSyncTestCase {
         XCTAssertNotNil(subscriptions)
         XCTAssertEqual(subscriptions.count, 0)
 
-        try await subscriptions.write {
+        try await subscriptions.update {
             subscriptions.append(QuerySubscription<SwiftPerson>(name: "person_age_15") {
                 $0.age > 15 && $0.firstName == "\(#function)"
             })
@@ -1021,7 +1021,7 @@ class SwiftAsyncFlexibleSyncTests: SwiftSyncTestCase {
         XCTAssertEqual(subscriptions.count, 0)
 
         // should complete
-        try await subscriptions.write {
+        try await subscriptions.update {
             subscriptions.append(QuerySubscription<SwiftPerson>(name: "person_age_15") {
                 $0.age > 15 && $0.firstName == "\(#function)"
             })
@@ -1029,7 +1029,7 @@ class SwiftAsyncFlexibleSyncTests: SwiftSyncTestCase {
         XCTAssertEqual(subscriptions.state, .complete)
         // should error
         do {
-            try await subscriptions.write {
+            try await subscriptions.update {
                 subscriptions.append(QuerySubscription<SwiftTypesSyncObject>(name: "swiftObject_longCol") {
                     $0.longCol == Int64(1)
                 })

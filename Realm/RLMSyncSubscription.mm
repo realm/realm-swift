@@ -228,11 +228,11 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
 
 #pragma mark - Batch Update subscriptions
 
-- (void)write:(__attribute__((noescape)) void(^)(void))block {
+- (void)update:(__attribute__((noescape)) void(^)(void))block {
     return [self write:block onComplete:^(NSError*){}];
 }
 
-- (void)write:(__attribute__((noescape)) void(^)(void))block
+- (void)update:(__attribute__((noescape)) void(^)(void))block
    onComplete:(void(^)(NSError *))completionBlock {
     if (_mutableSubscriptionSet != nil) {
         @throw RLMException(@"Cannot initiate a write transaction on subscription set that is already been updated.");

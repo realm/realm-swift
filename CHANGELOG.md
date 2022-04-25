@@ -62,7 +62,11 @@ allows submitting to the app store with Xcode 12.
   Realm or if `objectTypes` was set when opening a Realm would throw an
   exception ([#7786](https://github.com/realm/realm-swift/issues/7786)).
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+### Breaking Changes
+
+* Rename `SyncSubscriptionSet.write` to `SyncSubscriptionSet.update` to avoid confusion with `Realm.write`.
+* Rename `SyncSubscription.update` to `SyncSubscription.updateQuery` to avoid confusion with `SyncSubscriptionSet.update`.
+* Rename `RLMSyncSubscriptionSet.write` to `RLMSyncSubscriptionSet.update` to align it with swift API.
 
 ### Compatibility
 * Realm Studio: 11.0.0 or later.
