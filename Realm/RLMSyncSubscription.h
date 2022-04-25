@@ -112,7 +112,9 @@ NS_ASSUME_NONNULL_BEGIN
 
  @param block The block containing actions to perform to the subscription set.
  */
-- (void)write:(__attribute__((noescape)) void(^)(void))block;
+- (void)update:(__attribute__((noescape)) void(^)(void))block;
+
+- (void)write:(__attribute__((noescape)) void(^)(void))block __attribute__((unavailable("Use update")));
 
 /**
  Synchronously performs any transactions (add/remove/update) to the subscription set within the block,
@@ -123,7 +125,9 @@ NS_ASSUME_NONNULL_BEGIN
  @param onComplete The block called upon synchronization of subscriptions to the server. Otherwise
                    an `Error`describing what went wrong will be returned by the block
  */
-- (void)write:(__attribute__((noescape)) void(^)(void))block onComplete:(void(^)(NSError * _Nullable))onComplete;
+- (void)update:(__attribute__((noescape)) void(^)(void))block onComplete:(void(^)(NSError * _Nullable))onComplete;
+
+- (void)write:(__attribute__((noescape)) void(^)(void))block onComplete:(void(^)(NSError * _Nullable))onComplete __attribute__((unavailable("Use update")));
 
 #pragma mark - Find subscription
 
