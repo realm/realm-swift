@@ -95,6 +95,12 @@ allows submitting to the app store with Xcode 12.
 * Flexible sync would not correctly resume syncing if a bootstrap was interrupted
   ([#5466](https://github.com/realm/realm-core/pull/5466), since v10.21.1).
 
+### Breaking Changes
+
+* Rename `SyncSubscriptionSet.write` to `SyncSubscriptionSet.update` to avoid confusion with `Realm.write`.
+* Rename `SyncSubscription.update` to `SyncSubscription.updateQuery` to avoid confusion with `SyncSubscriptionSet.update`.
+* Rename `RLMSyncSubscriptionSet.write` to `RLMSyncSubscriptionSet.update` to align it with swift API.
+
 ### Compatibility
 
 * Realm Studio: 11.0.0 or later.

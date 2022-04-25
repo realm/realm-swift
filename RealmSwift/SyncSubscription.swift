@@ -87,11 +87,16 @@ import Realm.Private
      - parameter type: The type of the object to be queried.
      - parameter query: A query which will be used to modify the query.
      */
-    public func update<T: Object>(toType type: T.Type, where query: @escaping (Query<T>) -> Query<Bool>) {
+    public func updateQuery<T: Object>(toType type: T.Type, where query: @escaping (Query<T>) -> Query<Bool>) {
         guard _rlmSyncSubscription.objectClassName == "\(T.self)" else {
             throwRealmException("Updating a subscription query of a different Object Type is not allowed.")
         }
         _rlmSyncSubscription.update(with: query(Query()).predicate)
+    }
+
+    @available(*, deprecated, renamed: "updateQuery", message: "SyncSubscription update is deprecated, please use `.updateQuery` instead.")
+    public func update<T: Object>(toType type: T.Type, where query: @escaping (Query<T>) -> Query<Bool>) {
+        fatalError()
     }
 
     /**
@@ -103,8 +108,13 @@ import Realm.Private
      - parameter predicateFormat: A predicate format string, optionally followed by a variable number of arguments,
                                   which will be used to modify the query.
      */
-    public func update(to predicateFormat: String, _ args: Any...) {
+    public func updateQuery(to predicateFormat: String, _ args: Any...) {
         _rlmSyncSubscription.update(with: NSPredicate(format: predicateFormat, argumentArray: unwrapOptionals(in: args)))
+    }
+
+    @available(*, deprecated, renamed: "updateQuery", message: "SyncSubscription update is deprecated, please use `.updateQuery` instead.")
+    public func update(to predicateFormat: String, _ args: Any...) {
+        fatalError()
     }
 
     /**
@@ -116,8 +126,13 @@ import Realm.Private
      - parameter predicate: The predicate with which to filter the objects on the server, which
                             will be used to modify the query.
      */
-    public func update(to predicate: NSPredicate) {
+    public func updateQuery(to predicate: NSPredicate) {
         _rlmSyncSubscription.update(with: predicate)
+    }
+
+    @available(*, deprecated, renamed: "updateQuery", message: "SyncSubscription update is deprecated, please use `.updateQuery` instead.")
+    public func update(to predicate: NSPredicate) {
+        fatalError()
     }
 }
 
@@ -199,8 +214,13 @@ import Realm.Private
      - parameter onComplete: The block called upon synchronization of subscriptions to the server. Otherwise
                              an `Error`describing what went wrong will be returned by the block
      */
+    public func update(_ block: (() -> Void), onComplete: ((Error?) -> Void)? = nil) {
+        rlmSyncSubscriptionSet.update(block, onComplete: onComplete ?? { _ in })
+    }
+
+    @available(*, deprecated, renamed: "update", message: "SyncSubscriptionSet write is deprecated, please use `.update` instead.")
     public func write(_ block: (() -> Void), onComplete: ((Error?) -> Void)? = nil) {
-        rlmSyncSubscriptionSet.write(block, onComplete: onComplete ?? { _ in })
+       fatalError()
     }
 
     /// Returns the current state for the subscription set.
@@ -439,9 +459,9 @@ extension SyncSubscriptionSet {
                If `block` throws, the function throws the propagated `ErrorType` instead.
      */
     @MainActor
-    public func write(_ block: (() -> Void)) async throws {
+    public func update(_ block: (() -> Void)) async throws {
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
-            write(block) { error in
+            update(block) { error in
                 if let error = error {
                     continuation.resume(throwing: error)
                 } else {
@@ -449,6 +469,12 @@ extension SyncSubscriptionSet {
                 }
             }
         }
+    }
+
+    @available(*, deprecated, renamed: "update", message: "SyncSubscriptionSet write is deprecated, please use `.update` instead.")
+    @MainActor
+    public func write(_ block: (() -> Void)) async throws {
+        fatalError()
     }
 }
 #endif // swift(>=5.6)
