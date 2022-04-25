@@ -87,7 +87,7 @@
     XCTAssertEqual(subs.version, 0UL);
     XCTAssertEqual(subs.count, 0UL);
 
-    [subs write:^{
+    [subs update:^{
         [subs addSubscriptionWithClassName:Person.className
                                      where:@"age > 15"];
     }];
@@ -103,7 +103,7 @@
     XCTAssertEqual(subs.version, 0UL);
     XCTAssertEqual(subs.count, 0UL);
 
-    [subs write:^{
+    [subs update:^{
     }];
 
     XCTAssertEqual(subs.version, 1UL);
@@ -114,7 +114,7 @@
     RLMRealm *realm = [self openFlexibleSyncRealm:_cmd];
     RLMSyncSubscriptionSet *subs = realm.subscriptions;
 
-    [subs write:^{
+    [subs update:^{
         [subs addSubscriptionWithClassName:Person.className
                                      where:@"age > 15"];
     }];
@@ -133,7 +133,7 @@
     XCTAssertEqual(subs.version, 0UL);
     XCTAssertEqual(subs.count, 0UL);
 
-    [subs write:^{
+    [subs update:^{
         [subs addSubscriptionWithClassName:Person.className
                                      where:@"firstName == %@ and lastName == %@", @"John", @"Doe"];
     }];
@@ -155,7 +155,7 @@
     XCTAssertEqual(subs.version, 0UL);
     XCTAssertEqual(subs.count, 0UL);
 
-    [subs write:^{
+    [subs update:^{
         [subs addSubscriptionWithClassName:Person.className
                                  predicate:[NSPredicate predicateWithFormat:@"age == %d", 20]];
     }];
@@ -184,7 +184,7 @@
     XCTAssertEqual(realm.subscriptions.version, 0UL);
     XCTAssertEqual(realm.subscriptions.count, 0UL);
 
-    [subs write:^{
+    [subs update:^{
         [subs addSubscriptionWithClassName:Person.className
                           subscriptionName:@"person_older_15"
                                      where:@"age > 15"];
@@ -200,7 +200,7 @@
     RLMRealm *realm = [self openFlexibleSyncRealm:_cmd];
     RLMSyncSubscriptionSet *subs = realm.subscriptions;
 
-    [subs write:^{
+    [subs update:^{
         [subs addSubscriptionWithClassName:Person.className
                                      where:@"age > 15"];
         [subs addSubscriptionWithClassName:Person.className
@@ -215,7 +215,7 @@
     RLMRealm *realm = [self openFlexibleSyncRealm:_cmd];
     RLMSyncSubscriptionSet *subs = realm.subscriptions;
 
-    [subs write:^{
+    [subs update:^{
         [subs addSubscriptionWithClassName:Person.className
                           subscriptionName:@"person_age"
                                      where:@"age > 15"];
@@ -240,7 +240,7 @@
     RLMRealm *realm = [self openFlexibleSyncRealm:_cmd];
     RLMSyncSubscriptionSet *subs = realm.subscriptions;
 
-    [subs write:^{
+    [subs update:^{
         [subs addSubscriptionWithClassName:Person.className
                                      where:@"age > 15"];
         [subs addSubscriptionWithClassName:Person.className
@@ -255,7 +255,7 @@
     RLMRealm *realm = [self openFlexibleSyncRealm:_cmd];
     RLMSyncSubscriptionSet *subs = realm.subscriptions;
 
-    [subs write:^{
+    [subs update:^{
         [subs addSubscriptionWithClassName:Person.className
                           subscriptionName:@"person_age_1"
                                      where:@"age > 15"];
@@ -282,7 +282,7 @@
     RLMRealm *realm = [self openFlexibleSyncRealm:_cmd];
     RLMSyncSubscriptionSet *subs = realm.subscriptions;
 
-    [subs write:^{
+    [subs update:^{
         [subs addSubscriptionWithClassName:Person.className
                           subscriptionName:@"person_age_1"
                                      where:@"age > 15"];
@@ -298,7 +298,7 @@
     RLMRealm *realm = [self openFlexibleSyncRealm:_cmd];
     RLMSyncSubscriptionSet *subs = realm.subscriptions;
 
-    [subs write:^{
+    [subs update:^{
         [subs addSubscriptionWithClassName:Person.className
                                  predicate:[NSPredicate predicateWithFormat:@"age > %d", 15]];
         [subs addSubscriptionWithClassName:Person.className
@@ -314,13 +314,13 @@
     RLMRealm *realm = [self openFlexibleSyncRealm:_cmd];
     RLMSyncSubscriptionSet *subs = realm.subscriptions;
 
-    [subs write:^{
+    [subs update:^{
         [subs addSubscriptionWithClassName:Person.className
                           subscriptionName:@"person_age_1"
                                      where:@"age > 15"];
     }];
 
-    [subs write:^{
+    [subs update:^{
         [subs addSubscriptionWithClassName:Person.className
                           subscriptionName:@"person_age_2"
                                  predicate:[NSPredicate predicateWithFormat:@"age > %d", 20]];
@@ -340,7 +340,7 @@
     RLMRealm *realm = [self openFlexibleSyncRealm:_cmd];
     RLMSyncSubscriptionSet *subs = realm.subscriptions;
 
-    [subs write:^{
+    [subs update:^{
         [subs addSubscriptionWithClassName:Person.className
                           subscriptionName:@"person_age_1"
                                      where:@"age > 15"];
@@ -352,7 +352,7 @@
     XCTAssertEqual(subs.version, 1UL);
     XCTAssertEqual(subs.count, 2UL);
 
-    [subs write:^{
+    [subs update:^{
         [subs removeSubscriptionWithName:@"person_age_1"];
     }];
 
@@ -370,7 +370,7 @@
     RLMRealm *realm = [self openFlexibleSyncRealm:_cmd];
     RLMSyncSubscriptionSet *subs = realm.subscriptions;
 
-    [subs write:^{
+    [subs update:^{
         [subs addSubscriptionWithClassName:Person.className
                           subscriptionName:@"person_age_1"
                                      where:@"age > 15"];
@@ -385,7 +385,7 @@
     RLMRealm *realm = [self openFlexibleSyncRealm:_cmd];
     RLMSyncSubscriptionSet *subs = realm.subscriptions;
 
-    [subs write:^{
+    [subs update:^{
         [subs addSubscriptionWithClassName:Person.className
                           subscriptionName:@"person_age"
                                      where:@"age > 15"];
@@ -400,7 +400,7 @@
     XCTAssertEqual(subs.version, 1UL);
     XCTAssertEqual(subs.count, 3UL);
 
-    [subs write:^{
+    [subs update:^{
         [subs removeSubscriptionWithClassName:Person.className where:@"firstName == %@", @"John"];
         [subs removeSubscriptionWithClassName:Person.className predicate:[NSPredicate predicateWithFormat:@"lastName == %@", @"Doe"]];
     }];
@@ -422,7 +422,7 @@
     RLMRealm *realm = [self openFlexibleSyncRealm:_cmd];
     RLMSyncSubscriptionSet *subs = realm.subscriptions;
 
-    [subs write:^{
+    [subs update:^{
         [subs addSubscriptionWithClassName:Person.className
                           subscriptionName:@"person_age"
                                      where:@"age > 15"];
@@ -440,7 +440,7 @@
     RLMSyncSubscription *foundSubscription = [subs subscriptionWithName:@"person_age"];
     XCTAssertNotNil(foundSubscription);
 
-    [subs write:^{
+    [subs update:^{
         [subs removeSubscription:foundSubscription];
     }];
 
@@ -450,7 +450,7 @@
     RLMSyncSubscription *foundSubscription2 = [subs subscriptionWithName:@"person_firstname"];
     XCTAssertNotNil(foundSubscription2);
 
-    [subs write:^{
+    [subs update:^{
         [subs removeSubscription:foundSubscription2];
     }];
 
@@ -462,7 +462,7 @@
     RLMRealm *realm = [self openFlexibleSyncRealm:_cmd];
     RLMSyncSubscriptionSet *subs = realm.subscriptions;
 
-    [subs write:^{
+    [subs update:^{
         [subs addSubscriptionWithClassName:Person.className
                           subscriptionName:@"person_age"
                                      where:@"age > 15"];
@@ -477,7 +477,7 @@
     XCTAssertEqual(subs.version, 1UL);
     XCTAssertEqual(subs.count, 3UL);
 
-    [subs write:^{
+    [subs update:^{
         [subs removeAllSubscriptions];
     }];
 
@@ -492,7 +492,7 @@
     RLMRealm *realm = [self openFlexibleSyncRealm:_cmd];
     RLMSyncSubscriptionSet *subs = realm.subscriptions;
 
-    [subs write:^{
+    [subs update:^{
         [subs addSubscriptionWithClassName:Person.className
                           subscriptionName:@"person_age"
                                      where:@"age > 15"];
@@ -507,7 +507,7 @@
     XCTAssertEqual(subs.version, 1UL);
     XCTAssertEqual(subs.count, 3UL);
 
-    [subs write:^{
+    [subs update:^{
         [subs removeAllSubscriptionsWithClassName:Person.className];
     }];
 
@@ -517,7 +517,7 @@
     RLMSyncSubscription *foundSubscription = [subs subscriptionWithName:@"dog_name"];
     XCTAssertNotNil(foundSubscription);
 
-    [subs write:^{
+    [subs update:^{
         [subs removeAllSubscriptionsWithClassName:Dog.className];
     }];
 
@@ -529,7 +529,7 @@
     RLMRealm *realm = [self openFlexibleSyncRealm:_cmd];
     RLMSyncSubscriptionSet *subs = realm.subscriptions;
 
-    [subs write:^{
+    [subs update:^{
         [subs addSubscriptionWithClassName:Person.className
                           subscriptionName:@"person_age"
                                      where:@"age > 15"];
@@ -541,7 +541,7 @@
     RLMSyncSubscription *foundSubscription = [subs subscriptionWithName:@"person_age"];
     XCTAssertNotNil(foundSubscription);
 
-    [subs write:^{
+    [subs update:^{
         [foundSubscription updateSubscriptionWhere:@"age > 20"];
     }];
 
@@ -558,7 +558,7 @@
     RLMRealm *realm = [self openFlexibleSyncRealm:_cmd];
     RLMSyncSubscriptionSet *subs = realm.subscriptions;
 
-    [subs write:^{
+    [subs update:^{
         [subs addSubscriptionWithClassName:Person.className
                           subscriptionName:@"subscription_1"
                                      where:@"age > 15"];
@@ -578,7 +578,7 @@
     RLMSyncSubscriptionSet *subs = realm.subscriptions;
 
     double numberOfSubs = 100;
-    [subs write:^{
+    [subs update:^{
         for (int i = 0; i < numberOfSubs; ++i) {
             [subs addSubscriptionWithClassName:Person.className
                               subscriptionName:[NSString stringWithFormat:@"person_age_%d", i]
@@ -609,7 +609,7 @@
     XCTAssertNil(subs.lastObject);
 
     int numberOfSubs = 20;
-    [subs write:^{
+    [subs update:^{
         for (int i = 1; i <= numberOfSubs; ++i) {
             [subs addSubscriptionWithClassName:Person.className
                               subscriptionName:[NSString stringWithFormat:@"person_age_%d", i]
@@ -636,7 +636,7 @@
     XCTAssertEqual(subs.count, 0UL);
 
     int numberOfSubs = 20;
-    [subs write:^{
+    [subs update:^{
         for (int i = 1; i <= numberOfSubs; ++i) {
             [subs addSubscriptionWithClassName:Person.className
                               subscriptionName:[NSString stringWithFormat:@"person_age_%d", i]

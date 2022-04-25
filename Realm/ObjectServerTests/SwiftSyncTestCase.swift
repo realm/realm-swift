@@ -242,7 +242,7 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
         let subscriptions = realm.subscriptions
         XCTAssertNotNil(subscriptions)
         let ex = expectation(description: "state change complete")
-        subscriptions.write({
+        subscriptions.update({
             subscriptions.append(QuerySubscription<SwiftPerson>(where: "TRUEPREDICATE"))
             subscriptions.append(QuerySubscription<SwiftTypesSyncObject>(where: "TRUEPREDICATE"))
         }, onComplete: { error in
