@@ -44,6 +44,13 @@ allows submitting to the app store with Xcode 12.
 ```
 * Improve performance of opening a Realm with `objectClasses`/`objectTypes` set
   in the configuration.
+* Replace Xcode 13.3 binaries with 13.3.1 binaries.
+* Allow adding a subscription querying for all documents of a type in swift for flexible sync.
+```
+   try await subscriptions.update {
+      subscriptions.append(QuerySubscription<SwiftPerson>(name: "person_age_15"))
+   }
+```
 
 ### Fixed
 * Lower minimum OS version for `async` login and FunctionCallables. ([#7791]https://github.com/realm/realm-swift/issues/7791)
