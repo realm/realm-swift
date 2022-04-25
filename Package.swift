@@ -27,7 +27,6 @@ let cxxSettings: [CXXSetting] = [
     .define("REALM_VERSION_PATCH", to: String(coreVersionExtra[0])),
     .define("REALM_VERSION_EXTRA", to: "\"\(coreVersionExtra.count > 1 ? String(coreVersionExtra[1]) : "")\""),
     .define("REALM_VERSION_STRING", to: "\"\(coreVersionStr)\""),
-    .define("REALM_ASYNC_WRITES", .when(configuration: .debug)),
 ]
 let testCxxSettings: [CXXSetting] = cxxSettings + [
     // Command-line `swift build` resolves header search paths
@@ -48,11 +47,9 @@ func hostMachineArch() -> String {
 }
 let testSwiftSettings: [SwiftSetting]?
 #if swift(>=5.4) && !swift(>=5.5)
-testSwiftSettings = [.unsafeFlags(["-target", "\(hostMachineArch())-apple-macosx11.0"]),
-                     .define("REALM_ASYNC_WRITES", .when(configuration: .debug)),
-]
+testSwiftSettings = [.unsafeFlags(["-target", "\(hostMachineArch())-apple-macosx11.0"])]
 #else
-testSwiftSettings = [.define("REALM_ASYNC_WRITES", .when(configuration: .debug))]
+testSwiftSettings = nil
 #endif
 
 // SPM requires all targets to explicitly include or exclude every file, which
@@ -233,8 +230,7 @@ let package = Package(
                 "Realm/RLMUserAPIKey.mm"
             ],
             publicHeadersPath: "include",
-            cxxSettings: cxxSettings,
-            swiftSettings: testSwiftSettings
+            cxxSettings: cxxSettings
         ),
         .target(
             name: "RealmSwift",
@@ -244,9 +240,7 @@ let package = Package(
                 "Nonsync.swift",
                 "RealmSwift-Info.plist",
                 "Tests",
-            ],
-            cxxSettings: cxxSettings,
-            swiftSettings: testSwiftSettings
+            ]
         ),
         .target(
             name: "RealmTestSupport",
@@ -276,8 +270,7 @@ let package = Package(
                 "SwiftUISyncTestHost",
                 "SwiftUISyncTestHostUITests"
             ],
-            cxxSettings: testCxxSettings,
-            swiftSettings: testSwiftSettings
+            cxxSettings: testCxxSettings
         ),
         .testTarget(
             name: "RealmObjcSwiftTests",
