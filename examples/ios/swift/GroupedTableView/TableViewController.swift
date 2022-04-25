@@ -138,5 +138,5 @@ func randomTitle() -> String {
 }
 
 func randomSectionTitle() -> String {
-    return sectionTitles[Int.random(0..<sectionTitles.count)]
+    return sectionTitles[Int.random(in: 0..<sectionTitles.count)]
 }

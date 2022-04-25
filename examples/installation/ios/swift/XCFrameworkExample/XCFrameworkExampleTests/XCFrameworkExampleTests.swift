@@ -19,11 +19,13 @@
 import UIKit
 import XCTest
 import XCFrameworkExample
+import Realm
 import RealmSwift
 
 class XCFrameworkExampleTests: XCTestCase {
     func testExample() {
         // This is an example of a functional test case.
         XCTAssertNotNil(MyModel() as AnyObject is Object)
+        _ = try! Realm()
     }
 }

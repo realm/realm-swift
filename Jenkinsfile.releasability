@@ -35,6 +35,22 @@ def installationTest(platform, test, language) {
   }
 }
 
+def xcframeworkEvolutionTest() {
+  return {
+    node('osx') {
+      deleteDir()
+      unstash 'source'
+
+      sh """
+      hostname
+      export REALM_XCODE_OLDEST_VERSION=${xcodeVersions.first()}
+      export REALM_XCODE_LATEST_VERSION=${xcodeVersions.last()}
+      ./build.sh verify-xcframework-evolution-mode
+      """
+    }
+  }
+}
+
 def spmInstallationTest(platform) {
   return {
     node('osx') {
@@ -319,6 +335,7 @@ def doBuild() {
     }
 
     parallelBuilds["Installation - Mac Catalyst Swift CocoaPods"] = installationTest('catalyst', 'cocoapods', 'swift')
+    parallelBuilds["Installation - iOS XCFramework Evolution"] = xcframeworkEvolutionTest()
 
     parallel parallelBuilds
   }

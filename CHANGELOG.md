@@ -22,8 +22,9 @@ x.y.z Release notes (yyyy-MM-dd)
 * Replace Xcode 13.3 binaries with 13.3.1 binaries.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
-* None.
+* Consuming a RealmSwift XCFramework with library evolution enabled would give the error 
+  `'Failed to build module 'RealmSwift'; this SDK is not supported by the compiler'` when the XCFramework was built 
+  with an older XCode version and is then consumed with a later version. ([#7313](https://github.com/realm/realm-swift/issues/7313), since v3.18.0)
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
