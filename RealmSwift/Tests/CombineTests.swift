@@ -2771,4 +2771,34 @@ class CombineProjectionPublisherTests: CombinePublisherTestCase {
     }
 }
 
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+class CombineAsyncRealmTests: CombinePublisherTestCase {
+    func testWillChangeLocalWrite() {
+        let asyncWriteExpectation = expectation(description: "Should complete async write")
+        cancellable = realm
+            .objectWillChange
+            .sink {
+                asyncWriteExpectation.fulfill()
+            }
+
+        realm.writeAsync {
+            self.realm.create(SwiftIntObject.self, value: [])
+        }
+        waitForExpectations(timeout: 1, handler: nil)
+    }
+
+    func testWillChangeRemoteWrite() {
+        let exp = XCTestExpectation()
+        cancellable = realm.objectWillChange.sink {
+            exp.fulfill()
+        }
+        DispatchQueue.main.async {
+            let realm = try! Realm(configuration: self.realm.configuration)
+            realm.writeAsync {
+                realm.create(SwiftIntObject.self, value: [])
+            }
+        }
+        wait(for: [exp], timeout: 3)
+    }
+}
 #endif // canImport(Combine)
