@@ -132,7 +132,7 @@ struct CallbackLogger : public realm::util::RootLogger {
         config.user_agent_application_info = RLMStringDataWithNSString(appId);
     }
 
-    config.socket_factory = defaultSocketFactory();
+    config.socket_factory_builder = defaultSocketFactory();
     return config;
 }
 

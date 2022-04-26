@@ -450,8 +450,8 @@ void RLMSetConfigInfoForClientResetCallbacks(realm::SyncConfig& syncConfig, RLMR
 
 @end
 
-std::function<std::unique_ptr<realm::util::websocket::EZSocketFactory>(util::websocket::EZConfig&&)> defaultSocketFactory() {
-    using namespace realm::util::websocket;
+using namespace realm::util::websocket;
+std::function<std::unique_ptr<EZSocketFactory>(EZConfig&&)> defaultSocketFactory() {
     return [](EZConfig&& config) mutable {
         return std::unique_ptr<EZSocketFactory>(new CocoaSocketFactory(std::move(config)));
     };
