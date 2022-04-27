@@ -37,11 +37,10 @@ x.y.z Release notes (yyyy-MM-dd)
     }];
     [realm cancelAsyncTransaction:asyncTransactionId];
 ```
-* Replace Xcode 13.3 binaries with 13.3.1 binaries.
 
 ### Fixed
-* Consuming a RealmSwift XCFramework with library evolution enabled would give the error 
-  `'Failed to build module 'RealmSwift'; this SDK is not supported by the compiler'` when the XCFramework was built 
+* Consuming a RealmSwift XCFramework with library evolution enabled would give the error
+  `'Failed to build module 'RealmSwift'; this SDK is not supported by the compiler'` when the XCFramework was built
   with an older XCode version and is then consumed with a later version. ([#7313](https://github.com/realm/realm-swift/issues/7313), since v3.18.0)
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
@@ -55,6 +54,37 @@ x.y.z Release notes (yyyy-MM-dd)
 
 ### Internal
 * Upgraded realm-core from ? to ?
+
+10.25.2 Release notes (2022-04-27)
+=============================================================
+
+### Enhancements
+
+* Replace Xcode 13.3 binaries with 13.3.1 binaries.
+
+### Fixed
+
+* `List<AnyRealmValue>` would contain an invalidated object instead of null when
+  the object linked to was deleted by a difference sync client
+  ([Core #5215](https://github.com/realm/realm-core/pull/5215), since v10.8.0).
+* Adding an object to a Set, deleting the parent object of the Set, and then
+  deleting the object which was added to the Set would crash
+  ([Core #5387](https://github.com/realm/realm-core/issues/5387), since v10.8.0).
+* Synchronized Realm files which were first created using v10.0.0-beta.3 would
+  be redownloaded instead of using the existing file, possibly resulting in the
+  loss of any unsynchronized data in those files (since v10.20.0).
+
+### Compatibility
+
+* Realm Studio: 11.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 13.3.1.
+* CocoaPods: 1.10 or later.
+* Xcode: 12.4-13.3.1.
+
+### Internal
+
+* Upgraded realm-core from v11.14.0 to v11.15.0
 
 10.25.1 Release notes (2022-04-11)
 =============================================================
