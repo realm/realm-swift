@@ -580,7 +580,9 @@ public class RealmServer: NSObject {
         serverProcess.currentDirectoryPath = tempDir.path
         serverProcess.arguments = [
             "--configFile",
-            "\(stitchRoot)/etc/configs/test_config.json"
+            "\(stitchRoot)/etc/configs/test_config.json",
+            "--configFile",
+            "\(RealmServer.rootUrl)/Realm/ObjectServerTests/config_overrides.json"
         ]
 
         let pipe = Pipe()
