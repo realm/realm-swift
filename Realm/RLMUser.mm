@@ -140,7 +140,7 @@ using namespace realm;
         return "";
     }
 
-    SyncConfig config(_user, "");
+    SyncConfig config(_user, value);
     auto path = _user->sync_manager()->path_for_realm(config, value);
     if ([NSFileManager.defaultManager fileExistsAtPath:@(path.c_str())]) {
         return path;
