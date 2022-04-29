@@ -1494,6 +1494,7 @@
         }];
     }];
     [self waitForExpectationsWithTimeout:1.0 handler:nil];
+    [realm refresh];
     XCTAssertEqual(1U, [StringObject allObjectsInRealm:realm].count);
 }
 
@@ -1520,6 +1521,7 @@
     }];
 
     [self waitForExpectationsWithTimeout:1.0 handler:nil];
+    [realm refresh];
     XCTAssertEqual(0U, [StringObject allObjectsInRealm:realm].count);
 }
 
@@ -1554,6 +1556,7 @@
     }];
 
     [self waitForExpectationsWithTimeout:1.0 handler:nil];
+    [realm refresh];
     XCTAssertEqual(0U, [StringObject allObjectsInRealm:realm].count);
 }
 
