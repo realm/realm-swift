@@ -62,8 +62,11 @@ allows submitting to the app store with Xcode 12.
 * Using the dynamic subscript API on unmanaged objects before first opening a
   Realm or if `objectTypes` was set when opening a Realm would throw an
   exception ([#7786](https://github.com/realm/realm-swift/issues/7786)).
-
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+* The sync client may have sent a corrupted upload cursor leading to a fatal
+  error from the server due to an uninitialized variable.
+  ([#5460](https://github.com/realm/realm-core/pull/5460), since v10.25.1)
+* Flexible sync would not correctly resume syncing if a bootstrap was interrupted
+  ([#5466](https://github.com/realm/realm-core/pull/5466), since v10.21.1).
 
 ### Compatibility
 * Realm Studio: 11.0.0 or later.
@@ -73,7 +76,7 @@ allows submitting to the app store with Xcode 12.
 * Xcode: 13.1-13.4.
 
 ### Internal
-* Upgraded realm-core from ? to ?
+* Upgraded realm-core from v11.15.0 to v11.17.0
 
 10.25.2 Release notes (2022-04-27)
 =============================================================

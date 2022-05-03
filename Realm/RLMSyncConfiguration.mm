@@ -86,7 +86,7 @@ struct BeforeClientResetWrapper : CallbackSchema {
 
 struct AfterClientResetWrapper : CallbackSchema {
     RLMClientResetAfterBlock block;
-    void operator()(std::shared_ptr<Realm> local, std::shared_ptr<Realm> remote) {
+    void operator()(std::shared_ptr<Realm> local, std::shared_ptr<Realm> remote, bool) {
         @autoreleasepool {
             RLMSchema *schema = getSchema(*local);
             RLMRealm *localRealm = [RLMRealm realmWithSharedRealm:local
