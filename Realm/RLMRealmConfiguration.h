@@ -19,6 +19,8 @@
 #import <Foundation/Foundation.h>
 #import <Realm/RLMRealm.h>
 
+@class RLMSyncConfiguration;
+
 NS_ASSUME_NONNULL_BEGIN
 
 /**
@@ -171,6 +173,17 @@ typedef BOOL (^RLMShouldCompactOnLaunchBlock)(NSUInteger totalBytes, NSUInteger 
  will nil out the `inMemoryIdentifier`.
  */
 @property (nonatomic, copy, nullable) NSURL* seedFilePath;
+
+/**
+ A configuration object representing configuration state for Realms intended
+ to sync with MongoDB Realm.
+
+ This property is mutually exclusive with both `inMemoryIdentifier` and `fileURL`;
+ setting any one of the three properties will automatically nil out the other two.
+
+ @see `RLMSyncConfiguration`
+ */
+@property (nullable, nonatomic) RLMSyncConfiguration *syncConfiguration;
 
 @end
 

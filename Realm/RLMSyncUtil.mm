@@ -19,7 +19,6 @@
 #import "RLMSyncUtil_Private.hpp"
 
 #import "RLMObject_Private.hpp"
-#import "RLMRealmConfiguration+Sync.h"
 #import "RLMRealmConfiguration_Private.hpp"
 #import "RLMRealm_Private.hpp"
 #import "RLMSyncConfiguration_Private.hpp"
@@ -65,17 +64,6 @@ RLMSyncStopPolicy translateStopPolicy(SyncSessionStopPolicy stop_policy) {
         case SyncSessionStopPolicy::AfterChangesUploaded:   return RLMSyncStopPolicyAfterChangesUploaded;
     }
     REALM_UNREACHABLE();
-}
-
-std::shared_ptr<SyncSession> sync_session_for_realm(RLMRealm *realm) {
-    Realm::Config realmConfig = realm.configuration.config;
-    if (auto config = realmConfig.sync_config) {
-        std::shared_ptr<SyncUser> user = config->user;
-        if (user && user->state() != SyncUser::State::Removed) {
-            return user->session_for_on_disk_path(realmConfig.path);
-        }
-    }
-    return nullptr;
 }
 
 CocoaSyncUserContext& context_for(const std::shared_ptr<realm::SyncUser>& user)

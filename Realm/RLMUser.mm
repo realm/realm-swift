@@ -23,7 +23,6 @@
 #import "RLMBSON_Private.hpp"
 #import "RLMCredentials_Private.hpp"
 #import "RLMMongoClient_Private.hpp"
-#import "RLMRealmConfiguration+Sync.h"
 #import "RLMSyncConfiguration_Private.hpp"
 #import "RLMSyncSession_Private.hpp"
 #import "RLMUtil.hpp"

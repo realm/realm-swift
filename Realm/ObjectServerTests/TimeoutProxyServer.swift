@@ -45,6 +45,18 @@ public class TimeoutProxyServer: NSObject {
         }
     }
 
+    private var _dropConnections: Bool = false
+    @objc public var dropConnections: Bool {
+        get {
+            _dropConnections
+        }
+        set {
+            queue.sync {
+                _dropConnections = newValue
+            }
+        }
+    }
+
     @objc public init(port: UInt16, targetPort: UInt16) {
         self.port = NWEndpoint.Port(rawValue: port)!
         self.targetPort = NWEndpoint.Port(rawValue: targetPort)!
@@ -59,6 +71,10 @@ public class TimeoutProxyServer: NSObject {
             let targetConnection = NWConnection(host: self.serverEndpoint, port: self.targetPort, using: .tcp)
             targetConnection.start(queue: self.queue)
             self.connections.append(targetConnection)
+
+            if self.dropConnections {
+                return
+            }
 
             self.queue.asyncAfter(deadline: .now() + self.delay) {
                 self.copy(from: incomingConnection, to: targetConnection)

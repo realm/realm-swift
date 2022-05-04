@@ -1,0 +1,13 @@
+{
+  "events": {
+    "streams": {
+      "eventSubscriptionPollingPeriodSec": 2,
+      "eventSubscriptionHeartbeatPeriodSec": 2
+    },
+    "mediator": {
+      "eventSubscriptionPollingPeriodSeconds": 4,
+      "unownedEventSubscriptionPollingPeriodSeconds": 2,
+      "staleOwnedJobPollingPeriodSec": 2
+    }
+  }
+}

@@ -54,7 +54,6 @@ Pod::Spec.new do |s|
                               'include/RLMPushClient.h',
                               'include/RLMProviderClient.h',
                               'include/RLMRealm+Sync.h',
-                              'include/RLMRealmConfiguration+Sync.h',
                               'include/RLMSyncConfiguration.h',
                               'include/RLMCredentials.h',
                               'include/RLMSyncManager.h',
