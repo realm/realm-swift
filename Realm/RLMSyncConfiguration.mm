@@ -39,6 +39,7 @@
 
 using namespace realm;
 
+API_AVAILABLE(ios(13.0), macos(10.15), tvos(13.0), watchos(6.0))
 @interface RLMCocoaSocketDelegate : NSObject<NSURLSessionWebSocketDelegate>
 @property realm::util::websocket::EZObserver* observer;
 @end
@@ -57,30 +58,59 @@ using namespace realm;
 @end
 
 namespace realm::util::websocket {
-class API_AVAILABLE(ios(13.0), macos(10.15), tvos(13.0), watchos(6.0)) CocoaSocketFactory: public EZSocketFactory, public EZSocket {
+class API_AVAILABLE(ios(13.0), macos(10.15), tvos(13.0), watchos(6.0)) CocoaSocket: public EZSocket {
+
 public:
-    CocoaSocketFactory(EZConfig config)
-        : EZSocketFactory(config)
+    CocoaSocket(EZConfig config, EZObserver* observer, EZEndpoint&& endpoint):
+    m_config(config)
+    , delegate([RLMCocoaSocketDelegate new])
     {
+        setup(observer, std::move(endpoint));
     }
 
     RLMCocoaSocketDelegate *delegate;
     NSURLSessionWebSocketTask *task;
 
+    util::Logger& logger() const
+    {
+        return m_config.logger;
+    }
+
     void async_write_binary(const char *data, size_t size, util::UniqueFunction<void ()> &&handler) override
     {
+        logger().info(">>> CocoaSocket async_write_binary");
         [task sendMessage:[[NSURLSessionWebSocketMessage alloc] initWithString:@(data)]
         completionHandler:^(NSError * _Nullable error) {
             handler();
         }];
     }
 
-    std::unique_ptr<EZSocket> connect(EZObserver* observer, EZEndpoint&& endpoint) override
+private:
+
+    NSURL *buildUrl(EZEndpoint endpoint) {
+        NSMutableArray<NSString *> *strs = [NSMutableArray<NSString *> new];
+//        endpoint.is_ssl ? [strs addObject: @"wss://"] : [strs addObject: @"ws://"];
+        [strs addObject: @"ws://"];
+        endpoint.proxy ? [strs addObject: @(endpoint.proxy->address.data())] : [strs addObject: @(endpoint.address.data())];
+        endpoint.proxy ? [strs addObject: [NSString stringWithFormat:@":%u", endpoint.proxy->port]] : [strs addObject: [NSString stringWithFormat:@":%u", endpoint.port]];
+        [strs addObject:@(endpoint.path.data())];
+        logger().info("Connect to '%1'", [[strs componentsJoinedByString:@""] cStringUsingEncoding:NSUTF8StringEncoding]);
+        return [[NSURL alloc] initWithString:[strs componentsJoinedByString:@""]];
+    }
+
+    void setup(EZObserver* observer, EZEndpoint&& endpoint)
     {
-        task = [[NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration new] delegate:delegate delegateQueue:nil] webSocketTaskWithURL:[[NSURL alloc] initWithString:@(endpoint.path.data())]];
-        delegate = [RLMCocoaSocketDelegate new];
+        logger().info(">>> CocoaSocket setup");
         delegate.observer = observer;
+        NSURLSession *session = [NSURLSession sharedSession];
+        
+        task = [session webSocketTaskWithURL:buildUrl(endpoint)];
         [task receiveMessageWithCompletionHandler:^(NSURLSessionWebSocketMessage * _Nullable message, NSError * _Nullable error) {
+            if (error) {
+                logger().error("Failed to connect to endpoint '%1:%2'", endpoint.address, endpoint.proxy->port); // Throws
+//                observer->websocket_connect_error_handler(ec); // Throws
+                return;
+            }
             switch (message.type) {
                 case NSURLSessionWebSocketMessageTypeData:
                     observer->websocket_binary_message_received([[[NSString alloc] initWithData:message.data encoding:NSUTF8StringEncoding] UTF8String],
@@ -93,8 +123,26 @@ public:
             }
         }];
         [task resume];
-        return std::unique_ptr<EZSocket>(this);
     }
+
+    EZConfig m_config;
+};
+
+class API_AVAILABLE(ios(13.0), macos(10.15), tvos(13.0), watchos(6.0)) CocoaSocketFactory: public EZSocketFactory {
+public:
+    CocoaSocketFactory(EZConfig config)
+        : EZSocketFactory(config)
+    , m_config(config)
+    {
+    }
+
+    std::unique_ptr<EZSocket> connect(EZObserver* observer, EZEndpoint&& endpoint) override
+    {
+        return std::unique_ptr<EZSocket>(new CocoaSocket(std::move(m_config), observer, std::move(endpoint)));
+    }
+    
+private:
+    EZConfig m_config;
 };
 }
 
@@ -451,8 +499,13 @@ void RLMSetConfigInfoForClientResetCallbacks(realm::SyncConfig& syncConfig, RLMR
 @end
 
 using namespace realm::util::websocket;
+
 std::function<std::unique_ptr<EZSocketFactory>(EZConfig&&)> defaultSocketFactory() {
     return [](EZConfig&& config) mutable {
-        return std::unique_ptr<EZSocketFactory>(new CocoaSocketFactory(std::move(config)));
+        if (@available(macOS 10.15, *)) {
+            return std::unique_ptr<EZSocketFactory>(new CocoaSocketFactory(std::move(config)));
+        } else {
+            return std::unique_ptr<EZSocketFactory>(new EZSocketFactory(std::move(config)));
+        }
     };
 }
