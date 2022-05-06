@@ -102,8 +102,10 @@ private:
     {
         logger().info(">>> CocoaSocket setup");
         delegate.observer = observer;
-        NSURLSession *session = [NSURLSession sharedSession];
-        
+
+        NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
+        NSURLSession *session = [NSURLSession sessionWithConfiguration:configuration delegate:delegate delegateQueue:nil];
+
         task = [session webSocketTaskWithURL:buildUrl(endpoint)];
         [task receiveMessageWithCompletionHandler:^(NSURLSessionWebSocketMessage * _Nullable message, NSError * _Nullable error) {
             if (error) {
