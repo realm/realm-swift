@@ -41,17 +41,21 @@ using namespace realm;
 
 API_AVAILABLE(ios(13.0), macos(10.15), tvos(13.0), watchos(6.0))
 @interface RLMCocoaSocketDelegate : NSObject<NSURLSessionWebSocketDelegate>
-@property realm::util::websocket::EZObserver* observer;
+@property realm::util::websocket::EZObserver *observer;
+@property util::Logger *logger;
 @end
 
 @implementation RLMCocoaSocketDelegate
 
 - (void)URLSession:(NSURLSession *)session webSocketTask:(NSURLSessionWebSocketTask *)webSocketTask didOpenWithProtocol:(NSString *)protocol {
+    REALM_ASSERT([protocol length] > 0);
+    _logger->info(">>> CocoaSocket didOpenWithProtocol");
     _observer->websocket_handshake_completion_handler([protocol cStringUsingEncoding:NSUTF8StringEncoding]);
 }
 
 - (void)URLSession:(NSURLSession *)session webSocketTask:(NSURLSessionWebSocketTask *)webSocketTask didCloseWithCode:(NSURLSessionWebSocketCloseCode)closeCode reason:(NSData *)reason {
-    _observer->websocket_close_message_received(std::make_error_code(std::errc::connection_aborted),
+    _logger->info(">>> CocoaSocket didCloseWithCode '%1'", closeCode);
+    _observer->websocket_close_message_received(std::error_code(static_cast<int>(closeCode), std::generic_category()),
                                                 RLMStringDataWithNSString([[NSString alloc] initWithData: reason encoding:NSUTF8StringEncoding]));
 }
 
@@ -65,36 +69,62 @@ public:
     m_config(config)
     , delegate([RLMCocoaSocketDelegate new])
     {
+        delegate.logger = &m_config.logger;
         setup(observer, std::move(endpoint));
     }
 
     RLMCocoaSocketDelegate *delegate;
     NSURLSessionWebSocketTask *task;
+    NSURLSession *session;
+
+    ~CocoaSocket()
+    {
+        destroySocket();
+    }
 
     util::Logger& logger() const
     {
         return m_config.logger;
     }
 
+    util::UniqueFunction<void()> m_write_completion_handler;
+
     void async_write_binary(const char *data, size_t size, util::UniqueFunction<void ()> &&handler) override
     {
         logger().info(">>> CocoaSocket async_write_binary");
-        [task sendMessage:[[NSURLSessionWebSocketMessage alloc] initWithString:@(data)]
+        m_write_completion_handler = std::move(handler);
+
+        auto message = [[NSURLSessionWebSocketMessage alloc] initWithString:@(data)];
+        [task sendMessage:message
         completionHandler:^(NSError * _Nullable error) {
-            handler();
+            if (error) {
+                logger().error("Failed to send message: %1", error.localizedDescription.UTF8String); // Throws
+                delegate.observer->websocket_read_or_write_error_handler(std::error_code(static_cast<int>(error.code), std::generic_category())); // Throws
+                destroySocket(error);
+                return;
+            }
+            m_write_completion_handler();
+            m_write_completion_handler = nullptr;
         }];
     }
 
 private:
 
+    void destroySocket(NSError *error = nil) {
+        if (error) {
+            [session invalidateAndCancel];
+        } else {
+            [session finishTasksAndInvalidate];
+        }
+    }
+    
     NSURL *buildUrl(EZEndpoint endpoint) {
         NSMutableArray<NSString *> *strs = [NSMutableArray<NSString *> new];
-//        endpoint.is_ssl ? [strs addObject: @"wss://"] : [strs addObject: @"ws://"];
-        [strs addObject: @"ws://"];
+        endpoint.is_ssl ? [strs addObject: @"wss://"] : [strs addObject: @"ws://"];
         endpoint.proxy ? [strs addObject: @(endpoint.proxy->address.data())] : [strs addObject: @(endpoint.address.data())];
         endpoint.proxy ? [strs addObject: [NSString stringWithFormat:@":%u", endpoint.proxy->port]] : [strs addObject: [NSString stringWithFormat:@":%u", endpoint.port]];
         [strs addObject:@(endpoint.path.data())];
-        logger().info("Connect to '%1'", [[strs componentsJoinedByString:@""] cStringUsingEncoding:NSUTF8StringEncoding]);
+        logger().info("Connecting to '%1'", [[strs componentsJoinedByString:@""] cStringUsingEncoding:NSUTF8StringEncoding]);
         return [[NSURL alloc] initWithString:[strs componentsJoinedByString:@""]];
     }
 
@@ -104,13 +134,23 @@ private:
         delegate.observer = observer;
 
         NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
+
+        auto sessionHeaders = [NSMutableDictionary new];
+        for (const auto &x: endpoint.headers) {
+            sessionHeaders[@(x.first.c_str())] = @(x.second.c_str());
+        }
+        configuration.HTTPAdditionalHeaders = sessionHeaders;
+
+        auto protocols = [[NSString stringWithUTF8String:endpoint.protocols.c_str()] componentsSeparatedByString:@","];
+
         NSURLSession *session = [NSURLSession sessionWithConfiguration:configuration delegate:delegate delegateQueue:nil];
 
-        task = [session webSocketTaskWithURL:buildUrl(endpoint)];
+        task = [session webSocketTaskWithURL:buildUrl(endpoint) protocols:protocols];
         [task receiveMessageWithCompletionHandler:^(NSURLSessionWebSocketMessage * _Nullable message, NSError * _Nullable error) {
             if (error) {
                 logger().error("Failed to connect to endpoint '%1:%2'", endpoint.address, endpoint.proxy->port); // Throws
-//                observer->websocket_connect_error_handler(ec); // Throws
+                observer->websocket_read_or_write_error_handler(std::error_code(static_cast<int>(error.code), std::generic_category())); // Throws
+                destroySocket(error);
                 return;
             }
             switch (message.type) {
