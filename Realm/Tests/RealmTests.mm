@@ -2349,6 +2349,10 @@
     XCTAssertNil(writeError);
     RLMRealm *copy = [self realmWithTestPath];
     XCTAssertEqual(1U, [IntObject allObjectsInRealm:copy].count);
+
+    RLMRealm *frozenCopy = [copy freeze];
+    XCTAssertTrue(frozenCopy.isFrozen);
+    XCTAssertTrue([IntObject allObjectsInRealm:frozenCopy].isFrozen);
 }
 
 - (void)testCannotOverwriteWithWriteCopy
@@ -2486,6 +2490,10 @@
     XCTAssertNil(writeError);
     RLMRealm *copy = [RLMRealm realmWithConfiguration:configuration error:nil];
     XCTAssertEqual(1U, [IntObject allObjectsInRealm:copy].count);
+
+    RLMRealm *frozenCopy = [copy freeze];
+    XCTAssertTrue(frozenCopy.isFrozen);
+    XCTAssertTrue([IntObject allObjectsInRealm:frozenCopy].isFrozen);
 }
 
 - (void)testWritingCopyWithConfigurationUsesWriteTransactionInProgress

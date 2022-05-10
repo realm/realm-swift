@@ -49,6 +49,8 @@ x.y.z Release notes (yyyy-MM-dd)
 * If an async open of a Realm triggered a client reset, the callbacks for
   `discardLocal` could theoretically fail to be called due to a race condition.
   The timing for this was probably not possible to hit in practice (since 10.25.0).
+* Calling `[RLMRealm freeze]`/`Realm.freeze` on a Realm which had been created from `writeCopy`
+  would not produce a frozen Realm. ([#7697](https://github.com/realm/realm-swift/issues/7697), since v5.0.0)
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
