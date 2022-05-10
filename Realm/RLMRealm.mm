@@ -436,11 +436,11 @@ static RLMRealm *getCachedRealm(RLMRealmConfiguration *configuration, void *cach
 + (instancetype)realmWithConfiguration:(RLMRealmConfiguration *)configuration
                                  queue:(dispatch_queue_t)queue
                                  error:(NSError **)error {
-    // The main thread and main queue share a cache key of 1 so that they give
-    // the same instance. Other Realms are keyed on either the thread or the queue.
+    // The main thread and main queue share a cache key of `std::numeric_limits<uintptr_t>::max()`
+    // so that they give the same instance. Other Realms are keyed on either the thread or the queue.
     // Note that despite being a void* the cache key is not actually a pointer;
     // this is just an artifact of NSMapTable's strange API.
-    void *cacheKey = reinterpret_cast<void *>(1);
+    void *cacheKey = reinterpret_cast<void *>(std::numeric_limits<uintptr_t>::max());
     if (queue) {
         if (queue != dispatch_get_main_queue()) {
             cacheKey = (__bridge void *)queue;
