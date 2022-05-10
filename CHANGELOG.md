@@ -37,6 +37,8 @@ x.y.z Release notes (yyyy-MM-dd)
     }];
     [realm cancelAsyncTransaction:asyncTransactionId];
 ```
+* Improve performance of opening a Realm with `objectClasses`/`objectTypes` set
+  in the configuration.
 
 ### Fixed
 * Consuming a RealmSwift XCFramework with library evolution enabled would give the error
@@ -51,6 +53,9 @@ x.y.z Release notes (yyyy-MM-dd)
   The timing for this was probably not possible to hit in practice (since 10.25.0).
 * Calling `[RLMRealm freeze]`/`Realm.freeze` on a Realm which had been created from `writeCopy`
   would not produce a frozen Realm. ([#7697](https://github.com/realm/realm-swift/issues/7697), since v5.0.0)
+* Using the dynamic subscript API on unmanaged objects before first opening a
+  Realm or if `objectTypes` was set when opening a Realm would throw an
+  exception ([#7786](https://github.com/realm/realm-swift/issues/7786)).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 

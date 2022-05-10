@@ -276,7 +276,7 @@ static bool isSync(realm::Realm::Config const& config) {
 }
 
 - (void)setObjectClasses:(NSArray *)objectClasses {
-    self.customSchema = objectClasses ? [RLMSchema schemaWithObjectClasses:objectClasses] : nil;
+    _customSchema = objectClasses ? [RLMSchema schemaWithObjectClasses:objectClasses] : nil;
     [self updateSchemaMode];
 }
 

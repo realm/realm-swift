@@ -286,11 +286,9 @@ using namespace realm;
     schema->_unmanagedClass = _unmanagedClass;
     schema->_isSwiftClass = _isSwiftClass;
     schema->_isEmbedded = _isEmbedded;
-
-    // call property setter to reset map and primary key
-    schema.properties = [[NSArray allocWithZone:zone] initWithArray:_properties copyItems:YES];
-    schema.computedProperties = [[NSArray allocWithZone:zone] initWithArray:_computedProperties copyItems:YES];
-
+    schema->_properties = [[NSArray allocWithZone:zone] initWithArray:_properties copyItems:YES];
+    schema->_computedProperties = [[NSArray allocWithZone:zone] initWithArray:_computedProperties copyItems:YES];
+    [schema _propertiesDidChange];
     return schema;
 }
 
