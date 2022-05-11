@@ -432,7 +432,7 @@ public typealias AsyncTransactionId = RLMAsyncTransactionId
      @param onComplete A block which will be called on the source thread or queue once the commit
                      has either completed or failed with an error.
 
-     @param isGroupingAllowed If `true`, multiple sequential calls to `commitAsyncWrite` may be
+     @param allowGrouping If `true`, multiple sequential calls to `commitAsyncWrite` may be
                           batched together and persisted to stable storage in one group. This
                           improves write performance, particularly when the individual transactions
                           being batched are small. In the event of a crash or power failure,
@@ -445,8 +445,8 @@ public typealias AsyncTransactionId = RLMAsyncTransactionId
              the pending invocation of the block. Note that this does *not* cancel the commit itself.
     */
     @discardableResult
-    public func commitAsyncWrite(_ onComplete: ((Swift.Error?) -> Void)? = nil, isGroupingAllowed: Bool = false) -> AsyncTransactionId {
-        return rlmRealm.commitAsyncWriteTransaction(onComplete, isGroupingAllowed: isGroupingAllowed)
+    public func commitAsyncWrite(_ onComplete: ((Swift.Error?) -> Void)? = nil, allowGrouping: Bool = false) -> AsyncTransactionId {
+        return rlmRealm.commitAsyncWriteTransaction(onComplete, allowGrouping: allowGrouping)
     }
 
     /**

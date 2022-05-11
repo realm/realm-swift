@@ -763,10 +763,11 @@ static RLMRealm *getCachedRealm(RLMRealmConfiguration *configuration, void *cach
 }
 
 - (RLMAsyncTransactionId)commitAsyncWriteTransaction:(void(^)(NSError *))completionBlock {
-    return [self commitAsyncWriteTransaction:completionBlock isGroupingAllowed:false];
+    return [self commitAsyncWriteTransaction:completionBlock allowGrouping:false];
 }
 
-- (RLMAsyncTransactionId)commitAsyncWriteTransaction:(nullable void(^)(NSError *))completionBlock isGroupingAllowed:(BOOL)isGroupingAllowed {
+- (RLMAsyncTransactionId)commitAsyncWriteTransaction:(nullable void(^)(NSError *))completionBlock
+                                       allowGrouping:(BOOL)allowGrouping {
     try {
         auto completion = [=](std::exception_ptr err) {
             @autoreleasepool {
@@ -790,9 +791,9 @@ static RLMRealm *getCachedRealm(RLMRealmConfiguration *configuration, void *cach
         };
 
         if (completionBlock) {
-            return _realm->async_commit_transaction(completion, isGroupingAllowed);
+            return _realm->async_commit_transaction(completion, allowGrouping);
         }
-        return _realm->async_commit_transaction(nullptr, isGroupingAllowed);
+        return _realm->async_commit_transaction(nullptr, allowGrouping);
     }
     catch (...) {
         RLMRealmTranslateException(nil);
