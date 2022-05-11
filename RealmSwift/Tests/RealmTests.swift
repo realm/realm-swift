@@ -1183,9 +1183,9 @@ class RealmTests: TestCase {
 
         realm.beginAsyncWrite {
             realm.create(SwiftStringObject.self, value: ["string"])
-            realm.commitAsyncWrite({ _ in
+            realm.commitAsyncWrite(allowGrouping: true) { _ in
                 asyncComplete.fulfill()
-            }, allowGrouping: true)
+            }
         }
 
         realm.beginAsyncWrite {

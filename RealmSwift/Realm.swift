@@ -445,7 +445,7 @@ public typealias AsyncTransactionId = RLMAsyncTransactionId
              the pending invocation of the block. Note that this does *not* cancel the commit itself.
     */
     @discardableResult
-    public func commitAsyncWrite(_ onComplete: ((Swift.Error?) -> Void)? = nil, allowGrouping: Bool = false) -> AsyncTransactionId {
+    public func commitAsyncWrite(allowGrouping: Bool = false, _ onComplete: ((Swift.Error?) -> Void)? = nil) -> AsyncTransactionId {
         return rlmRealm.commitAsyncWriteTransaction(onComplete, allowGrouping: allowGrouping)
     }
 
