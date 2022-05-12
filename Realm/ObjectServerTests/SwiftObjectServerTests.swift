@@ -3058,5 +3058,5 @@ class AsyncAwaitObjectServerTests: SwiftSyncTestCase {
     }
 }
 
-#endif // swift(>=5.5)
+#endif // swift(>=5.6)
 #endif // os(macOS)

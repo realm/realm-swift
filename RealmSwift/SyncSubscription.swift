@@ -451,4 +451,4 @@ extension SyncSubscriptionSet {
         }
     }
 }
-#endif // swift(>=5.5)
+#endif // swift(>=5.6)

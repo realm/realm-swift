@@ -1,5 +1,9 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
+
+Xcode 13.1 is now the minimum supported version of Xcode, as Apple no longer
+allows submitting to the app store with Xcode 12.
+
 ### Enhancements
 * Add Swift API for asynchronous transactions
 ```
@@ -59,7 +63,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 13.3.1.
 * CocoaPods: 1.10 or later.
-* Xcode: 12.4-13.3.1.
+* Xcode: 13.1-13.3.1.
 
 ### Internal
 * Upgraded realm-core from ? to ?
