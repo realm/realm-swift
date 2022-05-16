@@ -715,7 +715,6 @@ class ThreadSafeWrapperTests: ThreadSafeReferenceTests {
     }
 }
 
-#if swift(>=5.5)
 extension ThreadSafeWrapperTests {
     func testThreadSafeWrapperInline() throws {
         let values = ["A", "B", "C", "D"]
@@ -796,4 +795,3 @@ extension ThreadSafeWrapperTests {
         XCTAssertNotEqual(obj?.stringCol, "before")
     }
 }
-#endif

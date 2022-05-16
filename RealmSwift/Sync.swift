@@ -916,7 +916,7 @@ extension FunctionCallable {
         }
     }
 }
-#endif // swift(>=5.5)
+#endif // swift(>=5.6)
 
 extension User {
     /**

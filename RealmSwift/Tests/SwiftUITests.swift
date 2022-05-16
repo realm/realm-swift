@@ -443,7 +443,6 @@ class SwiftUITests: TestCase {
         state.projectedValue.remove(object)
         XCTAssertEqual(state.wrappedValue.count, 0)
     }
-    #if swift(>=5.5)
     func testSwiftQuerySyntax() throws {
         let realm = inMemoryRealm(inMemoryIdentifier)
         try realm.write {
@@ -459,7 +458,6 @@ class SwiftUITests: TestCase {
         XCTAssertEqual(filteredResults.wrappedValue.count, 2)
         XCTAssertEqual(filteredResults.wrappedValue[0].str, "antenna")
     }
-    #endif
     func testResultsAppendFrozenObject() throws {
         let state1 = ObservedResults(SwiftUIObject.self, configuration: inMemoryRealm(inMemoryIdentifier).configuration)
         let object1 = SwiftUIObject()
@@ -531,7 +529,6 @@ class SwiftUITests: TestCase {
         XCTAssertEqual(binding.wrappedValue, "baz")
     }
 
-#if swift(>=5.5)
     func testStateRealmObjectKVO() throws {
         @StateRealmObject var object = SwiftUIObject()
         var hit = 0
@@ -558,34 +555,6 @@ class SwiftUITests: TestCase {
         cancellable.cancel()
         XCTAssertEqual(hit, 2)
     }
-#else
-    func testStateRealmObjectKVO() throws {
-        let object = StateRealmObject(wrappedValue: SwiftUIObject())
-        var hit = 0
-
-        let cancellable = object._publisher
-            .sink { _ in
-            } receiveValue: { _ in
-                hit += 1
-            }
-        XCTAssertEqual(hit, 0)
-        object.wrappedValue.int += 1
-        XCTAssertEqual(hit, 1)
-        XCTAssertNotNil(object.wrappedValue.observationInfo)
-        let realm = try Realm()
-        try realm.write {
-            realm.add(object.wrappedValue)
-        }
-        XCTAssertEqual(hit, 1)
-        XCTAssertNil(object.wrappedValue.observationInfo)
-        try realm.write {
-            object.wrappedValue.thaw()!.int += 1
-        }
-        XCTAssertEqual(hit, 2)
-        cancellable.cancel()
-        XCTAssertEqual(hit, 2)
-    }
-#endif
 
     // MARK: - Projection ObservedResults Operations
     func testResultsAppendProjection() throws {
@@ -614,7 +583,6 @@ class SwiftUITests: TestCase {
         XCTAssertEqual(state.wrappedValue.count, 0)
     }
 
-#if swift(>=5.5)
     func testProjectionStateRealmObjectKVO() throws {
         @StateRealmObject var projection = UIElementsProjection(projecting: SwiftUIObject())
         var hit = 0
@@ -641,34 +609,6 @@ class SwiftUITests: TestCase {
         cancellable.cancel()
         XCTAssertEqual(hit, 2)
     }
-#else
-    func testProjectionStateRealmObjectKVO() throws {
-        let projection = StateRealmObject(wrappedValue: UIElementsProjection(projecting: SwiftUIObject()))
-        var hit = 0
-
-        let cancellable = projection._publisher
-            .sink { _ in
-            } receiveValue: { _ in
-                hit += 1
-            }
-        XCTAssertEqual(hit, 0)
-        projection.wrappedValue.counter += 1
-        XCTAssertEqual(hit, 1)
-        XCTAssertNotNil(projection.wrappedValue.rootObject.observationInfo)
-        let realm = try Realm()
-        try realm.write {
-            realm.add(projection.wrappedValue.rootObject)
-        }
-        XCTAssertEqual(hit, 1)
-        XCTAssertNil(projection.wrappedValue.rootObject.observationInfo)
-        try realm.write {
-            projection.wrappedValue.thaw()!.counter += 1
-        }
-        XCTAssertEqual(hit, 2)
-        cancellable.cancel()
-        XCTAssertEqual(hit, 2)
-    }
-#endif
 
     func testProjectionDelete() throws {
         let results = ObservedResults(UIElementsProjection.self,
