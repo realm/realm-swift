@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Realm/RLMAudit.h>
+#import <Realm/RLMEvent.h>
 
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObjectStore.h"
@@ -36,7 +36,7 @@
 using namespace realm;
 
 @interface RLMObjectBase ()
-- (NSString *)customAuditRepresentation;
+- (NSString *)customEventRepresentation;
 @end
 
 namespace {
@@ -69,7 +69,7 @@ util::UniqueFunction<void (std::exception_ptr)> wrapCompletion(void (^completion
     };
 }
 
-realm::AuditInterface *audit_context(RLMAuditContext *context) {
+realm::AuditInterface *audit_context(RLMEventContext *context) {
     return reinterpret_cast<realm::AuditInterface *>(context);
 }
 
@@ -93,38 +93,38 @@ util::Optional<std::string> nsStringToOptionalString(NSString *str) {
 }
 } // anonymous namespace
 
-void RLMAuditBeginScope(RLMAuditContext *context, NSString *activity) {
+void RLMEventBeginScope(RLMEventContext *context, NSString *activity) {
     audit_context(context)->begin_scope(activity.UTF8String);
 }
 
-void RLMAuditEndScope(RLMAuditContext *context, RLMAuditCompletion completion) {
+void RLMEventEndScope(RLMEventContext *context, RLMEventCompletion completion) {
     audit_context(context)->end_scope(wrapCompletion(completion));
 }
 
-void RLMAuditRecordEvent(RLMAuditContext *context, NSString *activity, NSString *event,
-                         NSString *data, RLMAuditCompletion completion) {
+void RLMEventRecordEvent(RLMEventContext *context, NSString *activity, NSString *event,
+                         NSString *data, RLMEventCompletion completion) {
     audit_context(context)->record_event(activity.UTF8String, nsStringToOptionalString(event),
                                          nsStringToOptionalString(data), wrapCompletion(completion));
 }
 
-void RLMAuditUpdateMetadata(RLMAuditContext *context, NSDictionary<NSString *, NSString *> *newMetadata) {
+void RLMEventUpdateMetadata(RLMEventContext *context, NSDictionary<NSString *, NSString *> *newMetadata) {
     audit_context(context)->update_metadata(convertMetadata(newMetadata));
 }
 
-RLMAuditContext *RLMAuditGetContext(RLMRealm *realm) {
-    return reinterpret_cast<RLMAuditContext *>(realm->_realm->audit_context());
+RLMEventContext *RLMEventGetContext(RLMRealm *realm) {
+    return reinterpret_cast<RLMEventContext *>(realm->_realm->audit_context());
 }
 
-class RLMAuditSerializer : public realm::AuditObjectSerializer {
+class RLMEventSerializer : public realm::AuditObjectSerializer {
 public:
-    RLMAuditSerializer(RLMRealmConfiguration *c) : _config(c.copy) {
+    RLMEventSerializer(RLMRealmConfiguration *c) : _config(c.copy) {
         auto& config = _config.configRef;
         config.cache = false;
         config.audit_config = nullptr;
         config.automatic_change_notifications = false;
     }
 
-    ~RLMAuditSerializer() {
+    ~RLMEventSerializer() {
         scope_complete();
     }
 
@@ -157,8 +157,8 @@ public:
 
             acc->_row = obj;
             RLMInitializeSwiftAccessor(acc, false);
-            NSString *auditRepresentation = [acc customAuditRepresentation];
-            out = nlohmann::json::parse(auditRepresentation.UTF8String);
+            NSString *customRepresentation = [acc customEventRepresentation];
+            out = nlohmann::json::parse(customRepresentation.UTF8String);
         }
     }
 
@@ -181,7 +181,7 @@ private:
         }
 
         RLMClassInfo *info = realm()->_info[tableKey];
-        if (!info || !info->rlmObjectSchema.hasCustomAuditSerialization) {
+        if (!info || !info->rlmObjectSchema.hasCustomEventSerialization) {
             _accessorMap.insert({tableKey.value, nil});
             return nil;
         }
@@ -195,13 +195,13 @@ private:
     }
 };
 
-@implementation RLMAuditConfiguration
+@implementation RLMEventConfiguration
 - (std::shared_ptr<AuditConfig>)auditConfigWithRealmConfiguration:(RLMRealmConfiguration *)realmConfig {
     auto config = std::make_shared<realm::AuditConfig>();
     config->audit_user = self.syncUser._syncUser;
     config->partition_value_prefix = self.partitionPrefix.UTF8String;
     config->metadata = convertMetadata(self.metadata);
-    config->serializer = std::make_shared<RLMAuditSerializer>(realmConfig);
+    config->serializer = std::make_shared<RLMEventSerializer>(realmConfig);
     if (_logger) {
         config->logger = RLMWrapLogFunction(_logger);
     }

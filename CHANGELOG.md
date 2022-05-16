@@ -44,7 +44,8 @@ allows submitting to the app store with Xcode 12.
 ```
 * Improve performance of opening a Realm with `objectClasses`/`objectTypes` set
   in the configuration.
-* Implement the Realm Audit API for reporting reads and writes on a Realm file to Atlas.
+* Implement the Realm event recording API for reporting reads and writes on a
+  Realm file to Atlas.
 
 ### Fixed
 * Lower minimum OS version for `async` login and FunctionCallables. ([#7791]https://github.com/realm/realm-swift/issues/7791)

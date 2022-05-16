@@ -33,7 +33,7 @@
 
 using namespace realm;
 
-@protocol RLMCustomAuditRepresentable
+@protocol RLMCustomEventRepresentable
 @end
 
 // private properties
@@ -139,7 +139,7 @@ using namespace realm;
     schema.unmanagedClass = objectClass;
     schema.isSwiftClass = isSwift;
     schema.isEmbedded = [(id)objectClass isEmbedded];
-    schema.hasCustomAuditSerialization = [objectClass conformsToProtocol:@protocol(RLMCustomAuditRepresentable)];
+    schema.hasCustomEventSerialization = [objectClass conformsToProtocol:@protocol(RLMCustomEventRepresentable)];
 
     // create array of RLMProperties, inserting properties of superclasses first
     Class cls = objectClass;

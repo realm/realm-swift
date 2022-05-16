@@ -32,19 +32,19 @@ NS_ASSUME_NONNULL_BEGIN
 @class RLMRealm, RLMUser, RLMRealmConfiguration;
 typedef RLM_CLOSED_ENUM(NSUInteger, RLMSyncLogLevel);
 
-struct RLMAuditContext;
-typedef void (^RLMAuditCompletion)(NSError *);
+struct RLMEventContext;
+typedef void (^RLMEventCompletion)(NSError *);
 
-FOUNDATION_EXTERN struct RLMAuditContext *_Nullable RLMAuditGetContext(RLMRealm *realm);
-FOUNDATION_EXTERN void RLMAuditBeginScope(struct RLMAuditContext *context, NSString *activity);
-FOUNDATION_EXTERN void RLMAuditEndScope(struct RLMAuditContext *context, RLMAuditCompletion _Nullable completion);
-FOUNDATION_EXTERN void RLMAuditRecordEvent(struct RLMAuditContext *context, NSString *activity,
+FOUNDATION_EXTERN struct RLMEventContext *_Nullable RLMEventGetContext(RLMRealm *realm);
+FOUNDATION_EXTERN void RLMEventBeginScope(struct RLMEventContext *context, NSString *activity);
+FOUNDATION_EXTERN void RLMEventEndScope(struct RLMEventContext *context, RLMEventCompletion _Nullable completion);
+FOUNDATION_EXTERN void RLMEventRecordEvent(struct RLMEventContext *context, NSString *activity,
                                            NSString *_Nullable event, NSString *_Nullable data,
-                                           RLMAuditCompletion _Nullable completion);
-FOUNDATION_EXTERN void RLMAuditUpdateMetadata(struct RLMAuditContext *context,
+                                           RLMEventCompletion _Nullable completion);
+FOUNDATION_EXTERN void RLMEventUpdateMetadata(struct RLMEventContext *context,
                                               NSDictionary<NSString *, NSString *> *newMetadata);
 
-@interface RLMAuditConfiguration : NSObject
+@interface RLMEventConfiguration : NSObject
 @property (nonatomic) NSString *partitionPrefix;
 @property (nonatomic, nullable) RLMUser *syncUser;
 @property (nonatomic, nullable) NSDictionary<NSString *, NSString *> *metadata;

@@ -26,7 +26,7 @@ import RealmSyncTestSupport
 import RealmTestSupport
 #endif
 
-class SwiftCustomAuditRepresentation: Object, CustomAuditRepresentable {
+class SwiftCustomEventRepresentation: Object, CustomEventRepresentable {
     @Persisted(primaryKey: true) var _id: ObjectId
     @Persisted var value: Int
 
@@ -35,7 +35,7 @@ class SwiftCustomAuditRepresentation: Object, CustomAuditRepresentable {
         self.value = value
     }
 
-    func customAuditRepresentation() -> String {
+    func customEventRepresentation() -> String {
         if value == 0 {
             return "invalid json"
         }
@@ -58,8 +58,7 @@ class AuditEvent: Object {
     var parsedData: NSDictionary?
 }
 
-#if swift(>=5.5)
-class SwiftAuditTests: SwiftSyncTestCase {
+class SwiftEventTests: SwiftSyncTestCase {
     var user: User!
     var collection: MongoCollection!
     var start: Date!
@@ -88,19 +87,19 @@ class SwiftAuditTests: SwiftSyncTestCase {
 
     func config(partition: String = #function) throws -> Realm.Configuration {
         var config = user.configuration(partitionValue: partition)
-        config.auditConfiguration = AuditConfiguration()
-        config.objectTypes = [SwiftPerson.self, SwiftCustomAuditRepresentation.self]
+        config.eventConfiguration = EventConfiguration()
+        config.objectTypes = [SwiftPerson.self, SwiftCustomEventRepresentation.self]
         return config
     }
 
-    func scope<T>(_ audit: Audit, _ name: String, body: () throws -> T) rethrows -> T {
-        audit.beginScope(activity: name)
+    func scope<T>(_ events: Events, _ name: String, body: () throws -> T) rethrows -> T {
+        events.beginScope(activity: name)
         let result = try body()
-        audit.endScope().await(self)
+        events.endScope().await(self)
         return result
     }
 
-    func getAuditEvents(expectedCount: Int) -> [AuditEvent] {
+    func getEvents(expectedCount: Int) -> [AuditEvent] {
         let waitStart = Date()
         while collection.count(filter: [:]).await(self) < expectedCount && waitStart.timeIntervalSinceNow > -300.0 {
             sleep(5)
@@ -163,11 +162,11 @@ class SwiftAuditTests: SwiftSyncTestCase {
         XCTAssertEqual(matching[0].data, data, line: line)
     }
 
-    func testBasicAuditEvents() throws {
+    func testBasicEvents() throws {
         let realm = try openRealm(configuration: self.config())
-        let audit = realm.audit!
+        let events = realm.events!
 
-        let personJson: NSDictionary = try scope(audit, "create object") {
+        let personJson: NSDictionary = try scope(events, "create object") {
             try realm.write {
                 let person = SwiftPerson(firstName: "Fred", lastName: "Q", age: 30)
                 realm.add(person)
@@ -175,17 +174,17 @@ class SwiftAuditTests: SwiftSyncTestCase {
             }
         }
 
-        let person = scope(audit, "read object") {
+        let person = scope(events, "read object") {
             realm.objects(SwiftPerson.self).first!
         }
 
-        try scope(audit, "mutate object") {
+        try scope(events, "mutate object") {
             try realm.write {
                 person.age = 31
             }
         }
 
-        try scope(audit, "delete object") {
+        try scope(events, "delete object") {
             try realm.write {
                 realm.delete(person)
             }
@@ -194,54 +193,54 @@ class SwiftAuditTests: SwiftSyncTestCase {
         let mutatedPersonJson = personJson.mutableCopy() as! NSMutableDictionary
         mutatedPersonJson["age"] = 31
 
-        let events = getAuditEvents(expectedCount: 4)
-        assertEvent(events, activity: "create object", event: "write",
+        let result = getEvents(expectedCount: 4)
+        assertEvent(result, activity: "create object", event: "write",
                     ["SwiftPerson": ["insertions": [personJson]]])
-        assertEvent(events, activity: "read object", event: "read",
+        assertEvent(result, activity: "read object", event: "read",
                     ["type": "SwiftPerson", "value": [personJson]])
-        assertEvent(events, activity: "mutate object", event: "write",
+        assertEvent(result, activity: "mutate object", event: "write",
                     ["SwiftPerson": ["modifications": [
                         ["oldValue": personJson, "newValue": ["age": 31]]]]])
-        assertEvent(events, activity: "delete object", event: "write",
+        assertEvent(result, activity: "delete object", event: "write",
                     ["SwiftPerson": ["deletions": [mutatedPersonJson]]])
     }
 
-    func testCustomAuditRepresentation() throws {
+    func testCustomEventRepresentation() throws {
         let realm = try openRealm(configuration: self.config())
-        let audit = realm.audit!
-        audit.beginScope(activity: "bad json")
+        let events = realm.events!
+        events.beginScope(activity: "bad json")
         try realm.write {
-            realm.add(SwiftCustomAuditRepresentation(value: 0))
+            realm.add(SwiftCustomEventRepresentation(value: 0))
         }
-        audit.endScope().awaitFailure(self) { error in
+        events.endScope().awaitFailure(self) { error in
             XCTAssert(error.localizedDescription.contains("json.exception.parse_error"))
         }
 
-        audit.beginScope(activity: "exception thrown")
+        events.beginScope(activity: "exception thrown")
         try realm.write {
-            realm.add(SwiftCustomAuditRepresentation(value: 1))
+            realm.add(SwiftCustomEventRepresentation(value: 1))
         }
-        audit.endScope().awaitFailure(self) { error in
+        events.endScope().awaitFailure(self) { error in
             XCTAssertEqual((error as NSError).userInfo["ExceptionName"] as! String?,
                            NSExceptionName.rangeException.rawValue)
         }
 
-        try scope(audit, "valid representation") {
+        try scope(events, "valid representation") {
             try realm.write {
-                realm.add(SwiftCustomAuditRepresentation(value: 2))
+                realm.add(SwiftCustomEventRepresentation(value: 2))
             }
         }
 
-        let events = getAuditEvents(expectedCount: 1)
-        assertEvent(events, activity: "valid representation", event: "write",
-                    ["SwiftCustomAuditRepresentation": ["insertions": [["int": 2]]]])
+        let result = getEvents(expectedCount: 1)
+        assertEvent(result, activity: "valid representation", event: "write",
+                    ["SwiftCustomEventRepresentation": ["insertions": [["int": 2]]]])
     }
 
     func testReadEvents() throws {
         var config = try self.config()
         config.objectTypes = [SwiftPerson.self, LinkToSwiftPerson.self]
         let realm = try openRealm(configuration: config)
-        let audit = realm.audit!
+        let events = realm.events!
 
         let a = SwiftPerson(firstName: "A", lastName: "B")
         let b = SwiftPerson(firstName: "B", lastName: "C")
@@ -257,37 +256,37 @@ class SwiftAuditTests: SwiftSyncTestCase {
 
         let objects = realm.objects(SwiftPerson.self)
         let first = realm.objects(LinkToSwiftPerson.self).first!
-        scope(audit, "link") {
+        scope(events, "link") {
             _ = first.person
         }
-        scope(audit, "results") {
+        scope(events, "results") {
             _ = objects.first
         }
-        scope(audit, "query") {
+        scope(events, "query") {
             _ = objects.filter("firstName != 'B'").first
         }
-        scope(audit, "list") {
+        scope(events, "list") {
             _ = first.people.first
         }
-        scope(audit, "dynamic list") {
+        scope(events, "dynamic list") {
             _ = first.dynamicList("people").first
         }
-        scope(audit, "collection kvc") {
+        scope(events, "collection kvc") {
             _ = first.people.value(forKey: "firstName") as [AnyObject]
         }
-        scope(audit, "dictionary") {
+        scope(events, "dictionary") {
             _ = first.peopleByName["B"]
         }
-        scope(audit, "dynamic dictionary") {
+        scope(events, "dynamic dictionary") {
             _ = first.dynamicMap("peopleByName")["B"]
         }
-        scope(audit, "lookup by primary key") {
+        scope(events, "lookup by primary key") {
             _ = realm.object(ofType: SwiftPerson.self, forPrimaryKey: a._id)
         }
 
-        let events = getAuditEvents(expectedCount: 10)
+        let result = getEvents(expectedCount: 10)
         func assertEvent(_ activity: String, _ value: [NSDictionary]..., line: UInt = #line) {
-            let filtered = Array(events.filter { $0.activity == activity }.sorted { $0._id < $1._id })
+            let filtered = Array(result.filter { $0.activity == activity }.sorted { $0._id < $1._id })
             XCTAssertEqual(filtered.count, value.count, line: line)
             for (expected, actual) in zip(value, filtered.map { $0.parsedData }) {
                 XCTAssertNotNil(actual, line: line)
@@ -313,7 +312,7 @@ class SwiftAuditTests: SwiftSyncTestCase {
         var config = try self.config()
         config.objectTypes = [SwiftPerson.self, LinkToSwiftPerson.self]
         let realm = try openRealm(configuration: config)
-        let audit = realm.audit!
+        let events = realm.events!
 
         let a = SwiftPerson(firstName: "A", lastName: "B")
         let b = SwiftPerson(firstName: "B", lastName: "C")
@@ -330,42 +329,42 @@ class SwiftAuditTests: SwiftSyncTestCase {
 
         let objects = realm.objects(LinkToSwiftPerson.self)
         let dynamicObjects = realm.dynamicObjects("LinkToSwiftPerson")
-        scope(audit, "object read without link accesses") {
+        scope(events, "object read without link accesses") {
             _ = objects.first
         }
-        scope(audit, "link property") {
+        scope(events, "link property") {
             _ = objects.first!.person
         }
-        scope(audit, "link via KVC") {
+        scope(events, "link via KVC") {
             _ = objects.first!.value(forKey: "person")
         }
-        scope(audit, "link via subscript") {
+        scope(events, "link via subscript") {
             _ = objects.first!["person"]
         }
-        scope(audit, "link via dynamic") {
+        scope(events, "link via dynamic") {
             _ = dynamicObjects.first!["person"]
         }
 
-        scope(audit, "list property") {
+        scope(events, "list property") {
             _ = objects.first!.people.first
         }
-        scope(audit, "dynamic list property") {
+        scope(events, "dynamic list property") {
             _ = dynamicObjects.first!.dynamicList("people").first
         }
-        scope(audit, "dictionary property") {
+        scope(events, "dictionary property") {
             _ = objects.first!.peopleByName["B"]
         }
-        scope(audit, "dynamic dictionary property") {
+        scope(events, "dynamic dictionary property") {
             _ = dynamicObjects.first!.dynamicMap("peopleByName")["B"]
         }
 
-        let events = getAuditEvents(expectedCount: 17)
+        let result = getEvents(expectedCount: 17)
 
         func assertEvent(_ activity: String, personCount: Int, _ value: NSDictionary, line: UInt = #line) {
-            XCTAssertEqual(events.filter { $0.activity == activity &&
+            XCTAssertEqual(result.filter { $0.activity == activity &&
                                            $0.parsedData!["type"] as! String == "SwiftPerson" }.count,
                            personCount, line: line)
-            let event = events.filter { $0.activity == activity &&
+            let event = result.filter { $0.activity == activity &&
                                         $0.parsedData!["type"] as! String == "LinkToSwiftPerson" }.first
             XCTAssertNotNil(event, line: line)
             guard let event = event else { return }
@@ -417,10 +416,10 @@ class SwiftAuditTests: SwiftSyncTestCase {
 
     func testMetadata() throws {
         let realm = try Realm(configuration: self.config())
-        let audit = realm.audit!
+        let events = realm.events!
 
         func writeEvent(_ name: String) throws {
-            try scope(audit, name) {
+            try scope(events, name) {
                 try realm.write {
                     realm.add(SwiftPerson())
                 }
@@ -428,25 +427,25 @@ class SwiftAuditTests: SwiftSyncTestCase {
         }
 
         try writeEvent("no metadata")
-        audit.updateMetadata(["userId": "a"])
+        events.updateMetadata(["userId": "a"])
         try writeEvent("userId a")
-        audit.updateMetadata(["userId": "b"])
+        events.updateMetadata(["userId": "b"])
         try writeEvent("userId b")
-        audit.updateMetadata([:])
+        events.updateMetadata([:])
         try writeEvent("metadata removed")
 
-        let events = getAuditEvents(expectedCount: 4)
-        assertEvent(events, activity: "no metadata", userId: nil)
-        assertEvent(events, activity: "userId a", userId: "a")
-        assertEvent(events, activity: "userId b", userId: "b")
-        assertEvent(events, activity: "metadata removed", userId: nil)
+        let result = getEvents(expectedCount: 4)
+        assertEvent(result, activity: "no metadata", userId: nil)
+        assertEvent(result, activity: "userId a", userId: "a")
+        assertEvent(result, activity: "userId b", userId: "b")
+        assertEvent(result, activity: "metadata removed", userId: nil)
     }
 
     func testCustomLogger() throws {
         let ex = expectation(description: "saw message with scope name")
         ex.assertForOverFulfill = false
         var config = try self.config()
-        config.auditConfiguration!.logger = { _, message in
+        config.eventConfiguration!.logger = { _, message in
             // Mostly just verify that the user-provided logger is wired up
             // correctly and not that the log messages are sensible
             if message.contains("a scope name") {
@@ -454,28 +453,27 @@ class SwiftAuditTests: SwiftSyncTestCase {
             }
         }
         let realm = try Realm(configuration: config)
-        realm.audit!.beginScope(activity: "a scope name")
-        realm.audit!.endScope().await(self)
+        realm.events!.beginScope(activity: "a scope name")
+        realm.events!.endScope().await(self)
         waitForExpectations(timeout: 2.0)
     }
 
-    func testCustomAuditEvent() throws {
+    func testCustomEvent() throws {
         let realm = try Realm(configuration: self.config())
-        let audit = realm.audit!
+        let events = realm.events!
 
-        audit.recordEvent(activity: "no event or data")
-        audit.recordEvent(activity: "event", eventType: "custom event")
-        audit.recordEvent(activity: "json data", data: "{\"foo\": \"bar\"}")
-        audit.recordEvent(activity: "non-json data", data: "not valid json")
-        audit.recordEvent(activity: "event and data", eventType: "custom json event",
+        events.recordEvent(activity: "no event or data")
+        events.recordEvent(activity: "event", eventType: "custom event")
+        events.recordEvent(activity: "json data", data: "{\"foo\": \"bar\"}")
+        events.recordEvent(activity: "non-json data", data: "not valid json")
+        events.recordEvent(activity: "event and data", eventType: "custom json event",
                           data: "{\"bar\": \"foo\"}").await(self)
 
-        let events = getAuditEvents(expectedCount: 5)
-        assertEvent(events, activity: "no event or data", event: nil, nil)
-        assertEvent(events, activity: "event", event: "custom event", nil)
-        assertEvent(events, activity: "json data", event: nil, ["foo": "bar"])
-        assertEvent(events, activity: "non-json data", event: nil, data: "not valid json")
-        assertEvent(events, activity: "event and data", event: "custom json event", ["bar": "foo"])
+        let result = getEvents(expectedCount: 5)
+        assertEvent(result, activity: "no event or data", event: nil, nil)
+        assertEvent(result, activity: "event", event: "custom event", nil)
+        assertEvent(result, activity: "json data", event: nil, ["foo": "bar"])
+        assertEvent(result, activity: "non-json data", event: nil, data: "not valid json")
+        assertEvent(result, activity: "event and data", event: "custom json event", ["bar": "foo"])
     }
 }
-#endif // swift(>=5.5)

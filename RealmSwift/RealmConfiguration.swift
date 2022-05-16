@@ -265,10 +265,10 @@ extension Realm {
         public var seedFilePath: URL?
 
         /**
-         Configuration for Realm auditing. Auditing is enabled if this is set
+         Configuration for Realm event recording. Events are enabled if this is set
          to a non-nil value.
          */
-        public var auditConfiguration: AuditConfiguration?
+        public var eventConfiguration: EventConfiguration?
 
         /// A custom schema to use for the Realm.
         private var customSchema: RLMSchema?
@@ -308,13 +308,13 @@ extension Realm {
             configuration.setCustomSchemaWithoutCopying(self.customSchema)
             configuration.disableFormatUpgrade = self.disableFormatUpgrade
             configuration.maximumNumberOfActiveVersions = self.maximumNumberOfActiveVersions ?? 0
-            if let auditConfiguration = auditConfiguration {
-                let rlmConfig = RLMAuditConfiguration()
-                rlmConfig.partitionPrefix = auditConfiguration.partitionPrefix
-                rlmConfig.syncUser = auditConfiguration.syncUser
-                rlmConfig.metadata = auditConfiguration.metadata
-                rlmConfig.logger = auditConfiguration.logger
-                configuration.auditConfiguration = rlmConfig
+            if let eventConfiguration = eventConfiguration {
+                let rlmConfig = RLMEventConfiguration()
+                rlmConfig.partitionPrefix = eventConfiguration.partitionPrefix
+                rlmConfig.syncUser = eventConfiguration.syncUser
+                rlmConfig.metadata = eventConfiguration.metadata
+                rlmConfig.logger = eventConfiguration.logger
+                configuration.eventConfiguration = rlmConfig
             }
             return configuration
         }
@@ -341,10 +341,10 @@ extension Realm {
             configuration.customSchema = rlmConfiguration.customSchema
             configuration.disableFormatUpgrade = rlmConfiguration.disableFormatUpgrade
             configuration.maximumNumberOfActiveVersions = rlmConfiguration.maximumNumberOfActiveVersions
-            if let auditConfiguration = rlmConfiguration.auditConfiguration {
-                configuration.auditConfiguration = AuditConfiguration(metadata: auditConfiguration.metadata,
-                                                                      syncUser: auditConfiguration.syncUser,
-                                                                      partitionPrefix: auditConfiguration.partitionPrefix)
+            if let eventConfiguration = rlmConfiguration.eventConfiguration {
+                configuration.eventConfiguration = EventConfiguration(metadata: eventConfiguration.metadata,
+                                                                      syncUser: eventConfiguration.syncUser,
+                                                                      partitionPrefix: eventConfiguration.partitionPrefix)
             }
             return configuration
         }

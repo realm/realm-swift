@@ -19,7 +19,7 @@
 #import <Foundation/Foundation.h>
 #import <Realm/RLMRealm.h>
 
-@class RLMAuditConfiguration, RLMSyncConfiguration;
+@class RLMEventConfiguration, RLMSyncConfiguration;
 
 NS_ASSUME_NONNULL_BEGIN
 
