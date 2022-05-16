@@ -564,7 +564,7 @@ static RLMRealm *getCachedRealm(RLMRealmConfiguration *configuration, void *cach
 
         realm->_schema = schema;
         realm->_info = RLMSchemaInfo(realm);
-        RLMRealmCreateAccessors(realm.schema);
+        RLMSchemaEnsureAccessorsCreated(realm.schema);
 
         if (!configuration.readOnly) {
             REALM_ASSERT(!realm->_realm->is_in_read_transaction());

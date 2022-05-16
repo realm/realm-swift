@@ -1237,6 +1237,17 @@ RLM_COLLECTION_TYPE(NotARealClass)
     RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
     XCTAssertNotNil([realm.schema schemaForClassName:@"OrphanObject"]);
 }
+
+- (void)testDynamicUnmanagedAccessorsBeforeSharedSchemaInit {
+    if (self.isParent) {
+        RLMRunChildAndWait();
+        return;
+    }
+
+    IntObject *io = [IntObject new];
+    io[@"intCol"] = @10;
+    XCTAssertEqualObjects(io[@"intCol"], @10);
+}
 #endif
 
 @end
