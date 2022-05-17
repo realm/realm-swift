@@ -66,3 +66,6 @@ disabled_rules:
   # swiftlint complains about superfluous disable commands when the violation
   # occurs in an inactive #if and doesn't support conditionally disabling it
   - cyclomatic_complexity
+  # #unavailable was implemented in Swift 5.6 so we can't use it until that's
+  # the minimum version we support
+  - unavailable_condition
