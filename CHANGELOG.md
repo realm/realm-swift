@@ -1,6 +1,7 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
+* Lower minimum version async login and functions
 * Add Swift API for asynchronous transactions
 ```
     try? realm.writeAsync {
