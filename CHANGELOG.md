@@ -1,7 +1,6 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* Lower minimum version async login and functions
 * Add Swift API for asynchronous transactions
 ```
     try? realm.writeAsync {
@@ -40,6 +39,7 @@ x.y.z Release notes (yyyy-MM-dd)
 ```
 
 ### Fixed
+* Lower minimum OS version for `async` login and FunctionCallables. ([#7791]https://github.com/realm/realm-swift/issues/7791)
 * Consuming a RealmSwift XCFramework with library evolution enabled would give the error
   `'Failed to build module 'RealmSwift'; this SDK is not supported by the compiler'` when the XCFramework was built
   with an older XCode version and is then consumed with a later version. ([#7313](https://github.com/realm/realm-swift/issues/7313), since v3.18.0)
