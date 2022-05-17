@@ -5,6 +5,7 @@ Xcode 13.1 is now the minimum supported version of Xcode, as Apple no longer
 allows submitting to the app store with Xcode 12.
 
 ### Enhancements
+* Add Xcode 13.4 binaries to the release package.
 * Add Swift API for asynchronous transactions
 ```
     try? realm.writeAsync {
@@ -66,9 +67,9 @@ allows submitting to the app store with Xcode 12.
 ### Compatibility
 * Realm Studio: 11.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
-* Carthage release for Swift is built with Xcode 13.3.1.
+* Carthage release for Swift is built with Xcode 13.4.
 * CocoaPods: 1.10 or later.
-* Xcode: 13.1-13.3.1.
+* Xcode: 13.1-13.4.
 
 ### Internal
 * Upgraded realm-core from ? to ?
