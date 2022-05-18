@@ -43,17 +43,6 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
         XCTAssertEqual(collection.name, "Dog")
     }
 
-    func removeAllFromCollection(_ collection: MongoCollection) {
-        let deleteEx = expectation(description: "Delete all from Mongo collection")
-        collection.deleteManyDocuments(filter: [:]) { result in
-            if case .failure = result {
-                XCTFail("Should delete")
-            }
-            deleteEx.fulfill()
-        }
-        wait(for: [deleteEx], timeout: 20.0)
-    }
-
     func setupMongoCollection() -> MongoCollection {
         let user = try! logInUser(for: basicCredentials())
         let mongoClient = user.mongoClient("mongodb1")

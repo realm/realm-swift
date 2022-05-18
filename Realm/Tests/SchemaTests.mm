@@ -341,7 +341,6 @@ RLM_COLLECTION_TYPE(NotARealClass)
 @implementation OrphanObject
 @end
 
-
 @interface SchemaTests : RLMMultiProcessTestCase
 @end
 

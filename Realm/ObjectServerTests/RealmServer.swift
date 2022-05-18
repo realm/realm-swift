@@ -71,10 +71,10 @@ private func bsonType(_ type: PropertyType) -> String {
 }
 
 private extension Property {
-    func stitchRule(_ schema: Schema) -> [String: Any] {
+    func stitchRule(_ objectSchema: ObjectSchema) -> [String: Any] {
         let type: String
         if self.type == .object {
-            type = bsonType(schema[objectClassName!]!.primaryKeyProperty!.type)
+            type = bsonType(objectSchema.primaryKeyProperty!.type)
         } else {
             type = bsonType(self.type)
         }
@@ -113,7 +113,7 @@ private extension Property {
 }
 
 private extension ObjectSchema {
-    func stitchRule(_ partitionKeyType: String?, _ schema: Schema, id: String? = nil) -> [String: Any] {
+    func stitchRule(_ partitionKeyType: String?, id: String? = nil) -> [String: Any] {
         var stitchProperties: [String: Any] = [:]
 
         // We only add a partition property for pbs
@@ -128,12 +128,12 @@ private extension ObjectSchema {
         // First pass we only add the properties to the schema as we can't add
         // links until the targets of the links exist.
         let pk = primaryKeyProperty!
-        stitchProperties[pk.name] = pk.stitchRule(schema)
+        stitchProperties[pk.name] = pk.stitchRule(self)
         for property in properties {
             if property.type != .object {
-                stitchProperties[property.name] = property.stitchRule(schema)
+                stitchProperties[property.name] = property.stitchRule(self)
             } else if id != nil {
-                stitchProperties[property.name] = property.stitchRule(schema)
+                stitchProperties[property.name] = property.stitchRule(self)
                 relationships[property.name] = [
                     "ref": "#/relationship/mongodb1/test_data/\(property.objectClassName!)",
                     "foreign_key": "_id",
@@ -250,7 +250,7 @@ class Admin {
             private func request(httpMethod: String, data: Any? = nil,
                                  completionHandler: @escaping (Result<Any?, Error>) -> Void) {
                 var components = URLComponents(url: self.url, resolvingAgainstBaseURL: false)!
-                components.query = "bypass_service_change=SyncProtocolVersionIncrease"
+                components.query = "bypass_service_change=DestructiveSyncProtocolVersionIncrease"
                 var request = URLRequest(url: components.url!)
                 request.httpMethod = httpMethod
                 request.allHTTPHeaderFields = [
@@ -668,7 +668,7 @@ public class RealmServer: NSObject {
     /// Create a new server app
     /// This will create a App with different configuration depending on the SyncMode (partition based sync or flexible sync), partition type is used only in case
     /// this is partition based sync, and will crash if one is not provided in that mode
-    public func createAppForSyncMode(_ syncMode: SyncMode) throws -> AppId {
+    func createAppForSyncMode(_ syncMode: SyncMode, _ objectsSchema: [ObjectSchema]) throws -> AppId {
         guard let session = session else {
             throw URLError(.unknown)
         }
@@ -749,25 +749,28 @@ public class RealmServer: NSObject {
 
         // Creating the schema is a two-step process where we first add all the
         // objects with their properties to them so that we can add relationships
-        let schema = ObjectiveCSupport.convert(object: RLMSchema.shared())
         let syncTypes: [ObjectSchema]
         let partitionKeyType: String?
         if case .pbs(let bsonType) = syncMode {
-            syncTypes = schema.objectSchema.filter {
+            syncTypes = objectsSchema.filter {
                 guard let pk = $0.primaryKeyProperty else { return false }
                 return pk.name == "_id"
             }
             partitionKeyType = bsonType
         } else {
-            syncTypes = schema.objectSchema.filter {
-                let validSyncClasses = ["Dog", "Person", "SwiftPerson", "SwiftTypesSyncObject"]
+            syncTypes = objectsSchema.filter {
+                let validSyncClasses = ["Dog", "Person", "SwiftPerson", "SwiftTypesSyncObject", "PersonAsymmetric", "SwiftObjectAsymmetric"]
                 return validSyncClasses.contains($0.className)
             }
             partitionKeyType = nil
         }
         var schemaCreations = [Result<Any?, Error>]()
+        var asymmetricTables = [String]()
         for objectSchema in syncTypes {
-            schemaCreations.append(app.schemas.post(objectSchema.stitchRule(partitionKeyType, schema)))
+            schemaCreations.append(app.schemas.post(objectSchema.stitchRule(partitionKeyType)))
+            if objectSchema.isAsymmetric {
+                asymmetricTables.append(objectSchema.className)
+            }
         }
 
         var schemaIds: [String: String] = [:]
@@ -783,7 +786,7 @@ public class RealmServer: NSObject {
         var schemaUpdates = [Result<Any?, Error>]()
         for objectSchema in syncTypes {
             let schemaId = schemaIds[objectSchema.className]!
-            schemaUpdates.append(app.schemas[schemaId].put(objectSchema.stitchRule(partitionKeyType, schema, id: schemaId)))
+            schemaUpdates.append(app.schemas[schemaId].put(objectSchema.stitchRule(partitionKeyType, id: schemaId)))
         }
 
         for result in schemaUpdates {
@@ -816,6 +819,7 @@ public class RealmServer: NSObject {
                     "state": "enabled",
                     "database_name": "test_data",
                     "queryable_fields_names": fields,
+                    "asymmetric_tables": asymmetricTables,
                     "permissions": [
                         "rules": [:],
                         "defaultRoles": [[
@@ -913,15 +917,26 @@ public class RealmServer: NSObject {
     }
 
     @objc public func createAppWithQueryableFields(_ fields: [String]) throws -> AppId {
-        try createAppForSyncMode(.flx(fields))
+        let schema = ObjectiveCSupport.convert(object: RLMSchema.shared())
+        return try createAppForSyncMode(.flx(fields), schema.objectSchema)
+    }
+
+    @objc public func createAppForAsymmetricSchema(_ schema: [RLMObjectSchema]) throws -> AppId {
+        try createAppForSyncMode(.flx([]), schema.map(ObjectiveCSupport.convert(object:)))
+    }
+
+    public func createAppForAsymmetricSchema(_ schema: [ObjectSchema]) throws -> AppId {
+        try createAppForSyncMode(.flx([]), schema)
     }
 
     @objc public func createAppForBSONType(_ bsonType: String) throws -> AppId {
-        try createAppForSyncMode(.pbs(bsonType))
+        let schema = ObjectiveCSupport.convert(object: RLMSchema.shared())
+        return try createAppForSyncMode(.pbs(bsonType), schema.objectSchema)
     }
 
     @objc public func createApp() throws -> AppId {
-        try createAppForSyncMode(.pbs("string"))
+        let schema = ObjectiveCSupport.convert(object: RLMSchema.shared())
+        return try createAppForSyncMode(.pbs("string"), schema.objectSchema)
     }
 
     // Retrieve Atlas App Services AppId with ClientAppId using the Admin API

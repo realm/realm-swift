@@ -138,8 +138,13 @@ using namespace realm;
     schema.accessorClass = objectClass;
     schema.unmanagedClass = objectClass;
     schema.isSwiftClass = isSwift;
-    schema.isEmbedded = [(id)objectClass isEmbedded];
     schema.hasCustomEventSerialization = [objectClass conformsToProtocol:@protocol(RLMCustomEventRepresentable)];
+
+    bool isEmbedded = [(id)objectClass isEmbedded];
+    bool isAsymmetric = [(id)objectClass isAsymmetric];
+    REALM_ASSERT(!(isEmbedded && isAsymmetric));
+    schema.isEmbedded = isEmbedded;
+    schema.isAsymmetric = isAsymmetric;
 
     // create array of RLMProperties, inserting properties of superclasses first
     Class cls = objectClass;
@@ -290,6 +295,7 @@ using namespace realm;
     schema->_unmanagedClass = _unmanagedClass;
     schema->_isSwiftClass = _isSwiftClass;
     schema->_isEmbedded = _isEmbedded;
+    schema->_isAsymmetric = _isAsymmetric;
     schema->_properties = [[NSArray allocWithZone:zone] initWithArray:_properties copyItems:YES];
     schema->_computedProperties = [[NSArray allocWithZone:zone] initWithArray:_computedProperties copyItems:YES];
     [schema _propertiesDidChange];
@@ -339,7 +345,7 @@ using namespace realm;
     ObjectSchema objectSchema;
     objectSchema.name = self.objectStoreName;
     objectSchema.primary_key = _primaryKeyProperty ? _primaryKeyProperty.columnName.UTF8String : "";
-    objectSchema.table_type = _isEmbedded ? Type::Embedded : Type::TopLevel;
+    objectSchema.table_type = _isAsymmetric ? Type::TopLevelAsymmetric : _isEmbedded ? Type::Embedded : Type::TopLevel;
     for (RLMProperty *prop in _properties) {
         Property p = [prop objectStoreCopy:schema];
         p.is_primary = (prop == _primaryKeyProperty);
@@ -355,6 +361,7 @@ using namespace realm;
     RLMObjectSchema *schema = [RLMObjectSchema new];
     schema.className = @(objectSchema.name.c_str());
     schema.isEmbedded = objectSchema.table_type == ObjectSchema::ObjectType::Embedded;
+    schema.isAsymmetric = objectSchema.table_type == ObjectSchema::ObjectType::TopLevelAsymmetric;
 
     // create array of RLMProperties
     NSMutableArray *properties = [NSMutableArray arrayWithCapacity:objectSchema.persisted_properties.size()];

@@ -85,7 +85,6 @@
 }
 @end
 
-
 static NSURL *syncDirectoryForChildProcess() {
     NSString *path = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES)[0];
     NSBundle *bundle = [NSBundle mainBundle];

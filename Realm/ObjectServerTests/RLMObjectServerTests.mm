@@ -1879,6 +1879,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 
     RLMRealmConfiguration *localConfig = [RLMRealmConfiguration new];
     localConfig.fileURL = RLMTestRealmURL();
+    localConfig.objectClasses = @[Person.self];
     localConfig.schemaVersion = 1;
 
     RLMRealm *localCopy = [RLMRealm realmWithConfiguration:localConfig error:nil];

@@ -34,7 +34,7 @@
 @property NSString *lastName;
 @property NSString *partition;
 
-- (instancetype)initWithPrimaryKey:(RLMObjectId *)primaryKey age:(NSInteger)strCol firstName:(NSString *)intCol lastName:(NSString *)intCol;
+- (instancetype)initWithPrimaryKey:(RLMObjectId *)primaryKey age:(NSInteger)age firstName:(NSString *)firstName lastName:(NSString *)lastName;
 + (instancetype)john;
 + (instancetype)paul;
 + (instancetype)ringo;
