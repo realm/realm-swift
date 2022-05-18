@@ -268,9 +268,7 @@ struct ContentView: View {
     var body: some View {
         NavigationView {
             VStack {
-                if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *) {
-                    // Don't add a SearchView in case searchable is available
-                } else {
+                if #unavailable(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0) {
                     SearchView(searchFilter: $searchFilter)
                 }
                 ReminderListResultsView(searchFilter: $searchFilter)
