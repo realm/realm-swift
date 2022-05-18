@@ -113,20 +113,26 @@ private extension Property {
 }
 
 private extension ObjectSchema {
-    func stitchRule(_ partitionKeyType: String, _ schema: Schema, id: String? = nil) -> [String: Any] {
-        var stitchProperties: [String: Any] = [
-            "realm_id": [
+    func stitchRule(_ partitionKeyType: String?, _ schema: Schema, id: String? = nil) -> [String: Any] {
+        var stitchProperties: [String: Any] = [:]
+
+        // We only add a partition property for pbs
+        if let partitionKeyType = partitionKeyType {
+            stitchProperties["realm_id"] = [
                 "bsonType": "\(partitionKeyType)"
             ]
-        ]
-
+        }
+        
         var relationships: [String: Any] = [:]
+
+        // First pass we only add the properties to the schema as we can't add
+        // links until the targets of the links exist.
+        let pk = primaryKeyProperty!
+        stitchProperties[pk.name] = pk.stitchRule(schema)
         for property in properties {
-            // First pass we only add the properties to the schema as we can't add
-            // links until the targets of the links exist.
             if property.type != .object {
                 stitchProperties[property.name] = property.stitchRule(schema)
-            } else if property.type == .object && id != nil {
+            } else if id != nil {
                 stitchProperties[property.name] = property.stitchRule(schema)
                 relationships[property.name] = [
                     "ref": "#/relationship/mongodb1/test_data/\(property.objectClassName!)",
@@ -138,21 +144,17 @@ private extension ObjectSchema {
 
         return [
             "_id": id as Any,
-            "database": "test_data",
-            "collection": "\(className)",
-            "roles": [[
-                "name": "default",
-                "apply_when": [:],
-                "insert": true,
-                "delete": true,
-                "additional_fields": [:]
-            ]],
             "schema": [
                 "properties": stitchProperties,
                 // The server currently only supports non-optional collections
                 // but requires them to be marked as optional
                 "required": properties.compactMap { $0.isOptional || $0.type == .any || $0.isArray || $0.isMap || $0.isSet ? nil : $0.name },
                 "title": "\(className)"
+            ],
+            "metadata": [
+                "data_source": "mongodb1",
+                "database": "test_data",
+                "collection": "\(className)",
             ],
             "relationships": relationships
         ]
@@ -784,8 +786,6 @@ public class RealmServer: NSObject {
             throw URLError(.badServerResponse)
         }
 
-        let rules = app.services[serviceId].rules
-
         let syncTypes: [ObjectSchema]
         let partitionKeyType: String?
         if case .pbs(let bsonType) = syncMode {
@@ -802,22 +802,24 @@ public class RealmServer: NSObject {
             }
             partitionKeyType = nil
         }
-        var ruleCreations = [Result<Any?, Error>]()
+        var schemaCreations = [Result<Any?, Error>]()
         for objectSchema in syncTypes {
-            ruleCreations.append(rules.post(objectSchema.stitchRule(partitionKeyType ?? "string", schema)))
+            schemaCreations.append(app.schemas.post(objectSchema.stitchRule(partitionKeyType, schema)))
         }
 
-        var ruleIds: [String: String] = [:]
-        for result in ruleCreations {
+        var schemaIds: [String: String] = [:]
+        for result in schemaCreations {
             guard case .success(let data) = result else {
-                fatalError("Failed to create rule: \(result)")
+                fatalError("Failed to create schema: \(result)")
             }
-            let dict = (data as! [String: String])
-            ruleIds[dict["collection"]!] = dict["_id"]!
+            let dict = (data as! [String: Any])
+            let metadata = dict["metadata"] as! [String: String]
+            schemaIds[metadata["collection"]!] = dict["_id"]! as? String
         }
+
         for objectSchema in syncTypes {
-            let id = ruleIds[objectSchema.className]!
-            rules[id].put(on: group, data: objectSchema.stitchRule(partitionKeyType ?? "string", schema, id: id), failOnError)
+            let schemaId = schemaIds[objectSchema.className]!
+            app.schemas[schemaId].put(on: group, data: objectSchema.stitchRule(partitionKeyType, schema, id: schemaId), failOnError)
         }
 
         app.sync.config.put(on: group, data: [
@@ -868,6 +870,7 @@ public class RealmServer: NSObject {
             "relationships": [:]
         ]
 
+        let rules = app.services[serviceId].rules
         _ = rules.post(userDataRule)
         app.customUserData.patch(on: group, [
             "mongo_service_id": serviceId,
