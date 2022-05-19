@@ -82,6 +82,7 @@ Pod::Spec.new do |s|
                               'include/RLMBSON_Private.h',
                               'include/RLMCollection_Private.h',
                               'include/RLMDictionary_Private.h',
+                              'include/RLMEvent.h',
                               'include/RLMObjectBase_Private.h',
                               'include/RLMObjectSchema_Private.h',
                               'include/RLMObjectStore.h',
