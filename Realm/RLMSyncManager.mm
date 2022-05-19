@@ -23,6 +23,7 @@
 #import "RLMUser_Private.hpp"
 #import "RLMSyncUtil_Private.hpp"
 #import "RLMUtil.hpp"
+#import "RLMSyncConfiguration_Private.hpp"
 
 #import <realm/sync/config.hpp>
 #import <realm/object-store/sync/sync_manager.hpp>
@@ -131,6 +132,7 @@ struct CallbackLogger : public realm::util::RootLogger {
         config.user_agent_application_info = RLMStringDataWithNSString(appId);
     }
 
+    config.socket_factory = defaultSocketFactory();
     return config;
 }
 

@@ -62,6 +62,14 @@ allows submitting to the app store with Xcode 12.
 * Using the dynamic subscript API on unmanaged objects before first opening a
   Realm or if `objectTypes` was set when opening a Realm would throw an
   exception ([#7786](https://github.com/realm/realm-swift/issues/7786)).
+* None.
+* Add ability to use Swift Query syntax in `@ObservedResults`, which allows you 
+  to filter results using the `where` parameter.
+* Add ability to use `MutableSet` with `StateRealmObject` in SwiftUI.
+
+### Fixed
+* Adding a Realm Object to a `ObservedResults` or a collections using `StateRealmObject` that is managed by the same Realm 
+  would throw if the Object was frozen and not thawed before hand.
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
@@ -71,6 +79,9 @@ allows submitting to the app store with Xcode 12.
 * Carthage release for Swift is built with Xcode 13.4.
 * CocoaPods: 1.10 or later.
 * Xcode: 13.1-13.4.
+* Carthage release for Swift is built with Xcode 13.3.
+* CocoaPods: 1.10 or later.
+* Xcode: 12.4-13.3.
 
 ### Internal
 * Upgraded realm-core from ? to ?

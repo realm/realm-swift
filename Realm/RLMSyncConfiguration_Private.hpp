@@ -20,6 +20,7 @@
 
 #import <functional>
 #import <memory>
+#import <realm/util/ez_websocket.hpp>
 
 namespace realm {
 class SyncSession;
@@ -27,6 +28,9 @@ struct SyncConfig;
 struct SyncError;
 using SyncSessionErrorHandler = void(std::shared_ptr<SyncSession>, SyncError);
 }
+
+using namespace realm::util::websocket;
+extern std::function<std::unique_ptr<realm::util::websocket::EZSocketFactory>(realm::util::websocket::EZConfig&&)> defaultSocketFactory();
 
 NS_ASSUME_NONNULL_BEGIN
 
