@@ -204,10 +204,11 @@ extension MinKey: BSON {
     public init<T: BSON>(_ bson: T) {
         self = Self.convert(bson)
     }
-    /// Initialize a `BSON` from a type which conforms to `PartitionValue`. If this is not a valid `BSON` type,
+
+    /// Initialize a `BSON` from type `PartitionValue`. If this is not a valid `BSON` type,
     /// it will be considered `BSON` null type and will return `nil`.
-    public init(_ bson: PartitionValue) {
-        self = Self.convert(bson)
+    init(partitionValue: PartitionValue) {
+        self = Self.convert(partitionValue)
     }
 
     /// If this `BSON` is an `.int32`, return it as an `Int32`. Otherwise, return nil.

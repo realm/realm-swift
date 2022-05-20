@@ -1301,7 +1301,7 @@ private class ObservableAsyncOpenStorage: ObservableObject {
 
     public mutating func update() {
         if let partitionValue = partitionValue {
-            let bsonValue = AnyBSON(partitionValue)
+            let bsonValue = AnyBSON(partitionValue: partitionValue)
             if storage.partitionValue != bsonValue {
                 storage.partitionValue = bsonValue
                 storage.asyncOpen()
@@ -1426,7 +1426,7 @@ private class ObservableAsyncOpenStorage: ObservableObject {
 
     public mutating func update() {
         if let partitionValue = partitionValue {
-            let bsonValue = AnyBSON(partitionValue)
+            let bsonValue = AnyBSON(partitionValue: partitionValue)
             if storage.partitionValue != bsonValue {
                 storage.partitionValue = bsonValue
                 storage.asyncOpen()

@@ -135,7 +135,7 @@ struct LoginView: View {
             Button("Log In User 1") {
                 loggingIn()
                 loginHelper.login(email: ProcessInfo.processInfo.environment["email1"]!,
-                                  password: ProcessInfo.processInfo.environment["password"]!,
+                                  password: "password",
                                   completion: { user in
                     didLogin(user)
                 })
@@ -144,7 +144,7 @@ struct LoginView: View {
             Button("Log In User 2") {
                 loggingIn()
                 loginHelper.login(email: ProcessInfo.processInfo.environment["email2"]!,
-                                  password: ProcessInfo.processInfo.environment["password"]!,
+                                  password: "password",
                                   completion: { user in
                     didLogin(user)
                 })
