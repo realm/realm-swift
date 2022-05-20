@@ -72,7 +72,7 @@ allows submitting to the app store with Xcode 12.
 * Allow adding a subscription querying for all documents of a type in swift for flexible sync.
 ```
    try await subscriptions.update {
-      subscriptions.append(QuerySubscription<SwiftPerson>(name: "person_age_15"))
+      subscriptions.append(QuerySubscription<SwiftPerson>(name: "all_people"))
    }
 ```
 * Add Combine API support for flexible sync beta.

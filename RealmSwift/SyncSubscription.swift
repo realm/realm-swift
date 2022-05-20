@@ -153,13 +153,16 @@ import Combine
     fileprivate var className: String
     fileprivate var predicate: NSPredicate
 
+    /// :nodoc:
+    public typealias QueryFunction = (Query<T>) -> Query<Bool>
+
     /**
      Creates a `QuerySubscription` for the given type.
 
      - parameter name: Name of the subscription.
      - parameter query: The query for the subscription, if nil it will set the query to all documents for the collection.
      */
-    public init(name: String? = nil, query: ((Query<T>) -> Query<Bool>)? = nil) {
+    public init(name: String? = nil, query: QueryFunction? = nil) {
         self.name = name
         self.className = "\(T.self)"
         self.predicate = query?(Query()).predicate ?? NSPredicate(format: "TRUEPREDICATE")
@@ -452,7 +455,7 @@ extension SyncSubscriptionSet: Sequence {
 @available(macOS 10.15, tvOS 13.0, iOS 13.0, watchOS 6.0, *)
 extension SyncSubscriptionSet {
     /**
-     Synchronously creates and commit a write transaction and updates the subscription set,
+     Creates and commits a transaction, updating the subscription set,
      this will continue when the server acknowledge and all the data associated with this
      collection of subscriptions is synced.
 
@@ -485,7 +488,7 @@ extension SyncSubscriptionSet {
 @available(macOS 10.15, iOS 13, tvOS 13, watchOS 6, *)
 extension SyncSubscriptionSet {
     /**
-     Synchronously creates and commit a write transaction and updates the subscription set,
+     Creates and commit a transaction, updating the subscription set,
      this will return success when the server acknowledge and all the data associated with this
      collection of subscriptions is synced.
 
