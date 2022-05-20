@@ -1,7 +1,7 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+* `@AsyncOpen`/`@AutoOpen` property wrappers can be used with flexible sync.
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
@@ -68,7 +68,6 @@ allows submitting to the app store with Xcode 12.
   in the configuration.
 * Implement the Realm event recording API for reporting reads and writes on a
   Realm file to Atlas.
-* `@AsyncOpen`/`@AutoOpen` property wrappers can be used with flexible sync.
 
 ### Fixed
 
