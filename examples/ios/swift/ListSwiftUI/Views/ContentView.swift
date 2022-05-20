@@ -269,8 +269,9 @@ struct ContentView: View {
         NavigationView {
             VStack {
                 // FIXME: Remove swiftlint disable when our minimum Swift version is 5.6.
-                // swiftlint:disable unavailable_condition
+                // swiftlint:disable all
                 if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *) {
+                // swiftlint:enable all
                     // Don't add a SearchView in case searchable is available
                 } else {
                     SearchView(searchFilter: $searchFilter)
