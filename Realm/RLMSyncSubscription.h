@@ -114,7 +114,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)update:(__attribute__((noescape)) void(^)(void))block;
 /// :nodoc:
-- (void)write:(__attribute__((noescape)) void(^)(void))block __attribute__((unavailable("Use update")));
+- (void)write:(__attribute__((noescape)) void(^)(void))block __attribute__((unavailable("Renamed to -update")));
 
 /**
  Synchronously performs any transactions (add/remove/update) to the subscription set within the block,
@@ -127,7 +127,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)update:(__attribute__((noescape)) void(^)(void))block onComplete:(void(^)(NSError * _Nullable))onComplete;
 /// :nodoc:
-- (void)write:(__attribute__((noescape)) void(^)(void))block onComplete:(void(^)(NSError * _Nullable))onComplete __attribute__((unavailable("Use update")));
+- (void)write:(__attribute__((noescape)) void(^)(void))block onComplete:(void(^)(NSError * _Nullable))onComplete __attribute__((unavailable("Renamed to -update:onComplete.")));
 
 #pragma mark - Find subscription
 
