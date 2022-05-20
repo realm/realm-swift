@@ -89,7 +89,7 @@ import Combine
      - warning: This method may only be called during a write subscription block.
 
      - parameter type: The type of the object to be queried.
-     - parameter query: A query which will be used to modify the query, if nil it will set the query to all documents for the collection.
+     - parameter query: A query which will be used to modify the existing query, if nil it will set the query to get all documents in the collection.
      */
     public func updateQuery<T: Object>(toType type: T.Type, where query: ((Query<T>) -> Query<Bool>)? = nil) {
         guard _rlmSyncSubscription.objectClassName == "\(T.self)" else {
