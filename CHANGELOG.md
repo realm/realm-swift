@@ -1,13 +1,23 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+* Allow adding a subscription querying for all documents of a type in swift for flexible sync.
+```
+   try await subscriptions.update {
+      subscriptions.append(QuerySubscription<SwiftPerson>(name: "all_people"))
+   }
+```
+* Add Combine API support for flexible sync beta.
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
 * None.
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+### Breaking Changes
+
+* Rename `SyncSubscriptionSet.write` to `SyncSubscriptionSet.update` to avoid confusion with `Realm.write`.
+* Rename `SyncSubscription.update` to `SyncSubscription.updateQuery` to avoid confusion with `SyncSubscriptionSet.update`.
+* Rename `RLMSyncSubscriptionSet.write` to `RLMSyncSubscriptionSet.update` to align it with swift API.
 
 ### Compatibility
 * Realm Studio: 11.0.0 or later.
@@ -68,14 +78,6 @@ allows submitting to the app store with Xcode 12.
   in the configuration.
 * Implement the Realm event recording API for reporting reads and writes on a
   Realm file to Atlas.
-* Replace Xcode 13.3 binaries with 13.3.1 binaries.
-* Allow adding a subscription querying for all documents of a type in swift for flexible sync.
-```
-   try await subscriptions.update {
-      subscriptions.append(QuerySubscription<SwiftPerson>(name: "all_people"))
-   }
-```
-* Add Combine API support for flexible sync beta.
 
 ### Fixed
 
@@ -102,12 +104,6 @@ allows submitting to the app store with Xcode 12.
   ([#5460](https://github.com/realm/realm-core/pull/5460), since v10.25.1)
 * Flexible sync would not correctly resume syncing if a bootstrap was interrupted
   ([#5466](https://github.com/realm/realm-core/pull/5466), since v10.21.1).
-
-### Breaking Changes
-
-* Rename `SyncSubscriptionSet.write` to `SyncSubscriptionSet.update` to avoid confusion with `Realm.write`.
-* Rename `SyncSubscription.update` to `SyncSubscription.updateQuery` to avoid confusion with `SyncSubscriptionSet.update`.
-* Rename `RLMSyncSubscriptionSet.write` to `RLMSyncSubscriptionSet.update` to align it with swift API.
 
 ### Compatibility
 
