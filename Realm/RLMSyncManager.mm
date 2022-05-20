@@ -93,6 +93,13 @@ struct CallbackLogger : public realm::util::RootLogger {
 
 } // anonymous namespace
 
+std::shared_ptr<realm::util::Logger> RLMWrapLogFunction(RLMSyncLogFunction fn) {
+    auto logger = std::make_shared<CallbackLogger>();
+    logger->logFn = fn;
+    logger->set_level_threshold(Level::all);
+    return logger;
+}
+
 #pragma mark - RLMSyncManager
 
 @interface RLMSyncTimeoutOptions () {

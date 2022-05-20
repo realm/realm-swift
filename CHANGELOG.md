@@ -1,13 +1,14 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.26.0 Release notes (2022-05-19)
 =============================================================
 
 Xcode 13.1 is now the minimum supported version of Xcode, as Apple no longer
 allows submitting to the app store with Xcode 12.
 
 ### Enhancements
+
 * Add Xcode 13.4 binaries to the release package.
 * Add Swift API for asynchronous transactions
-```
+```swift
     try? realm.writeAsync {
         realm.create(SwiftStringObject.self, value: ["string"])
     } onComplete: { error in
@@ -44,12 +45,17 @@ allows submitting to the app store with Xcode 12.
 ```
 * Improve performance of opening a Realm with `objectClasses`/`objectTypes` set
   in the configuration.
+* Implement the Realm event recording API for reporting reads and writes on a
+  Realm file to Atlas.
 
 ### Fixed
-* Lower minimum OS version for `async` login and FunctionCallables. ([#7791]https://github.com/realm/realm-swift/issues/7791)
+
+* Lower minimum OS version for `async` login and FunctionCallables to match the
+  rest of the `async` functions. ([#7791]https://github.com/realm/realm-swift/issues/7791)
 * Consuming a RealmSwift XCFramework with library evolution enabled would give the error
-  `'Failed to build module 'RealmSwift'; this SDK is not supported by the compiler'` when the XCFramework was built
-  with an older XCode version and is then consumed with a later version. ([#7313](https://github.com/realm/realm-swift/issues/7313), since v3.18.0)
+  `'Failed to build module 'RealmSwift'; this SDK is not supported by the compiler'`
+  when the XCFramework was built with an older XCode version and is
+  then consumed with a later version. ([#7313](https://github.com/realm/realm-swift/issues/7313), since v3.18.0)
 * A data race would occur when opening a synchronized Realm with the client
   reset mode set to `discardLocal` on one thread at the same time as a client
   reset was being processed on another thread. This probably did not cause any
@@ -62,10 +68,14 @@ allows submitting to the app store with Xcode 12.
 * Using the dynamic subscript API on unmanaged objects before first opening a
   Realm or if `objectTypes` was set when opening a Realm would throw an
   exception ([#7786](https://github.com/realm/realm-swift/issues/7786)).
-
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+* The sync client may have sent a corrupted upload cursor leading to a fatal
+  error from the server due to an uninitialized variable.
+  ([#5460](https://github.com/realm/realm-core/pull/5460), since v10.25.1)
+* Flexible sync would not correctly resume syncing if a bootstrap was interrupted
+  ([#5466](https://github.com/realm/realm-core/pull/5466), since v10.21.1).
 
 ### Compatibility
+
 * Realm Studio: 11.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 13.4.
@@ -73,7 +83,8 @@ allows submitting to the app store with Xcode 12.
 * Xcode: 13.1-13.4.
 
 ### Internal
-* Upgraded realm-core from ? to ?
+
+* Upgraded realm-core from v11.15.0 to v11.17.0
 
 10.25.2 Release notes (2022-04-27)
 =============================================================

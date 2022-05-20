@@ -135,8 +135,8 @@ public extension App {
     /**
      Login to a user for the Realm app.
      
-     @param credentials The credentials identifying the user.
-     @param completion A callback invoked after completion. Will return `Result.success(User)` or `Result.failure(Error)`.
+     - parameter credentials: The credentials identifying the user.
+     - parameter completion: A callback invoked after completion. Will return `Result.success(User)` or `Result.failure(Error)`.
      */
     func login(credentials: Credentials, _ completion: @escaping (Result<User, Error>) -> Void) {
         self.__login(withCredential: ObjectiveCSupport.convert(object: credentials)) { user, error in

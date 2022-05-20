@@ -564,15 +564,15 @@ typedef void (^RLMNotificationBlock)(RLMNotification notification, RLMRealm *rea
                         queue once the commit has either completed or failed
                         with an error.
  
- @param isGroupingAllowed If `YES`, multiple sequential calls to
-                         `commitAsyncWriteTransaction:` may be batched together
-                         and persisted to stable storage in one group. This
-                         improves write performance, particularly when the
-                         individual transactions being batched are small. In the
-                         event of a crash or power failure, either all of the
-                         grouped transactions will be lost or none will, rather
-                         than the usual guarantee that data has been persisted as
-                         soon as a call to commit has returned.
+ @param allowGrouping If `YES`, multiple sequential calls to
+                      `commitAsyncWriteTransaction:` may be batched together
+                      and persisted to stable storage in one group. This
+                      improves write performance, particularly when the
+                      individual transactions being batched are small. In the
+                      event of a crash or power failure, either all of the
+                      grouped transactions will be lost or none will, rather
+                      than the usual guarantee that data has been persisted as
+                      soon as a call to commit has returned.
  
  @return An id identifying the asynchronous transaction commit can be passed to
          `cancelAsyncTransaction:` prior to the completion block being called
@@ -580,7 +580,7 @@ typedef void (^RLMNotificationBlock)(RLMNotification notification, RLMRealm *rea
          *not* cancel the commit itself.
 */
 - (RLMAsyncTransactionId)commitAsyncWriteTransaction:(nullable void(^)(NSError *))completionBlock
-                                   isGroupingAllowed:(BOOL)isGroupingAllowed;
+                                       allowGrouping:(BOOL)allowGrouping;
 
 /**
  Asynchronously commits a write transaction.

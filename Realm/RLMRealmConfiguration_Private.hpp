@@ -28,3 +28,5 @@
 @property (nonatomic) realm::SchemaMode schemaMode;
 - (void)updateSchemaMode;
 @end
+
+void RLMDeferredAuditConfigInit(realm::AuditConfig& auditConfig, RLMRealmConfiguration *realmConfig);

@@ -42,6 +42,6 @@ void RLMSetConfigInfoForClientResetCallbacks(realm::SyncConfig& syncConfig, RLMR
 
 @end
 
-
+NSError *_Nullable RLMTranslateSyncError(realm::SyncError);
 
 NS_ASSUME_NONNULL_END

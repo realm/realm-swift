@@ -28,6 +28,9 @@ class SyncManager;
 namespace app {
 class App;
 }
+namespace util {
+class Logger;
+}
 }
 
 @class RLMAppConfiguration, RLMUser, RLMSyncConfiguration;
@@ -51,6 +54,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)resetForTesting;
 - (void)waitForSessionTermination;
 
-NS_ASSUME_NONNULL_END
-
 @end
+
+std::shared_ptr<realm::util::Logger> RLMWrapLogFunction(RLMSyncLogFunction);
+
+NS_ASSUME_NONNULL_END

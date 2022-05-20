@@ -1595,7 +1595,7 @@
         [realm createObject:StringObject.className withValue:@[@"string"]];
         [realm commitAsyncWriteTransaction:^(NSError *) {
             [asyncComplete fulfill];
-        } isGroupingAllowed:true];
+        } allowGrouping:true];
     }];
 
     [realm beginAsyncWriteTransaction:^{

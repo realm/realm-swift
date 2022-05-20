@@ -834,7 +834,9 @@ RLMAccessorContext::RLMAccessorContext(__unsafe_unretained RLMObjectBase *const 
 : _realm(parent->_realm)
 , _info(prop && prop->type == realm::PropertyType::Object ? parent->_info->linkTargetType(*prop)
                                                           : *parent->_info)
+, _parentObject(parent->_row)
 , _parentObjectInfo(parent->_info)
+, _colKey(prop ? prop->column_key : ColKey{})
 {
 }
 
@@ -921,6 +923,13 @@ id RLMAccessorContext::box(realm::Object&& o) {
 }
 
 id RLMAccessorContext::box(realm::Obj&& r) {
+    if (!currentProperty) {
+        // If currentProperty is set, then we're reading from a Collection and
+        // that reported an audit read for us. If not, we need to report the
+        // audit read. This happens automatically when creating a
+        // `realm::Object`, but our object accessors don't wrap that type.
+        realm::Object(_realm->_realm, *_info.objectSchema, r, _parentObject, _colKey);
+    }
     return RLMCreateObjectAccessor(_info, std::move(r));
 }
 

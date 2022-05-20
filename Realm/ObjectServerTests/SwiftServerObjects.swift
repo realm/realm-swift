@@ -20,7 +20,7 @@ import Foundation
 import RealmSwift
 
 public class SwiftPerson: Object {
-    @Persisted(primaryKey: true) public var _id: ObjectId = ObjectId.generate()
+    @Persisted(primaryKey: true) public var _id: ObjectId
     @Persisted public var firstName: String = ""
     @Persisted public var lastName: String = ""
     @Persisted public var age: Int = 30
@@ -33,11 +33,18 @@ public class SwiftPerson: Object {
     }
 }
 
+public class LinkToSwiftPerson: Object {
+    @Persisted(primaryKey: true) public var _id: ObjectId
+    @Persisted public var person: SwiftPerson?
+    @Persisted public var people: List<SwiftPerson>
+    @Persisted public var peopleByName: Map<String, SwiftPerson?>
+}
+
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 extension SwiftPerson: ObjectKeyIdentifiable {}
 
 public class SwiftTypesSyncObject: Object {
-    @Persisted(primaryKey: true) public var _id: ObjectId = ObjectId.generate()
+    @Persisted(primaryKey: true) public var _id: ObjectId
     @Persisted public var boolCol: Bool = true
     @Persisted public var intCol: Int = 1
     @Persisted public var doubleCol: Double = 1.1
@@ -47,95 +54,80 @@ public class SwiftTypesSyncObject: Object {
     @Persisted public var longCol: Int64 = 1
     @Persisted public var decimalCol: Decimal128 = Decimal128(1)
     @Persisted public var uuidCol: UUID = UUID(uuidString: "85d4fbee-6ec6-47df-bfa1-615931903d7e")!
-    @Persisted public var objectIdCol: ObjectId = .generate()
+    @Persisted public var objectIdCol: ObjectId
     @Persisted public var objectCol: SwiftPerson?
-    @Persisted public var anyCol: AnyRealmValue
+    @Persisted public var anyCol: AnyRealmValue = .int(1)
 
     public convenience init(person: SwiftPerson) {
         self.init()
-        self.anyCol = .int(1)
         self.objectCol = person
-    }
-
-    public override class func primaryKey() -> String? {
-        return "_id"
     }
 }
 
 public class SwiftCollectionSyncObject: Object {
-    @objc public dynamic var _id: ObjectId? = ObjectId.generate()
-    public let intList = List<Int>()
-    public let boolList = List<Bool>()
-    public let stringList = List<String>()
-    public let dataList = List<Data>()
-    public let dateList = List<Date>()
-    public let doubleList = List<Double>()
-    public let objectIdList = List<ObjectId>()
-    public let decimalList = List<Decimal128>()
-    public let uuidList = List<UUID>()
-    public let anyList = List<AnyRealmValue>()
-    public let objectList = List<SwiftPerson>()
+    @Persisted(primaryKey: true) public var _id: ObjectId
+    @Persisted public var intList: List<Int>
+    @Persisted public var boolList: List<Bool>
+    @Persisted public var stringList: List<String>
+    @Persisted public var dataList: List<Data>
+    @Persisted public var dateList: List<Date>
+    @Persisted public var doubleList: List<Double>
+    @Persisted public var objectIdList: List<ObjectId>
+    @Persisted public var decimalList: List<Decimal128>
+    @Persisted public var uuidList: List<UUID>
+    @Persisted public var anyList: List<AnyRealmValue>
+    @Persisted public var objectList: List<SwiftPerson>
 
-    public let intSet = MutableSet<Int>()
-    public let stringSet = MutableSet<String>()
-    public let dataSet = MutableSet<Data>()
-    public let dateSet = MutableSet<Date>()
-    public let doubleSet = MutableSet<Double>()
-    public let objectIdSet = MutableSet<ObjectId>()
-    public let decimalSet = MutableSet<Decimal128>()
-    public let uuidSet = MutableSet<UUID>()
-    public let anySet = MutableSet<AnyRealmValue>()
-    public let objectSet = MutableSet<SwiftPerson>()
+    @Persisted public var intSet: MutableSet<Int>
+    @Persisted public var stringSet: MutableSet<String>
+    @Persisted public var dataSet: MutableSet<Data>
+    @Persisted public var dateSet: MutableSet<Date>
+    @Persisted public var doubleSet: MutableSet<Double>
+    @Persisted public var objectIdSet: MutableSet<ObjectId>
+    @Persisted public var decimalSet: MutableSet<Decimal128>
+    @Persisted public var uuidSet: MutableSet<UUID>
+    @Persisted public var anySet: MutableSet<AnyRealmValue>
+    @Persisted public var objectSet: MutableSet<SwiftPerson>
 
-    public let otherIntSet = MutableSet<Int>()
-    public let otherStringSet = MutableSet<String>()
-    public let otherDataSet = MutableSet<Data>()
-    public let otherDateSet = MutableSet<Date>()
-    public let otherDoubleSet = MutableSet<Double>()
-    public let otherObjectIdSet = MutableSet<ObjectId>()
-    public let otherDecimalSet = MutableSet<Decimal128>()
-    public let otherUuidSet = MutableSet<UUID>()
-    public let otherAnySet = MutableSet<AnyRealmValue>()
-    public let otherObjectSet = MutableSet<SwiftPerson>()
+    @Persisted public var otherIntSet: MutableSet<Int>
+    @Persisted public var otherStringSet: MutableSet<String>
+    @Persisted public var otherDataSet: MutableSet<Data>
+    @Persisted public var otherDateSet: MutableSet<Date>
+    @Persisted public var otherDoubleSet: MutableSet<Double>
+    @Persisted public var otherObjectIdSet: MutableSet<ObjectId>
+    @Persisted public var otherDecimalSet: MutableSet<Decimal128>
+    @Persisted public var otherUuidSet: MutableSet<UUID>
+    @Persisted public var otherAnySet: MutableSet<AnyRealmValue>
+    @Persisted public var otherObjectSet: MutableSet<SwiftPerson>
 
-    public let intMap = Map<String, Int>()
-    public let stringMap = Map<String, String>()
-    public let dataMap = Map<String, Data>()
-    public let dateMap = Map<String, Date>()
-    public let doubleMap = Map<String, Double>()
-    public let objectIdMap = Map<String, ObjectId>()
-    public let decimalMap = Map<String, Decimal128>()
-    public let uuidMap = Map<String, UUID>()
-    public let anyMap = Map<String, AnyRealmValue>()
-    public let objectMap = Map<String, SwiftPerson?>()
-
-    public override class func primaryKey() -> String? {
-        return "_id"
-    }
+    @Persisted public var intMap: Map<String, Int>
+    @Persisted public var stringMap: Map<String, String>
+    @Persisted public var dataMap: Map<String, Data>
+    @Persisted public var dateMap: Map<String, Date>
+    @Persisted public var doubleMap: Map<String, Double>
+    @Persisted public var objectIdMap: Map<String, ObjectId>
+    @Persisted public var decimalMap: Map<String, Decimal128>
+    @Persisted public var uuidMap: Map<String, UUID>
+    @Persisted public var anyMap: Map<String, AnyRealmValue>
+    @Persisted public var objectMap: Map<String, SwiftPerson?>
 }
 
 public class SwiftAnyRealmValueObject: Object {
-    @objc public dynamic var _id: ObjectId? = ObjectId.generate()
-    public let anyCol = RealmProperty<AnyRealmValue>()
-    public let otherAnyCol = RealmProperty<AnyRealmValue>()
-    public override class func primaryKey() -> String? {
-        return "_id"
-    }
+    @Persisted(primaryKey: true) public var _id: ObjectId
+    @Persisted public var anyCol: AnyRealmValue
+    @Persisted public var otherAnyCol: AnyRealmValue
 }
 
 public class SwiftMissingObject: Object {
-    @objc public dynamic var _id: ObjectId? = ObjectId.generate()
-    @objc public dynamic var objectCol: SwiftPerson?
-    public let anyCol = RealmProperty<AnyRealmValue>()
-    public override class func primaryKey() -> String? {
-        return "_id"
-    }
+    @Persisted(primaryKey: true) public var _id: ObjectId
+    @Persisted public var objectCol: SwiftPerson?
+    @Persisted public var anyCol: AnyRealmValue
 }
 
-@objcMembers public class SwiftUUIDPrimaryKeyObject: Object {
-    public dynamic var _id: UUID? = UUID(uuidString: "85d4fbee-6ec6-47df-bfa1-615931903d7e")!
-    public dynamic var strCol: String = ""
-    public dynamic var intCol: Int = 0
+public class SwiftUUIDPrimaryKeyObject: Object {
+    @Persisted(primaryKey: true) public var _id: UUID? = UUID(uuidString: "85d4fbee-6ec6-47df-bfa1-615931903d7e")!
+    @Persisted public var strCol: String = ""
+    @Persisted public var intCol: Int = 0
 
     public convenience init(id: UUID?, strCol: String, intCol: Int) {
         self.init()
@@ -143,16 +135,12 @@ public class SwiftMissingObject: Object {
         self.strCol = strCol
         self.intCol = intCol
     }
-
-    public override class func primaryKey() -> String? {
-        return "_id"
-    }
 }
 
-@objcMembers public class SwiftStringPrimaryKeyObject: Object {
-    public dynamic var _id: String? = "1234567890ab1234567890ab"
-    public dynamic var strCol: String = ""
-    public dynamic var intCol: Int = 0
+public class SwiftStringPrimaryKeyObject: Object {
+    @Persisted(primaryKey: true) public var _id: String? = "1234567890ab1234567890ab"
+    @Persisted public var strCol: String = ""
+    @Persisted public var intCol: Int = 0
 
     public convenience init(id: String, strCol: String, intCol: Int) {
         self.init()
@@ -160,16 +148,12 @@ public class SwiftMissingObject: Object {
         self.strCol = strCol
         self.intCol = intCol
     }
-
-    public override class func primaryKey() -> String? {
-        return "_id"
-    }
 }
 
-@objcMembers public class SwiftIntPrimaryKeyObject: Object {
-    public dynamic var _id: Int = 1234567890
-    public dynamic var strCol: String = ""
-    public dynamic var intCol: Int = 0
+public class SwiftIntPrimaryKeyObject: Object {
+    @Persisted(primaryKey: true) public var _id: Int = 1234567890
+    @Persisted public var strCol: String = ""
+    @Persisted public var intCol: Int = 0
 
     public convenience init(id: Int, strCol: String, intCol: Int) {
         self.init()
@@ -177,14 +161,10 @@ public class SwiftMissingObject: Object {
         self.strCol = strCol
         self.intCol = intCol
     }
-
-    public override class func primaryKey() -> String? {
-        return "_id"
-    }
 }
 
 public class SwiftHugeSyncObject: Object {
-    @Persisted(primaryKey: true) public var _id = ObjectId.generate()
+    @Persisted(primaryKey: true) public var _id: ObjectId
     @Persisted public var data: Data?
 
     public class func create() -> SwiftHugeSyncObject {

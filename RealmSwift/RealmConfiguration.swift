@@ -264,6 +264,12 @@ extension Realm {
          */
         public var seedFilePath: URL?
 
+        /**
+         Configuration for Realm event recording. Events are enabled if this is set
+         to a non-nil value.
+         */
+        public var eventConfiguration: EventConfiguration?
+
         /// A custom schema to use for the Realm.
         private var customSchema: RLMSchema?
 
@@ -302,6 +308,14 @@ extension Realm {
             configuration.setCustomSchemaWithoutCopying(self.customSchema)
             configuration.disableFormatUpgrade = self.disableFormatUpgrade
             configuration.maximumNumberOfActiveVersions = self.maximumNumberOfActiveVersions ?? 0
+            if let eventConfiguration = eventConfiguration {
+                let rlmConfig = RLMEventConfiguration()
+                rlmConfig.partitionPrefix = eventConfiguration.partitionPrefix
+                rlmConfig.syncUser = eventConfiguration.syncUser
+                rlmConfig.metadata = eventConfiguration.metadata
+                rlmConfig.logger = eventConfiguration.logger
+                configuration.eventConfiguration = rlmConfig
+            }
             return configuration
         }
 
@@ -327,6 +341,11 @@ extension Realm {
             configuration.customSchema = rlmConfiguration.customSchema
             configuration.disableFormatUpgrade = rlmConfiguration.disableFormatUpgrade
             configuration.maximumNumberOfActiveVersions = rlmConfiguration.maximumNumberOfActiveVersions
+            if let eventConfiguration = rlmConfiguration.eventConfiguration {
+                configuration.eventConfiguration = EventConfiguration(metadata: eventConfiguration.metadata,
+                                                                      syncUser: eventConfiguration.syncUser,
+                                                                      partitionPrefix: eventConfiguration.partitionPrefix)
+            }
             return configuration
         }
     }

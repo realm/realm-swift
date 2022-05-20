@@ -75,8 +75,9 @@ void RLMInitializeSwiftAccessor(RLMObjectBase *object, bool promotingExisting);
 }
 
 namespace realm {
-    class Table;
     class Obj;
+    class Table;
+    struct ColKey;
     struct ObjLink;
 }
 class RLMClassInfo;

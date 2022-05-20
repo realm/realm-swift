@@ -127,7 +127,7 @@ public:
     // Look up by name, throwing if it's not present
     RLMClassInfo& operator[](NSString *name);
     // Look up by table key, return none if its not present.
-    RLMClassInfo* operator[](realm::TableKey const& tableKey);
+    RLMClassInfo* operator[](realm::TableKey tableKey);
 
     // Emplaces a locally derived object schema into RLMSchemaInfo. This is used
     // when creating objects dynamically that are not registered in the Cocoa schema.

@@ -3,8 +3,8 @@
 import PackageDescription
 import Foundation
 
-let coreVersionStr = "11.15.0"
-let cocoaVersionStr = "10.25.2"
+let coreVersionStr = "11.17.0"
+let cocoaVersionStr = "10.26.0"
 
 let coreVersionPieces = coreVersionStr.split(separator: ".")
 let coreVersionExtra = coreVersionPieces[2].split(separator: "-")
@@ -55,7 +55,8 @@ let objectServerTestSources = [
     "RLMUser+ObjectServerTests.mm",
     "RLMWatchTestUtility.h",
     "RLMWatchTestUtility.m",
-    "RealmServer.swift",
+    "EventTests.swift" ,
+    "RealmServer.swift" ,
     "SwiftCollectionSyncTests.swift",
     "SwiftFlexibleSyncServerTests.swift",
     "SwiftMongoClientTests.swift",
@@ -67,6 +68,7 @@ let objectServerTestSources = [
     "TimeoutProxyServer.swift",
     "WatchTestUtility.swift",
     "certificates",
+    "config_overrides.json",
     "include",
     "setup_baas.rb",
 ]
@@ -149,6 +151,7 @@ let package = Package(
                 "scripts",
             ],
             sources: [
+                "Realm/RLMEvent.mm",
                 "Realm/RLMAccessor.mm",
                 "Realm/RLMAnalytics.mm",
                 "Realm/RLMArray.mm",
@@ -294,6 +297,7 @@ let package = Package(
         objectServerTestTarget(
             name: "SwiftObjectServerTests",
             sources: [
+                "EventTests.swift",
                 "SwiftObjectServerTests.swift",
                 "SwiftCollectionSyncTests.swift",
                 "SwiftObjectServerPartitionTests.swift",
