@@ -35,6 +35,10 @@ NS_ASSUME_NONNULL_BEGIN
 typedef BOOL (^RLMShouldCompactOnLaunchBlock)(NSUInteger totalBytes, NSUInteger bytesUsed);
 
 /**
+ */
+typedef void(^RLMFlexibleSyncInitialSubscriptionsBlock)(RLMSyncSubscriptionSet * _Nonnull subscriptions);
+
+/**
  An `RLMRealmConfiguration` instance describes the different options used to
  create an instance of a Realm.
 

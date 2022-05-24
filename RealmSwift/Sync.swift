@@ -929,8 +929,8 @@ extension User {
 
      @return A `Realm.Configuration` instance with a flexible sync configuration.
      */
-    public func flexibleSyncConfiguration() -> Realm.Configuration {
-        let config = self.__flexibleSyncConfiguration()
+    public func flexibleSyncConfiguration(initialSubscriptions: ((SyncSubscriptionSet) -> Void)? = nil, rerunOnOpen: Bool = false) -> Realm.Configuration {
+        let config = self.__flexibleSyncConfiguration(initialSubscriptions: ObjectiveCSupport.convert(object: initialSubscriptions), rerunsOnOpen: rerunOnOpen)
         return ObjectiveCSupport.convert(object: config)
     }
 }

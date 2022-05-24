@@ -31,6 +31,14 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSString *pathOnDisk;
 @property (nonatomic, retain, nullable) RLMEventConfiguration *eventConfiguration;
 
+/**
+ */
+@property (nonatomic, nullable) RLMFlexibleSyncInitialSubscriptionsBlock initialSubscriptions;
+
+/**
+ */
+@property (nonatomic) bool rerunsOnOpen;
+
 // Get the default confiugration without copying it
 + (RLMRealmConfiguration *)rawDefaultConfiguration;
 

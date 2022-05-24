@@ -101,7 +101,7 @@ typedef void(^RLMClientResetAfterBlock)(RLMRealm * _Nonnull beforeFrozen, RLMRea
  A callback which notifies after a client reset has occurred.
  -see: `RLMClientResetAfterBlock`
  */
-@property (nonatomic, nullable) RLMClientResetAfterBlock  afterClientReset;
+@property (nonatomic, nullable) RLMClientResetAfterBlock afterClientReset;
 
 /**
  Whether nonfatal connection errors should cancel async opens.

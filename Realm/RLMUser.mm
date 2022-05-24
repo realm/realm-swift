@@ -23,6 +23,7 @@
 #import "RLMBSON_Private.hpp"
 #import "RLMCredentials_Private.hpp"
 #import "RLMMongoClient_Private.hpp"
+#import "RLMRealmConfiguration_Private.h"
 #import "RLMSyncConfiguration_Private.hpp"
 #import "RLMSyncSession_Private.hpp"
 #import "RLMUtil.hpp"
@@ -112,6 +113,18 @@ using namespace realm;
                                                       stopPolicy:RLMSyncStopPolicyAfterChangesUploaded
                                               enableFlexibleSync:true];
     RLMRealmConfiguration *config = [[RLMRealmConfiguration alloc] init];
+    config.syncConfiguration = syncConfig;
+    return config;
+}
+
+- (RLMRealmConfiguration *)flexibleSyncConfigurationWithInitialSubscriptions:(nullable RLMFlexibleSyncInitialSubscriptionsBlock)initialSubscriptions
+                                        rerunsOnOpen:(BOOL)rerunsOnOpen {
+    auto syncConfig = [[RLMSyncConfiguration alloc] initWithUser:self
+                                                      stopPolicy:RLMSyncStopPolicyAfterChangesUploaded
+                                              enableFlexibleSync:true];
+    RLMRealmConfiguration *config = [[RLMRealmConfiguration alloc] init];
+    config.initialSubscriptions = initialSubscriptions;
+    config.rerunsOnOpen = rerunsOnOpen;
     config.syncConfiguration = syncConfig;
     return config;
 }

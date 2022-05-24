@@ -239,7 +239,14 @@ static RLMAsyncOpenTask *openAsync(RLMRealmConfiguration *configuration,
 #if REALM_ENABLE_SYNC
                 auto task = realm::Realm::get_synchronized_realm(std::move(config));
                 ret.task = task;
-                task->start(openCompletion);
+
+                [RLMRealm subscribeToInitialSubscriptions:configuration completion:^(NSError *error) {
+                    if (error) {
+                        openCompletion({}, std::current_exception());
+                    } else {
+                        task->start(openCompletion);
+                    }
+                }];
 #else
                 @throw RLMException(@"Realm was not built with sync enabled");
 #endif
@@ -255,6 +262,25 @@ static RLMAsyncOpenTask *openAsync(RLMRealmConfiguration *configuration,
         }
     });
     return ret;
+}
+
++ (void)subscribeToInitialSubscriptions:(RLMRealmConfiguration *)configuration
+                             completion:(void (^)(NSError *))completion {
+    if (configuration.config.sync_config->flx_sync_requested && configuration.initialSubscriptions) {
+        NSError *error;
+        RLMRealm *realm = [RLMRealm realmWithConfiguration:configuration
+                                                     error:&error];
+//        if (!realm_exists || configuration.rerunsOnOpen) {
+//
+//        }
+
+        RLMSyncSubscriptionSet *subscriptions = realm.subscriptions;
+        [subscriptions update:^{
+            configuration.initialSubscriptions(subscriptions);
+        } onComplete: completion];
+    } else {
+        completion(nil);
+    }
 }
 
 + (RLMAsyncOpenTask *)asyncOpenWithConfiguration:(RLMRealmConfiguration *)configuration

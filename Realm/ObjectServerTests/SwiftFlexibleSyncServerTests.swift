@@ -1096,6 +1096,61 @@ extension SwiftFlexibleSyncServerTests {
         checkCount(expected: 21, realm, SwiftPerson.self)
     }
 
+//    @MainActor
+//    func testFlexibleSyncInitialSubscriptions() async throws {
+//        try await populateFlexibleSyncData { realm in
+//            for i in 1...21 {
+//                let person = SwiftPerson(firstName: "\(#function)",
+//                                         lastName: "lastname_\(i)",
+//                                         age: i)
+//                realm.add(person)
+//            }
+//        }
+//
+//        let user = try await logInUser(for: basicCredentials(app: self.flexibleSyncApp), app: self.flexibleSyncApp)
+//        var config = user.flexibleSyncConfiguration(initialSubscriptions: { subscriptions in
+//            subscriptions.append(QuerySubscription<SwiftPerson>(name: "person_age_10") {
+//                $0.age > 10 && $0.firstName == "\(#function)"
+//            })
+//        })
+//
+//        if config.objectTypes == nil {
+//            config.objectTypes = [SwiftPerson.self,
+//                                  SwiftTypesSyncObject.self]
+//        }
+//        let realm = try await Realm(configuration: config, downloadBeforeOpen: .once)
+//        XCTAssertNotNil(realm)
+//
+//        XCTAssertEqual(realm.subscriptions.count, 1)
+//        waitForDownloads(for: realm)
+//        checkCount(expected: 11, realm, SwiftPerson.self)
+//    }
+//
+//    @MainActor
+//    func testFlexibleSyncInitialSubscriptionsRerunOnOpen() async throws {
+//        try await populateFlexibleSyncData { realm in
+//            realm.deleteAll() // Remove all objects for a clean state
+//            for i in 1...21 {
+//                let person = SwiftPerson(firstName: "\(#function)",
+//                                         lastName: "lastname_\(i)",
+//                                         age: i)
+//                realm.add(person)
+//            }
+//        }
+//
+//        let user = try await logInUser(for: basicCredentials(app: self.flexibleSyncApp), app: self.flexibleSyncApp)
+//        var config = user.flexibleSyncConfiguration(initialSubscriptions: { subscriptions in
+//
+//        }, rerunOnOpen: true)
+//        if config.objectTypes == nil {
+//            config.objectTypes = [SwiftPerson.self,
+//                                  SwiftTypesSyncObject.self]
+//        }
+//        let realm = try await Realm(configuration: config)
+//        waitForDownloads(for: realm)
+//        XCTAssertNotNil(realm)
+//        checkCount(expected: 0, realm, SwiftPerson.self)
+//    }
 }
 #endif // canImport(_Concurrency)
 
