@@ -413,8 +413,10 @@ extension SwiftFlexibleSyncTests {
         XCTAssertEqual(realm.subscriptions.count, numberOfSubs)
 
         var count = 0
-        for subscription in realm.subscriptions {
+        for (index, subscription) in realm.subscriptions.enumerated() {
             XCTAssertNotNil(subscription)
+            XCTAssertEqual(subscription.query, "age > \(index + 1)")
+            XCTAssertTrue((Calendar.current.date(byAdding: DateComponents(hour: -1), to: Date())!...Date()).contains(subscription.createdAt))
             count += 1
         }
 

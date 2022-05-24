@@ -2786,6 +2786,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
 }
 
 #if swift(>=5.6) && canImport(_Concurrency)
+
 @available(macOS 12.0, *)
 class AsyncAwaitObjectServerTests: SwiftSyncTestCase {
     override class var defaultTestSuite: XCTestSuite {

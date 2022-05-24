@@ -58,45 +58,6 @@ using namespace realm;
     return dispatch_semaphore_wait(sema, dispatch_time(DISPATCH_TIME_NOW, (int64_t)(timeout * NSEC_PER_SEC))) == 0;
 }
 
-- (BOOL)waitForUploadsForRealm:(RLMRealm *)realm error:(NSError **)error {
-    const NSTimeInterval timeout = 20;
-    dispatch_semaphore_t sema = dispatch_semaphore_create(0);
-    RLMSyncSession *session = realm.syncSession;
-    NSAssert(session, @"Cannot call with invalid Realm");
-    __block NSError *completionError;
-    BOOL couldWait = [session waitForUploadCompletionOnQueue:dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0) callback:^(NSError *error) {
-        completionError = error;
-        dispatch_semaphore_signal(sema);
-    }];
-    if (!couldWait) {
-        return NO;
-    }
-
-    if (error)
-        *error = completionError;
-
-    return dispatch_semaphore_wait(sema, dispatch_time(DISPATCH_TIME_NOW, (int64_t)(timeout * NSEC_PER_SEC))) == 0;
-}
-
-- (BOOL)waitForDownloadsForRealm:(RLMRealm *)realm error:(NSError **)error {
-    const NSTimeInterval timeout = 20;
-    dispatch_semaphore_t sema = dispatch_semaphore_create(0);
-    RLMSyncSession *session = realm.syncSession;
-    NSAssert(session, @"Cannot call with invalid Realm");
-    __block NSError *completionError;
-    BOOL couldWait = [session waitForDownloadCompletionOnQueue:dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0) callback:^(NSError *error) {
-        completionError = error;
-    }];
-    if (!couldWait) {
-        return NO;
-    }
-
-    if (error)
-        *error = completionError;
-
-    return dispatch_semaphore_wait(sema, dispatch_time(DISPATCH_TIME_NOW, (int64_t)(timeout * NSEC_PER_SEC))) == 0;
-}
-
 - (void)simulateClientResetErrorForSession:(NSString *)partitionValue {
     RLMSyncSession *session = [self sessionForPartitionValue:partitionValue];
     NSAssert(session, @"Cannot call with invalid URL");

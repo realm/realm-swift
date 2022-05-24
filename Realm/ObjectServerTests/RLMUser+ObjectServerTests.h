@@ -25,9 +25,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)waitForUploadToFinish:(NSString *)partitionValue;
 - (BOOL)waitForDownloadToFinish:(NSString *)partitionValue;
 
-- (BOOL)waitForUploadsForRealm:(RLMRealm *)realm error:(NSError **)error;
-- (BOOL)waitForDownloadsForRealm:(RLMRealm *)realm error:(NSError **)error;
-
 - (void)simulateClientResetErrorForSession:(NSString *)partitionValue;
 
 @end
