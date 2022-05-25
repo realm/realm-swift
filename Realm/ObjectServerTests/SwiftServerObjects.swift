@@ -43,6 +43,43 @@ public class LinkToSwiftPerson: Object {
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 extension SwiftPerson: ObjectKeyIdentifiable {}
 
+public class SwiftDog: Object {
+    public enum Gender: Int, PersistableEnum {
+        case male
+        case female
+        case unknown
+    }
+    @Persisted(primaryKey: true) public var _id: ObjectId = ObjectId.generate()
+    @Persisted public var name: String
+    @Persisted public var breed: String
+    @Persisted public var gender: Gender
+
+    public convenience init(name: String, breed: String, gender: Gender? = .unknown) {
+        self.init()
+        self.name = name
+        self.breed = breed
+    }
+}
+
+public enum BirdSpecies: Int, PersistableEnum {
+    case magpie
+    case owl
+    case penguin
+    case duck
+}
+
+public class Bird: Object {
+    @Persisted(primaryKey: true) public var _id: ObjectId = ObjectId.generate()
+    @Persisted public var name: String
+    @Persisted public var species: BirdSpecies
+
+    public convenience init(name: String, species: BirdSpecies) {
+        self.init()
+        self.name = name
+        self.species = species
+    }
+}
+
 public class SwiftTypesSyncObject: Object {
     @Persisted(primaryKey: true) public var _id: ObjectId
     @Persisted public var boolCol: Bool = true

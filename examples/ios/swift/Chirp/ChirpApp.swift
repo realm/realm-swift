@@ -35,7 +35,7 @@ struct AppState {
     static var shared: AppState = .init()
 
     var currentUser: ChirpUser?
-    var app = App(id: "")
+    var app = App(id: "<App id>")
 }
 
 struct ChirpView: View {
@@ -71,7 +71,7 @@ struct ChirpUserView: View {
                     currentUser.following.remove(user)
                 }
                 Task {
-                    try await subscribedUsers.update {
+                    try await subscribedUsers.where {
                         $0.in(currentUser.following)
                     }
                 }
@@ -85,7 +85,7 @@ struct ChirpDeckView: View {
     var subscribedUsers
 
     var body: some View {
-        if case .subscribing = $subscribedUsers.state {
+        if case .pending = $subscribedUsers.state {
             ProgressView()
         } else if case let .error(error) = $subscribedUsers.state {
             Text("Error: \(error.localizedDescription)")

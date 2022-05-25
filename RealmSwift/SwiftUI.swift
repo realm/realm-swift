@@ -423,19 +423,24 @@ extension Projection: _ObservedResultsValue { }
 
     public typealias Element = ResultType
 
+    /// An enum representing different states for the subscription associated to this query results..
     public enum SubscriptionState {
-        case subscribing
-        case complete
+        /// Subscription has been added and waiting for data to bootstrap.
+        case pending
+        /// An error has occurred while adding the subscription (client or server side).
         case error(Error)
-    }
-
-    public var state: SubscriptionState {
-        storage.state
+        /// Data has been bootstrapped and query results updated.
+        case completed
     }
 
     private class Storage: ObservableStorage<Results<ResultType>> {
         var setupHasRun = false
-        @State var state: SubscriptionState = .complete
+        /// :nodoc:
+        @Published var state: SubscriptionState = .completed {
+            willSet {
+                objectWillChange.send()
+            }
+        }
 
         private func didSet() {
             if setupHasRun {
@@ -444,36 +449,36 @@ extension Projection: _ObservedResultsValue { }
         }
 
         func setupValue() {
-            /// A base value to reset the state of the query if a user reassigns the `filter` or `sortDescriptor`
-            if configuration?.rlmConfiguration.isFlexibleSyncConfiguration ?? false {
+            if let configuration = configuration,
+               configuration.syncConfiguration?.isFlexibleSync ?? false {
+#if swift(>=5.6) && canImport(_Concurrency)
                 Task {
                     do {
-                        let realm = try await Realm(configuration: configuration ?? Realm.Configuration.defaultConfiguration)
-                        value = try await realm.objects(ResultType.self)
+                        let realm = try await Realm(configuration: configuration)
+                        let filter = filter ?? `where` ?? NSPredicate(format: "TRUEPREDICATE")
+                        value = try await realm.objects(ResultType.self, filter: filter)
+
                         if let sortDescriptor = sortDescriptor {
                             value = value.sorted(byKeyPath: sortDescriptor.keyPath, ascending: sortDescriptor.ascending)
                         }
-                        if let filter = filter {
-                            value = try await value.filter(filter)
-                        } else if let `where` = `where` {
-                            value = try await value.where(`where`)
-                        }
+
                         setupHasRun = true
-                        self.state = .complete
+                        self.state = .completed
                     } catch {
                         self.state = .error(error)
                     }
                 }
+#endif // swift(>=5.6)
             } else {
                 let realm = try! Realm(configuration: configuration ?? Realm.Configuration.defaultConfiguration)
                 value = realm.objects(ResultType.self)
                 if let sortDescriptor = sortDescriptor {
                     value = value.sorted(byKeyPath: sortDescriptor.keyPath, ascending: sortDescriptor.ascending)
                 }
-                if let filter = filter {
-                    value = value.filter(filter)
-                } else if let `where` = `where` {
-                    value = value.where(`where`)
+                let filters = [searchFilter, filter ?? `where`].compactMap { $0 }
+                if !filters.isEmpty {
+                    let compoundFilter = NSCompoundPredicate(andPredicateWithSubpredicates: filters)
+                    value = value.filter(compoundFilter)
                 }
                 setupHasRun = true
             }
@@ -504,7 +509,14 @@ extension Projection: _ObservedResultsValue { }
         var searchString: String = ""
         var searchFilter: NSPredicate? {
             didSet {
-                didSet()
+                if let configuration = configuration,
+                   configuration.syncConfiguration?.isFlexibleSync ?? false {
+                    if let searchFilter = searchFilter {
+                        value = value.filter(searchFilter)
+                    }
+                } else {
+                    didSet()
+                }
             }
         }
     }
@@ -547,12 +559,18 @@ extension Projection: _ObservedResultsValue { }
             storage.sortDescriptor = newValue
         }
     }
+
+    /// :Returns the current state for the subscription on a flexible sync context, if used this will update in case the state changes.
+    public var state: SubscriptionState {
+        return storage.state
+    }
+
     /// :nodoc:
     public var wrappedValue: Results<ResultType> {
         if !storage.setupHasRun {
             storage.setupValue()
         }
-        return storage.configuration != nil ? storage.value.freeze() : storage.value
+        return storage.configuration != nil && storage.value.realm != nil ? storage.value.freeze() : storage.value
     }
     /// :nodoc:
     public var projectedValue: Self {
@@ -647,6 +665,20 @@ extension Projection: _ObservedResultsValue { }
         }
     }
 }
+
+#if swift(>=5.6) && canImport(_Concurrency)
+@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+extension ObservedResults {
+    /// Unsubscribe the current `QueryResults` subscription, associated to this observed results,,
+    /// also will remove the data associated to that subscription from the results.
+    /// In case this is not a flexible sync result, this will do nothing.
+    @MainActor
+    public func unsubscribe() async throws {
+        try await storage.value.unsubscribe()
+    }
+
+}
+#endif // swift(>=5.6)
 
 // MARK: ObservedRealmObject
 

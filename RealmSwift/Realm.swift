@@ -1216,12 +1216,56 @@ extension Realm {
 
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 extension Realm {
-    public func objects<Element: RealmFetchable>(_ type: Element.Type) async throws -> Results<Element> {
-        return try await Results(RLMGetObjects(rlmRealm, type.className(), nil))
+    /**
+     Returns all objects of the given type stored in the Realm.
+     This will add or use a flexible sync subscription, for the query expressed, to the realm, .
+     This is an asynchronous call and will return when the subscription write has been completed
+     and data has been bootstrapped to the realm, in case of a flexible sync app.
+
+     - parameter type: The type of the objects to be returned.
+     - parameter where: The query closure to use for the subscription.
+
+     - returns: A `Results` containing the objects.
+     */
+    @MainActor
+    public func objects<Element: RealmFetchable>(_ type: Element.Type, where: ((Query<Element>) -> Query<Bool>)? = nil) async throws -> Results<Element> {
+        return try await objects(type, filter: `where`?(Query()).predicate ?? NSPredicate(format: "TRUEPREDICATE"))
+    }
+
+    /**
+     Returns all objects of the given type stored in the Realm.
+     This will add or use a flexible sync subscription, for the query expressed, to the realm, .
+     This is an asynchronous call and will return when the subscription write has been completed
+     and data has been bootstrapped to the realm, in case of a flexible sync app.
+
+     - parameter type: The type of the objects to be returned.
+     - parameter predicateFormat: A predicate format string, optionally followed by a variable number of arguments, to use for the subscription.
+
+     - returns: A `Results` containing the objects.
+     */
+    @MainActor
+    public func objects<Element: RealmFetchable>(_ type: Element.Type, where predicateFormat: String, _ args: Any...) async throws -> Results<Element> {
+        return try await objects(type, filter: NSPredicate(format: predicateFormat, argumentArray: unwrapOptionals(in: args)))
+    }
+
+    /**
+     Returns all objects of the given type stored in the Realm.
+     This will add or use a flexible sync subscription, for the query expressed, to the realm, .
+     This is an asynchronous call and will return when the subscription write has been completed
+     and data has been bootstrapped to the realm, in case of a flexible sync app.
+
+     - parameter type: The type of the objects to be returned.
+     - parameter predicate: The predicate to use for the subscription.
+
+     - returns: A `Results` containing the objects.
+     */
+    @MainActor
+    public func objects<Element: RealmFetchable>(_ type: Element.Type, filter: NSPredicate) async throws -> Results<Element> {
+        return try await Results(RLMGetObjects(rlmRealm, type.className(), filter), predicate: filter)
     }
 }
 
-#endif // swift(>=5.5)
+#endif // swift(>=5.6)
 
 /**
  Objects which can be feched from the Realm - Object or Projection
