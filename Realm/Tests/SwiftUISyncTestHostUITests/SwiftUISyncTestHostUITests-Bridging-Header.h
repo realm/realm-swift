@@ -16,5 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+#import "RLMSyncTestCase.h"
+#import "RLMChildProcessEnvironment.h"
 #import "RLMUser+ObjectServerTests.h"
 #import "RLMApp_Private.h"
