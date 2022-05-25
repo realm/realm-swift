@@ -89,7 +89,8 @@ import Combine
      - warning: This method may only be called during a write subscription block.
 
      - parameter type: The type of the object to be queried.
-     - parameter query: A query which will be used to modify the existing query, if nil it will set the query to get all documents in the collection.
+     - parameter query: A query which will be used to modify the existing query.
+                        If nil it will set the query to get all documents in the collection.
      */
     public func updateQuery<T: Object>(toType type: T.Type, where query: ((Query<T>) -> Query<Bool>)? = nil) {
         guard _rlmSyncSubscription.objectClassName == "\(T.self)" else {
@@ -99,9 +100,9 @@ import Combine
     }
 
     /// :nodoc:
-    @available(*, deprecated, renamed: "updateQuery", message: "SyncSubscription update is deprecated, please use `.updateQuery` instead.")
+    @available(*, unavailable, renamed: "updateQuery", message: "SyncSubscription update is unavailable, please use `.updateQuery` instead.")
     public func update<T: Object>(toType type: T.Type, where query: @escaping (Query<T>) -> Query<Bool>) {
-        fatalError("This API is deprecated, , please use `.updateQuery` instead.")
+        fatalError("This API is unavailable, , please use `.updateQuery` instead.")
     }
 
     /**
@@ -118,9 +119,9 @@ import Combine
     }
 
     /// :nodoc:
-    @available(*, deprecated, renamed: "updateQuery", message: "SyncSubscription update is deprecated, please use `.updateQuery` instead.")
+    @available(*, unavailable, renamed: "updateQuery", message: "SyncSubscription update is unavailable, please use `.updateQuery` instead.")
     public func update(to predicateFormat: String, _ args: Any...) {
-        fatalError("This API is deprecated, , please use `.updateQuery` instead.")
+        fatalError("This API is unavailable, , please use `.updateQuery` instead.")
     }
 
     /**
@@ -137,9 +138,9 @@ import Combine
     }
 
     /// :nodoc:
-    @available(*, deprecated, renamed: "updateQuery", message: "SyncSubscription update is deprecated, please use `.updateQuery` instead.")
+    @available(*, unavailable, renamed: "updateQuery", message: "SyncSubscription update is unavailable, please use `.updateQuery` instead.")
     public func update(to predicate: NSPredicate) {
-        fatalError("This API is deprecated, , please use `.updateQuery` instead.")
+        fatalError("This API is unavailable, , please use `.updateQuery` instead.")
     }
 }
 
@@ -224,9 +225,9 @@ import Combine
     }
 
     /// :nodoc:
-    @available(*, deprecated, renamed: "update", message: "SyncSubscriptionSet write is deprecated, please use `.update` instead.")
+    @available(*, unavailable, renamed: "update", message: "SyncSubscriptionSet write is unavailable, please use `.update` instead.")
     public func write(_ block: (() -> Void), onComplete: ((Error?) -> Void)? = nil) {
-        fatalError("This API is deprecated, , please use `.update` instead.")
+        fatalError("This API is unavailable, , please use `.update` instead.")
     }
 
     /// Returns the current state for the subscription set.
@@ -477,9 +478,9 @@ extension SyncSubscriptionSet {
     }
 
     /// :nodoc:
-    @available(*, deprecated, renamed: "update", message: "SyncSubscriptionSet write is deprecated, please use `.update` instead.")
+    @available(*, unavailable, renamed: "update", message: "SyncSubscriptionSet write is unavailable, please use `.update` instead.")
     public func write(_ block: (() -> Void)) async throws {
-        fatalError("This API is deprecated, , please use `.update` instead.")
+        fatalError("This API is unavailable, , please use `.update` instead.")
     }
 }
 #endif // swift(>=5.6)
