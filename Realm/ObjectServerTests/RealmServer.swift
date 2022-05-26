@@ -856,6 +856,7 @@ public class RealmServer: NSObject {
             """
         ], failOnError)
 
+        let rules = app.services[serviceId].rules
         let userDataRule: [String: Any] = [
             "database": "test_data",
             "collection": "UserData",
@@ -865,13 +866,10 @@ public class RealmServer: NSObject {
                 "insert": true,
                 "delete": true,
                 "additional_fields": [:]
-            ]],
-            "schema": [:],
-            "relationships": [:]
+            ]]
         ]
-
-        let rules = app.services[serviceId].rules
         _ = rules.post(userDataRule)
+
         app.customUserData.patch(on: group, [
             "mongo_service_id": serviceId,
             "enabled": true,
