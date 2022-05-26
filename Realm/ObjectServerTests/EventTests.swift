@@ -101,7 +101,7 @@ class SwiftEventTests: SwiftSyncTestCase {
 
     func getEvents(expectedCount: Int) -> [AuditEvent] {
         let waitStart = Date()
-        while collection.count(filter: [:]).await(self) < expectedCount && waitStart.timeIntervalSinceNow > -300.0 {
+        while collection.count(filter: [:]).await(self) < expectedCount && waitStart.timeIntervalSinceNow > -600.0 {
             sleep(5)
         }
         let docs = collection.find(filter: [:]).await(self)
