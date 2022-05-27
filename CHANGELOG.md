@@ -1,9 +1,12 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.27.0 Release notes (2022-05-26)
 =============================================================
+
 ### Enhancements
+
 * `@AsyncOpen`/`@AutoOpen` property wrappers can be used with flexible sync.
 
 ### Fixed
+
 * When installing via SPM, debug builds could potentially hit an assertion
   failure during flexible sync bootstrapping. ([Core #5527](https://github.com/realm/realm-core/pull/5527))
 * Flexible sync now only applies bootstrap data if the entire bootstrap is
@@ -16,9 +19,8 @@ x.y.z Release notes (yyyy-MM-dd)
   version adjusts how file synchronization is done to provide the same safety
   at a much smaller performance hit. ([#7740](https://github.com/realm/realm-swift/issues/7740)).
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
-
 ### Compatibility
+
 * Realm Studio: 11.0.0 or later (but see note below).
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 13.4.
@@ -26,6 +28,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * Xcode: 13.1-13.4.
 
 ### Internal
+
 * Upgraded realm-core from 11.17.0 to 12.0.0.
 * Bump the version number for the lockfile used for interprocess
   synchronization. This has no effect on persistent data, but means that
