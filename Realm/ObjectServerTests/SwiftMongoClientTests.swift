@@ -855,8 +855,8 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
         wait(for: [watchEx, teardownEx], timeout: 60.0)
     }
 
-    func testShouldNotDeleteOnMigrationWithSync() {
-        let user = try! logInUser(for: basicCredentials())
+    func testShouldNotDeleteOnMigrationWithSync() throws {
+        let user = try logInUser(for: basicCredentials())
         var configuration = user.configuration(testName: appId)
 
         assertThrows(configuration.deleteRealmIfMigrationNeeded = true,
