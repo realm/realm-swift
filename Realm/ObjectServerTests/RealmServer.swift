@@ -336,6 +336,10 @@ class Admin {
                 request(httpMethod: "PUT", data: data, completionHandler: completionHandler)
             }
 
+            func put(_ data: Any) -> Result<Any?, Error> {
+                request(httpMethod: "PUT", data: data)
+            }
+
             func delete(_ completionHandler: @escaping (Result<Any?, Error>) -> Void) {
                 request(httpMethod: "DELETE", completionHandler: completionHandler)
             }
@@ -353,7 +357,7 @@ class Admin {
             }
 
             func patch(_ data: Any, _ completionHandler: @escaping (Result<Any?, Error>) -> Void) {
-                            request(httpMethod: "PATCH", data: data, completionHandler: completionHandler)
+                request(httpMethod: "PATCH", data: data, completionHandler: completionHandler)
             }
         }
 
@@ -730,62 +734,22 @@ public class RealmServer: NSObject {
             "value": "mongodb://localhost:26000"
         ])
 
-        // Creating the rules is a two-step process where we first add all the
-        // rules and then add properties to them so that we can add relationships
-        let schema = ObjectiveCSupport.convert(object: RLMSchema.shared())
-
-        let appService: Any
-        switch syncMode {
-        case .pbs(let bsonType):
-            appService = [
-                "name": "mongodb1",
-                "type": "mongodb",
-                "config": [
-                    "uri": "mongodb://localhost:26000",
-                    "sync": [
-                        "state": "enabled",
-                        "database_name": "test_data",
-                        "partition": [
-                            "key": "realm_id",
-                            "type": "\(bsonType)",
-                            "required": false,
-                            "permissions": [
-                                "read": true,
-                                "write": true
-                            ]
-                        ]
-                    ]
-                ]
-                ]
-        case .flx(let fields):
-            appService = [
-                "name": "mongodb1",
-                "type": "mongodb",
-                "config": [
-                    "uri": "mongodb://localhost:26000",
-                    "flexible_sync": [
-                        "state": "enabled",
-                        "database_name": "test_data",
-                        "queryable_fields_names": fields,
-                        "permissions": [
-                            "rules": [:],
-                            "defaultRoles": [[
-                                "name": "all",
-                                "applyWhen": [:],
-                                "read": true,
-                                "write": true
-                            ]]
-                        ]
-                    ]
-                ]
+        let appService: [String : Any] = [
+            "name": "mongodb1",
+            "type": "mongodb",
+            "config": [
+                "uri": "mongodb://localhost:26000"
             ]
-        }
+        ]
 
         let serviceResponse = app.services.post(appService)
         guard let serviceId = (try serviceResponse.get() as? [String: Any])?["_id"] as? String else {
             throw URLError(.badServerResponse)
         }
 
+//         Creating the schema is a two-step process where we first add all the
+//         objects with their properties to them so that we can add relationships
+        let schema = ObjectiveCSupport.convert(object: RLMSchema.shared())
         let syncTypes: [ObjectSchema]
         let partitionKeyType: String?
         if case .pbs(let bsonType) = syncMode {
@@ -795,7 +759,6 @@ public class RealmServer: NSObject {
             }
             partitionKeyType = bsonType
         } else {
-            // This is a temporary workaround for not been able to add the complete schema for a flx App
             syncTypes = schema.objectSchema.filter {
                 let validSyncClasses = ["Dog", "Person", "SwiftPerson", "SwiftTypesSyncObject"]
                 return validSyncClasses.contains($0.className)
@@ -817,9 +780,57 @@ public class RealmServer: NSObject {
             schemaIds[metadata["collection"]!] = dict["_id"]! as? String
         }
 
+        var schemaUpdates = [Result<Any?, Error>]()
         for objectSchema in syncTypes {
             let schemaId = schemaIds[objectSchema.className]!
-            app.schemas[schemaId].put(on: group, data: objectSchema.stitchRule(partitionKeyType, schema, id: schemaId), failOnError)
+            schemaUpdates.append(app.schemas[schemaId].put(objectSchema.stitchRule(partitionKeyType, schema, id: schemaId)))
+        }
+
+        for result in schemaUpdates {
+            guard case .success = result else {
+                fatalError("Failed to create relationships for schema: \(result)")
+            }
+        }
+
+        let serviceConfig: Any
+        switch syncMode {
+        case .pbs(let bsonType):
+            serviceConfig = [
+                "sync": [
+                    "state": "enabled",
+                    "database_name": "test_data",
+                    "partition": [
+                        "key": "realm_id",
+                        "type": "\(bsonType)",
+                        "required": false,
+                        "permissions": [
+                            "read": true,
+                            "write": true
+                        ]
+                    ]
+                ]
+            ]
+        case .flx(let fields):
+            serviceConfig = [
+                "flexible_sync": [
+                    "state": "enabled",
+                    "database_name": "test_data",
+                    "queryable_fields_names": fields,
+                    "permissions": [
+                        "rules": [:],
+                        "defaultRoles": [[
+                            "name": "all",
+                            "applyWhen": [:],
+                            "read": true,
+                            "write": true
+                        ]]
+                    ]
+                ]
+            ]
+        }
+        let serviceConfigResponse = app.services[serviceId].config.patch(serviceConfig)
+        guard case .success = serviceConfigResponse else {
+            throw URLError(.badServerResponse)
         }
 
         app.sync.config.put(on: group, data: [
