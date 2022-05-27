@@ -126,7 +126,7 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
             ex.fulfill()
         }
 
-        waitForExpectations(timeout: 10, handler: nil)
+        waitForExpectations(timeout: 20, handler: nil)
         return theUser
     }
 
@@ -188,7 +188,7 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
             let config = user.configuration(testName: partitionValue)
 
             let realm = try openRealm(configuration: config)
-            try! realm.write {
+            try realm.write {
                 for _ in 0..<SwiftSyncTestCase.bigObjectCount {
                     realm.add(SwiftHugeSyncObject.create())
                 }

@@ -103,9 +103,9 @@ class SwiftUIServerTests: SwiftSyncTestCase {
     // In case of no internet connection AsyncOpen should return an error if there is a timeout
     func testAsyncOpenFailWithoutInternetConnection() throws {
         let proxy = TimeoutProxyServer(port: 5678, targetPort: 9090)
-        try! proxy.start()
+        try proxy.start()
 
-        let appId = try! RealmServer.shared.createApp()
+        let appId = try RealmServer.shared.createApp()
         let appConfig = AppConfiguration(baseURL: "http://localhost:5678",
                                          transport: AsyncOpenConnectionTimeoutTransport(),
                                          localAppName: nil,
@@ -341,8 +341,8 @@ class SwiftUIServerTests: SwiftSyncTestCase {
     // In case of no internet connection AutoOpen should return an opened Realm, offline-first approach
     func testAutoOpenOpenRealmWithoutInternetConnection() throws {
         let proxy = TimeoutProxyServer(port: 5678, targetPort: 9090)
-        try! proxy.start()
-        let appId = try! RealmServer.shared.createApp()
+        try proxy.start()
+        let appId = try RealmServer.shared.createApp()
         let appConfig = AppConfiguration(baseURL: "http://localhost:5678",
                                          transport: AsyncOpenConnectionTimeoutTransport(),
                                          localAppName: nil,

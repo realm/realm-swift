@@ -4,20 +4,35 @@ x.y.z Release notes (yyyy-MM-dd)
 * `@AsyncOpen`/`@AutoOpen` property wrappers can be used with flexible sync.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
-* None.
+* When installing via SPM, debug builds could potentially hit an assertion
+  failure during flexible sync bootstrapping. ([Core #5527](https://github.com/realm/realm-core/pull/5527))
+* Flexible sync now only applies bootstrap data if the entire bootstrap is
+  received. Previously orphaned objects could result from the read snapshot on
+  the server changing. ([Core #5331](https://github.com/realm/realm-core/pull/5331))
+* Partially fix a performance regression in write performance introduced in
+  v10.21.1. v10.21.1 fixed a case where a kernel panic or device's battery
+  dying at the wrong point in a write transaction could potentially result in a
+  corrected Realm file, but at the cost of a severe performance hit. This
+  version adjusts how file synchronization is done to provide the same safety
+  at a much smaller performance hit. ([#7740](https://github.com/realm/realm-swift/issues/7740)).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
 ### Compatibility
-* Realm Studio: 11.0.0 or later.
+* Realm Studio: 11.0.0 or later (but see note below).
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 13.4.
 * CocoaPods: 1.10 or later.
 * Xcode: 13.1-13.4.
 
 ### Internal
-* Upgraded realm-core from ? to ?
+* Upgraded realm-core from 11.17.0 to 12.0.0.
+* Bump the version number for the lockfile used for interprocess
+  synchronization. This has no effect on persistent data, but means that
+  versions of Realm which use pre-12.0.0 realm-core cannot open Realm files at
+  the same time as they are opened by this version. Notably this includes Realm
+  Studio, and v11.1.2 (the latest at the time of this release) cannot open
+  Realm files which are simultaneously open in the simulator.
 
 10.26.0 Release notes (2022-05-19)
 =============================================================
