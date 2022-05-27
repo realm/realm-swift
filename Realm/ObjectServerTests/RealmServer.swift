@@ -734,7 +734,7 @@ public class RealmServer: NSObject {
             "value": "mongodb://localhost:26000"
         ])
 
-        let appService: [String : Any] = [
+        let appService: [String: Any] = [
             "name": "mongodb1",
             "type": "mongodb",
             "config": [
