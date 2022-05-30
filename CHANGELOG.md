@@ -1,13 +1,23 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+* Allow adding a subscription querying for all documents of a type in swift for flexible sync.
+```
+   try await subscriptions.update {
+      subscriptions.append(QuerySubscription<SwiftPerson>(name: "all_people"))
+   }
+```
+* Add Combine API support for flexible sync beta.
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
 * None.
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+### Breaking Changes
+
+* Rename `SyncSubscriptionSet.write` to `SyncSubscriptionSet.update` to avoid confusion with `Realm.write`.
+* Rename `SyncSubscription.update` to `SyncSubscription.updateQuery` to avoid confusion with `SyncSubscriptionSet.update`.
+* Rename `RLMSyncSubscriptionSet.write` to `RLMSyncSubscriptionSet.update` to align it with swift API.
 
 ### Compatibility
 * Realm Studio: 11.0.0 or later.

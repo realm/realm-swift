@@ -706,7 +706,7 @@ static NSURL *syncDirectoryForChildProcess() {
     XCTAssertNotNil(subs);
 
     XCTestExpectation *ex = [self expectationWithDescription:@"state change complete"];
-    [subs write:^{
+    [subs update:^{
         [subs addSubscriptionWithClassName:Person.className
                           subscriptionName:@"person_all"
                                      where:@"TRUEPREDICATE"];
@@ -732,7 +732,7 @@ static NSURL *syncDirectoryForChildProcess() {
     XCTAssertNotNil(subs);
 
     XCTestExpectation *ex = [self expectationWithDescription:@"state changes"];
-    [subs write:^{
+    [subs update:^{
         block(subs);
     } onComplete:^(NSError* error) {
         if (error == nil) {

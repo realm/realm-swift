@@ -20,6 +20,10 @@ import Foundation
 import Realm
 import Realm.Private
 
+#if !(os(iOS) && (arch(i386) || arch(arm)))
+import Combine
+#endif
+
 /// An enum representing different states for the Subscription Set.
 @frozen public enum SyncSubscriptionState: Equatable {
     /// The subscription is complete and the server has sent all the data that matched the subscription
@@ -85,13 +89,20 @@ import Realm.Private
      - warning: This method may only be called during a write subscription block.
 
      - parameter type: The type of the object to be queried.
-     - parameter query: A query which will be used to modify the query.
+     - parameter query: A query which will be used to modify the existing query.
+                        If nil it will set the query to get all documents in the collection.
      */
-    public func update<T: Object>(toType type: T.Type, where query: @escaping (Query<T>) -> Query<Bool>) {
+    public func updateQuery<T: Object>(toType type: T.Type, where query: ((Query<T>) -> Query<Bool>)? = nil) {
         guard _rlmSyncSubscription.objectClassName == "\(T.self)" else {
             throwRealmException("Updating a subscription query of a different Object Type is not allowed.")
         }
-        _rlmSyncSubscription.update(with: query(Query()).predicate)
+        _rlmSyncSubscription.update(with: query?(Query()).predicate ?? NSPredicate(format: "TRUEPREDICATE"))
+    }
+
+    /// :nodoc:
+    @available(*, unavailable, renamed: "updateQuery", message: "SyncSubscription update is unavailable, please use `.updateQuery` instead.")
+    public func update<T: Object>(toType type: T.Type, where query: @escaping (Query<T>) -> Query<Bool>) {
+        fatalError("This API is unavailable, , please use `.updateQuery` instead.")
     }
 
     /**
@@ -103,8 +114,14 @@ import Realm.Private
      - parameter predicateFormat: A predicate format string, optionally followed by a variable number of arguments,
                                   which will be used to modify the query.
      */
-    public func update(to predicateFormat: String, _ args: Any...) {
+    public func updateQuery(to predicateFormat: String, _ args: Any...) {
         _rlmSyncSubscription.update(with: NSPredicate(format: predicateFormat, argumentArray: unwrapOptionals(in: args)))
+    }
+
+    /// :nodoc:
+    @available(*, unavailable, renamed: "updateQuery", message: "SyncSubscription update is unavailable, please use `.updateQuery` instead.")
+    public func update(to predicateFormat: String, _ args: Any...) {
+        fatalError("This API is unavailable, , please use `.updateQuery` instead.")
     }
 
     /**
@@ -116,8 +133,14 @@ import Realm.Private
      - parameter predicate: The predicate with which to filter the objects on the server, which
                             will be used to modify the query.
      */
-    public func update(to predicate: NSPredicate) {
+    public func updateQuery(to predicate: NSPredicate) {
         _rlmSyncSubscription.update(with: predicate)
+    }
+
+    /// :nodoc:
+    @available(*, unavailable, renamed: "updateQuery", message: "SyncSubscription update is unavailable, please use `.updateQuery` instead.")
+    public func update(to predicate: NSPredicate) {
+        fatalError("This API is unavailable, , please use `.updateQuery` instead.")
     }
 }
 
@@ -138,12 +161,12 @@ import Realm.Private
      Creates a `QuerySubscription` for the given type.
 
      - parameter name: Name of the subscription.
-     - parameter query: The query for the subscription.
+     - parameter query: The query for the subscription, if nil it will set the query to all documents for the collection.
      */
-    public init(name: String? = nil, query: @escaping QueryFunction) {
+    public init(name: String? = nil, query: QueryFunction? = nil) {
         self.name = name
         self.className = "\(T.self)"
-        self.predicate = query(Query()).predicate
+        self.predicate = query?(Query()).predicate ?? NSPredicate(format: "TRUEPREDICATE")
     }
 
     /**
@@ -192,15 +215,19 @@ import Realm.Private
 
     /**
      Synchronously performs any transactions (add/remove/update) to the subscription set within the block.
-     This will not wait for the server to acknowledge and see all the data associated with this collection of subscriptions,
-     and will return after committing the subscription transactions.
 
      - parameter block:      The block containing the subscriptions transactions to perform.
      - parameter onComplete: The block called upon synchronization of subscriptions to the server. Otherwise
                              an `Error`describing what went wrong will be returned by the block
      */
+    public func update(_ block: (() -> Void), onComplete: ((Error?) -> Void)? = nil) {
+        rlmSyncSubscriptionSet.update(block, onComplete: onComplete ?? { _ in })
+    }
+
+    /// :nodoc:
+    @available(*, unavailable, renamed: "update", message: "SyncSubscriptionSet write is unavailable, please use `.update` instead.")
     public func write(_ block: (() -> Void), onComplete: ((Error?) -> Void)? = nil) {
-        rlmSyncSubscriptionSet.write(block, onComplete: onComplete ?? { _ in })
+        fatalError("This API is unavailable, , please use `.update` instead.")
     }
 
     /// Returns the current state for the subscription set.
@@ -429,19 +456,18 @@ extension SyncSubscriptionSet: Sequence {
 @available(macOS 10.15, tvOS 13.0, iOS 13.0, watchOS 6.0, *)
 extension SyncSubscriptionSet {
     /**
-     Asynchronously creates and commit a write transaction and updates the subscription set,
-     this will not wait for the server to acknowledge and see all the data associated with this
-     collection of subscription.
+     Creates and commits a transaction, updating the subscription set,
+     this will continue when the server acknowledge and all the data associated with this
+     collection of subscriptions is synced.
 
      - parameter block: The block containing the subscriptions transactions to perform.
 
-     - throws: An `NSError` if the transaction could not be completed successfully.
-               If `block` throws, the function throws the propagated `ErrorType` instead.
+     - throws: An `NSError` if the subscription set state changes to an error state or there is and error while                           committing any changes to the subscriptions.
      */
     @MainActor
-    public func write(_ block: (() -> Void)) async throws {
+    public func update(_ block: (() -> Void)) async throws {
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
-            write(block) { error in
+            update(block) { error in
                 if let error = error {
                     continuation.resume(throwing: error)
                 } else {
@@ -450,5 +476,36 @@ extension SyncSubscriptionSet {
             }
         }
     }
+
+    /// :nodoc:
+    @available(*, unavailable, renamed: "update", message: "SyncSubscriptionSet write is unavailable, please use `.update` instead.")
+    public func write(_ block: (() -> Void)) async throws {
+        fatalError("This API is unavailable, , please use `.update` instead.")
+    }
 }
 #endif // swift(>=5.6)
+
+#if !(os(iOS) && (arch(i386) || arch(arm)))
+@available(macOS 10.15, iOS 13, tvOS 13, watchOS 6, *)
+extension SyncSubscriptionSet {
+    /**
+     Creates and commit a transaction, updating the subscription set,
+     this will return success when the server acknowledge and all the data associated with this
+     collection of subscriptions is synced.
+
+     - parameter block: The block containing the subscriptions transactions to perform.
+     - returns: A publisher that eventually returns `Result.success` or `Error`.
+     */
+    public func updateSubscriptions(_ block: @escaping (() -> Void)) -> Future<Void, Error> {
+        return Future<Void, Error> { promise in
+            update(block) { error in
+                if let error = error {
+                    promise(.failure(error))
+                } else {
+                    promise(.success(()))
+                }
+            }
+        }
+    }
+}
+#endif // canImport(Combine)

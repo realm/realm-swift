@@ -228,12 +228,11 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
 
 #pragma mark - Batch Update subscriptions
 
-- (void)write:(__attribute__((noescape)) void(^)(void))block {
-    return [self write:block onComplete:^(NSError*){}];
+- (void)update:(__attribute__((noescape)) void(^)(void))block {
+    return [self update:block onComplete:^(NSError*){}];
 }
 
-- (void)write:(__attribute__((noescape)) void(^)(void))block
-   onComplete:(void(^)(NSError *))completionBlock {
+- (void)update:(__attribute__((noescape)) void(^)(void))block onComplete:(void(^)(NSError *))completionBlock {
     if (_mutableSubscriptionSet != nil) {
         @throw RLMException(@"Cannot initiate a write transaction on subscription set that is already been updated.");
     }
@@ -369,10 +368,7 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
     if (name != nil) {
         auto iterator = _mutableSubscriptionSet->find([name UTF8String]);
         
-        if (updateExisting) {
-            _mutableSubscriptionSet->insert_or_assign([name UTF8String], query);
-        }
-        else if (iterator == _mutableSubscriptionSet->end()) {
+        if (updateExisting || iterator == _mutableSubscriptionSet->end()) {
             _mutableSubscriptionSet->insert_or_assign([name UTF8String], query);
         }
         else {
