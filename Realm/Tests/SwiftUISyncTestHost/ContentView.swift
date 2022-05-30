@@ -88,6 +88,12 @@ struct MainView: View {
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .background(Color.green)
                         .transition(AnyTransition.move(edge: .leading)).animation(.default)
+                case "async_open_flexible_sync":
+                    AsyncOpenFlexibleSyncView()
+                        .environment(\.realmConfiguration, user!.flexibleSyncConfiguration())
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .background(Color.green)
+                        .transition(AnyTransition.move(edge: .leading)).animation(.default)
                 case "auto_open":
                     AutoOpenView()
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -102,6 +108,12 @@ struct MainView: View {
                 case "auto_open_environment_configuration":
                     AutoOpenPartitionView()
                         .environment(\.realmConfiguration, user!.configuration(partitionValue: user!.id))
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .background(Color.green)
+                        .transition(AnyTransition.move(edge: .leading)).animation(.default)
+                case "auto_open_flexible_sync":
+                    AutoOpenFlexibleSyncView()
+                        .environment(\.realmConfiguration, user!.flexibleSyncConfiguration())
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .background(Color.green)
                         .transition(AnyTransition.move(edge: .leading)).animation(.default)
@@ -123,7 +135,7 @@ struct LoginView: View {
             Button("Log In User 1") {
                 loggingIn()
                 loginHelper.login(email: ProcessInfo.processInfo.environment["email1"]!,
-                                  password: ProcessInfo.processInfo.environment["password"]!,
+                                  password: "password",
                                   completion: { user in
                     didLogin(user)
                 })
@@ -132,7 +144,7 @@ struct LoginView: View {
             Button("Log In User 2") {
                 loggingIn()
                 loginHelper.login(email: ProcessInfo.processInfo.environment["email2"]!,
-                                  password: ProcessInfo.processInfo.environment["password"]!,
+                                  password: "password",
                                   completion: { user in
                     didLogin(user)
                 })
@@ -335,6 +347,124 @@ struct AutoOpenPartitionView: View {
                 ListView()
                     .environment(\.realm, realm)
                     .transition(AnyTransition.move(edge: .leading)).animation(.default)
+            case .error(let error):
+                ErrorView(error: error)
+                    .background(Color.red)
+                    .transition(AnyTransition.move(edge: .trailing)).animation(.default)
+            case .progress(let progress):
+                ProgressView(progress)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(Color.yellow)
+                    .transition(AnyTransition.move(edge: .trailing)).animation(.default)
+            }
+        }
+    }
+}
+
+enum SubscriptionState {
+    case initial
+    case completed
+    case navigate
+}
+
+struct AsyncOpenFlexibleSyncView: View {
+    @State var subscriptionState: SubscriptionState = .initial
+    @AsyncOpen(appId: ProcessInfo.processInfo.environment["app_id"]!,
+               timeout: 2000)
+    var asyncOpen
+
+    var body: some View {
+        VStack {
+            switch asyncOpen {
+            case .connecting:
+                ProgressView()
+            case .waitingForUser:
+                ProgressView("Waiting for user to logged in...")
+            case .open(let realm):
+                switch subscriptionState {
+                case .initial:
+                    ProgressView("Subscribing to Query")
+                        .onAppear {
+                            Task {
+                                do {
+                                    let subs = realm.subscriptions
+                                    try await subs.write {
+                                        subs.append(QuerySubscription<SwiftPerson>(name: "person_age") {
+                                            $0.age > 5 && $0.firstName == ProcessInfo.processInfo.environment["firstName"]!
+                                        })
+                                    }
+                                    subscriptionState = .completed
+                                }
+                            }
+                        }
+                case .completed:
+                    VStack {
+                        Button("Navigate Next View") {
+                            subscriptionState = .navigate
+                        }
+                        .accessibilityIdentifier("show_list_button_view")
+                    }
+                case .navigate:
+                    ListView()
+                        .environment(\.realm, realm)
+                        .transition(AnyTransition.move(edge: .leading)).animation(.default)
+                }
+            case .error(let error):
+                ErrorView(error: error)
+                    .background(Color.red)
+                    .transition(AnyTransition.move(edge: .trailing)).animation(.default)
+            case .progress(let progress):
+                ProgressView(progress)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(Color.yellow)
+                    .transition(AnyTransition.move(edge: .trailing)).animation(.default)
+            }
+        }
+    }
+}
+
+struct AutoOpenFlexibleSyncView: View {
+    @State var subscriptionState: SubscriptionState = .initial
+    @AutoOpen(appId: ProcessInfo.processInfo.environment["app_id"]!,
+              timeout: 2000)
+    var asyncOpen
+
+    var body: some View {
+        VStack {
+            switch asyncOpen {
+            case .connecting:
+                ProgressView()
+            case .waitingForUser:
+                ProgressView("Waiting for user to logged in...")
+            case .open(let realm):
+                switch subscriptionState {
+                case .initial:
+                    ProgressView("Subscribing to Query")
+                        .onAppear {
+                            Task {
+                                do {
+                                    let subs = realm.subscriptions
+                                    try await subs.write {
+                                        subs.append(QuerySubscription<SwiftPerson>(name: "person_age") {
+                                            $0.age > 2 && $0.firstName == ProcessInfo.processInfo.environment["firstName"]!
+                                        })
+                                    }
+                                    subscriptionState = .completed
+                                }
+                            }
+                        }
+                case .completed:
+                    VStack {
+                        Button("Navigate Next View") {
+                            subscriptionState = .navigate
+                        }
+                        .accessibilityIdentifier("show_list_button_view")
+                    }
+                case .navigate:
+                    ListView()
+                        .environment(\.realm, realm)
+                        .transition(AnyTransition.move(edge: .leading)).animation(.default)
+                }
             case .error(let error):
                 ErrorView(error: error)
                     .background(Color.red)

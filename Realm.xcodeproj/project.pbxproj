@@ -461,6 +461,14 @@
 		ACB6FD35273C60CC0009712F /* SyncSubscription.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACB6FD34273C60CC0009712F /* SyncSubscription.swift */; };
 		ACB6FD36273C60FD0009712F /* SwiftFlexibleSyncServerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACB6FD31273C60920009712F /* SwiftFlexibleSyncServerTests.swift */; };
 		ACB6FD37273C61040009712F /* RLMFlexibleSyncServerTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = ACB6FD30273C60920009712F /* RLMFlexibleSyncServerTests.mm */; };
+		ACBD595328364DB0009A664E /* SwiftSyncTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AA5AE961D989BE000ED8C27 /* SwiftSyncTestCase.swift */; };
+		ACBD595428364DCB009A664E /* RLMSyncTestCase.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1AA5AE9B1D98A68E00ED8C27 /* RLMSyncTestCase.mm */; };
+		ACBD595528364DFF009A664E /* RLMChildProcessEnvironment.m in Sources */ = {isa = PBXBuildFile; fileRef = 530BA61326DFA1CB008FC550 /* RLMChildProcessEnvironment.m */; };
+		ACBD5956283652B8009A664E /* RLMTestUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F73BC8B1E3A876600FE80B6 /* RLMTestUtils.m */; };
+		ACBD5957283652D7009A664E /* RLMTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F558C8322C29A02002F0F30 /* RLMTestCase.m */; };
+		ACBD59592836539B009A664E /* RLMServerTestObjects.m in Sources */ = {isa = PBXBuildFile; fileRef = 531F956E279070A800E497F1 /* RLMServerTestObjects.m */; };
+		ACBD595A283653CF009A664E /* RLMMultiProcessTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F558C8522C29A03002F0F30 /* RLMMultiProcessTestCase.m */; };
+		ACBD595B2836541F009A664E /* TestUtils.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3F558C7E22C29A02002F0F30 /* TestUtils.mm */; };
 		ACC6BEE42796B23D006C1728 /* RLMSyncSession.mm in Sources */ = {isa = PBXBuildFile; fileRef = 531F956927906EF300E497F1 /* RLMSyncSession.mm */; };
 		ACC6BEE52796EA23006C1728 /* RLMSyncSubscription_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 53E308C927905794002A8D91 /* RLMSyncSubscription_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		ACC6BEE62796EA78006C1728 /* RLMSyncSubscription.h in Headers */ = {isa = PBXBuildFile; fileRef = 53E308CA27905794002A8D91 /* RLMSyncSubscription.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -2994,8 +3002,16 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AC8847A9268926B500DF4A65 /* RealmServer.swift in Sources */,
+				ACBD595428364DCB009A664E /* RLMSyncTestCase.mm in Sources */,
+				ACBD5957283652D7009A664E /* RLMTestCase.m in Sources */,
+				ACBD595A283653CF009A664E /* RLMMultiProcessTestCase.m in Sources */,
+				ACBD595528364DFF009A664E /* RLMChildProcessEnvironment.m in Sources */,
+				ACBD59592836539B009A664E /* RLMServerTestObjects.m in Sources */,
+				ACBD5956283652B8009A664E /* RLMTestUtils.m in Sources */,
 				AC23487E26FC8619009129F2 /* RLMUser+ObjectServerTests.mm in Sources */,
+				ACBD595B2836541F009A664E /* TestUtils.mm in Sources */,
+				AC8847A9268926B500DF4A65 /* RealmServer.swift in Sources */,
+				ACBD595328364DB0009A664E /* SwiftSyncTestCase.swift in Sources */,
 				AC320BAE268E1F2D0043D484 /* SwiftServerObjects.swift in Sources */,
 				AC88478626888CEE00DF4A65 /* SwiftUISyncTestHostUITests.swift in Sources */,
 			);

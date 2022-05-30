@@ -1067,6 +1067,36 @@ extension SwiftFlexibleSyncServerTests {
     }
 
     @MainActor
+    func testFlexibleSyncAllDocumentsForType() async throws {
+        try await populateFlexibleSyncData { realm in
+            realm.deleteAll() // Remove all objects for a clean state
+            for i in 1...21 {
+                let person = SwiftPerson(firstName: "\(#function)",
+                                         lastName: "lastname_\(i)",
+                                         age: i)
+                realm.add(person)
+            }
+        }
+
+        var config = try await self.flexibleSyncApp.login(credentials: basicCredentials(app: self.flexibleSyncApp)).flexibleSyncConfiguration()
+        config.objectTypes = [SwiftPerson.self, SwiftTypesSyncObject.self]
+        let realm = try await Realm(configuration: config)
+        XCTAssertNotNil(realm)
+        checkCount(expected: 0, realm, SwiftPerson.self)
+
+        let subscriptions = realm.subscriptions
+        XCTAssertNotNil(subscriptions)
+        XCTAssertEqual(subscriptions.count, 0)
+
+        try await subscriptions.update {
+            subscriptions.append(QuerySubscription<SwiftPerson>(name: "person_age_all"))
+        }
+        XCTAssertEqual(subscriptions.state, .complete)
+        XCTAssertEqual(subscriptions.count, 1)
+        checkCount(expected: 21, realm, SwiftPerson.self)
+    }
+
+    @MainActor
     func testFlexibleSyncInitialSubscriptions() async throws {
         try await populateFlexibleSyncData { realm in
             for i in 1...21 {
