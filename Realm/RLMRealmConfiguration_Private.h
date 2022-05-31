@@ -35,7 +35,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, nullable) RLMFlexibleSyncInitialSubscriptionsBlock initialSubscriptions;
 
 // Retrieve the rerunOnOpen flag from the configuration.
-@property (nonatomic) bool rerunsOnOpen;
+@property (nonatomic) bool rerunOnOpen;
 
 // Get the default configuration without copying it
 + (RLMRealmConfiguration *)rawDefaultConfiguration;

@@ -282,7 +282,7 @@ extension Realm {
         internal var initialSubscriptions: ((SyncSubscriptionSet) -> Void)?
 
         /// If `true` Indicates that the initial subscriptions for this realm ...
-        internal var rerunsOnOpen: Bool = false
+        internal var rerunOnOpen: Bool = false
 
         // MARK: Private Methods
 
@@ -326,7 +326,7 @@ extension Realm {
             }
 
             configuration.initialSubscriptions = ObjectiveCSupport.convert(object: initialSubscriptions)
-            configuration.rerunsOnOpen = rerunsOnOpen
+            configuration.rerunOnOpen = rerunOnOpen
 
             return configuration
         }
@@ -360,7 +360,7 @@ extension Realm {
             }
 
             configuration.initialSubscriptions = ObjectiveCSupport.convert(object: rlmConfiguration.initialSubscriptions)
-            configuration.rerunsOnOpen = rlmConfiguration.rerunsOnOpen
+            configuration.rerunOnOpen = rlmConfiguration.rerunOnOpen
 
             return configuration
         }

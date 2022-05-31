@@ -118,13 +118,13 @@ using namespace realm;
 }
 
 - (RLMRealmConfiguration *)flexibleSyncConfigurationWithInitialSubscriptions:(nullable RLMFlexibleSyncInitialSubscriptionsBlock)initialSubscriptions
-                                        rerunsOnOpen:(BOOL)rerunsOnOpen {
+                                        rerunOnOpen:(BOOL)rerunOnOpen {
     auto syncConfig = [[RLMSyncConfiguration alloc] initWithUser:self
                                                       stopPolicy:RLMSyncStopPolicyAfterChangesUploaded
                                               enableFlexibleSync:true];
     RLMRealmConfiguration *config = [[RLMRealmConfiguration alloc] init];
     config.initialSubscriptions = initialSubscriptions;
-    config.rerunsOnOpen = rerunsOnOpen;
+    config.rerunOnOpen = rerunOnOpen;
     config.syncConfiguration = syncConfig;
     return config;
 }

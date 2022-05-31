@@ -482,7 +482,7 @@ static RLMRealm *getCachedRealm(RLMRealmConfiguration *configuration, void *cach
     bool isFirstOpen = (cachedRealm == nil) ? true : false;
 
     if (auto realm = cachedRealm) {
-        [RLMRealm subscribeToInitialSubscriptionsFromRealm:realm initialSubscriptions:configuration.initialSubscriptions rerunOnOpen:configuration.rerunsOnOpen isFirstOpen:isFirstOpen];
+        [RLMRealm subscribeToInitialSubscriptionsFromRealm:realm initialSubscriptions:configuration.initialSubscriptions rerunOnOpen:configuration.rerunOnOpen isFirstOpen:isFirstOpen];
         return RLMAutorelease(realm);
     }
 
@@ -615,7 +615,7 @@ static RLMRealm *getCachedRealm(RLMRealmConfiguration *configuration, void *cach
         realm->_realm->m_binding_context->realm = realm->_realm;
     }
 
-    [RLMRealm subscribeToInitialSubscriptionsFromRealm:realm initialSubscriptions:configuration.initialSubscriptions rerunOnOpen:configuration.rerunsOnOpen isFirstOpen:isFirstOpen];
+    [RLMRealm subscribeToInitialSubscriptionsFromRealm:realm initialSubscriptions:configuration.initialSubscriptions rerunOnOpen:configuration.rerunOnOpen isFirstOpen:isFirstOpen];
 
     return RLMAutorelease(realm);
 }
