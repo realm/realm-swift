@@ -353,7 +353,6 @@ extension Realm {
             configuration.customSchema = rlmConfiguration.customSchema
             configuration.disableFormatUpgrade = rlmConfiguration.disableFormatUpgrade
             configuration.maximumNumberOfActiveVersions = rlmConfiguration.maximumNumberOfActiveVersions
-
             if let eventConfiguration = rlmConfiguration.eventConfiguration {
                 configuration.eventConfiguration = EventConfiguration(metadata: eventConfiguration.metadata,
                                                                       syncUser: eventConfiguration.syncUser,

@@ -35,6 +35,8 @@ NS_ASSUME_NONNULL_BEGIN
 typedef BOOL (^RLMShouldCompactOnLaunchBlock)(NSUInteger totalBytes, NSUInteger bytesUsed);
 
 /**
+ A block which receives a subscription set instance, that can be used to add an initial set of subscriptions which will be executed
+ when the Realm is first opened.
  */
 typedef void(^RLMFlexibleSyncInitialSubscriptionsBlock)(RLMSyncSubscriptionSet * _Nonnull subscriptions);
 
