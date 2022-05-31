@@ -988,7 +988,7 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
             sleep(1) // wait until state is on complete state
         }
         XCTAssertEqual(subscriptions.state, .complete)
-        
+
         waitForDownloads(for: realm)
         checkCount(expected: 11, realm, SwiftPerson.self)
     }
@@ -1191,12 +1191,14 @@ extension SwiftFlexibleSyncServerTests {
     }
 
     @MainActor
-    func testFlexibleSyncInitialSubscriptionsRerunOnOpenSameQuery() async throws {
+    func testFlexibleSyncInitialSubscriptionsRerunOnOpenNamedQuery() async throws {
         let user = try await logInUser(for: basicCredentials(app: self.flexibleSyncApp), app: self.flexibleSyncApp)
         var config = user.flexibleSyncConfiguration(initialSubscriptions: { subscriptions in
-            subscriptions.append(QuerySubscription<SwiftPerson>(name: "person_age_10") {
-                $0.age > 10 && $0.firstName == "\(#function)"
-            })
+            if subscriptions.first(named: "person_age_10") != nil {
+                subscriptions.append(QuerySubscription<SwiftPerson>(name: "person_age_10") {
+                    $0.age > 10 && $0.firstName == "\(#function)"
+                })
+            }
         }, rerunOnOpen: true)
 
         if config.objectTypes == nil {
@@ -1213,7 +1215,7 @@ extension SwiftFlexibleSyncServerTests {
     }
 
     @MainActor
-    func testFlexibleSyncInitialSubscriptionsRerunOnOpen() async throws {
+    func testFlexibleSyncInitialSubscriptionsRerunOnOpenUnnamedQuery() async throws {
         try await populateFlexibleSyncData { realm in
             for i in 1...30 {
                 let object = SwiftTypesSyncObject()
@@ -1227,7 +1229,7 @@ extension SwiftFlexibleSyncServerTests {
         let user = try await logInUser(for: basicCredentials(app: self.flexibleSyncApp), app: self.flexibleSyncApp)
         var isFirstOpen = true
         var config = user.flexibleSyncConfiguration(initialSubscriptions: { subscriptions in
-            subscriptions.append(QuerySubscription<SwiftTypesSyncObject>(name: "current_date") {
+            subscriptions.append(QuerySubscription<SwiftTypesSyncObject>(query: {
                 let date = isFirstOpen ? Calendar.current.date(
                     byAdding: .hour,
                     value: -10,
@@ -1236,22 +1238,23 @@ extension SwiftFlexibleSyncServerTests {
                         value: -20,
                         to: Date())
                 isFirstOpen = false
-                return( $0.dateCol < Date() && $0.dateCol > date!)
-            })
+                return $0.dateCol < Date() && $0.dateCol > date!
+            }))
         }, rerunOnOpen: true)
 
         if config.objectTypes == nil {
             config.objectTypes = [SwiftPerson.self,
                                   SwiftTypesSyncObject.self]
         }
-        let realm = try await Realm(configuration: config, downloadBeforeOpen: .once)
+        let realm = try await Realm(configuration: config, downloadBeforeOpen: .always)
         XCTAssertNotNil(realm)
         XCTAssertEqual(realm.subscriptions.count, 1)
         checkCount(expected: 9, realm, SwiftTypesSyncObject.self)
 
-        let realm2 = try await Realm(configuration: config, downloadBeforeOpen: .once)
+        let realm2 = try await Realm(configuration: config, downloadBeforeOpen: .always)
         XCTAssertNotNil(realm2)
         XCTAssertEqual(realm.subscriptions.count, 2)
+        XCTAssertEqual(realm2.subscriptions.count, 2)
         checkCount(expected: 19, realm2, SwiftTypesSyncObject.self)
     }
 }
