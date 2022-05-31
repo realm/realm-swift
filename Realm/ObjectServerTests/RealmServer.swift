@@ -880,7 +880,6 @@ public class RealmServer: NSObject {
             ]]
         ]
         _ = rules.post(userDataRule)
-
         app.customUserData.patch(on: group, [
             "mongo_service_id": serviceId,
             "enabled": true,

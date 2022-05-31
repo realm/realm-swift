@@ -316,7 +316,6 @@ extension Realm {
             configuration.setCustomSchemaWithoutCopying(self.customSchema)
             configuration.disableFormatUpgrade = self.disableFormatUpgrade
             configuration.maximumNumberOfActiveVersions = self.maximumNumberOfActiveVersions ?? 0
-
             if let eventConfiguration = eventConfiguration {
                 let rlmConfig = RLMEventConfiguration()
                 rlmConfig.partitionPrefix = eventConfiguration.partitionPrefix

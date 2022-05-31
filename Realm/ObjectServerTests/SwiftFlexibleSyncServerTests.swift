@@ -974,15 +974,23 @@ class SwiftAsyncFlexibleSyncTests: SwiftSyncTestCase {
 
 @available(macOS 12.0, *)
 extension SwiftFlexibleSyncServerTests {
-    @MainActor
-    private func populateFlexibleSyncData(_ block: @escaping (Realm) -> Void) async throws {
+    func flexibleSyncConfig() async throws -> Realm.Configuration {
         var config = (try await self.flexibleSyncApp.login(credentials: .anonymous)).flexibleSyncConfiguration()
         if config.objectTypes == nil {
             config.objectTypes = [SwiftPerson.self,
                                   SwiftTypesSyncObject.self]
         }
-        let realm = try await Realm(configuration: config)
+        return config
+    }
 
+    func flexibleSyncRealm() async throws -> Realm {
+        let realm = try await Realm(configuration: flexibleSyncConfig())
+        return realm
+    }
+
+    @MainActor
+    private func populateFlexibleSyncData(_ block: @escaping (Realm) -> Void) async throws {
+        let realm = try await flexibleSyncRealm()
         let subscriptions = realm.subscriptions
         try await subscriptions.update {
             subscriptions.append(QuerySubscription<SwiftPerson> {
@@ -1009,9 +1017,7 @@ extension SwiftFlexibleSyncServerTests {
             }
         }
 
-        var config = try await self.flexibleSyncApp.login(credentials: basicCredentials(app: self.flexibleSyncApp)).flexibleSyncConfiguration()
-        config.objectTypes = [SwiftPerson.self, SwiftTypesSyncObject.self]
-        let realm = try await Realm(configuration: config)
+        let realm = try await flexibleSyncRealm()
         XCTAssertNotNil(realm)
         checkCount(expected: 0, realm, SwiftPerson.self)
 
@@ -1030,10 +1036,7 @@ extension SwiftFlexibleSyncServerTests {
 
     @MainActor
     func testStates() async throws {
-        var config = (try await self.flexibleSyncApp.login(credentials: .anonymous))
-            .flexibleSyncConfiguration()
-        config.objectTypes = [SwiftPerson.self, SwiftTypesSyncObject.self]
-        let realm = try await Realm(configuration: config)
+        let realm = try await flexibleSyncRealm()
         XCTAssertNotNil(realm)
 
         let subscriptions = realm.subscriptions
@@ -1078,9 +1081,7 @@ extension SwiftFlexibleSyncServerTests {
             }
         }
 
-        var config = try await self.flexibleSyncApp.login(credentials: basicCredentials(app: self.flexibleSyncApp)).flexibleSyncConfiguration()
-        config.objectTypes = [SwiftPerson.self, SwiftTypesSyncObject.self]
-        let realm = try await Realm(configuration: config)
+        let realm = try await flexibleSyncRealm()
         XCTAssertNotNil(realm)
         checkCount(expected: 0, realm, SwiftPerson.self)
 
@@ -1094,6 +1095,15 @@ extension SwiftFlexibleSyncServerTests {
         XCTAssertEqual(subscriptions.state, .complete)
         XCTAssertEqual(subscriptions.count, 1)
         checkCount(expected: 21, realm, SwiftPerson.self)
+    }
+
+    @MainActor
+    func testFlexibleSyncNotInitialSubscriptions() async throws {
+        let config = try await flexibleSyncConfig()
+        let realm = try await Realm(configuration: config, downloadBeforeOpen: .once)
+        XCTAssertNotNil(realm)
+
+        XCTAssertEqual(realm.subscriptions.count, 0)
     }
 
     @MainActor
