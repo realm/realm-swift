@@ -261,7 +261,7 @@ static RLMAsyncOpenTask *openAsync(RLMRealmConfiguration *configuration,
                             initialSubscriptions:(nullable RLMFlexibleSyncInitialSubscriptionsBlock)initialSubscriptions
                                      rerunOnOpen:(BOOL)rerunOnOpen
                                      isFirstOpen:(bool)isFirstOpen {
-    if (realm.configuration.config.sync_config->flx_sync_requested && initialSubscriptions) {
+    if (realm.configuration.config.sync_config && realm.configuration.config.sync_config->flx_sync_requested && initialSubscriptions) {
         if (isFirstOpen || rerunOnOpen) {
             RLMSyncSubscriptionSet *subscriptions = realm.subscriptions;
             [subscriptions update:^{
