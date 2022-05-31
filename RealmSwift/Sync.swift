@@ -927,7 +927,6 @@ extension User {
      a realm with a flexible sync configuration, you won't be able to open a realm with a PBS configuration
      and the other way around.
 
-     The block to invoke when notifications are available.
      - parameter initialSubscriptions: A block which receives a subscription set instance, that can be used to add an
                                        initial set of subscriptions which will be executed when the Realm is first opened.
      - parameter rerunOnOpen:          If true, allows to run the initial set of subscriptions specified, on every realm open.
@@ -935,7 +934,7 @@ extension User {
      @return A `Realm.Configuration` instance with a flexible sync configuration.
      */
     public func flexibleSyncConfiguration(initialSubscriptions: ((SyncSubscriptionSet) -> Void)? = nil, rerunOnOpen: Bool = false) -> Realm.Configuration {
-        let config = self.__flexibleSyncConfiguration(initialSubscriptions: ObjectiveCSupport.convert(object: initialSubscriptions), rerunOnOpen: rerunOnOpen)
+        let config = self.__flexibleSyncConfiguration(initialSubscriptions: ObjectiveCSupport.convert(block: initialSubscriptions)!, rerunOnOpen: rerunOnOpen)
         return ObjectiveCSupport.convert(object: config)
     }
 }

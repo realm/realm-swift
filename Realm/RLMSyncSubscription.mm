@@ -247,10 +247,10 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
         NSError *err = [[NSError alloc] initWithDomain:RLMFlexibleSyncErrorDomain code:RLMFlexibleSyncErrorCommitSubscriptionSetError userInfo:@{@"reason":@(error.what())}];
         return completionBlock(err);
     }
-    [self waitForSynchronisationOnComplete:completionBlock];
+    [self waitForSynchronizationWithBlock:completionBlock];
 }
 
-- (void)waitForSynchronisationOnComplete:(void(^)(NSError *))completionBlock {
+- (void)waitForSynchronizationWithBlock:(void(^)(NSError *))completionBlock {
     _subscriptionSet->get_state_change_notification(realm::sync::SubscriptionSet::State::Complete)
         .get_async([completionBlock](realm::StatusWith<realm::sync::SubscriptionSet::State> state) mutable noexcept {
             if (state.is_ok()) {

@@ -281,7 +281,7 @@ extension Realm {
         /// Callback for adding subscriptions to the initialisation of the realm
         internal var initialSubscriptions: ((SyncSubscriptionSet) -> Void)?
 
-        /// If `true` Indicates that the initial subscriptions for this realm ...
+        /// If `true` Indicates that the `initialsubscriptions` will run on every Realm open.
         internal var rerunOnOpen: Bool = false
 
         // MARK: Private Methods
@@ -325,7 +325,7 @@ extension Realm {
                 configuration.eventConfiguration = rlmConfig
             }
 
-            configuration.initialSubscriptions = ObjectiveCSupport.convert(object: initialSubscriptions)
+            configuration.initialSubscriptions = ObjectiveCSupport.convert(block: initialSubscriptions)
             configuration.rerunOnOpen = rerunOnOpen
 
             return configuration
@@ -359,7 +359,7 @@ extension Realm {
                                                                       partitionPrefix: eventConfiguration.partitionPrefix)
             }
 
-            configuration.initialSubscriptions = ObjectiveCSupport.convert(object: rlmConfiguration.initialSubscriptions)
+            configuration.initialSubscriptions = ObjectiveCSupport.convert(block: rlmConfiguration.initialSubscriptions)
             configuration.rerunOnOpen = rlmConfiguration.rerunOnOpen
 
             return configuration

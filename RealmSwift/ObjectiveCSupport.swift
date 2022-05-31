@@ -204,23 +204,23 @@ import Realm
         }
     }
 
-    ///
-    public static func convert(object: ((SyncSubscriptionSet) -> Void)?) -> RLMFlexibleSyncInitialSubscriptionsBlock? {
-        guard let object = object else {
+    /// Converts a swift block receiving a `SyncSubscriptionSet`to a RLMFlexibleSyncInitialSubscriptionsBlock receiving a `RLMSyncSubscriptionSet`.
+    public static func convert(block: ((SyncSubscriptionSet) -> Void)?) -> RLMFlexibleSyncInitialSubscriptionsBlock? {
+        guard let block = block else {
             return nil
         }
         return { subscriptionSet in
-            return object(SyncSubscriptionSet(subscriptionSet))
+            return block(SyncSubscriptionSet(subscriptionSet))
         }
     }
 
-    ///
-    public static func convert(object: RLMFlexibleSyncInitialSubscriptionsBlock?) -> ((SyncSubscriptionSet) -> Void)? {
-        guard let object = object else {
+    /// Converts a block receiving a `RLMSyncSubscriptionSet`to a swift block receiving a `SyncSubscriptionSet`.
+    public static func convert(block: RLMFlexibleSyncInitialSubscriptionsBlock?) -> ((SyncSubscriptionSet) -> Void)? {
+        guard let block = block else {
             return nil
         }
         return { subscriptionSet in
-            return object(subscriptionSet.rlmSyncSubscriptionSet)
+            return block(subscriptionSet.rlmSyncSubscriptionSet)
         }
     }
 }

@@ -31,10 +31,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSString *pathOnDisk;
 @property (nonatomic, retain, nullable) RLMEventConfiguration *eventConfiguration;
 
-// Retrieves the initial subscriptions block from the configuration.
+// Flexible Sync
 @property (nonatomic, nullable) RLMFlexibleSyncInitialSubscriptionsBlock initialSubscriptions;
-
-// Retrieve the rerunOnOpen flag from the configuration.
 @property (nonatomic) bool rerunOnOpen;
 
 // Get the default configuration without copying it

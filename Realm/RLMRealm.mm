@@ -258,16 +258,19 @@ static RLMAsyncOpenTask *openAsync(RLMRealmConfiguration *configuration,
 }
 
 + (void)subscribeToInitialSubscriptionsFromRealm:(RLMRealm *)realm
-                            initialSubscriptions:(nullable RLMFlexibleSyncInitialSubscriptionsBlock)initialSubscriptions
-                                     rerunOnOpen:(BOOL)rerunOnOpen
+                                   configuration:(RLMRealmConfiguration *)configuration
                                      isFirstOpen:(bool)isFirstOpen {
-    if (realm.configuration.config.sync_config && realm.configuration.config.sync_config->flx_sync_requested && initialSubscriptions) {
-        if (isFirstOpen || rerunOnOpen) {
+    if (configuration.config.sync_config && configuration.syncConfiguration.enableFlexibleSync && configuration.initialSubscriptions) {
+#if REALM_ENABLE_SYNC
+        if (isFirstOpen || configuration.rerunOnOpen) {
             RLMSyncSubscriptionSet *subscriptions = realm.subscriptions;
             [subscriptions update:^{
-                initialSubscriptions(subscriptions);
+                configuration.initialSubscriptions(subscriptions);
             }];
         }
+#else
+    @throw RLMException(@"Realm was not compiled with sync enabled");
+#endif
     }
 }
 
@@ -304,7 +307,7 @@ static RLMAsyncOpenTask *openAsync(RLMRealmConfiguration *configuration,
 
                     // In case of setting an initial subscription while opening the realm, we have to wait for the subscription to complete and bootstrap data before returning the realm.
                     if (localRealm.configuration.syncConfiguration.enableFlexibleSync && localRealm.subscriptions.state == RLMSyncSubscriptionStatePending) {
-                        [localRealm.subscriptions waitForSynchronisationOnComplete:^(NSError *subscriptionError) {
+                        [localRealm.subscriptions waitForSynchronizationWithBlock:^(NSError *subscriptionError) {
                             callback(localRealm, subscriptionError);
                         }];
                     } else {
@@ -480,7 +483,7 @@ static RLMRealm *getCachedRealm(RLMRealmConfiguration *configuration, void *cach
     bool isFirstOpen = (cachedRealm == nil) ? true : false;
 
     if (auto realm = cachedRealm) {
-        [RLMRealm subscribeToInitialSubscriptionsFromRealm:realm initialSubscriptions:configuration.initialSubscriptions rerunOnOpen:configuration.rerunOnOpen isFirstOpen:isFirstOpen];
+        [RLMRealm subscribeToInitialSubscriptionsFromRealm:realm configuration:configuration isFirstOpen:isFirstOpen];
         return RLMAutorelease(realm);
     }
 
@@ -613,7 +616,7 @@ static RLMRealm *getCachedRealm(RLMRealmConfiguration *configuration, void *cach
         realm->_realm->m_binding_context->realm = realm->_realm;
     }
 
-    [RLMRealm subscribeToInitialSubscriptionsFromRealm:realm initialSubscriptions:configuration.initialSubscriptions rerunOnOpen:configuration.rerunOnOpen isFirstOpen:isFirstOpen];
+    [RLMRealm subscribeToInitialSubscriptionsFromRealm:realm configuration:configuration isFirstOpen:isFirstOpen];
 
     return RLMAutorelease(realm);
 }
