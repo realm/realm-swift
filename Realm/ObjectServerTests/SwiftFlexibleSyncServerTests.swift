@@ -1133,7 +1133,7 @@ extension SwiftFlexibleSyncServerTests {
     @MainActor
     func testFlexibleSyncNotInitialSubscriptions() async throws {
         let config = try await flexibleSyncConfig()
-        let realm = try await Realm(configuration: config, downloadBeforeOpen: .once)
+        let realm = try await Realm(configuration: config, downloadBeforeOpen: .always)
         XCTAssertNotNil(realm)
 
         XCTAssertEqual(realm.subscriptions.count, 0)
