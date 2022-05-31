@@ -8,7 +8,7 @@ x.y.z Release notes (yyyy-MM-dd)
    }
 ```
 * Add Combine API support for flexible sync beta.
-* Added an `initialSubscriptions` parameter when retrieving the flexible sync configuration from a user, 
+* Add an `initialSubscriptions` parameter when retrieving the flexible sync configuration from a user, 
   which allows to specify a subscription update block, to bootstrap a set of flexible sync subscriptions 
   when the Realm is first opened.
   There is an additional optional parameter flag `rerunOnOpen`, which allows to run this initial 
