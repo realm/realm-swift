@@ -1012,7 +1012,7 @@ class SwiftAsyncFlexibleSyncTests: SwiftSyncTestCase {
 @available(macOS 12.0, *)
 extension SwiftFlexibleSyncServerTests {
     func flexibleSyncConfig() async throws -> Realm.Configuration {
-        var config = (try await self.flexibleSyncApp.login(credentials: .anonymous)).flexibleSyncConfiguration()
+        var config = (try await self.flexibleSyncApp.login(credentials: basicCredentials(app: flexibleSyncApp))).flexibleSyncConfiguration()
         if config.objectTypes == nil {
             config.objectTypes = [SwiftPerson.self,
                                   SwiftTypesSyncObject.self]
@@ -1194,7 +1194,7 @@ extension SwiftFlexibleSyncServerTests {
     func testFlexibleSyncInitialSubscriptionsRerunOnOpenNamedQuery() async throws {
         let user = try await logInUser(for: basicCredentials(app: self.flexibleSyncApp), app: self.flexibleSyncApp)
         var config = user.flexibleSyncConfiguration(initialSubscriptions: { subscriptions in
-            if subscriptions.first(named: "person_age_10") != nil {
+            if subscriptions.first(named: "person_age_10") == nil {
                 subscriptions.append(QuerySubscription<SwiftPerson>(name: "person_age_10") {
                     $0.age > 10 && $0.firstName == "\(#function)"
                 })
