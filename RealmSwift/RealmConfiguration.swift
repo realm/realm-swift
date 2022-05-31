@@ -278,7 +278,7 @@ extension Realm {
 
         // MARK: Flexible Sync
 
-        /// Callback for adding subscriptions to the initialisation of the realm
+        /// Callback for adding subscriptions to the initialization of the Realm
         internal var initialSubscriptions: ((SyncSubscriptionSet) -> Void)?
 
         /// If `true` Indicates that the initial subscriptions for this realm ...
