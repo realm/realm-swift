@@ -1033,10 +1033,10 @@
     XCTAssertNil(error);
 
     RLMAppConfiguration *appConfig = [[RLMAppConfiguration alloc] initWithBaseURL:@"http://localhost:9090"
-                                                                     transport:[AsyncOpenConnectionTimeoutTransport new]
-                                                                  localAppName:nil
-                                                               localAppVersion:nil
-                                                       defaultRequestTimeoutMS:60];
+                                                                        transport:[AsyncOpenConnectionTimeoutTransport new]
+                                                                     localAppName:nil
+                                                                  localAppVersion:nil
+                                                          defaultRequestTimeoutMS:60];
     RLMApp *app = [RLMApp appWithId:self.flexibleSyncAppId configuration:appConfig];
     RLMUser *user = [self logInUserForCredentials:[RLMCredentials anonymousCredentials] app:app];
 
@@ -1068,6 +1068,8 @@
         [ex fulfill];
     }];
     [self waitForExpectationsWithTimeout:10.0 handler:nil];
+
+    [proxy stop];
 }
 
 - (void)testFlexibleSyncInitialSubscriptionThrowsError {
@@ -1077,8 +1079,8 @@
                                               app:self.flexibleSyncApp];
 
     RLMRealmConfiguration *config = [user flexibleSyncConfigurationWithInitialSubscriptions:^(RLMSyncSubscriptionSet *subscriptions) {
-        RLMSyncSubscription *subscription = [subscriptions subscriptionWithName:@"object_strCol"];        [subscriptions addSubscriptionWithClassName:UUIDPrimaryKeyObject.className
-                                                                                                                                                where:@"strCol == %@", @"Tom"];
+        [subscriptions addSubscriptionWithClassName:UUIDPrimaryKeyObject.className
+                                              where:@"strCol == %@", @"Tom"];
     } rerunOnOpen:false];
     config.objectClasses = @[UUIDPrimaryKeyObject.self];
     XCTestExpectation *ex = [self expectationWithDescription:@"download-realm"];
@@ -1087,7 +1089,7 @@
                                 callback:^(RLMRealm *realm, NSError *error) {
         XCTAssertNotNil(error);
         XCTAssertEqual(error.code, 2);
-        XCTAssertEqual(error.domain, @"io.realm.sync.flx"); // This is a flexible sync error when the query property is not a queryable field, realm is opened but the subscription could not be completed.
+        XCTAssertTrue([error.domain isEqualToString: @"io.realm.sync.flx"]); // This is a flexible sync error when the query property is not a queryable field, realm is opened but the subscription could not be completed.
         XCTAssertNotNil(realm);
 
         [ex fulfill];

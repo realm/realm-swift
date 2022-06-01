@@ -153,13 +153,15 @@ NS_ASSUME_NONNULL_BEGIN
  and the other way around.
 
  @param initialSubscriptions A block which receives a subscription set instance, that can be
-                            used to add an initial set of subscriptions which will be executed
-                            when the Realm is first opened.
+                             used to add an initial set of subscriptions which will be executed
+                             when the Realm is first opened.
  @param rerunOnOpen If true, allows to run the initial set of subscriptions specified, on every realm open.
+                    This can be used to re-run dynamic time ranges and other queries that require a
+                    re-computation of a static variable.
 
  @return A `RLMRealmConfiguration` instance with a flexible sync configuration.
  */
-- (RLMRealmConfiguration *)flexibleSyncConfigurationWithInitialSubscriptions:(nullable RLMFlexibleSyncInitialSubscriptionsBlock)initialSubscriptions
+- (RLMRealmConfiguration *)flexibleSyncConfigurationWithInitialSubscriptions:(RLMFlexibleSyncInitialSubscriptionsBlock)initialSubscriptions
                                                                  rerunOnOpen:(BOOL)rerunOnOpen NS_REFINED_FOR_SWIFT;
 
 #pragma mark - Sessions

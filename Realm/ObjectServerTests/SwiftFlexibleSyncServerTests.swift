@@ -1240,7 +1240,7 @@ extension SwiftFlexibleSyncServerTests {
         }, rerunOnOpen: true)
 
         if config.objectTypes == nil {
-            config.objectTypes = [SwiftTypesSyncObject.self]
+            config.objectTypes = [SwiftTypesSyncObject.self, SwiftPerson.self]
         }
         let realm = try await Realm(configuration: config, downloadBeforeOpen: .always)
         XCTAssertNotNil(realm)

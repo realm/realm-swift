@@ -117,7 +117,7 @@ using namespace realm;
     return config;
 }
 
-- (RLMRealmConfiguration *)flexibleSyncConfigurationWithInitialSubscriptions:(nullable RLMFlexibleSyncInitialSubscriptionsBlock)initialSubscriptions
+- (RLMRealmConfiguration *)flexibleSyncConfigurationWithInitialSubscriptions:(RLMFlexibleSyncInitialSubscriptionsBlock)initialSubscriptions
                                                                  rerunOnOpen:(BOOL)rerunOnOpen {
     auto syncConfig = [[RLMSyncConfiguration alloc] initWithUser:self
                                                       stopPolicy:RLMSyncStopPolicyAfterChangesUploaded
