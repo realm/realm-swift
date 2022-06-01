@@ -20,7 +20,7 @@ import SwiftUI
 import AuthenticationServices
 import RealmSwift
 
-/// Your Atlas Device Sync Realm App ID
+/// Your Atlas Device Sync app ID
 let appId = "your-app-id"
 
 struct ContentView: View {

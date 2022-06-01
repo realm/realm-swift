@@ -43,7 +43,7 @@ extern NSString *const RLMSyncErrorDomain;
 extern NSString *const RLMSyncAuthErrorDomain;
 
 /**
-The error domain string for all SDK errors related to the Realm
+The error domain string for all SDK errors related to the Atlas Device Sync
 endpoint.
 */
 extern NSString *const RLMAppErrorDomain;

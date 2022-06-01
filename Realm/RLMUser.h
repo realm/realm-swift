@@ -159,7 +159,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  The custom data of the user.
- This is configured in your Atlas Realm App.
+ This is configured in your Atlas Device Sync app.
  */
 @property (nonatomic, readonly) NSDictionary *customData NS_REFINED_FOR_SWIFT;
 
@@ -197,7 +197,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)removeWithCompletion:(RLMUserOptionalErrorBlock)completion;
 
 /**
- Permanently deletes this user from your Atlas Realm app.
+ Permanently deletes this user from your Atlas Device Sync app.
 
  The users state will be set to `Removed` and the session will be destroyed.
  If the delete request fails, the local authentication state will be untouched.
