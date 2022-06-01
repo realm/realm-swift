@@ -1,6 +1,7 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
+* Updated naming and links for documentation.
 * Allow adding a subscription querying for all documents of a type in swift for flexible sync.
 ```
    try await subscriptions.update {
