@@ -56,7 +56,8 @@ NS_ASSUME_NONNULL_BEGIN
                            predicate:(NSPredicate *)predicate
                       updateExisting:(BOOL)updateExisting;
 
-- (void)waitForSynchronizationWithBlock:(void(^)(NSError *))completionBlock;
+- (void)waitForSynchronizationForQueue:(nullable dispatch_queue_t)queue
+                       completionBlock:(void(^)(NSError *))completionBlock;
 
 - (RLMSyncSubscriptionEnumerator *)fastEnumerator;
 

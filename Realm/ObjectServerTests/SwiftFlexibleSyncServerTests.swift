@@ -1158,8 +1158,7 @@ extension SwiftFlexibleSyncServerTests {
         })
 
         if config.objectTypes == nil {
-            config.objectTypes = [SwiftPerson.self,
-                                  SwiftTypesSyncObject.self]
+            config.objectTypes = [SwiftPerson.self]
         }
         let realm = try await Realm(configuration: config, downloadBeforeOpen: .once)
         XCTAssertNotNil(realm)
@@ -1178,8 +1177,7 @@ extension SwiftFlexibleSyncServerTests {
         })
 
         if config.objectTypes == nil {
-            config.objectTypes = [SwiftPerson.self,
-                                  SwiftTypesSyncObject.self]
+            config.objectTypes = [SwiftPerson.self]
         }
         let realm = try await Realm(configuration: config, downloadBeforeOpen: .once)
         XCTAssertNotNil(realm)
@@ -1202,8 +1200,7 @@ extension SwiftFlexibleSyncServerTests {
         }, rerunOnOpen: true)
 
         if config.objectTypes == nil {
-            config.objectTypes = [SwiftPerson.self,
-                                  SwiftTypesSyncObject.self]
+            config.objectTypes = [SwiftPerson.self]
         }
         let realm = try await Realm(configuration: config, downloadBeforeOpen: .once)
         XCTAssertNotNil(realm)
@@ -1243,8 +1240,7 @@ extension SwiftFlexibleSyncServerTests {
         }, rerunOnOpen: true)
 
         if config.objectTypes == nil {
-            config.objectTypes = [SwiftPerson.self,
-                                  SwiftTypesSyncObject.self]
+            config.objectTypes = [SwiftTypesSyncObject.self]
         }
         let realm = try await Realm(configuration: config, downloadBeforeOpen: .always)
         XCTAssertNotNil(realm)
@@ -1256,6 +1252,30 @@ extension SwiftFlexibleSyncServerTests {
         XCTAssertEqual(realm.subscriptions.count, 2)
         XCTAssertEqual(realm2.subscriptions.count, 2)
         checkCount(expected: 19, realm2, SwiftTypesSyncObject.self)
+    }
+
+    @MainActor
+    func testFlexibleSyncInitialSubscriptionsThrows() async throws {
+        let user = try await logInUser(for: basicCredentials(app: self.flexibleSyncApp), app: self.flexibleSyncApp)
+        var config = user.flexibleSyncConfiguration(initialSubscriptions: { subscriptions in
+            if subscriptions.first(named: "person_age_10") == nil {
+                subscriptions.append(QuerySubscription<SwiftTypesSyncObject>(query: {
+                    $0.uuidCol == UUID()
+                }))
+            }
+        })
+
+        if config.objectTypes == nil {
+            config.objectTypes = [SwiftTypesSyncObject.self, SwiftPerson.self]
+        }
+        do {
+           _ = try await Realm(configuration: config, downloadBeforeOpen: .once)
+        } catch {
+            XCTAssertNotNil(error)
+            let nsError = error as NSError
+            XCTAssertEqual(nsError.code, 2)
+            XCTAssertEqual(nsError.domain, "io.realm.sync.flx")
+        }
     }
 }
 #endif // canImport(_Concurrency)

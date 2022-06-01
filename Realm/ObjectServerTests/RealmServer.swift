@@ -747,8 +747,8 @@ public class RealmServer: NSObject {
             throw URLError(.badServerResponse)
         }
 
-//         Creating the schema is a two-step process where we first add all the
-//         objects with their properties to them so that we can add relationships
+        // Creating the schema is a two-step process where we first add all the
+        // objects with their properties to them so that we can add relationships
         let schema = ObjectiveCSupport.convert(object: RLMSchema.shared())
         let syncTypes: [ObjectSchema]
         let partitionKeyType: String?
