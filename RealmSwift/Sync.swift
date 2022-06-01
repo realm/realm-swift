@@ -948,7 +948,7 @@ extension User {
     public func flexibleSyncConfiguration(initialSubscriptions: ((SyncSubscriptionSet) -> Void)? = nil, rerunOnOpen: Bool = false) -> Realm.Configuration {
         let config: RLMRealmConfiguration
         if let initialSubscriptions = initialSubscriptions {
-            config = self.__flexibleSyncConfiguration(initialSubscriptions: ObjectiveCSupport.convert(block: initialSubscriptions), rerunOnOpen: rerunOnOpen)
+            config = self.__flexibleSyncConfiguration(initialSubscriptions: ObjectiveCSupport.convert(block: initialSubscriptions)!, rerunOnOpen: rerunOnOpen)
         } else {
             config = self.__flexibleSyncConfiguration()
         }

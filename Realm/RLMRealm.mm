@@ -257,21 +257,18 @@ static RLMAsyncOpenTask *openAsync(RLMRealmConfiguration *configuration,
     return ret;
 }
 
-+ (void)subscribeToInitialSubscriptionsFromRealm:(RLMRealm *)realm
-                                   configuration:(RLMRealmConfiguration *)configuration
-                                     isFirstOpen:(bool)isFirstOpen {
-    if (configuration.config.sync_config && configuration.syncConfiguration.enableFlexibleSync && configuration.initialSubscriptions) {
+- (void)subscribeToInitialSubscriptionsWithConfiguration:(RLMRealmConfiguration *)configuration
+                                             isFirstOpen:(bool)isFirstOpen {
 #if REALM_ENABLE_SYNC
+    if (configuration.config.sync_config && configuration.syncConfiguration.enableFlexibleSync && configuration.initialSubscriptions) {
         if (isFirstOpen || configuration.rerunOnOpen) {
-            RLMSyncSubscriptionSet *subscriptions = realm.subscriptions;
+            RLMSyncSubscriptionSet *subscriptions = self.subscriptions;
             [subscriptions update:^{
                 configuration.initialSubscriptions(subscriptions);
             }];
         }
-#else
-    @throw RLMException(@"Realm was not compiled with sync enabled");
-#endif
     }
+#endif
 }
 
 + (RLMAsyncOpenTask *)asyncOpenWithConfiguration:(RLMRealmConfiguration *)configuration
@@ -483,7 +480,7 @@ static RLMRealm *getCachedRealm(RLMRealmConfiguration *configuration, void *cach
     bool isFirstOpen = (cachedRealm == nil) ? true : false;
 
     if (auto realm = cachedRealm) {
-        [RLMRealm subscribeToInitialSubscriptionsFromRealm:realm configuration:configuration isFirstOpen:isFirstOpen];
+        [realm subscribeToInitialSubscriptionsWithConfiguration:configuration isFirstOpen:isFirstOpen];
         return RLMAutorelease(realm);
     }
 
@@ -616,8 +613,7 @@ static RLMRealm *getCachedRealm(RLMRealmConfiguration *configuration, void *cach
         realm->_realm->m_binding_context->realm = realm->_realm;
     }
 
-    [RLMRealm subscribeToInitialSubscriptionsFromRealm:realm configuration:configuration isFirstOpen:isFirstOpen];
-
+    [realm subscribeToInitialSubscriptionsWithConfiguration:configuration isFirstOpen:isFirstOpen];
     return RLMAutorelease(realm);
 }
 
