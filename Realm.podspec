@@ -4,13 +4,13 @@ Pod::Spec.new do |s|
   version                   = `sh build.sh get-version`
   s.version                 = version
   s.cocoapods_version       = '>= 1.10'
-  s.summary                 = 'Realm Swift is a modern data framework & database for iOS, macOS, tvOS & watchOS.'
+  s.summary                 = 'Realm is a modern data framework & database for iOS, macOS, tvOS & watchOS.'
   s.description             = <<-DESC
-                              Realm for Objective-C. (If you want to use Realm with Swift, see the "RealmSwift" pod.)
+                              The Realm Database, for Objective-C. (If you want to use Realm from Swift, see the “RealmSwift” pod.)
 
                               Realm is a fast, easy-to-use replacement for Core Data & SQLite. Use it with MongoDB Atlas Device Sync for realtime, automatic data sync. Works on iOS, macOS, tvOS & watchOS. Learn more and get help at https://docs.mongodb.com/realm/sdk/swift.
                               DESC
-  s.homepage                = "https://www.mongodb.com/realm"
+  s.homepage                = "https://realm.io"
   s.source                  = { :git => 'https://github.com/realm/realm-swift.git', :tag => "v#{s.version}" }
   s.author                  = { 'Realm' => 'realm-help@mongodb.com' }
   s.library                 = 'c++', 'z', 'compression'
