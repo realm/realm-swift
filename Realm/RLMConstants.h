@@ -46,7 +46,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  `RLMPropertyType` is an enumeration describing all property types supported in Realm models.
 
- For more information, see [Realm Models](https://realm.io/docs/objc/latest/#models).
+ For more information, see [Realm Models](https://www.mongodb.com/docs/realm/sdk/swift/fundamentals/object-models-and-schemas/).
  */
 typedef RLM_CLOSED_ENUM(int32_t, RLMPropertyType) {
 
@@ -75,9 +75,9 @@ typedef RLM_CLOSED_ENUM(int32_t, RLMPropertyType) {
 
 #pragma mark - Linked object types
 
-    /** Realm model objects. See [Realm Models](https://realm.io/docs/objc/latest/#models) for more information. */
+    /** Realm model objects. See [Realm Models](https://www.mongodb.com/docs/realm/sdk/swift/fundamentals/object-models-and-schemas/) for more information. */
     RLMPropertyTypeObject = 7,
-    /** Realm linking objects. See [Realm Models](https://realm.io/docs/objc/latest/#models) for more information. */
+    /** Realm linking objects. See [Realm Models](https://www.mongodb.com/docs/realm/sdk/swift/fundamentals/relationships/#inverse-relationship) for more information. */
     RLMPropertyTypeLinkingObjects = 8,
 
     RLMPropertyTypeObjectId = 10,

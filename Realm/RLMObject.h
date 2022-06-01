@@ -69,7 +69,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  ### Relationships
 
- See our [Cocoa guide](https://realm.io/docs/objc/latest#relationships) for more details.
+ See our [Realm Swift Documentation](https://www.mongodb.com/docs/realm/sdk/swift/fundamentals/relationships/#relationships) for more details.
 
  ### Key-Value Observing
 

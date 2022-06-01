@@ -312,7 +312,8 @@ static realm::util::Optional<RLMPropertyType> typeFromProtocolString(const char 
         }
         @throw RLMException(@"Property '%@' is of type '%@<%@>' which is not a supported %@ object type. "
                             @"%@ can only contain instances of RLMObject subclasses. "
-                            @"See https://realm.io/docs/objc/latest/#to-many for more information.", _name, collectionName, _objectClassName, collectionName, collectionName);
+                            @"See https://www.mongodb.com/docs/realm/sdk/swift/fundamentals/relationships/#to-many-relationship "
+                            @"for more information.", _name, collectionName, _objectClassName, collectionName, collectionName);
     }
     else if (strncmp(code, numberPrefix, numberPrefixLen) == 0) {
         auto type = typeFromProtocolString(code + numberPrefixLen);
@@ -322,7 +323,8 @@ static realm::util::Optional<RLMPropertyType> typeFromProtocolString(const char 
         }
         @throw RLMException(@"Property '%@' is of type %s which is not a supported NSNumber object type. "
                             @"NSNumbers can only be RLMInt, RLMFloat, RLMDouble, and RLMBool at the moment. "
-                            @"See https://realm.io/docs/objc/latest for more information.", _name, code + 1);
+                            @"See https://www.mongodb.com/docs/realm/sdk/swift/data-types/supported-property-types/ "
+                            @"for more information.", _name, code + 1);
     }
     else if (strncmp(code, linkingObjectsPrefix, linkingObjectsPrefixLen) == 0 &&
              (code[linkingObjectsPrefixLen] == '"' || code[linkingObjectsPrefixLen] == '<')) {
@@ -374,8 +376,10 @@ static realm::util::Optional<RLMPropertyType> typeFromProtocolString(const char 
 
         if (!cls) {
             @throw RLMException(@"Property '%@' is declared as '%@', which is not a supported RLMObject property type. "
-                                @"All properties must be primitives, NSString, NSDate, NSData, NSNumber, RLMArray, RLMSet, RLMDictionary, RLMLinkingObjects, RLMDecimal128, RLMObjectId, or subclasses of RLMObject. "
-                                @"See https://realm.io/docs/objc/latest/api/Classes/RLMObject.html for more information.", _name, className);
+                                @"All properties must be primitives, NSString, NSDate, NSData, NSNumber, RLMArray, RLMSet, "
+                                @"RLMDictionary, RLMLinkingObjects, RLMDecimal128, RLMObjectId, or subclasses of RLMObject. "
+                                @"See https://www.mongodb.com/docs/realm-legacy/docs/objc/latest/api/Classes/RLMObject.html "
+                                @"for more information.", _name, className);
         }
 
         _type = RLMPropertyTypeObject;
@@ -513,7 +517,8 @@ static realm::util::Optional<RLMPropertyType> typeFromProtocolString(const char 
         if (_type == RLMPropertyTypeObject && ![RLMSchema classForString:_objectClassName]) {
             @throw RLMException(@"Property '%@' is of type 'RLMArray<%@>' which is not a supported RLMArray object type. "
                                 @"RLMArrays can only contain instances of RLMObject subclasses. "
-                                @"See https://realm.io/docs/objc/latest/#to-many for more information.", _name, _objectClassName);
+                                @"See https://www.mongodb.com/docs/realm/sdk/swift/fundamentals/relationships/#to-many-relationship "
+                                @"for more information.", _name, _objectClassName);
         }
     }
     else if ([rawType isEqualToString:@"@\"RLMSet\""]) {
@@ -525,7 +530,8 @@ static realm::util::Optional<RLMPropertyType> typeFromProtocolString(const char 
         if (_type == RLMPropertyTypeObject && ![RLMSchema classForString:_objectClassName]) {
             @throw RLMException(@"Property '%@' is of type 'RLMSet<%@>' which is not a supported RLMSet object type. "
                                 @"RLMSets can only contain instances of RLMObject subclasses. "
-                                @"See https://realm.io/docs/objc/latest/#to-many for more information.", _name, _objectClassName);
+                                @"See https://www.mongodb.com/docs/realm/sdk/swift/fundamentals/relationships/#to-many-relationship "
+                                @"for more information.", _name, _objectClassName);
         }
     }
     else if ([rawType isEqualToString:@"@\"RLMDictionary\""]) {
@@ -538,7 +544,8 @@ static realm::util::Optional<RLMPropertyType> typeFromProtocolString(const char 
         if (_type == RLMPropertyTypeObject && ![RLMSchema classForString:_objectClassName]) {
             @throw RLMException(@"Property '%@' is of type 'RLMDictionary<KeyType, %@>' which is not a supported RLMDictionary object type. "
                                 @"RLMDictionarys can only contain instances of RLMObject subclasses. "
-                                @"See https://realm.io/docs/objc/latest/#to-many for more information.", _name, _objectClassName);
+                                @"See https://www.mongodb.com/docs/realm/sdk/swift/fundamentals/relationships/#to-many-relationship "
+                                @"for more information.", _name, _objectClassName);
         }
     }
     else if ([rawType isEqualToString:@"@\"NSNumber\""]) {

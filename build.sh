@@ -256,7 +256,7 @@ build_docs() {
       "${objc}" \
       --clean \
       --author Realm \
-      --author_url https://realm.io \
+      --author_url https://docs.mongodb.com/realm-sdks \
       --github_url https://github.com/realm/realm-swift \
       --github-file-prefix "https://github.com/realm/realm-swift/tree/v${version}" \
       --module-version "${version}" \
@@ -1202,7 +1202,7 @@ case "$COMMAND" in
 <plist version="1.0">
 <dict>
     <key>URL</key>
-    <string>https://realm.io/docs/${LANG}/${version}</string>
+    <string>https://www.mongodb.com/docs/realm-sdks/${LANG}/${version}</string>
 </dict>
 </plist>
 EOF
