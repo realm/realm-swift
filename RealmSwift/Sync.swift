@@ -24,7 +24,7 @@ import Combine
 #endif
 
 /**
- An object representing a MongoDB Realm user.
+ An object representing a Atlas Device Sync user.
 
  - see: `RLMUser`
  */
@@ -48,7 +48,7 @@ public extension User {
 }
 
 /**
- A manager which configures and manages MongoDB Realm synchronization-related
+ A manager which configures and manages Atlas Device Sync synchronization-related
  functionality.
 
  - see: `RLMSyncManager`
@@ -169,7 +169,7 @@ public typealias SyncLogLevel = RLMSyncLogLevel
 
 /**
  A data type whose values represent different authentication providers that can be used with
- MongoDB Realm.
+ Atlas Device Sync.
 
  - see: `RLMIdentityProvider`
  */
@@ -178,7 +178,7 @@ public typealias Provider = RLMIdentityProvider
 /**
  * How the Realm client should validate the identity of the server for secure connections.
  *
- * By default, when connecting to MongoDB Realm over HTTPS, Realm will
+ * By default, when connecting to Atlas Device Sync over HTTPS, Realm will
  * validate the server's HTTPS certificate using the system trust store and root
  * certificates. For additional protection against man-in-the-middle (MITM)
  * attacks and similar vulnerabilities, you can pin a certificate or public key,
@@ -258,7 +258,7 @@ public enum ClientResetMode {
 
 /**
  A `SyncConfiguration` represents configuration parameters for Realms intended to sync with
- MongoDB Realm.
+ Atlas Device Sync.
  */
 @frozen public struct SyncConfiguration {
     /// The `SyncUser` who owns the Realm that this configuration should open.
@@ -266,7 +266,7 @@ public enum ClientResetMode {
 
     /**
      The value this Realm is partitioned on. The partition key is a property defined in
-     MongoDB Realm. All classes with a property with this value will be synchronized to the
+     Atlas Device Sync. All classes with a property with this value will be synchronized to the
      Realm.
      */
     public let partitionValue: AnyBSON?
@@ -343,7 +343,7 @@ public enum ClientResetMode {
     }
 }
 
-/// Structure providing an interface to call a MongoDB Realm function with the provided name and arguments.
+/// Structure providing an interface to call a Atlas Device Sync function with the provided name and arguments.
 ///
 ///     user.functions.sum([1, 2, 3, 4, 5]) { sum, error in
 ///         guard case let .int64(value) = sum else {
@@ -536,7 +536,7 @@ public extension User {
 
     /**
      The custom data of the user.
-     This is configured in your MongoDB Realm App.
+     This is configured in your Device Sync Realm App.
     */
     var customData: Document {
         guard let rlmCustomData = self.__customData as RLMBSON?,
@@ -555,7 +555,7 @@ public extension User {
         return self.__mongoClient(withServiceName: serviceName)
     }
 
-    /// Call a MongoDB Realm function with the provided name and arguments.
+    /// Call a Atlas Device Sync function with the provided name and arguments.
     ///
     ///     user.functions.sum([1, 2, 3, 4, 5]) { sum, error in
     ///         guard case let .int64(value) = sum else {
@@ -785,7 +785,7 @@ public extension User {
         }
     }
 
-    /// Permanently deletes this user from your MongoDB Realm app.
+    /// Permanently deletes this user from your Atlas Device Sync Realm app.
     /// The users state will be set to `Removed` and the session will be destroyed.
     /// If the delete request fails, the local authentication state will be untouched.
     /// @returns A publisher that eventually return `Result.success` or `Error`.

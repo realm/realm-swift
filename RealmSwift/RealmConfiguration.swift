@@ -58,7 +58,7 @@ extension Realm {
 
          - parameter fileURL:            The local URL to the Realm file.
          - parameter inMemoryIdentifier: A string used to identify a particular in-memory Realm.
-         - parameter syncConfiguration:  For Realms intended to sync with MongoDB Realm, a sync configuration.
+         - parameter syncConfiguration:  For Realms intended to sync with Atlas Device Sync, a sync configuration.
          - parameter encryptionKey:      An optional 64-byte key to use to encrypt the data.
          - parameter readOnly:           Whether the Realm is read-only (must be true for read-only files).
          - parameter schemaVersion:      The current schema version.
@@ -107,7 +107,7 @@ extension Realm {
         // MARK: Configuration Properties
 
         /**
-         A configuration value used to configure a Realm for synchronization with MongoDB Realm. Mutually
+         A configuration value used to configure a Realm for synchronization with Atlas Device Sync. Mutually
          exclusive with `inMemoryIdentifier`.
          */
         public var syncConfiguration: SyncConfiguration? {

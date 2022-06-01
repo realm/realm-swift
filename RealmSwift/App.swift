@@ -96,7 +96,7 @@ public typealias PushClient = RLMPushClient
 public typealias UserAPIKey = RLMUserAPIKey
 
 /**
-`Credentials`is an enum representing supported authentication types for MongoDB Realm.
+`Credentials`is an enum representing supported authentication types for Atlas Device Sync.
 Example Usage:
 ```
 let credentials = Credentials.JWT(token: myToken)
@@ -115,7 +115,7 @@ let credentials = Credentials.JWT(token: myToken)
     case emailPassword(email: String, password: String)
     /// Credentials from a JSON Web Token
     case jwt(token: String)
-    /// Credentials for a MongoDB Realm function using a mongodb document as a json payload.
+    /// Credentials for a Atlas Device Sync function using a mongodb document as a json payload.
     /// If the json can not be successfully serialised and error will be produced and the object will be nil.
     case function(payload: Document)
     /// Credentials from a user api key.

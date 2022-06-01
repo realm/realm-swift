@@ -112,8 +112,8 @@ let realm = try Realm(configuration: config)
 // Use the Realm as normal
 let dogs = realm.objects(Dog.self).filter("name contains 'Fido'")
 ```
-## Data Sync
-The [MongoDB Realm Sync](https://www.mongodb.com/realm/mobile/sync) service makes it simple to keep data in sync across users, devices, and your backend in real-time.
+## Device Sync
+The [Atlas Device Sync](https://www.mongodb.com/realm/mobile/sync) service makes it simple to keep data in sync across users, devices, and your backend in real-time.
 
 ## Getting Started
 

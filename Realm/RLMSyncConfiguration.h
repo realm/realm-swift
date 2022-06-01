@@ -34,7 +34,7 @@ typedef NS_ENUM(NSUInteger, RLMClientResetMode) {
     /// The local copy of the Realm is copied into a recovery
     /// directory for safekeeping, and then deleted from the original location. The next time
     /// the Realm for that partition value is opened, the Realm will automatically be re-downloaded from
-    /// MongoDB Realm, and can be used as normal.
+    /// Atlas Device Sync, and can be used as normal.
 
     /// Data written to the Realm after the local copy of the Realm diverged from the backup
     /// remote copy will be present in the local recovery copy of the Realm file. The
@@ -77,7 +77,7 @@ typedef void(^RLMClientResetAfterBlock)(RLMRealm * _Nonnull beforeFrozen, RLMRea
 
 /**
  The value this Realm is partitioned on. The partition key is a property defined in
- MongoDB Realm. All classes with a property with this value will be synchronized to the
+ Atlas Device Sync. All classes with a property with this value will be synchronized to the
  Realm.
  */
 @property (nonatomic, readonly) id<RLMBSON> partitionValue;

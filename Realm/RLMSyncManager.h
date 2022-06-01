@@ -120,13 +120,13 @@ typedef void(^RLMSyncErrorReportingBlock)(NSError *, RLMSyncSession * _Nullable)
 @property (nonatomic, nullable) RLMSyncLogFunction logger;
 
 /**
- The name of the HTTP header to send authorization data in when making requests to MongoDB Realm which has
+ The name of the HTTP header to send authorization data in when making requests to Atlas Device Sync which has
  been configured to expect a custom authorization header.
  */
 @property (nullable, nonatomic, copy) NSString *authorizationHeaderName;
 
 /**
- Extra HTTP headers to append to every request to MongoDB Realm.
+ Extra HTTP headers to append to every request to Atlas Device Sync.
 
  Modifying this property while sync sessions are active will result in all
  sessions disconnecting and reconnecting using the new headers.

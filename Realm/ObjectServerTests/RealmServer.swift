@@ -913,7 +913,7 @@ public class RealmServer: NSObject {
         try createAppForSyncMode(.pbs("string"))
     }
 
-    // Retrieve MongoDB Realm AppId with ClientAppId using the Admin API
+    // Retrieve Atlas Device Sync AppId with ClientAppId using the Admin API
     public func retrieveAppServerId(_ clientAppId: String) throws -> String {
         guard let session = session else {
             fatalError()
@@ -1038,7 +1038,7 @@ public class RealmServer: NSObject {
         app.users[userId].get(completion)
     }
 
-    // Remove User from MongoDB Realm using the Admin API
+    // Remove User from Atlas Device Sync using the Admin API
     public func removeUserForApp(_ appId: String, userId: String, _ completion: @escaping (Result<Any?, Error>) -> Void) {
         guard let appServerId = try? RealmServer.shared.retrieveAppServerId(appId),
               let session = session else {
