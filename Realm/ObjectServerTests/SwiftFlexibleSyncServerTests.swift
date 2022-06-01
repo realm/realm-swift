@@ -1258,7 +1258,7 @@ extension SwiftFlexibleSyncServerTests {
     func testFlexibleSyncInitialSubscriptionsThrows() async throws {
         let user = try await logInUser(for: basicCredentials(app: self.flexibleSyncApp), app: self.flexibleSyncApp)
         var config = user.flexibleSyncConfiguration(initialSubscriptions: { subscriptions in
-            if subscriptions.first(named: "person_age_10") == nil {
+            if subscriptions.first(named: "query_uuid") == nil {
                 subscriptions.append(QuerySubscription<SwiftTypesSyncObject>(query: {
                     $0.uuidCol == UUID()
                 }))
