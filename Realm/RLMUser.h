@@ -159,7 +159,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @return A `RLMRealmConfiguration` instance with a flexible sync configuration.
  */
-- (RLMRealmConfiguration *)flexibleSyncConfigurationWithInitialSubscriptions:(RLMFlexibleSyncInitialSubscriptionsBlock)initialSubscriptions
+- (RLMRealmConfiguration *)flexibleSyncConfigurationWithInitialSubscriptions:(nullable RLMFlexibleSyncInitialSubscriptionsBlock)initialSubscriptions
                                                                  rerunOnOpen:(BOOL)rerunOnOpen NS_REFINED_FOR_SWIFT;
 
 #pragma mark - Sessions
