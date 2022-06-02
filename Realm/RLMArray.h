@@ -324,6 +324,8 @@ NS_ASSUME_NONNULL_BEGIN
 /// :nodoc:
 - (void)setObject:(RLMObjectType)newValue atIndexedSubscript:(NSUInteger)index;
 
+#pragma mark - Sectioning an Array
+
 /**
  Sorts and sections this collection from a given property key path, returning the result
  as an instance of `RLMSectionedResults`.

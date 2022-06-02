@@ -614,6 +614,200 @@ extension Projection: _ObservedResultsValue { }
     }
 }
 
+@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+@propertyWrapper public struct ObservedSectionResults<Key: _Persistable & Hashable, ResultType>: DynamicProperty, BoundCollection where ResultType: _ObservedResultsValue & RealmFetchable & KeypathSortable & Identifiable {
+    private class Storage: ObservableStorage<Results<ResultType>> {
+        var sectionedResults: SectionedResults<Key, ResultType>?
+        var setupHasRun = false
+        private func didSet() {
+            if setupHasRun {
+                setupValue()
+            }
+        }
+
+        func setupValue() {
+            /// A base value to reset the state of the query if a user reassigns the `filter` or `sortDescriptor`
+            let realm = try! Realm(configuration: configuration ?? Realm.Configuration.defaultConfiguration)
+            value = realm.objects(ResultType.self)
+
+            let filters = [searchFilter, filter ?? `where`].compactMap { $0 }
+            if !filters.isEmpty {
+                let compoundFilter = NSCompoundPredicate(andPredicateWithSubpredicates: filters)
+                value = value.filter(compoundFilter)
+            }
+
+            if sortDescriptors.isEmpty {
+                sortDescriptors.append(.init(keyPath: keyPathString, ascending: true))
+            }
+
+            sectionedResults = value.sectioned(sortDescriptors: sortDescriptors,
+                                               { (str: ResultType) in
+                str[keyPath: self.keyPath]
+            })
+
+            setupHasRun = true
+        }
+
+        var sortDescriptors: [SortDescriptor] = [] {
+            didSet {
+                didSet()
+            }
+        }
+
+        var filter: NSPredicate? {
+            didSet {
+                didSet()
+            }
+        }
+        var `where`: NSPredicate? {
+            didSet {
+                didSet()
+            }
+        }
+        var configuration: Realm.Configuration? {
+            didSet {
+                didSet()
+            }
+        }
+
+        var searchString: String = ""
+        var searchFilter: NSPredicate? {
+            didSet {
+                didSet()
+            }
+        }
+
+        var keyPath: KeyPath<ResultType, Key>
+        var keyPathString: String
+
+        init(_ value: Results<ResultType>, keyPath: KeyPath<ResultType, Key>, _ keyPaths: [String]? = nil) where ResultType: ObjectBase {
+            self.keyPath = keyPath
+            self.keyPathString = _name(for: keyPath)
+            super.init(value.realm != nil && !value.isInvalidated ? value.thaw() ?? value : value)
+            self.objectWillChange = ObservableStoragePublisher(value, keyPaths)
+            self.keyPaths = keyPaths
+        }
+
+        init<BoxedType: ObjectBase>(_ value: Results<ResultType>, keyPath: KeyPath<ResultType, Key>, _ keyPaths: [String]? = nil) where ResultType: Projection<BoxedType> {
+            self.keyPath = keyPath
+            self.keyPathString = _name(for: keyPath)
+            super.init(value.realm != nil && !value.isInvalidated ? value.thaw() ?? value : value)
+            self.objectWillChange = ObservableStoragePublisher(value, keyPaths)
+            self.keyPaths = keyPaths
+        }
+    }
+
+    @Environment(\.realmConfiguration) var configuration
+    @ObservedObject private var storage: Storage
+    /// :nodoc:
+    fileprivate func searchText<T: ObjectBase>(_ text: String, on keyPath: KeyPath<T, String>) {
+        if text.isEmpty {
+            if storage.searchFilter != nil {
+                storage.searchFilter = nil
+            }
+        } else if text != storage.searchString {
+            storage.searchFilter = Query<T>()[dynamicMember: keyPath].contains(text).predicate
+        }
+        storage.searchString = text
+    }
+    /// Stores an NSPredicate used for filtering the Results. This is mutually exclusive
+    /// to the `where` parameter.
+    @State public var filter: NSPredicate? {
+        willSet {
+            storage.where = nil
+            storage.filter = newValue
+        }
+    }
+    /// Stores a type safe query used for filtering the Results. This is mutually exclusive
+    /// to the `filter` parameter.
+    @State public var `where`: ((Query<ResultType>) -> Query<Bool>)? {
+        // The introduction of this property produces a compiler bug in
+        // Xcode 12.5.1. So Swift Queries are supported on Xcode 13 and above
+        // when used with SwiftUI.
+        willSet {
+            storage.filter = nil
+            storage.where = newValue?(Query()).predicate
+        }
+    }
+    /// :nodoc:
+    @State public var sortDescriptors: [SortDescriptor] = [] {
+        willSet {
+            storage.sortDescriptors = newValue
+        }
+    }
+    /// :nodoc:
+    public var wrappedValue: SectionedResults<Key, ResultType> {
+        if !storage.setupHasRun {
+            storage.setupValue()
+        }
+        guard let sectionedResults = storage.sectionedResults else {
+            fatalError("Could not instantiate SectionedResults")
+        }
+        print(sectionedResults)
+        return sectionedResults
+    }
+    /// :nodoc:
+    public var projectedValue: Self {
+        return self
+    }
+
+    public init<ObjectType: ObjectBase>(_ type: ResultType.Type,
+                                        sectionKeyPath: KeyPath<ResultType, Key>,
+                                        configuration: Realm.Configuration? = nil,
+                                        filter: NSPredicate? = nil,
+                                        keyPaths: [String]? = nil,
+                                        sortDescriptors: [SortDescriptor] = []) where ResultType: Projection<ObjectType>, ObjectType: ThreadConfined {
+        let results = Results<ResultType>(RLMResults<ResultType>.emptyDetached())
+        self.storage = Storage(results, keyPath: sectionKeyPath, keyPaths)
+        self.storage.configuration = configuration
+        self.filter = filter
+        self.sortDescriptors = sortDescriptors
+    }
+
+    public init(_ type: ResultType.Type,
+                sectionKeyPath: KeyPath<ResultType, Key>,
+                configuration: Realm.Configuration? = nil,
+                filter: NSPredicate? = nil,
+                keyPaths: [String]? = nil,
+                sortDescriptors: [SortDescriptor] = []) where ResultType: Object {
+        self.storage = Storage(Results(RLMResults<ResultType>.emptyDetached()), keyPath: sectionKeyPath, keyPaths)
+        self.storage.configuration = configuration
+        self.filter = filter
+        self.sortDescriptors = sortDescriptors
+    }
+
+    public init(_ type: ResultType.Type,
+                sectionKeyPath: KeyPath<ResultType, Key>,
+                configuration: Realm.Configuration? = nil,
+                where: ((Query<ResultType>) -> Query<Bool>)? = nil,
+                keyPaths: [String]? = nil,
+                sortDescriptors: [SortDescriptor] = []) where ResultType: Object {
+        self.storage = Storage(Results(RLMResults<ResultType>.emptyDetached()), keyPath: sectionKeyPath, keyPaths)
+        self.storage.configuration = configuration
+        self.where = `where`
+        self.sortDescriptors = sortDescriptors
+    }
+    /// :nodoc:
+    public init(_ type: ResultType.Type,
+                sectionKeyPath: KeyPath<ResultType, Key>,
+                keyPaths: [String]? = nil,
+                configuration: Realm.Configuration? = nil,
+                sortDescriptors: [SortDescriptor] = []) where ResultType: Object {
+        self.storage = Storage(Results(RLMResults<ResultType>.emptyDetached()), keyPath: sectionKeyPath, keyPaths)
+        self.storage.configuration = configuration
+        self.sortDescriptors = sortDescriptors
+    }
+
+    public mutating func update() {
+        // When the view updates, it will inject the @Environment
+        // into the propertyWrapper
+        if storage.configuration == nil {
+            storage.configuration = configuration
+        }
+    }
+}
+
+
 // MARK: ObservedRealmObject
 
 /// A property wrapper type that subscribes to an observable Realm `Object` or `List` and

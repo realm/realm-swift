@@ -51,6 +51,23 @@ public func _name<T: ObjectBase>(for keyPath: PartialKeyPath<T>) -> String {
     return names.componentsJoined(by: ".")
 }
 
+public func _name<O: ObjectBase, T>(for keyPath: PartialKeyPath<T>) -> String where T: Projection<O> {
+    if let name = keyPath._kvcKeyPathString {
+        return name
+    }
+    let names = NSMutableArray()
+    let value = T.keyPathRecorder(with: names)[keyPath: keyPath]
+    if let collection = value as? PropertyNameConvertible,
+       let propertyInfo = collection.propertyInformation, propertyInfo.isLegacy {
+        names.add(propertyInfo.key)
+    }
+
+    if let storage = value as? RLMSwiftValueStorage {
+        names.add(RLMSwiftValueStorageGetPropertyName(storage))
+    }
+    return names.componentsJoined(by: ".")
+}
+
 /// Create a valid element for a collection, as a keypath recorder if that type supports it.
 internal func elementKeyPathRecorder<T: RealmCollectionValue>(
         for type: T.Type, with lastAccessedNames: NSMutableArray) -> T {
@@ -91,6 +108,19 @@ extension ObjectBase: KeypathRecorder {
         (objectSchema.rlmObjectSchema.properties + objectSchema.rlmObjectSchema.computedProperties)
             .map { (prop: $0, accessor: $0.swiftAccessor) }
             .forEach { $0.accessor?.observe($0.prop, on: obj) }
+        return obj
+    }
+}
+
+
+extension Projection: KeypathRecorder {
+    public static func keyPathRecorder(with lastAccessedNames: NSMutableArray) -> Self {
+        let obj = Self(projecting: PersistedType())
+        obj.rootObject.lastAccessedNames = lastAccessedNames
+        let objectSchema = ObjectSchema(RLMObjectBaseObjectSchema(obj.rootObject)!)
+        (objectSchema.rlmObjectSchema.properties + objectSchema.rlmObjectSchema.computedProperties)
+            .map { (prop: $0, accessor: $0.swiftAccessor) }
+            .forEach { $0.accessor?.observe($0.prop, on: obj.rootObject) }
         return obj
     }
 }

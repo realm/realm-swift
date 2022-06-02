@@ -146,6 +146,23 @@ extension RealmCollectionImpl {
     public func makeIterator() -> RLMIterator<Element> {
         return RLMIterator(collection: collection)
     }
+
+    public func sectioned<Key: _Persistable>(sortDescriptors: [SortDescriptor],
+                                             _ keyBlock: @escaping ((Element) -> Key)) -> SectionedResults<Key, Element> {
+//        let sectionBlock: ((Element) -> Key) = { v in
+//            return block(v)
+//        }
+        if sortDescriptors.isEmpty {
+            throwRealmException("There must be at least one SortDescriptor when using SectionedResults.")
+        }
+        let sectionedResults = collection.sectionedResults(using: sortDescriptors.map(ObjectiveCSupport.convert)) { value in
+            return keyBlock(Element._rlmFromObjc(value)!)._rlmObjcValue as! RLMValue
+        }
+
+        return SectionedResults(rlmSectionedResults: sectionedResults,
+                                sectionBlock: keyBlock,
+                                valueProjector: { $0 as! Element })
+    }
 }
 
 // A helper protocol which lets us check for Optional in where clauses

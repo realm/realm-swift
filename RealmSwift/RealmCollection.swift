@@ -553,6 +553,9 @@ public protocol RealmCollection: RealmCollectionBase, Equatable {
      If called on a live collection, will return itself.
     */
     func thaw() -> Self?
+
+    func sectioned<Key: _Persistable>(sortDescriptors: [SortDescriptor],
+                                      _ keyBlock: @escaping ((Element) -> Key)) -> SectionedResults<Key, Element>
 }
 
 // MARK: - Codable
@@ -686,6 +689,25 @@ public extension RealmCollection where Element: ObjectBase {
     func average<T: _HasPersistedType>(of keyPath: KeyPath<Element, T>) -> T? where T.PersistedType: AddableType {
         average(ofProperty: _name(for: keyPath))
     }
+
+    func sectioned<Key: _Persistable>(by keyPath: KeyPath<Element, Key>,
+                                      ascending: Bool = true) -> SectionedResults<Key, Element> where Element: ObjectBase {
+        let keyPathString = _name(for: keyPath)
+        return sectioned(sortDescriptors: [.init(keyPath: keyPathString, ascending: ascending)], { $0[keyPath: keyPath] })
+    }
+
+    func sectioned<Key: _Persistable>(by keyPath: KeyPath<Element, Key>,
+                                      sortDescriptors: [SortDescriptor]) -> SectionedResults<Key, Element> where Element: ObjectBase {
+        guard let sortDescriptor = sortDescriptors.first else {
+            throwRealmException("Can not section Results with empty sortDescriptor parameter.")
+        }
+        let keyPathString = _name(for: keyPath)
+        if keyPathString != sortDescriptor.keyPath {
+            throwRealmException("The section key path must match the primary sort descriptor.")
+        }
+        return sectioned(sortDescriptors: sortDescriptors, { $0[keyPath: keyPath] })
+    }
+
 }
 
 public extension RealmCollection where Element.PersistedType: MinMaxType {
@@ -789,6 +811,13 @@ public extension RealmCollection where Element.PersistedType: SortableType {
      */
     func distinct() -> Results<Element> {
         return distinct(by: ["self"])
+    }
+}
+
+public extension RealmCollection where Element: SortableType {
+    func sectioned<Key: _Persistable>(by block: @escaping ((Element) -> Key),
+                                      ascending: Bool = true) -> SectionedResults<Key, Element> {
+        sectioned(sortDescriptors: [.init(keyPath: "self", ascending: ascending)], block)
     }
 }
 
@@ -1420,6 +1449,16 @@ public struct ProjectedCollection<Element>: RandomAccessCollection, CustomString
         self.keyPath = keyPath
         self.propertyName = propertyName
     }
+
+//    func sectioned<Key: _Persistable>(by keyPath: KeyPath<Element, Key>,
+//                                      ascending: Bool = false) -> SectionedResults<Key, Element> {
+//        fatalError()
+//    }
+//
+//    func sectioned<Key: _Persistable>(by keyPath: KeyPath<Element, Key>,
+//                                      sortDescriptors: [SortDescriptor]) -> SectionedResults<Key, Element> {
+//        fatalError()
+//    }
 }
 
 /**
