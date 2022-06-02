@@ -1,7 +1,7 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* Updated naming and links for documentation.
+* Replace mentions of 'MongoDB Realm' with 'Atlas Device Sync' in the documentation and update appropriate links to documentation.
 * Allow adding a subscription querying for all documents of a type in swift for flexible sync.
 ```
    try await subscriptions.update {
