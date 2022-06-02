@@ -1038,7 +1038,7 @@ public class RealmServer: NSObject {
         app.users[userId].get(completion)
     }
 
-    // Remove User from Atlas Device Sync using the Admin API
+    // Remove User from Atlas App Services using the Admin API
     public func removeUserForApp(_ appId: String, userId: String, _ completion: @escaping (Result<Any?, Error>) -> Void) {
         guard let appServerId = try? RealmServer.shared.retrieveAppServerId(appId),
               let session = session else {

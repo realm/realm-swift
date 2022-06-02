@@ -176,7 +176,7 @@ typedef BOOL (^RLMShouldCompactOnLaunchBlock)(NSUInteger totalBytes, NSUInteger 
 
 /**
  A configuration object representing configuration state for Realms intended
- to sync with Atlas Device Sync.
+ to sync with Atlas App Services.
 
  This property is mutually exclusive with both `inMemoryIdentifier` and `fileURL`;
  setting any one of the three properties will automatically nil out the other two.

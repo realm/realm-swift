@@ -1,4 +1,4 @@
-#  How to enable Apple Authentication via Atlas Device Sync
+#  How to enable Apple Authentication via Atlas App Services
 
 * You first need to setup your app in Atlas App Services. Follow these instructions to get started: https://www.mongodb.com/docs/atlas/app-services/authentication/apple/
 * Once that is done add Apple Sign In to your app's entitlements

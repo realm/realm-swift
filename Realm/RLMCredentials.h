@@ -24,10 +24,10 @@ NS_ASSUME_NONNULL_BEGIN
 /// A token representing an identity provider's credentials.
 typedef NSString *RLMCredentialsToken;
 
-/// A type representing the unique identifier of a Atlas Device Sync identity provider.
+/// A type representing the unique identifier of a Atlas App Services identity provider.
 typedef NSString *RLMIdentityProvider NS_EXTENSIBLE_STRING_ENUM;
 
-/// The username/password identity provider. User accounts are handled by Atlas Device Sync directly without the
+/// The username/password identity provider. User accounts are handled by Atlas App Services directly without the
 /// involvement of a third-party identity provider.
 extern RLMIdentityProvider const RLMIdentityProviderUsernamePassword;
 
@@ -84,7 +84,7 @@ extern RLMIdentityProvider const RLMIdentityProviderServerAPIKey;
 + (instancetype)credentialsWithAppleToken:(RLMCredentialsToken)token;
 
 /**
- Construct and return credentials for a Atlas Device Sync function using a mongodb document as a json payload.
+ Construct and return credentials for a Atlas App Services function using a mongodb document as a json payload.
 */
 + (instancetype)credentialsWithFunctionPayload:(NSDictionary<NSString *, id<RLMBSON>> *)payload;
 
@@ -99,7 +99,7 @@ extern RLMIdentityProvider const RLMIdentityProviderServerAPIKey;
 + (instancetype)credentialsWithServerAPIKey:(NSString *)apiKey;
 
 /**
- Construct and return Atlas Device Sync credentials from an email and password.
+ Construct and return Atlas App Services credentials from an email and password.
  */
 + (instancetype)credentialsWithEmail:(NSString *)email
                             password:(NSString *)password;

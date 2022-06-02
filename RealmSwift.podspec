@@ -7,7 +7,7 @@ Pod::Spec.new do |s|
   s.description               = <<-DESC
                                 The Realm Database, for Swift. (If you want to use Realm from Objective-C, see the “Realm” pod.)
 
-                                Realm is a fast, easy-to-use replacement for Core Data & SQLite. Use it with Atlas Device Sync for realtime, automatic data sync. Works on iOS, macOS, tvOS & watchOS. Learn more and get help at https://docs.mongodb.com/realm/sdk/swift.
+                                Realm is a fast, easy-to-use replacement for Core Data & SQLite. Use it with Atlas App Services for realtime, automatic data sync. Works on iOS, macOS, tvOS & watchOS. Learn more and get help at https://docs.mongodb.com/realm/sdk/swift.
                                 DESC
   s.homepage                  = "https://realm.io"
   s.source                    = { :git => 'https://github.com/realm/realm-swift.git', :tag => "v#{s.version}" }

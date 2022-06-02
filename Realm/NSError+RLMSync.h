@@ -27,7 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface NSError (RLMSync)
 
 /**
- Given an appropriate Atlas Device Sync error, return the token that
+ Given an appropriate Atlas App Services error, return the token that
  can be passed into `+[RLMSyncSession immediatelyHandleError:]` to
  immediately perform error clean-up work, or nil if the error isn't of
  a type that provides a token.
@@ -35,7 +35,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (nullable RLMSyncErrorActionToken *)rlmSync_errorActionToken NS_REFINED_FOR_SWIFT;
 
 /**
- Given a Atlas Device Sync client reset error, return the path where the
+ Given a Atlas App Services client reset error, return the path where the
  backup copy of the Realm will be placed once the client reset process is
  complete.
  */
