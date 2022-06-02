@@ -531,7 +531,7 @@ __attribute__((warn_unused_result));
  parent object.
 
  For more information, please see the "Inverse Relationships" section in the
- [documentation](https://realm.io/docs/objc/latest/#relationships).
+ [documentation](https://www.mongodb.com/docs/realm/sdk/swift/fundamentals/relationships/#relationships).
  */
 @interface RLMLinkingObjects<RLMObjectType: RLMObject *> : RLMResults
 @end

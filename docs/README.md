@@ -1,14 +1,14 @@
 # Documentation
 
-## Realm Objective-C
-
-The documentation can be found at [realm.io/docs/objc/latest](https://realm.io/docs/objc/latest).  
-The API reference is located at [realm.io/docs/objc/latest/api](https://realm.io/docs/objc/latest/api).
-
 ## Realm Swift
 
-The documentation can be found at [realm.io/docs/swift/latest](https://realm.io/docs/swift/latest).  
-The API reference is located at [realm.io/docs/swift/latest/api](https://realm.io/docs/swift/latest/api).
+The documentation can be found at [www.mongodb.com/docs/realm/sdk/swift/](https://www.mongodb.com/docs/realm/sdk/swift/).  
+The API reference is located at [www.mongodb.com/docs/realm-sdks/swift/latest/](https://www.mongodb.com/docs/realm-sdks/swift/latest/).
+
+## Realm Objective-C
+
+The documentation can be found at [www.mongodb.com/docs/realm/sdk/swift/](https://www.mongodb.com/docs/realm/sdk/swift/).  
+The API reference is located at [www.mongodb.com/docs/realm-sdks/objc/latest](https://www.mongodb.com/docs/realm-sdks/objc/latest).
 
 ## Generating Docs
 

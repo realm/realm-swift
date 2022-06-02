@@ -92,4 +92,4 @@ try! realm.write {
 }
 
 realm.objects(Person.self).count
-//: Thanks! To learn more about Realm go to https://realm.io
+//: Thanks! To learn more about Realm go to https://www.mongodb.com/docs/realm/

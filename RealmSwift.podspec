@@ -3,11 +3,11 @@ Pod::Spec.new do |s|
   s.name                      = 'RealmSwift'
   version                     = `sh build.sh get-version`
   s.version                   = version
-  s.summary                   = 'Realm is a modern data framework & database for iOS, macOS, tvOS & watchOS.'
+  s.summary                   = 'Realm Swift is a modern data framework & database for iOS, macOS, tvOS & watchOS.'
   s.description               = <<-DESC
-                                The Realm Mobile Database, for Swift. (If you want to use Realm from Objective-C, see the “Realm” pod.)
+                                The Realm Database, for Swift. (If you want to use Realm from Objective-C, see the “Realm” pod.)
 
-                                The Realm Mobile Database is a fast, easy-to-use replacement for Core Data & SQLite. Use it with MongoDB Realm Sync for realtime, automatic data sync. Works on iOS, macOS, tvOS & watchOS. Learn more and get help at https://realm.io.
+                                Realm is a fast, easy-to-use replacement for Core Data & SQLite. Use it with Atlas Device Sync for realtime, automatic data sync. Works on iOS, macOS, tvOS & watchOS. Learn more and get help at https://www.mongodb.com/docs/realm/sdk/swift/.
                                 DESC
   s.homepage                  = "https://realm.io"
   s.source                    = { :git => 'https://github.com/realm/realm-swift.git', :tag => "v#{s.version}" }

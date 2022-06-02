@@ -20,7 +20,7 @@ import SwiftUI
 import AuthenticationServices
 import RealmSwift
 
-/// Your MongoDB Realm App ID
+/// Your Atlas App Services app ID
 let appId = "your-app-id"
 
 struct ContentView: View {

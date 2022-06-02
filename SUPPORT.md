@@ -4,7 +4,7 @@ The Realm team is here to help you with your Realm-related issues!
 
 ## Documentation
 
-Before asking questions, please familiarize yourself with our [Swift](https://realm.io/docs/swift/latest) and [Objective-C](https://realm.io/docs/objc/latest) documentation. We also have a number of [Tech Notes](https://realm.io/docs/tech-notes/) which cover various topics that may be of interest.
+Before asking questions, please familiarize yourself with our [Realm Swift](https://www.mongodb.com/docs/realm/sdk/swift/) documentation. We also have a number of [Tech Notes](https://www.mongodb.com/developer/products/realm/) which cover various topics that may be of interest.
 
 ## Stack Overflow
 

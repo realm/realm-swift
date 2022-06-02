@@ -124,8 +124,7 @@ Open the project in Xcode, and press "Run" to build and run the program. It will
 
 The `installation/` directory contains example Xcode projects demonstrating how
 to install Realm Objective-C and Realm Swift from all available methods defined
-in <https://realm.io/docs/objc/latest/#installation> and
-<https://realm.io/docs/swift/latest/#installation>.
+in <https://www.mongodb.com/docs/realm/sdk/swift/install/#install-realm-for-ios--macos--tvos--and-watchos>.
 
 ## tvOS (Objective-C)
 
