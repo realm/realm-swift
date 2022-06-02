@@ -197,7 +197,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)removeWithCompletion:(RLMUserOptionalErrorBlock)completion;
 
 /**
- Permanently deletes this user from your Atlas App Services app.
+ Permanently deletes this user from your Atlas Device Sync app.
 
  The users state will be set to `Removed` and the session will be destroyed.
  If the delete request fails, the local authentication state will be untouched.

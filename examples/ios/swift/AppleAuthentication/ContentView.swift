@@ -20,7 +20,8 @@ import SwiftUI
 import AuthenticationServices
 import RealmSwift
 
-/// Your Atlas App Services app ID
+/// Your Atlas Device Sync app ID
+/// You can find it in Atlas App Services
 let appId = "your-app-id"
 
 struct ContentView: View {
