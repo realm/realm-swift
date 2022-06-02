@@ -258,7 +258,7 @@ static RLMAsyncOpenTask *openAsync(RLMRealmConfiguration *configuration,
 }
 
 - (void)subscribeToInitialSubscriptionsWithConfiguration:(RLMRealmConfiguration *)configuration
-                                             isFirstOpen:(bool)isFirstOpen {
+                                             isFirstOpen:(BOOL)isFirstOpen {
 #if REALM_ENABLE_SYNC
     if (configuration.config.sync_config && configuration.syncConfiguration.enableFlexibleSync && configuration.initialSubscriptions) {
         if (isFirstOpen || configuration.rerunOnOpen) {
@@ -304,7 +304,7 @@ static RLMAsyncOpenTask *openAsync(RLMRealmConfiguration *configuration,
 
                     // In case of setting an initial subscription while opening the realm, we have to wait for the subscription to complete and bootstrap data before returning the realm.
                     if (localRealm.configuration.syncConfiguration.enableFlexibleSync && localRealm.subscriptions.state == RLMSyncSubscriptionStatePending) {
-                        [localRealm.subscriptions waitForSynchronizationForQueue:callbackQueue completionBlock:^(NSError *subscriptionError) {
+                        [localRealm.subscriptions waitForSynchronizationOnQueue:callbackQueue completionBlock:^(NSError *subscriptionError) {
                             callback(localRealm, subscriptionError);
                         }];
                     } else {

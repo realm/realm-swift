@@ -325,7 +325,10 @@ extension Realm {
                 configuration.eventConfiguration = rlmConfig
             }
 
-            configuration.initialSubscriptions = ObjectiveCSupport.convert(block: initialSubscriptions)
+            if let initialSubscriptions = initialSubscriptions {
+                configuration.initialSubscriptions = ObjectiveCSupport.convert(block: initialSubscriptions)
+            }
+
             configuration.rerunOnOpen = rerunOnOpen
 
             return configuration

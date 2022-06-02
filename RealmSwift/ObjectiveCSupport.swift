@@ -205,10 +205,7 @@ import Realm
     }
 
     /// Converts a swift block receiving a `SyncSubscriptionSet`to a RLMFlexibleSyncInitialSubscriptionsBlock receiving a `RLMSyncSubscriptionSet`.
-    public static func convert(block: ((SyncSubscriptionSet) -> Void)?) -> RLMFlexibleSyncInitialSubscriptionsBlock? {
-        guard let block = block else {
-            return nil
-        }
+    public static func convert(block: @escaping ((SyncSubscriptionSet) -> Void)) -> RLMFlexibleSyncInitialSubscriptionsBlock {
         return { subscriptionSet in
             return block(SyncSubscriptionSet(subscriptionSet))
         }

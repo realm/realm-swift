@@ -32,8 +32,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, retain, nullable) RLMEventConfiguration *eventConfiguration;
 
 // Flexible Sync
-@property (nonatomic, nullable) RLMFlexibleSyncInitialSubscriptionsBlock initialSubscriptions;
-@property (nonatomic) bool rerunOnOpen;
+@property (nonatomic, readwrite, nullable) RLMFlexibleSyncInitialSubscriptionsBlock initialSubscriptions;
+@property (nonatomic, readwrite) BOOL rerunOnOpen;
 
 // Get the default configuration without copying it
 + (RLMRealmConfiguration *)rawDefaultConfiguration;
