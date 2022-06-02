@@ -327,9 +327,8 @@ extension Realm {
 
             if let initialSubscriptions = initialSubscriptions {
                 configuration.initialSubscriptions = ObjectiveCSupport.convert(block: initialSubscriptions)
+                configuration.rerunOnOpen = rerunOnOpen
             }
-
-            configuration.rerunOnOpen = rerunOnOpen
 
             return configuration
         }
