@@ -927,7 +927,7 @@ extension User {
      a realm with a flexible sync configuration, you won't be able to open a realm with a PBS configuration
      and the other way around.
 
-     Using `rerunOnOpen` cover the cases where we want to re-run dynamic queries, for example time ranges.
+     Using `rerunOnOpen` covers the cases where you want to re-run dynamic queries, for example time ranges.
      ```
      var config = user.flexibleSyncConfiguration(initialSubscriptions: { subscriptions in
          subscriptions.append(QuerySubscription<User>() {
