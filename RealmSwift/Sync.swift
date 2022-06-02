@@ -927,6 +927,21 @@ extension User {
      a realm with a flexible sync configuration, you won't be able to open a realm with a PBS configuration
      and the other way around.
 
+     @return A `Realm.Configuration` instance with a flexible sync configuration.
+     */
+    public func flexibleSyncConfiguration() -> Realm.Configuration {
+        let config = self.__flexibleSyncConfiguration()
+        return ObjectiveCSupport.convert(object: config)
+    }
+
+    /**
+     Create a flexible sync configuration instance, which can be used to open a realm  which
+     supports flexible sync.
+
+     It won't be possible to combine flexible and partition sync in the same app, which means if you open
+     a realm with a flexible sync configuration, you won't be able to open a realm with a PBS configuration
+     and the other way around.
+
      Using `rerunOnOpen` cover the cases where we want to re-run dynamic queries, for example time ranges.
      ```
      var config = user.flexibleSyncConfiguration(initialSubscriptions: { subscriptions in
@@ -945,13 +960,8 @@ extension User {
 
      @return A `Realm.Configuration` instance with a flexible sync configuration.
      */
-    public func flexibleSyncConfiguration(initialSubscriptions: ((SyncSubscriptionSet) -> Void)? = nil, rerunOnOpen: Bool = false) -> Realm.Configuration {
-        let config: RLMRealmConfiguration
-        if let initialSubscriptions = initialSubscriptions {
-            config = self.__flexibleSyncConfiguration(initialSubscriptions: ObjectiveCSupport.convert(block: initialSubscriptions)!, rerunOnOpen: rerunOnOpen)
-        } else {
-            config = self.__flexibleSyncConfiguration()
-        }
+    public func flexibleSyncConfiguration(initialSubscriptions: @escaping ((SyncSubscriptionSet) -> Void), rerunOnOpen: Bool = false) -> Realm.Configuration {
+        let config = self.__flexibleSyncConfiguration(initialSubscriptions: ObjectiveCSupport.convert(block: initialSubscriptions)!, rerunOnOpen: rerunOnOpen)
         return ObjectiveCSupport.convert(object: config)
     }
 }

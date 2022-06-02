@@ -475,12 +475,8 @@ static RLMRealm *getCachedRealm(RLMRealmConfiguration *configuration, void *cach
     }
 
     // First check if we already have a cached Realm for this thread/config
-    RLMRealm *cachedRealm = getCachedRealm(configuration, cacheKey);
-    // Check if this is the first time opening the realm or not.
-    bool isFirstOpen = (cachedRealm == nil) ? true : false;
-
-    if (auto realm = cachedRealm) {
-        [realm subscribeToInitialSubscriptionsWithConfiguration:configuration isFirstOpen:isFirstOpen];
+    if (auto realm = getCachedRealm(configuration, cacheKey)) {
+        [realm subscribeToInitialSubscriptionsWithConfiguration:configuration isFirstOpen:NO];
         return RLMAutorelease(realm);
     }
 
@@ -613,7 +609,7 @@ static RLMRealm *getCachedRealm(RLMRealmConfiguration *configuration, void *cach
         realm->_realm->m_binding_context->realm = realm->_realm;
     }
 
-    [realm subscribeToInitialSubscriptionsWithConfiguration:configuration isFirstOpen:isFirstOpen];
+    [realm subscribeToInitialSubscriptionsWithConfiguration:configuration isFirstOpen:YES];
     return RLMAutorelease(realm);
 }
 

@@ -614,7 +614,7 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
 
     func testFlexibleSyncAppWithoutQuery() throws {
         try populateFlexibleSyncData { realm in
-            for i in 1...21 {
+            for i in 1...10 {
                 // Using firstname to query only objects from this test
                 let person = SwiftPerson(firstName: "\(#function)",
                                          lastName: "lastname_\(i)",
@@ -637,7 +637,7 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
 
     func testFlexibleSyncAppAddQuery() throws {
         try populateFlexibleSyncData { realm in
-            for i in 1...21 {
+            for i in 1...25 {
                 let person = SwiftPerson(firstName: "\(#function)",
                                          lastName: "lastname_\(i)",
                                          age: i)
@@ -669,12 +669,12 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
         waitForExpectations(timeout: 20.0, handler: nil)
 
         waitForDownloads(for: realm)
-        checkCount(expected: 6, realm, SwiftPerson.self)
+        checkCount(expected: 10, realm, SwiftPerson.self)
     }
 
     func testFlexibleSyncAppMultipleQuery() throws {
         try populateFlexibleSyncData { realm in
-            for i in 1...21 {
+            for i in 1...20 {
                 let person = SwiftPerson(firstName: "\(#function)",
                                          lastName: "lastname_\(i)",
                                          age: i)
@@ -711,13 +711,13 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
         waitForExpectations(timeout: 20.0, handler: nil)
 
         waitForDownloads(for: realm)
-        checkCount(expected: 11, realm, SwiftPerson.self)
+        checkCount(expected: 10, realm, SwiftPerson.self)
         checkCount(expected: 1, realm, SwiftTypesSyncObject.self)
     }
 
     func testFlexibleSyncAppRemoveQuery() throws {
         try populateFlexibleSyncData { realm in
-            for i in 1...21 {
+            for i in 1...30 {
                 let person = SwiftPerson(firstName: "\(#function)",
                                          lastName: "lastname_\(i)",
                                          age: i)
@@ -754,7 +754,7 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
         waitForExpectations(timeout: 20.0, handler: nil)
 
         waitForDownloads(for: realm)
-        checkCount(expected: 16, realm, SwiftPerson.self)
+        checkCount(expected: 25, realm, SwiftPerson.self)
         checkCount(expected: 1, realm, SwiftTypesSyncObject.self)
 
         let ex2 = expectation(description: "state change complete")
@@ -776,7 +776,7 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
 
     func testFlexibleSyncAppRemoveAllQueries() throws {
         try populateFlexibleSyncData { realm in
-            for i in 1...21 {
+            for i in 1...25 {
                 let person = SwiftPerson(firstName: "\(#function)",
                                          lastName: "lastname_\(i)",
                                          age: i)
@@ -814,7 +814,7 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
         waitForExpectations(timeout: 20.0, handler: nil)
 
         waitForDownloads(for: realm)
-        checkCount(expected: 16, realm, SwiftPerson.self)
+        checkCount(expected: 20, realm, SwiftPerson.self)
         checkCount(expected: 1, realm, SwiftTypesSyncObject.self)
 
         let ex2 = expectation(description: "state change complete")
@@ -833,7 +833,7 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
         waitForExpectations(timeout: 20.0, handler: nil)
 
         waitForDownloads(for: realm)
-        checkCount(expected: 1, realm, SwiftPerson.self)
+        checkCount(expected: 5, realm, SwiftPerson.self)
         checkCount(expected: 0, realm, SwiftTypesSyncObject.self)
     }
 
@@ -902,7 +902,7 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
 
     func testFlexibleSyncAppUpdateQuery() throws {
         try populateFlexibleSyncData { realm in
-            for i in 1...21 {
+            for i in 1...25 {
                 let person = SwiftPerson(firstName: "\(#function)",
                                          lastName: "lastname_\(i)",
                                          age: i)
@@ -933,7 +933,7 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
         waitForExpectations(timeout: 20.0, handler: nil)
 
         waitForDownloads(for: realm)
-        checkCount(expected: 1, realm, SwiftPerson.self)
+        checkCount(expected: 5, realm, SwiftPerson.self)
 
         let foundSubscription = subscriptions.first(named: "person_age")
         XCTAssertNotNil(foundSubscription)
@@ -953,12 +953,12 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
         waitForExpectations(timeout: 20.0, handler: nil)
 
         waitForDownloads(for: realm)
-        checkCount(expected: 16, realm, SwiftPerson.self)
+        checkCount(expected: 20, realm, SwiftPerson.self)
     }
 
     func testFlexibleSyncInitialSubscriptions() throws {
         try populateFlexibleSyncData { realm in
-            for i in 1...21 {
+            for i in 1...20 {
                 let person = SwiftPerson(firstName: "\(#function)",
                                          lastName: "lastname_\(i)",
                                          age: i)
@@ -990,7 +990,7 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
         XCTAssertEqual(subscriptions.state, .complete)
 
         waitForDownloads(for: realm)
-        checkCount(expected: 11, realm, SwiftPerson.self)
+        checkCount(expected: 10, realm, SwiftPerson.self)
     }
 }
 
@@ -1042,7 +1042,7 @@ extension SwiftFlexibleSyncServerTests {
     @MainActor
     func testFlexibleSyncAppAddQueryAsyncAwait() async throws {
         try await populateFlexibleSyncData { realm in
-            for i in 1...21 {
+            for i in 1...25 {
                 let person = SwiftPerson(firstName: "\(#function)",
                                          lastName: "lastname_\(i)",
                                          age: i)
@@ -1064,7 +1064,7 @@ extension SwiftFlexibleSyncServerTests {
             })
         }
 
-        checkCount(expected: 6, realm, SwiftPerson.self)
+        checkCount(expected: 10, realm, SwiftPerson.self)
     }
 
     @MainActor
@@ -1106,7 +1106,7 @@ extension SwiftFlexibleSyncServerTests {
     func testFlexibleSyncAllDocumentsForType() async throws {
         try await populateFlexibleSyncData { realm in
             realm.deleteAll() // Remove all objects for a clean state
-            for i in 1...21 {
+            for i in 1...28 {
                 let person = SwiftPerson(firstName: "\(#function)",
                                          lastName: "lastname_\(i)",
                                          age: i)
@@ -1127,7 +1127,7 @@ extension SwiftFlexibleSyncServerTests {
         }
         XCTAssertEqual(subscriptions.state, .complete)
         XCTAssertEqual(subscriptions.count, 1)
-        checkCount(expected: 21, realm, SwiftPerson.self)
+        checkCount(expected: 28, realm, SwiftPerson.self)
     }
 
     @MainActor
@@ -1142,7 +1142,7 @@ extension SwiftFlexibleSyncServerTests {
     @MainActor
     func testFlexibleSyncInitialSubscriptionsAsync() async throws {
         try await populateFlexibleSyncData { realm in
-            for i in 1...21 {
+            for i in 1...20 {
                 let person = SwiftPerson(firstName: "\(#function)",
                                          lastName: "lastname_\(i)",
                                          age: i)
@@ -1164,7 +1164,7 @@ extension SwiftFlexibleSyncServerTests {
         XCTAssertNotNil(realm)
 
         XCTAssertEqual(realm.subscriptions.count, 1)
-        checkCount(expected: 11, realm, SwiftPerson.self)
+        checkCount(expected: 10, realm, SwiftPerson.self)
     }
 
     @MainActor
@@ -1194,7 +1194,7 @@ extension SwiftFlexibleSyncServerTests {
         var config = user.flexibleSyncConfiguration(initialSubscriptions: { subscriptions in
             if subscriptions.first(named: "person_age_10") == nil {
                 subscriptions.append(QuerySubscription<SwiftPerson>(name: "person_age_10") {
-                    $0.age > 10 && $0.firstName == "\(#function)"
+                    $0.age > 20 && $0.firstName == "\(#function)"
                 })
             }
         }, rerunOnOpen: true)
@@ -1286,7 +1286,7 @@ extension SwiftFlexibleSyncServerTests {
 extension SwiftFlexibleSyncServerTests {
     func testFlexibleSyncCombineWrite() throws {
         try populateFlexibleSyncData { realm in
-            for i in 1...21 {
+            for i in 1...25 {
                 let person = SwiftPerson(firstName: "\(#function)",
                                          lastName: "lastname_\(i)",
                                          age: i)
@@ -1316,7 +1316,7 @@ extension SwiftFlexibleSyncServerTests {
         waitForExpectations(timeout: 20.0, handler: nil)
 
         waitForDownloads(for: realm)
-        checkCount(expected: 11, realm, SwiftPerson.self)
+        checkCount(expected: 15, realm, SwiftPerson.self)
     }
 
     func testFlexibleSyncCombineWriteFails() throws {
