@@ -913,7 +913,7 @@ public class RealmServer: NSObject {
         try createAppForSyncMode(.pbs("string"))
     }
 
-    // Retrieve Atlas Device Sync AppId with ClientAppId using the Admin API
+    // Retrieve Atlas App Services App Id with ClientAppId using the Admin API
     public func retrieveAppServerId(_ clientAppId: String) throws -> String {
         guard let session = session else {
             fatalError()
