@@ -56,7 +56,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  A user may have one or more credentials associated with it. These credentials
  uniquely identify the user to the authentication provider, and are used to sign
- into a Atlas App Services user account.
+ into an Atlas App Services user account.
 
  Note that user objects are only vended out via SDK APIs, and cannot be directly
  initialized. User objects can be accessed from any thread.

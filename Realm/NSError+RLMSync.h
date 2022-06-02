@@ -35,7 +35,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (nullable RLMSyncErrorActionToken *)rlmSync_errorActionToken NS_REFINED_FOR_SWIFT;
 
 /**
- Given a Atlas App Services client reset error, return the path where the
+ Given an Atlas App Services client reset error, return the path where the
  backup copy of the Realm will be placed once the client reset process is
  complete.
  */

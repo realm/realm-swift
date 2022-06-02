@@ -24,7 +24,7 @@ import Combine
 #endif
 
 /**
- An object representing a Atlas App Services user.
+ An object representing an Atlas App Services user.
 
  - see: `RLMUser`
  */
@@ -343,7 +343,7 @@ public enum ClientResetMode {
     }
 }
 
-/// Structure providing an interface to call a Atlas App Services function with the provided name and arguments.
+/// Structure providing an interface to call an Atlas App Services function with the provided name and arguments.
 ///
 ///     user.functions.sum([1, 2, 3, 4, 5]) { sum, error in
 ///         guard case let .int64(value) = sum else {
@@ -555,7 +555,7 @@ public extension User {
         return self.__mongoClient(withServiceName: serviceName)
     }
 
-    /// Call a Atlas App Services function with the provided name and arguments.
+    /// Call an Atlas App Services function with the provided name and arguments.
     ///
     ///     user.functions.sum([1, 2, 3, 4, 5]) { sum, error in
     ///         guard case let .int64(value) = sum else {

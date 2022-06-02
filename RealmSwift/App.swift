@@ -115,7 +115,7 @@ let credentials = Credentials.JWT(token: myToken)
     case emailPassword(email: String, password: String)
     /// Credentials from a JSON Web Token
     case jwt(token: String)
-    /// Credentials for a Atlas App Services function using a mongodb document as a json payload.
+    /// Credentials for an Atlas App Services function using a mongodb document as a json payload.
     /// If the json can not be successfully serialised and error will be produced and the object will be nil.
     case function(payload: Document)
     /// Credentials from a user api key.

@@ -24,7 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
 /// A token representing an identity provider's credentials.
 typedef NSString *RLMCredentialsToken;
 
-/// A type representing the unique identifier of a Atlas App Services identity provider.
+/// A type representing the unique identifier of an Atlas App Services identity provider.
 typedef NSString *RLMIdentityProvider NS_EXTENSIBLE_STRING_ENUM;
 
 /// The username/password identity provider. User accounts are handled by Atlas App Services directly without the
@@ -84,7 +84,7 @@ extern RLMIdentityProvider const RLMIdentityProviderServerAPIKey;
 + (instancetype)credentialsWithAppleToken:(RLMCredentialsToken)token;
 
 /**
- Construct and return credentials for a Atlas App Services function using a mongodb document as a json payload.
+ Construct and return credentials for an Atlas App Services function using a mongodb document as a json payload.
 */
 + (instancetype)credentialsWithFunctionPayload:(NSDictionary<NSString *, id<RLMBSON>> *)payload;
 

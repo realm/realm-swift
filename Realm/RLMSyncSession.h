@@ -113,7 +113,7 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
- An object encapsulating a Atlas App Services "session". Sessions represent the
+ An object encapsulating an Atlas App Services "session". Sessions represent the
  communication between the client (and a local Realm file on disk), and the server
  (and a remote Realm with a given partition value stored on Atlas App Services).
 
