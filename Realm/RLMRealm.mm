@@ -460,8 +460,8 @@ static RLMRealm *getCachedRealm(RLMRealmConfiguration *configuration, void *cach
 + (instancetype)realmWithConfiguration:(RLMRealmConfiguration *)configuration
                                  queue:(dispatch_queue_t)queue
                                  error:(NSError **)error {
-    BOOL realmExist = [RLMRealm fileExistsForConfiguration:configuration];
-    return [RLMRealm realmWithConfiguration:configuration queue:queue error:error realmExist:realmExist];
+    BOOL realmExist = [self fileExistsForConfiguration:configuration];
+    return [self realmWithConfiguration:configuration queue:queue error:error realmExist:realmExist];
 }
 
 + (instancetype)realmWithConfiguration:(RLMRealmConfiguration *)configuration
