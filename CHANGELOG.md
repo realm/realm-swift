@@ -12,7 +12,7 @@ x.y.z Release notes (yyyy-MM-dd)
   which allows to specify a subscription update block, to bootstrap a set of flexible sync subscriptions 
   when the Realm is first opened.
   There is an additional optional parameter flag `rerunOnOpen`, which allows to run this initial 
-  subscriptions on every realm open.
+  subscriptions on every app startup.
 
 ```swift
     let config = user.flexibleSyncConfiguration(initialSubscriptions: { subs in

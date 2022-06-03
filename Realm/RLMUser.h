@@ -155,7 +155,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param initialSubscriptions A block which receives a subscription set instance, that can be
                              used to add an initial set of subscriptions which will be executed
                              when the Realm is first opened.
- @param rerunOnOpen If true, allows to run the initial set of subscriptions specified, on the first realm open.
+ @param rerunOnOpen If true, allows to run the initial set of subscriptions specified, on every app startup.
                     This can be used to re-run dynamic time ranges and other queries that require a
                     re-computation of a static variable.
 

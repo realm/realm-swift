@@ -1014,6 +1014,8 @@
     }];
     [self waitForExpectationsWithTimeout:10.0 handler:nil];
 
+    [self clearCachedRealms];
+
     XCTestExpectation *ex2 = [self expectationWithDescription:@"download-realm-2"];
     [RLMRealm asyncOpenWithConfiguration:config
                            callbackQueue:dispatch_get_main_queue()

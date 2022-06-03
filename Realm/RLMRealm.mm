@@ -258,10 +258,11 @@ static RLMAsyncOpenTask *openAsync(RLMRealmConfiguration *configuration,
 }
 
 - (void)subscribeToInitialSubscriptionsWithConfiguration:(RLMRealmConfiguration *)configuration
-                                              realmExist:(BOOL)realmExist {
+                                             realmExists:(BOOL)realmExists
+                                           realmIsCached:(bool)realmIsCached {
 #if REALM_ENABLE_SYNC
     if (configuration.config.sync_config && configuration.syncConfiguration.enableFlexibleSync && configuration.initialSubscriptions) {
-        if (!realmExist || configuration.rerunOnOpen) {
+        if (!realmExists || (configuration.rerunOnOpen || !realmIsCached)) {
             RLMSyncSubscriptionSet *subscriptions = self.subscriptions;
             [subscriptions update:^{
                 configuration.initialSubscriptions(subscriptions);
@@ -274,7 +275,7 @@ static RLMAsyncOpenTask *openAsync(RLMRealmConfiguration *configuration,
 + (RLMAsyncOpenTask *)asyncOpenWithConfiguration:(RLMRealmConfiguration *)configuration
                                    callbackQueue:(dispatch_queue_t)callbackQueue
                                         callback:(RLMAsyncOpenRealmCallback)callback {
-    BOOL realmExist = [RLMRealm fileExistsForConfiguration:configuration];
+    BOOL realmExists = [RLMRealm fileExistsForConfiguration:configuration];
     return openAsync(configuration, [=](ThreadSafeReference ref, std::exception_ptr err) {
         @autoreleasepool {
             if (err) {
@@ -301,7 +302,7 @@ static RLMAsyncOpenTask *openAsync(RLMRealmConfiguration *configuration,
                     RLMRealm *localRealm = [RLMRealm realmWithConfiguration:configuration
                                                                       queue:callbackQueue
                                                                       error:&error
-                                                                 realmExist:realmExist];
+                                                                realmExists:realmExists];
                     ref.reset();
 
                     // In case of setting an initial subscription while opening the realm, we have to wait for the subscription to complete and bootstrap data before returning the realm.
@@ -460,14 +461,14 @@ static RLMRealm *getCachedRealm(RLMRealmConfiguration *configuration, void *cach
 + (instancetype)realmWithConfiguration:(RLMRealmConfiguration *)configuration
                                  queue:(dispatch_queue_t)queue
                                  error:(NSError **)error {
-    BOOL realmExist = [self fileExistsForConfiguration:configuration];
-    return [self realmWithConfiguration:configuration queue:queue error:error realmExist:realmExist];
+    BOOL realmExists = [self fileExistsForConfiguration:configuration];
+    return [self realmWithConfiguration:configuration queue:queue error:error realmExists:realmExists];
 }
 
 + (instancetype)realmWithConfiguration:(RLMRealmConfiguration *)configuration
                                  queue:(dispatch_queue_t)queue
                                  error:(NSError **)error
-                            realmExist:(BOOL)realmExist {
+                           realmExists:(BOOL)realmExists {
     // The main thread and main queue share a cache key of `std::numeric_limits<uintptr_t>::max()`
     // so that they give the same instance. Other Realms are keyed on either the thread or the queue.
     // Note that despite being a void* the cache key is not actually a pointer;
@@ -483,6 +484,9 @@ static RLMRealm *getCachedRealm(RLMRealmConfiguration *configuration, void *cach
             cacheKey = pthread_self();
         }
     }
+
+    // We want to check if the realm for the given path has been opened already, so we don't rerun the initial subscription more than once on the App cycle.
+    bool realmIsCached = RLMAnyCachedRealmExistsForPath(configuration.path);
 
     // First check if we already have a cached Realm for this thread/config
     if (auto realm = getCachedRealm(configuration, cacheKey)) {
@@ -618,7 +622,7 @@ static RLMRealm *getCachedRealm(RLMRealmConfiguration *configuration, void *cach
         realm->_realm->m_binding_context->realm = realm->_realm;
     }
 
-    [realm subscribeToInitialSubscriptionsWithConfiguration:configuration realmExist:realmExist];
+    [realm subscribeToInitialSubscriptionsWithConfiguration:configuration realmExists:realmExists realmIsCached:realmIsCached];
     return RLMAutorelease(realm);
 }
 

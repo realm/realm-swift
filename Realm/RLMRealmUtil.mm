@@ -54,6 +54,11 @@ RLMRealm *RLMGetAnyCachedRealmForPath(std::string const& path) {
     return [s_realmsPerPath[path] objectEnumerator].nextObject;
 }
 
+bool RLMAnyCachedRealmExistsForPath(std::string const& path) {
+    std::lock_guard<std::mutex> lock(s_realmCacheMutex);
+    return s_realmsPerPath[path].count > 0;
+}
+
 RLMRealm *RLMGetThreadLocalCachedRealmForPath(std::string const& path, void *key) {
     std::lock_guard<std::mutex> lock(s_realmCacheMutex);
     RLMRealm *realm = [s_realmsPerPath[path] objectForKey:(__bridge id)key];
