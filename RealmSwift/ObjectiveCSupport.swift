@@ -203,4 +203,21 @@ import Realm
             return object(localRealm.rlmRealm, remoteRealm.rlmRealm)
         }
     }
+
+    /// Converts a swift block receiving a `SyncSubscriptionSet`to a RLMFlexibleSyncInitialSubscriptionsBlock receiving a `RLMSyncSubscriptionSet`.
+    public static func convert(block: @escaping ((SyncSubscriptionSet) -> Void)) -> RLMFlexibleSyncInitialSubscriptionsBlock {
+        return { subscriptionSet in
+            return block(SyncSubscriptionSet(subscriptionSet))
+        }
+    }
+
+    /// Converts a block receiving a `RLMSyncSubscriptionSet`to a swift block receiving a `SyncSubscriptionSet`.
+    public static func convert(block: RLMFlexibleSyncInitialSubscriptionsBlock?) -> ((SyncSubscriptionSet) -> Void)? {
+        guard let block = block else {
+            return nil
+        }
+        return { subscriptionSet in
+            return block(subscriptionSet.rlmSyncSubscriptionSet)
+        }
+    }
 }

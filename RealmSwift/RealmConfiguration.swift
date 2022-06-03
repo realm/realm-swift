@@ -276,6 +276,14 @@ extension Realm {
         /// If `true`, disables automatic format upgrades when accessing the Realm.
         internal var disableFormatUpgrade: Bool = false
 
+        // MARK: Flexible Sync
+
+        /// Callback for adding subscriptions to the initialization of the Realm
+        internal var initialSubscriptions: ((SyncSubscriptionSet) -> Void)?
+
+        /// If `true` Indicates that the `initialSubscriptions` will run on every Realm open.
+        internal var rerunOnOpen: Bool = false
+
         // MARK: Private Methods
 
         internal var rlmConfiguration: RLMRealmConfiguration {
@@ -316,6 +324,12 @@ extension Realm {
                 rlmConfig.logger = eventConfiguration.logger
                 configuration.eventConfiguration = rlmConfig
             }
+
+            if let initialSubscriptions = initialSubscriptions {
+                configuration.initialSubscriptions = ObjectiveCSupport.convert(block: initialSubscriptions)
+                configuration.rerunOnOpen = rerunOnOpen
+            }
+
             return configuration
         }
 
@@ -346,6 +360,10 @@ extension Realm {
                                                                       syncUser: eventConfiguration.syncUser,
                                                                       partitionPrefix: eventConfiguration.partitionPrefix)
             }
+
+            configuration.initialSubscriptions = ObjectiveCSupport.convert(block: rlmConfiguration.initialSubscriptions)
+            configuration.rerunOnOpen = rlmConfiguration.rerunOnOpen
+
             return configuration
         }
     }

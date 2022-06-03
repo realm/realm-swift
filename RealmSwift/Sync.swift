@@ -933,4 +933,35 @@ extension User {
         let config = self.__flexibleSyncConfiguration()
         return ObjectiveCSupport.convert(object: config)
     }
+
+    /**
+     Create a flexible sync configuration instance, which can be used to open a realm  which
+     supports flexible sync.
+
+     It won't be possible to combine flexible and partition sync in the same app, which means if you open
+     a realm with a flexible sync configuration, you won't be able to open a realm with a PBS configuration
+     and the other way around.
+
+     Using `rerunOnOpen` covers the cases where you want to re-run dynamic queries, for example time ranges.
+     ```
+     var config = user.flexibleSyncConfiguration(initialSubscriptions: { subscriptions in
+         subscriptions.append(QuerySubscription<User>() {
+             $0.birthdate < Date() && $0.birthdate > Calendar.current.date(byAdding: .year, value: 21)!
+         })
+     }, rerunOnOpen: true)
+     ```
+
+     - parameter initialSubscriptions: A block which receives a subscription set instance, that can be used to add an
+                                       initial set of subscriptions which will be executed when the Realm is first opened.
+     - parameter rerunOnOpen:          If true, allows to run the initial set of subscriptions specified, on every app startup.
+                                       This can be used to re-run dynamic time ranges and other queries that require a
+                                       re-computation of a static variable.
+
+
+     @return A `Realm.Configuration` instance with a flexible sync configuration.
+     */
+    public func flexibleSyncConfiguration(initialSubscriptions: @escaping ((SyncSubscriptionSet) -> Void), rerunOnOpen: Bool = false) -> Realm.Configuration {
+        let config = self.__flexibleSyncConfiguration(initialSubscriptions: ObjectiveCSupport.convert(block: initialSubscriptions), rerunOnOpen: rerunOnOpen)
+        return ObjectiveCSupport.convert(object: config)
+    }
 }

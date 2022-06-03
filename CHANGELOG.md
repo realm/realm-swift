@@ -9,6 +9,20 @@ x.y.z Release notes (yyyy-MM-dd)
    }
 ```
 * Add Combine API support for flexible sync beta.
+* Add an `initialSubscriptions` parameter when retrieving the flexible sync configuration from a user, 
+  which allows to specify a subscription update block, to bootstrap a set of flexible sync subscriptions 
+  when the Realm is first opened.
+  There is an additional optional parameter flag `rerunOnOpen`, which allows to run this initial 
+  subscriptions on every app startup.
+
+```swift
+    let config = user.flexibleSyncConfiguration(initialSubscriptions: { subs in
+        subs.append(QuerySubscription<SwiftPerson>(name: "people_10") {
+            $0.age > 10
+        })
+    }, rerunOnOpen: true)
+    let realm = try Realm(configuration: config)
+```
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)

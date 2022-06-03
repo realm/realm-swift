@@ -614,7 +614,7 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
 
     func testFlexibleSyncAppWithoutQuery() throws {
         try populateFlexibleSyncData { realm in
-            for i in 1...21 {
+            for i in 1...10 {
                 // Using firstname to query only objects from this test
                 let person = SwiftPerson(firstName: "\(#function)",
                                          lastName: "lastname_\(i)",
@@ -637,7 +637,7 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
 
     func testFlexibleSyncAppAddQuery() throws {
         try populateFlexibleSyncData { realm in
-            for i in 1...21 {
+            for i in 1...25 {
                 let person = SwiftPerson(firstName: "\(#function)",
                                          lastName: "lastname_\(i)",
                                          age: i)
@@ -669,12 +669,12 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
         waitForExpectations(timeout: 20.0, handler: nil)
 
         waitForDownloads(for: realm)
-        checkCount(expected: 6, realm, SwiftPerson.self)
+        checkCount(expected: 10, realm, SwiftPerson.self)
     }
 
     func testFlexibleSyncAppMultipleQuery() throws {
         try populateFlexibleSyncData { realm in
-            for i in 1...21 {
+            for i in 1...20 {
                 let person = SwiftPerson(firstName: "\(#function)",
                                          lastName: "lastname_\(i)",
                                          age: i)
@@ -711,13 +711,13 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
         waitForExpectations(timeout: 20.0, handler: nil)
 
         waitForDownloads(for: realm)
-        checkCount(expected: 11, realm, SwiftPerson.self)
+        checkCount(expected: 10, realm, SwiftPerson.self)
         checkCount(expected: 1, realm, SwiftTypesSyncObject.self)
     }
 
     func testFlexibleSyncAppRemoveQuery() throws {
         try populateFlexibleSyncData { realm in
-            for i in 1...21 {
+            for i in 1...30 {
                 let person = SwiftPerson(firstName: "\(#function)",
                                          lastName: "lastname_\(i)",
                                          age: i)
@@ -754,7 +754,7 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
         waitForExpectations(timeout: 20.0, handler: nil)
 
         waitForDownloads(for: realm)
-        checkCount(expected: 16, realm, SwiftPerson.self)
+        checkCount(expected: 25, realm, SwiftPerson.self)
         checkCount(expected: 1, realm, SwiftTypesSyncObject.self)
 
         let ex2 = expectation(description: "state change complete")
@@ -776,7 +776,7 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
 
     func testFlexibleSyncAppRemoveAllQueries() throws {
         try populateFlexibleSyncData { realm in
-            for i in 1...21 {
+            for i in 1...25 {
                 let person = SwiftPerson(firstName: "\(#function)",
                                          lastName: "lastname_\(i)",
                                          age: i)
@@ -814,7 +814,7 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
         waitForExpectations(timeout: 20.0, handler: nil)
 
         waitForDownloads(for: realm)
-        checkCount(expected: 16, realm, SwiftPerson.self)
+        checkCount(expected: 20, realm, SwiftPerson.self)
         checkCount(expected: 1, realm, SwiftTypesSyncObject.self)
 
         let ex2 = expectation(description: "state change complete")
@@ -833,7 +833,7 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
         waitForExpectations(timeout: 20.0, handler: nil)
 
         waitForDownloads(for: realm)
-        checkCount(expected: 1, realm, SwiftPerson.self)
+        checkCount(expected: 5, realm, SwiftPerson.self)
         checkCount(expected: 0, realm, SwiftTypesSyncObject.self)
     }
 
@@ -902,7 +902,7 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
 
     func testFlexibleSyncAppUpdateQuery() throws {
         try populateFlexibleSyncData { realm in
-            for i in 1...21 {
+            for i in 1...25 {
                 let person = SwiftPerson(firstName: "\(#function)",
                                          lastName: "lastname_\(i)",
                                          age: i)
@@ -933,7 +933,7 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
         waitForExpectations(timeout: 20.0, handler: nil)
 
         waitForDownloads(for: realm)
-        checkCount(expected: 1, realm, SwiftPerson.self)
+        checkCount(expected: 5, realm, SwiftPerson.self)
 
         let foundSubscription = subscriptions.first(named: "person_age")
         XCTAssertNotNil(foundSubscription)
@@ -953,7 +953,44 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
         waitForExpectations(timeout: 20.0, handler: nil)
 
         waitForDownloads(for: realm)
-        checkCount(expected: 16, realm, SwiftPerson.self)
+        checkCount(expected: 20, realm, SwiftPerson.self)
+    }
+
+    func testFlexibleSyncInitialSubscriptions() throws {
+        try populateFlexibleSyncData { realm in
+            for i in 1...20 {
+                let person = SwiftPerson(firstName: "\(#function)",
+                                         lastName: "lastname_\(i)",
+                                         age: i)
+                realm.add(person)
+            }
+        }
+
+        let user = try logInUser(for: basicCredentials(app: self.flexibleSyncApp), app: self.flexibleSyncApp)
+        var config = user.flexibleSyncConfiguration(initialSubscriptions: { subscriptions in
+            subscriptions.append(QuerySubscription<SwiftPerson>(name: "person_age_10") {
+                $0.age > 10 && $0.firstName == "\(#function)"
+            })
+        })
+        if config.objectTypes == nil {
+            config.objectTypes = [SwiftPerson.self,
+                                  SwiftTypesSyncObject.self]
+        }
+        let realm = try Realm(configuration: config)
+        let subscriptions = realm.subscriptions
+        XCTAssertNotNil(subscriptions)
+        XCTAssertEqual(subscriptions.count, 1)
+
+        checkCount(expected: 0, realm, SwiftPerson.self)
+
+        let start = Date()
+        while subscriptions.state != .complete && start.timeIntervalSinceNow > -5.0 {
+            sleep(1) // wait until state is on complete state
+        }
+        XCTAssertEqual(subscriptions.state, .complete)
+
+        waitForDownloads(for: realm)
+        checkCount(expected: 10, realm, SwiftPerson.self)
     }
 }
 
@@ -974,23 +1011,27 @@ class SwiftAsyncFlexibleSyncTests: SwiftSyncTestCase {
 
 @available(macOS 12.0, *)
 extension SwiftFlexibleSyncServerTests {
-    @MainActor
-    private func populateFlexibleSyncData(_ block: @escaping (Realm) -> Void) async throws {
-        var config = (try await self.flexibleSyncApp.login(credentials: .anonymous)).flexibleSyncConfiguration()
+    func flexibleSyncConfig() async throws -> Realm.Configuration {
+        var config = (try await self.flexibleSyncApp.login(credentials: basicCredentials(app: flexibleSyncApp))).flexibleSyncConfiguration()
         if config.objectTypes == nil {
             config.objectTypes = [SwiftPerson.self,
                                   SwiftTypesSyncObject.self]
         }
-        let realm = try await Realm(configuration: config)
+        return config
+    }
 
+    func flexibleSyncRealm() async throws -> Realm {
+        let realm = try await Realm(configuration: flexibleSyncConfig())
+        return realm
+    }
+
+    @MainActor
+    private func populateFlexibleSyncData(_ block: @escaping (Realm) -> Void) async throws {
+        let realm = try await flexibleSyncRealm()
         let subscriptions = realm.subscriptions
         try await subscriptions.update {
-            subscriptions.append(QuerySubscription<SwiftPerson> {
-                $0.age >= 0
-            })
-            subscriptions.append(QuerySubscription<SwiftTypesSyncObject> {
-                $0.boolCol == true
-            })
+            subscriptions.append(QuerySubscription<SwiftPerson>())
+            subscriptions.append(QuerySubscription<SwiftTypesSyncObject>())
         }
 
         try realm.write {
@@ -1001,7 +1042,7 @@ extension SwiftFlexibleSyncServerTests {
     @MainActor
     func testFlexibleSyncAppAddQueryAsyncAwait() async throws {
         try await populateFlexibleSyncData { realm in
-            for i in 1...21 {
+            for i in 1...25 {
                 let person = SwiftPerson(firstName: "\(#function)",
                                          lastName: "lastname_\(i)",
                                          age: i)
@@ -1009,9 +1050,7 @@ extension SwiftFlexibleSyncServerTests {
             }
         }
 
-        var config = try await self.flexibleSyncApp.login(credentials: basicCredentials(app: self.flexibleSyncApp)).flexibleSyncConfiguration()
-        config.objectTypes = [SwiftPerson.self, SwiftTypesSyncObject.self]
-        let realm = try await Realm(configuration: config)
+        let realm = try await flexibleSyncRealm()
         XCTAssertNotNil(realm)
         checkCount(expected: 0, realm, SwiftPerson.self)
 
@@ -1025,15 +1064,12 @@ extension SwiftFlexibleSyncServerTests {
             })
         }
 
-        checkCount(expected: 6, realm, SwiftPerson.self)
+        checkCount(expected: 10, realm, SwiftPerson.self)
     }
 
     @MainActor
     func testStates() async throws {
-        var config = (try await self.flexibleSyncApp.login(credentials: .anonymous))
-            .flexibleSyncConfiguration()
-        config.objectTypes = [SwiftPerson.self, SwiftTypesSyncObject.self]
-        let realm = try await Realm(configuration: config)
+        let realm = try await flexibleSyncRealm()
         XCTAssertNotNil(realm)
 
         let subscriptions = realm.subscriptions
@@ -1070,7 +1106,7 @@ extension SwiftFlexibleSyncServerTests {
     func testFlexibleSyncAllDocumentsForType() async throws {
         try await populateFlexibleSyncData { realm in
             realm.deleteAll() // Remove all objects for a clean state
-            for i in 1...21 {
+            for i in 1...28 {
                 let person = SwiftPerson(firstName: "\(#function)",
                                          lastName: "lastname_\(i)",
                                          age: i)
@@ -1078,9 +1114,7 @@ extension SwiftFlexibleSyncServerTests {
             }
         }
 
-        var config = try await self.flexibleSyncApp.login(credentials: basicCredentials(app: self.flexibleSyncApp)).flexibleSyncConfiguration()
-        config.objectTypes = [SwiftPerson.self, SwiftTypesSyncObject.self]
-        let realm = try await Realm(configuration: config)
+        let realm = try await flexibleSyncRealm()
         XCTAssertNotNil(realm)
         checkCount(expected: 0, realm, SwiftPerson.self)
 
@@ -1093,9 +1127,158 @@ extension SwiftFlexibleSyncServerTests {
         }
         XCTAssertEqual(subscriptions.state, .complete)
         XCTAssertEqual(subscriptions.count, 1)
-        checkCount(expected: 21, realm, SwiftPerson.self)
+        checkCount(expected: 28, realm, SwiftPerson.self)
     }
 
+    @MainActor
+    func testFlexibleSyncNotInitialSubscriptions() async throws {
+        let config = try await flexibleSyncConfig()
+        let realm = try await Realm(configuration: config, downloadBeforeOpen: .always)
+        XCTAssertNotNil(realm)
+
+        XCTAssertEqual(realm.subscriptions.count, 0)
+    }
+
+    @MainActor
+    func testFlexibleSyncInitialSubscriptionsAsync() async throws {
+        try await populateFlexibleSyncData { realm in
+            for i in 1...20 {
+                let person = SwiftPerson(firstName: "\(#function)",
+                                         lastName: "lastname_\(i)",
+                                         age: i)
+                realm.add(person)
+            }
+        }
+
+        let user = try await logInUser(for: basicCredentials(app: self.flexibleSyncApp), app: self.flexibleSyncApp)
+        var config = user.flexibleSyncConfiguration(initialSubscriptions: { subscriptions in
+            subscriptions.append(QuerySubscription<SwiftPerson>(name: "person_age_10") {
+                $0.age > 10 && $0.firstName == "\(#function)"
+            })
+        })
+
+        if config.objectTypes == nil {
+            config.objectTypes = [SwiftPerson.self]
+        }
+        let realm = try await Realm(configuration: config, downloadBeforeOpen: .once)
+        XCTAssertNotNil(realm)
+
+        XCTAssertEqual(realm.subscriptions.count, 1)
+        checkCount(expected: 10, realm, SwiftPerson.self)
+    }
+
+    @MainActor
+    func testFlexibleSyncInitialSubscriptionsNotRerunOnOpen() async throws {
+        let user = try await logInUser(for: basicCredentials(app: self.flexibleSyncApp), app: self.flexibleSyncApp)
+        var config = user.flexibleSyncConfiguration(initialSubscriptions: { subscriptions in
+            subscriptions.append(QuerySubscription<SwiftPerson>(name: "person_age_10") {
+                $0.age > 10 && $0.firstName == "\(#function)"
+            })
+        })
+
+        if config.objectTypes == nil {
+            config.objectTypes = [SwiftPerson.self]
+        }
+        let realm = try await Realm(configuration: config, downloadBeforeOpen: .once)
+        XCTAssertNotNil(realm)
+        XCTAssertEqual(realm.subscriptions.count, 1)
+
+        let realm2 = try await Realm(configuration: config, downloadBeforeOpen: .once)
+        XCTAssertNotNil(realm2)
+        XCTAssertEqual(realm.subscriptions.count, 1)
+    }
+
+    @MainActor
+    func testFlexibleSyncInitialSubscriptionsRerunOnOpenNamedQuery() async throws {
+        let user = try await logInUser(for: basicCredentials(app: self.flexibleSyncApp), app: self.flexibleSyncApp)
+        var config = user.flexibleSyncConfiguration(initialSubscriptions: { subscriptions in
+            if subscriptions.first(named: "person_age_10") == nil {
+                subscriptions.append(QuerySubscription<SwiftPerson>(name: "person_age_10") {
+                    $0.age > 20 && $0.firstName == "\(#function)"
+                })
+            }
+        }, rerunOnOpen: true)
+
+        if config.objectTypes == nil {
+            config.objectTypes = [SwiftPerson.self]
+        }
+        let realm = try await Realm(configuration: config, downloadBeforeOpen: .once)
+        XCTAssertNotNil(realm)
+        XCTAssertEqual(realm.subscriptions.count, 1)
+
+        let realm2 = try await Realm(configuration: config, downloadBeforeOpen: .once)
+        XCTAssertNotNil(realm2)
+        XCTAssertEqual(realm.subscriptions.count, 1)
+    }
+
+    @MainActor
+    func testFlexibleSyncInitialSubscriptionsRerunOnOpenUnnamedQuery() async throws {
+        try await populateFlexibleSyncData { realm in
+            for i in 1...30 {
+                let object = SwiftTypesSyncObject()
+                object.dateCol = Calendar.current.date(
+                    byAdding: .hour,
+                    value: -i,
+                    to: Date())!
+                realm.add(object)
+            }
+        }
+        let user = try await logInUser(for: basicCredentials(app: self.flexibleSyncApp), app: self.flexibleSyncApp)
+        var isFirstOpen = true
+        var config = user.flexibleSyncConfiguration(initialSubscriptions: { subscriptions in
+            subscriptions.append(QuerySubscription<SwiftTypesSyncObject>(query: {
+                let date = isFirstOpen ? Calendar.current.date(
+                    byAdding: .hour,
+                    value: -10,
+                    to: Date()) : Calendar.current.date(
+                        byAdding: .hour,
+                        value: -20,
+                        to: Date())
+                isFirstOpen = false
+                return $0.dateCol < Date() && $0.dateCol > date!
+            }))
+        }, rerunOnOpen: true)
+
+        if config.objectTypes == nil {
+            config.objectTypes = [SwiftTypesSyncObject.self, SwiftPerson.self]
+        }
+        let realm = try await Realm(configuration: config, downloadBeforeOpen: .always)
+        XCTAssertNotNil(realm)
+        XCTAssertEqual(realm.subscriptions.count, 1)
+        checkCount(expected: 9, realm, SwiftTypesSyncObject.self)
+
+        clearCachedRealms()
+
+        let realm2 = try await Realm(configuration: config, downloadBeforeOpen: .always)
+        XCTAssertNotNil(realm2)
+        XCTAssertEqual(realm.subscriptions.count, 2)
+        XCTAssertEqual(realm2.subscriptions.count, 2)
+        checkCount(expected: 19, realm2, SwiftTypesSyncObject.self)
+    }
+
+    @MainActor
+    func testFlexibleSyncInitialSubscriptionsThrows() async throws {
+        let user = try await logInUser(for: basicCredentials(app: self.flexibleSyncApp), app: self.flexibleSyncApp)
+        var config = user.flexibleSyncConfiguration(initialSubscriptions: { subscriptions in
+            if subscriptions.first(named: "query_uuid") == nil {
+                subscriptions.append(QuerySubscription<SwiftTypesSyncObject>(query: {
+                    $0.uuidCol == UUID()
+                }))
+            }
+        })
+
+        if config.objectTypes == nil {
+            config.objectTypes = [SwiftTypesSyncObject.self, SwiftPerson.self]
+        }
+        do {
+           _ = try await Realm(configuration: config, downloadBeforeOpen: .once)
+        } catch {
+            XCTAssertNotNil(error)
+            let nsError = error as NSError
+            XCTAssertEqual(nsError.code, 2)
+            XCTAssertEqual(nsError.domain, "io.realm.sync.flx")
+        }
+    }
 }
 #endif // canImport(_Concurrency)
 
@@ -1105,7 +1288,7 @@ extension SwiftFlexibleSyncServerTests {
 extension SwiftFlexibleSyncServerTests {
     func testFlexibleSyncCombineWrite() throws {
         try populateFlexibleSyncData { realm in
-            for i in 1...21 {
+            for i in 1...25 {
                 let person = SwiftPerson(firstName: "\(#function)",
                                          lastName: "lastname_\(i)",
                                          age: i)
@@ -1135,7 +1318,7 @@ extension SwiftFlexibleSyncServerTests {
         waitForExpectations(timeout: 20.0, handler: nil)
 
         waitForDownloads(for: realm)
-        checkCount(expected: 11, realm, SwiftPerson.self)
+        checkCount(expected: 15, realm, SwiftPerson.self)
     }
 
     func testFlexibleSyncCombineWriteFails() throws {

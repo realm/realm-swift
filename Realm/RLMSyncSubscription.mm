@@ -247,13 +247,28 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
         NSError *err = [[NSError alloc] initWithDomain:RLMFlexibleSyncErrorDomain code:RLMFlexibleSyncErrorCommitSubscriptionSetError userInfo:@{@"reason":@(error.what())}];
         return completionBlock(err);
     }
+    [self waitForSynchronizationOnQueue:nil completionBlock:completionBlock];
+}
+
+- (void)waitForSynchronizationOnQueue:(nullable dispatch_queue_t)queue
+                      completionBlock:(void(^)(NSError *))completionBlock {
     _subscriptionSet->get_state_change_notification(realm::sync::SubscriptionSet::State::Complete)
-        .get_async([completionBlock](realm::StatusWith<realm::sync::SubscriptionSet::State> state) mutable noexcept {
-            if (state.is_ok()) {
-                completionBlock(nil);
+        .get_async([completionBlock, queue](realm::StatusWith<realm::sync::SubscriptionSet::State> state) mutable noexcept {
+            void (^block)(void) = ^{
+                if (state.is_ok()) {
+                    completionBlock(nil);
+                } else {
+                    NSError* error = [[NSError alloc] initWithDomain:RLMFlexibleSyncErrorDomain code:state.get_status().code() userInfo:@{@"reason": @(state.get_status().reason().c_str())}];
+                    completionBlock(error);
+                }
+            };
+
+            if (queue) {
+                dispatch_async(queue, ^{
+                    block();
+                });
             } else {
-                NSError* error = [[NSError alloc] initWithDomain:RLMFlexibleSyncErrorDomain code:state.get_status().code() userInfo:@{@"reason": @(state.get_status().reason().c_str())}];
-                completionBlock(error);
+                block();
             }
         });
 }

@@ -27,6 +27,13 @@
 - (NSString *)createAppWithQueryableFields:(NSArray *)queryableFields error:(NSError **)error;
 @end
 
+@interface TimeoutProxyServer : NSObject
+- (instancetype)initWithPort:(uint16_t)port targetPort:(uint16_t)targetPort;
+- (void)startAndReturnError:(NSError **)error;
+- (void)stop;
+@property (nonatomic) double delay;
+@end
+
 @interface RLMFlexibleSyncTests : RLMSyncTestCase
 @end
 
@@ -908,5 +915,187 @@
         [realm addObject:[[Person alloc] initWithPrimaryKey:[RLMObjectId objectId] age:10 firstName:@"Nic" lastName:@"Cages"]];
     }];
     [self waitForExpectations:@[ex] timeout:20];
+}
+
+- (void)testFlexibleSyncInitialSubscription {
+    RLMUser *user = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd)
+                                                                        register:YES
+                                                                             app:self.flexibleSyncApp]
+                                              app:self.flexibleSyncApp];
+    RLMRealmConfiguration *config = [user flexibleSyncConfigurationWithInitialSubscriptions:^(RLMSyncSubscriptionSet *subscriptions) {
+        [subscriptions addSubscriptionWithClassName:Person.className
+                                   subscriptionName:@"person_age"
+                                              where:@"TRUEPREDICATE"];
+    } rerunOnOpen:false];
+    config.objectClasses = @[Person.self];
+    RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
+    XCTAssertEqual(realm.subscriptions.count, 1UL);
+}
+
+- (void)testFlexibleSyncInitialSubscriptionAwait {
+    bool didPopulate = [self populateData:^(RLMRealm *realm) {
+        [self createPeople:realm partition:_cmd];
+    }];
+    if (!didPopulate) {
+        return;
+    }
+
+    RLMUser *user = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd)
+                                                                        register:YES
+                                                                             app:self.flexibleSyncApp]
+                                              app:self.flexibleSyncApp];
+    RLMRealmConfiguration *config = [user flexibleSyncConfigurationWithInitialSubscriptions:^(RLMSyncSubscriptionSet *subscriptions) {
+        [subscriptions addSubscriptionWithClassName:Person.className
+                                   subscriptionName:@"person_age"
+                                              where:@"age > 10 and partition == %@", NSStringFromSelector(_cmd)];
+    } rerunOnOpen:false];
+    config.objectClasses = @[Person.self];
+    XCTestExpectation *ex = [self expectationWithDescription:@"download-realm"];
+    [RLMRealm asyncOpenWithConfiguration:config
+                           callbackQueue:dispatch_get_main_queue()
+                                callback:^(RLMRealm *realm, NSError *error) {
+        XCTAssertNil(error);
+        XCTAssertEqual(realm.subscriptions.count, 1UL);
+        CHECK_COUNT(11, Person, realm);
+        [ex fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:10.0 handler:nil];
+}
+
+- (void)testFlexibleSyncInitialSubscriptionDoNotRerunOnOpen {
+    RLMUser *user = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd)
+                                                                        register:YES
+                                                                             app:self.flexibleSyncApp]
+                                              app:self.flexibleSyncApp];
+    RLMRealmConfiguration *config = [user flexibleSyncConfigurationWithInitialSubscriptions:^(RLMSyncSubscriptionSet *subscriptions) {
+        [subscriptions addSubscriptionWithClassName:Person.className
+                                   subscriptionName:@"person_age"
+                                              where:@"age > 10 and partition == %@", NSStringFromSelector(_cmd)];
+    } rerunOnOpen:false];
+    config.objectClasses = @[Person.self];
+
+    RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
+    XCTAssertEqual(realm.subscriptions.count, 1UL);
+
+    RLMRealm *realm2 = [RLMRealm realmWithConfiguration:config error:nil];
+    XCTAssertEqual(realm2.subscriptions.count, 1UL);
+}
+
+- (void)testFlexibleSyncInitialSubscriptionRerunOnOpen {
+    bool didPopulate = [self populateData:^(RLMRealm *realm) {
+        [self createPeople:realm partition:_cmd];
+    }];
+    if (!didPopulate) {
+        return;
+    }
+
+    RLMUser *user = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd)
+                                                                        register:YES
+                                                                             app:self.flexibleSyncApp]
+                                              app:self.flexibleSyncApp];
+
+    __block bool isFirstOpen = true;
+    RLMRealmConfiguration *config = [user flexibleSyncConfigurationWithInitialSubscriptions:^(RLMSyncSubscriptionSet *subscriptions) {
+        RLMSyncSubscription *subscription = [subscriptions subscriptionWithName:@"person_age"];
+        int age = (isFirstOpen == true) ? 10 : 5;
+        [subscriptions addSubscriptionWithClassName:Person.className
+                                              where:@"age > %i and partition == %@", age, NSStringFromSelector(_cmd)];
+        isFirstOpen = false;
+    } rerunOnOpen:true];
+    config.objectClasses = @[Person.self];
+    XCTestExpectation *ex = [self expectationWithDescription:@"download-realm"];
+    [RLMRealm asyncOpenWithConfiguration:config
+                           callbackQueue:dispatch_get_main_queue()
+                                callback:^(RLMRealm *realm, NSError *error) {
+        XCTAssertNil(error);
+        XCTAssertEqual(realm.subscriptions.count, 1UL);
+        CHECK_COUNT(11, Person, realm);
+        [ex fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:10.0 handler:nil];
+
+    [self clearCachedRealms];
+
+    XCTestExpectation *ex2 = [self expectationWithDescription:@"download-realm-2"];
+    [RLMRealm asyncOpenWithConfiguration:config
+                           callbackQueue:dispatch_get_main_queue()
+                                callback:^(RLMRealm *realm, NSError *error) {
+        XCTAssertNil(error);
+        XCTAssertEqual(realm.subscriptions.count, 2UL);
+        CHECK_COUNT(16, Person, realm);
+        [ex2 fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:10.0 handler:nil];
+}
+
+- (void)testFlexibleSyncInitialOnConnectionTimeout {
+    TimeoutProxyServer *proxy = [[TimeoutProxyServer alloc] initWithPort:5678 targetPort:9090];
+    NSError *error;
+    [proxy startAndReturnError:&error];
+    XCTAssertNil(error);
+
+    RLMAppConfiguration *appConfig = [[RLMAppConfiguration alloc] initWithBaseURL:@"http://localhost:9090"
+                                                                        transport:[AsyncOpenConnectionTimeoutTransport new]
+                                                                     localAppName:nil
+                                                                  localAppVersion:nil
+                                                          defaultRequestTimeoutMS:60];
+    RLMApp *app = [RLMApp appWithId:self.flexibleSyncAppId configuration:appConfig];
+    RLMUser *user = [self logInUserForCredentials:[RLMCredentials anonymousCredentials] app:app];
+
+    RLMRealmConfiguration *config = [user flexibleSyncConfigurationWithInitialSubscriptions:^(RLMSyncSubscriptionSet *subscriptions) {
+        RLMSyncSubscription *subscription = [subscriptions subscriptionWithName:@"person_age"];
+        [subscriptions addSubscriptionWithClassName:Person.className
+                                              where:@"age > 10 and partition == %@", NSStringFromSelector(_cmd)];
+    } rerunOnOpen:true];
+    config.objectClasses = @[Person.class];
+    RLMSyncConfiguration *syncConfig = config.syncConfiguration;
+    syncConfig.cancelAsyncOpenOnNonFatalErrors = true;
+    config.syncConfiguration = syncConfig;
+
+    RLMSyncTimeoutOptions *timeoutOptions = [RLMSyncTimeoutOptions new];
+    timeoutOptions.connectTimeout = 1000.0;
+    app.syncManager.timeoutOptions = timeoutOptions;
+
+    // Set delay above the timeout so it should fail
+    proxy.delay = 2.0;
+
+    XCTestExpectation *ex = [self expectationWithDescription:@"async open"];
+    [RLMRealm asyncOpenWithConfiguration:config
+                           callbackQueue:dispatch_get_main_queue()
+                                callback:^(RLMRealm *realm, NSError *error) {
+        XCTAssertNotNil(error);
+        XCTAssertEqual(error.code, ETIMEDOUT);
+        XCTAssertEqual(error.domain, NSPOSIXErrorDomain);
+        XCTAssertNil(realm);
+        [ex fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:10.0 handler:nil];
+
+    [proxy stop];
+}
+
+- (void)testFlexibleSyncInitialSubscriptionThrowsError {
+    RLMUser *user = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd)
+                                                                        register:YES
+                                                                             app:self.flexibleSyncApp]
+                                              app:self.flexibleSyncApp];
+
+    RLMRealmConfiguration *config = [user flexibleSyncConfigurationWithInitialSubscriptions:^(RLMSyncSubscriptionSet *subscriptions) {
+        [subscriptions addSubscriptionWithClassName:UUIDPrimaryKeyObject.className
+                                              where:@"strCol == %@", @"Tom"];
+    } rerunOnOpen:false];
+    config.objectClasses = @[UUIDPrimaryKeyObject.self];
+    XCTestExpectation *ex = [self expectationWithDescription:@"download-realm"];
+    [RLMRealm asyncOpenWithConfiguration:config
+                           callbackQueue:dispatch_get_main_queue()
+                                callback:^(RLMRealm *realm, NSError *error) {
+        XCTAssertNotNil(error);
+        XCTAssertEqual(error.code, 2);
+        XCTAssertTrue([error.domain isEqualToString: @"io.realm.sync.flx"]); // This is a flexible sync error when the query property is not a queryable field, realm is opened but the subscription could not be completed.
+        XCTAssertNotNil(realm);
+
+        [ex fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:10.0 handler:nil];
 }
 @end
