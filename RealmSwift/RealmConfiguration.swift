@@ -281,7 +281,7 @@ extension Realm {
         /// Callback for adding subscriptions to the initialization of the Realm
         internal var initialSubscriptions: ((SyncSubscriptionSet) -> Void)?
 
-        /// If `true` Indicates that the `initialSubscriptions` will run on every Realm open.
+        /// If `true` Indicates that the `initialSubscriptions` will run on every app startup.
         internal var rerunOnOpen: Bool = false
 
         // MARK: Private Methods
