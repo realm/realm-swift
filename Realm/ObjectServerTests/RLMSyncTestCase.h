@@ -131,6 +131,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)resetAppCache;
 
+- (void)clearCachedRealms;
+
 #pragma mark Flexible Sync App
 
 @property (nonatomic, readonly) NSString *flexibleSyncAppId;

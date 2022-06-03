@@ -30,6 +30,7 @@
 #import "RLMUtil.hpp"
 #import "RLMApp_Private.hpp"
 #import "RLMChildProcessEnvironment.h"
+#import "RLMRealmUtil.hpp"
 
 #import <realm/object-store/sync/sync_manager.hpp>
 #import <realm/object-store/sync/sync_session.hpp>
@@ -744,6 +745,10 @@ static NSURL *syncDirectoryForChildProcess() {
     XCTAssertNotNil(subs);
     [self waitForExpectationsWithTimeout:20.0 handler:nil];
     [self waitForDownloadsForRealm:realm];
+}
+
+- (void)clearCachedRealms {
+    RLMClearRealmCache();
 }
 
 @end

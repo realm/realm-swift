@@ -1247,6 +1247,8 @@ extension SwiftFlexibleSyncServerTests {
         XCTAssertEqual(realm.subscriptions.count, 1)
         checkCount(expected: 9, realm, SwiftTypesSyncObject.self)
 
+        clearCachedRealms()
+
         let realm2 = try await Realm(configuration: config, downloadBeforeOpen: .always)
         XCTAssertNotNil(realm2)
         XCTAssertEqual(realm.subscriptions.count, 2)
