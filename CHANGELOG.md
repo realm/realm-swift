@@ -23,10 +23,11 @@ x.y.z Release notes (yyyy-MM-dd)
     }, rerunOnOpen: true)
     let realm = try Realm(configuration: config)
 ```
+* The sync client error handler will report an error, with detailed info about which object caused it, when writing an object to a flexible sync Realm outside of any query subscription. ([#5528](https://github.com/realm/realm-core/pull/5528))
+* Adding an object to a flexible sync Realm for a type that is not within a query subscription will now throw an exception. ([#5488](https://github.com/realm/realm-core/pull/5488)).
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
-* None.
+* Flexible Sync query subscriptions will correctly complete when data is synced to the local Realm. ([#5553](https://github.com/realm/realm-core/pull/5553), since v12.0.0)
 
 ### Breaking Changes
 
