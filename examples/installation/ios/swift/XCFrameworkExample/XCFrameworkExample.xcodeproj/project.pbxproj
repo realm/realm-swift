@@ -179,7 +179,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0710;
-				LastUpgradeCheck = 1300;
+				LastUpgradeCheck = 1400;
 				ORGANIZATIONNAME = Realm;
 				TargetAttributes = {
 					E8E060BA1AFAB5EB00484DEE = {

@@ -234,7 +234,7 @@
 		1403AF401BFDC60A00C1FBB4 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1300;
+				LastUpgradeCheck = 1400;
 				ORGANIZATIONNAME = Realm;
 				TargetAttributes = {
 					1403AF6A1BFDC8D300C1FBB4 = {

@@ -229,7 +229,7 @@
 		E8645B7C1C7913D600C241AA /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1300;
+				LastUpgradeCheck = 1400;
 				ORGANIZATIONNAME = Realm;
 				TargetAttributes = {
 					E8645B831C7913D600C241AA = {
