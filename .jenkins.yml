@@ -158,7 +158,7 @@ exclude:
   - xcode_version: 13.3.1
     target: watchos
 
-  - xcode_version: 13.4.1
+  - xcode_version: 14.0
     target: watchos
 
   - xcode_version: 13.2.1
@@ -167,7 +167,7 @@ exclude:
   - xcode_version: 13.3.1
     target: tvos
 
-  - xcode_version: 13.4.1
+  - xcode_version: 14.0
     target: tvos
 
   - xcode_version: 13.2.1
@@ -185,7 +185,7 @@ exclude:
   - xcode_version: 13.3.1
     target: tvos-swift
 
-  - xcode_version: 13.4.1
+  - xcode_version: 14.0
     target: tvos-swift
 
   - xcode_version: 13.1
@@ -221,7 +221,7 @@ exclude:
   - xcode_version: 13.3.1
     target: tvos-swift-evolution
 
-  - xcode_version: 13.4.1
+  - xcode_version: 14.0
     target: tvos-swift-evolution
 
   - xcode_version: 13.2.1
@@ -251,7 +251,7 @@ exclude:
   - xcode_version: 13.3.1
     target: xcframework
 
-  - xcode_version: 13.4.1
+  - xcode_version: 14.0
     target: xcframework
 
   - xcode_version: 13.2.1
@@ -278,7 +278,7 @@ exclude:
   - xcode_version: 13.3.1
     target: cocoapods-watchos
 
-  - xcode_version: 13.4.1
+  - xcode_version: 14.0
     target: cocoapods-watchos
 
   - xcode_version: 13.1
