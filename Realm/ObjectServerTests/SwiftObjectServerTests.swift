@@ -2713,7 +2713,7 @@ class AsyncAwaitObjectServerTests: SwiftSyncTestCase {
         return super.defaultTestSuite
     }
 
-    func testAsyncOpenStandalone() async throws {
+    @MainActor func testAsyncOpenStandalone() async throws {
         try autoreleasepool {
             let realm = try Realm()
             try realm.write {
