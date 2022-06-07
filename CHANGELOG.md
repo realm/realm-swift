@@ -1,8 +1,8 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* Work around a Swift 5.7 type checker bug and fix warnings when building with
-  Xcode 14.
+* Add support for Xcode 14. When building with Xcode 14, the minimum deployment
+  target is now iOS 11.
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
