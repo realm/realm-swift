@@ -420,6 +420,7 @@ extension Projection: _ObservedResultsValue { }
 ///
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 @propertyWrapper public struct ObservedResults<ResultType>: DynamicProperty, BoundCollection where ResultType: _ObservedResultsValue & RealmFetchable & KeypathSortable & Identifiable {
+    public typealias Element = ResultType
     private class Storage: ObservableStorage<Results<ResultType>> {
         var setupHasRun = false
         private func didSet() {
@@ -728,6 +729,8 @@ extension Binding where Value: ObjectBase & ThreadConfined {
 public protocol BoundCollection {
     /// :nodoc:
     associatedtype Value
+    /// :nodoc:
+    associatedtype Element: RealmCollectionValue
 
     /// :nodoc:
     var wrappedValue: Value { get }
@@ -741,15 +744,57 @@ public extension BoundCollection where Value: RealmCollection {
     typealias Index = Value.Index
     /// :nodoc:
     typealias Indices = Value.Indices
+}
 
+@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+public extension BoundCollection where Value == List<Element> {
     /// :nodoc:
-    func remove<V>(at index: Index) where Value == List<V> {
+    func remove(at index: Index) {
         safeWrite(self.wrappedValue) { list in
             list.remove(at: index)
         }
     }
+
     /// :nodoc:
-    func remove<V>(_ object: V) where Value == Results<V>, V: ObjectBase & ThreadConfined {
+    func remove(atOffsets offsets: IndexSet) {
+        safeWrite(self.wrappedValue) { list in
+            list.remove(atOffsets: offsets)
+        }
+    }
+
+    /// :nodoc:
+    func move(fromOffsets offsets: IndexSet, toOffset destination: Int) {
+        safeWrite(self.wrappedValue) { list in
+            list.move(fromOffsets: offsets, toOffset: destination)
+        }
+    }
+
+    /// :nodoc:
+    func append(_ value: Value.Element) {
+        safeWrite(self.wrappedValue) { list in
+            list.append(value)
+        }
+    }
+}
+
+@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+public extension BoundCollection where Value == List<Element>, Element: ObjectBase & ThreadConfined {
+    /// :nodoc:
+    func append(_ value: Value.Element) {
+        // if the value is unmanaged but the list is managed, we are adding this value to the realm
+        if value.realm == nil && self.wrappedValue.realm != nil {
+            SwiftUIKVO.observedObjects[value]?.cancel()
+        }
+        safeWrite(self.wrappedValue) { list in
+            list.append(thawObjectIfFrozen(value))
+        }
+    }
+}
+
+@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+public extension BoundCollection where Value == Results<Element>, Element: ObjectBase & ThreadConfined {
+    /// :nodoc:
+    func remove(_ object: Value.Element) {
         guard let thawed = object.thaw(),
               let index = wrappedValue.thaw()?.index(of: thawed) else {
             return
@@ -759,43 +804,39 @@ public extension BoundCollection where Value: RealmCollection {
         }
     }
     /// :nodoc:
-    func remove<V>(atOffsets offsets: IndexSet) where Value == Results<V>, V: ObjectBase {
+    func remove(atOffsets offsets: IndexSet) {
         safeWrite(self.wrappedValue) { results in
             results.realm?.delete(Array(offsets.map { results[$0] }))
         }
     }
+}
+
+@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+public extension BoundCollection where Value == MutableSet<Element> {
     /// :nodoc:
-    func remove<V>(atOffsets offsets: IndexSet) where Value == List<V> {
-        safeWrite(self.wrappedValue) { list in
-            list.remove(atOffsets: offsets)
-        }
-    }
-    /// :nodoc:
-    func remove<V>(_ element: V) where Value == MutableSet<V> {
+    func remove(_ element: Value.Element) {
         safeWrite(self.wrappedValue) { mutableSet in
             mutableSet.remove(element)
         }
     }
     /// :nodoc:
-    func remove<V>(_ object: V) where Value == MutableSet<V>, V: ObjectBase & ThreadConfined {
+    func insert(_ value: Value.Element) {
+        safeWrite(self.wrappedValue) { mutableSet in
+            mutableSet.insert(value)
+        }
+    }
+}
+
+@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+public extension BoundCollection where Value == MutableSet<Element>, Element: ObjectBase & ThreadConfined {
+    /// :nodoc:
+    func remove(_ object: Value.Element) {
         safeWrite(self.wrappedValue) { mutableSet in
             mutableSet.remove(thawObjectIfFrozen(object))
         }
     }
     /// :nodoc:
-    func move<V>(fromOffsets offsets: IndexSet, toOffset destination: Int) where Value == List<V> {
-        safeWrite(self.wrappedValue) { list in
-            list.move(fromOffsets: offsets, toOffset: destination)
-        }
-    }
-    /// :nodoc:
-    func append<V>(_ value: Value.Element) where Value == List<V> {
-        safeWrite(self.wrappedValue) { list in
-            list.append(value)
-        }
-    }
-    /// :nodoc:
-    func insert<V>(_ value: Value.Element) where Value == MutableSet<V>, Value.Element: ObjectBase & ThreadConfined {
+    func insert(_ value: Value.Element) {
         // if the value is unmanaged but the set is managed, we are adding this value to the realm
         if value.realm == nil && self.wrappedValue.realm != nil {
             SwiftUIKVO.observedObjects[value]?.cancel()
@@ -804,24 +845,12 @@ public extension BoundCollection where Value: RealmCollection {
             mutableSet.insert(thawObjectIfFrozen(value))
         }
     }
+}
+
+@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+public extension BoundCollection where Value == Results<Element>, Element: Object {
     /// :nodoc:
-    func insert<V>(_ value: Value.Element) where Value == MutableSet<V> {
-        safeWrite(self.wrappedValue) { mutableSet in
-            mutableSet.insert(value)
-        }
-    }
-    /// :nodoc:
-    func append<V>(_ value: Value.Element) where Value == List<V>, Value.Element: ObjectBase & ThreadConfined {
-        // if the value is unmanaged but the list is managed, we are adding this value to the realm
-        if value.realm == nil && self.wrappedValue.realm != nil {
-            SwiftUIKVO.observedObjects[value]?.cancel()
-        }
-        safeWrite(self.wrappedValue) { list in
-            list.append(thawObjectIfFrozen(value))
-        }
-    }
-    /// :nodoc:
-    func append<V>(_ value: Value.Element) where Value == Results<V>, V: Object {
+    func append(_ value: Value.Element) {
         if value.realm == nil && self.wrappedValue.realm != nil {
             SwiftUIKVO.observedObjects[value]?.cancel()
         }
@@ -829,8 +858,12 @@ public extension BoundCollection where Value: RealmCollection {
             results.realm?.add(thawObjectIfFrozen(value))
         }
     }
+}
+
+@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+public extension BoundCollection where Value == Results<Element>, Element: ProjectionObservable & ThreadConfined, Element.Root: Object {
     /// :nodoc:
-    func append<V>(_ value: Value.Element) where Value == Results<V>, V: ProjectionObservable & ThreadConfined, V.Root: Object {
+    func append(_ value: Value.Element) {
         if value.realm == nil && self.wrappedValue.realm != nil {
             SwiftUIKVO.observedObjects[value.rootObject]?.cancel()
         }
@@ -839,8 +872,15 @@ public extension BoundCollection where Value: RealmCollection {
         }
     }
 }
+
 @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
 extension Binding: BoundCollection where Value: RealmCollection {
+    /// :nodoc:
+    public typealias Element = Value.Element
+    /// :nodoc:
+    public typealias Index = Value.Index
+    /// :nodoc:
+    public typealias Indices = Value.Indices
 }
 
 // MARK: - BoundMap
@@ -849,7 +889,7 @@ extension Binding: BoundCollection where Value: RealmCollection {
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 public protocol BoundMap {
     /// :nodoc:
-    associatedtype Value
+    associatedtype Value: RealmKeyedCollection
 
     /// :nodoc:
     var wrappedValue: Value { get }
@@ -857,21 +897,28 @@ public protocol BoundMap {
 
 /// :nodoc:
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-public extension BoundMap where Value: RealmKeyedCollection {
-    /// :nodoc:
-    typealias Key = Value.Key
-    /// :nodoc:
-    typealias Element = Value.Value
-
+public extension BoundMap {
     // The compiler will not allow us to assign values by subscript as the binding is a get-only
     // property. To get around this we need an explicit `set` method.
     /// :nodoc:
-    subscript( key: Key) -> Element? {
+    subscript( key: Value.Key) -> Value.Value? {
         self.wrappedValue[key]
     }
 
     /// :nodoc:
-    func set<K, V>(object: Element?, for key: Key) where Element: ObjectBase & ThreadConfined, Value == Map<K, V> {
+    func set(object: Value.Value?, for key: Value.Key) {
+        safeWrite(self.wrappedValue) { map in
+            var m = map
+            m[key] = object
+        }
+    }
+}
+
+/// :nodoc:
+@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+public extension BoundMap where Value.Value: ObjectBase & ThreadConfined {
+    /// :nodoc:
+    func set(object: Value.Value?, for key: Value.Key) {
         // If the value is `nil` remove it from the map.
         guard let value = object else {
             safeWrite(self.wrappedValue) { map in
@@ -884,21 +931,8 @@ public extension BoundMap where Value: RealmKeyedCollection {
             SwiftUIKVO.observedObjects[value]?.cancel()
         }
         safeWrite(self.wrappedValue) { map in
-            map[key] = thawObjectIfFrozen(value)
-        }
-    }
-
-    /// :nodoc:
-    func set<K, V>(object: Element?, for key: Key) where Value == Map<K, V> {
-        // If the value is `nil` remove it from the map.
-        guard let value = object else {
-            safeWrite(self.wrappedValue) { map in
-                map.removeObject(for: key)
-            }
-            return
-        }
-        safeWrite(self.wrappedValue) { map in
-            map[key] = value
+            var m = map
+            m[key] = thawObjectIfFrozen(value)
         }
     }
 }

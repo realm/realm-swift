@@ -122,7 +122,7 @@ static NSString *RLMHashData(const void *bytes, size_t length) {
 
     char formatted[CC_SHA256_DIGEST_LENGTH * 2 + 1];
     for (int i = 0; i < CC_SHA256_DIGEST_LENGTH; ++i) {
-        sprintf(formatted + i * 2, "%02x", buffer[i]);
+        snprintf(formatted + i * 2, sizeof(formatted) - i * 2, "%02x", buffer[i]);
     }
 
     return [[NSString alloc] initWithBytes:formatted

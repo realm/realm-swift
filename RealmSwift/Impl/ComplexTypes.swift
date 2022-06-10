@@ -258,7 +258,7 @@ extension Optional: _Persistable where Wrapped: _PersistableInsideOptional {
 extension Optional: _PrimaryKey where Wrapped: _Persistable, Wrapped.PersistedType: _PrimaryKey {}
 extension Optional: _Indexable where Wrapped: _Persistable, Wrapped.PersistedType: _Indexable {}
 
-extension RealmProperty: _RealmSchemaDiscoverable, SchemaDiscoverable where Value: _RealmSchemaDiscoverable {
+extension RealmProperty: _RealmSchemaDiscoverable, SchemaDiscoverable {
     public static var _rlmType: PropertyType { Value._rlmType }
     public static var _rlmOptional: Bool { Value._rlmOptional }
     public static var _rlmRequireObjc: Bool { false }

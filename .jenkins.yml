@@ -7,7 +7,8 @@ xcode_version:
  - 13.1
  - 13.2.1
  - 13.3.1
- - 13.4
+ - 13.4.1
+ - 14.0
 target:
  - docs
  - swiftlint
@@ -52,6 +53,9 @@ exclude:
   - xcode_version: 13.3.1
     target: docs
 
+  - xcode_version: 13.4.1
+    target: docs
+
   - xcode_version: 13.1
     target: swiftlint
 
@@ -61,6 +65,9 @@ exclude:
   - xcode_version: 13.3.1
     target: swiftlint
 
+  - xcode_version: 13.4.1
+    target: swiftlint
+
   - xcode_version: 13.1
     target: osx-encryption
 
@@ -68,18 +75,27 @@ exclude:
     target: osx-encryption
 
   - xcode_version: 13.3.1
+    target: osx-encryption
+
+  - xcode_version: 13.4.1
     target: osx-encryption
 
   - xcode_version: 13.2.1
     target: osx-object-server
 
   - xcode_version: 13.3.1
+    target: osx-object-server
+
+  - xcode_version: 13.4.1
     target: osx-object-server
 
   - xcode_version: 13.2.1
     target: swiftpm
 
   - xcode_version: 13.3.1
+    target: swiftpm
+
+  - xcode_version: 13.4.1
     target: swiftpm
 
   - xcode_version: 13.1
@@ -89,6 +105,9 @@ exclude:
     target: swiftpm-address
 
   - xcode_version: 13.3.1
+    target: swiftpm-address
+
+  - xcode_version: 13.4.1
     target: swiftpm-address
 
   - xcode_version: 13.1
@@ -98,6 +117,9 @@ exclude:
     target: swiftpm-thread
 
   - xcode_version: 13.3.1
+    target: swiftpm-thread
+
+  - xcode_version: 13.4.1
     target: swiftpm-thread
 
   - xcode_version: 13.1
@@ -107,42 +129,63 @@ exclude:
     target: swiftpm-ios
 
   - xcode_version: 13.3.1
+    target: swiftpm-ios
+
+  - xcode_version: 13.4.1
     target: swiftpm-ios
 
   - xcode_version: 13.2.1
     target: ios-static
 
   - xcode_version: 13.3.1
+    target: ios-static
+
+  - xcode_version: 13.4.1
     target: ios-static
 
   - xcode_version: 13.2.1
     target: ios-dynamic
 
   - xcode_version: 13.3.1
+    target: ios-dynamic
+
+  - xcode_version: 13.4.1
     target: ios-dynamic
 
   - xcode_version: 13.2.1
     target: watchos
 
   - xcode_version: 13.3.1
+    target: watchos
+
+  - xcode_version: 14.0
     target: watchos
 
   - xcode_version: 13.2.1
     target: tvos
 
   - xcode_version: 13.3.1
+    target: tvos
+
+  - xcode_version: 14.0
     target: tvos
 
   - xcode_version: 13.2.1
     target: ios-swift
 
   - xcode_version: 13.3.1
+    target: ios-swift
+
+  - xcode_version: 13.4.1
     target: ios-swift
 
   - xcode_version: 13.2.1
     target: tvos-swift
 
   - xcode_version: 13.3.1
+    target: tvos-swift
+
+  - xcode_version: 14.0
     target: tvos-swift
 
   - xcode_version: 13.1
@@ -152,6 +195,9 @@ exclude:
     target: osx-swift-evolution
 
   - xcode_version: 13.3.1
+    target: osx-swift-evolution
+
+  - xcode_version: 13.4.1
     target: osx-swift-evolution
 
   - xcode_version: 13.1
@@ -161,6 +207,9 @@ exclude:
     target: ios-swift-evolution
 
   - xcode_version: 13.3.1
+    target: ios-swift-evolution
+
+  - xcode_version: 13.4.1
     target: ios-swift-evolution
 
   - xcode_version: 13.1
@@ -170,18 +219,27 @@ exclude:
     target: tvos-swift-evolution
 
   - xcode_version: 13.3.1
+    target: tvos-swift-evolution
+
+  - xcode_version: 14.0
     target: tvos-swift-evolution
 
   - xcode_version: 13.2.1
     target: catalyst
 
   - xcode_version: 13.3.1
+    target: catalyst
+
+  - xcode_version: 13.4.1
     target: catalyst
 
   - xcode_version: 13.2.1
     target: catalyst-swift
 
   - xcode_version: 13.3.1
+    target: catalyst-swift
+
+  - xcode_version: 13.4.1
     target: catalyst-swift
 
   - xcode_version: 13.1
@@ -191,24 +249,36 @@ exclude:
     target: xcframework
 
   - xcode_version: 13.3.1
+    target: xcframework
+
+  - xcode_version: 14.0
     target: xcframework
 
   - xcode_version: 13.2.1
     target: cocoapods-ios
 
   - xcode_version: 13.3.1
+    target: cocoapods-ios
+
+  - xcode_version: 13.4.1
     target: cocoapods-ios
 
   - xcode_version: 13.2.1
     target: cocoapods-ios-dynamic
 
   - xcode_version: 13.3.1
+    target: cocoapods-ios-dynamic
+
+  - xcode_version: 13.4.1
     target: cocoapods-ios-dynamic
 
   - xcode_version: 13.2.1
     target: cocoapods-watchos
 
   - xcode_version: 13.3.1
+    target: cocoapods-watchos
+
+  - xcode_version: 14.0
     target: cocoapods-watchos
 
   - xcode_version: 13.1
@@ -218,6 +288,9 @@ exclude:
     target: swiftui-ios
 
   - xcode_version: 13.3.1
+    target: swiftui-ios
+
+  - xcode_version: 13.4.1
     target: swiftui-ios
 
   - xcode_version: 13.1
@@ -227,4 +300,7 @@ exclude:
     target: swiftui-server-osx
 
   - xcode_version: 13.3.1
+    target: swiftui-server-osx
+
+  - xcode_version: 13.4.1
     target: swiftui-server-osx

@@ -119,7 +119,7 @@
 		E8F1E81519BA4A3800FAD64E /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1300;
+				LastUpgradeCheck = 1400;
 				ORGANIZATIONNAME = Realm;
 			};
 			buildConfigurationList = E8F1E81819BA4A3800FAD64E /* Build configuration list for PBXProject "RealmExamples" */;
