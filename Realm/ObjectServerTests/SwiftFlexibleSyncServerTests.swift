@@ -1281,6 +1281,22 @@ extension SwiftFlexibleSyncServerTests {
             XCTAssertEqual(nsError.domain, "io.realm.sync.flx")
         }
     }
+
+    @MainActor
+    func testFlexibleSyncInitialSubscriptionsDefaultConfiguration() async throws {
+        let user = try await logInUser(for: basicCredentials(app: self.flexibleSyncApp), app: self.flexibleSyncApp)
+        var config = user.flexibleSyncConfiguration(initialSubscriptions: { subscriptions in
+            subscriptions.append(QuerySubscription<SwiftTypesSyncObject>())
+        })
+
+        if config.objectTypes == nil {
+            config.objectTypes = [SwiftTypesSyncObject.self, SwiftPerson.self]
+        }
+        Realm.Configuration.defaultConfiguration = config
+
+        let realm = try await Realm(downloadBeforeOpen: .once)
+        XCTAssertEqual(realm.subscriptions.count, 1)
+    }
 }
 #endif // canImport(_Concurrency)
 
