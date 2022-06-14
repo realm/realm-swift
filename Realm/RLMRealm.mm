@@ -491,9 +491,11 @@ static RLMRealm *getCachedRealm(RLMRealmConfiguration *configuration, void *cach
             bool didCopySeed = false;
             NSError *copyError;
             DB::call_with_lock(configuration.path, [&](auto const&) {
-                didCopySeed = [[NSFileManager defaultManager] copyItemAtURL:configuration.seedFilePath
-                                                                      toURL:configuration.fileURL
-                                                                      error:&copyError];
+                if (![RLMRealm fileExistsForConfiguration:configuration]) {
+                    didCopySeed = [[NSFileManager defaultManager] copyItemAtURL:configuration.seedFilePath
+                                                                        toURL:configuration.fileURL
+                                                                        error:&copyError];
+                }
             });
             if (!didCopySeed && copyError != nil) {
                 RLMSetErrorOrThrow(copyError, error);
