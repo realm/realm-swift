@@ -495,7 +495,7 @@ static RLMRealm *getCachedRealm(RLMRealmConfiguration *configuration, void *cach
                                                                       toURL:configuration.fileURL
                                                                       error:&copyError];
             });
-            if (!didCopySeed && copyError != nil) {
+            if (!didCopySeed && copyError != nil && copyError.code != NSFileWriteFileExistsError) {
                 RLMSetErrorOrThrow(copyError, error);
                 return nil;
             }
