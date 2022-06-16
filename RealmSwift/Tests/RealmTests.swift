@@ -964,33 +964,46 @@ class RealmTests: TestCase {
         }
     }
 
-    func testSeedFilePath() {
-        do {
-            var localConfig = Realm.Configuration()
-            localConfig.fileURL = defaultRealmURL().deletingLastPathComponent().appendingPathComponent("original.realm")
+    func testSeedFilePath() throws {
+        var localConfig = Realm.Configuration()
+        localConfig.fileURL = defaultRealmURL().deletingLastPathComponent().appendingPathComponent("original.realm")
 
-            try autoreleasepool {
-                let realm = try Realm(configuration: localConfig)
-                try! realm.write {
-                    realm.add(SwiftBoolObject())
-                }
-                XCTAssertEqual(realm.objects(SwiftBoolObject.self).count, 1)
+        try autoreleasepool {
+            let realm = try Realm(configuration: localConfig)
+            try realm.write {
+                realm.add(SwiftBoolObject())
             }
+            XCTAssertEqual(realm.objects(SwiftBoolObject.self).count, 1)
+        }
 
-            var destinationConfig = Realm.Configuration()
-            destinationConfig.fileURL = defaultRealmURL().deletingLastPathComponent().appendingPathComponent("destination.realm")
-            destinationConfig.seedFilePath = defaultRealmURL().deletingLastPathComponent().appendingPathComponent("original.realm")
+        var destinationConfig = Realm.Configuration()
+        destinationConfig.fileURL = defaultRealmURL().deletingLastPathComponent().appendingPathComponent("destination.realm")
+        destinationConfig.seedFilePath = defaultRealmURL().deletingLastPathComponent().appendingPathComponent("original.realm")
 
+        try autoreleasepool {
+            // Should copy the seed file over before opening
             let destinationRealm = try Realm(configuration: destinationConfig)
             XCTAssertEqual(destinationRealm.objects(SwiftBoolObject.self).count, 1)
 
-            try! destinationRealm.write {
+            try destinationRealm.write {
                 destinationRealm.add(SwiftBoolObject())
             }
 
             XCTAssertEqual(destinationRealm.objects(SwiftBoolObject.self).count, 2)
-        } catch {
-            XCTFail("Got an error: \(error)")
+        }
+
+        try autoreleasepool {
+            let realm = try Realm(configuration: localConfig)
+            try realm.write {
+                realm.deleteAll()
+            }
+            XCTAssertEqual(realm.objects(SwiftBoolObject.self).count, 0)
+        }
+
+        try autoreleasepool {
+            // Should not have copied the seed file as the Realm already exists
+            let destinationRealm = try Realm(configuration: destinationConfig)
+            XCTAssertEqual(destinationRealm.objects(SwiftBoolObject.self).count, 2)
         }
     }
 

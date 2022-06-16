@@ -4,8 +4,9 @@ x.y.z Release notes (yyyy-MM-dd)
 * None.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
-* None.
+* Using `seedFilePath` threw an exception if the Realm file being opened
+  already existed ([#7840](https://github.com/realm/realm-swift/issues/7840),
+  since v10.26.0).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
