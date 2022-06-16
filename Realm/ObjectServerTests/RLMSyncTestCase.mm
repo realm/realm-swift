@@ -660,21 +660,21 @@ static NSURL *syncDirectoryForChildProcess() {
     return realm;
 }
 
+- (RLMUser *)flexibleSyncUser:(SEL)testSel {
+    return [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(testSel)
+                                                               register:YES
+                                                                    app:self.flexibleSyncApp]
+                                     app:self.flexibleSyncApp];
+}
+
 - (RLMRealm *)getFlexibleSyncRealm:(SEL)testSel {
-    RLMUser *user = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(testSel)
-                                                                        register:YES
-                                                                             app:self.flexibleSyncApp]
-                                              app:self.flexibleSyncApp];
-    RLMRealm *realm = [self flexibleSyncRealmForUser:user];
+    RLMRealm *realm = [self flexibleSyncRealmForUser:[self flexibleSyncUser:testSel]];
     XCTAssertNotNil(realm);
     return realm;
 }
 
 - (RLMRealm *)openFlexibleSyncRealm:(SEL)testSel {
-    RLMUser *user = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(testSel)
-                                                                        register:YES
-                                                                             app:self.flexibleSyncApp]
-                                              app:self.flexibleSyncApp];
+    RLMUser *user = [self flexibleSyncUser:testSel];
     RLMRealmConfiguration *config = [user flexibleSyncConfiguration];
     config.objectClasses = @[Dog.self,
                              Person.self];
@@ -699,8 +699,7 @@ static NSURL *syncDirectoryForChildProcess() {
                                                                              app:self.flexibleSyncApp]
                                               app:self.flexibleSyncApp];
     RLMRealmConfiguration *config = [user flexibleSyncConfiguration];
-    config.objectClasses = @[Dog.self,
-                             Person.self];
+    config.objectClasses = @[Dog.self, Person.self];
     RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
 
     RLMSyncSubscriptionSet *subs = realm.subscriptions;
@@ -745,10 +744,6 @@ static NSURL *syncDirectoryForChildProcess() {
     XCTAssertNotNil(subs);
     [self waitForExpectationsWithTimeout:20.0 handler:nil];
     [self waitForDownloadsForRealm:realm];
-}
-
-- (void)clearCachedRealms {
-    RLMClearRealmCache();
 }
 
 @end

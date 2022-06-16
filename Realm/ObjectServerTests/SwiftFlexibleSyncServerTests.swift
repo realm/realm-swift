@@ -1242,18 +1242,20 @@ extension SwiftFlexibleSyncServerTests {
         if config.objectTypes == nil {
             config.objectTypes = [SwiftTypesSyncObject.self, SwiftPerson.self]
         }
-        let realm = try await Realm(configuration: config, downloadBeforeOpen: .always)
-        XCTAssertNotNil(realm)
-        XCTAssertEqual(realm.subscriptions.count, 1)
-        checkCount(expected: 9, realm, SwiftTypesSyncObject.self)
+        let c = config
+        _ = try await Task { @MainActor in
+            let realm = try await Realm(configuration: c, downloadBeforeOpen: .always)
+            XCTAssertNotNil(realm)
+            XCTAssertEqual(realm.subscriptions.count, 1)
+            checkCount(expected: 9, realm, SwiftTypesSyncObject.self)
+        }.value
 
-        clearCachedRealms()
-
-        let realm2 = try await Realm(configuration: config, downloadBeforeOpen: .always)
-        XCTAssertNotNil(realm2)
-        XCTAssertEqual(realm.subscriptions.count, 2)
-        XCTAssertEqual(realm2.subscriptions.count, 2)
-        checkCount(expected: 19, realm2, SwiftTypesSyncObject.self)
+        _ = try await Task { @MainActor in
+            let realm = try await Realm(configuration: c, downloadBeforeOpen: .always)
+            XCTAssertNotNil(realm)
+            XCTAssertEqual(realm.subscriptions.count, 2)
+            checkCount(expected: 19, realm, SwiftTypesSyncObject.self)
+        }.value
     }
 
     @MainActor

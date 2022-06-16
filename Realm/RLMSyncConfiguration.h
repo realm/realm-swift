@@ -18,10 +18,10 @@
 
 #import <Foundation/Foundation.h>
 
+@class RLMApp;
 @class RLMRealm;
 @class RLMRealmConfiguration;
 @class RLMUser;
-@class RLMApp;
 @protocol RLMBSON;
 
 NS_ASSUME_NONNULL_BEGIN

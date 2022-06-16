@@ -229,7 +229,7 @@
         RLMAssertThrowsWithReason([subs addSubscriptionWithClassName:Person.className
                                                     subscriptionName:@"person_age"
                                                                where:@"age > 20"],
-                                  @"Cannot duplicate a subscription. If you meant to update the subscription please use the `update` method.");
+                                  @"A subscription named 'person_age' already exists. If you meant to update the existing subscription please use the `update` method.");
     }];
 
     XCTAssertEqual(subs.version, 1UL);
@@ -918,10 +918,7 @@
 }
 
 - (void)testFlexibleSyncInitialSubscription {
-    RLMUser *user = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                                        register:YES
-                                                                             app:self.flexibleSyncApp]
-                                              app:self.flexibleSyncApp];
+    RLMUser *user = [self flexibleSyncUser:_cmd];
     RLMRealmConfiguration *config = [user flexibleSyncConfigurationWithInitialSubscriptions:^(RLMSyncSubscriptionSet *subscriptions) {
         [subscriptions addSubscriptionWithClassName:Person.className
                                    subscriptionName:@"person_age"
@@ -940,10 +937,7 @@
         return;
     }
 
-    RLMUser *user = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                                        register:YES
-                                                                             app:self.flexibleSyncApp]
-                                              app:self.flexibleSyncApp];
+    RLMUser *user = [self flexibleSyncUser:_cmd];
     RLMRealmConfiguration *config = [user flexibleSyncConfigurationWithInitialSubscriptions:^(RLMSyncSubscriptionSet *subscriptions) {
         [subscriptions addSubscriptionWithClassName:Person.className
                                    subscriptionName:@"person_age"
@@ -963,10 +957,7 @@
 }
 
 - (void)testFlexibleSyncInitialSubscriptionDoNotRerunOnOpen {
-    RLMUser *user = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                                        register:YES
-                                                                             app:self.flexibleSyncApp]
-                                              app:self.flexibleSyncApp];
+    RLMUser *user = [self flexibleSyncUser:_cmd];
     RLMRealmConfiguration *config = [user flexibleSyncConfigurationWithInitialSubscriptions:^(RLMSyncSubscriptionSet *subscriptions) {
         [subscriptions addSubscriptionWithClassName:Person.className
                                    subscriptionName:@"person_age"
@@ -974,11 +965,18 @@
     } rerunOnOpen:false];
     config.objectClasses = @[Person.self];
 
+    @autoreleasepool {
+        RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
+        XCTAssertEqual(realm.subscriptions.count, 1UL);
+    }
+
     RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
     XCTAssertEqual(realm.subscriptions.count, 1UL);
 
-    RLMRealm *realm2 = [RLMRealm realmWithConfiguration:config error:nil];
-    XCTAssertEqual(realm2.subscriptions.count, 1UL);
+    [self dispatchAsyncAndWait:^{
+        RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
+        XCTAssertEqual(realm.subscriptions.count, 1UL);
+    }];
 }
 
 - (void)testFlexibleSyncInitialSubscriptionRerunOnOpen {
@@ -989,18 +987,15 @@
         return;
     }
 
-    RLMUser *user = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                                        register:YES
-                                                                             app:self.flexibleSyncApp]
-                                              app:self.flexibleSyncApp];
+    RLMUser *user = [self flexibleSyncUser:_cmd];
 
-    __block bool isFirstOpen = true;
+    __block int openCount = 0;
     RLMRealmConfiguration *config = [user flexibleSyncConfigurationWithInitialSubscriptions:^(RLMSyncSubscriptionSet *subscriptions) {
-        RLMSyncSubscription *subscription = [subscriptions subscriptionWithName:@"person_age"];
-        int age = (isFirstOpen == true) ? 10 : 5;
+        XCTAssertLessThan(openCount, 2);
+        int age = openCount == 0 ? 10 : 5;
         [subscriptions addSubscriptionWithClassName:Person.className
                                               where:@"age > %i and partition == %@", age, NSStringFromSelector(_cmd)];
-        isFirstOpen = false;
+        ++openCount;
     } rerunOnOpen:true];
     config.objectClasses = @[Person.self];
     XCTestExpectation *ex = [self expectationWithDescription:@"download-realm"];
@@ -1013,19 +1008,28 @@
         [ex fulfill];
     }];
     [self waitForExpectationsWithTimeout:10.0 handler:nil];
+    XCTAssertEqual(openCount, 1);
 
-    [self clearCachedRealms];
-
+    __block RLMRealm *realm;
     XCTestExpectation *ex2 = [self expectationWithDescription:@"download-realm-2"];
     [RLMRealm asyncOpenWithConfiguration:config
                            callbackQueue:dispatch_get_main_queue()
-                                callback:^(RLMRealm *realm, NSError *error) {
+                                callback:^(RLMRealm *r, NSError *error) {
+        realm = r;
         XCTAssertNil(error);
         XCTAssertEqual(realm.subscriptions.count, 2UL);
         CHECK_COUNT(16, Person, realm);
         [ex2 fulfill];
     }];
     [self waitForExpectationsWithTimeout:10.0 handler:nil];
+    XCTAssertEqual(openCount, 2);
+
+    [self dispatchAsyncAndWait:^{
+        [RLMRealm realmWithConfiguration:config error:nil];
+        // Should not have called initial subscriptions despite rerunOnOpen being
+        // set as the Realm was already open
+        XCTAssertEqual(openCount, 2);
+    }];
 }
 
 - (void)testFlexibleSyncInitialOnConnectionTimeout {
@@ -1075,11 +1079,7 @@
 }
 
 - (void)testFlexibleSyncInitialSubscriptionThrowsError {
-    RLMUser *user = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                                        register:YES
-                                                                             app:self.flexibleSyncApp]
-                                              app:self.flexibleSyncApp];
-
+    RLMUser *user = [self flexibleSyncUser:_cmd];
     RLMRealmConfiguration *config = [user flexibleSyncConfigurationWithInitialSubscriptions:^(RLMSyncSubscriptionSet *subscriptions) {
         [subscriptions addSubscriptionWithClassName:UUIDPrimaryKeyObject.className
                                               where:@"strCol == %@", @"Tom"];
