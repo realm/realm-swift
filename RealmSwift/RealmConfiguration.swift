@@ -289,7 +289,7 @@ extension Realm {
         internal var rlmConfiguration: RLMRealmConfiguration {
             let configuration = RLMRealmConfiguration()
             if let syncConfiguration = syncConfiguration {
-                configuration.syncConfiguration = syncConfiguration.asConfig()
+                configuration.syncConfiguration = syncConfiguration.config
             }
             if let fileURL = fileURL {
                 configuration.fileURL = fileURL
@@ -298,21 +298,13 @@ extension Realm {
             } else if syncConfiguration == nil {
                 fatalError("A Realm Configuration must specify a path or an in-memory identifier.")
             }
-            if let seedFilePath = seedFilePath {
-                configuration.seedFilePath = seedFilePath
-            } else if let inMemoryIdentifier = inMemoryIdentifier {
-                configuration.inMemoryIdentifier = inMemoryIdentifier
-            }
+            configuration.seedFilePath = self.seedFilePath
             configuration.encryptionKey = self.encryptionKey
             configuration.readOnly = self.readOnly
             configuration.schemaVersion = self.schemaVersion
             configuration.migrationBlock = self.migrationBlock.map { accessorMigrationBlock($0) }
             configuration.deleteRealmIfMigrationNeeded = self.deleteRealmIfMigrationNeeded
-            if let shouldCompactOnLaunch = self.shouldCompactOnLaunch {
-                configuration.shouldCompactOnLaunch = ObjectiveCSupport.convert(object: shouldCompactOnLaunch)
-            } else {
-                configuration.shouldCompactOnLaunch = nil
-            }
+            configuration.shouldCompactOnLaunch = self.shouldCompactOnLaunch.map(ObjectiveCSupport.convert(object:))
             configuration.setCustomSchemaWithoutCopying(self.customSchema)
             configuration.disableFormatUpgrade = self.disableFormatUpgrade
             configuration.maximumNumberOfActiveVersions = self.maximumNumberOfActiveVersions ?? 0
@@ -337,11 +329,7 @@ extension Realm {
             var configuration = Configuration()
             configuration._path = rlmConfiguration.fileURL?.path
             configuration._inMemoryIdentifier = rlmConfiguration.inMemoryIdentifier
-            if let objcSyncConfig = rlmConfiguration.syncConfiguration {
-                configuration._syncConfiguration = SyncConfiguration(config: objcSyncConfig)
-            } else {
-                configuration._syncConfiguration = nil
-            }
+            configuration._syncConfiguration = rlmConfiguration.syncConfiguration.map(SyncConfiguration.init(config:))
             configuration.encryptionKey = rlmConfiguration.encryptionKey
             configuration.readOnly = rlmConfiguration.readOnly
             configuration.schemaVersion = rlmConfiguration.schemaVersion

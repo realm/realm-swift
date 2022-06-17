@@ -113,9 +113,10 @@ struct AfterClientResetWrapper : CallbackSchema {
 
 @dynamic stopPolicy;
 
-- (instancetype)initWithRawConfig:(realm::SyncConfig)config {
+- (instancetype)initWithRawConfig:(realm::SyncConfig)config path:(std::string const&)path {
     if (self = [super init]) {
         _config = std::make_unique<realm::SyncConfig>(std::move(config));
+        _path = path;
     }
     return self;
 }
@@ -126,8 +127,8 @@ struct AfterClientResetWrapper : CallbackSchema {
     }
     RLMSyncConfiguration *that = (RLMSyncConfiguration *)object;
     return [self.partitionValue isEqual:that.partitionValue]
-    && [self.user isEqual:that.user]
-    && self.stopPolicy == that.stopPolicy;
+        && [self.user isEqual:that.user]
+        && self.stopPolicy == that.stopPolicy;
 }
 
 - (realm::SyncConfig&)rawConfiguration {
@@ -149,6 +150,10 @@ struct AfterClientResetWrapper : CallbackSchema {
 
 - (RLMClientResetMode)clientResetMode {
     return RLMClientResetMode(_config->client_resync_mode);
+}
+
+- (void)setClientResetMode:(RLMClientResetMode)clientResetMode {
+    _config->client_resync_mode = realm::ClientResyncMode(clientResetMode);
 }
 
 - (RLMClientResetBeforeBlock)beforeClientReset {
@@ -223,79 +228,6 @@ void RLMSetConfigInfoForClientResetCallbacks(realm::SyncConfig& syncConfig, RLMR
     return _config->flx_sync_requested;
 }
 
-- (instancetype)initWithUser:(RLMUser *)user
-              partitionValue:(nullable id<RLMBSON>)partitionValue {
-    return [self initWithUser:user
-               partitionValue:partitionValue
-                customFileURL:nil
-                   stopPolicy:RLMSyncStopPolicyAfterChangesUploaded
-           enableFlexibleSync:false
-              clientResetMode:RLMClientResetModeManual
-            notifyBeforeReset:nil 
-             notifyAfterReset:nil];
-}
-
-- (instancetype)initWithUser:(RLMUser *)user
-              partitionValue:(nullable id<RLMBSON>)partitionValue
-                  stopPolicy:(RLMSyncStopPolicy)stopPolicy
-             clientResetMode:(RLMClientResetMode)clientResetMode
-           notifyBeforeReset:(nullable RLMClientResetBeforeBlock)beforeResetBlock
-            notifyAfterReset:(nullable RLMClientResetAfterBlock)afterResetBlock {
-    auto config = [self initWithUser:user
-                      partitionValue:partitionValue
-                       customFileURL:nil
-                          stopPolicy:stopPolicy
-                  enableFlexibleSync:false
-                     clientResetMode:clientResetMode
-                   notifyBeforeReset:beforeResetBlock
-                    notifyAfterReset:afterResetBlock];
-    return config;
-}
-
-- (instancetype)initWithUser:(RLMUser *)user
-                  stopPolicy:(RLMSyncStopPolicy)stopPolicy
-          enableFlexibleSync:(BOOL)enableFlexibleSync {
-    auto config = [self initWithUser:user
-                      partitionValue:nil
-                       customFileURL:nil
-                          stopPolicy:stopPolicy
-                  enableFlexibleSync:enableFlexibleSync
-                     clientResetMode:RLMClientResetModeManual
-                   notifyBeforeReset:nil
-                    notifyAfterReset:nil];
-    return config;
-}
-
-
-
-- (instancetype)initWithUser:(RLMUser *)user
-              partitionValue:(nullable id<RLMBSON>)partitionValue
-             clientResetMode:(RLMClientResetMode)clientResetMode {
-    auto config = [self initWithUser:user
-                      partitionValue:partitionValue
-                       customFileURL:nil
-                          stopPolicy:RLMSyncStopPolicyAfterChangesUploaded
-                  enableFlexibleSync:false
-                     clientResetMode:clientResetMode
-                   notifyBeforeReset:nil
-                    notifyAfterReset:nil];
-    return config;
-}
-
-- (instancetype)initWithUser:(RLMUser *)user
-          enableFlexibleSync:(BOOL)enableFlexibleSync
-             clientResetMode:(RLMClientResetMode)clientResetMode {
-    auto config = [self initWithUser:user
-                      partitionValue:nil
-                       customFileURL:nil
-                          stopPolicy:RLMSyncStopPolicyAfterChangesUploaded
-                  enableFlexibleSync:enableFlexibleSync
-                     clientResetMode:clientResetMode
-                   notifyBeforeReset:nil
-                    notifyAfterReset:nil];
-    return config;
-}
-
 NSError *RLMTranslateSyncError(SyncError error) {
     NSString *recoveryPath;
     RLMSyncErrorActionToken *token;
@@ -338,61 +270,59 @@ NSError *RLMTranslateSyncError(SyncError error) {
     return make_sync_error(errorClass, @(error.message.c_str()), error.error_code.value(), custom);
 }
 
-- (instancetype)initWithUser:(RLMUser *)user
-              partitionValue:(nullable id<RLMBSON>)partitionValue
-               customFileURL:(nullable NSURL *)customFileURL
-                  stopPolicy:(RLMSyncStopPolicy)stopPolicy
-          enableFlexibleSync:(BOOL)enableFlexibleSync
-             clientResetMode:(RLMClientResetMode)clientResetMode
-           notifyBeforeReset:(RLMClientResetBeforeBlock)beforeResetBlock
-            notifyAfterReset:(RLMClientResetAfterBlock)afterResetBlock {
-    if (self = [super init]) {
-        if (enableFlexibleSync) {
-            _config = std::make_unique<SyncConfig>([user _syncUser], SyncConfig::FLXSyncEnabled{});
-        } else {
-            std::stringstream s;
-            s << RLMConvertRLMBSONToBson(partitionValue);
-            _config = std::make_unique<SyncConfig>([user _syncUser],
-                                                   s.str());
-        }
-        _config->stop_policy = translateStopPolicy(stopPolicy);
-        RLMSyncManager *manager = [user.app syncManager];
-        __weak RLMSyncManager *weakManager = manager;
-        _config->error_handler = [weakManager](std::shared_ptr<SyncSession> errored_session, SyncError error) {
-            RLMSyncErrorReportingBlock errorHandler;
-            @autoreleasepool {
-                errorHandler = weakManager.errorHandler;
-            }
-            if (!errorHandler) {
-                return;
-            }
-            NSError *nsError = RLMTranslateSyncError(std::move(error));
-            if (!nsError) {
-                return;
-            }
-            RLMSyncSession *session = [[RLMSyncSession alloc] initWithSyncSession:errored_session];
-            dispatch_async(dispatch_get_main_queue(), ^{
-                errorHandler(nsError, session);
-            });
-        };
-        // Default to manual mode
-        _config->client_resync_mode = realm::ClientResyncMode(clientResetMode);
-        self.beforeClientReset = beforeResetBlock;
-        self.afterClientReset = afterResetBlock;
+static void setDefaults(SyncConfig& config, RLMUser *user) {
+    config.client_resync_mode = ClientResyncMode::Manual;
+    config.stop_policy = SyncSessionStopPolicy::AfterChangesUploaded;
 
-        if (NSString *authorizationHeaderName = manager.authorizationHeaderName) {
-            _config->authorization_header_name.emplace(authorizationHeaderName.UTF8String);
+    RLMSyncManager *manager = [user.app syncManager];
+    __weak RLMSyncManager *weakManager = manager;
+    config.error_handler = [weakManager](std::shared_ptr<SyncSession> errored_session, SyncError error) {
+        RLMSyncErrorReportingBlock errorHandler;
+        @autoreleasepool {
+            errorHandler = weakManager.errorHandler;
         }
-        if (NSDictionary<NSString *, NSString *> *customRequestHeaders = manager.customRequestHeaders) {
-            for (NSString *key in customRequestHeaders) {
-                _config->custom_http_headers.emplace(key.UTF8String, customRequestHeaders[key].UTF8String);
-            }
+        if (!errorHandler) {
+            return;
         }
+        NSError *nsError = RLMTranslateSyncError(std::move(error));
+        if (!nsError) {
+            return;
+        }
+        RLMSyncSession *session = [[RLMSyncSession alloc] initWithSyncSession:errored_session];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            errorHandler(nsError, session);
+        });
+    };
 
-        self.customFileURL = customFileURL;
-        return self;
+    if (NSString *authorizationHeaderName = manager.authorizationHeaderName) {
+        config.authorization_header_name.emplace(authorizationHeaderName.UTF8String);
     }
-    return nil;
+    if (NSDictionary<NSString *, NSString *> *customRequestHeaders = manager.customRequestHeaders) {
+        for (NSString *key in customRequestHeaders) {
+            config.custom_http_headers.emplace(key.UTF8String, customRequestHeaders[key].UTF8String);
+        }
+    }
+}
+
+- (instancetype)initWithUser:(RLMUser *)user
+              partitionValue:(nullable id<RLMBSON>)partitionValue {
+    if (self = [super init]) {
+        std::stringstream s;
+        s << RLMConvertRLMBSONToBson(partitionValue);
+        _config = std::make_unique<SyncConfig>([user _syncUser], s.str());
+        _path = [user pathForPartitionValue:_config->partition_value];
+        setDefaults(*_config, user);
+    }
+    return self;
+}
+
+- (instancetype)initWithUser:(RLMUser *)user {
+    if (self = [super init]) {
+        _config = std::make_unique<SyncConfig>([user _syncUser], SyncConfig::FLXSyncEnabled{});
+        _path = [user pathForFlexibleSync];
+        setDefaults(*_config, user);
+    }
+    return self;
 }
 
 @end

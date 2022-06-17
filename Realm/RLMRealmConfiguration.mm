@@ -179,7 +179,9 @@ NSString *RLMRealmPathForFile(NSString *fileName) {
 
 - (void)setSeedFilePath:(NSURL *)seedFilePath {
     _seedFilePath = seedFilePath;
-    _config.in_memory = false;
+    if (_seedFilePath) {
+        _config.in_memory = false;
+    }
 }
 
 - (NSData *)encryptionKey {
@@ -356,15 +358,8 @@ static bool isSync(realm::Realm::Config const& config) {
 
     NSAssert(user.identifier, @"Cannot call this method on a user that doesn't have an identifier.");
     _config.in_memory = false;
-    _config.sync_config = std::make_shared<realm::SyncConfig>([syncConfiguration rawConfiguration]);
-
-    if (syncConfiguration.customFileURL) {
-       _config.path = syncConfiguration.customFileURL.path.UTF8String;
-    } else if (_config.sync_config->flx_sync_requested) {
-       _config.path = [user pathForFlexibleSync];
-    } else {
-       _config.path = [user pathForPartitionValue:_config.sync_config->partition_value];
-    }
+    _config.sync_config = std::make_shared<realm::SyncConfig>(syncConfiguration.rawConfiguration);
+    _config.path = syncConfiguration.path;
 
     [self updateSchemaMode];
 }
@@ -373,7 +368,7 @@ static bool isSync(realm::Realm::Config const& config) {
     if (!_config.sync_config) {
         return nil;
     }
-    return [[RLMSyncConfiguration alloc] initWithRawConfig:*_config.sync_config];
+    return [[RLMSyncConfiguration alloc] initWithRawConfig:*_config.sync_config path:_config.path];
 }
 
 #else // REALM_ENABLE_SYNC

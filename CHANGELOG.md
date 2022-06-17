@@ -1,7 +1,8 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+* Greatly improve the performance of obtaining cached Realm instances in Swift
+  when using a sync configuration.
 
 ### Fixed
 * Add missing `initialSubscription` and `rerunOnOpen` to copyWithZone method on `RLMRealmConfiguration`. This resulted in incorrect values when using `RLMRealmConfiguration.defaultConfiguration`.

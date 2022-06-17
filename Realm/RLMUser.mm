@@ -87,10 +87,12 @@ using namespace realm;
 
 - (RLMRealmConfiguration *)configurationWithPartitionValue:(nullable id<RLMBSON>)partitionValue
                                            clientResetMode:(RLMClientResetMode)clientResetMode {
-    return [self configurationWithPartitionValue:partitionValue
-                                 clientResetMode:clientResetMode
-                               notifyBeforeReset:nil
-                                notifyAfterReset:nil];
+    auto syncConfig = [[RLMSyncConfiguration alloc] initWithUser:self
+                                                  partitionValue:partitionValue];
+    syncConfig.clientResetMode = clientResetMode;
+    RLMRealmConfiguration *config = [[RLMRealmConfiguration alloc] init];
+    config.syncConfiguration = syncConfig;
+    return config;
 }
 
 - (RLMRealmConfiguration *)configurationWithPartitionValue:(nullable id<RLMBSON>)partitionValue
@@ -98,30 +100,24 @@ using namespace realm;
                                          notifyBeforeReset:(nullable RLMClientResetBeforeBlock)beforeResetBlock
                                           notifyAfterReset:(nullable RLMClientResetAfterBlock)afterResetBlock {
     auto syncConfig = [[RLMSyncConfiguration alloc] initWithUser:self
-                                                  partitionValue:partitionValue
-                                                      stopPolicy:RLMSyncStopPolicyImmediately
-                                                 clientResetMode:clientResetMode
-                                               notifyBeforeReset:beforeResetBlock
-                                                notifyAfterReset:afterResetBlock];
+                                                  partitionValue:partitionValue];
+    syncConfig.clientResetMode = clientResetMode;
+    syncConfig.beforeClientReset = beforeResetBlock;
+    syncConfig.afterClientReset = afterResetBlock;
     RLMRealmConfiguration *config = [[RLMRealmConfiguration alloc] init];
     config.syncConfiguration = syncConfig;
     return config;
 }
 
 - (RLMRealmConfiguration *)flexibleSyncConfiguration {
-    auto syncConfig = [[RLMSyncConfiguration alloc] initWithUser:self
-                                                      stopPolicy:RLMSyncStopPolicyAfterChangesUploaded
-                                              enableFlexibleSync:true];
     RLMRealmConfiguration *config = [[RLMRealmConfiguration alloc] init];
-    config.syncConfiguration = syncConfig;
+    config.syncConfiguration = [[RLMSyncConfiguration alloc] initWithUser:self];
     return config;
 }
 
 - (RLMRealmConfiguration *)flexibleSyncConfigurationWithInitialSubscriptions:(RLMFlexibleSyncInitialSubscriptionsBlock)initialSubscriptions
                                                                  rerunOnOpen:(BOOL)rerunOnOpen {
-    auto syncConfig = [[RLMSyncConfiguration alloc] initWithUser:self
-                                                      stopPolicy:RLMSyncStopPolicyAfterChangesUploaded
-                                              enableFlexibleSync:true];
+    auto syncConfig = [[RLMSyncConfiguration alloc] initWithUser:self];
     RLMRealmConfiguration *config = [[RLMRealmConfiguration alloc] init];
     config.initialSubscriptions = initialSubscriptions;
     config.rerunOnOpen = rerunOnOpen;

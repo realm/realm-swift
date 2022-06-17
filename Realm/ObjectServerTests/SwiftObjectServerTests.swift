@@ -354,7 +354,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         waitForSyncDisabled(appServerId: appServerId, syncServiceId: syncServiceId)
 
-        try block()
+        try autoreleasepool(invoking: block)
 
         waitForSyncEnabled(appServerId: appServerId, syncServiceId: syncServiceId, syncServiceConfig: syncServiceConfig)
         try waitForDevModeEnabled(appServerId: appServerId, syncServiceId: syncServiceId, syncServiceConfig: syncServiceConfig)
@@ -436,16 +436,15 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         // Sync is disabled, block executed, sync re-enabled
         try executeBlockOffline {
-            try autoreleasepool {
-                var configuration = user.configuration(partitionValue: partition)
-                configuration.objectTypes = [SwiftPerson.self]
-                let realm = try Realm(configuration: configuration)
-                // Add an object to the local realm that will not be in the server realm (because sync is disabled).
-                try realm.write {
-                    realm.add(SwiftPerson(firstName: "John", lastName: "L"))
-                }
-                XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1)
+            var configuration = user.configuration(partitionValue: partition)
+            configuration.objectTypes = [SwiftPerson.self]
+            let realm = try Realm(configuration: configuration)
+            realm.syncSession!.suspend()
+            // Add an object to the local realm that will not be in the server realm (because sync is disabled).
+            try realm.write {
+                realm.add(SwiftPerson(firstName: "John", lastName: "L"))
             }
+            XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1)
         }
 
         // After restarting sync, the sync history translator service needs time
@@ -498,7 +497,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             afterCallbackEx.fulfill()
         }
 
-        var configuration = user.configuration(partitionValue: #function, clientResetMode: .discardLocal(beforeClientResetBlock, afterClientResetBlock))
+        var configuration = user.configuration(partitionValue: #function,
+                                               clientResetMode: .discardLocal(beforeClientResetBlock, afterClientResetBlock))
         configuration.objectTypes = [SwiftPerson.self]
 
         guard let syncConfig = configuration.syncConfiguration else { fatalError("Test condition failure. SyncConfiguration not set.") }
