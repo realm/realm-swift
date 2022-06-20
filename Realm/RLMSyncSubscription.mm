@@ -376,16 +376,18 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
                            predicate:(NSPredicate *)predicate
                       updateExisting:(BOOL)updateExisting {
     [self verifyInWriteTransaction];
-    
+
     RLMClassInfo& info = _realm->_info[objectClassName];
     auto query = RLMPredicateToQuery(predicate, info.rlmObjectSchema, _realm.schema, _realm.group);
-    
+
     if (name) {
-        if (updateExisting || _mutableSubscriptionSet->find(name.UTF8String) == _mutableSubscriptionSet->end()) {
+        auto iterator = _mutableSubscriptionSet->find([name UTF8String]);
+        if (updateExisting ||
+            !(query.get_description() == iterator->query_string() && [objectClassName UTF8String] == iterator->object_class_name())) {
             _mutableSubscriptionSet->insert_or_assign(name.UTF8String, query);
         }
         else {
-            @throw RLMException(@"A subscription named '%@' already exists. If you meant to update the existing subscription please use the `update` method.", name);
+            @throw RLMException(@"A subscription named '%@' already exists. Adding a subscription with the same name and query will throw. If you meant to update the subscription please use the `update` or `add` method with a new query.", name);
         }
     }
     else {

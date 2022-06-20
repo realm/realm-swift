@@ -185,6 +185,21 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
         XCTAssertEqual(subscriptions.count, 1)
     }
 
+    func skip_testAddDuplicateNamedSubscriptionsWillThrow() throws {
+        let realm = try openFlexibleSyncRealm()
+        let subscriptions = realm.subscriptions
+        subscriptions.update {
+            assertThrows(subscriptions.append(
+                QuerySubscription<SwiftPerson>(name: "person_age") {
+                    $0.age > 15
+                },
+                QuerySubscription<SwiftPerson>(name: "person_age") {
+                    $0.age > 15
+                }))
+        }
+        XCTAssertEqual(subscriptions.count, 1)
+    }
+
     func testAddDuplicateSubscriptionWithDifferentName() throws {
         let realm = try openFlexibleSyncRealm()
         let subscriptions = realm.subscriptions
@@ -1189,14 +1204,23 @@ extension SwiftFlexibleSyncServerTests {
     }
 
     @MainActor
-    func testFlexibleSyncInitialSubscriptionsRerunOnOpenNamedQuery() async throws {
-        let user = try await logInUser(for: basicCredentials(app: self.flexibleSyncApp), app: self.flexibleSyncApp)
-        var config = user.flexibleSyncConfiguration(initialSubscriptions: { subscriptions in
-            if subscriptions.first(named: "person_age_10") == nil {
-                subscriptions.append(QuerySubscription<SwiftPerson>(name: "person_age_10") {
-                    $0.age > 20 && $0.firstName == "\(#function)"
-                })
+    func testFlexibleSyncInitialSubscriptionsRerunOnOpenNamedDifferentQuery() async throws {
+        try await populateFlexibleSyncData { realm in
+            for i in 1...25 {
+                let person = SwiftPerson(firstName: "\(#function)",
+                                         lastName: "lastname_\(i)",
+                                         age: i)
+                realm.add(person)
             }
+        }
+        let user = try await logInUser(for: basicCredentials(app: self.flexibleSyncApp), app: self.flexibleSyncApp)
+        var isFirstOpen = true
+        var config = user.flexibleSyncConfiguration(initialSubscriptions: { subscriptions in
+            let age = isFirstOpen ? 15 : 20
+            subscriptions.append(QuerySubscription<SwiftPerson>(name: "person_age_10") {
+                $0.age > age && $0.firstName == "\(#function)"
+            })
+            isFirstOpen = false
         }, rerunOnOpen: true)
 
         if config.objectTypes == nil {
@@ -1205,10 +1229,12 @@ extension SwiftFlexibleSyncServerTests {
         let realm = try await Realm(configuration: config, downloadBeforeOpen: .once)
         XCTAssertNotNil(realm)
         XCTAssertEqual(realm.subscriptions.count, 1)
+        checkCount(expected: 10, realm, SwiftTypesSyncObject.self)
 
         let realm2 = try await Realm(configuration: config, downloadBeforeOpen: .once)
         XCTAssertNotNil(realm2)
         XCTAssertEqual(realm.subscriptions.count, 1)
+        checkCount(expected: 5, realm2, SwiftTypesSyncObject.self)
     }
 
     @MainActor

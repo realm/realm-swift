@@ -172,6 +172,8 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Adds a new subscription to the subscription set which will be sent to the server when
  committed at the end of a write subscription block.
+ This will update a subscription if there is an existing named subscription with the same name
+ but with a different query.
 
  @warning This method may only be called during a write subscription block.
 
@@ -189,6 +191,8 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Adds a new subscription to the subscription set which will be sent to the server when
  committed at the end of a write subscription block.
+ This will update a subscription if there is an existing named subscription with the same name
+ but with a different query.
 
  @warning This method may only be called during a write subscription block.
 
@@ -209,6 +213,8 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Adds a new subscription to the subscription set which will be sent to the server when
  committed at the end of a write subscription block.
+ This will update a subscription if there is an existing named subscription with the same name
+ but with a different query.
 
  @warning This method may only be called during a write subscription block.
 
@@ -221,6 +227,8 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Adds a new subscription to the subscription set which will be sent to the server when
  committed at the end of a write subscription block.
+ This will update a subscription if there is an existing named subscription with the same name
+ but with a different query.
 
  @warning This method may only be called during a write subscription block.
 

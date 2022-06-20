@@ -1,7 +1,7 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+* Allow using `SyncSubscriptionSet.append` or `RLMSyncSubscriptionSet.add` to update a named subscription query. This will allow us to add a subscriptions with the same name more than once, only if the passed query is different.
 
 ### Fixed
 * Add missing `initialSubscription` and `rerunOnOpen` to copyWithZone method on `RLMRealmConfiguration`. This resulted in incorrect values when using `RLMRealmConfiguration.defaultConfiguration`.

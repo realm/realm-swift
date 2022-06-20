@@ -294,6 +294,8 @@ import Combine
 
     /**
      Appends one or several subscriptions to the subscription set.
+     This will update a subscription if there is an existing named subscription with the same name
+     but with a different query.
 
      - warning: This method may only be called during a write subscription block.
 
