@@ -7,6 +7,9 @@ x.y.z Release notes (yyyy-MM-dd)
 * Using `seedFilePath` threw an exception if the Realm file being opened
   already existed ([#7840](https://github.com/realm/realm-swift/issues/7840),
   since v10.26.0).
+* The `intialSubscriptions` callback was invoked every time a Realm was opened
+  regardless of the value of `rerunOnOpen` and if the Realm was already open on
+  another thread (since v10.28.0).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
@@ -49,10 +52,10 @@ x.y.z Release notes (yyyy-MM-dd)
    }
 ```
 * Add Combine API support for flexible sync beta.
-* Add an `initialSubscriptions` parameter when retrieving the flexible sync configuration from a user, 
-  which allows to specify a subscription update block, to bootstrap a set of flexible sync subscriptions 
+* Add an `initialSubscriptions` parameter when retrieving the flexible sync configuration from a user,
+  which allows to specify a subscription update block, to bootstrap a set of flexible sync subscriptions
   when the Realm is first opened.
-  There is an additional optional parameter flag `rerunOnOpen`, which allows to run this initial 
+  There is an additional optional parameter flag `rerunOnOpen`, which allows to run this initial
   subscriptions on every app startup.
 
 ```swift

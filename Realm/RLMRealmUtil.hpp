@@ -31,8 +31,6 @@ void RLMCacheRealm(std::string const& path, void *key, RLMRealm *realm);
 RLMRealm *RLMGetThreadLocalCachedRealmForPath(std::string const& path, void *key);
 // Get a Realm for the given path
 RLMRealm *RLMGetAnyCachedRealmForPath(std::string const& path);
-// return `true` if any cached realm exist for the given path.
-bool RLMAnyCachedRealmExistsForPath(std::string const& path);
 // Clear the weak cache of Realms
 void RLMClearRealmCache();
 
