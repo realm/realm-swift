@@ -159,9 +159,9 @@ extension RealmCollectionImpl {
             return keyBlock(Element._rlmFromObjc(value)!)._rlmObjcValue as! RLMValue
         }
 
-        return SectionedResults(rlmSectionedResults: sectionedResults,
+        return SectionedResults(rlmSectionedResults: sectionedResults/*,
                                 sectionBlock: keyBlock,
-                                valueProjector: { $0 as! Element })
+                                valueProjector: { $0 as! Element }*/)
     }
 }
 

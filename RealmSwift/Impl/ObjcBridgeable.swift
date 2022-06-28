@@ -183,6 +183,15 @@ extension Results: _ObjcBridgeable {}
 extension AnyRealmCollection: _ObjcBridgeable {}
 extension List: _ObjcBridgeable {}
 extension MutableSet: _ObjcBridgeable {}
+extension SectionedResults: _ObjcBridgeable {
+    public static func _rlmFromObjc(_ value: Any, insideOptional: Bool) -> SectionedResults<Key, T>? {
+        (value as? RLMSectionedResults<AnyObject>).map(Self.init(sectionedResults:))
+    }
+
+    public var _rlmObjcValue: Any {
+        self.collection
+    }
+}
 
 extension RLMSwiftCollectionBase: Equatable {
     public static func == (lhs: RLMSwiftCollectionBase, rhs: RLMSwiftCollectionBase) -> Bool {

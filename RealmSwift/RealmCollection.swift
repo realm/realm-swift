@@ -693,7 +693,10 @@ public extension RealmCollection where Element: ObjectBase {
     func sectioned<Key: _Persistable>(by keyPath: KeyPath<Element, Key>,
                                       ascending: Bool = true) -> SectionedResults<Key, Element> where Element: ObjectBase {
         let keyPathString = _name(for: keyPath)
-        return sectioned(sortDescriptors: [.init(keyPath: keyPathString, ascending: ascending)], { $0[keyPath: keyPath] })
+        return sectioned(sortDescriptors: [.init(keyPath: keyPathString, ascending: ascending)], {
+            print("run")
+            return $0[keyPath: keyPath]
+        })
     }
 
     func sectioned<Key: _Persistable>(by keyPath: KeyPath<Element, Key>,

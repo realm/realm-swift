@@ -49,7 +49,7 @@ struct CollectionCallbackWrapper {
 
         if (ignoreChangesInInitialNotification) {
             ignoreChangesInInitialNotification = false;
-            block(collection, nil, nil);
+            return block(collection, nil, nil);
         }
 
         block(collection, [[RLMSectionedResultsChange alloc] initWithChanges:changes], nil);
@@ -326,7 +326,6 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
 @implementation RLMSectionedResults {
     RLMRealm *_realm;
     RLMClassInfo *_info;
-    RLMSectionedResultsKeyBlock _keyBlock;
 }
 
 - (instancetype)initWithResults:(realm::Results&&)results
@@ -337,7 +336,8 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
         _info = &objectInfo;
         _realm = realm;
         _keyBlock = keyBlock;
-        _sectionedResults = results.sectioned_results(SectionedResultsKeyProjection {_info, _keyBlock});
+//        _results = std::move(results);
+        _sectionedResults = _results.sectioned_results(SectionedResultsKeyProjection {_info, _keyBlock});
     }
     return self;
 }
@@ -349,7 +349,8 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
         _info = &objectInfo;
         _realm = results.realm;
         _keyBlock = keyBlock;
-        _sectionedResults = results->_results.sectioned_results(SectionedResultsKeyProjection {_info, _keyBlock});
+//        _results = results->_results;
+        _sectionedResults = _results.sectioned_results(SectionedResultsKeyProjection {_info, _keyBlock});
     }
     return self;
 }
@@ -416,7 +417,7 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
 #pragma mark - Thread Confined Protocol Conformance
 
 - (realm::ThreadSafeReference)makeThreadSafeReference {
-    return _sectionedResults.thread_safe_reference();
+    return _results;
 }
 
 - (id)objectiveCMetadata {
@@ -535,8 +536,6 @@ RLMNotificationToken *RLMAddNotificationBlock(RLMSection *collection,
     RLMRealm *_realm;
     RLMClassInfo *_info;
     RLMSectionedResultsKeyBlock _keyBlock;
-    // Used to keep a reference to the parent RLMSectionedResults if this section if
-    // created on a new thread.
     RLMSectionedResults *_parent;
 }
 
@@ -649,13 +648,13 @@ RLMNotificationToken *RLMAddNotificationBlock(RLMSection *collection,
 #pragma mark - Thread Confined Protocol Conformance
 
 - (realm::ThreadSafeReference)makeThreadSafeReference {
-    return _resultsSection.thread_safe_reference();
+    return _parent->_results;
 }
 
 - (id)objectiveCMetadata {
     return @{
         @"keyBlock": _keyBlock,
-        @"sectionHash": @(_resultsSection.hash())
+        @"sectionKey": [self key]
     };
 }
 
@@ -669,11 +668,11 @@ RLMNotificationToken *RLMAddNotificationBlock(RLMSection *collection,
                                                                      realm:realm
                                                                 objectInfo:realm->_info[objType]
                                                                   keyBlock:(RLMSectionedResultsKeyBlock)metadata[@"keyBlock"]];
-    NSNumber *hash = (NSNumber *)metadata[@"sectionHash"];
+    id<RLMValue> key = metadata[@"sectionKey"];
     RLMSection *section;
     // fast enumeration will create a snapshot which won't work with notifications.
     for(NSUInteger i = 0; i < sr.count; i++) {
-        if (sr[i].hash == hash.unsignedLongValue) {
+        if (sr[i].key == key) {
             section = sr[i];
             break;
         }
@@ -683,10 +682,6 @@ RLMNotificationToken *RLMAddNotificationBlock(RLMSection *collection,
     }
     section->_parent = sr;
     return section;
-}
-
-- (NSUInteger)hash {
-    return _resultsSection.hash();
 }
 
 - (BOOL)isInvalidated {
