@@ -60,7 +60,8 @@ using namespace realm;
 }
 
 - (void)dealloc {
-    if (_token != 0) {
+    auto session = _session.lock();
+    if (session && _token != 0) {
         NSLog(@"RLMProgressNotificationToken released without unregistering a notification. "
               @"You must hold on to the RLMProgressNotificationToken and call "
               @"-[RLMProgressNotificationToken invalidate] when you no longer wish to receive "
