@@ -1881,4 +1881,31 @@ RLM_COLLECTION_TYPE(MigrationTestObject);
                       objectSchemas:@[objectSchema] className:StringObject.className oldName:@"stringCol" newName:@"stringCol2"];
 }
 
+- (void)testAssignToEmbeddedObjectProperty {
+    RLMObjectSchema *fromChild = [RLMObjectSchema schemaForObjectClass:EmbeddedIntObject.class];
+    fromChild.isEmbedded = false;
+    RLMObjectSchema *fromParent = [RLMObjectSchema schemaForObjectClass:EmbeddedIntParentObject.class];
+
+    [self createTestRealmWithSchema:@[fromChild, fromParent] block:^(RLMRealm *realm) {
+        EmbeddedIntParentObject *intObj = [[EmbeddedIntParentObject alloc] init];
+        intObj.pk = 42;
+        [realm addObject:intObj];
+        [intObj.array addObject:[[EmbeddedIntObject alloc] initWithValue:@[@11]]];
+    }];
+
+    RLMRealm *realm = [self migrateTestRealmWithBlock:^(RLMMigration *migration, uint64_t) {
+        [migration enumerateObjects:EmbeddedIntParentObject.className block:^(RLMObject *oldObject, RLMObject *newObject) {
+            XCTAssertNotNil(oldObject);
+            XCTAssertNotNil(newObject);
+            newObject[@"object"] = [[EmbeddedIntObject alloc] initWithValue:@[@10]];
+            [newObject[@"array"] addObject:[[EmbeddedIntObject alloc] initWithValue:@[@11]]];
+        }];
+    }];
+
+    EmbeddedIntParentObject *parent = [EmbeddedIntParentObject allObjectsInRealm:realm].firstObject;
+    XCTAssertEqual(parent.object.intCol, 10);
+    EmbeddedIntObject *intObject = [parent.array firstObject];
+    XCTAssertEqual(intObject.intCol, 11);
+}
+
 @end
