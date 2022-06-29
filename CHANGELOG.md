@@ -11,6 +11,18 @@ x.y.z Release notes (yyyy-MM-dd)
   regardless of the value of `rerunOnOpen` and if the Realm was already open on
   another thread (since v10.28.0).
 * Allow `RLMSupport.Swift` to be used from RealmSwift's Cocoapods ([#6886](https://github.com/realm/realm-swift/pull/6886)).
+* Fix a UBSan failure when mapping encrypted pages (since v5.0.0).
+* Improved performance of sync clients during integration of changesets with
+  many small strings (totalling > 1024 bytes per changeset) on iOS 14, and
+  devices which have restrictive or fragmented memory.
+  ([Core #5614](https://github.com/realm/realm-core/issues/5614))
+* Fix a data race when opening a flexible sync Realm (since v10.28.0).
+* Add a missing backlink removal when assigning null or a non-link value to an
+  `AnyRealmValue` property which previously linked to an object.
+  This could have resulted in "key not found" exceptions or assertion failures
+  such as `mixed.hpp:165: [realm-core-12.1.0] Assertion failed: m_type` when
+  removing the destination link object.
+  ([Core #5574](https://github.com/realm/realm-core/pull/5573), since the introduction of AnyRealmValue in v10.8.0)
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
@@ -19,10 +31,10 @@ x.y.z Release notes (yyyy-MM-dd)
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 13.4.1.
 * CocoaPods: 1.10 or later.
-* Xcode: 13.1-14 beta 1.
+* Xcode: 13.1-14 beta 2.
 
 ### Internal
-* Upgraded realm-core from ? to ?
+* Upgraded realm-core from 12.1.0 to 12.3.0.
 
 10.28.1 Release notes (2022-06-10)
 =============================================================

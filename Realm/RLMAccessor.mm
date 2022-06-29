@@ -680,7 +680,7 @@ void RLMDynamicValidatedSet(RLMObjectBase *obj, NSString *propName, id val) {
 
     // Because embedded objects cannot be created directly, we accept anything
     // that can be converted to an embedded object for dynamic link set operations.
-    bool is_embedded = prop.type == RLMPropertyTypeObject && obj->_info->linkTargetType(prop.index).objectSchema->is_embedded;
+    bool is_embedded = prop.type == RLMPropertyTypeObject && obj->_info->linkTargetType(prop.index).rlmObjectSchema.isEmbedded;
     RLMValidateValueForProperty(val, schema, prop, !is_embedded);
     RLMDynamicSet(obj, prop, RLMCoerceToNil(val));
 }

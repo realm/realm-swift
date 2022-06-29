@@ -335,10 +335,11 @@ using namespace realm;
 }
 
 - (realm::ObjectSchema)objectStoreCopy:(RLMSchema *)schema {
+    using Type = ObjectSchema::ObjectType;
     ObjectSchema objectSchema;
     objectSchema.name = self.objectStoreName;
     objectSchema.primary_key = _primaryKeyProperty ? _primaryKeyProperty.columnName.UTF8String : "";
-    objectSchema.is_embedded = ObjectSchema::IsEmbedded(_isEmbedded);
+    objectSchema.table_type = _isEmbedded ? Type::Embedded : Type::TopLevel;
     for (RLMProperty *prop in _properties) {
         Property p = [prop objectStoreCopy:schema];
         p.is_primary = (prop == _primaryKeyProperty);
@@ -353,7 +354,7 @@ using namespace realm;
 + (instancetype)objectSchemaForObjectStoreSchema:(realm::ObjectSchema const&)objectSchema {
     RLMObjectSchema *schema = [RLMObjectSchema new];
     schema.className = @(objectSchema.name.c_str());
-    schema.isEmbedded = objectSchema.is_embedded;
+    schema.isEmbedded = objectSchema.table_type == ObjectSchema::ObjectType::Embedded;
 
     // create array of RLMProperties
     NSMutableArray *properties = [NSMutableArray arrayWithCapacity:objectSchema.persisted_properties.size()];

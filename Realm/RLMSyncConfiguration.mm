@@ -33,6 +33,7 @@
 
 #import <realm/object-store/sync/sync_manager.hpp>
 #import <realm/object-store/sync/sync_session.hpp>
+#import <realm/object-store/thread_safe_reference.hpp>
 #import <realm/sync/config.hpp>
 #import <realm/sync/protocol.hpp>
 
@@ -86,14 +87,14 @@ struct BeforeClientResetWrapper : CallbackSchema {
 
 struct AfterClientResetWrapper : CallbackSchema {
     RLMClientResetAfterBlock block;
-    void operator()(std::shared_ptr<Realm> local, std::shared_ptr<Realm> remote, bool) {
+    void operator()(std::shared_ptr<Realm> local, ThreadSafeReference remote, bool) {
         @autoreleasepool {
             RLMSchema *schema = getSchema(*local);
             RLMRealm *localRealm = [RLMRealm realmWithSharedRealm:local
                                                            schema:schema
                                                           dynamic:false];
 
-            RLMRealm *remoteRealm = [RLMRealm realmWithSharedRealm:remote
+            RLMRealm *remoteRealm = [RLMRealm realmWithSharedRealm:Realm::get_shared_realm(std::move(remote))
                                                             schema:schema
                                                            dynamic:false];
             block(localRealm, remoteRealm);
