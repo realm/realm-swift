@@ -10,6 +10,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * The `intialSubscriptions` callback was invoked every time a Realm was opened
   regardless of the value of `rerunOnOpen` and if the Realm was already open on
   another thread (since v10.28.0).
+* Allow `RLMSupport.Swift` to be used from RealmSwift's Cocoapods ([#6886](https://github.com/realm/realm-swift/pull/6886)).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
