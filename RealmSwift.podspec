@@ -25,7 +25,7 @@ Pod::Spec.new do |s|
   s.weak_frameworks = 'SwiftUI'
 
   s.dependency 'Realm', "= #{s.version}"
-  s.source_files = 'RealmSwift/*.swift', 'RealmSwift/Impl/*.swift'
+  s.source_files = 'RealmSwift/*.swift', 'RealmSwift/Impl/*.swift', 'Realm/Swift/*.swift'
   s.exclude_files = 'RealmSwift/Nonsync.swift'
 
   s.pod_target_xcconfig = { 'APPLICATION_EXTENSION_API_ONLY' => 'YES' }
