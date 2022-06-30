@@ -142,7 +142,7 @@ static NSString *generateRandomString(int num) {
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:10.0 handler:nil];
+    [self waitForExpectationsWithTimeout:30.0 handler:nil];
 }
 
 - (void)testSwitchUser {
@@ -205,14 +205,14 @@ static NSString *generateRandomString(int num) {
         XCTAssertNil(error);
         [expectation fulfill];
     }];
-    [self waitForExpectationsWithTimeout:10.0 handler:nil];
+    [self waitForExpectationsWithTimeout:30.0 handler:nil];
 
     expectation = [self expectationWithDescription:@"should deregister device"];
     [client deregisterDeviceForUser:self.app.currentUser completion:^(NSError *error) {
         XCTAssertNil(error);
         [expectation fulfill];
     }];
-    [self waitForExpectationsWithTimeout:10.0 handler:nil];
+    [self waitForExpectationsWithTimeout:30.0 handler:nil];
 }
 
 // FIXME: Reenable once possible underlying race condition is understood
@@ -576,7 +576,7 @@ static NSString *randomEmail() {
                                   encryptionKey:nil
                                      stopPolicy:RLMSyncStopPolicyAfterChangesUploaded];
 
-    [self waitForExpectationsWithTimeout:10.0 handler:nil];
+    [self waitForExpectationsWithTimeout:30.0 handler:nil];
 }
 
 #pragma mark - User Profile
@@ -1432,7 +1432,7 @@ static NSString *randomEmail() {
         [ex fulfill];
     };
     [user simulateClientResetErrorForSession:@"realm_id"];
-    [self waitForExpectationsWithTimeout:10 handler:nil];
+    [self waitForExpectationsWithTimeout:30 handler:nil];
     XCTAssertNotNil(theError);
     XCTAssertTrue(theError.code == RLMSyncErrorClientResetError);
     NSString *pathValue = [theError rlmSync_clientResetBackedUpRealmPath];
@@ -1457,7 +1457,7 @@ static NSString *randomEmail() {
             [ex fulfill];
         };
         [user simulateClientResetErrorForSession:partitionValue];
-        [self waitForExpectationsWithTimeout:10 handler:nil];
+        [self waitForExpectationsWithTimeout:30 handler:nil];
         XCTAssertNotNil(theError);
     }
     // At this point the Realm should be invalidated and client reset should be possible.
@@ -1550,7 +1550,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     }];
     // Wait for the child process to upload everything.
     RLMRunChildAndWait();
-    [self waitForExpectationsWithTimeout:10.0 handler:nil];
+    [self waitForExpectationsWithTimeout:30.0 handler:nil];
     [token invalidate];
     // The notifier should have been called at least twice: once at the beginning and at least once
     // to report progress.
@@ -1592,7 +1592,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     }
     [realm commitWriteTransaction];
     // Wait for upload to begin and finish
-    [self waitForExpectationsWithTimeout:10.0 handler:nil];
+    [self waitForExpectationsWithTimeout:30.0 handler:nil];
     [token invalidate];
     // The notifier should have been called at least twice: once at the beginning and at least once
     // to report progress.
@@ -1633,7 +1633,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
         return 0;
     };
     XCTAssertNil(RLMGetAnyCachedRealmForPath(c.pathOnDisk.UTF8String));
-    [self waitForExpectationsWithTimeout:10.0 handler:nil];
+    [self waitForExpectationsWithTimeout:30.0 handler:nil];
     XCTAssertGreaterThan(fileSize(c.pathOnDisk), 0U);
     XCTAssertNil(RLMGetAnyCachedRealmForPath(c.pathOnDisk.UTF8String));
 }
@@ -1799,7 +1799,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
         XCTAssertNil(realm);
         [ex fulfill];
     }];
-    [self waitForExpectationsWithTimeout:10.0 handler:nil];
+    [self waitForExpectationsWithTimeout:30.0 handler:nil];
 
     // Delay below the timeout should work
     proxy.delay = 0.5;
@@ -1812,7 +1812,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
         XCTAssertNil(error);
         [ex fulfill];
     }];
-    [self waitForExpectationsWithTimeout:10.0 handler:nil];
+    [self waitForExpectationsWithTimeout:30.0 handler:nil];
 
     [proxy stop];
 }
