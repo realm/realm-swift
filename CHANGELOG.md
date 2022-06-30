@@ -1,17 +1,19 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.28.2 Release notes (2022-06-30)
 =============================================================
-### Enhancements
-* None.
 
 ### Fixed
+
 * Using `seedFilePath` threw an exception if the Realm file being opened
   already existed ([#7840](https://github.com/realm/realm-swift/issues/7840),
   since v10.26.0).
 * The `intialSubscriptions` callback was invoked every time a Realm was opened
   regardless of the value of `rerunOnOpen` and if the Realm was already open on
   another thread (since v10.28.0).
-* Allow `RLMSupport.Swift` to be used from RealmSwift's Cocoapods ([#6886](https://github.com/realm/realm-swift/pull/6886)).
-* Fix a UBSan failure when mapping encrypted pages (since v5.0.0).
+* Allow using `RLMSupport.Swift` from RealmSwift's Cocoapods
+  ([#6886](https://github.com/realm/realm-swift/pull/6886)).
+* Fix a UBSan failure when mapping encrypted pages. Fixing this did not change
+  the resulting assembly, so there were probably no functional problems
+  resulting from this (since v5.0.0).
 * Improved performance of sync clients during integration of changesets with
   many small strings (totalling > 1024 bytes per changeset) on iOS 14, and
   devices which have restrictive or fragmented memory.
@@ -24,16 +26,16 @@ x.y.z Release notes (yyyy-MM-dd)
   removing the destination link object.
   ([Core #5574](https://github.com/realm/realm-core/pull/5573), since the introduction of AnyRealmValue in v10.8.0)
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
-
 ### Compatibility
-* Realm Studio: 11.0.0 or later.
+
+* Realm Studio: 12.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 13.4.1.
 * CocoaPods: 1.10 or later.
 * Xcode: 13.1-14 beta 2.
 
 ### Internal
+
 * Upgraded realm-core from 12.1.0 to 12.3.0.
 
 10.28.1 Release notes (2022-06-10)
