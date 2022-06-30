@@ -79,7 +79,7 @@ typedef void(^RLMSyncErrorReportingBlock)(NSError *, RLMSyncSession * _Nullable)
 
  @see `RLMSyncError`
  */
-@property (nullable, nonatomic, copy) RLMSyncErrorReportingBlock errorHandler;
+@property (nullable, atomic, copy) RLMSyncErrorReportingBlock errorHandler;
 
 /**
  A reverse-DNS string uniquely identifying this application. In most cases this
