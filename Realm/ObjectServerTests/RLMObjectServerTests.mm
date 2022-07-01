@@ -2624,6 +2624,13 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 
 - (NSArray<RLMObjectId *> *)insertDogDocuments:(RLMMongoCollection *)collection {
     __block NSArray<RLMObjectId *> *objectIds;
+    XCTestExpectation *ex = [self expectationWithDescription:@"delete existing documents"];
+    [collection deleteManyDocumentsWhere:@{} completion:^(NSInteger, NSError *error) {
+        XCTAssertNil(error);
+        [ex fulfill];
+    }];
+    [self waitForExpectations:@[ex] timeout:60.0];
+
     XCTestExpectation *insertManyExpectation = [self expectationWithDescription:@"should insert documents"];
     [collection insertManyDocuments:@[
         @{@"name": @"fido", @"breed": @"cane corso"},
