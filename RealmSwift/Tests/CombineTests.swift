@@ -111,6 +111,7 @@ class CombinePublisherTestCase: TestCase {
     override func setUp() {
         super.setUp()
         realm = try! Realm(configuration: Realm.Configuration(inMemoryIdentifier: "test"))
+        XCTAssertTrue(realm.isEmpty)
     }
 
     override func tearDown() {
@@ -2775,9 +2776,7 @@ class CombineProjectionPublisherTests: CombinePublisherTestCase {
 class CombineAsyncRealmTests: CombinePublisherTestCase {
     func testWillChangeLocalWrite() {
         let asyncWriteExpectation = expectation(description: "Should complete async write")
-        cancellable = realm
-            .objectWillChange
-            .sink {
+        cancellable = realm.objectWillChange.sink {
                 asyncWriteExpectation.fulfill()
             }
 
@@ -2792,8 +2791,8 @@ class CombineAsyncRealmTests: CombinePublisherTestCase {
         cancellable = realm.objectWillChange.sink {
             exp.fulfill()
         }
-        DispatchQueue.main.async {
-            let realm = try! Realm(configuration: self.realm.configuration)
+        queue.async {
+            let realm = try! Realm(configuration: self.realm.configuration, queue: self.queue)
             realm.writeAsync {
                 realm.create(SwiftIntObject.self, value: [])
             }
