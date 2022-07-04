@@ -540,7 +540,7 @@ class CombineObjectPublisherTests: CombinePublisherTestCase {
                 var prev: SwiftIntObject?
                 for change in arr {
                     guard case .change(let obj, let properties) = change else {
-                        XCTFail("Expected .change, got(\(change)")
+                        XCTFail("Expected .change but got \(change)")
                         sema.signal()
                         return
                     }
@@ -573,7 +573,7 @@ class CombineObjectPublisherTests: CombinePublisherTestCase {
             .sink { arr in
                 for change in arr {
                     guard case .change(let obj, let properties) = change else {
-                        XCTFail("Expected .change, got(\(change)")
+                        XCTFail("Expected .change but got \(change)")
                         exp.fulfill()
                         return
                     }
@@ -607,7 +607,7 @@ class CombineObjectPublisherTests: CombinePublisherTestCase {
                 var prev: SwiftIntObject?
                 for change in arr {
                     guard case .change(let obj, let properties) = change else {
-                        XCTFail("Expected .change, got(\(change)")
+                        XCTFail("Expected .change but got \(change)")
                         sema.signal()
                         return
                     }
@@ -2531,7 +2531,7 @@ class CombineProjectionPublisherTests: CombinePublisherTestCase {
                 for change in arr {
                     print(change)
                     guard case .change(let p, let properties) = change else {
-                        XCTFail("Expected .change, got(\(change)")
+                        XCTFail("Expected .change but got \(change)")
                         sema.signal()
                         return
                     }
@@ -2564,7 +2564,7 @@ class CombineProjectionPublisherTests: CombinePublisherTestCase {
             .sink { arr in
                 for change in arr {
                     guard case .change(let p, let properties) = change else {
-                        XCTFail("Expected .change, got(\(change)")
+                        XCTFail("Expected .change but got \(change)")
                         exp.fulfill()
                         return
                     }
@@ -2598,7 +2598,7 @@ class CombineProjectionPublisherTests: CombinePublisherTestCase {
                 var prev: SimpleProjection?
                 for change in arr {
                     guard case .change(let p, let properties) = change else {
-                        XCTFail("Expected .change, got(\(change)")
+                        XCTFail("Expected .change but got \(change)")
                         sema.signal()
                         return
                     }
