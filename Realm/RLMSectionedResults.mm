@@ -336,8 +336,20 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
         _info = &objectInfo;
         _realm = realm;
         _keyBlock = keyBlock;
-//        _results = std::move(results);
-        _sectionedResults = _results.sectioned_results(SectionedResultsKeyProjection {_info, _keyBlock});
+        _results = results;
+        _sectionedResults = results.sectioned_results(SectionedResultsKeyProjection {_info, _keyBlock});
+    }
+    return self;
+}
+
+- (instancetype)initWithSectionedResults:(realm::SectionedResults&&)sectionedResults
+                              objectInfo:(RLMClassInfo&)objectInfo
+                                keyBlock:(RLMSectionedResultsKeyBlock)keyBlock{
+    if (self = [super init]) {
+        _info = &objectInfo;
+        _realm = _info->realm;
+        _sectionedResults = std::move(sectionedResults);
+        _keyBlock = keyBlock;
     }
     return self;
 }
@@ -349,8 +361,8 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
         _info = &objectInfo;
         _realm = results.realm;
         _keyBlock = keyBlock;
-//        _results = results->_results;
-        _sectionedResults = _results.sectioned_results(SectionedResultsKeyProjection {_info, _keyBlock});
+        _results = results->_results;
+        _sectionedResults = results->_results.sectioned_results(SectionedResultsKeyProjection {_info, _keyBlock});
     }
     return self;
 }
@@ -361,6 +373,36 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
 
 - (RLMRealm *)realm {
     return _realm;
+}
+
+- (instancetype)resolveInRealm:(RLMRealm *)realm {
+     return translateRLMResultsErrors([&] {
+        if (realm.isFrozen) {
+            return [[RLMSectionedResults alloc] initWithSectionedResults:_sectionedResults.freeze(realm->_realm)
+                                                              objectInfo:_info->resolve(realm)
+                                                                keyBlock:_keyBlock];
+        } else {
+            auto sr = _sectionedResults.freeze(realm->_realm);
+            sr.reset_section_callback(SectionedResultsKeyProjection {&_info->resolve(realm), _keyBlock});
+            return [[RLMSectionedResults alloc] initWithSectionedResults:std::move(sr)
+                                                              objectInfo:_info->resolve(realm)
+                                                                keyBlock:_keyBlock];
+        }
+    });
+}
+
+- (instancetype)freeze {
+    if (self.frozen) {
+        return self;
+    }
+    return [self resolveInRealm:_realm.freeze];
+}
+
+- (instancetype)thaw {
+    if (!self.frozen) {
+        return self;
+    }
+    return [self resolveInRealm:_realm.thaw];
 }
 
 - (NSUInteger)count {
@@ -383,7 +425,8 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
     return [[RLMSection alloc] initWithResultsSection:_sectionedResults[index]
                                                 realm:self.realm
                                            objectInfo:*_info
-                                             keyBlock:_keyBlock];
+                                             keyBlock:_keyBlock
+                                               parent:self];
 }
 
 // The compiler complains about the method's argument type not matching due to
@@ -570,12 +613,14 @@ RLMNotificationToken *RLMAddNotificationBlock(RLMSection *collection,
                                  realm:(RLMRealm *)realm
                             objectInfo:(RLMClassInfo&)objectInfo
                               keyBlock:(RLMSectionedResultsKeyBlock)keyBlock
+                                parent:(RLMSectionedResults *)parent
 {
     if (self = [super init]) {
         _realm = realm;
         _info = &objectInfo;
         _keyBlock = keyBlock;
         _resultsSection = std::move(resultsSection);
+        _parent = parent;
     }
     return self;
 }
@@ -654,7 +699,7 @@ RLMNotificationToken *RLMAddNotificationBlock(RLMSection *collection,
 - (id)objectiveCMetadata {
     return @{
         @"keyBlock": _keyBlock,
-        @"sectionKey": [self key]
+        @"sectionKey": self.key
     };
 }
 
@@ -668,20 +713,13 @@ RLMNotificationToken *RLMAddNotificationBlock(RLMSection *collection,
                                                                      realm:realm
                                                                 objectInfo:realm->_info[objType]
                                                                   keyBlock:(RLMSectionedResultsKeyBlock)metadata[@"keyBlock"]];
-    id<RLMValue> key = metadata[@"sectionKey"];
-    RLMSection *section;
-    // fast enumeration will create a snapshot which won't work with notifications.
-    for(NSUInteger i = 0; i < sr.count; i++) {
-        if (sr[i].key == key) {
-            section = sr[i];
-            break;
-        }
-    }
-    if (!section) {
-        @throw RLMException(@"Could not access section during thread handover.");
-    }
-    section->_parent = sr;
-    return section;
+    return translateRLMResultsErrors([&] {
+        return [[RLMSection alloc] initWithResultsSection:sr->_sectionedResults[RLMObjcToMixed(metadata[@"sectionKey"])]
+                                                    realm:realm
+                                               objectInfo:realm->_info[objType]
+                                                 keyBlock:(RLMSectionedResultsKeyBlock)metadata[@"keyBlock"]
+                                                   parent:sr];
+    });
 }
 
 - (BOOL)isInvalidated {

@@ -84,7 +84,8 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
 - (instancetype)initWithResultsSection:(realm::ResultsSection&&)resultsSection
                                  realm:(RLMRealm *)realm
                             objectInfo:(RLMClassInfo&)objectInfo
-                              keyBlock:(RLMSectionedResultsKeyBlock)keyBlock;
+                              keyBlock:(RLMSectionedResultsKeyBlock)keyBlock
+                                parent:(RLMSectionedResults *)parent;
 
 
 - (RLMSectionedResultsEnumerator *)fastEnumerator;

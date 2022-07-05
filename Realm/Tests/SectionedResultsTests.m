@@ -491,9 +491,9 @@
     RLMResults<AllTypesObject *> *results = [AllTypesObject allObjectsInRealm:realm];
     RLMSectionedResults<AllTypesObject *> *sr = [results sectionedResultsSortedUsingKeyPath:@"objectCol.stringCol"
                                                                                   ascending:YES
-                                                                                   keyBlock:^id<RLMValue>(id value) {
+                                                                                   keyBlock:^id<RLMValue>(AllTypesObject *value) {
         algoRunCount++;
-        return value;
+        return value.stringCol;
     }];
 
     for (RLMSection *section in sr) {
@@ -906,16 +906,18 @@ static void ExpectChangePrimitive(id self,
     run([AggregateObject allObjectsInRealm:realm]);
 }
 
-- (void)testFrozen {
+- (void)testFrozenFromResults {
     [self createObjects];
     RLMRealm *realm = self.realmWithTestPath;
-
+    // Test creation from frozen RLMResults
     RLMResults<AllTypesObject *> *results = [[AllTypesObject allObjectsInRealm:realm] freeze];
     RLMSectionedResults<AllTypesObject *> *sr = [results sectionedResultsSortedUsingKeyPath:@"objectCol.stringCol"
                                                                                   ascending:YES
                                                                                    keyBlock:^id<RLMValue>(AllTypesObject *value) {
         return [value.objectCol.stringCol substringToIndex:1];
     }];
+
+    [self createObjects];
 
     XCTAssertNotNil(sr);
     XCTAssertEqual(sr.count, 4);
@@ -926,6 +928,53 @@ static void ExpectChangePrimitive(id self,
 
     XCTAssertTrue(sr[0][0].isFrozen);
     XCTAssertTrue(sr.isFrozen);
+
+    RLMSectionedResults<AllTypesObject *> *thawed = [sr thaw];
+    XCTAssertNotNil(thawed);
+    XCTAssertEqual(thawed.count, 4);
+    XCTAssertEqual(thawed[0].count, 6);
+    XCTAssertEqual(thawed[1].count, 2);
+    XCTAssertEqual(thawed[2].count, 4);
+    XCTAssertEqual(thawed[3].count, 6);
+
+    XCTAssertFalse(thawed[0][0].isFrozen);
+    XCTAssertFalse(thawed.isFrozen);
+}
+
+- (void)testFrozenSectionedResults {
+    [self createObjects];
+    RLMRealm *realm = self.realmWithTestPath;
+    // Test creation from frozen RLMResults
+    RLMResults<AllTypesObject *> *results = [AllTypesObject allObjectsInRealm:realm];
+    RLMSectionedResults<AllTypesObject *> *sr = [results sectionedResultsSortedUsingKeyPath:@"objectCol.stringCol"
+                                                                                  ascending:YES
+                                                                                   keyBlock:^id<RLMValue>(AllTypesObject *value) {
+        return [value.objectCol.stringCol substringToIndex:1];
+    }];
+
+    RLMSectionedResults<AllTypesObject *> *frozen = [sr freeze];
+    [self createObjects];
+
+    XCTAssertNotNil(sr);
+    XCTAssertEqual(frozen.count, 4);
+    XCTAssertEqual(frozen[0].count, 3);
+    XCTAssertEqual(frozen[1].count, 1);
+    XCTAssertEqual(frozen[2].count, 2);
+    XCTAssertEqual(frozen[3].count, 3);
+
+    XCTAssertTrue(frozen[0][0].isFrozen);
+    XCTAssertTrue(frozen.isFrozen);
+
+    RLMSectionedResults<AllTypesObject *> *thawed = [frozen thaw];
+    XCTAssertNotNil(thawed);
+    XCTAssertEqual(thawed.count, 4);
+    XCTAssertEqual(thawed[0].count, 6);
+    XCTAssertEqual(thawed[1].count, 2);
+    XCTAssertEqual(thawed[2].count, 4);
+    XCTAssertEqual(thawed[3].count, 6);
+
+    XCTAssertFalse(thawed[0][0].isFrozen);
+    XCTAssertFalse(thawed.isFrozen);
 }
 
 - (void)testInitFromRLMArray {

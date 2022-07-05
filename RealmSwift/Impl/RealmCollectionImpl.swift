@@ -149,9 +149,6 @@ extension RealmCollectionImpl {
 
     public func sectioned<Key: _Persistable>(sortDescriptors: [SortDescriptor],
                                              _ keyBlock: @escaping ((Element) -> Key)) -> SectionedResults<Key, Element> {
-//        let sectionBlock: ((Element) -> Key) = { v in
-//            return block(v)
-//        }
         if sortDescriptors.isEmpty {
             throwRealmException("There must be at least one SortDescriptor when using SectionedResults.")
         }
@@ -159,9 +156,7 @@ extension RealmCollectionImpl {
             return keyBlock(Element._rlmFromObjc(value)!)._rlmObjcValue as! RLMValue
         }
 
-        return SectionedResults(rlmSectionedResults: sectionedResults/*,
-                                sectionBlock: keyBlock,
-                                valueProjector: { $0 as! Element }*/)
+        return SectionedResults(rlmSectionedResults: sectionedResults)
     }
 }
 

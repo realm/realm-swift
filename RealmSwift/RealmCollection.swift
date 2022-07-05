@@ -694,7 +694,6 @@ public extension RealmCollection where Element: ObjectBase {
                                       ascending: Bool = true) -> SectionedResults<Key, Element> where Element: ObjectBase {
         let keyPathString = _name(for: keyPath)
         return sectioned(sortDescriptors: [.init(keyPath: keyPathString, ascending: ascending)], {
-            print("run")
             return $0[keyPath: keyPath]
         })
     }
@@ -711,6 +710,10 @@ public extension RealmCollection where Element: ObjectBase {
         return sectioned(sortDescriptors: sortDescriptors, { $0[keyPath: keyPath] })
     }
 
+    func sectioned<Key: _Persistable>(by block: @escaping ((Element) -> Key),
+                                      sortDescriptors: [SortDescriptor]) -> SectionedResults<Key, Element> where Element: ObjectBase {
+        return sectioned(sortDescriptors: sortDescriptors, block)
+    }
 }
 
 public extension RealmCollection where Element.PersistedType: MinMaxType {
@@ -1092,6 +1095,33 @@ public extension RealmCollection {
     }
 }
 
+extension RealmCollection {
+    public func sectioned<Key: _Persistable, O: ObjectBase>(by keyPath: KeyPath<Element, Key>,
+                                                     ascending: Bool = true) -> SectionedResults<Key, Element> where Element: Projection<O> {
+        let keyPathString = _name(for: keyPath)
+        return sectioned(sortDescriptors: [.init(keyPath: keyPathString, ascending: ascending)], {
+            return $0[keyPath: keyPath]
+        })
+    }
+
+    public func sectioned<Key: _Persistable, O: ObjectBase>(by keyPath: KeyPath<Element, Key>,
+                                                     sortDescriptors: [SortDescriptor]) -> SectionedResults<Key, Element> where Element: Projection<O> {
+        guard let sortDescriptor = sortDescriptors.first else {
+            throwRealmException("Can not section Results with empty sortDescriptor parameter.")
+        }
+        let keyPathString = _name(for: keyPath)
+        if keyPathString != sortDescriptor.keyPath {
+            throwRealmException("The section key path must match the primary sort descriptor.")
+        }
+        return sectioned(sortDescriptors: sortDescriptors, { $0[keyPath: keyPath] })
+    }
+
+    public func sectioned<Key: _Persistable, O: ObjectBase>(by block: @escaping ((Element) -> Key),
+                                                     sortDescriptors: [SortDescriptor]) -> SectionedResults<Key, Element> where Element: Projection<O> {
+        return sectioned(sortDescriptors: sortDescriptors, block)
+    }
+}
+
 /**
  A type-erased `RealmCollection`.
 
@@ -1452,16 +1482,6 @@ public struct ProjectedCollection<Element>: RandomAccessCollection, CustomString
         self.keyPath = keyPath
         self.propertyName = propertyName
     }
-
-//    func sectioned<Key: _Persistable>(by keyPath: KeyPath<Element, Key>,
-//                                      ascending: Bool = false) -> SectionedResults<Key, Element> {
-//        fatalError()
-//    }
-//
-//    func sectioned<Key: _Persistable>(by keyPath: KeyPath<Element, Key>,
-//                                      sortDescriptors: [SortDescriptor]) -> SectionedResults<Key, Element> {
-//        fatalError()
-//    }
 }
 
 /**
