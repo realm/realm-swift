@@ -254,6 +254,8 @@ public enum ClientResetMode {
     ///  For more details on the second block: ((Realm, Realm) -> Void)? = nil,
     /// - see: `RLMClientResetAfterBlock`
     case discardLocal(((Realm) -> Void)? = nil, ((Realm, Realm) -> Void)? = nil)
+    case recover(((Realm) -> Void)? = nil, ((Realm, Realm) -> Void)? = nil)
+    case recoverOrDiscard(((Realm) -> Void)? = nil, ((Realm, Realm) -> Void)? = nil)
 }
 
 /**
@@ -310,6 +312,10 @@ public enum ClientResetMode {
             self.clientResetMode = .manual
         case .discardLocal:
             self.clientResetMode = .discardLocal(ObjectiveCSupport.convert(object: config.beforeClientReset), ObjectiveCSupport.convert(object: config.afterClientReset))
+        case .recover:
+            self.clientResetMode = .recover(ObjectiveCSupport.convert(object: config.beforeClientReset), ObjectiveCSupport.convert(object: config.afterClientReset))
+        case .recoverOrDiscard:
+            self.clientResetMode = .recoverOrDiscard(ObjectiveCSupport.convert(object: config.beforeClientReset), ObjectiveCSupport.convert(object: config.afterClientReset))
         @unknown default:
             fatalError("what's best in this case?")
         }
@@ -333,6 +339,20 @@ public enum ClientResetMode {
                                                          partitionValue: partitionValue.map(ObjectiveCSupport.convertBson),
                                                          stopPolicy: stopPolicy,
                                                          clientResetMode: .discardLocal,
+                                                         notifyBeforeReset: ObjectiveCSupport.convert(object: before),
+                                                         notifyAfterReset: ObjectiveCSupport.convert(object: after))
+            case .recover(let before, let after):
+                syncConfiguration = RLMSyncConfiguration(user: user,
+                                                         partitionValue: partitionValue.map(ObjectiveCSupport.convertBson),
+                                                         stopPolicy: stopPolicy,
+                                                         clientResetMode: .recover,
+                                                         notifyBeforeReset: ObjectiveCSupport.convert(object: before),
+                                                         notifyAfterReset: ObjectiveCSupport.convert(object: after))
+            case .recoverOrDiscard(let before, let after):
+                syncConfiguration = RLMSyncConfiguration(user: user,
+                                                         partitionValue: partitionValue.map(ObjectiveCSupport.convertBson),
+                                                         stopPolicy: stopPolicy,
+                                                         clientResetMode: .recoverOrDiscard,
                                                          notifyBeforeReset: ObjectiveCSupport.convert(object: before),
                                                          notifyAfterReset: ObjectiveCSupport.convert(object: after))
             }
@@ -486,6 +506,16 @@ public extension User {
         case .discardLocal(let beforeClientReset, let afterClientReset):
             config = self.__configuration(withPartitionValue: ObjectiveCSupport.convert(object: AnyBSON(partitionValue)),
                                               clientResetMode: .discardLocal,
+                                              notifyBeforeReset: ObjectiveCSupport.convert(object: beforeClientReset),
+                                              notifyAfterReset: ObjectiveCSupport.convert(object: afterClientReset))
+        case .recover(let beforeClientReset, let afterClientReset):
+            config = self.__configuration(withPartitionValue: ObjectiveCSupport.convert(object: AnyBSON(partitionValue)),
+                                              clientResetMode: .recover,
+                                              notifyBeforeReset: ObjectiveCSupport.convert(object: beforeClientReset),
+                                              notifyAfterReset: ObjectiveCSupport.convert(object: afterClientReset))
+        case .recoverOrDiscard(let beforeClientReset, let afterClientReset):
+            config = self.__configuration(withPartitionValue: ObjectiveCSupport.convert(object: AnyBSON(partitionValue)),
+                                              clientResetMode: .recoverOrDiscard,
                                               notifyBeforeReset: ObjectiveCSupport.convert(object: beforeClientReset),
                                               notifyAfterReset: ObjectiveCSupport.convert(object: afterClientReset))
         }

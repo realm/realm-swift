@@ -1470,9 +1470,13 @@ static NSString *randomEmail() {
 - (void)testSetClientResetMode {
     RLMUser *user = [self userForTest:_cmd];
     NSString *partitionValue = NSStringFromSelector(_cmd);
+
     RLMRealmConfiguration *config = [user configurationWithPartitionValue:partitionValue clientResetMode:RLMClientResetModeDiscardLocal];
     XCTAssertEqual(config.syncConfiguration.clientResetMode, RLMClientResetModeDiscardLocal);
-
+    config = [user configurationWithPartitionValue:partitionValue clientResetMode:RLMClientResetModeRecover];
+    XCTAssertEqual(config.syncConfiguration.clientResetMode, RLMClientResetModeRecover);
+    config = [user configurationWithPartitionValue:partitionValue clientResetMode:RLMClientResetModeRecoverOrDiscard];
+    XCTAssertEqual(config.syncConfiguration.clientResetMode, RLMClientResetModeRecoverOrDiscard);
     // Default is manual
     config = [user configurationWithPartitionValue:partitionValue];
     XCTAssertEqual(config.syncConfiguration.clientResetMode, RLMClientResetModeManual);
