@@ -50,7 +50,11 @@ typedef NS_ENUM(NSUInteger, RLMClientResetMode) {
     /// If RLMClientResetModeDiscardLocal is enabled but the client reset operation is unable to complete
     /// then the client reset process reverts to manual mode. Example) During a destructive schema change this
     /// mode will fail and invoke the manual client reset handler.
-    RLMClientResetModeDiscardLocal
+    RLMClientResetModeDiscardLocal,
+    // TODO: docs
+    RLMClientResetModeRecover,
+    // TODO: docs
+    RLMClientResetModeRecoverOrDiscard
 };
 
 /**
