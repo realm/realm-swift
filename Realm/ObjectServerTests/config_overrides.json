@@ -1,13 +1,28 @@
 {
   "events": {
-    "streams": {
-      "eventSubscriptionPollingPeriodSec": 2,
-      "eventSubscriptionHeartbeatPeriodSec": 2
+    "database": {
+      "maxCoordinatorChangeStreams": 50000
+    },
+    "log_forwarder": {
+      "enabled": false
     },
     "mediator": {
-      "eventSubscriptionPollingPeriodSeconds": 4,
-      "unownedEventSubscriptionPollingPeriodSeconds": 2,
-      "staleOwnedJobPollingPeriodSec": 2
+      "eventSubscriptionPollingPeriodSeconds": 2,
+      "unownedEventSubscriptionPollingPeriodSeconds": 1,
+      "staleOwnedJobPollingPeriodSec": 1
+    },
+    "streams": {
+      "eventSubscriptionPollingPeriodSec": 2,
+      "eventSubscriptionHeartbeatPeriodSec": 1
     }
+  },
+  "graphql": {
+    "enabled": false
+  },
+  "metrics": {
+    "enabled": false
+  },
+  "secretsManager": {
+    "enabled": false
   }
 }
