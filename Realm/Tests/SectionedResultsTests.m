@@ -955,7 +955,7 @@ static void ExpectChangePrimitive(id self,
     RLMSectionedResults<AllTypesObject *> *frozen = [sr freeze];
     [self createObjects];
 
-    XCTAssertNotNil(sr);
+    XCTAssertNotNil(frozen);
     XCTAssertEqual(frozen.count, 4);
     XCTAssertEqual(frozen[0].count, 3);
     XCTAssertEqual(frozen[1].count, 1);
@@ -974,6 +974,33 @@ static void ExpectChangePrimitive(id self,
     XCTAssertEqual(thawed[3].count, 6);
 
     XCTAssertFalse(thawed[0][0].isFrozen);
+    XCTAssertFalse(thawed.isFrozen);
+}
+
+- (void)testFrozenSection {
+    [self createObjects];
+    RLMRealm *realm = self.realmWithTestPath;
+    // Test creation from frozen RLMResults
+    RLMResults<AllTypesObject *> *results = [AllTypesObject allObjectsInRealm:realm];
+    RLMSectionedResults<AllTypesObject *> *sr = [results sectionedResultsSortedUsingKeyPath:@"objectCol.stringCol"
+                                                                                  ascending:YES
+                                                                                   keyBlock:^id<RLMValue>(AllTypesObject *value) {
+        return [value.objectCol.stringCol substringToIndex:1];
+    }];
+
+    RLMSection<AllTypesObject *> *frozen = [sr[0] freeze];
+    [self createObjects];
+
+    XCTAssertNotNil(frozen);
+    XCTAssertEqual(frozen.count, 3);
+    XCTAssertTrue(frozen[0].isFrozen);
+    XCTAssertTrue(frozen.isFrozen);
+
+    RLMSection<AllTypesObject *> *thawed = [frozen thaw];
+    XCTAssertNotNil(thawed);
+    XCTAssertEqual(thawed.count, 6);
+
+    XCTAssertFalse(thawed[0].isFrozen);
     XCTAssertFalse(thawed.isFrozen);
 }
 
@@ -1066,6 +1093,75 @@ static void ExpectChangePrimitive(id self,
     XCTAssertEqualObjects(sr[1].key, @0);
     XCTAssertEqualObjects(sr[1][0], @4);
     XCTAssertEqualObjects(sr[1][1], @2);
+}
+
+- (void)testThreadSafeReference {
+    [self createObjects];
+    RLMRealm *realm = self.realmWithTestPath;
+    // Test creation from frozen RLMResults
+    RLMResults<AllTypesObject *> *results = [AllTypesObject allObjectsInRealm:realm];
+    __block BOOL isMainQueue = NO;
+    RLMSectionedResults<AllTypesObject *> *sr = [results sectionedResultsSortedUsingKeyPath:@"objectCol.stringCol"
+                                                                                  ascending:YES
+                                                                                   keyBlock:^id<RLMValue>(AllTypesObject *value) {
+        isMainQueue = [NSThread isMainThread];
+        return [value.objectCol.stringCol substringToIndex:1];
+    }];
+
+    XCTAssertEqual(sr.count, 4);
+    XCTAssertTrue(isMainQueue);
+
+    __block RLMThreadSafeReference<RLMSectionedResults<AllTypesObject *> *> *tsr = [RLMThreadSafeReference referenceWithThreadConfined:sr];
+
+    dispatch_queue_t q = dispatch_queue_create("sectioned-results", DISPATCH_QUEUE_SERIAL);
+    __block BOOL didRun = NO;
+    dispatch_async(q, ^{
+        RLMRealmConfiguration *config = [[RLMRealmConfiguration alloc] init];
+        config.fileURL = RLMTestRealmURL();
+        RLMRealm *r = [RLMRealm realmWithConfiguration:config queue:q error:nil];
+        RLMSectionedResults<AllTypesObject *> *tsrSectionedResults = [r resolveThreadSafeReference:tsr];
+        XCTAssertEqual(tsrSectionedResults.count, 4);
+        didRun = YES;
+    });
+
+    dispatch_sync(q, ^{});
+    XCTAssertTrue(didRun);
+    XCTAssertFalse(isMainQueue);
+}
+
+- (void)testThreadSafeReferenceOnSection {
+    [self createObjects];
+    RLMRealm *realm = self.realmWithTestPath;
+    // Test creation from frozen RLMResults
+    RLMResults<AllTypesObject *> *results = [AllTypesObject allObjectsInRealm:realm];
+    __block BOOL isMainQueue = NO;
+    RLMSectionedResults<AllTypesObject *> *sr = [results sectionedResultsSortedUsingKeyPath:@"objectCol.stringCol"
+                                                                                  ascending:YES
+                                                                                   keyBlock:^id<RLMValue>(AllTypesObject *value) {
+        isMainQueue = [NSThread isMainThread];
+        return [value.objectCol.stringCol substringToIndex:1];
+    }];
+    RLMSection *section = sr[0];
+
+    XCTAssertEqual(section.count, 3);
+    XCTAssertTrue(isMainQueue);
+
+    __block RLMThreadSafeReference<RLMSection<AllTypesObject *> *> *tsr = [RLMThreadSafeReference referenceWithThreadConfined:section];
+
+    dispatch_queue_t q = dispatch_queue_create("sectioned-results", DISPATCH_QUEUE_SERIAL);
+    __block BOOL didRun = NO;
+    dispatch_async(q, ^{
+        RLMRealmConfiguration *config = [[RLMRealmConfiguration alloc] init];
+        config.fileURL = RLMTestRealmURL();
+        RLMRealm *r = [RLMRealm realmWithConfiguration:config queue:q error:nil];
+        RLMSection<AllTypesObject *> *tsrSection = [r resolveThreadSafeReference:tsr];
+        XCTAssertEqual(tsrSection.count, 3);
+        didRun = YES;
+    });
+
+    dispatch_sync(q, ^{});
+    XCTAssertTrue(didRun);
+    XCTAssertFalse(isMainQueue);
 }
 
 @end

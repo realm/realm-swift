@@ -820,7 +820,9 @@ public extension RealmCollection where Element.PersistedType: SortableType {
     }
 }
 
-public extension RealmCollection where Element: SortableType {
+// MARK: - Sectioned Results on primitives
+
+public extension RealmCollection {
     func sectioned<Key: _Persistable>(by block: @escaping ((Element) -> Key),
                                       ascending: Bool = true) -> SectionedResults<Key, Element> {
         sectioned(sortDescriptors: [.init(keyPath: "self", ascending: ascending)], block)

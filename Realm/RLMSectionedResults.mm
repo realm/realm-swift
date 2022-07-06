@@ -423,9 +423,6 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
 
 - (id)objectAtIndex:(NSUInteger)index {
     return [[RLMSection alloc] initWithResultsSection:_sectionedResults[index]
-                                                realm:self.realm
-                                           objectInfo:*_info
-                                             keyBlock:_keyBlock
                                                parent:self];
 }
 
@@ -576,9 +573,6 @@ RLMNotificationToken *RLMAddNotificationBlock(RLMSection *collection,
 @end
 
 @implementation RLMSection {
-    RLMRealm *_realm;
-    RLMClassInfo *_info;
-    RLMSectionedResultsKeyBlock _keyBlock;
     RLMSectionedResults *_parent;
 }
 
@@ -610,15 +604,9 @@ RLMNotificationToken *RLMAddNotificationBlock(RLMSection *collection,
 }
 
 - (instancetype)initWithResultsSection:(realm::ResultsSection&&)resultsSection
-                                 realm:(RLMRealm *)realm
-                            objectInfo:(RLMClassInfo&)objectInfo
-                              keyBlock:(RLMSectionedResultsKeyBlock)keyBlock
                                 parent:(RLMSectionedResults *)parent
 {
     if (self = [super init]) {
-        _realm = realm;
-        _info = &objectInfo;
-        _keyBlock = keyBlock;
         _resultsSection = std::move(resultsSection);
         _parent = parent;
     }
@@ -630,7 +618,7 @@ RLMNotificationToken *RLMAddNotificationBlock(RLMSection *collection,
 }
 
 - (id)objectAtIndex:(NSUInteger)index {
-    RLMAccessorContext ctx(*_info);
+    RLMAccessorContext ctx(*_parent.objectInfo);
     return translateRLMResultsErrors([&] {
         return ctx.box(_resultsSection[index]);
     });
@@ -659,11 +647,19 @@ RLMNotificationToken *RLMAddNotificationBlock(RLMSection *collection,
 }
 
 - (RLMRealm *)realm {
-    return _realm;
+    return _parent.realm;
 }
 
 - (RLMClassInfo *)objectInfo {
-    return _info;
+    return _parent.objectInfo;
+}
+
+- (BOOL)isInvalidated {
+    return translateRLMResultsErrors([&] { return !_resultsSection.is_valid(); });
+}
+
+- (BOOL)isFrozen {
+    return translateRLMResultsErrors([&] { return _parent.frozen; });
 }
 
 // The compiler complains about the method's argument type not matching due to
@@ -698,7 +694,7 @@ RLMNotificationToken *RLMAddNotificationBlock(RLMSection *collection,
 
 - (id)objectiveCMetadata {
     return @{
-        @"keyBlock": _keyBlock,
+        @"keyBlock": _parent->_keyBlock,
         @"sectionKey": self.key
     };
 }
@@ -715,15 +711,36 @@ RLMNotificationToken *RLMAddNotificationBlock(RLMSection *collection,
                                                                   keyBlock:(RLMSectionedResultsKeyBlock)metadata[@"keyBlock"]];
     return translateRLMResultsErrors([&] {
         return [[RLMSection alloc] initWithResultsSection:sr->_sectionedResults[RLMObjcToMixed(metadata[@"sectionKey"])]
-                                                    realm:realm
-                                               objectInfo:realm->_info[objType]
-                                                 keyBlock:(RLMSectionedResultsKeyBlock)metadata[@"keyBlock"]
                                                    parent:sr];
     });
 }
 
-- (BOOL)isInvalidated {
-    return translateRLMResultsErrors([&] { return !_resultsSection.is_valid(); });
+- (instancetype)resolveInRealm:(RLMRealm *)realm {
+     return translateRLMResultsErrors([&] {
+        if (realm.isFrozen) {
+            RLMSectionedResults *sr = [_parent freeze];
+            return [[RLMSection alloc] initWithResultsSection:sr->_sectionedResults[RLMObjcToMixed(self.key)]
+                                                       parent:sr];
+        } else {
+            RLMSectionedResults *sr = [_parent thaw];
+            return [[RLMSection alloc] initWithResultsSection:sr->_sectionedResults[RLMObjcToMixed(self.key)]
+                                                       parent:sr];
+        }
+    });
+}
+
+- (instancetype)freeze {
+    if (self.frozen) {
+        return self;
+    }
+    return [self resolveInRealm:_parent.realm.freeze];
+}
+
+- (instancetype)thaw {
+    if (!self.frozen) {
+        return self;
+    }
+    return [self resolveInRealm:_parent.realm.thaw];
 }
 
 @end

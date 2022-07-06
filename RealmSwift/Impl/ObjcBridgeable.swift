@@ -185,7 +185,17 @@ extension List: _ObjcBridgeable {}
 extension MutableSet: _ObjcBridgeable {}
 extension SectionedResults: _ObjcBridgeable {
     public static func _rlmFromObjc(_ value: Any, insideOptional: Bool) -> SectionedResults<Key, T>? {
-        (value as? RLMSectionedResults<AnyObject>).map(Self.init(sectionedResults:))
+        (value as? RLMSectionedResults<AnyObject>).map(Self.init(rlmSectionedResults:))
+    }
+
+    public var _rlmObjcValue: Any {
+        self.collection
+    }
+}
+
+extension Section: _ObjcBridgeable {
+    public static func _rlmFromObjc(_ value: Any, insideOptional: Bool) -> Section<Key, T>? {
+        (value as? RLMSection<AnyObject>).map(Self.init(rlmSection:))
     }
 
     public var _rlmObjcValue: Any {

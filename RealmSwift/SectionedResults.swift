@@ -33,16 +33,12 @@ public protocol RealmSectionedResults: RandomAccessCollection, Equatable, Thread
 public struct SectionedResults<Key: _Persistable & Hashable, T: RealmCollectionValue>: RealmSectionedResults {
     let collection: RLMSectionedResults<AnyObject>
 
-    internal init(sectionedResults: RLMSectionedResults<AnyObject>) {
-        self.collection = sectionedResults
-    }
-
     internal init(rlmSectionedResults: RLMSectionedResults<AnyObject>) {
         self.collection = rlmSectionedResults
     }
 
     public subscript(_ index: Int) -> Section<Key, T> {
-        return Section<Key, T>(rlmSection: collection[UInt(index)]/*, sectionBlock: sectionBlock*/)
+        return Section<Key, T>(rlmSection: collection[UInt(index)])
     }
 
     public subscript(_ indexPath: IndexPath) -> T {
@@ -107,62 +103,24 @@ public struct SectionedResults<Key: _Persistable & Hashable, T: RealmCollectionV
     }
 }
 
-public protocol RealmResultsSection: RandomAccessCollection, Equatable, ThreadConfined {
-    func observe(keyPaths: [String]?,
-                 on queue: DispatchQueue?,
-                 _ block: @escaping (RealmSectionedResultsChange<Self>) -> Void) -> NotificationToken
-    func observe(on queue: DispatchQueue?,
-                 _ block: @escaping (RealmSectionedResultsChange<Self>) -> Void) -> NotificationToken
-    func observe<T: ObjectBase>(keyPaths: [PartialKeyPath<T>],
-                                on queue: DispatchQueue?,
-                                _ block: @escaping (RealmSectionedResultsChange<Self>) -> Void) -> NotificationToken
-}
+public struct Section<Key: _Persistable & Hashable, T: RealmCollectionValue>: RealmSectionedResults {
 
-public struct Section<Key: _Persistable & Hashable, T: RealmCollectionValue>: RealmResultsSection {
-
-    internal typealias ObjcSectionedResultsChange = (RLMSection<AnyObject>?, RLMSectionedResultsChange?, Error?) -> Void
-    internal func wrapObserveBlock(_ block: @escaping (RealmSectionedResultsChange<Self>) -> Void) -> ObjcSectionedResultsChange {
-        var col: Self?
-        return { collection, change, error in
-            if col == nil, let collection = collection {
-                col = self.collection === collection ? self : Self(rlmSection: collection)
-            }
-            block(RealmSectionedResultsChange.fromObjc(value: col, change: change, error: error))
-        }
-    }
-
-    public func observe(keyPaths: [String]? = nil,
-                        on queue: DispatchQueue? = nil,
-                        _ block: @escaping (RealmSectionedResultsChange<Self>) -> Void) -> NotificationToken {
-        return collection.addNotificationBlock(wrapObserveBlock(block), keyPaths: keyPaths, queue: queue)
-    }
-    public func observe(on queue: DispatchQueue? = nil,
-                        _ block: @escaping (RealmSectionedResultsChange<Self>) -> Void) -> NotificationToken {
-        return collection.addNotificationBlock(wrapObserveBlock(block), keyPaths: nil, queue: queue)
-    }
-    public func observe<T: ObjectBase>(keyPaths: [PartialKeyPath<T>],
-                                       on queue: DispatchQueue? = nil,
-                                       _ block: @escaping (RealmSectionedResultsChange<Self>) -> Void) -> NotificationToken {
-        return collection.addNotificationBlock(wrapObserveBlock(block), keyPaths: keyPaths.map(_name(for:)), queue: queue)
-    }
-
-
-   public var realm: Realm?
+    public var realm: Realm? { collection.realm.map(Realm.init) }
 
     public var isInvalidated: Bool {
-        fatalError()
+        return collection.isInvalidated
     }
 
     public var isFrozen: Bool {
-        fatalError()
+        collection.isFrozen
     }
 
     public func freeze() -> Section<Key, T> {
-        fatalError()
+        return Self(rlmSection: collection.freeze())
     }
 
     public func thaw() -> Section<Key, T>? {
-        fatalError()
+        return Self(rlmSection: collection.thaw())
     }
 
     let collection: RLMSection<AnyObject>
@@ -204,6 +162,32 @@ public struct Section<Key: _Persistable & Hashable, T: RealmCollectionValue>: Re
 
     public static func == (lhs: Section<Key, T>, rhs: Section<Key, T>) -> Bool {
         return lhs.collection == rhs.collection
+    }
+
+    internal typealias ObjcSectionedResultsChange = (RLMSection<AnyObject>?, RLMSectionedResultsChange?, Error?) -> Void
+    internal func wrapObserveBlock(_ block: @escaping (RealmSectionedResultsChange<Self>) -> Void) -> ObjcSectionedResultsChange {
+        var col: Self?
+        return { collection, change, error in
+            if col == nil, let collection = collection {
+                col = self.collection === collection ? self : Self(rlmSection: collection)
+            }
+            block(RealmSectionedResultsChange.fromObjc(value: col, change: change, error: error))
+        }
+    }
+
+    public func observe(keyPaths: [String]? = nil,
+                        on queue: DispatchQueue? = nil,
+                        _ block: @escaping (RealmSectionedResultsChange<Self>) -> Void) -> NotificationToken {
+        return collection.addNotificationBlock(wrapObserveBlock(block), keyPaths: keyPaths, queue: queue)
+    }
+    public func observe(on queue: DispatchQueue? = nil,
+                        _ block: @escaping (RealmSectionedResultsChange<Self>) -> Void) -> NotificationToken {
+        return collection.addNotificationBlock(wrapObserveBlock(block), keyPaths: nil, queue: queue)
+    }
+    public func observe<T: ObjectBase>(keyPaths: [PartialKeyPath<T>],
+                                       on queue: DispatchQueue? = nil,
+                                       _ block: @escaping (RealmSectionedResultsChange<Self>) -> Void) -> NotificationToken {
+        return collection.addNotificationBlock(wrapObserveBlock(block), keyPaths: keyPaths.map(_name(for:)), queue: queue)
     }
 }
 
@@ -258,11 +242,9 @@ public struct Section<Key: _Persistable & Hashable, T: RealmCollectionValue>: Re
  */
 @frozen public struct RLMSectionedResultsIterator<Key: _Persistable & Hashable, Element: RealmCollectionValue>: IteratorProtocol {
     private var generatorBase: NSFastEnumerationIterator
-//    private let sectionBlock: ((Element) -> Key)
 
-    init(collection: RLMSectionedResults<AnyObject>/*, sectionBlock: @escaping ((Element) -> Key)*/) {
+    init(collection: RLMSectionedResults<AnyObject>) {
         generatorBase = NSFastEnumerationIterator(collection)
-//        self.sectionBlock = sectionBlock
     }
 
     /// Advance to the next element and return it, or `nil` if no next element exists.

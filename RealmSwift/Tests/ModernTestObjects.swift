@@ -536,3 +536,107 @@ class LinkToModernCollectionsOfEnums: Object {
 class ModernListAnyRealmValueObject: Object {
     @Persisted var value: List<AnyRealmValue>
 }
+
+class ModernAllTypesProjection: Projection<ModernAllTypesObject> {
+    @Projected(\ModernAllTypesObject.boolCol) var boolCol
+    @Projected(\ModernAllTypesObject.intCol) var intCol: Int
+    @Projected(\ModernAllTypesObject.floatCol) var floatCol: Float
+    @Projected(\ModernAllTypesObject.doubleCol) var doubleCol: Double
+    @Projected(\ModernAllTypesObject.stringCol) var stringCol: String
+    @Projected(\ModernAllTypesObject.binaryCol) var binaryCol: Data
+    @Projected(\ModernAllTypesObject.dateCol) var dateCol: Date
+    @Projected(\ModernAllTypesObject.decimalCol) var decimalCol: Decimal128
+    @Projected(\ModernAllTypesObject.objectIdCol) var objectIdCol: ObjectId
+    @Projected(\ModernAllTypesObject.objectCol) var objectCol: ModernAllTypesObject?
+    @Projected(\ModernAllTypesObject.arrayCol) var arrayCol: List<ModernAllTypesObject>
+    @Projected(\ModernAllTypesObject.setCol) var setCol: MutableSet<ModernAllTypesObject>
+    @Projected(\ModernAllTypesObject.mapCol) var mapCol: Map<String, ModernAllTypesObject?>
+    @Projected(\ModernAllTypesObject.anyCol) var anyCol: AnyRealmValue
+    @Projected(\ModernAllTypesObject.uuidCol) var uuidCol: UUID
+    @Projected(\ModernAllTypesObject.intEnumCol) var intEnumCol: ModernIntEnum
+    @Projected(\ModernAllTypesObject.stringEnumCol) var stringEnumCol: ModernStringEnum
+
+    @Projected(\ModernAllTypesObject.optIntCol) var optIntCol: Int?
+    @Projected(\ModernAllTypesObject.optFloatCol) var optFloatCol: Float?
+    @Projected(\ModernAllTypesObject.optDoubleCol) var optDoubleCol: Double?
+    @Projected(\ModernAllTypesObject.optBoolCol) var optBoolCol: Bool?
+    @Projected(\ModernAllTypesObject.optStringCol) var optStringCol: String?
+    @Projected(\ModernAllTypesObject.optBinaryCol) var optBinaryCol: Data?
+    @Projected(\ModernAllTypesObject.optDateCol) var optDateCol: Date?
+    @Projected(\ModernAllTypesObject.optDecimalCol) var optDecimalCol: Decimal128?
+    @Projected(\ModernAllTypesObject.optObjectIdCol) var optObjectIdCol: ObjectId?
+    @Projected(\ModernAllTypesObject.optUuidCol) var optUuidCol: UUID?
+    @Projected(\ModernAllTypesObject.optIntEnumCol) var optIntEnumCol: ModernIntEnum?
+    @Projected(\ModernAllTypesObject.optStringEnumCol) var optStringEnumCol: ModernStringEnum?
+
+    @Projected(\ModernAllTypesObject.arrayBool) var arrayBool: List<Bool>
+    @Projected(\ModernAllTypesObject.arrayInt) var arrayInt: List<Int>
+    @Projected(\ModernAllTypesObject.arrayFloat) var arrayFloat: List<Float>
+    @Projected(\ModernAllTypesObject.arrayDouble) var arrayDouble: List<Double>
+    @Projected(\ModernAllTypesObject.arrayString) var arrayString: List<String>
+    @Projected(\ModernAllTypesObject.arrayBinary) var arrayBinary: List<Data>
+    @Projected(\ModernAllTypesObject.arrayDate) var arrayDate: List<Date>
+    @Projected(\ModernAllTypesObject.arrayDecimal) var arrayDecimal: List<Decimal128>
+    @Projected(\ModernAllTypesObject.arrayObjectId) var arrayObjectId: List<ObjectId>
+    @Projected(\ModernAllTypesObject.arrayAny) var arrayAny: List<AnyRealmValue>
+    @Projected(\ModernAllTypesObject.arrayUuid) var arrayUuid: List<UUID>
+
+    @Projected(\ModernAllTypesObject.arrayOptBool) var arrayOptBool: List<Bool?>
+    @Projected(\ModernAllTypesObject.arrayOptInt) var arrayOptInt: List<Int?>
+    @Projected(\ModernAllTypesObject.arrayOptFloat) var arrayOptFloat: List<Float?>
+    @Projected(\ModernAllTypesObject.arrayOptDouble) var arrayOptDouble: List<Double?>
+    @Projected(\ModernAllTypesObject.arrayOptString) var arrayOptString: List<String?>
+    @Projected(\ModernAllTypesObject.arrayOptBinary) var arrayOptBinary: List<Data?>
+    @Projected(\ModernAllTypesObject.arrayOptDate) var arrayOptDate: List<Date?>
+    @Projected(\ModernAllTypesObject.arrayOptDecimal) var arrayOptDecimal: List<Decimal128?>
+    @Projected(\ModernAllTypesObject.arrayOptObjectId) var arrayOptObjectId: List<ObjectId?>
+    @Projected(\ModernAllTypesObject.arrayOptUuid) var arrayOptUuid: List<UUID?>
+
+    @Projected(\ModernAllTypesObject.setBool) var setBool: MutableSet<Bool>
+    @Projected(\ModernAllTypesObject.setInt) var setInt: MutableSet<Int>
+    @Projected(\ModernAllTypesObject.setFloat) var setFloat: MutableSet<Float>
+    @Projected(\ModernAllTypesObject.setDouble) var setDouble: MutableSet<Double>
+    @Projected(\ModernAllTypesObject.setString) var setString: MutableSet<String>
+    @Projected(\ModernAllTypesObject.setBinary) var setBinary: MutableSet<Data>
+    @Projected(\ModernAllTypesObject.setDate) var setDate: MutableSet<Date>
+    @Projected(\ModernAllTypesObject.setDecimal) var setDecimal: MutableSet<Decimal128>
+    @Projected(\ModernAllTypesObject.setObjectId) var setObjectId: MutableSet<ObjectId>
+    @Projected(\ModernAllTypesObject.setAny) var setAny: MutableSet<AnyRealmValue>
+    @Projected(\ModernAllTypesObject.setUuid) var setUuid: MutableSet<UUID>
+
+    @Projected(\ModernAllTypesObject.setOptBool) var setOptBool: MutableSet<Bool?>
+    @Projected(\ModernAllTypesObject.setOptInt) var setOptInt: MutableSet<Int?>
+    @Projected(\ModernAllTypesObject.setOptFloat) var setOptFloat: MutableSet<Float?>
+    @Projected(\ModernAllTypesObject.setOptDouble) var setOptDouble: MutableSet<Double?>
+    @Projected(\ModernAllTypesObject.setOptString) var setOptString: MutableSet<String?>
+    @Projected(\ModernAllTypesObject.setOptBinary) var setOptBinary: MutableSet<Data?>
+    @Projected(\ModernAllTypesObject.setOptDate) var setOptDate: MutableSet<Date?>
+    @Projected(\ModernAllTypesObject.setOptDecimal) var setOptDecimal: MutableSet<Decimal128?>
+    @Projected(\ModernAllTypesObject.setOptObjectId) var setOptObjectId: MutableSet<ObjectId?>
+    @Projected(\ModernAllTypesObject.setOptUuid) var setOptUuid: MutableSet<UUID?>
+
+    @Projected(\ModernAllTypesObject.mapBool) var mapBool: Map<String, Bool>
+    @Projected(\ModernAllTypesObject.mapInt) var mapInt: Map<String, Int>
+    @Projected(\ModernAllTypesObject.mapFloat) var mapFloat: Map<String, Float>
+    @Projected(\ModernAllTypesObject.mapDouble) var mapDouble: Map<String, Double>
+    @Projected(\ModernAllTypesObject.mapString) var mapString: Map<String, String>
+    @Projected(\ModernAllTypesObject.mapBinary) var mapBinary: Map<String, Data>
+    @Projected(\ModernAllTypesObject.mapDate) var mapDate: Map<String, Date>
+    @Projected(\ModernAllTypesObject.mapDecimal) var mapDecimal: Map<String, Decimal128>
+    @Projected(\ModernAllTypesObject.mapObjectId) var mapObjectId: Map<String, ObjectId>
+    @Projected(\ModernAllTypesObject.mapAny) var mapAny: Map<String, AnyRealmValue>
+    @Projected(\ModernAllTypesObject.mapUuid) var mapUuid: Map<String, UUID>
+
+    @Projected(\ModernAllTypesObject.mapOptBool) var mapOptBool: Map<String, Bool?>
+    @Projected(\ModernAllTypesObject.mapOptInt) var mapOptInt: Map<String, Int?>
+    @Projected(\ModernAllTypesObject.mapOptFloat) var mapOptFloat: Map<String, Float?>
+    @Projected(\ModernAllTypesObject.mapOptDouble) var mapOptDouble: Map<String, Double?>
+    @Projected(\ModernAllTypesObject.mapOptString) var mapOptString: Map<String, String?>
+    @Projected(\ModernAllTypesObject.mapOptBinary) var mapOptBinary: Map<String, Data?>
+    @Projected(\ModernAllTypesObject.mapOptDate) var mapOptDate: Map<String, Date?>
+    @Projected(\ModernAllTypesObject.mapOptDecimal) var mapOptDecimal: Map<String, Decimal128?>
+    @Projected(\ModernAllTypesObject.mapOptObjectId) var mapOptObjectId: Map<String, ObjectId?>
+    @Projected(\ModernAllTypesObject.mapOptUuid) var mapOptUuid: Map<String, UUID?>
+
+    @Projected(\ModernAllTypesObject.linkingObjects) var linkingObjects: LinkingObjects<ModernAllTypesObject>
+}

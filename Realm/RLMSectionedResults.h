@@ -74,6 +74,41 @@ NS_ASSUME_NONNULL_BEGIN
 /// Returns the object for a given index in the section.
 - (id)objectAtIndex:(NSUInteger)index;
 
+#pragma mark - Freeze
+
+/**
+ Returns a frozen (immutable) snapshot of this array.
+
+ The frozen copy is an immutable array which contains the same data as this
+ array currently contains, but will not update when writes are made to the
+ containing Realm. Unlike live arrays, frozen arrays can be accessed from any
+ thread.
+
+ @warning This method cannot be called during a write transaction, or when the
+          containing Realm is read-only.
+ @warning This method may only be called on a managed array.
+ @warning Holding onto a frozen array for an extended period while performing
+          write transaction on the Realm may result in the Realm file growing
+          to large sizes. See `RLMRealmConfiguration.maximumNumberOfActiveVersions`
+          for more information.
+ */
+- (instancetype)freeze;
+
+/**
+ Returns a live version of this frozen collection.
+
+ This method resolves a reference to a live copy of the same frozen collection.
+ If called on a live collection, will return itself.
+*/
+- (instancetype)thaw;
+
+/**
+ Indicates if the underlying collection is frozen.
+
+ Frozen collections are immutable and can be accessed from any thread.
+ */
+@property (nonatomic, readonly, getter = isFrozen) BOOL frozen;
+
 #pragma mark - RLMSection Notifications
 
 /**

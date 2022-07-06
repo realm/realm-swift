@@ -79,9 +79,11 @@ class BasePrimitiveSectionedResultsTests<TestData: SectionedResultsTestData>: RL
     }
 
     func testCreationFromResults() {
-        let results = TestData.results(obj!)
-        assert(results)
-        assert(results, asending: false)
+        if !TestData.skipResultsTests {
+            let results = TestData.results(obj!)
+            assert(results)
+            assert(results, asending: false)
+        }
     }
 
     func testCreationFromList() {
@@ -97,9 +99,42 @@ class BasePrimitiveSectionedResultsTests<TestData: SectionedResultsTestData>: RL
     }
 
     func testCreationFromAnyRealmCollection() {
-        let collection = TestData.anyRealmCollection(obj!)
-        assert(collection)
-        assert(collection, asending: false)
+        if !TestData.skipResultsTests {
+            let collection = TestData.anyRealmCollection(obj!)
+            assert(collection)
+            assert(collection, asending: false)
+        }
+    }
+
+    func testFrozenFromParentCollection() {
+        let collection = TestData.list(obj!)
+        let sectionedResults = collection.sectioned(by: TestData.sectionBlock)
+        XCTAssertFalse(sectionedResults.isFrozen)
+        let frozenCollection = collection.freeze()
+        let frozenSectionedResults = frozenCollection.sectioned(by: TestData.sectionBlock)
+        XCTAssertTrue(frozenSectionedResults.isFrozen)
+        XCTAssertEqual(frozenSectionedResults.count, TestData.expectedSectionedValues.count)
+
+        guard let thawedSectionedResults = frozenSectionedResults.thaw() else {
+            return XCTFail("Could not thaw sectioned results.")
+        }
+        XCTAssertFalse(thawedSectionedResults.isFrozen)
+        XCTAssertEqual(thawedSectionedResults.count, TestData.expectedSectionedValues.count)
+    }
+
+    func testFrozen() {
+        let collection = TestData.list(obj!)
+        let sectionedResults = collection.sectioned(by: TestData.sectionBlock)
+        XCTAssertFalse(sectionedResults.isFrozen)
+        let frozenSectionedResults = sectionedResults.freeze()
+        XCTAssertTrue(frozenSectionedResults.isFrozen)
+        XCTAssertEqual(frozenSectionedResults.count, TestData.expectedSectionedValues.count)
+
+        guard let thawedSectionedResults = frozenSectionedResults.thaw() else {
+            return XCTFail("Could not thaw sectioned results.")
+        }
+        XCTAssertFalse(thawedSectionedResults.isFrozen)
+        XCTAssertEqual(thawedSectionedResults.count, TestData.expectedSectionedValues.count)
     }
 }
 
@@ -133,9 +168,11 @@ class BaseOptionalPrimitiveSectionedResultsTests<TestData: OptionalSectionedResu
     }
 
     func testCreationFromResultsOptional() {
-        let results = TestData.resultsOpt(obj!)
-        assertOptional(results)
-        assertOptional(results, asending: false)
+        if !TestData.skipResultsTests {
+            let results = TestData.resultsOpt(obj!)
+            assertOptional(results)
+            assertOptional(results, asending: false)
+        }
     }
 
     func testCreationFromListOptional() {
@@ -151,29 +188,50 @@ class BaseOptionalPrimitiveSectionedResultsTests<TestData: OptionalSectionedResu
     }
 
     func testCreationFromAnyRealmCollectionOptional() {
-        let collection = TestData.anyRealmCollectionOpt(obj!)
-        assertOptional(collection)
-        assertOptional(collection, asending: false)
+        if !TestData.skipResultsTests {
+            let collection = TestData.anyRealmCollectionOpt(obj!)
+            assertOptional(collection)
+            assertOptional(collection, asending: false)
+        }
     }
 
     func testEquality() {
-        let collection = TestData.anyRealmCollectionOpt(obj!)
+        let collection = TestData.listOpt(obj!)
         let sectionedResults = collection.sectioned(by: TestData.sectionBlock)
         let sectionedResults2 = collection.sectioned(by: TestData.sectionBlock)
         XCTAssertEqual(sectionedResults, sectionedResults)
         XCTAssertNotEqual(sectionedResults, sectionedResults2)
     }
 
-    func testFrozen() {
-        var collection = TestData.anyRealmCollectionOpt(obj!)
-        var sectionedResults = collection.sectioned(by: TestData.sectionBlock)
+    func testFrozenFromParentCollection() {
+        let collection = TestData.listOpt(obj!)
+        let sectionedResults = collection.sectioned(by: TestData.sectionBlock)
         XCTAssertFalse(sectionedResults.isFrozen)
         let frozenCollection = collection.freeze()
-        var frozenSectionedResults = frozenCollection.sectioned(by: TestData.sectionBlock)
+        let frozenSectionedResults = frozenCollection.sectioned(by: TestData.sectionBlock)
         XCTAssertTrue(frozenSectionedResults.isFrozen)
-        collection = TestData.anyRealmCollectionOpt(obj!)
-        sectionedResults = collection.sectioned(by: TestData.sectionBlock)
-        frozenSectionedResults = sectionedResults.freeze()
+        XCTAssertEqual(frozenSectionedResults.count, TestData.expectedSectionedValuesOpt.count)
+
+        guard let thawedSectionedResults = frozenSectionedResults.thaw() else {
+            return XCTFail("Could not thaw sectioned results.")
+        }
+        XCTAssertFalse(thawedSectionedResults.isFrozen)
+        XCTAssertEqual(thawedSectionedResults.count, TestData.expectedSectionedValuesOpt.count)
+    }
+
+    func testFrozen() {
+        let collection = TestData.listOpt(obj!)
+        let sectionedResults = collection.sectioned(by: TestData.sectionBlock)
+        XCTAssertFalse(sectionedResults.isFrozen)
+        let frozenSectionedResults = sectionedResults.freeze()
+        XCTAssertTrue(frozenSectionedResults.isFrozen)
+        XCTAssertEqual(frozenSectionedResults.count, TestData.expectedSectionedValuesOpt.count)
+
+        guard let thawedSectionedResults = frozenSectionedResults.thaw() else {
+            return XCTFail("Could not thaw sectioned results.")
+        }
+        XCTAssertFalse(thawedSectionedResults.isFrozen)
+        XCTAssertEqual(thawedSectionedResults.count, TestData.expectedSectionedValuesOpt.count)
     }
 }
 
@@ -182,6 +240,7 @@ class PrimitiveSectionedResultsTests: TestCase {
         let suite = XCTestSuite(name: "Primitive SectionedResults Tests")
 
         BasePrimitiveSectionedResultsTests<SectionedResultsTestDataInt>.defaultTestSuite.tests.forEach(suite.addTest)
+        BasePrimitiveSectionedResultsTests<SectionedResultsTestDataBool>.defaultTestSuite.tests.forEach(suite.addTest)
         BasePrimitiveSectionedResultsTests<SectionedResultsTestDataFloat>.defaultTestSuite.tests.forEach(suite.addTest)
         BasePrimitiveSectionedResultsTests<SectionedResultsTestDataDouble>.defaultTestSuite.tests.forEach(suite.addTest)
         BasePrimitiveSectionedResultsTests<SectionedResultsTestDataString>.defaultTestSuite.tests.forEach(suite.addTest)
@@ -191,6 +250,7 @@ class PrimitiveSectionedResultsTests: TestCase {
         BasePrimitiveSectionedResultsTests<SectionedResultsTestDataDecimal128>.defaultTestSuite.tests.forEach(suite.addTest)
 
         BaseOptionalPrimitiveSectionedResultsTests<SectionedResultsTestDataOptionalInt>.defaultTestSuite.tests.forEach(suite.addTest)
+        BaseOptionalPrimitiveSectionedResultsTests<SectionedResultsTestDataOptionalBool>.defaultTestSuite.tests.forEach(suite.addTest)
         BaseOptionalPrimitiveSectionedResultsTests<SectionedResultsTestDataOptionalFloat>.defaultTestSuite.tests.forEach(suite.addTest)
         BaseOptionalPrimitiveSectionedResultsTests<SectionedResultsTestDataOptionalDouble>.defaultTestSuite.tests.forEach(suite.addTest)
         BaseOptionalPrimitiveSectionedResultsTests<SectionedResultsTestDataOptionalString>.defaultTestSuite.tests.forEach(suite.addTest)
@@ -208,7 +268,13 @@ extension ModernAllTypesObject {
     }
 }
 
-class SectionedResultsTests: RLMTestCaseBase {
+extension ModernAllTypesProjection {
+    var firstLetter: String? {
+        stringCol.first.map { String($0) }
+    }
+}
+
+class SectionedResultsTestsBase: RLMTestCaseBase {
     func createObjects() {
         let o1 = ModernAllTypesObject()
         o1.stringCol = "banana"
@@ -226,6 +292,9 @@ class SectionedResultsTests: RLMTestCaseBase {
             realm.add([o1, o2, o3, o4])
         }
     }
+}
+
+class SectionedResultsTests: SectionedResultsTestsBase {
 
     func testCreationFromResults() {
         createObjects()
@@ -613,66 +682,464 @@ class SectionedResultsTests: RLMTestCaseBase {
         assert(ascending: true, sectionCount: 3, sectionKeys: ["a", "b", "c"])
         assert(ascending: false, sectionCount: 3, sectionKeys: ["c", "b", "a"])
     }
-}
 
-extension ModernSwiftStringProjection {
-    var firstLetter: String? {
-        string.first.map { String($0) }
-    }
-}
-
-class SectionedResultsProjectionTests: RLMTestCaseBase {
-    func createObjects() {
-        let o1 = ModernSwiftStringObject()
-        o1.stringCol = "banana"
-        let o2 = ModernSwiftStringObject()
-        o2.stringCol = "box"
-        let o3 = ModernSwiftStringObject()
-        o3.stringCol = "apple"
-        let o4 = ModernSwiftStringObject()
-        o4.stringCol = "chalk"
+    func testFrozenSection() {
         let realm = try! Realm()
-        try! realm.write {
-            realm.deleteAll()
-            realm.add([o1, o2, o3, o4])
-        }
-    }
+        let results = realm.objects(ModernAllTypesObject.self)
+        XCTAssertFalse(results.isFrozen)
+        createObjects()
 
+        func assert(ascending: Bool, beforeCount: Int, afterCount: Int, sectionKey: String) {
+            let frozenSection = results.sectioned(by: \.firstLetter, ascending: ascending)[0].freeze()
+            createObjects()
+            try! realm.write {
+                let o = ModernAllTypesObject()
+                o.stringCol = sectionKey
+                realm.add(o)
+            }
+            XCTAssertTrue(frozenSection.isFrozen)
+            XCTAssertEqual(frozenSection.count, 1)
+            XCTAssertEqual(frozenSection.key, sectionKey)
+            guard let thawed = frozenSection.thaw() else {
+                return XCTFail("Could not produce thawed sectioned results")
+            }
+            XCTAssertFalse(thawed.isFrozen)
+            XCTAssertEqual(thawed.count, 2)
+            XCTAssertEqual(thawed.key, sectionKey)
+        }
+
+        assert(ascending: true, beforeCount: 1, afterCount: 2, sectionKey: "a")
+        assert(ascending: false, beforeCount: 1, afterCount: 2, sectionKey: "c")
+    }
+}
+
+class SectionedResultsProjectionTests: SectionedResultsTestsBase {
     func testCreationFromResults() {
         createObjects()
         let realm = try! Realm()
-        let results = realm.objects(ModernSwiftStringProjection.self)
+        let results = realm.objects(ModernAllTypesProjection.self)
 
         func assert(ascending: Bool, sectionCount: Int, sectionKeys: [String]) {
             let sectionedResults = results.sectioned(by: \.firstLetter, ascending: ascending)
             XCTAssertEqual(sectionedResults.count, sectionCount)
             XCTAssertEqual(sectionedResults.map { $0.key }, sectionKeys)
-            var o: ModernSwiftStringProjection = sectionedResults[0][0]
-            XCTAssertEqual(o.string, ascending ? "apple" : "chalk")
+            var o: ModernAllTypesProjection = sectionedResults[0][0]
+            XCTAssertEqual(o.stringCol, ascending ? "apple" : "chalk")
 
             let sectionedResults2 = results.sectioned(by: \.firstLetter,
                                                       sortDescriptors: [SortDescriptor.init(keyPath: "stringCol", ascending: ascending)])
             XCTAssertEqual(sectionedResults2.count, sectionCount)
             XCTAssertEqual(sectionedResults2.map { $0.key }, sectionKeys)
             o = sectionedResults2[0][0]
-            XCTAssertEqual(o.string, ascending ? "apple" : "chalk")
+            XCTAssertEqual(o.stringCol, ascending ? "apple" : "chalk")
 
-            let sectionedResults3 = results.sectioned(by: { String($0.string.first!) },
+            let sectionedResults3 = results.sectioned(by: { String($0.stringCol.first!) },
                                                       sortDescriptors: [SortDescriptor.init(keyPath: "stringCol", ascending: ascending)])
             XCTAssertEqual(sectionedResults3.count, sectionCount)
             XCTAssertEqual(sectionedResults3.map { $0.key }, sectionKeys)
             o = sectionedResults3[0][0]
-            XCTAssertEqual(o.string, ascending ? "apple" : "chalk")
+            XCTAssertEqual(o.stringCol, ascending ? "apple" : "chalk")
         }
 
         assert(ascending: true, sectionCount: 3, sectionKeys: ["a", "b", "c"])
         assert(ascending: false, sectionCount: 3, sectionKeys: ["c", "b", "a"])
     }
-    
+
+    func testCreationFromList() {
+        createObjects()
+        let realm = try! Realm()
+        let list = realm.objects(ModernAllTypesProjection.self)[0].arrayString
+
+        func assert(ascending: Bool, sectionCount: Int, sectionKeys: [String]) {
+            let sectionedResults = list.sectioned(by: { String($0.first!) }, ascending: ascending)
+            XCTAssertEqual(sectionedResults.count, sectionCount)
+            XCTAssertEqual(sectionedResults.map { $0.key }, sectionKeys)
+        }
+
+        assert(ascending: true, sectionCount: 3, sectionKeys: ["a", "b", "c"])
+        assert(ascending: false, sectionCount: 3, sectionKeys: ["c", "b", "a"])
+    }
+
+    func testCreateFromMutableSet() {
+        createObjects()
+        let realm = try! Realm()
+        let set = realm.objects(ModernAllTypesProjection.self)[0].setString
+
+        func assert(ascending: Bool, sectionCount: Int, sectionKeys: [String]) {
+            let sectionedResults = set.sectioned(by: { String($0.first!) }, ascending: ascending)
+            XCTAssertEqual(sectionedResults.count, sectionCount)
+            XCTAssertEqual(sectionedResults.map { $0.key }, sectionKeys)
+        }
+
+        assert(ascending: true, sectionCount: 3, sectionKeys: ["a", "b", "c"])
+        assert(ascending: false, sectionCount: 3, sectionKeys: ["c", "b", "a"])
+    }
+
+    func testObservation() {
+        createObjects()
+        let realm = try! Realm()
+        let results = realm.objects(ModernAllTypesProjection.self)
+        let sectionedResults = results.sectioned(by: \.firstLetter, ascending: true)
+        let ex = expectation(description: "initial notification")
+        let token = sectionedResults.observe { (changes: RealmSectionedResultsChange) in
+            switch changes {
+            case .initial(let collection):
+                XCTAssertEqual(collection.count, 3)
+            case .update:
+                XCTFail("Shouldn't happen")
+            case .error:
+                XCTFail("Shouldn't happen")
+            }
+
+            ex.fulfill()
+        }
+        waitForExpectations(timeout: 1, handler: nil)
+
+        // add a second notification and wait for it
+        var ex2 = expectation(description: "second initial notification")
+        let token2 = sectionedResults.observe { _ in
+            ex2.fulfill()
+        }
+        waitForExpectations(timeout: 1, handler: nil)
+
+        // make a write and implicitly verify that only the unskipped
+        // notification is called (the first would error on .update)
+        ex2 = expectation(description: "change notification")
+
+        try! realm.write(withoutNotifying: [token]) {
+            realm.delete(realm.objects(ModernAllTypesObject.self))
+        }
+        waitForExpectations(timeout: 1, handler: nil)
+        token.invalidate()
+        token2.invalidate()
+    }
+
+    func testObserveOnQueue() {
+        createObjects()
+        let realm = try! Realm()
+        let results = realm.objects(ModernAllTypesProjection.self)
+        let sectionedResults = results.sectioned(by: \.firstLetter, ascending: true)
+        let sema = DispatchSemaphore(value: 0)
+        let queue = DispatchQueue(label: "background")
+        var firstRun = true
+        let token = sectionedResults.observe(keyPaths: ["stringCol"],
+                                             on: queue) { (changes: RealmSectionedResultsChange) in
+            switch changes {
+            case .initial(let collection):
+                XCTAssertEqual(collection.count, 3)
+            case let .update(collection, deletions: deletions, insertions: insertions, modifications: modifications,
+                             sectionsToInsert: sectionsToInsert, sectionsToDelete: sectionsToDelete):
+                if firstRun {
+                    XCTAssertEqual(collection.count, 3)
+                    XCTAssertEqual(sectionsToDelete, [0])
+                    XCTAssertEqual(sectionsToInsert, [2])
+                    XCTAssertEqual(deletions.count, 2)
+                    XCTAssertEqual(deletions, [IndexPath(item: 0, section: 1), IndexPath(item: 1, section: 1)])
+                    XCTAssertTrue(modifications.isEmpty)
+                    XCTAssertEqual(insertions.count, 2)
+                    XCTAssertEqual(insertions, [IndexPath(item: 0, section: 0),
+                                                IndexPath(item: 0, section: 2)])
+                } else {
+                    XCTAssertEqual(collection.count, 3)
+                    XCTAssertTrue(sectionsToDelete.isEmpty)
+                    XCTAssertTrue(sectionsToInsert.isEmpty)
+                    XCTAssertTrue(deletions.isEmpty)
+                    XCTAssertTrue(insertions.isEmpty)
+                    XCTAssertEqual(modifications.count, 1)
+                    XCTAssertEqual(modifications, [IndexPath(item: 0, section: 0)])
+                }
+            case .error:
+                XCTFail("Shouldn't happen")
+            }
+            XCTAssertFalse(Thread.isMainThread)
+            sema.signal()
+        }
+        sema.wait()
+
+        try! realm.write {
+            realm.delete([results[2].rootObject, results[0].rootObject]) // banana, apple
+            results[0].stringCol = "bog" // previously: box
+            let o = ModernAllTypesObject()
+            o.stringCol = "zebra"
+            realm.add(o)
+        }
+        sema.wait()
+        // Check modifications.
+        firstRun = false
+        try! realm.write {
+            results[0].stringCol = "bogg" // previously: bog
+            results[1].intCol = 1 // should be ignored.
+        }
+        sema.wait()
+        token.invalidate()
+    }
+
+    func testObservationOnSection() {
+        createObjects()
+        let realm = try! Realm()
+        let results = realm.objects(ModernAllTypesProjection.self)
+        let sectionedResults = results.sectioned(by: \.firstLetter, ascending: true)
+        let section1 = sectionedResults[0]
+        let section2 = sectionedResults[1]
+
+        var firstRun = true
+        // Only get notifications for key 'a'.
+        let token1 = section1.observe(keyPaths: ["stringCol"]) { (changes: RealmSectionedResultsChange) in
+            switch changes {
+            case .initial(let collection):
+                XCTAssertEqual(collection.count, 1)
+            case let .update(collection, deletions: deletions, insertions: insertions, modifications: modifications,
+                             sectionsToInsert: sectionsToInsert, sectionsToDelete: sectionsToDelete):
+                if firstRun {
+                    XCTAssertEqual(sectionsToDelete, [0])
+                    XCTAssertTrue(sectionsToInsert.isEmpty)
+                    XCTAssertTrue(deletions.isEmpty)
+                    XCTAssertTrue(modifications.isEmpty)
+                    XCTAssertTrue(insertions.isEmpty)
+                } else {
+                    XCTAssertEqual(collection.count, 1)
+                    XCTAssertEqual(insertions, [IndexPath(item: 0, section: 0)])
+                    XCTAssertEqual(sectionsToInsert, [0])
+                }
+            case .error:
+                XCTFail("Shouldn't happen")
+            }
+        }
+
+        // Only get notifications for key 'b'.
+        let token2 = section2.observe(keyPaths: ["stringCol"]) { (changes: RealmSectionedResultsChange) in
+            switch changes {
+            case .initial(let collection):
+                if firstRun {
+                    XCTAssertEqual(collection.count, 2)
+                }
+            case let .update(collection, deletions: deletions, insertions: insertions, modifications: modifications,
+                             sectionsToInsert: sectionsToInsert, sectionsToDelete: sectionsToDelete):
+                if firstRun {
+                    XCTAssertEqual(collection.count, 1)
+                    XCTAssertTrue(sectionsToDelete.isEmpty)
+                    XCTAssertTrue(sectionsToInsert.isEmpty)
+                    XCTAssertEqual(deletions, [IndexPath(item: 0, section: 1)])
+                    XCTAssertTrue(modifications.isEmpty)
+                    XCTAssertTrue(insertions.isEmpty)
+                } else {
+                    XCTAssertEqual(collection.count, 2)
+                    XCTAssertTrue(sectionsToDelete.isEmpty)
+                    XCTAssertTrue(sectionsToInsert.isEmpty)
+                    XCTAssertEqual(deletions, [IndexPath(item: 0, section: 0)])
+                    XCTAssertTrue(modifications.isEmpty)
+                    XCTAssertEqual(insertions, [IndexPath(item: 0, section: 0), IndexPath(item: 1, section: 0)])
+                }
+            case .error:
+                XCTFail("Shouldn't happen")
+            }
+        }
+
+        try! realm.write {
+            realm.delete([results[2].rootObject, results[0].rootObject]) // banana, apple
+        }
+        try! realm.write {}
+        firstRun = false
+        try! realm.write {
+            results[0].stringCol = "bog" // previously: box
+            let o = ModernAllTypesObject()
+            o.stringCol = "bag"
+            realm.add(o)
+        }
+        try! realm.write {}
+        try! realm.write {
+            let o = ModernAllTypesObject()
+            o.stringCol = "app"
+            realm.add(o)
+        }
+        try! realm.write {}
+        token1.invalidate()
+        token2.invalidate()
+    }
+
+    func testObservationOnSectionOnQueue() {
+        let realm = try! Realm()
+        createObjects()
+        let results = realm.objects(ModernAllTypesObject.self)
+        let sectionedResults = results.sectioned(by: \.firstLetter, ascending: true)
+        let section1 = sectionedResults[0]
+        let section2 = sectionedResults[1]
+
+        let sema1 = DispatchSemaphore(value: 0)
+        let sema2 = DispatchSemaphore(value: 0)
+        let queue = DispatchQueue(label: "background")
+        var firstRun = true
+        // Only get notifications for key 'a'.
+        let token1 = section1.observe(keyPaths: ["stringCol"],
+                                      on: queue) { (changes: RealmSectionedResultsChange) in
+            switch changes {
+            case .initial(let collection):
+                XCTAssertEqual(collection.count, 1)
+            case let .update(collection, deletions: deletions, insertions: insertions, modifications: modifications,
+                             sectionsToInsert: sectionsToInsert, sectionsToDelete: sectionsToDelete):
+                if firstRun {
+                    XCTAssertEqual(sectionsToDelete, [0])
+                    XCTAssertTrue(sectionsToInsert.isEmpty)
+                    XCTAssertTrue(deletions.isEmpty)
+                    XCTAssertTrue(modifications.isEmpty)
+                    XCTAssertTrue(insertions.isEmpty)
+                } else {
+                    XCTAssertEqual(collection.count, 1)
+                    XCTAssertEqual(insertions, [IndexPath(item: 0, section: 0)])
+                    XCTAssertEqual(sectionsToInsert, [0])
+                }
+            case .error:
+                XCTFail("Shouldn't happen")
+            }
+            XCTAssertFalse(Thread.isMainThread)
+            sema1.signal()
+        }
+        sema1.wait()
+        // Only get notifications for key 'b'.
+        let token2 = section2.observe(keyPaths: ["stringCol"],
+                                      on: queue) { (changes: RealmSectionedResultsChange) in
+            switch changes {
+            case .initial(let collection):
+                if firstRun {
+                    XCTAssertEqual(collection.count, 2)
+                }
+            case let .update(collection, deletions: deletions, insertions: insertions, modifications: modifications,
+                             sectionsToInsert: sectionsToInsert, sectionsToDelete: sectionsToDelete):
+                if firstRun {
+                    XCTAssertEqual(collection.count, 1)
+                    XCTAssertTrue(sectionsToDelete.isEmpty)
+                    XCTAssertTrue(sectionsToInsert.isEmpty)
+                    XCTAssertEqual(deletions, [IndexPath(item: 0, section: 1)])
+                    XCTAssertTrue(modifications.isEmpty)
+                    XCTAssertTrue(insertions.isEmpty)
+                } else {
+                    XCTAssertEqual(collection.count, 2)
+                    XCTAssertTrue(sectionsToDelete.isEmpty)
+                    XCTAssertTrue(sectionsToInsert.isEmpty)
+                    XCTAssertEqual(deletions, [IndexPath(item: 0, section: 0)])
+                    XCTAssertTrue(modifications.isEmpty)
+                    XCTAssertEqual(insertions, [IndexPath(item: 0, section: 0), IndexPath(item: 1, section: 0)])
+                }
+            case .error:
+                XCTFail("Shouldn't happen")
+            }
+            XCTAssertFalse(Thread.isMainThread)
+            sema2.signal()
+        }
+        sema2.wait()
+
+        try! realm.write {
+            realm.delete([results[2], results[0]]) // banana, apple
+        }
+        sema1.wait()
+        sema2.wait()
+        firstRun = false
+        try! realm.write {
+            results[0].stringCol = "bog" // previously: box
+            let o = ModernAllTypesObject()
+            o.stringCol = "bag"
+            realm.add(o)
+        }
+        sema2.wait()
+        try! realm.write {
+            let o = ModernAllTypesObject()
+            o.stringCol = "app"
+            realm.add(o)
+        }
+        sema1.wait()
+        token1.invalidate()
+        token2.invalidate()
+    }
+
+    func testFrozenResults() {
+        createObjects()
+        let realm = try! Realm()
+        let frozenResults = realm.objects(ModernAllTypesProjection.self).freeze()
+        XCTAssertTrue(frozenResults.isFrozen)
+        try! realm.write {
+            let o = ModernAllTypesObject()
+            o.stringCol = "z"
+            realm.add(o)
+        }
+
+        func assert(ascending: Bool, sectionCount: Int, sectionKeys: [String]) {
+            let sectionedResults = frozenResults.sectioned(by: \.firstLetter, ascending: ascending)
+
+            XCTAssertTrue(sectionedResults.isFrozen)
+            XCTAssertEqual(sectionedResults.count, sectionCount)
+            XCTAssertEqual(sectionedResults.map { $0.key }, sectionKeys)
+            guard let thawed = sectionedResults.thaw() else {
+                return XCTFail("Could not produce thawed sectioned results")
+            }
+            XCTAssertFalse(thawed.isFrozen)
+            XCTAssertEqual(thawed.count, 4)
+            XCTAssertEqual(thawed.map { $0.key }, ascending ? sectionKeys + ["z"] : ["z"] + sectionKeys)
+        }
+
+        assert(ascending: true, sectionCount: 3, sectionKeys: ["a", "b", "c"])
+        assert(ascending: false, sectionCount: 3, sectionKeys: ["c", "b", "a"])
+    }
+
+    func testFrozen() {
+        let realm = try! Realm()
+        let results = realm.objects(ModernAllTypesObject.self)
+        XCTAssertFalse(results.isFrozen)
+
+        func assert(ascending: Bool, sectionCount: Int, sectionKeys: [String]) {
+            createObjects()
+            let frozenSectionedResults = results.sectioned(by: \.firstLetter, ascending: ascending).freeze()
+            try! realm.write {
+                let o = ModernAllTypesObject()
+                o.stringCol = "z"
+                realm.add(o)
+            }
+            XCTAssertTrue(frozenSectionedResults.isFrozen)
+            XCTAssertEqual(frozenSectionedResults.count, sectionCount)
+            XCTAssertEqual(frozenSectionedResults.map { $0.key }, sectionKeys)
+            guard let thawed = frozenSectionedResults.thaw() else {
+                return XCTFail("Could not produce thawed sectioned results")
+            }
+            XCTAssertFalse(thawed.isFrozen)
+            XCTAssertEqual(thawed.count, 4)
+            XCTAssertEqual(thawed.map { $0.key }, ascending ? sectionKeys + ["z"] : ["z"] + sectionKeys)
+        }
+
+        assert(ascending: true, sectionCount: 3, sectionKeys: ["a", "b", "c"])
+        assert(ascending: false, sectionCount: 3, sectionKeys: ["c", "b", "a"])
+    }
+
+    func testFrozenSection() {
+        let realm = try! Realm()
+        let results = realm.objects(ModernAllTypesObject.self)
+        XCTAssertFalse(results.isFrozen)
+
+        func assert(ascending: Bool, sectionKey: String, beforeCount: Int, afterCount: Int) {
+            createObjects()
+            let frozenSection = results.sectioned(by: \.firstLetter, ascending: ascending)[0].freeze()
+            try! realm.write {
+                let o = ModernAllTypesObject()
+                o.stringCol = sectionKey
+                realm.add(o)
+            }
+            XCTAssertTrue(frozenSection.isFrozen)
+            XCTAssertEqual(frozenSection.count, beforeCount)
+            XCTAssertEqual(frozenSection.key, sectionKey)
+            guard let thawed = frozenSection.thaw() else {
+                return XCTFail("Could not produce thawed section.")
+            }
+            XCTAssertFalse(thawed.isFrozen)
+            XCTAssertEqual(thawed.count, afterCount)
+            XCTAssertEqual(thawed.key, sectionKey)
+        }
+
+        assert(ascending: true, sectionKey: "a", beforeCount: 1, afterCount: 2)
+        assert(ascending: false, sectionKey: "c", beforeCount: 1, afterCount: 2)
+    }
 }
+
 protocol SectionedResultsTestData {
     associatedtype Key: _Persistable & Hashable
-    associatedtype Element: RealmCollectionValue & SortableType & _Persistable
+    associatedtype Element: RealmCollectionValue & _Persistable
 
     static var values: [Element] { get }
     static var expectedSectionedValues: [Key: [Element]] { get }
@@ -683,11 +1150,12 @@ protocol SectionedResultsTestData {
     static func results(_ obj: ModernAllTypesObject) -> Results<Element>
     static func anyRealmCollection(_ obj: ModernAllTypesObject) -> AnyRealmCollection<Element>
     static func sectionBlock(_ element: Element) -> Key
+    static var skipResultsTests: Bool { get }
 }
 
 protocol OptionalSectionedResultsTestData {
     associatedtype Key: _Persistable & Hashable
-    associatedtype Element: _RealmCollectionValueInsideOptional & SortableType & _Persistable
+    associatedtype Element: _RealmCollectionValueInsideOptional & _Persistable
     static var values: [Element] { get }
     static var expectedSectionedValuesOpt: [Key: [Element??]] { get }
     static func orderedKeysOpt(ascending: Bool) -> [Key]
@@ -697,17 +1165,24 @@ protocol OptionalSectionedResultsTestData {
     static func resultsOpt(_ obj: ModernAllTypesObject) -> Results<Element?>
     static func anyRealmCollectionOpt(_ obj: ModernAllTypesObject) -> AnyRealmCollection<Element?>
     static func sectionBlock(_ element: Element?) -> Key
+    static var skipResultsTests: Bool { get }
 }
 
 extension SectionedResultsTestData {
     static func anyRealmCollection(_ obj: ModernAllTypesObject) -> AnyRealmCollection<Element> {
         AnyRealmCollection(results(obj))
     }
+    static var skipResultsTests: Bool {
+        false
+    }
 }
 
 extension OptionalSectionedResultsTestData {
     static func anyRealmCollectionOpt(_ obj: ModernAllTypesObject) -> AnyRealmCollection<Element?> {
         AnyRealmCollection(resultsOpt(obj))
+    }
+    static var skipResultsTests: Bool {
+        false
     }
 }
 
@@ -720,19 +1195,11 @@ struct SectionedResultsTestDataInt: SectionedResultsTestData {
         [1: [1, 3, 5], 0: [2, 4]]
     }
 
-    static var expectedSectionedValuesOpt: [Int: [Int??]] {
-        return [1: [1, 3, 5], 0: [2, 4], Int.max: [.some(.none)]]
-    }
-
     static func orderedKeys(ascending: Bool) -> [Int] {
         return [1, 0]
     }
 
-    static func orderedKeysOpt(ascending: Bool) -> [Int] {
-        return ascending ? [Int.max, 1, 0] : [1, 0, Int.max]
-    }
-
-    static func setupObject() ->  ModernAllTypesObject {
+    static func setupObject() -> ModernAllTypesObject {
         let object = ModernAllTypesObject()
         object.arrayInt.append(objectsIn: values)
         object.setInt.insert(objectsIn: values)
@@ -751,25 +1218,8 @@ struct SectionedResultsTestDataInt: SectionedResultsTestData {
         obj.arrayInt.sorted(ascending: true)
     }
 
-    static func listOpt(_ obj: ModernAllTypesObject) -> List<Int?> {
-        obj.arrayOptInt
-    }
-    static func mutableSetOpt(_ obj: ModernAllTypesObject) -> MutableSet<Int?> {
-        obj.setOptInt
-    }
-    static func resultsOpt(_ obj: ModernAllTypesObject) -> Results<Int?> {
-        obj.arrayOptInt.sorted(ascending: true)
-    }
-
     static func sectionBlock(_ element: Int) -> Int {
         element % 2
-    }
-
-    static func sectionBlock(_ element: Int?) -> Int {
-        guard let element = element else {
-            return Int.max
-        }
-        return element % 2
     }
 }
 
@@ -786,7 +1236,7 @@ struct SectionedResultsTestDataOptionalInt: OptionalSectionedResultsTestData {
         return ascending ? [nil, 1, 0] : [1, 0, nil]
     }
 
-    static func setupObject() ->  ModernAllTypesObject {
+    static func setupObject() -> ModernAllTypesObject {
         let object = ModernAllTypesObject()
         object.arrayOptInt.append(objectsIn: values + [nil])
         object.setOptInt.insert(objectsIn: values + [nil])
@@ -823,7 +1273,7 @@ struct SectionedResultsTestDataFloat: SectionedResultsTestData {
         return ascending ? ["small", "large"] : ["large", "small"]
     }
 
-    static func setupObject() ->  ModernAllTypesObject {
+    static func setupObject() -> ModernAllTypesObject {
         let object = ModernAllTypesObject()
         object.arrayFloat.append(objectsIn: values)
         object.setFloat.insert(objectsIn: values)
@@ -858,7 +1308,7 @@ struct SectionedResultsTestDataOptionalFloat: OptionalSectionedResultsTestData {
         return ascending ? [nil, 0.0, 1.0] : [1.0, 0.0, nil]
     }
 
-    static func setupObject() ->  ModernAllTypesObject {
+    static func setupObject() -> ModernAllTypesObject {
         let object = ModernAllTypesObject()
         object.arrayOptFloat.append(objectsIn: values + [nil])
         object.setOptFloat.insert(objectsIn: values + [nil])
@@ -895,7 +1345,7 @@ struct SectionedResultsTestDataDouble: SectionedResultsTestData {
         return ascending ? ["small", "large"] : ["large", "small"]
     }
 
-    static func setupObject() ->  ModernAllTypesObject {
+    static func setupObject() -> ModernAllTypesObject {
         let object = ModernAllTypesObject()
         object.arrayDouble.append(objectsIn: values)
         object.setDouble.insert(objectsIn: values)
@@ -932,7 +1382,7 @@ struct SectionedResultsTestDataOptionalDouble: OptionalSectionedResultsTestData 
         return ascending ? [nil, 0.0, 1.0] : [1.0, 0.0, nil]
     }
 
-    static func setupObject() ->  ModernAllTypesObject {
+    static func setupObject() -> ModernAllTypesObject {
         let object = ModernAllTypesObject()
         object.arrayDouble.append(objectsIn: values)
         object.setDouble.insert(objectsIn: values)
@@ -970,7 +1420,7 @@ struct SectionedResultsTestDataString: SectionedResultsTestData {
         return ascending ? ["a", "b", "d", "p"] : ["p", "d", "b", "a"]
     }
 
-    static func setupObject() ->  ModernAllTypesObject {
+    static func setupObject() -> ModernAllTypesObject {
         let object = ModernAllTypesObject()
         object.arrayString.append(objectsIn: values)
         object.setString.insert(objectsIn: values)
@@ -1004,7 +1454,7 @@ struct SectionedResultsTestDataOptionalString: OptionalSectionedResultsTestData 
         return ascending ? [nil, "a", "b", "d", "p"] : ["p", "d", "b", "a", nil]
     }
 
-    static func setupObject() ->  ModernAllTypesObject {
+    static func setupObject() -> ModernAllTypesObject {
         let object = ModernAllTypesObject()
         object.arrayOptString.append(objectsIn: values + [nil])
         object.setOptString.insert(objectsIn: values + [nil])
@@ -1041,7 +1491,7 @@ struct SectionedResultsTestDataAnyRealmValue: SectionedResultsTestData {
         return ["alphanumeric", "data"]
     }
 
-    static func setupObject() ->  ModernAllTypesObject {
+    static func setupObject() -> ModernAllTypesObject {
         let object = ModernAllTypesObject()
         object.arrayAny.append(objectsIn: values)
         object.setAny.insert(objectsIn: values)
@@ -1095,7 +1545,7 @@ struct SectionedResultsTestDataBinary: SectionedResultsTestData {
         return ["short", "long"]
     }
 
-    static func setupObject() ->  ModernAllTypesObject {
+    static func setupObject() -> ModernAllTypesObject {
         let object = ModernAllTypesObject()
         object.arrayBinary.append(objectsIn: values)
         object.setBinary.insert(objectsIn: values)
@@ -1134,7 +1584,7 @@ struct SectionedResultsTestDataOptionalBinary: OptionalSectionedResultsTestData 
         return ascending ? [nil, "short", "long"] : ["short", "long", nil]
     }
 
-    static func setupObject() ->  ModernAllTypesObject {
+    static func setupObject() -> ModernAllTypesObject {
         let object = ModernAllTypesObject()
         object.arrayOptBinary.append(objectsIn: values + [nil])
         object.setOptBinary.insert(objectsIn: values + [nil])
@@ -1178,7 +1628,7 @@ struct SectionedResultsTestDataDate: SectionedResultsTestData {
         return ascending ? keys : keys.reversed()
     }
 
-    static func setupObject() ->  ModernAllTypesObject {
+    static func setupObject() -> ModernAllTypesObject {
         let object = ModernAllTypesObject()
         object.arrayDate.append(objectsIn: values)
         object.setDate.insert(objectsIn: values)
@@ -1219,10 +1669,10 @@ struct SectionedResultsTestDataOptionalDate: OptionalSectionedResultsTestData {
 
     static func orderedKeysOpt(ascending: Bool) -> [Date?] {
         let keys = [nil, Date(timeIntervalSince1970: 1648684800), Date(timeIntervalSince1970: 1651276800), Date(timeIntervalSince1970: 1653955200)]
-        return ascending ? keys  : keys.reversed()
+        return ascending ? keys : keys.reversed()
     }
 
-    static func setupObject() ->  ModernAllTypesObject {
+    static func setupObject() -> ModernAllTypesObject {
         let object = ModernAllTypesObject()
         object.arrayOptDate.append(objectsIn: values + [nil])
         object.setOptDate.insert(objectsIn: values + [nil])
@@ -1268,7 +1718,7 @@ struct SectionedResultsTestDataDecimal128: SectionedResultsTestData {
         return ascending ? keys : keys.reversed()
     }
 
-    static func setupObject() ->  ModernAllTypesObject {
+    static func setupObject() -> ModernAllTypesObject {
         let object = ModernAllTypesObject()
         object.arrayDecimal.append(objectsIn: values)
         object.setDecimal.insert(objectsIn: values)
@@ -1307,10 +1757,10 @@ struct SectionedResultsTestDataOptionalDecimal128: OptionalSectionedResultsTestD
 
     static func orderedKeysOpt(ascending: Bool) -> [Decimal128?] {
         let keys: [Decimal128?] = [nil, Decimal128(1.0), Decimal128(2.0)]
-        return ascending ? keys  : keys.reversed()
+        return ascending ? keys : keys.reversed()
     }
 
-    static func setupObject() ->  ModernAllTypesObject {
+    static func setupObject() -> ModernAllTypesObject {
         let object = ModernAllTypesObject()
         object.arrayOptDecimal.append(objectsIn: values + [nil])
         object.setOptDecimal.insert(objectsIn: values + [nil])
@@ -1334,3 +1784,86 @@ struct SectionedResultsTestDataOptionalDecimal128: OptionalSectionedResultsTestD
         return decimal.doubleValue.truncatingRemainder(dividingBy: 2.0) == 0 ? Decimal128(2.0) : Decimal128(1.0)
     }
 }
+
+struct SectionedResultsTestDataBool: SectionedResultsTestData {
+    static var values: [Bool] {
+        [true, false]
+    }
+    static var expectedSectionedValues: [Bool: [Bool]] {
+        [false: [false], true: [true]]
+    }
+
+    static func orderedKeys(ascending: Bool) -> [Bool] {
+        return ascending ? [false, true] : [true, false]
+    }
+
+    static func setupObject() -> ModernAllTypesObject {
+        let object = ModernAllTypesObject()
+        object.arrayBool.append(objectsIn: values)
+        object.setBool.insert(objectsIn: values)
+        return object
+    }
+
+    static func list(_ obj: ModernAllTypesObject) -> List<Bool> {
+        obj.arrayBool
+    }
+    static func mutableSet(_ obj: ModernAllTypesObject) -> MutableSet<Bool> {
+        obj.setBool
+    }
+    static func results(_ obj: ModernAllTypesObject) -> Results<Bool> {
+        fatalError("Not implemented")
+    }
+
+    static func sectionBlock(_ element: Bool) -> Bool {
+        element
+    }
+
+    static var skipResultsTests: Bool {
+        true
+    }
+}
+
+struct SectionedResultsTestDataOptionalBool: OptionalSectionedResultsTestData {
+    static var values: [Bool] {
+        [true, false]
+    }
+
+    static var expectedSectionedValuesOpt: [Bool?: [Bool??]] {
+        return [false: [false], true: [true], nil: [.some(.none)]]
+    }
+
+    static func orderedKeysOpt(ascending: Bool) -> [Bool?] {
+        return ascending ? [nil, false, true] : [true, false, nil]
+    }
+
+    static func setupObject() -> ModernAllTypesObject {
+        let object = ModernAllTypesObject()
+        object.arrayOptBool.append(objectsIn: values + [nil])
+        object.setOptBool.insert(objectsIn: values + [nil])
+        return object
+    }
+
+    static func listOpt(_ obj: ModernAllTypesObject) -> List<Bool?> {
+        obj.arrayOptBool
+    }
+    static func mutableSetOpt(_ obj: ModernAllTypesObject) -> MutableSet<Bool?> {
+        obj.setOptBool
+    }
+    static func resultsOpt(_ obj: ModernAllTypesObject) -> Results<Bool?> {
+        fatalError("Not implemented")
+    }
+
+    static func sectionBlock(_ element: Bool?) -> Bool? {
+        guard let element = element else {
+            return nil
+        }
+        return element
+    }
+
+    static var skipResultsTests: Bool {
+        true
+    }
+}
+
+// Missing:
+// Sectioning on Enum
