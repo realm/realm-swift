@@ -50,8 +50,6 @@ static_assert((int)RLMClientResetModeDiscardLocal == (int)realm::ClientResyncMod
 static_assert((int)RLMClientResetModeRecover == (int)realm::ClientResyncMode::Recover);
 static_assert((int)RLMClientResetModeRecoverOrDiscard == (int)realm::ClientResyncMode::RecoverOrDiscard);
 
-
-
 SyncSessionStopPolicy translateStopPolicy(RLMSyncStopPolicy stopPolicy) {
     switch (stopPolicy) {
         case RLMSyncStopPolicyImmediately:              return SyncSessionStopPolicy::Immediately;

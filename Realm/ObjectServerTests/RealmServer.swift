@@ -433,7 +433,7 @@ public class RealmServer: NSObject {
     @objc public static var shared = RealmServer()
 
     /// Log level for the server and mongo processes.
-    public var logLevel = LogLevel.info
+    public var logLevel = LogLevel.none
 
     /// Process that runs the local mongo server. Should be terminated on exit.
     private let mongoProcess = Process()
@@ -1039,7 +1039,6 @@ public class RealmServer: NSObject {
         app.services[syncServiceId].config.patch(syncConfig, completion)
     }
 
-    // ???: think about collapsing this into devmodeenabled?
     public func recoveryModeDisabled(appServerId: String, syncServiceId: String) throws -> Bool {
         guard let session = session else {
             fatalError()
@@ -1073,22 +1072,6 @@ public class RealmServer: NSObject {
         syncConfig["sync"] = syncInfo
         app.services[syncServiceId].config.patch(syncConfig, completion)
     }
-    
-//    public func disableRecoveryMode(appServerId: String, syncServiceId: String, syncServiceConfiguration: [String: Any], completion: @escaping (Result<Any?, Error>) -> Void) {
-//        var syncConfig = syncServiceConfiguration
-//        guard let session = session else {
-//            completion(.failure(URLError.unknown as! Error))
-//            return
-//        }
-//        let app = session.apps[appServerId]
-//        guard var syncInfo = syncConfig["sync"] as? [String: Any] else {
-//            completion(.failure(URLError.unknown as! Error))
-//            return
-//        }
-//        syncInfo["is_recovery_mode_disabled"] = true
-//        syncConfig["sync"] = syncInfo
-//        app.services[syncServiceId].config.patch(syncConfig, completion)
-//    }
 
     public func retrieveUser(_ appId: String, userId: String, _ completion: @escaping (Result<Any?, Error>) -> Void) {
         guard let appServerId = try? RealmServer.shared.retrieveAppServerId(appId),

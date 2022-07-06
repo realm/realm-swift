@@ -254,7 +254,9 @@ public enum ClientResetMode {
     ///  For more details on the second block: ((Realm, Realm) -> Void)? = nil,
     /// - see: `RLMClientResetAfterBlock`
     case discardLocal(((Realm) -> Void)? = nil, ((Realm, Realm) -> Void)? = nil)
+    // TODO: docs
     case recover(((Realm) -> Void)? = nil, ((Realm, Realm) -> Void)? = nil)
+    // TODO: docs
     case recoverOrDiscard(((Realm) -> Void)? = nil, ((Realm, Realm) -> Void)? = nil)
 }
 
