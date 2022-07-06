@@ -1047,7 +1047,6 @@
     RLMUser *user = [self logInUserForCredentials:[RLMCredentials anonymousCredentials] app:app];
 
     RLMRealmConfiguration *config = [user flexibleSyncConfigurationWithInitialSubscriptions:^(RLMSyncSubscriptionSet *subscriptions) {
-        RLMSyncSubscription *subscription = [subscriptions subscriptionWithName:@"person_age"];
         [subscriptions addSubscriptionWithClassName:Person.className
                                               where:@"age > 10 and partition == %@", NSStringFromSelector(_cmd)];
     } rerunOnOpen:true];
