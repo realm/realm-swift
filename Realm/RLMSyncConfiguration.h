@@ -51,7 +51,11 @@ typedef NS_ENUM(NSUInteger, RLMClientResetMode) {
     /// then the client reset process reverts to manual mode. Example) During a destructive schema change this
     /// mode will fail and invoke the manual client reset handler.
     RLMClientResetModeDiscardLocal,
-    // TODO: docs
+    /// The client device will download a realm with objects reflecting the latest version of the server. A recovery
+    /// process is run locally in an attempt to integrate the server version with any local changes from before the
+    /// client reset occurred.
+    /// The changes are integrated with the following rules:
+    /// TODO: finish docstring
     RLMClientResetModeRecover,
     // TODO: docs
     RLMClientResetModeRecoverOrDiscard
