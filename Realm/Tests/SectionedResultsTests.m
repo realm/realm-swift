@@ -185,7 +185,7 @@
         case RLMPropertyTypeDate: {
             NSCalendar *calendar = [NSCalendar currentCalendar];
             NSDateComponents *comp = [calendar components:NSCalendarUnitWeekday fromDate:(NSDate *)value];
-            return [NSNumber numberWithInt:comp.weekday];
+            return [NSNumber numberWithInt:(int)comp.weekday];
         }
         case RLMPropertyTypeDecimal128:
             switch ((int)((RLMDecimal128 *)value).doubleValue) {
@@ -210,6 +210,7 @@
             return [NSNumber numberWithInt:(((NSNumber *)value).intValue % 2)];;
         default:
             XCTFail();
+            return nil;
     }
 }
 
@@ -497,7 +498,7 @@
     }];
 
     for (RLMSection *section in sr) {
-        for (AllTypesObject *o in section) {
+        for (AllTypesObject *o __unused in section) {
             forLoopCount++;
         }
     }
@@ -508,7 +509,7 @@
     algoRunCount = 0;
 
     for (RLMSection *section in sr) {
-        for (AllTypesObject *o in section) {
+        for (AllTypesObject *o __unused in section) {
             forLoopCount++;
         }
     }
@@ -516,10 +517,10 @@
     XCTAssertEqual(forLoopCount, results.count);
     forLoopCount = 0;
     algoRunCount = 0;
-    int originalCount = results.count;
+    NSUInteger originalCount = results.count;
 
     for (RLMSection *section in sr) {
-        for (AllTypesObject *o in section) {
+        for (AllTypesObject *o __unused in section) {
             forLoopCount++;
         }
         [self createObjects];
@@ -741,6 +742,7 @@ static void ExpectChange(id self,
     @"\tsectionsToRemove: \\[0, 1, 2\\]\n"
     @"\\}";
     RLMAssertMatches(changes.description, expDesc);
+    [token invalidate];
 }
 
 - (void)testNotificationsOnSection {
@@ -760,6 +762,7 @@ static void ExpectChange(id self,
     id token = [section addNotificationBlock:^(RLMSection *r, RLMSectionedResultsChange *c, NSError *e) {
         changes = c;
         XCTAssertNil(e);
+        XCTAssertNotNil(r);
     }
                                     keyPaths:@[@"stringCol"]
                                        queue:notificationQueue];
@@ -792,6 +795,7 @@ static void ExpectChange(id self,
     XCTAssertEqualObjects(changes.deletions, @[]);
     XCTAssertEqual(changes.sectionsToInsert.count, 0);
     XCTAssertTrue([changes.sectionsToRemove containsIndex:0]);
+    [token invalidate];
 }
 
 static RLMSectionedResultsChange *getChangePrimitive(SectionedResultsTests *self, void (^block)(RLMRealm *)) {

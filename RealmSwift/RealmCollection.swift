@@ -528,7 +528,7 @@ public protocol RealmCollection: RealmCollectionBase, Equatable {
 
     // MARK: Frozen Objects
 
-    /// Returns if this collection is frozen
+    /// Returns true if this collection is frozen
     var isFrozen: Bool { get }
 
     /**

@@ -645,40 +645,76 @@ class SwiftUITests: TestCase {
     }
 
     // MARK: - ObservedSectionedResults
+
     func testObservedSectionedResults() throws {
-        let object = SwiftUIObject()
         let fullResults = ObservedSectionedResults(SwiftUIObject.self,
                                                    sectionKeyPath: \.str,
                                                    configuration: inMemoryRealm(inMemoryIdentifier).configuration)
         XCTAssertEqual(fullResults.wrappedValue.count, 0)
         let realm = inMemoryRealm(inMemoryIdentifier)
-        realm.beginWrite()
-        object.str = "abc"
-        object.int = 1
-        // add another default inited object for filter comparison
-        realm.add(SwiftUIObject())
-        try realm.commitWrite()
+        try realm.write {
+            let object = SwiftUIObject()
+            object.str = "abc"
+            object.int = 1
+            // add another default inited object for filter comparison
+            realm.add(object)
+        }
         XCTAssertEqual(fullResults.wrappedValue.count, 1)
+        XCTAssertEqual(fullResults.wrappedValue[0].key, "abc")
 
-        let filteredResults = ObservedResults(SwiftUIObject.self,
-                                              configuration: inMemoryRealm(inMemoryIdentifier).configuration,
-                                              filter: NSPredicate(format: "str = %@", "abc"))
-//        XCTAssertEqual(fullResults.wrappedValue.count, 2)
-//        XCTAssertEqual(filteredResults.wrappedValue.count, 1)
-//        var sortedResults = ObservedResults(SwiftUIObject.self,
-//                                            configuration: inMemoryRealm(inMemoryIdentifier).configuration,
-//                                            filter: NSPredicate(format: "int >= 0"),
-//                                            sortDescriptor: SortDescriptor(keyPath: "int", ascending: true))
-//        XCTAssertEqual(sortedResults.wrappedValue.count, 2)
-//        XCTAssertEqual(sortedResults.wrappedValue[0].int, 0)
-//        XCTAssertEqual(sortedResults.wrappedValue[1].int, 1)
-//        sortedResults = ObservedResults(SwiftUIObject.self,
-//                                        configuration: inMemoryRealm(inMemoryIdentifier).configuration,
-//                                        filter: NSPredicate(format: "int >= 0"),
-//                                        sortDescriptor: SortDescriptor(keyPath: "int", ascending: false))
-//        XCTAssertEqual(sortedResults.wrappedValue.count, 2)
-//        XCTAssertEqual(sortedResults.wrappedValue[0].int, 1)
-//        XCTAssertEqual(sortedResults.wrappedValue[1].int, 0)
+        try realm.write {
+            let object = SwiftUIObject()
+            object.str = "def"
+            object.int = 1
+            // add another default inited object for filter comparison
+            realm.add(object)
+        }
+
+        var filteredResults = ObservedSectionedResults(SwiftUIObject.self,
+                                                       sectionKeyPath: \.str,
+                                                       configuration: inMemoryRealm(inMemoryIdentifier).configuration,
+                                                       filter: NSPredicate(format: "str = %@", "def"))
+        XCTAssertEqual(filteredResults.wrappedValue.count, 1)
+        XCTAssertEqual(filteredResults.wrappedValue[0].key, "def")
+
+        filteredResults = ObservedSectionedResults(SwiftUIObject.self,
+                                                   sectionKeyPath: \.str,
+                                                   configuration: inMemoryRealm(inMemoryIdentifier).configuration,
+                                                   where: { $0.str == "def" })
+        XCTAssertEqual(filteredResults.wrappedValue.count, 1)
+        XCTAssertEqual(filteredResults.wrappedValue[0].key, "def")
+    }
+
+    func testObservedSectionedResultsWithProjection() throws {
+        let fullResults = ObservedSectionedResults(UIElementsProjection.self,
+                                                   sectionKeyPath: \.label,
+                                                   configuration: inMemoryRealm(inMemoryIdentifier).configuration)
+        XCTAssertEqual(fullResults.wrappedValue.count, 0)
+        let realm = inMemoryRealm(inMemoryIdentifier)
+        try realm.write {
+            let object = SwiftUIObject()
+            object.str = "abc"
+            object.int = 1
+            // add another default inited object for filter comparison
+            realm.add(object)
+        }
+        XCTAssertEqual(fullResults.wrappedValue.count, 1)
+        XCTAssertEqual(fullResults.wrappedValue[0].key, "abc")
+
+        try realm.write {
+            let object = SwiftUIObject()
+            object.str = "def"
+            object.int = 1
+            // add another default inited object for filter comparison
+            realm.add(object)
+        }
+
+        let filteredResults = ObservedSectionedResults(UIElementsProjection.self,
+                                                       sectionKeyPath: \.label,
+                                                       configuration: inMemoryRealm(inMemoryIdentifier).configuration,
+                                                       filter: NSPredicate(format: "str = %@", "def"))
+        XCTAssertEqual(filteredResults.wrappedValue.count, 1)
+        XCTAssertEqual(filteredResults.wrappedValue[0].key, "def")
     }
 }
 #endif

@@ -57,14 +57,14 @@ struct CollectionCallbackWrapper {
 };
 } // anonymous namespace
 
-realm::SectionedResults& RLMGetBackingCollection(RLMSectionedResults *self) {
+static realm::SectionedResults& RLMGetBackingCollection(RLMSectionedResults *self) {
     return self->_sectionedResults;
 }
 
-RLMNotificationToken *RLMAddNotificationBlock(RLMSectionedResults *collection,
-                                              void (^block)(id, RLMSectionedResultsChange *, NSError *),
-                                              NSArray<NSString *> *keyPaths,
-                                              dispatch_queue_t queue) {
+static RLMNotificationToken *RLMAddNotificationBlock(RLMSectionedResults *collection,
+                                                     void (^block)(id, RLMSectionedResultsChange *, NSError *),
+                                                     NSArray<NSString *> *keyPaths,
+                                                     dispatch_queue_t queue) {
     RLMRealm *realm = collection.realm;
     if (!realm) {
         @throw RLMException(@"Collection of Sectioned Results has been invalidated or deleted.");
@@ -524,14 +524,14 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
 
 @end
 
-realm::ResultsSection& RLMGetBackingCollection(RLMSection *self) {
+static realm::ResultsSection& RLMGetBackingCollection(RLMSection *self) {
     return self->_resultsSection;
 }
 
-RLMNotificationToken *RLMAddNotificationBlock(RLMSection *collection,
-                                              void (^block)(id, RLMSectionedResultsChange *, NSError *),
-                                              NSArray<NSString *> *keyPaths,
-                                              dispatch_queue_t queue) {
+static RLMNotificationToken *RLMAddNotificationBlock(RLMSection *collection,
+                                                     void (^block)(id, RLMSectionedResultsChange *, NSError *),
+                                                     NSArray<NSString *> *keyPaths,
+                                                     dispatch_queue_t queue) {
     RLMRealm *realm = collection.realm;
     if (!realm) {
         @throw RLMException(@"Collection of Sectioned Results has been invalidated or deleted.");

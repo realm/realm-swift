@@ -156,7 +156,7 @@ extension RealmCollectionImpl {
             return keyBlock(Element._rlmFromObjc(value)!)._rlmObjcValue as! RLMValue
         }
 
-        return SectionedResults(rlmSectionedResults: sectionedResults)
+        return SectionedResults(rlmSectionedResult: sectionedResults)
     }
 }
 

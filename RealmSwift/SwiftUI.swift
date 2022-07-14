@@ -688,7 +688,9 @@ extension Projection: _ObservedResultsValue { }
             self.keyPaths = keyPaths
         }
 
-        init<BoxedType: ObjectBase>(_ value: Results<ResultType>, keyPath: KeyPath<ResultType, Key>, _ keyPaths: [String]? = nil) where ResultType: Projection<BoxedType> {
+        init<BoxedType: ObjectBase>(_ value: Results<ResultType>,
+                                    keyPath: KeyPath<ResultType, Key>,
+                                    _ keyPaths: [String]? = nil) where ResultType: Projection<BoxedType> {
             self.keyPath = keyPath
             self.keyPathString = _name(for: keyPath)
             super.init(value.realm != nil && !value.isInvalidated ? value.thaw() ?? value : value)
