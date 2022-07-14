@@ -183,7 +183,8 @@ extension Results: _ObjcBridgeable {}
 extension AnyRealmCollection: _ObjcBridgeable {}
 extension List: _ObjcBridgeable {}
 extension MutableSet: _ObjcBridgeable {}
-extension SectionedResults: _ObjcBridgeable {
+
+extension SectionedResults: BuiltInObjcBridgeable {
     public static func _rlmFromObjc(_ value: Any, insideOptional: Bool) -> SectionedResults<Key, T>? {
         (value as? RLMSectionedResults<AnyObject>).map(Self.init(rlmSectionedResults:))
     }
@@ -193,7 +194,7 @@ extension SectionedResults: _ObjcBridgeable {
     }
 }
 
-extension Section: _ObjcBridgeable {
+extension Section: BuiltInObjcBridgeable {
     public static func _rlmFromObjc(_ value: Any, insideOptional: Bool) -> Section<Key, T>? {
         (value as? RLMSection<AnyObject>).map(Self.init(rlmSection:))
     }

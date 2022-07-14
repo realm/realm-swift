@@ -29,8 +29,6 @@
 #import <realm/timestamp.hpp>
 #import <realm/util/file.hpp>
 
-#import <iostream>
-
 namespace realm {
 class Decimal128;
 class Mixed;

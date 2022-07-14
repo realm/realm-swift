@@ -157,7 +157,6 @@ RLMNotificationToken *RLMAddNotificationBlock(RLMSectionedResults *collection,
 /// Returns the index paths of the deletion indices in the given section.
 - (NSArray<NSIndexPath *> *)deletionsInSection:(NSUInteger)section {
     return toIndexPathArray(_indices.deletions[section], section);
-
 }
 
 /// Returns the index paths of the insertion indices in the given section.
@@ -201,7 +200,7 @@ RLMNotificationToken *RLMAddNotificationBlock(RLMSectionedResults *collection,
         [s appendString:@"]"];
         return s;
     };
-    return [NSString stringWithFormat:@"<RLMSectionedResultsChange: %p> {\n\tinsertions: %@,\n\tdeletions: %@,\n\tmodifications: %@,\n\tsectionsToInsert: %@, \n\tsectionsToRemove: %@\n}",
+    return [NSString stringWithFormat:@"<RLMSectionedResultsChange: %p> {\n\tinsertions: %@,\n\tdeletions: %@,\n\tmodifications: %@,\n\tsectionsToInsert: %@,\n\tsectionsToRemove: %@\n}",
             (__bridge void *)self,
             indexPathToString(self.insertions),
             indexPathToString(self.deletions),

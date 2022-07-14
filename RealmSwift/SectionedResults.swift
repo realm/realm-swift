@@ -19,23 +19,58 @@
 import Foundation
 import Realm
 
-public protocol RealmSectionedResults: RandomAccessCollection, Equatable, ThreadConfined {
+public protocol RealmSectionedResult: RandomAccessCollection, Equatable, ThreadConfined {
+    var realm: Realm? { get }
+
+    var isInvalidated: Bool { get }
+
+    var count: Int { get }
+
+    var isFrozen: Bool { get }
+
+    func freeze() -> Self
+
+    func thaw() -> Self?
+
     func observe(keyPaths: [String]?,
                  on queue: DispatchQueue?,
                  _ block: @escaping (RealmSectionedResultsChange<Self>) -> Void) -> NotificationToken
+
     func observe(on queue: DispatchQueue?,
                  _ block: @escaping (RealmSectionedResultsChange<Self>) -> Void) -> NotificationToken
+
     func observe<T: ObjectBase>(keyPaths: [PartialKeyPath<T>],
                                 on queue: DispatchQueue?,
                                 _ block: @escaping (RealmSectionedResultsChange<Self>) -> Void) -> NotificationToken
 }
 
-public struct SectionedResults<Key: _Persistable & Hashable, T: RealmCollectionValue>: RealmSectionedResults {
-    let collection: RLMSectionedResults<AnyObject>
+public struct SectionedResults<Key: _Persistable & Hashable, T: RealmCollectionValue>: RealmSectionedResult {
+
+    public var collection: RLMSectionedResults<AnyObject>
+    let x: RLMSectionedResult? = nil
 
     internal init(rlmSectionedResults: RLMSectionedResults<AnyObject>) {
         self.collection = rlmSectionedResults
     }
+
+    public var realm: Realm? {
+        collection.realm.map(Realm.init)
+    }
+    public var isInvalidated: Bool {
+        collection.isInvalidated
+    }
+    public var count: Int {
+        Int(collection.count)
+    }
+
+    /// The position of the first element in a non-empty collection.
+    /// Identical to endIndex in an empty collection.
+    public var startIndex: Int { 0 }
+
+    /// The collection's "past the end" position.
+    /// endIndex is not a valid argument to subscript, and is always reachable from startIndex by
+    /// zero or more applications of successor().
+    public var endIndex: Int { count }
 
     public subscript(_ index: Int) -> Section<Key, T> {
         return Section<Key, T>(rlmSection: collection[UInt(index)])
@@ -44,8 +79,6 @@ public struct SectionedResults<Key: _Persistable & Hashable, T: RealmCollectionV
     public subscript(_ indexPath: IndexPath) -> T {
         return self[indexPath.section][indexPath.item]
     }
-
-    public var count: Int { Int(collection.count) }
 
     public func observe(keyPaths: [String]? = nil,
                         on queue: DispatchQueue? = nil,
@@ -81,18 +114,9 @@ public struct SectionedResults<Key: _Persistable & Hashable, T: RealmCollectionV
         return lhs.collection == rhs.collection
     }
 
-    /// The position of the first element in a non-empty collection.
-    /// Identical to endIndex in an empty collection.
-    public var startIndex: Int { 0 }
-
-    /// The collection's "past the end" position.
-    /// endIndex is not a valid argument to subscript, and is always reachable from startIndex by
-    /// zero or more applications of successor().
-    public var endIndex: Int { count }
-
-    public var realm: Realm? { collection.realm.map(Realm.init) }
-    public var isInvalidated: Bool { collection.isInvalidated }
-    public var isFrozen: Bool { collection.isFrozen }
+    public var isFrozen: Bool {
+        collection.isFrozen
+    }
 
     public func freeze() -> SectionedResults<Key, T> {
         return Self(rlmSectionedResults: collection.freeze())
@@ -103,12 +127,33 @@ public struct SectionedResults<Key: _Persistable & Hashable, T: RealmCollectionV
     }
 }
 
-public struct Section<Key: _Persistable & Hashable, T: RealmCollectionValue>: RealmSectionedResults {
+public struct Section<Key: _Persistable & Hashable, T: RealmCollectionValue>: RealmSectionedResult {
 
-    public var realm: Realm? { collection.realm.map(Realm.init) }
+    public var realm: Realm? {
+        collection.realm.map(Realm.init)
+    }
+
+    public var count: Int {
+        Int(collection.count)
+    }
 
     public var isInvalidated: Bool {
         return collection.isInvalidated
+    }
+
+    /// The position of the first element in a non-empty collection.
+    /// Identical to endIndex in an empty collection.
+    public var startIndex: Int { 0 }
+
+    /// The collection's "past the end" position.
+    /// endIndex is not a valid argument to subscript, and is always reachable from startIndex by
+    /// zero or more applications of successor().
+    public var endIndex: Int { count }
+
+    let collection: RLMSection<AnyObject>
+
+    internal init(rlmSection: RLMSection<AnyObject>) {
+        self.collection = rlmSection
     }
 
     public var isFrozen: Bool {
@@ -123,8 +168,6 @@ public struct Section<Key: _Persistable & Hashable, T: RealmCollectionValue>: Re
         return Self(rlmSection: collection.thaw())
     }
 
-    let collection: RLMSection<AnyObject>
-
     public var key: Key {
         return Key._rlmFromObjc(collection.key)!
     }
@@ -133,15 +176,9 @@ public struct Section<Key: _Persistable & Hashable, T: RealmCollectionValue>: Re
         return key
     }
 
-    internal init(rlmSection: RLMSection<AnyObject>) {
-        self.collection = rlmSection
-    }
-
     public subscript(_ index: Int) -> T {
         return T._rlmFromObjc(collection[UInt(index)])!
     }
-
-    public var count: Int { Int(collection.count) }
 
     public func makeIterator() -> RLMSectionIterator<T> {
         return RLMSectionIterator(collection: collection)
@@ -150,15 +187,6 @@ public struct Section<Key: _Persistable & Hashable, T: RealmCollectionValue>: Re
     public func hash(into hasher: inout Hasher) {
         hasher.combine(key)
     }
-
-    /// The position of the first element in a non-empty collection.
-    /// Identical to endIndex in an empty collection.
-    public var startIndex: Int { 0 }
-
-    /// The collection's "past the end" position.
-    /// endIndex is not a valid argument to subscript, and is always reachable from startIndex by
-    /// zero or more applications of successor().
-    public var endIndex: Int { count }
 
     public static func == (lhs: Section<Key, T>, rhs: Section<Key, T>) -> Bool {
         return lhs.collection == rhs.collection
@@ -250,7 +278,7 @@ public struct Section<Key: _Persistable & Hashable, T: RealmCollectionValue>: Re
     /// Advance to the next element and return it, or `nil` if no next element exists.
     public mutating func next() -> Section<Key, Element>? {
         guard let next = generatorBase.next() else { return nil }
-        return Section<Key, Element>(rlmSection: next as! RLMSection<AnyObject>/*, sectionBlock: sectionBlock*/)
+        return Section<Key, Element>(rlmSection: next as! RLMSection<AnyObject>)
     }
 }
 

@@ -295,7 +295,6 @@ class SectionedResultsTestsBase: RLMTestCaseBase {
 }
 
 class SectionedResultsTests: SectionedResultsTestsBase {
-
     func testCreationFromResults() {
         createObjects()
         let realm = try! Realm()
@@ -348,6 +347,19 @@ class SectionedResultsTests: SectionedResultsTestsBase {
 
         assert(ascending: true, sectionCount: 3, sectionKeys: ["a", "b", "c"])
         assert(ascending: false, sectionCount: 3, sectionKeys: ["c", "b", "a"])
+    }
+
+    func testSubscript() {
+        createObjects()
+        let realm = try! Realm()
+        let results = realm.objects(ModernAllTypesObject.self)
+        let sectionedResults = results.sectioned(by: \.firstLetter, ascending: true)
+        let section = sectionedResults[0]
+        XCTAssertEqual(section.count, 1)
+        var obj = section[0]
+        XCTAssertEqual(obj.stringCol, "apple")
+        obj = sectionedResults[IndexPath(item: 0, section: 0)]
+        XCTAssertEqual(obj.stringCol, "apple")
     }
 
     func testObservation() {
@@ -1134,6 +1146,25 @@ class SectionedResultsProjectionTests: SectionedResultsTestsBase {
 
         assert(ascending: true, sectionKey: "a", beforeCount: 1, afterCount: 2)
         assert(ascending: false, sectionKey: "c", beforeCount: 1, afterCount: 2)
+    }
+
+    func testFastEnumeration() {
+        let realm = try! Realm()
+        createObjects()
+        let results = realm.objects(ModernAllTypesObject.self)
+        let sectionedResults = results.sectioned(by: \.firstLetter, ascending: true)
+        var keys = ["a", "b", "c"]
+        var strs = ["apple", "banana", "box", "chalk"]
+        for section in sectionedResults {
+            XCTAssertEqual(section.key, keys.first!)
+            for obj in section {
+                XCTAssertEqual(obj.stringCol, strs.first!)
+                strs = Array(strs.dropFirst())
+            }
+            keys = Array(keys.dropFirst())
+        }
+        XCTAssertTrue(keys.isEmpty)
+        XCTAssertTrue(strs.isEmpty)
     }
 }
 

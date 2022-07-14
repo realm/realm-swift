@@ -63,6 +63,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSArray<NSIndexPath *> *)modificationsInSection:(NSUInteger)section;
 @end
 
+@protocol RLMSectionedResult <NSFastEnumeration, RLMThreadConfined>
+
+@property (nonatomic, readonly) NSUInteger count;
+
+@end
+
 /// An RLMSection contains the objects which below to a specified section key.
 @interface RLMSection<RLMObjectType> : NSObject<NSFastEnumeration, RLMThreadConfined>
 /// The count of objects in this section.

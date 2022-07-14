@@ -643,5 +643,42 @@ class SwiftUITests: TestCase {
         XCTAssertEqual(projection.label, "baz")
         XCTAssertEqual(binding.wrappedValue, "baz")
     }
+
+    // MARK: - ObservedSectionedResults
+    func testObservedSectionedResults() throws {
+        let object = SwiftUIObject()
+        let fullResults = ObservedSectionedResults(SwiftUIObject.self,
+                                                   sectionKeyPath: \.str,
+                                                   configuration: inMemoryRealm(inMemoryIdentifier).configuration)
+        XCTAssertEqual(fullResults.wrappedValue.count, 0)
+        let realm = inMemoryRealm(inMemoryIdentifier)
+        realm.beginWrite()
+        object.str = "abc"
+        object.int = 1
+        // add another default inited object for filter comparison
+        realm.add(SwiftUIObject())
+        try realm.commitWrite()
+        XCTAssertEqual(fullResults.wrappedValue.count, 1)
+
+        let filteredResults = ObservedResults(SwiftUIObject.self,
+                                              configuration: inMemoryRealm(inMemoryIdentifier).configuration,
+                                              filter: NSPredicate(format: "str = %@", "abc"))
+//        XCTAssertEqual(fullResults.wrappedValue.count, 2)
+//        XCTAssertEqual(filteredResults.wrappedValue.count, 1)
+//        var sortedResults = ObservedResults(SwiftUIObject.self,
+//                                            configuration: inMemoryRealm(inMemoryIdentifier).configuration,
+//                                            filter: NSPredicate(format: "int >= 0"),
+//                                            sortDescriptor: SortDescriptor(keyPath: "int", ascending: true))
+//        XCTAssertEqual(sortedResults.wrappedValue.count, 2)
+//        XCTAssertEqual(sortedResults.wrappedValue[0].int, 0)
+//        XCTAssertEqual(sortedResults.wrappedValue[1].int, 1)
+//        sortedResults = ObservedResults(SwiftUIObject.self,
+//                                        configuration: inMemoryRealm(inMemoryIdentifier).configuration,
+//                                        filter: NSPredicate(format: "int >= 0"),
+//                                        sortDescriptor: SortDescriptor(keyPath: "int", ascending: false))
+//        XCTAssertEqual(sortedResults.wrappedValue.count, 2)
+//        XCTAssertEqual(sortedResults.wrappedValue[0].int, 1)
+//        XCTAssertEqual(sortedResults.wrappedValue[1].int, 0)
+    }
 }
 #endif

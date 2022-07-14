@@ -2312,7 +2312,7 @@ private class CombineSectionedResultsPublisherTests<Collection: RealmCollection>
         }
     }
 
-    func checkChangeset<SectionedResults: RealmSectionedResults>(_ change: RealmSectionedResultsChange<SectionedResults>, insertions: [IndexPath] = [],
+    func checkChangeset<SectionedResults: RealmSectionedResult>(_ change: RealmSectionedResultsChange<SectionedResults>, insertions: [IndexPath] = [],
                                                                  deletions: [IndexPath] = [],
                                                                  frozen: Bool = false) {
         switch change {
@@ -2763,14 +2763,12 @@ private class CombineSectionedResultsPublisherTests<Collection: RealmCollection>
         sectionEx = expectation(description: "change notification")
         try! realm.write {
             collection.appendObject()
-
         }
         waitForExpectations(timeout: 1.0, handler: nil)
 
         sectionEx = expectation(description: "change notification")
         try! realm.write {
             collection.modifyObject()
-
         }
         waitForExpectations(timeout: 10.0, handler: nil)
     }

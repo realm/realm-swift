@@ -615,7 +615,7 @@ extension Projection: _ObservedResultsValue { }
 }
 
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-@propertyWrapper public struct ObservedSectionResults<Key: _Persistable & Hashable, ResultType>: DynamicProperty, BoundCollection where ResultType: _ObservedResultsValue & RealmFetchable & KeypathSortable & Identifiable {
+@propertyWrapper public struct ObservedSectionedResults<Key: _Persistable & Hashable, ResultType>: DynamicProperty, BoundCollection where ResultType: _ObservedResultsValue & RealmFetchable & KeypathSortable & Identifiable {
     private class Storage: ObservableStorage<Results<ResultType>> {
         var sectionedResults: SectionedResults<Key, ResultType>?
         var setupHasRun = false
@@ -743,7 +743,6 @@ extension Projection: _ObservedResultsValue { }
         guard let sectionedResults = storage.sectionedResults else {
             fatalError("Could not instantiate SectionedResults")
         }
-        print(sectionedResults)
         return sectionedResults
     }
     /// :nodoc:

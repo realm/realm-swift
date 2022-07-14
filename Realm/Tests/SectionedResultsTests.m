@@ -583,6 +583,21 @@ static void ExpectChange(id self,
     XCTAssertEqual(sectionsToInsert.count, changes.sectionsToInsert.count);
     XCTAssertEqual(sectionsToRemove.count, changes.sectionsToRemove.count);
 
+    for (NSIndexPath *insertion in insertions) {
+        NSArray *filtered = [insertions filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"section == %d", insertion.section]];
+        XCTAssertEqualObjects(filtered, [changes insertionsInSection:insertion.section]);
+    }
+
+    for (NSIndexPath *deletion in deletions) {
+        NSArray *filtered = [deletions filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"section == %d", deletion.section]];
+        XCTAssertEqualObjects(filtered, [changes deletionsInSection:deletion.section]);
+    }
+
+    for (NSIndexPath *modification in modifications) {
+        NSArray *filtered = [modifications filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"section == %d", modification.section]];
+        XCTAssertEqualObjects(filtered, [changes modificationsInSection:modification.section]);
+    }
+
     for (NSNumber *i in sectionsToInsert) {
         XCTAssertTrue([changes.sectionsToInsert containsIndex:i.unsignedIntegerValue]);
     }
@@ -674,21 +689,58 @@ static void ExpectChange(id self,
     id token = [sr addNotificationBlock:^(RLMSectionedResults *r, RLMSectionedResultsChange *c, NSError *e) {
         changes = c;
         XCTAssertNil(e);
+        XCTAssertNotNil(r);
     }
                                keyPaths:@[@"stringCol"]
                                   queue:notificationQueue];
 
     [self waitForNotification:RLMRealmDidChangeNotification realm:self.realmWithTestPath block:^{
+        [self.realmWithTestPath transactionWithBlock:^{ }]; // Wait for initial notification.
+    }];
+    [self waitForNotification:RLMRealmDidChangeNotification realm:self.realmWithTestPath block:^{
         RLMRealm *r = self.realmWithTestPath;
         [r transactionWithBlock:^{
-            AllTypesObject *o = [AllTypesObject allObjectsInRealm:r][0];
-            o.stringCol = @"app";
+                AllTypesObject *o = [AllTypesObject allObjectsInRealm:r][0];
+                o.stringCol = @"app";
         }];
     }];
 
     dispatch_sync(notificationQueue, ^{});
     XCTAssertEqualObjects(changes.insertions, @[[NSIndexPath indexPathForItem:2 inSection:0]]);
     XCTAssertEqualObjects(changes.deletions, @[[NSIndexPath indexPathForItem:0 inSection:0]]);
+
+    NSString *expDesc =
+    @"\\<RLMSectionedResultsChange: 0x[a-z0-9]+\\> \\{\n"
+    @"\tinsertions: \\[\n"
+    @"\t\t\\<NSIndexPath: 0x[a-z0-9]+\\> \\{length = 2, path = 0 - 2\\}\n"
+    @"\t\\],\n"
+    @"\tdeletions: \\[\n"
+    @"\t\t\\<NSIndexPath: 0x[a-z0-9]+\\> \\{length = 2, path = 0 - 0\\}\n"
+    @"\t\\],\n"
+    @"\tmodifications: \\[\\],\n"
+    @"\tsectionsToInsert: \\[\\],\n"
+    @"\tsectionsToRemove: \\[\\]\n"
+    @"\\}";
+    RLMAssertMatches(changes.description, expDesc);
+
+    [self waitForNotification:RLMRealmDidChangeNotification realm:self.realmWithTestPath block:^{
+        RLMRealm *r = self.realmWithTestPath;
+        [r transactionWithBlock:^{
+            [r deleteAllObjects];
+        }];
+    }];
+
+    dispatch_sync(notificationQueue, ^{});
+    XCTAssertEqual(changes.sectionsToRemove.count, 3);
+
+    expDesc = @"\\<RLMSectionedResultsChange: 0x[a-z0-9]+\\> \\{\n"
+    @"\tinsertions: \\[\\],\n"
+    @"\tdeletions: \\[\\],\n"
+    @"\tmodifications: \\[\\],\n"
+    @"\tsectionsToInsert: \\[\\],\n"
+    @"\tsectionsToRemove: \\[0, 1, 2\\]\n"
+    @"\\}";
+    RLMAssertMatches(changes.description, expDesc);
 }
 
 - (void)testNotificationsOnSection {
@@ -953,6 +1005,7 @@ static void ExpectChangePrimitive(id self,
     }];
 
     RLMSectionedResults<AllTypesObject *> *frozen = [sr freeze];
+    XCTAssertEqual(frozen, [frozen freeze]); // should return self
     [self createObjects];
 
     XCTAssertNotNil(frozen);
@@ -966,6 +1019,7 @@ static void ExpectChangePrimitive(id self,
     XCTAssertTrue(frozen.isFrozen);
 
     RLMSectionedResults<AllTypesObject *> *thawed = [frozen thaw];
+    XCTAssertEqual(thawed, [thawed thaw]); // should return self
     XCTAssertNotNil(thawed);
     XCTAssertEqual(thawed.count, 4);
     XCTAssertEqual(thawed[0].count, 6);
@@ -989,6 +1043,7 @@ static void ExpectChangePrimitive(id self,
     }];
 
     RLMSection<AllTypesObject *> *frozen = [sr[0] freeze];
+    XCTAssertEqual(frozen, [frozen freeze]); // should return self
     [self createObjects];
 
     XCTAssertNotNil(frozen);
@@ -997,6 +1052,7 @@ static void ExpectChangePrimitive(id self,
     XCTAssertTrue(frozen.isFrozen);
 
     RLMSection<AllTypesObject *> *thawed = [frozen thaw];
+    XCTAssertEqual(thawed, [thawed thaw]); // should return self
     XCTAssertNotNil(thawed);
     XCTAssertEqual(thawed.count, 6);
 

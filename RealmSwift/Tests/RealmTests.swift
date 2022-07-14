@@ -24,31 +24,8 @@ import XCTest
 #endif
 import Foundation
 
-class MyClass: Object {
-   @Persisted var myList = List<AnyRealmValue>()
-}
-
-class DogClass: Object {
-   @Persisted var name = ""
-}
-
-class PersonClass: Object {
-   @Persisted var name = ""
-}
-
-//let dog = DogClass()
-//let person = PersonClass()
-//
-//let obj0: AnyRealmValue = .object(dog) //both of these are objects, even through they are different objects
-//let obj1: AnyRealmValue = .object(person)
-//
-//let m = MyClass()
-//m.myList.append(obj0)
-//m.myList.append(obj1)
-
 @available(*, deprecated) // Silence deprecation warnings for RealmOptional
 class RealmTests: TestCase {
-
     enum TestError: Error {
         case intentional
     }
