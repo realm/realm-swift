@@ -21,9 +21,9 @@
 
 // Realm model object
 @interface DemoObject : RLMObject
-@property NSString *title;
+@property NSString *phoneNumber;
 @property NSDate   *date;
-@property NSString *sectionTitle;
+@property NSString *contactName;
 @end
 
 @implementation DemoObject
@@ -35,8 +35,7 @@ static NSString * const kTableName = @"table";
 
 @interface TableViewController ()
 
-@property (nonatomic, strong) NSArray *sectionTitles;
-@property (nonatomic, strong) NSMutableArray *objectsBySection;
+@property (nonatomic, strong) RLMSectionedResults<NSString *, DemoObject *> *sectionedResults;
 @property (nonatomic, strong) RLMNotificationToken *notification;
 
 @end
@@ -49,20 +48,31 @@ static NSString * const kTableName = @"table";
 {
     [super viewDidLoad];
     // Section Titles
-    self.sectionTitles = @[@"A", @"B", @"C"];
     [self setupUI];
+
+    self.sectionedResults = [[DemoObject allObjects] sectionedResultsSortedUsingKeyPath:@"contactName"
+                                                                              ascending:YES
+                                                                               keyBlock:^NSString * (DemoObject *object) {
+        return [object.contactName substringToIndex:1];
+    }];
 
     // Set realm notification block
     __weak typeof(self) weakSelf = self;
-    self.notification = [RLMRealm.defaultRealm addNotificationBlock:^(NSString *note, RLMRealm *realm) {
-        [weakSelf.tableView reloadData];
+    self.notification = [self.sectionedResults addNotificationBlock:^(RLMSectionedResults<NSString *, DemoObject *> *col,
+                                                                      RLMSectionedResultsChange * changes, NSError *err) {
+        if (changes != nil) {
+            [weakSelf.tableView performBatchUpdates:^{
+                [weakSelf.tableView deleteRowsAtIndexPaths:changes.deletions withRowAnimation:UITableViewRowAnimationAutomatic];
+                [weakSelf.tableView insertRowsAtIndexPaths:changes.insertions withRowAnimation:UITableViewRowAnimationAutomatic];
+                [weakSelf.tableView reloadRowsAtIndexPaths:changes.modifications withRowAnimation:UITableViewRowAnimationAutomatic];
+                [weakSelf.tableView insertSections:changes.sectionsToInsert withRowAnimation:UITableViewRowAnimationAutomatic];
+                [weakSelf.tableView deleteSections:changes.sectionsToRemove withRowAnimation:UITableViewRowAnimationAutomatic];
+            } completion:^(BOOL finished) {
+                // Noop
+            }];
+        }
     }];
-    self.objectsBySection = [NSMutableArray arrayWithCapacity:3];
-    for (NSString *section in self.sectionTitles) {
-        RLMResults *unsortedObjects = [DemoObject objectsWhere:@"sectionTitle == %@", section];
-        RLMResults *sortedObjects = [unsortedObjects sortedResultsUsingKeyPath:@"date" ascending:YES];
-        [self.objectsBySection addObject:sortedObjects];
-    }
+
     [self.tableView reloadData];
 }
 
@@ -86,17 +96,22 @@ static NSString * const kTableName = @"table";
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-    return self.sectionTitles.count;
+    return self.sectionedResults.count;
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
 {
-    return self.sectionTitles[section];
+    return self.sectionedResults[section].key;
+}
+
+- (NSArray<NSString *> *)sectionIndexTitlesForTableView:(UITableView *)tableView
+{
+    return self.sectionedResults.allKeys;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return [self objectsInSection:section].count;
+    return self.sectionedResults[section].count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -108,8 +123,8 @@ static NSString * const kTableName = @"table";
                                       reuseIdentifier:kCellID];
     }
 
-    DemoObject *object = [self objectsInSection:indexPath.section][indexPath.row];
-    cell.textLabel.text = object.title;
+    DemoObject *object = self.sectionedResults[indexPath.section][indexPath.row];
+    cell.textLabel.text = [NSString stringWithFormat:@"%@: %@", object.contactName, object.phoneNumber];
     cell.detailTextLabel.text = object.date.description;
 
     return cell;
@@ -121,7 +136,8 @@ forRowAtIndexPath:(NSIndexPath *)indexPath
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         RLMRealm *realm = RLMRealm.defaultRealm;
         [realm beginWriteTransaction];
-        [realm deleteObject:[self objectsInSection:indexPath.section][indexPath.row]];
+        DemoObject *object = self.sectionedResults[indexPath.section][indexPath.row];
+        [realm deleteObject:object];
         [realm commitWriteTransaction];
     }
 }
@@ -139,9 +155,9 @@ forRowAtIndexPath:(NSIndexPath *)indexPath
             [realm beginWriteTransaction];
             for (NSInteger index = 0; index < 5; index++) {
                 // Add row via dictionary. Order is ignored.
-                [DemoObject createInRealm:realm withValue:@{@"title": [self randomTitle],
+                [DemoObject createInRealm:realm withValue:@{@"phoneNumber": [self randomContactInfo],
                                                              @"date": [NSDate date],
-                                                             @"sectionTitle": [self randomSectionTitle]}];
+                                                             @"contactName": [self randomContactName]}];
             }
             [realm commitWriteTransaction];
         }
@@ -151,25 +167,29 @@ forRowAtIndexPath:(NSIndexPath *)indexPath
 - (void)add
 {
     [[RLMRealm defaultRealm] transactionWithBlock:^{
-        [DemoObject createInDefaultRealmWithValue:@[[self randomTitle], [NSDate date], [self randomSectionTitle]]];
+        [DemoObject createInDefaultRealmWithValue:@[[self randomContactInfo], [NSDate date], [self randomContactName]]];
     }];
 }
 
 #pragma - Helpers
 
-- (RLMResults *)objectsInSection:(NSUInteger)section
+- (NSInteger)randomNumberBetween:(NSInteger)min maxNumber:(NSInteger)max
 {
-    return self.objectsBySection[section];
+    return min + arc4random_uniform((uint32_t)(max - min + 1));
 }
 
-- (NSString *)randomTitle
+- (NSString *)randomContactInfo
 {
-    return [NSString stringWithFormat:@"Title %d", arc4random()];
+    NSInteger rand1 = [self randomNumberBetween:0 maxNumber:9];
+    NSInteger rand2 = [self randomNumberBetween:0 maxNumber:9];
+    NSInteger rand3 = [self randomNumberBetween:0 maxNumber:9];
+    return [NSString stringWithFormat:@"555-55%ld-%ld%ld55", (long)rand1, rand2, rand3];
 }
 
-- (NSString *)randomSectionTitle
+- (NSString *)randomContactName
 {
-    return self.sectionTitles[arc4random() % self.sectionTitles.count];
+    NSArray *names = @[@"John", @"Mary", @"Fred", @"Sarah", @"Sally", @"James"];
+    return [names objectAtIndex:arc4random()%[names count]];
 }
 
 @end

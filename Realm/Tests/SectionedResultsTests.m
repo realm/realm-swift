@@ -66,9 +66,9 @@
     RLMRealm *realm = self.realmWithTestPath;
 
     RLMResults<AllTypesObject *> *results = [AllTypesObject allObjectsInRealm:realm];
-    RLMSectionedResults<AllTypesObject *> *sr = [results sectionedResultsSortedUsingKeyPath:@"objectCol.stringCol"
-                                                                                  ascending:YES
-                                                                                   keyBlock:^id<RLMValue>(AllTypesObject *value) {
+    RLMSectionedResults<NSString *, AllTypesObject *> *sr = [results sectionedResultsSortedUsingKeyPath:@"objectCol.stringCol"
+                                                                                              ascending:YES
+                                                                                               keyBlock:^id<RLMValue>(AllTypesObject *value) {
         return [value.objectCol.stringCol substringToIndex:1];
     }];
 
@@ -221,9 +221,9 @@
 
     void(^testBlock)(NSString *) = ^(NSString *keyPath) {
         __block int algoRunCount = 0;
-        RLMSectionedResults<AllTypesObject *> *sr = [results sectionedResultsSortedUsingKeyPath:keyPath
-                                                                                      ascending:YES
-                                                                                       keyBlock:^id<RLMValue>(id value) {
+        RLMSectionedResults<id<RLMValue>, AllTypesObject *> *sr = [results sectionedResultsSortedUsingKeyPath:keyPath
+                                                                                                    ascending:YES
+                                                                                                     keyBlock:^id<RLMValue>(id value) {
             algoRunCount++;
             return [self sectionKeyForValue:[value valueForKeyPath:keyPath]];
         }];
@@ -273,9 +273,9 @@
 
     void(^testBlock)(NSString *) = ^(NSString *keyPath) {
         __block int algoRunCount = 0;
-        RLMSectionedResults<AllOptionalTypes *> *sr = [results sectionedResultsSortedUsingKeyPath:keyPath
-                                                                                        ascending:YES
-                                                                                         keyBlock:^id<RLMValue>(AllOptionalTypes *value) {
+        RLMSectionedResults<id<RLMValue>, AllOptionalTypes *> *sr = [results sectionedResultsSortedUsingKeyPath:keyPath
+                                                                                                      ascending:YES
+                                                                                                       keyBlock:^id<RLMValue>(AllOptionalTypes *value) {
             algoRunCount++;
             if ([value valueForKeyPath:keyPath]) {
                 return @"Not null";
@@ -328,9 +328,9 @@
     RLMResults<AllOptionalTypes *> *resultsOpt = [AllOptionalTypes allObjectsInRealm:realm];
     __block int sectionAlgoCount = 0;
 
-    RLMSectionedResults<AllTypesObject *> *sr = [results sectionedResultsSortedUsingKeyPath:@"objectIdCol"
-                                                                                  ascending:YES
-                                                                                   keyBlock:^id<RLMValue>(id value) {
+    RLMSectionedResults<NSString *, AllTypesObject *> *sr = [results sectionedResultsSortedUsingKeyPath:@"objectIdCol"
+                                                                                              ascending:YES
+                                                                                               keyBlock:^id<RLMValue>(id value) {
         id v = [value valueForKeyPath:@"objectIdCol"];
         sectionAlgoCount++;
         return [((RLMObjectId *)v) isEqualTo:oid1] ? @"a" : @"b";
@@ -346,9 +346,9 @@
     XCTAssertEqual(sectionAlgoCount, 2);
 
     sectionAlgoCount = 0;
-    RLMSectionedResults<AllOptionalTypes *> *srOpt = [resultsOpt sectionedResultsSortedUsingKeyPath:@"objectId"
-                                                                                          ascending:YES
-                                                                                           keyBlock:^id<RLMValue>(id value) {
+    RLMSectionedResults<NSString  *, AllOptionalTypes *> *srOpt = [resultsOpt sectionedResultsSortedUsingKeyPath:@"objectId"
+                                                                                                       ascending:YES
+                                                                                                        keyBlock:^id<RLMValue>(id value) {
         sectionAlgoCount++;
         id v = [value valueForKeyPath:@"objectId"];
         return !v ? @"b" : @"a";
@@ -393,9 +393,9 @@
     __block int sectionAlgoCount = 0;
 
     // Sorting on binary col is unsupported
-    RLMSectionedResults<AllTypesObject *> *sr = [results sectionedResultsSortedUsingKeyPath:@"intCol"
-                                                                                  ascending:YES
-                                                                                   keyBlock:^id<RLMValue>(id value) {
+    RLMSectionedResults<NSString *, AllTypesObject *> *sr = [results sectionedResultsSortedUsingKeyPath:@"intCol"
+                                                                                              ascending:YES
+                                                                                               keyBlock:^id<RLMValue>(id value) {
         id v = [value valueForKeyPath:@"binaryCol"];
         sectionAlgoCount++;
         return [((NSData *)v) isEqualTo:d1] ? @"a" : @"b";
@@ -411,9 +411,9 @@
     XCTAssertEqual(sectionAlgoCount, 2);
 
     sectionAlgoCount = 0;
-    RLMSectionedResults<AllOptionalTypes *> *srOpt = [resultsOpt sectionedResultsSortedUsingKeyPath:@"intObj"
-                                                                                          ascending:YES
-                                                                                           keyBlock:^id<RLMValue>(id value) {
+    RLMSectionedResults<NSString *, AllOptionalTypes *> *srOpt = [resultsOpt sectionedResultsSortedUsingKeyPath:@"intObj"
+                                                                                                      ascending:YES
+                                                                                                       keyBlock:^id<RLMValue>(id value) {
         sectionAlgoCount++;
         id v = [value valueForKeyPath:@"data"];
         return !v ? @"b" : @"a";
@@ -434,6 +434,25 @@
     XCTAssertEqual(sectionAlgoCount, 2);
 }
 
+- (void)testAllKeys {
+    RLMRealm *realm = self.realmWithTestPath;
+
+    [realm transactionWithBlock:^{
+        [StringObject createInRealm:realm withValue:@[@"apple"]];
+        [StringObject createInRealm:realm withValue:@[@"any"]];
+        [StringObject createInRealm:realm withValue:@[@"banana"]];
+    }];
+
+    RLMResults<StringObject *> *results = [StringObject allObjectsInRealm:realm];
+    RLMSectionedResults<NSString *, AllTypesObject *> *sr = [results sectionedResultsSortedUsingKeyPath:@"stringCol"
+                                                                                              ascending:YES
+                                                                                               keyBlock:^id<RLMValue>(StringObject *value) {
+        return value.firstLetter;
+    }];
+
+    XCTAssertEqualObjects(sr.allKeys, (@[@"a", @"b"]));
+}
+
 - (void)testDescription {
     RLMRealm *realm = self.realmWithTestPath;
 
@@ -444,9 +463,9 @@
     }];
 
     RLMResults<StringObject *> *results = [StringObject allObjectsInRealm:realm];
-    RLMSectionedResults<AllTypesObject *> *sr = [results sectionedResultsSortedUsingKeyPath:@"stringCol"
-                                                                                  ascending:YES
-                                                                                   keyBlock:^id<RLMValue>(StringObject *value) {
+    RLMSectionedResults<NSString *, AllTypesObject *> *sr = [results sectionedResultsSortedUsingKeyPath:@"stringCol"
+                                                                                              ascending:YES
+                                                                                               keyBlock:^id<RLMValue>(StringObject *value) {
         return value.firstLetter;
     }];
 
@@ -490,9 +509,9 @@
     __block NSUInteger forLoopCount = 0;
 
     RLMResults<AllTypesObject *> *results = [AllTypesObject allObjectsInRealm:realm];
-    RLMSectionedResults<AllTypesObject *> *sr = [results sectionedResultsSortedUsingKeyPath:@"objectCol.stringCol"
-                                                                                  ascending:YES
-                                                                                   keyBlock:^id<RLMValue>(AllTypesObject *value) {
+    RLMSectionedResults<NSString *, AllTypesObject *> *sr = [results sectionedResultsSortedUsingKeyPath:@"objectCol.stringCol"
+                                                                                              ascending:YES
+                                                                                               keyBlock:^id<RLMValue>(AllTypesObject *value) {
         algoRunCount++;
         return value.stringCol;
     }];
@@ -535,9 +554,9 @@ static RLMSectionedResultsChange *getChange(SectionedResultsTests *self, void (^
     __block RLMSectionedResultsChange *changes;
     RLMRealm *realm = [RLMRealm defaultRealm];
     RLMResults<StringObject *> *results = [StringObject allObjectsInRealm:realm];
-    RLMSectionedResults<StringObject *> *sr = [results sectionedResultsSortedUsingKeyPath:@"stringCol"
-                                                                                ascending:YES
-                                                                                 keyBlock:^id<RLMValue>(StringObject *value) {
+    RLMSectionedResults<NSString *, StringObject *> *sr = [results sectionedResultsSortedUsingKeyPath:@"stringCol"
+                                                                                            ascending:YES
+                                                                                             keyBlock:^id<RLMValue>(StringObject *value) {
         return value.firstLetter;
     }];
 
@@ -679,9 +698,9 @@ static void ExpectChange(id self,
     RLMRealm *realm = self.realmWithTestPath;
     [self createObjects];
     RLMResults<AllTypesObject *> *results = [AllTypesObject allObjectsInRealm:realm];
-    RLMSectionedResults<AllTypesObject *> *sr = [results sectionedResultsSortedUsingKeyPath:@"stringCol"
-                                                                                  ascending:YES
-                                                                                   keyBlock:^id<RLMValue>(AllTypesObject *value) {
+    RLMSectionedResults<NSString *, AllTypesObject *> *sr = [results sectionedResultsSortedUsingKeyPath:@"stringCol"
+                                                                                              ascending:YES
+                                                                                               keyBlock:^id<RLMValue>(AllTypesObject *value) {
         return [value.stringCol substringToIndex:1];
     }];
 
@@ -750,13 +769,13 @@ static void ExpectChange(id self,
     RLMRealm *realm = self.realmWithTestPath;
     [self createObjects];
     RLMResults<StringObject *> *results = [StringObject allObjectsInRealm:realm];
-    RLMSectionedResults<StringObject *> *sr = [results sectionedResultsSortedUsingKeyPath:@"stringCol"
-                                                                                ascending:YES
-                                                                                 keyBlock:^id<RLMValue>(StringObject *value) {
+    RLMSectionedResults<NSString *, StringObject *> *sr = [results sectionedResultsSortedUsingKeyPath:@"stringCol"
+                                                                                            ascending:YES
+                                                                                             keyBlock:^id<RLMValue>(StringObject *value) {
         return value.firstLetter;
     }];
 
-    RLMSection<StringObject *> *section = sr[0];
+    RLMSection<NSString *, StringObject *> *section = sr[0];
     dispatch_queue_t notificationQueue = dispatch_queue_create("notificationQueue", DISPATCH_QUEUE_SERIAL);
 
     id token = [section addNotificationBlock:^(RLMSection *r, RLMSectionedResultsChange *c, NSError *e) {
@@ -938,8 +957,8 @@ static void ExpectChangePrimitive(id self,
     AggregateSetObject *setObj = [AggregateSetObject allObjectsInRealm:realm][0];
 
     void(^run)(id<RLMCollection> collection) = ^(id<RLMCollection> collection) {
-        RLMSectionedResults<AggregateObject *> *sr = [collection sectionedResultsUsingSortDescriptors:sortDescriptors
-                                                                                             keyBlock:^id<RLMValue>(AggregateObject *value) {
+        RLMSectionedResults<NSNumber *, AggregateObject *> *sr = [collection sectionedResultsUsingSortDescriptors:sortDescriptors
+                                                                                                         keyBlock:^id<RLMValue>(AggregateObject *value) {
             return @(value.intCol);
         }];
 
@@ -967,9 +986,9 @@ static void ExpectChangePrimitive(id self,
     RLMRealm *realm = self.realmWithTestPath;
     // Test creation from frozen RLMResults
     RLMResults<AllTypesObject *> *results = [[AllTypesObject allObjectsInRealm:realm] freeze];
-    RLMSectionedResults<AllTypesObject *> *sr = [results sectionedResultsSortedUsingKeyPath:@"objectCol.stringCol"
-                                                                                  ascending:YES
-                                                                                   keyBlock:^id<RLMValue>(AllTypesObject *value) {
+    RLMSectionedResults<NSString *, AllTypesObject *> *sr = [results sectionedResultsSortedUsingKeyPath:@"objectCol.stringCol"
+                                                                                              ascending:YES
+                                                                                               keyBlock:^id<RLMValue>(AllTypesObject *value) {
         return [value.objectCol.stringCol substringToIndex:1];
     }];
 
@@ -985,7 +1004,7 @@ static void ExpectChangePrimitive(id self,
     XCTAssertTrue(sr[0][0].isFrozen);
     XCTAssertTrue(sr.isFrozen);
 
-    RLMSectionedResults<AllTypesObject *> *thawed = [sr thaw];
+    RLMSectionedResults<NSString *, AllTypesObject *> *thawed = [sr thaw];
     XCTAssertNotNil(thawed);
     XCTAssertEqual(thawed.count, 4);
     XCTAssertEqual(thawed[0].count, 6);
@@ -1002,13 +1021,13 @@ static void ExpectChangePrimitive(id self,
     RLMRealm *realm = self.realmWithTestPath;
     // Test creation from frozen RLMResults
     RLMResults<AllTypesObject *> *results = [AllTypesObject allObjectsInRealm:realm];
-    RLMSectionedResults<AllTypesObject *> *sr = [results sectionedResultsSortedUsingKeyPath:@"objectCol.stringCol"
-                                                                                  ascending:YES
-                                                                                   keyBlock:^id<RLMValue>(AllTypesObject *value) {
+    RLMSectionedResults<NSString *, AllTypesObject *> *sr = [results sectionedResultsSortedUsingKeyPath:@"objectCol.stringCol"
+                                                                                              ascending:YES
+                                                                                               keyBlock:^id<RLMValue>(AllTypesObject *value) {
         return [value.objectCol.stringCol substringToIndex:1];
     }];
 
-    RLMSectionedResults<AllTypesObject *> *frozen = [sr freeze];
+    RLMSectionedResults<NSString *, AllTypesObject *> *frozen = [sr freeze];
     XCTAssertEqual(frozen, [frozen freeze]); // should return self
     [self createObjects];
 
@@ -1022,7 +1041,7 @@ static void ExpectChangePrimitive(id self,
     XCTAssertTrue(frozen[0][0].isFrozen);
     XCTAssertTrue(frozen.isFrozen);
 
-    RLMSectionedResults<AllTypesObject *> *thawed = [frozen thaw];
+    RLMSectionedResults<NSString *, AllTypesObject *> *thawed = [frozen thaw];
     XCTAssertEqual(thawed, [thawed thaw]); // should return self
     XCTAssertNotNil(thawed);
     XCTAssertEqual(thawed.count, 4);
@@ -1040,13 +1059,13 @@ static void ExpectChangePrimitive(id self,
     RLMRealm *realm = self.realmWithTestPath;
     // Test creation from frozen RLMResults
     RLMResults<AllTypesObject *> *results = [AllTypesObject allObjectsInRealm:realm];
-    RLMSectionedResults<AllTypesObject *> *sr = [results sectionedResultsSortedUsingKeyPath:@"objectCol.stringCol"
-                                                                                  ascending:YES
-                                                                                   keyBlock:^id<RLMValue>(AllTypesObject *value) {
+    RLMSectionedResults<NSString *, AllTypesObject *> *sr = [results sectionedResultsSortedUsingKeyPath:@"objectCol.stringCol"
+                                                                                              ascending:YES
+                                                                                               keyBlock:^id<RLMValue>(AllTypesObject *value) {
         return [value.objectCol.stringCol substringToIndex:1];
     }];
 
-    RLMSection<AllTypesObject *> *frozen = [sr[0] freeze];
+    RLMSection<NSString *, AllTypesObject *> *frozen = [sr[0] freeze];
     XCTAssertEqual(frozen, [frozen freeze]); // should return self
     [self createObjects];
 
@@ -1055,7 +1074,7 @@ static void ExpectChangePrimitive(id self,
     XCTAssertTrue(frozen[0].isFrozen);
     XCTAssertTrue(frozen.isFrozen);
 
-    RLMSection<AllTypesObject *> *thawed = [frozen thaw];
+    RLMSection<NSString *, AllTypesObject *> *thawed = [frozen thaw];
     XCTAssertEqual(thawed, [thawed thaw]); // should return self
     XCTAssertNotNil(thawed);
     XCTAssertEqual(thawed.count, 6);
@@ -1071,9 +1090,9 @@ static void ExpectChangePrimitive(id self,
     }];
 
     MixedObject *obj = [MixedObject allObjectsInRealm:realm][0];
-    RLMSectionedResults<MixedObject *> *sr = [obj.anyArray sectionedResultsSortedUsingKeyPath:@"self"
-                                                                                    ascending:YES
-                                                                                     keyBlock:^id<RLMValue>(id<RLMValue> value) {
+    RLMSectionedResults<NSNumber *, MixedObject *> *sr = [obj.anyArray sectionedResultsSortedUsingKeyPath:@"self"
+                                                                                                ascending:YES
+                                                                                                 keyBlock:^id<RLMValue>(id<RLMValue> value) {
         return @(((NSNumber *)value).intValue % 2);
     }];
 
@@ -1119,9 +1138,9 @@ static void ExpectChangePrimitive(id self,
     }];
 
     AllPrimitiveSets *obj = [AllPrimitiveSets allObjectsInRealm:realm][0];
-    RLMSectionedResults<AllPrimitiveSets *> *sr = [obj.intObj sectionedResultsSortedUsingKeyPath:@"self"
-                                                                                       ascending:YES
-                                                                                        keyBlock:^id<RLMValue>(id<RLMValue> value) {
+    RLMSectionedResults<NSNumber *, AllPrimitiveSets *> *sr = [obj.intObj sectionedResultsSortedUsingKeyPath:@"self"
+                                                                                                   ascending:YES
+                                                                                                    keyBlock:^id<RLMValue>(id<RLMValue> value) {
         return @(((NSNumber *)value).intValue % 2);
     }];
 
@@ -1161,9 +1180,9 @@ static void ExpectChangePrimitive(id self,
     // Test creation from frozen RLMResults
     RLMResults<AllTypesObject *> *results = [AllTypesObject allObjectsInRealm:realm];
     __block BOOL isMainQueue = NO;
-    RLMSectionedResults<AllTypesObject *> *sr = [results sectionedResultsSortedUsingKeyPath:@"objectCol.stringCol"
-                                                                                  ascending:YES
-                                                                                   keyBlock:^id<RLMValue>(AllTypesObject *value) {
+    RLMSectionedResults<NSString *, AllTypesObject *> *sr = [results sectionedResultsSortedUsingKeyPath:@"objectCol.stringCol"
+                                                                                              ascending:YES
+                                                                                               keyBlock:^id<RLMValue>(AllTypesObject *value) {
         isMainQueue = [NSThread isMainThread];
         return [value.objectCol.stringCol substringToIndex:1];
     }];
@@ -1171,7 +1190,7 @@ static void ExpectChangePrimitive(id self,
     XCTAssertEqual(sr.count, 4);
     XCTAssertTrue(isMainQueue);
 
-    __block RLMThreadSafeReference<RLMSectionedResults<AllTypesObject *> *> *tsr = [RLMThreadSafeReference referenceWithThreadConfined:sr];
+    __block RLMThreadSafeReference<RLMSectionedResults<NSString *, AllTypesObject *> *> *tsr = [RLMThreadSafeReference referenceWithThreadConfined:sr];
 
     dispatch_queue_t q = dispatch_queue_create("sectioned-results", DISPATCH_QUEUE_SERIAL);
     __block BOOL didRun = NO;
@@ -1179,7 +1198,7 @@ static void ExpectChangePrimitive(id self,
         RLMRealmConfiguration *config = [[RLMRealmConfiguration alloc] init];
         config.fileURL = RLMTestRealmURL();
         RLMRealm *r = [RLMRealm realmWithConfiguration:config queue:q error:nil];
-        RLMSectionedResults<AllTypesObject *> *tsrSectionedResults = [r resolveThreadSafeReference:tsr];
+        RLMSectionedResults<NSString *, AllTypesObject *> *tsrSectionedResults = [r resolveThreadSafeReference:tsr];
         XCTAssertEqual(tsrSectionedResults.count, 4);
         didRun = YES;
     });
@@ -1195,9 +1214,9 @@ static void ExpectChangePrimitive(id self,
     // Test creation from frozen RLMResults
     RLMResults<AllTypesObject *> *results = [AllTypesObject allObjectsInRealm:realm];
     __block BOOL isMainQueue = NO;
-    RLMSectionedResults<AllTypesObject *> *sr = [results sectionedResultsSortedUsingKeyPath:@"objectCol.stringCol"
-                                                                                  ascending:YES
-                                                                                   keyBlock:^id<RLMValue>(AllTypesObject *value) {
+    RLMSectionedResults<NSString *, AllTypesObject *> *sr = [results sectionedResultsSortedUsingKeyPath:@"objectCol.stringCol"
+                                                                                              ascending:YES
+                                                                                               keyBlock:^id<RLMValue>(AllTypesObject *value) {
         isMainQueue = [NSThread isMainThread];
         return [value.objectCol.stringCol substringToIndex:1];
     }];
@@ -1206,7 +1225,7 @@ static void ExpectChangePrimitive(id self,
     XCTAssertEqual(section.count, 3);
     XCTAssertTrue(isMainQueue);
 
-    __block RLMThreadSafeReference<RLMSection<AllTypesObject *> *> *tsr = [RLMThreadSafeReference referenceWithThreadConfined:section];
+    __block RLMThreadSafeReference<RLMSection<NSString *, AllTypesObject *> *> *tsr = [RLMThreadSafeReference referenceWithThreadConfined:section];
 
     dispatch_queue_t q = dispatch_queue_create("sectioned-results", DISPATCH_QUEUE_SERIAL);
     __block BOOL didRun = NO;
@@ -1214,7 +1233,7 @@ static void ExpectChangePrimitive(id self,
         RLMRealmConfiguration *config = [[RLMRealmConfiguration alloc] init];
         config.fileURL = RLMTestRealmURL();
         RLMRealm *r = [RLMRealm realmWithConfiguration:config queue:q error:nil];
-        RLMSection<AllTypesObject *> *tsrSection = [r resolveThreadSafeReference:tsr];
+        RLMSection<NSString *, AllTypesObject *> *tsrSection = [r resolveThreadSafeReference:tsr];
         XCTAssertEqual(tsrSection.count, 3);
         didRun = YES;
     });

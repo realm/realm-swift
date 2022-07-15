@@ -2313,16 +2313,16 @@ private class CombineSectionedResultsPublisherTests<Collection: RealmCollection>
     }
 
     func checkChangeset<SectionedResults: RealmSectionedResult>(_ change: RealmSectionedResultsChange<SectionedResults>, insertions: [IndexPath] = [],
-                                                                 deletions: [IndexPath] = [],
-                                                                 frozen: Bool = false) {
+                                                                deletions: [IndexPath] = [],
+                                                                frozen: Bool = false) {
         switch change {
         case .initial(let collection):
             XCTAssertEqual(collection.isFrozen, frozen)
-        case .update(let collection, deletions: let _deletions, insertions: let _insertions,
+        case .update(let collection, deletions: let del, insertions: let ins,
                      modifications: let modifications, _, _):
             XCTAssertEqual(collection.isFrozen, frozen)
-            XCTAssertEqual(_insertions, insertions)
-            XCTAssertEqual(_deletions, deletions)
+            XCTAssertEqual(ins, insertions)
+            XCTAssertEqual(del, deletions)
             XCTAssertEqual(modifications, [])
         case .error(let error):
             XCTFail("Unexpected error \(error)")

@@ -134,10 +134,14 @@ extension RealmSectionedResultImpl {
 
 public struct SectionedResults<Key: _Persistable & Hashable, T: RealmCollectionValue>: RealmSectionedResultImpl {
     /// :nodoc:
-    internal var collection: RLMSectionedResults<AnyObject>
+    internal var collection: RLMSectionedResults<RLMValue, RLMValue>
     /// :nodoc:
-    internal init(rlmSectionedResult: RLMSectionedResults<AnyObject>) {
+    internal init(rlmSectionedResult: RLMSectionedResults<RLMValue, RLMValue>) {
         self.collection = rlmSectionedResult
+    }
+
+    public var allKeys: [Key] {
+        collection.allKeys.map { Key._rlmFromObjc($0)! }
     }
 
     /// The total number of sections in this sectioned results collection.
@@ -541,9 +545,9 @@ public struct SectionedResults<Key: _Persistable & Hashable, T: RealmCollectionV
 
 public struct ResultsSection<Key: _Persistable & Hashable, T: RealmCollectionValue>: RealmSectionedResultImpl, Identifiable {
     /// :nodoc:
-    internal var collection: RLMSection<AnyObject>
+    internal var collection: RLMSection<RLMValue, RLMValue>
     /// :nodoc:
-    internal init(rlmSectionedResult: RLMSection<AnyObject>) {
+    internal init(rlmSectionedResult: RLMSection<RLMValue, RLMValue>) {
         self.collection = rlmSectionedResult
     }
 
@@ -997,14 +1001,14 @@ public struct ResultsSection<Key: _Persistable & Hashable, T: RealmCollectionVal
 @frozen public struct RLMSectionedResultsIterator<Key: _Persistable & Hashable, Element: RealmCollectionValue>: IteratorProtocol {
     private var generatorBase: NSFastEnumerationIterator
 
-    init(collection: RLMSectionedResults<AnyObject>) {
+    init(collection: RLMSectionedResults<RLMValue, RLMValue>) {
         generatorBase = NSFastEnumerationIterator(collection)
     }
 
     /// Advance to the next element and return it, or `nil` if no next element exists.
     public mutating func next() -> ResultsSection<Key, Element>? {
         guard let next = generatorBase.next() else { return nil }
-        return ResultsSection<Key, Element>(rlmSectionedResult: next as! RLMSection<AnyObject>)
+        return ResultsSection<Key, Element>(rlmSectionedResult: next as! RLMSection<RLMValue, RLMValue>)
     }
 }
 
@@ -1014,7 +1018,7 @@ public struct ResultsSection<Key: _Persistable & Hashable, T: RealmCollectionVal
 @frozen public struct RLMSectionIterator<Element: RealmCollectionValue>: IteratorProtocol {
     private var generatorBase: NSFastEnumerationIterator
 
-    init(collection: RLMSection<AnyObject>) {
+    init(collection: RLMSection<RLMValue, RLMValue>) {
         generatorBase = NSFastEnumerationIterator(collection)
     }
 

@@ -153,7 +153,7 @@ extension RealmCollectionImpl {
             throwRealmException("There must be at least one SortDescriptor when using SectionedResults.")
         }
         let sectionedResults = collection.sectionedResults(using: sortDescriptors.map(ObjectiveCSupport.convert)) { value in
-            return keyBlock(Element._rlmFromObjc(value)!)._rlmObjcValue as! RLMValue
+            return keyBlock(Element._rlmFromObjc(value)!)._rlmObjcValue as? RLMValue
         }
 
         return SectionedResults(rlmSectionedResult: sectionedResults)

@@ -640,8 +640,7 @@ extension Projection: _ObservedResultsValue { }
                 sortDescriptors.append(.init(keyPath: keyPathString, ascending: true))
             }
 
-            sectionedResults = value.sectioned(sortDescriptors: sortDescriptors,
-                                               { (str: ResultType) in
+            sectionedResults = value.sectioned(sortDescriptors: sortDescriptors, { (str: ResultType) in
                 str[keyPath: self.keyPath]
             })
 

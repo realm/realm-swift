@@ -366,42 +366,23 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
     return self;
 }
 
+- (NSArray *)allKeys {
+    return translateRLMResultsErrors([&] {
+        NSUInteger count = [self count];
+        NSMutableArray *arr = [NSMutableArray arrayWithCapacity:count];
+        for (NSUInteger i = 0; i < count; i++) {
+            [arr addObject:RLMMixedToObjc(_sectionedResults[i].key())];
+        }
+        return arr;
+    });
+}
+
 - (RLMSectionedResultsEnumerator *)fastEnumerator {
     return [[RLMSectionedResultsEnumerator alloc] initWithSectionedResults:self];
 }
 
 - (RLMRealm *)realm {
     return _realm;
-}
-
-- (instancetype)resolveInRealm:(RLMRealm *)realm {
-     return translateRLMResultsErrors([&] {
-        if (realm.isFrozen) {
-            return [[RLMSectionedResults alloc] initWithSectionedResults:_sectionedResults.freeze(realm->_realm)
-                                                              objectInfo:_info->resolve(realm)
-                                                                keyBlock:_keyBlock];
-        } else {
-            auto sr = _sectionedResults.freeze(realm->_realm);
-            sr.reset_section_callback(SectionedResultsKeyProjection {&_info->resolve(realm), _keyBlock});
-            return [[RLMSectionedResults alloc] initWithSectionedResults:std::move(sr)
-                                                              objectInfo:_info->resolve(realm)
-                                                                keyBlock:_keyBlock];
-        }
-    });
-}
-
-- (instancetype)freeze {
-    if (self.frozen) {
-        return self;
-    }
-    return [self resolveInRealm:_realm.freeze];
-}
-
-- (instancetype)thaw {
-    if (!self.frozen) {
-        return self;
-    }
-    return [self resolveInRealm:_realm.thaw];
 }
 
 - (NSUInteger)count {
@@ -452,6 +433,37 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
 - (RLMClassInfo *)objectInfo {
     return _info;
 }
+
+- (instancetype)resolveInRealm:(RLMRealm *)realm {
+     return translateRLMResultsErrors([&] {
+        if (realm.isFrozen) {
+            return [[RLMSectionedResults alloc] initWithSectionedResults:_sectionedResults.freeze(realm->_realm)
+                                                              objectInfo:_info->resolve(realm)
+                                                                keyBlock:_keyBlock];
+        } else {
+            auto sr = _sectionedResults.freeze(realm->_realm);
+            sr.reset_section_callback(SectionedResultsKeyProjection {&_info->resolve(realm), _keyBlock});
+            return [[RLMSectionedResults alloc] initWithSectionedResults:std::move(sr)
+                                                              objectInfo:_info->resolve(realm)
+                                                                keyBlock:_keyBlock];
+        }
+    });
+}
+
+- (instancetype)freeze {
+    if (self.frozen) {
+        return self;
+    }
+    return [self resolveInRealm:_realm.freeze];
+}
+
+- (instancetype)thaw {
+    if (!self.frozen) {
+        return self;
+    }
+    return [self resolveInRealm:_realm.thaw];
+}
+
 
 #pragma mark - Thread Confined Protocol Conformance
 

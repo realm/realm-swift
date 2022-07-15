@@ -20,9 +20,15 @@ import UIKit
 import RealmSwift
 
 class DemoObject: Object {
-    @Persisted var title: String
+    @Persisted var phoneNumber: String
     @Persisted var date: Date
-    @Persisted var sectionTitle: String
+    @Persisted var contactName: String
+    var firstLetter: String {
+        guard let char = contactName.first else {
+            return ""
+        }
+        return String(char)
+    }
 }
 
 class Cell: UITableViewCell {
@@ -38,21 +44,38 @@ class Cell: UITableViewCell {
 class TableViewController: UITableViewController {
     var notificationToken: NotificationToken?
     var realm: Realm!
-    var sectionedResults: SectionedResults<DemoObject, String>!
+    var sectionedResults: SectionedResults<String, DemoObject>!
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
         setupUI()
         realm = try! Realm()
+        sectionedResults = realm.objects(DemoObject.self)
+            .sectioned(by: \.firstLetter, ascending: true)
 
         // Set realm notification block
-        notificationToken = realm.observe { [unowned self] _, _ in
-            self.tableView.reloadData()
+        notificationToken = sectionedResults.observe { change in
+            switch change {
+            case .initial:
+                break
+            case let .update(_,
+                             deletions: deletions,
+                             insertions: insertions,
+                             modifications: modifications,
+                             sectionsToInsert: sectionsToInsert,
+                             sectionsToDelete: sectionsToDelete):
+                self.tableView.performBatchUpdates {
+                    self.tableView.deleteRows(at: deletions, with: .automatic)
+                    self.tableView.insertRows(at: insertions, with: .automatic)
+                    self.tableView.reloadRows(at: modifications, with: .automatic)
+                    self.tableView.insertSections(sectionsToInsert, with: .automatic)
+                    self.tableView.deleteSections(sectionsToDelete, with: .automatic)
+                }
+            case .error:
+                break
+            }
         }
-        sectionedResults = realm.objects(DemoObject.self)
-            .sorted(by: \.date, ascending: true)
-            .sectioned(by: \DemoObject.sectionTitle, ascending: true)
         tableView.reloadData()
     }
 
@@ -72,6 +95,10 @@ class TableViewController: UITableViewController {
         return sectionedResults.count
     }
 
+    override func sectionIndexTitles(for tableView: UITableView) -> [String]? {
+        return sectionedResults.allKeys
+    }
+
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         return sectionedResults[section].key
     }
@@ -84,7 +111,7 @@ class TableViewController: UITableViewController {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! Cell
 
         let object = sectionedResults[indexPath]
-        cell.textLabel?.text = object.title
+        cell.textLabel?.text = "\(object.contactName): \(object.phoneNumber)"
         cell.detailTextLabel?.text = object.date.description
 
         return cell
@@ -109,7 +136,7 @@ class TableViewController: UITableViewController {
                 realm.beginWrite()
                 for _ in 0..<5 {
                     // Add row via dictionary. Order is ignored.
-                    realm.create(DemoObject.self, value: ["title": randomTitle(), "date": NSDate(), "sectionTitle": randomSectionTitle()])
+                    realm.create(DemoObject.self, value: ["contactName": randomName(), "date": NSDate(), "phoneNumber": randomPhoneNumber()])
                 }
                 try! realm.commitWrite()
             }
@@ -118,7 +145,7 @@ class TableViewController: UITableViewController {
 
     @objc func add() {
         try! realm.write {
-            realm.create(DemoObject.self, value: [randomTitle(), NSDate(), randomSectionTitle()])
+            realm.create(DemoObject.self, value: ["contactName": randomName(), "date": NSDate(), "phoneNumber": randomPhoneNumber()])
         }
     }
 }
@@ -126,10 +153,11 @@ class TableViewController: UITableViewController {
 // Helpers
 
 
-func randomTitle() -> String {
-    return "Title \(Int.random(in: 0..<100))"
+func randomPhoneNumber() -> String {
+
+    return "555-55\(Int.random(in: 0...9))5-55\(Int.random(in: 0...9))"
 }
 
-func randomSectionTitle() -> String {
-    return sectionTitles[Int.random(in: 0..<sectionTitles.count)]
+func randomName() -> String {
+    return ["John", "Jane", "Mary", "Eric", "Sarah", "Sally"].randomElement()!
 }

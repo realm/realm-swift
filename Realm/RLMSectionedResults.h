@@ -360,9 +360,9 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /// An RLMSection contains the objects which below to a specified section key.
-@interface RLMSection<RLMObjectType> : NSObject<RLMSectionedResult>
+@interface RLMSection<RLMKeyType: id<RLMValue>, RLMObjectType> : NSObject<RLMSectionedResult>
 /// The value that represents the key in this section.
-@property (nonatomic, readonly) id<RLMValue> key;
+@property (nonatomic, readonly) RLMKeyType key;
 /// Returns the object for a given index in the section.
 - (RLMObjectType)objectAtIndexedSubscript:(NSUInteger)index;
 /// Returns the object for a given index in the section.
@@ -462,7 +462,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @return A token which must be held for as long as you want updates to be delivered.
  */
-- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMSection<RLMObjectType> *, RLMSectionedResultsChange *, NSError *))block __attribute__((warn_unused_result));
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMSection<RLMKeyType, RLMObjectType> *, RLMSectionedResultsChange *, NSError *))block __attribute__((warn_unused_result));
 /**
  Registers a block to be called each time the section changes.
 
@@ -524,7 +524,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @return A token which must be held for as long as you want updates to be delivered.
  */
-- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMSection<RLMObjectType> *, RLMSectionedResultsChange *, NSError *))block
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMSection<RLMKeyType, RLMObjectType> *, RLMSectionedResultsChange *, NSError *))block
                                          queue:(dispatch_queue_t)queue __attribute__((warn_unused_result));
 /**
  Registers a block to be called each time the section changes.
@@ -588,7 +588,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @return A token which must be held for as long as you want updates to be delivered.
  */
-- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMSection<RLMObjectType> *, RLMSectionedResultsChange *, NSError *))block
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMSection<RLMKeyType, RLMObjectType> *, RLMSectionedResultsChange *, NSError *))block
                                       keyPaths:(NSArray<NSString *> *)keyPaths __attribute__((warn_unused_result));
 /**
  Registers a block to be called each time the section changes.
@@ -653,18 +653,20 @@ NS_ASSUME_NONNULL_BEGIN
 
  @return A token which must be held for as long as you want updates to be delivered.
  */
-- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMSection<RLMObjectType> *, RLMSectionedResultsChange *, NSError *))block
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMSection<RLMKeyType, RLMObjectType> *, RLMSectionedResultsChange *, NSError *))block
                                       keyPaths:(nullable NSArray<NSString *> *)keyPaths
                                          queue:(nullable dispatch_queue_t)queue __attribute__((warn_unused_result));
 @end
 
-@interface RLMSectionedResults<RLMObjectType> : NSObject<RLMSectionedResult>
+@interface RLMSectionedResults<RLMKeyType: id<RLMValue>, RLMObjectType: id<RLMValue>> : NSObject<RLMSectionedResult>
+/// An array of all keys in the sectioned results collection.
+@property (nonatomic) NSArray<RLMKeyType> *allKeys;
 /// The total amount of sections in this collection.
 @property (nonatomic, readonly, assign) NSUInteger count;
 /// Returns the section at a given index.
-- (RLMSection<RLMObjectType> *)objectAtIndexedSubscript:(NSUInteger)index;
+- (RLMSection<RLMKeyType, RLMObjectType> *)objectAtIndexedSubscript:(NSUInteger)index;
 /// Returns the section at a given index.
-- (RLMSection<RLMObjectType> *)objectAtIndex:(NSUInteger)index;
+- (RLMSection<RLMKeyType, RLMObjectType> *)objectAtIndex:(NSUInteger)index;
 
 #pragma mark - Freeze
 
@@ -758,7 +760,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @return A token which must be held for as long as you want updates to be delivered.
  */
-- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMSectionedResults<RLMObjectType> *, RLMSectionedResultsChange *, NSError *))block __attribute__((warn_unused_result));
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMSectionedResults<RLMKeyType, RLMObjectType> *, RLMSectionedResultsChange *, NSError *))block __attribute__((warn_unused_result));
 /**
  Registers a block to be called each time the sectioned results collection changes.
 
@@ -818,7 +820,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @return A token which must be held for as long as you want updates to be delivered.
  */
-- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMSectionedResults<RLMObjectType> *, RLMSectionedResultsChange *, NSError *))block
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMSectionedResults<RLMKeyType, RLMObjectType> *, RLMSectionedResultsChange *, NSError *))block
                                          queue:(dispatch_queue_t)queue __attribute__((warn_unused_result));
 /**
  Registers a block to be called each time the sectioned results collection changes.
@@ -880,7 +882,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @return A token which must be held for as long as you want updates to be delivered.
  */
-- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMSectionedResults<RLMObjectType> *, RLMSectionedResultsChange *, NSError *))block
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMSectionedResults<RLMKeyType, RLMObjectType> *, RLMSectionedResultsChange *, NSError *))block
                                       keyPaths:(NSArray<NSString *> *)keyPaths __attribute__((warn_unused_result));
 /**
  Registers a block to be called each time the sectioned results collection changes.
@@ -943,7 +945,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @return A token which must be held for as long as you want updates to be delivered.
  */
-- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMSectionedResults<RLMObjectType> *, RLMSectionedResultsChange *, NSError *))block
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMSectionedResults<RLMKeyType, RLMObjectType> *, RLMSectionedResultsChange *, NSError *))block
                                       keyPaths:(nullable NSArray<NSString *> *)keyPaths
                                          queue:(nullable dispatch_queue_t)queue __attribute__((warn_unused_result));
 @end

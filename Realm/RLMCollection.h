@@ -26,7 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol RLMValue;
 @class RLMRealm, RLMResults, RLMSortDescriptor, RLMNotificationToken, RLMCollectionChange, RLMSectionedResults;
 typedef RLM_CLOSED_ENUM(int32_t, RLMPropertyType);
-typedef id<RLMValue> _Nonnull(^RLMSectionedResultsKeyBlock)(id);
+typedef id<RLMValue> _Nullable(^RLMSectionedResultsKeyBlock)(id);
 
 /**
  A homogenous collection of Realm-managed objects. Examples of conforming types

@@ -349,6 +349,14 @@ class SectionedResultsTests: SectionedResultsTestsBase {
         assert(ascending: false, sectionCount: 3, sectionKeys: ["c", "b", "a"])
     }
 
+    func testAllKeys() {
+        createObjects()
+        let realm = try! Realm()
+        let results = realm.objects(ModernAllTypesObject.self)
+        let sectionedResults = results.sectioned(by: \.firstLetter, ascending: true)
+        XCTAssertEqual(sectionedResults.allKeys, ["a", "b", "c"])
+    }
+
     func testSubscript() {
         createObjects()
         let realm = try! Realm()
@@ -1169,8 +1177,8 @@ class SectionedResultsProjectionTests: SectionedResultsTestsBase {
 }
 
 protocol SectionedResultsTestData {
-    associatedtype Key: _Persistable & Hashable
-    associatedtype Element: RealmCollectionValue & _Persistable
+    associatedtype Key: _Persistable, Hashable
+    associatedtype Element: RealmCollectionValue, _Persistable
 
     static var values: [Element] { get }
     static var expectedSectionedValues: [Key: [Element]] { get }
@@ -1185,8 +1193,8 @@ protocol SectionedResultsTestData {
 }
 
 protocol OptionalSectionedResultsTestData {
-    associatedtype Key: _Persistable & Hashable
-    associatedtype Element: _RealmCollectionValueInsideOptional & _Persistable
+    associatedtype Key: _Persistable, Hashable
+    associatedtype Element: _RealmCollectionValueInsideOptional, _Persistable
     static var values: [Element] { get }
     static var expectedSectionedValuesOpt: [Key: [Element??]] { get }
     static func orderedKeysOpt(ascending: Bool) -> [Key]
@@ -1770,7 +1778,7 @@ struct SectionedResultsTestDataDecimal128: SectionedResultsTestData {
         return element.doubleValue.truncatingRemainder(dividingBy: 2.0) == 0 ? Decimal128(2.0) : Decimal128(1.0)
     }
 }
-
+// swiftlint:disable:next type_name
 struct SectionedResultsTestDataOptionalDecimal128: OptionalSectionedResultsTestData {
     static var values: [Decimal128] {
         [Decimal128(1.0),

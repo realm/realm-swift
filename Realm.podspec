@@ -40,6 +40,7 @@ Pod::Spec.new do |s|
                               'include/RLMRealmConfiguration.h',
                               'include/RLMResults.h',
                               'include/RLMSchema.h',
+                              'include/RLMSectionedResults.h',
                               'include/RLMSet.h',
                               'include/RLMSwiftCollectionBase.h',
                               'include/RLMSwiftValueStorage.h',

@@ -554,7 +554,7 @@
 		CFDBC4B628803C7200EE80E6 /* RLMSectionedResults.mm in Sources */ = {isa = PBXBuildFile; fileRef = CFDBC4B328803C7200EE80E6 /* RLMSectionedResults.mm */; };
 		CFDBC4B728803C7200EE80E6 /* RLMSectionedResults.h in Headers */ = {isa = PBXBuildFile; fileRef = CFDBC4B428803C7200EE80E6 /* RLMSectionedResults.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CFDBC4B828803C7700EE80E6 /* RLMSectionedResults.mm in Sources */ = {isa = PBXBuildFile; fileRef = CFDBC4B328803C7200EE80E6 /* RLMSectionedResults.mm */; };
-		CFDBC4BA28803C8200EE80E6 /* RLMSectionedResults.h in Headers */ = {isa = PBXBuildFile; fileRef = CFDBC4B428803C7200EE80E6 /* RLMSectionedResults.h */; };
+		CFDBC4BA28803C8200EE80E6 /* RLMSectionedResults.h in Headers */ = {isa = PBXBuildFile; fileRef = CFDBC4B428803C7200EE80E6 /* RLMSectionedResults.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CFDBC4C0288040E700EE80E6 /* SectionedResultsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFDBC4BE288040CD00EE80E6 /* SectionedResultsTests.swift */; };
 		CFE9CE31265554FB00BF96D6 /* MutableSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF986D8E25AE3C980039D287 /* MutableSet.swift */; };
 		CFE9CE3326555BBD00BF96D6 /* RealmKeyedCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFE9CE3226555BBD00BF96D6 /* RealmKeyedCollection.swift */; };
@@ -2037,7 +2037,6 @@
 				E8F992BE1F1401C100F634B5 /* RLMObjectBase_Private.h in Headers */,
 				3F4F3AD723F71C790048DB43 /* RLMObjectId.h in Headers */,
 				5D659EB51BE04556006515A0 /* RLMObjectSchema.h in Headers */,
-				CFDBC4B728803C7200EE80E6 /* RLMSectionedResults.h in Headers */,
 				5D659EB61BE04556006515A0 /* RLMObjectSchema_Private.h in Headers */,
 				5D659EB81BE04556006515A0 /* RLMObjectStore.h in Headers */,
 				5D659EBC1BE04556006515A0 /* RLMProperty.h in Headers */,
@@ -2045,6 +2044,7 @@
 				CF6E0486242A321200DB7F14 /* RLMProviderClient.h in Headers */,
 				6807E64A2487E8660096066F /* RLMPushClient.h in Headers */,
 				6807E64F2487F9210096066F /* RLMPushClient_Private.hpp in Headers */,
+				CFDBC4B728803C7200EE80E6 /* RLMSectionedResults.h in Headers */,
 				1AD397CF1F72FFC7002AA897 /* RLMRealm+Sync.h in Headers */,
 				5D659EBF1BE04556006515A0 /* RLMRealm.h in Headers */,
 				5D659EC01BE04556006515A0 /* RLMRealm_Dynamic.h in Headers */,
@@ -2090,6 +2090,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				AC4793152881E2FF004E60F6 /* RLMAsymmetricObject.h in Headers */,
+				CFDBC4BA28803C8200EE80E6 /* RLMSectionedResults.h in Headers */,
 				3F73BC971E3A879700FE80B6 /* NSError+RLMSync.h in Headers */,
 				5DD755A31BE056DE002800DA /* Realm.h in Headers */,
 				5DD755A51BE056DE002800DA /* RLMAccessor.h in Headers */,
@@ -2153,7 +2154,6 @@
 				1A7DE7071D38474F0029F0AE /* RLMSyncManager.h in Headers */,
 				1A7003111D5270FF00FD9EE3 /* RLMSyncSession.h in Headers */,
 				ACC6BEE62796EA78006C1728 /* RLMSyncSubscription.h in Headers */,
-				CFDBC4BA28803C8200EE80E6 /* RLMSectionedResults.h in Headers */,
 				ACC6BEE52796EA23006C1728 /* RLMSyncSubscription_Private.h in Headers */,
 				1A7DE70B1D3847670029F0AE /* RLMSyncUtil.h in Headers */,
 				E8C6EAF41DD66C0C00EC1A03 /* RLMSyncUtil_Private.h in Headers */,

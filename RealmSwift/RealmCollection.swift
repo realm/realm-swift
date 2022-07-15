@@ -1099,7 +1099,7 @@ public extension RealmCollection {
 
 extension RealmCollection {
     public func sectioned<Key: _Persistable, O: ObjectBase>(by keyPath: KeyPath<Element, Key>,
-                                                     ascending: Bool = true) -> SectionedResults<Key, Element> where Element: Projection<O> {
+                                                            ascending: Bool = true) -> SectionedResults<Key, Element> where Element: Projection<O> {
         let keyPathString = _name(for: keyPath)
         return sectioned(sortDescriptors: [.init(keyPath: keyPathString, ascending: ascending)], {
             return $0[keyPath: keyPath]
@@ -1107,7 +1107,7 @@ extension RealmCollection {
     }
 
     public func sectioned<Key: _Persistable, O: ObjectBase>(by keyPath: KeyPath<Element, Key>,
-                                                     sortDescriptors: [SortDescriptor]) -> SectionedResults<Key, Element> where Element: Projection<O> {
+                                                            sortDescriptors: [SortDescriptor]) -> SectionedResults<Key, Element> where Element: Projection<O> {
         guard let sortDescriptor = sortDescriptors.first else {
             throwRealmException("Can not section Results with empty sortDescriptor parameter.")
         }
@@ -1119,7 +1119,7 @@ extension RealmCollection {
     }
 
     public func sectioned<Key: _Persistable, O: ObjectBase>(by block: @escaping ((Element) -> Key),
-                                                     sortDescriptors: [SortDescriptor]) -> SectionedResults<Key, Element> where Element: Projection<O> {
+                                                            sortDescriptors: [SortDescriptor]) -> SectionedResults<Key, Element> where Element: Projection<O> {
         return sectioned(sortDescriptors: sortDescriptors, block)
     }
 }
