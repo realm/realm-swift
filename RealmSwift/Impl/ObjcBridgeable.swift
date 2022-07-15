@@ -193,8 +193,8 @@ extension SectionedResults: BuiltInObjcBridgeable {
     }
 }
 
-extension Section: BuiltInObjcBridgeable {
-    public static func _rlmFromObjc(_ value: Any, insideOptional: Bool) -> Section<Key, T>? {
+extension ResultsSection: BuiltInObjcBridgeable {
+    public static func _rlmFromObjc(_ value: Any, insideOptional: Bool) -> ResultsSection<Key, T>? {
         (value as? RLMSection<AnyObject>).map(Self.init(rlmSectionedResult:))
     }
     public var _rlmObjcValue: Any {

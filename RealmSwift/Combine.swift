@@ -760,7 +760,7 @@ extension SectionedResults: RealmSubscribable {
 }
 
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
-extension Section: RealmSubscribable {
+extension ResultsSection: RealmSubscribable {
     /// :nodoc:
     public func _observe<S>(_ keyPaths: [String]? = nil, on queue: DispatchQueue? = nil, _ subscriber: S)
         -> NotificationToken where S: Subscriber, S.Input == Self, S.Failure == Error {
@@ -785,7 +785,7 @@ extension Section: RealmSubscribable {
     /// A publisher that emits Void each time the collection changes.
     ///
     /// Despite the name, this actually emits *after* the collection has changed.
-    public var objectWillChange: RealmPublishers.WillChange<Section> {
+    public var objectWillChange: RealmPublishers.WillChange<ResultsSection> {
         RealmPublishers.WillChange(self)
     }
 

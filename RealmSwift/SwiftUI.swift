@@ -1969,6 +1969,303 @@ extension View {
             collection.searchText(text, on: keyPath)
         }
     }
+
+    /// Marks this view as searchable, which configures the display of a search field.
+    /// You can provide a collection and a key path to be filtered using the search
+    /// field string provided by the searchable component, this will result in the collection
+    /// querying for all items containing the search field string for the given key path.
+    ///
+    ///     @State var searchString: String
+    ///     @ObservedSectionedResults(Reminder.self) var reminders
+    ///
+    ///     List {
+    ///         ForEach(reminders) { reminderSection in
+    ///             Section(reminderSection.key) {
+    ///                 ForEach(reminderSection) { object in
+    ///                     ReminderRowView(reminder: object)
+    ///                 }
+    ///             }
+    ///         }
+    ///     }
+    ///     .searchable(text: $searchFilter,
+    ///                 collection: $reminders,
+    ///                 keyPath: \.name) {
+    ///         ForEach(reminders) { remindersFiltered in
+    ///             Text(remindersFiltered.name).searchCompletion(remindersFiltered.name)
+    ///         }
+    ///     }
+    ///
+    /**
+    - Note: See ``SwiftUI/View/searchable(text:placement:prompt)``
+            <https://developer.apple.com/documentation/swiftui/form/searchable(text:placement:prompt:)-6royb>
+            for more information on searchable view modifier.
+
+    - parameter text: The text to display and edit in the search field.
+    - parameter collection: The collection to be filtered.
+    - parameter keyPath: The key path to the property which will be used to filter
+                the collection, only key paths with `String` type are allowed.
+    - parameter placement: The preferred placement of the search field within the
+                containing view hierarchy.
+    - parameter prompt: A `Text` representing the prompt of the search field
+                which provides users with guidance on what to search for.
+     */
+    public func searchable<Key, T: ObjectBase>(text: Binding<String>, collection: ObservedSectionedResults<Key, T>, keyPath: KeyPath<T, String>,
+                                               placement: SearchFieldPlacement = .automatic, prompt: Text? = nil) -> some View {
+        filterCollection(collection, for: text.wrappedValue, on: keyPath)
+        return searchable(text: text, placement: placement, prompt: prompt)
+    }
+
+    /// Marks this view as searchable, which configures the display of a search field.
+    /// You can provide a collection and a key path to be filtered using the search
+    /// field string provided by the searchable component, this will result in the collection
+    /// querying for all items containing the search field string for the given key path.
+    ///
+    ///     @State var searchString: String
+    ///     @ObservedResults(Reminder.self) var reminders
+    ///
+    ///     List {
+    ///         ForEach(reminders) { reminderSection in
+    ///             Section(reminderSection.key) {
+    ///                 ForEach(reminderSection) { object in
+    ///                     ReminderRowView(reminder: object)
+    ///                 }
+    ///             }
+    ///         }
+    ///     }
+    ///     .searchable(text: $searchFilter,
+    ///                 collection: $reminders,
+    ///                 keyPath: \.name) {
+    ///         ForEach(reminders) { remindersFiltered in
+    ///             Text(remindersFiltered.name).searchCompletion(remindersFiltered.name)
+    ///         }
+    ///     }
+    ///
+    /**
+    - Note: See ``SwiftUI/View/searchable(text:placement:prompt)``
+            <https://developer.apple.com/documentation/swiftui/form/searchable(text:placement:prompt:)-2ed8t>
+            for more information on searchable view modifier.
+
+    - parameter text: The text to display and edit in the search field.
+    - parameter collection: The collection to be filtered.
+    - parameter keyPath: The key path to the property which will be used to filter
+                the collection.
+    - parameter placement: The preferred placement of the search field within the
+                containing view hierarchy.
+    - parameter prompt: The key for the localized prompt of the search field
+                which provides users with guidance on what to search for.
+     */
+    public func searchable<Key, T: ObjectBase>(text: Binding<String>, collection: ObservedSectionedResults<Key, T>,
+                                               keyPath: KeyPath<T, String>, placement: SearchFieldPlacement = .automatic,
+                                               prompt: LocalizedStringKey) -> some View {
+        filterCollection(collection, for: text.wrappedValue, on: keyPath)
+        return searchable(text: text,
+                          placement: placement,
+                          prompt: prompt)
+    }
+
+    /// Marks this view as searchable, which configures the display of a search field.
+    /// You can provide a collection and a key path to be filtered using the search
+    /// field string provided by the searchable component, this will result in the collection
+    /// querying for all items containing the search field string for the given key path.
+    ///
+    ///     @State var searchString: String
+    ///     @ObservedResults(Reminder.self) var reminders
+    ///
+    ///     List {
+    ///         ForEach(reminders) { reminderSection in
+    ///             Section(reminderSection.key) {
+    ///                 ForEach(reminderSection) { object in
+    ///                     ReminderRowView(reminder: object)
+    ///                 }
+    ///             }
+    ///         }
+    ///     }
+    ///     .searchable(text: $searchFilter,
+    ///                 collection: $reminders,
+    ///                 keyPath: \.name) {
+    ///         ForEach(reminders) { remindersFiltered in
+    ///             Text(remindersFiltered.name).searchCompletion(remindersFiltered.name)
+    ///         }
+    ///     }
+    ///
+    /**
+    - Note: See ``SwiftUI/View/searchable(text:placement:prompt)``
+            <https://developer.apple.com/documentation/swiftui/form/searchable(text:placement:prompt:)-58egp>
+            for more information on searchable view modifier.
+
+    - parameter text: The text to display and edit in the search field.
+    - parameter collection: The collection to be filtered.
+    - parameter keyPath: The key path to the property which will be used to filter
+                the collection.
+    - parameter placement: The preferred placement of the search field within the
+                containing view hierarchy.
+    - parameter prompt: A string representing the prompt of the search field
+                which provides users with guidance on what to search for.
+     */
+    public func searchable<Key, T: ObjectBase, S>(text: Binding<String>, collection: ObservedSectionedResults<Key, T>, keyPath: KeyPath<T, String>,
+                                                  placement: SearchFieldPlacement = .automatic, prompt: S) -> some View where S: StringProtocol {
+        filterCollection(collection, for: text.wrappedValue, on: keyPath)
+        return searchable(text: text, placement: placement, prompt: prompt)
+    }
+
+    /// Marks this view as searchable, which configures the display of a search field.
+    /// You can provide a collection and a key path to be filtered using the search
+    /// field string provided by the searchable component, this will result in the collection
+    /// querying for all items containing the search field string for the given key path.
+    ///
+    ///     @State var searchString: String
+    ///     @ObservedResults(Reminder.self) var reminders
+    ///
+    ///     List {
+    ///         ForEach(reminders) { reminderSection in
+    ///             Section(reminderSection.key) {
+    ///                 ForEach(reminderSection) { object in
+    ///                     ReminderRowView(reminder: object)
+    ///                 }
+    ///             }
+    ///         }
+    ///     }
+    ///     .searchable(text: $searchFilter,
+    ///                 collection: $reminders,
+    ///                 keyPath: \.name) {
+    ///         ForEach(reminders) { remindersFiltered in
+    ///             Text(remindersFiltered.name).searchCompletion(remindersFiltered.name)
+    ///         }
+    ///     }
+    ///
+    /**
+    - Note: See ``SwiftUI/View/searchable(text:placement:prompt:suggestions)``
+            <https://developer.apple.com/documentation/swiftui/form/searchable(text:placement:prompt:suggestions:)-94bdu>
+            for more information on searchable view modifier.
+
+    - parameter text: The text to display and edit in the search field.
+    - parameter collection: The collection to be filtered.
+    - parameter keyPath: The key path to the property which will be used to filter
+                the collection.
+    - parameter placement: The preferred placement of the search field within the
+                containing view hierarchy.
+    - parameter prompt: A `Text` representing the prompt of the search field
+                which provides users with guidance on what to search for.
+    - parameter suggestions: A view builder that produces content that
+                populates a list of suggestions.
+     */
+    public func searchable<Key, T: ObjectBase, S>(text: Binding<String>, collection: ObservedSectionedResults<Key, T>, keyPath: KeyPath<T, String>,
+                                                  placement: SearchFieldPlacement = .automatic, prompt: Text? = nil, @ViewBuilder suggestions: () -> S)
+    -> some View where S: View {
+        filterCollection(collection, for: text.wrappedValue, on: keyPath)
+        return searchable(text: text,
+                          placement: placement,
+                          prompt: prompt,
+                          suggestions: suggestions)
+    }
+
+    /// Marks this view as searchable, which configures the display of a search field.
+    /// You can provide a collection and a key path to be filtered using the search
+    /// field string provided by the searchable component, this will result in the collection
+    /// querying for all items containing the search field string for the given key path.
+    ///
+    ///     @State var searchString: String
+    ///     @ObservedResults(Reminder.self) var reminders
+    ///
+    ///     List {
+    ///         ForEach(reminders) { reminderSection in
+    ///             Section(reminderSection.key) {
+    ///                 ForEach(reminderSection) { object in
+    ///                     ReminderRowView(reminder: object)
+    ///                 }
+    ///             }
+    ///         }
+    ///     }
+    ///     .searchable(text: $searchFilter,
+    ///                 collection: $reminders,
+    ///                 keyPath: \.name) {
+    ///         ForEach(reminders) { remindersFiltered in
+    ///             Text(remindersFiltered.name).searchCompletion(remindersFiltered.name)
+    ///         }
+    ///     }
+    ///
+    /**
+    - Note: See ``SwiftUI/View/searchable(text:placement:prompt:suggestions)``
+            <https://developer.apple.com/documentation/swiftui/form/searchable(text:placement:prompt:suggestions:)-1mw1m>
+            for more information on searchable view modifier.
+
+    - parameter text: The text to display and edit in the search field.
+    - parameter collection: The collection to be filtered.
+    - parameter keyPath: The key path to the property which will be used to filter
+                the collection.
+    - parameter placement: The preferred placement of the search field within the
+                containing view hierarchy.
+    - parameter prompt: The key for the localized prompt of the search field
+                which provides users with guidance on what to search for.
+    - parameter suggestions: A view builder that produces content that
+                populates a list of suggestions.
+     */
+    public func searchable<Key, T: ObjectBase, S>(text: Binding<String>, collection: ObservedSectionedResults<Key, T>, keyPath: KeyPath<T, String>,
+                                                  placement: SearchFieldPlacement = .automatic, prompt: LocalizedStringKey, @ViewBuilder suggestions: () -> S)
+    -> some View where S: View {
+        filterCollection(collection, for: text.wrappedValue, on: keyPath)
+        return searchable(text: text,
+                          placement: placement,
+                          prompt: prompt,
+                          suggestions: suggestions)
+    }
+
+    /// Marks this view as searchable, which configures the display of a search field.
+    /// You can provide a collection and a key path to be filtered using the search
+    /// field string provided by the searchable component, this will result in the collection
+    /// querying for all items containing the search field string for the given key path.
+    ///
+    ///     @State var searchString: String
+    ///     @ObservedResults(Reminder.self) var reminders
+    ///
+    ///     List {
+    ///         ForEach(reminders) { reminderSection in
+    ///             Section(reminderSection.key) {
+    ///                 ForEach(reminderSection) { object in
+    ///                     ReminderRowView(reminder: object)
+    ///                 }
+    ///             }
+    ///         }
+    ///     }
+    ///     .searchable(text: $searchFilter,
+    ///                 collection: $reminders,
+    ///                 keyPath: \.name) {
+    ///         ForEach(reminders) { remindersFiltered in
+    ///             Text(remindersFiltered.name).searchCompletion(remindersFiltered.name)
+    ///         }
+    ///     }
+    ///
+    /**
+    - Note: See ``SwiftUI/View/searchable(text:placement:prompt:suggestions)``
+            <https://developer.apple.com/documentation/swiftui/form/searchable(text:placement:prompt:suggestions:)-6h6qo>
+            for more information on searchable view modifier.
+
+    - parameter text: The text to display and edit in the search field.
+    - parameter collection: The collection to be filtered.
+    - parameter keyPath: The key path to the property which will be used to filter
+                the collection.
+    - parameter placement: The preferred placement of the search field within the
+                containing view hierarchy.
+    - parameter prompt: A string representing the prompt of the search field
+                which provides users with guidance on what to search for.
+    - parameter suggestions: A view builder that produces content that
+                populates a list of suggestions.
+     */
+    public func searchable<Key, T: ObjectBase, V, S>(text: Binding<String>, collection: ObservedSectionedResults<Key, T>, keyPath: KeyPath<T, String>,
+                                                     placement: SearchFieldPlacement = .automatic, prompt: S, @ViewBuilder suggestions: () -> V)
+    -> some View where V: View, S: StringProtocol {
+        filterCollection(collection, for: text.wrappedValue, on: keyPath)
+        return searchable(text: text,
+                          placement: placement,
+                          prompt: prompt,
+                          suggestions: suggestions)
+    }
+
+    private func filterCollection<Key, T: ObjectBase>(_ collection: ObservedSectionedResults<Key, T>, for text: String, on keyPath: KeyPath<T, String>) {
+        DispatchQueue.main.async {
+            collection.searchText(text, on: keyPath)
+        }
+    }
 }
 #endif
 #else

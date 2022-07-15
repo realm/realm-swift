@@ -149,8 +149,8 @@ public struct SectionedResults<Key: _Persistable & Hashable, T: RealmCollectionV
      Returns the section at the given `index`.
      - parameter index: The index.
      */
-    public subscript(_ index: Int) -> Section<Key, T> {
-        return Section<Key, T>(rlmSectionedResult: collection[UInt(index)])
+    public subscript(_ index: Int) -> ResultsSection<Key, T> {
+        return ResultsSection<Key, T>(rlmSectionedResult: collection[UInt(index)])
     }
 
     /**
@@ -539,7 +539,7 @@ public struct SectionedResults<Key: _Persistable & Hashable, T: RealmCollectionV
     }
 }
 
-public struct Section<Key: _Persistable & Hashable, T: RealmCollectionValue>: RealmSectionedResultImpl {
+public struct ResultsSection<Key: _Persistable & Hashable, T: RealmCollectionValue>: RealmSectionedResultImpl, Identifiable {
     /// :nodoc:
     internal var collection: RLMSection<AnyObject>
     /// :nodoc:
@@ -554,6 +554,10 @@ public struct Section<Key: _Persistable & Hashable, T: RealmCollectionValue>: Re
 
     /// The key which represents this section.
     public var key: Key {
+        return Key._rlmFromObjc(collection.key)!
+    }
+    /// :nodoc:
+    public var id: Key {
         return Key._rlmFromObjc(collection.key)!
     }
 
@@ -934,7 +938,7 @@ public struct Section<Key: _Persistable & Hashable, T: RealmCollectionValue>: Re
     }
 
     /// :nodoc:
-    public static func == (lhs: Section<Key, T>, rhs: Section<Key, T>) -> Bool {
+    public static func == (lhs: ResultsSection<Key, T>, rhs: ResultsSection<Key, T>) -> Bool {
         return lhs.collection == rhs.collection
     }
 }
@@ -998,9 +1002,9 @@ public struct Section<Key: _Persistable & Hashable, T: RealmCollectionValue>: Re
     }
 
     /// Advance to the next element and return it, or `nil` if no next element exists.
-    public mutating func next() -> Section<Key, Element>? {
+    public mutating func next() -> ResultsSection<Key, Element>? {
         guard let next = generatorBase.next() else { return nil }
-        return Section<Key, Element>(rlmSectionedResult: next as! RLMSection<AnyObject>)
+        return ResultsSection<Key, Element>(rlmSectionedResult: next as! RLMSection<AnyObject>)
     }
 }
 
