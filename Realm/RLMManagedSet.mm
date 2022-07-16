@@ -516,14 +516,12 @@ static void ensureInWriteTransaction(NSString *message, RLMManagedSet *set, RLMM
                                                   ascending:(BOOL)ascending
                                                    keyBlock:(RLMSectionedResultsKeyBlock)keyBlock {
     return [[RLMSectionedResults alloc] initWithResults:[self sortedResultsUsingKeyPath:keyPath ascending:ascending]
-                                             objectInfo:*_objectInfo
                                                keyBlock:keyBlock];
 }
 
-- (RLMSectionedResults *)sectionedResultsUsingSortDescriptors:(NSArray<RLMSortDescriptor *> *)properties
+- (RLMSectionedResults *)sectionedResultsUsingSortDescriptors:(NSArray<RLMSortDescriptor *> *)sortDescriptors
                                                      keyBlock:(RLMSectionedResultsKeyBlock)keyBlock {
-    return [[RLMSectionedResults alloc] initWithResults:[self sortedResultsUsingDescriptors:properties]
-                                             objectInfo:*_objectInfo
+    return [[RLMSectionedResults alloc] initWithResults:[self sortedResultsUsingDescriptors:sortDescriptors]
                                                keyBlock:keyBlock];
 }
 

@@ -26,8 +26,6 @@
 #import "RLMResults_Private.hpp"
 #import "RLMThreadSafeReference_Private.hpp"
 
-#include <map>
-
 namespace {
 struct CollectionCallbackWrapper {
     void (^block)(id, RLMSectionedResultsChange *, NSError *);
@@ -152,7 +150,6 @@ static RLMNotificationToken *RLMAddNotificationBlock(RLMSectionedResults *collec
     }
     return indices;
 }
-
 
 /// Returns the index paths of the deletion indices in the given section.
 - (NSArray<NSIndexPath *> *)deletionsInSection:(NSUInteger)section {
@@ -354,10 +351,9 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
 }
 
 - (instancetype)initWithResults:(RLMResults *)results
-                     objectInfo:(RLMClassInfo&)objectInfo
                        keyBlock:(RLMSectionedResultsKeyBlock)keyBlock {
     if (self = [super init]) {
-        _info = &objectInfo;
+        _info = results.objectInfo;
         _realm = results.realm;
         _keyBlock = keyBlock;
         _results = results->_results;

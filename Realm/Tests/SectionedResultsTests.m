@@ -16,12 +16,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+#import "RLMSectionedResults.h"
 #import "RLMTestCase.h"
 
-#import "RLMSectionedResults.h"
-#import "RLMTestObjects.h"
-
-#import <Foundation/Foundation.h>
 
 @interface SectionedResultsTests : RLMTestCase
 @end
@@ -184,8 +181,9 @@
             return [(NSString *)value substringToIndex:1];
         case RLMPropertyTypeDate: {
             NSCalendar *calendar = [NSCalendar currentCalendar];
+            [calendar setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
             NSDateComponents *comp = [calendar components:NSCalendarUnitWeekday fromDate:(NSDate *)value];
-            return [NSNumber numberWithInt:(int)comp.weekday];
+            return [NSNumber numberWithInteger:(NSInteger)comp.weekday];
         }
         case RLMPropertyTypeDecimal128:
             switch ((int)((RLMDecimal128 *)value).doubleValue) {
@@ -199,11 +197,11 @@
                     XCTFail();
             }
         case RLMPropertyTypeUUID:
-            if ([(NSUUID *)value isEqualTo:[[NSUUID alloc] initWithUUIDString:@"00000000-0000-0000-0000-000000000000"]]) {
+            if ([(NSUUID *)value isEqual:[[NSUUID alloc] initWithUUIDString:@"00000000-0000-0000-0000-000000000000"]]) {
                 return @"a";
-            } else if ([(NSUUID *)value isEqualTo:[[NSUUID alloc] initWithUUIDString:@"137DECC8-B300-4954-A233-F89909F4FD89"]]) {
+            } else if ([(NSUUID *)value isEqual:[[NSUUID alloc] initWithUUIDString:@"137DECC8-B300-4954-A233-F89909F4FD89"]]) {
                 return @"b";
-            } else if ([(NSUUID *)value isEqualTo:[[NSUUID alloc] initWithUUIDString:@"b84e8912-a7c2-41cd-8385-86d200d7b31e"]]) {
+            } else if ([(NSUUID *)value isEqual:[[NSUUID alloc] initWithUUIDString:@"b84e8912-a7c2-41cd-8385-86d200d7b31e"]]) {
                 return @"c";
             }
         case RLMPropertyTypeAny:
@@ -333,7 +331,7 @@
                                                                                                keyBlock:^id<RLMValue>(id value) {
         id v = [value valueForKeyPath:@"objectIdCol"];
         sectionAlgoCount++;
-        return [((RLMObjectId *)v) isEqualTo:oid1] ? @"a" : @"b";
+        return [((RLMObjectId *)v) isEqual:oid1] ? @"a" : @"b";
     }];
 
     NSDictionary *values = @{@"a": oid1, @"b": oid2};
@@ -398,7 +396,7 @@
                                                                                                keyBlock:^id<RLMValue>(id value) {
         id v = [value valueForKeyPath:@"binaryCol"];
         sectionAlgoCount++;
-        return [((NSData *)v) isEqualTo:d1] ? @"a" : @"b";
+        return [((NSData *)v) isEqual:d1] ? @"a" : @"b";
     }];
 
     NSDictionary *values = @{@"a": d1, @"b": d2};

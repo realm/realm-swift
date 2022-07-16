@@ -554,6 +554,17 @@ public protocol RealmCollection: RealmCollectionBase, Equatable {
     */
     func thaw() -> Self?
 
+    /**
+     Sorts and sections this collection from a given array of sort descriptors, returning the result
+     as an instance of `SectionedResults`.
+
+     - parameter sortDescriptors: An array of `SortDescriptor`s to sort by. Note: the primary sort descriptor
+                                  must be responsible for determining the section key.
+     - parameter keyBlock: A callback which is invoked on each element in the Results collection.
+                           This callback is to return the section key for the element in the collection.
+
+     - returns: An instance of `SectionedResults`.
+     */
     func sectioned<Key: _Persistable>(sortDescriptors: [SortDescriptor],
                                       _ keyBlock: @escaping ((Element) -> Key)) -> SectionedResults<Key, Element>
 }
@@ -690,14 +701,34 @@ public extension RealmCollection where Element: ObjectBase {
         average(ofProperty: _name(for: keyPath))
     }
 
+    /**
+     Sorts and sections this collection from a given property key path, returning the result
+     as an instance of `SectionedResults`. For every unique value retrieved from the
+     keyPath a section key will be generated.
+
+     - parameter keyPath: The property key path to sort on.
+     - parameter ascending: The direction to sort in.
+
+     - returns: An instance of `SectionedResults`.
+     */
     func sectioned<Key: _Persistable>(by keyPath: KeyPath<Element, Key>,
                                       ascending: Bool = true) -> SectionedResults<Key, Element> where Element: ObjectBase {
-        let keyPathString = _name(for: keyPath)
-        return sectioned(sortDescriptors: [.init(keyPath: keyPathString, ascending: ascending)], {
+        return sectioned(sortDescriptors: [.init(keyPath: _name(for: keyPath), ascending: ascending)], {
             return $0[keyPath: keyPath]
         })
     }
 
+    /**
+     Sorts and sections this collection from a given property key path, returning the result
+     as an instance of `SectionedResults`. For every unique value retrieved from the
+     keyPath a section key will be generated.
+
+     - parameter keyPath: The property key path to sort on.
+     - parameter sortDescriptors: An array of `SortDescriptor`s to sort by. Note: the primary sort descriptor
+                                  must be responsible for determining the section key.
+
+     - returns: An instance of `SectionedResults`.
+     */
     func sectioned<Key: _Persistable>(by keyPath: KeyPath<Element, Key>,
                                       sortDescriptors: [SortDescriptor]) -> SectionedResults<Key, Element> where Element: ObjectBase {
         guard let sortDescriptor = sortDescriptors.first else {
@@ -710,6 +741,18 @@ public extension RealmCollection where Element: ObjectBase {
         return sectioned(sortDescriptors: sortDescriptors, { $0[keyPath: keyPath] })
     }
 
+    /**
+     Sorts and sections this collection from a given property key path, returning the result
+     as an instance of `SectionedResults`. For every unique value retrieved from the
+     block a section key will be generated.
+
+     - parameter block: A callback which is invoked on each element in the collection.
+                        This callback is to return the section key for the element in the collection.
+     - parameter sortDescriptors: An array of `SortDescriptor`s to sort by. Note: the primary sort descriptor
+                                  must be responsible for determining the section key.
+
+     - returns: An instance of `SectionedResults`.
+     */
     func sectioned<Key: _Persistable>(by block: @escaping ((Element) -> Key),
                                       sortDescriptors: [SortDescriptor]) -> SectionedResults<Key, Element> where Element: ObjectBase {
         return sectioned(sortDescriptors: sortDescriptors, block)
@@ -823,6 +866,18 @@ public extension RealmCollection where Element.PersistedType: SortableType {
 // MARK: - Sectioned Results on primitives
 
 public extension RealmCollection {
+    /**
+     Sorts and sections this collection from a given property key path, returning the result
+     as an instance of `SectionedResults`. For every unique value retrieved from the
+     block a section key will be generated.
+
+     - parameter block: A callback which is invoked on each element in the collection.
+                        This callback is to return the section key for the element in the collection.
+     - parameter ascending: The direction to sort in.
+
+
+     - returns: An instance of `SectionedResults`.
+     */
     func sectioned<Key: _Persistable>(by block: @escaping ((Element) -> Key),
                                       ascending: Bool = true) -> SectionedResults<Key, Element> {
         sectioned(sortDescriptors: [.init(keyPath: "self", ascending: ascending)], block)
@@ -1098,6 +1153,17 @@ public extension RealmCollection {
 }
 
 extension RealmCollection {
+
+    /**
+     Sorts and sections this collection from a given property key path, returning the result
+     as an instance of `SectionedResults`. For every unique value retrieved from the
+     keyPath a section key will be generated.
+
+     - parameter keyPath: The property key path to sort on.
+     - parameter ascending: The direction to sort in.
+
+     - returns: An instance of `SectionedResults`.
+     */
     public func sectioned<Key: _Persistable, O: ObjectBase>(by keyPath: KeyPath<Element, Key>,
                                                             ascending: Bool = true) -> SectionedResults<Key, Element> where Element: Projection<O> {
         let keyPathString = _name(for: keyPath)
@@ -1106,6 +1172,17 @@ extension RealmCollection {
         })
     }
 
+    /**
+     Sorts and sections this collection from a given property key path, returning the result
+     as an instance of `SectionedResults`. For every unique value retrieved from the
+     keyPath a section key will be generated.
+
+     - parameter keyPath: The property key path to sort on.
+     - parameter sortDescriptors: An array of `SortDescriptor`s to sort by. Note: the primary sort descriptor
+                                  must be responsible for determining the section key.
+
+     - returns: An instance of `SectionedResults`.
+     */
     public func sectioned<Key: _Persistable, O: ObjectBase>(by keyPath: KeyPath<Element, Key>,
                                                             sortDescriptors: [SortDescriptor]) -> SectionedResults<Key, Element> where Element: Projection<O> {
         guard let sortDescriptor = sortDescriptors.first else {
@@ -1118,6 +1195,17 @@ extension RealmCollection {
         return sectioned(sortDescriptors: sortDescriptors, { $0[keyPath: keyPath] })
     }
 
+    /**
+     Sorts and sections this collection from a given array of sort descriptors, returning the result
+     as an instance of `SectionedResults`.
+
+     - parameter block: A callback which is invoked on each element in the Results collection.
+                        This callback is to return the section key for the element in the collection.
+     - parameter sortDescriptors: An array of `SortDescriptor`s to sort by. Note: the primary sort descriptor
+                                  must be responsible for determining the section key.
+
+     - returns: An instance of `SectionedResults`.
+     */
     public func sectioned<Key: _Persistable, O: ObjectBase>(by block: @escaping ((Element) -> Key),
                                                             sortDescriptors: [SortDescriptor]) -> SectionedResults<Key, Element> where Element: Projection<O> {
         return sectioned(sortDescriptors: sortDescriptors, block)

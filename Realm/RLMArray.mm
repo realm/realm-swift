@@ -573,7 +573,7 @@ static void validateArrayBounds(__unsafe_unretained RLMArray *const ar,
     @throw RLMException(@"This method may only be called on RLMArray instances retrieved from an RLMRealm");
 }
 
-- (RLMSectionedResults *)sectionedResultsUsingSortDescriptors:(NSArray<RLMSortDescriptor *> *)properties
+- (RLMSectionedResults *)sectionedResultsUsingSortDescriptors:(NSArray<RLMSortDescriptor *> *)sortDescriptors
                                                      keyBlock:(RLMSectionedResultsKeyBlock)keyBlock {
     @throw RLMException(@"This method may only be called on RLMArray instances retrieved from an RLMRealm");
 }

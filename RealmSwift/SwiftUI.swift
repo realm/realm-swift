@@ -616,6 +616,9 @@ extension Projection: _ObservedResultsValue { }
 
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 @propertyWrapper public struct ObservedSectionedResults<Key: _Persistable & Hashable, ResultType>: DynamicProperty, BoundCollection where ResultType: _ObservedResultsValue & RealmFetchable & KeypathSortable & Identifiable {
+    public typealias Value = SectionedResults<Key, ResultType>
+    public typealias Element = ResultType
+
     private class Storage: ObservableStorage<Results<ResultType>> {
         var sectionedResults: SectionedResults<Key, ResultType>?
         var setupHasRun = false

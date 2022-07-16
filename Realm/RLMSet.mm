@@ -518,7 +518,7 @@ void RLMSetValidateMatchingObjectType(__unsafe_unretained RLMSet *const set,
     @throw RLMException(@"This method may only be called on RLMSet instances retrieved from an RLMRealm");
 }
 
-- (RLMSectionedResults *)sectionedResultsUsingSortDescriptors:(NSArray<RLMSortDescriptor *> *)properties
+- (RLMSectionedResults *)sectionedResultsUsingSortDescriptors:(NSArray<RLMSortDescriptor *> *)sortDescriptors
                                                      keyBlock:(RLMSectionedResultsKeyBlock)keyBlock {
     @throw RLMException(@"This method may only be called on RLMSet instances retrieved from an RLMRealm");
 }

@@ -42,6 +42,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (instancetype)resultsWithObjectInfo:(RLMClassInfo&)info results:(realm::Results&&)results;
 
 - (instancetype)subresultsWithResults:(realm::Results)results;
+- (RLMClassInfo *)objectInfo;
 @end
 
 NS_ASSUME_NONNULL_END

@@ -481,14 +481,12 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
                                                   ascending:(BOOL)ascending
                                                    keyBlock:(RLMSectionedResultsKeyBlock)keyBlock {
     return [[RLMSectionedResults alloc] initWithResults:[self sortedResultsUsingKeyPath:keyPath ascending:ascending]
-                                             objectInfo:*_info
                                                keyBlock:keyBlock];
 }
 
-- (RLMSectionedResults *)sectionedResultsUsingSortDescriptors:(NSArray<RLMSortDescriptor *> *)properties
+- (RLMSectionedResults *)sectionedResultsUsingSortDescriptors:(NSArray<RLMSortDescriptor *> *)sortDescriptors
                                                      keyBlock:(RLMSectionedResultsKeyBlock)keyBlock {
-    return [[RLMSectionedResults alloc] initWithResults:[self sortedResultsUsingDescriptors:properties]
-                                             objectInfo:*_info
+    return [[RLMSectionedResults alloc] initWithResults:[self sortedResultsUsingDescriptors:sortDescriptors]
                                                keyBlock:keyBlock];
 }
 

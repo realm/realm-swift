@@ -35,23 +35,29 @@ import Realm.Private
  ```
  */
 public func _name<T: ObjectBase>(for keyPath: PartialKeyPath<T>) -> String {
-    if let name = keyPath._kvcKeyPathString {
-        return name
-    }
-    let names = NSMutableArray()
-    let value = T.keyPathRecorder(with: names)[keyPath: keyPath]
-    if let collection = value as? PropertyNameConvertible,
-       let propertyInfo = collection.propertyInformation, propertyInfo.isLegacy {
-        names.add(propertyInfo.key)
-    }
-
-    if let storage = value as? RLMSwiftValueStorage {
-        names.add(RLMSwiftValueStorageGetPropertyName(storage))
-    }
-    return names.componentsJoined(by: ".")
+    return name(for: keyPath)
 }
 
+/**
+ Gets the components of a given key path as a string.
+
+ - warning: Objects that declare properties with the old `@objc dynamic` syntax are not fully supported
+ by this function, and it is recommened that you use `@Persisted` to declare your properties if you wish to use
+ this function to its full benefit.
+
+ Example:
+ ```
+ let name = PersonProjection._name(for: \PersonProjection.dogs[0].name) // "dogs.name"
+ // Note that the above KeyPath expression is only supported with properties declared
+ // with `@Persisted`.
+ let nested = ObjectBase._name(for: \Person.address.city.zip) // "address.city.zip"
+ ```
+ */
 public func _name<O: ObjectBase, T>(for keyPath: PartialKeyPath<T>) -> String where T: Projection<O> {
+    return name(for: keyPath)
+}
+
+private func name<T: KeypathRecorder>(for keyPath: PartialKeyPath<T>) -> String {
     if let name = keyPath._kvcKeyPathString {
         return name
     }
@@ -112,9 +118,8 @@ extension ObjectBase: KeypathRecorder {
     }
 }
 
-
 extension Projection: KeypathRecorder {
-    public static func keyPathRecorder(with lastAccessedNames: NSMutableArray) -> Self {
+    internal static func keyPathRecorder(with lastAccessedNames: NSMutableArray) -> Self {
         let obj = Self(projecting: PersistedType())
         obj.rootObject.lastAccessedNames = lastAccessedNames
         let objectSchema = ObjectSchema(RLMObjectBaseObjectSchema(obj.rootObject)!)

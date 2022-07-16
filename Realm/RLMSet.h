@@ -229,14 +229,14 @@ NS_ASSUME_NONNULL_BEGIN
  Sorts and sections this collection from a given array of sort descriptors, returning the result
  as an instance of `RLMSectionedResults`.
 
- @param properties  An array of `RLMSortDescriptor`s to sort by. Note: the primary sort descriptor
-                   will be responsible for determining the section key.
- @param keyBlock A callback which is invoked on each element in the Results collection.
-                This callback is to return the section key for the element in the collection.
+ @param sortDescriptors  An array of `RLMSortDescriptor`s to sort by. Note: the primary sort descriptor
+                        must be responsible for determining the section key.
+ @param keyBlock  A callback which is invoked on each element in the Results collection.
+                 This callback is to return the section key for the element in the collection.
 
  @return An instance of RLMSectionedResults.
  */
-- (RLMSectionedResults *)sectionedResultsUsingSortDescriptors:(NSArray<RLMSortDescriptor *> *)properties
+- (RLMSectionedResults *)sectionedResultsUsingSortDescriptors:(NSArray<RLMSortDescriptor *> *)sortDescriptors
                                                      keyBlock:(RLMSectionedResultsKeyBlock)keyBlock;
 
 

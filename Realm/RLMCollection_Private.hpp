@@ -127,8 +127,7 @@ static inline bool canAggregate(RLMPropertyType type, bool allowDate) {
             return false;
     }
 }
-
-static NSArray *toIndexPathArray(realm::IndexSet const& set, NSUInteger section) {
+static inline NSArray *toIndexPathArray(realm::IndexSet const& set, NSUInteger section) {
     NSMutableArray *ret = [NSMutableArray new];
     NSUInteger path[2] = {section, 0};
     for (auto index : set.as_indexes()) {

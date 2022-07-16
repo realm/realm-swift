@@ -21,7 +21,7 @@ import Realm
 
 /**
  `RealmSectionedResult` defines properties and methods which are common between
- `SectionedResults` and `Section`.
+ `SectionedResults` and `ResultSection`.
  */
 public protocol RealmSectionedResult: RandomAccessCollection, Equatable, ThreadConfined {
 
@@ -81,7 +81,7 @@ public protocol RealmSectionedResult: RandomAccessCollection, Equatable, ThreadC
 
 /**
  `RealmSectionedResultImpl` implements properties and methods which are common between
- `SectionedResults` and `Section`.
+ `SectionedResults` and `ResultSection`.
  */
 internal protocol RealmSectionedResultImpl: RealmSectionedResult {
     associatedtype Collection: RLMSectionedResult
@@ -98,19 +98,31 @@ extension RealmSectionedResultImpl {
     /// endIndex is not a valid argument to subscript, and is always reachable from startIndex by
     /// zero or more applications of successor().
     public var endIndex: Int { count }
-    /// :nodoc:
+    /// The Realm which manages the object.
     public var realm: Realm? {
         collection.realm.map(Realm.init)
     }
-    /// :nodoc:
+    /// Indicates if the collection can no longer be accessed.
     public var isInvalidated: Bool {
         collection.isInvalidated
     }
-    /// :nodoc:
+    /// Returns true if this collection is frozen
     public var isFrozen: Bool {
         collection.isFrozen
     }
-    /// :nodoc:
+    /**
+     Returns a frozen (immutable) snapshot of this collection.
+
+     The frozen copy is an immutable collection which contains the same data as this collection
+    currently contains, but will not update when writes are made to the containing Realm. Unlike
+    live collections, frozen collections can be accessed from any thread.
+
+     - warning: This method cannot be called during a write transaction, or when the containing
+    Realm is read-only.
+     - warning: Holding onto a frozen collection for an extended period while performing write
+     transaction on the Realm may result in the Realm file growing to large sizes. See
+     `Realm.Configuration.maximumNumberOfActiveVersions` for more information.
+    */
     public func freeze() -> Self {
         return Self(rlmSectionedResult: collection.freeze())
     }
@@ -140,6 +152,7 @@ public struct SectionedResults<Key: _Persistable & Hashable, T: RealmCollectionV
         self.collection = rlmSectionedResult
     }
 
+    /// An array of all keys in the sectioned results collection.
     public var allKeys: [Key] {
         collection.allKeys.map { Key._rlmFromObjc($0)! }
     }

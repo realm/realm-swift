@@ -504,7 +504,7 @@ static void changeDictionary(__unsafe_unretained RLMDictionary *const dictionary
     @throw RLMException(@"This method is not available on RLMDictionary.");
 }
 
-- (RLMSectionedResults *)sectionedResultsUsingSortDescriptors:(NSArray<RLMSortDescriptor *> *)properties
+- (RLMSectionedResults *)sectionedResultsUsingSortDescriptors:(NSArray<RLMSortDescriptor *> *)sortDescriptors
                                                      keyBlock:(RLMSectionedResultsKeyBlock)keyBlock {
     @throw RLMException(@"This method is not available on RLMDictionary.");
 }

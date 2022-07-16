@@ -1685,9 +1685,10 @@ struct SectionedResultsTestDataDate: SectionedResultsTestData {
     }
 
     static func sectionBlock(_ element: Date) -> Date {
-        let comp = Calendar(identifier: .gregorian).dateComponents([.month, .year], from: element)
-        let components = DateComponents(year: comp.year, month: comp.month, day: 0, hour: 1, minute: 0, second: 0)
-        return Calendar(identifier: .gregorian).date(from: components)!
+        var cal = Calendar(identifier: .gregorian)
+        cal.timeZone = TimeZone(secondsFromGMT: 0)!
+        let comps = cal.dateComponents([.month, .year], from: element)
+        return cal.date(from: DateComponents(year: comps.year, month: comps.month, day: 0, hour: 0, minute: 0, second: 0))!
     }
 }
 
@@ -1732,9 +1733,10 @@ struct SectionedResultsTestDataOptionalDate: OptionalSectionedResultsTestData {
         guard let date = element else {
             return nil
         }
-        let comp = Calendar(identifier: .gregorian).dateComponents([.month, .year], from: date)
-        let components = DateComponents(year: comp.year, month: comp.month, day: 0, hour: 1, minute: 0, second: 0)
-        return Calendar(identifier: .gregorian).date(from: components)!
+        var cal = Calendar(identifier: .gregorian)
+        cal.timeZone = TimeZone(secondsFromGMT: 0)!
+        let comps = cal.dateComponents([.month, .year], from: date)
+        return cal.date(from: DateComponents(year: comps.year, month: comps.month, day: 0, hour: 0, minute: 0, second: 0))!
     }
 }
 

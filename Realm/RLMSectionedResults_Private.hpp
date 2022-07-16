@@ -49,23 +49,16 @@ typedef id<RLMValue>_Nullable(^RLMSectionedResultsKeyBlock)(id);
     @public
     realm::SectionedResults _sectionedResults;
     RLMSectionedResultsKeyBlock _keyBlock;
-    // We need to hold a reference to the parent
-    // Results so we can obtain a ThreadSafeReference
+    // We need to hold an instance to the parent
+    // `Results` so we can obtain a ThreadSafeReference
     // for notifications.
     realm::Results _results;
 }
 
 - (instancetype)initWithResults:(RLMResults *)results
-                     objectInfo:(RLMClassInfo&)objectInfo
-                       keyBlock:(RLMSectionedResultsKeyBlock)keyBlock;
-
-- (instancetype)initWithResults:(realm::Results&&)results
-                          realm:(RLMRealm *)realm
-                     objectInfo:(RLMClassInfo&)objectInfo
                        keyBlock:(RLMSectionedResultsKeyBlock)keyBlock;
 
 - (RLMRealm *)realm;
-
 - (RLMSectionedResultsEnumerator *)fastEnumerator;
 - (RLMClassInfo *)objectInfo;
 - (RLMSectionedResults *)snapshot;

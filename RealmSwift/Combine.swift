@@ -173,18 +173,18 @@ extension Publisher {
             }
     }
 
-    /// Freezes all Realm collection changesets from the upstream publisher.
+    /// Freezes all Realm sectioned results changesets from the upstream publisher.
     ///
-    /// Freezing a Realm collection changeset makes the included collection
+    /// Freezing a Realm  sectioned results changeset makes the included  sectioned results
     /// reference no longer live-update when writes are made to the Realm and
     /// makes it safe to pass freely between threads without using
-    /// `.threadSafeReference()`. It also guarantees that the frozen collection
+    /// `.threadSafeReference()`. It also guarantees that the frozen  sectioned results
     /// contained in the changset will always match the change information,
     /// which is not always the case when using thread-safe references.
     ///
     /// ```
-    /// // Get a changeset publisher for a collection
-    /// let cancellable = myList.changesetPublisher
+    /// // Get a changeset publisher for the sectioned results
+    /// let cancellable = mySectionedResults.changesetPublisher
     ///    // Convert to frozen changesets
     ///    .freeze()
     ///    // Unlike live objects, frozen objects can be sent to a concurrent queue
@@ -425,7 +425,7 @@ extension Publisher {
         RealmPublishers.MakeThreadSafeKeyedCollectionChangeset(self)
     }
 
-    /// Enables passing Realm collection changesets to a different dispatch queue.
+    /// Enables passing Realm  sectioned results changesets to a different dispatch queue.
     ///
     /// Each call to `receive(on:)` on a publisher which emits Realm
     /// thread-confined objects must be proceeded by a call to
@@ -437,13 +437,13 @@ extension Publisher {
     /// For example, to subscribe on a background thread, do some work there,
     /// then pass the collection changeset to the main thread you can do:
     ///
-    ///     let cancellable = myCollection.changesetPublisher
+    ///     let cancellable = mySectionedResults.changesetPublisher
     ///         .subscribe(on: DispatchQueue(label: "background queue")
     ///         .print()
     ///         .threadSafeReference()
     ///         .receive(on: DispatchQueue.main)
-    ///         .sink { collectionChange in
-    ///             // Do things with the collection on the main thread
+    ///         .sink { sectionedResultsChange in
+    ///             // Do things with the sectioned results on the main thread
     ///         }
     ///
     /// - returns: A publisher that supports `receive(on:)` for thread-confined objects.
@@ -713,7 +713,6 @@ extension SectionedResults: RealmSubscribable {
     /// :nodoc:
     public func _observe<S>(_ keyPaths: [String]? = nil, on queue: DispatchQueue? = nil, _ subscriber: S)
         -> NotificationToken where S: Subscriber, S.Input == Self, S.Failure == Error {
-            // FIXME: we could skip some pointless work in converting the changeset to the Swift type here
         return observe(keyPaths: keyPaths, on: queue) { change in
                 switch change {
                 case .initial(let collection):
@@ -731,29 +730,29 @@ extension SectionedResults: RealmSubscribable {
         return observe(keyPaths: keyPaths, on: nil) { _ in _ = subscriber.receive() }
     }
 
-    /// A publisher that emits Void each time the collection changes.
+    /// A publisher that emits Void each time the sectioned results collection changes.
     ///
-    /// Despite the name, this actually emits *after* the collection has changed.
+    /// Despite the name, this actually emits *after* the sectioned results collection has changed.
     public var objectWillChange: RealmPublishers.WillChange<SectionedResults> {
         RealmPublishers.WillChange(self)
     }
 
-    /// A publisher that emits the collection each time the collection changes.
+    /// A publisher that emits the sectioned results collection each time the sectioned results collection changes.
     public var collectionPublisher: RealmPublishers.Value<Self> {
         RealmPublishers.Value(self)
     }
 
-    /// A publisher that emits the collection each time the collection changes on the given property keyPaths.
+    /// A publisher that emits the sectioned results collection each time the sectioned results collection changes on the given property keyPaths.
     public func collectionPublisher(keyPaths: [String]?) -> RealmPublishers.Value<Self> {
         return RealmPublishers.Value(self, keyPaths: keyPaths)
     }
 
-    /// A publisher that emits a collection changeset each time the collection changes.
+    /// A publisher that emits a sectioned results collection changeset each time the sectioned results collection changes.
     public var changesetPublisher: RealmPublishers.SectionedResultsChangeset<Self> {
         RealmPublishers.SectionedResultsChangeset(self)
     }
 
-    /// A publisher that emits a collection changeset each time the collection changes on the given property keyPaths.
+    /// A publisher that emits a sectioned results collection changeset each time the sectioned results collection changes on the given property keyPaths.
     public func changesetPublisher(keyPaths: [String]?) -> RealmPublishers.SectionedResultsChangeset<Self> {
         return RealmPublishers.SectionedResultsChangeset(self, keyPaths: keyPaths)
     }
@@ -764,7 +763,6 @@ extension ResultsSection: RealmSubscribable {
     /// :nodoc:
     public func _observe<S>(_ keyPaths: [String]? = nil, on queue: DispatchQueue? = nil, _ subscriber: S)
         -> NotificationToken where S: Subscriber, S.Input == Self, S.Failure == Error {
-            // FIXME: we could skip some pointless work in converting the changeset to the Swift type here
         return observe(keyPaths: keyPaths, on: queue) { change in
                 switch change {
                 case .initial(let collection):
@@ -782,29 +780,29 @@ extension ResultsSection: RealmSubscribable {
         return observe(keyPaths: keyPaths, on: nil) { _ in _ = subscriber.receive() }
     }
 
-    /// A publisher that emits Void each time the collection changes.
+    /// A publisher that emits Void each time the results section collection changes.
     ///
-    /// Despite the name, this actually emits *after* the collection has changed.
+    /// Despite the name, this actually emits *after* the results section collection has changed.
     public var objectWillChange: RealmPublishers.WillChange<ResultsSection> {
         RealmPublishers.WillChange(self)
     }
 
-    /// A publisher that emits the collection each time the collection changes.
+    /// A publisher that emits the results section collection each time the results section collection changes.
     public var collectionPublisher: RealmPublishers.Value<Self> {
         RealmPublishers.Value(self)
     }
 
-    /// A publisher that emits the collection each time the collection changes on the given property keyPaths.
+    /// A publisher that emits the results section collection each time the results section collection changes on the given property keyPaths.
     public func collectionPublisher(keyPaths: [String]?) -> RealmPublishers.Value<Self> {
         return RealmPublishers.Value(self, keyPaths: keyPaths)
     }
 
-    /// A publisher that emits a collection changeset each time the collection changes.
+    /// A publisher that emits a results section collection changeset each time the results section collection changes.
     public var changesetPublisher: RealmPublishers.SectionChangeset<Self> {
         RealmPublishers.SectionChangeset(self)
     }
 
-    /// A publisher that emits a collection changeset each time the collection changes on the given property keyPaths.
+    /// A publisher that emits a results section collection changeset each time the results section collection changes on the given property keyPaths.
     public func changesetPublisher(keyPaths: [String]?) -> RealmPublishers.SectionChangeset<Self> {
         return RealmPublishers.SectionChangeset(self, keyPaths: keyPaths)
     }
