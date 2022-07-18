@@ -18,12 +18,14 @@
 
 #import "RLMScheduler.h"
 
+#import "RLMUtil.hpp"
+
 #include <realm/object-store/util/scheduler.hpp>
 
 @interface RLMMainRunLoopScheduler : RLMScheduler
 @end
 
-__attribute__((visibility("hidden")))
+RLM_HIDDEN
 @implementation RLMMainRunLoopScheduler
 - (std::shared_ptr<realm::util::Scheduler>)osScheduler {
     return realm::util::Scheduler::make_runloop(CFRunLoopGetMain());
@@ -36,12 +38,31 @@ __attribute__((visibility("hidden")))
     // this is just an artifact of NSMapTable's strange API.
     return reinterpret_cast<void *>(std::numeric_limits<uintptr_t>::max());
 }
+
+// We can't access MainActor.shared directly from obj-c and need to set it from
+// Swift. The locking here is _almost_ unnecessary as this is set from a static
+// initializer before the value can ever be read, but mixed use of the obj-c and
+// Swift APIs could potentially race on the read.
+static auto& g_mainActorLock = *new RLMUnfairMutex;
+static id g_mainActor;
+void RLMSetMainActor(id actor) {
+    std::lock_guard lock(g_mainActorLock);
+    g_mainActor = actor;
+}
+- (id)actor {
+    std::lock_guard lock(g_mainActorLock);
+    return g_mainActor;
+}
+
+- (void)invoke:(dispatch_block_t)block {
+    dispatch_async(dispatch_get_main_queue(), block);
+}
 @end
 
 @interface RLMDispatchQueueScheduler : RLMScheduler
 @end
 
-__attribute__((visibility("hidden")))
+RLM_HIDDEN
 @implementation RLMDispatchQueueScheduler {
     dispatch_queue_t _queue;
 }
@@ -72,8 +93,86 @@ __attribute__((visibility("hidden")))
 }
 @end
 
+namespace {
+class ActorScheduler final : public realm::util::Scheduler {
+public:
+    ActorScheduler(void (^invoke)(dispatch_block_t), dispatch_block_t verify)
+    : _invoke(invoke) , _verify(verify) {}
+
+    void invoke(realm::util::UniqueFunction<void()>&& fn) override {
+        auto ptr = fn.release();
+        _invoke(^{
+            realm::util::UniqueFunction<void()> fn(ptr);
+            fn();
+        });
+    }
+
+    // This currently isn't actually implementable, but fortunately is only used
+    // to report errors when we aren't on the thread, so triggering the actor
+    // data race detection is good enough.
+    bool is_on_thread() const noexcept override {
+        _verify();
+        return true;
+    }
+
+    // This is used for OS Realm caching, which we don't use (as we have our own cache)
+    bool is_same_as(const Scheduler *) const noexcept override {
+        REALM_UNREACHABLE();
+    }
+
+    // Actor isolated Realms can always invoke blocks
+    bool can_invoke() const noexcept override {
+        return true;
+    }
+
+private:
+    void (^_invoke)(dispatch_block_t);
+    dispatch_block_t _verify;
+};
+}
+
+@interface RLMActorScheduler : RLMScheduler
+@end
+
+RLM_HIDDEN
+@implementation RLMActorScheduler {
+    id _actor;
+    void (^_invoke)(dispatch_block_t);
+    void (^_verify)();
+}
+
+- (instancetype)initWithActor:(id)actor invoke:(void (^)(dispatch_block_t))invoke verify:(void (^)())verify {
+    if (self = [super init]) {
+        _actor = actor;
+        _invoke = invoke;
+        _verify = verify;
+    }
+    return self;
+}
+
+- (void)invoke:(dispatch_block_t)block {
+    _invoke(block);
+}
+
+- (std::shared_ptr<realm::util::Scheduler>)osScheduler {
+    return std::make_shared<ActorScheduler>(_invoke, _verify);
+}
+
+- (void *)cacheKey {
+    return (__bridge void *)_actor;
+}
+
+- (id)actor {
+    return _actor;
+}
+@end
+
 @implementation RLMScheduler
 + (RLMScheduler *)currentRunLoop {
+    if (pthread_main_np()) {
+        return RLMScheduler.mainRunLoop;
+    }
+
     static RLMScheduler *currentRunLoopScheduler = [[RLMScheduler alloc] init];
     return currentRunLoopScheduler;
 }
@@ -90,6 +189,14 @@ __attribute__((visibility("hidden")))
     return RLMScheduler.currentRunLoop;
 }
 
++ (RLMScheduler *)actor:(id)actor invoke:(void (^)(dispatch_block_t))invoke verify:(void (^)())verify {
+    auto mainRunLoopScheduler = RLMScheduler.mainRunLoop;
+    if (actor == mainRunLoopScheduler.actor) {
+        return mainRunLoopScheduler;
+    }
+    return [[RLMActorScheduler alloc] initWithActor:actor invoke:invoke verify:verify];
+}
+
 - (void)invoke:(dispatch_block_t)block {
     // Currently not used or needed for run loops
     REALM_UNREACHABLE();
@@ -101,9 +208,10 @@ __attribute__((visibility("hidden")))
 }
 
 - (void *)cacheKey {
-    if (pthread_main_np()) {
-        return RLMScheduler.mainRunLoop.cacheKey;
-    }
     return pthread_self();
+}
+
+- (id)actor {
+    return nil;
 }
 @end

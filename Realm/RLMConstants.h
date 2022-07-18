@@ -55,7 +55,12 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 #define RLM_ERROR_ENUM(type, name, domain) NS_ENUM(type, name)
 #endif
 
-#define REALM_HIDDEN __attribute__((visibility("hidden")))
+#define RLM_HIDDEN __attribute__((visibility("hidden")))
+#define RLM_VISIBLE __attribute__((visibility("default")))
+#define RLM_HIDDEN_BEGIN _Pragma("GCC visibility push(hidden)")
+#define RLM_HIDDEN_END _Pragma("GCC visibility pop")
+#define RLM_DIRECT __attribute__((objc_direct))
+#define RLM_DIRECT_MEMBERS __attribute__((objc_direct_members))
 
 #pragma mark - Enums
 

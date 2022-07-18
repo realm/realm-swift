@@ -1506,6 +1506,41 @@ class ProjectionTests: TestCase {
         observeSetChange(obs, "mapOptUuid") { obj.mapOptUuid.removeObject(for: "key") }
     }
 
+#if swift(>=5.8)
+    func testObserveOnActor() async throws {
+        let projection = simpleProjection()
+        let ex = expectation(description: "got change")
+        ex.expectedFulfillmentCount = 2
+        let block = { @Sendable (_: isolated CustomGlobalActor, change: ObjectChange<SimpleProjection>) in
+            guard case let .change(_, properties) = change else {
+                return XCTFail("expected .change but got \(change)")
+            }
+            guard properties.count == 1 else {
+                return XCTFail("expected one property but got \(properties)")
+            }
+            let prop = properties[0]
+            XCTAssertEqual(prop.name, "int")
+            XCTAssertEqual(prop.oldValue as? Int, 0)
+            XCTAssertEqual(prop.newValue as? Int, 1)
+            ex.fulfill()
+        }
+        let tokens = await [
+            projection.observe(keyPaths: ["int"], on: CustomGlobalActor.shared, block),
+            projection.observe(keyPaths: [\.int], on: CustomGlobalActor.shared, block)
+        ]
+
+        // should not produce notification
+        try projection.realm!.write {
+            projection.rootObject.bool = true
+        }
+        try projection.realm!.write {
+            projection.int = 1
+        }
+        await fulfillment(of: [ex])
+        tokens.forEach { $0.invalidate() }
+    }
+#endif
+
     // MARK: Frozen Objects
 
     func simpleProjection() -> SimpleProjection {

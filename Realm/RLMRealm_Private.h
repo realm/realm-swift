@@ -18,7 +18,7 @@
 
 #import <Realm/RLMRealm.h>
 
-@class RLMFastEnumerator, RLMAsyncRefreshTask, RLMScheduler;
+@class RLMFastEnumerator, RLMScheduler, RLMAsyncRefreshTask, RLMAsyncWriteTask;
 
 RLM_HEADER_AUDIT_BEGIN(nullability)
 
@@ -43,8 +43,18 @@ BOOL RLMIsRealmCachedAtPath(NSString *path);
 // Register a block to be called from the next before_notify() invocation
 FOUNDATION_EXTERN void RLMAddBeforeNotifyBlock(RLMRealm *realm, dispatch_block_t block);
 
+// Test hook to run the async notifiers for a Realm which has the background thread disabled
+FOUNDATION_EXTERN void RLMRunAsyncNotifiers(NSString *path);
+
+// Get the cached Realm for the given configuration and scheduler, if any
 FOUNDATION_EXTERN RLMRealm *_Nullable RLMGetCachedRealm(RLMRealmConfiguration *, RLMScheduler *) NS_RETURNS_RETAINED;
+// Get a cached Realm for the given configuration and any scheduler. The returned
+// Realm is not confined to the current thread, so very few operations are safe
+// to perform on it
 FOUNDATION_EXTERN RLMRealm *_Nullable RLMGetAnyCachedRealm(RLMRealmConfiguration *) NS_RETURNS_RETAINED;
+
+// Scheduler an async refresh for the given Realm
+FOUNDATION_EXTERN RLMAsyncRefreshTask *_Nullable RLMRealmRefreshAsync(RLMRealm *rlmRealm) NS_RETURNS_RETAINED;
 
 // RLMRealm private members
 @interface RLMRealm ()
@@ -68,7 +78,10 @@ FOUNDATION_EXTERN RLMRealm *_Nullable RLMGetAnyCachedRealm(RLMRealmConfiguration
 + (nullable instancetype)realmWithConfiguration:(RLMRealmConfiguration *)configuration
                                      confinedTo:(RLMScheduler *)options
                                           error:(NSError **)error;
-- (void)waitForDownloadCompletion:(void (^)(NSError *_Nullable))completion;
+
+- (RLMAsyncWriteTask *)beginAsyncWrite NS_RETURNS_RETAINED;
+- (void)commitAsyncWriteWithGrouping:(bool)allowGrouping
+                          completion:(void(^)(NSError *_Nullable))completion;
 @end
 
 @interface RLMPinnedRealm : NSObject

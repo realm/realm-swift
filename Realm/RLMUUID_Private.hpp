@@ -25,10 +25,8 @@ class UUID;
 RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
 @interface NSUUID (RLMUUIDSupport) <RLMUUID>
-
 - (instancetype)initWithRealmUUID:(realm::UUID)uuidValue;
-
 - (realm::UUID)rlm_uuidValue;
-
 @end
+
 RLM_HEADER_AUDIT_END(nullability, sendability)

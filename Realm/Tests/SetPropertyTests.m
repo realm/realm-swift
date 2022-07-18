@@ -1308,7 +1308,7 @@
     [(RLMNotificationToken *)token invalidate];
 }
 
-static RLMSet<IntObject *> *managedTestSet() {
+static RLMSet<IntObject *> *managedTestSet(void) {
     RLMRealm *realm = [RLMRealm defaultRealm];
     __block RLMSet *set;
     [realm transactionWithBlock:^{

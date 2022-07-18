@@ -39,6 +39,8 @@ RLM_SWIFT_SENDABLE // is immutable
 + (RLMScheduler *)currentRunLoop __attribute__((objc_direct));
 // A scheduler for the given queue if it's non-nil, and currentRunLoop otherwise
 + (RLMScheduler *)dispatchQueue:(nullable dispatch_queue_t)queue;
++ (RLMScheduler *)actor:(id)actor invoke:(void (^)(dispatch_block_t))invoke
+                 verify:(void (^)(void))verify;
 
 // Invoke the block on this scheduler. Currently not actually implement for run
 // loop schedulers.
@@ -48,10 +50,14 @@ RLM_SWIFT_SENDABLE // is immutable
 // when called from the current scheduler.
 - (void *)cacheKey;
 
+- (nullable id)actor;
+
 #ifdef __cplusplus
 // The object store Scheduler corresponding to this scheduler
 - (std::shared_ptr<realm::util::Scheduler>)osScheduler;
 #endif
 @end
+
+FOUNDATION_EXTERN void RLMSetMainActor(id actor);
 
 RLM_HEADER_AUDIT_END(nullability, sendability)

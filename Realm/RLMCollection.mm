@@ -460,24 +460,36 @@ struct CollectionCallbackWrapper {
 };
 } // anonymous namespace
 
-@implementation RLMCancellationToken
+@interface RLMCancellationToken : RLMNotificationToken
+@end
+
+RLM_HIDDEN
+@implementation RLMCancellationToken {
+    __unsafe_unretained RLMRealm *_realm;
+    realm::NotificationToken _token;
+    RLMUnfairMutex _mutex;
+}
 
 - (RLMRealm *)realm {
-    std::lock_guard<std::mutex> lock(_mutex);
+    std::lock_guard lock(_mutex);
     return _realm;
 }
 
 - (void)suppressNextNotification {
-    std::lock_guard<std::mutex> lock(_mutex);
+    std::lock_guard lock(_mutex);
     if (_realm) {
         _token.suppress_next();
     }
 }
 
-- (void)invalidate {
-    std::lock_guard<std::mutex> lock(_mutex);
-    _token = {};
-    _realm = nil;
+- (bool)invalidate {
+    std::lock_guard lock(_mutex);
+    if (_realm) {
+        _token = {};
+        _realm = nil;
+        return true;
+    }
+    return false;
 }
 
 RLMNotificationToken *RLMAddNotificationBlock(id c, id block,
@@ -501,7 +513,7 @@ RLMNotificationToken *RLMAddNotificationBlock(id c, id block,
     RLMThreadSafeReference *tsr = [RLMThreadSafeReference referenceWithThreadConfined:collection];
     RLMRealmConfiguration *config = realm.configuration;
     dispatch_async(queue, ^{
-        std::lock_guard<std::mutex> lock(token->_mutex);
+        std::lock_guard lock(token->_mutex);
         if (!token->_realm) {
             return;
         }
@@ -516,7 +528,6 @@ realm::CollectionChangeCallback RLMWrapCollectionChangeCallback(void (^block)(id
                                                                 id collection, bool skipFirst) {
     return CollectionCallbackWrapper{block, collection, skipFirst};
 }
-
 @end
 
 NSArray *RLMToIndexPathArray(realm::IndexSet const& set, NSUInteger section) {

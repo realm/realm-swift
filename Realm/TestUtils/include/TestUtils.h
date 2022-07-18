@@ -39,3 +39,6 @@ FOUNDATION_EXTERN RLMUser *RLMDummyUser(void);
 // It appears to be impossible to check this from Swift so we need a helper function
 FOUNDATION_EXTERN bool RLMThreadSanitizerEnabled(void);
 
+FOUNDATION_EXTERN bool RLMCanFork(void);
+FOUNDATION_EXTERN pid_t RLMFork(void);
+

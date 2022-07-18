@@ -723,7 +723,7 @@
     [realm cancelWriteTransaction];
 }
 
-static vm_size_t get_resident_size() {
+static vm_size_t get_resident_size(void) {
     struct task_basic_info info;
     mach_msg_type_number_t size = sizeof(info);
     task_info(mach_task_self(), TASK_BASIC_INFO, (task_info_t)&info, &size);
@@ -837,9 +837,7 @@ static vm_size_t get_resident_size() {
     [self dispatchAsyncAndWait:^{
         RLMRealm *realm = self.realmWithTestPath;
         [realm beginWriteTransaction];
-        // FIXME: this is roundabout because `table.clear()` does not update
-        // table views correctly
-        [realm deleteObjects:[IntObject objectsInRealm:realm where:@"intCol = 0"]];
+        [realm deleteObjects:[IntObject allObjectsInRealm:realm]];
         [realm commitWriteTransaction];
     }];
 
@@ -1215,7 +1213,7 @@ static vm_size_t get_resident_size() {
 
 #pragma mark - Frozen Results
 
-static RLMResults<IntObject *> *testResults() {
+static RLMResults<IntObject *> *testResults(void) {
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm transactionWithBlock:^{
         [IntObject createInDefaultRealmWithValue:@[@0]];

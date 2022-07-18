@@ -40,7 +40,7 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 FOUNDATION_EXTERN NSString *RLMDictionaryDescriptionWithMaxDepth(NSString *name,
                                                                  RLMDictionary *dictionary,
                                                                  NSUInteger depth);
-id RLMDictionaryKey(RLMDictionary *dictionary, id key) REALM_HIDDEN;
-id RLMDictionaryValue(RLMDictionary *dictionary, id value) REALM_HIDDEN;
+id RLMDictionaryKey(RLMDictionary *dictionary, id key) RLM_HIDDEN;
+id RLMDictionaryValue(RLMDictionary *dictionary, id value) RLM_HIDDEN;
 
 RLM_HEADER_AUDIT_END(nullability, sendability)

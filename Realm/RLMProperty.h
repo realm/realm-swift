@@ -127,6 +127,7 @@ RLM_SWIFT_SENDABLE RLM_FINAL // not actually immutable, but the public API kinda
 /**
  An `RLMPropertyDescriptor` instance represents a specific property on a given class.
  */
+RLM_SWIFT_SENDABLE RLM_FINAL
 @interface RLMPropertyDescriptor : NSObject
 
 /**

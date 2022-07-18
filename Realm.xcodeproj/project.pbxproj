@@ -167,7 +167,6 @@
 		3F67DB3E1E26D69C0024533D /* RLMThreadSafeReference.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3F67DB3B1E26D69C0024533D /* RLMThreadSafeReference.mm */; };
 		3F67DB401E26D6A20024533D /* RLMThreadSafeReference.h in Headers */ = {isa = PBXBuildFile; fileRef = 3F67DB391E26D69C0024533D /* RLMThreadSafeReference.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3F67DB411E26D6AD0024533D /* RLMThreadSafeReference.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3F67DB3B1E26D69C0024533D /* RLMThreadSafeReference.mm */; };
-		3F73BC921E3A877300FE80B6 /* RLMTestUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F73BC8B1E3A876600FE80B6 /* RLMTestUtils.m */; };
 		3F73BC951E3A878500FE80B6 /* NSError+RLMSync.h in Headers */ = {isa = PBXBuildFile; fileRef = 3F73BC931E3A878500FE80B6 /* NSError+RLMSync.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3F73BC961E3A878500FE80B6 /* NSError+RLMSync.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F73BC941E3A878500FE80B6 /* NSError+RLMSync.m */; };
 		3F73BC971E3A879700FE80B6 /* NSError+RLMSync.h in Headers */ = {isa = PBXBuildFile; fileRef = 3F73BC931E3A878500FE80B6 /* NSError+RLMSync.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -495,7 +494,6 @@
 		ACBD595328364DB0009A664E /* SwiftSyncTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AA5AE961D989BE000ED8C27 /* SwiftSyncTestCase.swift */; };
 		ACBD595428364DCB009A664E /* RLMSyncTestCase.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1AA5AE9B1D98A68E00ED8C27 /* RLMSyncTestCase.mm */; };
 		ACBD595528364DFF009A664E /* RLMChildProcessEnvironment.m in Sources */ = {isa = PBXBuildFile; fileRef = 530BA61326DFA1CB008FC550 /* RLMChildProcessEnvironment.m */; };
-		ACBD5956283652B8009A664E /* RLMTestUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F73BC8B1E3A876600FE80B6 /* RLMTestUtils.m */; };
 		ACBD5957283652D7009A664E /* RLMTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F558C8322C29A02002F0F30 /* RLMTestCase.m */; };
 		ACBD59592836539B009A664E /* RLMServerTestObjects.m in Sources */ = {isa = PBXBuildFile; fileRef = 531F956E279070A800E497F1 /* RLMServerTestObjects.m */; };
 		ACBD595A283653CF009A664E /* RLMMultiProcessTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F558C8522C29A03002F0F30 /* RLMMultiProcessTestCase.m */; };
@@ -919,8 +917,6 @@
 		3F68BFCD1B558CA800D50FBD /* RLMPrefix.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMPrefix.h; sourceTree = "<group>"; };
 		3F73BC841E3A870F00FE80B6 /* ThreadSafeReferenceTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ThreadSafeReferenceTests.swift; sourceTree = "<group>"; };
 		3F73BC871E3A876600FE80B6 /* ObjectServerTests-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "ObjectServerTests-Info.plist"; path = "Realm/ObjectServerTests/ObjectServerTests-Info.plist"; sourceTree = "<group>"; };
-		3F73BC8A1E3A876600FE80B6 /* RLMTestUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMTestUtils.h; path = Realm/ObjectServerTests/RLMTestUtils.h; sourceTree = "<group>"; };
-		3F73BC8B1E3A876600FE80B6 /* RLMTestUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMTestUtils.m; path = Realm/ObjectServerTests/RLMTestUtils.m; sourceTree = "<group>"; };
 		3F73BC931E3A878500FE80B6 /* NSError+RLMSync.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSError+RLMSync.h"; sourceTree = "<group>"; };
 		3F73BC941E3A878500FE80B6 /* NSError+RLMSync.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSError+RLMSync.m"; sourceTree = "<group>"; };
 		3F7556731BE95A050058BC7E /* AsyncTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = AsyncTests.mm; sourceTree = "<group>"; };
@@ -1810,8 +1806,6 @@
 				531F956E279070A800E497F1 /* RLMServerTestObjects.m */,
 				1AA5AE9D1D98A6D800ED8C27 /* RLMSyncTestCase.h */,
 				1AA5AE9B1D98A68E00ED8C27 /* RLMSyncTestCase.mm */,
-				3F73BC8A1E3A876600FE80B6 /* RLMTestUtils.h */,
-				3F73BC8B1E3A876600FE80B6 /* RLMTestUtils.m */,
 				49D9DFC4246C8E48003AD31D /* setup_baas.rb */,
 				AC0538062885B1DF00CE27C4 /* SwiftAsymmetricSyncServerTests.swift */,
 				3F9ADA9326E7E87B007349A5 /* SwiftCollectionSyncTests.swift */,
@@ -3126,7 +3120,6 @@
 				ACBD59592836539B009A664E /* RLMServerTestObjects.m in Sources */,
 				ACBD595428364DCB009A664E /* RLMSyncTestCase.mm in Sources */,
 				ACBD5957283652D7009A664E /* RLMTestCase.m in Sources */,
-				ACBD5956283652B8009A664E /* RLMTestUtils.m in Sources */,
 				AC23487E26FC8619009129F2 /* RLMUser+ObjectServerTests.mm in Sources */,
 				AC320BAE268E1F2D0043D484 /* SwiftServerObjects.swift in Sources */,
 				ACBD595328364DB0009A664E /* SwiftSyncTestCase.swift in Sources */,
@@ -3153,7 +3146,6 @@
 				531F9570279070A900E497F1 /* RLMServerTestObjects.m in Sources */,
 				1AA5AE9C1D98A68E00ED8C27 /* RLMSyncTestCase.mm in Sources */,
 				3F558C9022C29A03002F0F30 /* RLMTestCase.m in Sources */,
-				3F73BC921E3A877300FE80B6 /* RLMTestUtils.m in Sources */,
 				1A1536481DB0408A00C0EC93 /* RLMUser+ObjectServerTests.mm in Sources */,
 				CF330BBE24E57D5F00F07EE2 /* RLMWatchTestUtility.m in Sources */,
 				AC05380C2885B25A00CE27C4 /* SwiftAsymmetricSyncServerTests.swift in Sources */,

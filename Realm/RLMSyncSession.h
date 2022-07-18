@@ -220,6 +220,7 @@ NS_REFINED_FOR_SWIFT;
 
  @see `RLMSyncErrorClientResetError`, `RLMSyncErrorPermissionDeniedError`
  */
+RLM_SWIFT_SENDABLE RLM_FINAL
 @interface RLMSyncErrorActionToken : NSObject
 
 /// :nodoc:

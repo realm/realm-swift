@@ -51,12 +51,14 @@ using namespace realm;
     // `-[RLMRealm commitWriteTransactionWithoutNotifying:]`.
 }
 
-- (void)invalidate {
+- (bool)invalidate {
     if (_session) {
         _session->unregister_progress_notifier(_token);
         _session.reset();
         _token = 0;
+        return true;
     }
+    return false;
 }
 
 - (nullable instancetype)initWithTokenValue:(uint64_t)token

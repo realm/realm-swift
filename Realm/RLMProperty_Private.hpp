@@ -22,12 +22,10 @@
 
 @class RLMSchema;
 
+RLM_DIRECT_MEMBERS
 @interface RLMProperty ()
-
 + (instancetype)propertyForObjectStoreProperty:(const realm::Property&)property;
-
 - (realm::Property)objectStoreCopy:(RLMSchema *)schema;
-
 @end
 
 static inline bool isNullable(const realm::PropertyType& t) {

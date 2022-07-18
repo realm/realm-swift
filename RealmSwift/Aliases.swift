@@ -66,26 +66,15 @@ extension ObjectBase {
                                           _ block: @escaping (ObjectChange<T>) -> Void) -> NotificationToken {
         return RLMObjectBaseAddNotificationBlock(self, keyPaths, queue) { object, names, oldValues, newValues, error in
             assert(error == nil)
-            guard let names = names, let newValues = newValues else {
-                block(.deleted)
-                return
-            }
-
-            block(.change(object as! T, (0..<newValues.count).map { i in
-                PropertyChange(name: names[i], oldValue: oldValues?[i], newValue: newValues[i])
-            }))
+            block(.init(object: object as? T, names: names, oldValues: oldValues, newValues: newValues))
         }
     }
 
     internal func _observe<T: ObjectBase>(keyPaths: [String]? = nil,
                                           on queue: DispatchQueue? = nil,
                                           _ block: @escaping (T?) -> Void) -> NotificationToken {
-        return RLMObjectBaseAddNotificationBlock(self, keyPaths, queue) { object, names, _, _, _ in
-            if names == nil {
-                block(nil)
-            } else {
-                block((object as! T))
-            }
+        return RLMObjectBaseAddNotificationBlock(self, keyPaths, queue) { object, _, _, _, _ in
+            block(object as? T)
         }
     }
 
@@ -96,4 +85,24 @@ extension ObjectBase {
             block()
         }
     }
+
+#if swift(>=5.8)
+    @available(macOS 10.15, tvOS 13.0, iOS 13.0, watchOS 6.0, *)
+    internal func _observe<A: Actor, T: ObjectBase>(
+        keyPaths: [String]? = nil, on actor: isolated A,
+        _ block: @Sendable @escaping (isolated A, ObjectChange<T>) -> Void
+    ) async -> NotificationToken {
+        let token = RLMObjectNotificationToken()
+        token.observe(self, keyPaths: keyPaths) { object, names, oldValues, newValues, error in
+            assert(error == nil)
+            assumeOnActorExecutor(actor) { actor in
+                block(actor, .init(object: object as? T, names: names,
+                        oldValues: oldValues, newValues: newValues))
+            }
+        }
+        await withTaskCancellationHandler(operation: token.registrationComplete,
+                                          onCancel: { token.invalidate() })
+        return token
+    }
+#endif // swift(>=5.8)
 }

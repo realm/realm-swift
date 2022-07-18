@@ -31,6 +31,11 @@ import RealmTestSupport
 import RealmSwiftTestSupport
 #endif
 
+// SE-0392 exposes this functionality directly, but for now we have to call the
+// internal standard library function
+@_silgen_name("swift_job_run")
+private func _swiftJobRun(_ job: UnownedJob, _ executor: UnownedSerialExecutor)
+
 func assertAppError(_ error: AppError, _ code: AppError.Code, _ message: String,
                     line: UInt = #line, file: StaticString = #file) {
     XCTAssertEqual(error.code, code, file: file, line: line)
@@ -2329,7 +2334,7 @@ func hasCombine() -> Bool {
     return false
 }
 
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+@available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
 @objc(CombineObjectServerTests)
 class CombineObjectServerTests: SwiftSyncTestCase {
     override class var defaultTestSuite: XCTestSuite {
@@ -3124,6 +3129,123 @@ class AsyncAwaitObjectServerTests: SwiftSyncTestCase {
         XCTAssertNil(object?.objectIdCol)
         XCTAssertEqual(object!.objectCol!.id, linkedObjectId)
     }
+
+#if swift(>=5.8)
+    // A custom executor which cancels the task after the requested number of
+    // invocations. This is a very naive executor which just synchronously
+    // invokes jobs, which generally is not a legal thing to do
+    final class CancellingExecutor: SerialExecutor, @unchecked Sendable {
+        private var remaining: Locked<Int>
+        private var pendingJob: UnownedJob?
+        var task: Task<Void, any Error>? {
+            didSet {
+                if let pendingJob = pendingJob {
+                    self.pendingJob = nil
+                    enqueue(pendingJob)
+                }
+            }
+        }
+
+        init(cancelAfter: Int) {
+            remaining = Locked(cancelAfter)
+        }
+
+        func enqueue(_ job: UnownedJob) {
+            // The body of the task is enqueued before the task variable is
+            // set, so we need to defer invoking the very first job
+            guard let task = task else {
+                precondition(pendingJob == nil)
+                pendingJob = job
+                return
+            }
+
+            remaining.withLock { remaining in
+                if remaining == 0 {
+                    task.cancel()
+                }
+                remaining -= 1
+
+                // S#-0392 exposes all the stuff we need for this in the public
+                // API (Which hopefully will arrive in Swift 5.9), but for now
+                // invoking a job requires some private things.
+                _swiftJobRun(job, self.asUnownedSerialExecutor())
+            }
+        }
+
+        func asUnownedSerialExecutor() -> UnownedSerialExecutor {
+            UnownedSerialExecutor(ordinary: self)
+        }
+    }
+
+    // An actor that does nothing other than have a custom executor
+    actor CustomExecutorActor {
+        nonisolated let executor: UnownedSerialExecutor
+        init(_ executor: UnownedSerialExecutor) {
+            self.executor = executor
+        }
+        nonisolated var unownedExecutor: UnownedSerialExecutor {
+            executor
+        }
+    }
+
+    @MainActor func testAsyncOpenTaskCancellation() async throws {
+        // Populate the Realm on the server
+        let user = try await self.app.login(credentials: basicCredentials())
+        let configuration = user.configuration(testName: #function)
+        try await Task { @MainActor in
+            let realm = try await Realm(configuration: configuration)
+            try realm.write {
+                realm.add(SwiftHugeSyncObject.create())
+                realm.add(SwiftHugeSyncObject.create())
+            }
+            waitForUploads(for: realm)
+        }.value
+
+        func isolatedOpen(_ actor: isolated CustomExecutorActor) async throws {
+            _ = try await Realm(configuration: configuration, actor: actor, downloadBeforeOpen: .always)
+        }
+
+        // Try opening the Realm with the Task being cancelled at every possible
+        // point between executor invocations. This doesn't really test that
+        // cancellation is *correct*; just that cancellation never results in
+        // a hang or crash.
+        for i in 0 ..< .max {
+            RLMWaitForRealmToClose(configuration.fileURL!.path)
+            _ = try Realm.deleteFiles(for: configuration)
+
+            let executor = CancellingExecutor(cancelAfter: i)
+            executor.task = Task {
+                try await isolatedOpen(.init(executor.asUnownedSerialExecutor()))
+            }
+            do {
+                try await executor.task!.value
+                break
+            } catch is CancellationError {
+                // pass
+            } catch {
+                XCTFail("Expected CancellationError but got \(error)")
+            }
+        }
+
+        // Repeat the above, but with a cached Realm so that we hit that code path instead
+        let cachedRealm = try await Realm(configuration: configuration, downloadBeforeOpen: .always)
+        for i in 0 ..< .max {
+            let executor = CancellingExecutor(cancelAfter: i)
+            executor.task = Task {
+                try await isolatedOpen(.init(executor.asUnownedSerialExecutor()))
+            }
+            do {
+                try await executor.task!.value
+                break
+            } catch is CancellationError {
+                // pass
+            } catch {
+                XCTFail("Expected CancellationError but got \(error)")
+            }
+        }
+        cachedRealm.invalidate()
+    }
+#endif
 
     func testCallResetPasswordAsyncAwait() async throws {
         let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"

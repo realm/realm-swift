@@ -50,8 +50,6 @@ let objectServerTestSources = [
     "RLMServerTestObjects.m",
     "RLMSyncTestCase.h",
     "RLMSyncTestCase.mm",
-    "RLMTestUtils.h",
-    "RLMTestUtils.m",
     "RLMUser+ObjectServerTests.h",
     "RLMUser+ObjectServerTests.mm",
     "RLMWatchTestUtility.h",

@@ -1,12 +1,126 @@
-10.38.3 Release notes (2023-04-28)
+x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
+* Add support for actor-isolated Realms, opened with `try await Realm(actor: actor)`.
 
-* Improve performance of cancelling a write transactions after making changes. If no KVO observers are used this is now constant time rather than taking time proportional to the number of changes to be rolled back. Cancelling a write transaction with KVO observers is 10-20% faster. ([Core PR #6513](https://github.com/realm/realm-core/pull/6513)).
+  Rather than being confined to the current thread or a dispatch queue,
+  actor-isolated Realms are isolated to an actor. This means that they can be
+  used from any thread as long as it's within a function isolated to that
+  actor, and they remain valid over suspension points where a task may hop
+  between threads. Actor-isolated Realms can be used with either global or
+  local actors:
+
+  ```swift
+  @MainActor function mainThreadFunction() async throws {
+      // These are identical: the async init continues to produce a
+      // MainActor-confined Realm if no actor is supplied
+      let realm1 = try await Realm()
+      let realm2 = try await Realm(MainActor.shared)
+  }
+
+  // A simple example of a custom global actor
+  @globalActor actor BackgroundActor: GlobalActor {
+      static var shared = BackgroundActor()
+  }
+
+  @BackgroundActor backgroundThreadFunction() async throws {
+      // Explicitly specifying the actor is required for everything but MainActor
+      let realm = try await Realm(actor: BackgroundActor.shared)
+      try await realm.write {
+          _ = realm.create(MyObject.self)
+      }
+      // Thread-confined Realms would sometimes throw an exception here, as we
+      // may end up on a different thread after an `await`
+      print("\(realm.objects(MyObject.self).count)")
+  }
+
+  actor MyActor {
+      // An implicitly-unwrapped optional is used here to let us pass `self` to
+      // `Realm(actor:)` within `init`
+      var realm: Realm!
+      init() async throws {
+          realm = try await Realm(actor: self)
+      }
+
+      var count: Int {
+          realm.objects(MyObject.self).count
+      }
+
+      func create() async throws {
+          try await realm.asyncWrite {
+              realm.create(MyObject.self)
+          }
+      }
+  }
+
+  // This function isn't isolated to the actor, so each operation has to be async
+  func createObjects() async throws {
+      let actor = try await MyActor()
+      for _ in 0..<5 {
+        await actor.create()
+      }
+      print("\(await actor.count)")
+  }
+
+  // In an isolated function, an actor-isolated Realm can be used synchronously
+  func createObjects(in actor: isolated MyActor) async throws {
+      await actor.realm.write {
+          actor.realm.create(MyObject.self)
+      }
+      print("\(actor.realm.objects(MyObject.self).count)")
+  }
+  ```
+
+  Actor-isolated Realms come with a more convenient syntax for asynchronous
+  writes. `try await realm.write { ... }` will suspend the current task,
+  acquire the write lock without blocking the current thread, and then invoke
+  the block. The actual data is then written to disk on a background thread,
+  and the task is resumed once that completes. As this does not block the
+  calling thread while waiting to write and does not perform i/o on the calling
+  thread, this will often be safe to use from `@MainActor` functions without
+  blocking the UI. Sufficiently large writes may still benefit from being done
+  on a background thread.
+
+  Asynchronous writes are only supported for actor-isolated Realms or in
+  `@MainActor` functions.
+
+  Actor-isolated Realms require Swift 5.8 (Xcode 14.3). Enabling both strict
+  concurrency checking (`SWIFT_STRICT_CONCURRENCY=complete` in Xcode) and
+  runtime actor data race detection (`OTHER_SWIFT_FLAGS=-Xfrontend
+  -enable-actor-data-race-checks`) is strongly recommended when using
+  actor-isolated Realms.
+
+### Fixed
+* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
+* None.
+
+<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+
+### Compatibility
+* Realm Studio: 14.0.1 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 14.3.
+* CocoaPods: 1.10 or later.
+* Xcode: 13.4-14.3.
+
+### Internal
+* Upgraded realm-core from ? to ?
+
+10.38.3 Release notes (2023-04-28)
+=============================================================
+
+### Enhancements
+
+* Improve performance of cancelling a write transactions after making changes.
+  If no KVO observers are used this is now constant time rather than taking
+  time proportional to the number of changes to be rolled back. Cancelling a
+  write transaction with KVO observers is 10-20% faster. ([Core PR #6513](https://github.com/realm/realm-core/pull/6513)).
 
 ### Fixed
 
-* Performing a large number of queries without ever performing a write resulted in steadily increasing memory usage, some of which was never fully freed due to an unbounded cache ([#7978](https://github.com/realm/realm-swift/issues/7978), since v10.27.0).
+* Performing a large number of queries without ever performing a write resulted
+  in steadily increasing memory usage, some of which was never fully freed due
+  to an unbounded cache ([#7978](https://github.com/realm/realm-swift/issues/7978), since v10.27.0).
 
 ### Compatibility
 

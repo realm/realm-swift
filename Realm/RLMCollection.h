@@ -530,6 +530,7 @@ __attribute__((warn_unused_result));
 
  `RLMSortDescriptor` instances are immutable.
  */
+RLM_SWIFT_SENDABLE RLM_FINAL
 @interface RLMSortDescriptor : NSObject
 
 #pragma mark - Properties

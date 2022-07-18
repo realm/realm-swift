@@ -22,6 +22,7 @@ namespace realm {
 class Decimal128;
 }
 
+RLM_DIRECT_MEMBERS
 @interface RLMDecimal128 ()
 - (instancetype)initWithDecimal128:(realm::Decimal128)value;
 - (realm::Decimal128)decimal128Value;

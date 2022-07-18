@@ -22,8 +22,8 @@ namespace realm {
 class ObjectId;
 }
 
+RLM_DIRECT_MEMBERS
 @interface RLMObjectId ()
 @property (nonatomic, readonly) realm::ObjectId value;
-
 - (instancetype)initWithValue:(realm::ObjectId)value;
 @end

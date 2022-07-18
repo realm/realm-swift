@@ -702,7 +702,7 @@ static void ExpectChange(id self,
 
     RLMSection<NSString *, StringObject *> *section = sr[0];
 
-    id token = [section addNotificationBlock:^(RLMSection *r, RLMSectionedResultsChange *c) {
+    RLMNotificationToken *token = [section addNotificationBlock:^(RLMSection *r, RLMSectionedResultsChange *c) {
         changes = c;
         XCTAssertNotNil(r);
         CFRunLoopStop(CFRunLoopGetCurrent());
