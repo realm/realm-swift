@@ -16,13 +16,18 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-import XCTest
 #if DEBUG
     @testable import RealmSwift
 #else
     import RealmSwift
 #endif
 import Foundation
+import Realm
+import XCTest
+
+#if canImport(RealmSwiftTestSupport)
+import RealmSwiftTestSupport
+#endif
 
 @available(*, deprecated) // Silence deprecation warnings for RealmOptional
 class RealmTests: TestCase {
@@ -872,7 +877,7 @@ class RealmTests: TestCase {
         let realm = try! Realm()
         realm.autorefresh = false
 
-        // test that autoreresh is not applied
+        // test that autorefresh is not applied
         // we have two notifications, one for opening the realm, and a second when performing our transaction
         let notificationFired = expectation(description: "notification fired")
         var token: NotificationToken!
@@ -938,42 +943,37 @@ class RealmTests: TestCase {
         try FileManager.default.removeItem(at: fileURL)
     }
 
-    func testWriteCopyForConfiguration() {
-        do {
-            var localConfig = Realm.Configuration()
-            localConfig.fileURL = defaultRealmURL().deletingLastPathComponent().appendingPathComponent("original.realm")
+    func testWriteCopyForConfiguration() throws {
+        var localConfig = Realm.Configuration()
+        localConfig.fileURL = defaultRealmURL().deletingLastPathComponent().appendingPathComponent("original.realm")
 
-            let realm = try Realm(configuration: localConfig)
-            try! realm.write {
-                realm.add(SwiftBoolObject())
-            }
-
-            XCTAssertEqual(realm.objects(SwiftBoolObject.self).count, 1)
-
-            var destinationConfig = Realm.Configuration()
-            destinationConfig.fileURL = defaultRealmURL().deletingLastPathComponent().appendingPathComponent("destination.realm")
-
-            try realm.writeCopy(configuration: destinationConfig)
-
-            let destinationRealm = try Realm(configuration: destinationConfig)
-            XCTAssertEqual(destinationRealm.objects(SwiftBoolObject.self).count, 1)
-
-            try! destinationRealm.write {
-                destinationRealm.add(SwiftBoolObject())
-            }
-
-            XCTAssertEqual(destinationRealm.objects(SwiftBoolObject.self).count, 2)
-
-            let frozenRealm = destinationRealm.freeze()
-            XCTAssertTrue(frozenRealm.isFrozen)
-            XCTAssertTrue(frozenRealm.objects(SwiftBoolObject.self).isFrozen)
-
-            try FileManager.default.removeItem(at: localConfig.fileURL!)
-            try FileManager.default.removeItem(at: destinationConfig.fileURL!)
-        } catch {
-            print(error.localizedDescription)
-            XCTFail("Got an error: \(error)")
+        let realm = try Realm(configuration: localConfig)
+        try realm.write {
+            realm.add(SwiftBoolObject())
         }
+
+        XCTAssertEqual(realm.objects(SwiftBoolObject.self).count, 1)
+
+        var destinationConfig = Realm.Configuration()
+        destinationConfig.fileURL = defaultRealmURL().deletingLastPathComponent().appendingPathComponent("destination.realm")
+
+        try realm.writeCopy(configuration: destinationConfig)
+
+        let destinationRealm = try Realm(configuration: destinationConfig)
+        XCTAssertEqual(destinationRealm.objects(SwiftBoolObject.self).count, 1)
+
+        try destinationRealm.write {
+            destinationRealm.add(SwiftBoolObject())
+        }
+
+        XCTAssertEqual(destinationRealm.objects(SwiftBoolObject.self).count, 2)
+
+        let frozenRealm = destinationRealm.freeze()
+        XCTAssertTrue(frozenRealm.isFrozen)
+        XCTAssertTrue(frozenRealm.objects(SwiftBoolObject.self).isFrozen)
+
+        try FileManager.default.removeItem(at: localConfig.fileURL!)
+        try FileManager.default.removeItem(at: destinationConfig.fileURL!)
     }
 
     func testSeedFilePath() throws {
@@ -1317,7 +1317,7 @@ class RealmTests: TestCase {
         updateComplete.expectedFulfillmentCount = 2
 
         let resultsUnderTest = realm.objects(SwiftStringObject.self)
-        let token = resultsUnderTest.observe(on: nil) { change in
+        let token = resultsUnderTest.observe { change in
             switch change {
             case .initial:
                 return // ignore
@@ -1486,5 +1486,12 @@ class RealmTests: TestCase {
         waitForExpectations(timeout: 1, handler: nil)
         XCTAssertNil(realm.objects(SwiftStringObject.self).first { $0.stringCol == "string A" })
         XCTAssertNotNil(realm.objects(SwiftStringObject.self).first { $0.stringCol == "string B" })
+    }
+}
+
+@available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
+extension CancellationError: Equatable {
+    public static func == (lhs: CancellationError, rhs: CancellationError) -> Bool {
+        true
     }
 }

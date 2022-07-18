@@ -46,13 +46,7 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 @end
 
 @interface RLMSyncErrorActionToken ()
-
 - (instancetype)initWithOriginalPath:(std::string)originalPath;
-
-@end
-
-@interface RLMAsyncOpenTask ()
-@property (nonatomic) std::shared_ptr<realm::AsyncOpenTask> task;
 @end
 
 RLM_HEADER_AUDIT_END(nullability, sendability)

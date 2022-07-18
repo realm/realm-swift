@@ -50,6 +50,7 @@ framework module Realm {
         header "RLMAccessor.h"
         header "RLMApp_Private.h"
         header "RLMArray_Private.h"
+        header "RLMAsyncTask_Private.h"
         header "RLMCollection_Private.h"
         header "RLMDictionary_Private.h"
         header "RLMEvent.h"

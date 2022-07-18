@@ -18,12 +18,26 @@ x.y.z Release notes (yyyy-MM-dd)
   which contains information about what was rejected and why. This information
   is intended primarily for debugging and logging purposes and may not have a
   stable format. ([PR #8002](https://github.com/realm/realm-swift/pull/8002))
+* Async `Realm.init()` now handles Task cancellation and will cancel the async
+  open if the Task is cancelled ([PR #8148](https://github.com/realm/realm-swift/pull/8148)).
+* Cancelling async opens now has more consistent behavior. The previously
+  intended and documented behavior was that cancelling an async open would
+  result in the callback associated with the specific task that was cancelled
+  never being called, and all other pending callbacks would be invoked with an
+  ECANCELED error. This never actually worked correctly, and the callback which
+  was not supposed to be invoked at all sometimes would be. We now
+  unconditionally invoke all of the exactly once, passing ECANCELED to all of
+  them ([PR #8148](https://github.com/realm/realm-swift/pull/8148)).
 
 ### Fixed
 * `UserPublisher` incorrectly bounced all notifications to the main thread instead
   of setting up the Combine publisher to correctly receive on the main thread.
   ([#8132](https://github.com/realm/realm-swift/issues/8132), since 10.21.0)
 * Fix warnings when building with Xcode 14.3 beta 1.
+  Errors in async open resulting from invalid queries in `initialSubscriptions`
+  would result in the callback being invoked with both a non-nil Realm and a
+  non-nil Error even though the Realm was in an invalid state. Now only the
+  error is passed to the callback ([PR #8148](https://github.com/realm/realm-swift/pull/8148), since v10.28.0).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 * Converting a local realm to a synced realm would crash if an embedded object

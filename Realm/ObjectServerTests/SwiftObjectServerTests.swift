@@ -1435,21 +1435,22 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         // Use a serial queue for asyncOpen to ensure that the first one adds
         // the completion block before the second one cancels it
-        RLMSetAsyncOpenQueue(DispatchQueue(label: "io.realm.asyncOpen"))
+        let queue = DispatchQueue(label: "io.realm.asyncOpen")
+        RLMSetAsyncOpenQueue(queue)
 
         let ex = expectation(description: "async open")
+        ex.expectedFulfillmentCount = 2
         let config = user.configuration(testName: #function)
-        Realm.asyncOpen(configuration: config) { result in
+        let completion = { (result: Result<Realm, Error>) -> Void in
             guard case .failure = result else {
                 XCTFail("No error on cancelled async open")
                 return ex.fulfill()
             }
             ex.fulfill()
         }
-        let task = Realm.asyncOpen(configuration: config) { _ in
-            XCTFail("Cancelled completion handler was called")
-        }
-        task.cancel()
+        Realm.asyncOpen(configuration: config, callback: completion)
+        let task = Realm.asyncOpen(configuration: config, callback: completion)
+        queue.sync { task.cancel() }
         waitForExpectations(timeout: 10.0, handler: nil)
     }
 
@@ -3069,8 +3070,7 @@ class AsyncAwaitObjectServerTests: SwiftSyncTestCase {
         XCTAssertEqual(realm3.objects(SwiftHugeSyncObject.self).count, 2)
     }
 
-
-    @MainActor func testAsyncOpenDownloadBehaviorAlways() async throws {
+    @MainActor func testAsyncOpenDownloadBehaviorAlwaysWithCachedRealm() async throws {
         // Populate the Realm on the server
         let user1 = try await self.app.login(credentials: basicCredentials())
         let realm1 = try await Realm(configuration: user1.configuration(testName: #function))
@@ -3086,6 +3086,37 @@ class AsyncAwaitObjectServerTests: SwiftSyncTestCase {
                                      downloadBeforeOpen: .always)
         XCTAssertEqual(realm2.objects(SwiftHugeSyncObject.self).count, 2)
         realm2.syncSession?.suspend()
+
+        // Add some more objects
+        try realm1.write {
+            realm1.add(SwiftHugeSyncObject.create())
+            realm1.add(SwiftHugeSyncObject.create())
+        }
+        waitForUploads(for: realm1)
+
+        // Should wait for the new objects to download
+        let realm3 = try await Realm(configuration: user2.configuration(testName: #function),
+                                     downloadBeforeOpen: .always)
+        XCTAssertEqual(realm3.objects(SwiftHugeSyncObject.self).count, 4)
+    }
+
+    @MainActor func testAsyncOpenDownloadBehaviorAlwaysWithFreshRealm() async throws {
+        // Populate the Realm on the server
+        let user1 = try await self.app.login(credentials: basicCredentials())
+        let realm1 = try await Realm(configuration: user1.configuration(testName: #function))
+        try realm1.write {
+            realm1.add(SwiftHugeSyncObject.create())
+            realm1.add(SwiftHugeSyncObject.create())
+        }
+        waitForUploads(for: realm1)
+
+        let user2 = try await app.login(credentials: .anonymous)
+        // Open in a Task so that the Realm is closed and re-opened later
+        _ = try await Task {
+            let realm2 = try await Realm(configuration: user2.configuration(testName: #function),
+                                         downloadBeforeOpen: .always)
+            XCTAssertEqual(realm2.objects(SwiftHugeSyncObject.self).count, 2)
+        }.value
 
         // Add some more objects
         try realm1.write {

@@ -157,6 +157,7 @@ let package = Package(
                 "Realm/RLMAnalytics.mm",
                 "Realm/RLMArray.mm",
                 "Realm/RLMAsymmetricObject.mm",
+                "Realm/RLMAsyncTask.mm",
                 "Realm/RLMClassInfo.mm",
                 "Realm/RLMCollection.mm",
                 "Realm/RLMConstants.m",

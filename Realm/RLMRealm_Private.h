@@ -18,7 +18,7 @@
 
 #import <Realm/RLMRealm.h>
 
-@class RLMFastEnumerator;
+@class RLMFastEnumerator, RLMAsyncRefreshTask;
 
 RLM_HEADER_AUDIT_BEGIN(nullability)
 
@@ -43,10 +43,33 @@ BOOL RLMIsRealmCachedAtPath(NSString *path);
 // Register a block to be called from the next before_notify() invocation
 FOUNDATION_EXTERN void RLMAddBeforeNotifyBlock(RLMRealm *realm, dispatch_block_t block);
 
+// This struct is awkward to make it compatible with Swift. Non-c++ obj-c can't
+// have retaining struct members (as that requires copy constructors etc.), so
+// it needs to be non-owning and passed via a pointer to C. In C++ land, though,
+// we need to be able to copy it and have it retain things. This is arguable an
+// ODR violation but Foundation does it all over the place.
+typedef struct RLMConfinement {
+#ifdef __cplusplus
+    _Nullable dispatch_queue_t queue;
+    _Nullable id actor;
+    void (^_Nullable scheduler)(dispatch_block_t);
+    _Nullable dispatch_block_t verifier;
+#else
+    __unsafe_unretained _Nullable dispatch_queue_t queue;
+    __unsafe_unretained _Nullable id actor;
+    __unsafe_unretained void (^_Nullable scheduler)(dispatch_block_t);
+    __unsafe_unretained _Nullable dispatch_block_t verifier;
+#endif
+} RLMConfinement;
+
+FOUNDATION_EXTERN RLMRealm *_Nullable RLMGetCachedRealm(RLMRealmConfiguration *, const RLMConfinement *) NS_RETURNS_RETAINED;
+
 // RLMRealm private members
 @interface RLMRealm ()
 @property (nonatomic, readonly) BOOL dynamic;
 @property (nonatomic, readwrite) RLMSchema *schema;
+@property (nonatomic, readonly, nullable) id actor;
+@property (nonatomic, readonly) bool isFlexibleSync;
 
 + (void)resetRealmState;
 
@@ -59,8 +82,11 @@ FOUNDATION_EXTERN void RLMAddBeforeNotifyBlock(RLMRealm *realm, dispatch_block_t
 - (void)verifyNotificationsAreSupported:(bool)isCollection;
 
 - (RLMRealm *)frozenCopy NS_RETURNS_RETAINED;
-+ (RLMAsyncOpenTask *)asyncOpenWithConfiguration:(RLMRealmConfiguration *)configuration
-                                        callback:(void (^)(NSError * _Nullable))callback;
+
++ (nullable instancetype)realmWithConfiguration:(RLMRealmConfiguration *)configuration
+                                     confinedTo:(const RLMConfinement *)options
+                                          error:(NSError **)error;
+- (void)waitForDownloadCompletion:(void (^)(NSError *_Nullable))completion;
 @end
 
 @interface RLMPinnedRealm : NSObject

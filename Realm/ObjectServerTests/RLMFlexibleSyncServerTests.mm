@@ -1107,7 +1107,7 @@
                                 callback:^(RLMRealm *realm, NSError *error) {
         RLMValidateError(error, RLMErrorDomain, RLMErrorSubscriptionFailed,
                          @"Client provided query with bad syntax: unsupported query for table \"UUIDPrimaryKeyObject\": key \"strCol\" is not a queryable field");
-        XCTAssertNotNil(realm);
+        XCTAssertNil(realm);
         [ex fulfill];
     }];
     [self waitForExpectationsWithTimeout:30.0 handler:nil];
