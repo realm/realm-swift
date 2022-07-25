@@ -355,7 +355,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let exp = expectation(description: "edit recovery mode")
         try RealmServer.shared.patchRecoveryMode(disable: disable, appServerId: appServerId, syncServiceId: syncServiceId, syncServiceConfiguration: syncServiceConfig) { result in
             switch result {
-            case .success(_):
+            case .success:
                 exp.fulfill()
             case .failure(let error):
                 XCTFail("Error: \(error.localizedDescription)")
@@ -526,7 +526,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         case .discardLocal(let before, let after):
             XCTAssertNotNil(before)
             XCTAssertNotNil(after)
-        case .recover(_, _):
+        case .recover:
             XCTFail("Should be set to discardLocal")
         case .recoverOrDiscard:
             XCTFail("Should be set to discardLocal")
@@ -573,12 +573,12 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         switch syncConfig.clientResetMode {
         case .manual:
             XCTFail("Should be set to recover")
-        case .discardLocal(_, _):
+        case .discardLocal:
             XCTFail("Should be set to recover")
         case .recover(let before, let after):
             XCTAssertNotNil(before)
             XCTAssertNotNil(after)
-        case .recoverOrDiscard(_, _):
+        case .recoverOrDiscard:
             XCTFail("Should be set to recover")
         }
 
@@ -628,9 +628,9 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         switch syncConfig.clientResetMode {
         case .manual:
             XCTFail("Should be set to recoverOrDiscard")
-        case .discardLocal(_, _):
+        case .discardLocal:
             XCTFail("Should be set to recoverOrDiscard")
-        case .recover(_, _):
+        case .recover:
             XCTFail("Should be set to recoverOrDiscard")
         case .recoverOrDiscard(let before, let after):
             XCTAssertNotNil(before)
