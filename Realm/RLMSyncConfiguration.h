@@ -55,7 +55,10 @@ typedef NS_ENUM(NSUInteger, RLMClientResetMode) {
     /// process is run locally in an attempt to integrate the server version with any local changes from before the
     /// client reset occurred.
     /// The changes are integrated with the following rules:
-    /// TODO: finish docstring
+    /// 1. Objects created locally that were not integrated before client reset will be integrated.
+    /// 2. If an object has been deleted on the server, but was modified on the recovering client, the delete takes precedence and the update is discarded
+    /// 3. If an object was deleted on the recovering client, but not the server, then the client delete instruction is applied.
+    /// 4. In the case of conflicting updates to the same field, the most recent update is applied.
     RLMClientResetModeRecover,
     // TODO: docs
     RLMClientResetModeRecoverOrDiscard

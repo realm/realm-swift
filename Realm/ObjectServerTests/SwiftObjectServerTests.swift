@@ -540,7 +540,61 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
     }
 
-    func testClientResetFailbackToDiscardLocal() throws {
+    func testClientResetRecover() throws {
+        let user = try logInUser(for: basicCredentials())
+        try prepareClientReset(#function, user)
+
+        // Define the blocks that will be passed into the sync configuration initializer.
+        let beforeCallbackEx = expectation(description: "before reset callback")
+        let beforeClientResetBlock: (Realm) -> Void = { local in
+            let results = local.objects(SwiftPerson.self)
+            XCTAssertEqual(results.count, 1)
+            XCTAssertEqual(results.filter("firstName == 'John'").count, 1)
+            beforeCallbackEx.fulfill()
+        }
+        let afterCallbackEx = expectation(description: "after reset callback")
+        let afterClientResetBlock: (Realm, Realm) -> Void = { before, after in
+            let results = before.objects(SwiftPerson.self)
+            XCTAssertEqual(results.count, 1)
+            XCTAssertEqual(results.filter("firstName == 'John'").count, 1)
+
+            let results2 = after.objects(SwiftPerson.self)
+            XCTAssertEqual(results2.count, 2)
+            XCTAssertEqual(results2.filter("firstName == 'John'").count, 1)
+            XCTAssertEqual(results2.filter("firstName == 'Paul'").count, 1)
+
+            afterCallbackEx.fulfill()
+        }
+
+        var configuration = user.configuration(partitionValue: #function, clientResetMode: .recover(beforeClientResetBlock, afterClientResetBlock))
+        configuration.objectTypes = [SwiftPerson.self]
+
+        guard let syncConfig = configuration.syncConfiguration else { fatalError("Test condition failure. SyncConfiguration not set.") }
+        switch syncConfig.clientResetMode {
+        case .manual:
+            XCTFail("Should be set to recover")
+        case .discardLocal(_, _):
+            XCTFail("Should be set to recover")
+        case .recover(let before, let after):
+            XCTAssertNotNil(before)
+            XCTAssertNotNil(after)
+        case .recoverOrDiscard(_, _):
+            XCTFail("Should be set to recover")
+        }
+
+        try autoreleasepool {
+            let realm = try Realm(configuration: configuration)
+            wait(for: [beforeCallbackEx, afterCallbackEx], timeout: 60.0)
+            XCTAssertEqual(realm.objects(SwiftPerson.self).count, 2) // Expect two objects, the one created before reset, and the one created while server was offline
+            XCTAssertEqual(realm.objects(SwiftPerson.self)[0].firstName, "John")
+            XCTAssertEqual(realm.objects(SwiftPerson.self)[1].firstName, "Paul")
+        }
+    }
+
+    func testClientResetRecoverOrDiscardLocalFailedRecovery() throws {
+        // Disable recovery mode on the server.
+        // This attempts to simulate a case where recovery mode fails when
+        // using RecoverOrDiscardLocal
         try waitForEditRecoveryMode(disable: true)
 
         let user = try logInUser(for: basicCredentials())
@@ -592,57 +646,6 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
 
         try waitForEditRecoveryMode(disable: false)
-    }
-
-    func testClientResetRecover() throws {
-        let user = try logInUser(for: basicCredentials())
-        try prepareClientReset(#function, user)
-
-        // Define the blocks that will be passed into the sync configuration initializer.
-        let beforeCallbackEx = expectation(description: "before reset callback")
-        let beforeClientResetBlock: (Realm) -> Void = { local in
-            let results = local.objects(SwiftPerson.self)
-            XCTAssertEqual(results.count, 1)
-            XCTAssertEqual(results.filter("firstName == 'John'").count, 1)
-            beforeCallbackEx.fulfill()
-        }
-        let afterCallbackEx = expectation(description: "after reset callback")
-        let afterClientResetBlock: (Realm, Realm) -> Void = { before, after in
-            let results = before.objects(SwiftPerson.self)
-            XCTAssertEqual(results.count, 1)
-            XCTAssertEqual(results.filter("firstName == 'John'").count, 1)
-
-            let results2 = after.objects(SwiftPerson.self)
-            XCTAssertEqual(results2.count, 2)
-            XCTAssertEqual(results2.filter("firstName == 'John'").count, 1)
-            XCTAssertEqual(results2.filter("firstName == 'Paul'").count, 1)
-
-            afterCallbackEx.fulfill()
-        }
-
-        var configuration = user.configuration(partitionValue: #function, clientResetMode: .recover(beforeClientResetBlock, afterClientResetBlock))
-        configuration.objectTypes = [SwiftPerson.self]
-
-        guard let syncConfig = configuration.syncConfiguration else { fatalError("Test condition failure. SyncConfiguration not set.") }
-        switch syncConfig.clientResetMode {
-        case .manual:
-            XCTFail("Should be set to recover")
-        case .discardLocal(_, _):
-            XCTFail("Should be set to recover")
-        case .recover(let before, let after):
-            XCTAssertNotNil(before)
-            XCTAssertNotNil(after)
-        case .recoverOrDiscard(_, _):
-            XCTFail("Should be set to recover")
-        }
-
-        try autoreleasepool {
-            let realm = try Realm(configuration: configuration)
-            wait(for: [beforeCallbackEx, afterCallbackEx], timeout: 60.0)
-            XCTAssertEqual(realm.objects(SwiftPerson.self).count, 2) // Expect two objects, the one created before reset, and the one created while server was offline
-            XCTAssertEqual(realm.objects(SwiftPerson.self)[0].firstName, "John")
-            XCTAssertEqual(realm.objects(SwiftPerson.self)[1].firstName, "Paul")
-        }
     }
 
     func testClientResetDiscardLocalAsyncOpen() throws {
