@@ -1,7 +1,20 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+* Add `.recover` and `.recoverOrDiscardLocal` behaviors to `ClientResetMode`. See below for detail.
+* Add `RLMClientResetModeRecover` and `RLMClientResetModeRecoverOrDiscard` behaviors to `RLMClientResetMode` enums.  See below for detail.
+* The new recover modes function by downloading a realm with objects which reflect 
+  the latest version of the server after a client reset. The recovery process is run 
+  locally in an attempt to integrate the server version with any local changes from 
+  before the client reset occurred.
+  The changes are integrated with the following rules:
+  1. Objects created locally that were not integrated before client reset will be integrated.
+  2. If an object has been deleted on the server, but was modified on the recovering client, the delete takes precedence and the update is discarded
+  3. If an object was deleted on the recovering client, but not the server, then the client delete instruction is applied.
+  4. In the case of conflicting updates to the same field, the most recent update is applied.
+  - The two new swift recovery also support client reset callbacks: `.recover(((Realm) -> Void)? = nil, ((Realm, Realm) -> Void)? = nil)`.
+  - The two new Obj-C recovery modes support client reset callback via the `notifyBeforeReset` and `notifyAfterReset` parameters in `[RLMUser configurationWithPartitionValue]`
+  - For more detail on client reset callbacks, see `ClientResetMode`, `RLMClientResetBeforeBlock`, `RLMClientResetAfterBlock`, and the 10.25.0 changelog entry.
 
 ### Fixed
 * Add missing `initialSubscription` and `rerunOnOpen` to copyWithZone method on `RLMRealmConfiguration`. This resulted in incorrect values when using `RLMRealmConfiguration.defaultConfiguration`.

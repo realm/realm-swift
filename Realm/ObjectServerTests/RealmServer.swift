@@ -1053,7 +1053,7 @@ public class RealmServer: NSObject {
 
     public func patchRecoveryMode(disable: Bool, appServerId: String, syncServiceId: String, syncServiceConfiguration: [String: Any], completion: @escaping (Result<Any?, Error>) -> Void) throws {
         // If desired edit is already the case, return
-        if (try recoveryModeDisabled(appServerId: appServerId, syncServiceId: syncServiceId) == disable) {
+        if try recoveryModeDisabled(appServerId: appServerId, syncServiceId: syncServiceId) == disable {
             return
         }
 
