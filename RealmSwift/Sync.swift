@@ -218,7 +218,7 @@ public enum ClientResetMode {
     case manual
     /// - see: `RLMClientResetModeDiscardLocal` for more details on `.discardLocal` behavior
     ///
-    /// The first `.discardLocal` function argument notifies prior to a client reset occurring.
+    /// The first `.discardLocal` function argument, `((Realm) -> Void)? = nil`, is executed prior to a client reset occurring.
     /// The `Realm` argument contains a frozen copy of the Realm state prior to client reset.
     /// ```
     /// user.configuration(partitionValue: "myPartition", clientResetMode: .discardLocal({ beforeRealm in
@@ -235,14 +235,14 @@ public enum ClientResetMode {
     ///  For more details on ((Realm) -> Void)? = nil,
     /// - see: `RLMClientResetBeforeBlock`
     ///
-    /// The second `.discardLocal` function argument notifies after a client reset has occurred.
+    /// The second `.discardLocal` function argument, `((Realm, Realm) -> Void)? = nil`, is executed after a client reset has occurred.
     /// - Within this function, the first `Realm` argument contains a frozen copy of the local Realm state prior to client reset.
     /// - Within this function, the second `Realm` argument contains the Realm state after client reset.
     /// ```
     /// user.configuration(partitionValue: "myPartition", clientResetMode: .discardLocal( nil, { beforeRealm, afterRealm in
     /// // This block could be used to add custom recovery logic, back-up a realm file, send reporting, etc.
-    /// for object in before.objects(myClass.self) {
-    ///     let res = after.objects(myClass.self)
+    /// for object in beforeRealm.objects(myClass.self) {
+    ///     let res = afterRealm.objects(myClass.self)
     ///     if (res.filter("primaryKey == %@", object.primaryKey).first != nil) {
     ///         // ...custom recovery logic...
     ///     } else {
@@ -254,9 +254,15 @@ public enum ClientResetMode {
     ///  For more details on the second block: ((Realm, Realm) -> Void)? = nil,
     /// - see: `RLMClientResetAfterBlock`
     case discardLocal(((Realm) -> Void)? = nil, ((Realm, Realm) -> Void)? = nil)
-    // TODO: docs
+    /// - see: `RLMClientResetModeRecover` for more details on `.recover` behavior
+    ///
+    /// - see `ClientResetMode.discardLocal` for a detailed explanation of the
+    ///   two callback arguments: `((Realm) -> Void)? = nil, ((Realm, Realm) -> Void)? = nil`
     case recover(((Realm) -> Void)? = nil, ((Realm, Realm) -> Void)? = nil)
-    // TODO: docs
+    /// - see: `RLMClientResetModeRecoverOrDiscard` for more details on `.recoverOrDiscard` behavior
+    ///
+    /// - see `ClientResetMode.discardLocal` for a detailed explanation of the
+    ///   two callback arguments: `((Realm) -> Void)? = nil, ((Realm, Realm) -> Void)? = nil`
     case recoverOrDiscard(((Realm) -> Void)? = nil, ((Realm, Realm) -> Void)? = nil)
 }
 
