@@ -290,6 +290,9 @@ static void setDefaults(SyncConfig& config, RLMUser *user) {
         }
         RLMSyncSession *session = [[RLMSyncSession alloc] initWithSyncSession:errored_session];
         dispatch_async(dispatch_get_main_queue(), ^{
+            // Keep the SyncSession alive until the callback completes as
+            // RLMSyncSession only holds a weak reference
+            static_cast<void>(errored_session);
             errorHandler(nsError, session);
         });
     };

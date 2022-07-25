@@ -144,6 +144,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface RLMSyncManager ()
+- (void)waitForSessionTermination;
+@end
+
 NS_ASSUME_NONNULL_END
 
 #define WAIT_FOR_SEMAPHORE(macro_semaphore, macro_timeout) do {                                                        \
