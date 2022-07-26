@@ -524,7 +524,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         case .discardLocal(let before, let after):
             XCTAssertNotNil(before)
             XCTAssertNotNil(after)
-        case default:
+        default:
             XCTFail("Should be set to discardLocal")
         }
 
@@ -572,7 +572,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         case .recover(let before, let after):
             XCTAssertNotNil(before)
             XCTAssertNotNil(after)
-        case default:
+        default:
             XCTFail("Should be set to recover")
         }
 
@@ -625,7 +625,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         case .recoverOrDiscard(let before, let after):
             XCTAssertNotNil(before)
             XCTAssertNotNil(after)
-        case default:
+        default:
             XCTFail("Should be set to recoverOrDiscard")
         }
 
