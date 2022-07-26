@@ -64,7 +64,9 @@ typedef NS_ENUM(NSUInteger, RLMClientResetMode) {
     /// 3. If an object was deleted on the client, but not the server, then the client delete instruction is applied.
     /// 4. In the case of conflicting updates to the same field, the most recent update is applied.
     ///
-    /// If the recovery process fails, the client reset process falls back to RLMClientResetModeManual.
+    /// If the recovery integration fails, the client reset process falls back to RLMClientResetModeManual.
+    /// The recovery integration will fail if the "Client Recovery" setting is not enabled on the server.
+    /// Integration may also fail in the event of an incompatible schema change.
     ///
     /// The RLMClientResetModeRecover mode supports two client reset callbacks -- `RLMClientResetBeforeBlock`, `RLMClientResetAfterBlock` -- which can be passed as arguments when creating the `RLMSyncConfiguration`.
     ///- see: `RLMClientResetAfterBlock` and `RLMClientResetBeforeBlock`
@@ -79,7 +81,9 @@ typedef NS_ENUM(NSUInteger, RLMClientResetMode) {
     /// 3. If an object was deleted on the client, but not the server, then the client delete instruction is applied.
     /// 4. In the case of conflicting updates to the same field, the most recent update is applied.
     ///
-    /// If the recovery process fails, the client reset process falls back to RLMClientResetModeDiscardLocal.
+    /// If the recovery integration fails, the client reset process falls back to RLMClientResetModeDiscardLocal.
+    /// The recovery integration will fail if the "Client Recovery" setting is not enabled on the server.
+    /// Integration may also fail in the event of an incompatible schema change.
     ///
     /// The RLMClientResetModeRecoverOrDiscard mode supports two client reset callbacks -- `RLMClientResetBeforeBlock`, `RLMClientResetAfterBlock` -- which can be passed as arguments when creating the `RLMSyncConfiguration`.
     ///- see: `RLMClientResetAfterBlock` and `RLMClientResetBeforeBlock`

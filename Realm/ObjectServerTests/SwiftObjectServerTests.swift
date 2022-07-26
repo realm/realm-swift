@@ -521,21 +521,19 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         guard let syncConfig = configuration.syncConfiguration else { fatalError("Test condition failure. SyncConfiguration not set.") }
         switch syncConfig.clientResetMode {
-        case .manual:
-            XCTFail("Should be set to discardLocal")
         case .discardLocal(let before, let after):
             XCTAssertNotNil(before)
             XCTAssertNotNil(after)
-        case .recover:
-            XCTFail("Should be set to discardLocal")
-        case .recoverOrDiscard:
+        case default:
             XCTFail("Should be set to discardLocal")
         }
 
         try autoreleasepool {
             let realm = try Realm(configuration: configuration)
             wait(for: [beforeCallbackEx, afterCallbackEx], timeout: 60.0)
-            XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1) // Expect the server realm (one object) to have overwritten the local realm (2 objects)
+            XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1)
+            // The object created locally (John) and the object created on the server (Paul)
+            // should both be integrated into the new realm file.
             XCTAssertEqual(realm.objects(SwiftPerson.self)[0].firstName, "Paul")
         }
     }
@@ -571,21 +569,19 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         guard let syncConfig = configuration.syncConfiguration else { fatalError("Test condition failure. SyncConfiguration not set.") }
         switch syncConfig.clientResetMode {
-        case .manual:
-            XCTFail("Should be set to recover")
-        case .discardLocal:
-            XCTFail("Should be set to recover")
         case .recover(let before, let after):
             XCTAssertNotNil(before)
             XCTAssertNotNil(after)
-        case .recoverOrDiscard:
+        case default:
             XCTFail("Should be set to recover")
         }
 
         try autoreleasepool {
             let realm = try Realm(configuration: configuration)
             wait(for: [beforeCallbackEx, afterCallbackEx], timeout: 60.0)
-            XCTAssertEqual(realm.objects(SwiftPerson.self).count, 2) // Expect two objects, the one created before reset, and the one created while server was offline
+            XCTAssertEqual(realm.objects(SwiftPerson.self).count, 2)
+            // The object created locally (John) and the object created on the server (Paul)
+            // should both be integrated into the new realm file.
             XCTAssertEqual(realm.objects(SwiftPerson.self)[0].firstName, "John")
             XCTAssertEqual(realm.objects(SwiftPerson.self)[1].firstName, "Paul")
         }
@@ -626,22 +622,20 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         guard let syncConfig = configuration.syncConfiguration else { fatalError("Test condition failure. SyncConfiguration not set.") }
         switch syncConfig.clientResetMode {
-        case .manual:
-            XCTFail("Should be set to recoverOrDiscard")
-        case .discardLocal:
-            XCTFail("Should be set to recoverOrDiscard")
-        case .recover:
-            XCTFail("Should be set to recoverOrDiscard")
         case .recoverOrDiscard(let before, let after):
             XCTAssertNotNil(before)
             XCTAssertNotNil(after)
+        case default:
+            XCTFail("Should be set to recoverOrDiscard")
         }
 
         // Expect the recovery to fail back to discardLocal logic
         try autoreleasepool {
             let realm = try Realm(configuration: configuration)
             wait(for: [beforeCallbackEx, afterCallbackEx], timeout: 60.0)
-            XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1) // Expect the server realm (one object) to have overwritten the local realm (2 objects)
+            XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1)
+            // The Person created locally ("John") should have been discarded,
+            // while the one from the server ("Paul") should be present.
             XCTAssertEqual(realm.objects(SwiftPerson.self)[0].firstName, "Paul")
         }
 

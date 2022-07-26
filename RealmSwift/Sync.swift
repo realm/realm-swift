@@ -218,7 +218,7 @@ public enum ClientResetMode {
     case manual
     /// - see: `RLMClientResetModeDiscardLocal` for more details on `.discardLocal` behavior
     ///
-    /// The first `.discardLocal` function argument, `((Realm) -> Void)? = nil`, is executed prior to a client reset occurring.
+    /// The first `.discardLocal` function argument is executed prior to a client reset occurring.
     /// The `Realm` argument contains a frozen copy of the Realm state prior to client reset.
     /// ```
     /// user.configuration(partitionValue: "myPartition", clientResetMode: .discardLocal({ beforeRealm in
@@ -235,7 +235,7 @@ public enum ClientResetMode {
     ///  For more details on ((Realm) -> Void)? = nil,
     /// - see: `RLMClientResetBeforeBlock`
     ///
-    /// The second `.discardLocal` function argument, `((Realm, Realm) -> Void)? = nil`, is executed after a client reset has occurred.
+    /// The second `.discardLocal` function argument is executed after a client reset has occurred.
     /// - Within this function, the first `Realm` argument contains a frozen copy of the local Realm state prior to client reset.
     /// - Within this function, the second `Realm` argument contains the Realm state after client reset.
     /// ```
