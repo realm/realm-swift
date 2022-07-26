@@ -152,7 +152,45 @@ x.y.z Release notes (yyyy-MM-dd)
 
 * Greatly improve the performance of obtaining cached Realm instances in Swift
   when using a sync configuration.
+* Add ability to section a collection which conforms to `RealmCollection`, `RLMCollection`.
+  Collections can be sectioned by a unique key retreived from a keyPath or a callback and will return an instance of `SectionedResults`/`RLMSectionedResults`.
+  Each section in the collection will be an instance of `ResultsSection`/`RLMSection` which gives access to the elements corresponding to the section key.
+  `SectionedResults`/`RLMSectionedResults` and `ResultsSection`/`RLMSection` have the ability to be observed.
+  ```swift
+  class DemoObject: Object {
+    @Persisted var title: String
+    @Persisted var date: Date
+    var firstLetter: String {
+        return title.first.map(String.init(_:)) ?? ""
+    }
+  }
 
+  var sectionedResults: SectionedResults<String, DemoObject>
+  ...
+  sectionedResults = realm.objects(DemoObject.self)
+      .sectioned(by: \.firstLetter, ascending: true)
+  ```
+* Add `@ObservedSectionedResults` for SwiftUI support. This property wrapper type retrieves sectioned results 
+  from a Realm using a keyPath or callback to determine the section key.
+  ```swift
+  struct DemoView: View {
+    @ObservedSectionedResults(DemoObject.self,
+                              sectionKeyPath: \.firstLetter) var demoObjects
+
+    var body: some View {
+        VStack {
+            List {
+                ForEach(demoObjects) { section in
+                    Section(header: Text(section.key)) {
+                        ForEach(section) { object in
+                            MyRowView(object: object)
+                        }
+                    }
+                }
+            }
+        }
+    }
+  ```
 ### Fixed
 
 * Add missing `initialSubscription` and `rerunOnOpen` to copyWithZone method on

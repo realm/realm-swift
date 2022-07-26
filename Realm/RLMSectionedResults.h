@@ -359,10 +359,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-/// An RLMSection contains the objects which below to a specified section key.
+/// An RLMSection contains the objects which belong to a specified section key.
 @interface RLMSection<RLMKeyType: id<RLMValue>, RLMObjectType> : NSObject<RLMSectionedResult>
 /// The value that represents the key in this section.
 @property (nonatomic, readonly) RLMKeyType key;
+/// The count of objects in the section.
+@property (nonatomic, readonly) NSUInteger count;
 /// Returns the object for a given index in the section.
 - (RLMObjectType)objectAtIndexedSubscript:(NSUInteger)index;
 /// Returns the object for a given index in the section.
@@ -658,6 +660,7 @@ NS_ASSUME_NONNULL_BEGIN
                                          queue:(nullable dispatch_queue_t)queue __attribute__((warn_unused_result));
 @end
 
+/// A lazily evaluated collection that holds elements in sections determined by a section key.
 @interface RLMSectionedResults<RLMKeyType: id<RLMValue>, RLMObjectType: id<RLMValue>> : NSObject<RLMSectionedResult>
 /// An array of all keys in the sectioned results collection.
 @property (nonatomic) NSArray<RLMKeyType> *allKeys;

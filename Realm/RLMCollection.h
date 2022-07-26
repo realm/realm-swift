@@ -26,6 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol RLMValue;
 @class RLMRealm, RLMResults, RLMSortDescriptor, RLMNotificationToken, RLMCollectionChange, RLMSectionedResults;
 typedef RLM_CLOSED_ENUM(int32_t, RLMPropertyType);
+/// A callback which is invoked on each element in the Results collection which returns the section key.
 typedef id<RLMValue> _Nullable(^RLMSectionedResultsKeyBlock)(id);
 
 /**
@@ -396,6 +397,8 @@ key paths are given, notifications are delivered for every property key path.
                                       keyPaths:(nullable NSArray<NSString *> *)keyPaths
                                          queue:(nullable dispatch_queue_t)queue
 __attribute__((warn_unused_result));
+
+#pragma mark - Sectioned Results
 
 /**
  Sorts and sections this collection from a given property key path, returning the result

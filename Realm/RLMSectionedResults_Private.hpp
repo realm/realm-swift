@@ -26,8 +26,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef id<RLMValue>_Nullable(^RLMSectionedResultsKeyBlock)(id);
-
 @interface RLMSectionedResultsChange ()
 - (instancetype)initWithChanges:(realm::SectionedResultsChangeSet)indices;
 @end

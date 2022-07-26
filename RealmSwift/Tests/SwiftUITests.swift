@@ -672,15 +672,15 @@ class SwiftUITests: TestCase {
 
         var filteredResults = ObservedSectionedResults(SwiftUIObject.self,
                                                        sectionKeyPath: \.str,
-                                                       configuration: inMemoryRealm(inMemoryIdentifier).configuration,
-                                                       filter: NSPredicate(format: "str = %@", "def"))
+                                                       filter: NSPredicate(format: "str = %@", "def"),
+                                                       configuration: inMemoryRealm(inMemoryIdentifier).configuration)
         XCTAssertEqual(filteredResults.wrappedValue.count, 1)
         XCTAssertEqual(filteredResults.wrappedValue[0].key, "def")
 
         filteredResults = ObservedSectionedResults(SwiftUIObject.self,
                                                    sectionKeyPath: \.str,
-                                                   configuration: inMemoryRealm(inMemoryIdentifier).configuration,
-                                                   where: { $0.str == "def" })
+                                                   where: { $0.str == "def" },
+                                                   configuration: inMemoryRealm(inMemoryIdentifier).configuration)
         XCTAssertEqual(filteredResults.wrappedValue.count, 1)
         XCTAssertEqual(filteredResults.wrappedValue[0].key, "def")
     }
@@ -711,10 +711,97 @@ class SwiftUITests: TestCase {
 
         let filteredResults = ObservedSectionedResults(UIElementsProjection.self,
                                                        sectionKeyPath: \.label,
-                                                       configuration: inMemoryRealm(inMemoryIdentifier).configuration,
-                                                       filter: NSPredicate(format: "str = %@", "def"))
+                                                       filter: NSPredicate(format: "str = %@", "def"),
+                                                       configuration: inMemoryRealm(inMemoryIdentifier).configuration)
         XCTAssertEqual(filteredResults.wrappedValue.count, 1)
         XCTAssertEqual(filteredResults.wrappedValue[0].key, "def")
+    }
+
+    func testAllObservedSectionedResultsConstructors() throws {
+        let realm = inMemoryRealm(inMemoryIdentifier)
+        try realm.write {
+            let object = SwiftUIObject()
+            object.str = "foo"
+            realm.add(object)
+        }
+        // Projections with `sectionKeyPath`
+        var projectionSectionedResults = ObservedSectionedResults(UIElementsProjection.self,
+                                                                  sectionKeyPath: \.label,
+                                                                  configuration: inMemoryRealm(inMemoryIdentifier).configuration)
+        XCTAssertEqual(projectionSectionedResults.wrappedValue.count, 1)
+        projectionSectionedResults = ObservedSectionedResults(UIElementsProjection.self,
+                                                              sectionKeyPath: \.label,
+                                                              sortDescriptors: [SortDescriptor.init(keyPath: "str")],
+                                                              configuration: inMemoryRealm(inMemoryIdentifier).configuration)
+        XCTAssertEqual(projectionSectionedResults.wrappedValue.count, 1)
+        projectionSectionedResults = ObservedSectionedResults(UIElementsProjection.self,
+                                                              sectionKeyPath: \.label,
+                                                              sortDescriptors: [SortDescriptor.init(keyPath: "str")],
+                                                              configuration: inMemoryRealm(inMemoryIdentifier).configuration)
+        XCTAssertEqual(projectionSectionedResults.wrappedValue.count, 1)
+        projectionSectionedResults = ObservedSectionedResults(UIElementsProjection.self,
+                                                              sectionKeyPath: \.label,
+                                                              sortDescriptors: [SortDescriptor.init(keyPath: "str")],
+                                                              filter: NSPredicate(format: "str == 'foo'"),
+                                                              configuration: inMemoryRealm(inMemoryIdentifier).configuration)
+        XCTAssertEqual(projectionSectionedResults.wrappedValue.count, 1)
+        // Projections with `sectionBlock`
+        projectionSectionedResults = ObservedSectionedResults(UIElementsProjection.self,
+                                                              sectionBlock: { $0.label.first.map(String.init(_:)) ?? "" },
+                                                              sortDescriptors: [SortDescriptor.init(keyPath: "str")],
+                                                              configuration: inMemoryRealm(inMemoryIdentifier).configuration)
+        XCTAssertEqual(projectionSectionedResults.wrappedValue.count, 1)
+        projectionSectionedResults = ObservedSectionedResults(UIElementsProjection.self,
+                                                              sectionBlock: { $0.label.first.map(String.init(_:)) ?? "" },
+                                                              sortDescriptors: [SortDescriptor.init(keyPath: "str")],
+                                                              configuration: inMemoryRealm(inMemoryIdentifier).configuration)
+        XCTAssertEqual(projectionSectionedResults.wrappedValue.count, 1)
+        projectionSectionedResults = ObservedSectionedResults(UIElementsProjection.self,
+                                                              sectionBlock: { $0.label.first.map(String.init(_:)) ?? "" },
+                                                              sortDescriptors: [SortDescriptor.init(keyPath: "str")],
+                                                              filter: NSPredicate(format: "str == 'foo'"),
+                                                              configuration: inMemoryRealm(inMemoryIdentifier).configuration)
+        XCTAssertEqual(projectionSectionedResults.wrappedValue.count, 1)
+        // Objects with `sectionKeyPath`
+        var objectSectionedResults = ObservedSectionedResults(SwiftUIObject.self,
+                                                              sectionKeyPath: \.str,
+                                                              configuration: inMemoryRealm(inMemoryIdentifier).configuration)
+        XCTAssertEqual(objectSectionedResults.wrappedValue.count, 1)
+        objectSectionedResults = ObservedSectionedResults(SwiftUIObject.self,
+                                                          sectionKeyPath: \.str,
+                                                          sortDescriptors: [SortDescriptor.init(keyPath: "str")],
+                                                          configuration: inMemoryRealm(inMemoryIdentifier).configuration)
+        XCTAssertEqual(objectSectionedResults.wrappedValue.count, 1)
+        objectSectionedResults = ObservedSectionedResults(SwiftUIObject.self,
+                                                          sectionKeyPath: \.str,
+                                                          sortDescriptors: [SortDescriptor.init(keyPath: "str")],
+                                                          where: { $0.str == "foo" },
+                                                          configuration: inMemoryRealm(inMemoryIdentifier).configuration)
+        XCTAssertEqual(objectSectionedResults.wrappedValue.count, 1)
+        objectSectionedResults = ObservedSectionedResults(SwiftUIObject.self,
+                                                          sectionKeyPath: \.str,
+                                                          sortDescriptors: [SortDescriptor.init(keyPath: "str")],
+                                                          filter: NSPredicate(format: "str == 'foo'"),
+                                                          configuration: inMemoryRealm(inMemoryIdentifier).configuration)
+        XCTAssertEqual(objectSectionedResults.wrappedValue.count, 1)
+        // Objects with `sectionBlock`
+        objectSectionedResults = ObservedSectionedResults(SwiftUIObject.self,
+                                                          sectionBlock: { $0.str.first.map(String.init(_:)) ?? "" },
+                                                          sortDescriptors: [SortDescriptor.init(keyPath: "str")],
+                                                          configuration: inMemoryRealm(inMemoryIdentifier).configuration)
+        XCTAssertEqual(objectSectionedResults.wrappedValue.count, 1)
+        objectSectionedResults = ObservedSectionedResults(SwiftUIObject.self,
+                                                          sectionBlock: { $0.str.first.map(String.init(_:)) ?? "" },
+                                                          sortDescriptors: [SortDescriptor.init(keyPath: "str")],
+                                                          filter: NSPredicate(format: "str == 'foo'"),
+                                                          configuration: inMemoryRealm(inMemoryIdentifier).configuration)
+        XCTAssertEqual(objectSectionedResults.wrappedValue.count, 1)
+        objectSectionedResults = ObservedSectionedResults(SwiftUIObject.self,
+                                                          sectionBlock: { $0.str.first.map(String.init(_:)) ?? "" },
+                                                          sortDescriptors: [SortDescriptor.init(keyPath: "str")],
+                                                          where: { $0.str == "foo" },
+                                                          configuration: inMemoryRealm(inMemoryIdentifier).configuration)
+        XCTAssertEqual(objectSectionedResults.wrappedValue.count, 1)
     }
 }
 #endif

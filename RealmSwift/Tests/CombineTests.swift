@@ -2154,7 +2154,7 @@ class ManagedMapPublisherTests: TestCase {
 // MARK: - Sectioned Results
 
 protocol RealmSectionedObject: ObjectBase {
-    associatedtype Key: _Persistable & Hashable
+    associatedtype Key: _Persistable, Hashable
     var key: Key { get }
 }
 
@@ -3186,7 +3186,7 @@ private class CombineSectionedResultsPublisherTests<Collection: RealmCollection>
             .sink { arr in
                 XCTAssertEqual(arr.count, 10)
                 for (i, change) in arr.enumerated() {
-                    self.checkChangeset(change, insertions: [IndexPath(item: i - 1, section: 0)],frozen: true)
+                    self.checkChangeset(change, insertions: [IndexPath(item: i - 1, section: 0)], frozen: true)
                 }
                 exp.fulfill()
         }
@@ -3207,7 +3207,7 @@ private class CombineSectionedResultsPublisherTests<Collection: RealmCollection>
             .sink { arr in
                 XCTAssertEqual(arr.count, objectsCount)
                 for (i, change) in arr.enumerated() {
-                    self.checkChangeset(change, insertions: [IndexPath(item: (i + objectsCount) - 1, section: 0)],frozen: true)
+                    self.checkChangeset(change, insertions: [IndexPath(item: (i + objectsCount) - 1, section: 0)], frozen: true)
                 }
                 sectionExp.fulfill()
         }
@@ -3367,6 +3367,7 @@ private class CombineSectionedResultsPublisherTests<Collection: RealmCollection>
 }
 
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+// swiftlint:disable:next type_name
 class ResultsWithSectionedResultsPublisherTests: TestCase {
     override class var defaultTestSuite: XCTestSuite {
         return CombineSectionedResultsPublisherTests<Results<ModernAllTypesObject>>.testSuite("Results")
@@ -3374,6 +3375,7 @@ class ResultsWithSectionedResultsPublisherTests: TestCase {
 }
 
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+// swiftlint:disable:next type_name
 class ManagedListSectionedResultsPublisherTests: TestCase {
     override class var defaultTestSuite: XCTestSuite {
         return CombineSectionedResultsPublisherTests<List<ModernAllTypesObject>>.testSuite("List")
@@ -3381,6 +3383,7 @@ class ManagedListSectionedResultsPublisherTests: TestCase {
 }
 
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+// swiftlint:disable:next type_name
 class ManagedMutableSetSectionedResultsPublisherTests: TestCase {
     override class var defaultTestSuite: XCTestSuite {
         return CombineSectionedResultsPublisherTests<MutableSet<ModernAllTypesObject>>.testSuite("MutableSet")
@@ -3388,6 +3391,7 @@ class ManagedMutableSetSectionedResultsPublisherTests: TestCase {
 }
 
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+// swiftlint:disable:next type_name
 class LinkingObjectsSectionedResultsPublisherTests: TestCase {
     override class var defaultTestSuite: XCTestSuite {
         return CombineSectionedResultsPublisherTests<LinkingObjects<ModernAllTypesObject>>.testSuite("LinkingObjects")
@@ -3395,6 +3399,7 @@ class LinkingObjectsSectionedResultsPublisherTests: TestCase {
 }
 
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+// swiftlint:disable:next type_name
 class AnyRealmCollectionSectionedResultsPublisherTests: TestCase {
     override class var defaultTestSuite: XCTestSuite {
         return CombineSectionedResultsPublisherTests<AnyRealmCollection<ModernAllTypesObject>>.testSuite("AnyRealmCollection")

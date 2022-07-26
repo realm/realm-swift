@@ -555,8 +555,8 @@ public protocol RealmCollection: RealmCollectionBase, Equatable {
     func thaw() -> Self?
 
     /**
-     Sorts and sections this collection from a given array of sort descriptors, returning the result
-     as an instance of `SectionedResults`.
+     Sorts this collection from a given array of sort descriptors and performs sectioning via a
+     user defined callback, returning the result as an instance of `SectionedResults`.
 
      - parameter sortDescriptors: An array of `SortDescriptor`s to sort by. Note: the primary sort descriptor
                                   must be responsible for determining the section key.
@@ -706,7 +706,7 @@ public extension RealmCollection where Element: ObjectBase {
      as an instance of `SectionedResults`. For every unique value retrieved from the
      keyPath a section key will be generated.
 
-     - parameter keyPath: The property key path to sort on.
+     - parameter keyPath: The property key path to sort & section on.
      - parameter ascending: The direction to sort in.
 
      - returns: An instance of `SectionedResults`.
@@ -723,7 +723,7 @@ public extension RealmCollection where Element: ObjectBase {
      as an instance of `SectionedResults`. For every unique value retrieved from the
      keyPath a section key will be generated.
 
-     - parameter keyPath: The property key path to sort on.
+     - parameter keyPath: The property key path to sort & section on.
      - parameter sortDescriptors: An array of `SortDescriptor`s to sort by. Note: the primary sort descriptor
                                   must be responsible for determining the section key.
 
@@ -742,9 +742,8 @@ public extension RealmCollection where Element: ObjectBase {
     }
 
     /**
-     Sorts and sections this collection from a given property key path, returning the result
-     as an instance of `SectionedResults`. For every unique value retrieved from the
-     block a section key will be generated.
+     Sorts this collection from a given array of `SortDescriptor`'s and performs sectioning
+     via a user defined callback function.
 
      - parameter block: A callback which is invoked on each element in the collection.
                         This callback is to return the section key for the element in the collection.
@@ -867,9 +866,8 @@ public extension RealmCollection where Element.PersistedType: SortableType {
 
 public extension RealmCollection {
     /**
-     Sorts and sections this collection from a given property key path, returning the result
-     as an instance of `SectionedResults`. For every unique value retrieved from the
-     block a section key will be generated.
+     Sorts this collection in ascending or descending order and performs sectioning
+     via a user defined callback function.
 
      - parameter block: A callback which is invoked on each element in the collection.
                         This callback is to return the section key for the element in the collection.
@@ -1196,8 +1194,8 @@ extension RealmCollection {
     }
 
     /**
-     Sorts and sections this collection from a given array of sort descriptors, returning the result
-     as an instance of `SectionedResults`.
+     Sorts this collection from a given array of sort descriptors and performs sectioning from
+     a user defined callback, returning the result as an instance of `SectionedResults`.
 
      - parameter block: A callback which is invoked on each element in the Results collection.
                         This callback is to return the section key for the element in the collection.

@@ -138,6 +138,7 @@ class BasePrimitiveSectionedResultsTests<TestData: SectionedResultsTestData>: RL
     }
 }
 
+// swiftlint:disable:next type_name
 class BaseOptionalPrimitiveSectionedResultsTests<TestData: OptionalSectionedResultsTestData>: BaseSectionedResultsTests {
     override func setUp() {
         realm = try! Realm(configuration: .init(inMemoryIdentifier: "BaseOptionalPrimitiveSectionedResultsTests",

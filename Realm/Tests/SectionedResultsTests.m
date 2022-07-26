@@ -691,77 +691,6 @@ static void ExpectChange(id self,
     });
 }
 
-- (void)testNotificationOnQueue {
-    __block RLMSectionedResultsChange *changes;
-    RLMRealm *realm = self.realmWithTestPath;
-    [self createObjects];
-    RLMResults<AllTypesObject *> *results = [AllTypesObject allObjectsInRealm:realm];
-    RLMSectionedResults<NSString *, AllTypesObject *> *sr = [results sectionedResultsSortedUsingKeyPath:@"stringCol"
-                                                                                              ascending:YES
-                                                                                               keyBlock:^id<RLMValue>(AllTypesObject *value) {
-        return [value.stringCol substringToIndex:1];
-    }];
-
-    dispatch_queue_t notificationQueue = dispatch_queue_create("notificationQueue", DISPATCH_QUEUE_SERIAL);
-
-    id token = [sr addNotificationBlock:^(RLMSectionedResults *r, RLMSectionedResultsChange *c, NSError *e) {
-        changes = c;
-        XCTAssertNil(e);
-        XCTAssertNotNil(r);
-    }
-                               keyPaths:@[@"stringCol"]
-                                  queue:notificationQueue];
-
-    [self waitForNotification:RLMRealmDidChangeNotification realm:self.realmWithTestPath block:^{
-        [self.realmWithTestPath transactionWithBlock:^{ }]; // Wait for initial notification.
-    }];
-    [self waitForNotification:RLMRealmDidChangeNotification realm:self.realmWithTestPath block:^{
-        RLMRealm *r = self.realmWithTestPath;
-        [r transactionWithBlock:^{
-                AllTypesObject *o = [AllTypesObject allObjectsInRealm:r][0];
-                o.stringCol = @"app";
-        }];
-    }];
-
-    dispatch_sync(notificationQueue, ^{});
-    XCTAssertEqualObjects(changes.insertions, @[[NSIndexPath indexPathForItem:2 inSection:0]]);
-    XCTAssertEqualObjects(changes.deletions, @[[NSIndexPath indexPathForItem:0 inSection:0]]);
-
-    NSString *expDesc =
-    @"\\<RLMSectionedResultsChange: 0x[a-z0-9]+\\> \\{\n"
-    @"\tinsertions: \\[\n"
-    @"\t\t\\<NSIndexPath: 0x[a-z0-9]+\\> \\{length = 2, path = 0 - 2\\}\n"
-    @"\t\\],\n"
-    @"\tdeletions: \\[\n"
-    @"\t\t\\<NSIndexPath: 0x[a-z0-9]+\\> \\{length = 2, path = 0 - 0\\}\n"
-    @"\t\\],\n"
-    @"\tmodifications: \\[\\],\n"
-    @"\tsectionsToInsert: \\[\\],\n"
-    @"\tsectionsToRemove: \\[\\]\n"
-    @"\\}";
-    RLMAssertMatches(changes.description, expDesc);
-
-    [self waitForNotification:RLMRealmDidChangeNotification realm:self.realmWithTestPath block:^{
-        RLMRealm *r = self.realmWithTestPath;
-        [r transactionWithBlock:^{
-            [r deleteAllObjects];
-        }];
-    }];
-
-    dispatch_sync(notificationQueue, ^{});
-    XCTAssertEqual(changes.sectionsToRemove.count, 3);
-
-    expDesc = @"\\<RLMSectionedResultsChange: 0x[a-z0-9]+\\> \\{\n"
-    @"\tinsertions: \\[\\],\n"
-    @"\tdeletions: \\[\\],\n"
-    @"\tmodifications: \\[\\],\n"
-    @"\tsectionsToInsert: \\[\\],\n"
-    @"\tsectionsToRemove: \\[0, 1, 2\\]\n"
-    @"\\}";
-    RLMAssertMatches(changes.description, expDesc);
-    [token invalidate];
-}
-
 - (void)testNotificationsOnSection {
     __block RLMSectionedResultsChange *changes;
     RLMRealm *realm = self.realmWithTestPath;
@@ -774,16 +703,16 @@ static void ExpectChange(id self,
     }];
 
     RLMSection<NSString *, StringObject *> *section = sr[0];
-    dispatch_queue_t notificationQueue = dispatch_queue_create("notificationQueue", DISPATCH_QUEUE_SERIAL);
 
     id token = [section addNotificationBlock:^(RLMSection *r, RLMSectionedResultsChange *c, NSError *e) {
         changes = c;
         XCTAssertNil(e);
         XCTAssertNotNil(r);
+        CFRunLoopStop(CFRunLoopGetCurrent());
     }
-                                    keyPaths:@[@"stringCol"]
-                                       queue:notificationQueue];
+                                    keyPaths:@[@"stringCol"]];
 
+    CFRunLoopRun();
     [self waitForNotification:RLMRealmDidChangeNotification realm:self.realmWithTestPath block:^{
         RLMRealm *r = self.realmWithTestPath;
         [r transactionWithBlock:^{
@@ -792,26 +721,11 @@ static void ExpectChange(id self,
         }];
     }];
 
-    dispatch_sync(notificationQueue, ^{});
     XCTAssertEqualObjects(changes.insertions, @[[NSIndexPath indexPathForItem:0 inSection:0]]);
     XCTAssertEqualObjects(changes.modifications, @[]);
     XCTAssertEqualObjects(changes.deletions, @[]);
     XCTAssertEqual(changes.sectionsToInsert.count, 0);
     XCTAssertEqual(changes.sectionsToRemove.count, 0);
-
-    [self waitForNotification:RLMRealmDidChangeNotification realm:self.realmWithTestPath block:^{
-        RLMRealm *r = self.realmWithTestPath;
-        [r transactionWithBlock:^{
-            [r deleteAllObjects];
-        }];
-    }];
-
-    dispatch_sync(notificationQueue, ^{});
-    XCTAssertEqualObjects(changes.insertions, @[]);
-    XCTAssertEqualObjects(changes.modifications, @[]);
-    XCTAssertEqualObjects(changes.deletions, @[]);
-    XCTAssertEqual(changes.sectionsToInsert.count, 0);
-    XCTAssertTrue([changes.sectionsToRemove containsIndex:0]);
     [token invalidate];
 }
 
@@ -1170,75 +1084,6 @@ static void ExpectChangePrimitive(id self,
     XCTAssertEqualObjects(sr[1].key, @0);
     XCTAssertEqualObjects(sr[1][0], @4);
     XCTAssertEqualObjects(sr[1][1], @2);
-}
-
-- (void)testThreadSafeReference {
-    [self createObjects];
-    RLMRealm *realm = self.realmWithTestPath;
-    // Test creation from frozen RLMResults
-    RLMResults<AllTypesObject *> *results = [AllTypesObject allObjectsInRealm:realm];
-    __block BOOL isMainQueue = NO;
-    RLMSectionedResults<NSString *, AllTypesObject *> *sr = [results sectionedResultsSortedUsingKeyPath:@"objectCol.stringCol"
-                                                                                              ascending:YES
-                                                                                               keyBlock:^id<RLMValue>(AllTypesObject *value) {
-        isMainQueue = [NSThread isMainThread];
-        return [value.objectCol.stringCol substringToIndex:1];
-    }];
-
-    XCTAssertEqual(sr.count, 4);
-    XCTAssertTrue(isMainQueue);
-
-    __block RLMThreadSafeReference<RLMSectionedResults<NSString *, AllTypesObject *> *> *tsr = [RLMThreadSafeReference referenceWithThreadConfined:sr];
-
-    dispatch_queue_t q = dispatch_queue_create("sectioned-results", DISPATCH_QUEUE_SERIAL);
-    __block BOOL didRun = NO;
-    dispatch_async(q, ^{
-        RLMRealmConfiguration *config = [[RLMRealmConfiguration alloc] init];
-        config.fileURL = RLMTestRealmURL();
-        RLMRealm *r = [RLMRealm realmWithConfiguration:config queue:q error:nil];
-        RLMSectionedResults<NSString *, AllTypesObject *> *tsrSectionedResults = [r resolveThreadSafeReference:tsr];
-        XCTAssertEqual(tsrSectionedResults.count, 4);
-        didRun = YES;
-    });
-
-    dispatch_sync(q, ^{});
-    XCTAssertTrue(didRun);
-    XCTAssertFalse(isMainQueue);
-}
-
-- (void)testThreadSafeReferenceOnSection {
-    [self createObjects];
-    RLMRealm *realm = self.realmWithTestPath;
-    // Test creation from frozen RLMResults
-    RLMResults<AllTypesObject *> *results = [AllTypesObject allObjectsInRealm:realm];
-    __block BOOL isMainQueue = NO;
-    RLMSectionedResults<NSString *, AllTypesObject *> *sr = [results sectionedResultsSortedUsingKeyPath:@"objectCol.stringCol"
-                                                                                              ascending:YES
-                                                                                               keyBlock:^id<RLMValue>(AllTypesObject *value) {
-        isMainQueue = [NSThread isMainThread];
-        return [value.objectCol.stringCol substringToIndex:1];
-    }];
-    RLMSection *section = sr[0];
-
-    XCTAssertEqual(section.count, 3);
-    XCTAssertTrue(isMainQueue);
-
-    __block RLMThreadSafeReference<RLMSection<NSString *, AllTypesObject *> *> *tsr = [RLMThreadSafeReference referenceWithThreadConfined:section];
-
-    dispatch_queue_t q = dispatch_queue_create("sectioned-results", DISPATCH_QUEUE_SERIAL);
-    __block BOOL didRun = NO;
-    dispatch_async(q, ^{
-        RLMRealmConfiguration *config = [[RLMRealmConfiguration alloc] init];
-        config.fileURL = RLMTestRealmURL();
-        RLMRealm *r = [RLMRealm realmWithConfiguration:config queue:q error:nil];
-        RLMSection<NSString *, AllTypesObject *> *tsrSection = [r resolveThreadSafeReference:tsr];
-        XCTAssertEqual(tsrSection.count, 3);
-        didRun = YES;
-    });
-
-    dispatch_sync(q, ^{});
-    XCTAssertTrue(didRun);
-    XCTAssertFalse(isMainQueue);
 }
 
 @end

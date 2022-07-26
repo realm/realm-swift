@@ -332,8 +332,8 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
         _info = &objectInfo;
         _realm = realm;
         _keyBlock = keyBlock;
-        _results = results;
-        _sectionedResults = results.sectioned_results(SectionedResultsKeyProjection {_info, _keyBlock});
+        _results = std::move(results);
+        _sectionedResults = _results.sectioned_results(SectionedResultsKeyProjection {_info, _keyBlock});
     }
     return self;
 }

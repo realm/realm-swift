@@ -175,10 +175,10 @@ extension Publisher {
 
     /// Freezes all Realm sectioned results changesets from the upstream publisher.
     ///
-    /// Freezing a Realm  sectioned results changeset makes the included  sectioned results
+    /// Freezing a Realm sectioned results changeset makes the included  sectioned results
     /// reference no longer live-update when writes are made to the Realm and
     /// makes it safe to pass freely between threads without using
-    /// `.threadSafeReference()`. It also guarantees that the frozen  sectioned results
+    /// `.threadSafeReference()`. It also guarantees that the frozen sectioned results
     /// contained in the changset will always match the change information,
     /// which is not always the case when using thread-safe references.
     ///
@@ -425,7 +425,7 @@ extension Publisher {
         RealmPublishers.MakeThreadSafeKeyedCollectionChangeset(self)
     }
 
-    /// Enables passing Realm  sectioned results changesets to a different dispatch queue.
+    /// Enables passing Realm sectioned results changesets to a different dispatch queue.
     ///
     /// Each call to `receive(on:)` on a publisher which emits Realm
     /// thread-confined objects must be proceeded by a call to
@@ -1829,17 +1829,17 @@ public enum RealmPublishers {
         }
     }
 
-    /// A publisher which emits RealmMapChange<Key, Value> each time the observed object is modified
+    /// A publisher which emits RealmSectionedResultsChange<Collection> each time the observed object is modified
     ///
     /// `receive(on:)` and `subscribe(on:)` can be called directly on this
     /// publisher, and calling `.threadSafeReference()` is only required if
     /// there is an intermediate transform. If `subscribe(on:)` is used, it
     /// should always be the first operation in the pipeline.
     ///
-    /// Create this publisher using the `changesetPublisher` property on RealmCollection.
+    /// Create this publisher using the `changesetPublisher` property on RealmSectionedResult.
     @frozen public struct SectionedResultsChangeset<Collection: RealmSectionedResult>: Publisher {
         public typealias Output = RealmSectionedResultsChange<Collection>
-        /// This publisher reports error via the `.error` case of RealmMapChange.
+        /// This publisher reports error via the `.error` case of RealmSectionedResultsChange.
         public typealias Failure = Never
 
         private let collection: Collection
@@ -1852,7 +1852,7 @@ public enum RealmPublishers {
             self.queue = queue
         }
 
-        /// Captures the `NotificationToken` produced by observing a Realm Collection.
+        /// Captures the `NotificationToken` produced by observing the collection.
         ///
         /// This allows you to do notification skipping when performing a `Realm.write(withoutNotifying:)`. You should use this call if you
         /// require to write to the Realm database and ignore this specific observation chain.
@@ -1861,7 +1861,7 @@ public enum RealmPublishers {
         /// - Parameters:
         ///   - object: The object which the `NotificationToken` is written to.
         ///   - keyPath: The KeyPath which the `NotificationToken` is written to.
-        /// - Returns: A `CollectionChangesetWithToken` Publisher.
+        /// - Returns: A `SectionedResultsChangesetWithToken` Publisher.
         public func saveToken<T>(on object: T, at keyPath: WritableKeyPath<T, NotificationToken?>) -> SectionedResultsChangesetWithToken<Collection, T> {
               return SectionedResultsChangesetWithToken<Collection, T>(collection, queue, object, keyPath)
         }
@@ -1912,17 +1912,17 @@ public enum RealmPublishers {
         }
     }
 
-    /// A publisher which emits RealmMapChange<Key, Value> each time the observed object is modified
+    /// A publisher which emits RealmSectionedResultsChange<Collection> each time the observed object is modified
     ///
     /// `receive(on:)` and `subscribe(on:)` can be called directly on this
     /// publisher, and calling `.threadSafeReference()` is only required if
     /// there is an intermediate transform. If `subscribe(on:)` is used, it
     /// should always be the first operation in the pipeline.
     ///
-    /// Create this publisher using the `changesetPublisher` property on RealmCollection.
+    /// Create this publisher using the `changesetPublisher` property on RealmSectionedResult.
     @frozen public struct SectionChangeset<Collection: RealmSectionedResult>: Publisher {
         public typealias Output = RealmSectionedResultsChange<Collection>
-        /// This publisher reports error via the `.error` case of RealmMapChange.
+        /// This publisher reports error via the `.error` case of RealmSectionedResultsChange.
         public typealias Failure = Never
 
         private let collection: Collection
@@ -1935,7 +1935,7 @@ public enum RealmPublishers {
             self.queue = queue
         }
 
-        /// Captures the `NotificationToken` produced by observing a Realm Collection.
+        /// Captures the `NotificationToken` produced by observing a the collection.
         ///
         /// This allows you to do notification skipping when performing a `Realm.write(withoutNotifying:)`. You should use this call if you
         /// require to write to the Realm database and ignore this specific observation chain.
@@ -1944,10 +1944,10 @@ public enum RealmPublishers {
         /// - Parameters:
         ///   - object: The object which the `NotificationToken` is written to.
         ///   - keyPath: The KeyPath which the `NotificationToken` is written to.
-        /// - Returns: A `CollectionChangesetWithToken` Publisher.
+        /// - Returns: A `SectionedResultsChangesetWithToken` Publisher.
         public func saveToken<T>(on object: T, at keyPath: WritableKeyPath<T, NotificationToken?>) -> SectionedResultsChangesetWithToken<Collection, T> {
               return SectionedResultsChangesetWithToken<Collection, T>(collection, queue, object, keyPath)
-        }        
+        }
 
         /// :nodoc:
         public func receive<S>(subscriber: S) where S: Subscriber, S.Failure == Never, Output == S.Input {
@@ -2075,14 +2075,14 @@ public enum RealmPublishers {
         }
     }
 
-    /// A publisher which emits RealmCollectionChange<T> each time the observed object is modified
+    /// A publisher which emits RealmSectionedResultsChange<T> each time the observed object is modified
     ///
     /// `receive(on:)` and `subscribe(on:)` can be called directly on this
     /// publisher, and calling `.threadSafeReference()` is only required if
     /// there is an intermediate transform. If `subscribe(on:)` is used, it
     /// should always be the first operation in the pipeline.
     ///
-    /// Create this publisher using the `changesetPublisher` property on RealmCollection.
+    /// Create this publisher using the `changesetPublisher` property on RealmSectionedResult.
     public class SectionedResultsChangesetWithToken<Collection: RealmSectionedResult, T>: Publisher {
         public typealias Output = RealmSectionedResultsChange<Collection>
         /// This publisher reports error via the `.error` case of RealmCollectionChange.
@@ -2154,14 +2154,14 @@ public enum RealmPublishers {
         }
     }
 
-    /// A publisher which emits RealmCollectionChange<T> each time the observed object is modified
+    /// A publisher which emits RealmSectionedResultsChange<T> each time the observed object is modified
     ///
     /// `receive(on:)` and `subscribe(on:)` can be called directly on this
     /// publisher, and calling `.threadSafeReference()` is only required if
     /// there is an intermediate transform. If `subscribe(on:)` is used, it
     /// should always be the first operation in the pipeline.
     ///
-    /// Create this publisher using the `changesetPublisher` property on RealmCollection.
+    /// Create this publisher using the `changesetPublisher` property on RealmSectionedResult.
     public class SectionChangesetWithToken<Collection: RealmSectionedResult, T>: Publisher {
         public typealias Output = RealmSectionedResultsChange<Collection>
         /// This publisher reports error via the `.error` case of RealmCollectionChange.
@@ -2550,6 +2550,7 @@ public enum RealmPublishers {
     ///
     /// Create using `.threadSafeReference().receive(on: queue)` on a publisher
     /// that emits `RealmCollectionChange`.
+    // swiftlint:disable:next type_name
     @frozen public struct DeferredHandoverSectionedResultsChangeset<Upstream: Publisher, T: RealmSectionedResult, S: Scheduler>: Publisher where Upstream.Output == RealmSectionedResultsChange<T> {
         /// :nodoc:
         public typealias Failure = Upstream.Failure
@@ -2624,7 +2625,7 @@ public enum RealmPublishers {
     /// serial dispatch queue.
     ///
     /// Create using `.threadSafeReference().receive(on: queue)` on a publisher
-    /// that emits `RealmCollectionChange`.
+    /// that emits `RealmSectionedResultsChange`.
     @frozen public struct DeferredHandoverSectionChangeset<Upstream: Publisher, T: RealmSectionedResult, S: Scheduler>: Publisher where Upstream.Output == RealmSectionedResultsChange<T> {
         /// :nodoc:
         public typealias Failure = Upstream.Failure

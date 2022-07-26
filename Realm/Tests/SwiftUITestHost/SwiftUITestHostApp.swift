@@ -369,7 +369,32 @@ struct ObservedSectionedResultsKeyPathTestView: View {
     }
 }
 
+struct ObservedSectionedResultsKeyPathTestView2: View {
+    @ObservedSectionedResults(ReminderList.self,
+                              sectionBlock: { $0.name.first.map(String.init(_:)) ?? "" },
+                              sortDescriptors: [SortDescriptor(keyPath: \ReminderList.name)],
+                              keyPaths: ["reminders.isFlagged"]) var reminders
+
+    var body: some View {
+        VStack {
+            List {
+                ForEach(reminders) { section in
+                    Section(header: Text(section.key)) {
+                        ForEach(section) { object in
+                            ObservedResultsKeyPathTestRow(list: object)
+                        }
+                    }
+                }
+            }
+            .navigationBarItems(trailing: EditButton())
+            .navigationTitle("reminders")
+            Footer()
+        }
+    }
+}
+
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
+// swiftlint:disable:next type_name
 struct ObservedSectionedResultsSearchableTestView: View {
     @ObservedSectionedResults(ReminderList.self,
                               sectionKeyPath: \.firstLetter,
@@ -494,6 +519,8 @@ struct App: SwiftUI.App {
                                 .environment(\.realmConfiguration, Realm.Configuration(inMemoryIdentifier: "realm_a")))
             case "observed_sectioned_results_key_path":
                 return AnyView(ObservedSectionedResultsKeyPathTestView())
+            case "observed_sectioned_results_key_path2":
+                return AnyView(ObservedSectionedResultsKeyPathTestView2())
             case "observed_sectioned_results_searchable":
                 if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *) {
                     return AnyView(ObservedSectionedResultsSearchableTestView())
