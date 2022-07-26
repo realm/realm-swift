@@ -2501,7 +2501,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     RLMMongoDatabase *database = [client databaseWithName:@"test_data"];
     RLMMongoCollection *collection = [database collectionWithName:@"Dog"];
 
-    NSArray<RLMObjectId *> *objectIds = [self insertDogDocuments:collection];
+    NSArray<RLMObjectId *> *objectIds = [self prepareDogDocumentsIn:collection];
     RLMObjectId *rexObjectId = objectIds[1];
 
     XCTestExpectation *deleteOneExpectation1 = [self expectationWithDescription:@"should delete first document in collection"];
@@ -2622,7 +2622,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     [self performWatchWithMatchFilterTest:asyncQueue];
 }
 
-- (NSArray<RLMObjectId *> *)insertDogDocuments:(RLMMongoCollection *)collection {
+- (NSArray<RLMObjectId *> *)prepareDogDocumentsIn:(RLMMongoCollection *)collection {
     __block NSArray<RLMObjectId *> *objectIds;
     XCTestExpectation *ex = [self expectationWithDescription:@"delete existing documents"];
     [collection deleteManyDocumentsWhere:@{} completion:^(NSInteger, NSError *error) {
@@ -2653,7 +2653,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     RLMMongoClient *client = [self.anonymousUser mongoClientWithServiceName:@"mongodb1"];
     RLMMongoDatabase *database = [client databaseWithName:@"test_data"];
     __block RLMMongoCollection *collection = [database collectionWithName:@"Dog"];
-    NSArray<RLMObjectId *> *objectIds = [self insertDogDocuments:collection];
+    NSArray<RLMObjectId *> *objectIds = [self prepareDogDocumentsIn:collection];
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"watch collection and receive change event 3 times"];
 
@@ -2700,7 +2700,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     RLMMongoClient *client = [self.anonymousUser mongoClientWithServiceName:@"mongodb1"];
     RLMMongoDatabase *database = [client databaseWithName:@"test_data"];
     __block RLMMongoCollection *collection = [database collectionWithName:@"Dog"];
-    NSArray<RLMObjectId *> *objectIds = [self insertDogDocuments:collection];
+    NSArray<RLMObjectId *> *objectIds = [self prepareDogDocumentsIn:collection];
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"watch collection and receive change event 3 times"];
 
@@ -2748,7 +2748,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     RLMMongoClient *client = [self.anonymousUser mongoClientWithServiceName:@"mongodb1"];
     RLMMongoDatabase *database = [client databaseWithName:@"test_data"];
     __block RLMMongoCollection *collection = [database collectionWithName:@"Dog"];
-    NSArray<RLMObjectId *> *objectIds = [self insertDogDocuments:collection];
+    NSArray<RLMObjectId *> *objectIds = [self prepareDogDocumentsIn:collection];
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"watch collection and receive change event 3 times"];
     expectation.expectedFulfillmentCount = 2;
