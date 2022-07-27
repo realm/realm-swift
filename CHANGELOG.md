@@ -1,10 +1,13 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.28.3 Release notes (2022-07-27)
 =============================================================
+
 ### Enhancements
+
 * Greatly improve the performance of obtaining cached Realm instances in Swift
   when using a sync configuration.
 
 ### Fixed
+
 * Add missing `initialSubscription` and `rerunOnOpen` to copyWithZone method on
   `RLMRealmConfiguration`. This resulted in incorrect values when using
   `RLMRealmConfiguration.defaultConfiguration`.
@@ -13,17 +16,13 @@ x.y.z Release notes (yyyy-MM-dd)
   resulting in the session passed to the error handler being invalid if there
   were no other remaining strong references elsewhere.
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
-
 ### Compatibility
+
 * Realm Studio: 11.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 13.4.1.
 * CocoaPods: 1.10 or later.
-* Xcode: 13.1-14 beta 1.
-
-### Internal
-* Upgraded realm-core from ? to ?
+* Xcode: 13.1-14 beta 3.
 
 10.28.2 Release notes (2022-06-30)
 =============================================================
