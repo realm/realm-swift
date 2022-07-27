@@ -238,7 +238,7 @@ using namespace realm;
 }
 
 - (void)refreshCustomDataWithCompletion:(RLMUserCustomDataBlock)completion {
-    _user->refresh_custom_data([completion, self](util::Optional<app::AppError> error) {
+    _user->refresh_custom_data([completion, self](std::optional<app::AppError> error) {
         if (!error) {
             return completion([self customData], nil);
         }
@@ -250,7 +250,7 @@ using namespace realm;
 - (void)linkUserWithCredentials:(RLMCredentials *)credentials
                      completion:(RLMOptionalUserBlock)completion {
     _app._realmApp->link_user(_user, credentials.appCredentials,
-                   ^(std::shared_ptr<SyncUser> user, util::Optional<app::AppError> error) {
+                   ^(std::shared_ptr<SyncUser> user, std::optional<app::AppError> error) {
         if (error && error->error_code) {
             return completion(nil, RLMAppErrorToNSError(*error));
         }
@@ -260,19 +260,19 @@ using namespace realm;
 }
 
 - (void)removeWithCompletion:(RLMOptionalErrorBlock)completion {
-    _app._realmApp->remove_user(_user, ^(realm::util::Optional<app::AppError> error) {
+    _app._realmApp->remove_user(_user, ^(std::optional<app::AppError> error) {
         [self handleResponse:error completion:completion];
     });
 }
 
 - (void)deleteWithCompletion:(RLMUserOptionalErrorBlock)completion {
-    _app._realmApp->delete_user(_user, ^(realm::util::Optional<app::AppError> error) {
+    _app._realmApp->delete_user(_user, ^(std::optional<app::AppError> error) {
         [self handleResponse:error completion:completion];
     });
 }
 
 - (void)logOutWithCompletion:(RLMOptionalErrorBlock)completion {
-    _app._realmApp->log_out(_user, ^(realm::util::Optional<app::AppError> error) {
+    _app._realmApp->log_out(_user, ^(std::optional<app::AppError> error) {
         [self handleResponse:error completion:completion];
     });
 }
@@ -295,8 +295,8 @@ using namespace realm;
     }
 
     _app._realmApp->call_function(_user, name.UTF8String, args,
-                                  [completionBlock](util::Optional<bson::Bson>&& response,
-                                                    util::Optional<app::AppError> error) {
+                                  [completionBlock](std::optional<bson::Bson>&& response,
+                                                    std::optional<app::AppError> error) {
         if (error) {
             return completionBlock(nil, RLMAppErrorToNSError(*error));
         }
@@ -305,7 +305,7 @@ using namespace realm;
     });
 }
 
-- (void)handleResponse:(realm::util::Optional<realm::app::AppError>)error
+- (void)handleResponse:(std::optional<realm::app::AppError>)error
             completion:(RLMOptionalErrorBlock)completion {
     if (error && error->error_code) {
         return completion(RLMAppErrorToNSError(*error));
@@ -388,7 +388,7 @@ using namespace realm;
 }
 @end
 
-static NSString* userProfileMemberToNSString(const util::Optional<std::string>& member) {
+static NSString* userProfileMemberToNSString(const std::optional<std::string>& member) {
     if (member == util::none) {
         return nil;
     }
@@ -397,7 +397,7 @@ static NSString* userProfileMemberToNSString(const util::Optional<std::string>& 
 
 @implementation RLMUserProfile
 
-using UserProfileMember = util::Optional<std::string> (SyncUserProfile::*)() const;
+using UserProfileMember = std::optional<std::string> (SyncUserProfile::*)() const;
 
 - (instancetype)initWithUserProfile:(SyncUserProfile)userProfile {
     if (self = [super init]) {

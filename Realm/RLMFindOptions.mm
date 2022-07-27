@@ -61,7 +61,7 @@
 - (void)setProjection:(id<RLMBSON>)projection {
     if (projection) {
         auto bson = realm::bson::BsonDocument(RLMConvertRLMBSONToBson(projection));
-        _options.projection_bson = realm::util::Optional<realm::bson::BsonDocument>(bson);
+        _options.projection_bson = std::optional<realm::bson::BsonDocument>(bson);
     } else {
         _options.projection_bson = realm::util::none;
     }
@@ -70,7 +70,7 @@
 - (void)setSort:(id<RLMBSON>)sort {
     if (sort) {
         auto bson = realm::bson::BsonDocument(RLMConvertRLMBSONToBson(sort));
-        _options.sort_bson = realm::util::Optional<realm::bson::BsonDocument>(bson);
+        _options.sort_bson = std::optional<realm::bson::BsonDocument>(bson);
     } else {
         _options.sort_bson = realm::util::none;
     }
@@ -81,7 +81,7 @@
 }
 
 - (void)setLimit:(NSInteger)limit {
-    _options.limit = realm::util::Optional<int64_t>(limit);
+    _options.limit = std::optional<int64_t>(limit);
 }
 
 @end

@@ -180,7 +180,7 @@ static NSString *generateRandomString(int num) {
 - (void)testDeleteUser {
     [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd)
                                                         register:YES]];
-    RLMUser *secondUser = [self logInUserForCredentials:[self basicCredentialsWithName:@"test2@10gen.com"
+    RLMUser *secondUser = [self logInUserForCredentials:[self basicCredentialsWithName:@"test3@10gen.com"
                                                                               register:YES]];
 
     XCTAssert([self.app.currentUser.identifier isEqualToString:secondUser.identifier]);

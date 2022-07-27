@@ -25,6 +25,6 @@
 /// A block type used to report an error
 typedef void(^RLMProviderClientOptionalErrorBlock)(NSError * _Nullable);
 
-std::function<void(realm::util::Optional<realm::app::AppError>)>
+std::function<void(std::optional<realm::app::AppError>)>
 RLMWrapCompletion(_Nonnull RLMProviderClientOptionalErrorBlock);
 @end
