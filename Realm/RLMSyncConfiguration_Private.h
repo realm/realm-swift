@@ -33,22 +33,14 @@ typedef RLM_CLOSED_ENUM(NSUInteger, RLMSyncStopPolicy) {
 
 @interface RLMSyncConfiguration ()
 
+// Flexible sync
+- (instancetype)initWithUser:(RLMUser *)user;
+// Partition-based sync
 - (instancetype)initWithUser:(RLMUser *)user
-              partitionValue:(nullable id<RLMBSON>)partitionValue
-                  stopPolicy:(RLMSyncStopPolicy)stopPolicy
-             clientResetMode:(RLMClientResetMode)clientResetMode
-           notifyBeforeReset:(nullable RLMClientResetBeforeBlock)beforeResetBlock
-            notifyAfterReset:(nullable RLMClientResetAfterBlock)afterResetBlock;
-
-- (instancetype)initWithUser:(RLMUser *)user
-                  stopPolicy:(RLMSyncStopPolicy)stopPolicy
-          enableFlexibleSync:(BOOL)enableFlexibleSync;
-
-@property (nonatomic, readwrite) RLMSyncStopPolicy stopPolicy;
+              partitionValue:(nullable id<RLMBSON>)partitionValue;
 
 // Internal-only APIs
-@property (nullable, nonatomic) NSURL *customFileURL;
-
+@property (nonatomic, readwrite) RLMSyncStopPolicy stopPolicy;
 @property (nonatomic, readonly) BOOL enableFlexibleSync;
 
 @end

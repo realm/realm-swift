@@ -953,7 +953,7 @@
         CHECK_COUNT(11, Person, realm);
         [ex fulfill];
     }];
-    [self waitForExpectationsWithTimeout:10.0 handler:nil];
+    [self waitForExpectationsWithTimeout:30.0 handler:nil];
 }
 
 - (void)testFlexibleSyncInitialSubscriptionDoNotRerunOnOpen {
@@ -1007,7 +1007,7 @@
         CHECK_COUNT(11, Person, realm);
         [ex fulfill];
     }];
-    [self waitForExpectationsWithTimeout:10.0 handler:nil];
+    [self waitForExpectationsWithTimeout:30.0 handler:nil];
     XCTAssertEqual(openCount, 1);
 
     __block RLMRealm *realm;
@@ -1021,7 +1021,7 @@
         CHECK_COUNT(16, Person, realm);
         [ex2 fulfill];
     }];
-    [self waitForExpectationsWithTimeout:10.0 handler:nil];
+    [self waitForExpectationsWithTimeout:30.0 handler:nil];
     XCTAssertEqual(openCount, 2);
 
     [self dispatchAsyncAndWait:^{
@@ -1072,7 +1072,7 @@
         XCTAssertNil(realm);
         [ex fulfill];
     }];
-    [self waitForExpectationsWithTimeout:10.0 handler:nil];
+    [self waitForExpectationsWithTimeout:30.0 handler:nil];
 
     [proxy stop];
 }
@@ -1095,6 +1095,6 @@
 
         [ex fulfill];
     }];
-    [self waitForExpectationsWithTimeout:10.0 handler:nil];
+    [self waitForExpectationsWithTimeout:30.0 handler:nil];
 }
 @end

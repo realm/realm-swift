@@ -98,6 +98,13 @@ namespace {
     return nil;
 }
 
+- (instancetype)init {
+    return [self initWithBaseURL:nil
+                       transport:nil
+                    localAppName:nil
+                 localAppVersion:nil];
+}
+
 - (instancetype)initWithBaseURL:(nullable NSString *)baseURL
                       transport:(nullable id<RLMNetworkTransport>)transport
                    localAppName:(nullable NSString *)localAppName
@@ -111,7 +118,7 @@ namespace {
 
 - (instancetype)initWithBaseURL:(nullable NSString *)baseURL
                       transport:(nullable id<RLMNetworkTransport>)transport
-                   localAppName:(NSString *)localAppName
+                   localAppName:(nullable NSString *)localAppName
                 localAppVersion:(nullable NSString *)localAppVersion
         defaultRequestTimeoutMS:(NSUInteger)defaultRequestTimeoutMS {
     if (self = [super init]) {

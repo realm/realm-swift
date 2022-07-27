@@ -194,6 +194,19 @@ static std::string fakeJWT() {
     return encoded_prefix + "." + encoded_body + "." + suffix;
 }
 
+// A network transport which doesn't actually do anything
+@interface NoOpTransport : NSObject <RLMNetworkTransport>
+@end
+@implementation NoOpTransport
+- (void)sendRequestToServer:(RLMRequest *)request
+                 completion:(RLMNetworkTransportCompletionBlock)completionBlock {
+}
+- (NSURLSession *)doStreamRequest:(RLMRequest *)request
+                  eventSubscriber:(id<RLMEventDelegate>)subscriber {
+    return nil;
+}
+@end
+
 RLMUser *RLMDummyUser() {
     // Add a fake user to the metadata Realm
     @autoreleasepool {
@@ -213,7 +226,9 @@ RLMUser *RLMDummyUser() {
     }
 
     // Creating an app reads the fake cached user
-    RLMApp *app = [RLMApp appWithId:@"dummy"];
+    RLMAppConfiguration *config = [RLMAppConfiguration new];
+    config.transport = [NoOpTransport new];
+    RLMApp *app = [RLMApp appWithId:@"dummy" configuration:config];
     return app.allUsers.allValues.firstObject;
 }
 

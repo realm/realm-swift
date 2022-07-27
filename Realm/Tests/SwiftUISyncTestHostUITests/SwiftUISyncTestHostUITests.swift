@@ -391,7 +391,7 @@ extension SwiftUISyncTestHostUITests {
         let realm = try Realm(configuration: config)
         let subs = realm.subscriptions
         let ex = expectation(description: "state change complete")
-        subs.write({
+        subs.update({
             subs.append(QuerySubscription<SwiftPerson>(name: "person_age", where: "TRUEPREDICATE"))
         }, onComplete: { error in
             if error == nil {

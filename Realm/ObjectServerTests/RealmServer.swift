@@ -293,7 +293,7 @@ class Admin {
                     result = $0
                     group.leave()
                 }
-                guard case .success = group.wait(timeout: .now() + 5) else {
+                guard case .success = group.wait(timeout: .now() + 30) else {
                     return .failure(URLError(.badServerResponse))
                 }
                 return result

@@ -125,7 +125,7 @@ static RLMSyncConnectionState convertConnectionState(SyncSession::ConnectionStat
 
 - (RLMSyncConfiguration *)configuration {
     if (auto session = _session.lock()) {
-        return [[RLMSyncConfiguration alloc] initWithRawConfig:session->config()];
+        return [[RLMSyncConfiguration alloc] initWithRawConfig:session->config() path:session->path()];
     }
     return nil;
 }

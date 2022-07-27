@@ -388,7 +388,7 @@ struct AsyncOpenFlexibleSyncView: View {
                             Task {
                                 do {
                                     let subs = realm.subscriptions
-                                    try await subs.write {
+                                    try await subs.update {
                                         subs.append(QuerySubscription<SwiftPerson>(name: "person_age") {
                                             $0.age > 5 && $0.firstName == ProcessInfo.processInfo.environment["firstName"]!
                                         })
@@ -444,7 +444,7 @@ struct AutoOpenFlexibleSyncView: View {
                             Task {
                                 do {
                                     let subs = realm.subscriptions
-                                    try await subs.write {
+                                    try await subs.update {
                                         subs.append(QuerySubscription<SwiftPerson>(name: "person_age") {
                                             $0.age > 2 && $0.firstName == ProcessInfo.processInfo.environment["firstName"]!
                                         })

@@ -1043,7 +1043,7 @@ case "$COMMAND" in
                 mkdir .baas
                 mv build/stitch .baas
                 source "$(brew --prefix nvm)/nvm.sh" --no-use
-                nvm install 13.14.0
+                nvm install 16.5.0
                 sh build.sh setup-baas
             fi
 

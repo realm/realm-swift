@@ -132,7 +132,7 @@ static NSURL *syncDirectoryForChildProcess() {
             XCTAssertNil(error);
             [expectation fulfill];
         }];
-        [self waitForExpectationsWithTimeout:4.0 handler:nil];
+        [self waitForExpectationsWithTimeout:20.0 handler:nil];
     }
     return [RLMCredentials credentialsWithEmail:name
                                        password:@"password"];
@@ -209,7 +209,7 @@ static NSURL *syncDirectoryForChildProcess() {
         r = realm;
         [ex fulfill];
     }];
-    [self waitForExpectationsWithTimeout:10.0 handler:nil];
+    [self waitForExpectationsWithTimeout:30.0 handler:nil];
     // Ensure that the block does not retain the Realm, as it may not be dealloced
     // immediately and so would extend the lifetime of the Realm an inconsistent amount
     auto realm = r;
@@ -228,7 +228,7 @@ static NSURL *syncDirectoryForChildProcess() {
         error = err;
         [ex fulfill];
     }];
-    [self waitForExpectationsWithTimeout:10.0 handler:nil];
+    [self waitForExpectationsWithTimeout:30.0 handler:nil];
     return error;
 }
 
@@ -267,7 +267,7 @@ static NSURL *syncDirectoryForChildProcess() {
         user = u;
         [expectation fulfill];
     }];
-    [self waitForExpectations:@[expectation] timeout:4.0];
+    [self waitForExpectations:@[expectation] timeout:20.0];
     XCTAssertTrue(user.state == RLMUserStateLoggedIn, @"User should have been valid, but wasn't");
     return user;
 }
@@ -278,7 +278,7 @@ static NSURL *syncDirectoryForChildProcess() {
         XCTAssertNil(error);
         [expectation fulfill];
     }];
-    [self waitForExpectations:@[expectation] timeout:4.0];
+    [self waitForExpectations:@[expectation] timeout:20.0];
     XCTAssertTrue(user.state == RLMUserStateLoggedOut, @"User should have been logged out, but wasn't");
 }
 
@@ -359,7 +359,7 @@ static NSURL *syncDirectoryForChildProcess() {
         XCTFail(@"Download waiter did not queue; session was invalid or errored out.");
         return;
     }
-    [self waitForExpectations:@[ex] timeout:20.0];
+    [self waitForExpectations:@[ex] timeout:60.0];
     if (error) {
         *error = theError;
     }
@@ -378,7 +378,7 @@ static NSURL *syncDirectoryForChildProcess() {
         XCTFail(@"Upload waiter did not queue; session was invalid or errored out.");
         return;
     }
-    [self waitForExpectations:@[ex] timeout:20.0];
+    [self waitForExpectations:@[ex] timeout:60.0];
     if (error)
         *error = completionError;
 }
@@ -396,7 +396,7 @@ static NSURL *syncDirectoryForChildProcess() {
         XCTFail(@"Download waiter did not queue; session was invalid or errored out.");
         return;
     }
-    [self waitForExpectations:@[ex] timeout:20.0];
+    [self waitForExpectations:@[ex] timeout:60.0];
     if (error) {
         *error = completionError;
     }
