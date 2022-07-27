@@ -449,7 +449,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         // After restarting sync, the sync history translator service needs time
         // to resynthesize the new history from existing objects on the server
-        // The following creates a new realm with the same parition and wait for
+        // The following creates a new realm with the same partition and wait for
         // downloads to ensure the the new history has been created.
         try autoreleasepool {
             var newConfig = user.configuration(partitionValue: partition)
@@ -470,6 +470,90 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 return
             }
         }
+    }
+
+    func testClientResetManual() throws {
+        let creds = basicCredentials()
+        try autoreleasepool {
+            let user = try logInUser(for: creds)
+            try prepareClientReset(#function, user)
+
+            var configuration = user.configuration(partitionValue: #function)
+            configuration.objectTypes = [SwiftPerson.self]
+
+            let ex = self.expectation(description: "get client reset error")
+            let syncManager = self.app.syncManager
+            syncManager.errorHandler = { error, session in
+                guard let error = error as? SyncError else {
+                    XCTFail("Bad error type: \(error)")
+                    return
+                }
+                XCTAssertEqual(error.code, .clientResetError)
+                XCTAssertEqual(session?.state, .inactive)
+                XCTAssertEqual(session?.connectionState, .disconnected)
+                XCTAssertEqual(session?.parentUser()?.id, user.id)
+                ex.fulfill()
+            }
+
+            try autoreleasepool {
+                let realm = try Realm(configuration: configuration)
+                wait(for: [ex], timeout: 60.0)
+                // The locally created object should still be present as we didn't
+                // actually handle the client reset
+                XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1)
+                XCTAssertEqual(realm.objects(SwiftPerson.self)[0].firstName, "John")
+            }
+            syncManager.waitForSessionTermination()
+            resetSyncManager()
+        }
+
+        let user = try logInUser(for: creds)
+        var configuration = user.configuration(partitionValue: #function)
+        configuration.objectTypes = [SwiftPerson.self]
+
+        try autoreleasepool {
+            let realm = try Realm(configuration: configuration)
+            waitForDownloads(for: realm)
+            // After reopening, the old Realm file should have been moved aside
+            // and we should now have the data from the server
+            XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1)
+            XCTAssertEqual(realm.objects(SwiftPerson.self)[0].firstName, "Paul")
+        }
+    }
+
+    func testClientResetManualWithoutLiveRealmInstance() throws {
+        let creds = basicCredentials()
+        let user = try logInUser(for: creds)
+        try prepareClientReset(#function, user)
+
+        var configuration = user.configuration(partitionValue: #function)
+        configuration.objectTypes = [SwiftPerson.self]
+
+        let ex = self.expectation(description: "get client reset error")
+        let syncManager = self.app.syncManager
+        syncManager.errorHandler = { error, session in
+            guard let error = error as? SyncError else {
+                XCTFail("Bad error type: \(error)")
+                return
+            }
+            XCTAssertEqual(error.code, .clientResetError)
+            XCTAssertEqual(session?.state, .inactive)
+            XCTAssertEqual(session?.connectionState, .disconnected)
+            XCTAssertEqual(session?.parentUser()?.id, user.id)
+            ex.fulfill()
+        }
+
+        try autoreleasepool {
+            _ = try Realm(configuration: configuration)
+            // We have to wait for the error to arrive (or the session will just
+            // transition to inactive without calling the error handler), but we
+            // need to ensure the Realm is deallocated before the error handler
+            // is invoked on the main thread.
+            sleep(1)
+        }
+        wait(for: [ex], timeout: 60.0)
+        syncManager.waitForSessionTermination()
+        resetSyncManager()
     }
 
     func testClientResetDiscardLocal() throws {
@@ -513,7 +597,9 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         try autoreleasepool {
             let realm = try Realm(configuration: configuration)
             wait(for: [beforeCallbackEx, afterCallbackEx], timeout: 60.0)
-            XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1) // Expect the server realm (one object) to have overwritten the local realm (2 objects)
+            // The Person created locally ("John") should have been discarded,
+            // while the one from the server ("Paul") should be present
+            XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1)
             XCTAssertEqual(realm.objects(SwiftPerson.self)[0].firstName, "Paul")
         }
     }

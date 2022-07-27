@@ -5,7 +5,13 @@ x.y.z Release notes (yyyy-MM-dd)
   when using a sync configuration.
 
 ### Fixed
-* Add missing `initialSubscription` and `rerunOnOpen` to copyWithZone method on `RLMRealmConfiguration`. This resulted in incorrect values when using `RLMRealmConfiguration.defaultConfiguration`.
+* Add missing `initialSubscription` and `rerunOnOpen` to copyWithZone method on
+  `RLMRealmConfiguration`. This resulted in incorrect values when using
+  `RLMRealmConfiguration.defaultConfiguration`.
+* The sync error handler did not hold a strong reference to the sync session
+  while dispatching the error from the worker thread to the main thread,
+  resulting in the session passed to the error handler being invalid if there
+  were no other remaining strong references elsewhere.
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
