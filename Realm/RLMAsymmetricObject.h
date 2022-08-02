@@ -22,7 +22,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class RLMObjectSchema, RLMPropertyDescriptor;
 /**
- `RLMAsymmetricObject`  is a base class used to define asymmetric Realm objects.
+ `RLMAsymmetricObject` is a base class used to define asymmetric Realm objects.
 
  Asymmetric objects can only be created using the `createObject:`
  function, and cannot be added, removed or queried.
