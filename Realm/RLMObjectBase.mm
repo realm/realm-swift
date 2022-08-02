@@ -798,4 +798,8 @@ uint64_t RLMObjectBaseGetCombineId(__unsafe_unretained RLMObjectBase *const obj)
 + (BOOL)accessInstanceVariablesDirectly {
     return NO;
 }
+
++ (bool)isAsymmetric {
+    return YES;
+}
 @end

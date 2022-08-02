@@ -25,7 +25,7 @@ import Realm.Private
 
  Asymmetric objects can only be created using the `create(_ object:)`
  function, and cannot be added, removed or queried.
- When created asymmetric objects will synced unidirectionally to the  MongoDB
+ When created, asymmetric objects will be synced unidirectionally to the MongoDB
  database and cannot be accessed locally.
 
  Incoming links from any asymmetric table are not allowed, meaning embedding
@@ -46,11 +46,6 @@ import Realm.Private
  */
 public typealias AsymmetricObject = RealmSwiftAsymmetricObject
 extension AsymmetricObject: _RealmCollectionValueInsideOptional {
-    /// :nodoc:
-    public class override final func isAsymmetric() -> Bool {
-        return true
-    }
-
     // MARK: Initializers
 
     /**

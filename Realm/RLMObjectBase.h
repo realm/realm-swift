@@ -134,20 +134,20 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
-  `RLMAsymmetricObject` is a base class used to define asymmetric Realm model objects.
+ `AsymmetricObject` is a base class used to define asymmetric Realm objects.
 
- Asymmetric objects can only be created using the `createObject:`
+ Asymmetric objects can only be created using the `create(_ object:)`
  function, and cannot be added, removed or queried.
- When created asymmetric objects will synced unidirectionally to the  MongoDB
+ When created, asymmetric objects will be synced unidirectionally to the MongoDB
  database and cannot be accessed locally.
 
- Incoming links from and asymmetric table are not allowed, meaning embedding
- an asymmetric object within an `RLMObject` will throw an error.
+ Incoming links from any asymmetric table are not allowed, meaning embedding
+ an asymmetric object within an `Object` will throw an error.
 
- The property types supported on `RLMAsymmetricObject` are the same as for `RLMObject`,
- except for that asymmetric objects can only link to embedded objects, so `RLMObject`
- and `RLMArray<RLMObject>` properties are not supported (`RLMEmbeddedObject` and
- `RLMArray<RLEmbeddedObject>` *are*).
+ The property types supported on `AsymmetricObject` are the same as for `Object`,
+ except for that asymmetric objects can only link to embedded objects, so `Object`
+ and `List<Object>` properties are not supported (`EmbeddedObject` and
+ `List<EmbeddedObject>` *are*).
 
  ```swift
  class Person: AsymmetricObject {

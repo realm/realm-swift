@@ -24,12 +24,12 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  `RLMAsymmetricObject` is a base class used to define asymmetric Realm objects.
 
- Asymmetric objects can only be created using the `createObject:`
+ Asymmetric objects can only be created using the `createInRealm:`
  function, and cannot be added, removed or queried.
  When created, asymmetric objects will be synced unidirectionally to the MongoDB
  database and cannot be accessed locally.
 
- Incoming links from and asymmetric table are not allowed, meaning embedding
+ Incoming links from any asymmetric table are not allowed, meaning embedding
  an asymmetric object within an `RLMObject` will throw an error.
 
  The property types supported on `RLMAsymmetricObject` are the same as for `RLMObject`,
