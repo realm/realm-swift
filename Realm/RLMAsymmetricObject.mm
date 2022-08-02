@@ -19,8 +19,8 @@
 #import "RLMAsymmetricObject.h"
 
 #import "RLMObject_Private.hpp"
-#import "RLMSchema_Private.h"
 #import "RLMObjectStore.h"
+#import "RLMSchema_Private.h"
 
 @implementation RLMAsymmetricObject
 // synthesized in RLMObjectBase but redeclared here for documentation purposes
