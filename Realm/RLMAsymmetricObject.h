@@ -26,7 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  Asymmetric objects can only be created using the `createObject:`
  function, and cannot be added, removed or queried.
- When created asymmetric objects will synced unidirectionally to the  MongoDB
+ When created, asymmetric objects will be synced unidirectionally to the MongoDB
  database and cannot be accessed locally.
 
  Incoming links from and asymmetric table are not allowed, meaning embedding
