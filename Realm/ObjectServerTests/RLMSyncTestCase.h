@@ -25,6 +25,15 @@ typedef void(^RLMSyncBasicErrorReportingBlock)(NSError * _Nullable);
 
 NS_ASSUME_NONNULL_BEGIN
 
+@interface RealmServer : NSObject
++ (RealmServer *)shared;
++ (bool)haveServer;
+- (NSString *)createAppForBSONType:(NSString *)bsonType error:(NSError **)error;
+- (NSString *)createAppAndReturnError:(NSError **)error;
+- (NSString *)createAppWithQueryableFields:(NSArray *)queryableFields error:(NSError **)error;
+- (NSString *)createAppForAsymmetricSchema:(NSArray <RLMObjectSchema *> *)schema error:(NSError **)error;
+@end
+
 @interface AsyncOpenConnectionTimeoutTransport : RLMNetworkTransport
 @end
 

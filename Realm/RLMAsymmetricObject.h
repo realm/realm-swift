@@ -37,7 +37,6 @@ NS_ASSUME_NONNULL_BEGIN
  and `RLMArray<RLMObject>` properties are not supported (`RLMEmbeddedObject` and
  `RLMArray<RLEmbeddedObject>` *are*).
  */
-
 @interface RLMAsymmetricObject : RLMObjectBase
 
 #pragma mark - Creating & Initializing Objects

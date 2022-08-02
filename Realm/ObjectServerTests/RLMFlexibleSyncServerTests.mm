@@ -20,13 +20,6 @@
 #import "RLMSyncSubscription_Private.h"
 #import "RLMApp_Private.hpp"
 
-// These are defined in Swift. Importing the auto-generated header doesn't work
-// when building with SPM, so just redeclare the bits we need.
-@interface RealmServer : NSObject
-+ (RealmServer *)shared;
-- (NSString *)createAppWithQueryableFields:(NSArray *)queryableFields error:(NSError **)error;
-@end
-
 @interface TimeoutProxyServer : NSObject
 - (instancetype)initWithPort:(uint16_t)port targetPort:(uint16_t)targetPort;
 - (void)startAndReturnError:(NSError **)error;

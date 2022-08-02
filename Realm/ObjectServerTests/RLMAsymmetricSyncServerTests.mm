@@ -17,16 +17,10 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMSyncTestCase.h"
-#import "RLMObject_Private.h"
-#import "RLMApp_Private.h"
-#import "RLMObjectSchema_Private.h"
 
-// These are defined in Swift. Importing the auto-generated header doesn't work
-// when building with SPM, so just redeclare the bits we need.
-@interface RealmServer : NSObject
-+ (RealmServer *)shared;
-- (NSString *)createAppForAsymmetricSchema:(NSArray <RLMObjectSchema *> *)schema error:(NSError **)error;
-@end
+#import "RLMApp_Private.h"
+#import "RLMObject_Private.h"
+#import "RLMObjectSchema_Private.h"
 
 #pragma mark PersonAsymmetric
 
@@ -265,15 +259,15 @@ RLM_COLLECTION_TYPE(PersonAsymmetric);
 }
 
 // FIXME: Enable this test when this is implemented on core. Core should validate if the schema includes an asymmetric table for a PBS configuration and throw an error.
-//- (void)testOpenPBSConfigurationWithAsymmetricObjectError {
-//    RLMUser *user = [self userForTest:_cmd];
-//    RLMRealmConfiguration *configuration = [user configurationWithPartitionValue:NSStringFromSelector(_cmd)];
-//    configuration.objectClasses = @[PersonAsymmetric.self];
-//    NSError *error;
-//    RLMRealm *realm = [RLMRealm realmWithConfiguration:configuration error:&error];
-//    XCTAssertNil(realm);
-//    XCTAssertNotNil(error);
-//}
+- (void)fixme_testOpenPBSConfigurationWithAsymmetricObjectError {
+    RLMUser *user = [self userForTest:_cmd];
+    RLMRealmConfiguration *configuration = [user configurationWithPartitionValue:NSStringFromSelector(_cmd)];
+    configuration.objectClasses = @[PersonAsymmetric.self];
+    NSError *error;
+    RLMRealm *realm = [RLMRealm realmWithConfiguration:configuration error:&error];
+    XCTAssertNil(realm);
+    XCTAssertNotNil(error);
+}
 
 - (void)testCreateAsymmetricObject {
     RLMUser *user = [self userForSelector:_cmd];

@@ -22,16 +22,6 @@
 
 #if TARGET_OS_OSX
 
-#pragma mark - Helpers
-
-// These are defined in Swift. Importing the auto-generated header doesn't work
-// when building with SPM, so just redeclare the bits we need.
-@interface RealmServer : NSObject
-+ (RealmServer *)shared;
-- (NSString *)createAppForBSONType:(NSString *)bsonType
-                             error:(NSError **)error;
-@end
-
 #pragma mark ObjectServer Partition Tests
 
 @interface RLMObjectServerPartitionTests : RLMSyncTestCase
