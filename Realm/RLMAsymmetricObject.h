@@ -65,7 +65,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  Creates an Asymmetric object, which will be synced unidirectionally and
- cannot be query locally, only objects which inherits from `RLMAsymmetricObject`
+ cannot be queried locally, only objects which inherits from `RLMAsymmetricObject`
  can be created using this method.
 
  Objects created using this method will not be added to the Realm.
