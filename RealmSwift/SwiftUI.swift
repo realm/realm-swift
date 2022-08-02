@@ -1211,7 +1211,9 @@ private class ObservableAsyncOpenStorage: ObservableObject {
         }
 
         // Use the user configuration by default or set configuration with the current user `syncConfiguration`'s.
-        if var configuration = configuration {
+        if var configuration = configuration,
+           let syncConfiguration = configuration.syncConfiguration,
+            syncConfiguration.user.id == user.id {
             let userSyncConfig = config.syncConfiguration
             configuration.syncConfiguration = userSyncConfig
             config = configuration

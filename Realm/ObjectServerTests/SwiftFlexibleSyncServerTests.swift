@@ -522,6 +522,146 @@ extension SwiftFlexibleSyncTests {
         XCTAssertEqual(originalPersons.count, 0)
         XCTAssertEqual(persons!.count, 0)
     }
+
+    @MainActor
+    func testFlexibleSyncInitialSubscriptionsAsync() async throws {
+        try await populateFlexibleSyncDataForType(SwiftPerson.self) { realm in
+            for i in 1...20 {
+                let person = SwiftPerson(firstName: "\(#function)", lastName: "lastname_\(i)", age: i)
+                realm.add(person)
+            }
+        }
+
+        let user = try await logInUser(for: basicCredentials(app: self.flexibleSyncApp), app: self.flexibleSyncApp)
+        var config = user.flexibleSyncConfiguration(initialSubscriptions: { subscriptions in
+            subscriptions.append(ofType: SwiftPerson.self,
+                                 where: { $0.age > 10 && $0.firstName == "\(#function)" })
+        })
+
+        if config.objectTypes == nil {
+            config.objectTypes = [SwiftPerson.self]
+        }
+        let realm = try await Realm(configuration: config, downloadBeforeOpen: .once)
+        XCTAssertNotNil(realm)
+
+        XCTAssertEqual(realm.subscriptions.count, 1)
+        // Adding this sleep, because there seems to be a timing issue after this commit in baas
+        // https://github.com/10gen/baas/commit/64e75b3f1fe8a6f8704d1597de60f9dda401ccce,
+        // data take a little longer to be downloaded to the realm even though the
+        // sync client changed the subscription state to completed.
+        sleep(1)
+        checkCount(expected: 10, realm, SwiftPerson.self)
+    }
+
+    @MainActor
+    func testFlexibleSyncInitialSubscriptionsNotRerunOnOpen() async throws {
+        let user = try await logInUser(for: basicCredentials(app: self.flexibleSyncApp), app: self.flexibleSyncApp)
+        var config = user.flexibleSyncConfiguration(initialSubscriptions: { subscriptions in
+            subscriptions.append(ofType: SwiftPerson.self,
+                                 where: { $0.age > 10 && $0.firstName == "\(#function)" })
+        })
+
+        if config.objectTypes == nil {
+            config.objectTypes = [SwiftPerson.self]
+        }
+        let realm = try await Realm(configuration: config, downloadBeforeOpen: .once)
+        XCTAssertNotNil(realm)
+        XCTAssertEqual(realm.subscriptions.count, 1)
+
+        let realm2 = try await Realm(configuration: config, downloadBeforeOpen: .once)
+        XCTAssertNotNil(realm2)
+        XCTAssertEqual(realm.subscriptions.count, 1)
+    }
+
+    @MainActor
+    func testFlexibleSyncInitialSubscriptionsRerunOnOpen() async throws {
+        try await populateFlexibleSyncDataForType(SwiftTypesSyncObject.self) { realm in
+            for i in 1...30 {
+                let object = SwiftTypesSyncObject()
+                object.dateCol = Calendar.current.date(
+                    byAdding: .hour,
+                    value: -i,
+                    to: Date())!
+                realm.add(object)
+            }
+        }
+
+        let user = try await logInUser(for: basicCredentials(app: self.flexibleSyncApp), app: self.flexibleSyncApp)
+        var isFirstOpen = true
+        var config = user.flexibleSyncConfiguration(initialSubscriptions: { subscriptions in
+            subscriptions.append(ofType: SwiftTypesSyncObject.self,
+                                 where: {
+                let date = isFirstOpen ? Calendar.current.date(
+                    byAdding: .hour,
+                    value: -10,
+                    to: Date()) : Calendar.current.date(
+                        byAdding: .hour,
+                        value: -20,
+                        to: Date())
+                isFirstOpen = false
+                return $0.dateCol < Date() && $0.dateCol > date! })
+        }, rerunOnOpen: true)
+
+        if config.objectTypes == nil {
+            config.objectTypes = [SwiftTypesSyncObject.self, SwiftPerson.self]
+        }
+        let c = config
+        _ = try await Task { @MainActor in
+            let realm = try await Realm(configuration: c, downloadBeforeOpen: .always)
+            XCTAssertNotNil(realm)
+            XCTAssertEqual(realm.subscriptions.count, 1)
+            // Adding this sleep, because there seems to be a timing issue after this commit in baas
+            // https://github.com/10gen/baas/commit/64e75b3f1fe8a6f8704d1597de60f9dda401ccce,
+            // data take a little longer to be downloaded to the realm even though the
+            // sync client changed the subscription state to completed.
+            sleep(1)
+            checkCount(expected: 9, realm, SwiftTypesSyncObject.self)
+        }.value
+
+        _ = try await Task { @MainActor in
+            let realm = try await Realm(configuration: c, downloadBeforeOpen: .always)
+            XCTAssertNotNil(realm)
+            XCTAssertEqual(realm.subscriptions.count, 2)
+            checkCount(expected: 19, realm, SwiftTypesSyncObject.self)
+        }.value
+    }
+
+    @MainActor
+    func testFlexibleSyncInitialSubscriptionsThrows() async throws {
+        let user = try await logInUser(for: basicCredentials(app: self.flexibleSyncApp), app: self.flexibleSyncApp)
+        var config = user.flexibleSyncConfiguration(initialSubscriptions: { subscriptions in
+            subscriptions.append(ofType: SwiftTypesSyncObject.self,
+                                 where: { $0.uuidCol == UUID() })
+        })
+
+        if config.objectTypes == nil {
+            config.objectTypes = [SwiftTypesSyncObject.self, SwiftPerson.self]
+        }
+        do {
+           _ = try await Realm(configuration: config, downloadBeforeOpen: .once)
+        } catch {
+            XCTAssertNotNil(error)
+            let nsError = error as NSError
+            XCTAssertEqual(nsError.code, 2)
+            XCTAssertEqual(nsError.domain, "io.realm.sync.flx")
+        }
+    }
+
+    @MainActor
+    func testFlexibleSyncInitialSubscriptionsDefaultConfiguration() async throws {
+        let user = try await logInUser(for: basicCredentials(app: self.flexibleSyncApp), app: self.flexibleSyncApp)
+        var config = user.flexibleSyncConfiguration(initialSubscriptions: { subscriptions in
+            subscriptions.append(ofType: SwiftTypesSyncObject.self)
+        })
+
+        if config.objectTypes == nil {
+            config.objectTypes = [SwiftTypesSyncObject.self, SwiftPerson.self]
+        }
+        Realm.Configuration.defaultConfiguration = config
+
+        let realm = try await Realm(downloadBeforeOpen: .once)
+        XCTAssertEqual(realm.subscriptions.count, 1)
+    }
 }
 
 #endif // canImport(_Concurrency)

@@ -301,6 +301,21 @@ protocol _QuerySubscription {
         }
     }
 
+    /**
+     Appends a query to the subscription set.
+
+     - warning: This method may only be called on the `initialSubscription` block when initialising the flexible sync configuration.
+
+     - parameter type: The type of the object to be queried.
+     - parameter where: A query builder that generates a query which can be added to the
+                        subscriptions set the user is subscribed to.
+     */
+    public func `append`<T: RealmFetchable>(ofType type: T.Type, `where` query: ((Query<T>) -> Query<Bool>)? = nil) {
+        let query = query != nil ? QuerySubscription<T>(query!) : QuerySubscription<T>()
+        rlmSyncSubscriptionSet.addSubscription(withClassName: query.className,
+                                               predicate: query.predicate)
+    }
+
     // MARK: Public
 
     /// Returns the current state for the subscription set.

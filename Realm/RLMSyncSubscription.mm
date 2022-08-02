@@ -264,7 +264,7 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
         NSError *err = [[NSError alloc] initWithDomain:RLMFlexibleSyncErrorDomain code:RLMFlexibleSyncErrorCommitSubscriptionSetError userInfo:@{@"reason":@(error.what())}];
         return completionBlock(err);
     }
-    [self waitForSynchronizationOnQueue:nil completionBlock:completionBlock];
+    [self waitForSynchronizationOnQueue:queue completionBlock:completionBlock];
 }
 
 - (void)waitForSynchronizationOnQueue:(nullable dispatch_queue_t)queue
