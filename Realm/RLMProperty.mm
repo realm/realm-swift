@@ -152,7 +152,7 @@ static bool rawTypeShouldBeTreatedAsComputedProperty(NSString *rawType) {
     _setterSel = NSSelectorFromString(_setterName);
 }
 
-static realm::util::Optional<RLMPropertyType> typeFromProtocolString(const char *type) {
+static std::optional<RLMPropertyType> typeFromProtocolString(const char *type) {
     if (strcmp(type, "RLMValue>\"") == 0) {
         return RLMPropertyTypeAny;
     }

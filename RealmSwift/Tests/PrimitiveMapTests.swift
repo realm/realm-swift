@@ -63,10 +63,8 @@ class PrimitiveMapTests<O: ObjectFactory, V: MapValueFactory>: PrimitiveMapTests
         map.merge(values) { $1 }
         let exp = expectation(description: "did enumerate all keys and values")
         exp.expectedFulfillmentCount = 3
-        for element in map {
-            if values.filter({ $0.key == element.key }).first!.value == element.value {
-                exp.fulfill()
-            }
+        for element in map where values.filter({ $0.key == element.key }).first!.value == element.value {
+            exp.fulfill()
         }
         waitForExpectations(timeout: 1.0, handler: nil)
     }

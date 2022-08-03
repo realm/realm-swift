@@ -567,17 +567,17 @@ case "$COMMAND" in
         if [[ "$CONFIGURATION" == "Debug" ]]; then
             COVERAGE_PARAMS=(GCC_GENERATE_TEST_COVERAGE_FILES=YES GCC_INSTRUMENT_PROGRAM_FLOW_ARCS=YES)
         fi
-        xctest Realm -configuration "$CONFIGURATION" "${COVERAGE_PARAMS[@]}"
+        xctest Realm -configuration "$CONFIGURATION" "${COVERAGE_PARAMS[@]}" -destination "platform=macOS,arch=$(uname -m)"
         exit 0
         ;;
 
     "test-osx-swift")
-        xctest RealmSwift -configuration $CONFIGURATION
+        xctest RealmSwift -configuration $CONFIGURATION -destination "platform=macOS,arch=$(uname -m)"
         exit 0
         ;;
 
     "test-osx-object-server")
-        xctest 'Object Server Tests' -configuration "$CONFIGURATION" -sdk macosx
+        xctest 'Object Server Tests' -configuration "$CONFIGURATION" -sdk macosx -destination "platform=macOS,arch=$(uname -m)"
         exit 0
         ;;
 
@@ -915,7 +915,10 @@ case "$COMMAND" in
         ;;
 
     "examples-osx")
-        xc -workspace examples/osx/objc/RealmExamples.xcworkspace -scheme JSONImport -configuration "${CONFIGURATION}" build "${CODESIGN_PARAMS[@]}"
+        xc -workspace examples/osx/objc/RealmExamples.xcworkspace \
+           -scheme JSONImport -configuration "${CONFIGURATION}" \
+           -destination "platform=macOS,arch=$(uname -m)" \
+           build "${CODESIGN_PARAMS[@]}"
         ;;
 
     "examples-tvos")

@@ -1,23 +1,43 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.28.4 Release notes (2022-08-03)
 =============================================================
+
 ### Enhancements
-* None.
+
+* Add support for building arm64 watchOS when installing Realm via CocoaPods.
+* Reduce the amount of virtual address space used
+  ([Core #5645](https://github.com/realm/realm-core/pull/5645)).
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
-* None.
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+* Fix some warnings when building with Xcode 14
+  ([Core #5577](https://github.com/realm/realm-core/pull/5577)).
+* Fix compilation failures on watchOS platforms which do not support thread-local storage.
+  ([#7694](https://github.com/realm/realm-swift/issues/7694), [#7695](https://github.com/realm/realm-swift/issues/7695) since v10.21.1)
+* Fix a data race when committing a transaction while multiple threads are
+  waiting to begin write transactions. This appears to not have caused any
+  functional problems.
+* Fix a data race when writing audit events which could occur if the sync
+  client thread was busy with other work when the event Realm was opened.
+* Fix some cases of running out of virtual address space (seen/reported as mmap
+  failures) ([Core #5645](https://github.com/realm/realm-core/pull/5645)).
+* Audit event scopes containing only write events and no read events would
+  occasionally throw a `BadVersion` exception when a write transaction was
+  committed (since v10.26.0).
+* The client reset callbacks for the DiscardLocal mode would be passed invalid
+  Realm instances if the callback was invoked at a point where the Realm was
+  not otherwise open. ([Core #5654](https://github.com/realm/realm-core/pull/5654), since the introduction of DiscardLocal reset mode in v10.25.0)
 
 ### Compatibility
+
 * Realm Studio: 11.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 13.4.1.
 * CocoaPods: 1.10 or later.
-* Xcode: 13.1-14 beta 1.
+* Xcode: 13.1-14 beta 4.
 
 ### Internal
-* Upgraded realm-core from ? to ?
+
+* Upgraded realm-core from 12.3.0 to 12.4.0.
 
 10.28.3 Release notes (2022-07-27)
 =============================================================

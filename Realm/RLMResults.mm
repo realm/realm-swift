@@ -314,7 +314,7 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
 }
 
 - (NSNumber *)_aggregateForKeyPath:(NSString *)keyPath
-                            method:(util::Optional<Mixed> (Results::*)(ColKey))method
+                            method:(std::optional<Mixed> (Results::*)(ColKey))method
                         methodName:(NSString *)methodName returnNilForEmpty:(BOOL)returnNilForEmpty {
     assertKeyPathIsNotNested(keyPath);
     return [self aggregate:keyPath method:method methodName:methodName returnNilForEmpty:returnNilForEmpty];
@@ -435,7 +435,7 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     return [self objectAtIndex:index];
 }
 
-- (id)aggregate:(NSString *)property method:(util::Optional<Mixed> (Results::*)(ColKey))method
+- (id)aggregate:(NSString *)property method:(std::optional<Mixed> (Results::*)(ColKey))method
      methodName:(NSString *)methodName returnNilForEmpty:(BOOL)returnNilForEmpty {
     if (_results.get_mode() == Results::Mode::Empty) {
         return returnNilForEmpty ? nil : @0;

@@ -82,7 +82,7 @@ std::vector<std::pair<std::string, std::string>> convertMetadata(NSDictionary *m
     return ret;
 }
 
-util::Optional<std::string> nsStringToOptionalString(NSString *str) {
+std::optional<std::string> nsStringToOptionalString(NSString *str) {
     if (!str) {
         return util::none;
     }
