@@ -452,7 +452,7 @@ extension Projection: _ObservedResultsValue { }
             if let configuration = configuration,
                configuration.syncConfiguration?.isFlexibleSync ?? false {
 #if swift(>=5.6) && canImport(_Concurrency)
-                Task {
+                Task { @MainActor in
                     do {
                         let realm = try await Realm(configuration: configuration)
                         let filter = filter ?? `where` ?? NSPredicate(format: "TRUEPREDICATE")
@@ -1192,7 +1192,9 @@ private class ObservableAsyncOpenStorage: ObservableObject {
         }
 
         // Use the user configuration by default or set configuration with the current user `syncConfiguration`'s.
-        if var configuration = configuration {
+        if var configuration = configuration,
+           let syncConfiguration = configuration.syncConfiguration,
+            syncConfiguration.user.id == user.id {
             let userSyncConfig = config.syncConfiguration
             configuration.syncConfiguration = userSyncConfig
             config = configuration

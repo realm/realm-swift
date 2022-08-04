@@ -206,6 +206,21 @@ struct QuerySubscription<T: RealmFetchable> {
             rlmSyncSubscriptionSet.remove(subscription._rlmSyncSubscription)
         }
     }
+
+    /**
+     Appends a query to the subscription set.
+
+     - warning: This method may only be called on the `initialSubscription` block when initialising the flexible sync configuration.
+
+     - parameter type: The type of the object to be queried.
+     - parameter where: A query builder that generates a query which can be added to the
+                        subscriptions set the user is subscribed to.
+     */
+    public func `append`<T: RealmFetchable>(ofType type: T.Type, `where` query: ((Query<T>) -> Query<Bool>)? = nil) {
+        let query = query != nil ? QuerySubscription<T>(query!) : QuerySubscription<T>()
+        rlmSyncSubscriptionSet.addSubscription(withClassName: query.className,
+                                               predicate: query.predicate)
+    }
 }
 
 #if swift(>=5.6) && canImport(_Concurrency)
@@ -255,3 +270,34 @@ extension SyncSubscriptionSet {
    }
 }
 #endif // swift(>=5.6)
+
+extension User {
+    /**
+     Return a `Realm` for the given configuration and injects the sync configuration associated to a flexible sync session.
+
+     - parameter configuration: The configuration for the realm. This can be used if any custom configuration is needed.
+
+     - returns: A `Realm`.
+     */
+    public func realm(configuration: Realm.Configuration = Realm.Configuration()) throws -> Realm {
+        return try Realm(configuration: flexibleSyncConfiguration(configuration))
+    }
+
+    /**
+     Create a flexible sync configuration instance, which can be used to open a realm  which
+     supports flexible sync.
+
+     It won't be possible to combine flexible and partition sync in the same app, which means if you open
+     a realm with a flexible sync configuration, you won't be able to open a realm with a PBS configuration
+     and the other way around.
+
+     - parameter configuration: The configuration for the realm. This can be used if any custom configuration is needed.
+
+     - returns: A `Realm.Configuration` instance with a flexible sync configuration.
+     */
+    public func flexibleSyncConfiguration(_ configuration: Realm.Configuration = Realm.Configuration()) -> Realm.Configuration {
+        let config = configuration.rlmConfiguration
+        config.syncConfiguration = self.__flexibleSyncConfiguration().syncConfiguration
+        return ObjectiveCSupport.convert(object: config)
+    }
+}
