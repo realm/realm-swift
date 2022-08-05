@@ -2409,15 +2409,13 @@ class CombineObjectServerTests: SwiftSyncTestCase {
 
     func testAsyncOpenStandaloneCombine() throws {
         try autoreleasepool {
-            let configuration = Realm.Configuration(objectTypes: [SwiftPerson.self])
-            let realm = try Realm(configuration: configuration)
+            let realm = try Realm()
             try realm.write {
                 (0..<10000).forEach { _ in realm.add(SwiftPerson(firstName: "Charlie", lastName: "Bucket")) }
             }
         }
 
-        let configuration = Realm.Configuration(objectTypes: [SwiftPerson.self])
-        Realm.asyncOpen(configuration: configuration).await(self) { realm in
+        Realm.asyncOpen().await(self) { realm in
             XCTAssertEqual(realm.objects(SwiftPerson.self).count, 10000)
         }
     }

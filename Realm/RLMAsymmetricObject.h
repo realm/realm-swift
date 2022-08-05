@@ -72,10 +72,12 @@ NS_ASSUME_NONNULL_BEGIN
 
  @warning This method may only be called during a write transaction.
 
- @param object The asymmetric object to create.
+ @param realm    The Realm to be used to create the asymmetric object..
+ @param value    The value used to populate the object.
 
+ @return  This will return `nil`.
  */
-+ (void)createInRealm:(RLMRealm *)realm withObject:(RLMAsymmetricObject *)object;
++ (instancetype)createInRealm:(RLMRealm *)realm withValue:(id)value __attribute__((warn_unused_result));
 
 #pragma mark - Properties
 

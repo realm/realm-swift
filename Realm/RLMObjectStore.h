@@ -62,8 +62,7 @@ RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *classN
 NS_RETURNS_RETAINED;
 
 // creates an asymmetric object and doesn't return
-void RLMCreateAsymmetricObjectInRealm(__unsafe_unretained RLMObjectBase *const object,
-                                      __unsafe_unretained RLMRealm *const realm);
+void RLMCreateAsymmetricObjectInRealm(RLMRealm *realm, NSString *className, id value);
 
 //
 // Accessor Creation

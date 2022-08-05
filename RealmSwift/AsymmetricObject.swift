@@ -45,7 +45,7 @@ import Realm.Private
  ```
  */
 public typealias AsymmetricObject = RealmSwiftAsymmetricObject
-extension AsymmetricObject: _RealmCollectionValueInsideOptional {
+extension AsymmetricObject {
     // MARK: Initializers
 
     /**
@@ -61,7 +61,7 @@ extension AsymmetricObject: _RealmCollectionValueInsideOptional {
 
      - parameter value:  The value used to populate the object.
      */
-    public convenience init(value: Any) {
+    internal convenience init(value: Any) {
         self.init()
         RLMInitializeWithValue(self, value, .partialPrivateShared())
     }

@@ -83,33 +83,6 @@ extension EmbeddedObject: SchemaDiscoverable, _PersistableInsideOptional, _Defau
     }
 }
 
-extension AsymmetricObject: SchemaDiscoverable, _PersistableInsideOptional, _DefaultConstructible {
-    public typealias PersistedType = AsymmetricObject
-    public static var _rlmType: PropertyType { .object }
-    public static func _rlmPopulateProperty(_ prop: RLMProperty) {
-        Object._rlmPopulateProperty(prop)
-        prop.objectClassName = className()
-    }
-
-    public static func _rlmGetProperty(_ obj: ObjectBase, _ key: UInt16) -> Self {
-        if let value = RLMGetSwiftPropertyObject(obj, key) {
-            return value as! Self
-        }
-        return Self()
-    }
-
-    public static func _rlmGetPropertyOptional(_ obj: ObjectBase, _ key: UInt16) -> Self? {
-        if let value = RLMGetSwiftPropertyObject(obj, key) {
-            return (value as! Self)
-        }
-        return nil
-    }
-
-    public static func _rlmSetProperty(_ obj: ObjectBase, _ key: UInt16, _ value: AsymmetricObject) {
-        RLMSetSwiftPropertyObject(obj, key, value)
-    }
-}
-
 extension List: _RealmSchemaDiscoverable, SchemaDiscoverable where Element: _RealmSchemaDiscoverable {
     public static var _rlmType: PropertyType { Element._rlmType }
     public static var _rlmOptional: Bool { Element._rlmOptional }

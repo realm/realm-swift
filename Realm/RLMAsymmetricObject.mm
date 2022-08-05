@@ -44,8 +44,9 @@
 
 #pragma mark - Class-based Object Creation
 
-+ (void)createInRealm:(RLMRealm *)realm withObject:(RLMAsymmetricObject *)object {
-    RLMCreateAsymmetricObjectInRealm(object, realm);
++ (instancetype)createInRealm:(RLMRealm *)realm withValue:(id)value {
+    RLMCreateAsymmetricObjectInRealm(realm, [self className], value);
+    return nil;
 }
 
 #pragma mark - Subscripting

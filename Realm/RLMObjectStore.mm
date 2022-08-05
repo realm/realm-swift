@@ -138,15 +138,14 @@ RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *classN
     return object;
 }
 
-void RLMCreateAsymmetricObjectInRealm(__unsafe_unretained RLMObjectBase *const object,
-                                      __unsafe_unretained RLMRealm *const realm) {
+void RLMCreateAsymmetricObjectInRealm(RLMRealm *realm, NSString *className, id value) {
     RLMVerifyInWriteTransaction(realm);
 
     CreatePolicy createPolicy = {.create = true, .copy = true, .diff = false, .update = false};
 
-    auto& info = realm->_info[object->_objectSchema.className];
+    auto& info = realm->_info[className];
     RLMAccessorContext c{info};
-    c.createObject(object, createPolicy);
+    c.createObject(value, createPolicy);
 }
 
 RLMObjectBase *RLMObjectFromObjLink(RLMRealm *realm, realm::ObjLink&& objLink, bool parentIsSwiftObject) {

@@ -192,20 +192,24 @@ RLM_COLLECTION_TYPE(PersonAsymmetric);
     [super tearDown];
 }
 
-- (void)checkCountInMongo:(unsigned long)count {
+- (void)checkCountInMongo:(unsigned long)expectedCount {
     RLMUser *user = [self logInUserForCredentials:[RLMCredentials anonymousCredentials]
                                               app:self.asymmetricSyncApp];
     RLMMongoClient *client = [user mongoClientWithServiceName:@"mongodb1"];
     RLMMongoDatabase *database = [client databaseWithName:@"test_data"];
     RLMMongoCollection *collection = [database collectionWithName:@"PersonAsymmetric"];
-    XCTestExpectation *findExpectation4 = [self expectationWithDescription:@"Should find documents"];
-    [collection findWhere:@{}
-               completion:^(NSArray<NSDictionary *> *documents, NSError *error) {
-        XCTAssertEqual(documents.count, count);
-        XCTAssertNil(error);
-        [findExpectation4 fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:60.0 handler:nil];
+
+    __block unsigned long count = 0;
+    NSDate *waitStart = [NSDate date];
+    while (count < expectedCount && ([waitStart timeIntervalSinceNow] > -600.0)) {
+        [collection countWhere:@{}
+                    completion:^(NSInteger c, NSError *error) {
+            count = c;
+
+        }];
+        sleep(5);
+    }
+    XCTAssertEqual(count, expectedCount);
 }
 
 - (void)testAsymmetricObjectSchema {
@@ -224,7 +228,8 @@ RLM_COLLECTION_TYPE(PersonAsymmetric);
     RLMRealm *realm = [RLMRealm realmWithConfiguration:configuration error:&error];
     XCTAssertNil(realm);
     // This error comes from core, we are not even adding this objects to the server schema.
-    XCTAssertNotNil(error);
+    XCTAssert([error.localizedDescription containsString:@"Asymmetric table with property 'UnsupportedLinkAsymmetric.object' of type 'object' cannot have an object type."]);
+    XCTAssert([error.localizedDescription containsString:@"Asymmetric table with property 'UnsupportedLinkAsymmetric.objectArray' of type 'array' cannot have an object type."]);
 }
 
 - (void)testUnsupportedAsymmetricLinkObjectThrowsError  {
@@ -235,7 +240,8 @@ RLM_COLLECTION_TYPE(PersonAsymmetric);
     RLMRealm *realm = [RLMRealm realmWithConfiguration:configuration error:&error];
     XCTAssertNil(realm);
     // This error comes from core, we are not even adding this objects to the server schema.
-    XCTAssertNotNil(error);
+    XCTAssert([error.localizedDescription containsString:@"Asymmetric table with property 'UnsupportedLinkObject.object' of type 'object' cannot have an object type."]);
+    XCTAssert([error.localizedDescription containsString:@"Asymmetric table with property 'UnsupportedLinkObject.objectArray' of type 'array' cannot have an object type."]);
 }
 
 - (void)testUnsupportedObjectLinksAsymmetricThrowsError  {
@@ -244,9 +250,10 @@ RLM_COLLECTION_TYPE(PersonAsymmetric);
     configuration.objectClasses = @[UnsupportedObjectLinkAsymmetric.self, PersonAsymmetric.self];
     NSError *error;
     RLMRealm *realm = [RLMRealm realmWithConfiguration:configuration error:&error];
-    // This error comes from core, we are not even adding this objects to the server schema.
     XCTAssertNil(realm);
-    XCTAssertNotNil(error);
+    // This error comes from core, we are not even adding this objects to the server schema.
+    XCTAssert([error.localizedDescription containsString:@"Property 'UnsupportedObjectLinkAsymmetric.object' of type 'object' cannot be a link to an asymmetric object."]);
+    XCTAssert([error.localizedDescription containsString:@"Property 'UnsupportedObjectLinkAsymmetric.objectArray' of type 'array' cannot be a link to an asymmetric object."]);
 }
 
 - (void)testOpenLocalRealmWithAsymmetricObjectError {
@@ -269,7 +276,7 @@ RLM_COLLECTION_TYPE(PersonAsymmetric);
     XCTAssertNotNil(error);
 }
 
-- (void)testCreateAsymmetricObject {
+- (void)testCreateAsymmetricObjects {
     RLMUser *user = [self userForSelector:_cmd];
     RLMRealmConfiguration *configuration = [user flexibleSyncConfiguration];
     configuration.objectClasses = @[PersonAsymmetric.self];
@@ -277,13 +284,9 @@ RLM_COLLECTION_TYPE(PersonAsymmetric);
     XCTAssertNotNil(realm);
 
     [realm beginWriteTransaction];
-    const int numberOfSubs = 12;
-    for (int i = 1; i <= numberOfSubs; ++i) {
-        PersonAsymmetric *person = [[PersonAsymmetric alloc] initWithPrimaryKey:[RLMObjectId objectId]
-                                                                      firstName:[NSString stringWithFormat:@"firstname_%d", i]
-                                                                       lastName:[NSString stringWithFormat:@"lastname_%d", i]
-                                                                            age:i];
-        [PersonAsymmetric createInRealm:realm withObject:person];
+    for (int i = 1; i <= 12; ++i) {
+        RLMObjectId *oid = [RLMObjectId objectId];
+        (void)[PersonAsymmetric createInRealm:realm withValue:@[oid, [NSString stringWithFormat:@"firstname_%d", i], [NSString stringWithFormat:@"lastname_%d", i]]];
     }
     [realm commitWriteTransaction];
     [self waitForUploadsForRealm:realm];
@@ -297,18 +300,15 @@ RLM_COLLECTION_TYPE(PersonAsymmetric);
     RLMRealm *realm = [RLMRealm realmWithConfiguration:configuration error:nil];
     XCTAssertNotNil(realm);
 
-    PersonAsymmetric *person = [[PersonAsymmetric alloc] initWithPrimaryKey:[RLMObjectId objectId]
-                                                                  firstName:@"firstname"
-                                                                   lastName:@"lastname"
-                                                                        age:10];
+    RLMObjectId *oid = [RLMObjectId objectId];
     [realm beginWriteTransaction];
-    [PersonAsymmetric createInRealm:realm withObject:person];
+    (void)[PersonAsymmetric createInRealm:realm withValue:@[oid, @"firstname", @"lastname", @10]];
     [realm commitWriteTransaction];
     [self waitForUploadsForRealm:realm];
     [self checkCountInMongo:1];
 
     [realm beginWriteTransaction];
-    [PersonAsymmetric createInRealm:realm withObject:person];
+    (void)[PersonAsymmetric createInRealm:realm withValue:@[oid, @"firstname", @"lastname", @10]];
     [realm commitWriteTransaction];
     [self waitForUploadsForRealm:realm];
     [self checkCountInMongo:1];

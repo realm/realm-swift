@@ -28,7 +28,8 @@ import RealmSyncTestSupport
 import RealmTestSupport
 #endif
 
-public class SwiftObjectAsymmetric: AsymmetricObject {
+let object = SwiftObjectAsymmetric()
+class SwiftObjectAsymmetric: AsymmetricObject {
     @Persisted(primaryKey: true) var _id: ObjectId
     @Persisted var string: String
     @Persisted var int: Int
@@ -39,58 +40,63 @@ public class SwiftObjectAsymmetric: AsymmetricObject {
     @Persisted var uuid: UUID = UUID(uuidString: "85d4fbee-6ec6-47df-bfa1-615931903d7e")!
     @Persisted var objectId: ObjectId = ObjectId("6058f12682b2fbb1f334ef1d")
 
-    @Persisted public var intList: List<Int>
-    @Persisted public var boolList: List<Bool>
-    @Persisted public var stringList: List<String>
-    @Persisted public var dataList: List<Data>
-    @Persisted public var dateList: List<Date>
-    @Persisted public var doubleList: List<Double>
-    @Persisted public var objectIdList: List<ObjectId>
-    @Persisted public var decimalList: List<Decimal128>
-    @Persisted public var uuidList: List<UUID>
-    @Persisted public var anyList: List<AnyRealmValue>
+    @Persisted var intList: List<Int>
+    @Persisted var boolList: List<Bool>
+    @Persisted var stringList: List<String>
+    @Persisted var dataList: List<Data>
+    @Persisted var dateList: List<Date>
+    @Persisted var doubleList: List<Double>
+    @Persisted var objectIdList: List<ObjectId>
+    @Persisted var decimalList: List<Decimal128>
+    @Persisted var uuidList: List<UUID>
+    @Persisted var anyList: List<AnyRealmValue>
 
-    @Persisted public var intSet: MutableSet<Int>
-    @Persisted public var stringSet: MutableSet<String>
-    @Persisted public var dataSet: MutableSet<Data>
-    @Persisted public var dateSet: MutableSet<Date>
-    @Persisted public var doubleSet: MutableSet<Double>
-    @Persisted public var objectIdSet: MutableSet<ObjectId>
-    @Persisted public var decimalSet: MutableSet<Decimal128>
-    @Persisted public var uuidSet: MutableSet<UUID>
-    @Persisted public var anySet: MutableSet<AnyRealmValue>
+    @Persisted var intSet: MutableSet<Int>
+    @Persisted var stringSet: MutableSet<String>
+    @Persisted var dataSet: MutableSet<Data>
+    @Persisted var dateSet: MutableSet<Date>
+    @Persisted var doubleSet: MutableSet<Double>
+    @Persisted var objectIdSet: MutableSet<ObjectId>
+    @Persisted var decimalSet: MutableSet<Decimal128>
+    @Persisted var uuidSet: MutableSet<UUID>
+    @Persisted var anySet: MutableSet<AnyRealmValue>
 
-    @Persisted public var otherIntSet: MutableSet<Int>
-    @Persisted public var otherStringSet: MutableSet<String>
-    @Persisted public var otherDataSet: MutableSet<Data>
-    @Persisted public var otherDateSet: MutableSet<Date>
-    @Persisted public var otherDoubleSet: MutableSet<Double>
-    @Persisted public var otherObjectIdSet: MutableSet<ObjectId>
-    @Persisted public var otherDecimalSet: MutableSet<Decimal128>
-    @Persisted public var otherUuidSet: MutableSet<UUID>
-    @Persisted public var otherAnySet: MutableSet<AnyRealmValue>
+    @Persisted var otherIntSet: MutableSet<Int>
+    @Persisted var otherStringSet: MutableSet<String>
+    @Persisted var otherDataSet: MutableSet<Data>
+    @Persisted var otherDateSet: MutableSet<Date>
+    @Persisted var otherDoubleSet: MutableSet<Double>
+    @Persisted var otherObjectIdSet: MutableSet<ObjectId>
+    @Persisted var otherDecimalSet: MutableSet<Decimal128>
+    @Persisted var otherUuidSet: MutableSet<UUID>
+    @Persisted var otherAnySet: MutableSet<AnyRealmValue>
 
-    @Persisted public var intMap: Map<String, Int>
-    @Persisted public var stringMap: Map<String, String>
-    @Persisted public var dataMap: Map<String, Data>
-    @Persisted public var dateMap: Map<String, Date>
-    @Persisted public var doubleMap: Map<String, Double>
-    @Persisted public var objectIdMap: Map<String, ObjectId>
-    @Persisted public var decimalMap: Map<String, Decimal128>
-    @Persisted public var uuidMap: Map<String, UUID>
-    @Persisted public var anyMap: Map<String, AnyRealmValue>
+    @Persisted var intMap: Map<String, Int>
+    @Persisted var stringMap: Map<String, String>
+    @Persisted var dataMap: Map<String, Data>
+    @Persisted var dateMap: Map<String, Date>
+    @Persisted var doubleMap: Map<String, Double>
+    @Persisted var objectIdMap: Map<String, ObjectId>
+    @Persisted var decimalMap: Map<String, Decimal128>
+    @Persisted var uuidMap: Map<String, UUID>
+    @Persisted var anyMap: Map<String, AnyRealmValue>
 
-    public override class func _realmIgnoreClass() -> Bool {
+    override class func _realmIgnoreClass() -> Bool {
         return true
     }
 
-    public convenience init(id: ObjectId, string: String, int: Int, bool: Bool) {
+    convenience init(id: ObjectId, string: String, int: Int, bool: Bool) {
         self.init()
         self._id = id
         self.string = string
         self.int = int
         self.bool = bool
     }
+}
+
+class HugeObjectAsymmetric: AsymmetricObject {
+    @Persisted(primaryKey: true) public var _id: ObjectId
+    @Persisted public var data: Data?
 }
 
 class SwiftAsymmetricSyncTests: SwiftSyncTestCase {
@@ -108,8 +114,9 @@ class SwiftAsymmetricSyncTests: SwiftSyncTestCase {
         var appId = SwiftAsymmetricSyncTests.asymmetricAppId
         if appId == nil {
             do {
-                let objectSchema = RLMObjectSchema(forObjectClass: SwiftObjectAsymmetric.self)
-                appId = try RealmServer.shared.createAppForAsymmetricSchema([objectSchema])
+                let objectAsymmetricSchema = RLMObjectSchema(forObjectClass: SwiftObjectAsymmetric.self)
+                let hugeObjectAsymmetricSchema = RLMObjectSchema(forObjectClass: HugeObjectAsymmetric.self)
+                appId = try RealmServer.shared.createAppForAsymmetricSchema([objectAsymmetricSchema, hugeObjectAsymmetricSchema])
                 SwiftAsymmetricSyncTests.asymmetricAppId = appId
             } catch {
                 XCTFail("Failed to create Asymmetric app: \(error)")
@@ -146,7 +153,7 @@ class SwiftAsymmetricSyncTests: SwiftSyncTestCase {
             _ = try Realm(configuration: configuration)
             XCTFail("Opening a local Realm with an `Asymmetric` table should fail")
         } catch {
-            XCTAssertNotNil(error)
+            XCTAssertEqual(error.localizedDescription, "Schema validation failed due to the following errors:\n- Asymmetric table \'SwiftObjectAsymmetric\' not allowed in a local Realm")
         }
     }
 
@@ -170,7 +177,7 @@ class SwiftAsymmetricSyncTests: SwiftSyncTestCase {
 extension SwiftAsymmetricSyncTests {
     func config() async throws -> Realm.Configuration {
         var config = (try await asymmetricApp.login(credentials: basicCredentials(app: asymmetricApp))).flexibleSyncConfiguration()
-        config.objectTypes = [SwiftObjectAsymmetric.self]
+        config.objectTypes = [SwiftObjectAsymmetric.self, HugeObjectAsymmetric.self]
         return config
     }
 
@@ -180,12 +187,21 @@ extension SwiftAsymmetricSyncTests {
     }
 
     @MainActor
-    func setupCollection() async throws -> MongoCollection {
+    func setupCollection(_ collection: String) async throws -> MongoCollection {
         let user = try await asymmetricApp.login(credentials: .anonymous)
         let mongoClient = user.mongoClient("mongodb1")
         let database = mongoClient.database(named: "test_data")
-        let collection =  database.collection(withName: "SwiftObjectAsymmetric")
+        let collection =  database.collection(withName: collection)
         return collection
+    }
+
+    @MainActor
+    func checkCountInMongo(_ expectedCount: Int, forCollection collection: String) async throws {
+        let waitStart = Date()
+        let collection = try await setupCollection(collection)
+        while collection.count(filter: [:]).await(self) < expectedCount && waitStart.timeIntervalSinceNow > -600.0 {
+            sleep(5)
+        }
     }
 
     @MainActor
@@ -194,22 +210,20 @@ extension SwiftAsymmetricSyncTests {
         XCTAssertNotNil(realm)
 
         // Create Asymmetric Objects and create them on the Realm
-        for i in 1...15 {
-            try realm.write {
-                let personAsymmetric = SwiftObjectAsymmetric(id: ObjectId.generate(),
-                                                             string: "name_\(#function)_\(i)",
-                                                             int: i,
-                                                             bool: Bool.random())
-                realm.create(personAsymmetric)
+
+        try realm.write {
+            for i in 1...15 {
+                realm.create(SwiftObjectAsymmetric.self, value: ["id": ObjectId.generate(),
+                                                                 "string": "name_\(#function)_\(i)",
+                                                                 "int": i,
+                                                                 "bool": Bool.random()])
             }
         }
         waitForUploads(for: realm)
 
         // We use the Mongo client API to check if the documents were create,
         // because we cannot query `AsymmetricObject`s directly.
-        let collection = try await setupCollection()
-        let documents = try await collection.find(filter: [:])
-        XCTAssertEqual(documents.count, 15)
+        try await checkCountInMongo(15, forCollection: "SwiftObjectAsymmetric")
     }
 
     @MainActor
@@ -219,22 +233,18 @@ extension SwiftAsymmetricSyncTests {
 
         // Create Asymmetric Objects and create them on the Realm
         try realm.write {
-
-            let personAsymmetric = SwiftObjectAsymmetric(id: ObjectId.generate(),
-                                                         string: "name_\(#function)",
-                                                         int: 15,
-                                                         bool: true)
-            realm.create(personAsymmetric)
+            realm.create(SwiftObjectAsymmetric.self, value: ["id": ObjectId.generate(),
+                                                             "string": "name_\(#function)",
+                                                             "int": 15,
+                                                             "bool": true])
         }
         waitForUploads(for: realm)
 
         // We use the Mongo client API to check if the documents were create,
         // because we cannot query AsymmetricObjects directly.
-        let collection = try await setupCollection()
-        let documents = try await collection.find(filter: [:])
-        XCTAssertEqual(documents.count, 1)
+        try await checkCountInMongo(1, forCollection: "SwiftObjectAsymmetric")
 
-        let document = documents[0]
+        let document = try await setupCollection("SwiftObjectAsymmetric").find(filter: [:])[0]
         XCTAssertEqual(document["string"]??.stringValue, "name_\(#function)")
         XCTAssertEqual(document["int"]??.int64Value, 15)
         XCTAssertEqual(document["bool"]??.boolValue, true)
@@ -243,6 +253,21 @@ extension SwiftAsymmetricSyncTests {
         XCTAssertEqual(document["decimal"]??.decimal128Value, Decimal128(1))
         XCTAssertEqual(document["uuid"]??.uuidValue, UUID(uuidString: "85d4fbee-6ec6-47df-bfa1-615931903d7e")!)
         XCTAssertEqual(document["objectId"]??.objectIdValue, ObjectId("6058f12682b2fbb1f334ef1d"))
+    }
+
+    @MainActor
+    func testCreateHugeAsymmetricObject() async throws {
+        let realm = try await realm()
+        XCTAssertNotNil(realm)
+
+        try realm.write {
+            for _ in 0..<2 {
+                realm.create(HugeObjectAsymmetric.self, value: ["data": Data(repeating: 16, count: 1000000)])
+            }
+        }
+        waitForUploads(for: realm)
+
+        try await checkCountInMongo(2, forCollection: "HugeObjectAsymmetric")
     }
 }
 #endif // canImport(_Concurrency)

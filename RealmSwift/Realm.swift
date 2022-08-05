@@ -1113,10 +1113,12 @@ extension Realm {
 
      - warning: This method may only be called during a write transaction.
 
-     - parameter object: The asymmetricObject to create.
+     - parameter type:   The type of the object to create.
+     - parameter value:  The value used to populate the object.
      */
-    public func create(_ object: AsymmetricObject) {
-        RLMCreateAsymmetricObjectInRealm(object, rlmRealm)
+    public func create<T: AsymmetricObject>(_ type: T.Type, value: Any = [:]) {
+        let typeName = (type as AsymmetricObject.Type).className()
+        RLMCreateAsymmetricObjectInRealm(rlmRealm, typeName, value)
     }
 }
 
