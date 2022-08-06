@@ -97,6 +97,10 @@ class SwiftObjectAsymmetric: AsymmetricObject {
 class HugeObjectAsymmetric: AsymmetricObject {
     @Persisted(primaryKey: true) public var _id: ObjectId
     @Persisted public var data: Data?
+
+    override class func _realmIgnoreClass() -> Bool {
+        return true
+    }
 }
 
 class SwiftAsymmetricSyncTests: SwiftSyncTestCase {
