@@ -1,23 +1,31 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.28.5 Release notes (2022-08-09)
 =============================================================
+
 ### Enhancements
-* None.
+
+* Improve performance of accessing `SubscriptionSet` properties when no writes
+  have been made to the Realm since the last access.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
-* None.
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+* A use-after-free could occur if a Realm with audit events enabled was
+  destroyed while processing an upload completion for the events Realm on a
+  different thread. ([Core PR #5714](https://github.com/realm/realm-core/pull/5714))
+* Opening a read-only synchronized Realm for the first time via asyncOpen did
+  not set the schema version, which could lead to `m_schema_version !=
+  ObjectStore::NotVersioned` assertion failures later on.
 
 ### Compatibility
+
 * Realm Studio: 11.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 13.4.1.
 * CocoaPods: 1.10 or later.
-* Xcode: 13.1-14 beta 1.
+* Xcode: 13.1-14 beta 4.
 
 ### Internal
-* Upgraded realm-core from ? to ?
+
+* Upgraded realm-core from 12.4.0 to 12.5.0
 
 10.28.4 Release notes (2022-08-03)
 =============================================================
