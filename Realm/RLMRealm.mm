@@ -591,6 +591,10 @@ static std::shared_ptr<realm::util::Scheduler> makeScheduler(dispatch_queue_t qu
         }
 
         try {
+            // FIXME: temporary workaround for a core 12.5.0 bug
+            if (config.schema_mode == realm::SchemaMode::ReadOnly) {
+                realm->_realm->update_schema({}, config.schema_version);
+            }
             realm->_realm->update_schema(schema.objectStoreCopy, config.schema_version,
                                          std::move(migrationFunction), std::move(initializationFunction));
         }
