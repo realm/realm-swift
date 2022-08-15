@@ -77,7 +77,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @return  This will return `nil`.
  */
-+ (instancetype)createInRealm:(RLMRealm *)realm withValue:(id)value __attribute__((warn_unused_result));
++ (void)createInRealm:(RLMRealm *)realm withValue:(id)value;
 
 #pragma mark - Properties
 

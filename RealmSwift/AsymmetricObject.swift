@@ -61,7 +61,7 @@ extension AsymmetricObject {
 
      - parameter value:  The value used to populate the object.
      */
-    internal convenience init(value: Any) {
+    public convenience init(value: Any) {
         self.init()
         RLMInitializeWithValue(self, value, .partialPrivateShared())
     }

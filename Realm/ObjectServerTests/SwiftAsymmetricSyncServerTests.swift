@@ -28,7 +28,6 @@ import RealmSyncTestSupport
 import RealmTestSupport
 #endif
 
-let object = SwiftObjectAsymmetric()
 class SwiftObjectAsymmetric: AsymmetricObject {
     @Persisted(primaryKey: true) var _id: ObjectId
     @Persisted var string: String
@@ -205,6 +204,7 @@ extension SwiftAsymmetricSyncTests {
         let collection = try await setupCollection(collection)
         while collection.count(filter: [:]).await(self) < expectedCount && waitStart.timeIntervalSinceNow > -600.0 {
             sleep(5)
+            XCTFail("Count timed out")
         }
     }
 
