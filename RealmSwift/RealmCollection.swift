@@ -155,7 +155,7 @@ public protocol _RealmMapValue {
     /**
      If an error occurs, notification blocks are called one time with a `.error`
      result and an `NSError` containing details about the error. This can only
-     currently happen if opening the Realm on a background thread to calcuate
+     currently happen if opening the Realm on a background thread to calculate
      the change set fails. The callback will never be called again after it is
      invoked with a .error value.
      */
@@ -472,7 +472,7 @@ public protocol RealmCollection: RealmCollectionBase, Equatable {
             // ...
          case .update:
             // This case is hit:
-            // - after the token is intialized
+            // - after the token is initialized
             // - when the name property of an object in the
             // collection is modified
             // - when an element is inserted or removed
@@ -558,10 +558,11 @@ public protocol RealmCollection: RealmCollectionBase, Equatable {
      Sorts this collection from a given array of sort descriptors and performs sectioning via a
      user defined callback, returning the result as an instance of `SectionedResults`.
 
-     - parameter sortDescriptors: An array of `SortDescriptor`s to sort by. Note: the primary sort descriptor
-                                  must be responsible for determining the section key.
+     - parameter sortDescriptors: An array of `SortDescriptor`s to sort by.
      - parameter keyBlock: A callback which is invoked on each element in the Results collection.
                            This callback is to return the section key for the element in the collection.
+
+     - note: The primary sort descriptor must be responsible for determining the section key.
 
      - returns: An instance of `SectionedResults`.
      */
@@ -724,8 +725,9 @@ public extension RealmCollection where Element: ObjectBase {
      keyPath a section key will be generated.
 
      - parameter keyPath: The property key path to sort & section on.
-     - parameter sortDescriptors: An array of `SortDescriptor`s to sort by. Note: the primary sort descriptor
-                                  must be responsible for determining the section key.
+     - parameter sortDescriptors: An array of `SortDescriptor`s to sort by.
+
+     - note: The primary sort descriptor must be responsible for determining the section key.
 
      - returns: An instance of `SectionedResults`.
      */
@@ -747,8 +749,9 @@ public extension RealmCollection where Element: ObjectBase {
 
      - parameter block: A callback which is invoked on each element in the collection.
                         This callback is to return the section key for the element in the collection.
-     - parameter sortDescriptors: An array of `SortDescriptor`s to sort by. Note: the primary sort descriptor
-                                  must be responsible for determining the section key.
+     - parameter sortDescriptors: An array of `SortDescriptor`s to sort by.
+
+     - note: The primary sort descriptor must be responsible for determining the section key.
 
      - returns: An instance of `SectionedResults`.
      */
@@ -873,7 +876,6 @@ public extension RealmCollection {
                         This callback is to return the section key for the element in the collection.
      - parameter ascending: The direction to sort in.
 
-
      - returns: An instance of `SectionedResults`.
      */
     func sectioned<Key: _Persistable>(by block: @escaping ((Element) -> Key),
@@ -975,7 +977,7 @@ public extension RealmCollection {
             // ...
          case .update:
             // This case is hit:
-            // - after the token is intialized
+            // - after the token is initialized
             // - when the name property of an object in the
             // collection is modified
             // - when an element is inserted or removed
@@ -1095,7 +1097,7 @@ public extension RealmCollection {
             // ...
          case .update:
             // This case is hit:
-            // - after the token is intialized
+            // - after the token is initialized
             // - when the name property of an object in the
             // collection is modified
             // - when an element is inserted or removed
@@ -1151,7 +1153,6 @@ public extension RealmCollection {
 }
 
 extension RealmCollection {
-
     /**
      Sorts and sections this collection from a given property key path, returning the result
      as an instance of `SectionedResults`. For every unique value retrieved from the
@@ -1176,8 +1177,9 @@ extension RealmCollection {
      keyPath a section key will be generated.
 
      - parameter keyPath: The property key path to sort on.
-     - parameter sortDescriptors: An array of `SortDescriptor`s to sort by. Note: the primary sort descriptor
-                                  must be responsible for determining the section key.
+     - parameter sortDescriptors: An array of `SortDescriptor`s to sort by.
+
+     - note: The primary sort descriptor must be responsible for determining the section key.
 
      - returns: An instance of `SectionedResults`.
      */
@@ -1199,8 +1201,9 @@ extension RealmCollection {
 
      - parameter block: A callback which is invoked on each element in the Results collection.
                         This callback is to return the section key for the element in the collection.
-     - parameter sortDescriptors: An array of `SortDescriptor`s to sort by. Note: the primary sort descriptor
-                                  must be responsible for determining the section key.
+     - parameter sortDescriptors: An array of `SortDescriptor`s to sort by.
+
+     - note: The primary sort descriptor must be responsible for determining the section key.
 
      - returns: An instance of `SectionedResults`.
      */
@@ -1436,7 +1439,7 @@ public struct ProjectedCollection<Element>: RandomAccessCollection, CustomString
             // ...
          case .update:
             // This case is hit:
-            // - after the token is intialized
+            // - after the token is initialized
             // - when the name property of an object in the
             // collection is modified
             // - when an element is inserted or removed

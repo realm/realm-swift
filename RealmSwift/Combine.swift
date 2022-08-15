@@ -110,7 +110,7 @@ extension Publisher {
     /// no longer live-update when writes are made to the Realm and makes it
     /// safe to pass freely between threads without using
     /// `.threadSafeReference()`. It also guarantees that the frozen object
-    /// contained in the changset will always match the property changes, which
+    /// contained in the changeset will always match the property changes, which
     /// is not always the case when using thread-safe references.
     ///
     /// ```
@@ -142,7 +142,7 @@ extension Publisher {
     /// reference no longer live-update when writes are made to the Realm and
     /// makes it safe to pass freely between threads without using
     /// `.threadSafeReference()`. It also guarantees that the frozen collection
-    /// contained in the changset will always match the change information,
+    /// contained in the changeset will always match the change information,
     /// which is not always the case when using thread-safe references.
     ///
     /// ```
@@ -179,7 +179,7 @@ extension Publisher {
     /// reference no longer live-update when writes are made to the Realm and
     /// makes it safe to pass freely between threads without using
     /// `.threadSafeReference()`. It also guarantees that the frozen sectioned results
-    /// contained in the changset will always match the change information,
+    /// contained in the changeset will always match the change information,
     /// which is not always the case when using thread-safe references.
     ///
     /// ```
@@ -218,7 +218,7 @@ extension Publisher {
     /// reference no longer live-update when writes are made to the Realm and
     /// makes it safe to pass freely between threads without using
     /// `.threadSafeReference()`. It also guarantees that the frozen collection
-    /// contained in the changset will always match the change information,
+    /// contained in the changeset will always match the change information,
     /// which is not always the case when using thread-safe references.
     ///
     /// ```
@@ -255,7 +255,7 @@ extension Publisher {
     /// no longer live-update when writes are made to the Realm and makes it
     /// safe to pass freely between threads without using
     /// `.threadSafeReference()`. It also guarantees that the frozen projection
-    /// contained in the changset will always match the property changes, which
+    /// contained in the changeset will always match the property changes, which
     /// is not always the case when using thread-safe references.
     ///
     /// ```
@@ -762,17 +762,17 @@ extension SectionedResults: RealmSubscribable {
 extension ResultsSection: RealmSubscribable {
     /// :nodoc:
     public func _observe<S>(_ keyPaths: [String]? = nil, on queue: DispatchQueue? = nil, _ subscriber: S)
-        -> NotificationToken where S: Subscriber, S.Input == Self, S.Failure == Error {
+    -> NotificationToken where S: Subscriber, S.Input == Self, S.Failure == Error {
         return observe(keyPaths: keyPaths, on: queue) { change in
-                switch change {
-                case .initial(let collection):
-                    _ = subscriber.receive(collection)
-                case .update(let collection, deletions: _, insertions: _, modifications: _, sectionsToInsert: _, sectionsToDelete: _):
-                    _ = subscriber.receive(collection)
-                case .error(let error):
-                    subscriber.receive(completion: .failure(error))
-                }
+            switch change {
+            case .initial(let collection):
+                _ = subscriber.receive(collection)
+            case .update(let collection, deletions: _, insertions: _, modifications: _, sectionsToInsert: _, sectionsToDelete: _):
+                _ = subscriber.receive(collection)
+            case .error(let error):
+                subscriber.receive(completion: .failure(error))
             }
+        }
     }
 
     /// :nodoc:

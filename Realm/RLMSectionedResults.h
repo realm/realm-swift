@@ -285,7 +285,7 @@ NS_ASSUME_NONNULL_BEGIN
  @warning The queue must be a serial queue.
 
  @param block The block to be called whenever a change occurs.
- @param keyPaths The block will be called for changes occuring on these keypaths. If no
+ @param keyPaths The block will be called for changes occurring on these keypaths. If no
  key paths are given, notifications are delivered for every property key path.
 
  @return A token which must be held for as long as you want updates to be delivered.
@@ -348,7 +348,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @param block The block to be called whenever a change occurs.
  @param queue The serial queue to deliver notifications to.
- @param keyPaths The block will be called for changes occuring on these keypaths. If no
+ @param keyPaths The block will be called for changes occurring on these keypaths. If no
  key paths are given, notifications are delivered for every property key path.
 
  @return A token which must be held for as long as you want updates to be delivered.
@@ -585,7 +585,7 @@ NS_ASSUME_NONNULL_BEGIN
  @warning The queue must be a serial queue.
 
  @param block The block to be called whenever a change occurs.
- @param keyPaths The block will be called for changes occuring on these keypaths. If no
+ @param keyPaths The block will be called for changes occurring on these keypaths. If no
  key paths are given, notifications are delivered for every property key path.
 
  @return A token which must be held for as long as you want updates to be delivered.
@@ -649,9 +649,9 @@ NS_ASSUME_NONNULL_BEGIN
  @warning The queue must be a serial queue.
 
  @param block The block to be called whenever a change occurs.
- @param queue The serial queue to deliver notifications to.
- @param keyPaths The block will be called for changes occuring on these keypaths. If no
+ @param keyPaths The block will be called for changes occurring on these keypaths. If no
  key paths are given, notifications are delivered for every property key path.
+ @param queue The serial queue to deliver notifications to.
 
  @return A token which must be held for as long as you want updates to be delivered.
  */
@@ -880,7 +880,7 @@ NS_ASSUME_NONNULL_BEGIN
  @warning The queue must be a serial queue.
 
  @param block The block to be called whenever a change occurs.
- @param keyPaths The block will be called for changes occuring on these keypaths. If no
+ @param keyPaths The block will be called for changes occurring on these keypaths. If no
  key paths are given, notifications are delivered for every property key path.
 
  @return A token which must be held for as long as you want updates to be delivered.
@@ -942,9 +942,9 @@ NS_ASSUME_NONNULL_BEGIN
  @warning The queue must be a serial queue.
 
  @param block The block to be called whenever a change occurs.
- @param queue The serial queue to deliver notifications to.
- @param keyPaths The block will be called for changes occuring on these keypaths. If no
+ @param keyPaths The block will be called for changes occurring on these keypaths. If no
  key paths are given, notifications are delivered for every property key path.
+ @param queue The serial queue to deliver notifications to.
 
  @return A token which must be held for as long as you want updates to be delivered.
  */

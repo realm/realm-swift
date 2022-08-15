@@ -144,6 +144,9 @@ extension RealmSectionedResultImpl {
     }
 }
 
+/// `SectionedResults` is a type safe collection which holds individual `ResultsSection`s as its elements.
+/// The container is lazily evaluated, meaning that if the underlying collection has changed a full recalculation of the section keys will take place.
+/// A `SectionedResults` instance can be observed and it also conforms to `ThreadConfined`.
 public struct SectionedResults<Key: _Persistable & Hashable, T: RealmCollectionValue>: RealmSectionedResultImpl {
     /// :nodoc:
     internal var collection: RLMSectionedResults<RLMValue, RLMValue>
@@ -249,7 +252,7 @@ public struct SectionedResults<Key: _Persistable & Hashable, T: RealmCollectionV
             // ...
          case .update:
             // This case is hit:
-            // - after the token is intialized
+            // - after the token is initialized
             // - when the name property of an object in the
             // collection is modified
             // - when an element is inserted or removed
@@ -374,7 +377,7 @@ public struct SectionedResults<Key: _Persistable & Hashable, T: RealmCollectionV
             // ...
          case .update:
             // This case is hit:
-            // - after the token is intialized
+            // - after the token is initialized
             // - when the name property of an object in the
             // collection is modified
             // - when an element is inserted or removed
@@ -492,7 +495,7 @@ public struct SectionedResults<Key: _Persistable & Hashable, T: RealmCollectionV
             // ...
          case .update:
             // This case is hit:
-            // - after the token is intialized
+            // - after the token is initialized
             // - when the name property of an object in the
             // collection is modified
             // - when an element is inserted or removed
@@ -556,6 +559,10 @@ public struct SectionedResults<Key: _Persistable & Hashable, T: RealmCollectionV
     }
 }
 
+
+/// `ResultsSection` is a collection which allows access  to objects that belong to a given section key.
+/// The collection is lazily evaluated, meaning that if the underlying collection has changed a full recalculation of the section keys will take place.
+/// A `ResultsSection` instance can be observed and it also conforms to `ThreadConfined`.
 public struct ResultsSection<Key: _Persistable & Hashable, T: RealmCollectionValue>: RealmSectionedResultImpl, Identifiable {
     /// :nodoc:
     internal var collection: RLMSection<RLMValue, RLMValue>
@@ -655,7 +662,7 @@ public struct ResultsSection<Key: _Persistable & Hashable, T: RealmCollectionVal
             // ...
          case .update:
             // This case is hit:
-            // - after the token is intialized
+            // - after the token is initialized
             // - when the name property of an object in the
             // collection is modified
             // - when an element is inserted or removed
@@ -779,7 +786,7 @@ public struct ResultsSection<Key: _Persistable & Hashable, T: RealmCollectionVal
             // ...
          case .update:
             // This case is hit:
-            // - after the token is intialized
+            // - after the token is initialized
             // - when the name property of an object in the
             // collection is modified
             // - when an element is inserted or removed
@@ -896,7 +903,7 @@ public struct ResultsSection<Key: _Persistable & Hashable, T: RealmCollectionVal
             // ...
          case .update:
             // This case is hit:
-            // - after the token is intialized
+            // - after the token is initialized
             // - when the name property of an object in the
             // collection is modified
             // - when an element is inserted or removed
@@ -986,9 +993,9 @@ public struct ResultsSection<Key: _Persistable & Hashable, T: RealmCollectionVal
     /**
      If an error occurs, notification blocks are called one time with a `.error`
      result and an `NSError` containing details about the error. This can only
-     currently happen if opening the Realm on a background thread to calcuate
+     currently happen if opening the Realm on a background thread to calculate
      the change set fails. The callback will never be called again after it is
-     invoked with a .error value.
+     invoked with a `.error` value.
      */
     case error(Error)
     /// :nodoc:

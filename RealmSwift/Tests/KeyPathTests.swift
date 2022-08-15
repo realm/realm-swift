@@ -357,7 +357,7 @@ class KeyPathTests: TestCase {
 
         // Allowing old property syntax objects to do nested key path strings involves an invasive change to `unmanagedGetter` in RLMAccessor.
         // We would need to prevent the getter function from returning `nil` and instead return a block that appends the property name to the
-        // tracing array in the object. This would break a ton of other stuff and instead it is recommened that a user use @Persisted
+        // tracing array in the object. This would break a ton of other stuff and instead it is recommended that a user use @Persisted
     }
 
     func testOldSyntaxEmbeddedObject() {

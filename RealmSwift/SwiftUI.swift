@@ -614,6 +614,15 @@ extension Projection: _ObservedResultsValue { }
     }
 }
 
+/// A property wrapper type that represents a sectioned results collection.
+///
+/// The sectioned results use the realm configuration provided by
+/// the environment value `EnvironmentValues/realmConfiguration`
+/// if `configuration` is not set in the initializer.
+///
+///
+/// Given `@ObservedSectionedResults var v` in SwiftUI, `$v` refers to a `BoundCollection`.
+///
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 @propertyWrapper public struct ObservedSectionedResults<Key: _Persistable & Hashable, ResultType>: DynamicProperty, BoundCollection where ResultType: _ObservedResultsValue & RealmFetchable & KeypathSortable & Identifiable {
     public typealias Element = ResultType
@@ -679,42 +688,17 @@ extension Projection: _ObservedResultsValue { }
         var keyPathString: String?
 
         init(_ value: Results<ResultType>,
-             sectionKeyPath: KeyPath<ResultType, Key>,
-             sortDescriptors: [SortDescriptor],
-             keyPaths: [String]? = nil) where ResultType: ObjectBase {
-            self.sectionBlock = { (obj: ResultType) in
-                obj[keyPath: sectionKeyPath]
-            }
-            self.keyPathString = _name(for: sectionKeyPath)
-            self.sortDescriptors = sortDescriptors
-            if let keyPathString = self.keyPathString, self.sortDescriptors.isEmpty {
-                self.sortDescriptors.append(.init(keyPath: keyPathString, ascending: true))
-            }
-            super.init(value.sectioned(by: sectionKeyPath, sortDescriptors: self.sortDescriptors), keyPaths)
-        }
-
-        init<BoxedType: ObjectBase>(_ value: Results<ResultType>,
-                                    sectionKeyPath: KeyPath<ResultType, Key>,
-                                    sortDescriptors: [SortDescriptor],
-                                    keyPaths: [String]? = nil) where ResultType: Projection<BoxedType> {
-            self.sectionBlock = { (obj: ResultType) in
-                obj[keyPath: sectionKeyPath]
-            }
-            self.keyPathString = _name(for: sectionKeyPath)
-            self.sortDescriptors = sortDescriptors
-            if let keyPathString = self.keyPathString, self.sortDescriptors.isEmpty {
-                self.sortDescriptors.append(.init(keyPath: keyPathString, ascending: true))
-            }
-            super.init(value.sectioned(by: sectionKeyPath, sortDescriptors: self.sortDescriptors), keyPaths)
-        }
-
-        init(_ value: Results<ResultType>,
              sectionBlock: @escaping ((ResultType) -> Key),
              sortDescriptors: [SortDescriptor],
+             keyPathString: String? = nil,
              keyPaths: [String]? = nil) where ResultType: ObjectBase {
             self.sectionBlock = sectionBlock
             self.sortDescriptors = sortDescriptors
-            if sortDescriptors.isEmpty {
+            if let keyPathString = keyPathString {
+                self.keyPathString = keyPathString
+                self.sortDescriptors.append(.init(keyPath: keyPathString, ascending: true))
+            }
+            if self.sortDescriptors.isEmpty {
                 throwRealmException("sortDescriptors must not be empty when sectioning ObservedSectionedResults with `sectionBlock`")
             }
             super.init(value.sectioned(by: self.sectionBlock, sortDescriptors: self.sortDescriptors), keyPaths)
@@ -723,10 +707,15 @@ extension Projection: _ObservedResultsValue { }
         init<BoxedType: ObjectBase>(_ value: Results<ResultType>,
                                     sectionBlock: @escaping ((ResultType) -> Key),
                                     sortDescriptors: [SortDescriptor],
+                                    keyPathString: String? = nil,
                                     keyPaths: [String]? = nil) where ResultType: Projection<BoxedType> {
             self.sectionBlock = sectionBlock
             self.sortDescriptors = sortDescriptors
-            if sortDescriptors.isEmpty {
+            if let keyPathString = keyPathString {
+                self.keyPathString = keyPathString
+                self.sortDescriptors.append(.init(keyPath: keyPathString, ascending: true))
+            }
+            if self.sortDescriptors.isEmpty {
                 throwRealmException("sortDescriptors must not be empty when sectioning ObservedSectionedResults with `sectionBlock`")
             }
             super.init(value.sectioned(by: self.sectionBlock, sortDescriptors: self.sortDescriptors), keyPaths)
@@ -783,13 +772,53 @@ extension Projection: _ObservedResultsValue { }
         return self
     }
 
+    private init<ObjectType: ObjectBase>(type: ResultType.Type,
+                                         sectionBlock: @escaping ((ResultType) -> Key),
+                                         sortDescriptors: [SortDescriptor] = [],
+                                         filter: NSPredicate? = nil,
+                                         keyPaths: [String]? = nil,
+                                         keyPathString: String? = nil,
+                                         configuration: Realm.Configuration? = nil) where ResultType: Projection<ObjectType>, ObjectType: ThreadConfined {
+        let results = Results<ResultType>(RLMResults<ResultType>.emptyDetached())
+        self.storage = Storage(results,
+                               sectionBlock: sectionBlock,
+                               sortDescriptors: sortDescriptors,
+                               keyPathString: keyPathString,
+                               keyPaths: keyPaths)
+        self.storage.configuration = configuration
+        self.filter = filter
+        self.sortDescriptors = sortDescriptors
+    }
+
+    private init(type: ResultType.Type,
+                 sectionBlock: @escaping ((ResultType) -> Key),
+                 sortDescriptors: [SortDescriptor] = [],
+                 filter: NSPredicate? = nil,
+                 where: ((Query<ResultType>) -> Query<Bool>)? = nil,
+                 keyPaths: [String]? = nil,
+                 keyPathString: String? = nil,
+                 configuration: Realm.Configuration? = nil) where ResultType: Object {
+        let results = Results<ResultType>(RLMResults<ResultType>.emptyDetached())
+        self.storage = Storage(results,
+                               sectionBlock: sectionBlock,
+                               sortDescriptors: sortDescriptors,
+                               keyPathString: keyPathString,
+                               keyPaths: keyPaths)
+        self.storage.configuration = configuration
+        if let filter = filter {
+            self.filter = filter
+        } else if let `where` = `where` {
+            self.where = `where`
+        }
+        self.sortDescriptors = sortDescriptors
+    }
+
     /**
      Initialize a `ObservedSectionedResults` struct for a given `Projection` type.
      - parameter type: Observed type
      - parameter sectionKeyPath: The keyPath that will produce the key for each section.
      For every unique value retrieved from the keyPath a section key will be generated.
-     - parameter sortDescriptors: A sequence of `SortDescriptor`s to sort by. Note: the primary sort descriptor
-     must be responsible for determining the section key.
+     - parameter sortDescriptors: A sequence of `SortDescriptor`s to sort by.
      - parameter filter: Observations will be made only for passing objects.
      If no filter given - all objects will be observed
      - parameter keyPaths: Only properties contained in the key paths array will be observed.
@@ -797,6 +826,8 @@ extension Projection: _ObservedResultsValue { }
      String key paths which do not correspond to a valid a property will throw an exception.
      - parameter configuration: The `Realm.Configuration` used when creating the Realm.
      If empty the configuration is set to the `defaultConfiguration`
+
+     - note: The primary sort descriptor must be responsible for determining the section key.
      */
     public init<ObjectType: ObjectBase>(_ type: ResultType.Type,
                                         sectionKeyPath: KeyPath<ResultType, Key>,
@@ -804,19 +835,20 @@ extension Projection: _ObservedResultsValue { }
                                         filter: NSPredicate? = nil,
                                         keyPaths: [String]? = nil,
                                         configuration: Realm.Configuration? = nil) where ResultType: Projection<ObjectType>, ObjectType: ThreadConfined {
-        let results = Results<ResultType>(RLMResults<ResultType>.emptyDetached())
-        self.storage = Storage(results, sectionKeyPath: sectionKeyPath, sortDescriptors: sortDescriptors, keyPaths: keyPaths)
-        self.storage.configuration = configuration
-        self.filter = filter
-        self.sortDescriptors = sortDescriptors
+        self.init(type: type,
+                  sectionBlock: { (obj: ResultType) in obj[keyPath: sectionKeyPath] },
+                  sortDescriptors: sortDescriptors,
+                  filter: filter,
+                  keyPaths: keyPaths,
+                  keyPathString: _name(for: sectionKeyPath),
+                  configuration: configuration)
     }
 
     /**
      Initialize a `ObservedSectionedResults` struct for a given `Projection` type.
      - parameter type: Observed type
      - parameter sectionBlock: A callback which returns the section key for each object in the collection.
-     - parameter sortDescriptors: A sequence of `SortDescriptor`s to sort by. Note: the primary sort descriptor
-     must be responsible for determining the section key.
+     - parameter sortDescriptors: A sequence of `SortDescriptor`s to sort by.
      - parameter filter: Observations will be made only for passing objects.
      If no filter given - all objects will be observed
      - parameter keyPaths: Only properties contained in the key paths array will be observed.
@@ -824,6 +856,8 @@ extension Projection: _ObservedResultsValue { }
      String key paths which do not correspond to a valid a property will throw an exception.
      - parameter configuration: The `Realm.Configuration` used when creating the Realm.
      If empty the configuration is set to the `defaultConfiguration`
+
+     - note: The primary sort descriptor must be responsible for determining the section key.
      */
     public init<ObjectType: ObjectBase>(_ type: ResultType.Type,
                                         sectionBlock: @escaping ((ResultType) -> Key),
@@ -831,11 +865,12 @@ extension Projection: _ObservedResultsValue { }
                                         filter: NSPredicate? = nil,
                                         keyPaths: [String]? = nil,
                                         configuration: Realm.Configuration? = nil) where ResultType: Projection<ObjectType>, ObjectType: ThreadConfined {
-        let results = Results<ResultType>(RLMResults<ResultType>.emptyDetached())
-        self.storage = Storage(results, sectionBlock: sectionBlock, sortDescriptors: sortDescriptors, keyPaths: keyPaths)
-        self.storage.configuration = configuration
-        self.filter = filter
-        self.sortDescriptors = sortDescriptors
+        self.init(type: type,
+                  sectionBlock: sectionBlock,
+                  sortDescriptors: sortDescriptors,
+                  filter: filter,
+                  keyPaths: keyPaths,
+                  configuration: configuration)
     }
 
     /**
@@ -843,8 +878,7 @@ extension Projection: _ObservedResultsValue { }
      - parameter type: Observed type
      - parameter sectionKeyPath: The keyPath that will produce the key for each section.
      For every unique value retrieved from the keyPath a section key will be generated.
-     - parameter sortDescriptors: A sequence of `SortDescriptor`s to sort by. Note: the primary sort descriptor
-     must be responsible for determining the section key.
+     - parameter sortDescriptors: A sequence of `SortDescriptor`s to sort by.
      - parameter filter: Observations will be made only for passing objects.
      If no filter given - all objects will be observed
      - parameter keyPaths: Only properties contained in the key paths array will be observed.
@@ -852,6 +886,8 @@ extension Projection: _ObservedResultsValue { }
      String key paths which do not correspond to a valid a property will throw an exception.
      - parameter configuration: The `Realm.Configuration` used when creating the Realm.
      If empty the configuration is set to the `defaultConfiguration`
+
+     - note: The primary sort descriptor must be responsible for determining the section key.
      */
     public init(_ type: ResultType.Type,
                 sectionKeyPath: KeyPath<ResultType, Key>,
@@ -859,19 +895,20 @@ extension Projection: _ObservedResultsValue { }
                 filter: NSPredicate? = nil,
                 keyPaths: [String]? = nil,
                 configuration: Realm.Configuration? = nil) where ResultType: Object {
-        let results = Results<ResultType>(RLMResults<ResultType>.emptyDetached())
-        self.storage = Storage(results, sectionKeyPath: sectionKeyPath, sortDescriptors: sortDescriptors, keyPaths: keyPaths)
-        self.storage.configuration = configuration
-        self.filter = filter
-        self.sortDescriptors = sortDescriptors
+        self.init(type: type,
+                  sectionBlock: { (obj: ResultType) in obj[keyPath: sectionKeyPath] },
+                  sortDescriptors: sortDescriptors,
+                  filter: filter,
+                  keyPaths: keyPaths,
+                  keyPathString: _name(for: sectionKeyPath),
+                  configuration: configuration)
     }
 
     /**
      Initialize a `ObservedSectionedResults` struct for a given `Object` or `EmbeddedObject` type.
      - parameter type: Observed type
      - parameter sectionBlock: A callback which returns the section key for each object in the collection.
-     - parameter sortDescriptors: A sequence of `SortDescriptor`s to sort by. Note: the primary sort descriptor
-     must be responsible for determining the section key.
+     - parameter sortDescriptors: A sequence of `SortDescriptor`s to sort by.
      - parameter filter: Observations will be made only for passing objects.
      If no filter given - all objects will be observed
      - parameter keyPaths: Only properties contained in the key paths array will be observed.
@@ -879,6 +916,8 @@ extension Projection: _ObservedResultsValue { }
      String key paths which do not correspond to a valid a property will throw an exception.
      - parameter configuration: The `Realm.Configuration` used when creating the Realm.
      If empty the configuration is set to the `defaultConfiguration`
+
+     - note: The primary sort descriptor must be responsible for determining the section key.
      */
     public init(_ type: ResultType.Type,
                 sectionBlock: @escaping ((ResultType) -> Key),
@@ -886,19 +925,19 @@ extension Projection: _ObservedResultsValue { }
                 filter: NSPredicate? = nil,
                 keyPaths: [String]? = nil,
                 configuration: Realm.Configuration? = nil) where ResultType: Object {
-        let results = Results<ResultType>(RLMResults<ResultType>.emptyDetached())
-        self.storage = Storage(results, sectionBlock: sectionBlock, sortDescriptors: sortDescriptors, keyPaths: keyPaths)
-        self.storage.configuration = configuration
-        self.filter = filter
-        self.sortDescriptors = sortDescriptors
+        self.init(type: type,
+                  sectionBlock: sectionBlock,
+                  sortDescriptors: sortDescriptors,
+                  filter: filter,
+                  keyPaths: keyPaths,
+                  configuration: configuration)
     }
 
     /**
      Initialize a `ObservedSectionedResults` struct for a given `Object` or `EmbeddedObject` type.
      - parameter type: Observed type
      - parameter sectionBlock: A callback which returns the section key for each object in the collection.
-     - parameter sortDescriptors: A sequence of `SortDescriptor`s to sort by. Note: the primary sort descriptor
-     must be responsible for determining the section key.
+     - parameter sortDescriptors: A sequence of `SortDescriptor`s to sort by.
      - parameter where: Observations will be made only for passing objects.
      If no type safe query is given - all objects will be observed.
      - parameter keyPaths: Only properties contained in the key paths array will be observed.
@@ -906,6 +945,8 @@ extension Projection: _ObservedResultsValue { }
      String key paths which do not correspond to a valid a property will throw an exception.
      - parameter configuration: The `Realm.Configuration` used when creating the Realm.
      If empty the configuration is set to the `defaultConfiguration`
+
+     - note: The primary sort descriptor must be responsible for determining the section key.
      */
     public init(_ type: ResultType.Type,
                 sectionBlock: @escaping ((ResultType) -> Key),
@@ -913,11 +954,12 @@ extension Projection: _ObservedResultsValue { }
                 where: ((Query<ResultType>) -> Query<Bool>)? = nil,
                 keyPaths: [String]? = nil,
                 configuration: Realm.Configuration? = nil) where ResultType: Object {
-        let results = Results<ResultType>(RLMResults<ResultType>.emptyDetached())
-        self.storage = Storage(results, sectionBlock: sectionBlock, sortDescriptors: sortDescriptors, keyPaths: keyPaths)
-        self.storage.configuration = configuration
-        self.where = `where`
-        self.sortDescriptors = sortDescriptors
+        self.init(type: type,
+                  sectionBlock: sectionBlock,
+                  sortDescriptors: sortDescriptors,
+                  where: `where`,
+                  keyPaths: keyPaths,
+                  configuration: configuration)
     }
 
     /**
@@ -925,8 +967,7 @@ extension Projection: _ObservedResultsValue { }
      - parameter type: Observed type
      - parameter sectionKeyPath: The keyPath that will produce the key for each section.
      For every unique value retrieved from the keyPath a section key will be generated.
-     - parameter sortDescriptors: A sequence of `SortDescriptor`s to sort by. Note: the primary sort descriptor
-     must be responsible for determining the section key.
+     - parameter sortDescriptors: A sequence of `SortDescriptor`s to sort by.
      - parameter where: Observations will be made only for passing objects.
      If no type safe query is given - all objects will be observed.
      - parameter keyPaths: Only properties contained in the key paths array will be observed.
@@ -934,6 +975,8 @@ extension Projection: _ObservedResultsValue { }
      String key paths which do not correspond to a valid a property will throw an exception.
      - parameter configuration: The `Realm.Configuration` used when creating the Realm.
      If empty the configuration is set to the `defaultConfiguration`
+
+     - note: The primary sort descriptor must be responsible for determining the section key.
      */
     public init(_ type: ResultType.Type,
                 sectionKeyPath: KeyPath<ResultType, Key>,
@@ -941,11 +984,13 @@ extension Projection: _ObservedResultsValue { }
                 where: ((Query<ResultType>) -> Query<Bool>)? = nil,
                 keyPaths: [String]? = nil,
                 configuration: Realm.Configuration? = nil) where ResultType: Object {
-        let results = Results<ResultType>(RLMResults<ResultType>.emptyDetached())
-        self.storage = Storage(results, sectionKeyPath: sectionKeyPath, sortDescriptors: sortDescriptors, keyPaths: keyPaths)
-        self.storage.configuration = configuration
-        self.where = `where`
-        self.sortDescriptors = sortDescriptors
+        self.init(type: type,
+                  sectionBlock: { (obj: ResultType) in obj[keyPath: sectionKeyPath] },
+                  sortDescriptors: sortDescriptors,
+                  where: `where`,
+                  keyPaths: keyPaths,
+                  keyPathString: _name(for: sectionKeyPath),
+                  configuration: configuration)
     }
 
     /**
@@ -953,46 +998,51 @@ extension Projection: _ObservedResultsValue { }
      - parameter type: Observed type
      - parameter sectionKeyPath: The keyPath that will produce the key for each section.
      For every unique value retrieved from the keyPath a section key will be generated.
-     - parameter sortDescriptors: A sequence of `SortDescriptor`s to sort by. Note: the primary sort descriptor
-     must be responsible for determining the section key.
+     - parameter sortDescriptors: A sequence of `SortDescriptor`s to sort by.
      - parameter keyPaths: Only properties contained in the key paths array will be observed.
      If `nil`, notifications will be delivered for any property change on the object.
      String key paths which do not correspond to a valid a property will throw an exception.
      - parameter configuration: The `Realm.Configuration` used when creating the Realm.
      If empty the configuration is set to the `defaultConfiguration`
+
+     - note: The primary sort descriptor must be responsible for determining the section key.
      */
     public init(_ type: ResultType.Type,
                 sectionKeyPath: KeyPath<ResultType, Key>,
                 sortDescriptors: [SortDescriptor] = [],
                 keyPaths: [String]? = nil,
                 configuration: Realm.Configuration? = nil) where ResultType: Object {
-        let results = Results<ResultType>(RLMResults<ResultType>.emptyDetached())
-        self.storage = Storage(results, sectionKeyPath: sectionKeyPath, sortDescriptors: sortDescriptors, keyPaths: keyPaths)
-        self.storage.configuration = configuration
-        self.sortDescriptors = sortDescriptors
+        self.init(type: type,
+                  sectionBlock: { (obj: ResultType) in obj[keyPath: sectionKeyPath] },
+                  sortDescriptors: sortDescriptors,
+                  keyPaths: keyPaths,
+                  keyPathString: _name(for: sectionKeyPath),
+                  configuration: configuration)
     }
 
     /**
      Initialize a `ObservedSectionedResults` struct for a given `Object` or `EmbeddedObject` type.
      - parameter type: Observed type
      - parameter sectionBlock: A callback which returns the section key for each object in the collection.
-     - parameter sortDescriptors: A sequence of `SortDescriptor`s to sort by. Note: the primary sort descriptor
-     must be responsible for determining the section key.
+     - parameter sortDescriptors: A sequence of `SortDescriptor`s to sort by.
      - parameter keyPaths: Only properties contained in the key paths array will be observed.
      If `nil`, notifications will be delivered for any property change on the object.
      String key paths which do not correspond to a valid a property will throw an exception.
      - parameter configuration: The `Realm.Configuration` used when creating the Realm.
      If empty the configuration is set to the `defaultConfiguration`
+
+     - note: The primary sort descriptor must be responsible for determining the section key.
      */
     public init(_ type: ResultType.Type,
                 sectionBlock: @escaping ((ResultType) -> Key),
                 sortDescriptors: [SortDescriptor],
                 keyPaths: [String]? = nil,
                 configuration: Realm.Configuration? = nil) where ResultType: Object {
-        let results = Results<ResultType>(RLMResults<ResultType>.emptyDetached())
-        self.storage = Storage(results, sectionBlock: sectionBlock, sortDescriptors: sortDescriptors, keyPaths: keyPaths)
-        self.storage.configuration = configuration
-        self.sortDescriptors = sortDescriptors
+        self.init(type: type,
+                  sectionBlock: sectionBlock,
+                  sortDescriptors: sortDescriptors,
+                  keyPaths: keyPaths,
+                  configuration: configuration)
     }
 
     public mutating func update() {

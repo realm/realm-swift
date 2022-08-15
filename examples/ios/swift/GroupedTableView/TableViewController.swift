@@ -125,7 +125,7 @@ class TableViewController: UITableViewController {
         }
     }
 
-    // Actions
+    // MARK: Actions
 
     @objc func backgroundAdd() {
         // Import many items in a background thread
@@ -150,11 +150,9 @@ class TableViewController: UITableViewController {
     }
 }
 
-// Helpers
-
+// MARK: Helpers
 
 func randomPhoneNumber() -> String {
-
     return "555-55\(Int.random(in: 0...9))5-55\(Int.random(in: 0...9))"
 }
 

@@ -55,50 +55,6 @@ struct CollectionCallbackWrapper {
 };
 } // anonymous namespace
 
-static realm::SectionedResults& RLMGetBackingCollection(RLMSectionedResults *self) {
-    return self->_sectionedResults;
-}
-
-static RLMNotificationToken *RLMAddNotificationBlock(RLMSectionedResults *collection,
-                                                     void (^block)(id, RLMSectionedResultsChange *, NSError *),
-                                                     NSArray<NSString *> *keyPaths,
-                                                     dispatch_queue_t queue) {
-    RLMRealm *realm = collection.realm;
-    if (!realm) {
-        @throw RLMException(@"Collection of Sectioned Results has been invalidated or deleted.");
-    }
-    auto token = [[RLMCancellationToken alloc] init];
-
-    RLMClassInfo *info = collection.objectInfo;
-    realm::KeyPathArray keyPathArray = RLMKeyPathArrayFromStringArray(realm, info, keyPaths);
-
-    if (!queue) {
-        [realm verifyNotificationsAreSupported:true];
-        token->_realm = realm;
-        token->_token = RLMGetBackingCollection(collection).add_notification_callback(CollectionCallbackWrapper{block, collection}, std::move(keyPathArray));
-        return token;
-    }
-
-    RLMThreadSafeReference *tsr = [RLMThreadSafeReference referenceWithThreadConfined:collection];
-    token->_realm = realm;
-    RLMRealmConfiguration *config = realm.configuration;
-    dispatch_async(queue, ^{
-        std::lock_guard<std::mutex> lock(token->_mutex);
-        if (!token->_realm) {
-            return;
-        }
-        NSError *error;
-        RLMRealm *realm = token->_realm = [RLMRealm realmWithConfiguration:config queue:queue error:&error];
-        if (!realm) {
-            block(nil, nil, error);
-            return;
-        }
-        RLMSectionedResults *collection = [realm resolveThreadSafeReference:tsr];
-        token->_token = RLMGetBackingCollection(collection).add_notification_callback(CollectionCallbackWrapper{block, collection}, std::move(keyPathArray));
-    });
-    return token;
-}
-
 @implementation RLMSectionedResultsChange {
     realm::SectionedResultsChangeSet _indices;
 }
@@ -166,37 +122,21 @@ static RLMNotificationToken *RLMAddNotificationBlock(RLMSectionedResults *collec
     return toIndexPathArray(_indices.modifications[section], section);
 }
 
+static NSString *indexPathToString(NSArray<NSIndexPath *> *indexes) {
+    if (indexes.count == 0) {
+        return @"[]";
+    }
+    return [NSString stringWithFormat:@"[\n\t%@\n\t]", [indexes componentsJoinedByString:@"\n\t\t"]];
+};
+
+static NSString *indexSetToString(NSIndexSet *sections) {
+    if (sections.count == 0) {
+        return @"[]";
+    }
+    return [NSString stringWithFormat:@"[\n\t%@\n\t]", sections];
+}
+
 - (NSString *)description {
-    NSString *(^indexPathToString)(NSArray<NSIndexPath *> *) = ^NSString*(NSArray<NSIndexPath *> * indexes) {
-        NSMutableString *s = [NSMutableString new];
-        [s appendString:@"["];
-        BOOL hasItems = NO;
-        for (NSIndexPath *i in indexes) {
-            hasItems = YES;
-            [s appendFormat:@"\n\t\t%@", i.description];
-        }
-        if (hasItems) {
-            [s appendString:@"\n\t]"];
-        } else {
-            [s appendString:@"]"];
-        }
-        return s;
-    };
-    NSString *(^indexSetToString)(NSIndexSet *) = ^NSString*(NSIndexSet * sections) {
-        NSMutableString *s = [NSMutableString new];
-        [s appendString:@"["];
-        __block BOOL hasRun = NO;
-        [sections enumerateIndexesUsingBlock:^(NSUInteger i, BOOL *) {
-            if (hasRun) {
-                [s appendFormat:@", %lu", (unsigned long)i];
-            } else {
-                [s appendFormat:@"%lu", i];
-            }
-            hasRun = YES;
-        }];
-        [s appendString:@"]"];
-        return s;
-    };
     return [NSString stringWithFormat:@"<RLMSectionedResultsChange: %p> {\n\tinsertions: %@,\n\tdeletions: %@,\n\tmodifications: %@,\n\tsectionsToInsert: %@,\n\tsectionsToRemove: %@\n}",
             (__bridge void *)self,
             indexPathToString(self.insertions),
@@ -224,7 +164,7 @@ struct SectionedResultsKeyProjection {
     // autoreleased (a table can have more rows than the device has memory for
     // accessor objects) we need a thing to retain them.
     id _strongBuffer[16];
-    BOOL _isSection;
+    id<RLMSectionedResult> _sectionedResult;
 }
 @end
 
@@ -232,8 +172,7 @@ struct SectionedResultsKeyProjection {
 
 - (instancetype)initWithSectionedResults:(RLMSectionedResults *)sectionedResults {
     if (self = [super init]) {
-        _sectionedResults = [sectionedResults snapshot];
-        _isSection = NO;
+        _sectionedResult = [sectionedResults snapshot];
         return self;
     }
     return nil;
@@ -241,8 +180,7 @@ struct SectionedResultsKeyProjection {
 
 - (instancetype)initWithResultsSection:(RLMSection *)resultsSection {
     if (self = [super init]) {
-        _resultsSection = resultsSection;
-        _isSection = YES;
+        _sectionedResult = resultsSection;
         return self;
     }
     return nil;
@@ -250,16 +188,10 @@ struct SectionedResultsKeyProjection {
 
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state
                                     count:(NSUInteger)len {
-    NSUInteger batchCount = 0, count = _isSection ? [_resultsSection count] : [_sectionedResults count];
+    NSUInteger batchCount = 0, count = [_sectionedResult count];
     for (NSUInteger index = state->state; index < count && batchCount < len; ++index) {
-        if (_isSection) {
-            RLMSectionedResults *sectionedResults = [_resultsSection objectAtIndex:index];
-            _strongBuffer[batchCount] = sectionedResults;
-        } else {
-            RLMSection *section = [_sectionedResults objectAtIndex:index];
-            _strongBuffer[batchCount] = section;
-        }
-
+        id<RLMSectionedResult> sectionedResults = [_sectionedResult objectAtIndex:index];
+        _strongBuffer[batchCount] = sectionedResults;
         batchCount++;
     }
 
@@ -270,8 +202,8 @@ struct SectionedResultsKeyProjection {
     if (batchCount == 0) {
         // Release our data if we're done, as we're autoreleased and so may
         // stick around for a while
-        if (_sectionedResults) {
-            _sectionedResults = nil;
+        if (_sectionedResult) {
+            _sectionedResult = nil;
         }
     }
 
@@ -320,8 +252,60 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
 @end
 
 @implementation RLMSectionedResults {
+    @public
+    realm::SectionedResults _sectionedResults;
+    RLMSectionedResultsKeyBlock _keyBlock;
+    // We need to hold an instance to the parent
+    // `Results` so we can obtain a ThreadSafeReference
+    // for notifications.
+    realm::Results _results;
+    @private
     RLMRealm *_realm;
     RLMClassInfo *_info;
+}
+
+static realm::SectionedResults& RLMGetBackingCollection(RLMSectionedResults *self) {
+    return self->_sectionedResults;
+}
+
+static RLMNotificationToken *RLMAddNotificationBlock(RLMSectionedResults *collection,
+                                                     void (^block)(id, RLMSectionedResultsChange *, NSError *),
+                                                     NSArray<NSString *> *keyPaths,
+                                                     dispatch_queue_t queue) {
+    RLMRealm *realm = collection.realm;
+    if (!realm) {
+        @throw RLMException(@"Collection of Sectioned Results has been invalidated or deleted.");
+    }
+    auto token = [[RLMCancellationToken alloc] init];
+
+    RLMClassInfo *info = collection.objectInfo;
+    realm::KeyPathArray keyPathArray = RLMKeyPathArrayFromStringArray(realm, info, keyPaths);
+
+    if (!queue) {
+        [realm verifyNotificationsAreSupported:true];
+        token->_realm = realm;
+        token->_token = RLMGetBackingCollection(collection).add_notification_callback(CollectionCallbackWrapper{block, collection}, std::move(keyPathArray));
+        return token;
+    }
+
+    RLMThreadSafeReference *tsr = [RLMThreadSafeReference referenceWithThreadConfined:collection];
+    token->_realm = realm;
+    RLMRealmConfiguration *config = realm.configuration;
+    dispatch_async(queue, ^{
+        std::lock_guard<std::mutex> lock(token->_mutex);
+        if (!token->_realm) {
+            return;
+        }
+        NSError *error;
+        RLMRealm *realm = token->_realm = [RLMRealm realmWithConfiguration:config queue:queue error:&error];
+        if (!realm) {
+            block(nil, nil, error);
+            return;
+        }
+        RLMSectionedResults *collection = [realm resolveThreadSafeReference:tsr];
+        token->_token = RLMGetBackingCollection(collection).add_notification_callback(CollectionCallbackWrapper{block, collection}, std::move(keyPathArray));
+    });
+    return token;
 }
 
 - (instancetype)initWithResults:(realm::Results&&)results
@@ -436,7 +420,8 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
             return [[RLMSectionedResults alloc] initWithSectionedResults:_sectionedResults.freeze(realm->_realm)
                                                               objectInfo:_info->resolve(realm)
                                                                 keyBlock:_keyBlock];
-        } else {
+        }
+        else {
             auto sr = _sectionedResults.freeze(realm->_realm);
             sr.reset_section_callback(SectionedResultsKeyProjection {&_info->resolve(realm), _keyBlock});
             return [[RLMSectionedResults alloc] initWithSectionedResults:std::move(sr)
@@ -532,6 +517,35 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
 
 @end
 
+/// Stores information about a given section during thread handover.
+@interface RLMSectionMetadata : NSObject
+
+@property (nonatomic, strong) RLMSectionedResultsKeyBlock keyBlock;
+@property (nonatomic, copy) id<RLMValue> sectionKey;
+
+- (instancetype)initWithKeyBlock:(RLMSectionedResultsKeyBlock)keyBlock
+                      sectionKey:(id<RLMValue>)sectionKey;
+@end
+
+@implementation RLMSectionMetadata
+- (instancetype)initWithKeyBlock:(RLMSectionedResultsKeyBlock)keyBlock
+                      sectionKey:(id<RLMValue>)sectionKey {
+    if (self = [super init]) {
+        _keyBlock = keyBlock;
+        _sectionKey = sectionKey;
+    }
+    return self;
+}
+@end
+
+@interface RLMSection () <RLMThreadConfined_Private>
+@end
+
+@implementation RLMSection {
+    RLMSectionedResults *_parent;
+    realm::ResultsSection _resultsSection;
+}
+
 static realm::ResultsSection& RLMGetBackingCollection(RLMSection *self) {
     return self->_resultsSection;
 }
@@ -574,13 +588,6 @@ static RLMNotificationToken *RLMAddNotificationBlock(RLMSection *collection,
         token->_token = RLMGetBackingCollection(collection).add_notification_callback(CollectionCallbackWrapper{block, collection}, std::move(keyPathArray));
     });
     return token;
-}
-
-@interface RLMSection () <RLMThreadConfined_Private>
-@end
-
-@implementation RLMSection {
-    RLMSectionedResults *_parent;
 }
 
 - (NSString *)description {
@@ -699,15 +706,13 @@ static RLMNotificationToken *RLMAddNotificationBlock(RLMSection *collection,
     return _parent->_results;
 }
 
-- (id)objectiveCMetadata {
-    return @{
-        @"keyBlock": _parent->_keyBlock,
-        @"sectionKey": self.key
-    };
+- (RLMSectionMetadata *)objectiveCMetadata {
+    return [[RLMSectionMetadata alloc] initWithKeyBlock:_parent->_keyBlock
+                                             sectionKey:self.key];
 }
 
 + (instancetype)objectWithThreadSafeReference:(realm::ThreadSafeReference)reference
-                                     metadata:(id)metadata
+                                     metadata:(RLMSectionMetadata *)metadata
                                         realm:(RLMRealm *)realm {
     auto results = reference.resolve<realm::Results>(realm->_realm);
     auto objType = RLMStringDataToNSString(results.get_object_type());
@@ -715,24 +720,18 @@ static RLMNotificationToken *RLMAddNotificationBlock(RLMSection *collection,
     RLMSectionedResults *sr = [[RLMSectionedResults alloc] initWithResults:std::move(results)
                                                                      realm:realm
                                                                 objectInfo:realm->_info[objType]
-                                                                  keyBlock:(RLMSectionedResultsKeyBlock)metadata[@"keyBlock"]];
+                                                                  keyBlock:metadata.keyBlock];
     return translateRLMResultsErrors([&] {
-        return [[RLMSection alloc] initWithResultsSection:sr->_sectionedResults[RLMObjcToMixed(metadata[@"sectionKey"])]
+        return [[RLMSection alloc] initWithResultsSection:sr->_sectionedResults[RLMObjcToMixed(metadata.sectionKey)]
                                                    parent:sr];
     });
 }
 
 - (instancetype)resolveInRealm:(RLMRealm *)realm {
      return translateRLMResultsErrors([&] {
-        if (realm.isFrozen) {
-            RLMSectionedResults *sr = [_parent freeze];
-            return [[RLMSection alloc] initWithResultsSection:sr->_sectionedResults[RLMObjcToMixed(self.key)]
-                                                       parent:sr];
-        } else {
-            RLMSectionedResults *sr = [_parent thaw];
-            return [[RLMSection alloc] initWithResultsSection:sr->_sectionedResults[RLMObjcToMixed(self.key)]
-                                                       parent:sr];
-        }
+        RLMSectionedResults *sr = realm.isFrozen ? [_parent freeze] : [_parent thaw];
+        return [[RLMSection alloc] initWithResultsSection:sr->_sectionedResults[RLMObjcToMixed(self.key)]
+                                                   parent:sr];
     });
 }
 

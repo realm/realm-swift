@@ -345,10 +345,11 @@ NS_ASSUME_NONNULL_BEGIN
  Sorts and sections this collection from a given array of sort descriptors, returning the result
  as an instance of `RLMSectionedResults`.
 
- @param sortDescriptors  An array of `RLMSortDescriptor`s to sort by. Note: the primary sort descriptor
-                        must be responsible for determining the section key.
+ @param sortDescriptors  An array of `RLMSortDescriptor`s to sort by.
  @param keyBlock  A callback which is invoked on each element in the Results collection.
                  This callback is to return the section key for the element in the collection.
+
+ @note The primary sort descriptor must be responsible for determining the section key.
 
  @return An instance of RLMSectionedResults.
  */
@@ -486,7 +487,7 @@ __attribute__((warn_unused_result));
  @warning The queue must be a serial queue.
 
  @param block The block to be called whenever a change occurs.
- @param keyPaths The block will be called for changes occuring on these keypaths. If no
+ @param keyPaths The block will be called for changes occurring on these keypaths. If no
  key paths are given, notifications are delivered for every property key path.
  @param queue The serial queue to deliver notifications to.
  @return A token which must be held for as long as you want updates to be delivered.
@@ -534,7 +535,7 @@ __attribute__((warn_unused_result));
  @warning The queue must be a serial queue.
 
  @param block The block to be called whenever a change occurs.
- @param keyPaths The block will be called for changes occuring on these keypaths. If no
+ @param keyPaths The block will be called for changes occurring on these keypaths. If no
  key paths are given, notifications are delivered for every property key path.
  @return A token which must be held for as long as you want updates to be delivered.
  */

@@ -23,7 +23,7 @@ import Realm.Private
  Gets the components of a given key path as a string.
 
  - warning: Objects that declare properties with the old `@objc dynamic` syntax are not fully supported
- by this function, and it is recommened that you use `@Persisted` to declare your properties if you wish to use
+ by this function, and it is recommended that you use `@Persisted` to declare your properties if you wish to use
  this function to its full benefit.
 
  Example:
@@ -42,7 +42,7 @@ public func _name<T: ObjectBase>(for keyPath: PartialKeyPath<T>) -> String {
  Gets the components of a given key path as a string.
 
  - warning: Objects that declare properties with the old `@objc dynamic` syntax are not fully supported
- by this function, and it is recommened that you use `@Persisted` to declare your properties if you wish to use
+ by this function, and it is recommended that you use `@Persisted` to declare your properties if you wish to use
  this function to its full benefit.
 
  Example:

@@ -342,7 +342,7 @@ public protocol RealmKeyedCollection: Sequence, ThreadConfined, CustomStringConv
             // ...
          case .update:
             // This case is hit:
-            // - after the token is intialized
+            // - after the token is initialized
             // - when the name property of an object in the
             // collection is modified
             // - when an element is inserted or removed

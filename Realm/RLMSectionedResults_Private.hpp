@@ -32,9 +32,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface RLMSectionedResultsEnumerator : NSObject
 
-@property (nonatomic, readonly) RLMSectionedResults *sectionedResults;
-@property (nonatomic, readonly) RLMSection *resultsSection;
-
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state
                                     count:(NSUInteger)len;
 
@@ -43,20 +40,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface RLMSectionedResults () {
-    @public
-    realm::SectionedResults _sectionedResults;
-    RLMSectionedResultsKeyBlock _keyBlock;
-    // We need to hold an instance to the parent
-    // `Results` so we can obtain a ThreadSafeReference
-    // for notifications.
-    realm::Results _results;
-}
+@interface RLMSectionedResults()
 
 - (instancetype)initWithResults:(RLMResults *)results
                        keyBlock:(RLMSectionedResultsKeyBlock)keyBlock;
 
-- (RLMRealm *)realm;
 - (RLMSectionedResultsEnumerator *)fastEnumerator;
 - (RLMClassInfo *)objectInfo;
 - (RLMSectionedResults *)snapshot;
@@ -67,14 +55,10 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
 
 @end
 
-@interface RLMSection () {
-    @public
-    realm::ResultsSection _resultsSection;
-}
+@interface RLMSection ()
 
 - (instancetype)initWithResultsSection:(realm::ResultsSection&&)resultsSection
                                 parent:(RLMSectionedResults *)parent;
-
 
 - (RLMSectionedResultsEnumerator *)fastEnumerator;
 - (RLMClassInfo *)objectInfo;
