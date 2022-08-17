@@ -3494,7 +3494,7 @@
 			baseConfigurationReference = AC8847432687DFE700DF4A65 /* SwiftUISyncTestHost.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "";
-				PRODUCT_BUNDLE_IDENTIFIER = io.realm.TestHost;
+				PRODUCT_BUNDLE_IDENTIFIER = io.realm.SwiftUISyncTestHost;
 			};
 			name = Debug;
 		};
@@ -3503,7 +3503,7 @@
 			baseConfigurationReference = AC8847432687DFE700DF4A65 /* SwiftUISyncTestHost.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "";
-				PRODUCT_BUNDLE_IDENTIFIER = io.realm.TestHost;
+				PRODUCT_BUNDLE_IDENTIFIER = io.realm.SwiftUISyncTestHost;
 			};
 			name = Release;
 		};
@@ -3514,6 +3514,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = "";
+				PRODUCT_BUNDLE_IDENTIFIER = io.realm.SwiftUISyncTests;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				TEST_TARGET_NAME = SwiftUISyncTestHost;
 			};
@@ -3526,6 +3527,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = "";
+				PRODUCT_BUNDLE_IDENTIFIER = io.realm.SwiftUISyncTests;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				TEST_TARGET_NAME = SwiftUISyncTestHost;
 			};

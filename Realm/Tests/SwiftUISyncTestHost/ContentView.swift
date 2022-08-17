@@ -171,7 +171,7 @@ class LoginHelper: ObservableObject {
                                              localAppVersion: nil)
     private var clientDataRoot: URL {
         let applicationSupportDirectory = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
-        return applicationSupportDirectory.appendingPathComponent(Bundle.main.bundleIdentifier!)
+        return applicationSupportDirectory.appendingPathComponent("\(Bundle.main.bundleIdentifier!).xctrunner")
     }
 
     func login(email: String, password: String, completion: @escaping (User) -> Void) {
