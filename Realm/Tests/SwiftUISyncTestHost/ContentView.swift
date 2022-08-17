@@ -311,9 +311,17 @@ struct AsyncOpenPartitionView: View {
                     .accessibilityIdentifier("waiting_user_view")
                 ProgressView("Waiting for user to logged in...")
             case .open(let realm):
-                ListView()
-                    .environment(\.realm, realm)
-                    .transition(AnyTransition.move(edge: .leading)).animation(.default)
+                if ProcessInfo.processInfo.environment["is_sectioned_results"] == "true" {
+                    if #available(macOS 12.0, *) {
+                        SectionedResultsView()
+                            .environment(\.realm, realm)
+                            .transition(AnyTransition.move(edge: .leading)).animation(.default)
+                    }
+                } else {
+                    ListView()
+                        .environment(\.realm, realm)
+                        .transition(AnyTransition.move(edge: .leading)).animation(.default)
+                }
             case .error(let error):
                 ErrorView(error: error)
                     .background(Color.red)
@@ -497,6 +505,24 @@ struct ListView: View {
         List {
             ForEach(objects) { object in
                 Text("\(object.firstName)")
+            }
+        }
+        .navigationTitle("SwiftHugeSyncObject's List")
+    }
+}
+
+@available(macOS 12.0, *)
+struct SectionedResultsView: View {
+    @ObservedSectionedResults(SwiftPerson.self, sectionKeyPath: \.firstName) var objects
+
+    var body: some View {
+        List {
+            ForEach(objects) { section in
+                Section(section.key) {
+                    ForEach(section) { object in
+                        Text("\(object.firstName) \(object.lastName)")
+                    }
+                }
             }
         }
         .navigationTitle("SwiftHugeSyncObject's List")
