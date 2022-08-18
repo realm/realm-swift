@@ -1039,6 +1039,40 @@ public class RealmServer: NSObject {
         app.services[syncServiceId].config.patch(syncConfig, completion)
     }
 
+    public func recoveryModeDisabled(appServerId: String, syncServiceId: String) throws -> Bool {
+        guard let session = session else {
+            fatalError()
+        }
+        let app = session.apps[appServerId]
+        let response = try app.services[syncServiceId].config.get().get() as? [String: Any]
+        guard let syncInfo = response?["sync"] as? [String: Any] else {
+            return false
+        }
+        return (syncInfo["is_recovery_mode_disabled"] as? Bool == true)
+    }
+
+    public func patchRecoveryMode(disable: Bool, appServerId: String, syncServiceId: String, syncServiceConfiguration: [String: Any], completion: @escaping (Result<Any?, Error>) -> Void) throws {
+        // If desired edit is already the case, return
+        if try recoveryModeDisabled(appServerId: appServerId, syncServiceId: syncServiceId) == disable {
+            return
+        }
+
+        var syncConfig = syncServiceConfiguration
+        guard let session = session else {
+            completion(.failure(URLError.unknown as! Error))
+            return
+        }
+        let app = session.apps[appServerId]
+        guard var syncInfo = syncConfig["sync"] as? [String: Any] else {
+            completion(.failure(URLError.unknown as! Error))
+            return
+        }
+
+        syncInfo["is_recovery_mode_disabled"] = disable
+        syncConfig["sync"] = syncInfo
+        app.services[syncServiceId].config.patch(syncConfig, completion)
+    }
+
     public func retrieveUser(_ appId: String, userId: String, _ completion: @escaping (Result<Any?, Error>) -> Void) {
         guard let appServerId = try? RealmServer.shared.retrieveAppServerId(appId),
               let session = session else {
