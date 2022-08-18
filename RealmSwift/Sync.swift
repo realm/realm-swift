@@ -919,8 +919,19 @@ extension User {
 
      @return A `Realm.Configuration` instance with a flexible sync configuration.
      */
-    public func flexibleSyncConfiguration() -> Realm.Configuration {
-        let config = self.__flexibleSyncConfiguration()
+    // TODO: make recover the default. DiscardLocal is default until that test starts passing
+    public func flexibleSyncConfiguration(clientResetMode: ClientResetMode = .discardLocal(nil, nil)) -> Realm.Configuration {
+        var config: RLMRealmConfiguration
+        switch clientResetMode {
+        case .manual:
+            config = self.__flexibleSyncConfiguration(with: .manual, notifyBeforeReset: nil, notifyAfterReset: nil)
+        case .discardLocal(let beforeBlock, let afterBlock):
+            config = self.__flexibleSyncConfiguration(with: .discardLocal, notifyBeforeReset: ObjectiveCSupport.convert(object: beforeBlock), notifyAfterReset: ObjectiveCSupport.convert(object: afterBlock))
+        case .recover(let beforeBlock, let afterBlock):
+            config = self.__flexibleSyncConfiguration(with: .recover, notifyBeforeReset: ObjectiveCSupport.convert(object: beforeBlock), notifyAfterReset: ObjectiveCSupport.convert(object: afterBlock))
+        case .recoverOrDiscard(let beforeBlock, let afterBlock):
+            config = self.__flexibleSyncConfiguration(with: .recoverOrDiscard, notifyBeforeReset: ObjectiveCSupport.convert(object: beforeBlock), notifyAfterReset: ObjectiveCSupport.convert(object: afterBlock))
+        }
         return ObjectiveCSupport.convert(object: config)
     }
 

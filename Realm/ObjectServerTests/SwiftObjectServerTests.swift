@@ -300,10 +300,10 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
     // MARK: - Client reset
 
-    func waitForSyncDisabled(appServerId: String, syncServiceId: String) {
-        XCTAssertTrue(try RealmServer.shared.syncEnabled(appServerId: appServerId, syncServiceId: syncServiceId))
+    func waitForSyncDisabled(flexibleSync: Bool = false, appServerId: String, syncServiceId: String) {
+        XCTAssertTrue(try RealmServer.shared.syncEnabled(flexibleSync: flexibleSync, appServerId: appServerId, syncServiceId: syncServiceId))
         let exp = expectation(description: "disable sync")
-        RealmServer.shared.disableSync(appServerId: appServerId, syncServiceId: syncServiceId) { results in
+        RealmServer.shared.disableSync(flexibleSync: flexibleSync,appServerId: appServerId, syncServiceId: syncServiceId) { results in
             switch results {
             case .success:
                 exp.fulfill()
@@ -315,9 +315,11 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         XCTAssertFalse(try RealmServer.shared.syncEnabled(appServerId: appServerId, syncServiceId: syncServiceId))
     }
 
-    func waitForSyncEnabled(appServerId: String, syncServiceId: String, syncServiceConfig: [String: Any]) {
+    // TODO: Refactor
+    func waitForSyncEnabled(flexibleSync: Bool = false, appServerId: String, syncServiceId: String, syncServiceConfig: [String: Any]) {
         let exp = expectation(description: "enable sync")
-        RealmServer.shared.enableSync(appServerId: appServerId, syncServiceId: syncServiceId, syncServiceConfiguration: syncServiceConfig) { results in
+
+        RealmServer.shared.enableSync(flexibleSync: flexibleSync, appServerId: appServerId, syncServiceId: syncServiceId, syncServiceConfiguration: syncServiceConfig) { results in
             switch results {
             case .success:
                 exp.fulfill()
@@ -326,7 +328,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             }
         }
         waitForExpectations(timeout: 20, handler: nil)
-        XCTAssertTrue(try RealmServer.shared.syncEnabled(appServerId: appServerId, syncServiceId: syncServiceId))
+        XCTAssertTrue(try RealmServer.shared.syncEnabled(flexibleSync: flexibleSync, appServerId: appServerId, syncServiceId: syncServiceId))
     }
 
     func waitForDevModeEnabled(appServerId: String, syncServiceId: String, syncServiceConfig: [String: Any]) throws {
@@ -366,16 +368,16 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     }
 
     // This function disables sync, executes a block while the sync service is disabled, then re-enables the sync service and dev mode.
-    func executeBlockOffline(block: () throws -> Void) throws {
+    func executeBlockOffline(flexibleSync: Bool = false, appId: String, block: () throws -> Void) throws {
         let appServerId = try RealmServer.shared.retrieveAppServerId(appId)
         let syncServiceId = try RealmServer.shared.retrieveSyncServiceId(appServerId: appServerId)
         guard let syncServiceConfig = try RealmServer.shared.getSyncServiceConfiguration(appServerId: appServerId, syncServiceId: syncServiceId) else { fatalError("precondition failure: no sync service configuration found") }
 
-        waitForSyncDisabled(appServerId: appServerId, syncServiceId: syncServiceId)
+        waitForSyncDisabled(flexibleSync: flexibleSync, appServerId: appServerId, syncServiceId: syncServiceId)
 
         try autoreleasepool(invoking: block)
 
-        waitForSyncEnabled(appServerId: appServerId, syncServiceId: syncServiceId, syncServiceConfig: syncServiceConfig)
+        waitForSyncEnabled(flexibleSync: flexibleSync, appServerId: appServerId, syncServiceId: syncServiceId, syncServiceConfig: syncServiceConfig)
         try waitForDevModeEnabled(appServerId: appServerId, syncServiceId: syncServiceId, syncServiceConfig: syncServiceConfig)
     }
 
@@ -454,7 +456,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         collection.insertOne(serverObject).await(self, timeout: 30.0)
 
         // Sync is disabled, block executed, sync re-enabled
-        try executeBlockOffline {
+        try executeBlockOffline(appId: appId) {
             var configuration = user.configuration(partitionValue: partition)
             configuration.objectTypes = [SwiftPerson.self]
             let realm = try Realm(configuration: configuration)
@@ -504,6 +506,15 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             var configuration = user.flexibleSyncConfiguration()
             configuration.objectTypes = [SwiftPerson.self]
             let realm = try Realm(configuration: configuration)
+            let subscriptions = realm.subscriptions
+            let expectation = expectation(description: "register subscription")
+            subscriptions.update {
+                subscriptions.append(QuerySubscription<SwiftPerson>(name: "all_people"))
+            } onComplete: { error in
+                XCTAssertNil(error)
+                expectation.fulfill()
+            }
+            wait(for: [expectation], timeout: 15.0)
             waitForUploads(for: realm)
         }
 
@@ -518,17 +529,13 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         collection.insertOne(serverObject).await(self, timeout: 30.0)
 
         // Sync is disabled, block executed, sync re-enabled
-        try executeBlockOffline {
+        try executeBlockOffline(flexibleSync: true, appId: flexibleSyncAppId) {
             var configuration = user.flexibleSyncConfiguration()
             configuration.objectTypes = [SwiftPerson.self]
             let realm = try Realm(configuration: configuration)
             realm.syncSession!.suspend()
 
             // Add an object to the local realm that will not be in the server realm (because sync is disabled).
-            let subscriptions = realm.subscriptions
-            subscriptions.update {
-                subscriptions.append(QuerySubscription<SwiftPerson>(name: "all_people"))
-            }
             try realm.write {
                 realm.add(SwiftPerson(firstName: "John", lastName: "L"))
             }
@@ -833,6 +840,55 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             XCTAssertEqual(realm.objects(SwiftPerson.self)[0].firstName, "Paul")
         }
         try waitForEditRecoveryMode(disable: false)
+    }
+    
+    func testFlexibleSyncDiscardLocalClientReset() throws {
+        let user = try logInUser(for: basicCredentials(app: self.flexibleSyncApp), app: self.flexibleSyncApp)
+        try prepareFlexibleClientReset(user)
+        
+        // Define the blocks that will be passed into the sync configuration initializer.
+        let beforeCallbackEx = expectation(description: "before reset callback")
+        let beforeClientResetBlock: (Realm) -> Void = { local in
+            let results = local.objects(SwiftPerson.self)
+            XCTAssertEqual(results.count, 1)
+            XCTAssertEqual(results.filter("firstName == 'John'").count, 1)
+            beforeCallbackEx.fulfill()
+        }
+        let afterCallbackEx = expectation(description: "after reset callback")
+        let afterClientResetBlock: (Realm, Realm) -> Void = { before, after in
+            let results = before.objects(SwiftPerson.self)
+            XCTAssertEqual(results.count, 1)
+            XCTAssertEqual(results.filter("firstName == 'John'").count, 1)
+            let results2 = after.objects(SwiftPerson.self)
+            XCTAssertEqual(results2.count, 1)
+            XCTAssertEqual(results2.filter("firstName == 'Paul'").count, 1)
+            afterCallbackEx.fulfill()
+        }
+        
+        var config = user.flexibleSyncConfiguration(clientResetMode: .discardLocal(beforeClientResetBlock, afterClientResetBlock))
+        config.objectTypes = [SwiftPerson.self]
+        guard let syncConfig = config.syncConfiguration else {
+            fatalError("Test condition failure. SyncConfiguration not set.")
+        }
+        switch syncConfig.clientResetMode {
+        case .discardLocal(let before, let after):
+            XCTAssertNotNil(before)
+            XCTAssertNotNil(after)
+        default:
+            XCTFail("Should be set to discardLocal")
+        }
+
+        try autoreleasepool{
+            XCTAssertEqual(user.flexibleSyncConfiguration().fileURL, config.fileURL)
+            let realm = try Realm(configuration: config)
+            let subscriptions = realm.subscriptions
+            XCTAssertEqual(subscriptions.count, 1) // subscription created during prepareFlexibleSyncClientReset
+            XCTAssertEqual(subscriptions.first?.name, "all_people")
+
+            wait(for: [beforeCallbackEx, afterCallbackEx], timeout: 15.0)
+            XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1) // XCTAssertEqual failed: ("2") is not equal to ("1"). WHY? Why is object that was created while server offline not being discarded?
+            XCTAssertEqual(realm.objects(SwiftPerson.self).first?.firstName, "Paul")
+        }
     }
 
     // MARK: - Progress notifiers

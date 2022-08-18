@@ -115,6 +115,18 @@ using namespace realm;
     return config;
 }
 
+- (RLMRealmConfiguration *)flexibleSyncConfigurationWithClientResetMode:(RLMClientResetMode)clientResetMode
+                                                      notifyBeforeReset:(nullable RLMClientResetBeforeBlock)beforeResetBlock
+                                                       notifyAfterReset:(nullable RLMClientResetAfterBlock)afterResetBlock {
+    auto syncConfig = [[RLMSyncConfiguration alloc] initWithUser:self];
+    syncConfig.clientResetMode = clientResetMode;
+    syncConfig.beforeClientReset = beforeResetBlock;
+    syncConfig.afterClientReset = afterResetBlock;
+    RLMRealmConfiguration *config = [[RLMRealmConfiguration alloc] init];
+    config.syncConfiguration = syncConfig;
+    return config;
+}
+
 - (RLMRealmConfiguration *)flexibleSyncConfigurationWithInitialSubscriptions:(RLMFlexibleSyncInitialSubscriptionsBlock)initialSubscriptions
                                                                  rerunOnOpen:(BOOL)rerunOnOpen {
     auto syncConfig = [[RLMSyncConfiguration alloc] initWithUser:self];

@@ -433,7 +433,7 @@ public class RealmServer: NSObject {
     @objc public static var shared = RealmServer()
 
     /// Log level for the server and mongo processes.
-    public var logLevel = LogLevel.none
+    public var logLevel = LogLevel.info
 
     /// Process that runs the local mongo server. Should be terminated on exit.
     private let mongoProcess = Process()
@@ -981,13 +981,14 @@ public class RealmServer: NSObject {
         }
     }
 
-    public func syncEnabled(appServerId: String, syncServiceId: String) throws -> Bool {
+    public func syncEnabled(flexibleSync: Bool = false, appServerId: String, syncServiceId: String) throws -> Bool {
+        let configOption = flexibleSync ? "flexible_sync" : "sync"
         guard let session = session else {
             fatalError()
         }
         let app = session.apps[appServerId]
         let response = try app.services[syncServiceId].config.get().get() as? [String: Any]
-        guard let syncInfo = response?["sync"] as? [String: Any] else {
+        guard let syncInfo = response?[configOption] as? [String: Any] else {
             return false
         }
         return (syncInfo["state"] as? String == "enabled")
@@ -1014,28 +1015,57 @@ public class RealmServer: NSObject {
         app.sync.config.put(data: ["development_mode_enabled": true], completion)
     }
 
-    public func disableSync(appServerId: String, syncServiceId: String, completion: @escaping (Result<Any?, Error>) -> Void) {
+    public func disableSync(flexibleSync: Bool = false, appServerId: String, syncServiceId: String, completion: @escaping (Result<Any?, Error>) -> Void) {
+        let configOption = flexibleSync ? "flexible_sync" : "sync"
         guard let session = session else {
             completion(.failure(URLError.unknown as! Error))
             return
         }
         let app = session.apps[appServerId]
-        app.services[syncServiceId].config.patch(["sync": ["state": ""]], completion)
+        app.services[syncServiceId].config.patch([configOption: ["state": ""]], completion)
     }
 
-    public func enableSync(appServerId: String, syncServiceId: String, syncServiceConfiguration: [String: Any], _ completion: @escaping (Result<Any?, Error>) -> Void) {
+    // TODO: refactor when/if this works
+//    public func disableFlexibleSync(appServerId: String, syncServiceId: String, completion: @escaping (Result<Any?, Error>) -> Void) {
+//        guard let session = session else {
+//            completion(.failure(URLError.unknown as! Error))
+//            return
+//        }
+//        let app = session.apps[appServerId]
+//        app.services[syncServiceId].config.patch(["flexible_sync": ["state": ""]], completion)
+//    }
+
+    // TODO: refactor when it works
+//    public func enableFlexibleSync(appServerId: String, syncServiceId: String, syncServiceConfiguration: [String: Any], _ completion: @escaping (Result<Any?, Error>) -> Void) {
+//        var syncConfig = syncServiceConfiguration
+//        guard let session = session else {
+//            completion(.failure(URLError.unknown as! Error))
+//            return
+//        }
+//        let app = session.apps[appServerId]
+//        guard var syncInfo = syncConfig["flexible_sync"] as? [String: Any] else {
+//            completion(.failure(URLError.unknown as! Error))
+//            return
+//        }
+//        syncInfo["state"] = "enabled"
+//        syncConfig["flexible_sync"] = syncInfo
+//        app.services[syncServiceId].config.patch(syncConfig, completion)
+//    }
+
+    public func enableSync(flexibleSync: Bool = false, appServerId: String, syncServiceId: String, syncServiceConfiguration: [String: Any], _ completion: @escaping (Result<Any?, Error>) -> Void) {
+        let configOption = flexibleSync ? "flexible_sync" : "sync"
         var syncConfig = syncServiceConfiguration
         guard let session = session else {
             completion(.failure(URLError.unknown as! Error))
             return
         }
         let app = session.apps[appServerId]
-        guard var syncInfo = syncConfig["sync"] as? [String: Any] else {
+        guard var syncInfo = syncConfig[configOption] as? [String: Any] else {
             completion(.failure(URLError.unknown as! Error))
             return
         }
         syncInfo["state"] = "enabled"
-        syncConfig["sync"] = syncInfo
+        syncConfig[configOption] = syncInfo
         app.services[syncServiceId].config.patch(syncConfig, completion)
     }
 
