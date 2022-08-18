@@ -490,6 +490,80 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             }
         }
     }
+    // !!!: For development. Delete before release.
+    func testPrepareFlexibleClientReset() throws {
+        let user = try logInUser(for: basicCredentials(app: self.flexibleSyncApp), app: self.flexibleSyncApp)
+        try prepareFlexibleClientReset(user)
+    }
+    // TODO: Once this actually works, see about refactoring into prepareClientReset
+    func prepareFlexibleClientReset(_ user: User) throws {
+        let collection = setupMongoCollection(user: user, collectionName: "SwiftPerson")
+
+        // Initialize the local file so that we have conflicting history
+        try autoreleasepool {
+            var configuration = user.flexibleSyncConfiguration()
+            configuration.objectTypes = [SwiftPerson.self]
+            let realm = try Realm(configuration: configuration)
+            waitForUploads(for: realm)
+        }
+
+        // Create an object on the server which should be present after client reset
+        let serverObject: Document = [
+//            "realm_id": .string(partition),
+            "_id": .objectId(ObjectId.generate()),
+            "firstName": .string("Paul"),
+            "lastName": .string("M"),
+            "age": .int32(30)
+        ]
+        collection.insertOne(serverObject).await(self, timeout: 30.0)
+
+        // Sync is disabled, block executed, sync re-enabled
+        try executeBlockOffline {
+            var configuration = user.flexibleSyncConfiguration()
+            configuration.objectTypes = [SwiftPerson.self]
+            let realm = try Realm(configuration: configuration)
+            realm.syncSession!.suspend()
+
+            // Add an object to the local realm that will not be in the server realm (because sync is disabled).
+            let subscriptions = realm.subscriptions
+            subscriptions.update {
+                subscriptions.append(QuerySubscription<SwiftPerson>(name: "all_people"))
+            }
+            try realm.write {
+                realm.add(SwiftPerson(firstName: "John", lastName: "L"))
+            }
+            XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1)
+        }
+        // TODO: edit comment
+        // After restarting sync, the sync history translator service needs time
+        // to resynthesize the new history from existing objects on the server
+        // The following creates a new realm with the same partition and wait for
+        // downloads to ensure the the new history has been created.
+        try autoreleasepool {
+            var newConfig = user.flexibleSyncConfiguration()
+            newConfig.fileURL = RLMTestRealmURL()
+            newConfig.objectTypes = [SwiftPerson.self]
+            let newRealm = try Realm(configuration: newConfig)
+
+            let subscriptions = newRealm.subscriptions
+            subscriptions.update {
+                subscriptions.append(QuerySubscription<SwiftPerson>(name: "all_people"))
+            }
+
+            let start = Date()
+            while newRealm.isEmpty && start.timeIntervalSinceNow > -60.0 {
+                self.waitForDownloads(for: newRealm)
+                sleep(1) // Wait between requests
+            }
+            if newRealm.objects(SwiftPerson.self).count > 0 {
+                XCTAssertEqual(newRealm.objects(SwiftPerson.self).count, 1)
+                XCTAssertEqual(newRealm.objects(SwiftPerson.self)[0].firstName, "Paul")
+            } else {
+                XCTFail("Waited longer than one minute for history to resynthesize")
+                return
+            }
+        }
+    }
 
     func testClientResetManual() throws {
         let creds = basicCredentials()
@@ -758,7 +832,6 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             // while the one from the server ("Paul") should be present.
             XCTAssertEqual(realm.objects(SwiftPerson.self)[0].firstName, "Paul")
         }
-
         try waitForEditRecoveryMode(disable: false)
     }
 
