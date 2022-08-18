@@ -369,7 +369,7 @@ struct ObservedSectionedResultsKeyPathTestView: View {
     }
 }
 
-struct ObservedSectionedResultsKeyPathTestView2: View {
+struct ObservedSectionedResultsWithSortDescriptorsView: View {
     @ObservedSectionedResults(ReminderList.self,
                               sectionBlock: { $0.name.first.map(String.init(_:)) ?? "" },
                               sortDescriptors: [SortDescriptor(keyPath: \ReminderList.name)],
