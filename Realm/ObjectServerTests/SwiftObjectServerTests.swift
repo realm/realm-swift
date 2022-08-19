@@ -349,14 +349,14 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     }
 
     // Uses admin API to toggle recovery mode on the baas server
-    func waitForEditRecoveryMode(disable: Bool) throws {
+    func waitForEditRecoveryMode(flexibleSync: Bool = false, appId: String, disable: Bool) throws {
         // Retrieve server IDs
         let appServerId = try RealmServer.shared.retrieveAppServerId(appId)
         let syncServiceId = try RealmServer.shared.retrieveSyncServiceId(appServerId: appServerId)
         guard let syncServiceConfig = try RealmServer.shared.getSyncServiceConfiguration(appServerId: appServerId, syncServiceId: syncServiceId) else { fatalError("precondition failure: no sync service configuration found") }
 
         let exp = expectation(description: "edit recovery mode")
-        try RealmServer.shared.patchRecoveryMode(disable: disable, appServerId: appServerId, syncServiceId: syncServiceId, syncServiceConfiguration: syncServiceConfig) { result in
+        try RealmServer.shared.patchRecoveryMode(flexibleSync: flexibleSync ,disable: disable, appServerId: appServerId, syncServiceId: syncServiceId, syncServiceConfiguration: syncServiceConfig) { result in
             switch result {
             case .success:
                 exp.fulfill()
@@ -493,10 +493,10 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
     }
     // !!!: For development. Delete before release.
-    func testPrepareFlexibleClientReset() throws {
-        let user = try logInUser(for: basicCredentials(app: self.flexibleSyncApp), app: self.flexibleSyncApp)
-        try prepareFlexibleClientReset(user)
-    }
+//    func testPrepareFlexibleClientReset() throws {
+//        let user = try logInUser(for: basicCredentials(app: self.flexibleSyncApp), app: self.flexibleSyncApp)
+//        try prepareFlexibleClientReset(user)
+//    }
     // TODO: Once this actually works, see about refactoring into prepareClientReset
     func prepareFlexibleClientReset(_ user: User) throws {
         let collection = setupMongoCollection(user: user, collectionName: "SwiftPerson")
@@ -792,7 +792,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         // Disable recovery mode on the server.
         // This attempts to simulate a case where recovery mode fails when
         // using RecoverOrDiscardLocal
-        try waitForEditRecoveryMode(disable: true)
+        try waitForEditRecoveryMode(appId: appId, disable: true)
 
         let user = try logInUser(for: basicCredentials())
         try prepareClientReset(#function, user)
@@ -839,7 +839,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             // while the one from the server ("Paul") should be present.
             XCTAssertEqual(realm.objects(SwiftPerson.self)[0].firstName, "Paul")
         }
-        try waitForEditRecoveryMode(disable: false)
+        try waitForEditRecoveryMode(appId: appId, disable: false)
     }
     
     func testFlexibleSyncDiscardLocalClientReset() throws {
@@ -864,7 +864,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             XCTAssertEqual(results2.filter("firstName == 'Paul'").count, 1)
             afterCallbackEx.fulfill()
         }
-        
+
         var config = user.flexibleSyncConfiguration(clientResetMode: .discardLocal(beforeClientResetBlock, afterClientResetBlock))
         config.objectTypes = [SwiftPerson.self]
         guard let syncConfig = config.syncConfiguration else {
@@ -889,6 +889,119 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1) // XCTAssertEqual failed: ("2") is not equal to ("1"). WHY? Why is object that was created while server offline not being discarded?
             XCTAssertEqual(realm.objects(SwiftPerson.self).first?.firstName, "Paul")
         }
+    }
+
+    func testFlexibleSyncClientResetRecover() throws {
+        let user = try logInUser(for: basicCredentials(app: self.flexibleSyncApp), app: self.flexibleSyncApp)
+        try prepareFlexibleClientReset(user)
+
+        // Define the blocks that will be passed into the sync configuration initializer.
+        let beforeCallbackEx = expectation(description: "before reset callback")
+        let beforeClientResetBlock: (Realm) -> Void = { local in
+            let results = local.objects(SwiftPerson.self)
+            XCTAssertEqual(results.count, 1)
+            XCTAssertEqual(results.filter("firstName == 'John'").count, 1)
+            beforeCallbackEx.fulfill()
+        }
+        let afterCallbackEx = expectation(description: "after reset callback")
+        let afterClientResetBlock: (Realm, Realm) -> Void = { before, after in
+            let results = before.objects(SwiftPerson.self)
+            XCTAssertEqual(results.count, 1)
+            XCTAssertEqual(results.filter("firstName == 'John'").count, 1)
+
+            let results2 = after.objects(SwiftPerson.self)
+            XCTAssertEqual(results2.count, 2)
+            XCTAssertEqual(results2.filter("firstName == 'John'").count, 1)
+            XCTAssertEqual(results2.filter("firstName == 'Paul'").count, 1)
+
+            afterCallbackEx.fulfill()
+        }
+
+        var config = user.flexibleSyncConfiguration(clientResetMode: .recover(beforeClientResetBlock, afterClientResetBlock))
+        config.objectTypes = [SwiftPerson.self]
+        guard let syncConfig = config.syncConfiguration else {
+            fatalError("Test condition failure. SyncConfiguration not set.")
+        }
+        switch syncConfig.clientResetMode {
+        case .recover(let before, let after):
+            XCTAssertNotNil(before)
+            XCTAssertNotNil(after)
+        default:
+            XCTFail("Should be set to recover")
+        }
+
+        try autoreleasepool {
+            XCTAssertEqual(user.flexibleSyncConfiguration().fileURL, config.fileURL)
+            let realm = try Realm(configuration: config)
+            let subscriptions = realm.subscriptions
+            XCTAssertEqual(subscriptions.count, 1) // subscription created during prepareFlexibleSyncClientReset
+            XCTAssertEqual(subscriptions.first?.name, "all_people")
+
+            wait(for: [beforeCallbackEx, afterCallbackEx], timeout: 60.0)
+            XCTAssertEqual(realm.objects(SwiftPerson.self).count, 2)
+            // The object created locally (John) and the object created on the server (Paul)
+            // should both be integrated into the new realm file.
+            XCTAssertEqual(realm.objects(SwiftPerson.self).filter("firstName == 'John'").count, 1)
+            XCTAssertEqual(realm.objects(SwiftPerson.self).filter("firstName == 'Paul'").count, 1)
+        }
+    }
+
+    func testFlexibleSyncClientResetRecoverOrDiscardLocalFailedRecovery() throws {
+        // Disable recovery mode on the server.
+        // This attempts to simulate a case where recovery mode fails when
+        // using RecoverOrDiscardLocal
+        try waitForEditRecoveryMode(flexibleSync: true, appId: self.flexibleSyncAppId, disable: true)
+
+        let user = try logInUser(for: basicCredentials(app: self.flexibleSyncApp), app: self.flexibleSyncApp)
+        try prepareFlexibleClientReset(user)
+
+        // Define the blocks that will be passed into the sync configuration initializer.
+        let beforeCallbackEx = expectation(description: "before reset callback")
+        let beforeClientResetBlock: (Realm) -> Void = { local in
+            let results = local.objects(SwiftPerson.self)
+            XCTAssertEqual(results.count, 1)
+            XCTAssertEqual(results.filter("firstName == 'John'").count, 1)
+            beforeCallbackEx.fulfill()
+        }
+        let afterCallbackEx = expectation(description: "after reset callback")
+        let afterClientResetBlock: (Realm, Realm) -> Void = { before, after in
+            let results = before.objects(SwiftPerson.self)
+            XCTAssertEqual(results.count, 1)
+            XCTAssertEqual(results.filter("firstName == 'John'").count, 1)
+
+            let results2 = after.objects(SwiftPerson.self)
+            XCTAssertEqual(results2.count, 1)
+            XCTAssertEqual(results2.filter("firstName == 'Paul'").count, 1)
+            afterCallbackEx.fulfill()
+        }
+
+        var config = user.flexibleSyncConfiguration(clientResetMode: .recoverOrDiscard(beforeClientResetBlock, afterClientResetBlock))
+        config.objectTypes = [SwiftPerson.self]
+        guard let syncConfig = config.syncConfiguration else {
+            fatalError("Test condition failure. SyncConfiguration not set.")
+        }
+        switch syncConfig.clientResetMode {
+        case .recoverOrDiscard(let before, let after):
+            XCTAssertNotNil(before)
+            XCTAssertNotNil(after)
+        default:
+            XCTFail("Should be set to recoverOrDiscard")
+        }
+
+        try autoreleasepool {
+            XCTAssertEqual(user.flexibleSyncConfiguration().fileURL, config.fileURL)
+            let realm = try Realm(configuration: config)
+            let subscriptions = realm.subscriptions
+            XCTAssertEqual(subscriptions.count, 1) // subscription created during prepareFlexibleSyncClientReset
+            XCTAssertEqual(subscriptions.first?.name, "all_people")
+
+            wait(for: [beforeCallbackEx, afterCallbackEx], timeout: 60.0)
+            XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1)
+            // The Person created locally ("John") should have been discarded,
+            // while the one from the server ("Paul") should be present.
+            XCTAssertEqual(realm.objects(SwiftPerson.self)[0].firstName, "Paul")
+        }
+        try waitForEditRecoveryMode(flexibleSync: true, appId: self.flexibleSyncAppId,  disable: false)
     }
 
     // MARK: - Progress notifiers
