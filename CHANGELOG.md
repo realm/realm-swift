@@ -1,23 +1,19 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.28.6 Release notes (2022-08-19)
 =============================================================
-### Enhancements
-* None.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
-* None.
-
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+* Fixed an issue where having realm-swift as SPM sub-target dependency leads to missing symbols error during iOS archiving ([Core #7645](https://github.com/realm/realm-core/pull/7645)).
 
 ### Compatibility
 * Realm Studio: 11.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 13.4.1.
 * CocoaPods: 1.10 or later.
-* Xcode: 13.1-14 beta 1.
+* Xcode: 13.1-14 beta 5.
 
 ### Internal
-* Upgraded realm-core from ? to ?
+
+* Upgraded realm-core from 12.5.0 to 12.5.1
 
 10.28.5 Release notes (2022-08-09)
 =============================================================
