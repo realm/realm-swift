@@ -109,6 +109,18 @@ using namespace realm;
     return config;
 }
 
+- (RLMRealmConfiguration *)configurationWithPartitionValue:(nullable id<RLMBSON>)partitionValue
+                                           clientResetMode:(RLMClientResetMode)clientResetMode
+                                         manualClientReset:(nullable RLMSyncErrorReportingBlock)manualClientReset {
+    auto syncConfig = [[RLMSyncConfiguration alloc] initWithUser:self
+                                                  partitionValue:partitionValue];
+    syncConfig.clientResetMode = clientResetMode;
+    syncConfig.manualClientReset = manualClientReset;
+    RLMRealmConfiguration *config = [[RLMRealmConfiguration alloc] init];
+    config.syncConfiguration = syncConfig;
+    return config;
+}
+
 - (RLMRealmConfiguration *)flexibleSyncConfiguration {
     RLMRealmConfiguration *config = [[RLMRealmConfiguration alloc] init];
     config.syncConfiguration = [[RLMSyncConfiguration alloc] initWithUser:self];

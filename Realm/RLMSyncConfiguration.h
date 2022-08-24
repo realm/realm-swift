@@ -18,6 +18,8 @@
 
 #import <Foundation/Foundation.h>
 
+#import <Realm/RLMSyncManager.h>
+
 @class RLMApp;
 @class RLMRealm;
 @class RLMRealmConfiguration;
@@ -139,6 +141,10 @@ typedef void(^RLMClientResetAfterBlock)(RLMRealm * _Nonnull beforeFrozen, RLMRea
  -see: `RLMClientResetAfterBlock`
  */
 @property (nonatomic, nullable) RLMClientResetAfterBlock afterClientReset;
+
+// is this necessary?
+@property (nonatomic, nullable) RLMSyncErrorReportingBlock manualClientReset;
+
 
 /**
  Whether nonfatal connection errors should cancel async opens.

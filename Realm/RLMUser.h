@@ -132,6 +132,10 @@ NS_ASSUME_NONNULL_BEGIN
                                          notifyBeforeReset:(nullable RLMClientResetBeforeBlock)beforeResetBlock
                                           notifyAfterReset:(nullable RLMClientResetAfterBlock)afterResetBlock NS_REFINED_FOR_SWIFT;
 
+- (RLMRealmConfiguration *)configurationWithPartitionValue:(nullable id<RLMBSON>)partitionValue
+                                           clientResetMode:(RLMClientResetMode)clientResetMode
+                                         manualClientReset:(nullable RLMSyncErrorReportingBlock)manualClientReset NS_REFINED_FOR_SWIFT;
+
 /**
  Create a flexible sync configuration instance, which can be used to open a Realm that
  supports flexible sync.

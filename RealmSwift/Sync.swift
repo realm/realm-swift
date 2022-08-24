@@ -215,7 +215,8 @@ public typealias Provider = RLMIdentityProvider
 */
 public enum ClientResetMode {
     /// - see: `RLMClientResetModeManual`
-    case manual
+    /// TODO: edit docs
+    case manual(ErrorReportingBlock?)
     /// - see: `RLMClientResetModeDiscardLocal` for more details on `.discardLocal` behavior
     ///
     /// The first `.discardLocal` function argument notifies prior to a client reset occurring.
@@ -287,7 +288,7 @@ public enum ClientResetMode {
 
     /**
      An enum which determines file recovery behvaior in the event of a client reset.
-     - note: Defaults to `.manual`
+     - note: Defaults to `.manual` // TODO: change this
 
      - see: `ClientResetMode` and `RLMClientResetMode`
      - see: https://docs.mongodb.com/realm/sync/error-handling/client-resets/
@@ -295,7 +296,7 @@ public enum ClientResetMode {
     public var clientResetMode: ClientResetMode {
         switch config.clientResetMode {
         case .manual:
-            return .manual
+            return .manual(config.manualClientReset)
         case .discardLocal:
             return .discardLocal(ObjectiveCSupport.convert(object: config.beforeClientReset), ObjectiveCSupport.convert(object: config.afterClientReset))
         case .recover:
@@ -460,24 +461,25 @@ public extension User {
                                 clientResetMode: ClientResetMode) -> Realm.Configuration {
         var config: RLMRealmConfiguration
         switch clientResetMode {
-        case .manual:
+        case .manual(let manualClientReset):
             config = self.__configuration(withPartitionValue: ObjectiveCSupport.convert(object: AnyBSON(partitionValue)),
-                                              clientResetMode: .manual)
+                                          clientResetMode: .manual,
+                                          manualClientReset: manualClientReset)
         case .discardLocal(let beforeClientReset, let afterClientReset):
             config = self.__configuration(withPartitionValue: ObjectiveCSupport.convert(object: AnyBSON(partitionValue)),
-                                              clientResetMode: .discardLocal,
-                                              notifyBeforeReset: ObjectiveCSupport.convert(object: beforeClientReset),
-                                              notifyAfterReset: ObjectiveCSupport.convert(object: afterClientReset))
+                                          clientResetMode: .discardLocal,
+                                          notifyBeforeReset: ObjectiveCSupport.convert(object: beforeClientReset),
+                                          notifyAfterReset: ObjectiveCSupport.convert(object: afterClientReset))
         case .recover(let beforeClientReset, let afterClientReset):
             config = self.__configuration(withPartitionValue: ObjectiveCSupport.convert(object: AnyBSON(partitionValue)),
-                                              clientResetMode: .recover,
-                                              notifyBeforeReset: ObjectiveCSupport.convert(object: beforeClientReset),
-                                              notifyAfterReset: ObjectiveCSupport.convert(object: afterClientReset))
+                                          clientResetMode: .recover,
+                                          notifyBeforeReset: ObjectiveCSupport.convert(object: beforeClientReset),
+                                          notifyAfterReset: ObjectiveCSupport.convert(object: afterClientReset))
         case .recoverOrDiscard(let beforeClientReset, let afterClientReset):
             config = self.__configuration(withPartitionValue: ObjectiveCSupport.convert(object: AnyBSON(partitionValue)),
-                                              clientResetMode: .recoverOrDiscard,
-                                              notifyBeforeReset: ObjectiveCSupport.convert(object: beforeClientReset),
-                                              notifyAfterReset: ObjectiveCSupport.convert(object: afterClientReset))
+                                          clientResetMode: .recoverOrDiscard,
+                                          notifyBeforeReset: ObjectiveCSupport.convert(object: beforeClientReset),
+                                          notifyAfterReset: ObjectiveCSupport.convert(object: afterClientReset))
         }
         return ObjectiveCSupport.convert(object: config)
     }

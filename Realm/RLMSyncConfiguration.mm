@@ -187,10 +187,54 @@ struct AfterClientResetWrapper : CallbackSchema {
 - (void)setAfterClientReset:(RLMClientResetAfterBlock)afterClientReset {
     if (!afterClientReset) {
         _config->notify_after_client_reset = nullptr;
-    } else if (self.clientResetMode == RLMClientResetModeManual) {
+    } else if (self.clientResetMode == RLMClientResetModeManual) { //TODO: change messages
         @throw RLMException(@"Client reset notifications not supported in Manual mode. Use SyncManager.ErrorHandler");
     } else {
         _config->notify_after_client_reset = AfterClientResetWrapper{.block = afterClientReset};
+    }
+}
+
+- (RLMSyncErrorReportingBlock)getManualClientReset {
+    NSLog(@"testhit2");
+    return _manualClientReset;
+}
+
+// TODO: refactor the syncmanager setting to singule method. also shared by set defaults
+- (void)setManualClientReset:(RLMSyncErrorReportingBlock)manualClientReset {
+    if (!manualClientReset) {
+        return;
+    } else if (self.clientResetMode != RLMClientResetModeManual) {
+        @throw RLMException(@"message TBD");
+    } else {
+        _manualClientReset = manualClientReset;
+        RLMSyncManager *manager = [self.user.app syncManager];
+        __weak RLMSyncManager *weakManager = manager;
+        _config->error_handler = [weakManager, &self](std::shared_ptr<SyncSession> errored_session, SyncError error) {
+            RLMSyncErrorReportingBlock errorHandler;
+            @autoreleasepool {
+                errorHandler = weakManager.errorHandler;
+            }
+            if (!errorHandler) { // needs to be rearranged in case no errorhandler, but provided manual callbacks
+                return;
+            }
+            NSError *nsError = RLMTranslateSyncError(std::move(error));
+            if (!nsError) {
+                return;
+            }
+            
+            RLMSyncSession *session = [[RLMSyncSession alloc] initWithSyncSession:errored_session];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                // Keep the SyncSession alive until the callback completes as
+                // RLMSyncSession only holds a weak reference
+                static_cast<void>(errored_session);
+                if (nsError.code == RLMSyncErrorClientResetError /* needs "&& callback exists" */) {
+                    NSLog(@"testhit");
+                    self.getManualClientReset(nsError, session);
+                } else {
+                    errorHandler(nsError, session);
+                }
+            });
+        };
     }
 }
 
@@ -281,7 +325,7 @@ static void setDefaults(SyncConfig& config, RLMUser *user) {
         @autoreleasepool {
             errorHandler = weakManager.errorHandler;
         }
-        if (!errorHandler) {
+        if (!errorHandler) { // needs to be rearranged in case no errorhandler, but provided manual callbacks
             return;
         }
         NSError *nsError = RLMTranslateSyncError(std::move(error));
