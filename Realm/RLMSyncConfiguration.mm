@@ -105,6 +105,7 @@ struct AfterClientResetWrapper : CallbackSchema {
 
 @interface RLMSyncConfiguration () {
     std::unique_ptr<realm::SyncConfig> _config;
+    RLMSyncErrorReportingBlock _manualClientReset;
 }
 
 @end
@@ -194,7 +195,7 @@ struct AfterClientResetWrapper : CallbackSchema {
     }
 }
 
-- (RLMSyncErrorReportingBlock)getManualClientReset {
+- (RLMSyncErrorReportingBlock)manualClientReset {
     NSLog(@"testhit2");
     return _manualClientReset;
 }
@@ -209,27 +210,29 @@ struct AfterClientResetWrapper : CallbackSchema {
         _manualClientReset = manualClientReset;
         RLMSyncManager *manager = [self.user.app syncManager];
         __weak RLMSyncManager *weakManager = manager;
-        _config->error_handler = [weakManager, &self](std::shared_ptr<SyncSession> errored_session, SyncError error) {
+        _config->error_handler = [weakManager, self](std::shared_ptr<SyncSession> errored_session, SyncError error) {
             RLMSyncErrorReportingBlock errorHandler;
             @autoreleasepool {
                 errorHandler = weakManager.errorHandler;
-            }
-            if (!errorHandler) { // needs to be rearranged in case no errorhandler, but provided manual callbacks
-                return;
             }
             NSError *nsError = RLMTranslateSyncError(std::move(error));
             if (!nsError) {
                 return;
             }
-            
+            if (!errorHandler && nsError.code != RLMSyncErrorClientResetError) {
+                return;
+            } else if (!errorHandler && !_manualClientReset && nsError.code == RLMSyncErrorClientResetError) {
+                return;
+            }
+
             RLMSyncSession *session = [[RLMSyncSession alloc] initWithSyncSession:errored_session];
             dispatch_async(dispatch_get_main_queue(), ^{
                 // Keep the SyncSession alive until the callback completes as
                 // RLMSyncSession only holds a weak reference
                 static_cast<void>(errored_session);
-                if (nsError.code == RLMSyncErrorClientResetError /* needs "&& callback exists" */) {
-                    NSLog(@"testhit");
-                    self.getManualClientReset(nsError, session);
+                if (_manualClientReset && nsError.code == RLMSyncErrorClientResetError) {
+                    NSLog(@"testhit"); // TODO: remove line; for debugging
+                    self.manualClientReset(nsError, session);
                 } else {
                     errorHandler(nsError, session);
                 }

@@ -630,7 +630,6 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                     XCTFail("Bad error type: \(error)")
                     return
                 }
-                XCTAssertNotNil(error.clientResetInfo()) // TODO: make this check better
                 XCTAssertEqual(error.code, .clientResetError)
                 XCTAssertEqual(session?.state, .inactive)
                 XCTAssertEqual(session?.connectionState, .disconnected)
@@ -642,12 +641,97 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             try autoreleasepool {
                 let realm = try Realm(configuration: configuration)
                 wait(for: [ex], timeout: 60.0)
-//                wait(for: [beforeCallbackEx, afterCallbackEx], timeout: 60.0)
                 // The locally created object should still be present as we didn't
                 // actually handle the client reset
                 XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1)
                 XCTAssertEqual(realm.objects(SwiftPerson.self)[0].firstName, "John")
             }
+            resetSyncManager()
+        }
+
+        let user = try logInUser(for: creds)
+        var configuration = user.configuration(partitionValue: #function)
+        configuration.objectTypes = [SwiftPerson.self]
+
+        try autoreleasepool {
+            let realm = try Realm(configuration: configuration)
+            waitForDownloads(for: realm)
+            // After reopening, the old Realm file should have been moved aside
+            // and we should now have the data from the server
+            XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1)
+            XCTAssertEqual(realm.objects(SwiftPerson.self)[0].firstName, "Paul")
+        }
+    }
+
+    func testClientResetManualManagerFallback() throws {
+        let creds = basicCredentials()
+        try autoreleasepool {
+            let user = try logInUser(for: creds)
+            try prepareClientReset(#function, user)
+
+            // No callback is passed into enum `.manual`, but a syncManager.errorHandler exists,
+            // so expect that to be used instead.
+            var configuration = user.configuration(partitionValue: #function, clientResetMode: .manual())
+            configuration.objectTypes = [SwiftPerson.self]
+            
+            let ex = self.expectation(description: "get client reset error in sync manager")
+            let syncManager = self.app.syncManager
+            syncManager.errorHandler = { error, session in
+                guard let error = error as? SyncError else {
+                    XCTFail("Bad error type: \(error)")
+                    return
+                }
+                XCTAssertEqual(error.code, .clientResetError)
+                XCTAssertEqual(session?.state, .inactive)
+                XCTAssertEqual(session?.connectionState, .disconnected)
+                XCTAssertEqual(session?.parentUser()?.id, user.id)
+                ex.fulfill()
+            }
+
+            try autoreleasepool {
+                let realm = try Realm(configuration: configuration)
+                wait(for: [ex], timeout: 60.0)
+                // The locally created object should still be present as we didn't
+                // actually handle the client reset
+                XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1)
+                XCTAssertEqual(realm.objects(SwiftPerson.self)[0].firstName, "John")
+            }
+            resetSyncManager()
+        }
+
+        let user = try logInUser(for: creds)
+        var configuration = user.configuration(partitionValue: #function)
+        configuration.objectTypes = [SwiftPerson.self]
+
+        try autoreleasepool {
+            let realm = try Realm(configuration: configuration)
+            waitForDownloads(for: realm)
+            // After reopening, the old Realm file should have been moved aside
+            // and we should now have the data from the server
+            XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1)
+            XCTAssertEqual(realm.objects(SwiftPerson.self)[0].firstName, "Paul")
+        }
+    }
+
+    func testClientResetManualNoCallback() throws {
+        let creds = basicCredentials()
+        try autoreleasepool {
+            let user = try logInUser(for: creds)
+            try prepareClientReset(#function, user)
+            
+            // No callback is passed into enum `.manual`, but a syncManager.errorHandler exists,
+            // so expect that to be used instead.
+            var configuration = user.configuration(partitionValue: #function, clientResetMode: .manual())
+            configuration.objectTypes = [SwiftPerson.self]
+            
+            try autoreleasepool {
+                let realm = try Realm(configuration: configuration)
+                // The locally created object should still be present as we didn't
+                // actually handle the client reset
+                XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1)
+                XCTAssertEqual(realm.objects(SwiftPerson.self)[0].firstName, "John")
+            }
+            resetSyncManager()
         }
 
         let user = try logInUser(for: creds)

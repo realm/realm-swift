@@ -216,7 +216,7 @@ public typealias Provider = RLMIdentityProvider
 public enum ClientResetMode {
     /// - see: `RLMClientResetModeManual`
     /// TODO: edit docs
-    case manual(ErrorReportingBlock?)
+    case manual(ErrorReportingBlock? = nil)
     /// - see: `RLMClientResetModeDiscardLocal` for more details on `.discardLocal` behavior
     ///
     /// The first `.discardLocal` function argument notifies prior to a client reset occurring.
