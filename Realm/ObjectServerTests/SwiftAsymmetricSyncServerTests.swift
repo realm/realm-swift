@@ -152,10 +152,7 @@ class SwiftAsymmetricSyncTests: SwiftSyncTestCase {
 
     func testOpenLocalRealmWithAsymmetricObjectError() throws {
         let configuration = Realm.Configuration(objectTypes: [SwiftObjectAsymmetric.self])
-        do {
-            _ = try Realm(configuration: configuration)
-            XCTFail("Opening a local Realm with an `Asymmetric` table should fail")
-        } catch {
+        XCTAssertThrowsError(try Realm(configuration: configuration)) { error in
             XCTAssertEqual(error.localizedDescription, "Schema validation failed due to the following errors:\n- Asymmetric table \'SwiftObjectAsymmetric\' not allowed in a local Realm")
         }
     }
@@ -202,10 +199,11 @@ extension SwiftAsymmetricSyncTests {
     func checkCountInMongo(_ expectedCount: Int, forCollection collection: String) async throws {
         let waitStart = Date()
         let collection = try await setupCollection(collection)
-        while collection.count(filter: [:]).await(self) < expectedCount && waitStart.timeIntervalSinceNow > -600.0 {
+        while collection.count(filter: [:]).await(self) != expectedCount && waitStart.timeIntervalSinceNow > -600.0 {
             sleep(5)
-            XCTFail("Count timed out")
         }
+
+        XCTAssertEqual(collection.count(filter: [:]).await(self), expectedCount)
     }
 
     @MainActor
@@ -213,8 +211,7 @@ extension SwiftAsymmetricSyncTests {
         let realm = try await realm()
         XCTAssertNotNil(realm)
 
-        // Create Asymmetric Objects and create them on the Realm
-
+        // Create Asymmetric Objects
         try realm.write {
             for i in 1...15 {
                 realm.create(SwiftObjectAsymmetric.self, value: ["id": ObjectId.generate(),
@@ -235,7 +232,7 @@ extension SwiftAsymmetricSyncTests {
         let realm = try await realm()
         XCTAssertNotNil(realm)
 
-        // Create Asymmetric Objects and create them on the Realm
+        // Create Asymmetric Objects
         try realm.write {
             realm.create(SwiftObjectAsymmetric.self, value: ["id": ObjectId.generate(),
                                                              "string": "name_\(#function)",

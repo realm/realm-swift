@@ -23,13 +23,12 @@ import Realm.Private
 /**
  `AsymmetricObject` is a base class used to define asymmetric Realm objects.
 
- Asymmetric objects can only be created using the `create(_ object:)`
+ Asymmetric objects can only be created using the `create(_ type:, value:)`
  function, and cannot be added, removed or queried.
  When created, asymmetric objects will be synced unidirectionally to the MongoDB
  database and cannot be accessed locally.
 
- Incoming links from any asymmetric table are not allowed, meaning embedding
- an asymmetric object within an `Object` will throw an error.
+ Linking an asymmetric object within an `Object` is not allowed and will throw an error.
 
  The property types supported on `AsymmetricObject` are the same as for `Object`,
  except for that asymmetric objects can only link to embedded objects, so `Object`
@@ -38,7 +37,7 @@ import Realm.Private
 
  ```swift
  class Person: AsymmetricObject {
-     @Persisted(primaryKey: true) var _id: ObjectId = ObjectId.generate()
+     @Persisted(primaryKey: true) var _id: ObjectId
      @Persisted var name: String
      @Persisted var age: Int
  }

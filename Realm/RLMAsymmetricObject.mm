@@ -44,7 +44,7 @@
 
 #pragma mark - Class-based Object Creation
 
-+ (instancetype)createInRealm:(RLMRealm *)realm withValue:(id)value {
++ (void)createInRealm:(RLMRealm *)realm withValue:(id)value {
     RLMCreateAsymmetricObjectInRealm(realm, [self className], value);
     return nil;
 }
