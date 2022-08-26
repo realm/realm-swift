@@ -510,7 +510,6 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 expectation.fulfill()
             }
             wait(for: [expectation], timeout: 15.0)
-            waitForUploads(for: realm)
         }
 
         // Create an object on the server which should be present after client reset
@@ -529,9 +528,20 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             let realm = try Realm(configuration: configuration)
             realm.syncSession!.suspend()
 
+            // There is enough time between the collection insert and the server
+            // being turned off for the subscription sync to sync "Paul M".
+            if (realm.objects(SwiftPerson.self).count > 0) {
+                try realm.write {
+                    realm.deleteAll()
+                }
+            }
+
             // Add an object to the local realm that will not be in the server realm (because sync is disabled).
             try realm.write {
                 realm.add(SwiftPerson(firstName: "John", lastName: "L"))
+            }
+            if (realm.objects(SwiftPerson.self).count > 1) {
+                print("why?")
             }
             XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1)
         }
@@ -910,7 +920,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
         try waitForEditRecoveryMode(appId: appId, disable: false)
     }
-    
+
     func testFlexibleSyncDiscardLocalClientReset() throws {
         let user = try logInUser(for: basicCredentials(app: self.flexibleSyncApp), app: self.flexibleSyncApp)
         try prepareFlexibleClientReset(user)
@@ -937,7 +947,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             XCTAssertEqual(subscriptions.first?.name, "all_people")
 
             waitForExpectations(timeout: 15.0)
-            XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1) // XCTAssertEqual failed: ("2") is not equal to ("1"). WHY? Why is object that was created while server offline not being discarded?
+            XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1)
             XCTAssertEqual(realm.objects(SwiftPerson.self).first?.firstName, "Paul")
         }
     }
