@@ -128,6 +128,16 @@ using namespace realm;
 }
 
 - (RLMRealmConfiguration *)flexibleSyncConfigurationWithClientResetMode:(RLMClientResetMode)clientResetMode
+                                                      manualClientReset:(nullable RLMSyncErrorReportingBlock)manualClientReset {
+      auto syncConfig = [[RLMSyncConfiguration alloc] initWithUser:self];
+      syncConfig.clientResetMode = clientResetMode;
+      syncConfig.manualClientReset = manualClientReset;
+      RLMRealmConfiguration *config = [[RLMRealmConfiguration alloc] init];
+      config.syncConfiguration = syncConfig;
+      return config;
+  }
+
+- (RLMRealmConfiguration *)flexibleSyncConfigurationWithClientResetMode:(RLMClientResetMode)clientResetMode
                                                       notifyBeforeReset:(nullable RLMClientResetBeforeBlock)beforeResetBlock
                                                        notifyAfterReset:(nullable RLMClientResetAfterBlock)afterResetBlock {
     auto syncConfig = [[RLMSyncConfiguration alloc] initWithUser:self];

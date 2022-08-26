@@ -195,6 +195,7 @@ struct AfterClientResetWrapper : CallbackSchema {
     }
 }
 
+// TODO: hook up getter to swift sdk
 - (RLMSyncErrorReportingBlock)manualClientReset {
     NSLog(@"testhit2");
     return _manualClientReset;
