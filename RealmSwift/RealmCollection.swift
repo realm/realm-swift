@@ -611,6 +611,35 @@ public extension RealmCollection {
     func `where`(_ isIncluded: ((Query<Element>) -> Query<Bool>)) -> Results<Element> {
         return filter(isIncluded(Query()).predicate)
     }
+
+    /**
+     Returns the minimum (lowest) value of the given key path among all the objects in the collection, or `nil` if the
+     collection is empty.
+
+     - parameter keyPath: The key path whose minimum value is desired.
+     */
+    func min<T: MinMaxType>(of keyPath: KeyPath<Self, T>) -> T? {
+        return min(ofProperty: NSExpression(forKeyPath: keyPath).keyPath)
+    }
+
+    /**
+     Returns the maximum (highest) value of the given key path among all the objects in the collection, or `nil` if the
+     collection is empty.
+
+     - parameter keyPath: The key path whose minimum value is desired.
+     */
+    func max<T: MinMaxType>(of keyPath: KeyPath<Self, T>) -> T? {
+        return max(ofProperty: NSExpression(forKeyPath: keyPath).keyPath)
+    }
+
+    /**
+    Returns the sum of the given key path for objects in the collection, or `nil` if the collection is empty.
+
+    - parameter keyPath: The key path with value conforming to `AddableType` to calculate sum on.
+    */
+    func sum<T: AddableType>(of keyPath: KeyPath<Self, T>) -> T {
+        return sum(ofProperty: NSExpression(forKeyPath: keyPath).keyPath)
+    }
 }
 
 // MARK: Collection protocol

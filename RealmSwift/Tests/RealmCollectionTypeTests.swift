@@ -441,6 +441,7 @@ class RealmCollectionTests<Collection: RealmCollection, AggregateCollection: Rea
 
     func testMin() {
         let collection = getAggregateableCollection()
+        XCTAssertEqual(1, collection.min(of: \.intCol))
         XCTAssertEqual(1, collection.min(ofProperty: "intCol") as NSNumber?)
         XCTAssertEqual(1, collection.min(ofProperty: "intCol") as Int?)
         XCTAssertEqual(1, collection.min(ofProperty: "int8Col") as NSNumber?)
@@ -476,6 +477,7 @@ class RealmCollectionTests<Collection: RealmCollection, AggregateCollection: Rea
 
     func testMax() {
         let collection = getAggregateableCollection()
+        XCTAssertEqual(3, collection.max(of: \.intCol))
         XCTAssertEqual(3, collection.max(ofProperty: "intCol") as NSNumber?)
         XCTAssertEqual(3, collection.max(ofProperty: "intCol") as Int?)
         XCTAssertEqual(3, collection.max(ofProperty: "int8Col") as NSNumber?)
@@ -512,6 +514,7 @@ class RealmCollectionTests<Collection: RealmCollection, AggregateCollection: Rea
 
     func testSum() {
         let collection = getAggregateableCollection()
+        XCTAssertEqual(6, collection.sum(of: \.intCol))
         XCTAssertEqual(6, collection.sum(ofProperty: "intCol") as NSNumber)
         XCTAssertEqual(6, collection.sum(ofProperty: "intCol") as Int)
         XCTAssertEqual(6, collection.sum(ofProperty: "int8Col") as NSNumber)
@@ -548,6 +551,7 @@ class RealmCollectionTests<Collection: RealmCollection, AggregateCollection: Rea
 
     func testAverage() {
         let collection = getAggregateableCollection()
+        XCTAssertEqual(2, collection.average(of: \.intCol))
         XCTAssertEqual(2, collection.average(ofProperty: "intCol"))
         XCTAssertEqual(2, collection.average(ofProperty: "int8Col"))
         XCTAssertEqual(2, collection.average(ofProperty: "int16Col"))
