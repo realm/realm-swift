@@ -228,8 +228,8 @@ RLM_COLLECTION_TYPE(PersonAsymmetric);
     RLMRealm *realm = [RLMRealm realmWithConfiguration:configuration error:&error];
     XCTAssertNil(realm);
     // This error comes from core, we are not even adding this objects to the server schema.
-    XCTAssert([error.localizedDescription containsString:@"Asymmetric table with property 'UnsupportedLinkAsymmetric.object' of type 'object' cannot have an object type."]);
-    XCTAssert([error.localizedDescription containsString:@"Asymmetric table with property 'UnsupportedLinkAsymmetric.objectArray' of type 'array' cannot have an object type."]);
+    XCTAssert([error.localizedDescription containsString:@"Asymmetric table with property 'UnsupportedLinkAsymmetric.object' of type 'object' cannot have a non-embedded object type"]);
+    XCTAssert([error.localizedDescription containsString:@"Asymmetric table with property 'UnsupportedLinkAsymmetric.objectArray' of type 'array' cannot have a non-embedded object type."]);
 }
 
 - (void)testUnsupportedAsymmetricLinkObjectThrowsError  {
@@ -240,8 +240,8 @@ RLM_COLLECTION_TYPE(PersonAsymmetric);
     RLMRealm *realm = [RLMRealm realmWithConfiguration:configuration error:&error];
     XCTAssertNil(realm);
     // This error comes from core, we are not even adding this objects to the server schema.
-    XCTAssert([error.localizedDescription containsString:@"Asymmetric table with property 'UnsupportedLinkObject.object' of type 'object' cannot have an object type."]);
-    XCTAssert([error.localizedDescription containsString:@"Asymmetric table with property 'UnsupportedLinkObject.objectArray' of type 'array' cannot have an object type."]);
+    XCTAssert([error.localizedDescription containsString:@"Asymmetric table with property 'UnsupportedLinkObject.object' of type 'object' cannot have a non-embedded object type."]);
+    XCTAssert([error.localizedDescription containsString:@"Asymmetric table with property 'UnsupportedLinkObject.objectArray' of type 'array' cannot have a non-embedded object type."]);
 }
 
 - (void)testUnsupportedObjectLinksAsymmetricThrowsError  {
@@ -286,7 +286,8 @@ RLM_COLLECTION_TYPE(PersonAsymmetric);
     [realm beginWriteTransaction];
     for (int i = 1; i <= 12; ++i) {
         RLMObjectId *oid = [RLMObjectId objectId];
-        (void)[PersonAsymmetric createInRealm:realm withValue:@[oid, [NSString stringWithFormat:@"firstname_%d", i], [NSString stringWithFormat:@"lastname_%d", i]]];
+        PersonAsymmetric *person = [PersonAsymmetric createInRealm:realm withValue:@[oid, [NSString stringWithFormat:@"firstname_%d", i], [NSString stringWithFormat:@"lastname_%d", i]]];
+        XCTAssertNil(person);
     }
     [realm commitWriteTransaction];
     [self waitForUploadsForRealm:realm];
@@ -302,13 +303,15 @@ RLM_COLLECTION_TYPE(PersonAsymmetric);
 
     RLMObjectId *oid = [RLMObjectId objectId];
     [realm beginWriteTransaction];
-    (void)[PersonAsymmetric createInRealm:realm withValue:@[oid, @"firstname", @"lastname", @10]];
+    PersonAsymmetric *person = [PersonAsymmetric createInRealm:realm withValue:@[oid, @"firstname", @"lastname", @10]];
+    XCTAssertNil(person);
     [realm commitWriteTransaction];
     [self waitForUploadsForRealm:realm];
     [self checkCountInMongo:1];
 
     [realm beginWriteTransaction];
-    (void)[PersonAsymmetric createInRealm:realm withValue:@[oid, @"firstname", @"lastname", @10]];
+    PersonAsymmetric *person2 = [PersonAsymmetric createInRealm:realm withValue:@[oid, @"firstname", @"lastname", @10]];
+    XCTAssertNil(person2);
     [realm commitWriteTransaction];
     [self waitForUploadsForRealm:realm];
     [self checkCountInMongo:1];
