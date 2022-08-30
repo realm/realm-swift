@@ -1,7 +1,7 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+* Add prebuilt binaries for Xcode 14 to the release package.
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
