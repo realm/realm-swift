@@ -1423,7 +1423,9 @@ static NSString *randomEmail() {
 - (void)testClientReset {
     RLMUser *user = [self userForTest:_cmd];
     // Open the Realm
-    __attribute__((objc_precise_lifetime)) RLMRealm *realm = [self openRealmForPartitionValue:@"realm_id" user:user];
+    __attribute__((objc_precise_lifetime)) RLMRealm *realm = [self openRealmForPartitionValue:@"realm_id"
+                                                                                         user:user
+                                                                              clientResetMode:RLMClientResetModeManual];
 
     __block NSError *theError = nil;
     XCTestExpectation *ex = [self expectationWithDescription:@"Waiting for error handler to be called..."];
@@ -1450,7 +1452,7 @@ static NSString *randomEmail() {
 
     __block NSError *theError = nil;
     @autoreleasepool {
-        __attribute__((objc_precise_lifetime)) RLMRealm *realm = [self openRealmForPartitionValue:partitionValue user:user];
+        __attribute__((objc_precise_lifetime)) RLMRealm *realm = [self openRealmForPartitionValue:partitionValue user:user clientResetMode:RLMClientResetModeManual];
         XCTestExpectation *ex = [self expectationWithDescription:@"Waiting for error handler to be called..."];
         self.app.syncManager.errorHandler = ^(NSError *error, RLMSyncSession *) {
             theError = error;
@@ -1473,9 +1475,9 @@ static NSString *randomEmail() {
     RLMRealmConfiguration *config = [user configurationWithPartitionValue:partitionValue clientResetMode:RLMClientResetModeDiscardLocal];
     XCTAssertEqual(config.syncConfiguration.clientResetMode, RLMClientResetModeDiscardLocal);
 
-    // Default is manual
+    // Default is recover
     config = [user configurationWithPartitionValue:partitionValue];
-    XCTAssertEqual(config.syncConfiguration.clientResetMode, RLMClientResetModeManual);
+    XCTAssertEqual(config.syncConfiguration.clientResetMode, RLMClientResetModeRecover);
 }
 
 - (void)testSetClientResetCallbacks {

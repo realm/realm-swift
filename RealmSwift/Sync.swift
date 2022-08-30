@@ -209,14 +209,12 @@ public typealias Provider = RLMIdentityProvider
 
 /**
  An enum used to determines file recovery behavior in the event of a client reset.
+ Defaults to  `.recover`.
 
  - see: `RLMClientResetMode`
  - see: https://docs.mongodb.com/realm/sync/error-handling/client-resets/
 */
 public enum ClientResetMode {
-    /// - see: `RLMClientResetModeManual`
-    /// TODO: edit docs
-    case manual(ErrorReportingBlock? = nil)
     /// - see: `RLMClientResetModeDiscardLocal` for more details on `.discardLocal` behavior
     ///
     /// The first `.discardLocal` function argument notifies prior to a client reset occurring.
@@ -257,7 +255,7 @@ public enum ClientResetMode {
     case discardLocal(((Realm) -> Void)? = nil, ((Realm, Realm) -> Void)? = nil)
     /// - see: `RLMClientResetModeRecover` for more details on `.recover` behavior
     ///
-    /// - see `ClientResetMode.discardLocal` for a detailed explanation of the
+    /// - see `ClientResetMode.discardLocal` above for a detailed explanation of the
     ///   two callback arguments: `((Realm) -> Void)? = nil, ((Realm, Realm) -> Void)? = nil`
     case recover(((Realm) -> Void)? = nil, ((Realm, Realm) -> Void)? = nil)
     /// - see: `RLMClientResetModeRecoverOrDiscard` for more details on `.recoverOrDiscard` behavior
@@ -265,6 +263,20 @@ public enum ClientResetMode {
     /// - see `ClientResetMode.discardLocal` for a detailed explanation of the
     ///   two callback arguments: `((Realm) -> Void)? = nil, ((Realm, Realm) -> Void)? = nil`
     case recoverOrDiscard(((Realm) -> Void)? = nil, ((Realm, Realm) -> Void)? = nil)
+    /// - see: `RLMClientResetModeManual`
+    /// - note: Not supported in Flexible Sync configurations.
+    ///
+    ///  The manual client reset mode handler can be set in two places:
+    ///  1. As an ErrorReportingBlock argument in the ClientResetMode enum (`ErrorReportingBlock? = nil`).
+    ///  2. As an ErrorReportingBlock in the `SyncManager.errorHandler` property.  - see: `RLMSyncManager.errorHandler`
+    ///
+    ///  During a `RLMSyncErrorClientResetError` the blocks executed is determined by the following rules
+    ///  - If an error reporting block is set in `ClientResetMode` and the `SyncManager`, the `ClientResetMode` block will be executed.
+    ///  - If an error reporting block is set in either the `ClientResetMode` or the `SyncManager`, but not both, wheverever the block was set will execute.
+    ///  - If no block is set in either location, the client reset will not be handled. The application will likely need to be restarted and unsynced local changes may be lost.
+    ///  - note: The `SyncManager.errorHandler` is still invoked under all `RLMSyncError`s *other than* `RLMSyncErrorClientResetError`.
+    ///          See `RLMSyncError` for an exhaustive list.
+    case manual(ErrorReportingBlock? = nil)
 }
 
 /**
@@ -288,7 +300,7 @@ public enum ClientResetMode {
 
     /**
      An enum which determines file recovery behvaior in the event of a client reset.
-     - note: Defaults to `.manual` // TODO: change this
+     - note: Defaults to `.recover
 
      - see: `ClientResetMode` and `RLMClientResetMode`
      - see: https://docs.mongodb.com/realm/sync/error-handling/client-resets/
@@ -296,7 +308,7 @@ public enum ClientResetMode {
     public var clientResetMode: ClientResetMode {
         switch config.clientResetMode {
         case .manual:
-            return .manual(config.manualClientReset)
+            return .manual(config.manualClientResetHandler)
         case .discardLocal:
             return .discardLocal(ObjectiveCSupport.convert(object: config.beforeClientReset), ObjectiveCSupport.convert(object: config.afterClientReset))
         case .recover:
@@ -440,7 +452,7 @@ public extension User {
      Additional settings can be optionally specified. Descriptions of these
      settings follow.
 
-     `ClientResetMode` is `.manual` by default.
+     `ClientResetMode` is `.recover` by default.
 
      - warning: NEVER disable SSL validation for a system running in production.
      */
@@ -453,7 +465,7 @@ public extension User {
      Create a sync configuration instance.
 
      - parameter partitionValue: The `BSON` value the Realm is partitioned on.
-     - parameter clientResetMode: Determines file recovery behavior during a client reset.
+     - parameter clientResetMode: Determines file recovery behavior during a client reset. `.recover` by default.
      - parameter notifyBeforeClientReset: A callback which notifies prior to a client reset occurring. See: `notifyBeforeClientReset`.
      - parameter notifyAfterClientReset: A callback which notifies after a client reset has occurred. See: `notifyAfterClientReset`.
      */
@@ -464,7 +476,7 @@ public extension User {
         case .manual(let manualClientReset):
             config = self.__configuration(withPartitionValue: ObjectiveCSupport.convert(object: AnyBSON(partitionValue)),
                                           clientResetMode: .manual,
-                                          manualClientReset: manualClientReset)
+                                          manualClientResetHandler: manualClientReset)
         case .discardLocal(let beforeClientReset, let afterClientReset):
             config = self.__configuration(withPartitionValue: ObjectiveCSupport.convert(object: AnyBSON(partitionValue)),
                                           clientResetMode: .discardLocal,
@@ -921,7 +933,6 @@ extension User {
 
      @return A `Realm.Configuration` instance with a flexible sync configuration.
      */
-    // TODO: make recover the default. DiscardLocal is default until that test starts passing
     public func flexibleSyncConfiguration(clientResetMode: ClientResetMode = .recover(nil, nil)) -> Realm.Configuration {
         var config: RLMRealmConfiguration
         switch clientResetMode {

@@ -105,7 +105,7 @@ struct AfterClientResetWrapper : CallbackSchema {
 
 @interface RLMSyncConfiguration () {
     std::unique_ptr<realm::SyncConfig> _config;
-    RLMSyncErrorReportingBlock _manualClientReset;
+    RLMSyncErrorReportingBlock _manualClientResetHandler;
 }
 
 @end
@@ -170,7 +170,7 @@ struct AfterClientResetWrapper : CallbackSchema {
     if (!beforeClientReset) {
         _config->notify_before_client_reset = nullptr;
     } else if (self.clientResetMode == RLMClientResetModeManual) {
-        @throw RLMException(@"Client reset notifications not supported in Manual mode. Use SyncManager.ErrorHandler");
+        @throw RLMException(@"RLMClientResetBeforeBlock reset notifications are not supported in Manual mode. Use RLMSyncConfiguration.manualClientResetHandler or SyncManager.ErrorHandler");
     } else {
         _config->notify_before_client_reset = BeforeClientResetWrapper{.block = beforeClientReset};
     }
@@ -188,57 +188,24 @@ struct AfterClientResetWrapper : CallbackSchema {
 - (void)setAfterClientReset:(RLMClientResetAfterBlock)afterClientReset {
     if (!afterClientReset) {
         _config->notify_after_client_reset = nullptr;
-    } else if (self.clientResetMode == RLMClientResetModeManual) { //TODO: change messages
-        @throw RLMException(@"Client reset notifications not supported in Manual mode. Use SyncManager.ErrorHandler");
+    } else if (self.clientResetMode == RLMClientResetModeManual) {
+        @throw RLMException(@"RLMClientResetAfterBlock reset notifications are not supported in Manual mode. Use RLMSyncConfiguration.manualClientResetHandler or SyncManager.ErrorHandler");
     } else {
         _config->notify_after_client_reset = AfterClientResetWrapper{.block = afterClientReset};
     }
 }
 
-// TODO: hook up getter to swift sdk
-- (RLMSyncErrorReportingBlock)manualClientReset {
-    NSLog(@"testhit2");
-    return _manualClientReset;
+- (RLMSyncErrorReportingBlock)manualClientResetHandler {
+    return _manualClientResetHandler;
 }
 
-// TODO: refactor the syncmanager setting to singule method. also shared by set defaults
-- (void)setManualClientReset:(RLMSyncErrorReportingBlock)manualClientReset {
+- (void)setManualClientResetHandler:(RLMSyncErrorReportingBlock)manualClientReset {
     if (!manualClientReset) {
         return;
     } else if (self.clientResetMode != RLMClientResetModeManual) {
         @throw RLMException(@"message TBD");
     } else {
-        _manualClientReset = manualClientReset;
-        RLMSyncManager *manager = [self.user.app syncManager];
-        __weak RLMSyncManager *weakManager = manager;
-        _config->error_handler = [weakManager, self](std::shared_ptr<SyncSession> errored_session, SyncError error) {
-            RLMSyncErrorReportingBlock errorHandler;
-            @autoreleasepool {
-                errorHandler = weakManager.errorHandler;
-            }
-            NSError *nsError = RLMTranslateSyncError(std::move(error));
-            if (!nsError) {
-                return;
-            }
-            if (!errorHandler && nsError.code != RLMSyncErrorClientResetError) {
-                return;
-            } else if (!errorHandler && !_manualClientReset && nsError.code == RLMSyncErrorClientResetError) {
-                return;
-            }
-
-            RLMSyncSession *session = [[RLMSyncSession alloc] initWithSyncSession:errored_session];
-            dispatch_async(dispatch_get_main_queue(), ^{
-                // Keep the SyncSession alive until the callback completes as
-                // RLMSyncSession only holds a weak reference
-                static_cast<void>(errored_session);
-                if (_manualClientReset && nsError.code == RLMSyncErrorClientResetError) {
-                    NSLog(@"testhit"); // TODO: remove line; for debugging
-                    self.manualClientReset(nsError, session);
-                } else {
-                    errorHandler(nsError, session);
-                }
-            });
-        };
+        _manualClientResetHandler = manualClientReset;
     }
 }
 
@@ -318,32 +285,43 @@ NSError *RLMTranslateSyncError(SyncError error) {
     return make_sync_error(errorClass, @(error.message.c_str()), error.error_code.value(), custom);
 }
 
-static void setDefaults(SyncConfig& config, RLMUser *user) {
-    config.client_resync_mode = ClientResyncMode::Manual;
-    config.stop_policy = SyncSessionStopPolicy::AfterChangesUploaded;
-
+- (void)setErrorHandler:(RLMUser *)user {
     RLMSyncManager *manager = [user.app syncManager];
     __weak RLMSyncManager *weakManager = manager;
-    config.error_handler = [weakManager](std::shared_ptr<SyncSession> errored_session, SyncError error) {
+    _config->error_handler = [weakManager, self](std::shared_ptr<SyncSession> errored_session, SyncError error) {
         RLMSyncErrorReportingBlock errorHandler;
         @autoreleasepool {
             errorHandler = weakManager.errorHandler;
-        }
-        if (!errorHandler) { // needs to be rearranged in case no errorhandler, but provided manual callbacks
-            return;
         }
         NSError *nsError = RLMTranslateSyncError(std::move(error));
         if (!nsError) {
             return;
         }
+        if (!errorHandler && nsError.code != RLMSyncErrorClientResetError) {
+            return;
+        } else if (!errorHandler && !_manualClientResetHandler && nsError.code == RLMSyncErrorClientResetError) {
+            return;
+        }
+
         RLMSyncSession *session = [[RLMSyncSession alloc] initWithSyncSession:errored_session];
         dispatch_async(dispatch_get_main_queue(), ^{
             // Keep the SyncSession alive until the callback completes as
             // RLMSyncSession only holds a weak reference
             static_cast<void>(errored_session);
-            errorHandler(nsError, session);
+            if (_manualClientResetHandler && nsError.code == RLMSyncErrorClientResetError) {
+                self.manualClientResetHandler(nsError, session);
+            } else {
+                errorHandler(nsError, session);
+            }
         });
     };
+};
+
+static void setDefaults(SyncConfig& config, RLMUser *user) {
+    config.client_resync_mode = ClientResyncMode::Manual;
+    config.stop_policy = SyncSessionStopPolicy::AfterChangesUploaded;
+
+    RLMSyncManager *manager = [user.app syncManager];
 
     if (NSString *authorizationHeaderName = manager.authorizationHeaderName) {
         config.authorization_header_name.emplace(authorizationHeaderName.UTF8String);
@@ -363,6 +341,7 @@ static void setDefaults(SyncConfig& config, RLMUser *user) {
         _config = std::make_unique<SyncConfig>([user _syncUser], s.str());
         _path = [user pathForPartitionValue:_config->partition_value];
         setDefaults(*_config, user);
+        [self setErrorHandler:user];
     }
     return self;
 }
@@ -372,6 +351,7 @@ static void setDefaults(SyncConfig& config, RLMUser *user) {
         _config = std::make_unique<SyncConfig>([user _syncUser], SyncConfig::FLXSyncEnabled{});
         _path = [user pathForFlexibleSync];
         setDefaults(*_config, user);
+        [self setErrorHandler:user];
     }
     return self;
 }

@@ -123,7 +123,7 @@ typedef void(^RLMClientResetAfterBlock)(RLMRealm * _Nonnull beforeFrozen, RLMRea
 
 /**
  An enum which determines file recovery behvaior in the event of a client reset.
- - note: Defaults to `RLMClientResetModeManual`
+ - note: Defaults to `RLMClientResetModeManual` // edit docs
 
  - see: `RLMClientResetMode`
  - see: https://docs.mongodb.com/realm/sync/error-handling/client-resets/
@@ -143,7 +143,7 @@ typedef void(^RLMClientResetAfterBlock)(RLMRealm * _Nonnull beforeFrozen, RLMRea
 @property (nonatomic, nullable) RLMClientResetAfterBlock afterClientReset;
 
 // is this necessary?
-@property (nonatomic, nullable) RLMSyncErrorReportingBlock manualClientReset;
+@property (nonatomic, nullable) RLMSyncErrorReportingBlock manualClientResetHandler;
 
 
 /**

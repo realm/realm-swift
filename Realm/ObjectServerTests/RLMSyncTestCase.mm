@@ -176,6 +176,17 @@ static NSURL *syncDirectoryForChildProcess() {
 - (RLMRealm *)openRealmForPartitionValue:(nullable id<RLMBSON>)partitionValue user:(RLMUser *)user {
     return [self openRealmForPartitionValue:partitionValue
                                        user:user
+                            clientResetMode:RLMClientResetModeRecover
+                              encryptionKey:nil
+                                 stopPolicy:RLMSyncStopPolicyAfterChangesUploaded];
+}
+
+- (RLMRealm *)openRealmForPartitionValue:(nullable id<RLMBSON>)partitionValue
+                                    user:(RLMUser *)user
+                         clientResetMode:(RLMClientResetMode)clientResetMode {
+    return [self openRealmForPartitionValue:partitionValue
+                                       user:user
+                            clientResetMode:clientResetMode
                               encryptionKey:nil
                                  stopPolicy:RLMSyncStopPolicyAfterChangesUploaded];
 }
@@ -184,8 +195,21 @@ static NSURL *syncDirectoryForChildProcess() {
                                     user:(RLMUser *)user
                            encryptionKey:(nullable NSData *)encryptionKey
                               stopPolicy:(RLMSyncStopPolicy)stopPolicy {
+    return [self openRealmForPartitionValue:partitionValue
+                                       user:user
+                            clientResetMode:RLMClientResetModeRecover
+                              encryptionKey:encryptionKey
+                                 stopPolicy:stopPolicy];
+}
+
+- (RLMRealm *)openRealmForPartitionValue:(nullable id<RLMBSON>)partitionValue
+                                    user:(RLMUser *)user
+                         clientResetMode:(RLMClientResetMode)clientResetMode
+                           encryptionKey:(nullable NSData *)encryptionKey
+                              stopPolicy:(RLMSyncStopPolicy)stopPolicy {
     RLMRealm *realm = [self immediatelyOpenRealmForPartitionValue:partitionValue
                                                              user:user
+                                                  clientResetMode:clientResetMode
                                                     encryptionKey:encryptionKey
                                                        stopPolicy:stopPolicy];
     [self waitForDownloadsForRealm:realm];
@@ -232,9 +256,18 @@ static NSURL *syncDirectoryForChildProcess() {
     return error;
 }
 
-- (RLMRealm *)immediatelyOpenRealmForPartitionValue:(NSString *)partitionValue user:(RLMUser *)user {
+- (RLMRealm *)immediatelyOpenRealmForPartitionValue:(nullable id<RLMBSON>)partitionValue user:(RLMUser *)user {
     return [self immediatelyOpenRealmForPartitionValue:partitionValue
                                                   user:user
+                                       clientResetMode:RLMClientResetModeRecover];
+}
+
+- (RLMRealm *)immediatelyOpenRealmForPartitionValue:(NSString *)partitionValue
+                                               user:(RLMUser *)user
+                                    clientResetMode:(RLMClientResetMode)clientResetMode {
+    return [self immediatelyOpenRealmForPartitionValue:partitionValue
+                                                  user:user
+                                       clientResetMode:clientResetMode
                                          encryptionKey:nil
                                             stopPolicy:RLMSyncStopPolicyAfterChangesUploaded];
 }
@@ -243,7 +276,19 @@ static NSURL *syncDirectoryForChildProcess() {
                                                user:(RLMUser *)user
                                       encryptionKey:(NSData *)encryptionKey
                                          stopPolicy:(RLMSyncStopPolicy)stopPolicy {
-    auto c = [user configurationWithPartitionValue:partitionValue];
+    return [self immediatelyOpenRealmForPartitionValue:partitionValue
+                                                  user:user
+                                       clientResetMode:RLMClientResetModeRecover
+                                         encryptionKey:encryptionKey
+                                            stopPolicy:RLMSyncStopPolicyAfterChangesUploaded];
+}
+
+- (RLMRealm *)immediatelyOpenRealmForPartitionValue:(NSString *)partitionValue
+                                               user:(RLMUser *)user
+                                    clientResetMode:(RLMClientResetMode)clientResetMode
+                                      encryptionKey:(NSData *)encryptionKey
+                                         stopPolicy:(RLMSyncStopPolicy)stopPolicy {
+    auto c = [user configurationWithPartitionValue:partitionValue clientResetMode:clientResetMode];
     c.encryptionKey = encryptionKey;
     c.objectClasses = @[Dog.self, Person.self, HugeSyncObject.self, RLMSetSyncObject.self,
                         RLMArraySyncObject.self, UUIDPrimaryKeyObject.self, StringPrimaryKeyObject.self,

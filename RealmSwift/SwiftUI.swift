@@ -1467,7 +1467,7 @@ private class ObservableAsyncOpenStorage: ObservableObject {
             }
         }
 
-        // We don't want to use the `defaultConfiguration` from the environment, we only want to use this environment value in @AsyncOpen if is not the default one
+        // We don't want to use the `defaultConfiguration` from the environment, we only want to use this environment value in @AutoOpen if is not the default one
         if configuration != .defaultConfiguration,
            storage.configuration != configuration {
             if let partitionValue = configuration.syncConfiguration?.partitionValue {

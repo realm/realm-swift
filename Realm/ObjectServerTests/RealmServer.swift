@@ -1025,33 +1025,6 @@ public class RealmServer: NSObject {
         app.services[syncServiceId].config.patch([configOption: ["state": ""]], completion)
     }
 
-    // TODO: refactor when/if this works
-//    public func disableFlexibleSync(appServerId: String, syncServiceId: String, completion: @escaping (Result<Any?, Error>) -> Void) {
-//        guard let session = session else {
-//            completion(.failure(URLError.unknown as! Error))
-//            return
-//        }
-//        let app = session.apps[appServerId]
-//        app.services[syncServiceId].config.patch(["flexible_sync": ["state": ""]], completion)
-//    }
-
-    // TODO: refactor when it works
-//    public func enableFlexibleSync(appServerId: String, syncServiceId: String, syncServiceConfiguration: [String: Any], _ completion: @escaping (Result<Any?, Error>) -> Void) {
-//        var syncConfig = syncServiceConfiguration
-//        guard let session = session else {
-//            completion(.failure(URLError.unknown as! Error))
-//            return
-//        }
-//        let app = session.apps[appServerId]
-//        guard var syncInfo = syncConfig["flexible_sync"] as? [String: Any] else {
-//            completion(.failure(URLError.unknown as! Error))
-//            return
-//        }
-//        syncInfo["state"] = "enabled"
-//        syncConfig["flexible_sync"] = syncInfo
-//        app.services[syncServiceId].config.patch(syncConfig, completion)
-//    }
-
     public func enableSync(flexibleSync: Bool = false, appServerId: String, syncServiceId: String, syncServiceConfiguration: [String: Any], _ completion: @escaping (Result<Any?, Error>) -> Void) {
         let configOption = flexibleSync ? "flexible_sync" : "sync"
         var syncConfig = syncServiceConfiguration
@@ -1082,8 +1055,7 @@ public class RealmServer: NSObject {
         return (syncInfo["is_recovery_mode_disabled"] as? Bool == true)
     }
 
-    // TODO: shorten all these signatures with a hyphen
-    public func patchRecoveryMode(flexibleSync: Bool ,disable: Bool, appServerId: String, syncServiceId: String, syncServiceConfiguration: [String: Any], completion: @escaping (Result<Any?, Error>) -> Void) throws {
+    public func patchRecoveryMode(flexibleSync: Bool ,disable: Bool, _ appServerId: String, _ syncServiceId: String, _ syncServiceConfiguration: [String: Any], completion: @escaping (Result<Any?, Error>) -> Void) throws {
         // If desired edit is already the case, return
         if try recoveryModeDisabled(flexibleSync: flexibleSync, appServerId: appServerId, syncServiceId: syncServiceId) == disable {
             return

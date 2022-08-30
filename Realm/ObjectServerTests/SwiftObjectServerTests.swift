@@ -51,7 +51,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 XCTFail("Error: \(error.localizedDescription)")
             }
         }
-        wait(for: [ex], timeout: 30.0)
+        wait(for: [ex], timeout: 60.0)
     }
     /// It should be possible to successfully open a Realm configured for sync.
     func testBasicSwiftSync() throws {
@@ -315,7 +315,6 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         XCTAssertFalse(try RealmServer.shared.syncEnabled(appServerId: appServerId, syncServiceId: syncServiceId))
     }
 
-    // TODO: Refactor
     func waitForSyncEnabled(flexibleSync: Bool = false, appServerId: String, syncServiceId: String, syncServiceConfig: [String: Any]) {
         let exp = expectation(description: "enable sync")
 
@@ -356,7 +355,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         guard let syncServiceConfig = try RealmServer.shared.getSyncServiceConfiguration(appServerId: appServerId, syncServiceId: syncServiceId) else { fatalError("precondition failure: no sync service configuration found") }
 
         let exp = expectation(description: "edit recovery mode")
-        try RealmServer.shared.patchRecoveryMode(flexibleSync: flexibleSync ,disable: disable, appServerId: appServerId, syncServiceId: syncServiceId, syncServiceConfiguration: syncServiceConfig) { result in
+        try RealmServer.shared.patchRecoveryMode(flexibleSync: flexibleSync ,disable: disable, appServerId, syncServiceId, syncServiceConfig) { result in
             switch result {
             case .success:
                 exp.fulfill()
@@ -402,7 +401,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
     func testClientReset() throws {
         let user = try logInUser(for: basicCredentials())
-        let realm = try openRealm(partitionValue: #function, user: user)
+        let realm = try openRealm(partitionValue: #function, user: user, clientResetMode: .manual())
 
         let e = expectSyncError {
             user.simulateClientResetError(forSession: #function)
@@ -421,7 +420,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let user = try logInUser(for: basicCredentials())
 
         let e: SyncError? = try autoreleasepool {
-            let realm = try openRealm(partitionValue: #function, user: user)
+            let realm = try openRealm(partitionValue: #function, user: user, clientResetMode: .manual())
             return expectSyncError {
                 user.simulateClientResetError(forSession: #function)
                 realm.invalidate()
@@ -433,7 +432,22 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         SyncSession.immediatelyHandleError(errorToken, syncManager: self.app.syncManager)
         XCTAssertTrue(FileManager.default.fileExists(atPath: path))
     }
-    // TODO: Move method to spot above
+    
+    func waitForServerHistoryAfterRestart(realm: Realm) {
+        let start = Date()
+        while realm.isEmpty && start.timeIntervalSinceNow > -60.0 {
+            self.waitForDownloads(for: realm)
+            sleep(1) // Wait between requests
+        }
+        if realm.objects(SwiftPerson.self).count > 0 {
+            XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1)
+            XCTAssertEqual(realm.objects(SwiftPerson.self)[0].firstName, "Paul")
+        } else {
+            XCTFail("Waited longer than one minute for history to resynthesize")
+            return
+        }
+    }
+
     func prepareClientReset(_ partition: String, _ user: User) throws {
         let collection = setupMongoCollection(user: user, collectionName: "SwiftPerson")
 
@@ -478,21 +492,9 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             newConfig.objectTypes = [SwiftPerson.self]
             let newRealm = try Realm(configuration: newConfig)
 
-            let start = Date()
-            while newRealm.isEmpty && start.timeIntervalSinceNow > -60.0 {
-                self.waitForDownloads(for: newRealm)
-                sleep(1) // Wait between requests
-            }
-            if newRealm.objects(SwiftPerson.self).count > 0 {
-                XCTAssertEqual(newRealm.objects(SwiftPerson.self).count, 1)
-                XCTAssertEqual(newRealm.objects(SwiftPerson.self)[0].firstName, "Paul")
-            } else {
-                XCTFail("Waited longer than one minute for history to resynthesize")
-                return
-            }
+            waitForServerHistoryAfterRestart(realm: newRealm)
         }
     }
-    // TODO: Once this actually works, see about refactoring into prepareClientReset
     func prepareFlexibleClientReset(_ user: User) throws {
         let collection = setupMongoCollection(user: user, collectionName: "SwiftPerson")
 
@@ -540,12 +542,9 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             try realm.write {
                 realm.add(SwiftPerson(firstName: "John", lastName: "L"))
             }
-            if (realm.objects(SwiftPerson.self).count > 1) {
-                print("why?")
-            }
             XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1)
         }
-        // TODO: edit comment
+
         // After restarting sync, the sync history translator service needs time
         // to resynthesize the new history from existing objects on the server
         // The following creates a new realm with the same partition and wait for
@@ -560,19 +559,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             subscriptions.update {
                 subscriptions.append(QuerySubscription<SwiftPerson>(name: "all_people"))
             }
-
-            let start = Date()
-            while newRealm.isEmpty && start.timeIntervalSinceNow > -60.0 {
-                self.waitForDownloads(for: newRealm)
-                sleep(1) // Wait between requests
-            }
-            if newRealm.objects(SwiftPerson.self).count > 0 {
-                XCTAssertEqual(newRealm.objects(SwiftPerson.self).count, 1)
-                XCTAssertEqual(newRealm.objects(SwiftPerson.self)[0].firstName, "Paul")
-            } else {
-                XCTFail("Waited longer than one minute for history to resynthesize")
-                return
-            }
+            waitForServerHistoryAfterRestart(realm: newRealm)
         }
     }
 
@@ -650,7 +637,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             let user = try logInUser(for: creds)
             try prepareClientReset(#function, user)
 
-            var configuration = user.configuration(partitionValue: #function)
+            var configuration = user.configuration(partitionValue: #function, clientResetMode: .manual())
             configuration.objectTypes = [SwiftPerson.self]
 
             let syncManager = self.app.syncManager
@@ -682,7 +669,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
     }
 
-    func testClientResetManualWithCallback() throws {
+    func testClientResetManualWithEnumCallback() throws {
         let creds = basicCredentials()
         try autoreleasepool {
             let user = try logInUser(for: creds)
@@ -794,7 +781,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let user = try logInUser(for: creds)
         try prepareClientReset(#function, user)
 
-        var configuration = user.configuration(partitionValue: #function)
+        var configuration = user.configuration(partitionValue: #function, clientResetMode: .manual())
         configuration.objectTypes = [SwiftPerson.self]
 
         let syncManager = self.app.syncManager
@@ -1029,6 +1016,30 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     func testFlexibleClientResetManual() throws {
         let user = try logInUser(for: basicCredentials(app: self.flexibleSyncApp), app: self.flexibleSyncApp)
         assertThrows(user.flexibleSyncConfiguration(clientResetMode: .manual()))
+    }
+
+    func testDefaultFlexibleClientResetMode() throws {
+        let user = try logInUser(for: basicCredentials(app: self.flexibleSyncApp), app: self.flexibleSyncApp)
+        let config = user.flexibleSyncConfiguration()
+
+        switch config.syncConfiguration!.clientResetMode {
+        case .recover:
+            return
+        default:
+            XCTFail("expected recover mode")
+        }
+    }
+    
+    func testDefaultPartitionClientResetMode() throws {
+        let user = try logInUser(for: basicCredentials())
+        let config = user.configuration(partitionValue: #function)
+        
+        switch config.syncConfiguration!.clientResetMode {
+        case .recover:
+            return
+        default:
+            XCTFail("expected recover mode")
+        }
     }
 
     // MARK: - Progress notifiers

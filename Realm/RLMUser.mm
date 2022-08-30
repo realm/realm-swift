@@ -82,7 +82,8 @@ using namespace realm;
 }
 
 - (RLMRealmConfiguration *)configurationWithPartitionValue:(nullable id<RLMBSON>)partitionValue {
-    return [self configurationWithPartitionValue:partitionValue clientResetMode:RLMClientResetModeManual];
+    return [self configurationWithPartitionValue:partitionValue clientResetMode:RLMClientResetModeRecover];
+//    return [self configurationWithPartitionValue:partitionValue clientResetMode:RLMClientResetModeManual];
 }
 
 - (RLMRealmConfiguration *)configurationWithPartitionValue:(nullable id<RLMBSON>)partitionValue
@@ -111,11 +112,11 @@ using namespace realm;
 
 - (RLMRealmConfiguration *)configurationWithPartitionValue:(nullable id<RLMBSON>)partitionValue
                                            clientResetMode:(RLMClientResetMode)clientResetMode
-                                         manualClientReset:(nullable RLMSyncErrorReportingBlock)manualClientReset {
+                                  manualClientResetHandler:(nullable RLMSyncErrorReportingBlock)manualClientReset {
     auto syncConfig = [[RLMSyncConfiguration alloc] initWithUser:self
                                                   partitionValue:partitionValue];
     syncConfig.clientResetMode = clientResetMode;
-    syncConfig.manualClientReset = manualClientReset;
+    syncConfig.manualClientResetHandler = manualClientReset;
     RLMRealmConfiguration *config = [[RLMRealmConfiguration alloc] init];
     config.syncConfiguration = syncConfig;
     return config;
@@ -128,20 +129,14 @@ using namespace realm;
 }
 
 - (RLMRealmConfiguration *)flexibleSyncConfigurationWithClientResetMode:(RLMClientResetMode)clientResetMode
-                                                      manualClientReset:(nullable RLMSyncErrorReportingBlock)manualClientReset {
-      auto syncConfig = [[RLMSyncConfiguration alloc] initWithUser:self];
-      syncConfig.clientResetMode = clientResetMode;
-      syncConfig.manualClientReset = manualClientReset;
-      RLMRealmConfiguration *config = [[RLMRealmConfiguration alloc] init];
-      config.syncConfiguration = syncConfig;
-      return config;
-  }
-
-- (RLMRealmConfiguration *)flexibleSyncConfigurationWithClientResetMode:(RLMClientResetMode)clientResetMode
                                                       notifyBeforeReset:(nullable RLMClientResetBeforeBlock)beforeResetBlock
                                                        notifyAfterReset:(nullable RLMClientResetAfterBlock)afterResetBlock {
     auto syncConfig = [[RLMSyncConfiguration alloc] initWithUser:self];
-    syncConfig.clientResetMode = clientResetMode;
+    if (clientResetMode == RLMClientResetModeManual) {
+        @throw RLMException(@"RLMClientResetModeManual not available for flexible sync configurations");
+    } else {
+        syncConfig.clientResetMode = clientResetMode;
+    }
     syncConfig.beforeClientReset = beforeResetBlock;
     syncConfig.afterClientReset = afterResetBlock;
     RLMRealmConfiguration *config = [[RLMRealmConfiguration alloc] init];

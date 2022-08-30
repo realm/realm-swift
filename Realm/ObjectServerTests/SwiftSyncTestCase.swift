@@ -24,6 +24,7 @@ import RealmSwift
 #if canImport(RealmTestSupport)
 import RealmTestSupport
 import RealmSyncTestSupport
+import SwiftUI
 #endif
 
 public extension User {
@@ -79,9 +80,15 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
 
     public func openRealm<T: BSON>(partitionValue: T,
                                    user: User,
+                                   clientResetMode: ClientResetMode? = nil,
                                    file: StaticString = #file,
                                    line: UInt = #line) throws -> Realm {
-        let config = user.configuration(partitionValue: partitionValue)
+        let config: Realm.Configuration
+        if clientResetMode != nil {
+            config = user.configuration(partitionValue: partitionValue, clientResetMode: clientResetMode!)
+        } else {
+            config = user.configuration(partitionValue: partitionValue)
+        }
         return try openRealm(configuration: config)
     }
 
