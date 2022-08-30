@@ -43,7 +43,19 @@ typedef NS_ENUM(NSUInteger, RLMClientResetMode) {
     /// re-downloaded Realm will initially contain only the data present at the time the Realm
     /// was backed up on the server.
     ///
-    /// - see: `rlmSync_clientResetBackedUpRealmPath` or `SyncError.clientResetInfo()` for more information on accessing the recovery directory.
+    /// @see: `rlmSync_clientResetBackedUpRealmPath` or `SyncError.clientResetInfo()` for more information on accessing the recovery directory.
+    ///
+    /// The manual client reset mode handler can be set in two places:
+    ///  1. As an ErrorReportingBlock argument at `RLMSyncConfiguration.manualClientResetHandler`.
+    ///  2. As an ErrorReportingBlock in the `SyncManager.errorHandler` property.  - see: `RLMSyncManager.errorHandler`
+    ///
+    ///  During an `RLMSyncErrorClientResetError` the block executed is determined by the following rules
+    ///  - If an error reporting block is set in `.manualClientResetHandler` and the `SyncManager`, the `.manualClientResetHandler` block will be executed.
+    ///  - If an error reporting block is set in either the `.manualClientResetHandler` or the `SyncManager`, but not both, wheverever the block was set will execute.
+    ///  - If no block is set in either location, the client reset will not be handled. The application will likely need to be restarted and unsynced local changes may be lost.
+    /// @note: The `SyncManager.errorHandler` is still invoked under all `RLMSyncError`s *other than* `RLMSyncErrorClientResetError`.
+    ///       @see `RLMSyncError` for an exhaustive list.
+    /// @note: RLMClientResetModeManual is not supported in Flexible Sync configurations.
     RLMClientResetModeManual,
     /// All unsynchronized local changes are automatically discarded and the local state is
     /// automatically reverted to the most recent state from the server. Unsynchronized changes
@@ -123,26 +135,28 @@ typedef void(^RLMClientResetAfterBlock)(RLMRealm * _Nonnull beforeFrozen, RLMRea
 
 /**
  An enum which determines file recovery behvaior in the event of a client reset.
- - note: Defaults to `RLMClientResetModeManual` // edit docs
+ @note: Defaults to `RLMClientResetModeRecover`
 
- - see: `RLMClientResetMode`
- - see: https://docs.mongodb.com/realm/sync/error-handling/client-resets/
+ @see: `RLMClientResetMode`
+ @see: https://docs.mongodb.com/realm/sync/error-handling/client-resets/
 */
 @property (nonatomic) RLMClientResetMode clientResetMode;
 
 /**
  A callback which notifies prior to  prior to a client reset occurring.
- - see: `RLMClientResetBeforeBlock`
+ @see: `RLMClientResetBeforeBlock`
  */
 @property (nonatomic, nullable) RLMClientResetBeforeBlock beforeClientReset;
 
 /**
  A callback which notifies after a client reset has occurred.
- -see: `RLMClientResetAfterBlock`
+ @see: `RLMClientResetAfterBlock`
  */
 @property (nonatomic, nullable) RLMClientResetAfterBlock afterClientReset;
 
-// is this necessary?
+/**
+ 
+ */
 @property (nonatomic, nullable) RLMSyncErrorReportingBlock manualClientResetHandler;
 
 

@@ -203,16 +203,6 @@ import Realm
             return object(localRealm.rlmRealm, remoteRealm.rlmRealm)
         }
     }
-    // Not actually used
-    /// Convert an RLMSyncErrorReportingBlock to a RealmSwift a swift block
-    public static func convert(object: RLMSyncErrorReportingBlock?) -> ((Error, SyncSession?) -> Void)? {
-        guard let object = object else {
-            return nil
-        }
-        return { error, session in
-            return object(error.self, session)
-        }
-    }
 
     /// Converts a swift block receiving a `SyncSubscriptionSet`to a RLMFlexibleSyncInitialSubscriptionsBlock receiving a `RLMSyncSubscriptionSet`.
     public static func convert(block: @escaping ((SyncSubscriptionSet) -> Void)) -> RLMFlexibleSyncInitialSubscriptionsBlock {

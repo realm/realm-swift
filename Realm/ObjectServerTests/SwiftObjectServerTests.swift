@@ -972,6 +972,78 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             XCTAssertEqual(realm.objects(SwiftPerson.self).filter("firstName == 'Paul'").count, 1)
         }
     }
+    
+    func testFlexibleSyncClientResetRecoverWithInitialSubscriptions() throws {
+        let user = try logInUser(for: basicCredentials(app: self.flexibleSyncApp), app: self.flexibleSyncApp)
+        try prepareFlexibleClientReset(user)
+
+        let (assertBeforeBlock, assertAfterBlock) = assertRecover()
+        var config = user.flexibleSyncConfiguration(clientResetMode: .recover(assertBeforeBlock, assertAfterBlock), initialSubscriptions: { subscriptions in
+            subscriptions.append(QuerySubscription<SwiftPerson>(name: "all_people"))
+        })
+        config.objectTypes = [SwiftPerson.self]
+        guard let syncConfig = config.syncConfiguration else {
+            fatalError("Test condition failure. SyncConfiguration not set.")
+        }
+        switch syncConfig.clientResetMode {
+        case .recover(let before, let after):
+            XCTAssertNotNil(before)
+            XCTAssertNotNil(after)
+        default:
+            XCTFail("Should be set to recover")
+        }
+        
+        try autoreleasepool {
+            XCTAssertEqual(user.flexibleSyncConfiguration().fileURL, config.fileURL)
+            let realm = try Realm(configuration: config)
+            let subscriptions = realm.subscriptions
+            XCTAssertEqual(subscriptions.count, 1)
+            XCTAssertEqual(subscriptions.first?.name, "all_people")
+
+            waitForExpectations(timeout: 15.0)
+            XCTAssertEqual(realm.objects(SwiftPerson.self).count, 2)
+            // The object created locally (John) and the object created on the server (Paul)
+            // should both be integrated into the new realm file.
+            XCTAssertEqual(realm.objects(SwiftPerson.self).filter("firstName == 'John'").count, 1)
+            XCTAssertEqual(realm.objects(SwiftPerson.self).filter("firstName == 'Paul'").count, 1)
+        }
+    }
+    
+    func testFlexibleSyncClientResetDiscardLocalWithInitialSubscriptions() throws {
+        let user = try logInUser(for: basicCredentials(app: self.flexibleSyncApp), app: self.flexibleSyncApp)
+        try prepareFlexibleClientReset(user)
+
+        let (assertBeforeBlock, assertAfterBlock) = assertDiscardLocal()
+        var config = user.flexibleSyncConfiguration(clientResetMode: .discardLocal(assertBeforeBlock, assertAfterBlock), initialSubscriptions: { subscriptions in
+            subscriptions.append(QuerySubscription<SwiftPerson>(name: "all_people"))
+        })
+        config.objectTypes = [SwiftPerson.self]
+        guard let syncConfig = config.syncConfiguration else {
+            fatalError("Test condition failure. SyncConfiguration not set.")
+        }
+        switch syncConfig.clientResetMode {
+        case .discardLocal(let before, let after):
+            XCTAssertNotNil(before)
+            XCTAssertNotNil(after)
+        default:
+            XCTFail("Should be set to recover")
+        }
+        
+        try autoreleasepool {
+            XCTAssertEqual(user.flexibleSyncConfiguration().fileURL, config.fileURL)
+            let realm = try Realm(configuration: config)
+            let subscriptions = realm.subscriptions
+            XCTAssertEqual(subscriptions.count, 1)
+            XCTAssertEqual(subscriptions.first?.name, "all_people")
+
+            waitForExpectations(timeout: 15.0)
+            XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1)
+            // The Person created locally ("John") should have been discarded,
+            // while the one from the server ("Paul") should be present
+            XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1)
+            XCTAssertEqual(realm.objects(SwiftPerson.self)[0].firstName, "Paul")
+        }
+    }
 
     func testFlexibleSyncClientResetRecoverOrDiscardLocalFailedRecovery() throws {
         // Disable recovery mode on the server.
@@ -1018,23 +1090,18 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         assertThrows(user.flexibleSyncConfiguration(clientResetMode: .manual()))
     }
 
-    func testDefaultFlexibleClientResetMode() throws {
+    func testDefaultClientResetMode() throws {
         let user = try logInUser(for: basicCredentials(app: self.flexibleSyncApp), app: self.flexibleSyncApp)
-        let config = user.flexibleSyncConfiguration()
+        let fConfig = user.flexibleSyncConfiguration()
+        let pConfig = user.configuration(partitionValue: #function)
 
-        switch config.syncConfiguration!.clientResetMode {
+        switch fConfig.syncConfiguration!.clientResetMode {
         case .recover:
             return
         default:
             XCTFail("expected recover mode")
         }
-    }
-    
-    func testDefaultPartitionClientResetMode() throws {
-        let user = try logInUser(for: basicCredentials())
-        let config = user.configuration(partitionValue: #function)
-        
-        switch config.syncConfiguration!.clientResetMode {
+        switch pConfig.syncConfiguration!.clientResetMode {
         case .recover:
             return
         default:

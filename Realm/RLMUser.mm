@@ -83,7 +83,6 @@ using namespace realm;
 
 - (RLMRealmConfiguration *)configurationWithPartitionValue:(nullable id<RLMBSON>)partitionValue {
     return [self configurationWithPartitionValue:partitionValue clientResetMode:RLMClientResetModeRecover];
-//    return [self configurationWithPartitionValue:partitionValue clientResetMode:RLMClientResetModeManual];
 }
 
 - (RLMRealmConfiguration *)configurationWithPartitionValue:(nullable id<RLMBSON>)partitionValue
@@ -149,6 +148,26 @@ using namespace realm;
     auto syncConfig = [[RLMSyncConfiguration alloc] initWithUser:self];
     RLMRealmConfiguration *config = [[RLMRealmConfiguration alloc] init];
     config.initialSubscriptions = initialSubscriptions;
+    config.rerunOnOpen = rerunOnOpen;
+    config.syncConfiguration = syncConfig;
+    return config;
+}
+
+- (RLMRealmConfiguration *)flexibleSyncConfigurationWithInitialSubscriptions:(RLMFlexibleSyncInitialSubscriptionsBlock)initialSubscriptions
+                                                             clientResetMode:(RLMClientResetMode)clientResetMode
+                                                           notifyBeforeReset:(nullable RLMClientResetBeforeBlock)beforeResetBlock
+                                                            notifyAfterReset:(nullable RLMClientResetAfterBlock)afterResetBlock
+                                                                 rerunOnOpen:(BOOL)rerunOnOpen {
+    auto syncConfig = [[RLMSyncConfiguration alloc] initWithUser:self];
+    RLMRealmConfiguration *config = [[RLMRealmConfiguration alloc] init];
+    config.initialSubscriptions = initialSubscriptions;
+    if (clientResetMode == RLMClientResetModeManual) {
+        @throw RLMException(@"RLMClientResetModeManual not available for flexible sync configurations");
+    } else {
+        syncConfig.clientResetMode = clientResetMode;
+    }
+    syncConfig.beforeClientReset = beforeResetBlock;
+    syncConfig.afterClientReset = afterResetBlock;
     config.rerunOnOpen = rerunOnOpen;
     config.syncConfiguration = syncConfig;
     return config;

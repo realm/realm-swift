@@ -270,12 +270,12 @@ public enum ClientResetMode {
     ///  1. As an ErrorReportingBlock argument in the ClientResetMode enum (`ErrorReportingBlock? = nil`).
     ///  2. As an ErrorReportingBlock in the `SyncManager.errorHandler` property.  - see: `RLMSyncManager.errorHandler`
     ///
-    ///  During a `RLMSyncErrorClientResetError` the blocks executed is determined by the following rules
+    ///  During an `RLMSyncErrorClientResetError` the block executed is determined by the following rules
     ///  - If an error reporting block is set in `ClientResetMode` and the `SyncManager`, the `ClientResetMode` block will be executed.
     ///  - If an error reporting block is set in either the `ClientResetMode` or the `SyncManager`, but not both, wheverever the block was set will execute.
     ///  - If no block is set in either location, the client reset will not be handled. The application will likely need to be restarted and unsynced local changes may be lost.
     ///  - note: The `SyncManager.errorHandler` is still invoked under all `RLMSyncError`s *other than* `RLMSyncErrorClientResetError`.
-    ///          See `RLMSyncError` for an exhaustive list.
+    ///      - see `RLMSyncError` for an exhaustive list.
     case manual(ErrorReportingBlock? = nil)
 }
 
@@ -974,8 +974,30 @@ extension User {
 
      @return A `Realm.Configuration` instance with a flexible sync configuration.
      */
-    public func flexibleSyncConfiguration(initialSubscriptions: @escaping ((SyncSubscriptionSet) -> Void), rerunOnOpen: Bool = false) -> Realm.Configuration {
-        let config = self.__flexibleSyncConfiguration(initialSubscriptions: ObjectiveCSupport.convert(block: initialSubscriptions), rerunOnOpen: rerunOnOpen)
+    public func flexibleSyncConfiguration(clientResetMode: ClientResetMode = .recover(nil, nil), initialSubscriptions: @escaping ((SyncSubscriptionSet) -> Void), rerunOnOpen: Bool = false) -> Realm.Configuration {
+        var config: RLMRealmConfiguration
+        switch clientResetMode {
+        case .manual:
+            throwRealmException("Manual mode not supported for flexible sync configurations")
+        case .discardLocal(let beforeBlock, let afterBlock):
+            config = self.__flexibleSyncConfiguration(initialSubscriptions: ObjectiveCSupport.convert(block: initialSubscriptions),
+                                                      clientResetMode: .discardLocal,
+                                                      notifyBeforeReset: ObjectiveCSupport.convert(object: beforeBlock),
+                                                      notifyAfterReset: ObjectiveCSupport.convert(object: afterBlock),
+                                                      rerunOnOpen: rerunOnOpen)
+        case .recover(let beforeBlock, let afterBlock):
+            config = self.__flexibleSyncConfiguration(initialSubscriptions: ObjectiveCSupport.convert(block: initialSubscriptions),
+                                                      clientResetMode: .recover,
+                                                      notifyBeforeReset: ObjectiveCSupport.convert(object: beforeBlock),
+                                                      notifyAfterReset: ObjectiveCSupport.convert(object: afterBlock),
+                                                      rerunOnOpen: rerunOnOpen)
+        case .recoverOrDiscard(let beforeBlock, let afterBlock):
+            config = self.__flexibleSyncConfiguration(initialSubscriptions: ObjectiveCSupport.convert(block: initialSubscriptions),
+                                                      clientResetMode: .recoverOrDiscard,
+                                                      notifyBeforeReset: ObjectiveCSupport.convert(object: beforeBlock),
+                                                      notifyAfterReset: ObjectiveCSupport.convert(object: afterBlock),
+                                                      rerunOnOpen: rerunOnOpen)
+        }
         return ObjectiveCSupport.convert(object: config)
     }
 }

@@ -45,10 +45,11 @@ NSString *const kRLMSyncUnderlyingErrorKey      = @"underlying_error";
 
 using namespace realm;
 
-static_assert((int)RLMClientResetModeManual == (int)realm::ClientResyncMode::Manual);
 static_assert((int)RLMClientResetModeDiscardLocal == (int)realm::ClientResyncMode::DiscardLocal);
 static_assert((int)RLMClientResetModeRecover == (int)realm::ClientResyncMode::Recover);
 static_assert((int)RLMClientResetModeRecoverOrDiscard == (int)realm::ClientResyncMode::RecoverOrDiscard);
+static_assert((int)RLMClientResetModeManual == (int)realm::ClientResyncMode::Manual);
+
 
 SyncSessionStopPolicy translateStopPolicy(RLMSyncStopPolicy stopPolicy) {
     switch (stopPolicy) {

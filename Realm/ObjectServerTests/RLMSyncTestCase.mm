@@ -256,7 +256,7 @@ static NSURL *syncDirectoryForChildProcess() {
     return error;
 }
 
-- (RLMRealm *)immediatelyOpenRealmForPartitionValue:(nullable id<RLMBSON>)partitionValue user:(RLMUser *)user {
+- (RLMRealm *)immediatelyOpenRealmForPartitionValue:(NSString *)partitionValue user:(RLMUser *)user {
     return [self immediatelyOpenRealmForPartitionValue:partitionValue
                                                   user:user
                                        clientResetMode:RLMClientResetModeRecover];

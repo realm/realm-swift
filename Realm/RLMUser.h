@@ -190,6 +190,32 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (RLMRealmConfiguration *)flexibleSyncConfigurationWithInitialSubscriptions:(RLMFlexibleSyncInitialSubscriptionsBlock)initialSubscriptions
                                                                  rerunOnOpen:(BOOL)rerunOnOpen NS_REFINED_FOR_SWIFT;
+/**
+ Create a flexible sync configuration instance, which can be used to open a Realm that
+ supports flexible sync.
+
+ It won't possible to combine flexible and partition sync in the same app, which means if you open
+ a realm with a flexible sync configuration, you won't be able to open a realm with a PBS configuration
+ and the other way around.
+
+ @param initialSubscriptions A block which receives a subscription set instance, that can be
+                             used to add an initial set of subscriptions which will be executed
+                             when the Realm is first opened.
+ @param clientResetMode Determines file recovery behavior in the event of a client reset.
+                        See: https://docs.mongodb.com/realm/sync/error-handling/client-resets/
+ @param beforeResetBlock A callback which notifies prior to a client reset occurring. See: `RLMClientResetBeforeBlock`
+ @param afterResetBlock A callback which notifies after a client reset has occurred. See: `RLMClientResetAfterBlock`
+ @param rerunOnOpen If true, allows to run the initial set of subscriptions specified, on every app startup.
+                    This can be used to re-run dynamic time ranges and other queries that require a
+                    re-computation of a static variable.
+
+ @return A `RLMRealmConfiguration` instance with a flexible sync configuration.
+ */
+- (RLMRealmConfiguration *)flexibleSyncConfigurationWithInitialSubscriptions:(RLMFlexibleSyncInitialSubscriptionsBlock)initialSubscriptions
+                                                             clientResetMode:(RLMClientResetMode)clientResetMode
+                                                           notifyBeforeReset:(nullable RLMClientResetBeforeBlock)beforeResetBlock
+                                                            notifyAfterReset:(nullable RLMClientResetAfterBlock)afterResetBlock
+                                                                 rerunOnOpen:(BOOL)rerunOnOpen NS_REFINED_FOR_SWIFT;
 
 #pragma mark - Sessions
 

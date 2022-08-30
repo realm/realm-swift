@@ -1055,7 +1055,7 @@ public class RealmServer: NSObject {
         return (syncInfo["is_recovery_mode_disabled"] as? Bool == true)
     }
 
-    public func patchRecoveryMode(flexibleSync: Bool ,disable: Bool, _ appServerId: String, _ syncServiceId: String, _ syncServiceConfiguration: [String: Any], completion: @escaping (Result<Any?, Error>) -> Void) throws {
+    public func patchRecoveryMode(flexibleSync: Bool, disable: Bool, _ appServerId: String, _ syncServiceId: String, _ syncServiceConfiguration: [String: Any], completion: @escaping (Result<Any?, Error>) -> Void) throws {
         // If desired edit is already the case, return
         if try recoveryModeDisabled(flexibleSync: flexibleSync, appServerId: appServerId, syncServiceId: syncServiceId) == disable {
             return
