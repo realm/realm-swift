@@ -253,16 +253,16 @@ public enum ClientResetMode {
     ///  For more details on the second block: ((Realm, Realm) -> Void)? = nil,
     /// - see: `RLMClientResetAfterBlock`
     case discardLocal(((Realm) -> Void)? = nil, ((Realm, Realm) -> Void)? = nil)
-    /// - see: `RLMClientResetModeRecover` for more details on `.recover` behavior
+    /// - see: `RLMClientResetModeRecoverUnsyncedChanges` for more details on `.recover` behavior
     ///
     /// - see `ClientResetMode.discardLocal` above for a detailed explanation of the
     ///   two callback arguments: `((Realm) -> Void)? = nil, ((Realm, Realm) -> Void)? = nil`
-    case recover(((Realm) -> Void)? = nil, ((Realm, Realm) -> Void)? = nil)
-    /// - see: `RLMClientResetModeRecoverOrDiscard` for more details on `.recoverOrDiscard` behavior
+    case recoverUnsyncedChanges(((Realm) -> Void)? = nil, ((Realm, Realm) -> Void)? = nil)
+    /// - see: `RLMClientResetModeRecoverOrDiscardUnsyncedChanges` for more details on `.recoverOrDiscard` behavior
     ///
     /// - see `ClientResetMode.discardLocal` for a detailed explanation of the
     ///   two callback arguments: `((Realm) -> Void)? = nil, ((Realm, Realm) -> Void)? = nil`
-    case recoverOrDiscard(((Realm) -> Void)? = nil, ((Realm, Realm) -> Void)? = nil)
+    case recoverOrDiscardUnsyncedChanges(((Realm) -> Void)? = nil, ((Realm, Realm) -> Void)? = nil)
     /// - see: `RLMClientResetModeManual`
     /// - note: Not supported in Flexible Sync configurations.
     ///
@@ -311,10 +311,10 @@ public enum ClientResetMode {
             return .manual(config.manualClientResetHandler)
         case .discardLocal:
             return .discardLocal(ObjectiveCSupport.convert(object: config.beforeClientReset), ObjectiveCSupport.convert(object: config.afterClientReset))
-        case .recover:
-            return .recover(ObjectiveCSupport.convert(object: config.beforeClientReset), ObjectiveCSupport.convert(object: config.afterClientReset))
-        case .recoverOrDiscard:
-            return .recoverOrDiscard(ObjectiveCSupport.convert(object: config.beforeClientReset), ObjectiveCSupport.convert(object: config.afterClientReset))
+        case .recoverUnsyncedChanges:
+            return .recoverUnsyncedChanges(ObjectiveCSupport.convert(object: config.beforeClientReset), ObjectiveCSupport.convert(object: config.afterClientReset))
+        case .recoverOrDiscardUnsyncedChanges:
+            return .recoverOrDiscardUnsyncedChanges(ObjectiveCSupport.convert(object: config.beforeClientReset), ObjectiveCSupport.convert(object: config.afterClientReset))
         @unknown default:
             fatalError()
         }
@@ -482,14 +482,14 @@ public extension User {
                                           clientResetMode: .discardLocal,
                                           notifyBeforeReset: ObjectiveCSupport.convert(object: beforeClientReset),
                                           notifyAfterReset: ObjectiveCSupport.convert(object: afterClientReset))
-        case .recover(let beforeClientReset, let afterClientReset):
+        case .recoverUnsyncedChanges(let beforeClientReset, let afterClientReset):
             config = self.__configuration(withPartitionValue: ObjectiveCSupport.convert(object: AnyBSON(partitionValue)),
-                                          clientResetMode: .recover,
+                                          clientResetMode: .recoverUnsyncedChanges,
                                           notifyBeforeReset: ObjectiveCSupport.convert(object: beforeClientReset),
                                           notifyAfterReset: ObjectiveCSupport.convert(object: afterClientReset))
-        case .recoverOrDiscard(let beforeClientReset, let afterClientReset):
+        case .recoverOrDiscardUnsyncedChanges(let beforeClientReset, let afterClientReset):
             config = self.__configuration(withPartitionValue: ObjectiveCSupport.convert(object: AnyBSON(partitionValue)),
-                                          clientResetMode: .recoverOrDiscard,
+                                          clientResetMode: .recoverOrDiscardUnsyncedChanges,
                                           notifyBeforeReset: ObjectiveCSupport.convert(object: beforeClientReset),
                                           notifyAfterReset: ObjectiveCSupport.convert(object: afterClientReset))
         }
@@ -933,17 +933,17 @@ extension User {
 
      @return A `Realm.Configuration` instance with a flexible sync configuration.
      */
-    public func flexibleSyncConfiguration(clientResetMode: ClientResetMode = .recover(nil, nil)) -> Realm.Configuration {
+    public func flexibleSyncConfiguration(clientResetMode: ClientResetMode = .recoverUnsyncedChanges(nil, nil)) -> Realm.Configuration {
         var config: RLMRealmConfiguration
         switch clientResetMode {
         case .manual:
             throwRealmException("Manual mode not supported for flexible sync configurations")
         case .discardLocal(let beforeBlock, let afterBlock):
             config = self.__flexibleSyncConfiguration(with: .discardLocal, notifyBeforeReset: ObjectiveCSupport.convert(object: beforeBlock), notifyAfterReset: ObjectiveCSupport.convert(object: afterBlock))
-        case .recover(let beforeBlock, let afterBlock):
-            config = self.__flexibleSyncConfiguration(with: .recover, notifyBeforeReset: ObjectiveCSupport.convert(object: beforeBlock), notifyAfterReset: ObjectiveCSupport.convert(object: afterBlock))
-        case .recoverOrDiscard(let beforeBlock, let afterBlock):
-            config = self.__flexibleSyncConfiguration(with: .recoverOrDiscard, notifyBeforeReset: ObjectiveCSupport.convert(object: beforeBlock), notifyAfterReset: ObjectiveCSupport.convert(object: afterBlock))
+        case .recoverUnsyncedChanges(let beforeBlock, let afterBlock):
+            config = self.__flexibleSyncConfiguration(with: .recoverUnsyncedChanges, notifyBeforeReset: ObjectiveCSupport.convert(object: beforeBlock), notifyAfterReset: ObjectiveCSupport.convert(object: afterBlock))
+        case .recoverOrDiscardUnsyncedChanges(let beforeBlock, let afterBlock):
+            config = self.__flexibleSyncConfiguration(with: .recoverOrDiscardUnsyncedChanges, notifyBeforeReset: ObjectiveCSupport.convert(object: beforeBlock), notifyAfterReset: ObjectiveCSupport.convert(object: afterBlock))
         }
         return ObjectiveCSupport.convert(object: config)
     }
@@ -974,7 +974,7 @@ extension User {
 
      @return A `Realm.Configuration` instance with a flexible sync configuration.
      */
-    public func flexibleSyncConfiguration(clientResetMode: ClientResetMode = .recover(nil, nil), initialSubscriptions: @escaping ((SyncSubscriptionSet) -> Void), rerunOnOpen: Bool = false) -> Realm.Configuration {
+    public func flexibleSyncConfiguration(clientResetMode: ClientResetMode = .recoverUnsyncedChanges(nil, nil), initialSubscriptions: @escaping ((SyncSubscriptionSet) -> Void), rerunOnOpen: Bool = false) -> Realm.Configuration {
         var config: RLMRealmConfiguration
         switch clientResetMode {
         case .manual:
@@ -985,15 +985,15 @@ extension User {
                                                       notifyBeforeReset: ObjectiveCSupport.convert(object: beforeBlock),
                                                       notifyAfterReset: ObjectiveCSupport.convert(object: afterBlock),
                                                       rerunOnOpen: rerunOnOpen)
-        case .recover(let beforeBlock, let afterBlock):
+        case .recoverUnsyncedChanges(let beforeBlock, let afterBlock):
             config = self.__flexibleSyncConfiguration(initialSubscriptions: ObjectiveCSupport.convert(block: initialSubscriptions),
-                                                      clientResetMode: .recover,
+                                                      clientResetMode: .recoverUnsyncedChanges,
                                                       notifyBeforeReset: ObjectiveCSupport.convert(object: beforeBlock),
                                                       notifyAfterReset: ObjectiveCSupport.convert(object: afterBlock),
                                                       rerunOnOpen: rerunOnOpen)
-        case .recoverOrDiscard(let beforeBlock, let afterBlock):
+        case .recoverOrDiscardUnsyncedChanges(let beforeBlock, let afterBlock):
             config = self.__flexibleSyncConfiguration(initialSubscriptions: ObjectiveCSupport.convert(block: initialSubscriptions),
-                                                      clientResetMode: .recoverOrDiscard,
+                                                      clientResetMode: .recoverOrDiscardUnsyncedChanges,
                                                       notifyBeforeReset: ObjectiveCSupport.convert(object: beforeBlock),
                                                       notifyAfterReset: ObjectiveCSupport.convert(object: afterBlock),
                                                       rerunOnOpen: rerunOnOpen)

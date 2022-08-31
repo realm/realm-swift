@@ -82,7 +82,7 @@ using namespace realm;
 }
 
 - (RLMRealmConfiguration *)configurationWithPartitionValue:(nullable id<RLMBSON>)partitionValue {
-    return [self configurationWithPartitionValue:partitionValue clientResetMode:RLMClientResetModeRecover];
+    return [self configurationWithPartitionValue:partitionValue clientResetMode:RLMClientResetModeRecoverUnsyncedChanges];
 }
 
 - (RLMRealmConfiguration *)configurationWithPartitionValue:(nullable id<RLMBSON>)partitionValue

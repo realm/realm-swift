@@ -1477,7 +1477,7 @@ static NSString *randomEmail() {
 
     // Default is recover
     config = [user configurationWithPartitionValue:partitionValue];
-    XCTAssertEqual(config.syncConfiguration.clientResetMode, RLMClientResetModeRecover);
+    XCTAssertEqual(config.syncConfiguration.clientResetMode, RLMClientResetModeRecoverUnsyncedChanges);
 }
 
 - (void)testSetClientResetCallbacks {

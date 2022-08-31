@@ -851,12 +851,12 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         try prepareClientReset(#function, user)
 
         let (assertBeforeBlock, assertAfterBlock) = assertRecover()
-        var configuration = user.configuration(partitionValue: #function, clientResetMode: .recover(assertBeforeBlock, assertAfterBlock))
+        var configuration = user.configuration(partitionValue: #function, clientResetMode: .recoverUnsyncedChanges(assertBeforeBlock, assertAfterBlock))
         configuration.objectTypes = [SwiftPerson.self]
 
         guard let syncConfig = configuration.syncConfiguration else { fatalError("Test condition failure. SyncConfiguration not set.") }
         switch syncConfig.clientResetMode {
-        case .recover(let before, let after):
+        case .recoverUnsyncedChanges(let before, let after):
             XCTAssertNotNil(before)
             XCTAssertNotNil(after)
         default:
@@ -884,12 +884,12 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         // Expect the recovery to fail back to discardLocal logic
         let (assertBeforeBlock, assertAfterBlock) = assertDiscardLocal()
-        var configuration = user.configuration(partitionValue: #function, clientResetMode: .recoverOrDiscard(assertBeforeBlock, assertAfterBlock))
+        var configuration = user.configuration(partitionValue: #function, clientResetMode: .recoverOrDiscardUnsyncedChanges(assertBeforeBlock, assertAfterBlock))
         configuration.objectTypes = [SwiftPerson.self]
 
         guard let syncConfig = configuration.syncConfiguration else { fatalError("Test condition failure. SyncConfiguration not set.") }
         switch syncConfig.clientResetMode {
-        case .recoverOrDiscard(let before, let after):
+        case .recoverOrDiscardUnsyncedChanges(let before, let after):
             XCTAssertNotNil(before)
             XCTAssertNotNil(after)
         default:
@@ -944,13 +944,13 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         try prepareFlexibleClientReset(user)
 
         let (assertBeforeBlock, assertAfterBlock) = assertRecover()
-        var config = user.flexibleSyncConfiguration(clientResetMode: .recover(assertBeforeBlock, assertAfterBlock))
+        var config = user.flexibleSyncConfiguration(clientResetMode: .recoverUnsyncedChanges(assertBeforeBlock, assertAfterBlock))
         config.objectTypes = [SwiftPerson.self]
         guard let syncConfig = config.syncConfiguration else {
             fatalError("Test condition failure. SyncConfiguration not set.")
         }
         switch syncConfig.clientResetMode {
-        case .recover(let before, let after):
+        case .recoverUnsyncedChanges(let before, let after):
             XCTAssertNotNil(before)
             XCTAssertNotNil(after)
         default:
@@ -978,7 +978,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         try prepareFlexibleClientReset(user)
 
         let (assertBeforeBlock, assertAfterBlock) = assertRecover()
-        var config = user.flexibleSyncConfiguration(clientResetMode: .recover(assertBeforeBlock, assertAfterBlock), initialSubscriptions: { subscriptions in
+        var config = user.flexibleSyncConfiguration(clientResetMode: .recoverUnsyncedChanges(assertBeforeBlock, assertAfterBlock), initialSubscriptions: { subscriptions in
             subscriptions.append(QuerySubscription<SwiftPerson>(name: "all_people"))
         })
         config.objectTypes = [SwiftPerson.self]
@@ -986,7 +986,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             fatalError("Test condition failure. SyncConfiguration not set.")
         }
         switch syncConfig.clientResetMode {
-        case .recover(let before, let after):
+        case .recoverUnsyncedChanges(let before, let after):
             XCTAssertNotNil(before)
             XCTAssertNotNil(after)
         default:
@@ -1056,13 +1056,13 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         // Expect the client reset process to discard the local changes
         let (assertBeforeBlock, assertAfterBlock) = assertDiscardLocal()
-        var config = user.flexibleSyncConfiguration(clientResetMode: .recoverOrDiscard(assertBeforeBlock, assertAfterBlock))
+        var config = user.flexibleSyncConfiguration(clientResetMode: .recoverOrDiscardUnsyncedChanges(assertBeforeBlock, assertAfterBlock))
         config.objectTypes = [SwiftPerson.self]
         guard let syncConfig = config.syncConfiguration else {
             fatalError("Test condition failure. SyncConfiguration not set.")
         }
         switch syncConfig.clientResetMode {
-        case .recoverOrDiscard(let before, let after):
+        case .recoverOrDiscardUnsyncedChanges(let before, let after):
             XCTAssertNotNil(before)
             XCTAssertNotNil(after)
         default:
@@ -1096,13 +1096,13 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let pConfig = user.configuration(partitionValue: #function)
 
         switch fConfig.syncConfiguration!.clientResetMode {
-        case .recover:
+        case .recoverUnsyncedChanges:
             return
         default:
             XCTFail("expected recover mode")
         }
         switch pConfig.syncConfiguration!.clientResetMode {
-        case .recover:
+        case .recoverUnsyncedChanges:
             return
         default:
             XCTFail("expected recover mode")

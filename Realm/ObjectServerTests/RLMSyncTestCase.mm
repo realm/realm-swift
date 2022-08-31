@@ -176,7 +176,7 @@ static NSURL *syncDirectoryForChildProcess() {
 - (RLMRealm *)openRealmForPartitionValue:(nullable id<RLMBSON>)partitionValue user:(RLMUser *)user {
     return [self openRealmForPartitionValue:partitionValue
                                        user:user
-                            clientResetMode:RLMClientResetModeRecover
+                            clientResetMode:RLMClientResetModeRecoverUnsyncedChanges
                               encryptionKey:nil
                                  stopPolicy:RLMSyncStopPolicyAfterChangesUploaded];
 }
@@ -197,7 +197,7 @@ static NSURL *syncDirectoryForChildProcess() {
                               stopPolicy:(RLMSyncStopPolicy)stopPolicy {
     return [self openRealmForPartitionValue:partitionValue
                                        user:user
-                            clientResetMode:RLMClientResetModeRecover
+                            clientResetMode:RLMClientResetModeRecoverUnsyncedChanges
                               encryptionKey:encryptionKey
                                  stopPolicy:stopPolicy];
 }
@@ -259,7 +259,7 @@ static NSURL *syncDirectoryForChildProcess() {
 - (RLMRealm *)immediatelyOpenRealmForPartitionValue:(NSString *)partitionValue user:(RLMUser *)user {
     return [self immediatelyOpenRealmForPartitionValue:partitionValue
                                                   user:user
-                                       clientResetMode:RLMClientResetModeRecover];
+                                       clientResetMode:RLMClientResetModeRecoverUnsyncedChanges];
 }
 
 - (RLMRealm *)immediatelyOpenRealmForPartitionValue:(NSString *)partitionValue
@@ -278,7 +278,7 @@ static NSURL *syncDirectoryForChildProcess() {
                                          stopPolicy:(RLMSyncStopPolicy)stopPolicy {
     return [self immediatelyOpenRealmForPartitionValue:partitionValue
                                                   user:user
-                                       clientResetMode:RLMClientResetModeRecover
+                                       clientResetMode:RLMClientResetModeRecoverUnsyncedChanges
                                          encryptionKey:encryptionKey
                                             stopPolicy:RLMSyncStopPolicyAfterChangesUploaded];
 }

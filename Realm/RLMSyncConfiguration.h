@@ -82,9 +82,9 @@ typedef NS_ENUM(NSUInteger, RLMClientResetMode) {
     /// The recovery integration will fail if the "Client Recovery" setting is not enabled on the server.
     /// Integration may also fail in the event of an incompatible schema change.
     ///
-    /// The RLMClientResetModeRecover mode supports two client reset callbacks -- `RLMClientResetBeforeBlock`, `RLMClientResetAfterBlock` -- which can be passed as arguments when creating the `RLMSyncConfiguration`.
+    /// The RLMClientResetModeRecoverUnsyncedChanges mode supports two client reset callbacks -- `RLMClientResetBeforeBlock`, `RLMClientResetAfterBlock` -- which can be passed as arguments when creating the `RLMSyncConfiguration`.
     ///- see: `RLMClientResetAfterBlock` and `RLMClientResetBeforeBlock`
-    RLMClientResetModeRecover,
+    RLMClientResetModeRecoverUnsyncedChanges,
     /// The client device will download a realm with objects reflecting the latest version of the server. A recovery
     /// process is run locally in an attempt to integrate the server version with any local changes from before the
     /// client reset occurred.
@@ -99,9 +99,9 @@ typedef NS_ENUM(NSUInteger, RLMClientResetMode) {
     /// The recovery integration will fail if the "Client Recovery" setting is not enabled on the server.
     /// Integration may also fail in the event of an incompatible schema change.
     ///
-    /// The RLMClientResetModeRecoverOrDiscard mode supports two client reset callbacks -- `RLMClientResetBeforeBlock`, `RLMClientResetAfterBlock` -- which can be passed as arguments when creating the `RLMSyncConfiguration`.
+    /// The RLMClientResetModeRecoverOrDiscardUnsyncedChanges mode supports two client reset callbacks -- `RLMClientResetBeforeBlock`, `RLMClientResetAfterBlock` -- which can be passed as arguments when creating the `RLMSyncConfiguration`.
     ///- see: `RLMClientResetAfterBlock` and `RLMClientResetBeforeBlock`
-    RLMClientResetModeRecoverOrDiscard
+    RLMClientResetModeRecoverOrDiscardUnsyncedChanges
 };
 
 /**
@@ -135,7 +135,7 @@ typedef void(^RLMClientResetAfterBlock)(RLMRealm * _Nonnull beforeFrozen, RLMRea
 
 /**
  An enum which determines file recovery behvaior in the event of a client reset.
- @note: Defaults to `RLMClientResetModeRecover`
+ @note: Defaults to `RLMClientResetModeRecoverUnsycnedChanges`
 
  @see: `RLMClientResetMode`
  @see: https://docs.mongodb.com/realm/sync/error-handling/client-resets/
