@@ -287,7 +287,7 @@ static NSURL *syncDirectoryForChildProcess() {
     NSDictionary *payload = @{
         @"aud": appId,
         @"sub": @"someUserId",
-        @"exp": @1661896476,
+        @"exp": @1961896476,
         @"user_data": @{
             @"name": @"Foo Bar",
             @"occupation": @"firefighter"
