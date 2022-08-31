@@ -951,9 +951,6 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
         switch syncConfig.clientResetMode {
         // ClientResetMode always comes back as .discardLocal because discardLocal and discardUnsyncedChanges assert to the enum value.
-//        case .discardUnsyncedChanges(let before, let after):
-//            XCTAssertNotNil(before)
-//            XCTAssertNotNil(after)
         case .discardLocal(let before, let after):
             XCTAssertNotNil(before)
             XCTAssertNotNil(after)
