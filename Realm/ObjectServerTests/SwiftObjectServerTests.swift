@@ -939,6 +939,41 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
     }
 
+    func testFlexibleSyncDiscardUnsyncedChangesClientReset() throws {
+        let user = try logInUser(for: basicCredentials(app: self.flexibleSyncApp), app: self.flexibleSyncApp)
+        try prepareFlexibleClientReset(user)
+        
+        let (assertBeforeBlock, assertAfterBlock) = assertDiscardLocal()
+        var config = user.flexibleSyncConfiguration(clientResetMode: .discardUnsyncedChanges(assertBeforeBlock, assertAfterBlock))
+        config.objectTypes = [SwiftPerson.self]
+        guard let syncConfig = config.syncConfiguration else {
+            fatalError("Test condition failure. SyncConfiguration not set.")
+        }
+        switch syncConfig.clientResetMode {
+        // ClientResetMode always comes back as .discardLocal because discardLocal and discardUnsyncedChanges assert to the enum value.
+//        case .discardUnsyncedChanges(let before, let after):
+//            XCTAssertNotNil(before)
+//            XCTAssertNotNil(after)
+        case .discardLocal(let before, let after):
+            XCTAssertNotNil(before)
+            XCTAssertNotNil(after)
+        default:
+            XCTFail("Should be set to discardUnsyncedChanges")
+        }
+
+        try autoreleasepool{
+            XCTAssertEqual(user.flexibleSyncConfiguration().fileURL, config.fileURL)
+            let realm = try Realm(configuration: config)
+            let subscriptions = realm.subscriptions
+            XCTAssertEqual(subscriptions.count, 1) // subscription created during prepareFlexibleSyncClientReset
+            XCTAssertEqual(subscriptions.first?.name, "all_people")
+
+            waitForExpectations(timeout: 15.0)
+            XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1)
+            XCTAssertEqual(realm.objects(SwiftPerson.self).first?.firstName, "Paul")
+        }
+    }
+
     func testFlexibleSyncClientResetRecover() throws {
         let user = try logInUser(for: basicCredentials(app: self.flexibleSyncApp), app: self.flexibleSyncApp)
         try prepareFlexibleClientReset(user)

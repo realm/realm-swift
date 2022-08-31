@@ -56,7 +56,7 @@ typedef NS_ENUM(NSUInteger, RLMClientResetMode) {
     /// @note: The `SyncManager.errorHandler` is still invoked under all `RLMSyncError`s *other than* `RLMSyncErrorClientResetError`.
     ///       @see `RLMSyncError` for an exhaustive list.
     /// @note: RLMClientResetModeManual is not supported in Flexible Sync configurations.
-    RLMClientResetModeManual,
+    RLMClientResetModeManual = 0,
     /// All unsynchronized local changes are automatically discarded and the local state is
     /// automatically reverted to the most recent state from the server. Unsynchronized changes
     /// can then be recovered in the post-client-reset callback block.
@@ -67,7 +67,10 @@ typedef NS_ENUM(NSUInteger, RLMClientResetMode) {
     ///
     /// The RLMClientResetModeDiscardLocal mode supports two client reset callbacks -- `RLMClientResetBeforeBlock`, `RLMClientResetAfterBlock` -- which can be passed as arguments when creating the `RLMSyncConfiguration`.
     ///- see: `RLMClientResetAfterBlock` and `RLMClientResetBeforeBlock`
-    RLMClientResetModeDiscardLocal,
+    RLMClientResetModeDiscardLocal __deprecated_enum_msg("Use RLMClientResetModeDiscardUnsyncedChanges") = 1,
+    /// Identical in behavior to RLMClientResetModeDiscardLocal. Will fully replace
+    /// `RLMClientResetModeDiscardLocal` once it's removed.
+    RLMClientResetModeDiscardUnsyncedChanges = 1,
     /// The client device will download a realm with objects reflecting the latest version of the server. A recovery
     /// process is run locally in an attempt to integrate the server version with any local changes from before the
     /// client reset occurred.
@@ -84,7 +87,7 @@ typedef NS_ENUM(NSUInteger, RLMClientResetMode) {
     ///
     /// The RLMClientResetModeRecoverUnsyncedChanges mode supports two client reset callbacks -- `RLMClientResetBeforeBlock`, `RLMClientResetAfterBlock` -- which can be passed as arguments when creating the `RLMSyncConfiguration`.
     ///- see: `RLMClientResetAfterBlock` and `RLMClientResetBeforeBlock`
-    RLMClientResetModeRecoverUnsyncedChanges,
+    RLMClientResetModeRecoverUnsyncedChanges = 2,
     /// The client device will download a realm with objects reflecting the latest version of the server. A recovery
     /// process is run locally in an attempt to integrate the server version with any local changes from before the
     /// client reset occurred.
@@ -101,7 +104,7 @@ typedef NS_ENUM(NSUInteger, RLMClientResetMode) {
     ///
     /// The RLMClientResetModeRecoverOrDiscardUnsyncedChanges mode supports two client reset callbacks -- `RLMClientResetBeforeBlock`, `RLMClientResetAfterBlock` -- which can be passed as arguments when creating the `RLMSyncConfiguration`.
     ///- see: `RLMClientResetAfterBlock` and `RLMClientResetBeforeBlock`
-    RLMClientResetModeRecoverOrDiscardUnsyncedChanges
+    RLMClientResetModeRecoverOrDiscardUnsyncedChanges = 3
 };
 
 /**
