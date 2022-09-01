@@ -80,6 +80,13 @@ NS_ASSUME_NONNULL_BEGIN
                                       encryptionKey:(nullable NSData *)encryptionKey
                                          stopPolicy:(RLMSyncStopPolicy)stopPolicy;
 
+/// Immediately open a synced Realm with encryption key and stop policy.
+- (RLMRealm *)immediatelyOpenRealmForPartitionValue:(nullable id<RLMBSON>)partitionValue
+                                               user:(RLMUser *)user
+                                    clientResetMode:(RLMClientResetMode)clientResetMode
+                                      encryptionKey:(nullable NSData *)encryptionKey
+                                         stopPolicy:(RLMSyncStopPolicy)stopPolicy;
+
 /// Synchronously create, log in, and return a user.
 - (RLMUser *)logInUserForCredentials:(RLMCredentials *)credentials;
 - (RLMUser *)logInUserForCredentials:(RLMCredentials *)credentials app:(RLMApp *)app;
