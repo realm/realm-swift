@@ -335,7 +335,7 @@ def doBuild() {
     }
 
     parallelBuilds["Installation - Mac Catalyst Swift CocoaPods"] = installationTest('catalyst', 'cocoapods', 'swift')
-    parallelBuilds["Installation - iOS XCFramework Evolution"] = xcframeworkEvolutionTest()
+    parallelBuilds["Installation - XCFramework Evolution"] = xcframeworkEvolutionTest()
 
     parallel parallelBuilds
   }

@@ -465,7 +465,7 @@ case "$COMMAND" in
         # set the Xcode version to the oldest
         export REALM_XCODE_VERSION=$REALM_XCODE_OLDEST_VERSION
         unset REALM_SWIFT_VERSION
-        sh build.sh xcframework ios
+        sh build.sh xcframework osx
         # copy the xcframework to the testing target
         rm -rf examples/installation/xcframework-evolution
         mkdir examples/installation/xcframework-evolution
@@ -473,7 +473,7 @@ case "$COMMAND" in
         export REALM_XCODE_VERSION=$REALM_XCODE_LATEST_VERSION
         unset REALM_SWIFT_VERSION
         cd examples/installation
-        sh build.sh "test-ios-swift-xcframework"
+        sh build.sh "test-osx-swift-xcframework"
 
         exit 0
         ;;
