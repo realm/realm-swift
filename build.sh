@@ -469,7 +469,7 @@ case "$COMMAND" in
         # copy the xcframework to the testing target
         rm -rf examples/installation/xcframework-evolution
         mkdir examples/installation/xcframework-evolution
-        cp -r build/*.xcframework examples/installation/xcframework-evolution
+        cp -cr build/*.xcframework examples/installation/xcframework-evolution
         export REALM_XCODE_VERSION=$REALM_XCODE_LATEST_VERSION
         unset REALM_SWIFT_VERSION
         cd examples/installation

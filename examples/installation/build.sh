@@ -108,6 +108,11 @@ xctest() {
         if [ -n "$sha" ]; then
             ex '+%s@branch = master@branch = "'"$sha"'"@' -scwq "$DIRECTORY/$NAME.xcodeproj/project.pbxproj"
         fi
+    elif [[ $NAME == XCFramework* ]]; then
+        if ! [ -d xcframework-evolution ]; then
+            echo 'XCFramework does not exist'
+            exit 1
+        fi
     elif [[ $LANG == swift* ]]; then
         download_zip_if_needed swift
     else
