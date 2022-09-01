@@ -139,6 +139,7 @@ xctest() {
 
     xcodebuild "${project[@]}" "${scheme[@]}" clean build "${destination[@]}" "${code_signing_flags[@]}"
     if [[ $PLATFORM != watchos ]]; then
+        pkill -9 xctest || true
         xcodebuild "${project[@]}" "${scheme[@]}" test "${destination[@]}" "${code_signing_flags[@]}"
     fi
 
