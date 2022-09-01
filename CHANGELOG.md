@@ -23,8 +23,8 @@ x.y.z Release notes (yyyy-MM-dd)
   - These error reporting blocks are invoked in the event of a `RLMSyncErrorClientResetError`.
   - See `ErrorReportingBlock` (`RLMSyncErrorReportingBlock`), and `ClientResetInfo` for more detail.
   - Previously, manual client resets were handled only through the `SyncManager.ErrorHandler`. You have the
-    option, but not the requirement to define manual reset handler in these interfaces,
-    otherwise the `SyncManager.ErrorHandler` is still used.
+    option, but not the requirement, to define manual reset handler in these interfaces.
+    Otherwise, the `SyncManager.ErrorHandler` is still invoked during the manual client reset process.
   - These new interfaces are only invoked during a `RLMSyncErrorClientResetError`. All other sync errors
     are still handled in the `SyncManager.ErrorHandler`.
   - See 'Breaking Changes' for information how these interfaces interact with an already existing
