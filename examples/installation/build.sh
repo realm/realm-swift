@@ -106,7 +106,7 @@ xctest() {
         )
     elif [[ $NAME == SwiftPackageManager* ]]; then
         if [ -n "$sha" ]; then
-            ex '+%s@branch = "master"@branch = "'"$sha"'"@' -scwq "$DIRECTORY/$NAME.xcodeproj/project.pbxproj"
+            ex '+%s@branch = master@branch = "'"$sha"'"@' -scwq "$DIRECTORY/$NAME.xcodeproj/project.pbxproj"
         fi
     elif [[ $LANG == swift* ]]; then
         download_zip_if_needed swift
