@@ -60,7 +60,7 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
         XCTAssert(0 == runChildAndWait(), "Tests in child process failed", file: file, line: line)
     }
 
-    public func basicCredentials(usernameSuffix: String = "", app: App? = nil) -> Credentials {
+    public func basicCredentials(usernameSuffix: String = "", app: RealmSwift.App? = nil) -> Credentials {
         let email = "\(randomString(10))\(usernameSuffix)"
         let password = "abcdef"
         let credentials = Credentials.emailPassword(email: email, password: password)
@@ -118,7 +118,7 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
         return try Realm(configuration: configuration)
     }
 
-    open func logInUser(for credentials: Credentials, app: App? = nil) throws -> User {
+    open func logInUser(for credentials: Credentials, app: RealmSwift.App? = nil) throws -> User {
         var theUser: User!
         let ex = expectation(description: "Should log in the user properly")
 
@@ -267,7 +267,7 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
 
 @available(macOS 12.0, *)
 extension SwiftSyncTestCase {
-    public func basicCredentials(usernameSuffix: String = "", app: App? = nil) async throws -> Credentials {
+    public func basicCredentials(usernameSuffix: String = "", app: RealmSwift.App? = nil) async throws -> Credentials {
         let email = "\(randomString(10))\(usernameSuffix)"
         let password = "abcdef"
         let credentials = Credentials.emailPassword(email: email, password: password)
