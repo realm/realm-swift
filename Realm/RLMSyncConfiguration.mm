@@ -203,7 +203,7 @@ struct AfterClientResetWrapper : CallbackSchema {
     if (!manualClientReset) {
         return;
     } else if (self.clientResetMode != RLMClientResetModeManual) {
-        @throw RLMException(@"message TBD");
+        @throw RLMException(@"A manualClientResetHandler can only be set with RLMClientResetModeManual");
     } else {
         _manualClientResetHandler = manualClientReset;
     }

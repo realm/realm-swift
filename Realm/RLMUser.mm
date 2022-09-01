@@ -111,11 +111,11 @@ using namespace realm;
 
 - (RLMRealmConfiguration *)configurationWithPartitionValue:(nullable id<RLMBSON>)partitionValue
                                            clientResetMode:(RLMClientResetMode)clientResetMode
-                                  manualClientResetHandler:(nullable RLMSyncErrorReportingBlock)manualClientReset {
+                                  manualClientResetHandler:(nullable RLMSyncErrorReportingBlock)manualClientResetHandler {
     auto syncConfig = [[RLMSyncConfiguration alloc] initWithUser:self
                                                   partitionValue:partitionValue];
     syncConfig.clientResetMode = clientResetMode;
-    syncConfig.manualClientResetHandler = manualClientReset;
+    syncConfig.manualClientResetHandler = manualClientResetHandler;
     RLMRealmConfiguration *config = [[RLMRealmConfiguration alloc] init];
     config.syncConfiguration = syncConfig;
     return config;
