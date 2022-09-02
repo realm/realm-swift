@@ -276,7 +276,14 @@ public enum ClientResetMode {
     }
 
     /**
-     An enum which determines file recovery behvaior in the event of a client reset.
+     Returns true if the sync configuration corresponds to a flexible sync App.
+     */
+    internal var isFlexibleSync: Bool {
+        return config.enableFlexibleSync
+    }
+
+    /**
+     An enum which determines file recovery behavior in the event of a client reset.
      - note: Defaults to `.manual`
 
      - see: `ClientResetMode` and `RLMClientResetMode`

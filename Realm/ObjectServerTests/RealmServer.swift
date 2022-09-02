@@ -760,7 +760,7 @@ public class RealmServer: NSObject {
             partitionKeyType = bsonType
         } else {
             syncTypes = schema.objectSchema.filter {
-                let validSyncClasses = ["Dog", "Person", "SwiftPerson", "SwiftTypesSyncObject"]
+                let validSyncClasses = ["Dog", "Person", "SwiftPerson", "SwiftDog", "Bird"]
                 return validSyncClasses.contains($0.className)
             }
             partitionKeyType = nil

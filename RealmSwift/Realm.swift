@@ -1097,7 +1097,7 @@ extension Realm {
      */
     @available(*, message: "This feature is currently in beta.")
     public var subscriptions: SyncSubscriptionSet {
-        return SyncSubscriptionSet(rlmRealm.subscriptions)
+        return SyncSubscriptionSet(rlmRealm.subscriptions, realm: self)
     }
 }
 

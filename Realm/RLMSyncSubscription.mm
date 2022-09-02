@@ -70,6 +70,18 @@
     return RLMStringViewToNSString(_subscription->object_class_name());
 }
 
+- (void)unsubscribeOnComplete:(void(^)(NSError *))completionBlock {
+    [_subscriptionSet update:^{
+        [_subscriptionSet removeSubscription:self];
+    } onComplete:^(NSError* error) {
+        if (error == nil) {
+            completionBlock(nil);
+        } else {
+            completionBlock(error);
+        }
+    }];
+}
+
 - (void)updateSubscriptionWhere:(NSString *)predicateFormat, ... {
     va_list args;
     va_start(args, predicateFormat);
@@ -180,7 +192,6 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
 
 @implementation RLMSyncSubscriptionSet {
     std::mutex _collectionEnumeratorMutex;
-    RLMRealm *_realm;
 }
 
 - (instancetype)initWithSubscriptionSet:(realm::sync::SubscriptionSet)subscriptionSet
@@ -233,6 +244,12 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
 }
 
 - (void)update:(__attribute__((noescape)) void(^)(void))block onComplete:(void(^)(NSError *))completionBlock {
+    return [self update:block queue:nil onComplete:completionBlock];
+}
+
+- (void)update:(__attribute__((noescape)) void(^)(void))block
+        queue:(nullable dispatch_queue_t)queue
+   onComplete:(void(^)(NSError *))completionBlock {
     if (_mutableSubscriptionSet != nil) {
         @throw RLMException(@"Cannot initiate a write transaction on subscription set that is already been updated.");
     }
@@ -247,7 +264,7 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
         NSError *err = [[NSError alloc] initWithDomain:RLMFlexibleSyncErrorDomain code:RLMFlexibleSyncErrorCommitSubscriptionSetError userInfo:@{@"reason":@(error.what())}];
         return completionBlock(err);
     }
-    [self waitForSynchronizationOnQueue:nil completionBlock:completionBlock];
+    [self waitForSynchronizationOnQueue:queue completionBlock:completionBlock];
 }
 
 - (void)waitForSynchronizationOnQueue:(nullable dispatch_queue_t)queue
@@ -272,6 +289,11 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
             }
         });
 }
+
+- (void)write:(__attribute__((noescape)) void(^)(void))block onComplete:(void(^)(NSError *))completionBlock {
+    [self update:block queue:nil onComplete:completionBlock];
+}
+
 
 #pragma mark - Find subscription
 

@@ -32,6 +32,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, readonly) NSString *objectClassName;
 
+- (void)unsubscribeOnComplete:(void(^)(NSError *))completionBlock;
+
 @end
 
 #pragma mark - SubscriptionSet
@@ -49,7 +51,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface RLMSyncSubscriptionSet ()
 
+@property (nonatomic, readonly) RLMRealm *realm;
 @property (readonly) uint64_t version;
+
+- (void)update:(__attribute__((noescape)) void(^)(void))block queue:(nullable dispatch_queue_t)queue onComplete:(void(^)(NSError *))completionBlock;
 
 - (void)addSubscriptionWithClassName:(NSString *)objectClassName
                     subscriptionName:(nullable NSString *)name
