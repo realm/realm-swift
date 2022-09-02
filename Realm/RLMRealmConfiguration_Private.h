@@ -34,8 +34,9 @@ NS_ASSUME_NONNULL_BEGIN
 // Flexible Sync
 @property (nonatomic, readwrite, nullable) RLMFlexibleSyncInitialSubscriptionsBlock initialSubscriptions;
 @property (nonatomic, readwrite) BOOL rerunOnOpen;
+@property (nonatomic, readonly) bool isFlexibleSyncConfiguration;
 
-// Get the default configuration without copying it
+// Get the default confiugration without copying it
 + (RLMRealmConfiguration *)rawDefaultConfiguration;
 
 + (void)resetRealmConfigurationState;

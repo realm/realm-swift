@@ -111,6 +111,7 @@ extension Projection: KeypathSortable {}
  */
 @frozen public struct Results<Element: RealmCollectionValue>: Equatable, RealmCollectionImpl {
     internal let collection: RLMCollection
+    fileprivate var subscription: SyncSubscription?
 
     /// A human-readable description of the objects represented by the results.
     public var description: String {
@@ -144,3 +145,84 @@ extension Projection: KeypathSortable {}
 }
 
 extension Results: Encodable where Element: Encodable {}
+
+#if swift(>=5.6) && canImport(_Concurrency)
+@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+extension Results where Element: RealmFetchable {
+    internal init(_ collection: RLMCollection,
+                  predicate: NSPredicate) async throws {
+        self.collection = collection
+        guard let realm = realm else {
+            fatalError()
+        }
+
+        guard realm.configuration.syncConfiguration?.isFlexibleSync ?? false,
+              realm.subscriptions.first(ofType: Element.self, where: predicate) == nil else {
+            return
+        }
+
+        let subscriptions = realm.subscriptions
+        try await subscriptions.update {
+            subscriptions.append(QuerySubscription<Element>(predicate))
+        }
+
+        self.subscription = realm.subscriptions.first(ofType: Element.self, where: predicate)
+    }
+
+    /**
+     Returns a `Results` containing all objects matching the given query in the collection.
+     This updates the current query for the subscription associated to this result in case of a flexible sync app.
+
+     - Note: See ``Query`` for more information on what query operations are available.
+
+     - parameter isIncluded: The query closure to use to filter the objects.
+     */
+    public func `where`(_ isIncluded: ((Query<Element>) -> Query<Bool>)) async throws -> Results<Element> {
+        return try await filter(isIncluded(Query()).predicate)
+    }
+
+    /**
+     Returns a `Results` containing all objects matching the given query in the collection.
+     This updates the current query for the subscription associated to this result in case of a flexible sync app.
+
+     - Note: See ``Query`` for more information on what query operations are available.
+
+     - parameter predicateFormat: A predicate format string, optionally followed by a variable number of arguments.
+     */
+    public func filter(_ predicateFormat: String, _ args: Any...) async throws -> Results<Element> {
+        return try await filter(NSPredicate(format: predicateFormat, argumentArray: unwrapOptionals(in: args)))
+    }
+
+    /**
+     Returns a `Results` containing all objects matching the given query in the collection.
+     This updates the current query for the subscription associated to this result in case of a flexible sync app.
+
+     - Note: See ``Query`` for more information on what query operations are available.
+
+     - parameter predicate: The predicate to use to filter the objects.
+     */
+    public func filter(_ predicate: NSPredicate) async throws -> Results<Element> {
+        try await unsubscribe()
+        return try await Results<Element>(collection, predicate: predicate)
+    }
+
+    /**
+     Removes the subscription associated to this result from the subscription set.
+     */
+    public func unsubscribe() async throws {
+        guard let realm = realm else {
+            fatalError()
+        }
+
+        guard realm.configuration.syncConfiguration?.isFlexibleSync ?? false,
+            let subscription = subscription else {
+            return
+        }
+
+        let subscriptions = realm.subscriptions
+        try await subscriptions.update {
+            subscriptions.remove(subscription)
+        }
+    }
+}
+#endif // swift(>=5.6)

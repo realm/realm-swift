@@ -88,7 +88,9 @@ struct MainView: View {
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .background(Color.green)
                         .transition(AnyTransition.move(edge: .leading)).animation(.default)
-                case "async_open_flexible_sync":
+                case "async_open_flexible_sync",
+                    "flexible_sync_observed_query_results_state",
+                    "flexible_sync_observed_query_results":
                     AsyncOpenFlexibleSyncView()
                         .environment(\.realmConfiguration, user!.flexibleSyncConfiguration())
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -368,7 +370,7 @@ enum SubscriptionState {
 }
 
 struct AsyncOpenFlexibleSyncView: View {
-    @State var subscriptionState: SubscriptionState = .initial
+    let testType: String = ProcessInfo.processInfo.environment["async_view_type"]!
     @AsyncOpen(appId: ProcessInfo.processInfo.environment["app_id"]!,
                timeout: 2000)
     var asyncOpen
@@ -381,33 +383,18 @@ struct AsyncOpenFlexibleSyncView: View {
             case .waitingForUser:
                 ProgressView("Waiting for user to logged in...")
             case .open(let realm):
-                switch subscriptionState {
-                case .initial:
-                    ProgressView("Subscribing to Query")
-                        .onAppear {
-                            Task {
-                                do {
-                                    let subs = realm.subscriptions
-                                    try await subs.update {
-                                        subs.append(QuerySubscription<SwiftPerson>(name: "person_age") {
-                                            $0.age > 5 && $0.firstName == ProcessInfo.processInfo.environment["firstName"]!
-                                        })
-                                    }
-                                    subscriptionState = .completed
-                                }
-                            }
-                        }
-                case .completed:
-                    VStack {
-                        Button("Navigate Next View") {
-                            subscriptionState = .navigate
-                        }
-                        .accessibilityIdentifier("show_list_button_view")
+                Text("Synced")
+                    .accessibilityIdentifier("flexible_sync_synced")
+                if #available(macOS 12.0, *) {
+                    switch testType {
+                    case "flexible_sync_observed_query_results_state":
+                        ObservedQueryResultsStateView()
+                            .environment(\.realmConfiguration, realm.configuration)
+                    case "flexible_sync_observed_query_results":
+                        ObservedQueryResultsView()
+                            .environment(\.realmConfiguration, realm.configuration)
+                    default: EmptyView()
                     }
-                case .navigate:
-                    ListView()
-                        .environment(\.realm, realm)
-                        .transition(AnyTransition.move(edge: .leading)).animation(.default)
                 }
             case .error(let error):
                 ErrorView(error: error)
@@ -424,7 +411,6 @@ struct AsyncOpenFlexibleSyncView: View {
 }
 
 struct AutoOpenFlexibleSyncView: View {
-    @State var subscriptionState: SubscriptionState = .initial
     @AutoOpen(appId: ProcessInfo.processInfo.environment["app_id"]!,
               timeout: 2000)
     var asyncOpen
@@ -436,35 +422,9 @@ struct AutoOpenFlexibleSyncView: View {
                 ProgressView()
             case .waitingForUser:
                 ProgressView("Waiting for user to logged in...")
-            case .open(let realm):
-                switch subscriptionState {
-                case .initial:
-                    ProgressView("Subscribing to Query")
-                        .onAppear {
-                            Task {
-                                do {
-                                    let subs = realm.subscriptions
-                                    try await subs.update {
-                                        subs.append(QuerySubscription<SwiftPerson>(name: "person_age") {
-                                            $0.age > 2 && $0.firstName == ProcessInfo.processInfo.environment["firstName"]!
-                                        })
-                                    }
-                                    subscriptionState = .completed
-                                }
-                            }
-                        }
-                case .completed:
-                    VStack {
-                        Button("Navigate Next View") {
-                            subscriptionState = .navigate
-                        }
-                        .accessibilityIdentifier("show_list_button_view")
-                    }
-                case .navigate:
-                    ListView()
-                        .environment(\.realm, realm)
-                        .transition(AnyTransition.move(edge: .leading)).animation(.default)
-                }
+            case .open:
+                Text("Synced")
+                    .accessibilityIdentifier("flexible_sync_synced")
             case .error(let error):
                 ErrorView(error: error)
                     .background(Color.red)
@@ -474,6 +434,77 @@ struct AutoOpenFlexibleSyncView: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .background(Color.yellow)
                     .transition(AnyTransition.move(edge: .trailing)).animation(.default)
+            }
+        }
+    }
+}
+
+@available(macOS 12.0, *)
+struct ObservedQueryResultsStateView: View {
+    @ObservedResults(SwiftPerson.self,
+                     where: { $0.age > 18 && $0.firstName == ProcessInfo.processInfo.environment["firstName"]! })
+    var persons
+
+    var body: some View {
+        VStack {
+            switch $persons.state {
+            case .pending:
+                ProgressView()
+            case .completed:
+                List {
+                    ForEach(persons) { person in
+                        Text("\(person.firstName)")
+                    }
+                }
+            case .error(let error):
+                ErrorView(error: error)
+                    .background(Color.red)
+                    .transition(AnyTransition.move(edge: .trailing)).animation(.default)
+            }
+            Spacer()
+            Button("Unsubscribe") {
+                Task {
+                    do {
+                        try await $persons.unsubscribe()
+                    }
+                }
+            }
+            .accessibilityIdentifier("unsubscribe_button")
+        }
+    }
+}
+
+@available(macOS 12.0, *)
+struct ObservedQueryResultsView: View {
+    @ObservedResults(SwiftPerson.self,
+                     where: { $0.age >= 15 && $0.firstName == ProcessInfo.processInfo.environment["firstName"]! })
+    var persons
+    @State var searchFilter: String = ""
+
+    var body: some View {
+        VStack {
+            if persons.isEmpty {
+                ProgressView()
+            } else {
+                List {
+                    ForEach(persons) { person in
+                        HStack {
+                            Text("\(person.firstName)")
+                            Spacer()
+                            Text("\(person.age)")
+                        }
+                    }
+                    .searchable(text: $searchFilter,
+                                collection: $persons,
+                                keyPath: \.lastName)
+                }
+            }
+        }
+        .onDisappear {
+            Task {
+                do {
+                    try await $persons.unsubscribe()
+                }
             }
         }
     }
@@ -499,6 +530,6 @@ struct ListView: View {
                 Text("\(object.firstName)")
             }
         }
-        .navigationTitle("SwiftHugeSyncObject's List")
+        .navigationTitle("SwiftPerson's List")
     }
 }
