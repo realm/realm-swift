@@ -38,13 +38,6 @@
 
 #if TARGET_OS_OSX
 
-@interface RealmServer : NSObject
-+ (RealmServer *)shared;
-+ (bool)haveServer;
-- (NSString *)createAppAndReturnError:(NSError **)error;
-- (NSString *)createAppWithQueryableFields:(NSArray *)queryableFields error:(NSError **)error;
-@end
-
 // Set this to 1 if you want the test ROS instance to log its debug messages to console.
 #define LOG_ROS_OUTPUT 0
 
@@ -84,7 +77,6 @@
     }
 }
 @end
-
 
 static NSURL *syncDirectoryForChildProcess() {
     NSString *path = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES)[0];

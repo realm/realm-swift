@@ -356,6 +356,10 @@ id RLMCreateManagedAccessor(Class cls, RLMClassInfo *info) {
     return false;
 }
 
++ (bool)isAsymmetric {
+    return false;
+}
+
 - (id)mutableArrayValueForKey:(NSString *)key {
     id obj = [self valueForKey:key];
     if ([obj isKindOfClass:[RLMArray class]]) {
@@ -787,5 +791,15 @@ uint64_t RLMObjectBaseGetCombineId(__unsafe_unretained RLMObjectBase *const obj)
 @implementation RealmSwiftEmbeddedObject
 + (BOOL)accessInstanceVariablesDirectly {
     return NO;
+}
+@end
+
+@implementation RealmSwiftAsymmetricObject
++ (BOOL)accessInstanceVariablesDirectly {
+    return NO;
+}
+
++ (bool)isAsymmetric {
+    return YES;
 }
 @end

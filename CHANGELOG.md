@@ -1,7 +1,24 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+* Add support for asymmetric sync. When a class inherits from
+  `AsymmetricObject`, objects created are synced unidirectionally to the server
+  and cannot be queried or read locally.
+  
+```swift
+    class PersonObject: AsymmetricObject {
+       @Persisted(primaryKey: true) var _id: ObjectId
+       @Persisted var name: String
+       @Persisted var age: Int
+    }
+    
+    try realm.write {
+       // This will create the object on the server but not locally.
+       realm.create(PersonObject.self, value: ["_id": ObjectId.generate(),
+                                               "name": "Dylan",
+                                               "age": 20])
+    }
+```
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)

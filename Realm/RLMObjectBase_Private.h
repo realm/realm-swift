@@ -28,6 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (void)initializeLinkedObjectSchemas;
 + (bool)isEmbedded;
++ (bool)isAsymmetric;
 
 @end
 

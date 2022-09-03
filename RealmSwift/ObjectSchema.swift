@@ -48,6 +48,12 @@ import Realm.Private
     /// The object class the schema describes.
     public var objectClass: AnyClass { return rlmObjectSchema.objectClass }
 
+    /// Whether this object is embedded.
+    public var isEmbedded: Bool { return rlmObjectSchema.isEmbedded }
+
+    /// Whether this object is asymmetric.
+    public var isAsymmetric: Bool { return rlmObjectSchema.isAsymmetric }
+
     /// The property which serves as the primary key for the class the schema describes, if any.
     public var primaryKeyProperty: Property? {
         if let rlmProperty = rlmObjectSchema.primaryKeyProperty {

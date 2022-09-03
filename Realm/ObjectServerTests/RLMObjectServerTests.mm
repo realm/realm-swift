@@ -45,13 +45,6 @@
 
 #pragma mark - Helpers
 
-// These are defined in Swift. Importing the auto-generated header doesn't work
-// when building with SPM, so just redeclare the bits we need.
-@interface RealmServer : NSObject
-+ (RealmServer *)shared;
-- (NSString *)createAppAndReturnError:(NSError **)error;
-@end
-
 @interface TimeoutProxyServer : NSObject
 - (instancetype)initWithPort:(uint16_t)port targetPort:(uint16_t)targetPort;
 - (void)startAndReturnError:(NSError **)error;
@@ -1879,6 +1872,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 
     RLMRealmConfiguration *localConfig = [RLMRealmConfiguration new];
     localConfig.fileURL = RLMTestRealmURL();
+    localConfig.objectClasses = @[Person.self];
     localConfig.schemaVersion = 1;
 
     RLMRealm *localCopy = [RLMRealm realmWithConfiguration:localConfig error:nil];
