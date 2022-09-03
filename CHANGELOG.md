@@ -13,9 +13,10 @@ x.y.z Release notes (yyyy-MM-dd)
     }
     
     try realm.write {
-       let person = PersonObject(name: "Dylan", age: 20, isFavorite: true)
        // This will create the object on the server but not locally.
-       realm.create(person)
+       realm.create(PersonObject.self, value: ["_id": ObjectId.generate(),
+                                               "name": "Dylan",
+                                               "age": 20])
     }
 ```
 
