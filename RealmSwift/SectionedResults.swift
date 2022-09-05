@@ -24,7 +24,7 @@ import Realm
  `SectionedResults` and `ResultSection`.
  */
 public protocol RealmSectionedResult: RandomAccessCollection, Equatable, ThreadConfined {
-
+    associatedtype Key: _Persistable, Hashable
     // MARK: Properties
 
     /// The Realm which manages the collection, or `nil` if the collection is invalidated.
@@ -73,10 +73,15 @@ public protocol RealmSectionedResult: RandomAccessCollection, Equatable, ThreadC
     /// :nodoc:
     func observe(on queue: DispatchQueue?,
                  _ block: @escaping (RealmSectionedResultsChange<Self>) -> Void) -> NotificationToken
+}
+
+extension RealmSectionedResult where Element: RLMObjectBase {
     /// :nodoc:
-    func observe<T: ObjectBase>(keyPaths: [PartialKeyPath<T>],
-                                on queue: DispatchQueue?,
-                                _ block: @escaping (RealmSectionedResultsChange<Self>) -> Void) -> NotificationToken
+    func observe(keyPaths: [PartialKeyPath<Element>],
+                 on queue: DispatchQueue?,
+                 _ block: @escaping (RealmSectionedResultsChange<Self>) -> Void) -> NotificationToken {
+        fatalError("abstract")
+    }
 }
 
 /**
@@ -147,7 +152,7 @@ extension RealmSectionedResultImpl {
 /// `SectionedResults` is a type safe collection which holds individual `ResultsSection`s as its elements.
 /// The container is lazily evaluated, meaning that if the underlying collection has changed a full recalculation of the section keys will take place.
 /// A `SectionedResults` instance can be observed and it also conforms to `ThreadConfined`.
-public struct SectionedResults<Key: _Persistable & Hashable, T: RealmCollectionValue>: RealmSectionedResultImpl {
+public struct SectionedResults<Key: _Persistable & Hashable, Element: RealmCollectionValue>: RealmSectionedResultImpl {
     /// :nodoc:
     internal var collection: RLMSectionedResults<RLMValue, RLMValue>
     /// :nodoc:
@@ -169,15 +174,15 @@ public struct SectionedResults<Key: _Persistable & Hashable, T: RealmCollectionV
      Returns the section at the given `index`.
      - parameter index: The index.
      */
-    public subscript(_ index: Int) -> ResultsSection<Key, T> {
-        return ResultsSection<Key, T>(rlmSectionedResult: collection[UInt(index)])
+    public subscript(_ index: Int) -> ResultsSection<Key, Element> {
+        return ResultsSection<Key, Element>(rlmSectionedResult: collection[UInt(index)])
     }
 
     /**
      Returns the object at the given `IndexPath`.
      - parameter indexPath: The IndexPath.
      */
-    public subscript(_ indexPath: IndexPath) -> T {
+    public subscript(_ indexPath: IndexPath) -> Element {
         return self[indexPath.section][indexPath.item]
     }
 
@@ -280,6 +285,8 @@ public struct SectionedResults<Key: _Persistable & Hashable, T: RealmCollectionV
      would *not* trigger the block.
      Any insertion or removal to the `Dog` type collection being observed
      would still trigger a notification.
+     - Any modification to the section key path property which results in the object changing
+     position in the section, or changing section entirely will trigger a notification.
 
      - note: Multiple notification tokens on the same object which filter for
      separate key paths *do not* filter exclusively. If one key path
@@ -405,6 +412,8 @@ public struct SectionedResults<Key: _Persistable & Hashable, T: RealmCollectionV
      would *not* trigger the block.
      Any insertion or removal to the `Dog` type collection being observed
      would still trigger a notification.
+     - Any modification to the section key path property which results in the object changing
+     position in the section, or changing section entirely will trigger a notification.
 
      - note: Multiple notification tokens on the same object which filter for
      separate key paths *do not* filter exclusively. If one key path
@@ -426,6 +435,18 @@ public struct SectionedResults<Key: _Persistable & Hashable, T: RealmCollectionV
         return collection.addNotificationBlock(wrapObserveBlock(block), keyPaths: nil, queue: queue)
     }
 
+    /// :nodoc:
+    public func makeIterator() -> RLMSectionedResultsIterator<Key, Element> {
+        return RLMSectionedResultsIterator(collection: collection)
+    }
+
+    /// :nodoc:
+    public static func == (lhs: SectionedResults<Key, Element>, rhs: SectionedResults<Key, Element>) -> Bool {
+        return lhs.collection == rhs.collection
+    }
+}
+
+extension SectionedResults where Element: RLMObjectBase {
     /**
      Registers a block to be called each time the sectioned results collection changes.
 
@@ -523,6 +544,8 @@ public struct SectionedResults<Key: _Persistable & Hashable, T: RealmCollectionV
      would *not* trigger the block.
      Any insertion or removal to the `Dog` type collection being observed
      would still trigger a notification.
+     - Any modification to the section key path property which results in the object changing
+     position in the section, or changing section entirely will trigger a notification.
 
      - note: Multiple notification tokens on the same object which filter for
      separate key paths *do not* filter exclusively. If one key path
@@ -542,28 +565,18 @@ public struct SectionedResults<Key: _Persistable & Hashable, T: RealmCollectionV
      - parameter block: The block to be called whenever a change occurs.
      - returns: A token which must be held for as long as you want updates to be delivered.
      */
-    public func observe<T: ObjectBase>(keyPaths: [PartialKeyPath<T>],
-                                       on queue: DispatchQueue? = nil,
-                                       _ block: @escaping (RealmSectionedResultsChange<Self>) -> Void) -> NotificationToken {
+    public func observe(keyPaths: [PartialKeyPath<Element>],
+                        on queue: DispatchQueue? = nil,
+                        _ block: @escaping (RealmSectionedResultsChange<Self>) -> Void) -> NotificationToken {
         return collection.addNotificationBlock(wrapObserveBlock(block), keyPaths: keyPaths.map(_name(for:)), queue: queue)
     }
-
-    /// :nodoc:
-    public func makeIterator() -> RLMSectionedResultsIterator<Key, T> {
-        return RLMSectionedResultsIterator(collection: collection)
-    }
-
-    /// :nodoc:
-    public static func == (lhs: SectionedResults<Key, T>, rhs: SectionedResults<Key, T>) -> Bool {
-        return lhs.collection == rhs.collection
-    }
 }
-
 
 /// `ResultsSection` is a collection which allows access  to objects that belong to a given section key.
 /// The collection is lazily evaluated, meaning that if the underlying collection has changed a full recalculation of the section keys will take place.
 /// A `ResultsSection` instance can be observed and it also conforms to `ThreadConfined`.
-public struct ResultsSection<Key: _Persistable & Hashable, T: RealmCollectionValue>: RealmSectionedResultImpl, Identifiable {
+public struct ResultsSection<Key: _Persistable & Hashable, T: RealmCollectionValue>: RealmSectionedResultImpl {
+    public typealias Element = T
     /// :nodoc:
     internal var collection: RLMSection<RLMValue, RLMValue>
     /// :nodoc:
@@ -690,6 +703,8 @@ public struct ResultsSection<Key: _Persistable & Hashable, T: RealmCollectionVal
      would *not* trigger the block.
      Any insertion or removal to the `Dog` type collection being observed
      would still trigger a notification.
+     - Any modification to the section key path property which results in the object changing
+     position in the section, or changing section entirely will trigger a notification.
 
      - note: Multiple notification tokens on the same object which filter for
      separate key paths *do not* filter exclusively. If one key path
@@ -814,6 +829,8 @@ public struct ResultsSection<Key: _Persistable & Hashable, T: RealmCollectionVal
      would *not* trigger the block.
      Any insertion or removal to the `Dog` type collection being observed
      would still trigger a notification.
+     - Any modification to the section key path property which results in the object changing
+     position in the section, or changing section entirely will trigger a notification.
 
      - note: Multiple notification tokens on the same object which filter for
      separate key paths *do not* filter exclusively. If one key path
@@ -834,6 +851,19 @@ public struct ResultsSection<Key: _Persistable & Hashable, T: RealmCollectionVal
                         _ block: @escaping (RealmSectionedResultsChange<Self>) -> Void) -> NotificationToken {
         return collection.addNotificationBlock(wrapObserveBlock(block), keyPaths: nil, queue: queue)
     }
+
+    /// :nodoc:
+    public func makeIterator() -> RLMSectionIterator<Element> {
+        return RLMSectionIterator(collection: collection)
+    }
+
+    /// :nodoc:
+    public static func == (lhs: ResultsSection<Key, Element>, rhs: ResultsSection<Key, Element>) -> Bool {
+        return lhs.collection == rhs.collection
+    }
+}
+
+extension ResultsSection where T: RLMObjectBase {
     /**
      Registers a block to be called each time the sectioned results collection changes.
 
@@ -931,6 +961,8 @@ public struct ResultsSection<Key: _Persistable & Hashable, T: RealmCollectionVal
      would *not* trigger the block.
      Any insertion or removal to the `Dog` type collection being observed
      would still trigger a notification.
+     - Any modification to the section key path property which results in the object changing
+     position in the section, or changing section entirely will trigger a notification.
 
      - note: Multiple notification tokens on the same object which filter for
      separate key paths *do not* filter exclusively. If one key path
@@ -950,22 +982,15 @@ public struct ResultsSection<Key: _Persistable & Hashable, T: RealmCollectionVal
      - parameter block: The block to be called whenever a change occurs.
      - returns: A token which must be held for as long as you want updates to be delivered.
      */
-    public func observe<T: ObjectBase>(keyPaths: [PartialKeyPath<T>],
-                                       on queue: DispatchQueue? = nil,
-                                       _ block: @escaping (RealmSectionedResultsChange<Self>) -> Void) -> NotificationToken {
+    public func observe(keyPaths: [PartialKeyPath<Element>],
+                        on queue: DispatchQueue? = nil,
+                        _ block: @escaping (RealmSectionedResultsChange<Self>) -> Void) -> NotificationToken {
         return collection.addNotificationBlock(wrapObserveBlock(block), keyPaths: keyPaths.map(_name(for:)), queue: queue)
     }
-
-    /// :nodoc:
-    public func makeIterator() -> RLMSectionIterator<T> {
-        return RLMSectionIterator(collection: collection)
-    }
-
-    /// :nodoc:
-    public static func == (lhs: ResultsSection<Key, T>, rhs: ResultsSection<Key, T>) -> Bool {
-        return lhs.collection == rhs.collection
-    }
 }
+
+@available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
+extension ResultsSection: Identifiable { }
 
 @frozen public enum RealmSectionedResultsChange<Collection> {
     /**

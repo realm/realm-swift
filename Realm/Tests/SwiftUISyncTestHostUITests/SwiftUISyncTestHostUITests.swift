@@ -248,7 +248,6 @@ extension SwiftUISyncTestHostUITests {
         XCTAssertEqual(table.cells.count, 4)
         XCTAssertEqual(table.staticTexts.count, 4)
 
-
         loginUser(.second)
 
         // Query for button to start syncing

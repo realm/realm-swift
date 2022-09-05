@@ -191,6 +191,7 @@ x.y.z Release notes (yyyy-MM-dd)
 
 * Greatly improve the performance of obtaining cached Realm instances in Swift
   when using a sync configuration.
+
 ### Fixed
 
 * Add missing `initialSubscription` and `rerunOnOpen` to copyWithZone method on

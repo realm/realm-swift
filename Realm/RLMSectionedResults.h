@@ -346,6 +346,11 @@ NS_ASSUME_NONNULL_BEGIN
           containing Realm is read-only.
  @warning The queue must be a serial queue.
 
+ @note When filtering with key paths a notification will be fired in the following scenarios:
+    - An object in the collection has been modified at the filtered properties.
+    - An object has been modified on the section key path property, and the result of that modification has changed it's position in the section, or the object may need to move to another section.
+    - An object of the same observed type has been inserted or deleted from the Realm.
+
  @param block The block to be called whenever a change occurs.
  @param keyPaths The block will be called for changes occurring on these keypaths. If no
  key paths are given, notifications are delivered for every property key path.
@@ -584,6 +589,11 @@ NS_ASSUME_NONNULL_BEGIN
           containing Realm is read-only.
  @warning The queue must be a serial queue.
 
+ @note When filtering with key paths a notification will be fired in the following scenarios:
+    - An object in the collection has been modified at the filtered properties.
+    - An object has been modified on the section key path property, and the result of that modification has changed it's position in the section, or the object may need to move to another section.
+    - An object of the same observed type has been inserted or deleted from the Realm.
+
  @param block The block to be called whenever a change occurs.
  @param keyPaths The block will be called for changes occurring on these keypaths. If no
  key paths are given, notifications are delivered for every property key path.
@@ -647,6 +657,11 @@ NS_ASSUME_NONNULL_BEGIN
  @warning This method cannot be called during a write transaction, or when the
           containing Realm is read-only.
  @warning The queue must be a serial queue.
+
+ @note When filtering with key paths a notification will be fired in the following scenarios:
+    - An object in the collection has been modified at the filtered properties.
+    - An object has been modified on the section key path property, and the result of that modification has changed it's position in the section, or the object may need to move to another section.
+    - An object of the same observed type has been inserted or deleted from the Realm.
 
  @param block The block to be called whenever a change occurs.
  @param keyPaths The block will be called for changes occurring on these keypaths. If no
@@ -879,6 +894,11 @@ NS_ASSUME_NONNULL_BEGIN
           containing Realm is read-only.
  @warning The queue must be a serial queue.
 
+ @note When filtering with key paths a notification will be fired in the following scenarios:
+    - An object in the collection has been modified at the filtered properties.
+    - An object has been modified on the section key path property, and the result of that modification has changed it's position in the section, or the object may need to move to another section.
+    - An object of the same observed type has been inserted or deleted from the Realm.
+
  @param block The block to be called whenever a change occurs.
  @param keyPaths The block will be called for changes occurring on these keypaths. If no
  key paths are given, notifications are delivered for every property key path.
@@ -940,6 +960,11 @@ NS_ASSUME_NONNULL_BEGIN
  @warning This method cannot be called during a write transaction, or when the
           containing Realm is read-only.
  @warning The queue must be a serial queue.
+
+ @note When filtering with key paths a notification will be fired in the following scenarios:
+    - An object in the collection has been modified at the filtered properties.
+    - An object has been modified on the section key path property, and the result of that modification has changed it's position in the section, or the object may need to move to another section.
+    - An object of the same observed type has been inserted or deleted from the Realm.
 
  @param block The block to be called whenever a change occurs.
  @param keyPaths The block will be called for changes occurring on these keypaths. If no

@@ -525,6 +525,6 @@ struct SectionedResultsView: View {
                 }
             }
         }
-        .navigationTitle("SwiftHugeSyncObject's List")
+        .navigationTitle("SwiftPerson's List")
     }
 }

@@ -412,7 +412,7 @@ class SwiftUITests: XCTestCase {
 
     func testKeyPathObservedSectionedResults2() {
         // Tests ObservedSectionedResults ctor that uses the `sectionBlock` param.
-        app.launchEnvironment["test_type"] = "observed_sectioned_results_key_path2"
+        app.launchEnvironment["test_type"] = "observed_sectioned_results_sort_descriptors"
         app.launch()
 
         let addButton = app.buttons["addList"]

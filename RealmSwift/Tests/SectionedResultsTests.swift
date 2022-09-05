@@ -410,6 +410,93 @@ class SectionedResultsTests: SectionedResultsTestsBase {
         token2.invalidate()
     }
 
+    func testObserveWithKeyPathFilter() {
+        createObjects()
+        let realm = try! Realm()
+        let results = realm.objects(ModernAllTypesObject.self)
+        let sectionedResults = results.sectioned(by: \.firstLetter, ascending: true)
+
+        let ex = expectation(description: "notifications")
+        ex.expectedFulfillmentCount = 3
+        let token = sectionedResults.observe(keyPaths: [\.boolCol]) { (changes: RealmSectionedResultsChange) in
+            switch changes {
+            case .error:
+                XCTFail("Shouldn't happen")
+            default:
+                ex.fulfill()
+            }
+        }
+
+        let obj = results.where { $0.stringCol.starts(with: "a") }[0]
+        // Expect notification as changing sections.
+        try! realm.write {
+            obj.stringCol = "box"
+        }
+        // Expect notification as the observed property is modified.
+        try! realm.write {
+            obj.boolCol = true
+        }
+        waitForExpectations(timeout: 1.0)
+
+        let exRealm = expectation(description: "notifications")
+        exRealm.expectedFulfillmentCount = 2
+        let realmToken = realm.observe { _, _ in
+            exRealm.fulfill()
+        }
+        // Expect no notification as the object will not change sections.
+        try! realm.write {
+            obj.stringCol = "box"
+        }
+        try! realm.write {
+            obj.stringCol = "box"
+        }
+        waitForExpectations(timeout: 1)
+
+        token.invalidate()
+        realmToken.invalidate()
+    }
+
+    func testObserveWithKeyPathFilterOnSection() {
+        createObjects()
+        let realm = try! Realm()
+        let results = realm.objects(ModernAllTypesObject.self)
+        let sectionedResults = results.sectioned(by: \.firstLetter, ascending: true)[0]
+
+        let ex = expectation(description: "notifications")
+        ex.expectedFulfillmentCount = 2
+        let token = sectionedResults.observe(keyPaths: [\.boolCol]) { (changes: RealmSectionedResultsChange) in
+            switch changes {
+            case .error:
+                XCTFail("Shouldn't happen")
+            default:
+                ex.fulfill()
+            }
+        }
+
+        let obj = results.where { $0.stringCol.starts(with: "a") }[0]
+        try! realm.write {
+            obj.boolCol = false
+        }
+        waitForExpectations(timeout: 1.0)
+
+        let exRealm = expectation(description: "notifications")
+        exRealm.expectedFulfillmentCount = 2
+        let realmToken = realm.observe { _, _ in
+            exRealm.fulfill()
+        }
+        // Expect no notification as the object will not change sections.
+        try! realm.write {
+            obj.intCol = 123
+        }
+        try! realm.write {
+            obj.intCol = 456
+        }
+        waitForExpectations(timeout: 1)
+
+        token.invalidate()
+        realmToken.invalidate()
+    }
+
     func testObserveOnQueue() {
         createObjects()
         let realm = try! Realm()
@@ -418,7 +505,7 @@ class SectionedResultsTests: SectionedResultsTestsBase {
         let sema = DispatchSemaphore(value: 0)
         let queue = DispatchQueue(label: "background")
         var firstRun = true
-        let token = sectionedResults.observe(keyPaths: [\ModernAllTypesObject.stringCol],
+        let token = sectionedResults.observe(keyPaths: [\.stringCol],
                                              on: queue) { (changes: RealmSectionedResultsChange) in
             switch changes {
             case .initial(let collection):
@@ -480,7 +567,7 @@ class SectionedResultsTests: SectionedResultsTestsBase {
 
         var firstRun = true
         // Only get notifications for key 'a'.
-        let token1 = section1.observe(keyPaths: [\ModernAllTypesObject.stringCol]) { (changes: RealmSectionedResultsChange) in
+        let token1 = section1.observe(keyPaths: [\.stringCol]) { (changes: RealmSectionedResultsChange) in
             switch changes {
             case .initial(let collection):
                 XCTAssertEqual(collection.count, 1)
@@ -503,7 +590,7 @@ class SectionedResultsTests: SectionedResultsTestsBase {
         }
 
         // Only get notifications for key 'b'.
-        let token2 = section2.observe(keyPaths: [\ModernAllTypesObject.stringCol]) { (changes: RealmSectionedResultsChange) in
+        let token2 = section2.observe(keyPaths: [\.stringCol]) { (changes: RealmSectionedResultsChange) in
             switch changes {
             case .initial(let collection):
                 if firstRun {
@@ -566,7 +653,7 @@ class SectionedResultsTests: SectionedResultsTestsBase {
         let queue = DispatchQueue(label: "background")
         var firstRun = true
         // Only get notifications for key 'a'.
-        let token1 = section1.observe(keyPaths: [\ModernAllTypesObject.stringCol],
+        let token1 = section1.observe(keyPaths: [\.stringCol],
                                       on: queue) { (changes: RealmSectionedResultsChange) in
             switch changes {
             case .initial(let collection):
@@ -592,7 +679,7 @@ class SectionedResultsTests: SectionedResultsTestsBase {
         }
         sema1.wait()
         // Only get notifications for key 'b'.
-        let token2 = section2.observe(keyPaths: [\ModernAllTypesObject.stringCol],
+        let token2 = section2.observe(keyPaths: [\.stringCol],
                                       on: queue) { (changes: RealmSectionedResultsChange) in
             switch changes {
             case .initial(let collection):
