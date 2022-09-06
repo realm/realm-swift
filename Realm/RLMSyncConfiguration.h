@@ -49,7 +49,7 @@ typedef NS_ENUM(NSUInteger, RLMClientResetMode) {
     ///  1. As an ErrorReportingBlock argument at `RLMSyncConfiguration.manualClientResetHandler`.
     ///  2. As an ErrorReportingBlock in the `SyncManager.errorHandler` property.  - see: `RLMSyncManager.errorHandler`
     ///
-    ///  During an `RLMSyncErrorClientResetError` the block executed is determined by the following rules
+    ///  When an `RLMSyncErrorClientResetError` is thrown, the following rules determine which block is executed:
     ///  - If an error reporting block is set in `.manualClientResetHandler` and the `SyncManager`, the `.manualClientResetHandler` block will be executed.
     ///  - If an error reporting block is set in either the `.manualClientResetHandler` or the `SyncManager`, but not both, wheverever the block was set will execute.
     ///  - If no block is set in either location, the client reset will not be handled. The application will likely need to be restarted and unsynced local changes may be lost.

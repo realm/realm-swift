@@ -313,7 +313,9 @@ public enum ClientResetMode {
         switch config.clientResetMode {
         case .manual:
             return .manual(config.manualClientResetHandler)
-        case .discardLocal, .discardUnsyncedChanges:
+        case .discardLocal:
+            return .discardLocal(ObjectiveCSupport.convert(object: config.beforeClientReset), ObjectiveCSupport.convert(object: config.afterClientReset))
+        case .discardUnsyncedChanges:
             return .discardUnsyncedChanges(ObjectiveCSupport.convert(object: config.beforeClientReset), ObjectiveCSupport.convert(object: config.afterClientReset))
         case .recoverUnsyncedChanges:
             return .recoverUnsyncedChanges(ObjectiveCSupport.convert(object: config.beforeClientReset), ObjectiveCSupport.convert(object: config.afterClientReset))

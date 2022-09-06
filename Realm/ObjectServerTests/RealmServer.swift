@@ -1057,7 +1057,7 @@ public class RealmServer: NSObject {
         app.services[syncServiceId].config.patch(syncConfig, completion)
     }
 
-    public func recoveryModeDisabled(flexibleSync: Bool, appServerId: String, syncServiceId: String) throws -> Bool {
+    public func isRecoveryModeDisabled(flexibleSync: Bool, appServerId: String, syncServiceId: String) throws -> Bool {
         guard let session = session else {
             fatalError()
         }
@@ -1072,7 +1072,7 @@ public class RealmServer: NSObject {
 
     public func patchRecoveryMode(flexibleSync: Bool, disable: Bool, _ appServerId: String, _ syncServiceId: String, _ syncServiceConfiguration: [String: Any], completion: @escaping (Result<Any?, Error>) -> Void) throws {
         // If desired edit is already the case, return
-        if try recoveryModeDisabled(flexibleSync: flexibleSync, appServerId: appServerId, syncServiceId: syncServiceId) == disable {
+        if try isRecoveryModeDisabled(flexibleSync: flexibleSync, appServerId: appServerId, syncServiceId: syncServiceId) == disable {
             return
         }
         let configOption = flexibleSync ? "flexible_sync" : "sync"
