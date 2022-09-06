@@ -24,7 +24,6 @@ import RealmSwift
 #if canImport(RealmTestSupport)
 import RealmTestSupport
 import RealmSyncTestSupport
-import SwiftUI
 #endif
 
 public extension User {

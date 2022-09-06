@@ -20,16 +20,18 @@ x.y.z Release notes (yyyy-MM-dd)
     }
 ```
 * Add `.recoverUnsyncedChanges` (`RLMClientResetModeRecoverUnsyncedChanges`) and
-`.recoverOrDiscardUnsyncedChanges` behaviors to `ClientResetMode` (`RLMClientResetMode`).
-  - The new recover modes function by downloading a realm with objects which reflect the latest
-    version of the server after a client reset. A recovery process is run locally in an
-    attempt to integrate the server version with any local changes from before the
+`.recoverOrDiscardUnsyncedChanges` (`RLMClientResetModeRecoverOrDiscardUnsyncedChanges`) behaviors to `ClientResetMode` (`RLMClientResetMode`).
+  - The newly added recover modes function by downloading a realm which reflects the latest
+    state of the server after a client reset. A recovery process is run locally in an
+    attempt to integrate the server state with any local changes from before the
     client reset occurred.
     The changes are integrated with the following rules:
     1. Objects created locally that were not synced before client reset will be integrated.
     2. If an object has been deleted on the server, but was modified on the client, the delete takes precedence and the update is discarded
     3. If an object was deleted on the client, but not the server, then the client delete instruction is applied.
     4. In the case of conflicting updates to the same field, the most recent update is applied.
+  - The client reset process will fallback to `ClientResetMode.discardUnsyncedChanges` if the recovery process fails in `.recoverOrDiscardUnsyncedChanges`.
+  - The client reset process will fallback to `ClientResetMode.manual` if the recovery process fails in `.recoverUnsyncedChanges`.
   - The two new swift recovery modes support client reset callbacks: `.recoverUnsyncedChanges(((Realm) -> Void)? = nil, ((Realm, Realm) -> Void)? = nil)`.
   - The two new Obj-C recovery modes support client reset callbacks via the `notifyBeforeReset`
     and `notifyAfterReset` parameters in `[RLMUser configurationWithPartitionValue]`
@@ -64,12 +66,12 @@ x.y.z Release notes (yyyy-MM-dd)
     The `SyncManager.errorHandler` will still be invoked during a client reset if
     no callback is passed into these new interfaces.
 
-### Compatibility
-* This release introduces breaking changes for applications handling client resets manually.
-  See the "Breaking Changes" section for more detail.
+### Deprecations
 * `ClientResetMode.discardLocal` is deprecated in favor of `ClientResetMode.discardUnsyncedChanges`.
   The reasoning is that the name better reflects the effect of this reset mode. There is no actual
   difference in behavior.
+
+### Compatibility
 * Realm Studio: 11.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 13.4.1.

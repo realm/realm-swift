@@ -289,7 +289,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     // MARK: - Client reset
 
     func waitForSyncDisabled(flexibleSync: Bool = false, appServerId: String, syncServiceId: String) {
-        XCTAssertTrue(try RealmServer.shared.syncEnabled(flexibleSync: flexibleSync, appServerId: appServerId, syncServiceId: syncServiceId))
+        XCTAssertTrue(try RealmServer.shared.isSyncEnabled(flexibleSync: flexibleSync, appServerId: appServerId, syncServiceId: syncServiceId))
         let exp = expectation(description: "disable sync")
         RealmServer.shared.disableSync(flexibleSync: flexibleSync, appServerId: appServerId, syncServiceId: syncServiceId) { results in
             switch results {
@@ -300,7 +300,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             }
         }
         waitForExpectations(timeout: 20, handler: nil)
-        XCTAssertFalse(try RealmServer.shared.syncEnabled(appServerId: appServerId, syncServiceId: syncServiceId))
+        XCTAssertFalse(try RealmServer.shared.isSyncEnabled(appServerId: appServerId, syncServiceId: syncServiceId))
     }
 
     func waitForSyncEnabled(flexibleSync: Bool = false, appServerId: String, syncServiceId: String, syncServiceConfig: [String: Any]) {
@@ -315,11 +315,11 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             }
         }
         waitForExpectations(timeout: 20, handler: nil)
-        XCTAssertTrue(try RealmServer.shared.syncEnabled(flexibleSync: flexibleSync, appServerId: appServerId, syncServiceId: syncServiceId))
+        XCTAssertTrue(try RealmServer.shared.isSyncEnabled(flexibleSync: flexibleSync, appServerId: appServerId, syncServiceId: syncServiceId))
     }
 
     func waitForDevModeEnabled(appServerId: String, syncServiceId: String, syncServiceConfig: [String: Any]) throws {
-        let devModeEnabled = try RealmServer.shared.devModeEnabled(appServerId: appServerId, syncServiceId: syncServiceId)
+        let devModeEnabled = try RealmServer.shared.isDevModeEnabled(appServerId: appServerId, syncServiceId: syncServiceId)
         let exp = expectation(description: "enable dev mode")
         if !devModeEnabled {
             RealmServer.shared.enableDevMode(appServerId: appServerId, syncServiceId: syncServiceId, syncServiceConfiguration: syncServiceConfig) { results in
@@ -332,7 +332,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             }
         }
         waitForExpectations(timeout: 20, handler: nil)
-        XCTAssertTrue(try RealmServer.shared.devModeEnabled(appServerId: appServerId, syncServiceId: syncServiceId))
+        XCTAssertTrue(try RealmServer.shared.isDevModeEnabled(appServerId: appServerId, syncServiceId: syncServiceId))
     }
 
     // Uses admin API to toggle recovery mode on the baas server
@@ -730,6 +730,51 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
     }
 
+    // If the syncManager.ErrorHandler and manual enum callback
+    // are both set, use the enum callback.
+    func testClientResetManualEnumCallbackNotManager() throws {
+        let creds = basicCredentials()
+        try autoreleasepool {
+            let user = try logInUser(for: creds)
+            try prepareClientReset(#function, user)
+
+            var configuration = user.configuration(partitionValue: #function, clientResetMode: .manual(assertManualClientReset(user)))
+            configuration.objectTypes = [SwiftPerson.self]
+
+            let syncManager = self.app.syncManager
+            syncManager.errorHandler = { error, session in
+                guard let _ = error as? SyncError else {
+                    XCTFail("Bad error type: \(error)")
+                    return
+                }
+                XCTFail("Expected the syncManager.ErrorHandler to not be called")
+            }
+
+            try autoreleasepool {
+                let realm = try Realm(configuration: configuration)
+                waitForExpectations(timeout: 15.0)
+                // The locally created object should still be present as we didn't
+                // actually handle the client reset
+                XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1)
+                XCTAssertEqual(realm.objects(SwiftPerson.self)[0].firstName, "John")
+            }
+            resetSyncManager()
+        }
+
+        let user = try logInUser(for: creds)
+        var configuration = user.configuration(partitionValue: #function)
+        configuration.objectTypes = [SwiftPerson.self]
+
+        try autoreleasepool {
+            let realm = try Realm(configuration: configuration)
+            waitForDownloads(for: realm)
+            // After reopening, the old Realm file should have been moved aside
+            // and we should now have the data from the server
+            XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1)
+            XCTAssertEqual(realm.objects(SwiftPerson.self)[0].firstName, "Paul")
+        }
+    }
+
     func testClientResetManualNoCallbacks() throws {
         let creds = basicCredentials()
         try autoreleasepool {
@@ -804,6 +849,34 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             XCTAssertNotNil(after)
         default:
             XCTFail("Should be set to discardLocal")
+        }
+
+        try autoreleasepool {
+            let realm = try Realm(configuration: configuration)
+            waitForExpectations(timeout: 15.0)
+            // The Person created locally ("John") should have been discarded,
+            // while the one from the server ("Paul") should be present
+            XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1)
+            XCTAssertEqual(realm.objects(SwiftPerson.self)[0].firstName, "Paul")
+        }
+    }
+
+    func testClientResetDiscardUnsyncedChanges() throws {
+        let user = try logInUser(for: basicCredentials())
+        try prepareClientReset(#function, user)
+
+        let (assertBeforeBlock, assertAfterBlock) = assertDiscardLocal()
+        var configuration = user.configuration(partitionValue: #function,
+                                               clientResetMode: .discardUnsyncedChanges(assertBeforeBlock, assertAfterBlock))
+        configuration.objectTypes = [SwiftPerson.self]
+
+        guard let syncConfig = configuration.syncConfiguration else { fatalError("Test condition failure. SyncConfiguration not set.") }
+        switch syncConfig.clientResetMode {
+        case .discardUnsyncedChanges(let before, let after):
+            XCTAssertNotNil(before)
+            XCTAssertNotNil(after)
+        default:
+            XCTFail("Should be set to discardUnsyncedChanges")
         }
 
         try autoreleasepool {

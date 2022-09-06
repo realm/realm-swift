@@ -303,7 +303,7 @@ public enum ClientResetMode {
     }
 
     /**
-     An enum which determines file recovery behvaior in the event of a client reset.
+     An enum which determines file recovery behavior in the event of a client reset.
      - note: Defaults to `.recover
 
      - see: `ClientResetMode` and `RLMClientResetMode`
@@ -313,9 +313,7 @@ public enum ClientResetMode {
         switch config.clientResetMode {
         case .manual:
             return .manual(config.manualClientResetHandler)
-        case .discardLocal:
-            return .discardLocal(ObjectiveCSupport.convert(object: config.beforeClientReset), ObjectiveCSupport.convert(object: config.afterClientReset))
-        case .discardUnsyncedChanges:
+        case .discardLocal, .discardUnsyncedChanges:
             return .discardUnsyncedChanges(ObjectiveCSupport.convert(object: config.beforeClientReset), ObjectiveCSupport.convert(object: config.afterClientReset))
         case .recoverUnsyncedChanges:
             return .recoverUnsyncedChanges(ObjectiveCSupport.convert(object: config.beforeClientReset), ObjectiveCSupport.convert(object: config.afterClientReset))
@@ -994,28 +992,28 @@ extension User {
             throwRealmException("Manual mode not supported for flexible sync configurations")
         case .discardLocal(let beforeBlock, let afterBlock):
             config = self.__flexibleSyncConfiguration(initialSubscriptions: ObjectiveCSupport.convert(block: initialSubscriptions),
+                                                      rerunOnOpen: rerunOnOpen,
                                                       clientResetMode: .discardLocal,
                                                       notifyBeforeReset: ObjectiveCSupport.convert(object: beforeBlock),
-                                                      notifyAfterReset: ObjectiveCSupport.convert(object: afterBlock),
-                                                      rerunOnOpen: rerunOnOpen)
+                                                      notifyAfterReset: ObjectiveCSupport.convert(object: afterBlock))
         case .discardUnsyncedChanges(let beforeBlock, let afterBlock):
             config = self.__flexibleSyncConfiguration(initialSubscriptions: ObjectiveCSupport.convert(block: initialSubscriptions),
+                                                      rerunOnOpen: rerunOnOpen,
                                                       clientResetMode: .discardUnsyncedChanges,
                                                       notifyBeforeReset: ObjectiveCSupport.convert(object: beforeBlock),
-                                                      notifyAfterReset: ObjectiveCSupport.convert(object: afterBlock),
-                                                      rerunOnOpen: rerunOnOpen)
+                                                      notifyAfterReset: ObjectiveCSupport.convert(object: afterBlock))
         case .recoverUnsyncedChanges(let beforeBlock, let afterBlock):
             config = self.__flexibleSyncConfiguration(initialSubscriptions: ObjectiveCSupport.convert(block: initialSubscriptions),
+                                                      rerunOnOpen: rerunOnOpen,
                                                       clientResetMode: .recoverUnsyncedChanges,
                                                       notifyBeforeReset: ObjectiveCSupport.convert(object: beforeBlock),
-                                                      notifyAfterReset: ObjectiveCSupport.convert(object: afterBlock),
-                                                      rerunOnOpen: rerunOnOpen)
+                                                      notifyAfterReset: ObjectiveCSupport.convert(object: afterBlock))
         case .recoverOrDiscardUnsyncedChanges(let beforeBlock, let afterBlock):
             config = self.__flexibleSyncConfiguration(initialSubscriptions: ObjectiveCSupport.convert(block: initialSubscriptions),
+                                                      rerunOnOpen: rerunOnOpen,
                                                       clientResetMode: .recoverOrDiscardUnsyncedChanges,
                                                       notifyBeforeReset: ObjectiveCSupport.convert(object: beforeBlock),
-                                                      notifyAfterReset: ObjectiveCSupport.convert(object: afterBlock),
-                                                      rerunOnOpen: rerunOnOpen)
+                                                      notifyAfterReset: ObjectiveCSupport.convert(object: afterBlock))
         }
         return ObjectiveCSupport.convert(object: config)
     }

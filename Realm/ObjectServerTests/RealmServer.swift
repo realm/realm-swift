@@ -996,7 +996,7 @@ public class RealmServer: NSObject {
         }
     }
 
-    public func syncEnabled(flexibleSync: Bool = false, appServerId: String, syncServiceId: String) throws -> Bool {
+    public func isSyncEnabled(flexibleSync: Bool = false, appServerId: String, syncServiceId: String) throws -> Bool {
         let configOption = flexibleSync ? "flexible_sync" : "sync"
         guard let session = session else {
             fatalError()
@@ -1009,7 +1009,7 @@ public class RealmServer: NSObject {
         return (syncInfo["state"] as? String == "enabled")
     }
 
-    public func devModeEnabled(appServerId: String, syncServiceId: String) throws -> Bool {
+    public func isDevModeEnabled(appServerId: String, syncServiceId: String) throws -> Bool {
         guard let session = session else {
             fatalError()
         }

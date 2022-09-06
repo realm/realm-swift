@@ -154,10 +154,10 @@ using namespace realm;
 }
 
 - (RLMRealmConfiguration *)flexibleSyncConfigurationWithInitialSubscriptions:(RLMFlexibleSyncInitialSubscriptionsBlock)initialSubscriptions
+                                                                 rerunOnOpen:(BOOL)rerunOnOpen
                                                              clientResetMode:(RLMClientResetMode)clientResetMode
                                                            notifyBeforeReset:(nullable RLMClientResetBeforeBlock)beforeResetBlock
-                                                            notifyAfterReset:(nullable RLMClientResetAfterBlock)afterResetBlock
-                                                                 rerunOnOpen:(BOOL)rerunOnOpen {
+                                                            notifyAfterReset:(nullable RLMClientResetAfterBlock)afterResetBlock {
     auto syncConfig = [[RLMSyncConfiguration alloc] initWithUser:self];
     RLMRealmConfiguration *config = [[RLMRealmConfiguration alloc] init];
     config.initialSubscriptions = initialSubscriptions;

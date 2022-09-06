@@ -43,7 +43,7 @@ typedef NS_ENUM(NSUInteger, RLMClientResetMode) {
     /// re-downloaded Realm will initially contain only the data present at the time the Realm
     /// was backed up on the server.
     ///
-    /// @see: `rlmSync_clientResetBackedUpRealmPath` or `SyncError.clientResetInfo()` for more information on accessing the recovery directory.
+    /// @see: `rlmSync_clientResetBackedUpRealmPath` and `RLMSyncErrorActionToken` for more information on accessing the recovery directory and error information.
     ///
     /// The manual client reset mode handler can be set in two places:
     ///  1. As an ErrorReportingBlock argument at `RLMSyncConfiguration.manualClientResetHandler`.
@@ -137,7 +137,7 @@ typedef void(^RLMClientResetAfterBlock)(RLMRealm * _Nonnull beforeFrozen, RLMRea
 @property (nonatomic, readonly) id<RLMBSON> partitionValue;
 
 /**
- An enum which determines file recovery behvaior in the event of a client reset.
+ An enum which determines file recovery behavior in the event of a client reset.
  @note: Defaults to `RLMClientResetModeRecoverUnsycnedChanges`
 
  @see: `RLMClientResetMode`
