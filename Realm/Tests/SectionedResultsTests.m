@@ -559,10 +559,8 @@ static RLMSectionedResultsChange *getChange(SectionedResultsTests *self, void (^
     }];
 
     id token = [sr addNotificationBlock:^(RLMSectionedResults *sr,
-                                          RLMSectionedResultsChange *c,
-                                          NSError *e) {
+                                          RLMSectionedResultsChange *c) {
         changes = c;
-        XCTAssertNil(e);
         XCTAssertNotNil(sr);
         CFRunLoopStop(CFRunLoopGetCurrent());
     }];
@@ -704,9 +702,8 @@ static void ExpectChange(id self,
 
     RLMSection<NSString *, StringObject *> *section = sr[0];
 
-    id token = [section addNotificationBlock:^(RLMSection *r, RLMSectionedResultsChange *c, NSError *e) {
+    id token = [section addNotificationBlock:^(RLMSection *r, RLMSectionedResultsChange *c) {
         changes = c;
-        XCTAssertNil(e);
         XCTAssertNotNil(r);
         CFRunLoopStop(CFRunLoopGetCurrent());
     }
@@ -741,10 +738,8 @@ static RLMSectionedResultsChange *getChangePrimitive(SectionedResultsTests *self
     }];
 
     id token = [sr addNotificationBlock:^(RLMSectionedResults *sr,
-                                          RLMSectionedResultsChange *c,
-                                          NSError *e) {
+                                          RLMSectionedResultsChange *c) {
         changes = c;
-        XCTAssertNil(e);
         XCTAssertNotNil(sr);
         CFRunLoopStop(CFRunLoopGetCurrent());
     }];

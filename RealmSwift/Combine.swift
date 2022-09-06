@@ -73,10 +73,10 @@ extension ObjectKeyIdentifiable where Self: ProjectionObservable {
 public protocol RealmSubscribable {
     /// :nodoc:
     func _observe<S>(_ keyPaths: [String]?, on queue: DispatchQueue?, _ subscriber: S)
-        -> NotificationToken where S: Subscriber, S.Input == Self, S.Failure == Error
+        -> NotificationToken where S: Subscriber, S.Input == Self
     /// :nodoc:
     func _observe<S>(_ keyPaths: [String]?, _ subscriber: S)
-        -> NotificationToken where S: Subscriber, S.Input == Void, S.Failure == Never
+        -> NotificationToken where S: Subscriber, S.Input == Void
 }
 
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
@@ -206,8 +206,6 @@ extension Publisher {
                              sectionsToInsert: let sectionsToInsert, sectionsToDelete: let sectionsToDelete):
                     return .update(collection.freeze(), deletions: deletions, insertions: insertions, modifications: modifications,
                                    sectionsToInsert: sectionsToInsert, sectionsToDelete: sectionsToDelete)
-                case .error(let error):
-                    return .error(error)
                 }
             }
     }
@@ -628,7 +626,7 @@ extension EmbeddedObject: ObservableObject {
 extension ObjectBase: RealmSubscribable {
     /// :nodoc:
     public func _observe<S>(_ keyPaths: [String]?, on queue: DispatchQueue?, _ subscriber: S) -> NotificationToken
-        where S.Input: ObjectBase, S: Subscriber, S.Failure == Error {
+        where S.Input: ObjectBase, S: Subscriber {
         return _observe(keyPaths: keyPaths, on: queue) { (change: ObjectChange<S.Input>) in
             switch change {
             case .change(let object, _):
@@ -636,12 +634,12 @@ extension ObjectBase: RealmSubscribable {
             case .deleted:
                 subscriber.receive(completion: .finished)
             case .error(let error):
-                subscriber.receive(completion: .failure(error))
+                fatalError("Unexpected error \(error)")
             }
         }
     }
     /// :nodoc:
-    public func _observe<S>(_ keyPaths: [String]?, _ subscriber: S) -> NotificationToken where S: Subscriber, S.Failure == Never, S.Input == Void {
+    public func _observe<S>(_ keyPaths: [String]?, _ subscriber: S) -> NotificationToken where S: Subscriber, S.Input == Void {
         return _observe(keyPaths: keyPaths, { _ in _ = subscriber.receive()})
     }
 }
@@ -712,21 +710,19 @@ extension Results: RealmSubscribable {
 extension SectionedResults: RealmSubscribable {
     /// :nodoc:
     public func _observe<S>(_ keyPaths: [String]? = nil, on queue: DispatchQueue? = nil, _ subscriber: S)
-        -> NotificationToken where S: Subscriber, S.Input == Self, S.Failure == Error {
+        -> NotificationToken where S: Subscriber, S.Input == Self {
         return observe(keyPaths: keyPaths, on: queue) { change in
                 switch change {
                 case .initial(let collection):
                     _ = subscriber.receive(collection)
                 case .update(let collection, deletions: _, insertions: _, modifications: _, sectionsToInsert: _, sectionsToDelete: _):
                     _ = subscriber.receive(collection)
-                case .error(let error):
-                    subscriber.receive(completion: .failure(error))
                 }
             }
     }
 
     /// :nodoc:
-    public func _observe<S: Subscriber>(_ keyPaths: [String]? = nil, _ subscriber: S) -> NotificationToken where S.Input == Void, S.Failure == Never {
+    public func _observe<S: Subscriber>(_ keyPaths: [String]? = nil, _ subscriber: S) -> NotificationToken where S.Input == Void {
         return observe(keyPaths: keyPaths, on: nil) { _ in _ = subscriber.receive() }
     }
 
@@ -762,21 +758,19 @@ extension SectionedResults: RealmSubscribable {
 extension ResultsSection: RealmSubscribable {
     /// :nodoc:
     public func _observe<S>(_ keyPaths: [String]? = nil, on queue: DispatchQueue? = nil, _ subscriber: S)
-    -> NotificationToken where S: Subscriber, S.Input == Self, S.Failure == Error {
+    -> NotificationToken where S: Subscriber, S.Input == Self {
         return observe(keyPaths: keyPaths, on: queue) { change in
             switch change {
             case .initial(let collection):
                 _ = subscriber.receive(collection)
             case .update(let collection, deletions: _, insertions: _, modifications: _, sectionsToInsert: _, sectionsToDelete: _):
                 _ = subscriber.receive(collection)
-            case .error(let error):
-                subscriber.receive(completion: .failure(error))
             }
         }
     }
 
     /// :nodoc:
-    public func _observe<S: Subscriber>(_ keyPaths: [String]? = nil, _ subscriber: S) -> NotificationToken where S.Input == Void, S.Failure == Never {
+    public func _observe<S: Subscriber>(_ keyPaths: [String]? = nil, _ subscriber: S) -> NotificationToken where S.Input == Void {
         return observe(keyPaths: keyPaths, on: nil) { _ in _ = subscriber.receive() }
     }
 
@@ -814,7 +808,7 @@ extension ResultsSection: RealmSubscribable {
 extension RealmCollection {
     /// :nodoc:
     public func _observe<S>(_ keyPaths: [String]? = nil, on queue: DispatchQueue? = nil, _ subscriber: S)
-        -> NotificationToken where S: Subscriber, S.Input == Self, S.Failure == Error {
+        -> NotificationToken where S: Subscriber, S.Input == Self {
             // FIXME: we could skip some pointless work in converting the changeset to the Swift type here
         return observe(keyPaths: keyPaths, on: queue) { change in
                 switch change {
@@ -823,13 +817,13 @@ extension RealmCollection {
                 case .update(let collection, deletions: _, insertions: _, modifications: _):
                     _ = subscriber.receive(collection)
                 case .error(let error):
-                    subscriber.receive(completion: .failure(error))
+                    fatalError("Unexpected error \(error)")
                 }
             }
     }
 
     /// :nodoc:
-    public func _observe<S: Subscriber>(_ keyPaths: [String]? = nil, _ subscriber: S) -> NotificationToken where S.Input == Void, S.Failure == Never {
+    public func _observe<S: Subscriber>(_ keyPaths: [String]? = nil, _ subscriber: S) -> NotificationToken where S.Input == Void {
         return observe(keyPaths: keyPaths, on: nil) { _ in _ = subscriber.receive() }
     }
 }
@@ -843,7 +837,7 @@ extension AnyRealmCollection: RealmSubscribable {}
 extension RealmKeyedCollection {
     /// :nodoc:
     public func _observe<S>(_ keyPaths: [String]?, on queue: DispatchQueue? = nil, _ subscriber: S)
-        -> NotificationToken where S: Subscriber, S.Input == Self, S.Failure == Error {
+        -> NotificationToken where S: Subscriber, S.Input == Self {
             // FIXME: we could skip some pointless work in converting the changeset to the Swift type here
             return observe(keyPaths: keyPaths, on: queue) { change in
                 switch change {
@@ -852,16 +846,16 @@ extension RealmKeyedCollection {
                 case .update(let collection, deletions: _, insertions: _, modifications: _):
                     _ = subscriber.receive(collection)
                 case .error(let error):
-                    subscriber.receive(completion: .failure(error))
+                    fatalError("Unexpected error \(error)")
                 }
             }
     }
     /// :nodoc:
-    public func _observe<S: Subscriber>(_ subscriber: S) -> NotificationToken where S.Input == Void, S.Failure == Never {
+    public func _observe<S: Subscriber>(_ subscriber: S) -> NotificationToken where S.Input == Void {
         return observe(keyPaths: nil, on: nil) { _ in _ = subscriber.receive() }
     }
     /// :nodoc:
-    public func _observe<S: Subscriber>(_ keyPaths: [String]? = nil, _ subscriber: S) -> NotificationToken where S.Input == Void, S.Failure == Never {
+    public func _observe<S: Subscriber>(_ keyPaths: [String]? = nil, _ subscriber: S) -> NotificationToken where S.Input == Void {
         return observe(keyPaths: keyPaths, on: nil) { _ in _ = subscriber.receive() }
     }
 }
@@ -1136,8 +1130,7 @@ public enum RealmPublishers {
 
     /// A publisher which emits an object or collection each time that object is mutated.
     @frozen public struct Value<Subscribable: RealmSubscribable>: Publisher where Subscribable: ThreadConfined {
-        /// This publisher can only fail due to resource exhaustion when
-        /// creating the worker thread used for change notifications.
+        /// This publisher cannot actually fail and will change to Never in the future.
         public typealias Failure = Error
         /// This publisher emits the object or collection which it is publishing.
         public typealias Output = Subscribable
@@ -1211,8 +1204,7 @@ public enum RealmPublishers {
 
     /// A publisher which emits an object or collection each time that object is mutated.
     public class ValueWithToken<Subscribable: RealmSubscribable, T>: Publisher where Subscribable: ThreadConfined {
-        /// This publisher can only fail due to resource exhaustion when
-        /// creating the worker thread used for change notifications.
+        /// This publisher cannot actually fail and will change to Never in the future.
         public typealias Failure = Error
         /// This publisher emits the object or collection which it is publishing.
         public typealias Output = Subscribable
@@ -2594,8 +2586,6 @@ public enum RealmPublishers {
                         return .update(realm.freeze(), ThreadSafeReference(to: collection),
                                        deletions: deletions, insertions: insertions, modifications: modifications,
                                        sectionsToInsert: sectionsToInsert, sectionsToDelete: sectionsToDelete)
-                    case .error:
-                        return .passthrough(change)
                     }
                 }
                 .receive(on: scheduler)
@@ -2669,8 +2659,6 @@ public enum RealmPublishers {
                         return .update(realm.freeze(), ThreadSafeReference(to: collection),
                                        deletions: deletions, insertions: insertions, modifications: modifications,
                                        sectionsToInsert: sectionsToInsert, sectionsToDelete: sectionsToDelete)
-                    case .error:
-                        return .passthrough(change)
                     }
                 }
                 .receive(on: scheduler)

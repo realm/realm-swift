@@ -67,7 +67,9 @@ using namespace realm;
         static_cast<int>(realm::sync::ProtocolError::bad_client_file_ident),
         realm::sync::protocol_error_category()
     };
-    SyncSession::OnlyForTesting::handle_error(*raw_session, {code, "Not a real error message", false});
+    realm::SyncError error = {code, "Not a real error message", false};
+    error.server_requests_action = realm::sync::ProtocolErrorInfo::Action::ClientReset;
+    SyncSession::OnlyForTesting::handle_error(*raw_session, std::move(error));
 }
 
 @end

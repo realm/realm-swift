@@ -125,10 +125,6 @@ NS_ASSUME_NONNULL_BEGIN
  information on how the changes are reported and an example of updating a
  `UITableView`.
 
- If an error occurs the block will be called with `nil` for the results
- parameter and a non-`nil` error. Currently the only errors that can occur are
- when opening the Realm on the background worker thread.
-
  At the time when the block is called, the `RLMSection` / `RLMSectionedResults` object will be fully
  evaluated and up-to-date.
 
@@ -144,8 +140,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     RLMResults<Dog *> *results = [Dog allObjects];
     RLMSectionedResults<Dog *> *sectionedResults = [results sectionedResultsUsingKeyPath:@"age" ascending:YES];
-    self.token = [sectionedResults addNotificationBlock:^(RLMSectionedResults *sectionedResults, RLMSectionedResultsChange *changes,
-                                           NSError *error) {
+    self.token = [sectionedResults addNotificationBlock:^(RLMSectionedResults *sectionedResults, RLMSectionedResultsChange *changes) {
          // Only fired once for the example
          NSLog(@"sectionedResults.count: %zu", sectionedResults.count); // => 1
      }];
@@ -168,7 +163,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @return A token which must be held for as long as you want updates to be delivered.
  */
-- (RLMNotificationToken *)addNotificationBlock:(void (^)(id<RLMSectionedResult>, RLMSectionedResultsChange *, NSError *))block __attribute__((warn_unused_result));
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(id<RLMSectionedResult>, RLMSectionedResultsChange *))block __attribute__((warn_unused_result));
 /**
  Registers a block to be called each time the collection changes.
 
@@ -183,10 +178,6 @@ NS_ASSUME_NONNULL_BEGIN
  the block is not called at all. See the `RLMSectionedResultsChange` documentation for
  information on how the changes are reported and an example of updating a
  `UITableView`.
-
- If an error occurs the block will be called with `nil` for the results
- parameter and a non-`nil` error. Currently the only errors that can occur are
- when opening the Realm on the background worker thread.
 
  At the time when the block is called, the `RLMSection` / `RLMSectionedResults` object will be fully
  evaluated and up-to-date.
@@ -203,8 +194,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     RLMResults<Dog *> *results = [Dog allObjects];
     RLMSectionedResults<Dog *> *sectionedResults = [results sectionedResultsUsingKeyPath:@"age" ascending:YES];
-    self.token = [sectionedResults addNotificationBlock:^(RLMSectionedResults *sectionedResults, RLMSectionedResultsChange *changes,
-                                           NSError *error) {
+    self.token = [sectionedResults addNotificationBlock:^(RLMSectionedResults *sectionedResults, RLMSectionedResultsChange *changes) {
          // Only fired once for the example
          NSLog(@"sectionedResults.count: %zu", sectionedResults.count); // => 1
      }];
@@ -228,7 +218,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @return A token which must be held for as long as you want updates to be delivered.
  */
-- (RLMNotificationToken *)addNotificationBlock:(void (^)(id<RLMSectionedResult>, RLMSectionedResultsChange *, NSError *))block
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(id<RLMSectionedResult>, RLMSectionedResultsChange *))block
                                          queue:(dispatch_queue_t)queue __attribute__((warn_unused_result));
 /**
  Registers a block to be called each time the collection changes.
@@ -245,10 +235,6 @@ NS_ASSUME_NONNULL_BEGIN
  information on how the changes are reported and an example of updating a
  `UITableView`.
 
- If an error occurs the block will be called with `nil` for the results
- parameter and a non-`nil` error. Currently the only errors that can occur are
- when opening the Realm on the background worker thread.
-
  At the time when the block is called, the `RLMSection` / `RLMSectionedResults` object will be fully
  evaluated and up-to-date.
 
@@ -264,8 +250,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     RLMResults<Dog *> *results = [Dog allObjects];
     RLMSectionedResults<Dog *> *sectionedResults = [results sectionedResultsUsingKeyPath:@"age" ascending:YES];
-    self.token = [sectionedResults addNotificationBlock:^(RLMSectionedResults *sectionedResults, RLMSectionedResultsChange *changes,
-                                           NSError *error) {
+    self.token = [sectionedResults addNotificationBlock:^(RLMSectionedResults *sectionedResults, RLMSectionedResultsChange *changes) {
          // Only fired once for the example
          NSLog(@"sectionedResults.count: %zu", sectionedResults.count); // => 1
      }];
@@ -290,7 +275,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @return A token which must be held for as long as you want updates to be delivered.
  */
-- (RLMNotificationToken *)addNotificationBlock:(void (^)(id<RLMSectionedResult>, RLMSectionedResultsChange *, NSError *))block
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(id<RLMSectionedResult>, RLMSectionedResultsChange *))block
                                       keyPaths:(NSArray<NSString *> *)keyPaths __attribute__((warn_unused_result));
 /**
  Registers a block to be called each time the collection changes.
@@ -307,10 +292,6 @@ NS_ASSUME_NONNULL_BEGIN
  information on how the changes are reported and an example of updating a
  `UITableView`.
 
- If an error occurs the block will be called with `nil` for the results
- parameter and a non-`nil` error. Currently the only errors that can occur are
- when opening the Realm on the background worker thread.
-
  At the time when the block is called, the `RLMSection` / `RLMSectionedResults` object will be fully
  evaluated and up-to-date.
 
@@ -326,8 +307,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     RLMResults<Dog *> *results = [Dog allObjects];
     RLMSectionedResults<Dog *> *sectionedResults = [results sectionedResultsUsingKeyPath:@"age" ascending:YES];
-    self.token = [sectionedResults addNotificationBlock:^(RLMSectionedResults *sectionedResults, RLMSectionedResultsChange *changes,
-                                           NSError *error) {
+    self.token = [sectionedResults addNotificationBlock:^(RLMSectionedResults *sectionedResults, RLMSectionedResultsChange *changes) {
          // Only fired once for the example
          NSLog(@"sectionedResults.count: %zu", sectionedResults.count); // => 1
      }];
@@ -358,7 +338,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @return A token which must be held for as long as you want updates to be delivered.
  */
-- (RLMNotificationToken *)addNotificationBlock:(void (^)(id<RLMSectionedResult>, RLMSectionedResultsChange *, NSError *))block
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(id<RLMSectionedResult>, RLMSectionedResultsChange *))block
                                       keyPaths:(nullable NSArray<NSString *> *)keyPaths
                                          queue:(nullable dispatch_queue_t)queue __attribute__((warn_unused_result));
 
@@ -424,10 +404,6 @@ NS_ASSUME_NONNULL_BEGIN
  information on how the changes are reported and an example of updating a
  `UITableView`.
 
- If an error occurs the block will be called with `nil` for the results
- parameter and a non-`nil` error. Currently the only errors that can occur are
- when opening the Realm on the background worker thread.
-
  At the time when the block is called, the `RLMSection` object will be fully
  evaluated and up-to-date.
 
@@ -445,8 +421,7 @@ NS_ASSUME_NONNULL_BEGIN
     RLMSectionedResults<Dog *> *sectionedResults = [results sectionedResultsUsingKeyPath:@"age" ascending:YES];
     RLMSection<Dog *> *section = sectionedResults[0] // section with dogs aged '5' already exists.
 
-    self.token = [section addNotificationBlock:^(RLMSection *section, RLMSectionedResultsChange *changes,
-                                    NSError *error) {
+    self.token = [section addNotificationBlock:^(RLMSection *section, RLMSectionedResultsChange *changes) {
          // Only fired once for the example
          NSLog(@"section.count: %zu", section.count); // => 2
      }];
@@ -469,7 +444,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @return A token which must be held for as long as you want updates to be delivered.
  */
-- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMSection<RLMKeyType, RLMObjectType> *, RLMSectionedResultsChange *, NSError *))block __attribute__((warn_unused_result));
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMSection<RLMKeyType, RLMObjectType> *, RLMSectionedResultsChange *))block __attribute__((warn_unused_result));
 /**
  Registers a block to be called each time the section changes.
 
@@ -484,10 +459,6 @@ NS_ASSUME_NONNULL_BEGIN
  the block is not called at all. See the `RLMSectionedResultsChange` documentation for
  information on how the changes are reported and an example of updating a
  `UITableView`.
-
- If an error occurs the block will be called with `nil` for the results
- parameter and a non-`nil` error. Currently the only errors that can occur are
- when opening the Realm on the background worker thread.
 
  At the time when the block is called, the `RLMSection` object will be fully
  evaluated and up-to-date.
@@ -506,8 +477,7 @@ NS_ASSUME_NONNULL_BEGIN
     RLMSectionedResults<Dog *> *sectionedResults = [results sectionedResultsUsingKeyPath:@"age" ascending:YES];
     RLMSection<Dog *> *section = sectionedResults[0] // section with dogs aged '5' already exists.
 
-    self.token = [section addNotificationBlock:^(RLMSection *section, RLMSectionedResultsChange *changes,
-                                    NSError *error) {
+    self.token = [section addNotificationBlock:^(RLMSection *section, RLMSectionedResultsChange *changes) {
          // Only fired once for the example
          NSLog(@"section.count: %zu", section.count); // => 2
      }];
@@ -531,7 +501,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @return A token which must be held for as long as you want updates to be delivered.
  */
-- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMSection<RLMKeyType, RLMObjectType> *, RLMSectionedResultsChange *, NSError *))block
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMSection<RLMKeyType, RLMObjectType> *, RLMSectionedResultsChange *))block
                                          queue:(dispatch_queue_t)queue __attribute__((warn_unused_result));
 /**
  Registers a block to be called each time the section changes.
@@ -548,10 +518,6 @@ NS_ASSUME_NONNULL_BEGIN
  information on how the changes are reported and an example of updating a
  `UITableView`.
 
- If an error occurs the block will be called with `nil` for the results
- parameter and a non-`nil` error. Currently the only errors that can occur are
- when opening the Realm on the background worker thread.
-
  At the time when the block is called, the `RLMSection` object will be fully
  evaluated and up-to-date.
 
@@ -569,8 +535,7 @@ NS_ASSUME_NONNULL_BEGIN
     RLMSectionedResults<Dog *> *sectionedResults = [results sectionedResultsUsingKeyPath:@"age" ascending:YES];
     RLMSection<Dog *> *section = sectionedResults[0] // section with dogs aged '5' already exists.
 
-    self.token = [section addNotificationBlock:^(RLMSection *section, RLMSectionedResultsChange *changes,
-                                    NSError *error) {
+    self.token = [section addNotificationBlock:^(RLMSection *section, RLMSectionedResultsChange *changes) {
          // Only fired once for the example
          NSLog(@"section.count: %zu", section.count); // => 2
      }];
@@ -600,7 +565,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @return A token which must be held for as long as you want updates to be delivered.
  */
-- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMSection<RLMKeyType, RLMObjectType> *, RLMSectionedResultsChange *, NSError *))block
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMSection<RLMKeyType, RLMObjectType> *, RLMSectionedResultsChange *))block
                                       keyPaths:(NSArray<NSString *> *)keyPaths __attribute__((warn_unused_result));
 /**
  Registers a block to be called each time the section changes.
@@ -616,10 +581,6 @@ NS_ASSUME_NONNULL_BEGIN
  the block is not called at all. See the `RLMSectionedResultsChange` documentation for
  information on how the changes are reported and an example of updating a
  `UITableView`.
-
- If an error occurs the block will be called with `nil` for the results
- parameter and a non-`nil` error. Currently the only errors that can occur are
- when opening the Realm on the background worker thread.
 
  At the time when the block is called, the `RLMSection` object will be fully
  evaluated and up-to-date.
@@ -638,8 +599,7 @@ NS_ASSUME_NONNULL_BEGIN
     RLMSectionedResults<Dog *> *sectionedResults = [results sectionedResultsUsingKeyPath:@"age" ascending:YES];
     RLMSection<Dog *> *section = sectionedResults[0] // section with dogs aged '5' already exists.
 
-    self.token = [section addNotificationBlock:^(RLMSection *section, RLMSectionedResultsChange *changes,
-                                    NSError *error) {
+    self.token = [section addNotificationBlock:^(RLMSection *section, RLMSectionedResultsChange *changes) {
          // Only fired once for the example
          NSLog(@"section.count: %zu", section.count); // => 2
      }];
@@ -670,7 +630,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @return A token which must be held for as long as you want updates to be delivered.
  */
-- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMSection<RLMKeyType, RLMObjectType> *, RLMSectionedResultsChange *, NSError *))block
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMSection<RLMKeyType, RLMObjectType> *, RLMSectionedResultsChange *))block
                                       keyPaths:(nullable NSArray<NSString *> *)keyPaths
                                          queue:(nullable dispatch_queue_t)queue __attribute__((warn_unused_result));
 @end
@@ -735,10 +695,6 @@ NS_ASSUME_NONNULL_BEGIN
  information on how the changes are reported and an example of updating a
  `UITableView`.
 
- If an error occurs the block will be called with `nil` for the results
- parameter and a non-`nil` error. Currently the only errors that can occur are
- when opening the Realm on the background worker thread.
-
  At the time when the block is called, the `RLMSectionedResults` object will be fully
  evaluated and up-to-date.
 
@@ -754,8 +710,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     RLMResults<Dog *> *results = [Dog allObjects];
     RLMSectionedResults<Dog *> *sectionedResults = [results sectionedResultsUsingKeyPath:@"age" ascending:YES];
-    self.token = [sectionedResults addNotificationBlock:^(RLMSectionedResults *sectionedResults, RLMSectionedResultsChange *changes,
-                                           NSError *error) {
+    self.token = [sectionedResults addNotificationBlock:^(RLMSectionedResults *sectionedResults, RLMSectionedResultsChange *changes) {
          // Only fired once for the example
          NSLog(@"sectionedResults.count: %zu", sectionedResults.count); // => 1
      }];
@@ -778,7 +733,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @return A token which must be held for as long as you want updates to be delivered.
  */
-- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMSectionedResults<RLMKeyType, RLMObjectType> *, RLMSectionedResultsChange *, NSError *))block __attribute__((warn_unused_result));
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMSectionedResults<RLMKeyType, RLMObjectType> *, RLMSectionedResultsChange *))block __attribute__((warn_unused_result));
 /**
  Registers a block to be called each time the sectioned results collection changes.
 
@@ -793,10 +748,6 @@ NS_ASSUME_NONNULL_BEGIN
  the block is not called at all. See the `RLMSectionedResultsChange` documentation for
  information on how the changes are reported and an example of updating a
  `UITableView`.
-
- If an error occurs the block will be called with `nil` for the results
- parameter and a non-`nil` error. Currently the only errors that can occur are
- when opening the Realm on the background worker thread.
 
  At the time when the block is called, the `RLMSectionedResults` object will be fully
  evaluated and up-to-date.
@@ -813,8 +764,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     RLMResults<Dog *> *results = [Dog allObjects];
     RLMSectionedResults<Dog *> *sectionedResults = [results sectionedResultsUsingKeyPath:@"age" ascending:YES];
-    self.token = [sectionedResults addNotificationBlock:^(RLMSectionedResults *sectionedResults, RLMSectionedResultsChange *changes,
-                                           NSError *error) {
+    self.token = [sectionedResults addNotificationBlock:^(RLMSectionedResults *sectionedResults, RLMSectionedResultsChange *changes) {
          // Only fired once for the example
          NSLog(@"sectionedResults.count: %zu", sectionedResults.count); // => 1
      }];
@@ -838,7 +788,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @return A token which must be held for as long as you want updates to be delivered.
  */
-- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMSectionedResults<RLMKeyType, RLMObjectType> *, RLMSectionedResultsChange *, NSError *))block
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMSectionedResults<RLMKeyType, RLMObjectType> *, RLMSectionedResultsChange *))block
                                          queue:(dispatch_queue_t)queue __attribute__((warn_unused_result));
 /**
  Registers a block to be called each time the sectioned results collection changes.
@@ -855,10 +805,6 @@ NS_ASSUME_NONNULL_BEGIN
  information on how the changes are reported and an example of updating a
  `UITableView`.
 
- If an error occurs the block will be called with `nil` for the results
- parameter and a non-`nil` error. Currently the only errors that can occur are
- when opening the Realm on the background worker thread.
-
  At the time when the block is called, the `RLMSectionedResults` object will be fully
  evaluated and up-to-date.
 
@@ -874,8 +820,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     RLMResults<Dog *> *results = [Dog allObjects];
     RLMSectionedResults<Dog *> *sectionedResults = [results sectionedResultsUsingKeyPath:@"age" ascending:YES];
-    self.token = [sectionedResults addNotificationBlock:^(RLMSectionedResults *sectionedResults, RLMSectionedResultsChange *changes,
-                                           NSError *error) {
+    self.token = [sectionedResults addNotificationBlock:^(RLMSectionedResults *sectionedResults, RLMSectionedResultsChange *changes) {
          // Only fired once for the example
          NSLog(@"sectionedResults.count: %zu", sectionedResults.count); // => 1
      }];
@@ -905,7 +850,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @return A token which must be held for as long as you want updates to be delivered.
  */
-- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMSectionedResults<RLMKeyType, RLMObjectType> *, RLMSectionedResultsChange *, NSError *))block
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMSectionedResults<RLMKeyType, RLMObjectType> *, RLMSectionedResultsChange *))block
                                       keyPaths:(NSArray<NSString *> *)keyPaths __attribute__((warn_unused_result));
 /**
  Registers a block to be called each time the sectioned results collection changes.
@@ -922,10 +867,6 @@ NS_ASSUME_NONNULL_BEGIN
  information on how the changes are reported and an example of updating a
  `UITableView`.
 
- If an error occurs the block will be called with `nil` for the results
- parameter and a non-`nil` error. Currently the only errors that can occur are
- when opening the Realm on the background worker thread.
-
  At the time when the block is called, the `RLMSectionedResults` object will be fully
  evaluated and up-to-date.
 
@@ -941,8 +882,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     RLMResults<Dog *> *results = [Dog allObjects];
     RLMSectionedResults<Dog *> *sectionedResults = [results sectionedResultsUsingKeyPath:@"age" ascending:YES];
-    self.token = [sectionedResults addNotificationBlock:^(RLMSectionedResults *sectionedResults, RLMSectionedResultsChange *changes,
-                                           NSError *error) {
+    self.token = [sectionedResults addNotificationBlock:^(RLMSectionedResults *sectionedResults, RLMSectionedResultsChange *changes) {
          // Only fired once for the example
          NSLog(@"sectionedResults.count: %zu", sectionedResults.count); // => 1
      }];
@@ -973,7 +913,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @return A token which must be held for as long as you want updates to be delivered.
  */
-- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMSectionedResults<RLMKeyType, RLMObjectType> *, RLMSectionedResultsChange *, NSError *))block
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMSectionedResults<RLMKeyType, RLMObjectType> *, RLMSectionedResultsChange *))block
                                       keyPaths:(nullable NSArray<NSString *> *)keyPaths
                                          queue:(nullable dispatch_queue_t)queue __attribute__((warn_unused_result));
 @end

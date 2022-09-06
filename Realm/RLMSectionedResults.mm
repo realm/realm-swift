@@ -28,29 +28,17 @@
 
 namespace {
 struct CollectionCallbackWrapper {
-    void (^block)(id, RLMSectionedResultsChange *, NSError *);
+    void (^block)(id, RLMSectionedResultsChange *);
     id collection;
     bool ignoreChangesInInitialNotification = true;
 
-    void operator()(realm::SectionedResultsChangeSet const& changes, std::exception_ptr err) {
-        if (err) {
-            try {
-                rethrow_exception(err);
-            }
-            catch (...) {
-                NSError *error = nil;
-                RLMRealmTranslateException(&error);
-                block(nil, nil, error);
-                return;
-            }
-        }
-
+    void operator()(realm::SectionedResultsChangeSet const& changes) {
         if (ignoreChangesInInitialNotification) {
             ignoreChangesInInitialNotification = false;
-            return block(collection, nil, nil);
+            return block(collection, nil);
         }
 
-        block(collection, [[RLMSectionedResultsChange alloc] initWithChanges:changes], nil);
+        block(collection, [[RLMSectionedResultsChange alloc] initWithChanges:changes]);
     }
 };
 } // anonymous namespace
@@ -269,7 +257,7 @@ static realm::SectionedResults& RLMGetBackingCollection(RLMSectionedResults *sel
 }
 
 static RLMNotificationToken *RLMAddNotificationBlock(RLMSectionedResults *collection,
-                                                     void (^block)(id, RLMSectionedResultsChange *, NSError *),
+                                                     void (^block)(id, RLMSectionedResultsChange *),
                                                      NSArray<NSString *> *keyPaths,
                                                      dispatch_queue_t queue) {
     RLMRealm *realm = collection.realm;
@@ -296,12 +284,7 @@ static RLMNotificationToken *RLMAddNotificationBlock(RLMSectionedResults *collec
         if (!token->_realm) {
             return;
         }
-        NSError *error;
-        RLMRealm *realm = token->_realm = [RLMRealm realmWithConfiguration:config queue:queue error:&error];
-        if (!realm) {
-            block(nil, nil, error);
-            return;
-        }
+        RLMRealm *realm = token->_realm = [RLMRealm realmWithConfiguration:config queue:queue error:nil];
         RLMSectionedResults *collection = [realm resolveThreadSafeReference:tsr];
         token->_token = RLMGetBackingCollection(collection).add_notification_callback(CollectionCallbackWrapper{block, collection}, std::move(keyPathArray));
     });
@@ -317,7 +300,7 @@ static RLMNotificationToken *RLMAddNotificationBlock(RLMSectionedResults *collec
         _realm = realm;
         _keyBlock = keyBlock;
         _results = std::move(results);
-        _sectionedResults = _results.sectioned_results(SectionedResultsKeyProjection {_info, _keyBlock});
+        _sectionedResults = _results.sectioned_results(SectionedResultsKeyProjection{_info, _keyBlock});
     }
     return self;
 }
@@ -341,7 +324,7 @@ static RLMNotificationToken *RLMAddNotificationBlock(RLMSectionedResults *collec
         _realm = results.realm;
         _keyBlock = keyBlock;
         _results = results->_results;
-        _sectionedResults = results->_results.sectioned_results(SectionedResultsKeyProjection {_info, _keyBlock});
+        _sectionedResults = results->_results.sectioned_results(SectionedResultsKeyProjection{_info, _keyBlock});
     }
     return self;
 }
@@ -392,18 +375,18 @@ static RLMNotificationToken *RLMAddNotificationBlock(RLMSectionedResults *collec
 // http://www.openradar.me/radar?id=6135653276319744
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmismatched-parameter-types"
-- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMResults *, RLMSectionedResultsChange *, NSError *))block {
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMResults *, RLMSectionedResultsChange *))block {
     return RLMAddNotificationBlock(self, block, nil, nil);
 }
-- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMResults *, RLMSectionedResultsChange *, NSError *))block queue:(dispatch_queue_t)queue {
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMResults *, RLMSectionedResultsChange *))block queue:(dispatch_queue_t)queue {
     return RLMAddNotificationBlock(self, block, nil, queue);
 }
 
-- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMResults *, RLMSectionedResultsChange *, NSError *))block keyPaths:(NSArray<NSString *> *)keyPaths {
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMResults *, RLMSectionedResultsChange *))block keyPaths:(NSArray<NSString *> *)keyPaths {
     return RLMAddNotificationBlock(self, block, keyPaths, nil);
 }
 
-- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMResults *, RLMSectionedResultsChange *, NSError *))block
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMResults *, RLMSectionedResultsChange *))block
                                       keyPaths:(NSArray<NSString *> *)keyPaths
                                          queue:(dispatch_queue_t)queue {
     return RLMAddNotificationBlock(self, block, keyPaths, queue);
@@ -551,7 +534,7 @@ static realm::ResultsSection& RLMGetBackingCollection(RLMSection *self) {
 }
 
 static RLMNotificationToken *RLMAddNotificationBlock(RLMSection *collection,
-                                                     void (^block)(id, RLMSectionedResultsChange *, NSError *),
+                                                     void (^block)(id, RLMSectionedResultsChange *),
                                                      NSArray<NSString *> *keyPaths,
                                                      dispatch_queue_t queue) {
     RLMRealm *realm = collection.realm;
@@ -578,12 +561,7 @@ static RLMNotificationToken *RLMAddNotificationBlock(RLMSection *collection,
         if (!token->_realm) {
             return;
         }
-        NSError *error;
-        RLMRealm *realm = token->_realm = [RLMRealm realmWithConfiguration:config queue:queue error:&error];
-        if (!realm) {
-            block(nil, nil, error);
-            return;
-        }
+        RLMRealm *realm = token->_realm = [RLMRealm realmWithConfiguration:config queue:queue error:nil];
         RLMSection *collection = [realm resolveThreadSafeReference:tsr];
         token->_token = RLMGetBackingCollection(collection).add_notification_callback(CollectionCallbackWrapper{block, collection}, std::move(keyPathArray));
     });
@@ -682,18 +660,18 @@ static RLMNotificationToken *RLMAddNotificationBlock(RLMSection *collection,
 // http://www.openradar.me/radar?id=6135653276319744
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmismatched-parameter-types"
-- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMResults *, RLMSectionedResultsChange *, NSError *))block {
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMResults *, RLMSectionedResultsChange *))block {
     return RLMAddNotificationBlock(self, block, nil, nil);
 }
-- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMResults *, RLMSectionedResultsChange *, NSError *))block queue:(dispatch_queue_t)queue {
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMResults *, RLMSectionedResultsChange *))block queue:(dispatch_queue_t)queue {
     return RLMAddNotificationBlock(self, block, nil, queue);
 }
 
-- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMResults *, RLMSectionedResultsChange *, NSError *))block keyPaths:(NSArray<NSString *> *)keyPaths {
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMResults *, RLMSectionedResultsChange *))block keyPaths:(NSArray<NSString *> *)keyPaths {
     return RLMAddNotificationBlock(self, block, keyPaths, nil);
 }
 
-- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMResults *, RLMSectionedResultsChange *, NSError *))block
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMResults *, RLMSectionedResultsChange *))block
                                       keyPaths:(NSArray<NSString *> *)keyPaths
                                          queue:(dispatch_queue_t)queue {
     return RLMAddNotificationBlock(self, block, keyPaths, queue);

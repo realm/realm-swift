@@ -2312,9 +2312,9 @@ private class CombineSectionedResultsPublisherTests<Collection: RealmCollection>
         }
     }
 
-    func checkChangeset<SectionedResults: RealmSectionedResult>(_ change: RealmSectionedResultsChange<SectionedResults>, insertions: [IndexPath] = [],
-                                                                deletions: [IndexPath] = [],
-                                                                frozen: Bool = false) {
+    func checkChangeset<SectionedResults: RealmSectionedResult>(
+            _ change: RealmSectionedResultsChange<SectionedResults>,
+            insertions: [IndexPath] = [], deletions: [IndexPath] = [], frozen: Bool = false) {
         switch change {
         case .initial(let collection):
             XCTAssertEqual(collection.isFrozen, frozen)
@@ -2324,8 +2324,6 @@ private class CombineSectionedResultsPublisherTests<Collection: RealmCollection>
             XCTAssertEqual(ins, insertions)
             XCTAssertEqual(del, deletions)
             XCTAssertEqual(modifications, [])
-        case .error(let error):
-            XCTFail("Unexpected error \(error)")
         }
     }
 

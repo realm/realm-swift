@@ -1,17 +1,19 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
+
 ### Enhancements
+
 * Add support for asymmetric sync. When a class inherits from
   `AsymmetricObject`, objects created are synced unidirectionally to the server
   and cannot be queried or read locally.
-  
+
 ```swift
     class PersonObject: AsymmetricObject {
        @Persisted(primaryKey: true) var _id: ObjectId
        @Persisted var name: String
        @Persisted var age: Int
     }
-    
+
     try realm.write {
        // This will create the object on the server but not locally.
        realm.create(PersonObject.self, value: ["_id": ObjectId.generate(),
@@ -31,9 +33,8 @@ x.y.z Release notes (yyyy-MM-dd)
           return title.first.map(String.init(_:)) ?? ""
       }
   }
-
   var sectionedResults: SectionedResults<String, DemoObject>
-  ...
+  // ...
   sectionedResults = realm.objects(DemoObject.self)
       .sectioned(by: \.firstLetter, ascending: true)
   ```
@@ -59,13 +60,38 @@ x.y.z Release notes (yyyy-MM-dd)
       }
   }
   ```
-### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
-* None.
+* Add automatic handing for changing top-level objects to embedded objects in
+  migrations. Any objects of the now-embedded type which have zero incoming
+  links are deleted, and objects with multiple incoming links are duplicated.
+  This happens after the migration callback function completes, so there is no
+  functional change if you already have migration logic which correctly handles
+  this. ([Core #5737](https://github.com/realm/realm-core/pull/5737)).
+* Improve performance when a new Realm file connects to the server for the
+  first time, especially when significant amounts of data has been written
+  while offline. ([Core #5772](https://github.com/realm/realm-core/pull/5772))
+* Shift more of the work done on the sync worker thread out of the write
+  transaction used to apply server changes, reducing how long it blocks other
+  threads from writing. ([Core #5772](https://github.com/realm/realm-core/pull/5772))
+* Improve the performance of the sync changeset parser, which speeds up
+  applying changesets from the server. ([Core #5772](https://github.com/realm/realm-core/pull/5772))
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+### Fixed
+
+* Fix all of the UBSan failures hit by our tests. It is unclear if any of these
+  manifested as visible bugs. ([Core #5665](https://github.com/realm/realm-core/pull/5665))
+* Upload completion callbacks were sometimes called before the final step of
+  interally marking the upload as complete, which could result in calling
+  `Realm.writeCopy()` from the completion callback failing due to there being
+  unuploaded changes. ([Core #4865](https://github.com/realm/realm-core/issues/4865)).
+* Writing to a Realm stored on an exFAT drive threw the exception "fcntl() with
+  F_BARRIERFSYNC failed: Inappropriate ioctl for device" when a write
+  transaction needed to expand the file.
+  ([Core #5789](https://github.com/realm/realm-core/issues/5789), since 10.27.0)
+* Syncing a Decimal128 with big significand could result in a crash.
+  ([Core #5728](https://github.com/realm/realm-core/issues/5728))
 
 ### Compatibility
+
 * Realm Studio: 11.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 13.4.1.
@@ -73,7 +99,8 @@ x.y.z Release notes (yyyy-MM-dd)
 * Xcode: 13.1-14 beta 6.
 
 ### Internal
-* Upgraded realm-core from ? to ?
+
+* Upgraded realm-core from 12.5.1 to 12.6.0
 
 10.28.7 Release notes (2022-09-02)
 =============================================================

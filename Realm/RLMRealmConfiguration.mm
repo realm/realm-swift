@@ -113,6 +113,7 @@ NSString *RLMRealmPathForFile(NSString *fileName) {
         self.fileURL = defaultRealmURL;
         self.schemaVersion = 0;
         self.cache = YES;
+        _config.automatic_handle_backlicks_in_migrations = true;
     }
 
     return self;

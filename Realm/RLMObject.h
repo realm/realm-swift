@@ -540,9 +540,7 @@ NS_ASSUME_NONNULL_BEGIN
  `NO`, a `nil` error, and an array of `RLMPropertyChange` objects which
  indicate which properties of the objects were modified.
 
- If an error occurs, `deleted` will be `NO`, `changes` will be `nil`, and
- `error` will include information about the error. The block will never be
- called again after an error occurs.
+ `error` is always `nil` and will be removed in a future version.
  */
 typedef void (^RLMObjectChangeBlock)(BOOL deleted,
                                      NSArray<RLMPropertyChange *> *_Nullable changes,
