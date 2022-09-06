@@ -1,6 +1,24 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
+* Add support for asymmetric sync. When a class inherits from
+  `AsymmetricObject`, objects created are synced unidirectionally to the server
+  and cannot be queried or read locally.
+  
+```swift
+    class PersonObject: AsymmetricObject {
+       @Persisted(primaryKey: true) var _id: ObjectId
+       @Persisted var name: String
+       @Persisted var age: Int
+    }
+    
+    try realm.write {
+       // This will create the object on the server but not locally.
+       realm.create(PersonObject.self, value: ["_id": ObjectId.generate(),
+                                               "name": "Dylan",
+                                               "age": 20])
+    }
+```
 * Add `.recoverUnsyncedChanges` (`RLMClientResetModeRecoverUnsyncedChanges`) and
 `.recoverOrDiscardUnsyncedChanges` behaviors to `ClientResetMode` (`RLMClientResetMode`).
   - The new recover modes function by downloading a realm with objects which reflect the latest
@@ -56,18 +74,40 @@ x.y.z Release notes (yyyy-MM-dd)
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 13.4.1.
 * CocoaPods: 1.10 or later.
-* Xcode: 13.1-14 beta 1.
+* Xcode: 13.1-14 beta 6.
 
 ### Internal
 * Upgraded realm-core from ? to ?
+
+10.28.7 Release notes (2022-09-02)
+=============================================================
+
+### Enhancements
+
+* Add prebuilt binaries for Xcode 14 to the release package.
+
+### Fixed
+
+* Fix archiving watchOS release builds with Xcode 14.
+
+### Compatibility
+
+* Realm Studio: 11.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 13.4.1.
+* CocoaPods: 1.10 or later.
+* Xcode: 13.1-14 beta 6.
 
 10.28.6 Release notes (2022-08-19)
 =============================================================
 
 ### Fixed
-* Fixed an issue where having realm-swift as SPM sub-target dependency leads to missing symbols error during iOS archiving ([Core #7645](https://github.com/realm/realm-core/pull/7645)).
+
+* Fixed an issue where having realm-swift as SPM sub-target dependency leads to
+  missing symbols error during iOS archiving ([Core #7645](https://github.com/realm/realm-core/pull/7645)).
 
 ### Compatibility
+
 * Realm Studio: 11.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 13.4.1.

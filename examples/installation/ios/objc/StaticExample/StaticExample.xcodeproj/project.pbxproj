@@ -3,12 +3,13 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 46;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3FCABC1F28BE9B9D008C966A /* libcompression.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 3FCABC1E28BE9B9C008C966A /* libcompression.tbd */; };
+		3FCABC2128BE9BC5008C966A /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 3FCABC2028BE9BB3008C966A /* libc++.tbd */; };
 		E85A7EEC1AFAAFBF005C839C /* Realm.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = E88ABBDA1AFAA5D600FA1E1D /* Realm.xcframework */; };
-		E85A7EED1AFAAFC2005C839C /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E88ABBDC1AFAA5E000FA1E1D /* libc++.dylib */; };
 		E88ABBB51AFA9DE300FA1E1D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E88ABBB41AFA9DE300FA1E1D /* main.m */; };
 		E88ABBB81AFA9DE300FA1E1D /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = E88ABBB71AFA9DE300FA1E1D /* AppDelegate.m */; };
 		E88ABBBB1AFA9DE300FA1E1D /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E88ABBBA1AFA9DE300FA1E1D /* ViewController.m */; };
@@ -17,7 +18,6 @@
 		E88ABBC31AFA9DE300FA1E1D /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = E88ABBC11AFA9DE300FA1E1D /* LaunchScreen.xib */; };
 		E88ABBCF1AFA9DE400FA1E1D /* StaticExampleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E88ABBCE1AFA9DE400FA1E1D /* StaticExampleTests.m */; };
 		E88ABBDB1AFAA5D600FA1E1D /* Realm.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = E88ABBDA1AFAA5D600FA1E1D /* Realm.xcframework */; };
-		E88ABBDD1AFAA5E000FA1E1D /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E88ABBDC1AFAA5E000FA1E1D /* libc++.dylib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -31,6 +31,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		3FCABC1E28BE9B9C008C966A /* libcompression.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libcompression.tbd; path = usr/lib/libcompression.tbd; sourceTree = SDKROOT; };
+		3FCABC2028BE9BB3008C966A /* libc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; };
 		E88ABBAF1AFA9DE300FA1E1D /* StaticExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = StaticExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E88ABBB31AFA9DE300FA1E1D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E88ABBB41AFA9DE300FA1E1D /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -45,7 +47,6 @@
 		E88ABBCD1AFA9DE400FA1E1D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E88ABBCE1AFA9DE400FA1E1D /* StaticExampleTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = StaticExampleTests.m; sourceTree = "<group>"; };
 		E88ABBDA1AFAA5D600FA1E1D /* Realm.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Realm.xcframework; path = "../../../realm-objc-latest/ios-static/Realm.xcframework"; sourceTree = "<group>"; };
-		E88ABBDC1AFAA5E000FA1E1D /* libc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.dylib"; path = "usr/lib/libc++.dylib"; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -53,7 +54,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E88ABBDD1AFAA5E000FA1E1D /* libc++.dylib in Frameworks */,
+				3FCABC2128BE9BC5008C966A /* libc++.tbd in Frameworks */,
+				3FCABC1F28BE9B9D008C966A /* libcompression.tbd in Frameworks */,
 				E88ABBDB1AFAA5D600FA1E1D /* Realm.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -62,7 +64,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E85A7EED1AFAAFC2005C839C /* libc++.dylib in Frameworks */,
 				E85A7EEC1AFAAFBF005C839C /* Realm.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -70,13 +71,22 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		3FCABC1D28BE9B9C008C966A /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				3FCABC2028BE9BB3008C966A /* libc++.tbd */,
+				3FCABC1E28BE9B9C008C966A /* libcompression.tbd */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		E88ABBA61AFA9DE300FA1E1D = {
 			isa = PBXGroup;
 			children = (
+				3FCABC1D28BE9B9C008C966A /* Frameworks */,
 				E88ABBB01AFA9DE300FA1E1D /* Products */,
 				E88ABBB11AFA9DE300FA1E1D /* StaticExample */,
 				E88ABBCB1AFA9DE400FA1E1D /* StaticExampleTests */,
-				E88ABBDC1AFAA5E000FA1E1D /* libc++.dylib */,
 				E88ABBDA1AFAA5D600FA1E1D /* Realm.xcframework */,
 			);
 			sourceTree = "<group>";
@@ -192,6 +202,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 				Base,
 			);
@@ -297,7 +308,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-                               CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -352,7 +363,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-                               CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -387,7 +398,10 @@
 					"../../../realm-objc-latest/ios/static",
 				);
 				INFOPLIST_FILE = StaticExample/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				OTHER_LDFLAGS = "-lz";
 				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -403,7 +417,10 @@
 					"../../../realm-objc-latest/ios/static",
 				);
 				INFOPLIST_FILE = StaticExample/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				OTHER_LDFLAGS = "-lz";
 				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -425,7 +442,11 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = StaticExampleTests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/StaticExample.app/StaticExample";
@@ -444,7 +465,11 @@
 					"../../../realm-objc-latest/ios/static/",
 				);
 				INFOPLIST_FILE = StaticExampleTests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/StaticExample.app/StaticExample";

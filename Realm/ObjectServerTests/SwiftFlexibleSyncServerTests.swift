@@ -30,7 +30,7 @@ import SwiftUI
 
 class SwiftFlexibleSyncTests: SwiftSyncTestCase {
     func testCreateFlexibleSyncApp() throws {
-        let appId = try RealmServer.shared.createAppForSyncMode(.flx(["age"]))
+        let appId = try RealmServer.shared.createAppWithQueryableFields(["age"])
         let flexibleApp = app(fromAppId: appId)
         let user = try logInUser(for: basicCredentials(app: flexibleApp), app: flexibleApp)
         XCTAssertNotNil(user)
@@ -42,7 +42,9 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
     }
 
     func testGetSubscriptionsWhenLocalRealm() throws {
-        let realm = try Realm()
+        var configuration = Realm.Configuration.defaultConfiguration
+        configuration.objectTypes = [SwiftPerson.self]
+        let realm = try Realm(configuration: configuration)
         assertThrows(realm.subscriptions)
     }
 
@@ -1011,20 +1013,6 @@ class SwiftAsyncFlexibleSyncTests: SwiftSyncTestCase {
 
 @available(macOS 12.0, *)
 extension SwiftFlexibleSyncServerTests {
-    func flexibleSyncConfig() async throws -> Realm.Configuration {
-        var config = (try await self.flexibleSyncApp.login(credentials: basicCredentials(app: flexibleSyncApp))).flexibleSyncConfiguration()
-        if config.objectTypes == nil {
-            config.objectTypes = [SwiftPerson.self,
-                                  SwiftTypesSyncObject.self]
-        }
-        return config
-    }
-
-    func flexibleSyncRealm() async throws -> Realm {
-        let realm = try await Realm(configuration: flexibleSyncConfig())
-        return realm
-    }
-
     @MainActor
     private func populateFlexibleSyncData(_ block: @escaping (Realm) -> Void) async throws {
         let realm = try await flexibleSyncRealm()
@@ -1164,6 +1152,11 @@ extension SwiftFlexibleSyncServerTests {
         XCTAssertNotNil(realm)
 
         XCTAssertEqual(realm.subscriptions.count, 1)
+        // Adding this sleep, because there seems to be a timing issue after this commit in baas
+        // https://github.com/10gen/baas/commit/64e75b3f1fe8a6f8704d1597de60f9dda401ccce,
+        // data take a little longer to be downloaded to the realm even though the
+        // sync client changed the subscription state to completed.
+        sleep(1)
         checkCount(expected: 10, realm, SwiftPerson.self)
     }
 
@@ -1247,6 +1240,11 @@ extension SwiftFlexibleSyncServerTests {
             let realm = try await Realm(configuration: c, downloadBeforeOpen: .always)
             XCTAssertNotNil(realm)
             XCTAssertEqual(realm.subscriptions.count, 1)
+            // Adding this sleep, because there seems to be a timing issue after this commit in baas
+            // https://github.com/10gen/baas/commit/64e75b3f1fe8a6f8704d1597de60f9dda401ccce,
+            // data take a little longer to be downloaded to the realm even though the
+            // sync client changed the subscription state to completed.
+            sleep(1)
             checkCount(expected: 9, realm, SwiftTypesSyncObject.self)
         }.value
 

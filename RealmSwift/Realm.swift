@@ -1101,6 +1101,27 @@ extension Realm {
     }
 }
 
+// MARK: Asymmetric Sync
+
+extension Realm {
+    /**
+     Creates an Asymmetric object, which will be synced unidirectionally and
+     cannot be queried locally. Only objects which inherit from `AsymmetricObject`
+     can be created using this method.
+
+     Objects created using this method will not be added to the Realm.
+
+     - warning: This method may only be called during a write transaction.
+
+     - parameter type:   The type of the object to create.
+     - parameter value:  The value used to populate the object.
+     */
+    public func create<T: AsymmetricObject>(_ type: T.Type, value: Any = [:]) {
+        let typeName = (type as AsymmetricObject.Type).className()
+        RLMCreateAsymmetricObjectInRealm(rlmRealm, typeName, value)
+    }
+}
+
 // MARK: Equatable
 
 extension Realm: Equatable {

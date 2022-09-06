@@ -465,15 +465,15 @@ case "$COMMAND" in
         # set the Xcode version to the oldest
         export REALM_XCODE_VERSION=$REALM_XCODE_OLDEST_VERSION
         unset REALM_SWIFT_VERSION
-        sh build.sh xcframework ios
+        sh build.sh xcframework osx
         # copy the xcframework to the testing target
         rm -rf examples/installation/xcframework-evolution
         mkdir examples/installation/xcframework-evolution
-        cp -r build/*.xcframework examples/installation/xcframework-evolution
+        cp -cr build/*.xcframework examples/installation/xcframework-evolution
         export REALM_XCODE_VERSION=$REALM_XCODE_LATEST_VERSION
         unset REALM_SWIFT_VERSION
         cd examples/installation
-        sh build.sh "test-ios-swift-xcframework"
+        sh build.sh "test-osx-swift-xcframework"
 
         exit 0
         ;;
@@ -976,42 +976,6 @@ case "$COMMAND" in
         ;;
 
     ######################################
-    # Bitcode Detection
-    ######################################
-
-    "binary-has-bitcode")
-        # Disable pipefail as grep -q will make otool fail due to exiting
-        # before reading all the output
-        set +o pipefail
-
-        BINARY="$2"
-        if otool -l "$BINARY" | grep -q "segname __LLVM"; then
-            exit 0
-        fi
-        # Work around rdar://21826157 by checking for bitcode in thin binaries
-
-        # Get architectures for binary
-        archs="$(lipo -info "$BINARY" | rev | cut -d ':' -f1 | rev)"
-
-        archs_array=( $archs )
-        if [[ ${#archs_array[@]} -lt 2 ]]; then
-            echo 'Error: Built library is not a fat binary'
-            exit 1 # Early exit if not a fat binary
-        fi
-
-        TEMPDIR=$(mktemp -d $TMPDIR/realm-bitcode-check.XXXX)
-
-        for arch in $archs; do
-            lipo -thin "$arch" "$BINARY" -output "$TEMPDIR/$arch"
-            if otool -l "$TEMPDIR/$arch" | grep -q "segname __LLVM"; then
-                exit 0
-            fi
-        done
-        echo 'Error: Built library does not contain bitcode'
-        exit 1
-        ;;
-
-    ######################################
     # Continuous Integration
     ######################################
 
@@ -1298,7 +1262,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 13.4.1.
 * CocoaPods: 1.10 or later.
-* Xcode: 13.1-14 beta 1.
+* Xcode: 13.1-14 beta 6.
 
 ### Internal
 * Upgraded realm-core from ? to ?

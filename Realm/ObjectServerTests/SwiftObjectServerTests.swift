@@ -41,18 +41,6 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         return collection
     }
 
-    func removeAllFromCollection(_ collection: MongoCollection) {
-        let ex = expectation(description: "delete objects")
-        collection.deleteManyDocuments(filter: [:]) { result in
-            switch result {
-            case .success:
-                ex.fulfill()
-            case .failure(let error):
-                XCTFail("Error: \(error.localizedDescription)")
-            }
-        }
-        wait(for: [ex], timeout: 60.0)
-    }
     /// It should be possible to successfully open a Realm configured for sync.
     func testBasicSwiftSync() throws {
         let user = try logInUser(for: basicCredentials())
@@ -2221,6 +2209,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         var localConfig = Realm.Configuration()
         localConfig.seedFilePath = seedURL
         localConfig.fileURL = RLMDefaultRealmURL()
+        localConfig.objectTypes = [SwiftHugeSyncObject.self]
         localConfig.schemaVersion = 1
 
         let realm = try Realm(configuration: localConfig)
@@ -2580,10 +2569,6 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         return collection
     }
 
-    func removeAllFromCollection(_ collection: MongoCollection) {
-        collection.deleteManyDocuments(filter: [:]).await(self)
-    }
-
     // swiftlint:disable multiple_closures_with_trailing_closure
     func testWatchCombine() throws {
         let sema = DispatchSemaphore(value: 0)
@@ -2930,6 +2915,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
                 (0..<10000).forEach { _ in realm.add(SwiftPerson(firstName: "Charlie", lastName: "Bucket")) }
             }
         }
+
         Realm.asyncOpen().await(self) { realm in
             XCTAssertEqual(realm.objects(SwiftPerson.self).count, 10000)
         }
@@ -3302,12 +3288,14 @@ class AsyncAwaitObjectServerTests: SwiftSyncTestCase {
 
     @MainActor func testAsyncOpenStandalone() async throws {
         try autoreleasepool {
-            let realm = try Realm()
+            let configuration = Realm.Configuration(objectTypes: [SwiftPerson.self])
+            let realm = try Realm(configuration: configuration)
             try realm.write {
                 (0..<10).forEach { _ in realm.add(SwiftPerson(firstName: "Charlie", lastName: "Bucket")) }
             }
         }
-        let realm = try await Realm()
+        let configuration = Realm.Configuration(objectTypes: [SwiftPerson.self])
+        let realm = try await Realm(configuration: configuration)
         XCTAssertEqual(realm.objects(SwiftPerson.self).count, 10)
     }
 

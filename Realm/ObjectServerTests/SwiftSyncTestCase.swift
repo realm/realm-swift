@@ -261,10 +261,22 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
         waitForExpectations(timeout: 20.0, handler: nil)
         try block(realm)
     }
+
+    // MARK: - Mongo Client
+
+    public func removeAllFromCollection(_ collection: MongoCollection) {
+        let deleteEx = expectation(description: "Delete all from Mongo collection")
+        collection.deleteManyDocuments(filter: [:]) { result in
+            if case .failure = result {
+                XCTFail("Should delete")
+            }
+            deleteEx.fulfill()
+        }
+        wait(for: [deleteEx], timeout: 30.0)
+    }
 }
 
 #if swift(>=5.6) && canImport(_Concurrency)
-
 @available(macOS 12.0, *)
 extension SwiftSyncTestCase {
     public func basicCredentials(usernameSuffix: String = "", app: RealmSwift.App? = nil) async throws -> Credentials {
@@ -274,7 +286,22 @@ extension SwiftSyncTestCase {
         try await (app ?? self.app).emailPasswordAuth.registerUser(email: email, password: password)
         return credentials
     }
-}
 
+    // MARK: - Flexible Sync Async Use Cases
+
+    public func flexibleSyncConfig() async throws -> Realm.Configuration {
+        var config = (try await self.flexibleSyncApp.login(credentials: basicCredentials(app: flexibleSyncApp))).flexibleSyncConfiguration()
+        if config.objectTypes == nil {
+            config.objectTypes = [SwiftPerson.self,
+                                  SwiftTypesSyncObject.self]
+        }
+        return config
+    }
+
+    public func flexibleSyncRealm() async throws -> Realm {
+        let realm = try await Realm(configuration: flexibleSyncConfig())
+        return realm
+    }
+}
 #endif // swift(>=5.6)
 #endif // os(macOS)

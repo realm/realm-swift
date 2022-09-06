@@ -20,13 +20,6 @@
 #import "RLMSyncSubscription_Private.h"
 #import "RLMApp_Private.hpp"
 
-// These are defined in Swift. Importing the auto-generated header doesn't work
-// when building with SPM, so just redeclare the bits we need.
-@interface RealmServer : NSObject
-+ (RealmServer *)shared;
-- (NSString *)createAppWithQueryableFields:(NSArray *)queryableFields error:(NSError **)error;
-@end
-
 @interface TimeoutProxyServer : NSObject
 - (instancetype)initWithPort:(uint16_t)port targetPort:(uint16_t)targetPort;
 - (void)startAndReturnError:(NSError **)error;
@@ -52,7 +45,9 @@
 }
 
 - (void)testGetSubscriptionsWhenLocalRealm {
-    RLMRealm *realm = [RLMRealm defaultRealm];
+    RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
+    configuration.objectClasses = @[Person.self];
+    RLMRealm *realm = [RLMRealm realmWithConfiguration:configuration error:nil];
     RLMAssertThrowsWithReason(realm.subscriptions, @"This Realm was not configured with flexible sync");
 }
 
@@ -950,6 +945,11 @@
                                 callback:^(RLMRealm *realm, NSError *error) {
         XCTAssertNil(error);
         XCTAssertEqual(realm.subscriptions.count, 1UL);
+        // Adding this sleep, because there seems to be a timing issue after this commit in baas
+        // https://github.com/10gen/baas/commit/64e75b3f1fe8a6f8704d1597de60f9dda401ccce,
+        // data take a little longer to be downloaded to the realm even though the
+        // sync client changed the subscription state to completed.
+        sleep(1);
         CHECK_COUNT(11, Person, realm);
         [ex fulfill];
     }];
@@ -1004,6 +1004,11 @@
                                 callback:^(RLMRealm *realm, NSError *error) {
         XCTAssertNil(error);
         XCTAssertEqual(realm.subscriptions.count, 1UL);
+        // Adding this sleep, because there seems to be a timing issue after this commit in baas
+        // https://github.com/10gen/baas/commit/64e75b3f1fe8a6f8704d1597de60f9dda401ccce,
+        // data take a little longer to be downloaded to the realm even though the
+        // sync client changed the subscription state to completed.
+        sleep(1);
         CHECK_COUNT(11, Person, realm);
         [ex fulfill];
     }];

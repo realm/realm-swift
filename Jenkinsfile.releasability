@@ -1,4 +1,4 @@
-xcodeVersions = ['13.1', '13.2.1', '13.3.1', '13.4.1']
+xcodeVersions = ['13.1', '13.2.1', '13.3.1', '13.4.1', '14.0']
 platforms = ['osx', 'ios', 'watchos', 'tvos', 'catalyst']
 carthagePlatforms = ['osx', 'ios', 'watchos', 'tvos']
 platformNames = ['osx': 'macOS', 'ios': 'iOS', 'watchos': 'watchOS', 'tvos': 'tvOS', 'catalyst': 'Catalyst']
@@ -335,7 +335,7 @@ def doBuild() {
     }
 
     parallelBuilds["Installation - Mac Catalyst Swift CocoaPods"] = installationTest('catalyst', 'cocoapods', 'swift')
-    parallelBuilds["Installation - iOS XCFramework Evolution"] = xcframeworkEvolutionTest()
+    parallelBuilds["Installation - XCFramework Evolution"] = xcframeworkEvolutionTest()
 
     parallel parallelBuilds
   }
