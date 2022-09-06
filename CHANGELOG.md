@@ -1,4 +1,4 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.29.0 Release notes (2022-09-09)
 =============================================================
 
 ### Enhancements
@@ -96,7 +96,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 13.4.1.
 * CocoaPods: 1.10 or later.
-* Xcode: 13.1-14 beta 6.
+* Xcode: 13.1-14 RC.
 
 ### Internal
 
