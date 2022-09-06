@@ -209,7 +209,7 @@ public typealias Provider = RLMIdentityProvider
 
 /**
  An enum used to determines file recovery behavior in the event of a client reset.
- Defaults to  `.recover`.
+ Defaults to  `. recoverUnsyncedChanges `.
 
  - see: `RLMClientResetMode`
  - see: https://docs.mongodb.com/realm/sync/error-handling/client-resets/
@@ -257,12 +257,12 @@ public enum ClientResetMode {
     /// Identical in behavior to `.discardLocal.` Will fully replace
     /// `.discardLocal.` once it's removed.
     case discardUnsyncedChanges(((Realm) -> Void)? = nil, ((Realm, Realm) -> Void)? = nil)
-    /// - see: `RLMClientResetModeRecoverUnsyncedChanges` for more details on `.recover` behavior
+    /// - see: `RLMClientResetModeRecoverUnsyncedChanges` for more details on `.recoverUnsyncedChanges` behavior
     ///
     /// - see `ClientResetMode.discardLocal` above for a detailed explanation of the
     ///   two callback arguments: `((Realm) -> Void)? = nil, ((Realm, Realm) -> Void)? = nil`
     case recoverUnsyncedChanges(((Realm) -> Void)? = nil, ((Realm, Realm) -> Void)? = nil)
-    /// - see: `RLMClientResetModeRecoverOrDiscardUnsyncedChanges` for more details on `.recoverOrDiscard` behavior
+    /// - see: `RLMClientResetModeRecoverOrDiscardUnsyncedChanges` for more details on `.recoverOrDiscardUnsyncedChanges` behavior
     ///
     /// - see `ClientResetMode.discardLocal` for a detailed explanation of the
     ///   two callback arguments: `((Realm) -> Void)? = nil, ((Realm, Realm) -> Void)? = nil`
@@ -458,7 +458,7 @@ public extension User {
      Additional settings can be optionally specified. Descriptions of these
      settings follow.
 
-     `ClientResetMode` is `.recover` by default.
+     `ClientResetMode` is `.recoverUnsyncedChanges` by default.
 
      - warning: NEVER disable SSL validation for a system running in production.
      */
@@ -471,7 +471,7 @@ public extension User {
      Create a sync configuration instance.
 
      - parameter partitionValue: The `BSON` value the Realm is partitioned on.
-     - parameter clientResetMode: Determines file recovery behavior during a client reset. `.recover` by default.
+     - parameter clientResetMode: Determines file recovery behavior during a client reset. `. recoverUnsyncedChanges ` by default.
      - parameter notifyBeforeClientReset: A callback which notifies prior to a client reset occurring. See: `notifyBeforeClientReset`.
      - parameter notifyAfterClientReset: A callback which notifies after a client reset has occurred. See: `notifyAfterClientReset`.
      */

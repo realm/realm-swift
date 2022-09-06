@@ -170,7 +170,7 @@ struct AfterClientResetWrapper : CallbackSchema {
     if (!beforeClientReset) {
         _config->notify_before_client_reset = nullptr;
     } else if (self.clientResetMode == RLMClientResetModeManual) {
-        @throw RLMException(@"RLMClientResetBeforeBlock reset notifications are not supported in Manual mode. Use RLMSyncConfiguration.manualClientResetHandler or SyncManager.ErrorHandler");
+        @throw RLMException(@"RLMClientResetBeforeBlock reset notifications are not supported in Manual mode. Use RLMSyncConfiguration.manualClientResetHandler or RLMSyncManager.ErrorHandler");
     } else {
         _config->notify_before_client_reset = BeforeClientResetWrapper{.block = beforeClientReset};
     }
