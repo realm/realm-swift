@@ -29,7 +29,7 @@ x.y.z Release notes (yyyy-MM-dd)
     1. Objects created locally not synced before client reset, will be integrated.
     2. If an object has been deleted on the server, but was modified on the client, the delete takes precedence and the update is discarded
     3. If an object was deleted on the client, but not the server, then the client delete instruction is applied.
-    4. In the case of conflicting updates to the same field, the most recent update is applied.
+    4. In the case of conflicting updates to the same field, the client update is applied.
   - The client reset process will fallback to `ClientResetMode.discardUnsyncedChanges` if the recovery process fails in `.recoverOrDiscardUnsyncedChanges`.
   - The client reset process will fallback to `ClientResetMode.manual` if the recovery process fails in `.recoverUnsyncedChanges`.
   - The two new swift recovery modes support client reset callbacks: `.recoverUnsyncedChanges(((Realm) -> Void)? = nil, ((Realm, Realm) -> Void)? = nil)`.

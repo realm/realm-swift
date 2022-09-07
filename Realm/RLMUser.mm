@@ -131,14 +131,19 @@ using namespace realm;
                                                       notifyBeforeReset:(nullable RLMClientResetBeforeBlock)beforeResetBlock
                                                        notifyAfterReset:(nullable RLMClientResetAfterBlock)afterResetBlock {
     auto syncConfig = [[RLMSyncConfiguration alloc] initWithUser:self];
-    if (clientResetMode == RLMClientResetModeManual) {
-        @throw RLMException(@"RLMClientResetModeManual not available for flexible sync configurations");
-    } else {
-        syncConfig.clientResetMode = clientResetMode;
-    }
+    RLMRealmConfiguration *config = [[RLMRealmConfiguration alloc] init];
     syncConfig.beforeClientReset = beforeResetBlock;
     syncConfig.afterClientReset = afterResetBlock;
+    config.syncConfiguration = syncConfig;
+    return config;
+}
+
+- (RLMRealmConfiguration *)flexibleSyncConfigurationWithClientResetMode:(RLMClientResetMode)clientResetMode
+                                               manualClientResetHandler:(nullable RLMSyncErrorReportingBlock)manualClientResetHandler {
+    auto syncConfig = [[RLMSyncConfiguration alloc] initWithUser:self];
     RLMRealmConfiguration *config = [[RLMRealmConfiguration alloc] init];
+    syncConfig.clientResetMode = clientResetMode;
+    syncConfig.manualClientResetHandler = manualClientResetHandler;
     config.syncConfiguration = syncConfig;
     return config;
 }
@@ -160,14 +165,23 @@ using namespace realm;
                                                             notifyAfterReset:(nullable RLMClientResetAfterBlock)afterResetBlock {
     auto syncConfig = [[RLMSyncConfiguration alloc] initWithUser:self];
     RLMRealmConfiguration *config = [[RLMRealmConfiguration alloc] init];
-    config.initialSubscriptions = initialSubscriptions;
-    if (clientResetMode == RLMClientResetModeManual) {
-        @throw RLMException(@"RLMClientResetModeManual not available for flexible sync configurations");
-    } else {
-        syncConfig.clientResetMode = clientResetMode;
-    }
     syncConfig.beforeClientReset = beforeResetBlock;
     syncConfig.afterClientReset = afterResetBlock;
+    config.initialSubscriptions = initialSubscriptions;
+    config.rerunOnOpen = rerunOnOpen;
+    config.syncConfiguration = syncConfig;
+    return config;
+}
+
+- (RLMRealmConfiguration *)flexibleSyncConfigurationWithInitialSubscriptions:(RLMFlexibleSyncInitialSubscriptionsBlock)initialSubscriptions
+                                                                 rerunOnOpen:(BOOL)rerunOnOpen
+                                                             clientResetMode:(RLMClientResetMode)clientResetMode
+                                                    manualClientResetHandler:(nullable RLMSyncErrorReportingBlock)manualClientResetHandler {
+    auto syncConfig = [[RLMSyncConfiguration alloc] initWithUser:self];
+    RLMRealmConfiguration *config = [[RLMRealmConfiguration alloc] init];
+    syncConfig.clientResetMode = clientResetMode;
+    syncConfig.manualClientResetHandler = manualClientResetHandler;
+    config.initialSubscriptions = initialSubscriptions;
     config.rerunOnOpen = rerunOnOpen;
     config.syncConfiguration = syncConfig;
     return config;

@@ -254,21 +254,152 @@ public enum ClientResetMode {
     /// - see: `RLMClientResetAfterBlock`
     @available(*, deprecated, message: "Use discardUnsyncedChanges")
     case discardLocal(((Realm) -> Void)? = nil, ((Realm, Realm) -> Void)? = nil)
-    /// Identical in behavior to `.discardLocal.` Will fully replace
-    /// `.discardLocal.` once it's removed.
+    /// All unsynchronized local changes are automatically discarded and the local state is
+    /// automatically reverted to the most recent state from the server. Unsynchronized changes
+    /// can then be recovered in the post-client-reset callback block.
+    ///
+    /// If `.discardUnsyncedChanges` is enabled but the client reset operation is unable to complete
+    /// then the client reset process reverts to manual mode. Example) During a destructive schema change this
+    /// mode will fail and invoke the manual client reset handler.
+    ///
+    /// The first `.discardUnsyncedChanges` function argument notifies prior to a client reset occurring.
+    /// The `Realm` argument contains a frozen copy of the Realm state prior to client reset.
+    /// ```
+    /// user.configuration(partitionValue: "myPartition", clientResetMode: .discardUnsyncedChanges({ beforeRealm in
+    ///    var recoveryConfig = Realm.Configuration()
+    ///    recoveryConfig.fileURL = myRecoveryPath
+    ///    do {
+    ///        beforeRealm.writeCopy(configuration: recoveryConfig)
+    ///        // The copied realm could be used later for recovery, debugging, reporting, etc.
+    ///    } catch {
+    ///        // handle error
+    ///    }
+    /// }, nil))
+    /// ```
+    ///  For more details on ((Realm) -> Void)? = nil,
+    /// - see: `RLMClientResetBeforeBlock`
+    ///
+    /// The second `.discardUnsyncedChanges` function argument notifies after a client reset has occurred.
+    /// - Within this function, the first `Realm` argument contains a frozen copy of the local Realm state prior to client reset.
+    /// - Within this function, the second `Realm` argument contains the Realm state after client reset.
+    /// ```
+    /// user.configuration(partitionValue: "myPartition", clientResetMode: .discardUnsyncedChanges( nil, { beforeRealm, afterRealm in
+    /// // This block could be used to add custom recovery logic, back-up a realm file, send reporting, etc.
+    /// for object in before.objects(myClass.self) {
+    ///     let res = after.objects(myClass.self)
+    ///     if (res.filter("primaryKey == %@", object.primaryKey).first != nil) {
+    ///         // ...custom recovery logic...
+    ///     } else {
+    ///         // ...custom recovery logic...
+    ///     }
+    /// }
+    /// }))
+    /// ```
+    ///  For more details on the second block: ((Realm, Realm) -> Void)? = nil,
+    /// - see: `RLMClientResetAfterBlock`
     case discardUnsyncedChanges(((Realm) -> Void)? = nil, ((Realm, Realm) -> Void)? = nil)
-    /// - see: `RLMClientResetModeRecoverUnsyncedChanges` for more details on `.recoverUnsyncedChanges` behavior
+    /// The client device will download a realm realm which reflects the latest
+    /// state of the server after a client reset. A recovery process is run locally in
+    /// an attempt to integrate the server version with any local changes from
+    /// before the client reset occurred.
     ///
-    /// - see `ClientResetMode.discardLocal` above for a detailed explanation of the
-    ///   two callback arguments: `((Realm) -> Void)? = nil, ((Realm, Realm) -> Void)? = nil`
+    /// The changes are integrated with the following rules:
+    /// 1. Objects created locally that were not synced before client reset will be integrated.
+    /// 2. If an object has been deleted on the server, but was modified on the client, the delete takes precedence and the update is discarded
+    /// 3. If an object was deleted on the client, but not the server, then the client delete instruction is applied.
+    /// 4. In the case of conflicting updates to the same field, the client update is applied.
+    ///
+    /// If the recovery integration fails, the client reset process falls back to ClientResetMode.manual.
+    /// The recovery integration will fail if the "Client Recovery" setting is not enabled on the server.
+    /// Integration may also fail in the event of an incompatible schema change.
+    ///
+    /// The first `.recoverUnsyncedChanges` function argument notifies prior to a client reset occurring.
+    /// The `Realm` argument contains a frozen copy of the Realm state prior to client reset.
+    /// ```
+    /// user.configuration(partitionValue: "myPartition", clientResetMode: .recoverUnsyncedChanges({ beforeRealm in
+    ///    var recoveryConfig = Realm.Configuration()
+    ///    recoveryConfig.fileURL = myRecoveryPath
+    ///    do {
+    ///        beforeRealm.writeCopy(configuration: recoveryConfig)
+    ///        // The copied realm could be used later as a backup, debugging, reporting, etc.
+    ///    } catch {
+    ///        // handle error
+    ///    }
+    /// }, nil))
+    /// ```
+    ///  For more details on ((Realm) -> Void)? = nil,
+    /// - see: `RLMClientResetBeforeBlock`
+    ///
+    /// The second `.recoverUnsyncedChanges` function argument notifies after a client reset has occurred.
+    /// - Within this function, the first `Realm` argument contains a frozen copy of the local Realm state prior to client reset.
+    /// - Within this function, the second `Realm` argument contains the Realm state after client reset.
+    /// ```
+    /// user.configuration(partitionValue: "myPartition", clientResetMode: .recoverUnsyncedChanges( nil, { beforeRealm, afterRealm in
+    /// // This block could be used for additional recovery logic, back-up a realm file, send reporting, etc.
+    /// for object in before.objects(myClass.self) {
+    ///     let res = after.objects(myClass.self)
+    ///     if (res.filter("primaryKey == %@", object.primaryKey).first != nil) {
+    ///         // ...custom recovery logic...
+    ///     } else {
+    ///         // ...custom recovery logic...
+    ///     }
+    /// }
+    /// }))
+    /// ```
+    ///  For more details on the second block: ((Realm, Realm) -> Void)? = nil,
+    /// - see: `RLMClientResetAfterBlock`
     case recoverUnsyncedChanges(((Realm) -> Void)? = nil, ((Realm, Realm) -> Void)? = nil)
-    /// - see: `RLMClientResetModeRecoverOrDiscardUnsyncedChanges` for more details on `.recoverOrDiscardUnsyncedChanges` behavior
+    /// The client device will download a realm with objects reflecting the latest version of the server. A recovery
+    /// process is run locally in an attempt to integrate the server version with any local changes from before the
+    /// client reset occurred.
     ///
-    /// - see `ClientResetMode.discardLocal` for a detailed explanation of the
-    ///   two callback arguments: `((Realm) -> Void)? = nil, ((Realm, Realm) -> Void)? = nil`
+    /// The changes are integrated with the following rules:
+    /// 1. Objects created locally that were not synced before client reset will be integrated.
+    /// 2. If an object has been deleted on the server, but was modified on the client, the delete takes precedence and the update is discarded
+    /// 3. If an object was deleted on the client, but not the server, then the client delete instruction is applied.
+    /// 4. In the case of conflicting updates to the same field, the client update is applied.
+    ///
+    /// If the recovery integration fails, the client reset process falls back to ClientResetMode.discardUnsyncedChanges.
+    /// The recovery integration will fail if the "Client Recovery" setting is not enabled on the server.
+    /// Integration may also fail in the event of an incompatible schema change.
+    ///
+    /// The first `.recoverOrDiscardUnsyncedChanges` function argument notifies prior to a client reset occurring.
+    /// The `Realm` argument contains a frozen copy of the Realm state prior to client reset.
+    /// ```
+    /// user.configuration(partitionValue: "myPartition", clientResetMode: .recoverOrDiscardUnsyncedChanges({ beforeRealm in
+    ///    var recoveryConfig = Realm.Configuration()
+    ///    recoveryConfig.fileURL = myRecoveryPath
+    ///    do {
+    ///        beforeRealm.writeCopy(configuration: recoveryConfig)
+    ///        // The copied realm could be used later as a backup, debugging, reporting, etc.
+    ///    } catch {
+    ///        // handle error
+    ///    }
+    /// }, nil))
+    /// ```
+    ///  For more details on ((Realm) -> Void)? = nil,
+    /// - see: `RLMClientResetBeforeBlock`
+    ///
+    /// The second `.recoverOrDiscardUnsyncedChanges` function argument notifies after a client reset has occurred.
+    /// - Within this function, the first `Realm` argument contains a frozen copy of the local Realm state prior to client reset.
+    /// - Within this function, the second `Realm` argument contains the Realm state after client reset.
+    /// ```
+    /// user.configuration(partitionValue: "myPartition", clientResetMode: .recoverOrDiscardUnsyncedChanges( nil, { beforeRealm, afterRealm in
+    /// // This block could be used for additional recovery logic, back-up a realm file, send reporting, etc.
+    /// for object in before.objects(myClass.self) {
+    ///     let res = after.objects(myClass.self)
+    ///     if (res.filter("primaryKey == %@", object.primaryKey).first != nil) {
+    ///         // ...custom recovery logic...
+    ///     } else {
+    ///         // ...custom recovery logic...
+    ///     }
+    /// }
+    /// }))
+    /// ```
+    ///  For more details on the second block: ((Realm, Realm) -> Void)? = nil,
+    /// - see: `RLMClientResetAfterBlock`
     case recoverOrDiscardUnsyncedChanges(((Realm) -> Void)? = nil, ((Realm, Realm) -> Void)? = nil)
     /// - see: `RLMClientResetModeManual`
-    /// - note: Not supported in Flexible Sync configurations.
     ///
     ///  The manual client reset mode handler can be set in two places:
     ///  1. As an ErrorReportingBlock argument in the ClientResetMode enum (`ErrorReportingBlock? = nil`).
@@ -276,7 +407,7 @@ public enum ClientResetMode {
     ///
     ///  During an `RLMSyncErrorClientResetError` the block executed is determined by the following rules
     ///  - If an error reporting block is set in `ClientResetMode` and the `SyncManager`, the `ClientResetMode` block will be executed.
-    ///  - If an error reporting block is set in either the `ClientResetMode` or the `SyncManager`, but not both, wheverever the block was set will execute.
+    ///  - If an error reporting block is set in either the `ClientResetMode` or the `SyncManager`, but not both, the single block will execute.
     ///  - If no block is set in either location, the client reset will not be handled. The application will likely need to be restarted and unsynced local changes may be lost.
     ///  - note: The `SyncManager.errorHandler` is still invoked under all `RLMSyncError`s *other than* `RLMSyncErrorClientResetError`.
     ///      - see `RLMSyncError` for an exhaustive list.
@@ -947,8 +1078,8 @@ extension User {
     public func flexibleSyncConfiguration(clientResetMode: ClientResetMode = .recoverUnsyncedChanges(nil, nil)) -> Realm.Configuration {
         var config: RLMRealmConfiguration
         switch clientResetMode {
-        case .manual:
-            throwRealmException("Manual mode not supported for flexible sync configurations")
+        case .manual(let block):
+            config = self.__flexibleSyncConfiguration(with: .manual, manualClientResetHandler: block)
         case .discardLocal(let beforeBlock, let afterBlock):
             config = self.__flexibleSyncConfiguration(with: .discardLocal, notifyBeforeReset: ObjectiveCSupport.convert(object: beforeBlock), notifyAfterReset: ObjectiveCSupport.convert(object: afterBlock))
         case .discardUnsyncedChanges(let beforeBlock, let afterBlock):
@@ -990,8 +1121,11 @@ extension User {
     public func flexibleSyncConfiguration(clientResetMode: ClientResetMode = .recoverUnsyncedChanges(nil, nil), initialSubscriptions: @escaping ((SyncSubscriptionSet) -> Void), rerunOnOpen: Bool = false) -> Realm.Configuration {
         var config: RLMRealmConfiguration
         switch clientResetMode {
-        case .manual:
-            throwRealmException("Manual mode not supported for flexible sync configurations")
+        case .manual(let block):
+            config = self.__flexibleSyncConfiguration(initialSubscriptions: ObjectiveCSupport.convert(block: initialSubscriptions),
+                                                      rerunOnOpen: rerunOnOpen,
+                                                      clientResetMode: .manual,
+                                                      manualClientResetHandler: block)
         case .discardLocal(let beforeBlock, let afterBlock):
             config = self.__flexibleSyncConfiguration(initialSubscriptions: ObjectiveCSupport.convert(block: initialSubscriptions),
                                                       rerunOnOpen: rerunOnOpen,
