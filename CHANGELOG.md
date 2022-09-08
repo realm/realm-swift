@@ -30,7 +30,11 @@ x.y.z Release notes (yyyy-MM-dd)
 * Accented characters are now handled by case-insensitive but
   diacritic-sensitive queries. ([Core #5825](https://github.com/realm/realm-core/issues/5825), since v2.2.0)
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+### Breaking Changes
+* `-[RLMASLoginDelegate authenticationDidCompleteWithError:]` has been renamed
+  to `-[RLMASLoginDelegate authenticationDidFailWithError:]` to comply with new
+  app store requirements. This only effects the obj-c API.
+  ([#7945](https://github.com/realm/realm-swift/issues/7945))
 
 ### Compatibility
 * Realm Studio: 11.0.0 or later.
