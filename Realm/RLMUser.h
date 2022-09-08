@@ -184,16 +184,16 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Create a flexible sync configuration instance, which can be used to open a Realm that
  supports flexible sync.
- 
+
  It won't possible to combine flexible and partition sync in the same app, which means if you open
  a realm with a flexible sync configuration, you won't be able to open a realm with a PBS configuration
  and the other way around.
- 
+
  @param clientResetMode Determines file recovery behavior in the event of a client reset.
                         See: https://docs.mongodb.com/realm/sync/error-handling/client-resets/
  @param manualClientResetHandler An error reporting block that is invoked during a client reset.
                                  See `RLMSyncErrorReportingBlock` and `RLMClientResetInfo`
- 
+
  @return A `RLMRealmConfiguration` instance with a flexible sync configuration.
  */
 - (RLMRealmConfiguration *)flexibleSyncConfigurationWithClientResetMode:(RLMClientResetMode)clientResetMode

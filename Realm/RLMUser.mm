@@ -132,6 +132,7 @@ using namespace realm;
                                                        notifyAfterReset:(nullable RLMClientResetAfterBlock)afterResetBlock {
     auto syncConfig = [[RLMSyncConfiguration alloc] initWithUser:self];
     RLMRealmConfiguration *config = [[RLMRealmConfiguration alloc] init];
+    syncConfig.clientResetMode = clientResetMode;
     syncConfig.beforeClientReset = beforeResetBlock;
     syncConfig.afterClientReset = afterResetBlock;
     config.syncConfiguration = syncConfig;
@@ -165,6 +166,7 @@ using namespace realm;
                                                             notifyAfterReset:(nullable RLMClientResetAfterBlock)afterResetBlock {
     auto syncConfig = [[RLMSyncConfiguration alloc] initWithUser:self];
     RLMRealmConfiguration *config = [[RLMRealmConfiguration alloc] init];
+    syncConfig.clientResetMode = clientResetMode;
     syncConfig.beforeClientReset = beforeResetBlock;
     syncConfig.afterClientReset = afterResetBlock;
     config.initialSubscriptions = initialSubscriptions;

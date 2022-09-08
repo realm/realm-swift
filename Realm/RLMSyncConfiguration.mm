@@ -297,9 +297,9 @@ NSError *RLMTranslateSyncError(SyncError error) {
         if (!nsError) {
             return;
         }
-        if (!errorHandler && nsError.code != RLMSyncErrorClientResetError) {
+        if (!errorHandler && !_manualClientResetHandler) {
             return;
-        } else if (!errorHandler && !_manualClientResetHandler && nsError.code == RLMSyncErrorClientResetError) {
+        } else if (!errorHandler && nsError.code != RLMSyncErrorClientResetError) {
             return;
         }
 
