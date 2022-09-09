@@ -1465,8 +1465,11 @@ static NSString *randomEmail() {
 - (void)testSetClientResetMode {
     RLMUser *user = [self userForTest:_cmd];
     NSString *partitionValue = NSStringFromSelector(_cmd);
+    #pragma clang diagnostic push
+    #pragma clang diagnostic ignored "-Wdeprecated-declarations"
     RLMRealmConfiguration *config = [user configurationWithPartitionValue:partitionValue clientResetMode:RLMClientResetModeDiscardLocal];
     XCTAssertEqual(config.syncConfiguration.clientResetMode, RLMClientResetModeDiscardLocal);
+    #pragma clang diagnostic pop
 
     // Default is recover
     config = [user configurationWithPartitionValue:partitionValue];
@@ -1476,7 +1479,11 @@ static NSString *randomEmail() {
 - (void)testSetClientResetCallbacks {
     RLMUser *user = [self userForTest:_cmd];
     NSString *partitionValue = NSStringFromSelector(_cmd);
+
+    #pragma clang diagnostic push
+    #pragma clang diagnostic ignored "-Wdeprecated-declarations"
     RLMRealmConfiguration *config = [user configurationWithPartitionValue:partitionValue clientResetMode:RLMClientResetModeDiscardLocal];
+
     XCTAssertNil(config.syncConfiguration.beforeClientReset);
     XCTAssertNil(config.syncConfiguration.afterClientReset);
 
@@ -1492,6 +1499,8 @@ static NSString *randomEmail() {
                                                           notifyAfterReset:afterBlock];
     XCTAssertNotNil(config2.syncConfiguration.beforeClientReset);
     XCTAssertNotNil(config2.syncConfiguration.afterClientReset);
+    #pragma clang diagnostic pop
+
 }
 
 #pragma mark - Progress Notifications

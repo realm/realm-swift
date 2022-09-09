@@ -115,7 +115,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param clientResetMode Determines file recovery behavior in the event of a client reset.
                         See: https://docs.mongodb.com/realm/sync/error-handling/client-resets/
  
- @return A default configuration object with the sync configuration set to use the given partition value.
+ @return A configuration object with the sync configuration set to use the given partition value.
  */
 - (RLMRealmConfiguration *)configurationWithPartitionValue:(nullable id<RLMBSON>)partitionValue
                                            clientResetMode:(RLMClientResetMode)clientResetMode NS_REFINED_FOR_SWIFT;
@@ -129,7 +129,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param beforeResetBlock A callback which notifies prior to a client reset occurring. See: `RLMClientResetBeforeBlock`
  @param afterResetBlock A callback which notifies after a client reset has occurred. See: `RLMClientResetAfterBlock`
  
- @return A default configuration object with the sync configuration set to use the given partition value.
+ @return A configuration object with the sync configuration set to use the given partition value.
  */
 - (RLMRealmConfiguration *)configurationWithPartitionValue:(nullable id<RLMBSON>)partitionValue
                                            clientResetMode:(RLMClientResetMode)clientResetMode
@@ -145,7 +145,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param manualClientResetHandler An error reporting block that is invoked during a client reset.
                                  See `RLMSyncErrorReportingBlock` and `RLMClientResetInfo`
  
- @return A default configuration object with the sync configuration set to use the given partition value.
+ @return A configuration object with the sync configuration set to use the given partition value.
  */
 - (RLMRealmConfiguration *)configurationWithPartitionValue:(nullable id<RLMBSON>)partitionValue
                                            clientResetMode:(RLMClientResetMode)clientResetMode
@@ -155,9 +155,13 @@ NS_ASSUME_NONNULL_BEGIN
  Create a flexible sync configuration instance, which can be used to open a Realm that
  supports flexible sync.
 
- It won't possible to combine flexible and partition sync in the same app, which means if you open
- a realm with a flexible sync configuration, you won't be able to open a realm with a PBS configuration
- and the other way around.
+ @note A single server-side Device Sync App service may connect to only flexible or partition-based realms.
+ In order for an application to contain both partition-based and flexible sync realms, more than one
+ server-side Device Sync  App service must be used.
+ 
+ @note A single server-side Device Sync App service may connect to only flexible or partition-based realms.
+ In order for an application to contain both partition-based and flexible sync realms, more than one
+ server-side Device Sync  App service must be used.
 
  @return A `RLMRealmConfiguration` instance with a flexible sync configuration.
  */
@@ -167,9 +171,9 @@ NS_ASSUME_NONNULL_BEGIN
  Create a flexible sync configuration instance, which can be used to open a Realm that
  supports flexible sync.
  
- It won't possible to combine flexible and partition sync in the same app, which means if you open
- a realm with a flexible sync configuration, you won't be able to open a realm with a PBS configuration
- and the other way around.
+ @note A single server-side Device Sync App service may connect to only flexible or partition-based realms.
+ In order for an application to contain both partition-based and flexible sync realms, more than one
+ server-side Device Sync  App service must be used.
  
  @param clientResetMode Determines file recovery behavior in the event of a client reset.
                         See: https://docs.mongodb.com/realm/sync/error-handling/client-resets/
@@ -185,9 +189,9 @@ NS_ASSUME_NONNULL_BEGIN
  Create a flexible sync configuration instance, which can be used to open a Realm that
  supports flexible sync.
 
- It won't possible to combine flexible and partition sync in the same app, which means if you open
- a realm with a flexible sync configuration, you won't be able to open a realm with a PBS configuration
- and the other way around.
+ @note A single server-side Device Sync App service may connect to only flexible or partition-based realms.
+ In order for an application to contain both partition-based and flexible sync realms, more than one
+ server-side Device Sync  App service must be used.
 
  @param clientResetMode Determines file recovery behavior in the event of a client reset.
                         See: https://docs.mongodb.com/realm/sync/error-handling/client-resets/
@@ -203,9 +207,9 @@ NS_ASSUME_NONNULL_BEGIN
  Create a flexible sync configuration instance, which can be used to open a Realm that
  supports flexible sync.
 
- It won't possible to combine flexible and partition sync in the same app, which means if you open
- a realm with a flexible sync configuration, you won't be able to open a realm with a PBS configuration
- and the other way around.
+ @note A single server-side Device Sync App service may connect to only flexible or partition-based realms.
+ In order for an application to contain both partition-based and flexible sync realms, more than one
+ server-side Device Sync  App service must be used.
 
  @param initialSubscriptions A block which receives a subscription set instance, that can be
                              used to add an initial set of subscriptions which will be executed
@@ -222,9 +226,9 @@ NS_ASSUME_NONNULL_BEGIN
  Create a flexible sync configuration instance, which can be used to open a Realm that
  supports flexible sync.
 
- It won't possible to combine flexible and partition sync in the same app, which means if you open
- a realm with a flexible sync configuration, you won't be able to open a realm with a PBS configuration
- and the other way around.
+ @note A single server-side Device Sync App service may connect to only flexible or partition-based realms.
+ In order for an application to contain both partition-based and flexible sync realms, more than one
+ server-side Device Sync  App service must be used.
 
  @param initialSubscriptions A block which receives a subscription set instance, that can be
                              used to add an initial set of subscriptions which will be executed
@@ -249,9 +253,9 @@ NS_ASSUME_NONNULL_BEGIN
  Create a flexible sync configuration instance, which can be used to open a Realm that
  supports flexible sync.
 
- It won't possible to combine flexible and partition sync in the same app, which means if you open
- a realm with a flexible sync configuration, you won't be able to open a realm with a PBS configuration
- and the other way around.
+ @note A single server-side Device Sync App service may connect to only flexible or partition-based realms.
+ In order for an application to contain both partition-based and flexible sync realms, more than one
+ server-side Device Sync  App service must be used.
 
  @param initialSubscriptions A block which receives a subscription set instance, that can be
                              used to add an initial set of subscriptions which will be executed

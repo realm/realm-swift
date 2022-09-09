@@ -45,7 +45,10 @@ NSString *const kRLMSyncUnderlyingErrorKey      = @"underlying_error";
 
 using namespace realm;
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
 static_assert((int)RLMClientResetModeDiscardLocal == (int)realm::ClientResyncMode::DiscardLocal);
+#pragma clang diagnostic pop
 static_assert((int)RLMClientResetModeDiscardUnsyncedChanges == (int)realm::ClientResyncMode::DiscardLocal);
 static_assert((int)RLMClientResetModeRecoverUnsyncedChanges == (int)realm::ClientResyncMode::Recover);
 static_assert((int)RLMClientResetModeRecoverOrDiscardUnsyncedChanges == (int)realm::ClientResyncMode::RecoverOrDiscard);

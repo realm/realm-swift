@@ -201,7 +201,7 @@ struct AfterClientResetWrapper : CallbackSchema {
 
 - (void)setManualClientResetHandler:(RLMSyncErrorReportingBlock)manualClientReset {
     if (!manualClientReset) {
-        return;
+        _manualClientResetHandler = nil;
     } else if (self.clientResetMode != RLMClientResetModeManual) {
         @throw RLMException(@"A manualClientResetHandler can only be set with RLMClientResetModeManual");
     } else {
@@ -285,7 +285,7 @@ NSError *RLMTranslateSyncError(SyncError error) {
     return make_sync_error(errorClass, @(error.message.c_str()), error.error_code.value(), custom);
 }
 
-- (void)setErrorHandler:(RLMUser *)user {
+- (void)assignConfigErrorHandler:(RLMUser *)user {
     RLMSyncManager *manager = [user.app syncManager];
     __weak RLMSyncManager *weakManager = manager;
     _config->error_handler = [weakManager, self](std::shared_ptr<SyncSession> errored_session, SyncError error) {
@@ -309,7 +309,7 @@ NSError *RLMTranslateSyncError(SyncError error) {
             // RLMSyncSession only holds a weak reference
             static_cast<void>(errored_session);
             if (_manualClientResetHandler && nsError.code == RLMSyncErrorClientResetError) {
-                self.manualClientResetHandler(nsError, session);
+                _manualClientResetHandler(nsError, session);
             } else {
                 errorHandler(nsError, session);
             }
@@ -318,7 +318,7 @@ NSError *RLMTranslateSyncError(SyncError error) {
 };
 
 static void setDefaults(SyncConfig& config, RLMUser *user) {
-    config.client_resync_mode = ClientResyncMode::Manual;
+    config.client_resync_mode = ClientResyncMode::Recover;
     config.stop_policy = SyncSessionStopPolicy::AfterChangesUploaded;
 
     RLMSyncManager *manager = [user.app syncManager];
@@ -341,7 +341,7 @@ static void setDefaults(SyncConfig& config, RLMUser *user) {
         _config = std::make_unique<SyncConfig>([user _syncUser], s.str());
         _path = [user pathForPartitionValue:_config->partition_value];
         setDefaults(*_config, user);
-        [self setErrorHandler:user];
+        [self assignConfigErrorHandler:user];
     }
     return self;
 }
@@ -351,7 +351,7 @@ static void setDefaults(SyncConfig& config, RLMUser *user) {
         _config = std::make_unique<SyncConfig>([user _syncUser], SyncConfig::FLXSyncEnabled{});
         _path = [user pathForFlexibleSync];
         setDefaults(*_config, user);
-        [self setErrorHandler:user];
+        [self assignConfigErrorHandler:user];
     }
     return self;
 }
