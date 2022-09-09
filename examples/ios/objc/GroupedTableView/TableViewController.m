@@ -52,15 +52,15 @@ static NSString * const kTableName = @"table";
 
     self.sectionedResults = [[DemoObject allObjects] sectionedResultsSortedUsingKeyPath:@"contactName"
                                                                               ascending:YES
-                                                                               keyBlock:^NSString * (DemoObject *object) {
+                                                                               keyBlock:^(DemoObject *object) {
         return [object.contactName substringToIndex:1];
     }];
 
     // Set realm notification block
     __weak typeof(self) weakSelf = self;
     self.notification = [self.sectionedResults addNotificationBlock:^(RLMSectionedResults<NSString *, DemoObject *> *col,
-                                                                      RLMSectionedResultsChange * changes, NSError *err) {
-        if (changes != nil) {
+                                                                      RLMSectionedResultsChange *changes) {
+        if (changes) {
             [weakSelf.tableView performBatchUpdates:^{
                 [weakSelf.tableView deleteRowsAtIndexPaths:changes.deletions withRowAnimation:UITableViewRowAnimationAutomatic];
                 [weakSelf.tableView insertRowsAtIndexPaths:changes.insertions withRowAnimation:UITableViewRowAnimationAutomatic];

@@ -153,11 +153,8 @@ public protocol _RealmMapValue {
     case update(CollectionType, deletions: [Int], insertions: [Int], modifications: [Int])
 
     /**
-     If an error occurs, notification blocks are called one time with a `.error`
-     result and an `NSError` containing details about the error. This can only
-     currently happen if opening the Realm on a background thread to calculate
-     the change set fails. The callback will never be called again after it is
-     invoked with a .error value.
+     Errors can no longer occur. This case is unused and will be removed in the
+     next major version.
      */
     case error(Error)
 

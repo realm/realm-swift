@@ -383,8 +383,6 @@ class SectionedResultsTests: SectionedResultsTestsBase {
                 XCTAssertEqual(collection.count, 3)
             case .update:
                 XCTFail("Shouldn't happen")
-            case .error:
-                XCTFail("Shouldn't happen")
             }
 
             ex.fulfill()
@@ -418,13 +416,8 @@ class SectionedResultsTests: SectionedResultsTestsBase {
 
         let ex = expectation(description: "notifications")
         ex.expectedFulfillmentCount = 3
-        let token = sectionedResults.observe(keyPaths: [\.boolCol]) { (changes: RealmSectionedResultsChange) in
-            switch changes {
-            case .error:
-                XCTFail("Shouldn't happen")
-            default:
-                ex.fulfill()
-            }
+        let token = sectionedResults.observe(keyPaths: [\.boolCol]) { _ in
+            ex.fulfill()
         }
 
         let obj = results.where { $0.stringCol.starts(with: "a") }[0]
@@ -464,13 +457,8 @@ class SectionedResultsTests: SectionedResultsTestsBase {
 
         let ex = expectation(description: "notifications")
         ex.expectedFulfillmentCount = 2
-        let token = sectionedResults.observe(keyPaths: [\.boolCol]) { (changes: RealmSectionedResultsChange) in
-            switch changes {
-            case .error:
-                XCTFail("Shouldn't happen")
-            default:
-                ex.fulfill()
-            }
+        let token = sectionedResults.observe(keyPaths: [\.boolCol]) { _ in
+            ex.fulfill()
         }
 
         let obj = results.where { $0.stringCol.starts(with: "a") }[0]
@@ -531,8 +519,6 @@ class SectionedResultsTests: SectionedResultsTestsBase {
                     XCTAssertEqual(modifications.count, 1)
                     XCTAssertEqual(modifications, [IndexPath(item: 0, section: 0)])
                 }
-            case .error:
-                XCTFail("Shouldn't happen")
             }
             XCTAssertFalse(Thread.isMainThread)
             sema.signal()
@@ -584,8 +570,6 @@ class SectionedResultsTests: SectionedResultsTestsBase {
                     XCTAssertEqual(insertions, [IndexPath(item: 0, section: 0)])
                     XCTAssertEqual(sectionsToInsert, [0])
                 }
-            case .error:
-                XCTFail("Shouldn't happen")
             }
         }
 
@@ -613,8 +597,6 @@ class SectionedResultsTests: SectionedResultsTestsBase {
                     XCTAssertTrue(modifications.isEmpty)
                     XCTAssertEqual(insertions, [IndexPath(item: 0, section: 0), IndexPath(item: 1, section: 0)])
                 }
-            case .error:
-                XCTFail("Shouldn't happen")
             }
         }
 
@@ -671,8 +653,6 @@ class SectionedResultsTests: SectionedResultsTestsBase {
                     XCTAssertEqual(insertions, [IndexPath(item: 0, section: 0)])
                     XCTAssertEqual(sectionsToInsert, [0])
                 }
-            case .error:
-                XCTFail("Shouldn't happen")
             }
             XCTAssertFalse(Thread.isMainThread)
             sema1.signal()
@@ -703,8 +683,6 @@ class SectionedResultsTests: SectionedResultsTestsBase {
                     XCTAssertTrue(modifications.isEmpty)
                     XCTAssertEqual(insertions, [IndexPath(item: 0, section: 0), IndexPath(item: 1, section: 0)])
                 }
-            case .error:
-                XCTFail("Shouldn't happen")
             }
             XCTAssertFalse(Thread.isMainThread)
             sema2.signal()
@@ -895,8 +873,6 @@ class SectionedResultsProjectionTests: SectionedResultsTestsBase {
                 XCTAssertEqual(collection.count, 3)
             case .update:
                 XCTFail("Shouldn't happen")
-            case .error:
-                XCTFail("Shouldn't happen")
             }
 
             ex.fulfill()
@@ -956,8 +932,6 @@ class SectionedResultsProjectionTests: SectionedResultsTestsBase {
                     XCTAssertEqual(modifications.count, 1)
                     XCTAssertEqual(modifications, [IndexPath(item: 0, section: 0)])
                 }
-            case .error:
-                XCTFail("Shouldn't happen")
             }
             XCTAssertFalse(Thread.isMainThread)
             sema.signal()
@@ -1009,8 +983,6 @@ class SectionedResultsProjectionTests: SectionedResultsTestsBase {
                     XCTAssertEqual(insertions, [IndexPath(item: 0, section: 0)])
                     XCTAssertEqual(sectionsToInsert, [0])
                 }
-            case .error:
-                XCTFail("Shouldn't happen")
             }
         }
 
@@ -1038,8 +1010,6 @@ class SectionedResultsProjectionTests: SectionedResultsTestsBase {
                     XCTAssertTrue(modifications.isEmpty)
                     XCTAssertEqual(insertions, [IndexPath(item: 0, section: 0), IndexPath(item: 1, section: 0)])
                 }
-            case .error:
-                XCTFail("Shouldn't happen")
             }
         }
 
@@ -1096,8 +1066,6 @@ class SectionedResultsProjectionTests: SectionedResultsTestsBase {
                     XCTAssertEqual(insertions, [IndexPath(item: 0, section: 0)])
                     XCTAssertEqual(sectionsToInsert, [0])
                 }
-            case .error:
-                XCTFail("Shouldn't happen")
             }
             XCTAssertFalse(Thread.isMainThread)
             sema1.signal()
@@ -1128,8 +1096,6 @@ class SectionedResultsProjectionTests: SectionedResultsTestsBase {
                     XCTAssertTrue(modifications.isEmpty)
                     XCTAssertEqual(insertions, [IndexPath(item: 0, section: 0), IndexPath(item: 1, section: 0)])
                 }
-            case .error:
-                XCTFail("Shouldn't happen")
             }
             XCTAssertFalse(Thread.isMainThread)
             sema2.signal()
@@ -1573,7 +1539,7 @@ struct SectionedResultsTestDataOptionalString: OptionalSectionedResultsTestData 
     static var values: [String] {
         ["apple", "banana", "any", "phone", "door"]
     }
-    static var expectedSectionedValuesOpt: [String? : [String??]] {
+    static var expectedSectionedValuesOpt: [String?: [String??]] {
         return ["a": ["any", "apple"], "b": ["banana"], "d": ["door"], "p": ["phone"], nil: [.some(.none)]]
     }
 

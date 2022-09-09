@@ -72,8 +72,6 @@ class TableViewController: UITableViewController {
                     self.tableView.insertSections(sectionsToInsert, with: .automatic)
                     self.tableView.deleteSections(sectionsToDelete, with: .automatic)
                 }
-            case .error:
-                break
             }
         }
         tableView.reloadData()

@@ -204,6 +204,7 @@ RLM_COLLECTION_TYPE(PersonAsymmetric);
     while (count < expectedCount && ([waitStart timeIntervalSinceNow] > -600.0)) {
         [collection countWhere:@{}
                     completion:^(NSInteger c, NSError *error) {
+            XCTAssertNil(error);
             count = c;
 
         }];

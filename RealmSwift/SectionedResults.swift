@@ -136,15 +136,15 @@ extension RealmSectionedResultImpl {
         return Self(rlmSectionedResult: collection.thaw())
     }
     /// :nodoc:
-    internal typealias ObjcSectionedResultsChange = (RLMSectionedResult?, RLMSectionedResultsChange?, Error?) -> Void
+    internal typealias ObjcSectionedResultsChange = (RLMSectionedResult?, RLMSectionedResultsChange?) -> Void
     /// :nodoc:
     internal func wrapObserveBlock(_ block: @escaping (RealmSectionedResultsChange<Self>) -> Void) -> ObjcSectionedResultsChange {
         var col: Self?
-        return { collection, change, error in
+        return { collection, change in
             if col == nil, let collection = collection {
                 col = self.collection === collection ? self : Self(rlmSectionedResult: collection as! Self.Collection)
             }
-            block(RealmSectionedResultsChange.fromObjc(value: col, change: change, error: error))
+            block(RealmSectionedResultsChange.fromObjc(value: col, change: change))
         }
     }
 }
@@ -1015,19 +1015,9 @@ extension ResultsSection: Identifiable { }
      */
     case update(Collection, deletions: [IndexPath], insertions: [IndexPath], modifications: [IndexPath],
                 sectionsToInsert: IndexSet, sectionsToDelete: IndexSet)
-    /**
-     If an error occurs, notification blocks are called one time with a `.error`
-     result and an `NSError` containing details about the error. This can only
-     currently happen if opening the Realm on a background thread to calculate
-     the change set fails. The callback will never be called again after it is
-     invoked with a `.error` value.
-     */
-    case error(Error)
+
     /// :nodoc:
-    static func fromObjc(value: Collection?, change: RLMSectionedResultsChange?, error: Error?) -> RealmSectionedResultsChange {
-        if let error = error {
-            return .error(error)
-        }
+    static func fromObjc(value: Collection?, change: RLMSectionedResultsChange?) -> RealmSectionedResultsChange {
         if let change = change {
             return .update(value!,
                            deletions: change.deletions as [IndexPath],

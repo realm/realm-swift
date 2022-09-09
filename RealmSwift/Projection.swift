@@ -579,7 +579,7 @@ extension Projection: ThreadConfined where Root: ThreadConfined {
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 extension ProjectionObservable {
     /// :nodoc:
-    public func _observe<S>(_ keyPaths: [String]?, on queue: DispatchQueue?, _ subscriber: S) -> NotificationToken where S: Subscriber, S.Input == Self, S.Failure == Error {
+    public func _observe<S>(_ keyPaths: [String]?, on queue: DispatchQueue?, _ subscriber: S) -> NotificationToken where S: Subscriber, S.Input == Self {
         return observe(keyPaths: keyPaths ?? [], on: queue) { (change: ObjectChange<S.Input>) in
             switch change {
             case .change(let projection, _):
@@ -587,13 +587,13 @@ extension ProjectionObservable {
             case .deleted:
                 subscriber.receive(completion: .finished)
             case .error(let error):
-                subscriber.receive(completion: .failure(error))
+                fatalError("Unexpected error \(error)")
             }
         }
     }
 
     /// :nodoc:
-    public func _observe<S>(_ keyPaths: [String]?, _ subscriber: S) -> NotificationToken where S: Subscriber, S.Failure == Never, S.Input == Void {
+    public func _observe<S>(_ keyPaths: [String]?, _ subscriber: S) -> NotificationToken where S: Subscriber, S.Input == Void {
         return observe(keyPaths: [PartialKeyPath<Self>](), { _ in _ = subscriber.receive() })
     }
 }

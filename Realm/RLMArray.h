@@ -367,16 +367,15 @@ NS_ASSUME_NONNULL_BEGIN
  the array, which objects are in the results, or the order of the objects in the
  array.
 
- The `changes` parameter will be `nil` the first time the block is called.
- For each call after that, it will contain information about
- which rows in the array were added, removed or modified. If a write transaction
- did not modify any objects in the array, the block is not called at all.
- See the `RLMCollectionChange` documentation for information on how the changes
- are reported and an example of updating a `UITableView`.
+ The `changes` parameter will be `nil` the first time the block is called. For
+ each call after that, it will contain information about which rows in the
+ array were added, removed or modified. If a write transaction did not modify
+ any objects in the array, the block is not called at all. See the
+ `RLMCollectionChange` documentation for information on how the changes are
+ reported and an example of updating a `UITableView`.
 
- If an error occurs the block will be called with `nil` for the results
- parameter and a non-`nil` error. Currently the only errors that can occur are
- when opening the Realm on the background worker thread.
+ The error parameter is present only for backwards compatiblity and will always
+ be `nil`.
 
  Notifications are delivered via the standard run loop, and so can't be
  delivered while the run loop is blocked by other activity. When
@@ -433,9 +432,8 @@ __attribute__((warn_unused_result));
  See the `RLMCollectionChange` documentation for information on how the changes
  are reported and an example of updating a `UITableView`.
 
- If an error occurs the block will be called with `nil` for the results
- parameter and a non-`nil` error. Currently the only errors that can occur are
- when opening the Realm on the background worker thread.
+ The error parameter is present only for backwards compatiblity and will always
+ be `nil`.
 
  Notifications are delivered on the given queue. If the queue is blocked and
  notifications can't be delivered instantly, multiple notifications may be
@@ -472,9 +470,8 @@ __attribute__((warn_unused_result));
  See the `RLMCollectionChange` documentation for information on how the changes
  are reported and an example of updating a `UITableView`.
 
- If an error occurs the block will be called with `nil` for the results
- parameter and a non-`nil` error. Currently the only errors that can occur are
- when opening the Realm on the background worker thread.
+ The error parameter is present only for backwards compatiblity and will always
+ be `nil`.
 
  Notifications are delivered on the given queue. If the queue is blocked and
  notifications can't be delivered instantly, multiple notifications may be
@@ -514,9 +511,8 @@ __attribute__((warn_unused_result));
  See the `RLMCollectionChange` documentation for information on how the changes
  are reported and an example of updating a `UITableView`.
 
- If an error occurs the block will be called with `nil` for the results
- parameter and a non-`nil` error. Currently the only errors that can occur are
- when opening the Realm on the background worker thread.
+ The error parameter is present only for backwards compatiblity and will always
+ be `nil`.
 
  Notifications are delivered via the standard run loop, and so can't be
  delivered while the run loop is blocked by other activity. When

@@ -518,11 +518,8 @@ extension Object: ThreadConfined {
  */
 @frozen public enum ObjectChange<T> {
     /**
-     If an error occurs, notification blocks are called one time with a `.error`
-     result and an `NSError` containing details about the error. Currently the
-     only errors which can occur are when opening the Realm on a background
-     worker thread to calculate the change set. The callback will never be
-     called again after `.error` is delivered.
+     Errors can no longer occur. This case is unused and will be removed in the
+     next major version.
      */
     case error(_ error: NSError)
     /**

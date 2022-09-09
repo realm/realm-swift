@@ -346,9 +346,8 @@ NS_ASSUME_NONNULL_BEGIN
  which keys in the dictionary were added, modified or deleted. If a write transaction
  did not modify any keys or values in the dictionary, the block is not called at all.
 
- If an error occurs the block will be called with `nil` for the results
- parameter and a non-`nil` error. Currently the only errors that can occur are
- when opening the Realm on the background worker thread.
+ The error parameter is present only for backwards compatiblity and will always
+ be `nil`.
 
  Notifications are delivered via the standard run loop, and so can't be
  delivered while the run loop is blocked by other activity. When
@@ -402,9 +401,8 @@ __attribute__((warn_unused_result));
  which keys in the dictionary were added or modified. If a write transaction
  did not modify any objects in the dictionary, the block is not called at all.
 
- If an error occurs the block will be called with `nil` for the results
- parameter and a non-`nil` error. Currently the only errors that can occur are
- when opening the Realm on the background worker thread.
+ The error parameter is present only for backwards compatiblity and will always
+ be `nil`.
 
  Notifications are delivered on the given queue. If the queue is blocked and
  notifications can't be delivered instantly, multiple notifications may be
@@ -438,9 +436,8 @@ __attribute__((warn_unused_result));
  which keys in the dictionary were added or modified. If a write transaction
  did not modify any objects in the dictionary, the block is not called at all.
 
- If an error occurs the block will be called with `nil` for the results
- parameter and a non-`nil` error. Currently the only errors that can occur are
- when opening the Realm on the background worker thread.
+ The error parameter is present only for backwards compatiblity and will always
+ be `nil`.
 
  Notifications are delivered on the given queue. If the queue is blocked and
  notifications can't be delivered instantly, multiple notifications may be
@@ -476,9 +473,8 @@ __attribute__((warn_unused_result));
  which keys in the dictionary were added or modified. If a write transaction
  did not modify any objects in the dictionary, the block is not called at all.
 
- If an error occurs the block will be called with `nil` for the results
- parameter and a non-`nil` error. Currently the only errors that can occur are
- when opening the Realm on the background worker thread.
+ The error parameter is present only for backwards compatiblity and will always
+ be `nil`.
 
  You must retain the returned token for as long as you want updates to continue
  to be sent to the block. To stop receiving updates, call `-invalidate` on the token.

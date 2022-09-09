@@ -409,19 +409,7 @@ struct CollectionCallbackWrapper {
     id collection;
     bool ignoreChangesInInitialNotification;
 
-    void operator()(realm::CollectionChangeSet const& changes, std::exception_ptr err) {
-        if (err) {
-            try {
-                rethrow_exception(err);
-            }
-            catch (...) {
-                NSError *error = nil;
-                RLMRealmTranslateException(&error);
-                block(nil, nil, error);
-                return;
-            }
-        }
-
+    void operator()(realm::CollectionChangeSet const& changes) {
         if (ignoreChangesInInitialNotification) {
             ignoreChangesInInitialNotification = false;
             block(collection, nil, nil);

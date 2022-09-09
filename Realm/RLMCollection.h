@@ -259,9 +259,8 @@ the block is not called at all. See the `RLMCollectionChange` documentation for
 information on how the changes are reported and an example of updating a
 `UITableView`.
 
-If an error occurs the block will be called with `nil` for the results
-parameter and a non-`nil` error. Currently there are no expected errors and
-this parameter remains only for compatiblity.
+ The error parameter is present only for backwards compatiblity and will always
+ be `nil`.
 
 At the time when the block is called, the collection object will be fully
 evaluated and up-to-date, and as long as you do not perform a write transaction
@@ -322,9 +321,8 @@ the block is not called at all. See the `RLMCollectionChange` documentation for
 information on how the changes are reported and an example of updating a
 `UITableView`.
 
-If an error occurs the block will be called with `nil` for the results
-parameter and a non-`nil` error. Currently there are no expected errors and
-this parameter remains only for compatiblity.
+ The error parameter is present only for backwards compatiblity and will always
+ be `nil`.
 
 At the time when the block is called, the collection object will be fully
 evaluated and up-to-date, and as long as you do not perform a write transaction
@@ -366,9 +364,8 @@ the block is not called at all. See the `RLMCollectionChange` documentation for
 information on how the changes are reported and an example of updating a
 `UITableView`.
 
-If an error occurs the block will be called with `nil` for the results
-parameter and a non-`nil` error. Currently there are no expected errors and
-this parameter remains only for compatiblity.
+ The error parameter is present only for backwards compatiblity and will always
+ be `nil`.
 
 At the time when the block is called, the collection object will be fully
 evaluated and up-to-date, and as long as you do not perform a write transaction

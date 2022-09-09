@@ -142,10 +142,7 @@ extension ObjectBase {
                                           on queue: DispatchQueue? = nil,
                                           _ block: @escaping (ObjectChange<T>) -> Void) -> NotificationToken {
         return RLMObjectBaseAddNotificationBlock(self, keyPaths, queue) { object, names, oldValues, newValues, error in
-            if let error = error {
-                block(.error(error as NSError))
-                return
-            }
+            assert(error == nil)
             guard let names = names, let newValues = newValues else {
                 block(.deleted)
                 return
