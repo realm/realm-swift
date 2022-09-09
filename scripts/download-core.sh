@@ -25,8 +25,11 @@ copy_core() {
 
 tries_left=3
 readonly version="$REALM_CORE_VERSION"
-readonly url="${REALM_BASE_URL}/core/realm-monorepo-xcframework-v${version}.tar.xz"
-
+nightly_version=""
+if [[ "$REALM_CORE_VERSION" == *"nightly"* ]]; then
+  nightly_version="v${version}/cocoa/"
+fi
+readonly url="${REALM_BASE_URL}/core/${nightly_version}realm-monorepo-xcframework-v${version}.tar.xz"
 # First check if we need to do anything
 if [ -e "$dst" ]; then
     if [ -e "$dst/version.txt" ]; then

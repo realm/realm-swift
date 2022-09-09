@@ -384,16 +384,6 @@ static NSArray *toArray(realm::IndexSet const& set) {
     return toArray(_indices.modifications);
 }
 
-static NSArray *toIndexPathArray(realm::IndexSet const& set, NSUInteger section) {
-    NSMutableArray *ret = [NSMutableArray new];
-    NSUInteger path[2] = {section, 0};
-    for (auto index : set.as_indexes()) {
-        path[1] = index;
-        [ret addObject:[NSIndexPath indexPathWithIndexes:path length:2]];
-    }
-    return ret;
-}
-
 - (NSArray<NSIndexPath *> *)deletionsInSection:(NSUInteger)section {
     return toIndexPathArray(_indices.deletions, section);
 }

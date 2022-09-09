@@ -512,6 +512,17 @@ void RLMSetValidateMatchingObjectType(__unsafe_unretained RLMSet *const set,
     @throw RLMException(@"This method may only be called on RLMSet instances retrieved from an RLMRealm");
 }
 
+- (RLMSectionedResults *)sectionedResultsSortedUsingKeyPath:(NSString *)keyPath
+                                                  ascending:(BOOL)ascending
+                                                   keyBlock:(RLMSectionedResultsKeyBlock)keyBlock {
+    @throw RLMException(@"This method may only be called on RLMSet instances retrieved from an RLMRealm");
+}
+
+- (RLMSectionedResults *)sectionedResultsUsingSortDescriptors:(NSArray<RLMSortDescriptor *> *)sortDescriptors
+                                                     keyBlock:(RLMSectionedResultsKeyBlock)keyBlock {
+    @throw RLMException(@"This method may only be called on RLMSet instances retrieved from an RLMRealm");
+}
+
 // The compiler complains about the method's argument type not matching due to
 // it not having the generic type attached, but it doesn't seem to be possible
 // to actually include the generic type

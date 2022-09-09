@@ -45,4 +45,10 @@ class ReminderList: Object, ObjectKeyIdentifiable {
     @Persisted var name = "New List"
     @Persisted var icon = "list.bullet"
     @Persisted var reminders = RealmSwift.List<Reminder>()
+    var firstLetter: String {
+        guard let char = name.first else {
+            return ""
+        }
+        return String(char)
+    }
 }

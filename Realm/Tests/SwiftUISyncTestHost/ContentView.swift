@@ -171,7 +171,7 @@ class LoginHelper: ObservableObject {
                                              localAppVersion: nil)
     private var clientDataRoot: URL {
         let applicationSupportDirectory = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
-        return applicationSupportDirectory.appendingPathComponent(Bundle.main.bundleIdentifier!)
+        return applicationSupportDirectory.appendingPathComponent("\(Bundle.main.bundleIdentifier!).xctrunner")
     }
 
     func login(email: String, password: String, completion: @escaping (User) -> Void) {
@@ -311,9 +311,17 @@ struct AsyncOpenPartitionView: View {
                     .accessibilityIdentifier("waiting_user_view")
                 ProgressView("Waiting for user to logged in...")
             case .open(let realm):
-                ListView()
-                    .environment(\.realm, realm)
-                    .transition(AnyTransition.move(edge: .leading)).animation(.default)
+                if ProcessInfo.processInfo.environment["is_sectioned_results"] == "true" {
+                    if #available(macOS 12.0, *) {
+                        SectionedResultsView()
+                            .environment(\.realm, realm)
+                            .transition(AnyTransition.move(edge: .leading)).animation(.default)
+                    }
+                } else {
+                    ListView()
+                        .environment(\.realm, realm)
+                        .transition(AnyTransition.move(edge: .leading)).animation(.default)
+                }
             case .error(let error):
                 ErrorView(error: error)
                     .background(Color.red)
@@ -500,5 +508,23 @@ struct ListView: View {
             }
         }
         .navigationTitle("SwiftHugeSyncObject's List")
+    }
+}
+
+@available(macOS 12.0, *)
+struct SectionedResultsView: View {
+    @ObservedSectionedResults(SwiftPerson.self, sectionKeyPath: \.firstName) var objects
+
+    var body: some View {
+        List {
+            ForEach(objects) { section in
+                Section(section.key) {
+                    ForEach(section) { object in
+                        Text("\(object.firstName) \(object.lastName)")
+                    }
+                }
+            }
+        }
+        .navigationTitle("SwiftPerson's List")
     }
 }

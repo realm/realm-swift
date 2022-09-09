@@ -19,7 +19,46 @@ x.y.z Release notes (yyyy-MM-dd)
                                                "age": 20])
     }
 ```
+* Add ability to section a collection which conforms to `RealmCollection`, `RLMCollection`.
+  Collections can be sectioned by a unique key retrieved from a keyPath or a callback and will return an instance of `SectionedResults`/`RLMSectionedResults`.
+  Each section in the collection will be an instance of `ResultsSection`/`RLMSection` which gives access to the elements corresponding to the section key.
+  `SectionedResults`/`RLMSectionedResults` and `ResultsSection`/`RLMSection` have the ability to be observed.
+  ```swift
+  class DemoObject: Object {
+      @Persisted var title: String
+      @Persisted var date: Date
+      var firstLetter: String {
+          return title.first.map(String.init(_:)) ?? ""
+      }
+  }
 
+  var sectionedResults: SectionedResults<String, DemoObject>
+  ...
+  sectionedResults = realm.objects(DemoObject.self)
+      .sectioned(by: \.firstLetter, ascending: true)
+  ```
+* Add `@ObservedSectionedResults` for SwiftUI support. This property wrapper type retrieves sectioned results 
+  from a Realm using a keyPath or callback to determine the section key.
+  ```swift
+  struct DemoView: View {
+      @ObservedSectionedResults(DemoObject.self,
+                                sectionKeyPath: \.firstLetter) var demoObjects
+
+      var body: some View {
+          VStack {
+              List {
+                  ForEach(demoObjects) { section in
+                      Section(header: Text(section.key)) {
+                          ForEach(section) { object in
+                              MyRowView(object: object)
+                          }
+                      }
+                  }
+              }
+          }
+      }
+  }
+  ```
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
 * None.
@@ -2014,7 +2053,7 @@ Xcode 12.2 is now the minimum supported version.
 * Allow enumerating objects in migrations with types which are no longer
   present in the schema.
 * Add `RLMResponse.customStatusCode`. This fixes timeout exceptions that were
-  occuring with a poor connection. ([#4188](https://github.com/realm/realm-core/issues/4188))
+  occurring with a poor connection. ([#4188](https://github.com/realm/realm-core/issues/4188))
 * Limit availability of ObjectKeyIdentifiable to platforms which support
   Combine to match the change made in the Xcode 12.5 SDK.
   ([#7083](https://github.com/realm/realm-swift/issues/7083))
@@ -2110,7 +2149,7 @@ Xcode 12.2 is now the minimum supported version.
 
 ### Fixed
 
-* Integrating changsets from the server would sometimes hit the assertion
+* Integrating changesets from the server would sometimes hit the assertion
   failure "n != realm::npos" inside Table::create_object_with_primary_key()
   when creating an object with a primary key which previously had been used and
   had incoming links. ([Core PR #4180](https://github.com/realm/realm-core/pull/4180), since v10.0.0).

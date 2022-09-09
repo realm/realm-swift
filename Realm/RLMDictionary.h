@@ -453,7 +453,7 @@ __attribute__((warn_unused_result));
  @warning The queue must be a serial queue.
 
  @param block The block to be called whenever a change occurs.
- @param keyPaths The block will be called for changes occuring on these keypaths. If no
+ @param keyPaths The block will be called for changes occurring on these keypaths. If no
  key paths are given, notifications are delivered for every property key path.
  @return A token which must be held for as long as you want updates to be delivered.
  */
@@ -487,7 +487,7 @@ __attribute__((warn_unused_result));
  @warning The queue must be a serial queue.
 
  @param block The block to be called whenever a change occurs.
- @param keyPaths The block will be called for changes occuring on these keypaths. If no
+ @param keyPaths The block will be called for changes occurring on these keypaths. If no
  key paths are given, notifications are delivered for every property key path.
  @return A token which must be held for as long as you want updates to be delivered.
  */

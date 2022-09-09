@@ -180,9 +180,9 @@ class SwiftRLMSchemaTests: RLMMultiProcessTestCase {
         // Objects in default schema
 
         // Should not throw (or crash) despite creating an object with an
-        // unintialized schema during schema init
+        // uninitialized schema during schema init
         _ = InitLinkedToClass()
-        // Again with an object that links to an unintialized type
+        // Again with an object that links to an uninitialized type
         // rather than creating one
         _ = SwiftRLMCompanyObject()
 
