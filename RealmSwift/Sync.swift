@@ -444,9 +444,7 @@ public enum ClientResetMode {
         switch config.clientResetMode {
         case .manual:
             return .manual(config.manualClientResetHandler)
-        case .discardLocal:
-            return .discardLocal(ObjectiveCSupport.convert(object: config.beforeClientReset), ObjectiveCSupport.convert(object: config.afterClientReset))
-        case .discardUnsyncedChanges:
+        case  .discardUnsyncedChanges, .discardLocal:
             return .discardUnsyncedChanges(ObjectiveCSupport.convert(object: config.beforeClientReset), ObjectiveCSupport.convert(object: config.afterClientReset))
         case .recoverUnsyncedChanges:
             return .recoverUnsyncedChanges(ObjectiveCSupport.convert(object: config.beforeClientReset), ObjectiveCSupport.convert(object: config.afterClientReset))
@@ -614,12 +612,7 @@ public extension User {
             config = self.__configuration(withPartitionValue: ObjectiveCSupport.convert(object: AnyBSON(partitionValue)),
                                           clientResetMode: .manual,
                                           manualClientResetHandler: manualClientReset)
-        case .discardLocal(let beforeClientReset, let afterClientReset):
-            config = self.__configuration(withPartitionValue: ObjectiveCSupport.convert(object: AnyBSON(partitionValue)),
-                                          clientResetMode: .discardLocal,
-                                          notifyBeforeReset: ObjectiveCSupport.convert(object: beforeClientReset),
-                                          notifyAfterReset: ObjectiveCSupport.convert(object: afterClientReset))
-        case .discardUnsyncedChanges(let beforeClientReset, let afterClientReset):
+        case .discardUnsyncedChanges(let beforeClientReset, let afterClientReset), .discardLocal(let beforeClientReset, let afterClientReset):
             config = self.__configuration(withPartitionValue: ObjectiveCSupport.convert(object: AnyBSON(partitionValue)),
                                           clientResetMode: .discardUnsyncedChanges,
                                           notifyBeforeReset: ObjectiveCSupport.convert(object: beforeClientReset),
@@ -1080,9 +1073,7 @@ extension User {
         switch clientResetMode {
         case .manual(let block):
             config = self.__flexibleSyncConfiguration(with: .manual, manualClientResetHandler: block)
-        case .discardLocal(let beforeBlock, let afterBlock):
-            config = self.__flexibleSyncConfiguration(with: .discardLocal, notifyBeforeReset: ObjectiveCSupport.convert(object: beforeBlock), notifyAfterReset: ObjectiveCSupport.convert(object: afterBlock))
-        case .discardUnsyncedChanges(let beforeBlock, let afterBlock):
+        case .discardUnsyncedChanges(let beforeBlock, let afterBlock), .discardLocal(let beforeBlock, let afterBlock):
             config = self.__flexibleSyncConfiguration(with: .discardUnsyncedChanges, notifyBeforeReset: ObjectiveCSupport.convert(object: beforeBlock), notifyAfterReset: ObjectiveCSupport.convert(object: afterBlock))
         case .recoverUnsyncedChanges(let beforeBlock, let afterBlock):
             config = self.__flexibleSyncConfiguration(with: .recoverUnsyncedChanges, notifyBeforeReset: ObjectiveCSupport.convert(object: beforeBlock), notifyAfterReset: ObjectiveCSupport.convert(object: afterBlock))
@@ -1126,13 +1117,7 @@ extension User {
                                                       rerunOnOpen: rerunOnOpen,
                                                       clientResetMode: .manual,
                                                       manualClientResetHandler: block)
-        case .discardLocal(let beforeBlock, let afterBlock):
-            config = self.__flexibleSyncConfiguration(initialSubscriptions: ObjectiveCSupport.convert(block: initialSubscriptions),
-                                                      rerunOnOpen: rerunOnOpen,
-                                                      clientResetMode: .discardLocal,
-                                                      notifyBeforeReset: ObjectiveCSupport.convert(object: beforeBlock),
-                                                      notifyAfterReset: ObjectiveCSupport.convert(object: afterBlock))
-        case .discardUnsyncedChanges(let beforeBlock, let afterBlock):
+        case .discardUnsyncedChanges(let beforeBlock, let afterBlock), .discardLocal(let beforeBlock, let afterBlock):
             config = self.__flexibleSyncConfiguration(initialSubscriptions: ObjectiveCSupport.convert(block: initialSubscriptions),
                                                       rerunOnOpen: rerunOnOpen,
                                                       clientResetMode: .discardUnsyncedChanges,

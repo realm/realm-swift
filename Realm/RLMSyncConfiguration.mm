@@ -207,6 +207,7 @@ struct AfterClientResetWrapper : CallbackSchema {
     } else {
         _manualClientResetHandler = manualClientReset;
     }
+    [self assignConfigErrorHandler:self.user];
 }
 
 void RLMSetConfigInfoForClientResetCallbacks(realm::SyncConfig& syncConfig, RLMRealmConfiguration *config) {
@@ -288,7 +289,8 @@ NSError *RLMTranslateSyncError(SyncError error) {
 - (void)assignConfigErrorHandler:(RLMUser *)user {
     RLMSyncManager *manager = [user.app syncManager];
     __weak RLMSyncManager *weakManager = manager;
-    _config->error_handler = [weakManager, self](std::shared_ptr<SyncSession> errored_session, SyncError error) {
+    RLMSyncErrorReportingBlock resetHandler = self.manualClientResetHandler;
+    _config->error_handler = [weakManager, resetHandler](std::shared_ptr<SyncSession> errored_session, SyncError error) {
         RLMSyncErrorReportingBlock errorHandler;
         @autoreleasepool {
             errorHandler = weakManager.errorHandler;
@@ -297,7 +299,7 @@ NSError *RLMTranslateSyncError(SyncError error) {
         if (!nsError) {
             return;
         }
-        if (!errorHandler && !_manualClientResetHandler) {
+        if (!errorHandler && !resetHandler) {
             return;
         } else if (!errorHandler && nsError.code != RLMSyncErrorClientResetError) {
             return;
@@ -308,8 +310,8 @@ NSError *RLMTranslateSyncError(SyncError error) {
             // Keep the SyncSession alive until the callback completes as
             // RLMSyncSession only holds a weak reference
             static_cast<void>(errored_session);
-            if (_manualClientResetHandler && nsError.code == RLMSyncErrorClientResetError) {
-                _manualClientResetHandler(nsError, session);
+            if (resetHandler && nsError.code == RLMSyncErrorClientResetError) {
+                resetHandler(nsError, session);
             } else {
                 errorHandler(nsError, session);
             }
