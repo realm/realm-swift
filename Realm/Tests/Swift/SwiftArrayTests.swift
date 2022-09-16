@@ -128,7 +128,7 @@ class SwiftRLMArrayTests: RLMTestCase {
 
         // Test double min
         min = noArray.min(ofProperty: "doubleCol") as! NSNumber
-        XCTAssertEqual(min.doubleValue, Double(2.5), accuracy: 0.1, "Minimum should be 1.5")
+        XCTAssertEqual(min.doubleValue, Double(2.5), accuracy: 0.1, "Minimum should be 2.5")
         min = yesArray.min(ofProperty: "doubleCol") as! NSNumber
         XCTAssertEqual(min.doubleValue, Double(0), accuracy: 0.1, "Minimum should be 0.0")
 
@@ -153,7 +153,7 @@ class SwiftRLMArrayTests: RLMTestCase {
 
         // Test double max
         max = noArray.max(ofProperty: "doubleCol") as! NSNumber
-        XCTAssertEqual(max.doubleValue, Double(2.5), accuracy: 0.1, "Maximum should be 3.5")
+        XCTAssertEqual(max.doubleValue, Double(2.5), accuracy: 0.1, "Maximum should be 2.5")
         max = yesArray.max(ofProperty: "doubleCol") as! NSNumber
         XCTAssertEqual(max.doubleValue, Double(0), accuracy: 0.1, "Maximum should be 0.0")
 
@@ -355,7 +355,7 @@ class SwiftRLMArrayTests: RLMTestCase {
 
         // Test double min
         min = noArray.min(ofProperty: "doubleCol") as! NSNumber
-        XCTAssertEqual(min.doubleValue, Double(2.5), accuracy: 0.1, "Minimum should be 1.5")
+        XCTAssertEqual(min.doubleValue, Double(2.5), accuracy: 0.1, "Minimum should be 2.5")
         min = yesArray.min(ofProperty: "doubleCol") as! NSNumber
         XCTAssertEqual(min.doubleValue, Double(0), accuracy: 0.1, "Minimum should be 0.0")
 
@@ -368,9 +368,9 @@ class SwiftRLMArrayTests: RLMTestCase {
         // MAX ::::::::::::::::::::::::::::::::::::::::::::::
         // Test int max
         var max = noArray.max(ofProperty: "intCol") as! NSNumber
-        XCTAssertEqual(max.intValue, 1, "Maximum should be 8")
+        XCTAssertEqual(max.intValue, 1, "Maximum should be 1")
         max = yesArray.max(ofProperty: "intCol") as! NSNumber
-        XCTAssertEqual(max.intValue, 0, "Maximum should be 10")
+        XCTAssertEqual(max.intValue, 0, "Maximum should be 0")
 
         // Test float max
         max = noArray.max(ofProperty: "floatCol") as! NSNumber
@@ -380,7 +380,7 @@ class SwiftRLMArrayTests: RLMTestCase {
 
         // Test double max
         max = noArray.max(ofProperty: "doubleCol") as! NSNumber
-        XCTAssertEqual(max.doubleValue, Double(2.5), accuracy: 0.1, "Maximum should be 3.5")
+        XCTAssertEqual(max.doubleValue, Double(2.5), accuracy: 0.1, "Maximum should be 2.5")
         max = yesArray.max(ofProperty: "doubleCol") as! NSNumber
         XCTAssertEqual(max.doubleValue, Double(0), accuracy: 0.1, "Maximum should be 0.0")
 
