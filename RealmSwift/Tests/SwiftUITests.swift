@@ -24,6 +24,7 @@ import Combine
 
 class SwiftUIObject: Object, ObjectKeyIdentifiable {
     @Persisted var list: RealmSwift.List<SwiftBoolObject>
+    @Persisted var stringList: RealmSwift.List<SwiftStringObject>
     @Persisted var set: RealmSwift.MutableSet<SwiftBoolObject>
     @Persisted var map: Map<String, SwiftBoolObject?>
     @Persisted var primitiveList: RealmSwift.List<Int>
@@ -442,6 +443,56 @@ class SwiftUITests: TestCase {
         XCTAssertEqual(state.wrappedValue.count, 1)
         state.projectedValue.remove(object)
         XCTAssertEqual(state.wrappedValue.count, 0)
+    }
+    func testResultsMoveUnmanagedObject() throws {
+        let state = ObservedResults(SwiftUIObject.self,
+                                    configuration: inMemoryRealm(inMemoryIdentifier).configuration)
+        let object = SwiftUIObject()
+        XCTAssertEqual(state.wrappedValue.count, 0)
+
+        object.stringList.append(SwiftStringObject(stringCol: "Tom"))
+        object.stringList.append(SwiftStringObject(stringCol: "Sam"))
+        object.stringList.append(SwiftStringObject(stringCol: "Dan"))
+
+        let binding = object.bind(\.stringList)
+        XCTAssertEqual(object.stringList.first!.stringCol, "Tom")
+        XCTAssertEqual(object.stringList.last!.stringCol, "Dan")
+
+        binding.move(fromOffsets: IndexSet([0]), toOffset: 3)
+        XCTAssertEqual(object.stringList.first!.stringCol, "Sam")
+        XCTAssertEqual(object.stringList.last!.stringCol, "Tom")
+
+        binding.move(fromOffsets: IndexSet([2]), toOffset: 0)
+        XCTAssertEqual(object.stringList.first!.stringCol, "Tom")
+        XCTAssertEqual(object.stringList.last!.stringCol, "Dan")
+
+        XCTAssertEqual(state.wrappedValue.count, 0)
+    }
+    func testResultsMoveManagedObject() throws {
+        let state = ObservedResults(SwiftUIObject.self,
+                                    configuration: inMemoryRealm(inMemoryIdentifier).configuration)
+        let object = SwiftUIObject()
+        XCTAssertEqual(state.wrappedValue.count, 0)
+
+        object.stringList.append(SwiftStringObject(stringCol: "Tom"))
+        object.stringList.append(SwiftStringObject(stringCol: "Sam"))
+        object.stringList.append(SwiftStringObject(stringCol: "Dan"))
+
+        state.projectedValue.append(object)
+
+        let binding = object.bind(\.stringList)
+        XCTAssertEqual(object.stringList.first!.stringCol, "Tom")
+        XCTAssertEqual(object.stringList.last!.stringCol, "Dan")
+
+        binding.move(fromOffsets: IndexSet([0]), toOffset: 3)
+        XCTAssertEqual(object.stringList.first!.stringCol, "Sam")
+        XCTAssertEqual(object.stringList.last!.stringCol, "Tom")
+
+        binding.move(fromOffsets: IndexSet([2]), toOffset: 0)
+        XCTAssertEqual(object.stringList.first!.stringCol, "Tom")
+        XCTAssertEqual(object.stringList.last!.stringCol, "Dan")
+
+        XCTAssertEqual(state.wrappedValue.count, 1)
     }
     func testSwiftQuerySyntax() throws {
         let realm = inMemoryRealm(inMemoryIdentifier)

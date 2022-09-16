@@ -88,13 +88,15 @@ class SwiftUITests: XCTestCase {
         addButton.tap()
         app.buttons["New List"].tap()
         XCTAssertTrue(app.navigationBars.staticTexts["New List"].waitForExistence(timeout: 1.0))
-        app.buttons["addReminder"].tap()
-        // type in a name
-        app.textFields["title"].tap()
-        app.textFields["title"].tap()
-        app.textFields["title"].typeText("My Reminder")
-        // check to see if it is reflected live in the title view
-        XCTAssertTrue(app.navigationBars.staticTexts["My Reminder"].waitForExistence(timeout: 1.0))
+        func addReminder(_ title: String) {
+            app.buttons["addReminder"].tap()
+            app.textFields["title"].tap()
+            app.textFields["title"].tap()
+            app.textFields["title"].typeText(title)
+            XCTAssertTrue(app.navigationBars.staticTexts[title].waitForExistence(timeout: 1.0))
+        }
+
+        addReminder("My Reminder")
         let myReminder = realm.objects(ReminderList.self).first!.reminders.first!
         XCTAssertEqual(myReminder.priority, .low)
         if #available(iOS 16, *) {
@@ -108,16 +110,32 @@ class SwiftUITests: XCTestCase {
         app.navigationBars.buttons.element(boundBy: 0).tap()
 
         // MARK: Test Move
-        app.buttons["addReminder"].tap()
-        XCTAssertEqual(realm.objects(ReminderList.self).first!.reminders.first!.title, "My Reminder")
-        XCTAssertEqual(realm.objects(ReminderList.self).first!.reminders[1].title, "")
+        addReminder("My Reminder 2")
+        app.navigationBars.buttons.element(boundBy: 0).tap()
+        addReminder("My Reminder 3")
+        app.navigationBars.buttons.element(boundBy: 0).tap()
+        addReminder("My Reminder 4")
         app.navigationBars.buttons.element(boundBy: 0).tap()
 
-        app.buttons["Edit"].tap()
-        app.buttons.matching(identifier: "Reorder").firstMatch.press(forDuration: 0.5, thenDragTo: tables.cells.element(boundBy: 1))
+        XCTAssertEqual(realm.objects(ReminderList.self).first!.reminders.first!.title, "My Reminder")
+        XCTAssertEqual(realm.objects(ReminderList.self).first!.reminders[1].title, "My Reminder 2")
+        XCTAssertEqual(realm.objects(ReminderList.self).first!.reminders[2].title, "My Reminder 3")
+        XCTAssertEqual(realm.objects(ReminderList.self).first!.reminders[3].title, "My Reminder 4")
 
-        XCTAssertEqual(realm.objects(ReminderList.self).first!.reminders.first!.title, "")
-        XCTAssertEqual(realm.objects(ReminderList.self).first!.reminders[1].title, "My Reminder")
+        app.buttons["Edit"].tap()
+        app.buttons.matching(identifier: "Reorder").firstMatch.press(forDuration: 0.5, thenDragTo: tables.cells.element(boundBy: 2))
+
+        XCTAssertEqual(realm.objects(ReminderList.self).first!.reminders.first!.title, "My Reminder 2")
+        XCTAssertEqual(realm.objects(ReminderList.self).first!.reminders[1].title, "My Reminder 3")
+        XCTAssertEqual(realm.objects(ReminderList.self).first!.reminders[2].title, "My Reminder")
+        XCTAssertEqual(realm.objects(ReminderList.self).first!.reminders[3].title, "My Reminder 4")
+
+        app.buttons.matching(identifier: "Reorder").element(boundBy: 2).press(forDuration: 0.5, thenDragTo: tables.cells.element(boundBy: 0))
+
+        XCTAssertEqual(realm.objects(ReminderList.self).first!.reminders.first!.title, "My Reminder")
+        XCTAssertEqual(realm.objects(ReminderList.self).first!.reminders[1].title, "My Reminder 2")
+        XCTAssertEqual(realm.objects(ReminderList.self).first!.reminders[2].title, "My Reminder 3")
+        XCTAssertEqual(realm.objects(ReminderList.self).first!.reminders[3].title, "My Reminder 4")
 
         // MARK: Test Delete
         // potentially brittle, but these are the hooks swiftUI gives us. when editing a list,
@@ -134,20 +152,19 @@ class SwiftUITests: XCTestCase {
                 app.buttons.matching(identifier: "Delete").firstMatch.tap()
             }
         }
+        XCTAssertEqual(realm.objects(ReminderList.self).first!.reminders.count, 4)
+        delete()
+        XCTAssertEqual(realm.objects(ReminderList.self).first!.reminders.count, 3)
+        delete()
         XCTAssertEqual(realm.objects(ReminderList.self).first!.reminders.count, 2)
         delete()
         XCTAssertEqual(realm.objects(ReminderList.self).first!.reminders.count, 1)
-        if #available(iOS 16.0, *) {
-            app.buttons["Edit"].tap()
-        }
-        delete()
-        XCTAssertEqual(realm.objects(ReminderList.self).first!.reminders.count, 0)
-
-        app.navigationBars.buttons.firstMatch.tap()
 
         if #available(iOS 16.0, *) {
             app.buttons["Done"].tap()
         }
+
+        app.navigationBars.buttons.firstMatch.tap()
         tables.cells.firstMatch.swipeLeft()
         app.buttons.matching(identifier: "Delete").firstMatch.tap()
         XCTAssertEqual(realm.objects(ReminderList.self).count, 0)
@@ -183,7 +200,7 @@ class SwiftUITests: XCTestCase {
         searchBar.tap()
 
         searchBar.typeText("reminder list 1\n") // \n to dismiss keyboard
-        XCTAssertEqual(table.cells.count, 11)
+        XCTAssertEqual(table.cells.count, 9)
     }
 
     func testMultipleEnvironmentRealms() {
@@ -297,7 +314,7 @@ class SwiftUITests: XCTestCase {
         let table = tables.firstMatch
 
         // Observed Results filter, should filter reminders without name.
-        XCTAssertEqual(table.cells.count, 13)
+        XCTAssertEqual(table.cells.count, 12)
 
         let searchBar = app.searchFields.firstMatch
         searchBar.tap()
@@ -316,7 +333,7 @@ class SwiftUITests: XCTestCase {
 
         clearSearchBar()
         app.navigationBars["Reminders"].buttons["Cancel"].tap()
-        XCTAssertEqual(table.cells.count, 13)
+        XCTAssertEqual(table.cells.count, 12)
 
         searchBar.tap()
         searchBar.typeText("2")
@@ -377,13 +394,14 @@ class SwiftUITests: XCTestCase {
         // Expect the ui to still show two cells labelled New List.
         // The view should've not updated because the name change was
         // outside keypath input.
-        XCTAssert(app.tables.firstMatch.otherElements.staticTexts["N"].exists)
-        let cell0 = app.tables.firstMatch.cells.element(boundBy: 0)
-        let cell1 = app.tables.firstMatch.cells.element(boundBy: 1)
+        XCTAssert(app.collectionViews.firstMatch.otherElements.staticTexts["N"].exists)
+        let cell0 = app.collectionViews.firstMatch.cells.element(boundBy: 1)
+        let cell1 = app.collectionViews.firstMatch.cells.element(boundBy: 2)
         XCTAssert(cell0.staticTexts["New List"].exists)
         XCTAssert(cell1.staticTexts["New List"].exists)
         XCTAssertEqual(realm.objects(ReminderList.self).count, 2)
-        XCTAssertEqual(app.tables.firstMatch.cells.count, 2)
+        // The section title is now a cell within the collection view
+        XCTAssertEqual(app.collectionViews.firstMatch.cells.count, 3)
 
         // Change isFlagged status of a linked reminder.
         try! realm.write {
@@ -399,15 +417,15 @@ class SwiftUITests: XCTestCase {
         // Expect 2 cells now displaying "changed".
         // Expect two sections as another `ReminderList` has
         // been inserted into the Realm.
-        XCTAssert(app.tables.otherElements.staticTexts["A"].exists)
-        XCTAssert(app.tables.otherElements.staticTexts["c"].exists)
+        XCTAssert(app.collectionViews.otherElements.staticTexts["A"].exists)
+        XCTAssert(app.collectionViews.otherElements.staticTexts["c"].exists)
         XCTAssert(cell0.staticTexts["Another List"].exists)
-        let cell2 = app.tables.cells.element(boundBy: 1)
-        let cell3 = app.tables.cells.element(boundBy: 2)
+        let cell2 = app.collectionViews.cells.element(boundBy: 3)
+        let cell3 = app.collectionViews.cells.element(boundBy: 4)
         XCTAssert(cell2.staticTexts["changed"].exists)
         XCTAssert(cell3.staticTexts["changed"].exists)
         XCTAssertEqual(realm.objects(ReminderList.self).count, 3)
-        XCTAssertEqual(app.tables.firstMatch.cells.count, 3)
+        XCTAssertEqual(app.collectionViews.firstMatch.cells.count, 5)
     }
 
     func testKeyPathObservedSectionedResults2() {
@@ -437,13 +455,13 @@ class SwiftUITests: XCTestCase {
         // Expect the ui to still show two cells labelled New List.
         // The view should've not updated because the name change was
         // outside keypath input.
-        XCTAssert(app.tables.firstMatch.otherElements.staticTexts["N"].exists)
-        let cell0 = app.tables.firstMatch.cells.element(boundBy: 0)
-        let cell1 = app.tables.firstMatch.cells.element(boundBy: 1)
+        XCTAssert(app.collectionViews.firstMatch.otherElements.staticTexts["N"].exists)
+        let cell0 = app.collectionViews.firstMatch.cells.element(boundBy: 1)
+        let cell1 = app.collectionViews.firstMatch.cells.element(boundBy: 2)
         XCTAssert(cell0.staticTexts["New List"].exists)
         XCTAssert(cell1.staticTexts["New List"].exists)
         XCTAssertEqual(realm.objects(ReminderList.self).count, 2)
-        XCTAssertEqual(app.tables.firstMatch.cells.count, 2)
+        XCTAssertEqual(app.collectionViews.firstMatch.cells.count, 3)
 
         // Change isFlagged status of a linked reminder.
         try! realm.write {
@@ -459,15 +477,15 @@ class SwiftUITests: XCTestCase {
         // Expect 2 cells now displaying "changed".
         // Expect two sections as another `ReminderList` has
         // been inserted into the Realm.
-        XCTAssert(app.tables.otherElements.staticTexts["A"].exists)
-        XCTAssert(app.tables.otherElements.staticTexts["c"].exists)
+        XCTAssert(app.collectionViews.otherElements.staticTexts["A"].exists)
+        XCTAssert(app.collectionViews.otherElements.staticTexts["c"].exists)
         XCTAssert(cell0.staticTexts["Another List"].exists)
-        let cell2 = app.tables.cells.element(boundBy: 1)
-        let cell3 = app.tables.cells.element(boundBy: 2)
+        let cell2 = app.collectionViews.cells.element(boundBy: 3)
+        let cell3 = app.collectionViews.cells.element(boundBy: 4)
         XCTAssert(cell2.staticTexts["changed"].exists)
         XCTAssert(cell3.staticTexts["changed"].exists)
         XCTAssertEqual(realm.objects(ReminderList.self).count, 3)
-        XCTAssertEqual(app.tables.firstMatch.cells.count, 3)
+        XCTAssertEqual(app.collectionViews.firstMatch.cells.count, 5)
     }
 
     func testUpdateObservedSectionedResultsWithSearchable() {
@@ -496,36 +514,38 @@ class SwiftUITests: XCTestCase {
             searchBar.typeText(deleteString)
         }
 
-        let table = app.tables.firstMatch
+        let table = app.collectionViews.firstMatch
 
         // Observed Results filter, should filter reminders without name.
-        XCTAssertEqual(table.cells.count, 20)
+        XCTAssertEqual(table.cells.count, 12)
 
         let searchBar = app.searchFields.firstMatch
         searchBar.tap()
 
         searchBar.typeText("reminder")
-        XCTAssertEqual(table.cells.count, 20)
-        XCTAssert(app.tables.otherElements.staticTexts["r"].exists)
+        XCTAssertEqual(table.cells.count, 14)
+        XCTAssert(app.collectionViews.otherElements.staticTexts["r"].exists)
 
         searchBar.typeText(" list 1")
-        XCTAssertEqual(table.cells.count, 11)
+        XCTAssertEqual(table.cells.count, 12)
 
         searchBar.typeText("8")
-        XCTAssertEqual(table.cells.count, 1)
+        XCTAssertEqual(table.cells.count, 2)
 
         searchBar.typeText("9")
         XCTAssertEqual(table.cells.count, 0)
 
         clearSearchBar()
-        XCTAssertEqual(table.cells.count, 20)
+        app.buttons["Cancel"].tap()
+        XCTAssertEqual(table.cells.count, 12)
 
+        searchBar.tap()
         searchBar.typeText("5")
-        XCTAssertEqual(table.cells.count, 2)
+        XCTAssertEqual(table.cells.count, 3)
 
         clearSearchBar()
         searchBar.typeText("12")
-        XCTAssertEqual(table.cells.count, 1)
+        XCTAssertEqual(table.cells.count, 2)
     }
 
     func testObservedSectionedResultsConfiguration() {
@@ -545,12 +565,12 @@ class SwiftUITests: XCTestCase {
             addButtonB.tap()
         }
 
-        let tableA = app.tables["ListA"]
+        let tableA = app.collectionViews["ListA"]
         XCTAssert(tableA.otherElements.staticTexts["N"].exists)
-        XCTAssertEqual(tableA.cells.count, 5)
+        XCTAssertEqual(tableA.cells.count, 6)
 
-        let tableB = app.tables["ListB"]
+        let tableB = app.collectionViews["ListB"]
         XCTAssert(tableB.otherElements.staticTexts["N"].exists)
-        XCTAssertEqual(tableB.cells.count, 5)
+        XCTAssertEqual(tableB.cells.count, 6)
     }
 }

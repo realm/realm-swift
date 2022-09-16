@@ -22,6 +22,11 @@ import Realm
 
 final class SwiftStringObject: Object {
     @objc dynamic var stringCol = ""
+
+    convenience init(stringCol: String) {
+        self.init()
+        self.stringCol = stringCol
+    }
 }
 
 class ModernSwiftStringObject: Object {
