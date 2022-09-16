@@ -350,4 +350,207 @@ class SwiftUITests: XCTestCase {
         let tableB = tables["ListB"]
         XCTAssertEqual(tableB.cells.count, 5)
     }
+
+    func testKeyPathObservedSectionedResults() {
+        app.launchEnvironment["test_type"] = "observed_sectioned_results_key_path"
+        app.launch()
+
+        let addButton = app.buttons["addList"]
+        addButton.tap()
+        addButton.tap()
+
+        // Populate reminders to reminder list.
+        try! realm.write {
+            for obj in realm.objects(ReminderList.self) {
+                obj.reminders.append(Reminder())
+            }
+        }
+        // Change the name of two ReminderList objects.
+        // This is a separate write block because it's testing a change outside
+        // the keypath input.
+        try! realm.write {
+            for obj in realm.objects(ReminderList.self) {
+                obj.name = "changed"
+            }
+        }
+
+        // Expect the ui to still show two cells labelled New List.
+        // The view should've not updated because the name change was
+        // outside keypath input.
+        XCTAssert(app.tables.firstMatch.otherElements.staticTexts["N"].exists)
+        let cell0 = app.tables.firstMatch.cells.element(boundBy: 0)
+        let cell1 = app.tables.firstMatch.cells.element(boundBy: 1)
+        XCTAssert(cell0.staticTexts["New List"].exists)
+        XCTAssert(cell1.staticTexts["New List"].exists)
+        XCTAssertEqual(realm.objects(ReminderList.self).count, 2)
+        XCTAssertEqual(app.tables.firstMatch.cells.count, 2)
+
+        // Change isFlagged status of a linked reminder.
+        try! realm.write {
+            let first = realm.objects(ReminderList.self).first!
+            first.reminders[0].isFlagged = true
+            let list = ReminderList()
+            list.name = "Another List"
+            realm.add(list)
+        }
+
+        // Expect ui to refresh because the "reminders.isFlagged" keypath
+        // has been changed.
+        // Expect 2 cells now displaying "changed".
+        // Expect two sections as another `ReminderList` has
+        // been inserted into the Realm.
+        XCTAssert(app.tables.otherElements.staticTexts["A"].exists)
+        XCTAssert(app.tables.otherElements.staticTexts["c"].exists)
+        XCTAssert(cell0.staticTexts["Another List"].exists)
+        let cell2 = app.tables.cells.element(boundBy: 1)
+        let cell3 = app.tables.cells.element(boundBy: 2)
+        XCTAssert(cell2.staticTexts["changed"].exists)
+        XCTAssert(cell3.staticTexts["changed"].exists)
+        XCTAssertEqual(realm.objects(ReminderList.self).count, 3)
+        XCTAssertEqual(app.tables.firstMatch.cells.count, 3)
+    }
+
+    func testKeyPathObservedSectionedResults2() {
+        // Tests ObservedSectionedResults ctor that uses the `sectionBlock` param.
+        app.launchEnvironment["test_type"] = "observed_sectioned_results_sort_descriptors"
+        app.launch()
+
+        let addButton = app.buttons["addList"]
+        addButton.tap()
+        addButton.tap()
+
+        // Populate reminders to reminder list.
+        try! realm.write {
+            for obj in realm.objects(ReminderList.self) {
+                obj.reminders.append(Reminder())
+            }
+        }
+        // Change the name of two ReminderList objects.
+        // This is a separate write block because it's testing a change outside
+        // the keypath input.
+        try! realm.write {
+            for obj in realm.objects(ReminderList.self) {
+                obj.name = "changed"
+            }
+        }
+
+        // Expect the ui to still show two cells labelled New List.
+        // The view should've not updated because the name change was
+        // outside keypath input.
+        XCTAssert(app.tables.firstMatch.otherElements.staticTexts["N"].exists)
+        let cell0 = app.tables.firstMatch.cells.element(boundBy: 0)
+        let cell1 = app.tables.firstMatch.cells.element(boundBy: 1)
+        XCTAssert(cell0.staticTexts["New List"].exists)
+        XCTAssert(cell1.staticTexts["New List"].exists)
+        XCTAssertEqual(realm.objects(ReminderList.self).count, 2)
+        XCTAssertEqual(app.tables.firstMatch.cells.count, 2)
+
+        // Change isFlagged status of a linked reminder.
+        try! realm.write {
+            let first = realm.objects(ReminderList.self).first!
+            first.reminders[0].isFlagged = true
+            let list = ReminderList()
+            list.name = "Another List"
+            realm.add(list)
+        }
+
+        // Expect ui to refresh because the "reminders.isFlagged" keypath
+        // has been changed.
+        // Expect 2 cells now displaying "changed".
+        // Expect two sections as another `ReminderList` has
+        // been inserted into the Realm.
+        XCTAssert(app.tables.otherElements.staticTexts["A"].exists)
+        XCTAssert(app.tables.otherElements.staticTexts["c"].exists)
+        XCTAssert(cell0.staticTexts["Another List"].exists)
+        let cell2 = app.tables.cells.element(boundBy: 1)
+        let cell3 = app.tables.cells.element(boundBy: 2)
+        XCTAssert(cell2.staticTexts["changed"].exists)
+        XCTAssert(cell3.staticTexts["changed"].exists)
+        XCTAssertEqual(realm.objects(ReminderList.self).count, 3)
+        XCTAssertEqual(app.tables.firstMatch.cells.count, 3)
+    }
+
+    func testUpdateObservedSectionedResultsWithSearchable() {
+        app.launchEnvironment["test_type"] = "observed_sectioned_results_searchable"
+        app.launch()
+
+        let addButton = app.buttons["addList"]
+        (1...20).forEach { _ in
+            addButton.tap()
+        }
+
+        // Name every reminders list for search
+        try! realm.write {
+            for (index, obj) in (realm.objects(ReminderList.self)).enumerated() {
+                obj.name = "reminder list \(index)"
+            }
+        }
+
+        (1...5).forEach { _ in
+            addButton.tap()
+        }
+
+        func clearSearchBar() {
+            let searchBar = app.searchFields.firstMatch
+            let deleteString = String(repeating: XCUIKeyboardKey.delete.rawValue, count: (searchBar.value as? String)!.count)
+            searchBar.typeText(deleteString)
+        }
+
+        let table = app.tables.firstMatch
+
+        // Observed Results filter, should filter reminders without name.
+        XCTAssertEqual(table.cells.count, 20)
+
+        let searchBar = app.searchFields.firstMatch
+        searchBar.tap()
+
+        searchBar.typeText("reminder")
+        XCTAssertEqual(table.cells.count, 20)
+        XCTAssert(app.tables.otherElements.staticTexts["r"].exists)
+
+        searchBar.typeText(" list 1")
+        XCTAssertEqual(table.cells.count, 11)
+
+        searchBar.typeText("8")
+        XCTAssertEqual(table.cells.count, 1)
+
+        searchBar.typeText("9")
+        XCTAssertEqual(table.cells.count, 0)
+
+        clearSearchBar()
+        XCTAssertEqual(table.cells.count, 20)
+
+        searchBar.typeText("5")
+        XCTAssertEqual(table.cells.count, 2)
+
+        clearSearchBar()
+        searchBar.typeText("12")
+        XCTAssertEqual(table.cells.count, 1)
+    }
+
+    func testObservedSectionedResultsConfiguration() {
+        app.launchEnvironment["test_type"] = "observed_sectioned_results_configuration"
+        app.launch()
+
+        // Check that both @ObservedResults contain the correct configuration.
+        // `remindersA` will get it's config from .environment, while `remindersA`
+        // will get it's Realm config passed in the @ObservedResults initializer.
+        XCTAssertEqual(app.staticTexts["realm_a_label"].label, "realm_a")
+        XCTAssertEqual(app.staticTexts["realm_b_label"].label, "realm_b")
+
+        let addButtonA = app.buttons["addListA"]
+        let addButtonB = app.buttons["addListB"]
+        (1...5).forEach { _ in
+            addButtonA.tap()
+            addButtonB.tap()
+        }
+
+        let tableA = app.tables["ListA"]
+        XCTAssert(tableA.otherElements.staticTexts["N"].exists)
+        XCTAssertEqual(tableA.cells.count, 5)
+
+        let tableB = app.tables["ListB"]
+        XCTAssert(tableB.otherElements.staticTexts["N"].exists)
+        XCTAssertEqual(tableB.cells.count, 5)
+    }
 }

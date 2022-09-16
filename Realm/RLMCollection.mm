@@ -384,16 +384,6 @@ static NSArray *toArray(realm::IndexSet const& set) {
     return toArray(_indices.modifications);
 }
 
-static NSArray *toIndexPathArray(realm::IndexSet const& set, NSUInteger section) {
-    NSMutableArray *ret = [NSMutableArray new];
-    NSUInteger path[2] = {section, 0};
-    for (auto index : set.as_indexes()) {
-        path[1] = index;
-        [ret addObject:[NSIndexPath indexPathWithIndexes:path length:2]];
-    }
-    return ret;
-}
-
 - (NSArray<NSIndexPath *> *)deletionsInSection:(NSUInteger)section {
     return toIndexPathArray(_indices.deletions, section);
 }
@@ -419,19 +409,7 @@ struct CollectionCallbackWrapper {
     id collection;
     bool ignoreChangesInInitialNotification;
 
-    void operator()(realm::CollectionChangeSet const& changes, std::exception_ptr err) {
-        if (err) {
-            try {
-                rethrow_exception(err);
-            }
-            catch (...) {
-                NSError *error = nil;
-                RLMRealmTranslateException(&error);
-                block(nil, nil, error);
-                return;
-            }
-        }
-
+    void operator()(realm::CollectionChangeSet const& changes) {
         if (ignoreChangesInInitialNotification) {
             ignoreChangesInInitialNotification = false;
             block(collection, nil, nil);

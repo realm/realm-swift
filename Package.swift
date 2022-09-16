@@ -3,8 +3,8 @@
 import PackageDescription
 import Foundation
 
-let coreVersionStr = "12.3.0"
-let cocoaVersionStr = "10.28.2"
+let coreVersionStr = "12.6.0"
+let cocoaVersionStr = "10.29.0"
 
 let coreVersionPieces = coreVersionStr.split(separator: ".")
 let coreVersionExtra = coreVersionPieces[2].split(separator: "-")
@@ -41,6 +41,7 @@ let testCxxSettings: [CXXSetting] = cxxSettings + [
 let objectServerTestSources = [
     "Object-Server-Tests-Bridging-Header.h",
     "ObjectServerTests-Info.plist",
+    "RLMAsymmetricSyncServerTests.mm",
     "RLMBSONTests.mm",
     "RLMCollectionSyncTests.mm",
     "RLMFlexibleSyncServerTests.mm",
@@ -55,8 +56,9 @@ let objectServerTestSources = [
     "RLMUser+ObjectServerTests.mm",
     "RLMWatchTestUtility.h",
     "RLMWatchTestUtility.m",
-    "EventTests.swift" ,
-    "RealmServer.swift" ,
+    "EventTests.swift",
+    "RealmServer.swift",
+    "SwiftAsymmetricSyncServerTests.swift",
     "SwiftCollectionSyncTests.swift",
     "SwiftFlexibleSyncServerTests.swift",
     "SwiftMongoClientTests.swift",
@@ -155,6 +157,7 @@ let package = Package(
                 "Realm/RLMAccessor.mm",
                 "Realm/RLMAnalytics.mm",
                 "Realm/RLMArray.mm",
+                "Realm/RLMAsymmetricObject.mm",
                 "Realm/RLMClassInfo.mm",
                 "Realm/RLMCollection.mm",
                 "Realm/RLMConstants.m",
@@ -179,6 +182,7 @@ let package = Package(
                 "Realm/RLMRealmUtil.mm",
                 "Realm/RLMResults.mm",
                 "Realm/RLMSchema.mm",
+                "Realm/RLMSectionedResults.mm",
                 "Realm/RLMSet.mm",
                 "Realm/RLMSwiftCollectionBase.mm",
                 "Realm/RLMSwiftSupport.m",
@@ -298,23 +302,25 @@ let package = Package(
             name: "SwiftObjectServerTests",
             sources: [
                 "EventTests.swift",
-                "SwiftObjectServerTests.swift",
+                "SwiftAsymmetricSyncServerTests.swift",
                 "SwiftCollectionSyncTests.swift",
-                "SwiftObjectServerPartitionTests.swift",
-                "SwiftUIServerTests.swift",
+                "SwiftFlexibleSyncServerTests.swift",
                 "SwiftMongoClientTests.swift",
-                "SwiftFlexibleSyncServerTests.swift"
+                "SwiftObjectServerPartitionTests.swift",
+                "SwiftObjectServerTests.swift",
+                "SwiftUIServerTests.swift"
             ]
         ),
         objectServerTestTarget(
             name: "ObjcObjectServerTests",
             sources: [
+                "RLMAsymmetricSyncServerTests.mm",
                 "RLMBSONTests.mm",
                 "RLMCollectionSyncTests.mm",
+                "RLMFlexibleSyncServerTests.mm",
                 "RLMObjectServerPartitionTests.mm",
                 "RLMObjectServerTests.mm",
-                "RLMWatchTestUtility.m",
-                "RLMFlexibleSyncServerTests.mm"
+                "RLMWatchTestUtility.m"
             ]
         )
     ],

@@ -14,10 +14,249 @@ x.y.z Release notes (yyyy-MM-dd)
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 13.4.1.
 * CocoaPods: 1.10 or later.
-* Xcode: 13.1-14 beta 1.
+* Xcode: 13.1-14 beta 6.
 
 ### Internal
 * Upgraded realm-core from ? to ?
+
+10.29.0 Release notes (2022-09-09)
+=============================================================
+
+### Enhancements
+
+* Add support for asymmetric sync. When a class inherits from
+  `AsymmetricObject`, objects created are synced unidirectionally to the server
+  and cannot be queried or read locally.
+
+```swift
+    class PersonObject: AsymmetricObject {
+       @Persisted(primaryKey: true) var _id: ObjectId
+       @Persisted var name: String
+       @Persisted var age: Int
+    }
+
+    try realm.write {
+       // This will create the object on the server but not locally.
+       realm.create(PersonObject.self, value: ["_id": ObjectId.generate(),
+                                               "name": "Dylan",
+                                               "age": 20])
+    }
+```
+* Add ability to section a collection which conforms to `RealmCollection`, `RLMCollection`.
+  Collections can be sectioned by a unique key retrieved from a keyPath or a callback and will return an instance of `SectionedResults`/`RLMSectionedResults`.
+  Each section in the collection will be an instance of `ResultsSection`/`RLMSection` which gives access to the elements corresponding to the section key.
+  `SectionedResults`/`RLMSectionedResults` and `ResultsSection`/`RLMSection` have the ability to be observed.
+  ```swift
+  class DemoObject: Object {
+      @Persisted var title: String
+      @Persisted var date: Date
+      var firstLetter: String {
+          return title.first.map(String.init(_:)) ?? ""
+      }
+  }
+  var sectionedResults: SectionedResults<String, DemoObject>
+  // ...
+  sectionedResults = realm.objects(DemoObject.self)
+      .sectioned(by: \.firstLetter, ascending: true)
+  ```
+* Add `@ObservedSectionedResults` for SwiftUI support. This property wrapper type retrieves sectioned results 
+  from a Realm using a keyPath or callback to determine the section key.
+  ```swift
+  struct DemoView: View {
+      @ObservedSectionedResults(DemoObject.self,
+                                sectionKeyPath: \.firstLetter) var demoObjects
+
+      var body: some View {
+          VStack {
+              List {
+                  ForEach(demoObjects) { section in
+                      Section(header: Text(section.key)) {
+                          ForEach(section) { object in
+                              MyRowView(object: object)
+                          }
+                      }
+                  }
+              }
+          }
+      }
+  }
+  ```
+* Add automatic handing for changing top-level objects to embedded objects in
+  migrations. Any objects of the now-embedded type which have zero incoming
+  links are deleted, and objects with multiple incoming links are duplicated.
+  This happens after the migration callback function completes, so there is no
+  functional change if you already have migration logic which correctly handles
+  this. ([Core #5737](https://github.com/realm/realm-core/pull/5737)).
+* Improve performance when a new Realm file connects to the server for the
+  first time, especially when significant amounts of data has been written
+  while offline. ([Core #5772](https://github.com/realm/realm-core/pull/5772))
+* Shift more of the work done on the sync worker thread out of the write
+  transaction used to apply server changes, reducing how long it blocks other
+  threads from writing. ([Core #5772](https://github.com/realm/realm-core/pull/5772))
+* Improve the performance of the sync changeset parser, which speeds up
+  applying changesets from the server. ([Core #5772](https://github.com/realm/realm-core/pull/5772))
+
+### Fixed
+
+* Fix all of the UBSan failures hit by our tests. It is unclear if any of these
+  manifested as visible bugs. ([Core #5665](https://github.com/realm/realm-core/pull/5665))
+* Upload completion callbacks were sometimes called before the final step of
+  interally marking the upload as complete, which could result in calling
+  `Realm.writeCopy()` from the completion callback failing due to there being
+  unuploaded changes. ([Core #4865](https://github.com/realm/realm-core/issues/4865)).
+* Writing to a Realm stored on an exFAT drive threw the exception "fcntl() with
+  F_BARRIERFSYNC failed: Inappropriate ioctl for device" when a write
+  transaction needed to expand the file.
+  ([Core #5789](https://github.com/realm/realm-core/issues/5789), since 10.27.0)
+* Syncing a Decimal128 with big significand could result in a crash.
+  ([Core #5728](https://github.com/realm/realm-core/issues/5728))
+
+### Compatibility
+
+* Realm Studio: 11.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 13.4.1.
+* CocoaPods: 1.10 or later.
+* Xcode: 13.1-14 RC.
+
+### Internal
+
+* Upgraded realm-core from 12.5.1 to 12.6.0
+
+10.28.7 Release notes (2022-09-02)
+=============================================================
+
+### Enhancements
+
+* Add prebuilt binaries for Xcode 14 to the release package.
+
+### Fixed
+
+* Fix archiving watchOS release builds with Xcode 14.
+
+### Compatibility
+
+* Realm Studio: 11.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 13.4.1.
+* CocoaPods: 1.10 or later.
+* Xcode: 13.1-14 beta 6.
+
+10.28.6 Release notes (2022-08-19)
+=============================================================
+
+### Fixed
+
+* Fixed an issue where having realm-swift as SPM sub-target dependency leads to
+  missing symbols error during iOS archiving ([Core #7645](https://github.com/realm/realm-core/pull/7645)).
+
+### Compatibility
+
+* Realm Studio: 11.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 13.4.1.
+* CocoaPods: 1.10 or later.
+* Xcode: 13.1-14 beta 5.
+
+### Internal
+
+* Upgraded realm-core from 12.5.0 to 12.5.1
+
+10.28.5 Release notes (2022-08-09)
+=============================================================
+
+### Enhancements
+
+* Improve performance of accessing `SubscriptionSet` properties when no writes
+  have been made to the Realm since the last access.
+
+### Fixed
+
+* A use-after-free could occur if a Realm with audit events enabled was
+  destroyed while processing an upload completion for the events Realm on a
+  different thread. ([Core PR #5714](https://github.com/realm/realm-core/pull/5714))
+* Opening a read-only synchronized Realm for the first time via asyncOpen did
+  not set the schema version, which could lead to `m_schema_version !=
+  ObjectStore::NotVersioned` assertion failures later on.
+
+### Compatibility
+
+* Realm Studio: 11.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 13.4.1.
+* CocoaPods: 1.10 or later.
+* Xcode: 13.1-14 beta 4.
+
+### Internal
+
+* Upgraded realm-core from 12.4.0 to 12.5.0
+
+10.28.4 Release notes (2022-08-03)
+=============================================================
+
+### Enhancements
+
+* Add support for building arm64 watchOS when installing Realm via CocoaPods.
+* Reduce the amount of virtual address space used
+  ([Core #5645](https://github.com/realm/realm-core/pull/5645)).
+
+### Fixed
+
+* Fix some warnings when building with Xcode 14
+  ([Core #5577](https://github.com/realm/realm-core/pull/5577)).
+* Fix compilation failures on watchOS platforms which do not support thread-local storage.
+  ([#7694](https://github.com/realm/realm-swift/issues/7694), [#7695](https://github.com/realm/realm-swift/issues/7695) since v10.21.1)
+* Fix a data race when committing a transaction while multiple threads are
+  waiting to begin write transactions. This appears to not have caused any
+  functional problems.
+* Fix a data race when writing audit events which could occur if the sync
+  client thread was busy with other work when the event Realm was opened.
+* Fix some cases of running out of virtual address space (seen/reported as mmap
+  failures) ([Core #5645](https://github.com/realm/realm-core/pull/5645)).
+* Audit event scopes containing only write events and no read events would
+  occasionally throw a `BadVersion` exception when a write transaction was
+  committed (since v10.26.0).
+* The client reset callbacks for the DiscardLocal mode would be passed invalid
+  Realm instances if the callback was invoked at a point where the Realm was
+  not otherwise open. ([Core #5654](https://github.com/realm/realm-core/pull/5654), since the introduction of DiscardLocal reset mode in v10.25.0)
+
+### Compatibility
+
+* Realm Studio: 11.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 13.4.1.
+* CocoaPods: 1.10 or later.
+* Xcode: 13.1-14 beta 4.
+
+### Internal
+
+* Upgraded realm-core from 12.3.0 to 12.4.0.
+
+10.28.3 Release notes (2022-07-27)
+=============================================================
+
+### Enhancements
+
+* Greatly improve the performance of obtaining cached Realm instances in Swift
+  when using a sync configuration.
+
+### Fixed
+
+* Add missing `initialSubscription` and `rerunOnOpen` to copyWithZone method on
+  `RLMRealmConfiguration`. This resulted in incorrect values when using
+  `RLMRealmConfiguration.defaultConfiguration`.
+* The sync error handler did not hold a strong reference to the sync session
+  while dispatching the error from the worker thread to the main thread,
+  resulting in the session passed to the error handler being invalid if there
+  were no other remaining strong references elsewhere.
+
+### Compatibility
+
+* Realm Studio: 11.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 13.4.1.
+* CocoaPods: 1.10 or later.
+* Xcode: 13.1-14 beta 3.
 
 10.28.2 Release notes (2022-06-30)
 =============================================================
@@ -1862,7 +2101,7 @@ Xcode 12.2 is now the minimum supported version.
 * Allow enumerating objects in migrations with types which are no longer
   present in the schema.
 * Add `RLMResponse.customStatusCode`. This fixes timeout exceptions that were
-  occuring with a poor connection. ([#4188](https://github.com/realm/realm-core/issues/4188))
+  occurring with a poor connection. ([#4188](https://github.com/realm/realm-core/issues/4188))
 * Limit availability of ObjectKeyIdentifiable to platforms which support
   Combine to match the change made in the Xcode 12.5 SDK.
   ([#7083](https://github.com/realm/realm-swift/issues/7083))
@@ -1958,7 +2197,7 @@ Xcode 12.2 is now the minimum supported version.
 
 ### Fixed
 
-* Integrating changsets from the server would sometimes hit the assertion
+* Integrating changesets from the server would sometimes hit the assertion
   failure "n != realm::npos" inside Table::create_object_with_primary_key()
   when creating an object with a primary key which previously had been used and
   had incoming links. ([Core PR #4180](https://github.com/realm/realm-core/pull/4180), since v10.0.0).

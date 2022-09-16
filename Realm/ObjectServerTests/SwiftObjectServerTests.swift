@@ -41,18 +41,6 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         return collection
     }
 
-    func removeAllFromCollection(_ collection: MongoCollection) {
-        let ex = expectation(description: "delete objects")
-        collection.deleteManyDocuments(filter: [:]) { result in
-            switch result {
-            case .success:
-                ex.fulfill()
-            case .failure(let error):
-                XCTFail("Error: \(error.localizedDescription)")
-            }
-        }
-        wait(for: [ex], timeout: 30.0)
-    }
     /// It should be possible to successfully open a Realm configured for sync.
     func testBasicSwiftSync() throws {
         let user = try logInUser(for: basicCredentials())
@@ -354,7 +342,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         waitForSyncDisabled(appServerId: appServerId, syncServiceId: syncServiceId)
 
-        try block()
+        try autoreleasepool(invoking: block)
 
         waitForSyncEnabled(appServerId: appServerId, syncServiceId: syncServiceId, syncServiceConfig: syncServiceConfig)
         try waitForDevModeEnabled(appServerId: appServerId, syncServiceId: syncServiceId, syncServiceConfig: syncServiceConfig)
@@ -436,21 +424,20 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         // Sync is disabled, block executed, sync re-enabled
         try executeBlockOffline {
-            try autoreleasepool {
-                var configuration = user.configuration(partitionValue: partition)
-                configuration.objectTypes = [SwiftPerson.self]
-                let realm = try Realm(configuration: configuration)
-                // Add an object to the local realm that will not be in the server realm (because sync is disabled).
-                try realm.write {
-                    realm.add(SwiftPerson(firstName: "John", lastName: "L"))
-                }
-                XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1)
+            var configuration = user.configuration(partitionValue: partition)
+            configuration.objectTypes = [SwiftPerson.self]
+            let realm = try Realm(configuration: configuration)
+            realm.syncSession!.suspend()
+            // Add an object to the local realm that will not be in the server realm (because sync is disabled).
+            try realm.write {
+                realm.add(SwiftPerson(firstName: "John", lastName: "L"))
             }
+            XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1)
         }
 
         // After restarting sync, the sync history translator service needs time
         // to resynthesize the new history from existing objects on the server
-        // The following creates a new realm with the same parition and wait for
+        // The following creates a new realm with the same partition and wait for
         // downloads to ensure the the new history has been created.
         try autoreleasepool {
             var newConfig = user.configuration(partitionValue: partition)
@@ -471,6 +458,90 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 return
             }
         }
+    }
+
+    func testClientResetManual() throws {
+        let creds = basicCredentials()
+        try autoreleasepool {
+            let user = try logInUser(for: creds)
+            try prepareClientReset(#function, user)
+
+            var configuration = user.configuration(partitionValue: #function)
+            configuration.objectTypes = [SwiftPerson.self]
+
+            let ex = self.expectation(description: "get client reset error")
+            let syncManager = self.app.syncManager
+            syncManager.errorHandler = { error, session in
+                guard let error = error as? SyncError else {
+                    XCTFail("Bad error type: \(error)")
+                    return
+                }
+                XCTAssertEqual(error.code, .clientResetError)
+                XCTAssertEqual(session?.state, .inactive)
+                XCTAssertEqual(session?.connectionState, .disconnected)
+                XCTAssertEqual(session?.parentUser()?.id, user.id)
+                ex.fulfill()
+            }
+
+            try autoreleasepool {
+                let realm = try Realm(configuration: configuration)
+                wait(for: [ex], timeout: 60.0)
+                // The locally created object should still be present as we didn't
+                // actually handle the client reset
+                XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1)
+                XCTAssertEqual(realm.objects(SwiftPerson.self)[0].firstName, "John")
+            }
+            syncManager.waitForSessionTermination()
+            resetSyncManager()
+        }
+
+        let user = try logInUser(for: creds)
+        var configuration = user.configuration(partitionValue: #function)
+        configuration.objectTypes = [SwiftPerson.self]
+
+        try autoreleasepool {
+            let realm = try Realm(configuration: configuration)
+            waitForDownloads(for: realm)
+            // After reopening, the old Realm file should have been moved aside
+            // and we should now have the data from the server
+            XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1)
+            XCTAssertEqual(realm.objects(SwiftPerson.self)[0].firstName, "Paul")
+        }
+    }
+
+    func testClientResetManualWithoutLiveRealmInstance() throws {
+        let creds = basicCredentials()
+        let user = try logInUser(for: creds)
+        try prepareClientReset(#function, user)
+
+        var configuration = user.configuration(partitionValue: #function)
+        configuration.objectTypes = [SwiftPerson.self]
+
+        let ex = self.expectation(description: "get client reset error")
+        let syncManager = self.app.syncManager
+        syncManager.errorHandler = { error, session in
+            guard let error = error as? SyncError else {
+                XCTFail("Bad error type: \(error)")
+                return
+            }
+            XCTAssertEqual(error.code, .clientResetError)
+            XCTAssertEqual(session?.state, .inactive)
+            XCTAssertEqual(session?.connectionState, .disconnected)
+            XCTAssertEqual(session?.parentUser()?.id, user.id)
+            ex.fulfill()
+        }
+
+        try autoreleasepool {
+            _ = try Realm(configuration: configuration)
+            // We have to wait for the error to arrive (or the session will just
+            // transition to inactive without calling the error handler), but we
+            // need to ensure the Realm is deallocated before the error handler
+            // is invoked on the main thread.
+            sleep(1)
+        }
+        wait(for: [ex], timeout: 60.0)
+        syncManager.waitForSessionTermination()
+        resetSyncManager()
     }
 
     func testClientResetDiscardLocal() throws {
@@ -498,7 +569,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             afterCallbackEx.fulfill()
         }
 
-        var configuration = user.configuration(partitionValue: #function, clientResetMode: .discardLocal(beforeClientResetBlock, afterClientResetBlock))
+        var configuration = user.configuration(partitionValue: #function,
+                                               clientResetMode: .discardLocal(beforeClientResetBlock, afterClientResetBlock))
         configuration.objectTypes = [SwiftPerson.self]
 
         guard let syncConfig = configuration.syncConfiguration else { fatalError("Test condition failure. SyncConfiguration not set.") }
@@ -513,7 +585,9 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         try autoreleasepool {
             let realm = try Realm(configuration: configuration)
             wait(for: [beforeCallbackEx, afterCallbackEx], timeout: 60.0)
-            XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1) // Expect the server realm (one object) to have overwritten the local realm (2 objects)
+            // The Person created locally ("John") should have been discarded,
+            // while the one from the server ("Paul") should be present
+            XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1)
             XCTAssertEqual(realm.objects(SwiftPerson.self)[0].firstName, "Paul")
         }
     }
@@ -805,7 +879,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 }
                 ex.fulfill()
             }
-            waitForExpectations(timeout: 4.0, handler: nil)
+            waitForExpectations(timeout: 20.0, handler: nil)
         }
 
         proxy.stop()
@@ -928,7 +1002,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             XCTAssertNil(error)
             registerUserEx.fulfill()
         }
-        wait(for: [registerUserEx], timeout: 4.0)
+        wait(for: [registerUserEx], timeout: 20.0)
 
         let loginEx = expectation(description: "Login user")
         var syncUser: User?
@@ -943,7 +1017,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             loginEx.fulfill()
         }
 
-        wait(for: [loginEx], timeout: 4.0)
+        wait(for: [loginEx], timeout: 20.0)
 
         XCTAssertEqual(syncUser?.id, app.currentUser?.id)
         XCTAssertEqual(app.allUsers.count, 1)
@@ -968,7 +1042,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             registerUser2Ex.fulfill()
         }
 
-        wait(for: [registerUser1Ex, registerUser2Ex], timeout: 4.0)
+        wait(for: [registerUser1Ex, registerUser2Ex], timeout: 20.0)
 
         let login1Ex = expectation(description: "Login user 1")
         let login2Ex = expectation(description: "Login user 2")
@@ -985,7 +1059,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             login1Ex.fulfill()
         }
 
-        wait(for: [login1Ex], timeout: 4.0)
+        wait(for: [login1Ex], timeout: 20.0)
 
         app.login(credentials: Credentials.emailPassword(email: email2, password: password2)) { result in
             if case .success(let user) = result {
@@ -996,7 +1070,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             login2Ex.fulfill()
         }
 
-        wait(for: [login2Ex], timeout: 4.0)
+        wait(for: [login2Ex], timeout: 20.0)
 
         XCTAssertEqual(app.allUsers.count, 2)
 
@@ -1012,7 +1086,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             removeEx.fulfill()
         }
 
-        wait(for: [removeEx], timeout: 4.0)
+        wait(for: [removeEx], timeout: 20.0)
 
         XCTAssertEqual(syncUser2!.id, app.currentUser!.id)
         XCTAssertEqual(app.allUsers.count, 1)
@@ -1031,7 +1105,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 XCTFail("Should login user")
             }
         }
-        wait(for: [loginEx], timeout: 4.0)
+        wait(for: [loginEx], timeout: 20.0)
 
         let user = app.currentUser!
 
@@ -1054,7 +1128,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             }
             deleteUserEx.fulfill()
         }
-        wait(for: [deleteUserEx], timeout: 4.0)
+        wait(for: [deleteUserEx], timeout: 20.0)
 
         // Try to open a Realm with the user; this will cause our errorHandler block defined above to be fired.
         XCTAssertFalse(blockCalled)
@@ -1078,7 +1152,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 }
                 serverEx.fulfill()
             }
-            wait(for: [serverEx], timeout: 4.0)
+            wait(for: [serverEx], timeout: 20.0)
             return userExists
         }
 
@@ -1091,7 +1165,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             XCTAssertNil(error)
             registerUserEx.fulfill()
         }
-        wait(for: [registerUserEx], timeout: 4.0)
+        wait(for: [registerUserEx], timeout: 20.0)
 
         let loginEx = expectation(description: "Login user")
         var syncUser: User?
@@ -1106,7 +1180,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             loginEx.fulfill()
         }
 
-        wait(for: [loginEx], timeout: 4.0)
+        wait(for: [loginEx], timeout: 20.0)
         XCTAssertTrue(userExistsOnServer(syncUser!))
 
         XCTAssertEqual(syncUser?.id, app.currentUser?.id)
@@ -1121,7 +1195,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             deleteEx.fulfill()
         }
 
-        wait(for: [deleteEx], timeout: 4.0)
+        wait(for: [deleteEx], timeout: 20.0)
 
         XCTAssertFalse(userExistsOnServer(syncUser!))
         XCTAssertNil(app.currentUser)
@@ -1138,7 +1212,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             XCTAssertNil(error)
             registerUserEx.fulfill()
         }
-        wait(for: [registerUserEx], timeout: 4.0)
+        wait(for: [registerUserEx], timeout: 20.0)
 
         let loginEx = expectation(description: "Login user")
         var syncUser: User!
@@ -1153,7 +1227,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             }
             loginEx.fulfill()
         }
-        wait(for: [loginEx], timeout: 4.0)
+        wait(for: [loginEx], timeout: 20.0)
 
         let linkEx = expectation(description: "Link user")
         syncUser.linkUser(credentials: credentials) { result in
@@ -1166,7 +1240,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             linkEx.fulfill()
         }
 
-        wait(for: [linkEx], timeout: 4.0)
+        wait(for: [linkEx], timeout: 20.0)
 
         XCTAssertEqual(syncUser?.id, app.currentUser?.id)
         XCTAssertEqual(syncUser?.identities.count, 2)
@@ -1184,7 +1258,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             XCTAssertNil(error)
             registerUserEx.fulfill()
         }
-        wait(for: [registerUserEx], timeout: 4.0)
+        wait(for: [registerUserEx], timeout: 20.0)
 
         let confirmUserEx = expectation(description: "Confirm user")
 
@@ -1192,7 +1266,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             XCTAssertNotNil(error)
             confirmUserEx.fulfill()
         }
-        wait(for: [confirmUserEx], timeout: 4.0)
+        wait(for: [confirmUserEx], timeout: 20.0)
 
         let resendEmailEx = expectation(description: "Resend email confirmation")
 
@@ -1200,7 +1274,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             XCTAssertNotNil(error)
             resendEmailEx.fulfill()
         }
-        wait(for: [resendEmailEx], timeout: 4.0)
+        wait(for: [resendEmailEx], timeout: 20.0)
 
         let retryCustomEx = expectation(description: "Retry custom confirmation")
 
@@ -1208,7 +1282,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             XCTAssertNotNil(error)
             retryCustomEx.fulfill()
         }
-        wait(for: [retryCustomEx], timeout: 4.0)
+        wait(for: [retryCustomEx], timeout: 20.0)
 
         let resendResetPasswordEx = expectation(description: "Resend reset password email")
 
@@ -1216,7 +1290,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             XCTAssertNotNil(error)
             resendResetPasswordEx.fulfill()
         }
-        wait(for: [resendResetPasswordEx], timeout: 4.0)
+        wait(for: [resendResetPasswordEx], timeout: 20.0)
 
         let resetPasswordEx = expectation(description: "Reset password email")
 
@@ -1224,7 +1298,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             XCTAssertNotNil(error)
             resetPasswordEx.fulfill()
         }
-        wait(for: [resetPasswordEx], timeout: 4.0)
+        wait(for: [resetPasswordEx], timeout: 20.0)
 
         let callResetFunctionEx = expectation(description: "Reset password function")
         app.emailPasswordAuth.callResetPasswordFunction(email: email,
@@ -1233,7 +1307,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             XCTAssertNotNil(error)
             callResetFunctionEx.fulfill()
         }
-        wait(for: [callResetFunctionEx], timeout: 4.0)
+        wait(for: [callResetFunctionEx], timeout: 20.0)
     }
 
     func testUserAPIKeyProviderClient() {
@@ -1246,7 +1320,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             XCTAssertNil(error)
             registerUserEx.fulfill()
         }
-        wait(for: [registerUserEx], timeout: 4.0)
+        wait(for: [registerUserEx], timeout: 20.0)
 
         let loginEx = expectation(description: "Login user")
         let credentials = Credentials.emailPassword(email: email, password: password)
@@ -1262,7 +1336,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             loginEx.fulfill()
         }
 
-        wait(for: [loginEx], timeout: 4.0)
+        wait(for: [loginEx], timeout: 20.0)
 
         let createAPIKeyEx = expectation(description: "Create user api key")
 
@@ -1273,7 +1347,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             apiKey = key
             createAPIKeyEx.fulfill()
         }
-        wait(for: [createAPIKeyEx], timeout: 4.0)
+        wait(for: [createAPIKeyEx], timeout: 20.0)
 
         let fetchAPIKeyEx = expectation(description: "Fetch user api key")
         syncUser?.apiKeysAuth.fetchAPIKey(apiKey!.objectId) { (key, error) in
@@ -1281,7 +1355,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             XCTAssertNil(error)
             fetchAPIKeyEx.fulfill()
         }
-        wait(for: [fetchAPIKeyEx], timeout: 4.0)
+        wait(for: [fetchAPIKeyEx], timeout: 20.0)
 
         let fetchAPIKeysEx = expectation(description: "Fetch user api keys")
         syncUser?.apiKeysAuth.fetchAPIKeys(completion: { (keys, error) in
@@ -1290,28 +1364,28 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             XCTAssertNil(error)
             fetchAPIKeysEx.fulfill()
         })
-        wait(for: [fetchAPIKeysEx], timeout: 4.0)
+        wait(for: [fetchAPIKeysEx], timeout: 20.0)
 
         let disableKeyEx = expectation(description: "Disable API key")
         syncUser?.apiKeysAuth.disableAPIKey(apiKey!.objectId) { (error) in
             XCTAssertNil(error)
             disableKeyEx.fulfill()
         }
-        wait(for: [disableKeyEx], timeout: 4.0)
+        wait(for: [disableKeyEx], timeout: 20.0)
 
         let enableKeyEx = expectation(description: "Enable API key")
         syncUser?.apiKeysAuth.enableAPIKey(apiKey!.objectId) { (error) in
             XCTAssertNil(error)
             enableKeyEx.fulfill()
         }
-        wait(for: [enableKeyEx], timeout: 4.0)
+        wait(for: [enableKeyEx], timeout: 20.0)
 
         let deleteKeyEx = expectation(description: "Delete API key")
         syncUser?.apiKeysAuth.deleteAPIKey(apiKey!.objectId) { (error) in
             XCTAssertNil(error)
             deleteKeyEx.fulfill()
         }
-        wait(for: [deleteKeyEx], timeout: 4.0)
+        wait(for: [deleteKeyEx], timeout: 20.0)
     }
 
     func testApiKeyAuthResultCompletion() {
@@ -1323,7 +1397,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             XCTAssertNil(error)
             registerUserEx.fulfill()
         }
-        wait(for: [registerUserEx], timeout: 4.0)
+        wait(for: [registerUserEx], timeout: 20.0)
 
         let loginEx = expectation(description: "Login user")
         let credentials = Credentials.emailPassword(email: email, password: password)
@@ -1337,7 +1411,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             }
             loginEx.fulfill()
         }
-        wait(for: [loginEx], timeout: 4.0)
+        wait(for: [loginEx], timeout: 20.0)
 
         let createAPIKeyEx = expectation(description: "Create user api key")
         var apiKey: UserAPIKey?
@@ -1350,7 +1424,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             }
             createAPIKeyEx.fulfill()
         }
-        wait(for: [createAPIKeyEx], timeout: 4.0)
+        wait(for: [createAPIKeyEx], timeout: 20.0)
 
         let fetchAPIKeyEx = expectation(description: "Fetch user api key")
         syncUser?.apiKeysAuth.fetchAPIKey(apiKey!.objectId as! ObjectId, { result in
@@ -1359,7 +1433,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             }
             fetchAPIKeyEx.fulfill()
         })
-        wait(for: [fetchAPIKeyEx], timeout: 4.0)
+        wait(for: [fetchAPIKeyEx], timeout: 20.0)
 
         let fetchAPIKeysEx = expectation(description: "Fetch user api keys")
         syncUser?.apiKeysAuth.fetchAPIKeys { result in
@@ -1371,7 +1445,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             }
             fetchAPIKeysEx.fulfill()
         }
-        wait(for: [fetchAPIKeysEx], timeout: 4.0)
+        wait(for: [fetchAPIKeysEx], timeout: 20.0)
     }
 
     func testCallFunction() {
@@ -1384,7 +1458,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             XCTAssertNil(error)
             registerUserEx.fulfill()
         }
-        wait(for: [registerUserEx], timeout: 4.0)
+        wait(for: [registerUserEx], timeout: 20.0)
 
         let loginEx = expectation(description: "Login user")
 
@@ -1398,7 +1472,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             }
             loginEx.fulfill()
         }
-        wait(for: [loginEx], timeout: 4.0)
+        wait(for: [loginEx], timeout: 20.0)
 
         let callFunctionEx = expectation(description: "Call function")
         app.currentUser?.functions.sum([1, 2, 3, 4, 5]) { bson, error in
@@ -1416,7 +1490,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             XCTAssertEqual(sum, 15)
             callFunctionEx.fulfill()
         }
-        wait(for: [callFunctionEx], timeout: 4.0)
+        wait(for: [callFunctionEx], timeout: 20.0)
 
         // Test function with completion handler (Result<AnyBSON, Error>) -> Void
         let callFunctionResultEx = expectation(description: "Call function")
@@ -1433,7 +1507,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             }
             callFunctionResultEx.fulfill()
         }
-        wait(for: [callFunctionResultEx], timeout: 4.0)
+        wait(for: [callFunctionResultEx], timeout: 20.0)
     }
 
     func testPushRegistration() {
@@ -1446,7 +1520,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             XCTAssertNil(error)
             registerUserEx.fulfill()
         }
-        wait(for: [registerUserEx], timeout: 4.0)
+        wait(for: [registerUserEx], timeout: 20.0)
 
         let loginExpectation = expectation(description: "Login user")
 
@@ -1457,7 +1531,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             }
             loginExpectation.fulfill()
         }
-        wait(for: [loginExpectation], timeout: 4.0)
+        wait(for: [loginExpectation], timeout: 20.0)
 
         let registerDeviceExpectation = expectation(description: "Register Device")
         let client = app.pushClient(serviceName: "gcm")
@@ -1465,14 +1539,14 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             XCTAssertNil(error)
             registerDeviceExpectation.fulfill()
         }
-        wait(for: [registerDeviceExpectation], timeout: 4.0)
+        wait(for: [registerDeviceExpectation], timeout: 20.0)
 
         let dergisterDeviceExpectation = expectation(description: "Deregister Device")
         client.deregisterDevice(user: app.currentUser!, completion: { error in
             XCTAssertNil(error)
             dergisterDeviceExpectation.fulfill()
         })
-        wait(for: [dergisterDeviceExpectation], timeout: 4.0)
+        wait(for: [dergisterDeviceExpectation], timeout: 20.0)
     }
 
     func testCustomUserData() {
@@ -1485,7 +1559,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             XCTAssertNil(error)
             registerUserEx.fulfill()
         }
-        wait(for: [registerUserEx], timeout: 4.0)
+        wait(for: [registerUserEx], timeout: 20.0)
 
         let loginEx = expectation(description: "Login user")
         let credentials = Credentials.emailPassword(email: email, password: password)
@@ -1498,14 +1572,14 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             }
             loginEx.fulfill()
         }
-        wait(for: [loginEx], timeout: 4.0)
+        wait(for: [loginEx], timeout: 20.0)
 
         let userDataEx = expectation(description: "Update user data")
         app.currentUser?.functions.updateUserData([["favourite_colour": "green", "apples": 10]]) { _, error  in
             XCTAssertNil(error)
             userDataEx.fulfill()
         }
-        wait(for: [userDataEx], timeout: 4.0)
+        wait(for: [userDataEx], timeout: 20.0)
 
         let refreshDataEx = expectation(description: "Refresh user data")
         app.currentUser?.refreshCustomData { customData, error in
@@ -1515,7 +1589,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             XCTAssertEqual(customData?["favourite_colour"] as! String, "green")
             refreshDataEx.fulfill()
         }
-        wait(for: [refreshDataEx], timeout: 4.0)
+        wait(for: [refreshDataEx], timeout: 20.0)
 
         XCTAssertEqual(app.currentUser?.customData["favourite_colour"], .string("green"))
         XCTAssertEqual(app.currentUser?.customData["apples"], .int64(10))
@@ -1634,6 +1708,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         var localConfig = Realm.Configuration()
         localConfig.seedFilePath = seedURL
         localConfig.fileURL = RLMDefaultRealmURL()
+        localConfig.objectTypes = [SwiftHugeSyncObject.self]
         localConfig.schemaVersion = 1
 
         let realm = try Realm(configuration: localConfig)
@@ -1933,7 +2008,7 @@ extension Publisher {
         })
     }
 
-    func await(_ testCase: XCTestCase, timeout: TimeInterval = 4.0, receiveValue: ((Self.Output) -> Void)? = nil) {
+    func await(_ testCase: XCTestCase, timeout: TimeInterval = 20.0, receiveValue: ((Self.Output) -> Void)? = nil) {
         let expectation = testCase.expectation(description: "Async combine pipeline")
         let cancellable = self.expectValue(testCase, expectation, receiveValue: receiveValue)
         testCase.wait(for: [expectation], timeout: timeout)
@@ -1941,7 +2016,7 @@ extension Publisher {
     }
 
     @discardableResult
-    func await(_ testCase: XCTestCase, timeout: TimeInterval = 4.0) -> Self.Output {
+    func await(_ testCase: XCTestCase, timeout: TimeInterval = 20.0) -> Self.Output {
         let expectation = testCase.expectation(description: "Async combine pipeline")
         var value: Self.Output?
         let cancellable = self.expectValue(testCase, expectation, receiveValue: { value = $0 })
@@ -1950,7 +2025,7 @@ extension Publisher {
         return value!
     }
 
-    func awaitFailure(_ testCase: XCTestCase, timeout: TimeInterval = 4.0,
+    func awaitFailure(_ testCase: XCTestCase, timeout: TimeInterval = 20.0,
                       _ errorHandler: ((Self.Failure) -> Void)? = nil) {
         let expectation = testCase.expectation(description: "Async combine pipeline should fail")
         let cancellable = self.sink(receiveCompletion: { result in
@@ -1991,10 +2066,6 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         let collection = database.collection(withName: "Dog")
         removeAllFromCollection(collection)
         return collection
-    }
-
-    func removeAllFromCollection(_ collection: MongoCollection) {
-        collection.deleteManyDocuments(filter: [:]).await(self)
     }
 
     // swiftlint:disable multiple_closures_with_trailing_closure
@@ -2077,7 +2148,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
             }
             insertManyEx.fulfill()
         }
-        wait(for: [insertManyEx], timeout: 4.0)
+        wait(for: [insertManyEx], timeout: 20.0)
 
         let watchEx1 = expectation(description: "Watch 3 document events")
         watchEx1.expectedFulfillmentCount = 3
@@ -2172,7 +2243,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
             }
             insertManyEx.fulfill()
         }
-        wait(for: [insertManyEx], timeout: 4.0)
+        wait(for: [insertManyEx], timeout: 20.0)
 
         let watchEx1 = expectation(description: "Watch 3 document events")
         watchEx1.expectedFulfillmentCount = 3
@@ -2343,6 +2414,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
                 (0..<10000).forEach { _ in realm.add(SwiftPerson(firstName: "Charlie", lastName: "Bucket")) }
             }
         }
+
         Realm.asyncOpen().await(self) { realm in
             XCTAssertEqual(realm.objects(SwiftPerson.self).count, 10000)
         }
@@ -2365,7 +2437,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
             XCTAssertNil(error)
             userDataEx.fulfill()
         }
-        wait(for: [userDataEx], timeout: 4.0)
+        wait(for: [userDataEx], timeout: 20.0)
 
         app.currentUser?.refreshCustomData()
             .await(self) { customData in
@@ -2715,12 +2787,14 @@ class AsyncAwaitObjectServerTests: SwiftSyncTestCase {
 
     @MainActor func testAsyncOpenStandalone() async throws {
         try autoreleasepool {
-            let realm = try Realm()
+            let configuration = Realm.Configuration(objectTypes: [SwiftPerson.self])
+            let realm = try Realm(configuration: configuration)
             try realm.write {
                 (0..<10).forEach { _ in realm.add(SwiftPerson(firstName: "Charlie", lastName: "Bucket")) }
             }
         }
-        let realm = try await Realm()
+        let configuration = Realm.Configuration(objectTypes: [SwiftPerson.self])
+        let realm = try await Realm(configuration: configuration)
         XCTAssertEqual(realm.objects(SwiftPerson.self).count, 10)
     }
 

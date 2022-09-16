@@ -341,7 +341,6 @@ RLM_COLLECTION_TYPE(NotARealClass)
 @implementation OrphanObject
 @end
 
-
 @interface SchemaTests : RLMMultiProcessTestCase
 @end
 
@@ -1006,7 +1005,7 @@ RLM_COLLECTION_TYPE(NotARealClass)
             [notificationFired fulfill];
         }
     }];
-    [self waitForExpectationsWithTimeout:10.0 handler:nil];
+    [self waitForExpectationsWithTimeout:30.0 handler:nil];
     [token invalidate];
 
     // Release the write transaction and let them run

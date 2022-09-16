@@ -498,6 +498,17 @@ static void changeDictionary(__unsafe_unretained RLMDictionary *const dictionary
     @throw RLMException(@"This method is not available on RLMDictionary.");
 }
 
+- (RLMSectionedResults *)sectionedResultsSortedUsingKeyPath:(NSString *)keyPath
+                                                  ascending:(BOOL)ascending
+                                                   keyBlock:(RLMSectionedResultsKeyBlock)keyBlock {
+    @throw RLMException(@"This method is not available on RLMDictionary.");
+}
+
+- (RLMSectionedResults *)sectionedResultsUsingSortDescriptors:(NSArray<RLMSortDescriptor *> *)sortDescriptors
+                                                     keyBlock:(RLMSectionedResultsKeyBlock)keyBlock {
+    @throw RLMException(@"This method is not available on RLMDictionary.");
+}
+
 #pragma clang diagnostic pop // unused parameter warning
 
 #pragma mark - Thread Confined Protocol Conformance

@@ -262,20 +262,18 @@ public enum ClientResetMode {
  */
 @frozen public struct SyncConfiguration {
     /// The `SyncUser` who owns the Realm that this configuration should open.
-    public let user: User
+    public var user: User {
+        config.user
+    }
 
     /**
      The value this Realm is partitioned on. The partition key is a property defined in
      Atlas App Services. All classes with a property with this value will be synchronized to the
      Realm.
      */
-    public let partitionValue: AnyBSON?
-
-    /**
-     A policy that determines what should happen when all references to Realms opened by this
-     configuration go out of scope.
-     */
-    internal let stopPolicy: RLMSyncStopPolicy
+    public var partitionValue: AnyBSON? {
+        ObjectiveCSupport.convert(object: config.partitionValue)
+    }
 
     /**
      An enum which determines file recovery behvaior in the event of a client reset.
@@ -284,12 +282,16 @@ public enum ClientResetMode {
      - see: `ClientResetMode` and `RLMClientResetMode`
      - see: https://docs.mongodb.com/realm/sync/error-handling/client-resets/
     */
-    public let clientResetMode: ClientResetMode
-
-    /**
-     Determines if the sync configuration is flexible sync or not
-     */
-    internal let isFlexibleSync: Bool
+    public var clientResetMode: ClientResetMode {
+        switch config.clientResetMode {
+        case .manual:
+            return .manual
+        case .discardLocal:
+            return .discardLocal(ObjectiveCSupport.convert(object: config.beforeClientReset), ObjectiveCSupport.convert(object: config.afterClientReset))
+        @unknown default:
+            fatalError()
+        }
+    }
 
     /**
      By default, Realm.asyncOpen() swallows non-fatal connection errors such as
@@ -297,49 +299,13 @@ public enum ClientResetMode {
      this is set to `true`, instead the error will be reported to the callback
      and the async open will be cancelled.
      */
-    public let cancelAsyncOpenOnNonFatalErrors: Bool
-
-    internal init(config: RLMSyncConfiguration) {
-        self.user = config.user
-        self.stopPolicy = config.stopPolicy
-        self.partitionValue = ObjectiveCSupport.convert(object: config.partitionValue)
-        self.cancelAsyncOpenOnNonFatalErrors = config.cancelAsyncOpenOnNonFatalErrors
-        self.isFlexibleSync = config.enableFlexibleSync
-        switch config.clientResetMode {
-        case .manual:
-            self.clientResetMode = .manual
-        case .discardLocal:
-            self.clientResetMode = .discardLocal(ObjectiveCSupport.convert(object: config.beforeClientReset), ObjectiveCSupport.convert(object: config.afterClientReset))
-        @unknown default:
-            fatalError("what's best in this case?")
-        }
+    public var cancelAsyncOpenOnNonFatalErrors: Bool {
+        config.cancelAsyncOpenOnNonFatalErrors
     }
 
-    func asConfig() -> RLMSyncConfiguration {
-        let syncConfiguration: RLMSyncConfiguration
-        if isFlexibleSync {
-            syncConfiguration = RLMSyncConfiguration(user: user, stopPolicy: stopPolicy, enableFlexibleSync: isFlexibleSync)
-        } else {
-            switch clientResetMode {
-            case .manual:
-                syncConfiguration = RLMSyncConfiguration(user: user,
-                                                         partitionValue: partitionValue.map(ObjectiveCSupport.convertBson),
-                                                         stopPolicy: stopPolicy,
-                                                         clientResetMode: .manual,
-                                                         notifyBeforeReset: nil,
-                                                         notifyAfterReset: nil)
-            case .discardLocal(let before, let after):
-                syncConfiguration = RLMSyncConfiguration(user: user,
-                                                         partitionValue: partitionValue.map(ObjectiveCSupport.convertBson),
-                                                         stopPolicy: stopPolicy,
-                                                         clientResetMode: .discardLocal,
-                                                         notifyBeforeReset: ObjectiveCSupport.convert(object: before),
-                                                         notifyAfterReset: ObjectiveCSupport.convert(object: after))
-            }
-
-        }
-        syncConfiguration.cancelAsyncOpenOnNonFatalErrors = cancelAsyncOpenOnNonFatalErrors
-        return syncConfiguration
+    internal let config: RLMSyncConfiguration
+    internal init(config: RLMSyncConfiguration) {
+        self.config = config
     }
 }
 

@@ -29,4 +29,4 @@ using BsonDocument = IndexedMap<Bson>;
 
 realm::bson::Bson RLMConvertRLMBSONToBson(id<RLMBSON> b);
 id<RLMBSON> RLMConvertBsonToRLMBSON(const realm::bson::Bson& b);
-id<RLMBSON> RLMConvertBsonDocumentToRLMBSON(realm::util::Optional<realm::bson::BsonDocument> b);
+id<RLMBSON> RLMConvertBsonDocumentToRLMBSON(std::optional<realm::bson::BsonDocument> b);

@@ -346,6 +346,151 @@ struct ObservedResultsConfiguration: View {
     }
 }
 
+struct ObservedSectionedResultsKeyPathTestView: View {
+    @ObservedSectionedResults(ReminderList.self,
+                              sectionKeyPath: \.firstLetter,
+                              keyPaths: ["reminders.isFlagged"]) var reminders
+
+    var body: some View {
+        VStack {
+            List {
+                ForEach(reminders) { section in
+                    Section(header: Text(section.key)) {
+                        ForEach(section) { object in
+                            ObservedResultsKeyPathTestRow(list: object)
+                        }
+                    }
+                }
+            }
+            .navigationBarItems(trailing: EditButton())
+            .navigationTitle("reminders")
+            Footer()
+        }
+    }
+}
+
+// swiftlint:disable:next type_name
+struct ObservedSectionedResultsWithSortDescriptorsView: View {
+    @ObservedSectionedResults(ReminderList.self,
+                              sectionBlock: { $0.name.first.map(String.init(_:)) ?? "" },
+                              sortDescriptors: [SortDescriptor(keyPath: \ReminderList.name)],
+                              keyPaths: ["reminders.isFlagged"]) var reminders
+
+    var body: some View {
+        VStack {
+            List {
+                ForEach(reminders) { section in
+                    Section(header: Text(section.key)) {
+                        ForEach(section) { object in
+                            ObservedResultsKeyPathTestRow(list: object)
+                        }
+                    }
+                }
+            }
+            .navigationBarItems(trailing: EditButton())
+            .navigationTitle("reminders")
+            Footer()
+        }
+    }
+}
+
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
+// swiftlint:disable:next type_name
+struct ObservedSectionedResultsSearchableTestView: View {
+    @ObservedSectionedResults(ReminderList.self,
+                              sectionKeyPath: \.firstLetter,
+                              where: { $0.name.starts(with: "reminder") }) var reminders
+    @State var searchFilter: String = ""
+
+    var body: some View {
+        NavigationView {
+            List {
+                ForEach(reminders) { section in
+                    Section(section.key) {
+                        ForEach(section) { object in
+                            Text(object.name)
+                        }
+                    }
+                }
+            }
+            .searchable(text: $searchFilter,
+                        collection: $reminders,
+                        keyPath: \.name) {
+                ForEach(reminders) { section in
+                    Section(section.key) {
+                        ForEach(section) { objectsFiltered in
+                            Text(objectsFiltered.name).searchCompletion(objectsFiltered.name)
+                        }
+                    }
+                }
+            }
+            .navigationTitle("Reminders")
+            .navigationBarItems(trailing:
+                Button("add") {
+                let realm = $reminders.wrappedValue.realm
+                try! realm?.write {
+                    realm?.add(ReminderList())
+                }
+                }.accessibility(identifier: "addList"))
+        }
+    }
+}
+
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
+struct ObservedSectionedResultsConfiguration: View {
+    @ObservedSectionedResults(ReminderList.self, sectionKeyPath: \.firstLetter) var remindersA // config from `.environment`
+    @ObservedSectionedResults(ReminderList.self,
+                              sectionKeyPath: \.firstLetter,
+                              configuration: Realm.Configuration(inMemoryIdentifier: "realm_b")) var remindersB
+
+    var body: some View {
+        NavigationView {
+            VStack {
+                Text(remindersA.realm?.configuration.inMemoryIdentifier ?? "no memory identifier")
+                    .accessibility(identifier: "realm_a_label")
+                Text(remindersB.realm?.configuration.inMemoryIdentifier ?? "no memory identifier")
+                    .accessibility(identifier: "realm_b_label")
+                List {
+                    ForEach(remindersA) { reminderSection in
+                        Section(reminderSection.key) {
+                            ForEach(reminderSection) { object in
+                                Text(object.name)
+                            }
+                        }
+                    }
+                }.accessibility(identifier: "ListA")
+                List {
+                    ForEach(remindersB) { reminderSection in
+                        Section(reminderSection.key) {
+                            ForEach(reminderSection) { object in
+                                Text(object.name)
+                            }
+                        }
+                    }
+                }.accessibility(identifier: "ListB")
+            }
+            .navigationTitle("Reminders")
+            .navigationBarItems(leading:
+                Button("add A") {
+                    let realm = $remindersA.wrappedValue.realm
+                    try! realm?.write {
+                        realm?.add(ReminderList())
+                    }
+                }.accessibility(identifier: "addListA")
+            )
+            .navigationBarItems(trailing:
+                Button("add B") {
+                    let realm = $remindersB.wrappedValue.realm
+                    try! realm?.write {
+                        realm?.add(ReminderList())
+                    }
+                }.accessibility(identifier: "addListB")
+            )
+        }
+    }
+}
+
+
 @main
 struct App: SwiftUI.App {
     var body: some Scene {
@@ -373,6 +518,23 @@ struct App: SwiftUI.App {
             case "observed_results_configuration":
                 return AnyView(ObservedResultsConfiguration()
                                 .environment(\.realmConfiguration, Realm.Configuration(inMemoryIdentifier: "realm_a")))
+            case "observed_sectioned_results_key_path":
+                return AnyView(ObservedSectionedResultsKeyPathTestView())
+            case "observed_sectioned_results_sort_descriptors":
+                return AnyView(ObservedSectionedResultsWithSortDescriptorsView())
+            case "observed_sectioned_results_searchable":
+                if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *) {
+                    return AnyView(ObservedSectionedResultsSearchableTestView())
+                } else {
+                    return AnyView(EmptyView())
+                }
+            case "observed_sectioned_results_configuration":
+                if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *) {
+                    return AnyView(ObservedSectionedResultsConfiguration()
+                                    .environment(\.realmConfiguration, Realm.Configuration(inMemoryIdentifier: "realm_a")))
+                } else {
+                    return AnyView(EmptyView())
+                }
             default:
                 return AnyView(ContentView())
             }

@@ -1579,7 +1579,7 @@
         [StringObject createInRealm:realm withValue:@[@"string"]];
     }];
 
-    [self waitForExpectationsWithTimeout:10.0 handler:nil];
+    [self waitForExpectationsWithTimeout:30.0 handler:nil];
 
     XCTAssertEqual(1U, [StringObject allObjectsInRealm:realm].count);
 }

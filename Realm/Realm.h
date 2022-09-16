@@ -19,6 +19,7 @@
 #import <Foundation/Foundation.h>
 
 #import <Realm/RLMArray.h>
+#import <Realm/RLMAsymmetricObject.h>
 #import <Realm/RLMDecimal128.h>
 #import <Realm/RLMDictionary.h>
 #import <Realm/RLMEmbeddedObject.h>
@@ -34,6 +35,7 @@
 #import <Realm/RLMRealmConfiguration.h>
 #import <Realm/RLMResults.h>
 #import <Realm/RLMSchema.h>
+#import <Realm/RLMSectionedResults.h>
 #import <Realm/RLMSet.h>
 #import <Realm/RLMValue.h>
 

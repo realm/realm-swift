@@ -35,6 +35,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readwrite, copy) NSArray<RLMProperty *> *properties;
 @property (nonatomic, readwrite, assign) bool isSwiftClass;
 @property (nonatomic, readwrite, assign) BOOL isEmbedded;
+@property (nonatomic, readwrite, assign) BOOL isAsymmetric;
 
 // class used for this object schema
 @property (nonatomic, readwrite, assign) Class objectClass;

@@ -19,6 +19,10 @@
 import XCTest
 import RealmSwift
 
+#if canImport(RealmTestSupport)
+import RealmTestSupport
+#endif
+
 private func createStringObjects(_ factor: Int) -> Realm {
     let realm = inMemoryRealm(factor.description)
     try! realm.write {
@@ -433,6 +437,92 @@ class SwiftPerformanceTests: TestCase {
                 }
             }
         }
+    }
+
+    func deleteServerFiles() {
+        try! FileManager.default.removeItem(at: URL(fileURLWithPath: testDir, isDirectory: true).deletingLastPathComponent().appendingPathComponent("mongodb-realm"))
+        App.resetAppCache()
+    }
+
+    func testSyncRealmCacheLookup() {
+        var config = RLMDummyUser().configuration(partitionValue: "")
+        config.objectTypes = []
+        let realm = try! Realm(configuration: config)
+
+        measure {
+            for _ in 0..<1250 {
+                autoreleasepool {
+                    _ = try! Realm(configuration: config)
+                }
+            }
+        }
+        realm.invalidate()
+        deleteServerFiles()
+    }
+
+    func testSyncRealmCreationCached() {
+        var config = RLMDummyUser().configuration(partitionValue: "")
+        config.objectTypes = []
+        var realm: Realm!
+        dispatchSyncNewThread {
+            realm = try! Realm(configuration: config)
+        }
+
+        measure {
+            for _ in 0..<1250 {
+                autoreleasepool {
+                    _ = try! Realm(configuration: config)
+                }
+            }
+        }
+        _ = realm.configuration
+        deleteServerFiles()
+    }
+
+    func testSyncRealmMultithreadedCacheLookup() {
+        var config = RLMDummyUser().configuration(partitionValue: "")
+        config.objectTypes = []
+        var realm: Realm!
+        dispatchSyncNewThread {
+            realm = try! Realm(configuration: config)
+        }
+
+        measure {
+            DispatchQueue.concurrentPerform(iterations: 50) { _ in
+                autoreleasepool {
+                    let realm = try! Realm(configuration: config)
+                    for _ in 0..<25 {
+                        autoreleasepool {
+                            _ = try! Realm(configuration: config)
+                        }
+                    }
+                    realm.invalidate()
+                }
+            }
+        }
+        _ = realm.configuration
+        deleteServerFiles()
+    }
+
+    func testSyncRealmMultithreadedCreationCached() {
+        var config = RLMDummyUser().configuration(partitionValue: "")
+        config.objectTypes = []
+        var realm: Realm!
+        dispatchSyncNewThread {
+            realm = try! Realm(configuration: config)
+        }
+
+        measure {
+            DispatchQueue.concurrentPerform(iterations: 50) { _ in
+                for _ in 0..<25 {
+                    autoreleasepool {
+                        _ = try! Realm(configuration: config)
+                    }
+                }
+            }
+        }
+        _ = realm.configuration
+        deleteServerFiles()
     }
 
     func testCommitWriteTransaction() {
@@ -853,5 +943,119 @@ class SwiftPerformanceTests: TestCase {
                 _ = proj.string
             }
         }
+    }
+}
+
+class SwiftSyncRealmPerformanceTests: TestCase {
+    override class var defaultTestSuite: XCTestSuite {
+        #if !DEBUG && os(iOS) && !targetEnvironment(macCatalyst)
+            if isRunningOnDevice {
+                return super.defaultTestSuite
+            }
+        #endif
+        return XCTestSuite(name: "SwiftSyncRealmPerformanceTests")
+    }
+
+    override func measure(_ block: (() -> Void)) {
+        super.measure {
+            autoreleasepool {
+                block()
+            }
+        }
+    }
+
+    func deleteServerFiles() {
+        try! FileManager.default.removeItem(at: URL(fileURLWithPath: testDir, isDirectory: true).deletingLastPathComponent().appendingPathComponent("mongodb-realm"))
+        App.resetAppCache()
+    }
+
+    var config: Realm.Configuration {
+        var config = RLMDummyUser().configuration(partitionValue: "")
+        config.objectTypes = []
+        return config
+    }
+
+    func testSyncRealmCacheLookup() {
+        let config = self.config
+        let realm = try! Realm(configuration: config)
+
+        measure {
+            for _ in 0..<1250 {
+                autoreleasepool {
+                    _ = try! Realm(configuration: config)
+                }
+            }
+        }
+        realm.invalidate()
+        deleteServerFiles()
+    }
+
+    func testSyncRealmCreationCached() {
+        let config = self.config
+        var realm: Realm!
+        dispatchSyncNewThread {
+            // Open on a different thread so that the test hits the path where
+            // the cache lookup is a miss but there's a cached Realm on a
+            // different thread
+            realm = try! Realm(configuration: config)
+        }
+
+        measure {
+            for _ in 0..<1250 {
+                autoreleasepool {
+                    _ = try! Realm(configuration: config)
+                }
+            }
+        }
+        _ = realm.configuration // ensure realm is still alive until this point
+        deleteServerFiles()
+    }
+
+    func testSyncRealmMultithreadedCacheLookup() {
+        let config = self.config
+        let realm = try! Realm(configuration: config)
+
+        measure {
+            DispatchQueue.concurrentPerform(iterations: 50) { _ in
+                autoreleasepool {
+                    // Ideally we wouldn't measure this and would only measure
+                    // the cache lookups but that'd be much more difficult to set up
+                    let realm = try! Realm(configuration: config)
+                    for _ in 0..<25 {
+                        autoreleasepool {
+                            _ = try! Realm(configuration: config)
+                        }
+                    }
+                    realm.invalidate()
+                }
+            }
+        }
+        realm.invalidate() // ensure realm is still alive until this point
+        deleteServerFiles()
+    }
+
+    func testSyncRealmMultithreadedCreationCached() {
+        let config = self.config
+        let realm = try! Realm(configuration: config)
+
+        measure {
+            DispatchQueue.concurrentPerform(iterations: 50) { _ in
+                for _ in 0..<25 {
+                    autoreleasepool {
+                        _ = try! Realm(configuration: config)
+                    }
+                }
+            }
+        }
+        realm.invalidate() // ensure realm is still alive until this point
+        deleteServerFiles()
+    }
+}
+
+class SwiftFlexibleSyncRealmPerformanceTests: SwiftSyncRealmPerformanceTests {
+    override var config: Realm.Configuration {
+        var config = RLMDummyUser().flexibleSyncConfiguration()
+        config.objectTypes = []
+        return config
     }
 }

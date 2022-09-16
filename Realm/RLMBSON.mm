@@ -397,6 +397,6 @@ id<RLMBSON> RLMConvertBsonToRLMBSON(const Bson& b) {
     return nil;
 }
 
-id<RLMBSON> RLMConvertBsonDocumentToRLMBSON(realm::util::Optional<BsonDocument> b) {
+id<RLMBSON> RLMConvertBsonDocumentToRLMBSON(std::optional<BsonDocument> b) {
     return b ? RLMConvertBsonToRLMBSON(*b) : nil;
 }

@@ -19,11 +19,11 @@ DEPENDENCIES = File.open("#{BASE_DIR}/dependencies.list").map { |line|
 
 MONGODB_VERSION='5.0.6'
 GO_VERSION='1.17.8'
-NODE_VERSION='13.14.0'
+NODE_VERSION='16.13.1'
 STITCH_VERSION=DEPENDENCIES["STITCH_VERSION"]
 
 MONGODB_URL="https://fastdl.mongodb.org/osx/mongodb-macos-x86_64-#{MONGODB_VERSION}.tgz"
-TRANSPILER_TARGET='node13-macos'
+TRANSPILER_TARGET='node16-macos'
 SERVER_STITCH_LIB_URL="https://s3.amazonaws.com/stitch-artifacts/stitch-support/stitch-support-macos-debug-4.3.2-721-ge791a2e-patch-5e2a6ad2a4cf473ae2e67b09.tgz"
 MONGO_DIR="#{BUILD_DIR}/mongodb-macos-x86_64-#{MONGODB_VERSION}"
 
@@ -141,6 +141,9 @@ def setup_stitch
     end
 
     puts 'building transpiler'
+    # Install a newer version of pkg that actually supports recent versions of node
+    puts `#{exports.length() == 0 ? "" : exports.join(' && ') + ' &&'} \
+        cd '#{stitch_dir}/etc/transpiler' && yarn add pkg`
     puts `#{exports.length() == 0 ? "" : exports.join(' && ') + ' &&'} \
         cd '#{stitch_dir}/etc/transpiler' && yarn install && yarn run build -t "#{TRANSPILER_TARGET}" &&
         cp -c bin/transpiler #{BUILD_DIR}/bin`

@@ -1378,6 +1378,11 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/GroupedTableView/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				OTHER_LDFLAGS = (
+					"-lz",
+					"-ObjC",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = GroupedTableView;
 				WRAPPER_EXTENSION = app;
@@ -1392,6 +1397,11 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
 				INFOPLIST_FILE = "$(SRCROOT)/GroupedTableView/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				OTHER_LDFLAGS = (
+					"-lz",
+					"-ObjC",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = GroupedTableView;
 				WRAPPER_EXTENSION = app;

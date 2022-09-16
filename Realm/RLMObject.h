@@ -540,9 +540,7 @@ NS_ASSUME_NONNULL_BEGIN
  `NO`, a `nil` error, and an array of `RLMPropertyChange` objects which
  indicate which properties of the objects were modified.
 
- If an error occurs, `deleted` will be `NO`, `changes` will be `nil`, and
- `error` will include information about the error. The block will never be
- called again after an error occurs.
+ `error` is always `nil` and will be removed in a future version.
  */
 typedef void (^RLMObjectChangeBlock)(BOOL deleted,
                                      NSArray<RLMPropertyChange *> *_Nullable changes,
@@ -656,7 +654,7 @@ typedef void (^RLMObjectChangeBlock)(BOOL deleted,
  @warning The queue must be a serial queue.
 
  @param block The block to be called whenever a change occurs.
- @param keyPaths The block will be called for changes occuring on these keypaths. If no
+ @param keyPaths The block will be called for changes occurring on these keypaths. If no
  key paths are given, notifications are delivered for every property key path.
  @param queue The serial queue to deliver notifications to.
  @return A token which must be held for as long as you want updates to be delivered.
@@ -696,7 +694,7 @@ typedef void (^RLMObjectChangeBlock)(BOOL deleted,
  @warning The queue must be a serial queue.
 
  @param block The block to be called whenever a change occurs.
- @param keyPaths The block will be called for changes occuring on these keypaths. If no
+ @param keyPaths The block will be called for changes occurring on these keypaths. If no
  key paths are given, notifications are delivered for every property key path.
  @return A token which must be held for as long as you want updates to be delivered.
  */

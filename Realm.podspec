@@ -23,6 +23,7 @@ Pod::Spec.new do |s|
 
                               # Realm module
                               'include/RLMArray.h',
+                              'include/RLMAsymmetricObject.h',
                               'include/RLMCollection.h',
                               'include/RLMConstants.h',
                               'include/RLMDecimal128.h',
@@ -39,6 +40,7 @@ Pod::Spec.new do |s|
                               'include/RLMRealmConfiguration.h',
                               'include/RLMResults.h',
                               'include/RLMSchema.h',
+                              'include/RLMSectionedResults.h',
                               'include/RLMSet.h',
                               'include/RLMSwiftCollectionBase.h',
                               'include/RLMSwiftValueStorage.h',

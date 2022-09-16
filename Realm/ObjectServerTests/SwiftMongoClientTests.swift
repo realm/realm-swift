@@ -43,17 +43,6 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
         XCTAssertEqual(collection.name, "Dog")
     }
 
-    func removeAllFromCollection(_ collection: MongoCollection) {
-        let deleteEx = expectation(description: "Delete all from Mongo collection")
-        collection.deleteManyDocuments(filter: [:]) { result in
-            if case .failure = result {
-                XCTFail("Should delete")
-            }
-            deleteEx.fulfill()
-        }
-        wait(for: [deleteEx], timeout: 4.0)
-    }
-
     func setupMongoCollection() -> MongoCollection {
         let user = try! logInUser(for: basicCredentials())
         let mongoClient = user.mongoClient("mongodb1")
@@ -96,7 +85,7 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
             }
             insertOneEx1.fulfill()
         }
-        wait(for: [insertOneEx1], timeout: 4.0)
+        wait(for: [insertOneEx1], timeout: 20.0)
 
         let insertManyEx1 = expectation(description: "Insert many documents")
         collection.insertMany([document, document2]) { result in
@@ -108,7 +97,7 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
             }
             insertManyEx1.fulfill()
         }
-        wait(for: [insertManyEx1], timeout: 4.0)
+        wait(for: [insertManyEx1], timeout: 20.0)
 
         let findEx1 = expectation(description: "Find documents")
         collection.find(filter: [:]) { result in
@@ -123,7 +112,7 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
             }
             findEx1.fulfill()
         }
-        wait(for: [findEx1], timeout: 4.0)
+        wait(for: [findEx1], timeout: 20.0)
     }
 
     func testMongoFindResultCompletion() {
@@ -144,7 +133,7 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
             }
             insertManyEx1.fulfill()
         }
-        wait(for: [insertManyEx1], timeout: 4.0)
+        wait(for: [insertManyEx1], timeout: 20.0)
 
         let findEx1 = expectation(description: "Find documents")
         collection.find(filter: [:]) { result in
@@ -159,7 +148,7 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
                 }
             findEx1.fulfill()
         }
-        wait(for: [findEx1], timeout: 4.0)
+        wait(for: [findEx1], timeout: 20.0)
 
         let findEx2 = expectation(description: "Find documents")
         collection.find(filter: [:], options: findOptions) { result in
@@ -172,7 +161,7 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
             }
             findEx2.fulfill()
         }
-        wait(for: [findEx2], timeout: 4.0)
+        wait(for: [findEx2], timeout: 20.0)
 
         let findEx3 = expectation(description: "Find documents")
         collection.find(filter: document3, options: findOptions) { result in
@@ -184,7 +173,7 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
             }
             findEx3.fulfill()
         }
-        wait(for: [findEx3], timeout: 4.0)
+        wait(for: [findEx3], timeout: 20.0)
 
         let findOneEx1 = expectation(description: "Find one document")
         collection.findOneDocument(filter: document) { result in
@@ -196,7 +185,7 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
             }
             findOneEx1.fulfill()
         }
-        wait(for: [findOneEx1], timeout: 4.0)
+        wait(for: [findOneEx1], timeout: 20.0)
 
         let findOneEx2 = expectation(description: "Find one document")
         collection.findOneDocument(filter: document, options: findOptions) { result in
@@ -208,7 +197,7 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
             }
             findOneEx2.fulfill()
         }
-        wait(for: [findOneEx2], timeout: 4.0)
+        wait(for: [findOneEx2], timeout: 20.0)
     }
 
     func testMongoFindAndReplaceResultCompletion() {
@@ -228,7 +217,7 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
             }
             findOneReplaceEx1.fulfill()
         }
-        wait(for: [findOneReplaceEx1], timeout: 4.0)
+        wait(for: [findOneReplaceEx1], timeout: 20.0)
 
         let options1 = FindOneAndModifyOptions(["name": 1], ["_id": 1], true, true)
         let findOneReplaceEx2 = expectation(description: "Find one document and replace")
@@ -241,7 +230,7 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
             }
             findOneReplaceEx2.fulfill()
         }
-        wait(for: [findOneReplaceEx2], timeout: 4.0)
+        wait(for: [findOneReplaceEx2], timeout: 20.0)
 
         let options2 = FindOneAndModifyOptions(["name": 1], ["_id": 1], true, false)
         let findOneReplaceEx3 = expectation(description: "Find one document and replace")
@@ -255,7 +244,7 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
             }
             findOneReplaceEx3.fulfill()
         }
-        wait(for: [findOneReplaceEx3], timeout: 4.0)
+        wait(for: [findOneReplaceEx3], timeout: 20.0)
     }
 
     func testMongoFindAndUpdateResultCompletion() {
@@ -275,7 +264,7 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
             }
             findOneUpdateEx1.fulfill()
         }
-        wait(for: [findOneUpdateEx1], timeout: 4.0)
+        wait(for: [findOneUpdateEx1], timeout: 20.0)
 
         let options1 = FindOneAndModifyOptions(["name": 1], ["_id": 1], true, true)
         let findOneUpdateEx2 = expectation(description: "Find one document and update")
@@ -289,7 +278,7 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
             }
             findOneUpdateEx2.fulfill()
         }
-        wait(for: [findOneUpdateEx2], timeout: 4.0)
+        wait(for: [findOneUpdateEx2], timeout: 20.0)
 
         let options2 = FindOneAndModifyOptions(["name": 1], ["_id": 1], true, true)
         let findOneUpdateEx3 = expectation(description: "Find one document and update")
@@ -303,7 +292,7 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
             }
             findOneUpdateEx3.fulfill()
         }
-        wait(for: [findOneUpdateEx3], timeout: 4.0)
+        wait(for: [findOneUpdateEx3], timeout: 20.0)
     }
 
     func testMongoFindAndDeleteResultCompletion() {
@@ -320,7 +309,7 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
             }
             insertManyEx.fulfill()
         }
-        wait(for: [insertManyEx], timeout: 4.0)
+        wait(for: [insertManyEx], timeout: 20.0)
 
         let findOneDeleteEx1 = expectation(description: "Find one document and delete")
         collection.findOneAndDelete(filter: document) { result in
@@ -333,7 +322,7 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
             }
             findOneDeleteEx1.fulfill()
         }
-        wait(for: [findOneDeleteEx1], timeout: 4.0)
+        wait(for: [findOneDeleteEx1], timeout: 20.0)
 
         let options1 = FindOneAndModifyOptions(["name": 1], ["_id": 1], false, false)
         let findOneDeleteEx2 = expectation(description: "Find one document and delete")
@@ -347,7 +336,7 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
                 XCTFail("Should find")
             }
         }
-        wait(for: [findOneDeleteEx2], timeout: 4.0)
+        wait(for: [findOneDeleteEx2], timeout: 20.0)
 
         let options2 = FindOneAndModifyOptions(["name": 1], ["_id": 1])
         let findOneDeleteEx3 = expectation(description: "Find one document and delete")
@@ -361,7 +350,7 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
                 XCTFail("Should find")
             }
         }
-        wait(for: [findOneDeleteEx3], timeout: 4.0)
+        wait(for: [findOneDeleteEx3], timeout: 20.0)
 
         let findEx = expectation(description: "Find documents")
         collection.find(filter: [:]) { result in
@@ -373,7 +362,7 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
             }
             findEx.fulfill()
         }
-        wait(for: [findEx], timeout: 4.0)
+        wait(for: [findEx], timeout: 20.0)
     }
 
     func testMongoUpdateOneResultCompletion() {
@@ -394,7 +383,7 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
             }
             insertManyEx.fulfill()
         }
-        wait(for: [insertManyEx], timeout: 4.0)
+        wait(for: [insertManyEx], timeout: 20.0)
 
         let updateEx1 = expectation(description: "Update one document")
         collection.updateOneDocument(filter: document, update: document2) { result in
@@ -408,7 +397,7 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
             }
             updateEx1.fulfill()
         }
-        wait(for: [updateEx1], timeout: 4.0)
+        wait(for: [updateEx1], timeout: 20.0)
 
         let updateEx2 = expectation(description: "Update one document")
         collection.updateOneDocument(filter: document5, update: document2, upsert: true) { result in
@@ -422,7 +411,7 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
             }
             updateEx2.fulfill()
         }
-        wait(for: [updateEx2], timeout: 4.0)
+        wait(for: [updateEx2], timeout: 20.0)
     }
 
     func testMongoUpdateManyResultCompletion() {
@@ -443,7 +432,7 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
             }
             insertManyEx.fulfill()
         }
-        wait(for: [insertManyEx], timeout: 4.0)
+        wait(for: [insertManyEx], timeout: 20.0)
 
         let updateEx1 = expectation(description: "Update one document")
         collection.updateManyDocuments(filter: document, update: document2) { result in
@@ -457,7 +446,7 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
             }
             updateEx1.fulfill()
         }
-        wait(for: [updateEx1], timeout: 4.0)
+        wait(for: [updateEx1], timeout: 20.0)
 
         let updateEx2 = expectation(description: "Update one document")
         collection.updateManyDocuments(filter: document5, update: document2, upsert: true) { result in
@@ -471,7 +460,7 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
             }
             updateEx2.fulfill()
         }
-        wait(for: [updateEx2], timeout: 4.0)
+        wait(for: [updateEx2], timeout: 20.0)
     }
 
     func testMongoDeleteOneResultCompletion() {
@@ -489,7 +478,7 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
             }
             deleteEx1.fulfill()
         }
-        wait(for: [deleteEx1], timeout: 4.0)
+        wait(for: [deleteEx1], timeout: 20.0)
 
         let insertManyEx = expectation(description: "Insert many documents")
         collection.insertMany([document, document2]) { result in
@@ -501,7 +490,7 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
             }
             insertManyEx.fulfill()
         }
-        wait(for: [insertManyEx], timeout: 4.0)
+        wait(for: [insertManyEx], timeout: 20.0)
 
         let deleteEx2 = expectation(description: "Delete one document")
         collection.deleteOneDocument(filter: document) { result in
@@ -513,7 +502,7 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
             }
             deleteEx2.fulfill()
         }
-        wait(for: [deleteEx2], timeout: 4.0)
+        wait(for: [deleteEx2], timeout: 20.0)
     }
 
     func testMongoDeleteManyResultCompletion() {
@@ -531,7 +520,7 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
             }
             deleteEx1.fulfill()
         }
-        wait(for: [deleteEx1], timeout: 4.0)
+        wait(for: [deleteEx1], timeout: 20.0)
 
         let insertManyEx = expectation(description: "Insert many documents")
         collection.insertMany([document, document2]) { result in
@@ -543,7 +532,7 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
             }
             insertManyEx.fulfill()
         }
-        wait(for: [insertManyEx], timeout: 4.0)
+        wait(for: [insertManyEx], timeout: 20.0)
 
         let deleteEx2 = expectation(description: "Delete one document")
         collection.deleteManyDocuments(filter: ["breed": "cane corso"]) { result in
@@ -555,7 +544,7 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
             }
             deleteEx2.fulfill()
         }
-        wait(for: [deleteEx2], timeout: 4.0)
+        wait(for: [deleteEx2], timeout: 20.0)
     }
 
     func testMongoCountAndAggregateResultCompletion() {
@@ -572,7 +561,7 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
             }
             insertManyEx1.fulfill()
         }
-        wait(for: [insertManyEx1], timeout: 4.0)
+        wait(for: [insertManyEx1], timeout: 20.0)
 
         collection.aggregate(pipeline: [["$match": ["name": "fido"]], ["$group": ["_id": "$name"]]]) { result in
             switch result {
@@ -593,7 +582,7 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
             }
             countEx1.fulfill()
         }
-        wait(for: [countEx1], timeout: 4.0)
+        wait(for: [countEx1], timeout: 20.0)
 
         let countEx2 = expectation(description: "Count documents")
         collection.count(filter: document, limit: 1) { result in
@@ -605,7 +594,7 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
             }
             countEx2.fulfill()
         }
-        wait(for: [countEx2], timeout: 4.0)
+        wait(for: [countEx2], timeout: 20.0)
     }
 
     func testWatch() {
@@ -673,7 +662,7 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
             }
             insertManyEx.fulfill()
         }
-        wait(for: [insertManyEx], timeout: 4.0)
+        wait(for: [insertManyEx], timeout: 20.0)
 
         var watchEx = expectation(description: "Watch 3 document events")
         let watchTestUtility = WatchTestUtility(targetEventCount: 3, matchingObjectId: objectIds.first!, expectation: &watchEx)
@@ -739,7 +728,7 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
             }
             insertManyEx.fulfill()
         }
-        wait(for: [insertManyEx], timeout: 4.0)
+        wait(for: [insertManyEx], timeout: 20.0)
 
         var watchEx = expectation(description: "Watch 3 document events")
         let watchTestUtility = WatchTestUtility(targetEventCount: 3,
@@ -803,7 +792,7 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
             }
             insertManyEx.fulfill()
         }
-        wait(for: [insertManyEx], timeout: 4.0)
+        wait(for: [insertManyEx], timeout: 20.0)
 
         var watchEx = expectation(description: "Watch 5 document events")
         watchEx.expectedFulfillmentCount = 2

@@ -208,6 +208,39 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (BOOL)isEqualToSet:(RLMSet<RLMObjectType> *)otherSet;
 
+#pragma mark - Sectioning a Set
+
+/**
+ Sorts and sections this collection from a given property key path, returning the result
+ as an instance of `RLMSectionedResults`.
+
+ @param keyPath The property key path to sort on.
+ @param ascending The direction to sort in.
+ @param keyBlock A callback which is invoked on each element in the Results collection.
+                This callback is to return the section key for the element in the collection.
+
+ @return An instance of RLMSectionedResults.
+ */
+- (RLMSectionedResults *)sectionedResultsSortedUsingKeyPath:(NSString *)keyPath
+                                                  ascending:(BOOL)ascending
+                                                   keyBlock:(RLMSectionedResultsKeyBlock)keyBlock;
+
+/**
+ Sorts and sections this collection from a given array of sort descriptors, returning the result
+ as an instance of `RLMSectionedResults`.
+
+ @param sortDescriptors  An array of `RLMSortDescriptor`s to sort by.
+ @param keyBlock  A callback which is invoked on each element in the Results collection.
+                 This callback is to return the section key for the element in the collection.
+
+ @note The primary sort descriptor must be responsible for determining the section key.
+
+ @return An instance of RLMSectionedResults.
+ */
+- (RLMSectionedResults *)sectionedResultsUsingSortDescriptors:(NSArray<RLMSortDescriptor *> *)sortDescriptors
+                                                     keyBlock:(RLMSectionedResultsKeyBlock)keyBlock;
+
+
 #pragma mark - Notifications
 
 /**
@@ -225,9 +258,8 @@ NS_ASSUME_NONNULL_BEGIN
  See the `RLMCollectionChange` documentation for information on how the changes
  are reported and an example of updating a `UITableView`.
 
- If an error occurs the block will be called with `nil` for the results
- parameter and a non-`nil` error. Currently the only errors that can occur are
- when opening the Realm on the background worker thread.
+ The error parameter is present only for backwards compatiblity and will always
+ be `nil`.
 
  Notifications are delivered via the standard run loop, and so can't be
  delivered while the run loop is blocked by other activity. When
@@ -284,9 +316,8 @@ __attribute__((warn_unused_result));
  See the `RLMCollectionChange` documentation for information on how the changes
  are reported and an example of updating a `UITableView`.
 
- If an error occurs the block will be called with `nil` for the results
- parameter and a non-`nil` error. Currently the only errors that can occur are
- when opening the Realm on the background worker thread.
+ The error parameter is present only for backwards compatiblity and will always
+ be `nil`.
 
  Notifications are delivered on the given queue. If the queue is blocked and
  notifications can't be delivered instantly, multiple notifications may be
@@ -323,9 +354,8 @@ __attribute__((warn_unused_result));
  See the `RLMCollectionChange` documentation for information on how the changes
  are reported and an example of updating a `UITableView`.
 
- If an error occurs the block will be called with `nil` for the results
- parameter and a non-`nil` error. Currently the only errors that can occur are
- when opening the Realm on the background worker thread.
+ The error parameter is present only for backwards compatiblity and will always
+ be `nil`.
 
  Notifications are delivered on the given queue. If the queue is blocked and
  notifications can't be delivered instantly, multiple notifications may be
@@ -338,7 +368,7 @@ __attribute__((warn_unused_result));
  @warning The queue must be a serial queue.
 
  @param block The block to be called whenever a change occurs.
- @param keyPaths The block will be called for changes occuring on these keypaths. If no
+ @param keyPaths The block will be called for changes occurring on these keypaths. If no
  key paths are given, notifications are delivered for every property key path.
  @param queue The serial queue to deliver notifications to.
  @return A token which must be held for as long as you want updates to be delivered.
@@ -365,9 +395,8 @@ __attribute__((warn_unused_result));
  See the `RLMCollectionChange` documentation for information on how the changes
  are reported and an example of updating a `UITableView`.
 
- If an error occurs the block will be called with `nil` for the results
- parameter and a non-`nil` error. Currently the only errors that can occur are
- when opening the Realm on the background worker thread.
+ The error parameter is present only for backwards compatiblity and will always
+ be `nil`.
 
  Notifications are delivered via the standard run loop, and so can't be
  delivered while the run loop is blocked by other activity. When
@@ -385,7 +414,7 @@ __attribute__((warn_unused_result));
  @warning This method cannot be called when the containing Realm is read-only or frozen.
  @warning The queue must be a serial queue.
  @param block The block to be called whenever a change occurs.
- @param keyPaths The block will be called for changes occuring on these keypaths. If no
+ @param keyPaths The block will be called for changes occurring on these keypaths. If no
  key paths are given, notifications are delivered for every property key path.
  @return A token which must be held for as long as you want updates to be delivered.
  */
