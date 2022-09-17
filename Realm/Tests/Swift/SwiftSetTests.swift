@@ -150,59 +150,84 @@ class SwiftRLMSetTests: RLMTestCase {
 
         try! realm.commitWriteTransaction()
 
+        let noArray = SwiftRLMAggregateObject.objects(in: realm, where: "boolCol == NO")
+        let yesArray = SwiftRLMAggregateObject.objects(in: realm, where: "boolCol == YES")
+        
         // SUM ::::::::::::::::::::::::::::::::::::::::::::::
         // Test int sum
-        XCTAssertEqual(aggSet.set.sum(ofProperty: "intCol").intValue, 100, "Sum should be 100")
+        XCTAssertEqual(noArray.sum(ofProperty: "intCol").intValue, 40, "Sum should be 40")
+        XCTAssertEqual(yesArray.sum(ofProperty: "intCol").intValue, 60, "Sum should be 60")
 
         // Test float sum
-        XCTAssertEqual(aggSet.set.sum(ofProperty: "floatCol").floatValue, Float(7.20), accuracy: 0.1, "Sum should be 0.0")
+        XCTAssertEqual(noArray.sum(ofProperty: "floatCol").floatValue, Float(0.0), accuracy: 0.1, "Sum should be 0.0")
+        XCTAssertEqual(yesArray.sum(ofProperty: "floatCol").floatValue, Float(7.2), accuracy: 0.1, "Sum should be 7.2")
 
         // Test double sum
-        XCTAssertEqual(aggSet.set.sum(ofProperty: "doubleCol").doubleValue, Double(10), accuracy: 0.1, "Sum should be 10.0")
-
+        XCTAssertEqual(noArray.sum(ofProperty: "doubleCol").doubleValue, Double(10.0), accuracy: 0.1, "Sum should be 10.0")
+        XCTAssertEqual(yesArray.sum(ofProperty: "doubleCol").doubleValue, Double(0.0), accuracy: 0.1, "Sum should be 0.0")
+        
         // Average ::::::::::::::::::::::::::::::::::::::::::::::
         // Test int average
-        XCTAssertEqual(aggSet.set.average(ofProperty: "intCol")!.doubleValue, Double(10.0), accuracy: 0.1, "Average should be 1.0")
+        XCTAssertEqual(noArray.average(ofProperty: "intCol")!.doubleValue, Double(10.0), accuracy: 0.1, "Average should be 10.0")
+        XCTAssertEqual(yesArray.average(ofProperty: "intCol")!.doubleValue, Double(10.0), accuracy: 0.1, "Average should be 10.0")
 
         // Test float average
-        XCTAssertEqual(aggSet.set.average(ofProperty: "floatCol")!.doubleValue, Double(0.72), accuracy: 0.1, "Average should be 0.0")
+        XCTAssertEqual(noArray.average(ofProperty: "floatCol")!.doubleValue, Double(0.0), accuracy: 0.1, "Average should be 0.0")
+        XCTAssertEqual(yesArray.average(ofProperty: "floatCol")!.doubleValue, Double(1.2), accuracy: 0.1, "Average should be 1.2")
 
         // Test double average
-        XCTAssertEqual(aggSet.set.average(ofProperty: "doubleCol")!.doubleValue, Double(1.0), accuracy: 0.1, "Average should be 2.5")
+        XCTAssertEqual(noArray.average(ofProperty: "doubleCol")!.doubleValue, Double(2.5), accuracy: 0.1, "Average should be 2.5")
+        XCTAssertEqual(yesArray.average(ofProperty: "doubleCol")!.doubleValue, Double(0.0), accuracy: 0.1, "Average should be 2.5")
 
         // MIN ::::::::::::::::::::::::::::::::::::::::::::::
         // Test int min
-        var min = aggSet.set.min(ofProperty: "intCol") as! NSNumber
+        var min = noArray.min(ofProperty: "intCol") as! NSNumber
+        XCTAssertEqual(min.int32Value, Int32(10), "Minimum should be 10")
+        min = yesArray.min(ofProperty: "intCol") as! NSNumber
         XCTAssertEqual(min.int32Value, Int32(10), "Minimum should be 10")
 
         // Test float min
-        min = aggSet.set.min(ofProperty: "floatCol") as! NSNumber
+        min = noArray.min(ofProperty: "floatCol") as! NSNumber
         XCTAssertEqual(min.floatValue, Float(0), accuracy: 0.1, "Minimum should be 0.0f")
+        min = yesArray.min(ofProperty: "floatCol") as! NSNumber
+        XCTAssertEqual(min.floatValue, Float(1.2), accuracy: 0.1, "Minimum should be 1.2f")
 
         // Test double min
-        min = aggSet.set.min(ofProperty: "doubleCol") as! NSNumber
-        XCTAssertEqual(min.doubleValue, Double(0.0), accuracy: 0.1, "Minimum should be 1.5")
+        min = noArray.min(ofProperty: "doubleCol") as! NSNumber
+        XCTAssertEqual(min.doubleValue, Double(2.5), accuracy: 0.1, "Minimum should be 2.5")
+        min = yesArray.min(ofProperty: "doubleCol") as! NSNumber
+        XCTAssertEqual(min.doubleValue, Double(0.0), accuracy: 0.1, "Minimum should be 0.0")
 
         // Test date min
-        let dateMinOutput = aggSet.set.min(ofProperty: "dateCol") as! Date
-        XCTAssertEqual(dateMinOutput, dateMinInput, "Minimum should be dateMaxInput")
+        var dateMinOutput = noArray.min(ofProperty: "dateCol") as! Date
+        XCTAssertEqual(dateMinOutput, dateMaxInput, "Minimum should be dateMaxInput")
+        dateMinOutput = yesArray.min(ofProperty: "dateCol") as! Date
+        XCTAssertEqual(dateMinOutput, dateMinInput, "Minimum should be dateMinInput")
 
         // MAX ::::::::::::::::::::::::::::::::::::::::::::::
         // Test int max
-        var max = aggSet.set.max(ofProperty: "intCol") as! NSNumber
+        var max = noArray.max(ofProperty: "intCol") as! NSNumber
+        XCTAssertEqual(max.intValue, 10, "Maximum should be 10")
+        max = yesArray.max(ofProperty: "intCol") as! NSNumber
         XCTAssertEqual(max.intValue, 10, "Maximum should be 10")
 
         // Test float max
-        max = aggSet.set.max(ofProperty: "floatCol") as! NSNumber
-        XCTAssertEqual(max.floatValue, Float(1.2), accuracy: 0.1, "Maximum should be 0.0f")
+        max = noArray.max(ofProperty: "floatCol") as! NSNumber
+        XCTAssertEqual(max.floatValue, Float(0.0), accuracy: 0.1, "Maximum should be 0.0f")
+        max = yesArray.max(ofProperty: "floatCol") as! NSNumber
+        XCTAssertEqual(max.floatValue, Float(1.2), accuracy: 0.1, "Maximum should be 1.2f")
 
         // Test double max
-        max = aggSet.set.max(ofProperty: "doubleCol") as! NSNumber
-        XCTAssertEqual(max.doubleValue, Double(2.5), accuracy: 0.1, "Maximum should be 3.5")
+        max = noArray.max(ofProperty: "doubleCol") as! NSNumber
+        XCTAssertEqual(max.doubleValue, Double(2.5), accuracy: 0.1, "Maximum should be 2.5")
+        max = yesArray.max(ofProperty: "doubleCol") as! NSNumber
+        XCTAssertEqual(max.doubleValue, Double(0.0), accuracy: 0.1, "Maximum should be 0.0")
 
         // Test date max
-        let dateMaxOutput = aggSet.set.max(ofProperty: "dateCol") as! Date
+        var dateMaxOutput = noArray.max(ofProperty: "dateCol") as! Date
         XCTAssertEqual(dateMaxOutput, dateMaxInput, "Maximum should be dateMaxInput")
+        dateMaxOutput = yesArray.max(ofProperty: "dateCol") as! Date
+        XCTAssertEqual(dateMaxOutput, dateMinInput, "Maximum should be dateMinInput")
     }
 
     func testSetDescription_objc() {
