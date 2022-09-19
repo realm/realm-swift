@@ -115,12 +115,12 @@ file = open(os.path.dirname(__file__) + '/PrimitiveArrayPropertyTests.tpl.m', 'r
 for line in file:
     # Lines without anything to expand just appear as-is
     if not '$' in line:
-        print line,
+        print(line, end='')
         continue
 
     if '$allArrays' in line:
         line = line.replace(' ^n', '\n' + ' ' * (line.find('(') + 4))
-        print '    for (RLMArray *array in allArrays) {\n    ' + line.replace('$allArrays', 'array') + '    }'
+        print('    for (RLMArray *array in allArrays) {\n    ' + line.replace('$allArrays', 'array') + '    }')
         continue
 
     filtered_types = types
@@ -142,7 +142,7 @@ for line in file:
     # Repeat each line for each type, replacing variables with values from the dictionary
     for t in filtered_types:
         l = line
-        for k, v in t.iteritems():
+        for k, v in t.items():
             if k in l:
                 l = l.replace('$' + k, v)
-        print l,
+        print(l, end='')
