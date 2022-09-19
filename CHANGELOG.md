@@ -4,8 +4,31 @@ x.y.z Release notes (yyyy-MM-dd)
 * None.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
-* None.
+* Incoming links from `RealmAny` properties were not handled correctly when
+  migrating an object type from top-level to embedded. `RealmAny` properties
+  currently cannot link to embedded objects.
+  ([Core #5796](https://github.com/realm/realm-core/pull/5796), since 10.8.0).
+* `Realm.refresh()` sometimes did not actually advance to the latest version.
+  It attempted to be semi-non-blocking in a very confusing way which resulted
+  in it sometimes advancing to a newer version that is not the latest version,
+  and sometimes blocking until notifiers are ready so that it could advance to
+  the latest version. This behavior was undocumented and didn't work correctly,
+  so it now always blocks if needed to advance to the latest version.
+  ([#7625](https://github.com/realm/realm-swift/issues/7625), since v0.98.0).
+* Fix the most common cause of thread priority inversions when performing
+  writes on the main thread. If beginning the write transaction has to wait for
+  the background notification calculations to complete, that wait is now done
+  in a QoS-aware way. ([#7902](https://github.com/realm/realm-swift/issues/7902))
+* Subscribing to link properties in a flexible sync Realm did not work due to a
+  mismatch between what the client sent and what the server needed.
+  ([Core #5409](https://github.com/realm/realm-core/issues/5409))
+* Attempting to use `AsymmetricObject` with partition-based sync now reports a
+  sensible error much earlier in the process. Asymmetric sync requires using
+  flexible sync. ([Core #5691](https://github.com/realm/realm-core/issues/5691), since 10.29.0).
+* Case-insensitive but diacritic-sensitive queries would crash on 4-byte UTF-8
+  characters ([Core #5825](https://github.com/realm/realm-core/issues/5825), since v2.2.0)
+* Accented characters are now handled by case-insensitive but
+  diacritic-sensitive queries. ([Core #5825](https://github.com/realm/realm-core/issues/5825), since v2.2.0)
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
@@ -14,10 +37,10 @@ x.y.z Release notes (yyyy-MM-dd)
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 13.4.1.
 * CocoaPods: 1.10 or later.
-* Xcode: 13.1-14 beta 6.
+* Xcode: 13.1 - 14.
 
 ### Internal
-* Upgraded realm-core from ? to ?
+* Upgraded realm-core from 12.6.0 to 12.7.0
 
 10.29.0 Release notes (2022-09-09)
 =============================================================
