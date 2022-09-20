@@ -152,7 +152,7 @@ class SwiftRLMSetTests: RLMTestCase {
 
         let noArray = SwiftRLMAggregateObject.objects(in: realm, where: "boolCol == NO")
         let yesArray = SwiftRLMAggregateObject.objects(in: realm, where: "boolCol == YES")
-        
+
         // SUM ::::::::::::::::::::::::::::::::::::::::::::::
         // Test int sum
         XCTAssertEqual(noArray.sum(ofProperty: "intCol").intValue, 40, "Sum should be 40")
@@ -165,7 +165,7 @@ class SwiftRLMSetTests: RLMTestCase {
         // Test double sum
         XCTAssertEqual(noArray.sum(ofProperty: "doubleCol").doubleValue, Double(10.0), accuracy: 0.1, "Sum should be 10.0")
         XCTAssertEqual(yesArray.sum(ofProperty: "doubleCol").doubleValue, Double(0.0), accuracy: 0.1, "Sum should be 0.0")
-        
+
         // Average ::::::::::::::::::::::::::::::::::::::::::::::
         // Test int average
         XCTAssertEqual(noArray.average(ofProperty: "intCol")!.doubleValue, Double(10.0), accuracy: 0.1, "Average should be 10.0")
