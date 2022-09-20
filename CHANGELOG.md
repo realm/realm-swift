@@ -1,9 +1,8 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.30.0 Release notes (2022-09-20)
 =============================================================
-### Enhancements
-* None.
 
 ### Fixed
+
 * Incoming links from `RealmAny` properties were not handled correctly when
   migrating an object type from top-level to embedded. `RealmAny` properties
   currently cannot link to embedded objects.
@@ -31,12 +30,14 @@ x.y.z Release notes (yyyy-MM-dd)
   diacritic-sensitive queries. ([Core #5825](https://github.com/realm/realm-core/issues/5825), since v2.2.0)
 
 ### Breaking Changes
+
 * `-[RLMASLoginDelegate authenticationDidCompleteWithError:]` has been renamed
   to `-[RLMASLoginDelegate authenticationDidFailWithError:]` to comply with new
   app store requirements. This only effects the obj-c API.
   ([#7945](https://github.com/realm/realm-swift/issues/7945))
 
 ### Compatibility
+
 * Realm Studio: 11.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 13.4.1.
@@ -44,6 +45,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * Xcode: 13.1 - 14.
 
 ### Internal
+
 * Upgraded realm-core from 12.6.0 to 12.7.0
 
 10.29.0 Release notes (2022-09-09)
