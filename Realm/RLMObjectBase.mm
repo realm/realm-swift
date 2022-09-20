@@ -125,7 +125,8 @@ static id validatedObjectForProperty(__unsafe_unretained id const obj,
         }
         else if (prop.collection) {
             NSMutableArray *ret = [[NSMutableArray alloc] init];
-            for (id el in obj) {
+            id enumerable = RLMAsFastEnumeration(obj);
+            for (id el in enumerable) {
                 [ret addObject:coerceToObjectType(el, objectClass, schema)];
             }
             return ret;
