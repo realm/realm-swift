@@ -565,7 +565,7 @@ class ObjectTests: TestCase {
         setter(object, NSNull(), "arrayCol")
         XCTAssertEqual((getter(object, "arrayCol") as! List<SwiftBoolObject>).count, 0)
 
-        if (object.realm != nil) {
+        if object.realm != nil {
             let listRes = object.realm!.objects(SwiftBoolObject.self).filter("boolCol == true")
             setter(object, listRes, "arrayCol")
             XCTAssertEqual((getter(object, "arrayCol") as! List<SwiftBoolObject>).count, listRes.count)
