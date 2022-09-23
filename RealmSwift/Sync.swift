@@ -259,7 +259,7 @@ public enum ClientResetMode {
     /// can then be recovered in the post-client-reset callback block.
     ///
     /// If `.discardUnsyncedChanges` is enabled but the client reset operation is unable to complete
-    /// then the client reset process reverts to manual mode. Example) During a destructive schema change this
+    /// then the client reset process reverts to manual mode. Example: During a destructive schema change this
     /// mode will fail and invoke the manual client reset handler.
     ///
     /// The first `.discardUnsyncedChanges` function argument notifies prior to a client reset occurring.

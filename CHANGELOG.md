@@ -10,7 +10,7 @@ x.y.z Release notes (yyyy-MM-dd)
     client reset occurred.
     The changes are integrated with the following rules:
     1. Objects created locally not synced before client reset, will be integrated.
-    2. If an object has been deleted on the server, but was modified on the client, the delete takes precedence and the update is discarded
+    2. If an object has been deleted on the server, but was modified on the client, the delete takes precedence and the update is discarded.
     3. If an object was deleted on the client, but not the server, then the client delete instruction is applied.
     4. In the case of conflicting updates to the same field, the client update is applied.
   - The client reset process will fallback to `ClientResetMode.discardUnsyncedChanges` if the recovery process fails in `.recoverOrDiscardUnsyncedChanges`.
