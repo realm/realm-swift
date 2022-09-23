@@ -1,15 +1,63 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+
+* Add `.recoverUnsyncedChanges` (`RLMClientResetModeRecoverUnsyncedChanges`) and
+`.recoverOrDiscardUnsyncedChanges` (`RLMClientResetModeRecoverOrDiscardUnsyncedChanges`) behaviors to `ClientResetMode` (`RLMClientResetMode`).
+  - The newly added recover modes function by downloading a realm which reflects the latest
+    state of the server after a client reset. A recovery process is run locally in an
+    attempt to integrate the server state with any local changes from before the
+    client reset occurred.
+    The changes are integrated with the following rules:
+    1. Objects created locally not synced before client reset, will be integrated.
+    2. If an object has been deleted on the server, but was modified on the client, the delete takes precedence and the update is discarded
+    3. If an object was deleted on the client, but not the server, then the client delete instruction is applied.
+    4. In the case of conflicting updates to the same field, the client update is applied.
+  - The client reset process will fallback to `ClientResetMode.discardUnsyncedChanges` if the recovery process fails in `.recoverOrDiscardUnsyncedChanges`.
+  - The client reset process will fallback to `ClientResetMode.manual` if the recovery process fails in `.recoverUnsyncedChanges`.
+  - The two new swift recovery modes support client reset callbacks: `.recoverUnsyncedChanges(((Realm) -> Void)? = nil, ((Realm, Realm) -> Void)? = nil)`.
+  - The two new Obj-C recovery modes support client reset callbacks in `notifyBeforeReset`
+    and `notifyAfterReset`for both `[RLMUser configurationWithPartitionValue]` and `[RLMUser flexibleSyncConfigurationWithClientResetMode]`
+    For more detail on client reset callbacks, see `ClientResetMode`, `RLMClientResetBeforeBlock`,
+    `RLMClientResetAfterBlock`, and the 10.25.0 changelog entry.
+* Add two new additional interfaces to define a manual client reset handler:
+  - Add a manual callback handler to `ClientResetMode.manual` -> `ClientResetMode.manual(ErrorReportingBlock? = nil)`.
+  - Add the `RLMSyncConfiguration.manualClientResetHandler` property (type `RLMSyncErrorReportingBlock`).
+  - These error reporting blocks are invoked in the event of a `RLMSyncErrorClientResetError`.
+  - See `ErrorReportingBlock` (`RLMSyncErrorReportingBlock`), and `ClientResetInfo` for more detail.
+  - Previously, manual client resets were handled only through the `SyncManager.ErrorHandler`. You have the
+    option, but not the requirement, to define manual reset handler in these interfaces.
+    Otherwise, the `SyncManager.ErrorHandler` is still invoked during the manual client reset process.
+  - These new interfaces are only invoked during a `RLMSyncErrorClientResetError`. All other sync errors
+    are still handled in the `SyncManager.ErrorHandler`.
+  - See 'Breaking Changes' for information how these interfaces interact with an already existing
+    `SyncManager.ErrorHandler`.
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
 * None.
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+### Breaking Changes
+
+* The default `clientResetMode` (`RLMClientResetMode`) is switched from `.manual` (`RLMClientResetModeManual`)
+  to `.recoverUnsyncedChanges` (`RLMClientResetModeRecoverUnsyncedChanges`).
+  - If you are currently using `.manual` and continue to do so, the only change
+    you must explicitly make is designating manual mode in
+    your `Realm.Configuration.SyncConfiguration`s, since they will now default to `.recoverUnsyncedChanges`.
+  - You may choose to define your manual client reset handler in the newly
+    introduced `manual(ErrorReportingBlock? = nil)`
+    or `RLMSyncConfiguration.manualClientResetHandler`, but this is not required.
+    The `SyncManager.errorHandler` will still be invoked during a client reset if
+    no callback is passed into these new interfaces.
+
+### Deprecations
+
+* `ClientResetMode.discardLocal` is deprecated in favor of `ClientResetMode.discardUnsyncedChanges`.
+  The reasoning is that the name better reflects the effect of this reset mode. There is no actual
+  difference in behavior.
 
 ### Compatibility
+
 * Realm Studio: 11.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 13.4.1.
@@ -92,36 +140,6 @@ x.y.z Release notes (yyyy-MM-dd)
                                                "age": 20])
     }
 ```
-* Add `.recoverUnsyncedChanges` (`RLMClientResetModeRecoverUnsyncedChanges`) and
-`.recoverOrDiscardUnsyncedChanges` (`RLMClientResetModeRecoverOrDiscardUnsyncedChanges`) behaviors to `ClientResetMode` (`RLMClientResetMode`).
-  - The newly added recover modes function by downloading a realm which reflects the latest
-    state of the server after a client reset. A recovery process is run locally in an
-    attempt to integrate the server state with any local changes from before the
-    client reset occurred.
-    The changes are integrated with the following rules:
-    1. Objects created locally not synced before client reset, will be integrated.
-    2. If an object has been deleted on the server, but was modified on the client, the delete takes precedence and the update is discarded
-    3. If an object was deleted on the client, but not the server, then the client delete instruction is applied.
-    4. In the case of conflicting updates to the same field, the client update is applied.
-  - The client reset process will fallback to `ClientResetMode.discardUnsyncedChanges` if the recovery process fails in `.recoverOrDiscardUnsyncedChanges`.
-  - The client reset process will fallback to `ClientResetMode.manual` if the recovery process fails in `.recoverUnsyncedChanges`.
-  - The two new swift recovery modes support client reset callbacks: `.recoverUnsyncedChanges(((Realm) -> Void)? = nil, ((Realm, Realm) -> Void)? = nil)`.
-  - The two new Obj-C recovery modes support client reset callbacks via the `notifyBeforeReset`
-    and `notifyAfterReset` parameters in `[RLMUser configurationWithPartitionValue]`
-    For more detail on client reset callbacks, see `ClientResetMode`, `RLMClientResetBeforeBlock`,
-    `RLMClientResetAfterBlock`, and the 10.25.0 changelog entry.
-* Add two new additional interfaces to define a manual client reset handler:
-  - Add a manual callback handler to `ClientResetMode.manual` -> `ClientResetMode.manual(ErrorReportingBlock? = nil)`.
-  - Add the `RLMSyncConfiguration.manualClientResetHandler` property (type `RLMSyncErrorReportingBlock`).
-  - These error reporting blocks are invoked in the event of a `RLMSyncErrorClientResetError`.
-  - See `ErrorReportingBlock` (`RLMSyncErrorReportingBlock`), and `ClientResetInfo` for more detail.
-  - Previously, manual client resets were handled only through the `SyncManager.ErrorHandler`. You have the
-    option, but not the requirement, to define manual reset handler in these interfaces.
-    Otherwise, the `SyncManager.ErrorHandler` is still invoked during the manual client reset process.
-  - These new interfaces are only invoked during a `RLMSyncErrorClientResetError`. All other sync errors
-    are still handled in the `SyncManager.ErrorHandler`.
-  - See 'Breaking Changes' for information how these interfaces interact with an already existing
-    `SyncManager.ErrorHandler`.
 * Add ability to section a collection which conforms to `RealmCollection`, `RLMCollection`.
   Collections can be sectioned by a unique key retrieved from a keyPath or a callback and will return an instance of `SectionedResults`/`RLMSectionedResults`.
   Each section in the collection will be an instance of `ResultsSection`/`RLMSection` which gives access to the elements corresponding to the section key.
@@ -178,22 +196,6 @@ x.y.z Release notes (yyyy-MM-dd)
 
 ### Fixed
 
-### Breaking Changes
-* The default `clientResetMode` (`RLMClientResetMode`) is switched from `.manual` (`RLMClientResetModeManual`)
-  to `.recoverUnsyncedChanges` (`RLMClientResetModeRecoverUnsyncedChanges`).
-  - If you are currently using `.manual` and continue to do so, the only change
-    you must explicitly make is designating manual mode in
-    your `Realm.Configuration.SyncConfiguration`s, since they will now default to `.recoverUnsyncedChanges`.
-  - You may choose to define your manual client reset handler in the newly
-    introduced `manual(ErrorReportingBlock? = nil)`
-    or `RLMSyncConfiguration.manualClientResetHandler`, but this is not required.
-    The `SyncManager.errorHandler` will still be invoked during a client reset if
-    no callback is passed into these new interfaces.
-
-### Deprecations
-* `ClientResetMode.discardLocal` is deprecated in favor of `ClientResetMode.discardUnsyncedChanges`.
-  The reasoning is that the name better reflects the effect of this reset mode. There is no actual
-  difference in behavior.
 * Fix all of the UBSan failures hit by our tests. It is unclear if any of these
   manifested as visible bugs. ([Core #5665](https://github.com/realm/realm-core/pull/5665))
 * Upload completion callbacks were sometimes called before the final step of

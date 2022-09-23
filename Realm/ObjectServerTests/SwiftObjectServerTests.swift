@@ -666,6 +666,13 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             var configuration = user.configuration(partitionValue: #function, clientResetMode: .manual(assertManualClientReset(user)))
             configuration.objectTypes = [SwiftPerson.self]
 
+            switch configuration.syncConfiguration!.clientResetMode {
+            case .manual(let block):
+                XCTAssertNotNil(block)
+            default:
+                XCTFail("Should be set to manual")
+            }
+
             try autoreleasepool {
                 let realm = try Realm(configuration: configuration)
                 waitForExpectations(timeout: 15.0)
@@ -740,6 +747,13 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
             var configuration = user.configuration(partitionValue: #function, clientResetMode: .manual(assertManualClientReset(user)))
             configuration.objectTypes = [SwiftPerson.self]
+
+            switch configuration.syncConfiguration!.clientResetMode {
+            case .manual(let block):
+                XCTAssertNotNil(block)
+            default:
+                XCTFail("Should be set to manual")
+            }
 
             let syncManager = self.app.syncManager
             syncManager.errorHandler = { error, _ in
@@ -1178,47 +1192,47 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     }
 
     // A stray session is left during teardown. Can't find out where.
-//    func testFlexibleClientResetManual() throws {
-//        try autoreleasepool {
-//            let user = try logInUser(for: basicCredentials(app: self.flexibleSyncApp), app: self.flexibleSyncApp)
-//            try prepareFlexibleClientReset(user)
-//
-//            var config = user.flexibleSyncConfiguration(clientResetMode: .manual(assertManualClientReset(user)))
-//            config.objectTypes = [SwiftPerson.self]
-//
-//            guard let syncConfig = config.syncConfiguration else {
-//                fatalError("Test condition failure. SyncConfiguration not set.")
-//            }
-//            switch syncConfig.clientResetMode {
-//            case .manual:
-//                print("is manual")
-//            default:
-//                XCTFail("Should be set to discardLocal")
-//            }
-//            try autoreleasepool {
-//                let realm = try Realm(configuration: config)
-//                waitForExpectations(timeout: 15.0)
-//                // The locally created object should still be present as we didn't
-//                // actually handle the client reset
-//                XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1)
-//                XCTAssertEqual(realm.objects(SwiftPerson.self)[0].firstName, "John")
-//            }
-////            resetSyncManager() Need to reset the syncManager. But path_for_realm is nil when creating new flex config?
-//        }
-//
-//        let user = try logInUser(for: basicCredentials(app: self.flexibleSyncApp), app: self.flexibleSyncApp)
-//        var config = user.flexibleSyncConfiguration(clientResetMode: .manual(assertManualClientReset(user)))
-//        config.objectTypes = [SwiftPerson.self]
-//
-//        try autoreleasepool {
-//            let realm = try Realm(configuration: config)
-//            waitForDownloads(for: realm)
-//            // After reopening, the old Realm file should have been moved aside
-//            // and we should now have the data from the server
-//            XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1)
-//            XCTAssertEqual(realm.objects(SwiftPerson.self)[0].firstName, "Paul")
-//        }
-//    }
+    func fix_testFlexibleClientResetManual() throws {
+        try autoreleasepool {
+            let user = try logInUser(for: basicCredentials(app: self.flexibleSyncApp), app: self.flexibleSyncApp)
+            try prepareFlexibleClientReset(user)
+
+            var config = user.flexibleSyncConfiguration(clientResetMode: .manual(assertManualClientReset(user)))
+            config.objectTypes = [SwiftPerson.self]
+
+            guard let syncConfig = config.syncConfiguration else {
+                fatalError("Test condition failure. SyncConfiguration not set.")
+            }
+            switch syncConfig.clientResetMode {
+            case .manual(let block):
+                XCTAssertNotNil(block)
+            default:
+                XCTFail("Should be set to manual")
+            }
+            try autoreleasepool {
+                let realm = try Realm(configuration: config)
+                waitForExpectations(timeout: 15.0)
+                // The locally created object should still be present as we didn't
+                // actually handle the client reset
+                XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1)
+                XCTAssertEqual(realm.objects(SwiftPerson.self)[0].firstName, "John")
+            }
+//            resetSyncManager() Need to reset the syncManager. But path_for_realm is nil when creating new flex config?
+        }
+
+        let user = try logInUser(for: basicCredentials(app: self.flexibleSyncApp), app: self.flexibleSyncApp)
+        var config = user.flexibleSyncConfiguration(clientResetMode: .manual(assertManualClientReset(user)))
+        config.objectTypes = [SwiftPerson.self]
+
+        try autoreleasepool {
+            let realm = try Realm(configuration: config)
+            waitForDownloads(for: realm)
+            // After reopening, the old Realm file should have been moved aside
+            // and we should now have the data from the server
+            XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1)
+            XCTAssertEqual(realm.objects(SwiftPerson.self)[0].firstName, "Paul")
+        }
+    }
 
     func testDefaultClientResetMode() throws {
         let user = try logInUser(for: basicCredentials(app: self.flexibleSyncApp), app: self.flexibleSyncApp)
@@ -1238,6 +1252,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             XCTFail("expected recover mode")
         }
     }
+
 
     // MARK: - Progress notifiers
     func testStreamingDownloadNotifier() throws {

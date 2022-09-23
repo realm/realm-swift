@@ -66,6 +66,7 @@ NSString *RLMRealmPathForFile(NSString *fileName) {
 
 @implementation RLMRealmConfiguration {
     realm::Realm::Config _config;
+    RLMSyncConfiguration *_syncConfiguration;
 }
 
 - (realm::Realm::Config&)configRef {
@@ -361,6 +362,8 @@ static bool isSync(realm::Realm::Config const& config) {
     _config.in_memory = false;
     _config.sync_config = std::make_shared<realm::SyncConfig>(syncConfiguration.rawConfiguration);
     _config.path = syncConfiguration.path;
+    // Assign _syncConfiguration for RLMSyncConfiguration properties that do not exist on the raw sync_config.
+    _syncConfiguration = syncConfiguration;
 
     [self updateSchemaMode];
 }
@@ -369,7 +372,9 @@ static bool isSync(realm::Realm::Config const& config) {
     if (!_config.sync_config) {
         return nil;
     }
-    return [[RLMSyncConfiguration alloc] initWithRawConfig:*_config.sync_config path:_config.path];
+    RLMSyncConfiguration* syncConfig = [[RLMSyncConfiguration alloc] initWithRawConfig:*_config.sync_config path:_config.path];
+    syncConfig.manualClientResetHandler = _syncConfiguration.manualClientResetHandler;
+    return syncConfig;
 }
 
 #else // REALM_ENABLE_SYNC

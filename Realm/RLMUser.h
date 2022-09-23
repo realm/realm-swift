@@ -154,14 +154,10 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Create a flexible sync configuration instance, which can be used to open a Realm that
  supports flexible sync.
-
- @note A single server-side Device Sync App service may connect to only flexible or partition-based realms.
- In order for an application to contain both partition-based and flexible sync realms, more than one
- server-side Device Sync  App service must be used.
  
- @note A single server-side Device Sync App service may connect to only flexible or partition-based realms.
+ @note A single server-side Device Sync App may connect to only flexible or partition-based realms.
  In order for an application to contain both partition-based and flexible sync realms, more than one
- server-side Device Sync  App service must be used.
+ server-side Device Sync  App must be used.
 
  @return A `RLMRealmConfiguration` instance with a flexible sync configuration.
  */
@@ -171,9 +167,9 @@ NS_ASSUME_NONNULL_BEGIN
  Create a flexible sync configuration instance, which can be used to open a Realm that
  supports flexible sync.
  
- @note A single server-side Device Sync App service may connect to only flexible or partition-based realms.
+ @note A single server-side Device Sync App may connect to only flexible or partition-based realms.
  In order for an application to contain both partition-based and flexible sync realms, more than one
- server-side Device Sync  App service must be used.
+ server-side Device Sync  App must be used.
  
  @param clientResetMode Determines file recovery behavior in the event of a client reset.
                         See: https://docs.mongodb.com/realm/sync/error-handling/client-resets/
@@ -189,9 +185,9 @@ NS_ASSUME_NONNULL_BEGIN
  Create a flexible sync configuration instance, which can be used to open a Realm that
  supports flexible sync.
 
- @note A single server-side Device Sync App service may connect to only flexible or partition-based realms.
+ @note A single server-side Device Sync App may connect to only flexible or partition-based realms.
  In order for an application to contain both partition-based and flexible sync realms, more than one
- server-side Device Sync  App service must be used.
+ server-side Device Sync  App must be used.
 
  @param clientResetMode Determines file recovery behavior in the event of a client reset.
                         See: https://docs.mongodb.com/realm/sync/error-handling/client-resets/
@@ -207,9 +203,9 @@ NS_ASSUME_NONNULL_BEGIN
  Create a flexible sync configuration instance, which can be used to open a Realm that
  supports flexible sync.
 
- @note A single server-side Device Sync App service may connect to only flexible or partition-based realms.
+ @note A single server-side Device Sync App may connect to only flexible or partition-based realms.
  In order for an application to contain both partition-based and flexible sync realms, more than one
- server-side Device Sync  App service must be used.
+ server-side Device Sync  App must be used.
 
  @param initialSubscriptions A block which receives a subscription set instance, that can be
                              used to add an initial set of subscriptions which will be executed
@@ -226,20 +222,20 @@ NS_ASSUME_NONNULL_BEGIN
  Create a flexible sync configuration instance, which can be used to open a Realm that
  supports flexible sync.
 
- @note A single server-side Device Sync App service may connect to only flexible or partition-based realms.
+ @note A single server-side Device Sync App may connect to only flexible or partition-based realms.
  In order for an application to contain both partition-based and flexible sync realms, more than one
- server-side Device Sync  App service must be used.
+ server-side Device Sync  App must be used.
 
  @param initialSubscriptions A block which receives a subscription set instance, that can be
                              used to add an initial set of subscriptions which will be executed
                              when the Realm is first opened.
+ @param rerunOnOpen If true, allows to run the initial set of subscriptions specified, on every app startup.
+                    This can be used to re-run dynamic time ranges and other queries that require a
+                    re-computation of a static variable.
  @param clientResetMode Determines file recovery behavior in the event of a client reset.
                         See: https://docs.mongodb.com/realm/sync/error-handling/client-resets/
  @param beforeResetBlock A callback which notifies prior to a client reset occurring. See: `RLMClientResetBeforeBlock`
  @param afterResetBlock A callback which notifies after a client reset has occurred. See: `RLMClientResetAfterBlock`
- @param rerunOnOpen If true, allows to run the initial set of subscriptions specified, on every app startup.
-                    This can be used to re-run dynamic time ranges and other queries that require a
-                    re-computation of a static variable.
 
  @return A `RLMRealmConfiguration` instance with a flexible sync configuration.
  */
@@ -253,20 +249,20 @@ NS_ASSUME_NONNULL_BEGIN
  Create a flexible sync configuration instance, which can be used to open a Realm that
  supports flexible sync.
 
- @note A single server-side Device Sync App service may connect to only flexible or partition-based realms.
+ @note A single server-side Device Sync App may connect to only flexible or partition-based realms.
  In order for an application to contain both partition-based and flexible sync realms, more than one
- server-side Device Sync  App service must be used.
+ server-side Device Sync  App must be used.
 
  @param initialSubscriptions A block which receives a subscription set instance, that can be
                              used to add an initial set of subscriptions which will be executed
                              when the Realm is first opened.
+ @param rerunOnOpen If true, allows to run the initial set of subscriptions specified, on every app startup.
+                    This can be used to re-run dynamic time ranges and other queries that require a
+                    re-computation of a static variable.
  @param clientResetMode Determines file recovery behavior in the event of a client reset.
                         See: https://docs.mongodb.com/realm/sync/error-handling/client-resets/
  @param manualClientResetHandler An error reporting block that is invoked during a client reset.
                                  See `RLMSyncErrorReportingBlock` and `RLMClientResetInfo`
- @param rerunOnOpen If true, allows to run the initial set of subscriptions specified, on every app startup.
-                    This can be used to re-run dynamic time ranges and other queries that require a
-                    re-computation of a static variable.
 
  @return A `RLMRealmConfiguration` instance with a flexible sync configuration.
  */
