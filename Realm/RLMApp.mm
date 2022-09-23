@@ -397,14 +397,14 @@ static std::mutex& s_appMutex = *new std::mutex();
            if (user) {
                [self.authorizationDelegate authenticationDidCompleteWithUser:user];
            } else {
-               [self.authorizationDelegate authenticationDidCompleteWithError:error];
+               [self.authorizationDelegate authenticationDidFailWithError:error];
            }
        }];
 }
 
 - (void)authorizationController:(__unused ASAuthorizationController *)controller
            didCompleteWithError:(NSError *)error API_AVAILABLE(ios(13.0), macos(10.15), tvos(13.0), watchos(6.0)) {
-    [self.authorizationDelegate authenticationDidCompleteWithError:error];
+    [self.authorizationDelegate authenticationDidFailWithError:error];
 }
 
 - (RLMAppSubscriptionToken *)subscribe:(RLMAppNotificationBlock)block {

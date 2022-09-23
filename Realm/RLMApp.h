@@ -184,7 +184,7 @@ API_AVAILABLE(ios(13.0), macos(10.15), tvos(13.0), watchos(6.0))
 
 /// Callback that is invoked should the authentication fail.
 /// @param error An error describing the authentication failure.
-- (void)authenticationDidCompleteWithError:(NSError *)error NS_SWIFT_NAME(authenticationDidComplete(error:));
+- (void)authenticationDidFailWithError:(NSError *)error NS_SWIFT_NAME(authenticationDidComplete(error:));
 
 /// Callback that is invoked should the authentication succeed.
 /// @param user The newly authenticated user.

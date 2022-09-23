@@ -62,20 +62,7 @@ struct DictionaryCallbackWrapper {
 
     }
 
-    void operator()(realm::DictionaryChangeSet const& changes, std::exception_ptr err) {
-        if (err) {
-            previousTransaction->end_read();
-            try {
-                rethrow_exception(err);
-            }
-            catch (...) {
-                NSError *error = nil;
-                RLMRealmTranslateException(&error);
-                block(nil, nil, error);
-                return;
-            }
-        }
-
+    void operator()(realm::DictionaryChangeSet const& changes) {
         if (changes.deletions.empty() &&
             changes.insertions.empty() &&
             changes.modifications.empty()) {

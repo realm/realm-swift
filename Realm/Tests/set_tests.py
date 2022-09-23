@@ -129,11 +129,11 @@ for type in types:
 file = open(os.path.dirname(__file__) + '/PrimitiveSetPropertyTests.tpl.m', 'rt')
 for line in file:
     if not '$' in line:
-        print line,
+        print(line, end='')
         continue
     if '$allSets' in line:
         line = line.replace(' ^n', '\n' + ' ' * (line.find('(') + 4))
-        print '    for (RLMSet *set in allSets) {\n    ' + line.replace('$allSets', 'set') + '    }'
+        print('    for (RLMSet *set in allSets) {\n    ' + line.replace('$allSets', 'set') + '    }')
         continue
 
     filtered_types = types
@@ -150,7 +150,7 @@ for line in file:
 
     for t in filtered_types:
         l = line
-        for k, v in t.iteritems():
+        for k, v in t.items():
             if k in l:
                 l = l.replace('$' + k, v)
-        print l,
+        print(l, end='')

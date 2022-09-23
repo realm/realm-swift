@@ -35,6 +35,8 @@
 
 @property NSString *stringCol;
 
+@property(readonly) NSString *firstLetter;
+
 @end
 
 @interface IntObject : RLMObject

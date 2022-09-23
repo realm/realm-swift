@@ -1308,7 +1308,7 @@
         RLMAssertCount(cls, 3U, @"%K BEGINSWITH[cd] 'U'", colName);
 
         RLMAssertCount(cls, 1U, @"%K BEGINSWITH 'ü'", colName);
-        RLMAssertCount(cls, 0U, @"%K BEGINSWITH[c] 'Ü'", colName);
+        RLMAssertCount(cls, 1U, @"%K BEGINSWITH[c] 'Ü'", colName);
         RLMAssertCount(cls, 3U, @"%K BEGINSWITH[d] 'ü'", colName);
         RLMAssertCount(cls, 3U, @"%K BEGINSWITH[cd] 'Ü'", colName);
 
@@ -1378,7 +1378,7 @@
         RLMAssertCount(cls, 2U, @"%K ENDSWITH[cd] 'U'", colName);
 
         RLMAssertCount(cls, 1U, @"%K ENDSWITH 'ü'", colName);
-        RLMAssertCount(cls, 0U, @"%K ENDSWITH[c] 'Ü'", colName);
+        RLMAssertCount(cls, 1U, @"%K ENDSWITH[c] 'Ü'", colName);
         RLMAssertCount(cls, 2U, @"%K ENDSWITH[d] 'ü'", colName);
         RLMAssertCount(cls, 2U, @"%K ENDSWITH[cd] 'Ü'", colName);
 
@@ -1449,7 +1449,7 @@
         RLMAssertCount(cls, 0U, @"%K CONTAINS[cd] ''", colName);
 
         RLMAssertCount(cls, 1U, @"%K CONTAINS 'ü'", colName);
-        RLMAssertCount(cls, 0U, @"%K CONTAINS[c] 'Ü'", colName);
+        RLMAssertCount(cls, 1U, @"%K CONTAINS[c] 'Ü'", colName);
         RLMAssertCount(cls, 3U, @"%K CONTAINS[d] 'ü'", colName);
         RLMAssertCount(cls, 3U, @"%K CONTAINS[cd] 'Ü'", colName);
 
