@@ -1475,7 +1475,7 @@ static NSString *randomEmail() {
     config = [user configurationWithPartitionValue:partitionValue];
     XCTAssertEqual(config.syncConfiguration.clientResetMode, RLMClientResetModeRecoverUnsyncedChanges);
 
-    RLMSyncErrorReportingBlock block = ^(NSError *error, RLMSyncSession *) {
+    RLMSyncErrorReportingBlock block = ^(NSError *, RLMSyncSession *) {
         XCTFail("Should never hit");
     };
     RLMAssertThrowsWithReason([user configurationWithPartitionValue:partitionValue clientResetMode:RLMClientResetModeDiscardUnsyncedChanges manualClientResetHandler:block], @"A manual client reset handler can only be set with RLMClientResetModeManual");

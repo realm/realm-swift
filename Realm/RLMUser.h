@@ -157,7 +157,7 @@ NS_ASSUME_NONNULL_BEGIN
  
  @note A single server-side Device Sync App may connect to only flexible or partition-based realms.
  In order for an application to contain both partition-based and flexible sync realms, more than one
- server-side Device Sync  App must be used.
+ server-side Device Sync App must be used.
 
  @return A `RLMRealmConfiguration` instance with a flexible sync configuration.
  */
@@ -169,7 +169,7 @@ NS_ASSUME_NONNULL_BEGIN
  
  @note A single server-side Device Sync App may connect to only flexible or partition-based realms.
  In order for an application to contain both partition-based and flexible sync realms, more than one
- server-side Device Sync  App must be used.
+ server-side Device Sync App must be used.
  
  @param clientResetMode Determines file recovery behavior in the event of a client reset.
                         See: https://docs.mongodb.com/realm/sync/error-handling/client-resets/
@@ -187,7 +187,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @note A single server-side Device Sync App may connect to only flexible or partition-based realms.
  In order for an application to contain both partition-based and flexible sync realms, more than one
- server-side Device Sync  App must be used.
+ server-side Device Sync App must be used.
 
  @param clientResetMode Determines file recovery behavior in the event of a client reset.
                         See: https://docs.mongodb.com/realm/sync/error-handling/client-resets/
@@ -205,7 +205,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @note A single server-side Device Sync App may connect to only flexible or partition-based realms.
  In order for an application to contain both partition-based and flexible sync realms, more than one
- server-side Device Sync  App must be used.
+ server-side Device Sync App must be used.
 
  @param initialSubscriptions A block which receives a subscription set instance, that can be
                              used to add an initial set of subscriptions which will be executed
@@ -224,7 +224,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @note A single server-side Device Sync App may connect to only flexible or partition-based realms.
  In order for an application to contain both partition-based and flexible sync realms, more than one
- server-side Device Sync  App must be used.
+ server-side Device Sync App must be used.
 
  @param initialSubscriptions A block which receives a subscription set instance, that can be
                              used to add an initial set of subscriptions which will be executed
@@ -251,7 +251,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @note A single server-side Device Sync App may connect to only flexible or partition-based realms.
  In order for an application to contain both partition-based and flexible sync realms, more than one
- server-side Device Sync  App must be used.
+ server-side Device Sync App must be used.
 
  @param initialSubscriptions A block which receives a subscription set instance, that can be
                              used to add an initial set of subscriptions which will be executed
