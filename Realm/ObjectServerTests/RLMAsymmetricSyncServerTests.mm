@@ -202,13 +202,17 @@ RLM_COLLECTION_TYPE(PersonAsymmetric);
     __block unsigned long count = 0;
     NSDate *waitStart = [NSDate date];
     while (count < expectedCount && ([waitStart timeIntervalSinceNow] > -600.0)) {
+        auto ex = [self expectationWithDescription:@""];
         [collection countWhere:@{}
                     completion:^(NSInteger c, NSError *error) {
             XCTAssertNil(error);
             count = c;
-
+            [ex fulfill];
         }];
-        sleep(5);
+        [self waitForExpectations:@[ex] timeout:5.0];
+        if (count < expectedCount) {
+            sleep(5);
+        }
     }
     XCTAssertEqual(count, expectedCount);
 }
