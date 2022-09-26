@@ -2374,7 +2374,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
                                 upsert:YES
                             completion:^(RLMUpdateResult *result, NSError *error) {
         XCTAssertNotNil(result);
-        XCTAssertNotNil(result.objectId);
+        XCTAssertNotNil(result.documentId);
         XCTAssertEqual(result.modifiedCount, (NSUInteger)0);
         XCTAssertEqual(result.matchedCount, (NSUInteger)0);
         XCTAssertNil(error);
@@ -2388,7 +2388,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
                                 upsert:NO
                             completion:^(RLMUpdateResult *result, NSError *error) {
         XCTAssertNotNil(result);
-        XCTAssertNil(result.objectId);
+        XCTAssertNil(result.documentId);
         XCTAssertEqual(result.modifiedCount, (NSUInteger)1);
         XCTAssertEqual(result.matchedCount, (NSUInteger)1);
         XCTAssertNil(error);
@@ -2401,7 +2401,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
                         updateDocument:@{@"name" : @"scrabby"}
                             completion:^(RLMUpdateResult *result, NSError *error) {
         XCTAssertNotNil(result);
-        XCTAssertNil(result.objectId);
+        XCTAssertNil(result.documentId);
         XCTAssertEqual(result.modifiedCount, (NSUInteger)1);
         XCTAssertEqual(result.matchedCount, (NSUInteger)1);
         XCTAssertNil(error);
@@ -2414,7 +2414,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
                           updateDocument:@{@"name" : @"fred"}
                               completion:^(RLMUpdateResult *result, NSError *error) {
         XCTAssertNotNil(result);
-        XCTAssertNil(result.objectId);
+        XCTAssertNil(result.documentId);
         XCTAssertEqual(result.modifiedCount, (NSUInteger)1);
         XCTAssertEqual(result.matchedCount, (NSUInteger)1);
         XCTAssertNil(error);
@@ -2428,7 +2428,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
                                   upsert:YES
                               completion:^(RLMUpdateResult *result, NSError *error) {
         XCTAssertNotNil(result);
-        XCTAssertNotNil(result.objectId);
+        XCTAssertNotNil(result.documentId);
         XCTAssertEqual(result.modifiedCount, (NSUInteger)0);
         XCTAssertEqual(result.matchedCount, (NSUInteger)0);
         XCTAssertNil(error);
@@ -2442,10 +2442,11 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     RLMMongoDatabase *database = [client databaseWithName:@"test_data"];
     RLMMongoCollection *collection = [database collectionWithName:@"Dog"];
 
-    RLMFindOneAndModifyOptions *findAndModifyOptions = [[RLMFindOneAndModifyOptions alloc] initWithProjection:@{@"name" : @1, @"breed" : @1}
-                                                                                                         sort:@{@"name" : @1, @"breed" : @1}
-                                                                                                       upsert:YES
-                                                                                      shouldReturnNewDocument:YES];
+    RLMFindOneAndModifyOptions *findAndModifyOptions = [[RLMFindOneAndModifyOptions alloc]
+                                                        initWithProjection:@{@"name" : @1, @"breed" : @1}
+                                                        sort:@{@"name" : @1, @"breed" : @1}
+                                                        upsert:YES
+                                                        shouldReturnNewDocument:YES];
 
     XCTestExpectation *findOneAndUpdateExpectation1 = [self expectationWithDescription:@"should find one document and update"];
     [collection findOneAndUpdateWhere:@{@"name" : @"alex"}

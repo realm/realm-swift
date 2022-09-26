@@ -17,16 +17,19 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMUpdateResult_Private.hpp"
-#import "RLMObjectId_Private.hpp"
+
+#import "RLMBSON_Private.hpp"
+#import "RLMUtil.hpp"
 
 @implementation RLMUpdateResult
 
-- (instancetype)initWithUpdateResult:(realm::app::MongoCollection::UpdateResult)UpdateResult {
+- (instancetype)initWithUpdateResult:(realm::app::MongoCollection::UpdateResult)updateResult {
     if (self = [super init]) {
-        _matchedCount = UpdateResult.matched_count;
-        _modifiedCount = UpdateResult.modified_count;
-        if (UpdateResult.upserted_id) {
-            _objectId = [[RLMObjectId alloc] initWithValue:*UpdateResult.upserted_id];
+        _matchedCount = updateResult.matched_count;
+        _modifiedCount = updateResult.modified_count;
+        if (updateResult.upserted_id) {
+            _documentId = RLMConvertBsonToRLMBSON(*updateResult.upserted_id);
+            _objectId = RLMDynamicCast<RLMObjectId>(_documentId);
         }
     }
     return self;
