@@ -121,7 +121,7 @@ xctest() {
     local destination=()
     if [[ $PLATFORM == ios ]]; then
         simulator_id="$(xcrun simctl list devices | grep -v unavailable | grep -m 1 -o '[0-9A-F\-]\{36\}')"
-        xcrun simctl boot "$simulator_id"
+        xcrun simctl boot "$simulator_id" || true
         destination=(-destination "id=$simulator_id")
     elif [[ $PLATFORM == watchos ]]; then
         destination=(-sdk watchsimulator)
