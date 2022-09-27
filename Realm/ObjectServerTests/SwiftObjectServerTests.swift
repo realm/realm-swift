@@ -33,11 +33,13 @@ import RealmTestSupport
 @available(OSX 10.14, *)
 @objc(SwiftObjectServerTests)
 class SwiftObjectServerTests: SwiftSyncTestCase {
-    func setupMongoCollection(user: User, collectionName: String) -> MongoCollection {
+    func setupMongoCollection(user: User, collectionName: String, removeObjects: Bool = true) -> MongoCollection {
         let mongoClient = user.mongoClient("mongodb1")
         let database = mongoClient.database(named: "test_data")
         let collection = database.collection(withName: collectionName)
-        removeAllFromCollection(collection)
+        if removeObjects {
+            removeAllFromCollection(collection)
+        }
         return collection
     }
 
@@ -551,7 +553,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
     }
 
-    func assertManualClientReset(_ user: User) -> ErrorReportingBlock {
+    func assertManualClientReset(_ user: User, flexibleSync: Bool = false) -> ErrorReportingBlock {
         let ex = self.expectation(description: "get client reset error")
         return { error, session in
             guard let error = error as? SyncError else {
@@ -566,7 +568,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 XCTAssertNotNil(error.clientResetInfo())
                 return
             }
-            XCTAssertTrue(resetInfo.0.contains("mongodb-realm/\(self.appId)/recovered-realms/recovered_realm"))
+            let xyz = flexibleSync ? self.flexibleSyncAppId : self.appId
+            XCTAssertTrue(resetInfo.0.contains("mongodb-realm/\(xyz)/recovered-realms/recovered_realm"))
             ex.fulfill()
         }
     }
@@ -685,7 +688,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
 
         let user = try logInUser(for: creds)
-        var configuration = user.configuration(partitionValue: #function)
+        var configuration = user.configuration(partitionValue: #function, clientResetMode: .manual())
         configuration.objectTypes = [SwiftPerson.self]
 
         try autoreleasepool {
@@ -1070,7 +1073,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             XCTAssertEqual(subscriptions.count, 1) // subscription created during prepareFlexibleSyncClientReset
             XCTAssertEqual(subscriptions.first?.name, "all_people")
 
-            waitForExpectations(timeout: 15.0)
+            waitForExpectations(timeout: 15.0) // wait for expectations in assertRecover
             XCTAssertEqual(realm.objects(SwiftPerson.self).count, 2)
             // The object created locally (John) and the object created on the server (Paul)
             // should both be integrated into the new realm file.
@@ -1193,11 +1196,12 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
     // A stray session is left during teardown. Can't find out where.
     func fix_testFlexibleClientResetManual() throws {
+        let credentials =  basicCredentials(app: self.flexibleSyncApp)
         try autoreleasepool {
-            let user = try logInUser(for: basicCredentials(app: self.flexibleSyncApp), app: self.flexibleSyncApp)
+            let user = try logInUser(for: credentials, app: self.flexibleSyncApp)
             try prepareFlexibleClientReset(user)
 
-            var config = user.flexibleSyncConfiguration(clientResetMode: .manual(assertManualClientReset(user)))
+            var config = user.flexibleSyncConfiguration(clientResetMode: .manual(assertManualClientReset(user, flexibleSync: true)))
             config.objectTypes = [SwiftPerson.self]
 
             guard let syncConfig = config.syncConfiguration else {
@@ -1217,16 +1221,20 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1)
                 XCTAssertEqual(realm.objects(SwiftPerson.self)[0].firstName, "John")
             }
-//            resetSyncManager() Need to reset the syncManager. But path_for_realm is nil when creating new flex config?
+            self.flexibleSyncApp.syncManager.waitForSessionTermination()
+            resetSyncManager() // sets m_file_manager to nullptr, causes 1235 exception
         }
 
-        let user = try logInUser(for: basicCredentials(app: self.flexibleSyncApp), app: self.flexibleSyncApp)
-        var config = user.flexibleSyncConfiguration(clientResetMode: .manual(assertManualClientReset(user)))
+        let user = try logInUser(for: credentials, app: self.flexibleSyncApp)
+        var config = user.flexibleSyncConfiguration(clientResetMode: .manual())
         config.objectTypes = [SwiftPerson.self]
 
         try autoreleasepool {
             let realm = try Realm(configuration: config)
+            let subscriptions = realm.subscriptions
+            XCTAssertEqual(subscriptions.count, 1)
             waitForDownloads(for: realm)
+
             // After reopening, the old Realm file should have been moved aside
             // and we should now have the data from the server
             XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1)
@@ -1252,7 +1260,6 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             XCTFail("expected recover mode")
         }
     }
-
 
     // MARK: - Progress notifiers
     func testStreamingDownloadNotifier() throws {

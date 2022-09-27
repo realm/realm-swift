@@ -79,7 +79,7 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
 
     public func openRealm<T: BSON>(partitionValue: T,
                                    user: User,
-                                   clientResetMode: ClientResetMode? = nil,
+                                   clientResetMode: ClientResetMode? = .recoverUnsyncedChanges(),
                                    file: StaticString = #file,
                                    line: UInt = #line) throws -> Realm {
         let config: Realm.Configuration

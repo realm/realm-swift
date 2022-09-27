@@ -155,7 +155,7 @@ NS_ASSUME_NONNULL_BEGIN
  Create a flexible sync configuration instance, which can be used to open a Realm that
  supports flexible sync.
  
- @note A single server-side Device Sync App may connect to only flexible or partition-based realms.
+ @note A single server-side Device Sync App can sync data with either partition-based realms or flexible sync based realms.
  In order for an application to contain both partition-based and flexible sync realms, more than one
  server-side Device Sync App must be used.
 
@@ -167,7 +167,7 @@ NS_ASSUME_NONNULL_BEGIN
  Create a flexible sync configuration instance, which can be used to open a Realm that
  supports flexible sync.
  
- @note A single server-side Device Sync App may connect to only flexible or partition-based realms.
+ @note A single server-side Device Sync App can sync data with either partition-based realms or flexible sync based realms.
  In order for an application to contain both partition-based and flexible sync realms, more than one
  server-side Device Sync App must be used.
  
@@ -185,7 +185,7 @@ NS_ASSUME_NONNULL_BEGIN
  Create a flexible sync configuration instance, which can be used to open a Realm that
  supports flexible sync.
 
- @note A single server-side Device Sync App may connect to only flexible or partition-based realms.
+ @note A single server-side Device Sync App can sync data with either partition-based realms or flexible sync based realms.
  In order for an application to contain both partition-based and flexible sync realms, more than one
  server-side Device Sync App must be used.
 
@@ -203,7 +203,7 @@ NS_ASSUME_NONNULL_BEGIN
  Create a flexible sync configuration instance, which can be used to open a Realm that
  supports flexible sync.
 
- @note A single server-side Device Sync App may connect to only flexible or partition-based realms.
+ @note A single server-side Device Sync App can sync data with either partition-based realms or flexible sync based realms.
  In order for an application to contain both partition-based and flexible sync realms, more than one
  server-side Device Sync App must be used.
 
@@ -222,7 +222,7 @@ NS_ASSUME_NONNULL_BEGIN
  Create a flexible sync configuration instance, which can be used to open a Realm that
  supports flexible sync.
 
- @note A single server-side Device Sync App may connect to only flexible or partition-based realms.
+ @note A single server-side Device Sync App can sync data with either partition-based realms or flexible sync based realms.
  In order for an application to contain both partition-based and flexible sync realms, more than one
  server-side Device Sync App must be used.
 
@@ -249,7 +249,7 @@ NS_ASSUME_NONNULL_BEGIN
  Create a flexible sync configuration instance, which can be used to open a Realm that
  supports flexible sync.
 
- @note A single server-side Device Sync App may connect to only flexible or partition-based realms.
+ @note A single server-side Device Sync App can sync data with either partition-based realms or flexible sync based realms.
  In order for an application to contain both partition-based and flexible sync realms, more than one
  server-side Device Sync App must be used.
 

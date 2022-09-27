@@ -9,7 +9,7 @@ x.y.z Release notes (yyyy-MM-dd)
     attempt to integrate the server state with any local changes from before the
     client reset occurred.
     The changes are integrated with the following rules:
-    1. Objects created locally not synced before client reset, will be integrated.
+    1. Objects created locally that were not synced before client reset, will be integrated.
     2. If an object has been deleted on the server, but was modified on the client, the delete takes precedence and the update is discarded.
     3. If an object was deleted on the client, but not the server, then the client delete instruction is applied.
     4. In the case of conflicting updates to the same field, the client update is applied.
