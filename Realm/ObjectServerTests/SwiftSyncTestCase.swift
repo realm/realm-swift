@@ -243,6 +243,17 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
         }
     }
 
+    public func updateAllPeopleSubscription(_ subscriptions: SyncSubscriptionSet) {
+        let expectation = expectation(description: "register subscription")
+        subscriptions.update {
+            subscriptions.append(QuerySubscription<SwiftPerson>(name: "all_people"))
+        } onComplete: { error in
+            XCTAssertNil(error)
+            expectation.fulfill()
+        }
+        wait(for: [expectation], timeout: 15.0)
+    }
+
     public func writeToFlxRealm(_ block: @escaping (Realm) throws -> Void) throws {
         let realm = try flexibleSyncRealm()
         let subscriptions = realm.subscriptions

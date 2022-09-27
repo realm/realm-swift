@@ -423,6 +423,10 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         XCTAssertTrue(FileManager.default.fileExists(atPath: path))
     }
 
+    // After restarting sync, the sync history translator service needs time
+    // to resynthesize the new history from existing objects on the server
+    // This method waits for the realm to receive "Paul" from the server
+    // as confirmation.
     func waitForServerHistoryAfterRestart(realm: Realm) {
         let start = Date()
         while realm.isEmpty && start.timeIntervalSinceNow > -60.0 {
@@ -494,14 +498,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             configuration.objectTypes = [SwiftPerson.self]
             let realm = try Realm(configuration: configuration)
             let subscriptions = realm.subscriptions
-            let expectation = expectation(description: "register subscription")
-            subscriptions.update {
-                subscriptions.append(QuerySubscription<SwiftPerson>(name: "all_people"))
-            } onComplete: { error in
-                XCTAssertNil(error)
-                expectation.fulfill()
-            }
-            wait(for: [expectation], timeout: 15.0)
+            updateAllPeopleSubscription(subscriptions)
         }
 
         // Create an object on the server which should be present after client reset
@@ -546,9 +543,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             let newRealm = try Realm(configuration: newConfig)
 
             let subscriptions = newRealm.subscriptions
-            subscriptions.update {
-                subscriptions.append(QuerySubscription<SwiftPerson>(name: "all_people"))
-            }
+            updateAllPeopleSubscription(subscriptions)
             waitForServerHistoryAfterRestart(realm: newRealm)
         }
     }
@@ -568,8 +563,10 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 XCTAssertNotNil(error.clientResetInfo())
                 return
             }
-            let xyz = flexibleSync ? self.flexibleSyncAppId : self.appId
-            XCTAssertTrue(resetInfo.0.contains("mongodb-realm/\(xyz)/recovered-realms/recovered_realm"))
+            let id = flexibleSync ? self.flexibleSyncAppId : self.appId
+            XCTAssertTrue(resetInfo.0.contains("mongodb-realm/\(id)/recovered-realms/recovered_realm"))
+            let manager = flexibleSync ? self.flexibleSyncApp.syncManager : self.app.syncManager
+            SyncSession.immediatelyHandleError(resetInfo.1, syncManager: manager)
             ex.fulfill()
         }
     }
@@ -642,8 +639,6 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1)
                 XCTAssertEqual(realm.objects(SwiftPerson.self)[0].firstName, "John")
             }
-            syncManager.waitForSessionTermination()
-            resetSyncManager()
         }
 
         let user = try logInUser(for: creds)
@@ -684,7 +679,6 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1)
                 XCTAssertEqual(realm.objects(SwiftPerson.self)[0].firstName, "John")
             }
-            resetSyncManager()
         }
 
         let user = try logInUser(for: creds)
@@ -717,13 +711,12 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
             try autoreleasepool {
                 let realm = try Realm(configuration: configuration)
-                waitForExpectations(timeout: 15.0)
+                waitForExpectations(timeout: 15.0) // Wait for expectations in asssertManualClientReset
                 // The locally created object should still be present as we didn't
                 // actually handle the client reset
                 XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1)
                 XCTAssertEqual(realm.objects(SwiftPerson.self)[0].firstName, "John")
             }
-            resetSyncManager()
         }
 
         let user = try logInUser(for: creds)
@@ -775,41 +768,6 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1)
                 XCTAssertEqual(realm.objects(SwiftPerson.self)[0].firstName, "John")
             }
-            resetSyncManager()
-        }
-
-        let user = try logInUser(for: creds)
-        var configuration = user.configuration(partitionValue: #function)
-        configuration.objectTypes = [SwiftPerson.self]
-
-        try autoreleasepool {
-            let realm = try Realm(configuration: configuration)
-            waitForDownloads(for: realm)
-            // After reopening, the old Realm file should have been moved aside
-            // and we should now have the data from the server
-            XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1)
-            XCTAssertEqual(realm.objects(SwiftPerson.self)[0].firstName, "Paul")
-        }
-    }
-
-    func testClientResetManualNoCallbacks() throws {
-        let creds = basicCredentials()
-        try autoreleasepool {
-            let user = try logInUser(for: creds)
-            try prepareClientReset(#function, user)
-
-            // No callback is passed into enum `.manual`, and no syncManager.errorHandler exists
-            var configuration = user.configuration(partitionValue: #function, clientResetMode: .manual())
-            configuration.objectTypes = [SwiftPerson.self]
-
-            try autoreleasepool {
-                let realm = try Realm(configuration: configuration)
-                // The locally created object should still be present as we didn't
-                // actually handle the client reset
-                XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1)
-                XCTAssertEqual(realm.objects(SwiftPerson.self)[0].firstName, "John")
-            }
-            resetSyncManager()
         }
 
         let user = try logInUser(for: creds)
@@ -1195,7 +1153,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     }
 
     // A stray session is left during teardown. Can't find out where.
-    func fix_testFlexibleClientResetManual() throws {
+    func testFlexibleClientResetManual() throws {
         let credentials =  basicCredentials(app: self.flexibleSyncApp)
         try autoreleasepool {
             let user = try logInUser(for: credentials, app: self.flexibleSyncApp)
@@ -1204,10 +1162,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             var config = user.flexibleSyncConfiguration(clientResetMode: .manual(assertManualClientReset(user, flexibleSync: true)))
             config.objectTypes = [SwiftPerson.self]
 
-            guard let syncConfig = config.syncConfiguration else {
-                fatalError("Test condition failure. SyncConfiguration not set.")
-            }
-            switch syncConfig.clientResetMode {
+            switch config.syncConfiguration!.clientResetMode {
             case .manual(let block):
                 XCTAssertNotNil(block)
             default:
@@ -1221,8 +1176,6 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1)
                 XCTAssertEqual(realm.objects(SwiftPerson.self)[0].firstName, "John")
             }
-            self.flexibleSyncApp.syncManager.waitForSessionTermination()
-            resetSyncManager() // sets m_file_manager to nullptr, causes 1235 exception
         }
 
         let user = try logInUser(for: credentials, app: self.flexibleSyncApp)
@@ -1232,6 +1185,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         try autoreleasepool {
             let realm = try Realm(configuration: config)
             let subscriptions = realm.subscriptions
+            updateAllPeopleSubscription(subscriptions)
             XCTAssertEqual(subscriptions.count, 1)
             waitForDownloads(for: realm)
 
