@@ -292,8 +292,16 @@ NSError *RLMTranslateSyncError(SyncError error) {
     RLMSyncErrorReportingBlock resetHandler = self.manualClientResetHandler;
     _config->error_handler = [weakManager, resetHandler](std::shared_ptr<SyncSession> errored_session, SyncError error) {
         RLMSyncErrorReportingBlock errorHandler;
-        @autoreleasepool {
-            errorHandler = weakManager.errorHandler;
+        if (error.is_client_reset_requested()) {
+            errorHandler = resetHandler;
+        }
+        if (!errorHandler) {
+            @autoreleasepool {
+                errorHandler = weakManager.errorHandler;
+            }
+        }
+        if (!errorHandler) {
+            return;
         }
         NSError *nsError = RLMTranslateSyncError(std::move(error));
         if (!nsError) {
