@@ -8,6 +8,8 @@ The prebuilt binary for Carthage is now build with Xcode 14.0.1.
 
 ### Fixed
 * Setting a `List` property with `Results` no longer throws an unrecognized selector exception (since 10.8.0-beta.2)
+* Do not show an error message in cases where `RLMProgressNotificationToken` session is already deallocated ([#7831](https://github.com/realm/realm-swift/issues/7831),
+  since v2.3.0).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
@@ -337,8 +339,6 @@ The prebuilt binary for Carthage is now build with Xcode 14.0.1.
   such as `mixed.hpp:165: [realm-core-12.1.0] Assertion failed: m_type` when
   removing the destination link object.
   ([Core #5574](https://github.com/realm/realm-core/pull/5573), since the introduction of AnyRealmValue in v10.8.0)
-* Do not show an error message in cases where `RLMProgressNotificationToken` session is already deallocated ([#7831](https://github.com/realm/realm-swift/issues/7831),
-  since v2.3.0).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 

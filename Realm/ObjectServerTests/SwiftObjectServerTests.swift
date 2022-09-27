@@ -741,11 +741,11 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         XCTAssert(downloadCount > 1)
         XCTAssert(uploadCount > 1)
 
-        downloadCount = 0
-        uploadCount = 0
-
         tokenDownload!.invalidate()
         tokenUpload!.invalidate()
+
+        downloadCount = 0
+        uploadCount = 0
 
         executeChild()
         waitForDownloads(for: realm)
