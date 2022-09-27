@@ -1152,7 +1152,6 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         try waitForEditRecoveryMode(flexibleSync: true, appId: self.flexibleSyncAppId, disable: false)
     }
 
-    // A stray session is left during teardown. Can't find out where.
     func testFlexibleClientResetManual() throws {
         let credentials =  basicCredentials(app: self.flexibleSyncApp)
         try autoreleasepool {
