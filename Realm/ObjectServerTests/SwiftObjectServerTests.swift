@@ -702,6 +702,63 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         XCTAssert(transferred >= transferrable)
     }
 
+    func testStreamingNotifierInvalidate() throws {
+        let user = try logInUser(for: basicCredentials())
+        if !isParent {
+            let config = user.configuration(testName: #function)
+            let realm = try openRealm(configuration: config)
+            try realm.write {
+                for _ in 0..<SwiftSyncTestCase.bigObjectCount {
+                    realm.add(SwiftHugeSyncObject.create())
+                }
+            }
+            waitForUploads(for: realm)
+            return
+        }
+
+        let realm = try immediatelyOpenRealm(partitionValue: #function, user: user)
+        guard let session = realm.syncSession else {
+            XCTFail("Session must not be nil")
+            return
+
+        }
+        var downloadCount = 0
+        var uploadCount = 0
+        let tokenDownload = session.addProgressNotification(for: .download, mode: .reportIndefinitely) { _ in
+            downloadCount += 1
+        }
+        let tokenUpload = session.addProgressNotification(for: .upload, mode: .reportIndefinitely) { _ in
+            uploadCount += 1
+        }
+
+        executeChild()
+        waitForDownloads(for: realm)
+        try realm.write {
+            realm.add(SwiftHugeSyncObject.create())
+        }
+        waitForUploads(for: realm)
+
+        XCTAssert(downloadCount > 1)
+        XCTAssert(uploadCount > 1)
+
+        downloadCount = 0
+        uploadCount = 0
+
+        tokenDownload!.invalidate()
+        tokenUpload!.invalidate()
+
+        executeChild()
+        waitForDownloads(for: realm)
+        try realm.write {
+            realm.add(SwiftHugeSyncObject.create())
+        }
+        waitForUploads(for: realm)
+
+        // We check that the notification block is not called after we reset the counters on the notifiers and call invalidated().
+        XCTAssertEqual(downloadCount, 0)
+        XCTAssertEqual(uploadCount, 0)
+    }
+
     // MARK: - Download Realm
 
     func testDownloadRealm() throws {
