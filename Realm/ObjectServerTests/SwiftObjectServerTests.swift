@@ -33,13 +33,11 @@ import RealmTestSupport
 @available(OSX 10.14, *)
 @objc(SwiftObjectServerTests)
 class SwiftObjectServerTests: SwiftSyncTestCase {
-    func setupMongoCollection(user: User, collectionName: String, removeObjects: Bool = true) -> MongoCollection {
+    func setupMongoCollection(user: User, collectionName: String) -> MongoCollection {
         let mongoClient = user.mongoClient("mongodb1")
         let database = mongoClient.database(named: "test_data")
         let collection = database.collection(withName: collectionName)
-        if removeObjects {
-            removeAllFromCollection(collection)
-        }
+        removeAllFromCollection(collection)
         return collection
     }
 

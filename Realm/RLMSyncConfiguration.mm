@@ -307,22 +307,12 @@ NSError *RLMTranslateSyncError(SyncError error) {
         if (!nsError) {
             return;
         }
-        if (!errorHandler && !resetHandler) {
-            return;
-        } else if (!errorHandler && nsError.code != RLMSyncErrorClientResetError) {
-            return;
-        }
-
         RLMSyncSession *session = [[RLMSyncSession alloc] initWithSyncSession:errored_session];
         dispatch_async(dispatch_get_main_queue(), ^{
             // Keep the SyncSession alive until the callback completes as
             // RLMSyncSession only holds a weak reference
             static_cast<void>(errored_session);
-            if (resetHandler && nsError.code == RLMSyncErrorClientResetError) {
-                resetHandler(nsError, session);
-            } else {
-                errorHandler(nsError, session);
-            }
+            errorHandler(nsError, session);
         });
     };
 };
