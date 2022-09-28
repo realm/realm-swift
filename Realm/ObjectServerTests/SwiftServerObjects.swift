@@ -172,3 +172,35 @@ public class SwiftHugeSyncObject: Object {
         return SwiftHugeSyncObject(value: ["data": Data(repeating: 16, count: fakeDataSize)])
     }
 }
+
+public let customColumnPropertiesMapping: [String: String] = ["id": "_id",
+                                                              "boolCol": "custom_boolCol",
+                                                              "intCol": "custom_intCol",
+                                                              "doubleCol": "custom_doubleCol",
+                                                              "stringCol": "custom_stringCol",
+                                                              "binaryCol": "custom_binaryCol",
+                                                              "dateCol": "custom_dateCol",
+                                                              "longCol": "custom_longCol",
+                                                              "decimalCol": "custom_decimalCol",
+                                                              "uuidCol": "custom_uuidCol",
+                                                              "objectIdCol": "custom_objectIdCol",
+                                                              "objectCol": "custom_objectCol"]
+
+public class SwiftCustomColumnObject: Object {
+    @Persisted(primaryKey: true) public var id: ObjectId
+    @Persisted public var boolCol: Bool = true
+    @Persisted public var intCol: Int = 1
+    @Persisted public var doubleCol: Double = 1.1
+    @Persisted public var stringCol: String = "string"
+    @Persisted public var binaryCol = "string".data(using: String.Encoding.utf8)!
+    @Persisted public var dateCol: Date = Date(timeIntervalSince1970: -1)
+    @Persisted public var longCol: Int64 = 1
+    @Persisted public var decimalCol: Decimal128 = Decimal128(1)
+    @Persisted public var uuidCol: UUID = UUID(uuidString: "85d4fbee-6ec6-47df-bfa1-615931903d7e")!
+    @Persisted public var objectIdCol: ObjectId?
+    @Persisted public var objectCol: SwiftCustomColumnObject?
+
+    override class public func propertiesMapping() -> [String: String] {
+        customColumnPropertiesMapping
+    }
+}

@@ -417,7 +417,7 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
             @throw RLMException(@"Cannot distinct on keypath '%@': KVC collection operators are not supported.", keyPath);
         }
     }
-    
+
     return translateRLMResultsErrors([&] {
         if (_results.get_mode() == Results::Mode::Empty) {
             return self;
@@ -466,15 +466,8 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
 }
 
 - (id)averageOfProperty:(NSString *)property {
-    if (_results.get_mode() == Results::Mode::Empty) {
-        return nil;
-    }
-    ColKey column;
-    if (self.type == RLMPropertyTypeObject || ![property isEqualToString:@"self"]) {
-        column = _info->tableColumn(property);
-    }
-    auto value = translateRLMResultsErrors([&] { return _results.average(column); }, @"averageOfProperty");
-    return value ? RLMMixedToObjc(*value) : nil;
+    return [self aggregate:property method:&Results::average
+                methodName:@"averageOfProperty" returnNilForEmpty:YES];
 }
 
 - (RLMSectionedResults *)sectionedResultsSortedUsingKeyPath:(NSString *)keyPath

@@ -20,7 +20,7 @@
 
 #import "RLMAccessor.hpp"
 #import "RLMObject_Private.hpp"
-#import "RLMProperty.h"
+#import "RLMProperty_Private.h"
 #import "RLMUtil.hpp"
 
 #import <realm/object-store/object.hpp>
@@ -71,7 +71,7 @@ public:
     ManagedSwiftValueStorage(RLMObjectBase *obj, RLMProperty *prop)
     : _realm(obj->_realm)
     , _object(obj->_realm->_realm, *obj->_info->objectSchema, obj->_row)
-    , _propertyName(prop.name.UTF8String)
+    , _propertyName(prop.columnName.UTF8String)
     , _ctx(*obj->_info)
     {
     }

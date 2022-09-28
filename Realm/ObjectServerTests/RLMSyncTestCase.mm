@@ -664,7 +664,7 @@ static NSURL *syncDirectoryForChildProcess() {
         }
         else {
             NSError *error;
-            _flexibleSyncAppId = [RealmServer.shared createAppWithQueryableFields:@[@"age", @"breed", @"partition", @"firstName", @"boolCol", @"intCol", @"stringCol", @"dateCol", @"lastName"] error:&error];
+            _flexibleSyncAppId = [RealmServer.shared createAppWithQueryableFields:@[@"age", @"breed", @"partition", @"firstName", @"boolCol", @"intCol", @"stringCol", @"dateCol", @"lastName", @"_id"] error:&error];
             if (error) {
                 NSLog(@"Failed to create app: %@", error);
                 abort();

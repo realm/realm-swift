@@ -38,6 +38,9 @@ FOUNDATION_EXTERN void RLMInitializeWithValue(RLMObjectBase *, id, RLMSchema *);
 + (nullable NSArray<RLMProperty *> *)_getProperties;
 + (bool)_realmIgnoreClass;
 
+// This enables to override the propertiesMapping in Swift, it is not to be used in Objective-C API.
++ (NSDictionary<NSString *, NSString *> *)propertiesMapping;
+
 @end
 
 @interface RLMDynamicObject : RLMObject

@@ -1279,4 +1279,144 @@ class MigrationTests: TestCase {
 
         class_replaceMethod(metaClass, #selector(RLMObjectBase.sharedSchema), originalImp!, "@@:")
     }
+
+    func testObjectWithCustomColumnNames() {
+        autoreleasepool {
+            let realm = try! Realm()
+            try! realm.write {
+                let object = ModernCustomObject()
+                object.intCol = 123
+                object.anyCol = .int(456)
+                object.intEnumCol = .value3
+                let linkedObject = ModernCustomObject()
+                linkedObject.intCol = 789
+                object.objectCol = linkedObject
+                object.arrayCol.append(linkedObject)
+                object.setCol.insert(linkedObject)
+                object.mapCol["key"] = linkedObject
+                let embeddedObject = EmbeddedModernCustomObject()
+                embeddedObject.intCol = 102
+                object.embeddedObject = embeddedObject
+                realm.add(object)
+            }
+            XCTAssertEqual(realm.objects(ModernCustomObject.self).count, 2)
+        }
+
+        migrateAndTestDefaultRealm { migration, _ in
+            var checkOnce = false
+            migration.enumerateObjects(ofType: "ModernCustomObject", { oldObj, newObj in
+                guard !checkOnce else { return }
+                XCTAssertEqual((oldObj!["custom_intCol"] as! Int), 123)
+                XCTAssertEqual((newObj!["intCol"] as! Int), 123)
+
+                let anyValue = AnyRealmValue.int(456)
+                XCTAssertEqual(((oldObj!["custom_anyCol"] as! Int)), anyValue.intValue)
+                XCTAssertEqual(((newObj!["anyCol"] as! Int)), anyValue.intValue)
+
+                XCTAssertEqual(((oldObj!["custom_intEnumCol"] as! Int)), ModernIntEnum.value3.rawValue)
+                XCTAssertEqual(((newObj!["intEnumCol"] as! Int)), ModernIntEnum.value3.rawValue)
+
+                XCTAssertEqual(((oldObj!["custom_objectCol"] as! MigrationObject)["custom_intCol"] as! Int), 789)
+                XCTAssertEqual(((newObj!["objectCol"] as! MigrationObject)["intCol"] as! Int), 789)
+
+                XCTAssertEqual((oldObj!["custom_arrayCol"] as! List<MigrationObject>).count, 1)
+                XCTAssertEqual(((oldObj!["custom_arrayCol"] as! List<MigrationObject>)[0]["custom_intCol"] as! Int), 789)
+                XCTAssertEqual((newObj!["arrayCol"] as! List<MigrationObject>).count, 1)
+                XCTAssertEqual(((newObj!["arrayCol"] as! List<MigrationObject>)[0]["intCol"] as! Int), 789)
+
+                XCTAssertEqual((oldObj!["custom_setCol"] as! MutableSet<MigrationObject>).count, 1)
+                XCTAssertEqual(((oldObj!["custom_setCol"] as! MutableSet<MigrationObject>)[0]["custom_intCol"] as! Int), 789)
+                XCTAssertEqual((newObj!["setCol"] as! MutableSet<MigrationObject>).count, 1)
+                XCTAssertEqual(((newObj!["setCol"] as! MutableSet<MigrationObject>)[0]["intCol"] as! Int), 789)
+
+                XCTAssertEqual((oldObj!["custom_mapCol"] as! Map<String, MigrationObject?>).count, 1)
+                XCTAssertEqual(((oldObj!["custom_mapCol"] as! Map<String, MigrationObject?>)["key"]?!["custom_intCol"] as! Int), 789)
+                XCTAssertEqual((newObj!["mapCol"] as! Map<String, MigrationObject?>).count, 1)
+                XCTAssertEqual(((newObj!["mapCol"] as! Map<String, MigrationObject?>)["key"]?!["intCol"] as! Int), 789)
+
+                XCTAssertEqual(((oldObj!["custom_embeddedObject"] as! MigrationObject)["custom_intCol"] as! Int), 102)
+                XCTAssertEqual(((newObj!["embeddedObject"] as! MigrationObject)["intCol"] as! Int), 102)
+                checkOnce = true
+            })
+        }
+
+        // refresh to update realm
+        try! Realm().refresh()
+
+        // check edited values
+        let realm = try! Realm()
+        let object = realm.objects(ModernCustomObject.self).first!
+        XCTAssertEqual(object.intCol, 123)
+        XCTAssertEqual(object.anyCol, .int(456))
+        XCTAssertEqual(object.intEnumCol, .value3)
+        XCTAssertEqual(object.objectCol!.intCol, 789)
+        XCTAssertEqual(object.arrayCol.count, 1)
+        XCTAssertEqual(object.arrayCol[0].intCol, 789)
+        XCTAssertEqual(object.setCol.count, 1)
+        XCTAssertEqual(object.setCol[0].intCol, 789)
+        XCTAssertEqual(object.mapCol.count, 1)
+        XCTAssertEqual(object.mapCol["key"]!?.intCol, 789)
+        XCTAssertEqual(object.embeddedObject?.intCol, 102)
+        XCTAssertEqual(realm.objects(ModernCustomObject.self).count, 2)
+    }
+
+    func testCustomColumnDataAfterMigrationRealm() {
+        autoreleasepool {
+            let realm = try! Realm()
+            try! realm.write {
+                let object = ModernCustomObject()
+                object.intCol = 123
+                object.anyCol = .int(456)
+                object.intEnumCol = .value3
+                let linkedObject = ModernCustomObject()
+                linkedObject.intCol = 789
+                object.objectCol = linkedObject
+                object.setCol.insert(linkedObject)
+                object.mapCol["key"] = linkedObject
+                let embeddedObject = EmbeddedModernCustomObject()
+                embeddedObject.intCol = 102
+                object.embeddedObject = embeddedObject
+                realm.add(object)
+            }
+        }
+
+        let config = Realm.Configuration(fileURL: defaultRealmURL(),
+                                         schemaVersion: 1)
+        let realm = try! Realm(configuration: config)
+        XCTAssertEqual(realm.objects(ModernCustomObject.self).count, 2)
+    }
+
+    func testCustomColumnRenamePropertyToCustom() {
+        autoreleasepool {
+            let prop = RLMProperty(name: "before_intCol", type: .int, objectClassName: nil,
+                                   linkOriginPropertyName: nil, indexed: false, optional: false)
+            prop.columnName = "custom_before_intCol"
+            autoreleasepool {
+                let realm = realmWithSingleClassProperties(defaultRealmURL(), className: "ModernCustomObject",
+                                                           properties: [prop])
+                try! realm.transaction {
+                    realm.createObject("ModernCustomObject", withValue: [123])
+                }
+            }
+
+            migrateAndTestDefaultRealm { migration, _ in
+                XCTAssertEqual(migration.oldSchema.objectSchema[0].properties.count, 1)
+                migration.renameProperty(onType: "ModernCustomObject", from: "custom_before_intCol",
+                                         to: "custom_intCol")
+            }
+
+            let dynamicRealm = dynamicRealm(defaultRealmURL())
+            XCTAssertEqual(dynamicRealm.schema.schema(forClassName: "ModernCustomObject")!.properties.count, 12)
+            XCTAssertEqual(1, dynamicRealm.allObjects("ModernCustomObject").count)
+            XCTAssertEqual(123, dynamicRealm.allObjects("ModernCustomObject").firstObject()?["custom_intCol"] as? Int)
+
+            let configuration = RLMRealmConfiguration()
+            configuration.fileURL = defaultRealmURL()
+            configuration.schemaVersion = 1
+            let realm = try! RLMRealm(configuration: configuration)
+            XCTAssertEqual(realm.schema.schema(forClassName: "ModernCustomObject")!.properties.count, 12)
+            XCTAssertEqual(1, realm.allObjects("ModernCustomObject").count)
+            XCTAssertEqual(123, realm.allObjects("ModernCustomObject").firstObject()?["intCol"] as? Int)
+        }
+    }
 }

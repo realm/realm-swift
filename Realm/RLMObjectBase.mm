@@ -361,6 +361,11 @@ id RLMCreateManagedAccessor(Class cls, RLMClassInfo *info) {
     return false;
 }
 
+// This enables to override the propertiesMapping in Swift, it is not to be used in Objective-C API.
++ (NSDictionary *)propertiesMapping {
+    return @{};
+}
+
 - (id)mutableArrayValueForKey:(NSString *)key {
     id obj = [self valueForKey:key];
     if ([obj isKindOfClass:[RLMArray class]]) {

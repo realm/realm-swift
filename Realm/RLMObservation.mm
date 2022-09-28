@@ -571,7 +571,7 @@ static KeyPath keyPathFromString(RLMRealm *realm,
         TableKey tk = info->objectSchema->table_key;
         ColKey ck;
         if (property.type == RLMPropertyTypeObject) {
-            ck = info->tableColumn(property.columnName);
+            ck = info->tableColumn(property.name);
             info = &realm->_info[property.objectClassName];
             rlmObjectSchema = schema[property.objectClassName];
         } else if (property.type == RLMPropertyTypeLinkingObjects) {
@@ -579,7 +579,7 @@ static KeyPath keyPathFromString(RLMRealm *realm,
             info = &realm->_info[property.objectClassName];
             rlmObjectSchema = schema[property.objectClassName];
         } else {
-            ck = info->tableColumn(property.columnName);
+            ck = info->tableColumn(property.name);
         }
 
         keyPairs.push_back(std::make_pair(tk, ck));

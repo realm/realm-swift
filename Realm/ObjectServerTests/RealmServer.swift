@@ -128,13 +128,13 @@ private extension ObjectSchema {
         // First pass we only add the properties to the schema as we can't add
         // links until the targets of the links exist.
         let pk = primaryKeyProperty!
-        stitchProperties[pk.name] = pk.stitchRule(self)
+        stitchProperties[pk.columnName] = pk.stitchRule(self)
         for property in properties {
             if property.type != .object {
-                stitchProperties[property.name] = property.stitchRule(self)
+                stitchProperties[property.columnName] = property.stitchRule(self)
             } else if id != nil {
-                stitchProperties[property.name] = property.stitchRule(self)
-                relationships[property.name] = [
+                stitchProperties[property.columnName] = property.stitchRule(self)
+                relationships[property.columnName] = [
                     "ref": "#/relationship/mongodb1/test_data/\(property.objectClassName!)",
                     "foreign_key": "_id",
                     "is_list": property.isArray || property.isSet || property.isMap
@@ -148,7 +148,7 @@ private extension ObjectSchema {
                 "properties": stitchProperties,
                 // The server currently only supports non-optional collections
                 // but requires them to be marked as optional
-                "required": properties.compactMap { $0.isOptional || $0.type == .any || $0.isArray || $0.isMap || $0.isSet ? nil : $0.name },
+                "required": properties.compactMap { $0.isOptional || $0.type == .any || $0.isArray || $0.isMap || $0.isSet ? nil : $0.columnName },
                 "title": "\(className)"
             ],
             "metadata": [
@@ -586,6 +586,7 @@ public class RealmServer: NSObject {
 
         serverProcess.environment = env
         // golang server needs a tmp directory
+
         try! FileManager.default.createDirectory(atPath: "\(tempDir.path)/tmp",
             withIntermediateDirectories: false, attributes: nil)
         serverProcess.launchPath = "\(binDir)/stitch_server"
@@ -759,12 +760,12 @@ public class RealmServer: NSObject {
         if case .pbs(let bsonType) = syncMode {
             syncTypes = objectsSchema.filter {
                 guard let pk = $0.primaryKeyProperty else { return false }
-                return pk.name == "_id"
+                return pk.columnName == "_id"
             }
             partitionKeyType = bsonType
         } else {
             syncTypes = objectsSchema.filter {
-                let validSyncClasses = ["Dog", "Person", "SwiftPerson", "SwiftTypesSyncObject", "PersonAsymmetric", "SwiftObjectAsymmetric", "HugeObjectAsymmetric"]
+                let validSyncClasses = ["Dog", "Person", "SwiftPerson", "SwiftTypesSyncObject", "PersonAsymmetric", "SwiftObjectAsymmetric", "HugeObjectAsymmetric", "SwiftCustomColumnObject", "SwiftCustomColumnAsymmetricObject"]
                 return validSyncClasses.contains($0.className)
             }
             partitionKeyType = nil
@@ -1104,6 +1105,29 @@ public class RealmServer: NSObject {
             return .failure(URLError.unknown as! Error)
         }
         return session.apps[appServerId].users[userId].delete()
+    }
+
+    public func retrieveSchemaProperties(_ appId: String, className: String, _ completion: @escaping (Result<[String], Error>) -> Void) {
+        guard let appServerId = try? RealmServer.shared.retrieveAppServerId(appId),
+              let session = session else {
+            fatalError()
+        }
+
+        guard let schemasList = try? session.apps[appServerId].schemas.get().get(),
+              let schemas = schemasList as? [[String: Any]],
+              let schemaSelected = schemas.first(where: { ($0["metadata"] as? [String: String])?["collection"] == className }) else {
+            completion(.failure(URLError.unknown as! Error))
+            return
+        }
+
+        guard let schema = try? session.apps[appServerId].schemas[schemaSelected["_id"] as! String].get().get(),
+              let schemaProperties = ((schema as? [String: Any])?["schema"] as? [String: Any])?["properties"] as? [String: Any] else {
+            completion(.failure(URLError.unknown as! Error))
+            return
+        }
+
+        completion(.success(schemaProperties.compactMap { $0.key }))
+
     }
 }
 

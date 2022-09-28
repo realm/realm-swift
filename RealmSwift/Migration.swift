@@ -160,9 +160,9 @@ extension Realm {
 
      - parameter className:  The name of the class whose property should be renamed. This class must be present
                              in both the old and new Realm schemas.
-     - parameter oldName:    The old name for the property to be renamed. There must not be a property with this name in
+     - parameter oldName:    The old column name for the property to be renamed. There must not be a property with this name in
                              the class as defined by the new Realm schema.
-     - parameter newName:    The new name for the property to be renamed. There must not be a property with this name in
+     - parameter newName:    The new column name for the property to be renamed. There must not be a property with this name in
                              the class as defined by the old Realm schema.
      */
     public func renameProperty(onType typeName: String, from oldName: String, to newName: String) {
@@ -173,7 +173,6 @@ extension Realm {
         self.rlmMigration = rlmMigration
     }
 }
-
 
 // MARK: Private Helpers
 

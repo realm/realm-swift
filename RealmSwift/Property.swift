@@ -35,6 +35,10 @@ import Realm
     /// The name of the property.
     public var name: String { return rlmProperty.name }
 
+    /// The column name of the property in the database. This will be the same as the property name when no
+    /// private name is provided on the property mapping.
+    public var columnName: String { return rlmProperty.columnName ?? name }
+
     /// The type of the property.
     public var type: PropertyType { return rlmProperty.type }
 

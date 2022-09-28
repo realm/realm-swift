@@ -767,7 +767,7 @@ class SwiftRenamedProperties1: Object {
     let linking2 = LinkingObjects(fromType: LinkToSwiftRenamedProperties2.self, property: "linkD")
 
     override class func _realmObjectName() -> String { return "Swift Renamed Properties" }
-    override class func _realmColumnNames() -> [String: String] {
+    override class func propertiesMapping() -> [String: String] {
         return ["propA": "prop 1", "propB": "prop 2"]
     }
 }
@@ -779,7 +779,7 @@ class SwiftRenamedProperties2: Object {
     let linking2 = LinkingObjects(fromType: LinkToSwiftRenamedProperties2.self, property: "linkD")
 
     override class func _realmObjectName() -> String { return "Swift Renamed Properties" }
-    override class func _realmColumnNames() -> [String: String] {
+    override class func propertiesMapping() -> [String: String] {
         return ["propC": "prop 1", "propD": "prop 2"]
     }
 }
@@ -791,7 +791,7 @@ class LinkToSwiftRenamedProperties1: Object {
     let set1 = MutableSet<SwiftRenamedProperties1>()
 
     override class func _realmObjectName() -> String { return "Link To Swift Renamed Properties" }
-    override class func _realmColumnNames() -> [String: String] {
+    override class func propertiesMapping() -> [String: String] {
         return ["linkA": "link 1", "linkB": "link 2", "array1": "array", "set1": "set"]
     }
 }
@@ -803,7 +803,7 @@ class LinkToSwiftRenamedProperties2: Object {
     let set2 = MutableSet<SwiftRenamedProperties2>()
 
     override class func _realmObjectName() -> String { return "Link To Swift Renamed Properties" }
-    override class func _realmColumnNames() -> [String: String] {
+    override class func propertiesMapping() -> [String: String] {
         return ["linkC": "link 1", "linkD": "link 2", "array2": "array", "set2": "set"]
     }
 }

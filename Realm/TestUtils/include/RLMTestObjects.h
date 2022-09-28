@@ -695,6 +695,10 @@ RLM_COLLECTION_TYPE(PrimaryCompanyObject);
 @property NSURL *URL;
 @end
 
+@interface RenamedProperties : RLMObject
+@property NSString *stringCol;
+@end
+
 @interface RenamedProperties1 : RLMObject
 @property (nonatomic) int propA;
 @property (nonatomic) NSString *propB;

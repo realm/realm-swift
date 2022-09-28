@@ -450,6 +450,12 @@
 
 @end
 
+@implementation RenamedProperties
++ (NSDictionary *)_realmColumnNames {
+    return @{@"stringCol": @"custom_stringCol"};
+}
+@end
+
 @implementation RenamedProperties1
 + (NSString *)_realmObjectName {
     return @"Renamed Properties";

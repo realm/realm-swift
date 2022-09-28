@@ -59,6 +59,7 @@
     XCTAssertEqualObjects(objectSchema.description, @"PrimaryStringObject {\n"
                                                     @"\tstringCol {\n"
                                                     @"\t\ttype = string;\n"
+                                                    @"\t\tcolumnName = stringCol;\n"
                                                     @"\t\tindexed = YES;\n"
                                                     @"\t\tisPrimary = YES;\n"
                                                     @"\t\tarray = NO;\n"
@@ -68,6 +69,7 @@
                                                     @"\t}\n"
                                                     @"\tintCol {\n"
                                                     @"\t\ttype = int;\n"
+                                                    @"\t\tcolumnName = intCol;\n"
                                                     @"\t\tindexed = NO;\n"
                                                     @"\t\tisPrimary = NO;\n"
                                                     @"\t\tarray = NO;\n"
@@ -81,12 +83,28 @@
                           @"EmbeddedIntObject (embedded) {\n"
                           @"\tintCol {\n"
                           @"\t\ttype = int;\n"
+                          @"\t\tcolumnName = intCol;\n"
                           @"\t\tindexed = NO;\n"
                           @"\t\tisPrimary = NO;\n"
                           @"\t\tarray = NO;\n"
                           @"\t\tset = NO;\n"
                           @"\t\tdictionary = NO;\n"
                           @"\t\toptional = NO;\n"
+                          @"\t}\n"
+                          @"}");
+
+    objectSchema = [RLMObjectSchema schemaForObjectClass:[RenamedProperties class]];
+    XCTAssertEqualObjects(objectSchema.description,
+                          @"RenamedProperties {\n"
+                          @"\tstringCol {\n"
+                          @"\t\ttype = string;\n"
+                          @"\t\tcolumnName = custom_stringCol;\n"
+                          @"\t\tindexed = NO;\n"
+                          @"\t\tisPrimary = NO;\n"
+                          @"\t\tarray = NO;\n"
+                          @"\t\tset = NO;\n"
+                          @"\t\tdictionary = NO;\n"
+                          @"\t\toptional = YES;\n"
                           @"\t}\n"
                           @"}");
 }
