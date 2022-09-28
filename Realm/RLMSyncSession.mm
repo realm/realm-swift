@@ -52,9 +52,11 @@ using namespace realm;
 }
 
 - (void)invalidate {
-    _session->unregister_progress_notifier(_token);
-    _session.reset();
-    _token = 0;
+    if (_session) {
+        _session->unregister_progress_notifier(_token);
+        _session.reset();
+        _token = 0;
+    }
 }
 
 - (nullable instancetype)initWithTokenValue:(uint64_t)token
