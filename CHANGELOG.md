@@ -1,5 +1,8 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
+
+The prebuilt binary for Carthage is now build with Xcode 14.0.1.
+
 ### Enhancements
 
 * Add `.recoverUnsyncedChanges` (`RLMClientResetModeRecoverUnsyncedChanges`) and
@@ -34,8 +37,7 @@ x.y.z Release notes (yyyy-MM-dd)
     `SyncManager.ErrorHandler`.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
-* None.
+* Setting a `List` property with `Results` no longer throws an unrecognized selector exception (since 10.8.0-beta.2)
 
 ### Breaking Changes
 
@@ -60,9 +62,9 @@ x.y.z Release notes (yyyy-MM-dd)
 
 * Realm Studio: 11.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
-* Carthage release for Swift is built with Xcode 13.4.1.
+* Carthage release for Swift is built with Xcode 14.0.1.
 * CocoaPods: 1.10 or later.
-* Xcode: 13.1-14.
+* Xcode: 13.1-14.1.
 
 ### Internal
 * Upgraded realm-core from ? to ?

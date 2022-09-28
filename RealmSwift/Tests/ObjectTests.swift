@@ -565,6 +565,13 @@ class ObjectTests: TestCase {
         setter(object, NSNull(), "arrayCol")
         XCTAssertEqual((getter(object, "arrayCol") as! List<SwiftBoolObject>).count, 0)
 
+        if object.realm != nil {
+            let listRes = object.realm!.objects(SwiftBoolObject.self).filter("boolCol == true")
+            setter(object, listRes, "arrayCol")
+            XCTAssertEqual((getter(object, "arrayCol") as! List<SwiftBoolObject>).count, listRes.count)
+            assertEqual((getter(object, "arrayCol") as! List<SwiftBoolObject>).first!, boolObject)
+        }
+
         let set = MutableSet<SwiftBoolObject>()
         set.insert(boolObject)
         setter(object, set, "setCol")
