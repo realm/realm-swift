@@ -453,18 +453,31 @@ class SwiftUITests: TestCase {
         object.stringList.append(SwiftStringObject(stringCol: "Tom"))
         object.stringList.append(SwiftStringObject(stringCol: "Sam"))
         object.stringList.append(SwiftStringObject(stringCol: "Dan"))
+        object.stringList.append(SwiftStringObject(stringCol: "Paul"))
 
         let binding = object.bind(\.stringList)
         XCTAssertEqual(object.stringList.first!.stringCol, "Tom")
-        XCTAssertEqual(object.stringList.last!.stringCol, "Dan")
+        XCTAssertEqual(object.stringList[1].stringCol, "Sam")
+        XCTAssertEqual(object.stringList[2].stringCol, "Dan")
+        XCTAssertEqual(object.stringList.last!.stringCol, "Paul")
 
         binding.move(fromOffsets: IndexSet([0]), toOffset: 3)
         XCTAssertEqual(object.stringList.first!.stringCol, "Sam")
+        XCTAssertEqual(object.stringList[1].stringCol, "Dan")
+        XCTAssertEqual(object.stringList[2].stringCol, "Tom")
+        XCTAssertEqual(object.stringList.last!.stringCol, "Paul")
+
+        binding.move(fromOffsets: IndexSet([2]), toOffset: 4)
+        XCTAssertEqual(object.stringList.first!.stringCol, "Sam")
+        XCTAssertEqual(object.stringList[1].stringCol, "Dan")
+        XCTAssertEqual(object.stringList[2].stringCol, "Paul")
         XCTAssertEqual(object.stringList.last!.stringCol, "Tom")
 
-        binding.move(fromOffsets: IndexSet([2]), toOffset: 0)
+        binding.move(fromOffsets: IndexSet([3]), toOffset: 0)
         XCTAssertEqual(object.stringList.first!.stringCol, "Tom")
-        XCTAssertEqual(object.stringList.last!.stringCol, "Dan")
+        XCTAssertEqual(object.stringList[1].stringCol, "Sam")
+        XCTAssertEqual(object.stringList[2].stringCol, "Dan")
+        XCTAssertEqual(object.stringList.last!.stringCol, "Paul")
 
         XCTAssertEqual(state.wrappedValue.count, 0)
     }
@@ -477,20 +490,33 @@ class SwiftUITests: TestCase {
         object.stringList.append(SwiftStringObject(stringCol: "Tom"))
         object.stringList.append(SwiftStringObject(stringCol: "Sam"))
         object.stringList.append(SwiftStringObject(stringCol: "Dan"))
+        object.stringList.append(SwiftStringObject(stringCol: "Paul"))
 
         state.projectedValue.append(object)
 
         let binding = object.bind(\.stringList)
         XCTAssertEqual(object.stringList.first!.stringCol, "Tom")
-        XCTAssertEqual(object.stringList.last!.stringCol, "Dan")
+        XCTAssertEqual(object.stringList[1].stringCol, "Sam")
+        XCTAssertEqual(object.stringList[2].stringCol, "Dan")
+        XCTAssertEqual(object.stringList.last!.stringCol, "Paul")
 
         binding.move(fromOffsets: IndexSet([0]), toOffset: 3)
         XCTAssertEqual(object.stringList.first!.stringCol, "Sam")
+        XCTAssertEqual(object.stringList[1].stringCol, "Dan")
+        XCTAssertEqual(object.stringList[2].stringCol, "Tom")
+        XCTAssertEqual(object.stringList.last!.stringCol, "Paul")
+
+        binding.move(fromOffsets: IndexSet([2]), toOffset: 4)
+        XCTAssertEqual(object.stringList.first!.stringCol, "Sam")
+        XCTAssertEqual(object.stringList[1].stringCol, "Dan")
+        XCTAssertEqual(object.stringList[2].stringCol, "Paul")
         XCTAssertEqual(object.stringList.last!.stringCol, "Tom")
 
-        binding.move(fromOffsets: IndexSet([2]), toOffset: 0)
+        binding.move(fromOffsets: IndexSet([3]), toOffset: 0)
         XCTAssertEqual(object.stringList.first!.stringCol, "Tom")
-        XCTAssertEqual(object.stringList.last!.stringCol, "Dan")
+        XCTAssertEqual(object.stringList[1].stringCol, "Sam")
+        XCTAssertEqual(object.stringList[2].stringCol, "Dan")
+        XCTAssertEqual(object.stringList.last!.stringCol, "Paul")
 
         XCTAssertEqual(state.wrappedValue.count, 1)
     }

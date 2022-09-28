@@ -346,7 +346,7 @@ class ListTests: TestCase {
         XCTAssertEqual(array[1].stringCol, "3")
         XCTAssertEqual(array[2].stringCol, "2")
 
-        array.move(fromOffsets: IndexSet([0]), toOffset: 0)
+        array.move(fromOffsets: IndexSet([0]), toOffset: 1)
         // [1, 3, 2]
         XCTAssertEqual(array[0].stringCol, "1")
         XCTAssertEqual(array[1].stringCol, "3")
@@ -368,10 +368,10 @@ class ListTests: TestCase {
         XCTAssertEqual(array[2].stringCol, "3")
 
         array.move(fromOffsets: IndexSet([0, 2]), toOffset: 1)
-        // [2, 3, 1]
-        XCTAssertEqual(array[0].stringCol, "2")
+        // [1, 3, 2]
+        XCTAssertEqual(array[0].stringCol, "1")
         XCTAssertEqual(array[1].stringCol, "3")
-        XCTAssertEqual(array[2].stringCol, "1")
+        XCTAssertEqual(array[2].stringCol, "2")
     }
 
     func testReplaceRange() {
