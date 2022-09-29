@@ -340,8 +340,6 @@ The prebuilt binary for Carthage is now build with Xcode 14.0.1.
   removing the destination link object.
   ([Core #5574](https://github.com/realm/realm-core/pull/5573), since the introduction of AnyRealmValue in v10.8.0)
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
-
 ### Compatibility
 
 * Realm Studio: 12.0.0 or later.
