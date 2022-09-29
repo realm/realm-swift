@@ -40,7 +40,7 @@ using namespace realm;
 
 @interface RLMProgressNotificationToken() {
     uint64_t _token;
-    std::weak_ptr<SyncSession> _session;
+    std::shared_ptr<SyncSession> _session;
 }
 @end
 
@@ -52,19 +52,10 @@ using namespace realm;
 }
 
 - (void)invalidate {
-    if (auto session = _session.lock()) {
-        session->unregister_progress_notifier(_token);
+    if (_session) {
+        _session->unregister_progress_notifier(_token);
         _session.reset();
         _token = 0;
-    }
-}
-
-- (void)dealloc {
-    if (_token != 0) {
-        NSLog(@"RLMProgressNotificationToken released without unregistering a notification. "
-              @"You must hold on to the RLMProgressNotificationToken and call "
-              @"-[RLMProgressNotificationToken invalidate] when you no longer wish to receive "
-              @"progress update notifications.");
     }
 }
 
@@ -213,7 +204,7 @@ static RLMSyncConnectionState convertConnectionState(SyncSession::ConnectionStat
                 block((NSUInteger)transferred, (NSUInteger)transferrable);
             });
         }, notifier_direction, is_streaming);
-        return [[RLMProgressNotificationToken alloc] initWithTokenValue:token session:std::move(session)];
+        return [[RLMProgressNotificationToken alloc] initWithTokenValue:token session:session];
     }
     return nil;
 }
