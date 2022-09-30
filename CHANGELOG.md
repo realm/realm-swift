@@ -38,6 +38,10 @@ The prebuilt binary for Carthage is now build with Xcode 14.0.1.
 
 ### Fixed
 * Setting a `List` property with `Results` no longer throws an unrecognized selector exception (since 10.8.0-beta.2)
+* Do not show an error message in cases where `RLMProgressNotificationToken` session is already deallocated. 
+  Now `RLMProgressNotificationToken` and `ProgressNotificationToken` hold a strong reference to the sync session,
+  keeping it alive until the token is deallocated or invalidated. 
+  ([#7831](https://github.com/realm/realm-swift/issues/7831), since v2.3.0).
 
 ### Breaking Changes
 
@@ -57,10 +61,6 @@ The prebuilt binary for Carthage is now build with Xcode 14.0.1.
 * `ClientResetMode.discardLocal` is deprecated in favor of `ClientResetMode.discardUnsyncedChanges`.
   The reasoning is that the name better reflects the effect of this reset mode. There is no actual
   difference in behavior.
-* Do not show an error message in cases where `RLMProgressNotificationToken` session is already deallocated. 
-  Now `RLMProgressNotificationToken` and `ProgressNotificationToken` hold a strong reference to the sync session,
-  keeping it alive until the token is deallocated or invalidated. 
-  ([#7831](https://github.com/realm/realm-swift/issues/7831), since v2.3.0).
 
 ### Compatibility
 
