@@ -1,9 +1,10 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.31.0 Release notes (2022-10-05)
 =============================================================
 
 The prebuilt binary for Carthage is now build with Xcode 14.0.1.
 
 ### Enhancements
+
 * Cut the runtime of aggregate operations on large dictionaries in half
   ([Core #5864](https://github.com/realm/realm-core/pull/5864)).
 * Improve performance of aggregate operations on collections of objects by 2x
@@ -22,10 +23,12 @@ The prebuilt binary for Carthage is now build with Xcode 14.0.1.
   received from the server to the Realm file ([Core #5844](https://github.com/realm/realm-core/pull/5844)).
 
 ### Fixed
-* Setting a `List` property with `Results` no longer throws an unrecognized selector exception (since 10.8.0-beta.2)
-* Do not show an error message in cases where `RLMProgressNotificationToken` session is already deallocated. 
-  Now `RLMProgressNotificationToken` and `ProgressNotificationToken` hold a strong reference to the sync session,
-  keeping it alive until the token is deallocated or invalidated. 
+
+* Setting a `List` property with `Results` no longer throws an unrecognized
+  selector exception (since 10.8.0-beta.2)
+* `RLMProgressNotificationToken` and `ProgressNotificationToken` now hold a
+  strong reference to the sync session, keeping it alive until the token is
+  deallocated or invalidated, as the other notification tokens do.
   ([#7831](https://github.com/realm/realm-swift/issues/7831), since v2.3.0).
 * Results permitted some nonsensical aggregate operations on column types which
   do not make sense to aggregate, giving garbage results rather than reporting
@@ -36,8 +39,6 @@ The prebuilt binary for Carthage is now build with Xcode 14.0.1.
   at the same time ([Core #5752](https://github.com/realm/realm-core/issues/5752),
   since v10.19.0).
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
-
 ### Deprecations
 
 * `RLMUpdateResult.objectId` has been deprecated in favor of
@@ -45,6 +46,7 @@ The prebuilt binary for Carthage is now build with Xcode 14.0.1.
   object ids.
 
 ### Compatibility
+
 * Realm Studio: 11.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 14.0.1.
@@ -52,6 +54,7 @@ The prebuilt binary for Carthage is now build with Xcode 14.0.1.
 * Xcode: 13.1-14.1.
 
 ### Internal
+
 * Upgraded realm-core from 12.7.0 to 12.9.0
 
 10.30.0 Release notes (2022-09-20)
