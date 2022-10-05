@@ -21,6 +21,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @class RLMObjectId;
+@protocol RLMBSON;
 
 /// The result of an `updateOne` or `updateMany` operation a `RLMMongoCollection`.
 @interface RLMUpdateResult : NSObject
@@ -31,8 +32,12 @@ NS_ASSUME_NONNULL_BEGIN
 /// The number of documents modified.
 @property (nonatomic, readonly) NSUInteger modifiedCount;
 
+/// The identifier of the inserted document if an upsert took place and the document's primary key is an `ObjectId`.
+@property (nonatomic, nullable, readonly) RLMObjectId *objectId
+__attribute__((deprecated("Use documentId instead, which support all BSON types", "documentId")));
+
 /// The identifier of the inserted document if an upsert took place.
-@property (nonatomic, nullable, readonly) RLMObjectId *objectId;
+@property (nonatomic, nullable, readonly) id<RLMBSON> documentId;
 
 @end
 

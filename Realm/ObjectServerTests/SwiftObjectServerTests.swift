@@ -2637,13 +2637,13 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         collection.updateOneDocument(filter: document, update: document2).await(self) { updateResult in
             XCTAssertEqual(updateResult.matchedCount, 1)
             XCTAssertEqual(updateResult.modifiedCount, 1)
-            XCTAssertNil(updateResult.objectId)
+            XCTAssertNil(updateResult.documentId)
         }
 
         collection.updateOneDocument(filter: document5, update: document2, upsert: true).await(self) { updateResult in
             XCTAssertEqual(updateResult.matchedCount, 0)
             XCTAssertEqual(updateResult.modifiedCount, 0)
-            XCTAssertNotNil(updateResult.objectId)
+            XCTAssertNotNil(updateResult.documentId)
         }
     }
 
@@ -2659,12 +2659,12 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         collection.updateManyDocuments(filter: document, update: document2).await(self) { updateResult in
             XCTAssertEqual(updateResult.matchedCount, 1)
             XCTAssertEqual(updateResult.modifiedCount, 1)
-            XCTAssertNil(updateResult.objectId)
+            XCTAssertNil(updateResult.documentId)
         }
         collection.updateManyDocuments(filter: document5, update: document2, upsert: true).await(self) { updateResult in
             XCTAssertEqual(updateResult.matchedCount, 0)
             XCTAssertEqual(updateResult.modifiedCount, 0)
-            XCTAssertNotNil(updateResult.objectId)
+            XCTAssertNotNil(updateResult.documentId)
         }
     }
 
