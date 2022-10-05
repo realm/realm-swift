@@ -67,14 +67,6 @@ The prebuilt binary for Carthage is now build with Xcode 14.0.1.
   at the same time ([Core #5752](https://github.com/realm/realm-core/issues/5752),
   since v10.19.0).
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
-
-### Deprecations
-
-* `RLMUpdateResult.objectId` has been deprecated in favor of
-  `RLMUpdateResult.documentId` to support reporting document ids which are not
-  object ids.
-
 ### Breaking Changes
 
 * The default `clientResetMode` (`RLMClientResetMode`) is switched from `.manual` (`RLMClientResetModeManual`)
@@ -90,6 +82,9 @@ The prebuilt binary for Carthage is now build with Xcode 14.0.1.
 
 ### Deprecations
 
+* `RLMUpdateResult.objectId` has been deprecated in favor of
+  `RLMUpdateResult.documentId` to support reporting document ids which are not
+  object ids.
 * `ClientResetMode.discardLocal` is deprecated in favor of `ClientResetMode.discardUnsyncedChanges`.
   The reasoning is that the name better reflects the effect of this reset mode. There is no actual
   difference in behavior.
