@@ -1,8 +1,5 @@
-10.31.0 Release notes (2022-10-05)
+x.y.z Release notes (yyyy-MM-dd)
 =============================================================
-
-The prebuilt binary for Carthage is now build with Xcode 14.0.1.
-
 ### Enhancements
 
 * Add `.recoverUnsyncedChanges` (`RLMClientResetModeRecoverUnsyncedChanges`) and
@@ -35,6 +32,47 @@ The prebuilt binary for Carthage is now build with Xcode 14.0.1.
     are still handled in the `SyncManager.ErrorHandler`.
   - See 'Breaking Changes' for information how these interfaces interact with an already existing
     `SyncManager.ErrorHandler`.
+
+### Fixed
+* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????) since v?.?.?)
+* None.
+
+### Breaking Changes
+
+* The default `clientResetMode` (`RLMClientResetMode`) is switched from `.manual` (`RLMClientResetModeManual`)
+  to `.recoverUnsyncedChanges` (`RLMClientResetModeRecoverUnsyncedChanges`).
+  - If you are currently using `.manual` and continue to do so, the only change
+    you must explicitly make is designating manual mode in
+    your `Realm.Configuration.SyncConfiguration`s, since they will now default to `.recoverUnsyncedChanges`.
+  - You may choose to define your manual client reset handler in the newly
+    introduced `manual(ErrorReportingBlock? = nil)`
+    or `RLMSyncConfiguration.manualClientResetHandler`, but this is not required.
+    The `SyncManager.errorHandler` will still be invoked during a client reset if
+    no callback is passed into these new interfaces.
+
+### Deprecations
+
+* `ClientResetMode.discardLocal` is deprecated in favor of `ClientResetMode.discardUnsyncedChanges`.
+  The reasoning is that the name better reflects the effect of this reset mode. There is no actual
+  difference in behavior.
+
+### Compatibility
+* Realm Studio: 11.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 13.4.1.
+* CocoaPods: 1.10 or later.
+* Xcode: 13.1-14.
+
+### Internal
+* Upgraded realm-core from ? to ?
+
+10.31.0 Release notes (2022-10-05)
+=============================================================
+
+The prebuilt binary for Carthage is now build with Xcode 14.0.1.
+
+### Enhancements
+
 * Cut the runtime of aggregate operations on large dictionaries in half
   ([Core #5864](https://github.com/realm/realm-core/pull/5864)).
 * Improve performance of aggregate operations on collections of objects by 2x
@@ -69,27 +107,11 @@ The prebuilt binary for Carthage is now build with Xcode 14.0.1.
   at the same time ([Core #5752](https://github.com/realm/realm-core/issues/5752),
   since v10.19.0).
 
-### Breaking Changes
-
-* The default `clientResetMode` (`RLMClientResetMode`) is switched from `.manual` (`RLMClientResetModeManual`)
-  to `.recoverUnsyncedChanges` (`RLMClientResetModeRecoverUnsyncedChanges`).
-  - If you are currently using `.manual` and continue to do so, the only change
-    you must explicitly make is designating manual mode in
-    your `Realm.Configuration.SyncConfiguration`s, since they will now default to `.recoverUnsyncedChanges`.
-  - You may choose to define your manual client reset handler in the newly
-    introduced `manual(ErrorReportingBlock? = nil)`
-    or `RLMSyncConfiguration.manualClientResetHandler`, but this is not required.
-    The `SyncManager.errorHandler` will still be invoked during a client reset if
-    no callback is passed into these new interfaces.
-
 ### Deprecations
 
 * `RLMUpdateResult.objectId` has been deprecated in favor of
   `RLMUpdateResult.documentId` to support reporting document ids which are not
   object ids.
-* `ClientResetMode.discardLocal` is deprecated in favor of `ClientResetMode.discardUnsyncedChanges`.
-  The reasoning is that the name better reflects the effect of this reset mode. There is no actual
-  difference in behavior.
 
 ### Compatibility
 
