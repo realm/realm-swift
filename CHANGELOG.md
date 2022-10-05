@@ -35,6 +35,22 @@ The prebuilt binary for Carthage is now build with Xcode 14.0.1.
     are still handled in the `SyncManager.ErrorHandler`.
   - See 'Breaking Changes' for information how these interfaces interact with an already existing
     `SyncManager.ErrorHandler`.
+* Cut the runtime of aggregate operations on large dictionaries in half
+  ([Core #5864](https://github.com/realm/realm-core/pull/5864)).
+* Improve performance of aggregate operations on collections of objects by 2x
+  to 10x ([Core #5864](https://github.com/realm/realm-core/pull/5864)).
+  Greatly improve the performance of sorting or distincting a Dictionary's keys
+  or values. The most expensive operation is now performed O(log N) rather than
+  O(N log N) times, and large Dictionaries can see upwards of 99% reduction in
+  time to sort. ([Core #5166](https://github.com/realm/realm-core/pulls/5166))
+* Add support for changing the deployment location for Atlas Apps. Previously
+  this was assumed to be immutable ([Core #5648](https://github.com/realm/realm-core/issues/5648)).
+* The sync client will now yield the write lock to other threads which are
+  waiting to perform a write transaction even if it still has remaining work to
+  do, rather than always applying all changesets received from the server even
+  when other threads are trying to write. ([Core #5844](https://github.com/realm/realm-core/pull/5844)).
+* The sync client no longer writes an unused temporary copy of the changesets
+  received from the server to the Realm file ([Core #5844](https://github.com/realm/realm-core/pull/5844)).
 
 ### Fixed
 * Setting a `List` property with `Results` no longer throws an unrecognized selector exception (since 10.8.0-beta.2)
@@ -42,6 +58,22 @@ The prebuilt binary for Carthage is now build with Xcode 14.0.1.
   Now `RLMProgressNotificationToken` and `ProgressNotificationToken` hold a strong reference to the sync session,
   keeping it alive until the token is deallocated or invalidated. 
   ([#7831](https://github.com/realm/realm-swift/issues/7831), since v2.3.0).
+* Results permitted some nonsensical aggregate operations on column types which
+  do not make sense to aggregate, giving garbage results rather than reporting
+  an error ([Core #5876](https://github.com/realm/realm-core/pull/5876), since v5.0.0).
+* Upserting a document in a Mongo collection would crash if the document's id
+  type was anything other than ObjectId (since v10.0.0).
+* Fix a use-after-free when a sync session is closed and the app is destroyed
+  at the same time ([Core #5752](https://github.com/realm/realm-core/issues/5752),
+  since v10.19.0).
+
+<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+
+### Deprecations
+
+* `RLMUpdateResult.objectId` has been deprecated in favor of
+  `RLMUpdateResult.documentId` to support reporting document ids which are not
+  object ids.
 
 ### Breaking Changes
 
@@ -71,7 +103,7 @@ The prebuilt binary for Carthage is now build with Xcode 14.0.1.
 * Xcode: 13.1-14.1.
 
 ### Internal
-* Upgraded realm-core from ? to ?
+* Upgraded realm-core from 12.7.0 to 12.9.0
 
 10.30.0 Release notes (2022-09-20)
 =============================================================

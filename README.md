@@ -6,8 +6,9 @@ This repository holds the source code for the iOS, macOS, tvOS & watchOS version
 ## Why Use Realm
 
 * **Intuitive to Developers:** Realm’s object-oriented data model is simple to learn, doesn’t need an ORM, and lets you write less code.
-* **Designed for Offline Use:** Realm’s local database persists data on-disk, so apps work as well offline as they do online.
 * **Built for Mobile:** Realm is fully-featured, lightweight, and efficiently uses memory, disk space, and battery life.
+* **Designed for Offline Use:** Realm’s local database persists data on-disk, so apps work as well offline as they do online.
+* **[Device Sync](https://www.mongodb.com/atlas/app-services/device-sync)**: Makes it simple to keep data in sync across users, devices, and your backend in real-time. [Get started](http://mongodb.com/realm/register?utm_medium=github_atlas_CTA&utm_source=realm_swift_github) for free with a template application that includes a cloud backend and Sync.
 
 ## Object-Oriented: Streamline Your Code
 
@@ -112,14 +113,14 @@ let realm = try Realm(configuration: config)
 // Use the Realm as normal
 let dogs = realm.objects(Dog.self).filter("name contains 'Fido'")
 ```
-## Data Sync
-The [Device Sync](https://www.mongodb.com/atlas/app-services/device-sync) service makes it simple to keep data in sync across users, devices, and your backend in real-time.
 
 ## Getting Started
 
 We support installing Realm via Swift Package Manager, CocoaPods, Carthage, or by importing a dynamic XCFramework.
 
 For more information, see the detailed instructions in our [docs](https://docs.mongodb.com/realm/sdk/ios/install/).
+
+Interested in getting started for free with a template application that includes a cloud backend and Sync? [Create a MongoDB Atlas Account](http://mongodb.com/realm/register?utm_medium=github_atlas_CTA&utm_source=realm_swift_github).
 
 ## Documentation
 
