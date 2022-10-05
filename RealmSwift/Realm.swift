@@ -530,7 +530,7 @@ public typealias AsyncTransactionId = RLMAsyncTransactionId
      - warning: This method may only be called during a write transaction.
 
      - parameter object: The object to be added to this Realm.
-     - parameter update: What to do if an object with the same primary key alredy exists. Must be `.error` for objects
+     - parameter update: What to do if an object with the same primary key already exists. Must be `.error` for objects
      without a primary key.
      */
     public func add(_ object: Object, update: UpdatePolicy = .error) {
@@ -556,7 +556,7 @@ public typealias AsyncTransactionId = RLMAsyncTransactionId
      - parameter objects: A sequence which contains objects to be added to the Realm.
      - parameter update: How to handle
      without a primary key.
-     - parameter update: How to handle objects in the collection with a primary key that alredy exists in this
+     - parameter update: How to handle objects in the collection with a primary key that already exists in this
      Realm. Must be `.error` for object types without a primary key.
      */
     public func add<S: Sequence>(_ objects: S, update: UpdatePolicy = .error) where S.Iterator.Element: Object {
@@ -597,7 +597,7 @@ public typealias AsyncTransactionId = RLMAsyncTransactionId
 
      - parameter type:   The type of the object to create.
      - parameter value:  The value used to populate the object.
-     - parameter update: What to do if an object with the same primary key alredy exists. Must be `.error` for object
+     - parameter update: What to do if an object with the same primary key already exists. Must be `.error` for object
      types without a primary key.
 
      - returns: The newly created object.
@@ -650,7 +650,7 @@ public typealias AsyncTransactionId = RLMAsyncTransactionId
 
      - parameter className:  The class name of the object to create.
      - parameter value:      The value used to populate the object.
-     - parameter update:     What to do if an object with the same primary key alredy exists.
+     - parameter update:     What to do if an object with the same primary key already exists.
      Must be `.error` for object types without a primary key.
 
      - returns: The created object.
