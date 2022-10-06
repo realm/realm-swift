@@ -34,7 +34,7 @@ x.y.z Release notes (yyyy-MM-dd)
     `SyncManager.ErrorHandler`.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????) since v?.?.?)
+* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
 * None.
 
 ### Breaking Changes
@@ -56,12 +56,6 @@ x.y.z Release notes (yyyy-MM-dd)
   The reasoning is that the name better reflects the effect of this reset mode. There is no actual
   difference in behavior.
 * None.
-
-### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
-* None.
-
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
 ### Compatibility
 * Realm Studio: 11.0.0 or later.
