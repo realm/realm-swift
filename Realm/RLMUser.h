@@ -143,7 +143,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param clientResetMode Determines file recovery behavior in the event of a client reset.
                         See: https://docs.mongodb.com/realm/sync/error-handling/client-resets/
  @param manualClientResetHandler An error reporting block that is invoked during a client reset.
-                                 See `RLMSyncErrorReportingBlock` and `RLMClientResetInfo`
+                                @See ``RLMSyncErrorReportingBlock`` and ``RLMClientResetInfo``
  
  @return A configuration object with the sync configuration set to use the given partition value.
  */
@@ -159,7 +159,7 @@ NS_ASSUME_NONNULL_BEGIN
  In order for an application to contain both partition-based and flexible sync realms, more than one
  server-side Device Sync App must be used.
 
- @return A `RLMRealmConfiguration` instance with a flexible sync configuration.
+ @return A ``RLMRealmConfiguration`` instance with a flexible sync configuration.
  */
 - (RLMRealmConfiguration *)flexibleSyncConfiguration NS_REFINED_FOR_SWIFT;
 
@@ -192,7 +192,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param clientResetMode Determines file recovery behavior in the event of a client reset.
                         See: https://docs.mongodb.com/realm/sync/error-handling/client-resets/
  @param manualClientResetHandler An error reporting block that is invoked during a client reset.
-                                 See `RLMSyncErrorReportingBlock` and `RLMClientResetInfo`
+                                @See `RLMSyncErrorReportingBlock` and `RLMClientResetInfo`
 
  @return A `RLMRealmConfiguration` instance with a flexible sync configuration.
  */
@@ -262,7 +262,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param clientResetMode Determines file recovery behavior in the event of a client reset.
                         See: https://docs.mongodb.com/realm/sync/error-handling/client-resets/
  @param manualClientResetHandler An error reporting block that is invoked during a client reset.
-                                 See `RLMSyncErrorReportingBlock` and `RLMClientResetInfo`
+                                @See `RLMSyncErrorReportingBlock` and `RLMClientResetInfo`
 
  @return A `RLMRealmConfiguration` instance with a flexible sync configuration.
  */
