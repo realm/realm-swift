@@ -55,6 +55,13 @@ x.y.z Release notes (yyyy-MM-dd)
 * `ClientResetMode.discardLocal` is deprecated in favor of `ClientResetMode.discardUnsyncedChanges`.
   The reasoning is that the name better reflects the effect of this reset mode. There is no actual
   difference in behavior.
+* None.
+
+### Fixed
+* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
+* None.
+
+<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
 ### Compatibility
 * Realm Studio: 11.0.0 or later.
@@ -62,6 +69,9 @@ x.y.z Release notes (yyyy-MM-dd)
 * Carthage release for Swift is built with Xcode 13.4.1.
 * CocoaPods: 1.10 or later.
 * Xcode: 13.1-14.
+* Carthage release for Swift is built with Xcode 14.0.1.
+* CocoaPods: 1.10 or later.
+* Xcode: 13.1-14.1.
 
 ### Internal
 * Upgraded realm-core from ? to ?
