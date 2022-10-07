@@ -229,11 +229,11 @@ public enum ClientResetMode {
 
     /// Example Usage
     /// ```
-    /// user.configuration(partitionValue: "myPartition", clientResetMode: .discardUnsyncedChanges({ beforeRealm in
+    /// user.configuration(partitionValue: "myPartition", clientResetMode: .discardUnsyncedChanges({ before in
     ///    var recoveryConfig = Realm.Configuration()
     ///    recoveryConfig.fileURL = myRecoveryPath
     ///    do {
-    ///        beforeRealm.writeCopy(configuration: recoveryConfig)
+    ///        before.writeCopy(configuration: recoveryConfig)
     ///        // The copied realm could be used later for recovery, debugging, reporting, etc.
     ///    } catch {
     ///        // handle error
@@ -248,7 +248,7 @@ public enum ClientResetMode {
     ///
     /// Example Usage
     /// ```
-    /// user.configuration(partitionValue: "myPartition", clientResetMode: .discardUnsyncedChanges( nil, { beforeRealm, afterRealm in
+    /// user.configuration(partitionValue: "myPartition", clientResetMode: .discardUnsyncedChanges( nil, { before, after in
     /// // This block could be used to add custom recovery logic, back-up a realm file, send reporting, etc.
     /// for object in before.objects(myClass.self) {
     ///     let res = after.objects(myClass.self)
@@ -276,11 +276,11 @@ public enum ClientResetMode {
 
     /// Example Usage
     /// ```
-    /// user.configuration(partitionValue: "myPartition", clientResetMode: .discardUnsyncedChanges({ beforeRealm in
+    /// user.configuration(partitionValue: "myPartition", clientResetMode: .discardUnsyncedChanges({ before in
     ///    var recoveryConfig = Realm.Configuration()
     ///    recoveryConfig.fileURL = myRecoveryPath
     ///    do {
-    ///        beforeRealm.writeCopy(configuration: recoveryConfig)
+    ///        before.writeCopy(configuration: recoveryConfig)
     ///        // The copied realm could be used later for recovery, debugging, reporting, etc.
     ///    } catch {
     ///        // handle error
@@ -295,7 +295,7 @@ public enum ClientResetMode {
     ///
     /// Example Usage
     /// ```
-    /// user.configuration(partitionValue: "myPartition", clientResetMode: .discardUnsyncedChanges( nil, { beforeRealm, afterRealm in
+    /// user.configuration(partitionValue: "myPartition", clientResetMode: .discardUnsyncedChanges( nil, { before, after in
     /// // This block could be used to add custom recovery logic, back-up a realm file, send reporting, etc.
     /// for object in before.objects(myClass.self) {
     ///     let res = after.objects(myClass.self)
@@ -329,11 +329,11 @@ public enum ClientResetMode {
 
     /// Example Usage
     /// ```
-    /// user.configuration(partitionValue: "myPartition", clientResetMode: .discardUnsyncedChanges({ beforeRealm in
+    /// user.configuration(partitionValue: "myPartition", clientResetMode: .discardUnsyncedChanges({ before in
     ///    var recoveryConfig = Realm.Configuration()
     ///    recoveryConfig.fileURL = myRecoveryPath
     ///    do {
-    ///        beforeRealm.writeCopy(configuration: recoveryConfig)
+    ///        before.writeCopy(configuration: recoveryConfig)
     ///        // The copied realm could be used later for recovery, debugging, reporting, etc.
     ///    } catch {
     ///        // handle error
@@ -348,7 +348,7 @@ public enum ClientResetMode {
     ///
     /// Example Usage
     /// ```
-    /// user.configuration(partitionValue: "myPartition", clientResetMode: .discardUnsyncedChanges( nil, { beforeRealm, afterRealm in
+    /// user.configuration(partitionValue: "myPartition", clientResetMode: .discardUnsyncedChanges( nil, { before, after in
     /// // This block could be used to add custom recovery logic, back-up a realm file, send reporting, etc.
     /// for object in before.objects(myClass.self) {
     ///     let res = after.objects(myClass.self)
@@ -381,11 +381,11 @@ public enum ClientResetMode {
 
     /// Example Usage
     /// ```
-    /// user.configuration(partitionValue: "myPartition", clientResetMode: .discardUnsyncedChanges({ beforeRealm in
+    /// user.configuration(partitionValue: "myPartition", clientResetMode: .discardUnsyncedChanges({ before in
     ///    var recoveryConfig = Realm.Configuration()
     ///    recoveryConfig.fileURL = myRecoveryPath
     ///    do {
-    ///        beforeRealm.writeCopy(configuration: recoveryConfig)
+    ///        before.writeCopy(configuration: recoveryConfig)
     ///        // The copied realm could be used later for recovery, debugging, reporting, etc.
     ///    } catch {
     ///        // handle error
@@ -400,7 +400,7 @@ public enum ClientResetMode {
     ///
     /// Example Usage
     /// ```
-    /// user.configuration(partitionValue: "myPartition", clientResetMode: .discardUnsyncedChanges( nil, { beforeRealm, afterRealm in
+    /// user.configuration(partitionValue: "myPartition", clientResetMode: .discardUnsyncedChanges( nil, { before, after in
     /// // This block could be used to add custom recovery logic, back-up a realm file, send reporting, etc.
     /// for object in before.objects(myClass.self) {
     ///     let res = after.objects(myClass.self)
