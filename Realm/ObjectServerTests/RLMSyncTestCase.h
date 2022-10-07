@@ -66,6 +66,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (RLMRealm *)openRealmForPartitionValue:(nullable id<RLMBSON>)partitionValue
                                     user:(RLMUser *)user;
 
+/// Synchronously open a synced Realm and wait for downloads.
+- (RLMRealm *)openRealmForPartitionValue:(nullable id<RLMBSON>)partitionValue
+                                    user:(RLMUser *)user
+                         clientResetMode:(RLMClientResetMode)clientResetMode;
+
 /// Synchronously open a synced Realm with encryption key and stop policy and wait for downloads.
 - (RLMRealm *)openRealmForPartitionValue:(nullable id<RLMBSON>)partitionValue
                                     user:(RLMUser *)user
@@ -81,6 +86,13 @@ NS_ASSUME_NONNULL_BEGIN
 /// Immediately open a synced Realm with encryption key and stop policy.
 - (RLMRealm *)immediatelyOpenRealmForPartitionValue:(nullable id<RLMBSON>)partitionValue
                                                user:(RLMUser *)user
+                                      encryptionKey:(nullable NSData *)encryptionKey
+                                         stopPolicy:(RLMSyncStopPolicy)stopPolicy;
+
+/// Immediately open a synced Realm with encryption key and stop policy.
+- (RLMRealm *)immediatelyOpenRealmForPartitionValue:(nullable id<RLMBSON>)partitionValue
+                                               user:(RLMUser *)user
+                                    clientResetMode:(RLMClientResetMode)clientResetMode
                                       encryptionKey:(nullable NSData *)encryptionKey
                                          stopPolicy:(RLMSyncStopPolicy)stopPolicy;
 

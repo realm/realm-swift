@@ -79,9 +79,15 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
 
     public func openRealm<T: BSON>(partitionValue: T,
                                    user: User,
+                                   clientResetMode: ClientResetMode? = .recoverUnsyncedChanges(),
                                    file: StaticString = #file,
                                    line: UInt = #line) throws -> Realm {
-        let config = user.configuration(partitionValue: partitionValue)
+        let config: Realm.Configuration
+        if clientResetMode != nil {
+            config = user.configuration(partitionValue: partitionValue, clientResetMode: clientResetMode!)
+        } else {
+            config = user.configuration(partitionValue: partitionValue)
+        }
         return try openRealm(configuration: config)
     }
 
@@ -235,6 +241,17 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
             }
             self.waitForUploads(for: realm)
         }
+    }
+
+    public func updateAllPeopleSubscription(_ subscriptions: SyncSubscriptionSet) {
+        let expectation = expectation(description: "register subscription")
+        subscriptions.update {
+            subscriptions.append(QuerySubscription<SwiftPerson>(name: "all_people"))
+        } onComplete: { error in
+            XCTAssertNil(error)
+            expectation.fulfill()
+        }
+        wait(for: [expectation], timeout: 15.0)
     }
 
     public func writeToFlxRealm(_ block: @escaping (Realm) throws -> Void) throws {

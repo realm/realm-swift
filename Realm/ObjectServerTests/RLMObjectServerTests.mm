@@ -1416,7 +1416,9 @@ static NSString *randomEmail() {
 - (void)testClientReset {
     RLMUser *user = [self userForTest:_cmd];
     // Open the Realm
-    __attribute__((objc_precise_lifetime)) RLMRealm *realm = [self openRealmForPartitionValue:@"realm_id" user:user];
+    __attribute__((objc_precise_lifetime)) RLMRealm *realm = [self openRealmForPartitionValue:@"realm_id"
+                                                                                         user:user
+                                                                              clientResetMode:RLMClientResetModeManual];
 
     __block NSError *theError = nil;
     XCTestExpectation *ex = [self expectationWithDescription:@"Waiting for error handler to be called..."];
@@ -1443,7 +1445,7 @@ static NSString *randomEmail() {
 
     __block NSError *theError = nil;
     @autoreleasepool {
-        __attribute__((objc_precise_lifetime)) RLMRealm *realm = [self openRealmForPartitionValue:partitionValue user:user];
+        __attribute__((objc_precise_lifetime)) RLMRealm *realm = [self openRealmForPartitionValue:partitionValue user:user clientResetMode:RLMClientResetModeManual];
         XCTestExpectation *ex = [self expectationWithDescription:@"Waiting for error handler to be called..."];
         self.app.syncManager.errorHandler = ^(NSError *error, RLMSyncSession *) {
             theError = error;
@@ -1463,18 +1465,30 @@ static NSString *randomEmail() {
 - (void)testSetClientResetMode {
     RLMUser *user = [self userForTest:_cmd];
     NSString *partitionValue = NSStringFromSelector(_cmd);
+    #pragma clang diagnostic push
+    #pragma clang diagnostic ignored "-Wdeprecated-declarations"
     RLMRealmConfiguration *config = [user configurationWithPartitionValue:partitionValue clientResetMode:RLMClientResetModeDiscardLocal];
     XCTAssertEqual(config.syncConfiguration.clientResetMode, RLMClientResetModeDiscardLocal);
+    #pragma clang diagnostic pop
 
-    // Default is manual
+    // Default is recover
     config = [user configurationWithPartitionValue:partitionValue];
-    XCTAssertEqual(config.syncConfiguration.clientResetMode, RLMClientResetModeManual);
+    XCTAssertEqual(config.syncConfiguration.clientResetMode, RLMClientResetModeRecoverUnsyncedChanges);
+
+    RLMSyncErrorReportingBlock block = ^(NSError *, RLMSyncSession *) {
+        XCTFail("Should never hit");
+    };
+    RLMAssertThrowsWithReason([user configurationWithPartitionValue:partitionValue clientResetMode:RLMClientResetModeDiscardUnsyncedChanges manualClientResetHandler:block], @"A manual client reset handler can only be set with RLMClientResetModeManual");
 }
 
 - (void)testSetClientResetCallbacks {
     RLMUser *user = [self userForTest:_cmd];
     NSString *partitionValue = NSStringFromSelector(_cmd);
+
+    #pragma clang diagnostic push
+    #pragma clang diagnostic ignored "-Wdeprecated-declarations"
     RLMRealmConfiguration *config = [user configurationWithPartitionValue:partitionValue clientResetMode:RLMClientResetModeDiscardLocal];
+
     XCTAssertNil(config.syncConfiguration.beforeClientReset);
     XCTAssertNil(config.syncConfiguration.afterClientReset);
 
@@ -1490,6 +1504,8 @@ static NSString *randomEmail() {
                                                           notifyAfterReset:afterBlock];
     XCTAssertNotNil(config2.syncConfiguration.beforeClientReset);
     XCTAssertNotNil(config2.syncConfiguration.afterClientReset);
+    #pragma clang diagnostic pop
+
 }
 
 #pragma mark - Progress Notifications

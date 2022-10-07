@@ -66,6 +66,7 @@ NSString *RLMRealmPathForFile(NSString *fileName) {
 
 @implementation RLMRealmConfiguration {
     realm::Realm::Config _config;
+    RLMSyncErrorReportingBlock _manualClientResetHandler;
 }
 
 - (realm::Realm::Config&)configRef {
@@ -362,6 +363,10 @@ static bool isSync(realm::Realm::Config const& config) {
     _config.sync_config = std::make_shared<realm::SyncConfig>(syncConfiguration.rawConfiguration);
     _config.path = syncConfiguration.path;
 
+    // The manual client reset handler doesn't exist on the raw config,
+    // so assign it here.
+    _manualClientResetHandler = syncConfiguration.manualClientResetHandler;
+
     [self updateSchemaMode];
 }
 
@@ -369,7 +374,9 @@ static bool isSync(realm::Realm::Config const& config) {
     if (!_config.sync_config) {
         return nil;
     }
-    return [[RLMSyncConfiguration alloc] initWithRawConfig:*_config.sync_config path:_config.path];
+    RLMSyncConfiguration* syncConfig = [[RLMSyncConfiguration alloc] initWithRawConfig:*_config.sync_config path:_config.path];
+    syncConfig.manualClientResetHandler = _manualClientResetHandler;
+    return syncConfig;
 }
 
 #else // REALM_ENABLE_SYNC

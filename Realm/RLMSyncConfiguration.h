@@ -18,6 +18,8 @@
 
 #import <Foundation/Foundation.h>
 
+#import <Realm/RLMSyncManager.h>
+
 @class RLMApp;
 @class RLMRealm;
 @class RLMRealmConfiguration;
@@ -28,7 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**  Determines file behavior during a client reset.
 
- - see: https://docs.mongodb.com/realm/sync/error-handling/client-resets/
+ @see: https://docs.mongodb.com/realm/sync/error-handling/client-resets/
 */
 typedef NS_ENUM(NSUInteger, RLMClientResetMode) {
     /// The local copy of the Realm is copied into a recovery
@@ -41,16 +43,77 @@ typedef NS_ENUM(NSUInteger, RLMClientResetMode) {
     /// re-downloaded Realm will initially contain only the data present at the time the Realm
     /// was backed up on the server.
     ///
-    /// - see: `rlmSync_clientResetBackedUpRealmPath` or `SyncError.clientResetInfo()` for more information on accessing the recovery directory.
-    RLMClientResetModeManual,
+    /// @see: ``rlmSync_clientResetBackedUpRealmPath`` and ``RLMSyncErrorActionToken`` for more information on accessing the recovery directory and error information.
+    ///
+    /// The manual client reset mode handler can be set in two places:
+    ///  1. As an ErrorReportingBlock argument at ``RLMSyncConfiguration.manualClientResetHandler``.
+    ///  2. As an ErrorReportingBlock in the ``RLMSyncManager.errorHandler`` property.
+    ///  @see: ``RLMSyncManager.errorHandler``
+    ///
+    ///  When an ``RLMSyncErrorClientResetError`` is thrown, the following rules determine which block is executed:
+    ///  - If an error reporting block is set in ``.manualClientResetHandler`` and the ``RLMSyncManager.errorHandler``, the ``.manualClientResetHandler`` block will be executed.
+    ///  - If an error reporting block is set in either the ``.manualClientResetHandler`` or the ``RLMSyncManager``, but not both, the single block will execute.
+    ///  - If no block is set in either location, the client reset will not be handled. The application will likely need to be restarted and unsynced local changes may be lost.
+    /// @note: The ``RLMSyncManager.errorHandler`` is still invoked under all ``RLMSyncError``s *other than* ``RLMSyncErrorClientResetError``.
+    /// @see ``RLMSyncError`` for an exhaustive list.
+    RLMClientResetModeManual = 0,
     /// All unsynchronized local changes are automatically discarded and the local state is
     /// automatically reverted to the most recent state from the server. Unsynchronized changes
     /// can then be recovered in the post-client-reset callback block.
     ///
-    /// If RLMClientResetModeDiscardLocal is enabled but the client reset operation is unable to complete
+    /// If ``RLMClientResetModeDiscardLocal`` is enabled but the client reset operation is unable to complete
     /// then the client reset process reverts to manual mode. Example) During a destructive schema change this
     /// mode will fail and invoke the manual client reset handler.
-    RLMClientResetModeDiscardLocal
+    ///
+    /// The RLMClientResetModeDiscardLocal mode supports two client reset callbacks -- ``RLMClientResetBeforeBlock``, ``RLMClientResetAfterBlock`` -- which can be passed as arguments when creating the ``RLMSyncConfiguration``.
+    /// @see: ``RLMClientResetAfterBlock`` and ``RLMClientResetBeforeBlock``
+    RLMClientResetModeDiscardLocal __deprecated_enum_msg("Use RLMClientResetModeDiscardUnsyncedChanges") = 1,
+    /// All unsynchronized local changes are automatically discarded and the local state is
+    /// automatically reverted to the most recent state from the server. Unsynchronized changes
+    /// can then be recovered in the post-client-reset callback block.
+    ///
+    /// If ``RLMClientResetModeDiscardUnsyncedChanges`` is enabled but the client reset operation is unable to complete
+    /// then the client reset process reverts to manual mode. Example) During a destructive schema change this
+    /// mode will fail and invoke the manual client reset handler.
+    ///
+    /// The RLMClientResetModeDiscardUnsyncedChanges mode supports two client reset callbacks -- ``RLMClientResetBeforeBlock``, ``RLMClientResetAfterBlock`` -- which can be passed as arguments when creating the ``RLMSyncConfiguration``.
+    /// @see: ``RLMClientResetAfterBlock`` and ``RLMClientResetBeforeBlock``
+    RLMClientResetModeDiscardUnsyncedChanges = 1,
+    /// The client device will download a realm realm which reflects the latest
+    /// state of the server after a client reset. A recovery process is run locally in
+    /// an attempt to integrate the server version with any local changes from
+    /// before the client reset occurred.
+    ///
+    /// The changes are integrated with the following rules:
+    /// 1. Objects created locally that were not synced before client reset will be integrated.
+    /// 2. If an object has been deleted on the server, but was modified on the client, the delete takes precedence and the update is discarded
+    /// 3. If an object was deleted on the client, but not the server, then the client delete instruction is applied.
+    /// 4. In the case of conflicting updates to the same field, the client update is applied.
+    ///
+    /// If the recovery integration fails, the client reset process falls back to ``RLMClientResetModeManual``.
+    /// The recovery integration will fail if the "Client Recovery" setting is not enabled on the server.
+    /// Integration may also fail in the event of an incompatible schema change.
+    ///
+    /// The RLMClientResetModeRecoverUnsyncedChanges mode supports two client reset callbacks -- ``RLMClientResetBeforeBlock``, ``RLMClientResetAfterBlock`` -- which can be passed as arguments when creating the ``RLMSyncConfiguration``.
+    /// @see: ``RLMClientResetAfterBlock`` and ``RLMClientResetBeforeBlock``
+    RLMClientResetModeRecoverUnsyncedChanges = 2,
+    /// The client device will download a realm with objects reflecting the latest version of the server. A recovery
+    /// process is run locally in an attempt to integrate the server version with any local changes from before the
+    /// client reset occurred.
+    ///
+    /// The changes are integrated with the following rules:
+    /// 1. Objects created locally that were not synced before client reset will be integrated.
+    /// 2. If an object has been deleted on the server, but was modified on the client, the delete takes precedence and the update is discarded
+    /// 3. If an object was deleted on the client, but not the server, then the client delete instruction is applied.
+    /// 4. In the case of conflicting updates to the same field, the client update is applied.
+    ///
+    /// If the recovery integration fails, the client reset process falls back to ``RLMClientResetModeDiscardUnsyncedChanges``.
+    /// The recovery integration will fail if the "Client Recovery" setting is not enabled on the server.
+    /// Integration may also fail in the event of an incompatible schema change.
+    ///
+    /// The RLMClientResetModeRecoverOrDiscardUnsyncedChanges mode supports two client reset callbacks -- ``RLMClientResetBeforeBlock``, ``RLMClientResetAfterBlock`` -- which can be passed as arguments when creating the ``RLMSyncConfiguration``.
+    /// @see: ``RLMClientResetAfterBlock`` and ``RLMClientResetBeforeBlock``
+    RLMClientResetModeRecoverOrDiscardUnsyncedChanges = 3
 };
 
 /**
@@ -83,25 +146,33 @@ typedef void(^RLMClientResetAfterBlock)(RLMRealm * _Nonnull beforeFrozen, RLMRea
 @property (nonatomic, readonly) id<RLMBSON> partitionValue;
 
 /**
- An enum which determines file recovery behvaior in the event of a client reset.
- - note: Defaults to `RLMClientResetModeManual`
+ An enum which determines file recovery behavior in the event of a client reset.
+ @note: Defaults to `RLMClientResetModeRecoverUnsyncedChanges`
 
- - see: `RLMClientResetMode`
- - see: https://docs.mongodb.com/realm/sync/error-handling/client-resets/
+ @see: `RLMClientResetMode`
+ @see: https://docs.mongodb.com/realm/sync/error-handling/client-resets/
 */
 @property (nonatomic) RLMClientResetMode clientResetMode;
 
 /**
  A callback which notifies prior to  prior to a client reset occurring.
- - see: `RLMClientResetBeforeBlock`
+ @see: `RLMClientResetBeforeBlock`
  */
 @property (nonatomic, nullable) RLMClientResetBeforeBlock beforeClientReset;
 
 /**
  A callback which notifies after a client reset has occurred.
- -see: `RLMClientResetAfterBlock`
+ @see: `RLMClientResetAfterBlock`
  */
 @property (nonatomic, nullable) RLMClientResetAfterBlock afterClientReset;
+
+/**
+    A callback that's executed when an `RLMSyncErrorClientResetError` is encountered.
+    @See RLMSyncErrorReportingBlock and RLMSyncErrorClientResetError for more
+    details on handling a client reset manually.
+ */
+@property (nonatomic, nullable) RLMSyncErrorReportingBlock manualClientResetHandler;
+
 
 /**
  Whether nonfatal connection errors should cancel async opens.
