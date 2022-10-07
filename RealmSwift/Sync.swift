@@ -450,9 +450,9 @@ public enum ClientResetMode {
 
     /**
      An enum which determines file recovery behavior in the event of a client reset.
-     - note: Defaults to `.recover
+     - note: Defaults to ``.recoverUnsyncedChanges``
 
-     - see: `ClientResetMode` and `RLMClientResetMode`
+     - see: ``ClientResetMode`` and ``RLMClientResetMode``
      - see: https://docs.mongodb.com/realm/sync/error-handling/client-resets/
     */
     public var clientResetMode: ClientResetMode {
