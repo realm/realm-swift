@@ -659,7 +659,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             let user = try logInUser(for: creds)
             try prepareClientReset(#function, user)
 
-            var configuration = user.configuration(partitionValue: #function, clientResetMode: .manual(assertManualClientReset(user)))
+            var configuration = user.configuration(partitionValue: #function, clientResetMode: .manual(errorHandler: assertManualClientReset(user)))
             configuration.objectTypes = [SwiftPerson.self]
 
             switch configuration.syncConfiguration!.clientResetMode {
@@ -739,7 +739,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             let user = try logInUser(for: creds)
             try prepareClientReset(#function, user)
 
-            var configuration = user.configuration(partitionValue: #function, clientResetMode: .manual(assertManualClientReset(user)))
+            var configuration = user.configuration(partitionValue: #function, clientResetMode: .manual(errorHandler: assertManualClientReset(user)))
             configuration.objectTypes = [SwiftPerson.self]
 
             switch configuration.syncConfiguration!.clientResetMode {
@@ -812,7 +812,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         let (assertBeforeBlock, assertAfterBlock) = assertDiscardLocal()
         var configuration = user.configuration(partitionValue: #function,
-                                               clientResetMode: .discardLocal(assertBeforeBlock, assertAfterBlock))
+                                               clientResetMode: .discardLocal(beforeReset: assertBeforeBlock, afterReset: assertAfterBlock))
         configuration.objectTypes = [SwiftPerson.self]
 
         guard let syncConfig = configuration.syncConfiguration else { fatalError("Test condition failure. SyncConfiguration not set.") }
@@ -840,7 +840,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         let (assertBeforeBlock, assertAfterBlock) = assertDiscardLocal()
         var configuration = user.configuration(partitionValue: #function,
-                                               clientResetMode: .discardUnsyncedChanges(assertBeforeBlock, assertAfterBlock))
+                                               clientResetMode: .discardUnsyncedChanges(beforeReset: assertBeforeBlock, afterReset: assertAfterBlock))
         configuration.objectTypes = [SwiftPerson.self]
 
         guard let syncConfig = configuration.syncConfiguration else { fatalError("Test condition failure. SyncConfiguration not set.") }
@@ -867,7 +867,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         try prepareClientReset(#function, user)
 
         let (assertBeforeBlock, assertAfterBlock) = assertDiscardLocal()
-        var configuration = user.configuration(partitionValue: #function, clientResetMode: .discardLocal(assertBeforeBlock, assertAfterBlock))
+        var configuration = user.configuration(partitionValue: #function, clientResetMode: .discardLocal(beforeReset: assertBeforeBlock, afterReset: assertAfterBlock))
         configuration.objectTypes = [SwiftPerson.self]
 
         let asyncOpenEx = expectation(description: "async open")
@@ -885,7 +885,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         try prepareClientReset(#function, user)
 
         let (assertBeforeBlock, assertAfterBlock) = assertRecover()
-        var configuration = user.configuration(partitionValue: #function, clientResetMode: .recoverUnsyncedChanges(assertBeforeBlock, assertAfterBlock))
+        var configuration = user.configuration(partitionValue: #function, clientResetMode: .recoverUnsyncedChanges(beforeReset: assertBeforeBlock, afterReset: assertAfterBlock))
         configuration.objectTypes = [SwiftPerson.self]
 
         guard let syncConfig = configuration.syncConfiguration else { fatalError("Test condition failure. SyncConfiguration not set.") }
@@ -918,7 +918,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         // Expect the recovery to fail back to discardLocal logic
         let (assertBeforeBlock, assertAfterBlock) = assertDiscardLocal()
-        var configuration = user.configuration(partitionValue: #function, clientResetMode: .recoverOrDiscardUnsyncedChanges(assertBeforeBlock, assertAfterBlock))
+        var configuration = user.configuration(partitionValue: #function, clientResetMode: .recoverOrDiscardUnsyncedChanges(beforeReset: assertBeforeBlock, afterReset: assertAfterBlock))
         configuration.objectTypes = [SwiftPerson.self]
 
         guard let syncConfig = configuration.syncConfiguration else { fatalError("Test condition failure. SyncConfiguration not set.") }
@@ -947,7 +947,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         try prepareFlexibleClientReset(user)
 
         let (assertBeforeBlock, assertAfterBlock) = assertDiscardLocal()
-        var config = user.flexibleSyncConfiguration(clientResetMode: .discardLocal(assertBeforeBlock, assertAfterBlock))
+        var config = user.flexibleSyncConfiguration(clientResetMode: .discardLocal(beforeReset: assertBeforeBlock, afterReset: assertAfterBlock))
         config.objectTypes = [SwiftPerson.self]
         guard let syncConfig = config.syncConfiguration else {
             fatalError("Test condition failure. SyncConfiguration not set.")
@@ -978,7 +978,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         try prepareFlexibleClientReset(user)
 
         let (assertBeforeBlock, assertAfterBlock) = assertDiscardLocal()
-        var config = user.flexibleSyncConfiguration(clientResetMode: .discardUnsyncedChanges(assertBeforeBlock, assertAfterBlock))
+        var config = user.flexibleSyncConfiguration(clientResetMode: .discardUnsyncedChanges(beforeReset: assertBeforeBlock, afterReset: assertAfterBlock))
         config.objectTypes = [SwiftPerson.self]
         guard let syncConfig = config.syncConfiguration else {
             fatalError("Test condition failure. SyncConfiguration not set.")
@@ -1009,7 +1009,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         try prepareFlexibleClientReset(user)
 
         let (assertBeforeBlock, assertAfterBlock) = assertRecover()
-        var config = user.flexibleSyncConfiguration(clientResetMode: .recoverUnsyncedChanges(assertBeforeBlock, assertAfterBlock))
+        var config = user.flexibleSyncConfiguration(clientResetMode: .recoverUnsyncedChanges(beforeReset: assertBeforeBlock, afterReset: assertAfterBlock))
         config.objectTypes = [SwiftPerson.self]
         guard let syncConfig = config.syncConfiguration else {
             fatalError("Test condition failure. SyncConfiguration not set.")
@@ -1043,7 +1043,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         try prepareFlexibleClientReset(user)
 
         let (assertBeforeBlock, assertAfterBlock) = assertRecover()
-        var config = user.flexibleSyncConfiguration(clientResetMode: .recoverUnsyncedChanges(assertBeforeBlock, assertAfterBlock), initialSubscriptions: { subscriptions in
+        var config = user.flexibleSyncConfiguration(clientResetMode: .recoverUnsyncedChanges(beforeReset: assertBeforeBlock, afterReset: assertAfterBlock), initialSubscriptions: { subscriptions in
             subscriptions.append(QuerySubscription<SwiftPerson>(name: "all_people"))
         })
         config.objectTypes = [SwiftPerson.self]
@@ -1079,7 +1079,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         try prepareFlexibleClientReset(user)
 
         let (assertBeforeBlock, assertAfterBlock) = assertDiscardLocal()
-        var config = user.flexibleSyncConfiguration(clientResetMode: .discardLocal(assertBeforeBlock, assertAfterBlock), initialSubscriptions: { subscriptions in
+        var config = user.flexibleSyncConfiguration(clientResetMode: .discardLocal(beforeReset: assertBeforeBlock, afterReset: assertAfterBlock), initialSubscriptions: { subscriptions in
             subscriptions.append(QuerySubscription<SwiftPerson>(name: "all_people"))
         })
         config.objectTypes = [SwiftPerson.self]
@@ -1121,7 +1121,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         // Expect the client reset process to discard the local changes
         let (assertBeforeBlock, assertAfterBlock) = assertDiscardLocal()
-        var config = user.flexibleSyncConfiguration(clientResetMode: .recoverOrDiscardUnsyncedChanges(assertBeforeBlock, assertAfterBlock))
+        var config = user.flexibleSyncConfiguration(clientResetMode: .recoverOrDiscardUnsyncedChanges(beforeReset: assertBeforeBlock, afterReset: assertAfterBlock))
         config.objectTypes = [SwiftPerson.self]
         guard let syncConfig = config.syncConfiguration else {
             fatalError("Test condition failure. SyncConfiguration not set.")
@@ -1156,7 +1156,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             let user = try logInUser(for: credentials, app: self.flexibleSyncApp)
             try prepareFlexibleClientReset(user)
 
-            var config = user.flexibleSyncConfiguration(clientResetMode: .manual(assertManualClientReset(user, flexibleSync: true)))
+            var config = user.flexibleSyncConfiguration(clientResetMode: .manual(errorHandler: assertManualClientReset(user, flexibleSync: true)))
             config.objectTypes = [SwiftPerson.self]
 
             switch config.syncConfiguration!.clientResetMode {
