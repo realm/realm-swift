@@ -1,5 +1,6 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.32.0 Release notes (2022-10-10)
 =============================================================
+
 ### Enhancements
 
 * Add `.recoverUnsyncedChanges` (`RLMClientResetModeRecoverUnsyncedChanges`) and
@@ -15,7 +16,7 @@ x.y.z Release notes (yyyy-MM-dd)
     4. In the case of conflicting updates to the same field, the client update is applied.
   - The client reset process will fallback to `ClientResetMode.discardUnsyncedChanges` if the recovery process fails in `.recoverOrDiscardUnsyncedChanges`.
   - The client reset process will fallback to `ClientResetMode.manual` if the recovery process fails in `.recoverUnsyncedChanges`.
-  - The two new swift recovery modes support client reset callbacks: `.recoverUnsyncedChanges(((Realm) -> Void)? = nil, ((Realm, Realm) -> Void)? = nil)`.
+  - The two new swift recovery modes support client reset callbacks: `.recoverUnsyncedChanges(beforeReset: ((Realm) -> Void)? = nil, afterReset: ((Realm, Realm) -> Void)? = nil)`.
   - The two new Obj-C recovery modes support client reset callbacks in `notifyBeforeReset`
     and `notifyAfterReset`for both `[RLMUser configurationWithPartitionValue]` and `[RLMUser flexibleSyncConfigurationWithClientResetMode]`
     For more detail on client reset callbacks, see `ClientResetMode`, `RLMClientResetBeforeBlock`,
@@ -32,10 +33,6 @@ x.y.z Release notes (yyyy-MM-dd)
     are still handled in the `SyncManager.ErrorHandler`.
   - See 'Breaking Changes' for information how these interfaces interact with an already existing
     `SyncManager.ErrorHandler`.
-
-### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
-* None.
 
 ### Breaking Changes
 
@@ -55,17 +52,14 @@ x.y.z Release notes (yyyy-MM-dd)
 * `ClientResetMode.discardLocal` is deprecated in favor of `ClientResetMode.discardUnsyncedChanges`.
   The reasoning is that the name better reflects the effect of this reset mode. There is no actual
   difference in behavior.
-* None.
 
 ### Compatibility
+
 * Realm Studio: 11.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 14.0.1.
 * CocoaPods: 1.10 or later.
 * Xcode: 13.1-14.1.
-
-### Internal
-* Upgraded realm-core from ? to ?
 
 10.31.0 Release notes (2022-10-05)
 =============================================================
