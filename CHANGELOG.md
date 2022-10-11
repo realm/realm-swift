@@ -11,6 +11,9 @@ x.y.z Release notes (yyyy-MM-dd)
 * `UserPublisher` incorrectly bounced all notifications to the main thread instead
  of setting up the Combine publisher to correctly receive on the main thread.
   ([#8132](https://github.com/realm/realm-swift/issues/8132), since 10.21.0)
+* Copy EmbeddedObject for embedded object property on initializing unmanaged object ([#6921](https://github.com/realm/realm-cocoa/issues/6921).
+* Copying an embedded object to an unmanaged object will not throw ([#6921](https://github.com/realm/realm-cocoa/issues/6921).
+
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
 ### Compatibility
@@ -539,10 +542,6 @@ The prebuilt binary for Carthage is now build with Xcode 14.0.1.
   characters ([Core #5825](https://github.com/realm/realm-core/issues/5825), since v2.2.0)
 * Accented characters are now handled by case-insensitive but
   diacritic-sensitive queries. ([Core #5825](https://github.com/realm/realm-core/issues/5825), since v2.2.0)
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
-* None.
-* Copy EmbeddedObject for embedded object property on initializing unmanaged object ([#6921](https://github.com/realm/realm-cocoa/issues/6921)
-* Copying an embedded object to an unmanaged object will not throw ([#6921](https://github.com/realm/realm-cocoa/issues/6921)
 
 ### Breaking Changes
 
@@ -1326,7 +1325,6 @@ no functional changes from 10.24.0.
 
 ### Fixed
 
-* Copying an embedded object to an unmanaged object will not throw ([#6921](https://github.com/realm/realm-cocoa/issues/6921)
 * Add support of arm64 in Carthage build ([#7154](https://github.com/realm/realm-cocoa/issues/7154)
 * Adding missing support for `IN` queries to primitives types on Type Safe Queries.
   ```swift
