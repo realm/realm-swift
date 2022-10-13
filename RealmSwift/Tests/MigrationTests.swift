@@ -1223,10 +1223,8 @@ class MigrationTests: TestCase {
         }
 
         let config = Realm.Configuration(fileURL: defaultRealmURL(), objectTypes: [SwiftEmployeeObject.self])
-        autoreleasepool {
-            assertFails(.schemaMismatch) {
-                try Realm(configuration: config)
-            }
+        assertFails(.schemaMismatch) {
+            try Realm(configuration: config)
         }
     }
 
@@ -1243,10 +1241,8 @@ class MigrationTests: TestCase {
         }
         config.deleteRealmIfMigrationNeeded = true
 
-        autoreleasepool {
-            assertSucceeds {
-                _ = try Realm(configuration: config)
-            }
+        assertSucceeds {
+            _ = try Realm(configuration: config)
         }
     }
 
@@ -1266,10 +1262,8 @@ class MigrationTests: TestCase {
         let originalImp = class_getMethodImplementation(metaClass, #selector(RLMObjectBase.sharedSchema))
         class_replaceMethod(metaClass, #selector(RLMObjectBase.sharedSchema), imp, "@@:")
 
-        autoreleasepool {
-            assertFails(.schemaMismatch) {
-                try Realm()
-            }
+        assertFails(.schemaMismatch) {
+            try Realm()
         }
 
         let migrationBlock: MigrationBlock = { _, _ in

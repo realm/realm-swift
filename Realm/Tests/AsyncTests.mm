@@ -793,27 +793,23 @@
 }
 
 - (void)testBlockedThreadWithNotificationsDoesNotPreventDeliveryOnOtherThreads {
-    dispatch_semaphore_t sema = dispatch_semaphore_create(0);
-    dispatch_semaphore_t sema2 = dispatch_semaphore_create(0);
-    [self dispatchAsync:^{
-        // Add a notification block on a background thread, run the runloop
-        // until the initial results are ready, and then block the thread without
-        // running the runloop until the main thread is done testing things
-        __block RLMNotificationToken *token;
-        CFRunLoopPerformBlock(CFRunLoopGetCurrent(), kCFRunLoopDefaultMode, ^{
-            token = [IntObject.allObjects addNotificationBlock:^(RLMResults *results, RLMCollectionChange *change, NSError *error) {
-                dispatch_semaphore_signal(sema);
-                CFRunLoopStop(CFRunLoopGetCurrent());
-                dispatch_semaphore_wait(sema2, DISPATCH_TIME_FOREVER);
-            }];
-        });
-        CFRunLoopRun();
-        [token invalidate];
-    }];
-    dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
+    dispatch_group_t group1 = dispatch_group_create();
+    dispatch_group_t group2 = dispatch_group_create();
+    // Add a notification block on a background thread, run the runloop
+    // until the initial results are ready, and then block the thread without
+    // running the runloop until the main thread is done testing things
+    __block RLMNotificationToken *token;
+    dispatch_group_enter(group1);
+    dispatch_group_enter(group2);
+    token = [IntObject.allObjects addNotificationBlock:^(RLMResults *, RLMCollectionChange *, NSError *) {
+        dispatch_group_leave(group1);
+        dispatch_group_wait(group2, DISPATCH_TIME_FOREVER);
+    } queue:self.bgQueue];
+
+    dispatch_group_wait(group1, DISPATCH_TIME_FOREVER);
 
     __block int calls = 0;
-    auto token = [self subscribeAndWaitForInitial:IntObject.allObjects block:^(RLMResults *results) {
+    auto token2 = [self subscribeAndWaitForInitial:IntObject.allObjects block:^(RLMResults *results) {
         ++calls;
     }];
     XCTAssertEqual(calls, 0);
@@ -824,7 +820,8 @@
     XCTAssertEqual(calls, 1);
 
     [token invalidate];
-    dispatch_semaphore_signal(sema2);
+    [token2 invalidate];
+    dispatch_group_leave(group2);
 }
 
 - (void)testAddNotificationBlockFromWrongThread {

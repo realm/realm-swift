@@ -348,6 +348,10 @@ class Admin {
                 request(on: group, httpMethod: "DELETE", completionHandler)
             }
 
+            func delete() -> Result<Any?, Error> {
+                request(httpMethod: "DELETE")
+            }
+
             func patch(on group: DispatchGroup, _ data: Any, _ completionHandler: @escaping (Result<Any?, Error>) -> Void) {
                 request(on: group, httpMethod: "PATCH", data: data, completionHandler)
             }
@@ -1021,97 +1025,84 @@ public class RealmServer: NSObject {
         return option
     }
 
-    public func enableDevMode(appServerId: String, syncServiceId: String, syncServiceConfiguration: [String: Any], _ completion: @escaping (Result<Any?, Error>) -> Void) {
+    public func enableDevMode(appServerId: String, syncServiceId: String, syncServiceConfiguration: [String: Any]) -> Result<Any?, Error> {
         guard let session = session else {
-            completion(.failure(URLError.unknown as! Error))
-            return
+            return .failure(URLError.unknown as! Error)
         }
         let app = session.apps[appServerId]
-        app.sync.config.put(data: ["development_mode_enabled": true], completion)
+        return app.sync.config.put(["development_mode_enabled": true])
     }
 
-    public func disableSync(flexibleSync: Bool = false, appServerId: String, syncServiceId: String, completion: @escaping (Result<Any?, Error>) -> Void) {
+    public func disableSync(flexibleSync: Bool = false, appServerId: String, syncServiceId: String)
+            -> Result<Any?, Error> {
         let configOption = flexibleSync ? "flexible_sync" : "sync"
         guard let session = session else {
-            completion(.failure(URLError.unknown as! Error))
-            return
+            return .failure(URLError.unknown as! Error)
         }
         let app = session.apps[appServerId]
-        app.services[syncServiceId].config.patch([configOption: ["state": ""]], completion)
+        return app.services[syncServiceId].config.patch([configOption: ["state": ""]])
     }
 
-    public func enableSync(flexibleSync: Bool = false, appServerId: String, syncServiceId: String, syncServiceConfiguration: [String: Any], _ completion: @escaping (Result<Any?, Error>) -> Void) {
+    public func enableSync(flexibleSync: Bool = false, appServerId: String, syncServiceId: String, syncServiceConfiguration: [String: Any]) -> Result<Any?, Error> {
         let configOption = flexibleSync ? "flexible_sync" : "sync"
         var syncConfig = syncServiceConfiguration
         guard let session = session else {
-            completion(.failure(URLError.unknown as! Error))
-            return
+            return .failure(URLError.unknown as! Error)
         }
         let app = session.apps[appServerId]
         guard var syncInfo = syncConfig[configOption] as? [String: Any] else {
-            completion(.failure(URLError.unknown as! Error))
-            return
+            return .failure(URLError.unknown as! Error)
         }
         syncInfo["state"] = "enabled"
         syncConfig[configOption] = syncInfo
-        app.services[syncServiceId].config.patch(syncConfig, completion)
+        return app.services[syncServiceId].config.patch(syncConfig)
     }
 
-    public func isRecoveryModeDisabled(flexibleSync: Bool, appServerId: String, syncServiceId: String) throws -> Bool {
+    public func patchRecoveryMode(flexibleSync: Bool, disable: Bool, _ appServerId: String,
+                                  _ syncServiceId: String, _ syncServiceConfiguration: [String: Any]) -> Result<Any?, Error> {
         guard let session = session else {
-            fatalError()
+            return .failure(URLError.unknown as! Error)
         }
+
         let configOption = flexibleSync ? "flexible_sync" : "sync"
         let app = session.apps[appServerId]
-        let response = try app.services[syncServiceId].config.get().get() as? [String: Any]
-        guard let syncInfo = response?[configOption] as? [String: Any] else {
-            return false
-        }
-        return (syncInfo["is_recovery_mode_disabled"] as? Bool == true)
-    }
-
-    public func patchRecoveryMode(flexibleSync: Bool, disable: Bool, _ appServerId: String, _ syncServiceId: String, _ syncServiceConfiguration: [String: Any], completion: @escaping (Result<Any?, Error>) -> Void) throws {
-        // If desired edit is already the case, return
-        if try isRecoveryModeDisabled(flexibleSync: flexibleSync, appServerId: appServerId, syncServiceId: syncServiceId) == disable {
-            return
-        }
-        let configOption = flexibleSync ? "flexible_sync" : "sync"
-
         var syncConfig = syncServiceConfiguration
-        guard let session = session else {
-            completion(.failure(URLError.unknown as! Error))
-            return
-        }
-        let app = session.apps[appServerId]
-        guard var syncInfo = syncConfig[configOption] as? [String: Any] else {
-            completion(.failure(URLError.unknown as! Error))
-            return
-        }
+        return app.services[syncServiceId].config.get()
+            .map { response in
+                guard let config = response as? [String: Any] else { return false }
+                guard let syncInfo = config[configOption] as? [String: Any] else { return false }
+                return syncInfo["is_recovery_mode_disabled"] as? Bool ?? false
+            }
+            .flatMap { (isDisabled: Bool) in
+                if isDisabled == disable {
+                    return .success(syncConfig)
+                }
 
-        syncInfo["is_recovery_mode_disabled"] = disable
-        syncConfig[configOption] = syncInfo
-        app.services[syncServiceId].config.patch(syncConfig, completion)
+                guard var syncInfo = syncConfig[configOption] as? [String: Any] else {
+                    return .failure(URLError.unknown as! Error)
+                }
+
+                syncInfo["is_recovery_mode_disabled"] = disable
+                syncConfig[configOption] = syncInfo
+                return app.services[syncServiceId].config.patch(syncConfig)
+            }
     }
 
-    public func retrieveUser(_ appId: String, userId: String, _ completion: @escaping (Result<Any?, Error>) -> Void) {
+    public func retrieveUser(_ appId: String, userId: String) -> Result<Any?, Error> {
         guard let appServerId = try? RealmServer.shared.retrieveAppServerId(appId),
               let session = session else {
-            completion(.failure(URLError.unknown as! Error))
-            return
+            return .failure(URLError.unknown as! Error)
         }
-        let app = session.apps[appServerId]
-        app.users[userId].get(completion)
+        return session.apps[appServerId].users[userId].get()
     }
 
     // Remove User from Atlas App Services using the Admin API
-    public func removeUserForApp(_ appId: String, userId: String, _ completion: @escaping (Result<Any?, Error>) -> Void) {
+    public func removeUserForApp(_ appId: String, userId: String) -> Result<Any?, Error> {
         guard let appServerId = try? RealmServer.shared.retrieveAppServerId(appId),
               let session = session else {
-            completion(.failure(URLError.unknown as! Error))
-            return
+            return .failure(URLError.unknown as! Error)
         }
-        let app = session.apps[appServerId]
-        app.users[userId].delete(completion)
+        return session.apps[appServerId].users[userId].delete()
     }
 }
 

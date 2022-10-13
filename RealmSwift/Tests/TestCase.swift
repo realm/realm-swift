@@ -175,7 +175,7 @@ extension XCTestCase {
     func assertSucceeds(message: String? = nil, fileName: StaticString = #file,
                         lineNumber: UInt = #line, block: () throws -> Void) {
         do {
-            try block()
+            try autoreleasepool(invoking: block)
         } catch {
             XCTFail("Expected no error, but instead caught <\(error)>.",
                 file: (fileName), line: lineNumber)
@@ -186,14 +186,16 @@ extension XCTestCase {
                         fileName: StaticString = #file, lineNumber: UInt = #line,
                         block: () throws -> T) {
         do {
-            _ = try block()
+            _ = try autoreleasepool(invoking: block)
             XCTFail("Expected to catch <\(expectedError)>, but no error was thrown.",
-                file: (fileName), line: lineNumber)
+                file: fileName, line: lineNumber)
         } catch let e as Realm.Error where e.code == expectedError {
-            // Success!
+            if message != nil {
+                XCTAssertEqual(e.localizedDescription, message, file: fileName, line: lineNumber)
+            }
         } catch {
             XCTFail("Expected to catch <\(expectedError)>, but instead caught <\(error)>.",
-                file: (fileName), line: lineNumber)
+                file: fileName, line: lineNumber)
         }
     }
 
@@ -201,14 +203,14 @@ extension XCTestCase {
                         fileName: StaticString = #file, lineNumber: UInt = #line,
                         block: () throws -> T) {
         do {
-            _ = try block()
+            _ = try autoreleasepool(invoking: block)
             XCTFail("Expected to catch <\(expectedError)>, but no error was thrown.",
-                file: (fileName), line: lineNumber)
+                file: fileName, line: lineNumber)
         } catch let e where e._code == expectedError._code {
             // Success!
         } catch {
             XCTFail("Expected to catch <\(expectedError)>, but instead caught <\(error)>.",
-                file: (fileName), line: lineNumber)
+                file: fileName, line: lineNumber)
         }
     }
 

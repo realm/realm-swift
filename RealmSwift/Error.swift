@@ -43,7 +43,7 @@ extension Realm.Error {
 
 // MARK: Equatable
 
-//extension Realm.Error: Equatable {}
+extension Realm.Error: Equatable {}
 
 // FIXME: we should not be defining this but it's a breaking change to remove
 /// Returns a Boolean indicating whether the errors are identical.

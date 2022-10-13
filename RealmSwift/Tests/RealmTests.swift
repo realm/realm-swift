@@ -57,16 +57,17 @@ class RealmTests: TestCase {
         }
     }
 
-    func testReadOnlyFile() {
-        autoreleasepool {
-            let realm = try! Realm(fileURL: testRealmURL())
-            try! realm.write {
+    func testReadOnlyFile() throws {
+        try autoreleasepool {
+            let realm = try Realm(fileURL: testRealmURL())
+            try realm.write {
                 realm.create(SwiftStringObject.self, value: ["a"])
             }
         }
 
         let fileManager = FileManager.default
-        try! fileManager.setAttributes([ FileAttributeKey.immutable: true ], ofItemAtPath: testRealmURL().path)
+        try fileManager.setAttributes([FileAttributeKey.immutable: true],
+                                      ofItemAtPath: testRealmURL().path)
 
         // Should not be able to open read-write
         assertFails(.fileAccess) {
@@ -79,7 +80,8 @@ class RealmTests: TestCase {
             XCTAssertEqual(1, realm.objects(SwiftStringObject.self).count)
         }
 
-        try! fileManager.setAttributes([ FileAttributeKey.immutable: false ], ofItemAtPath: testRealmURL().path)
+        try fileManager.setAttributes([FileAttributeKey.immutable: false],
+                                      ofItemAtPath: testRealmURL().path)
     }
 
     func testReadOnlyRealmMustExist() {
@@ -98,7 +100,7 @@ class RealmTests: TestCase {
         let fileManager = FileManager.default
         let permissions = try! fileManager
             .attributesOfItem(atPath: testRealmURL().path)[FileAttributeKey.posixPermissions] as! NSNumber
-        try! fileManager.setAttributes([ FileAttributeKey.posixPermissions: 0000 ],
+        try! fileManager.setAttributes([FileAttributeKey.posixPermissions: 0000],
                                        ofItemAtPath: testRealmURL().path)
 
         assertFails(.filePermissionDenied) {
@@ -151,17 +153,12 @@ class RealmTests: TestCase {
     }
 
     func testInitFailable() {
-        autoreleasepool {
-            _ = try! Realm()
-        }
-
         FileManager.default.createFile(atPath: defaultRealmURL().path,
             contents: "a".data(using: String.Encoding.utf8, allowLossyConversion: false),
             attributes: nil)
 
         assertFails(.fileAccess) {
             _ = try Realm()
-            XCTFail("Realm creation should have failed")
         }
     }
 
@@ -1027,7 +1024,7 @@ class RealmTests: TestCase {
         } catch Realm.Error.fileAccess {
             // Success to catch the error
         } catch {
-            XCTFail("Failed to bridge RLMError to Realm.Error")
+            XCTFail("Unexpected error \(error)")
         }
         do {
             _ = try Realm(configuration: Realm.Configuration(fileURL: defaultRealmURL(), readOnly: true))
@@ -1035,7 +1032,7 @@ class RealmTests: TestCase {
         } catch Realm.Error.fileNotFound {
             // Success to catch the error
         } catch {
-            XCTFail("Failed to bridge RLMError to Realm.Error")
+            XCTFail("Unexpected error \(error)")
         }
     }
 

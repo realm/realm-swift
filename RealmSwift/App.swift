@@ -94,6 +94,13 @@ public typealias PushClient = RLMPushClient
 
 /// An object which is used within UserAPIKeyProviderClient
 public typealias UserAPIKey = RLMUserAPIKey
+extension UserAPIKey {
+
+/// The ObjectId of the API key.
+    public var objectId: ObjectId {
+        __objectId as! ObjectId
+    }
+}
 
 /**
 `Credentials`is an enum representing supported authentication types for Atlas App Services.
