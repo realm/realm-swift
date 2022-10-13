@@ -1,7 +1,10 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+* `Realm.Error` is now a typealias for `RLMError` rather than a
+  manually-defined version of what the automatic bridging produces. This should
+  have no effect on existing working code, but the manual definition was
+  missing a few things supplied by the automatic bridging.
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
