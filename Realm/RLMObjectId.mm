@@ -18,6 +18,7 @@
 
 #import "RLMObjectId_Private.hpp"
 
+#import "RLMError_Private.hpp"
 #import "RLMUtil.hpp"
 
 #import <realm/object_id.hpp>

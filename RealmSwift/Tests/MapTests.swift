@@ -458,7 +458,7 @@ class MapTests: TestCase {
         if map.realm != nil {
             // This message comes from Core and is incorrect for Dictionary.
             assertThrows((map["unassigned"] = map["0"]),
-                         reason: "Cannot add an existing managed embedded object to a List.")
+                         reason: "Cannot add an existing managed embedded object to a Dictionary.")
         }
         realm.cancelWrite()
     }
@@ -477,7 +477,7 @@ class MapTests: TestCase {
         if map.realm != nil {
             XCTAssertTrue(oldObj!!.isInvalidated)
             assertThrows(map["key"] = obj,
-                         reason: "Cannot add an existing managed embedded object to a List.")
+                         reason: "Cannot add an existing managed embedded object to a Dictionary.")
         }
 
         realm.cancelWrite()

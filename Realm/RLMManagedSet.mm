@@ -122,65 +122,10 @@ void RLMEnsureSetObservationInfo(std::unique_ptr<RLMObservationInfo>& info,
     }
 }
 
-//
-// validation helpers
-//
-[[gnu::noinline]]
-[[noreturn]]
-static void throwError(__unsafe_unretained RLMManagedSet *const ar, NSString *aggregateMethod) {
-    try {
-        throw;
-    }
-    catch (realm::InvalidTransactionException const&) {
-        @throw RLMException(@"Cannot modify managed RLMSet outside of a write transaction.");
-    }
-    catch (realm::IncorrectThreadException const&) {
-        @throw RLMException(@"Realm accessed from incorrect thread.");
-    }
-    catch (realm::object_store::Set::InvalidatedException const&) {
-        @throw RLMException(@"RLMSet has been invalidated or the containing object has been deleted.");
-    }
-    catch (realm::object_store::Set::InvalidEmbeddedOperationException const&) {
-        @throw RLMException(@"Cannot add an embedded object to an RLMSet.");
-    }
-    catch (realm::Results::UnsupportedColumnTypeException const& e) {
-        if (ar->_backingSet.get_type() == realm::PropertyType::Object) {
-            @throw RLMException(@"%@: is not supported for %s%s property '%s'.",
-                                aggregateMethod,
-                                string_for_property_type(e.property_type),
-                                is_nullable(e.property_type) ? "?" : "",
-                                e.column_name.data());
-        }
-        @throw RLMException(@"%@: is not supported for %s%s set '%@.%@'.",
-                            aggregateMethod,
-                            string_for_property_type(e.property_type),
-                            is_nullable(e.property_type) ? "?" : "",
-                            ar->_ownerInfo->rlmObjectSchema.className, ar->_key);
-    }
-    catch (std::logic_error const& e) {
-        @throw RLMException(e);
-    }
-}
-
 template<typename Function>
-static auto translateErrors(__unsafe_unretained RLMManagedSet *const set,
-                            Function&& f, NSString *aggregateMethod=nil) {
-    try {
-        return f();
-    }
-    catch (...) {
-        throwError(set, aggregateMethod);
-    }
-}
-
-template<typename Function>
+__attribute__((always_inline))
 static auto translateErrors(Function&& f) {
-    try {
-        return f();
-    }
-    catch (...) {
-        throwError(nil, nil);
-    }
+    return translateCollectionError(static_cast<Function&&>(f), @"Set");
 }
 
 static void changeSet(__unsafe_unretained RLMManagedSet *const set,
@@ -459,24 +404,24 @@ static void ensureInWriteTransaction(NSString *message, RLMManagedSet *set, RLMM
 
 - (id)minOfProperty:(NSString *)property {
     auto column = columnForProperty(property, _backingSet, _objectInfo, _type, RLMCollectionTypeSet);
-    auto value = translateErrors(self, [&] { return _backingSet.min(column); }, @"minOfProperty");
+    auto value = translateErrors([&] { return _backingSet.min(column); });
     return value ? RLMMixedToObjc(*value) : nil;
 }
 
 - (id)maxOfProperty:(NSString *)property {
     auto column = columnForProperty(property, _backingSet, _objectInfo, _type, RLMCollectionTypeSet);
-    auto value = translateErrors(self, [&] { return _backingSet.max(column); }, @"maxOfProperty");
+    auto value = translateErrors([&] { return _backingSet.max(column); });
     return value ? RLMMixedToObjc(*value) : nil;
 }
 
 - (id)sumOfProperty:(NSString *)property {
     auto column = columnForProperty(property, _backingSet, _objectInfo, _type, RLMCollectionTypeSet);
-    return RLMMixedToObjc(translateErrors(self, [&] { return _backingSet.sum(column); }, @"sumOfProperty"));
+    return RLMMixedToObjc(translateErrors([&] { return _backingSet.sum(column); }));
 }
 
 - (id)averageOfProperty:(NSString *)property {
     auto column = columnForProperty(property, _backingSet, _objectInfo, _type, RLMCollectionTypeSet);
-    auto value = translateErrors(self, [&] { return _backingSet.average(column); }, @"averageOfProperty");
+    auto value = translateErrors([&] { return _backingSet.average(column); });
     return value ? RLMMixedToObjc(*value) : nil;
 }
 
@@ -551,7 +496,7 @@ static void ensureInWriteTransaction(NSString *message, RLMManagedSet *set, RLMM
 
 - (instancetype)resolveInRealm:(RLMRealm *)realm {
     auto& parentInfo = _ownerInfo->resolve(realm);
-    return translateRLMResultsErrors([&] {
+    return translateErrors([&] {
         return [[self.class alloc] initWithBackingCollection:_backingSet.freeze(realm->_realm)
                                                   parentInfo:&parentInfo
                                                     property:parentInfo.rlmObjectSchema[_key]];

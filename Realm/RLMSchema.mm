@@ -112,7 +112,7 @@ static RLMObjectSchema *registerClass(Class cls) {
     s_sharedSchemaState = SharedSchemaState::Initializing;
     RLMObjectSchema *schema;
     {
-        auto cleanup = util::make_scope_exit([&]() noexcept {
+        util::ScopeExit cleanup([&]() noexcept {
             s_sharedSchemaState = prevState;
         });
         schema = [RLMObjectSchema schemaForObjectClass:cls];

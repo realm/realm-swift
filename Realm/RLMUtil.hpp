@@ -31,8 +31,8 @@
 
 namespace realm {
 class Decimal128;
+class Exception;
 class Mixed;
-class RealmFileException;
 }
 
 class RLMClassInfo;
@@ -43,12 +43,7 @@ class RLMClassInfo;
 __attribute__((format(NSString, 1, 2)))
 NSException *RLMException(NSString *fmt, ...);
 NSException *RLMException(std::exception const& exception);
-
-NSError *RLMMakeError(RLMError code, NSString *msg);
-NSError *RLMMakeError(RLMError code, std::exception const& exception);
-NSError *RLMMakeError(RLMError code, const realm::util::File::AccessError&);
-NSError *RLMMakeError(RLMError code, const realm::RealmFileException&);
-NSError *RLMMakeError(std::system_error const& exception);
+NSException *RLMException(realm::Exception const& exception);
 
 void RLMSetErrorOrThrow(NSError *error, NSError **outError);
 
@@ -107,7 +102,7 @@ id RLMBridgeSwiftValue(id obj);
 bool RLMIsSwiftObjectClass(Class cls);
 
 // String conversion utilities
-static inline NSString * RLMStringDataToNSString(realm::StringData stringData) {
+static inline NSString *RLMStringDataToNSString(realm::StringData stringData) {
     static_assert(sizeof(NSUInteger) >= sizeof(size_t),
                   "Need runtime overflow check for size_t to NSUInteger conversion");
     if (stringData.is_null()) {
@@ -120,7 +115,7 @@ static inline NSString * RLMStringDataToNSString(realm::StringData stringData) {
     }
 }
 
-static inline NSString * RLMStringViewToNSString(std::string_view stringView) {
+static inline NSString *RLMStringViewToNSString(std::string_view stringView) {
     if (stringView.size() == 0) {
         return nil;
     }

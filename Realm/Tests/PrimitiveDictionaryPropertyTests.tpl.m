@@ -357,7 +357,7 @@ static double average(NSDictionary *dictionary) {
 
 - (void)testMin {
     %noany %nominmax %unman RLMAssertThrowsWithReason([$dictionary minOfProperty:@"self"], ^n @"minOfProperty: is not supported for $type dictionary");
-    %noany %nominmax %man RLMAssertThrowsWithReason([$dictionary minOfProperty:@"self"], ^n @"minOfProperty: is not supported for $type dictionary '$class.$prop'");
+    %noany %nominmax %man RLMAssertThrowsWithReason([$dictionary minOfProperty:@"self"], ^n @"Operation 'min' not supported for $type dictionary '$class.$prop'");
 
     %minmax uncheckedAssertNil([$dictionary minOfProperty:@"self"]);
 
@@ -368,7 +368,7 @@ static double average(NSDictionary *dictionary) {
 
 - (void)testMax {
     %noany %nominmax %unman RLMAssertThrowsWithReason([$dictionary maxOfProperty:@"self"], ^n @"maxOfProperty: is not supported for $type dictionary");
-    %noany %nominmax %man RLMAssertThrowsWithReason([$dictionary maxOfProperty:@"self"], ^n @"maxOfProperty: is not supported for $type dictionary '$class.$prop'");
+    %noany %nominmax %man RLMAssertThrowsWithReason([$dictionary maxOfProperty:@"self"], ^n @"Operation 'max' not supported for $type dictionary '$class.$prop'");
 
     %minmax uncheckedAssertNil([$dictionary maxOfProperty:@"self"]);
 
@@ -380,7 +380,7 @@ static double average(NSDictionary *dictionary) {
 
 - (void)testSum {
     %noany %nosum %unman RLMAssertThrowsWithReason([$dictionary sumOfProperty:@"self"], ^n @"sumOfProperty: is not supported for $type dictionary");
-    %noany %nosum %man RLMAssertThrowsWithReason([$dictionary sumOfProperty:@"self"], ^n @"sumOfProperty: is not supported for $type dictionary '$class.$prop'");
+    %noany %nosum %man RLMAssertThrowsWithReason([$dictionary sumOfProperty:@"self"], ^n @"Operation 'sum' not supported for $type dictionary '$class.$prop'");
 
     %sum uncheckedAssertEqualObjects([$dictionary sumOfProperty:@"self"], @0);
 
@@ -391,7 +391,7 @@ static double average(NSDictionary *dictionary) {
 
 - (void)testAverage {
     %noany %noavg %unman RLMAssertThrowsWithReason([$dictionary averageOfProperty:@"self"], ^n @"averageOfProperty: is not supported for $type dictionary");
-    %noany %noavg %man RLMAssertThrowsWithReason([$dictionary averageOfProperty:@"self"], ^n @"averageOfProperty: is not supported for $type dictionary '$class.$prop'");
+    %noany %noavg %man RLMAssertThrowsWithReason([$dictionary averageOfProperty:@"self"], ^n @"Operation 'average' not supported for $type dictionary '$class.$prop'");
 
     %avg uncheckedAssertNil([$dictionary averageOfProperty:@"self"]);
 

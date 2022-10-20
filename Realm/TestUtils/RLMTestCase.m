@@ -120,8 +120,12 @@ static BOOL encryptTests(void) {
     [self resetRealmState];
 
     // Delete Realm files
-    [self deleteRealmFileAtURL:RLMDefaultRealmURL()];
-    [self deleteRealmFileAtURL:RLMTestRealmURL()];
+    NSURL *directory = RLMDefaultRealmURL().URLByDeletingLastPathComponent;
+    NSError *error = nil;
+    for (NSString *file in [NSFileManager.defaultManager
+                            contentsOfDirectoryAtPath:directory.path error:&error]) {
+        deleteOrThrow([directory URLByAppendingPathComponent:file]);
+    }
 }
 
 - (void)deleteRealmFileAtURL:(NSURL *)fileURL {

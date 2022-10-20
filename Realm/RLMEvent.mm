@@ -18,6 +18,7 @@
 
 #import <Realm/RLMEvent.h>
 
+#import "RLMError_Private.hpp"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObjectStore.h"
 #import "RLMObject_Private.hpp"
@@ -215,7 +216,7 @@ private:
     }
     if (_errorHandler) {
         config->sync_error_handler = [eh = _errorHandler](realm::SyncError e) {
-            if (auto error = RLMTranslateSyncError(e)) {
+            if (auto error = makeError(std::move(e))) {
                 eh(error);
             }
         };

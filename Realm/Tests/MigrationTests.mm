@@ -304,10 +304,11 @@ RLM_COLLECTION_TYPE(MigrationTestObject);
 #pragma mark - Schema versions
 
 - (void)testGetSchemaVersion {
-    XCTAssertThrows([RLMRealm schemaVersionAtURL:RLMDefaultRealmURL() encryptionKey:nil error:nil]);
+    XCTAssertEqual(RLMNotVersioned, [RLMRealm schemaVersionAtURL:RLMDefaultRealmURL() encryptionKey:nil error:nil]);
     NSError *error;
     XCTAssertEqual(RLMNotVersioned, [RLMRealm schemaVersionAtURL:RLMDefaultRealmURL() encryptionKey:nil error:&error]);
-    RLMValidateRealmError(error, RLMErrorFail, @"Cannot open an uninitialized realm in read-only mode", nil);
+    RLMValidateRealmError(error, RLMErrorInvalidDatabase,
+                          @"Realm at path '%@' has not been initialized.", RLMDefaultRealmURL().path);
 
     RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
     config.encryptionKey = nil;

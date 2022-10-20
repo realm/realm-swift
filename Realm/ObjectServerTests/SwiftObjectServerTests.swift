@@ -2160,7 +2160,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         // Changes have yet to be uploaded so expect an exception
         XCTAssertThrowsError(try realm.writeCopy(configuration: user2Config)) { error in
-            XCTAssertEqual(error.localizedDescription, "Could not write file as not all client changes are integrated in server")
+            XCTAssertEqual(error.localizedDescription, "All client changes must be integrated in server before writing copy")
         }
     }
 

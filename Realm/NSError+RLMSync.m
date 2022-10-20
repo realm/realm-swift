@@ -18,7 +18,7 @@
 
 #import "NSError+RLMSync.h"
 
-#import "RLMSyncUtil.h"
+#import "RLMError.h"
 
 @implementation NSError (RLMSync)
 

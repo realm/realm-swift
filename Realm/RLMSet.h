@@ -258,7 +258,7 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
  See the `RLMCollectionChange` documentation for information on how the changes
  are reported and an example of updating a `UITableView`.
 
- The error parameter is present only for backwards compatiblity and will always
+ The error parameter is present only for backwards compatibility and will always
  be `nil`.
 
  Notifications are delivered via the standard run loop, and so can't be
@@ -316,7 +316,7 @@ __attribute__((warn_unused_result));
  See the `RLMCollectionChange` documentation for information on how the changes
  are reported and an example of updating a `UITableView`.
 
- The error parameter is present only for backwards compatiblity and will always
+ The error parameter is present only for backwards compatibility and will always
  be `nil`.
 
  Notifications are delivered on the given queue. If the queue is blocked and
@@ -354,7 +354,7 @@ __attribute__((warn_unused_result));
  See the `RLMCollectionChange` documentation for information on how the changes
  are reported and an example of updating a `UITableView`.
 
- The error parameter is present only for backwards compatiblity and will always
+ The error parameter is present only for backwards compatibility and will always
  be `nil`.
 
  Notifications are delivered on the given queue. If the queue is blocked and
@@ -395,7 +395,7 @@ __attribute__((warn_unused_result));
  See the `RLMCollectionChange` documentation for information on how the changes
  are reported and an example of updating a `UITableView`.
 
- The error parameter is present only for backwards compatiblity and will always
+ The error parameter is present only for backwards compatibility and will always
  be `nil`.
 
  Notifications are delivered via the standard run loop, and so can't be

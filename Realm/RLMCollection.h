@@ -257,7 +257,7 @@ the block is not called at all. See the `RLMCollectionChange` documentation for
 information on how the changes are reported and an example of updating a
 `UITableView`.
 
- The error parameter is present only for backwards compatiblity and will always
+ The error parameter is present only for backwards compatibility and will always
  be `nil`.
 
 At the time when the block is called, the collection object will be fully
@@ -319,7 +319,7 @@ the block is not called at all. See the `RLMCollectionChange` documentation for
 information on how the changes are reported and an example of updating a
 `UITableView`.
 
- The error parameter is present only for backwards compatiblity and will always
+ The error parameter is present only for backwards compatibility and will always
  be `nil`.
 
 At the time when the block is called, the collection object will be fully
@@ -362,7 +362,7 @@ the block is not called at all. See the `RLMCollectionChange` documentation for
 information on how the changes are reported and an example of updating a
 `UITableView`.
 
- The error parameter is present only for backwards compatiblity and will always
+ The error parameter is present only for backwards compatibility and will always
  be `nil`.
 
 At the time when the block is called, the collection object will be fully

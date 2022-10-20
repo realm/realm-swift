@@ -23,6 +23,7 @@
 #import <Realm/RLMDecimal128.h>
 #import <Realm/RLMDictionary.h>
 #import <Realm/RLMEmbeddedObject.h>
+#import <Realm/RLMError.h>
 #import <Realm/RLMMigration.h>
 #import <Realm/RLMObject.h>
 #import <Realm/RLMObjectId.h>
@@ -48,7 +49,6 @@
 #import <Realm/RLMSyncManager.h>
 #import <Realm/RLMSyncSession.h>
 #import <Realm/RLMUser.h>
-#import <Realm/RLMSyncUtil.h>
 #import <Realm/RLMUserAPIKey.h>
 #import <Realm/RLMAPIKeyAuth.h>
 #import <Realm/RLMEmailPasswordAuth.h>

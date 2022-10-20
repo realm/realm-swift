@@ -33,7 +33,6 @@
 #import "RLMSchema_Private.h"
 #import "RLMSyncConfiguration_Private.hpp"
 #import "RLMSyncManager_Private.hpp"
-#import "RLMSyncUtil_Private.h"
 #import "RLMUser_Private.hpp"
 #import "RLMWatchTestUtility.h"
 
@@ -942,15 +941,15 @@ static NSString *randomEmail() {
 
     RLMRealmConfiguration *c = [RLMRealmConfiguration defaultConfiguration];
     c.fileURL = [NSURL fileURLWithPath:path];
-    RLMAssertThrowsWithError([RLMRealm realmWithConfiguration:c error:nil],
-                             @"Unable to open a realm at path",
-                             RLMErrorFileAccess,
-                             @"Realm file initial open failed");
+    RLMAssertRealmExceptionContains([RLMRealm realmWithConfiguration:c error:nil],
+                                    RLMErrorInvalidDatabase,
+                                    @"Failed to open Realm file at path '%@': header has invalid mnemonic. The file is either not a Realm file, is an encrypted Realm file but no encryption key was supplied, or is corrupted.",
+                                    c.fileURL.path);
     c.encryptionKey = RLMGenerateKey();
-    RLMAssertThrowsWithError([RLMRealm realmWithConfiguration:c error:nil],
-                             @"Unable to open a realm at path",
-                             RLMErrorFileAccess,
-                             @"Realm file decryption failed");
+    RLMAssertRealmExceptionContains([RLMRealm realmWithConfiguration:c error:nil],
+                                    RLMErrorInvalidDatabase,
+                                    @"Failed to open Realm file at path '%@': Realm file decryption failed (Decryption failed)",
+                                    c.fileURL.path);
 }
 
 #pragma mark - Multiple Realm Sync
@@ -1764,7 +1763,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     [RLMRealm asyncOpenWithConfiguration:c callbackQueue:dispatch_get_main_queue()
                                 callback:^(RLMRealm *realm, NSError *error) {
         XCTAssertNil(realm);
-        RLMValidateError(error, RLMAppErrorDomain, RLMAppErrorUnknown, @"Unknown");
+        RLMValidateError(error, RLMAppErrorDomain, RLMAppErrorUnknown, @"signature is invalid");
         [ex fulfill];
     }];
     [self waitForExpectationsWithTimeout:20.0 handler:nil];
@@ -1791,7 +1790,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
                            callbackQueue:dispatch_get_main_queue()
                                 callback:^(RLMRealm *realm, NSError *error) {
         XCTAssertNil(realm);
-        RLMValidateError(error, NSPOSIXErrorDomain, ECANCELED, @"Operation canceled");
+        RLMValidateError(error, NSPOSIXErrorDomain, ECANCELED, @"Sync session became inactive");
         [ex fulfill];
     }];
     [[RLMRealm asyncOpenWithConfiguration:c
@@ -2098,7 +2097,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     NSError *error;
     [syncedRealm writeCopyForConfiguration:syncConfig2 error:&error];
     XCTAssertEqual(error.code, RLMErrorFail);
-    XCTAssertEqualObjects(error.localizedDescription, @"Could not write file as not all client changes are integrated in server");
+    XCTAssertEqualObjects(error.localizedDescription, @"All client changes must be integrated in server before writing copy");
 }
 
 - (void)testWriteCopyForConfigurationLocalRealmForSyncWithExistingData {

@@ -70,7 +70,7 @@ extension ObjectBase: BuiltInObjcBridgeable {
 
 // `NSNumber as? T` coerces values which can't be exact represented for some
 // types and fails for others. We want to always coerce, for backwards
-// compatiblity if nothing else.
+// compatibility if nothing else.
 extension Float: BuiltInObjcBridgeable {
     public static func _rlmFromObjc(_ value: Any) -> Self? {
         return (value as? NSNumber)?.floatValue

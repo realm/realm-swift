@@ -16,8 +16,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMSyncUtil_Private.h"
-
 #import "RLMSyncConfiguration_Private.h"
 
 #import <realm/object-store/sync/sync_manager.hpp>
@@ -34,7 +32,3 @@ realm::ClientResyncMode translateClientResetMode(RLMClientResetMode mode);
 #pragma mark - Get user context
 
 CocoaSyncUserContext& context_for(const std::shared_ptr<realm::SyncUser>& user);
-
-#pragma mark - Error construction
-
-NSError *make_sync_error(std::error_code);

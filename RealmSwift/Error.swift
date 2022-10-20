@@ -39,6 +39,11 @@ extension Realm {
 extension Realm.Error {
     /// This error could be returned by completion block when no success and no error were produced
     public static let callFailed = Realm.Error(Realm.Error.fail, userInfo: [NSLocalizedDescriptionKey: "Call failed"])
+
+    /// The file URL which produced this error, or `nil` if not applicable
+    public var fileURL: URL? {
+        return (userInfo[NSFilePathErrorKey] as? String).flatMap(URL.init(fileURLWithPath:))
+    }
 }
 
 // MARK: Equatable

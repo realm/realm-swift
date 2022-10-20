@@ -153,7 +153,6 @@ let package = Package(
                 "scripts",
             ],
             sources: [
-                "Realm/RLMEvent.mm",
                 "Realm/RLMAccessor.mm",
                 "Realm/RLMAnalytics.mm",
                 "Realm/RLMArray.mm",
@@ -164,6 +163,8 @@ let package = Package(
                 "Realm/RLMDecimal128.mm",
                 "Realm/RLMDictionary.mm",
                 "Realm/RLMEmbeddedObject.mm",
+                "Realm/RLMError.mm",
+                "Realm/RLMEvent.mm",
                 "Realm/RLMManagedArray.mm",
                 "Realm/RLMManagedDictionary.mm",
                 "Realm/RLMManagedSet.mm",
@@ -188,9 +189,9 @@ let package = Package(
                 "Realm/RLMSwiftSupport.m",
                 "Realm/RLMSwiftValueStorage.mm",
                 "Realm/RLMThreadSafeReference.mm",
+                "Realm/RLMUUID.mm",
                 "Realm/RLMUpdateChecker.mm",
                 "Realm/RLMUtil.mm",
-                "Realm/RLMUUID.mm",
                 "Realm/RLMValue.mm",
 
                 // Sync source files

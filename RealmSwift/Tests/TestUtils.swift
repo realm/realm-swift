@@ -123,6 +123,22 @@ public extension XCTestCase {
         }
     }
 
+    func assertFails<T>(_ expectedError: Realm.Error.Code, _ file: URL, _ message: String,
+                        fileName: StaticString = #file, lineNumber: UInt = #line,
+                        block: () throws -> T) {
+        do {
+            _ = try autoreleasepool(invoking: block)
+            XCTFail("Expected to catch <\(expectedError)>, but no error was thrown.",
+                file: fileName, line: lineNumber)
+        } catch let e as Realm.Error where e.code == expectedError {
+            XCTAssertEqual(e.localizedDescription, message, file: fileName, line: lineNumber)
+            XCTAssertEqual(e.fileURL, file, file: fileName, line: lineNumber)
+        } catch {
+            XCTFail("Expected to catch <\(expectedError)>, but instead caught <\(error)>.",
+                file: fileName, line: lineNumber)
+        }
+    }
+
     func assertFails<T>(_ expectedError: Error, _ message: String? = nil,
                         fileName: StaticString = #file, lineNumber: UInt = #line,
                         block: () throws -> T) {

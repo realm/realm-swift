@@ -307,7 +307,7 @@ using namespace realm;
             return completion([self customData], nil);
         }
 
-        completion(nil, RLMAppErrorToNSError(*error));
+        completion(nil, makeError(*error));
     });
 }
 
@@ -315,8 +315,8 @@ using namespace realm;
                      completion:(RLMOptionalUserBlock)completion {
     _app._realmApp->link_user(_user, credentials.appCredentials,
                    ^(std::shared_ptr<SyncUser> user, std::optional<app::AppError> error) {
-        if (error && error->error_code) {
-            return completion(nil, RLMAppErrorToNSError(*error));
+        if (error) {
+            return completion(nil, makeError(*error));
         }
 
         completion([[RLMUser alloc] initWithUser:user app:_app], nil);
@@ -362,7 +362,7 @@ using namespace realm;
                                   [completionBlock](std::optional<bson::Bson>&& response,
                                                     std::optional<app::AppError> error) {
         if (error) {
-            return completionBlock(nil, RLMAppErrorToNSError(*error));
+            return completionBlock(nil, makeError(*error));
         }
 
         completionBlock(RLMConvertBsonToRLMBSON(*response), nil);
@@ -371,8 +371,8 @@ using namespace realm;
 
 - (void)handleResponse:(std::optional<realm::app::AppError>)error
             completion:(RLMOptionalErrorBlock)completion {
-    if (error && error->error_code) {
-        return completion(RLMAppErrorToNSError(*error));
+    if (error) {
+        return completion(makeError(*error));
     }
     completion(nil);
 }

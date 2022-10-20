@@ -62,7 +62,10 @@
 - (void)testOpeningInvalidPathThrows {
     RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
     config.fileURL = [NSURL fileURLWithPath:@"/dev/null/foo"];
-    RLMAssertThrowsWithCodeMatching([RLMRealm realmWithConfiguration:config error:nil], RLMErrorFileAccess);
+    RLMAssertRealmException([RLMRealm realmWithConfiguration:config error:nil],
+                            RLMErrorFileOperationFailed,
+                            @"Failed to open file at path '%@': parent path is not a directory",
+                            [config.fileURL.path stringByAppendingString:@".lock"]);
 }
 
 - (void)testPathCannotBeBothInMemoryAndRegularDurability {
@@ -73,9 +76,9 @@
 
     // make sure we can't open disk-realm at same path
     config.fileURL = [NSURL fileURLWithPath:@(inMemoryRealm.configuration.path.c_str())];
-    NSError *error; // passing in a reference to assert that this error can't be catched!
-    RLMAssertThrowsWithReasonMatching([RLMRealm realmWithConfiguration:config error:&error],
-                                      @"Realm at path '.*' already opened with different inMemory settings");
+    NSError *error; // passing in a reference to assert that this error can't be caught!
+    RLMAssertThrowsWithReason([RLMRealm realmWithConfiguration:config error:&error],
+                              ([NSString stringWithFormat:@"Realm at path '%@' already opened with different inMemory settings", config.fileURL.path]));
 }
 
 - (void)testRealmWithPathUsesDefaultConfiguration {
@@ -95,16 +98,21 @@
         [realm commitWriteTransaction];
     }
 
-    [NSFileManager.defaultManager setAttributes:@{NSFileImmutable: @YES} ofItemAtPath:RLMTestRealmURL().path error:nil];
+    [NSFileManager.defaultManager setAttributes:@{NSFileImmutable: @YES}
+                                   ofItemAtPath:RLMTestRealmURL().path error:nil];
 
     // Should not be able to open read-write
-    RLMAssertThrowsWithCodeMatching([self realmWithTestPath], RLMErrorFileAccess);
+    RLMAssertRealmException([self realmWithTestPath],
+                            RLMErrorFilePermissionDenied,
+                            @"Failed to open Realm file at path '%@': Operation not permitted. Please use a path where your app has read-write permissions.",
+                            RLMTestRealmURL().path);
 
     RLMRealm *realm;
     XCTAssertNoThrow(realm = [self readOnlyRealmWithURL:RLMTestRealmURL() error:nil]);
     XCTAssertEqual(1U, [StringObject allObjectsInRealm:realm].count);
 
-    [NSFileManager.defaultManager setAttributes:@{NSFileImmutable: @NO} ofItemAtPath:RLMTestRealmURL().path error:nil];
+    [NSFileManager.defaultManager setAttributes:@{NSFileImmutable: @NO}
+                                   ofItemAtPath:RLMTestRealmURL().path error:nil];
 }
 
 - (void)testReadOnlyFileInImmutableDirectory {
@@ -121,7 +129,8 @@
 
     // Make parent directory immutable to simulate opening Realm in an app bundle
     NSURL *parentDirectoryOfTestRealmURL = [RLMTestRealmURL() URLByDeletingLastPathComponent];
-    [NSFileManager.defaultManager setAttributes:@{NSFileImmutable: @YES} ofItemAtPath:parentDirectoryOfTestRealmURL.path error:nil];
+    [NSFileManager.defaultManager setAttributes:@{NSFileImmutable: @YES}
+                                   ofItemAtPath:parentDirectoryOfTestRealmURL.path error:nil];
 
     RLMRealm *realm;
     // Read-only Realm should be opened even in immutable directory
@@ -129,11 +138,15 @@
 
     [self dispatchAsyncAndWait:^{ XCTAssertNoThrow([self readOnlyRealmWithURL:RLMTestRealmURL() error:nil]); }];
 
-    [NSFileManager.defaultManager setAttributes:@{NSFileImmutable: @NO} ofItemAtPath:parentDirectoryOfTestRealmURL.path error:nil];
+    [NSFileManager.defaultManager setAttributes:@{NSFileImmutable: @NO}
+                                   ofItemAtPath:parentDirectoryOfTestRealmURL.path error:nil];
 }
 
 - (void)testReadOnlyRealmMustExist {
-   RLMAssertThrowsWithCodeMatching([self readOnlyRealmWithURL:RLMTestRealmURL() error:nil], RLMErrorFileNotFound);
+    RLMAssertRealmException([self readOnlyRealmWithURL:RLMTestRealmURL() error:nil],
+                            RLMErrorFileNotFound,
+                            @"Failed to open Realm file at path '%@': No such file or directory",
+                            RLMTestRealmURL().path);
 }
 
 - (void)testCannotHaveReadOnlyAndReadWriteRealmsAtSamePathAtSameTime {
@@ -183,14 +196,25 @@
     NSError *error;
     NSNumber *permissions = [NSFileManager.defaultManager attributesOfItemAtPath:RLMTestRealmURL().path error:&error][NSFilePosixPermissions];
     assert(!error);
-    [NSFileManager.defaultManager setAttributes:@{NSFilePosixPermissions: @(0000)} ofItemAtPath:RLMTestRealmURL().path error:&error];
+    [NSFileManager.defaultManager setAttributes:@{NSFilePosixPermissions: @(0000)}
+                                   ofItemAtPath:RLMTestRealmURL().path error:&error];
     assert(!error);
 
-    RLMAssertThrowsWithCodeMatching([self realmWithTestPath], RLMErrorFilePermissionDenied);
+    RLMAssertRealmException([self realmWithTestPath],
+                            RLMErrorFilePermissionDenied,
+                            @"Failed to open Realm file at path '%@': Permission denied. Please use a path where your app has read-write permissions.",
+                            RLMTestRealmURL().path);
+    RLMAssertRealmException([self readOnlyRealmWithURL:RLMTestRealmURL() error:nil],
+                            RLMErrorFilePermissionDenied,
+                            @"Failed to open Realm file at path '%@': Permission denied. Please use a path where your app has read permissions.",
+                            RLMTestRealmURL().path);
 
-    [NSFileManager.defaultManager setAttributes:@{NSFilePosixPermissions: permissions} ofItemAtPath:RLMTestRealmURL().path error:&error];
+    [NSFileManager.defaultManager setAttributes:@{NSFilePosixPermissions: permissions}
+                                   ofItemAtPath:RLMTestRealmURL().path error:&error];
     assert(!error);
 }
+
+#ifndef SWIFT_PACKAGE
 
 // Check that the data for file was left unchanged when opened with upgrading
 // disabled, but allow expanding the file to the page size
@@ -199,26 +223,17 @@
     NSData *newData = [NSData dataWithContentsOfURL:newURL]; \
     if (oldData.length < realm::util::page_size()) { \
         XCTAssertEqual(newData.length, realm::util::page_size()); \
-        XCTAssertNotEqual(([newData rangeOfData:oldData options:0 range:{0, oldData.length}]).location, NSNotFound); \
+        XCTAssertEqualObjects(oldData, ([newData subdataWithRange:{0, oldData.length}])); \
     } \
     else \
         XCTAssertEqualObjects(oldData, newData); \
 } while (0)
 
-#if 0 // FIXME: replace with migration from core 5 files
 - (void)testFileFormatUpgradeRequiredDeleteRealmIfNeeded {
-    RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
+    RLMRealmConfiguration *config = [RLMRealmConfiguration new];
     config.deleteRealmIfMigrationNeeded = YES;
 
-    NSURL *bundledRealmURL = [[NSBundle bundleForClass:[RealmTests class]] URLForResource:@"fileformat-pre-null" withExtension:@"realm"];
-    [NSFileManager.defaultManager copyItemAtURL:bundledRealmURL toURL:config.fileURL error:nil];
-
-    @autoreleasepool {
-        XCTAssertTrue([[RLMRealm realmWithConfiguration:config error:nil] isEmpty]);
-    }
-
-    bundledRealmURL = [[NSBundle bundleForClass:[RealmTests class]] URLForResource:@"fileformat-old-date" withExtension:@"realm"];
-    [NSFileManager.defaultManager removeItemAtURL:config.fileURL error:nil];
+    NSURL *bundledRealmURL = [[NSBundle bundleForClass:[RealmTests class]] URLForResource:@"file-format-version-21" withExtension:@"realm"];
     [NSFileManager.defaultManager copyItemAtURL:bundledRealmURL toURL:config.fileURL error:nil];
 
     @autoreleasepool {
@@ -227,18 +242,10 @@
 }
 
 - (void)testFileFormatUpgradeRequiredButDisabled {
-    RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
+    RLMRealmConfiguration *config = [RLMRealmConfiguration new];
     config.disableFormatUpgrade = true;
 
-    NSURL *bundledRealmURL = [[NSBundle bundleForClass:[RealmTests class]] URLForResource:@"fileformat-pre-null" withExtension:@"realm"];
-    [NSFileManager.defaultManager copyItemAtURL:bundledRealmURL toURL:config.fileURL error:nil];
-
-    RLMAssertThrowsWithCodeMatching([RLMRealm realmWithConfiguration:config error:nil],
-                                    RLMErrorFileFormatUpgradeRequired);
-    AssertFileUnmodified(bundledRealmURL, config.fileURL);
-
-    bundledRealmURL = [[NSBundle bundleForClass:[RealmTests class]] URLForResource:@"fileformat-old-date" withExtension:@"realm"];
-    [NSFileManager.defaultManager removeItemAtURL:config.fileURL error:nil];
+    NSURL *bundledRealmURL = [[NSBundle bundleForClass:[RealmTests class]] URLForResource:@"file-format-version-21" withExtension:@"realm"];
     [NSFileManager.defaultManager copyItemAtURL:bundledRealmURL toURL:config.fileURL error:nil];
 
     RLMAssertThrowsWithCodeMatching([RLMRealm realmWithConfiguration:config error:nil],
@@ -247,25 +254,29 @@
 }
 
 - (void)testFileFormatUpgradeRequiredButReadOnly {
-    RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
+    RLMRealmConfiguration *config = [RLMRealmConfiguration new];
     config.readOnly = true;
 
-    NSURL *bundledRealmURL = [[NSBundle bundleForClass:[RealmTests class]] URLForResource:@"fileformat-pre-null" withExtension:@"realm"];
+    NSURL *bundledRealmURL = [[NSBundle bundleForClass:[RealmTests class]] URLForResource:@"file-format-version-10" withExtension:@"realm"];
     [NSFileManager.defaultManager copyItemAtURL:bundledRealmURL toURL:config.fileURL error:nil];
 
-    RLMAssertThrowsWithCodeMatching([RLMRealm realmWithConfiguration:config error:nil], RLMErrorFileAccess);
-    XCTAssertEqualObjects([NSData dataWithContentsOfURL:bundledRealmURL],
-                          [NSData dataWithContentsOfURL:config.fileURL]);
-
-    bundledRealmURL = [[NSBundle bundleForClass:[RealmTests class]] URLForResource:@"fileformat-old-date" withExtension:@"realm"];
-    [NSFileManager.defaultManager removeItemAtURL:config.fileURL error:nil];
-    [NSFileManager.defaultManager copyItemAtURL:bundledRealmURL toURL:config.fileURL error:nil];
-
-    RLMAssertThrowsWithCodeMatching([RLMRealm realmWithConfiguration:config error:nil], RLMErrorFileAccess);
+    RLMAssertRealmException([RLMRealm realmWithConfiguration:config error:nil], RLMErrorFileFormatUpgradeRequired,
+                            @"Realm file at path '%@' cannot be opened in read-only mode because it has a file format version (10) which requires an upgrade",
+                            config.fileURL.path);
     XCTAssertEqualObjects([NSData dataWithContentsOfURL:bundledRealmURL],
                           [NSData dataWithContentsOfURL:config.fileURL]);
 }
-#endif // FIXME
+
+- (void)testUnsupportedFileFormatVersion {
+    RLMRealmConfiguration *config = [RLMRealmConfiguration new];
+    NSURL *bundledRealmURL = [[NSBundle bundleForClass:[RealmTests class]] URLForResource:@"fileformat-pre-null" withExtension:@"realm"];
+    [NSFileManager.defaultManager copyItemAtURL:bundledRealmURL toURL:config.fileURL error:nil];
+
+    RLMAssertThrowsWithCodeMatching([RLMRealm realmWithConfiguration:config error:nil], RLMErrorUnsupportedFileFormatVersion);
+    AssertFileUnmodified(bundledRealmURL, config.fileURL);
+}
+
+#endif // SWIFT_PACKAGE
 
 #if TARGET_OS_IOS && !TARGET_OS_MACCATALYST && (!TARGET_OS_SIMULATOR || !TARGET_RT_64_BIT)
 - (void)testExceedingVirtualAddressSpace {
@@ -782,8 +793,7 @@
     XCTAssertEqual(0U, DogObject.allObjects.count);
 }
 
-- (void)testAddObjectsFromArray
-{
+- (void)testAddObjectsFromArray {
     RLMRealm *realm = [self realmWithTestPath];
 
     [realm beginWriteTransaction];
@@ -1050,8 +1060,7 @@
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
 }
 
-- (void)testReadOnlyRealmIsImmutable
-{
+- (void)testReadOnlyRealmIsImmutable {
     @autoreleasepool { [self realmWithTestPath]; }
 
     RLMRealm *realm = [self readOnlyRealmWithURL:RLMTestRealmURL() error:nil];
@@ -1059,8 +1068,7 @@
     XCTAssertThrows([realm refresh]);
 }
 
-- (void)testRollbackInsert
-{
+- (void)testRollbackInsert {
     RLMRealm *realm = [self realmWithTestPath];
 
     [realm beginWriteTransaction];
@@ -1071,8 +1079,7 @@
     XCTAssertEqual(0U, [IntObject allObjectsInRealm:realm].count);
 }
 
-- (void)testRollbackDelete
-{
+- (void)testRollbackDelete {
     RLMRealm *realm = [self realmWithTestPath];
 
     [realm beginWriteTransaction];
@@ -1088,8 +1095,7 @@
     XCTAssertEqual(5, objectToDelete.intCol);
 }
 
-- (void)testRollbackModify
-{
+- (void)testRollbackModify {
     RLMRealm *realm = [self realmWithTestPath];
 
     [realm beginWriteTransaction];
@@ -1103,8 +1109,7 @@
     XCTAssertEqual(0, objectToModify.intCol);
 }
 
-- (void)testRollbackLink
-{
+- (void)testRollbackLink {
     RLMRealm *realm = [self realmWithTestPath];
 
     [realm beginWriteTransaction];
@@ -1152,8 +1157,7 @@
     XCTAssertTrue([obj1.next isEqualToObject:obj2]);
 }
 
-- (void)testRollbackLinkList
-{
+- (void)testRollbackLinkList {
     RLMRealm *realm = [self realmWithTestPath];
 
     [realm beginWriteTransaction];
@@ -1193,8 +1197,7 @@
     XCTAssertTrue([array.intArray[0] isEqualToObject:obj1]);
 }
 
-- (void)testRollbackTransactionWithBlock
-{
+- (void)testRollbackTransactionWithBlock {
     RLMRealm *realm = [self realmWithTestPath];
     [realm transactionWithBlock:^{
         [IntObject createInRealm:realm withValue:@[@0]];
@@ -1204,8 +1207,7 @@
     XCTAssertEqual(0U, [IntObject allObjectsInRealm:realm].count);
 }
 
-- (void)testRollbackTransactionWithoutExplicitCommitOrCancel
-{
+- (void)testRollbackTransactionWithoutExplicitCommitOrCancel {
     @autoreleasepool {
         RLMRealm *realm = [self realmWithTestPath];
         [realm beginWriteTransaction];
@@ -1215,8 +1217,7 @@
     XCTAssertEqual(0U, [IntObject allObjectsInRealm:[self realmWithTestPath]].count);
 }
 
-- (void)testCanRestartReadTransactionAfterInvalidate
-{
+- (void)testCanRestartReadTransactionAfterInvalidate {
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm transactionWithBlock:^{
         [IntObject createInRealm:realm withValue:@[@1]];
@@ -1227,8 +1228,7 @@
     XCTAssertEqual(obj.intCol, 1);
 }
 
-- (void)testInvalidateDetachesAccessors
-{
+- (void)testInvalidateDetachesAccessors {
     RLMRealm *realm = [RLMRealm defaultRealm];
     __block IntObject *obj;
     [realm transactionWithBlock:^{
@@ -1240,8 +1240,7 @@
     XCTAssertThrows([obj intCol]);
 }
 
-- (void)testInvalidateInvalidatesResults
-{
+- (void)testInvalidateInvalidatesResults {
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm transactionWithBlock:^{
         [IntObject createInRealm:realm withValue:@[@1]];
@@ -1255,8 +1254,7 @@
     XCTAssertThrows([results firstObject]);
 }
 
-- (void)testInvalidateInvalidatesArrays
-{
+- (void)testInvalidateInvalidatesArrays {
     RLMRealm *realm = [RLMRealm defaultRealm];
     __block ArrayPropertyObject *arrayObject;
     [realm transactionWithBlock:^{
@@ -1270,8 +1268,7 @@
     XCTAssertThrows([array count]);
 }
 
-- (void)testInvalidateOnReadOnlyRealm
-{
+- (void)testInvalidateOnReadOnlyRealm {
     @autoreleasepool {
         RLMRealm *realm = [self realmWithTestPath];
         [realm transactionWithBlock:^{
@@ -1286,14 +1283,12 @@
     XCTAssertFalse([[[IntObject allObjectsInRealm:realm] firstObject] isInvalidated]);
 }
 
-- (void)testInvalidateBeforeReadDoesNotAssert
-{
+- (void)testInvalidateBeforeReadDoesNotAssert {
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm invalidate];
 }
 
-- (void)testInvalidateDuringWriteRollsBack
-{
+- (void)testInvalidateDuringWriteRollsBack {
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm beginWriteTransaction];
     @autoreleasepool {
@@ -1304,8 +1299,7 @@
     XCTAssertEqual(0U, [IntObject allObjectsInRealm:realm].count);
 }
 
-- (void)testRefreshCreatesAReadTransaction
-{
+- (void)testRefreshCreatesAReadTransaction {
     RLMRealm *realm = [RLMRealm defaultRealm];
 
     [self dispatchAsyncAndWait:^{
@@ -1454,7 +1448,8 @@
     XCTAssertThrows([realm transactionWithBlock:^{ }]);
     NSError *error;
     [realm transactionWithBlock:^{} error:&error];
-    XCTAssertNotNil(error);
+    RLMValidateError(error, RLMErrorDomain, RLMErrorFail,
+                     @"Number of active versions (4) in the Realm exceeded the limit of 3");
 }
 
 #pragma mark - Async Transactions
@@ -1501,27 +1496,19 @@
 - (void)testAsyncTransactionShouldCancel {
     RLMRealm *realm = RLMRealm.defaultRealm;
     XCTestExpectation *waitComplete = [self expectationWithDescription:@"async wait complete"];
-    XCTestExpectation *writeComplete = [self expectationWithDescription:@"async transaction should be cancelled"];
-    writeComplete.inverted = YES;
 
     XCTAssertEqual(0U, [StringObject allObjectsInRealm:realm].count);
 
-    [self dispatchAsync:^{
-        RLMRealm *realm = [RLMRealm defaultRealmForQueue:self.bgQueue];
-        [realm beginAsyncWriteTransaction:^{ sleep(10); }];
-        [realm beginAsyncWriteTransaction:^{ sleep(10); }];
-        RLMAsyncTransactionId asyncTransactionId = [realm beginAsyncWriteTransaction:^{
-            [realm createObject:StringObject.className withValue:@[@"string"]];
-            [realm commitAsyncWriteTransaction:^(NSError *) {
-                [writeComplete fulfill];
-            }];
-        }];
-        [realm cancelAsyncTransaction:asyncTransactionId];
+    RLMAsyncTransactionId asyncTransactionId = [realm beginAsyncWriteTransaction:^{
+        XCTFail(@"should have been cancelled");
+    }];
+    [realm beginAsyncWriteTransaction:^{
+        [realm cancelWriteTransaction];
         [waitComplete fulfill];
     }];
+    [realm cancelAsyncTransaction:asyncTransactionId];
 
     [self waitForExpectationsWithTimeout:1.0 handler:nil];
-    [realm refresh];
     XCTAssertEqual(0U, [StringObject allObjectsInRealm:realm].count);
 }
 
@@ -2030,8 +2017,7 @@
 
 #pragma mark - Threads
 
-- (void)testCrossThreadAccess
-{
+- (void)testCrossThreadAccess {
     RLMRealm *realm = RLMRealm.defaultRealm;
 
     [self dispatchAsyncAndWait:^{
@@ -2278,8 +2264,7 @@
 
 #pragma mark - Read-only Realms
 
-- (void)testReadOnlyRealmWithMissingTables
-{
+- (void)testReadOnlyRealmWithMissingTables {
     // create a realm with only a StringObject table
     @autoreleasepool {
         RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:StringObject.class];
@@ -2320,8 +2305,7 @@
     }
 }
 
-- (void)testReadOnlyRealmWithMissingColumns
-{
+- (void)testReadOnlyRealmWithMissingColumns {
     // create a realm with only a zero-column StringObject table
     @autoreleasepool {
         RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:StringObject.class];
@@ -2355,8 +2339,7 @@
     XCTAssertTrue([IntObject allObjectsInRealm:frozenCopy].isFrozen);
 }
 
-- (void)testCannotOverwriteWithWriteCopy
-{
+- (void)testCannotOverwriteWithWriteCopy {
     RLMRealm *realm = [self realmWithTestPath];
     [realm transactionWithBlock:^{
         [IntObject createInRealm:realm withValue:@[@0]];
@@ -2366,20 +2349,20 @@
     // Does not throw when given a nil error out param
     XCTAssertFalse([realm writeCopyToURL:RLMTestRealmURL() encryptionKey:nil error:nil]);
 
-    NSString *expectedError = [NSString stringWithFormat:@"File at path '%@' already exists.", RLMTestRealmURL().path];
-    NSString *expectedUnderlying = [NSString stringWithFormat:@"open(\"%@\") failed: file exists", RLMTestRealmURL().path];
+    NSString *expectedError = @"Failed to open file at path '%@': File exists";
     XCTAssertFalse([realm writeCopyToURL:RLMTestRealmURL() encryptionKey:nil error:&writeError]);
-    RLMValidateRealmError(writeError, RLMErrorFileExists, expectedError, expectedUnderlying);
+    RLMValidateRealmError(writeError, RLMErrorFileExists,
+                          expectedError, RLMTestRealmURL().path);
 
     RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
     configuration.fileURL = RLMTestRealmURL();
     writeError = nil;
     XCTAssertFalse([realm writeCopyForConfiguration:configuration error:&writeError]);
-    RLMValidateRealmError(writeError, RLMErrorFileExists, expectedError, @"");
+    RLMValidateRealmError(writeError, RLMErrorFileExists,
+                          expectedError, RLMTestRealmURL().path);
 }
 
-- (void)testCannotWriteInNonExistentDirectory
-{
+- (void)testCannotWriteInNonExistentDirectory {
     RLMRealm *realm = [self realmWithTestPath];
     [realm transactionWithBlock:^{
         [IntObject createInRealm:realm withValue:@[@0]];
@@ -2387,21 +2370,19 @@
 
     NSString *badPath = @"/tmp/RLMTestDirMayNotExist/foo";
 
-    NSString *expectedError = [NSString stringWithFormat:@"Directory at path '%@' does not exist.", badPath];
-    NSString *expectedUnderlying = [NSString stringWithFormat:@"open(\"%@\") failed: no such file or directory", badPath];
+    NSString *expectedError = @"Failed to open file at path '%@': parent directory does not exist";
     NSError *writeError;
     XCTAssertFalse([realm writeCopyToURL:[NSURL fileURLWithPath:badPath] encryptionKey:nil error:&writeError]);
-    RLMValidateRealmError(writeError, RLMErrorFileNotFound, expectedError, expectedUnderlying);
+    RLMValidateRealmError(writeError, RLMErrorFileNotFound, expectedError, badPath);
 
     RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
     configuration.fileURL = [NSURL fileURLWithPath:badPath];
     writeError = nil;
     XCTAssertFalse([realm writeCopyForConfiguration:configuration error:&writeError]);
-    RLMValidateRealmError(writeError, RLMErrorFileNotFound, expectedError, expectedUnderlying);
+    RLMValidateRealmError(writeError, RLMErrorFileNotFound, expectedError, badPath);
 }
 
-- (void)testWriteToReadOnlyDirectory
-{
+- (void)testWriteToReadOnlyDirectory {
     RLMRealm *realm = [RLMRealm defaultRealm];
 
     // Make the parent directory temporarily read-only
@@ -2410,25 +2391,24 @@
     NSNumber *oldPermissions = [fm attributesOfItemAtPath:directory error:nil][NSFilePosixPermissions];
     [fm setAttributes:@{NSFilePosixPermissions: @(0100)} ofItemAtPath:directory error:nil];
 
-    NSString *expectedError = [NSString stringWithFormat:@"Unable to open a Realm at path '%@'. Please use a path where your app has read-write permissions.", RLMTestRealmURL().path];
-    NSString *expectedUnderlying = [NSString stringWithFormat:@"open(\"%@\") failed: permission denied", RLMTestRealmURL().path];
     NSError *writeError;
     XCTAssertFalse([realm writeCopyToURL:RLMTestRealmURL() encryptionKey:nil error:&writeError]);
-    RLMValidateRealmError(writeError, RLMErrorFilePermissionDenied, expectedError, expectedUnderlying);
+    RLMValidateRealmError(writeError, RLMErrorFilePermissionDenied,
+                          @"Failed to open file at path '%@': Permission denied", RLMTestRealmURL().path);
 
     // Test writeCopyForConfiguration
     RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
     configuration.fileURL = RLMTestRealmURL();
     writeError = nil;
     XCTAssertFalse([realm writeCopyForConfiguration:configuration error:&writeError]);
-    RLMValidateRealmError(writeError, RLMErrorFilePermissionDenied, expectedError, expectedUnderlying);
+    RLMValidateRealmError(writeError, RLMErrorFilePermissionDenied,
+                          @"Failed to open file at path '%@': Permission denied", RLMTestRealmURL().path);
 
     // Restore old permissions
     [fm setAttributes:@{NSFilePosixPermissions: oldPermissions} ofItemAtPath:directory error:nil];
 }
 
-- (void)testWriteWithNonSpecialCasedError
-{
+- (void)testWriteWithNonSpecialCasedError {
     // Testing an open() error which doesn't have its own exception type and
     // just uses the generic "something failed" error
     RLMRealm *realm = [RLMRealm defaultRealm];
@@ -2445,25 +2425,23 @@
     rl.rlim_cur = 0;
     setrlimit(RLIMIT_NOFILE, &rl);
 
-    NSString *expectedError = [NSString stringWithFormat:@"Unable to open a Realm at path '%@': open() failed: too many open files",
-                               RLMTestRealmURL().path];
-    NSString *expectedUnderlying = [NSString stringWithFormat:@"open(\"%@\") failed: too many open files", RLMTestRealmURL().path];
     NSError *writeError;
     XCTAssertFalse([realm writeCopyToURL:RLMTestRealmURL() encryptionKey:nil error:&writeError]);
-    RLMValidateRealmError(writeError, RLMErrorFileAccess, expectedError, expectedUnderlying);
+    RLMValidateRealmError(writeError, RLMErrorFileOperationFailed,
+                          @"Failed to open file at path '%@': Too many open files", RLMTestRealmURL().path);
 
     RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
     configuration.fileURL = RLMTestRealmURL();
     writeError = nil;
     XCTAssertFalse([realm writeCopyForConfiguration:configuration error:&writeError]);
-    RLMValidateRealmError(writeError, RLMErrorFileAccess, expectedError, expectedUnderlying);
+    RLMValidateRealmError(writeError, RLMErrorFileOperationFailed,
+                          @"Failed to open file at path '%@': Too many open files", RLMTestRealmURL().path);
 
     // Restore the old open file limit
     setrlimit(RLIMIT_NOFILE, &oldrl);
 }
 
-- (void)testWritingCopyUsesWriteTransactionInProgress
-{
+- (void)testWritingCopyUsesWriteTransactionInProgress {
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm transactionWithBlock:^{
         [IntObject createInRealm:realm withValue:@[@0]];
@@ -2480,8 +2458,7 @@
 
 #pragma mark - Write Copy For Configuration
 
-- (void)testWriteCopyForConfiguration
-{
+- (void)testWriteCopyForConfiguration {
     RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
     configuration.fileURL = RLMTestRealmURL();
 
@@ -2501,8 +2478,7 @@
     XCTAssertTrue([IntObject allObjectsInRealm:frozenCopy].isFrozen);
 }
 
-- (void)testWritingCopyWithConfigurationUsesWriteTransactionInProgress
-{
+- (void)testWritingCopyWithConfigurationUsesWriteTransactionInProgress {
     RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
     configuration.fileURL = RLMTestRealmURL();
 
@@ -2662,11 +2638,10 @@
                                       @"Realm path must not be empty", @"nil path");
 }
 
-- (void)testRealmFileAccessNoExistingFile
-{
+- (void)testRealmFileAccessNoExistingFile {
     NSURL *fileURL = [NSURL fileURLWithPath:RLMRealmPathForFile(@"filename.realm")];
     [[NSFileManager defaultManager] removeItemAtPath:fileURL.path error:nil];
-    assert(![[NSFileManager defaultManager] fileExistsAtPath:fileURL.path]);
+    XCTAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:fileURL.path]);
 
     NSError *error;
     RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
@@ -2676,9 +2651,7 @@
     XCTAssertNil(error);
 }
 
-// FIXME: core 10.0.0-alpha.3 does not throw the correct exception for this test
-- (void)SKIP_testRealmFileAccessInvalidFile
-{
+- (void)testRealmFileAccessInvalidFile {
     NSString *content = @"Some content";
     NSData *fileContents = [content dataUsingEncoding:NSUTF8StringEncoding];
     NSURL *fileURL = [NSURL fileURLWithPath:RLMRealmPathForFile(@"filename.realm")];
@@ -2687,14 +2660,14 @@
     [[NSFileManager defaultManager] createFileAtPath:fileURL.path contents:fileContents attributes:nil];
 
     NSError *error;
-    RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
+    RLMRealmConfiguration *configuration = [RLMRealmConfiguration new];
     configuration.fileURL = fileURL;
-    XCTAssertNil([RLMRealm realmWithConfiguration:configuration error:&error], @"Invalid database");
-    RLMValidateRealmError(error, RLMErrorFileAccess, @"Unable to open a realm at path", @"Realm file has bad size");
+    XCTAssertNil([RLMRealm realmWithConfiguration:configuration error:&error]);
+    RLMValidateRealmError(error, RLMErrorInvalidDatabase,
+                          @"Failed to open Realm file at path '%@': file is non-empty but too small (12 bytes) to be a valid Realm.", fileURL.path);
 }
 
-- (void)testRealmFileAccessFileIsDirectory
-{
+- (void)testRealmFileAccessFileIsDirectory {
     NSURL *testURL = RLMTestRealmURL();
     [[NSFileManager defaultManager] createDirectoryAtPath:testURL.path
                               withIntermediateDirectories:NO
@@ -2703,13 +2676,13 @@
     NSError *error;
     RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
     configuration.fileURL = testURL;
-    XCTAssertNil([RLMRealm realmWithConfiguration:configuration error:&error], @"Invalid database");
-    RLMValidateRealmError(error, RLMErrorFileAccess, @"Unable to open a realm at path", @"Is a directory");
+    XCTAssertNil([RLMRealm realmWithConfiguration:configuration error:&error]);
+    RLMValidateRealmError(error, RLMErrorFileOperationFailed,
+                          @"Failed to open Realm file at path '%@': Is a directory", testURL.path);
 }
 
 #if !TARGET_OS_TV
-- (void)testRealmFifoError
-{
+- (void)testRealmFifoError {
     NSFileManager *manager = [NSFileManager defaultManager];
     NSURL *testURL = RLMTestRealmURL();
     RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
@@ -2726,15 +2699,17 @@
     realm::DBOptions::set_sys_tmp_dir("");
 
     NSError *error;
-    XCTAssertNil([RLMRealm realmWithConfiguration:configuration error:&error], @"Should not have been able to open FIFO");
-    RLMValidateRealmError(error, RLMErrorFileAccess, @"Is a directory", nil);
+    XCTAssertNil([RLMRealm realmWithConfiguration:configuration error:&error],
+                 @"Should not have been able to open FIFO");
+    RLMValidateRealmError(error, RLMErrorFileExists,
+                          @"Cannot create fifo at path '%@': a non-fifo entry already exists at that path.",
+                          [testURL.path stringByAppendingString:@".note"]);
 
     realm::DBOptions::set_sys_tmp_dir(std::move(oldTempDir));
 }
 #endif
 
-- (void)testMultipleRealms
-{
+- (void)testMultipleRealms {
     // Create one StringObject in two different realms
     RLMRealm *defaultRealm = [RLMRealm defaultRealm];
     RLMRealm *testRealm = self.realmWithTestPath;
@@ -2760,7 +2735,8 @@
     // Create the realm file and lock file
     @autoreleasepool { [RLMRealm defaultRealm]; }
 
-    int fd = open([RLMRealmConfiguration.defaultConfiguration.fileURL.path stringByAppendingString:@".lock"].UTF8String, O_RDWR);
+    NSString *path = RLMRealmConfiguration.defaultConfiguration.fileURL.path;
+    int fd = open([path stringByAppendingString:@".lock"].UTF8String, O_RDWR);
     XCTAssertNotEqual(-1, fd);
 
     // Change the value of the mutex size field in the shared info header
@@ -2775,7 +2751,7 @@
     NSError *error;
     RLMRealm *realm = [RLMRealm realmWithConfiguration:RLMRealmConfiguration.defaultConfiguration error:&error];
     XCTAssertNil(realm);
-    RLMValidateRealmError(error, RLMErrorIncompatibleLockFile, @"Realm file is currently open in another process", nil);
+    RLMValidateRealmError(error, RLMErrorIncompatibleLockFile, @"Realm file '%@' is currently open in another process which cannot share access with this process. This could either be due to the existing process being a different architecture or due to the existing process using an incompatible version of Realm. If the other process is Realm Studio, you may need to update it (or update Realm if your Studio version is too new), and if using an iOS simulator, make sure that you are using a 64-bit simulator. Underlying problem: Architecture mismatch: Mutex size is 255 but should be 1.", path);
 
     flock(fd, LOCK_UN);
     close(fd);
@@ -2798,8 +2774,7 @@
     }
 }
 
-- (NSArray *)pathsFor100Realms
-{
+- (NSArray *)pathsFor100Realms {
     NSMutableArray *paths = [NSMutableArray array];
     for (int i = 0; i < 100; ++i) {
         NSString *realmFileName = [NSString stringWithFormat:@"test.%d.realm", i];
@@ -2808,8 +2783,7 @@
     return paths;
 }
 
-- (void)testCanCreate100RealmsWithoutBreakingGCD
-{
+- (void)testCanCreate100RealmsWithoutBreakingGCD {
     NSMutableArray *realms = [NSMutableArray array];
     for (NSString *realmPath in self.pathsFor100Realms) {
         [realms addObject:[RLMRealm realmWithURL:[NSURL fileURLWithPath:realmPath]]];
@@ -2949,6 +2923,7 @@
 
     NSError *error;
     XCTAssertTrue([RLMRealm deleteFilesForConfiguration:config error:&error]);
+    XCTAssertEqual(error.domain, NSCocoaErrorDomain);
     XCTAssertEqual(error.code, NSFileWriteNoPermissionError);
     [fm setAttributes:@{NSFileImmutable: @NO} ofItemAtPath:notificationPipe error:nil];
 }

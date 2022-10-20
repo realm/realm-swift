@@ -41,6 +41,12 @@ struct CollectionCallbackWrapper {
         block(collection, [[RLMSectionedResultsChange alloc] initWithChanges:changes]);
     }
 };
+
+template<typename Function>
+__attribute__((always_inline))
+static auto translateErrors(Function&& f) {
+    return translateCollectionError(static_cast<Function&&>(f), @"SectionedResults");
+}
 } // anonymous namespace
 
 @implementation RLMSectionedResultsChange {
@@ -330,7 +336,7 @@ static RLMNotificationToken *RLMAddNotificationBlock(RLMSectionedResults *collec
 }
 
 - (NSArray *)allKeys {
-    return translateRLMResultsErrors([&] {
+    return translateErrors([&] {
         NSUInteger count = [self count];
         NSMutableArray *arr = [NSMutableArray arrayWithCapacity:count];
         for (NSUInteger i = 0; i < count; i++) {
@@ -349,7 +355,7 @@ static RLMNotificationToken *RLMAddNotificationBlock(RLMSectionedResults *collec
 }
 
 - (NSUInteger)count {
-    return translateRLMResultsErrors([&] {
+    return translateErrors([&] {
         return _sectionedResults.size();
     });
 }
@@ -398,7 +404,7 @@ static RLMNotificationToken *RLMAddNotificationBlock(RLMSectionedResults *collec
 }
 
 - (instancetype)resolveInRealm:(RLMRealm *)realm {
-     return translateRLMResultsErrors([&] {
+     return translateErrors([&] {
         if (realm.isFrozen) {
             return [[RLMSectionedResults alloc] initWithSectionedResults:_sectionedResults.freeze(realm->_realm)
                                                               objectInfo:_info->resolve(realm)
@@ -451,7 +457,7 @@ static RLMNotificationToken *RLMAddNotificationBlock(RLMSectionedResults *collec
 }
 
 - (BOOL)isInvalidated {
-    return translateRLMResultsErrors([&] { return !_sectionedResults.is_valid(); });
+    return translateErrors([&] { return !_sectionedResults.is_valid(); });
 }
 
 - (NSString *)description {
@@ -495,7 +501,7 @@ static RLMNotificationToken *RLMAddNotificationBlock(RLMSectionedResults *collec
 }
 
 - (BOOL)isFrozen {
-    return translateRLMResultsErrors([&] { return _sectionedResults.is_frozen(); });
+    return translateErrors([&] { return _sectionedResults.is_frozen(); });
 }
 
 @end
@@ -611,19 +617,19 @@ static RLMNotificationToken *RLMAddNotificationBlock(RLMSection *collection,
 
 - (id)objectAtIndex:(NSUInteger)index {
     RLMAccessorContext ctx(*_parent.objectInfo);
-    return translateRLMResultsErrors([&] {
+    return translateErrors([&] {
         return ctx.box(_resultsSection[index]);
     });
 }
 
 - (NSUInteger)count {
-    return translateRLMResultsErrors([&] {
+    return translateErrors([&] {
         return _resultsSection.size();
     });
 }
 
 - (id<RLMValue>)key {
-    return translateRLMResultsErrors([&] {
+    return translateErrors([&] {
         return RLMMixedToObjc(_resultsSection.key());
     });
 }
@@ -647,11 +653,11 @@ static RLMNotificationToken *RLMAddNotificationBlock(RLMSection *collection,
 }
 
 - (BOOL)isInvalidated {
-    return translateRLMResultsErrors([&] { return !_resultsSection.is_valid(); });
+    return translateErrors([&] { return !_resultsSection.is_valid(); });
 }
 
 - (BOOL)isFrozen {
-    return translateRLMResultsErrors([&] { return _parent.frozen; });
+    return translateErrors([&] { return _parent.frozen; });
 }
 
 // The compiler complains about the method's argument type not matching due to
@@ -699,14 +705,14 @@ static RLMNotificationToken *RLMAddNotificationBlock(RLMSection *collection,
                                                                      realm:realm
                                                                 objectInfo:realm->_info[objType]
                                                                   keyBlock:metadata.keyBlock];
-    return translateRLMResultsErrors([&] {
+    return translateErrors([&] {
         return [[RLMSection alloc] initWithResultsSection:sr->_sectionedResults[RLMObjcToMixed(metadata.sectionKey)]
                                                    parent:sr];
     });
 }
 
 - (instancetype)resolveInRealm:(RLMRealm *)realm {
-     return translateRLMResultsErrors([&] {
+     return translateErrors([&] {
         RLMSectionedResults *sr = realm.isFrozen ? [_parent freeze] : [_parent thaw];
         return [[RLMSection alloc] initWithResultsSection:sr->_sectionedResults[RLMObjcToMixed(self.key)]
                                                    parent:sr];

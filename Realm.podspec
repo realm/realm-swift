@@ -29,6 +29,7 @@ Pod::Spec.new do |s|
                               'include/RLMDecimal128.h',
                               'include/RLMDictionary.h',
                               'include/RLMEmbeddedObject.h',
+                              'include/RLMError.h',
                               'include/RLMMigration.h',
                               'include/RLMObject.h',
                               'include/RLMObjectBase.h',
@@ -61,7 +62,6 @@ Pod::Spec.new do |s|
                               'include/RLMSyncManager.h',
                               'include/RLMSyncSession.h',
                               'include/RLMUser.h',
-                              'include/RLMSyncUtil.h',
                               'include/RLMUserAPIKey.h',
                               'include/RLMAPIKeyAuth.h',
                               'include/RLMEmailPasswordAuth.h',
@@ -105,7 +105,6 @@ Pod::Spec.new do |s|
                               'include/RLMSwiftProperty.h',
                               'include/RLMSyncConfiguration_Private.h',
                               'include/RLMSyncSubscription_Private.h',
-                              'include/RLMSyncUtil_Private.h',
                               'include/RLMUpdateResult_Private.h',
                               'include/RLMUser_Private.h',
 

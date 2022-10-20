@@ -17,11 +17,12 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMSyncSubscription_Private.hpp"
+
+#import "RLMError_Private.hpp"
+#import "RLMObjectId_Private.hpp"
+#import "RLMQueryUtil.hpp"
 #import "RLMRealm_Private.hpp"
 #import "RLMUtil.hpp"
-#import "RLMQueryUtil.hpp"
-#import "RLMObjectId_Private.hpp"
-#import "RLMSyncUtil.h"
 
 #import <realm/sync/subscriptions.hpp>
 #import <realm/status_with.hpp>
@@ -211,7 +212,9 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
     if (errorMessage.length == 0) {
         return nil;
     }
-    return [[NSError alloc] initWithDomain:RLMFlexibleSyncErrorDomain code:RLMFlexibleSyncErrorStatusError userInfo:@{NSLocalizedDescriptionKey: errorMessage}];
+    return [[NSError alloc] initWithDomain:RLMSyncErrorDomain
+                                      code:RLMSyncErrorInvalidFlexibleSyncSubscriptions
+                                  userInfo:@{NSLocalizedDescriptionKey: errorMessage}];
 }
 
 - (RLMSyncSubscriptionState)state {
@@ -234,44 +237,49 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
 #pragma mark - Batch Update subscriptions
 
 - (void)update:(__attribute__((noescape)) void(^)(void))block {
-    return [self update:block onComplete:^(NSError*){}];
+    return [self update:block onComplete:nil];
 }
 
 - (void)update:(__attribute__((noescape)) void(^)(void))block onComplete:(void(^)(NSError *))completionBlock {
-    if (_mutableSubscriptionSet != nil) {
-        @throw RLMException(@"Cannot initiate a write transaction on subscription set that is already been updated.");
+    if (_mutableSubscriptionSet) {
+        @throw RLMException(@"Cannot initiate a write transaction on subscription set that is already being updated.");
     }
     _mutableSubscriptionSet = std::make_unique<realm::sync::MutableSubscriptionSet>(_subscriptionSet->make_mutable_copy());
+    realm::util::ScopeExit cleanup([&]() noexcept {
+        if (_mutableSubscriptionSet) {
+            _mutableSubscriptionSet = nullptr;
+            _subscriptionSet->refresh();
+        }
+    });
+
     block();
+
     try {
         _subscriptionSet = std::make_unique<realm::sync::SubscriptionSet>(std::move(*_mutableSubscriptionSet).commit());
         _mutableSubscriptionSet = nullptr;
     }
-    catch (const std::exception& error) {
-        _subscriptionSet->refresh();
-        NSError *err = [[NSError alloc] initWithDomain:RLMFlexibleSyncErrorDomain code:RLMFlexibleSyncErrorCommitSubscriptionSetError userInfo:@{@"reason":@(error.what())}];
-        return completionBlock(err);
+    catch (realm::Exception const& ex) {
+        @throw RLMException(ex);
     }
-    [self waitForSynchronizationOnQueue:nil completionBlock:completionBlock];
+    catch (std::exception const& ex) {
+        @throw RLMException(ex);
+    }
+
+    if (completionBlock) {
+        [self waitForSynchronizationOnQueue:nil completionBlock:completionBlock];
+    }
 }
 
 - (void)waitForSynchronizationOnQueue:(nullable dispatch_queue_t)queue
                       completionBlock:(void(^)(NSError *))completionBlock {
     _subscriptionSet->get_state_change_notification(realm::sync::SubscriptionSet::State::Complete)
         .get_async([completionBlock, queue](realm::StatusWith<realm::sync::SubscriptionSet::State> state) noexcept {
-            NSError *error;
-            if (!state.is_ok()) {
-                error = [[NSError alloc] initWithDomain:RLMErrorDomain
-                                                   code:RLMErrorSubscriptionFailed
-                                               userInfo:@{NSLocalizedDescriptionKey: @(state.get_status().reason().c_str())}];
-            }
             if (queue) {
-                dispatch_async(queue, ^{
-                    completionBlock(error);
+                return dispatch_async(queue, ^{
+                    completionBlock(makeError(state));
                 });
-            } else {
-                completionBlock(error);
             }
+            return completionBlock(makeError(state));
         });
 }
 

@@ -122,11 +122,13 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
  and will return after committing the subscription transactions.
 
  @param block The block containing actions to perform to the subscription set.
- @param onComplete The block called upon synchronization of subscriptions to the server. Otherwise
-                   an `Error`describing what went wrong will be returned by the block
+ @param onComplete A block which is called upon synchronization of
+                   subscriptions to the server. The block will be passed `nil`
+                   if the update succeeded, and an error describing the problem
+                   otherwise.
  */
 - (void)update:(__attribute__((noescape)) void(^)(void))block
-    onComplete:(void(^)(NSError * _Nullable))onComplete
+    onComplete:(nullable void(^)(NSError * _Nullable))onComplete
     __attribute__((swift_async(not_swift_private, 2)))
     __attribute__((swift_attr("@_unsafeInheritExecutor")));
 /// :nodoc:

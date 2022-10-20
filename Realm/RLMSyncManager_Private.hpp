@@ -18,7 +18,6 @@
 
 #import <Realm/RLMSyncManager.h>
 
-#import "RLMSyncUtil_Private.h"
 #import "RLMNetworkTransport.h"
 #import <memory>
 

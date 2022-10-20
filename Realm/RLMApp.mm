@@ -218,6 +218,7 @@ static void setOptionalString(std::optional<std::string>& dst, NSString *src) {
 @end
 
 #pragma mark RLMAppSubscriptionToken
+
 @implementation RLMAppSubscriptionToken {
 @public
     std::unique_ptr<realm::Subscribable<app::App>::Token> _token;
@@ -348,8 +349,8 @@ static std::mutex& s_appMutex = *new std::mutex();
 - (void)loginWithCredential:(RLMCredentials *)credentials
                  completion:(RLMUserCompletionBlock)completionHandler {
     auto completion = ^(std::shared_ptr<SyncUser> user, std::optional<app::AppError> error) {
-        if (error && error->error_code) {
-            return completionHandler(nil, RLMAppErrorToNSError(*error));
+        if (error) {
+            return completionHandler(nil, makeError(*error));
         }
 
         completionHandler([[RLMUser alloc] initWithUser:user app:self], nil);
