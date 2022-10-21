@@ -803,7 +803,7 @@ public extension SyncSession {
     /**
      A struct encapsulating progress information, as well as useful helper methods.
      */
-    struct Progress {
+    struct Progress: Sendable {
         /// The number of bytes that have been transferred.
         public let transferredBytes: Int
 

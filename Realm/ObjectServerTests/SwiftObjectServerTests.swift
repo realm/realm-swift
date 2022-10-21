@@ -1206,39 +1206,57 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     }
 
     // MARK: - Progress notifiers
+    @MainActor
     func testStreamingDownloadNotifier() throws {
         let user = try logInUser(for: basicCredentials())
         if !isParent {
-            populateRealm(user: user, partitionValue: #function)
-            return
+            return try populateRealm(user: user, partitionValue: #function)
         }
 
         let realm = try immediatelyOpenRealm(partitionValue: #function, user: user)
         let session = try XCTUnwrap(realm.syncSession)
-        let ex = expectation(description: "streaming-downloads-expectation")
-        @Locked var progress: SyncSession.Progress?
+        var ex = expectation(description: "first download")
+        var minimumDownloadSize = 1000000
+        var callCount = 0
+        var progress: SyncSession.Progress?
         let token = session.addProgressNotification(for: .download, mode: .reportIndefinitely) { p in
-            if let progress = $progress.wrappedValue {
-                XCTAssertGreaterThanOrEqual(p.transferredBytes, progress.transferredBytes)
-                XCTAssertGreaterThanOrEqual(p.transferrableBytes, progress.transferrableBytes)
-                if p.transferredBytes == progress.transferredBytes && p.transferrableBytes == progress.transferrableBytes {
-                    return
+            DispatchQueue.main.async { @MainActor in
+                // Verify that progress doesn't decrease, but sometimes it won't
+                // have increased since the last call
+                if let progress = progress {
+                    XCTAssertGreaterThanOrEqual(p.transferredBytes, progress.transferredBytes)
+                    XCTAssertGreaterThanOrEqual(p.transferrableBytes, progress.transferrableBytes)
+                    if p.transferredBytes == progress.transferredBytes && p.transferrableBytes == progress.transferrableBytes {
+                        return
+                    }
                 }
-            }
-            $progress.wrappedValue = p
-            if p.transferredBytes > 1000000 && p.isTransferComplete {
-                ex.fulfill()
+                progress = p
+                callCount += 1
+                if p.transferredBytes > minimumDownloadSize && p.isTransferComplete {
+                    ex.fulfill()
+                }
             }
         }
         XCTAssertNotNil(token)
 
         // Wait for the child process to upload all the data.
         executeChild()
-
         waitForExpectations(timeout: 60.0, handler: nil)
+        XCTAssertGreaterThanOrEqual(callCount, 1)
+        let p1 = try XCTUnwrap(progress)
+        XCTAssertEqual(p1.transferredBytes, p1.transferrableBytes)
+        let initialCallCount = callCount
+        minimumDownloadSize = p1.transferredBytes + 1000000
+
+        // Run a second time to upload more data and verify that the callback continues to be called
+        ex = expectation(description: "second download")
+        executeChild()
+        waitForExpectations(timeout: 60.0, handler: nil)
+        XCTAssertGreaterThanOrEqual(callCount, initialCallCount)
+        let p2 = try XCTUnwrap(progress)
+        XCTAssertEqual(p2.transferredBytes, p2.transferrableBytes)
+
         token!.invalidate()
-        let p = try XCTUnwrap(progress)
-        XCTAssertEqual(p.transferredBytes, p.transferrableBytes)
     }
 
     func testStreamingUploadNotifier() throws {
@@ -1338,8 +1356,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     func testDownloadRealm() throws {
         let user = try logInUser(for: basicCredentials())
         if !isParent {
-            populateRealm(user: user, partitionValue: #function)
-            return
+            return try populateRealm(user: user, partitionValue: #function)
         }
 
         // Wait for the child process to upload everything.
@@ -1373,8 +1390,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     func testDownloadRealmToCustomPath() throws {
         let user = try logInUser(for: basicCredentials())
         if !isParent {
-            populateRealm(user: user, partitionValue: #function)
-            return
+            return try populateRealm(user: user, partitionValue: #function)
         }
 
         // Wait for the child process to upload everything.
@@ -1411,8 +1427,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     func testCancelDownloadRealm() throws {
         let user = try logInUser(for: basicCredentials())
         if !isParent {
-            populateRealm(user: user, partitionValue: #function)
-            return
+            return try populateRealm(user: user, partitionValue: #function)
         }
 
         // Wait for the child process to upload everything.
@@ -1441,8 +1456,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     func testAsyncOpenProgress() throws {
         let user = try logInUser(for: basicCredentials())
         if !isParent {
-            populateRealm(user: user, partitionValue: #function)
-            return
+            return try populateRealm(user: user, partitionValue: #function)
         }
 
         // Wait for the child process to upload everything.

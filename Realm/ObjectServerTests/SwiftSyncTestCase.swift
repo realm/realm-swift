@@ -180,22 +180,17 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
     }
 
     public static let bigObjectCount = 2
-    public func populateRealm<T: BSON>(user: User? = nil, partitionValue: T) {
-        do {
-            let user = try (user ?? logInUser(for: basicCredentials()))
-            let config = user.configuration(testName: partitionValue)
+    public func populateRealm<T: BSON>(user: User? = nil, partitionValue: T) throws {
+        let user = try (user ?? logInUser(for: basicCredentials()))
+        let config = user.configuration(testName: partitionValue)
 
-            let realm = try openRealm(configuration: config)
-            try realm.write {
-                for _ in 0..<SwiftSyncTestCase.bigObjectCount {
-                    realm.add(SwiftHugeSyncObject.create())
-                }
+        let realm = try openRealm(configuration: config)
+        try realm.write {
+            for _ in 0..<SwiftSyncTestCase.bigObjectCount {
+                realm.add(SwiftHugeSyncObject.create())
             }
-            waitForUploads(for: realm)
-            checkCount(expected: SwiftSyncTestCase.bigObjectCount, realm, SwiftHugeSyncObject.self)
-        } catch {
-            XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
         }
+        waitForUploads(for: realm)
     }
 
     // MARK: - Flexible Sync Use Cases
