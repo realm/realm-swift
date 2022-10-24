@@ -1,11 +1,31 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+* `Realm.Error` is now a typealias for `RLMError` rather than a
+  manually-defined version of what the automatic bridging produces. This should
+  have no effect on existing working code, but the manual definition was
+  missing a few things supplied by the automatic bridging.
+* Some sync errors sent by the server include a link to the server-side logs
+  associated with that error. This link is now exposed in the `serverLogURL`
+  property on `SyncError` (or `RLMServerLogURLKey` userInfo field when using NSError).
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
-* None.
+* Many sync and app errors were reported using undocumented internal error
+  codes and/or domains and could not be progammatically handled. Some notable
+  things which now have public error codes instead of unstable internal ones:
+  - `Realm.Error.subscriptionFailed`: The server rejected a flexible sync subscription.
+  - `AppError.invalidPassword`: A login attempt failed due to a bad password.
+  - `AppError.accountNameInUse`: A registration attempt failed due to the account name being in use.
+  - `AppError.httpRequestFailed`: A HTTP request to Atlas App Services
+    completed with an error HTTP code. The failing code is available in the
+    `httpStatusCode` property.
+  - Many other less common error codes have been added to `AppError`.
+  - All sync errors other than `SyncError.clientResetError` reported incorrect
+    error codes.
+  (since v10.0.0).
+* `UserAPIKey.objectId` was incorrectly bridged to Swift as `RLMObjectId` to
+  `ObjectId`. This may produce warnings about an unneccesary cast if you were
+  previously casting it to the correct type (since v10.0.0).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 

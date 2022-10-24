@@ -152,9 +152,10 @@ typedef RLM_ERROR_ENUM(NSInteger, RLMError, RLMErrorDomain) {
 
     /// Denotates an error where an input value was invalid.
     RLMErrorInvalidInput = 13,
-};
 
-#pragma mark - Constants
+    /// A subscription was rejected by the server.
+    RLMErrorSubscriptionFailed = 14,
+};
 
 #pragma mark - Notification Constants
 

@@ -276,7 +276,7 @@ extension ModernAllTypesProjection {
 }
 
 class SectionedResultsTestsBase: RLMTestCaseBase {
-    func createObjects() {
+    func createObjects(_ r: Realm? = nil) -> Realm {
         let o1 = ModernAllTypesObject()
         o1.stringCol = "banana"
         o1.arrayString.append(objectsIn: ["banana", "box", "apple", "chalk"])
@@ -287,18 +287,18 @@ class SectionedResultsTestsBase: RLMTestCaseBase {
         o3.stringCol = "apple"
         let o4 = ModernAllTypesObject()
         o4.stringCol = "chalk"
-        let realm = try! Realm()
+        let realm = try! r ?? Realm(configuration: .init(inMemoryIdentifier: "sectioned results test"))
         try! realm.write {
             realm.deleteAll()
             realm.add([o1, o2, o3, o4])
         }
+        return realm
     }
 }
 
 class SectionedResultsTests: SectionedResultsTestsBase {
     func testCreationFromResults() {
-        createObjects()
-        let realm = try! Realm()
+        let realm = createObjects()
         let results = realm.objects(ModernAllTypesObject.self)
 
         func assert(ascending: Bool, sectionCount: Int, sectionKeys: [String]) {
@@ -321,8 +321,7 @@ class SectionedResultsTests: SectionedResultsTestsBase {
     }
 
     func testCreationFromList() {
-        createObjects()
-        let realm = try! Realm()
+        let realm = createObjects()
         let list = realm.objects(ModernAllTypesObject.self)[0].arrayString
 
         func assert(ascending: Bool, sectionCount: Int, sectionKeys: [String]) {
@@ -336,8 +335,7 @@ class SectionedResultsTests: SectionedResultsTestsBase {
     }
 
     func testCreateFromMutableSet() {
-        createObjects()
-        let realm = try! Realm()
+        let realm = createObjects()
         let set = realm.objects(ModernAllTypesObject.self)[0].setString
 
         func assert(ascending: Bool, sectionCount: Int, sectionKeys: [String]) {
@@ -351,16 +349,14 @@ class SectionedResultsTests: SectionedResultsTestsBase {
     }
 
     func testAllKeys() {
-        createObjects()
-        let realm = try! Realm()
+        let realm = createObjects()
         let results = realm.objects(ModernAllTypesObject.self)
         let sectionedResults = results.sectioned(by: \.firstLetter, ascending: true)
         XCTAssertEqual(sectionedResults.allKeys, ["a", "b", "c"])
     }
 
     func testSubscript() {
-        createObjects()
-        let realm = try! Realm()
+        let realm = createObjects()
         let results = realm.objects(ModernAllTypesObject.self)
         let sectionedResults = results.sectioned(by: \.firstLetter, ascending: true)
         let section = sectionedResults[0]
@@ -372,8 +368,7 @@ class SectionedResultsTests: SectionedResultsTestsBase {
     }
 
     func testObservation() {
-        createObjects()
-        let realm = try! Realm()
+        let realm = createObjects()
         let results = realm.objects(ModernAllTypesObject.self)
         let sectionedResults = results.sectioned(by: \.firstLetter, ascending: true)
         let ex = expectation(description: "initial notification")
@@ -409,8 +404,7 @@ class SectionedResultsTests: SectionedResultsTestsBase {
     }
 
     func testObserveWithKeyPathFilter() {
-        createObjects()
-        let realm = try! Realm()
+        let realm = createObjects()
         let results = realm.objects(ModernAllTypesObject.self)
         let sectionedResults = results.sectioned(by: \.firstLetter, ascending: true)
 
@@ -450,8 +444,7 @@ class SectionedResultsTests: SectionedResultsTestsBase {
     }
 
     func testObserveWithKeyPathFilterOnSection() {
-        createObjects()
-        let realm = try! Realm()
+        let realm = createObjects()
         let results = realm.objects(ModernAllTypesObject.self)
         let sectionedResults = results.sectioned(by: \.firstLetter, ascending: true)[0]
 
@@ -486,8 +479,7 @@ class SectionedResultsTests: SectionedResultsTestsBase {
     }
 
     func testObserveOnQueue() {
-        createObjects()
-        let realm = try! Realm()
+        let realm = createObjects()
         let results = realm.objects(ModernAllTypesObject.self)
         let sectionedResults = results.sectioned(by: \.firstLetter, ascending: true)
         let sema = DispatchSemaphore(value: 0)
@@ -544,8 +536,7 @@ class SectionedResultsTests: SectionedResultsTestsBase {
     }
 
     func testObservationOnSection() {
-        createObjects()
-        let realm = try! Realm()
+        let realm = createObjects()
         let results = realm.objects(ModernAllTypesObject.self)
         let sectionedResults = results.sectioned(by: \.firstLetter, ascending: true)
         let section1 = sectionedResults[0]
@@ -623,8 +614,7 @@ class SectionedResultsTests: SectionedResultsTestsBase {
     }
 
     func testObservationOnSectionOnQueue() {
-        let realm = try! Realm()
-        createObjects()
+        let realm = createObjects()
         let results = realm.objects(ModernAllTypesObject.self)
         let sectionedResults = results.sectioned(by: \.firstLetter, ascending: true)
         let section1 = sectionedResults[0]
@@ -713,8 +703,7 @@ class SectionedResultsTests: SectionedResultsTestsBase {
     }
 
     func testFrozenResults() {
-        createObjects()
-        let realm = try! Realm()
+        let realm = createObjects()
         let frozenResults = realm.objects(ModernAllTypesObject.self).freeze()
         XCTAssertTrue(frozenResults.isFrozen)
         try! realm.write {
@@ -742,16 +731,15 @@ class SectionedResultsTests: SectionedResultsTestsBase {
     }
 
     func testFrozen() {
-        let realm = try! Realm()
+        let realm = createObjects()
         let results = realm.objects(ModernAllTypesObject.self)
         XCTAssertFalse(results.isFrozen)
 
-        func assert(ascending: Bool, sectionCount: Int, sectionKeys: [String]) {
-            createObjects()
+        func assert(ascending: Bool, sectionCount: Int, sectionKeys: [String], newSection: String) {
             let frozenSectionedResults = results.sectioned(by: \.firstLetter, ascending: ascending).freeze()
             try! realm.write {
                 let o = ModernAllTypesObject()
-                o.stringCol = "z"
+                o.stringCol = newSection
                 realm.add(o)
             }
             XCTAssertTrue(frozenSectionedResults.isFrozen)
@@ -761,23 +749,22 @@ class SectionedResultsTests: SectionedResultsTestsBase {
                 return XCTFail("Could not produce thawed sectioned results")
             }
             XCTAssertFalse(thawed.isFrozen)
-            XCTAssertEqual(thawed.count, 4)
-            XCTAssertEqual(thawed.map { $0.key }, ascending ? sectionKeys + ["z"] : ["z"] + sectionKeys)
+            XCTAssertEqual(thawed.count, sectionCount + 1)
+            XCTAssertEqual(thawed.map { $0.key }, ascending ? sectionKeys + [newSection]
+                                                            : [newSection] + sectionKeys)
         }
 
-        assert(ascending: true, sectionCount: 3, sectionKeys: ["a", "b", "c"])
-        assert(ascending: false, sectionCount: 3, sectionKeys: ["c", "b", "a"])
+        assert(ascending: true, sectionCount: 3, sectionKeys: ["a", "b", "c"], newSection: "d")
+        assert(ascending: false, sectionCount: 4, sectionKeys: ["d", "c", "b", "a"], newSection: "e")
     }
 
     func testFrozenSection() {
-        let realm = try! Realm()
+        let realm = createObjects()
         let results = realm.objects(ModernAllTypesObject.self)
         XCTAssertFalse(results.isFrozen)
-        createObjects()
 
         func assert(ascending: Bool, beforeCount: Int, afterCount: Int, sectionKey: String) {
             let frozenSection = results.sectioned(by: \.firstLetter, ascending: ascending)[0].freeze()
-            createObjects()
             try! realm.write {
                 let o = ModernAllTypesObject()
                 o.stringCol = sectionKey
@@ -801,8 +788,7 @@ class SectionedResultsTests: SectionedResultsTestsBase {
 
 class SectionedResultsProjectionTests: SectionedResultsTestsBase {
     func testCreationFromResults() {
-        createObjects()
-        let realm = try! Realm()
+        let realm = createObjects()
         let results = realm.objects(ModernAllTypesProjection.self)
 
         func assert(ascending: Bool, sectionCount: Int, sectionKeys: [String]) {
@@ -832,8 +818,7 @@ class SectionedResultsProjectionTests: SectionedResultsTestsBase {
     }
 
     func testCreationFromList() {
-        createObjects()
-        let realm = try! Realm()
+        let realm = createObjects()
         let list = realm.objects(ModernAllTypesProjection.self)[0].arrayString
 
         func assert(ascending: Bool, sectionCount: Int, sectionKeys: [String]) {
@@ -847,8 +832,7 @@ class SectionedResultsProjectionTests: SectionedResultsTestsBase {
     }
 
     func testCreateFromMutableSet() {
-        createObjects()
-        let realm = try! Realm()
+        let realm = createObjects()
         let set = realm.objects(ModernAllTypesProjection.self)[0].setString
 
         func assert(ascending: Bool, sectionCount: Int, sectionKeys: [String]) {
@@ -862,8 +846,7 @@ class SectionedResultsProjectionTests: SectionedResultsTestsBase {
     }
 
     func testObservation() {
-        createObjects()
-        let realm = try! Realm()
+        let realm = createObjects()
         let results = realm.objects(ModernAllTypesProjection.self)
         let sectionedResults = results.sectioned(by: \.firstLetter, ascending: true)
         let ex = expectation(description: "initial notification")
@@ -899,8 +882,7 @@ class SectionedResultsProjectionTests: SectionedResultsTestsBase {
     }
 
     func testObserveOnQueue() {
-        createObjects()
-        let realm = try! Realm()
+        let realm = createObjects()
         let results = realm.objects(ModernAllTypesProjection.self)
         let sectionedResults = results.sectioned(by: \.firstLetter, ascending: true)
         let sema = DispatchSemaphore(value: 0)
@@ -957,8 +939,7 @@ class SectionedResultsProjectionTests: SectionedResultsTestsBase {
     }
 
     func testObservationOnSection() {
-        createObjects()
-        let realm = try! Realm()
+        let realm = createObjects()
         let results = realm.objects(ModernAllTypesProjection.self)
         let sectionedResults = results.sectioned(by: \.firstLetter, ascending: true)
         let section1 = sectionedResults[0]
@@ -1036,8 +1017,7 @@ class SectionedResultsProjectionTests: SectionedResultsTestsBase {
     }
 
     func testObservationOnSectionOnQueue() {
-        let realm = try! Realm()
-        createObjects()
+        let realm = createObjects()
         let results = realm.objects(ModernAllTypesObject.self)
         let sectionedResults = results.sectioned(by: \.firstLetter, ascending: true)
         let section1 = sectionedResults[0]
@@ -1126,8 +1106,7 @@ class SectionedResultsProjectionTests: SectionedResultsTestsBase {
     }
 
     func testFrozenResults() {
-        createObjects()
-        let realm = try! Realm()
+        let realm = createObjects()
         let frozenResults = realm.objects(ModernAllTypesProjection.self).freeze()
         XCTAssertTrue(frozenResults.isFrozen)
         try! realm.write {
@@ -1155,16 +1134,15 @@ class SectionedResultsProjectionTests: SectionedResultsTestsBase {
     }
 
     func testFrozen() {
-        let realm = try! Realm()
+        let realm = createObjects()
         let results = realm.objects(ModernAllTypesObject.self)
         XCTAssertFalse(results.isFrozen)
 
-        func assert(ascending: Bool, sectionCount: Int, sectionKeys: [String]) {
-            createObjects()
+        func assert(ascending: Bool, sectionCount: Int, sectionKeys: [String], newSection: String) {
             let frozenSectionedResults = results.sectioned(by: \.firstLetter, ascending: ascending).freeze()
             try! realm.write {
                 let o = ModernAllTypesObject()
-                o.stringCol = "z"
+                o.stringCol = newSection
                 realm.add(o)
             }
             XCTAssertTrue(frozenSectionedResults.isFrozen)
@@ -1174,21 +1152,20 @@ class SectionedResultsProjectionTests: SectionedResultsTestsBase {
                 return XCTFail("Could not produce thawed sectioned results")
             }
             XCTAssertFalse(thawed.isFrozen)
-            XCTAssertEqual(thawed.count, 4)
-            XCTAssertEqual(thawed.map { $0.key }, ascending ? sectionKeys + ["z"] : ["z"] + sectionKeys)
+            XCTAssertEqual(thawed.count, sectionCount + 1)
+            XCTAssertEqual(thawed.map { $0.key }, ascending ? sectionKeys + [newSection] : [newSection] + sectionKeys)
         }
 
-        assert(ascending: true, sectionCount: 3, sectionKeys: ["a", "b", "c"])
-        assert(ascending: false, sectionCount: 3, sectionKeys: ["c", "b", "a"])
+        assert(ascending: true, sectionCount: 3, sectionKeys: ["a", "b", "c"], newSection: "d")
+        assert(ascending: false, sectionCount: 4, sectionKeys: ["d", "c", "b", "a"], newSection: "e")
     }
 
     func testFrozenSection() {
-        let realm = try! Realm()
+        let realm = createObjects()
         let results = realm.objects(ModernAllTypesObject.self)
         XCTAssertFalse(results.isFrozen)
 
         func assert(ascending: Bool, sectionKey: String, beforeCount: Int, afterCount: Int) {
-            createObjects()
             let frozenSection = results.sectioned(by: \.firstLetter, ascending: ascending)[0].freeze()
             try! realm.write {
                 let o = ModernAllTypesObject()
@@ -1211,8 +1188,7 @@ class SectionedResultsProjectionTests: SectionedResultsTestsBase {
     }
 
     func testFastEnumeration() {
-        let realm = try! Realm()
-        createObjects()
+        let realm = createObjects()
         let results = realm.objects(ModernAllTypesObject.self)
         let sectionedResults = results.sectioned(by: \.firstLetter, ascending: true)
         var keys = ["a", "b", "c"]

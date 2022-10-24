@@ -157,17 +157,13 @@ class SwiftAsymmetricSyncTests: SwiftSyncTestCase {
         }
     }
 
-    // FIXME: Enable this test when this is implemented on core. Core should validate if the schema includes an asymmetric table for a PBS configuration and throw an error.
-    func fixme_testOpenPBSConfigurationRealmWithAsymmetricObjectError() throws {
+    func testOpenPBSConfigurationRealmWithAsymmetricObjectError() throws {
         let user = try logInUser(for: basicCredentials(app: self.flexibleSyncApp), app: self.flexibleSyncApp)
         var configuration = user.configuration(partitionValue: #function)
         configuration.objectTypes = [SwiftObjectAsymmetric.self]
 
-        do {
-            _ = try Realm(configuration: configuration)
-            XCTFail("Opening a local Realm with an `Asymmetric` table should fail")
-        } catch {
-            XCTAssertNotNil(error)
+        XCTAssertThrowsError(try Realm(configuration: configuration)) { error in
+            XCTAssert(error.localizedDescription.contains("Asymmetric table 'SwiftObjectAsymmetric' not allowed in partition based sync"))
         }
     }
 }

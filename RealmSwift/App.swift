@@ -94,6 +94,13 @@ public typealias PushClient = RLMPushClient
 
 /// An object which is used within UserAPIKeyProviderClient
 public typealias UserAPIKey = RLMUserAPIKey
+extension UserAPIKey {
+
+/// The ObjectId of the API key.
+    public var objectId: ObjectId {
+        __objectId as! ObjectId
+    }
+}
 
 /**
 `Credentials`is an enum representing supported authentication types for Atlas App Services.
@@ -256,6 +263,19 @@ extension App: ObservableObject {
 }
 
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, macCatalyst 13.0, macCatalystApplicationExtension 13.0, *)
+private func promisify(_ fn: @escaping (@escaping (Error?) -> Void) -> Void) -> Future<Void, Error> {
+    return Future<Void, Error> { promise in
+        fn { error in
+            if let error = error {
+                promise(.failure(error))
+            } else {
+                promise(.success(()))
+            }
+        }
+    }
+}
+
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, macCatalyst 13.0, macCatalystApplicationExtension 13.0, *)
 public extension EmailPasswordAuth {
     /**
      Registers a new email identity with the username/password provider,
@@ -266,14 +286,8 @@ public extension EmailPasswordAuth {
      @returns A publisher that eventually return `Result.success` or `Error`.
     */
     func registerUser(email: String, password: String) -> Future<Void, Error> {
-        return Future<Void, Error> { promise in
-            self.registerUser(email: email, password: password) { error in
-                if let error = error {
-                    promise(.failure(error))
-                } else {
-                    promise(.success(()))
-                }
-            }
+        promisify {
+            self.registerUser(email: email, password: password, completion: $0)
         }
     }
 
@@ -285,14 +299,8 @@ public extension EmailPasswordAuth {
      @returns A publisher that eventually return `Result.success` or `Error`.
     */
     func confirmUser(_ token: String, tokenId: String) -> Future<Void, Error> {
-        return Future<Void, Error> { promise in
-            self.confirmUser(token, tokenId: tokenId) { error in
-                if let error = error {
-                    promise(.failure(error))
-                } else {
-                    promise(.success(()))
-                }
-            }
+        promisify {
+            self.confirmUser(token, tokenId: tokenId, completion: $0)
         }
     }
 
@@ -303,14 +311,8 @@ public extension EmailPasswordAuth {
      @returns A publisher that eventually return `Result.success` or `Error`.
     */
     func resendConfirmationEmail(email: String) -> Future<Void, Error> {
-        return Future<Void, Error> { promise in
-            self.resendConfirmationEmail(email) { error in
-                if let error = error {
-                    promise(.failure(error))
-                } else {
-                    promise(.success(()))
-                }
-            }
+        promisify {
+            self.resendConfirmationEmail(email, completion: $0)
         }
     }
 
@@ -321,14 +323,8 @@ public extension EmailPasswordAuth {
      @returns A publisher that eventually return `Result.success` or `Error`.
      */
     func retryCustomConfirmation(email: String) -> Future<Void, Error> {
-        return Future<Void, Error> { promise in
-            self.retryCustomConfirmation(email) { error in
-                if let error = error {
-                    promise(.failure(error))
-                } else {
-                    promise(.success(()))
-                }
-            }
+        promisify {
+            self.retryCustomConfirmation(email, completion: $0)
         }
     }
 
@@ -338,14 +334,8 @@ public extension EmailPasswordAuth {
      @returns A publisher that eventually return `Result.success` or `Error`.
     */
     func sendResetPasswordEmail(email: String) -> Future<Void, Error> {
-        return Future<Void, Error> { promise in
-            self.sendResetPasswordEmail(email) { error in
-                if let error = error {
-                    promise(.failure(error))
-                } else {
-                    promise(.success(()))
-                }
-            }
+        promisify {
+            self.sendResetPasswordEmail(email, completion: $0)
         }
     }
 
@@ -359,14 +349,8 @@ public extension EmailPasswordAuth {
      @returns A publisher that eventually return `Result.success` or `Error`.
     */
     func resetPassword(to: String, token: String, tokenId: String) -> Future<Void, Error> {
-        return Future<Void, Error> { promise in
-            self.resetPassword(to: to, token: token, tokenId: tokenId) { error in
-                if let error = error {
-                    promise(.failure(error))
-                } else {
-                    promise(.success(()))
-                }
-            }
+        promisify {
+            self.resetPassword(to: to, token: token, tokenId: tokenId, completion: $0)
         }
     }
 
@@ -380,14 +364,8 @@ public extension EmailPasswordAuth {
      @returns A publisher that eventually return `Result.success` or `Error`.
     */
     func callResetPasswordFunction(email: String, password: String, args: [AnyBSON]) -> Future<Void, Error> {
-        return Future<Void, Error> { promise in
-            self.callResetPasswordFunction(email: email, password: password, args: args) { error in
-                if let error = error {
-                    promise(.failure(error))
-                } else {
-                    promise(.success(()))
-                }
-            }
+        promisify {
+            self.callResetPasswordFunction(email: email, password: password, args: args, $0)
         }
     }
 }
@@ -426,14 +404,8 @@ public extension APIKeyAuth {
      @returns A publisher that eventually return `Result.success` or `Error`.
      */
     func deleteAPIKey(_ objectId: ObjectId) -> Future<Void, Error> {
-        return Future { promise in
-            self.deleteAPIKey(objectId) { (error) in
-                if let error = error {
-                    promise(.failure(error))
-                } else {
-                    promise(.success(Void()))
-                }
-            }
+        promisify {
+            self.deleteAPIKey(objectId, completion: $0)
         }
     }
 
@@ -443,14 +415,8 @@ public extension APIKeyAuth {
      @returns A publisher that eventually return `Result.success` or `Error`.
      */
     func enableAPIKey(_ objectId: ObjectId) -> Future<Void, Error> {
-        return Future { promise in
-            self.enableAPIKey(objectId) { (error) in
-                if let error = error {
-                    promise(.failure(error))
-                } else {
-                    promise(.success(Void()))
-                }
-            }
+        promisify {
+            self.enableAPIKey(objectId, completion: $0)
         }
     }
 
@@ -460,14 +426,8 @@ public extension APIKeyAuth {
      @returns A publisher that eventually return `Result.success` or `Error`.
      */
     func disableAPIKey(_ objectId: ObjectId) -> Future<Void, Error> {
-        return Future { promise in
-            self.disableAPIKey(objectId) { (error) in
-                if let error = error {
-                    promise(.failure(error))
-                } else {
-                    promise(.success(Void()))
-                }
-            }
+        promisify {
+            self.disableAPIKey(objectId, completion: $0)
         }
     }
 }
@@ -489,14 +449,8 @@ public extension PushClient {
     /// @param user - device's user
     /// @returns A publisher that eventually return `Result.success` or `Error`.
     func registerDevice(token: String, user: User) -> Future<Void, Error> {
-        return Future { promise in
-            self.registerDevice(token: token, user: user) { (error) in
-                if let error = error {
-                    promise(.failure(error))
-                } else {
-                    promise(.success(Void()))
-                }
-            }
+        promisify {
+            self.registerDevice(token: token, user: user, completion: $0)
         }
     }
 
@@ -504,14 +458,8 @@ public extension PushClient {
     /// @param user - devoce's user
     /// @returns A publisher that eventually return `Result.success` or `Error`.
     func deregisterDevice(user: User) -> Future<Void, Error> {
-        return Future { promise in
-            self.deregisterDevice(user: user) { (error) in
-                if let error = error {
-                    promise(.failure(error))
-                } else {
-                    promise(.success(Void()))
-                }
-            }
+        promisify {
+            self.deregisterDevice(user: user, completion: $0)
         }
     }
 }

@@ -2702,8 +2702,7 @@
     RLMValidateRealmError(error, RLMErrorFileAccess, @"Unable to open a realm at path", @"Is a directory");
 }
 
-#if TARGET_OS_TV
-#else
+#if !TARGET_OS_TV
 - (void)testRealmFifoError
 {
     NSFileManager *manager = [NSFileManager defaultManager];
@@ -2723,7 +2722,6 @@
 
     NSError *error;
     XCTAssertNil([RLMRealm realmWithConfiguration:configuration error:&error], @"Should not have been able to open FIFO");
-    XCTAssertNotNil(error);
     RLMValidateRealmError(error, RLMErrorFileAccess, @"Is a directory", nil);
 
     realm::DBOptions::set_sys_tmp_dir(std::move(oldTempDir));

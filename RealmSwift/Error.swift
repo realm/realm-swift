@@ -33,92 +33,21 @@ extension Realm {
      }
      ```
     */
-    @frozen public struct Error {
-        public typealias Code = RLMError.Code
-
-        /// Error thrown by Realm if no other specific error is returned when a realm is opened.
-        public static let fail: Code = .fail
-
-        /// Error thrown by Realm for any I/O related exception scenarios when a realm is opened.
-        public static let fileAccess: Code = .fileAccess
-
-        /// Error thrown by Realm if the user does not have permission to open or create
-        /// the specified file in the specified access mode when the realm is opened.
-        public static let filePermissionDenied: Code = .filePermissionDenied
-
-        /// Error thrown by Realm if the file already exists when a copy should be written.
-        public static let fileExists: Code = .fileExists
-
-        /// Error thrown by Realm if no file was found when a realm was opened as
-        /// read-only or if the directory part of the specified path was not found
-        /// when a copy should be written.
-        public static let fileNotFound: Code = .fileNotFound
-
-        /// Error thrown by Realm if the database file is currently open in another process which
-        /// cannot share with the current process due to an architecture mismatch.
-        public static let incompatibleLockFile: Code = .incompatibleLockFile
-
-        /// Error thrown by Realm if a file format upgrade is required to open the file,
-        /// but upgrades were explicitly disabled.
-        public static let fileFormatUpgradeRequired: Code = .fileFormatUpgradeRequired
-
-        /// Error thrown by Realm if there is insufficient available address space.
-        public static let addressSpaceExhausted: Code = .addressSpaceExhausted
-
-        /// Error thrown by Realm if there is a schema version mismatch, so that a migration is required.
-        public static let schemaMismatch: Code = .schemaMismatch
-
-        /// :nodoc:
-        public var code: Code {
-            return (_nsError as! RLMError).code
-        }
-
-        /// :nodoc:
-        public let _nsError: NSError
-
-        /// :nodoc:
-        public init(_nsError error: NSError) {
-            _nsError = error
-        }
-
-        /// Realm configuration that can be used to open the backup copy of a Realm file
-        ///
-        /// Only applicable to `incompatibleSyncedFile`. Will be `nil` for all other errors.
-        public var backupConfiguration: Realm.Configuration? {
-            let configuration = userInfo[RLMBackupRealmConfigurationErrorKey] as! RLMRealmConfiguration?
-            return configuration.map(Realm.Configuration.fromRLMRealmConfiguration)
-        }
-
-        /// This error could be returned by completion block when no success and no error were produced
-        public static let callFailed = Error(.fail, userInfo: [NSLocalizedDescriptionKey: "Call failed"])
-    }
+    public typealias Error = RLMError
 }
 
-/// :nodoc:
-// Provide bridging from errors with domain RLMErrorDomain to Error.
-extension Realm.Error: _BridgedStoredNSError {
-    /// :nodoc:
-    public static let _nsErrorDomain = RLMErrorDomain
-    /// :nodoc:
-    public static let errorDomain = RLMErrorDomain
+extension Realm.Error {
+    /// This error could be returned by completion block when no success and no error were produced
+    public static let callFailed = Realm.Error(Realm.Error.fail, userInfo: [NSLocalizedDescriptionKey: "Call failed"])
 }
 
 // MARK: Equatable
 
 extension Realm.Error: Equatable {}
 
+// FIXME: we should not be defining this but it's a breaking change to remove
 /// Returns a Boolean indicating whether the errors are identical.
 public func == (lhs: Error, rhs: Error) -> Bool {
     return lhs._code == rhs._code
         && lhs._domain == rhs._domain
-}
-
-// MARK: Pattern Matching
-
-/**
- Pattern matching matching for `Realm.Error`, so that the instances can be used with Swift's
- `do { ... } catch { ... }` syntax.
-*/
-public func ~= (lhs: Realm.Error, rhs: Error) -> Bool {
-    return lhs == rhs
 }

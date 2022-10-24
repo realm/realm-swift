@@ -149,16 +149,29 @@ extension SyncError {
     public func deleteRealmUserInfo() -> SyncError.ActionToken? {
         return _nsError.__rlmSync_errorActionToken()
     }
+
+    /**
+     Sync errors which originate from the server also produce server-side logs
+     which may contain useful information. When applicable, this field contains
+     the url of those logs, and `nil` otherwise.
+     */
+    public var serverLogURL: URL? {
+        (userInfo[RLMServerLogURLKey] as? String).flatMap(URL.init)
+    }
 }
 
 /**
- An error associated with network requests made to the authentication server. This type of error
- may be returned in the callback block to `SyncUser.logIn()` upon certain types of failed login
- attempts (for example, if the request is malformed or if the server is experiencing an issue).
-
- - see: `RLMSyncAuthError`
+ An error which occurred when making a request to Atlas App Services. Most User
+ and App functions which can fail report errors of this type.
  */
-public typealias SyncAuthError = RLMSyncAuthError
+public typealias AppError = RLMAppError
+
+extension AppError {
+    /// When applicable, the HTTP status code which resulted in this error.
+    var httpStatusCode: Int? {
+        userInfo[RLMHTTPStatusCodeKey] as? Int
+    }
+}
 
 /**
  An enum which can be used to specify the level of logging.
@@ -174,38 +187,6 @@ public typealias SyncLogLevel = RLMSyncLogLevel
  - see: `RLMIdentityProvider`
  */
 public typealias Provider = RLMIdentityProvider
-
-/**
- * How the Realm client should validate the identity of the server for secure connections.
- *
- * By default, when connecting to Atlas App Services over HTTPS, Realm will
- * validate the server's HTTPS certificate using the system trust store and root
- * certificates. For additional protection against man-in-the-middle (MITM)
- * attacks and similar vulnerabilities, you can pin a certificate or public key,
- * and reject all others, even if they are signed by a trusted CA.
- */
-@frozen public enum ServerValidationPolicy {
-    /// Perform no validation and accept potentially invalid certificates.
-    ///
-    /// - warning: DO NOT USE THIS OPTION IN PRODUCTION.
-    case none
-
-    /// Use the default server trust evaluation based on the system-wide CA
-    /// store. Any certificate signed by a trusted CA will be accepted.
-    case system
-
-    /// Use a specific pinned certificate to validate the server identify.
-    ///
-    /// This will only connect to a server if one of the server certificates
-    /// matches the certificate stored at the given local path and that
-    /// certificate has a valid trust chain.
-    ///
-    /// On macOS, the certificate files may be in any of the formats supported
-    /// by SecItemImport(), including PEM and .cer (see SecExternalFormat for a
-    /// complete list of possible formats). On iOS and other platforms, only
-    /// DER .cer files are supported.
-    case pinCertificate(path: URL)
-}
 
 /**
  An enum used to determines file recovery behavior in the event of a client reset.

@@ -211,15 +211,6 @@ namespace {
 
 @end
 
-NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
-    return [[NSError alloc] initWithDomain:@(appError.error_code.category().name())
-                                      code:appError.error_code.value()
-                                  userInfo:@{
-                                      @(appError.error_code.category().name()) : @(appError.error_code.message().data()),
-                                      NSLocalizedDescriptionKey : @(appError.message.c_str())
-                                  }];
-}
-
 #pragma mark RLMAppSubscriptionToken
 @implementation RLMAppSubscriptionToken {
 @public

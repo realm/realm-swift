@@ -1078,12 +1078,7 @@ extension SwiftFlexibleSyncServerTests {
                 })
             }
             XCTFail("Invalid query should have failed")
-        } catch let error {
-            if let error = error as NSError? {
-                XCTAssertTrue(error.domain == RLMFlexibleSyncErrorDomain)
-                XCTAssertTrue(error.code == 2)
-            }
-
+        } catch Realm.Error.subscriptionFailed {
             guard case .error = subscriptions.state else {
                 return XCTFail("Adding a query for a not queryable field should change the subscription set state to error")
             }
@@ -1272,11 +1267,8 @@ extension SwiftFlexibleSyncServerTests {
         }
         do {
            _ = try await Realm(configuration: config, downloadBeforeOpen: .once)
-        } catch {
-            XCTAssertNotNil(error)
-            let nsError = error as NSError
-            XCTAssertEqual(nsError.code, 2)
-            XCTAssertEqual(nsError.domain, "io.realm.sync.flx")
+        } catch let error as Realm.Error {
+            XCTAssertEqual(error.code, .subscriptionFailed)
         }
     }
 
@@ -1353,17 +1345,15 @@ extension SwiftFlexibleSyncServerTests {
             })
         }
         .sink(receiveCompletion: { result in
-            if case .failure(let error) = result {
-                if let error = error as NSError? {
-                    XCTAssertTrue(error.domain == RLMFlexibleSyncErrorDomain)
-                    XCTAssertTrue(error.code == 2)
-                }
-
+            if case .failure(let error as Realm.Error) = result {
+                XCTAssertEqual(error.code, .subscriptionFailed)
                 guard case .error = subscriptions.state else {
                     return XCTFail("Adding a query for a not queryable field should change the subscription set state to error")
                 }
-                ex.fulfill()
+            } else {
+                XCTFail("Expected an error but got \(result)")
             }
+            ex.fulfill()
         }, receiveValue: { _ in })
         .store(in: &cancellables)
 

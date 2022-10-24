@@ -503,7 +503,8 @@ static NSString *randomEmail() {
 
     [self.app loginWithCredential:credentials completion:^(RLMUser *user, NSError *error) {
         XCTAssertNil(user);
-        XCTAssertNotNil(error);
+        RLMValidateError(error, RLMAppErrorDomain, RLMAppErrorInvalidPassword,
+                         @"invalid username/password");
         [expectation fulfill];
     }];
 
@@ -519,7 +520,8 @@ static NSString *randomEmail() {
 
     [self.app loginWithCredential:credentials completion:^(RLMUser *user, NSError *error) {
         XCTAssertNil(user);
-        XCTAssertNotNil(error);
+        RLMValidateError(error, RLMAppErrorDomain, RLMAppErrorInvalidPassword,
+                         @"invalid username/password");
         [expectation fulfill];
     }];
 
@@ -541,23 +543,22 @@ static NSString *randomEmail() {
     [[self.app emailPasswordAuth] registerUserWithEmail:NSStringFromSelector(_cmd)
                                                password:@"password"
                                              completion:^(NSError *error) {
-        XCTAssertNotNil(error);
+        RLMValidateError(error, RLMAppErrorDomain, RLMAppErrorAccountNameInUse, @"name already in use");
+        XCTAssertNotNil(error.userInfo[RLMServerLogURLKey]);
         [expectationB fulfill];
     }];
 
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
 }
 
-/// Errors reported in RLMSyncManager.errorHandler shouldn't contain sync error domain errors as underlying error
-
 - (void)testSyncErrorHandlerErrorDomain {
     RLMUser *user = [self userForTest:_cmd];
     XCTAssertNotNil(user);
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"should fail after setting bad token"];
-    [self.app syncManager].errorHandler = ^(__unused NSError *error, __unused RLMSyncSession *session) {
-        XCTAssertTrue([error.domain isEqualToString:RLMSyncErrorDomain]);
-        XCTAssertFalse([[error.userInfo[kRLMSyncUnderlyingErrorKey] domain] isEqualToString:RLMSyncErrorDomain]);
+    self.app.syncManager.errorHandler = ^(NSError *error, __unused RLMSyncSession *session) {
+        RLMValidateError(error, RLMSyncErrorDomain, RLMSyncErrorClientUserError,
+                         @"Unable to refresh the user access token.");
         [expectation fulfill];
     };
 
@@ -1701,10 +1702,10 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     [RLMRealm asyncOpenWithConfiguration:c callbackQueue:dispatch_get_main_queue()
                                 callback:^(RLMRealm *realm, NSError *error) {
         XCTAssertNil(realm);
-        XCTAssertNotNil(error);
+        RLMValidateError(error, RLMAppErrorDomain, RLMAppErrorUnknown, @"Unknown");
         [ex fulfill];
     }];
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    [self waitForExpectationsWithTimeout:20.0 handler:nil];
 }
 
 - (void)testCancelDownload {
@@ -1728,7 +1729,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
                            callbackQueue:dispatch_get_main_queue()
                                 callback:^(RLMRealm *realm, NSError *error) {
         XCTAssertNil(realm);
-        XCTAssertNotNil(error);
+        RLMValidateError(error, NSPOSIXErrorDomain, ECANCELED, @"Operation canceled");
         [ex fulfill];
     }];
     [[RLMRealm asyncOpenWithConfiguration:c
@@ -1802,9 +1803,8 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     [RLMRealm asyncOpenWithConfiguration:c
                            callbackQueue:dispatch_get_main_queue()
                                 callback:^(RLMRealm *realm, NSError *error) {
-        XCTAssertNotNil(error);
-        XCTAssertEqual(error.code, ETIMEDOUT);
-        XCTAssertEqual(error.domain, NSPOSIXErrorDomain);
+        RLMValidateError(error, NSPOSIXErrorDomain, ETIMEDOUT,
+                         @"Sync connection was not fully established in time");
         XCTAssertNil(realm);
         [ex fulfill];
     }];
@@ -2036,7 +2036,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     NSError *error;
     [syncedRealm writeCopyForConfiguration:syncConfig2 error:&error];
     XCTAssertEqual(error.code, RLMErrorFail);
-    XCTAssertTrue([error.userInfo[NSLocalizedDescriptionKey] isEqualToString:@"Could not write file as not all client changes are integrated in server"]);
+    XCTAssertEqualObjects(error.localizedDescription, @"Could not write file as not all client changes are integrated in server");
 }
 
 - (void)testWriteCopyForConfigurationLocalRealmForSyncWithExistingData {
@@ -2321,8 +2321,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     [self waitForExpectationsWithTimeout:60.0 handler:nil];
 }
 
-// FIXME: Re-enable once we understand why the server is not setup correctly
-- (void)fixme_testMongoAggregateAndCount {
+- (void)testMongoAggregateAndCount {
     RLMMongoClient *client = [self.anonymousUser mongoClientWithServiceName:@"mongodb1"];
     RLMMongoDatabase *database = [client databaseWithName:@"test_data"];
     RLMMongoCollection *collection = [database collectionWithName:@"Dog"];
@@ -2342,8 +2341,8 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     XCTestExpectation *aggregateExpectation1 = [self expectationWithDescription:@"should aggregate documents"];
     [collection aggregateWithPipeline:@[@{@"name" : @"fido"}]
                            completion:^(NSArray<NSDictionary *> *documents, NSError *error) {
-        XCTAssertNotNil(error);
-        XCTAssertTrue([error.domain.description isEqualToString:@"realm::app::ServiceError"]);
+        RLMValidateErrorContains(error, RLMAppErrorDomain, RLMAppErrorMongoDBError,
+                                 @"Unrecognized pipeline stage name: 'name'");
         XCTAssertNil(documents);
         [aggregateExpectation1 fulfill];
     }];
