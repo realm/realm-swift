@@ -1481,20 +1481,6 @@ RLM_COLLECTION_TYPE(MigrationTestObject);
     [self assertMigrationRequiredForChangeFrom:@[fromChild, fromParent] to:@[toChild, toParent]];
 }
 
-- (void)testChangeTableToEmbeddedWithoutBacklinks {
-    RLMObjectSchema *fromChild = [RLMObjectSchema schemaForObjectClass:EmbeddedIntObject.class];
-    fromChild.isEmbedded = false;
-    RLMObjectSchema *toChild = [RLMObjectSchema schemaForObjectClass:EmbeddedIntObject.class];
-    [self createTestRealmWithSchema:@[fromChild] block:^(RLMRealm *) {}];
-    
-    RLMRealmConfiguration *realmConfiguration = self.config;
-    realmConfiguration.schemaVersion = 1;
-    realmConfiguration.customSchema = [self schemaWithObjects:@[toChild]];
-    NSError *error;
-    XCTAssertFalse([RLMRealm performMigrationForConfiguration:realmConfiguration error:&error]);
-    XCTAssertNotNil(error);
-}
-
 - (void)testChangeTableToEmbeddedWithOnlyOneLinkPerObject {
     RLMObjectSchema *fromChild = [RLMObjectSchema schemaForObjectClass:EmbeddedIntObject.class];
     fromChild.isEmbedded = false;
