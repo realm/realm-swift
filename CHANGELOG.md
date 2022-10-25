@@ -1,6 +1,8 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
+
 ### Enhancements
+
 * `Realm.Error` is now a typealias for `RLMError` rather than a
   manually-defined version of what the automatic bridging produces. This should
   have no effect on existing working code, but the manual definition was
@@ -8,8 +10,11 @@ x.y.z Release notes (yyyy-MM-dd)
 * Some sync errors sent by the server include a link to the server-side logs
   associated with that error. This link is now exposed in the `serverLogURL`
   property on `SyncError` (or `RLMServerLogURLKey` userInfo field when using NSError).
+* Improve performance of client reset with automatic recovery and converting
+  top-level tables into embedded tables ([Core #5897](https://github.com/realm/realm-core/pull/5897)).
 
 ### Fixed
+
 * Many sync and app errors were reported using undocumented internal error
   codes and/or domains and could not be progammatically handled. Some notable
   things which now have public error codes instead of unstable internal ones:
@@ -26,10 +31,29 @@ x.y.z Release notes (yyyy-MM-dd)
 * `UserAPIKey.objectId` was incorrectly bridged to Swift as `RLMObjectId` to
   `ObjectId`. This may produce warnings about an unneccesary cast if you were
   previously casting it to the correct type (since v10.0.0).
+* Fixed an assertion failure when observing change notifications on a sectioned
+  result, if the first modification was to a linked property that did not cause
+  the state of the sections to change.
+  ([Core #5912](https://github.com/realm/realm-core/issues/5912),
+  since the introduction of sectioned results in v10.29.0)
+* Fix a use-after-free if the last external reference to an encrypted
+  synchronized Realm was closed between when a client reset error was received
+  and when the download of the new Realm began.
+  ([Core #5949](https://github.com/realm/realm-core/pull/5949), since 10.28.4).
+* Fix an assertion failure during client reset with recovery when recovering
+  a list operation on an embedded object that has a link column in the path
+  prefix to the list from the top level object.
+  ([Core #5957](https://github.com/realm/realm-core/issues/5957),
+  since introduction of automatic recovery in v10.32.0).
+* Creating a write transaction which is rejected by the server due to it
+  exceeding the maximum transaction size now results in a client reset error
+  instead of synchronization breaking and becoming stuck forever
+  ([Core #5209](https://github.com/realm/realm-core/issues/5209), since v10).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
 ### Compatibility
+
 * Realm Studio: 11.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 14.0.1.
@@ -37,7 +61,8 @@ x.y.z Release notes (yyyy-MM-dd)
 * Xcode: 13.1-14.1.
 
 ### Internal
-* Upgraded realm-core from ? to ?
+
+* Upgraded realm-core from 12.9.0 to 12.11.0
 
 10.32.0 Release notes (2022-10-10)
 =============================================================
