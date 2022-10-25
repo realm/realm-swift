@@ -52,8 +52,7 @@ def shutdown_simulator_devices(devices)
   end
 end
 
-attempts = 0
-begin
+def kill_running_simulator()
   # Kill all the current simulator processes as they may be from a different Xcode version
   print 'Killing running Simulator processes...'
   while system('pgrep -q Simulator')
@@ -64,7 +63,9 @@ begin
   end
   wait_for_core_simulator_service
   puts ' done!'
+end
 
+def shutdown_simulators()
   print 'Shut down existing simulator devices...'
   # Shut down any running simulator devices. This may take multiple attempts if some
   # simulators are currently in the process of booting or being created.
@@ -81,14 +82,24 @@ begin
     # Exclude devices marked as unavailable as they're from a different version of Xcode.
     all_available_devices = all_devices.reject { |device| device['availability'] =~ /unavailable/ }
 
-    break if running_devices(all_available_devices).empty?
+    break if running_devices(devices).empty?
 
-    shutdown_simulator_devices all_available_devices
+    shutdown_simulator_devices devices
     sleep shutdown_attempt if shutdown_attempt > 0
   end
   puts ' done!'
+end
 
-  # Delete all simulators.
+attempts = 0
+begin
+  print 'Prepare simulators...'
+
+  devices_json = simctl('list devices -j')[0]
+  all_devices = JSON.parse(devices_json)['devices'].flat_map { |_, devices| devices }
+
+  # Exclude devices marked as unavailable as they're from a different version of Xcode.
+  all_available_devices = all_devices.reject { |device| device['availability'] =~ /unavailable/ }
+
   print 'Deleting all simulators...'
   (0..5).each do |delete_attempt|
     break if all_available_devices.empty?
@@ -101,18 +112,18 @@ begin
       devices_json = simctl('list devices -j')[0]
       all_devices = JSON.parse(devices_json)['devices'].flat_map { |_, devices| devices }
     rescue JSON::ParserError
-      sleep shutdown_attempt if shutdown_attempt > 0
+      sleep delete_attempt if delete_attempt > 0
       next
     end
 
     all_available_devices = all_devices.reject { |device| device['availability'] =~ /unavailable/ }
     break if all_available_devices.empty?
   end
-  puts ' done!'
 
   if not all_available_devices.empty?
     raise "Failed to delete devices #{all_available_devices}"
   end
+  puts ' done!'
 
   # Recreate all simulators.
   runtimes = JSON.parse(simctl('list runtimes -j')[0])['runtimes']
