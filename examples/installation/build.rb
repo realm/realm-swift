@@ -47,6 +47,8 @@ end
 TEST_RELEASE = ENV['REALM_TEST_RELEASE']
 TEST_BRANCH = ENV['REALM_TEST_BRANCH']
 XCODE_VERSION = ENV['REALM_XCODE_VERSION']
+REALM_CORE_VERSION = ENV['REALM_CORE_VERSION']
+
 DEPENDENCIES = File.open("../../dependencies.list").map { |line| line.chomp.split("=") }.to_h
 
 def replace_in_file(filepath, *args)
@@ -138,20 +140,21 @@ def download_realm(platform, method, static)
     unless File.symlink? "#{project}.xcodeproj/project.pbxproj"
       FileUtils.mkdir_p "#{project}.xcodeproj"
       File.symlink "../#{project}.notxcodeproj/project.pbxproj",
-                   "#{project}.xcodeproj/project.pbxproj"
+                 "#{project}.xcodeproj/project.pbxproj"
     end
 
     # Update the XcodeProj to reference the requested branch or version
     if TEST_RELEASE
       replace_in_file "#{project}.xcodeproj/project.pbxproj",
         /(branch|version) = .*;/, "version = #{TEST_RELEASE};",
-        /kind = .*;/, "kind = exactVersion;"
+      /kind = .*;/, "kind = exactVersion;"
     elsif TEST_BRANCH
       replace_in_file "#{project}.xcodeproj/project.pbxproj",
-        /(branch|version) = .*;/, "branch = #{TEST_BRANCH};",
-        /kind = .*;/, "kind = branch;"
+      /(branch|version) = .*;/, "branch = #{TEST_BRANCH};",
+      /kind = .*;/, "kind = branch;"
     end
-    sh 'xcodebuild', '-project', "#{project}.xcodeproj", '-resolvePackageDependencies'
+
+    sh 'xcodebuild', '-project', "#{project}.xcodeproj", '-resolvePackageDependencies', '-IDEPackageOnlyUseVersionsFromResolvedFile=NO', '-IDEDisableAutomaticPackageResolution=NO'
 
   when 'xcframework'
     # If we're testing a branch then we should already have a built zip

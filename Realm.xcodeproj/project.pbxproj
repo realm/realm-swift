@@ -18,6 +18,16 @@
 			name = "Download BaaS";
 			productName = "Download BaaS";
 		};
+		ACB76B772AA9D9A600C59983 /* CI */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = ACB76B7B2AA9D9A600C59983 /* Build configuration list for PBXAggregateTarget "CI" */;
+			buildPhases = (
+			);
+			dependencies = (
+			);
+			name = CI;
+			productName = CI;
+		};
 		E83EAC791BED3D880085CCD2 /* SwiftLint */ = {
 			isa = PBXAggregateTarget;
 			buildConfigurationList = E83EAC7C1BED3D880085CCD2 /* Build configuration list for PBXAggregateTarget "SwiftLint" */;
@@ -2140,6 +2150,9 @@
 					AC88475926888C6300DF4A65 = {
 						TestTargetID = AC8846722686573B00DF4A65;
 					};
+					ACB76B772AA9D9A600C59983 = {
+						CreatedOnToolsVersion = 15.0;
+					};
 					E8267FB11D90B79000E001C7 = {
 						LastSwiftMigration = 1020;
 					};
@@ -2178,6 +2191,7 @@
 				53124AD325B71AF700771CE4 /* SwiftUITests */,
 				AC8846722686573B00DF4A65 /* SwiftUISyncTestHost */,
 				AC88475926888C6300DF4A65 /* SwiftUISyncTests */,
+				ACB76B772AA9D9A600C59983 /* CI */,
 			);
 		};
 /* End PBXProject section */
@@ -3087,6 +3101,30 @@
 			};
 			name = Release;
 		};
+		ACB76B782AA9D9A600C59983 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		ACB76B792AA9D9A600C59983 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		ACB76B7A2AA9D9A600C59983 /* Static */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Static;
+		};
 		E8267FEB1D90B79000E001C7 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 3FB56E7E250D457A00A6216B /* ObjectServerTests.xcconfig */;
@@ -3242,6 +3280,16 @@
 				AC88477F26888C6300DF4A65 /* Debug */,
 				AC88478026888C6300DF4A65 /* Release */,
 				3FEC91532A4B58BD0044BFF5 /* Static */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		ACB76B7B2AA9D9A600C59983 /* Build configuration list for PBXAggregateTarget "CI" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				ACB76B782AA9D9A600C59983 /* Debug */,
+				ACB76B792AA9D9A600C59983 /* Release */,
+				ACB76B7A2AA9D9A600C59983 /* Static */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
