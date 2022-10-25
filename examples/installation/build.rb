@@ -47,6 +47,8 @@ end
 TEST_RELEASE = ENV['REALM_TEST_RELEASE']
 TEST_BRANCH = ENV['REALM_TEST_BRANCH']
 XCODE_VERSION = ENV['REALM_XCODE_VERSION']
+REALM_CORE_VERSION = ENV['REALM_CORE_VERSION']
+
 DEPENDENCIES = File.open("../../dependencies.list").map { |line| line.chomp.split("=") }.to_h
 
 def replace_in_file(filepath, *args)
@@ -131,26 +133,35 @@ def download_realm(platform, method, static)
     sh 'carthage', 'update', '--use-xcframeworks', '--platform', platformName
 
   when 'spm'
-    project = static ? 'SwiftPackageManager' : 'SwiftPackageManagerDynamic'
-    # We have to hide the spm example from carthage because otherwise
-    # it'll fetch the example's package dependencies as part of deciding
-    # what to build from this repo.
-    unless File.symlink? "#{project}.xcodeproj/project.pbxproj"
-      FileUtils.mkdir_p "#{project}.xcodeproj"
-      File.symlink "../#{project}.notxcodeproj/project.pbxproj",
-                   "#{project}.xcodeproj/project.pbxproj"
+  project = static ? 'SwiftPackageManager' : 'SwiftPackageManagerDynamic'
+  # We have to hide the spm example from carthage because otherwise
+  # it'll fetch the example's package dependencies as part of deciding
+  # what to build from this repo.
+  unless File.symlink? "#{project}.xcodeproj/project.pbxproj"
+    FileUtils.mkdir_p "#{project}.xcodeproj"
+    File.symlink "../#{project}.notxcodeproj/project.pbxproj",
+                 "#{project}.xcodeproj/project.pbxproj"
+
+    FileUtils.mkdir_p "#{project}.xcodeproj/project.xcworkspace/xcshareddata/swiftpm"
+    FileUtils.cp "#{project}.notxcodeproj/project.notxcworkspace/xcshareddata/swiftpm/Package.resolved",
+                 "#{project}.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved"
+  end
+
+  # Update the XcodeProj to reference the requested branch or version
+  if TEST_RELEASE
+    replace_in_file "#{project}.xcodeproj/project.pbxproj",
+      /(branch|version) = .*;/, "version = #{TEST_RELEASE};",
+      /kind = .*;/, "kind = exactVersion;"
+  elsif TEST_BRANCH
+    replace_in_file "#{project}.xcodeproj/project.pbxproj",
+      /(branch|version) = .*;/, "branch = #{TEST_BRANCH};",
+      /kind = .*;/, "kind = branch;"
+    swift_revision = ENV['CI_COMMIT'] ? ENV['CI_COMMIT'] : ENV['GITHUB_PR_HEAD_SHA']
+    replace_in_file "#{project}.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved",
+      /\"branch\" : \"master\"/, "\"branch\" : \"#{TEST_BRANCH}\"",
+      /\"revision\" : \"swift\"/, "\"revision\" : \"#{swift_revision}\""
     end
 
-    # Update the XcodeProj to reference the requested branch or version
-    if TEST_RELEASE
-      replace_in_file "#{project}.xcodeproj/project.pbxproj",
-        /(branch|version) = .*;/, "version = #{TEST_RELEASE};",
-        /kind = .*;/, "kind = exactVersion;"
-    elsif TEST_BRANCH
-      replace_in_file "#{project}.xcodeproj/project.pbxproj",
-        /(branch|version) = .*;/, "branch = #{TEST_BRANCH};",
-        /kind = .*;/, "kind = branch;"
-    end
     sh 'xcodebuild', '-project', "#{project}.xcodeproj", '-resolvePackageDependencies'
 
   when 'xcframework'

@@ -30,6 +30,16 @@ if [ -n "${JENKINS_HOME}" ]; then
     CODESIGN_PARAMS=(CODE_SIGN_IDENTITY='' CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO)
 fi
 
+if [ $CI ]; then
+    DERIVED_DATA=$CI_DERIVED_DATA_PATH
+    ROOT_WORKSPACE=$CI_WORKSPACE/
+    BRANCH=$CI_BRANCH
+else
+    DERIVED_DATA=build/DerivedData/Realm
+    ROOT_WORKSPACE=""
+    BRANCH=$GITHUB_PR_SOURCE_BRANCH
+fi
+
 usage() {
 cat <<EOF
 Usage: sh $0 command [argument]
@@ -178,7 +188,7 @@ build_combined() {
     build_args=(-scheme "$product" -configuration "$config" build REALM_HIDE_SYMBOLS=YES)
 
     # Derive build paths
-    local build_products_path="build/DerivedData/Realm/Build/Products"
+    local build_products_path="$DERIVED_DATA/Build/Products"
     local product_name="$product.framework"
     local os_path="$build_products_path/$config${config_suffix}/$product_name"
     local simulator_path="$build_products_path/$config-$simulator_suffix/$product_name"
@@ -267,6 +277,7 @@ build_docs() {
         objc=""
     fi
 
+    echo ">>> RUN JAZZY"
     jazzy \
       "${objc}" \
       --clean \
@@ -432,11 +443,11 @@ case "$COMMAND" in
         done
 
         # Assemble them into xcframeworks
-        rm -rf "build/$CONFIGURATION/"*.xcframework
-        find "build/$CONFIGURATION" -name 'Realm.framework' \
+        rm -rf "$DERIVED_DATA/Build/Products"*.xcframework
+        find $DERIVED_DATA/Build/Products -name 'Realm.framework' \
             | sed 's/.*/-framework &/' \
             | xargs xcodebuild -create-xcframework -allow-internal-distribution -output "build/$CONFIGURATION/Realm.xcframework"
-        find "build/$CONFIGURATION" -name 'RealmSwift.framework' \
+        find $DERIVED_DATA/Build/Products -name 'RealmSwift.framework' \
             | sed 's/.*/-framework &/' \
             | xargs xcodebuild -create-xcframework -allow-internal-distribution -output "build/$CONFIGURATION/RealmSwift.xcframework"
 
@@ -571,7 +582,7 @@ case "$COMMAND" in
         ;;
 
     test-ios-xcode-spm)
-        cd examples/installation
+        cd ${ROOT_WORKSPACE}examples/installation
         ./build.rb ios spm
         exit 0
         ;;
@@ -689,7 +700,13 @@ case "$COMMAND" in
         sh build.sh examples-osx
 
         (
-            cd examples/osx/objc/build/DerivedData/RealmExamples/Build/Products/$CONFIGURATION
+            if [ $CI ]; then
+                DERIVED_EXAMPLE_DATA=$CI_DERIVED_DATA_PATH
+            else
+                DERIVED_EXAMPLE_DATA=examples/osx/objc/build/DerivedData/RealmExamples
+            fi
+
+            cd $DERIVED_EXAMPLE_DATA/Build/Products/$CONFIGURATION
             DYLD_FRAMEWORK_PATH=. ./JSONImport >/dev/null
         )
         exit 0
@@ -914,14 +931,29 @@ case "$COMMAND" in
         exit 0
         ;;
 
+    "update-core-revision")
+        version="$(sed -n 's/^REALM_CORE_VERSION=\(.*\)$/\1/p' "${source_root}/dependencies.list")"
+
+        git clone https://github.com/realm/realm-core.git
+        cd realm-core
+        git checkout v$version
+        last_commit=$(git rev-parse HEAD);
+        cd ..
+        sed -i '' "s/\"revision\" : .*,/\"revision\" : \"$last_commit\",/" examples/installation/SwiftPackageManagerDynamic.notxcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
+        rm -rf realm-core
+        exit 0
+        ;;
+
     "set-core-version")
         new_version="$2"
         old_version="$(sed -n 's/^REALM_CORE_VERSION=\(.*\)$/\1/p' "${source_root}/dependencies.list")"
 
         sed -i '' "s/^REALM_CORE_VERSION=.*/REALM_CORE_VERSION=$new_version/" dependencies.list
         sed -i '' "s/^let coreVersion =.*/let coreVersion = Version(\"$new_version\")/" Package.swift
+        sed -i '' "s/\"version\" : .*/\"version\" : \"$new_version\",/" examples/installation/SwiftPackageManagerDynamic.notxcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
         sed -i '' "s/Upgraded realm-core from ? to ?/Upgraded realm-core from $old_version to $new_version/" CHANGELOG.md
 
+        update-core-revision
         exit 0
         ;;
 
@@ -930,6 +962,7 @@ case "$COMMAND" in
     ######################################
 
     "ci-pr")
+        echo "XCode Version $(xcodebuild -version)"
         mkdir -p build/reports
         export REALM_DISABLE_ANALYTICS=1
         export REALM_DISABLE_UPDATE_CHECKER=1
@@ -949,8 +982,9 @@ case "$COMMAND" in
         elif [ "$target" = "swiftlint" ]; then
             sh build.sh verify-swiftlint
         else
-            export sha=$GITHUB_PR_SOURCE_BRANCH
+            export sha=$BRANCH
             export REALM_EXTRA_BUILD_ARGUMENTS='GCC_GENERATE_DEBUGGING_SYMBOLS=NO -allowProvisioningUpdates'
+
             if [[ "$target" = *ios* ]] || [[ "$target" = *tvos* ]] || [[ "$target" = *watchos* ]]; then
                 sh build.sh prelaunch-simulator "$target"
             fi
@@ -958,9 +992,10 @@ case "$COMMAND" in
 
             if [[ "$target" = *"server"* ]] || [[ "$target" = "swiftpm"* ]]; then
                 mkdir .baas
-                mv build/stitch .baas
-                source "$(brew --prefix nvm)/nvm.sh" --no-use
-                nvm install 16.5.0
+                if [[ -z $CI ]]; then
+                    mv build/stitch .baas
+                    source "$(brew --prefix nvm)/nvm.sh" --no-use
+                fi
                 sh build.sh setup-baas
             fi
 
