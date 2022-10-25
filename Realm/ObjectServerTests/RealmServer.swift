@@ -293,8 +293,9 @@ class Admin {
                     result = $0
                     group.leave()
                 }
-                guard case .success = group.wait(timeout: .now() + 30) else {
-                    return .failure(URLError(.badServerResponse))
+                guard case .success = group.wait(timeout: .now() + 60) else {
+                    print("HTTP request timed out: \(httpMethod) \(self.url)")
+                    return .failure(URLError(.timedOut))
                 }
                 return result
             }
