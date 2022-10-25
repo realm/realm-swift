@@ -228,7 +228,7 @@ public protocol RealmCollectionBase: RandomAccessCollection, LazyCollectionProto
 /**
  A homogenous collection of `Object`s which can be retrieved, filtered, sorted, and operated upon.
 */
-public protocol RealmCollection: RealmCollectionBase, Equatable {
+public protocol RealmCollection: RealmCollectionBase, Equatable where Iterator == RLMIterator<Element> {
     // MARK: Properties
 
     /// The Realm which manages the collection, or `nil` for unmanaged collections.
@@ -1248,6 +1248,12 @@ extension RealmCollection {
     public static func == (lhs: AnyRealmCollection<Element>, rhs: AnyRealmCollection<Element>) -> Bool {
         lhs.collection.isEqual(rhs.collection)
     }
+
+    /// :nodoc:
+    public func makeIterator() -> RLMIterator<Element> {
+        return RLMIterator(collection: collection)
+    }
+
 }
 
 extension AnyRealmCollection: Encodable where Element: Encodable {}

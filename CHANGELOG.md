@@ -1,3 +1,24 @@
+x.y.z Release notes (yyyy-MM-dd)
+=============================================================
+### Enhancements
+* None.
+
+### Fixed
+* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
+* Fix linker errors when building a release build with Xcode 14.1 when installing via SPM ([#7995](https://github.com/realm/realm-swift/issues/7995)).
+
+<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+
+### Compatibility
+* Realm Studio: 11.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 14.0.1.
+* CocoaPods: 1.10 or later.
+* Xcode: 13.1-14.1.
+
+### Internal
+* Upgraded realm-core from ? to ?
+
 10.32.1 Release notes (2022-10-25)
 =============================================================
 
