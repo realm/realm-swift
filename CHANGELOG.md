@@ -2,6 +2,9 @@
 =============================================================
 
 ### Enhancements
+
+* Improve performance of client reset with automatic recovery and converting
+  top-level tables into embedded tables ([Core #5897](https://github.com/realm/realm-core/pull/5897)).
 * `Realm.Error` is now a typealias for `RLMError` rather than a
   manually-defined version of what the automatic bridging produces. This should
   have no effect on existing working code, but the manual definition was
@@ -10,10 +13,8 @@
   associated with that error. This link is now exposed in the `serverLogURL`
   property on `SyncError` (or `RLMServerLogURLKey` userInfo field when using NSError).
 
-* Improve performance of client reset with automatic recovery and converting
-  top-level tables into embedded tables ([Core #5897](https://github.com/realm/realm-core/pull/5897)).
-
 ### Fixed
+
 * Many sync and app errors were reported using undocumented internal error
   codes and/or domains and could not be progammatically handled. Some notable
   things which now have public error codes instead of unstable internal ones:
@@ -30,7 +31,6 @@
 * `UserAPIKey.objectId` was incorrectly bridged to Swift as `RLMObjectId` to
   `ObjectId`. This may produce warnings about an unneccesary cast if you were
   previously casting it to the correct type (since v10.0.0).
-
 * Fixed an assertion failure when observing change notifications on a sectioned
   result, if the first modification was to a linked property that did not cause
   the state of the sections to change.
