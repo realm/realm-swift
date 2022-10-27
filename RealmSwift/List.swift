@@ -357,6 +357,11 @@ extension List: MutableCollection {
             move(from: offset, to: d)
         }
     }
+
+    /// :nodoc:
+    public func makeIterator() -> RLMIterator<Element> {
+        return RLMIterator(collection: collection)
+    }
 }
 
 // MARK: - Codable

@@ -27,7 +27,7 @@ import Realm
 // The functions don't need to be documented here because Xcode/DocC inherit
 // the documentation from the RealmCollection protocol definition, and jazzy
 // excludes this file entirely.
-internal protocol RealmCollectionImpl: RealmCollection where Index == Int, SubSequence == Slice<Self> {
+internal protocol RealmCollectionImpl: RealmCollection where Index == Int, SubSequence == Slice<Self>, Iterator == RLMIterator<Element> {
     var collection: RLMCollection { get }
     init(collection: RLMCollection)
 }
@@ -141,10 +141,6 @@ extension RealmCollectionImpl {
     }
     public func thaw() -> Self? {
         return Self(collection: collection.thaw())
-    }
-
-    public func makeIterator() -> RLMIterator<Element> {
-        return RLMIterator(collection: collection)
     }
 
     public func sectioned<Key: _Persistable>(sortDescriptors: [SortDescriptor],

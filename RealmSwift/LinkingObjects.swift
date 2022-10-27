@@ -80,7 +80,6 @@ import Realm
     }
 
     // MARK: Implementation
-
     internal init(propertyName: String, handle: RLMLinkingObjectsHandle?) {
         self.propertyName = propertyName
         self.handle = handle
@@ -97,4 +96,9 @@ import Realm
     internal var propertyName: String
     internal var handle: RLMLinkingObjectsHandle?
     internal var lastAccessedNames: NSMutableArray?
+
+    /// :nodoc:
+    public func makeIterator() -> RLMIterator<Element> {
+        return RLMIterator(collection: collection)
+    }
 }

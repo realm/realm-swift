@@ -217,6 +217,11 @@ public final class MutableSet<Element: RealmCollectionValue>: RLMSwiftCollection
     }
 
     /// :nodoc:
+    public func makeIterator() -> RLMIterator<Element> {
+        return RLMIterator(collection: collection)
+    }
+
+    /// :nodoc:
     public func index(of object: Element) -> Int? {
         fatalError("index(of:) is not available on MutableSet")
     }
