@@ -97,11 +97,11 @@ xctest() {
                 echo "github \"realm/realm-swift\" \"${sha:-master}\"" > Cartfile
             fi
             if [[ $PLATFORM == ios ]]; then
-                carthage update --platform iOS
+                carthage update --use-xcframeworks --platform iOS
             elif [[ $PLATFORM == osx ]]; then
-                carthage update --platform Mac
+                carthage update --use-xcframeworks --platform Mac
             elif [[ $PLATFORM == watchos ]]; then
-                carthage update --platform watchOS
+                carthage update --use-xcframeworks --platform watchOS
             fi
         )
     elif [[ $NAME == SwiftPackageManager* ]]; then
@@ -197,7 +197,6 @@ case "$COMMAND" in
         ;;
 
     test-*-*-carthage)
-        export REALM_CARTHAGE_ARM_DISABLED='YES'
         xctest "$PLATFORM" "$LANGUAGE" CarthageExample
         ;;
 

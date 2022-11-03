@@ -3,18 +3,18 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 46;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3F4520552914CEB4008F07AD /* Realm.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F4520542914CEB4008F07AD /* Realm.xcframework */; };
+		3F4520562914CEB4008F07AD /* Realm.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 3F4520542914CEB4008F07AD /* Realm.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		E81D29431B015EFF009EDD76 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = E81D29421B015EFF009EDD76 /* AppDelegate.m */; };
 		E81D29451B015EFF009EDD76 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E81D29441B015EFF009EDD76 /* main.m */; };
 		E81D29481B015EFF009EDD76 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E81D29471B015EFF009EDD76 /* ViewController.m */; };
 		E81D294A1B015EFF009EDD76 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E81D29491B015EFF009EDD76 /* Images.xcassets */; };
 		E81D294D1B015EFF009EDD76 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E81D294B1B015EFF009EDD76 /* Main.storyboard */; };
 		E81D29591B015EFF009EDD76 /* CarthageExampleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E81D29581B015EFF009EDD76 /* CarthageExampleTests.m */; };
-		E887530C1B01605F00DD2234 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E887530B1B01605F00DD2234 /* Realm.framework */; };
-		E887530D1B01605F00DD2234 /* Realm.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = E887530B1B01605F00DD2234 /* Realm.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -34,7 +34,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				E887530D1B01605F00DD2234 /* Realm.framework in Embed Frameworks */,
+				3F4520562914CEB4008F07AD /* Realm.xcframework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -42,6 +42,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		3F4520542914CEB4008F07AD /* Realm.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Realm.xcframework; path = Carthage/Build/Realm.xcframework; sourceTree = "<group>"; };
 		E81D293C1B015EFE009EDD76 /* CarthageExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CarthageExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E81D29401B015EFF009EDD76 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E81D29411B015EFF009EDD76 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -54,7 +55,6 @@
 		E81D29521B015EFF009EDD76 /* CarthageExampleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CarthageExampleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E81D29571B015EFF009EDD76 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E81D29581B015EFF009EDD76 /* CarthageExampleTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CarthageExampleTests.m; sourceTree = "<group>"; };
-		E887530B1B01605F00DD2234 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = Carthage/Build/Mac/Realm.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -62,7 +62,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E887530C1B01605F00DD2234 /* Realm.framework in Frameworks */,
+				3F4520552914CEB4008F07AD /* Realm.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -76,13 +76,21 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		3F4520532914CEB4008F07AD /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				3F4520542914CEB4008F07AD /* Realm.xcframework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		E81D29331B015EFE009EDD76 = {
 			isa = PBXGroup;
 			children = (
 				E81D293E1B015EFE009EDD76 /* CarthageExample */,
 				E81D29551B015EFF009EDD76 /* CarthageExampleTests */,
 				E81D293D1B015EFE009EDD76 /* Products */,
-				E887530B1B01605F00DD2234 /* Realm.framework */,
+				3F4520532914CEB4008F07AD /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -197,6 +205,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 				Base,
 			);
@@ -293,7 +302,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-                               CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -349,7 +358,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-                               CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -382,7 +391,10 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = CarthageExample/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -395,7 +407,10 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = CarthageExample/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -415,7 +430,11 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = CarthageExampleTests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CarthageExample.app/Contents/MacOS/CarthageExample";
@@ -432,7 +451,11 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = CarthageExampleTests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CarthageExample.app/Contents/MacOS/CarthageExample";
