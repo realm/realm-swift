@@ -7,6 +7,9 @@ x.y.z Release notes (yyyy-MM-dd)
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
 * Fix name lookup errors when importing Realm Swift built in library evolution
   mode (([#8014](https://github.com/realm/realm-swift/issues/8014)).
+* The prebuilt watchOS library in the objective-c release package was missing
+  an arm64 slice. The Swift release package was uneffected
+  ([PR #8016](https://github.com/realm/realm-swift/pull/8016)).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 

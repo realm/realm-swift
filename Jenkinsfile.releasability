@@ -210,6 +210,7 @@ def doBuild() {
             unstash "${platform}-${objcXcodeVersion}"
           }
 
+          unstash "watchos-14.0.1"
           unstash 'ios-static'
           unstash 'examples'
           unstash 'source'
