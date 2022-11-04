@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3F4520602915978E008F07AD /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F45205F29159778008F07AD /* libc++.tbd */; };
+		3F4520612915978E008F07AD /* libcompression.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F45205D29159778008F07AD /* libcompression.tbd */; };
+		3F4520622915978E008F07AD /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F45205E29159778008F07AD /* libz.tbd */; };
 		3F636A5D29146AB700DB1CBC /* Realm.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F636A5B29146AB600DB1CBC /* Realm.xcframework */; };
 		3F636A5E29146AB700DB1CBC /* Realm.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 3F636A5B29146AB600DB1CBC /* Realm.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		3F636A5F29146AB700DB1CBC /* RealmSwift.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F636A5C29146AB600DB1CBC /* RealmSwift.xcframework */; };
@@ -45,6 +48,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		3F45205D29159778008F07AD /* libcompression.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libcompression.tbd; path = usr/lib/libcompression.tbd; sourceTree = SDKROOT; };
+		3F45205E29159778008F07AD /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
+		3F45205F29159778008F07AD /* libc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; };
 		3F636A5B29146AB600DB1CBC /* Realm.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Realm.xcframework; path = Carthage/Build/Realm.xcframework; sourceTree = "<group>"; };
 		3F636A5C29146AB600DB1CBC /* RealmSwift.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = RealmSwift.xcframework; path = Carthage/Build/RealmSwift.xcframework; sourceTree = "<group>"; };
 		E8FA5D321B3CD3320095EF19 /* CarthageExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CarthageExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -64,6 +70,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3F4520602915978E008F07AD /* libc++.tbd in Frameworks */,
+				3F4520612915978E008F07AD /* libcompression.tbd in Frameworks */,
+				3F4520622915978E008F07AD /* libz.tbd in Frameworks */,
 				3F636A5D29146AB700DB1CBC /* Realm.xcframework in Frameworks */,
 				3F636A5F29146AB700DB1CBC /* RealmSwift.xcframework in Frameworks */,
 			);
@@ -82,6 +91,9 @@
 		3F636A5A29146AB600DB1CBC /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				3F45205F29159778008F07AD /* libc++.tbd */,
+				3F45205D29159778008F07AD /* libcompression.tbd */,
+				3F45205E29159778008F07AD /* libz.tbd */,
 				3F636A5B29146AB600DB1CBC /* Realm.xcframework */,
 				3F636A5C29146AB600DB1CBC /* RealmSwift.xcframework */,
 			);
@@ -210,6 +222,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 				Base,
 			);
@@ -406,7 +419,10 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = CarthageExample/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.0;
@@ -419,7 +435,10 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = CarthageExample/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.0;
@@ -439,7 +458,11 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = CarthageExampleTests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.0;
@@ -456,7 +479,11 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = CarthageExampleTests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.0;

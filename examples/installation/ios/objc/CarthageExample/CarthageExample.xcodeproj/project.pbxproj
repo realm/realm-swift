@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3F45205829159716008F07AD /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F4520572915970B008F07AD /* libc++.tbd */; };
+		3F45205A29159723008F07AD /* libcompression.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F4520592915971C008F07AD /* libcompression.tbd */; };
+		3F45205C29159731008F07AD /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F45205B29159729008F07AD /* libz.tbd */; };
 		3F636A6429146EDA00DB1CBC /* Realm.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F636A6329146EDA00DB1CBC /* Realm.xcframework */; };
 		3F636A6529146EDA00DB1CBC /* Realm.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 3F636A6329146EDA00DB1CBC /* Realm.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		E8F8D99A1B0177C10098F6CD /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E8F8D9991B0177C10098F6CD /* main.m */; };
@@ -43,6 +46,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		3F4520572915970B008F07AD /* libc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; };
+		3F4520592915971C008F07AD /* libcompression.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libcompression.tbd; path = usr/lib/libcompression.tbd; sourceTree = SDKROOT; };
+		3F45205B29159729008F07AD /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		3F636A6329146EDA00DB1CBC /* Realm.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Realm.xcframework; path = Carthage/Build/Realm.xcframework; sourceTree = "<group>"; };
 		E8F8D9941B0177C10098F6CD /* CarthageExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CarthageExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E8F8D9981B0177C10098F6CD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -64,6 +70,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3F45205829159716008F07AD /* libc++.tbd in Frameworks */,
+				3F45205A29159723008F07AD /* libcompression.tbd in Frameworks */,
+				3F45205C29159731008F07AD /* libz.tbd in Frameworks */,
 				3F636A6429146EDA00DB1CBC /* Realm.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -81,6 +90,9 @@
 		3F636A6229146EDA00DB1CBC /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				3F4520572915970B008F07AD /* libc++.tbd */,
+				3F4520592915971C008F07AD /* libcompression.tbd */,
+				3F45205B29159729008F07AD /* libz.tbd */,
 				3F636A6329146EDA00DB1CBC /* Realm.xcframework */,
 			);
 			name = Frameworks;
