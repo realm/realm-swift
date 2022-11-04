@@ -52,13 +52,16 @@ COMMAND="$1"
 export EXPANDED_CODE_SIGN_IDENTITY=''
 
 download_zip_if_needed() {
-    LANG="$1"
-    local DIRECTORY=realm-$LANG-latest
-    if [ ! -d "$DIRECTORY" ]; then
-        curl -o "$DIRECTORY".zip -L https://static.realm.io/downloads/"$LANG"/latest
-        unzip "$DIRECTORY".zip
-        rm "$DIRECTORY".zip
-        mv realm-"$LANG"-* "$DIRECTORY"
+    local lang="$1"
+    local directory="realm-$lang-latest"
+    local version
+    version=$(curl --silent https://static.realm.io/update/cocoa)
+
+    if [ ! -d "$directory" ]; then
+        curl -o "$directory".zip -L "https://static.realm.io/downloads/$lang/realm-$lang-$version.zip"
+        unzip "$directory".zip
+        rm "$directory".zip
+        mv realm-"$lang"-* "$directory"
     fi
 }
 
