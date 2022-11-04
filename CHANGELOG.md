@@ -5,7 +5,8 @@ x.y.z Release notes (yyyy-MM-dd)
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
-* None.
+* Fix name lookup errors when importing Realm Swift built in library evolution
+  mode (([#8014](https://github.com/realm/realm-swift/issues/8014)).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 

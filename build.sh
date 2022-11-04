@@ -449,12 +449,12 @@ case "$COMMAND" in
         -exec sed -i '' 's/import Private/import Realm.Private/g' {} \; \
         -exec sed -i '' 's/RealmSwift.Configuration/RealmSwift.Realm.Configuration/g' {} \; \
         -exec sed -i '' 's/extension Configuration/extension Realm.Configuration/g' {} \; \
-        -exec sed -i '' 's/RealmSwift.Error/RealmSwift.Realm.Error/g' {} \; \
+        -exec sed -i '' 's/RealmSwift.Error[[:>:]]/RealmSwift.Realm.Error/g' {} \; \
         -exec sed -i '' 's/extension Error/extension Realm.Error/g' {} \; \
         -exec sed -i '' 's/RealmSwift.AsyncOpenTask/RealmSwift.Realm.AsyncOpenTask/g' {} \; \
         -exec sed -i '' 's/RealmSwift.UpdatePolicy/RealmSwift.Realm.UpdatePolicy/g' {} \; \
-        -exec sed -i '' 's/RealmSwift.Notification /RealmSwift.Realm.Notification /g' {} \; \
-        -exec sed -i '' 's/RealmSwift.Notification,/RealmSwift.Realm.Notification,/g' {} \; \
+        -exec sed -i '' 's/RealmSwift.Notification[[:>:]]/RealmSwift.Realm.Notification/g' {} \; \
+        -exec sed -i '' 's/RealmSwift.OpenBehavior/RealmSwift.Realm.OpenBehavior/g' {} \; \
         -exec sed -i '' 's/τ_1_0/V/g' {} \; # Generics will use τ_1_0 which needs to be changed to the correct type name.
 
         exit 0

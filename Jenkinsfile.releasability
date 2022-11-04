@@ -16,9 +16,17 @@ def installationTest(platform, test, language) {
         unstash "${language}-packaged"
       }
 
+      // Carthage currently doesn't support building for watchOS or tvOS with
+      // Xcode 14 because it incorrectly requires bitcode for those platforms
+      // https://github.com/Carthage/Carthage/pull/3293
+      def xcodeVersion = carthageXcodeVersion
+      if (test == "carthage" && (platform == "watchos" || platform == "tvos")) {
+        xcodeVersion = "13.4.1"
+      }
+
       sh """
       hostname
-      export REALM_XCODE_VERSION=${carthageXcodeVersion}
+      export REALM_XCODE_VERSION=${xcodeVersion}
       archive=\$(echo \$PWD/realm-${language}-*.zip)
 
       cd examples/installation
@@ -154,8 +162,12 @@ def doBuild() {
           # for each platform.
           ./scripts/reset-simulators.rb -firstOnly
 
-          # Building the iOS static scheme just wastes time, so delete it
-          rm 'Realm.xcodeproj/xcshareddata/xcschemes/Realm iOS static.xcscheme'
+          # Carthage doesn't let us tell it which schemes to build, so delete
+          # all of them except for the two we actually want
+          find Realm.xcodeproj -name '*.xcscheme' \
+            -and -not -name 'Realm.xcscheme' \
+            -and -not -name 'RealmSwift.xcscheme' \
+            -delete
 
           carthage build --no-skip-current --platform ${platform} --derived-data DerivedData
           carthage archive --output Carthage-${platform}.framework.zip
