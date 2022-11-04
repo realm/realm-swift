@@ -724,7 +724,7 @@ static std::optional<RLMPropertyType> typeFromProtocolString(const char *type) {
 - (realm::Property)objectStoreCopy:(RLMSchema *)schema {
     realm::Property p;
     p.name = self.columnName.UTF8String;
-    if (self.columnName != _name) {
+    if (_columnName) {
         p.public_name = _name.UTF8String;
     }
     if (_objectClassName) {

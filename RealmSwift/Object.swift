@@ -180,7 +180,7 @@ extension Object: _RealmCollectionValueInsideOptional {
 
     /**
      Override this method to specify a map of public-private property names.
-     This will set a different property column name on the Realm, and allows using the public name
+     This will set a different persisted property name on the Realm, and allows using the public name
      for any operation with the property. (Ex: Queries, Sorting, ...).
      This very helpful if you need to map property names from your `Device Sync` JSON schema
      to local property names.
@@ -200,7 +200,6 @@ extension Object: _RealmCollectionValueInsideOptional {
 
      - note: Only property that have a different column name have to be added to the properties mapping
      dictionary.
-     - note: This API is enable for both old and modern property declaration syntax only.
      - note: In a migration block, when enumerating an old property with a public/private name, you will have to use
      the old column name instead of the public one to retrieve the property value.
 

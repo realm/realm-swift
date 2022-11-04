@@ -351,7 +351,7 @@ class ManagedPrimitiveMutableSetTests: TestCase {
         SortablePrimitiveMutableSetTests<ManagedObjectFactory, Double>.defaultTestSuite.tests.forEach(suite.addTest)
         SortablePrimitiveMutableSetTests<ManagedObjectFactory, String>.defaultTestSuite.tests.forEach(suite.addTest)
         SortablePrimitiveMutableSetTests<ManagedObjectFactory, Date>.defaultTestSuite.tests.forEach(suite.addTest)
-        SortablePrimitiveListTests<ManagedObjectFactory, Data>.defaultTestSuite.tests.forEach(suite.addTest)
+        SortablePrimitiveMutableSetTests<ManagedObjectFactory, Data>.defaultTestSuite.tests.forEach(suite.addTest)
 
         SortablePrimitiveMutableSetTests<ManagedObjectFactory, Int?>.defaultTestSuite.tests.forEach(suite.addTest)
         SortablePrimitiveMutableSetTests<ManagedObjectFactory, Int8?>.defaultTestSuite.tests.forEach(suite.addTest)
@@ -362,7 +362,7 @@ class ManagedPrimitiveMutableSetTests: TestCase {
         SortablePrimitiveMutableSetTests<ManagedObjectFactory, Double?>.defaultTestSuite.tests.forEach(suite.addTest)
         SortablePrimitiveMutableSetTests<ManagedObjectFactory, String?>.defaultTestSuite.tests.forEach(suite.addTest)
         SortablePrimitiveMutableSetTests<ManagedObjectFactory, Date?>.defaultTestSuite.tests.forEach(suite.addTest)
-        SortablePrimitiveListTests<ManagedObjectFactory, Data?>.defaultTestSuite.tests.forEach(suite.addTest)
+        SortablePrimitiveMutableSetTests<ManagedObjectFactory, Data?>.defaultTestSuite.tests.forEach(suite.addTest)
 
         SortablePrimitiveMutableSetTests<ManagedObjectFactory, EnumInt>.defaultTestSuite.tests.forEach(suite.addTest)
         SortablePrimitiveMutableSetTests<ManagedObjectFactory, EnumInt8>.defaultTestSuite.tests.forEach(suite.addTest)

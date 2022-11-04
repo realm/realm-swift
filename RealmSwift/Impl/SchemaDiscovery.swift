@@ -62,7 +62,7 @@ internal extension RLMProperty {
     }
 }
 
-private func getModernProperties(_ object: ObjectBase, _ cls: ObjectBase.Type) -> [RLMProperty] {
+private func getModernProperties(_ object: ObjectBase) -> [RLMProperty] {
     let columnNames: [String: String] = type(of: object).propertiesMapping()
     return Mirror(reflecting: object).children.compactMap { prop in
         guard let label = prop.label else { return nil }
@@ -182,7 +182,7 @@ private func getProperties(_ cls: RLMObjectBase.Type) -> [RLMProperty] {
     // Check for any modern properties and only scan for legacy properties if
     // none are found.
     let object = cls.init()
-    let props = getModernProperties(object, cls)
+    let props = getModernProperties(object)
     if props.count > 0 {
         return props
     }

@@ -346,7 +346,7 @@ class ManagedPrimitiveMapTests: TestCase {
         SortablePrimitiveMapTests<ManagedObjectFactory, Double>.defaultTestSuite.tests.forEach(suite.addTest)
         SortablePrimitiveMapTests<ManagedObjectFactory, String>.defaultTestSuite.tests.forEach(suite.addTest)
         SortablePrimitiveMapTests<ManagedObjectFactory, Date>.defaultTestSuite.tests.forEach(suite.addTest)
-        SortablePrimitiveListTests<ManagedObjectFactory, Data>.defaultTestSuite.tests.forEach(suite.addTest)
+        SortablePrimitiveMapTests<ManagedObjectFactory, Data>.defaultTestSuite.tests.forEach(suite.addTest)
 
         SortablePrimitiveMapTests<ManagedObjectFactory, Int?>.defaultTestSuite.tests.forEach(suite.addTest)
         SortablePrimitiveMapTests<ManagedObjectFactory, Int8?>.defaultTestSuite.tests.forEach(suite.addTest)
@@ -357,7 +357,7 @@ class ManagedPrimitiveMapTests: TestCase {
         SortablePrimitiveMapTests<ManagedObjectFactory, Double?>.defaultTestSuite.tests.forEach(suite.addTest)
         SortablePrimitiveMapTests<ManagedObjectFactory, String?>.defaultTestSuite.tests.forEach(suite.addTest)
         SortablePrimitiveMapTests<ManagedObjectFactory, Date?>.defaultTestSuite.tests.forEach(suite.addTest)
-        SortablePrimitiveListTests<ManagedObjectFactory, Data?>.defaultTestSuite.tests.forEach(suite.addTest)
+        SortablePrimitiveMapTests<ManagedObjectFactory, Data?>.defaultTestSuite.tests.forEach(suite.addTest)
 
         SortablePrimitiveMapTests<ManagedObjectFactory, EnumInt>.defaultTestSuite.tests.forEach(suite.addTest)
         SortablePrimitiveMapTests<ManagedObjectFactory, EnumInt8>.defaultTestSuite.tests.forEach(suite.addTest)

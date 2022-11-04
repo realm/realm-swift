@@ -71,17 +71,17 @@ public:
     ManagedSwiftValueStorage(RLMObjectBase *obj, RLMProperty *prop)
     : _realm(obj->_realm)
     , _object(obj->_realm->_realm, *obj->_info->objectSchema, obj->_row)
-    , _propertyName(prop.columnName.UTF8String)
+    , _columnName(prop.columnName.UTF8String)
     , _ctx(*obj->_info)
     {
     }
 
     id get() override {
-        return _object.get_property_value<id>(_ctx, _propertyName);
+        return _object.get_property_value<id>(_ctx, _columnName);
     }
 
     void set(__unsafe_unretained id const value) override {
-        _object.set_property_value(_ctx, _propertyName, value ?: NSNull.null);
+        _object.set_property_value(_ctx, _columnName, value ?: NSNull.null);
     }
 
     NSString *propertyName() override {
@@ -94,7 +94,7 @@ private:
     // RLMAccessorContext holds a non-retaining one.
     __unused RLMRealm *_realm;
     realm::Object _object;
-    std::string _propertyName;
+    std::string _columnName;
     RLMAccessorContext _ctx;
 };
 } // anonymous namespace

@@ -89,19 +89,19 @@ extension AsymmetricObject {
 
     /**
      Override this method to specify a map of public-private property names.
-     This will set a different property column name on the Realm, and allows using the public name
+     This will set a different persisted property name on the Realm, and allows using the public name
      for any operation with the property. (Ex: Queries, Sorting, ...).
      This very helpful if you need to map property names from your `Device Sync` JSON schema
      to local property names.
 
      ```swift
      class Person: AsymmetricObject {
-         @Persisted var firtName: String
+         @Persisted var firstName: String
          @Persisted var birthDate: Date
          @Persisted var age: Int
 
          override class public func propertiesMapping() -> [String : String] {
-             ["firtName"; "first_name",
+             ["firstName"; "first_name",
               "lastName"; "last_name"]
          }
      }
@@ -109,7 +109,6 @@ extension AsymmetricObject {
 
      - note: Only property that have a different column name have to be added to the properties mapping
      dictionary.
-     - note: This API is enable for both old and modern property declaration syntax only.
 
      - returns: A dictionary of public-private property names.
      */
