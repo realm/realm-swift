@@ -998,19 +998,6 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
 // MARK: - Async Await
 #if swift(>=5.6) && canImport(_Concurrency)
 @available(macOS 12.0, *)
-class SwiftAsyncFlexibleSyncTests: SwiftSyncTestCase {
-    override class var defaultTestSuite: XCTestSuite {
-        // async/await is currently incompatible with thread sanitizer and will
-        // produce many false positives
-        // https://bugs.swift.org/browse/SR-15444
-        if RLMThreadSanitizerEnabled() {
-            return XCTestSuite(name: "\(type(of: self))")
-        }
-        return super.defaultTestSuite
-    }
-}
-
-@available(macOS 12.0, *)
 extension SwiftFlexibleSyncServerTests {
     @MainActor
     private func populateFlexibleSyncData(_ block: @escaping (Realm) -> Void) async throws {
@@ -1157,11 +1144,6 @@ extension SwiftFlexibleSyncServerTests {
         XCTAssertNotNil(realm)
 
         XCTAssertEqual(realm.subscriptions.count, 1)
-        // Adding this sleep, because there seems to be a timing issue after this commit in baas
-        // https://github.com/10gen/baas/commit/64e75b3f1fe8a6f8704d1597de60f9dda401ccce,
-        // data take a little longer to be downloaded to the realm even though the
-        // sync client changed the subscription state to completed.
-        sleep(1)
         checkCount(expected: 10, realm, SwiftPerson.self)
     }
 
@@ -1245,11 +1227,6 @@ extension SwiftFlexibleSyncServerTests {
             let realm = try await Realm(configuration: c, downloadBeforeOpen: .always)
             XCTAssertNotNil(realm)
             XCTAssertEqual(realm.subscriptions.count, 1)
-            // Adding this sleep, because there seems to be a timing issue after this commit in baas
-            // https://github.com/10gen/baas/commit/64e75b3f1fe8a6f8704d1597de60f9dda401ccce,
-            // data take a little longer to be downloaded to the realm even though the
-            // sync client changed the subscription state to completed.
-            sleep(1)
             checkCount(expected: 9, realm, SwiftTypesSyncObject.self)
         }.value
 
@@ -1340,6 +1317,7 @@ extension SwiftFlexibleSyncServerTests {
         try realm.write {
             realm.create(SwiftCustomColumnObject.self, value: valuesDictionary)
         }
+        checkCount(expected: 1, realm, SwiftCustomColumnObject.self)
         waitForUploads(for: realm)
 
         let user1 = try await logInUser(for: basicCredentials(app: self.flexibleSyncApp), app: self.flexibleSyncApp)
@@ -1350,15 +1328,9 @@ extension SwiftFlexibleSyncServerTests {
         let realm1 = try await Realm(configuration: config2, downloadBeforeOpen: .once)
         XCTAssertNotNil(realm1)
         XCTAssertEqual(realm1.subscriptions.count, 1)
+        checkCount(expected: 1, realm1, SwiftCustomColumnObject.self)
 
-        // Adding this sleep, because there seems to be a timing issue after this commit in baas
-        // https://github.com/10gen/baas/commit/64e75b3f1fe8a6f8704d1597de60f9dda401ccce,
-        // data take a little longer to be downloaded to the realm even though the
-        // sync client changed the subscription state to completed.
-        sleep(1)
-        checkCount(expected: 1, realm, SwiftCustomColumnObject.self)
-
-        let foundObject = realm.object(ofType: SwiftCustomColumnObject.self, forPrimaryKey: objectId)
+        let foundObject = realm1.object(ofType: SwiftCustomColumnObject.self, forPrimaryKey: objectId)
         XCTAssertNotNil(foundObject)
         XCTAssertEqual(foundObject!.id, objectId)
         XCTAssertEqual(foundObject!.boolCol, true)
@@ -1395,12 +1367,6 @@ extension SwiftFlexibleSyncServerTests {
         let realm = try await Realm(configuration: config, downloadBeforeOpen: .once)
         XCTAssertNotNil(realm)
         XCTAssertEqual(realm.subscriptions.count, 1)
-
-        // Adding this sleep, because there seems to be a timing issue after this commit in baas
-        // https://github.com/10gen/baas/commit/64e75b3f1fe8a6f8704d1597de60f9dda401ccce,
-        // data take a little longer to be downloaded to the realm even though the
-        // sync client changed the subscription state to completed.
-        sleep(1)
         checkCount(expected: 2, realm, SwiftCustomColumnObject.self)
 
         let foundObject = realm.objects(SwiftCustomColumnObject.self).where { $0.id == objectId }.first
@@ -1441,12 +1407,6 @@ extension SwiftFlexibleSyncServerTests {
         let realm = try await Realm(configuration: config, downloadBeforeOpen: .once)
         XCTAssertNotNil(realm)
         XCTAssertEqual(realm.subscriptions.count, 1)
-
-        // Adding this sleep, because there seems to be a timing issue after this commit in baas
-        // https://github.com/10gen/baas/commit/64e75b3f1fe8a6f8704d1597de60f9dda401ccce,
-        // data take a little longer to be downloaded to the realm even though the
-        // sync client changed the subscription state to completed.
-        sleep(1)
         checkCount(expected: 2, realm, SwiftCustomColumnObject.self)
 
         let foundObject = realm.objects(SwiftCustomColumnObject.self).where { $0.id == objectId }.first
@@ -1489,12 +1449,6 @@ extension SwiftFlexibleSyncServerTests {
         let realm = try await Realm(configuration: config, downloadBeforeOpen: .once)
         XCTAssertNotNil(realm)
         XCTAssertEqual(realm.subscriptions.count, 1)
-
-        // Adding this sleep, because there seems to be a timing issue after this commit in baas
-        // https://github.com/10gen/baas/commit/64e75b3f1fe8a6f8704d1597de60f9dda401ccce,
-        // data take a little longer to be downloaded to the realm even though the
-        // sync client changed the subscription state to completed.
-        sleep(1)
         checkCount(expected: 2, realm, SwiftCustomColumnObject.self)
 
         let foundObject = realm.objects(SwiftCustomColumnObject.self).where { $0.id == objectId }.first

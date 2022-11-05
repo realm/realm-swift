@@ -140,13 +140,13 @@ extension EmbeddedObject: _RealmCollectionValueInsideOptional {
 
      ```swift
      class Person: EmbeddedObject {
-         @Persisted var firtName: String
+         @Persisted var firstName: String
          @Persisted var birthDate: Date
          @Persisted var age: Int
 
          override class public func propertiesMapping() -> [String : String] {
-             ["firtName"; "first_name",
-              "lastName"; "last_name"]
+             ["firstName"; "first_name",
+              "birthDate"; "birth_date"]
          }
      }
      ```

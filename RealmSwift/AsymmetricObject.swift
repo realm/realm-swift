@@ -102,7 +102,7 @@ extension AsymmetricObject {
 
          override class public func propertiesMapping() -> [String : String] {
              ["firstName"; "first_name",
-              "lastName"; "last_name"]
+              "birthDate"; "birth_date"]
          }
      }
      ```

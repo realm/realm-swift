@@ -622,6 +622,48 @@
     XCTAssertEqual(3, [[obj.dictionary maxOfProperty:@"propA"] intValue]);
 }
 
+-(void)testRenamedPropertyObservation {
+    RLMRealm *realm = self.realmWithTestPath;
+
+    __block LinkToRenamedProperties1 *obj;
+    [realm transactionWithBlock:^{
+        [RenamedProperties1 createInRealm:realm withValue:@[@1, @""]];
+        [RenamedProperties1 createInRealm:realm withValue:@[@2, @""]];
+        [RenamedProperties1 createInRealm:realm withValue:@[@3, @""]];
+
+        obj = [LinkToRenamedProperties1 createInRealm:realm withValue:@[]];
+        RLMResults<RenamedProperties1 *> *allObjects = [RenamedProperties1 allObjectsInRealm:realm];
+        for (NSUInteger i = 0; i < allObjects.count; i++) {
+            NSString *key = [NSString stringWithFormat:@"item%lu", (unsigned long)i];
+            obj.dictionary[key] = allObjects[i];
+        }
+    }];
+
+    __block bool first = true;
+    __block id expectation = [self expectationWithDescription:@""];
+    id token = [obj.dictionary addNotificationBlock:^(RLMDictionary *dictionary, RLMDictionaryChange *change, NSError *error) {
+        XCTAssertNotNil(dictionary);
+        XCTAssert(first ? !change : !!change);
+        XCTAssertNil(error);
+        first = false;
+        [expectation fulfill];
+    } keyPaths:@[@"propB"]];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    expectation = [self expectationWithDescription:@""];
+    [self dispatchAsyncAndWait:^{
+        RLMRealm *realm = self.realmWithTestPath;
+        [realm transactionWithBlock:^{
+            RLMDictionary *dict = [(LinkToRenamedProperties1 *)[LinkToRenamedProperties1 allObjectsInRealm:realm].firstObject dictionary];
+            RenamedProperties1 *property = dict[@"item0"];
+            property.propB = @"newValue";
+        }];
+    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    [(RLMNotificationToken *)token invalidate];
+}
+
 -(void)testInsertMultiple {
     RLMRealm *realm = [self realmWithTestPath];
     

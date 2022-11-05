@@ -19,6 +19,15 @@
 import XCTest
 import RealmSwift
 
+// MARK: - Custom Column Object Factory
+
+protocol CustomColumnObjectFactory {
+    associatedtype Root: Object
+
+    static func create(primaryKey: ObjectId, nestedObject: Root?) -> Root
+    static func createValues(primaryKey: ObjectId) -> Any
+}
+
 // MARK: - Models
 
 let propertiesModernCustomMapping: [String: String] =  ["pk": "custom_pk",
@@ -72,7 +81,7 @@ class EmbeddedModernCustomObject: EmbeddedObject {
 extension ModernCustomObject: CustomColumnObjectFactory {
     typealias Root = ModernCustomObject
 
-    static func create(primaryKey: ObjectId) -> ModernCustomObject {
+    static func create(primaryKey: ObjectId, nestedObject: ModernCustomObject?) -> ModernCustomObject {
         let object = ModernCustomObject()
         object.pk = primaryKey
 
@@ -80,13 +89,15 @@ extension ModernCustomObject: CustomColumnObjectFactory {
         linkedObject.pk = ObjectId.generate()
         linkedObject.embeddedObject = EmbeddedModernCustomObject()
 
-        object.anyCol = .object(linkedObject)
         object.embeddedObject = EmbeddedModernCustomObject()
 
-        object.objectCol = linkedObject
-        object.arrayCol.append(linkedObject)
-        object.setCol.insert(linkedObject)
-        object.mapCol["key"] = linkedObject
+        if let nestedObject = nestedObject {
+            object.anyCol = .object(nestedObject)
+            object.objectCol = nestedObject
+            object.arrayCol.append(nestedObject)
+            object.setCol.insert(nestedObject)
+            object.mapCol["key"] = nestedObject
+        }
         return object
     }
 
@@ -151,7 +162,7 @@ class OldCustomObject: Object {
 extension OldCustomObject: CustomColumnObjectFactory {
     typealias Root = OldCustomObject
 
-    static func create(primaryKey: ObjectId) -> OldCustomObject {
+    static func create(primaryKey: ObjectId, nestedObject: OldCustomObject?) -> OldCustomObject {
         let object = OldCustomObject()
         object.pk = primaryKey
         object.embeddedObject = EmbeddedCustomObject()
@@ -160,10 +171,12 @@ extension OldCustomObject: CustomColumnObjectFactory {
         linkedObject.pk = ObjectId.generate()
         linkedObject.embeddedObject = EmbeddedCustomObject()
 
-        object.objectCol = linkedObject
-        object.arrayCol.append(linkedObject)
-        object.setCol.insert(linkedObject)
-        object.mapCol["key"] = linkedObject
+        if let nestedObject = nestedObject {
+            object.objectCol = nestedObject
+            object.arrayCol.append(nestedObject)
+            object.setCol.insert(nestedObject)
+            object.mapCol["key"] = nestedObject
+        }
         return object
     }
 
@@ -368,7 +381,7 @@ class CustomColumnModernDynamicObjectTest: TestCase {
     override func setUp() {
         super.setUp()
         realm = inMemoryRealm("CustomColumnTests")
-        let object = ModernCustomObject.create(primaryKey: ObjectId("6058f12682b2fbb1f334ef1d"))
+        let object = ModernCustomObject.create(primaryKey: ObjectId("6058f12682b2fbb1f334ef1d"), nestedObject: nil)
         object.anyCol = .object(ModernCustomObject())
         try! realm.write {
             realm.add(object)
@@ -435,13 +448,15 @@ class CustomColumnTestsBase<O: CustomColumnObjectFactory, F: CustomColumnTypeFac
     public var notificationTokens: [NotificationToken] = []
 
     var object: O.Root!
+    var nestedObject: O.Root!
     var primaryKey: ObjectId!
 
     override func setUp() {
         realm = inMemoryRealm("CustomColumnTests")
         try! realm.write {
             primaryKey = ObjectId("61184062c1d8f096a3695045")
-            object = O.create(primaryKey: primaryKey)
+            nestedObject = O.create(primaryKey: ObjectId.generate(), nestedObject: nil)
+            object = O.create(primaryKey: primaryKey, nestedObject: nestedObject)
             for (keyPath, value) in F.keyPaths {
                 object.setValue(value, forKeyPath: _name(for: keyPath))
             }
@@ -456,6 +471,17 @@ class CustomColumnTestsBase<O: CustomColumnObjectFactory, F: CustomColumnTypeFac
             token.invalidate()
         }
         notificationTokens = []
+    }
+
+    func setValue(_ value: F.ValueType, for keyPath: KeyPath<O.Root, F.ValueType>) throws {
+        try realm.write {
+            let keyPathString = _name(for: keyPath)
+            if keyPathString.components(separatedBy: ".").count > 1 {
+                nestedObject[keyPathString.components(separatedBy: ".").last!] = value
+            } else {
+                object[keyPathString] = value
+            }
+        }
     }
 
     override func invokeTest() {
@@ -521,7 +547,7 @@ class CustomColumnResultsTest<O: CustomColumnObjectFactory, F: CustomColumnResul
     }
 
     func testCustomColumnResultsSort() throws {
-        let object2 = O.create(primaryKey: ObjectId.generate())
+        let object2 = O.create(primaryKey: ObjectId.generate(), nestedObject: O.create(primaryKey: ObjectId.generate(), nestedObject: nil))
         try realm.write {
             realm.add(object2)
         }
@@ -537,7 +563,7 @@ class CustomColumnResultsTest<O: CustomColumnObjectFactory, F: CustomColumnResul
     // MARK: - Get/Set ValueForKey
 
     func testCustomColumnResultsSetGetValueForKey() throws {
-        for (keyPath, value) in F.valueKey {
+        for (keyPath, value) in F.values {
             try realm.write {
                 results.setValue(value, forKey: _name(for: keyPath))
 
@@ -557,12 +583,12 @@ class CustomColumnResultsTest<O: CustomColumnObjectFactory, F: CustomColumnResul
     // MARK: - Observation
 
     func testCustomColumnResultsPropertyObservation() throws {
-        for (keyPath, value) in F.valueKey {
+        for (keyPath, value) in F.values {
             let ex = XCTestExpectation(description: "Notification to be called")
-            let notificationToken = results.observe { changes in
+            let notificationToken = results.observe(keyPaths: [keyPath]) { changes in
                 switch changes {
                 case .update(_, _, _, let modifications):
-                    XCTAssertEqual(modifications.count, 2)
+                    XCTAssertGreaterThan(modifications.count, 0)
                     ex.fulfill()
                 case .initial: break
                 default:
@@ -570,10 +596,8 @@ class CustomColumnResultsTest<O: CustomColumnObjectFactory, F: CustomColumnResul
                 }
             }
             notificationTokens.append(notificationToken)
+            try setValue(value, for: keyPath)
 
-            try realm.write {
-                results.setValue(value, forKey: _name(for: keyPath))
-            }
             wait(for: [ex], timeout: 1.0)
         }
     }
@@ -696,9 +720,8 @@ class CustomColumnObjectTest<O: CustomColumnObjectFactory, F: ObjectCustomColumn
     // MARK: - Subscript
 
     func testCustomColumnObjectKVC() throws {
-        for (keyPath, value) in F.propertyValue {
-            try assertObjectSetKVCPropertyValue(for: keyPath, newValue: value)
-            assertObjectGetKVCProperty(for: keyPath)
+        for (keyPath, value) in F.propertyValues {
+            try setValue(value, for: keyPath)
         }
     }
 
@@ -719,33 +742,25 @@ class CustomColumnObjectTest<O: CustomColumnObjectFactory, F: ObjectCustomColumn
     // MARK: - Observation
 
     func testCustomColumnObjectPropertyObservation() throws {
-        for (keyPath, value) in F.propertyValue {
+        for (keyPath, value) in F.propertyValues {
             let ex = XCTestExpectation(description: "Notification to be called")
-            let notificationToken = object.observe { changes in
+            let notificationToken = object.observe(keyPaths: [keyPath]) { changes in
                 switch changes {
                 case .change(_, let propertyChanges):
-                    XCTAssertEqual(propertyChanges.count, 1)
+                    XCTAssertGreaterThan(propertyChanges.count, 0)
                     ex.fulfill()
                 default:
                     XCTFail("No other changes are done to the object")
                 }
             }
             notificationTokens.append(notificationToken)
+            try setValue(value, for: keyPath)
 
-            try realm.write {
-                object[_name(for: keyPath)] = value
-            }
             wait(for: [ex], timeout: 1.0)
         }
     }
 
     // MARK: - Private
-
-    private func assertObjectSetKVCPropertyValue(for keyPath: KeyPath<O.Root, F.ValueType>, newValue: F.ValueType) throws {
-        try realm.write {
-            object[_name(for: keyPath)] = newValue
-        }
-    }
 
     private func assertObjectGetKVCProperty(for keyPath: KeyPath<O.Root, F.ValueType>) {
         let value: F.ValueType = object[_name(for: keyPath)] as! F.ValueType
@@ -772,7 +787,7 @@ class CustomColumnListTest<O: CustomColumnObjectFactory, F: CustomColumnTypeFact
 
         var listObjects: [O.Root] = []
         for _ in 0...2 {
-            let newObject = O.create(primaryKey: ObjectId.generate())
+            let newObject = O.create(primaryKey: ObjectId.generate(), nestedObject: O.create(primaryKey: ObjectId.generate(), nestedObject: nil))
             for (keyPath, value) in F.keyPaths {
                 newObject[_name(for: keyPath)] = value
             }
@@ -815,7 +830,7 @@ class CustomColumnSetTest<O: CustomColumnObjectFactory, F: CustomColumnTypeFacto
 
         let setObjects: MutableSet<O.Root> = MutableSet<O.Root>()
         for _ in 0...2 {
-            let newObject = O.create(primaryKey: ObjectId.generate())
+            let newObject = O.create(primaryKey: ObjectId.generate(), nestedObject: O.create(primaryKey: ObjectId.generate(), nestedObject: nil))
             for (keyPath, value) in F.keyPaths {
                 newObject[_name(for: keyPath)] = value
             }
@@ -853,7 +868,7 @@ class CustomColumnMapTestBase<O: CustomColumnObjectFactory, F: CustomColumnMapTy
 
         let mapObjects: Map<String, O.Root> = Map<String, O.Root>()
         for (key, (keyPath, value)) in F.keyValues {
-            let newObject = O.create(primaryKey: ObjectId.generate())
+            let newObject = O.create(primaryKey: ObjectId.generate(), nestedObject: O.create(primaryKey: ObjectId.generate(), nestedObject: nil))
             newObject[_name(for: keyPath)] = value
             mapObjects[key] = newObject
         }
@@ -882,9 +897,9 @@ class CustomColumnMapTest<O: CustomColumnObjectFactory, F: CustomColumnMapTypeFa
     }
 
     func testCustomColumnMapSetValueForKey() throws {
-        for (keyPath, value) in F.setValue {
+        for (keyPath, value) in F.values {
             try realm.write {
-                let newObject = O.create(primaryKey: ObjectId.generate())
+                let newObject = O.create(primaryKey: ObjectId.generate(), nestedObject: O.create(primaryKey: ObjectId.generate(), nestedObject: nil))
                 newObject[_name(for: keyPath)] = value
                 map.setValue(newObject, forKey: "key0")
             }
@@ -898,9 +913,9 @@ class CustomColumnMapTest<O: CustomColumnObjectFactory, F: CustomColumnMapTypeFa
     // MARK: - Observation
 
     func testCustomColumnMapPropertyObservation() throws {
-        for (keyPath, value) in F.setValue {
+        for (keyPath, value) in F.values {
             let ex = XCTestExpectation(description: "Notification to be called")
-            let notificationToken = map.observe { changes in
+            let notificationToken = map.observe(keyPaths: [_name(for: keyPath)]) { changes in
                 switch changes {
                 case .update(_, _, _, let mapChanges):
                     XCTAssertEqual(mapChanges.count, 1)
@@ -1066,13 +1081,6 @@ class CustomObjectTests: TestCase {
 
 // MARK: - Custom Column Tests Factory
 
-protocol CustomColumnObjectFactory {
-    associatedtype Root: Object
-
-    static func create(primaryKey: ObjectId) -> Root
-    static func createValues(primaryKey: ObjectId) -> Any
-}
-
 protocol CustomColumnTypeFactoryBase {
     associatedtype Root
     associatedtype ValueType
@@ -1088,7 +1096,7 @@ protocol CustomColumnResultsTypeFactory: CustomColumnTypeFactoryBase {
     static var query: [KeyPath<Root, ValueType>: (Query<Root>) -> Query<Bool>] { get }
     static var distincts: [KeyPath<Root, ValueType>: Int] { get }
     static var sort: [KeyPath<Root, ValueType>: ValueType] { get }
-    static var valueKey: [KeyPath<Root, ValueType>: ValueType] { get }
+    static var values: [KeyPath<Root, ValueType>: ValueType] { get }
 }
 
 protocol CustomColumnAggregatesTypeFactory: CustomColumnTypeFactoryBase where ValueType: _HasPersistedType, ValueType.PersistedType: AddableType & MinMaxType {
@@ -1105,21 +1113,21 @@ protocol CustomColumnResultsSectionedTypeFactory: CustomColumnTypeFactoryBase wh
 
 protocol ObjectCustomColumnObjectTypeFactory: CustomColumnTypeFactoryBase {
     // Nested keyPaths are not available in Object Subscripts/Observation
-    static var propertyValue: [KeyPath<Root, ValueType>: ValueType] { get }
+    static var propertyValues: [KeyPath<Root, ValueType>: ValueType] { get }
     static var dynamicListProperty: [KeyPath<Root, ValueType>: Int] { get }
     static var dynamicMutableSetProperty: [KeyPath<Root, ValueType>: Int] { get }
-}
-
-protocol CustomColumnObjectKeyedTypeFactory: CustomColumnTypeFactoryBase where ValueType: RealmKeyedCollection, ValueType.Value: RealmCollectionValue {
-    static var dynamicMapValue: [KeyPath<Root, ValueType>: Int] { get }
 }
 
 protocol CustomColumnMapTypeBaseFactory: CustomColumnTypeFactoryBase {
     static var keyValues: [String: (KeyPath<Root, ValueType>, ValueType)] { get }
 }
 
+protocol CustomColumnObjectKeyedTypeFactory: CustomColumnTypeFactoryBase where ValueType: RealmKeyedCollection, ValueType.Value: RealmCollectionValue {
+    static var dynamicMapValue: [KeyPath<Root, ValueType>: Int] { get }
+}
+
 protocol CustomColumnMapTypeFactory: CustomColumnMapTypeBaseFactory {
-    static var setValue: [KeyPath<Root, ValueType>: ValueType] { get }
+    static var values: [KeyPath<Root, ValueType>: ValueType] { get }
     static var sort: [KeyPath<Root, ValueType>: ValueType] { get }
 }
 
@@ -1163,8 +1171,9 @@ struct ModernResultsIntType: CustomColumnResultsTypeFactory {
           \ModernCustomObject.objectCol!.embeddedObject!.intCol: 0]
     }
 
-    static var valueKey: [KeyPath<ModernCustomObject, Int>: Int] {
-        [\ModernCustomObject.intCol: 111]
+    static var propertyValues: [KeyPath<ModernCustomObject, Int>: Int] {
+        [\ModernCustomObject.intCol: 111,
+          \ModernCustomObject.objectCol!.intCol: 999]
     }
 }
 
@@ -1194,7 +1203,7 @@ extension ModernResultsIntType: CustomColumnResultsSectionedTypeFactory {
 }
 
 extension ModernResultsIntType: ObjectCustomColumnObjectTypeFactory {
-    static var propertyValue: [KeyPath<ModernCustomObject, Int>: Int] {
+    static var values: [KeyPath<ModernCustomObject, Int>: Int] {
         [\ModernCustomObject.intCol: 256]
     }
 
@@ -1223,7 +1232,7 @@ struct ModernListResultsIntType: CustomColumnResultsTypeFactory {
     static var distincts: [KeyPath<ModernCustomObject, List<Int>>: Int] { [:] } // Not Applicable
     static var sort: [KeyPath<ModernCustomObject, List<Int>>: ValueType] { [:] } // Not Applicable
 
-    static var propertyValue: [KeyPath<ModernCustomObject, List<Int>>: List<Int>] {
+    static var propertyValues: [KeyPath<ModernCustomObject, List<Int>>: List<Int>] {
         let list = List<Int>()
         list.append(objectsIn: [111, 222, 333, 444])
         return [\ModernCustomObject.arrayIntCol: list]
@@ -1231,7 +1240,7 @@ struct ModernListResultsIntType: CustomColumnResultsTypeFactory {
 }
 
 extension ModernListResultsIntType: ObjectCustomColumnObjectTypeFactory {
-    static var valueKey: [KeyPath<ModernCustomObject, List<Int>>: List<Int>] {
+    static var values: [KeyPath<ModernCustomObject, List<Int>>: List<Int>] {
         let list = List<Int>()
         list.append(objectsIn: [987, 765, 543, 321])
         return [\ModernCustomObject.arrayIntCol: list]
@@ -1265,7 +1274,7 @@ struct ModernMutableSetResultsIntType: CustomColumnResultsTypeFactory {
     static var distincts: [KeyPath<ModernCustomObject, ValueType>: Int] { [:] } // Not Applicable
     static var sort: [KeyPath<ModernCustomObject, ValueType>: ValueType] { [:] } // Not Applicable
 
-    static var propertyValue: [KeyPath<ModernCustomObject, MutableSet<Int>>: MutableSet<Int>] {
+    static var propertyValues: [KeyPath<ModernCustomObject, MutableSet<Int>>: MutableSet<Int>] {
         let set = MutableSet<Int>()
         set.insert(objectsIn: [111, 222, 333, 444])
         return [\ModernCustomObject.setIntCol: set]
@@ -1273,7 +1282,7 @@ struct ModernMutableSetResultsIntType: CustomColumnResultsTypeFactory {
 }
 
 extension ModernMutableSetResultsIntType: ObjectCustomColumnObjectTypeFactory {
-    static var valueKey: [KeyPath<ModernCustomObject, MutableSet<Int>>: MutableSet<Int>] {
+    static var values: [KeyPath<ModernCustomObject, MutableSet<Int>>: MutableSet<Int>] {
         let set = MutableSet<Int>()
         set.insert(objectsIn: [987, 765, 543, 321])
         return [\ModernCustomObject.setIntCol: set]
@@ -1310,7 +1319,7 @@ struct ModernMapResultsIntType: CustomColumnResultsTypeFactory {
     static var distincts: [KeyPath<ModernCustomObject, Map<String, Int>>: Int] { [:] } // Not Applicable
     static var sort: [KeyPath<ModernCustomObject, Map<String, Int>>: Map<String, Int>] { [:] } // Not Applicable
 
-    static var propertyValue: [KeyPath<ModernCustomObject, Map<String, Int>>: Map<String, Int>] {
+    static var propertyValues: [KeyPath<ModernCustomObject, Map<String, Int>>: Map<String, Int>] {
         let map = Map<String, Int>()
         map["key"] = 111
         map["key1"] = 222
@@ -1321,7 +1330,7 @@ struct ModernMapResultsIntType: CustomColumnResultsTypeFactory {
 }
 
 extension ModernMapResultsIntType: ObjectCustomColumnObjectTypeFactory {
-    static var valueKey: [KeyPath<ModernCustomObject, Map<String, Int>>: Map<String, Int>] {
+    static var values: [KeyPath<ModernCustomObject, Map<String, Int>>: Map<String, Int>] {
         let map = Map<String, Int>()
         map["key"] = 123
         map["key1"] = 345
@@ -1393,7 +1402,7 @@ struct ModernMapIntType: CustomColumnMapTypeFactory {
         [\ModernCustomObject.intCol: 938]
     }
 
-    static var setValue: [KeyPath<ModernCustomObject, Int>: Int] {
+    static var values: [KeyPath<ModernCustomObject, Int>: Int] {
         [\ModernCustomObject.intCol: 1234]
     }
 
@@ -1458,7 +1467,7 @@ struct OldResultsIntType: CustomColumnResultsTypeFactory {
           \OldCustomObject.objectCol!.embeddedObject!.intCol: 0]
     }
 
-    static var propertyValue: [KeyPath<OldCustomObject, Int>: Int] {
+    static var propertyValues: [KeyPath<OldCustomObject, Int>: Int] {
         [\OldCustomObject.intCol: 111]
     }
 }
@@ -1489,7 +1498,7 @@ extension OldResultsIntType: CustomColumnResultsSectionedTypeFactory {
 }
 
 extension OldResultsIntType: ObjectCustomColumnObjectTypeFactory {
-    static var valueKey: [KeyPath<OldCustomObject, Int>: Int] {
+    static var values: [KeyPath<OldCustomObject, Int>: Int] {
         [\OldCustomObject.intCol: 96]
     }
 
@@ -1518,7 +1527,7 @@ struct OldListResultsIntType: CustomColumnResultsTypeFactory {
     static var distincts: [KeyPath<OldCustomObject, List<Int>>: Int] { [:] } // Not Applicable
     static var sort: [KeyPath<OldCustomObject, List<Int>>: ValueType] { [:] } // Not Applicable
 
-    static var propertyValue: [KeyPath<OldCustomObject, List<Int>>: List<Int>] {
+    static var propertyValues: [KeyPath<OldCustomObject, List<Int>>: List<Int>] {
         let list = List<Int>()
         list.append(objectsIn: [99, 88, 22, 11])
         return [\OldCustomObject.arrayIntCol: list]
@@ -1532,7 +1541,7 @@ struct OldListResultsIntType: CustomColumnResultsTypeFactory {
 }
 
 extension OldListResultsIntType: ObjectCustomColumnObjectTypeFactory {
-    static var valueKey: [KeyPath<OldCustomObject, List<Int>>: List<Int>] {
+    static var values: [KeyPath<OldCustomObject, List<Int>>: List<Int>] {
         let list = List<Int>()
         list.append(objectsIn: [43, 87, 23, 18])
         return [\OldCustomObject.arrayIntCol: list]
@@ -1566,7 +1575,7 @@ struct OldMutableSetResultsIntType: CustomColumnResultsTypeFactory {
     static var distincts: [KeyPath<OldCustomObject, ValueType>: Int] { [:] } // Not Applicable
     static var sort: [KeyPath<OldCustomObject, ValueType>: ValueType] { [:] } // Not Applicable
 
-    static var valueKey: [KeyPath<OldCustomObject, MutableSet<Int>>: MutableSet<Int>] {
+    static var propertyValues: [KeyPath<OldCustomObject, MutableSet<Int>>: MutableSet<Int>] {
         let set = MutableSet<Int>()
         set.insert(objectsIn: [67, 45, 27, 84])
         return [\OldCustomObject.setIntCol: set]
@@ -1574,7 +1583,7 @@ struct OldMutableSetResultsIntType: CustomColumnResultsTypeFactory {
 }
 
 extension OldMutableSetResultsIntType: ObjectCustomColumnObjectTypeFactory {
-    static var propertyValue: [KeyPath<OldCustomObject, RealmSwift.MutableSet<Int>>: RealmSwift.MutableSet<Int>] {
+    static var values: [KeyPath<OldCustomObject, RealmSwift.MutableSet<Int>>: RealmSwift.MutableSet<Int>] {
         let set = MutableSet<Int>()
         set.insert(objectsIn: [23, 45, 36, 28])
         return [\OldCustomObject.setIntCol: set]
@@ -1611,7 +1620,7 @@ struct OldMapResultsIntType: CustomColumnResultsTypeFactory {
     static var distincts: [KeyPath<OldCustomObject, Map<String, Int?>>: Int] { [:] } // Not Applicable
     static var sort: [KeyPath<OldCustomObject, Map<String, Int?>>: Map<String, Int?>] { [:] } // Not Applicable
 
-    static var propertyValue: [KeyPath<OldCustomObject, Map<String, Int?>>: Map<String, Int?>] {
+    static var propertyValues: [KeyPath<OldCustomObject, Map<String, Int?>>: Map<String, Int?>] {
         let map = Map<String, Int?>()
         map["key"] = 111
         map["key1"] = 222
@@ -1622,7 +1631,7 @@ struct OldMapResultsIntType: CustomColumnResultsTypeFactory {
 }
 
 extension OldMapResultsIntType: ObjectCustomColumnObjectTypeFactory {
-    static var valueKey: [KeyPath<OldCustomObject, Map<String, Int?>>: Map<String, Int?>] {
+    static var values: [KeyPath<OldCustomObject, Map<String, Int?>>: Map<String, Int?>] {
         let map = Map<String, Int?>()
         map["key"] = 123
         map["key1"] = 345
@@ -1694,7 +1703,7 @@ struct OldMapIntType: CustomColumnMapTypeFactory {
         [\OldCustomObject.intCol: 938]
     }
 
-    static var setValue: [KeyPath<OldCustomObject, Int>: Int] {
+    static var values: [KeyPath<OldCustomObject, Int>: Int] {
         [\OldCustomObject.intCol: 1234]
     }
 

@@ -6,13 +6,13 @@ x.y.z Release notes (yyyy-MM-dd)
   from the one used in your object declaration.
   ```swift
   class Person: Object {
-      @Persisted var firtName: String
+      @Persisted var firstName: String
       @Persisted var birthDate: Date
       @Persisted var age: Int
       
       override class public func propertiesMapping() -> [String : String] {
-          ["firtName"; "first_name",
-           "lastName"; "last_name"]
+          ["firstName"; "first_name",
+           "birthDate"; "birth_date"]
       }
   }
   ```
