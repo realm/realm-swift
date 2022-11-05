@@ -829,14 +829,11 @@
 
 -(void)testRenamedPropertyObservation {
     RLMRealm *realm = self.realmWithTestPath;
-    __block LinkToRenamedProperties1 *obj;
+    __block LinkToRenamedProperties *obj;
     [realm transactionWithBlock:^{
-        [RenamedProperties1 createInRealm:realm withValue:@[@1, @""]];
-        [RenamedProperties1 createInRealm:realm withValue:@[@2, @""]];
-        [RenamedProperties1 createInRealm:realm withValue:@[@3, @""]];
-
-        obj = [LinkToRenamedProperties1 createInRealm:realm withValue:@[]];
-        [obj.set addObjects:[RenamedProperties1 allObjectsInRealm:realm]];
+        obj = [LinkToRenamedProperties createInRealm:realm withValue:@[]];
+        RenamedProperties *linkedObject = [RenamedProperties createInRealm:realm withValue:@[@""]];
+        [obj.set addObjects:@[linkedObject]];
     }];
 
     __block bool first = true;
@@ -847,16 +844,15 @@
         XCTAssertNil(error);
         first = false;
         [expectation fulfill];
-    } keyPaths:@[@"propA"]];
+    } keyPaths:@[@"stringCol"]];
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
 
     expectation = [self expectationWithDescription:@""];
     [self dispatchAsyncAndWait:^{
         RLMRealm *realm = self.realmWithTestPath;
         [realm transactionWithBlock:^{
-
-            RLMSet<RenamedProperties1> *set = [(LinkToRenamedProperties1 *)[LinkToRenamedProperties1 allObjectsInRealm:realm].firstObject set];
-            [set setValue:@11 forKey:@"propA"];
+            RLMSet<RenamedProperties> *set = [(LinkToRenamedProperties *)[LinkToRenamedProperties allObjectsInRealm:realm].firstObject set];
+            [set setValue:@"newValue" forKey:@"stringCol"];
         }];
     }];
     [self waitForExpectationsWithTimeout:2.0 handler:nil];

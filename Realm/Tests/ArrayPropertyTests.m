@@ -917,14 +917,13 @@
 - (void)testRenamedPropertyObservation {
     RLMRealm *realm = self.realmWithTestPath;
 
-    __block LinkToRenamedProperties1 *obj;
+    __block LinkToRenamedProperties *obj;
     [realm transactionWithBlock:^{
         [RenamedProperties1 createInRealm:realm withValue:@[@1, @""]];
-        [RenamedProperties1 createInRealm:realm withValue:@[@2, @""]];
-        [RenamedProperties1 createInRealm:realm withValue:@[@3, @""]];
 
-        obj = [LinkToRenamedProperties1 createInRealm:realm withValue:@[]];
-        [obj.array addObjects:[RenamedProperties1 allObjectsInRealm:realm]];
+        obj = [LinkToRenamedProperties createInRealm:realm withValue:@[]];
+        RenamedProperties *linkedObject = [RenamedProperties createInRealm:realm withValue:@[@""]];
+        [obj.array addObject:linkedObject];
     }];
 
     __block bool first = true;
@@ -936,15 +935,15 @@
         XCTAssertNil(error);
         first = false;
         [expectation fulfill];
-    } keyPaths:@[@"propB"]];
+    } keyPaths:@[@"stringCol"]];
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
 
     expectation = [self expectationWithDescription:@""];
     [self dispatchAsyncAndWait:^{
         RLMRealm *realm = self.realmWithTestPath;
         [realm transactionWithBlock:^{
-            RLMArray *array = [(LinkToRenamedProperties1 *)[LinkToRenamedProperties1 allObjectsInRealm:realm].firstObject array];
-            [array setValue:@"newValue" forKey:@"propB"];
+            RLMArray *array = [(LinkToRenamedProperties *)[LinkToRenamedProperties allObjectsInRealm:realm].firstObject array];
+            [array setValue:@"newValue" forKey:@"stringCol"];
         }];
     }];
     [self waitForExpectationsWithTimeout:2.0 handler:nil];

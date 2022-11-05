@@ -625,18 +625,11 @@
 -(void)testRenamedPropertyObservation {
     RLMRealm *realm = self.realmWithTestPath;
 
-    __block LinkToRenamedProperties1 *obj;
+    __block LinkToRenamedProperties *obj;
     [realm transactionWithBlock:^{
-        [RenamedProperties1 createInRealm:realm withValue:@[@1, @""]];
-        [RenamedProperties1 createInRealm:realm withValue:@[@2, @""]];
-        [RenamedProperties1 createInRealm:realm withValue:@[@3, @""]];
-
-        obj = [LinkToRenamedProperties1 createInRealm:realm withValue:@[]];
-        RLMResults<RenamedProperties1 *> *allObjects = [RenamedProperties1 allObjectsInRealm:realm];
-        for (NSUInteger i = 0; i < allObjects.count; i++) {
-            NSString *key = [NSString stringWithFormat:@"item%lu", (unsigned long)i];
-            obj.dictionary[key] = allObjects[i];
-        }
+        obj = [LinkToRenamedProperties createInRealm:realm withValue:@[]];
+        RenamedProperties *linkedObject = [RenamedProperties createInRealm:realm withValue:@[@""]];
+        obj.dictionary[@"item"] = linkedObject;
     }];
 
     __block bool first = true;
@@ -647,16 +640,16 @@
         XCTAssertNil(error);
         first = false;
         [expectation fulfill];
-    } keyPaths:@[@"propB"]];
+    } keyPaths:@[@"stringCol"]];
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
 
     expectation = [self expectationWithDescription:@""];
     [self dispatchAsyncAndWait:^{
         RLMRealm *realm = self.realmWithTestPath;
         [realm transactionWithBlock:^{
-            RLMDictionary *dict = [(LinkToRenamedProperties1 *)[LinkToRenamedProperties1 allObjectsInRealm:realm].firstObject dictionary];
-            RenamedProperties1 *property = dict[@"item0"];
-            property.propB = @"newValue";
+            RLMDictionary *dict = [(LinkToRenamedProperties *)[LinkToRenamedProperties allObjectsInRealm:realm].firstObject dictionary];
+            RenamedProperties *property = dict[@"item"];
+            property.stringCol = @"newValue";
         }];
     }];
     [self waitForExpectationsWithTimeout:2.0 handler:nil];

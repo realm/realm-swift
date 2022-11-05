@@ -484,6 +484,12 @@
 }
 @end
 
+@implementation LinkToRenamedProperties
++ (NSDictionary *)_realmColumnNames {
+    return @{@"link": @"Link"};
+}
+@end
+
 @implementation LinkToRenamedProperties1
 + (NSString *)_realmObjectName {
     return @"Link To Renamed Properties";

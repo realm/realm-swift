@@ -715,6 +715,14 @@ RLM_COLLECTION_TYPE(PrimaryCompanyObject);
 
 RLM_COLLECTION_TYPE(RenamedProperties1)
 RLM_COLLECTION_TYPE(RenamedProperties2)
+RLM_COLLECTION_TYPE(RenamedProperties)
+
+@interface LinkToRenamedProperties : RLMObject
+@property (nonatomic) RenamedProperties *link;
+@property (nonatomic) RLM_GENERIC_ARRAY(RenamedProperties) *array;
+@property (nonatomic) RLM_GENERIC_SET(RenamedProperties) *set;
+@property (nonatomic) RLMDictionary<NSString *, RenamedProperties *><RLMString, RenamedProperties> *dictionary;
+@end
 
 @interface LinkToRenamedProperties1 : RLMObject
 @property (nonatomic) RenamedProperties1 *linkA;
