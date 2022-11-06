@@ -408,7 +408,7 @@ class CustomColumnModernDynamicObjectTest: TestCase {
 
     func testCustomColumnDynamicObjectSetValue() throws {
         let dynamicObjects = realm.dynamicObjects("ModernCustomObject")
-        XCTAssertEqual(dynamicObjects.count, 3)
+        XCTAssertEqual(dynamicObjects.count, 2)
         let dynamicObject = dynamicObjects.first!
         XCTAssertNotNil(dynamicObject)
 
@@ -420,7 +420,7 @@ class CustomColumnModernDynamicObjectTest: TestCase {
 
     func testCustomColumnDynamicObjectMemberLookUp() throws {
         let dynamicObjects = realm.dynamicObjects("ModernCustomObject")
-        XCTAssertEqual(dynamicObjects.count, 3)
+        XCTAssertEqual(dynamicObjects.count, 2)
         let dynamicObject = dynamicObjects.first!
         XCTAssertNotNil(dynamicObject)
 
@@ -432,7 +432,7 @@ class CustomColumnModernDynamicObjectTest: TestCase {
 
     func testCustomColumnDynamicSchema() throws {
         let dynamicObjects = realm.dynamicObjects("ModernCustomObject")
-        XCTAssertEqual(dynamicObjects.count, 3)
+        XCTAssertEqual(dynamicObjects.count, 2)
         let dynamicObject = dynamicObjects.first!
         XCTAssertNotNil(dynamicObject)
 
