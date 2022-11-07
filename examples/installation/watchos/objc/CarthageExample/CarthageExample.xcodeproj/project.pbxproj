@@ -3,11 +3,12 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 46;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
-		E82D95AC1C791A58000717F3 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E82D95A71C7919D9000717F3 /* Realm.framework */; };
+		3F45204829147015008F07AD /* Realm.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F45204729147015008F07AD /* Realm.xcframework */; };
+		3F45204929147015008F07AD /* Realm.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 3F45204729147015008F07AD /* Realm.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		E8645B891C7913D600C241AA /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E8645B881C7913D600C241AA /* main.m */; };
 		E8645B9C1C7913D600C241AA /* CarthageExample WatchKit App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = E8645B9B1C7913D600C241AA /* CarthageExample WatchKit App.app */; };
 		E8645BA21C7913D600C241AA /* Interface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E8645BA01C7913D600C241AA /* Interface.storyboard */; };
@@ -33,6 +34,17 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		3F45204A29147015008F07AD /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				3F45204929147015008F07AD /* Realm.xcframework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E8645BBD1C7913D600C241AA /* Embed App Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -58,7 +70,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		E82D95A71C7919D9000717F3 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = Carthage/Build/watchOS/Realm.framework; sourceTree = "<group>"; };
+		3F45204729147015008F07AD /* Realm.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Realm.xcframework; path = Carthage/Build/Realm.xcframework; sourceTree = "<group>"; };
 		E8645B841C7913D600C241AA /* CarthageExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CarthageExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E8645B881C7913D600C241AA /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		E8645B981C7913D600C241AA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -83,13 +95,21 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E82D95AC1C791A58000717F3 /* Realm.framework in Frameworks */,
+				3F45204829147015008F07AD /* Realm.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		3F45204629147015008F07AD /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				3F45204729147015008F07AD /* Realm.xcframework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		E8645B7B1C7913D600C241AA = {
 			isa = PBXGroup;
 			children = (
@@ -97,7 +117,7 @@
 				E8645B9F1C7913D600C241AA /* CarthageExample WatchKit App */,
 				E8645BAE1C7913D600C241AA /* CarthageExample WatchKit Extension */,
 				E8645B851C7913D600C241AA /* Products */,
-				E82D95A71C7919D9000717F3 /* Realm.framework */,
+				3F45204629147015008F07AD /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -185,7 +205,7 @@
 				E8645BA61C7913D600C241AA /* Sources */,
 				E8645BA71C7913D600C241AA /* Frameworks */,
 				E8645BA81C7913D600C241AA /* Resources */,
-				E8F769EE1C792A3B00A1003A /* ShellScript */,
+				3F45204A29147015008F07AD /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -221,6 +241,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 				Base,
 			);
@@ -260,23 +281,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
-
-/* Begin PBXShellScriptBuildPhase section */
-		E8F769EE1C792A3B00A1003A /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"$(SRCROOT)/Carthage/Build/watchOS/Realm.framework",
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "/usr/local/bin/carthage copy-frameworks";
-		};
-/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		E8645B801C7913D600C241AA /* Sources */ = {
@@ -344,7 +348,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-                               CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -369,7 +373,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.2;
+				UPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -399,7 +403,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-                               CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -418,7 +422,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.2;
+				UPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -431,13 +435,17 @@
 			buildSettings = {
 				FRAMEWORK_SEARCH_PATHS = Carthage/Build/watchOS;
 				INFOPLIST_FILE = "CarthageExample WatchKit Extension/Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = io.realm.CarthageExample.watchkitapp.watchkitextension;
 				PRODUCT_NAME = "${TARGET_NAME}";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = 4;
-				WATCHOS_DEPLOYMENT_TARGET = 2.1;
+				WATCHOS_DEPLOYMENT_TARGET = 4.0;
 			};
 			name = Debug;
 		};
@@ -446,13 +454,17 @@
 			buildSettings = {
 				FRAMEWORK_SEARCH_PATHS = Carthage/Build/watchOS;
 				INFOPLIST_FILE = "CarthageExample WatchKit Extension/Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = io.realm.CarthageExample.watchkitapp.watchkitextension;
 				PRODUCT_NAME = "${TARGET_NAME}";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = 4;
-				WATCHOS_DEPLOYMENT_TARGET = 2.1;
+				WATCHOS_DEPLOYMENT_TARGET = 4.0;
 			};
 			name = Release;
 		};
@@ -467,7 +479,7 @@
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = 4;
-				WATCHOS_DEPLOYMENT_TARGET = 2.1;
+				WATCHOS_DEPLOYMENT_TARGET = 4.0;
 			};
 			name = Debug;
 		};
@@ -482,7 +494,7 @@
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = 4;
-				WATCHOS_DEPLOYMENT_TARGET = 2.1;
+				WATCHOS_DEPLOYMENT_TARGET = 4.0;
 			};
 			name = Release;
 		};
@@ -491,7 +503,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = CarthageExample/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = io.realm.CarthageExample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -502,7 +517,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = CarthageExample/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = io.realm.CarthageExample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};

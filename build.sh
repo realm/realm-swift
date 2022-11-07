@@ -449,12 +449,12 @@ case "$COMMAND" in
         -exec sed -i '' 's/import Private/import Realm.Private/g' {} \; \
         -exec sed -i '' 's/RealmSwift.Configuration/RealmSwift.Realm.Configuration/g' {} \; \
         -exec sed -i '' 's/extension Configuration/extension Realm.Configuration/g' {} \; \
-        -exec sed -i '' 's/RealmSwift.Error/RealmSwift.Realm.Error/g' {} \; \
+        -exec sed -i '' 's/RealmSwift.Error[[:>:]]/RealmSwift.Realm.Error/g' {} \; \
         -exec sed -i '' 's/extension Error/extension Realm.Error/g' {} \; \
         -exec sed -i '' 's/RealmSwift.AsyncOpenTask/RealmSwift.Realm.AsyncOpenTask/g' {} \; \
         -exec sed -i '' 's/RealmSwift.UpdatePolicy/RealmSwift.Realm.UpdatePolicy/g' {} \; \
-        -exec sed -i '' 's/RealmSwift.Notification /RealmSwift.Realm.Notification /g' {} \; \
-        -exec sed -i '' 's/RealmSwift.Notification,/RealmSwift.Realm.Notification,/g' {} \; \
+        -exec sed -i '' 's/RealmSwift.Notification[[:>:]]/RealmSwift.Realm.Notification/g' {} \; \
+        -exec sed -i '' 's/RealmSwift.OpenBehavior/RealmSwift.Realm.OpenBehavior/g' {} \; \
         -exec sed -i '' 's/τ_1_0/V/g' {} \; # Generics will use τ_1_0 which needs to be changed to the correct type name.
 
         exit 0
@@ -1124,6 +1124,16 @@ case "$COMMAND" in
             for platform in osx ios watchos tvos catalyst; do
                 unzip "${WORKSPACE}/realm-framework-${platform}-${REALM_XCODE_VERSION}.zip" -d "${extract_dir}/${platform}"
             done
+
+            # Add the arm64 slice to the watchOS library
+            # The arm64 arch was added in Xcode 14, but we need the other
+            # slices to be built with Xcode 13 so that they have bitcode.
+            unzip "${WORKSPACE}/realm-framework-watchos-14.0.1.zip" -d "${extract_dir}/watchos"
+            lipo "${extract_dir}/watchos/swift-14.0.1/Realm.xcframework/watchos-arm64_arm64_32_armv7k/Realm.framework/Realm" -thin arm64 -output watchos-arm64-slice
+            lipo "${extract_dir}/watchos/swift-${REALM_XCODE_VERSION}/Realm.xcframework/watchos-arm64_32_armv7k/Realm.framework/Realm" watchos-arm64-slice -create -output watchos-fat
+            mv watchos-fat "${extract_dir}/watchos/swift-${REALM_XCODE_VERSION}/Realm.xcframework/watchos-arm64_32_armv7k/Realm.framework/Realm"
+            rm -r "${extract_dir}/watchos/swift-14.0.1"
+
             find "${extract_dir}" -name 'Realm.framework' \
                 | sed 's/.*/-framework &/' \
                 | xargs xcodebuild -create-xcframework -allow-internal-distribution -output "${package_dir}/Realm.xcframework"
