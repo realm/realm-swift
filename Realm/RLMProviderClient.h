@@ -23,10 +23,11 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 @class RLMApp;
 
 /// Base provider client interface.
+RLM_SWIFT_SENDABLE
 @interface RLMProviderClient : NSObject
 
 /// The app associated with this provider client.
-@property (nonatomic, strong) RLMApp *app;
+@property (nonatomic, strong, readonly) RLMApp *app;
 
 /**
  Initialize a provider client with a given app.

@@ -24,6 +24,7 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 @protocol RLMBSON;
 
 /// The result of an `updateOne` or `updateMany` operation a `RLMMongoCollection`.
+RLM_SWIFT_SENDABLE RLM_FINAL // immutable final class
 @interface RLMUpdateResult : NSObject
 
 /// The number of documents that matched the filter.

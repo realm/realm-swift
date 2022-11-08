@@ -882,6 +882,7 @@ NS_REFINED_FOR_SWIFT;
 
  @param oldSchemaVersion    The schema version of the Realm being migrated.
  */
+RLM_SWIFT_SENDABLE
 typedef void (^RLMMigrationBlock)(RLMMigration *migration, uint64_t oldSchemaVersion);
 
 /**
@@ -946,7 +947,7 @@ NS_REFINED_FOR_SWIFT;
  When you wish to stop, call the `-invalidate` method. Notifications are also stopped if
  the token is deallocated.
  */
-RLM_SWIFT_SENDABLE
+RLM_SWIFT_SENDABLE // is internally thread-safe
 @interface RLMNotificationToken : NSObject
 /// Stops notifications for the change subscription that returned this token.
 - (void)invalidate;

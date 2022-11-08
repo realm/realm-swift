@@ -32,6 +32,7 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 ///
 /// - SeeAlso:
 /// `RLMApp`, `RLMMongoDatabase`, `RLMMongoCollection`
+RLM_SWIFT_SENDABLE RLM_FINAL // immutable final class
 @interface RLMMongoClient : NSObject
 
 /// The name of the client

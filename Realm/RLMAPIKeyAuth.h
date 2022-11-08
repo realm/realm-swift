@@ -23,15 +23,19 @@
 RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
 /// Provider client for user API keys.
+RLM_SWIFT_SENDABLE RLM_FINAL // immutable final class
 @interface RLMAPIKeyAuth : RLMProviderClient
 
 /// A block type used to report an error
+RLM_SWIFT_SENDABLE // invoked on a background thread
 typedef void(^RLMAPIKeyAuthOptionalErrorBlock)(NSError * _Nullable);
 
 /// A block type used to return an `RLMUserAPIKey` on success, or an `NSError` on failure
+RLM_SWIFT_SENDABLE // invoked on a background thread
 typedef void(^RLMOptionalUserAPIKeyBlock)(RLMUserAPIKey * _Nullable, NSError * _Nullable);
 
 /// A block type used to return an array of `RLMUserAPIKey` on success, or an `NSError` on failure
+RLM_SWIFT_SENDABLE // invoked on a background thread
 typedef void(^RLMUserAPIKeysBlock)(NSArray<RLMUserAPIKey *> *  _Nullable, NSError * _Nullable);
 
 /**

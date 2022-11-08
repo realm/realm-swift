@@ -107,6 +107,7 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
  To stop notifications manually, call `-invalidate` on it. Notifications should be stopped before
  the token goes out of scope or is destroyed.
  */
+RLM_SWIFT_SENDABLE RLM_FINAL // is internally thread-safe
 @interface RLMProgressNotificationToken : RLMNotificationToken
 @end
 
@@ -119,6 +120,7 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
  lifespans of sessions associated with Realms are managed automatically. Session
  objects can be accessed from any thread.
  */
+RLM_SWIFT_SENDABLE RLM_FINAL // is internally thread-safe
 @interface RLMSyncSession : NSObject
 
 /// The session's current state.
@@ -238,6 +240,7 @@ NS_REFINED_FOR_SWIFT;
  session as the sync session itself is created asynchronously, and may not exist
  yet when -[RLMRealm asyncOpenWithConfiguration:completion:] returns.
  */
+RLM_SWIFT_SENDABLE RLM_FINAL // is internally thread-safe
 @interface RLMAsyncOpenTask : NSObject
 /**
  Register a progress notification block.

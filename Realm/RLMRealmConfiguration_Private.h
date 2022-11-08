@@ -30,6 +30,7 @@ RLM_HEADER_AUDIT_BEGIN(nullability)
 @property (nonatomic, copy, nullable) RLMSchema *customSchema;
 @property (nonatomic, copy) NSString *pathOnDisk;
 @property (nonatomic, retain, nullable) RLMEventConfiguration *eventConfiguration;
+@property (nonatomic, nullable) Class migrationObjectClass;
 
 // Flexible Sync
 @property (nonatomic, readwrite, nullable) RLMFlexibleSyncInitialSubscriptionsBlock initialSubscriptions;

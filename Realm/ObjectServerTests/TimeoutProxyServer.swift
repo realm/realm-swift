@@ -19,11 +19,11 @@
 #if os(macOS)
 
 import Foundation
-import Network
+@preconcurrency import Network
 
 @available(OSX 10.14, *)
 @objc(TimeoutProxyServer)
-public class TimeoutProxyServer: NSObject {
+public class TimeoutProxyServer: NSObject, @unchecked Sendable {
     let port: NWEndpoint.Port
     let targetPort: NWEndpoint.Port
 
@@ -77,8 +77,8 @@ public class TimeoutProxyServer: NSObject {
             }
 
             self.queue.asyncAfter(deadline: .now() + self.delay) {
-                self.copy(from: incomingConnection, to: targetConnection)
-                self.copy(from: targetConnection, to: incomingConnection)
+                copyData(from: incomingConnection, to: targetConnection)
+                copyData(from: targetConnection, to: incomingConnection)
             }
         }
         listener.start(queue: self.queue)
@@ -92,23 +92,25 @@ public class TimeoutProxyServer: NSObject {
             }
         }
     }
+}
 
-    private func copy(from: NWConnection, to: NWConnection) {
-        from.receive(minimumIncompleteLength: 1, maximumLength: 8192) { [weak self] (data, context, isComplete, _) in
-            guard let data = data else {
-                if !isComplete {
-                    self?.copy(from: from, to: to)
-                }
-                return
+@available(macOS 10.14, *)
+private func copyData(from: NWConnection, to: NWConnection) {
+    from.receive(minimumIncompleteLength: 1, maximumLength: 8192) { (data, context, isComplete, _) in
+        guard let data = data else {
+            if !isComplete {
+                copyData(from: from, to: to)
             }
-            to.send(content: data, contentContext: context ?? .defaultMessage,
-                    isComplete: isComplete, completion: .contentProcessed({ [weak self] _ in
-                        if !isComplete {
-                            self?.copy(from: from, to: to)
-                        }
-                    }))
+            return
         }
+        to.send(content: data, contentContext: context ?? .defaultMessage,
+                isComplete: isComplete, completion: .contentProcessed({  _ in
+            if !isComplete {
+                copyData(from: from, to: to)
+            }
+        }))
     }
 }
+
 
 #endif // os(macOS)

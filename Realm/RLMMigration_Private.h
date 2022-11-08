@@ -33,7 +33,7 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
 - (instancetype)initWithRealm:(RLMRealm *)realm oldRealm:(RLMRealm *)oldRealm schema:(realm::Schema &)schema;
 
-- (void)execute:(RLMMigrationBlock)block;
+- (void)execute:(RLMMigrationBlock)block objectClass:(_Nullable Class)cls;
 
 @end
 

@@ -321,17 +321,7 @@ NSError *RLMTranslateSyncError(SyncError error) {
 static void setDefaults(SyncConfig& config, RLMUser *user) {
     config.client_resync_mode = ClientResyncMode::Recover;
     config.stop_policy = SyncSessionStopPolicy::AfterChangesUploaded;
-
-    RLMSyncManager *manager = [user.app syncManager];
-
-    if (NSString *authorizationHeaderName = manager.authorizationHeaderName) {
-        config.authorization_header_name.emplace(authorizationHeaderName.UTF8String);
-    }
-    if (NSDictionary<NSString *, NSString *> *customRequestHeaders = manager.customRequestHeaders) {
-        for (NSString *key in customRequestHeaders) {
-            config.custom_http_headers.emplace(key.UTF8String, customRequestHeaders[key].UTF8String);
-        }
-    }
+    [user.app.syncManager populateConfig:config];
 }
 
 - (instancetype)initWithUser:(RLMUser *)user

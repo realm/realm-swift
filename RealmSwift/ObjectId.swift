@@ -31,7 +31,7 @@ import Realm
  ObjectIds are intended to be fast to generate. Sorting by an ObjectId field will typically result in the objects being sorted in creation order.
  */
 @objc(RealmSwiftObjectId)
-public final class ObjectId: RLMObjectId, Decodable {
+public final class ObjectId: RLMObjectId, Decodable, @unchecked Sendable {
     // MARK: Initializers
 
     /// Creates a new zero-initialized ObjectId.

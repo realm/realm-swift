@@ -22,6 +22,7 @@
 RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
 /// UserAPIKey model for APIKeys recevied from the server.
+RLM_SWIFT_SENDABLE RLM_FINAL // immutable final class
 @interface RLMUserAPIKey : NSObject
 
 /// Indicates if the API key is disabled or not

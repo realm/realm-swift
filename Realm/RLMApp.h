@@ -90,7 +90,7 @@ Create a new Realm App configuration.
 
  This interface provides access to login and authentication.
  */
-RLM_SWIFT_SENDABLE
+RLM_SWIFT_SENDABLE RLM_FINAL // internally thread-safe
 @interface RLMApp : NSObject
 
 /// The configuration for this Realm app.

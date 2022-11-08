@@ -236,6 +236,12 @@ let package = Package(
             path: "Realm/TestUtils",
             cxxSettings: testCxxSettings
         ),
+        .target(
+            name: "RealmSwiftTestSupport",
+            dependencies: ["RealmSwift", "RealmTestSupport"],
+            path: "RealmSwift/Tests",
+            sources: ["TestUtils.swift"]
+        ),
         .testTarget(
             name: "RealmTests",
             dependencies: ["Realm", "RealmTestSupport"],
@@ -268,11 +274,12 @@ let package = Package(
         ),
         .testTarget(
             name: "RealmSwiftTests",
-            dependencies: ["RealmSwift", "RealmTestSupport"],
+            dependencies: ["RealmSwift", "RealmTestSupport", "RealmSwiftTestSupport"],
             path: "RealmSwift/Tests",
             exclude: [
                 "RealmSwiftTests-Info.plist",
-                "QueryTests.swift.gyb"
+                "QueryTests.swift.gyb",
+                "TestUtils.swift"
             ]
         ),
 
@@ -289,7 +296,7 @@ let package = Package(
         ),
         objectServerTestSupportTarget(
             name: "RealmSwiftSyncTestSupport",
-            dependencies: ["RealmSwift", "RealmTestSupport", "RealmSyncTestSupport"],
+            dependencies: ["RealmSwift", "RealmTestSupport", "RealmSyncTestSupport", "RealmSwiftTestSupport"],
             sources: [
                  "SwiftSyncTestCase.swift",
                  "TimeoutProxyServer.swift",

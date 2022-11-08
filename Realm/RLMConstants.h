@@ -32,6 +32,8 @@
 #define RLM_SWIFT_SENDABLE
 #endif
 
+#define RLM_FINAL __attribute__((objc_subclassing_restricted))
+
 RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
 // Swift 5 considers NS_ENUM to be "open", meaning there could be values present

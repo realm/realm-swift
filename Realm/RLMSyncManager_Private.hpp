@@ -24,6 +24,7 @@
 
 namespace realm {
 struct SyncClientConfig;
+struct SyncConfig;
 class SyncManager;
 namespace app {
 class App;
@@ -35,13 +36,9 @@ class Logger;
 
 @class RLMAppConfiguration, RLMUser, RLMSyncConfiguration;
 
-// All private API methods are threadsafe and synchronized, unless denoted otherwise. Since they are expected to be
-// called very infrequently, this should pose no issues.
-
 RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
 @interface RLMSyncManager ()
-
 - (std::weak_ptr<realm::app::App>)app;
 - (std::shared_ptr<realm::SyncManager>)syncManager;
 - (instancetype)initWithSyncManager:(std::shared_ptr<realm::SyncManager>)syncManager;
@@ -49,11 +46,9 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 + (realm::SyncClientConfig)configurationWithRootDirectory:(nullable NSURL *)rootDirectory
                                                     appId:(nonnull NSString *)appId;
 
-- (void)_fireError:(NSError *)error;
-
 - (void)resetForTesting;
 - (void)waitForSessionTermination;
-
+- (void)populateConfig:(realm::SyncConfig&)config;
 @end
 
 std::shared_ptr<realm::util::Logger> RLMWrapLogFunction(RLMSyncLogFunction);

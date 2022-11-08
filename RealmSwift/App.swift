@@ -109,7 +109,7 @@ Example Usage:
 let credentials = Credentials.JWT(token: myToken)
 ```
 */
-@frozen public enum Credentials {
+@frozen public enum Credentials: Sendable {
     /// Credentials from a Facebook access token.
     case facebook(accessToken: String)
     /// Credentials from a Google serverAuthCode.
@@ -217,7 +217,7 @@ import Combine
 
 /// :nodoc:
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, macCatalyst 13.0, macCatalystApplicationExtension 13.0, *)
-public struct AppPublisher: Publisher {
+public struct AppPublisher: Publisher, @unchecked Sendable { // DispatchQueue
     /// This publisher cannot fail.
     public typealias Failure = Never
     /// This publisher emits App.
@@ -232,7 +232,7 @@ public struct AppPublisher: Publisher {
     }
 
     /// :nodoc:
-    public func receive<S>(subscriber: S) where S: Subscriber, S.Failure == Never, Output == S.Input {
+    public func receive<S: Sendable>(subscriber: S) where S: Subscriber, S.Failure == Never, Output == S.Input {
         let token = app.subscribe { _ in
             self.callbackQueue.async {
                 _ = subscriber.receive(self.app)
@@ -263,8 +263,8 @@ extension App: ObservableObject {
 }
 
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, macCatalyst 13.0, macCatalystApplicationExtension 13.0, *)
-private func promisify(_ fn: @escaping (@escaping (Error?) -> Void) -> Void) -> Future<Void, Error> {
-    return Future<Void, Error> { promise in
+private func promisify(_ fn: @escaping (@escaping @Sendable (Error?) -> Void) -> Void) -> Future<Void, Error> {
+    return future { promise in
         fn { error in
             if let error = error {
                 promise(.failure(error))
@@ -378,7 +378,7 @@ public extension APIKeyAuth {
      @returns A publisher that eventually return `UserAPIKey` or `Error`.
      */
     func createAPIKey(named: String) -> Future<UserAPIKey, Error> {
-        return Future { self.createAPIKey(named: named, completion: $0) }
+        return future { self.createAPIKey(named: named, completion: $0) }
     }
 
     /**
@@ -387,7 +387,7 @@ public extension APIKeyAuth {
      @returns A publisher that eventually return `UserAPIKey` or `Error`.
      */
     func fetchAPIKey(_ objectId: ObjectId) -> Future<UserAPIKey, Error> {
-        return Future { self.fetchAPIKey(objectId, $0) }
+        return future { self.fetchAPIKey(objectId, $0) }
     }
 
     /**
@@ -395,7 +395,7 @@ public extension APIKeyAuth {
      @returns A publisher that eventually return `[UserAPIKey]` or `Error`.
      */
     func fetchAPIKeys() -> Future<[UserAPIKey], Error> {
-        return Future { self.fetchAPIKeys($0) }
+        return future { self.fetchAPIKeys($0) }
     }
 
     /**
@@ -471,7 +471,8 @@ public extension APIKeyAuth {
      @param name The name of the API key to be created.
      @completion A completion that eventually return `Result.success(UserAPIKey)` or `Result.failure(Error)`.
      */
-    func createAPIKey(named: String, completion: @escaping (Result<UserAPIKey, Error>) -> Void) {
+    @preconcurrency
+    func createAPIKey(named: String, completion: @escaping @Sendable (Result<UserAPIKey, Error>) -> Void) {
         createAPIKey(named: named) { (userApiKey, error) in
             if let userApiKey = userApiKey {
                 completion(.success(userApiKey))
@@ -486,7 +487,8 @@ public extension APIKeyAuth {
      @param objectId The ObjectId of the API key to fetch.
      @completion A completion that eventually return `Result.success(UserAPIKey)` or `Result.failure(Error)`.
      */
-    func fetchAPIKey(_ objectId: ObjectId, _ completion: @escaping (Result<UserAPIKey, Error>) -> Void) {
+    @preconcurrency
+    func fetchAPIKey(_ objectId: ObjectId, _ completion: @escaping @Sendable (Result<UserAPIKey, Error>) -> Void) {
         fetchAPIKey(objectId) { (userApiKey, error) in
             if let userApiKey = userApiKey {
                 completion(.success(userApiKey))
@@ -500,7 +502,8 @@ public extension APIKeyAuth {
      Fetches the user API keys associated with the current user.
      @completion A completion that eventually return `Result.success([UserAPIKey])` or `Result.failure(Error)`.
      */
-    func fetchAPIKeys(_ completion: @escaping (Result<[UserAPIKey], Error>) -> Void) {
+    @preconcurrency
+    func fetchAPIKeys(_ completion: @escaping @Sendable (Result<[UserAPIKey], Error>) -> Void) {
         fetchAPIKeys { (userApiKeys, error) in
             if let userApiKeys = userApiKeys {
                 completion(.success(userApiKeys))

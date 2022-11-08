@@ -60,6 +60,7 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
  Note that user objects are only vended out via SDK APIs, and cannot be directly
  initialized. User objects can be accessed from any thread.
  */
+RLM_SWIFT_SENDABLE RLM_FINAL // internally thread-safe
 @interface RLMUser : NSObject
 
 /**
@@ -380,6 +381,7 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
  Note this is different from a user's unique identifier string.
  @seeAlso `RLMUser.identifier`
  */
+RLM_SWIFT_SENDABLE RLM_FINAL // immutable final class
 @interface RLMUserIdentity : NSObject
 
 /**
@@ -405,6 +407,7 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 /**
  A profile for a given User.
  */
+RLM_SWIFT_SENDABLE RLM_FINAL // immutable final class
 @interface RLMUserProfile : NSObject
 
 /// The full name of the user.

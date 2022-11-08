@@ -37,22 +37,6 @@
 
 using namespace realm;
 
-// The source realm for a migration has to use a SharedGroup to be able to share
-// the file with the destination realm, but we don't want to let the user call
-// beginWriteTransaction on it as that would make no sense.
-@interface RLMMigrationRealm : RLMRealm
-@end
-
-@implementation RLMMigrationRealm
-- (BOOL)readonly {
-    return YES;
-}
-
-- (void)beginWriteTransaction {
-    @throw RLMException(@"Cannot modify the source Realm in a migration");
-}
-@end
-
 @implementation RLMMigration {
     realm::Schema *_schema;
 }
@@ -63,7 +47,6 @@ using namespace realm;
         _realm = realm;
         _oldRealm = oldRealm;
         _schema = &schema;
-        object_setClass(_oldRealm, RLMMigrationRealm.class);
     }
     return self;
 }
@@ -123,15 +106,18 @@ using namespace realm;
     }
 }
 
-- (void)execute:(RLMMigrationBlock)block {
+- (void)execute:(RLMMigrationBlock)block objectClass:(Class)dynamicObjectClass {
+    if (!dynamicObjectClass) {
+        dynamicObjectClass = RLMDynamicObject.class;
+    }
     @autoreleasepool {
         // disable all primary keys for migration and use DynamicObject for all types
         for (RLMObjectSchema *objectSchema in _realm.schema.objectSchema) {
-            objectSchema.accessorClass = RLMDynamicObject.class;
+            objectSchema.accessorClass = dynamicObjectClass;
             objectSchema.primaryKeyProperty.isPrimary = NO;
         }
         for (RLMObjectSchema *objectSchema in _oldRealm.schema.objectSchema) {
-            objectSchema.accessorClass = RLMDynamicObject.class;
+            objectSchema.accessorClass = dynamicObjectClass;
         }
 
         block(self, _oldRealm->_realm->schema_version());

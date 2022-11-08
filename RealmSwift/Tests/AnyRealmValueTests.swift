@@ -20,6 +20,10 @@ import XCTest
 import Realm
 import RealmSwift
 
+#if canImport(RealmSwiftTestSupport)
+import RealmSwiftTestSupport
+#endif
+
 class AnyRealmTypeObject: Object {
     let anyValue = RealmProperty<AnyRealmValue>()
 }

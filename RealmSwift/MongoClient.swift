@@ -166,17 +166,17 @@ extension FindOneAndModifyOptions {
 public typealias UpdateResult = RLMUpdateResult
 
 /// Block which returns Result.success(DocumentId) on a successful insert or Result.failure(error)
-public typealias MongoInsertBlock = (Result<AnyBSON, Error>) -> Void
+public typealias MongoInsertBlock = @Sendable (Result<AnyBSON, Error>) -> Void
 /// Block which returns Result.success([ObjectId]) on a successful insertMany or Result.failure(error)
-public typealias MongoInsertManyBlock = (Result<[AnyBSON], Error>) -> Void
+public typealias MongoInsertManyBlock = @Sendable (Result<[AnyBSON], Error>) -> Void
 /// Block which returns Result.success([Document]) on a successful find operation or Result.failure(error)
-public typealias MongoFindBlock = (Result<[Document], Error>) -> Void
+public typealias MongoFindBlock = @Sendable (Result<[Document], Error>) -> Void
 /// Block which returns Result.success(Document?) on a successful findOne operation or Result.failure(error)
-public typealias MongoFindOneBlock = (Result<Document?, Error>) -> Void
+public typealias MongoFindOneBlock = @Sendable (Result<Document?, Error>) -> Void
 /// Block which returns Result.success(Int) on a successful count operation or Result.failure(error)
-public typealias MongoCountBlock = (Result<Int, Error>) -> Void
+public typealias MongoCountBlock = @Sendable (Result<Int, Error>) -> Void
 /// Block which returns Result.success(UpdateResult) on a successful update operation or Result.failure(error)
-public typealias MongoUpdateBlock = (Result<UpdateResult, Error>) -> Void
+public typealias MongoUpdateBlock = @Sendable (Result<UpdateResult, Error>) -> Void
 
 /**
  * The `MongoCollection` represents a MongoDB collection.
@@ -270,6 +270,7 @@ extension MongoCollection {
     /// - Parameters:
     ///   - document: document  A `Document` value to insert.
     ///   - completion: The result of attempting to perform the insert. An Id will be returned for the inserted object on sucess
+    @preconcurrency
     public func insertOne(_ document: Document, _ completion: @escaping MongoInsertBlock) {
         let bson = ObjectiveCSupport.convert(object: .document(document))
         self.__insertOneDocument(bson as! [String: RLMBSON]) { objectId, error in
@@ -286,6 +287,7 @@ extension MongoCollection {
     /// - Parameters:
     ///   - documents: The `Document` values in a bson array to insert.
     ///   - completion: The result of the insert, returns an array inserted document ids in order.
+    @preconcurrency
     public func insertMany(_ documents: [Document], _ completion: @escaping MongoInsertManyBlock) {
         let bson = ObjectiveCSupport.convert(object: .array(documents.map {.document($0)}))
         self.__insertManyDocuments(bson as! [[String: RLMBSON]]) { objectIds, error in
@@ -302,28 +304,11 @@ extension MongoCollection {
     ///   - filter: A `Document` as bson that should match the query.
     ///   - options: `FindOptions` to use when executing the command.
     ///   - completion: The resulting bson array of documents or error if one occurs
-    public func find(filter: Document,
-                     options: FindOptions,
+    @preconcurrency
+    public func find(filter: Document, options: FindOptions = FindOptions(),
                      _ completion: @escaping MongoFindBlock) {
         let bson = ObjectiveCSupport.convert(object: .document(filter))
         self.__findWhere(bson as! [String: RLMBSON], options: options) { documents, error in
-            let bson: [Document]? = documents?.map { $0.mapValues { ObjectiveCSupport.convert(object: $0) } }
-            if let bson = bson {
-                completion(.success(bson))
-            } else {
-                completion(.failure(error ?? Realm.Error.callFailed))
-            }
-        }
-    }
-
-    /// Finds the documents in this collection which match the provided filter.
-    /// - Parameters:
-    ///   - filter: A `Document` as bson that should match the query.
-    ///   - completion: The resulting bson array of documents or error if one occurs
-    public func find(filter: Document,
-                     _ completion: @escaping MongoFindBlock) {
-        let bson = ObjectiveCSupport.convert(object: .document(filter))
-        self.__findWhere(bson as! [String: RLMBSON]) { documents, error in
             let bson: [Document]? = documents?.map { $0.mapValues { ObjectiveCSupport.convert(object: $0) } }
             if let bson = bson {
                 completion(.success(bson))
@@ -341,31 +326,11 @@ extension MongoCollection {
     ///   - filter: A `Document` as bson that should match the query.
     ///   - options: `FindOptions` to use when executing the command.
     ///   - completion: The resulting bson or error if one occurs
-    public func findOneDocument(filter: Document,
-                                options: FindOptions,
+    @preconcurrency
+    public func findOneDocument(filter: Document, options: FindOptions = FindOptions(),
                                 _ completion: @escaping MongoFindOneBlock) {
         let bson = ObjectiveCSupport.convert(object: .document(filter))
         self.__findOneDocumentWhere(bson as! [String: RLMBSON], options: options) { document, error in
-            if let error = error {
-                completion(.failure(error))
-            } else {
-                let bson: Document? = document?.mapValues { ObjectiveCSupport.convert(object: $0) }
-                completion(.success(bson))
-            }
-        }
-    }
-
-    /// Returns one document from a collection or view which matches the
-    /// provided filter. If multiple documents satisfy the query, this method
-    /// returns the first document according to the query's sort order or natural
-    /// order.
-    /// - Parameters:
-    ///   - filter: A `Document` as bson that should match the query.
-    ///   - completion: The resulting bson or error if one occurs
-    public func findOneDocument(filter: Document,
-                                _ completion: @escaping MongoFindOneBlock) {
-        let bson = ObjectiveCSupport.convert(object: .document(filter))
-        self.__findOneDocumentWhere(bson as! [String: RLMBSON]) { document, error in
             if let error = error {
                 completion(.failure(error))
             } else {
@@ -379,8 +344,8 @@ extension MongoCollection {
     /// - Parameters:
     ///   - pipeline: A bson array made up of `Documents` containing the pipeline of aggregation operations to perform.
     ///   - completion: The resulting bson array of documents or error if one occurs
-    public func aggregate(pipeline: [Document],
-                          _ completion: @escaping MongoFindBlock) {
+    @preconcurrency
+    public func aggregate(pipeline: [Document], _ completion: @escaping MongoFindBlock) {
         let bson = ObjectiveCSupport.convert(object: .array(pipeline.map {.document($0)}))
         self.__aggregate(withPipeline: bson as! [[String: RLMBSON]]) { documents, error in
             let bson: [Document]? = documents?.map { $0.mapValues { ObjectiveCSupport.convert(object: $0) } }
@@ -397,27 +362,10 @@ extension MongoCollection {
     ///   - filter: A `Document` as bson that should match the query.
     ///   - limit: The max amount of documents to count
     ///   - completion: Returns the count of the documents that matched the filter.
-    public func count(filter: Document,
-                      limit: Int,
-                      _ completion: @escaping MongoCountBlock) {
+    @preconcurrency
+    public func count(filter: Document, limit: Int? = nil, _ completion: @escaping MongoCountBlock) {
         let bson = ObjectiveCSupport.convert(object: .document(filter))
-        self.__countWhere(bson as! [String: RLMBSON], limit: limit) { count, error in
-            if let error = error {
-                completion(.failure(error))
-            } else {
-                completion(.success(count))
-            }
-        }
-    }
-
-    /// Counts the number of documents in this collection matching the provided filter.
-    /// - Parameters:
-    ///   - filter: A `Document` as bson that should match the query.
-    ///   - completion: Returns the count of the documents that matched the filter.
-    public func count(filter: Document,
-                      _ completion: @escaping MongoCountBlock) {
-        let bson = ObjectiveCSupport.convert(object: .document(filter))
-        self.__countWhere(bson as! [String: RLMBSON]) { count, error in
+        self.__countWhere(bson as! [String: RLMBSON], limit: limit ?? 0) { count, error in
             if let error = error {
                 completion(.failure(error))
             } else {
@@ -430,8 +378,8 @@ extension MongoCollection {
     /// - Parameters:
     ///   - filter: A `Document` as bson that should match the query.
     ///   - completion: The result of performing the deletion. Returns the count of deleted objects
-    public func deleteOneDocument(filter: Document,
-                                  _ completion: @escaping MongoCountBlock) {
+    @preconcurrency
+    public func deleteOneDocument(filter: Document, _ completion: @escaping MongoCountBlock) {
         let bson = ObjectiveCSupport.convert(object: .document(filter))
         self.__deleteOneDocumentWhere(bson as! [String: RLMBSON]) { count, error in
             if let error = error {
@@ -446,8 +394,8 @@ extension MongoCollection {
     /// - Parameters:
     ///   - filter: Document representing the match criteria
     ///   - completion: The result of performing the deletion. Returns the count of the deletion
-    public func deleteManyDocuments(filter: Document,
-                                    _ completion: @escaping MongoCountBlock) {
+    @preconcurrency
+    public func deleteManyDocuments(filter: Document, _ completion: @escaping MongoCountBlock) {
         let bson = ObjectiveCSupport.convert(object: .document(filter))
         self.__deleteManyDocumentsWhere(bson as! [String: RLMBSON]) { count, error in
             if let error = error {
@@ -464,9 +412,8 @@ extension MongoCollection {
     ///   - update: A bson `Document` representing the update to be applied to a matching document.
     ///   - upsert: When true, creates a new document if no document matches the query.
     ///   - completion: The result of the attempt to update a document.
-    public func updateOneDocument(filter: Document,
-                                  update: Document,
-                                  upsert: Bool,
+    @preconcurrency
+    public func updateOneDocument(filter: Document, update: Document, upsert: Bool = false,
                                   _ completion: @escaping MongoUpdateBlock) {
         let filterBSON = ObjectiveCSupport.convert(object: .document(filter))
         let updateBSON = ObjectiveCSupport.convert(object: .document(update))
@@ -481,61 +428,20 @@ extension MongoCollection {
         }
     }
 
-    /// Updates a single document matching the provided filter in this collection.
-    /// - Parameters:
-    ///   - filter: A bson `Document` representing the match criteria.
-    ///   - update: A bson `Document` representing the update to be applied to a matching document.
-    ///   - completion: The result of the attempt to update a document.
-    public func updateOneDocument(filter: Document,
-                                  update: Document,
-                                  _ completion: @escaping MongoUpdateBlock) {
-        let filterBSON = ObjectiveCSupport.convert(object: .document(filter))
-        let updateBSON = ObjectiveCSupport.convert(object: .document(update))
-        self.__updateOneDocumentWhere(filterBSON as! [String: RLMBSON],
-                                      updateDocument: updateBSON as! [String: RLMBSON]) { updateResult, error in
-            if let updateResult = updateResult {
-                completion(.success(updateResult))
-            } else {
-                completion(.failure(error ?? Realm.Error.callFailed))
-            }
-        }
-    }
-
     /// Updates multiple documents matching the provided filter in this collection.
     /// - Parameters:
     ///   - filter: A bson `Document` representing the match criteria.
     ///   - update: A bson `Document` representing the update to be applied to a matching document.
     ///   - upsert: When true, creates a new document if no document matches the query.
     ///   - completion: The result of the attempt to update a document.
-    public func updateManyDocuments(filter: Document,
-                                    update: Document,
-                                    upsert: Bool,
+    @preconcurrency
+    public func updateManyDocuments(filter: Document, update: Document, upsert: Bool = false,
                                     _ completion: @escaping MongoUpdateBlock) {
         let filterBSON = ObjectiveCSupport.convert(object: .document(filter))
         let updateBSON = ObjectiveCSupport.convert(object: .document(update))
         self.__updateManyDocumentsWhere(filterBSON as! [String: RLMBSON],
                                         updateDocument: updateBSON as! [String: RLMBSON],
                                         upsert: upsert) { updateResult, error in
-            if let updateResult = updateResult {
-                completion(.success(updateResult))
-            } else {
-                completion(.failure(error ?? Realm.Error.callFailed))
-            }
-        }
-    }
-
-    /// Updates multiple documents matching the provided filter in this collection.
-    /// - Parameters:
-    ///   - filter: A bson `Document` representing the match criteria.
-    ///   - update: A bson `Document` representing the update to be applied to a matching document.
-    ///   - completion: The result of the attempt to update a document.
-    public func updateManyDocuments(filter: Document,
-                                    update: Document,
-                                    _ completion: @escaping MongoUpdateBlock) {
-        let filterBSON = ObjectiveCSupport.convert(object: .document(filter))
-        let updateBSON = ObjectiveCSupport.convert(object: .document(update))
-        self.__updateManyDocumentsWhere(filterBSON as! [String: RLMBSON],
-                                        updateDocument: updateBSON as! [String: RLMBSON]) { updateResult, error in
             if let updateResult = updateResult {
                 completion(.success(updateResult))
             } else {
@@ -555,9 +461,9 @@ extension MongoCollection {
     ///   - update: A bson `Document` representing the update to be applied to a matching document.
     ///   - options: `RemoteFindOneAndModifyOptions` to use when executing the command.
     ///   - completion: The result of the attempt to update a document.
-    public func findOneAndUpdate(filter: Document,
-                                 update: Document,
-                                 options: FindOneAndModifyOptions,
+    @preconcurrency
+    public func findOneAndUpdate(filter: Document, update: Document,
+                                 options: FindOneAndModifyOptions = .init(),
                                  _ completion: @escaping MongoFindOneBlock) {
         let filterBSON = ObjectiveCSupport.convert(object: .document(filter))
         let updateBSON = ObjectiveCSupport.convert(object: .document(update))
@@ -573,32 +479,6 @@ extension MongoCollection {
         }
     }
 
-    /// Updates a single document in a collection based on a query filter and
-    /// returns the document in either its pre-update or post-update form. Unlike
-    /// `updateOneDocument`, this action allows you to atomically find, update, and
-    /// return a document with the same command. This avoids the risk of other
-    /// update operations changing the document between separate find and update
-    /// operations.
-    /// - Parameters:
-    ///   - filter: A bson `Document` representing the match criteria.
-    ///   - update: A bson `Document` representing the update to be applied to a matching document.
-    ///   - completion: The result of the attempt to update a document.
-    public func findOneAndUpdate(filter: Document,
-                                 update: Document,
-                                 _ completion: @escaping MongoFindOneBlock) {
-        let filterBSON = ObjectiveCSupport.convert(object: .document(filter))
-        let updateBSON = ObjectiveCSupport.convert(object: .document(update))
-        self.__findOneAndUpdateWhere(filterBSON as! [String: RLMBSON],
-                                     updateDocument: updateBSON as! [String: RLMBSON]) { document, error in
-            if let error = error {
-                completion(.failure(error))
-            } else {
-                let bson: Document? = document?.mapValues { ObjectiveCSupport.convert(object: $0) }
-                completion(.success(bson))
-            }
-        }
-    }
-
     /// Overwrites a single document in a collection based on a query filter and
     /// returns the document in either its pre-replacement or post-replacement
     /// form. Unlike `updateOneDocument`, this action allows you to atomically find,
@@ -610,9 +490,9 @@ extension MongoCollection {
     ///   - replacement: A `Document` describing the replacement.
     ///   - options: `FindOneAndModifyOptions` to use when executing the command.
     ///   - completion: The result of the attempt to replace a document.
-    public func findOneAndReplace(filter: Document,
-                                  replacement: Document,
-                                  options: FindOneAndModifyOptions,
+    @preconcurrency
+    public func findOneAndReplace(filter: Document, replacement: Document,
+                                  options: FindOneAndModifyOptions = .init(),
                                   _ completion: @escaping MongoFindOneBlock) {
         let filterBSON = ObjectiveCSupport.convert(object: .document(filter))
         let replacementBSON = ObjectiveCSupport.convert(object: .document(replacement))
@@ -628,33 +508,6 @@ extension MongoCollection {
         }
     }
 
-    /// Overwrites a single document in a collection based on a query filter and
-    /// returns the document in either its pre-replacement or post-replacement
-    /// form. Unlike `updateOneDocument`, this action allows you to atomically find,
-    /// replace, and return a document with the same command. This avoids the
-    /// risk of other update operations changing the document between separate
-    /// find and update operations.
-    /// - Parameters:
-    ///   - filter: A `Document` that should match the query.
-    ///   - replacement: A `Document` describing the replacement.
-    ///   - options: `RLMFindOneAndModifyOptions` to use when executing the command.
-    ///   - completion: The result of the attempt to replace a document.
-    public func findOneAndReplace(filter: Document,
-                                  replacement: Document,
-                                  _ completion: @escaping MongoFindOneBlock) {
-        let filterBSON = ObjectiveCSupport.convert(object: .document(filter))
-        let replacementBSON = ObjectiveCSupport.convert(object: .document(replacement))
-        self.__findOneAndReplaceWhere(filterBSON as! [String: RLMBSON],
-                                      replacementDocument: replacementBSON as! [String: RLMBSON]) { document, error in
-            if let error = error {
-                completion(.failure(error))
-            } else {
-                let bson: Document? = document?.mapValues { ObjectiveCSupport.convert(object: $0) }
-                completion(.success(bson))
-            }
-        }
-    }
-
     /// Removes a single document from a collection based on a query filter and
     /// returns a document with the same form as the document immediately before
     /// it was deleted. Unlike `deleteOneDocument`, this action allows you to atomically
@@ -665,34 +518,11 @@ extension MongoCollection {
     ///   - filter: A `Document` that should match the query.
     ///   - options: `FindOneAndModifyOptions` to use when executing the command.
     ///   - completion: The result of the attempt to delete a document.
-    public func findOneAndDelete(filter: Document,
-                                 options: FindOneAndModifyOptions,
+    @preconcurrency
+    public func findOneAndDelete(filter: Document, options: FindOneAndModifyOptions = .init(),
                                  _ completion: @escaping MongoFindOneBlock) {
         let filterBSON = ObjectiveCSupport.convert(object: .document(filter))
-        self.__findOneAndDeleteWhere(filterBSON as! [String: RLMBSON],
-                                     options: options) { document, error in
-            if let error = error {
-                completion(.failure(error))
-            } else {
-                let bson: Document? = document?.mapValues { ObjectiveCSupport.convert(object: $0) }
-                completion(.success(bson))
-            }
-        }
-    }
-
-    /// Removes a single document from a collection based on a query filter and
-    /// returns a document with the same form as the document immediately before
-    /// it was deleted. Unlike `deleteOneDocument`, this action allows you to atomically
-    /// find and delete a document with the same command. This avoids the risk of
-    /// other update operations changing the document between separate find and
-    /// delete operations.
-    /// - Parameters:
-    ///   - filter: A `Document` that should match the query.
-    ///   - completion: The result of the attempt to delete a document.
-    public func findOneAndDelete(filter: Document,
-                                 _ completion: @escaping MongoFindOneBlock) {
-        let filterBSON = ObjectiveCSupport.convert(object: .document(filter))
-        self.__findOneAndDeleteWhere(filterBSON as! [String: RLMBSON]) { document, error in
+        self.__findOneAndDeleteWhere(filterBSON as! [String: RLMBSON], options: options) { document, error in
             if let error = error {
                 completion(.failure(error))
             } else {
@@ -704,6 +534,16 @@ extension MongoCollection {
 }
 
 #if swift(>=5.6) && canImport(_Concurrency)
+// Generating a closure by referencing a bound member function (e.g. `foo(continuation.resume)`) currently
+// does not generate a Sendable closure even if the type is Sendable
+@available(macOS 10.15, tvOS 13.0, iOS 13.0, watchOS 6.0, *)
+private func withCheckedThrowingSendableContinuation<T>(function: String = #function,
+                                                        _ body: (@escaping @Sendable (Result<T, Error>) -> Void) -> Void) async throws -> T {
+    return try await withCheckedThrowingContinuation(function: function) { continuation in
+        body { continuation.resume(with: $0) }
+    }
+}
+
 @available(macOS 10.15, tvOS 13.0, iOS 13.0, watchOS 6.0, *)
 extension MongoCollection {
     /// Encodes the provided value to BSON and inserts it. If the value is missing an identifier, one will be
@@ -712,8 +552,8 @@ extension MongoCollection {
     ///   - document: A `Document` value to insert.
     /// - Returns: The object id of the inserted document.
     public func insertOne(_ document: Document) async throws -> AnyBSON {
-        return try await withCheckedThrowingContinuation { continuation in
-            insertOne(document, continuation.resume)
+        return try await withCheckedThrowingSendableContinuation { continuation in
+            insertOne(document, continuation)
         }
     }
 
@@ -723,24 +563,27 @@ extension MongoCollection {
     ///   - documents: The `Document` values in a bson array to insert.
     /// - Returns: The object ids of inserted documents.
     public func insertMany(_ documents: [Document]) async throws -> [AnyBSON] {
-        return try await withCheckedThrowingContinuation { continuation in
-            insertMany(documents, continuation.resume)
+        return try await withCheckedThrowingSendableContinuation { continuation in
+            insertMany(documents, continuation)
         }
     }
 
+#if swift(>=5.7)
+    // These uses of `@_unsafeInheritExecutor` should instead be marking the
+    // options parameters as `@Copy`. Unfortunately, as of Swift 5.7 that doesn't
+    // actually work due to https://github.com/apple/swift/issues/61358
+
+    // NEXT-MAJOR: make the options parameter non-optional and default to .init()
+    // instead of nil with nil-coalescing internally.
     /// Finds the documents in this collection which match the provided filter.
     /// - Parameters:
     ///   - filter: A `Document` as bson that should match the query.
     ///   - options: `FindOptions` to use when executing the command.
     /// - Returns: Array of `Document` filtered.
-    public func find(filter: Document,
-                     options: FindOptions? = nil) async throws -> [Document] {
-        return try await withCheckedThrowingContinuation { continuation in
-            if let options = options {
-                find(filter: filter, options: options, continuation.resume)
-            } else {
-                find(filter: filter, continuation.resume)
-            }
+    @_unsafeInheritExecutor
+    public func find(filter: Document, options: FindOptions? = nil) async throws -> [Document] {
+        return try await withCheckedThrowingSendableContinuation { continuation in
+            find(filter: filter, options: options ?? .init(), continuation)
         }
     }
 
@@ -752,24 +595,48 @@ extension MongoCollection {
     ///   - filter: A `Document` as bson that should match the query.
     ///   - options: `FindOptions` to use when executing the command.
     /// - Returns: `Document` filtered.
-    public func findOneDocument(filter: Document,
-                                options: FindOptions? = nil) async throws -> Document? {
-        return try await withCheckedThrowingContinuation { continuation in
-            if let options = options {
-                findOneDocument(filter: filter, options: options, continuation.resume)
-            } else {
-                findOneDocument(filter: filter, continuation.resume)
-            }
+    @_unsafeInheritExecutor
+    public func findOneDocument(filter: Document, options: FindOptions? = nil) async throws -> Document? {
+        return try await withCheckedThrowingSendableContinuation { continuation in
+            findOneDocument(filter: filter, options: options ?? .init(), continuation)
         }
     }
+
+#else
+
+    /// Finds the documents in this collection which match the provided filter.
+    /// - Parameters:
+    ///   - filter: A `Document` as bson that should match the query.
+    ///   - options: `FindOptions` to use when executing the command.
+    /// - Returns: Array of `Document` filtered.
+    public func find(filter: Document, options: FindOptions? = nil) async throws -> [Document] {
+        return try await withCheckedThrowingSendableContinuation { continuation in
+            find(filter: filter, options: options ?? .init(), continuation)
+        }
+    }
+
+    /// Returns one document from a collection or view which matches the
+    /// provided filter. If multiple documents satisfy the query, this method
+    /// returns the first document according to the query's sort order or natural
+    /// order.
+    /// - Parameters:
+    ///   - filter: A `Document` as bson that should match the query.
+    ///   - options: `FindOptions` to use when executing the command.
+    /// - Returns: `Document` filtered.
+    public func findOneDocument(filter: Document, options: FindOptions? = nil) async throws -> Document? {
+        return try await withCheckedThrowingSendableContinuation { continuation in
+            findOneDocument(filter: filter, options: options ?? .init(), continuation)
+        }
+    }
+#endif
 
     /// Runs an aggregation framework pipeline against this collection.
     /// - Parameters:
     ///   - pipeline: A bson array made up of `Documents` containing the pipeline of aggregation operations to perform.
     /// - Returns:An array of `Document` result of the aggregation operation.
     public func aggregate(pipeline: [Document]) async throws -> [Document] {
-        return try await withCheckedThrowingContinuation { continuation in
-            aggregate(pipeline: pipeline, continuation.resume)
+        return try await withCheckedThrowingSendableContinuation { continuation in
+            aggregate(pipeline: pipeline, continuation)
         }
     }
 
@@ -780,11 +647,11 @@ extension MongoCollection {
     /// - Returns: Count of the documents that matched the filter.
     public func count(filter: Document,
                       limit: Int? = nil) async throws -> Int {
-        return try await withCheckedThrowingContinuation { continuation in
+        return try await withCheckedThrowingSendableContinuation { continuation in
             if let limit = limit {
-                count(filter: filter, limit: limit, continuation.resume)
+                count(filter: filter, limit: limit, continuation)
             } else {
-                count(filter: filter, continuation.resume)
+                count(filter: filter, continuation)
             }
         }
     }
@@ -794,8 +661,8 @@ extension MongoCollection {
     ///   - filter: A `Document` as bson that should match the query.
     /// - Returns: `Int` count of deleted documents.
     public func deleteOneDocument(filter: Document) async throws -> Int {
-        return try await withCheckedThrowingContinuation { continuation in
-            deleteOneDocument(filter: filter, continuation.resume)
+        return try await withCheckedThrowingSendableContinuation { continuation in
+            deleteOneDocument(filter: filter, continuation)
         }
     }
 
@@ -804,8 +671,8 @@ extension MongoCollection {
     ///   - filter: Document representing the match criteria
     /// - Returns: `Int` count of deleted documents.
     public func deleteManyDocuments(filter: Document) async throws -> Int {
-        return try await withCheckedThrowingContinuation { continuation in
-            deleteManyDocuments(filter: filter, continuation.resume)
+        return try await withCheckedThrowingSendableContinuation { continuation in
+            deleteManyDocuments(filter: filter, continuation)
         }
     }
 
@@ -818,16 +685,16 @@ extension MongoCollection {
     public func updateOneDocument(filter: Document,
                                   update: Document,
                                   upsert: Bool? = nil) async throws -> UpdateResult {
-        return try await withCheckedThrowingContinuation { continuation in
+        return try await withCheckedThrowingSendableContinuation { continuation in
             if let upsert = upsert {
                 updateOneDocument(filter: filter,
                                   update: update,
                                   upsert: upsert,
-                                  continuation.resume)
+                                  continuation)
             } else {
                 updateOneDocument(filter: filter,
                                   update: update,
-                                  continuation.resume)
+                                  continuation)
             }
         }
     }
@@ -841,20 +708,23 @@ extension MongoCollection {
     public func updateManyDocuments(filter: Document,
                                     update: Document,
                                     upsert: Bool? = nil) async throws -> UpdateResult {
-        return try await withCheckedThrowingContinuation { continuation in
+        return try await withCheckedThrowingSendableContinuation { continuation in
             if let upsert = upsert {
                 updateManyDocuments(filter: filter,
                                     update: update,
                                     upsert: upsert,
-                                    continuation.resume)
+                                    continuation)
             } else {
                 updateManyDocuments(filter: filter,
                                     update: update,
-                                    continuation.resume)
+                                    continuation)
             }
         }
     }
 
+    // NEXT-MAJOR: make the options parameter non-optional and default to .init()
+    // instead of nil with nil-coalescing internally.
+#if swift(>=5.7)
     /// Updates a single document in a collection based on a query filter and
     /// returns the document in either its pre-update or post-update form. Unlike
     /// `updateOneDocument`, this action allows you to atomically find, update, and
@@ -866,20 +736,12 @@ extension MongoCollection {
     ///   - update: A bson `Document` representing the update to be applied to a matching document.
     ///   - options: `RemoteFindOneAndModifyOptions` to use when executing the command.
     /// - Returns: `Document` result of the attempt to update a document  or `nil` if document wasn't found.
-    public func findOneAndUpdate(filter: Document,
-                                 update: Document,
+    @_unsafeInheritExecutor
+    public func findOneAndUpdate(filter: Document, update: Document,
                                  options: FindOneAndModifyOptions? = nil) async throws -> Document? {
-        return try await withCheckedThrowingContinuation { continuation in
-            if let options = options {
-                findOneAndUpdate(filter: filter,
-                                 update: update,
-                                 options: options,
-                                 continuation.resume)
-            } else {
-                findOneAndUpdate(filter: filter,
-                                 update: update,
-                                 continuation.resume)
-            }
+        return try await withCheckedThrowingSendableContinuation { continuation in
+            findOneAndUpdate(filter: filter, update: update,
+                             options: options ?? .init(), continuation)
         }
     }
 
@@ -894,20 +756,68 @@ extension MongoCollection {
     ///   - replacement: A `Document` describing the replacement.
     ///   - options: `FindOneAndModifyOptions` to use when executing the command.
     /// - Returns: `Document`result of the attempt to reaplce a document   or `nil` if document wasn't found.
-    public func findOneAndReplace(filter: Document,
-                                  replacement: Document,
+    @_unsafeInheritExecutor
+    public func findOneAndReplace(filter: Document, replacement: Document,
                                   options: FindOneAndModifyOptions? = nil) async throws -> Document? {
-        return try await withCheckedThrowingContinuation { continuation in
-            if let options = options {
-                findOneAndReplace(filter: filter,
-                                  replacement: replacement,
-                                  options: options,
-                                  continuation.resume)
-            } else {
-                findOneAndReplace(filter: filter,
-                                  replacement: replacement,
-                                  continuation.resume)
-            }
+        return try await withCheckedThrowingSendableContinuation { continuation in
+            findOneAndReplace(filter: filter, replacement: replacement,
+                              options: options ?? .init(), continuation)
+        }
+    }
+
+    /// Removes a single document from a collection based on a query filter and
+    /// returns a document with the same form as the document immediately before
+    /// it was deleted. Unlike `deleteOneDocument`, this action allows you to atomically
+    /// find and delete a document with the same command. This avoids the risk of
+    /// other update operations changing the document between separate find and
+    /// delete operations.
+    /// - Parameters:
+    ///   - filter: A `Document` that should match the query.
+    ///   - options: `FindOneAndModifyOptions` to use when executing the command.
+    /// - Returns: `Document` result of the attempt to delete a document  or `nil` if document wasn't found.
+    @_unsafeInheritExecutor
+    public func findOneAndDelete(filter: Document,
+                                 options: FindOneAndModifyOptions? = nil) async throws -> Document? {
+        return try await withCheckedThrowingSendableContinuation { continuation in
+            findOneAndDelete(filter: filter, options: options ?? .init(), continuation)
+        }
+    }
+#else
+    /// Updates a single document in a collection based on a query filter and
+    /// returns the document in either its pre-update or post-update form. Unlike
+    /// `updateOneDocument`, this action allows you to atomically find, update, and
+    /// return a document with the same command. This avoids the risk of other
+    /// update operations changing the document between separate find and update
+    /// operations.
+    /// - Parameters:
+    ///   - filter: A bson `Document` representing the match criteria.
+    ///   - update: A bson `Document` representing the update to be applied to a matching document.
+    ///   - options: `RemoteFindOneAndModifyOptions` to use when executing the command.
+    /// - Returns: `Document` result of the attempt to update a document  or `nil` if document wasn't found.
+    public func findOneAndUpdate(filter: Document, update: Document,
+                                 options: FindOneAndModifyOptions? = nil) async throws -> Document? {
+        return try await withCheckedThrowingSendableContinuation { continuation in
+            findOneAndUpdate(filter: filter, update: update,
+                             options: options ?? .init(), continuation)
+        }
+    }
+
+    /// Overwrites a single document in a collection based on a query filter and
+    /// returns the document in either its pre-replacement or post-replacement
+    /// form. Unlike `updateOneDocument`, this action allows you to atomically find,
+    /// replace, and return a document with the same command. This avoids the
+    /// risk of other update operations changing the document between separate
+    /// find and update operations.
+    /// - Parameters:
+    ///   - filter: A `Document` that should match the query.
+    ///   - replacement: A `Document` describing the replacement.
+    ///   - options: `FindOneAndModifyOptions` to use when executing the command.
+    /// - Returns: `Document`result of the attempt to reaplce a document   or `nil` if document wasn't found.
+    public func findOneAndReplace(filter: Document, replacement: Document,
+                                  options: FindOneAndModifyOptions? = nil) async throws -> Document? {
+        return try await withCheckedThrowingSendableContinuation { continuation in
+            findOneAndReplace(filter: filter, replacement: replacement,
+                              options: options ?? .init(), continuation)
         }
     }
 
@@ -923,17 +833,11 @@ extension MongoCollection {
     /// - Returns: `Document` result of the attempt to delete a document  or `nil` if document wasn't found.
     public func findOneAndDelete(filter: Document,
                                  options: FindOneAndModifyOptions? = nil) async throws -> Document? {
-        return try await withCheckedThrowingContinuation { continuation in
-            if let options = options {
-                findOneAndDelete(filter: filter,
-                                 options: options,
-                                 continuation.resume)
-            } else {
-                findOneAndDelete(filter: filter,
-                                 continuation.resume)
-            }
+        return try await withCheckedThrowingSendableContinuation { continuation in
+            findOneAndDelete(filter: filter, options: options ?? .init(), continuation)
         }
     }
+#endif
 }
 #endif // swift(>=5.6)
 
@@ -1119,13 +1023,24 @@ extension MongoCollection {
 }
 
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, macCatalyst 13.0, macCatalystApplicationExtension 13.0, *)
+@usableFromInline
+internal func future<T>(_ fn: @escaping (@escaping @Sendable (Result<T, Error>) -> Void) -> Void) -> Future<T, Error> {
+    return Future<T, Error> { promise in
+        // Future.Promise currently isn't marked as Sendable despite that being
+        // the whole point of Future
+        typealias SendablePromise = @Sendable (Result<T, Error>) -> Void
+        fn(unsafeBitCast(promise, to: SendablePromise.self))
+    }
+}
+
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, macCatalyst 13.0, macCatalystApplicationExtension 13.0, *)
 public extension MongoCollection {
     /// Encodes the provided value to BSON and inserts it. If the value is missing an identifier, one will be
     /// generated for it.
     /// @param document:  A `Document` value to insert.
     /// @returns A publisher that eventually return the object id of the inserted document or `Error`.
     func insertOne(_ document: Document) -> Future<AnyBSON, Error> {
-        return Future { self.insertOne(document, $0) }
+        return future { self.insertOne(document, $0) }
     }
 
     /// Encodes the provided values to BSON and inserts them. If any values are missing identifiers,
@@ -1133,7 +1048,7 @@ public extension MongoCollection {
     /// @param documents: The `Document` values in a bson array to insert.
     /// @returns A publisher that eventually return the object ids of inserted documents or `Error`.
     func insertMany(_ documents: [Document]) -> Future<[AnyBSON], Error> {
-        return Future { self.insertMany(documents, $0) }
+        return future { self.insertMany(documents, $0) }
     }
 
     /// Finds the documents in this collection which match the provided filter.
@@ -1141,14 +1056,14 @@ public extension MongoCollection {
     /// @param options: `FindOptions` to use when executing the command.
     /// @returns A publisher that eventually return `[ObjectId]` of documents or `Error`.
     func find(filter: Document, options: FindOptions) -> Future<[Document], Error> {
-        return Future { self.find(filter: filter, options: options, $0) }
+        return future { self.find(filter: filter, options: options, $0) }
     }
 
     /// Finds the documents in this collection which match the provided filter.
     /// @param filter: A `Document` as bson that should match the query.
     /// @returns A publisher that eventually return `[ObjectId]` of documents or `Error`.
     func find(filter: Document) -> Future<[Document], Error> {
-        return Future { self.find(filter: filter, $0) }
+        return future { self.find(filter: filter, $0) }
     }
 
     /// Returns one document from a collection or view which matches the
@@ -1159,7 +1074,7 @@ public extension MongoCollection {
     /// @param options: `FindOptions` to use when executing the command.
     /// @returns A publisher that eventually return `Document` or `Error`.
     func findOneDocument(filter: Document, options: FindOptions) -> Future<Document?, Error> {
-        return Future { self.findOneDocument(filter: filter, $0) }
+        return future { self.findOneDocument(filter: filter, $0) }
     }
 
     /// Returns one document from a collection or view which matches the
@@ -1169,14 +1084,14 @@ public extension MongoCollection {
     /// @param filter: A `Document` as bson that should match the query.
     /// @returns A publisher that eventually return `Document` or `nil` if document wasn't found or `Error`.
     func findOneDocument(filter: Document) -> Future<Document?, Error> {
-        return Future { self.findOneDocument(filter: filter, $0) }
+        return future { self.findOneDocument(filter: filter, $0) }
     }
 
     /// Runs an aggregation framework pipeline against this collection.
     /// @param pipeline: A bson array made up of `Documents` containing the pipeline of aggregation operations to perform.
     /// @returns A publisher that eventually return `Document` or `Error`.
     func aggregate(pipeline: [Document]) -> Future<[Document], Error> {
-        return Future { self.aggregate(pipeline: pipeline, $0) }
+        return future { self.aggregate(pipeline: pipeline, $0) }
     }
 
     /// Counts the number of documents in this collection matching the provided filter.
@@ -1184,28 +1099,28 @@ public extension MongoCollection {
     /// @param limit: The max amount of documents to count
     /// @returns A publisher that eventually return `Int` count of documents or `Error`.
     func count(filter: Document, limit: Int) -> Future<Int, Error> {
-        return Future { self.count(filter: filter, limit: limit, $0) }
+        return future { self.count(filter: filter, limit: limit, $0) }
     }
 
     /// Counts the number of documents in this collection matching the provided filter.
     /// @param filter: A `Document` as bson that should match the query.
     /// @returns A publisher that eventually return `Int` count of documents or `Error`.
     func count(filter: Document) -> Future<Int, Error> {
-        return Future { self.count(filter: filter, $0) }
+        return future { self.count(filter: filter, $0) }
     }
 
     /// Deletes a single matching document from the collection.
     /// @param filter: A `Document` as bson that should match the query.
     /// @returns A publisher that eventually return `Int` count of deleted documents or `Error`.
     func deleteOneDocument(filter: Document) -> Future<Int, Error> {
-        return Future { self.deleteOneDocument(filter: filter, $0) }
+        return future { self.deleteOneDocument(filter: filter, $0) }
     }
 
     /// Deletes multiple documents
     /// @param filter: Document representing the match criteria
     /// @returns A publisher that eventually return `Int` count of deleted documents or `Error`.
     func deleteManyDocuments(filter: Document) -> Future<Int, Error> {
-        return Future { self.deleteManyDocuments(filter: filter, $0) }
+        return future { self.deleteManyDocuments(filter: filter, $0) }
     }
 
     /// Updates a single document matching the provided filter in this collection.
@@ -1214,7 +1129,7 @@ public extension MongoCollection {
     /// @param upsert: When true, creates a new document if no document matches the query.
     /// @returns A publisher that eventually return `UpdateResult` or `Error`.
     func updateOneDocument(filter: Document, update: Document, upsert: Bool) -> Future<UpdateResult, Error> {
-        return Future { self.updateOneDocument(filter: filter, update: update, upsert: upsert, $0) }
+        return future { self.updateOneDocument(filter: filter, update: update, upsert: upsert, $0) }
     }
 
     /// Updates a single document matching the provided filter in this collection.
@@ -1222,7 +1137,7 @@ public extension MongoCollection {
     /// @param update: A bson `Document` representing the update to be applied to a matching document.
     /// @returns A publisher that eventually return `UpdateResult` or `Error`.
     func updateOneDocument(filter: Document, update: Document) -> Future<UpdateResult, Error> {
-        return Future { self.updateOneDocument(filter: filter, update: update, $0) }
+        return future { self.updateOneDocument(filter: filter, update: update, $0) }
     }
 
     /// Updates multiple documents matching the provided filter in this collection.
@@ -1231,7 +1146,7 @@ public extension MongoCollection {
     /// @param upsert: When true, creates a new document if no document matches the query.
     /// @returns A publisher that eventually return `UpdateResult` or `Error`.
     func updateManyDocuments(filter: Document, update: Document, upsert: Bool) -> Future<UpdateResult, Error> {
-        return Future { self.updateManyDocuments(filter: filter, update: update, upsert: upsert, $0) }
+        return future { self.updateManyDocuments(filter: filter, update: update, upsert: upsert, $0) }
     }
 
     /// Updates multiple documents matching the provided filter in this collection.
@@ -1239,7 +1154,7 @@ public extension MongoCollection {
     /// @param update: A bson `Document` representing the update to be applied to a matching document.
     /// @returns A publisher that eventually return `UpdateResult` or `Error`.
     func updateManyDocuments(filter: Document, update: Document) -> Future<UpdateResult, Error> {
-        return Future { self.updateManyDocuments(filter: filter, update: update, $0) }
+        return future { self.updateManyDocuments(filter: filter, update: update, $0) }
     }
 
     /// Updates a single document in a collection based on a query filter and
@@ -1253,7 +1168,7 @@ public extension MongoCollection {
     /// @param options: `RemoteFindOneAndModifyOptions` to use when executing the command.
     /// @returns A publisher that eventually return `Document` or `nil` if document wasn't found or `Error`.
     func findOneAndUpdate(filter: Document, update: Document, options: FindOneAndModifyOptions) -> Future<Document?, Error> {
-        return Future { self.findOneAndUpdate(filter: filter, update: update, options: options, $0) }
+        return future { self.findOneAndUpdate(filter: filter, update: update, options: options, $0) }
     }
 
     /// Updates a single document in a collection based on a query filter and
@@ -1266,7 +1181,7 @@ public extension MongoCollection {
     /// @param update: A bson `Document` representing the update to be applied to a matching document.
     /// @returns A publisher that eventually return `Document` or `nil` if document wasn't found or `Error`.
     func findOneAndUpdate(filter: Document, update: Document) -> Future<Document?, Error> {
-        return Future { self.findOneAndUpdate(filter: filter, update: update, $0) }
+        return future { self.findOneAndUpdate(filter: filter, update: update, $0) }
     }
 
     /// Overwrites a single document in a collection based on a query filter and
@@ -1280,7 +1195,7 @@ public extension MongoCollection {
     /// @param options: `FindOneAndModifyOptions` to use when executing the command.
     /// @returns A publisher that eventually return `Document` or `nil` if document wasn't found or `Error`.
     func findOneAndReplace(filter: Document, replacement: Document, options: FindOneAndModifyOptions) -> Future<Document?, Error> {
-        return Future { self.findOneAndReplace(filter: filter, replacement: replacement, options: options, $0) }
+        return future { self.findOneAndReplace(filter: filter, replacement: replacement, options: options, $0) }
     }
 
     /// Overwrites a single document in a collection based on a query filter and
@@ -1293,7 +1208,7 @@ public extension MongoCollection {
     /// @param replacement: A `Document` describing the replacement.
     /// @returns A publisher that eventually return `Document` or `nil` if document wasn't found or `Error`.
     func findOneAndReplace(filter: Document, replacement: Document) -> Future<Document?, Error> {
-        return Future { self.findOneAndReplace(filter: filter, replacement: replacement, $0) }
+        return future { self.findOneAndReplace(filter: filter, replacement: replacement, $0) }
     }
 
     /// Removes a single document from a collection based on a query filter and
@@ -1306,7 +1221,7 @@ public extension MongoCollection {
     /// @param options: `FindOneAndModifyOptions` to use when executing the command.
     /// @returns A publisher that eventually return `Document` or `nil` if document wasn't found or `Error`.
     func findOneAndDelete(filter: Document, options: FindOneAndModifyOptions) -> Future<Document?, Error> {
-        return Future { self.findOneAndDelete(filter: filter, options: options, $0) }
+        return future { self.findOneAndDelete(filter: filter, options: options, $0) }
     }
 
     /// Removes a single document from a collection based on a query filter and
@@ -1318,7 +1233,7 @@ public extension MongoCollection {
     /// @param filter: A `Document` that should match the query.
     /// @returns A publisher that eventually return `Document` or `nil` if document wasn't found or `Error`.
     func findOneAndDelete(filter: Document) -> Future<Document?, Error> {
-        return Future { self.findOneAndDelete(filter: filter, $0) }
+        return future { self.findOneAndDelete(filter: filter, $0) }
     }
 }
 

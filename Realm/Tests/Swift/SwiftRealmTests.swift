@@ -23,6 +23,7 @@ import Realm
 import RealmTestSupport
 #endif
 
+@MainActor
 class SwiftRLMRealmTests: RLMTestCase {
 
     // No models

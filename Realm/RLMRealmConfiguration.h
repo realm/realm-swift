@@ -31,12 +31,14 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
  Return `YES` to indicate that an attempt to compact the file should be made.
  The compaction will be skipped if another process is accessing it.
  */
+RLM_SWIFT_SENDABLE
 typedef BOOL (^RLMShouldCompactOnLaunchBlock)(NSUInteger totalBytes, NSUInteger bytesUsed);
 
 /**
  A block which receives a subscription set instance, that can be used to add an initial set of subscriptions which will be executed
  when the Realm is first opened.
  */
+RLM_SWIFT_SENDABLE
 typedef void(^RLMFlexibleSyncInitialSubscriptionsBlock)(RLMSyncSubscriptionSet * _Nonnull subscriptions);
 
 /**

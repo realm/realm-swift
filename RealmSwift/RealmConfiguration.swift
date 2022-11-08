@@ -16,8 +16,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-import Foundation
-import Realm
 import Realm.Private
 
 extension Realm {
@@ -31,7 +29,7 @@ extension Realm {
      of this, you will normally want to cache and reuse a single configuration value for each distinct configuration
      rather than creating a new value each time you open a Realm.
      */
-    @frozen public struct Configuration {
+    @frozen public struct Configuration: Sendable {
 
         // MARK: Default Configuration
 
@@ -76,6 +74,7 @@ extension Realm {
          - parameter seedFilePath:       The path to the realm file that will be copied to the fileURL when opened
                                          for the first time.
         */
+        @preconcurrency
         public init(fileURL: URL? = URL(fileURLWithPath: RLMRealmPathForFile("default.realm"), isDirectory: false),
                     inMemoryIdentifier: String? = nil,
                     syncConfiguration: SyncConfiguration? = nil,
@@ -84,7 +83,7 @@ extension Realm {
                     schemaVersion: UInt64 = 0,
                     migrationBlock: MigrationBlock? = nil,
                     deleteRealmIfMigrationNeeded: Bool = false,
-                    shouldCompactOnLaunch: ((Int, Int) -> Bool)? = nil,
+                    shouldCompactOnLaunch: (@Sendable (Int, Int) -> Bool)? = nil,
                     objectTypes: [ObjectBase.Type]? = nil,
                     seedFilePath: URL? = nil) {
                 self.fileURL = fileURL
@@ -178,6 +177,7 @@ extension Realm {
         public var schemaVersion: UInt64 = 0
 
         /// The block which migrates the Realm to the current version.
+        @preconcurrency
         public var migrationBlock: MigrationBlock?
 
         /**
@@ -211,7 +211,8 @@ extension Realm {
          Return `true ` to indicate that an attempt to compact the file should be made.
          The compaction will be skipped if another process is accessing it.
          */
-        public var shouldCompactOnLaunch: ((Int, Int) -> Bool)?
+        @preconcurrency
+        public var shouldCompactOnLaunch: (@Sendable (Int, Int) -> Bool)?
 
         /// The classes managed by the Realm.
         public var objectTypes: [ObjectBase.Type]? {
@@ -279,7 +280,7 @@ extension Realm {
         // MARK: Flexible Sync
 
         /// Callback for adding subscriptions to the initialization of the Realm
-        internal var initialSubscriptions: ((SyncSubscriptionSet) -> Void)?
+        internal var initialSubscriptions: (@Sendable (SyncSubscriptionSet) -> Void)?
 
         /// If `true` Indicates that the `initialSubscriptions` will run on every app startup.
         internal var rerunOnOpen: Bool = false
@@ -302,7 +303,8 @@ extension Realm {
             configuration.encryptionKey = self.encryptionKey
             configuration.readOnly = self.readOnly
             configuration.schemaVersion = self.schemaVersion
-            configuration.migrationBlock = self.migrationBlock.map { accessorMigrationBlock($0) }
+            configuration.migrationBlock = self.migrationBlock
+            configuration.migrationObjectClass = MigrationObject.self
             configuration.deleteRealmIfMigrationNeeded = self.deleteRealmIfMigrationNeeded
             configuration.shouldCompactOnLaunch = self.shouldCompactOnLaunch.map(ObjectiveCSupport.convert(object:))
             configuration.setCustomSchemaWithoutCopying(self.customSchema)
@@ -333,11 +335,7 @@ extension Realm {
             configuration.encryptionKey = rlmConfiguration.encryptionKey
             configuration.readOnly = rlmConfiguration.readOnly
             configuration.schemaVersion = rlmConfiguration.schemaVersion
-            configuration.migrationBlock = rlmConfiguration.migrationBlock.map { rlmMigration in
-                return { migration, schemaVersion in
-                    rlmMigration(migration.rlmMigration, schemaVersion)
-                }
-            }
+            configuration.migrationBlock = rlmConfiguration.migrationBlock
             configuration.deleteRealmIfMigrationNeeded = rlmConfiguration.deleteRealmIfMigrationNeeded
             configuration.shouldCompactOnLaunch = rlmConfiguration.shouldCompactOnLaunch.map(ObjectiveCSupport.convert)
             configuration.customSchema = rlmConfiguration.customSchema
