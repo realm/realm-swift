@@ -16,7 +16,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
 #import <Realm/RLMConstants.h>
 
 #ifdef __cplusplus
@@ -27,7 +26,7 @@ struct AuditConfig;
 }
 #endif
 
-NS_ASSUME_NONNULL_BEGIN
+RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
 @class RLMRealm, RLMUser, RLMRealmConfiguration;
 typedef RLM_CLOSED_ENUM(NSUInteger, RLMSyncLogLevel);
@@ -56,4 +55,4 @@ FOUNDATION_EXTERN void RLMEventUpdateMetadata(struct RLMEventContext *context,
 #endif
 @end
 
-NS_ASSUME_NONNULL_END
+RLM_HEADER_AUDIT_END(nullability, sendability)

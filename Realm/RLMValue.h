@@ -16,8 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
-
+#import <Realm/RLMConstants.h>
 #import <Realm/RLMDecimal128.h>
 #import <Realm/RLMObject.h>
 #import <Realm/RLMObjectBase.h>

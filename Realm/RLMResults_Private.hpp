@@ -22,7 +22,7 @@
 
 class RLMClassInfo;
 
-NS_ASSUME_NONNULL_BEGIN
+RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
 @interface RLMResults () {
 @public
@@ -45,7 +45,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (RLMClassInfo *)objectInfo;
 @end
 
-NS_ASSUME_NONNULL_END
+RLM_HEADER_AUDIT_END(nullability, sendability)
 
 // Utility functions
 

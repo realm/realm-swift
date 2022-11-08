@@ -26,7 +26,7 @@ class AsyncOpenTask;
 class SyncSession;
 }
 
-NS_ASSUME_NONNULL_BEGIN
+RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
 @interface RLMSyncSession () {
 @public     // So it's visible to tests
@@ -53,4 +53,4 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) std::shared_ptr<realm::AsyncOpenTask> task;
 @end
 
-NS_ASSUME_NONNULL_END
+RLM_HEADER_AUDIT_END(nullability, sendability)

@@ -21,7 +21,7 @@
 
 @class RLMObjectBase, RLMProperty;
 
-NS_ASSUME_NONNULL_BEGIN
+RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
 @interface RLMSet ()
 - (instancetype)initWithObjectClassName:(NSString *)objectClassName;
@@ -40,4 +40,4 @@ void RLMSetValidateMatchingObjectType(RLMSet *set, id value);
 - (instancetype)initWithParent:(RLMObjectBase *)parentObject property:(RLMProperty *)property;
 @end
 
-NS_ASSUME_NONNULL_END
+RLM_HEADER_AUDIT_END(nullability, sendability)

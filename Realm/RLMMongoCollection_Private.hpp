@@ -18,7 +18,7 @@
 
 #import <Realm/RLMMongoCollection.h>
 
-NS_ASSUME_NONNULL_BEGIN
+RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
 @class RLMUser;
 @protocol RLMChangeEventDelegate;
@@ -43,4 +43,4 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-NS_ASSUME_NONNULL_END
+RLM_HEADER_AUDIT_END(nullability, sendability)

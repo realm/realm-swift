@@ -20,7 +20,7 @@
 
 @class RLMFastEnumerator;
 
-NS_ASSUME_NONNULL_BEGIN
+RLM_HEADER_AUDIT_BEGIN(nullability)
 
 // Disable syncing files to disk. Cannot be re-enabled. Use only for tests.
 FOUNDATION_EXTERN void RLMDisableSyncToDisk(void);
@@ -62,4 +62,4 @@ BOOL RLMIsRealmCachedAtPath(NSString *path);
 
 @end
 
-NS_ASSUME_NONNULL_END
+RLM_HEADER_AUDIT_END(nullability)

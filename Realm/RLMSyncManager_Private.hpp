@@ -38,7 +38,7 @@ class Logger;
 // All private API methods are threadsafe and synchronized, unless denoted otherwise. Since they are expected to be
 // called very infrequently, this should pose no issues.
 
-NS_ASSUME_NONNULL_BEGIN
+RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
 @interface RLMSyncManager ()
 
@@ -58,4 +58,4 @@ NS_ASSUME_NONNULL_BEGIN
 
 std::shared_ptr<realm::util::Logger> RLMWrapLogFunction(RLMSyncLogFunction);
 
-NS_ASSUME_NONNULL_END
+RLM_HEADER_AUDIT_END(nullability, sendability)

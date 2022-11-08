@@ -16,8 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
-
+#import <Realm/RLMConstants.h>
 #import <Realm/RLMCredentials.h>
 #import <Realm/RLMRealmConfiguration.h>
 #import <Realm/RLMSyncConfiguration.h>
@@ -49,7 +48,7 @@ typedef void(^RLMUserCustomDataBlock)(NSDictionary * _Nullable, NSError * _Nulla
 /// A block type for returning from function calls.
 typedef void(^RLMCallFunctionCompletionBlock)(id<RLMBSON> _Nullable, NSError * _Nullable);
 
-NS_ASSUME_NONNULL_BEGIN
+RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
 /**
  A `RLMUser` instance represents a single Realm App user account.
@@ -431,4 +430,4 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-NS_ASSUME_NONNULL_END
+RLM_HEADER_AUDIT_END(nullability, sendability)

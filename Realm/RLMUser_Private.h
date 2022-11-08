@@ -18,7 +18,7 @@
 
 #import <Realm/RLMUser.h>
 
-NS_ASSUME_NONNULL_BEGIN
+RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
 /// Observer block for user notifications.
 typedef void(^RLMUserNotificationBlock)(RLMUser *);
@@ -44,4 +44,4 @@ typedef void(^RLMUserNotificationBlock)(RLMUser *);
 
 @end
 
-NS_ASSUME_NONNULL_END
+RLM_HEADER_AUDIT_END(nullability, sendability)

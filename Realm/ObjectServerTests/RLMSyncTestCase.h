@@ -23,7 +23,7 @@
 typedef NS_ENUM(NSUInteger, RLMSyncStopPolicy);
 typedef void(^RLMSyncBasicErrorReportingBlock)(NSError * _Nullable);
 
-NS_ASSUME_NONNULL_BEGIN
+RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
 @interface RealmServer : NSObject
 + (RealmServer *)shared;
@@ -169,7 +169,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)waitForSessionTermination;
 @end
 
-NS_ASSUME_NONNULL_END
+RLM_HEADER_AUDIT_END(nullability, sendability)
 
 #define WAIT_FOR_SEMAPHORE(macro_semaphore, macro_timeout) do {                                                        \
     int64_t delay_in_ns = (int64_t)(macro_timeout * NSEC_PER_SEC);                                                     \

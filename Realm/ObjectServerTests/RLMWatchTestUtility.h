@@ -20,7 +20,7 @@
 #import <Realm/RLMMongoCollection.h>
 #import <XCTest/XCTest.h>
 
-NS_ASSUME_NONNULL_BEGIN
+RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
 /// Used to process watch change events and assert tests.
 @interface RLMWatchTestUtility : XCTestCase <RLMChangeEventDelegate>
@@ -44,4 +44,4 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 @end
-NS_ASSUME_NONNULL_END
+RLM_HEADER_AUDIT_END(nullability, sendability)
