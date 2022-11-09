@@ -832,7 +832,7 @@
     __block LinkToRenamedProperties *obj;
     [realm transactionWithBlock:^{
         obj = [LinkToRenamedProperties createInRealm:realm withValue:@[]];
-        RenamedProperties *linkedObject = [RenamedProperties createInRealm:realm withValue:@[@""]];
+        RenamedProperties *linkedObject = [RenamedProperties createInRealm:realm withValue:@[@1, @""]];
         [obj.set addObjects:@[linkedObject]];
     }];
 
@@ -992,19 +992,11 @@
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm beginWriteTransaction];
     id value = @{@"set": @[@[@1, @"c"], @[@2, @"b"], @[@3, @"a"]]};
-    LinkToRenamedProperties1 *obj = [LinkToRenamedProperties1 createInRealm:realm withValue:value];
+    LinkToRenamedProperties *obj = [LinkToRenamedProperties createInRealm:realm withValue:value];
 
-    // FIXME: sorting has to use the column names because the parsing is done by
-    // the object store. This is not ideal.
-    XCTAssertEqualObjects([[obj.set sortedResultsUsingKeyPath:@"prop 1" ascending:YES] valueForKeyPath:@"propA"],
+    XCTAssertEqualObjects([[obj.set sortedResultsUsingKeyPath:@"intCol" ascending:YES] valueForKeyPath:@"intCol"],
                           (@[@1, @2, @3]));
-    XCTAssertEqualObjects([[obj.set sortedResultsUsingKeyPath:@"prop 2" ascending:YES] valueForKeyPath:@"propA"],
-                          (@[@3, @2, @1]));
-
-    LinkToRenamedProperties2 *obj2 = [LinkToRenamedProperties2 allObjectsInRealm:realm].firstObject;
-    XCTAssertEqualObjects([[obj2.set sortedResultsUsingKeyPath:@"prop 1" ascending:YES] valueForKeyPath:@"propC"],
-                          (@[@1, @2, @3]));
-    XCTAssertEqualObjects([[obj2.set sortedResultsUsingKeyPath:@"prop 2" ascending:YES] valueForKeyPath:@"propC"],
+    XCTAssertEqualObjects([[obj.set sortedResultsUsingKeyPath:@"intCol" ascending:NO] valueForKeyPath:@"intCol"],
                           (@[@3, @2, @1]));
 
     [realm cancelWriteTransaction];

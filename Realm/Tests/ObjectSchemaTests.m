@@ -96,6 +96,16 @@
     objectSchema = [RLMObjectSchema schemaForObjectClass:[RenamedProperties class]];
     XCTAssertEqualObjects(objectSchema.description,
                           @"RenamedProperties {\n"
+                          @"\tintCol {\n"
+                          @"\t\ttype = int;\n"
+                          @"\t\tcolumnName = custom_intCol;\n"
+                          @"\t\tindexed = NO;\n"
+                          @"\t\tisPrimary = NO;\n"
+                          @"\t\tarray = NO;\n"
+                          @"\t\tset = NO;\n"
+                          @"\t\tdictionary = NO;\n"
+                          @"\t\toptional = NO;\n"
+                          @"\t}\n"
                           @"\tstringCol {\n"
                           @"\t\ttype = string;\n"
                           @"\t\tcolumnName = custom_stringCol;\n"

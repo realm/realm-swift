@@ -696,6 +696,7 @@ RLM_COLLECTION_TYPE(PrimaryCompanyObject);
 @end
 
 @interface RenamedProperties : RLMObject
+@property (nonatomic) int intCol;
 @property NSString *stringCol;
 @end
 

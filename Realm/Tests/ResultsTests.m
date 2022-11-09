@@ -435,7 +435,7 @@
         RLMRealm *realm = self.realmWithTestPath;
         [realm transactionWithBlock:^{
             LinkToRenamedProperties *object = (LinkToRenamedProperties *)[LinkToRenamedProperties allObjectsInRealm:realm].firstObject;
-            RenamedProperties *linkedObject = [RenamedProperties createInRealm:realm withValue:@[@""]];
+            RenamedProperties *linkedObject = [RenamedProperties createInRealm:realm withValue:@[@1, @""]];
             object.link = linkedObject;
         }];
     }];
