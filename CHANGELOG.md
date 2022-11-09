@@ -11,7 +11,7 @@ x.y.z Release notes (yyyy-MM-dd)
   an arm64 slice. The Swift release package was uneffected
   ([PR #8016](https://github.com/realm/realm-swift/pull/8016)).
 * Fix issue where `RLMUserAPIKey.key`/`UserAPIKey.key` incorrectly returned the name of the API 
-  key instead of the key itself. ([#????](https://github.com/realm/realm-swift/issues/8021), since v10.0.0)
+  key instead of the key itself. ([#8021](https://github.com/realm/realm-swift/issues/8021), since v10.0.0)
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
