@@ -340,6 +340,7 @@ static NSString *randomEmail() {
     [[syncUser apiKeysAuth] createAPIKeyWithName:@"apiKeyName1" completion:^(RLMUserAPIKey *userAPIKey, NSError *error) {
         XCTAssert(!error);
         XCTAssert([userAPIKey.name isEqualToString:@"apiKeyName1"]);
+        XCTAssert(![userAPIKey.key isEqualToString:@"apiKeyName1"] && userAPIKey.key.length > 0);
         userAPIKeyA = userAPIKey;
         [createAPIKeyExpectationA fulfill];
     }];

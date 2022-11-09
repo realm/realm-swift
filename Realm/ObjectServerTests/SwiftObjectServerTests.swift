@@ -1767,6 +1767,10 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let syncUser = app.login(credentials: credentials).await(self)
 
         let apiKey = syncUser.apiKeysAuth.createAPIKey(named: "my-api-key").await(self)
+        XCTAssertEqual(apiKey.name, "my-api-key")
+        XCTAssertNotNil(apiKey.key)
+        XCTAssertNotEqual(apiKey.key!, "my-api-key")
+        XCTAssertFalse(apiKey.key!.isEmpty)
 
         syncUser.apiKeysAuth.fetchAPIKey(apiKey.objectId).await(self)
 
