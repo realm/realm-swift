@@ -1,29 +1,23 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.32.3 Release notes (2022-11-10)
 =============================================================
-### Enhancements
-* None.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
+
 * Fix name lookup errors when importing Realm Swift built in library evolution
   mode (([#8014](https://github.com/realm/realm-swift/issues/8014)).
 * The prebuilt watchOS library in the objective-c release package was missing
   an arm64 slice. The Swift release package was uneffected
   ([PR #8016](https://github.com/realm/realm-swift/pull/8016)).
-* Fix issue where `RLMUserAPIKey.key`/`UserAPIKey.key` incorrectly returned the name of the API 
+* Fix issue where `RLMUserAPIKey.key`/`UserAPIKey.key` incorrectly returned the name of the API
   key instead of the key itself. ([#8021](https://github.com/realm/realm-swift/issues/8021), since v10.0.0)
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
-
 ### Compatibility
+
 * Realm Studio: 11.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 14.1.
 * CocoaPods: 1.10 or later.
 * Xcode: 13.1-14.1.
-
-### Internal
-* Upgraded realm-core from ? to ?
 
 10.32.2 Release notes (2022-11-01)
 =============================================================
