@@ -321,7 +321,7 @@ extension SwiftAsymmetricSyncTests {
         let document = try await collection.findOneDocument(filter: filter)
         XCTAssertNotNil(document)
 
-        XCTAssertEqual(document!["custom_id"], AnyBSON(objectId))
+        XCTAssertEqual(document!["_id"], AnyBSON(objectId))
         XCTAssertEqual(document!["custom_boolCol"], AnyBSON(false))
         XCTAssertEqual(document!["custom_intCol"], AnyBSON(1234))
         XCTAssertEqual(document!["custom_doubleCol"], AnyBSON(1234.1234))

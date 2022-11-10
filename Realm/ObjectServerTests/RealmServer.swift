@@ -1127,7 +1127,6 @@ public class RealmServer: NSObject {
         }
 
         completion(.success(schemaProperties.compactMap { $0.key }))
-
     }
 }
 
