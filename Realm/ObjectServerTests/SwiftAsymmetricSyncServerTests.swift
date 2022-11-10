@@ -303,11 +303,11 @@ extension SwiftAsymmetricSyncTests {
         XCTAssertNotNil(realm)
 
         let objectId = ObjectId.generate()
-        let valuesDictionary: [String: any BSON] = ["id": objectId,
-                                                    "boolCol": false,
-                                                    "intCol": 1234,
-                                                    "doubleCol": 1234.1234,
-                                                    "stringCol": "$%&/("]
+        let valuesDictionary: [String: Any] = ["id": objectId,
+                                               "boolCol": false,
+                                               "intCol": 1234,
+                                               "doubleCol": 1234.1234,
+                                               "stringCol": "$%&/("]
 
         // Create Asymmetric Objects
         try realm.write {
@@ -321,11 +321,11 @@ extension SwiftAsymmetricSyncTests {
         let document = try await collection.findOneDocument(filter: filter)
         XCTAssertNotNil(document)
 
-        for (key, customKey) in customColumnAsymmetricPropertiesMapping {
-            if let value = valuesDictionary[key] as? AnyBSON {
-                XCTAssertEqual(document![customKey], AnyBSON(value))
-            }
-        }
+        XCTAssertEqual(document!["custom_id"], AnyBSON(objectId))
+        XCTAssertEqual(document!["custom_boolCol"], AnyBSON(false))
+        XCTAssertEqual(document!["custom_intCol"], AnyBSON(1234))
+        XCTAssertEqual(document!["custom_doubleCol"], AnyBSON(1234.1234))
+        XCTAssertEqual(document!["custom_stringCol"], AnyBSON("$%&/("))
     }
 }
 #endif // canImport(_Concurrency)

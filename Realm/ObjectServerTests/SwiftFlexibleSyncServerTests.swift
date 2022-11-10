@@ -1291,6 +1291,23 @@ extension SwiftFlexibleSyncServerTests {
 
     @MainActor
     func testCreateCustomColumnFlexibleSyncSubscription() async throws {
+        let objectId = ObjectId.generate()
+        try await populateFlexibleSyncData { realm in
+            let valuesDictionary: [String: Any] = ["id": objectId,
+                                                   "boolCol": true,
+                                                   "intCol": 365,
+                                                   "doubleCol": 365.365,
+                                                   "stringCol": "@#¢∞¬÷÷",
+                                                   "binaryCol": "string".data(using: String.Encoding.utf8)!,
+                                                   "dateCol": Date(timeIntervalSince1970: -365),
+                                                   "longCol": 365,
+                                                   "decimalCol": Decimal128(365),
+                                                   "uuidCol": UUID(uuidString: "629bba42-97dc-4fee-97ff-78af054952ec")!,
+                                                   "objectIdCol": ObjectId.generate()]
+
+            realm.create(SwiftCustomColumnObject.self, value: valuesDictionary)
+        }
+
         let user = try await logInUser(for: basicCredentials(app: self.flexibleSyncApp), app: self.flexibleSyncApp)
         var config = user.flexibleSyncConfiguration(initialSubscriptions: { subscriptions in
             subscriptions.append(QuerySubscription<SwiftCustomColumnObject>())
@@ -1299,50 +1316,21 @@ extension SwiftFlexibleSyncServerTests {
         let realm = try await Realm(configuration: config, downloadBeforeOpen: .once)
         XCTAssertNotNil(realm)
         XCTAssertEqual(realm.subscriptions.count, 1)
-        // Ensure a clean state in the realm
-        realm.deleteAll()
 
-        let objectId = ObjectId.generate()
-        let valuesDictionary: [String: any BSON] = ["id": objectId,
-                                                    "boolCol": true,
-                                                    "intCol": 365,
-                                                    "doubleCol": 365.365,
-                                                    "stringCol": "@#¢∞¬÷÷",
-                                                    "dateCol": Date(timeIntervalSince1970: -365),
-                                                    "longCol": 365,
-                                                    "decimalCol": Decimal128(365),
-                                                    "uuidCol": UUID(uuidString: "629bba42-97dc-4fee-97ff-78af054952ec")!,
-                                                    "objectIdCol": ObjectId.generate()]
-
-        try realm.write {
-            realm.create(SwiftCustomColumnObject.self, value: valuesDictionary)
-        }
-        checkCount(expected: 1, realm, SwiftCustomColumnObject.self)
-        waitForUploads(for: realm)
-
-        let user1 = try await logInUser(for: basicCredentials(app: self.flexibleSyncApp), app: self.flexibleSyncApp)
-        var config2 = user1.flexibleSyncConfiguration(initialSubscriptions: { subscriptions in
-            subscriptions.append(QuerySubscription<SwiftCustomColumnObject>())
-        })
-        config2.objectTypes = [SwiftCustomColumnObject.self]
-        let realm1 = try await Realm(configuration: config2, downloadBeforeOpen: .once)
-        XCTAssertNotNil(realm1)
-        XCTAssertEqual(realm1.subscriptions.count, 1)
-        checkCount(expected: 1, realm1, SwiftCustomColumnObject.self)
-
-        let foundObject = realm1.object(ofType: SwiftCustomColumnObject.self, forPrimaryKey: objectId)
+        let foundObject = realm.object(ofType: SwiftCustomColumnObject.self, forPrimaryKey: objectId)
         XCTAssertNotNil(foundObject)
         XCTAssertEqual(foundObject!.id, objectId)
         XCTAssertEqual(foundObject!.boolCol, true)
-        XCTAssertEqual(foundObject!.intCol, 1)
-        XCTAssertEqual(foundObject!.doubleCol, 1.1)
-        XCTAssertEqual(foundObject!.stringCol, "string")
+        XCTAssertEqual(foundObject!.intCol, 365)
+        XCTAssertEqual(foundObject!.doubleCol, 365.365)
+        XCTAssertEqual(foundObject!.stringCol, "@#¢∞¬÷÷")
         XCTAssertEqual(foundObject!.binaryCol, "string".data(using: String.Encoding.utf8)!)
-        XCTAssertEqual(foundObject!.dateCol, Date(timeIntervalSince1970: -1))
-        XCTAssertEqual(foundObject!.longCol, 1)
-        XCTAssertEqual(foundObject!.decimalCol, Decimal128(1))
-        XCTAssertEqual(foundObject!.uuidCol, UUID(uuidString: "85d4fbee-6ec6-47df-bfa1-615931903d7e")!)
-        XCTAssertNil(foundObject?.objectIdCol)
+        XCTAssertEqual(foundObject!.dateCol, Date(timeIntervalSince1970: -365))
+        XCTAssertEqual(foundObject!.longCol, 365)
+        XCTAssertEqual(foundObject!.decimalCol, Decimal128(365))
+        XCTAssertEqual(foundObject!.uuidCol, UUID(uuidString: "629bba42-97dc-4fee-97ff-78af054952ec")!)
+        XCTAssertNotNil(foundObject?.objectIdCol)
+        XCTAssertNil(foundObject?.objectCol)
     }
 
     @MainActor

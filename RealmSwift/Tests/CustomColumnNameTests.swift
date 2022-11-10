@@ -617,10 +617,6 @@ class CustomColumnResultsTest<O: CustomColumnObjectFactory, F: CustomColumnResul
         let predicate = NSPredicate(format: queryStr, argumentArray: constructedValues)
         let predicateResults: Results<O.Root> = results.filter(predicate)
         XCTAssertEqual(predicateResults.count, expectedCount)
-
-        // Filter
-        let filterResults: Results<O.Root> = results.filter(queryStr, constructedValues)
-        XCTAssertEqual(filterResults.count, expectedCount)
     }
 
     private func assertIndexMatching(_ query: ((Query<O.Root>) -> Query<Bool>),
@@ -644,7 +640,7 @@ class CustomColumnResultsTest<O: CustomColumnObjectFactory, F: CustomColumnResul
     }
 }
 
-class CustomColumnResultsAggregatesTest<O: CustomColumnObjectFactory, F: CustomColumnAggregatesTypeFactory>: CustomColumnResultsTestBase<O, F> where O.Root == F.Root, F.ValueType: Equatable & _HasPersistedType {
+class CustomColumnResultsAggregatesTest<O: CustomColumnObjectFactory, F: CustomColumnAggregatesTypeFactory>: CustomColumnResultsTestBase<O, F> where O.Root == F.Root, F.ValueType: Equatable {
     // MARK: - Aggregates
 
     func testCustomColumnResultsAggregateAvg() throws {
@@ -677,32 +673,32 @@ class CustomColumnResultsAggregatesTest<O: CustomColumnObjectFactory, F: CustomC
 
     // MARK: - Private
 
-    private func assertAverage(for keyPath: KeyPath<O.Root, F.ValueType>, value: F.ValueType) where F.ValueType.PersistedType: AddableType {
+    private func assertAverage(for keyPath: KeyPath<O.Root, F.ValueType>, value: F.ValueType) {
         XCTAssertEqual(results.average(of: keyPath), value)
         let average: F.ValueType? = results.average(ofProperty: _name(for: keyPath))
         XCTAssertEqual(average, value)
     }
 
-    private func assertSum(for keyPath: KeyPath<O.Root, F.ValueType>, value: F.ValueType) where F.ValueType.PersistedType: AddableType {
+    private func assertSum(for keyPath: KeyPath<O.Root, F.ValueType>, value: F.ValueType) {
         XCTAssertEqual(results.sum(of: keyPath), value)
         let average: F.ValueType? = results.sum(ofProperty: _name(for: keyPath))
         XCTAssertEqual(average, value)
     }
 
-    private func assertMax(for keyPath: KeyPath<O.Root, F.ValueType>, value: F.ValueType) where F.ValueType.PersistedType: MinMaxType {
+    private func assertMax(for keyPath: KeyPath<O.Root, F.ValueType>, value: F.ValueType) {
         XCTAssertEqual(results.max(of: keyPath), value)
         let average: F.ValueType? = results.max(ofProperty: _name(for: keyPath))
         XCTAssertEqual(average, value)
     }
 
-    private func assertMin(for keyPath: KeyPath<O.Root, F.ValueType>, value: F.ValueType) where F.ValueType.PersistedType: MinMaxType {
+    private func assertMin(for keyPath: KeyPath<O.Root, F.ValueType>, value: F.ValueType) {
         XCTAssertEqual(results.min(of: keyPath), value)
         let average: F.ValueType? = results.min(ofProperty: _name(for: keyPath))
         XCTAssertEqual(average, value)
     }
 }
 
-class CustomColumnResultsSectionedTest<O: CustomColumnObjectFactory, F: CustomColumnResultsSectionedTypeFactory>: CustomColumnResultsTestBase<O, F> where O.Root == F.Root, F.ValueType: _Persistable & Hashable {
+class CustomColumnResultsSectionedTest<O: CustomColumnObjectFactory, F: CustomColumnResultsSectionedTypeFactory>: CustomColumnResultsTestBase<O, F> where O.Root == F.Root {
     // MARK: - Sectioned
 
     func testCustomColumnSectionedResults() throws {
@@ -860,7 +856,7 @@ class CustomColumnSetTest<O: CustomColumnObjectFactory, F: CustomColumnTypeFacto
     }
 }
 
-class CustomColumnMapTestBase<O: CustomColumnObjectFactory, F: CustomColumnMapTypeBaseFactory>: CustomColumnTestsBase<O, F> where O.Root == F.Root, F.ValueType: RealmCollectionValue, O.Root: ObjectBase {
+class CustomColumnMapTestBase<O: CustomColumnObjectFactory, F: CustomColumnMapTypeBaseFactory>: CustomColumnTestsBase<O, F> where O.Root == F.Root {
     var map: Map<String, O.Root?>!
 
     override func setUp() {
@@ -885,7 +881,7 @@ class CustomColumnMapTestBase<O: CustomColumnObjectFactory, F: CustomColumnMapTy
     }
 }
 
-class CustomColumnMapTest<O: CustomColumnObjectFactory, F: CustomColumnMapTypeFactory>: CustomColumnMapTestBase<O, F> where O.Root == F.Root, F.ValueType: RealmCollectionValue, O.Root: ObjectBase {
+class CustomColumnMapTest<O: CustomColumnObjectFactory, F: CustomColumnMapTypeFactory>: CustomColumnMapTestBase<O, F> where O.Root == F.Root, F.ValueType: Equatable {
     // MARK: - ValueForKey
 
     func testCustomColumnMapGetValueForKey() throws {
@@ -944,7 +940,7 @@ class CustomColumnMapTest<O: CustomColumnObjectFactory, F: CustomColumnMapTypeFa
     }
 }
 
-class CustomColumnAggregatesMapTest<O: CustomColumnObjectFactory, F: CustomColumnMapAggregatesTypeFactory>: CustomColumnMapTestBase<O, F> where O.Root == F.Root, F.ValueType: RealmCollectionValue, O.Root: ObjectBase, F.ValueType: Equatable & _HasPersistedType {
+class CustomColumnAggregatesMapTest<O: CustomColumnObjectFactory, F: CustomColumnMapAggregatesTypeFactory>: CustomColumnMapTestBase<O, F> where O.Root == F.Root, F.ValueType: RealmCollectionValue {
     // MARK: - Aggregates
 
     func testCustomColumnResultsAggregateAvg() throws {
@@ -977,25 +973,25 @@ class CustomColumnAggregatesMapTest<O: CustomColumnObjectFactory, F: CustomColum
 
     // MARK: - Private
 
-    private func assertAverage(for keyPath: KeyPath<O.Root, F.ValueType>, value: F.ValueType) where F.ValueType.PersistedType: AddableType {
+    private func assertAverage(for keyPath: KeyPath<O.Root, F.ValueType>, value: F.ValueType) {
         XCTAssertEqual(map.average(of: keyPath), value)
         let average: F.ValueType? = map.average(ofProperty: _name(for: keyPath))
         XCTAssertEqual(average, value)
     }
 
-    private func assertSum(for keyPath: KeyPath<O.Root, F.ValueType>, value: F.ValueType) where F.ValueType.PersistedType: AddableType {
+    private func assertSum(for keyPath: KeyPath<O.Root, F.ValueType>, value: F.ValueType) {
         XCTAssertEqual(map.sum(of: keyPath), value)
         let average: F.ValueType? = map.sum(ofProperty: _name(for: keyPath))
         XCTAssertEqual(average, value)
     }
 
-    private func assertMax(for keyPath: KeyPath<O.Root, F.ValueType>, value: F.ValueType) where F.ValueType.PersistedType: MinMaxType {
+    private func assertMax(for keyPath: KeyPath<O.Root, F.ValueType>, value: F.ValueType) {
         XCTAssertEqual(map.max(of: keyPath), value)
         let average: F.ValueType? = map.max(ofProperty: _name(for: keyPath))
         XCTAssertEqual(average, value)
     }
 
-    private func assertMin(for keyPath: KeyPath<O.Root, F.ValueType>, value: F.ValueType) where F.ValueType.PersistedType: MinMaxType {
+    private func assertMin(for keyPath: KeyPath<O.Root, F.ValueType>, value: F.ValueType) {
         XCTAssertEqual(map.min(of: keyPath), value)
         let average: F.ValueType? = map.min(ofProperty: _name(for: keyPath))
         XCTAssertEqual(average, value)
@@ -1004,7 +1000,7 @@ class CustomColumnAggregatesMapTest<O: CustomColumnObjectFactory, F: CustomColum
 
 class CustomObjectTests: TestCase {
     override class var defaultTestSuite: XCTestSuite {
-        let suite = XCTestSuite(name: "Custom Column Name Tests")
+        let suite = XCTestSuite(name: "CustomColumnNameTests")
 
         // MARK: - Results
         // ModernCustomObject
@@ -1122,7 +1118,7 @@ protocol CustomColumnMapTypeBaseFactory: CustomColumnTypeFactoryBase {
     static var keyValues: [String: (KeyPath<Root, ValueType>, ValueType)] { get }
 }
 
-protocol CustomColumnObjectKeyedTypeFactory: CustomColumnTypeFactoryBase where ValueType: RealmKeyedCollection, ValueType.Value: RealmCollectionValue {
+protocol CustomColumnObjectKeyedTypeFactory: CustomColumnTypeFactoryBase where ValueType: RealmKeyedCollection {
     static var dynamicMapValue: [KeyPath<Root, ValueType>: Int] { get }
 }
 
