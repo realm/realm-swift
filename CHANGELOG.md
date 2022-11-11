@@ -1,11 +1,13 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+* Flexible sync subscription state will change to `SyncSubscriptionState.pending` (`RLMSyncSubscriptionStatePending`) while waiting for the server to have sent all pending history after a bootstrap and before marking a subscription as Complete.  ([#5795](https://github.com/realm/realm-core/pull/5795))
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
-* None.
+* Fix a race condition which could result in "operation cancelled" errors being delivered to async open callbacks rather than the actual sync error which caused things to fail ([PR #5968](https://github.com/realm/realm-core/pull/5968), since the introduction of async open).
+* Fix `Results.distinct(keypaths)` and `Results.sort(keypaths)` not correctly handling keypaths names for properties that have a public/private(column) property name ([PR #5952](https://github.com/realm/realm-core/pull/5952).
+* Bootstraps will not be applied in a single write transaction - they will be applied 1MB of changesets at a time, or as configured by the SDK ([#5999](https://github.com/realm/realm-core/pull/5999), since v12.0.0).
+* Fix database corruption and encryption issues on apple platforms, reported in several bugs listed in the PR. ([PR #5993](https://github.com/realm/realm-core/pull/5993), since v11.8.0)
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
@@ -17,7 +19,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * Xcode: 13.1-14.1.
 
 ### Internal
-* Upgraded realm-core from ? to ?
+* Upgraded realm-core from 12.11.0 to 12.12.0
 
 10.32.3 Release notes (2022-11-10)
 =============================================================
