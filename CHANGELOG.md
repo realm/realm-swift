@@ -5,9 +5,8 @@ x.y.z Release notes (yyyy-MM-dd)
 
 ### Fixed
 * Fix a race condition which could result in "operation cancelled" errors being delivered to async open callbacks rather than the actual sync error which caused things to fail ([PR #5968](https://github.com/realm/realm-core/pull/5968), since the introduction of async open).
-* Fix `Results.distinct(keypaths)` and `Results.sort(keypaths)` not correctly handling keypaths names for properties that have a public/private(column) property name ([PR #5952](https://github.com/realm/realm-core/pull/5952).
-* Bootstraps will not be applied in a single write transaction - they will be applied 1MB of changesets at a time, or as configured by the SDK ([#5999](https://github.com/realm/realm-core/pull/5999), since v12.0.0).
-* Fix database corruption and encryption issues on apple platforms, reported in several bugs listed in the PR. ([PR #5993](https://github.com/realm/realm-core/pull/5993), since v11.8.0)
+* Bootstraps will not be applied in a single write transaction - they will be applied 1MB of changesets at a time, or as configured by the SDK ([#5999](https://github.com/realm/realm-core/pull/5999), since v10.27.0).
+* Fix database corruption and encryption issues on apple platforms, reported in several bugs listed in the PR. ([PR #5993](https://github.com/realm/realm-core/pull/5993), since v10.21.1)
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
