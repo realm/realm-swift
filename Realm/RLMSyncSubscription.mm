@@ -216,6 +216,7 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
         case realm::sync::SubscriptionSet::State::Uncommitted:
         case realm::sync::SubscriptionSet::State::Pending:
         case realm::sync::SubscriptionSet::State::Bootstrapping:
+        case realm::sync::SubscriptionSet::State::AwaitingMark:
             return RLMSyncSubscriptionStatePending;
         case realm::sync::SubscriptionSet::State::Complete:
             return RLMSyncSubscriptionStateComplete;
