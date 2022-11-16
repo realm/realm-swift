@@ -3061,7 +3061,6 @@ class AsyncAwaitObjectServerTests: SwiftSyncTestCase {
         XCTAssertEqual(realm3.objects(SwiftHugeSyncObject.self).count, 2)
     }
 
-
     @MainActor func testAsyncOpenDownloadBehaviorAlways() async throws {
         // Populate the Realm on the server
         let user1 = try await self.app.login(credentials: basicCredentials())
@@ -3090,6 +3089,38 @@ class AsyncAwaitObjectServerTests: SwiftSyncTestCase {
         let realm3 = try await Realm(configuration: user2.configuration(testName: #function),
                                      downloadBeforeOpen: .always)
         XCTAssertEqual(realm3.objects(SwiftHugeSyncObject.self).count, 4)
+    }
+
+    @MainActor func testAsyncOpenWithProgressNotification() async throws {
+        // Populate the Realm on the server
+        let user1 = try await self.app.login(credentials: basicCredentials())
+        let realm1 = try await Realm(configuration: user1.configuration(testName: #function))
+        try realm1.write {
+            realm1.add(SwiftHugeSyncObject.create())
+            realm1.add(SwiftHugeSyncObject.create())
+        }
+        waitForUploads(for: realm1)
+
+        var transferred = 0
+        var transferrable = 0
+        let user2 = try await app.login(credentials: .anonymous)
+        var ex = expectation(description: "Progresss Notification")
+        let realm2 = try await Realm(configuration: user2.configuration(testName: #function),
+                                     downloadBeforeOpen: .once,
+                                     progress: { progress in
+            XCTAssert(progress.transferredBytes >= transferred)
+            XCTAssert(progress.transferrableBytes >= transferrable)
+            transferred = progress.transferredBytes
+            transferrable = progress.transferrableBytes
+            if progress.transferredBytes > 0 && progress.isTransferComplete {
+                ex.fulfill()
+            }
+        })
+        waitForExpectations(timeout: 10.0, handler: nil)
+        XCTAssert(transferred >= transferrable)
+
+        XCTAssertEqual(realm2.objects(SwiftHugeSyncObject.self).count, 2)
+        realm2.syncSession?.suspend()
     }
 
     func testCallResetPasswordAsyncAwait() async throws {

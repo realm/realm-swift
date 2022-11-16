@@ -1206,7 +1206,8 @@ extension Realm {
      */
     @MainActor
     public init(configuration: Realm.Configuration = .defaultConfiguration,
-                downloadBeforeOpen: OpenBehavior = .never) async throws {
+                downloadBeforeOpen: OpenBehavior = .never,
+                progress block: ((SyncSession.Progress) -> Void)? = nil) async throws {
         var rlmRealm: RLMRealm?
         switch downloadBeforeOpen {
         case .never:
@@ -1217,11 +1218,16 @@ extension Realm {
             }
         case .always:
             rlmRealm = try await withCheckedThrowingContinuation { continuation in
-                RLMRealm.asyncOpen(with: configuration.rlmConfiguration, callbackQueue: .main) { (realm, error) in
+                let rlmTask = RLMRealm.asyncOpen(with: configuration.rlmConfiguration, callbackQueue: .main) { (realm, error) in
                     if let error = error {
                         continuation.resume(with: .failure(error))
                     } else {
                         continuation.resume(with: .success(realm!))
+                    }
+                }
+                if let block = block {
+                    rlmTask.addProgressNotification(on: DispatchQueue.main) { transferred, transferrable in
+                        block(SyncSession.Progress(transferred: transferred, transferrable: transferrable))
                     }
                 }
             }
