@@ -567,7 +567,6 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
         }
     }
 
-
     func testFlexibleSyncTransactionsWithPredicateFormatAndNSPredicate() throws {
         let realm = try openFlexibleSyncRealm()
         let subscriptions = realm.subscriptions
@@ -999,19 +998,6 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
 // MARK: - Async Await
 #if swift(>=5.6) && canImport(_Concurrency)
 @available(macOS 12.0, *)
-class SwiftAsyncFlexibleSyncTests: SwiftSyncTestCase {
-    override class var defaultTestSuite: XCTestSuite {
-        // async/await is currently incompatible with thread sanitizer and will
-        // produce many false positives
-        // https://bugs.swift.org/browse/SR-15444
-        if RLMThreadSanitizerEnabled() {
-            return XCTestSuite(name: "\(type(of: self))")
-        }
-        return super.defaultTestSuite
-    }
-}
-
-@available(macOS 12.0, *)
 extension SwiftFlexibleSyncServerTests {
     @MainActor
     private func populateFlexibleSyncData(_ block: @escaping (Realm) -> Void) async throws {
@@ -1020,11 +1006,22 @@ extension SwiftFlexibleSyncServerTests {
         try await subscriptions.update {
             subscriptions.append(QuerySubscription<SwiftPerson>())
             subscriptions.append(QuerySubscription<SwiftTypesSyncObject>())
+            subscriptions.append(QuerySubscription<SwiftCustomColumnObject>())
         }
 
         try realm.write {
             block(realm)
         }
+    }
+
+    @MainActor
+    func setupCollection(_ collection: String) async throws -> MongoCollection {
+        let user = try await flexibleSyncApp.login(credentials: .anonymous)
+        let mongoClient = user.mongoClient("mongodb1")
+        let database = mongoClient.database(named: "test_data")
+        let collection =  database.collection(withName: collection)
+        removeAllFromCollection(collection)
+        return collection
     }
 
     @MainActor
@@ -1147,11 +1144,6 @@ extension SwiftFlexibleSyncServerTests {
         XCTAssertNotNil(realm)
 
         XCTAssertEqual(realm.subscriptions.count, 1)
-        // Adding this sleep, because there seems to be a timing issue after this commit in baas
-        // https://github.com/10gen/baas/commit/64e75b3f1fe8a6f8704d1597de60f9dda401ccce,
-        // data take a little longer to be downloaded to the realm even though the
-        // sync client changed the subscription state to completed.
-        sleep(1)
         checkCount(expected: 10, realm, SwiftPerson.self)
     }
 
@@ -1235,11 +1227,6 @@ extension SwiftFlexibleSyncServerTests {
             let realm = try await Realm(configuration: c, downloadBeforeOpen: .always)
             XCTAssertNotNil(realm)
             XCTAssertEqual(realm.subscriptions.count, 1)
-            // Adding this sleep, because there seems to be a timing issue after this commit in baas
-            // https://github.com/10gen/baas/commit/64e75b3f1fe8a6f8704d1597de60f9dda401ccce,
-            // data take a little longer to be downloaded to the realm even though the
-            // sync client changed the subscription state to completed.
-            sleep(1)
             checkCount(expected: 9, realm, SwiftTypesSyncObject.self)
         }.value
 
@@ -1286,6 +1273,187 @@ extension SwiftFlexibleSyncServerTests {
 
         let realm = try await Realm(downloadBeforeOpen: .once)
         XCTAssertEqual(realm.subscriptions.count, 1)
+    }
+
+    // MARK: - Custom Column
+
+    @MainActor
+    func testCustomColumnFlexibleSyncSchema() async throws {
+        let user = try await logInUser(for: basicCredentials(app: self.flexibleSyncApp), app: self.flexibleSyncApp)
+        var config = user.flexibleSyncConfiguration()
+        config.objectTypes = [SwiftCustomColumnObject.self]
+        let realm = try await Realm(configuration: config)
+
+        for property in realm.schema.objectSchema.first(where: { $0.className == "SwiftCustomColumnObject" })!.properties {
+            XCTAssertEqual(customColumnPropertiesMapping[property.name], property.columnName)
+        }
+    }
+
+    @MainActor
+    func testCreateCustomColumnFlexibleSyncSubscription() async throws {
+        let objectId = ObjectId.generate()
+        try await populateFlexibleSyncData { realm in
+            let valuesDictionary: [String: Any] = ["id": objectId,
+                                                   "boolCol": true,
+                                                   "intCol": 365,
+                                                   "doubleCol": 365.365,
+                                                   "stringCol": "@#¢∞¬÷÷",
+                                                   "binaryCol": "string".data(using: String.Encoding.utf8)!,
+                                                   "dateCol": Date(timeIntervalSince1970: -365),
+                                                   "longCol": 365,
+                                                   "decimalCol": Decimal128(365),
+                                                   "uuidCol": UUID(uuidString: "629bba42-97dc-4fee-97ff-78af054952ec")!,
+                                                   "objectIdCol": ObjectId.generate()]
+
+            realm.create(SwiftCustomColumnObject.self, value: valuesDictionary)
+        }
+
+        let user = try await logInUser(for: basicCredentials(app: self.flexibleSyncApp), app: self.flexibleSyncApp)
+        var config = user.flexibleSyncConfiguration(initialSubscriptions: { subscriptions in
+            subscriptions.append(QuerySubscription<SwiftCustomColumnObject>())
+        })
+        config.objectTypes = [SwiftCustomColumnObject.self]
+        let realm = try await Realm(configuration: config, downloadBeforeOpen: .once)
+        XCTAssertNotNil(realm)
+        XCTAssertEqual(realm.subscriptions.count, 1)
+
+        let foundObject = realm.object(ofType: SwiftCustomColumnObject.self, forPrimaryKey: objectId)
+        XCTAssertNotNil(foundObject)
+        XCTAssertEqual(foundObject!.id, objectId)
+        XCTAssertEqual(foundObject!.boolCol, true)
+        XCTAssertEqual(foundObject!.intCol, 365)
+        XCTAssertEqual(foundObject!.doubleCol, 365.365)
+        XCTAssertEqual(foundObject!.stringCol, "@#¢∞¬÷÷")
+        XCTAssertEqual(foundObject!.binaryCol, "string".data(using: String.Encoding.utf8)!)
+        XCTAssertEqual(foundObject!.dateCol, Date(timeIntervalSince1970: -365))
+        XCTAssertEqual(foundObject!.longCol, 365)
+        XCTAssertEqual(foundObject!.decimalCol, Decimal128(365))
+        XCTAssertEqual(foundObject!.uuidCol, UUID(uuidString: "629bba42-97dc-4fee-97ff-78af054952ec")!)
+        XCTAssertNotNil(foundObject?.objectIdCol)
+        XCTAssertNil(foundObject?.objectCol)
+    }
+
+    @MainActor
+    func testCustomColumnFlexibleSyncSubscriptionNSPredicate() async throws {
+        let objectId = ObjectId.generate()
+        let linkedObjectId = ObjectId.generate()
+        try await populateFlexibleSyncData { realm in
+            let object = SwiftCustomColumnObject()
+            object.id = objectId
+            object.binaryCol = "string".data(using: String.Encoding.utf8)!
+            let linkedObject = SwiftCustomColumnObject()
+            linkedObject.id = linkedObjectId
+            object.objectCol = linkedObject
+            realm.add(object)
+        }
+        let user = try await logInUser(for: basicCredentials(app: self.flexibleSyncApp), app: self.flexibleSyncApp)
+
+        var config = user.flexibleSyncConfiguration(initialSubscriptions: { subscriptions in
+            subscriptions.append(QuerySubscription<SwiftCustomColumnObject>(where: NSPredicate(format: "id == %@ || id == %@", objectId, linkedObjectId)))
+        })
+        config.objectTypes = [SwiftCustomColumnObject.self]
+        let realm = try await Realm(configuration: config, downloadBeforeOpen: .once)
+        XCTAssertNotNil(realm)
+        XCTAssertEqual(realm.subscriptions.count, 1)
+        checkCount(expected: 2, realm, SwiftCustomColumnObject.self)
+
+        let foundObject = realm.objects(SwiftCustomColumnObject.self).where { $0.id == objectId }.first
+        XCTAssertNotNil(foundObject)
+        XCTAssertEqual(foundObject!.id, objectId)
+        XCTAssertEqual(foundObject!.boolCol, true)
+        XCTAssertEqual(foundObject!.intCol, 1)
+        XCTAssertEqual(foundObject!.doubleCol, 1.1)
+        XCTAssertEqual(foundObject!.stringCol, "string")
+        XCTAssertEqual(foundObject!.binaryCol, "string".data(using: String.Encoding.utf8)!)
+        XCTAssertEqual(foundObject!.dateCol, Date(timeIntervalSince1970: -1))
+        XCTAssertEqual(foundObject!.longCol, 1)
+        XCTAssertEqual(foundObject!.decimalCol, Decimal128(1))
+        XCTAssertEqual(foundObject!.uuidCol, UUID(uuidString: "85d4fbee-6ec6-47df-bfa1-615931903d7e")!)
+        XCTAssertNil(foundObject?.objectIdCol)
+        XCTAssertEqual(foundObject!.objectCol!.id, linkedObjectId)
+    }
+
+    @MainActor
+    func testCustomColumnFlexibleSyncSubscriptionFilter() async throws {
+        let objectId = ObjectId.generate()
+        let linkedObjectId = ObjectId.generate()
+        try await populateFlexibleSyncData { realm in
+            let object = SwiftCustomColumnObject()
+            object.id = objectId
+            object.binaryCol = "string".data(using: String.Encoding.utf8)!
+            let linkedObject = SwiftCustomColumnObject()
+            linkedObject.id = linkedObjectId
+            object.objectCol = linkedObject
+            realm.add(object)
+        }
+        let user = try await logInUser(for: basicCredentials(app: self.flexibleSyncApp), app: self.flexibleSyncApp)
+
+        var config = user.flexibleSyncConfiguration(initialSubscriptions: { subscriptions in
+            subscriptions.append(QuerySubscription<SwiftCustomColumnObject>(where: "id == %@ || id == %@", objectId, linkedObjectId))
+        })
+        config.objectTypes = [SwiftCustomColumnObject.self]
+        let realm = try await Realm(configuration: config, downloadBeforeOpen: .once)
+        XCTAssertNotNil(realm)
+        XCTAssertEqual(realm.subscriptions.count, 1)
+        checkCount(expected: 2, realm, SwiftCustomColumnObject.self)
+
+        let foundObject = realm.objects(SwiftCustomColumnObject.self).where { $0.id == objectId }.first
+        XCTAssertNotNil(foundObject)
+        XCTAssertEqual(foundObject!.id, objectId)
+        XCTAssertEqual(foundObject!.boolCol, true)
+        XCTAssertEqual(foundObject!.intCol, 1)
+        XCTAssertEqual(foundObject!.doubleCol, 1.1)
+        XCTAssertEqual(foundObject!.stringCol, "string")
+        XCTAssertEqual(foundObject!.binaryCol, "string".data(using: String.Encoding.utf8)!)
+        XCTAssertEqual(foundObject!.dateCol, Date(timeIntervalSince1970: -1))
+        XCTAssertEqual(foundObject!.longCol, 1)
+        XCTAssertEqual(foundObject!.decimalCol, Decimal128(1))
+        XCTAssertEqual(foundObject!.uuidCol, UUID(uuidString: "85d4fbee-6ec6-47df-bfa1-615931903d7e")!)
+        XCTAssertNil(foundObject?.objectIdCol)
+        XCTAssertEqual(foundObject!.objectCol!.id, linkedObjectId)
+    }
+
+    @MainActor
+    func testCustomColumnFlexibleSyncSubscriptionQuery() async throws {
+        let objectId = ObjectId.generate()
+        let linkedObjectId = ObjectId.generate()
+        try await populateFlexibleSyncData { realm in
+            let object = SwiftCustomColumnObject()
+            object.id = objectId
+            object.binaryCol = "string".data(using: String.Encoding.utf8)!
+            let linkedObject = SwiftCustomColumnObject()
+            linkedObject.id = linkedObjectId
+            object.objectCol = linkedObject
+            realm.add(object)
+        }
+        let user = try await logInUser(for: basicCredentials(app: self.flexibleSyncApp), app: self.flexibleSyncApp)
+
+        var config = user.flexibleSyncConfiguration(initialSubscriptions: { subscriptions in
+            subscriptions.append(QuerySubscription<SwiftCustomColumnObject> {
+                $0.id == objectId || $0.id == linkedObjectId
+            })
+        })
+        config.objectTypes = [SwiftCustomColumnObject.self]
+        let realm = try await Realm(configuration: config, downloadBeforeOpen: .once)
+        XCTAssertNotNil(realm)
+        XCTAssertEqual(realm.subscriptions.count, 1)
+        checkCount(expected: 2, realm, SwiftCustomColumnObject.self)
+
+        let foundObject = realm.objects(SwiftCustomColumnObject.self).where { $0.id == objectId }.first
+
+        XCTAssertNotNil(foundObject)
+        XCTAssertEqual(foundObject!.id, objectId)
+        XCTAssertEqual(foundObject!.boolCol, true)
+        XCTAssertEqual(foundObject!.intCol, 1)
+        XCTAssertEqual(foundObject!.doubleCol, 1.1)
+        XCTAssertEqual(foundObject!.stringCol, "string")
+        XCTAssertEqual(foundObject!.binaryCol, "string".data(using: String.Encoding.utf8)!)
+        XCTAssertEqual(foundObject!.dateCol, Date(timeIntervalSince1970: -1))
+        XCTAssertEqual(foundObject!.longCol, 1)
+        XCTAssertEqual(foundObject!.decimalCol, Decimal128(1))
+        XCTAssertEqual(foundObject!.uuidCol, UUID(uuidString: "85d4fbee-6ec6-47df-bfa1-615931903d7e")!)
+        XCTAssertNil(foundObject?.objectIdCol)
+        XCTAssertEqual(foundObject!.objectCol!.id, linkedObjectId)
     }
 }
 #endif // canImport(_Concurrency)

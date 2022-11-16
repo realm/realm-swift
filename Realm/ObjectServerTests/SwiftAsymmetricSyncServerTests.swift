@@ -102,6 +102,28 @@ class HugeObjectAsymmetric: AsymmetricObject {
     }
 }
 
+let customColumnAsymmetricPropertiesMapping: [String: String] = ["id": "_id",
+                                                                 "boolCol": "custom_boolCol",
+                                                                 "intCol": "custom_intCol",
+                                                                 "doubleCol": "custom_doubleCol",
+                                                                 "stringCol": "custom_stringCol"]
+
+class SwiftCustomColumnAsymmetricObject: AsymmetricObject {
+    @Persisted(primaryKey: true) public var id: ObjectId
+    @Persisted public var boolCol: Bool = true
+    @Persisted public var intCol: Int = 1
+    @Persisted public var doubleCol: Double = 1.1
+    @Persisted public var stringCol: String = "string"
+
+    override class func propertiesMapping() -> [String: String] {
+        customColumnAsymmetricPropertiesMapping
+    }
+
+    override class func _realmIgnoreClass() -> Bool {
+        return true
+    }
+}
+
 class SwiftAsymmetricSyncTests: SwiftSyncTestCase {
     override class var defaultTestSuite: XCTestSuite {
         // async/await is currently incompatible with thread sanitizer and will
@@ -117,9 +139,10 @@ class SwiftAsymmetricSyncTests: SwiftSyncTestCase {
         var appId = SwiftAsymmetricSyncTests.asymmetricAppId
         if appId == nil {
             do {
-                let objectAsymmetricSchema = RLMObjectSchema(forObjectClass: SwiftObjectAsymmetric.self)
-                let hugeObjectAsymmetricSchema = RLMObjectSchema(forObjectClass: HugeObjectAsymmetric.self)
-                appId = try RealmServer.shared.createAppForAsymmetricSchema([objectAsymmetricSchema, hugeObjectAsymmetricSchema])
+                let objectSchemas = [SwiftObjectAsymmetric.self,
+                                     HugeObjectAsymmetric.self,
+                                     SwiftCustomColumnAsymmetricObject.self].map { RLMObjectSchema(forObjectClass: $0) }
+                appId = try RealmServer.shared.createAppForAsymmetricSchema(objectSchemas)
                 SwiftAsymmetricSyncTests.asymmetricAppId = appId
             } catch {
                 XCTFail("Failed to create Asymmetric app: \(error)")
@@ -133,15 +156,6 @@ class SwiftAsymmetricSyncTests: SwiftSyncTestCase {
         return App(id: appId!, configuration: appConfig)
     }
     static var asymmetricAppId: String?
-
-    override func tearDown() {
-        let user = try! logInUser(for: .anonymous, app: asymmetricApp)
-        let mongoClient = user.mongoClient("mongodb1")
-        let database = mongoClient.database(named: "test_data")
-        let collection =  database.collection(withName: "SwiftObjectAsymmetric")
-        removeAllFromCollection(collection)
-        super.tearDown()
-    }
 
     func testAsymmetricObjectSchema() throws {
         var configuration = (try logInUser(for: basicCredentials(app: asymmetricApp), app: asymmetricApp)).flexibleSyncConfiguration()
@@ -166,6 +180,13 @@ class SwiftAsymmetricSyncTests: SwiftSyncTestCase {
             XCTAssert(error.localizedDescription.contains("Asymmetric table 'SwiftObjectAsymmetric' not allowed in partition based sync"))
         }
     }
+
+    func testCustomColumnNameAsymmetricObjectSchema() {
+        let modernCustomObjectSchema = SwiftCustomColumnAsymmetricObject().objectSchema
+        for property in modernCustomObjectSchema.properties {
+            XCTAssertEqual(customColumnAsymmetricPropertiesMapping[property.name], property.columnName)
+        }
+    }
 }
 
 #if swift(>=5.6) && canImport(_Concurrency)
@@ -173,7 +194,7 @@ class SwiftAsymmetricSyncTests: SwiftSyncTestCase {
 extension SwiftAsymmetricSyncTests {
     func config() async throws -> Realm.Configuration {
         var config = (try await asymmetricApp.login(credentials: basicCredentials(app: asymmetricApp))).flexibleSyncConfiguration()
-        config.objectTypes = [SwiftObjectAsymmetric.self, HugeObjectAsymmetric.self]
+        config.objectTypes = [SwiftObjectAsymmetric.self, HugeObjectAsymmetric.self, SwiftCustomColumnAsymmetricObject.self]
         return config
     }
 
@@ -188,13 +209,19 @@ extension SwiftAsymmetricSyncTests {
         let mongoClient = user.mongoClient("mongodb1")
         let database = mongoClient.database(named: "test_data")
         let collection =  database.collection(withName: collection)
+        if try await collection.count(filter: [:]) > 0 {
+            removeAllFromCollection(collection)
+        }
         return collection
     }
 
     @MainActor
     func checkCountInMongo(_ expectedCount: Int, forCollection collection: String) async throws {
         let waitStart = Date()
-        let collection = try await setupCollection(collection)
+        let user = try await asymmetricApp.login(credentials: .anonymous)
+        let mongoClient = user.mongoClient("mongodb1")
+        let database = mongoClient.database(named: "test_data")
+        let collection =  database.collection(withName: collection)
         while collection.count(filter: [:]).await(self) != expectedCount && waitStart.timeIntervalSinceNow > -600.0 {
             sleep(5)
         }
@@ -225,6 +252,7 @@ extension SwiftAsymmetricSyncTests {
 
     @MainActor
     func testPropertyTypesAsymmetricObject() async throws {
+        let collection = try await setupCollection("SwiftObjectAsymmetric")
         let realm = try await realm()
         XCTAssertNotNil(realm)
 
@@ -241,7 +269,7 @@ extension SwiftAsymmetricSyncTests {
         // because we cannot query AsymmetricObjects directly.
         try await checkCountInMongo(1, forCollection: "SwiftObjectAsymmetric")
 
-        let document = try await setupCollection("SwiftObjectAsymmetric").find(filter: [:])[0]
+        let document = try await collection.find(filter: [:])[0]
         XCTAssertEqual(document["string"]??.stringValue, "name_\(#function)")
         XCTAssertEqual(document["int"]??.int64Value, 15)
         XCTAssertEqual(document["bool"]??.boolValue, true)
@@ -257,6 +285,7 @@ extension SwiftAsymmetricSyncTests {
         let realm = try await realm()
         XCTAssertNotNil(realm)
 
+        // Create Asymmetric Objects
         try realm.write {
             for _ in 0..<2 {
                 realm.create(HugeObjectAsymmetric.self, value: ["data": Data(repeating: 16, count: 1000000)])
@@ -265,6 +294,38 @@ extension SwiftAsymmetricSyncTests {
         waitForUploads(for: realm)
 
         try await checkCountInMongo(2, forCollection: "HugeObjectAsymmetric")
+    }
+
+    @MainActor
+    func testCreateCustomAsymmetricObject() async throws {
+        let collection = try await setupCollection("SwiftCustomColumnAsymmetricObject")
+        let realm = try await realm()
+        XCTAssertNotNil(realm)
+
+        let objectId = ObjectId.generate()
+        let valuesDictionary: [String: Any] = ["id": objectId,
+                                               "boolCol": false,
+                                               "intCol": 1234,
+                                               "doubleCol": 1234.1234,
+                                               "stringCol": "$%&/("]
+
+        // Create Asymmetric Objects
+        try realm.write {
+            realm.create(SwiftCustomColumnAsymmetricObject.self, value: valuesDictionary)
+        }
+        waitForUploads(for: realm)
+
+        try await checkCountInMongo(1, forCollection: "SwiftCustomColumnAsymmetricObject")
+
+        let filter: Document = ["_id": .objectId(objectId)]
+        let document = try await collection.findOneDocument(filter: filter)
+        XCTAssertNotNil(document)
+
+        XCTAssertEqual(document!["_id"], AnyBSON(objectId))
+        XCTAssertEqual(document!["custom_boolCol"], AnyBSON(false))
+        XCTAssertEqual(document!["custom_intCol"], AnyBSON(1234))
+        XCTAssertEqual(document!["custom_doubleCol"], AnyBSON(1234.1234))
+        XCTAssertEqual(document!["custom_stringCol"], AnyBSON("$%&/("))
     }
 }
 #endif // canImport(_Concurrency)

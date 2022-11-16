@@ -2,6 +2,24 @@ x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
 * Flexible sync subscription state will change to `SyncSubscriptionState.pending` (`RLMSyncSubscriptionStatePending`) while waiting for the server to have sent all pending history after a bootstrap and before marking a subscription as Complete.  ([#5795](https://github.com/realm/realm-core/pull/5795))
+* Add custom column names API, which allows to set a different column name in the realm 
+  from the one used in your object declaration.
+  ```swift
+  class Person: Object {
+      @Persisted var firstName: String
+      @Persisted var birthDate: Date
+      @Persisted var age: Int
+      
+      override class public func propertiesMapping() -> [String : String] {
+          ["firstName"; "first_name",
+           "birthDate"; "birth_date"]
+      }
+  }
+  ```
+  This is very helpful in cases where you want to name a property differently 
+  from your `Device Sync` JSON schema.
+  This API is only available for old and modern object declaration syntax on the
+  `RealmSwift` SDK.
 
 ### Fixed
 * Fix a race condition which could result in "operation cancelled" errors being delivered to async open callbacks rather than the actual sync error which caused things to fail ([PR #5968](https://github.com/realm/realm-core/pull/5968), since the introduction of async open).
@@ -239,6 +257,10 @@ The prebuilt binary for Carthage is now build with Xcode 14.0.1.
 * `RLMUpdateResult.objectId` has been deprecated in favor of
   `RLMUpdateResult.documentId` to support reporting document ids which are not
   object ids.
+### Breaking Changes
+* Private API `_realmColumnNames` has been renamed to a new public API
+  called `propertiesMapping()`. This change only affects the Swift API 
+  and doesn't have any effects in the obj-c API.
 
 ### Compatibility
 

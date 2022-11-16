@@ -412,6 +412,37 @@
     XCTAssertEqual(3, [[results maxOfProperty:@"propA"] intValue]);
 }
 
+-(void)testRenamedPropertyObservation {
+    RLMRealm *realm = self.realmWithTestPath;
+    [realm transactionWithBlock:^{
+        [LinkToRenamedProperties createInRealm:realm withValue:@[]];
+    }];
+
+    __block bool first = true;
+    __block id expectation = [self expectationWithDescription:@""];
+    RLMResults<LinkToRenamedProperties *> *allObjects = [LinkToRenamedProperties allObjectsInRealm:realm];
+    id token = [allObjects addNotificationBlock:^(__unused RLMResults *results, RLMCollectionChange *change, __unused NSError *error) {
+        XCTAssertNotNil(results);
+        XCTAssert(first ? !change : !!change);
+        XCTAssertNil(error);
+        first = false;
+        [expectation fulfill];
+    } keyPaths:@[@"link"]];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    expectation = [self expectationWithDescription:@""];
+    [self dispatchAsyncAndWait:^{
+        RLMRealm *realm = self.realmWithTestPath;
+        [realm transactionWithBlock:^{
+            LinkToRenamedProperties *object = (LinkToRenamedProperties *)[LinkToRenamedProperties allObjectsInRealm:realm].firstObject;
+            RenamedProperties *linkedObject = [RenamedProperties createInRealm:realm withValue:@[@1, @""]];
+            object.link = linkedObject;
+        }];
+    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    [(RLMNotificationToken *)token invalidate];
+}
 
 - (void)testValueForCollectionOperationKeyPath {
     RLMRealm *realm = [RLMRealm defaultRealm];

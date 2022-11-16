@@ -115,9 +115,9 @@ typedef void (^RLMObjectMigrationBlock)(RLMObject * __nullable oldObject, RLMObj
 
  @param className The name of the class whose property should be renamed. This class must be present
                   in both the old and new Realm schemas.
- @param oldName   The old name for the property to be renamed. There must not be a property with this name in the
+ @param oldName   The old persisted property name for the property to be renamed. There must not be a property with this name in the
                   class as defined by the new Realm schema.
- @param newName   The new name for the property to be renamed. There must not be a property with this name in the
+ @param newName   The new persisted property name for the property to be renamed. There must not be a property with this name in the
                   class as defined by the old Realm schema.
  */
 - (void)renamePropertyForClass:(NSString *)className oldName:(NSString *)oldName newName:(NSString *)newName;

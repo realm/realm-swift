@@ -59,6 +59,7 @@ class ObjectSchemaTests: TestCase {
         SwiftObject {
             boolCol {
                 type = bool;
+                columnName = boolCol;
                 indexed = NO;
                 isPrimary = NO;
                 array = NO;
@@ -68,6 +69,7 @@ class ObjectSchemaTests: TestCase {
             }
             intCol {
                 type = int;
+                columnName = intCol;
                 indexed = NO;
                 isPrimary = NO;
                 array = NO;
@@ -77,6 +79,7 @@ class ObjectSchemaTests: TestCase {
             }
             int8Col {
                 type = int;
+                columnName = int8Col;
                 indexed = NO;
                 isPrimary = NO;
                 array = NO;
@@ -86,6 +89,7 @@ class ObjectSchemaTests: TestCase {
             }
             int16Col {
                 type = int;
+                columnName = int16Col;
                 indexed = NO;
                 isPrimary = NO;
                 array = NO;
@@ -95,6 +99,7 @@ class ObjectSchemaTests: TestCase {
             }
             int32Col {
                 type = int;
+                columnName = int32Col;
                 indexed = NO;
                 isPrimary = NO;
                 array = NO;
@@ -104,6 +109,7 @@ class ObjectSchemaTests: TestCase {
             }
             int64Col {
                 type = int;
+                columnName = int64Col;
                 indexed = NO;
                 isPrimary = NO;
                 array = NO;
@@ -113,6 +119,7 @@ class ObjectSchemaTests: TestCase {
             }
             intEnumCol {
                 type = int;
+                columnName = intEnumCol;
                 indexed = NO;
                 isPrimary = NO;
                 array = NO;
@@ -122,6 +129,7 @@ class ObjectSchemaTests: TestCase {
             }
             floatCol {
                 type = float;
+                columnName = floatCol;
                 indexed = NO;
                 isPrimary = NO;
                 array = NO;
@@ -131,6 +139,7 @@ class ObjectSchemaTests: TestCase {
             }
             doubleCol {
                 type = double;
+                columnName = doubleCol;
                 indexed = NO;
                 isPrimary = NO;
                 array = NO;
@@ -140,6 +149,7 @@ class ObjectSchemaTests: TestCase {
             }
             stringCol {
                 type = string;
+                columnName = stringCol;
                 indexed = NO;
                 isPrimary = NO;
                 array = NO;
@@ -149,6 +159,7 @@ class ObjectSchemaTests: TestCase {
             }
             binaryCol {
                 type = data;
+                columnName = binaryCol;
                 indexed = NO;
                 isPrimary = NO;
                 array = NO;
@@ -158,6 +169,7 @@ class ObjectSchemaTests: TestCase {
             }
             dateCol {
                 type = date;
+                columnName = dateCol;
                 indexed = NO;
                 isPrimary = NO;
                 array = NO;
@@ -167,6 +179,7 @@ class ObjectSchemaTests: TestCase {
             }
             decimalCol {
                 type = decimal128;
+                columnName = decimalCol;
                 indexed = NO;
                 isPrimary = NO;
                 array = NO;
@@ -176,6 +189,7 @@ class ObjectSchemaTests: TestCase {
             }
             objectIdCol {
                 type = object id;
+                columnName = objectIdCol;
                 indexed = NO;
                 isPrimary = NO;
                 array = NO;
@@ -187,6 +201,7 @@ class ObjectSchemaTests: TestCase {
                 type = object;
                 objectClassName = SwiftBoolObject;
                 linkOriginPropertyName = (null);
+                columnName = objectCol;
                 indexed = NO;
                 isPrimary = NO;
                 array = NO;
@@ -196,6 +211,7 @@ class ObjectSchemaTests: TestCase {
             }
             uuidCol {
                 type = uuid;
+                columnName = uuidCol;
                 indexed = NO;
                 isPrimary = NO;
                 array = NO;
@@ -205,6 +221,7 @@ class ObjectSchemaTests: TestCase {
             }
             anyCol {
                 type = mixed;
+                columnName = anyCol;
                 indexed = NO;
                 isPrimary = NO;
                 array = NO;
@@ -216,6 +233,7 @@ class ObjectSchemaTests: TestCase {
                 type = object;
                 objectClassName = SwiftBoolObject;
                 linkOriginPropertyName = (null);
+                columnName = arrayCol;
                 indexed = NO;
                 isPrimary = NO;
                 array = YES;
@@ -227,6 +245,7 @@ class ObjectSchemaTests: TestCase {
                 type = object;
                 objectClassName = SwiftBoolObject;
                 linkOriginPropertyName = (null);
+                columnName = setCol;
                 indexed = NO;
                 isPrimary = NO;
                 array = NO;
@@ -238,6 +257,7 @@ class ObjectSchemaTests: TestCase {
                 type = object;
                 objectClassName = SwiftBoolObject;
                 linkOriginPropertyName = (null);
+                columnName = mapCol;
                 indexed = NO;
                 isPrimary = NO;
                 array = NO;

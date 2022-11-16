@@ -38,7 +38,7 @@ public struct StringOptions: OptionSet {
 
  With `Query` you are given the ability to create Swift style query expression that will then
  be constructed into an `NSPredicate`. The `Query` class should not be instantiated directly
- and should be only used as a paramater within a closure that takes a query expression as an argument.
+ and should be only used as a parameter within a closure that takes a query expression as an argument.
  Example:
  ```swift
  public func where(_ query: ((Query<Element>) -> Query<Element>)) -> Results<Element>
@@ -114,7 +114,7 @@ public struct Query<T> {
     private let node: QueryNode
 
     /**
-     The `Query` struct works by compunding `QueryNode`s together in a tree structure.
+     The `Query` struct works by compounding `QueryNode`s together in a tree structure.
      Each part of a query expression will be represented by one of the below static methods.
      For example in the simple expression `stringCol == 'Foo'`:
 

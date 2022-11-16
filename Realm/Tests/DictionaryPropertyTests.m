@@ -622,6 +622,41 @@
     XCTAssertEqual(3, [[obj.dictionary maxOfProperty:@"propA"] intValue]);
 }
 
+-(void)testRenamedPropertyObservation {
+    RLMRealm *realm = self.realmWithTestPath;
+
+    __block LinkToRenamedProperties *obj;
+    [realm transactionWithBlock:^{
+        obj = [LinkToRenamedProperties createInRealm:realm withValue:@[]];
+        RenamedProperties *linkedObject = [RenamedProperties createInRealm:realm withValue:@[@1, @""]];
+        obj.dictionary[@"item"] = linkedObject;
+    }];
+
+    __block bool first = true;
+    __block id expectation = [self expectationWithDescription:@""];
+    id token = [obj.dictionary addNotificationBlock:^(RLMDictionary *dictionary, RLMDictionaryChange *change, NSError *error) {
+        XCTAssertNotNil(dictionary);
+        XCTAssert(first ? !change : !!change);
+        XCTAssertNil(error);
+        first = false;
+        [expectation fulfill];
+    } keyPaths:@[@"stringCol"]];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    expectation = [self expectationWithDescription:@""];
+    [self dispatchAsyncAndWait:^{
+        RLMRealm *realm = self.realmWithTestPath;
+        [realm transactionWithBlock:^{
+            RLMDictionary *dict = [(LinkToRenamedProperties *)[LinkToRenamedProperties allObjectsInRealm:realm].firstObject dictionary];
+            RenamedProperties *property = dict[@"item"];
+            property.stringCol = @"newValue";
+        }];
+    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    [(RLMNotificationToken *)token invalidate];
+}
+
 -(void)testInsertMultiple {
     RLMRealm *realm = [self realmWithTestPath];
     
@@ -969,19 +1004,11 @@
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm beginWriteTransaction];
     id value = @{@"dictionary": @{@"0": @[@1, @"c"], @"1": @[@2, @"b"], @"2": @[@3, @"a"]}, @"set": @[]};
-    LinkToRenamedProperties1 *obj = [LinkToRenamedProperties1 createInRealm:realm withValue:value];
-    
-    // FIXME: sorting has to use the column names because the parsing is done by
-    // the object store. This is not ideal.
-    XCTAssertEqualObjects([[obj.dictionary sortedResultsUsingKeyPath:@"prop 1" ascending:YES] valueForKeyPath:@"propA"],
+    LinkToRenamedProperties *obj = [LinkToRenamedProperties createInRealm:realm withValue:value];
+
+    XCTAssertEqualObjects([[obj.dictionary sortedResultsUsingKeyPath:@"intCol" ascending:YES] valueForKeyPath:@"intCol"],
                           (@[@1, @2, @3]));
-    XCTAssertEqualObjects([[obj.dictionary sortedResultsUsingKeyPath:@"prop 2" ascending:YES] valueForKeyPath:@"propA"],
-                          (@[@3, @2, @1]));
-    
-    LinkToRenamedProperties2 *obj2 = [LinkToRenamedProperties2 allObjectsInRealm:realm].firstObject;
-    XCTAssertEqualObjects([[obj2.dictionary sortedResultsUsingKeyPath:@"prop 1" ascending:YES] valueForKeyPath:@"propC"],
-                          (@[@1, @2, @3]));
-    XCTAssertEqualObjects([[obj2.dictionary sortedResultsUsingKeyPath:@"prop 2" ascending:YES] valueForKeyPath:@"propC"],
+    XCTAssertEqualObjects([[obj.dictionary sortedResultsUsingKeyPath:@"intCol" ascending:NO] valueForKeyPath:@"intCol"],
                           (@[@3, @2, @1]));
     
     [realm cancelWriteTransaction];

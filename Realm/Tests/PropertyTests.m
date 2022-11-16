@@ -37,6 +37,7 @@
                                                 @"\ttype = object;\n"
                                                 @"\tobjectClassName = StringObject;\n"
                                                 @"\tlinkOriginPropertyName = (null);\n"
+                                                @"\tcolumnName = objectCol;\n"
                                                 @"\tindexed = NO;\n"
                                                 @"\tisPrimary = NO;\n"
                                                 @"\tarray = NO;\n"

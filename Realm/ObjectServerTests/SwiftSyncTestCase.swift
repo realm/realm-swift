@@ -29,7 +29,7 @@ import RealmSyncTestSupport
 public extension User {
     func configuration<T: BSON>(testName: T) -> Realm.Configuration {
         var config = self.configuration(partitionValue: testName)
-        config.objectTypes = [SwiftPerson.self, SwiftHugeSyncObject.self, SwiftTypesSyncObject.self]
+        config.objectTypes = [SwiftPerson.self, SwiftHugeSyncObject.self, SwiftTypesSyncObject.self, SwiftCustomColumnObject.self]
         return config
     }
 }
@@ -132,7 +132,7 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
             ex.fulfill()
         }
 
-        waitForExpectations(timeout: 20, handler: nil)
+        waitForExpectations(timeout: 60, handler: nil)
         return theUser
     }
 
@@ -274,6 +274,15 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
 
     // MARK: - Mongo Client
 
+    public func setupMongoCollection(for collection: String) throws -> MongoCollection {
+        let user = try logInUser(for: basicCredentials())
+        let mongoClient = user.mongoClient("mongodb1")
+        let database = mongoClient.database(named: "test_data")
+        let collection = database.collection(withName: collection)
+        removeAllFromCollection(collection)
+        return collection
+    }
+
     public func removeAllFromCollection(_ collection: MongoCollection) {
         let deleteEx = expectation(description: "Delete all from Mongo collection")
         collection.deleteManyDocuments(filter: [:]) { result in
@@ -303,7 +312,8 @@ extension SwiftSyncTestCase {
         var config = (try await self.flexibleSyncApp.login(credentials: basicCredentials(app: flexibleSyncApp))).flexibleSyncConfiguration()
         if config.objectTypes == nil {
             config.objectTypes = [SwiftPerson.self,
-                                  SwiftTypesSyncObject.self]
+                                  SwiftTypesSyncObject.self,
+                                  SwiftCustomColumnObject.self]
         }
         return config
     }

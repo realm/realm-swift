@@ -432,7 +432,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 + (NSDictionary<NSString *, RLMPropertyDescriptor *> *)linkingObjectsProperties;
 
-
 #pragma mark - Getting & Querying Objects from the Default Realm
 
 /**
