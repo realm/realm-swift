@@ -66,9 +66,9 @@
 }
 
 - (void)didReceiveEvent:(nonnull NSData *)event {
-    std::string_view str = [[NSString alloc] initWithData:event encoding:NSUTF8StringEncoding].UTF8String;
-    if (!str.empty() && _watchStream.state() == realm::app::WatchStream::State::NEED_DATA) {
-        _watchStream.feed_buffer(str);
+    NSString *str = [[NSString alloc] initWithData:event encoding:NSUTF8StringEncoding];
+    if (str && [str length] != 0 && _watchStream.state() == realm::app::WatchStream::State::NEED_DATA) {
+        _watchStream.feed_buffer([str UTF8String]);
     }
 
     while (_watchStream.state() == realm::app::WatchStream::State::HAVE_EVENT) {
