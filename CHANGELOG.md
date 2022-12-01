@@ -1,8 +1,14 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.33.0 Release notes (2022-12-01)
 =============================================================
+
 ### Enhancements
-* Flexible sync subscription state will change to `SyncSubscriptionState.pending` (`RLMSyncSubscriptionStatePending`) while waiting for the server to have sent all pending history after a bootstrap and before marking a subscription as Complete.  ([#5795](https://github.com/realm/realm-core/pull/5795))
-* Add custom column names API, which allows to set a different column name in the realm 
+
+* Flexible sync subscription state will change to
+  `SyncSubscriptionState.pending` (`RLMSyncSubscriptionStatePending`) while
+  waiting for the server to have sent all pending history after a bootstrap and
+  before marking a subscription as Complete.
+  ([#5795](https://github.com/realm/realm-core/pull/5795))
+* Add custom column names API, which allows to set a different column name in the realm
   from the one used in your object declaration.
   ```swift
   class Person: Object {
@@ -10,9 +16,9 @@ x.y.z Release notes (yyyy-MM-dd)
       @Persisted var birthDate: Date
       @Persisted var age: Int
 
-      override class public func propertiesMapping() -> [String : String] {
-          ["firstName"; "first_name",
-           "birthDate"; "birth_date"]
+      override class public func propertiesMapping() -> [String: String] {
+          ["firstName": "first_name",
+           "birthDate": "birth_date"]
       }
   }
   ```
@@ -25,6 +31,7 @@ x.y.z Release notes (yyyy-MM-dd)
   ([Core PR #5999](https://github.com/realm/realm-core/pull/5999)).
 
 ### Fixed
+
 * Fix a race condition which could result in "operation cancelled" errors being
   delivered to async open callbacks rather than the actual sync error which
   caused things to fail ([Core PR #5968](https://github.com/realm/realm-core/pull/5968), since the introduction of async open).
@@ -42,9 +49,8 @@ x.y.z Release notes (yyyy-MM-dd)
 * Fetching a user's profile while the user logs out would result in an
   assertion failure. ([Core PR #6017](https://github.com/realm/realm-core/issues/5571), since v10.8.0)
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
-
 ### Compatibility
+
 * Realm Studio: 11.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 14.1.
@@ -52,6 +58,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * Xcode: 13.1-14.1.
 
 ### Internal
+
 * Upgraded realm-core from 12.11.0 to 12.13.0
 
 10.32.3 Release notes (2022-11-10)
