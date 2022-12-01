@@ -267,16 +267,23 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
 
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 private class ObservableResultsStorage<T>: ObservableStorage<T> where T: RealmSubscribable & ThreadConfined & Equatable {
-    var setupHasRun = false
+    private var setupHasRun = false
     func didSet() {
         if setupHasRun {
-            setupValue()
-            setupHasRun = true
+            updateValue()
         }
     }
 
-    func setupValue() {
+    func updateValue() {
+        // Implemented in subclasses
         fatalError()
+    }
+
+    func setupValue() {
+        if !setupHasRun {
+            updateValue()
+            setupHasRun = true
+        }
     }
 
     var sortDescriptor: SortDescriptor? {
@@ -471,7 +478,7 @@ extension Projection: _ObservedResultsValue { }
 @propertyWrapper public struct ObservedResults<ResultType>: DynamicProperty, BoundCollection where ResultType: _ObservedResultsValue & RealmFetchable & KeypathSortable & Identifiable {
     public typealias Element = ResultType
     private class Storage: ObservableResultsStorage<Results<ResultType>> {
-        override func setupValue() {
+        override func updateValue() {
             /// A base value to reset the state of the query if a user reassigns the `filter` or `sortDescriptor`
             let realm = try! Realm(configuration: configuration ?? Realm.Configuration.defaultConfiguration)
             var value = realm.objects(ResultType.self)
@@ -516,9 +523,7 @@ extension Projection: _ObservedResultsValue { }
     }
     /// :nodoc:
     public var wrappedValue: Results<ResultType> {
-        if !storage.setupHasRun {
-            storage.setupValue()
-        }
+        storage.setupValue()
         return storage.configuration != nil ? storage.value.freeze() : storage.value
     }
     /// :nodoc:
@@ -629,7 +634,7 @@ extension Projection: _ObservedResultsValue { }
     public typealias Element = ResultType
 
     private class Storage: ObservableResultsStorage<SectionedResults<Key, ResultType>> {
-        override func setupValue() {
+        override func updateValue() {
             /// A base value to reset the state of the query if a user reassigns the `filter` or `sortDescriptor`
             let realm = try! Realm(configuration: configuration ?? Realm.Configuration.defaultConfiguration)
             var results = realm.objects(ResultType.self)
@@ -701,9 +706,7 @@ extension Projection: _ObservedResultsValue { }
     }
     /// :nodoc:
     public var wrappedValue: SectionedResults<Key, ResultType> {
-        if !storage.setupHasRun {
-            storage.setupValue()
-        }
+        storage.setupValue()
         return storage.value
     }
     /// :nodoc:

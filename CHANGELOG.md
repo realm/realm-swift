@@ -32,11 +32,13 @@ x.y.z Release notes (yyyy-MM-dd)
   terminated at a certain point in the process of comitting a write
   transaciton. ([Core PR #5993](https://github.com/realm/realm-core/pull/5993), since v10.21.1)
 * `@AsyncOpen` and `@AutoOpen` would begin and then cancel a second async open
-  operation (since v10.12.0).
+  operation ([PR #8038](https://github.com/realm/realm-swift/pull/8038), since v10.12.0).
 * Changing the search text when using the searchable SwiftUI extension would
-  trigger multiple updates on the View for each change (since v10.19.0).
-* Changing the filter or search properties of an `@ObservedResults` would
-  trigger up to three updates on the View (since v10.6.0).
+  trigger multiple updates on the View for each change
+  ([PR #8038](https://github.com/realm/realm-swift/pull/8038), since v10.19.0).
+* Changing the filter or search properties of an `@ObservedResults` or
+  `@ObservedSectionedResults` would trigger up to three updates on the View
+  ([PR #8038](https://github.com/realm/realm-swift/pull/8038), since v10.6.0).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
