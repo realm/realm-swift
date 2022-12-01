@@ -39,6 +39,8 @@ x.y.z Release notes (yyyy-MM-dd)
 * Changing the filter or search properties of an `@ObservedResults` or
   `@ObservedSectionedResults` would trigger up to three updates on the View
   ([PR #8038](https://github.com/realm/realm-swift/pull/8038), since v10.6.0).
+* Fetching a user's profile while the user logs out would result in an
+  assertion failure. ([Core PR #6017](https://github.com/realm/realm-core/issues/5571), since v10.8.0)
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
@@ -50,7 +52,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * Xcode: 13.1-14.1.
 
 ### Internal
-* Upgraded realm-core from 12.11.0 to 12.12.0
+* Upgraded realm-core from 12.11.0 to 12.13.0
 
 10.32.3 Release notes (2022-11-10)
 =============================================================
