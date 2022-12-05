@@ -1,31 +1,15 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* Flexible sync subscription state will change to `SyncSubscriptionState.pending` (`RLMSyncSubscriptionStatePending`) while waiting for the server to have sent all pending history after a bootstrap and before marking a subscription as Complete.  ([#5795](https://github.com/realm/realm-core/pull/5795))
-* Add custom column names API, which allows to set a different column name in the realm 
-  from the one used in your object declaration.
-  ```swift
-  class Person: Object {
-      @Persisted var firstName: String
-      @Persisted var birthDate: Date
-      @Persisted var age: Int
-      
-      override class public func propertiesMapping() -> [String : String] {
-          ["firstName"; "first_name",
-           "birthDate"; "birth_date"]
-      }
-  }
-  ```
-  This is very helpful in cases where you want to name a property differently 
-  from your `Device Sync` JSON schema.
-  This API is only available for old and modern object declaration syntax on the
-  `RealmSwift` SDK.
+* None.
 
 ### Fixed
 * Fix a race condition which could result in "operation cancelled" errors being delivered to async open callbacks rather than the actual sync error which caused things to fail ([PR #5968](https://github.com/realm/realm-core/pull/5968), since the introduction of async open).
 * Bootstraps will not be applied in a single write transaction - they will be applied 1MB of changesets at a time, or as configured by the SDK ([#5999](https://github.com/realm/realm-core/pull/5999), since v10.27.0).
 * Fix database corruption and encryption issues on apple platforms, reported in several bugs listed in the PR. ([PR #5993](https://github.com/realm/realm-core/pull/5993), since v10.21.1)
 * Add extra check when allocating string when receiving data in a changestream [PR #8039](https://github.com/realm/realm-swift/pull/8039).
+* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
+* None.
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
@@ -37,7 +21,70 @@ x.y.z Release notes (yyyy-MM-dd)
 * Xcode: 13.1-14.1.
 
 ### Internal
-* Upgraded realm-core from 12.11.0 to 12.12.0
+* Upgraded realm-core from ? to ?
+
+10.33.0 Release notes (2022-12-01)
+=============================================================
+
+### Enhancements
+
+* Flexible sync subscription state will change to
+  `SyncSubscriptionState.pending` (`RLMSyncSubscriptionStatePending`) while
+  waiting for the server to have sent all pending history after a bootstrap and
+  before marking a subscription as Complete.
+  ([#5795](https://github.com/realm/realm-core/pull/5795))
+* Add custom column names API, which allows to set a different column name in the realm
+  from the one used in your object declaration.
+  ```swift
+  class Person: Object {
+      @Persisted var firstName: String
+      @Persisted var birthDate: Date
+      @Persisted var age: Int
+
+      override class public func propertiesMapping() -> [String: String] {
+          ["firstName": "first_name",
+           "birthDate": "birth_date"]
+      }
+  }
+  ```
+  This is very helpful in cases where you want to name a property differently
+  from your `Device Sync` JSON schema.
+  This API is only available for old and modern object declaration syntax on the
+  `RealmSwift` SDK.
+* Flexible sync bootstraps now apply 1MB of changesets per write transaction
+  rather than applying all of them in a single write transaction.
+  ([Core PR #5999](https://github.com/realm/realm-core/pull/5999)).
+
+### Fixed
+
+* Fix a race condition which could result in "operation cancelled" errors being
+  delivered to async open callbacks rather than the actual sync error which
+  caused things to fail ([Core PR #5968](https://github.com/realm/realm-core/pull/5968), since the introduction of async open).
+* Fix database corruption issues which could happen if an application was
+  terminated at a certain point in the process of comitting a write
+  transaciton. ([Core PR #5993](https://github.com/realm/realm-core/pull/5993), since v10.21.1)
+* `@AsyncOpen` and `@AutoOpen` would begin and then cancel a second async open
+  operation ([PR #8038](https://github.com/realm/realm-swift/pull/8038), since v10.12.0).
+* Changing the search text when using the searchable SwiftUI extension would
+  trigger multiple updates on the View for each change
+  ([PR #8038](https://github.com/realm/realm-swift/pull/8038), since v10.19.0).
+* Changing the filter or search properties of an `@ObservedResults` or
+  `@ObservedSectionedResults` would trigger up to three updates on the View
+  ([PR #8038](https://github.com/realm/realm-swift/pull/8038), since v10.6.0).
+* Fetching a user's profile while the user logs out would result in an
+  assertion failure. ([Core PR #6017](https://github.com/realm/realm-core/issues/5571), since v10.8.0)
+
+### Compatibility
+
+* Realm Studio: 11.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 14.1.
+* CocoaPods: 1.10 or later.
+* Xcode: 13.1-14.1.
+
+### Internal
+
+* Upgraded realm-core from 12.11.0 to 12.13.0
 
 10.32.3 Release notes (2022-11-10)
 =============================================================
