@@ -672,7 +672,6 @@ class SwiftObjectiveCTypesObject: Object {
 }
 
 class SwiftComputedPropertyNotIgnoredObject: Object {
-    // swiftlint:disable:next identifier_name
     @objc dynamic var _urlBacking = ""
 
     // Dynamic; no ivar

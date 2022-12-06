@@ -159,11 +159,9 @@ extension RealmCollectionImpl {
 // A helper protocol which lets us check for Optional in where clauses
 public protocol OptionalProtocol {
     associatedtype Wrapped
-    // swiftlint:disable:next identifier_name
     func _rlmInferWrappedType() -> Wrapped
 }
 
 extension Optional: OptionalProtocol {
-    // swiftlint:disable:next identifier_name
     public func _rlmInferWrappedType() -> Wrapped { return self! }
 }

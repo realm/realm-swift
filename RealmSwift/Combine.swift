@@ -2537,12 +2537,12 @@ public enum RealmPublishers {
         }
     }
 
+    // swiftlint:disable type_name
     /// A publisher which delivers thread-confined collection changesets to a
     /// serial dispatch queue.
     ///
     /// Create using `.threadSafeReference().receive(on: queue)` on a publisher
     /// that emits `RealmCollectionChange`.
-    // swiftlint:disable:next type_name
     @frozen public struct DeferredHandoverSectionedResultsChangeset<Upstream: Publisher, T: RealmSectionedResult, S: Scheduler>: Publisher where Upstream.Output == RealmSectionedResultsChange<T> {
         /// :nodoc:
         public typealias Failure = Upstream.Failure
@@ -2610,6 +2610,7 @@ public enum RealmPublishers {
                 .receive(subscriber: subscriber)
         }
     }
+    // swiftlint:enable type_name
 
     /// A publisher which delivers thread-confined collection changesets to a
     /// serial dispatch queue.

@@ -1068,7 +1068,7 @@ class ObjectCreationTests: TestCase {
     }
 
     func testAddObjectCycle() {
-        weak var weakObj1: SwiftCircleObject? = nil, weakObj2: SwiftCircleObject? = nil
+        weak var weakObj1: SwiftCircleObject?, weakObj2: SwiftCircleObject?
 
         autoreleasepool {
             let obj1 = SwiftCircleObject(value: [])

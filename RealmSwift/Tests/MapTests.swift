@@ -715,7 +715,7 @@ class MapTests: TestCase {
             case .initial(let map):
                 XCTAssertNotNil(map)
                 exp.fulfill()
-            case .update(_, deletions: _, insertions: _, modifications: _):
+            case .update:
                 XCTFail("should not get here for this test")
             case .error:
                 XCTFail("should not get here for this test")

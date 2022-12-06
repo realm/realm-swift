@@ -181,12 +181,12 @@ class ObjectTests: TestCase {
 
         let intObj = SwiftPrimaryIntObject()
         intObj.intCol = 1
-        intObj.intCol = 0; // can change primary key unattached
+        intObj.intCol = 0 // can change primary key unattached
         XCTAssertEqual(0, intObj.intCol)
 
         let optionalIntObj = SwiftPrimaryOptionalIntObject()
         optionalIntObj.intCol.value = 1
-        optionalIntObj.intCol.value = 0; // can change primary key unattached
+        optionalIntObj.intCol.value = 0 // can change primary key unattached
         XCTAssertEqual(0, optionalIntObj.intCol.value)
 
         let stringObj = SwiftPrimaryStringObject()
