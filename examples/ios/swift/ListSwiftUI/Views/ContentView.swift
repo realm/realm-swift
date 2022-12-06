@@ -284,7 +284,6 @@ struct ContentView: View {
 }
 
 #if DEBUG
-// swiftlint:disable type_name
 struct Content_Preview: PreviewProvider {
     static var previews: some View {
         ContentView()

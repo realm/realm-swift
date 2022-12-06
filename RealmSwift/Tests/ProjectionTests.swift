@@ -170,8 +170,8 @@ class AllTypesPrimitiveProjection: Projection<ModernAllTypesObject> {
 
 class AdvancedObject: Object {
     @Persisted(primaryKey: true) var pk: ObjectId
-    @Persisted var commonArray: RealmSwift.List<Int>
-    @Persisted var objectsArray: RealmSwift.List<SimpleObject>
+    @Persisted var commonArray: List<Int>
+    @Persisted var objectsArray: List<SimpleObject>
     @Persisted var commonSet: MutableSet<Int>
     @Persisted var objectsSet: MutableSet<SimpleObject>
 }
@@ -204,8 +204,8 @@ public class CommonPerson: Object {
     @Persisted var lastName = ""
     @Persisted var birthday: Date
     @Persisted var address: AddressSwift?
-    @Persisted public var friends: RealmSwift.List<CommonPerson>
-    @Persisted var reviews: RealmSwift.List<String>
+    @Persisted public var friends: List<CommonPerson>
+    @Persisted var reviews: List<String>
     @Persisted var money: Decimal128
 }
 
@@ -224,6 +224,12 @@ public class SimpleObject: Object {
 
 public final class SimpleProjection: Projection<SimpleObject> {
     @Projected(\SimpleObject.int) var int
+}
+
+public final class MultipleProjectionsFromOneProperty: Projection<SimpleObject> {
+    @Projected(\SimpleObject.int) var int1
+    @Projected(\SimpleObject.int) var int2
+    @Projected(\SimpleObject.int) var int3
 }
 
 // MARK: Tests
@@ -684,20 +690,13 @@ class ProjectionTests: TestCase {
                 XCTAssertNil(observedOld)
                 XCTAssertNil(observedNew)
 
-                guard let projectedNew = object[keyPath: keyPath] as? RealmSwift.List<E>,
+                guard let projectedNew = object[keyPath: keyPath] as? List<E>,
                       let newVals = new else {
-                          XCTFail("Expected new array to be [\(String(describing: E.self))] and projected array to be \(String(describing: RealmSwift.List<E>.self)), got \(String(describing: new)) and \(String(describing: obs[keyPath: keyPath]))",
-                                  file: (fileName), line: lineNumber)
-                          return
-                      }
-
-                if projectedNew.count != newVals.count {
-                    XCTAssertEqual(projectedNew.count, newVals.count, "Expected \(projectedNew) and \(newVals) to be equal", file: (fileName), line: lineNumber)
-                } else {
-                    for (index, element) in projectedNew.enumerated() {
-                        XCTAssertEqual(element, newVals[index], "Element \(element) at index \(index) should be equal to \(newVals[index])", file: (fileName), line: lineNumber)
-                    }
+                        XCTFail("Expected new array to be [\(E.self)] and projected array to be \(List<E>.self), got \(String(describing: new)) and \(obs[keyPath: keyPath])",
+                                file: fileName, line: lineNumber)
+                        return
                 }
+                XCTAssertEqual(Array(projectedNew), newVals)
             } else {
                 XCTFail("Expected .change but got \(changes)", file: (fileName), line: lineNumber)
             }
@@ -724,10 +723,10 @@ class ProjectionTests: TestCase {
                 XCTAssertNil(observedNew)
 
                 guard let projectedNew = object[keyPath: keyPath] as? MutableSet<E> else {
-                          XCTFail("Expected new set to be \(String(describing: Set<E>.self)) and projected set to be \(String(describing: MutableSet<E>.self)), got \(String(describing: new)) and \(String(describing: obs[keyPath: keyPath]))",
-                                  file: (fileName), line: lineNumber)
-                          return
-                      }
+                    XCTFail("Expected new set to be \(Set<E>.self) and projected set to be \(MutableSet<E>.self), got \(String(describing: new)) and \(obs[keyPath: keyPath])",
+                            file: fileName, line: lineNumber)
+                    return
+                }
 
                 self.assertSetEquals(projectedNew, new)
             } else {
@@ -756,17 +755,11 @@ class ProjectionTests: TestCase {
                 XCTAssertNil(observedNew)
 
                 guard let projectedNew = object[keyPath: keyPath] as? Map<String, E> else {
-                    XCTFail("Expected new set to be \(String(describing: Dictionary<String, E>.self)) and projected set to be \(String(describing: Map<String, E>.self)), got \(String(describing: new)) and \(String(describing: obs[keyPath: keyPath]))",
-                            file: (fileName), line: lineNumber)
+                    XCTFail("Expected new map to be \(Dictionary<String, E>.self) and projected map to be \(Map<String, E>.self), got \(String(describing: new)) and \(obs[keyPath: keyPath])",
+                            file: fileName, line: lineNumber)
                     return
                 }
-                if projectedNew.count != new.count {
-                    XCTAssertEqual(projectedNew.count, new.count, "Expected \(projectedNew) and \(new) to be equal", file: (fileName), line: lineNumber)
-                } else {
-                    for (key, value) in new {
-                        XCTAssertEqual(projectedNew[key], value, "Projected set should contain (\(key), \(value))", file: (fileName), line: lineNumber)
-                    }
-                }
+                self.assertMapEquals(projectedNew, new)
             } else {
                 XCTFail("Expected .change but got \(changes)", file: (fileName), line: lineNumber)
             }
@@ -1631,7 +1624,7 @@ class ProjectionTests: TestCase {
 
     func testObserveFrozenObject() {
         let frozen = simpleProjection().freeze()
-        assertThrows(frozen.observe(keyPaths: [String](), { _ in }), "Frozen Realms do not change and do not have change notifications.")
+        assertThrows(frozen.observe { _ in }, "Frozen Realms do not change and do not have change notifications.")
     }
 
     func testFrozenObjectEquality() {
@@ -1767,6 +1760,38 @@ class ProjectionTests: TestCase {
         }
 
         waitForExpectations(timeout: 2)
+        token.invalidate()
+    }
+
+    func testObserveMultipleProjectionsFromOneProperty() {
+        let realm = realmWithTestPath()
+        try! realm.write {
+            realm.create(SimpleObject.self, value: [1, false])
+        }
+        let projection = realm.objects(MultipleProjectionsFromOneProperty.self).first!
+
+        let ex = expectation(description: "values will be observed")
+        let token = projection.observe { c in
+            if case let .change(_, change) = c {
+                ex.fulfill()
+                XCTAssertEqual(change.count, 3)
+                for (i, prop) in change.enumerated() {
+                    XCTAssertEqual(prop.name, "int\(i + 1)")
+                    XCTAssertEqual(prop.oldValue as? Int, 1)
+                    XCTAssertEqual(prop.newValue as? Int, 2)
+                }
+            }
+        }
+
+        try! realm.write {}
+
+        dispatchSyncNewThread {
+            let realm = self.realmWithTestPath()
+            try! realm.write {
+                realm.objects(SimpleObject.self).first!.int = 2
+            }
+        }
+        wait(for: [ex], timeout: 2.0)
         token.invalidate()
     }
 

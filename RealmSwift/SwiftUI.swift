@@ -479,7 +479,6 @@ extension Projection: _ObservedResultsValue { }
     public typealias Element = ResultType
     private class Storage: ObservableResultsStorage<Results<ResultType>> {
         override func updateValue() {
-            /// A base value to reset the state of the query if a user reassigns the `filter` or `sortDescriptor`
             let realm = try! Realm(configuration: configuration ?? Realm.Configuration.defaultConfiguration)
             var value = realm.objects(ResultType.self)
             if let sortDescriptor = sortDescriptor {
@@ -635,7 +634,6 @@ extension Projection: _ObservedResultsValue { }
 
     private class Storage: ObservableResultsStorage<SectionedResults<Key, ResultType>> {
         override func updateValue() {
-            /// A base value to reset the state of the query if a user reassigns the `filter` or `sortDescriptor`
             let realm = try! Realm(configuration: configuration ?? Realm.Configuration.defaultConfiguration)
             var results = realm.objects(ResultType.self)
 

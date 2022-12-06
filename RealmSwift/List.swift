@@ -210,7 +210,6 @@ public final class List<Element: RealmCollectionValue>: RLMSwiftCollectionBase, 
         rlmArray.exchangeObject(at: UInt(index1), withObjectAt: UInt(index2))
     }
 
-    // swiftlint:disable:next identifier_name
     @objc class func _unmanagedCollection() -> RLMArray<AnyObject> {
         if let type = Element.self as? ObjectBase.Type {
             return RLMArray(objectClassName: type.className())

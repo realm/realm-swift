@@ -1306,7 +1306,7 @@ class RealmTests: TestCase {
             switch change {
             case .initial:
                 return // ignore
-            case .update(_, deletions: _, insertions: _, modifications: _):
+            case .update:
                 updateComplete.fulfill()
             case .error:
                 XCTFail("should not get here for this test")

@@ -188,7 +188,6 @@ public final class MutableSet<Element: RealmCollectionValue>: RLMSwiftCollection
         rlmSet.union(other.rlmSet)
     }
 
-    // swiftlint:disable:next identifier_name
     @objc class func _unmanagedCollection() -> RLMSet<AnyObject> {
         if let type = Element.self as? ObjectBase.Type {
             return RLMSet(objectClassName: type.className())

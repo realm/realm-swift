@@ -904,7 +904,7 @@ class ModernObjectCreationTests: TestCase {
     }
 
     func testAddObjectCycle() {
-        weak var weakObj1: ModernCircleObject? = nil, weakObj2: ModernCircleObject? = nil
+        weak var weakObj1: ModernCircleObject?, weakObj2: ModernCircleObject?
 
         autoreleasepool {
             let obj1 = ModernCircleObject(value: [])
