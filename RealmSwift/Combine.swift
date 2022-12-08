@@ -625,22 +625,18 @@ extension EmbeddedObject: ObservableObject {
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 extension ObjectBase: RealmSubscribable {
     /// :nodoc:
-    public func _observe<S>(_ keyPaths: [String]?, on queue: DispatchQueue?, _ subscriber: S) -> NotificationToken
-        where S.Input: ObjectBase, S: Subscriber {
-        return _observe(keyPaths: keyPaths, on: queue) { (change: ObjectChange<S.Input>) in
-            switch change {
-            case .change(let object, _):
+    public func _observe<S: Subscriber>(_ keyPaths: [String]?, on queue: DispatchQueue?, _ subscriber: S) -> NotificationToken where S.Input: ObjectBase {
+        return _observe(keyPaths: keyPaths, on: queue) { (object: S.Input?) in
+            if let object = object {
                 _ = subscriber.receive(object)
-            case .deleted:
+            } else {
                 subscriber.receive(completion: .finished)
-            case .error(let error):
-                fatalError("Unexpected error \(error)")
             }
         }
     }
     /// :nodoc:
     public func _observe<S>(_ keyPaths: [String]?, _ subscriber: S) -> NotificationToken where S: Subscriber, S.Input == Void {
-        return _observe(keyPaths: keyPaths, { _ in _ = subscriber.receive()})
+        return _observe(keyPaths: keyPaths, { _ = subscriber.receive() })
     }
 }
 
@@ -805,26 +801,25 @@ extension ResultsSection: RealmSubscribable {
 // MARK: RealmCollection
 
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
-extension RealmCollection {
+extension RealmCollectionImpl {
     /// :nodoc:
     public func _observe<S>(_ keyPaths: [String]? = nil, on queue: DispatchQueue? = nil, _ subscriber: S)
         -> NotificationToken where S: Subscriber, S.Input == Self {
-            // FIXME: we could skip some pointless work in converting the changeset to the Swift type here
-        return observe(keyPaths: keyPaths, on: queue) { change in
-                switch change {
-                case .initial(let collection):
-                    _ = subscriber.receive(collection)
-                case .update(let collection, deletions: _, insertions: _, modifications: _):
-                    _ = subscriber.receive(collection)
-                case .error(let error):
-                    fatalError("Unexpected error \(error)")
-                }
+        var col: Self?
+        return collection.addNotificationBlock({ collection, _, _ in
+            if col == nil, let collection = collection {
+                col = self.collection === collection ? self : Self(collection: collection)
             }
+            if let col = col {
+                _ = subscriber.receive(col)
+            }
+        }, keyPaths: keyPaths, queue: queue)
     }
 
     /// :nodoc:
     public func _observe<S: Subscriber>(_ keyPaths: [String]? = nil, _ subscriber: S) -> NotificationToken where S.Input == Void {
-        return observe(keyPaths: keyPaths, on: nil) { _ in _ = subscriber.receive() }
+        collection.addNotificationBlock({ _, _, _ in _ = subscriber.receive() },
+                                        keyPaths: keyPaths, queue: nil)
     }
 }
 
