@@ -232,16 +232,7 @@ private final class ObservableStoragePublisher<ObjectType>: Publisher where Obje
 
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 private class ObservableStorage<ObservedType>: ObservableObject where ObservedType: RealmSubscribable & ThreadConfined & Equatable {
-    @Published var value: ObservedType {
-        willSet {
-            if newValue != value {
-                objectWillChange.subscribers.forEach {
-                    $0.receive(subscription: ObservationSubscription(token: newValue._observe(keyPaths, $0)))
-                }
-                objectWillChange.send()
-            }
-        }
-    }
+    @Published var value: ObservedType
 
     let objectWillChange: ObservableStoragePublisher<ObservedType>
     let keyPaths: [String]?
@@ -270,7 +261,9 @@ private class ObservableResultsStorage<T>: ObservableStorage<T> where T: RealmSu
     private var setupHasRun = false
     func didSet() {
         if setupHasRun {
+            objectWillChange.send()
             updateValue()
+            subscribe()
         }
     }
 
@@ -280,9 +273,18 @@ private class ObservableResultsStorage<T>: ObservableStorage<T> where T: RealmSu
     }
 
     func setupValue() {
-        if !setupHasRun {
-            updateValue()
-            setupHasRun = true
+        guard !setupHasRun else { return }
+        updateValue()
+        subscribe()
+        setupHasRun = true
+    }
+
+    // Each time we create a new Results we need to resubscribe all of the
+    // existing subscribers to it. We are trusting that SwiftUI will clean up
+    // the old subscriptions rather than hold onto them forever.
+    private func subscribe() {
+        objectWillChange.subscribers.forEach {
+            $0.receive(subscription: ObservationSubscription(token: value._observe(keyPaths, $0)))
         }
     }
 

@@ -5,7 +5,9 @@ x.y.z Release notes (yyyy-MM-dd)
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
-* None.
+* Fix "Publishing changes from within view updates is not allowed" warnings
+  when using `@ObservedResults` or `@ObservedSectionedResults`. This is an
+  incomplete fix and other property wrappers still produce this warning.
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
