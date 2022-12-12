@@ -192,8 +192,8 @@ extension Object: _RealmCollectionValueInsideOptional {
          @Persisted var age: Int
 
          override class public func propertiesMapping() -> [String : String] {
-             ["firstName"; "first_name",
-              "birthDate"; "birth_date"]
+             ["firstName": "first_name",
+              "birthDate": "birth_date"]
          }
      }
      ```

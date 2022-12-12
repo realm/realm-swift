@@ -5,19 +5,28 @@ x.y.z Release notes (yyyy-MM-dd)
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
-* None.
+* The realm file will be shrunk if the larger file size is no longer needed. (Core PR [#5755](https://github.com/realm/realm-core/pull/5755))
+* Most of the file growth caused by version pinning is eliminated. (Core PR [#5440](https://github.com/realm/realm-core/pull/5440))
+* Set<Mixed> consider string and binary data equivalent. This could cause the client to be inconsistent with the server if a string and some binary data with equivalent content was inserted from Atlas. ([Core PR #4860](https://github.com/realm/realm-core/issues/4860), since v10.8.0)
+* Fixed wrong assertion on query error that could result in a crash. ([Core PR #6038](https://github.com/realm/realm-core/issues/6038), since v10.21.1)
+* Not possible to open an encrypted file on a device with a page size bigger than the one on which the file was produced. ([Core PR #8030](https://github.com/realm/realm-swift/issues/8030), since v10.32.1)
+* Fixed `realm_add_realm_refresh_callback` and notify immediately that there is not transaction snapshot to advance to. ([Core PR #6075](https://github.com/realm/realm-core/issues/6075), since v12.6.0)
+* Fix no notification for write transaction that contains only change to backlink property. ([Core PR #7493](https://github.com/realm/realm-swift/issues/7493), since v10.18.0)
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+### Breaking Changes
+* Encoding of Dictionary in the realm file has changed. This will change the order of the elements, so if any tests depend on the order, those must be revised.
 
 ### Compatibility
 * Realm Studio: 11.0.0 - 12.0.0.
+* Realm Studio: 13.1.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 14.2.
 * CocoaPods: 1.10 or later.
 * Xcode: 13.3-14.2.
 
 ### Internal
-* Upgraded realm-core from ? to ?
+* Upgraded realm-core from 12.13.0 to 13.2.0
+
 
 10.34.1 Release notes (2023-01-20)
 =============================================================

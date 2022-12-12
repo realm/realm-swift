@@ -47,27 +47,31 @@
 }
 
 - (RLMObjectId *)identifier {
-    return [[RLMObjectId alloc] initWithValue:_subscription->id()];
+    return [[RLMObjectId alloc] initWithValue:_subscription->id];
 }
 
 - (nullable NSString *)name {
-    return RLMStringViewToNSString(_subscription->name());
+    auto name = _subscription->name;
+    if (name) {
+        return @(name->c_str());
+    }
+    return nil;
 }
 
 - (NSDate *)createdAt {
-    return RLMTimestampToNSDate(_subscription->created_at());
+    return RLMTimestampToNSDate(_subscription->created_at);
 }
 
 - (NSDate *)updatedAt {
-    return RLMTimestampToNSDate(_subscription->updated_at());
+    return RLMTimestampToNSDate(_subscription->updated_at);
 }
 
 - (NSString *)queryString {
-    return RLMStringViewToNSString(_subscription->query_string());
+    return @(_subscription->query_string.c_str());
 }
 
 - (NSString *)objectClassName {
-    return RLMStringViewToNSString(_subscription->object_class_name());
+    return @(_subscription->object_class_name.c_str());
 }
 
 - (void)updateSubscriptionWhere:(NSString *)predicateFormat, ... {
@@ -274,9 +278,9 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
 #pragma mark - Find subscription
 
 - (nullable RLMSyncSubscription *)subscriptionWithName:(NSString *)name {
-    auto iterator = _subscriptionSet->find([name UTF8String]);
-    if (iterator != _subscriptionSet->end()) {
-        return [[RLMSyncSubscription alloc] initWithSubscription:*iterator
+    auto subscription = _subscriptionSet->find([name UTF8String]);
+    if (subscription) {
+        return [[RLMSyncSubscription alloc] initWithSubscription:*subscription
                                                  subscriptionSet:self];
     }
     return nil;
@@ -303,8 +307,9 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
                                                   predicate:(NSPredicate *)predicate {
     RLMClassInfo& info = _realm->_info[objectClassName];
     auto query = RLMPredicateToQuery(predicate, info.rlmObjectSchema, _realm.schema, _realm.group);
-    if (auto it = _subscriptionSet->find(query); it != _subscriptionSet->end()) {
-        return [[RLMSyncSubscription alloc] initWithSubscription:*it
+    auto subscription = _subscriptionSet->find(query);
+    if (subscription) {
+        return [[RLMSyncSubscription alloc] initWithSubscription:*subscription
                                                  subscriptionSet:self];
     }
     return nil;
@@ -379,7 +384,7 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
     auto query = RLMPredicateToQuery(predicate, info.rlmObjectSchema, _realm.schema, _realm.group);
     
     if (name) {
-        if (updateExisting || _mutableSubscriptionSet->find(name.UTF8String) == _mutableSubscriptionSet->end()) {
+        if (updateExisting || !_mutableSubscriptionSet->find(name.UTF8String)) {
             _mutableSubscriptionSet->insert_or_assign(name.UTF8String, query);
         }
         else {
@@ -396,9 +401,9 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
 - (void)removeSubscriptionWithName:(NSString *)name {
     [self verifyInWriteTransaction];
 
-    auto iterator = _mutableSubscriptionSet->find([name UTF8String]);
-    if (iterator != _mutableSubscriptionSet->end()) {
-        _mutableSubscriptionSet->erase(iterator);
+    auto subscription = _subscriptionSet->find([name UTF8String]);
+    if (subscription) {
+        _mutableSubscriptionSet->erase(subscription->name);
     }
 }
 
@@ -425,9 +430,9 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
     
     RLMClassInfo& info = _realm->_info[objectClassName];
     auto query = RLMPredicateToQuery(predicate, info.rlmObjectSchema, _realm.schema, _realm.group);
-    auto iterator = _mutableSubscriptionSet->find(query);
-    if (iterator != _mutableSubscriptionSet->end()) {
-        _mutableSubscriptionSet->erase(iterator);
+    auto subscription = _subscriptionSet->find(query);
+    if (subscription) {
+        _mutableSubscriptionSet->erase(query);
     }
 }
 
@@ -435,7 +440,7 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
     [self verifyInWriteTransaction];
 
     for (auto it = _mutableSubscriptionSet->begin(); it != _mutableSubscriptionSet->end();) {
-        if (it->id() == subscription.identifier.value) {
+        if (it->id == subscription.identifier.value) {
             it = _mutableSubscriptionSet->erase(it);
             return;
         }
@@ -454,7 +459,7 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
     [self verifyInWriteTransaction];
     
     for (auto it = _mutableSubscriptionSet->begin(); it != _mutableSubscriptionSet->end();) {
-        if (it->object_class_name() == [className UTF8String]) {
+        if (it->object_class_name == [className UTF8String]) {
             it = _mutableSubscriptionSet->erase(it);
         }
         else {

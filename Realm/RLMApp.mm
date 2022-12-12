@@ -128,10 +128,11 @@ namespace {
         self.localAppVersion = localAppVersion;
         self.defaultRequestTimeoutMS = defaultRequestTimeoutMS;
 
-        _config.platform = "Realm Cocoa";
+        _config.device_info.sdk = "Realm Swift";
 
-        RLMNSStringToStdString(_config.platform_version, [[NSProcessInfo processInfo] operatingSystemVersionString]);
-        RLMNSStringToStdString(_config.sdk_version, REALM_COCOA_VERSION);
+        RLMNSStringToStdString(_config.device_info.platform, [[[[NSProcessInfo processInfo] environment][@"RUN_DESTINATION_DEVICE_PLATFORM_IDENTIFIER"] componentsSeparatedByString:@"."] lastObject]);
+        RLMNSStringToStdString(_config.device_info.platform_version, [[NSProcessInfo processInfo] operatingSystemVersionString]);
+        RLMNSStringToStdString(_config.device_info.sdk_version, REALM_COCOA_VERSION);
         return self;
     }
     return nil;

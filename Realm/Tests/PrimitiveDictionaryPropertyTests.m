@@ -2510,45 +2510,45 @@ static double average(NSDictionary *dictionary) {
     [managed.anyObjectIdObj addEntriesFromDictionary:@{ @"key1": objectId(1), @"key2": objectId(2) }];
     [managed.anyUUIDObj addEntriesFromDictionary:@{ @"key1": uuid(@"00000000-0000-0000-0000-000000000000"), @"key2": uuid(@"137DECC8-B300-4954-A233-F89909F4FD89") }];
 
-    uncheckedAssertEqual(1U, [[managed.boolObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:@NO]);
-    uncheckedAssertEqual(1U, [[managed.intObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:@2]);
-    uncheckedAssertEqual(1U, [[managed.stringObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:@"bar"]);
-    uncheckedAssertEqual(1U, [[managed.dateObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:date(1)]);
-    uncheckedAssertEqual(1U, [[managed.anyBoolObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:@NO]);
-    uncheckedAssertEqual(1U, [[managed.anyIntObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:@2]);
-    uncheckedAssertEqual(1U, [[managed.anyFloatObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:@2.2f]);
-    uncheckedAssertEqual(1U, [[managed.anyDoubleObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:@2.2]);
-    uncheckedAssertEqual(1U, [[managed.anyStringObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:@"a"]);
-    uncheckedAssertEqual(1U, [[managed.anyDataObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:data(1)]);
-    uncheckedAssertEqual(1U, [[managed.anyDateObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:date(1)]);
-    uncheckedAssertEqual(1U, [[managed.anyDecimalObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:decimal128(2)]);
-    uncheckedAssertEqual(1U, [[managed.anyUUIDObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:uuid(@"00000000-0000-0000-0000-000000000000")]);
-    uncheckedAssertEqual(0U, [[managed.boolObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:@YES]);
-    uncheckedAssertEqual(0U, [[managed.intObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:@3]);
-    uncheckedAssertEqual(0U, [[managed.stringObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:@"foo"]);
-    uncheckedAssertEqual(0U, [[managed.dateObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:date(2)]);
-    uncheckedAssertEqual(0U, [[managed.anyBoolObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:@YES]);
-    uncheckedAssertEqual(0U, [[managed.anyIntObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:@3]);
-    uncheckedAssertEqual(0U, [[managed.anyFloatObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:@3.3f]);
-    uncheckedAssertEqual(0U, [[managed.anyDoubleObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:@3.3]);
-    uncheckedAssertEqual(0U, [[managed.anyStringObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:@"b"]);
-    uncheckedAssertEqual(0U, [[managed.anyDataObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:data(2)]);
-    uncheckedAssertEqual(0U, [[managed.anyDateObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:date(2)]);
-    uncheckedAssertEqual(0U, [[managed.anyDecimalObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:decimal128(3)]);
-    uncheckedAssertEqual(0U, [[managed.anyUUIDObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]);
+    uncheckedAssertEqual(0U, [[managed.boolObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:@NO]);
+    uncheckedAssertEqual(0U, [[managed.intObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:@2]);
+    uncheckedAssertEqual(0U, [[managed.stringObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:@"bar"]);
+    uncheckedAssertEqual(0U, [[managed.dateObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:date(1)]);
+    uncheckedAssertEqual(0U, [[managed.anyBoolObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:@NO]);
+    uncheckedAssertEqual(0U, [[managed.anyIntObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:@2]);
+    uncheckedAssertEqual(0U, [[managed.anyFloatObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:@2.2f]);
+    uncheckedAssertEqual(0U, [[managed.anyDoubleObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:@2.2]);
+    uncheckedAssertEqual(0U, [[managed.anyStringObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:@"a"]);
+    uncheckedAssertEqual(0U, [[managed.anyDataObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:data(1)]);
+    uncheckedAssertEqual(0U, [[managed.anyDateObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:date(1)]);
+    uncheckedAssertEqual(0U, [[managed.anyDecimalObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:decimal128(2)]);
+    uncheckedAssertEqual(0U, [[managed.anyUUIDObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:uuid(@"00000000-0000-0000-0000-000000000000")]);
+    uncheckedAssertEqual(1U, [[managed.boolObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:@YES]);
+    uncheckedAssertEqual(1U, [[managed.intObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:@3]);
+    uncheckedAssertEqual(1U, [[managed.stringObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:@"foo"]);
+    uncheckedAssertEqual(1U, [[managed.dateObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:date(2)]);
+    uncheckedAssertEqual(1U, [[managed.anyBoolObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:@YES]);
+    uncheckedAssertEqual(1U, [[managed.anyIntObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:@3]);
+    uncheckedAssertEqual(1U, [[managed.anyFloatObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:@3.3f]);
+    uncheckedAssertEqual(1U, [[managed.anyDoubleObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:@3.3]);
+    uncheckedAssertEqual(1U, [[managed.anyStringObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:@"b"]);
+    uncheckedAssertEqual(1U, [[managed.anyDataObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:data(2)]);
+    uncheckedAssertEqual(1U, [[managed.anyDateObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:date(2)]);
+    uncheckedAssertEqual(1U, [[managed.anyDecimalObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:decimal128(3)]);
+    uncheckedAssertEqual(1U, [[managed.anyUUIDObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]);
 
-    uncheckedAssertEqual(1U, [[optManaged.boolObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:@NO]);
-    uncheckedAssertEqual(1U, [[optManaged.intObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:@2]);
-    uncheckedAssertEqual(1U, [[optManaged.stringObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:@"bar"]);
-    uncheckedAssertEqual(1U, [[optManaged.dateObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:date(1)]);
-    uncheckedAssertEqual(0U, [[optManaged.boolObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:(id)NSNull.null]);
-    uncheckedAssertEqual(0U, [[optManaged.intObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:(id)NSNull.null]);
-    uncheckedAssertEqual(0U, [[optManaged.stringObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:(id)NSNull.null]);
-    uncheckedAssertEqual(0U, [[optManaged.dateObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:(id)NSNull.null]);
-    uncheckedAssertEqual(0U, [[optManaged.boolObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:(id)NSNull.null]);
-    uncheckedAssertEqual(0U, [[optManaged.intObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:(id)NSNull.null]);
-    uncheckedAssertEqual(0U, [[optManaged.stringObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:(id)NSNull.null]);
-    uncheckedAssertEqual(0U, [[optManaged.dateObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:(id)NSNull.null]);
+    uncheckedAssertEqual(0U, [[optManaged.boolObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:@NO]);
+    uncheckedAssertEqual(0U, [[optManaged.intObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:@2]);
+    uncheckedAssertEqual(0U, [[optManaged.stringObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:@"bar"]);
+    uncheckedAssertEqual(0U, [[optManaged.dateObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:date(1)]);
+    uncheckedAssertEqual(1U, [[optManaged.boolObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:(id)NSNull.null]);
+    uncheckedAssertEqual(1U, [[optManaged.intObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:(id)NSNull.null]);
+    uncheckedAssertEqual(1U, [[optManaged.stringObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:(id)NSNull.null]);
+    uncheckedAssertEqual(1U, [[optManaged.dateObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:(id)NSNull.null]);
+    uncheckedAssertEqual(1U, [[optManaged.boolObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:(id)NSNull.null]);
+    uncheckedAssertEqual(1U, [[optManaged.intObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:(id)NSNull.null]);
+    uncheckedAssertEqual(1U, [[optManaged.stringObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:(id)NSNull.null]);
+    uncheckedAssertEqual(1U, [[optManaged.dateObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:(id)NSNull.null]);
 }
 
 - (void)testSort {
@@ -2769,39 +2769,39 @@ static double average(NSDictionary *dictionary) {
     [managed.anyUUIDObj addEntriesFromDictionary:@{ @"key1": uuid(@"00000000-0000-0000-0000-000000000000"), @"key2": uuid(@"137DECC8-B300-4954-A233-F89909F4FD89") }];
 
     uncheckedAssertEqualObjects([[managed.boolObj sortedResultsUsingDescriptors:@[]] valueForKey:@"self"],
-                                (@[@YES, @NO]));
+                                (@[@NO, @YES]));
     uncheckedAssertEqualObjects([[optManaged.boolObj sortedResultsUsingDescriptors:@[]] valueForKey:@"self"],
-                                (@[NSNull.null, @NO]));
+                                (@[@NO, NSNull.null]));
     uncheckedAssertEqualObjects([[managed.intObj sortedResultsUsingDescriptors:@[]] valueForKey:@"self"],
-                                (@[@3, @2]));
+                                (@[@2, @3]));
     uncheckedAssertEqualObjects([[optManaged.intObj sortedResultsUsingDescriptors:@[]] valueForKey:@"self"],
-                                (@[NSNull.null, @2]));
+                                (@[@2, NSNull.null]));
     uncheckedAssertEqualObjects([[managed.stringObj sortedResultsUsingDescriptors:@[]] valueForKey:@"self"],
-                                (@[@"foo", @"bar"]));
+                                (@[@"bar", @"foo"]));
     uncheckedAssertEqualObjects([[optManaged.stringObj sortedResultsUsingDescriptors:@[]] valueForKey:@"self"],
-                                (@[NSNull.null, @"bar"]));
+                                (@[@"bar", NSNull.null]));
     uncheckedAssertEqualObjects([[managed.dateObj sortedResultsUsingDescriptors:@[]] valueForKey:@"self"],
-                                (@[date(2), date(1)]));
+                                (@[date(1), date(2)]));
     uncheckedAssertEqualObjects([[optManaged.dateObj sortedResultsUsingDescriptors:@[]] valueForKey:@"self"],
-                                (@[NSNull.null, date(1)]));
+                                (@[date(1), NSNull.null]));
     uncheckedAssertEqualObjects([[managed.anyBoolObj sortedResultsUsingDescriptors:@[]] valueForKey:@"self"],
-                                (@[@YES, @NO]));
+                                (@[@NO, @YES]));
     uncheckedAssertEqualObjects([[managed.anyIntObj sortedResultsUsingDescriptors:@[]] valueForKey:@"self"],
-                                (@[@3, @2]));
+                                (@[@2, @3]));
     uncheckedAssertEqualObjects([[managed.anyFloatObj sortedResultsUsingDescriptors:@[]] valueForKey:@"self"],
-                                (@[@3.3f, @2.2f]));
+                                (@[@2.2f, @3.3f]));
     uncheckedAssertEqualObjects([[managed.anyDoubleObj sortedResultsUsingDescriptors:@[]] valueForKey:@"self"],
-                                (@[@3.3, @2.2]));
+                                (@[@2.2, @3.3]));
     uncheckedAssertEqualObjects([[managed.anyStringObj sortedResultsUsingDescriptors:@[]] valueForKey:@"self"],
-                                (@[@"b", @"a"]));
+                                (@[@"a", @"b"]));
     uncheckedAssertEqualObjects([[managed.anyDataObj sortedResultsUsingDescriptors:@[]] valueForKey:@"self"],
-                                (@[data(2), data(1)]));
+                                (@[data(1), data(2)]));
     uncheckedAssertEqualObjects([[managed.anyDateObj sortedResultsUsingDescriptors:@[]] valueForKey:@"self"],
-                                (@[date(2), date(1)]));
+                                (@[date(1), date(2)]));
     uncheckedAssertEqualObjects([[managed.anyDecimalObj sortedResultsUsingDescriptors:@[]] valueForKey:@"self"],
-                                (@[decimal128(3), decimal128(2)]));
+                                (@[decimal128(2), decimal128(3)]));
     uncheckedAssertEqualObjects([[managed.anyUUIDObj sortedResultsUsingDescriptors:@[]] valueForKey:@"self"],
-                                (@[uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"), uuid(@"00000000-0000-0000-0000-000000000000")]));
+                                (@[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]));
 
     uncheckedAssertEqualObjects([[managed.boolObj sortedResultsUsingKeyPath:@"self" ascending:NO] valueForKey:@"self"],
                                 (@[@YES, @NO]));

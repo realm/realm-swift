@@ -244,7 +244,7 @@ extension Realm {
          number of versions will instead throw an exception. This can be used with a
          low value during development to help identify places that may be problematic,
          or in production use to cause the app to crash rather than produce a Realm
-         file which is too large to be oened.
+         file which is too large to be opened.
          */
         public var maximumNumberOfActiveVersions: UInt?
 

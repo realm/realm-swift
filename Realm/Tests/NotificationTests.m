@@ -1076,7 +1076,7 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions,
 }
 
 - (void)testInsertBothMatchingAndNonMatching {
-    ExpectChange(self, @[], @[@0], @[], ^(RLMRealm *realm) {
+    ExpectChange(self, @[], @[@4], @[], ^(RLMRealm *realm) {
         RLMDictionary *dictionary = [[[DictionaryPropertyObject allObjectsInRealm:realm] firstObject] intObjDictionary];
         dictionary[@"keyA"] = [IntObject createInRealm:realm withValue:@[@5]];
         dictionary[@"keyB"] = [IntObject createInRealm:realm withValue:@[@3]];
@@ -1084,7 +1084,7 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions,
 }
 
 - (void)testInsertMultipleMatching {
-    ExpectChange(self, @[], @[@0, @1], @[], ^(RLMRealm *realm) {
+    ExpectChange(self, @[], @[@4, @5], @[], ^(RLMRealm *realm) {
         RLMDictionary *dictionary = [[[DictionaryPropertyObject allObjectsInRealm:realm] firstObject] intObjDictionary];
         dictionary[@"keyA"] = [IntObject createInRealm:realm withValue:@[@5]];
         dictionary[@"keyB"] = [IntObject createInRealm:realm withValue:@[@3]];
@@ -1094,7 +1094,7 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions,
 }
 
 - (void)testRemoveFromDictionary {
-    ExpectChange(self, @[@1], @[], @[], ^(RLMRealm *realm) {
+    ExpectChange(self, @[@0], @[], @[], ^(RLMRealm *realm) {
         RLMDictionary *dictionary = [[[DictionaryPropertyObject allObjectsInRealm:realm] firstObject] intObjDictionary];
         [dictionary removeObjectForKey:@"key1"];
     });
