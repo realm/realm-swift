@@ -235,10 +235,10 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
     @Published var value: ObservedType {
         willSet {
             if newValue != value {
+                objectWillChange.send()
                 objectWillChange.subscribers.forEach {
                     $0.receive(subscription: ObservationSubscription(token: newValue._observe(keyPaths, $0)))
                 }
-                objectWillChange.send()
             }
         }
     }
@@ -280,10 +280,9 @@ private class ObservableResultsStorage<T>: ObservableStorage<T> where T: RealmSu
     }
 
     func setupValue() {
-        if !setupHasRun {
-            updateValue()
-            setupHasRun = true
-        }
+        guard !setupHasRun else { return }
+        updateValue()
+        setupHasRun = true
     }
 
     var sortDescriptor: SortDescriptor? {
@@ -1450,59 +1449,67 @@ private class ObservableAsyncOpenStorage: ObservableObject {
         case loggedIn(User)
         case loggedOut
     }
-    private var appState: AppState {
-        didSet {
-            switch appState {
-            case .loggedIn(let user):
-                self.asyncOpenForUser(user)
-            case .loggedOut:
-                asyncOpenState = .waitingForUser
-            }
-        }
-    }
+    private var appState: AppState = .loggedOut
 
     // Cancellables
     private var appCancellable = [AnyCancellable]()
     private var asyncOpenCancellable = [AnyCancellable]()
 
-    @Published var asyncOpenState: AsyncOpenState = .connecting {
-        willSet {
-            objectWillChange.send()
+    @Published fileprivate var asyncOpenState: AsyncOpenState
+
+    init(asyncOpenKind: AsyncOpenKind, app: App, configuration: Realm.Configuration?, partitionValue: AnyBSON?) {
+        self.asyncOpenKind = asyncOpenKind
+        self.app = app
+        self.configuration = configuration
+        self.partitionValue = partitionValue
+
+        // Initialising the state value depending on the user status, before first rendering.
+        if let user = app.currentUser {
+            appState = .loggedIn(user)
+            asyncOpenState = .connecting
+        } else {
+            asyncOpenState = .waitingForUser
         }
     }
 
-    fileprivate func update(_ partitionValue: PartitionValue?, _ configuration: Realm.Configuration) {
-        var open = false
-        if let partitionValue = partitionValue {
-            let bsonValue = AnyBSON(partitionValue: partitionValue)
-            if self.partitionValue != bsonValue {
-                self.partitionValue = bsonValue
-                open = true
-            }
-        }
-
-        // We don't want to use the `defaultConfiguration` from the environment, we only want to use this environment value in @AsyncOpen if is not the default one
-        if configuration != .defaultConfiguration, self.configuration != configuration {
-            if let partitionValue = configuration.syncConfiguration?.partitionValue {
-                self.partitionValue = partitionValue
-            }
-            self.configuration = configuration
-            open = true
-        }
-        if open {
-            self.asyncOpen()
-        }
+    var setupHasRun = false
+    func setup() {
+        guard !setupHasRun else { return }
+        initAsyncOpen()
+        setupHasRun = true
     }
 
-    private func asyncOpen() {
-        if case let .loggedIn(user) = appState {
+    private func initAsyncOpen() {
+        if case .loggedIn(let user) = appState {
+            // we only open the realm on initialisation if there is a user logged.
             asyncOpenForUser(user)
         }
+
+        // we observe the changes in the app state to check for user changes,
+        // we store an internal state, so we could react to those changes (user login, user change, logout).
+        app.objectWillChange.sink { app in
+            switch self.appState {
+            case .loggedIn(let user):
+                if let newUser = app.currentUser,
+                    user != newUser {
+                    self.appState = .loggedIn(newUser)
+                    self.asyncOpenState = .connecting
+                    self.asyncOpenForUser(user)
+                } else if app.currentUser == nil {
+                    self.asyncOpenState = .waitingForUser
+                    self.appState = .loggedOut
+                }
+            case .loggedOut:
+                if let user = app.currentUser {
+                    self.appState = .loggedIn(user)
+                    self.asyncOpenState = .connecting
+                    self.asyncOpenForUser(user)
+                }
+            }
+        }.store(in: &appCancellable)
     }
 
     private func asyncOpenForUser(_ user: User) {
-        asyncOpenState = .connecting
-
         // Set the `syncConfiguration` depending if there is partition value (pbs) or not (flx).
         var config: Realm.Configuration
         if let partitionValue = partitionValue {
@@ -1513,6 +1520,10 @@ private class ObservableAsyncOpenStorage: ObservableObject {
 
         // Use the user configuration by default or set configuration with the current user `syncConfiguration`'s.
         if var configuration = configuration {
+            // We want to throw if the configuration doesn't contain a `SyncConfiguration`
+            guard configuration.syncConfiguration != nil else {
+                throwRealmException("The used configuration was not configured with sync.")
+            }
             let userSyncConfig = config.syncConfiguration
             configuration.syncConfiguration = userSyncConfig
             config = configuration
@@ -1549,6 +1560,23 @@ private class ObservableAsyncOpenStorage: ObservableObject {
             }.store(in: &self.asyncOpenCancellable)
     }
 
+    fileprivate func update(_ partitionValue: PartitionValue?, _ configuration: Realm.Configuration) {
+        if let partitionValue = partitionValue {
+            let bsonValue = AnyBSON(partitionValue: partitionValue)
+            if self.partitionValue != bsonValue {
+                self.partitionValue = bsonValue
+            }
+        }
+
+        // We don't want to use the `defaultConfiguration` from the environment, we only want to use this environment value in @AsyncOpen if is not the default one
+        if configuration != .defaultConfiguration, self.configuration != configuration {
+            if let partitionValue = configuration.syncConfiguration?.partitionValue {
+                self.partitionValue = partitionValue
+            }
+            self.configuration = configuration
+        }
+    }
+
     private func cancelAsyncOpen() {
         asyncOpenCancellable.forEach { $0.cancel() }
         asyncOpenCancellable = []
@@ -1558,36 +1586,6 @@ private class ObservableAsyncOpenStorage: ObservableObject {
         cancelAsyncOpen()
         appCancellable.forEach { $0.cancel() }
         appCancellable = []
-    }
-
-    init(asyncOpenKind: AsyncOpenKind, app: App, configuration: Realm.Configuration?, partitionValue: AnyBSON?) {
-        self.asyncOpenKind = asyncOpenKind
-        self.app = app
-        self.configuration = configuration
-        self.partitionValue = partitionValue
-
-        if let user = app.currentUser {
-            appState = .loggedIn(user)
-            asyncOpenForUser(user)
-        } else {
-            appState = .loggedOut
-            asyncOpenState = .waitingForUser
-        }
-        app.objectWillChange.sink { app in
-            switch self.appState {
-            case .loggedIn(let user):
-                if let newUser = app.currentUser,
-                    user != newUser {
-                    self.appState = .loggedIn(newUser)
-                } else if app.currentUser == nil {
-                    self.appState = .loggedOut
-                }
-            case .loggedOut:
-                if let user = app.currentUser {
-                    self.appState = .loggedIn(user)
-                }
-            }
-        }.store(in: &appCancellable)
     }
 
     // MARK: - AutoOpen & AsyncOpen Helper
@@ -1668,12 +1666,13 @@ private class ObservableAsyncOpenStorage: ObservableObject {
      A Publisher for `AsyncOpenState`, emits a state each time the asyncOpen state changes.
      */
     public var projectedValue: Published<AsyncOpenState>.Publisher {
-        return storage.$asyncOpenState
+        storage.$asyncOpenState
     }
 
     /// :nodoc:
     public var wrappedValue: AsyncOpenState {
-        storage.asyncOpenState
+        storage.setup()
+        return storage.asyncOpenState
     }
 
     /**
@@ -1691,7 +1690,7 @@ private class ObservableAsyncOpenStorage: ObservableObject {
                  user's sync configuration for the given partition value will be set as the `syncConfiguration`,
                  if empty the user configuration will be used.
      - parameter timeout: The maximum number of milliseconds to allow for a connection to
-     become fully established., if empty or `nil` no connection timeout is set.
+                 become fully established., if empty or `nil` no connection timeout is set.
      */
     public init<Partition>(appId: String? = nil,
                            partitionValue: Partition,
@@ -1777,12 +1776,13 @@ private class ObservableAsyncOpenStorage: ObservableObject {
      A Publisher for `AsyncOpenState`, emits a state each time the asyncOpen state changes.
      */
     public var projectedValue: Published<AsyncOpenState>.Publisher {
-        return storage.$asyncOpenState
+        storage.$asyncOpenState
     }
 
     /// :nodoc:
     public var wrappedValue: AsyncOpenState {
-        storage.asyncOpenState
+        storage.setup()
+        return storage.asyncOpenState
     }
 
     /**

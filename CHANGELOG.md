@@ -12,6 +12,15 @@ x.y.z Release notes (yyyy-MM-dd)
 * Fix `@AutoOpen` not returning a realm for a flexible sync configuration, 
   when there is no internet connection. 
   ([#7986](https://github.com/realm/realm-swift/issues/7986), since v10.27.0)
+* Fix "Publishing changes from within view updates is not allowed" warnings
+  when using `@ObservedResults` or `@ObservedSectionedResults`. 
+  ([#7908](https://github.com/realm/realm-swift/issues/7908), since XCode 14 Beta 5).
+* Fix "Publishing changes from within view updates is not allowed" warnings
+  when using `@AutoOpen` or `@AsyncOpen`.
+  ([#7908](https://github.com/realm/realm-swift/issues/7908), since XCode 14 Beta 5).
+* Defer `Realm.asyncOpen` execution on `@AsyncOpen` and `@AutoOpen` property wrappers, 
+  until all the environment values are set. This will guarantee the configuration and partition value
+  are set set before opening the realm. ([#7931](https://github.com/realm/realm-swift/issues/7931), since v10.12.0).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
