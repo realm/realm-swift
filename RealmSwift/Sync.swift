@@ -461,11 +461,7 @@ public enum ClientResetMode {
      and the async open will be cancelled.
      */
     public var cancelAsyncOpenOnNonFatalErrors: Bool {
-        get {
-            return config.cancelAsyncOpenOnNonFatalErrors
-        } set {
-            config.cancelAsyncOpenOnNonFatalErrors = newValue
-        }
+        config.cancelAsyncOpenOnNonFatalErrors
     }
 
     internal let config: RLMSyncConfiguration
