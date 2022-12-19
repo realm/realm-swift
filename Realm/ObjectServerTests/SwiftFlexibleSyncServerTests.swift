@@ -993,6 +993,45 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
         waitForDownloads(for: realm)
         checkCount(expected: 10, realm, SwiftPerson.self)
     }
+
+    func testFlexibleSyncCancelOnNonFatalError() throws {
+        let proxy = TimeoutProxyServer(port: 5678, targetPort: 9090)
+        try proxy.start()
+
+        let appId = try RealmServer.shared.createApp()
+        let appConfig = AppConfiguration(baseURL: "http://localhost:5678",
+                                         transport: AsyncOpenConnectionTimeoutTransport(),
+                                         localAppName: nil, localAppVersion: nil)
+        let app = App(id: appId, configuration: appConfig)
+
+        let syncTimeoutOptions = SyncTimeoutOptions()
+        syncTimeoutOptions.connectTimeout = 1000
+        app.syncManager.timeoutOptions = syncTimeoutOptions
+
+        let user = try logInUser(for: basicCredentials(app: app), app: app)
+        let config = user.flexibleSyncConfiguration()
+        var syncConfiguration = config.syncConfiguration
+        syncConfiguration?.cancelAsyncOpenOnNonFatalErrors = true
+
+        autoreleasepool {
+            proxy.delay = 2.0
+            let ex = expectation(description: "async open")
+            Realm.asyncOpen(configuration: config) { result in
+                guard case .failure(let error) = result else {
+                    XCTFail("Did not fail: \(result)")
+                    return
+                }
+                if let error = error as NSError? {
+                    XCTAssertEqual(error.code, Int(ETIMEDOUT))
+                    XCTAssertEqual(error.domain, NSPOSIXErrorDomain)
+                }
+                ex.fulfill()
+            }
+            waitForExpectations(timeout: 20.0, handler: nil)
+        }
+
+        proxy.stop()
+    }
 }
 
 // MARK: - Async Await
