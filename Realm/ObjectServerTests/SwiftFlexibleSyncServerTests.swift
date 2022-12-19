@@ -998,23 +998,20 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
         let proxy = TimeoutProxyServer(port: 5678, targetPort: 9090)
         try proxy.start()
 
-        let appId = try RealmServer.shared.createApp()
         let appConfig = AppConfiguration(baseURL: "http://localhost:5678",
                                          transport: AsyncOpenConnectionTimeoutTransport(),
                                          localAppName: nil, localAppVersion: nil)
-        let app = App(id: appId, configuration: appConfig)
+        let app = App(id: flexibleSyncAppId, configuration: appConfig)
 
         let syncTimeoutOptions = SyncTimeoutOptions()
-        syncTimeoutOptions.connectTimeout = 1000
+        syncTimeoutOptions.connectTimeout = 2000
         app.syncManager.timeoutOptions = syncTimeoutOptions
 
         let user = try logInUser(for: basicCredentials(app: app), app: app)
-        let config = user.flexibleSyncConfiguration()
-        var syncConfiguration = config.syncConfiguration
-        syncConfiguration?.cancelAsyncOpenOnNonFatalErrors = true
+        let config = user.flexibleSyncConfiguration(cancelAsyncOpenOnNonFatalErrors: true)
 
         autoreleasepool {
-            proxy.delay = 2.0
+            proxy.delay = 3.0
             let ex = expectation(description: "async open")
             Realm.asyncOpen(configuration: config) { result in
                 guard case .failure(let error) = result else {
