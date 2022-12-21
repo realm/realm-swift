@@ -16,12 +16,11 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
 #import <Realm/RLMRealm.h>
 
 @class RLMEventConfiguration, RLMSyncConfiguration;
 
-NS_ASSUME_NONNULL_BEGIN
+RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
 /**
  A block called when opening a Realm for the first time during the life
@@ -193,4 +192,4 @@ typedef void(^RLMFlexibleSyncInitialSubscriptionsBlock)(RLMSyncSubscriptionSet *
 
 @end
 
-NS_ASSUME_NONNULL_END
+RLM_HEADER_AUDIT_END(nullability, sendability)

@@ -16,7 +16,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
 #import <Realm/RLMConstants.h>
 
 @class RLMRealmConfiguration, RLMRealm, RLMObject, RLMSchema, RLMMigration, RLMNotificationToken, RLMThreadSafeReference, RLMAsyncOpenTask, RLMSyncSubscriptionSet;
@@ -31,7 +30,7 @@ typedef void(^RLMAsyncOpenRealmCallback)(RLMRealm * _Nullable realm, NSError * _
 /// The Id of the asynchronous transaction.
 typedef unsigned RLMAsyncTransactionId;
 
-NS_ASSUME_NONNULL_BEGIN
+RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
 /**
  An `RLMRealm` instance (also referred to as "a Realm") represents a Realm
@@ -947,6 +946,7 @@ NS_REFINED_FOR_SWIFT;
  When you wish to stop, call the `-invalidate` method. Notifications are also stopped if
  the token is deallocated.
  */
+RLM_SWIFT_SENDABLE
 @interface RLMNotificationToken : NSObject
 /// Stops notifications for the change subscription that returned this token.
 - (void)invalidate;
@@ -955,4 +955,4 @@ NS_REFINED_FOR_SWIFT;
 - (void)stop __attribute__((unavailable("Renamed to -invalidate."))) NS_REFINED_FOR_SWIFT;
 @end
 
-NS_ASSUME_NONNULL_END
+RLM_HEADER_AUDIT_END(nullability, sendability)

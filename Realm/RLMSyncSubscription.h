@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
+#import <Realm/RLMConstants.h>
 
 @class RLMObjectId;
 
@@ -44,7 +44,7 @@ typedef NS_ENUM(NSUInteger, RLMSyncSubscriptionState) {
     RLMSyncSubscriptionStateSuperseded
 };
 
-NS_ASSUME_NONNULL_BEGIN
+RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
 /**
  `RLMSyncSubscription` is  used to define a Flexible Sync subscription obtained from querying a
@@ -337,4 +337,4 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-NS_ASSUME_NONNULL_END
+RLM_HEADER_AUDIT_END(nullability, sendability)

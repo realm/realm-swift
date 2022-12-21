@@ -25,7 +25,7 @@
 extern "C" {
 #endif
 
-NS_ASSUME_NONNULL_BEGIN
+RLM_HEADER_AUDIT_BEGIN(nullability)
 
 #define REALM_FOR_EACH_SWIFT_PRIMITIVE_TYPE(macro) \
     macro(bool, Bool, bool) \
@@ -64,7 +64,7 @@ RLMArray *_Nonnull RLMGetSwiftPropertyArray(RLMObjectBase *obj, uint16_t);
 RLMSet *_Nonnull RLMGetSwiftPropertySet(RLMObjectBase *obj, uint16_t);
 RLMDictionary *_Nonnull RLMGetSwiftPropertyMap(RLMObjectBase *obj, uint16_t);
 
-NS_ASSUME_NONNULL_END
+RLM_HEADER_AUDIT_END(nullability)
 
 #ifdef __cplusplus
 } // extern "C"

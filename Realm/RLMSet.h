@@ -18,7 +18,7 @@
 
 #import <Realm/RLMCollection.h>
 
-NS_ASSUME_NONNULL_BEGIN
+RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
 @class RLMObject, RLMResults<RLMObjectType>;
 
@@ -532,4 +532,4 @@ __attribute__((warn_unused_result));
 - (instancetype)initWithObjectClassName:(NSString *)objectClassName;
 @end
 
-NS_ASSUME_NONNULL_END
+RLM_HEADER_AUDIT_END(nullability, sendability)

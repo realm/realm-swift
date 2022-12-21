@@ -20,7 +20,7 @@
 
 @class RLMUserAPIKey, RLMObjectId;
 
-NS_ASSUME_NONNULL_BEGIN
+RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
 /// Provider client for user API keys.
 @interface RLMAPIKeyAuth : RLMProviderClient
@@ -88,4 +88,4 @@ typedef void(^RLMUserAPIKeysBlock)(NSArray<RLMUserAPIKey *> *  _Nullable, NSErro
 
 @end
 
-NS_ASSUME_NONNULL_END
+RLM_HEADER_AUDIT_END(nullability, sendability)

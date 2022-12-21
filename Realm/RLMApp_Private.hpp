@@ -22,13 +22,11 @@
 
 #import <memory>
 
-NS_ASSUME_NONNULL_BEGIN
+RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
 @interface RLMAppConfiguration ()
 
 - (realm::app::App::Config&)config;
-
-- (void)setAppId:(NSString *)appId;
 
 - (instancetype)initWithConfig:(const realm::app::App::Config&)config;
 
@@ -48,4 +46,4 @@ NS_ASSUME_NONNULL_BEGIN
 
 NSError * RLMAppErrorToNSError(realm::app::AppError const& appError);
 
-NS_ASSUME_NONNULL_END
+RLM_HEADER_AUDIT_END(nullability, sendability)

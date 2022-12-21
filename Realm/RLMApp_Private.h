@@ -18,7 +18,7 @@
 
 #import <Realm/RLMApp.h>
 
-NS_ASSUME_NONNULL_BEGIN
+RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
 /// Observer block for app notifications.
 typedef void(^RLMAppNotificationBlock)(RLMApp *);
@@ -48,4 +48,4 @@ typedef void(^RLMAppNotificationBlock)(RLMApp *);
 + (void)resetAppCache;
 @end
 
-NS_ASSUME_NONNULL_END
+RLM_HEADER_AUDIT_END(nullability, sendability)

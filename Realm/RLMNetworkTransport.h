@@ -18,7 +18,7 @@
 
 #import <Realm/RLMConstants.h>
 
-NS_ASSUME_NONNULL_BEGIN
+RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
 /// Allowed HTTP methods to be used with `RLMNetworkTransport`.
 typedef RLM_CLOSED_ENUM(int32_t, RLMHTTPMethod) {
@@ -127,4 +127,4 @@ typedef void(^RLMNetworkTransportCompletionBlock)(RLMResponse *);
 
 @end
 
-NS_ASSUME_NONNULL_END
+RLM_HEADER_AUDIT_END(nullability, sendability)

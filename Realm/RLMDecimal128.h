@@ -16,9 +16,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
+#import <Realm/RLMConstants.h>
 
-NS_ASSUME_NONNULL_BEGIN
+RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
 /**
  A 128-bit IEEE 754-2008 decimal floating point number.
@@ -29,6 +29,7 @@ NS_ASSUME_NONNULL_BEGIN
  this type stores up to 34 digits of significand and an exponent from -6143 to
  6144.
  */
+RLM_SWIFT_SENDABLE
 @interface RLMDecimal128 : NSObject <NSCopying>
 /// Creates a new zero-initialized decimal128.
 - (instancetype)init;
@@ -106,4 +107,4 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-NS_ASSUME_NONNULL_END
+RLM_HEADER_AUDIT_END(nullability, sendability)

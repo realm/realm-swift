@@ -26,7 +26,7 @@
 
 @class RLMSyncConfiguration, RLMSyncSessionRefreshHandle, RLMApp;
 
-NS_ASSUME_NONNULL_BEGIN
+RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
 class CocoaSyncUserContext : public realm::SyncUserContext {
 public:
@@ -57,4 +57,4 @@ private:
 - (instancetype)initWithUserProfile:(realm::SyncUserProfile)userProfile;
 @end
 
-NS_ASSUME_NONNULL_END
+RLM_HEADER_AUDIT_END(nullability, sendability)

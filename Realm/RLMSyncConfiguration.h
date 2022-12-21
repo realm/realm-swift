@@ -26,7 +26,7 @@
 @class RLMUser;
 @protocol RLMBSON;
 
-NS_ASSUME_NONNULL_BEGIN
+RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
 /**  Determines file behavior during a client reset.
 
@@ -191,4 +191,4 @@ typedef void(^RLMClientResetAfterBlock)(RLMRealm * _Nonnull beforeFrozen, RLMRea
 
 @end
 
-NS_ASSUME_NONNULL_END
+RLM_HEADER_AUDIT_END(nullability, sendability)

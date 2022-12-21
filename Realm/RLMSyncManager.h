@@ -16,13 +16,11 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
-
 #import <Realm/RLMSyncUtil.h>
 
 @class RLMSyncSession, RLMSyncTimeoutOptions, RLMAppConfiguration;
 
-NS_ASSUME_NONNULL_BEGIN
+RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
 /// An enum representing different levels of sync-related logging that can be configured.
 typedef RLM_CLOSED_ENUM(NSUInteger, RLMSyncLogLevel) {
@@ -219,4 +217,4 @@ typedef void(^RLMSyncErrorReportingBlock)(NSError *, RLMSyncSession * _Nullable)
 @property (nonatomic, readonly) RLMAppConfiguration *appConfiguration;
 @end
 
-NS_ASSUME_NONNULL_END
+RLM_HEADER_AUDIT_END(nullability, sendability)
