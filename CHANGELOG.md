@@ -4,7 +4,6 @@ x.y.z Release notes (yyyy-MM-dd)
 * Improve performance of creating Projection objects and of change
   notifications on projections ([PR #8050](https://github.com/realm/realm-swift/pull/8050)).
 * Allow initialising any sync configuration with `cancelAsyncOpenOnNonFatalErrors`.
-* Allow setting `cancelAsyncOpenOnNonFatalErrors` from Swift's `SyncConfiguration`.
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
