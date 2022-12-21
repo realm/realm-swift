@@ -287,9 +287,7 @@ class SwiftUIServerTests: SwiftSyncTestCase {
                                 configuration: configuration,
                                 timeout: timeout)
         autoOpen.projectedValue
-            .sink { autoOpenState in
-                handler(autoOpenState)
-            }
+            .sink(receiveValue: handler)
             .store(in: &cancellables)
         waitForExpectations(timeout: 10.0)
         autoOpen.cancel()
@@ -373,6 +371,7 @@ class SwiftUIServerTests: SwiftSyncTestCase {
     func testAutoOpenOpenForFlexibleSyncConfigWithoutInternetConnection() throws {
         let proxy = TimeoutProxyServer(port: 5678, targetPort: 9090)
         try proxy.start()
+
         let appConfig = AppConfiguration(baseURL: "http://localhost:5678",
                                          transport: AsyncOpenConnectionTimeoutTransport(),
                                          localAppName: nil,
@@ -392,11 +391,14 @@ class SwiftUIServerTests: SwiftSyncTestCase {
         App.resetAppCache()
 
         let app = App(id: flexibleSyncAppId, configuration: appConfig)
+
         let user = try logInUser(for: basicCredentials(app: app), app: app)
-        
+        var configuration = user.flexibleSyncConfiguration()
+        configuration.objectTypes = [SwiftPerson.self]
+
         proxy.dropConnections = true
-        let ex = expectation(description: "download-realm-auto-open-no-connection")
-        let autoOpen = AutoOpen(appId: flexibleSyncAppId, timeout: 1000)
+        let ex = expectation(description: "download-realm-flexible-auto-open-no-connection")
+        let autoOpen = AutoOpen(appId: flexibleSyncAppId, configuration: configuration, timeout: 1000)
         autoOpen.projectedValue
             .sink { autoOpenState in
                 if case let .open(realm) = autoOpenState {
@@ -405,7 +407,7 @@ class SwiftUIServerTests: SwiftSyncTestCase {
                 }
             }
             .store(in: &cancellables)
-        
+
         waitForExpectations(timeout: 10.0)
         autoOpen.cancel()
 
