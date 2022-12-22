@@ -1,3 +1,6 @@
+# NOTE: This is a common file that is overwritten by realm/ci-actions sync service
+# and should only be modified in that repository.
+
 name: Feature Request
 description: Request a new feature or enhancement
 labels: [T-Enhancement]
@@ -5,7 +8,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for taking the time to suggest improvements to the SDK!
+        Thanks for taking the time to suggest improvements to Realm!
   - type: textarea
     id: problem
     attributes:
@@ -20,14 +23,33 @@ body:
       description: Describe the solution you envision, including API and usage example if possible.
     validations:
       required: false
+  - type: textarea
+    id: alternative-solution
+    attributes:
+      label: Alternatives
+      description: Describe the alternative solutions or features you have considered
+    validations:
+      required: false
   - type: dropdown
     id: importance
     attributes:
       label: How important is this improvement for you?
       options:
+        - -- select --
         - Dealbreaker
         - Would be a major improvement
-        - I'd like to see it, but have a workaround
-        - Fairly niche, but nice to have anyway.
+        - I would like to have it but have a workaround
+        - Fairly niche but nice to have anyway
     validations:
-      required: false
+      required: true
+  - type: dropdown
+    id: sync
+    attributes:
+      label: Feature would mainly be used with
+      options:
+        - -- select --
+        - Local Database only
+        - Atlas Device Sync
+        - 'Atlas App Services: Auth or Functions etc'
+    validations:
+      required: true
