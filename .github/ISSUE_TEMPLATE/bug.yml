@@ -12,9 +12,10 @@ body:
     attributes:
       label: How frequently does the bug occur?
       options:
-        - Seen once
+        - -- select --
+        - Once
         - Sometimes
-        - All the time
+        - Allways
     validations:
       required: true
 # Description
@@ -38,9 +39,10 @@ body:
     attributes:
       label: Can you reproduce the bug?
       options:
-        - Yes, always
-        - Yes, sometimes
-        - Not yet
+        - -- select --
+        - Always
+        - Sometimes
+        - 'No'
     validations:
       required: true
   - type: textarea
@@ -62,21 +64,25 @@ body:
     validations:
       required: true
   - type: dropdown
-    id: sync
+    id: services
     attributes:
-      label: What SDK flavour are you using?
+      label: What Services are you using?
       options:
+        - -- select --
         - Local Database only
-        - MongoDB Realm (i.e. Sync, auth, functions)
+        - Atlas Device Sync
+        - 'Atlas App Services: Auth or Functions etc'
+        - Both Atlas Device Sync and Atlas App Services
     validations:
       required: true
   - type: dropdown
     id: encryption
     attributes:
-      label: Are you using encryption?
+      label: Are you using Encryption?
       options:
-        - Yes, using encryption
-        - No, not using encryption
+        - -- select --
+        - 'Yes'
+        - 'No'
     validations:
       required: true
 # Environment
