@@ -9,6 +9,9 @@ x.y.z Release notes (yyyy-MM-dd)
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
 * Object change notifications on projections only included the first projected
   property for each source property ([PR #8050](https://github.com/realm/realm-swift/pull/8050), since v10.21.0).
+* Fix `@AutoOpen` not returning a realm for a flexible sync configuration, 
+  when there is no internet connection. 
+  ([#7986](https://github.com/realm/realm-swift/issues/7986), since v10.27.0)
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 

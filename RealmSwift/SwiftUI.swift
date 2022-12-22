@@ -1508,7 +1508,7 @@ private class ObservableAsyncOpenStorage: ObservableObject {
         if let partitionValue = partitionValue {
             config = user.configuration(partitionValue: partitionValue, cancelAsyncOpenOnNonFatalErrors: true)
         } else {
-            config = user.flexibleSyncConfiguration()
+            config = user.flexibleSyncConfiguration(cancelAsyncOpenOnNonFatalErrors: true)
         }
 
         // Use the user configuration by default or set configuration with the current user `syncConfiguration`'s.
