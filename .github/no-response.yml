@@ -1,3 +1,6 @@
+# NOTE: This is a common file that is overwritten by realm/ci-actions sync service
+# and should only be modified in that repository.
+
 # Configuration for probot-no-response - https://github.com/probot/no-response
 
 # Number of days of inactivity before an Issue is closed for lack of response
