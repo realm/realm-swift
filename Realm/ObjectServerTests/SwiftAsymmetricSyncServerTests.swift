@@ -189,7 +189,7 @@ class SwiftAsymmetricSyncTests: SwiftSyncTestCase {
     }
 }
 
-#if swift(>=5.6) && canImport(_Concurrency)
+#if canImport(_Concurrency)
 @available(macOS 12.0, *)
 extension SwiftAsymmetricSyncTests {
     func config() async throws -> Realm.Configuration {

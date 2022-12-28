@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 # A script to generate the .jenkins.yml file for the CI pull request job
-XCODE_VERSIONS = %w(13.1 13.2.1 13.4.1 14.0.1 14.1)
+XCODE_VERSIONS = %w(13.4.1 14.0.1 14.1 14.2)
 
 all = ->(v) { true }
 latest_only = ->(v) { v == XCODE_VERSIONS.last }

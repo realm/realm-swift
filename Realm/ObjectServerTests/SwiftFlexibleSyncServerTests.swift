@@ -1034,7 +1034,7 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
 }
 
 // MARK: - Async Await
-#if swift(>=5.6) && canImport(_Concurrency)
+#if canImport(_Concurrency)
 @available(macOS 12.0, *)
 extension SwiftFlexibleSyncServerTests {
     @MainActor

@@ -533,7 +533,7 @@ extension MongoCollection {
     }
 }
 
-#if swift(>=5.6) && canImport(_Concurrency)
+#if canImport(_Concurrency)
 // Generating a closure by referencing a bound member function (e.g. `foo(continuation.resume)`) currently
 // does not generate a Sendable closure even if the type is Sendable
 @available(macOS 10.15, tvOS 13.0, iOS 13.0, watchOS 6.0, *)

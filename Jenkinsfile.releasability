@@ -1,9 +1,9 @@
-xcodeVersions = ['13.1', '13.2.1', '13.4.1', '14.0.1', '14.1']
+xcodeVersions = ['13.4.1', '14.0.1', '14.1', '14.2']
 platforms = ['osx', 'ios', 'watchos', 'tvos', 'catalyst']
 carthagePlatforms = ['osx', 'ios', 'watchos', 'tvos']
 platformNames = ['osx': 'macOS', 'ios': 'iOS', 'watchos': 'watchOS', 'tvos': 'tvOS', 'catalyst': 'Catalyst']
-carthageXcodeVersion = '14.1'
-objcXcodeVersion = '13.1'
+carthageXcodeVersion = '14.2'
+objcXcodeVersion = '13.4.1'
 docsSwiftVersion = '5.6'
 
 def installationTest(platform, test, language) {

@@ -794,7 +794,7 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
 }
 
 // MARK: - AsyncAwaitMongoClientTests
-#if swift(>=5.6) && canImport(_Concurrency)
+#if canImport(_Concurrency)
 @available(macOS 12.0, *)
 class AsyncAwaitMongoClientTests: SwiftSyncTestCase {
     override class var defaultTestSuite: XCTestSuite {

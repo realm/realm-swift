@@ -998,7 +998,7 @@ public extension User {
     }
 }
 
-#if swift(>=5.6) && canImport(_Concurrency)
+#if canImport(_Concurrency)
 @available(macOS 10.15, tvOS 13.0, iOS 13.0, watchOS 6.0, *)
 public extension User {
     /// Links the currently authenticated user with a new identity, where the identity is defined by the credential

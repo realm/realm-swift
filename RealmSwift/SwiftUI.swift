@@ -1880,7 +1880,7 @@ extension SwiftUIKVO {
 
 // Adding `_Concurrency` flag is the only way to verify
 // if the BASE SDK contains latest framework updates
-#if swift(>=5.5) && canImport(_Concurrency)
+#if canImport(_Concurrency)
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
 extension View {
     /// Marks this view as searchable, which configures the display of a search field.

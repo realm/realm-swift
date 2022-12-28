@@ -286,7 +286,7 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
     }
 }
 
-#if swift(>=5.6) && canImport(_Concurrency)
+#if canImport(_Concurrency)
 @available(macOS 12.0, *)
 extension SwiftSyncTestCase {
     public func basicCredentials(usernameSuffix: String = "", app: App? = nil) async throws -> Credentials {
