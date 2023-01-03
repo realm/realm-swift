@@ -18,7 +18,7 @@
 
 #import <Realm/RLMConstants.h>
 
-NS_ASSUME_NONNULL_BEGIN
+RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
 /// :nodoc:
 @protocol RLMInt @end
@@ -55,6 +55,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  These property instances map to columns in the core database.
  */
+RLM_SWIFT_SENDABLE
 @interface RLMProperty : NSObject
 
 #pragma mark - Properties
@@ -144,4 +145,4 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-NS_ASSUME_NONNULL_END
+RLM_HEADER_AUDIT_END(nullability, sendability)

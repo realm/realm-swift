@@ -18,7 +18,7 @@
 
 #import <Realm/RLMCollection.h>
 
-NS_ASSUME_NONNULL_BEGIN
+RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
 @protocol RLMValue;
 @class RLMResults<RLMObjectType>;
@@ -918,4 +918,4 @@ NS_ASSUME_NONNULL_BEGIN
                                          queue:(nullable dispatch_queue_t)queue __attribute__((warn_unused_result));
 @end
 
-NS_ASSUME_NONNULL_END
+RLM_HEADER_AUDIT_END(nullability, sendability)

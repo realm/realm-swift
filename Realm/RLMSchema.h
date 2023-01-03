@@ -16,9 +16,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
+#import <Realm/RLMConstants.h>
 
-NS_ASSUME_NONNULL_BEGIN
+RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
 @class RLMObjectSchema;
 
@@ -30,6 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  Schemas map to collections of tables in the core database.
  */
+RLM_SWIFT_SENDABLE
 @interface RLMSchema : NSObject<NSCopying>
 
 #pragma mark - Properties
@@ -74,4 +75,4 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-NS_ASSUME_NONNULL_END
+RLM_HEADER_AUDIT_END(nullability, sendability)

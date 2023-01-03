@@ -347,9 +347,9 @@ extension Persisted where Value.PersistedType: _PrimaryKey {
     }
 }
 
-/// :nodoc:
 // Constraining the LinkingObjects initializer to only LinkingObjects require
 // doing so via a protocol which only that type conforms to.
+/// :nodoc:
 public protocol LinkingObjectsProtocol {
     init(fromType: Element.Type, property: String)
     associatedtype Element

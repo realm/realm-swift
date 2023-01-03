@@ -91,18 +91,7 @@ public struct Projected<T: ObjectBase, Value>: AnyProjected {
         self._projectedKeyPath = projectedKeyPath
     }
 }
-
-// MARK: Projection Schema
-private struct ProjectedMetadata {
-    let projectedKeyPath: AnyKeyPath
-    let originPropertyKeyPathString: String
-    let label: String
-}
-
-private var schema = [ObjectIdentifier: [ProjectedMetadata]]()
-private let projectionSchemaLock = NSLock()
-
-// MARK: ProjectionOservable
+// MARK: ProjectionObservable
 /**
   A type erased Projection.
  
@@ -115,50 +104,6 @@ public protocol ProjectionObservable: AnyObject {
     var rootObject: Root { get }
     /// :nodoc:
     init(projecting object: Root)
-}
-
-extension ObjectChange {
-    fileprivate static func processChange(_ objectChange: ObjectChange<T.Root>,
-                                          _ projection: T) -> ObjectChange<T> where T: ProjectionObservable {
-        let schema = projection._schema
-        switch objectChange {
-        case .error(let error):
-            return .error(error)
-        case .change(let object, let objectPropertyChanges):
-            let newProjection = T(projecting: object)
-            let projectedPropertyChanges: [PropertyChange] = objectPropertyChanges.map { propChange in
-                // read the metadata for the property whose origin name matches
-                // the changed property's name
-                projectionSchemaLock.lock()
-                let propertyMetadata = schema.first(where: {
-                    $0.originPropertyKeyPathString == propChange.name
-                })!
-                projectionSchemaLock.unlock()
-                var changeOldValue: Any?
-                if let oldValue = propChange.oldValue {
-                    // if there is an oldValue in the change, construct an empty Root
-                    let newRoot = T.Root()
-                    let processorProjection = T(projecting: newRoot)
-
-                    // assign the oldValue to the empty root object
-                    processorProjection.rootObject.setValue(oldValue, forKey: propChange.name)
-                    changeOldValue = processorProjection.rootObject[keyPath: propertyMetadata.projectedKeyPath]
-                }
-                var changeNewValue: Any?
-                if propChange.newValue != nil {
-                    changeNewValue = newProjection.rootObject[keyPath: propertyMetadata.projectedKeyPath]
-                }
-
-                let valueName = String(propertyMetadata.label.dropFirst()) // this drops the _ from the property wrapper name
-                return PropertyChange(name: valueName,
-                                      oldValue: changeOldValue,
-                                      newValue: changeNewValue)
-            }
-            return .change(newProjection, projectedPropertyChanges)
-        case .deleted:
-            return .deleted
-        }
-    }
 }
 
 /// ``Projection`` is a light weight model of the original Realm ``Object`` or ``EmbeddedObject``.
@@ -181,12 +126,16 @@ extension ObjectChange {
 ///
 /// class PersonProjection: Projection<Person> {
 ///     @Projected(\Person.firstName) var firstName
-///     @Projected(\Person.lastName.localizedUppercase) var lastNameCaps
+///     @Projected(\Person.lastName.localizedUppercase)
+///     var lastNameCaps
 ///     @Projected(\Person.address.city) var homeCity
-///     @Projected(\Person.friends.projectTo.firstName) var friendsFirstName: ProjectedCollection<String>
+///     @Projected(\Person.friends.projectTo.firstName)
+///     var friendsFirstName: ProjectedCollection<String>
 /// }
 /// ```
+///
 ///  ### Supported property types
+///
 /// Projection can transform the original `@Persisted` properties in several ways:
 /// - `Passthrough` - `Projection`'s property will have same name and type as original object. See `PersonProjection.firstName`.
 /// - `Rename` - Projection's property will have same type as original object just with the new name.
@@ -200,8 +149,10 @@ extension ObjectChange {
 /// Each `Object` or `EmbeddedObject` can have sevaral projections of same or different classes at once.
 ///
 /// ### Querying
+///
 /// You can retrieve all Projections of a given type from a Realm by calling the `objects(_:)` of Realm or `init(projecting:)`
 /// of Projection's class:
+///
 /// ```swift
 /// let projections = realm.object(PersonProjection.self)
 /// let personObject = realm.create(Person.self)
@@ -220,8 +171,9 @@ open class Projection<Root: ObjectBase & RealmCollectionValue>: RealmCollectionV
      */
     public required init(projecting object: Root) {
         self.rootObject = object
-        // Initialize schema for projection class
-        _ = _schema
+
+        // Eagerly initialize the schema to ensure we report errors at a sensible time
+        _ = schema
     }
     /// :nodoc:
     public static func == (lhs: Projection, rhs: Projection) -> Bool {
@@ -236,8 +188,8 @@ open class Projection<Root: ObjectBase & RealmCollectionValue>: RealmCollectionV
     open var description: String {
         return """
 \(type(of: self))<\(type(of: rootObject))> <\(Unmanaged.passUnretained(rootObject).toOpaque())> {
-\t\(_schema.map {
-    "\t\(String($0.label.dropFirst()))(\\.\($0.originPropertyKeyPathString)) = \(rootObject[keyPath: $0.projectedKeyPath]!);"
+\t\(schema.map {
+    "\t\(String($0.label))(\\.\($0.originPropertyKeyPathString)) = \(rootObject[keyPath: $0.projectedKeyPath]!);"
 }.joined(separator: "\n"))
 }
 """
@@ -333,15 +285,60 @@ extension ProjectionObservable {
     public func observe(keyPaths: [String] = [],
                         on queue: DispatchQueue? = nil,
                         _ block: @escaping (ObjectChange<Self>) -> Void) -> NotificationToken {
-        let kps: [String]
-        if keyPaths.isEmpty {
-            kps = _schema.map(\.originPropertyKeyPathString)
-        } else {
-            kps = _schema.filter { keyPaths.contains($0.originPropertyKeyPathString) }.map(\.originPropertyKeyPathString)
+        var kps: [String] = schema.map(\.originPropertyKeyPathString)
+        if !keyPaths.isEmpty {
+            kps = kps.filter { keyPaths.contains($0) }
         }
-        return rootObject._observe(keyPaths: kps, on: queue, { change in
-            block(ObjectChange<Self>.processChange(change, self))
-        })
+
+        // If we're observing on a different queue, we need a projection which
+        // wraps an object confined to that queue. We'll lazily create it the
+        // first time the observation block is called. We can't create it now
+        // as we're probably not on the queue. If we aren't observing on a queue,
+        // we can just use ourself rather than allocating a new object
+        var projection: Self?
+        if queue == nil {
+            projection = self
+        }
+        let schema = self.schema
+        return RLMObjectBaseAddNotificationBlock(rootObject, kps, queue) { object, names, oldValues, newValues, error in
+            assert(error == nil) // error is no longer used
+            guard let names = names, let newValues = newValues else {
+                block(.deleted)
+                return
+            }
+            if projection == nil {
+                projection = Self(projecting: object as! Self.Root)
+            }
+
+            // Mapping the old values to the projected values requires assigning
+            // them to an object and then reading from the projected key path
+            var unmanagedRoot: Self.Root?
+            if let oldValues = oldValues {
+                unmanagedRoot = Self.Root()
+                for i in 0..<oldValues.count {
+                    unmanagedRoot!.setValue(oldValues[i], forKey: names[i])
+                }
+            }
+
+            var projectedChanges = [PropertyChange]()
+            for i in 0..<newValues.count {
+                for property in schema.filter({ $0.originPropertyKeyPathString == names[i] }) {
+                    var changeOldValue: Any?
+                    if oldValues != nil {
+                        changeOldValue = unmanagedRoot![keyPath: property.projectedKeyPath]
+                    }
+                    let changeNewValue = object[keyPath: property.projectedKeyPath]
+                    projectedChanges.append(.init(name: property.label,
+                                                  oldValue: changeOldValue,
+                                                  newValue: changeNewValue))
+                }
+            }
+
+            // keypath filtering means this should never actually be empty
+            if !projectedChanges.isEmpty {
+                block(.change(projection!, projectedChanges))
+            }
+        }
     }
 
     /**
@@ -421,53 +418,28 @@ extension ProjectionObservable {
      - parameter block: The block to call with information about changes to the object.
      - returns: A token which must be held for as long as you want updates to be delivered.
      */
-    public func observe(keyPaths: [PartialKeyPath<Self>] = [],
+    public func observe(keyPaths: [PartialKeyPath<Self>],
                         on queue: DispatchQueue? = nil,
                         _ block: @escaping (ObjectChange<Self>) -> Void) -> NotificationToken {
         var kps: [String]
         if keyPaths.isEmpty {
-            kps = _schema.map(\.originPropertyKeyPathString)
+            kps = schema.map(\.originPropertyKeyPathString)
         } else {
             kps = []
-            let root = Root.keyPathRecorder(with: [])
-            let projection = Self(projecting: root) // tracer time
+            let names = NSMutableArray()
+            let root = Root.keyPathRecorder(with: names)
+            let projection = Self(projecting: root)
             for keyPath in keyPaths {
-                root.lastAccessedNames = NSMutableArray()
+                names.removeAllObjects()
                 _ = projection[keyPath: keyPath]
-                kps.append(root.lastAccessedNames!.componentsJoined(by: "."))
+                kps.append(names.componentsJoined(by: "."))
             }
         }
-        return rootObject._observe(keyPaths: kps, on: queue, { change in
-            block(ObjectChange<Self>.processChange(change, self))
-        })
+        return observe(keyPaths: kps, on: queue, block)
     }
 
-    fileprivate var _schema: [ProjectedMetadata] {
-        projectionSchemaLock.lock()
-        defer {
-            projectionSchemaLock.unlock()
-        }
-        let identifier = ObjectIdentifier(type(of: self))
-        if let schema = schema[identifier] {
-            return schema
-        }
-
-        let mirror = Mirror(reflecting: self)
-        let metadatas: [ProjectedMetadata] = mirror.children.compactMap { child in
-            guard let projected = child.value as? AnyProjected else {
-                return nil
-            }
-            let originPropertyLabel = _name(for: projected.projectedKeyPath as! PartialKeyPath<Root>)
-            guard !originPropertyLabel.isEmpty else {
-                projectionSchemaLock.unlock()
-                throwRealmException("@Projected property '\(child.label!)' must be a part of Realm object")
-            }
-            return ProjectedMetadata(projectedKeyPath: projected.projectedKeyPath,
-                                     originPropertyKeyPathString: originPropertyLabel,
-                                     label: child.label!)
-        }
-        schema[identifier] = metadatas
-        return metadatas
+    fileprivate var schema: [ProjectionProperty] {
+        projectionSchemaCache.schema(for: self)
     }
 }
 /**
@@ -610,3 +582,92 @@ extension Projection: ObservableObject, RealmSubscribable where Root: ThreadConf
 #endif // !(os(iOS) && (arch(i386) || arch(arm)))
 
 #endif // canImport(Combine)
+
+// MARK: Implementation
+
+private struct ProjectionProperty: @unchecked Sendable {
+    let projectedKeyPath: AnyKeyPath
+    let originPropertyKeyPathString: String
+    let label: String
+}
+
+// An adaptor for os_unfair_lock to make it implement NSLocking
+@available(OSX 10.12, watchOS 3.0, iOS 10.0, iOSApplicationExtension 10.0, OSXApplicationExtension 10.12, tvOS 10.0, *)
+private final class UnfairLock: NSLocking, Sendable {
+    func lock() {
+        os_unfair_lock_lock(impl)
+    }
+    func unlock() {
+        os_unfair_lock_unlock(impl)
+    }
+
+    private let impl: os_unfair_lock_t = .allocate(capacity: 1)
+    init() {
+        impl.initialize(to: os_unfair_lock())
+    }
+}
+
+// We want to use os_unfair_lock when it's available, but fall back to NSLock otherwise
+private func createLock() -> NSLocking {
+    if #available(OSX 10.12, watchOS 3.0, iOS 10.0, iOSApplicationExtension 10.0, OSXApplicationExtension 10.12, tvOS 10.0, *) {
+        return UnfairLock()
+    }
+    return NSLock()
+}
+
+// withLock() was added in Xcode 14.1
+#if compiler(<5.7.1)
+extension NSLocking {
+    func withLock<R>(_ body: () throws -> R) rethrows -> R {
+        lock()
+        defer { unlock() }
+        return try body()
+    }
+}
+#endif
+
+// A property wrapper which unsafely disables concurrency checking for a property
+// This is required when a property is guarded by something which concurrency
+// checking doesn't understand (i.e. a lock instead of an actor)
+@propertyWrapper
+private struct Unchecked<Wrapped>: @unchecked Sendable {
+    var wrappedValue: Wrapped
+    init(wrappedValue: Wrapped) {
+        self.wrappedValue = wrappedValue
+    }
+}
+
+private final class ProjectionSchemaCache: @unchecked Sendable {
+    @Unchecked private static var schema = [ObjectIdentifier: [ProjectionProperty]]()
+    private static let lock = createLock()
+
+    fileprivate func schema<T: ProjectionObservable>(for obj: T) -> [ProjectionProperty] {
+        let identifier = ObjectIdentifier(type(of: obj))
+        if let schema = Self.lock.withLock({ Self.schema[identifier] }) {
+            return schema
+        }
+
+        var properties = [ProjectionProperty]()
+        for child in Mirror(reflecting: obj).children {
+            guard let label = child.label?.dropFirst() else { continue }
+            guard let projected = child.value as? AnyProjected else { continue }
+
+            let originPropertyLabel = _name(for: projected.projectedKeyPath as! PartialKeyPath<T.Root>)
+            guard !originPropertyLabel.isEmpty else {
+                throwRealmException("@Projected property '\(label)' must be a part of Realm object")
+            }
+            properties.append(.init(projectedKeyPath: projected.projectedKeyPath,
+                                    originPropertyKeyPathString: originPropertyLabel,
+                                    label: String(label)))
+        }
+        Self.lock.withLock {
+            // This might overwrite a schema generated by a different thread
+            // if we happened to do the initialization on multiple threads at
+            // once, but if so that's fine.
+            Self.schema[identifier] = properties
+        }
+        return properties
+    }
+}
+
+private let projectionSchemaCache = ProjectionSchemaCache()

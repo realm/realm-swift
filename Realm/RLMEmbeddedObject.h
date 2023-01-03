@@ -16,12 +16,10 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
-
 #import <Realm/RLMObjectBase.h>
 #import <Realm/RLMThreadSafeReference.h>
 
-NS_ASSUME_NONNULL_BEGIN
+RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
 @class RLMObjectSchema, RLMPropertyDescriptor, RLMRealm, RLMNotificationToken, RLMPropertyChange;
 typedef void (^RLMObjectChangeBlock)(BOOL deleted,
@@ -366,4 +364,4 @@ typedef void (^RLMObjectChangeBlock)(BOOL deleted,
 
 @end
 
-NS_ASSUME_NONNULL_END
+RLM_HEADER_AUDIT_END(nullability, sendability)

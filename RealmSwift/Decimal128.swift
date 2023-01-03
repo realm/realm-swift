@@ -238,8 +238,6 @@ extension Decimal128: Numeric {
     ///   - lhs: The first value to multiply.
     ///   - rhs: The second value to multiply.
     public static func *= (lhs: inout Decimal128, rhs: Decimal128) {
-        // Swiftlint wants us to use *= but this is the definition of *=
-        // swiftlint:disable:next shorthand_operator
         lhs = lhs * rhs
     }
 

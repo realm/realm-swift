@@ -642,7 +642,6 @@ public final class Map<Key: _MapKey, Value: RealmCollectionValue>: RLMSwiftColle
         return Map(objc: rlmDictionary.thaw())
     }
 
-    // swiftlint:disable:next identifier_name
     @objc class func _unmanagedCollection() -> RLMDictionary<AnyObject, AnyObject> {
         if let type = Value.self as? HasClassName.Type ?? Value.PersistedType.self as? HasClassName.Type {
             return RLMDictionary(objectClassName: type.className(), keyType: Key._rlmType)

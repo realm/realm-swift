@@ -850,7 +850,7 @@ extension Optional: _QueryBinary where Wrapped: _Persistable, Wrapped.PersistedT
 
 // MARK: QueryNode -
 
-fileprivate indirect enum QueryNode {
+private indirect enum QueryNode {
     enum Operator: String {
         case or = "||"
         case and = "&&"

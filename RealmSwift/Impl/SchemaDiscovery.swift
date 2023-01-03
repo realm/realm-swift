@@ -191,7 +191,7 @@ private func getProperties(_ cls: RLMObjectBase.Type) -> [RLMProperty] {
 
 internal class ObjectUtil {
     private static let runOnce: Void = {
-        RLMSwiftBridgeValue = { (value: Any) -> Any? in
+        RLMSetSwiftBridgeCallback { (value: Any) -> Any? in
             // `as AnyObject` required on iOS <= 13; it will compile but silently
             // fail to cast otherwise
             if let value = value as AnyObject as? _ObjcBridgeable {

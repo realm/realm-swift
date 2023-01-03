@@ -20,7 +20,7 @@
 
 #import <Realm/RLMNetworkTransport.h>
 
-NS_ASSUME_NONNULL_BEGIN
+RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 @protocol RLMBSON;
 
 @class RLMFindOptions, RLMFindOneAndModifyOptions, RLMUpdateResult, RLMChangeStream, RLMObjectId;
@@ -315,4 +315,4 @@ typedef void(^RLMMongoDeleteBlock)(NSDictionary<NSString *, id<RLMBSON>> * _Null
 
 @end
 
-NS_ASSUME_NONNULL_END
+RLM_HEADER_AUDIT_END(nullability, sendability)

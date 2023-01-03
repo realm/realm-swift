@@ -20,7 +20,7 @@
 
 @class RLMObjectSchema, RLMRealm;
 
-NS_ASSUME_NONNULL_BEGIN
+RLM_HEADER_AUDIT_BEGIN(nullability)
 
 /**
  Returns the Realm that manages the object, if one exists.
@@ -79,4 +79,4 @@ FOUNDATION_EXTERN id _Nullable RLMObjectBaseObjectForKeyedSubscript(RLMObjectBas
  */
 FOUNDATION_EXTERN void RLMObjectBaseSetObjectForKeyedSubscript(RLMObjectBase * _Nullable object, NSString *key, id _Nullable obj);
 
-NS_ASSUME_NONNULL_END
+RLM_HEADER_AUDIT_END(nullability)

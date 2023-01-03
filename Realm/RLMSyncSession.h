@@ -16,8 +16,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
-
 #import <Realm/RLMRealm.h>
 
 /**
@@ -101,7 +99,7 @@ typedef NS_ENUM(NSUInteger, RLMSyncProgressMode) {
  */
 typedef void(^RLMProgressNotificationBlock)(NSUInteger transferredBytes, NSUInteger transferrableBytes);
 
-NS_ASSUME_NONNULL_BEGIN
+RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
 /**
  A token object corresponding to a progress notification block on a session object.
@@ -272,4 +270,4 @@ NS_REFINED_FOR_SWIFT;
 - (void)cancel;
 @end
 
-NS_ASSUME_NONNULL_END
+RLM_HEADER_AUDIT_END(nullability, sendability)

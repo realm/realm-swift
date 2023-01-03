@@ -21,7 +21,7 @@
 /// A token originating from Atlas App Services.
 typedef NSString* RLMServerToken;
 
-NS_ASSUME_NONNULL_BEGIN
+RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
 /// A user info key for use with `RLMSyncErrorClientResetError`.
 extern NSString *const kRLMSyncPathOfRealmBackupCopyKey;
@@ -232,4 +232,4 @@ typedef RLM_ERROR_ENUM(NSInteger, RLMAppError, RLMAppErrorDomain) {
     RLMAppErrorMongoDBError,
 };
 
-NS_ASSUME_NONNULL_END
+RLM_HEADER_AUDIT_END(nullability, sendability)

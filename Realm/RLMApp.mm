@@ -153,11 +153,14 @@ namespace {
     return nil;
 }
 
+static void setOptionalString(std::optional<std::string>& dst, NSString *src) {
+    std::string tmp;
+    RLMNSStringToStdString(tmp, src);
+    dst = tmp.empty() ? util::none : std::optional(std::move(tmp));
+}
+
 - (void)setBaseURL:(nullable NSString *)baseURL {
-    std::string base_url;
-    RLMNSStringToStdString(base_url, baseURL);
-    _config.base_url = base_url.empty() ? util::none : std::optional(base_url);
-    return;
+    setOptionalString(_config.base_url, baseURL);
 }
 
 - (id<RLMNetworkTransport>)transport {
@@ -180,10 +183,7 @@ namespace {
 }
 
 - (void)setLocalAppName:(nullable NSString *)localAppName {
-    std::string local_app_name;
-    RLMNSStringToStdString(local_app_name, localAppName);
-    _config.local_app_name = local_app_name.empty() ? util::none : std::optional(local_app_name);
-    return;
+    setOptionalString(_config.local_app_name, localAppName);
 }
 
 - (NSString *)localAppVersion {
@@ -195,10 +195,7 @@ namespace {
 }
 
 - (void)setLocalAppVersion:(nullable NSString *)localAppVersion {
-    std::string local_app_version;
-    RLMNSStringToStdString(local_app_version, localAppVersion);
-    _config.local_app_version = local_app_version.empty() ? util::none : std::optional(local_app_version);
-    return;
+    setOptionalString(_config.local_app_version, localAppVersion);
 }
 
 - (NSUInteger)defaultRequestTimeoutMS {

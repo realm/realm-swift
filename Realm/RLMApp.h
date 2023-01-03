@@ -16,10 +16,10 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
+#import <Realm/RLMConstants.h>
 #import <AuthenticationServices/AuthenticationServices.h>
 
-NS_ASSUME_NONNULL_BEGIN
+RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
 @protocol RLMNetworkTransport, RLMBSON;
 
@@ -38,7 +38,7 @@ typedef void(^RLMOptionalErrorBlock)(NSError * _Nullable);
 @interface RLMAppConfiguration : NSObject
 
 /// A custom base URL to request against.
-@property (nonatomic, strong, nullable) NSString* baseURL;
+@property (nonatomic, strong, nullable) NSString *baseURL;
 
 /// The custom transport for network calls to the server.
 @property (nonatomic, strong, nullable) id<RLMNetworkTransport> transport;
@@ -90,6 +90,7 @@ Create a new Realm App configuration.
 
  This interface provides access to login and authentication.
  */
+RLM_SWIFT_SENDABLE
 @interface RLMApp : NSObject
 
 /// The configuration for this Realm app.
@@ -172,11 +173,7 @@ to obtain a reference to an RLMApp.
 
 @end
 
-NS_ASSUME_NONNULL_END
-
 #pragma mark - Sign In With Apple Extension
-
-NS_ASSUME_NONNULL_BEGIN
 
 API_AVAILABLE(ios(13.0), macos(10.15), tvos(13.0), watchos(6.0))
 /// Use this delegate to be provided a callback once authentication has succeed or failed
@@ -206,4 +203,4 @@ API_AVAILABLE(ios(13.0), macos(10.15), tvos(13.0), watchos(6.0))
 
 @end
 
-NS_ASSUME_NONNULL_END
+RLM_HEADER_AUDIT_END(nullability, sendability)

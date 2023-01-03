@@ -20,7 +20,7 @@
 
 #import <realm/object-store/thread_safe_reference.hpp>
 
-NS_ASSUME_NONNULL_BEGIN
+RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
 @protocol RLMThreadConfined_Private <NSObject>
 
@@ -42,4 +42,4 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-NS_ASSUME_NONNULL_END
+RLM_HEADER_AUDIT_END(nullability, sendability)
