@@ -91,6 +91,7 @@ import Realm
     }
 
     /// Convert a `Migration` to a `RLMMigration`.
+    @available(*, deprecated, message: "This function is now redundant")
     public static func convert(object: Migration) -> RLMMigration {
         return object
     }
