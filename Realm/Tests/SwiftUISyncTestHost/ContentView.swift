@@ -94,6 +94,12 @@ struct MainView: View {
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .background(Color.green)
                         .transition(AnyTransition.move(edge: .leading)).animation(.default)
+                case "async_open_custom_configuration":
+                    AsyncOpenPartitionView()
+                        .environment(\.realmConfiguration, getConfigurationForUser(user!))
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .background(Color.green)
+                        .transition(AnyTransition.move(edge: .leading)).animation(.default)
                 case "auto_open":
                     AutoOpenView()
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -117,11 +123,30 @@ struct MainView: View {
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .background(Color.green)
                         .transition(AnyTransition.move(edge: .leading)).animation(.default)
+                case "auto_open_custom_configuration":
+                    AutoOpenPartitionView()
+                        .environment(\.realmConfiguration, getConfigurationForUser(user!))
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .background(Color.green)
+                        .transition(AnyTransition.move(edge: .leading)).animation(.default)
                 default:
                     EmptyView()
                 }
             }
         }
+    }
+
+    func getConfigurationForUser(_ user: User) -> Realm.Configuration {
+        var configuration = user.configuration(partitionValue: user.id)
+        configuration.encryptionKey = getKey()
+        return configuration
+    }
+
+    func getKey() -> Data {
+        var key = Data(count: 64)
+        _ = key.withUnsafeMutableBytes { (pointer: UnsafeMutableRawBufferPointer) in
+            SecRandomCopyBytes(kSecRandomDefault, 64, pointer.baseAddress!) }
+        return key
     }
 }
 
@@ -169,13 +194,9 @@ class LoginHelper: ObservableObject {
                                              transport: nil,
                                              localAppName: nil,
                                              localAppVersion: nil)
-    private var clientDataRoot: URL {
-        let applicationSupportDirectory = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
-        return applicationSupportDirectory.appendingPathComponent("\(Bundle.main.bundleIdentifier!).xctrunner")
-    }
 
     func login(email: String, password: String, completion: @escaping (User) -> Void) {
-        let app = RealmSwift.App(id: ProcessInfo.processInfo.environment["app_id"]!, configuration: appConfig, rootDirectory: clientDataRoot)
+        let app = RealmSwift.App(id: ProcessInfo.processInfo.environment["app_id"]!, configuration: appConfig)
         app.login(credentials: .emailPassword(email: email, password: password))
             .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { result in
@@ -189,12 +210,12 @@ class LoginHelper: ObservableObject {
     }
 
     func logout() {
-        let app = RealmSwift.App(id: ProcessInfo.processInfo.environment["app_id"]!, configuration: appConfig, rootDirectory: clientDataRoot)
+        let app = RealmSwift.App(id: ProcessInfo.processInfo.environment["app_id"]!, configuration: appConfig)
         app.currentUser?.logOut { _ in }
     }
 
     func logoutAllUsers() {
-        let app = RealmSwift.App(id: ProcessInfo.processInfo.environment["app_id"]!, configuration: appConfig, rootDirectory: clientDataRoot)
+        let app = RealmSwift.App(id: ProcessInfo.processInfo.environment["app_id"]!, configuration: appConfig)
         for (_, user) in app.allUsers {
             user.logOut { _ in }
         }

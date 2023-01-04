@@ -51,6 +51,7 @@ class SwiftUIServerTests: SwiftSyncTestCase {
                                   partitionValue: partitionValue,
                                   configuration: configuration,
                                   timeout: timeout)
+        _ = asyncOpen.wrappedValue // Retrieving the wrappedValue to simulate a SwiftUI environment where this is called when initialising the view.
         asyncOpen.projectedValue
             .sink(receiveValue: handler)
             .store(in: &cancellables)
@@ -286,6 +287,7 @@ class SwiftUIServerTests: SwiftSyncTestCase {
                                 partitionValue: partitionValue,
                                 configuration: configuration,
                                 timeout: timeout)
+        _ = autoOpen.wrappedValue // Retrieving the wrappedValue to simulate a SwiftUI environment where this is called when initialising the view.
         autoOpen.projectedValue
             .sink(receiveValue: handler)
             .store(in: &cancellables)
@@ -399,6 +401,8 @@ class SwiftUIServerTests: SwiftSyncTestCase {
         proxy.dropConnections = true
         let ex = expectation(description: "download-realm-flexible-auto-open-no-connection")
         let autoOpen = AutoOpen(appId: flexibleSyncAppId, configuration: configuration, timeout: 1000)
+
+        _ = autoOpen.wrappedValue // Retrieving the wrappedValue to simulate a SwiftUI environment where this is called when initialising the view.
         autoOpen.projectedValue
             .sink { autoOpenState in
                 if case let .open(realm) = autoOpenState {

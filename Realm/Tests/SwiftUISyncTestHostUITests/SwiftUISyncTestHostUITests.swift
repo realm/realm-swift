@@ -216,7 +216,7 @@ extension SwiftUISyncTestHostUITests {
     func testObservedSectionedResults() throws {
         // This test ensures that `@ObservedResults` correctly observes both local
         // and sync changes to a collection.
-        let partitionValue = "test"
+        let partitionValue = "test2"
         let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
         let email2 = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
 
@@ -245,7 +245,7 @@ extension SwiftUISyncTestHostUITests {
         // Test show ListView after syncing realm
         let table = application.tables.firstMatch
         XCTAssertTrue(table.waitForExistence(timeout: 6))
-        XCTAssertEqual(table.cells.count, 4)
+        XCTAssertEqual(table.cells.count, 4) // Includes section headers and cells
         XCTAssertEqual(table.staticTexts.count, 4)
 
         loginUser(.second)
@@ -329,6 +329,33 @@ extension SwiftUISyncTestHostUITests {
 
         let waitingUserView = application.staticTexts["waiting_user_view"]
         XCTAssertTrue(waitingUserView.waitForExistence(timeout: 2))
+    }
+
+    func testAsyncOpenWithDeferRealmConfiguration() throws {
+        let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
+        let user = try populateForEmail(email, n: 20)
+
+        application.launchEnvironment["email1"] = email
+        application.launchEnvironment["async_view_type"] = "async_open_custom_configuration"
+        application.launchEnvironment["app_id"] = appId
+        application.launchEnvironment["partition_value"] = user.id
+        application.launch()
+
+        asyncOpen()
+
+        // Test show ListView after syncing realm
+        let table = application.tables.firstMatch
+        XCTAssertTrue(table.waitForExistence(timeout: 6))
+        XCTAssertEqual(table.cells.count, 20)
+
+        // Check if there is more than one realm when using environment values.
+        let enumerator = FileManager.default.enumerator(at: clientDataRoot(), includingPropertiesForKeys: [.nameKey, .isDirectoryKey])
+        var counter = 0
+        while let element = enumerator?.nextObject() as? URL {
+            if element.path.hasSuffix(".realm") { counter += 1 }
+        }
+        // Synced Realm and Sync Metadata
+        XCTAssertEqual(counter, 2)
     }
 }
 
@@ -445,6 +472,33 @@ extension SwiftUISyncTestHostUITests {
 
         let waitingUserView = application.staticTexts["waiting_user_view"]
         XCTAssertTrue(waitingUserView.waitForExistence(timeout: 2))
+    }
+
+    func testAutoOpenWithDeferRealmConfiguration() throws {
+        let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
+        let user = try populateForEmail(email, n: 20)
+
+        application.launchEnvironment["email1"] = email
+        application.launchEnvironment["async_view_type"] = "auto_open_custom_configuration"
+        application.launchEnvironment["app_id"] = appId
+        application.launchEnvironment["partition_value"] = user.id
+        application.launch()
+
+        asyncOpen()
+
+        // Test show ListView after syncing realm
+        let table = application.tables.firstMatch
+        XCTAssertTrue(table.waitForExistence(timeout: 6))
+        XCTAssertEqual(table.cells.count, 20)
+
+        // Check if there is more than one realm when using environment values.
+        let enumerator = FileManager.default.enumerator(at: clientDataRoot(), includingPropertiesForKeys: [.nameKey, .isDirectoryKey])
+        var counter = 0
+        while let element = enumerator?.nextObject() as? URL {
+            if element.path.hasSuffix(".realm") { counter += 1 }
+        }
+        // Synced Realm and Sync Metadata
+        XCTAssertEqual(counter, 2)
     }
 }
 
