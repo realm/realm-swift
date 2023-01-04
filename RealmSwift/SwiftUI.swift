@@ -1488,24 +1488,24 @@ private class ObservableAsyncOpenStorage: ObservableObject {
         // we observe the changes in the app state to check for user changes,
         // we store an internal state, so we could react to those changes (user login, user change, logout).
         app.objectWillChange.sink { [weak self] app in
-            switch self?.appState {
+            guard let self = self else { return }
+            switch self.appState {
             case .loggedIn(let user):
                 if let newUser = app.currentUser,
                     user != newUser {
-                    self?.appState = .loggedIn(newUser)
-                    self?.asyncOpenState = .connecting
-                    self?.asyncOpenForUser(user)
+                    self.appState = .loggedIn(newUser)
+                    self.asyncOpenState = .connecting
+                    self.asyncOpenForUser(user)
                 } else if app.currentUser == nil {
-                    self?.asyncOpenState = .waitingForUser
-                    self?.appState = .loggedOut
+                    self.asyncOpenState = .waitingForUser
+                    self.appState = .loggedOut
                 }
             case .loggedOut:
                 if let user = app.currentUser {
-                    self?.appState = .loggedIn(user)
-                    self?.asyncOpenState = .connecting
-                    self?.asyncOpenForUser(user)
+                    self.appState = .loggedIn(user)
+                    self.asyncOpenState = .connecting
+                    self.asyncOpenForUser(user)
                 }
-            default: break // if appState is nil
             }
         }.store(in: &appCancellable)
     }
