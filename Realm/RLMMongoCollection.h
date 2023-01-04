@@ -74,10 +74,12 @@ RLM_SWIFT_SENDABLE // invoked on a background thread
 typedef void(^RLMMongoInsertManyBlock)(NSArray<id<RLMBSON>> * _Nullable, NSError * _Nullable);
 /// Block which returns an array of Documents on a successful find operation, or an error should one occur.
 RLM_SWIFT_SENDABLE // invoked on a background thread
-typedef void(^RLMMongoFindBlock)(NSArray<NSDictionary<NSString *, id<RLMBSON>> *> * _Nullable, NSError * _Nullable);
+typedef void(^RLMMongoFindBlock)(NSArray<NSDictionary<NSString *, id<RLMBSON>> *> * _Nullable,
+                                 NSError * _Nullable);
 /// Block which returns a Document on a successful findOne operation, or an error should one occur.
 RLM_SWIFT_SENDABLE // invoked on a background thread
-typedef void(^RLMMongoFindOneBlock)(NSDictionary<NSString *, id<RLMBSON>> * _Nullable, NSError * _Nullable);
+typedef void(^RLMMongoFindOneBlock)(NSDictionary<NSString *, id<RLMBSON>> * _Nullable_result,
+                                    NSError * _Nullable);
 /// Block which returns the number of Documents in a collection on a successful count operation, or an error should one occur.
 RLM_SWIFT_SENDABLE // invoked on a background thread
 typedef void(^RLMMongoCountBlock)(NSInteger, NSError * _Nullable);
@@ -86,7 +88,8 @@ RLM_SWIFT_SENDABLE // invoked on a background thread
 typedef void(^RLMMongoUpdateBlock)(RLMUpdateResult * _Nullable, NSError * _Nullable);
 /// Block which returns the deleted Document on a successful delete operation, or an error should one occur.
 RLM_SWIFT_SENDABLE // invoked on a background thread
-typedef void(^RLMMongoDeleteBlock)(NSDictionary<NSString *, id<RLMBSON>> * _Nullable, NSError * _Nullable);
+typedef void(^RLMMongoDeleteBlock)(NSDictionary<NSString *, id<RLMBSON>> * _Nullable_result,
+                                   NSError * _Nullable);
 
 /// The name of this mongodb collection.
 @property (nonatomic, readonly) NSString *name;

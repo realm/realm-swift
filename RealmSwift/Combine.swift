@@ -69,7 +69,7 @@ extension ObjectKeyIdentifiable where Self: ProjectionObservable {
 // MARK: - Combine
 
 /// A type which can be passed to `valuePublisher()` or `changesetPublisher()`.
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 public protocol RealmSubscribable {
     /// :nodoc:
     func _observe<S>(_ keyPaths: [String]?, on queue: DispatchQueue?, _ subscriber: S)
@@ -79,7 +79,7 @@ public protocol RealmSubscribable {
         -> NotificationToken where S: Subscriber, S.Input == Void
 }
 
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publisher {
     /// Freezes all Realm objects and collections emitted by the upstream publisher
     ///
@@ -281,7 +281,7 @@ extension Publisher {
     }
 }
 
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publisher where Output: ThreadConfined {
     /// Enables passing thread-confined objects to a different dispatch queue.
     ///
@@ -313,7 +313,7 @@ extension Publisher where Output: ThreadConfined {
     }
 }
 
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publisher {
     /// Enables passing object changesets to a different dispatch queue.
     ///
@@ -451,7 +451,7 @@ extension Publisher {
     }
 }
 
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension RealmCollection where Self: RealmSubscribable {
     /// A publisher that emits Void each time the collection changes.
     ///
@@ -487,7 +487,7 @@ extension RealmCollection where Self: RealmSubscribable {
     }
 }
 
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension RealmKeyedCollection where Self: RealmSubscribable {
     /// A publisher that emits Void each time the collection changes.
     ///
@@ -529,7 +529,7 @@ extension RealmKeyedCollection where Self: RealmSubscribable {
 /// - parameter object: A managed object to observe.
 /// - parameter keyPaths: The publisher emits changes on these property keyPaths. If `nil` the publisher emits changes for every property.
 /// - returns: A publisher that emits the object each time it changes.
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 public func valuePublisher<T: Object>(_ object: T, keyPaths: [String]? = nil) -> RealmPublishers.Value<T> {
     RealmPublishers.Value<T>(object, keyPaths: keyPaths)
 }
@@ -540,7 +540,7 @@ public func valuePublisher<T: Object>(_ object: T, keyPaths: [String]? = nil) ->
 /// - parameter object: A managed collection to observe.
 /// - parameter keyPaths: The publisher emits changes on these property keyPaths. If `nil` the publisher emits changes for every property.
 /// - returns: A publisher that emits the collection each time it changes.
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 public func valuePublisher<T: RealmCollection>(_ collection: T, keyPaths: [String]? = nil) -> RealmPublishers.Value<T> {
     RealmPublishers.Value<T>(collection, keyPaths: keyPaths)
 }
@@ -551,7 +551,7 @@ public func valuePublisher<T: RealmCollection>(_ collection: T, keyPaths: [Strin
 /// - parameter object: A managed object to observe.
 /// - parameter keyPaths: The publisher emits changes on these property keyPaths. If `nil` the publisher emits changes for every property.
 /// - returns: A publisher that emits the object each time it changes.
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 public func valuePublisher<T: ProjectionObservable>(_ projection: T, keyPaths: [String]? = nil) -> RealmPublishers.Value<T> {
     RealmPublishers.Value<T>(projection, keyPaths: keyPaths)
 }
@@ -562,7 +562,7 @@ public func valuePublisher<T: ProjectionObservable>(_ projection: T, keyPaths: [
 /// - parameter object: A managed object to observe.
 /// - parameter keyPaths: The publisher emits changes on these property keyPaths. If `nil` the publisher emits changes for every property.
 /// - returns: A publisher that emits an object changeset each time the object changes.
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 public func changesetPublisher<T: Object>(_ object: T, keyPaths: [String]? = nil) -> RealmPublishers.ObjectChangeset<T> {
     precondition(object.realm != nil, "Only managed objects can be published")
     precondition(!object.isInvalidated, "Object is invalidated or deleted")
@@ -578,7 +578,7 @@ public func changesetPublisher<T: Object>(_ object: T, keyPaths: [String]? = nil
 /// - parameter projection: A projection of Realm Object to observe.
 /// - parameter keyPaths: The publisher emits changes on these property keyPaths. If `nil` the publisher emits changes for every property.
 /// - returns: A publisher that emits an object changeset each time the projection changes.
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 public func changesetPublisher<T: ProjectionObservable>(_ projection: T, keyPaths: [String]? = nil) -> RealmPublishers.ObjectChangeset<T> {
     precondition(projection.realm != nil, "Only managed objects can be published")
     precondition(!projection.isInvalidated, "Object is invalidated or deleted")
@@ -593,14 +593,14 @@ public func changesetPublisher<T: ProjectionObservable>(_ projection: T, keyPath
 /// - parameter object: A managed collection to observe.
 /// - parameter keyPaths: The publisher emits changes on these property keyPaths. If `nil` the publisher emits changes for every property.
 /// - returns: A publisher that emits a collection changeset each time the collection changes.
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 public func changesetPublisher<T: RealmCollection>(_ collection: T, keyPaths: [String]? = nil) -> RealmPublishers.CollectionChangeset<T> {
     RealmPublishers.CollectionChangeset<T>(collection, keyPaths: keyPaths)
 }
 
 // MARK: - Realm
 
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Realm {
     /// A publisher that emits Void each time the object changes.
     ///
@@ -612,7 +612,7 @@ extension Realm {
 
 // MARK: - Object
 
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Object: ObservableObject {
     /// A publisher that emits Void each time the object changes.
     ///
@@ -621,7 +621,7 @@ extension Object: ObservableObject {
         return RealmPublishers.WillChange(self)
     }
 }
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension EmbeddedObject: ObservableObject {
     /// A publisher that emits Void each time the object changes.
     ///
@@ -630,7 +630,7 @@ extension EmbeddedObject: ObservableObject {
         return RealmPublishers.WillChange(self)
     }
 }
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension ObjectBase: RealmSubscribable {
     /// :nodoc:
     public func _observe<S: Subscriber>(_ keyPaths: [String]?, on queue: DispatchQueue?, _ subscriber: S) -> NotificationToken where S.Input: ObjectBase {
@@ -650,7 +650,7 @@ extension ObjectBase: RealmSubscribable {
 
 // MARK: - List
 
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension List: ObservableObject, RealmSubscribable {
     /// A publisher that emits Void each time the collection changes.
     ///
@@ -662,7 +662,7 @@ extension List: ObservableObject, RealmSubscribable {
 
 // MARK: - MutableSet
 
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension MutableSet: ObservableObject, RealmSubscribable {
     /// A publisher that emits Void each time the collection changes.
     ///
@@ -674,7 +674,7 @@ extension MutableSet: ObservableObject, RealmSubscribable {
 
 // MARK: - Map
 
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Map: ObservableObject, RealmSubscribable {
     /// A publisher that emits Void each time the collection changes.
     ///
@@ -686,7 +686,7 @@ extension Map: ObservableObject, RealmSubscribable {
 
 // MARK: - LinkingObjects
 
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension LinkingObjects: RealmSubscribable {
     /// A publisher that emits Void each time the collection changes.
     ///
@@ -698,7 +698,7 @@ extension LinkingObjects: RealmSubscribable {
 
 // MARK: - Results
 
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Results: RealmSubscribable {
     /// A publisher that emits Void each time the collection changes.
     ///
@@ -710,7 +710,7 @@ extension Results: RealmSubscribable {
 
 // MARK: - Sectioned Results
 
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension SectionedResults: RealmSubscribable {
     /// :nodoc:
     public func _observe<S>(_ keyPaths: [String]? = nil, on queue: DispatchQueue? = nil, _ subscriber: S)
@@ -758,7 +758,7 @@ extension SectionedResults: RealmSubscribable {
     }
 }
 
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension ResultsSection: RealmSubscribable {
     /// :nodoc:
     public func _observe<S>(_ keyPaths: [String]? = nil, on queue: DispatchQueue? = nil, _ subscriber: S)
@@ -808,7 +808,7 @@ extension ResultsSection: RealmSubscribable {
 
 // MARK: RealmCollection
 
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension RealmCollectionImpl {
     /// :nodoc:
     public func _observe<S>(_ keyPaths: [String]? = nil, on queue: DispatchQueue? = nil, _ subscriber: S)
@@ -831,12 +831,12 @@ extension RealmCollectionImpl {
     }
 }
 
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension AnyRealmCollection: RealmSubscribable {}
 
 // MARK: RealmKeyedCollection
 
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension RealmKeyedCollection {
     /// :nodoc:
     public func _observe<S>(_ keyPaths: [String]?, on queue: DispatchQueue? = nil, _ subscriber: S)
@@ -866,7 +866,7 @@ extension RealmKeyedCollection {
 // MARK: Subscriptions
 
 /// A subscription which wraps a Realm notification.
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 @frozen public struct ObservationSubscription: Subscription {
     private var token: NotificationToken
     internal init(token: NotificationToken) {
@@ -891,7 +891,7 @@ extension RealmKeyedCollection {
 }
 
 /// A subscription which wraps a Realm AsyncOpenTask.
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 @frozen public struct AsyncOpenSubscription: Subscription {
     private let task: Realm.AsyncOpenTask
 
@@ -927,7 +927,7 @@ extension RealmKeyedCollection {
 ///
 /// You normally should not create any of these types directly, and should
 /// instead use the extension methods which create them.
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 public enum RealmPublishers {
     static private func realm<S: Scheduler>(_ config: RLMRealmConfiguration, _ scheduler: S) -> Realm? {
         try? Realm(RLMRealm(configuration: config, queue: scheduler as? DispatchQueue))

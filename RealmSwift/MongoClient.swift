@@ -74,6 +74,7 @@ extension FindOptions {
         }
     }
 
+    // NEXT-MAJOR: there's no reason for limit to be optional here
     /// Options to use when executing a `find` command on a `MongoCollection`.
     /// - Parameters:
     ///   - limit: The maximum number of documents to return. Specifying 0 will return all documents.
@@ -96,13 +97,11 @@ extension FindOptions {
     }
 }
 
-
 /// Options to use when executing a `findOneAndUpdate`, `findOneAndReplace`,
 /// or `findOneAndDelete` command on a `MongoCollection`.
 public typealias FindOneAndModifyOptions = RLMFindOneAndModifyOptions
 
 extension FindOneAndModifyOptions {
-
     /// Limits the fields to return for all matching documents.
     public var projection: Document? {
         get {
@@ -241,10 +240,9 @@ extension MongoCollection {
     ///   - queue: Dispatches streaming events to an optional queue, if no queue is provided the main queue is used
     /// - Returns: A ChangeStream which will manage the streaming events.
     public func watch(matchFilter: Document, delegate: ChangeEventDelegate, queue: DispatchQueue = .main) -> ChangeStream {
-        let filterBSON = ObjectiveCSupport.convert(object: .document(matchFilter)) as! [String: RLMBSON]
-        return self.__watch(withMatchFilter: filterBSON,
-                            delegate: ChangeEventDelegateProxy(delegate),
-                            delegateQueue: queue)
+        __watch(withMatchFilter: ObjectiveCSupport.convert(matchFilter),
+                delegate: ChangeEventDelegateProxy(delegate),
+                delegateQueue: queue)
     }
 
     /// Opens a MongoDB change stream against the collection to watch for changes
@@ -256,10 +254,9 @@ extension MongoCollection {
     ///   - queue: Dispatches streaming events to an optional queue, if no queue is provided the main queue is used
     /// - Returns: A ChangeStream which will manage the streaming events.
     public func watch(filterIds: [ObjectId], delegate: ChangeEventDelegate, queue: DispatchQueue = .main) -> ChangeStream {
-        let filterBSON = ObjectiveCSupport.convert(object: .array(filterIds.map {AnyBSON($0)})) as! [RLMObjectId]
-        return self.__watch(withFilterIds: filterBSON,
-                            delegate: ChangeEventDelegateProxy(delegate),
-                            delegateQueue: queue)
+        __watch(withFilterIds: filterIds,
+                delegate: ChangeEventDelegateProxy(delegate),
+                delegateQueue: queue)
     }
 }
 
@@ -272,8 +269,8 @@ extension MongoCollection {
     ///   - completion: The result of attempting to perform the insert. An Id will be returned for the inserted object on sucess
     @preconcurrency
     public func insertOne(_ document: Document, _ completion: @escaping MongoInsertBlock) {
-        let bson = ObjectiveCSupport.convert(object: .document(document))
-        self.__insertOneDocument(bson as! [String: RLMBSON]) { objectId, error in
+        let bson = ObjectiveCSupport.convert(document)
+        __insertOneDocument(bson) { objectId, error in
             if let o = objectId.map(ObjectiveCSupport.convert), let objectId = o {
                 completion(.success(objectId))
             } else {
@@ -289,8 +286,8 @@ extension MongoCollection {
     ///   - completion: The result of the insert, returns an array inserted document ids in order.
     @preconcurrency
     public func insertMany(_ documents: [Document], _ completion: @escaping MongoInsertManyBlock) {
-        let bson = ObjectiveCSupport.convert(object: .array(documents.map {.document($0)}))
-        self.__insertManyDocuments(bson as! [[String: RLMBSON]]) { objectIds, error in
+        let bson = documents.map(ObjectiveCSupport.convert)
+        __insertManyDocuments(bson) { objectIds, error in
             if let objectIds = objectIds?.compactMap(ObjectiveCSupport.convert) {
                 completion(.success(objectIds))
             } else {
@@ -307,10 +304,9 @@ extension MongoCollection {
     @preconcurrency
     public func find(filter: Document, options: FindOptions = FindOptions(),
                      _ completion: @escaping MongoFindBlock) {
-        let bson = ObjectiveCSupport.convert(object: .document(filter))
-        self.__findWhere(bson as! [String: RLMBSON], options: options) { documents, error in
-            let bson: [Document]? = documents?.map { $0.mapValues { ObjectiveCSupport.convert(object: $0) } }
-            if let bson = bson {
+        let bson = ObjectiveCSupport.convert(filter)
+        __findWhere(bson, options: options) { documents, error in
+            if let bson = documents?.map(ObjectiveCSupport.convert) {
                 completion(.success(bson))
             } else {
                 completion(.failure(error ?? Realm.Error.callFailed))
@@ -329,13 +325,12 @@ extension MongoCollection {
     @preconcurrency
     public func findOneDocument(filter: Document, options: FindOptions = FindOptions(),
                                 _ completion: @escaping MongoFindOneBlock) {
-        let bson = ObjectiveCSupport.convert(object: .document(filter))
-        self.__findOneDocumentWhere(bson as! [String: RLMBSON], options: options) { document, error in
+        let bson = ObjectiveCSupport.convert(filter)
+        __findOneDocumentWhere(bson, options: options) { document, error in
             if let error = error {
                 completion(.failure(error))
             } else {
-                let bson: Document? = document?.mapValues { ObjectiveCSupport.convert(object: $0) }
-                completion(.success(bson))
+                completion(.success(document.map(ObjectiveCSupport.convert)))
             }
         }
     }
@@ -346,10 +341,9 @@ extension MongoCollection {
     ///   - completion: The resulting bson array of documents or error if one occurs
     @preconcurrency
     public func aggregate(pipeline: [Document], _ completion: @escaping MongoFindBlock) {
-        let bson = ObjectiveCSupport.convert(object: .array(pipeline.map {.document($0)}))
-        self.__aggregate(withPipeline: bson as! [[String: RLMBSON]]) { documents, error in
-            let bson: [Document]? = documents?.map { $0.mapValues { ObjectiveCSupport.convert(object: $0) } }
-            if let bson = bson {
+        let bson = pipeline.map(ObjectiveCSupport.convert)
+        __aggregate(withPipeline: bson) { documents, error in
+            if let bson = documents?.map(ObjectiveCSupport.convert) {
                 completion(.success(bson))
             } else {
                 completion(.failure(error ?? Realm.Error.callFailed))
@@ -364,8 +358,8 @@ extension MongoCollection {
     ///   - completion: Returns the count of the documents that matched the filter.
     @preconcurrency
     public func count(filter: Document, limit: Int? = nil, _ completion: @escaping MongoCountBlock) {
-        let bson = ObjectiveCSupport.convert(object: .document(filter))
-        self.__countWhere(bson as! [String: RLMBSON], limit: limit ?? 0) { count, error in
+        let bson = ObjectiveCSupport.convert(filter)
+        __countWhere(bson, limit: limit ?? 0) { count, error in
             if let error = error {
                 completion(.failure(error))
             } else {
@@ -380,8 +374,8 @@ extension MongoCollection {
     ///   - completion: The result of performing the deletion. Returns the count of deleted objects
     @preconcurrency
     public func deleteOneDocument(filter: Document, _ completion: @escaping MongoCountBlock) {
-        let bson = ObjectiveCSupport.convert(object: .document(filter))
-        self.__deleteOneDocumentWhere(bson as! [String: RLMBSON]) { count, error in
+        let bson = ObjectiveCSupport.convert(filter)
+        __deleteOneDocumentWhere(bson) { count, error in
             if let error = error {
                 completion(.failure(error))
             } else {
@@ -396,8 +390,8 @@ extension MongoCollection {
     ///   - completion: The result of performing the deletion. Returns the count of the deletion
     @preconcurrency
     public func deleteManyDocuments(filter: Document, _ completion: @escaping MongoCountBlock) {
-        let bson = ObjectiveCSupport.convert(object: .document(filter))
-        self.__deleteManyDocumentsWhere(bson as! [String: RLMBSON]) { count, error in
+        let bson = ObjectiveCSupport.convert(filter)
+        __deleteManyDocumentsWhere(bson) { count, error in
             if let error = error {
                 completion(.failure(error))
             } else {
@@ -415,11 +409,10 @@ extension MongoCollection {
     @preconcurrency
     public func updateOneDocument(filter: Document, update: Document, upsert: Bool = false,
                                   _ completion: @escaping MongoUpdateBlock) {
-        let filterBSON = ObjectiveCSupport.convert(object: .document(filter))
-        let updateBSON = ObjectiveCSupport.convert(object: .document(update))
-        self.__updateOneDocumentWhere(filterBSON as! [String: RLMBSON],
-                                      updateDocument: updateBSON as! [String: RLMBSON],
-                                      upsert: upsert) { updateResult, error in
+        let filterBSON = ObjectiveCSupport.convert(filter)
+        let updateBSON = ObjectiveCSupport.convert(update)
+        __updateOneDocumentWhere(filterBSON, updateDocument: updateBSON,
+                                 upsert: upsert) { updateResult, error in
             if let updateResult = updateResult {
                 completion(.success(updateResult))
             } else {
@@ -437,11 +430,10 @@ extension MongoCollection {
     @preconcurrency
     public func updateManyDocuments(filter: Document, update: Document, upsert: Bool = false,
                                     _ completion: @escaping MongoUpdateBlock) {
-        let filterBSON = ObjectiveCSupport.convert(object: .document(filter))
-        let updateBSON = ObjectiveCSupport.convert(object: .document(update))
-        self.__updateManyDocumentsWhere(filterBSON as! [String: RLMBSON],
-                                        updateDocument: updateBSON as! [String: RLMBSON],
-                                        upsert: upsert) { updateResult, error in
+        let filterBSON = ObjectiveCSupport.convert(filter)
+        let updateBSON = ObjectiveCSupport.convert(update)
+        __updateManyDocumentsWhere(filterBSON, updateDocument: updateBSON,
+                                   upsert: upsert) { updateResult, error in
             if let updateResult = updateResult {
                 completion(.success(updateResult))
             } else {
@@ -465,11 +457,10 @@ extension MongoCollection {
     public func findOneAndUpdate(filter: Document, update: Document,
                                  options: FindOneAndModifyOptions = .init(),
                                  _ completion: @escaping MongoFindOneBlock) {
-        let filterBSON = ObjectiveCSupport.convert(object: .document(filter))
-        let updateBSON = ObjectiveCSupport.convert(object: .document(update))
-        self.__findOneAndUpdateWhere(filterBSON as! [String: RLMBSON],
-                                     updateDocument: updateBSON as! [String: RLMBSON],
-                                     options: options) { document, error in
+        let filterBSON = ObjectiveCSupport.convert(filter)
+        let updateBSON = ObjectiveCSupport.convert(update)
+        __findOneAndUpdateWhere(filterBSON, updateDocument: updateBSON,
+                                options: options) { document, error in
             if let error = error {
                 completion(.failure(error))
             } else {
@@ -494,16 +485,14 @@ extension MongoCollection {
     public func findOneAndReplace(filter: Document, replacement: Document,
                                   options: FindOneAndModifyOptions = .init(),
                                   _ completion: @escaping MongoFindOneBlock) {
-        let filterBSON = ObjectiveCSupport.convert(object: .document(filter))
-        let replacementBSON = ObjectiveCSupport.convert(object: .document(replacement))
-        self.__findOneAndReplaceWhere(filterBSON as! [String: RLMBSON],
-                                      replacementDocument: replacementBSON as! [String: RLMBSON],
-                                      options: options) { document, error in
+        let filterBSON = ObjectiveCSupport.convert(filter)
+        let replacementBSON = ObjectiveCSupport.convert(replacement)
+        __findOneAndReplaceWhere(filterBSON, replacementDocument: replacementBSON,
+                                 options: options) { document, error in
             if let error = error {
                 completion(.failure(error))
             } else {
-                let bson: Document? = document?.mapValues { ObjectiveCSupport.convert(object: $0) }
-                completion(.success(bson))
+                completion(.success(document.map(ObjectiveCSupport.convert)))
             }
         }
     }
@@ -521,30 +510,19 @@ extension MongoCollection {
     @preconcurrency
     public func findOneAndDelete(filter: Document, options: FindOneAndModifyOptions = .init(),
                                  _ completion: @escaping MongoFindOneBlock) {
-        let filterBSON = ObjectiveCSupport.convert(object: .document(filter))
-        self.__findOneAndDeleteWhere(filterBSON as! [String: RLMBSON], options: options) { document, error in
+        let filterBSON = ObjectiveCSupport.convert(filter)
+        __findOneAndDeleteWhere(filterBSON, options: options) { document, error in
             if let error = error {
                 completion(.failure(error))
             } else {
-                let bson: Document? = document?.mapValues { ObjectiveCSupport.convert(object: $0) }
-                completion(.success(bson))
+                completion(.success(document.map(ObjectiveCSupport.convert)))
             }
         }
     }
 }
 
 #if canImport(_Concurrency)
-// Generating a closure by referencing a bound member function (e.g. `foo(continuation.resume)`) currently
-// does not generate a Sendable closure even if the type is Sendable
-@available(macOS 10.15, tvOS 13.0, iOS 13.0, watchOS 6.0, *)
-private func withCheckedThrowingSendableContinuation<T>(function: String = #function,
-                                                        _ body: (@escaping @Sendable (Result<T, Error>) -> Void) -> Void) async throws -> T {
-    return try await withCheckedThrowingContinuation(function: function) { continuation in
-        body { continuation.resume(with: $0) }
-    }
-}
-
-@available(macOS 10.15, tvOS 13.0, iOS 13.0, watchOS 6.0, *)
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension MongoCollection {
     /// Encodes the provided value to BSON and inserts it. If the value is missing an identifier, one will be
     /// generated for it.
@@ -552,9 +530,7 @@ extension MongoCollection {
     ///   - document: A `Document` value to insert.
     /// - Returns: The object id of the inserted document.
     public func insertOne(_ document: Document) async throws -> AnyBSON {
-        return try await withCheckedThrowingSendableContinuation { continuation in
-            insertOne(document, continuation)
-        }
+        try await ObjectiveCSupport.convert(object: __insertOneDocument(ObjectiveCSupport.convert(document)))!
     }
 
     /// Encodes the provided values to BSON and inserts them. If any values are missing identifiers,
@@ -563,9 +539,8 @@ extension MongoCollection {
     ///   - documents: The `Document` values in a bson array to insert.
     /// - Returns: The object ids of inserted documents.
     public func insertMany(_ documents: [Document]) async throws -> [AnyBSON] {
-        return try await withCheckedThrowingSendableContinuation { continuation in
-            insertMany(documents, continuation)
-        }
+        try await __insertManyDocuments(documents.map(ObjectiveCSupport.convert))
+            .compactMap(ObjectiveCSupport.convertBson(object:))
     }
 
 #if swift(>=5.7)
@@ -582,9 +557,9 @@ extension MongoCollection {
     /// - Returns: Array of `Document` filtered.
     @_unsafeInheritExecutor
     public func find(filter: Document, options: FindOptions? = nil) async throws -> [Document] {
-        return try await withCheckedThrowingSendableContinuation { continuation in
-            find(filter: filter, options: options ?? .init(), continuation)
-        }
+        try await __findWhere(ObjectiveCSupport.convert(filter),
+                              options: options ?? .init())
+            .map(ObjectiveCSupport.convert)
     }
 
     /// Returns one document from a collection or view which matches the
@@ -597,22 +572,20 @@ extension MongoCollection {
     /// - Returns: `Document` filtered.
     @_unsafeInheritExecutor
     public func findOneDocument(filter: Document, options: FindOptions? = nil) async throws -> Document? {
-        return try await withCheckedThrowingSendableContinuation { continuation in
-            findOneDocument(filter: filter, options: options ?? .init(), continuation)
-        }
+        try await __findOneDocumentWhere(ObjectiveCSupport.convert(filter),
+                                         options: options ?? .init())
+            .map(ObjectiveCSupport.convert)
     }
-
 #else
-
     /// Finds the documents in this collection which match the provided filter.
     /// - Parameters:
     ///   - filter: A `Document` as bson that should match the query.
     ///   - options: `FindOptions` to use when executing the command.
     /// - Returns: Array of `Document` filtered.
     public func find(filter: Document, options: FindOptions? = nil) async throws -> [Document] {
-        return try await withCheckedThrowingSendableContinuation { continuation in
-            find(filter: filter, options: options ?? .init(), continuation)
-        }
+        try await __findWhere(ObjectiveCSupport.convert(filter),
+                              options: options ?? .init())
+            .map(ObjectiveCSupport.convert)
     }
 
     /// Returns one document from a collection or view which matches the
@@ -624,9 +597,9 @@ extension MongoCollection {
     ///   - options: `FindOptions` to use when executing the command.
     /// - Returns: `Document` filtered.
     public func findOneDocument(filter: Document, options: FindOptions? = nil) async throws -> Document? {
-        return try await withCheckedThrowingSendableContinuation { continuation in
-            findOneDocument(filter: filter, options: options ?? .init(), continuation)
-        }
+        try await __findOneDocumentWhere(ObjectiveCSupport.convert(filter),
+                                         options: options ?? .init())
+            .map(ObjectiveCSupport.convert)
     }
 #endif
 
@@ -635,9 +608,8 @@ extension MongoCollection {
     ///   - pipeline: A bson array made up of `Documents` containing the pipeline of aggregation operations to perform.
     /// - Returns:An array of `Document` result of the aggregation operation.
     public func aggregate(pipeline: [Document]) async throws -> [Document] {
-        return try await withCheckedThrowingSendableContinuation { continuation in
-            aggregate(pipeline: pipeline, continuation)
-        }
+        try await __aggregate(withPipeline: pipeline.map(ObjectiveCSupport.convert))
+            .map(ObjectiveCSupport.convert)
     }
 
     /// Counts the number of documents in this collection matching the provided filter.
@@ -645,15 +617,8 @@ extension MongoCollection {
     ///   - filter: A `Document` as bson that should match the query.
     ///   - limit: The max amount of documents to count
     /// - Returns: Count of the documents that matched the filter.
-    public func count(filter: Document,
-                      limit: Int? = nil) async throws -> Int {
-        return try await withCheckedThrowingSendableContinuation { continuation in
-            if let limit = limit {
-                count(filter: filter, limit: limit, continuation)
-            } else {
-                count(filter: filter, continuation)
-            }
-        }
+    public func count(filter: Document, limit: Int? = nil) async throws -> Int {
+        try await __countWhere(ObjectiveCSupport.convert(filter), limit: limit ?? 0)
     }
 
     /// Deletes a single matching document from the collection.
@@ -661,9 +626,7 @@ extension MongoCollection {
     ///   - filter: A `Document` as bson that should match the query.
     /// - Returns: `Int` count of deleted documents.
     public func deleteOneDocument(filter: Document) async throws -> Int {
-        return try await withCheckedThrowingSendableContinuation { continuation in
-            deleteOneDocument(filter: filter, continuation)
-        }
+        try await __deleteOneDocumentWhere(ObjectiveCSupport.convert(filter))
     }
 
     /// Deletes multiple documents
@@ -671,11 +634,10 @@ extension MongoCollection {
     ///   - filter: Document representing the match criteria
     /// - Returns: `Int` count of deleted documents.
     public func deleteManyDocuments(filter: Document) async throws -> Int {
-        return try await withCheckedThrowingSendableContinuation { continuation in
-            deleteManyDocuments(filter: filter, continuation)
-        }
+        try await __deleteManyDocumentsWhere(ObjectiveCSupport.convert(filter))
     }
 
+    // NEXT-MAJOR: there's no reason for upsert to be optional
     /// Updates a single document matching the provided filter in this collection.
     /// - Parameters:
     ///   - filter: A bson `Document` representing the match criteria.
@@ -685,18 +647,9 @@ extension MongoCollection {
     public func updateOneDocument(filter: Document,
                                   update: Document,
                                   upsert: Bool? = nil) async throws -> UpdateResult {
-        return try await withCheckedThrowingSendableContinuation { continuation in
-            if let upsert = upsert {
-                updateOneDocument(filter: filter,
-                                  update: update,
-                                  upsert: upsert,
-                                  continuation)
-            } else {
-                updateOneDocument(filter: filter,
-                                  update: update,
-                                  continuation)
-            }
-        }
+        try await __updateOneDocumentWhere(ObjectiveCSupport.convert(filter),
+                                           updateDocument: ObjectiveCSupport.convert(update),
+                                           upsert: upsert ?? false)
     }
 
     /// Updates multiple documents matching the provided filter in this collection.
@@ -708,18 +661,9 @@ extension MongoCollection {
     public func updateManyDocuments(filter: Document,
                                     update: Document,
                                     upsert: Bool? = nil) async throws -> UpdateResult {
-        return try await withCheckedThrowingSendableContinuation { continuation in
-            if let upsert = upsert {
-                updateManyDocuments(filter: filter,
-                                    update: update,
-                                    upsert: upsert,
-                                    continuation)
-            } else {
-                updateManyDocuments(filter: filter,
-                                    update: update,
-                                    continuation)
-            }
-        }
+        try await __updateManyDocumentsWhere(ObjectiveCSupport.convert(filter),
+                                             updateDocument: ObjectiveCSupport.convert(update),
+                                             upsert: upsert ?? false)
     }
 
     // NEXT-MAJOR: make the options parameter non-optional and default to .init()
@@ -739,10 +683,10 @@ extension MongoCollection {
     @_unsafeInheritExecutor
     public func findOneAndUpdate(filter: Document, update: Document,
                                  options: FindOneAndModifyOptions? = nil) async throws -> Document? {
-        return try await withCheckedThrowingSendableContinuation { continuation in
-            findOneAndUpdate(filter: filter, update: update,
-                             options: options ?? .init(), continuation)
-        }
+        try await __findOneAndUpdateWhere(ObjectiveCSupport.convert(filter),
+                                          updateDocument: ObjectiveCSupport.convert(update),
+                                          options: options ?? .init())
+            .map(ObjectiveCSupport.convert)
     }
 
     /// Overwrites a single document in a collection based on a query filter and
@@ -759,10 +703,10 @@ extension MongoCollection {
     @_unsafeInheritExecutor
     public func findOneAndReplace(filter: Document, replacement: Document,
                                   options: FindOneAndModifyOptions? = nil) async throws -> Document? {
-        return try await withCheckedThrowingSendableContinuation { continuation in
-            findOneAndReplace(filter: filter, replacement: replacement,
-                              options: options ?? .init(), continuation)
-        }
+        try await __findOneAndReplaceWhere(ObjectiveCSupport.convert(filter),
+                                           replacementDocument: ObjectiveCSupport.convert(replacement),
+                                           options: options ?? .init())
+            .map(ObjectiveCSupport.convert)
     }
 
     /// Removes a single document from a collection based on a query filter and
@@ -778,9 +722,9 @@ extension MongoCollection {
     @_unsafeInheritExecutor
     public func findOneAndDelete(filter: Document,
                                  options: FindOneAndModifyOptions? = nil) async throws -> Document? {
-        return try await withCheckedThrowingSendableContinuation { continuation in
-            findOneAndDelete(filter: filter, options: options ?? .init(), continuation)
-        }
+        try await __findOneAndDeleteWhere(ObjectiveCSupport.convert(filter),
+                                          options: options ?? .init())
+            .map(ObjectiveCSupport.convert)
     }
 #else
     /// Updates a single document in a collection based on a query filter and
@@ -796,10 +740,10 @@ extension MongoCollection {
     /// - Returns: `Document` result of the attempt to update a document  or `nil` if document wasn't found.
     public func findOneAndUpdate(filter: Document, update: Document,
                                  options: FindOneAndModifyOptions? = nil) async throws -> Document? {
-        return try await withCheckedThrowingSendableContinuation { continuation in
-            findOneAndUpdate(filter: filter, update: update,
-                             options: options ?? .init(), continuation)
-        }
+        try await __findOneAndUpdateWhere(ObjectiveCSupport.convert(filter),
+                                          updateDocument: ObjectiveCSupport.convert(update),
+                                          options: options ?? .init())
+            .map(ObjectiveCSupport.convert)
     }
 
     /// Overwrites a single document in a collection based on a query filter and
@@ -815,10 +759,10 @@ extension MongoCollection {
     /// - Returns: `Document`result of the attempt to reaplce a document   or `nil` if document wasn't found.
     public func findOneAndReplace(filter: Document, replacement: Document,
                                   options: FindOneAndModifyOptions? = nil) async throws -> Document? {
-        return try await withCheckedThrowingSendableContinuation { continuation in
-            findOneAndReplace(filter: filter, replacement: replacement,
-                              options: options ?? .init(), continuation)
-        }
+        try await __findOneAndReplaceWhere(ObjectiveCSupport.convert(filter),
+                                           replacementDocument: ObjectiveCSupport.convert(replacement),
+                                           options: options ?? .init())
+            .map(ObjectiveCSupport.convert)
     }
 
     /// Removes a single document from a collection based on a query filter and
@@ -833,9 +777,9 @@ extension MongoCollection {
     /// - Returns: `Document` result of the attempt to delete a document  or `nil` if document wasn't found.
     public func findOneAndDelete(filter: Document,
                                  options: FindOneAndModifyOptions? = nil) async throws -> Document? {
-        return try await withCheckedThrowingSendableContinuation { continuation in
-            findOneAndDelete(filter: filter, options: options ?? .init(), continuation)
-        }
+        try await __findOneAndDeleteWhere(ObjectiveCSupport.convert(filter),
+                                          options: options ?? .init())
+            .map(ObjectiveCSupport.convert)
     }
 #endif
 }
@@ -870,7 +814,7 @@ private class ChangeEventDelegateProxy: RLMChangeEventDelegate {
 #if !(os(iOS) && (arch(i386) || arch(arm)))
 import Combine
 
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers {
     class WatchSubscription<S: Subscriber>: ChangeEventDelegate, Subscription where S.Input == AnyBSON, S.Failure == Error {
         private let collection: MongoCollection
@@ -998,7 +942,7 @@ extension Publishers {
     }
 }
 
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension MongoCollection {
     /// Creates a publisher that emits a AnyBSON change event each time the MongoDB collection changes.
     ///

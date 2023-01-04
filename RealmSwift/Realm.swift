@@ -160,7 +160,7 @@ public typealias AsyncTransactionId = RLMAsyncTransactionId
      - returns: A publisher. If the Realm was successfully opened, it will be received by the subscribers.
                 Otherwise, a `Swift.Error` describing what went wrong will be passed upstream instead.
      */
-    @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+    @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
     public static func asyncOpen(configuration: Realm.Configuration = .defaultConfiguration) -> RealmPublishers.AsyncOpenPublisher {
         return RealmPublishers.AsyncOpenPublisher(configuration: configuration)
     }
@@ -1162,7 +1162,8 @@ extension Realm {
 public typealias NotificationBlock = (_ notification: Realm.Notification, _ realm: Realm) -> Void
 
 #if canImport(_Concurrency)
-@available(macOS 10.15, tvOS 13.0, iOS 13.0, watchOS 6.0, *)
+
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Realm {
     /// Options for when to download all data from the server before opening
     /// a synchronized Realm.

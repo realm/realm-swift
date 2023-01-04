@@ -125,9 +125,13 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
  @param onComplete The block called upon synchronization of subscriptions to the server. Otherwise
                    an `Error`describing what went wrong will be returned by the block
  */
-- (void)update:(__attribute__((noescape)) void(^)(void))block onComplete:(void(^)(NSError * _Nullable))onComplete;
+- (void)update:(__attribute__((noescape)) void(^)(void))block
+    onComplete:(void(^)(NSError * _Nullable))onComplete
+    __attribute__((swift_async(not_swift_private, 2)))
+    __attribute__((swift_attr("@_unsafeInheritExecutor")));
 /// :nodoc:
-- (void)write:(__attribute__((noescape)) void(^)(void))block onComplete:(void(^)(NSError * _Nullable))onComplete __attribute__((unavailable("Renamed to -update:onComplete.")));
+- (void)write:(__attribute__((noescape)) void(^)(void))block
+   onComplete:(void(^)(NSError * _Nullable))onComplete __attribute__((unavailable("Renamed to -update:onComplete.")));
 
 #pragma mark - Find subscription
 
