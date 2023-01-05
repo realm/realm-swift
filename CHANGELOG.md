@@ -1,7 +1,11 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+* `MongoCollection.watch().subscribe(on:)` now supports any swift Scheduler
+  rather than only dispatch queues ([PR #8131](https://github.com/realm/realm-swift/pull/8130)).
+* Add an async sequence wrapper for `MongoCollection.watch()`, allowing you to
+  do `for try await change in collection.changeEvents { ... }`
+  ([PR #8131](https://github.com/realm/realm-swift/pull/8130)).
 
 ### Fixed
 * `UserPublisher` incorrectly bounced all notifications to the main thread instead

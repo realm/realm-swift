@@ -18,24 +18,8 @@
 
 #import "RLMNetworkTransport.h"
 
-namespace realm {
-namespace app {
-struct GenericEventSubscriber;
+namespace realm::app {
 struct Request;
 }
-}
 
-@interface RLMEventSubscriber : NSObject<RLMEventDelegate>
-- (void)didReceiveEvent:(NSData *)event;
-- (void)didReceiveError:(NSError *)error;
-- (void)didOpen;
-- (void)didCloseWithError:(NSError *)error;
-
-@end
-
-@interface RLMNetworkTransport()
-
-- (RLMRequest *)RLMRequestFromRequest:(realm::app::Request)request;
-
-@end
-
+RLMRequest *RLMRequestFromRequest(realm::app::Request const& request);

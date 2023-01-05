@@ -44,6 +44,8 @@ RLM_SWIFT_SENDABLE RLM_FINAL // is internally thread-safe
 @interface RLMChangeStream : NSObject<RLMEventDelegate>
 /// Stops a watch streaming session.
 - (void)close;
+/// :nodoc:
+- (instancetype)init NS_UNAVAILABLE;
 @end
 
 /// The `RLMMongoCollection` represents a MongoDB collection.

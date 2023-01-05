@@ -201,7 +201,7 @@ public typealias ChangeStream = RLMChangeStream
 public protocol ChangeEventDelegate: AnyObject {
     /// The stream was opened.
     /// - Parameter changeStream: The `ChangeStream` subscribing to the stream changes.
-    func changeStreamDidOpen(_ changeStream: ChangeStream )
+    func changeStreamDidOpen(_ changeStream: ChangeStream)
     /// The stream has been closed.
     /// - Parameter error: If an error occurred when closing the stream, an error will be passed.
     func changeStreamDidClose(with error: Error?)
@@ -786,7 +786,8 @@ extension MongoCollection {
 #endif // swift(>=5.6)
 
 private class ChangeEventDelegateProxy: RLMChangeEventDelegate {
-
+    // NEXT-MAJOR: This doesn't need to be weak and making it not weak would
+    // allow removing the class requirement on ChangeEventDelegate
     private weak var proxyDelegate: ChangeEventDelegate?
 
     init(_ proxyDelegate: ChangeEventDelegate) {
@@ -816,63 +817,48 @@ import Combine
 
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers {
-    class WatchSubscription<S: Subscriber>: ChangeEventDelegate, Subscription where S.Input == AnyBSON, S.Failure == Error {
-        private let collection: MongoCollection
-        private var changeStream: ChangeStream?
-        private var subscriber: S?
+    private class WatchSubscription<S: Subscriber>: RLMChangeEventDelegate, Subscription where S.Input == AnyBSON, S.Failure == Error {
+        private var changeStream: RLMChangeStream!
+        private var subscriber: S
         private var onOpen: (() -> Void)?
 
-        init(collection: MongoCollection,
-             subscriber: S,
-             queue: DispatchQueue = .main,
-             filterIds: [ObjectId]? = nil,
-             matchFilter: Document? = nil,
-             onOpen: (() -> Void)? = nil) {
-            self.collection = collection
+        init(publisher: __shared WatchPublisher, subscriber: S) {
             self.subscriber = subscriber
-            self.onOpen = onOpen
-
-            if let matchFilter = matchFilter {
-                changeStream = collection.watch(matchFilter: matchFilter,
-                                                delegate: self,
-                                                queue: queue)
-            } else if let filterIds = filterIds {
-                changeStream = collection.watch(filterIds: filterIds,
-                                                delegate: self,
-                                                queue: queue)
-            } else {
-                changeStream = collection.watch(delegate: self,
-                                                queue: queue)
-            }
+            self.onOpen = publisher.openEvent
+            let scheduler = publisher.scheduler
+            changeStream = publisher.collection.watch(
+                withMatchFilter: publisher.matchFilter.map(ObjectiveCSupport.convert) as RLMBSON?,
+                idFilter: publisher.filterIds as RLMBSON?,
+                delegate: self as RLMChangeEventDelegate,
+                scheduler: scheduler ?? DispatchQueue.main.schedule) as RLMChangeStream
         }
 
         func request(_ demand: Subscribers.Demand) { }
 
         func cancel() {
-            changeStream?.close()
+            changeStream.close()
         }
 
         func changeStreamDidOpen(_ changeStream: RLMChangeStream) {
             onOpen?()
         }
 
-        func changeStreamDidClose(with error: Error?) {
-            guard let error = error else {
-                subscriber?.receive(completion: .finished)
-                return
+        func changeStreamDidCloseWithError(_ error: Error?) {
+            if let error = error {
+                subscriber.receive(completion: .failure(error))
+            } else {
+                subscriber.receive(completion: .finished)
             }
-            subscriber?.receive(completion: .failure(error))
         }
 
-        func changeStreamDidReceive(error: Error) {
-            subscriber?.receive(completion: .failure(error))
+        func changeStreamDidReceiveError(_ error: Error) {
+            subscriber.receive(completion: .failure(error))
         }
 
-        func changeStreamDidReceive(changeEvent: AnyBSON?) {
-            guard let changeEvent = changeEvent else {
-                return
+        func changeStreamDidReceiveChangeEvent(_ changeEvent: RLMBSON) {
+            if let changeEvent = ObjectiveCSupport.convert(object: changeEvent) {
+                _ = subscriber.receive(changeEvent)
             }
-            _ = subscriber?.receive(changeEvent)
         }
     }
 
@@ -881,19 +867,19 @@ extension Publishers {
         public typealias Output = AnyBSON
         public typealias Failure = Error
 
-        private let collection: MongoCollection
-        private let queue: DispatchQueue
-        private let filterIds: [ObjectId]?
-        private let matchFilter: Document?
-        private let openEvent: (() -> Void)?
+        fileprivate let collection: MongoCollection
+        fileprivate let scheduler: ((@escaping () -> Void) -> Void)?
+        fileprivate let filterIds: [ObjectId]?
+        fileprivate let matchFilter: Document?
+        fileprivate let openEvent: (() -> Void)?
 
         init(collection: MongoCollection,
-             queue: DispatchQueue,
+             scheduler: ((@escaping () -> Void) -> Void)? = nil,
              filterIds: [ObjectId]? = nil,
              matchFilter: Document? = nil,
              onOpen: (() -> Void)? = nil) {
             self.collection = collection
-            self.queue = queue
+            self.scheduler = scheduler
             self.filterIds = filterIds
             self.matchFilter = matchFilter
             self.openEvent = onOpen
@@ -907,34 +893,23 @@ extension Publishers {
         /// - Parameter event: Callback which will be invoked once the change stream is open.
         /// - Returns: A publisher that emits a change event each time the remote MongoDB collection changes.
         public func onOpen(_ event: @escaping (() -> Void)) -> Self {
-            Self(collection: collection,
-                 queue: queue,
-                 filterIds: filterIds,
-                 matchFilter: matchFilter,
-                 onOpen: event)
+            Self(collection: collection, scheduler: scheduler,
+                 filterIds: filterIds, matchFilter: matchFilter, onOpen: event)
         }
 
         /// :nodoc:
         public func receive<S: Subscriber>(subscriber: S) where Failure == S.Failure, Output == S.Input {
-            let subscription = WatchSubscription(collection: collection,
-                                                 subscriber: subscriber,
-                                                 queue: queue,
-                                                 filterIds: filterIds,
-                                                 matchFilter: matchFilter,
-                                                 onOpen: openEvent)
+            let subscription = WatchSubscription(publisher: self, subscriber: subscriber)
             subscriber.receive(subscription: subscription)
         }
 
         /// Specifies the scheduler on which to perform subscribe, cancel, and request operations.
         ///
-        /// - parameter scheduler: The dispatch queue to perform the subscription on.
+        /// - parameter scheduler: The scheduler to perform the subscription on.
         /// - returns: A publisher which subscribes on the given scheduler.
         public func subscribe<S: Scheduler>(on scheduler: S) -> WatchPublisher {
-            guard let queue = scheduler as? DispatchQueue else {
-                fatalError("Cannot subscribe on scheduler \(scheduler): only dispatch queues are currently implemented.")
-            }
             return Self(collection: collection,
-                        queue: queue,
+                        scheduler: { scheduler.schedule($0) },
                         filterIds: filterIds,
                         matchFilter: matchFilter,
                         onOpen: openEvent)
@@ -948,23 +923,77 @@ extension MongoCollection {
     ///
     /// - returns: A publisher that emits the AnyBSON change event each time the collection changes.
     public func watch() -> Publishers.WatchPublisher {
-        return Publishers.WatchPublisher(collection: self, queue: .main)
+        Publishers.WatchPublisher(collection: self)
     }
+
     /// Creates a publisher that emits a AnyBSON change event each time the MongoDB collection changes.
     ///
     /// - Parameter filterIds: The list of _ids in the collection to watch.
     /// - Returns: A publisher that emits the AnyBSON change event each time the collection changes.
     public func watch(filterIds: [ObjectId]) -> Publishers.WatchPublisher {
-        return Publishers.WatchPublisher(collection: self, queue: .main, filterIds: filterIds)
+        Publishers.WatchPublisher(collection: self, filterIds: filterIds)
     }
+
     /// Creates a publisher that emits a AnyBSON change event each time the MongoDB collection changes.
     ///
     /// - Parameter matchFilter: The $match filter to apply to incoming change events.
     /// - Returns: A publisher that emits the AnyBSON change event each time the collection changes.
     public func watch(matchFilter: Document) -> Publishers.WatchPublisher {
-        return Publishers.WatchPublisher(collection: self, queue: .main, matchFilter: matchFilter)
+        Publishers.WatchPublisher(collection: self, matchFilter: matchFilter)
     }
 }
+
+#if swift(>=5.7)
+@available(macOS 12.0, iOS 15.0, tvOS 15.0, watchOS 8.0, *)
+extension MongoCollection {
+    /// An async sequence of AnyBSON values containing information about each
+    /// change to the MongoDB collection
+    public var changeEvents: AsyncThrowingPublisher<Publishers.WatchPublisher> {
+        Publishers.WatchPublisher(collection: self)
+            .subscribe(on: ImmediateScheduler.shared).values
+    }
+
+    /// An async sequence of AnyBSON values containing information about each
+    /// change to the MongoDB collection
+    ///  - parameter onOpen: A callback which is invoked when the watch stream
+    ///  has initialized on the server. Server-side changes triggered before
+    ///  this callback is invoked may not produce change events.
+    public func changeEvents(onOpen: @escaping () -> Void)
+            -> AsyncThrowingPublisher<Publishers.WatchPublisher> {
+        Publishers.WatchPublisher(collection: self, onOpen: onOpen)
+            .subscribe(on: ImmediateScheduler.shared).values
+    }
+
+    /// An async sequence of AnyBSON values containing information about each
+    /// change to objects with ids contained in `filterIds` within the the
+    /// MongoDB collection.
+    ///  - parameter filterIds: Document ids which should produce change events
+    ///  - parameter onOpen: An optional callback which is invoked when the
+    ///  watch stream has initialized on the server. Server-side changes
+    ///  triggered before this callback is invoked may not produce change
+    ///  events.
+    public func changeEvents(filterIds: [ObjectId], onOpen: (() -> Void)? = nil)
+            -> AsyncThrowingPublisher<Publishers.WatchPublisher> {
+        Publishers.WatchPublisher(collection: self, filterIds: filterIds, onOpen: onOpen)
+            .subscribe(on: ImmediateScheduler.shared).values
+    }
+
+    /// An async sequence of AnyBSON values containing information about each
+    /// change to objects within the MongoDB collection matching the given
+    /// $match filter.
+    ///  - parameter matchFilter: $match filter to filter the documents which
+    ///  produce change events.
+    ///  - parameter onOpen: An optional callback which is invoked when the
+    ///  watch stream has initialized on the server. Server-side changes
+    ///  triggered before this callback is invoked may not produce change
+    ///  events.
+    public func changeEvents(matchFilter: Document, onOpen: (() -> Void)? = nil)
+            -> AsyncThrowingPublisher<Publishers.WatchPublisher> {
+        Publishers.WatchPublisher(collection: self, matchFilter: matchFilter, onOpen: onOpen)
+            .subscribe(on: ImmediateScheduler.shared).values
+    }
+}
+#endif
 
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, macCatalyst 13.0, macCatalystApplicationExtension 13.0, *)
 @usableFromInline
@@ -981,31 +1010,31 @@ internal func future<T>(_ fn: @escaping (@escaping @Sendable (Result<T, Error>) 
 public extension MongoCollection {
     /// Encodes the provided value to BSON and inserts it. If the value is missing an identifier, one will be
     /// generated for it.
-    /// @param document:  A `Document` value to insert.
-    /// @returns A publisher that eventually return the object id of the inserted document or `Error`.
+    /// - parameter document:  A `Document` value to insert.
+    /// - returns: A publisher that eventually return the object id of the inserted document or `Error`.
     func insertOne(_ document: Document) -> Future<AnyBSON, Error> {
         return future { self.insertOne(document, $0) }
     }
 
     /// Encodes the provided values to BSON and inserts them. If any values are missing identifiers,
     /// they will be generated.
-    /// @param documents: The `Document` values in a bson array to insert.
-    /// @returns A publisher that eventually return the object ids of inserted documents or `Error`.
+    /// - parameter documents: The `Document` values in a bson array to insert.
+    /// - returns: A publisher that eventually return the object ids of inserted documents or `Error`.
     func insertMany(_ documents: [Document]) -> Future<[AnyBSON], Error> {
         return future { self.insertMany(documents, $0) }
     }
 
     /// Finds the documents in this collection which match the provided filter.
-    /// @param filter: A `Document` as bson that should match the query.
-    /// @param options: `FindOptions` to use when executing the command.
-    /// @returns A publisher that eventually return `[ObjectId]` of documents or `Error`.
+    /// - parameter filter: A `Document` as bson that should match the query.
+    /// - parameter options: `FindOptions` to use when executing the command.
+    /// - returns: A publisher that eventually return `[ObjectId]` of documents or `Error`.
     func find(filter: Document, options: FindOptions) -> Future<[Document], Error> {
         return future { self.find(filter: filter, options: options, $0) }
     }
 
     /// Finds the documents in this collection which match the provided filter.
-    /// @param filter: A `Document` as bson that should match the query.
-    /// @returns A publisher that eventually return `[ObjectId]` of documents or `Error`.
+    /// - parameter filter: A `Document` as bson that should match the query.
+    /// - returns: A publisher that eventually return `[ObjectId]` of documents or `Error`.
     func find(filter: Document) -> Future<[Document], Error> {
         return future { self.find(filter: filter, $0) }
     }
@@ -1014,9 +1043,9 @@ public extension MongoCollection {
     /// provided filter. If multiple documents satisfy the query, this method
     /// returns the first document according to the query's sort order or natural
     /// order.
-    /// @param filter: A `Document` as bson that should match the query.
-    /// @param options: `FindOptions` to use when executing the command.
-    /// @returns A publisher that eventually return `Document` or `Error`.
+    /// - parameter filter: A `Document` as bson that should match the query.
+    /// - parameter options: `FindOptions` to use when executing the command.
+    /// - returns: A publisher that eventually return `Document` or `Error`.
     func findOneDocument(filter: Document, options: FindOptions) -> Future<Document?, Error> {
         return future { self.findOneDocument(filter: filter, $0) }
     }
@@ -1025,78 +1054,78 @@ public extension MongoCollection {
     /// provided filter. If multiple documents satisfy the query, this method
     /// returns the first document according to the query's sort order or natural
     /// order.
-    /// @param filter: A `Document` as bson that should match the query.
-    /// @returns A publisher that eventually return `Document` or `nil` if document wasn't found or `Error`.
+    /// - parameter filter: A `Document` as bson that should match the query.
+    /// - returns: A publisher that eventually return `Document` or `nil` if document wasn't found or `Error`.
     func findOneDocument(filter: Document) -> Future<Document?, Error> {
         return future { self.findOneDocument(filter: filter, $0) }
     }
 
     /// Runs an aggregation framework pipeline against this collection.
-    /// @param pipeline: A bson array made up of `Documents` containing the pipeline of aggregation operations to perform.
-    /// @returns A publisher that eventually return `Document` or `Error`.
+    /// - parameter pipeline: A bson array made up of `Documents` containing the pipeline of aggregation operations to perform.
+    /// - returns: A publisher that eventually return `Document` or `Error`.
     func aggregate(pipeline: [Document]) -> Future<[Document], Error> {
         return future { self.aggregate(pipeline: pipeline, $0) }
     }
 
     /// Counts the number of documents in this collection matching the provided filter.
-    /// @param filter: A `Document` as bson that should match the query.
-    /// @param limit: The max amount of documents to count
-    /// @returns A publisher that eventually return `Int` count of documents or `Error`.
+    /// - parameter filter: A `Document` as bson that should match the query.
+    /// - parameter limit: The max amount of documents to count
+    /// - returns: A publisher that eventually return `Int` count of documents or `Error`.
     func count(filter: Document, limit: Int) -> Future<Int, Error> {
         return future { self.count(filter: filter, limit: limit, $0) }
     }
 
     /// Counts the number of documents in this collection matching the provided filter.
-    /// @param filter: A `Document` as bson that should match the query.
-    /// @returns A publisher that eventually return `Int` count of documents or `Error`.
+    /// - parameter filter: A `Document` as bson that should match the query.
+    /// - returns: A publisher that eventually return `Int` count of documents or `Error`.
     func count(filter: Document) -> Future<Int, Error> {
         return future { self.count(filter: filter, $0) }
     }
 
     /// Deletes a single matching document from the collection.
-    /// @param filter: A `Document` as bson that should match the query.
-    /// @returns A publisher that eventually return `Int` count of deleted documents or `Error`.
+    /// - parameter filter: A `Document` as bson that should match the query.
+    /// - returns: A publisher that eventually return `Int` count of deleted documents or `Error`.
     func deleteOneDocument(filter: Document) -> Future<Int, Error> {
         return future { self.deleteOneDocument(filter: filter, $0) }
     }
 
     /// Deletes multiple documents
-    /// @param filter: Document representing the match criteria
-    /// @returns A publisher that eventually return `Int` count of deleted documents or `Error`.
+    /// - parameter filter: Document representing the match criteria
+    /// - returns: A publisher that eventually return `Int` count of deleted documents or `Error`.
     func deleteManyDocuments(filter: Document) -> Future<Int, Error> {
         return future { self.deleteManyDocuments(filter: filter, $0) }
     }
 
     /// Updates a single document matching the provided filter in this collection.
-    /// @param filter: A bson `Document` representing the match criteria.
-    /// @param update: A bson `Document` representing the update to be applied to a matching document.
-    /// @param upsert: When true, creates a new document if no document matches the query.
-    /// @returns A publisher that eventually return `UpdateResult` or `Error`.
+    /// - parameter filter: A bson `Document` representing the match criteria.
+    /// - parameter update: A bson `Document` representing the update to be applied to a matching document.
+    /// - parameter upsert: When true, creates a new document if no document matches the query.
+    /// - returns: A publisher that eventually return `UpdateResult` or `Error`.
     func updateOneDocument(filter: Document, update: Document, upsert: Bool) -> Future<UpdateResult, Error> {
         return future { self.updateOneDocument(filter: filter, update: update, upsert: upsert, $0) }
     }
 
     /// Updates a single document matching the provided filter in this collection.
-    /// @param filter: A bson `Document` representing the match criteria.
-    /// @param update: A bson `Document` representing the update to be applied to a matching document.
-    /// @returns A publisher that eventually return `UpdateResult` or `Error`.
+    /// - parameter filter: A bson `Document` representing the match criteria.
+    /// - parameter update: A bson `Document` representing the update to be applied to a matching document.
+    /// - returns: A publisher that eventually return `UpdateResult` or `Error`.
     func updateOneDocument(filter: Document, update: Document) -> Future<UpdateResult, Error> {
         return future { self.updateOneDocument(filter: filter, update: update, $0) }
     }
 
     /// Updates multiple documents matching the provided filter in this collection.
-    /// @param filter: A bson `Document` representing the match criteria.
-    /// @param update: A bson `Document` representing the update to be applied to a matching document.
-    /// @param upsert: When true, creates a new document if no document matches the query.
-    /// @returns A publisher that eventually return `UpdateResult` or `Error`.
+    /// - parameter filter: A bson `Document` representing the match criteria.
+    /// - parameter update: A bson `Document` representing the update to be applied to a matching document.
+    /// - parameter upsert: When true, creates a new document if no document matches the query.
+    /// - returns: A publisher that eventually return `UpdateResult` or `Error`.
     func updateManyDocuments(filter: Document, update: Document, upsert: Bool) -> Future<UpdateResult, Error> {
         return future { self.updateManyDocuments(filter: filter, update: update, upsert: upsert, $0) }
     }
 
     /// Updates multiple documents matching the provided filter in this collection.
-    /// @param filter: A bson `Document` representing the match criteria.
-    /// @param update: A bson `Document` representing the update to be applied to a matching document.
-    /// @returns A publisher that eventually return `UpdateResult` or `Error`.
+    /// - parameter filter: A bson `Document` representing the match criteria.
+    /// - parameter update: A bson `Document` representing the update to be applied to a matching document.
+    /// - returns: A publisher that eventually return `UpdateResult` or `Error`.
     func updateManyDocuments(filter: Document, update: Document) -> Future<UpdateResult, Error> {
         return future { self.updateManyDocuments(filter: filter, update: update, $0) }
     }
@@ -1107,10 +1136,10 @@ public extension MongoCollection {
     /// return a document with the same command. This avoids the risk of other
     /// update operations changing the document between separate find and update
     /// operations.
-    /// @param filter: A bson `Document` representing the match criteria.
-    /// @param update: A bson `Document` representing the update to be applied to a matching document.
-    /// @param options: `RemoteFindOneAndModifyOptions` to use when executing the command.
-    /// @returns A publisher that eventually return `Document` or `nil` if document wasn't found or `Error`.
+    /// - parameter filter: A bson `Document` representing the match criteria.
+    /// - parameter update: A bson `Document` representing the update to be applied to a matching document.
+    /// - parameter options: `RemoteFindOneAndModifyOptions` to use when executing the command.
+    /// - returns: A publisher that eventually return `Document` or `nil` if document wasn't found or `Error`.
     func findOneAndUpdate(filter: Document, update: Document, options: FindOneAndModifyOptions) -> Future<Document?, Error> {
         return future { self.findOneAndUpdate(filter: filter, update: update, options: options, $0) }
     }
@@ -1121,9 +1150,9 @@ public extension MongoCollection {
     /// return a document with the same command. This avoids the risk of other
     /// update operations changing the document between separate find and update
     /// operations.
-    /// @param filter: A bson `Document` representing the match criteria.
-    /// @param update: A bson `Document` representing the update to be applied to a matching document.
-    /// @returns A publisher that eventually return `Document` or `nil` if document wasn't found or `Error`.
+    /// - parameter filter: A bson `Document` representing the match criteria.
+    /// - parameter update: A bson `Document` representing the update to be applied to a matching document.
+    /// - returns: A publisher that eventually return `Document` or `nil` if document wasn't found or `Error`.
     func findOneAndUpdate(filter: Document, update: Document) -> Future<Document?, Error> {
         return future { self.findOneAndUpdate(filter: filter, update: update, $0) }
     }
@@ -1134,10 +1163,10 @@ public extension MongoCollection {
     /// replace, and return a document with the same command. This avoids the
     /// risk of other update operations changing the document between separate
     /// find and update operations.
-    /// @param filter: A `Document` that should match the query.
-    /// @param replacement: A `Document` describing the replacement.
-    /// @param options: `FindOneAndModifyOptions` to use when executing the command.
-    /// @returns A publisher that eventually return `Document` or `nil` if document wasn't found or `Error`.
+    /// - parameter filter: A `Document` that should match the query.
+    /// - parameter replacement: A `Document` describing the replacement.
+    /// - parameter options: `FindOneAndModifyOptions` to use when executing the command.
+    /// - returns: A publisher that eventually return `Document` or `nil` if document wasn't found or `Error`.
     func findOneAndReplace(filter: Document, replacement: Document, options: FindOneAndModifyOptions) -> Future<Document?, Error> {
         return future { self.findOneAndReplace(filter: filter, replacement: replacement, options: options, $0) }
     }
@@ -1148,9 +1177,9 @@ public extension MongoCollection {
     /// replace, and return a document with the same command. This avoids the
     /// risk of other update operations changing the document between separate
     /// find and update operations.
-    /// @param filter: A `Document` that should match the query.
-    /// @param replacement: A `Document` describing the replacement.
-    /// @returns A publisher that eventually return `Document` or `nil` if document wasn't found or `Error`.
+    /// - parameter filter: A `Document` that should match the query.
+    /// - parameter replacement: A `Document` describing the replacement.
+    /// - returns: A publisher that eventually return `Document` or `nil` if document wasn't found or `Error`.
     func findOneAndReplace(filter: Document, replacement: Document) -> Future<Document?, Error> {
         return future { self.findOneAndReplace(filter: filter, replacement: replacement, $0) }
     }
@@ -1161,9 +1190,9 @@ public extension MongoCollection {
     /// find and delete a document with the same command. This avoids the risk of
     /// other update operations changing the document between separate find and
     /// delete operations.
-    /// @param filter: A `Document` that should match the query.
-    /// @param options: `FindOneAndModifyOptions` to use when executing the command.
-    /// @returns A publisher that eventually return `Document` or `nil` if document wasn't found or `Error`.
+    /// - parameter filter: A `Document` that should match the query.
+    /// - parameter options: `FindOneAndModifyOptions` to use when executing the command.
+    /// - returns: A publisher that eventually return `Document` or `nil` if document wasn't found or `Error`.
     func findOneAndDelete(filter: Document, options: FindOneAndModifyOptions) -> Future<Document?, Error> {
         return future { self.findOneAndDelete(filter: filter, options: options, $0) }
     }
@@ -1174,8 +1203,9 @@ public extension MongoCollection {
     /// find and delete a document with the same command. This avoids the risk of
     /// other update operations changing the document between separate find and
     /// delete operations.
-    /// @param filter: A `Document` that should match the query.
-    /// @returns A publisher that eventually return `Document` or `nil` if document wasn't found or `Error`.
+    ///
+    /// - parameter filter: A `Document` that should match the query.
+    /// - returns: A publisher that eventually return `Document` or `nil` if document wasn't found or `Error`.
     func findOneAndDelete(filter: Document) -> Future<Document?, Error> {
         return future { self.findOneAndDelete(filter: filter, $0) }
     }

@@ -19,7 +19,7 @@
 #import "RLMMongoClient_Private.hpp"
 
 #import "RLMMongoDatabase_Private.hpp"
-#import "RLMMongoCollection_Private.hpp"
+#import "RLMMongoCollection_Private.h"
 #import "RLMApp_Private.hpp"
 
 #import <realm/object-store/sync/mongo_client.hpp>

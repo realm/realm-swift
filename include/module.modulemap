@@ -13,6 +13,7 @@ module Realm {
         header "Realm/RLMCollection_Private.h"
         header "Realm/RLMDictionary_Private.h"
         header "Realm/RLMEvent.h"
+        header "Realm/RLMMongoCollection_Private.h"
         header "Realm/RLMObjectBase_Dynamic.h"
         header "Realm/RLMObjectBase_Private.h"
         header "Realm/RLMObjectSchema_Private.h"
