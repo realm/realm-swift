@@ -66,9 +66,10 @@
 }
 
 - (void)didReceiveEvent:(nonnull NSData *)event {
-    std::string_view str = [[NSString alloc] initWithData:event encoding:NSUTF8StringEncoding].UTF8String;
-    if (!str.empty() && _watchStream.state() == realm::app::WatchStream::State::NEED_DATA) {
-        _watchStream.feed_buffer(str);
+    if (_watchStream.state() == realm::app::WatchStream::State::NEED_DATA) {
+        [event enumerateByteRangesUsingBlock:^(const void *bytes, NSRange byteRange, BOOL *) {
+            _watchStream.feed_buffer(std::string_view(static_cast<const char *>(bytes), byteRange.length));
+        }];
     }
 
     while (_watchStream.state() == realm::app::WatchStream::State::HAVE_EVENT) {

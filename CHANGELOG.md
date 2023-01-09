@@ -6,6 +6,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * Allow initialising any sync configuration with `cancelAsyncOpenOnNonFatalErrors`.
 
 ### Fixed
+* Fix bad memory access exception that can occur when watching change streams. [PR #8039](https://github.com/realm/realm-swift/pull/8039).
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
 * Object change notifications on projections only included the first projected
   property for each source property ([PR #8050](https://github.com/realm/realm-swift/pull/8050), since v10.21.0).
