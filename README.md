@@ -21,7 +21,7 @@ class Dog: Object {
     @Persisted var age: Int
 }
 class Person: Object {
-    @Persisted(primaryKey: true) var _id: String
+    @Persisted(primaryKey: true) var _id: ObjectId
     @Persisted var name: String
     @Persisted var age: Int
     // Create relationships by pointing an Object field to another Class
