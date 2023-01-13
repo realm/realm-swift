@@ -22,6 +22,10 @@ import Realm
 import Realm.Dynamic
 import Foundation
 
+#if canImport(RealmSwiftTestSupport)
+import RealmSwiftTestSupport
+#endif
+
 @discardableResult
 private func realmWithSingleClassProperties(_ fileURL: URL, className: String, properties: [AnyObject]) -> RLMRealm {
     let schema = RLMSchema()
@@ -56,13 +60,13 @@ class MigrationTests: TestCase {
     // migrate realm at path and ensure migration
     private func migrateAndTestRealm(_ fileURL: URL, shouldRun: Bool = true, schemaVersion: UInt64 = 1,
                                      autoMigration: Bool = false, block: MigrationBlock? = nil) {
-        var didRun = false
+        @Locked var didRun = false
         let config = Realm.Configuration(fileURL: fileURL, schemaVersion: schemaVersion,
             migrationBlock: { migration, oldSchemaVersion in
                 if let block = block {
                     block(migration, oldSchemaVersion)
                 }
-                didRun = true
+                $didRun.wrappedValue = true
                 return
         })
 
@@ -89,14 +93,14 @@ class MigrationTests: TestCase {
     func testSetDefaultRealmSchemaVersion() {
         createAndTestRealmAtURL(defaultRealmURL())
 
-        var didRun = false
+        @Locked var didRun = false
         let config = Realm.Configuration(fileURL: defaultRealmURL(), schemaVersion: 1,
-                                         migrationBlock: { _, _ in didRun = true })
+                                         migrationBlock: { _, _ in $didRun.wrappedValue = true })
         Realm.Configuration.defaultConfiguration = config
 
         try! Realm.performMigration()
 
-        XCTAssertEqual(didRun, true)
+        XCTAssert(didRun)
         XCTAssertEqual(1, try! schemaVersionAtURL(defaultRealmURL()))
     }
 
@@ -281,7 +285,7 @@ class MigrationTests: TestCase {
         }
 
         var version = UInt64(1)
-        func write(_ value: @autoclosure () -> AnyRealmValue, test: @escaping (Any?, Any?) -> Void) {
+        func write(_ value: @autoclosure () -> AnyRealmValue, test: @escaping @Sendable (Any?, Any?) -> Void) {
             autoreleasepool {
                 let realm = try! Realm()
                 try! realm.write {

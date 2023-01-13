@@ -21,10 +21,15 @@ import Realm.Private
 import RealmSwift
 import XCTest
 
+#if canImport(RealmSwiftTestSupport)
+import RealmSwiftTestSupport
+#endif
+
 #if os(macOS)
 
 extension URLSession {
-    fileprivate func resultDataTask(with request: URLRequest, _ completionHandler: @escaping (Result<Data, Error>) -> Void) {
+    fileprivate func resultDataTask(with request: URLRequest,
+                                    _ completionHandler: @Sendable @escaping (Result<Data, Error>) -> Void) {
         URLSession(configuration: .default, delegate: nil, delegateQueue: OperationQueue()).dataTask(with: request) { (data, response, error) in
             if let httpResponse = response as? HTTPURLResponse,
                 httpResponse.statusCode >= 200 && httpResponse.statusCode < 300,
@@ -37,12 +42,13 @@ extension URLSession {
     }
 
     // Synchronously perform a data task, returning the data from it
+    @available(macOS 10.12, *)
     fileprivate func resultDataTask(with request: URLRequest) -> Result<Data, Error> {
-        var result: Result<Data, Error>!
+        @Locked var result: Result<Data, Error>!
         let group = DispatchGroup()
         group.enter()
         resultDataTask(with: request) {
-            result = $0
+            $result.wrappedValue = $0
             group.leave()
         }
         guard case .success = group.wait(timeout: .now() + 10) else {
@@ -174,204 +180,216 @@ struct AdminProfile: Codable {
     let roles: [Role]
 }
 
-// MARK: - Admin
-class Admin {
-    // MARK: AdminSession
-    /// An authenticated session for using the Admin API
-    class AdminSession {
+// Dispatch has not yet been annotated for sendability
+extension DispatchGroup: @unchecked Sendable {
+}
+
+// MARK: AdminSession
+/// An authenticated session for using the Admin API
+@available(macOS 10.12, *)
+class AdminSession {
+    /// The access token of the authenticated user
+    var accessToken: String
+    /// The group id associated with the authenticated user
+    var groupId: String
+
+    init(accessToken: String, groupId: String) {
+        self.accessToken = accessToken
+        self.groupId = groupId
+    }
+
+    // MARK: AdminEndpoint
+    /// Representation of a given admin endpoint.
+    /// This allows us to call a give endpoint dynamically with loose typing.
+    @dynamicMemberLookup
+    struct AdminEndpoint {
         /// The access token of the authenticated user
         var accessToken: String
         /// The group id associated with the authenticated user
         var groupId: String
+        /// The endpoint url. This will be appending to dynamically by appending the dynamic member called
+        /// as if it were a path.
+        var url: URL
 
-        init(accessToken: String, groupId: String) {
-            self.accessToken = accessToken
-            self.groupId = groupId
+        /**
+         Append the given member to the path. E.g., if the current URL is set to
+         http://localhost:9090/api/admin/v3.0/groups/groupId/apps/appId
+         and you currently have a:
+         ```
+         var app: AdminEndpoint
+         ```
+         you can fetch a list of all services by calling
+         ```
+         app.services.get()
+         ```
+         */
+        subscript(dynamicMember member: String) -> AdminEndpoint {
+            let pattern = "([a-z0-9])([A-Z])"
+
+            let regex = try? NSRegularExpression(pattern: pattern, options: [])
+            let range = NSRange(location: 0, length: member.count)
+            let snakeCaseMember = regex?.stringByReplacingMatches(in: member,
+                                                                  options: [],
+                                                                  range: range,
+                                                                  withTemplate: "$1_$2").lowercased()
+            return AdminEndpoint(accessToken: accessToken,
+                                 groupId: groupId,
+                                 url: url.appendingPathComponent(snakeCaseMember!))
         }
 
-        // MARK: AdminEndpoint
-        /// Representation of a given admin endpoint.
-        /// This allows us to call a give endpoint dynamically with loose typing.
-        @dynamicMemberLookup
-        struct AdminEndpoint {
-            /// The access token of the authenticated user
-            var accessToken: String
-            /// The group id associated with the authenticated user
-            var groupId: String
-            /// The endpoint url. This will be appending to dynamically by appending the dynamic member called
-            /// as if it were a path.
-            var url: URL
+        /**
+         Append the given id to the path. E.g., if the current URL is set to
+         http://localhost:9090/api/admin/v3.0/groups/groupId/apps/
+         and you currently have a:
+         ```
+         var apps: AdminEndpoint
+         var appId: String
+         ```
+         you can fetch the app from its appId with
+         ```
+         apps[appId].get()
+         ```
+         */
+        subscript(_ id: String) -> AdminEndpoint {
+            return AdminEndpoint(accessToken: accessToken,
+                                 groupId: groupId,
+                                 url: url.appendingPathComponent(id))
+        }
 
-            /**
-             Append the given member to the path. E.g., if the current URL is set to
-            http://localhost:9090/api/admin/v3.0/groups/groupId/apps/appId
-             and you currently have a:
-             ```
-             var app: AdminEndpoint
-             ```
-             you can fetch a list of all services by calling
-             ```
-             app.services.get()
-             ```
-             */
-            subscript(dynamicMember member: String) -> AdminEndpoint {
-                let pattern = "([a-z0-9])([A-Z])"
+        typealias Completion = @Sendable (Result<Any?, Error>) -> Void
 
-                let regex = try? NSRegularExpression(pattern: pattern, options: [])
-                let range = NSRange(location: 0, length: member.count)
-                let snakeCaseMember = regex?.stringByReplacingMatches(in: member,
-                                                                      options: [],
-                                                                      range: range,
-                                                                      withTemplate: "$1_$2").lowercased()
-                return AdminEndpoint(accessToken: accessToken,
-                                     groupId: groupId,
-                                     url: url.appendingPathComponent(snakeCaseMember!))
+        private func request(httpMethod: String, data: Any? = nil,
+                             completionHandler: @escaping Completion) {
+            var components = URLComponents(url: self.url, resolvingAgainstBaseURL: false)!
+            components.query = "bypass_service_change=DestructiveSyncProtocolVersionIncrease"
+            var request = URLRequest(url: components.url!)
+            request.httpMethod = httpMethod
+            request.allHTTPHeaderFields = [
+                "Authorization": "Bearer \(accessToken)",
+                "Content-Type": "application/json;charset=utf-8",
+                "Accept": "application/json"
+            ]
+            if let data = data {
+                do {
+                    request.httpBody = try JSONSerialization.data(withJSONObject: data)
+                } catch {
+                    completionHandler(.failure(error))
+                }
             }
 
-            /**
-             Append the given id to the path. E.g., if the current URL is set to
-             http://localhost:9090/api/admin/v3.0/groups/groupId/apps/
-              and you currently have a:
-              ```
-              var apps: AdminEndpoint
-              var appId: String
-              ```
-              you can fetch the app from its appId with
-              ```
-              apps[appId].get()
-              ```
-             */
-            subscript(_ id: String) -> AdminEndpoint {
-                return AdminEndpoint(accessToken: accessToken,
-                                     groupId: groupId,
-                                     url: url.appendingPathComponent(id))
-            }
-
-            private func request(httpMethod: String, data: Any? = nil,
-                                 completionHandler: @escaping (Result<Any?, Error>) -> Void) {
-                var components = URLComponents(url: self.url, resolvingAgainstBaseURL: false)!
-                components.query = "bypass_service_change=DestructiveSyncProtocolVersionIncrease"
-                var request = URLRequest(url: components.url!)
-                request.httpMethod = httpMethod
-                request.allHTTPHeaderFields = [
-                    "Authorization": "Bearer \(accessToken)",
-                    "Content-Type": "application/json;charset=utf-8",
-                    "Accept": "application/json"
-                ]
-                if let data = data {
-                    do {
-                        request.httpBody = try JSONSerialization.data(withJSONObject: data)
-                    } catch {
-                        completionHandler(.failure(error))
+            URLSession(configuration: URLSessionConfiguration.default,
+                       delegate: nil, delegateQueue: OperationQueue())
+            .resultDataTask(with: request) { result in
+                completionHandler(result.flatMap { data in
+                    Result {
+                        data.count > 0 ? try JSONSerialization.jsonObject(with: data) : nil
                     }
-                }
-
-                URLSession(configuration: URLSessionConfiguration.default,
-                           delegate: nil, delegateQueue: OperationQueue())
-                    .resultDataTask(with: request) { result in
-                        completionHandler(result.flatMap { data in
-                            Result {
-                                data.count > 0 ? try JSONSerialization.jsonObject(with: data) : nil
-                            }
-                        })
-                }
-            }
-
-            private func request(on group: DispatchGroup, httpMethod: String, data: Any? = nil, _ completionHandler: @escaping (Result<Any?, Error>) -> Void) {
-                group.enter()
-                request(httpMethod: httpMethod, data: data) { result in
-                    completionHandler(result)
-                    group.leave()
-                }
-            }
-
-            private func request(httpMethod: String, data: Any? = nil) -> Result<Any?, Error> {
-                let group = DispatchGroup()
-                var result: Result<Any?, Error>!
-                group.enter()
-                request(httpMethod: httpMethod, data: data) {
-                    result = $0
-                    group.leave()
-                }
-                guard case .success = group.wait(timeout: .now() + 60) else {
-                    print("HTTP request timed out: \(httpMethod) \(self.url)")
-                    return .failure(URLError(.timedOut))
-                }
-                return result
-            }
-
-            func get(_ completionHandler: @escaping (Result<Any?, Error>) -> Void) {
-                request(httpMethod: "GET", completionHandler: completionHandler)
-            }
-
-            func get(on group: DispatchGroup, _ completionHandler: @escaping (Result<Any?, Error>) -> Void) {
-                request(on: group, httpMethod: "GET", completionHandler)
-            }
-
-            func get() -> Result<Any?, Error> {
-                request(httpMethod: "GET")
-            }
-
-            func post(_ data: Any, _ completionHandler: @escaping (Result<Any?, Error>) -> Void) {
-                request(httpMethod: "POST", data: data, completionHandler: completionHandler)
-            }
-
-            func post(on group: DispatchGroup, _ data: Any,
-                      _ completionHandler: @escaping (Result<Any?, Error>) -> Void) {
-                request(on: group, httpMethod: "POST", data: data, completionHandler)
-            }
-
-            func post(_ data: Any) -> Result<Any?, Error> {
-                request(httpMethod: "POST", data: data)
-            }
-
-            func put(_ completionHandler: @escaping (Result<Any?, Error>) -> Void) {
-                request(httpMethod: "PUT", completionHandler: completionHandler)
-            }
-
-            func put(on group: DispatchGroup, data: Any? = nil, _ completionHandler: @escaping (Result<Any?, Error>) -> Void) {
-                request(on: group, httpMethod: "PUT", data: data, completionHandler)
-            }
-
-            func put(data: Any? = nil, _ completionHandler: @escaping (Result<Any?, Error>) -> Void) {
-                request(httpMethod: "PUT", data: data, completionHandler: completionHandler)
-            }
-
-            func put(_ data: Any) -> Result<Any?, Error> {
-                request(httpMethod: "PUT", data: data)
-            }
-
-            func delete(_ completionHandler: @escaping (Result<Any?, Error>) -> Void) {
-                request(httpMethod: "DELETE", completionHandler: completionHandler)
-            }
-
-            func delete(on group: DispatchGroup, _ completionHandler: @escaping (Result<Any?, Error>) -> Void) {
-                request(on: group, httpMethod: "DELETE", completionHandler)
-            }
-
-            func delete() -> Result<Any?, Error> {
-                request(httpMethod: "DELETE")
-            }
-
-            func patch(on group: DispatchGroup, _ data: Any, _ completionHandler: @escaping (Result<Any?, Error>) -> Void) {
-                request(on: group, httpMethod: "PATCH", data: data, completionHandler)
-            }
-
-            func patch(_ data: Any) -> Result<Any?, Error> {
-                request(httpMethod: "PATCH", data: data)
-            }
-
-            func patch(_ data: Any, _ completionHandler: @escaping (Result<Any?, Error>) -> Void) {
-                request(httpMethod: "PATCH", data: data, completionHandler: completionHandler)
+                })
             }
         }
 
-        /// The initial endpoint to access the admin server
-        lazy var apps = AdminEndpoint(accessToken: accessToken,
-                                      groupId: groupId,
-                                      url: URL(string: "http://localhost:9090/api/admin/v3.0/groups/\(groupId)/apps")!)
+        private func request(on group: DispatchGroup, httpMethod: String, data: Any? = nil,
+                             _ completionHandler: @escaping Completion) {
+            group.enter()
+            request(httpMethod: httpMethod, data: data) { result in
+                completionHandler(result)
+                group.leave()
+            }
+        }
+
+        private func request(httpMethod: String, data: Any? = nil) -> Result<Any?, Error> {
+            let group = DispatchGroup()
+            @Locked var result: Result<Any?, Error>!
+            group.enter()
+            request(httpMethod: httpMethod, data: data) {
+                $result.wrappedValue = $0
+                group.leave()
+            }
+            guard case .success = group.wait(timeout: .now() + 60) else {
+                print("HTTP request timed out: \(httpMethod) \(self.url)")
+                return .failure(URLError(.timedOut))
+            }
+            return result
+        }
+
+        func get(_ completionHandler: @escaping Completion) {
+            request(httpMethod: "GET", completionHandler: completionHandler)
+        }
+
+        func get(on group: DispatchGroup,
+                 _ completionHandler: @escaping Completion) {
+            request(on: group, httpMethod: "GET", completionHandler)
+        }
+
+        func get() -> Result<Any?, Error> {
+            request(httpMethod: "GET")
+        }
+
+        func post(_ data: Any, _ completionHandler: @escaping Completion) {
+            request(httpMethod: "POST", data: data, completionHandler: completionHandler)
+        }
+
+        func post(on group: DispatchGroup, _ data: Any,
+                  _ completionHandler: @escaping Completion) {
+            request(on: group, httpMethod: "POST", data: data, completionHandler)
+        }
+
+        func post(_ data: Any) -> Result<Any?, Error> {
+            request(httpMethod: "POST", data: data)
+        }
+
+        func put(_ completionHandler: @escaping Completion) {
+            request(httpMethod: "PUT", completionHandler: completionHandler)
+        }
+
+        func put(on group: DispatchGroup, data: Any? = nil,
+                 _ completionHandler: @escaping Completion) {
+            request(on: group, httpMethod: "PUT", data: data, completionHandler)
+        }
+
+        func put(data: Any? = nil, _ completionHandler: @escaping Completion) {
+            request(httpMethod: "PUT", data: data, completionHandler: completionHandler)
+        }
+
+        func put(_ data: Any) -> Result<Any?, Error> {
+            request(httpMethod: "PUT", data: data)
+        }
+
+        func delete(_ completionHandler: @escaping Completion) {
+            request(httpMethod: "DELETE", completionHandler: completionHandler)
+        }
+
+        func delete(on group: DispatchGroup, _ completionHandler: @escaping Completion) {
+            request(on: group, httpMethod: "DELETE", completionHandler)
+        }
+
+        func delete() -> Result<Any?, Error> {
+            request(httpMethod: "DELETE")
+        }
+
+        func patch(on group: DispatchGroup, _ data: Any,
+                   _ completionHandler: @escaping Completion) {
+            request(on: group, httpMethod: "PATCH", data: data, completionHandler)
+        }
+
+        func patch(_ data: Any) -> Result<Any?, Error> {
+            request(httpMethod: "PATCH", data: data)
+        }
+
+        func patch(_ data: Any, _ completionHandler: @escaping Completion) {
+            request(httpMethod: "PATCH", data: data, completionHandler: completionHandler)
+        }
     }
 
+    /// The initial endpoint to access the admin server
+    lazy var apps = AdminEndpoint(accessToken: accessToken,
+                                  groupId: groupId,
+                                  url: URL(string: "http://localhost:9090/api/admin/v3.0/groups/\(groupId)/apps")!)
+}
+
+// MARK: - Admin
+@available(macOS 10.12, *)
+class Admin {
     private func userProfile(accessToken: String) -> Result<AdminProfile, Error> {
         var request = URLRequest(url: URL(string: "http://localhost:9090/api/admin/v3.0/auth/profile")!)
         request.allHTTPHeaderFields = [
@@ -430,12 +448,12 @@ public enum SyncMode {
 @available(OSX 10.13, *)
 @objc(RealmServer)
 public class RealmServer: NSObject {
-    public enum LogLevel {
+    public enum LogLevel: Sendable {
         case none, info, warn, error
     }
 
     /// Shared RealmServer. This class only needs to be initialized and torn down once per test suite run.
-    @objc public static var shared = RealmServer()
+    @objc public static let shared = RealmServer()
 
     /// Log level for the server and mongo processes.
     public var logLevel = LogLevel.none
@@ -462,7 +480,7 @@ public class RealmServer: NSObject {
     private lazy var isParentProcess = (getenv("RLMProcessIsChild") == nil)
 
     /// The current admin session
-    private var session: Admin.AdminSession?
+    private var session: AdminSession?
 
     /// Check if the BaaS files are present and we can run the server
     @objc public class func haveServer() -> Bool {
@@ -599,6 +617,7 @@ public class RealmServer: NSObject {
         ]
 
         let pipe = Pipe()
+        let logLevel = self.logLevel
         pipe.fileHandleForReading.readabilityHandler = { file in
             guard file.availableData.count > 0,
                   let available = String(data: file.availableData, encoding: .utf8)?.split(separator: "\t") else {
@@ -609,12 +628,12 @@ public class RealmServer: NSObject {
             var parts = [String]()
             for part in available {
                 if part.contains("INFO") {
-                    guard self.logLevel == .info else {
+                    guard logLevel == .info else {
                         return
                     }
                     parts.append("🔵")
                 } else if part.contains("DEBUG") {
-                    guard self.logLevel == .info || self.logLevel == .warn else {
+                    guard logLevel == .info || logLevel == .warn else {
                         return
                     }
                     parts.append("🟡")
@@ -644,7 +663,7 @@ public class RealmServer: NSObject {
     private func waitForServerToStart() {
         let group = DispatchGroup()
         group.enter()
-        func pingServer(_ tries: Int = 0) {
+        @Sendable func pingServer(_ tries: Int = 0) {
             let session = URLSession(configuration: URLSessionConfiguration.default,
                                      delegate: nil,
                                      delegateQueue: OperationQueue())
@@ -664,12 +683,6 @@ public class RealmServer: NSObject {
     }
 
     public typealias AppId = String
-
-    private func failOnError<T>(_ result: Result<T, Error>) {
-        if case .failure(let error) = result {
-            XCTFail(error.localizedDescription)
-        }
-    }
 
     /// Create a new server app
     /// This will create a App with different configuration depending on the SyncMode (partition based sync or flexible sync), partition type is used only in case
@@ -729,7 +742,7 @@ public class RealmServer: NSObject {
                 guard let provider = authProviders.first(where: { $0["type"] as? String == "api-key" }) else {
                     return XCTFail("Did not find api-key provider")
                 }
-                app.authProviders[provider["_id"] as! String].enable.put(on: group, self.failOnError)
+                app.authProviders[provider["_id"] as! String].enable.put(on: group, failOnError)
             } catch {
                 XCTFail(error.localizedDescription)
             }
@@ -1129,5 +1142,12 @@ public class RealmServer: NSObject {
         completion(.success(schemaProperties.compactMap { $0.key }))
     }
 }
+
+@Sendable private func failOnError<T>(_ result: Result<T, Error>) {
+    if case .failure(let error) = result {
+        XCTFail(error.localizedDescription)
+    }
+}
+
 
 #endif

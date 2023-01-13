@@ -633,19 +633,6 @@ struct ObjectChangeCallbackWrapper {
             oldValues = nil;
         }
     }
-
-    void error(std::exception_ptr err) {
-        @autoreleasepool {
-            try {
-                rethrow_exception(err);
-            }
-            catch (...) {
-                NSError *error = nil;
-                RLMRealmTranslateException(&error);
-                block(nil, nil, nil, nil, error);
-            }
-        }
-    }
 };
 } // anonymous namespace
 

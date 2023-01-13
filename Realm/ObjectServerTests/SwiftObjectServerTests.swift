@@ -28,12 +28,22 @@ import XCTest
 import RealmSwiftSyncTestSupport
 import RealmSyncTestSupport
 import RealmTestSupport
+import RealmSwiftTestSupport
 #endif
 
 func assertAppError(_ error: AppError, _ code: AppError.Code, _ message: String,
                     line: UInt = #line, file: StaticString = #file) {
     XCTAssertEqual(error.code, code, file: file, line: line)
     XCTAssertEqual(error.localizedDescription, message, file: file, line: line)
+}
+
+func assertSyncError(_ error: Error, _ code: SyncError.Code, _ message: String,
+                     line: UInt = #line, file: StaticString = #file) {
+    let e = error as NSError
+    XCTAssertEqual(e.domain, RLMSyncErrorDomain, file: file, line: line)
+    XCTAssertEqual(e.code, code.rawValue, file: file, line: line)
+    XCTAssertEqual(e.localizedDescription, "Unable to refresh the user access token.",
+                   file: file, line: line)
 }
 
 @available(OSX 10.14, *)
@@ -345,11 +355,11 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     }
 
     func expectSyncError(_ fn: () -> Void) -> SyncError? {
-        var error: SyncError?
+        @Locked var error: SyncError?
         let ex = expectation(description: "Waiting for error handler to be called...")
-        app.syncManager.errorHandler = { (e, _) in
+        app.syncManager.errorHandler = { @Sendable (e, _) in
             if let e = e as? SyncError {
-                error = e
+                $error.wrappedValue = e
             } else {
                 XCTFail("Error \(e) was not a sync error. Something is wrong.")
             }
@@ -524,6 +534,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
     func assertManualClientReset(_ user: User, flexibleSync: Bool = false) -> ErrorReportingBlock {
         let ex = self.expectation(description: "get client reset error")
+        let id = flexibleSync ? self.flexibleSyncAppId : self.appId
+        let manager = flexibleSync ? self.flexibleSyncApp.syncManager : self.app.syncManager
         return { error, session in
             guard let error = error as? SyncError else {
                 XCTFail("Bad error type: \(error)")
@@ -537,17 +549,15 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 XCTAssertNotNil(error.clientResetInfo())
                 return
             }
-            let id = flexibleSync ? self.flexibleSyncAppId : self.appId
             XCTAssertTrue(resetInfo.0.contains("mongodb-realm/\(id)/recovered-realms/recovered_realm"))
-            let manager = flexibleSync ? self.flexibleSyncApp.syncManager : self.app.syncManager
             SyncSession.immediatelyHandleError(resetInfo.1, syncManager: manager)
             ex.fulfill()
         }
     }
 
-    func assertDiscardLocal() -> ((Realm) -> Void, (Realm, Realm) -> Void) {
+    func assertDiscardLocal() -> (@Sendable (Realm) -> Void, @Sendable (Realm, Realm) -> Void) {
         let beforeCallbackEx = expectation(description: "before reset callback")
-        let beforeClientResetBlock: (Realm) -> Void = { before in
+        @Sendable func beforeClientReset(_ before: Realm) {
             let results = before.objects(SwiftPerson.self)
             XCTAssertEqual(results.count, 1)
             XCTAssertEqual(results.filter("firstName == 'John'").count, 1)
@@ -555,7 +565,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             beforeCallbackEx.fulfill()
         }
         let afterCallbackEx = expectation(description: "before reset callback")
-        let afterClientResetBlock: (Realm, Realm) -> Void = { before, after in
+        @Sendable func afterClientReset(_ before: Realm, _ after: Realm) {
             let results = before.objects(SwiftPerson.self)
             XCTAssertEqual(results.count, 1)
             XCTAssertEqual(results.filter("firstName == 'John'").count, 1)
@@ -566,19 +576,19 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
             afterCallbackEx.fulfill()
         }
-        return (beforeClientResetBlock, afterClientResetBlock)
+        return (beforeClientReset, afterClientReset)
     }
 
-    func assertRecover() -> ((Realm) -> Void, (Realm, Realm) -> Void) {
+    func assertRecover() -> (@Sendable (Realm) -> Void, @Sendable (Realm, Realm) -> Void) {
         let beforeCallbackEx = expectation(description: "before reset callback")
-        let beforeClientResetBlock: (Realm) -> Void = { local in
-            let results = local.objects(SwiftPerson.self)
+        @Sendable func beforeClientReset(_ before: Realm) {
+            let results = before.objects(SwiftPerson.self)
             XCTAssertEqual(results.count, 1)
             XCTAssertEqual(results.filter("firstName == 'John'").count, 1)
             beforeCallbackEx.fulfill()
         }
         let afterCallbackEx = expectation(description: "after reset callback")
-        let afterClientResetBlock: (Realm, Realm) -> Void = { before, after in
+        @Sendable func afterClientReset(_ before: Realm, _ after: Realm) {
             let results = before.objects(SwiftPerson.self)
             XCTAssertEqual(results.count, 1)
             XCTAssertEqual(results.filter("firstName == 'John'").count, 1)
@@ -590,7 +600,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
             afterCallbackEx.fulfill()
         }
-        return (beforeClientResetBlock, afterClientResetBlock)
+        return (beforeClientReset, afterClientReset)
     }
 
     func testClientResetManual() throws {
@@ -1561,24 +1571,15 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
     // MARK: - User-specific functionality
 
-    func assertSyncError(_ error: Error, _ code: SyncError.Code, _ message: String,
-                         line: UInt = #line, file: StaticString = #file) {
-        let e = error as NSError
-        XCTAssertEqual(e.domain, RLMSyncErrorDomain, file: file, line: line)
-        XCTAssertEqual(e.code, code.rawValue, file: file, line: line)
-        XCTAssertEqual(e.localizedDescription, "Unable to refresh the user access token.",
-                       file: file, line: line)
-    }
-
     func testUserExpirationCallback() throws {
         let user = try logInUser(for: basicCredentials())
 
         // Set a callback on the user
-        var blockCalled = false
+        @Locked var blockCalled = false
         let ex = expectation(description: "Error callback should fire upon receiving an error")
-        app.syncManager.errorHandler = { (error, _) in
-            self.assertSyncError(error, .clientUserError, "Unable to refresh the user access token.")
-            blockCalled = true
+        app.syncManager.errorHandler = { @Sendable (error, _) in
+            assertSyncError(error, .clientUserError, "Unable to refresh the user access token.")
+            $blockCalled.wrappedValue = true
             ex.fulfill()
         }
 
@@ -1675,8 +1676,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         // Set a callback on the user
         let ex = expectation(description: "Error callback should fire upon receiving an error")
         ex.assertForOverFulfill = false // error handler can legally be called multiple times
-        app.syncManager.errorHandler = { (error, _) in
-            self.assertSyncError(error, .clientUserError, "Unable to refresh the user access token.")
+        app.syncManager.errorHandler = { @Sendable (error, _) in
+            assertSyncError(error, .clientUserError, "Unable to refresh the user access token.")
             ex.fulfill()
         }
 
@@ -2355,6 +2356,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
 
     var subscriptions: Set<AnyCancellable> = []
 
+    @MainActor // for Xcode 13; 14 inherits it properly from the class
     override func tearDown() {
         subscriptions.forEach { $0.cancel() }
         subscriptions = []
@@ -2363,94 +2365,62 @@ class CombineObjectServerTests: SwiftSyncTestCase {
 
     // swiftlint:disable multiple_closures_with_trailing_closure
     func testWatchCombine() throws {
-        let sema = DispatchSemaphore(value: 0)
-        let sema2 = DispatchSemaphore(value: 0)
-        let openSema = DispatchSemaphore(value: 0)
-        let openSema2 = DispatchSemaphore(value: 0)
         let collection = try setupMongoCollection(for: "Dog")
         let document: Document = ["name": "fido", "breed": "cane corso"]
 
-        let watchEx1 = expectation(description: "Watch 3 document events")
-        watchEx1.expectedFulfillmentCount = 3
-        let watchEx2 = expectation(description: "Watch 3 document events")
-        watchEx2.expectedFulfillmentCount = 3
+        var watchEx1 = expectation(description: "Main thread watch")
+        var watchEx2 = expectation(description: "Background thread watch")
 
         collection.watch()
             .onOpen {
-                openSema.signal()
+                watchEx1.fulfill()
             }
             .subscribe(on: DispatchQueue.global())
             .receive(on: DispatchQueue.global())
             .sink(receiveCompletion: { _ in }) { _ in
-                watchEx1.fulfill()
                 XCTAssertFalse(Thread.isMainThread)
-                sema.signal()
+                watchEx1.fulfill()
             }.store(in: &subscriptions)
 
         collection.watch()
             .onOpen {
-                openSema2.signal()
+                watchEx2.fulfill()
             }
             .subscribe(on: DispatchQueue.main)
             .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { _ in }) { _ in
-                watchEx2.fulfill()
                 XCTAssertTrue(Thread.isMainThread)
-                sema2.signal()
+                watchEx2.fulfill()
             }.store(in: &subscriptions)
 
-        DispatchQueue.global().async {
-            openSema.wait()
-            openSema2.wait()
-            for _ in 0..<3 {
-                collection.insertOne(document) { result in
-                    if case .failure(let error) = result {
-                        XCTFail("Failed to insert: \(error)")
-                    }
+        for _ in 0..<3 {
+            wait(for: [watchEx1, watchEx2], timeout: 60.0)
+            watchEx1 = expectation(description: "Main thread watch")
+            watchEx2 = expectation(description: "Background thread watch")
+            collection.insertOne(document) { result in
+                if case .failure(let error) = result {
+                    XCTFail("Failed to insert: \(error)")
                 }
-                sema.wait()
-                sema2.wait()
-            }
-            DispatchQueue.main.async {
-                self.subscriptions.forEach { $0.cancel() }
             }
         }
         wait(for: [watchEx1, watchEx2], timeout: 60.0)
     }
 
     func testWatchCombineWithFilterIds() throws {
-        let sema1 = DispatchSemaphore(value: 0)
-        let sema2 = DispatchSemaphore(value: 0)
-        let openSema1 = DispatchSemaphore(value: 0)
-        let openSema2 = DispatchSemaphore(value: 0)
         let collection = try setupMongoCollection(for: "Dog")
         let document: Document = ["name": "fido", "breed": "cane corso"]
         let document2: Document = ["name": "rex", "breed": "cane corso"]
         let document3: Document = ["name": "john", "breed": "cane corso"]
         let document4: Document = ["name": "ted", "breed": "bullmastiff"]
-        var objectIds = [ObjectId]()
 
-        let insertManyEx = expectation(description: "Insert many documents")
-        collection.insertMany([document, document2, document3, document4]) { result in
-            switch result {
-            case .success(let objIds):
-                XCTAssertEqual(objIds.count, 4)
-                objectIds = objIds.map { $0.objectIdValue! }
-            case .failure:
-                XCTFail("Should insert")
-            }
-            insertManyEx.fulfill()
-        }
-        wait(for: [insertManyEx], timeout: 20.0)
+        let objIds = collection.insertMany([document, document2, document3, document4]).await(self)
+        let objectIds = objIds.map { $0.objectIdValue! }
 
-        let watchEx1 = expectation(description: "Watch 3 document events")
-        watchEx1.expectedFulfillmentCount = 3
-        let watchEx2 = expectation(description: "Watch 3 document events")
-        watchEx2.expectedFulfillmentCount = 3
-
+        var watchEx1 = expectation(description: "Main thread watch")
+        var watchEx2 = expectation(description: "Background thread watch")
         collection.watch(filterIds: [objectIds[0]])
             .onOpen {
-                openSema1.signal()
+                watchEx1.fulfill()
             }
             .subscribe(on: DispatchQueue.main)
             .receive(on: DispatchQueue.main)
@@ -2463,13 +2433,12 @@ class CombineObjectServerTests: SwiftSyncTestCase {
                 let objectId = doc["fullDocument"]??.documentValue!["_id"]??.objectIdValue!
                 if objectId == objectIds[0] {
                     watchEx1.fulfill()
-                    sema1.signal()
                 }
             }.store(in: &subscriptions)
 
         collection.watch(filterIds: [objectIds[1]])
             .onOpen {
-                openSema2.signal()
+                watchEx2.fulfill()
             }
             .subscribe(on: DispatchQueue.global())
             .receive(on: DispatchQueue.global())
@@ -2482,70 +2451,47 @@ class CombineObjectServerTests: SwiftSyncTestCase {
                 let objectId = doc["fullDocument"]??.documentValue!["_id"]??.objectIdValue!
                 if objectId == objectIds[1] {
                     watchEx2.fulfill()
-                    sema2.signal()
                 }
             }.store(in: &subscriptions)
 
-        DispatchQueue.global().async {
-            openSema1.wait()
-            openSema2.wait()
-            for i in 0..<3 {
-                let name: AnyBSON = .string("fido-\(i)")
-                collection.updateOneDocument(filter: ["_id": AnyBSON.objectId(objectIds[0])],
-                                             update: ["name": name, "breed": "king charles"]) { result in
-                    if case .failure(let error) = result {
-                        XCTFail("Failed to update: \(error)")
-                    }
+        for i in 0..<3 {
+            wait(for: [watchEx1, watchEx2], timeout: 60.0)
+            watchEx1 = expectation(description: "Main thread watch")
+            watchEx2 = expectation(description: "Background thread watch")
+
+            let name: AnyBSON = .string("fido-\(i)")
+            collection.updateOneDocument(filter: ["_id": AnyBSON.objectId(objectIds[0])],
+                                         update: ["name": name, "breed": "king charles"]) { result in
+                if case .failure(let error) = result {
+                    XCTFail("Failed to update: \(error)")
                 }
-                collection.updateOneDocument(filter: ["_id": AnyBSON.objectId(objectIds[1])],
-                                             update: ["name": name, "breed": "king charles"]) { result in
-                    if case .failure(let error) = result {
-                        XCTFail("Failed to update: \(error)")
-                    }
-                }
-                sema1.wait()
-                sema2.wait()
             }
-            DispatchQueue.main.async {
-                self.subscriptions.forEach { $0.cancel() }
+            collection.updateOneDocument(filter: ["_id": AnyBSON.objectId(objectIds[1])],
+                                         update: ["name": name, "breed": "king charles"]) { result in
+                if case .failure(let error) = result {
+                    XCTFail("Failed to update: \(error)")
+                }
             }
         }
         wait(for: [watchEx1, watchEx2], timeout: 60.0)
     }
 
     func testWatchCombineWithMatchFilter() throws {
-        let sema1 = DispatchSemaphore(value: 0)
-        let sema2 = DispatchSemaphore(value: 0)
-        let openSema1 = DispatchSemaphore(value: 0)
-        let openSema2 = DispatchSemaphore(value: 0)
         let collection = try setupMongoCollection(for: "Dog")
         let document: Document = ["name": "fido", "breed": "cane corso"]
         let document2: Document = ["name": "rex", "breed": "cane corso"]
         let document3: Document = ["name": "john", "breed": "cane corso"]
         let document4: Document = ["name": "ted", "breed": "bullmastiff"]
-        var objectIds = [ObjectId]()
 
-        let insertManyEx = expectation(description: "Insert many documents")
-        collection.insertMany([document, document2, document3, document4]) { result in
-            switch result {
-            case .success(let objIds):
-                XCTAssertEqual(objIds.count, 4)
-                objectIds = objIds.map { $0.objectIdValue! }
-            case .failure(let error):
-                XCTFail("Failed to insert: \(error)")
-            }
-            insertManyEx.fulfill()
-        }
-        wait(for: [insertManyEx], timeout: 20.0)
+        let objIds = collection.insertMany([document, document2, document3, document4]).await(self)
+        XCTAssertEqual(objIds.count, 4)
+        let objectIds = objIds.map { $0.objectIdValue! }
 
-        let watchEx1 = expectation(description: "Watch 3 document events")
-        watchEx1.expectedFulfillmentCount = 3
-        let watchEx2 = expectation(description: "Watch 3 document events")
-        watchEx2.expectedFulfillmentCount = 3
-
+        var watchEx1 = expectation(description: "Main thread watch")
+        var watchEx2 = expectation(description: "Background thread watch")
         collection.watch(matchFilter: ["fullDocument._id": AnyBSON.objectId(objectIds[0])])
             .onOpen {
-                openSema1.signal()
+                watchEx1.fulfill()
             }
             .subscribe(on: DispatchQueue.main)
             .receive(on: DispatchQueue.main)
@@ -2558,13 +2504,12 @@ class CombineObjectServerTests: SwiftSyncTestCase {
                 let objectId = doc["fullDocument"]??.documentValue!["_id"]??.objectIdValue!
                 if objectId == objectIds[0] {
                     watchEx1.fulfill()
-                    sema1.signal()
                 }
         }.store(in: &subscriptions)
 
         collection.watch(matchFilter: ["fullDocument._id": AnyBSON.objectId(objectIds[1])])
             .onOpen {
-                openSema2.signal()
+                watchEx2.fulfill()
             }
             .subscribe(on: DispatchQueue.global())
             .receive(on: DispatchQueue.global())
@@ -2577,32 +2522,26 @@ class CombineObjectServerTests: SwiftSyncTestCase {
                 let objectId = doc["fullDocument"]??.documentValue!["_id"]??.objectIdValue!
                 if objectId == objectIds[1] {
                     watchEx2.fulfill()
-                    sema2.signal()
                 }
         }.store(in: &subscriptions)
 
-        DispatchQueue.global().async {
-            openSema1.wait()
-            openSema2.wait()
-            for i in 0..<3 {
-                let name: AnyBSON = .string("fido-\(i)")
-                collection.updateOneDocument(filter: ["_id": AnyBSON.objectId(objectIds[0])],
-                                             update: ["name": name, "breed": "king charles"]) { result in
-                    if case .failure = result {
-                        XCTFail("Should update")
-                    }
+        for i in 0..<3 {
+            wait(for: [watchEx1, watchEx2], timeout: 60.0)
+            watchEx1 = expectation(description: "Main thread watch")
+            watchEx2 = expectation(description: "Background thread watch")
+
+            let name: AnyBSON = .string("fido-\(i)")
+            collection.updateOneDocument(filter: ["_id": AnyBSON.objectId(objectIds[0])],
+                                         update: ["name": name, "breed": "king charles"]) { result in
+                if case .failure(let error) = result {
+                    XCTFail("Failed to update: \(error)")
                 }
-                collection.updateOneDocument(filter: ["_id": AnyBSON.objectId(objectIds[1])],
-                                             update: ["name": name, "breed": "king charles"]) { result in
-                    if case .failure = result {
-                        XCTFail("Should update")
-                    }
-                }
-                sema1.wait()
-                sema2.wait()
             }
-            DispatchQueue.main.async {
-                self.subscriptions.forEach { $0.cancel() }
+            collection.updateOneDocument(filter: ["_id": AnyBSON.objectId(objectIds[1])],
+                                         update: ["name": name, "breed": "king charles"]) { result in
+                if case .failure(let error) = result {
+                    XCTFail("Failed to update: \(error)")
+                }
             }
         }
         wait(for: [watchEx1, watchEx2], timeout: 60.0)
@@ -3009,7 +2948,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
     }
 }
 
-#if swift(>=5.6) && canImport(_Concurrency)
+#if canImport(_Concurrency)
 
 @available(macOS 12.0, *)
 class AsyncAwaitObjectServerTests: SwiftSyncTestCase {

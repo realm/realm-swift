@@ -19,6 +19,10 @@
 import XCTest
 import RealmSwift
 
+#if canImport(RealmSwiftTestSupport)
+import RealmSwiftTestSupport
+#endif
+
 class ListTests: TestCase {
     var str1: SwiftStringObject?
     var str2: SwiftStringObject?

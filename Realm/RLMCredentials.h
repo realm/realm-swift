@@ -58,10 +58,11 @@ extern RLMIdentityProvider const RLMIdentityProviderServerAPIKey;
 /**
  Opaque credentials representing a specific Realm App user.
  */
+RLM_SWIFT_SENDABLE RLM_FINAL // immutable final class
 @interface RLMCredentials : NSObject
 
 /// The name of the identity provider which generated the credentials token.
-@property (nonatomic) RLMIdentityProvider provider;
+@property (nonatomic, readonly) RLMIdentityProvider provider;
 
 /**
  Construct and return credentials from a Facebook account token.

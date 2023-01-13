@@ -4,7 +4,7 @@ import PackageDescription
 import Foundation
 
 let coreVersionStr = "12.13.0"
-let cocoaVersionStr = "10.33.0"
+let cocoaVersionStr = "10.34.0"
 
 let coreVersionPieces = coreVersionStr.split(separator: ".")
 let coreVersionExtra = coreVersionPieces[2].split(separator: "-")
@@ -236,6 +236,12 @@ let package = Package(
             path: "Realm/TestUtils",
             cxxSettings: testCxxSettings
         ),
+        .target(
+            name: "RealmSwiftTestSupport",
+            dependencies: ["RealmSwift", "RealmTestSupport"],
+            path: "RealmSwift/Tests",
+            sources: ["TestUtils.swift"]
+        ),
         .testTarget(
             name: "RealmTests",
             dependencies: ["Realm", "RealmTestSupport"],
@@ -268,11 +274,12 @@ let package = Package(
         ),
         .testTarget(
             name: "RealmSwiftTests",
-            dependencies: ["RealmSwift", "RealmTestSupport"],
+            dependencies: ["RealmSwift", "RealmTestSupport", "RealmSwiftTestSupport"],
             path: "RealmSwift/Tests",
             exclude: [
                 "RealmSwiftTests-Info.plist",
-                "QueryTests.swift.gyb"
+                "QueryTests.swift.gyb",
+                "TestUtils.swift"
             ]
         ),
 
@@ -289,7 +296,7 @@ let package = Package(
         ),
         objectServerTestSupportTarget(
             name: "RealmSwiftSyncTestSupport",
-            dependencies: ["RealmSwift", "RealmTestSupport", "RealmSyncTestSupport"],
+            dependencies: ["RealmSwift", "RealmTestSupport", "RealmSyncTestSupport", "RealmSwiftTestSupport"],
             sources: [
                  "SwiftSyncTestCase.swift",
                  "TimeoutProxyServer.swift",

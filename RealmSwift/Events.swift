@@ -16,9 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-import Realm
 import Realm.Private
-import Foundation
 import Combine
 
 /**
@@ -194,7 +192,7 @@ extension Realm {
 /// - `data`: `String?`
 /// - `timestamp`: `Date`
 /// In addition, there must be a `String?` field for each metadata key used.
-@frozen public struct EventConfiguration {
+@frozen public struct EventConfiguration: Sendable {
     /// Metadata which is attached to each event generated. Each key in the
     /// metadata dictionary is stored in a column with that name in the event
     /// Realm, and so the schema configured on the server for the AuditEvent
@@ -219,22 +217,25 @@ extension Realm {
 
     /// A logger callback function. This function should be thread-safe as it
     /// may be called from multiple threads simultaneously.
-    public typealias LoggerFunction = (SyncLogLevel, String) -> Void
+    public typealias LoggerFunction = @Sendable (SyncLogLevel, String) -> Void
     /// A logger which will be called to report information about the work done
     /// on the background event thread. If `nil`, this is instead reported to
     /// the ``SyncManager``'s logger.
+    @preconcurrency
     public var logger: LoggerFunction?
 
     /// The error handler which will be called if a sync error occurs when
     /// uploading event data. If `nil`, the error will be logged and then
     /// `abort()` will be called. Production usage should always define a
     /// custom error handler unless aborting on error is desired.
-    public var errorHandler: ((Swift.Error) -> Void)?
+    @preconcurrency
+    public var errorHandler: (@Sendable (Swift.Error) -> Void)?
 
     /// Creates an `EventConfiguration` which enables Realm event recording.
+    @preconcurrency
     public init(metadata: [String: String]? = nil, syncUser: User? = nil,
                 partitionPrefix: String = "events", logger: LoggerFunction? = nil,
-                errorHandler: ((Swift.Error) -> Void)? = nil) {
+                errorHandler: (@Sendable (Swift.Error) -> Void)? = nil) {
         self.metadata = metadata
         self.syncUser = syncUser
         self.partitionPrefix = partitionPrefix

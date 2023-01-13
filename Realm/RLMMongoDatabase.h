@@ -34,6 +34,7 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 ///
 /// - SeeAlso:
 /// `RLMMongoClient`, `RLMMongoCollection`
+RLM_SWIFT_SENDABLE RLM_FINAL // immutable final class
 @interface RLMMongoDatabase : NSObject
 
 /// The name of this database

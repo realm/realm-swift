@@ -342,7 +342,7 @@ using namespace realm;
 }
 
 - (RLMAPIKeyAuth *)apiKeysAuth {
-    return [[RLMAPIKeyAuth alloc] initWithApp: _app];
+    return [[RLMAPIKeyAuth alloc] initWithApp:_app];
 }
 
 - (RLMMongoClient *)mongoClientWithServiceName:(NSString *)serviceName {

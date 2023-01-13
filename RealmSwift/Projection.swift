@@ -630,9 +630,9 @@ extension NSLocking {
 // This is required when a property is guarded by something which concurrency
 // checking doesn't understand (i.e. a lock instead of an actor)
 @propertyWrapper
-private struct Unchecked<Wrapped>: @unchecked Sendable {
-    var wrappedValue: Wrapped
-    init(wrappedValue: Wrapped) {
+public struct Unchecked<Wrapped>: @unchecked Sendable {
+    public var wrappedValue: Wrapped
+    public init(wrappedValue: Wrapped) {
         self.wrappedValue = wrappedValue
     }
 }

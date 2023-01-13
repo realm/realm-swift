@@ -26,6 +26,7 @@ import RealmSwiftSyncTestSupport
 import RealmSyncTestSupport
 import RealmTestSupport
 import SwiftUI
+import RealmSwiftTestSupport
 #endif
 
 class SwiftFlexibleSyncTests: SwiftSyncTestCase {
@@ -607,6 +608,7 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
         return XCTestSuite(name: "\(type(of: self))")
     }
 
+    @MainActor // for Xcode 13; 14 inherits it properly from the class
     override func tearDown() {
         cancellables.forEach { $0.cancel() }
         cancellables = []
@@ -1032,7 +1034,7 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
 }
 
 // MARK: - Async Await
-#if swift(>=5.6) && canImport(_Concurrency)
+#if canImport(_Concurrency)
 @available(macOS 12.0, *)
 extension SwiftFlexibleSyncServerTests {
     @MainActor
@@ -1240,17 +1242,17 @@ extension SwiftFlexibleSyncServerTests {
             }
         }
         let user = try await logInUser(for: basicCredentials(app: self.flexibleSyncApp), app: self.flexibleSyncApp)
-        var isFirstOpen = true
+        @Locked var isFirstOpen = true
         var config = user.flexibleSyncConfiguration(initialSubscriptions: { subscriptions in
             subscriptions.append(QuerySubscription<SwiftTypesSyncObject>(query: {
-                let date = isFirstOpen ? Calendar.current.date(
+                let date = $isFirstOpen.wrappedValue ? Calendar.current.date(
                     byAdding: .hour,
                     value: -10,
                     to: Date()) : Calendar.current.date(
                         byAdding: .hour,
                         value: -20,
                         to: Date())
-                isFirstOpen = false
+                $isFirstOpen.wrappedValue = false
                 return $0.dateCol < Date() && $0.dateCol > date!
             }))
         }, rerunOnOpen: true)

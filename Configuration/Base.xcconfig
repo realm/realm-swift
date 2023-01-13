@@ -48,6 +48,7 @@ GCC_WARN_UNUSED_PARAMETER = YES;
 GCC_WARN_UNUSED_VARIABLE = YES;
 SWIFT_COMPILATION_MODE = wholemodule;
 SWIFT_OPTIMIZATION_LEVEL = -Owholemodule;
+SWIFT_STRICT_CONCURRENCY = complete;
 WARNING_CFLAGS = -Wmismatched-tags -Wunused-private-field -Wpartial-availability;
 OTHER_CFLAGS = -fvisibility-inlines-hidden;
 OTHER_CFLAGS[arch=armv7] = -fvisibility-inlines-hidden -fno-aligned-new;

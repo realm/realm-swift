@@ -28,7 +28,7 @@ import Realm.Private
 
  - parameter oldSchemaVersion: The schema version of the Realm being migrated.
  */
-public typealias MigrationBlock = (_ migration: Migration, _ oldSchemaVersion: UInt64) -> Void
+public typealias MigrationBlock = @Sendable (_ migration: Migration, _ oldSchemaVersion: UInt64) -> Void
 
 /// An object class used during migrations.
 public typealias MigrationObject = DynamicObject
@@ -80,17 +80,15 @@ extension Realm {
  instance provides access to the old and new database schemas, the objects in the Realm, and provides functionality for
  modifying the Realm during the migration.
  */
-@frozen public struct Migration {
-
+public typealias Migration = RLMMigration
+extension Migration {
     // MARK: Properties
 
     /// The old schema, describing the Realm before applying a migration.
-    public var oldSchema: Schema { return Schema(rlmMigration.oldSchema) }
+    public var oldSchema: Schema { return Schema(__oldSchema) }
 
     /// The new schema, describing the Realm after applying a migration.
-    public var newSchema: Schema { return Schema(rlmMigration.newSchema) }
-
-    internal var rlmMigration: RLMMigration
+    public var newSchema: Schema { return Schema(__newSchema) }
 
     // MARK: Altering Objects During a Migration
 
@@ -102,7 +100,7 @@ extension Realm {
      - parameter block:           The block providing both the old and new versions of an object in this Realm.
      */
     public func enumerateObjects(ofType typeName: String, _ block: MigrationObjectEnumerateBlock) {
-        rlmMigration.enumerateObjects(typeName) { oldObject, newObject in
+        __enumerateObjects(typeName) { oldObject, newObject in
             block(unsafeBitCast(oldObject, to: MigrationObject.self),
                   unsafeBitCast(newObject, to: MigrationObject.self))
         }
@@ -126,7 +124,7 @@ extension Realm {
      */
     @discardableResult
     public func create(_ typeName: String, value: Any = [:]) -> MigrationObject {
-        return unsafeBitCast(rlmMigration.createObject(typeName, withValue: value), to: MigrationObject.self)
+        return unsafeBitCast(__createObject(typeName, withValue: value), to: MigrationObject.self)
     }
 
     /**
@@ -137,7 +135,7 @@ extension Realm {
      - parameter object: An object to be deleted from the Realm being migrated.
      */
     public func delete(_ object: MigrationObject) {
-        rlmMigration.delete(object.unsafeCastToRLMObject())
+        __delete(object.unsafeCastToRLMObject())
     }
 
     /**
@@ -152,7 +150,7 @@ extension Realm {
      */
     @discardableResult
     public func deleteData(forType typeName: String) -> Bool {
-        return rlmMigration.deleteData(forClassName: typeName)
+        return __deleteData(forClassName: typeName)
     }
 
     /**
@@ -166,31 +164,6 @@ extension Realm {
                              the class as defined by the old Realm schema.
      */
     public func renameProperty(onType typeName: String, from oldName: String, to newName: String) {
-        rlmMigration.renameProperty(forClass: typeName, oldName: oldName, newName: newName)
-    }
-
-    internal init(_ rlmMigration: RLMMigration) {
-        self.rlmMigration = rlmMigration
-    }
-}
-
-// MARK: Private Helpers
-
-internal func accessorMigrationBlock(_ migrationBlock: @escaping MigrationBlock) -> RLMMigrationBlock {
-    return { migration, oldVersion in
-        // set all accessor classes to MigrationObject
-        for objectSchema in migration.oldSchema.objectSchema {
-            objectSchema.accessorClass = MigrationObject.self
-            // isSwiftClass is always `false` for object schema generated
-            // from the table, but we need to pretend it's from a swift class
-            // (even if it isn't) for the accessors to be initialized correctly.
-            objectSchema.isSwiftClass = true
-        }
-        for objectSchema in migration.newSchema.objectSchema {
-            objectSchema.accessorClass = MigrationObject.self
-        }
-
-        // run migration
-        migrationBlock(Migration(migration), oldVersion)
+        __renameProperty(forClass: typeName, oldName: oldName, newName: newName)
     }
 }

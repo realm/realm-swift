@@ -576,7 +576,8 @@ static std::shared_ptr<realm::util::Scheduler> makeScheduler(dispatch_queue_t qu
                                                              schema:schema.copy
                                                             dynamic:true];
 
-                [[[RLMMigration alloc] initWithRealm:newRealm oldRealm:oldRealm schema:mutableSchema] execute:migrationBlock];
+                [[[RLMMigration alloc] initWithRealm:newRealm oldRealm:oldRealm schema:mutableSchema]
+                 execute:migrationBlock objectClass:configuration.migrationObjectClass];
 
                 oldRealm->_realm = nullptr;
                 newRealm->_realm = nullptr;

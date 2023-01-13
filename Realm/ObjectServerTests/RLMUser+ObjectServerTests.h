@@ -18,7 +18,7 @@
 
 #import <Realm/Realm.h>
 
-RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
+RLM_HEADER_AUDIT_BEGIN(nullability)
 
 @interface RLMUser (ObjectServerTests)
 
@@ -29,4 +29,4 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
 @end
 
-RLM_HEADER_AUDIT_END(nullability, sendability)
+RLM_HEADER_AUDIT_END(nullability)

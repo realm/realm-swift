@@ -3,6 +3,7 @@
 INFOPLIST_FILE = RealmSwift/Tests/RealmSwiftTests-Info.plist;
 SWIFT_OBJC_BRIDGING_HEADER = RealmSwift/Tests/RealmSwiftTests-BridgingHeader.h
 SWIFT_OPTIMIZATION_LEVEL = -Onone;
+SWIFT_STRICT_CONCURRENCY = targeted;
 
 EXCLUDED_SOURCE_FILE_NAMES[sdk=iphone*] = build/osx/*;
 EXCLUDED_SOURCE_FILE_NAMES[sdk=appletv*] = build/osx/*;

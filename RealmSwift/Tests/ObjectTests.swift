@@ -21,6 +21,10 @@ import Realm
 import RealmSwift
 import Foundation
 
+#if canImport(RealmSwiftTestSupport)
+import RealmSwiftTestSupport
+#endif
+
 private var dynamicDefaultSeed = 0
 private func nextDynamicDefaultSeed() -> Int {
     dynamicDefaultSeed += 1
@@ -681,20 +685,20 @@ class ObjectTests: TestCase {
     }
 
     // Yields a read-write migration `SwiftObject` to the given block
-    private func withMigrationObject(block: @escaping ((MigrationObject, Migration) -> Void)) {
+    private func withMigrationObject(block: @escaping @Sendable (MigrationObject, Migration) -> Void) {
         autoreleasepool {
             let realm = self.realmWithTestPath()
             try! realm.write {
                 _ = realm.create(SwiftObject.self)
             }
         }
+        @Locked var enumerated = false
         autoreleasepool {
-            var enumerated = false
             let configuration = Realm.Configuration(schemaVersion: 1, migrationBlock: { migration, _ in
                 migration.enumerateObjects(ofType: SwiftObject.className()) { _, newObject in
                     if let newObject = newObject {
                         block(newObject, migration)
-                        enumerated = true
+                        $enumerated.wrappedValue = true
                     }
                 }
             })

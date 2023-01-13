@@ -1,39 +1,52 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.34.0 Release notes (2023-01-13)
 =============================================================
+
+Swift 5.5 is no longer supported. Swift 5.6 (Xcode 13.3) is now the minimum
+supported version.
+
+The prebuilt binary for Carthage is now build with Xcode 14.2.
+
 ### Enhancements
+
 * Improve performance of creating Projection objects and of change
   notifications on projections ([PR #8050](https://github.com/realm/realm-swift/pull/8050)).
 * Allow initialising any sync configuration with `cancelAsyncOpenOnNonFatalErrors`.
+* Improve performance of Combine value publishers which do not use the
+  object/collection changesets a little.
+* All public types have been audited for sendability and are now marked as
+  Sendable when applicable. A few types which were incidentally not thread-safe
+  but make sense to use from multiple threads are now thread-safe.
+* Add support for building Realm with strict concurrency checking enabled.
 
 ### Fixed
-* Fix bad memory access exception that can occur when watching change streams. [PR #8039](https://github.com/realm/realm-swift/pull/8039).
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
+
+* Fix bad memory access exception that can occur when watching change streams.
+  [PR #8039](https://github.com/realm/realm-swift/pull/8039).
 * Object change notifications on projections only included the first projected
   property for each source property ([PR #8050](https://github.com/realm/realm-swift/pull/8050), since v10.21.0).
-* Fix `@AutoOpen` not returning a realm for a flexible sync configuration, 
-  when there is no internet connection. 
-  ([#7986](https://github.com/realm/realm-swift/issues/7986), since v10.27.0)
+* `@AutoOpen` failed to open flexible sync Realms while offline
+  ([#7986](https://github.com/realm/realm-swift/issues/7986), since v10.27.0).
 * Fix "Publishing changes from within view updates is not allowed" warnings
-  when using `@ObservedResults` or `@ObservedSectionedResults`. 
-  ([#7908](https://github.com/realm/realm-swift/issues/7908), since XCode 14 Beta 5).
+  when using `@ObservedResults` or `@ObservedSectionedResults`
+  ([#7908](https://github.com/realm/realm-swift/issues/7908)).
 * Fix "Publishing changes from within view updates is not allowed" warnings
   when using `@AutoOpen` or `@AsyncOpen`.
-  ([#7908](https://github.com/realm/realm-swift/issues/7908), since XCode 14 Beta 5).
-* Defer `Realm.asyncOpen` execution on `@AsyncOpen` and `@AutoOpen` property wrappers, 
-  until all the environment values are set. This will guarantee the configuration and partition value
-  are set set before opening the realm. ([#7931](https://github.com/realm/realm-swift/issues/7931), since v10.12.0).
-
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+  ([#7908](https://github.com/realm/realm-swift/issues/7908)).
+* Defer `Realm.asyncOpen` execution on `@AsyncOpen` and `@AutoOpen` property
+  wrappers until all the environment values are set. This will guarantee the
+  configuration and partition value are set set before opening the realm.
+  ([#7931](https://github.com/realm/realm-swift/issues/7931), since v10.12.0).
+* `@ObservedResults.remove()` could delete the wrong object if a write on a
+  background thread which changed the index of the object being removed
+  occurred at a very specific time (since v10.6.0).
 
 ### Compatibility
-* Realm Studio: 11.0.0 or later.
-* APIs are backwards compatible with all previous releases in the 10.x.y series.
-* Carthage release for Swift is built with Xcode 14.1.
-* CocoaPods: 1.10 or later.
-* Xcode: 13.1-14.1.
 
-### Internal
-* Upgraded realm-core from ? to ?
+* Realm Studio: 11.0.0 - 12.0.0. 13.0.0 is currently incompatible.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 14.2.
+* CocoaPods: 1.10 or later.
+* Xcode: 13.3-14.2.
 
 10.33.0 Release notes (2022-12-01)
 =============================================================

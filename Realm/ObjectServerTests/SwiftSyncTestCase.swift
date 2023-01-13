@@ -54,6 +54,7 @@ public enum ProcessKind {
     }
 }
 
+@MainActor
 open class SwiftSyncTestCase: RLMSyncTestCase {
     public func executeChild(file: StaticString = #file, line: UInt = #line) {
         XCTAssert(0 == runChildAndWait(), "Tests in child process failed", file: file, line: line)
@@ -177,16 +178,6 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
         RLMAssertThrowsWithReasonMatching(self, { _ = block() }, regexString, message, fileName, lineNumber)
     }
 
-    public func assertSucceeds(message: String? = nil, fileName: StaticString = #file,
-                               lineNumber: UInt = #line, block: () throws -> Void) {
-        do {
-            try block()
-        } catch {
-            XCTFail("Expected no error, but instead caught <\(error)>.",
-                file: (fileName), line: lineNumber)
-        }
-    }
-
     public static let bigObjectCount = 2
     public func populateRealm<T: BSON>(user: User? = nil, partitionValue: T) {
         do {
@@ -295,7 +286,7 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
     }
 }
 
-#if swift(>=5.6) && canImport(_Concurrency)
+#if canImport(_Concurrency)
 @available(macOS 12.0, *)
 extension SwiftSyncTestCase {
     public func basicCredentials(usernameSuffix: String = "", app: App? = nil) async throws -> Credentials {
@@ -318,6 +309,7 @@ extension SwiftSyncTestCase {
         return config
     }
 
+    @MainActor
     public func flexibleSyncRealm() async throws -> Realm {
         let realm = try await Realm(configuration: flexibleSyncConfig())
         return realm

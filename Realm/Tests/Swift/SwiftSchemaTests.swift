@@ -88,14 +88,14 @@ class IgnoredLinkPropertyObject : RLMObject {
     }
 }
 
+@MainActor
 class SwiftRLMRecursingSchemaTestObject : RLMObject {
     @objc dynamic var propertyWithIllegalDefaultValue: SwiftRLMIntObject? = {
         if mayAccessSchema {
             let realm = RLMRealm.default()
             return SwiftRLMIntObject.allObjects().firstObject() as! SwiftRLMIntObject?
-        } else {
-            return nil
         }
+        return nil
     }()
 
     static var mayAccessSchema = false
@@ -113,6 +113,7 @@ class InvalidDictionaryType: FakeObject {
     @objc dynamic var dictionary = RLMDictionary<NSString, SwiftRLMIntObject>(objectClassName: "invalid class", keyType: .string)
 }
 
+@MainActor
 class InitAppendsToArrayProperty : RLMObject {
     @objc dynamic var propertyWithIllegalDefaultValue: RLMArray<InitAppendsToArrayProperty> = {
         if mayAppend {
@@ -120,9 +121,8 @@ class InitAppendsToArrayProperty : RLMObject {
             let array = RLMArray<InitAppendsToArrayProperty>(objectClassName: InitAppendsToArrayProperty.className())
             array.add(InitAppendsToArrayProperty())
             return array
-        } else {
-            return RLMArray<InitAppendsToArrayProperty>(objectClassName: InitAppendsToArrayProperty.className())
         }
+        return RLMArray<InitAppendsToArrayProperty>(objectClassName: InitAppendsToArrayProperty.className())
     }()
 
     static var mayAppend = false
@@ -219,6 +219,7 @@ class SwiftRLMSchemaTests: RLMMultiProcessTestCase {
         }
     }
 
+    @MainActor
     func testPreventsDeadLocks() {
         if isParent {
             XCTAssertEqual(0, runChildAndWait(), "Tests in child process failed")
@@ -229,6 +230,7 @@ class SwiftRLMSchemaTests: RLMMultiProcessTestCase {
         assertThrowsWithReasonMatching(RLMSchema.shared(), ".*recursive.*")
     }
 
+    @MainActor
     func testAccessSchemaCreatesObjectWhichAttempsInsertionsToArrayProperty() {
         if isParent {
             XCTAssertEqual(0, runChildAndWait(), "Tests in child process failed")

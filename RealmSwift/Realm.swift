@@ -16,8 +16,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-import Foundation
-import Realm
 import Realm.Private
 
 /// The Id of the asynchronous transaction.
@@ -1163,12 +1161,12 @@ extension Realm {
 /// The type of a block to run for notification purposes when the data in a Realm is modified.
 public typealias NotificationBlock = (_ notification: Realm.Notification, _ realm: Realm) -> Void
 
-#if swift(>=5.6) && canImport(_Concurrency)
+#if canImport(_Concurrency)
 @available(macOS 10.15, tvOS 13.0, iOS 13.0, watchOS 6.0, *)
 extension Realm {
     /// Options for when to download all data from the server before opening
     /// a synchronized Realm.
-    @frozen public enum OpenBehavior {
+    @frozen public enum OpenBehavior: Sendable {
         /// Immediately return the Realm as if the synchronous initializer was
         /// used. If this is the first time that the Realm has been opened on
         /// this device, the Realm file will initially be empty. Synchronized
