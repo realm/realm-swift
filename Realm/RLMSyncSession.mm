@@ -152,7 +152,7 @@ static RLMSyncConnectionState convertConnectionState(SyncSession::ConnectionStat
 
 - (void)suspend {
     if (auto session = _session.lock()) {
-        session->log_out();
+        session->force_close();
     }
 }
 

@@ -267,7 +267,7 @@ static RLMNotificationToken *RLMAddNotificationBlock(RLMSectionedResults *collec
     auto token = [[RLMCancellationToken alloc] init];
 
     RLMClassInfo *info = collection.objectInfo;
-    realm::KeyPathArray keyPathArray = RLMKeyPathArrayFromStringArray(realm, info, keyPaths);
+    auto keyPathArray = RLMKeyPathArrayFromStringArray(realm, info, keyPaths);
 
     if (!queue) {
         [realm verifyNotificationsAreSupported:true];
@@ -544,7 +544,7 @@ static RLMNotificationToken *RLMAddNotificationBlock(RLMSection *collection,
     auto token = [[RLMCancellationToken alloc] init];
 
     RLMClassInfo *info = collection.objectInfo;
-    realm::KeyPathArray keyPathArray = RLMKeyPathArrayFromStringArray(realm, info, keyPaths);
+    auto keyPathArray = RLMKeyPathArrayFromStringArray(realm, info, keyPaths);
 
     if (!queue) {
         [realm verifyNotificationsAreSupported:true];

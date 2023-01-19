@@ -1,23 +1,60 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+* The Realm file is now automatically shrunk if the file size is larger than
+  needed to store all of the data. ([Core PR #5755](https://github.com/realm/realm-core/pull/5755))
+* Pinning old versions (either with frozen Realms or with Realms on background
+  threads that simply don't get refreshed) now only prevents overwriting the
+  data needed by that version, rather than the data needed by that version and
+  all later versions. In addition, frozen Realms no longer pin the transaction
+  logs used to drive change notifications. This mostly eliminates the file size
+  growth caused by pinning versions. ([Core PR #5440](https://github.com/realm/realm-core/pull/5440))
+* Rework how Dictionaries/Maps are stored in the Realm file. The new design uses
+  less space and is typically significantly faster. This changes the iteration
+  order of Maps, so any code relying on that may be broken. We continue
+  to make no guarantees about iteration order on Maps.
+* Improve performance of acquiring read locks when a read lock for that version
+  is already held. This speeds up many operations related to change
+  notifications, and particularly refreshing a Realm which has change notifiers
+  registered.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
-* The realm file will be shrunk if the larger file size is no longer needed. (Core PR [#5755](https://github.com/realm/realm-core/pull/5755))
-* Most of the file growth caused by version pinning is eliminated. (Core PR [#5440](https://github.com/realm/realm-core/pull/5440))
-* Set<Mixed> consider string and binary data equivalent. This could cause the client to be inconsistent with the server if a string and some binary data with equivalent content was inserted from Atlas. ([Core PR #4860](https://github.com/realm/realm-core/issues/4860), since v10.8.0)
-* Fixed wrong assertion on query error that could result in a crash. ([Core PR #6038](https://github.com/realm/realm-core/issues/6038), since v10.21.1)
-* Not possible to open an encrypted file on a device with a page size bigger than the one on which the file was produced. ([Core PR #8030](https://github.com/realm/realm-swift/issues/8030), since v10.32.1)
-* Fixed `realm_add_realm_refresh_callback` and notify immediately that there is not transaction snapshot to advance to. ([Core PR #6075](https://github.com/realm/realm-core/issues/6075), since v12.6.0)
-* Fix no notification for write transaction that contains only change to backlink property. ([Core PR #7493](https://github.com/realm/realm-swift/issues/7493), since v10.18.0)
-
-### Breaking Changes
-* Encoding of Dictionary in the realm file has changed. This will change the order of the elements, so if any tests depend on the order, those must be revised.
+* Fix a crash when using client reset with recovery and flexible sync with a
+  single subscription ([Core #6070](https://github.com/realm/realm-core/issues/6070), since v10.28.2)
+* Encrypted Realm files could not be opened on devices with a larger page size
+  than the one which originally wrote the file.
+  ([#8030](https://github.com/realm/realm-swift/issues/8030), since v10.32.1)
+* Creating multiple flexible sync subscriptions at once could hit an assertion
+  failure if the server reported an error for any of them other than the last
+  one ([#6038](https://github.com/realm/realm-core/issues/6038), since v10.21.1).
+* `Set<AnyRealmValue>` and `List<AnyRealmValue>` considered a string and binary
+  data containing that string encoded as UTF-8 to be equivalent. This could
+  result in a List entry not changing type on assignment and for the client be
+  inconsistent with the server if a string and some binary data with equivalent
+  content was inserted from Atlas.
+  ([#4860](https://github.com/realm/realm-core/issues/4860) and [#6201](https://github.com/realm/realm-core/issues/6201), since v10.8.0)
+* Querying for NaN on Decimal128 properties did not match any objects
+  ([Core #6182](https://github.com/realm/realm-core/issues/6182), since v10.8.0).
+* When client reset with recovery is used and the recovery did not need to
+  make any changes to the local Realm, the sync client could incorrectly think
+  the recovery failed and report the error "A fatal error occured during client
+  reset: 'A previous 'Recovery' mode reset from <timestamp> did not succeed,
+  giving up on 'Recovery' mode to prevent a cycle'".
+  ([Core #6195](https://github.com/realm/realm-core/issues/6195), since v10.32.0)
+* Fix a crash when using client reset with recovery and flexible sync with a
+  single subscription ([Core #6070](https://github.com/realm/realm-core/issues/6070), since v10.28.2)
+* Encrypted Realm files could not be opened on devices with a larger page size
+  than the one which originally wrote the file.
+  ([#8030](https://github.com/realm/realm-swift/issues/8030), since v10.32.1)
+* Creating multiple flexible sync subscriptions at once could hit an assertion
+  failure if the server reported an error for any of them other than the last
+  one ([#6038](https://github.com/realm/realm-core/issues/6038), since v10.21.1).
+* `Set<Mixed>` consider string and binary data equivalent. This could cause the
+  client to be inconsistent with the server if a string and some binary data
+  with equivalent content was inserted from Atlas.
+  ([#4860](https://github.com/realm/realm-core/issues/4860), since v10.8.0)
 
 ### Compatibility
-* Realm Studio: 11.0.0 - 12.0.0.
 * Realm Studio: 13.1.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 14.2.
@@ -1589,15 +1626,12 @@ Xcode 12.4 is now the minimum supported version of Xcode.
 
 10.17.0 Release notes (2021-10-06)
 =============================================================
+
 ### Enhancements
 
 * Add a new `@ThreadSafe` property wrapper. Objects and collections wrapped by `@ThreadSafe` may be passed between threads. It's
   intended to allow local variables and function parameters to be used across
   threads when needed.
-
-### Fixed
-
-* None.
 
 ### Compatibility
 
