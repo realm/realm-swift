@@ -40,6 +40,9 @@ void RLMRealmTranslateException(NSError **error);
 FOUNDATION_EXTERN void RLMWaitForRealmToClose(NSString *path);
 BOOL RLMIsRealmCachedAtPath(NSString *path);
 
+// Register a block to be called from the next before_notify() invocation
+FOUNDATION_EXTERN void RLMAddBeforeNotifyBlock(RLMRealm *realm, dispatch_block_t block);
+
 // RLMRealm private members
 @interface RLMRealm ()
 @property (nonatomic, readonly) BOOL dynamic;

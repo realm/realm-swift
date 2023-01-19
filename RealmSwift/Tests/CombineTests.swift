@@ -19,6 +19,7 @@
 #if !(os(iOS) && (arch(i386) || arch(arm)))
 import XCTest
 import Combine
+import Realm.Private
 import RealmSwift
 
 class CombineIdentifiableObject: Object, ObjectKeyIdentifiable {
@@ -98,8 +99,8 @@ class CombinePublisherTestCase: TestCase {
     var realm: Realm!
     var cancellable: AnyCancellable?
     var notificationToken: NotificationToken?
-    let subscribeOnQueue = DispatchQueue(label: "subscribe on")
-    let receiveOnQueue = DispatchQueue(label: "receive on")
+    let subscribeOnQueue = DispatchQueue(label: "subscribe on", qos: .userInteractive, autoreleaseFrequency: .workItem)
+    let receiveOnQueue = DispatchQueue(label: "receive on", qos: .userInteractive, autoreleaseFrequency: .workItem)
 
     override class var defaultTestSuite: XCTestSuite {
         if hasCombine() {
@@ -126,6 +127,20 @@ class CombinePublisherTestCase: TestCase {
         subscribeOnQueue.sync { }
         receiveOnQueue.sync { }
         super.tearDown()
+    }
+
+    func watchForNotifierAdded() -> XCTestExpectation {
+        // .subscribe(on:) is asynchronous, so we need to wait for the notifier
+        // to be ready before we do the thing which should produce notifications
+        let ex = expectation(description: "added notifier")
+        subscribeOnQueue.sync {
+            let r = try! Realm(configuration: realm.configuration, queue: subscribeOnQueue)
+            RLMAddBeforeNotifyBlock(ObjectiveCSupport.convert(object: r)) {
+                _ = r // retain the Realm until the block is released
+                ex.fulfill()
+            }
+        }
+        return ex
     }
 }
 
@@ -266,6 +281,7 @@ class CombineObjectPublisherTests: CombinePublisherTestCase {
     }
 
     func testSubscribeOn() {
+        let ex = watchForNotifierAdded()
         let sema = DispatchSemaphore(value: 0)
         var i = 1
         cancellable = valuePublisher(obj)
@@ -283,6 +299,7 @@ class CombineObjectPublisherTests: CombinePublisherTestCase {
                 sema.signal()
             }
 
+        wait(for: [ex], timeout: 2.0)
         for _ in 0..<10 {
             try! realm.write { obj.intCol += 1 }
             // wait between each write so that the notifications can't get coalesced
@@ -321,6 +338,7 @@ class CombineObjectPublisherTests: CombinePublisherTestCase {
     }
 
     func testChangeSetSubscribeOn() {
+        let ex = watchForNotifierAdded()
         let sema = DispatchSemaphore(value: 0)
 
         var prev: SwiftIntObject?
@@ -347,6 +365,7 @@ class CombineObjectPublisherTests: CombinePublisherTestCase {
                 }
             })
 
+        wait(for: [ex], timeout: 2.0)
         for _ in 0..<100 {
             try! realm.write { obj.intCol += 1 }
         }
@@ -362,6 +381,7 @@ class CombineObjectPublisherTests: CombinePublisherTestCase {
         let obj = try! realm.write { realm.create(SwiftObject.self, value: ["intCol": 0, "boolCol": false]) }
         let sema = DispatchSemaphore(value: 0)
 
+        let ex = watchForNotifierAdded()
         var prev: SwiftObject?
         cancellable = changesetPublisher(obj, keyPaths: ["intCol"])
             .subscribe(on: subscribeOnQueue)
@@ -385,6 +405,7 @@ class CombineObjectPublisherTests: CombinePublisherTestCase {
                     XCTFail("Expected .change but got \(change)")
                 }
             })
+        wait(for: [ex], timeout: 2.0)
 
         for _ in 0..<100 {
             try! realm.write { obj.intCol += 1 }
@@ -440,6 +461,7 @@ class CombineObjectPublisherTests: CombinePublisherTestCase {
     func testChangeSetSubscribeOnAndReceiveOn() {
         let sema = DispatchSemaphore(value: 0)
 
+        let ex = watchForNotifierAdded()
         var prev: SwiftIntObject?
         cancellable = changesetPublisher(obj)
             .subscribe(on: subscribeOnQueue)
@@ -465,6 +487,7 @@ class CombineObjectPublisherTests: CombinePublisherTestCase {
                     XCTFail("Expected .change but got \(change)")
                 }
             })
+        wait(for: [ex], timeout: 2.0)
 
         for _ in 0..<100 {
             try! realm.write { obj.intCol += 1 }
@@ -532,6 +555,7 @@ class CombineObjectPublisherTests: CombinePublisherTestCase {
 
     func testFrozenChangeSetSubscribeOn() {
         let sema = DispatchSemaphore(value: 0)
+        let ex = watchForNotifierAdded()
         cancellable = changesetPublisher(obj)
             .subscribe(on: subscribeOnQueue)
             .freeze()
@@ -556,6 +580,7 @@ class CombineObjectPublisherTests: CombinePublisherTestCase {
                 }
                 sema.signal()
             }
+        wait(for: [ex], timeout: 2.0)
 
         for _ in 0..<100 {
             try! realm.write { obj.intCol += 1 }
@@ -598,6 +623,7 @@ class CombineObjectPublisherTests: CombinePublisherTestCase {
 
     func testFrozenChangeSetSubscribeOnAndReceiveOn() {
         let sema = DispatchSemaphore(value: 0)
+        let ex = watchForNotifierAdded()
         cancellable = changesetPublisher(obj)
             .subscribe(on: subscribeOnQueue)
             .freeze()
@@ -622,7 +648,8 @@ class CombineObjectPublisherTests: CombinePublisherTestCase {
                     prev = obj
                 }
                 sema.signal()
-        }
+            }
+        wait(for: [ex], timeout: 2.0)
 
         for _ in 0..<100 {
             try! realm.write { obj.intCol += 1 }
@@ -3497,6 +3524,7 @@ class CombineProjectionPublisherTests: CombinePublisherTestCase {
     }
 
     func testSubscribeOn() {
+        let ex = watchForNotifierAdded()
         let sema = DispatchSemaphore(value: 0)
         var i = 1
         cancellable = valuePublisher(projection)
@@ -3513,6 +3541,7 @@ class CombineProjectionPublisherTests: CombinePublisherTestCase {
                 XCTAssertEqual(arr.count, 10)
                 sema.signal()
             }
+        wait(for: [ex], timeout: 2.0)
 
         for _ in 0..<10 {
             try! realm.write { object.int += 1 }
@@ -3554,6 +3583,7 @@ class CombineProjectionPublisherTests: CombinePublisherTestCase {
     func testChangeSetSubscribeOn() {
         let sema = DispatchSemaphore(value: 0)
 
+        let ex = watchForNotifierAdded()
         var prevProj: SimpleProjection?
         cancellable = changesetPublisher(projection)
             .subscribe(on: subscribeOnQueue)
@@ -3577,6 +3607,7 @@ class CombineProjectionPublisherTests: CombinePublisherTestCase {
                     XCTFail("Expected .change but got \(change)")
                 }
             })
+        wait(for: [ex], timeout: 2.0)
 
         for _ in 0..<100 {
             try! realm.write { object.int += 1 }
@@ -3592,6 +3623,7 @@ class CombineProjectionPublisherTests: CombinePublisherTestCase {
     func testChangeSetSubscribeOnKeyPath() {
         let sema = DispatchSemaphore(value: 0)
 
+        let ex = watchForNotifierAdded()
         var prevProj: SimpleProjection?
         cancellable = changesetPublisher(projection, keyPaths: ["int"])
             .subscribe(on: subscribeOnQueue)
@@ -3615,6 +3647,7 @@ class CombineProjectionPublisherTests: CombinePublisherTestCase {
                     XCTFail("Expected .change but got \(change)")
                 }
             })
+        wait(for: [ex], timeout: 2.0)
 
         for _ in 0..<100 {
             try! realm.write { object.int += 1 }
@@ -3670,6 +3703,7 @@ class CombineProjectionPublisherTests: CombinePublisherTestCase {
     func testChangeSetSubscribeOnAndReceiveOn() {
         let sema = DispatchSemaphore(value: 0)
 
+        let ex = watchForNotifierAdded()
         var prev: SimpleProjection?
         cancellable = changesetPublisher(projection)
             .subscribe(on: subscribeOnQueue)
@@ -3695,6 +3729,7 @@ class CombineProjectionPublisherTests: CombinePublisherTestCase {
                     XCTFail("Expected .change but got \(change)")
                 }
             })
+        wait(for: [ex], timeout: 2.0)
 
         for _ in 0..<100 {
             try! realm.write { object.int += 1 }
@@ -3760,23 +3795,38 @@ class CombineProjectionPublisherTests: CombinePublisherTestCase {
         wait(for: [exp], timeout: 1)
     }
 
-    @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
     func testFrozenPublisherSubscribeOn() {
-        let exp = XCTestExpectation()
-        cancellable = projection.publisher
-            .threadSafeReference()
-            .receive(on: subscribeOnQueue)
+        let setupEx = watchForNotifierAdded()
+        let completeEx = expectation(description: "pipeline complete")
+        var gotValueEx: XCTestExpectation!
+        cancellable = valuePublisher(projection)
+            .subscribe(on: subscribeOnQueue)
             .freeze()
-            .assertNoFailure()
-            .sink { change in
-                print(change)
-                exp.fulfill()
+            .map { (v: SimpleProjection) -> SimpleProjection in
+                gotValueEx.fulfill()
+                return v
             }
-        try! realm.write { object.int += 1 }
-        wait(for: [exp], timeout: 1)
+            .collect()
+            .assertNoFailure()
+            .sink { arr in
+                XCTAssertEqual(arr.count, 10)
+                for i in 0..<10 {
+                    XCTAssertEqual(arr[i].int, i + 1)
+                }
+                completeEx.fulfill()
+            }
+        wait(for: [setupEx], timeout: 2.0)
+        for _ in 0..<10 {
+            gotValueEx = expectation(description: "got value")
+            try! realm.write { object.int += 1 }
+            wait(for: [gotValueEx], timeout: 2.0)
+        }
+        try! realm.write { realm.delete(object) }
+        wait(for: [completeEx], timeout: 1)
     }
 
     func testFrozenChangeSetSubscribeOn() {
+        let setupEx = watchForNotifierAdded()
         let sema = DispatchSemaphore(value: 0)
         cancellable = changesetPublisher(projection)
             .subscribe(on: subscribeOnQueue)
@@ -3786,7 +3836,6 @@ class CombineProjectionPublisherTests: CombinePublisherTestCase {
             .sink { arr in
                 var prev: SimpleProjection?
                 for change in arr {
-                    print(change)
                     guard case .change(let p, let properties) = change else {
                         XCTFail("Expected .change but got \(change)")
                         sema.signal()
@@ -3803,6 +3852,7 @@ class CombineProjectionPublisherTests: CombinePublisherTestCase {
                 }
                 sema.signal()
             }
+        wait(for: [setupEx], timeout: 2.0)
 
         for _ in 0..<100 {
             try! realm.write { object.int += 1 }
@@ -3844,6 +3894,7 @@ class CombineProjectionPublisherTests: CombinePublisherTestCase {
     }
 
     func testFrozenChangeSetSubscribeOnAndReceiveOn() {
+        let setupEx = watchForNotifierAdded()
         let sema = DispatchSemaphore(value: 0)
         cancellable = changesetPublisher(projection)
             .subscribe(on: subscribeOnQueue)
@@ -3869,7 +3920,8 @@ class CombineProjectionPublisherTests: CombinePublisherTestCase {
                     prev = p
                 }
                 sema.signal()
-        }
+            }
+        wait(for: [setupEx], timeout: 2.0)
 
         for _ in 0..<100 {
             try! realm.write { object.int += 1 }

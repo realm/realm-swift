@@ -94,8 +94,11 @@
     RLMThreadSafeReference *ref1 = [RLMThreadSafeReference referenceWithThreadConfined:intObject];
     RLMThreadSafeReference *ref2 = [RLMThreadSafeReference referenceWithThreadConfined:intObject];
     XCTAssertEqual(0, intObject.intCol);
-    [realm transactionWithBlock:^{
-        [realm deleteObject:intObject];
+    [self dispatchAsyncAndWait:^{
+        RLMRealm *realm = [RLMRealm defaultRealm];
+        [realm transactionWithBlock:^{
+            [realm deleteAllObjects];
+        }];
     }];
     [self dispatchAsyncAndWait:^{
         RLMRealm *realm = [RLMRealm defaultRealm];
