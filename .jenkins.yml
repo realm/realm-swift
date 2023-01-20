@@ -100,15 +100,6 @@ exclude:
   - xcode_version: 14.1
     target: swiftpm-thread
 
-  - xcode_version: 13.4.1
-    target: swiftpm-ios
-
-  - xcode_version: 14.0.1
-    target: swiftpm-ios
-
-  - xcode_version: 14.1
-    target: swiftpm-ios
-
   - xcode_version: 14.0.1
     target: ios-static
 
