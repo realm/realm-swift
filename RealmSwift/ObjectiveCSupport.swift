@@ -147,6 +147,7 @@ import Realm
     }
 
     /// Convert a `RLMShouldCompactOnLaunchBlock` to a Realm Swift compact block.
+    @preconcurrency
     public static func convert(object: @escaping RLMShouldCompactOnLaunchBlock) -> @Sendable (Int, Int) -> Bool {
         return { totalBytes, usedBytes in
             return object(UInt(totalBytes), UInt(usedBytes))
@@ -173,6 +174,7 @@ import Realm
     }
 
     /// Convert an RLMClientResetBeforeBlock to a RealmSwift before  block
+    @preconcurrency
     public static func convert(object: RLMClientResetBeforeBlock?) -> (@Sendable (Realm) -> Void)? {
         guard let object = object else {
             return nil
@@ -194,6 +196,7 @@ import Realm
     }
 
     /// Convert an RLMClientResetAfterBlock to a RealmSwift after block
+    @preconcurrency
     public static func convert(object: RLMClientResetAfterBlock?) -> (@Sendable (Realm, Realm) -> Void)? {
         guard let object = object else {
             return nil
@@ -212,6 +215,7 @@ import Realm
     }
 
     /// Converts a block receiving a `RLMSyncSubscriptionSet`to a swift block receiving a `SyncSubscriptionSet`.
+    @preconcurrency
     public static func convert(block: RLMFlexibleSyncInitialSubscriptionsBlock?) -> (@Sendable (SyncSubscriptionSet) -> Void)? {
         guard let block = block else {
             return nil

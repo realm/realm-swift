@@ -415,6 +415,7 @@ public typealias Provider = RLMIdentityProvider
     /// - If no block is set in either location, the client reset will not be handled. The application will likely need to be restarted and unsynced local changes may be lost.
     /// - note: The ``SyncManager.errorHandler`` is still invoked under all ``RLMSyncError``s *other than* ``RLMSyncErrorClientResetError``.
     /// - seeAlso ``RLMSyncError`` for an exhaustive list.
+    @preconcurrency
     case manual(errorHandler: ErrorReportingBlock? = nil)
 }
 
