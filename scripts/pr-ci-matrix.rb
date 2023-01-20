@@ -22,7 +22,7 @@ targets = {
   'swiftpm-debug' => all,
   'swiftpm-address' => latest_only,
   'swiftpm-thread' => latest_only,
-  'swiftpm-ios' => latest_only,
+  'swiftpm-ios' => all,
 
   'ios-static' => oldest_and_latest,
   'ios-dynamic' => oldest_and_latest,

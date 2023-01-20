@@ -1,23 +1,19 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.34.1 Release notes (2023-01-20)
 =============================================================
-### Enhancements
-* None.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
-* None.
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+* Add some missing `@preconcurrency` annotations which lead to build failures
+  with Xcode 14.0 when importing via SPM or CocoaPods
+  ([#8104](https://github.com/realm/realm-swift/issues/8104), since v10.34.0).
 
 ### Compatibility
+
 * Realm Studio: 11.0.0 - 12.0.0.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 14.2.
 * CocoaPods: 1.10 or later.
 * Xcode: 13.3-14.2.
-
-### Internal
-* Upgraded realm-core from ? to ?
 
 10.34.0 Release notes (2023-01-13)
 =============================================================
