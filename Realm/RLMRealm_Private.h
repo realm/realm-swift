@@ -42,7 +42,6 @@ BOOL RLMIsRealmCachedAtPath(NSString *path);
 
 // RLMRealm private members
 @interface RLMRealm ()
-
 @property (nonatomic, readonly) BOOL dynamic;
 @property (nonatomic, readwrite) RLMSchema *schema;
 
@@ -59,7 +58,13 @@ BOOL RLMIsRealmCachedAtPath(NSString *path);
 - (RLMRealm *)frozenCopy NS_RETURNS_RETAINED;
 + (RLMAsyncOpenTask *)asyncOpenWithConfiguration:(RLMRealmConfiguration *)configuration
                                         callback:(void (^)(NSError * _Nullable))callback;
+@end
 
+@interface RLMPinnedRealm : NSObject
+@property (nonatomic, readonly) RLMRealmConfiguration *configuration;
+
+- (instancetype)initWithRealm:(RLMRealm *)realm;
+- (void)unpin;
 @end
 
 RLM_HEADER_AUDIT_END(nullability)

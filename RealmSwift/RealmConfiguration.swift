@@ -162,7 +162,7 @@ extension Realm {
          mode requires disabling Realm's reader/writer coordination, so committing a write
          transaction from another process will result in crashes.
 
-         Syncronized Realms must always be writeable (as otherwise no synchronization could happen),
+         Synchronized Realms must always be writeable (as otherwise no synchronization could happen),
          and this instead merely disallows performing write transactions on the Realm. In addition,
          it will skip some automatic writes made to the Realm, such as to initialize the Realm's
          schema. Setting `readOnly = YES` is not strictly required for Realms which the sync user

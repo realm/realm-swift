@@ -155,3 +155,20 @@ private:
 std::unique_ptr<realm::BindingContext> RLMCreateBindingContext(__unsafe_unretained RLMRealm *const realm) {
     return std::unique_ptr<realm::BindingContext>(new RLMNotificationHelper(realm));
 }
+
+@implementation RLMPinnedRealm {
+    realm::TransactionRef _pin;
+}
+
+- (instancetype)initWithRealm:(RLMRealm *)realm {
+    if (self = [super init]) {
+        _pin = realm->_realm->duplicate();
+        _configuration = realm.configuration;
+    }
+    return self;
+}
+
+- (void)unpin {
+    _pin.reset();
+}
+@end
