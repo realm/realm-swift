@@ -553,8 +553,37 @@ extension SwiftUISyncTestHostUITests {
         // Test show ListView after syncing realm
         let table = application.tables.firstMatch
         XCTAssertTrue(table.waitForExistence(timeout: 6))
+        XCTAssertEqual(table.cells.count, 8)
+    }
+
+    func testFlexibleSyncAsyncOpenWithEnvironmentConfiguration() throws {
+        let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
+        try populateFlexibleSyncForEmail(email, n: 10) { realm in
+            for index in (1...10) {
+                realm.add(SwiftPerson(firstName: "\(#function)", lastName: "Smith", age: index))
+            }
+        }
+
+        application.launchEnvironment["email1"] = email
+        application.launchEnvironment["async_view_type"] = "async_open_flexible_sync_configuration"
+        // Override appId for flexible app Id
+        application.launchEnvironment["app_id"] = flexibleSyncAppId
+        application.launchEnvironment["firstName"] = "\(#function)"
+        application.launch()
+
+        asyncOpen()
+
+        // Query for button to navigate to next view
+        let nextViewView = application.buttons["show_list_button_view"]
+        XCTAssertTrue(nextViewView.waitForExistence(timeout: 10))
+        nextViewView.tap()
+
+        // Test show ListView after syncing realm
+        let table = application.tables.firstMatch
+        XCTAssertTrue(table.waitForExistence(timeout: 6))
         XCTAssertEqual(table.cells.count, 5)
     }
+
 
     func testFlexibleSyncAutoOpenRoundTrip() throws {
         let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
@@ -566,6 +595,34 @@ extension SwiftUISyncTestHostUITests {
 
         application.launchEnvironment["email1"] = email
         application.launchEnvironment["async_view_type"] = "auto_open_flexible_sync"
+        // Override appId for flexible app Id
+        application.launchEnvironment["app_id"] = flexibleSyncAppId
+        application.launchEnvironment["firstName"] = "\(#function)"
+        application.launch()
+
+        asyncOpen()
+
+        // Query for button to navigate to next view
+        let nextViewView = application.buttons["show_list_button_view"]
+        XCTAssertTrue(nextViewView.waitForExistence(timeout: 10))
+        nextViewView.tap()
+
+        // Test show ListView after syncing realm
+        let table = application.tables.firstMatch
+        XCTAssertTrue(table.waitForExistence(timeout: 6))
+        XCTAssertEqual(table.cells.count, 18)
+    }
+
+    func testFlexibleSyncAutoOpenWithEnvironmentConfiguration() throws {
+        let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
+        try populateFlexibleSyncForEmail(email, n: 10) { realm in
+            for index in (1...20) {
+                realm.add(SwiftPerson(firstName: "\(#function)", lastName: "Smith", age: index))
+            }
+        }
+
+        application.launchEnvironment["email1"] = email
+        application.launchEnvironment["async_view_type"] = "auto_open_flexible_sync_configuration"
         // Override appId for flexible app Id
         application.launchEnvironment["app_id"] = flexibleSyncAppId
         application.launchEnvironment["firstName"] = "\(#function)"

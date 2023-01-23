@@ -90,7 +90,16 @@ struct MainView: View {
                         .transition(AnyTransition.move(edge: .leading)).animation(.default)
                 case "async_open_flexible_sync":
                     AsyncOpenFlexibleSyncView()
-                        .environment(\.realmConfiguration, user!.flexibleSyncConfiguration())
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .background(Color.green)
+                        .transition(AnyTransition.move(edge: .leading)).animation(.default)
+                case "async_open_flexible_sync_configuration":
+                    AsyncOpenFlexibleSyncView(subscriptionState: .completed)
+                        .environment(\.realmConfiguration, user!.flexibleSyncConfiguration(initialSubscriptions: { subs in
+                            subs.append(QuerySubscription<SwiftPerson>(name: "person_age") {
+                                $0.age > 5 && $0.firstName == ProcessInfo.processInfo.environment["firstName"]!
+                            })
+                        }))
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .background(Color.green)
                         .transition(AnyTransition.move(edge: .leading)).animation(.default)
@@ -119,7 +128,16 @@ struct MainView: View {
                         .transition(AnyTransition.move(edge: .leading)).animation(.default)
                 case "auto_open_flexible_sync":
                     AutoOpenFlexibleSyncView()
-                        .environment(\.realmConfiguration, user!.flexibleSyncConfiguration())
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .background(Color.green)
+                        .transition(AnyTransition.move(edge: .leading)).animation(.default)
+                case "auto_open_flexible_sync_configuration":
+                    AutoOpenFlexibleSyncView(subscriptionState: .completed)
+                        .environment(\.realmConfiguration, user!.flexibleSyncConfiguration(initialSubscriptions: { subs in
+                            subs.append(QuerySubscription<SwiftPerson>(name: "person_age") {
+                                $0.age > 2 && $0.firstName == ProcessInfo.processInfo.environment["firstName"]!
+                            })
+                        }))
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .background(Color.green)
                         .transition(AnyTransition.move(edge: .leading)).animation(.default)
@@ -194,6 +212,7 @@ class LoginHelper: ObservableObject {
 
     func login(email: String, password: String, completion: @escaping (User) -> Void) {
         let app = RealmSwift.App(id: ProcessInfo.processInfo.environment["app_id"]!, configuration: appConfig)
+        app.syncManager.logLevel = .trace
         app.login(credentials: .emailPassword(email: email, password: password))
             .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { result in
@@ -414,12 +433,16 @@ struct AsyncOpenFlexibleSyncView: View {
                             Task {
                                 do {
                                     let subs = realm.subscriptions
-                                    try await subs.update {
-                                        subs.append(QuerySubscription<SwiftPerson>(name: "person_age") {
-                                            $0.age > 5 && $0.firstName == ProcessInfo.processInfo.environment["firstName"]!
-                                        })
+                                    do {
+                                        try await subs.update {
+                                            subs.append(QuerySubscription<SwiftPerson>(name: "person_age") {
+                                                $0.age > 5 && $0.firstName == ProcessInfo.processInfo.environment["firstName"]!
+                                            })
+                                        }
+                                        subscriptionState = .completed
+                                    } catch {
+                                        print(error)
                                     }
-                                    subscriptionState = .completed
                                 }
                             }
                         }
