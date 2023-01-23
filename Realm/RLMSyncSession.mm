@@ -82,11 +82,7 @@ using namespace realm;
 @implementation RLMSyncSession
 
 + (dispatch_queue_t)notificationsQueue {
-    static dispatch_queue_t queue;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        queue = dispatch_queue_create("io.realm.sync.sessionsNotificationQueue", DISPATCH_QUEUE_SERIAL);
-    });
+    static auto queue = dispatch_queue_create("io.realm.sync.sessionsNotificationQueue", DISPATCH_QUEUE_SERIAL);
     return queue;
 }
 
