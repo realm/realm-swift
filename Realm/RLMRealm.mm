@@ -347,6 +347,7 @@ static id RLMAutorelease(__unsafe_unretained id value) {
     realm->_dynamic = dynamic;
     realm->_schema = schema;
     if (!dynamic) {
+        realm->_realm->read_group(); // ensure we've read the on-disk schema
         realm->_realm->set_schema_subset(schema.objectStoreCopy);
     }
     realm->_info = RLMSchemaInfo(realm);

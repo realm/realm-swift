@@ -380,12 +380,9 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let e = expectSyncError {
             user.simulateClientResetError(forSession: #function)
         }
-        guard let error = e else { return }
+        let error = try XCTUnwrap(e)
         XCTAssertEqual(error.code, .clientResetError)
-        XCTAssertNotNil(error.clientResetInfo())
-        guard let resetInfo = error.clientResetInfo() else {
-            return
-        }
+        let resetInfo = try XCTUnwrap(error.clientResetInfo())
         XCTAssertTrue(resetInfo.0.contains("mongodb-realm/\(self.appId)/recovered-realms/recovered_realm"))
         XCTAssertNotNil(realm)
     }
@@ -400,7 +397,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 realm.invalidate()
             }
         }
-        guard let error = e else { return }
+        let error = try XCTUnwrap(e)
         let (path, errorToken) = error.clientResetInfo()!
         XCTAssertFalse(FileManager.default.fileExists(atPath: path))
         SyncSession.immediatelyHandleError(errorToken, syncManager: self.app.syncManager)
@@ -618,6 +615,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             try autoreleasepool {
                 let realm = try Realm(configuration: configuration)
                 waitForExpectations(timeout: 15.0)
+                realm.refresh()
                 // The locally created object should still be present as we didn't
                 // actually handle the client reset
                 XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1)
@@ -658,6 +656,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             try autoreleasepool {
                 let realm = try Realm(configuration: configuration)
                 waitForExpectations(timeout: 15.0)
+                realm.refresh()
                 // The locally created object should still be present as we didn't
                 // actually handle the client reset
                 XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1)
@@ -801,7 +800,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                                                clientResetMode: .discardLocal(beforeReset: assertBeforeBlock, afterReset: assertAfterBlock))
         configuration.objectTypes = [SwiftPerson.self]
 
-        guard let syncConfig = configuration.syncConfiguration else { fatalError("Test condition failure. SyncConfiguration not set.") }
+        let syncConfig = try XCTUnwrap(configuration.syncConfiguration)
         switch syncConfig.clientResetMode {
         case .discardUnsyncedChanges(let before, let after):
             XCTAssertNotNil(before)
@@ -812,7 +811,10 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         try autoreleasepool {
             let realm = try Realm(configuration: configuration)
+            let results = realm.objects(SwiftPerson.self)
+            XCTAssertEqual(results.count, 1)
             waitForExpectations(timeout: 15.0)
+            realm.refresh() // expectation is potentially fulfilled before autorefresh
             // The Person created locally ("John") should have been discarded,
             // while the one from the server ("Paul") should be present
             XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1)
@@ -841,6 +843,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         try autoreleasepool {
             let realm = try Realm(configuration: configuration)
             waitForExpectations(timeout: 15.0)
+            realm.refresh()
             // The Person created locally ("John") should have been discarded,
             // while the one from the server ("Paul") should be present
             XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1)
@@ -874,7 +877,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         var configuration = user.configuration(partitionValue: #function, clientResetMode: .recoverUnsyncedChanges(beforeReset: assertBeforeBlock, afterReset: assertAfterBlock))
         configuration.objectTypes = [SwiftPerson.self]
 
-        guard let syncConfig = configuration.syncConfiguration else { fatalError("Test condition failure. SyncConfiguration not set.") }
+        let syncConfig = try XCTUnwrap(configuration.syncConfiguration)
         switch syncConfig.clientResetMode {
         case .recoverUnsyncedChanges(let before, let after):
             XCTAssertNotNil(before)
@@ -907,7 +910,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         var configuration = user.configuration(partitionValue: #function, clientResetMode: .recoverOrDiscardUnsyncedChanges(beforeReset: assertBeforeBlock, afterReset: assertAfterBlock))
         configuration.objectTypes = [SwiftPerson.self]
 
-        guard let syncConfig = configuration.syncConfiguration else { fatalError("Test condition failure. SyncConfiguration not set.") }
+        let syncConfig = try XCTUnwrap(configuration.syncConfiguration)
         switch syncConfig.clientResetMode {
         case .recoverOrDiscardUnsyncedChanges(let before, let after):
             XCTAssertNotNil(before)
@@ -920,6 +923,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         try autoreleasepool {
             let realm = try Realm(configuration: configuration)
             waitForExpectations(timeout: 15.0)
+            realm.refresh()
             XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1)
             // The Person created locally ("John") should have been discarded,
             // while the one from the server ("Paul") should be present.
@@ -935,9 +939,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let (assertBeforeBlock, assertAfterBlock) = assertDiscardLocal()
         var config = user.flexibleSyncConfiguration(clientResetMode: .discardLocal(beforeReset: assertBeforeBlock, afterReset: assertAfterBlock))
         config.objectTypes = [SwiftPerson.self]
-        guard let syncConfig = config.syncConfiguration else {
-            fatalError("Test condition failure. SyncConfiguration not set.")
-        }
+        let syncConfig = try XCTUnwrap(config.syncConfiguration)
         switch syncConfig.clientResetMode {
         case .discardUnsyncedChanges(let before, let after):
             XCTAssertNotNil(before)
@@ -954,6 +956,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             XCTAssertEqual(subscriptions.first?.name, "all_people")
 
             waitForExpectations(timeout: 15.0)
+            realm.refresh()
             XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1)
             XCTAssertEqual(realm.objects(SwiftPerson.self).first?.firstName, "Paul")
         }
@@ -966,9 +969,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let (assertBeforeBlock, assertAfterBlock) = assertDiscardLocal()
         var config = user.flexibleSyncConfiguration(clientResetMode: .discardUnsyncedChanges(beforeReset: assertBeforeBlock, afterReset: assertAfterBlock))
         config.objectTypes = [SwiftPerson.self]
-        guard let syncConfig = config.syncConfiguration else {
-            fatalError("Test condition failure. SyncConfiguration not set.")
-        }
+        let syncConfig = try XCTUnwrap(config.syncConfiguration)
         switch syncConfig.clientResetMode {
         case .discardUnsyncedChanges(let before, let after):
             XCTAssertNotNil(before)
@@ -985,6 +986,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             XCTAssertEqual(subscriptions.first?.name, "all_people")
 
             waitForExpectations(timeout: 15.0)
+            realm.refresh()
             XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1)
             XCTAssertEqual(realm.objects(SwiftPerson.self).first?.firstName, "Paul")
         }
@@ -997,9 +999,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let (assertBeforeBlock, assertAfterBlock) = assertRecover()
         var config = user.flexibleSyncConfiguration(clientResetMode: .recoverUnsyncedChanges(beforeReset: assertBeforeBlock, afterReset: assertAfterBlock))
         config.objectTypes = [SwiftPerson.self]
-        guard let syncConfig = config.syncConfiguration else {
-            fatalError("Test condition failure. SyncConfiguration not set.")
-        }
+        let syncConfig = try XCTUnwrap(config.syncConfiguration)
         switch syncConfig.clientResetMode {
         case .recoverUnsyncedChanges(let before, let after):
             XCTAssertNotNil(before)
@@ -1016,6 +1016,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             XCTAssertEqual(subscriptions.first?.name, "all_people")
 
             waitForExpectations(timeout: 15.0) // wait for expectations in assertRecover
+            realm.refresh()
             XCTAssertEqual(realm.objects(SwiftPerson.self).count, 2)
             // The object created locally (John) and the object created on the server (Paul)
             // should both be integrated into the new realm file.
@@ -1033,9 +1034,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             subscriptions.append(QuerySubscription<SwiftPerson>(name: "all_people"))
         })
         config.objectTypes = [SwiftPerson.self]
-        guard let syncConfig = config.syncConfiguration else {
-            fatalError("Test condition failure. SyncConfiguration not set.")
-        }
+        let syncConfig = try XCTUnwrap(config.syncConfiguration)
         switch syncConfig.clientResetMode {
         case .recoverUnsyncedChanges(let before, let after):
             XCTAssertNotNil(before)
@@ -1052,6 +1051,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             XCTAssertEqual(subscriptions.first?.name, "all_people")
 
             waitForExpectations(timeout: 15.0)
+            realm.refresh()
             XCTAssertEqual(realm.objects(SwiftPerson.self).count, 2)
             // The object created locally (John) and the object created on the server (Paul)
             // should both be integrated into the new realm file.
@@ -1069,9 +1069,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             subscriptions.append(QuerySubscription<SwiftPerson>(name: "all_people"))
         })
         config.objectTypes = [SwiftPerson.self]
-        guard let syncConfig = config.syncConfiguration else {
-            fatalError("Test condition failure. SyncConfiguration not set.")
-        }
+        let syncConfig = try XCTUnwrap(config.syncConfiguration)
         switch syncConfig.clientResetMode {
         case .discardUnsyncedChanges(let before, let after):
             XCTAssertNotNil(before)
@@ -1088,6 +1086,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             XCTAssertEqual(subscriptions.first?.name, "all_people")
 
             waitForExpectations(timeout: 15.0)
+            realm.refresh()
             XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1)
             // The Person created locally ("John") should have been discarded,
             // while the one from the server ("Paul") should be present
@@ -1128,6 +1127,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             XCTAssertEqual(subscriptions.first?.name, "all_people")
 
             waitForExpectations(timeout: 15.0)
+            realm.refresh()
             XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1)
             // The Person created locally ("John") should have been discarded,
             // while the one from the server ("Paul") should be present.
