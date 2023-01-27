@@ -179,7 +179,7 @@ private final class ObservableStoragePublisher<ObjectType>: Publisher where Obje
     public typealias Failure = Never
 
     var subscribers = [AnySubscriber<Void, Never>]()
-    private let value: ObjectType
+    private var value: ObjectType
     private let keyPaths: [String]?
     private let unwrappedValue: ObjectBase?
 
@@ -199,6 +199,11 @@ private final class ObservableStoragePublisher<ObjectType>: Publisher where Obje
         self.value = value
         self.keyPaths = keyPaths
         self.unwrappedValue = value.rootObject
+    }
+
+    // Refresh the publisher with a managed object.
+    func update(value: ObjectType) {
+        self.value = value
     }
 
     func send() {
@@ -237,6 +242,7 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
         willSet {
             if newValue != value {
                 objectWillChange.send()
+                objectWillChange.update(value: newValue)
                 objectWillChange.subscribers.forEach {
                     $0.receive(subscription: ObservationSubscription(token: newValue._observe(keyPaths, $0)))
                 }
