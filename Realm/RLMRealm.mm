@@ -90,7 +90,9 @@ void RLMWaitForRealmToClose(NSString *path) {
     NSString *lockfilePath = [path stringByAppendingString:@".lock"];
     File lockfile(lockfilePath.UTF8String, File::mode_Update);
     lockfile.set_fifo_path([path stringByAppendingString:@".management"].UTF8String, "lock.fifo");
-    lockfile.lock_exclusive();
+    while (!lockfile.try_rw_lock_exclusive()) {
+        sched_yield();
+    }
 }
 
 BOOL RLMIsRealmCachedAtPath(NSString *path) {
@@ -347,7 +349,6 @@ static id RLMAutorelease(__unsafe_unretained id value) {
     realm->_dynamic = dynamic;
     realm->_schema = schema;
     if (!dynamic) {
-        realm->_realm->read_group(); // ensure we've read the on-disk schema
         realm->_realm->set_schema_subset(schema.objectStoreCopy);
     }
     realm->_info = RLMSchemaInfo(realm);

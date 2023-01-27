@@ -2432,6 +2432,11 @@
     // Testing an open() error which doesn't have its own exception type and
     // just uses the generic "something failed" error
     RLMRealm *realm = [RLMRealm defaultRealm];
+#ifdef REALM_FILELOCK_EMULATION
+    // Beginning a read transaction involves opening a file when using filelock
+    // emulation, so do that before setting the open file limit.
+    [realm refresh];
+#endif
 
     // Set the max open files to zero so that opening new files will fail
     rlimit oldrl;
@@ -2750,7 +2755,7 @@
 }
 
 // iOS uses a different locking scheme which breaks how we stop core from reinitializing the lock file
-#if !TARGET_OS_IPHONE
+#ifndef REALM_FILELOCK_EMULATION
 - (void)testInvalidLockFile {
     // Create the realm file and lock file
     @autoreleasepool { [RLMRealm defaultRealm]; }

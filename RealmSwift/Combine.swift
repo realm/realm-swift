@@ -566,7 +566,7 @@ public func valuePublisher<T: ProjectionObservable>(_ projection: T, keyPaths: [
 public func changesetPublisher<T: Object>(_ object: T, keyPaths: [String]? = nil) -> RealmPublishers.ObjectChangeset<T> {
     precondition(object.realm != nil, "Only managed objects can be published")
     precondition(!object.isInvalidated, "Object is invalidated or deleted")
-    return RealmPublishers.ObjectChangeset<T>() { queue, fn in
+    return RealmPublishers.ObjectChangeset<T> { queue, fn in
         object.observe(keyPaths: keyPaths, on: queue, fn)
     }
 }
@@ -582,7 +582,7 @@ public func changesetPublisher<T: Object>(_ object: T, keyPaths: [String]? = nil
 public func changesetPublisher<T: ProjectionObservable>(_ projection: T, keyPaths: [String]? = nil) -> RealmPublishers.ObjectChangeset<T> {
     precondition(projection.realm != nil, "Only managed objects can be published")
     precondition(!projection.isInvalidated, "Object is invalidated or deleted")
-    return RealmPublishers.ObjectChangeset<T>() { queue, fn in
+    return RealmPublishers.ObjectChangeset<T> { queue, fn in
         projection.observe(keyPaths: keyPaths ?? [], on: queue, fn)
     }
 }
