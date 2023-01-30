@@ -1,0 +1,12 @@
+# NOTE: This is a common file that is overwritten by realm/ci-actions sync service
+# and should only be modified in that repository.
+
+name: Issue Needs Attention
+# This workflow is triggered on issue comments.
+on:
+  issue_comment:
+    types: created
+
+jobs:
+  applyNeedsAttentionLabel:
+    uses: realm/ci-actions/.github/workflows/issue-needs-attention.yml@main
