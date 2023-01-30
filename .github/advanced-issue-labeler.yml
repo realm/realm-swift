@@ -1,0 +1,76 @@
+# NOTE: This is a common file that is overwritten by realm/ci-actions sync service
+# and should only be modified in that repository.
+
+# syntax - https://github.com/redhat-plumbers-in-action/advanced-issue-labeler#policy
+# Below keys map from the option used in issue form dropdowns to issue labels
+# Limitation:
+# Currently it's not possible to use strings containing ,␣ in the dropdown menus in the issue forms.
+
+---
+
+policy:
+  - template: [bug.yml, feature.yml]
+    section:
+      - id: [frequency]
+        label:
+          - name: 'Frequency:Once'
+            keys: ['Once']
+          - name: 'Frequency:Sometimes'
+            keys: ['Sometimes']
+          - name: 'Frequency:Always'
+            keys: ['Always']
+
+      - id: [repro]
+        label:
+          - name: 'Repro:Always'
+            keys: ['Always']
+          - name: 'Repro:Sometimes'
+            keys: ['Sometimes']
+          - name: 'Repro:No'
+            keys: ['No']
+
+      - id: [sync, flavour, services]
+        block-list: []
+        label:
+          - name: 'SDK-Use:Local'
+            keys: ['Local Database only']
+          - name: 'SDK-Use:Sync'
+            keys: ['Atlas Device Sync']
+          - name: 'SDK-Use:Services'
+            keys: ['Atlas App Services: Function or GraphQL or DataAPI etc']
+          - name: ['SDK-Use:All']
+            keys: ['Both Atlas Device Sync and Atlas App Services']
+
+      - id: [encryption]
+        block-list: []
+        label:
+          - name: 'Encryption:On'
+            keys: ['Yes']
+          - name: 'Encryption:Off'
+            keys: ['No']
+
+      - id: [app-type]
+        block-list: []
+        label:
+          - name: 'App-type:Unity'
+            keys: ['Unity']
+          - name: 'App-type:Xamarin'
+            keys: ['Xamarin']
+          - name: 'App-type:WPF'
+            keys: ['WPF']
+          - name: 'App-type:Console'
+            keys: ['Console or Server']
+          - name: 'App-type:Other'
+            keys: ['Other']
+
+      - id: [importance]
+        block-list: []
+        label:
+          - name: 'Importance:Dealbraker'
+            keys: ['Dealbreaker']
+          - name: 'Importance:Major'
+            keys: ['Would be a major improvement']
+          - name: 'Importance:Workaround'
+            keys: ['I would like to have it but have a workaround']
+          - name: 'Importance:Nice'
+            keys: ['Fairly niche but nice to have anyway']

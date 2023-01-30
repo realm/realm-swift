@@ -1,0 +1,21 @@
+# NOTE: This is a common file that is overwritten by realm/ci-actions sync service
+# and should only be modified in that repository.
+
+name: "Check Changelog"
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review, labeled, unlabeled]
+
+jobs:
+  changelog:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@8230315d06ad95c617244d2f265d237a1682d445
+        with:
+          submodules: false
+      - name: Enforce Changelog
+        uses: dangoslen/changelog-enforcer@c0b9fd225180a405c5f21f7a74b99e2eccc3e951
+        with:
+          skipLabels: no-changelog
+          missingUpdateErrorMessage: Please add an entry in CHANGELOG.md or apply the 'no-changelog' label to skip this check.
