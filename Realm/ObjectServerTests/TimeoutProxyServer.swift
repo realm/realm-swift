@@ -64,7 +64,8 @@ public class TimeoutProxyServer: NSObject, @unchecked Sendable {
 
     @objc public func start() throws {
         listener = try NWListener(using: NWParameters.tcp, on: port)
-        listener.newConnectionHandler = { incomingConnection in
+        listener.newConnectionHandler = { [weak self] incomingConnection in
+            guard let self = self else { return }
             self.connections.append(incomingConnection)
             incomingConnection.start(queue: self.queue)
 

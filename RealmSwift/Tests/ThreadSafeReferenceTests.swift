@@ -81,8 +81,11 @@ class ThreadSafeReferenceTests: TestCase {
         let ref1 = ThreadSafeReference(to: intObject)
         let ref2 = ThreadSafeReference(to: intObject)
         XCTAssertEqual(0, intObject.intCol)
-        try! realm.write {
-            realm.delete(intObject)
+        dispatchSyncNewThread {
+            let realm = try! Realm()
+            try! realm.write {
+                realm.deleteAll()
+            }
         }
         dispatchSyncNewThread {
             let realm = try! Realm()

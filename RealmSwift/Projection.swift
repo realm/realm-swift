@@ -199,7 +199,6 @@ open class Projection<Root: ObjectBase & RealmCollectionValue>: RealmCollectionV
     public static func _rlmDefaultValue() -> Self {
         fatalError()
     }
-
 }
 
 extension ProjectionObservable {

@@ -622,12 +622,14 @@ static RLMNotificationToken *RLMAddNotificationBlock(RLMManagedDictionary *colle
     auto token = [[RLMCancellationToken alloc] init];
 
     RLMClassInfo *info = collection.objectInfo;
-    realm::KeyPathArray keyPathArray = RLMKeyPathArrayFromStringArray(realm, info, keyPaths);
+    auto keyPathArray = RLMKeyPathArrayFromStringArray(realm, info, keyPaths);
 
     if (!queue) {
         [realm verifyNotificationsAreSupported:true];
         token->_realm = realm;
-        token->_token = RLMGetBackingCollection(collection).add_key_based_notification_callback(DictionaryCallbackWrapper{block, collection}, std::move(keyPathArray));
+        token->_token = RLMGetBackingCollection(collection)
+            .add_key_based_notification_callback(DictionaryCallbackWrapper{block, collection},
+                                                 std::move(keyPathArray));
         return token;
     }
 
@@ -646,7 +648,9 @@ static RLMNotificationToken *RLMAddNotificationBlock(RLMManagedDictionary *colle
             return;
         }
         RLMManagedDictionary *collection = [realm resolveThreadSafeReference:tsr];
-        token->_token = RLMGetBackingCollection(collection).add_key_based_notification_callback(DictionaryCallbackWrapper{block, collection}, std::move(keyPathArray));
+        token->_token = RLMGetBackingCollection(collection)
+            .add_key_based_notification_callback(DictionaryCallbackWrapper{block, collection},
+                                                 std::move(keyPathArray));
     });
     return token;
 }

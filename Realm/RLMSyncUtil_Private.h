@@ -18,11 +18,7 @@
 
 #import <Realm/RLMSyncUtil.h>
 
-#import <Realm/RLMProperty.h>
-#import <Realm/RLMRealmConfiguration.h>
-#import <Realm/RLMCredentials.h>
-
-@class RLMUser;
+#import <Realm/RLMSyncSession.h>
 
 typedef void(^RLMSyncCompletionBlock)(NSError * _Nullable, NSDictionary * _Nullable);
 typedef void(^RLMSyncBasicErrorReportingBlock)(NSError * _Nullable);
@@ -37,5 +33,9 @@ extern NSString *const kRLMSyncUnderlyingErrorKey;
 #define RLM_SYNC_UNINITIALIZABLE \
 - (instancetype)init __attribute__((unavailable("This type cannot be created directly"))); \
 + (instancetype)new __attribute__((unavailable("This type cannot be created directly")));
+
+@interface RLMSyncSession ()
++ (dispatch_queue_t)notificationsQueue;
+@end
 
 RLM_HEADER_AUDIT_END(nullability)

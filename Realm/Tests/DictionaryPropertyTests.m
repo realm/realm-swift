@@ -820,8 +820,8 @@
     XCTAssertEqual([company.employeeDict objectsWhere:@"name = 'JoJo'"].count, 0U);
     
     RLMResults *results = [company.employeeDict objectsWhere:@"age > 30"];
-    XCTAssertEqual(0U, [results indexOfObjectWhere:@"name = 'Joe'"]);
-    XCTAssertEqual(1U, [results indexOfObjectWhere:@"name = 'Bill'"]);
+    XCTAssertEqual(1U, [results indexOfObjectWhere:@"name = 'Joe'"]);
+    XCTAssertEqual(0U, [results indexOfObjectWhere:@"name = 'Bill'"]);
     XCTAssertEqual((NSUInteger)NSNotFound, [results indexOfObjectWhere:@"name = 'John'"]);
     XCTAssertEqual((NSUInteger)NSNotFound, [results indexOfObjectWhere:@"name = 'Jill'"]);
 }
@@ -962,9 +962,9 @@
     RLMResults *notActuallySorted = [dict sortedResultsUsingDescriptors:@[]];
     XCTAssertEqual(notActuallySorted.count, dict.count);
     XCTAssertTrue([dict[@"a1"] isEqualToObject:notActuallySorted[0]]);
-    XCTAssertTrue([dict[@"b2"] isEqualToObject:notActuallySorted[1]]);
+    XCTAssertTrue([dict[@"a2"] isEqualToObject:notActuallySorted[1]]);
     XCTAssertTrue([dict[@"b1"] isEqualToObject:notActuallySorted[2]]);
-    XCTAssertTrue([dict[@"a2"] isEqualToObject:notActuallySorted[3]]);
+    XCTAssertTrue([dict[@"b2"] isEqualToObject:notActuallySorted[3]]);
 }
 
 - (void)testSortByMultipleColumns {

@@ -380,12 +380,9 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let e = expectSyncError {
             user.simulateClientResetError(forSession: #function)
         }
-        guard let error = e else { return }
+        let error = try XCTUnwrap(e)
         XCTAssertEqual(error.code, .clientResetError)
-        XCTAssertNotNil(error.clientResetInfo())
-        guard let resetInfo = error.clientResetInfo() else {
-            return
-        }
+        let resetInfo = try XCTUnwrap(error.clientResetInfo())
         XCTAssertTrue(resetInfo.0.contains("mongodb-realm/\(self.appId)/recovered-realms/recovered_realm"))
         XCTAssertNotNil(realm)
     }
@@ -400,7 +397,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 realm.invalidate()
             }
         }
-        guard let error = e else { return }
+        let error = try XCTUnwrap(e)
         let (path, errorToken) = error.clientResetInfo()!
         XCTAssertFalse(FileManager.default.fileExists(atPath: path))
         SyncSession.immediatelyHandleError(errorToken, syncManager: self.app.syncManager)
@@ -618,6 +615,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             try autoreleasepool {
                 let realm = try Realm(configuration: configuration)
                 waitForExpectations(timeout: 15.0)
+                realm.refresh()
                 // The locally created object should still be present as we didn't
                 // actually handle the client reset
                 XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1)
@@ -658,6 +656,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             try autoreleasepool {
                 let realm = try Realm(configuration: configuration)
                 waitForExpectations(timeout: 15.0)
+                realm.refresh()
                 // The locally created object should still be present as we didn't
                 // actually handle the client reset
                 XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1)
@@ -801,7 +800,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                                                clientResetMode: .discardLocal(beforeReset: assertBeforeBlock, afterReset: assertAfterBlock))
         configuration.objectTypes = [SwiftPerson.self]
 
-        guard let syncConfig = configuration.syncConfiguration else { fatalError("Test condition failure. SyncConfiguration not set.") }
+        let syncConfig = try XCTUnwrap(configuration.syncConfiguration)
         switch syncConfig.clientResetMode {
         case .discardUnsyncedChanges(let before, let after):
             XCTAssertNotNil(before)
@@ -812,7 +811,10 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         try autoreleasepool {
             let realm = try Realm(configuration: configuration)
+            let results = realm.objects(SwiftPerson.self)
+            XCTAssertEqual(results.count, 1)
             waitForExpectations(timeout: 15.0)
+            realm.refresh() // expectation is potentially fulfilled before autorefresh
             // The Person created locally ("John") should have been discarded,
             // while the one from the server ("Paul") should be present
             XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1)
@@ -841,6 +843,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         try autoreleasepool {
             let realm = try Realm(configuration: configuration)
             waitForExpectations(timeout: 15.0)
+            realm.refresh()
             // The Person created locally ("John") should have been discarded,
             // while the one from the server ("Paul") should be present
             XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1)
@@ -874,7 +877,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         var configuration = user.configuration(partitionValue: #function, clientResetMode: .recoverUnsyncedChanges(beforeReset: assertBeforeBlock, afterReset: assertAfterBlock))
         configuration.objectTypes = [SwiftPerson.self]
 
-        guard let syncConfig = configuration.syncConfiguration else { fatalError("Test condition failure. SyncConfiguration not set.") }
+        let syncConfig = try XCTUnwrap(configuration.syncConfiguration)
         switch syncConfig.clientResetMode {
         case .recoverUnsyncedChanges(let before, let after):
             XCTAssertNotNil(before)
@@ -907,7 +910,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         var configuration = user.configuration(partitionValue: #function, clientResetMode: .recoverOrDiscardUnsyncedChanges(beforeReset: assertBeforeBlock, afterReset: assertAfterBlock))
         configuration.objectTypes = [SwiftPerson.self]
 
-        guard let syncConfig = configuration.syncConfiguration else { fatalError("Test condition failure. SyncConfiguration not set.") }
+        let syncConfig = try XCTUnwrap(configuration.syncConfiguration)
         switch syncConfig.clientResetMode {
         case .recoverOrDiscardUnsyncedChanges(let before, let after):
             XCTAssertNotNil(before)
@@ -920,6 +923,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         try autoreleasepool {
             let realm = try Realm(configuration: configuration)
             waitForExpectations(timeout: 15.0)
+            realm.refresh()
             XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1)
             // The Person created locally ("John") should have been discarded,
             // while the one from the server ("Paul") should be present.
@@ -935,9 +939,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let (assertBeforeBlock, assertAfterBlock) = assertDiscardLocal()
         var config = user.flexibleSyncConfiguration(clientResetMode: .discardLocal(beforeReset: assertBeforeBlock, afterReset: assertAfterBlock))
         config.objectTypes = [SwiftPerson.self]
-        guard let syncConfig = config.syncConfiguration else {
-            fatalError("Test condition failure. SyncConfiguration not set.")
-        }
+        let syncConfig = try XCTUnwrap(config.syncConfiguration)
         switch syncConfig.clientResetMode {
         case .discardUnsyncedChanges(let before, let after):
             XCTAssertNotNil(before)
@@ -954,6 +956,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             XCTAssertEqual(subscriptions.first?.name, "all_people")
 
             waitForExpectations(timeout: 15.0)
+            realm.refresh()
             XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1)
             XCTAssertEqual(realm.objects(SwiftPerson.self).first?.firstName, "Paul")
         }
@@ -966,9 +969,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let (assertBeforeBlock, assertAfterBlock) = assertDiscardLocal()
         var config = user.flexibleSyncConfiguration(clientResetMode: .discardUnsyncedChanges(beforeReset: assertBeforeBlock, afterReset: assertAfterBlock))
         config.objectTypes = [SwiftPerson.self]
-        guard let syncConfig = config.syncConfiguration else {
-            fatalError("Test condition failure. SyncConfiguration not set.")
-        }
+        let syncConfig = try XCTUnwrap(config.syncConfiguration)
         switch syncConfig.clientResetMode {
         case .discardUnsyncedChanges(let before, let after):
             XCTAssertNotNil(before)
@@ -985,6 +986,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             XCTAssertEqual(subscriptions.first?.name, "all_people")
 
             waitForExpectations(timeout: 15.0)
+            realm.refresh()
             XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1)
             XCTAssertEqual(realm.objects(SwiftPerson.self).first?.firstName, "Paul")
         }
@@ -997,9 +999,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let (assertBeforeBlock, assertAfterBlock) = assertRecover()
         var config = user.flexibleSyncConfiguration(clientResetMode: .recoverUnsyncedChanges(beforeReset: assertBeforeBlock, afterReset: assertAfterBlock))
         config.objectTypes = [SwiftPerson.self]
-        guard let syncConfig = config.syncConfiguration else {
-            fatalError("Test condition failure. SyncConfiguration not set.")
-        }
+        let syncConfig = try XCTUnwrap(config.syncConfiguration)
         switch syncConfig.clientResetMode {
         case .recoverUnsyncedChanges(let before, let after):
             XCTAssertNotNil(before)
@@ -1016,6 +1016,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             XCTAssertEqual(subscriptions.first?.name, "all_people")
 
             waitForExpectations(timeout: 15.0) // wait for expectations in assertRecover
+            realm.refresh()
             XCTAssertEqual(realm.objects(SwiftPerson.self).count, 2)
             // The object created locally (John) and the object created on the server (Paul)
             // should both be integrated into the new realm file.
@@ -1033,9 +1034,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             subscriptions.append(QuerySubscription<SwiftPerson>(name: "all_people"))
         })
         config.objectTypes = [SwiftPerson.self]
-        guard let syncConfig = config.syncConfiguration else {
-            fatalError("Test condition failure. SyncConfiguration not set.")
-        }
+        let syncConfig = try XCTUnwrap(config.syncConfiguration)
         switch syncConfig.clientResetMode {
         case .recoverUnsyncedChanges(let before, let after):
             XCTAssertNotNil(before)
@@ -1052,6 +1051,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             XCTAssertEqual(subscriptions.first?.name, "all_people")
 
             waitForExpectations(timeout: 15.0)
+            realm.refresh()
             XCTAssertEqual(realm.objects(SwiftPerson.self).count, 2)
             // The object created locally (John) and the object created on the server (Paul)
             // should both be integrated into the new realm file.
@@ -1069,9 +1069,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             subscriptions.append(QuerySubscription<SwiftPerson>(name: "all_people"))
         })
         config.objectTypes = [SwiftPerson.self]
-        guard let syncConfig = config.syncConfiguration else {
-            fatalError("Test condition failure. SyncConfiguration not set.")
-        }
+        let syncConfig = try XCTUnwrap(config.syncConfiguration)
         switch syncConfig.clientResetMode {
         case .discardUnsyncedChanges(let before, let after):
             XCTAssertNotNil(before)
@@ -1088,6 +1086,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             XCTAssertEqual(subscriptions.first?.name, "all_people")
 
             waitForExpectations(timeout: 15.0)
+            realm.refresh()
             XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1)
             // The Person created locally ("John") should have been discarded,
             // while the one from the server ("Paul") should be present
@@ -1128,6 +1127,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             XCTAssertEqual(subscriptions.first?.name, "all_people")
 
             waitForExpectations(timeout: 15.0)
+            realm.refresh()
             XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1)
             // The Person created locally ("John") should have been discarded,
             // while the one from the server ("Paul") should be present.
@@ -1206,28 +1206,21 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             return
         }
 
-        var callCount = 0
-        var transferred = 0
-        var transferrable = 0
         let realm = try immediatelyOpenRealm(partitionValue: #function, user: user)
-
-        guard let session = realm.syncSession else {
-            XCTFail("Session must not be nil")
-            return
-
-        }
+        let session = try XCTUnwrap(realm.syncSession)
         let ex = expectation(description: "streaming-downloads-expectation")
-        var hasBeenFulfilled = false
-
+        @Locked var progress: SyncSession.Progress?
         let token = session.addProgressNotification(for: .download, mode: .reportIndefinitely) { p in
-            callCount += 1
-            XCTAssertGreaterThanOrEqual(p.transferredBytes, transferred)
-            XCTAssertGreaterThanOrEqual(p.transferrableBytes, transferrable)
-            transferred = p.transferredBytes
-            transferrable = p.transferrableBytes
-            if p.transferredBytes > 0 && p.isTransferComplete && !hasBeenFulfilled {
+            if let progress = $progress.wrappedValue {
+                XCTAssertGreaterThanOrEqual(p.transferredBytes, progress.transferredBytes)
+                XCTAssertGreaterThanOrEqual(p.transferrableBytes, progress.transferrableBytes)
+                if p.transferredBytes == progress.transferredBytes && p.transferrableBytes == progress.transferrableBytes {
+                    return
+                }
+            }
+            $progress.wrappedValue = p
+            if p.transferredBytes > 1000000 && p.isTransferComplete {
                 ex.fulfill()
-                hasBeenFulfilled = true
             }
         }
         XCTAssertNotNil(token)
@@ -1237,29 +1230,35 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         waitForExpectations(timeout: 60.0, handler: nil)
         token!.invalidate()
-        XCTAssert(callCount > 1)
-        XCTAssert(transferred >= transferrable)
+        let p = try XCTUnwrap(progress)
+        XCTAssertEqual(p.transferredBytes, p.transferrableBytes)
     }
 
     func testStreamingUploadNotifier() throws {
-        var transferred = 0
-        var transferrable = 0
         let user = try logInUser(for: basicCredentials())
-        let config = user.configuration(testName: #function)
-        let realm = try openRealm(configuration: config)
-        let session = realm.syncSession
-        XCTAssertNotNil(session)
-        var ex = expectation(description: "initial upload")
-        let token = session!.addProgressNotification(for: .upload, mode: .reportIndefinitely) { p in
-            XCTAssert(p.transferredBytes >= transferred)
-            XCTAssert(p.transferrableBytes >= transferrable)
-            transferred = p.transferredBytes
-            transferrable = p.transferrableBytes
+
+        let realm = try immediatelyOpenRealm(partitionValue: #function, user: user)
+        let session = try XCTUnwrap(realm.syncSession)
+
+        @Locked var ex = expectation(description: "initial upload")
+        @Locked var progress: SyncSession.Progress?
+        let token = session.addProgressNotification(for: .download, mode: .reportIndefinitely) { p in
+            if let progress = $progress.wrappedValue {
+                XCTAssertGreaterThanOrEqual(p.transferredBytes, progress.transferredBytes)
+                XCTAssertGreaterThanOrEqual(p.transferrableBytes, progress.transferrableBytes)
+                if p.transferredBytes == progress.transferredBytes && p.transferrableBytes == progress.transferrableBytes {
+                    return
+                }
+            }
+            $progress.wrappedValue = p
             if p.transferredBytes > 0 && p.isTransferComplete {
-                ex.fulfill()
+                $ex.wrappedValue.fulfill()
             }
         }
+        XCTAssertNotNil(token)
         waitForExpectations(timeout: 10.0, handler: nil)
+
+        progress = nil
         ex = expectation(description: "write transaction upload")
         try realm.write {
             for _ in 0..<SwiftSyncTestCase.bigObjectCount {
@@ -1268,7 +1267,9 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
         waitForExpectations(timeout: 10.0, handler: nil)
         token!.invalidate()
-        XCTAssert(transferred >= transferrable)
+
+        let p = try XCTUnwrap(progress)
+        XCTAssertEqual(p.transferredBytes, p.transferrableBytes)
     }
 
     func testStreamingNotifierInvalidate() throws {
@@ -1286,18 +1287,14 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
 
         let realm = try immediatelyOpenRealm(partitionValue: #function, user: user)
-        guard let session = realm.syncSession else {
-            XCTFail("Session must not be nil")
-            return
-
-        }
-        var downloadCount = 0
-        var uploadCount = 0
+        let session = try XCTUnwrap(realm.syncSession)
+        @Locked var downloadCount = 0
+        @Locked var uploadCount = 0
         let tokenDownload = session.addProgressNotification(for: .download, mode: .reportIndefinitely) { _ in
-            downloadCount += 1
+            $downloadCount.wrappedValue += 1
         }
         let tokenUpload = session.addProgressNotification(for: .upload, mode: .reportIndefinitely) { _ in
-            uploadCount += 1
+            $uploadCount.wrappedValue += 1
         }
 
         executeChild()
@@ -1307,11 +1304,12 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
         waitForUploads(for: realm)
 
-        XCTAssert(downloadCount > 1)
-        XCTAssert(uploadCount > 1)
+        XCTAssertGreaterThan(downloadCount, 1)
+        XCTAssertGreaterThan(uploadCount, 1)
 
         tokenDownload!.invalidate()
         tokenUpload!.invalidate()
+        RLMSyncSession.notificationsQueue().sync { }
 
         downloadCount = 0
         uploadCount = 0

@@ -824,9 +824,10 @@ public extension SyncSession {
 
      - see: `ProgressDirection`, `Progress`, `ProgressNotificationToken`
      */
+    @preconcurrency
     func addProgressNotification(for direction: ProgressDirection,
                                  mode: ProgressMode,
-                                 block: @escaping (Progress) -> Void) -> ProgressNotificationToken? {
+                                 block: @Sendable @escaping (Progress) -> Void) -> ProgressNotificationToken? {
         return __addProgressNotification(for: (direction == .upload ? .upload : .download),
                                          mode: (mode == .reportIndefinitely
                                             ? .reportIndefinitely

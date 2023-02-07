@@ -1,23 +1,72 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.35.0 Release notes (2023-02-07)
 =============================================================
+
+This version bumps the Realm file format version to 23. Realm files written by
+this version cannot be read by older versions of Realm.
+
 ### Enhancements
-* None.
+
+* The Realm file is now automatically shrunk if the file size is larger than
+  needed to store all of the data. ([Core PR #5755](https://github.com/realm/realm-core/pull/5755))
+* Pinning old versions (either with frozen Realms or with Realms on background
+  threads that simply don't get refreshed) now only prevents overwriting the
+  data needed by that version, rather than the data needed by that version and
+  all later versions. In addition, frozen Realms no longer pin the transaction
+  logs used to drive change notifications. This mostly eliminates the file size
+  growth caused by pinning versions. ([Core PR #5440](https://github.com/realm/realm-core/pull/5440))
+* Rework how Dictionaries/Maps are stored in the Realm file. The new design uses
+  less space and is typically significantly faster. This changes the iteration
+  order of Maps, so any code relying on that may be broken. We continue
+  to make no guarantees about iteration order on Maps ([Core #5764](https://github.com/realm/realm-core/issues/5764)).
+* Improve performance of freezing Realms ([Core PR #6211](https://github.com/realm/realm-core/pull/6211)).
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
-* None.
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+* Fix a crash when using client reset with recovery and flexible sync with a
+  single subscription ([Core #6070](https://github.com/realm/realm-core/issues/6070), since v10.28.2)
+* Encrypted Realm files could not be opened on devices with a larger page size
+  than the one which originally wrote the file.
+  ([#8030](https://github.com/realm/realm-swift/issues/8030), since v10.32.1)
+* Creating multiple flexible sync subscriptions at once could hit an assertion
+  failure if the server reported an error for any of them other than the last
+  one ([Core #6038](https://github.com/realm/realm-core/issues/6038), since v10.21.1).
+* `Set<AnyRealmValue>` and `List<AnyRealmValue>` considered a string and binary
+  data containing that string encoded as UTF-8 to be equivalent. This could
+  result in a List entry not changing type on assignment and for the client be
+  inconsistent with the server if a string and some binary data with equivalent
+  content was inserted from Atlas.
+  ([Core #4860](https://github.com/realm/realm-core/issues/4860) and
+  [Core #6201](https://github.com/realm/realm-core/issues/6201), since v10.8.0)
+* Querying for NaN on Decimal128 properties did not match any objects
+  ([Core #6182](https://github.com/realm/realm-core/issues/6182), since v10.8.0).
+* When client reset with recovery is used and the recovery did not need to
+  make any changes to the local Realm, the sync client could incorrectly think
+  the recovery failed and report the error "A fatal error occured during client
+  reset: 'A previous 'Recovery' mode reset from <timestamp> did not succeed,
+  giving up on 'Recovery' mode to prevent a cycle'".
+  ([Core #6195](https://github.com/realm/realm-core/issues/6195), since v10.32.0)
+* Fix a crash when using client reset with recovery and flexible sync with a
+  single subscription ([Core #6070](https://github.com/realm/realm-core/issues/6070), since v10.28.2)
+* Writing to newly in-view objects while a flexible sync bootstrap was in
+  progress would not synchronize those changes to the server
+  ([Core #5804](https://github.com/realm/realm-core/issues/5804), since v10.21.1).
+* If a client reset with recovery or discard local was interrupted while the
+  "fresh" realm was being downloaded, the sync client could crash with a
+  MultpleSyncAgents exception ([Core #6217](https://github.com/realm/realm-core/issues/6217), since v10.25.0).
+* Sharing Realm files between a Catalyst app and Realm Studio did not properly
+  synchronize access to the Realm file ([Core #6258](https://github.com/realm/realm-core/pull/6258), since v10.0.0).
 
 ### Compatibility
-* Realm Studio: 11.0.0 - 12.0.0.
+
+* Realm Studio: 13.0.2 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 14.2.
 * CocoaPods: 1.10 or later.
 * Xcode: 13.3-14.2.
 
 ### Internal
-* Upgraded realm-core from ? to ?
+
+* Upgraded realm-core from 12.13.0 to 13.4.0
 
 10.34.1 Release notes (2023-01-20)
 =============================================================
@@ -951,7 +1000,7 @@ allows submitting to the app store with Xcode 12.
 * Changeset upload batching did not calculate the accumulated size correctly,
   resulting in “error reading body failed to read: read limited at 16777217
   bytes” errors from the server when writing large amounts of data
-  ([Core #5373](https://github.com/realm/realm-core/pull/5373), since 11.13.0).
+  ([Core #5373](https://github.com/realm/realm-core/pull/5373), since 10.25.0).
 
 ### Compatibility
 
@@ -1580,15 +1629,12 @@ Xcode 12.4 is now the minimum supported version of Xcode.
 
 10.17.0 Release notes (2021-10-06)
 =============================================================
+
 ### Enhancements
 
 * Add a new `@ThreadSafe` property wrapper. Objects and collections wrapped by `@ThreadSafe` may be passed between threads. It's
   intended to allow local variables and function parameters to be used across
   threads when needed.
-
-### Fixed
-
-* None.
 
 ### Compatibility
 

@@ -90,7 +90,9 @@ void RLMWaitForRealmToClose(NSString *path) {
     NSString *lockfilePath = [path stringByAppendingString:@".lock"];
     File lockfile(lockfilePath.UTF8String, File::mode_Update);
     lockfile.set_fifo_path([path stringByAppendingString:@".management"].UTF8String, "lock.fifo");
-    lockfile.lock_exclusive();
+    while (!lockfile.try_rw_lock_exclusive()) {
+        sched_yield();
+    }
 }
 
 BOOL RLMIsRealmCachedAtPath(NSString *path) {

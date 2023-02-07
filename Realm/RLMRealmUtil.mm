@@ -99,6 +99,16 @@ class RLMNotificationHelper : public realm::BindingContext {
 public:
     RLMNotificationHelper(RLMRealm *realm) : _realm(realm) { }
 
+    void before_notify() override {
+        @autoreleasepool {
+            auto blocks = std::move(_beforeNotify);
+            _beforeNotify.clear();
+            for (auto block : blocks) {
+                block();
+            }
+        }
+    }
+
     void changes_available() override {
         @autoreleasepool {
             auto realm = _realm;
@@ -145,13 +155,38 @@ public:
         }
     }
 
+    void add_before_notify_block(dispatch_block_t block) {
+        _beforeNotify.push_back(block);
+    }
+
 private:
     // This is owned by the realm, so it needs to not retain the realm
     __weak RLMRealm *const _realm;
+    std::vector<dispatch_block_t> _beforeNotify;
 };
 } // anonymous namespace
-
 
 std::unique_ptr<realm::BindingContext> RLMCreateBindingContext(__unsafe_unretained RLMRealm *const realm) {
     return std::unique_ptr<realm::BindingContext>(new RLMNotificationHelper(realm));
 }
+
+void RLMAddBeforeNotifyBlock(RLMRealm *realm, dispatch_block_t block) {
+    static_cast<RLMNotificationHelper *>(realm->_realm->m_binding_context.get())->add_before_notify_block(block);
+}
+
+@implementation RLMPinnedRealm {
+    realm::TransactionRef _pin;
+}
+
+- (instancetype)initWithRealm:(RLMRealm *)realm {
+    if (self = [super init]) {
+        _pin = realm->_realm->duplicate();
+        _configuration = realm.configuration;
+    }
+    return self;
+}
+
+- (void)unpin {
+    _pin.reset();
+}
+@end

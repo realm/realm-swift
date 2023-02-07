@@ -587,12 +587,16 @@ static KeyPath keyPathFromString(RLMRealm *realm,
     return keyPairs;
 }
 
-KeyPathArray RLMKeyPathArrayFromStringArray(RLMRealm *realm,
-                                            RLMClassInfo *info,
-                                            NSArray<NSString *> *keyPaths) {
-    KeyPathArray keyPathArray;
-    for (NSString *keyPath in keyPaths) {
-        keyPathArray.push_back(keyPathFromString(realm , realm.schema, info, info->rlmObjectSchema, keyPath));
+std::optional<KeyPathArray> RLMKeyPathArrayFromStringArray(RLMRealm *realm,
+                                                           RLMClassInfo *info,
+                                                           NSArray<NSString *> *keyPaths) {
+    std::optional<KeyPathArray> keyPathArray;
+    if (keyPaths.count) {
+        keyPathArray.emplace();
+        for (NSString *keyPath in keyPaths) {
+            keyPathArray->push_back(keyPathFromString(realm , realm.schema, info,
+                                                      info->rlmObjectSchema, keyPath));
+        }
     }
     return keyPathArray;
 }

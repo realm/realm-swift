@@ -60,15 +60,15 @@ class BasePrimitiveSectionedResultsTests<TestData: SectionedResultsTestData>: RL
         autoreleasepool { super.invokeTest() }
     }
 
-    private func assert<T: RealmCollection>(_ collection: T, asending: Bool = true) where T.Element == TestData.Element {
-        let sectionedResults = collection.sectioned(by: TestData.sectionBlock, ascending: asending)
+    private func assert<T: RealmCollection>(_ collection: T, ascending: Bool = true) where T.Element == TestData.Element {
+        let sectionedResults = collection.sectioned(by: TestData.sectionBlock, ascending: ascending)
         var sectionCount = 0
         var elementCount = 0
-        let keys = TestData.orderedKeys(ascending: asending)
+        let keys = TestData.orderedKeys(ascending: ascending)
         for section in sectionedResults {
             XCTAssertEqual(section.key, keys[sectionCount])
             sectionCount += 1
-            let expValues = asending ? TestData.expectedSectionedValues[section.key] : TestData.expectedSectionedValues[section.key]!.reversed()
+            let expValues = ascending ? TestData.expectedSectionedValues[section.key] : TestData.expectedSectionedValues[section.key]!.reversed()
             for (i, value) in expValues!.enumerated() {
                 XCTAssertEqual(section[i], value)
                 elementCount += 1
@@ -82,27 +82,27 @@ class BasePrimitiveSectionedResultsTests<TestData: SectionedResultsTestData>: RL
         if !TestData.skipResultsTests {
             let results = TestData.results(obj!)
             assert(results)
-            assert(results, asending: false)
+            assert(results, ascending: false)
         }
     }
 
     func testCreationFromList() {
         let list = TestData.list(obj!)
         assert(list)
-        assert(list, asending: false)
+        assert(list, ascending: false)
     }
 
     func testCreationFromMutableSet() {
         let set = TestData.mutableSet(obj!)
         assert(set)
-        assert(set, asending: false)
+        assert(set, ascending: false)
     }
 
     func testCreationFromAnyRealmCollection() {
         if !TestData.skipResultsTests {
             let collection = TestData.anyRealmCollection(obj!)
             assert(collection)
-            assert(collection, asending: false)
+            assert(collection, ascending: false)
         }
     }
 
