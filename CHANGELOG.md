@@ -1,10 +1,11 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.35.0 Release notes (2023-02-07)
 =============================================================
 
 This version bumps the Realm file format version to 23. Realm files written by
 this version cannot be read by older versions of Realm.
 
 ### Enhancements
+
 * The Realm file is now automatically shrunk if the file size is larger than
   needed to store all of the data. ([Core PR #5755](https://github.com/realm/realm-core/pull/5755))
 * Pinning old versions (either with frozen Realms or with Realms on background
@@ -20,6 +21,7 @@ this version cannot be read by older versions of Realm.
 * Improve performance of freezing Realms ([Core PR #6211](https://github.com/realm/realm-core/pull/6211)).
 
 ### Fixed
+
 * Fix a crash when using client reset with recovery and flexible sync with a
   single subscription ([Core #6070](https://github.com/realm/realm-core/issues/6070), since v10.28.2)
 * Encrypted Realm files could not be opened on devices with a larger page size
@@ -55,6 +57,7 @@ this version cannot be read by older versions of Realm.
   synchronize access to the Realm file ([Core #6258](https://github.com/realm/realm-core/pull/6258), since v10.0.0).
 
 ### Compatibility
+
 * Realm Studio: 13.0.2 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 14.2.
@@ -62,6 +65,7 @@ this version cannot be read by older versions of Realm.
 * Xcode: 13.3-14.2.
 
 ### Internal
+
 * Upgraded realm-core from 12.13.0 to 13.4.0
 
 10.34.1 Release notes (2023-01-20)
