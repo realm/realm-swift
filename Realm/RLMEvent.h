@@ -32,11 +32,14 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 typedef RLM_CLOSED_ENUM(NSUInteger, RLMSyncLogLevel);
 
 struct RLMEventContext;
-typedef void (^RLMEventCompletion)(NSError *);
+typedef void (^RLMEventCompletion)(NSError *_Nullable);
 
 FOUNDATION_EXTERN struct RLMEventContext *_Nullable RLMEventGetContext(RLMRealm *realm);
-FOUNDATION_EXTERN void RLMEventBeginScope(struct RLMEventContext *context, NSString *activity);
-FOUNDATION_EXTERN void RLMEventEndScope(struct RLMEventContext *context, RLMEventCompletion _Nullable completion);
+FOUNDATION_EXTERN uint64_t RLMEventBeginScope(struct RLMEventContext *context, NSString *activity);
+FOUNDATION_EXTERN void RLMEventCommitScope(struct RLMEventContext *context, uint64_t scope_id,
+                                           RLMEventCompletion _Nullable completion);
+FOUNDATION_EXTERN void RLMEventCancelScope(struct RLMEventContext *context, uint64_t scope_id);
+FOUNDATION_EXTERN bool RLMEventIsActive(struct RLMEventContext *context, uint64_t scope_id);
 FOUNDATION_EXTERN void RLMEventRecordEvent(struct RLMEventContext *context, NSString *activity,
                                            NSString *_Nullable event, NSString *_Nullable data,
                                            RLMEventCompletion _Nullable completion);

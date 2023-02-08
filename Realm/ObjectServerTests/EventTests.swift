@@ -16,6 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+import Combine
 import Foundation
 import RealmSwift
 import XCTest
@@ -95,9 +96,11 @@ class SwiftEventTests: SwiftSyncTestCase {
     }
 
     func scope<T>(_ events: Events, _ name: String, body: () throws -> T) rethrows -> T {
-        events.beginScope(activity: name)
+        let scope = events.beginScope(activity: name)
+        XCTAssertTrue(scope.isActive)
         let result = try body()
-        events.endScope().await(self)
+        scope.commit().await(self)
+        XCTAssertFalse(scope.isActive)
         return result
     }
 
@@ -210,19 +213,19 @@ class SwiftEventTests: SwiftSyncTestCase {
     func testCustomEventRepresentation() throws {
         let realm = try openRealm(configuration: self.config())
         let events = realm.events!
-        events.beginScope(activity: "bad json")
+        let scope1 = events.beginScope(activity: "bad json")
         try realm.write {
             realm.add(SwiftCustomEventRepresentation(value: 0))
         }
-        events.endScope().awaitFailure(self) { error in
+        scope1.commit().awaitFailure(self) { error in
             XCTAssert(error.localizedDescription.contains("json.exception.parse_error"))
         }
 
-        events.beginScope(activity: "exception thrown")
+        let scope2 = events.beginScope(activity: "exception thrown")
         try realm.write {
             realm.add(SwiftCustomEventRepresentation(value: 1))
         }
-        events.endScope().awaitFailure(self) { error in
+        scope2.commit().awaitFailure(self) { error in
             XCTAssertEqual((error as NSError).userInfo["ExceptionName"] as! String?,
                            NSExceptionName.rangeException.rawValue)
         }
@@ -455,8 +458,8 @@ class SwiftEventTests: SwiftSyncTestCase {
             }
         }
         let realm = try Realm(configuration: config)
-        realm.events!.beginScope(activity: "a scope name")
-        realm.events!.endScope().await(self)
+        let scope = realm.events!.beginScope(activity: "a scope name")
+        scope.commit().await(self)
         waitForExpectations(timeout: 2.0)
     }
 
@@ -477,5 +480,44 @@ class SwiftEventTests: SwiftSyncTestCase {
         assertEvent(result, activity: "json data", event: nil, ["foo": "bar"])
         assertEvent(result, activity: "non-json data", event: nil, data: "not valid json")
         assertEvent(result, activity: "event and data", event: "custom json event", ["bar": "foo"])
+    }
+
+    func testScopeLifetimes() throws {
+        let realm = try openRealm(configuration: self.config())
+        let events = realm.events!
+
+        try autoreleasepool { () -> Future<Void, Error> in
+            let scope1 = events.beginScope(activity: "scope 1")
+            let scope2 = events.beginScope(activity: "scope 2")
+            let scope3 = events.beginScope(activity: "scope 3")
+
+            try realm.write {
+                realm.add(SwiftPerson())
+            }
+
+            scope1.cancel()
+            XCTAssertTrue(scope2.isActive) // ensure scope stays alive to here
+            return scope3.commit()
+        }.await(self)
+
+        let result = getEvents(expectedCount: 1)
+        XCTAssertEqual(result[0].activity, "scope 3")
+    }
+
+    func testScopeCanOutliveSourceRealm() throws {
+        var scope: Events.Scope?
+        try autoreleasepool {
+            let realm = try openRealm(configuration: self.config())
+            let events = realm.events!
+            scope = events.beginScope(activity: "scope")
+            try realm.write {
+                realm.add(SwiftPerson())
+            }
+        }
+
+        scope?.commit().await(self)
+
+        let result = getEvents(expectedCount: 1)
+        XCTAssertEqual(result[0].activity, "scope")
     }
 }

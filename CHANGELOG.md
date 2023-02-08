@@ -1,7 +1,10 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+* Add support for multiple overlapping or nested event scopes.
+  `Events.beginScope()` now returns a `Scope` object which is used to commit or
+  cancel that scope, and if more than one scope is active at a time events are
+  reported to all active scopes.
 
 ### Fixed
 * Fix moving `List` items to a higher index in SwiftUI results in wrong destination index
