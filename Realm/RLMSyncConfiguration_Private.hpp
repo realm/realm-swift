@@ -20,15 +20,38 @@
 
 #import <functional>
 #import <memory>
+#import <string>
 
 namespace realm {
+class Realm;
 class SyncSession;
 struct SyncConfig;
 struct SyncError;
 using SyncSessionErrorHandler = void(std::shared_ptr<SyncSession>, SyncError);
+class ThreadSafeReference;
 }
 
 RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
+
+namespace realm {
+
+struct CallbackSchema {
+    bool dynamic;
+    std::string path;
+    RLMSchema *customSchema;
+
+    RLMSchema *getSchema(realm::Realm& realm);
+};
+
+struct BeforeClientResetWrapper : CallbackSchema {
+    RLMClientResetBeforeBlock block;
+    void operator()(std::shared_ptr<realm::Realm> local);
+};
+struct AfterClientResetWrapper : CallbackSchema {
+    RLMClientResetAfterBlock block;
+    void operator()(std::shared_ptr<realm::Realm> local, realm::ThreadSafeReference remote, bool);
+};
+}
 
 @interface RLMSyncConfiguration ()
 

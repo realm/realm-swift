@@ -61,36 +61,31 @@ RLMSyncError errorKindForSyncError(SyncError error) {
         return RLMSyncErrorClientSessionError;
     return RLMSyncErrorClientInternalError;
 }
+} // anonymous namespace
 
-struct CallbackSchema {
-    bool dynamic;
-    std::string path;
-    RLMSchema *customSchema;
+namespace realm {
 
-    RLMSchema *getSchema(Realm& realm) {
-        if (dynamic) {
-            return [RLMSchema dynamicSchemaFromObjectStoreSchema:realm.schema()];
-        }
-        if (auto cached = RLMGetAnyCachedRealmForPath(path)) {
-            return cached.schema;
-        }
-        return customSchema ?: RLMSchema.sharedSchema;
+RLMSchema *CallbackSchema::getSchema(Realm& realm) {
+    if (dynamic) {
+        return [RLMSchema dynamicSchemaFromObjectStoreSchema:realm.schema()];
     }
-};
+    if (auto cached = RLMGetAnyCachedRealmForPath(path)) {
+        return cached.schema;
+    }
+    return customSchema ?: RLMSchema.sharedSchema;
+}
 
-struct BeforeClientResetWrapper : CallbackSchema {
-    RLMClientResetBeforeBlock block;
-    void operator()(std::shared_ptr<Realm> local) {
-        @autoreleasepool {
+void BeforeClientResetWrapper::operator ()(std::shared_ptr<realm::Realm> local) {
+    @autoreleasepool {
+        if (local->schema_version() != RLMNotVersioned) {
             block([RLMRealm realmWithSharedRealm:local schema:getSchema(*local) dynamic:false]);
         }
     }
-};
+}
 
-struct AfterClientResetWrapper : CallbackSchema {
-    RLMClientResetAfterBlock block;
-    void operator()(std::shared_ptr<Realm> local, ThreadSafeReference remote, bool) {
-        @autoreleasepool {
+void AfterClientResetWrapper::operator()(std::shared_ptr<realm::Realm> local, realm::ThreadSafeReference remote, bool) {
+    @autoreleasepool {
+        if (local->schema_version() != RLMNotVersioned) {
             RLMSchema *schema = getSchema(*local);
             RLMRealm *localRealm = [RLMRealm realmWithSharedRealm:local
                                                            schema:schema
@@ -102,7 +97,8 @@ struct AfterClientResetWrapper : CallbackSchema {
             block(localRealm, remoteRealm);
         }
     }
-};
+}
+
 } // anonymous namespace
 
 @interface RLMSyncConfiguration () {
