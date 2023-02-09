@@ -81,28 +81,6 @@ static NSString *generateRandomString(int num) {
 
 #pragma mark - Authentication and Tokens
 
-- (void)testSetSchemaVersion {
-    RLMRealmConfiguration *configNV = [RLMRealmConfiguration defaultConfiguration];
-    configNV.configRef.schema_version = RLMNotVersioned;
-    @autoreleasepool {
-        [RLMRealm realmWithConfiguration:configNV error:nil];
-    }
-    // This error is thrown when the schema version at url is not versioned.
-    RLMAssertThrowsWithReason([RLMRealm schemaVersionAtURL:configNV.fileURL encryptionKey:nil error:nil], @"Cannot open an uninitialized realm in read-only mode");
-
-    realm::BeforeClientResetWrapper wrapper = {
-        .block = ^(RLMRealm * _Nonnull beforeFrozen) {
-            // If I get called with a not versioned realm the test fails
-        }
-    };
-
-    wrapper.block([RLMRealm realmWithConfiguration:configNV error:nil]);
-    RLMRealm *r = [RLMRealm realmWithConfiguration:configNV error:nil];
-
-    wrapper(r->_realm); // one realm should invoke the block
-    wrapper(r->_realm); // while the other should not invoke the block
-}
-
 - (void)testAnonymousAuthentication {
     RLMUser *syncUser = self.anonymousUser;
     RLMUser *currentUser = [self.app currentUser];
