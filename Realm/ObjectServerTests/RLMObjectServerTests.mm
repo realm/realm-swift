@@ -40,6 +40,7 @@
 
 #import <realm/object-store/shared_realm.hpp>
 #import <realm/object-store/sync/sync_manager.hpp>
+#import <realm/object-store/thread_safe_reference.hpp>
 #import <realm/util/file.hpp>
 
 #import <atomic>
@@ -1531,6 +1532,65 @@ static NSString *randomEmail() {
     XCTAssertNotNil(config2.syncConfiguration.afterClientReset);
     #pragma clang diagnostic pop
 
+}
+
+- (void)testBeforeClientResetCallbackNotVersioned {
+    // Setup a realm with a versioned schema
+    RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
+    config.fileURL = RLMTestRealmURL();
+    // Need to open the realm once to get a version.
+    @autoreleasepool {
+        RLMRealm *versioned = [RLMRealm realmWithConfiguration:config error:nil];
+        XCTAssertEqual(0U, versioned->_realm->schema_version());
+    }
+    std::shared_ptr<realm::Realm> versioned = realm::Realm::get_shared_realm(config.config);
+
+    // Create a config that's not versioned.
+    RLMRealmConfiguration *configUnversioned = [RLMRealmConfiguration defaultConfiguration];
+    configUnversioned.configRef.schema_version = RLMNotVersioned; // Not strictly necessary. Already has no version because the realm's never been opened.
+    std::shared_ptr<realm::Realm> unversioned = realm::Realm::get_shared_realm(configUnversioned.config);
+
+    XCTestExpectation *beforeExpectation = [self expectationWithDescription:@"block called once"];
+    beforeExpectation.assertForOverFulfill = true; // asserts that fulfill isn't called more than once.
+
+    realm::BeforeClientResetWrapper beforeWrapper = {
+        .block = ^(RLMRealm * _Nonnull beforeFrozen) {
+            XCTAssertNotEqual(RLMNotVersioned, beforeFrozen->_realm->schema_version());
+            [beforeExpectation fulfill];
+        }
+    };
+
+    XCTAssertNotEqual(versioned->schema_version(), RLMNotVersioned);
+    XCTAssertEqual(unversioned->schema_version(), RLMNotVersioned);
+    beforeWrapper(versioned); // one realm should invoke the block
+    beforeWrapper(unversioned); // while the other should not invoke the block
+
+    [self waitForExpectationsWithTimeout:5 handler:nil];
+}
+
+- (void)testAfterClientResetCallbackNotVersioned {
+    // Create a config that's not versioned.
+    RLMRealmConfiguration *configUnversioned = [RLMRealmConfiguration defaultConfiguration];
+    configUnversioned.configRef.schema_version = RLMNotVersioned; // Not strictly necessary. Already has no version because the realm's never been opened.
+    std::shared_ptr<realm::Realm> unversioned = realm::Realm::get_shared_realm(configUnversioned.config);
+
+    XCTestExpectation *afterExpectation = [self expectationWithDescription:@"block called once"];
+    afterExpectation.inverted = true;
+
+    #pragma clang diagnostic push
+    #pragma clang diagnostic ignored "-Wunused-parameter"
+    realm::AfterClientResetWrapper afterWrapper = {
+        .block = ^(RLMRealm * _Nonnull beforeFrozen, RLMRealm * _Nonnull after) {
+            [afterExpectation fulfill];
+        }
+    };
+    #pragma clang diagnostic pop // unused parameter warning
+
+    auto unversionedTsr = realm::ThreadSafeReference(unversioned);
+    XCTAssertEqual(unversioned->schema_version(), RLMNotVersioned);
+    afterWrapper(unversioned, std::move(unversionedTsr), false);
+
+    [self waitForExpectationsWithTimeout:1 handler:nil];
 }
 
 #pragma mark - Progress Notifications
