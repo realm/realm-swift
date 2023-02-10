@@ -1535,7 +1535,7 @@ static NSString *randomEmail() {
 
     // Create a config that's not versioned.
     RLMRealmConfiguration *configUnversioned = [RLMRealmConfiguration defaultConfiguration];
-    configUnversioned.configRef.schema_version = RLMNotVersioned; // Not strictly necessary. Already has no version because the realm's never been opened.
+    configUnversioned.configRef.schema_version = RLMNotVersioned;
     std::shared_ptr<realm::Realm> unversioned = realm::Realm::get_shared_realm(configUnversioned.config);
 
     XCTAssertNotEqual(versioned->schema_version(), RLMNotVersioned);
@@ -1561,7 +1561,7 @@ static NSString *randomEmail() {
 
     // Create a config that's not versioned.
     RLMRealmConfiguration *configUnversioned = [RLMRealmConfiguration defaultConfiguration];
-    configUnversioned.configRef.schema_version = RLMNotVersioned; // Not strictly necessary. Already has no version because the realm's never been opened.
+    configUnversioned.configRef.schema_version = RLMNotVersioned;
     std::shared_ptr<realm::Realm> unversioned = realm::Realm::get_shared_realm(configUnversioned.config);
 
     auto unversionedTsr = realm::ThreadSafeReference(unversioned);
