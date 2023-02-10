@@ -99,7 +99,7 @@ void AfterClientResetWrapper::operator()(std::shared_ptr<realm::Realm> local, re
     }
 }
 
-} // anonymous namespace
+} // namespace realm
 
 @interface RLMSyncConfiguration () {
     std::unique_ptr<realm::SyncConfig> _config;
