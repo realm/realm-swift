@@ -26,12 +26,12 @@
 #import "RLMCredentials.h"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMRealm+Sync.h"
-#import "RLMRealmConfiguration_Private.h"
+#import "RLMRealmConfiguration_Private.hpp"
 #import "RLMRealmUtil.hpp"
 #import "RLMRealm_Dynamic.h"
 #import "RLMRealm_Private.hpp"
 #import "RLMSchema_Private.h"
-#import "RLMSyncConfiguration_Private.h"
+#import "RLMSyncConfiguration_Private.hpp"
 #import "RLMSyncManager_Private.hpp"
 #import "RLMSyncUtil_Private.h"
 #import "RLMUser_Private.hpp"
@@ -39,6 +39,7 @@
 
 #import <realm/object-store/shared_realm.hpp>
 #import <realm/object-store/sync/sync_manager.hpp>
+#import <realm/object-store/thread_safe_reference.hpp>
 #import <realm/util/file.hpp>
 
 #import <atomic>
@@ -1508,6 +1509,66 @@ static NSString *randomEmail() {
     XCTAssertNotNil(config2.syncConfiguration.afterClientReset);
     #pragma clang diagnostic pop
 
+}
+
+// TODO: Consider testing with sync_config->on_sync_client_event_hook or a client reset
+- (void)testBeforeClientResetCallbackNotVersioned {
+    // Setup sync config
+    RLMSyncConfiguration *syncConfig = [[RLMSyncConfiguration alloc] initWithRawConfig:{} path:""];
+    XCTestExpectation *beforeExpectation = [self expectationWithDescription:@"block called once"];
+    syncConfig.clientResetMode = RLMClientResetModeRecoverUnsyncedChanges;
+    syncConfig.beforeClientReset = ^(RLMRealm *beforeFrozen) {
+
+        XCTAssertNotEqual(RLMNotVersioned, beforeFrozen->_realm->schema_version());
+        [beforeExpectation fulfill];
+    };
+    auto& beforeWrapper = syncConfig.rawConfiguration.notify_before_client_reset;
+
+    // Setup a realm with a versioned schema
+    RLMRealmConfiguration *configVersioned = [RLMRealmConfiguration defaultConfiguration];
+    configVersioned.fileURL = RLMTestRealmURL();
+    @autoreleasepool {
+        RLMRealm *versioned = [RLMRealm realmWithConfiguration:configVersioned error:nil];
+        XCTAssertEqual(0U, versioned->_realm->schema_version());
+    }
+    std::shared_ptr<realm::Realm> versioned = realm::Realm::get_shared_realm(configVersioned.config);
+
+    // Create a config that's not versioned.
+    RLMRealmConfiguration *configUnversioned = [RLMRealmConfiguration defaultConfiguration];
+    configUnversioned.configRef.schema_version = RLMNotVersioned;
+    std::shared_ptr<realm::Realm> unversioned = realm::Realm::get_shared_realm(configUnversioned.config);
+
+    XCTAssertNotEqual(versioned->schema_version(), RLMNotVersioned);
+    XCTAssertEqual(unversioned->schema_version(), RLMNotVersioned);
+    beforeWrapper(versioned); // one realm should invoke the block
+    beforeWrapper(unversioned); // while the other should not invoke the block
+
+    [self waitForExpectationsWithTimeout:5 handler:nil];
+}
+
+// TODO: Consider testing with sync_config->on_sync_client_event_hook or a client reset
+- (void)testAfterClientResetCallbackNotVersioned {
+    // Setup sync config
+    RLMSyncConfiguration *syncConfig = [[RLMSyncConfiguration alloc] initWithRawConfig:{} path:""];
+    XCTestExpectation *afterExpectation = [self expectationWithDescription:@"block should not be called"];
+    afterExpectation.inverted = true;
+
+    syncConfig.clientResetMode = RLMClientResetModeRecoverUnsyncedChanges;
+    syncConfig.afterClientReset = ^(RLMRealm * _Nonnull, RLMRealm * _Nonnull) {
+        [afterExpectation fulfill];
+    };
+    auto& afterWrapper = syncConfig.rawConfiguration.notify_after_client_reset;
+
+    // Create a config that's not versioned.
+    RLMRealmConfiguration *configUnversioned = [RLMRealmConfiguration defaultConfiguration];
+    configUnversioned.configRef.schema_version = RLMNotVersioned;
+    std::shared_ptr<realm::Realm> unversioned = realm::Realm::get_shared_realm(configUnversioned.config);
+
+    auto unversionedTsr = realm::ThreadSafeReference(unversioned);
+    XCTAssertEqual(unversioned->schema_version(), RLMNotVersioned);
+    afterWrapper(unversioned, std::move(unversionedTsr), false);
+
+    [self waitForExpectationsWithTimeout:1 handler:nil];
 }
 
 #pragma mark - Progress Notifications

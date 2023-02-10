@@ -120,7 +120,7 @@ typedef NS_ENUM(NSUInteger, RLMClientResetMode) {
  A block type used to report before a client reset will occur.
  The `beforeFrozen` is a frozen copy of the local state prior to client reset.
  */
-RLM_SWIFT_SENDABLE // invoked on a backgroun thread
+RLM_SWIFT_SENDABLE // invoked on a background thread
 typedef void(^RLMClientResetBeforeBlock)(RLMRealm * _Nonnull beforeFrozen);
 
 /**

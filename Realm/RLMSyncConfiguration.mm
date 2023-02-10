@@ -82,7 +82,9 @@ struct BeforeClientResetWrapper : CallbackSchema {
     RLMClientResetBeforeBlock block;
     void operator()(std::shared_ptr<Realm> local) {
         @autoreleasepool {
-            block([RLMRealm realmWithSharedRealm:local schema:getSchema(*local) dynamic:false]);
+            if (local->schema_version() != RLMNotVersioned) {
+                block([RLMRealm realmWithSharedRealm:local schema:getSchema(*local) dynamic:false]);
+            }
         }
     }
 };
@@ -91,15 +93,17 @@ struct AfterClientResetWrapper : CallbackSchema {
     RLMClientResetAfterBlock block;
     void operator()(std::shared_ptr<Realm> local, ThreadSafeReference remote, bool) {
         @autoreleasepool {
-            RLMSchema *schema = getSchema(*local);
-            RLMRealm *localRealm = [RLMRealm realmWithSharedRealm:local
-                                                           schema:schema
-                                                          dynamic:false];
+            if (local->schema_version() != RLMNotVersioned) {
+                RLMSchema *schema = getSchema(*local);
+                RLMRealm *localRealm = [RLMRealm realmWithSharedRealm:local
+                                                               schema:schema
+                                                              dynamic:false];
 
-            RLMRealm *remoteRealm = [RLMRealm realmWithSharedRealm:Realm::get_shared_realm(std::move(remote))
-                                                            schema:schema
-                                                           dynamic:false];
-            block(localRealm, remoteRealm);
+                RLMRealm *remoteRealm = [RLMRealm realmWithSharedRealm:Realm::get_shared_realm(std::move(remote))
+                                                                schema:schema
+                                                               dynamic:false];
+                block(localRealm, remoteRealm);
+            }
         }
     }
 };
