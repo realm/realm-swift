@@ -26,7 +26,6 @@
 #import "RLMCredentials.h"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMRealm+Sync.h"
-#import "RLMRealmConfiguration_Private.h"
 #import "RLMRealmConfiguration_Private.hpp"
 #import "RLMRealmUtil.hpp"
 #import "RLMRealm_Dynamic.h"
@@ -1552,17 +1551,14 @@ static NSString *randomEmail() {
     configUnversioned.configRef.schema_version = RLMNotVersioned; // Not strictly necessary. Already has no version because the realm's never been opened.
     std::shared_ptr<realm::Realm> unversioned = realm::Realm::get_shared_realm(configUnversioned.config);
 
-    XCTestExpectation *afterExpectation = [self expectationWithDescription:@"block called once"];
+    XCTestExpectation *afterExpectation = [self expectationWithDescription:@"block is not called"];
     afterExpectation.inverted = true;
 
-    #pragma clang diagnostic push
-    #pragma clang diagnostic ignored "-Wunused-parameter"
     realm::AfterClientResetWrapper afterWrapper = {
-        .block = ^(RLMRealm * _Nonnull beforeFrozen, RLMRealm * _Nonnull after) {
+        .block = ^(RLMRealm * _Nonnull, RLMRealm * _Nonnull) {
             [afterExpectation fulfill];
         }
     };
-    #pragma clang diagnostic pop // unused parameter warning
 
     auto unversionedTsr = realm::ThreadSafeReference(unversioned);
     XCTAssertEqual(unversioned->schema_version(), RLMNotVersioned);
