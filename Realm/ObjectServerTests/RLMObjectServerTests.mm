@@ -1511,31 +1511,32 @@ static NSString *randomEmail() {
 
 }
 
+// TODO: Consider testing with sync_config->on_sync_client_event_hook or a client reset
 - (void)testBeforeClientResetCallbackNotVersioned {
+    // Setup sync config
+    RLMSyncConfiguration *syncConfig = [[RLMSyncConfiguration alloc] initWithRawConfig:{} path:""];
+    XCTestExpectation *beforeExpectation = [self expectationWithDescription:@"block called once"];
+    syncConfig.clientResetMode = RLMClientResetModeRecoverUnsyncedChanges;
+    syncConfig.beforeClientReset = ^(RLMRealm *beforeFrozen) {
+
+        XCTAssertNotEqual(RLMNotVersioned, beforeFrozen->_realm->schema_version());
+        [beforeExpectation fulfill];
+    };
+    auto& beforeWrapper = syncConfig.rawConfiguration.notify_before_client_reset;
+
     // Setup a realm with a versioned schema
-    RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
-    config.fileURL = RLMTestRealmURL();
-    // Need to open the realm once to get a version.
+    RLMRealmConfiguration *configVersioned = [RLMRealmConfiguration defaultConfiguration];
+    configVersioned.fileURL = RLMTestRealmURL();
     @autoreleasepool {
-        RLMRealm *versioned = [RLMRealm realmWithConfiguration:config error:nil];
+        RLMRealm *versioned = [RLMRealm realmWithConfiguration:configVersioned error:nil];
         XCTAssertEqual(0U, versioned->_realm->schema_version());
     }
-    std::shared_ptr<realm::Realm> versioned = realm::Realm::get_shared_realm(config.config);
+    std::shared_ptr<realm::Realm> versioned = realm::Realm::get_shared_realm(configVersioned.config);
 
     // Create a config that's not versioned.
     RLMRealmConfiguration *configUnversioned = [RLMRealmConfiguration defaultConfiguration];
     configUnversioned.configRef.schema_version = RLMNotVersioned; // Not strictly necessary. Already has no version because the realm's never been opened.
     std::shared_ptr<realm::Realm> unversioned = realm::Realm::get_shared_realm(configUnversioned.config);
-
-    XCTestExpectation *beforeExpectation = [self expectationWithDescription:@"block called once"];
-    beforeExpectation.assertForOverFulfill = true; // asserts that fulfill isn't called more than once.
-
-    realm::BeforeClientResetWrapper beforeWrapper = {
-        .block = ^(RLMRealm * _Nonnull beforeFrozen) {
-            XCTAssertNotEqual(RLMNotVersioned, beforeFrozen->_realm->schema_version());
-            [beforeExpectation fulfill];
-        }
-    };
 
     XCTAssertNotEqual(versioned->schema_version(), RLMNotVersioned);
     XCTAssertEqual(unversioned->schema_version(), RLMNotVersioned);
@@ -1545,20 +1546,23 @@ static NSString *randomEmail() {
     [self waitForExpectationsWithTimeout:5 handler:nil];
 }
 
+// TODO: Consider testing with sync_config->on_sync_client_event_hook or a client reset
 - (void)testAfterClientResetCallbackNotVersioned {
+    // Setup sync config
+    RLMSyncConfiguration *syncConfig = [[RLMSyncConfiguration alloc] initWithRawConfig:{} path:""];
+    XCTestExpectation *afterExpectation = [self expectationWithDescription:@"block should not be called"];
+    afterExpectation.inverted = true;
+
+    syncConfig.clientResetMode = RLMClientResetModeRecoverUnsyncedChanges;
+    syncConfig.afterClientReset = ^(RLMRealm * _Nonnull, RLMRealm * _Nonnull) {
+        [afterExpectation fulfill];
+    };
+    auto& afterWrapper = syncConfig.rawConfiguration.notify_after_client_reset;
+
     // Create a config that's not versioned.
     RLMRealmConfiguration *configUnversioned = [RLMRealmConfiguration defaultConfiguration];
     configUnversioned.configRef.schema_version = RLMNotVersioned; // Not strictly necessary. Already has no version because the realm's never been opened.
     std::shared_ptr<realm::Realm> unversioned = realm::Realm::get_shared_realm(configUnversioned.config);
-
-    XCTestExpectation *afterExpectation = [self expectationWithDescription:@"block is not called"];
-    afterExpectation.inverted = true;
-
-    realm::AfterClientResetWrapper afterWrapper = {
-        .block = ^(RLMRealm * _Nonnull, RLMRealm * _Nonnull) {
-            [afterExpectation fulfill];
-        }
-    };
 
     auto unversionedTsr = realm::ThreadSafeReference(unversioned);
     XCTAssertEqual(unversioned->schema_version(), RLMNotVersioned);

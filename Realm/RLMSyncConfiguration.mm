@@ -61,45 +61,53 @@ RLMSyncError errorKindForSyncError(SyncError error) {
         return RLMSyncErrorClientSessionError;
     return RLMSyncErrorClientInternalError;
 }
+
+struct CallbackSchema {
+    bool dynamic;
+    std::string path;
+    RLMSchema *customSchema;
+
+    RLMSchema *getSchema(Realm& realm) {
+        if (dynamic) {
+            return [RLMSchema dynamicSchemaFromObjectStoreSchema:realm.schema()];
+        }
+        if (auto cached = RLMGetAnyCachedRealmForPath(path)) {
+            return cached.schema;
+        }
+        return customSchema ?: RLMSchema.sharedSchema;
+    }
+};
+
+struct BeforeClientResetWrapper : CallbackSchema {
+    RLMClientResetBeforeBlock block;
+    void operator()(std::shared_ptr<Realm> local) {
+        @autoreleasepool {
+            if (local->schema_version() != RLMNotVersioned) {
+                block([RLMRealm realmWithSharedRealm:local schema:getSchema(*local) dynamic:false]);
+            }
+        }
+    }
+};
+
+struct AfterClientResetWrapper : CallbackSchema {
+    RLMClientResetAfterBlock block;
+    void operator()(std::shared_ptr<Realm> local, ThreadSafeReference remote, bool) {
+        @autoreleasepool {
+            if (local->schema_version() != RLMNotVersioned) {
+                RLMSchema *schema = getSchema(*local);
+                RLMRealm *localRealm = [RLMRealm realmWithSharedRealm:local
+                                                               schema:schema
+                                                              dynamic:false];
+
+                RLMRealm *remoteRealm = [RLMRealm realmWithSharedRealm:Realm::get_shared_realm(std::move(remote))
+                                                                schema:schema
+                                                               dynamic:false];
+                block(localRealm, remoteRealm);
+            }
+        }
+    }
+};
 } // anonymous namespace
-
-namespace realm {
-
-RLMSchema *CallbackSchema::getSchema(Realm& realm) {
-    if (dynamic) {
-        return [RLMSchema dynamicSchemaFromObjectStoreSchema:realm.schema()];
-    }
-    if (auto cached = RLMGetAnyCachedRealmForPath(path)) {
-        return cached.schema;
-    }
-    return customSchema ?: RLMSchema.sharedSchema;
-}
-
-void BeforeClientResetWrapper::operator ()(std::shared_ptr<realm::Realm> local) {
-    @autoreleasepool {
-        if (local->schema_version() != RLMNotVersioned) {
-            block([RLMRealm realmWithSharedRealm:local schema:getSchema(*local) dynamic:false]);
-        }
-    }
-}
-
-void AfterClientResetWrapper::operator()(std::shared_ptr<realm::Realm> local, realm::ThreadSafeReference remote, bool) {
-    @autoreleasepool {
-        if (local->schema_version() != RLMNotVersioned) {
-            RLMSchema *schema = getSchema(*local);
-            RLMRealm *localRealm = [RLMRealm realmWithSharedRealm:local
-                                                           schema:schema
-                                                          dynamic:false];
-
-            RLMRealm *remoteRealm = [RLMRealm realmWithSharedRealm:Realm::get_shared_realm(std::move(remote))
-                                                            schema:schema
-                                                           dynamic:false];
-            block(localRealm, remoteRealm);
-        }
-    }
-}
-
-} // namespace realm
 
 @interface RLMSyncConfiguration () {
     std::unique_ptr<realm::SyncConfig> _config;
