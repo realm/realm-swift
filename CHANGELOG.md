@@ -1,23 +1,20 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.35.1 Release notes (2023-02-10)
 =============================================================
-### Enhancements
-* None.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
-* Client reset callbacks no longer attempt to open a realm without an initialized schema ([PR #8125](https://github.com/realm/realm-swift/pull/8125))
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+* Client reset with recovery would crash if a client reset occurred the very
+  first time the Realm was opened with async open. The client reset callbacks
+  are now not called if the Realm had never been opened before
+  ([PR #8125](https://github.com/realm/realm-swift/pull/8125), since 10.32.0).
 
 ### Compatibility
-* Realm Studio: 11.0.0 - 12.0.0.
+
+* Realm Studio: 13.0.2 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 14.2.
 * CocoaPods: 1.10 or later.
 * Xcode: 13.3-14.2.
-
-### Internal
-* Upgraded realm-core from ? to ?
 
 10.35.0 Release notes (2023-02-07)
 =============================================================
