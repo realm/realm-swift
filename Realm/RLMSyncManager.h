@@ -166,7 +166,7 @@ __attribute__((deprecated("This property is not used for anything")));
 /// sessions have been abandoned.
 ///
 /// After all synchronized Realms have been closed for a given server, the
-/// connection is kept open until the linger time has expire to avoid the
+/// connection is kept open until the linger time has expired to avoid the
 /// overhead of reestablishing the connection when Realms are being closed and
 /// reopened.
 ///
