@@ -28,15 +28,6 @@
 #import "RLMThreadSafeReference_Private.hpp"
 #import "RLMUtil.hpp"
 
-// See -countByEnumeratingWithState:objects:count
-@interface RLMArrayHolder : NSObject {
-@public
-    std::unique_ptr<id[]> items;
-}
-@end
-@implementation RLMArrayHolder
-@end
-
 @interface RLMArray () <RLMThreadConfined_Private>
 @end
 
@@ -163,34 +154,8 @@
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state
                                   objects:(__unused __unsafe_unretained id [])buffer
                                     count:(__unused NSUInteger)len {
-    if (state->state != 0) {
-        return 0;
-    }
-
-    // We need to enumerate a copy of the backing array so that it doesn't
-    // reflect changes made during enumeration. This copy has to be autoreleased
-    // (since there's nowhere for us to store a strong reference), and uses
-    // RLMArrayHolder rather than an NSArray because NSArray doesn't guarantee
-    // that it'll use a single contiguous block of memory, and if it doesn't
-    // we'd need to forward multiple calls to this method to the same NSArray,
-    // which would require holding a reference to it somewhere.
-    __autoreleasing RLMArrayHolder *copy = [[RLMArrayHolder alloc] init];
-    copy->items = std::make_unique<id[]>(self.count);
-
-    NSUInteger i = 0;
-    for (id object in _backingCollection) {
-        copy->items[i++] = object;
-    }
-
-    state->itemsPtr = (__unsafe_unretained id *)(void *)copy->items.get();
-    // needs to point to something valid, but the whole point of this is so
-    // that it can't be changed
-    state->mutationsPtr = state->extra;
-    state->state = i;
-
-    return i;
+    return RLMUnmanagedFastEnumerate(_backingCollection, state);
 }
-
 
 template<typename IndexSetFactory>
 static void changeArray(__unsafe_unretained RLMArray *const ar,

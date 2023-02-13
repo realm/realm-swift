@@ -25,15 +25,6 @@
 #import "RLMThreadSafeReference_Private.hpp"
 #import "RLMUtil.hpp"
 
-// See -countByEnumeratingWithState:objects:count
-@interface RLMDictionaryHolder : NSObject {
-@public
-    std::unique_ptr<id[]> items;
-}
-@end
-@implementation RLMDictionaryHolder
-@end
-
 @interface RLMDictionary () <RLMThreadConfined_Private>
 @end
 
@@ -288,28 +279,7 @@ static void changeDictionary(__unsafe_unretained RLMDictionary *const dictionary
 - (NSUInteger)countByEnumeratingWithState:(nonnull NSFastEnumerationState *)state
                                   objects:(__unsafe_unretained id  _Nullable * _Nonnull)buffer
                                     count:(NSUInteger)len {
-    if (state->state != 0) {
-        return 0;
-    }
-
-    // We need to enumerate a copy of the backing dictionary so that it doesn't
-    // reflect changes made during enumeration. This copy has to be autoreleased
-    // (since there's nowhere for us to store a strong reference).
-    __autoreleasing RLMDictionaryHolder *copy = [[RLMDictionaryHolder alloc] init];
-    copy->items = std::make_unique<id[]>(_backingCollection.allKeys.count);
-
-    NSUInteger i = 0;
-    for (id key in _backingCollection.allKeys) {
-        copy->items[i++] = key;
-    }
-
-    state->itemsPtr = (__unsafe_unretained id *)(void *)copy->items.get();
-    // needs to point to something valid, but the whole point of this is so
-    // that it can't be changed
-    state->mutationsPtr = state->extra;
-    state->state = i;
-
-    return i;
+    return RLMUnmanagedFastEnumerate(_backingCollection.allKeys, state);
 }
 
 #pragma mark - Aggregate operations

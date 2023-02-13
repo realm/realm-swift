@@ -24,6 +24,7 @@
 
 RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
+NSUInteger RLMUnmanagedFastEnumerate(id collection, NSFastEnumerationState *);
 void RLMCollectionSetValueForKey(id<RLMFastEnumerable> collection, NSString *key, id _Nullable value);
 FOUNDATION_EXTERN NSString *RLMDescriptionWithMaxDepth(NSString *name, id<RLMCollection> collection, NSUInteger depth);
 FOUNDATION_EXTERN void RLMAssignToCollection(id<RLMCollection> collection, id value);
