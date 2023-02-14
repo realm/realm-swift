@@ -571,7 +571,12 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             XCTAssertEqual(results2.count, 1)
             XCTAssertEqual(results2.filter("firstName == 'Paul'").count, 1)
 
-            afterCallbackEx.fulfill()
+            // Fulfill on the main thread to make it harder to hit a race
+            // condition where the test completes before the client reset finishes
+            // unwinding. This does not fully fix the problem.
+            DispatchQueue.main.async {
+                afterCallbackEx.fulfill()
+            }
         }
         return (beforeClientReset, afterClientReset)
     }
@@ -595,7 +600,12 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             XCTAssertEqual(results2.filter("firstName == 'John'").count, 1)
             XCTAssertEqual(results2.filter("firstName == 'Paul'").count, 1)
 
-            afterCallbackEx.fulfill()
+            // Fulfill on the main thread to make it harder to hit a race
+            // condition where the test completes before the client reset finishes
+            // unwinding. This does not fully fix the problem.
+            DispatchQueue.main.async {
+                afterCallbackEx.fulfill()
+            }
         }
         return (beforeClientReset, afterClientReset)
     }
