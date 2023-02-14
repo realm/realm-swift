@@ -350,7 +350,7 @@ extension List: MutableCollection {
     public func move(fromOffsets offsets: IndexSet, toOffset destination: Int) {
         for offset in offsets {
             var d = destination
-            if destination >= count {
+            if destination > offset {
                 d = destination - 1
             }
             move(from: offset, to: d)
