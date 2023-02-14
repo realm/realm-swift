@@ -7,6 +7,8 @@ x.y.z Release notes (yyyy-MM-dd)
 * Fix moving `List` items to a higher index in SwiftUI results in wrong destination index
   ([#7956](https://github.com/realm/realm-swift/issues/7956), since v10.6.0).
 * Using the `searchable` view modifier with `@ObservedResults` in iOS 16 would cause the collection observation subscription to cancel. ([#8096](https://github.com/realm/realm-swift/issues/8096), since 10.21.0)
+* Client reset with recovery would sometimes crash if the recovery resurrected
+  a dangling link ([Core #6292](https://github.com/realm/realm-core/issues/6292), since v10.32.0).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
@@ -18,7 +20,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * Xcode: 13.3-14.2.
 
 ### Internal
-* Upgraded realm-core from ? to ?
+* Upgraded realm-core from 13.4.0 to 13.4.1
 
 10.35.1 Release notes (2023-02-10)
 =============================================================
