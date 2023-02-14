@@ -312,9 +312,21 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     }
 
     func waitForSyncEnabled(flexibleSync: Bool = false, appServerId: String, syncServiceId: String, syncServiceConfig: [String: Any]) {
-        _ = expectSuccess(RealmServer.shared.enableSync(
-            flexibleSync: flexibleSync, appServerId: appServerId,
-            syncServiceId: syncServiceId, syncServiceConfiguration: syncServiceConfig))
+        while true {
+            do {
+                _ = try RealmServer.shared.enableSync(
+                    flexibleSync: flexibleSync, appServerId: appServerId,
+                    syncServiceId: syncServiceId, syncServiceConfiguration: syncServiceConfig).get()
+            } catch {
+                // "cannot transition sync service state to \"enabled\" while sync is being terminated. Please try again in a few minutes after sync termination has completed"
+                guard error.localizedDescription.contains("Please try again in a few minutes") else {
+                    XCTFail("\(error))")
+                    return
+                }
+                print("waiting for sync to terminate...")
+                sleep(1)
+            }
+        }
         XCTAssertTrue(try RealmServer.shared.isSyncEnabled(flexibleSync: flexibleSync, appServerId: appServerId, syncServiceId: syncServiceId))
     }
 
@@ -1763,7 +1775,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         app.emailPasswordAuth.callResetPasswordFunction(email: email,
                                                         password: randomString(10),
                                                         args: [[:]]).awaitFailure(self) {
-            assertAppError($0, .unknown, "failed to reset password for user \(email)")
+            assertAppError($0, .unknown, "failed to reset password for user \"\(email)\"")
         }
     }
 
@@ -3136,7 +3148,7 @@ class AsyncAwaitObjectServerTests: SwiftSyncTestCase {
         await assertThrowsError(try await auth.callResetPasswordFunction(email: email,
                                                                          password: randomString(10),
                                                                          args: [[:]])) {
-            assertAppError($0, .unknown, "failed to reset password for user \(email)")
+            assertAppError($0, .unknown, "failed to reset password for user \"\(email)\"")
         }
     }
 

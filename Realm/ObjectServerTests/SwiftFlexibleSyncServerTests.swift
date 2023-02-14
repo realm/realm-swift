@@ -1090,6 +1090,7 @@ extension SwiftFlexibleSyncServerTests {
         checkCount(expected: 10, realm, SwiftPerson.self)
     }
 
+#if false // FIXME: this is no longer an error and needs to be updated to something which is
     @MainActor
     func testStates() async throws {
         let realm = try await flexibleSyncRealm()
@@ -1119,6 +1120,7 @@ extension SwiftFlexibleSyncServerTests {
             }
         }
     }
+#endif
 
     @MainActor
     func testFlexibleSyncAllDocumentsForType() async throws {
@@ -1535,6 +1537,7 @@ extension SwiftFlexibleSyncServerTests {
         checkCount(expected: 15, realm, SwiftPerson.self)
     }
 
+#if false // FIXME: this is no longer an error and needs to be updated to something which is
     func testFlexibleSyncCombineWriteFails() throws {
         let realm = try flexibleSyncRealm()
         XCTAssertNotNil(realm)
@@ -1568,6 +1571,7 @@ extension SwiftFlexibleSyncServerTests {
         waitForDownloads(for: realm)
         checkCount(expected: 0, realm, SwiftPerson.self)
     }
+#endif
 }
 #endif // canImport(Combine)
 #endif // os(macOS)
