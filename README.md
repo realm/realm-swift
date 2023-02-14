@@ -1,6 +1,3 @@
-## Developing with the Realm SDKs? We want to hear from you! [Take our short survey](https://mongodb.co1.qualtrics.com/jfe/form/SV_6fJwP5VUXddZmZg?Source=github)
-<br/>
-
 ![Realm](https://github.com/realm/realm-swift/raw/master/logo.png)
 
 Realm is a mobile database that runs directly inside phones, tablets or wearables.
