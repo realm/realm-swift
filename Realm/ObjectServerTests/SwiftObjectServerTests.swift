@@ -436,52 +436,36 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     }
 
     func prepareClientReset(_ partition: String, _ user: User) throws {
-        let collection = setupMongoCollection(user: user, collectionName: "SwiftPerson")
-
-        // Initialize the local file so that we have conflicting history
         try autoreleasepool {
+            // Initialize the local file so that we have conflicting history
             var configuration = user.configuration(partitionValue: partition)
             configuration.objectTypes = [SwiftPerson.self]
             let realm = try Realm(configuration: configuration)
             waitForUploads(for: realm)
-        }
-
-        // Create an object on the server which should be present after client reset
-        let serverObject: Document = [
-            "realm_id": .string(partition),
-            "_id": .objectId(ObjectId.generate()),
-            "firstName": .string("Paul"),
-            "lastName": .string("M"),
-            "age": .int32(30)
-        ]
-        collection.insertOne(serverObject).await(self, timeout: 30.0)
-
-        // Sync is disabled, block executed, sync re-enabled
-        try executeBlockOffline(appId: appId) {
-            var configuration = user.configuration(partitionValue: partition)
-            configuration.objectTypes = [SwiftPerson.self]
-            let realm = try Realm(configuration: configuration)
             realm.syncSession!.suspend()
-            // Add an object to the local realm that will not be in the server realm (because sync is disabled).
+            try RealmServer.shared.triggerClientReset(appId, realm)
+
+            // Add an object to the local realm that won't be synced due to the suspend
             try realm.write {
                 realm.add(SwiftPerson(firstName: "John", lastName: "L"))
             }
             XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1)
         }
 
-        // After restarting sync, the sync history translator service needs time
-        // to resynthesize the new history from existing objects on the server
-        // The following creates a new realm with the same partition and wait for
-        // downloads to ensure the the new history has been created.
+        // Write a different object in a different Realm which should appear in
+        // the first one after a client reset
         try autoreleasepool {
-            var newConfig = user.configuration(partitionValue: partition)
-            newConfig.fileURL = RLMTestRealmURL()
-            newConfig.objectTypes = [SwiftPerson.self]
-            let newRealm = try Realm(configuration: newConfig)
-
-            waitForServerHistoryAfterRestart(realm: newRealm)
+            var config = user.configuration(partitionValue: partition)
+            config.fileURL = RLMTestRealmURL()
+            config.objectTypes = [SwiftPerson.self]
+            let realm = try Realm(configuration: config)
+            try realm.write {
+                realm.add(SwiftPerson(firstName: "Paul", lastName: "M"))
+            }
+            waitForUploads(for: realm)
         }
     }
+
     func prepareFlexibleClientReset(_ user: User) throws {
         let collection = setupMongoCollection(user: user, collectionName: "SwiftPerson")
 

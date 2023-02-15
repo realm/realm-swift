@@ -808,4 +808,8 @@ static NSURL *syncDirectoryForChildProcess() {
 }
 @end
 
+int64_t RLMGetClientFileIdent(RLMRealm *realm) {
+    return realm::SyncSession::OnlyForTesting::get_file_ident(*realm->_realm->sync_session()).ident;
+}
+
 #endif // TARGET_OS_OSX

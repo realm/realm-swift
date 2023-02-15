@@ -169,6 +169,8 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 - (void)waitForSessionTermination;
 @end
 
+FOUNDATION_EXTERN int64_t RLMGetClientFileIdent(RLMRealm *realm);
+
 RLM_HEADER_AUDIT_END(nullability, sendability)
 
 #define WAIT_FOR_SEMAPHORE(macro_semaphore, macro_timeout) do {                                                        \

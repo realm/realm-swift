@@ -24,5 +24,8 @@
   },
   "secretsManager": {
     "enabled": false
+  },
+  "sync": {
+    "allowSyncSessionTestCommands": true
   }
 }
