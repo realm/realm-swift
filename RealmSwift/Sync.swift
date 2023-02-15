@@ -966,7 +966,9 @@ public class UserPublisher: Publisher {
     /// :nodoc:
     public func receive<S>(subscriber: S) where S: Subscriber, S.Failure == Never, Output == S.Input {
         let token = user.subscribe { _ in
-            _ = subscriber.receive(self.user)
+            DispatchQueue.main.async {
+                _ = subscriber.receive(self.user)
+            }
         }
 
         subscriber.receive(subscription: UserSubscription(user: user, token: token))

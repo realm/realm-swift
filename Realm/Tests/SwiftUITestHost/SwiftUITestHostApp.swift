@@ -28,9 +28,11 @@ struct ReminderFormView: View {
             DatePicker("date", selection: $reminder.date)
             Picker("priority", selection: $reminder.priority, content: {
                 ForEach(Reminder.Priority.allCases) { priority in
-                    Text(priority.description).tag(priority)
+                    Text(priority.description)
+                        .tag(priority)
+                        .accessibilityIdentifier(priority.description)
                 }
-            }).accessibilityIdentifier("picker")
+            }).accessibilityIdentifier("priority_picker")
         }
         .navigationTitle(reminder.title)
     }
@@ -164,16 +166,26 @@ struct Footer: View {
 struct ContentView: View {
     @State var searchFilter: String = ""
 
+    var content: some View {
+        VStack {
+            SearchView(searchFilter: $searchFilter)
+            ReminderListResultsView(searchFilter: $searchFilter)
+            Spacer()
+            Footer()
+        }
+        .navigationBarItems(trailing: EditButton())
+        .navigationTitle("reminders")
+    }
+
     var body: some View {
-        NavigationView {
-            VStack {
-                SearchView(searchFilter: $searchFilter)
-                ReminderListResultsView(searchFilter: $searchFilter)
-                Spacer()
-                Footer()
+        if #available(iOS 16.0, *) {
+            NavigationStack {
+                content
             }
-            .navigationBarItems(trailing: EditButton())
-            .navigationTitle("reminders")
+        } else {
+            NavigationView {
+                content
+            }
         }
     }
 }
