@@ -317,6 +317,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 _ = try RealmServer.shared.enableSync(
                     flexibleSync: flexibleSync, appServerId: appServerId,
                     syncServiceId: syncServiceId, syncServiceConfiguration: syncServiceConfig).get()
+                break
             } catch {
                 // "cannot transition sync service state to \"enabled\" while sync is being terminated. Please try again in a few minutes after sync termination has completed"
                 guard error.localizedDescription.contains("Please try again in a few minutes") else {

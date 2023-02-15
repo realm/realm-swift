@@ -97,7 +97,14 @@ public class TimeoutProxyServer: NSObject, @unchecked Sendable {
 
 @available(macOS 10.14, *)
 private func copyData(from: NWConnection, to: NWConnection) {
-    from.receive(minimumIncompleteLength: 1, maximumLength: 8192) { (data, context, isComplete, _) in
+    from.receive(minimumIncompleteLength: 1, maximumLength: 8192) { (data, context, isComplete, error) in
+        if let error = error {
+            if case .posix(.ECANCELED) = error {
+                return
+            }
+            fatalError("\(error)")
+        }
+
         guard let data = data else {
             if !isComplete {
                 copyData(from: from, to: to)
