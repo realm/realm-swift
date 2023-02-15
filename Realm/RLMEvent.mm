@@ -69,7 +69,7 @@ util::UniqueFunction<void (std::exception_ptr)> wrapCompletion(void (^completion
     };
 }
 
-realm::AuditInterface *audit_context(RLMEventContext *context) {
+realm::AuditInterface *auditContext(RLMEventContext *context) {
     return reinterpret_cast<realm::AuditInterface *>(context);
 }
 
@@ -93,22 +93,30 @@ std::optional<std::string> nsStringToOptionalString(NSString *str) {
 }
 } // anonymous namespace
 
-void RLMEventBeginScope(RLMEventContext *context, NSString *activity) {
-    audit_context(context)->begin_scope(activity.UTF8String);
+uint64_t RLMEventBeginScope(RLMEventContext *context, NSString *activity) {
+    return auditContext(context)->begin_scope(activity.UTF8String);
 }
 
-void RLMEventEndScope(RLMEventContext *context, RLMEventCompletion completion) {
-    audit_context(context)->end_scope(wrapCompletion(completion));
+void RLMEventCommitScope(RLMEventContext *context, uint64_t scope_id, RLMEventCompletion completion) {
+    auditContext(context)->end_scope(scope_id, wrapCompletion(completion));
+}
+
+void RLMEventCancelScope(RLMEventContext *context, uint64_t scope_id) {
+    auditContext(context)->cancel_scope(scope_id);
+}
+
+bool RLMEventIsActive(RLMEventContext *context, uint64_t scope_id) {
+    return auditContext(context)->is_scope_valid(scope_id);
 }
 
 void RLMEventRecordEvent(RLMEventContext *context, NSString *activity, NSString *event,
                          NSString *data, RLMEventCompletion completion) {
-    audit_context(context)->record_event(activity.UTF8String, nsStringToOptionalString(event),
+    auditContext(context)->record_event(activity.UTF8String, nsStringToOptionalString(event),
                                          nsStringToOptionalString(data), wrapCompletion(completion));
 }
 
 void RLMEventUpdateMetadata(RLMEventContext *context, NSDictionary<NSString *, NSString *> *newMetadata) {
-    audit_context(context)->update_metadata(convertMetadata(newMetadata));
+    auditContext(context)->update_metadata(convertMetadata(newMetadata));
 }
 
 RLMEventContext *RLMEventGetContext(RLMRealm *realm) {

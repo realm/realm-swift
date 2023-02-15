@@ -1,16 +1,25 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.36.0 Release notes (2023-02-15)
 =============================================================
+
 ### Enhancements
-* None.
+
+* Add support for multiple overlapping or nested event scopes.
+  `Events.beginScope()` now returns a `Scope` object which is used to commit or
+  cancel that scope, and if more than one scope is active at a time events are
+  reported to all active scopes.
 
 ### Fixed
+
 * Fix moving `List` items to a higher index in SwiftUI results in wrong destination index
   ([#7956](https://github.com/realm/realm-swift/issues/7956), since v10.6.0).
-* Using the `searchable` view modifier with `@ObservedResults` in iOS 16 would cause the collection observation subscription to cancel. ([#8096](https://github.com/realm/realm-swift/issues/8096), since 10.21.0)
-
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+* Using the `searchable` view modifier with `@ObservedResults` in iOS 16 would
+  cause the collection observation subscription to cancel.
+  ([#8096](https://github.com/realm/realm-swift/issues/8096), since 10.21.0)
+* Client reset with recovery would sometimes crash if the recovery resurrected
+  a dangling link ([Core #6292](https://github.com/realm/realm-core/issues/6292), since v10.32.0).
 
 ### Compatibility
+
 * Realm Studio: 13.0.2 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 14.2.
@@ -18,7 +27,8 @@ x.y.z Release notes (yyyy-MM-dd)
 * Xcode: 13.3-14.2.
 
 ### Internal
-* Upgraded realm-core from ? to ?
+
+* Upgraded realm-core from 13.4.0 to 13.4.1
 
 10.35.1 Release notes (2023-02-10)
 =============================================================

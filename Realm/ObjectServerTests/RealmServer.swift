@@ -23,6 +23,7 @@ import XCTest
 
 #if canImport(RealmSwiftTestSupport)
 import RealmSwiftTestSupport
+import RealmSyncTestSupport
 #endif
 
 #if os(macOS)
@@ -35,8 +36,14 @@ extension URLSession {
                 httpResponse.statusCode >= 200 && httpResponse.statusCode < 300,
                 let data = data {
                 completionHandler(.success(data))
+            } else if let error = error {
+                completionHandler(.failure(error))
+            } else if let data = data, let string = String(data: data, encoding: .utf8) {
+                completionHandler(.failure(NSError(domain: URLError.errorDomain,
+                                                   code: URLError.badServerResponse.rawValue,
+                                                   userInfo: [NSLocalizedDescriptionKey: string])))
             } else {
-                completionHandler(.failure(error ?? URLError(.badServerResponse)))
+                completionHandler(.failure(URLError(.badServerResponse)))
             }
         }.resume()
     }
@@ -385,6 +392,11 @@ class AdminSession {
     lazy var apps = AdminEndpoint(accessToken: accessToken,
                                   groupId: groupId,
                                   url: URL(string: "http://localhost:9090/api/admin/v3.0/groups/\(groupId)/apps")!)
+
+    /// The initial endpoint to access the private API
+    lazy var privateApps = AdminEndpoint(accessToken: accessToken,
+                                  groupId: groupId,
+                                  url: URL(string: "http://localhost:9090/api/private/v1.0/groups/\(groupId)/apps")!)
 }
 
 // MARK: - Admin
@@ -500,6 +512,7 @@ public class RealmServer: NSObject {
                 try launchMongoProcess()
                 try launchServerProcess()
                 self.session = try Admin().login()
+                try makeUserAdmin()
             } catch {
                 XCTFail("Could not initiate admin session: \(error.localizedDescription)")
             }
@@ -680,6 +693,40 @@ public class RealmServer: NSObject {
         guard case .success = group.wait(timeout: .now() + 20) else {
             return XCTFail("Server did not start")
         }
+    }
+
+    private func makeUserAdmin() throws {
+        let p = Process()
+        p.launchPath = RealmServer.binDir.appendingPathComponent("mongo").path
+        p.arguments = [
+            "--quiet",
+            "mongodb://localhost:26000/auth",
+            "--eval", """
+                // Sometimes the user seems to not exist immediately
+                let id = null;
+                for (let i = 0; i < 5; ++i) {
+                    let user = db.users.findOne({"data.email" : "unique_user@domain.com"});
+                    if (user) {
+                        id = user._id;
+                        break;
+                    }
+                }
+                if (id === null) {
+                    throw "could not find admin user";
+                }
+
+                let res = db.users.updateOne({"_id": id}, {
+                    "$addToSet":
+                        {"roles": {"$each": [{"roleName": "GLOBAL_STITCH_ADMIN"},
+                                             {"roleName": "GLOBAL_BAAS_FEATURE_ADMIN"}]}}
+                });
+                if (res.modifiedCount != 1) {
+                    throw "could not update admin user";
+                }
+            """
+        ]
+        try p.run()
+        p.waitUntilExit()
     }
 
     public typealias AppId = String
@@ -1140,6 +1187,13 @@ public class RealmServer: NSObject {
         }
 
         completion(.success(schemaProperties.compactMap { $0.key }))
+    }
+
+    public func triggerClientReset(_ appId: String, _ realm: Realm) throws {
+        let session = try XCTUnwrap(session)
+        let appServerId = try retrieveAppServerId(appId)
+        let ident = RLMGetClientFileIdent(ObjectiveCSupport.convert(object: realm))
+        _ = try session.privateApps[appServerId].sync.forceReset.put(["file_ident": ident]).get()
     }
 }
 

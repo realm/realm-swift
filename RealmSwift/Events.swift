@@ -28,6 +28,7 @@ import Combine
 */
 public struct Events {
     let context: OpaquePointer
+    let realm: RLMRealm
 
     /**
     Begin recording events with the given activity name.
@@ -37,24 +38,17 @@ public struct Events {
     objects modified within an event scope will produce 'write' events which
     report the initial state of the object and the new values of all properties
     which changed.
+
+     - returns: A scope object used to commit or cancel the scope.
     */
-    public func beginScope(activity: String) {
-        RLMEventBeginScope(context, activity)
+    public func beginScope(activity: String) -> Scope {
+        Scope(realm: realm, context: context, id: RLMEventBeginScope(context, activity))
     }
 
-    /**
-    End recording the current event scope and report all generated events.
-
-    This function saves the events to disk locally and then
-    asynchronously sends them to the server. The optional completion function
-    is called when the event data has been successfully persisted, and *not*
-    when the actual upload has completed.
-
-    Calls to this function must be paired with calls to `beginScope()` and an
-    exception will be thrown if no scope is currently active.
-    */
+    /// :nodoc:
+    @available(*, unavailable, message: "Use EventScope.commit()")
     public func endScope(completion: ((Swift.Error?) -> Void)? = nil) {
-        RLMEventEndScope(context, completion)
+        fatalError()
     }
 
     /**
@@ -101,29 +95,82 @@ public struct Events {
     init?(_ realm: Realm) {
         if let context = RLMEventGetContext(realm.rlmRealm) {
             self.context = context
+            self.realm = realm.rlmRealm
         } else {
             return nil
         }
     }
+
+    /**
+    An object which represents an active event scope which can be used to
+    either commit or cancel the scope.
+    */
+    public class Scope {
+        /**
+        End recording the event scope and report all generated events.
+
+        This function saves the events to disk locally and then
+        asynchronously sends them to the server. The optional completion function
+        is called when the event data has been successfully persisted, and *not*
+        when the actual upload has completed.
+
+        An exception will be thrown if this scope has already been committed or
+        cancelled (i.e. if ``isActive`` is `false`).
+        */
+        public func commit(completion: ((Swift.Error?) -> Void)? = nil) {
+            RLMEventCommitScope(context, id, completion)
+        }
+
+        /**
+        Cancel this event scope and discard all generated events.
+
+        An exception will be thrown if this scope has already been committed or
+        cancelled (i.e. if ``isActive`` is `false`).
+        */
+        public func cancel() {
+            RLMEventCancelScope(context, id)
+        }
+
+        /**
+        True if this scope has not been committed or cancelled, and false otherwise.
+        */
+        public var isActive: Bool {
+            RLMEventIsActive(context, id)
+        }
+
+        let realm: RLMRealm
+        let context: OpaquePointer
+        let id: UInt64
+        fileprivate init(realm: RLMRealm, context: OpaquePointer, id: UInt64) {
+            self.realm = realm
+            self.context = context
+            self.id = id
+        }
+        deinit {
+            guard isActive else { return }
+            logRuntimeIssue("Deallocating an active event scope. The scope's events will be discarded.")
+            cancel()
+        }
+    }
 }
 
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, macCatalyst 13.0, macCatalystApplicationExtension 13.0, *)
-public extension Events {
+@available(macOS 10.15, watchOS 6.0, iOS 13.0, tvOS 13.0, macCatalyst 13.0, *)
+extension Events.Scope {
     /**
-    End recording the current event scope and report all generated events.
+    End recording the event scope and report all generated events.
 
     This function saves the events to disk locally and then asynchronously
     sends them to the server. The returned future is fulfilled when the event
     data has been successfully persisted, and *not* when the actual upload has
     completed.
 
-    Calls to this function must be paired with calls to `beginScope()` and an
-    exception will be thrown if no scope is currently active.
+    An exception will be thrown if this scope has already been committed or
+    cancelled (i.e. if ``isActive`` is `false`).
     */
     @_disfavoredOverload
-    func endScope() -> Future<Void, Error> {
+    public func commit() -> Future<Void, Error> {
         return Future<Void, Error> { promise in
-            self.endScope { error in
+            RLMEventCommitScope(self.context, self.id) { error in
                 if let error = error {
                     promise(.failure(error))
                 } else {
@@ -131,6 +178,14 @@ public extension Events {
                 }
             }
         }
+    }
+}
+
+@available(macOS 10.15, watchOS 6.0, iOS 13.0, tvOS 13.0, macCatalyst 13.0, *)
+public extension Events {
+    @available(*, unavailable, message: "Use EventScope.commit()")
+    func endScope() -> Future<Void, Error> {
+        fatalError()
     }
 
     /**

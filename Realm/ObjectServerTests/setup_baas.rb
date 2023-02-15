@@ -18,13 +18,14 @@ DEPENDENCIES = File.open("#{BASE_DIR}/dependencies.list").map { |line|
 }.to_h
 
 MONGODB_VERSION='5.0.6'
-GO_VERSION='1.17.8'
+GO_VERSION='1.19.5'
 NODE_VERSION='16.13.1'
 STITCH_VERSION=DEPENDENCIES["STITCH_VERSION"]
 
 MONGODB_URL="https://fastdl.mongodb.org/osx/mongodb-macos-x86_64-#{MONGODB_VERSION}.tgz"
 TRANSPILER_TARGET='node16-macos'
 SERVER_STITCH_LIB_URL="https://s3.amazonaws.com/stitch-artifacts/stitch-support/stitch-support-macos-debug-4.3.2-721-ge791a2e-patch-5e2a6ad2a4cf473ae2e67b09.tgz"
+STITCH_SUPPORT_URL="https://static.realm.io/downloads/swift/stitch-support.tar.xz"
 MONGO_DIR="#{BUILD_DIR}/mongodb-macos-x86_64-#{MONGODB_VERSION}"
 
 def setup_mongod
@@ -106,25 +107,28 @@ def setup_stitch
         end
     end
 
+    if !File.exist?("#{BUILD_DIR}/stitch-support.tar.xz")
+        puts 'downloading stitch support'
+        puts `cd #{BUILD_DIR} && curl --silent -O "#{STITCH_SUPPORT_URL}"`
+    end
+
     stitch_dir = stitch_worktree
     if !File.exist?("#{LIB_DIR}/libstitch_support.dylib")
-        puts 'downloading mongodb dylibs'
-        FileUtils.mkdir_p "#{BUILD_DIR}/go/src/github.com/10gen/stitch/etc/dylib"
-        puts `curl -s '#{SERVER_STITCH_LIB_URL}' | tar xvfz - --strip-components=1 -C '#{BUILD_DIR}/go/src/github.com/10gen/stitch/etc/dylib'`
-        FileUtils.copy("#{BUILD_DIR}/go/src/github.com/10gen/stitch/etc/dylib/lib/libstitch_support.dylib", LIB_DIR)
+        FileUtils.mkdir_p "#{stitch_dir}/etc/dylib/include/stitch_support/v1/stitch_support"
+        puts `tar --extract --strip-components=1 -C '#{stitch_dir}/etc/dylib' --file '#{BUILD_DIR}/stitch-support.tar.xz' stitch-support/lib stitch-support/include`
+        FileUtils.copy "#{stitch_dir}/etc/dylib/lib/libstitch_support.dylib", "#{LIB_DIR}"
+        FileUtils.copy "#{stitch_dir}/etc/dylib/include/stitch_support.h", "#{stitch_dir}/etc/dylib/include/stitch_support/v1/stitch_support"
     end
 
     update_doc_filepath = "#{BIN_DIR}/update_doc"
     if !File.exist?(update_doc_filepath)
-        puts "downloading update_doc"
-        puts `cd '#{BIN_DIR}' && curl --silent -O "https://s3.amazonaws.com/stitch-artifacts/stitch-mongo-libs/stitch_mongo_libs_osx_patch_cbcbfd8ebefcca439ff2e4d99b022aedb0d61041_59e2b7a5c9ec4432c400181c_17_10_15_01_19_33/update_doc"`
+        puts `tar --extract --strip-components=2 -C '#{BIN_DIR}' --file '#{BUILD_DIR}/stitch-support.tar.xz' stitch-support/bin/update_doc`
         puts `chmod +x '#{update_doc_filepath}'`
     end
 
     assisted_agg_filepath = "#{BIN_DIR}/assisted_agg"
     if !File.exist?(assisted_agg_filepath)
-        puts "downloading assisted_agg"
-        puts `cd '#{BIN_DIR}' && curl --silent -O "https://s3.amazonaws.com/stitch-artifacts/stitch-mongo-libs/stitch_mongo_libs_osx_patch_b1c679a26ecb975372de41238ea44e4719b8fbf0_5f3d91c10ae6066889184912_20_08_19_20_57_17/assisted_agg"`
+        puts `tar --extract --strip-components=2 -C '#{BIN_DIR}' --file '#{BUILD_DIR}/stitch-support.tar.xz' stitch-support/bin/assisted_agg`
         puts `chmod +x '#{assisted_agg_filepath}'`
     end
 

@@ -312,9 +312,22 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     }
 
     func waitForSyncEnabled(flexibleSync: Bool = false, appServerId: String, syncServiceId: String, syncServiceConfig: [String: Any]) {
-        _ = expectSuccess(RealmServer.shared.enableSync(
-            flexibleSync: flexibleSync, appServerId: appServerId,
-            syncServiceId: syncServiceId, syncServiceConfiguration: syncServiceConfig))
+        while true {
+            do {
+                _ = try RealmServer.shared.enableSync(
+                    flexibleSync: flexibleSync, appServerId: appServerId,
+                    syncServiceId: syncServiceId, syncServiceConfiguration: syncServiceConfig).get()
+                break
+            } catch {
+                // "cannot transition sync service state to \"enabled\" while sync is being terminated. Please try again in a few minutes after sync termination has completed"
+                guard error.localizedDescription.contains("Please try again in a few minutes") else {
+                    XCTFail("\(error))")
+                    return
+                }
+                print("waiting for sync to terminate...")
+                sleep(1)
+            }
+        }
         XCTAssertTrue(try RealmServer.shared.isSyncEnabled(flexibleSync: flexibleSync, appServerId: appServerId, syncServiceId: syncServiceId))
     }
 
@@ -424,52 +437,36 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     }
 
     func prepareClientReset(_ partition: String, _ user: User) throws {
-        let collection = setupMongoCollection(user: user, collectionName: "SwiftPerson")
-
-        // Initialize the local file so that we have conflicting history
         try autoreleasepool {
+            // Initialize the local file so that we have conflicting history
             var configuration = user.configuration(partitionValue: partition)
             configuration.objectTypes = [SwiftPerson.self]
             let realm = try Realm(configuration: configuration)
             waitForUploads(for: realm)
-        }
-
-        // Create an object on the server which should be present after client reset
-        let serverObject: Document = [
-            "realm_id": .string(partition),
-            "_id": .objectId(ObjectId.generate()),
-            "firstName": .string("Paul"),
-            "lastName": .string("M"),
-            "age": .int32(30)
-        ]
-        collection.insertOne(serverObject).await(self, timeout: 30.0)
-
-        // Sync is disabled, block executed, sync re-enabled
-        try executeBlockOffline(appId: appId) {
-            var configuration = user.configuration(partitionValue: partition)
-            configuration.objectTypes = [SwiftPerson.self]
-            let realm = try Realm(configuration: configuration)
             realm.syncSession!.suspend()
-            // Add an object to the local realm that will not be in the server realm (because sync is disabled).
+            try RealmServer.shared.triggerClientReset(appId, realm)
+
+            // Add an object to the local realm that won't be synced due to the suspend
             try realm.write {
                 realm.add(SwiftPerson(firstName: "John", lastName: "L"))
             }
             XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1)
         }
 
-        // After restarting sync, the sync history translator service needs time
-        // to resynthesize the new history from existing objects on the server
-        // The following creates a new realm with the same partition and wait for
-        // downloads to ensure the the new history has been created.
+        // Write a different object in a different Realm which should appear in
+        // the first one after a client reset
         try autoreleasepool {
-            var newConfig = user.configuration(partitionValue: partition)
-            newConfig.fileURL = RLMTestRealmURL()
-            newConfig.objectTypes = [SwiftPerson.self]
-            let newRealm = try Realm(configuration: newConfig)
-
-            waitForServerHistoryAfterRestart(realm: newRealm)
+            var config = user.configuration(partitionValue: partition)
+            config.fileURL = RLMTestRealmURL()
+            config.objectTypes = [SwiftPerson.self]
+            let realm = try Realm(configuration: config)
+            try realm.write {
+                realm.add(SwiftPerson(firstName: "Paul", lastName: "M"))
+            }
+            waitForUploads(for: realm)
         }
     }
+
     func prepareFlexibleClientReset(_ user: User) throws {
         let collection = setupMongoCollection(user: user, collectionName: "SwiftPerson")
 
@@ -571,7 +568,12 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             XCTAssertEqual(results2.count, 1)
             XCTAssertEqual(results2.filter("firstName == 'Paul'").count, 1)
 
-            afterCallbackEx.fulfill()
+            // Fulfill on the main thread to make it harder to hit a race
+            // condition where the test completes before the client reset finishes
+            // unwinding. This does not fully fix the problem.
+            DispatchQueue.main.async {
+                afterCallbackEx.fulfill()
+            }
         }
         return (beforeClientReset, afterClientReset)
     }
@@ -595,7 +597,12 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             XCTAssertEqual(results2.filter("firstName == 'John'").count, 1)
             XCTAssertEqual(results2.filter("firstName == 'Paul'").count, 1)
 
-            afterCallbackEx.fulfill()
+            // Fulfill on the main thread to make it harder to hit a race
+            // condition where the test completes before the client reset finishes
+            // unwinding. This does not fully fix the problem.
+            DispatchQueue.main.async {
+                afterCallbackEx.fulfill()
+            }
         }
         return (beforeClientReset, afterClientReset)
     }
@@ -1753,7 +1760,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         app.emailPasswordAuth.callResetPasswordFunction(email: email,
                                                         password: randomString(10),
                                                         args: [[:]]).awaitFailure(self) {
-            assertAppError($0, .unknown, "failed to reset password for user \(email)")
+            assertAppError($0, .unknown, "failed to reset password for user \"\(email)\"")
         }
     }
 
@@ -3126,7 +3133,7 @@ class AsyncAwaitObjectServerTests: SwiftSyncTestCase {
         await assertThrowsError(try await auth.callResetPasswordFunction(email: email,
                                                                          password: randomString(10),
                                                                          args: [[:]])) {
-            assertAppError($0, .unknown, "failed to reset password for user \(email)")
+            assertAppError($0, .unknown, "failed to reset password for user \"\(email)\"")
         }
     }
 
