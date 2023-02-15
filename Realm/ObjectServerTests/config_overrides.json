@@ -14,6 +14,9 @@
     "streams": {
       "eventSubscriptionPollingPeriodSec": 2,
       "eventSubscriptionHeartbeatPeriodSec": 1
+    },
+    "translator": {
+      "maxCoordinatorTranslators": 1000
     }
   },
   "graphql": {
