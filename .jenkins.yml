@@ -4,40 +4,40 @@
 # This is a generated file produced by scripts/pr-ci-matrix.rb.
 
 xcode_version:
-# - 13.4.1
-# - 14.0.1
-# - 14.1
+ - 13.4.1
+ - 14.0.1
+ - 14.1
  - 14.2
 target:
-# - docs
-# - swiftlint
-# - osx
-# - osx-encryption
-# - osx-object-server
-# - swiftpm
-# - swiftpm-debug
-# - swiftpm-address
-# - swiftpm-thread
-# - swiftpm-ios
-# - ios-static
-# - ios-dynamic
-# - watchos
-# - tvos
-# - osx-swift
-# - ios-swift
-# - tvos-swift
-# - osx-swift-evolution
-# - ios-swift-evolution
-# - tvos-swift-evolution
-# - catalyst
-# - catalyst-swift
-# - xcframework
-# - cocoapods-osx
-# - cocoapods-ios
-# - cocoapods-ios-dynamic
-# - cocoapods-watchos
+ - docs
+ - swiftlint
+ - osx
+ - osx-encryption
+ - osx-object-server
+ - swiftpm
+ - swiftpm-debug
+ - swiftpm-address
+ - swiftpm-thread
+ - swiftpm-ios
+ - ios-static
+ - ios-dynamic
+ - watchos
+ - tvos
+ - osx-swift
+ - ios-swift
+ - tvos-swift
+ - osx-swift-evolution
+ - ios-swift-evolution
+ - tvos-swift-evolution
+ - catalyst
+ - catalyst-swift
+ - xcframework
+ - cocoapods-osx
+ - cocoapods-ios
+ - cocoapods-ios-dynamic
+ - cocoapods-watchos
  - swiftui-ios
-# - swiftui-server-osx
+ - swiftui-server-osx
 configuration:
  - N/A
 
