@@ -1,7 +1,8 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+* Add support for KeyPath initializiation for LinkingObjects declared with @Persisted: 
+  `@Persisted(originProperty: \.dogs) var persons: LinkingObjects<Person>
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
