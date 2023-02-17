@@ -89,7 +89,7 @@ func objectServerTestSupportTarget(name: String, dependencies: [Target.Dependenc
 func objectServerTestTarget(name: String, sources: [String]) -> Target {
     .testTarget(
         name: name,
-        dependencies: ["RealmSwift", "RealmTestSupport", "RealmSyncTestSupport", "RealmSwiftSyncTestSupport"],
+        dependencies: ["RealmSwift", "RealmTestSupport", "RealmSyncTestSupport", "RealmSwiftSyncTestSupport", .product(name: "SwiftBSON", package: "SwiftBSON")],
         path: "Realm/ObjectServerTests",
         exclude: objectServerTestSources.filter { !sources.contains($0) },
         sources: sources,
@@ -114,7 +114,9 @@ let package = Package(
             targets: ["Realm", "RealmSwift"]),
     ],
     dependencies: [
-        .package(name: "RealmDatabase", url: "https://github.com/realm/realm-core.git", .exact(Version(coreVersionStr)!))
+        .package(name: "RealmDatabase", url: "https://github.com/realm/realm-core.git", .exact(Version(coreVersionStr)!)),
+        .package(name: "SwiftBSON", url: "https://github.com/mongodb/swift-bson", .upToNextMajor(from: "3.1.0"))
+
     ],
     targets: [
       .target(

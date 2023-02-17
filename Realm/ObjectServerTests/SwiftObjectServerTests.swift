@@ -3157,7 +3157,7 @@ class AsyncAwaitObjectServerTests: SwiftSyncTestCase {
         }
         XCTAssertEqual(sum, 15)
     }
-
+    
     // MARK: - Objective-C async await
     func testPushRegistrationAsyncAwait() async throws {
         let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
@@ -3228,7 +3228,7 @@ class AsyncAwaitObjectServerTests: SwiftSyncTestCase {
 
         _ = try await user.functions.updateUserData([
             ["favourite_colour": "green", "apples": 10]
-        ])
+        ]) as AnyBSON
 
         try await app.currentUser?.refreshCustomData()
         XCTAssertEqual(app.currentUser?.customData["favourite_colour"], .string("green"))
@@ -3252,5 +3252,25 @@ class AsyncAwaitObjectServerTests: SwiftSyncTestCase {
     }
 }
 
+#if canImport(SwiftBSON)
+import SwiftBSON
+
+private struct Preferences: Codable {
+    let favoriteColor: String
+    let apples: Int
+}
+
+@available(macOS 12.0, *)
+extension AsyncAwaitObjectServerTests {
+    func testUserCallFunctionAsyncAwaitCodable() async throws {
+        let user = try await self.app.login(credentials: basicCredentials())
+        let preferences = try ExtendedJSONDecoder().decode(Preferences.self,
+                                                           from: try await user.functions.preferences())
+        
+        XCTAssertEqual(preferences.favoriteColor, "green")
+        XCTAssertEqual(preferences.apples, 10)
+    }
+}
+#endif // canImport(SwiftBSON)
 #endif // swift(>=5.6)
 #endif // os(macOS)

@@ -919,6 +919,17 @@ public class RealmServer: NSObject {
         ], failOnError)
 
         app.functions.post(on: group, [
+            "name": "preferences",
+            "private": false,
+            "can_evaluate": [:],
+            "source": """
+            exports = function(...args) {
+                return ["favoriteColor": "green", "apples": 10]
+            };
+            """
+        ], failOnError)
+        
+        app.functions.post(on: group, [
             "name": "updateUserData",
             "private": false,
             "can_evaluate": [:],

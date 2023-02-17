@@ -1038,6 +1038,19 @@ extension FunctionCallable {
             }
         }
     }
+    
+    public func dynamicallyCall(withArguments args: [[AnyBSON]]) async throws -> Data {
+        try await withCheckedThrowingContinuation { continuation in
+            let objcArgs = args.first!.map(ObjectiveCSupport.convertBson)
+            self.user.__callFunction(withStringResultNamed: name, arguments: objcArgs) { (str: String?, error: Error?) in
+                if let s = str, let data = s.data(using: .utf8) {
+                    continuation.resume(returning: data)
+                } else {
+                    continuation.resume(throwing: error ?? Realm.Error.callFailed)
+                }
+            }
+        }
+    }
 }
 #endif // swift(>=5.6)
 
