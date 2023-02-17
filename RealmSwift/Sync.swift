@@ -966,9 +966,7 @@ public class UserPublisher: Publisher {
     /// :nodoc:
     public func receive<S>(subscriber: S) where S: Subscriber, S.Failure == Never, Output == S.Input {
         let token = user.subscribe { _ in
-            DispatchQueue.main.async {
-                _ = subscriber.receive(self.user)
-            }
+            _ = subscriber.receive(self.user)
         }
 
         subscriber.receive(subscription: UserSubscription(user: user, token: token))
@@ -980,8 +978,8 @@ extension User: ObservableObject {
     /// A publisher that emits Void each time the user changes.
     ///
     /// Despite the name, this actually emits *after* the user has changed.
-    public var objectWillChange: UserPublisher {
-        return UserPublisher(self)
+    public var objectWillChange: AnyPublisher<UserPublisher.Output, UserPublisher.Failure> {
+        return UserPublisher(self).receive(on: DispatchQueue.main).eraseToAnyPublisher()
     }
 }
 #endif
