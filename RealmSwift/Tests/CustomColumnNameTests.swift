@@ -25,7 +25,7 @@ protocol CustomColumnObjectFactory {
     associatedtype Root: Object
 
     static func create(primaryKey: ObjectId, nestedObject: Root?) -> Root
-    static func createValues(primaryKey: ObjectId) -> Any
+    static func createValues(primaryKey: ObjectId) -> [String: Any]
 }
 
 // MARK: - Models
@@ -101,7 +101,7 @@ extension ModernCustomObject: CustomColumnObjectFactory {
         return object
     }
 
-    static func createValues(primaryKey: ObjectId) -> Any {
+    static func createValues(primaryKey: ObjectId) -> [String: Any] {
         return [
             "pk": primaryKey,
             "intCol": 123,
@@ -180,7 +180,7 @@ extension OldCustomObject: CustomColumnObjectFactory {
         return object
     }
 
-    static func createValues(primaryKey: ObjectId) -> Any {
+    static func createValues(primaryKey: ObjectId) -> [String: Any] {
         return [
             "pk": primaryKey,
             "intCol": 123,

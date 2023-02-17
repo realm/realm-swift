@@ -21,6 +21,9 @@ copy_core() {
     # XCFramework processing only copies the "realm" headers, so put the third-party ones in a known location
     mkdir -p "$dst/include"
     find "$src" -name external -exec ditto "{}" "$dst/include/external" \; -quit
+
+    # Remove the C API header to avoid accidentally pulling it in
+    find "$dst" -name realm.h -delete
 }
 
 tries_left=3

@@ -671,7 +671,7 @@ class ModernObjectCreationTests: TestCase {
         let realm = try! Realm()
         realm.beginWrite()
         let parent = realm.create(ModernEmbeddedParentObject.self, value: [
-            "object": ["value": 5, "child": ["value": 6], "children": [[7], [8]]],
+            "object": ["value": 5, "child": ["value": 6], "children": [[7], [8]]] as [String: Any],
             "array": [[9], [10]]
         ])
         XCTAssertEqual(parent.object!.value, 5)
@@ -721,7 +721,7 @@ class ModernObjectCreationTests: TestCase {
         let realm = try! Realm()
         realm.beginWrite()
         let parent = realm.create(ModernEmbeddedParentObject.self, value: [
-            "object": ["value": 5, "child": ["value": 6], "children": [[7], [8]]],
+            "object": ["value": 5, "child": ["value": 6], "children": [[7], [8]]] as [String: Any],
             "array": [[9], [10]]
         ])
         let copy = realm.create(ModernEmbeddedParentObject.self, value: parent)
@@ -742,7 +742,7 @@ class ModernObjectCreationTests: TestCase {
         let realmB = try! Realm()
         realmA.beginWrite()
         let parent = realmA.create(ModernEmbeddedParentObject.self, value: [
-            "object": ["value": 5, "child": ["value": 6], "children": [[7], [8]]],
+            "object": ["value": 5, "child": ["value": 6], "children": [[7], [8]]] as [String: Any],
             "array": [[9], [10]]
         ])
         try! realmA.commitWrite()
@@ -854,7 +854,7 @@ class ModernObjectCreationTests: TestCase {
         try! Realm().commitWrite()
 
         try! Realm().beginWrite()
-        let object = SwiftLinkToPrimaryStringObject(value: ["primary", ["primary", 2], []])
+        let object = SwiftLinkToPrimaryStringObject(value: ["primary", ["primary", 2] as [Any]])
         try! Realm().add(object, update: .modified)
         try! Realm().commitWrite()
 
@@ -907,7 +907,7 @@ class ModernObjectCreationTests: TestCase {
         weak var weakObj1: ModernCircleObject?, weakObj2: ModernCircleObject?
 
         autoreleasepool {
-            let obj1 = ModernCircleObject(value: [])
+            let obj1 = ModernCircleObject()
             let obj2 = ModernCircleObject(value: [obj1, [obj1]])
             obj1.obj = obj2
             obj1.array.append(obj2)

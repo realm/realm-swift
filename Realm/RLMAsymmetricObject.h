@@ -20,7 +20,7 @@
 
 RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
-@class RLMObjectSchema, RLMPropertyDescriptor;
+@class RLMObjectSchema, RLMPropertyDescriptor, RLMRealm;
 /**
  `RLMAsymmetricObject` is a base class used to define asymmetric Realm objects.
 

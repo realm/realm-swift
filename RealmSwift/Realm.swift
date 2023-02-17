@@ -563,13 +563,6 @@ public typealias AsyncTransactionId = RLMAsyncTransactionId
         }
     }
 
-    /// :nodoc:
-    @discardableResult
-    @available(*, unavailable, message: "Pass .error, .modified or .all rather than a boolean. .error is equivalent to false and .all is equivalent to true.")
-    public func create<T: Object>(_ type: T.Type, value: Any = [:], update: Bool) -> T {
-        fatalError()
-    }
-
     /**
      Creates a Realm object with a given value, adding it to the Realm and returning it.
 
@@ -601,20 +594,13 @@ public typealias AsyncTransactionId = RLMAsyncTransactionId
      - returns: The newly created object.
      */
     @discardableResult
-    public func create<T: Object>(_ type: T.Type, value: Any = [:], update: UpdatePolicy = .error) -> T {
+    public func create<T: Object>(_ type: T.Type, value: Any = [String: Any](), update: UpdatePolicy = .error) -> T {
         if update != .error {
             RLMVerifyHasPrimaryKey(type)
         }
         let typeName = (type as Object.Type).className()
         return unsafeDowncast(RLMCreateObjectInRealmWithValue(rlmRealm, typeName, value,
                                                               RLMUpdatePolicy(rawValue: UInt(update.rawValue))!), to: type)
-    }
-
-    /// :nodoc:
-    @discardableResult
-    @available(*, unavailable, message: "Pass .error, .modified or .all rather than a boolean. .error is equivalent to false and .all is equivalent to true.")
-    public func dynamicCreate(_ typeName: String, value: Any = [:], update: Bool) -> DynamicObject {
-        fatalError()
     }
 
     /**
@@ -656,7 +642,7 @@ public typealias AsyncTransactionId = RLMAsyncTransactionId
      :nodoc:
      */
     @discardableResult
-    public func dynamicCreate(_ typeName: String, value: Any = [:], update: UpdatePolicy = .error) -> DynamicObject {
+    public func dynamicCreate(_ typeName: String, value: Any = [String: Any](), update: UpdatePolicy = .error) -> DynamicObject {
         if update != .error && schema[typeName]?.primaryKeyProperty == nil {
             throwRealmException("'\(typeName)' does not have a primary key and can not be updated")
         }
@@ -1114,7 +1100,7 @@ extension Realm {
      - parameter type:   The type of the object to create.
      - parameter value:  The value used to populate the object.
      */
-    public func create<T: AsymmetricObject>(_ type: T.Type, value: Any = [:]) {
+    public func create<T: AsymmetricObject>(_ type: T.Type, value: Any = [String: Any]()) {
         let typeName = (type as AsymmetricObject.Type).className()
         RLMCreateAsymmetricObjectInRealm(rlmRealm, typeName, value)
     }

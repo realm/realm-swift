@@ -418,7 +418,7 @@ using namespace realm;
     return _user;
 }
 
-- (RLMUserSubscriptionToken *)subscribe:(RLMUserNotificationBlock) block {
+- (RLMUserSubscriptionToken *)subscribe:(RLMUserNotificationBlock)block {
     return [[RLMUserSubscriptionToken alloc] initWithToken:_user->subscribe([block, self] (auto&) {
         block(self);
     })];

@@ -54,6 +54,7 @@ public enum ProcessKind {
     }
 }
 
+@available(macOS 10.15, *)
 @MainActor
 open class SwiftSyncTestCase: RLMSyncTestCase {
     public func executeChild(file: StaticString = #file, line: UInt = #line) {

@@ -151,7 +151,7 @@
 			isa = PBXProject;
 			attributes = {
 				CLASSPREFIX = RLMP;
-				LastUpgradeCheck = 1400;
+				LastUpgradeCheck = 1430;
 				ORGANIZATIONNAME = Realm;
 			};
 			buildConfigurationList = 2263AAB119B0A1E5007240D9 /* Build configuration list for PBXProject "RealmPlugin" */;

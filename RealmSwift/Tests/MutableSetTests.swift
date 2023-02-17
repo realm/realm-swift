@@ -524,7 +524,7 @@ class MutableSetNewlyCreatedTests: MutableSetTests {
     override func createSet() -> SwiftMutableSetPropertyObject {
         let realm = realmWithTestPath()
         realm.beginWrite()
-        let set = realm.create(SwiftMutableSetPropertyObject.self, value: ["name", [], []])
+        let set = realm.create(SwiftMutableSetPropertyObject.self, value: ["name"])
         try! realm.commitWrite()
 
         XCTAssertNotNil(set.realm)
@@ -546,7 +546,7 @@ class MutableSetRetrievedTests: MutableSetTests {
     override func createSet() -> SwiftMutableSetPropertyObject {
         let realm = realmWithTestPath()
         realm.beginWrite()
-        realm.create(SwiftMutableSetPropertyObject.self, value: ["name", [], []])
+        realm.create(SwiftMutableSetPropertyObject.self, value: ["name"])
         try! realm.commitWrite()
         let set = realm.objects(SwiftMutableSetPropertyObject.self).last!
 

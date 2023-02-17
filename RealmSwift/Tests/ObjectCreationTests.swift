@@ -354,14 +354,13 @@ class ObjectCreationTests: TestCase {
         XCTAssertEqual(try! Realm().objects(SwiftObject.self).count, 2, "Object should have been copied")
     }
 
-    func testCreateWithNestedObjects() {
+    func testCreateWithNestedObjects() throws {
         let standalone = SwiftPrimaryStringObject(value: ["p0", 11])
-        let realm = try! Realm()
-
-        realm.beginWrite()
-        let objectWithNestedObjects = try! Realm().create(SwiftLinkToPrimaryStringObject.self, value: ["p1", ["p1", 12],
-            [standalone]])
-        try! realm.commitWrite()
+        let realm = try Realm()
+        let objectWithNestedObjects = try realm.write {
+            realm.create(SwiftLinkToPrimaryStringObject.self, value: ["p1", ["p1", 12] as [Any],
+                                                                      [standalone]])
+        }
 
         let stringObjects = realm.objects(SwiftPrimaryStringObject.self)
         XCTAssertEqual(stringObjects.count, 2)
@@ -376,19 +375,21 @@ class ObjectCreationTests: TestCase {
 
         let standalone1 = SwiftPrimaryStringObject(value: ["p3", 11])
         realm.beginWrite()
-        assertThrows(realm.create(SwiftLinkToPrimaryStringObject.self, value: ["p3", ["p3", 11], [standalone1]]),
+        assertThrows(realm.create(SwiftLinkToPrimaryStringObject.self, value: ["p3", ["p3", 11] as [Any], [standalone1]]),
             "Should throw with duplicate primary key")
-        try! realm.commitWrite()
+        realm.cancelWrite()
     }
 
-    func testUpdateWithNestedObjects() {
+    func testUpdateWithNestedObjects() throws {
         let standalone = SwiftPrimaryStringObject(value: ["primary", 11])
-        try! Realm().beginWrite()
-        let object = try! Realm().create(SwiftLinkToPrimaryStringObject.self, value: ["otherPrimary", ["primary", 12],
-            [["primary", 12]]], update: .all)
-        try! Realm().commitWrite()
+        let realm = try Realm()
+        let object = try realm.write {
+            realm.create(SwiftLinkToPrimaryStringObject.self,
+                         value: ["otherPrimary", ["primary", 12] as [Any],
+                                 [["primary", 12] as [Any]]], update: .all)
+        }
 
-        let stringObjects = try! Realm().objects(SwiftPrimaryStringObject.self)
+        let stringObjects = realm.objects(SwiftPrimaryStringObject.self)
         XCTAssertEqual(stringObjects.count, 1)
         let persistedObject = object.object!
 
@@ -398,14 +399,16 @@ class ObjectCreationTests: TestCase {
         XCTAssertEqual(object.objects.first!, persistedObject)
     }
 
-    func testUpdateChangedWithNestedObjects() {
+    func testUpdateChangedWithNestedObjects() throws {
         let standalone = SwiftPrimaryStringObject(value: ["primary", 11])
-        try! Realm().beginWrite()
-        let object = try! Realm().create(SwiftLinkToPrimaryStringObject.self, value: ["otherPrimary", ["primary", 12],
-                                                                                      [["primary", 12]]], update: .modified)
-        try! Realm().commitWrite()
+        let realm = try Realm()
+        let object = try realm.write {
+            realm.create(SwiftLinkToPrimaryStringObject.self,
+                         value: ["otherPrimary", ["primary", 12] as [Any],
+                                 [["primary", 12] as [Any]]], update: .modified)
+        }
 
-        let stringObjects = try! Realm().objects(SwiftPrimaryStringObject.self)
+        let stringObjects = realm.objects(SwiftPrimaryStringObject.self)
         XCTAssertEqual(stringObjects.count, 1)
         let persistedObject = object.object!
 
@@ -510,32 +513,38 @@ class ObjectCreationTests: TestCase {
         }
     }
 
-    func testUpdateWithObjectsFromAnotherRealm() {
-        realmWithTestPath().beginWrite()
-        let otherRealmObject = realmWithTestPath().create(SwiftLinkToPrimaryStringObject.self,
-                                                                value: ["primary", NSNull(), [["2", 2], ["4", 4]]])
-        try! realmWithTestPath().commitWrite()
+    func testUpdateWithObjectsFromAnotherRealm() throws {
+        let testRealm = realmWithTestPath()
+        let otherRealmObject = try testRealm.write {
+            testRealm.create(SwiftLinkToPrimaryStringObject.self,
+                             value: ["primary", NSNull(), [["2", 2] as [Any], ["4", 4]]])
+        }
 
-        try! Realm().beginWrite()
-        try! Realm().create(SwiftLinkToPrimaryStringObject.self, value: ["primary", ["10", 10], [["11", 11]]])
-        let object = try! Realm().create(SwiftLinkToPrimaryStringObject.self, value: otherRealmObject, update: .all)
-        try! Realm().commitWrite()
+        let realm = try Realm()
+        let object = try realm.write { () -> SwiftLinkToPrimaryStringObject in
+            realm.create(SwiftLinkToPrimaryStringObject.self,
+                         value: ["primary", ["10", 10] as [Any], [["11", 11] as [Any]]])
+            return realm.create(SwiftLinkToPrimaryStringObject.self, value: otherRealmObject, update: .all)
+        }
 
         XCTAssertNotEqual(otherRealmObject, object) // the object from the other realm should be copied into this realm
         XCTAssertEqual(try! Realm().objects(SwiftLinkToPrimaryStringObject.self).count, 1)
         XCTAssertEqual(try! Realm().objects(SwiftPrimaryStringObject.self).count, 4)
     }
 
-    func testUpdateChangedWithObjectsFromAnotherRealm() {
-        realmWithTestPath().beginWrite()
-        let otherRealmObject = realmWithTestPath().create(SwiftLinkToPrimaryStringObject.self,
-                                                          value: ["primary", NSNull(), [["2", 2], ["4", 4]]])
-        try! realmWithTestPath().commitWrite()
+    func testUpdateChangedWithObjectsFromAnotherRealm() throws {
+        let testRealm = realmWithTestPath()
+        let otherRealmObject = try testRealm.write {
+            testRealm.create(SwiftLinkToPrimaryStringObject.self,
+                             value: ["primary", NSNull(), [["2", 2] as [Any], ["4", 4]]])
+        }
 
-        try! Realm().beginWrite()
-        try! Realm().create(SwiftLinkToPrimaryStringObject.self, value: ["primary", ["10", 10], [["11", 11]]])
-        let object = try! Realm().create(SwiftLinkToPrimaryStringObject.self, value: otherRealmObject, update: .modified)
-        try! Realm().commitWrite()
+        let realm = try Realm()
+        let object = try realm.write { () -> SwiftLinkToPrimaryStringObject in
+            realm.create(SwiftLinkToPrimaryStringObject.self,
+                         value: ["primary", ["10", 10] as [Any], [["11", 11] as [Any]]])
+            return realm.create(SwiftLinkToPrimaryStringObject.self, value: otherRealmObject, update: .modified)
+        }
 
         XCTAssertNotEqual(otherRealmObject, object) // the object from the other realm should be copied into this realm
         XCTAssertEqual(try! Realm().objects(SwiftLinkToPrimaryStringObject.self).count, 1)
@@ -794,7 +803,7 @@ class ObjectCreationTests: TestCase {
     func testDynamicCreateEmbeddedDirectly() {
         let realm = try! Realm()
         realm.beginWrite()
-        assertThrows(realm.dynamicCreate("EmbeddedTreeObject1", value: []),
+        assertThrows(realm.dynamicCreate("EmbeddedTreeObject1"),
                      reasonMatching: "Embedded objects cannot be created directly")
         realm.cancelWrite()
     }
@@ -803,7 +812,7 @@ class ObjectCreationTests: TestCase {
         let realm = try! Realm()
         realm.beginWrite()
         let parent = realm.create(EmbeddedParentObject.self, value: [
-            "object": ["value": 5, "child": ["value": 6], "children": [[7], [8]]],
+            "object": ["value": 5, "child": ["value": 6], "children": [[7], [8]]] as [String: Any],
             "array": [[9], [10]]
         ])
         XCTAssertEqual(parent.object!.value, 5)
@@ -853,7 +862,7 @@ class ObjectCreationTests: TestCase {
         let realm = try! Realm()
         realm.beginWrite()
         let parent = realm.create(EmbeddedParentObject.self, value: [
-            "object": ["value": 5, "child": ["value": 6], "children": [[7], [8]]],
+            "object": ["value": 5, "child": ["value": 6], "children": [[7], [8]]] as [String: Any],
             "array": [[9], [10]]
         ])
         let copy = realm.create(EmbeddedParentObject.self, value: parent)
@@ -874,7 +883,7 @@ class ObjectCreationTests: TestCase {
         let realmB = try! Realm()
         realmA.beginWrite()
         let parent = realmA.create(EmbeddedParentObject.self, value: [
-            "object": ["value": 5, "child": ["value": 6], "children": [[7], [8]]],
+            "object": ["value": 5, "child": ["value": 6], "children": [[7], [8]]] as [String: Any],
             "array": [[9], [10]]
         ])
         try! realmA.commitWrite()
@@ -953,15 +962,17 @@ class ObjectCreationTests: TestCase {
         realm.cancelWrite()
     }
 
-    func testAddAndUpdateWithExisingNestedObjects() {
-        try! Realm().beginWrite()
-        let existingObject = try! Realm().create(SwiftPrimaryStringObject.self, value: ["primary", 1])
-        try! Realm().commitWrite()
+    func testAddAndUpdateWithExisingNestedObjects() throws {
+        let realm = try Realm()
+        let existingObject = try realm.write {
+            realm.create(SwiftPrimaryStringObject.self, value: ["primary", 1])
+        }
 
-        try! Realm().beginWrite()
-        let object = SwiftLinkToPrimaryStringObject(value: ["primary", ["primary", 2], []])
-        try! Realm().add(object, update: .all)
-        try! Realm().commitWrite()
+        let object = try realm.write { () -> SwiftLinkToPrimaryStringObject in
+            let object = SwiftLinkToPrimaryStringObject(value: ["primary", ["primary", 2] as [Any]])
+            realm.add(object, update: .all)
+            return object
+        }
 
         XCTAssertNotNil(object.realm)
         XCTAssertEqual(object.object!, existingObject) // the existing object should be updated
@@ -1018,7 +1029,7 @@ class ObjectCreationTests: TestCase {
         try! Realm().commitWrite()
 
         try! Realm().beginWrite()
-        let object = SwiftLinkToPrimaryStringObject(value: ["primary", ["primary", 2], []])
+        let object = SwiftLinkToPrimaryStringObject(value: ["primary", ["primary", 2] as [Any]])
         try! Realm().add(object, update: .modified)
         try! Realm().commitWrite()
 
@@ -1399,7 +1410,7 @@ class ObjectCreationTests: TestCase {
             return [
                 ["trueVal": ["boolCol": true], "falseVal": ["boolCol": false]],
                 ["trueVal": SwiftBoolObject(value: [true]), "falseVal": SwiftBoolObject(value: [false])],
-                ["trueVal": persistedObject, "falseVal": [false]]
+                ["trueVal": persistedObject, "falseVal": [false]] as [String: Any]
             ]
         }
         if array {
@@ -1407,7 +1418,7 @@ class ObjectCreationTests: TestCase {
                 [[true], [false]],
                 [["boolCol": true], ["boolCol": false]],
                 [SwiftBoolObject(value: [true]), SwiftBoolObject(value: [false])],
-                [persistedObject, [false]]
+                [persistedObject, [false]] as [Any]
             ]
         }
         switch type {
@@ -1433,8 +1444,8 @@ class ObjectCreationTests: TestCase {
         try! Realm().commitWrite()
         if map {
             return [
-                ["trueVal": ["boolCol": "invalid"], "falseVal": ["boolCol": false]],
-                ["trueVal": "invalid", "falseVal": SwiftBoolObject(value: [false])]
+                ["trueVal": ["boolCol": "invalid"] as [String: Any], "falseVal": ["boolCol": false]],
+                ["trueVal": "invalid", "falseVal": SwiftBoolObject(value: [false])] as [String: Any]
             ]
         }
         if array {

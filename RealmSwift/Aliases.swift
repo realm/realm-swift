@@ -17,7 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 import Foundation
-import Realm
+import Realm.Swift
 
 // These types don't change when wrapping in Swift
 // so we just typealias them to remove the 'RLM' prefix

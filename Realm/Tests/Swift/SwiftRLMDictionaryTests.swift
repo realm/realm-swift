@@ -91,7 +91,7 @@ class SwiftRLMDictionaryTests: RLMTestCase {
             "7": [1, 0 as Float, 2.5 as Double, false, dateMaxInput],
             "8": [0, 1.2 as Float, 0 as Double, true, dateMinInput],
             "9": [0, 1.2 as Float, 0 as Double, true, dateMinInput]
-        ]])
+        ] as [String: [Any]]])
         try! realm.commitWriteTransaction()
 
         XCTAssertEqual(dObj.dict.count, UInt(10), "10 objects added")
@@ -266,7 +266,7 @@ class SwiftRLMDictionaryTests: RLMTestCase {
             "7": [10, 0 as Float, 2.5 as Double, false, dateMaxInput],
             "8": [10, 1.2 as Float, 0 as Double, true, dateMinInput],
             "9": [10, 1.2 as Float, 0 as Double, true, dateMinInput]
-        ]])
+        ] as [String: [Any]]])
         try! realm.commitWriteTransaction()
 
         XCTAssertEqual(dObj.dictionary!.count, UInt(10), "10 objects added")
@@ -297,7 +297,7 @@ class SwiftRLMDictionaryTests: RLMTestCase {
             "7": [1, 0 as Float, 2.5 as Double, false, dateMaxInput],
             "8": [0, 1.2 as Float, 0 as Double, true, dateMinInput],
             "9": [0, 1.2 as Float, 0 as Double, true, dateMinInput]
-        ]])
+        ] as [String: [Any]]])
         try! realm.commitWriteTransaction()
 
         XCTAssertEqual(dObj.dictionary!.count, UInt(10), "10 objects added")
@@ -403,17 +403,12 @@ class SwiftRLMDictionaryTests: RLMTestCase {
     }
 
     func makeRlmEmployee(_ realm: RLMRealm, _ age: Int32, _ name: String, _ hired: Bool) -> SwiftRLMEmployeeObject {
-        let employee = SwiftRLMEmployeeObject.create(in: realm, withValue: ["age": age,
-                                                                            "name": name,
-                                                                            "hired": hired])
-        return employee
+        return SwiftRLMEmployeeObject.create(in: realm, withValue: [name, age, hired])
     }
 
     func makeEmployee(_ realm: RLMRealm, _ age: Int32, _ name: String, _ hired: Bool) -> EmployeeObject {
-        let employee = EmployeeObject.create(in: realm, withValue: ["age": age,
-                                                                    "name": name,
-                                                                    "hired": hired])
-        return employee
+        return EmployeeObject.create(in: realm,
+                                     withValue: ["age": age, "name": name, "hired": hired] as [String: Any])
     }
 
     func testDeleteLinksAndObjectsInDictionary_objc() {
@@ -423,10 +418,10 @@ class SwiftRLMDictionaryTests: RLMTestCase {
         let po1 = makeEmployee(realm, 40, "Joe", true)
         let po2 = makeEmployee(realm, 30, "John", false)
         let po3 = makeEmployee(realm, 25, "Jill", true)
-        let company = CompanyObject.create(in: realm, withValue: ["employeeDict":
-                                                                    ["Joe": po1,
-                                                                     "John": po2,
-                                                                     "Jill": po3]])
+        let company = CompanyObject.create(in: realm, withValue: ["employeeDict": [
+            "Joe": po1,
+            "John": po2,
+            "Jill": po3]])
         try! realm.commitWriteTransaction()
 
         let peopleInCompany = company.employeeDict!

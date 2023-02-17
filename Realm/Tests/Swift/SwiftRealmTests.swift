@@ -23,6 +23,7 @@ import Realm
 import RealmTestSupport
 #endif
 
+@available(iOS 13.0, *) // For @MainActor
 @MainActor
 class SwiftRLMRealmTests: RLMTestCase {
 

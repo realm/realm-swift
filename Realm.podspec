@@ -75,7 +75,10 @@ Pod::Spec.new do |s|
 
                               # Realm.Dynamic module
                               'include/RLMRealm_Dynamic.h',
-                              'include/RLMObjectBase_Dynamic.h'
+                              'include/RLMObjectBase_Dynamic.h',
+
+                              # Realm.Swift module
+                              'include/RLMSwiftObject.h'
 
                               # Realm.Private module
   private_header_files      = 'include/RLMAccessor.h',

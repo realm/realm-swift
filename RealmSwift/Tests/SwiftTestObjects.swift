@@ -109,10 +109,7 @@ class SwiftObject: Object {
             "decimalCol": Decimal128("123e4"),
             "objectIdCol": ObjectId("1234567890ab1234567890ab"),
             "objectCol": [false],
-            "uuidCol": UUID(uuidString: "137decc8-b300-4954-a233-f89909f4fd89")!,
-            "arrayCol": [],
-            "setCol": [],
-            "mapCol": [:]
+            "uuidCol": UUID(uuidString: "137decc8-b300-4954-a233-f89909f4fd89")!
         ]
     }
 }

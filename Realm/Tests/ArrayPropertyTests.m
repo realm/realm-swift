@@ -1403,7 +1403,7 @@
     [(RLMNotificationToken *)token invalidate];
 }
 
-static RLMArray<IntObject *> *managedTestArray() {
+static RLMArray<IntObject *> *managedTestArray(void) {
     RLMRealm *realm = [RLMRealm defaultRealm];
     __block RLMArray *array;
     [realm transactionWithBlock:^{

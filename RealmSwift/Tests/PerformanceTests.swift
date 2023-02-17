@@ -229,7 +229,7 @@ class SwiftPerformanceTests: TestCase {
         let realm = copyRealmToTestPath(largeRealm)
         realm.beginWrite()
         let arrayPropertyObject = realm.create(SwiftArrayPropertyObject.self,
-                                                     value: ["name", realm.objects(SwiftStringObject.self).map { $0 } as NSArray, []])
+                                               value: ["name", realm.objects(SwiftStringObject.self)])
         try! realm.commitWrite()
 
         measure {
@@ -243,7 +243,7 @@ class SwiftPerformanceTests: TestCase {
         let realm = copyRealmToTestPath(largeRealm)
         realm.beginWrite()
         let setPropertyObject = realm.create(SwiftMutableSetPropertyObject.self,
-                                             value: ["name", realm.objects(SwiftStringObject.self).map { $0 } as NSArray, []])
+                                             value: ["name", realm.objects(SwiftStringObject.self)])
         try! realm.commitWrite()
 
         measure {
@@ -257,7 +257,7 @@ class SwiftPerformanceTests: TestCase {
         let realm = copyRealmToTestPath(largeRealm)
         realm.beginWrite()
         let arrayPropertyObject = realm.create(SwiftArrayPropertyObject.self,
-                                                     value: ["name", realm.objects(SwiftStringObject.self).map { $0 } as NSArray, []])
+                                                     value: ["name", realm.objects(SwiftStringObject.self)])
         try! realm.commitWrite()
 
         measure {
@@ -272,7 +272,7 @@ class SwiftPerformanceTests: TestCase {
         let realm = copyRealmToTestPath(largeRealm)
         realm.beginWrite()
         let setPropertyObject = realm.create(SwiftMutableSetPropertyObject.self,
-                                             value: ["name", realm.objects(SwiftStringObject.self).map { $0 } as NSArray, []])
+                                             value: ["name", realm.objects(SwiftStringObject.self)])
         try! realm.commitWrite()
 
         measure {
@@ -308,7 +308,7 @@ class SwiftPerformanceTests: TestCase {
     func testEnumerateAndAccessMixed() {
         let realm = inMemoryRealm(#function)
         realm.beginWrite()
-        let list = realm.create(ModernListAnyRealmValueObject.self, value: []).value
+        let list = realm.create(ModernListAnyRealmValueObject.self).value
         for i in 0..<500000 {
             list.append(.int(i))
         }
@@ -347,7 +347,7 @@ class SwiftPerformanceTests: TestCase {
     func testManualDeletion() {
         inMeasureBlock {
             let realm = self.copyRealmToTestPath(mediumRealm)
-            let objects = realm.objects(SwiftStringObject.self).map { $0 }
+            let objects = Array(realm.objects(SwiftStringObject.self))
             self.startMeasuring()
             try! realm.write {
                 realm.delete(objects)

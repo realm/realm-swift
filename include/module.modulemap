@@ -3,8 +3,7 @@
 // Realm/ prefix (due to not being a framework module)
 module Realm {
     umbrella header "Realm/Realm.h"
-    export *
-    module * { export * }
+    export Foundation
 
     explicit module Private {
         header "Realm/RLMAccessor.h"
@@ -39,5 +38,9 @@ module Realm {
     explicit module Dynamic {
         header "Realm/RLMRealm_Dynamic.h"
         header "Realm/RLMObjectBase_Dynamic.h"
+    }
+
+    explicit module Swift {
+        header "Realm/RLMSwiftObject.h"
     }
 }

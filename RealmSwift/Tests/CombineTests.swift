@@ -85,8 +85,8 @@ class ObjectIdentifiableTests: TestCase {
         let realm = try! Realm()
         let (obj1, obj2) = try! realm.write {
             return (
-                realm.create(CombineIdentifiableObject.self, value: [1, [1]]),
-                realm.create(CombineIdentifiableObject.self, value: [2, [2]])
+                realm.create(CombineIdentifiableObject.self, value: [1, [1]] as [Any]),
+                realm.create(CombineIdentifiableObject.self, value: [2, [2]] as [Any])
             )
         }
         XCTAssertEqual(obj1.child!.id, obj1.child!.id)
@@ -155,7 +155,7 @@ class CombineRealmTests: CombinePublisherTestCase {
         }
 
         try! realm.write {
-            realm.create(SwiftIntObject.self, value: [])
+            realm.create(SwiftIntObject.self)
         }
         XCTAssertTrue(called)
     }
@@ -171,7 +171,7 @@ class CombineRealmTests: CombinePublisherTestCase {
         }
 
         try! realm.write {
-            realm.create(SwiftIntObject.self, value: [])
+            realm.create(SwiftIntObject.self)
         }
         XCTAssertNotNil(notificationToken)
         XCTAssertTrue(called)
@@ -189,7 +189,7 @@ class CombineRealmTests: CombinePublisherTestCase {
         XCTAssertNotNil(notificationToken)
         for _ in 0..<10 {
             try! realm.write(withoutNotifying: [notificationToken!]) {
-                realm.create(SwiftIntObject.self, value: [])
+                realm.create(SwiftIntObject.self)
             }
             XCTAssertFalse(called)
         }
@@ -203,7 +203,7 @@ class CombineRealmTests: CombinePublisherTestCase {
         subscribeOnQueue.async {
             let backgroundRealm = try! Realm(configuration: self.realm.configuration)
             try! backgroundRealm.write {
-                backgroundRealm.create(SwiftIntObject.self, value: [])
+                backgroundRealm.create(SwiftIntObject.self)
             }
         }
         wait(for: [exp], timeout: 1)
@@ -218,7 +218,7 @@ class CombineObjectPublisherTests: CombinePublisherTestCase {
 
     override func setUp() {
         super.setUp()
-        obj = try! realm.write { realm.create(SwiftIntObject.self, value: []) }
+        obj = try! realm.write { realm.create(SwiftIntObject.self) }
     }
 
     func testWillChange() {
@@ -1398,7 +1398,7 @@ extension Results: CombineTestCollection where Element == ModernAllTypesObject {
     }
 
     func appendObject() {
-        realm?.create(Element.self, value: [])
+        realm?.create(Element.self)
     }
 
     func modifyObject() {
@@ -1423,11 +1423,11 @@ class ResultsPublisherTests: TestCase {
 
 extension List: CombineTestCollection where Element == ModernAllTypesObject {
     static func getCollection(_ realm: Realm) -> List<Element> {
-        return try! realm.write { realm.create(ModernAllTypesObject.self, value: []).arrayCol }
+        return try! realm.write { realm.create(ModernAllTypesObject.self).arrayCol }
     }
 
     func appendObject() {
-        append(realm!.create(Element.self, value: []))
+        append(realm!.create(Element.self))
     }
 
     func modifyObject() {
@@ -1453,11 +1453,11 @@ class ManagedListPublisherTests: TestCase {
 
 extension MutableSet: CombineTestCollection where Element == ModernAllTypesObject {
     static func getCollection(_ realm: Realm) -> MutableSet<Element> {
-        return try! realm.write { realm.create(ModernAllTypesObject.self, value: []).setCol }
+        return try! realm.write { realm.create(ModernAllTypesObject.self).setCol }
     }
 
     func appendObject() {
-        insert(realm!.create(Element.self, value: []))
+        insert(realm!.create(Element.self))
     }
 
     func modifyObject() {
@@ -1482,7 +1482,7 @@ class ManagedMutableSetPublisherTests: TestCase {
 
 extension LinkingObjects: CombineTestCollection where Element == ModernAllTypesObject {
     static func getCollection(_ realm: Realm) -> LinkingObjects<Element> {
-        return try! realm.write { realm.create(ModernAllTypesObject.self, value: []).linkingObjects }
+        return try! realm.write { realm.create(ModernAllTypesObject.self).linkingObjects }
     }
 
     func appendObject() {
@@ -1518,7 +1518,7 @@ extension AnyRealmCollection: CombineTestCollection where Element == ModernAllTy
     }
 
     func appendObject() {
-        realm?.create(Element.self, value: [])
+        realm?.create(Element.self)
     }
 
     func modifyObject() {
@@ -2150,12 +2150,12 @@ private class CombineMapPublisherTests<Collection: RealmKeyedCollection>: Combin
 
 extension Map: CombineTestCollection where Key == String, Value == SwiftObject? {
     static func getCollection(_ realm: Realm) -> Map<Key, Value> {
-        return try! realm.write { realm.create(SwiftMapPropertyObject.self, value: []).swiftObjectMap }
+        return try! realm.write { realm.create(SwiftMapPropertyObject.self).swiftObjectMap }
     }
 
     func appendObject() {
         let key = UUID().uuidString
-        self[key] = realm!.create(SwiftObject.self, value: [])
+        self[key] = realm!.create(SwiftObject.self)
     }
 
     func modifyObject() {
@@ -4089,7 +4089,7 @@ class CombineAsyncRealmTests: CombinePublisherTestCase {
             }
 
         realm.writeAsync {
-            self.realm.create(SwiftIntObject.self, value: [])
+            self.realm.create(SwiftIntObject.self)
         }
         waitForExpectations(timeout: 1, handler: nil)
     }
@@ -4102,7 +4102,7 @@ class CombineAsyncRealmTests: CombinePublisherTestCase {
         queue.async {
             let realm = try! Realm(configuration: self.realm.configuration, queue: self.queue)
             realm.writeAsync {
-                realm.create(SwiftIntObject.self, value: [])
+                realm.create(SwiftIntObject.self)
             }
         }
         wait(for: [exp], timeout: 3)

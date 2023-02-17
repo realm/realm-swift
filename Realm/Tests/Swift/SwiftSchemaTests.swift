@@ -190,7 +190,7 @@ class SwiftRLMSchemaTests: RLMMultiProcessTestCase {
         _ = SwiftRLMLinkedNonDefaultObject(value: [[1]])
         _ = SwiftRLMNonDefaultArrayObject(value: [[[1]]])
         _ = SwiftRLMNonDefaultSetObject(value: [[[1]]])
-        _ = SwiftRLMMutualLink1Object(value: [[[:]]])
+        _ = SwiftRLMMutualLink1Object()
     }
 
     func testCreateUnmanagedObjectWhichCreatesAnotherClassViaInitWithValueDuringSchemaInit() {
@@ -200,7 +200,7 @@ class SwiftRLMSchemaTests: RLMMultiProcessTestCase {
         }
 
         _ = InitLinkedToClass(value: [[0]])
-        _ = SwiftRLMCompanyObject(value: [[["Jaden", 20, false]]])
+        _ = SwiftRLMCompanyObject(value: [[["Jaden", 20, false] as [Any]]])
     }
 
     func testInitUnmanagedObjectNotInClassSubsetDuringSchemaInit() {

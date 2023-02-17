@@ -20,7 +20,7 @@
 
 RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
-@class RLMProperty, RLMArray;
+@class RLMProperty, RLMArray, RLMSchema;
 typedef NS_ENUM(int32_t, RLMPropertyType);
 
 FOUNDATION_EXTERN void RLMInitializeWithValue(RLMObjectBase *, id, RLMSchema *);

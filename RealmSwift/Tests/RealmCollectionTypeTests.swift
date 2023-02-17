@@ -289,7 +289,7 @@ class RealmCollectionTests<Collection: RealmCollection, AggregateCollection: Rea
         let actual = collection.value(forKey: "stringCol") as! [String]?
         XCTAssertEqual(expected as! [String], actual!)
 
-        assertEqual(collection.map { $0 }, collection.value(forKey: "self") as! [CTTNullableStringObjectWithLink])
+        assertEqual(Array(collection), collection.value(forKey: "self") as! [CTTNullableStringObjectWithLink])
     }
 
     func testSetValueForKey() {
@@ -1316,7 +1316,7 @@ class ResultsWithCustomInitializerTests: TestCase {
         let expected = Array(collection.map { $0.stringCol })
         let actual = collection.value(forKey: "stringCol") as! [String]?
         XCTAssertEqual(expected, actual!)
-        assertEqual(collection.map { $0 }, collection.value(forKey: "self") as! [SwiftCustomInitializerObject])
+        assertEqual(Array(collection), collection.value(forKey: "self") as! [SwiftCustomInitializerObject])
     }
 }
 

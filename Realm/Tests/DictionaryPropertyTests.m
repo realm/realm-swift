@@ -1330,7 +1330,7 @@
     [(RLMNotificationToken *)token invalidate];
 }
 
-static RLMDictionary<NSString *, IntObject *><RLMString, IntObject> *managedTestDictionary() {
+static RLMDictionary<NSString *, IntObject *><RLMString, IntObject> *managedTestDictionary(void) {
     RLMRealm *realm = [RLMRealm defaultRealm];
     RLMDictionary<NSString *, IntObject *><RLMString, IntObject> *dict;
     [realm beginWriteTransaction];
