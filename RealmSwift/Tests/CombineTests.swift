@@ -2340,7 +2340,7 @@ private class CombineSectionedResultsPublisherTests<Collection: RealmCollection>
     }
 
     func checkChangeset<SectionedResults: RealmSectionedResult>(
-            _ change: RealmSectionedResultsChange<SectionedResults>,
+            _ change: SectionedResultsChange<SectionedResults>,
             insertions: [IndexPath] = [], deletions: [IndexPath] = [], frozen: Bool = false) {
         switch change {
         case .initial(let collection):

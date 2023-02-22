@@ -197,7 +197,7 @@ extension Publisher {
     /// - returns: A publisher that publishes frozen copies of the changesets
     ///            which the upstream publisher publishes.
     public func freeze<T: RealmSectionedResult>()
-        -> Publishers.Map<Self, RealmSectionedResultsChange<T>> where Output == RealmSectionedResultsChange<T> {
+        -> Publishers.Map<Self, SectionedResultsChange<T>> where Output == SectionedResultsChange<T> {
             return map {
                 switch $0 {
                 case .initial(let collection):
@@ -446,7 +446,7 @@ extension Publisher {
     ///
     /// - returns: A publisher that supports `receive(on:)` for thread-confined objects.
     public func threadSafeReference<T: RealmSectionedResult>()
-        -> RealmPublishers.MakeThreadSafeSectionedResultsChangeset<Self, T> where Output == RealmSectionedResultsChange<T> {
+        -> RealmPublishers.MakeThreadSafeSectionedResultsChangeset<Self, T> where Output == SectionedResultsChange<T> {
         RealmPublishers.MakeThreadSafeSectionedResultsChangeset(self)
     }
 }
@@ -1824,7 +1824,7 @@ public enum RealmPublishers {
         }
     }
 
-    /// A publisher which emits RealmSectionedResultsChange<Collection> each time the observed object is modified
+    /// A publisher which emits SectionedResultsChange<Collection> each time the observed object is modified
     ///
     /// `receive(on:)` and `subscribe(on:)` can be called directly on this
     /// publisher, and calling `.threadSafeReference()` is only required if
@@ -1833,8 +1833,8 @@ public enum RealmPublishers {
     ///
     /// Create this publisher using the `changesetPublisher` property on RealmSectionedResult.
     @frozen public struct SectionedResultsChangeset<Collection: RealmSectionedResult>: Publisher {
-        public typealias Output = RealmSectionedResultsChange<Collection>
-        /// This publisher reports error via the `.error` case of RealmSectionedResultsChange.
+        public typealias Output = SectionedResultsChange<Collection>
+        /// This publisher reports error via the `.error` case of SectionedResultsChange.
         public typealias Failure = Never
 
         private let collection: Collection
@@ -1907,7 +1907,7 @@ public enum RealmPublishers {
         }
     }
 
-    /// A publisher which emits RealmSectionedResultsChange<Collection> each time the observed object is modified
+    /// A publisher which emits SectionedResultsChange<Collection> each time the observed object is modified
     ///
     /// `receive(on:)` and `subscribe(on:)` can be called directly on this
     /// publisher, and calling `.threadSafeReference()` is only required if
@@ -1916,8 +1916,8 @@ public enum RealmPublishers {
     ///
     /// Create this publisher using the `changesetPublisher` property on RealmSectionedResult.
     @frozen public struct SectionChangeset<Collection: RealmSectionedResult>: Publisher {
-        public typealias Output = RealmSectionedResultsChange<Collection>
-        /// This publisher reports error via the `.error` case of RealmSectionedResultsChange.
+        public typealias Output = SectionedResultsChange<Collection>
+        /// This publisher reports error via the `.error` case of SectionedResultsChange.
         public typealias Failure = Never
 
         private let collection: Collection
@@ -2070,7 +2070,7 @@ public enum RealmPublishers {
         }
     }
 
-    /// A publisher which emits RealmSectionedResultsChange<T> each time the observed object is modified
+    /// A publisher which emits SectionedResultsChange<T> each time the observed object is modified
     ///
     /// `receive(on:)` and `subscribe(on:)` can be called directly on this
     /// publisher, and calling `.threadSafeReference()` is only required if
@@ -2079,7 +2079,7 @@ public enum RealmPublishers {
     ///
     /// Create this publisher using the `changesetPublisher` property on RealmSectionedResult.
     public class SectionedResultsChangesetWithToken<Collection: RealmSectionedResult, T>: Publisher {
-        public typealias Output = RealmSectionedResultsChange<Collection>
+        public typealias Output = SectionedResultsChange<Collection>
         /// This publisher reports error via the `.error` case of RealmCollectionChange.
         public typealias Failure = Never
 
@@ -2149,7 +2149,7 @@ public enum RealmPublishers {
         }
     }
 
-    /// A publisher which emits RealmSectionedResultsChange<T> each time the observed object is modified
+    /// A publisher which emits SectionedResultsChange<T> each time the observed object is modified
     ///
     /// `receive(on:)` and `subscribe(on:)` can be called directly on this
     /// publisher, and calling `.threadSafeReference()` is only required if
@@ -2158,7 +2158,7 @@ public enum RealmPublishers {
     ///
     /// Create this publisher using the `changesetPublisher` property on RealmSectionedResult.
     public class SectionChangesetWithToken<Collection: RealmSectionedResult, T>: Publisher {
-        public typealias Output = RealmSectionedResultsChange<Collection>
+        public typealias Output = SectionedResultsChange<Collection>
         /// This publisher reports error via the `.error` case of RealmCollectionChange.
         public typealias Failure = Never
 
@@ -2370,8 +2370,8 @@ public enum RealmPublishers {
     }
 
     /// A helper publisher created by calling `.threadSafeReference()` on a
-    /// publisher which emits `RealmSectionedResultsChange`.
-    @frozen public struct MakeThreadSafeSectionedResultsChangeset<Upstream: Publisher, T: RealmSectionedResult>: Publisher where Upstream.Output == RealmSectionedResultsChange<T> {
+    /// publisher which emits `SectionedResultsChange`.
+    @frozen public struct MakeThreadSafeSectionedResultsChangeset<Upstream: Publisher, T: RealmSectionedResult>: Publisher where Upstream.Output == SectionedResultsChange<T> {
         /// :nodoc:
         public typealias Failure = Upstream.Failure
         /// :nodoc:
@@ -2552,7 +2552,7 @@ public enum RealmPublishers {
     private enum SectionedHandover<T: RealmSectionedResult, S: Scheduler> {
         // A collection change which does not contain a live object and so
         // can be delivered directly
-        case passthrough(_ change: RealmSectionedResultsChange<T>)
+        case passthrough(_ change: SectionedResultsChange<T>)
         // The initial and update notifications for live collections need
         // to wrap the collection in a thread-safe reference and hold onto
         // a pinned Realm to ensure that the version which the change
@@ -2562,7 +2562,7 @@ public enum RealmPublishers {
                     deletions: [IndexPath], insertions: [IndexPath], modifications: [IndexPath],
                     sectionsToInsert: IndexSet, sectionsToDelete: IndexSet)
 
-        init(_ change: RealmSectionedResultsChange<T>) {
+        init(_ change: SectionedResultsChange<T>) {
             switch change {
             case .initial(let collection):
                 guard let realm = collection.realm, !realm.isFrozen else {
@@ -2585,7 +2585,7 @@ public enum RealmPublishers {
             }
         }
 
-        func resolve(_ scheduler: S) -> RealmSectionedResultsChange<T>? {
+        func resolve(_ scheduler: S) -> SectionedResultsChange<T>? {
             switch self {
             case .passthrough(let change):
                 return change
@@ -2613,7 +2613,7 @@ public enum RealmPublishers {
     ///
     /// Create using `.threadSafeReference().receive(on: queue)` on a publisher
     /// that emits `RealmCollectionChange`.
-    @frozen public struct DeferredHandoverSectionedResultsChangeset<Upstream: Publisher, T: RealmSectionedResult, S: Scheduler>: Publisher where Upstream.Output == RealmSectionedResultsChange<T> {
+    @frozen public struct DeferredHandoverSectionedResultsChangeset<Upstream: Publisher, T: RealmSectionedResult, S: Scheduler>: Publisher where Upstream.Output == SectionedResultsChange<T> {
         /// :nodoc:
         public typealias Failure = Upstream.Failure
         /// :nodoc:
@@ -2642,8 +2642,8 @@ public enum RealmPublishers {
     /// serial dispatch queue.
     ///
     /// Create using `.threadSafeReference().receive(on: queue)` on a publisher
-    /// that emits `RealmSectionedResultsChange`.
-    @frozen public struct DeferredHandoverSectionChangeset<Upstream: Publisher, T: RealmSectionedResult, S: Scheduler>: Publisher where Upstream.Output == RealmSectionedResultsChange<T> {
+    /// that emits `SectionedResultsChange`.
+    @frozen public struct DeferredHandoverSectionChangeset<Upstream: Publisher, T: RealmSectionedResult, S: Scheduler>: Publisher where Upstream.Output == SectionedResultsChange<T> {
         /// :nodoc:
         public typealias Failure = Upstream.Failure
         /// :nodoc:
