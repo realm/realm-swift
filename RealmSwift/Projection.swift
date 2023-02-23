@@ -471,7 +471,7 @@ extension ProjectionObservable {
 }
 
 // MARK: Notifications
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 public extension Projection {
     /// :nodoc:
     func addObserver(_ observer: NSObject,
@@ -547,7 +547,7 @@ extension Projection: ThreadConfined where Root: ThreadConfined {
 
 #if canImport(Combine)
 // MARK: - RealmSubscribable
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension ProjectionObservable {
     /// :nodoc:
     public func _observe<S>(_ keyPaths: [String]?, on queue: DispatchQueue?, _ subscriber: S) -> NotificationToken where S: Subscriber, S.Input == Self {
@@ -569,7 +569,7 @@ extension ProjectionObservable {
     }
 }
 #if !(os(iOS) && (arch(i386) || arch(arm)))
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Projection: ObservableObject, RealmSubscribable where Root: ThreadConfined {
     /// A publisher that emits Void each time the projection changes.
     ///

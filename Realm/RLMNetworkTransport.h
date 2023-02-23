@@ -77,15 +77,14 @@ typedef RLM_CLOSED_ENUM(int32_t, RLMHTTPMethod) {
 /// Invoked when a change event has been received.
 /// @param event The change event encoded as NSData
 - (void)didReceiveEvent:(NSData *)event;
-/// A error has occured while subscribing to changes.
-/// @param error The error that has occured.
+/// A error has occurred while subscribing to changes.
+/// @param error The error that has occurred.
 - (void)didReceiveError:(NSError *)error;
 /// The stream was opened.
 - (void)didOpen;
 /// The stream has been closed.
-/// @param error The error that has occured.
-- (void)didCloseWithError:(NSError *)error;
-
+/// @param error The error that has occurred.
+- (void)didCloseWithError:(NSError *_Nullable)error;
 @end
 
 /// A block for receiving an `RLMResponse` from the `RLMNetworkTransport`.

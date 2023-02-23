@@ -18,6 +18,7 @@
 
 #if os(macOS)
 
+import Combine
 import RealmSwift
 import XCTest
 
@@ -632,7 +633,7 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
         try performWatchWithMatchFilterTest(.main)
     }
 
-    func testWatchWithMatchFilterAsync() throws {
+    func testWatchWithMatchFilterQueue() throws {
         let queue = DispatchQueue(label: "io.realm.watchQueue", attributes: .concurrent)
         try performWatchWithMatchFilterTest(queue)
     }
@@ -689,7 +690,7 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
         try performWatchWithFilterIdsTest(nil)
     }
 
-    func testWatchWithFilterIdsAsync() throws {
+    func testWatchWithFilterIdsQueue() throws {
         let queue = DispatchQueue(label: "io.realm.watchQueue", attributes: .concurrent)
         try performWatchWithFilterIdsTest(queue)
     }
@@ -726,6 +727,72 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
         changeStream.close()
         watchTestUtility.waitForClose()
     }
+
+#if swift(>=5.8)
+    // wait(for:) doesn't work in async functions because it blocks the calling
+    // thread and doesn't let async tasks run. Xcode 14.3 introduced a new async
+    // version of it which does work, but there doesn't appear to be a workaround
+    // for older Xcode versions.
+    @available(macOS 12.0, *)
+    func performAsyncWatchTest(filterIds: Bool = false, matchFilter: Bool = false) async throws {
+        let collection = setupMongoCollection()
+        let objectIds = insertDocuments(collection)
+
+        let openEx = expectation(description: "open watch stream")
+        @Locked var ex: XCTestExpectation!
+        let task = Task {
+            let changeEvents: AsyncThrowingPublisher<Publishers.WatchPublisher>
+            if filterIds {
+                changeEvents = collection.changeEvents(filterIds: [objectIds[0]],
+                                                       onOpen: { openEx.fulfill() })
+            } else if matchFilter {
+                let filter = ["fullDocument._id": AnyBSON.objectId(objectIds[0])]
+                changeEvents = collection.changeEvents(matchFilter: filter, onOpen: { openEx.fulfill() })
+            } else {
+                changeEvents = collection.changeEvents(onOpen: { openEx.fulfill() })
+            }
+
+            for try await event in changeEvents {
+                let doc = event.documentValue!
+                XCTAssertEqual(doc["operationType"], "replace")
+                let id = try XCTUnwrap(doc["documentKey"]??.documentValue?["_id"]??.objectIdValue)
+                XCTAssertEqual(id, objectIds[0])
+                ex.fulfill()
+            }
+        }
+        await fulfillment(of: [openEx], timeout: 2.0)
+
+        for i in 0..<3 {
+            ex = expectation(description: "got change event")
+            let name: AnyBSON = .string("fido-\(i)")
+            _ = try await collection.updateOneDocument(filter: ["_id": AnyBSON.objectId(objectIds[0])],
+                                                       update: ["name": name, "breed": "king charles"])
+            if filterIds || matchFilter {
+                _ = try await collection.updateOneDocument(filter: ["_id": AnyBSON.objectId(objectIds[1])],
+                                                           update: ["name": name, "breed": "king charles"])
+            }
+            await fulfillment(of: [ex], timeout: 2.0)
+        }
+
+        task.cancel()
+        _ = await task.result
+    }
+
+    @available(macOS 12.0, *)
+    func testWatchAsync() async throws {
+        try await performAsyncWatchTest()
+    }
+
+    @available(macOS 12.0, *)
+    func testWatchWithMatchFilterAsync() async throws {
+        try await performAsyncWatchTest(matchFilter: true)
+    }
+
+    @available(macOS 12.0, *)
+    func testWatchWithFilterIdsAsync() async throws {
+        try await performAsyncWatchTest(filterIds: true)
+    }
+#endif
 
     func testWatchMultipleFilterStreams() throws {
         try performMultipleWatchStreamsTest(nil)

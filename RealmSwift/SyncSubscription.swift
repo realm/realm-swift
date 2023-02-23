@@ -453,7 +453,7 @@ extension SyncSubscriptionSet: Sequence {
 }
 
 #if canImport(_Concurrency)
-@available(macOS 10.15, tvOS 13.0, iOS 13.0, watchOS 6.0, *)
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension SyncSubscriptionSet {
     /**
      Creates and commits a transaction, updating the subscription set,
@@ -466,15 +466,7 @@ extension SyncSubscriptionSet {
      */
     @MainActor
     public func update(_ block: (() -> Void)) async throws {
-        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
-            update(block) { error in
-                if let error = error {
-                    continuation.resume(throwing: error)
-                } else {
-                    continuation.resume()
-                }
-            }
-        }
+        try await rlmSyncSubscriptionSet.update(block)
     }
 
     /// :nodoc:

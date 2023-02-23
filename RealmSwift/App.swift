@@ -20,6 +20,10 @@ import Foundation
 import Realm
 import Realm.Private
 
+#if !(os(iOS) && (arch(i386) || arch(arm)))
+import Combine
+#endif
+
 /**
 An object representing the Realm App configuration
 
@@ -67,7 +71,6 @@ extension UserProfile {
 /// A block type used to report an error
 public typealias EmailPasswordAuthOptionalErrorBlock = RLMEmailPasswordAuthOptionalErrorBlock
 extension EmailPasswordAuth {
-
     /// Resets the password of an email identity using the
     /// password reset function set up in the application.
     /// - Parameters:
@@ -80,8 +83,42 @@ extension EmailPasswordAuth {
                                           args: [AnyBSON],
                                           _ completion: @escaping EmailPasswordAuthOptionalErrorBlock) {
         let bson = ObjectiveCSupport.convert(object: .array(args))
-        self.__callResetPasswordFunction(email, password: password, args: bson as! [RLMBSON], completion: completion)
+        __callResetPasswordFunction(email, password: password, args: bson as! [RLMBSON], completion: completion)
     }
+
+#if !(os(iOS) && (arch(i386) || arch(arm)))
+    /**
+     Resets the password of an email identity using the
+     password reset function set up in the application.
+
+     @param email  The email address of the user.
+     @param password The desired new password.
+     @param args A list of arguments passed in as a BSON array.
+     @returns A publisher that eventually return `Result.success` or `Error`.
+    */
+    @available(macOS 10.15, watchOS 6.0, iOS 13.0, tvOS 13.0, *)
+    public func callResetPasswordFunction(email: String, password: String, args: [AnyBSON]) -> Future<Void, Error> {
+        promisify {
+            self.callResetPasswordFunction(email: email, password: password, args: args, $0)
+        }
+    }
+#endif
+
+ #if canImport(_Concurrency)
+    /// Resets the password of an email identity using the
+    /// password reset function set up in the application.
+    /// - Parameters:
+    ///   - email: The email address of the user.
+    ///   - password: The desired new password.
+    ///   - args: A list of arguments passed in as a BSON array.
+    @available(macOS 10.15, watchOS 6.0, iOS 13.0, tvOS 13.0, *)
+    public func callResetPasswordFunction(email: String,
+                                          password: String,
+                                          args: [AnyBSON]) async throws {
+        let bson = ObjectiveCSupport.convert(object: .array(args))
+        return try await __callResetPasswordFunction(email, password: password, args: bson as! [RLMBSON])
+    }
+#endif
 }
 
 /**
@@ -95,8 +132,7 @@ public typealias PushClient = RLMPushClient
 /// An object which is used within UserAPIKeyProviderClient
 public typealias UserAPIKey = RLMUserAPIKey
 extension UserAPIKey {
-
-/// The ObjectId of the API key.
+    /// The ObjectId of the API key.
     public var objectId: ObjectId {
         __objectId as! ObjectId
     }
@@ -154,13 +190,33 @@ public extension App {
             }
         }
     }
+
+#if !(os(iOS) && (arch(i386) || arch(arm)))
+    /// Login to a user for the Realm app.
+    /// @param credentials The credentials identifying the user.
+    /// @returns A publisher that eventually return `User` or `Error`.
+    @available(macOS 10.15, watchOS 6.0, iOS 13.0, tvOS 13.0, *)
+    func login(credentials: Credentials) -> Future<User, Error> {
+        return Future { self.login(credentials: credentials, $0) }
+    }
+#endif
+
+#if canImport(_Concurrency)
+    /// Login to a user for the Realm app.
+    /// @param credentials The credentials identifying the user.
+    /// @returns A publisher that eventually return `User` or `Error`.
+    @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+    func login(credentials: Credentials) async throws -> User {
+        try await __login(withCredential: ObjectiveCSupport.convert(object: credentials))
+    }
+#endif
 }
 
 /// Use this delegate to be provided a callback once authentication has succeed or failed
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 public typealias ASLoginDelegate = RLMASLoginDelegate
 
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension App {
     /**
      Sets the ASAuthorizationControllerDelegate to be handled by `App`
@@ -185,10 +241,8 @@ extension App {
 }
 
 #if !(os(iOS) && (arch(i386) || arch(arm)))
-import Combine
-
 /// :nodoc:
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, macCatalyst 13.0, macCatalystApplicationExtension 13.0, *)
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 @frozen public struct AppSubscription: Subscription {
     private let app: App
     private let token: RLMAppSubscriptionToken
@@ -216,7 +270,7 @@ import Combine
 }
 
 /// :nodoc:
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, macCatalyst 13.0, macCatalystApplicationExtension 13.0, *)
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 public struct AppPublisher: Publisher, @unchecked Sendable { // DispatchQueue
     /// This publisher cannot fail.
     public typealias Failure = Never
@@ -252,7 +306,7 @@ public struct AppPublisher: Publisher, @unchecked Sendable { // DispatchQueue
     }
 }
 
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, macCatalyst 13.0, macCatalystApplicationExtension 13.0, *)
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension App: ObservableObject {
     /// A publisher that emits Void each time the app changes.
     ///
@@ -262,7 +316,7 @@ extension App: ObservableObject {
     }
 }
 
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, macCatalyst 13.0, macCatalystApplicationExtension 13.0, *)
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 private func promisify(_ fn: @escaping (@escaping @Sendable (Error?) -> Void) -> Void) -> Future<Void, Error> {
     return future { promise in
         fn { error in
@@ -275,7 +329,7 @@ private func promisify(_ fn: @escaping (@escaping @Sendable (Error?) -> Void) ->
     }
 }
 
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, macCatalyst 13.0, macCatalystApplicationExtension 13.0, *)
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 public extension EmailPasswordAuth {
     /**
      Registers a new email identity with the username/password provider,
@@ -353,24 +407,9 @@ public extension EmailPasswordAuth {
             self.resetPassword(to: to, token: token, tokenId: tokenId, completion: $0)
         }
     }
-
-    /**
-     Resets the password of an email identity using the
-     password reset function set up in the application.
-
-     @param email  The email address of the user.
-     @param password The desired new password.
-     @param args A list of arguments passed in as a BSON array.
-     @returns A publisher that eventually return `Result.success` or `Error`.
-    */
-    func callResetPasswordFunction(email: String, password: String, args: [AnyBSON]) -> Future<Void, Error> {
-        promisify {
-            self.callResetPasswordFunction(email: email, password: password, args: args, $0)
-        }
-    }
 }
 
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, macCatalyst 13.0, macCatalystApplicationExtension 13.0, *)
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 public extension APIKeyAuth {
     /**
      Creates a user API key that can be used to authenticate as the current user.
@@ -432,17 +471,7 @@ public extension APIKeyAuth {
     }
 }
 
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, macCatalyst 13.0, macCatalystApplicationExtension 13.0, *)
-public extension App {
-    /// Login to a user for the Realm app.
-    /// @param credentials The credentials identifying the user.
-    /// @returns A publisher that eventually return `User` or `Error`.
-    func login(credentials: Credentials) -> Future<User, Error> {
-        return Future { self.login(credentials: credentials, $0) }
-    }
-}
-
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, macCatalyst 13.0, macCatalystApplicationExtension 13.0, *)
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 public extension PushClient {
     /// Request to register device token to the server
     /// @param token device token
@@ -513,40 +542,3 @@ public extension APIKeyAuth {
         }
     }
 }
-
-#if canImport(_Concurrency)
-@available(macOS 10.15, tvOS 13.0, iOS 13.0, watchOS 6.0, *)
-extension EmailPasswordAuth {
-    /// Resets the password of an email identity using the
-    /// password reset function set up in the application.
-    /// - Parameters:
-    ///   - email: The email address of the user.
-    ///   - password: The desired new password.
-    ///   - args: A list of arguments passed in as a BSON array.
-    public func callResetPasswordFunction(email: String,
-                                          password: String,
-                                          args: [AnyBSON]) async throws {
-        return try await withCheckedThrowingContinuation { continuation in
-            callResetPasswordFunction(email: email, password: password, args: args) { error in
-                if let error = error {
-                    continuation.resume(with: .failure(error))
-                } else {
-                    continuation.resume(with: .success(()))
-                }
-            }
-        }
-    }
-}
-
-@available(macOS 10.15, tvOS 13.0, iOS 13.0, watchOS 6.0, *)
-extension App {
-    /// Login to a user for the Realm app.
-    /// @param credentials The credentials identifying the user.
-    /// @returns A publisher that eventually return `User` or `Error`.
-    public func login(credentials: Credentials) async throws -> User {
-        return try await withCheckedThrowingContinuation { continuation in
-            self.login(credentials: credentials, continuation.resume)
-        }
-    }
-}
-#endif

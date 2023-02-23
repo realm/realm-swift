@@ -45,6 +45,31 @@ public extension User {
             }
         }
     }
+
+#if !(os(iOS) && (arch(i386) || arch(arm)))
+    /// Links the currently authenticated user with a new identity, where the identity is defined by the credential
+    /// specified as a parameter. This will only be successful if this `User` is the currently authenticated
+    /// with the client from which it was created. On success a new user will be returned with the new linked credentials.
+    /// @param credentials The `Credentials` used to link the user to a new identity.
+    /// @returns A publisher that eventually return `Result.success` or `Error`.
+    @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+    func linkUser(credentials: Credentials) -> Future<User, Error> {
+        return Future { self.linkUser(credentials: credentials, $0) }
+    }
+#endif
+
+#if canImport(_Concurrency)
+    /// Links the currently authenticated user with a new identity, where the identity is defined by the credential
+    /// specified as a parameter. This will only be successful if this `User` is the currently authenticated
+    /// with the client from which it was created. On success a new user will be returned with the new linked credentials.
+    /// - Parameters:
+    ///   - credentials: The `Credentials` used to link the user to a new identity.
+    /// - Returns:A `User` after successfully update its identity.
+    @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+    func linkUser(credentials: Credentials) async throws -> User {
+        try await __linkUser(with: ObjectiveCSupport.convert(object: credentials))
+    }
+#endif
 }
 
 /**
@@ -495,7 +520,6 @@ public typealias Provider = RLMIdentityProvider
 /// This handler is executed on a non-main global `DispatchQueue`.
 @dynamicMemberLookup
 @frozen public struct Functions {
-
     private let user: User
 
     fileprivate init(user: User) {
@@ -566,7 +590,7 @@ public struct FunctionCallable {
     ///        // Returned value from function
     ///     })
     ///
-    @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, macCatalyst 13.0, macCatalystApplicationExtension 13.0, *)
+    @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
     public func dynamicallyCall(withArguments args: [[AnyBSON]]) -> Future<AnyBSON, Error> {
         return Future<AnyBSON, Error> { promise in
             let objcArgs = args.first!.map(ObjectiveCSupport.convertBson)
@@ -578,11 +602,6 @@ public struct FunctionCallable {
                 }
             }
         }
-    }
-    #else
-    /// :nodoc:
-    public func dynamicallyCall(withArguments args: [Never]) {
-        //   noop
     }
     #endif
 }
@@ -855,7 +874,7 @@ extension Realm {
 }
 
 #if !(os(iOS) && (arch(i386) || arch(arm)))
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, macCatalyst 13.0, macCatalystApplicationExtension 13.0, *)
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 public extension User {
     /// Refresh a user's custom data. This will, in effect, refresh the user's auth session.
     /// @returns A publisher that eventually return `Dictionary` with user's data or `Error`.
@@ -863,14 +882,6 @@ public extension User {
         return Future { self.refreshCustomData($0) }
     }
 
-    /// Links the currently authenticated user with a new identity, where the identity is defined by the credential
-    /// specified as a parameter. This will only be successful if this `User` is the currently authenticated
-    /// with the client from which it was created. On success a new user will be returned with the new linked credentials.
-    /// @param credentials The `Credentials` used to link the user to a new identity.
-    /// @returns A publisher that eventually return `Result.success` or `Error`.
-    func linkUser(credentials: Credentials) -> Future<User, Error> {
-        return Future { self.linkUser(credentials: credentials, $0) }
-    }
 
     /// Removes the user
     /// This logs out and destroys the session related to this user. The completion block will return an error
@@ -922,7 +933,7 @@ public extension User {
 }
 
 /// :nodoc:
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, macCatalyst 13.0, macCatalystApplicationExtension 13.0, *)
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 @frozen public struct UserSubscription: Subscription {
     private let user: User
     private let token: RLMUserSubscriptionToken
@@ -950,7 +961,7 @@ public extension User {
 }
 
 /// :nodoc:
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, macCatalyst 13.0, macCatalystApplicationExtension 13.0, *)
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 public class UserPublisher: Publisher {
     /// This publisher cannot fail.
     public typealias Failure = Never
@@ -973,7 +984,7 @@ public class UserPublisher: Publisher {
     }
 }
 
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, macCatalyst 13.0, macCatalystApplicationExtension 13.0, *)
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension User: ObservableObject {
     /// A publisher that emits Void each time the user changes.
     ///
@@ -1001,22 +1012,7 @@ public extension User {
 }
 
 #if canImport(_Concurrency)
-@available(macOS 10.15, tvOS 13.0, iOS 13.0, watchOS 6.0, *)
-public extension User {
-    /// Links the currently authenticated user with a new identity, where the identity is defined by the credential
-    /// specified as a parameter. This will only be successful if this `User` is the currently authenticated
-    /// with the client from which it was created. On success a new user will be returned with the new linked credentials.
-    /// - Parameters:
-    ///   - credentials: The `Credentials` used to link the user to a new identity.
-    /// - Returns:A `User` after successfully update its identity.
-    func linkUser(credentials: Credentials) async throws -> User {
-        return try await withCheckedThrowingContinuation { continuation in
-            linkUser(credentials: credentials, continuation.resume)
-        }
-    }
-}
-
-@available(macOS 10.15, tvOS 13.0, iOS 13.0, watchOS 6.0, *)
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension FunctionCallable {
     /// The implementation of @dynamicMemberLookup that allows  for `async await` callable return.
     ///
@@ -1025,16 +1021,12 @@ extension FunctionCallable {
     ///     }
     ///
     public func dynamicallyCall(withArguments args: [[AnyBSON]]) async throws -> AnyBSON {
-        try await withCheckedThrowingContinuation { continuation in
-            let objcArgs = args.first!.map(ObjectiveCSupport.convertBson)
-            self.user.__callFunctionNamed(name, arguments: objcArgs) { (bson: RLMBSON?, error: Error?) in
-                if let b = bson.map(ObjectiveCSupport.convertBson), let bson = b {
-                    continuation.resume(returning: bson)
-                } else {
-                    continuation.resume(throwing: error ?? Realm.Error.callFailed)
-                }
-            }
+        let objcArgs = args.first!.map(ObjectiveCSupport.convertBson)
+        let ret = try await user.__callFunctionNamed(name, arguments: objcArgs)
+        if let bson = ObjectiveCSupport.convertBson(object: ret) {
+            return bson
         }
+        throw Realm.Error.callFailed
     }
 }
 #endif // swift(>=5.6)

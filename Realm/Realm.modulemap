@@ -11,6 +11,7 @@ framework module Realm {
         header "RLMCollection_Private.h"
         header "RLMDictionary_Private.h"
         header "RLMEvent.h"
+        header "RLMMongoCollection_Private.h"
         header "RLMObjectBase_Dynamic.h"
         header "RLMObjectBase_Private.h"
         header "RLMObjectSchema_Private.h"

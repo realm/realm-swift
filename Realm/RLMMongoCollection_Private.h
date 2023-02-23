@@ -18,29 +18,20 @@
 
 #import <Realm/RLMMongoCollection.h>
 
-RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
+RLM_HEADER_AUDIT_BEGIN(nullability)
 
 @class RLMUser;
-@protocol RLMChangeEventDelegate;
-
-@interface RLMChangeStream ()
-- (instancetype)initWithChangeEventSubscriber:(id<RLMChangeEventDelegate>)subscriber
-                                delegateQueue:(nullable dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
-- (instancetype)init NS_UNAVAILABLE;
-- (void)attachURLSession:(NSURLSession *)urlSession;
-@end
 
 @interface RLMMongoCollection ()
-
-@property (nonatomic, strong) RLMUser *user;
-@property (nonatomic, strong) NSString *serviceName;
-@property (nonatomic, strong) NSString *databaseName;
-
 - (instancetype)initWithUser:(RLMUser *)user
                  serviceName:(NSString *)serviceName
                 databaseName:(NSString *)databaseName
               collectionName:(NSString *)collectionName;
 
+- (RLMChangeStream *)watchWithMatchFilter:(nullable id<RLMBSON>)matchFilter
+                                 idFilter:(nullable id<RLMBSON>)idFilter
+                                 delegate:(id<RLMChangeEventDelegate>)delegate
+                                scheduler:(void (^)(dispatch_block_t))scheduler;
 @end
 
-RLM_HEADER_AUDIT_END(nullability, sendability)
+RLM_HEADER_AUDIT_END(nullability)

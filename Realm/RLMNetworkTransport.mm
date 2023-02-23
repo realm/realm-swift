@@ -56,7 +56,7 @@ NSString * const RLMHTTPMethodToNSString[] = {
 @end
 
 @interface RLMEventSessionDelegate <NSURLSessionDelegate> : NSObject
-+ (instancetype)delegateWithEventSubscriber:(RLMEventSubscriber *)subscriber;
++ (instancetype)delegateWithEventSubscriber:(id<RLMEventDelegate>)subscriber;
 @end;
 
 @implementation RLMNetworkTransport
@@ -104,11 +104,11 @@ NSString * const RLMHTTPMethodToNSString[] = {
     return session;
 }
 
-- (RLMRequest *)RLMRequestFromRequest:(const realm::app::Request)request {
+RLMRequest *RLMRequestFromRequest(realm::app::Request const& request) {
     RLMRequest *rlmRequest = [RLMRequest new];
     NSMutableDictionary<NSString *, NSString*> *headersDict = [NSMutableDictionary new];
-    for(auto &[key, value] : request.headers) {
-        [headersDict setValue:@(value.c_str()) forKey:@(key.c_str())];
+    for (auto &[key, value] : request.headers) {
+        headersDict[@(key.c_str())] = @(value.c_str());
     }
     rlmRequest.headers = headersDict;
     rlmRequest.method = static_cast<RLMHTTPMethod>(request.method);
@@ -169,11 +169,11 @@ didCompleteWithError:(NSError *)error
 @end
 
 @implementation RLMEventSessionDelegate {
-    RLMEventSubscriber *_subscriber;
+    id<RLMEventDelegate> _subscriber;
     bool _hasOpened;
 }
 
-+ (instancetype)delegateWithEventSubscriber:(RLMEventSubscriber *)subscriber {
++ (instancetype)delegateWithEventSubscriber:(id<RLMEventDelegate>)subscriber {
     RLMEventSessionDelegate *delegate = [RLMEventSessionDelegate new];
     delegate->_subscriber = subscriber;
     return delegate;

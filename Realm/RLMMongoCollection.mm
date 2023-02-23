@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMMongoCollection_Private.hpp"
+#import "RLMMongoCollection_Private.h"
 
 #import "RLMApp_Private.hpp"
 #import "RLMBSON_Private.hpp"
@@ -30,37 +30,38 @@
 #import <realm/object-store/sync/mongo_collection.hpp>
 #import <realm/object-store/sync/mongo_database.hpp>
 
+__attribute__((objc_direct_members))
 @implementation RLMChangeStream {
+@public
     realm::app::WatchStream _watchStream;
     id<RLMChangeEventDelegate> _subscriber;
     __weak NSURLSession *_session;
-    _Nonnull dispatch_queue_t _queue;
+    void (^_schedule)(dispatch_block_t);
 }
 
 - (instancetype)initWithChangeEventSubscriber:(id<RLMChangeEventDelegate>)subscriber
-                                delegateQueue:(nullable dispatch_queue_t)queue {
+                                    scheduler:(void (^)(dispatch_block_t))scheduler {
     if (self = [super init]) {
         _subscriber = subscriber;
-        _queue = queue ?: dispatch_get_main_queue();
-        return self;
+        _schedule = scheduler;
     }
-    return nil;
+    return self;
 }
 
 - (void)didCloseWithError:(NSError *)error {
-    dispatch_async(_queue, ^{
+    _schedule(^{
         [_subscriber changeStreamDidCloseWithError:error];
     });
 }
 
 - (void)didOpen {
-    dispatch_async(_queue, ^{
+    _schedule(^{
         [_subscriber changeStreamDidOpen:self];
     });
 }
 
 - (void)didReceiveError:(nonnull NSError *)error {
-    dispatch_async(_queue, ^{
+    _schedule(^{
         [_subscriber changeStreamDidReceiveError:error];
     });
 }
@@ -74,7 +75,7 @@
 
     while (_watchStream.state() == realm::app::WatchStream::State::HAVE_EVENT) {
         id<RLMBSON> event = RLMConvertBsonToRLMBSON(_watchStream.next_event());
-        dispatch_async(_queue, ^{
+        _schedule(^{
             [_subscriber changeStreamDidReceiveChangeEvent:event];
         });
     }
@@ -91,10 +92,7 @@
 - (void)close {
     [_session invalidateAndCancel];
 }
-
 @end
-
-@implementation RLMMongoCollection
 
 static realm::bson::BsonDocument toBsonDocument(id<RLMBSON> bson) {
     return realm::bson::BsonDocument(RLMConvertRLMBSONToBson(bson));
@@ -103,6 +101,15 @@ static realm::bson::BsonArray toBsonArray(id<RLMBSON> bson) {
     return realm::bson::BsonArray(RLMConvertRLMBSONToBson(bson));
 }
 
+__attribute__((objc_direct_members))
+@interface RLMMongoCollection ()
+@property (nonatomic, strong) RLMUser *user;
+@property (nonatomic, strong) NSString *serviceName;
+@property (nonatomic, strong) NSString *databaseName;
+@end
+
+__attribute__((objc_direct_members))
+@implementation RLMMongoCollection
 - (instancetype)initWithUser:(RLMUser *)user
                  serviceName:(NSString *)serviceName
                 databaseName:(NSString *)databaseName
@@ -397,6 +404,17 @@ static realm::bson::BsonArray toBsonArray(id<RLMBSON> bson) {
                                  idFilter:(nullable id<RLMBSON>)idFilter
                                  delegate:(id<RLMChangeEventDelegate>)delegate
                             delegateQueue:(nullable dispatch_queue_t)queue {
+    queue = queue ?: dispatch_get_main_queue();
+    return [self watchWithMatchFilter:matchFilter
+                             idFilter:idFilter
+                             delegate:delegate
+                            scheduler:^(dispatch_block_t block) { dispatch_async(queue, block); }];
+}
+
+- (RLMChangeStream *)watchWithMatchFilter:(nullable id<RLMBSON>)matchFilter
+                                 idFilter:(nullable id<RLMBSON>)idFilter
+                                 delegate:(id<RLMChangeEventDelegate>)delegate
+                                scheduler:(void (^)(dispatch_block_t))scheduler {
     realm::bson::BsonDocument baseArgs = {
         {"database", self.databaseName.UTF8String},
         {"collection", self.name.UTF8String}
@@ -412,13 +430,10 @@ static realm::bson::BsonArray toBsonArray(id<RLMBSON> bson) {
     auto app = self.user.app._realmApp;
     auto request = app->make_streaming_request(app->current_user(), "watch", args,
                                                std::optional<std::string>(self.serviceName.UTF8String));
-    RLMChangeStream *changeStream = [[RLMChangeStream alloc] initWithChangeEventSubscriber:delegate delegateQueue:queue];
+    auto changeStream = [[RLMChangeStream alloc] initWithChangeEventSubscriber:delegate scheduler:scheduler];
     RLMNetworkTransport *transport = self.user.app.configuration.transport;
-    RLMRequest *rlmRequest = [transport RLMRequestFromRequest:request];
-    NSURLSession *watchSession = [transport doStreamRequest:rlmRequest
-                                            eventSubscriber:changeStream];
-    [changeStream attachURLSession:watchSession];
+    RLMRequest *rlmRequest = RLMRequestFromRequest(request);
+    changeStream->_session = [transport doStreamRequest:rlmRequest eventSubscriber:changeStream];
     return changeStream;
 }
-
 @end
