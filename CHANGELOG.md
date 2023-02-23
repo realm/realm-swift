@@ -4,9 +4,9 @@ x.y.z Release notes (yyyy-MM-dd)
 * None.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
-* None.
-
+* `UserPublisher` incorrectly bounced all notifications to the main thread instead
+ of setting up the Combine publisher to correctly receive on the main thread.
+  ([#8132](https://github.com/realm/realm-swift/issues/8132), since 10.21.0)
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
 ### Compatibility
