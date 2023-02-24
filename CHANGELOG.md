@@ -11,6 +11,13 @@ x.y.z Release notes (yyyy-MM-dd)
 * `UserPublisher` incorrectly bounced all notifications to the main thread instead
  of setting up the Combine publisher to correctly receive on the main thread.
   ([#8132](https://github.com/realm/realm-swift/issues/8132), since 10.21.0)
+* Converting local realm to sync'd realm crashes if an embedded object is null ([Core #6294](https://github.com/realm/realm-core/issues/6294), since v11.9.0)
+* Fixed performance degradation on SubQueries ([Core #6327](https://github.com/realm/realm-core/issues/6327), since v6.0.0)
+* Fixed several cases where wrong type of exception was thrown ([Core #6208](https://github.com/realm/realm-core/issues/6208), never released)
+* Fixed classification of InvalidQuery exception ([Core #6223](https://github.com/realm/realm-core/issues/6223), never released)
+* Fix crash if secure transport returns an error with a non-zero length. ([Core #5435](https://github.com/realm/realm-core/issues/5435), since 10.0.0)
+* Sync client may [have failed an assertion](https://github.com/realm/realm-core/blob/006660c8d20c4941d3838f74aec6f3561ebf6784/src/realm/sync/noinst/client_impl_base.cpp#L388) during shutdown if all sessions hadn't been ready to finalize by the time the Client destructor ran. ([Core PR #6293](https://github.com/realm/realm-core/pull/6293), since v13.4.1)
+* Fixed the sync client being stuck in a cycle if an integration error occurs by issuing a client reset ([Core #6051](https://github.com/realm/realm-core/issues/6051), since v10.2.0)
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
 ### Compatibility
@@ -21,7 +28,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * Xcode: 13.3-14.2.
 
 ### Internal
-* Upgraded realm-core from ? to ?
+* Upgraded realm-core from 13.4.1 to 13.5.0
 
 10.36.0 Release notes (2023-02-15)
 =============================================================
