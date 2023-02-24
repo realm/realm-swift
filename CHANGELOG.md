@@ -9,11 +9,19 @@ x.y.z Release notes (yyyy-MM-dd)
 
 ### Fixed
 * `UserPublisher` incorrectly bounced all notifications to the main thread instead
- of setting up the Combine publisher to correctly receive on the main thread.
+  of setting up the Combine publisher to correctly receive on the main thread.
   ([#8132](https://github.com/realm/realm-swift/issues/8132), since 10.21.0)
 * Fix warnings when building with Xcode 14.3 beta 1.
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+* Converting a local realm to a synced realm would crash if an embedded object
+  was null ([Core #6294](https://github.com/realm/realm-core/issues/6294), since v10.22.0).
+* Subqueries on indexed properties performed extremely poorly. ([Core #6327](https://github.com/realm/realm-core/issues/6327), since v5.0.0)
+* Fix a crash when a SSL read successfully read a non-zero number of bytes and
+  also reported an error. ([Core #5435](https://github.com/realm/realm-core/issues/5435), since 10.0.0)
+* The sync client could get stuck in an infinite loop if the server sent an
+  invalid changeset which caused a transform error. This now results in a
+  client reset instead. ([Core #6051](https://github.com/realm/realm-core/issues/6051), since v10.0.0)
 
 ### Compatibility
 * Realm Studio: 13.0.2 or later.
@@ -23,7 +31,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * Xcode: 13.3-14.2.
 
 ### Internal
-* Upgraded realm-core from ? to ?
+* Upgraded realm-core from 13.4.1 to 13.5.0
 
 10.36.0 Release notes (2023-02-15)
 =============================================================
