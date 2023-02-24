@@ -886,21 +886,33 @@ public class RealmServer: NSObject {
                     "database_name": "test_data",
                     "queryable_fields_names": fields,
                     "asymmetric_tables": asymmetricTables,
-                    "permissions": [
-                        "rules": [:],
-                        "defaultRoles": [[
-                            "name": "all",
-                            "applyWhen": [:],
-                            "read": true,
-                            "write": true
-                        ]]
-                    ]
                 ]
             ]
         }
         let serviceConfigResponse = app.services[serviceId].config.patch(serviceConfig)
         guard case .success = serviceConfigResponse else {
             throw URLError(.badServerResponse)
+        }
+
+        if case .flx = syncMode {
+            let defaultRule = [
+                "roles": [[
+                    "name": "all",
+                    "apply_when": [:],
+                    "document_filters": [
+                        "read": true,
+                        "write": true
+                    ],
+                    "write": true,
+                    "read": true,
+                    "insert": true,
+                    "delete": true
+                ]]
+            ]
+            let rulesConfigResponse = app.services[serviceId].default_rule.post(defaultRule)
+            guard case .success = rulesConfigResponse else {
+                throw URLError(.badServerResponse)
+            }
         }
 
         app.sync.config.put(on: group, data: [
