@@ -894,8 +894,7 @@ public class RealmServer: NSObject {
             throw URLError(.badServerResponse)
         }
 
-        switch syncMode {
-        case .flx:
+        if case .flx = syncMode {
             let defaultRule = [
                 "roles": [[
                     "name": "all",
@@ -914,7 +913,6 @@ public class RealmServer: NSObject {
             guard case .success = rulesConfigResponse else {
                 throw URLError(.badServerResponse)
             }
-        default: break
         }
 
         app.sync.config.put(on: group, data: [
