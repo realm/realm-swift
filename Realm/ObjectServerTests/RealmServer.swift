@@ -752,9 +752,7 @@ public class RealmServer: NSObject {
     /// This will create a App with different configuration depending on the SyncMode (partition based sync or flexible sync), partition type is used only in case
     /// this is partition based sync, and will crash if one is not provided in that mode
     func createAppForSyncMode(_ syncMode: SyncMode, _ objectsSchema: [ObjectSchema]) throws -> AppId {
-        guard let session = session else {
-            throw URLError(.unknown)
-        }
+        let session = try XCTUnwrap(session)
 
         let info = try session.apps.post(["name": "test"]).get()
         guard let appInfo = info as? [String: Any],
@@ -873,8 +871,8 @@ public class RealmServer: NSObject {
         }
 
         for result in schemaUpdates {
-            guard case .success = result else {
-                fatalError("Failed to create relationships for schema: \(result)")
+            if case .failure(let error) = result {
+                fatalError("Failed to create relationships for schema: \(error)")
             }
         }
 
@@ -902,26 +900,10 @@ public class RealmServer: NSObject {
                     "state": "enabled",
                     "database_name": "test_data",
                     "queryable_fields_names": fields as [Json],
-                    "asymmetric_tables": asymmetricTables as [Json],
-                    "permissions": [
-                        "rules": [String: Json](),
-                        "defaultRoles": [[
-                            "name": "all",
-                            "applyWhen": [String: Json](),
-                            "read": true,
-                            "write": true
-                        ]]
-                    ]
+                    "asymmetric_tables": asymmetricTables as [Json]
                 ]
             ]
-        }
-        let serviceConfigResponse = app.services[serviceId].config.patch(serviceConfig)
-        guard case .success = serviceConfigResponse else {
-            throw URLError(.badServerResponse)
-        }
-
-        if case .flx = syncMode {
-            let rulesConfigResponse = app.services[serviceId].default_rule.post([
+            app.services[serviceId].default_rule.post(on: group, [
                 "roles": [[
                     "name": "all",
                     "apply_when": [String: Json](),
@@ -934,11 +916,9 @@ public class RealmServer: NSObject {
                     "insert": true,
                     "delete": true
                 ]]
-            ])
-            guard case .success = rulesConfigResponse else {
-                throw URLError(.badServerResponse)
-            }
+            ], failOnError)
         }
+        _ = try app.services[serviceId].config.patch(serviceConfig).get()
 
         app.sync.config.put(on: group, data: [
             "development_mode_enabled": true
@@ -1013,7 +993,7 @@ public class RealmServer: NSObject {
         ], failOnError)
 
         guard case .success = group.wait(timeout: .now() + 5.0) else {
-            throw URLError(.badServerResponse)
+            throw URLError(.timedOut)
         }
 
         return clientAppId
