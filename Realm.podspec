@@ -117,7 +117,7 @@ Pod::Spec.new do |s|
   s.private_header_files    = private_header_files
   s.header_mappings_dir     = 'include'
   s.pod_target_xcconfig     = { 'APPLICATION_EXTENSION_API_ONLY' => 'YES',
-                                'CLANG_CXX_LANGUAGE_STANDARD' => 'c++17',
+                                'CLANG_CXX_LANGUAGE_STANDARD' => 'c++20',
                                 'CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF' => 'NO',
                                 'OTHER_CPLUSPLUSFLAGS' => '-isystem "${PODS_ROOT}/Realm/include/core" -fvisibility-inlines-hidden',
                                 'OTHER_CPLUSPLUSFLAGS[arch=armv7]' => '-isystem "${PODS_ROOT}/Realm/include/core" -fvisibility-inlines-hidden -fno-aligned-new',
