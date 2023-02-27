@@ -529,6 +529,14 @@
     XCTAssertNoThrow(([[NumberObject alloc] initWithValue:@{@"doubleObj": @DBL_MAX}]));
 }
 
+- (void)testInitEmbeddedProperty {
+    NSArray *failVal = @[@{}, @{}, @{}, @{@"one": [[IntObject alloc] init]}];
+    XCTAssertThrows([[DictionaryPropertyObject alloc] initWithValue:failVal]);
+    
+    NSArray *passVal = @[@{}, @{}, @{}, @{@"one": [[EmbeddedIntObject alloc] init]}];
+    XCTAssertNoThrow([[DictionaryPropertyObject alloc] initWithValue:passVal]);
+}
+
 #pragma mark - Create
 
 - (void)testCreateWithArray {

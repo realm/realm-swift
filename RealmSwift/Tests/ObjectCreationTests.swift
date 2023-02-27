@@ -869,6 +869,51 @@ class ObjectCreationTests: TestCase {
         realm.cancelWrite()
     }
 
+    func testCopyEmbeddedObjectFromManagedObjectInSameRealm() {
+        let realm = try! Realm()
+        try! realm.write {
+            let parent = realm.create(EmbeddedParentObject.self, value: [
+                "object": ["value": 1],
+                "array": [[2]],
+                "map": ["some": [3]]
+            ])
+            // Copy managed object
+            let copyA = EmbeddedParentObject(value: parent)
+            realm.add(copyA)
+
+            XCTAssertNotEqual(parent, copyA)
+            XCTAssertEqual(copyA.object!.value, 1)
+            XCTAssertEqual(copyA.array.count, 1)
+            XCTAssertEqual(copyA.map.values.count, 1)
+
+            let copyB = EmbeddedParentObject()
+            // Explicit copy of object
+            copyB.object = EmbeddedTreeObject1(value: parent.object!)
+            realm.add(copyB)
+
+            XCTAssertNotEqual(parent, copyB)
+            XCTAssertEqual(copyB.object!.value, 1)
+
+            let copyC = EmbeddedParentObject()
+            // Assign of EmbeddedObject
+            copyC.object = parent.object
+            assertThrows(realm.add(copyC), "Cannot set a link to an existing managed embedded object")
+
+            let parentUnmanaged = EmbeddedParentObject(value: [
+                "object": ["value": 4],
+                "array": [[5]],
+                "map": ["some": [6]]
+            ])
+            // Do not copy unmanaged object
+            let copyD = EmbeddedParentObject(value: parentUnmanaged)
+            XCTAssertTrue(copyD.object === parentUnmanaged.object)
+            realm.add(copyD)
+            assertThrows(realm.add(parentUnmanaged), "Cannot set a link to an existing managed embedded object")
+
+            realm.cancelWrite()
+        }
+    }
+
     func testCreateEmbeddedFromManagedObjectInDifferentRealm() {
         let realmA = realmWithTestPath()
         let realmB = try! Realm()
@@ -891,6 +936,14 @@ class ObjectCreationTests: TestCase {
         XCTAssertEqual(copy.array[0].value, 9)
         XCTAssertEqual(copy.array[1].value, 10)
         realmB.cancelWrite()
+    }
+
+    func testInitEmbeddedProperty() {
+        let failVal: [Any] = [[], ["one": SwiftIntObject()]]
+        assertThrows(SwiftDictionaryObject(value: failVal))
+        
+        let passVal: [Any] = [[], ["one": EmbeddedSwiftIntObject()]]
+        XCTAssertNoThrow(SwiftDictionaryObject(value: passVal))
     }
 
     // test null object

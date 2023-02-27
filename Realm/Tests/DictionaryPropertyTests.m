@@ -265,7 +265,7 @@
     XCTAssertThrows([intDictionary.intObjDictionary sortedResultsUsingKeyPath:@"intCol" ascending:YES], @"Should throw on unmanaged RLMDictionary");
 
     // test unmanaged with literals
-    __unused DictionaryPropertyObject *obj = [[DictionaryPropertyObject alloc] initWithValue:@[@{}, @{}, @{}, @{@"one": [[IntObject alloc] initWithValue:@[@1]]}]];
+    __unused DictionaryPropertyObject *obj = [[DictionaryPropertyObject alloc] initWithValue:@[@{}, @{}, @{}, @{@"one": [[EmbeddedIntObject alloc] initWithValue:@[@1]]}, @{@"one": [[IntObject alloc] initWithValue:@[@1]]}]];
 }
 
 - (void)testUnmanagedComparision {
