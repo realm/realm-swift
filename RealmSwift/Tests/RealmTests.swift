@@ -1472,4 +1472,252 @@ class RealmTests: TestCase {
         XCTAssertNil(realm.objects(SwiftStringObject.self).first { $0.stringCol == "string A" })
         XCTAssertNotNil(realm.objects(SwiftStringObject.self).first { $0.stringCol == "string B" })
     }
+
+    func testAssignToList() throws {
+        let obj = ModernAllTypesObject()
+        obj.arrayInt = [5]
+        obj.arrayInt8 = [5]
+        obj.arrayInt16 = [5]
+        obj.arrayInt32 = [5]
+        obj.arrayInt64 = [5]
+        obj.arrayFloat = [3.141592]
+        obj.arrayDouble = [3.141592]
+        obj.arrayString = ["foobar"]
+        obj.arrayBinary = [Data()]
+        obj.arrayDate = [Date()]
+        obj.arrayDecimal = [Decimal128()]
+        obj.arrayObjectId = [ObjectId()]
+        obj.arrayUuid = [UUID()]
+        obj.arrayAny = [.int(5)]
+        obj.arrayCol = [ModernAllTypesObject()]
+
+        obj.arrayOptInt = [5]
+        obj.arrayOptInt8 = [5]
+        obj.arrayOptInt16 = [5]
+        obj.arrayOptInt32 = [5]
+        obj.arrayOptInt64 = [5]
+        obj.arrayOptFloat = [3.141592]
+        obj.arrayOptDouble = [3.141592]
+        obj.arrayOptString = ["foobar"]
+        obj.arrayOptBinary = [Data()]
+        obj.arrayOptDate = [Date()]
+        obj.arrayOptDecimal = [Decimal128()]
+        obj.arrayOptObjectId = [ObjectId()]
+        obj.arrayOptUuid = [UUID()]
+
+        XCTAssertEqual(obj.arrayInt.count, 1)
+        XCTAssertEqual(obj.arrayInt8.count, 1)
+        XCTAssertEqual(obj.arrayInt16.count, 1)
+        XCTAssertEqual(obj.arrayInt32.count, 1)
+        XCTAssertEqual(obj.arrayInt64.count, 1)
+        XCTAssertEqual(obj.arrayFloat.count, 1)
+        XCTAssertEqual(obj.arrayDouble.count, 1)
+        XCTAssertEqual(obj.arrayString.count, 1)
+        XCTAssertEqual(obj.arrayBinary.count, 1)
+        XCTAssertEqual(obj.arrayDate.count, 1)
+        XCTAssertEqual(obj.arrayDecimal.count, 1)
+        XCTAssertEqual(obj.arrayObjectId.count, 1)
+        XCTAssertEqual(obj.arrayUuid.count, 1)
+        XCTAssertEqual(obj.arrayAny.count, 1)
+        XCTAssertEqual(obj.arrayCol.count, 1)
+
+        XCTAssertEqual(obj.arrayOptInt.count, 1)
+        XCTAssertEqual(obj.arrayOptInt8.count, 1)
+        XCTAssertEqual(obj.arrayOptInt16.count, 1)
+        XCTAssertEqual(obj.arrayOptInt32.count, 1)
+        XCTAssertEqual(obj.arrayOptInt64.count, 1)
+        XCTAssertEqual(obj.arrayOptFloat.count, 1)
+        XCTAssertEqual(obj.arrayOptDouble.count, 1)
+        XCTAssertEqual(obj.arrayOptString.count, 1)
+        XCTAssertEqual(obj.arrayOptBinary.count, 1)
+        XCTAssertEqual(obj.arrayOptDate.count, 1)
+        XCTAssertEqual(obj.arrayOptDecimal.count, 1)
+        XCTAssertEqual(obj.arrayOptObjectId.count, 1)
+        XCTAssertEqual(obj.arrayOptUuid.count, 1)
+
+        let realm = try Realm()
+        try realm.write {
+            realm.add(obj)
+        }
+
+        let object = realm.objects(ModernAllTypesObject.self).first!
+        XCTAssertEqual(object.arrayInt.count, 1)
+        XCTAssertEqual(object.arrayInt8.count, 1)
+        XCTAssertEqual(object.arrayInt16.count, 1)
+        XCTAssertEqual(object.arrayInt32.count, 1)
+        XCTAssertEqual(object.arrayInt64.count, 1)
+        XCTAssertEqual(object.arrayFloat.count, 1)
+        XCTAssertEqual(object.arrayDouble.count, 1)
+        XCTAssertEqual(object.arrayString.count, 1)
+        XCTAssertEqual(object.arrayBinary.count, 1)
+        XCTAssertEqual(object.arrayDate.count, 1)
+        XCTAssertEqual(object.arrayDecimal.count, 1)
+        XCTAssertEqual(object.arrayObjectId.count, 1)
+        XCTAssertEqual(object.arrayUuid.count, 1)
+        XCTAssertEqual(object.arrayAny.count, 1)
+        XCTAssertEqual(object.arrayCol.count, 1)
+
+        XCTAssertEqual(object.arrayOptInt.count, 1)
+        XCTAssertEqual(object.arrayOptInt8.count, 1)
+        XCTAssertEqual(object.arrayOptInt16.count, 1)
+        XCTAssertEqual(object.arrayOptInt32.count, 1)
+        XCTAssertEqual(object.arrayOptInt64.count, 1)
+        XCTAssertEqual(object.arrayOptFloat.count, 1)
+        XCTAssertEqual(object.arrayOptDouble.count, 1)
+        XCTAssertEqual(object.arrayOptString.count, 1)
+        XCTAssertEqual(object.arrayOptBinary.count, 1)
+        XCTAssertEqual(object.arrayOptDate.count, 1)
+        XCTAssertEqual(object.arrayOptDecimal.count, 1)
+        XCTAssertEqual(object.arrayOptObjectId.count, 1)
+        XCTAssertEqual(object.arrayOptUuid.count, 1)
+
+        // Replace
+        try realm.write {
+            object.arrayInt = [5, 5, 5]
+            object.arrayInt8 = [5, 5, 5]
+            object.arrayInt16 = [5, 5, 5]
+            object.arrayInt32 = [5, 5, 5]
+            object.arrayInt64 = [5, 5, 5]
+            object.arrayFloat = [3.141592, 3.141592, 3.141592]
+            object.arrayDouble = [3.141592, 3.141592, 3.141592]
+            object.arrayString = ["foobar", "foobar", "foobar"]
+            object.arrayBinary = [Data(), Data(), Data()]
+            object.arrayDate = [Date(), Date(), Date()]
+            object.arrayDecimal = [Decimal128(5), Decimal128(5), Decimal128(5)]
+            object.arrayObjectId = [ObjectId.generate(), ObjectId.generate(), ObjectId.generate()]
+            object.arrayUuid = [UUID(), UUID(), UUID()]
+            object.arrayAny = [.int(5), .string("foobar"), .bool(true)]
+            object.arrayCol = [ModernAllTypesObject(), ModernAllTypesObject(), ModernAllTypesObject()]
+
+            object.arrayOptInt = [5, nil, 5]
+            object.arrayOptInt8 = [5, nil, 5]
+            object.arrayOptInt16 = [5, nil, 5]
+            object.arrayOptInt32 = [5, nil, 5]
+            object.arrayOptInt64 = [5, nil, 5]
+            object.arrayOptFloat = [3.141592, nil, 3.141592]
+            object.arrayOptDouble = [3.141592, nil, 3.141592]
+            object.arrayOptString = ["foobar", nil, "foobar"]
+            object.arrayOptBinary = [Data(), nil, Data()]
+            object.arrayOptDate = [Date(), nil, Date()]
+            object.arrayOptDecimal = [Decimal128(5), nil, Decimal128(5)]
+            object.arrayOptObjectId = [ObjectId.generate(), nil, ObjectId.generate()]
+            object.arrayOptUuid = [UUID(), nil, UUID()]
+        }
+
+        XCTAssertEqual(object.arrayInt.count, 3)
+        XCTAssertEqual(object.arrayInt8.count, 3)
+        XCTAssertEqual(object.arrayInt16.count, 3)
+        XCTAssertEqual(object.arrayInt32.count, 3)
+        XCTAssertEqual(object.arrayInt64.count, 3)
+        XCTAssertEqual(object.arrayFloat.count, 3)
+        XCTAssertEqual(object.arrayDouble.count, 3)
+        XCTAssertEqual(object.arrayString.count, 3)
+        XCTAssertEqual(object.arrayBinary.count, 3)
+        XCTAssertEqual(object.arrayDate.count, 3)
+        XCTAssertEqual(object.arrayDecimal.count, 3)
+        XCTAssertEqual(object.arrayObjectId.count, 3)
+        XCTAssertEqual(object.arrayUuid.count, 3)
+        XCTAssertEqual(object.arrayAny.count, 3)
+        XCTAssertEqual(object.arrayCol.count, 3)
+
+        XCTAssertEqual(object.arrayOptInt.count, 3)
+        XCTAssertEqual(object.arrayOptInt8.count, 3)
+        XCTAssertEqual(object.arrayOptInt16.count, 3)
+        XCTAssertEqual(object.arrayOptInt32.count, 3)
+        XCTAssertEqual(object.arrayOptInt64.count, 3)
+        XCTAssertEqual(object.arrayOptFloat.count, 3)
+        XCTAssertEqual(object.arrayOptDouble.count, 3)
+        XCTAssertEqual(object.arrayOptString.count, 3)
+        XCTAssertEqual(object.arrayOptBinary.count, 3)
+        XCTAssertEqual(object.arrayOptDate.count, 3)
+        XCTAssertEqual(object.arrayOptDecimal.count, 3)
+        XCTAssertEqual(object.arrayOptObjectId.count, 3)
+        XCTAssertEqual(object.arrayOptUuid.count, 3)
+    }
+
+    func testAppendAnyRealmValueToList() throws {
+        let object = ModernAllTypesObject()
+        let obj = ModernAllTypesObject(value: ["arrayAny": [object, 1, "Text"]])
+        XCTAssertEqual(obj.arrayAny.count, 3)
+
+        obj.arrayAny.append(Float(2.545))
+        XCTAssertEqual(obj.arrayAny.count, 4)
+        XCTAssertEqual(obj.arrayAny.last, .float(2.545))
+
+        let date = Date()
+        obj.arrayAny.append(objectsIn: [false, NSNull(), Double(26.6), date])
+        XCTAssertEqual(obj.arrayAny.count, 8)
+        XCTAssertEqual(obj.arrayAny.last, .date(date))
+
+        let data = Data()
+        obj.arrayAny.append(.data(data))
+        XCTAssertEqual(obj.arrayAny.count, 9)
+
+        let realm = try Realm()
+        try realm.write {
+            realm.add(obj)
+        }
+
+        let returnedObject = realm.objects(ModernAllTypesObject.self).first!
+
+        let uuid = UUID()
+        let objectId = ObjectId.generate()
+        try realm.write {
+            returnedObject.arrayAny.append(uuid)
+            returnedObject.arrayAny.append(objectsIn: [objectId, Decimal128(5)])
+        }
+
+        XCTAssertEqual(returnedObject.arrayAny.count, 12)
+        XCTAssertEqual(returnedObject.arrayAny[0], .object(object))
+        XCTAssertEqual(returnedObject.arrayAny[1], .int(1))
+        XCTAssertEqual(returnedObject.arrayAny[2], .string("Text"))
+        XCTAssertEqual(returnedObject.arrayAny[3], .float(2.545))
+        XCTAssertEqual(returnedObject.arrayAny[4], .bool(false))
+        XCTAssertEqual(returnedObject.arrayAny[5], .none)
+        XCTAssertEqual(returnedObject.arrayAny[6], .double(Double(26.6)))
+        XCTAssertEqual(returnedObject.arrayAny[7], .date(date))
+        XCTAssertEqual(returnedObject.arrayAny[8], .data(data))
+        XCTAssertEqual(returnedObject.arrayAny[9], .uuid(uuid))
+        XCTAssertEqual(returnedObject.arrayAny[10], .objectId(objectId))
+        XCTAssertEqual(returnedObject.arrayAny[11], .decimal128(Decimal128(5)))
+
+        let myObject = ModernAllTypesObject()
+        let list = List<AnyRealmValue>()
+        list.append(myObject)
+        try realm.write {
+            obj.arrayAny = list
+        }
+
+        XCTAssertEqual(obj.arrayAny.count, 1)
+        XCTAssertEqual(obj.arrayAny[0], .object(myObject))
+    }
+
+    func testAssignToAnyRealmValue() throws {
+        let object = ModernAllTypesObject()
+
+        let realm = try Realm()
+        try realm.write {
+            realm.add(object)
+        }
+
+        try realm.write {
+            object.anyCol = 5
+        }
+        XCTAssertEqual(realm.objects(ModernAllTypesObject.self).first!.anyCol, 5)
+
+        try realm.write {
+            object.anyCol = true
+        }
+        XCTAssertEqual(realm.objects(ModernAllTypesObject.self).first!.anyCol, true)
+
+        try realm.write {
+            object.anyCol = 3.141592
+        }
+        XCTAssertEqual(realm.objects(ModernAllTypesObject.self).first!.anyCol, 3.141592)
+
+        try realm.write {
+            object.anyCol = nil
+        }
+        XCTAssertEqual(realm.objects(ModernAllTypesObject.self).first!.anyCol, nil)
+    }
 }
