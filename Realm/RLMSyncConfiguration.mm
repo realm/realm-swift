@@ -20,6 +20,7 @@
 
 #import "RLMApp_Private.hpp"
 #import "RLMBSON_Private.hpp"
+#import "RLMError_Private.hpp"
 #import "RLMRealm_Private.hpp"
 #import "RLMRealmConfiguration_Private.h"
 #import "RLMRealmConfiguration_Private.hpp"
@@ -41,26 +42,6 @@ using namespace realm;
 
 namespace {
 using ProtocolError = realm::sync::ProtocolError;
-
-RLMSyncError errorKindForSyncError(SyncError error) {
-    if (error.is_client_reset_requested())
-        return RLMSyncErrorClientResetError;
-    if (error.error_code.category() == realm::sync::protocol_error_category()) {
-        switch (static_cast<ProtocolError>(error.error_code.value())) {
-            case ProtocolError::permission_denied:
-                return RLMSyncErrorPermissionDeniedError;
-            case ProtocolError::bad_authentication:
-                return RLMSyncErrorClientUserError;
-            case ProtocolError::compensating_write:
-                return RLMSyncErrorWriteRejected;
-            default:
-                break;
-        }
-    }
-    if (error.is_session_level_protocol_error())
-        return RLMSyncErrorClientSessionError;
-    return RLMSyncErrorClientInternalError;
-}
 
 struct CallbackSchema {
     bool dynamic;
@@ -250,47 +231,6 @@ void RLMSetConfigInfoForClientResetCallbacks(realm::SyncConfig& syncConfig, RLMR
     return _config->flx_sync_requested;
 }
 
-NSError *RLMTranslateSyncError(SyncError error) {
-    NSMutableDictionary *userInfo = [NSMutableDictionary new];
-
-    for (auto& pair : error.user_info) {
-        if (pair.first == realm::SyncError::c_original_file_path_key) {
-            userInfo[kRLMSyncErrorActionTokenKey] =
-                [[RLMSyncErrorActionToken alloc] initWithOriginalPath:pair.second];
-        }
-        else if (pair.first == realm::SyncError::c_recovery_file_path_key) {
-            userInfo[kRLMSyncPathOfRealmBackupCopyKey] = @(pair.second.c_str());
-        }
-    }
-
-    // Note that certain types of errors are 'interactive'; users have several options
-    // as to how to proceed after the error is reported.
-    auto errorCode = errorKindForSyncError(error);
-    switch (errorCode) {
-        case RLMSyncErrorClientResetError:
-        case RLMSyncErrorPermissionDeniedError:
-        case RLMSyncErrorUnderlyingAuthError:
-        case RLMSyncErrorWriteRejected:
-            break;
-        case RLMSyncErrorClientSessionError:
-        case RLMSyncErrorClientUserError:
-        case RLMSyncErrorClientInternalError:
-            if (!error.is_fatal) {
-                return nil;
-            }
-            break;
-    }
-    userInfo[NSLocalizedDescriptionKey] = RLMStringViewToNSString(error.simple_message);
-    userInfo[kRLMSyncErrorStatusCodeKey] = @(error.error_code.value());
-    if (!error.logURL.empty()) {
-        userInfo[RLMServerLogURLKey] = RLMStringViewToNSString(error.logURL);
-    }
-
-    return [NSError errorWithDomain:RLMSyncErrorDomain
-                               code:errorCode
-                           userInfo:[userInfo copy]];
-}
-
 - (void)assignConfigErrorHandler:(RLMUser *)user {
     RLMSyncManager *manager = [user.app syncManager];
     __weak RLMSyncManager *weakManager = manager;
@@ -308,7 +248,7 @@ NSError *RLMTranslateSyncError(SyncError error) {
         if (!errorHandler) {
             return;
         }
-        NSError *nsError = RLMTranslateSyncError(std::move(error));
+        NSError *nsError = makeError(std::move(error));
         if (!nsError) {
             return;
         }

@@ -3220,13 +3220,13 @@ static double average(NSDictionary *dictionary) {
     RLMAssertThrowsWithReason([optUnmanaged.uuidObj minOfProperty:@"self"],
                               @"minOfProperty: is not supported for uuid? dictionary");
     RLMAssertThrowsWithReason([managed.boolObj minOfProperty:@"self"],
-                              @"minOfProperty: is not supported for bool dictionary 'AllPrimitiveDictionaries.boolObj'");
+                              @"Operation 'min' not supported for bool dictionary 'AllPrimitiveDictionaries.boolObj'");
     RLMAssertThrowsWithReason([optManaged.boolObj minOfProperty:@"self"],
-                              @"minOfProperty: is not supported for bool? dictionary 'AllOptionalPrimitiveDictionaries.boolObj'");
+                              @"Operation 'min' not supported for bool? dictionary 'AllOptionalPrimitiveDictionaries.boolObj'");
     RLMAssertThrowsWithReason([managed.stringObj minOfProperty:@"self"],
-                              @"minOfProperty: is not supported for string dictionary 'AllPrimitiveDictionaries.stringObj'");
+                              @"Operation 'min' not supported for string dictionary 'AllPrimitiveDictionaries.stringObj'");
     RLMAssertThrowsWithReason([optManaged.stringObj minOfProperty:@"self"],
-                              @"minOfProperty: is not supported for string? dictionary 'AllOptionalPrimitiveDictionaries.stringObj'");
+                              @"Operation 'min' not supported for string? dictionary 'AllOptionalPrimitiveDictionaries.stringObj'");
 
     uncheckedAssertNil([unmanaged.intObj minOfProperty:@"self"]);
     uncheckedAssertNil([optUnmanaged.intObj minOfProperty:@"self"]);
@@ -3309,13 +3309,13 @@ static double average(NSDictionary *dictionary) {
     RLMAssertThrowsWithReason([optUnmanaged.uuidObj maxOfProperty:@"self"],
                               @"maxOfProperty: is not supported for uuid? dictionary");
     RLMAssertThrowsWithReason([managed.boolObj maxOfProperty:@"self"],
-                              @"maxOfProperty: is not supported for bool dictionary 'AllPrimitiveDictionaries.boolObj'");
+                              @"Operation 'max' not supported for bool dictionary 'AllPrimitiveDictionaries.boolObj'");
     RLMAssertThrowsWithReason([optManaged.boolObj maxOfProperty:@"self"],
-                              @"maxOfProperty: is not supported for bool? dictionary 'AllOptionalPrimitiveDictionaries.boolObj'");
+                              @"Operation 'max' not supported for bool? dictionary 'AllOptionalPrimitiveDictionaries.boolObj'");
     RLMAssertThrowsWithReason([managed.stringObj maxOfProperty:@"self"],
-                              @"maxOfProperty: is not supported for string dictionary 'AllPrimitiveDictionaries.stringObj'");
+                              @"Operation 'max' not supported for string dictionary 'AllPrimitiveDictionaries.stringObj'");
     RLMAssertThrowsWithReason([optManaged.stringObj maxOfProperty:@"self"],
-                              @"maxOfProperty: is not supported for string? dictionary 'AllOptionalPrimitiveDictionaries.stringObj'");
+                              @"Operation 'max' not supported for string? dictionary 'AllOptionalPrimitiveDictionaries.stringObj'");
 
     uncheckedAssertNil([unmanaged.intObj maxOfProperty:@"self"]);
     uncheckedAssertNil([optUnmanaged.intObj maxOfProperty:@"self"]);
@@ -3402,17 +3402,17 @@ static double average(NSDictionary *dictionary) {
     RLMAssertThrowsWithReason([optUnmanaged.uuidObj sumOfProperty:@"self"],
                               @"sumOfProperty: is not supported for uuid? dictionary");
     RLMAssertThrowsWithReason([managed.boolObj sumOfProperty:@"self"],
-                              @"sumOfProperty: is not supported for bool dictionary 'AllPrimitiveDictionaries.boolObj'");
+                              @"Operation 'sum' not supported for bool dictionary 'AllPrimitiveDictionaries.boolObj'");
     RLMAssertThrowsWithReason([optManaged.boolObj sumOfProperty:@"self"],
-                              @"sumOfProperty: is not supported for bool? dictionary 'AllOptionalPrimitiveDictionaries.boolObj'");
+                              @"Operation 'sum' not supported for bool? dictionary 'AllOptionalPrimitiveDictionaries.boolObj'");
     RLMAssertThrowsWithReason([managed.stringObj sumOfProperty:@"self"],
-                              @"sumOfProperty: is not supported for string dictionary 'AllPrimitiveDictionaries.stringObj'");
+                              @"Operation 'sum' not supported for string dictionary 'AllPrimitiveDictionaries.stringObj'");
     RLMAssertThrowsWithReason([optManaged.stringObj sumOfProperty:@"self"],
-                              @"sumOfProperty: is not supported for string? dictionary 'AllOptionalPrimitiveDictionaries.stringObj'");
+                              @"Operation 'sum' not supported for string? dictionary 'AllOptionalPrimitiveDictionaries.stringObj'");
     RLMAssertThrowsWithReason([managed.dateObj sumOfProperty:@"self"],
-                              @"sumOfProperty: is not supported for date dictionary 'AllPrimitiveDictionaries.dateObj'");
+                              @"Operation 'sum' not supported for date dictionary 'AllPrimitiveDictionaries.dateObj'");
     RLMAssertThrowsWithReason([optManaged.dateObj sumOfProperty:@"self"],
-                              @"sumOfProperty: is not supported for date? dictionary 'AllOptionalPrimitiveDictionaries.dateObj'");
+                              @"Operation 'sum' not supported for date? dictionary 'AllOptionalPrimitiveDictionaries.dateObj'");
 
     uncheckedAssertEqualObjects([unmanaged.intObj sumOfProperty:@"self"], @0);
     uncheckedAssertEqualObjects([optUnmanaged.intObj sumOfProperty:@"self"], @0);
@@ -3493,17 +3493,17 @@ static double average(NSDictionary *dictionary) {
     RLMAssertThrowsWithReason([optUnmanaged.uuidObj averageOfProperty:@"self"],
                               @"averageOfProperty: is not supported for uuid? dictionary");
     RLMAssertThrowsWithReason([managed.boolObj averageOfProperty:@"self"],
-                              @"averageOfProperty: is not supported for bool dictionary 'AllPrimitiveDictionaries.boolObj'");
+                              @"Operation 'average' not supported for bool dictionary 'AllPrimitiveDictionaries.boolObj'");
     RLMAssertThrowsWithReason([optManaged.boolObj averageOfProperty:@"self"],
-                              @"averageOfProperty: is not supported for bool? dictionary 'AllOptionalPrimitiveDictionaries.boolObj'");
+                              @"Operation 'average' not supported for bool? dictionary 'AllOptionalPrimitiveDictionaries.boolObj'");
     RLMAssertThrowsWithReason([managed.stringObj averageOfProperty:@"self"],
-                              @"averageOfProperty: is not supported for string dictionary 'AllPrimitiveDictionaries.stringObj'");
+                              @"Operation 'average' not supported for string dictionary 'AllPrimitiveDictionaries.stringObj'");
     RLMAssertThrowsWithReason([optManaged.stringObj averageOfProperty:@"self"],
-                              @"averageOfProperty: is not supported for string? dictionary 'AllOptionalPrimitiveDictionaries.stringObj'");
+                              @"Operation 'average' not supported for string? dictionary 'AllOptionalPrimitiveDictionaries.stringObj'");
     RLMAssertThrowsWithReason([managed.dateObj averageOfProperty:@"self"],
-                              @"averageOfProperty: is not supported for date dictionary 'AllPrimitiveDictionaries.dateObj'");
+                              @"Operation 'average' not supported for date dictionary 'AllPrimitiveDictionaries.dateObj'");
     RLMAssertThrowsWithReason([optManaged.dateObj averageOfProperty:@"self"],
-                              @"averageOfProperty: is not supported for date? dictionary 'AllOptionalPrimitiveDictionaries.dateObj'");
+                              @"Operation 'average' not supported for date? dictionary 'AllOptionalPrimitiveDictionaries.dateObj'");
 
     uncheckedAssertNil([unmanaged.intObj averageOfProperty:@"self"]);
     uncheckedAssertNil([optUnmanaged.intObj averageOfProperty:@"self"]);

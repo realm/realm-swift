@@ -477,7 +477,7 @@ static double average(NSArray *values) {
 
 - (void)testMin {
     %noany %nominmax %unman RLMAssertThrowsWithReason([$set minOfProperty:@"self"], ^n @"minOfProperty: is not supported for $type set");
-    %noany %nominmax %man RLMAssertThrowsWithReason([$set minOfProperty:@"self"], ^n @"minOfProperty: is not supported for $type set '$class.$prop'");
+    %noany %nominmax %man RLMAssertThrowsWithReason([$set minOfProperty:@"self"], ^n @"Operation 'min' not supported for $type set '$class.$prop'");
 
     %minmax uncheckedAssertNil([$set minOfProperty:@"self"]);
 
@@ -492,7 +492,7 @@ static double average(NSArray *values) {
 
 - (void)testMax {
     %noany %nominmax %unman RLMAssertThrowsWithReason([$set maxOfProperty:@"self"], ^n @"maxOfProperty: is not supported for $type set");
-    %noany %nominmax %man RLMAssertThrowsWithReason([$set maxOfProperty:@"self"], ^n @"maxOfProperty: is not supported for $type set '$class.$prop'");
+    %noany %nominmax %man RLMAssertThrowsWithReason([$set maxOfProperty:@"self"], ^n @"Operation 'max' not supported for $type set '$class.$prop'");
 
     %minmax uncheckedAssertNil([$set maxOfProperty:@"self"]);
 
@@ -507,7 +507,7 @@ static double average(NSArray *values) {
 
 - (void)testSum {
     %noany %nosum %unman RLMAssertThrowsWithReason([$set sumOfProperty:@"self"], ^n @"sumOfProperty: is not supported for $type set");
-    %noany %nosum %man RLMAssertThrowsWithReason([$set sumOfProperty:@"self"], ^n @"sumOfProperty: is not supported for $type set '$class.$prop'");
+    %noany %nosum %man RLMAssertThrowsWithReason([$set sumOfProperty:@"self"], ^n @"Operation 'sum' not supported for $type set '$class.$prop'");
 
     %sum uncheckedAssertEqualObjects([$set sumOfProperty:@"self"], @0);
 
@@ -518,7 +518,7 @@ static double average(NSArray *values) {
 
 - (void)testAverage {
     %noany %noavg %unman RLMAssertThrowsWithReason([$set averageOfProperty:@"self"], ^n @"averageOfProperty: is not supported for $type set");
-    %noany %noavg %man RLMAssertThrowsWithReason([$set averageOfProperty:@"self"], ^n @"averageOfProperty: is not supported for $type set '$class.$prop'");
+    %noany %noavg %man RLMAssertThrowsWithReason([$set averageOfProperty:@"self"], ^n @"Operation 'average' not supported for $type set '$class.$prop'");
 
     %avg uncheckedAssertNil([$set averageOfProperty:@"self"]);
 

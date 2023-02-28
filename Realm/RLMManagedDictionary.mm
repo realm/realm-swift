@@ -199,56 +199,10 @@ void RLMEnsureDictionaryObservationInfo(std::unique_ptr<RLMObservationInfo>& inf
 //
 // validation helpers
 //
-[[gnu::noinline]]
-[[noreturn]]
-static void throwError(__unsafe_unretained RLMManagedDictionary *const dict, NSString *aggregateMethod) {
-    try {
-        throw;
-    }
-    catch (realm::InvalidTransactionException const&) {
-        @throw RLMException(@"Cannot modify managed RLMDictionary outside of a write transaction.");
-    }
-    catch (realm::IncorrectThreadException const&) {
-        @throw RLMException(@"Realm accessed from incorrect thread.");
-    }
-    catch (realm::Results::UnsupportedColumnTypeException const& e) {
-        if (dict->_backingCollection.get_type() == realm::PropertyType::Object) {
-            @throw RLMException(@"%@: is not supported for %s%s property '%s'.",
-                                aggregateMethod,
-                                string_for_property_type(e.property_type),
-                                dict->_optional ? "?" : "",
-                                e.column_name.data());
-        }
-        @throw RLMException(@"%@: is not supported for %s%s dictionary '%@.%@'.",
-                            aggregateMethod,
-                            string_for_property_type(e.property_type),
-                            dict->_optional ? "?" : "",
-                            dict->_ownerInfo->rlmObjectSchema.className, dict->_key);
-    }
-    catch (std::logic_error const& e) {
-        @throw RLMException(e);
-    }
-}
-
 template<typename Function>
-static auto translateErrors(__unsafe_unretained RLMManagedDictionary *const dictionary,
-                            Function&& f, NSString *aggregateMethod=nil) {
-    try {
-        return f();
-    }
-    catch (...) {
-        throwError(dictionary, aggregateMethod);
-    }
-}
-
-template<typename Function>
+__attribute__((always_inline))
 static auto translateErrors(Function&& f) {
-    try {
-        return f();
-    }
-    catch (...) {
-        throwError(nil, nil);
-    }
+    return translateCollectionError(static_cast<Function&&>(f), @"Dictionary");
 }
 
 static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dict,
@@ -437,33 +391,33 @@ static NSMutableArray *resultsToArray(RLMClassInfo& info, realm::Results r) {
 
 - (id)minOfProperty:(NSString *)property {
     auto column = columnForProperty(property, _backingCollection, _objectInfo, _type, RLMCollectionTypeDictionary);
-    auto value = translateErrors(self, [&] {
+    auto value = translateErrors([&] {
         return _backingCollection.as_results().min(column);
-    }, @"minOfProperty");
+    });
     return value ? RLMMixedToObjc(*value) : nil;
 }
 
 - (id)maxOfProperty:(NSString *)property {
     auto column = columnForProperty(property, _backingCollection, _objectInfo, _type, RLMCollectionTypeDictionary);
-    auto value = translateErrors(self, [&] {
+    auto value = translateErrors([&] {
         return _backingCollection.as_results().max(column);
-    }, @"maxOfProperty");
+    });
     return value ? RLMMixedToObjc(*value) : nil;
 }
 
 - (id)sumOfProperty:(NSString *)property {
     auto column = columnForProperty(property, _backingCollection, _objectInfo, _type, RLMCollectionTypeDictionary);
-    auto value = translateErrors(self, [&] {
+    auto value = translateErrors([&] {
         return _backingCollection.as_results().sum(column);
-    }, @"sumOfProperty");
+    });
     return value ? RLMMixedToObjc(*value) : @0;
 }
 
 - (id)averageOfProperty:(NSString *)property {
     auto column = columnForProperty(property, _backingCollection, _objectInfo, _type, RLMCollectionTypeDictionary);
-    auto value = translateErrors(self, [&] {
+    auto value = translateErrors([&] {
         return _backingCollection.as_results().average(column);
-    }, @"averageOfProperty");
+    });
     return value ? RLMMixedToObjc(*value) : nil;
 }
 
@@ -538,7 +492,7 @@ static NSMutableArray *resultsToArray(RLMClassInfo& info, realm::Results r) {
 
 - (instancetype)resolveInRealm:(RLMRealm *)realm {
     auto& parentInfo = _ownerInfo->resolve(realm);
-    return translateRLMResultsErrors([&] {
+    return translateErrors([&] {
         return [[self.class alloc] initWithBackingCollection:_backingCollection.freeze(realm->_realm)
                                                   parentInfo:&parentInfo
                                                     property:parentInfo.rlmObjectSchema[_key]];

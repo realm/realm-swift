@@ -52,25 +52,28 @@ class RealmTests: TestCase {
     }
 
     func testOpeningInvalidPathThrows() {
-        assertFails(.fileAccess) {
-            try Realm(configuration: Realm.Configuration(fileURL: URL(fileURLWithPath: "/dev/null/foo")))
+        let url = URL(fileURLWithPath: "/dev/null/foo")
+        assertFails(.fileOperationFailed, url.appendingPathExtension("lock"),
+                    "Failed to open file at path '\(url.path).lock': parent path is not a directory") {
+            try Realm(configuration: .init(fileURL: url))
         }
     }
 
     func testReadOnlyFile() throws {
-        try autoreleasepool {
-            let realm = try Realm(fileURL: testRealmURL())
-            try realm.write {
+        autoreleasepool {
+            let realm = try! Realm(fileURL: testRealmURL())
+            try! realm.write {
                 realm.create(SwiftStringObject.self, value: ["a"])
             }
         }
 
         let fileManager = FileManager.default
-        try fileManager.setAttributes([FileAttributeKey.immutable: true],
-                                      ofItemAtPath: testRealmURL().path)
+        try! fileManager.setAttributes([FileAttributeKey.immutable: true],
+                                       ofItemAtPath: testRealmURL().path)
 
         // Should not be able to open read-write
-        assertFails(.fileAccess) {
+        assertFails(.filePermissionDenied, testRealmURL(),
+                    "Failed to open Realm file at path '\(testRealmURL().path)': Operation not permitted. Please use a path where your app has read-write permissions.") {
             try Realm(fileURL: testRealmURL())
         }
 
@@ -80,12 +83,13 @@ class RealmTests: TestCase {
             XCTAssertEqual(1, realm.objects(SwiftStringObject.self).count)
         }
 
-        try fileManager.setAttributes([FileAttributeKey.immutable: false],
-                                      ofItemAtPath: testRealmURL().path)
+        try! fileManager.setAttributes([FileAttributeKey.immutable: false],
+                                       ofItemAtPath: testRealmURL().path)
     }
 
     func testReadOnlyRealmMustExist() {
-        assertFails(.fileNotFound) {
+        assertFails(.fileNotFound, defaultRealmURL(),
+                    "Failed to open Realm file at path '\(defaultRealmURL().path)': No such file or directory") {
             try Realm(configuration:
                 Realm.Configuration(fileURL: defaultRealmURL(), readOnly: true))
         }
@@ -103,7 +107,7 @@ class RealmTests: TestCase {
         try! fileManager.setAttributes([FileAttributeKey.posixPermissions: 0000],
                                        ofItemAtPath: testRealmURL().path)
 
-        assertFails(.filePermissionDenied) {
+        assertFails(.filePermissionDenied, testRealmURL(), "Failed to open Realm file at path '\(testRealmURL().path)': Permission denied. Please use a path where your app has read-write permissions.") {
             try Realm(fileURL: testRealmURL())
         }
 
@@ -111,13 +115,23 @@ class RealmTests: TestCase {
     }
 
     #if !SWIFT_PACKAGE && DEBUG
-    func testFileFormatUpgradeRequiredButDisabled() {
-        var config = Realm.Configuration.defaultConfiguration
+    func testUnsupportedFileFormatVersion() {
+        let config = Realm.Configuration.defaultConfiguration
         let bundledRealmPath = Bundle(for: RealmTests.self).path(forResource: "fileformat-pre-null.realm",
                                                                  ofType: nil)!
         try! FileManager.default.copyItem(atPath: bundledRealmPath, toPath: config.fileURL!.path)
+        assertFails(.unsupportedFileFormatVersion, "Database has an unsupported version (2) and cannot be upgraded") {
+            try Realm(configuration: config)
+        }
+    }
+
+    func testFileFormatUpgradeRequiredButDisabled() {
+        var config = Realm.Configuration.defaultConfiguration
+        let bundledRealmPath = Bundle(for: RealmTests.self).path(forResource: "file-format-version-21.realm",
+                                                                 ofType: nil)!
+        try! FileManager.default.copyItem(atPath: bundledRealmPath, toPath: config.fileURL!.path)
         config.disableFormatUpgrade = true
-        assertFails(Realm.Error.fileFormatUpgradeRequired) {
+        assertFails(.fileFormatUpgradeRequired, "Database upgrade required but prohibited.") {
             try Realm(configuration: config)
         }
     }
@@ -157,7 +171,8 @@ class RealmTests: TestCase {
             contents: "a".data(using: String.Encoding.utf8, allowLossyConversion: false),
             attributes: nil)
 
-        assertFails(.fileAccess) {
+        assertFails(.invalidDatabase, defaultRealmURL(),
+                    "Failed to open Realm file at path '\(defaultRealmURL().path)': file is non-empty but too small (1 bytes) to be a valid Realm.") {
             _ = try Realm()
         }
     }
@@ -1021,7 +1036,7 @@ class RealmTests: TestCase {
         do {
             _ = try Realm(configuration: Realm.Configuration(fileURL: URL(fileURLWithPath: "/dev/null/foo")))
             XCTFail("Error should be thrown")
-        } catch Realm.Error.fileAccess {
+        } catch Realm.Error.fileOperationFailed {
             // Success to catch the error
         } catch {
             XCTFail("Unexpected error \(error)")

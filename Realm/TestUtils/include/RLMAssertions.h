@@ -133,8 +133,14 @@ FOUNDATION_EXTERN bool RLMHasCachedRealmForPath(NSString *path);
               @"'%@' should contain '%@'", error.localizedDescription, msg);                            \
 } while (0)
 
+#define RLMValidateRealmError(macroError, errCode, msg, path) do {                                      \
+    NSError *error2 = (NSError *)macroError;                                                            \
+    RLMValidateError(error2, RLMErrorDomain, errCode, ([NSString stringWithFormat:msg, path]));         \
+    XCTAssertEqualObjects(error2.userInfo[NSFilePathErrorKey], path);                                   \
+} while (0)
+
 #define RLMValidateRealmErrorContains(macroError, errCode, msg, path) do {                              \
-    NSError* error2 = (NSError*)macroError;                                                             \
+    NSError *error2 = (NSError *)macroError;                                                            \
     RLMValidateErrorContains(error2, RLMErrorDomain, errCode, ([NSString stringWithFormat:msg, path])); \
     XCTAssertEqualObjects(error2.userInfo[NSFilePathErrorKey], path);                                   \
 } while (0)
@@ -144,7 +150,7 @@ FOUNDATION_EXTERN bool RLMHasCachedRealmForPath(NSString *path);
     XCTAssertEqual(exception.name, RLMExceptionName);                                                   \
     NSString* reason = [NSString stringWithFormat:msg, path];                                           \
     XCTAssertEqualObjects(exception.reason, reason);                                                    \
-    RLMValidateRealmError2(exception.userInfo[NSUnderlyingErrorKey], errCode, msg, path);               \
+    RLMValidateRealmError(exception.userInfo[NSUnderlyingErrorKey], errCode, msg, path);                \
 } while (0)
 
 #define RLMAssertRealmExceptionContains(expr, errCode, msg, path) do {                                  \
@@ -155,36 +161,6 @@ FOUNDATION_EXTERN bool RLMHasCachedRealmForPath(NSString *path);
               @"'%@' should contain '%@'", exception.reason, reason);                                   \
     RLMValidateRealmErrorContains(exception.userInfo[NSUnderlyingErrorKey], errCode, msg, path);        \
 } while (0)
-
-#define RLMValidateRealmError(macro_error, macro_errnum, macro_description, macro_underlying)            \
-({                                                                                                       \
-    NSString *macro_dsc = macro_description;                                                             \
-    NSString *macro_usl = macro_underlying;                                                              \
-    macro_dsc = [macro_dsc lowercaseString];                                                             \
-    macro_usl = [macro_usl lowercaseString];                                                             \
-    NSError *macro_castErr = (NSError *)macro_error;                                                     \
-    XCTAssertNotNil(macro_castErr);                                                                      \
-    XCTAssertEqual(macro_castErr.domain, RLMErrorDomain, @"Was expecting the error domain '%@', but got non-interned '%@' instead", RLMErrorDomain, macro_castErr.domain); \
-    XCTAssertEqual(macro_castErr.code, macro_errnum);                                                    \
-    if (macro_dsc.length) {                                                                              \
-        NSString *macro_dscActual = [macro_castErr.userInfo[NSLocalizedDescriptionKey] lowercaseString]; \
-        XCTAssertNotNil(macro_dscActual);                                                                \
-        XCTAssert([macro_dscActual rangeOfString:macro_dsc].location != NSNotFound, @"Did not find the expected string '%@' in the description string '%@'", macro_dsc, macro_dscActual); \
-    }                                                                                                    \
-    if (macro_usl.length) {                                                                              \
-        NSString *macro_uslActual = [macro_castErr.userInfo[@"Underlying"] lowercaseString];             \
-        XCTAssertNotNil(macro_uslActual);                                                                \
-        XCTAssert([macro_uslActual rangeOfString:macro_usl].location != NSNotFound, @"Did not find the expected string '%@' in the underlying info string '%@'", macro_usl, macro_uslActual); \
-    }                                                                                                    \
-})
-
-/// Check that an exception is thrown, and validate additional details about its underlying error.
-#define RLMAssertThrowsWithError(macro_expr, macro_except_string, macro_errnum, macro_underlying_string) \
-({                                                                                                       \
-    NSException *macro_exception = RLMAssertThrowsWithReasonMatching(macro_expr, macro_except_string);   \
-    NSError *macro_excErr = (NSError *)(macro_exception.userInfo[NSUnderlyingErrorKey]);                 \
-    RLMValidateRealmError(macro_excErr, macro_errnum, nil, macro_underlying_string);                     \
-})
 
 // XCTest assertions wrap each assertion in a try/catch to provide nice
 // reporting if an assertion unexpectedly throws an exception. This is normally

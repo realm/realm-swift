@@ -223,7 +223,7 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
  information on how the changes are reported and an example of updating a
  `UITableView`.
 
- The error parameter is present only for backwards compatiblity and will always
+ The error parameter is present only for backwards compatibility and will always
  be `nil`.
 
  At the time when the block is called, the `RLMResults` object will be fully
@@ -285,7 +285,7 @@ __attribute__((warn_unused_result));
  information on how the changes are reported and an example of updating a
  `UITableView`.
 
- The error parameter is present only for backwards compatiblity and will always
+ The error parameter is present only for backwards compatibility and will always
  be `nil`.
 
  At the time when the block is called, the `RLMResults` object will be fully
@@ -328,7 +328,7 @@ __attribute__((warn_unused_result));
  information on how the changes are reported and an example of updating a
  `UITableView`.
 
- The error parameter is present only for backwards compatiblity and will always
+ The error parameter is present only for backwards compatibility and will always
  be `nil`.
 
  At the time when the block is called, the `RLMResults` object will be fully
@@ -374,7 +374,7 @@ __attribute__((warn_unused_result));
  information on how the changes are reported and an example of updating a
  `UITableView`.
 
- The error parameter is present only for backwards compatiblity and will always
+ The error parameter is present only for backwards compatibility and will always
  be `nil`.
 
  At the time when the block is called, the `RLMResults` object will be fully

@@ -124,66 +124,10 @@ void RLMEnsureArrayObservationInfo(std::unique_ptr<RLMObservationInfo>& info,
     }
 }
 
-//
-// validation helpers
-//
-[[gnu::noinline]]
-[[noreturn]]
-static void throwError(__unsafe_unretained RLMManagedArray *const ar, NSString *aggregateMethod) {
-    try {
-        throw;
-    }
-    catch (realm::InvalidTransactionException const&) {
-        @throw RLMException(@"Cannot modify managed RLMArray outside of a write transaction.");
-    }
-    catch (realm::IncorrectThreadException const&) {
-        @throw RLMException(@"Realm accessed from incorrect thread.");
-    }
-    catch (realm::List::InvalidatedException const&) {
-        @throw RLMException(@"RLMArray has been invalidated or the containing object has been deleted.");
-    }
-    catch (realm::List::OutOfBoundsIndexException const& e) {
-        @throw RLMException(@"Index %zu is out of bounds (must be less than %zu).",
-                            e.requested, e.valid_count);
-    }
-    catch (realm::Results::UnsupportedColumnTypeException const& e) {
-        if (ar->_backingList.get_type() == realm::PropertyType::Object) {
-            @throw RLMException(@"%@: is not supported for %s%s property '%s'.",
-                                aggregateMethod,
-                                string_for_property_type(e.property_type),
-                                is_nullable(e.property_type) ? "?" : "",
-                                e.column_name.data());
-        }
-        @throw RLMException(@"%@: is not supported for %s%s array '%@.%@'.",
-                            aggregateMethod,
-                            string_for_property_type(e.property_type),
-                            isNullable(e.property_type) ? "?" : "",
-                            ar->_ownerInfo->rlmObjectSchema.className, ar->_key);
-    }
-    catch (std::logic_error const& e) {
-        @throw RLMException(e);
-    }
-}
-
 template<typename Function>
-static auto translateErrors(__unsafe_unretained RLMManagedArray *const ar,
-                            Function&& f, NSString *aggregateMethod=nil) {
-    try {
-        return f();
-    }
-    catch (...) {
-        throwError(ar, aggregateMethod);
-    }
-}
-
-template<typename Function>
+__attribute__((always_inline))
 static auto translateErrors(Function&& f) {
-    try {
-        return f();
-    }
-    catch (...) {
-        throwError(nil, nil);
-    }
+    return translateCollectionError(static_cast<Function&&>(f), @"List");
 }
 
 template<typename IndexSetFactory>
@@ -426,24 +370,24 @@ static void RLMInsertObject(RLMManagedArray *ar, id object, NSUInteger index) {
 
 - (id)minOfProperty:(NSString *)property {
     auto column = columnForProperty(property, _backingList, _objectInfo, _type, RLMCollectionTypeArray);
-    auto value = translateErrors(self, [&] { return _backingList.min(column); }, @"minOfProperty");
+    auto value = translateErrors([&] { return _backingList.min(column); });
     return value ? RLMMixedToObjc(*value) : nil;
 }
 
 - (id)maxOfProperty:(NSString *)property {
     auto column = columnForProperty(property, _backingList, _objectInfo, _type, RLMCollectionTypeArray);
-    auto value = translateErrors(self, [&] { return _backingList.max(column); }, @"maxOfProperty");
+    auto value = translateErrors([&] { return _backingList.max(column); });
     return value ? RLMMixedToObjc(*value) : nil;
 }
 
 - (id)sumOfProperty:(NSString *)property {
     auto column = columnForProperty(property, _backingList, _objectInfo, _type, RLMCollectionTypeArray);
-    return RLMMixedToObjc(translateErrors(self, [&] { return _backingList.sum(column); }, @"sumOfProperty"));
+    return RLMMixedToObjc(translateErrors([&] { return _backingList.sum(column); }));
 }
 
 - (id)averageOfProperty:(NSString *)property {
     auto column = columnForProperty(property, _backingList, _objectInfo, _type, RLMCollectionTypeArray);
-    auto value = translateErrors(self, [&] { return _backingList.average(column); }, @"averageOfProperty");
+    auto value = translateErrors([&] { return _backingList.average(column); });
     return value ? RLMMixedToObjc(*value) : nil;
 }
 
@@ -550,7 +494,7 @@ static void RLMInsertObject(RLMManagedArray *ar, id object, NSUInteger index) {
 
 - (instancetype)resolveInRealm:(RLMRealm *)realm {
     auto& parentInfo = _ownerInfo->resolve(realm);
-    return translateRLMResultsErrors([&] {
+    return translateErrors([&] {
         return [[self.class alloc] initWithBackingCollection:_backingList.freeze(realm->_realm)
                                                   parentInfo:&parentInfo
                                                     property:parentInfo.rlmObjectSchema[_key]];

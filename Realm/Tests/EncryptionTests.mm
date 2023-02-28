@@ -69,34 +69,27 @@
     }
 }
 
-// FIXME: core 10.0.0-alpha.3 does not throw the correct exception for this test
-- (void)SKIP_testReopenWithNoKeyThrows {
-    NSData *key = RLMGenerateKey();
+- (void)testReopenWithNoKeyThrows {
     @autoreleasepool {
-        [self realmWithKey:key];
+        [self realmWithKey:RLMGenerateKey()];
     }
 
-    @autoreleasepool {
-        RLMAssertThrowsWithError([RLMRealm defaultRealm],
-                                 @"Unable to open a realm at path",
-                                 RLMErrorFileAccess,
-                                 @"invalid mnemonic");
-    }
+    RLMAssertRealmExceptionContains([self realmWithKey:nil],
+                                    RLMErrorInvalidDatabase,
+                                    @"Failed to open Realm file at path '%@': header has invalid mnemonic.",
+                                    RLMDefaultRealmURL().path);
 }
 
 - (void)testReopenWithWrongKeyThrows {
     @autoreleasepool {
-        NSData *key = RLMGenerateKey();
-        [self realmWithKey:key];
+        [self realmWithKey:RLMGenerateKey()];
     }
 
-    @autoreleasepool {
-        NSData *key = RLMGenerateKey();
-        RLMAssertThrowsWithError([self realmWithKey:key],
-                                 @"Unable to open a realm at path",
-                                 RLMErrorFileAccess,
-                                 @"Realm file decryption failed");
-    }
+    NSData *key = RLMGenerateKey();
+    RLMAssertRealmExceptionContains([self realmWithKey:key],
+                                    RLMErrorInvalidDatabase,
+                                    @"Failed to open Realm file at path '%@': Realm file decryption failed (Decryption failed)",
+                                    RLMDefaultRealmURL().path);
 }
 
 - (void)testOpenUnencryptedWithKeyThrows {
@@ -104,21 +97,17 @@
         [RLMRealm defaultRealm];
     }
 
-    @autoreleasepool {
-        NSData *key = RLMGenerateKey();
-        // FIXME: Should throw a "Realm file decryption failed" exception
-        // https://github.com/realm/realm-swift-private/issues/347
-        XCTAssertThrows([self realmWithKey:key]);
-        // RLMAssertThrowsWithError([self realmWithKey:key],
-        //                          @"Unable to open a realm at path",
-        //                          RLMErrorFileAccess,
-        //                          @"Realm file decryption failed");
-    }
+    NSData *key = RLMGenerateKey();
+    RLMAssertRealmExceptionContains([self realmWithKey:key],
+                                    RLMErrorInvalidDatabase,
+                                    @"Failed to open Realm file at path '%@': Realm file decryption failed (Decryption failed)",
+                                    RLMDefaultRealmURL().path);
 }
 
 - (void)testOpenWithNewKeyWhileAlreadyOpenThrows {
     [self realmWithKey:RLMGenerateKey()];
-    RLMAssertThrows([self realmWithKey:RLMGenerateKey()], @"already opened with different encryption key");
+    RLMAssertThrows([self realmWithKey:RLMGenerateKey()],
+                    @"already opened with different encryption key");
 }
 
 #pragma mark - writeCopyToURL:

@@ -19,6 +19,7 @@
 #import "RLMNetworkTransport_Private.hpp"
 
 #import "RLMApp.h"
+#import "RLMError.h"
 #import "RLMRealmConfiguration.h"
 #import "RLMSyncUtil_Private.hpp"
 #import "RLMSyncManager_Private.hpp"
@@ -180,23 +181,26 @@ didCompleteWithError:(NSError *)error
 }
 
 - (void)URLSession:(__unused NSURLSession *)session
-          dataTask:(__unused NSURLSessionDataTask *)dataTask
+          dataTask:(NSURLSessionDataTask *)dataTask
     didReceiveData:(NSData *)data {
     if (!_hasOpened) {
         _hasOpened = true;
         [_subscriber didOpen];
     }
 
-    NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *) dataTask.response;
-    if (httpResponse.statusCode != 200) {
-        NSString *errorStatus = [NSString stringWithFormat:@"URLSession HTTP error code: %ld",
-                                 (long)httpResponse.statusCode];
-        NSError *error = [NSError errorWithDomain:RLMErrorDomain
-                                             code:0
-                                         userInfo:@{NSLocalizedDescriptionKey: errorStatus}];
-        return [_subscriber didCloseWithError:error];
+    NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)dataTask.response;
+    if (httpResponse.statusCode == 200) {
+        return [_subscriber didReceiveEvent:data];
     }
-    [_subscriber didReceiveEvent:data];
+
+    NSString *errorStatus = [NSString stringWithFormat:@"URLSession HTTP error code: %ld",
+                             (long)httpResponse.statusCode];
+    NSError *error = [NSError errorWithDomain:RLMAppErrorDomain
+                                         code:RLMAppErrorHttpRequestFailed
+                                     userInfo:@{NSLocalizedDescriptionKey: errorStatus,
+                                                RLMHTTPStatusCodeKey: @(httpResponse.statusCode),
+                                                NSURLErrorFailingURLErrorKey: dataTask.currentRequest.URL}];
+    return [_subscriber didCloseWithError:error];
 }
 
 - (void)URLSession:(__unused NSURLSession *)session
@@ -204,7 +208,7 @@ didCompleteWithError:(NSError *)error
 didCompleteWithError:(NSError *)error
 {
     RLMResponse *response = [RLMResponse new];
-    NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *) task.response;
+    NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)task.response;
     response.headers = httpResponse.allHeaderFields;
     response.httpStatusCode = httpResponse.statusCode;
 
@@ -212,18 +216,23 @@ didCompleteWithError:(NSError *)error
     if (error && (error.code != -999)) {
         response.body = [error localizedDescription];
         return [_subscriber didCloseWithError:error];
-    } else if (error && (error.code == -999)) {
+    }
+    if (error && (error.code == -999)) {
         return [_subscriber didCloseWithError:nil];
     }
-
-    if (response.httpStatusCode != 200) {
-        NSString *errorStatus = [NSString stringWithFormat:@"URLSession HTTP error code: %ld",
-                                 (long)httpResponse.statusCode];
-        NSError *error = [NSError errorWithDomain:RLMErrorDomain
-                                             code:0
-                                         userInfo:@{NSLocalizedDescriptionKey: errorStatus}];
-        return [_subscriber didCloseWithError:error];
+    if (response.httpStatusCode == 200) {
+        return;
     }
+
+    NSString *errorStatus = [NSString stringWithFormat:@"URLSession HTTP error code: %ld",
+                             (long)httpResponse.statusCode];
+    NSError *wrappedError = [NSError errorWithDomain:RLMAppErrorDomain
+                                                code:RLMAppErrorHttpRequestFailed
+                                            userInfo:@{NSLocalizedDescriptionKey: errorStatus,
+                                                RLMHTTPStatusCodeKey: @(httpResponse.statusCode),
+                                                       NSURLErrorFailingURLErrorKey: task.currentRequest.URL,
+                                                       NSUnderlyingErrorKey: error}];
+    return [_subscriber didCloseWithError:wrappedError];
 }
 
 @end

@@ -4683,25 +4683,25 @@ static double average(NSArray *values) {
     RLMAssertThrowsWithReason([optUnmanaged.uuidObj minOfProperty:@"self"],
                               @"minOfProperty: is not supported for uuid? array");
     RLMAssertThrowsWithReason([managed.boolObj minOfProperty:@"self"],
-                              @"minOfProperty: is not supported for bool array 'AllPrimitiveArrays.boolObj'");
+                              @"Operation 'min' not supported for bool list 'AllPrimitiveArrays.boolObj'");
     RLMAssertThrowsWithReason([managed.stringObj minOfProperty:@"self"],
-                              @"minOfProperty: is not supported for string array 'AllPrimitiveArrays.stringObj'");
+                              @"Operation 'min' not supported for string list 'AllPrimitiveArrays.stringObj'");
     RLMAssertThrowsWithReason([managed.dataObj minOfProperty:@"self"],
-                              @"minOfProperty: is not supported for data array 'AllPrimitiveArrays.dataObj'");
+                              @"Operation 'min' not supported for data list 'AllPrimitiveArrays.dataObj'");
     RLMAssertThrowsWithReason([managed.objectIdObj minOfProperty:@"self"],
-                              @"minOfProperty: is not supported for object id array 'AllPrimitiveArrays.objectIdObj'");
+                              @"Operation 'min' not supported for object id list 'AllPrimitiveArrays.objectIdObj'");
     RLMAssertThrowsWithReason([managed.uuidObj minOfProperty:@"self"],
-                              @"minOfProperty: is not supported for uuid array 'AllPrimitiveArrays.uuidObj'");
+                              @"Operation 'min' not supported for uuid list 'AllPrimitiveArrays.uuidObj'");
     RLMAssertThrowsWithReason([optManaged.boolObj minOfProperty:@"self"],
-                              @"minOfProperty: is not supported for bool? array 'AllOptionalPrimitiveArrays.boolObj'");
+                              @"Operation 'min' not supported for bool? list 'AllOptionalPrimitiveArrays.boolObj'");
     RLMAssertThrowsWithReason([optManaged.stringObj minOfProperty:@"self"],
-                              @"minOfProperty: is not supported for string? array 'AllOptionalPrimitiveArrays.stringObj'");
+                              @"Operation 'min' not supported for string? list 'AllOptionalPrimitiveArrays.stringObj'");
     RLMAssertThrowsWithReason([optManaged.dataObj minOfProperty:@"self"],
-                              @"minOfProperty: is not supported for data? array 'AllOptionalPrimitiveArrays.dataObj'");
+                              @"Operation 'min' not supported for data? list 'AllOptionalPrimitiveArrays.dataObj'");
     RLMAssertThrowsWithReason([optManaged.objectIdObj minOfProperty:@"self"],
-                              @"minOfProperty: is not supported for object id? array 'AllOptionalPrimitiveArrays.objectIdObj'");
+                              @"Operation 'min' not supported for object id? list 'AllOptionalPrimitiveArrays.objectIdObj'");
     RLMAssertThrowsWithReason([optManaged.uuidObj minOfProperty:@"self"],
-                              @"minOfProperty: is not supported for uuid? array 'AllOptionalPrimitiveArrays.uuidObj'");
+                              @"Operation 'min' not supported for uuid? list 'AllOptionalPrimitiveArrays.uuidObj'");
 
     uncheckedAssertNil([unmanaged.intObj minOfProperty:@"self"]);
     uncheckedAssertNil([unmanaged.floatObj minOfProperty:@"self"]);
@@ -4788,25 +4788,25 @@ static double average(NSArray *values) {
     RLMAssertThrowsWithReason([optUnmanaged.uuidObj maxOfProperty:@"self"],
                               @"maxOfProperty: is not supported for uuid? array");
     RLMAssertThrowsWithReason([managed.boolObj maxOfProperty:@"self"],
-                              @"maxOfProperty: is not supported for bool array 'AllPrimitiveArrays.boolObj'");
+                              @"Operation 'max' not supported for bool list 'AllPrimitiveArrays.boolObj'");
     RLMAssertThrowsWithReason([managed.stringObj maxOfProperty:@"self"],
-                              @"maxOfProperty: is not supported for string array 'AllPrimitiveArrays.stringObj'");
+                              @"Operation 'max' not supported for string list 'AllPrimitiveArrays.stringObj'");
     RLMAssertThrowsWithReason([managed.dataObj maxOfProperty:@"self"],
-                              @"maxOfProperty: is not supported for data array 'AllPrimitiveArrays.dataObj'");
+                              @"Operation 'max' not supported for data list 'AllPrimitiveArrays.dataObj'");
     RLMAssertThrowsWithReason([managed.objectIdObj maxOfProperty:@"self"],
-                              @"maxOfProperty: is not supported for object id array 'AllPrimitiveArrays.objectIdObj'");
+                              @"Operation 'max' not supported for object id list 'AllPrimitiveArrays.objectIdObj'");
     RLMAssertThrowsWithReason([managed.uuidObj maxOfProperty:@"self"],
-                              @"maxOfProperty: is not supported for uuid array 'AllPrimitiveArrays.uuidObj'");
+                              @"Operation 'max' not supported for uuid list 'AllPrimitiveArrays.uuidObj'");
     RLMAssertThrowsWithReason([optManaged.boolObj maxOfProperty:@"self"],
-                              @"maxOfProperty: is not supported for bool? array 'AllOptionalPrimitiveArrays.boolObj'");
+                              @"Operation 'max' not supported for bool? list 'AllOptionalPrimitiveArrays.boolObj'");
     RLMAssertThrowsWithReason([optManaged.stringObj maxOfProperty:@"self"],
-                              @"maxOfProperty: is not supported for string? array 'AllOptionalPrimitiveArrays.stringObj'");
+                              @"Operation 'max' not supported for string? list 'AllOptionalPrimitiveArrays.stringObj'");
     RLMAssertThrowsWithReason([optManaged.dataObj maxOfProperty:@"self"],
-                              @"maxOfProperty: is not supported for data? array 'AllOptionalPrimitiveArrays.dataObj'");
+                              @"Operation 'max' not supported for data? list 'AllOptionalPrimitiveArrays.dataObj'");
     RLMAssertThrowsWithReason([optManaged.objectIdObj maxOfProperty:@"self"],
-                              @"maxOfProperty: is not supported for object id? array 'AllOptionalPrimitiveArrays.objectIdObj'");
+                              @"Operation 'max' not supported for object id? list 'AllOptionalPrimitiveArrays.objectIdObj'");
     RLMAssertThrowsWithReason([optManaged.uuidObj maxOfProperty:@"self"],
-                              @"maxOfProperty: is not supported for uuid? array 'AllOptionalPrimitiveArrays.uuidObj'");
+                              @"Operation 'max' not supported for uuid? list 'AllOptionalPrimitiveArrays.uuidObj'");
 
     uncheckedAssertNil([unmanaged.intObj maxOfProperty:@"self"]);
     uncheckedAssertNil([unmanaged.floatObj maxOfProperty:@"self"]);
@@ -4897,29 +4897,29 @@ static double average(NSArray *values) {
     RLMAssertThrowsWithReason([optUnmanaged.uuidObj sumOfProperty:@"self"],
                               @"sumOfProperty: is not supported for uuid? array");
     RLMAssertThrowsWithReason([managed.boolObj sumOfProperty:@"self"],
-                              @"sumOfProperty: is not supported for bool array 'AllPrimitiveArrays.boolObj'");
+                              @"Operation 'sum' not supported for bool list 'AllPrimitiveArrays.boolObj'");
     RLMAssertThrowsWithReason([managed.stringObj sumOfProperty:@"self"],
-                              @"sumOfProperty: is not supported for string array 'AllPrimitiveArrays.stringObj'");
+                              @"Operation 'sum' not supported for string list 'AllPrimitiveArrays.stringObj'");
     RLMAssertThrowsWithReason([managed.dataObj sumOfProperty:@"self"],
-                              @"sumOfProperty: is not supported for data array 'AllPrimitiveArrays.dataObj'");
+                              @"Operation 'sum' not supported for data list 'AllPrimitiveArrays.dataObj'");
     RLMAssertThrowsWithReason([managed.dateObj sumOfProperty:@"self"],
-                              @"sumOfProperty: is not supported for date array 'AllPrimitiveArrays.dateObj'");
+                              @"Operation 'sum' not supported for date list 'AllPrimitiveArrays.dateObj'");
     RLMAssertThrowsWithReason([managed.objectIdObj sumOfProperty:@"self"],
-                              @"sumOfProperty: is not supported for object id array 'AllPrimitiveArrays.objectIdObj'");
+                              @"Operation 'sum' not supported for object id list 'AllPrimitiveArrays.objectIdObj'");
     RLMAssertThrowsWithReason([managed.uuidObj sumOfProperty:@"self"],
-                              @"sumOfProperty: is not supported for uuid array 'AllPrimitiveArrays.uuidObj'");
+                              @"Operation 'sum' not supported for uuid list 'AllPrimitiveArrays.uuidObj'");
     RLMAssertThrowsWithReason([optManaged.boolObj sumOfProperty:@"self"],
-                              @"sumOfProperty: is not supported for bool? array 'AllOptionalPrimitiveArrays.boolObj'");
+                              @"Operation 'sum' not supported for bool? list 'AllOptionalPrimitiveArrays.boolObj'");
     RLMAssertThrowsWithReason([optManaged.stringObj sumOfProperty:@"self"],
-                              @"sumOfProperty: is not supported for string? array 'AllOptionalPrimitiveArrays.stringObj'");
+                              @"Operation 'sum' not supported for string? list 'AllOptionalPrimitiveArrays.stringObj'");
     RLMAssertThrowsWithReason([optManaged.dataObj sumOfProperty:@"self"],
-                              @"sumOfProperty: is not supported for data? array 'AllOptionalPrimitiveArrays.dataObj'");
+                              @"Operation 'sum' not supported for data? list 'AllOptionalPrimitiveArrays.dataObj'");
     RLMAssertThrowsWithReason([optManaged.dateObj sumOfProperty:@"self"],
-                              @"sumOfProperty: is not supported for date? array 'AllOptionalPrimitiveArrays.dateObj'");
+                              @"Operation 'sum' not supported for date? list 'AllOptionalPrimitiveArrays.dateObj'");
     RLMAssertThrowsWithReason([optManaged.objectIdObj sumOfProperty:@"self"],
-                              @"sumOfProperty: is not supported for object id? array 'AllOptionalPrimitiveArrays.objectIdObj'");
+                              @"Operation 'sum' not supported for object id? list 'AllOptionalPrimitiveArrays.objectIdObj'");
     RLMAssertThrowsWithReason([optManaged.uuidObj sumOfProperty:@"self"],
-                              @"sumOfProperty: is not supported for uuid? array 'AllOptionalPrimitiveArrays.uuidObj'");
+                              @"Operation 'sum' not supported for uuid? list 'AllOptionalPrimitiveArrays.uuidObj'");
 
     uncheckedAssertEqualObjects([unmanaged.intObj sumOfProperty:@"self"], @0);
     uncheckedAssertEqualObjects([unmanaged.floatObj sumOfProperty:@"self"], @0);
@@ -5000,29 +5000,29 @@ static double average(NSArray *values) {
     RLMAssertThrowsWithReason([optUnmanaged.uuidObj averageOfProperty:@"self"],
                               @"averageOfProperty: is not supported for uuid? array");
     RLMAssertThrowsWithReason([managed.boolObj averageOfProperty:@"self"],
-                              @"averageOfProperty: is not supported for bool array 'AllPrimitiveArrays.boolObj'");
+                              @"Operation 'average' not supported for bool list 'AllPrimitiveArrays.boolObj'");
     RLMAssertThrowsWithReason([managed.stringObj averageOfProperty:@"self"],
-                              @"averageOfProperty: is not supported for string array 'AllPrimitiveArrays.stringObj'");
+                              @"Operation 'average' not supported for string list 'AllPrimitiveArrays.stringObj'");
     RLMAssertThrowsWithReason([managed.dataObj averageOfProperty:@"self"],
-                              @"averageOfProperty: is not supported for data array 'AllPrimitiveArrays.dataObj'");
+                              @"Operation 'average' not supported for data list 'AllPrimitiveArrays.dataObj'");
     RLMAssertThrowsWithReason([managed.dateObj averageOfProperty:@"self"],
-                              @"averageOfProperty: is not supported for date array 'AllPrimitiveArrays.dateObj'");
+                              @"Operation 'average' not supported for date list 'AllPrimitiveArrays.dateObj'");
     RLMAssertThrowsWithReason([managed.objectIdObj averageOfProperty:@"self"],
-                              @"averageOfProperty: is not supported for object id array 'AllPrimitiveArrays.objectIdObj'");
+                              @"Operation 'average' not supported for object id list 'AllPrimitiveArrays.objectIdObj'");
     RLMAssertThrowsWithReason([managed.uuidObj averageOfProperty:@"self"],
-                              @"averageOfProperty: is not supported for uuid array 'AllPrimitiveArrays.uuidObj'");
+                              @"Operation 'average' not supported for uuid list 'AllPrimitiveArrays.uuidObj'");
     RLMAssertThrowsWithReason([optManaged.boolObj averageOfProperty:@"self"],
-                              @"averageOfProperty: is not supported for bool? array 'AllOptionalPrimitiveArrays.boolObj'");
+                              @"Operation 'average' not supported for bool? list 'AllOptionalPrimitiveArrays.boolObj'");
     RLMAssertThrowsWithReason([optManaged.stringObj averageOfProperty:@"self"],
-                              @"averageOfProperty: is not supported for string? array 'AllOptionalPrimitiveArrays.stringObj'");
+                              @"Operation 'average' not supported for string? list 'AllOptionalPrimitiveArrays.stringObj'");
     RLMAssertThrowsWithReason([optManaged.dataObj averageOfProperty:@"self"],
-                              @"averageOfProperty: is not supported for data? array 'AllOptionalPrimitiveArrays.dataObj'");
+                              @"Operation 'average' not supported for data? list 'AllOptionalPrimitiveArrays.dataObj'");
     RLMAssertThrowsWithReason([optManaged.dateObj averageOfProperty:@"self"],
-                              @"averageOfProperty: is not supported for date? array 'AllOptionalPrimitiveArrays.dateObj'");
+                              @"Operation 'average' not supported for date? list 'AllOptionalPrimitiveArrays.dateObj'");
     RLMAssertThrowsWithReason([optManaged.objectIdObj averageOfProperty:@"self"],
-                              @"averageOfProperty: is not supported for object id? array 'AllOptionalPrimitiveArrays.objectIdObj'");
+                              @"Operation 'average' not supported for object id? list 'AllOptionalPrimitiveArrays.objectIdObj'");
     RLMAssertThrowsWithReason([optManaged.uuidObj averageOfProperty:@"self"],
-                              @"averageOfProperty: is not supported for uuid? array 'AllOptionalPrimitiveArrays.uuidObj'");
+                              @"Operation 'average' not supported for uuid? list 'AllOptionalPrimitiveArrays.uuidObj'");
 
     uncheckedAssertNil([unmanaged.intObj averageOfProperty:@"self"]);
     uncheckedAssertNil([unmanaged.floatObj averageOfProperty:@"self"]);

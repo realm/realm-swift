@@ -77,8 +77,7 @@ class SwiftUIServerTests: SwiftSyncTestCase {
     func testAsyncOpenDownloadRealm() throws {
         let user = try logInUser(for: basicCredentials())
         if !isParent {
-            populateRealm(user: user, partitionValue: #function)
-            return
+            return try populateRealm(user: user, partitionValue: #function)
         }
         executeChild()
 
@@ -135,8 +134,7 @@ class SwiftUIServerTests: SwiftSyncTestCase {
     func testAsyncOpenProgressNotification() throws {
         let user = try logInUser(for: basicCredentials())
         if !isParent {
-            populateRealm(user: user, partitionValue: #function)
-            return
+            return try populateRealm(user: user, partitionValue: #function)
         }
         executeChild()
 
@@ -155,8 +153,7 @@ class SwiftUIServerTests: SwiftSyncTestCase {
     func testAsyncOpenWithACachedApp() throws {
         let user = try logInUser(for: basicCredentials())
         if !isParent {
-            populateRealm(user: user, partitionValue: #function)
-            return
+            return try populateRealm(user: user, partitionValue: #function)
         }
         executeChild()
 
@@ -189,8 +186,7 @@ class SwiftUIServerTests: SwiftSyncTestCase {
 
         let user = try logInUser(for: basicCredentials())
         if !isParent {
-            populateRealm(user: user, partitionValue: partitionValueA)
-            return
+            return try populateRealm(user: user, partitionValue: partitionValueA)
         }
         executeChild()
 
@@ -223,8 +219,7 @@ class SwiftUIServerTests: SwiftSyncTestCase {
         XCTAssertEqual(syncUser2.id, app.currentUser!.id)
 
         if !isParent {
-            populateRealm(user: syncUser1, partitionValue: partitionValueA)
-            return
+            return try populateRealm(user: syncUser1, partitionValue: partitionValueA)
         }
         executeChild()
 
@@ -257,8 +252,7 @@ class SwiftUIServerTests: SwiftSyncTestCase {
 
         let user = try logInUser(for: basicCredentials())
         if !isParent {
-            populateRealm(user: user, partitionValue: partitionValueB)
-            return
+            return try populateRealm(user: user, partitionValue: partitionValueB)
         }
         executeChild()
 
@@ -315,8 +309,7 @@ class SwiftUIServerTests: SwiftSyncTestCase {
         let user = try logInUser(for: basicCredentials())
 
         if !isParent {
-            populateRealm(user: user, partitionValue: #function)
-            return
+            return try populateRealm(user: user, partitionValue: #function)
         }
         executeChild()
 
@@ -356,7 +349,7 @@ class SwiftUIServerTests: SwiftSyncTestCase {
         try autoreleasepool {
             let app = App(id: appId, configuration: appConfig)
             let user = try logInUser(for: basicCredentials(app: app), app: app)
-            populateRealm(user: user, partitionValue: #function)
+            try populateRealm(user: user, partitionValue: #function)
         }
         App.resetAppCache()
 
@@ -426,7 +419,7 @@ class SwiftUIServerTests: SwiftSyncTestCase {
     func testAutoOpenProgressNotification() throws {
         try autoreleasepool {
             let user = try logInUser(for: basicCredentials())
-            populateRealm(user: user, partitionValue: #function)
+            try populateRealm(user: user, partitionValue: #function)
         }
 
         let user = try logInUser(for: basicCredentials())
@@ -445,8 +438,7 @@ class SwiftUIServerTests: SwiftSyncTestCase {
     func testAutoOpenWithACachedApp() throws {
         let user = try logInUser(for: basicCredentials())
         if !isParent {
-            populateRealm(user: user, partitionValue: #function)
-            return
+            return try populateRealm(user: user, partitionValue: #function)
         }
         executeChild()
 
@@ -485,8 +477,7 @@ class SwiftUIServerTests: SwiftSyncTestCase {
         XCTAssertEqual(syncUser2.id, app.currentUser!.id)
 
         if !isParent {
-            populateRealm(user: syncUser1, partitionValue: partitionValueA)
-            return
+            return try populateRealm(user: syncUser1, partitionValue: partitionValueA)
         }
         executeChild()
 
@@ -531,8 +522,7 @@ class SwiftUIServerTests: SwiftSyncTestCase {
 
         let user = try logInUser(for: basicCredentials())
         if !isParent {
-            populateRealm(user: user, partitionValue: partitionValueB)
-            return
+            return try populateRealm(user: user, partitionValue: partitionValueB)
         }
         executeChild()
 
@@ -552,8 +542,7 @@ class SwiftUIServerTests: SwiftSyncTestCase {
 
         let user = try logInUser(for: basicCredentials())
         if !isParent {
-            populateRealm(user: user, partitionValue: partitionValueA)
-            return
+            return try populateRealm(user: user, partitionValue: partitionValueA)
         }
         executeChild()
 
@@ -583,8 +572,7 @@ class SwiftUIServerTests: SwiftSyncTestCase {
 
         let user = try logInUser(for: basicCredentials())
         if !isParent {
-            populateRealm(user: user, partitionValue: partitionValueA)
-            return
+            return try populateRealm(user: user, partitionValue: partitionValueA)
         }
         executeChild()
 
@@ -617,8 +605,7 @@ class SwiftUIServerTests: SwiftSyncTestCase {
         XCTAssertEqual(syncUser2.id, app.currentUser!.id)
 
         if !isParent {
-            populateRealm(user: syncUser1, partitionValue: partitionValueA)
-            return
+            return try populateRealm(user: syncUser1, partitionValue: partitionValueA)
         }
         executeChild()
 

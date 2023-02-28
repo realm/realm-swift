@@ -21,9 +21,6 @@
 RLMNotification const RLMRealmRefreshRequiredNotification = @"RLMRealmRefreshRequiredNotification";
 RLMNotification const RLMRealmDidChangeNotification = @"RLMRealmDidChangeNotification";
 
-NSString * const RLMErrorDomain = @"io.realm";
-NSString * const RLMUnknownSystemErrorDomain = @"io.realm.unknown";
-
 NSString * const RLMExceptionName = @"RLMException";
 
 NSString * const RLMRealmVersionKey = @"RLMRealmVersion";
@@ -33,5 +30,3 @@ NSString * const RLMRealmCoreVersionKey = @"RLMRealmCoreVersion";
 NSString * const RLMInvalidatedKey = @"invalidated";
 
 NSString * const RLMBackupRealmConfigurationErrorKey = @"RLMBackupRealmConfiguration";
-NSString * const RLMServerLogURLKey = @"Server Log URL";
-NSString * const RLMHTTPStatusCodeKey = @"HTTP Status Code";

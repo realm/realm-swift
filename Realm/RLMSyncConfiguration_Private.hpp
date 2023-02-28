@@ -18,7 +18,6 @@
 
 #import "RLMSyncConfiguration_Private.h"
 
-#import <functional>
 #import <memory>
 
 namespace realm {
@@ -31,7 +30,6 @@ using SyncSessionErrorHandler = void(std::shared_ptr<SyncSession>, SyncError);
 RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
 @interface RLMSyncConfiguration ()
-
 - (instancetype)initWithRawConfig:(realm::SyncConfig)config path:(std::string const&)path;
 - (realm::SyncConfig&)rawConfiguration;
 
@@ -40,9 +38,6 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 void RLMSetConfigInfoForClientResetCallbacks(realm::SyncConfig& syncConfig, RLMRealmConfiguration *config);
 
 @property (nonatomic) std::string path;
-
 @end
-
-NSError *_Nullable RLMTranslateSyncError(realm::SyncError);
 
 RLM_HEADER_AUDIT_END(nullability, sendability)

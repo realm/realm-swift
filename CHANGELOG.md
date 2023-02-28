@@ -6,14 +6,34 @@ x.y.z Release notes (yyyy-MM-dd)
 * Add an async sequence wrapper for `MongoCollection.watch()`, allowing you to
   do `for try await change in collection.changeEvents { ... }`
   ([PR #8131](https://github.com/realm/realm-swift/pull/8130)).
+* The internals of error handling and reporting have been significantly
+  reworked. The visible effects of this are that some errors which previously
+  had unhelpful error messages now include more detail about what went wrong,
+  and App errors now expose a much more complete set of error codes
+  ([PR #8002](https://github.com/realm/realm-swift/pull/8002)).
+* Expose compensating write error information. When the server rejects a
+  modification made by the client (such as if the user does not have the
+  required permissions), a `SyncError` is delivered to the sync error handler
+  with the code `.writeRejected` and a non-nil `compensatingWriteInfo` field
+  which contains information about what was rejected and why. This information
+  is intended primarily for debugging and logging purposes and may not have a
+  stable format. ([PR #8002](https://github.com/realm/realm-swift/pull/8002))
 
 ### Fixed
 * `UserPublisher` incorrectly bounced all notifications to the main thread instead
- of setting up the Combine publisher to correctly receive on the main thread.
+  of setting up the Combine publisher to correctly receive on the main thread.
   ([#8132](https://github.com/realm/realm-swift/issues/8132), since 10.21.0)
 * Fix warnings when building with Xcode 14.3 beta 1.
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+* Converting a local realm to a synced realm would crash if an embedded object
+  was null ([Core #6294](https://github.com/realm/realm-core/issues/6294), since v10.22.0).
+* Subqueries on indexed properties performed extremely poorly. ([Core #6327](https://github.com/realm/realm-core/issues/6327), since v5.0.0)
+* Fix a crash when a SSL read successfully read a non-zero number of bytes and
+  also reported an error. ([Core #5435](https://github.com/realm/realm-core/issues/5435), since 10.0.0)
+* The sync client could get stuck in an infinite loop if the server sent an
+  invalid changeset which caused a transform error. This now results in a
+  client reset instead. ([Core #6051](https://github.com/realm/realm-core/issues/6051), since v10.0.0)
 
 ### Compatibility
 * Realm Studio: 13.0.2 or later.
@@ -23,7 +43,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * Xcode: 13.3-14.2.
 
 ### Internal
-* Upgraded realm-core from ? to ?
+* Upgraded realm-core from 13.4.1 to 13.5.0
 
 10.36.0 Release notes (2023-02-15)
 =============================================================
@@ -3925,11 +3945,11 @@ upgraded Realms.
 ### Fixed
 
 * Fix the spelling of `ObjectKeyIdentifiable`. The old spelling is available
-  and deprecated for compatiblity.
+  and deprecated for compatibility.
 * Rename `RealmCollection.publisher` to `RealmCollection.collectionPublisher`.
   The old name interacted with the `publisher` defined by `Sequence` in very
   confusing ways, so we need to use a different name. The `publisher` name is
-  still available for compatiblity. ([#6516](https://github.com/realm/realm-swift/issues/6516))
+  still available for compatibility. ([#6516](https://github.com/realm/realm-swift/issues/6516))
 * Work around "xcodebuild timed out while trying to read
   SwiftPackageManagerExample.xcodeproj" errors when installing Realm via
   Carthage. ([#6549](https://github.com/realm/realm-swift/issues/6549)).
@@ -8022,7 +8042,7 @@ Prebuilt frameworks are now built with Xcode 7.1.
 
 ### Enhancements
 
-* Improve compatiblity of encrypted Realms with third-party crash reporters.
+* Improve compatibility of encrypted Realms with third-party crash reporters.
 
 ### Bugfixes
 

@@ -393,54 +393,6 @@
     [token2 invalidate];
 }
 
-#if 0 // Not obvious if there's still any way for notifiers to fail other than memory allocation failure
-- (void)testErrorHandling {
-    RLMRealm *realm = [RLMRealm defaultRealm];
-    XCTestExpectation *exp = [self expectationWithDescription:@""];
-
-    // Set the max open files to zero so that opening new files will fail
-    rlimit oldrl;
-    getrlimit(RLIMIT_NOFILE, &oldrl);
-    rlimit rl = oldrl;
-    rl.rlim_cur = 0;
-    setrlimit(RLIMIT_NOFILE, &rl);
-
-    // Will try to open another copy of the file for the pin SG
-    __block bool called = false;
-    auto token = [IntObject.allObjects addNotificationBlock:^(RLMResults *results, RLMCollectionChange *change, NSError *error) {
-        XCTAssertNil(results);
-        RLMValidateRealmError(error, RLMErrorFileAccess, @"Too many open files", nil);
-        called = true;
-        [exp fulfill];
-    }];
-
-    // Restore the old open file limit now so that we can make commits
-    setrlimit(RLIMIT_NOFILE, &oldrl);
-
-    // Block should still be called asynchronously
-    XCTAssertFalse(called);
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
-    XCTAssertTrue(called);
-
-    // Neither adding a new async query nor commiting a write transaction should
-    // cause it to resend the error
-    XCTestExpectation *exp2 = [self expectationWithDescription:@""];
-    auto token2 = [IntObject.allObjects addNotificationBlock:^(RLMResults *results, RLMCollectionChange *change, NSError *error) {
-        XCTAssertNil(results);
-        RLMValidateRealmError(error, RLMErrorFileAccess, @"Too many open files", nil);
-        [exp2 fulfill];
-    }];
-    [realm beginWriteTransaction];
-    [IntObject createInDefaultRealmWithValue:@[@0]];
-    [realm commitWriteTransaction];
-
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
-
-    [token invalidate];
-    [token2 invalidate];
-}
-#endif
-
 - (void)testRLMResultsInstanceIsReused {
     __weak __block RLMResults *prev;
     __block bool first = true;

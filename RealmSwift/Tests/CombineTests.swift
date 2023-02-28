@@ -111,7 +111,7 @@ class CombinePublisherTestCase: TestCase {
 
     override func setUp() {
         super.setUp()
-        realm = try! Realm(configuration: Realm.Configuration(inMemoryIdentifier: "test"))
+        realm = try! Realm(configuration: Realm.Configuration(inMemoryIdentifier: "CombinePublisherTestCase"))
         XCTAssertTrue(realm.isEmpty)
     }
 

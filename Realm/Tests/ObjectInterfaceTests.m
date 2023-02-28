@@ -274,10 +274,14 @@
     [realm beginWriteTransaction];
     RequiredNumberObject *obj = [RequiredNumberObject createInRealm:realm withValue:@[@0, @0, @0, @0]];
 
-    RLMAssertThrowsWithReason(obj.intObj = nil, @"insert null into non-nullable");
-    RLMAssertThrowsWithReason(obj.floatObj = nil, @"insert null into non-nullable");
-    RLMAssertThrowsWithReason(obj.doubleObj = nil, @"insert null into non-nullable");
-    RLMAssertThrowsWithReason(obj.boolObj = nil, @"insert null into non-nullable");
+    RLMAssertThrowsWithReason(obj.intObj = nil,
+                              @"Invalid null value for non-nullable property 'RequiredNumberObject.intObj'");
+    RLMAssertThrowsWithReason(obj.floatObj = nil,
+                              @"Invalid null value for non-nullable property 'RequiredNumberObject.floatObj'");
+    RLMAssertThrowsWithReason(obj.doubleObj = nil,
+                              @"Invalid null value for non-nullable property 'RequiredNumberObject.doubleObj'");
+    RLMAssertThrowsWithReason(obj.boolObj = nil,
+                              @"Invalid null value for non-nullable property 'RequiredNumberObject.boolObj'");
 
     obj.intObj = @1;
     XCTAssertEqualObjects(obj.intObj, @1);
@@ -306,8 +310,10 @@
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm beginWriteTransaction];
     [realm addObject:ro];
-    RLMAssertThrowsWithReasonMatching(ro.stringCol = nil, @"null into non-nullable column");
-    RLMAssertThrowsWithReasonMatching(ro.binaryCol = nil, @"null into non-nullable column");
+    RLMAssertThrowsWithReasonMatching(ro.stringCol = nil,
+                                      @"Invalid null value for non-nullable property 'RequiredPropertiesObject.stringCol'.");
+    RLMAssertThrowsWithReasonMatching(ro.binaryCol = nil,
+                                      @"Invalid null value for non-nullable property 'RequiredPropertiesObject.binaryCol'.");
     [realm cancelWriteTransaction];
 }
 

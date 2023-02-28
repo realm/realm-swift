@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Realm/RLMSyncUtil.h>
+#import <Realm/RLMConstants.h>
 
 RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 @protocol RLMBSON;

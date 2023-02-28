@@ -1020,7 +1020,7 @@ case "$COMMAND" in
 
             failed=0
             sh build.sh "verify-$target" 2>&1 | tee build/build.log | xcpretty -r junit -o build/reports/junit.xml || failed=1
-            if [ "$failed" = "1" ] && grep -E 'DTXProxyChannel|DTXChannel|out of date and needs to be rebuilt|operation never finished bootstrapping' build/build.log ; then
+            if [ "$failed" = "1" ] && grep -E 'DTXProxyChannel|DTXChannel|out of date and needs to be rebuilt|operation never finished bootstrapping|thread is already initializing this class' build/build.log ; then
                 echo "Known Xcode error detected. Running job again."
                 if grep -E 'out of date and needs to be rebuilt' build/build.log; then
                     rm -rf build/DerivedData

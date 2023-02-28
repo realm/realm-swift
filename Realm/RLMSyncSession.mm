@@ -20,6 +20,7 @@
 
 #import "RLMApp.h"
 #import "RLMRealm_Private.hpp"
+#import "RLMError_Private.hpp"
 #import "RLMSyncConfiguration_Private.hpp"
 #import "RLMUser_Private.hpp"
 #import "RLMSyncManager_Private.hpp"
@@ -158,15 +159,20 @@ static RLMSyncConnectionState convertConnectionState(SyncSession::ConnectionStat
     }
 }
 
+static util::UniqueFunction<void(Status)> wrapCompletion(dispatch_queue_t queue,
+                                                         void (^callback)(NSError *)) {
+    queue = queue ?: dispatch_get_main_queue();
+    return [=](Status status) {
+        NSError *error = makeError(status);
+        dispatch_async(queue, ^{
+            callback(error);
+        });
+    };
+}
+
 - (BOOL)waitForUploadCompletionOnQueue:(dispatch_queue_t)queue callback:(void(^)(NSError *))callback {
     if (auto session = _session.lock()) {
-        queue = queue ?: dispatch_get_main_queue();
-        session->wait_for_upload_completion([=](std::error_code err) {
-            NSError *error = (err == std::error_code{}) ? nil : make_sync_error(err);
-            dispatch_async(queue, ^{
-                callback(error);
-            });
-        });
+        session->wait_for_upload_completion(wrapCompletion(queue, callback));
         return YES;
     }
     return NO;
@@ -174,13 +180,7 @@ static RLMSyncConnectionState convertConnectionState(SyncSession::ConnectionStat
 
 - (BOOL)waitForDownloadCompletionOnQueue:(dispatch_queue_t)queue callback:(void(^)(NSError *))callback {
     if (auto session = _session.lock()) {
-        queue = queue ?: dispatch_get_main_queue();
-        session->wait_for_download_completion([=](std::error_code err) {
-            NSError *error = (err == std::error_code{}) ? nil : make_sync_error(err);
-            dispatch_async(queue, ^{
-                callback(error);
-            });
-        });
+        session->wait_for_download_completion(wrapCompletion(queue, callback));
         return YES;
     }
     return NO;

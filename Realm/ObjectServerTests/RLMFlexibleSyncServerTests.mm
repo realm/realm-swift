@@ -906,6 +906,12 @@
     self.flexibleSyncApp.syncManager.errorHandler = ^(NSError *error, RLMSyncSession *) {
         RLMValidateError(error, RLMSyncErrorDomain, RLMSyncErrorWriteRejected,
                          @"Client attempted a write that is outside of permissions or query filters; it has been reverted");
+        NSArray<RLMCompensatingWriteInfo *> *info = error.userInfo[RLMCompensatingWriteInfoKey];
+        XCTAssertEqual(info.count, 1U);
+        XCTAssertEqualObjects(info[0].objectType, @"Person");
+        XCTAssertEqualObjects(info[0].primaryKey, invalidObjectPK);
+        XCTAssertEqualObjects(info[0].reason,
+                              ([NSString stringWithFormat:@"write to \"%@\" in table \"Person\" not allowed; object is outside of the current query view", invalidObjectPK]));
         [ex fulfill];
     };
     [realm transactionWithBlock:^{

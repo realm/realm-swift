@@ -45,23 +45,20 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 - (RLMClassInfo *)objectInfo;
 @end
 
-RLM_HEADER_AUDIT_END(nullability, sendability)
-
 // Utility functions
 
 [[gnu::noinline]]
 [[noreturn]]
-void RLMThrowResultsError(NSString * _Nullable aggregateMethod);
+void RLMThrowCollectionException(NSString *collectionName);
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wnullability-completeness"
 template<typename Function>
-static auto translateRLMResultsErrors(Function&& f, NSString *aggregateMethod=nil) {
+static auto translateCollectionError(Function&& f, NSString *collectionName) {
     try {
         return f();
     }
     catch (...) {
-        RLMThrowResultsError(aggregateMethod);
+        RLMThrowCollectionException(collectionName);
     }
 }
-#pragma clang diagnostic pop
+
+RLM_HEADER_AUDIT_END(nullability, sendability)

@@ -19,7 +19,6 @@
 #import "RLMCredentials_Private.hpp"
 
 #import "RLMBSON_Private.hpp"
-#import "RLMSyncUtil_Private.h"
 #import "RLMUtil.hpp"
 
 #import <realm/object-store/util/bson/bson.hpp>

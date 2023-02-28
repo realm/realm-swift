@@ -44,6 +44,6 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
 @end
 
-NSError * RLMAppErrorToNSError(realm::app::AppError const& appError);
+NSError * makeError(realm::app::AppError const& appError);
 
 RLM_HEADER_AUDIT_END(nullability, sendability)

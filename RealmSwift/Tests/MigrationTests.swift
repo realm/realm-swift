@@ -112,7 +112,8 @@ class MigrationTests: TestCase {
     }
 
     func testSchemaVersionAtURL() {
-        assertFails(.fail) {
+        assertFails(.invalidDatabase, defaultRealmURL(),
+                    "Realm at path '\(defaultRealmURL().path)' has not been initialized.") {
             // Version should throw before Realm creation
             try schemaVersionAtURL(defaultRealmURL())
         }

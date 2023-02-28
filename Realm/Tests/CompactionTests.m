@@ -261,10 +261,13 @@ static const NSUInteger count = 1000;
     };
     NSURL *tmpURL = [configuration.fileURL URLByAppendingPathExtension:@"tmp_compaction_space"];
     [NSData.data writeToURL:tmpURL atomically:NO];
-    [NSFileManager.defaultManager setAttributes:@{NSFileImmutable: @YES} ofItemAtPath:tmpURL.path error:nil];
-    RLMAssertThrowsWithReason([RLMRealm realmWithConfiguration:configuration error:nil],
-                              @"unlink() failed: Operation not permitted");
-    [NSFileManager.defaultManager setAttributes:@{NSFileImmutable: @NO} ofItemAtPath:tmpURL.path error:nil];
+    [NSFileManager.defaultManager setAttributes:@{NSFileImmutable: @YES}
+                                   ofItemAtPath:tmpURL.path error:nil];
+    RLMAssertRealmException([RLMRealm realmWithConfiguration:configuration error:nil],
+                            RLMErrorFilePermissionDenied,
+                            @"Failed to delete file at '%@': Operation not permitted", tmpURL.path);
+    [NSFileManager.defaultManager setAttributes:@{NSFileImmutable: @NO}
+                                   ofItemAtPath:tmpURL.path error:nil];
     XCTAssertNoThrow([RLMRealm realmWithConfiguration:configuration error:nil]);
 }
 
