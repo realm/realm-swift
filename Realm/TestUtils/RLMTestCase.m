@@ -23,7 +23,7 @@
 #import <Realm/RLMSchema_Private.h>
 #import <Realm/RLMRealmConfiguration_Private.h>
 
-static NSString *parentProcessBundleIdentifier()
+static NSString *parentProcessBundleIdentifier(void)
 {
     static BOOL hasInitializedIdentifier;
     static NSString *identifier;
@@ -35,11 +35,11 @@ static NSString *parentProcessBundleIdentifier()
     return identifier;
 }
 
-NSURL *RLMDefaultRealmURL() {
+NSURL *RLMDefaultRealmURL(void) {
     return [NSURL fileURLWithPath:RLMRealmPathForFileAndBundleIdentifier(@"default.realm", parentProcessBundleIdentifier())];
 }
 
-NSURL *RLMTestRealmURL() {
+NSURL *RLMTestRealmURL(void) {
     return [NSURL fileURLWithPath:RLMRealmPathForFileAndBundleIdentifier(@"test.realm", parentProcessBundleIdentifier())];
 }
 
@@ -54,13 +54,13 @@ static void deleteOrThrow(NSURL *fileURL) {
     }
 }
 
-NSData *RLMGenerateKey() {
+NSData *RLMGenerateKey(void) {
     uint8_t buffer[64];
     (void)SecRandomCopyBytes(kSecRandomDefault, 64, buffer);
     return [[NSData alloc] initWithBytes:buffer length:sizeof(buffer)];
 }
 
-static BOOL encryptTests() {
+static BOOL encryptTests(void) {
     static BOOL encryptAll = NO;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{

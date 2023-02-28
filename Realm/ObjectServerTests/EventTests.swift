@@ -256,7 +256,7 @@ class SwiftEventTests: SwiftSyncTestCase {
                 "person": a,
                 "people": [b, c],
                 "peopleByName": [b.firstName: b, c.firstName: c]
-            ])
+            ] as [String: Any])
         }
 
         let objects = realm.objects(SwiftPerson.self)
@@ -329,7 +329,7 @@ class SwiftEventTests: SwiftSyncTestCase {
                 "person": a,
                 "people": [b, c],
                 "peopleByName": [b.firstName: b, c.firstName: c]
-            ])._id
+            ] as [String: Any])._id
         }
 
         let objects = realm.objects(LinkToSwiftPerson.self)

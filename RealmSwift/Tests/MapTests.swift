@@ -1048,7 +1048,7 @@ class MapNewlyAddedTests: MapTests {
 
 class MapNewlyCreatedTests: MapTests {
     override func createMap() -> Map<String, SwiftStringObject?> {
-        let mapObj = realm.create(SwiftMapPropertyObject.self, value: ["name", [], []])
+        let mapObj = realm.create(SwiftMapPropertyObject.self, value: ["name"])
         try! realm.commitWrite()
         realm.beginWrite()
         XCTAssertNotNil(mapObj.realm)
@@ -1064,13 +1064,13 @@ class MapNewlyCreatedTests: MapTests {
     }
 
     override func createEmbeddedMap() -> Map<String, EmbeddedTreeObject1?> {
-        return realm.create(EmbeddedParentObject.self, value: []).map
+        return realm.create(EmbeddedParentObject.self).map
     }
 }
 
 class MapRetrievedTests: MapTests {
     override func createMap() -> Map<String, SwiftStringObject?> {
-        realm.create(SwiftMapPropertyObject.self, value: ["name", [:], [:]])
+        realm.create(SwiftMapPropertyObject.self, value: ["name"])
         try! realm.commitWrite()
         let mapObj = realm.objects(SwiftMapPropertyObject.self).first!
 
@@ -1091,7 +1091,7 @@ class MapRetrievedTests: MapTests {
     }
 
     override func createEmbeddedMap() -> Map<String, EmbeddedTreeObject1?> {
-        realm.create(EmbeddedParentObject.self, value: [])
+        realm.create(EmbeddedParentObject.self)
         return realm.objects(EmbeddedParentObject.self).first!.map
     }
 }

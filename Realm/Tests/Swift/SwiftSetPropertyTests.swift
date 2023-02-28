@@ -60,7 +60,7 @@ class SwiftRLMSetPropertyTests: RLMTestCase {
         let realm = realmWithTestPath()
 
         realm.beginWriteTransaction()
-        let set = SwiftRLMSetPropertyObject.create(in: realm, withValue: ["setObject", [], []])
+        let set = SwiftRLMSetPropertyObject.create(in: realm, withValue: ["setObject"])
         XCTAssertNotNil(set.set, "Should be able to get an empty set")
         XCTAssertEqual(set.set.count, UInt(0), "Should start with no set elements")
 
@@ -90,7 +90,7 @@ class SwiftRLMSetPropertyTests: RLMTestCase {
     func testModifyDetatchedSet() {
         let realm = realmWithTestPath()
         realm.beginWriteTransaction()
-        let setObj = SwiftRLMSetPropertyObject.create(in: realm, withValue: ["setObject", [], []])
+        let setObj = SwiftRLMSetPropertyObject.create(in: realm, withValue: ["setObject"])
         XCTAssertNotNil(setObj.set, "Should be able to get an empty set")
         XCTAssertEqual(setObj.set.count, UInt(0), "Should start with no set elements")
 
@@ -118,7 +118,7 @@ class SwiftRLMSetPropertyTests: RLMTestCase {
 
         realm.beginWriteTransaction()
 
-        let obj = SwiftRLMSetPropertyObject.create(in: realm, withValue: ["setObject", [], []])
+        let obj = SwiftRLMSetPropertyObject.create(in: realm, withValue: ["setObject"])
         let child1 = SwiftRLMStringObject.create(in: realm, withValue: ["a"])
         let child2 = SwiftRLMStringObject()
         child2.stringCol = "b"
@@ -190,7 +190,7 @@ class SwiftRLMSetPropertyTests: RLMTestCase {
         let realm = realmWithTestPath()
 
         realm.beginWriteTransaction()
-        let set = SetPropertyObject.create(in: realm, withValue: ["setObject", [], []])
+        let set = SetPropertyObject.create(in: realm, withValue: ["setObject"])
         XCTAssertNotNil(set.set, "Should be able to get an empty set")
         XCTAssertEqual(set.set.count, UInt(0), "Should start with no set elements")
 
@@ -219,7 +219,7 @@ class SwiftRLMSetPropertyTests: RLMTestCase {
     func testModifyDetatchedSet_objc() {
         let realm = realmWithTestPath()
         realm.beginWriteTransaction()
-        let setObj = SetPropertyObject.create(in: realm, withValue: ["setObject", [], []])
+        let setObj = SetPropertyObject.create(in: realm, withValue: ["setObject"])
         XCTAssertNotNil(setObj.set, "Should be able to get an empty set")
         XCTAssertEqual(setObj.set.count, UInt(0), "Should start with no set elements")
 
@@ -247,7 +247,7 @@ class SwiftRLMSetPropertyTests: RLMTestCase {
 
         realm.beginWriteTransaction()
 
-        let obj = SetPropertyObject.create(in: realm, withValue: ["setObject", [], []])
+        let obj = SetPropertyObject.create(in: realm, withValue: ["setObject"])
         let child1 = StringObject.create(in: realm, withValue: ["a"])
         let child2 = StringObject()
         child2.stringCol = "b"

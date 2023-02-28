@@ -84,9 +84,8 @@ class SwiftObjectAsymmetric: AsymmetricObject {
         return true
     }
 
-    convenience init(id: ObjectId, string: String, int: Int, bool: Bool) {
+    convenience init(string: String, int: Int, bool: Bool) {
         self.init()
-        self._id = id
         self.string = string
         self.int = int
         self.bool = bool
@@ -237,10 +236,9 @@ extension SwiftAsymmetricSyncTests {
         // Create Asymmetric Objects
         try realm.write {
             for i in 1...15 {
-                realm.create(SwiftObjectAsymmetric.self, value: ["id": ObjectId.generate(),
-                                                                 "string": "name_\(#function)_\(i)",
-                                                                 "int": i,
-                                                                 "bool": Bool.random()])
+                realm.create(SwiftObjectAsymmetric.self,
+                             value: SwiftObjectAsymmetric(string: "name_\(#function)_\(i)",
+                                                          int: i, bool: Bool.random()))
             }
         }
         waitForUploads(for: realm)
@@ -258,10 +256,9 @@ extension SwiftAsymmetricSyncTests {
 
         // Create Asymmetric Objects
         try realm.write {
-            realm.create(SwiftObjectAsymmetric.self, value: ["id": ObjectId.generate(),
-                                                             "string": "name_\(#function)",
-                                                             "int": 15,
-                                                             "bool": true])
+            realm.create(SwiftObjectAsymmetric.self,
+                         value: SwiftObjectAsymmetric(string: "name_\(#function)",
+                                                      int: 15, bool: true))
         }
         waitForUploads(for: realm)
 

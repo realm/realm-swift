@@ -134,3 +134,35 @@ class TestCase: RLMTestCaseBase, @unchecked Sendable {
         return directory.appendingPathComponent(fileName, isDirectory: false)
     }
 }
+
+extension Realm {
+    @discardableResult
+    public func create<T: Object>(_ type: T.Type, value: [String: Any], update: UpdatePolicy = .error) -> T {
+        return create(type, value: value as Any, update: update)
+    }
+
+    @discardableResult
+    public func create<T: Object>(_ type: T.Type, value: [Any], update: UpdatePolicy = .error) -> T {
+        return create(type, value: value as Any, update: update)
+    }
+}
+
+extension Object {
+    public convenience init(value: [String: Any]) {
+        self.init(value: value as Any)
+    }
+
+    public convenience init(value: [Any]) {
+        self.init(value: value as Any)
+    }
+}
+
+extension AsymmetricObject {
+    public convenience init(value: [String: Any]) {
+        self.init(value: value as Any)
+    }
+
+    public convenience init(value: [Any]) {
+        self.init(value: value as Any)
+    }
+}

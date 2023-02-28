@@ -2088,8 +2088,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         // Make sure objects with confliciting primary keys sync ok.
         let conflictingObjectId = ObjectId.generate()
-        let person = SwiftPerson(value: ["_id": conflictingObjectId,
-                                         "firstName": "Foo", "lastName": "Bar"])
+        let person = SwiftPerson(firstName: "Foo", lastName: "Bar")
+        person._id = conflictingObjectId
         let initialRealm = try Realm(configuration: initialSyncConfig)
         try initialRealm.write {
             initialRealm.add(person)
@@ -2107,8 +2107,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         let localRealm = try Realm(configuration: localConfig)
         // `person2` will override what was previously stored on the server.
-        let person2 = SwiftPerson(value: ["_id": conflictingObjectId,
-                                          "firstName": "John", "lastName": "Doe"])
+        let person2 = SwiftPerson(firstName: "John", lastName: "Doe")
+        person2._id = conflictingObjectId
         try localRealm.write {
             localRealm.add(person2)
             localRealm.add(SwiftPerson(firstName: "Foo3", lastName: "Bar3"))

@@ -712,7 +712,7 @@ class ListNewlyCreatedTests: ListTests {
     override func createArray() -> SwiftArrayPropertyObject {
         let realm = realmWithTestPath()
         realm.beginWrite()
-        let array = realm.create(SwiftArrayPropertyObject.self, value: ["name", [], []])
+        let array = realm.create(SwiftArrayPropertyObject.self, value: ["name"])
         try! realm.commitWrite()
 
         XCTAssertNotNil(array.realm)
@@ -732,7 +732,7 @@ class ListNewlyCreatedTests: ListTests {
     override func createEmbeddedArray() -> List<EmbeddedTreeObject1> {
         let realm = try! Realm()
         return try! realm.write {
-            realm.create(EmbeddedParentObject.self, value: []).array
+            realm.create(EmbeddedParentObject.self).array
         }
     }
 }
@@ -741,7 +741,7 @@ class ListRetrievedTests: ListTests {
     override func createArray() -> SwiftArrayPropertyObject {
         let realm = realmWithTestPath()
         realm.beginWrite()
-        realm.create(SwiftArrayPropertyObject.self, value: ["name", [], []])
+        realm.create(SwiftArrayPropertyObject.self, value: ["name"])
         try! realm.commitWrite()
         let array = realm.objects(SwiftArrayPropertyObject.self).first!
 
@@ -763,7 +763,7 @@ class ListRetrievedTests: ListTests {
     override func createEmbeddedArray() -> List<EmbeddedTreeObject1> {
         let realm = try! Realm()
         try! realm.write {
-            realm.create(EmbeddedParentObject.self, value: [])
+            realm.create(EmbeddedParentObject.self)
         }
         return realm.objects(EmbeddedParentObject.self).first!.array
     }

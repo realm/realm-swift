@@ -202,7 +202,7 @@ class MigrationTests: TestCase {
             try! Realm().write {
                 try! Realm().create(SwiftArrayPropertyObject.self, value: ["string", [["array"]], [[2]]])
                 try! Realm().create(SwiftMutableSetPropertyObject.self, value: ["string", [["set"]], [[2]]])
-                try! Realm().create(SwiftMapPropertyObject.self, value: ["string", ["key": ["value"]], [:]])
+                try! Realm().create(SwiftMapPropertyObject.self, value: ["string", ["key": ["value"]]])
             }
         }
 
@@ -732,7 +732,7 @@ class MigrationTests: TestCase {
             migration.create("SwiftStringObject", value: ["stringCol": StringWrapper(persistedValue: "string3")])
             migration.create("SwiftStringObject")
 
-            self.assertThrows(migration.create("NoSuchObject", value: []))
+            self.assertThrows(migration.create("NoSuchObject"))
         }
 
         let objects = try! Realm().objects(SwiftStringObject.self)

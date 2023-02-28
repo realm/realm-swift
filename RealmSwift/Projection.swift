@@ -628,8 +628,9 @@ extension NSLocking {
 // A property wrapper which unsafely disables concurrency checking for a property
 // This is required when a property is guarded by something which concurrency
 // checking doesn't understand (i.e. a lock instead of an actor)
+@usableFromInline
 @propertyWrapper
-public struct Unchecked<Wrapped>: @unchecked Sendable {
+internal struct Unchecked<Wrapped>: @unchecked Sendable {
     public var wrappedValue: Wrapped
     public init(wrappedValue: Wrapped) {
         self.wrappedValue = wrappedValue

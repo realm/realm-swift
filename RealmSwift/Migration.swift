@@ -123,7 +123,7 @@ extension Migration {
      - returns: The newly created object.
      */
     @discardableResult
-    public func create(_ typeName: String, value: Any = [:]) -> MigrationObject {
+    public func create(_ typeName: String, value: Any = [Any]()) -> MigrationObject {
         return unsafeBitCast(__createObject(typeName, withValue: value), to: MigrationObject.self)
     }
 

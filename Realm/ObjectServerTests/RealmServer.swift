@@ -84,7 +84,7 @@ private func bsonType(_ type: PropertyType) -> String {
 }
 
 private extension Property {
-    func stitchRule(_ objectSchema: ObjectSchema) -> [String: Any] {
+    func stitchRule(_ objectSchema: ObjectSchema) -> [String: Json] {
         let type: String
         if self.type == .object {
             type = bsonType(objectSchema.primaryKeyProperty!.type)
@@ -125,9 +125,26 @@ private extension Property {
     }
 }
 
+// Swift 5.8 complains if collections are inferred as having type Any and adding
+// explicit types everywhere makes things awful, but this doesn't quite work on
+// older versions of Swift
+#if swift(>=5.8)
+internal protocol Json {}
+extension Bool: Json {}
+extension Int: Json {}
+extension Int64: Json {}
+extension String: Json {}
+extension Double: Json {}
+extension Dictionary: Json where Key == String, Value == Json {}
+extension Array: Json where Element == Json {}
+extension Optional: Json where Wrapped: Json {}
+#else
+typealias Json = Any
+#endif
+
 private extension ObjectSchema {
-    func stitchRule(_ partitionKeyType: String?, id: String? = nil) -> [String: Any] {
-        var stitchProperties: [String: Any] = [:]
+    func stitchRule(_ partitionKeyType: String?, id: String? = nil) -> [String: Json] {
+        var stitchProperties: [String: Json] = [:]
 
         // We only add a partition property for pbs
         if let partitionKeyType = partitionKeyType {
@@ -136,7 +153,7 @@ private extension ObjectSchema {
             ]
         }
 
-        var relationships: [String: Any] = [:]
+        var relationships: [String: Json] = [:]
 
         // First pass we only add the properties to the schema as we can't add
         // links until the targets of the links exist.
@@ -156,7 +173,7 @@ private extension ObjectSchema {
         }
 
         return [
-            "_id": id as Any,
+            "_id": id as Json,
             "schema": [
                 "properties": stitchProperties,
                 // The server currently only supports non-optional collections
@@ -332,16 +349,16 @@ class AdminSession {
             request(httpMethod: "GET")
         }
 
-        func post(_ data: Any, _ completionHandler: @escaping Completion) {
+        func post(_ data: [String: Json], _ completionHandler: @escaping Completion) {
             request(httpMethod: "POST", data: data, completionHandler: completionHandler)
         }
 
-        func post(on group: DispatchGroup, _ data: Any,
+        func post(on group: DispatchGroup, _ data: [String: Json],
                   _ completionHandler: @escaping Completion) {
             request(on: group, httpMethod: "POST", data: data, completionHandler)
         }
 
-        func post(_ data: Any) -> Result<Any?, Error> {
+        func post(_ data: [String: Json]) -> Result<Any?, Error> {
             request(httpMethod: "POST", data: data)
         }
 
@@ -349,16 +366,16 @@ class AdminSession {
             request(httpMethod: "PUT", completionHandler: completionHandler)
         }
 
-        func put(on group: DispatchGroup, data: Any? = nil,
+        func put(on group: DispatchGroup, data: Json? = nil,
                  _ completionHandler: @escaping Completion) {
             request(on: group, httpMethod: "PUT", data: data, completionHandler)
         }
 
-        func put(data: Any? = nil, _ completionHandler: @escaping Completion) {
+        func put(data: [String: Json]? = nil, _ completionHandler: @escaping Completion) {
             request(httpMethod: "PUT", data: data, completionHandler: completionHandler)
         }
 
-        func put(_ data: Any) -> Result<Any?, Error> {
+        func put(_ data: [String: Json]) -> Result<Any?, Error> {
             request(httpMethod: "PUT", data: data)
         }
 
@@ -374,7 +391,7 @@ class AdminSession {
             request(httpMethod: "DELETE")
         }
 
-        func patch(on group: DispatchGroup, _ data: Any,
+        func patch(on group: DispatchGroup, _ data: [String: Json],
                    _ completionHandler: @escaping Completion) {
             request(on: group, httpMethod: "PATCH", data: data, completionHandler)
         }
@@ -383,7 +400,7 @@ class AdminSession {
             request(httpMethod: "PATCH", data: data)
         }
 
-        func patch(_ data: Any, _ completionHandler: @escaping Completion) {
+        func patch(_ data: [String: Json], _ completionHandler: @escaping Completion) {
             request(httpMethod: "PATCH", data: data, completionHandler: completionHandler)
         }
     }
@@ -735,9 +752,7 @@ public class RealmServer: NSObject {
     /// This will create a App with different configuration depending on the SyncMode (partition based sync or flexible sync), partition type is used only in case
     /// this is partition based sync, and will crash if one is not provided in that mode
     func createAppForSyncMode(_ syncMode: SyncMode, _ objectsSchema: [ObjectSchema]) throws -> AppId {
-        guard let session = session else {
-            throw URLError(.unknown)
-        }
+        let session = try XCTUnwrap(session)
 
         let info = try session.apps.post(["name": "test"]).get()
         guard let appInfo = info as? [String: Any],
@@ -800,7 +815,7 @@ public class RealmServer: NSObject {
             "value": "mongodb://localhost:26000"
         ])
 
-        let appService: [String: Any] = [
+        let appService: [String: Json] = [
             "name": "mongodb1",
             "type": "mongodb",
             "config": [
@@ -856,12 +871,12 @@ public class RealmServer: NSObject {
         }
 
         for result in schemaUpdates {
-            guard case .success = result else {
-                fatalError("Failed to create relationships for schema: \(result)")
+            if case .failure(let error) = result {
+                fatalError("Failed to create relationships for schema: \(error)")
             }
         }
 
-        let serviceConfig: Any
+        let serviceConfig: [String: Json]
         switch syncMode {
         case .pbs(let bsonType):
             serviceConfig = [
@@ -884,21 +899,14 @@ public class RealmServer: NSObject {
                 "flexible_sync": [
                     "state": "enabled",
                     "database_name": "test_data",
-                    "queryable_fields_names": fields,
-                    "asymmetric_tables": asymmetricTables,
+                    "queryable_fields_names": fields as [Json],
+                    "asymmetric_tables": asymmetricTables as [Json]
                 ]
             ]
-        }
-        let serviceConfigResponse = app.services[serviceId].config.patch(serviceConfig)
-        guard case .success = serviceConfigResponse else {
-            throw URLError(.badServerResponse)
-        }
-
-        if case .flx = syncMode {
-            let defaultRule = [
+            app.services[serviceId].default_rule.post(on: group, [
                 "roles": [[
                     "name": "all",
-                    "apply_when": [:],
+                    "apply_when": [String: Json](),
                     "document_filters": [
                         "read": true,
                         "write": true
@@ -908,12 +916,9 @@ public class RealmServer: NSObject {
                     "insert": true,
                     "delete": true
                 ]]
-            ]
-            let rulesConfigResponse = app.services[serviceId].default_rule.post(defaultRule)
-            guard case .success = rulesConfigResponse else {
-                throw URLError(.badServerResponse)
-            }
+            ], failOnError)
         }
+        _ = try app.services[serviceId].config.patch(serviceConfig).get()
 
         app.sync.config.put(on: group, data: [
             "development_mode_enabled": true
@@ -950,7 +955,7 @@ public class RealmServer: NSObject {
         ], failOnError)
 
         let rules = app.services[serviceId].rules
-        let userDataRule: [String: Any] = [
+        let userDataRule: [String: Json] = [
             "database": "test_data",
             "collection": "UserData",
             "roles": [[
@@ -988,7 +993,7 @@ public class RealmServer: NSObject {
         ], failOnError)
 
         guard case .success = group.wait(timeout: .now() + 5.0) else {
-            throw URLError(.badServerResponse)
+            throw URLError(.timedOut)
         }
 
         return clientAppId
@@ -1081,7 +1086,7 @@ public class RealmServer: NSObject {
         }
         let app = session.apps[appServerId]
         let response = try app.services[syncServiceId].config.get().get() as? [String: Any]
-        guard let syncInfo = response?[configOption] as? [String: Any] else {
+        guard let syncInfo = response?[configOption] as? [String: Json] else {
             return false
         }
         return (syncInfo["state"] as? String == "enabled")
@@ -1143,7 +1148,7 @@ public class RealmServer: NSObject {
         var syncConfig = syncServiceConfiguration
         return app.services[syncServiceId].config.get()
             .map { response in
-                guard let config = response as? [String: Any] else { return false }
+                guard let config = response as? [String: Json] else { return false }
                 guard let syncInfo = config[configOption] as? [String: Any] else { return false }
                 return syncInfo["is_recovery_mode_disabled"] as? Bool ?? false
             }
@@ -1188,12 +1193,12 @@ public class RealmServer: NSObject {
         guard let schemasList = try? session.apps[appServerId].schemas.get().get(),
               let schemas = schemasList as? [[String: Any]],
               let schemaSelected = schemas.first(where: { ($0["metadata"] as? [String: String])?["collection"] == className }) else {
-            completion(.failure(URLError.unknown as! Error))
+            completion(.failure(URLError(.unknown)))
             return
         }
 
         guard let schema = try? session.apps[appServerId].schemas[schemaSelected["_id"] as! String].get().get(),
-              let schemaProperties = ((schema as? [String: Any])?["schema"] as? [String: Any])?["properties"] as? [String: Any] else {
+              let schemaProperties = ((schema as? [String: Json])?["schema"] as? [String: Any])?["properties"] as? [String: Json] else {
             completion(.failure(URLError.unknown as! Error))
             return
         }

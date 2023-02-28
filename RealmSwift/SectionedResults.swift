@@ -24,7 +24,6 @@ import Realm
  `SectionedResults` and `ResultSection`.
  */
 public protocol RealmSectionedResult: RandomAccessCollection, Equatable, ThreadConfined {
-    associatedtype Key: _Persistable, Hashable
     // MARK: Properties
 
     /// The Realm which manages the collection, or `nil` if the collection is invalidated.
@@ -69,17 +68,17 @@ public protocol RealmSectionedResult: RandomAccessCollection, Equatable, ThreadC
     /// :nodoc:
     func observe(keyPaths: [String]?,
                  on queue: DispatchQueue?,
-                 _ block: @escaping (RealmSectionedResultsChange<Self>) -> Void) -> NotificationToken
+                 _ block: @escaping (SectionedResultsChange<Self>) -> Void) -> NotificationToken
     /// :nodoc:
     func observe(on queue: DispatchQueue?,
-                 _ block: @escaping (RealmSectionedResultsChange<Self>) -> Void) -> NotificationToken
+                 _ block: @escaping (SectionedResultsChange<Self>) -> Void) -> NotificationToken
 }
 
 extension RealmSectionedResult where Element: RLMObjectBase {
     /// :nodoc:
     func observe(keyPaths: [PartialKeyPath<Element>],
                  on queue: DispatchQueue?,
-                 _ block: @escaping (RealmSectionedResultsChange<Self>) -> Void) -> NotificationToken {
+                 _ block: @escaping (SectionedResultsChange<Self>) -> Void) -> NotificationToken {
         fatalError("abstract")
     }
 }
@@ -138,13 +137,13 @@ extension RealmSectionedResultImpl {
     /// :nodoc:
     internal typealias ObjcSectionedResultsChange = (RLMSectionedResult?, RLMSectionedResultsChange?) -> Void
     /// :nodoc:
-    internal func wrapObserveBlock(_ block: @escaping (RealmSectionedResultsChange<Self>) -> Void) -> ObjcSectionedResultsChange {
+    internal func wrapObserveBlock(_ block: @escaping (SectionedResultsChange<Self>) -> Void) -> ObjcSectionedResultsChange {
         var col: Self?
         return { collection, change in
             if col == nil, let collection = collection {
                 col = self.collection === collection ? self : Self(rlmSectionedResult: collection as! Self.Collection)
             }
-            block(RealmSectionedResultsChange.fromObjc(value: col, change: change))
+            block(SectionedResultsChange.fromObjc(value: col, change: change))
         }
     }
 }
@@ -195,7 +194,7 @@ public struct SectionedResults<Key: _Persistable & Hashable, Element: RealmColle
      transaction which changes either any of the objects in the sectioned results collection, or which objects are in the sectioned results collection.
 
      The `change` parameter that is passed to the block reports, in the form of indices within the collection, which of
-     the objects were added, removed, or modified during each write transaction. See the `RealmSectionedResultsChange`
+     the objects were added, removed, or modified during each write transaction. See the `SectionedResultsChange`
      documentation for more information on the change information supplied and an example of how to use it to update a
      `UITableView`.
 
@@ -311,7 +310,7 @@ public struct SectionedResults<Key: _Persistable & Hashable, Element: RealmColle
      */
     public func observe(keyPaths: [String]? = nil,
                         on queue: DispatchQueue? = nil,
-                        _ block: @escaping (RealmSectionedResultsChange<Self>) -> Void) -> NotificationToken {
+                        _ block: @escaping (SectionedResultsChange<Self>) -> Void) -> NotificationToken {
         return collection.addNotificationBlock(wrapObserveBlock(block), keyPaths: keyPaths, queue: queue)
     }
 
@@ -322,7 +321,7 @@ public struct SectionedResults<Key: _Persistable & Hashable, Element: RealmColle
      transaction which changes either any of the objects in the sectioned results collection, or which objects are in the sectioned results collection.
 
      The `change` parameter that is passed to the block reports, in the form of indices within the collection, which of
-     the objects were added, removed, or modified during each write transaction. See the `RealmSectionedResultsChange`
+     the objects were added, removed, or modified during each write transaction. See the `SectionedResultsChange`
      documentation for more information on the change information supplied and an example of how to use it to update a
      `UITableView`.
 
@@ -431,13 +430,13 @@ public struct SectionedResults<Key: _Persistable & Hashable, Element: RealmColle
      - returns: A token which must be held for as long as you want updates to be delivered.
      */
     public func observe(on queue: DispatchQueue? = nil,
-                        _ block: @escaping (RealmSectionedResultsChange<Self>) -> Void) -> NotificationToken {
+                        _ block: @escaping (SectionedResultsChange<Self>) -> Void) -> NotificationToken {
         return collection.addNotificationBlock(wrapObserveBlock(block), keyPaths: nil, queue: queue)
     }
 
     /// :nodoc:
-    public func makeIterator() -> RLMSectionedResultsIterator<Key, Element> {
-        return RLMSectionedResultsIterator(collection: collection)
+    public func makeIterator() -> SectionedResultsIterator<Key, Element> {
+        return SectionedResultsIterator(collection: collection)
     }
 
     /// :nodoc:
@@ -454,7 +453,7 @@ extension SectionedResults where Element: RLMObjectBase {
      transaction which changes either any of the objects in the sectioned results collection, or which objects are in the sectioned results collection.
 
      The `change` parameter that is passed to the block reports, in the form of indices within the collection, which of
-     the objects were added, removed, or modified during each write transaction. See the `RealmSectionedResultsChange`
+     the objects were added, removed, or modified during each write transaction. See the `SectionedResultsChange`
      documentation for more information on the change information supplied and an example of how to use it to update a
      `UITableView`.
 
@@ -567,7 +566,7 @@ extension SectionedResults where Element: RLMObjectBase {
      */
     public func observe(keyPaths: [PartialKeyPath<Element>],
                         on queue: DispatchQueue? = nil,
-                        _ block: @escaping (RealmSectionedResultsChange<Self>) -> Void) -> NotificationToken {
+                        _ block: @escaping (SectionedResultsChange<Self>) -> Void) -> NotificationToken {
         return collection.addNotificationBlock(wrapObserveBlock(block), keyPaths: keyPaths.map(_name(for:)), queue: queue)
     }
 }
@@ -613,7 +612,7 @@ public struct ResultsSection<Key: _Persistable & Hashable, T: RealmCollectionVal
      transaction which changes either any of the objects in the sectioned results collection, or which objects are in the sectioned results collection.
 
      The `change` parameter that is passed to the block reports, in the form of indices within the collection, which of
-     the objects were added, removed, or modified during each write transaction. See the `RealmSectionedResultsChange`
+     the objects were added, removed, or modified during each write transaction. See the `SectionedResultsChange`
      documentation for more information on the change information supplied and an example of how to use it to update a
      `UITableView`.
 
@@ -729,7 +728,7 @@ public struct ResultsSection<Key: _Persistable & Hashable, T: RealmCollectionVal
      */
     public func observe(keyPaths: [String]? = nil,
                         on queue: DispatchQueue? = nil,
-                        _ block: @escaping (RealmSectionedResultsChange<Self>) -> Void) -> NotificationToken {
+                        _ block: @escaping (SectionedResultsChange<Self>) -> Void) -> NotificationToken {
         return collection.addNotificationBlock(wrapObserveBlock(block), keyPaths: keyPaths, queue: queue)
     }
     /**
@@ -739,7 +738,7 @@ public struct ResultsSection<Key: _Persistable & Hashable, T: RealmCollectionVal
      transaction which changes either any of the objects in the sectioned results collection, or which objects are in the sectioned results collection.
 
      The `change` parameter that is passed to the block reports, in the form of indices within the collection, which of
-     the objects were added, removed, or modified during each write transaction. See the `RealmSectionedResultsChange`
+     the objects were added, removed, or modified during each write transaction. See the `SectionedResultsChange`
      documentation for more information on the change information supplied and an example of how to use it to update a
      `UITableView`.
 
@@ -848,13 +847,13 @@ public struct ResultsSection<Key: _Persistable & Hashable, T: RealmCollectionVal
      - returns: A token which must be held for as long as you want updates to be delivered.
      */
     public func observe(on queue: DispatchQueue? = nil,
-                        _ block: @escaping (RealmSectionedResultsChange<Self>) -> Void) -> NotificationToken {
+                        _ block: @escaping (SectionedResultsChange<Self>) -> Void) -> NotificationToken {
         return collection.addNotificationBlock(wrapObserveBlock(block), keyPaths: nil, queue: queue)
     }
 
     /// :nodoc:
-    public func makeIterator() -> RLMSectionIterator<Element> {
-        return RLMSectionIterator(collection: collection)
+    public func makeIterator() -> SectionIterator<Element> {
+        return SectionIterator(collection: collection)
     }
 
     /// :nodoc:
@@ -871,7 +870,7 @@ extension ResultsSection where T: RLMObjectBase {
      transaction which changes either any of the objects in the sectioned results collection, or which objects are in the sectioned results collection.
 
      The `change` parameter that is passed to the block reports, in the form of indices within the collection, which of
-     the objects were added, removed, or modified during each write transaction. See the `RealmSectionedResultsChange`
+     the objects were added, removed, or modified during each write transaction. See the `SectionedResultsChange`
      documentation for more information on the change information supplied and an example of how to use it to update a
      `UITableView`.
 
@@ -984,7 +983,7 @@ extension ResultsSection where T: RLMObjectBase {
      */
     public func observe(keyPaths: [PartialKeyPath<Element>],
                         on queue: DispatchQueue? = nil,
-                        _ block: @escaping (RealmSectionedResultsChange<Self>) -> Void) -> NotificationToken {
+                        _ block: @escaping (SectionedResultsChange<Self>) -> Void) -> NotificationToken {
         return collection.addNotificationBlock(wrapObserveBlock(block), keyPaths: keyPaths.map(_name(for:)), queue: queue)
     }
 }
@@ -992,7 +991,16 @@ extension ResultsSection where T: RLMObjectBase {
 @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
 extension ResultsSection: Identifiable { }
 
-@frozen public enum RealmSectionedResultsChange<Collection> {
+/**
+ A `SectionedResultsChange` value encapsulates information about changes to
+ sectioned results that are reported by Realm notifications.
+
+ The first time a notification is delivered it will be `.initial`, and all
+ subsequent notifications will be `.change()` with information about what has
+ changed since the last time the callback was invoked.
+ }
+ */
+@frozen public enum SectionedResultsChange<Collection> {
     /**
      `.initial` indicates that the initial run of the query has completed (if
      applicable), and the collection can now be used without performing any
@@ -1017,7 +1025,7 @@ extension ResultsSection: Identifiable { }
                 sectionsToInsert: IndexSet, sectionsToDelete: IndexSet)
 
     /// :nodoc:
-    static func fromObjc(value: Collection?, change: RLMSectionedResultsChange?) -> RealmSectionedResultsChange {
+    static func fromObjc(value: Collection?, change: RLMSectionedResultsChange?) -> SectionedResultsChange {
         if let change = change {
             return .update(value!,
                            deletions: change.deletions as [IndexPath],
@@ -1030,10 +1038,14 @@ extension ResultsSection: Identifiable { }
     }
 }
 
+/// :nodoc:
+@available(*, deprecated, renamed: "SectionedResultsChange")
+public typealias RealmSectionedResultsChange = SectionedResultsChange
+
 /**
  An iterator for a `SectionedResults` instance.
  */
-@frozen public struct RLMSectionedResultsIterator<Key: _Persistable & Hashable, Element: RealmCollectionValue>: IteratorProtocol {
+@frozen public struct SectionedResultsIterator<Key: _Persistable & Hashable, Element: RealmCollectionValue>: IteratorProtocol {
     private var generatorBase: NSFastEnumerationIterator
 
     init(collection: RLMSectionedResults<RLMValue, RLMValue>) {
@@ -1047,10 +1059,14 @@ extension ResultsSection: Identifiable { }
     }
 }
 
+/// :nodoc:
+@available(*, deprecated, renamed: "SectionedResultsIterator")
+public typealias RLMSectionedResultsIterator = SectionedResultsIterator
+
 /**
  An iterator for a `Section` instance.
  */
-@frozen public struct RLMSectionIterator<Element: RealmCollectionValue>: IteratorProtocol {
+@frozen public struct SectionIterator<Element: RealmCollectionValue>: IteratorProtocol {
     private var generatorBase: NSFastEnumerationIterator
 
     init(collection: RLMSection<RLMValue, RLMValue>) {
@@ -1063,3 +1079,7 @@ extension ResultsSection: Identifiable { }
         return next as? Element
     }
 }
+
+/// :nodoc:
+@available(*, deprecated, renamed: "SectionIterator")
+public typealias RLMSectionIterator = SectionIterator

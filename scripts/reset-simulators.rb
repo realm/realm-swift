@@ -58,6 +58,7 @@ begin
   print 'Killing running Simulator processes...'
   while system('pgrep -q Simulator')
     system('pkill Simulator 2>/dev/null')
+    system('pkill -9 update_dyld_sim_shared_cache 2>/dev/null')
     # CoreSimulatorService doesn't exit when sent SIGTERM
     system('pkill -9 Simulator 2>/dev/null')
   end
@@ -169,7 +170,8 @@ begin
   puts ' done!'
 
   print 'Waiting for dyld shared cache to update...'
-  while system('pgrep -q update_dyld_sim_shared_cache')
+  10.times do
+    break unless system('pgrep -q update_dyld_sim_shared_cache')
     sleep 15
   end
   puts ' done!'

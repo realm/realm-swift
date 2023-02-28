@@ -55,7 +55,7 @@ class ObjectTests: TestCase {
         let realm = try! Realm()
         var persisted: SwiftStringObject!
         try! realm.write {
-            persisted = realm.create(SwiftStringObject.self, value: [:])
+            persisted = realm.create(SwiftStringObject.self)
             XCTAssertNotNil(persisted.realm)
             XCTAssertEqual(realm, persisted.realm!)
         }
@@ -326,7 +326,7 @@ class ObjectTests: TestCase {
         test(SwiftObject())
         let realm = try! Realm()
         try! realm.write {
-            test(realm.create(SwiftObject.self, value: [:]))
+            test(realm.create(SwiftObject.self))
             let addedObj = SwiftObject()
             realm.add(addedObj)
             test(addedObj)
@@ -354,7 +354,7 @@ class ObjectTests: TestCase {
         test(SwiftOptionalObject())
         let realm = try! Realm()
         try! realm.write {
-            test(realm.create(SwiftOptionalObject.self, value: [:]))
+            test(realm.create(SwiftOptionalObject.self))
             let addedObj = SwiftOptionalObject()
             realm.add(addedObj)
             test(addedObj)
@@ -398,7 +398,7 @@ class ObjectTests: TestCase {
         test(SwiftListObject())
         let realm = try! Realm()
         try! realm.write {
-            test(realm.create(SwiftListObject.self, value: [:]))
+            test(realm.create(SwiftListObject.self))
             let addedObj = SwiftListObject()
             realm.add(addedObj)
             test(addedObj)
@@ -440,7 +440,7 @@ class ObjectTests: TestCase {
         test(SwiftMutableSetObject())
         let realm = try! Realm()
         try! realm.write {
-            test(realm.create(SwiftMutableSetObject.self, value: [:]))
+            test(realm.create(SwiftMutableSetObject.self))
             let addedObj = SwiftMutableSetObject()
             realm.add(addedObj)
             test(addedObj)
@@ -723,7 +723,7 @@ class ObjectTests: TestCase {
 
         setAndTestAllTypes(setter, getter: getter, object: SwiftObject())
         try! Realm().write {
-            let persistedObject = try! Realm().create(SwiftObject.self, value: [:])
+            let persistedObject = try! Realm().create(SwiftObject.self)
             self.setAndTestAllTypes(setter, getter: getter, object: persistedObject)
         }
     }
@@ -743,7 +743,7 @@ class ObjectTests: TestCase {
 
         setAndTestAllTypes(setter, getter: getter, object: SwiftObject())
         try! Realm().write {
-            let persistedObject = try! Realm().create(SwiftObject.self, value: [:])
+            let persistedObject = try! Realm().create(SwiftObject.self)
             self.setAndTestAllTypes(setter, getter: getter, object: persistedObject)
         }
     }
@@ -1092,7 +1092,7 @@ class ObjectTests: TestCase {
     func testListPropertyNotifications() {
         let realm = try! Realm()
         realm.beginWrite()
-        let object = realm.create(SwiftRecursiveObject.self, value: [[]])
+        let object = realm.create(SwiftRecursiveObject.self)
         try! realm.commitWrite()
 
         let token = object.observe(expectChange("objects", Int?.none, Int?.none))
@@ -1384,7 +1384,7 @@ class ObjectTests: TestCase {
     func testMutableSetPropertyNotifications() {
         let realm = try! Realm()
         realm.beginWrite()
-        let object = realm.create(SwiftRecursiveObject.self, value: [[]])
+        let object = realm.create(SwiftRecursiveObject.self)
         try! realm.commitWrite()
 
         let token = object.observe(expectChange("objectSet", Int?.none, Int?.none))

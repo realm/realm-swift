@@ -23,6 +23,28 @@ import Realm
 import RealmTestSupport
 #endif
 
+extension RLMObject {
+    @discardableResult
+    class func create(in realm: RLMRealm, withValue value: [Any]) -> Self {
+        create(in: realm, withValue: value as Any)
+    }
+
+    @discardableResult
+    class func createInDefaultRealm(withValue value: [Any]) -> Self {
+        createInDefaultRealm(withValue: value as Any)
+    }
+
+    @discardableResult
+    class func createOrUpdate(in realm: RLMRealm, withValue value: [Any]) -> Self {
+        create(in: realm, withValue: value as Any)
+    }
+
+    @discardableResult
+    class func createOrUpdateInDefaultRealm(withValue value: [Any]) -> Self {
+        createOrUpdateInDefaultRealm(withValue: value as Any)
+    }
+}
+
 class SwiftRLMArrayPropertyTests: RLMTestCase {
 
     // Swift models
@@ -60,7 +82,7 @@ class SwiftRLMArrayPropertyTests: RLMTestCase {
         let realm = realmWithTestPath()
 
         realm.beginWriteTransaction()
-        let array = SwiftRLMArrayPropertyObject.create(in: realm, withValue: ["arrayObject", [], []])
+        let array = SwiftRLMArrayPropertyObject.create(in: realm, withValue: ["arrayObject"])
         XCTAssertNotNil(array.array, "Should be able to get an empty array")
         XCTAssertEqual(array.array.count, UInt(0), "Should start with no array elements")
 
@@ -84,7 +106,7 @@ class SwiftRLMArrayPropertyTests: RLMTestCase {
     func testModifyDetatchedArray() {
         let realm = realmWithTestPath()
         realm.beginWriteTransaction()
-        let arObj = SwiftRLMArrayPropertyObject.create(in: realm, withValue: ["arrayObject", [], []])
+        let arObj = SwiftRLMArrayPropertyObject.create(in: realm, withValue: ["arrayObject"])
         XCTAssertNotNil(arObj.array, "Should be able to get an empty array")
         XCTAssertEqual(arObj.array.count, UInt(0), "Should start with no array elements")
 
@@ -105,7 +127,7 @@ class SwiftRLMArrayPropertyTests: RLMTestCase {
 
         realm.beginWriteTransaction()
 
-        let obj = SwiftRLMArrayPropertyObject.create(in: realm, withValue: ["arrayObject", [], []])
+        let obj = SwiftRLMArrayPropertyObject.create(in: realm, withValue: ["arrayObject"])
         let child1 = SwiftRLMStringObject.create(in: realm, withValue: ["a"])
         let child2 = SwiftRLMStringObject()
         child2.stringCol = "b"
@@ -171,7 +193,7 @@ class SwiftRLMArrayPropertyTests: RLMTestCase {
         let realm = realmWithTestPath()
 
         realm.beginWriteTransaction()
-        let array = ArrayPropertyObject.create(in: realm, withValue: ["arrayObject", [], []])
+        let array = ArrayPropertyObject.create(in: realm, withValue: ["arrayObject"])
         XCTAssertNotNil(array.array, "Should be able to get an empty array")
         XCTAssertEqual(array.array.count, UInt(0), "Should start with no array elements")
 
@@ -195,7 +217,7 @@ class SwiftRLMArrayPropertyTests: RLMTestCase {
     func testModifyDetatchedArray_objc() {
         let realm = realmWithTestPath()
         realm.beginWriteTransaction()
-        let arObj = ArrayPropertyObject.create(in: realm, withValue: ["arrayObject", [], []])
+        let arObj = ArrayPropertyObject.create(in: realm, withValue: ["arrayObject"])
         XCTAssertNotNil(arObj.array, "Should be able to get an empty array")
         XCTAssertEqual(arObj.array.count, UInt(0), "Should start with no array elements")
 
@@ -216,7 +238,7 @@ class SwiftRLMArrayPropertyTests: RLMTestCase {
 
         realm.beginWriteTransaction()
 
-        let obj = ArrayPropertyObject.create(in: realm, withValue: ["arrayObject", [], []])
+        let obj = ArrayPropertyObject.create(in: realm, withValue: ["arrayObject"])
         let child1 = StringObject.create(in: realm, withValue: ["a"])
         let child2 = StringObject()
         child2.stringCol = "b"

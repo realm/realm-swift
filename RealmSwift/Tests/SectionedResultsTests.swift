@@ -372,7 +372,7 @@ class SectionedResultsTests: SectionedResultsTestsBase {
         let results = realm.objects(ModernAllTypesObject.self)
         let sectionedResults = results.sectioned(by: \.firstLetter, ascending: true)
         let ex = expectation(description: "initial notification")
-        let token = sectionedResults.observe { (changes: RealmSectionedResultsChange) in
+        let token = sectionedResults.observe { (changes: SectionedResultsChange) in
             switch changes {
             case .initial(let collection):
                 XCTAssertEqual(collection.count, 3)
@@ -486,7 +486,7 @@ class SectionedResultsTests: SectionedResultsTestsBase {
         let queue = DispatchQueue(label: "background")
         var firstRun = true
         let token = sectionedResults.observe(keyPaths: [\.stringCol],
-                                             on: queue) { (changes: RealmSectionedResultsChange) in
+                                             on: queue) { (changes: SectionedResultsChange) in
             switch changes {
             case .initial(let collection):
                 XCTAssertEqual(collection.count, 3)
@@ -544,7 +544,7 @@ class SectionedResultsTests: SectionedResultsTestsBase {
 
         var firstRun = true
         // Only get notifications for key 'a'.
-        let token1 = section1.observe(keyPaths: [\.stringCol]) { (changes: RealmSectionedResultsChange) in
+        let token1 = section1.observe(keyPaths: [\.stringCol]) { (changes: SectionedResultsChange) in
             switch changes {
             case .initial(let collection):
                 XCTAssertEqual(collection.count, 1)
@@ -565,7 +565,7 @@ class SectionedResultsTests: SectionedResultsTestsBase {
         }
 
         // Only get notifications for key 'b'.
-        let token2 = section2.observe(keyPaths: [\.stringCol]) { (changes: RealmSectionedResultsChange) in
+        let token2 = section2.observe(keyPaths: [\.stringCol]) { (changes: SectionedResultsChange) in
             switch changes {
             case .initial(let collection):
                 if firstRun {
@@ -626,7 +626,7 @@ class SectionedResultsTests: SectionedResultsTestsBase {
         var firstRun = true
         // Only get notifications for key 'a'.
         let token1 = section1.observe(keyPaths: [\.stringCol],
-                                      on: queue) { (changes: RealmSectionedResultsChange) in
+                                      on: queue) { (changes: SectionedResultsChange) in
             switch changes {
             case .initial(let collection):
                 XCTAssertEqual(collection.count, 1)
@@ -650,7 +650,7 @@ class SectionedResultsTests: SectionedResultsTestsBase {
         sema1.wait()
         // Only get notifications for key 'b'.
         let token2 = section2.observe(keyPaths: [\.stringCol],
-                                      on: queue) { (changes: RealmSectionedResultsChange) in
+                                      on: queue) { (changes: SectionedResultsChange) in
             switch changes {
             case .initial(let collection):
                 if firstRun {
@@ -850,7 +850,7 @@ class SectionedResultsProjectionTests: SectionedResultsTestsBase {
         let results = realm.objects(ModernAllTypesProjection.self)
         let sectionedResults = results.sectioned(by: \.firstLetter, ascending: true)
         let ex = expectation(description: "initial notification")
-        let token = sectionedResults.observe { (changes: RealmSectionedResultsChange) in
+        let token = sectionedResults.observe { (changes: SectionedResultsChange) in
             switch changes {
             case .initial(let collection):
                 XCTAssertEqual(collection.count, 3)
@@ -889,7 +889,7 @@ class SectionedResultsProjectionTests: SectionedResultsTestsBase {
         let queue = DispatchQueue(label: "background")
         var firstRun = true
         let token = sectionedResults.observe(keyPaths: ["stringCol"],
-                                             on: queue) { (changes: RealmSectionedResultsChange) in
+                                             on: queue) { (changes: SectionedResultsChange) in
             switch changes {
             case .initial(let collection):
                 XCTAssertEqual(collection.count, 3)
@@ -947,7 +947,7 @@ class SectionedResultsProjectionTests: SectionedResultsTestsBase {
 
         var firstRun = true
         // Only get notifications for key 'a'.
-        let token1 = section1.observe(keyPaths: ["stringCol"]) { (changes: RealmSectionedResultsChange) in
+        let token1 = section1.observe(keyPaths: ["stringCol"]) { (changes: SectionedResultsChange) in
             switch changes {
             case .initial(let collection):
                 XCTAssertEqual(collection.count, 1)
@@ -968,7 +968,7 @@ class SectionedResultsProjectionTests: SectionedResultsTestsBase {
         }
 
         // Only get notifications for key 'b'.
-        let token2 = section2.observe(keyPaths: ["stringCol"]) { (changes: RealmSectionedResultsChange) in
+        let token2 = section2.observe(keyPaths: ["stringCol"]) { (changes: SectionedResultsChange) in
             switch changes {
             case .initial(let collection):
                 if firstRun {
@@ -1029,7 +1029,7 @@ class SectionedResultsProjectionTests: SectionedResultsTestsBase {
         var firstRun = true
         // Only get notifications for key 'a'.
         let token1 = section1.observe(keyPaths: ["stringCol"],
-                                      on: queue) { (changes: RealmSectionedResultsChange) in
+                                      on: queue) { (changes: SectionedResultsChange) in
             switch changes {
             case .initial(let collection):
                 XCTAssertEqual(collection.count, 1)
@@ -1053,7 +1053,7 @@ class SectionedResultsProjectionTests: SectionedResultsTestsBase {
         sema1.wait()
         // Only get notifications for key 'b'.
         let token2 = section2.observe(keyPaths: ["stringCol"],
-                                      on: queue) { (changes: RealmSectionedResultsChange) in
+                                      on: queue) { (changes: SectionedResultsChange) in
             switch changes {
             case .initial(let collection):
                 if firstRun {

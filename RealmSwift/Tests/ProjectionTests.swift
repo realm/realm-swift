@@ -427,7 +427,11 @@ class ProjectionTests: TestCase {
             dt.friends.append(js)
 
             realm.create(ModernAllTypesObject.self, value: allTypeValues)
-            realm.create(AdvancedObject.self, value: ["pk": ObjectId.generate(), "commonArray": [1, 2, 3], "objectsArray": [[1, true], [2, false]], "commonSet": [1, 2, 3], "objectsSet": [[1, true], [2, false]]])
+            realm.create(AdvancedObject.self, value: ["pk": ObjectId.generate(),
+                                                      "commonArray": [1, 2, 3],
+                                                      "objectsArray": [[1, true] as [Any], [2, false]],
+                                                      "commonSet": [1, 2, 3],
+                                                      "objectsSet": [[1, true] as [Any], [2, false]]])
         }
         return realm
     }
