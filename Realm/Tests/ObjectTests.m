@@ -1386,7 +1386,7 @@ static void addProperty(Class cls, const char *name, const char *type, size_t si
 
 #pragma mark - Frozen Objects
 
-static IntObject *managedObject() {
+static IntObject *managedObject(void) {
     IntObject *obj = [[IntObject alloc] init];
     RLMRealm *realm = RLMRealm.defaultRealm;
     [realm transactionWithBlock:^{

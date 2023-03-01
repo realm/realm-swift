@@ -102,6 +102,7 @@ Pod::Spec.new do |s|
                               'include/RLMRealmConfiguration_Private.h',
                               'include/RLMRealm_Private.h',
                               'include/RLMResults_Private.h',
+                              'include/RLMScheduler.h',
                               'include/RLMSchema_Private.h',
                               'include/RLMSet_Private.h',
                               'include/RLMSwiftProperty.h',

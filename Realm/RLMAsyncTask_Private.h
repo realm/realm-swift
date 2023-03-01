@@ -26,13 +26,13 @@ RLM_HEADER_AUDIT_BEGIN(nullability)
 @property (nonatomic, nullable) RLMRealm *localRealm;
 
 - (instancetype)initWithConfiguration:(RLMRealmConfiguration *)configuration
-                           confinedTo:(const RLMConfinement *)confinement
+                           confinedTo:(RLMScheduler *)confinement
                              download:(bool)waitForDownloadCompletion
                            completion:(RLMAsyncOpenRealmCallback)completion
 __attribute__((objc_direct));
 
 - (instancetype)initWithConfiguration:(RLMRealmConfiguration *)configuration
-                           confinedTo:(const RLMConfinement *)confinement
+                           confinedTo:(RLMScheduler *)confinement
                              download:(bool)waitForDownloadCompletion;
 - (void)waitForOpen:(RLMAsyncOpenRealmCallback)completion
     __attribute__((swift_attr("@_unsafeInheritExecutor")));

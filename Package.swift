@@ -183,6 +183,7 @@ let package = Package(
                 "Realm/RLMRealmConfiguration.mm",
                 "Realm/RLMRealmUtil.mm",
                 "Realm/RLMResults.mm",
+                "Realm/RLMScheduler.mm",
                 "Realm/RLMSchema.mm",
                 "Realm/RLMSectionedResults.mm",
                 "Realm/RLMSet.mm",

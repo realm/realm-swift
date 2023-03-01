@@ -34,6 +34,7 @@
 #import "RLMQueryUtil.hpp"
 #import "RLMRealmConfiguration_Private.hpp"
 #import "RLMRealmUtil.hpp"
+#import "RLMScheduler.h"
 #import "RLMSchema_Private.hpp"
 #import "RLMSyncConfiguration.h"
 #import "RLMSyncConfiguration_Private.hpp"
@@ -177,7 +178,7 @@ id autorelease(__unsafe_unretained id value) {
     return value ? (__bridge id)CFAutorelease((__bridge_retained CFTypeRef)value) : nil;
 }
 
-RLMRealm *getCachedRealm(RLMRealmConfiguration *configuration, const RLMConfinement *options) NS_RETURNS_RETAINED {
+RLMRealm *getCachedRealm(RLMRealmConfiguration *configuration, RLMScheduler *options) NS_RETURNS_RETAINED {
     auto& config = configuration.configRef;
     if (!configuration.cache && !configuration.dynamic) {
         return nil;
@@ -223,25 +224,6 @@ bool copySeedFile(RLMRealmConfiguration *configuration, NSError **error) {
     }
     return false;
 }
-
-std::shared_ptr<realm::util::Scheduler> makeScheduler(RLMConfinement const& options) {
-    std::shared_ptr<realm::util::Scheduler> scheduler;
-    if (auto queue = options.queue) {
-        if (queue == dispatch_get_main_queue()) {
-            scheduler = realm::util::Scheduler::make_runloop(CFRunLoopGetMain());
-        }
-        else {
-            scheduler = realm::util::Scheduler::make_dispatch((__bridge void *)queue);
-        }
-    }
-    if (scheduler && !scheduler->is_on_thread()) {
-        throw RLMException(@"Realm opened from incorrect dispatch queue.");
-    }
-
-    // For thread-confined Realms we let object store create the scheduler
-    return scheduler;
-}
-
 } // anonymous namespace
 
 @implementation RLMRealm {
@@ -318,9 +300,8 @@ std::shared_ptr<realm::util::Scheduler> makeScheduler(RLMConfinement const& opti
 + (RLMAsyncOpenTask *)asyncOpenWithConfiguration:(RLMRealmConfiguration *)configuration
                                    callbackQueue:(dispatch_queue_t)callbackQueue
                                         callback:(RLMAsyncOpenRealmCallback)callback {
-    RLMConfinement confinement = {.queue = callbackQueue};
     return [[RLMAsyncOpenTask alloc] initWithConfiguration:configuration
-                                                confinedTo:&confinement
+                                                confinedTo:[RLMScheduler dispatchQueue:callbackQueue]
                                                   download:true completion:callback];
 }
 
@@ -339,22 +320,24 @@ std::shared_ptr<realm::util::Scheduler> makeScheduler(RLMConfinement const& opti
 }
 
 + (instancetype)realmWithConfiguration:(RLMRealmConfiguration *)configuration error:(NSError **)error {
-    const RLMConfinement confinement = {};
-    return autorelease([self realmWithConfiguration:configuration confinedTo:&confinement error:error]);
+    return autorelease([self realmWithConfiguration:configuration
+                                         confinedTo:RLMScheduler.currentRunLoop
+                                              error:error]);
 }
 
 + (instancetype)realmWithConfiguration:(RLMRealmConfiguration *)configuration
                                  queue:(dispatch_queue_t)queue
                                  error:(NSError **)error {
-    RLMConfinement confinement = {.queue = queue};
-    return autorelease([self realmWithConfiguration:configuration confinedTo:&confinement error:error]);
+    return autorelease([self realmWithConfiguration:configuration
+                                         confinedTo:[RLMScheduler dispatchQueue:queue]
+                                              error:error]);
 }
 
 + (instancetype)realmWithConfiguration:(RLMRealmConfiguration *)configuration
-                            confinedTo:(const RLMConfinement *)confinement
+                            confinedTo:(RLMScheduler *)scheduler
                                  error:(NSError **)error {
     // First check if we already have a cached Realm for this config
-    if (auto realm = getCachedRealm(configuration, confinement)) {
+    if (auto realm = getCachedRealm(configuration, scheduler)) {
         return realm;
     }
 
@@ -375,7 +358,10 @@ std::shared_ptr<realm::util::Scheduler> makeScheduler(RLMConfinement const& opti
     std::lock_guard lock(initLock);
 
     try {
-        config.scheduler = makeScheduler(*confinement);
+        config.scheduler = scheduler.osScheduler;
+        if (config.scheduler && !config.scheduler->is_on_thread()) {
+            throw RLMException(@"Realm opened from incorrect dispatch queue.");
+        }
         realm->_realm = Realm::get_shared_realm(config);
     }
     catch (...) {
@@ -463,7 +449,7 @@ std::shared_ptr<realm::util::Scheduler> makeScheduler(RLMConfinement const& opti
     }
 
     if (cache) {
-        RLMCacheRealm(configuration, confinement, realm);
+        RLMCacheRealm(configuration, scheduler, realm);
     }
 
     if (!configuration.readOnly) {

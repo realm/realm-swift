@@ -1204,17 +1204,17 @@ extension Realm {
     @MainActor
     public init(configuration: Realm.Configuration = .defaultConfiguration,
                 downloadBeforeOpen: OpenBehavior = .never) async throws {
-        var confinement = RLMConfinement(queue: .passUnretained(.main), actor: nil, scheduler: nil, verifier: nil)
+        let scheduler = RLMScheduler.dispatchQueue(.main)
         let rlmConfiguration = configuration.rlmConfiguration
 
         // If we already have a cached Realm for this actor, just reuse it
         // If this Realm is open but with a different scheduler, open it synchronously.
         // An async open would just dispatch to the background and then back to
         // perform the final synchronous open.
-        var realm = RLMGetCachedRealm(rlmConfiguration, &confinement)
+        var realm = RLMGetCachedRealm(rlmConfiguration, scheduler)
         if realm == nil, let cachedRealm = RLMGetAnyCachedRealm(rlmConfiguration) {
             realm = try withExtendedLifetime(cachedRealm) {
-                try RLMRealm(configuration: rlmConfiguration, confinedTo: &confinement)
+                try RLMRealm(configuration: rlmConfiguration, confinedTo: scheduler)
             }
         }
         if let realm = realm {
@@ -1228,7 +1228,7 @@ extension Realm {
 
         // We're doing the first open and hitting the expensive path, so do an async
         // open on a background thread
-        let task = RLMAsyncOpenTask(configuration: rlmConfiguration, confinedTo: &confinement,
+        let task = RLMAsyncOpenTask(configuration: rlmConfiguration, confinedTo: scheduler,
                                     download: shouldAsyncOpen(configuration, downloadBeforeOpen))
         do {
             try await withTaskCancellationHandler {

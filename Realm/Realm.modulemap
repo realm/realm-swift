@@ -64,6 +64,7 @@ framework module Realm {
         header "RLMRealmConfiguration_Private.h"
         header "RLMRealm_Private.h"
         header "RLMResults_Private.h"
+        header "RLMScheduler.h"
         header "RLMSchema_Private.h"
         header "RLMSectionedResults.h"
         header "RLMSet_Private.h"

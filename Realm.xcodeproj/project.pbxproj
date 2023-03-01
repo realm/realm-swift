@@ -99,6 +99,10 @@
 		3F08725527F3B5E0007A1175 /* libcompression.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F08725427F3B5E0007A1175 /* libcompression.tbd */; };
 		3F08725627F3B5EB007A1175 /* libcompression.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F08725427F3B5E0007A1175 /* libcompression.tbd */; };
 		3F08725727F3B87A007A1175 /* libcompression.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F08725427F3B5E0007A1175 /* libcompression.tbd */; };
+		3F0BBB9729AFDA6600FEA7A7 /* RLMScheduler.h in Headers */ = {isa = PBXBuildFile; fileRef = 3F0BBB9529AFDA6600FEA7A7 /* RLMScheduler.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		3F0BBB9829AFDA6600FEA7A7 /* RLMScheduler.h in Headers */ = {isa = PBXBuildFile; fileRef = 3F0BBB9529AFDA6600FEA7A7 /* RLMScheduler.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		3F0BBB9929AFDA6600FEA7A7 /* RLMScheduler.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3F0BBB9629AFDA6600FEA7A7 /* RLMScheduler.mm */; };
+		3F0BBB9A29AFDA6600FEA7A7 /* RLMScheduler.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3F0BBB9629AFDA6600FEA7A7 /* RLMScheduler.mm */; };
 		3F102CBD23DBC68300108FD2 /* Combine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F102CBC23DBC68300108FD2 /* Combine.swift */; };
 		3F149CCB2668112A00111D65 /* PersistedProperty.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F149CCA2668112A00111D65 /* PersistedProperty.swift */; };
 		3F1D8D33265B071000593ABA /* RLMValue.h in Headers */ = {isa = PBXBuildFile; fileRef = 3F1D8D30265B071000593ABA /* RLMValue.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -236,14 +240,14 @@
 		3FC3F915241808B400E27322 /* RLMEmbeddedObject.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3FC3F911241808B300E27322 /* RLMEmbeddedObject.mm */; };
 		3FC3F9172419B63200E27322 /* EmbeddedObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FC3F9162419B63100E27322 /* EmbeddedObject.swift */; };
 		3FCB1A7522A9B0A2003807FB /* CodableTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FCB1A7422A9B0A2003807FB /* CodableTests.swift */; };
+		3FCC56E429A55607004C5057 /* RLMSwiftObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 3FCC56E329A55607004C5057 /* RLMSwiftObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3FCC56E529A55607004C5057 /* RLMSwiftObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 3FCC56E329A55607004C5057 /* RLMSwiftObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3FD0D7C729675A2E0031C196 /* RLMAsyncTask.h in Headers */ = {isa = PBXBuildFile; fileRef = 3FD0D7C529675A2E0031C196 /* RLMAsyncTask.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3FD0D7C829675A2E0031C196 /* RLMAsyncTask.h in Headers */ = {isa = PBXBuildFile; fileRef = 3FD0D7C529675A2E0031C196 /* RLMAsyncTask.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3FD0D7C929675A2E0031C196 /* RLMAsyncTask.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3FD0D7C629675A2E0031C196 /* RLMAsyncTask.mm */; };
 		3FD0D7CA29675A2E0031C196 /* RLMAsyncTask.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3FD0D7C629675A2E0031C196 /* RLMAsyncTask.mm */; };
 		3FD0D7CE2967CA1E0031C196 /* RLMMongoCollection_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = CF76F7D224816AAA00890DD2 /* RLMMongoCollection_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		3FD0D7CF2967CA1F0031C196 /* RLMMongoCollection_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = CF76F7D224816AAA00890DD2 /* RLMMongoCollection_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
-		3FCC56E429A55607004C5057 /* RLMSwiftObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 3FCC56E329A55607004C5057 /* RLMSwiftObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		3FCC56E529A55607004C5057 /* RLMSwiftObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 3FCC56E329A55607004C5057 /* RLMSwiftObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3FDAB841290B4CCB00168F24 /* RLMError.h in Headers */ = {isa = PBXBuildFile; fileRef = 3FDAB83E290B4CCB00168F24 /* RLMError.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3FDAB842290B4CCB00168F24 /* RLMError.h in Headers */ = {isa = PBXBuildFile; fileRef = 3FDAB83E290B4CCB00168F24 /* RLMError.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3FDAB845290B4CCB00168F24 /* RLMError.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3FDAB840290B4CCB00168F24 /* RLMError.mm */; };
@@ -860,6 +864,8 @@
 		3F0338491E6F466D00F9E288 /* RLMAccessor.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RLMAccessor.hpp; sourceTree = "<group>"; };
 		3F04EA2D1992BEE400C2CE2E /* PerformanceTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PerformanceTests.m; sourceTree = "<group>"; };
 		3F08725427F3B5E0007A1175 /* libcompression.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libcompression.tbd; path = usr/lib/libcompression.tbd; sourceTree = SDKROOT; };
+		3F0BBB9529AFDA6600FEA7A7 /* RLMScheduler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMScheduler.h; sourceTree = "<group>"; };
+		3F0BBB9629AFDA6600FEA7A7 /* RLMScheduler.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMScheduler.mm; sourceTree = "<group>"; };
 		3F0F029D1B6FFE610046A4D5 /* KVOTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = KVOTests.mm; sourceTree = "<group>"; };
 		3F0F02AC1B6FFF3D0046A4D5 /* RLMObservation.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = RLMObservation.hpp; sourceTree = "<group>"; };
 		3F0F02AD1B6FFF3D0046A4D5 /* RLMObservation.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMObservation.mm; sourceTree = "<group>"; };
@@ -945,14 +951,14 @@
 		3FC3F9162419B63100E27322 /* EmbeddedObject.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EmbeddedObject.swift; sourceTree = "<group>"; };
 		3FCB1A7422A9B0A2003807FB /* CodableTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodableTests.swift; sourceTree = "<group>"; };
 		3FCC56E329A55607004C5057 /* RLMSwiftObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMSwiftObject.h; sourceTree = "<group>"; };
+		3FD0D7C529675A2E0031C196 /* RLMAsyncTask.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMAsyncTask.h; sourceTree = "<group>"; };
+		3FD0D7C629675A2E0031C196 /* RLMAsyncTask.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMAsyncTask.mm; sourceTree = "<group>"; };
+		3FD0D7CB29675AE10031C196 /* RLMAsyncTask_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMAsyncTask_Private.h; sourceTree = "<group>"; };
 		3FDAB83E290B4CCB00168F24 /* RLMError.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMError.h; sourceTree = "<group>"; };
 		3FDAB83F290B4CCB00168F24 /* RLMError_Private.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = RLMError_Private.hpp; sourceTree = "<group>"; };
 		3FDAB840290B4CCB00168F24 /* RLMError.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMError.mm; sourceTree = "<group>"; };
 		3FDAB847290B658300168F24 /* file-format-version-21.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = "file-format-version-21.realm"; sourceTree = "<group>"; };
 		3FDAB84B290B7A0200168F24 /* file-format-version-10.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = "file-format-version-10.realm"; sourceTree = "<group>"; };
-		3FD0D7C529675A2E0031C196 /* RLMAsyncTask.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMAsyncTask.h; sourceTree = "<group>"; };
-		3FD0D7C629675A2E0031C196 /* RLMAsyncTask.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMAsyncTask.mm; sourceTree = "<group>"; };
-		3FD0D7CB29675AE10031C196 /* RLMAsyncTask_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMAsyncTask_Private.h; sourceTree = "<group>"; };
 		3FE267CF264308670030F83C /* CollectionAccess.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CollectionAccess.swift; sourceTree = "<group>"; };
 		3FE267D0264308680030F83C /* ComplexTypes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ComplexTypes.swift; sourceTree = "<group>"; };
 		3FE267D1264308680030F83C /* BasicTypes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BasicTypes.swift; sourceTree = "<group>"; };
@@ -1961,6 +1967,8 @@
 				E81A1F6A1955FC9300FDED82 /* RLMResults.mm */,
 				29EDB8E51A7710B700458D80 /* RLMResults_Private.h */,
 				1A1EBF861F269E8E00F47698 /* RLMResults_Private.hpp */,
+				3F0BBB9529AFDA6600FEA7A7 /* RLMScheduler.h */,
+				3F0BBB9629AFDA6600FEA7A7 /* RLMScheduler.mm */,
 				E81A1F7E1955FC9300FDED82 /* RLMSchema.h */,
 				E81A1F7F1955FC9300FDED82 /* RLMSchema.mm */,
 				E81A1F7D1955FC9300FDED82 /* RLMSchema_Private.h */,
@@ -2094,6 +2102,7 @@
 				5D659EC31BE04556006515A0 /* RLMRealmConfiguration_Private.h in Headers */,
 				5D659EC51BE04556006515A0 /* RLMResults.h in Headers */,
 				5D659EC61BE04556006515A0 /* RLMResults_Private.h in Headers */,
+				3F0BBB9729AFDA6600FEA7A7 /* RLMScheduler.h in Headers */,
 				5D659EC71BE04556006515A0 /* RLMSchema.h in Headers */,
 				5D659EC81BE04556006515A0 /* RLMSchema_Private.h in Headers */,
 				CFDBC4B728803C7200EE80E6 /* RLMSectionedResults.h in Headers */,
@@ -2185,6 +2194,7 @@
 				5DD755C11BE056DE002800DA /* RLMRealmConfiguration_Private.h in Headers */,
 				5DD755C31BE056DE002800DA /* RLMResults.h in Headers */,
 				5DD755C41BE056DE002800DA /* RLMResults_Private.h in Headers */,
+				3F0BBB9829AFDA6600FEA7A7 /* RLMScheduler.h in Headers */,
 				5DD755C51BE056DE002800DA /* RLMSchema.h in Headers */,
 				5DD755C61BE056DE002800DA /* RLMSchema_Private.h in Headers */,
 				CFDBC4BA28803C8200EE80E6 /* RLMSectionedResults.h in Headers */,
@@ -2880,6 +2890,7 @@
 				5D659E951BE04556006515A0 /* RLMRealmConfiguration.mm in Sources */,
 				5D659E961BE04556006515A0 /* RLMRealmUtil.mm in Sources */,
 				5D659E971BE04556006515A0 /* RLMResults.mm in Sources */,
+				3F0BBB9929AFDA6600FEA7A7 /* RLMScheduler.mm in Sources */,
 				5D659E981BE04556006515A0 /* RLMSchema.mm in Sources */,
 				CFDBC4B628803C7200EE80E6 /* RLMSectionedResults.mm in Sources */,
 				CF986D2025AE3B090039D287 /* RLMSet.mm in Sources */,
@@ -3072,6 +3083,7 @@
 				5DD755931BE056DE002800DA /* RLMRealmConfiguration.mm in Sources */,
 				5DD755941BE056DE002800DA /* RLMRealmUtil.mm in Sources */,
 				5DD755951BE056DE002800DA /* RLMResults.mm in Sources */,
+				3F0BBB9A29AFDA6600FEA7A7 /* RLMScheduler.mm in Sources */,
 				5DD755961BE056DE002800DA /* RLMSchema.mm in Sources */,
 				CFDBC4B828803C7700EE80E6 /* RLMSectionedResults.mm in Sources */,
 				CF986D2125AE3B090039D287 /* RLMSet.mm in Sources */,

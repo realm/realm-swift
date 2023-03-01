@@ -21,8 +21,7 @@
 #import <memory>
 #import <string>
 
-@class RLMRealm, RLMRealmConfiguration;
-struct RLMConfinement;
+@class RLMRealm, RLMRealmConfiguration, RLMScheduler;
 
 namespace realm {
     class BindingContext;
@@ -30,7 +29,7 @@ namespace realm {
 
 // Add a Realm to the weak cache
 void RLMCacheRealm(RLMRealmConfiguration *configuration,
-                   const RLMConfinement *options,
+                   RLMScheduler *options,
                    RLMRealm *realm);
 RLMRealm *RLMGetAnyCachedRealmForPath(std::string const& path) NS_RETURNS_RETAINED;
 // Clear the weak cache of Realms

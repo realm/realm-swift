@@ -22,6 +22,7 @@
 #import "RLMObservation.hpp"
 #import "RLMRealmConfiguration_Private.hpp"
 #import "RLMRealm_Private.hpp"
+#import "RLMScheduler.h"
 #import "RLMUtil.hpp"
 
 #import <realm/object-store/binding_context.hpp>
@@ -36,32 +37,11 @@ static auto& s_realmCacheMutex = *new RLMUnfairMutex;
 static auto& s_realmsPerPath = *new std::map<std::string, NSMapTable *>();
 static auto& s_frozenRealms = *new std::map<std::string, NSMapTable *>();
 
-static void *cacheKeyForOptions(RLMConfinement const& options) {
-    if (auto queue = options.queue) {
-        if (queue != dispatch_get_main_queue()) {
-            return (__bridge void *)queue;
-        }
-    }
-    else if (id actor = options.actor) {
-        // check for main actor?
-        return (__bridge void *)actor;
-    }
-    else if (!pthread_main_np()) {
-        return pthread_self();
-    }
-
-    // The main thread and main queue share a cache key of `std::numeric_limits<uintptr_t>::max()`
-    // so that they give the same instance. Other Realms are keyed on either the thread or the queue.
-    // Note that despite being a void* the cache key is not actually a pointer;
-    // this is just an artifact of NSMapTable's strange API.
-    return reinterpret_cast<void *>(std::numeric_limits<uintptr_t>::max());
-}
-
 void RLMCacheRealm(__unsafe_unretained RLMRealmConfiguration *const configuration,
-                   const RLMConfinement *options,
+                   RLMScheduler *scheduler,
                    __unsafe_unretained RLMRealm *const realm) {
     auto& path = configuration.path;
-    auto key = cacheKeyForOptions(*options);
+    auto key = scheduler.cacheKey;
     std::lock_guard lock(s_realmCacheMutex);
     NSMapTable *realms = s_realmsPerPath[path];
     if (!realms) {
@@ -72,8 +52,8 @@ void RLMCacheRealm(__unsafe_unretained RLMRealmConfiguration *const configuratio
 }
 
 RLMRealm *RLMGetCachedRealm(__unsafe_unretained RLMRealmConfiguration *const configuration,
-                            const RLMConfinement *options) {
-    void *key = cacheKeyForOptions(*options);
+                            RLMScheduler *scheduler) {
+    auto key = scheduler.cacheKey;
     auto& path = configuration.path;
     std::lock_guard lock(s_realmCacheMutex);
     RLMRealm *realm = [s_realmsPerPath[path] objectForKey:(__bridge id)key];

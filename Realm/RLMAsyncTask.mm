@@ -20,6 +20,7 @@
 
 #import "RLMError_Private.hpp"
 #import "RLMRealmConfiguration_Private.hpp"
+#import "RLMScheduler.h"
 #import "RLMSyncSubscription_Private.h"
 #import "RLMUtil.hpp"
 
@@ -46,7 +47,7 @@ __attribute__((objc_direct_members))
     bool _cancel;
 
     RLMRealmConfiguration *_configuration;
-    RLMConfinement _confinement;
+    RLMScheduler *_scheduler;
     bool _waitForDownloadCompletion;
     RLMAsyncOpenRealmCallback _completion;
 
@@ -100,7 +101,7 @@ __attribute__((objc_direct_members))
 }
 
 - (instancetype)initWithConfiguration:(RLMRealmConfiguration *)configuration
-                           confinedTo:(const RLMConfinement *)confinement
+                           confinedTo:(RLMScheduler *)scheduler
                              download:(bool)waitForDownloadCompletion {
     if (!(self = [super init])) {
         return self;
@@ -109,21 +110,14 @@ __attribute__((objc_direct_members))
     // Copying the configuration here as the user could potentially modify
     // the config after calling async open
     _configuration = configuration.copy;
-    _confinement = *confinement;
+    _scheduler = scheduler;
     _waitForDownloadCompletion = waitForDownloadCompletion;
-
-    if (_confinement.queue && !_confinement.scheduler) {
-        auto queue = _confinement.queue;
-        _confinement.scheduler = ^(dispatch_block_t block) {
-            dispatch_async(queue, block);
-        };
-    }
 
     return self;
 }
 
 - (instancetype)initWithConfiguration:(RLMRealmConfiguration *)configuration
-                           confinedTo:(const RLMConfinement *)confinement
+                           confinedTo:(RLMScheduler *)confinement
                              download:(bool)waitForDownloadCompletion
                            completion:(RLMAsyncOpenRealmCallback)completion {
     self = [self initWithConfiguration:configuration confinedTo:confinement
@@ -201,9 +195,8 @@ __attribute__((objc_direct_members))
     @autoreleasepool {
         // Holding onto the Realm so that opening the final Realm on the target
         // scheduler can hit the fast path
-        RLMConfinement confinement = {};
         _backgroundRealm = [RLMRealm realmWithConfiguration:_configuration
-                                                 confinedTo:&confinement error:&error];
+                                                 confinedTo:RLMScheduler.currentRunLoop error:&error];
         if (error) {
             return [self reportError:error];
         }
@@ -234,17 +227,17 @@ __attribute__((objc_direct_members))
         return;
     }
 
-    _confinement.scheduler([=] {
+    [_scheduler invoke:^{
         @autoreleasepool {
             NSError *error;
             RLMRealm *localRealm = [RLMRealm realmWithConfiguration:_configuration
-                                                         confinedTo:&_confinement
+                                                         confinedTo:_scheduler
                                                               error:&error];
             auto completion = _completion;
             [self releaseResources];
             completion(localRealm, error);
         }
-    });
+    }];
 }
 
 - (bool)checkCancellation {
@@ -271,17 +264,17 @@ __attribute__((objc_direct_members))
 
 - (void)reportError:(NSError *)error {
     auto completion = _completion;
-    auto scheduler = _confinement.scheduler;
+    auto scheduler = _scheduler;
     [self releaseResources];
-    scheduler(^{
+    [scheduler invoke:^{
         completion(nil, error);
-    });
+    }];
 }
 
 - (void)releaseResources {
     _backgroundRealm = nil;
     _configuration = nil;
-    _confinement = {};
+    _scheduler = nil;
     _completion = nil;
 }
 @end
