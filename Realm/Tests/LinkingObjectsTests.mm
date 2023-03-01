@@ -84,7 +84,7 @@
     XCTAssertEqual(NSNotFound, [don.parents indexOfObjectWhere:@"TRUEPREDICATE"]);
 
     RLMAssertThrowsWithReason(([don.parents addNotificationBlock:^(RLMResults *, RLMCollectionChange *, NSError *) { }]),
-                              @"Linking objects notifications are only supported on managed objects.");
+                              @"Change notifications are only supported on managed collections.");
 }
 
 - (void)testLinkingObjectsOnFrozenObject {

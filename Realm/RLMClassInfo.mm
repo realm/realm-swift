@@ -111,6 +111,51 @@ bool RLMClassInfo::isDynamic() const noexcept {
     return !!dynamicObjectSchema;
 }
 
+static KeyPath keyPathFromString(RLMRealm *realm,
+                                 RLMSchema *schema,
+                                 const RLMClassInfo *info,
+                                 RLMObjectSchema *rlmObjectSchema,
+                                 NSString *keyPath) {
+    KeyPath keyPairs;
+
+    for (NSString *component in [keyPath componentsSeparatedByString:@"."]) {
+        RLMProperty *property = rlmObjectSchema[component];
+        if (!property) {
+            throw RLMException(@"Invalid property name: property '%@' not found in object of type '%@'",
+                               component, rlmObjectSchema.className);
+        }
+
+        TableKey tk = info->objectSchema->table_key;
+        ColKey ck;
+        if (property.type == RLMPropertyTypeObject) {
+            ck = info->tableColumn(property.name);
+            info = &realm->_info[property.objectClassName];
+            rlmObjectSchema = schema[property.objectClassName];
+        } else if (property.type == RLMPropertyTypeLinkingObjects) {
+            ck = info->computedTableColumn(property);
+            info = &realm->_info[property.objectClassName];
+            rlmObjectSchema = schema[property.objectClassName];
+        } else {
+            ck = info->tableColumn(property.name);
+        }
+
+        keyPairs.emplace_back(tk, ck);
+    }
+    return keyPairs;
+}
+
+std::optional<realm::KeyPathArray> RLMClassInfo::keyPathArrayFromStringArray(NSArray<NSString *> *keyPaths) const {
+    std::optional<KeyPathArray> keyPathArray;
+    if (keyPaths.count) {
+        keyPathArray.emplace();
+        for (NSString *keyPath in keyPaths) {
+            keyPathArray->push_back(keyPathFromString(realm, realm.schema, this,
+                                                      rlmObjectSchema, keyPath));
+        }
+    }
+    return keyPathArray;
+}
+
 RLMSchemaInfo::impl::iterator RLMSchemaInfo::begin() noexcept { return m_objects.begin(); }
 RLMSchemaInfo::impl::iterator RLMSchemaInfo::end() noexcept { return m_objects.end(); }
 RLMSchemaInfo::impl::const_iterator RLMSchemaInfo::begin() const noexcept { return m_objects.begin(); }
@@ -182,4 +227,3 @@ void RLMSchemaInfo::appendDynamicObjectSchema(std::unique_ptr<realm::ObjectSchem
                       std::forward_as_tuple(target_realm, objectSchema,
                                             std::move(schema)));
 }
-

@@ -293,7 +293,7 @@ static double average(NSArray *values) {
 }
 
 - (void)testNotifications {
-    %unman RLMAssertThrowsWithReason([$set addNotificationBlock:^(__unused id a, __unused id c, __unused id e) { }], ^n @"This method may only be called on RLMSet instances retrieved from an RLMRealm");
+    %unman RLMAssertThrowsWithReason([$set addNotificationBlock:^(__unused id a, __unused id c, __unused id e) { }], ^n @"Change notifications are only supported on managed collections.");
 }
 
 - (void)testSetSet {

@@ -44,7 +44,7 @@ class RLMObservationInfo;
 }
 @end
 
-@interface RLMManagedDictionary () <RLMFastEnumerable>
+@interface RLMManagedDictionary () <RLMCollectionPrivate>
 
 - (RLMManagedDictionary *)initWithBackingCollection:(realm::object_store::Dictionary)dictionary
                                          parentInfo:(RLMClassInfo *)parentInfo

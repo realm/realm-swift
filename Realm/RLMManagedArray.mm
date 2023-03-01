@@ -515,32 +515,9 @@ static void RLMInsertObject(RLMManagedArray *ar, id object, NSUInteger index) {
     return [self resolveInRealm:_realm.thaw];
 }
 
-// The compiler complains about the method's argument type not matching due to
-// it not having the generic type attached, but it doesn't seem to be possible
-// to actually include the generic type
-// http://www.openradar.me/radar?id=6135653276319744
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wmismatched-parameter-types"
-- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMArray *, RLMCollectionChange *, NSError *))block {
-    return RLMAddNotificationBlock(self, block, nil, nil);
-}
-- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMArray *, RLMCollectionChange *, NSError *))block queue:(dispatch_queue_t)queue {
-    return RLMAddNotificationBlock(self, block, nil, queue);
-}
-
-- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMArray *, RLMCollectionChange *, NSError *))block keyPaths:(NSArray<NSString *> *)keyPaths {
-    return RLMAddNotificationBlock(self, block, keyPaths,nil);
-}
-
-- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMArray *, RLMCollectionChange *, NSError *))block
-                                      keyPaths:(NSArray<NSString *> *)keyPaths
-                                         queue:(dispatch_queue_t)queue {
-    return RLMAddNotificationBlock(self, block, keyPaths, queue);
-}
-#pragma clang diagnostic pop
-
-realm::List& RLMGetBackingCollection(RLMManagedArray *self) {
-    return self->_backingList;
+- (realm::NotificationToken)addNotificationCallback:(id)block
+keyPaths:(std::optional<std::vector<std::vector<std::pair<realm::TableKey, realm::ColKey>>>>&&)keyPaths {
+    return _backingList.add_notification_callback(RLMWrapCollectionChangeCallback(block, self, false), std::move(keyPaths));
 }
 
 #pragma mark - Thread Confined Protocol Conformance

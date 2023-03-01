@@ -117,6 +117,32 @@
                                                                    arguments:args]];
 }
 
+// The compiler complains about the method's argument type not matching due to
+// it not having the generic type attached, but it doesn't seem to be possible
+// to actually include the generic type
+// http://www.openradar.me/radar?id=6135653276319744
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmismatched-parameter-types"
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMArray *, RLMCollectionChange *, NSError *))block {
+    return RLMAddNotificationBlock(self, block, nil, nil);
+}
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMArray *, RLMCollectionChange *, NSError *))block
+                                         queue:(dispatch_queue_t)queue {
+    return RLMAddNotificationBlock(self, block, nil, queue);
+}
+
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMArray *, RLMCollectionChange *, NSError *))block
+                                      keyPaths:(NSArray<NSString *> *)keyPaths {
+    return RLMAddNotificationBlock(self, block, keyPaths, nil);
+}
+
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMArray *, RLMCollectionChange *, NSError *))block
+                                      keyPaths:(NSArray<NSString *> *)keyPaths
+                                         queue:(dispatch_queue_t)queue {
+    return RLMAddNotificationBlock(self, block, keyPaths, queue);
+}
+#pragma clang diagnostic pop
+
 #pragma mark - Unmanaged RLMArray implementation
 
 - (RLMRealm *)realm {
@@ -540,30 +566,6 @@ static void validateArrayBounds(__unsafe_unretained RLMArray *const ar,
 
 - (RLMSectionedResults *)sectionedResultsUsingSortDescriptors:(NSArray<RLMSortDescriptor *> *)sortDescriptors
                                                      keyBlock:(RLMSectionedResultsKeyBlock)keyBlock {
-    @throw RLMException(@"This method may only be called on RLMArray instances retrieved from an RLMRealm");
-}
-
-// The compiler complains about the method's argument type not matching due to
-// it not having the generic type attached, but it doesn't seem to be possible
-// to actually include the generic type
-// http://www.openradar.me/radar?id=6135653276319744
-#pragma clang diagnostic ignored "-Wmismatched-parameter-types"
-- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMArray *, RLMCollectionChange *, NSError *))block {
-    return [self addNotificationBlock:block queue:nil];
-}
-- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMArray *, RLMCollectionChange *, NSError *))block
-                                         queue:(nullable dispatch_queue_t)queue {
-    @throw RLMException(@"This method may only be called on RLMArray instances retrieved from an RLMRealm");
-}
-
-- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMArray *, RLMCollectionChange *, NSError *))block
-                                      keyPaths:(NSArray<NSString *> *)keyPaths
-                                         queue:(nullable dispatch_queue_t)queue {
-    @throw RLMException(@"This method may only be called on RLMArray instances retrieved from an RLMRealm");
-}
-
-- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMArray *, RLMCollectionChange *, NSError *))block
-                                      keyPaths:(NSArray<NSString *> *)keyPaths {
     @throw RLMException(@"This method may only be called on RLMArray instances retrieved from an RLMRealm");
 }
 

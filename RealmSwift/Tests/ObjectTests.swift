@@ -864,8 +864,10 @@ class ObjectTests: TestCase {
         realm.beginWrite()
         let object = realm.create(SwiftObject.self)
         try! realm.commitWrite()
-        assertThrows(object.observe(keyPaths: ["notAProperty"], { _ in }), reason: "Property 'notAProperty' not found in object of type 'SwiftObject'")
-        assertThrows(object.observe(keyPaths: ["arrayCol.alsoNotAProperty"], { _ in }), reason: "Property 'alsoNotAProperty' not found in object of type 'SwiftBoolObject'")
+        assertThrows(object.observe(keyPaths: ["notAProperty"], { _ in }),
+                     reason: "property 'notAProperty' not found in object of type 'SwiftObject'")
+        assertThrows(object.observe(keyPaths: ["arrayCol.alsoNotAProperty"], { _ in }),
+                     reason: "property 'alsoNotAProperty' not found in object of type 'SwiftBoolObject'")
     }
 
     func checkChange<T: Equatable, U: Equatable>(_ name: String, _ old: T?, _ new: U?, _ change: ObjectChange<ObjectBase>) {

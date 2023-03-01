@@ -18,17 +18,20 @@
 
 #import <Realm/RLMCollection.h>
 
-#import <Realm/RLMRealm.h>
-
-@protocol RLMFastEnumerable;
+@protocol RLMCollectionPrivate;
 
 RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
 NSUInteger RLMUnmanagedFastEnumerate(id collection, NSFastEnumerationState *);
-void RLMCollectionSetValueForKey(id<RLMFastEnumerable> collection, NSString *key, id _Nullable value);
+void RLMCollectionSetValueForKey(id<RLMCollectionPrivate> collection, NSString *key, id _Nullable value);
 FOUNDATION_EXTERN NSString *RLMDescriptionWithMaxDepth(NSString *name, id<RLMCollection> collection, NSUInteger depth);
 FOUNDATION_EXTERN void RLMAssignToCollection(id<RLMCollection> collection, id value);
 FOUNDATION_EXTERN void RLMSetSwiftBridgeCallback(id _Nullable (*_Nonnull)(id));
+
+FOUNDATION_EXTERN
+RLMNotificationToken *RLMAddNotificationBlock(id collection, id block,
+                                              NSArray<NSString *> *_Nullable keyPaths,
+                                              dispatch_queue_t _Nullable queue);
 
 typedef RLM_CLOSED_ENUM(int32_t, RLMCollectionType) {
     RLMCollectionTypeArray = 0,
