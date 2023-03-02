@@ -18,7 +18,9 @@
 
 #import "RLMRealm_Private.hpp"
 
+#if DEBUG
 #import "RLMAnalytics.hpp"
+#endif
 #import "RLMAsyncTask_Private.h"
 #import "RLMArray_Private.hpp"
 #import "RLMDictionary_Private.hpp"
@@ -239,18 +241,21 @@ bool copySeedFile(RLMRealmConfiguration *configuration, NSError **error) {
 }
 
 + (void)initialize {
+    // In cases where we are not using a synced Realm, we initialise the default logger
+    // before opening any realm.
+    [RLMLogger class];
+}
+
++ (void)runFirstCheckForConfiguration:(RLMRealmConfiguration *)configuration schema:(RLMSchema *)schema {
     static bool initialized;
     if (initialized) {
         return;
     }
     initialized = true;
 
+    // Run Analytics on the very first any Realm open.
+    RLMSendAnalytics(configuration, schema);
     RLMCheckForUpdates();
-    RLMSendAnalytics();
-
-    // In cases where we are not using a synced Realm, we initialise the default logger
-    // before opening any realm.
-    [RLMLogger class];
 }
 
 - (instancetype)initPrivate {
@@ -476,6 +481,9 @@ bool copySeedFile(RLMRealmConfiguration *configuration, NSError **error) {
         }];
     }
 #endif
+
+    // Run Analytics and Update checker, this will be run only the first any realm open
+    [self runFirstCheckForConfiguration:configuration schema:realm.schema];
 
     return realm;
 }

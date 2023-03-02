@@ -227,10 +227,6 @@ void RLMSetConfigInfoForClientResetCallbacks(realm::SyncConfig& syncConfig, RLMR
     _config->cancel_waits_on_nonfatal_error = cancelAsyncOpenOnNonFatalErrors;
 }
 
-- (BOOL)enableFlexibleSync {
-    return _config->flx_sync_requested;
-}
-
 - (void)assignConfigErrorHandler:(RLMUser *)user {
     RLMSyncManager *manager = [user.app syncManager];
     __weak RLMSyncManager *weakManager = manager;
