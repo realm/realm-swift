@@ -997,7 +997,7 @@ public class RealmServer: NSObject {
             "sync": ["disable_client_error_backoff": true]
         ], failOnError)
 
-        guard case .success = group.wait(timeout: .now() + 5.0) else {
+        guard case .success = group.wait(timeout: .now() + 15.0) else {
             throw URLError(.timedOut)
         }
 
