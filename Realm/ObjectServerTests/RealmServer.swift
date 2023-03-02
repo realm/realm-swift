@@ -531,7 +531,7 @@ public class RealmServer: NSObject {
                 self.session = try Admin().login()
                 try makeUserAdmin()
             } catch {
-                XCTFail("Could not initiate admin session: \(error.localizedDescription)")
+                fatalError("Could not initiate admin session: \(error.localizedDescription)")
             }
         }
     }

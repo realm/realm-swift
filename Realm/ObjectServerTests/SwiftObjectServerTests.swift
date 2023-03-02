@@ -1259,38 +1259,45 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         token!.invalidate()
     }
 
+    @MainActor
     func testStreamingUploadNotifier() throws {
         let user = try logInUser(for: basicCredentials())
 
         let realm = try immediatelyOpenRealm(partitionValue: #function, user: user)
         let session = try XCTUnwrap(realm.syncSession)
 
-        @Locked var ex = expectation(description: "initial upload")
-        @Locked var progress: SyncSession.Progress?
-        let token = session.addProgressNotification(for: .download, mode: .reportIndefinitely) { p in
-            if let progress = $progress.wrappedValue {
-                XCTAssertGreaterThanOrEqual(p.transferredBytes, progress.transferredBytes)
-                XCTAssertGreaterThanOrEqual(p.transferrableBytes, progress.transferrableBytes)
-                if p.transferredBytes == progress.transferredBytes && p.transferrableBytes == progress.transferrableBytes {
-                    return
+        var ex = expectation(description: "initial upload")
+        var progress: SyncSession.Progress?
+
+        let token = session.addProgressNotification(for: .upload, mode: .reportIndefinitely) { p in
+            DispatchQueue.main.async { @MainActor in
+                if let progress = progress {
+                    XCTAssertGreaterThanOrEqual(p.transferredBytes, progress.transferredBytes)
+                    XCTAssertGreaterThanOrEqual(p.transferrableBytes, progress.transferrableBytes)
+                    // The sync client sometimes sends spurious notifications
+                    // where nothing has changed, and we should just ignore those
+                    if p.transferredBytes == progress.transferredBytes && p.transferrableBytes == progress.transferrableBytes {
+                        return
+                    }
                 }
-            }
-            $progress.wrappedValue = p
-            if p.transferredBytes > 0 && p.isTransferComplete {
-                $ex.wrappedValue.fulfill()
+                progress = p
+                if p.transferredBytes > 100 && p.isTransferComplete {
+                    ex.fulfill()
+                }
             }
         }
         XCTAssertNotNil(token)
         waitForExpectations(timeout: 10.0, handler: nil)
 
-        progress = nil
-        ex = expectation(description: "write transaction upload")
-        try realm.write {
-            for _ in 0..<SwiftSyncTestCase.bigObjectCount {
-                realm.add(SwiftHugeSyncObject.create())
+        for i in 0..<5 {
+            ex = expectation(description: "write transaction upload \(i)")
+            try realm.write {
+                for _ in 0..<SwiftSyncTestCase.bigObjectCount {
+                    realm.add(SwiftHugeSyncObject.create())
+                }
             }
+            waitForExpectations(timeout: 10.0, handler: nil)
         }
-        waitForExpectations(timeout: 10.0, handler: nil)
         token!.invalidate()
 
         let p = try XCTUnwrap(progress)
