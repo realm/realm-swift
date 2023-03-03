@@ -27,7 +27,6 @@
 #import "RLMSyncUtil_Private.hpp"
 
 #import <realm/object-store/sync/app.hpp>
-#import <realm/object-store/sync/async_open_task.hpp>
 #import <realm/object-store/sync/sync_session.hpp>
 
 using namespace realm;
@@ -255,61 +254,4 @@ static util::UniqueFunction<void(Status)> wrapCompletion(dispatch_queue_t queue,
     return nil;
 }
 
-@end
-
-@implementation RLMAsyncOpenTask {
-    bool _cancel;
-    NSMutableArray<RLMProgressNotificationBlock> *_blocks;
-}
-
-- (void)addProgressNotificationOnQueue:(dispatch_queue_t)queue block:(RLMProgressNotificationBlock)block {
-    auto wrappedBlock = ^(NSUInteger transferred_bytes, NSUInteger transferrable_bytes) {
-        dispatch_async(queue, ^{
-            @autoreleasepool {
-                block(transferred_bytes, transferrable_bytes);
-            }
-        });
-    };
-
-    @synchronized (self) {
-        if (_task) {
-            _task->register_download_progress_notifier(wrappedBlock);
-        }
-        else if (!_cancel) {
-            if (!_blocks) {
-                _blocks = [NSMutableArray new];
-            }
-            [_blocks addObject:wrappedBlock];
-        }
-    }
-}
-
-- (void)addProgressNotificationBlock:(RLMProgressNotificationBlock)block {
-    [self addProgressNotificationOnQueue:dispatch_get_main_queue() block:block];
-}
-
-- (void)cancel {
-    @synchronized (self) {
-        if (_task) {
-            _task->cancel();
-        }
-        else {
-            _cancel = true;
-            _blocks = nil;
-        }
-    }
-}
-
-- (void)setTask:(std::shared_ptr<realm::AsyncOpenTask>)task {
-    @synchronized (self) {
-        _task = task;
-        if (_cancel) {
-            _task->cancel();
-        }
-        for (RLMProgressNotificationBlock block in _blocks) {
-            _task->register_download_progress_notifier(block);
-        }
-        _blocks = nil;
-    }
-}
 @end

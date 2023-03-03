@@ -24,6 +24,7 @@ Pod::Spec.new do |s|
                               # Realm module
                               'include/RLMArray.h',
                               'include/RLMAsymmetricObject.h',
+                              'include/RLMAsyncTask.h',
                               'include/RLMCollection.h',
                               'include/RLMConstants.h',
                               'include/RLMDecimal128.h',
@@ -84,6 +85,7 @@ Pod::Spec.new do |s|
   private_header_files      = 'include/RLMAccessor.h',
                               'include/RLMApp_Private.h',
                               'include/RLMArray_Private.h',
+                              'include/RLMAsyncTask_Private.h',
                               'include/RLMBSON_Private.h',
                               'include/RLMCollection_Private.h',
                               'include/RLMDictionary_Private.h',
@@ -100,6 +102,7 @@ Pod::Spec.new do |s|
                               'include/RLMRealmConfiguration_Private.h',
                               'include/RLMRealm_Private.h',
                               'include/RLMResults_Private.h',
+                              'include/RLMScheduler.h',
                               'include/RLMSchema_Private.h',
                               'include/RLMSet_Private.h',
                               'include/RLMSwiftProperty.h',
@@ -107,7 +110,6 @@ Pod::Spec.new do |s|
                               'include/RLMSyncSubscription_Private.h',
                               'include/RLMUpdateResult_Private.h',
                               'include/RLMUser_Private.h',
-
 
   s.frameworks              = 'Security'
   s.module_map              = 'Realm/Realm.modulemap'

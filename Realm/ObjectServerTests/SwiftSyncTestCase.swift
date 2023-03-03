@@ -181,16 +181,19 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
 
     public static let bigObjectCount = 2
     public func populateRealm<T: BSON>(user: User? = nil, partitionValue: T) throws {
-        let user = try (user ?? logInUser(for: basicCredentials()))
-        let config = user.configuration(testName: partitionValue)
+        try autoreleasepool {
+            let user = try (user ?? logInUser(for: basicCredentials()))
+            let config = user.configuration(testName: partitionValue)
 
-        let realm = try openRealm(configuration: config)
-        try realm.write {
-            for _ in 0..<SwiftSyncTestCase.bigObjectCount {
-                realm.add(SwiftHugeSyncObject.create())
+            let realm = try openRealm(configuration: config)
+            try realm.write {
+                for _ in 0..<SwiftSyncTestCase.bigObjectCount {
+                    realm.add(SwiftHugeSyncObject.create())
+                }
             }
+            waitForUploads(for: realm)
+            realm.syncSession?.suspend()
         }
-        waitForUploads(for: realm)
     }
 
     // MARK: - Flexible Sync Use Cases

@@ -18,29 +18,31 @@
 
 #import "RLMRealmUtil.hpp"
 
-#import "RLMObjectSchema_Private.hpp"
+#import "RLMAsyncTask_Private.h"
 #import "RLMObservation.hpp"
+#import "RLMRealmConfiguration_Private.hpp"
 #import "RLMRealm_Private.hpp"
+#import "RLMScheduler.h"
 #import "RLMUtil.hpp"
 
-#import <Realm/RLMConstants.h>
-#import <Realm/RLMSchema.h>
-
-#import <realm/obj.hpp>
 #import <realm/object-store/binding_context.hpp>
+#import <realm/object-store/impl/realm_coordinator.hpp>
 #import <realm/object-store/shared_realm.hpp>
 #import <realm/object-store/util/scheduler.hpp>
 
 #import <map>
-#import <mutex>
 
 // Global realm state
-static auto& s_realmCacheMutex = *new std::mutex();
+static auto& s_realmCacheMutex = *new RLMUnfairMutex;
 static auto& s_realmsPerPath = *new std::map<std::string, NSMapTable *>();
 static auto& s_frozenRealms = *new std::map<std::string, NSMapTable *>();
 
-void RLMCacheRealm(std::string const& path, void *key, __unsafe_unretained RLMRealm *const realm) {
-    std::lock_guard<std::mutex> lock(s_realmCacheMutex);
+void RLMCacheRealm(__unsafe_unretained RLMRealmConfiguration *const configuration,
+                   RLMScheduler *scheduler,
+                   __unsafe_unretained RLMRealm *const realm) {
+    auto& path = configuration.path;
+    auto key = scheduler.cacheKey;
+    std::lock_guard lock(s_realmCacheMutex);
     NSMapTable *realms = s_realmsPerPath[path];
     if (!realms) {
         s_realmsPerPath[path] = realms = [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsOpaquePersonality|NSPointerFunctionsOpaqueMemory
@@ -49,13 +51,11 @@ void RLMCacheRealm(std::string const& path, void *key, __unsafe_unretained RLMRe
     [realms setObject:realm forKey:(__bridge id)key];
 }
 
-RLMRealm *RLMGetAnyCachedRealmForPath(std::string const& path) {
-    std::lock_guard<std::mutex> lock(s_realmCacheMutex);
-    return [s_realmsPerPath[path] objectEnumerator].nextObject;
-}
-
-RLMRealm *RLMGetThreadLocalCachedRealmForPath(std::string const& path, void *key) {
-    std::lock_guard<std::mutex> lock(s_realmCacheMutex);
+RLMRealm *RLMGetCachedRealm(__unsafe_unretained RLMRealmConfiguration *const configuration,
+                            RLMScheduler *scheduler) {
+    auto key = scheduler.cacheKey;
+    auto& path = configuration.path;
+    std::lock_guard lock(s_realmCacheMutex);
     RLMRealm *realm = [s_realmsPerPath[path] objectForKey:(__bridge id)key];
     if (realm && !realm->_realm->scheduler()->is_on_thread()) {
         // We can get here in two cases: if the user is trying to open a
@@ -69,14 +69,23 @@ RLMRealm *RLMGetThreadLocalCachedRealmForPath(std::string const& path, void *key
     return realm;
 }
 
+RLMRealm *RLMGetAnyCachedRealm(__unsafe_unretained RLMRealmConfiguration *const configuration) {
+    return RLMGetAnyCachedRealmForPath(configuration.path);
+}
+
+RLMRealm *RLMGetAnyCachedRealmForPath(std::string const& path) {
+    std::lock_guard lock(s_realmCacheMutex);
+    return [s_realmsPerPath[path] objectEnumerator].nextObject;
+}
+
 void RLMClearRealmCache() {
-    std::lock_guard<std::mutex> lock(s_realmCacheMutex);
+    std::lock_guard lock(s_realmCacheMutex);
     s_realmsPerPath.clear();
     s_frozenRealms.clear();
 }
 
 RLMRealm *RLMGetFrozenRealmForSourceRealm(__unsafe_unretained RLMRealm *const sourceRealm) {
-    std::lock_guard<std::mutex> lock(s_realmCacheMutex);
+    std::lock_guard lock(s_realmCacheMutex);
     auto& r = *sourceRealm->_realm;
     auto& path = r.config().path;
     NSMapTable *realms = s_realmsPerPath[path];

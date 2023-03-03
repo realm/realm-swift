@@ -20,14 +20,15 @@
 #import <Realm/RLMSwiftValueStorage.h>
 #import <Realm/RLMValue.h>
 
-#import <objc/runtime.h>
-
 #import <realm/array.hpp>
 #import <realm/binary_data.hpp>
 #import <realm/object-store/object.hpp>
 #import <realm/string_data.hpp>
 #import <realm/timestamp.hpp>
 #import <realm/util/file.hpp>
+
+#import <objc/runtime.h>
+#import <os/lock.h>
 
 namespace realm {
 class Decimal128;
@@ -285,3 +286,33 @@ static inline bool numberIsDouble(__unsafe_unretained NSNumber *const obj) {
            data_type == *@encode(unsigned long) ||
            data_type == *@encode(unsigned long long);
 }
+
+// The actual condition here is iOS >= 10.0 (or equivalent), but doing runtime
+// checking eliminates a lot of the benefit of using os_unfair_lock (better perf
+// and less storage required), so only use os_unfair_lock when our minimum
+// deployment target is high enough
+#if __clang_major__ >= 14
+class RLMUnfairMutex {
+public:
+    RLMUnfairMutex() = default;
+
+    void lock() noexcept {
+        os_unfair_lock_lock(&_lock);
+    }
+
+    bool try_lock() noexcept {
+        return os_unfair_lock_trylock(&_lock);
+    }
+
+    void unlock() noexcept {
+        os_unfair_lock_unlock(&_lock);
+    }
+
+private:
+    os_unfair_lock _lock = OS_UNFAIR_LOCK_INIT;
+    RLMUnfairMutex(RLMUnfairMutex const&) = delete;
+    RLMUnfairMutex& operator=(RLMUnfairMutex const&) = delete;
+};
+#else
+using RLMUnfairMutex = std::mutex;
+#endif

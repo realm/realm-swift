@@ -531,7 +531,7 @@ public class RealmServer: NSObject {
                 self.session = try Admin().login()
                 try makeUserAdmin()
             } catch {
-                XCTFail("Could not initiate admin session: \(error.localizedDescription)")
+                fatalError("Could not initiate admin session: \(error.localizedDescription)")
             }
         }
     }
@@ -992,7 +992,12 @@ public class RealmServer: NSObject {
             "version": 1
         ], failOnError)
 
-        guard case .success = group.wait(timeout: .now() + 5.0) else {
+        // Disable exponential backoff when the server isn't ready for us to connect
+        session.privateApps[appId].settings.patch(on: group, [
+            "sync": ["disable_client_error_backoff": true]
+        ], failOnError)
+
+        guard case .success = group.wait(timeout: .now() + 15.0) else {
             throw URLError(.timedOut)
         }
 

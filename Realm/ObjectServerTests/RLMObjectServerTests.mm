@@ -1575,15 +1575,21 @@ static NSString *randomEmail() {
 static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 
 - (void)populateDataForUser:(RLMUser *)user partitionValue:(NSString *)partitionValue {
-    RLMRealm *realm = [self openRealmForPartitionValue:partitionValue user:user];
-    CHECK_COUNT(0, HugeSyncObject, realm);
-    [realm beginWriteTransaction];
-    for (NSInteger i=0; i<NUMBER_OF_BIG_OBJECTS; i++) {
-        [realm addObject:[HugeSyncObject hugeSyncObject]];
+    NSURL *realmURL;
+    @autoreleasepool {
+        RLMRealm *realm = [self openRealmForPartitionValue:partitionValue user:user];
+        realmURL = realm.configuration.fileURL;
+        CHECK_COUNT(0, HugeSyncObject, realm);
+        [realm beginWriteTransaction];
+        for (NSInteger i=0; i<NUMBER_OF_BIG_OBJECTS; i++) {
+            [realm addObject:[HugeSyncObject hugeSyncObject]];
+        }
+        [realm commitWriteTransaction];
+        [self waitForUploadsForRealm:realm];
+        CHECK_COUNT(NUMBER_OF_BIG_OBJECTS, HugeSyncObject, realm);
     }
-    [realm commitWriteTransaction];
-    [self waitForUploadsForRealm:realm];
-    CHECK_COUNT(NUMBER_OF_BIG_OBJECTS, HugeSyncObject, realm);
+    [user.app.syncManager waitForSessionTermination];
+    [self deleteRealmFileAtURL:realmURL];
 }
 
 - (void)testStreamingDownloadNotifier {
@@ -1676,14 +1682,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 - (void)testDownloadRealm {
     const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     RLMUser *user = [self userForTest:_cmd];
-
-    if (!self.isParent) {
-        [self populateDataForUser:user partitionValue:NSStringFromSelector(_cmd)];
-        return;
-    }
-
-    // Wait for the child process to upload everything.
-    RLMRunChildAndWait();
+    [self populateDataForUser:user partitionValue:NSStringFromSelector(_cmd)];
 
     XCTestExpectation *ex = [self expectationWithDescription:@"download-realm"];
     RLMRealmConfiguration *c = [user configurationWithTestSelector:_cmd];
@@ -1771,47 +1770,42 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 
 - (void)testCancelDownload {
     RLMUser *user = [self userForTest:_cmd];
-
-    if (!self.isParent) {
-        [self populateDataForUser:user partitionValue:NSStringFromSelector(_cmd)];
-        return;
-    }
-
-    // Wait for the child process to upload everything.
-    RLMRunChildAndWait();
+    [self populateDataForUser:user partitionValue:NSStringFromSelector(_cmd)];
 
     // Use a serial queue for asyncOpen to ensure that the first one adds
     // the completion block before the second one cancels it
-    RLMSetAsyncOpenQueue(dispatch_queue_create("io.realm.asyncOpen", 0));
+    auto queue = dispatch_queue_create("io.realm.asyncOpen", 0);
+    RLMSetAsyncOpenQueue(queue);
 
     XCTestExpectation *ex = [self expectationWithDescription:@"download-realm"];
+    ex.expectedFulfillmentCount = 2;
     RLMRealmConfiguration *c = [user configurationWithTestSelector:_cmd];
     [RLMRealm asyncOpenWithConfiguration:c
                            callbackQueue:dispatch_get_main_queue()
                                 callback:^(RLMRealm *realm, NSError *error) {
         XCTAssertNil(realm);
-        RLMValidateError(error, NSPOSIXErrorDomain, ECANCELED, @"Sync session became inactive");
+        RLMValidateError(error, NSPOSIXErrorDomain, ECANCELED, @"Operation canceled");
         [ex fulfill];
     }];
-    [[RLMRealm asyncOpenWithConfiguration:c
+    auto task = [RLMRealm asyncOpenWithConfiguration:c
                             callbackQueue:dispatch_get_main_queue()
-                                 callback:^(RLMRealm *, NSError *) {
-        XCTFail(@"Cancelled callback got called");
-    }] cancel];
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+                                 callback:^(RLMRealm *realm, NSError *error) {
+        XCTAssertNil(realm);
+        RLMValidateError(error, NSPOSIXErrorDomain, ECANCELED, @"Operation canceled");
+        [ex fulfill];
+    }];
+
+    // The cancel needs to be scheduled after we've actually started the task,
+    // which is itself async
+    dispatch_sync(queue, ^{ [task cancel]; });
+    [self waitForExpectationsWithTimeout:20.0 handler:nil];
 }
 
 - (void)testAsyncOpenProgressNotifications {
     RLMCredentials *credentials = [self basicCredentialsWithName:NSStringFromSelector(_cmd)
                                                         register:self.isParent];
     RLMUser *user = [self logInUserForCredentials:credentials];
-
-    if (!self.isParent) {
-        [self populateDataForUser:user partitionValue:NSStringFromSelector(_cmd)];
-        return;
-    }
-
-    RLMRunChildAndWait();
+    [self populateDataForUser:user partitionValue:NSStringFromSelector(_cmd)];
 
     XCTestExpectation *ex1 = [self expectationWithDescription:@"async open"];
     XCTestExpectation *ex2 = [self expectationWithDescription:@"download progress complete"];

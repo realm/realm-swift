@@ -338,22 +338,19 @@ class SwiftUIServerTests: SwiftSyncTestCase {
 
     // In case of no internet connection AutoOpen should return an opened Realm, offline-first approach
     func testAutoOpenOpenRealmWithoutInternetConnection() throws {
+        try autoreleasepool {
+            let user = try logInUser(for: basicCredentials(app: self.app), app: self.app)
+            try populateRealm(user: user, partitionValue: #function)
+        }
+        resetAppCache()
+
         let proxy = TimeoutProxyServer(port: 5678, targetPort: 9090)
         try proxy.start()
-        let appId = try RealmServer.shared.createApp()
         let appConfig = AppConfiguration(baseURL: "http://localhost:5678",
                                          transport: AsyncOpenConnectionTimeoutTransport(),
                                          localAppName: nil,
                                          localAppVersion: nil)
-
-        try autoreleasepool {
-            let app = App(id: appId, configuration: appConfig)
-            let user = try logInUser(for: basicCredentials(app: app), app: app)
-            try populateRealm(user: user, partitionValue: #function)
-        }
-        App.resetAppCache()
-
-        let app = App(id: appId, configuration: appConfig)
+        let app = App(id: appId, configuration: appConfig, rootDirectory: nil)
         let user = try logInUser(for: basicCredentials(app: app), app: app)
         proxy.dropConnections = true
         let ex = expectation(description: "download-realm-auto-open-no-connection")
@@ -364,19 +361,13 @@ class SwiftUIServerTests: SwiftSyncTestCase {
             }
         }
 
+        // Clear cache to avoid leaking our app which connects to the proxy
+        App.resetAppCache()
         proxy.stop()
     }
 
     // In case of no internet connection AutoOpen should return an opened Realm, offline-first approach
     func testAutoOpenOpenForFlexibleSyncConfigWithoutInternetConnection() throws {
-        let proxy = TimeoutProxyServer(port: 5678, targetPort: 9090)
-        try proxy.start()
-
-        let appConfig = AppConfiguration(baseURL: "http://localhost:5678",
-                                         transport: AsyncOpenConnectionTimeoutTransport(),
-                                         localAppName: nil,
-                                         localAppVersion: nil)
-
         try autoreleasepool {
             try populateFlexibleSyncData { realm in
                 for i in 1...10 {
@@ -388,8 +379,14 @@ class SwiftUIServerTests: SwiftSyncTestCase {
                 }
             }
         }
-        App.resetAppCache()
+        resetAppCache()
 
+        let proxy = TimeoutProxyServer(port: 5678, targetPort: 9090)
+        try proxy.start()
+        let appConfig = AppConfiguration(baseURL: "http://localhost:5678",
+                                         transport: AsyncOpenConnectionTimeoutTransport(),
+                                         localAppName: nil,
+                                         localAppVersion: nil)
         let app = App(id: flexibleSyncAppId, configuration: appConfig)
 
         let user = try logInUser(for: basicCredentials(app: app), app: app)
@@ -413,6 +410,7 @@ class SwiftUIServerTests: SwiftSyncTestCase {
         waitForExpectations(timeout: 10.0)
         autoOpen.cancel()
 
+        App.resetAppCache()
         proxy.stop()
     }
 

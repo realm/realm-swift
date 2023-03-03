@@ -314,6 +314,19 @@ static std::mutex& s_appMutex = *new std::mutex();
     return app;
 }
 
++ (instancetype)uncachedAppWithId:(NSString *)appId
+                    configuration:(RLMAppConfiguration *)configuration
+                    rootDirectory:(NSURL *)rootDirectory {
+    REALM_ASSERT(appId.length);
+
+    [configuration setAppId:appId];
+    auto app = RLMTranslateError([&] {
+        return app::App::get_uncached_app(configuration.config,
+                                          [RLMSyncManager configurationWithRootDirectory:rootDirectory appId:appId]);
+    });
+    return [[RLMApp alloc] initWithApp:app];
+}
+
 + (instancetype)appWithId:(NSString *)appId configuration:(RLMAppConfiguration *)configuration {
     return [self appWithId:appId configuration:configuration rootDirectory:nil];
 }

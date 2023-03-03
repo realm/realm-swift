@@ -99,10 +99,12 @@ public class TimeoutProxyServer: NSObject, @unchecked Sendable {
 private func copyData(from: NWConnection, to: NWConnection) {
     from.receive(minimumIncompleteLength: 1, maximumLength: 8192) { (data, context, isComplete, error) in
         if let error = error {
-            if case .posix(.ECANCELED) = error {
+            switch error {
+            case .posix(.ECANCELED), .posix(.ECONNRESET):
                 return
+            default:
+                fatalError("\(error)")
             }
-            fatalError("\(error)")
         }
 
         guard let data = data else {

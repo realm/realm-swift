@@ -45,6 +45,10 @@ typedef void(^RLMAppNotificationBlock)(RLMApp *);
             configuration:(nullable RLMAppConfiguration *)configuration
             rootDirectory:(nullable NSURL *)rootDirectory;
 
++ (instancetype)uncachedAppWithId:(NSString *)appId
+                    configuration:(RLMAppConfiguration *)configuration
+                    rootDirectory:(nullable NSURL *)rootDirectory;
+
 + (void)resetAppCache;
 @end
 

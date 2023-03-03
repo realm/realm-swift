@@ -457,7 +457,7 @@ typedef void (^RLMNotificationBlock)(RLMNotification notification, RLMRealm *rea
 
  KVO observers on any objects which were modified during the transaction will
  be notified about the change back to their initial values, but no other
- notifcations are produced by a cancelled write transaction.
+ notifications are produced by a cancelled write transaction.
 
  @warning This method may only be called during a write transaction.
  */
@@ -578,7 +578,7 @@ typedef void (^RLMNotificationBlock)(RLMNotification notification, RLMRealm *rea
          to cancel the pending invocation of the block. Note that this does
          *not* cancel the commit itself.
 */
-- (RLMAsyncTransactionId)commitAsyncWriteTransaction:(nullable void(^)(NSError *))completionBlock
+- (RLMAsyncTransactionId)commitAsyncWriteTransaction:(nullable void(^)(NSError *_Nullable))completionBlock
                                        allowGrouping:(BOOL)allowGrouping;
 
 /**
@@ -597,7 +597,7 @@ typedef void (^RLMNotificationBlock)(RLMNotification notification, RLMRealm *rea
          to cancel the pending invocation of the block. Note that this does
          *not* cancel the commit itself.
 */
-- (RLMAsyncTransactionId)commitAsyncWriteTransaction:(void(^)(NSError *))completionBlock;
+- (RLMAsyncTransactionId)commitAsyncWriteTransaction:(void(^)(NSError *_Nullable))completionBlock;
 
 /**
  Asynchronously commits a write transaction.

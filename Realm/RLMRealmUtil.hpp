@@ -16,24 +16,25 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+#import <Realm/RLMConstants.h>
+
 #import <memory>
 #import <string>
 
-@class RLMRealm;
+@class RLMRealm, RLMRealmConfiguration, RLMScheduler;
 
 namespace realm {
     class BindingContext;
 }
 
 // Add a Realm to the weak cache
-void RLMCacheRealm(std::string const& path, void *key, RLMRealm *realm);
-// Get a Realm for the given path which can be used on the current thread
-RLMRealm *RLMGetThreadLocalCachedRealmForPath(std::string const& path, void *key);
-// Get a Realm for the given path
-RLMRealm *RLMGetAnyCachedRealmForPath(std::string const& path);
+void RLMCacheRealm(RLMRealmConfiguration *configuration,
+                   RLMScheduler *options,
+                   RLMRealm *realm);
+RLMRealm *RLMGetAnyCachedRealmForPath(std::string const& path) NS_RETURNS_RETAINED;
 // Clear the weak cache of Realms
 void RLMClearRealmCache();
 
-RLMRealm *RLMGetFrozenRealmForSourceRealm(RLMRealm *realm);
+RLMRealm *RLMGetFrozenRealmForSourceRealm(RLMRealm *realm) NS_RETURNS_RETAINED;
 
 std::unique_ptr<realm::BindingContext> RLMCreateBindingContext(RLMRealm *realm);
