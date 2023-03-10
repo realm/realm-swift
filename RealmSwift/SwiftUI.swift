@@ -1549,7 +1549,8 @@ private class ObservableAsyncOpenStorage: ObservableObject {
         // Cancel any current subscriptions to asyncOpen if there is one
         cancelAsyncOpen()
         Realm.asyncOpen(configuration: config)
-            .onProgressNotification { asyncProgress in
+            .onProgressNotification { [weak self] asyncProgress in
+                guard let self = self else { return }
                 // Do not change state to progress if the realm file is already opened or there is an error
                 switch self.asyncOpenState {
                 case .connecting, .waitingForUser, .progress:
@@ -1559,7 +1560,8 @@ private class ObservableAsyncOpenStorage: ObservableObject {
                 default: break
                 }
             }
-            .sink { completion in
+            .sink { [weak self] completion in
+                guard let self = self else { return }
                 if case .failure(let error) = completion {
                     switch self.asyncOpenKind {
                     case .asyncOpen:
@@ -1572,8 +1574,8 @@ private class ObservableAsyncOpenStorage: ObservableObject {
                         }
                     }
                 }
-            } receiveValue: { realm in
-                self.asyncOpenState = .open(realm)
+            } receiveValue: { [weak self] realm in
+                self?.asyncOpenState = .open(realm)
             }.store(in: &self.asyncOpenCancellable)
     }
 
