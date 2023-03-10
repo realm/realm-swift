@@ -1,6 +1,8 @@
-10.36.0 Release notes (2023-03-09)
+10.37.0 Release notes (2023-03-09)
 =============================================================
+
 ### Enhancements
+
 * `MongoCollection.watch().subscribe(on:)` now supports any swift Scheduler
   rather than only dispatch queues ([PR #8131](https://github.com/realm/realm-swift/pull/8130)).
 * Add an async sequence wrapper for `MongoCollection.watch()`, allowing you to
@@ -30,6 +32,7 @@
   them ([PR #8148](https://github.com/realm/realm-swift/pull/8148)).
 
 ### Fixed
+
 * `UserPublisher` incorrectly bounced all notifications to the main thread instead
   of setting up the Combine publisher to correctly receive on the main thread.
   ([#8132](https://github.com/realm/realm-swift/issues/8132), since 10.21.0)
@@ -53,6 +56,7 @@
   ([Core #6350](https://github.com/realm/realm-core/issues/6350), since 10.22.0).
 
 ### Compatibility
+
 * Realm Studio: 13.0.2 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 14.2.
@@ -60,6 +64,7 @@
 * Xcode: 13.3-14.2.
 
 ### Internal
+
 * Upgraded realm-core from 13.4.1 to 13.6.0
 
 10.36.0 Release notes (2023-02-15)
