@@ -1,4 +1,4 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.36.0 Release notes (2023-03-09)
 =============================================================
 ### Enhancements
 * `MongoCollection.watch().subscribe(on:)` now supports any swift Scheduler
