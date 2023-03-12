@@ -1091,10 +1091,10 @@ public class RealmServer: NSObject {
         }
         let app = session.apps[appServerId]
         let response = try app.services[syncServiceId].config.get().get() as? [String: Any]
-        guard let syncInfo = response?[configOption] as? [String: Json] else {
+        guard let syncInfo = response?[configOption] as? [String: Any] else {
             return false
         }
-        return (syncInfo["state"] as? String == "enabled")
+        return syncInfo["state"] as? String == "enabled"
     }
 
     public func isDevModeEnabled(appServerId: String, syncServiceId: String) throws -> Bool {
@@ -1102,16 +1102,13 @@ public class RealmServer: NSObject {
             fatalError()
         }
         let app = session.apps[appServerId]
-        let res = try app.sync.config.get().get() as? [String: Any]
-        guard let option = res!["development_mode_enabled"] as? Bool else {
-            return false
-        }
-        return option
+        let res = try app.sync.config.get().get() as! [String: Any]
+        return res["development_mode_enabled"] as? Bool ?? false
     }
 
     public func enableDevMode(appServerId: String, syncServiceId: String, syncServiceConfiguration: [String: Any]) -> Result<Any?, Error> {
         guard let session = session else {
-            return .failure(URLError.unknown as! Error)
+            return .failure(URLError(.unknown))
         }
         let app = session.apps[appServerId]
         return app.sync.config.put(["development_mode_enabled": true])
@@ -1121,7 +1118,7 @@ public class RealmServer: NSObject {
             -> Result<Any?, Error> {
         let configOption = flexibleSync ? "flexible_sync" : "sync"
         guard let session = session else {
-            return .failure(URLError.unknown as! Error)
+            return .failure(URLError(.unknown))
         }
         let app = session.apps[appServerId]
         return app.services[syncServiceId].config.patch([configOption: ["state": ""]])
@@ -1131,11 +1128,11 @@ public class RealmServer: NSObject {
         let configOption = flexibleSync ? "flexible_sync" : "sync"
         var syncConfig = syncServiceConfiguration
         guard let session = session else {
-            return .failure(URLError.unknown as! Error)
+            return .failure(URLError(.unknown))
         }
         let app = session.apps[appServerId]
         guard var syncInfo = syncConfig[configOption] as? [String: Any] else {
-            return .failure(URLError.unknown as! Error)
+            return .failure(URLError(.unknown))
         }
         syncInfo["state"] = "enabled"
         syncConfig[configOption] = syncInfo
@@ -1145,7 +1142,7 @@ public class RealmServer: NSObject {
     public func patchRecoveryMode(flexibleSync: Bool, disable: Bool, _ appServerId: String,
                                   _ syncServiceId: String, _ syncServiceConfiguration: [String: Any]) -> Result<Any?, Error> {
         guard let session = session else {
-            return .failure(URLError.unknown as! Error)
+            return .failure(URLError(.unknown))
         }
 
         let configOption = flexibleSync ? "flexible_sync" : "sync"
@@ -1163,7 +1160,7 @@ public class RealmServer: NSObject {
                 }
 
                 guard var syncInfo = syncConfig[configOption] as? [String: Any] else {
-                    return .failure(URLError.unknown as! Error)
+                    return .failure(URLError(.unknown))
                 }
 
                 syncInfo["is_recovery_mode_disabled"] = disable
@@ -1175,7 +1172,7 @@ public class RealmServer: NSObject {
     public func retrieveUser(_ appId: String, userId: String) -> Result<Any?, Error> {
         guard let appServerId = try? RealmServer.shared.retrieveAppServerId(appId),
               let session = session else {
-            return .failure(URLError.unknown as! Error)
+            return .failure(URLError(.unknown))
         }
         return session.apps[appServerId].users[userId].get()
     }
@@ -1184,7 +1181,7 @@ public class RealmServer: NSObject {
     public func removeUserForApp(_ appId: String, userId: String) -> Result<Any?, Error> {
         guard let appServerId = try? RealmServer.shared.retrieveAppServerId(appId),
               let session = session else {
-            return .failure(URLError.unknown as! Error)
+            return .failure(URLError(.unknown))
         }
         return session.apps[appServerId].users[userId].delete()
     }
@@ -1203,8 +1200,8 @@ public class RealmServer: NSObject {
         }
 
         guard let schema = try? session.apps[appServerId].schemas[schemaSelected["_id"] as! String].get().get(),
-              let schemaProperties = ((schema as? [String: Json])?["schema"] as? [String: Any])?["properties"] as? [String: Json] else {
-            completion(.failure(URLError.unknown as! Error))
+              let schemaProperties = ((schema as? [String: Any])?["schema"] as? [String: Any])?["properties"] as? [String: Any] else {
+            completion(.failure(URLError(.unknown)))
             return
         }
 

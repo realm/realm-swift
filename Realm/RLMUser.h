@@ -37,15 +37,19 @@ typedef NS_ENUM(NSUInteger, RLMUserState) {
 };
 
 /// A block type used to report an error related to a specific user.
+RLM_SWIFT_SENDABLE
 typedef void(^RLMOptionalUserBlock)(RLMUser * _Nullable, NSError * _Nullable);
 
 /// A block type used to report an error on a network request from the user.
+RLM_SWIFT_SENDABLE
 typedef void(^RLMUserOptionalErrorBlock)(NSError * _Nullable);
 
 /// A block which returns a dictionary should there be any custom data set for a user
+RLM_SWIFT_SENDABLE
 typedef void(^RLMUserCustomDataBlock)(NSDictionary * _Nullable, NSError * _Nullable);
 
 /// A block type for returning from function calls.
+RLM_SWIFT_SENDABLE
 typedef void(^RLMCallFunctionCompletionBlock)(id<RLMBSON> _Nullable, NSError * _Nullable);
 
 RLM_HEADER_AUDIT_BEGIN(nullability, sendability)

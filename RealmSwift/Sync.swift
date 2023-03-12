@@ -36,7 +36,8 @@ public extension User {
     /// with the client from which it was created. On success a new user will be returned with the new linked credentials.
     /// @param credentials The `Credentials` used to link the user to a new identity.
     /// @completion A completion that eventually return `Result.success(User)` with user's data or `Result.failure(Error)`.
-    func linkUser(credentials: Credentials, _ completion: @escaping (Result<User, Error>) -> Void) {
+    @preconcurrency
+    func linkUser(credentials: Credentials, _ completion: @Sendable @escaping (Result<User, Error>) -> Void) {
         self.__linkUser(with: ObjectiveCSupport.convert(object: credentials)) { user, error in
             if let user = user {
                 completion(.success(user))
@@ -54,7 +55,7 @@ public extension User {
     /// @returns A publisher that eventually return `Result.success` or `Error`.
     @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
     func linkUser(credentials: Credentials) -> Future<User, Error> {
-        return Future { self.linkUser(credentials: credentials, $0) }
+        return future { self.linkUser(credentials: credentials, $0) }
     }
 #endif
 
@@ -545,18 +546,17 @@ public typealias Provider = RLMIdentityProvider
 /// The second and final argument is the completion handler to call when the function call is complete.
 /// This handler is executed on a non-main global `DispatchQueue`.
 @dynamicMemberLookup
-@frozen public struct Functions {
+@frozen public struct Functions: Sendable {
     private let user: User
-
     fileprivate init(user: User) {
         self.user = user
     }
 
     /// A closure type for receiving the completion of a remote function call.
-    public typealias FunctionCompletionHandler = (AnyBSON?, Error?) -> Void
+    public typealias FunctionCompletionHandler = @Sendable (AnyBSON?, Error?) -> Void
 
     /// A closure type for the dynamic remote function type.
-    public typealias Function = ([AnyBSON], @escaping FunctionCompletionHandler) -> Void
+    public typealias Function = @Sendable ([AnyBSON], @escaping FunctionCompletionHandler) -> Void
 
     /// The implementation of @dynamicMemberLookup that allows for dynamic remote function calls.
     public subscript(dynamicMember string: String) -> Function {
@@ -569,12 +569,13 @@ public typealias Provider = RLMIdentityProvider
     }
 
     /// A closure type for receiving the completion result of a remote function call.
-    public typealias ResultFunctionCompletionHandler = (Result<AnyBSON, Error>) -> Void
+    public typealias ResultFunctionCompletionHandler = @Sendable (Result<AnyBSON, Error>) -> Void
 
     /// A closure type for the dynamic remote function type.
-    public typealias ResultFunction = ([AnyBSON], @escaping ResultFunctionCompletionHandler) -> Void
+    public typealias ResultFunction = @Sendable ([AnyBSON], @escaping ResultFunctionCompletionHandler) -> Void
 
     /// The implementation of @dynamicMemberLookup that allows for dynamic remote function calls with a `ResultFunctionCompletionHandler` completion.
+    @preconcurrency
     public subscript(dynamicMember string: String) -> ResultFunction {
         return { (arguments: [AnyBSON], completionHandler: @escaping ResultFunctionCompletionHandler) in
             let objcArgs = arguments.map(ObjectiveCSupport.convertBson)
@@ -603,7 +604,7 @@ public typealias Provider = RLMIdentityProvider
 /// The dynamic member name (`sum` in the above example) is provided by `@dynamicMemberLookup`
 /// which is directly associated with the function name.
 @dynamicCallable
-public struct FunctionCallable {
+public struct FunctionCallable: Sendable {
     fileprivate let name: String
     fileprivate let user: User
 
@@ -616,9 +617,10 @@ public struct FunctionCallable {
     ///        // Returned value from function
     ///     })
     ///
+    @preconcurrency
     @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
     public func dynamicallyCall(withArguments args: [[AnyBSON]]) -> Future<AnyBSON, Error> {
-        return Future<AnyBSON, Error> { promise in
+        return future { promise in
             let objcArgs = args.first!.map(ObjectiveCSupport.convertBson)
             self.user.__callFunctionNamed(name, arguments: objcArgs) { (bson: RLMBSON?, error: Error?) in
                 if let b = bson.map(ObjectiveCSupport.convertBson), let bson = b {
@@ -633,7 +635,6 @@ public struct FunctionCallable {
 }
 
 public extension User {
-
     /**
      Create a sync configuration instance.
 
@@ -905,7 +906,7 @@ public extension User {
     /// Refresh a user's custom data. This will, in effect, refresh the user's auth session.
     /// @returns A publisher that eventually return `Dictionary` with user's data or `Error`.
     func refreshCustomData() -> Future<[AnyHashable: Any], Error> {
-        return Future { self.refreshCustomData($0) }
+        return future { self.refreshCustomData($0) }
     }
 
 
@@ -914,15 +915,7 @@ public extension User {
     /// if the user is not found or is already removed.
     /// @returns A publisher that eventually return `Result.success` or `Error`.
     func remove() -> Future<Void, Error> {
-        return Future<Void, Error> { promise in
-            self.remove { error in
-                if let error = error {
-                    promise(.failure(error))
-                } else {
-                    promise(.success(()))
-                }
-            }
-        }
+        promisify(remove(completion:))
     }
 
     /// Logs out the current user
@@ -930,15 +923,7 @@ public extension User {
     //// If the logout request fails, this method will still clear local authentication state.
     /// @returns A publisher that eventually return `Result.success` or `Error`.
     func logOut() -> Future<Void, Error> {
-        return Future<Void, Error> { promise in
-            self.logOut { error in
-                if let error = error {
-                    promise(.failure(error))
-                } else {
-                    promise(.success(()))
-                }
-            }
-        }
+        promisify(logOut(completion:))
     }
 
     /// Permanently deletes this user from your Atlas App Services app.
@@ -946,15 +931,7 @@ public extension User {
     /// If the delete request fails, the local authentication state will be untouched.
     /// @returns A publisher that eventually return `Result.success` or `Error`.
     func delete() -> Future<Void, Error> {
-        return Future<Void, Error> { promise in
-            self.delete { error in
-                if let error = error {
-                    promise(.failure(error))
-                } else {
-                    promise(.success(()))
-                }
-            }
-        }
+        promisify(delete(completion:))
     }
 }
 
@@ -1026,7 +1003,8 @@ public extension User {
     // rather than `[AnyHashable: Any]`
     /// Refresh a user's custom data. This will, in effect, refresh the user's auth session.
     /// @completion A completion that eventually return `Result.success(Dictionary)` with user's data or `Result.failure(Error)`.
-    func refreshCustomData(_ completion: @escaping (Result<[AnyHashable: Any], Error>) -> Void) {
+    @preconcurrency
+    func refreshCustomData(_ completion: @escaping @Sendable (Result<[AnyHashable: Any], Error>) -> Void) {
         self.refreshCustomData { customData, error in
             if let customData = customData {
                 completion(.success(customData))

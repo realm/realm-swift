@@ -35,6 +35,10 @@ public class Locked<T>: @unchecked Sendable {
         lock.initialize(to: os_unfair_lock())
     }
 
+    convenience public init(_ wrappedValue: T) {
+        self.init(wrappedValue: wrappedValue)
+    }
+
     public var wrappedValue: T {
         get {
             os_unfair_lock_lock(lock)

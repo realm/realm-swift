@@ -18,12 +18,14 @@
 
 #if os(macOS)
 
+import Combine
 import XCTest
 import RealmSwift
 
 #if canImport(RealmTestSupport)
 import RealmTestSupport
 import RealmSyncTestSupport
+import RealmSwiftTestSupport
 #endif
 
 public extension User {
@@ -120,22 +122,9 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
     }
 
     open func logInUser(for credentials: Credentials, app: App? = nil) throws -> User {
-        var theUser: User!
-        let ex = expectation(description: "Should log in the user properly")
-
-        (app ?? self.app).login(credentials: credentials) { result in
-            switch result {
-            case .success(let user):
-                theUser = user
-                XCTAssertTrue(theUser.isLoggedIn)
-            case .failure(let error):
-                XCTFail("Should login user: \(error)")
-            }
-            ex.fulfill()
-        }
-
-        waitForExpectations(timeout: 60, handler: nil)
-        return theUser
+        let user = (app ?? self.app).login(credentials: credentials).await(self, timeout: 60.0)
+        XCTAssertTrue(user.isLoggedIn)
+        return user
     }
 
     public func waitForUploads(for realm: Realm) {
@@ -315,4 +304,67 @@ extension SwiftSyncTestCase {
     }
 }
 #endif // swift(>=5.6)
+
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+public extension Publisher {
+    func expectValue(_ testCase: XCTestCase, _ expectation: XCTestExpectation,
+                     receiveValue: (@Sendable (Self.Output) -> Void)? = nil) -> AnyCancellable {
+        sink(receiveCompletion: { result in
+            if case .failure(let error) = result {
+                XCTFail("Unexpected failure: \(error)")
+            }
+        }, receiveValue: { value in
+            receiveValue?(value)
+            expectation.fulfill()
+        })
+    }
+
+    @MainActor
+    func await(_ testCase: XCTestCase, timeout: TimeInterval = 20.0, receiveValue: (@Sendable (Self.Output) -> Void)? = nil) {
+        let expectation = testCase.expectation(description: "Async combine pipeline")
+        let cancellable = self.expectValue(testCase, expectation, receiveValue: receiveValue)
+        testCase.wait(for: [expectation], timeout: timeout)
+        cancellable.cancel()
+    }
+
+    @discardableResult
+    @MainActor
+    func await(_ testCase: XCTestCase, timeout: TimeInterval = 20.0) -> Self.Output {
+        let expectation = testCase.expectation(description: "Async combine pipeline")
+        let value = Locked(Self.Output?.none)
+        let cancellable = self.expectValue(testCase, expectation, receiveValue: { value.wrappedValue = $0 })
+        testCase.wait(for: [expectation], timeout: timeout)
+        cancellable.cancel()
+        return value.wrappedValue!
+    }
+
+    @MainActor
+    func awaitFailure(_ testCase: XCTestCase, timeout: TimeInterval = 20.0,
+                      _ errorHandler: (@Sendable (Self.Failure) -> Void)? = nil) {
+        let expectation = testCase.expectation(description: "Async combine pipeline should fail")
+        let cancellable = sink(receiveCompletion: { @Sendable result in
+            if case .failure(let error) = result {
+                errorHandler?(error)
+                expectation.fulfill()
+            }
+        }, receiveValue: { @Sendable value in
+            XCTFail("Should have failed but got \(value)")
+        })
+        testCase.wait(for: [expectation], timeout: timeout)
+        cancellable.cancel()
+    }
+
+    @MainActor
+    func awaitFailure<E: Error>(_ testCase: XCTestCase, timeout: TimeInterval = 20.0,
+                                _ errorHandler: @escaping (@Sendable (E) -> Void)) {
+        awaitFailure(testCase, timeout: timeout) { error in
+            guard let error = error as? E else {
+                XCTFail("Expected error of type \(E.self), got \(error)")
+                return
+            }
+            errorHandler(error)
+        }
+    }
+}
+
 #endif // os(macOS)

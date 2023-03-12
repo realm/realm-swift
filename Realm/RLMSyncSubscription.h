@@ -128,7 +128,7 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
                    otherwise.
  */
 - (void)update:(__attribute__((noescape)) void(^)(void))block
-    onComplete:(nullable void(^)(NSError * _Nullable))onComplete
+    onComplete:(nullable void(^RLM_SWIFT_SENDABLE)(NSError *_Nullable))onComplete
     __attribute__((swift_async(not_swift_private, 2)))
     __attribute__((swift_attr("@_unsafeInheritExecutor")));
 /// :nodoc:

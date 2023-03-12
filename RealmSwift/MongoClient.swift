@@ -820,7 +820,7 @@ extension Publishers {
     private class WatchSubscription<S: Subscriber>: RLMChangeEventDelegate, Subscription where S.Input == AnyBSON, S.Failure == Error {
         private var changeStream: RLMChangeStream!
         private var subscriber: S
-        private var onOpen: (() -> Void)?
+        private var onOpen: (@Sendable () -> Void)?
 
         init(publisher: __shared WatchPublisher, subscriber: S) {
             self.subscriber = subscriber
@@ -871,13 +871,13 @@ extension Publishers {
         fileprivate let scheduler: ((@escaping () -> Void) -> Void)?
         fileprivate let filterIds: [ObjectId]?
         fileprivate let matchFilter: Document?
-        fileprivate let openEvent: (() -> Void)?
+        fileprivate let openEvent: (@Sendable () -> Void)?
 
         init(collection: MongoCollection,
              scheduler: ((@escaping () -> Void) -> Void)? = nil,
              filterIds: [ObjectId]? = nil,
              matchFilter: Document? = nil,
-             onOpen: (() -> Void)? = nil) {
+             onOpen: (@Sendable () -> Void)? = nil) {
             self.collection = collection
             self.scheduler = scheduler
             self.filterIds = filterIds
@@ -892,7 +892,7 @@ extension Publishers {
         ///
         /// - Parameter event: Callback which will be invoked once the change stream is open.
         /// - Returns: A publisher that emits a change event each time the remote MongoDB collection changes.
-        public func onOpen(_ event: @escaping (() -> Void)) -> Self {
+        public func onOpen(_ event: @escaping @Sendable () -> Void) -> Self {
             Self(collection: collection, scheduler: scheduler,
                  filterIds: filterIds, matchFilter: matchFilter, onOpen: event)
         }
@@ -958,7 +958,7 @@ extension MongoCollection {
     ///  - parameter onOpen: A callback which is invoked when the watch stream
     ///  has initialized on the server. Server-side changes triggered before
     ///  this callback is invoked may not produce change events.
-    public func changeEvents(onOpen: @escaping () -> Void)
+    public func changeEvents(onOpen: @Sendable @escaping () -> Void)
             -> AsyncThrowingPublisher<Publishers.WatchPublisher> {
         Publishers.WatchPublisher(collection: self, onOpen: onOpen)
             .subscribe(on: ImmediateScheduler.shared).values
@@ -972,7 +972,7 @@ extension MongoCollection {
     ///  watch stream has initialized on the server. Server-side changes
     ///  triggered before this callback is invoked may not produce change
     ///  events.
-    public func changeEvents(filterIds: [ObjectId], onOpen: (() -> Void)? = nil)
+    public func changeEvents(filterIds: [ObjectId], onOpen: (@Sendable () -> Void)? = nil)
             -> AsyncThrowingPublisher<Publishers.WatchPublisher> {
         Publishers.WatchPublisher(collection: self, filterIds: filterIds, onOpen: onOpen)
             .subscribe(on: ImmediateScheduler.shared).values
@@ -987,7 +987,7 @@ extension MongoCollection {
     ///  watch stream has initialized on the server. Server-side changes
     ///  triggered before this callback is invoked may not produce change
     ///  events.
-    public func changeEvents(matchFilter: Document, onOpen: (() -> Void)? = nil)
+    public func changeEvents(matchFilter: Document, onOpen: (@Sendable () -> Void)? = nil)
             -> AsyncThrowingPublisher<Publishers.WatchPublisher> {
         Publishers.WatchPublisher(collection: self, matchFilter: matchFilter, onOpen: onOpen)
             .subscribe(on: ImmediateScheduler.shared).values

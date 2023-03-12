@@ -154,6 +154,7 @@ public struct Events {
     }
 }
 
+#if !(os(iOS) && (arch(i386) || arch(arm)))
 @available(macOS 10.15, watchOS 6.0, iOS 13.0, tvOS 13.0, macCatalyst 13.0, *)
 extension Events.Scope {
     /**
@@ -169,14 +170,8 @@ extension Events.Scope {
     */
     @_disfavoredOverload
     public func commit() -> Future<Void, Error> {
-        return Future<Void, Error> { promise in
-            RLMEventCommitScope(self.context, self.id) { error in
-                if let error = error {
-                    promise(.failure(error))
-                } else {
-                    promise(.success(()))
-                }
-            }
+        promisify {
+            RLMEventCommitScope(self.context, self.id, $0)
         }
     }
 }
@@ -211,17 +206,12 @@ public extension Events {
     @_disfavoredOverload
     func recordEvent(activity: String, eventType: String? = nil, data: String? = nil)
             -> Future<Void, Error> {
-        return Future<Void, Error> { promise in
-            self.recordEvent(activity: activity, eventType: eventType, data: data) { error in
-                if let error = error {
-                    promise(.failure(error))
-                } else {
-                    promise(.success(()))
-                }
-            }
+        promisify {
+            recordEvent(activity: activity, eventType: eventType, data: data, completion: $0)
         }
     }
 }
+#endif
 
 extension Realm {
     /// Get the event context for the Realm. Will be `nil` unless an

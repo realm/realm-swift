@@ -1244,17 +1244,17 @@ extension SwiftFlexibleSyncServerTests {
             }
         }
         let user = try await logInUser(for: basicCredentials(app: self.flexibleSyncApp), app: self.flexibleSyncApp)
-        @Locked var isFirstOpen = true
+        let isFirstOpen = Locked(true)
         var config = user.flexibleSyncConfiguration(initialSubscriptions: { subscriptions in
             subscriptions.append(QuerySubscription<SwiftTypesSyncObject>(query: {
-                let date = $isFirstOpen.wrappedValue ? Calendar.current.date(
+                let date = isFirstOpen.wrappedValue ? Calendar.current.date(
                     byAdding: .hour,
                     value: -10,
                     to: Date()) : Calendar.current.date(
                         byAdding: .hour,
                         value: -20,
                         to: Date())
-                $isFirstOpen.wrappedValue = false
+                isFirstOpen.wrappedValue = false
                 return $0.dateCol < Date() && $0.dateCol > date!
             }))
         }, rerunOnOpen: true)
@@ -1525,11 +1525,9 @@ extension SwiftFlexibleSyncServerTests {
             subscriptions.append(QuerySubscription<SwiftPerson>(name: "person_age_10") {
                 $0.age > 10 && $0.firstName == "\(#function)"
             })
-        }
-        .sink(receiveCompletion: { _ in },
-              receiveValue: { _ in
-            ex.fulfill()
-        }).store(in: &cancellables)
+        }.sink(receiveCompletion: { @Sendable _ in },
+               receiveValue: { @Sendable _ in ex.fulfill() }
+        ).store(in: &cancellables)
 
         waitForExpectations(timeout: 20.0, handler: nil)
 

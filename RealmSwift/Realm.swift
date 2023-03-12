@@ -1231,13 +1231,17 @@ extension Realm {
         let task = RLMAsyncOpenTask(configuration: rlmConfiguration, confinedTo: scheduler,
                                     download: shouldAsyncOpen(configuration, downloadBeforeOpen))
         do {
-            try await withTaskCancellationHandler {
-                // Work around https://github.com/apple/swift/issues/61119 by smuggling
-                // the Realm out via a property on task rather than returning it
-                task.localRealm = try await task.waitForOpen()
-            } onCancel: {
-                task.cancel()
+            // Work around https://github.com/apple/swift/issues/61119, which
+            // makes it impossible to use withTaskCancellationHandler() from
+            // within an isolated function without getting warnings
+            nonisolated func workaround() async throws {
+                try await withTaskCancellationHandler { @Sendable in
+                    task.localRealm = try await task.waitForOpen()
+                } onCancel: { @Sendable in
+                    task.cancel()
+                }
             }
+            try await workaround()
             self = Realm(task.localRealm!)
             task.localRealm = nil
         } catch {

@@ -182,7 +182,8 @@ public extension App {
      - parameter credentials: The credentials identifying the user.
      - parameter completion: A callback invoked after completion. Will return `Result.success(User)` or `Result.failure(Error)`.
      */
-    func login(credentials: Credentials, _ completion: @escaping (Result<User, Error>) -> Void) {
+    @preconcurrency
+    func login(credentials: Credentials, _ completion: @Sendable @escaping (Result<User, Error>) -> Void) {
         self.__login(withCredential: ObjectiveCSupport.convert(object: credentials)) { user, error in
             if let user = user {
                 completion(.success(user))
@@ -198,7 +199,7 @@ public extension App {
     /// @returns A publisher that eventually return `User` or `Error`.
     @available(macOS 10.15, watchOS 6.0, iOS 13.0, tvOS 13.0, *)
     func login(credentials: Credentials) -> Future<User, Error> {
-        return Future { self.login(credentials: credentials, $0) }
+        return future { self.login(credentials: credentials, $0) }
     }
 #endif
 
@@ -318,7 +319,7 @@ extension App: ObservableObject {
 }
 
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-private func promisify(_ fn: @escaping (@escaping @Sendable (Error?) -> Void) -> Void) -> Future<Void, Error> {
+internal func promisify(_ fn: @escaping (@escaping @Sendable (Error?) -> Void) -> Void) -> Future<Void, Error> {
     return future { promise in
         fn { error in
             if let error = error {

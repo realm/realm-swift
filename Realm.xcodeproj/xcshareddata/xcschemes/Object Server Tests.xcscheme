@@ -98,6 +98,11 @@
             ReferencedContainer = "container:Realm.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
+         <EnvironmentVariable
+            key = "SWIFT_UNEXPECTED_EXECUTOR_LOG_LEVEL"
+            value = "2"
+            isEnabled = "YES">
+         </EnvironmentVariable>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"

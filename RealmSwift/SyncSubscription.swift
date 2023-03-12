@@ -220,7 +220,7 @@ import Combine
      - parameter onComplete: The block called upon synchronization of subscriptions to the server. Otherwise
                              an `Error`describing what went wrong will be returned by the block
      */
-    public func update(_ block: (() -> Void), onComplete: ((Error?) -> Void)? = nil) {
+    public func update(_ block: (() -> Void), onComplete: (@Sendable (Error?) -> Void)? = nil) {
         rlmSyncSubscriptionSet.update(block, onComplete: onComplete ?? { _ in })
     }
 
@@ -489,14 +489,8 @@ extension SyncSubscriptionSet {
      - returns: A publisher that eventually returns `Result.success` or `Error`.
      */
     public func updateSubscriptions(_ block: @escaping (() -> Void)) -> Future<Void, Error> {
-        return Future<Void, Error> { promise in
-            update(block) { error in
-                if let error = error {
-                    promise(.failure(error))
-                } else {
-                    promise(.success(()))
-                }
-            }
+        promisify {
+            update(block, onComplete: $0)
         }
     }
 }
