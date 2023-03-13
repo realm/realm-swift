@@ -4,7 +4,8 @@ x.y.z Release notes (yyyy-MM-dd)
 * None.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
+* Import as `RLMRealm_Private.h` as a module would cause issues when using Realm as a subdependency.
+  ([#8164](https://github.com/realm/realm-swift/issues/8164), since 10.37.0)
 * None.
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
