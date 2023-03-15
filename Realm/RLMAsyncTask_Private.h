@@ -34,8 +34,16 @@ __attribute__((objc_direct));
 - (instancetype)initWithConfiguration:(RLMRealmConfiguration *)configuration
                            confinedTo:(RLMScheduler *)confinement
                              download:(bool)waitForDownloadCompletion;
-- (void)waitForOpen:(RLMAsyncOpenRealmCallback)completion
-    __attribute__((swift_attr("@_unsafeInheritExecutor")));
+
+- (void)waitWithCompletion:(void (^)(NSError *_Nullable))completion;
+- (void)waitForOpen:(RLMAsyncOpenRealmCallback)completion __attribute__((objc_direct));
+@end
+
+RLM_SWIFT_SENDABLE
+@interface RLMAsyncDownloadTask : NSObject
+- (instancetype)initWithRealm:(RLMRealm *)realm;
+- (void)cancel;
+- (void)waitWithCompletion:(void (^)(NSError *_Nullable))completion;
 @end
 
 RLM_HEADER_AUDIT_END(nullability)
