@@ -12,7 +12,8 @@ if [ "$IS_MACCATALYST" = "YES" ]; then
 fi
 
 unifdef -B -DREALM_BUILDING_FOR_$(echo ${PLATFORM_SUFFIX} | tr "[:lower:]" "[:upper:]") < "${SOURCE_FILE}" | sed -e "s/''/'/" > "${TEMPORARY_FILE}"
-echo "#define REALM_IOPLATFORMUUID @\"$(sh build.sh get-ioplatformuuid)\"" >> ${TEMPORARY_FILE}
+echo "#define REALM_IOPLATFORMUUID @\"\"" >> ${TEMPORARY_FILE}
+
 
 if ! cmp -s "${TEMPORARY_FILE}" "${DESTINATION_FILE}"; then
   echo "Updating ${DESTINATION_FILE}"

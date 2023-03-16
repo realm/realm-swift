@@ -18,9 +18,7 @@
 
 #import "RLMRealm_Private.hpp"
 
-#if DEBUG
 #import "RLMAnalytics.hpp"
-#endif
 #import "RLMAsyncTask_Private.h"
 #import "RLMArray_Private.hpp"
 #import "RLMDictionary_Private.hpp"

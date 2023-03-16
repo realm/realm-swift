@@ -144,58 +144,6 @@ static NSString *RLMTargetArch() {
     return targetArchitecture;
 }
 
-static NSString *RLMXCodeVersion() {
-    NSString *xcodeVersion;
-#if TARGET_OS_WATCH
-#if __WATCH_OS_VERSION_MAX_ALLOWED >= 90200
-    xcodeVersion = @"14.3";
-// Because the max version allowed for XCode 14.2 and XCode 14.1 are the same, we are registering this as users of the latest version which is 14.2
-#elif __WATCH_OS_VERSION_MAX_ALLOWED >= 90100
-    xcodeVersion = @"14.2";
-#elif __WATCH_OS_VERSION_MAX_ALLOWED >= 90000
-    xcodeVersion = @"14.0.1";
-#elif __WATCH_OS_VERSION_MAX_ALLOWED >= 80500
-    xcodeVersion = @"13.4.1";
-#endif
-#elif TARGET_OS_TV
-#if __TV_OS_VERSION_MAX_ALLOWED >= 160200
-    xcodeVersion = @"14.3";
-// Because the max version allowed for XCode 14.2 and XCode 14.1 are the same, we are registering this as users of the latest version which is 14.2
-#elif __TV_OS_VERSION_MAX_ALLOWED >= 160100
-    xcodeVersion = @"14.2";
-#elif __TV_OS_VERSION_MAX_ALLOWED >= 160000
-    xcodeVersion = @"14.0.1";
-#elif __TV_OS_VERSION_MAX_ALLOWED >= 150400
-    xcodeVersion = @"13.4.1";
-#endif
-#elif TARGET_OS_IPHONE
-#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 160300
-    xcodeVersion = @"14.3";
-#elif __IPHONE_OS_VERSION_MAX_ALLOWED >= 160200
-    xcodeVersion = @"14.2";
-#elif __IPHONE_OS_VERSION_MAX_ALLOWED >= 160100
-    xcodeVersion = @"14.1";
-#elif __IPHONE_OS_VERSION_MAX_ALLOWED >= 160000
-    xcodeVersion = @"14.0.1";
-#elif __IPHONE_OS_VERSION_MAX_ALLOWED >= 150600
-    xcodeVersion = @"13.4.1";
-#endif
-#else
-#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 130200
-    xcodeVersion = @"14.3";
-#elif __MAC_OS_X_VERSION_MAX_ALLOWED >= 130100
-    xcodeVersion = @"14.2";
-#elif __MAC_OS_X_VERSION_MAX_ALLOWED >= 130000
-    xcodeVersion = @"14.1";
-#elif __MAC_OS_X_VERSION_MAX_ALLOWED >= 120500
-    xcodeVersion = @"14.0.1";
-#elif __MAC_OS_X_VERSION_MAX_ALLOWED >= 120300
-    xcodeVersion = @"13.4.1";
-#endif
-#endif
-    return xcodeVersion;
-}
-
 // Hash the data in the given buffer and convert it to a hex-format string
 static NSString *RLMHashBase16Data(const void *bytes, size_t length) {
     unsigned char buffer[CC_SHA256_DIGEST_LENGTH];
@@ -257,23 +205,20 @@ static NSString *RLMMACAddress() {
  }
 
 static NSString *RLMBuilderId() {
-    NSString *iopPlatformUuid = REALM_IOPLATFORMUUID;
+    NSString *ioPlatformUuid = REALM_IOPLATFORMUUID;
+    if ([ioPlatformUuid length] == 0) {
+        return nil;
+    }
     NSString *salt = @"realm is great";
-
-    NSString *saltedId = [iopPlatformUuid stringByAppendingString:salt];
+    NSString *saltedId = [ioPlatformUuid stringByAppendingString:salt];
     NSData *data = [saltedId dataUsingEncoding:NSUTF8StringEncoding];
 
     unsigned char buffer[CC_SHA256_DIGEST_LENGTH];
     CC_SHA256(data.bytes, static_cast<CC_LONG>(data.length), buffer);
-
-    char formatted[CC_SHA256_DIGEST_LENGTH * 2 + 1];
-    for (int i = 0; i < CC_SHA256_DIGEST_LENGTH; ++i) {
-        snprintf(formatted + i * 2, sizeof(formatted) - i * 2, "%02x", buffer[i]);
-    }
-    NSData* dataFormatted = [NSData dataWithBytes:formatted length:CC_SHA256_DIGEST_LENGTH * 2 + 1];
-
+    NSData* hashedData = [NSData dataWithBytes:buffer length:CC_SHA256_DIGEST_LENGTH];
+    
     // Base64 Encoding
-    return [dataFormatted base64EncodedStringWithOptions:kNilOptions];
+    return [hashedData base64EncodedStringWithOptions:kNilOptions];
 }
 
 static NSDictionary *RLMBaseMetrics() {
@@ -299,16 +244,15 @@ static NSDictionary *RLMBaseMetrics() {
         hashedBundleID = RLMHashBase16Data(data.bytes, data.length);
     }
 
-    NSString *osVersionString = [[NSProcessInfo processInfo] operatingSystemVersionString];
-    Class swiftUtil = NSClassFromString(@"RealmSwiftDecimal128");
-    BOOL isSwift = swiftUtil != nil;
+    Class swiftDecimal128 = NSClassFromString(@"RealmSwiftDecimal128");
+    BOOL isSwift = swiftDecimal128 != nil;
 
     NSString *hashedDistinctId = RLMMACAddress();
-    NSString *hashedBuilderId = RLMBuilderId();
+    // We use the IOPlatformUUID if is available (Cocoapods, SPM),
+    // in case we cannot obtain it (Pre-built binaries) we use the hashed mac address.
+    NSString *hashedBuilderId = RLMBuilderId() ?: hashedDistinctId;
 
     NSDictionary *info = appBundle.infoDictionary;
-
-    BOOL isClang = __clang__ == 1;
 
     return @{
         // MixPanel properties
@@ -332,7 +276,7 @@ static NSDictionary *RLMBaseMetrics() {
 
         // Target Info
         // Current OS version the app is targeting
-        @"Target OS Version": osVersionString,
+        @"Target OS Version": [[NSProcessInfo processInfo] operatingSystemVersionString],
         // Minimum OS version the app is targeting
         @"Target OS Minimum Version": info[@"MinimumOSVersion"] ?: info[@"LSMinimumSystemVersion"] ?: kUnknownString,
 #if TARGET_OS_WATCH
@@ -372,76 +316,69 @@ static NSDictionary *RLMBaseMetrics() {
 #endif
 
         // Compiler Info
-        @"Compiler": isClang ? @"clang" : @"other",
+        @"Compiler": @"clang",
         @"Clang Version": @__clang_version__,
         @"Clang Major Version": @__clang_major__,
-
-        // This will report the XCode Version even if the developer is using another
-        // IDE(AppCode), in that case this will register the version of the XCode tools
-        // AppCode is using.
-        @"IDE Version": RLMXCodeVersion() ?: kUnknownString,
     };
 }
 
 // This will only be executed once but depending on the number of objects, could take sometime
 static NSDictionary *RLMSchemaMetrics(RLMSchema *schema) {
-    NSDictionary *dict = @{
-        @"Embedded_Object": @0,
-        @"Asymmetric_Object": @0,
-        @"Reference_Link": @0,
-        @"Mixed": @0,
-        @"Primitive_List": @0,
-        @"Primitive_Set": @0,
-        @"Primitive_Dictionary": @0,
-        @"Reference_List": @0,
-        @"Reference_Set": @0,
-        @"Reference_Dictionary": @0,
-    };
-    NSMutableDictionary *featuresDictionary = [[NSMutableDictionary alloc] init];
-    [featuresDictionary addEntriesFromDictionary: dict];
+    NSMutableDictionary *featuresDictionary = [@{@"Embedded_Object": @0,
+                                                 @"Asymmetric_Object": @0,
+                                                 @"Reference_Link": @0,
+                                                 @"Mixed": @0,
+                                                 @"Primitive_List": @0,
+                                                 @"Primitive_Set": @0,
+                                                 @"Primitive_Dictionary": @0,
+                                                 @"Reference_List": @0,
+                                                 @"Reference_Set": @0,
+                                                 @"Reference_Dictionary": @0,
+                                               } mutableCopy];
+
     for (RLMObjectSchema *objectSchema in schema.objectSchema) {
         if (objectSchema.isEmbedded) {
-            [featuresDictionary setObject:@1 forKey:@"Embedded_Object"];
+            featuresDictionary[@"Embedded_Object"] = @1;
         }
         if (objectSchema.isAsymmetric) {
-            [featuresDictionary setObject:@1 forKey:@"Asymmetric_Object"];
+            featuresDictionary[@"Asymmetric_Object"] = @1;
         }
 
         for (RLMProperty *property in objectSchema.properties) {
             if (property.array) {
                 if (property.type == RLMPropertyTypeObject) {
-                    [featuresDictionary setObject:@1 forKey:@"Reference_List"];
+                    featuresDictionary[@"Reference_List"] = @1;
                 } else {
-                    [featuresDictionary setObject:@1 forKey:@"Primitive_List"];
+                    featuresDictionary[@"Primitive_List"] = @1;
                 }
                 continue;
             }
             if (property.set) {
                 if (property.type == RLMPropertyTypeObject) {
-                    [featuresDictionary setObject:@1 forKey:@"Reference_Set"];
+                    featuresDictionary[@"Reference_Set"] = @1;
                 } else {
-                    [featuresDictionary setObject:@1 forKey:@"Primitive_Set"];
+                    featuresDictionary[@"Primitive_Set"] = @1;
                 }
                 continue;
             }
             if (property.dictionary) {
                 if (property.type == RLMPropertyTypeObject) {
-                    [featuresDictionary setObject:@1 forKey:@"Reference_Dictionary"];
+                    featuresDictionary[@"Reference_Dictionary"] = @1;
                 } else {
-                    [featuresDictionary setObject:@1 forKey:@"Primitive_Dictionary"];
+                    featuresDictionary[@"Primitive_Dictionary"] = @1;
                 }
                 continue;
             }
 
             switch (property.type) {
                case RLMPropertyTypeAny:
-                    [featuresDictionary setObject:@1 forKey:@"Mixed"];
+                    featuresDictionary[@"Mixed"] = @1;
                   break;
                case RLMPropertyTypeObject:
-                    [featuresDictionary setObject:@1 forKey:@"Reference_Link"];
+                    featuresDictionary[@"Reference_Link"] = @1;
                   break;
                 case RLMPropertyTypeLinkingObjects:
-                     [featuresDictionary setObject:@1 forKey:@"Backlink"];
+                    featuresDictionary[@"Backlink"] = @1;
                    break;
                default:
                     break;
@@ -452,17 +389,18 @@ static NSDictionary *RLMSchemaMetrics(RLMSchema *schema) {
 }
 
 static NSDictionary *RLMConfigurationMetrics(RLMRealmConfiguration *configuration) {
-    BOOL isSyncEnable = configuration.syncConfiguration != nil;
-    BOOL isSync = configuration.syncConfiguration != nil;
-    BOOL isPBSSync = configuration.syncConfiguration.partitionValue != nil;
-    BOOL isFlexibleSync = (isSync && !isPBSSync);
-    BOOL isCompactOnLaunch = configuration.shouldCompactOnLaunch != nil;
-    BOOL migrationBlock = configuration.migrationBlock != nil;
+    RLMSyncConfiguration *syncConfiguration = configuration.syncConfiguration;
+    bool isSync = syncConfiguration != nil;
+    bool isPBSSync = syncConfiguration.partitionValue != nil;
+    bool isFlexibleSync = (isSync && !isPBSSync);
+    auto resetMode = syncConfiguration.clientResetMode;
 
-    auto resetMode = configuration.syncConfiguration.clientResetMode;
+    bool isCompactOnLaunch = configuration.shouldCompactOnLaunch != nil;
+    bool migrationBlock = configuration.migrationBlock != nil;
+
     return @{
         // Sync
-        @"Sync Enabled": isSyncEnable ? @"true" : @"false",
+        @"Sync Enabled": isSync ? @"true" : @"false",
         @"Flexible_Sync": isFlexibleSync ? @1 : @0,
         @"Pbs_Sync": isPBSSync ? @1 : @0,
 
@@ -479,30 +417,31 @@ static NSDictionary *RLMConfigurationMetrics(RLMRealmConfiguration *configuratio
 }
 
 void RLMSendAnalytics(RLMRealmConfiguration *configuration, RLMSchema *schema) {
-    if (getenv("REALM_DISABLE_ANALYTICS") || !RLMIsDebuggerAttached() || RLMIsRunningInPlayground()) {
-        return;
-    }
-    NSArray *urlStrings = @[@"https://data.mongodb-api.com/app/realmsdkmetrics-zmhtm/endpoint/metric_webhook/metric?data=%@"];
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        if (getenv("REALM_DISABLE_ANALYTICS") || !RLMIsDebuggerAttached() || RLMIsRunningInPlayground()) {
+            return;
+        }
+        NSArray *urlStrings = @[@"https://data.mongodb-api.com/app/realmsdkmetrics-zmhtm/endpoint/metric_webhook/metric?data=%@"];
 
-    NSDictionary *baseMetrics = RLMBaseMetrics();
-    NSDictionary *schemaMetrics = RLMSchemaMetrics(schema);
-    NSDictionary *configurationMetrics = RLMConfigurationMetrics(configuration);
+        NSDictionary *baseMetrics = RLMBaseMetrics();
+        NSDictionary *schemaMetrics = RLMSchemaMetrics(schema);
+        NSDictionary *configurationMetrics = RLMConfigurationMetrics(configuration);
 
-    NSMutableDictionary *metrics = [[NSMutableDictionary alloc] init];
-    [metrics addEntriesFromDictionary:baseMetrics];
-    [metrics addEntriesFromDictionary:schemaMetrics];
-    [metrics addEntriesFromDictionary:configurationMetrics];
+        NSMutableDictionary *metrics = [[NSMutableDictionary alloc] init];
+        [metrics addEntriesFromDictionary:baseMetrics];
+        [metrics addEntriesFromDictionary:schemaMetrics];
+        [metrics addEntriesFromDictionary:configurationMetrics];
 
-    NSMutableDictionary *payloadN = [NSMutableDictionary dictionaryWithDictionary:@{ @"event": @"Run" }];
-    [payloadN setObject:metrics forKey:@"properties"];
-    NSData *payload = [NSJSONSerialization dataWithJSONObject:payloadN options:0 error:nil];
+        NSDictionary *payloadN = @{@"event": @"Run", @"properties": metrics};
+        NSData *payload = [NSJSONSerialization dataWithJSONObject:payloadN options:0 error:nil];
 
-    for (NSString *urlString in urlStrings) {
-        NSString *formatted = [NSString stringWithFormat:urlString, [payload base64EncodedStringWithOptions:0]];
-        // No error handling or anything because logging errors annoyed people for no
-        // real benefit, and it's not clear what else we could do
-        [[NSURLSession.sharedSession dataTaskWithURL:[NSURL URLWithString:formatted]] resume];
-    }
+        for (NSString *urlString in urlStrings) {
+            NSString *formatted = [NSString stringWithFormat:urlString, [payload base64EncodedStringWithOptions:0]];
+            // No error handling or anything because logging errors annoyed people for no
+            // real benefit, and it's not clear what else we could do
+            [[NSURLSession.sharedSession dataTaskWithURL:[NSURL URLWithString:formatted]] resume];
+        }
+    });
 }
 
 #else
