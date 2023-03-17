@@ -352,7 +352,7 @@ static double average(NSDictionary *dictionary) {
 }
 
 - (void)testNotifications {
-    %unman RLMAssertThrowsWithReason([$dictionary addNotificationBlock:^(__unused id a, __unused id c, __unused id e) { }], ^n @"This method may only be called on RLMDictionary instances retrieved from an RLMRealm");
+    %unman RLMAssertThrowsWithReason([$dictionary addNotificationBlock:^(__unused id a, __unused id c, __unused id e) { }], ^n @"Change notifications are only supported on managed collections.");
 }
 
 - (void)testMin {

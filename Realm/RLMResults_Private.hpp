@@ -18,13 +18,15 @@
 
 #import "RLMResults_Private.h"
 
+#import "RLMCollection_Private.hpp"
+
 #import <realm/object-store/results.hpp>
 
 class RLMClassInfo;
 
 RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
-@interface RLMResults () {
+@interface RLMResults () <RLMCollectionPrivate> {
 @public
     realm::Results _results;
 }
@@ -43,6 +45,7 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
 - (instancetype)subresultsWithResults:(realm::Results)results;
 - (RLMClassInfo *)objectInfo;
+- (void)deleteObjectsFromRealm;
 @end
 
 // Utility functions

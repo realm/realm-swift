@@ -3137,65 +3137,65 @@ static double average(NSDictionary *dictionary) {
 
 - (void)testNotifications {
     RLMAssertThrowsWithReason([unmanaged.boolObj addNotificationBlock:^(__unused id a, __unused id c, __unused id e) { }],
-                              @"This method may only be called on RLMDictionary instances retrieved from an RLMRealm");
+                              @"Change notifications are only supported on managed collections.");
     RLMAssertThrowsWithReason([optUnmanaged.boolObj addNotificationBlock:^(__unused id a, __unused id c, __unused id e) { }],
-                              @"This method may only be called on RLMDictionary instances retrieved from an RLMRealm");
+                              @"Change notifications are only supported on managed collections.");
     RLMAssertThrowsWithReason([unmanaged.intObj addNotificationBlock:^(__unused id a, __unused id c, __unused id e) { }],
-                              @"This method may only be called on RLMDictionary instances retrieved from an RLMRealm");
+                              @"Change notifications are only supported on managed collections.");
     RLMAssertThrowsWithReason([optUnmanaged.intObj addNotificationBlock:^(__unused id a, __unused id c, __unused id e) { }],
-                              @"This method may only be called on RLMDictionary instances retrieved from an RLMRealm");
+                              @"Change notifications are only supported on managed collections.");
     RLMAssertThrowsWithReason([unmanaged.stringObj addNotificationBlock:^(__unused id a, __unused id c, __unused id e) { }],
-                              @"This method may only be called on RLMDictionary instances retrieved from an RLMRealm");
+                              @"Change notifications are only supported on managed collections.");
     RLMAssertThrowsWithReason([optUnmanaged.stringObj addNotificationBlock:^(__unused id a, __unused id c, __unused id e) { }],
-                              @"This method may only be called on RLMDictionary instances retrieved from an RLMRealm");
+                              @"Change notifications are only supported on managed collections.");
     RLMAssertThrowsWithReason([unmanaged.dateObj addNotificationBlock:^(__unused id a, __unused id c, __unused id e) { }],
-                              @"This method may only be called on RLMDictionary instances retrieved from an RLMRealm");
+                              @"Change notifications are only supported on managed collections.");
     RLMAssertThrowsWithReason([optUnmanaged.dateObj addNotificationBlock:^(__unused id a, __unused id c, __unused id e) { }],
-                              @"This method may only be called on RLMDictionary instances retrieved from an RLMRealm");
+                              @"Change notifications are only supported on managed collections.");
     RLMAssertThrowsWithReason([unmanaged.floatObj addNotificationBlock:^(__unused id a, __unused id c, __unused id e) { }],
-                              @"This method may only be called on RLMDictionary instances retrieved from an RLMRealm");
+                              @"Change notifications are only supported on managed collections.");
     RLMAssertThrowsWithReason([optUnmanaged.floatObj addNotificationBlock:^(__unused id a, __unused id c, __unused id e) { }],
-                              @"This method may only be called on RLMDictionary instances retrieved from an RLMRealm");
+                              @"Change notifications are only supported on managed collections.");
     RLMAssertThrowsWithReason([unmanaged.doubleObj addNotificationBlock:^(__unused id a, __unused id c, __unused id e) { }],
-                              @"This method may only be called on RLMDictionary instances retrieved from an RLMRealm");
+                              @"Change notifications are only supported on managed collections.");
     RLMAssertThrowsWithReason([optUnmanaged.doubleObj addNotificationBlock:^(__unused id a, __unused id c, __unused id e) { }],
-                              @"This method may only be called on RLMDictionary instances retrieved from an RLMRealm");
+                              @"Change notifications are only supported on managed collections.");
     RLMAssertThrowsWithReason([unmanaged.dataObj addNotificationBlock:^(__unused id a, __unused id c, __unused id e) { }],
-                              @"This method may only be called on RLMDictionary instances retrieved from an RLMRealm");
+                              @"Change notifications are only supported on managed collections.");
     RLMAssertThrowsWithReason([optUnmanaged.dataObj addNotificationBlock:^(__unused id a, __unused id c, __unused id e) { }],
-                              @"This method may only be called on RLMDictionary instances retrieved from an RLMRealm");
+                              @"Change notifications are only supported on managed collections.");
     RLMAssertThrowsWithReason([unmanaged.decimalObj addNotificationBlock:^(__unused id a, __unused id c, __unused id e) { }],
-                              @"This method may only be called on RLMDictionary instances retrieved from an RLMRealm");
+                              @"Change notifications are only supported on managed collections.");
     RLMAssertThrowsWithReason([optUnmanaged.decimalObj addNotificationBlock:^(__unused id a, __unused id c, __unused id e) { }],
-                              @"This method may only be called on RLMDictionary instances retrieved from an RLMRealm");
+                              @"Change notifications are only supported on managed collections.");
     RLMAssertThrowsWithReason([unmanaged.objectIdObj addNotificationBlock:^(__unused id a, __unused id c, __unused id e) { }],
-                              @"This method may only be called on RLMDictionary instances retrieved from an RLMRealm");
+                              @"Change notifications are only supported on managed collections.");
     RLMAssertThrowsWithReason([optUnmanaged.objectIdObj addNotificationBlock:^(__unused id a, __unused id c, __unused id e) { }],
-                              @"This method may only be called on RLMDictionary instances retrieved from an RLMRealm");
+                              @"Change notifications are only supported on managed collections.");
     RLMAssertThrowsWithReason([unmanaged.uuidObj addNotificationBlock:^(__unused id a, __unused id c, __unused id e) { }],
-                              @"This method may only be called on RLMDictionary instances retrieved from an RLMRealm");
+                              @"Change notifications are only supported on managed collections.");
     RLMAssertThrowsWithReason([optUnmanaged.uuidObj addNotificationBlock:^(__unused id a, __unused id c, __unused id e) { }],
-                              @"This method may only be called on RLMDictionary instances retrieved from an RLMRealm");
+                              @"Change notifications are only supported on managed collections.");
     RLMAssertThrowsWithReason([unmanaged.anyBoolObj addNotificationBlock:^(__unused id a, __unused id c, __unused id e) { }],
-                              @"This method may only be called on RLMDictionary instances retrieved from an RLMRealm");
+                              @"Change notifications are only supported on managed collections.");
     RLMAssertThrowsWithReason([unmanaged.anyIntObj addNotificationBlock:^(__unused id a, __unused id c, __unused id e) { }],
-                              @"This method may only be called on RLMDictionary instances retrieved from an RLMRealm");
+                              @"Change notifications are only supported on managed collections.");
     RLMAssertThrowsWithReason([unmanaged.anyFloatObj addNotificationBlock:^(__unused id a, __unused id c, __unused id e) { }],
-                              @"This method may only be called on RLMDictionary instances retrieved from an RLMRealm");
+                              @"Change notifications are only supported on managed collections.");
     RLMAssertThrowsWithReason([unmanaged.anyDoubleObj addNotificationBlock:^(__unused id a, __unused id c, __unused id e) { }],
-                              @"This method may only be called on RLMDictionary instances retrieved from an RLMRealm");
+                              @"Change notifications are only supported on managed collections.");
     RLMAssertThrowsWithReason([unmanaged.anyStringObj addNotificationBlock:^(__unused id a, __unused id c, __unused id e) { }],
-                              @"This method may only be called on RLMDictionary instances retrieved from an RLMRealm");
+                              @"Change notifications are only supported on managed collections.");
     RLMAssertThrowsWithReason([unmanaged.anyDataObj addNotificationBlock:^(__unused id a, __unused id c, __unused id e) { }],
-                              @"This method may only be called on RLMDictionary instances retrieved from an RLMRealm");
+                              @"Change notifications are only supported on managed collections.");
     RLMAssertThrowsWithReason([unmanaged.anyDateObj addNotificationBlock:^(__unused id a, __unused id c, __unused id e) { }],
-                              @"This method may only be called on RLMDictionary instances retrieved from an RLMRealm");
+                              @"Change notifications are only supported on managed collections.");
     RLMAssertThrowsWithReason([unmanaged.anyDecimalObj addNotificationBlock:^(__unused id a, __unused id c, __unused id e) { }],
-                              @"This method may only be called on RLMDictionary instances retrieved from an RLMRealm");
+                              @"Change notifications are only supported on managed collections.");
     RLMAssertThrowsWithReason([unmanaged.anyObjectIdObj addNotificationBlock:^(__unused id a, __unused id c, __unused id e) { }],
-                              @"This method may only be called on RLMDictionary instances retrieved from an RLMRealm");
+                              @"Change notifications are only supported on managed collections.");
     RLMAssertThrowsWithReason([unmanaged.anyUUIDObj addNotificationBlock:^(__unused id a, __unused id c, __unused id e) { }],
-                              @"This method may only be called on RLMDictionary instances retrieved from an RLMRealm");
+                              @"Change notifications are only supported on managed collections.");
 }
 
 - (void)testMin {

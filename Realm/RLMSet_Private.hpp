@@ -46,7 +46,7 @@ class RLMObservationInfo;
 }
 @end
 
-@interface RLMManagedSet () <RLMFastEnumerable>
+@interface RLMManagedSet () <RLMCollectionPrivate>
 
 - (RLMManagedSet *)initWithBackingCollection:(realm::object_store::Set)set
                                   parentInfo:(RLMClassInfo *)parentInfo

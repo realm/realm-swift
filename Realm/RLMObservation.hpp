@@ -183,14 +183,6 @@ std::vector<realm::BindingContext::ObserverState> RLMGetObservedRows(RLMSchemaIn
 void RLMWillChange(std::vector<realm::BindingContext::ObserverState> const& observed, std::vector<void *> const& invalidated);
 void RLMDidChange(std::vector<realm::BindingContext::ObserverState> const& observed, std::vector<void *> const& invalidated);
 
-// KeyPathFromString converts a string keypath to a vector of key
-// pairs to be used for deep change checking across links.
-// NEXT-MAJOR: This conflates a nil array and an empty array for backwards
-// compatibility, but core now gives them different semantics
-std::optional<realm::KeyPathArray> RLMKeyPathArrayFromStringArray(RLMRealm *realm,
-                                                                  RLMClassInfo *info,
-                                                                  NSArray<NSString *> *keyPath);
-
 // Used for checking if an `Object` declared with `@StateRealmObject` needs to have
 // it's accessors temporarily removed and added back so that the `Object` can be
 // managed be the Realm.

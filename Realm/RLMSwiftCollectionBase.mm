@@ -23,7 +23,6 @@
 #import "RLMObject_Private.hpp"
 #import "RLMObservation.hpp"
 #import "RLMProperty_Private.h"
-#import "RLMRealm_Private.hpp"
 #import "RLMSet_Private.hpp"
 #import "RLMDictionary_Private.hpp"
 
