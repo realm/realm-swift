@@ -24,41 +24,60 @@ import XCTest
 import RealmTestSupport
 #endif
 
+// Wrap a sendable value in a lock to enable sharing a mutable variable between
+// threads.
+//
+// When guarding a member variable this can be used as a property wrapper to
+// simplify use. Due to a bug in the Swift compiler
+// (https://github.com/apple/swift/issues/61358), this current doesn't work for
+// local variables.
 @available(macOS 10.12, iOS 10.0, tvOS 10.0, watchOS 3.0, *)
 @propertyWrapper
 public class Locked<T>: @unchecked Sendable {
-    private var value: T
+    private var _value: T
     private let lock: os_unfair_lock_t = .allocate(capacity: 1)
 
-    public init(wrappedValue: T) {
-        value = wrappedValue
+    public init(_ value: T) {
+        _value = value
         lock.initialize(to: os_unfair_lock())
     }
 
-    convenience public init(_ wrappedValue: T) {
-        self.init(wrappedValue: wrappedValue)
-    }
-
-    public var wrappedValue: T {
+    public var value: T {
         get {
-            os_unfair_lock_lock(lock)
-            let value = self.value
-            os_unfair_lock_unlock(lock)
-            return value
+            withLock {$0 }
         }
         set {
+            withLock {
+                $0 = newValue
+            }
+        }
+        // Accessor for modify operations (e.g. += and mutating functions on structs)
+        // which eliminates race conditions which would otherwise happen if multiple
+        // threads mutated the value at the same time.
+        _modify {
             os_unfair_lock_lock(lock)
-            value = newValue
+            yield &_value
             os_unfair_lock_unlock(lock)
         }
     }
 
-    // A workaround for https://github.com/apple/swift/issues/61358
-    // @Sendable property wrappers don't actually work currently, including
-    // when capturing the property wrapper itself (i.e. with _foo). Capturing
-    // the projected value does work, though.
-    public var projectedValue: Locked<T> {
-        self
+    // Invoke a closure while holding the lock. This can be used to safely
+    // perform logic more complicated than a simple assignment or read of the
+    // value.
+    public func withLock<U>(_ fn: (inout T) -> U) -> U {
+        os_unfair_lock_lock(lock)
+        let ret = fn(&_value)
+        os_unfair_lock_unlock(lock)
+        return ret
+    }
+
+    // Property wrapper implementation
+    public convenience init(wrappedValue: T) {
+        self.init(wrappedValue)
+    }
+    public var wrappedValue: T {
+        get { value }
+        set { value = newValue }
     }
 }
 

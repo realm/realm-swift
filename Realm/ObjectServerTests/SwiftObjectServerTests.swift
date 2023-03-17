@@ -368,11 +368,11 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     }
 
     func expectSyncError(_ fn: () -> Void) -> SyncError? {
-        @Locked var error: SyncError?
+        let error = Locked(SyncError?.none)
         let ex = expectation(description: "Waiting for error handler to be called...")
         app.syncManager.errorHandler = { @Sendable (e, _) in
             if let e = e as? SyncError {
-                $error.wrappedValue = e
+                error.value = e
             } else {
                 XCTFail("Error \(e) was not a sync error. Something is wrong.")
             }
@@ -382,8 +382,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         fn()
 
         waitForExpectations(timeout: 10, handler: nil)
-        XCTAssertNotNil(error)
-        return error
+        XCTAssertNotNil(error.value)
+        return error.value
     }
 
     func testClientReset() throws {
@@ -1608,11 +1608,11 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let user = try logInUser(for: basicCredentials())
 
         // Set a callback on the user
-        @Locked var blockCalled = false
+        let blockCalled = Locked(false)
         let ex = expectation(description: "Error callback should fire upon receiving an error")
         app.syncManager.errorHandler = { @Sendable (error, _) in
             assertSyncError(error, .clientUserError, "Unable to refresh the user access token.")
-            $blockCalled.wrappedValue = true
+            blockCalled.value = true
             ex.fulfill()
         }
 
@@ -1620,7 +1620,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         manuallySetAccessToken(for: user, value: badAccessToken())
         manuallySetRefreshToken(for: user, value: badAccessToken())
         // Try to open a Realm with the user; this will cause our errorHandler block defined above to be fired.
-        XCTAssertFalse(blockCalled)
+        XCTAssertFalse(blockCalled.value)
         _ = try immediatelyOpenRealm(partitionValue: "realm_id", user: user)
 
         waitForExpectations(timeout: 10.0, handler: nil)

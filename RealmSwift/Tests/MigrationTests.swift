@@ -60,13 +60,13 @@ class MigrationTests: TestCase {
     // migrate realm at path and ensure migration
     private func migrateAndTestRealm(_ fileURL: URL, shouldRun: Bool = true, schemaVersion: UInt64 = 1,
                                      autoMigration: Bool = false, block: MigrationBlock? = nil) {
-        @Locked var didRun = false
+        let didRun = Locked(false)
         let config = Realm.Configuration(fileURL: fileURL, schemaVersion: schemaVersion,
             migrationBlock: { migration, oldSchemaVersion in
                 if let block = block {
                     block(migration, oldSchemaVersion)
                 }
-                $didRun.wrappedValue = true
+                didRun.value = true
                 return
         })
 
@@ -78,7 +78,7 @@ class MigrationTests: TestCase {
             try! Realm.performMigration(for: config)
         }
 
-        XCTAssertEqual(didRun, shouldRun)
+        XCTAssertEqual(didRun.value, shouldRun)
     }
 
     private func migrateAndTestDefaultRealm(_ schemaVersion: UInt64 = 1, block: @escaping MigrationBlock) {
@@ -93,14 +93,14 @@ class MigrationTests: TestCase {
     func testSetDefaultRealmSchemaVersion() {
         createAndTestRealmAtURL(defaultRealmURL())
 
-        @Locked var didRun = false
+        let didRun = Locked(false)
         let config = Realm.Configuration(fileURL: defaultRealmURL(), schemaVersion: 1,
-                                         migrationBlock: { _, _ in $didRun.wrappedValue = true })
+                                         migrationBlock: { _, _ in didRun.value = true })
         Realm.Configuration.defaultConfiguration = config
 
         try! Realm.performMigration()
 
-        XCTAssert(didRun)
+        XCTAssert(didRun.value)
         XCTAssertEqual(1, try! schemaVersionAtURL(defaultRealmURL()))
     }
 

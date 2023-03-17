@@ -51,17 +51,17 @@ extension URLSession {
     // Synchronously perform a data task, returning the data from it
     @available(macOS 10.12, *)
     fileprivate func resultDataTask(with request: URLRequest) -> Result<Data, Error> {
-        @Locked var result: Result<Data, Error>!
+        let result = Locked(Result<Data, Error>?.none)
         let group = DispatchGroup()
         group.enter()
         resultDataTask(with: request) {
-            $result.wrappedValue = $0
+            result.value = $0
             group.leave()
         }
         guard case .success = group.wait(timeout: .now() + 10) else {
             return .failure(URLError(.cannotFindHost))
         }
-        return result
+        return result.value!
     }
 }
 
@@ -323,17 +323,17 @@ class AdminSession {
 
         private func request(httpMethod: String, data: Any? = nil) -> Result<Any?, Error> {
             let group = DispatchGroup()
-            @Locked var result: Result<Any?, Error>!
+            let result = Locked(Result<Any?, Error>?.none)
             group.enter()
             request(httpMethod: httpMethod, data: data) {
-                $result.wrappedValue = $0
+                result.value = $0
                 group.leave()
             }
             guard case .success = group.wait(timeout: .now() + 60) else {
                 print("HTTP request timed out: \(httpMethod) \(self.url)")
                 return .failure(URLError(.timedOut))
             }
-            return result
+            return result.value!
         }
 
         func get(_ completionHandler: @escaping Completion) {
