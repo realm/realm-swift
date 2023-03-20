@@ -22,6 +22,7 @@
 #import "RLMRealmUtil.hpp"
 
 #import <realm/object-store/sync/sync_session.hpp>
+#import <realm/sync/client_base.hpp>
 #import <realm/sync/protocol.hpp>
 
 using namespace realm;
@@ -67,7 +68,7 @@ using namespace realm;
         static_cast<int>(realm::sync::ProtocolError::bad_client_file_ident),
         realm::sync::protocol_error_category()
     };
-    realm::SyncError error = {code, "Not a real error message", false};
+    realm::sync::SessionErrorInfo error = {code, "Not a real error message", true};
     error.server_requests_action = realm::sync::ProtocolErrorInfo::Action::ClientReset;
     SyncSession::OnlyForTesting::handle_error(*raw_session, std::move(error));
 }

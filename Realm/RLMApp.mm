@@ -248,6 +248,10 @@ static void setOptionalString(std::optional<std::string>& dst, NSString *src) {
 
 @implementation RLMApp : NSObject
 
++ (void)initialize {
+    [RLMRealm class];
+}
+
 - (instancetype)initWithApp:(std::shared_ptr<realm::app::App>)app {
     if (self = [super init]) {
         _configuration = [[RLMAppConfiguration alloc] initWithConfig:app->config()];

@@ -1,7 +1,20 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+* Performance improvement for the following queries ([Core #6376](https://github.com/realm/realm-core/issues/6376)):
+    * Significant (~75%) improvement when counting (`Results.count`) the number
+      of exact matches (with no other query conditions) on a
+      string/int/UUID/ObjectID property that has an index. This improvement
+      will be especially noticiable if there are a large number of results
+      returned (duplicate values).
+    * Significant (~99%) improvement when querying for an exact match on a Date
+      property that has an index.
+    * Significant (~99%) improvement when querying for a case insensitive match
+      on an AnyRealmValue property that has an index.
+    * Moderate (~25%) improvement when querying for an exact match on a Bool
+      property that has an index.
+    * Small (~5%) improvement when querying for a case insensitive match on an
+      AnyRealmValue property that does not have an index.
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
@@ -12,6 +25,19 @@ x.y.z Release notes (yyyy-MM-dd)
   cancelled if the Realm was already open ([PR #8178](https://github.com/realm/realm-swift/pull/8178), since v10.37.0).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+* Fix a crash when querying an AnyRealmValue property with a string operator
+  (contains/like/beginswith/endswith) or with case insensitivity.
+  ([Core #6376](https://github.com/realm/realm-core/issues/6376), since v10.8.0)
+* Querying for case-sensitive equality of a string on an indexed AnyRealmValue
+  property was returning case insensitive matches. For example querying for
+  `myIndexedAny == "Foo"` would incorrectly match on values of "foo" or "FOO" etc.
+  ([Core #6376](https://github.com/realm/realm-core/issues/6376), since v10.8.0)
+* Adding an index to an AnyRealmValue property when objects of that type
+  already existed would crash with an assertion.
+  ([Core #6376](https://github.com/realm/realm-core/issues/6376), since v10.8.0).
+* Fix a bug that may have resulted in arrays being in different orders on
+  different devices. Some cases of “Invalid prior_size” may be fixed too.
+  ([Core #6191](https://github.com/realm/realm-core/issues/6191), since v10.25.0).
 
 ### Compatibility
 * Realm Studio: 13.0.2 or later.
@@ -21,7 +47,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * Xcode: 13.3-14.2.
 
 ### Internal
-* Upgraded realm-core from ? to ?
+* Upgraded realm-core from 13.6.0 to 13.8.0
 
 10.37.0 Release notes (2023-03-09)
 =============================================================
