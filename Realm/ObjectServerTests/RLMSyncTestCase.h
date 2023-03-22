@@ -170,6 +170,11 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 - (void)waitForSessionTermination;
 @end
 
+@interface RLMSyncSession ()
+- (void)pause;
+- (void)unpause;
+@end
+
 FOUNDATION_EXTERN int64_t RLMGetClientFileIdent(RLMRealm *realm);
 
 RLM_HEADER_AUDIT_END(nullability, sendability)

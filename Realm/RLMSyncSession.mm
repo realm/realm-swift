@@ -160,6 +160,20 @@ static RLMSyncConnectionState convertConnectionState(SyncSession::ConnectionStat
     }
 }
 
+- (void)pause {
+    // NEXT-MAJOR: this is what suspend should be
+    if (auto session = _session.lock()) {
+        session->pause();
+    }
+}
+
+- (void)unpause {
+    // NEXT-MAJOR: this is what resume should be
+    if (auto session = _session.lock()) {
+        session->resume();
+    }
+}
+
 static util::UniqueFunction<void(Status)> wrapCompletion(dispatch_queue_t queue,
                                                          void (^callback)(NSError *)) {
     queue = queue ?: dispatch_get_main_queue();
