@@ -91,6 +91,9 @@ xctest() {
     fi
     if [[ $NAME == CocoaPods* ]]; then
         pod install --project-directory="$DIRECTORY"
+        # Workaround for https://github.com/CocoaPods/CocoaPods/issues/11808
+        # FIXME: remove once a release with https://github.com/CocoaPods/CocoaPods/pull/11828 is out
+        find "$DIRECTORY" -name 'Pods-*-frameworks.sh' -exec sed -i '' 's/readlink "/readlink -f "/' {} \;
     elif [[ $NAME == Carthage* ]]; then
         (
             cd "$DIRECTORY"
