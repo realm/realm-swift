@@ -938,17 +938,15 @@ public extension User {
 /// :nodoc:
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 @frozen public struct UserSubscription: Subscription {
-    private let user: User
     private let token: RLMUserSubscriptionToken
 
-    internal init(user: User, token: RLMUserSubscriptionToken) {
-        self.user = user
+    internal init(token: RLMUserSubscriptionToken) {
         self.token = token
     }
 
     /// A unique identifier for identifying publisher streams.
     public var combineIdentifier: CombineIdentifier {
-        return CombineIdentifier(NSNumber(value: token.value))
+        return CombineIdentifier(token)
     }
 
     /// This function is not implemented.
@@ -959,7 +957,7 @@ public extension User {
 
     /// Stop emitting values on this subscription.
     public func cancel() {
-        user.unsubscribe(token)
+        token.unsubscribe()
     }
 }
 
@@ -979,11 +977,11 @@ public class UserPublisher: Publisher {
 
     /// :nodoc:
     public func receive<S>(subscriber: S) where S: Subscriber, S.Failure == Never, Output == S.Input {
-        let token = user.subscribe { _ in
-            _ = subscriber.receive(self.user)
+        let token = user.subscribe { user in
+            _ = subscriber.receive(user)
         }
 
-        subscriber.receive(subscription: UserSubscription(user: user, token: token))
+        subscriber.receive(subscription: UserSubscription(token: token))
     }
 }
 

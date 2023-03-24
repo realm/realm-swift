@@ -27,10 +27,7 @@ typedef void(^RLMAppNotificationBlock)(RLMApp *);
 /// avoid dangling observers, therefore this must be retained to hold
 /// onto a subscription.
 @interface RLMAppSubscriptionToken : NSObject
-
-/// The underlying value of the subscription token.
-@property (nonatomic, readonly) NSUInteger value;
-
+- (void)unsubscribe;
 @end
 
 @interface RLMApp ()
@@ -38,8 +35,6 @@ typedef void(^RLMAppNotificationBlock)(RLMApp *);
 + (NSArray<RLMApp *> *)allApps;
 /// Subscribe to notifications for this RLMApp.
 - (RLMAppSubscriptionToken *)subscribe:(RLMAppNotificationBlock)block;
-/// Unsubscribe to notifications for this RLMApp.
-- (void)unsubscribe:(RLMAppSubscriptionToken *)token;
 
 + (instancetype)appWithId:(NSString *)appId
             configuration:(nullable RLMAppConfiguration *)configuration

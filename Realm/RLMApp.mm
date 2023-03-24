@@ -220,21 +220,21 @@ static void setOptionalString(std::optional<std::string>& dst, NSString *src) {
 #pragma mark RLMAppSubscriptionToken
 
 @implementation RLMAppSubscriptionToken {
-@public
-    std::unique_ptr<realm::Subscribable<app::App>::Token> _token;
+    std::shared_ptr<app::App> _app;
+    std::optional<app::App::Token> _token;
 }
 
-- (instancetype)initWithToken:(realm::Subscribable<app::App>::Token&&)token {
+- (instancetype)initWithApp:(std::shared_ptr<app::App>)app token:(app::App::Token&&)token {
     if (self = [super init]) {
-        _token = std::make_unique<realm::Subscribable<app::App>::Token>(std::move(token));
-        return self;
+        _app = std::move(app);
+        _token = std::move(token);
     }
-
-    return nil;
+    return self;
 }
 
-- (NSUInteger)value {
-    return _token->value();
+- (void)unsubscribe {
+    _token.reset();
+    _app.reset();
 }
 @end
 
@@ -423,15 +423,9 @@ static std::mutex& s_appMutex = *new std::mutex();
 }
 
 - (RLMAppSubscriptionToken *)subscribe:(RLMAppNotificationBlock)block {
-    return [[RLMAppSubscriptionToken alloc] initWithToken:_app->subscribe([block, self] (auto&) {
+    return [[RLMAppSubscriptionToken alloc] initWithApp:_app token:_app->subscribe([block, self] (auto&) {
         block(self);
     })];
 }
 
-- (void)unsubscribe:(RLMAppSubscriptionToken *)token {
-    return _app->unsubscribe(*token->_token);
-}
-
 @end
-
-
