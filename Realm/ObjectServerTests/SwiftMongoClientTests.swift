@@ -645,7 +645,7 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
         let document4: Document = ["name": "ted", "breed": "bullmastiff"]
 
         let objectIds = collection.insertMany([document, document2, document3, document4])
-            .map { $0.map { $0 .objectIdValue! } }
+            .map { @Sendable in $0.map(\.objectIdValue!) }
             .await(self)
         XCTAssertEqual(objectIds.count, 4)
         return objectIds

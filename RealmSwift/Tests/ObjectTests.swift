@@ -692,18 +692,18 @@ class ObjectTests: TestCase {
                 _ = realm.create(SwiftObject.self)
             }
         }
-        @Locked var enumerated = false
+        let enumerated = Locked(false)
         autoreleasepool {
             let configuration = Realm.Configuration(schemaVersion: 1, migrationBlock: { migration, _ in
                 migration.enumerateObjects(ofType: SwiftObject.className()) { _, newObject in
                     if let newObject = newObject {
                         block(newObject, migration)
-                        $enumerated.wrappedValue = true
+                        enumerated.value = true
                     }
                 }
             })
             self.realmWithTestPath(configuration: configuration)
-            XCTAssert(enumerated)
+            XCTAssert(enumerated.value)
         }
     }
 

@@ -1220,9 +1220,10 @@ extension Realm {
         if let realm = realm {
             // This can't be hit on the first open so .once == .never
             if downloadBeforeOpen == .always {
-                try await realm.waitForDownloadCompletion()
+                let task = RLMAsyncDownloadTask(realm: realm)
+                try await task.waitWithCancellationHandler()
             }
-            self = Realm(realm)
+            rlmRealm = realm
             return
         }
 
@@ -1231,14 +1232,8 @@ extension Realm {
         let task = RLMAsyncOpenTask(configuration: rlmConfiguration, confinedTo: scheduler,
                                     download: shouldAsyncOpen(configuration, downloadBeforeOpen))
         do {
-            try await withTaskCancellationHandler {
-                // Work around https://github.com/apple/swift/issues/61119 by smuggling
-                // the Realm out via a property on task rather than returning it
-                task.localRealm = try await task.waitForOpen()
-            } onCancel: {
-                task.cancel()
-            }
-            self = Realm(task.localRealm!)
+            try await task.waitWithCancellationHandler()
+            rlmRealm = task.localRealm!
             task.localRealm = nil
         } catch {
             // Check if the task was cancelled and if so replace the error
@@ -1248,7 +1243,34 @@ extension Realm {
         }
     }
 }
-#endif // swift(>=5.5)
+
+@available(macOS 10.15, tvOS 13.0, iOS 13.0, watchOS 6.0, *)
+private protocol TaskWithCancellation: Sendable {
+    func waitWithCancellationHandler() async throws
+    func wait() async throws
+    func cancel()
+}
+
+@available(macOS 10.15, tvOS 13.0, iOS 13.0, watchOS 6.0, *)
+extension TaskWithCancellation {
+    func waitWithCancellationHandler() async throws {
+        do {
+            try await withTaskCancellationHandler {
+                try await wait()
+            } onCancel: {
+                cancel()
+            }
+        } catch {
+            // Check if the task was cancelled and if so replace the error
+            // with reporting cancellation
+            try Task.checkCancellation()
+            throw error
+        }
+    }
+}
+extension RLMAsyncOpenTask: TaskWithCancellation {}
+extension RLMAsyncDownloadTask: TaskWithCancellation {}
+#endif // canImport(_Concurrency)
 
 /**
  Objects which can be fetched from the Realm - Object or Projection

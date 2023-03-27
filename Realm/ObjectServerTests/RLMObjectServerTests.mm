@@ -843,10 +843,10 @@ static NSString *randomEmail() {
 
     __block XCTestExpectation *ex = [self expectationWithDescription:@"got initial notification"];
     ex.expectedFulfillmentCount = 2;
-    id token1 = [[Person allObjectsInRealm:syncRealm] addNotificationBlock:^(RLMResults *, RLMCollectionChange *, NSError *) {
+    RLMNotificationToken *token1 = [[Person allObjectsInRealm:syncRealm] addNotificationBlock:^(RLMResults *, RLMCollectionChange *, NSError *) {
         [ex fulfill];
     }];
-    id token2 = [[Person allObjectsInRealm:asyncRealm] addNotificationBlock:^(RLMResults *, RLMCollectionChange *, NSError *) {
+    RLMNotificationToken *token2 = [[Person allObjectsInRealm:asyncRealm] addNotificationBlock:^(RLMResults *, RLMCollectionChange *, NSError *) {
         [ex fulfill];
     }];
     [self waitForExpectations:@[ex] timeout:5.0];
@@ -1611,9 +1611,9 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     RLMSyncSession *session = realm.syncSession;
     XCTAssertNotNil(session);
     XCTestExpectation *ex = [self expectationWithDescription:@"streaming-download-notifier"];
-    id token = [session addProgressNotificationForDirection:RLMSyncProgressDirectionDownload
-                                                       mode:RLMSyncProgressModeReportIndefinitely
-                                                      block:[&](NSUInteger xfr, NSUInteger xfb) {
+    RLMNotificationToken *token = [session addProgressNotificationForDirection:RLMSyncProgressDirectionDownload
+                                                                          mode:RLMSyncProgressModeReportIndefinitely
+                                                                         block:[&](NSUInteger xfr, NSUInteger xfb) {
         // Make sure the values are increasing, and update our stored copies.
         XCTAssertGreaterThanOrEqual(xfr, transferred.load());
         XCTAssertGreaterThanOrEqual(xfb, transferrable.load());

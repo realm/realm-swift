@@ -368,11 +368,11 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     }
 
     func expectSyncError(_ fn: () -> Void) -> SyncError? {
-        @Locked var error: SyncError?
+        let error = Locked(SyncError?.none)
         let ex = expectation(description: "Waiting for error handler to be called...")
         app.syncManager.errorHandler = { @Sendable (e, _) in
             if let e = e as? SyncError {
-                $error.wrappedValue = e
+                error.value = e
             } else {
                 XCTFail("Error \(e) was not a sync error. Something is wrong.")
             }
@@ -382,8 +382,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         fn()
 
         waitForExpectations(timeout: 10, handler: nil)
-        XCTAssertNotNil(error)
-        return error
+        XCTAssertNotNil(error.value)
+        return error.value
     }
 
     func testClientReset() throws {
@@ -798,6 +798,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         resetSyncManager()
     }
 
+    @available(*, deprecated) // .discardLocal
     func testClientResetDiscardLocal() throws {
         let user = try logInUser(for: basicCredentials())
         try prepareClientReset(#function, user)
@@ -858,6 +859,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
     }
 
+    @available(*, deprecated) // .discardLocal
     func testClientResetDiscardLocalAsyncOpen() throws {
         let user = try logInUser(for: basicCredentials())
         try prepareClientReset(#function, user)
@@ -939,6 +941,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         try waitForEditRecoveryMode(appId: appId, disable: false)
     }
 
+    @available(*, deprecated) // .discardLocal
     func testFlexibleSyncDiscardLocalClientReset() throws {
         let user = try logInUser(for: basicCredentials(app: self.flexibleSyncApp), app: self.flexibleSyncApp)
         try prepareFlexibleClientReset(user)
@@ -1037,7 +1040,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         try prepareFlexibleClientReset(user)
 
         let (assertBeforeBlock, assertAfterBlock) = assertRecover()
-        var config = user.flexibleSyncConfiguration(clientResetMode: .recoverUnsyncedChanges(beforeReset: assertBeforeBlock, afterReset: assertAfterBlock), initialSubscriptions: { subscriptions in
+        var config = user.flexibleSyncConfiguration(clientResetMode: .recoverUnsyncedChanges(beforeReset: assertBeforeBlock, afterReset: assertAfterBlock),
+                                                    initialSubscriptions: { subscriptions in
             subscriptions.append(QuerySubscription<SwiftPerson>(name: "all_people"))
         })
         config.objectTypes = [SwiftPerson.self]
@@ -1067,12 +1071,14 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
     }
 
+    @available(*, deprecated) // .discardLocal
     func testFlexibleSyncClientResetDiscardLocalWithInitialSubscriptions() throws {
         let user = try logInUser(for: basicCredentials(app: self.flexibleSyncApp), app: self.flexibleSyncApp)
         try prepareFlexibleClientReset(user)
 
         let (assertBeforeBlock, assertAfterBlock) = assertDiscardLocal()
-        var config = user.flexibleSyncConfiguration(clientResetMode: .discardLocal(beforeReset: assertBeforeBlock, afterReset: assertAfterBlock), initialSubscriptions: { subscriptions in
+        var config = user.flexibleSyncConfiguration(clientResetMode: .discardLocal(beforeReset: assertBeforeBlock, afterReset: assertAfterBlock),
+                                                    initialSubscriptions: { subscriptions in
             subscriptions.append(QuerySubscription<SwiftPerson>(name: "all_people"))
         })
         config.objectTypes = [SwiftPerson.self]
@@ -1320,13 +1326,13 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         let realm = try immediatelyOpenRealm(partitionValue: #function, user: user)
         let session = try XCTUnwrap(realm.syncSession)
-        @Locked var downloadCount = 0
-        @Locked var uploadCount = 0
+        let downloadCount = Locked(0)
+        let uploadCount = Locked(0)
         let tokenDownload = session.addProgressNotification(for: .download, mode: .reportIndefinitely) { _ in
-            $downloadCount.wrappedValue += 1
+            downloadCount.wrappedValue += 1
         }
         let tokenUpload = session.addProgressNotification(for: .upload, mode: .reportIndefinitely) { _ in
-            $uploadCount.wrappedValue += 1
+            uploadCount.wrappedValue += 1
         }
 
         executeChild()
@@ -1336,15 +1342,15 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
         waitForUploads(for: realm)
 
-        XCTAssertGreaterThan(downloadCount, 1)
-        XCTAssertGreaterThan(uploadCount, 1)
+        XCTAssertGreaterThan(downloadCount.wrappedValue, 1)
+        XCTAssertGreaterThan(uploadCount.wrappedValue, 1)
 
         tokenDownload!.invalidate()
         tokenUpload!.invalidate()
         RLMSyncSession.notificationsQueue().sync { }
 
-        downloadCount = 0
-        uploadCount = 0
+        downloadCount.wrappedValue = 0
+        uploadCount.wrappedValue = 0
 
         executeChild()
         waitForDownloads(for: realm)
@@ -1354,8 +1360,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         waitForUploads(for: realm)
 
         // We check that the notification block is not called after we reset the counters on the notifiers and call invalidated().
-        XCTAssertEqual(downloadCount, 0)
-        XCTAssertEqual(uploadCount, 0)
+        XCTAssertEqual(downloadCount.wrappedValue, 0)
+        XCTAssertEqual(uploadCount.wrappedValue, 0)
     }
 
     // MARK: - Download Realm
@@ -1602,11 +1608,11 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let user = try logInUser(for: basicCredentials())
 
         // Set a callback on the user
-        @Locked var blockCalled = false
+        let blockCalled = Locked(false)
         let ex = expectation(description: "Error callback should fire upon receiving an error")
         app.syncManager.errorHandler = { @Sendable (error, _) in
             assertSyncError(error, .clientUserError, "Unable to refresh the user access token.")
-            $blockCalled.wrappedValue = true
+            blockCalled.value = true
             ex.fulfill()
         }
 
@@ -1614,7 +1620,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         manuallySetAccessToken(for: user, value: badAccessToken())
         manuallySetRefreshToken(for: user, value: badAccessToken())
         // Try to open a Realm with the user; this will cause our errorHandler block defined above to be fired.
-        XCTAssertFalse(blockCalled)
+        XCTAssertFalse(blockCalled.value)
         _ = try immediatelyOpenRealm(partitionValue: "realm_id", user: user)
 
         waitForExpectations(timeout: 10.0, handler: nil)
@@ -2191,8 +2197,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let className = "SwiftCustomColumnObject"
         RealmServer.shared.retrieveSchemaProperties(appId, className: className) { result in
             switch result {
-            case .failure:
-                XCTFail("Couldn't retrieve schema properties for \(className)")
+            case .failure(let error):
+                XCTFail("Couldn't retrieve schema properties for \(className): \(error)")
             case .success(let properties):
                 for (_, value) in customColumnPropertiesMapping {
                     XCTAssertTrue(properties.contains(where: { $0 == value }))
@@ -2314,64 +2320,6 @@ func hasCombine() -> Bool {
 }
 
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
-extension Publisher {
-    func expectValue(_ testCase: XCTestCase, _ expectation: XCTestExpectation,
-                     receiveValue: ((Self.Output) -> Void)? = nil) -> AnyCancellable {
-        return self.sink(receiveCompletion: { result in
-            if case .failure(let error) = result {
-                XCTFail("Unexpected failure: \(error)")
-            }
-        }, receiveValue: { value in
-            receiveValue?(value)
-            expectation.fulfill()
-        })
-    }
-
-    func await(_ testCase: XCTestCase, timeout: TimeInterval = 20.0, receiveValue: ((Self.Output) -> Void)? = nil) {
-        let expectation = testCase.expectation(description: "Async combine pipeline")
-        let cancellable = self.expectValue(testCase, expectation, receiveValue: receiveValue)
-        testCase.wait(for: [expectation], timeout: timeout)
-        cancellable.cancel()
-    }
-
-    @discardableResult
-    func await(_ testCase: XCTestCase, timeout: TimeInterval = 20.0) -> Self.Output {
-        let expectation = testCase.expectation(description: "Async combine pipeline")
-        var value: Self.Output?
-        let cancellable = self.expectValue(testCase, expectation, receiveValue: { value = $0 })
-        testCase.wait(for: [expectation], timeout: timeout)
-        cancellable.cancel()
-        return value!
-    }
-
-    func awaitFailure(_ testCase: XCTestCase, timeout: TimeInterval = 20.0,
-                      _ errorHandler: ((Self.Failure) -> Void)? = nil) {
-        let expectation = testCase.expectation(description: "Async combine pipeline should fail")
-        let cancellable = self.sink(receiveCompletion: { result in
-            if case .failure(let error) = result {
-                errorHandler?(error)
-                expectation.fulfill()
-            }
-        }, receiveValue: { value in
-            XCTFail("Should have failed but got \(value)")
-        })
-        testCase.wait(for: [expectation], timeout: timeout)
-        cancellable.cancel()
-    }
-
-    func awaitFailure<E: Error>(_ testCase: XCTestCase, timeout: TimeInterval = 20.0,
-                                _ errorHandler: @escaping ((E) -> Void)) {
-        awaitFailure(testCase, timeout: timeout) { error in
-            guard let error = error as? E else {
-                XCTFail("Expected error of type \(E.self), got \(error)")
-                return
-            }
-            errorHandler(error)
-        }
-    }
-}
-
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 @objc(CombineObjectServerTests)
 class CombineObjectServerTests: SwiftSyncTestCase {
     override class var defaultTestSuite: XCTestSuite {
@@ -2395,42 +2343,42 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         let collection = try setupMongoCollection(for: "Dog")
         let document: Document = ["name": "fido", "breed": "cane corso"]
 
-        var watchEx1 = expectation(description: "Main thread watch")
-        var watchEx2 = expectation(description: "Background thread watch")
+        let watchEx1 = Locked(expectation(description: "Main thread watch"))
+        let watchEx2 = Locked(expectation(description: "Background thread watch"))
 
         collection.watch()
             .onOpen {
-                watchEx1.fulfill()
+                watchEx1.wrappedValue.fulfill()
             }
             .subscribe(on: DispatchQueue.global())
             .receive(on: DispatchQueue.global())
-            .sink(receiveCompletion: { _ in }) { _ in
+            .sink(receiveCompletion: { @Sendable _ in }) { @Sendable _ in
                 XCTAssertFalse(Thread.isMainThread)
-                watchEx1.fulfill()
+                watchEx1.wrappedValue.fulfill()
             }.store(in: &subscriptions)
 
         collection.watch()
             .onOpen {
-                watchEx2.fulfill()
+                watchEx2.wrappedValue.fulfill()
             }
             .subscribe(on: DispatchQueue.main)
             .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { _ in }) { _ in
                 XCTAssertTrue(Thread.isMainThread)
-                watchEx2.fulfill()
+                watchEx2.wrappedValue.fulfill()
             }.store(in: &subscriptions)
 
         for _ in 0..<3 {
-            wait(for: [watchEx1, watchEx2], timeout: 60.0)
-            watchEx1 = expectation(description: "Main thread watch")
-            watchEx2 = expectation(description: "Background thread watch")
+            wait(for: [watchEx1.wrappedValue, watchEx2.wrappedValue], timeout: 60.0)
+            watchEx1.wrappedValue = expectation(description: "Main thread watch")
+            watchEx2.wrappedValue = expectation(description: "Background thread watch")
             collection.insertOne(document) { result in
                 if case .failure(let error) = result {
                     XCTFail("Failed to insert: \(error)")
                 }
             }
         }
-        wait(for: [watchEx1, watchEx2], timeout: 60.0)
+        wait(for: [watchEx1.wrappedValue, watchEx2.wrappedValue], timeout: 60.0)
     }
 
     func testWatchCombineWithFilterIds() throws {
@@ -2443,11 +2391,11 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         let objIds = collection.insertMany([document, document2, document3, document4]).await(self)
         let objectIds = objIds.map { $0.objectIdValue! }
 
-        var watchEx1 = expectation(description: "Main thread watch")
-        var watchEx2 = expectation(description: "Background thread watch")
+        let watchEx1 = Locked(expectation(description: "Main thread watch"))
+        let watchEx2 = Locked(expectation(description: "Background thread watch"))
         collection.watch(filterIds: [objectIds[0]])
             .onOpen {
-                watchEx1.fulfill()
+                watchEx1.wrappedValue.fulfill()
             }
             .subscribe(on: DispatchQueue.main)
             .receive(on: DispatchQueue.main)
@@ -2459,17 +2407,17 @@ class CombineObjectServerTests: SwiftSyncTestCase {
 
                 let objectId = doc["fullDocument"]??.documentValue!["_id"]??.objectIdValue!
                 if objectId == objectIds[0] {
-                    watchEx1.fulfill()
+                    watchEx1.wrappedValue.fulfill()
                 }
             }.store(in: &subscriptions)
 
         collection.watch(filterIds: [objectIds[1]])
             .onOpen {
-                watchEx2.fulfill()
+                watchEx2.wrappedValue.fulfill()
             }
             .subscribe(on: DispatchQueue.global())
             .receive(on: DispatchQueue.global())
-            .sink(receiveCompletion: { _ in }) { (changeEvent) in
+            .sink(receiveCompletion: { _ in }) { @Sendable changeEvent in
                 XCTAssertFalse(Thread.isMainThread)
                 guard let doc = changeEvent.documentValue else {
                     return
@@ -2477,14 +2425,14 @@ class CombineObjectServerTests: SwiftSyncTestCase {
 
                 let objectId = doc["fullDocument"]??.documentValue!["_id"]??.objectIdValue!
                 if objectId == objectIds[1] {
-                    watchEx2.fulfill()
+                    watchEx2.wrappedValue.fulfill()
                 }
             }.store(in: &subscriptions)
 
         for i in 0..<3 {
-            wait(for: [watchEx1, watchEx2], timeout: 60.0)
-            watchEx1 = expectation(description: "Main thread watch")
-            watchEx2 = expectation(description: "Background thread watch")
+            wait(for: [watchEx1.wrappedValue, watchEx2.wrappedValue], timeout: 60.0)
+            watchEx1.wrappedValue = expectation(description: "Main thread watch")
+            watchEx2.wrappedValue = expectation(description: "Background thread watch")
 
             let name: AnyBSON = .string("fido-\(i)")
             collection.updateOneDocument(filter: ["_id": AnyBSON.objectId(objectIds[0])],
@@ -2500,7 +2448,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
                 }
             }
         }
-        wait(for: [watchEx1, watchEx2], timeout: 60.0)
+        wait(for: [watchEx1.wrappedValue, watchEx2.wrappedValue], timeout: 60.0)
     }
 
     func testWatchCombineWithMatchFilter() throws {
@@ -2514,11 +2462,11 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         XCTAssertEqual(objIds.count, 4)
         let objectIds = objIds.map { $0.objectIdValue! }
 
-        var watchEx1 = expectation(description: "Main thread watch")
-        var watchEx2 = expectation(description: "Background thread watch")
+        let watchEx1 = Locked(expectation(description: "Main thread watch"))
+        let watchEx2 = Locked(expectation(description: "Background thread watch"))
         collection.watch(matchFilter: ["fullDocument._id": AnyBSON.objectId(objectIds[0])])
             .onOpen {
-                watchEx1.fulfill()
+                watchEx1.wrappedValue.fulfill()
             }
             .subscribe(on: DispatchQueue.main)
             .receive(on: DispatchQueue.main)
@@ -2530,17 +2478,17 @@ class CombineObjectServerTests: SwiftSyncTestCase {
 
                 let objectId = doc["fullDocument"]??.documentValue!["_id"]??.objectIdValue!
                 if objectId == objectIds[0] {
-                    watchEx1.fulfill()
+                    watchEx1.wrappedValue.fulfill()
                 }
         }.store(in: &subscriptions)
 
         collection.watch(matchFilter: ["fullDocument._id": AnyBSON.objectId(objectIds[1])])
             .onOpen {
-                watchEx2.fulfill()
+                watchEx2.wrappedValue.fulfill()
             }
             .subscribe(on: DispatchQueue.global())
             .receive(on: DispatchQueue.global())
-            .sink(receiveCompletion: { _ in }) { changeEvent in
+            .sink(receiveCompletion: { _ in }) { @Sendable changeEvent in
                 XCTAssertFalse(Thread.isMainThread)
                 guard let doc = changeEvent.documentValue else {
                     return
@@ -2548,14 +2496,14 @@ class CombineObjectServerTests: SwiftSyncTestCase {
 
                 let objectId = doc["fullDocument"]??.documentValue!["_id"]??.objectIdValue!
                 if objectId == objectIds[1] {
-                    watchEx2.fulfill()
+                    watchEx2.wrappedValue.fulfill()
                 }
         }.store(in: &subscriptions)
 
         for i in 0..<3 {
-            wait(for: [watchEx1, watchEx2], timeout: 60.0)
-            watchEx1 = expectation(description: "Main thread watch")
-            watchEx2 = expectation(description: "Background thread watch")
+            wait(for: [watchEx1.wrappedValue, watchEx2.wrappedValue], timeout: 60.0)
+            watchEx1.wrappedValue = expectation(description: "Main thread watch")
+            watchEx2.wrappedValue = expectation(description: "Background thread watch")
 
             let name: AnyBSON = .string("fido-\(i)")
             collection.updateOneDocument(filter: ["_id": AnyBSON.objectId(objectIds[0])],
@@ -2571,7 +2519,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
                 }
             }
         }
-        wait(for: [watchEx1, watchEx2], timeout: 60.0)
+        wait(for: [watchEx1.wrappedValue, watchEx2.wrappedValue], timeout: 60.0)
     }
 
     // MARK: - Combine promises
@@ -2591,13 +2539,14 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         }.store(in: &subscriptions)
 
         app.emailPasswordAuth.registerUser(email: email, password: password)
-            .flatMap { self.app.login(credentials: .emailPassword(email: email, password: password)) }
+            .flatMap { @Sendable in self.app.login(credentials: .emailPassword(email: email, password: password)) }
+            .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { result in
                 if case let .failure(error) = result {
                     XCTFail("Should have completed login chain: \(error.localizedDescription)")
                 }
             }, receiveValue: { user in
-                user.objectWillChange.sink { user in
+                user.objectWillChange.sink { @Sendable user in
                     XCTAssert(!user.isLoggedIn)
                     loginEx.fulfill()
                 }.store(in: &self.subscriptions)
@@ -2611,45 +2560,42 @@ class CombineObjectServerTests: SwiftSyncTestCase {
     }
 
     func testAsyncOpenCombine() {
-        if isParent {
-            let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
-            let password = randomString(10)
-            app.emailPasswordAuth.registerUser(email: email, password: password)
-                .flatMap { self.app.login(credentials: .emailPassword(email: email, password: password)) }
-                .flatMap { user in
-                    Realm.asyncOpen(configuration: user.configuration(testName: #function))
+        let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
+        let password = randomString(10)
+        app.emailPasswordAuth.registerUser(email: email, password: password)
+            .flatMap { @Sendable in self.app.login(credentials: .emailPassword(email: email, password: password)) }
+            .flatMap { @Sendable user in
+                Realm.asyncOpen(configuration: user.configuration(testName: #function))
+            }
+            .await(self, timeout: 30.0) { realm in
+                try! realm.write {
+                    realm.add(SwiftHugeSyncObject.create())
+                    realm.add(SwiftHugeSyncObject.create())
                 }
-                .await(self, timeout: 30.0) { realm in
-                    try! realm.write {
-                        realm.add(SwiftHugeSyncObject.create())
-                        realm.add(SwiftHugeSyncObject.create())
-                    }
-                    let progressEx = self.expectation(description: "Should upload")
-                    let token = realm.syncSession!.addProgressNotification(for: .upload, mode: .forCurrentlyOutstandingWork) {
-                        if $0.isTransferComplete {
-                            progressEx.fulfill()
-                        }
-                    }
-                    self.wait(for: [progressEx], timeout: 30.0)
-                    token?.invalidate()
-                }
-            executeChild()
-        } else {
-            let chainEx = expectation(description: "Should chain realm login => realm async open")
-            let progressEx = expectation(description: "Should receive progress notification")
-            app.login(credentials: .anonymous)
-                .flatMap {
-                    Realm.asyncOpen(configuration: $0.configuration(testName: #function)).onProgressNotification {
-                        if $0.isTransferComplete {
-                            progressEx.fulfill()
-                        }
+                let progressEx = self.expectation(description: "Should upload")
+                let token = realm.syncSession!.addProgressNotification(for: .upload, mode: .forCurrentlyOutstandingWork) {
+                    if $0.isTransferComplete {
+                        progressEx.fulfill()
                     }
                 }
-                .expectValue(self, chainEx) { realm in
-                    XCTAssertEqual(realm.objects(SwiftHugeSyncObject.self).count, 2)
-                }.store(in: &subscriptions)
-            wait(for: [chainEx, progressEx], timeout: 30.0)
-        }
+                self.wait(for: [progressEx], timeout: 30.0)
+                token?.invalidate()
+            }
+
+        let chainEx = expectation(description: "Should chain realm login => realm async open")
+        let progressEx = expectation(description: "Should receive progress notification")
+        app.login(credentials: .anonymous)
+            .flatMap { @Sendable in
+                Realm.asyncOpen(configuration: $0.configuration(testName: #function)).onProgressNotification {
+                    if $0.isTransferComplete {
+                        progressEx.fulfill()
+                    }
+                }
+            }
+            .expectValue(self, chainEx) { realm in
+                XCTAssertEqual(realm.objects(SwiftHugeSyncObject.self).count, 2)
+            }.store(in: &subscriptions)
+        wait(for: [chainEx, progressEx], timeout: 30.0)
     }
 
     func testAsyncOpenStandaloneCombine() throws {
@@ -2669,7 +2615,6 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
         let password = randomString(10)
 
-        let deleteEx = expectation(description: "Delete user")
         let appEx = expectation(description: "App changes triggered")
         var triggered = 0
         app.objectWillChange.sink { _ in
@@ -2680,17 +2625,10 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         }.store(in: &subscriptions)
 
         app.emailPasswordAuth.registerUser(email: email, password: password)
-            .flatMap { self.app.login(credentials: .emailPassword(email: email, password: password)) }
-            .flatMap { $0.delete() }
-            .sink(receiveCompletion: { completion in
-                if case let .failure(error) = completion {
-                    XCTFail("Should have completed login chain: \(error.localizedDescription)")
-                }
-            }, receiveValue: {
-                deleteEx.fulfill()
-            })
-            .store(in: &subscriptions)
-        wait(for: [deleteEx, appEx], timeout: 30.0)
+            .flatMap { @Sendable in self.app.login(credentials: .emailPassword(email: email, password: password)) }
+            .flatMap { @Sendable in $0.delete() }
+            .await(self)
+        wait(for: [appEx], timeout: 30.0)
         XCTAssertEqual(self.app.allUsers.count, 0)
         XCTAssertEqual(triggered, 2)
     }

@@ -5,7 +5,11 @@ x.y.z Release notes (yyyy-MM-dd)
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
-* None.
+* Add missing `@Sendable` annotations to several sync and app services related
+  callbacks ([PR #8169](https://github.com/realm/realm-swift/pull/8169), since v10.34.0).
+* Fix some bugs in handling task cancellation for async Realm init. Some very
+  specific timing windows could cause crashes, and the download would not be
+  cancelled if the Realm was already open ([PR #8178](https://github.com/realm/realm-swift/pull/8178), since v10.37.0).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 

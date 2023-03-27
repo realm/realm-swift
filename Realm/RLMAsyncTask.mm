@@ -19,6 +19,7 @@
 #import "RLMAsyncTask_Private.h"
 
 #import "RLMError_Private.hpp"
+#import "RLMRealm_Private.hpp"
 #import "RLMRealmConfiguration_Private.hpp"
 #import "RLMScheduler.h"
 #import "RLMSyncSubscription_Private.h"
@@ -26,6 +27,7 @@
 
 #import <realm/exceptions.hpp>
 #import <realm/object-store/sync/async_open_task.hpp>
+#import <realm/object-store/sync/sync_session.hpp>
 #import <realm/object-store/thread_safe_reference.hpp>
 
 static dispatch_queue_t s_async_open_queue = dispatch_queue_create("io.realm.asyncOpenDispatchQueue",
@@ -49,7 +51,7 @@ __attribute__((objc_direct_members))
     RLMRealmConfiguration *_configuration;
     RLMScheduler *_scheduler;
     bool _waitForDownloadCompletion;
-    RLMAsyncOpenRealmCallback _completion;
+    void (^_completion)(NSError *);
 
     RLMRealm *_backgroundRealm;
 }
@@ -82,22 +84,13 @@ __attribute__((objc_direct_members))
     _progressBlocks.clear();
     if (_task) {
         _task->cancel();
+        // Cancelling realm::AsyncOpenTask results in it never calling our callback,
+        // so if we're currently in that we have to just send the cancellation
+        // error immediately. In all other cases, though, we want to wait until
+        // we've actually cancelled and will send the error the next time we
+        // check for cancellation
+        [self reportError:s_canceledError];
     }
-    [self reportError:s_canceledError];
-}
-
-- (void)setTask:(std::shared_ptr<realm::AsyncOpenTask>)task __attribute__((objc_direct)) {
-    std::lock_guard lock(_mutex);
-    if (_cancel) {
-        task->cancel();
-        return;
-    }
-
-    _task = task;
-    for (auto& block : _progressBlocks) {
-        _task->register_download_progress_notifier(block);
-    }
-    _progressBlocks.clear();
 }
 
 - (instancetype)initWithConfiguration:(RLMRealmConfiguration *)configuration
@@ -127,12 +120,22 @@ __attribute__((objc_direct_members))
 }
 
 - (void)waitForOpen:(RLMAsyncOpenRealmCallback)completion {
-    {
-        std::lock_guard lock(_mutex);
-        _completion = completion;
-        if (_cancel) {
-            return [self reportError:s_canceledError];
+    __weak auto weakSelf = self;
+    [self waitWithCompletion:^(NSError *error) {
+        RLMRealm *realm;
+        if (auto self = weakSelf) {
+            realm = self->_localRealm;
+            self->_localRealm = nil;
         }
+        completion(realm, error);
+    }];
+}
+
+- (void)waitWithCompletion:(void (^)(NSError *))completion {
+    std::lock_guard lock(_mutex);
+    _completion = completion;
+    if (_cancel) {
+        return [self reportError:s_canceledError];
     }
 
     // get_synchronized_realm() synchronously opens the DB and performs file-format
@@ -144,23 +147,52 @@ __attribute__((objc_direct_members))
     });
 }
 
+// The full async open flow is:
+// 1. Dispatch to a background queue
+// 2. Use Realm::get_synchronized_realm() to create the Realm file, run
+//    migrations and compactions, and download the latest data from the server.
+// 3. Dispatch back to queue
+// 4. Initialize a RLMRealm in the background queue to perform the SDK
+//    initialization (e.g. creating managed accessor classes).
+// 5. Wait for initial flexible sync subscriptions to complete
+// 6. Dispatch to the final scheduler
+// 7. Open the final RLMRealm, release the previously opened background one,
+//    and then invoke the completion callback.
+//
+// Steps 2 and 5 are skipped for non-sync or non-flexible sync Realms, in which
+// case step 4 will handle doing migrations and compactions etc. in the background.
+//
+// At any point `cancel` can be called from another thread. Cancellation is mostly
+// cooperative rather than preemptive: we check at each step if we've been cancelled,
+// and if so call the completion with the cancellation error rather than
+// proceeding. Downloading the data from the server is the one exception to this.
+// Ideally waiting for flexible sync subscriptions would also be preempted.
 - (void)startAsyncOpen {
+    std::unique_lock lock(_mutex);
     if ([self checkCancellation]) {
         return;
     }
 
     if (_waitForDownloadCompletion && _configuration.configRef.sync_config) {
 #if REALM_ENABLE_SYNC
-        auto task = realm::Realm::get_synchronized_realm(_configuration.config);
-        self.task = task;
-        task->start([=](realm::ThreadSafeReference ref, std::exception_ptr err) {
+        _task = realm::Realm::get_synchronized_realm(_configuration.config);
+        for (auto& block : _progressBlocks) {
+            _task->register_download_progress_notifier(block);
+        }
+        _progressBlocks.clear();
+        _task->start([=](realm::ThreadSafeReference ref, std::exception_ptr err) {
+            std::lock_guard lock(_mutex);
             if ([self checkCancellation]) {
                 return;
             }
+            // Note that cancellation intentionally trumps reporting other kinds
+            // of errors
             if (err) {
                 return [self reportException:err];
             }
 
+            // Dispatch blocks can only capture copyable types, so we need to
+            // resolve the TSR to a shared_ptr<Realm>
             auto realm = ref.resolve<std::shared_ptr<realm::Realm>>(nullptr);
             // We're now running on the sync worker thread, so hop back
             // to a more appropriate queue for the next stage of init.
@@ -178,12 +210,15 @@ __attribute__((objc_direct_members))
 #endif
     }
     else {
-        // We're not downloading first, so just pretend it completed successfully
+        // We're not downloading first, so just proceed directly to the next step.
+        lock.unlock();
         [self downloadCompleted];
     }
 }
 
 - (void)downloadCompleted {
+    std::unique_lock lock(_mutex);
+    _task.reset();
     if ([self checkCancellation]) {
         return;
     }
@@ -212,36 +247,53 @@ __attribute__((objc_direct_members))
             return [subscriptions waitForSynchronizationOnQueue:nil
                                                 completionBlock:^(NSError *error) {
                 if (error) {
+                    std::lock_guard lock(_mutex);
                     return [self reportError:error];
                 }
-                [self completeAsyncOpen];
+                [self asyncOpenCompleted];
             }];
         }
     }
 #endif
-    [self completeAsyncOpen];
+    lock.unlock();
+    [self asyncOpenCompleted];
 }
 
-- (void)completeAsyncOpen {
-    if ([self checkCancellation]) {
-        return;
+- (void)asyncOpenCompleted {
+    std::lock_guard lock(_mutex);
+    if (![self checkCancellation]) {
+        [_scheduler invoke:^{
+            [self openFinalRealmAndCallCompletion];
+        }];
     }
+}
 
-    [_scheduler invoke:^{
-        @autoreleasepool {
-            NSError *error;
-            RLMRealm *localRealm = [RLMRealm realmWithConfiguration:_configuration
-                                                         confinedTo:_scheduler
-                                                              error:&error];
-            auto completion = _completion;
-            [self releaseResources];
-            completion(localRealm, error);
+- (void)openFinalRealmAndCallCompletion {
+    std::unique_lock lock(_mutex);
+    @autoreleasepool {
+        if ([self checkCancellation]) {
+            return;
         }
-    }];
+        if (!_completion) {
+            return;
+        }
+        NSError *error;
+        auto completion = _completion;
+        // It should not actually be possible for this to fail
+        _localRealm = [RLMRealm realmWithConfiguration:_configuration
+                                            confinedTo:_scheduler
+                                                 error:&error];
+        [self releaseResources];
+
+        lock.unlock();
+        completion(error);
+    }
 }
 
 - (bool)checkCancellation {
-    std::lock_guard lock(_mutex);
+    if (_cancel && _completion) {
+        [self reportError:s_canceledError];
+    }
     return _cancel;
 }
 
@@ -263,11 +315,15 @@ __attribute__((objc_direct_members))
 }
 
 - (void)reportError:(NSError *)error {
+    if (!_completion || !_scheduler) {
+        return;
+    }
+
     auto completion = _completion;
     auto scheduler = _scheduler;
     [self releaseResources];
     [scheduler invoke:^{
-        completion(nil, error);
+        completion(error);
     }];
 }
 
@@ -276,5 +332,41 @@ __attribute__((objc_direct_members))
     _configuration = nil;
     _scheduler = nil;
     _completion = nil;
+}
+@end
+
+@implementation RLMAsyncDownloadTask {
+    RLMUnfairMutex _mutex;
+    std::shared_ptr<realm::SyncSession> _session;
+    bool _started;
+}
+
+- (instancetype)initWithRealm:(RLMRealm *)realm {
+    if (self = [super init]) {
+        _session = realm->_realm->sync_session();
+    }
+    return self;
+}
+
+- (void)waitWithCompletion:(void (^)(NSError *_Nullable))completion {
+    std::unique_lock lock(_mutex);
+    if (!_session) {
+        lock.unlock();
+        return completion(nil);
+    }
+
+    _started = true;
+    _session->revive_if_needed();
+    _session->wait_for_download_completion([=](realm::Status status) {
+        completion(makeError(status));
+    });
+}
+
+- (void)cancel {
+    std::unique_lock lock(_mutex);
+    if (_started) {
+        _session->force_close();
+    }
+    _session = nullptr;
 }
 @end
