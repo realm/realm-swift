@@ -1,6 +1,8 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.37.1 Release notes (2023-03-27)
 =============================================================
+
 ### Enhancements
+
 * Performance improvement for the following queries ([Core #6376](https://github.com/realm/realm-core/issues/6376)):
     * Significant (~75%) improvement when counting (`Results.count`) the number
       of exact matches (with no other query conditions) on a
@@ -17,14 +19,12 @@ x.y.z Release notes (yyyy-MM-dd)
       AnyRealmValue property that does not have an index.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
+
 * Add missing `@Sendable` annotations to several sync and app services related
   callbacks ([PR #8169](https://github.com/realm/realm-swift/pull/8169), since v10.34.0).
 * Fix some bugs in handling task cancellation for async Realm init. Some very
   specific timing windows could cause crashes, and the download would not be
   cancelled if the Realm was already open ([PR #8178](https://github.com/realm/realm-swift/pull/8178), since v10.37.0).
-
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 * Fix a crash when querying an AnyRealmValue property with a string operator
   (contains/like/beginswith/endswith) or with case insensitivity.
   ([Core #6376](https://github.com/realm/realm-core/issues/6376), since v10.8.0)
@@ -40,6 +40,7 @@ x.y.z Release notes (yyyy-MM-dd)
   ([Core #6191](https://github.com/realm/realm-core/issues/6191), since v10.25.0).
 
 ### Compatibility
+
 * Realm Studio: 13.0.2 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 14.2.
@@ -47,6 +48,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * Xcode: 13.3-14.2.
 
 ### Internal
+
 * Upgraded realm-core from 13.6.0 to 13.8.0
 
 10.37.0 Release notes (2023-03-09)
