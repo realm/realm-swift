@@ -21,6 +21,7 @@
 #import "RLMBSON_Private.hpp"
 #import "RLMCredentials_Private.hpp"
 #import "RLMEmailPasswordAuth.h"
+#import "RLMLogger_Private.h"
 #import "RLMPushClient_Private.hpp"
 #import "RLMSyncManager_Private.hpp"
 #import "RLMUser_Private.hpp"
@@ -250,6 +251,9 @@ static void setOptionalString(std::optional<std::string>& dst, NSString *src) {
 
 + (void)initialize {
     [RLMRealm class];
+    // Even though there is nothing to log when the App initialises, we want to
+    // be able to log anything happening after this e.g. login/register.
+    RLMInitDefaultLogger();
 }
 
 - (instancetype)initWithApp:(std::shared_ptr<realm::app::App>)app {

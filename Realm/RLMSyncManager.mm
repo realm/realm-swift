@@ -36,6 +36,7 @@
 
 using namespace realm;
 
+// NEXT-MAJOR: All the code associated to the logger from sync manager should be removed.
 using Level = realm::util::Logger::Level;
 
 namespace {

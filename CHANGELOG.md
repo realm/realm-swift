@@ -125,6 +125,39 @@ x.y.z Release notes (yyyy-MM-dd)
 * Performing a large number of queries without ever performing a write resulted
   in steadily increasing memory usage, some of which was never fully freed due
   to an unbounded cache ([#7978](https://github.com/realm/realm-swift/issues/7978), since v10.27.0).
+* Improve performance of cancelling a write transactions after making changes. If no KVO observers are used this is now constant time rather than taking time proportional to the number of changes to be rolled back. Cancelling a write transaction with KVO observers is 10-20% faster. ([Core PR #6513](https://github.com/realm/realm-core/pull/6513)).
+* Added support for creating and add a custom logger, and implement your own logging logic.
+  Use `Logger` as a base class, which allows you to override the default logger 
+  implementation for `doLog(level:message)`, which can be used to add your own logging logic. 
+ 
+  ```swift
+  final class InMemoryLogger: Logger {
+     var logs: String = ""
+
+     override func doLog(level: LogLevel, message: String) {
+         logs += "Realm Logger: \(Date.now): \(level.logLevel) \(message)"
+     }
+  }
+  ```
+  This logger can be set as default using the new API `Logger.setDefaultLogger(inMemoryLogger)`.
+* It is now possible to change the set and get the log level at any point of the application's lifetime.
+  ```swift
+  Logger.logLevel = .debug
+  ```
+  This will override the log level set by any custom logger, and messages with log level greater
+  than the one set would not be returned/showed.
+* We have set `.warn` as the default log threshold level for Realm. You will now see some 
+  log message in your console. To disable set your log level to `off` using `Logger.logLevel = .off`.
+
+### Fixed
+
+* Performing a large number of queries without ever performing a write resulted in steadily increasing memory usage, some of which was never fully freed due to an unbounded cache ([#7978](https://github.com/realm/realm-swift/issues/7978), since v10.27.0).
+### Deprecations
+
+* `App.SyncManager.logLevel` and `App.SyncManager.logFunction` are deprecated in favour 
+  setting or using a default logger.
+  
+<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
 ### Compatibility
 

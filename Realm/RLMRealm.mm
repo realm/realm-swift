@@ -23,6 +23,7 @@
 #import "RLMArray_Private.hpp"
 #import "RLMDictionary_Private.hpp"
 #import "RLMError_Private.hpp"
+#import "RLMLogger_Private.h"
 #import "RLMMigration_Private.h"
 #import "RLMObject_Private.h"
 #import "RLMObject_Private.hpp"
@@ -49,7 +50,6 @@
 #import <realm/object-store/schema.hpp>
 #import <realm/object-store/shared_realm.hpp>
 #import <realm/object-store/util/scheduler.hpp>
-#import <realm/util/logger.hpp>
 #import <realm/util/scope_exit.hpp>
 #import <realm/version.hpp>
 
@@ -238,14 +238,6 @@ bool copySeedFile(RLMRealmConfiguration *configuration, NSError **error) {
     bool _sendingNotifications;
 }
 
-namespace {
-class NullLogger : public realm::util::Logger {
-public:
-    NullLogger() = default;
-    void do_log(Level, const std::string&) override {}
-};
-}
-
 + (void)initialize {
     static bool initialized;
     if (initialized) {
@@ -255,8 +247,10 @@ public:
 
     RLMCheckForUpdates();
     RLMSendAnalytics();
-    realm::util::Logger::set_default_level_threshold(realm::util::Logger::Level::off);
-    realm::util::Logger::set_default_logger(std::make_shared<NullLogger>());
+
+    // In cases where we are not using a synced Realm, we initialise the default logger
+    // before opening any realm.
+    RLMInitDefaultLogger();
 }
 
 - (instancetype)initPrivate {
