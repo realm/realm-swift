@@ -210,6 +210,23 @@ class SwiftEventTests: SwiftSyncTestCase {
                     ["SwiftPerson": ["deletions": [mutatedPersonJson]]])
     }
 
+    func testBasicWithAsyncOpen() throws {
+        let realm = try Realm.asyncOpen(configuration: self.config()).await(self)
+        let events = try XCTUnwrap(realm.events)
+
+        let personJson: NSDictionary = try scope(events, "create object") {
+            try realm.write {
+                let person = SwiftPerson(firstName: "Fred", lastName: "Q", age: 30)
+                realm.add(person)
+                return full(person)
+            }
+        }
+
+        let result = getEvents(expectedCount: 1)
+        assertEvent(result, activity: "create object", event: "write",
+                    ["SwiftPerson": ["insertions": [personJson]]])
+    }
+
     func testCustomEventRepresentation() throws {
         let realm = try openRealm(configuration: self.config())
         let events = realm.events!
