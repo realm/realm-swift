@@ -5,7 +5,11 @@ x.y.z Release notes (yyyy-MM-dd)
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
-* None.
+* Copying a `RLMRealmConfiguration` failed to copy several fields. This
+  resulted in migrations being passed the incorrect object type in Swift when
+  using the default configuration (since v10.34.0) or async open (since
+  v10.37.0). This also broke using the Events API in those two scenarios (since
+  v10.26.0 for default configuration and v10.37.0 for async open). ([#8190](https://github.com/realm/realm-swift/issues/8190))
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
