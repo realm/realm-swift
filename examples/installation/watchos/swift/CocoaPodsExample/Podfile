@@ -2,7 +2,7 @@ use_frameworks!
 branch = ENV['sha']
 
 target 'CocoaPodsExample WatchKit Extension' do
-  platform :watchos, '2.0'
+  platform :watchos, '4.0'
   pod 'Realm', git: 'https://github.com/realm/realm-swift.git', branch: branch
   pod 'RealmSwift', git: 'https://github.com/realm/realm-swift.git', branch: branch
 end
