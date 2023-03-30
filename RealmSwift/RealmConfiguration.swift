@@ -123,16 +123,10 @@ extension Realm {
 
         /// The local URL of the Realm file. Mutually exclusive with `inMemoryIdentifier`.
         public var fileURL: URL? {
-            get {
-                return _path.map { URL(fileURLWithPath: $0) }
-            }
-            set {
+            didSet {
                 _inMemoryIdentifier = nil
-                _path = newValue?.path
             }
         }
-
-        private var _path: String?
 
         /// A string used to identify a particular in-memory Realm. Mutually exclusive with `fileURL` and
         /// `syncConfiguration`.
@@ -141,7 +135,7 @@ extension Realm {
                 return _inMemoryIdentifier
             }
             set {
-                _path = nil
+                fileURL = nil
                 _syncConfiguration = nil
                 _inMemoryIdentifier = newValue
             }
@@ -329,7 +323,7 @@ extension Realm {
 
         internal static func fromRLMRealmConfiguration(_ rlmConfiguration: RLMRealmConfiguration) -> Configuration {
             var configuration = Configuration()
-            configuration._path = rlmConfiguration.fileURL?.path
+            configuration.fileURL = rlmConfiguration.fileURL
             configuration._inMemoryIdentifier = rlmConfiguration.inMemoryIdentifier
             configuration._syncConfiguration = rlmConfiguration.syncConfiguration.map(SyncConfiguration.init(config:))
             configuration.encryptionKey = rlmConfiguration.encryptionKey

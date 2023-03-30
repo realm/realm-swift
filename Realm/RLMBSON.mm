@@ -370,7 +370,7 @@ id<RLMBSON> RLMConvertBsonToRLMBSON(const Bson& b) {
         case realm::bson::Bson::Type::Double:
             return @(static_cast<double>(b));
         case realm::bson::Bson::Type::String:
-            return RLMStringDataToNSString(static_cast<std::string>(b).c_str());
+            return @(static_cast<std::string>(b).c_str());
         case realm::bson::Bson::Type::Binary:
             return [[NSData alloc] initWithBsonBinary:static_cast<std::vector<char>>(b)];
         case realm::bson::Bson::Type::Timestamp:
