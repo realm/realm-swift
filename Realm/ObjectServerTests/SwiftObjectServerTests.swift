@@ -1542,6 +1542,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
 
         proxy.stop()
+        try RealmServer.shared.deleteApp(appId)
     }
 
     func testAppCredentialSupport() {
@@ -2205,6 +2206,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 }
             }
         }
+        try RealmServer.shared.deleteApp(appId)
     }
 
     func testVerifyDocumentsWithCustomColumnNames() throws {

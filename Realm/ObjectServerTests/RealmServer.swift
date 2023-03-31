@@ -1027,6 +1027,12 @@ public class RealmServer: NSObject {
         return try createAppForSyncMode(.pbs("string"), schema.objectSchema)
     }
 
+    @objc public func deleteApp(_ appId: AppId) throws {
+        let appServerId = try RealmServer.shared.retrieveAppServerId(appId)
+        let app = try XCTUnwrap(session).apps[appServerId]
+        _ = try app.delete().get()
+    }
+
     // Retrieve Atlas App Services AppId with ClientAppId using the Admin API
     public func retrieveAppServerId(_ clientAppId: String) throws -> String {
         guard let session = session else {

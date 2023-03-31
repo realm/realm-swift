@@ -128,6 +128,7 @@ class SwiftUIServerTests: SwiftSyncTestCase {
         }
 
         proxy.stop()
+        try RealmServer.shared.deleteApp(appId)
     }
 
     @MainActor

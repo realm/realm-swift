@@ -38,6 +38,7 @@
                       configuration:[self defaultAppConfiguration]
                       rootDirectory:[self clientDataRoot]];
     XCTAssertNotNil(app);
+    [RealmServer.shared deleteApp:appId error:nil];
 }
 
 - (void)testFlexibleSyncOpenRealm {
