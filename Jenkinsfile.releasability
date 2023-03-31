@@ -1,10 +1,10 @@
-xcodeVersions = ['13.4.1', '14.0.1', '14.1', '14.2']
+xcodeVersions = ['13.4.1', '14.1', '14.2', '14.3']
 platforms = ['osx', 'ios', 'watchos', 'tvos', 'catalyst']
 carthagePlatforms = ['osx', 'ios', 'watchos', 'tvos']
 platformNames = ['osx': 'macOS', 'ios': 'iOS', 'watchos': 'watchOS', 'tvos': 'tvOS', 'catalyst': 'Catalyst']
-carthageXcodeVersion = '14.2'
+carthageXcodeVersion = '14.3'
 objcXcodeVersion = '13.4.1'
-docsSwiftVersion = '5.7.2'
+docsSwiftVersion = '5.8'
 
 def installationTest(platform, test, language) {
   return {
@@ -16,17 +16,9 @@ def installationTest(platform, test, language) {
         unstash "${language}-packaged"
       }
 
-      // Carthage currently doesn't support building for watchOS or tvOS with
-      // Xcode 14 because it incorrectly requires bitcode for those platforms
-      // https://github.com/Carthage/Carthage/pull/3293
-      def xcodeVersion = carthageXcodeVersion
-      if (test == "carthage" && (platform == "watchos" || platform == "tvos")) {
-        xcodeVersion = "13.4.1"
-      }
-
       sh """
       hostname
-      export REALM_XCODE_VERSION=${xcodeVersion}
+      export REALM_XCODE_VERSION=${carthageXcodeVersion}
       archive=\$(echo \$PWD/realm-${language}-*.zip)
 
       cd examples/installation
@@ -210,7 +202,7 @@ def doBuild() {
             unstash "${platform}-${objcXcodeVersion}"
           }
 
-          unstash "watchos-14.0.1"
+          unstash "watchos-14.1"
           unstash 'ios-static'
           unstash 'examples'
           unstash 'source'
