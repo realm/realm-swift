@@ -7,8 +7,8 @@ Switch to building the Carthage release with Xcode 14.3.
 * Add Xcode 14.3 binaries to the release package. Note that CocoaPods 1.12.0 does not support Xcode 14.3.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
-* None.
+* Address memory leaks caused by `URL.path` in `Realm.Configuration.fileURL` and std::string bytes being
+  incorrectly captured when using a string partition key in Partition Based Sync ([#8195](https://github.com/realm/realm-swift/pull/8195)), since v10.0.0).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
