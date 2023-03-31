@@ -948,7 +948,7 @@ static NSString *randomEmail() {
     c.encryptionKey = RLMGenerateKey();
     RLMAssertRealmExceptionContains([RLMRealm realmWithConfiguration:c error:nil],
                                     RLMErrorInvalidDatabase,
-                                    @"Failed to open Realm file at path '%@': Realm file decryption failed (Decryption failed)",
+                                    @"Failed to open Realm file at path '%@': Realm file decryption failed (Decryption failed: 'unable to decrypt after 0 seconds",
                                     c.fileURL.path);
 }
 

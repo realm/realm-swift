@@ -5,10 +5,19 @@ Switch to building the Carthage release with Xcode 14.3.
 
 ### Enhancements
 * Add Xcode 14.3 binaries to the release package. Note that CocoaPods 1.12.0 does not support Xcode 14.3.
+* Add support for sharing encrypted Realms between multiple processes. ([Core #1845](https://github.com/realm/realm-core/issues/1845))
 
 ### Fixed
-* Address memory leaks caused by `URL.path` in `Realm.Configuration.fileURL` and std::string bytes being
-  incorrectly captured when using a string partition key in Partition Based Sync ([#8195](https://github.com/realm/realm-swift/pull/8195)), since v10.0.0).
+* Fix a memory leak reported by Instruments on `URL.path` in
+  `Realm.Configuration.fileURL` when using a string partition key in Partition
+  Based Sync ([#8195](https://github.com/realm/realm-swift/pull/8195)), since v10.0.0).
+* Fix a data race in version management. If one thread committed a write
+  transaction which increased the number of live versions above the previous
+  highest seen during the current session at the same time as another thread
+  began a read, the reading thread could read from a no-longer-valid memory
+  mapping. This could potentially result in strange crashes when opening,
+  refreshing, freezing or thawing a Realm
+  ([Core #6411](https://github.com/realm/realm-core/pull/6411), since v10.35.0).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
@@ -20,7 +29,7 @@ Switch to building the Carthage release with Xcode 14.3.
 * Xcode: 13.4-14.3.
 
 ### Internal
-* Upgraded realm-core from ? to ?
+* Upgraded realm-core from 13.8.0 to 13.9.0.
 
 10.37.2 Release notes (2023-03-29)
 =============================================================
