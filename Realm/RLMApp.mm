@@ -339,6 +339,10 @@ static std::mutex& s_appMutex = *new std::mutex();
     return [self appWithId:appId configuration:nil];
 }
 
+- (NSString *)appId {
+    return @(_app->config().app_id.c_str());
+}
+
 - (std::shared_ptr<realm::app::App>)_realmApp {
     return _app;
 }

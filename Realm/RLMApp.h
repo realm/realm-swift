@@ -105,6 +105,9 @@ RLM_SWIFT_SENDABLE RLM_FINAL // internally thread-safe
 /// Get the current user logged into the Realm app.
 @property (nonatomic, readonly, nullable) RLMUser *currentUser;
 
+/// The app ID for this Realm app.
+@property (nonatomic, readonly) NSString *appId;
+
 /**
   A client for the email/password authentication provider which
   can be used to obtain a credential for logging in.
