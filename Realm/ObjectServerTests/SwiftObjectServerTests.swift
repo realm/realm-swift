@@ -467,8 +467,18 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
     }
 
-    func prepareFlexibleClientReset(_ user: User) throws {
+    func prepareFlexibleClientReset(disableRecoveryMode: Bool = false) throws -> (User, String) {
+        let appId = try RealmServer.shared.createAppWithQueryableFields(["age"])
+        let app = app(fromAppId: appId)
+        let user = try logInUser(for: basicCredentials(app: app), app: app)
         let collection = setupMongoCollection(user: user, collectionName: "SwiftPerson")
+
+        if disableRecoveryMode {
+            // Disable recovery mode on the server.
+            // This attempts to simulate a case where recovery mode fails when
+            // using RecoverOrDiscardLocal
+            try waitForEditRecoveryMode(flexibleSync: true, appId: appId, disable: true)
+        }
 
         // Initialize the local file so that we have conflicting history
         try autoreleasepool {
@@ -489,7 +499,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         collection.insertOne(serverObject).await(self, timeout: 30.0)
 
         // Sync is disabled, block executed, sync re-enabled
-        try executeBlockOffline(flexibleSync: true, appId: flexibleSyncAppId) {
+        try executeBlockOffline(flexibleSync: true, appId: appId) {
             var configuration = user.flexibleSyncConfiguration()
             configuration.objectTypes = [SwiftPerson.self]
             let realm = try Realm(configuration: configuration)
@@ -524,12 +534,12 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             updateAllPeopleSubscription(subscriptions)
             waitForServerHistoryAfterRestart(realm: newRealm)
         }
+
+        return (user, appId)
     }
 
-    func assertManualClientReset(_ user: User, flexibleSync: Bool = false) -> ErrorReportingBlock {
+    func assertManualClientReset(_ user: User, app: App) -> ErrorReportingBlock {
         let ex = self.expectation(description: "get client reset error")
-        let id = flexibleSync ? self.flexibleSyncAppId : self.appId
-        let manager = flexibleSync ? self.flexibleSyncApp.syncManager : self.app.syncManager
         return { error, session in
             guard let error = error as? SyncError else {
                 XCTFail("Bad error type: \(error)")
@@ -543,8 +553,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 XCTAssertNotNil(error.clientResetInfo())
                 return
             }
-            XCTAssertTrue(resetInfo.0.contains("mongodb-realm/\(id)/recovered-realms/recovered_realm"))
-            SyncSession.immediatelyHandleError(resetInfo.1, syncManager: manager)
+            XCTAssertTrue(resetInfo.0.contains("mongodb-realm/\(app.appId)/recovered-realms/recovered_realm"))
+            SyncSession.immediatelyHandleError(resetInfo.1, syncManager: app.syncManager)
             ex.fulfill()
         }
     }
@@ -617,7 +627,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             configuration.objectTypes = [SwiftPerson.self]
 
             let syncManager = self.app.syncManager
-            syncManager.errorHandler = assertManualClientReset(user)
+            syncManager.errorHandler = assertManualClientReset(user, app: app)
 
             try autoreleasepool {
                 let realm = try Realm(configuration: configuration)
@@ -650,7 +660,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             let user = try logInUser(for: creds)
             try prepareClientReset(#function, user)
 
-            var configuration = user.configuration(partitionValue: #function, clientResetMode: .manual(errorHandler: assertManualClientReset(user)))
+            var configuration = user.configuration(partitionValue: #function, clientResetMode: .manual(errorHandler: assertManualClientReset(user, app: app)))
             configuration.objectTypes = [SwiftPerson.self]
 
             switch configuration.syncConfiguration!.clientResetMode {
@@ -697,7 +707,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             configuration.objectTypes = [SwiftPerson.self]
 
             let syncManager = self.app.syncManager
-            syncManager.errorHandler = assertManualClientReset(user)
+            syncManager.errorHandler = assertManualClientReset(user, app: app)
 
             try autoreleasepool {
                 let realm = try Realm(configuration: configuration)
@@ -731,7 +741,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             let user = try logInUser(for: creds)
             try prepareClientReset(#function, user)
 
-            var configuration = user.configuration(partitionValue: #function, clientResetMode: .manual(errorHandler: assertManualClientReset(user)))
+            var configuration = user.configuration(partitionValue: #function, clientResetMode: .manual(errorHandler: assertManualClientReset(user, app: app)))
             configuration.objectTypes = [SwiftPerson.self]
 
             switch configuration.syncConfiguration!.clientResetMode {
@@ -783,7 +793,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         configuration.objectTypes = [SwiftPerson.self]
 
         let syncManager = self.app.syncManager
-        syncManager.errorHandler = assertManualClientReset(user)
+        syncManager.errorHandler = assertManualClientReset(user, app: app)
 
         try autoreleasepool {
             _ = try Realm(configuration: configuration)
@@ -943,8 +953,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
     @available(*, deprecated) // .discardLocal
     func testFlexibleSyncDiscardLocalClientReset() throws {
-        let user = try logInUser(for: basicCredentials(app: self.flexibleSyncApp), app: self.flexibleSyncApp)
-        try prepareFlexibleClientReset(user)
+        let (user, appId) = try prepareFlexibleClientReset()
 
         let (assertBeforeBlock, assertAfterBlock) = assertDiscardLocal()
         var config = user.flexibleSyncConfiguration(clientResetMode: .discardLocal(beforeReset: assertBeforeBlock, afterReset: assertAfterBlock))
@@ -970,11 +979,12 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1)
             XCTAssertEqual(realm.objects(SwiftPerson.self).first?.firstName, "Paul")
         }
+
+        try RealmServer.shared.deleteApp(appId)
     }
 
     func testFlexibleSyncDiscardUnsyncedChangesClientReset() throws {
-        let user = try logInUser(for: basicCredentials(app: self.flexibleSyncApp), app: self.flexibleSyncApp)
-        try prepareFlexibleClientReset(user)
+        let (user, appId) = try prepareFlexibleClientReset()
 
         let (assertBeforeBlock, assertAfterBlock) = assertDiscardLocal()
         var config = user.flexibleSyncConfiguration(clientResetMode: .discardUnsyncedChanges(beforeReset: assertBeforeBlock, afterReset: assertAfterBlock))
@@ -1000,11 +1010,12 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1)
             XCTAssertEqual(realm.objects(SwiftPerson.self).first?.firstName, "Paul")
         }
+
+        try RealmServer.shared.deleteApp(appId)
     }
 
     func testFlexibleSyncClientResetRecover() throws {
-        let user = try logInUser(for: basicCredentials(app: self.flexibleSyncApp), app: self.flexibleSyncApp)
-        try prepareFlexibleClientReset(user)
+        let (user, appId) = try prepareFlexibleClientReset()
 
         let (assertBeforeBlock, assertAfterBlock) = assertRecover()
         var config = user.flexibleSyncConfiguration(clientResetMode: .recoverUnsyncedChanges(beforeReset: assertBeforeBlock, afterReset: assertAfterBlock))
@@ -1033,11 +1044,12 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             XCTAssertEqual(realm.objects(SwiftPerson.self).filter("firstName == 'John'").count, 1)
             XCTAssertEqual(realm.objects(SwiftPerson.self).filter("firstName == 'Paul'").count, 1)
         }
+
+        try RealmServer.shared.deleteApp(appId)
     }
 
     func testFlexibleSyncClientResetRecoverWithInitialSubscriptions() throws {
-        let user = try logInUser(for: basicCredentials(app: self.flexibleSyncApp), app: self.flexibleSyncApp)
-        try prepareFlexibleClientReset(user)
+        let (user, appId) = try prepareFlexibleClientReset()
 
         let (assertBeforeBlock, assertAfterBlock) = assertRecover()
         var config = user.flexibleSyncConfiguration(clientResetMode: .recoverUnsyncedChanges(beforeReset: assertBeforeBlock, afterReset: assertAfterBlock),
@@ -1069,12 +1081,13 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             XCTAssertEqual(realm.objects(SwiftPerson.self).filter("firstName == 'John'").count, 1)
             XCTAssertEqual(realm.objects(SwiftPerson.self).filter("firstName == 'Paul'").count, 1)
         }
+
+        try RealmServer.shared.deleteApp(appId)
     }
 
     @available(*, deprecated) // .discardLocal
     func testFlexibleSyncClientResetDiscardLocalWithInitialSubscriptions() throws {
-        let user = try logInUser(for: basicCredentials(app: self.flexibleSyncApp), app: self.flexibleSyncApp)
-        try prepareFlexibleClientReset(user)
+        let (user, appId) = try prepareFlexibleClientReset()
 
         let (assertBeforeBlock, assertAfterBlock) = assertDiscardLocal()
         var config = user.flexibleSyncConfiguration(clientResetMode: .discardLocal(beforeReset: assertBeforeBlock, afterReset: assertAfterBlock),
@@ -1106,16 +1119,12 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1)
             XCTAssertEqual(realm.objects(SwiftPerson.self)[0].firstName, "Paul")
         }
+
+       try RealmServer.shared.deleteApp(appId)
     }
 
     func testFlexibleSyncClientResetRecoverOrDiscardLocalFailedRecovery() throws {
-        // Disable recovery mode on the server.
-        // This attempts to simulate a case where recovery mode fails when
-        // using RecoverOrDiscardLocal
-        try waitForEditRecoveryMode(flexibleSync: true, appId: self.flexibleSyncAppId, disable: true)
-
-        let user = try logInUser(for: basicCredentials(app: self.flexibleSyncApp), app: self.flexibleSyncApp)
-        try prepareFlexibleClientReset(user)
+        let (user, appId) = try prepareFlexibleClientReset(disableRecoveryMode: true)
 
         // Expect the client reset process to discard the local changes
         let (assertBeforeBlock, assertAfterBlock) = assertDiscardLocal()
@@ -1146,16 +1155,14 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             // while the one from the server ("Paul") should be present.
             XCTAssertEqual(realm.objects(SwiftPerson.self)[0].firstName, "Paul")
         }
-        try waitForEditRecoveryMode(flexibleSync: true, appId: self.flexibleSyncAppId, disable: false)
+
+        try RealmServer.shared.deleteApp(appId)
     }
 
     func testFlexibleClientResetManual() throws {
-        let credentials =  basicCredentials(app: self.flexibleSyncApp)
+        let (user, appId) = try prepareFlexibleClientReset()
         try autoreleasepool {
-            let user = try logInUser(for: credentials, app: self.flexibleSyncApp)
-            try prepareFlexibleClientReset(user)
-
-            var config = user.flexibleSyncConfiguration(clientResetMode: .manual(errorHandler: assertManualClientReset(user, flexibleSync: true)))
+            var config = user.flexibleSyncConfiguration(clientResetMode: .manual(errorHandler: assertManualClientReset(user, app: App(id: appId))))
             config.objectTypes = [SwiftPerson.self]
 
             switch config.syncConfiguration!.clientResetMode {
@@ -1174,7 +1181,6 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             }
         }
 
-        let user = try logInUser(for: credentials, app: self.flexibleSyncApp)
         var config = user.flexibleSyncConfiguration(clientResetMode: .manual())
         config.objectTypes = [SwiftPerson.self]
 
@@ -1190,6 +1196,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             XCTAssertEqual(realm.objects(SwiftPerson.self).count, 1)
             XCTAssertEqual(realm.objects(SwiftPerson.self)[0].firstName, "Paul")
         }
+
+       try RealmServer.shared.deleteApp(appId)
     }
 
     func testDefaultClientResetMode() throws {
@@ -1542,6 +1550,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
 
         proxy.stop()
+        try RealmServer.shared.deleteApp(appId)
     }
 
     func testAppCredentialSupport() {
@@ -2205,6 +2214,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 }
             }
         }
+        try RealmServer.shared.deleteApp(appId)
     }
 
     func testVerifyDocumentsWithCustomColumnNames() throws {

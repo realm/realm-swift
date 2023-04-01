@@ -68,6 +68,9 @@
     write();
     CHECK_COUNT(6, Person, realm);
     XCTAssertEqual([Person objectsInRealm:realm where:@"firstName = 'John'"].count, 2UL);
+
+    [RealmServer.shared deleteApp:appId error:&error];
+    XCTAssertNil(error);
 }
 
 - (void)testRoundTripForObjectIdPartitionValue {

@@ -763,6 +763,9 @@ static NSString *randomEmail() {
         XCTAssertEqual([Person objectsInRealm:realm2 where:@"firstName = 'Paul'"].count, 0UL);
         XCTAssertEqual([Person objectsInRealm:realm2 where:@"firstName = 'Ringo'"].count, 1UL);
         XCTAssertEqual([Person objectsInRealm:realm2 where:@"firstName = 'George'"].count, 1UL);
+
+        [RealmServer.shared deleteApp:appId1 error:nil];
+        [RealmServer.shared deleteApp:appId2 error:nil];
     } else {
         // Add objects.
         [self addPersonsToRealm:realm1
@@ -948,7 +951,7 @@ static NSString *randomEmail() {
     c.encryptionKey = RLMGenerateKey();
     RLMAssertRealmExceptionContains([RLMRealm realmWithConfiguration:c error:nil],
                                     RLMErrorInvalidDatabase,
-                                    @"Failed to open Realm file at path '%@': Realm file decryption failed (Decryption failed)",
+                                    @"Failed to open Realm file at path '%@': Realm file decryption failed (Decryption failed: 'unable to decrypt after 0 seconds",
                                     c.fileURL.path);
 }
 
@@ -1879,6 +1882,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     [self waitForExpectationsWithTimeout:30.0 handler:nil];
 
     [proxy stop];
+    [RealmServer.shared deleteApp:appId error:nil];
 }
 
 #pragma mark - Compact on Launch

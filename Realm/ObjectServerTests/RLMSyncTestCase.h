@@ -32,6 +32,7 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 - (NSString *)createAppAndReturnError:(NSError **)error;
 - (NSString *)createAppWithQueryableFields:(NSArray *)queryableFields error:(NSError **)error;
 - (NSString *)createAppForAsymmetricSchema:(NSArray <RLMObjectSchema *> *)schema error:(NSError **)error;
+- (void)deleteApp:(NSString *)appId error:(NSError **)error;
 @end
 
 @interface AsyncOpenConnectionTimeoutTransport : RLMNetworkTransport

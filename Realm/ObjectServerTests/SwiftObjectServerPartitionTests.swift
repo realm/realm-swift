@@ -61,6 +61,8 @@ class SwiftObjectServerPartitionTests: SwiftSyncTestCase {
         waitForDownloads(for: realm)
         checkCount(expected: 8, realm, SwiftPerson.self)
         XCTAssertEqual(realm.objects(SwiftPerson.self).filter { $0.firstName == "Ringo" }.count, 2)
+
+        try RealmServer.shared.deleteApp(appId)
     }
 
     func testSwiftRoundTripForObjectIdPartitionValue() throws {

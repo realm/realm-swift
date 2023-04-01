@@ -35,6 +35,7 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
         let flexibleApp = app(fromAppId: appId)
         let user = try logInUser(for: basicCredentials(app: flexibleApp), app: flexibleApp)
         XCTAssertNotNil(user)
+        try RealmServer.shared.deleteApp(appId)
     }
 
     func testFlexibleSyncOpenRealm() throws {
