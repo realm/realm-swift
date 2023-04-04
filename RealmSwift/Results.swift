@@ -89,6 +89,17 @@ extension Optional: SortableType where Wrapped: SortableType {}
 extension ObjectBase: KeypathSortable {}
 extension Projection: KeypathSortable {}
 
+// TODO: docs
+public typealias WaitForSyncMode = RLMWaitForSyncMode
+//@frozen public enum WaitForSyncMode: Sendable {
+//    // TODO: docs
+//    case onCreation
+//    // TODO: docs
+//    case always
+//    // TODO: docs
+//    case never
+//}
+
 /**
  `Results` is an auto-updating container type in Realm returned from object queries.
 
@@ -146,6 +157,24 @@ extension Projection: KeypathSortable {}
     public func makeIterator() -> RLMIterator<Element> {
         return RLMIterator(collection: collection)
     }
+    
+    // MARK: Flexible Sync
+
+//#if canImport(_Concurrency)
+    public func subscribe(named: String? = nil, waitForSync: WaitForSyncMode = .onCreation, timeout: TimeInterval? = nil) async throws -> Results {
+//        guard let realm = collection.realm  else {
+//            throwRealmException("no realm") // TODO: edit
+//        }
+        let rlmResults = ObjectiveCSupport.convert(object: self)
+        rlmResults.subscribe(completion: { res, err in
+            if (err != nil) {
+                
+            } else {
+            }
+        }, named: named, waitForSync: waitForSync)
+        return self
+    }
+//#endif
 
 }
 
