@@ -326,14 +326,14 @@ static NSDictionary *RLMBaseMetrics() {
 static NSDictionary *RLMSchemaMetrics(RLMSchema *schema) {
     NSMutableDictionary *featuresDictionary = [@{@"Embedded_Object": @0,
                                                  @"Asymmetric_Object": @0,
-                                                 @"Reference_Link": @0,
+                                                 @"Object_Link": @0,
                                                  @"Mixed": @0,
                                                  @"Primitive_List": @0,
                                                  @"Primitive_Set": @0,
                                                  @"Primitive_Dictionary": @0,
-                                                 @"Reference_List": @0,
-                                                 @"Reference_Set": @0,
-                                                 @"Reference_Dictionary": @0,
+                                                 @"Object_List": @0,
+                                                 @"Object_Set": @0,
+                                                 @"Object_Dictionary": @0,
                                                } mutableCopy];
 
     for (RLMObjectSchema *objectSchema in schema.objectSchema) {
@@ -347,7 +347,7 @@ static NSDictionary *RLMSchemaMetrics(RLMSchema *schema) {
         for (RLMProperty *property in objectSchema.properties) {
             if (property.array) {
                 if (property.type == RLMPropertyTypeObject) {
-                    featuresDictionary[@"Reference_List"] = @1;
+                    featuresDictionary[@"Object_List"] = @1;
                 } else {
                     featuresDictionary[@"Primitive_List"] = @1;
                 }
@@ -355,7 +355,7 @@ static NSDictionary *RLMSchemaMetrics(RLMSchema *schema) {
             }
             if (property.set) {
                 if (property.type == RLMPropertyTypeObject) {
-                    featuresDictionary[@"Reference_Set"] = @1;
+                    featuresDictionary[@"Object_Set"] = @1;
                 } else {
                     featuresDictionary[@"Primitive_Set"] = @1;
                 }
@@ -363,7 +363,7 @@ static NSDictionary *RLMSchemaMetrics(RLMSchema *schema) {
             }
             if (property.dictionary) {
                 if (property.type == RLMPropertyTypeObject) {
-                    featuresDictionary[@"Reference_Dictionary"] = @1;
+                    featuresDictionary[@"Object_Dictionary"] = @1;
                 } else {
                     featuresDictionary[@"Primitive_Dictionary"] = @1;
                 }
@@ -375,7 +375,7 @@ static NSDictionary *RLMSchemaMetrics(RLMSchema *schema) {
                     featuresDictionary[@"Mixed"] = @1;
                   break;
                case RLMPropertyTypeObject:
-                    featuresDictionary[@"Reference_Link"] = @1;
+                    featuresDictionary[@"Object_Link"] = @1;
                   break;
                 case RLMPropertyTypeLinkingObjects:
                     featuresDictionary[@"Backlink"] = @1;
@@ -401,14 +401,14 @@ static NSDictionary *RLMConfigurationMetrics(RLMRealmConfiguration *configuratio
     return @{
         // Sync
         @"Sync Enabled": isSync ? @"true" : @"false",
-        @"Flexible_Sync": isFlexibleSync ? @1 : @0,
+        @"Flx_Sync": isFlexibleSync ? @1 : @0,
         @"Pbs_Sync": isPBSSync ? @1 : @0,
 
         // Client Reset
-        @"Client_Reset_Recover_Or_Discard": (isSync && resetMode == RLMClientResetModeRecoverOrDiscardUnsyncedChanges) ? @1 : @0,
-        @"Client_Reset_Recover": (isSync && resetMode == RLMClientResetModeRecoverUnsyncedChanges) ? @1 : @0,
-        @"Client_Reset_Discard": (isSync && resetMode == RLMClientResetModeDiscardUnsyncedChanges) ? @1 : @0,
-        @"Client_Reset_Manual": (isSync && resetMode == RLMClientResetModeManual) ? @1 : @0,
+        @"CR_Recover_Discard": (isSync && resetMode == RLMClientResetModeRecoverOrDiscardUnsyncedChanges) ? @1 : @0,
+        @"CR_Recover": (isSync && resetMode == RLMClientResetModeRecoverUnsyncedChanges) ? @1 : @0,
+        @"CR_Discard": (isSync && resetMode == RLMClientResetModeDiscardUnsyncedChanges) ? @1 : @0,
+        @"CR_Manual": (isSync && resetMode == RLMClientResetModeManual) ? @1 : @0,
 
         // Configuration
         @"Compact_On_Launch": isCompactOnLaunch ? @1 : @0,
