@@ -444,14 +444,20 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
 
 - (void)removeSubscriptionWithClassName:(NSString *)objectClassName
                               predicate:(NSPredicate *)predicate {
-    [self verifyInWriteTransaction];
-    
     RLMClassInfo& info = _realm->_info[objectClassName];
     auto query = RLMPredicateToQuery(predicate, info.rlmObjectSchema, _realm.schema, _realm.group);
+    [self removeSubscriptionWithClassName:objectClassName query:query];
+}
+
+- (BOOL)removeSubscriptionWithClassName:(NSString *)objectClassName
+                                  query:(realm::Query)query {
+    [self verifyInWriteTransaction];
+
     auto subscription = _subscriptionSet->find(query);
     if (subscription) {
-        _mutableSubscriptionSet->erase(query);
+        return _mutableSubscriptionSet->erase(query);
     }
+    return false;
 }
 
 - (void)removeSubscription:(RLMSyncSubscription *)subscription {

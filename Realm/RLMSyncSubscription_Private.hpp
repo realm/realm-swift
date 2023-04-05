@@ -43,6 +43,9 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
                                query:(realm::Query)query
                       updateExisting:(BOOL)updateExisting;
 
+- (BOOL)removeSubscriptionWithClassName:(NSString *)objectClassName
+                                  query:(realm::Query)query;
+
 @end
 
 RLM_HEADER_AUDIT_END(nullability, sendability)

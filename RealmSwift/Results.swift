@@ -161,13 +161,18 @@ public typealias WaitForSyncMode = RLMWaitForSyncMode
     // MARK: Flexible Sync
 
 #if canImport(_Concurrency)
-    @MainActor
+    @_unsafeInheritExecutor
     public func subscribe(name: String? = nil, waitForSync: WaitForSyncMode = .onCreation, timeout: TimeInterval? = nil) async throws -> Results<Element> {
         var rlmResults = ObjectiveCSupport.convert(object: self)
         rlmResults = try await rlmResults.__subscribe(withName: name, waitForSyncMode: waitForSync)
         return Results(rlmResults)
     }
 #endif
+
+    public func unsubscribe() -> Bool {
+        let rlmResults = ObjectiveCSupport.convert(object: self)
+        return rlmResults.__unsubscribe()
+    }
 
 }
 
