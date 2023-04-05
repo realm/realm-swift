@@ -623,10 +623,10 @@ keyPaths:(std::optional<std::vector<std::vector<std::pair<realm::TableKey, realm
                                      query:_results.get_query()
                             updateExisting:true]; // TODO: change this
     } onComplete:^(NSError* error) {
-        if (error == nil) {
-            completionHandler(self, nil);
-        } else {
+        if (error != nil) {
             completionHandler(nil, error);
+        } else {
+            completionHandler(self, nil);
         }
     }];
 }
