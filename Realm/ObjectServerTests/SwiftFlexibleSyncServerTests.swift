@@ -1311,6 +1311,30 @@ extension SwiftFlexibleSyncServerTests {
         XCTAssertEqual(realm.subscriptions.count, 1)
     }
 
+    // MARK: Subscribe
+
+    func testSubcsribe() async throws {
+        try await populateFlexibleSyncData { realm in
+            realm.deleteAll() // Remove all objects for a clean state
+            for i in 1...10 {
+                let person = SwiftPerson(firstName: "\(#function)",
+                                         lastName: "lastname_\(i)",
+                                         age: i)
+                realm.add(person)
+            }
+        }
+
+        let realm = try openFlexibleSyncRealm()
+        let res1 = try await realm.objects(SwiftPerson.self).where { $0.age >= 6 }.subscribe()
+        XCTAssertEqual(res1.count, 5)
+        XCTAssertEqual(realm.subscriptions.count, 1)
+        let res2 = try await realm.objects(SwiftPerson.self).where { $0.lastName == "lastname_3" }.subscribe()
+        XCTAssertEqual(res2.count, 1)
+        XCTAssertEqual(realm.subscriptions.count, 2)
+        let res3 = realm.objects(SwiftPerson.self)
+        XCTAssertEqual(res3.count, 6)
+    }
+
     // MARK: - Custom Column
 
     @MainActor

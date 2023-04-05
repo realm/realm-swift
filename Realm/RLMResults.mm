@@ -30,6 +30,8 @@
 #import "RLMRealmConfiguration_Private.hpp"
 #import "RLMSchema_Private.h"
 #import "RLMSectionedResults_Private.hpp"
+#import "RLMSyncSubscription.h"
+#import "RLMSyncSubscription_Private.hpp"
 #import "RLMThreadSafeReference_Private.hpp"
 #import "RLMUtil.hpp"
 
@@ -561,6 +563,81 @@ returnNilForEmpty:(BOOL)returnNilForEmpty {
 - (realm::NotificationToken)addNotificationCallback:(id)block
 keyPaths:(std::optional<std::vector<std::vector<std::pair<realm::TableKey, realm::ColKey>>>>&&)keyPaths {
     return _results.add_notification_callback(RLMWrapCollectionChangeCallback(block, self, true), std::move(keyPaths));
+}
+
+//- (void)subscribeWithCompletion:(RLMResultsCompletionBlock)completion
+//                          named:(NSString *_Nullable)named
+//                    waitForSync:(RLMWaitForSyncMode)waitForSync
+//                        timeout:(NSTimeInterval)seconds {
+//
+//}
+//
+//- (void)subscribeWithCompletion:(RLMResultsCompletionBlock)completion
+//                          named:(NSString *_Nullable)named
+//                    waitForSync:(RLMWaitForSyncMode)waitForSync {
+//    RLMSyncSubscriptionSet *subs = self.realm.subscriptions;
+//    [subs update:^{
+//        [subs addSubscriptionWithClassName:self.className
+//                          subscriptionName:named
+//                                     query:_results.get_query()
+//                            updateExisting:true];
+//    } onComplete:^(NSError* error) {
+//        if (error == nil) {
+//        }
+//    }];
+//}
+
+//- (void)subscribeWithCompletion:(RLMResultsCompletionBlock)completion
+//                waitForSyncMode:(RLMWaitForSyncMode)waitForSyncMode
+//                           name:(NSString *_Nullable)name {
+//    RLMSyncSubscriptionSet *subs = self.realm.subscriptions;
+//    [subs update:^{
+//        [subs addSubscriptionWithClassName:self.objectClassName
+//                          subscriptionName:name
+//                                     query:_results.get_query()
+//                            updateExisting:true];
+//    } onComplete:^(NSError* error) {
+//        if (error == nil) {
+//            completion(nil, error);
+//        }
+//    }];
+//}
+//
+//- (void)subscribeWithCompletion:(RLMResultsCompletionBlock)completion
+//                waitForSyncMode:(RLMWaitForSyncMode)waitForSyncMode
+//                        timeout:(NSTimeInterval)seconds {}
+//
+//- (void)subscribeWithCompletion:(RLMResultsCompletionBlock)completion
+//                waitForSyncMode:(RLMWaitForSyncMode)waitForSyncMode
+//                           name:(NSString *_Nullable)name
+//                        timeout:(NSTimeInterval)seconds {}
+
+
+- (void)subscribeWithName:(NSString *_Nullable)name
+          waitForSyncMode:(RLMWaitForSyncMode)waitForSyncMode
+               completion:(RLMResultsCompletionBlock)completionHandler {
+    RLMSyncSubscriptionSet *subs = self.realm.subscriptions;
+    [subs update:^{
+        [subs addSubscriptionWithClassName:self.objectClassName
+                          subscriptionName:name
+                                     query:_results.get_query()
+                            updateExisting:true]; // TODO: change this
+    } onComplete:^(NSError* error) {
+        if (error == nil) {
+            completionHandler(self, nil);
+        } else {
+            completionHandler(nil, error);
+        }
+    }];
+}
+
+- (void)subscribeWithName:(NSString *_Nullable)name
+          waitForSyncMode:(RLMWaitForSyncMode)waitForSyncMode
+                  timeout:(NSTimeInterval)timeout
+               completion:(RLMResultsCompletionBlock)completionHandler {}
+
+- (BOOL)unsubscribe {
+    return false;
 }
 
 - (BOOL)isAttached {

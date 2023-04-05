@@ -22,6 +22,9 @@ namespace realm::sync {
 class Subscription;
 class SubscriptionSet;
 }
+namespace realm {
+class Query;
+}
 
 RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
@@ -34,6 +37,11 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 @interface RLMSyncSubscriptionSet ()
 
 - (instancetype)initWithSubscriptionSet:(realm::sync::SubscriptionSet)subscriptionSet realm:(RLMRealm *)realm;
+
+- (void)addSubscriptionWithClassName:(NSString *)objectClassName
+                    subscriptionName:(nullable NSString *)name
+                               query:(realm::Query)query
+                      updateExisting:(BOOL)updateExisting;
 
 @end
 

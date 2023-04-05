@@ -160,21 +160,14 @@ public typealias WaitForSyncMode = RLMWaitForSyncMode
     
     // MARK: Flexible Sync
 
-//#if canImport(_Concurrency)
-    public func subscribe(named: String? = nil, waitForSync: WaitForSyncMode = .onCreation, timeout: TimeInterval? = nil) async throws -> Results {
-//        guard let realm = collection.realm  else {
-//            throwRealmException("no realm") // TODO: edit
-//        }
-        let rlmResults = ObjectiveCSupport.convert(object: self)
-        rlmResults.subscribe(completion: { res, err in
-            if (err != nil) {
-                
-            } else {
-            }
-        }, named: named, waitForSync: waitForSync)
-        return self
+#if canImport(_Concurrency)
+    @MainActor
+    public func subscribe(name: String? = nil, waitForSync: WaitForSyncMode = .onCreation, timeout: TimeInterval? = nil) async throws -> Results<Element> {
+        var rlmResults = ObjectiveCSupport.convert(object: self)
+        rlmResults = try await rlmResults.__subscribe(withName: name, waitForSyncMode: waitForSync)
+        return Results(rlmResults)
     }
-//#endif
+#endif
 
 }
 

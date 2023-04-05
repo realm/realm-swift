@@ -20,6 +20,16 @@
 
 RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
+// TODO: docs
+typedef void(^RLMResultsCompletionBlock)(RLMResults * _Nullable, NSError * _Nullable);
+
+// TODO: docs
+typedef NS_ENUM(NSUInteger, RLMWaitForSyncMode) {
+    RLMWaitForSyncModeOnCreation,
+    RLMWaitForSyncModeAlways,
+    RLMWaitForSyncModeNever
+};
+
 @class RLMObject;
 
 /**
@@ -408,6 +418,38 @@ __attribute__((warn_unused_result));
                                                          NSError *_Nullable error))block
                                       keyPaths:(nullable NSArray<NSString *> *)keyPaths
 __attribute__((warn_unused_result));
+
+#pragma mark - Flexible Sync
+
+// TODO: docs
+//- (void)subscribeWithCompletion:(RLMResultsCompletionBlock)completion
+//                waitForSyncMode:(RLMWaitForSyncMode)waitForSyncMode
+//                           name:(NSString *_Nullable)name;
+//
+//- (void)subscribeWithCompletion:(RLMResultsCompletionBlock)completion
+//                waitForSyncMode:(RLMWaitForSyncMode)waitForSyncMode
+//                        timeout:(NSTimeInterval)seconds;
+//
+//- (void)subscribeWithCompletion:(RLMResultsCompletionBlock)completion
+//                waitForSyncMode:(RLMWaitForSyncMode)waitForSyncMode
+//                           name:(NSString *_Nullable)name
+//                        timeout:(NSTimeInterval)seconds;
+
+- (void)subscribeWithName:(NSString *_Nullable)name
+          waitForSyncMode:(RLMWaitForSyncMode)waitForSyncMode
+               completion:(RLMResultsCompletionBlock)completionHandler NS_REFINED_FOR_SWIFT;
+
+- (void)subscribeWithName:(NSString *_Nullable)name
+          waitForSyncMode:(RLMWaitForSyncMode)waitForSyncMode
+                  timeout:(NSTimeInterval)timeout
+               completion:(RLMResultsCompletionBlock)completionHandler NS_REFINED_FOR_SWIFT;
+
+// TODO: docs
+- (BOOL)unsubscribe NS_REFINED_FOR_SWIFT;
+
+
+
+
 #pragma mark - Aggregating Property Values
 
 /**

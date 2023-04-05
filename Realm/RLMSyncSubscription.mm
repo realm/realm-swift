@@ -386,11 +386,21 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
                     subscriptionName:(nullable NSString *)name
                            predicate:(NSPredicate *)predicate
                       updateExisting:(BOOL)updateExisting {
-    [self verifyInWriteTransaction];
-    
     RLMClassInfo& info = _realm->_info[objectClassName];
     auto query = RLMPredicateToQuery(predicate, info.rlmObjectSchema, _realm.schema, _realm.group);
-    
+
+    return [self addSubscriptionWithClassName:objectClassName
+                              subscriptionName:name
+                                         query:query
+                                updateExisting:updateExisting];
+}
+
+- (void)addSubscriptionWithClassName:(NSString *)objectClassName
+                    subscriptionName:(nullable NSString *)name
+                               query:(realm::Query)query
+                      updateExisting:(BOOL)updateExisting {
+    [self verifyInWriteTransaction];
+
     if (name) {
         if (updateExisting || !_mutableSubscriptionSet->find(name.UTF8String)) {
             _mutableSubscriptionSet->insert_or_assign(name.UTF8String, query);
