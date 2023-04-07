@@ -617,10 +617,16 @@ keyPaths:(std::optional<std::vector<std::vector<std::pair<realm::TableKey, realm
           waitForSyncMode:(RLMWaitForSyncMode)waitForSyncMode
                completion:(RLMResultsCompletionBlock)completionHandler {
     RLMSyncSubscriptionSet *subscriptions = self.realm.subscriptions;
+    // if onCreation && subscription exists
+    if (waitForSyncMode == RLMWaitForSyncModeOnCreation) {
+        if (name) {
+//            if ([subscriptions subscriptionWithName:name] == [])
+        }
+    }
     [subscriptions update:^{
         [subscriptions addSubscriptionWithClassName:self.objectClassName
-                          subscriptionName:name
-                                     query:_results.get_query()
+                                   subscriptionName:name
+                                              query:_results.get_query()
                             updateExisting:true]; // TODO: change this
     } onComplete:^(NSError* error) {
         if (error != nil) {
@@ -641,7 +647,7 @@ keyPaths:(std::optional<std::vector<std::vector<std::pair<realm::TableKey, realm
     BOOL __block removed = false;
     [subscriptions update:^{
         removed = [subscriptions removeSubscriptionWithClassName:self.objectClassName
-                                                 query:_results.get_query()];
+                                                           query:_results.get_query()];
     }];
     return removed;
 }
