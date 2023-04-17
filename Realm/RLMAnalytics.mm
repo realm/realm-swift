@@ -115,29 +115,10 @@ static NSString *RLMHostOSVersion() {
     return deviceModel;
 }
 
-static NSString *RLMHostArch() {
-    std::array<int, 2> mib = {{CTL_HW, HW_MACHINE}};
-    size_t bufferSize;
-    auto buffer = RLMSysCtl(&mib[0], mib.size(), &bufferSize);
-    if (!buffer) {
-        return nil;
-    }
-
-    NSString *n = [[NSString alloc] initWithBytesNoCopy:buffer.release()
-                                                 length:bufferSize - 1
-                                               encoding:NSUTF8StringEncoding
-                                           freeWhenDone:YES];
-    return n;
-}
-
 static NSString *RLMTargetArch() {
     NSString *targetArchitecture;
-#if TARGET_CPU_X86
-    targetArchitecture = @"x86";
-#elif TARGET_CPU_X86_64
+#if TARGET_CPU_X86_64
     targetArchitecture = @"x86_64";
-#elif TARGET_CPU_ARM
-    targetArchitecture = @"arm";
 #elif TARGET_CPU_ARM64
     targetArchitecture = @"arm64";
 #endif
@@ -299,8 +280,6 @@ static NSDictionary *RLMBaseMetrics() {
         // Host OS version being built on
         @"Host OS Type": @"macos",
         @"Host OS Version": RLMHostOSVersion() ?: kUnknownString,
-        // Architecture
-        @"Host CPU Arch": RLMHostArch() ?: kUnknownString,
 
         // Installation method
 #ifdef SWIFT_PACKAGE
@@ -334,6 +313,7 @@ static NSDictionary *RLMSchemaMetrics(RLMSchema *schema) {
                                                  @"Object_List": @0,
                                                  @"Object_Set": @0,
                                                  @"Object_Dictionary": @0,
+                                                 @"Backlink": @0,
                                                } mutableCopy];
 
     for (RLMObjectSchema *objectSchema in schema.objectSchema) {
@@ -417,15 +397,17 @@ static NSDictionary *RLMConfigurationMetrics(RLMRealmConfiguration *configuratio
 }
 
 void RLMSendAnalytics(RLMRealmConfiguration *configuration, RLMSchema *schema) {
+    if (getenv("REALM_DISABLE_ANALYTICS") || !RLMIsDebuggerAttached() || RLMIsRunningInPlayground()) {
+        return;
+    }
+
+    id config = [configuration copy];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        if (getenv("REALM_DISABLE_ANALYTICS") || !RLMIsDebuggerAttached() || RLMIsRunningInPlayground()) {
-            return;
-        }
         NSArray *urlStrings = @[@"https://data.mongodb-api.com/app/realmsdkmetrics-zmhtm/endpoint/metric_webhook/metric?data=%@"];
 
         NSDictionary *baseMetrics = RLMBaseMetrics();
         NSDictionary *schemaMetrics = RLMSchemaMetrics(schema);
-        NSDictionary *configurationMetrics = RLMConfigurationMetrics(configuration);
+        NSDictionary *configurationMetrics = RLMConfigurationMetrics(config);
 
         NSMutableDictionary *metrics = [[NSMutableDictionary alloc] init];
         [metrics addEntriesFromDictionary:baseMetrics];
