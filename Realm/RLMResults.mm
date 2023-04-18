@@ -617,17 +617,37 @@ keyPaths:(std::optional<std::vector<std::vector<std::pair<realm::TableKey, realm
           waitForSyncMode:(RLMWaitForSyncMode)waitForSyncMode
                completion:(RLMResultsCompletionBlock)completionHandler {
     RLMSyncSubscriptionSet *subscriptions = self.realm.subscriptions;
-    // if onCreation && subscription exists
+
     if (waitForSyncMode == RLMWaitForSyncModeOnCreation) {
         if (name) {
-//            if ([subscriptions subscriptionWithName:name] == [])
+            RLMSyncSubscription *sub = [subscriptions subscriptionWithName:name];
+            // need to import _subscriptions so I can compare the std::string to the description
+//            if  (sub->_subscription.queryString == _results.get_query().get_description()) {
+//                return;
+//            } // else contiune below to update the subscription
         }
     }
+    
+    if (waitForSyncMode == RLMWaitForSyncModeNever) {
+        [subscriptions update:^{
+            [subscriptions addSubscriptionWithClassName:self.objectClassName
+                                       subscriptionName:name
+                                                  query:_results.get_query()
+                                         updateExisting:true];
+        }];
+        return;
+    }
+    
+    if (waitForSyncMode == RLMWaitForSyncModeAlways) { // not needed
+        // waitfordownloads
+        // May not need anything here. Method will continue to subscription.update with a completion handler and return there.
+    }
+
     [subscriptions update:^{
         [subscriptions addSubscriptionWithClassName:self.objectClassName
                                    subscriptionName:name
                                               query:_results.get_query()
-                            updateExisting:true]; // TODO: change this
+                                     updateExisting:true]; // TODO: update true may work in all cases?
     } onComplete:^(NSError* error) {
         if (error != nil) {
             completionHandler(nil, error);
