@@ -20,59 +20,81 @@ import Realm
 import Realm.Private
 
 /**
- `Logger` is a base class for creating your own custom logging logic.
+ `Logger` is used for creating your own custom logging logic.
 
- Define your custom logger by subclassing `Logger` and override the `doLog(level:message:)`
- function to implement your custom logging logic.
+ You can define your own logger creating an instance of `Logger` and define the log function which will be
+ invoked whenever there is a log message.
 
  ```swift
- final class InMemoryLogger: Logger {
-     var logs: String = ""
-
-     override func doLog(level: LogLevel, message: String) {
-         logs += "Realm Logger: \(Date.now): \(level.logLevel) \(message)"
-     }
+ let logger = Logger(level: .all) { level, message in
+    print("Realm Log - \(level): \(message)")
  }
  ```
 
- Set this custom logger as you default logger using `Logger.setDefaultLogger()`.
+ Set this custom logger as you default logger using `Logger.shared`.
 
  ```swift
-    let inMemoryLogger = InMemoryLogger()
-    Logger.setDefaultLogger(inMemoryLogger)
+    Logger.shared = inMemoryLogger
  ```
+
+ - note: By default default log threshold level is `.warn`, and logging strings are output to Apple System Logger.
 */
-public typealias Logger = RLMLogger
-extension Logger {
+class Logger {
+    // MARK: Private
+    private let _rlmLogger: RLMLogger
+    private init(rlmLogger: RLMLogger) {
+        self._rlmLogger = rlmLogger
+    }
+
+    /**
+     Creates a  logger with the associated log level and the logic function to define your own logging logic..
+
+     - parameter level: The log level to be set for the logger.
+     - parameter logFunction: The log function which will be invoked whenever there is a log message.
+     */
+    public convenience init(level: LogLevel, logFunction: @escaping (LogLevel, String) -> Void) {
+        let rlmLogger = RLMLogger(level: level, logFunction: logFunction)
+        self.init(rlmLogger: rlmLogger)
+    }
+
+    /**
+     The logging threshold level used by the logger.
+     */
+    public var level: LogLevel {
+        get {
+            _rlmLogger.level
+        } set {
+            _rlmLogger.level = newValue
+        }
+    }
+
     /**
      Log a message to the supplied level.
 
      ```swift
-     let inMemoryLogger = InMemoryLogger()
-     inMemoryLogger.log(level: .info, message: "Info DB: Database opened succesfully")
+     let logger = Logger(level: .info, logFunction: { level, message in
+        print("Realm Log - \(level): \(message)")
+     })
+     logger.log(level: .info, message: "Info DB: Database opened succesfully")
      ```
 
      - parameter level: The log level for the message.
      - parameter message: The message to log.
      */
     public func log(level: LogLevel, message: String) {
-        self.logLevel(level, message: message)
+        _rlmLogger.logLevel(level, message: message)
     }
 
-    // MARK: Logger class functions
+    // MARK: Logger class functionss
+
     /**
-     The logging threshold level used by the global logger.
-
-     By default logging strings are output to Apple System Logger. Set a default `Logger` to perform custom logging logic instead.
-
-     - warning: Setting a global log threshold level after setting a custom logger will override any level threshold set by any default logger.
-     Logger will return log information, with associated log level, lower or equal to the global log level in that case.
+    The current default logger.
      */
-    public static var logLevel: LogLevel {
+    public class var shared: Logger {
         get {
-            RLMLogger.logLevel()
+            Logger(rlmLogger: RLMLogger.default())
         } set {
-            RLMLogger.setLogLevel(newValue)
+            RLMLogger.setDefault(newValue._rlmLogger)
         }
     }
 }

@@ -555,7 +555,7 @@ static NSURL *syncDirectoryForChildProcess() {
     if (!_app) {
         _app = [RLMApp appWithId:self.appId configuration:self.defaultAppConfiguration rootDirectory:self.clientDataRoot];
         RLMSyncManager *syncManager = self.app.syncManager;
-        [RLMLogger setLogLevel:RLMLogLevelOff];
+        [RLMLogger defaultLogger].level = RLMLogLevelOff;
 #pragma clang diagnostic pop
         syncManager.userAgent = self.name;
     }
@@ -683,7 +683,7 @@ static NSURL *syncDirectoryForChildProcess() {
                                configuration:self.defaultAppConfiguration
                                rootDirectory:self.clientDataRoot];
         RLMSyncManager *syncManager = self.flexibleSyncApp.syncManager;
-        [RLMLogger setLogLevel:RLMLogLevelOff];
+        [RLMLogger defaultLogger].level = RLMLogLevelOff;
         syncManager.userAgent = self.name;
     }
     return _flexibleSyncApp;

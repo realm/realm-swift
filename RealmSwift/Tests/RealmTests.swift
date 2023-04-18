@@ -1904,24 +1904,7 @@ extension CancellationError: Equatable {
     }
 }
 
-@available(macOS 12.0, watchOS 8.0, iOS 15.0, tvOS 15.0, macCatalyst 15.0, *)
-final class InMemoryLogger: Logger {
-    var logs: String = ""
-
-    init(level: LogLevel) {
-        super.init()
-        self.level = level
-    }
-
-    override func doLog(level: LogLevel, message: String) {
-        logs += "\(Date.now) \(level.logLevel) \(message)"
-    }
-
-    func clear() {
-        logs = ""
-    }
-}
-
+// Helper
 extension LogLevel {
     var logLevel: String {
         switch self {
@@ -1952,71 +1935,87 @@ extension LogLevel {
 @available(macOS 12.0, watchOS 8.0, iOS 15.0, tvOS 15.0, macCatalyst 15.0, *)
 class LoggerTests: TestCase {
     func testSetDefaultLogLevel() throws {
-        let inMemoryLogger = InMemoryLogger(level: .off)
-        Logger.setDefaultLogger(inMemoryLogger)
+        var logs: String = ""
+        Logger.shared = Logger(level: .off) { level, message in
+            logs += "\(Date.now) \(level.logLevel) \(message)"
+        }
 
         try autoreleasepool { _ = try Realm() }
-        XCTAssertTrue(inMemoryLogger.logs.isEmpty)
+        XCTAssertTrue(logs.isEmpty)
 
-        // Change default log threshold level, this should change the log level of the custom logger
-        Logger.logLevel = .all
+        Logger.shared.level = .all
         try autoreleasepool { _ = try Realm() } // We should be getting logs after changing the log level
-        XCTAssertEqual(Logger.logLevel, .all)
-        XCTAssertNotNil(inMemoryLogger.logs.range(of: "Info DB:", options: .regularExpression))
-        XCTAssertNotNil(inMemoryLogger.logs.range(of: "Trace DB:", options: .regularExpression))
+        XCTAssertEqual(Logger.shared.level, .all)
+        XCTAssertNotNil(logs.range(of: "Info DB:", options: .regularExpression))
+        XCTAssertNotNil(logs.range(of: "Trace DB:", options: .regularExpression))
     }
 
-    func testCustomLogger() throws {
-        let inMemoryLogger = InMemoryLogger(level: .off)
-        Logger.setDefaultLogger(inMemoryLogger)
+    func testDedaLogger() throws {
+        var logs: String = ""
+        let logger = Logger(level: .off) { level, message in
+            logs += "\(Date.now) \(level.logLevel) \(message)"
+        }
+        Logger.shared = logger
 
+        XCTAssertEqual(Logger.shared.level, .off)
         try autoreleasepool { _ = try Realm() }
-
-        XCTAssertTrue(inMemoryLogger.logs.isEmpty)
+        XCTAssertTrue(logs.isEmpty)
 
         // Info
-        inMemoryLogger.level = .info
+        Logger.shared.level = .info
         try autoreleasepool { _ = try Realm() }
 
-        XCTAssertTrue(!inMemoryLogger.logs.isEmpty)
-        XCTAssertNotNil(inMemoryLogger.logs.range(of: "Info DB:", options: .regularExpression))
+        XCTAssertTrue(!logs.isEmpty)
+        XCTAssertNotNil(logs.range(of: "Info DB:", options: .regularExpression))
 
         // Debug
-        inMemoryLogger.clear()
-        inMemoryLogger.level = .trace
+        logs = ""
+        Logger.shared.level = .trace
         try autoreleasepool { _ = try Realm() }
 
-        XCTAssertTrue(!inMemoryLogger.logs.isEmpty)
-        XCTAssertNotNil(inMemoryLogger.logs.range(of: "Trace DB:", options: .regularExpression))
+        XCTAssertTrue(!logs.isEmpty)
+        XCTAssertNotNil(logs.range(of: "Trace DB:", options: .regularExpression))
 
         // Info
-        inMemoryLogger.clear()
-        inMemoryLogger.level = .info
+        logs = ""
+        Logger.shared.level = .info
         try autoreleasepool { _ = try Realm() }
 
-        XCTAssertTrue(!inMemoryLogger.logs.isEmpty)
-        XCTAssertNotNil(inMemoryLogger.logs.range(of: "Info DB:", options: .regularExpression))
-        XCTAssertNil(inMemoryLogger.logs.range(of: "Trace DB:", options: .regularExpression))
+        XCTAssertTrue(!logs.isEmpty)
+        XCTAssertNotNil(logs.range(of: "Info DB:", options: .regularExpression))
+        XCTAssertNil(logs.range(of: "Trace DB:", options: .regularExpression))
+
+        logs = ""
+        Logger.shared = Logger(level: .info) { level, message in
+            logs += "\(Date.now) \(level.logLevel) \(message)"
+        }
+        XCTAssertEqual(Logger.shared.level, .info)
+        try autoreleasepool { _ = try Realm() }
+        XCTAssertTrue(!logs.isEmpty)
+        XCTAssertNotNil(logs.range(of: "Info DB:", options: .regularExpression))
     }
 
     func testCustomLoggerLog() throws {
-        let inMemoryLogger = InMemoryLogger(level: .info)
-        Logger.setDefaultLogger(inMemoryLogger)
-        XCTAssertTrue(inMemoryLogger.logs.isEmpty)
+        var logs: String = ""
+        let logger = Logger(level: .info) { level, message in
+            logs += "\(Date.now) \(level.logLevel) \(message)"
+        }
+        Logger.shared = logger
+        XCTAssertTrue(logs.isEmpty)
 
         try autoreleasepool { _ = try Realm() }
 
-        XCTAssertTrue(!inMemoryLogger.logs.isEmpty)
-        XCTAssertNotNil(inMemoryLogger.logs.range(of: "Info DB:", options: .regularExpression))
+        XCTAssertTrue(!logs.isEmpty)
+        XCTAssertNotNil(logs.range(of: "Info DB:", options: .regularExpression))
 
-        inMemoryLogger.log(level: .info, message: "Info DB: 'Database is broken'")
-        XCTAssertNotNil(inMemoryLogger.logs.range(of: "Info DB:", options: .regularExpression))
-        XCTAssertNotNil(inMemoryLogger.logs.range(of: "Info DB: 'Database is broken'", options: .regularExpression))
+        logger.log(level: .info, message: "Info DB: 'Database is broken'")
+        XCTAssertNotNil(logs.range(of: "Info DB:", options: .regularExpression))
+        XCTAssertNotNil(logs.range(of: "Info DB: 'Database is broken'", options: .regularExpression))
 
-        inMemoryLogger.log(level: .debug, message: "Debug DB: 'Database is good'")
+        logger.log(level: .debug, message: "Debug DB: 'Database is good'")
         // Should not be added to log, because log level is greater than the one set.
-        XCTAssertNotNil(inMemoryLogger.logs.range(of: "Info DB:", options: .regularExpression))
-        XCTAssertNotNil(inMemoryLogger.logs.range(of: "Info DB: 'Database is broken'", options: .regularExpression))
-        XCTAssertNil(inMemoryLogger.logs.range(of: "Debug DB: 'Database is good'", options: .regularExpression))
+        XCTAssertNotNil(logs.range(of: "Info DB:", options: .regularExpression))
+        XCTAssertNotNil(logs.range(of: "Info DB: 'Database is broken'", options: .regularExpression))
+        XCTAssertNil(logs.range(of: "Debug DB: 'Database is good'", options: .regularExpression))
     }
 }

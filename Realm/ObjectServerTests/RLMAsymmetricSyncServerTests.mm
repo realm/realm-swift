@@ -169,7 +169,7 @@ RLM_COLLECTION_TYPE(PersonAsymmetric);
                                  configuration:self.defaultAppConfiguration
                                  rootDirectory:self.clientDataRoot];
         RLMSyncManager *syncManager = self.asymmetricSyncApp.syncManager;
-        [RLMLogger setLogLevel:RLMLogLevelOff];
+        [RLMLogger defaultLogger].level = RLMLogLevelOff;
         syncManager.userAgent = self.name;
     }
     return _asymmetricSyncApp;

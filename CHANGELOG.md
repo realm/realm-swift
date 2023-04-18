@@ -133,21 +133,29 @@ x.y.z Release notes (yyyy-MM-dd)
   ```swift
   final class InMemoryLogger: Logger {
      var logs: String = ""
+* Added support adding a user created default logger, which allows implementing your own logging logic
+  and the log threshold level.
+  You can define your own logger creating an instance of `Logger` and define the log function which will be
+  invoked whenever there is a log message.
 
-     override func doLog(level: LogLevel, message: String) {
-         logs += "Realm Logger: \(Date.now): \(level.logLevel) \(message)"
-     }
-  }
-  ```
+ ```swift
+ let logger = Logger(level: .all) { level, message in
+    print("Realm Log - \(level): \(message)")
+ }
+ ```
+
+ Set this custom logger as you default logger using `Logger.shared`.
+ ```swift
+    Logger.shared = inMemoryLogger
+ ```
   This logger can be set as default using the new API `Logger.setDefaultLogger(inMemoryLogger)`.
-* It is now possible to change the set and get the log level at any point of the application's lifetime.
+* It is now possible to change the default log threshold level at any point of the application's lifetime.
   ```swift
-  Logger.logLevel = .debug
+  Logger.shared.logLevel = .debug
   ```
-  This will override the log level set by any custom logger, and messages with log level greater
-  than the one set would not be returned/showed.
+  This will override the log level set anytime before by a user created logger.
 * We have set `.warn` as the default log threshold level for Realm. You will now see some 
-  log message in your console. To disable set your log level to `off` using `Logger.logLevel = .off`.
+  log message in your console. To disable use `Logger.shared.level = .off`.
 
 ### Fixed
 

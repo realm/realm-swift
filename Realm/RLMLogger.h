@@ -48,40 +48,41 @@ typedef RLM_CLOSED_ENUM(NSUInteger, RLMLogLevel) {
     RLMLogLevelAll
 } NS_SWIFT_NAME(LogLevel);
 
+/// A log callback function which can be set on RLMLogger.
+///
+/// The log function may be called from multiple threads simultaneously, and is
+/// responsible for performing its own synchronization if any is required.
+RLM_SWIFT_SENDABLE // invoked on a background thread
+typedef void (^RLMLogFunction)(RLMLogLevel level, NSString *message);
+
 /**
- `RLMLogger` is a base class for creating your own custom logging logic.
+ `RLMLogger` is used for creating your own custom logging logic.
 
- Define your custom logger by subclassing `RLMLogger` and override the `doLog`
- function to implement your custom logging logic.
+ You can define your own logger creating an instance of `RLMLogger` and define the log function which will be
+ invoked whenever there is a log message.
+ Set this custom logger as you default logger using `setDefaultLogger`.
 
-     // InMemoryLogger.h
-     @interface InMemoryLogger : RLMLogger
-     @property (nonatomic, strong) NSString *logs;
-     @end
+     [RLMLogger setDefaultLogger:[[RLMLogger alloc] initWithLevel:RLMLogLevelDebug logFunction:^(RLMLogLevel level,    NSString * _Nonnull message) {
+        NSLog(@"Realm Log - %lu, %@", (unsigned long)level, message);
+     }]];
 
-     // InMemoryLogger.m
-     @implementation InMemoryLogger
-     - (void)doLog:(RLMLogLevel)logLevel message:(NSString *)message {
-        NSString *newLogs = [_logs stringByAppendingFormat:@" %@ %lu %@", [NSDate now], logLevel, message];
-        _logs = newLogs;
-     }
-     @end
-
- Set this custom logger as you default logger using `[RLMLogger setDefaultLogger:]`.
+ @note By default default log threshold level is `.warn`, and logging strings are output to Apple System Logger.
 */
 @interface RLMLogger : NSObject
 
 /**
-  Gets the logging threshold level used by the current logger.
-  Default log level is `RLMLogLevelOff`, if not set.
-
-  @warning Setting a global log threshold level after setting a custom logger will override any level threshold set by any default logger.
- Logger will return log information, with associated log level, lower or equal to the global log level in that case.
+  Gets the logging threshold level used by the logger.
  */
 @property (nonatomic) RLMLogLevel level;
 
-/// Creates a custom logger without any associated log level.
-- (instancetype)init NS_DESIGNATED_INITIALIZER;
+/// :nodoc:
+- (instancetype)init NS_UNAVAILABLE;
+
+/// Creates a  logger with the associated log level and the logic function to define your own logging logic.
+
+/// @param level The log level to be set for the logger.
+/// @param logFunction The log function which will be invoked whenever there is a log message.
+- (instancetype)initWithLevel:(RLMLogLevel)level logFunction:(RLMLogFunction)logFunction;
 
 /**
  Log a message to the supplied level.
@@ -91,38 +92,19 @@ typedef RLM_CLOSED_ENUM(NSUInteger, RLMLogLevel) {
  */
 - (void)logWithLevel:(RLMLogLevel)logLevel message:(NSString *)message, ... NS_SWIFT_UNAVAILABLE("");
 
-/**
- Override this method to implement your own custom logging logic. 
-
- @param logLevel The log level for the message returned.
- @param message The message logged.
- */
-- (void)doLog:(RLMLogLevel)logLevel message:(NSString *)message NS_SWIFT_NAME(doLog(level:message:));
-
-#pragma mark RLMLogger Static API
-
-/// The logging threshold level used by the global logger.
-+ (RLMLogLevel)logLevel;
+#pragma mark RLMLogger Default Logger API
 
 /**
- Sets the global logger threshold level to the given value.
-
- @param logLevel The `RLMLogLevel` to be set.
-
- By default logging strings are output to Apple System Logger. Setting a default `RLMLogger` to
- perform custom logging logic instead.
-
- @warning Setting a global log threshold level after setting a custom logger will override any level threshold set by any default logger.
- Logger will return log information, with associated log level, lower or equal to the global log level in that case.
- */
-+ (void)setLogLevel:(RLMLogLevel)logLevel;
-
-/**
- Sets a custom logger implementation as default, that will be used whenever information must be logged.
+ Sets a logger implementation as default, that will be used whenever information must be logged.
 
  @param logger The `RLMLogger` to be configured as the default logger
  */
-+ (void)setDefaultLogger:(RLMLogger *)logger NS_SWIFT_NAME(setDefaultLogger(_:));
++ (void)setDefaultLogger:(RLMLogger *)logger;
+
+/**
+ Gets the current set default logger.
+ */
++ (instancetype)defaultLogger;
 
 @end
 

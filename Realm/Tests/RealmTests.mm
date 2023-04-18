@@ -2937,78 +2937,90 @@
     XCTAssertEqual(error.code, RLMErrorAlreadyOpen);
     XCTAssertTrue([NSFileManager.defaultManager fileExistsAtPath:config.fileURL.path]);
 }
-
-@end
-
-@interface InMemoryLogger : RLMLogger
-@property (nonatomic, strong) NSString *logs;
-@end
-
-@implementation InMemoryLogger
-- (instancetype)initWithTitle:(NSString *)title logLevel:(RLMLogLevel)logLevel {
-    self = [super init];
-    if (self) {
-        super.level = logLevel;
-        self.logs = title;
-    }
-    return self;
-}
-
-- (void)doLog:(RLMLogLevel)logLevel message:(NSString *)message {
-    if (!self.logs) {
-        self.logs = @"";
-    }
-    NSString *newLogs = [_logs stringByAppendingFormat:@" %@ %lu %@", [NSDate now], logLevel, message];
-    self.logs = newLogs;
-}
 @end
 
 @interface RLMLoggerTests : RLMTestCase
 @end
 
 @implementation RLMLoggerTests
-- (void)testCustomLogger {
-    // Default Log Level is RLMLogLevelOff
-    InMemoryLogger *inMemoryLogger = [[InMemoryLogger alloc] init];
-    [RLMLogger setDefaultLogger:inMemoryLogger];
+- (void)testSetDefaultLogLevel {
+    [RLMLogger defaultLogger].level = RLMLogLevelOff;
+    @autoreleasepool { [RLMRealm defaultRealm]; }
+    XCTAssertEqual([RLMLogger defaultLogger].level, RLMLogLevelOff);
+
+    __block NSString *logs = @"";
+    RLMLogger *logger = [[RLMLogger alloc] initWithLevel:RLMLogLevelAll logFunction:^(RLMLogLevel level, NSString * _Nonnull message) {
+        NSString *newLogs = [logs stringByAppendingFormat:@" %@ %lu %@", [NSDate now], level, message];
+        logs = newLogs;
+    }];
+    [RLMLogger setDefaultLogger:logger];
 
     @autoreleasepool { [RLMRealm defaultRealm]; }
-    XCTAssertTrue([inMemoryLogger.logs length] == 0);
+    XCTAssertEqual([RLMLogger defaultLogger].level, RLMLogLevelAll);
+    XCTAssertTrue([logs rangeOfString:@"4 DB:" options:NSRegularExpressionSearch].location != NSNotFound); // Info
+    XCTAssertTrue([logs rangeOfString:@"7 DB:" options:NSRegularExpressionSearch].location != NSNotFound); // Trace
+
+    logs = @"";
+    [RLMLogger defaultLogger].level = RLMLogLevelInfo;
+    @autoreleasepool { [RLMRealm defaultRealm]; }
+    XCTAssertEqual([RLMLogger defaultLogger].level, RLMLogLevelInfo);
+    XCTAssertTrue([logs rangeOfString:@"4 DB:" options:NSRegularExpressionSearch].location != NSNotFound); // Info
+    XCTAssertTrue([logs rangeOfString:@"7 DB:" options:NSRegularExpressionSearch].location == NSNotFound); // Trace
+}
+
+- (void)testDefaultLogger {
+    __block NSString *logs = @"";
+    RLMLogger *logger = [[RLMLogger alloc] initWithLevel:RLMLogLevelOff logFunction:^(RLMLogLevel level, NSString * _Nonnull message) {
+        NSString *newLogs = [logs stringByAppendingFormat:@" %@ %lu %@", [NSDate now], level, message];
+        logs = newLogs;
+    }];
+    [RLMLogger setDefaultLogger:logger];
+    XCTAssertEqual([RLMLogger defaultLogger].level, RLMLogLevelOff);
+
+    @autoreleasepool { [RLMRealm defaultRealm]; }
+    XCTAssertTrue([logs length] == 0);
 
     // Test LogLevel Info
-    inMemoryLogger.level = RLMLogLevelInfo;
+    logger.level = RLMLogLevelInfo;
     @autoreleasepool { [RLMRealm defaultRealm]; }
-    XCTAssertTrue([inMemoryLogger.logs length] >= 0);
-    XCTAssertTrue([inMemoryLogger.logs rangeOfString:@"4 DB:" options:NSRegularExpressionSearch].location != NSNotFound); // Info
-    XCTAssertTrue([inMemoryLogger.logs rangeOfString:@"7 DB:" options:NSRegularExpressionSearch].location == NSNotFound); // Trace
+    XCTAssertTrue([logs length] >= 0);
+    XCTAssertTrue([logs rangeOfString:@"4 DB:" options:NSRegularExpressionSearch].location != NSNotFound); // Info
+    XCTAssertTrue([logs rangeOfString:@"7 DB:" options:NSRegularExpressionSearch].location == NSNotFound); // Trace
 
     // Test LogLevel All
-    inMemoryLogger.level = RLMLogLevelAll;
+    logger.level = RLMLogLevelAll;
     @autoreleasepool { [RLMRealm defaultRealm]; }
-    XCTAssertTrue([inMemoryLogger.logs length] >= 0);
-    XCTAssertTrue([inMemoryLogger.logs rangeOfString:@"4 DB:" options:NSRegularExpressionSearch].location != NSNotFound); // Info
-    XCTAssertTrue([inMemoryLogger.logs rangeOfString:@"7 DB:" options:NSRegularExpressionSearch].location != NSNotFound); // Trace
+    XCTAssertTrue([logs length] >= 0);
+    XCTAssertTrue([logs rangeOfString:@"4 DB:" options:NSRegularExpressionSearch].location != NSNotFound); // Info
+    XCTAssertTrue([logs rangeOfString:@"7 DB:" options:NSRegularExpressionSearch].location != NSNotFound); // Trace
 
+    logs = @"";
     // Init Custom Logger
-    InMemoryLogger *inMemoryLogger2 = [[InMemoryLogger alloc] initWithTitle:@"Realm Logs" logLevel:RLMLogLevelDebug];
-    [RLMLogger setDefaultLogger:inMemoryLogger2];
+    [RLMLogger setDefaultLogger:[[RLMLogger alloc] initWithLevel:RLMLogLevelDebug logFunction:^(RLMLogLevel level, NSString * _Nonnull message) {
+        NSString *newLogs = [logs stringByAppendingFormat:@" %@ %lu %@", [NSDate now], level, message];
+        logs = newLogs;
+    }]];
+
+    XCTAssertEqual([RLMLogger defaultLogger].level, RLMLogLevelDebug);
     @autoreleasepool { [RLMRealm defaultRealm]; }
-    XCTAssertTrue([inMemoryLogger2.logs rangeOfString:@"Realm Logs" options:NSRegularExpressionSearch].location != NSNotFound);
-    XCTAssertTrue([inMemoryLogger2.logs rangeOfString:@"4 DB:" options:NSRegularExpressionSearch].location != NSNotFound); // Info
-    XCTAssertTrue([inMemoryLogger2.logs rangeOfString:@"7 DB:" options:NSRegularExpressionSearch].location == NSNotFound); // Trace
+    XCTAssertTrue([logs rangeOfString:@"4 DB:" options:NSRegularExpressionSearch].location != NSNotFound); // Info
+    XCTAssertTrue([logs rangeOfString:@"7 DB:" options:NSRegularExpressionSearch].location == NSNotFound); // Trace
 }
 
 - (void)testCustomLoggerLogMessage {
-    InMemoryLogger *inMemoryLogger = [[InMemoryLogger alloc] init];
-    inMemoryLogger.level = RLMLogLevelInfo;
-    [RLMLogger setDefaultLogger:inMemoryLogger];
+    __block NSString *logs = @"";
+    RLMLogger *logger = [[RLMLogger alloc] initWithLevel: RLMLogLevelInfo logFunction:^(RLMLogLevel level, NSString * _Nonnull message) {
+        NSString *newLogs = [logs stringByAppendingFormat:@" %@ %lu %@", [NSDate now], level, message];
+        logs = newLogs;
+    }];
+    [RLMLogger setDefaultLogger:logger];
 
     @autoreleasepool { [RLMRealm defaultRealm]; }
-    XCTAssertTrue([inMemoryLogger.logs length] >= 0);
+    XCTAssertTrue([logs length] >= 0);
 
-    [inMemoryLogger logWithLevel:RLMLogLevelInfo message:@"IMPORTANT INFO"];
-    [inMemoryLogger logWithLevel:RLMLogLevelTrace message:@"IMPORTANT TRACE"];
-    XCTAssertTrue([inMemoryLogger.logs rangeOfString:@"IMPORTANT INFO" options:NSRegularExpressionSearch].location != NSNotFound); // Info
-    XCTAssertTrue([inMemoryLogger.logs rangeOfString:@"IMPORTANT TRACE" options:NSRegularExpressionSearch].location == NSNotFound); // Trace
+    [logger logWithLevel:RLMLogLevelInfo message:@"IMPORTANT INFO"];
+    [logger logWithLevel:RLMLogLevelTrace message:@"IMPORTANT TRACE"];
+    XCTAssertTrue([logs rangeOfString:@"IMPORTANT INFO" options:NSRegularExpressionSearch].location != NSNotFound); // Info
+    XCTAssertTrue([logs rangeOfString:@"IMPORTANT TRACE" options:NSRegularExpressionSearch].location == NSNotFound); // Trace
 }
 @end
