@@ -50,14 +50,17 @@ typedef RLM_CLOSED_ENUM(NSUInteger, RLMSyncLogLevel) {
     ///
     /// - warning: Will incur a measurable performance impact.
     RLMSyncLogLevelAll
-};
+} __attribute__((deprecated("Use `RLMSyncLevelDebug`/`LogLevel` instead")));
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
 /// A log callback function which can be set on RLMSyncManager.
 ///
 /// The log function may be called from multiple threads simultaneously, and is
 /// responsible for performing its own synchronization if any is required.
 RLM_SWIFT_SENDABLE // invoked on a background thread
 typedef void (^RLMSyncLogFunction)(RLMSyncLogLevel level, NSString *message);
+#pragma clang diagnostic pop
 
 /// A block type representing a block which can be used to report a sync-related error to the application. If the error
 /// pertains to a specific session, that session will also be passed into the block.
@@ -111,7 +114,7 @@ __attribute__((deprecated("This property is not used for anything")));
           with log level greater than the default log level will not show..
  */
 @property (atomic) RLMSyncLogLevel logLevel
-__attribute__((deprecated("Use [RLMLogger setLogLevel:] to set a global debug level, or [RLMLogger logLevel] to read the default global log level.")));
+__attribute__((deprecated("Use `RLMLogger.default.level`/`Logger.shared.level` to set/get the default logger threshold level.")));
 
 /**
  The function which will be invoked whenever the sync client has a log message.
@@ -123,7 +126,7 @@ __attribute__((deprecated("Use [RLMLogger setLogLevel:] to set a global debug le
  @warning Setting this logger will replace any logger set at global level.
  */
 @property (atomic, nullable) RLMSyncLogFunction logger
-__attribute__((deprecated("Use [RLMLogger setDefaultLogger:] to set a global logger or [RLMLogger defaultLogger] to get the default set logger.")));
+__attribute__((deprecated("Use `RLMLogger.default`/`Logger.shared` to set/get the default logger.")));
 
 /**
  The name of the HTTP header to send authorization data in when making requests to Atlas App Services which has

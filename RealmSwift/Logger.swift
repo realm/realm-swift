@@ -92,9 +92,9 @@ class Logger {
      */
     public class var shared: Logger {
         get {
-            Logger(rlmLogger: RLMLogger.default())
+            Logger(rlmLogger: RLMLogger.default)
         } set {
-            RLMLogger.setDefault(newValue._rlmLogger)
+            RLMLogger.default = newValue._rlmLogger
         }
     }
 }

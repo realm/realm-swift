@@ -253,7 +253,7 @@ static void setOptionalString(std::optional<std::string>& dst, NSString *src) {
     [RLMRealm class];
     // Even though there is nothing to log when the App initialises, we want to
     // be able to log anything happening after this e.g. login/register.
-    RLMInitDefaultLogger();
+    [RLMLogger class];
 }
 
 - (instancetype)initWithApp:(std::shared_ptr<realm::app::App>)app {

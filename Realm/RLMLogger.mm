@@ -97,16 +97,20 @@ public:
     std::shared_ptr<Logger> _logger;
 }
 
-static RLMLogger *s_defaultLogger;
-
 typedef void(^LoggerBlock)(RLMLogLevel level, NSString *message);
 
 - (RLMLogLevel)level {
-    return logLevelForLevel(Logger::get_default_level_threshold());
+    return logLevelForLevel(_logger->get_level_threshold());
 }
 
 - (void)setLevel:(RLMLogLevel)level {
-    Logger::set_default_level_threshold(levelForLogLevel(level));
+    _logger->set_level_threshold(levelForLogLevel(level));
+}
+
++ (void)initialize {
+    auto defaultLogger = std::make_shared<CocoaLogger>();
+    defaultLogger->set_level_threshold(Level::warn);
+    Logger::set_default_logger(defaultLogger);
 }
 
 - (instancetype)initWithLogger:(std::shared_ptr<Logger>)logger {
@@ -146,26 +150,10 @@ typedef void(^LoggerBlock)(RLMLogLevel level, NSString *message);
 #pragma mark Global Logger Setter
 
 + (instancetype)defaultLogger {
-    RLMLogger *logger;
-    if (!s_defaultLogger) {
-        auto defaultLogger = std::make_shared<CocoaLogger>();
-        defaultLogger->set_level_threshold(Level::warn);
-        s_defaultLogger = [[RLMLogger alloc] initWithLogger:defaultLogger];
-    }
-
-    logger = s_defaultLogger;
-    Logger::set_default_logger(logger->_logger);
-    return logger;
+    return [[RLMLogger alloc] initWithLogger:Logger::get_default_logger()];
 }
 
 + (void)setDefaultLogger:(RLMLogger *)logger {
-    Logger::set_default_level_threshold(logger->_logger->get_level_threshold());
     Logger::set_default_logger(logger->_logger);
-    s_defaultLogger = logger;
 }
 @end
-
-void RLMInitDefaultLogger() {
-    // If we already set a default logger this will only read it, if not this will create our own default logger.
-    [RLMLogger defaultLogger];
-}

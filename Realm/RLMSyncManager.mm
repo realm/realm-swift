@@ -40,7 +40,8 @@ using namespace realm;
 using Level = realm::util::Logger::Level;
 
 namespace {
-
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
 Level levelForSyncLogLevel(RLMSyncLogLevel logLevel) {
     switch (logLevel) {
         case RLMSyncLogLevelOff:    return Level::off;
@@ -70,6 +71,7 @@ RLMSyncLogLevel logLevelForLevel(Level logLevel) {
     }
     REALM_UNREACHABLE();    // Unrecognized log level.
 }
+#pragma clang diagnostic pop
 
 #pragma mark - Loggers
 

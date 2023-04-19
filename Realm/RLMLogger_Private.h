@@ -25,6 +25,4 @@ RLM_HEADER_AUDIT_BEGIN(nullability)
 - (void)logLevel:(RLMLogLevel)logLevel message:(NSString *)message;
 @end
 
-FOUNDATION_EXTERN void RLMInitDefaultLogger();
-
 RLM_HEADER_AUDIT_END(nullability)

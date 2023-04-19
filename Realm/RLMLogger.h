@@ -32,17 +32,17 @@ typedef RLM_CLOSED_ENUM(NSUInteger, RLMLogLevel) {
     RLMLogLevelWarn,
     /// Information about sync events will be logged. Fewer events will be logged in order to avoid overhead.
     RLMLogLevelInfo,
-    /// Information about sync events will be logged. More events will be logged than with `RLMSyncLogLevelInfo`.
+    /// Information about sync events will be logged. More events will be logged than with `RLMLogLevelInfo`.
     RLMLogLevelDetail,
     /// Log information that can aid in debugging.
     ///
     /// - warning: Will incur a measurable performance impact.
     RLMLogLevelDebug,
-    /// Log information that can aid in debugging. More events will be logged than with `RLMSyncLogLevelDebug`.
+    /// Log information that can aid in debugging. More events will be logged than with `RLMLogLevelDebug`.
     ///
     /// - warning: Will incur a measurable performance impact.
     RLMLogLevelTrace,
-    /// Log information that can aid in debugging. More events will be logged than with `RLMSyncLogLevelTrace`.
+    /// Log information that can aid in debugging. More events will be logged than with `RLMLogLevelTrace`.
     ///
     /// - warning: Will incur a measurable performance impact.
     RLMLogLevelAll
@@ -78,10 +78,12 @@ typedef void (^RLMLogFunction)(RLMLogLevel level, NSString *message);
 /// :nodoc:
 - (instancetype)init NS_UNAVAILABLE;
 
-/// Creates a  logger with the associated log level and the logic function to define your own logging logic.
+/**
+ Creates a logger with the associated log level and the logic function to define your own logging logic.
 
-/// @param level The log level to be set for the logger.
-/// @param logFunction The log function which will be invoked whenever there is a log message.
+ @param level The log level to be set for the logger.
+ @param logFunction The log function which will be invoked whenever there is a log message.
+*/
 - (instancetype)initWithLevel:(RLMLogLevel)level logFunction:(RLMLogFunction)logFunction;
 
 /**
@@ -95,16 +97,9 @@ typedef void (^RLMLogFunction)(RLMLogLevel level, NSString *message);
 #pragma mark RLMLogger Default Logger API
 
 /**
- Sets a logger implementation as default, that will be used whenever information must be logged.
-
- @param logger The `RLMLogger` to be configured as the default logger
+ The current default logger. When setting a logger as default, this logger will be used whenever information must be logged.
  */
-+ (void)setDefaultLogger:(RLMLogger *)logger;
-
-/**
- Gets the current set default logger.
- */
-+ (instancetype)defaultLogger;
+@property (class) RLMLogger *defaultLogger;
 
 @end
 
