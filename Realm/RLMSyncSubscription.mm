@@ -67,6 +67,11 @@
     return RLMTimestampToNSDate(_subscription->updated_at);
 }
 
+// TODO: rename
+- (std::string_view)stdString {
+    return _subscription->query_string;
+}
+
 - (NSString *)queryString {
     return @(_subscription->query_string.c_str());
 }
@@ -315,6 +320,11 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
                                                   predicate:(NSPredicate *)predicate {
     RLMClassInfo& info = _realm->_info[objectClassName];
     auto query = RLMPredicateToQuery(predicate, info.rlmObjectSchema, _realm.schema, _realm.group);
+    return [self subscriptionWithClassName:objectClassName query:query];
+}
+
+- (nullable RLMSyncSubscription *)subscriptionWithClassName:(NSString *)ObjectClassName
+                                                      query:(realm::Query)query {
     auto subscription = _subscriptionSet->find(query);
     if (subscription) {
         return [[RLMSyncSubscription alloc] initWithSubscription:*subscription

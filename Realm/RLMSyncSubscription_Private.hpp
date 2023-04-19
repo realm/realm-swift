@@ -18,6 +18,8 @@
 
 #import "RLMSyncSubscription_Private.h"
 
+#import <string>
+
 namespace realm::sync {
 class Subscription;
 class SubscriptionSet;
@@ -32,6 +34,8 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
 - (instancetype)initWithSubscription:(realm::sync::Subscription)subscription subscriptionSet:(RLMSyncSubscriptionSet *)subscriptionSet;
 
+@property (nonatomic, readonly) std::string_view stdString;
+
 @end
 
 @interface RLMSyncSubscriptionSet ()
@@ -42,6 +46,9 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
                     subscriptionName:(nullable NSString *)name
                                query:(realm::Query)query
                       updateExisting:(BOOL)updateExisting;
+
+- (nullable RLMSyncSubscription *)subscriptionWithClassName:(NSString *)ObjectClassName
+                                                      query:(realm::Query)query;
 
 - (BOOL)removeSubscriptionWithClassName:(NSString *)objectClassName
                                   query:(realm::Query)query;

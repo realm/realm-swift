@@ -618,16 +618,6 @@ keyPaths:(std::optional<std::vector<std::vector<std::pair<realm::TableKey, realm
                completion:(RLMResultsCompletionBlock)completionHandler {
     RLMSyncSubscriptionSet *subscriptions = self.realm.subscriptions;
 
-    if (waitForSyncMode == RLMWaitForSyncModeOnCreation) {
-        if (name) {
-            RLMSyncSubscription *sub = [subscriptions subscriptionWithName:name];
-            // need to import _subscriptions so I can compare the std::string to the description
-//            if  (sub->_subscription.queryString == _results.get_query().get_description()) {
-//                return;
-//            } // else contiune below to update the subscription
-        }
-    }
-    
     if (waitForSyncMode == RLMWaitForSyncModeNever) {
         [subscriptions update:^{
             [subscriptions addSubscriptionWithClassName:self.objectClassName
@@ -635,13 +625,28 @@ keyPaths:(std::optional<std::vector<std::vector<std::pair<realm::TableKey, realm
                                                   query:_results.get_query()
                                          updateExisting:true];
         }];
+        completionHandler(self, nil);
         return;
     }
-    
-    if (waitForSyncMode == RLMWaitForSyncModeAlways) { // not needed
-        // waitfordownloads
-        // May not need anything here. Method will continue to subscription.update with a completion handler and return there.
+
+    if (waitForSyncMode == RLMWaitForSyncModeOnCreation) { // make this not a bunch of branches
+        if (name) {
+            RLMSyncSubscription *sub = [subscriptions subscriptionWithName:name];
+            // need to import _subscriptions so I can compare the std::string to the description
+            if (sub.stdString == _results.get_query().get_description()) {
+                completionHandler(self, nil);
+                return;
+            }
+        } else {
+            RLMSyncSubscription *sub = [subscriptions subscriptionWithClassName:self.objectClassName query:_results.get_query()];
+            if (sub != nil) {
+                completionHandler(self, nil);
+                return;
+            }
+        }
     }
+
+    if (waitForSyncMode == RLMWaitForSyncModeAlways) {}
 
     [subscriptions update:^{
         [subscriptions addSubscriptionWithClassName:self.objectClassName
