@@ -356,6 +356,7 @@ protocol ModernEmbeddedTreeObject: EmbeddedObject {
 
 class ModernEmbeddedTreeObject1: EmbeddedObject, ModernEmbeddedTreeObject {
     @Persisted var value = 0
+    @Persisted var bool = false
     @Persisted var child: ModernEmbeddedTreeObject2?
     @Persisted var children: List<ModernEmbeddedTreeObject2>
 

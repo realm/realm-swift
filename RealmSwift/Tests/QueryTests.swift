@@ -59,10 +59,10 @@ class QueryTests: TestCase {
     override func setUp() {
         realm = inMemoryRealm("QueryTests")
         try! realm.write {
-            let objCustomPersistableCollections = CustomPersistableCollections()
-            let objAllCustomPersistableTypes = AllCustomPersistableTypes()
-            let objModernAllTypesObject = ModernAllTypesObject()
             let objModernCollectionsOfEnums = ModernCollectionsOfEnums()
+            let objCustomPersistableCollections = CustomPersistableCollections()
+            let objModernAllTypesObject = ModernAllTypesObject()
+            let objAllCustomPersistableTypes = AllCustomPersistableTypes()
 
             objModernAllTypesObject.boolCol = false
             objModernAllTypesObject.intCol = 3
@@ -420,8 +420,8 @@ class QueryTests: TestCase {
             objCustomPersistableCollections.mapOptUuid["foo"] = UUIDWrapper(persistedValue: UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!)
             objCustomPersistableCollections.mapOptUuid["bar"] = UUIDWrapper(persistedValue: UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!)
 
-            realm.add(objAllCustomPersistableTypes)
             realm.add(objModernCollectionsOfEnums)
+            realm.add(objAllCustomPersistableTypes)
             realm.add(objModernAllTypesObject)
             realm.add(objCustomPersistableCollections)
         }
@@ -435,21 +435,21 @@ class QueryTests: TestCase {
         realm.beginWrite()
         realm.deleteAll()
 
+        let parentLinkToModernCollectionsOfEnums = realm.create(LinkToModernCollectionsOfEnums.self)
+        let childrenModernCollectionsOfEnums = [ModernCollectionsOfEnums(), ModernCollectionsOfEnums(), ModernCollectionsOfEnums()]
+        parentLinkToModernCollectionsOfEnums.list.append(objectsIn: childrenModernCollectionsOfEnums)
+
         let parentLinkToCustomPersistableCollections = realm.create(LinkToCustomPersistableCollections.self)
         let childrenCustomPersistableCollections = [CustomPersistableCollections(), CustomPersistableCollections(), CustomPersistableCollections()]
         parentLinkToCustomPersistableCollections.list.append(objectsIn: childrenCustomPersistableCollections)
-
-        let parentLinkToAllCustomPersistableTypes = realm.create(LinkToAllCustomPersistableTypes.self)
-        let childrenAllCustomPersistableTypes = [AllCustomPersistableTypes(), AllCustomPersistableTypes(), AllCustomPersistableTypes()]
-        parentLinkToAllCustomPersistableTypes.list.append(objectsIn: childrenAllCustomPersistableTypes)
 
         let parentLinkToModernAllTypesObject = realm.create(LinkToModernAllTypesObject.self)
         let childrenModernAllTypesObject = [ModernAllTypesObject(), ModernAllTypesObject(), ModernAllTypesObject()]
         parentLinkToModernAllTypesObject.list.append(objectsIn: childrenModernAllTypesObject)
 
-        let parentLinkToModernCollectionsOfEnums = realm.create(LinkToModernCollectionsOfEnums.self)
-        let childrenModernCollectionsOfEnums = [ModernCollectionsOfEnums(), ModernCollectionsOfEnums(), ModernCollectionsOfEnums()]
-        parentLinkToModernCollectionsOfEnums.list.append(objectsIn: childrenModernCollectionsOfEnums)
+        let parentLinkToAllCustomPersistableTypes = realm.create(LinkToAllCustomPersistableTypes.self)
+        let childrenAllCustomPersistableTypes = [AllCustomPersistableTypes(), AllCustomPersistableTypes(), AllCustomPersistableTypes()]
+        parentLinkToAllCustomPersistableTypes.list.append(objectsIn: childrenAllCustomPersistableTypes)
 
 
         initForKeypathCollectionAggregates(childrenModernAllTypesObject, \.intCol)
@@ -506,12 +506,12 @@ class QueryTests: TestCase {
         realm.beginWrite()
         realm.deleteAll()
 
-        let parentLinkToModernCollectionsOfEnums = realm.create(LinkToModernCollectionsOfEnums.self)
-        let objModernCollectionsOfEnums = ModernCollectionsOfEnums()
-        parentLinkToModernCollectionsOfEnums["object"] = objModernCollectionsOfEnums
         let parentLinkToCustomPersistableCollections = realm.create(LinkToCustomPersistableCollections.self)
         let objCustomPersistableCollections = CustomPersistableCollections()
         parentLinkToCustomPersistableCollections["object"] = objCustomPersistableCollections
+        let parentLinkToModernCollectionsOfEnums = realm.create(LinkToModernCollectionsOfEnums.self)
+        let objModernCollectionsOfEnums = ModernCollectionsOfEnums()
+        parentLinkToModernCollectionsOfEnums["object"] = objModernCollectionsOfEnums
         let parentLinkToModernAllTypesObject = realm.create(LinkToModernAllTypesObject.self)
         let objModernAllTypesObject = ModernAllTypesObject()
         parentLinkToModernAllTypesObject["object"] = objModernAllTypesObject
@@ -908,6 +908,29 @@ class QueryTests: TestCase {
         validateEqualsNil("optDecimal", \Query<AllCustomPersistableTypes>.optDecimal)
         validateEqualsNil("optObjectId", \Query<AllCustomPersistableTypes>.optObjectId)
         validateEqualsNil("optUuid", \Query<AllCustomPersistableTypes>.optUuid)
+    }
+
+    func testImplicitBooleanOperation() {
+        assertQuery(ModernAllTypesObject.self, "boolCol == true", count: 0, { $0.boolCol })
+        assertQuery(ModernAllTypesObject.self, "boolCol == false", count: 1, { !$0.boolCol })
+
+        initLinkedCollectionAggregatesObject()
+        assertQuery(LinkToModernAllTypesObject.self, "object.boolCol == true", count: 0, { $0.object.boolCol })
+        assertQuery(LinkToModernAllTypesObject.self, "object.boolCol == false", count: 1, { !$0.object.boolCol })
+
+        let object = ModernEmbeddedParentObject()
+        let nestedObject = ModernEmbeddedTreeObject1()
+        object.object = nestedObject
+        try! realm.write {
+            realm.add(object)
+        }
+        assertQuery(ModernEmbeddedParentObject.self, "object.bool == true", count: 0, { $0.object.bool })
+        assertQuery(ModernEmbeddedParentObject.self, "object.bool == false", count: 1, { !$0.object.bool })
+
+        assertQuery(ModernAllTypesObject.self, "((intCol == %@) && boolCol == true)", 0, count: 0, { $0.intCol == 0 && $0.boolCol })
+        assertQuery(ModernAllTypesObject.self, "(boolCol == true && (intCol == %@))", 0, count: 0, { $0.boolCol && $0.intCol == 0 })
+        assertQuery(ModernAllTypesObject.self, "((intCol == %@) || boolCol == false)", 0, count: 1, { $0.intCol == 0 || !$0.boolCol })
+        assertQuery(ModernAllTypesObject.self, "(boolCol == false || (intCol == %@))", 0, count: 1, { !$0.boolCol || $0.intCol == 0 })
     }
 
     func testEqualAnyRealmValue() {
@@ -3662,17 +3685,17 @@ class QueryTests: TestCase {
 
     func testCollectionFromProperty() {
         try! realm.write {
+            let objModernCollectionsOfEnums = realm.objects(ModernCollectionsOfEnums.self).first!
+            _ = realm.create(LinkToModernCollectionsOfEnums.self, value: [
+                "list": [objModernCollectionsOfEnums],
+                "set": [objModernCollectionsOfEnums],
+                "map": ["foo": objModernCollectionsOfEnums]
+            ])
             let objCustomPersistableCollections = realm.objects(CustomPersistableCollections.self).first!
             _ = realm.create(LinkToCustomPersistableCollections.self, value: [
                 "list": [objCustomPersistableCollections],
                 "set": [objCustomPersistableCollections],
                 "map": ["foo": objCustomPersistableCollections]
-            ])
-            let objAllCustomPersistableTypes = realm.objects(AllCustomPersistableTypes.self).first!
-            _ = realm.create(LinkToAllCustomPersistableTypes.self, value: [
-                "list": [objAllCustomPersistableTypes],
-                "set": [objAllCustomPersistableTypes],
-                "map": ["foo": objAllCustomPersistableTypes]
             ])
             let objModernAllTypesObject = realm.objects(ModernAllTypesObject.self).first!
             _ = realm.create(LinkToModernAllTypesObject.self, value: [
@@ -3680,11 +3703,11 @@ class QueryTests: TestCase {
                 "set": [objModernAllTypesObject],
                 "map": ["foo": objModernAllTypesObject]
             ])
-            let objModernCollectionsOfEnums = realm.objects(ModernCollectionsOfEnums.self).first!
-            _ = realm.create(LinkToModernCollectionsOfEnums.self, value: [
-                "list": [objModernCollectionsOfEnums],
-                "set": [objModernCollectionsOfEnums],
-                "map": ["foo": objModernCollectionsOfEnums]
+            let objAllCustomPersistableTypes = realm.objects(AllCustomPersistableTypes.self).first!
+            _ = realm.create(LinkToAllCustomPersistableTypes.self, value: [
+                "list": [objAllCustomPersistableTypes],
+                "set": [objAllCustomPersistableTypes],
+                "map": ["foo": objAllCustomPersistableTypes]
             ])
         }
 
@@ -9453,10 +9476,10 @@ private protocol LinkToTestObject: Object {
     var set: MutableSet<Child> { get }
     var map: Map<String, Child?> { get }
 }
-extension LinkToCustomPersistableCollections: LinkToTestObject {}
-extension LinkToAllCustomPersistableTypes: LinkToTestObject {}
-extension LinkToModernAllTypesObject: LinkToTestObject {}
 extension LinkToModernCollectionsOfEnums: LinkToTestObject {}
+extension LinkToCustomPersistableCollections: LinkToTestObject {}
+extension LinkToModernAllTypesObject: LinkToTestObject {}
+extension LinkToAllCustomPersistableTypes: LinkToTestObject {}
 
 private protocol QueryValue {
     static func queryValues() -> [Self]
