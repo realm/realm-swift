@@ -31,11 +31,10 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
 /// The order in which to return matching documents.
 @property (nonatomic, nullable) id<RLMBSON> sort NS_REFINED_FOR_SWIFT
-__attribute__((deprecated("Use `sortDescriptors` instead, which correctly sort more than one sort attribute", "sortDescriptors")));
+__attribute__((deprecated("Use `sorting` instead, which correctly sort more than one sort attribute", "sorting")));
 
 /// The order in which to return matching documents.
-/// - seeAlso ``RLMSortDescriptor``
-@property (nonatomic) NSArray<RLMSortDescriptor *>* sortDescriptors NS_REFINED_FOR_SWIFT;
+@property (nonatomic) NSArray<id<RLMBSON>> *sorting NS_REFINED_FOR_SWIFT;
 
 
 /// Whether or not to perform an upsert, default is false
@@ -59,20 +58,21 @@ __attribute__((deprecated("Use `sortDescriptors` instead, which correctly sort m
 - (instancetype)initWithProjection:(id<RLMBSON> _Nullable)projection
                               sort:(id<RLMBSON> _Nullable)sort
                             upsert:(BOOL)upsert
-           shouldReturnNewDocument:(BOOL)shouldReturnNewDocument __deprecated
+           shouldReturnNewDocument:(BOOL)shouldReturnNewDocument
+__attribute__((deprecated("Please use `initWithProjection:sorting:upsert:shouldReturnNewDocument:`")))
      NS_SWIFT_UNAVAILABLE("Please see FindOneAndModifyOptions");
 
 /// Options to use when executing a `findOneAndUpdate`, `findOneAndReplace`,
 /// or `findOneAndDelete` command on a `RLMMongoCollection`.
 /// @param projection Limits the fields to return for all matching documents.
-/// @param sortDescriptors The order in which to return matching documents.
+/// @param sorting The order in which to return matching documents.
 /// @param upsert Whether or not to perform an upsert, default is false
 /// (only available for findOneAndReplace and findOneAndUpdate)
 /// @param shouldReturnNewDocument When true then the new document is returned,
 /// Otherwise the old document is returned (default),
 /// (only available for findOneAndReplace and findOneAndUpdate)
 - (instancetype)initWithProjection:(id<RLMBSON> _Nullable)projection
-                   sortDescriptors:(NSArray<RLMSortDescriptor *> *)sortDescriptors
+                           sorting:(NSArray<id<RLMBSON>> *)sorting
                             upsert:(BOOL)upsert
            shouldReturnNewDocument:(BOOL)shouldReturnNewDocument;
 @end

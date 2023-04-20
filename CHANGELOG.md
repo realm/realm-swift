@@ -89,6 +89,10 @@ x.y.z Release notes (yyyy-MM-dd)
   runtime actor data race detection (`OTHER_SWIFT_FLAGS=-Xfrontend
   -enable-actor-data-race-checks`) is strongly recommended when using
   actor-isolated Realms.
+* Now you can use an array `[["_id": 1], ["breed": 0]]` as sorting option for a MongoCollection. 
+  This new API fixes the issue where the resulting documents when using more than 
+  one sort parameter were not consistent between calls. 
+  ([#7188](https://github.com/realm/realm-swift/issues/7188), since v10.0.0). 
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
@@ -141,11 +145,6 @@ x.y.z Release notes (yyyy-MM-dd)
 
 * Improve performance of equality queries on a non-indexed AnyRealmValue
   property by about 30%. ([Core #6506](https://github.com/realm/realm-core/issues/6506))
-* Now you can use sortDescriptors parameter to set an array of `SortDescriptor`s 
-  which can be use to set the order of the matching documents when used within MongoCollection. 
-  This new API fixes the issue where the resulting documents when using more than 
-  one sort parameter were not consistent between calls. 
-  ([#7188](https://github.com/realm/realm-swift/issues/7188), since v10.0.0). 
 
 ### Fixed
 
