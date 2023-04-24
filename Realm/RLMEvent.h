@@ -51,7 +51,7 @@ FOUNDATION_EXTERN void RLMEventUpdateMetadata(struct RLMEventContext *context,
 @property (nonatomic, nullable) RLMUser *syncUser;
 @property (nonatomic, nullable) NSDictionary<NSString *, NSString *> *metadata;
 @property (nonatomic, nullable) void (^logger)(RLMSyncLogLevel, NSString *);
-@property (nonatomic, nullable) void (^errorHandler)(NSError *);
+@property (nonatomic, nullable) RLM_SWIFT_SENDABLE void (^errorHandler)(NSError *);
 
 #ifdef __cplusplus
 - (std::shared_ptr<realm::AuditConfig>)auditConfigWithRealmConfiguration:(RLMRealmConfiguration *)realmConfig;
