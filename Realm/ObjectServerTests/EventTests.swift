@@ -23,6 +23,7 @@ import XCTest
 
 #if canImport(RealmTestSupport)
 import RealmSwiftSyncTestSupport
+import RealmSwiftTestSupport
 import RealmSyncTestSupport
 import RealmTestSupport
 #endif
@@ -415,25 +416,25 @@ class SwiftEventTests: SwiftSyncTestCase {
         assertEvent("link via subscript", personCount: 1, linkAccessed)
         assertEvent("link via dynamic", personCount: 1, linkAccessed)
 
-        let listAccsssed: NSDictionary = [
+        let listAccessed: NSDictionary = [
             "_id": id!.stringValue,
             "realm_id": NSNull(),
             "person": idOnly(a),
             "people": [full(b), full(c)],
             "peopleByName": [b.firstName: idOnly(b), c.firstName: idOnly(c)]
         ]
-        assertEvent("list property", personCount: 1, listAccsssed)
-        assertEvent("dynamic list property", personCount: 1, listAccsssed)
+        assertEvent("list property", personCount: 1, listAccessed)
+        assertEvent("dynamic list property", personCount: 1, listAccessed)
 
-        let dictionaryAccsssed: NSDictionary = [
+        let dictionaryAccessed: NSDictionary = [
             "_id": id!.stringValue,
             "realm_id": NSNull(),
             "person": idOnly(a),
             "people": [idOnly(b), idOnly(c)],
             "peopleByName": [b.firstName: full(b), c.firstName: full(c)]
         ]
-        assertEvent("dictionary property", personCount: 1, dictionaryAccsssed)
-        assertEvent("dynamic dictionary property", personCount: 1, dictionaryAccsssed)
+        assertEvent("dictionary property", personCount: 1, dictionaryAccessed)
+        assertEvent("dynamic dictionary property", personCount: 1, dictionaryAccessed)
     }
 
     func testMetadata() throws {
@@ -536,5 +537,26 @@ class SwiftEventTests: SwiftSyncTestCase {
 
         let result = getEvents(expectedCount: 1)
         XCTAssertEqual(result[0].activity, "scope")
+    }
+
+    func testErrorHandler() throws {
+        var config = try self.config()
+        let blockCalled = Locked(false)
+        let ex = expectation(description: "Error callback called")
+        config.eventConfiguration?.errorHandler = { error in
+            assertSyncError(error, .clientUserError, "Unable to refresh the user access token.")
+            blockCalled.value = true
+            ex.fulfill()
+        }
+        let realm = try openRealm(configuration: config)
+        let events = realm.events!
+        manuallySetAccessToken(for: user, value: badAccessToken())
+        manuallySetRefreshToken(for: user, value: badAccessToken())
+
+        // Recording the audit event should succeed, but we should get a sync
+        // error when trying to actually upload it due to the user having
+        // an invalid access token
+        events.recordEvent(activity: "activity which should fail").await(self)
+        wait(for: [ex], timeout: 4.0)
     }
 }
