@@ -21,6 +21,7 @@
 #import "RLMAccessor.hpp"
 #import "RLMArray_Private.hpp"
 #import "RLMCollection_Private.hpp"
+#import "RLMError_Private.hpp"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObjectStore.h"
 #import "RLMObject_Private.hpp"
@@ -662,10 +663,32 @@ keyPaths:(std::optional<std::vector<std::vector<std::pair<realm::TableKey, realm
     }];
 }
 
+//typedef void(^RLMResultsCompletionBlock)(RLMResults * _Nullable, NSError * _Nullable);
 - (void)subscribeWithName:(NSString *_Nullable)name
           waitForSyncMode:(RLMWaitForSyncMode)waitForSyncMode
                   timeout:(NSTimeInterval)timeout
-               completion:(RLMResultsCompletionBlock)completionHandler {}
+               completion:(RLMResultsCompletionBlock)completionHandler {
+    __block BOOL called = false;
+    void(^completionBlock)(RLMResults* _Nullable, NSError* _Nullable) = ^(RLMResults* _Nullable results, NSError* _Nullable error) {
+        if (!called) {
+            if (error != nil) {
+                completionHandler(nil, error);
+            } else {
+                completionHandler(results, nil);
+            }
+            called = true;
+        }
+    };
+
+    dispatch_time_t time =  dispatch_time(DISPATCH_TIME_NOW, (int64_t)(timeout * NSEC_PER_SEC));
+
+    dispatch_after(time, dispatch_get_main_queue(), ^{
+        NSString* errorMessage = [NSString stringWithFormat:@"Waiting for subscribed data timedout after %f seconds.", timeout];
+        NSError* error = [NSError errorWithDomain:RLMErrorDomain code:RLMErrorClientTimeout userInfo:@{NSLocalizedDescriptionKey: errorMessage}];
+        completionBlock(nil, error);
+    });
+    [self subscribeWithName:name waitForSyncMode:waitForSyncMode completion:completionBlock];
+}
 
 - (BOOL)unsubscribe {
     RLMSyncSubscriptionSet *subscriptions = self.realm.subscriptions;

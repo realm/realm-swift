@@ -199,6 +199,14 @@ typedef RLM_ERROR_ENUM(NSInteger, RLMError, RLMErrorDomain) {
      subscription or the server will reject the write.
      */
     RLMErrorNoSubscriptionForWrite = 22,
+
+    /**
+     Denotes an error that occurs when the client ends an operation
+     due to a timeout set by the client. If the canceled operation was waiting for
+     the sync  server, this error does not imply a server error occurred or
+     that a server configured timeout had been exceeded.
+     */
+    RLMErrorClientTimeout = 23,
 };
 
 #pragma mark - RLMSyncError
