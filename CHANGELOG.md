@@ -1,22 +1,17 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.38.1 Release notes (2023-04-25)
 =============================================================
-### Enhancements
-* None.
 
 ### Fixed
+
 * The error handler set on EventsConfiguration was not actually used (since v10.26.0).
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
-
 ### Compatibility
+
 * Realm Studio: 13.0.2 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 14.3.
 * CocoaPods: 1.10 or later.
 * Xcode: 13.4-14.3.
-
-### Internal
-* Upgraded realm-core from ? to ?
 
 10.38.0 Release notes (2023-03-31)
 =============================================================
