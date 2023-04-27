@@ -368,6 +368,7 @@ import Realm.Private
         rlmSyncSubscriptionSet.removeSubscription(withName: named)
     }
 
+    // TODO: update docs
     /**
      Removes all subscriptions from the subscription set.
 
@@ -375,8 +376,8 @@ import Realm.Private
      - warning: Removing all subscriptions will result in an error if no new subscription is added. Server should
                 acknowledge at least one subscription.
      */
-    public func removeAll() {
-        rlmSyncSubscriptionSet.removeAllSubscriptions()
+    public func removeAll(unnamedOnly: Bool = false) {
+        rlmSyncSubscriptionSet.removeAllSubscriptions(unnamedOnly)
     }
 
     /**
