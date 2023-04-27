@@ -396,6 +396,8 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
                     subscriptionName:(nullable NSString *)name
                            predicate:(NSPredicate *)predicate
                       updateExisting:(BOOL)updateExisting {
+    [self verifyInWriteTransaction];
+
     RLMClassInfo& info = _realm->_info[objectClassName];
     auto query = RLMPredicateToQuery(predicate, info.rlmObjectSchema, _realm.schema, _realm.group);
 

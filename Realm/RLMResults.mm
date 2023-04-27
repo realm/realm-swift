@@ -566,57 +566,18 @@ keyPaths:(std::optional<std::vector<std::vector<std::pair<realm::TableKey, realm
     return _results.add_notification_callback(RLMWrapCollectionChangeCallback(block, self, true), std::move(keyPaths));
 }
 
-//- (void)subscribeWithCompletion:(RLMResultsCompletionBlock)completion
-//                          named:(NSString *_Nullable)named
-//                    waitForSync:(RLMWaitForSyncMode)waitForSync
-//                        timeout:(NSTimeInterval)seconds {
-//
-//}
-//
-//- (void)subscribeWithCompletion:(RLMResultsCompletionBlock)completion
-//                          named:(NSString *_Nullable)named
-//                    waitForSync:(RLMWaitForSyncMode)waitForSync {
-//    RLMSyncSubscriptionSet *subs = self.realm.subscriptions;
-//    [subs update:^{
-//        [subs addSubscriptionWithClassName:self.className
-//                          subscriptionName:named
-//                                     query:_results.get_query()
-//                            updateExisting:true];
-//    } onComplete:^(NSError* error) {
-//        if (error == nil) {
-//        }
-//    }];
-//}
+- (void)subscribeWithCompletion:(RLMResultsCompletionBlock)completion {
+    return [self subscribeWithName:nil completion:completion];
+};
 
-//- (void)subscribeWithCompletion:(RLMResultsCompletionBlock)completion
-//                waitForSyncMode:(RLMWaitForSyncMode)waitForSyncMode
-//                           name:(NSString *_Nullable)name {
-//    RLMSyncSubscriptionSet *subs = self.realm.subscriptions;
-//    [subs update:^{
-//        [subs addSubscriptionWithClassName:self.objectClassName
-//                          subscriptionName:name
-//                                     query:_results.get_query()
-//                            updateExisting:true];
-//    } onComplete:^(NSError* error) {
-//        if (error == nil) {
-//            completion(nil, error);
-//        }
-//    }];
-//}
-//
-//- (void)subscribeWithCompletion:(RLMResultsCompletionBlock)completion
-//                waitForSyncMode:(RLMWaitForSyncMode)waitForSyncMode
-//                        timeout:(NSTimeInterval)seconds {}
-//
-//- (void)subscribeWithCompletion:(RLMResultsCompletionBlock)completion
-//                waitForSyncMode:(RLMWaitForSyncMode)waitForSyncMode
-//                           name:(NSString *_Nullable)name
-//                        timeout:(NSTimeInterval)seconds {}
-
+- (void)subscribeWithName:(NSString *_Nullable)name
+               completion:(RLMResultsCompletionBlock)completion {
+    return [self subscribeWithName:name waitForSyncMode:RLMWaitForSyncModeOnCreation completion:completion];
+}
 
 - (void)subscribeWithName:(NSString *_Nullable)name
           waitForSyncMode:(RLMWaitForSyncMode)waitForSyncMode
-               completion:(RLMResultsCompletionBlock)completionHandler {
+               completion:(RLMResultsCompletionBlock)completion {
     RLMSyncSubscriptionSet *subscriptions = self.realm.subscriptions;
 
     if (waitForSyncMode == RLMWaitForSyncModeNever) {
@@ -626,29 +587,25 @@ keyPaths:(std::optional<std::vector<std::vector<std::pair<realm::TableKey, realm
                                                   query:_results.get_query()
                                          updateExisting:true];
         }];
-        completionHandler(self, nil);
+        completion(self, nil);
         return;
     }
-
-    if (waitForSyncMode == RLMWaitForSyncModeOnCreation) { // make this not a bunch of branches
+    if (waitForSyncMode == RLMWaitForSyncModeOnCreation) { // TODO: rewrite?
         if (name) {
             RLMSyncSubscription *sub = [subscriptions subscriptionWithName:name];
-            // need to import _subscriptions so I can compare the std::string to the description
             if (sub.stdString == _results.get_query().get_description()) {
-                completionHandler(self, nil);
+                completion(self, nil);
                 return;
             }
         } else {
             RLMSyncSubscription *sub = [subscriptions subscriptionWithClassName:self.objectClassName query:_results.get_query()];
             if (sub != nil) {
-                completionHandler(self, nil);
+                completion(self, nil);
                 return;
             }
         }
     }
-
-    if (waitForSyncMode == RLMWaitForSyncModeAlways) {}
-
+    // onComplete is called upon synchronization from the server, which satisfies if (waitForSyncMode == RLMWaitForSyncModeAlways)
     [subscriptions update:^{
         [subscriptions addSubscriptionWithClassName:self.objectClassName
                                    subscriptionName:name
@@ -656,38 +613,36 @@ keyPaths:(std::optional<std::vector<std::vector<std::pair<realm::TableKey, realm
                                      updateExisting:true]; // TODO: update true may work in all cases?
     } onComplete:^(NSError* error) {
         if (error != nil) {
-            completionHandler(nil, error);
+            completion(nil, error);
         } else {
-            completionHandler(self, nil);
+            completion(self, nil);
         }
     }];
 }
 
-//typedef void(^RLMResultsCompletionBlock)(RLMResults * _Nullable, NSError * _Nullable);
 - (void)subscribeWithName:(NSString *_Nullable)name
           waitForSyncMode:(RLMWaitForSyncMode)waitForSyncMode
                   timeout:(NSTimeInterval)timeout
-               completion:(RLMResultsCompletionBlock)completionHandler {
+               completion:(RLMResultsCompletionBlock)completion {
     __block BOOL called = false;
-    void(^completionBlock)(RLMResults* _Nullable, NSError* _Nullable) = ^(RLMResults* _Nullable results, NSError* _Nullable error) {
+    void(^methodCompletion)(RLMResults* _Nullable, NSError* _Nullable) = ^(RLMResults* _Nullable results, NSError* _Nullable error) {
         if (!called) {
             if (error != nil) {
-                completionHandler(nil, error);
+                completion(nil, error);
             } else {
-                completionHandler(results, nil);
+                completion(results, nil);
             }
             called = true;
         }
     };
 
     dispatch_time_t time =  dispatch_time(DISPATCH_TIME_NOW, (int64_t)(timeout * NSEC_PER_SEC));
-
     dispatch_after(time, dispatch_get_main_queue(), ^{
         NSString* errorMessage = [NSString stringWithFormat:@"Waiting for subscribed data timedout after %f seconds.", timeout];
         NSError* error = [NSError errorWithDomain:RLMErrorDomain code:RLMErrorClientTimeout userInfo:@{NSLocalizedDescriptionKey: errorMessage}];
-        completionBlock(nil, error);
+        methodCompletion(nil, error);
     });
-    [self subscribeWithName:name waitForSyncMode:waitForSyncMode completion:completionBlock];
+    [self subscribeWithName:name waitForSyncMode:waitForSyncMode completion:methodCompletion];
 }
 
 - (BOOL)unsubscribe {
