@@ -24,6 +24,7 @@
 #import "RLMRealm_Dynamic.h"
 #import "RLMRealm_Private.hpp"
 #import "RLMSchema_Private.h"
+#import "RLMLogger_Private.h"
 
 #import <mach/mach_init.h>
 #import <mach/vm_map.h>
@@ -2950,21 +2951,21 @@
 
     __block NSString *logs = @"";
     RLMLogger *logger = [[RLMLogger alloc] initWithLevel:RLMLogLevelAll logFunction:^(RLMLogLevel level, NSString * _Nonnull message) {
-        NSString *newLogs = [logs stringByAppendingFormat:@" %@ %lu %@", [NSDate now], level, message];
+        NSString *newLogs = [logs stringByAppendingFormat:@" %@ %lu %@", [NSDate date], level, message];
         logs = newLogs;
     }];
     RLMLogger.defaultLogger = logger;
 
     @autoreleasepool { [RLMRealm defaultRealm]; }
     XCTAssertEqual([RLMLogger defaultLogger].level, RLMLogLevelAll);
-    XCTAssertTrue([logs rangeOfString:@"4 DB:" options:NSRegularExpressionSearch].location != NSNotFound); // Info
+    XCTAssertTrue([logs rangeOfString:@"5 DB:" options:NSRegularExpressionSearch].location != NSNotFound); // Detail
     XCTAssertTrue([logs rangeOfString:@"7 DB:" options:NSRegularExpressionSearch].location != NSNotFound); // Trace
 
     logs = @"";
-    RLMLogger.defaultLogger.level = RLMLogLevelInfo;
+    RLMLogger.defaultLogger.level = RLMLogLevelDetail;
     @autoreleasepool { [RLMRealm defaultRealm]; }
-    XCTAssertEqual([RLMLogger defaultLogger].level, RLMLogLevelInfo);
-    XCTAssertTrue([logs rangeOfString:@"4 DB:" options:NSRegularExpressionSearch].location != NSNotFound); // Info
+    XCTAssertEqual([RLMLogger defaultLogger].level, RLMLogLevelDetail);
+    XCTAssertTrue([logs rangeOfString:@"5 DB:" options:NSRegularExpressionSearch].location != NSNotFound); // Detail
     XCTAssertTrue([logs rangeOfString:@"7 DB:" options:NSRegularExpressionSearch].location == NSNotFound); // Trace
 }
 
@@ -2972,7 +2973,7 @@
     __block NSString *logs = @"";
     RLMLogger *logger = [[RLMLogger alloc] initWithLevel:RLMLogLevelOff
                                              logFunction:^(RLMLogLevel level, NSString * _Nonnull message) {
-        NSString *newLogs = [logs stringByAppendingFormat:@" %@ %lu %@", [NSDate now], level, message];
+        NSString *newLogs = [logs stringByAppendingFormat:@" %@ %lu %@", [NSDate date], level, message];
         logs = newLogs;
     }];
     RLMLogger.defaultLogger = logger;
@@ -2981,31 +2982,31 @@
     @autoreleasepool { [RLMRealm defaultRealm]; }
     XCTAssertTrue([logs length] == 0);
 
-    // Test LogLevel Info
-    logger.level = RLMLogLevelInfo;
+    // Test LogLevel Detail
+    logger.level = RLMLogLevelDetail;
     @autoreleasepool { [RLMRealm defaultRealm]; }
     XCTAssertTrue([logs length] >= 0);
-    XCTAssertTrue([logs containsString:@"4 DB:"]); // Info
+    XCTAssertTrue([logs containsString:@"5 DB:"]); // Detail
     XCTAssertFalse([logs containsString:@"7 DB:"]); // Trace
 
     // Test LogLevel All
     logger.level = RLMLogLevelAll;
     @autoreleasepool { [RLMRealm defaultRealm]; }
     XCTAssertTrue([logs length] >= 0);
-    XCTAssertTrue([logs containsString:@"4 DB:"]); // Info
+    XCTAssertTrue([logs containsString:@"5 DB:"]); // Detail
     XCTAssertTrue([logs containsString:@"7 DB:"]); // Trace
 
     logs = @"";
     // Init Custom Logger
     RLMLogger.defaultLogger = [[RLMLogger alloc] initWithLevel:RLMLogLevelDebug
                                                    logFunction:^(RLMLogLevel level, NSString * message) {
-        NSString *newLogs = [logs stringByAppendingFormat:@" %@ %lu %@", [NSDate now], level, message];
+        NSString *newLogs = [logs stringByAppendingFormat:@" %@ %lu %@", [NSDate date], level, message];
         logs = newLogs;
     }];
 
     XCTAssertEqual(RLMLogger.defaultLogger.level, RLMLogLevelDebug);
     @autoreleasepool { [RLMRealm defaultRealm]; }
-    XCTAssertTrue([logs containsString:@"4 DB:"]); // Info
+    XCTAssertTrue([logs containsString:@"5 DB:"]); // Detail
     XCTAssertFalse([logs containsString:@"7 DB:"]); // Trace
 }
 
@@ -3013,7 +3014,7 @@
     __block NSString *logs = @"";
     RLMLogger *logger = [[RLMLogger alloc] initWithLevel:RLMLogLevelInfo
                                              logFunction:^(RLMLogLevel level, NSString * message) {
-        NSString *newLogs = [logs stringByAppendingFormat:@" %@ %lu %@", [NSDate now], level, message];
+        NSString *newLogs = [logs stringByAppendingFormat:@" %@ %lu %@", [NSDate date], level, message];
         logs = newLogs;
     }];
     RLMLogger.defaultLogger = logger;

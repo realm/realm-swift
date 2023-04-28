@@ -21,7 +21,7 @@
 #import "RLMBSON_Private.hpp"
 #import "RLMCredentials_Private.hpp"
 #import "RLMEmailPasswordAuth.h"
-#import "RLMLogger_Private.h"
+#import "RLMLogger.h"
 #import "RLMPushClient_Private.hpp"
 #import "RLMSyncManager_Private.hpp"
 #import "RLMUser_Private.hpp"

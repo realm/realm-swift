@@ -23,7 +23,7 @@
 #import "RLMArray_Private.hpp"
 #import "RLMDictionary_Private.hpp"
 #import "RLMError_Private.hpp"
-#import "RLMLogger_Private.h"
+#import "RLMLogger.h"
 #import "RLMMigration_Private.h"
 #import "RLMObject_Private.h"
 #import "RLMObject_Private.hpp"

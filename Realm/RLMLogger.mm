@@ -109,7 +109,7 @@ typedef void(^LoggerBlock)(RLMLogLevel level, NSString *message);
 
 + (void)initialize {
     auto defaultLogger = std::make_shared<CocoaLogger>();
-    defaultLogger->set_level_threshold(Level::warn);
+    defaultLogger->set_level_threshold(Level::info);
     Logger::set_default_logger(defaultLogger);
 }
 

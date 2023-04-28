@@ -62,11 +62,12 @@ typedef void (^RLMLogFunction)(RLMLogLevel level, NSString *message);
  invoked whenever there is a log message.
  Set this custom logger as you default logger using `setDefaultLogger`.
 
-     [RLMLogger setDefaultLogger:[[RLMLogger alloc] initWithLevel:RLMLogLevelDebug logFunction:^(RLMLogLevel level,    NSString * _Nonnull message) {
-        NSLog(@"Realm Log - %lu, %@", (unsigned long)level, message);
-     }]];
+     RLMLogger.defaultLogger = [[RLMLogger alloc] initWithLevel:RLMLogLevelDebug
+                                                logFunction:^(RLMLogLevel level, NSString * message) {
+         NSLog(@"Realm Log - %lu, %@", (unsigned long)level, message);
+     }];
 
- @note By default default log threshold level is `.warn`, and logging strings are output to Apple System Logger.
+ @note By default default log threshold level is `RLMLogLevelInfo`, and logging strings are output to Apple System Logger.
 */
 @interface RLMLogger : NSObject
 
@@ -86,20 +87,12 @@ typedef void (^RLMLogFunction)(RLMLogLevel level, NSString *message);
 */
 - (instancetype)initWithLevel:(RLMLogLevel)level logFunction:(RLMLogFunction)logFunction;
 
-/**
- Log a message to the supplied level.
-
- @param logLevel The log level for the message.
- @param message The message to log.
- */
-- (void)logWithLevel:(RLMLogLevel)logLevel message:(NSString *)message, ... NS_SWIFT_UNAVAILABLE("");
-
 #pragma mark RLMLogger Default Logger API
 
 /**
  The current default logger. When setting a logger as default, this logger will be used whenever information must be logged.
  */
-@property (class) RLMLogger *defaultLogger;
+@property (class) RLMLogger *defaultLogger NS_SWIFT_NAME(shared);
 
 @end
 

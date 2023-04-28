@@ -93,12 +93,39 @@ x.y.z Release notes (yyyy-MM-dd)
   This new API fixes the issue where the resulting documents when using more than 
   one sort parameter were not consistent between calls. 
   ([#7188](https://github.com/realm/realm-swift/issues/7188), since v10.0.0). 
+* Add support for adding a user created default logger, which allows implementing your own logging logic
+  and the log threshold level.
+  You can define your own logger creating an instance of `Logger` and define the log function which will be
+  invoked whenever there is a log message.
+
+ ```swift
+ let logger = Logger(level: .all) { level, message in
+    print("Realm Log - \(level): \(message)")
+ }
+ ```
+
+  Set this custom logger as Realm default logger using `Logger.shared`.
+ ```swift
+    Logger.shared = logger
+ ```
+* It is now possible to change the default log threshold level at any point of the application's lifetime.
+  ```swift
+  Logger.shared.logLevel = .debug
+  ```
+  This will override the log level set anytime before by a user created logger.
+* We have set `.info` as the default log threshold level for Realm. You will now see some 
+  log message in your console. To disable use `Logger.shared.level = .off`.
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
 * None.
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+
+### Deprecations
+
+* `App.SyncManager.logLevel` and `App.SyncManager.logFunction` are deprecated in favour of 
+  setting a default logger.
 
 ### Compatibility
 * Realm Studio: 14.0.1 or later.
@@ -125,47 +152,6 @@ x.y.z Release notes (yyyy-MM-dd)
 * Performing a large number of queries without ever performing a write resulted
   in steadily increasing memory usage, some of which was never fully freed due
   to an unbounded cache ([#7978](https://github.com/realm/realm-swift/issues/7978), since v10.27.0).
-* Improve performance of cancelling a write transactions after making changes. If no KVO observers are used this is now constant time rather than taking time proportional to the number of changes to be rolled back. Cancelling a write transaction with KVO observers is 10-20% faster. ([Core PR #6513](https://github.com/realm/realm-core/pull/6513)).
-* Added support for creating and add a custom logger, and implement your own logging logic.
-  Use `Logger` as a base class, which allows you to override the default logger 
-  implementation for `doLog(level:message)`, which can be used to add your own logging logic. 
- 
-  ```swift
-  final class InMemoryLogger: Logger {
-     var logs: String = ""
-* Added support adding a user created default logger, which allows implementing your own logging logic
-  and the log threshold level.
-  You can define your own logger creating an instance of `Logger` and define the log function which will be
-  invoked whenever there is a log message.
-
- ```swift
- let logger = Logger(level: .all) { level, message in
-    print("Realm Log - \(level): \(message)")
- }
- ```
-
- Set this custom logger as you default logger using `Logger.shared`.
- ```swift
-    Logger.shared = inMemoryLogger
- ```
-  This logger can be set as default using the new API `Logger.setDefaultLogger(inMemoryLogger)`.
-* It is now possible to change the default log threshold level at any point of the application's lifetime.
-  ```swift
-  Logger.shared.logLevel = .debug
-  ```
-  This will override the log level set anytime before by a user created logger.
-* We have set `.warn` as the default log threshold level for Realm. You will now see some 
-  log message in your console. To disable use `Logger.shared.level = .off`.
-
-### Fixed
-
-* Performing a large number of queries without ever performing a write resulted in steadily increasing memory usage, some of which was never fully freed due to an unbounded cache ([#7978](https://github.com/realm/realm-swift/issues/7978), since v10.27.0).
-### Deprecations
-
-* `App.SyncManager.logLevel` and `App.SyncManager.logFunction` are deprecated in favour 
-  setting or using a default logger.
-  
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
 ### Compatibility
 

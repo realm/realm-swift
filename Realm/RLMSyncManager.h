@@ -50,7 +50,7 @@ typedef RLM_CLOSED_ENUM(NSUInteger, RLMSyncLogLevel) {
     ///
     /// - warning: Will incur a measurable performance impact.
     RLMSyncLogLevelAll
-} __attribute__((deprecated("Use `RLMSyncLevelDebug`/`LogLevel` instead")));
+} __attribute__((deprecated("Use `RLMLogLevel`/`LogLevel` instead")));
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
@@ -110,8 +110,6 @@ __attribute__((deprecated("This property is not used for anything")));
 
  @warning This property must be set before any synced Realms are opened. Setting it after
           opening any synced Realm will do nothing.
- @warning Global default log level will override log level set at the `SyncManager` level, logs
-          with log level greater than the default log level will not show..
  */
 @property (atomic) RLMSyncLogLevel logLevel
 __attribute__((deprecated("Use `RLMLogger.default.level`/`Logger.shared.level` to set/get the default logger threshold level.")));
@@ -123,7 +121,6 @@ __attribute__((deprecated("Use `RLMLogger.default.level`/`Logger.shared.level` t
 
  @warning This property must be set before any synced Realms are opened. Setting
           it after opening any synced Realm will do nothing.
- @warning Setting this logger will replace any logger set at global level.
  */
 @property (atomic, nullable) RLMSyncLogFunction logger
 __attribute__((deprecated("Use `RLMLogger.default`/`Logger.shared` to set/get the default logger.")));

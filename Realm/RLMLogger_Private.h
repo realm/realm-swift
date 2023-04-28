@@ -22,6 +22,14 @@
 RLM_HEADER_AUDIT_BEGIN(nullability)
 
 @interface RLMLogger()
+
+/**
+ Log a message to the supplied level.
+
+ @param logLevel The log level for the message.
+ @param message The message to log.
+ */
+- (void)logWithLevel:(RLMLogLevel)logLevel message:(NSString *)message, ... NS_SWIFT_UNAVAILABLE("");
 - (void)logLevel:(RLMLogLevel)logLevel message:(NSString *)message;
 @end
 

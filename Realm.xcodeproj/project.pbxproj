@@ -479,7 +479,6 @@
 		AC3B33AE29DC6CEE0042F3A0 /* RLMLogger.h in Headers */ = {isa = PBXBuildFile; fileRef = AC3B33AB29DC6CEE0042F3A0 /* RLMLogger.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		AC3B33AF29DC6CEE0042F3A0 /* RLMLogger.mm in Sources */ = {isa = PBXBuildFile; fileRef = AC3B33AC29DC6CEE0042F3A0 /* RLMLogger.mm */; };
 		AC3B33B029DC6CEE0042F3A0 /* RLMLogger_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = AC3B33AD29DC6CEE0042F3A0 /* RLMLogger_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
-		AC3B33B229DC6D550042F3A0 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC3B33B129DC6D550042F3A0 /* Logger.swift */; };
 		AC3B33B329DC6D6F0042F3A0 /* RLMLogger.mm in Sources */ = {isa = PBXBuildFile; fileRef = AC3B33AC29DC6CEE0042F3A0 /* RLMLogger.mm */; };
 		AC4793152881E2FF004E60F6 /* RLMAsymmetricObject.h in Headers */ = {isa = PBXBuildFile; fileRef = AC813610287F21700029F15E /* RLMAsymmetricObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		AC786B5F29DC72950034116C /* RLMLogger_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = AC3B33AD29DC6CEE0042F3A0 /* RLMLogger_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
@@ -1089,7 +1088,6 @@
 		AC3B33AB29DC6CEE0042F3A0 /* RLMLogger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMLogger.h; sourceTree = "<group>"; };
 		AC3B33AC29DC6CEE0042F3A0 /* RLMLogger.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMLogger.mm; sourceTree = "<group>"; };
 		AC3B33AD29DC6CEE0042F3A0 /* RLMLogger_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMLogger_Private.h; sourceTree = "<group>"; };
-		AC3B33B129DC6D550042F3A0 /* Logger.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
 		AC7D182B261F2F560080E1D2 /* RLMObjectServerPartitionTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = RLMObjectServerPartitionTests.mm; path = Realm/ObjectServerTests/RLMObjectServerPartitionTests.mm; sourceTree = "<group>"; };
 		AC7D182C261F2F560080E1D2 /* SwiftObjectServerPartitionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SwiftObjectServerPartitionTests.swift; path = Realm/ObjectServerTests/SwiftObjectServerPartitionTests.swift; sourceTree = "<group>"; };
 		AC81360E287F21350029F15E /* AsymmetricObject.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AsymmetricObject.swift; sourceTree = "<group>"; };
@@ -1563,7 +1561,6 @@
 				3F7BCEB42834377E00EB6E16 /* Events.swift */,
 				5D1534B71CCFF545008976D7 /* LinkingObjects.swift */,
 				5D660FE41BE98D670021E04F /* List.swift */,
-				AC3B33B129DC6D550042F3A0 /* Logger.swift */,
 				0C3BD4D225C1C5AB007CFDD3 /* Map.swift */,
 				5D660FE51BE98D670021E04F /* Migration.swift */,
 				CF76F80124816B3800890DD2 /* MongoClient.swift */,
@@ -2177,7 +2174,7 @@
 				CF76F7F424816AAB00890DD2 /* RLMFindOneAndModifyOptions.h in Headers */,
 				CF76F7F624816AAB00890DD2 /* RLMFindOptions.h in Headers */,
 				ACDC7B7B29DC716800D06FC1 /* RLMLogger.h in Headers */,
-                AC786B5F29DC72950034116C /* RLMLogger_Private.h in Headers */,
+				AC786B5F29DC72950034116C /* RLMLogger_Private.h in Headers */,
 				5DD755AD1BE056DE002800DA /* RLMMigration.h in Headers */,
 				5DD755AE1BE056DE002800DA /* RLMMigration_Private.h in Headers */,
 				CF76F7FC24816AAB00890DD2 /* RLMMongoClient.h in Headers */,
@@ -2948,7 +2945,6 @@
 				3F857A482769291800F9B9B1 /* KeyPathStrings.swift in Sources */,
 				5D1534B81CCFF545008976D7 /* LinkingObjects.swift in Sources */,
 				5D660FF21BE98D670021E04F /* List.swift in Sources */,
-				AC3B33B229DC6D550042F3A0 /* Logger.swift in Sources */,
 				0C3BD4D325C1C5AB007CFDD3 /* Map.swift in Sources */,
 				5D660FF31BE98D670021E04F /* Migration.swift in Sources */,
 				CF76F80224816B3800890DD2 /* MongoClient.swift in Sources */,
