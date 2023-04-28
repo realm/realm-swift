@@ -422,20 +422,24 @@ __attribute__((warn_unused_result));
 #pragma mark - Flexible Sync
 
 // TODO: docs
-- (void)subscribeWithCompletion:(RLMResultsCompletionBlock)completion NS_REFINED_FOR_SWIFT;
+- (void)subscribeWithCompletion:(RLMResultsCompletionBlock)completion
+                        onQueue:(dispatch_queue_t _Nullable)queue NS_REFINED_FOR_SWIFT;
 
 // TODO: docs
 - (void)subscribeWithName:(NSString *_Nullable)name
+                  onQueue:(dispatch_queue_t _Nullable)queue
                completion:(RLMResultsCompletionBlock)completion NS_REFINED_FOR_SWIFT;
 
 // TODO: docs
 - (void)subscribeWithName:(NSString *_Nullable)name
           waitForSyncMode:(RLMWaitForSyncMode)waitForSyncMode
+                  onQueue:(dispatch_queue_t _Nullable)queue
                completion:(RLMResultsCompletionBlock)completion NS_REFINED_FOR_SWIFT;
 
 // TODO: docs
 - (void)subscribeWithName:(NSString *_Nullable)name
           waitForSyncMode:(RLMWaitForSyncMode)waitForSyncMode
+                  onQueue:(dispatch_queue_t _Nullable)queue
                   timeout:(NSTimeInterval)timeout
                completion:(RLMResultsCompletionBlock)completion NS_REFINED_FOR_SWIFT;
 

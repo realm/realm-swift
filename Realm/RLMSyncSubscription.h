@@ -135,6 +135,14 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 - (void)write:(__attribute__((noescape)) void(^)(void))block
    onComplete:(void(^)(NSError * _Nullable))onComplete __attribute__((unavailable("Renamed to -update:onComplete.")));
 
+// TODO: docs
+- (void)updateOnQueue:(nullable dispatch_queue_t)queue
+                block:(__attribute__((noescape)) void(^)(void))block
+           onComplete:(void(^)(NSError *))completionBlock
+           __attribute__((swift_async(not_swift_private, 3)))
+           __attribute__((swift_attr("@_unsafeInheritExecutor")));
+
+
 #pragma mark - Find subscription
 
 /**

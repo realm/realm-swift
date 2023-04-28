@@ -165,10 +165,10 @@ public typealias WaitForSyncMode = RLMWaitForSyncMode
     public func subscribe(name: String? = nil, waitForSync: WaitForSyncMode = .onCreation, timeout: TimeInterval? = nil) async throws -> Results<Element> {
         var rlmResults = ObjectiveCSupport.convert(object: self)
         guard let unwrapped = timeout else {
-            rlmResults = try await rlmResults.__subscribe(withName: name, waitForSyncMode: waitForSync)
+            rlmResults = try await rlmResults.__subscribe(withName: name, waitForSyncMode: waitForSync, on: nil)
             return Results(rlmResults)
         }
-        rlmResults = try await rlmResults.__subscribe(withName: name, waitForSyncMode: waitForSync, timeout: unwrapped)
+        rlmResults = try await rlmResults.__subscribe(withName: name, waitForSyncMode: waitForSync, on:nil, timeout: unwrapped)
         return Results(rlmResults)
     }
 #endif

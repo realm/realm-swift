@@ -245,7 +245,9 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
     return [self update:block onComplete:nil];
 }
 
-- (void)update:(__attribute__((noescape)) void(^)(void))block onComplete:(void(^)(NSError *))completionBlock {
+- (void)updateOnQueue:(nullable dispatch_queue_t)queue
+                block:(__attribute__((noescape)) void(^)(void))block
+           onComplete:(void(^)(NSError *))completionBlock {
     if (_mutableSubscriptionSet) {
         @throw RLMException(@"Cannot initiate a write transaction on subscription set that is already being updated.");
     }
@@ -271,8 +273,12 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
     }
 
     if (completionBlock) {
-        [self waitForSynchronizationOnQueue:nil completionBlock:completionBlock];
+        [self waitForSynchronizationOnQueue:queue completionBlock:completionBlock];
     }
+}
+
+- (void)update:(__attribute__((noescape)) void(^)(void))block onComplete:(void(^)(NSError *))completionBlock {
+    [self updateOnQueue:nil block:block onComplete:completionBlock];
 }
 
 - (void)waitForSynchronizationOnQueue:(nullable dispatch_queue_t)queue

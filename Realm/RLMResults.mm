@@ -566,17 +566,22 @@ keyPaths:(std::optional<std::vector<std::vector<std::pair<realm::TableKey, realm
     return _results.add_notification_callback(RLMWrapCollectionChangeCallback(block, self, true), std::move(keyPaths));
 }
 
-- (void)subscribeWithCompletion:(RLMResultsCompletionBlock)completion {
-    return [self subscribeWithName:nil completion:completion];
+- (void)subscribeWithCompletion:(RLMResultsCompletionBlock)completion
+                        onQueue:(dispatch_queue_t _Nullable)queue {
+    return [self subscribeWithName:nil onQueue:queue completion:completion];
 };
 
 - (void)subscribeWithName:(NSString *_Nullable)name
+                  onQueue:(dispatch_queue_t _Nullable)queue
                completion:(RLMResultsCompletionBlock)completion {
-    return [self subscribeWithName:name waitForSyncMode:RLMWaitForSyncModeOnCreation completion:completion];
+    return [self subscribeWithName:name waitForSyncMode:RLMWaitForSyncModeOnCreation onQueue:queue completion:completion];
 }
+
+// TODO: need a completeOnQueue helper func
 
 - (void)subscribeWithName:(NSString *_Nullable)name
           waitForSyncMode:(RLMWaitForSyncMode)waitForSyncMode
+                  onQueue:(dispatch_queue_t _Nullable)queue
                completion:(RLMResultsCompletionBlock)completion {
     RLMSyncSubscriptionSet *subscriptions = self.realm.subscriptions;
 
@@ -587,6 +592,11 @@ keyPaths:(std::optional<std::vector<std::vector<std::pair<realm::TableKey, realm
                                                   query:_results.get_query()
                                          updateExisting:true];
         }];
+        if (queue) {
+            return dispatch_async(queue, ^{
+                completion(self, nil);
+            });
+        }
         completion(self, nil);
         return;
     }
@@ -594,27 +604,47 @@ keyPaths:(std::optional<std::vector<std::vector<std::pair<realm::TableKey, realm
         if (name) {
             RLMSyncSubscription *sub = [subscriptions subscriptionWithName:name];
             if (sub.stdString == _results.get_query().get_description()) {
+                if (queue) {
+                    return dispatch_async(queue, ^{
+                        completion(self, nil);
+                    });
+                }
                 completion(self, nil);
                 return;
             }
         } else {
             RLMSyncSubscription *sub = [subscriptions subscriptionWithClassName:self.objectClassName query:_results.get_query()];
             if (sub != nil) {
+                if (queue) {
+                    return dispatch_async(queue, ^{
+                        completion(self, nil);
+                    });
+                }
                 completion(self, nil);
                 return;
             }
         }
     }
     // onComplete is called upon synchronization from the server, which satisfies if (waitForSyncMode == RLMWaitForSyncModeAlways)
-    [subscriptions update:^{
+    [subscriptions updateOnQueue:queue block:^{
         [subscriptions addSubscriptionWithClassName:self.objectClassName
                                    subscriptionName:name
                                               query:_results.get_query()
                                      updateExisting:true]; // TODO: update true may work in all cases?
-    } onComplete:^(NSError* error) {
+    } onComplete:^(NSError *error) {
         if (error != nil) {
+            if (queue) {
+                return dispatch_async(queue, ^{
+                    completion(nil, error);
+                });
+            }
             completion(nil, error);
         } else {
+            if (queue) {
+                return dispatch_async(queue, ^{
+                    completion(self, nil);
+                });
+            }
             completion(self, nil);
         }
     }];
@@ -622,6 +652,7 @@ keyPaths:(std::optional<std::vector<std::vector<std::pair<realm::TableKey, realm
 
 - (void)subscribeWithName:(NSString *_Nullable)name
           waitForSyncMode:(RLMWaitForSyncMode)waitForSyncMode
+                  onQueue:(dispatch_queue_t _Nullable)queue
                   timeout:(NSTimeInterval)timeout
                completion:(RLMResultsCompletionBlock)completion {
     __block BOOL called = false;
@@ -642,7 +673,7 @@ keyPaths:(std::optional<std::vector<std::vector<std::pair<realm::TableKey, realm
         NSError* error = [NSError errorWithDomain:RLMErrorDomain code:RLMErrorClientTimeout userInfo:@{NSLocalizedDescriptionKey: errorMessage}];
         methodCompletion(nil, error);
     });
-    [self subscribeWithName:name waitForSyncMode:waitForSyncMode completion:methodCompletion];
+    [self subscribeWithName:name waitForSyncMode:waitForSyncMode onQueue:queue completion:methodCompletion];
 }
 
 - (BOOL)unsubscribe {
