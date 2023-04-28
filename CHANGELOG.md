@@ -1,13 +1,13 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+
+* Improve performance of cancelling a write transactions after making changes. If no KVO observers are used this is now constant time rather than taking time proportional to the number of changes to be rolled back. Cancelling a write transaction with KVO observers is 10-20% faster. ([Core PR #6513](https://github.com/realm/realm-core/pull/6513)).
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
-* None.
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+* Performing a large number of queries without ever performing a write resulted in steadily increasing memory usage, some of which was never fully freed due to an unbounded cache ([#7978](https://github.com/realm/realm-swift/issues/7978), since v10.27.0).
 
 ### Compatibility
 * Realm Studio: 14.0.1 or later.
@@ -17,7 +17,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * Xcode: 13.4-14.3.
 
 ### Internal
-* Upgraded realm-core from ? to ?
+* Upgraded realm-core from 13.9.3 to 13.9.4
 
 10.38.2 Release notes (2023-04-25)
 =============================================================
