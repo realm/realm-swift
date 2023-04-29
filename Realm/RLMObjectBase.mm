@@ -416,6 +416,12 @@ id RLMCreateManagedAccessor(Class cls, RLMClassInfo *info) {
     return [super automaticallyNotifiesObserversForKey:key];
 }
 
++ (void)observe:(RLMObjectBase *)object
+       keyPaths:(nullable NSArray<NSString *> *)keyPaths
+          block:(RLMObjectNotificationCallback)block
+     completion:(void (^)(RLMNotificationToken *))completion {
+}
+
 #pragma mark - Thread Confined Protocol Conformance
 
 - (realm::ThreadSafeReference)makeThreadSafeReference {
@@ -555,6 +561,7 @@ namespace {
 struct ObjectChangeCallbackWrapper {
     RLMObjectNotificationCallback block;
     RLMObjectBase *object;
+    void (^registrationCompletion)();
 
     NSArray<NSString *> *propertyNames = nil;
     NSArray *oldValues = nil;
@@ -622,6 +629,10 @@ struct ObjectChangeCallbackWrapper {
 
     void after(realm::CollectionChangeSet const& c) {
         @autoreleasepool {
+            if (registrationCompletion) {
+                registrationCompletion();
+                registrationCompletion = nil;
+            }
             auto newValues = readValues(c);
             if (deleted) {
                 block(nil, nil, nil, nil, nil);
@@ -649,63 +660,114 @@ struct ObjectChangeCallbackWrapper {
 }
 @end
 
-@interface RLMObjectNotificationToken : RLMNotificationToken
-@end
+enum class TokenState {
+    Initializing,
+    Cancelled,
+    Ready
+};
 
+RLM_DIRECT_MEMBERS
 @implementation RLMObjectNotificationToken {
-    std::mutex _mutex;
+    RLMUnfairMutex _mutex;
     __unsafe_unretained RLMRealm *_realm;
     realm::Object _object;
     realm::NotificationToken _token;
+    void (^_completion)(void);
+    TokenState _state;
 }
 
 - (RLMRealm *)realm {
+    std::lock_guard lock(_mutex);
     return _realm;
 }
 
 - (void)suppressNextNotification {
-    std::lock_guard<std::mutex> lock(_mutex);
+    std::lock_guard lock(_mutex);
     if (_object.is_valid()) {
         _token.suppress_next();
     }
 }
 
-- (void)invalidate {
-    std::lock_guard<std::mutex> lock(_mutex);
-    _realm = nil;
-    _token = {};
-    _object = {};
+- (bool)invalidate {
+    dispatch_block_t completion;
+    {
+        std::lock_guard lock(_mutex);
+        if (_state == TokenState::Cancelled) {
+            REALM_ASSERT(!_completion);
+            return false;
+        }
+        _realm = nil;
+        _token = {};
+        _object = {};
+        _state = TokenState::Cancelled;
+        std::swap(completion, _completion);
+    }
+    if (completion) {
+        completion();
+    }
+    return true;
 }
 
 - (void)addNotificationBlock:(RLMObjectNotificationCallback)block
          threadSafeReference:(RLMThreadSafeReference *)tsr
                       config:(RLMRealmConfiguration *)config
-                    keyPaths:(std::optional<KeyPathArray>)keyPaths
+                    keyPaths:(NSArray *)keyPaths
                        queue:(dispatch_queue_t)queue {
-    std::lock_guard<std::mutex> lock(_mutex);
-    if (!_realm) {
+    std::lock_guard lock(_mutex);
+    if (_state != TokenState::Initializing) {
         // Token was invalidated before we got this far
         return;
     }
 
     NSError *error;
-    RLMRealm *realm = _realm = [RLMRealm realmWithConfiguration:config queue:queue error:&error];
-    if (!realm) {
+    _realm = [RLMRealm realmWithConfiguration:config queue:queue error:&error];
+    if (!_realm) {
         block(nil, nil, nil, nil, error);
         return;
     }
-    RLMObjectBase *obj = [realm resolveThreadSafeReference:tsr];
+    RLMObjectBase *obj = [_realm resolveThreadSafeReference:tsr];
 
-    _object = realm::Object(obj->_realm->_realm, *obj->_info->objectSchema, obj->_row);
-    _token = _object.add_notification_callback(ObjectChangeCallbackWrapper{block, obj}, std::move(keyPaths));
+    _object = realm::Object(_realm->_realm, *obj->_info->objectSchema, obj->_row);
+    _token = _object.add_notification_callback(ObjectChangeCallbackWrapper{block, obj},
+                                               obj->_info->keyPathArrayFromStringArray(keyPaths));
 }
 
-- (void)addNotificationBlock:(RLMObjectNotificationCallback)block
-                      object:(RLMObjectBase *)obj
-                    keyPaths:(std::optional<KeyPathArray>&&)keyPaths {
+- (void)observe:(RLMObjectBase *)obj
+       keyPaths:(NSArray *)keyPaths
+          block:(RLMObjectNotificationCallback)block {
+    std::lock_guard lock(_mutex);
+    if (_state != TokenState::Initializing) {
+        return;
+    }
     _object = realm::Object(obj->_realm->_realm, *obj->_info->objectSchema, obj->_row);
     _realm = obj->_realm;
-    _token = _object.add_notification_callback(ObjectChangeCallbackWrapper{block, obj}, std::move(keyPaths));
+
+    auto completion = [self] {
+        dispatch_block_t completion;
+        {
+            std::lock_guard lock(_mutex);
+            if (_state == TokenState::Initializing) {
+                _state = TokenState::Ready;
+            }
+            std::swap(completion, _completion);
+        }
+        if (completion) {
+            completion();
+        }
+    };
+    _token = _object.add_notification_callback(ObjectChangeCallbackWrapper{block, obj, completion},
+                                               obj->_info->keyPathArrayFromStringArray(keyPaths));
+}
+
+- (void)registrationComplete:(void (^)())completion {
+    {
+        std::lock_guard lock(_mutex);
+        if (_state == TokenState::Initializing) {
+            _completion = completion;
+            return;
+        }
+    }
+    completion();
 }
 
 RLMNotificationToken *RLMObjectBaseAddNotificationBlock(RLMObjectBase *obj,
@@ -716,13 +778,10 @@ RLMNotificationToken *RLMObjectBaseAddNotificationBlock(RLMObjectBase *obj,
         @throw RLMException(@"Only objects which are managed by a Realm support change notifications");
     }
 
-    auto keyPathArray = obj->_info->keyPathArrayFromStringArray(keyPaths);
-
     if (!queue) {
         [obj->_realm verifyNotificationsAreSupported:true];
         auto token = [[RLMObjectNotificationToken alloc] init];
-        token->_realm = obj->_realm;
-        [token addNotificationBlock:block object:obj keyPaths:std::move(keyPathArray)];
+        [token observe:obj keyPaths:keyPaths block:block];
         return token;
     }
 
@@ -732,12 +791,11 @@ RLMNotificationToken *RLMObjectBaseAddNotificationBlock(RLMObjectBase *obj,
     RLMRealmConfiguration *config = obj->_realm.configuration;
     dispatch_async(queue, ^{
         @autoreleasepool {
-            [token addNotificationBlock:block threadSafeReference:tsr config:config keyPaths:keyPathArray queue:queue];
+            [token addNotificationBlock:block threadSafeReference:tsr config:config keyPaths:keyPaths queue:queue];
         }
     });
     return token;
 }
-
 @end
 
 RLMNotificationToken *RLMObjectAddNotificationBlock(RLMObjectBase *obj, RLMObjectChangeBlock block, NSArray<NSString *> *keyPaths, dispatch_queue_t queue) {

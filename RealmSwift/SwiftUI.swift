@@ -617,7 +617,7 @@ extension Projection: _ObservedResultsValue { }
     }
 
     nonisolated public func update() {
-        unsafeInvokeAsMainActor {
+        assumeOnMainActorExecutor {
             // When the view updates, it will inject the @Environment
             // into the propertyWrapper
             if storage.configuration == nil {
@@ -976,7 +976,7 @@ extension Projection: _ObservedResultsValue { }
     }
 
     nonisolated public func update() {
-        unsafeInvokeAsMainActor {
+        assumeOnMainActorExecutor {
             // When the view updates, it will inject the @Environment
             // into the propertyWrapper
             if storage.configuration == nil {
@@ -1736,21 +1736,9 @@ private class ObservableAsyncOpenStorage: ObservableObject {
     }
 
     nonisolated public func update() {
-        unsafeInvokeAsMainActor {
+        assumeOnMainActorExecutor {
             storage.update(partitionValue, configuration)
         }
-    }
-}
-
-// Invoke a @MainActor function synchronously from a context which is not
-// statically annotated as being on the main actor.
-// This is needed to work around incomplete actor annotations.
-// `DynamicProperty.update()` is documented as being invoked on the UI thread
-// (and is in practice) but isn't marked @MainActor.
-func unsafeInvokeAsMainActor(_ fn: @MainActor () -> Void) {
-    assert(Thread.isMainThread)
-    withoutActuallyEscaping(fn) { fn in
-        unsafeBitCast(fn, to: (() -> Void).self)()
     }
 }
 
@@ -1860,7 +1848,7 @@ func unsafeInvokeAsMainActor(_ fn: @MainActor () -> Void) {
     }
 
     nonisolated public func update() {
-        unsafeInvokeAsMainActor {
+        assumeOnMainActorExecutor {
             storage.update(partitionValue, configuration)
         }
     }
@@ -2155,7 +2143,7 @@ extension View {
     }
 
     private func filterCollection<T: ObjectBase>(_ collection: ObservedResults<T>, for text: String, on keyPath: KeyPath<T, String>) {
-        unsafeInvokeAsMainActor {
+        assumeOnMainActorExecutor {
             collection.searchText(text, on: keyPath)
         }
     }
@@ -2450,7 +2438,7 @@ extension View {
     }
 
     private func filterCollection<Key, T: ObjectBase>(_ collection: ObservedSectionedResults<Key, T>, for text: String, on keyPath: KeyPath<T, String>) {
-        unsafeInvokeAsMainActor {
+        assumeOnMainActorExecutor {
             collection.searchText(text, on: keyPath)
         }
     }

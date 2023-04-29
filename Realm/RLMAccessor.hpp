@@ -31,6 +31,8 @@ class RLMClassInfo;
 class RLMObservationTracker;
 typedef NS_ENUM(NSUInteger, RLMUpdatePolicy);
 
+RLM_HIDDEN_BEGIN
+
 // std::optional<id> doesn't work because Objective-C types can't
 // be members of unions with ARC, so this covers the subset of Optional that we
 // actually need.
@@ -158,3 +160,5 @@ private:
     id defaultValue(NSString *key);
     id propertyValue(id obj, size_t propIndex, __unsafe_unretained RLMProperty *const prop);
 };
+
+RLM_HIDDEN_END

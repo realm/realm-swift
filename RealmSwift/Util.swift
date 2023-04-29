@@ -159,3 +159,29 @@ internal func logRuntimeIssue(_ message: StaticString) {
         print(message)
     }
 }
+
+#if swift(<5.9)
+// These are added in SE-0392, but can be partially polyfilled for older versions.
+// We can't actually perform the proper checks to see if we're actually on the
+// expected executor, though.
+@_unavailableFromAsync
+internal func assumeOnMainActorExecutor<T>(_ operation: @MainActor () throws -> T,
+                                           file: StaticString = #fileID, line: UInt = #line
+) rethrows -> T {
+    precondition(Thread.isMainThread, file: file, line: line)
+    return try withoutActuallyEscaping(operation) { fn in
+        try unsafeBitCast(fn, to: (() throws -> T).self)()
+    }
+}
+
+@_unavailableFromAsync
+@available(macOS 10.15, tvOS 13.0, iOS 13.0, watchOS 6.0, *)
+internal func assumeOnActorExecutor<A: Actor, T>(_ actor: A,
+                                                 _ operation: (isolated A) throws -> T
+) rethrows -> T {
+    try withoutActuallyEscaping(operation) { fn in
+        try unsafeBitCast(fn, to: ((A) throws -> T).self)(actor)
+    }
+}
+
+#endif

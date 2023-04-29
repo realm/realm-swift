@@ -347,6 +347,14 @@ static bool isSync(realm::Realm::Config const& config) {
     _customSchema = schema;
 }
 
+- (bool)disableAutomaticChangeNotifications {
+    return !_config.automatic_change_notifications;
+}
+
+- (void)setDisableAutomaticChangeNotifications:(bool)disableAutomaticChangeNotifications {
+    _config.automatic_change_notifications = !disableAutomaticChangeNotifications;
+}
+
 #if REALM_ENABLE_SYNC
 - (void)setSyncConfiguration:(RLMSyncConfiguration *)syncConfiguration {
     if (syncConfiguration == nil) {

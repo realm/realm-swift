@@ -321,7 +321,7 @@ extension Object: _RealmCollectionValueInsideOptional {
     public func observe<T: RLMObjectBase>(keyPaths: [String]? = nil,
                                           on queue: DispatchQueue? = nil,
                                           _ block: @escaping (ObjectChange<T>) -> Void) -> NotificationToken {
-        return _observe(keyPaths: keyPaths, on: queue, block)
+        _observe(keyPaths: keyPaths, on: queue, block)
     }
 
     /**
@@ -401,8 +401,96 @@ extension Object: _RealmCollectionValueInsideOptional {
     public func observe<T: ObjectBase>(keyPaths: [PartialKeyPath<T>],
                                        on queue: DispatchQueue? = nil,
                                        _ block: @escaping (ObjectChange<T>) -> Void) -> NotificationToken {
-        return _observe(keyPaths: keyPaths.map(_name(for:)), on: queue, block)
+        _observe(keyPaths: keyPaths.map(_name(for:)), on: queue, block)
     }
+
+#if swift(>=5.8)
+    /**
+    Registers a block to be called each time the object changes.
+
+    The block will be asynchronously called on the given actor's executor after
+    each write transaction which deletes the object or modifies any of the managed
+    properties of the object, including self-assignments that set a property to its
+    existing value. The block is passed a copy of the object isolated to the
+    requested actor which can be safely used on that actor along with information
+    about what changed.
+
+    For write transactions performed on different threads or in different
+    processes, the block will be called when the managing Realm is
+    (auto)refreshed to a version including the changes, while for local write
+    transactions it will be called at some point in the future after the write
+    transaction is committed.
+
+    Only objects which are managed by a Realm can be observed in this way. You
+    must retain the returned token for as long as you want updates to be sent
+    to the block. To stop receiving updates, call `invalidate()` on the token.
+
+    By default, only direct changes to the object's properties will produce
+    notifications, and not changes to linked objects. Note that this is different
+    from collection change notifications. If a non-nil, non-empty keypath array is
+    passed in, only changes to the properties identified by those keypaths will
+    produce change notifications. The keypaths may traverse link properties to
+    receive information about changes to linked objects.
+
+    - warning: This method cannot be called during a write transaction, or when
+    the containing Realm is read-only.
+    - parameter actor: The actor to isolate notifications to.
+    - parameter block: The block to call with information about changes to the object.
+    - returns: A token which must be held for as long as you want updates to be delivered.
+     */
+    @available(macOS 10.15, tvOS 13.0, iOS 13.0, watchOS 6.0, *)
+    @_unsafeInheritExecutor
+    public func observe<A: Actor, T: Object>(
+        keyPaths: [String]? = nil, on actor: A,
+        _ block: @Sendable @escaping (isolated A, ObjectChange<T>) -> Void
+    ) async -> NotificationToken {
+        await with(self, on: actor) { actor, obj in
+            await obj._observe(keyPaths: keyPaths, on: actor, block)
+        } ?? NotificationToken()
+    }
+
+    /**
+    Registers a block to be called each time the object changes.
+
+    The block will be asynchronously called on the given actor's executor after
+    each write transaction which deletes the object or modifies any of the managed
+    properties of the object, including self-assignments that set a property to its
+    existing value. The block is passed a copy of the object isolated to the
+    requested actor which can be safely used on that actor along with information
+    about what changed.
+
+    For write transactions performed on different threads or in different
+    processes, the block will be called when the managing Realm is
+    (auto)refreshed to a version including the changes, while for local write
+    transactions it will be called at some point in the future after the write
+    transaction is committed.
+
+    Only objects which are managed by a Realm can be observed in this way. You
+    must retain the returned token for as long as you want updates to be sent
+    to the block. To stop receiving updates, call `invalidate()` on the token.
+
+    By default, only direct changes to the object's properties will produce
+    notifications, and not changes to linked objects. Note that this is different
+    from collection change notifications. If a non-nil, non-empty keypath array is
+    passed in, only changes to the properties identified by those keypaths will
+    produce change notifications. The keypaths may traverse link properties to
+    receive information about changes to linked objects.
+
+    - warning: This method cannot be called during a write transaction, or when
+    the containing Realm is read-only.
+    - parameter actor: The actor to isolate notifications to.
+    - parameter block: The block to call with information about changes to the object.
+    - returns: A token which must be held for as long as you want updates to be delivered.
+     */
+    @available(macOS 10.15, tvOS 13.0, iOS 13.0, watchOS 6.0, *)
+    @_unsafeInheritExecutor
+    public func observe<A: Actor, T: Object>(
+        keyPaths: [PartialKeyPath<T>], on actor: A,
+        _ block: @Sendable @escaping (isolated A, ObjectChange<T>) -> Void
+    ) async -> NotificationToken {
+        await observe(keyPaths: keyPaths.map(_name(for:)), on: actor, block)
+    }
+#endif // swift(>=5.8)
 
     // MARK: Dynamic list
 
@@ -577,6 +665,17 @@ extension Object: ThreadConfined {
     case change(_: T, _: [PropertyChange])
     /// The object has been deleted from the Realm.
     case deleted
+
+    internal init(object: T?, names: [String]?, oldValues: [Any]?, newValues: [Any]?) {
+        guard let names = names, let newValues = newValues, let object = object else {
+            self = .deleted
+            return
+        }
+
+        self = .change(object, (0..<newValues.count).map { i in
+            PropertyChange(name: names[i], oldValue: oldValues?[i], newValue: newValues[i])
+        })
+    }
 }
 
 /// Object interface which allows untyped getters and setters for Objects.

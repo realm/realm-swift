@@ -21,7 +21,7 @@
 #import <realm/exceptions.hpp>
 #import <realm/status_with.hpp>
 
-#pragma GCC visibility push(hidden)
+RLM_HIDDEN_BEGIN
 
 namespace realm {
 struct SyncError;
@@ -45,4 +45,4 @@ NSError *makeError(realm::app::AppError const& error);
 NSError *makeError(realm::SyncError&& error);
 NSError *makeError(realm::SyncError const& error) = delete;
 
-#pragma GCC visibility pop
+RLM_HIDDEN_END

@@ -370,3 +370,107 @@ __attribute__((objc_direct_members))
     _session = nullptr;
 }
 @end
+
+__attribute__((objc_direct_members))
+@implementation RLMAsyncRefreshTask {
+    RLMUnfairMutex _mutex;
+    void (^_completion)(bool);
+    bool _complete;
+    bool _didRefresh;
+}
+
+- (void)complete:(bool)didRefresh {
+    void (^completion)(bool);
+    {
+        std::lock_guard lock(_mutex);
+        std::swap(completion, _completion);
+        _complete = true;
+        // If we're both cancelled and did complete a refresh then continue
+        // to report true
+        _didRefresh = _didRefresh || didRefresh;
+    }
+    if (completion) {
+        completion(didRefresh);
+    }
+}
+
+- (void)wait:(void (^)(bool))completion {
+    bool didRefresh;
+    {
+        std::lock_guard lock(_mutex);
+        if (!_complete) {
+            _completion = completion;
+            return;
+        }
+        didRefresh = _didRefresh;
+    }
+    completion(didRefresh);
+}
+
++ (RLMAsyncRefreshTask *)completedRefresh {
+    static RLMAsyncRefreshTask *shared = [] {
+        auto refresh = [[RLMAsyncRefreshTask alloc] init];
+        refresh->_complete = true;
+        refresh->_didRefresh = true;
+        return refresh;
+    }();
+    return shared;
+}
+@end
+
+@implementation RLMAsyncWriteTask {
+    // Mutex guards _realm and _completion
+    RLMUnfairMutex _mutex;
+
+    // _realm is non-nil only while waiting for an async write to begin. It is
+    // set to `nil` when it either completes or is cancelled.
+    RLMRealm *_realm;
+    dispatch_block_t _completion;
+
+    RLMAsyncTransactionId _id;
+}
+
+// No locking needed for these two as they have to be called before the
+// cancellation handler is set up
+- (instancetype)initWithRealm:(RLMRealm *)realm {
+    if (self = [super init]) {
+        _realm = realm;
+    }
+    return self;
+}
+- (void)setTransactionId:(RLMAsyncTransactionId)transactionID {
+    _id = transactionID;
+}
+
+- (void)complete:(bool)cancel {
+    // The swap-under-lock pattern is used to avoid invoking the callback with
+    // a lock held
+    dispatch_block_t completion;
+    {
+        std::lock_guard lock(_mutex);
+        std::swap(completion, _completion);
+        if (cancel) {
+            // This is a no-op if cancellation is coming after the wait completed
+            [_realm cancelAsyncTransaction:_id];
+        }
+        _realm = nil;
+    }
+    if (completion) {
+        completion();
+    }
+}
+
+- (void)wait:(void (^)())completion {
+    {
+        std::lock_guard lock(_mutex);
+        // `_realm` being non-nil means it's neither completed nor been cancelled
+        if (_realm) {
+            _completion = completion;
+            return;
+        }
+    }
+
+    // It has either been completed or cancelled, so call the callback immediately
+    completion();
+}
+@end

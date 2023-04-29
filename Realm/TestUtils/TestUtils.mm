@@ -251,3 +251,19 @@ bool RLMThreadSanitizerEnabled() {
     return false;
 #endif
 }
+
+#if !REALM_TVOS && !REALM_WATCHOS && !REALM_APPLE_DEVICE
+bool RLMCanFork() {
+    return true;
+}
+pid_t RLMFork() {
+    return fork();
+}
+#else
+bool RLMCanFork() {
+    return false;
+}
+pid_t RLMFork() {
+    abort();
+}
+#endif

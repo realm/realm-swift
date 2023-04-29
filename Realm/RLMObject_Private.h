@@ -18,12 +18,20 @@
 
 #import <Realm/RLMObjectBase_Dynamic.h>
 
+#import <Realm/RLMRealm.h>
+
 RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
 @class RLMProperty, RLMArray, RLMSchema;
 typedef NS_ENUM(int32_t, RLMPropertyType);
 
 FOUNDATION_EXTERN void RLMInitializeWithValue(RLMObjectBase *, id, RLMSchema *);
+
+typedef void (^RLMObjectNotificationCallback)(RLMObjectBase *_Nullable object,
+                                              NSArray<NSString *> *_Nullable propertyNames,
+                                              NSArray *_Nullable oldValues,
+                                              NSArray *_Nullable newValues,
+                                              NSError *_Nullable error);
 
 // RLMObject accessor and read/write realm
 @interface RLMObjectBase () {
@@ -40,7 +48,6 @@ FOUNDATION_EXTERN void RLMInitializeWithValue(RLMObjectBase *, id, RLMSchema *);
 
 // This enables to override the propertiesMapping in Swift, it is not to be used in Objective-C API.
 + (NSDictionary<NSString *, NSString *> *)propertiesMapping;
-
 @end
 
 @interface RLMDynamicObject : RLMObject
@@ -52,12 +59,6 @@ FOUNDATION_EXTERN id _Nullable RLMValidatedValueForProperty(id object, NSString 
 
 // Compare two RLObjectBases
 FOUNDATION_EXTERN BOOL RLMObjectBaseAreEqual(RLMObjectBase * _Nullable o1, RLMObjectBase * _Nullable o2);
-
-typedef void (^RLMObjectNotificationCallback)(RLMObjectBase *_Nullable object,
-                                              NSArray<NSString *> *_Nullable propertyNames,
-                                              NSArray *_Nullable oldValues,
-                                              NSArray *_Nullable newValues,
-                                              NSError *_Nullable error);
 
 FOUNDATION_EXTERN RLMNotificationToken *RLMObjectBaseAddNotificationBlock(RLMObjectBase *obj,
                                                                           NSArray<NSString *> *_Nullable keyPaths,
@@ -97,6 +98,13 @@ FOUNDATION_EXTERN uint64_t RLMObjectBaseGetCombineId(RLMObjectBase *);
 + (id)get:(RLMProperty *)property on:(RLMObjectBase *)parent;
 // Set the property to the given value, on either kind of object
 + (void)set:(RLMProperty *)property on:(RLMObjectBase *)parent to:(id)value;
+@end
+
+@interface RLMObjectNotificationToken : RLMNotificationToken
+- (void)observe:(RLMObjectBase *)obj
+       keyPaths:(nullable NSArray<NSString *> *)keyPaths
+          block:(RLMObjectNotificationCallback)block;
+- (void)registrationComplete:(void (^)(void))completion;
 @end
 
 RLM_HEADER_AUDIT_END(nullability, sendability)

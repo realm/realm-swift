@@ -51,12 +51,14 @@ using namespace realm;
     // `-[RLMRealm commitWriteTransactionWithoutNotifying:]`.
 }
 
-- (void)invalidate {
+- (bool)invalidate {
     if (_session) {
         _session->unregister_progress_notifier(_token);
         _session.reset();
         _token = 0;
+        return true;
     }
+    return false;
 }
 
 - (nullable instancetype)initWithTokenValue:(uint64_t)token
@@ -155,6 +157,20 @@ static RLMSyncConnectionState convertConnectionState(SyncSession::ConnectionStat
 - (void)resume {
     if (auto session = _session.lock()) {
         session->revive_if_needed();
+    }
+}
+
+- (void)pause {
+    // NEXT-MAJOR: this is what suspend should be
+    if (auto session = _session.lock()) {
+        session->pause();
+    }
+}
+
+- (void)unpause {
+    // NEXT-MAJOR: this is what resume should be
+    if (auto session = _session.lock()) {
+        session->resume();
     }
 }
 

@@ -20,6 +20,7 @@ import XCTest
 import Realm
 import RealmSwift
 import Foundation
+import os.lock
 
 #if canImport(RealmSwiftTestSupport)
 import RealmSwiftTestSupport
@@ -824,12 +825,12 @@ class ObjectTests: TestCase {
         assertThrows(SwiftIntObject().observe(keyPaths: ["intCol"]) { _ in }, reason: "managed")
     }
 
-    func testDeleteObservedObject() {
-        let realm = try! Realm()
+    func testDeleteObservedObject() throws {
+        let realm = try Realm()
         realm.beginWrite()
         let object0 = realm.create(SwiftIntObject.self, value: [0])
         let object1 = realm.create(SwiftIntObject.self, value: [0])
-        try! realm.commitWrite()
+        try realm.commitWrite()
 
         let exp0 = expectation(description: "Delete observed object")
         let token0 = object0.observe { change in
@@ -852,18 +853,22 @@ class ObjectTests: TestCase {
         realm.beginWrite()
         realm.delete(object0)
         realm.delete(object1)
-        try! realm.commitWrite()
+        try realm.commitWrite()
 
         waitForExpectations(timeout: 1)
         token0.invalidate()
         token1.invalidate()
     }
 
-    func testObserveInvalidKeyPath () {
-        let realm = try! Realm()
-        realm.beginWrite()
-        let object = realm.create(SwiftObject.self)
-        try! realm.commitWrite()
+    func createObject(_ value: Int = 0) throws -> SwiftObject {
+        let realm = try Realm()
+        return try realm.write {
+            realm.create(SwiftObject.self, value: ["intCol": value])
+        }
+    }
+
+    func testObserveInvalidKeyPath () throws {
+        let object = try createObject()
         assertThrows(object.observe(keyPaths: ["notAProperty"], { _ in }),
                      reason: "property 'notAProperty' not found in object of type 'SwiftObject'")
         assertThrows(object.observe(keyPaths: ["arrayCol.alsoNotAProperty"], { _ in }),
@@ -892,14 +897,10 @@ class ObjectTests: TestCase {
         }
     }
 
-    func testModifyObservedObjectLocally() {
-        let realm = try! Realm()
-        realm.beginWrite()
-        let object = realm.create(SwiftIntObject.self, value: [1])
-        try! realm.commitWrite()
-
+    func testModifyObservedObjectLocally() throws {
+        let object = try createObject()
         let token = object.observe(expectChange("intCol", Int?.none, 2))
-        try! realm.write {
+        try object.realm!.write {
             object.intCol = 2
         }
 
@@ -907,73 +908,34 @@ class ObjectTests: TestCase {
         token.invalidate()
     }
 
-    // !!!: Fails, but the feature will not support this behavior at first.
-    // See version below
-//    func testModifyObservedKeyPathLocally() {
-//        let realm = try! Realm()
-//        realm.beginWrite()
-//        let object = realm.create(SwiftObject.self)
-//        try! realm.commitWrite()
-//
-//        // Expect notification for "intCol" keyPath when "intCol" is modified
-//        let token1 = object.observe(keyPaths: ["intCol"], expectChange("intCol", Int?.none, 2))
-//
-//        // Expect no notification for "boolCol" keypath when "intCol" is modified
-//        let token0 = object.observe(keyPaths: ["boolCol"], { change in
-//            XCTFail("expected no change, got \(change)")
-//        })
-//
-//        try! realm.write {
-//            object.intCol = 2
-//        }
-//
-//        waitForExpectations(timeout: 2)
-//        token0.invalidate()
-//        token1.invalidate()
-//    }
-
-    func testModifyObservedKeyPathLocally() {
-        let realm = try! Realm()
-        realm.beginWrite()
-        let object = SwiftObject()
-        realm.add(object)
-        try! realm.commitWrite()
-
-        // Expect notification for "intCol" keyPath when "intCol" is modified
+    func testModifyObservedKeyPathLocally() throws {
+        let object = try createObject()
         let token = object.observe(keyPaths: ["intCol"], expectChange("intCol", Int?.none, 2))
-        try! realm.write {
+        try object.realm!.write {
             object.intCol = 2
         }
         waitForExpectations(timeout: 0.1)
         token.invalidate()
     }
 
-    func testModifyUnobservedKeyPathLocally() {
-        let realm = try! Realm()
-        realm.beginWrite()
-        let object = SwiftObject()
-        realm.add(object)
-        try! realm.commitWrite()
+    func testModifyUnobservedKeyPathLocally() throws {
+        let object = try createObject()
 
         // Expect no notification for "boolCol" keypath when "intCol" is modified
         let ex = expectation(description: "no change")
         ex.isInverted = true
-        let token = object.observe(keyPaths: ["boolCol"], { _ in
+        let token = object.observe(keyPaths: ["boolCol"]) { _ in
             ex.fulfill()
-        })
-        try! realm.write {
+        }
+        try object.realm!.write {
             object.intCol = 3
         }
         waitForExpectations(timeout: 0.1, handler: nil)
         token.invalidate()
     }
 
-    func testModifyMultipleObservedPartialKeyPathLocally() {
-        let realm = try! Realm()
-        realm.beginWrite()
-        let object = SwiftObject()
-        realm.add(object)
-        try! realm.commitWrite()
+    func testModifyMultipleObservedPartialKeyPathLocally() throws {
+        let object = try createObject()
 
         // Expect notification for "intCol" keyPath when "intCol" is modified
         var ex = expectation(description: "expect notification")
@@ -984,7 +946,7 @@ class ObjectTests: TestCase {
                 ex.fulfill()
             }
         }
-        try! realm.write {
+        try object.realm!.write {
             object.intCol = 2
         }
         waitForExpectations(timeout: 0.1)
@@ -999,58 +961,47 @@ class ObjectTests: TestCase {
                 ex.fulfill()
             }
         }
-        try! realm.write {
+        try object.realm!.write {
             object.stringCol = "new string"
         }
         waitForExpectations(timeout: 0.1)
         token.invalidate()
     }
 
-    func testModifyUnobservedPartialKeyPathLocally() {
-        let realm = try! Realm()
-        realm.beginWrite()
-        let object = SwiftObject()
-        realm.add(object)
-        try! realm.commitWrite()
+    func testModifyUnobservedPartialKeyPathLocally() throws {
+        let object = try createObject()
 
         // Expect no notification for "boolCol" keypath when "intCol" is modified
         let ex = expectation(description: "no change")
         ex.isInverted = true
-        let token = object.observe(keyPaths: [\SwiftObject.boolCol, \SwiftObject.stringCol], { _ in
+        let token = object.observe(keyPaths: [\SwiftObject.boolCol, \SwiftObject.stringCol]) { _ in
             ex.fulfill()
-        })
-        try! realm.write {
+        }
+        try object.realm!.write {
             object.intCol = 3
         }
         waitForExpectations(timeout: 0.1, handler: nil)
         token.invalidate()
     }
 
-    func testModifyObservedObjectRemotely() {
-        let realm = try! Realm()
-        realm.beginWrite()
-        let object = realm.create(SwiftIntObject.self, value: [1])
-        try! realm.commitWrite()
+    func testModifyObservedObjectRemotely() throws {
+        let object = try createObject(1)
 
         let token = object.observe(expectChange("intCol", 1, 2))
         dispatchSyncNewThread {
             let realm = try! Realm()
             try! realm.write {
-                realm.objects(SwiftIntObject.self).first!.intCol = 2
+                realm.objects(SwiftObject.self).first!.intCol = 2
             }
         }
 
-        realm.refresh()
+        object.realm!.refresh()
         waitForExpectations(timeout: 0)
         token.invalidate()
     }
 
-    func testModifyObservedKeyPathRemotely() {
-        let realm = try! Realm()
-        realm.beginWrite()
-        let object = SwiftObject()
-        realm.add(object)
-        try! realm.commitWrite()
+    func testModifyObservedKeyPathRemotely() throws {
+        let object = try createObject(123)
 
         // Expect notification for "intCol" keyPath when "intCol" is modified
         let token = object.observe(keyPaths: ["intCol"], expectChange("intCol", 123, 2))
@@ -1060,24 +1011,20 @@ class ObjectTests: TestCase {
                 realm.objects(SwiftObject.self).first!.intCol = 2
             }
         }
-        realm.refresh()
+        object.realm!.refresh()
         waitForExpectations(timeout: 0.1)
         token.invalidate()
     }
 
-    func testModifyUnobservedKeyPathRemotely() {
-        let realm = try! Realm()
-        realm.beginWrite()
-        let object = SwiftObject()
-        realm.add(object)
-        try! realm.commitWrite()
+    func testModifyUnobservedKeyPathRemotely() throws {
+        let object = try createObject()
 
         // Expect no notification for "boolCol" keypath when "intCol" is modified
         let ex = expectation(description: "no change")
         ex.isInverted = true
-        let token = object.observe(keyPaths: ["boolCol"], { _ in
+        let token = object.observe(keyPaths: ["boolCol"]) { _ in
             ex.fulfill()
-        })
+        }
 
         dispatchSyncNewThread {
             let realm = try! Realm()
@@ -1086,7 +1033,7 @@ class ObjectTests: TestCase {
                 first.intCol += 1
             }
         }
-        realm.refresh()
+        object.realm!.refresh()
         waitForExpectations(timeout: 0.1, handler: nil)
         token.invalidate()
     }
@@ -1582,6 +1529,192 @@ class ObjectTests: TestCase {
         token2.invalidate()
         queue.sync { }
     }
+
+#if swift(>=5.8)
+    @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+    func expectChange<T: Object>(_ obj: T, _ ex: XCTestExpectation, newValue: Int)
+    -> @Sendable (isolated CustomGlobalActor, ObjectChange<T>) -> Void {
+        let unchecked = Unchecked(obj)
+        return { _, change in
+            XCTAssertFalse(Thread.isMainThread)
+            guard case let .change(object, props) = change else {
+                return XCTFail("Expected change event but got \(change))")
+            }
+            XCTAssertNotIdentical(unchecked.value, object)
+            XCTAssertEqual(RLMObjectBaseGetCombineId(unchecked.value), RLMObjectBaseGetCombineId(object))
+            XCTAssertEqual(props.count, 1)
+            XCTAssertEqual(props[0].name, "intCol")
+            XCTAssertEqual(props[0].oldValue! as! Int, 0)
+            XCTAssertEqual(props[0].newValue! as! Int, newValue)
+            ex.fulfill()
+        }
+    }
+
+    @MainActor
+    @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+    func testObserveOnActor() async throws {
+        let obj1 = try createObject()
+        let obj2 = try createObject()
+        let ex1 = expectation(description: "first object")
+        let ex2 = expectation(description: "second object")
+        let tokens = await [
+            obj1.observe(keyPaths: ["intCol"], on: CustomGlobalActor.shared,
+                               expectChange(obj1, ex1, newValue: 2)),
+            obj2.observe(keyPaths: [\SwiftObject.intCol],
+                               on: CustomGlobalActor.shared,
+                               expectChange(obj2, ex2, newValue: 3))
+        ]
+
+        let realm = obj1.realm!
+        try await realm.asyncWrite {
+            obj1.boolCol = true
+            obj2.boolCol = true
+        }
+        try await realm.asyncWrite {
+            obj1.intCol = 2
+            obj2.intCol = 3
+        }
+        await fulfillment(of: [ex1, ex2], timeout: 2.0)
+        tokens.forEach { $0.invalidate() }
+    }
+
+    // This test consistently crashes inside the Swift runtime when building
+    // with SPM.
+    #if !SWIFT_PACKAGE
+    @MainActor
+    @available(macOS 12.0, iOS 15.0, tvOS 15.0, watchOS 8.0, *)
+    func testAsyncSequenceObserve() async throws {
+        let obj = try createObject()
+        let ex = Locked(expectation(description: "got value"))
+        let task = Task { @MainActor in
+            var value = 0
+            for try await object in valuePublisher(obj).values {
+                XCTAssertIdentical(object, obj)
+                value += 1
+                XCTAssertEqual(object.intCol, value)
+                ex.wrappedValue.fulfill()
+            }
+        }
+
+        for i in 1..<10 {
+            try await obj.realm!.asyncWrite {
+                obj.intCol += 1
+            }
+            await fulfillment(of: [ex.wrappedValue])
+            if i < 9 {
+                ex.wrappedValue = expectation(description: "got value")
+            }
+        }
+        task.cancel()
+        _ = try await task.value
+    }
+    #endif
+
+    @MainActor
+    @available(macOS 12.0, iOS 15.0, tvOS 15.0, watchOS 8.0, *)
+    func testAsyncSequenceObserveCustomActor() async throws {
+        let obj = try createObject()
+        let ex = Locked(expectation(description: "got next"))
+        let task = Task { @CustomGlobalActor in
+            let realm = try await Realm(actor: CustomGlobalActor.shared)
+            let obj = realm.objects(SwiftObject.self).first!
+            var value = 0
+            for try await change in changesetPublisher(obj).values {
+                guard case let .change(object, props) = change else {
+                    return XCTFail("Expected .change, got \(change)")
+                }
+                XCTAssertIdentical(object, obj)
+                value += 1
+                XCTAssertEqual(object.intCol, value)
+                XCTAssertEqual(props.count, 1)
+                let prop = props[0]
+                XCTAssertEqual(prop.name, "intCol")
+                XCTAssertEqual(prop.oldValue as? Int, value - 1)
+                XCTAssertEqual(prop.newValue as? Int, value)
+                ex.wrappedValue.fulfill()
+            }
+            XCTAssertEqual(value, 9)
+            ex.wrappedValue.fulfill()
+        }
+
+        // Use a dummy observation as synchronization to reduce the chance of
+        // writing before the notifier is ready
+        let token = await obj.observe(on: CustomGlobalActor.shared) { (_, _) in }
+
+        for _ in 1..<10 {
+            try await obj.realm!.asyncWrite {
+                obj.intCol += 1
+            }
+            await fulfillment(of: [ex.wrappedValue])
+            ex.wrappedValue = expectation(description: "got next")
+        }
+
+        try await obj.realm!.asyncWrite {
+            obj.realm!.delete(obj)
+        }
+        await fulfillment(of: [ex.wrappedValue])
+        _ = try await task.value
+        token.invalidate()
+    }
+
+    @MainActor
+    @available(macOS 12.0, iOS 15.0, tvOS 15.0, watchOS 8.0, *)
+    func testObserveOnAlreadyCancelledTask() async throws {
+        let obj = try createObject()
+        _ = await Task { @MainActor in
+            withUnsafeCurrentTask { task in
+                task?.cancel()
+            }
+            let token = await obj.observe(on: MainActor.shared) { _, _ in
+                XCTFail("should not have been called")
+            }
+            XCTAssertFalse(token.invalidate())
+        }.value
+    }
+
+    @MainActor
+    @available(macOS 12.0, iOS 15.0, tvOS 15.0, watchOS 8.0, *)
+    func testCancelTaskWhileWaitingForInitial() async throws {
+        // This can't be tested deterministically as it's trying to hit specific
+        // timing windows, so instead spawn a bunch of tasks and hope that at
+        // least one is in each of the interesting states. Not handling all of
+        // the cancel timing correctly is likely to make this test either crash
+        // or hang (if there's some scenario where we fail to call the completion
+        // handler).
+        _ = try createObject().realm!
+        let waitingForRealm = Locked(0)
+        let active = Locked(0)
+        let completed = Locked(0)
+        await withTaskGroup(of: NotificationToken.self) { group in
+            while active.value < 10 {
+                group.addTask { @CustomGlobalActor in
+                    waitingForRealm.withLock { $0 += 1 }
+                    // can throw due to cancellation
+                    guard let realm = try? await Realm(actor: CustomGlobalActor.shared) else {
+                        waitingForRealm.withLock { $0 -= 1 }
+                        return NotificationToken()
+                    }
+                    waitingForRealm.withLock { $0 -= 1 }
+                    active.withLock { $0 += 1 }
+                    let token = await realm.objects(SwiftObject.self).first!.observe(on: CustomGlobalActor.shared) { _, _ in }
+                    completed.withLock { $0 += 1 }
+                    return token
+                }
+
+                // Actor executors aren't fifo, so we can sometimes prevent the
+                // async opens from ever completing by continuously spawning new
+                // tasks
+                while waitingForRealm.value > 10 {
+                    await Task.yield()
+                }
+            }
+            group.cancelAll()
+            await group.waitForAll()
+            XCTAssertEqual(waitingForRealm.value, 0)
+            XCTAssertEqual(active.value, completed.value)
+        }
+    }
+#endif
 
     // MARK: Equality Tests
 

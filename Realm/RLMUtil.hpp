@@ -48,6 +48,8 @@ NSException *RLMException(realm::Exception const& exception);
 
 void RLMSetErrorOrThrow(NSError *error, NSError **outError);
 
+RLM_HIDDEN_BEGIN
+
 // returns if the object can be inserted as the given type
 BOOL RLMIsObjectValidForProperty(id obj, RLMProperty *prop);
 // throw an exception if the object is not a valid value for the property
@@ -214,6 +216,7 @@ realm::UUID RLMObjcToUUID(__unsafe_unretained id const value);
 
 // Given a bundle identifier, return the base directory on the disk within which Realm database and support files should
 // be stored.
+FOUNDATION_EXTERN RLM_VISIBLE
 NSString *RLMDefaultDirectoryForBundleIdentifier(NSString *bundleIdentifier);
 
 // Get a NSDateFormatter for ISO8601-formatted strings
@@ -316,3 +319,5 @@ private:
 #else
 using RLMUnfairMutex = std::mutex;
 #endif
+
+RLM_HIDDEN_END

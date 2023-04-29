@@ -1228,5 +1228,4 @@ public class RealmServer: NSObject {
     }
 }
 
-
 #endif

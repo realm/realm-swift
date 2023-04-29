@@ -197,6 +197,23 @@ public extension RealmSectionedResult {
                  _ block: @escaping (SectionedResultsChange<Self>) -> Void) -> NotificationToken {
         observe(keyPaths: keyPaths, on: queue, block)
     }
+
+#if swift(>=5.8)
+    @available(macOS 10.15, tvOS 13.0, iOS 13.0, watchOS 6.0, *)
+    @_unsafeInheritExecutor
+    func observe<A: Actor>(
+        keyPaths: [String]? = nil, on actor: A,
+        _ block: @Sendable @escaping (isolated A, SectionedResultsChange<Self>) -> Void
+    ) async -> NotificationToken {
+        await with(self, on: actor) { actor, collection in
+            collection.observe(keyPaths: keyPaths, on: nil) { change in
+                assumeOnActorExecutor(actor) { actor in
+                    block(actor, change)
+                }
+            }
+        } ?? NotificationToken()
+    }
+#endif
 }
 
 public extension RealmSectionedResult where Element: RealmSectionedResult, Element.Element: ObjectBase {
@@ -323,6 +340,17 @@ public extension RealmSectionedResult where Element: RealmSectionedResult, Eleme
                  _ block: @escaping (SectionedResultsChange<Self>) -> Void) -> NotificationToken {
         observe(keyPaths: keyPaths.map(_name(for:)), on: queue, block)
     }
+
+#if swift(>=5.8)
+    @available(macOS 10.15, tvOS 13.0, iOS 13.0, watchOS 6.0, *)
+    @_unsafeInheritExecutor
+    func observe<A: Actor>(
+        keyPaths: [PartialKeyPath<Element.Element>], on actor: A,
+        _ block: @Sendable @escaping (isolated A, SectionedResultsChange<Self>) -> Void
+    ) async -> NotificationToken {
+        await observe(keyPaths: keyPaths.map(_name(for:)), on: actor, block)
+    }
+#endif
 }
 
 public extension RealmSectionedResult where Element: ObjectBase {
@@ -449,6 +477,17 @@ public extension RealmSectionedResult where Element: ObjectBase {
                  _ block: @escaping (SectionedResultsChange<Self>) -> Void) -> NotificationToken {
         observe(keyPaths: keyPaths.map(_name(for:)), on: queue, block)
     }
+
+#if swift(>=5.8)
+    @available(macOS 10.15, tvOS 13.0, iOS 13.0, watchOS 6.0, *)
+    @_unsafeInheritExecutor
+    func observe<A: Actor>(
+        keyPaths: [PartialKeyPath<Element>], on actor: A,
+        _ block: @Sendable @escaping (isolated A, SectionedResultsChange<Self>) -> Void
+    ) async -> NotificationToken {
+        await observe(keyPaths: keyPaths.map(_name(for:)), on: actor, block)
+    }
+#endif
 }
 
 // Shared implementation of SectionedResults and ResultsSection

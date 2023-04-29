@@ -545,7 +545,7 @@ extension MongoCollection {
 
 #if swift(>=5.7)
     // These uses of `@_unsafeInheritExecutor` should instead be marking the
-    // options parameters as `@Copy`. Unfortunately, as of Swift 5.7 that doesn't
+    // options parameters as `@Copy`. Unfortunately, as of Swift 5.8 that doesn't
     // actually work due to https://github.com/apple/swift/issues/61358
 
     // NEXT-MAJOR: make the options parameter non-optional and default to .init()

@@ -521,7 +521,7 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions,
 
     RLMResults *query1 = [self query];
     __block int calls1 = 0;
-    id token1 = [query1 addNotificationBlock:^(RLMResults *results, RLMCollectionChange *c, NSError *error) {
+    RLMNotificationToken *token1 = [query1 addNotificationBlock:^(RLMResults *results, RLMCollectionChange *c, NSError *error) {
         XCTAssertNotNil(results);
         XCTAssertNil(error);
         if (calls1++ == 0) {
@@ -533,7 +533,7 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions,
 
     RLMResults *query2 = [self query];
     __block int calls2 = 0;
-    id token2 = [query2 addNotificationBlock:^(RLMResults *results, __unused RLMCollectionChange *c, NSError *error) {
+    RLMNotificationToken *token2 = [query2 addNotificationBlock:^(RLMResults *results, __unused RLMCollectionChange *c, NSError *error) {
         XCTAssertNotNil(results);
         XCTAssertNil(error);
         ++calls2;
@@ -551,7 +551,7 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions,
     id ex = [self expectationWithDescription:@"last query gets final notification"];
     RLMResults *query3 = [self query];
     __block int calls3 = 0;
-    id token3 = [query3 addNotificationBlock:^(RLMResults *results, RLMCollectionChange *c, NSError *error) {
+    RLMNotificationToken *token3 = [query3 addNotificationBlock:^(RLMResults *results, RLMCollectionChange *c, NSError *error) {
         XCTAssertNotNil(results);
         XCTAssertNil(error);
         if (++calls3 == 1) {

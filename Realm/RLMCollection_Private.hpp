@@ -43,6 +43,8 @@ class Set;
 class RLMClassInfo;
 @class RLMFastEnumerator, RLMManagedArray, RLMManagedSet, RLMManagedDictionary, RLMProperty, RLMObjectBase;
 
+RLM_HIDDEN_BEGIN
+
 @protocol RLMCollectionPrivate
 @property (nonatomic, readonly) RLMRealm *realm;
 @property (nonatomic, readonly) RLMClassInfo *objectInfo;
@@ -57,6 +59,7 @@ keyPaths:(std::optional<std::vector<std::vector<std::pair<realm::TableKey, realm
 // An object which encapsulates the shared logic for fast-enumerating RLMArray
 // RLMSet and RLMResults, and has a buffer to store strong references to the current
 // set of enumerated items
+RLM_DIRECT_MEMBERS
 @interface RLMFastEnumerator : NSObject
 - (instancetype)initWithBackingCollection:(realm::object_store::Collection const&)backingCollection
                                collection:(id)collection
@@ -86,14 +89,6 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state, NSUInteger len, id<RL
 
 @interface RLMCollectionChange ()
 - (instancetype)initWithChanges:(realm::CollectionChangeSet)indices;
-@end
-
-@interface RLMCancellationToken : RLMNotificationToken {
-@public
-    __unsafe_unretained RLMRealm *_realm;
-    realm::NotificationToken _token;
-    std::mutex _mutex;
-}
 @end
 
 realm::CollectionChangeCallback RLMWrapCollectionChangeCallback(void (^block)(id, id, NSError *),
@@ -126,3 +121,5 @@ static inline bool canAggregate(RLMPropertyType type, bool allowDate) {
 }
 
 NSArray *RLMToIndexPathArray(realm::IndexSet const& set, NSUInteger section);
+
+RLM_HIDDEN_END
