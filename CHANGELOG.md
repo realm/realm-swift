@@ -92,7 +92,10 @@ x.y.z Release notes (yyyy-MM-dd)
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
-* None.
+* Several schema initialization functions had incorrect `@MainActor`
+  annotations, resulting in runtime warnings if the first time a Realm was
+  opened was on a background thread
+  ([#8222](https://github.com/realm/realm-swift/issues/8222), since v10.34.0).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 

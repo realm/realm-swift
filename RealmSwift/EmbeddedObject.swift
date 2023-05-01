@@ -114,7 +114,7 @@ extension EmbeddedObject: _RealmCollectionValueInsideOptional {
      It is not considered part of the public API.
      :nodoc:
      */
-    @MainActor public override final class func _getProperties() -> [RLMProperty] {
+    public override final class func _getProperties() -> [RLMProperty] {
         return ObjectUtil.getSwiftProperties(self)
     }
 
