@@ -669,7 +669,7 @@ keyPaths:(std::optional<std::vector<std::vector<std::pair<realm::TableKey, realm
 
     dispatch_time_t time =  dispatch_time(DISPATCH_TIME_NOW, (int64_t)(timeout * NSEC_PER_SEC));
     dispatch_after(time, dispatch_get_main_queue(), ^{
-        NSString* errorMessage = [NSString stringWithFormat:@"Waiting for subscribed data timedout after %f seconds.", timeout];
+        NSString* errorMessage = [NSString stringWithFormat:@"Waiting for subscribed data timed out after %.01f seconds.", timeout];
         NSError* error = [NSError errorWithDomain:RLMErrorDomain code:RLMErrorClientTimeout userInfo:@{NSLocalizedDescriptionKey: errorMessage}];
         methodCompletion(nil, error);
     });

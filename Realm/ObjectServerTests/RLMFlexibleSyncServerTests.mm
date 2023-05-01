@@ -855,6 +855,38 @@
     CHECK_COUNT(1, Dog, realm);
 }
 
+- (void)testRemoveAllUnnamedSubscriptions {
+    bool didPopulate = [self populateData:^(RLMRealm *realm) {
+        [self createPeople:realm partition:_cmd];
+        [self createDog:realm partition:_cmd];
+    }];
+    if (!didPopulate) {
+        return;
+    }
+
+    RLMRealm *realm = [self getFlexibleSyncRealm:_cmd];
+    XCTAssertNotNil(realm);
+    CHECK_COUNT(0, Person, realm);
+
+    [self writeQueryAndCompleteForRealm:realm block:^(RLMSyncSubscriptionSet *subs) {
+        [subs addSubscriptionWithClassName:Person.className
+                                     where:@"age > 20 and partition == %@", NSStringFromSelector(_cmd)];
+        [subs addSubscriptionWithClassName:Person.className
+                          subscriptionName:@"person_age_2"
+                                     where:@"firstName == 'firstname_1' and partition == %@", NSStringFromSelector(_cmd)];
+        [subs addSubscriptionWithClassName:Dog.className
+                                     where:@"breed == 'Labradoodle' and partition == %@", NSStringFromSelector(_cmd)];
+    }];
+    CHECK_COUNT(2, Person, realm);
+    CHECK_COUNT(1, Dog, realm);
+
+    [self writeQueryAndCompleteForRealm:realm block:^(RLMSyncSubscriptionSet *subs) {
+        [subs removeAllUnnamedSubscriptions];
+    }];
+    CHECK_COUNT(1, Person, realm);
+    CHECK_COUNT(0, Dog, realm);
+}
+
 - (void)testFlexibleSyncUpdateQuery {
     bool didPopulate = [self populateData:^(RLMRealm *realm) {
         [self createPeople:realm partition:_cmd];
@@ -1135,7 +1167,7 @@
     RLMResults *res = [[Person allObjectsInRealm:realm] objectsWhere:@"age >= 20"];
     [res subscribeWithName:@"20up" waitForSyncMode:RLMWaitForSyncModeAlways onQueue:dispatch_get_main_queue() timeout:2.0 completion:^(RLMResults *results, NSError *error) {
         XCTAssert(error);
-        NSString *expectedDesc = [NSString stringWithFormat:@"Waiting for subscribed data timedout after %f seconds.", ti];
+        NSString *expectedDesc = [NSString stringWithFormat:@"Waiting for subscribed data timed out after %.01f seconds.", ti];
         XCTAssert([error.localizedDescription isEqualToString:expectedDesc]);
         XCTAssertNil(results);
         [ex fulfill];

@@ -305,7 +305,7 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 - (void)removeAllSubscriptions;
 
 // TODO: Docs
-- (void)removeAllSubscriptions:(BOOL)unnamedOnly;
+- (void)removeAllUnnamedSubscriptions;
 
 /**
  Removes all subscription with the specified class name.

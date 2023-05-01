@@ -492,25 +492,21 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
 
 #pragma mark - Remove Subscriptions
 
-- (void)removeAllSubscriptions:(BOOL)unnamedOnly {
-    [self verifyInWriteTransaction];
-
-    if (unnamedOnly) {
-        for (auto it = _mutableSubscriptionSet->begin(); it != _mutableSubscriptionSet->end();) {
-            if (!it->name) {
-                it = _mutableSubscriptionSet->erase(it);
-            } else {
-                it++;
-            }
-        }
-    } else {
-        _mutableSubscriptionSet->clear();
-    }
-}
-
 - (void)removeAllSubscriptions {
     [self verifyInWriteTransaction];
     _mutableSubscriptionSet->clear();
+}
+
+- (void)removeAllUnnamedSubscriptions {
+    [self verifyInWriteTransaction];
+
+    for (auto it = _mutableSubscriptionSet->begin(); it != _mutableSubscriptionSet->end();) {
+        if (!it->name) {
+            it = _mutableSubscriptionSet->erase(it);
+        } else {
+            it++;
+        }
+    }
 }
 
 - (void)removeAllSubscriptionsWithClassName:(NSString *)className {
