@@ -1385,6 +1385,11 @@ extension SwiftFlexibleSyncServerTests {
         XCTAssertEqual(results1.count, 3) // three objects on device because subscription "$0.age >= 8" still exists
     }
 
+#if swift(>=5.8)
+//     wait(for:) doesn't work in async functions because it blocks the calling
+//     thread and doesn't let async tasks run. Xcode 14.3 introduced a new async
+//     version of it which does work, but there doesn't appear to be a workaround
+//     for older Xcode versions.
     @MainActor
     func testSubscribeSameQueryNoName() async throws {
         try await populateSwiftPerson()
@@ -1559,7 +1564,7 @@ extension SwiftFlexibleSyncServerTests {
         while collection.count(filter: [:]).await(self) != 11 && start.timeIntervalSinceNow > -10.0 {
             sleep(1) // wait until server sync
         }
-        XCTAssertEqual(collection.count(filter: [:]).await(self), 11) // continuously fails with different count (usually between 6-10 documents on server). Why? Any alternatives other than polling?
+        XCTAssertEqual(collection.count(filter: [:]).await(self), 11) // continuously fails with different count (usually between 5-10 documents on server). Why? Any alternatives other than polling?
         // Another way to test this is to end the sync session. Wait with .always. Let the server hang, and after an arbitrary wait, end the wait and suceed the test.
         // But that seems like an awful test.
         
@@ -1615,18 +1620,24 @@ extension SwiftFlexibleSyncServerTests {
         }
         XCTAssertEqual(realm.subscriptions.state, .complete)
     }
+#endif
 
     @MainActor
-    func testSubscribeAndUpdate() async throws {
+    func testSubscribeAndUpdateBlock() async throws {
         try await populateSwiftPerson()
         let realm = try openFlexibleSyncRealm()
 
-        let _ = try await realm.objects(SwiftPerson.self).where { $0.age >= 8 }.subscribe(name: "8&up")
-        try await realm.subscriptions.update {
-            realm.subscriptions.append(QuerySubscription<SwiftPerson>(name: "8&up") {
-                $0.age >= 8
-            })
+        let results = try await realm.objects(SwiftPerson.self).where { $0.age >= 8 }.subscribe(name: "8&up")
+        XCTAssertEqual(results.count, 3)
+        let subscriptions = realm.subscriptions
+        XCTAssertEqual(subscriptions.count, 1)
+        let sub = subscriptions.first(named: "8&up")
+        try await subscriptions.update {
+            sub!.updateQuery(toType: SwiftPerson.self, where: { $0.age >= 6 })
         }
+        XCTAssertEqual(subscriptions.count, 1)
+        XCTAssertEqual(results.count, 3)
+        XCTAssertEqual(realm.objects(SwiftPerson.self).count, 5)
     }
 
     // MARK: - Custom Column

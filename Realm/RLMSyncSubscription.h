@@ -135,10 +135,21 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 - (void)write:(__attribute__((noescape)) void(^)(void))block
    onComplete:(void(^)(NSError * _Nullable))onComplete __attribute__((unavailable("Renamed to -update:onComplete.")));
 
-// TODO: docs
+/**
+ Synchronously performs any transactions (add/remove/update) to the subscription set within the block,
+ this will not wait for the server to acknowledge and see all the data associated with this collection of subscriptions,
+ and will return after committing the subscription transactions.
+
+ @param queue The serial queue to deliver notifications to.
+ @param block The block containing actions to perform to the subscription set.
+ @param onComplete A block which is called upon synchronization of
+                   subscriptions to the server. The block will be passed `nil`
+                   if the update succeeded, and an error describing the problem
+                   otherwise.
+ */
 - (void)updateOnQueue:(nullable dispatch_queue_t)queue
                 block:(__attribute__((noescape)) void(^)(void))block
-           onComplete:(void(^)(NSError *))completionBlock
+           onComplete:(void(^)(NSError *))onComplete
            __attribute__((swift_async(not_swift_private, 3)))
            __attribute__((swift_attr("@_unsafeInheritExecutor")));
 
@@ -304,8 +315,13 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
  */
 - (void)removeAllSubscriptions;
 
-// TODO: Docs
-- (void)removeAllUnnamedSubscriptions;
+/**
+ Removes all subscriptions without a name from the subscription set.
+
+ @warning This method may only be called during a write subscription block.
+ @warning Removing all subscriptions will result in an error if no new subscription is added. Server should
+          acknowledge at least one subscription.
+ */- (void)removeAllUnnamedSubscriptions;
 
 /**
  Removes all subscription with the specified class name.

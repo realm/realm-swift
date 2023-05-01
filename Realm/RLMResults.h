@@ -20,13 +20,20 @@
 
 RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
-// TODO: docs
+/// A block type used for APIs which asynchronously return an `RLMResults`.
 typedef void(^RLMResultsCompletionBlock)(RLMResults * _Nullable, NSError * _Nullable);
 
-// TODO: docs
+/**  Determines wait for download behavior when subscribing on RLMResults.
+*/
 typedef NS_ENUM(NSUInteger, RLMWaitForSyncMode) {
+    /// A call to subscribe will return once matching objects are downloaded
+    /// from the server only when the subscription is created the first time. If the
+    /// subscriptions already exists, the method will return without waiting for new downloads.
     RLMWaitForSyncModeOnCreation,
+    /// A call to subscribe will always for downloads before returning.
+    /// The method will not return in this mode unless an internet connection is established or a timeout is set.
     RLMWaitForSyncModeAlways,
+    /// A call to subscribe will not for downloads before returning.
     RLMWaitForSyncModeNever
 };
 
@@ -421,22 +428,55 @@ __attribute__((warn_unused_result));
 
 #pragma mark - Flexible Sync
 
-// TODO: docs
+// TODO: add more on specific behavior cases once settled
+/**
+ Creates an RLMSyncSubscription matching the RLMResults' local filter.
+
+ @param completion The block called after the subscription download is completed. The completion is called according to RLMWaitForSyncModeOnCreation behavior.
+ @see ``RLMWaitForSyncModeOnCreation`` and ``RLMWaitForSyncMode``
+ @param queue The queue where the completion disptaches.
+ */
 - (void)subscribeWithCompletion:(RLMResultsCompletionBlock)completion
                         onQueue:(dispatch_queue_t _Nullable)queue NS_REFINED_FOR_SWIFT;
 
-// TODO: docs
+/**
+ Creates an RLMSyncSubscription matching the RLMResults' local filter.
+
+ @param name The name used  to identify the subscription.
+ @param queue The queue where the completion disptaches.
+ @param completion The block called after the subscription download is completed.The completion is called according to RLMWaitForSyncModeOnCreation behavior.
+ @see ``RLMWaitForSyncModeOnCreation`` and ``RLMWaitForSyncMode``
+ */
 - (void)subscribeWithName:(NSString *_Nullable)name
                   onQueue:(dispatch_queue_t _Nullable)queue
                completion:(RLMResultsCompletionBlock)completion NS_REFINED_FOR_SWIFT;
 
-// TODO: docs
+/**
+ Creates an RLMSyncSubscription matching the RLMResults' local filter.
+
+ @param name The name used  to identify the subscription.
+ @param waitForSyncMode Dictates when the completion handler is called
+ @param queue The queue where the completion disptaches.
+ @param completion The block called after the subscription download is completed. Return behavior is dictated by the RLMWaitForSyncMode.
+ @see ``RLMWaitForSyncMode``
+ */
 - (void)subscribeWithName:(NSString *_Nullable)name
           waitForSyncMode:(RLMWaitForSyncMode)waitForSyncMode
                   onQueue:(dispatch_queue_t _Nullable)queue
                completion:(RLMResultsCompletionBlock)completion NS_REFINED_FOR_SWIFT;
 
-// TODO: docs
+/**
+ Creates an RLMSyncSubscription matching the RLMResults' local filter.
+
+ @param name The name used  to identify the subscription.
+ @param waitForSyncMode Dictates when the completion handler is called
+ @param queue The queue where the completion disptaches.
+ @param timeout A timeout which ends waiting for downloads via the completion handler.
+ If the timeout is exceeded the completion handler returns an `RLMErrorClientTimeout`.
+ @see ``RLMErrorClientTimeout``
+ @param completion The block called after the subscription download is completed. Return behavior is dictated by the RLMWaitForSyncMode.
+ @see ``RLMWaitForSyncMode``
+ */
 - (void)subscribeWithName:(NSString *_Nullable)name
           waitForSyncMode:(RLMWaitForSyncMode)waitForSyncMode
                   onQueue:(dispatch_queue_t _Nullable)queue

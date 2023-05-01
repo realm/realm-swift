@@ -67,7 +67,6 @@
     return RLMTimestampToNSDate(_subscription->updated_at);
 }
 
-// TODO: rename
 - (std::string_view)stdString {
     return _subscription->query_string;
 }

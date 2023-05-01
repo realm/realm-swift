@@ -579,6 +579,17 @@ keyPaths:(std::optional<std::vector<std::vector<std::pair<realm::TableKey, realm
 
 // TODO: need a completeOnQueue helper func
 
+- (void)completeOnQueue:(dispatch_queue_t _Nullable)queue
+             completion:(RLMResultsCompletionBlock)completion {
+    if (queue) {
+        return dispatch_async(queue, ^{
+            completion(self, nil);
+        });
+    } else {
+        completion(self, nil);
+    }
+}
+
 - (void)subscribeWithName:(NSString *_Nullable)name
           waitForSyncMode:(RLMWaitForSyncMode)waitForSyncMode
                   onQueue:(dispatch_queue_t _Nullable)queue
@@ -600,7 +611,7 @@ keyPaths:(std::optional<std::vector<std::vector<std::pair<realm::TableKey, realm
         completion(self, nil);
         return;
     }
-    if (waitForSyncMode == RLMWaitForSyncModeOnCreation) { // TODO: rewrite?
+    if (waitForSyncMode == RLMWaitForSyncModeOnCreation) {
         if (name) {
             RLMSyncSubscription *sub = [subscriptions subscriptionWithName:name];
             if (sub.stdString == _results.get_query().get_description()) {
@@ -625,12 +636,12 @@ keyPaths:(std::optional<std::vector<std::vector<std::pair<realm::TableKey, realm
             }
         }
     }
-    // onComplete is called upon synchronization from the server, which satisfies if (waitForSyncMode == RLMWaitForSyncModeAlways)
+    // onComplete is called after synchronization from the server, which satisfies if (waitForSyncMode == RLMWaitForSyncModeAlways)
     [subscriptions updateOnQueue:queue block:^{
         [subscriptions addSubscriptionWithClassName:self.objectClassName
                                    subscriptionName:name
                                               query:_results.get_query()
-                                     updateExisting:true]; // TODO: update true may work in all cases?
+                                     updateExisting:true];
     } onComplete:^(NSError *error) {
         if (error != nil) {
             if (queue) {
