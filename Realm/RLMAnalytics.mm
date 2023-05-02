@@ -126,7 +126,7 @@ static NSString *RLMTargetArch() {
 }
 
 // Hash the data in the given buffer and convert it to a hex-format string
-static NSString *RLMHashBase16Data(const void *bytes, size_t length) {
+NSString *RLMHashBase16Data(const void *bytes, size_t length) {
     unsigned char buffer[CC_SHA256_DIGEST_LENGTH];
     CC_SHA256(bytes, static_cast<CC_LONG>(length), buffer);
 

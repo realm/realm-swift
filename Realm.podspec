@@ -113,7 +113,10 @@ Pod::Spec.new do |s|
                               'include/RLMUpdateResult_Private.h',
                               'include/RLMUser_Private.h',
 
-  s.frameworks              = 'Security'
+  s.ios.frameworks          = 'Security'
+  s.ios.weak_framework      = 'UIKit'
+  s.tvos.weak_framework     = 'UIKit'
+  s.watchos.weak_framework  = 'UIKit'
   s.module_map              = 'Realm/Realm.modulemap'
   s.compiler_flags          = "-DREALM_HAVE_CONFIG -DREALM_COCOA_VERSION='@\"#{s.version}\"' -D__ASSERTMACROS__ -DREALM_ENABLE_SYNC"
   s.prepare_command         = 'sh scripts/setup-cocoapods.sh'
