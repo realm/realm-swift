@@ -403,8 +403,6 @@ void RLMSendAnalytics(RLMRealmConfiguration *configuration, RLMSchema *schema) {
 
     id config = [configuration copy];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        NSArray *urlStrings = @[@"https://data.mongodb-api.com/app/realmsdkmetrics-zmhtm/endpoint/metric_webhook/metric?data=%@"];
-
         NSDictionary *baseMetrics = RLMBaseMetrics();
         NSDictionary *schemaMetrics = RLMSchemaMetrics(schema);
         NSDictionary *configurationMetrics = RLMConfigurationMetrics(config);
@@ -417,12 +415,11 @@ void RLMSendAnalytics(RLMRealmConfiguration *configuration, RLMSchema *schema) {
         NSDictionary *payloadN = @{@"event": @"Run", @"properties": metrics};
         NSData *payload = [NSJSONSerialization dataWithJSONObject:payloadN options:0 error:nil];
 
-        for (NSString *urlString in urlStrings) {
-            NSString *formatted = [NSString stringWithFormat:urlString, [payload base64EncodedStringWithOptions:0]];
-            // No error handling or anything because logging errors annoyed people for no
-            // real benefit, and it's not clear what else we could do
-            [[NSURLSession.sharedSession dataTaskWithURL:[NSURL URLWithString:formatted]] resume];
-        }
+        NSString *url = @"https://data.mongodb-api.com/app/realmsdkmetrics-zmhtm/endpoint/metric_webhook/metric?data=%@";
+        NSString *formatted = [NSString stringWithFormat:url, [payload base64EncodedStringWithOptions:0]];
+        // No error handling or anything because logging errors annoyed people for no
+        // real benefit, and it's not clear what else we could do
+        [[NSURLSession.sharedSession dataTaskWithURL:[NSURL URLWithString:formatted]] resume];
     });
 }
 
