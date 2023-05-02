@@ -1934,16 +1934,24 @@ extension LogLevel {
 
 @available(macOS 12.0, watchOS 8.0, iOS 15.0, tvOS 15.0, macCatalyst 15.0, *)
 class LoggerTests: TestCase {
+    var logger: Logger!
+    override func setUp() {
+        logger = Logger.shared
+    }
+    override func tearDown() {
+        Logger.shared = logger
+    }
     func testSetDefaultLogLevel() throws {
         var logs: String = ""
-        Logger.shared = Logger(level: .off) { level, message in
+        let logger = Logger(level: .off) { level, message in
             logs += "\(Date.now) \(level.logLevel) \(message)"
         }
+        Logger.shared = logger
 
         try autoreleasepool { _ = try Realm() }
         XCTAssertTrue(logs.isEmpty)
 
-        Logger.shared.level = .all
+        logger.level = .all
         try autoreleasepool { _ = try Realm() } // We should be getting logs after changing the log level
         XCTAssertEqual(Logger.shared.level, .all)
         XCTAssertTrue(logs.contains("Details DB:"))
@@ -1962,7 +1970,7 @@ class LoggerTests: TestCase {
         XCTAssertTrue(logs.isEmpty)
 
         // Info
-        Logger.shared.level = .detail
+        logger.level = .detail
         try autoreleasepool { _ = try Realm() }
 
         XCTAssertTrue(!logs.isEmpty)
@@ -1970,7 +1978,7 @@ class LoggerTests: TestCase {
 
         // Trace
         logs = ""
-        Logger.shared.level = .trace
+        logger.level = .trace
         try autoreleasepool { _ = try Realm() }
 
         XCTAssertTrue(!logs.isEmpty)
@@ -1978,7 +1986,7 @@ class LoggerTests: TestCase {
 
         // Detail
         logs = ""
-        Logger.shared.level = .detail
+        logger.level = .detail
         try autoreleasepool { _ = try Realm() }
 
         XCTAssertTrue(!logs.isEmpty)

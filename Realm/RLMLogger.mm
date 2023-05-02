@@ -135,7 +135,7 @@ typedef void(^LoggerBlock)(RLMLogLevel level, NSString *message);
     if (_logger->would_log(level)) {
         va_list args;
         va_start(args, message);
-        _logger->log(level, message.UTF8String, args);
+        _logger->log(level, "%1", [[NSString alloc] initWithFormat:message arguments:args].UTF8String);
         va_end(args);
     }
 }
@@ -143,7 +143,7 @@ typedef void(^LoggerBlock)(RLMLogLevel level, NSString *message);
 - (void)logLevel:(RLMLogLevel)logLevel message:(NSString *)message {
     auto level = levelForLogLevel(logLevel);
     if (_logger->would_log(level)) {
-        _logger->log(level, message.UTF8String);
+        _logger->log(level, "%1", message.UTF8String);
     }
 }
 
