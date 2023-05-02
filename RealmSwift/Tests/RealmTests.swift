@@ -1903,3 +1903,104 @@ extension CancellationError: Equatable {
         true
     }
 }
+
+// Helper
+extension LogLevel {
+    var logLevel: String {
+        switch self {
+        case .off:
+            return "Off"
+        case .fatal:
+            return "Fatal"
+        case .error:
+            return "Error"
+        case .warn:
+            return "Warn"
+        case .info:
+            return "Info"
+        case .detail:
+            return "Details"
+        case .debug:
+            return "Debug"
+        case .trace:
+            return "Trace"
+        case .all:
+            return "All"
+        default:
+            return "unknown"
+        }
+    }
+}
+
+@available(macOS 12.0, watchOS 8.0, iOS 15.0, tvOS 15.0, macCatalyst 15.0, *)
+class LoggerTests: TestCase {
+    var logger: Logger!
+    override func setUp() {
+        logger = Logger.shared
+    }
+    override func tearDown() {
+        Logger.shared = logger
+    }
+    func testSetDefaultLogLevel() throws {
+        var logs: String = ""
+        let logger = Logger(level: .off) { level, message in
+            logs += "\(Date.now) \(level.logLevel) \(message)"
+        }
+        Logger.shared = logger
+
+        try autoreleasepool { _ = try Realm() }
+        XCTAssertTrue(logs.isEmpty)
+
+        logger.level = .all
+        try autoreleasepool { _ = try Realm() } // We should be getting logs after changing the log level
+        XCTAssertEqual(Logger.shared.level, .all)
+        XCTAssertTrue(logs.contains("Details DB:"))
+        XCTAssertTrue(logs.contains("Trace DB:"))
+    }
+
+    func testDefaultLogger() throws {
+        var logs: String = ""
+        let logger = Logger(level: .off) { level, message in
+            logs += "\(Date.now) \(level.logLevel) \(message)"
+        }
+        Logger.shared = logger
+
+        XCTAssertEqual(Logger.shared.level, .off)
+        try autoreleasepool { _ = try Realm() }
+        XCTAssertTrue(logs.isEmpty)
+
+        // Info
+        logger.level = .detail
+        try autoreleasepool { _ = try Realm() }
+
+        XCTAssertTrue(!logs.isEmpty)
+        XCTAssertTrue(logs.contains("Details DB:"))
+
+        // Trace
+        logs = ""
+        logger.level = .trace
+        try autoreleasepool { _ = try Realm() }
+
+        XCTAssertTrue(!logs.isEmpty)
+        XCTAssertTrue(logs.contains("Trace DB:"))
+
+        // Detail
+        logs = ""
+        logger.level = .detail
+        try autoreleasepool { _ = try Realm() }
+
+        XCTAssertTrue(!logs.isEmpty)
+        XCTAssertTrue(logs.contains("Details DB:"))
+        XCTAssertFalse(logs.contains("Trace DB:"))
+
+        logs = ""
+        Logger.shared = Logger(level: .trace) { level, message in
+            logs += "\(Date.now) \(level.logLevel) \(message)"
+        }
+        XCTAssertEqual(Logger.shared.level, .trace)
+        try autoreleasepool { _ = try Realm() }
+        XCTAssertTrue(!logs.isEmpty)
+        XCTAssertTrue(logs.contains("Details DB:"))
+        XCTAssertTrue(logs.contains("Trace DB:"))
+    }
+}

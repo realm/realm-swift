@@ -50,7 +50,10 @@ FOUNDATION_EXTERN void RLMEventUpdateMetadata(struct RLMEventContext *context,
 @property (nonatomic) NSString *partitionPrefix;
 @property (nonatomic, nullable) RLMUser *syncUser;
 @property (nonatomic, nullable) NSDictionary<NSString *, NSString *> *metadata;
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
 @property (nonatomic, nullable) void (^logger)(RLMSyncLogLevel, NSString *);
+#pragma clang diagnostic pop
 @property (nonatomic, nullable) RLM_SWIFT_SENDABLE void (^errorHandler)(NSError *);
 
 #ifdef __cplusplus

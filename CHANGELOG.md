@@ -100,6 +100,28 @@ x.y.z Release notes (yyyy-MM-dd)
   This new API fixes the issue where the resulting documents when using more than 
   one sort parameter were not consistent between calls. 
   ([#7188](https://github.com/realm/realm-swift/issues/7188), since v10.0.0). 
+* Add support for adding a user created default logger, which allows implementing your own logging logic
+  and the log threshold level.
+  You can define your own logger creating an instance of `Logger` and define the log function which will be
+  invoked whenever there is a log message.
+
+ ```swift
+ let logger = Logger(level: .all) { level, message in
+    print("Realm Log - \(level): \(message)")
+ }
+ ```
+
+  Set this custom logger as Realm default logger using `Logger.shared`.
+ ```swift
+    Logger.shared = logger
+ ```
+* It is now possible to change the default log threshold level at any point of the application's lifetime.
+  ```swift
+  Logger.shared.logLevel = .debug
+  ```
+  This will override the log level set anytime before by a user created logger.
+* We have set `.info` as the default log threshold level for Realm. You will now see some 
+  log message in your console. To disable use `Logger.shared.level = .off`.
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
@@ -109,6 +131,11 @@ x.y.z Release notes (yyyy-MM-dd)
   ([#8222](https://github.com/realm/realm-swift/issues/8222), since v10.34.0).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+
+### Deprecations
+
+* `App.SyncManager.logLevel` and `App.SyncManager.logFunction` are deprecated in favour of 
+  setting a default logger.
 
 ### Compatibility
 * Realm Studio: 14.0.1 or later.

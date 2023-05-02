@@ -22,6 +22,8 @@
 
 RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
+// NEXT-MAJOR: This enum needs to be removed when access to the logger is removed
+// from the sync manager. 
 /// An enum representing different levels of sync-related logging that can be configured.
 typedef RLM_CLOSED_ENUM(NSUInteger, RLMSyncLogLevel) {
     /// Nothing will ever be logged.
@@ -48,18 +50,21 @@ typedef RLM_CLOSED_ENUM(NSUInteger, RLMSyncLogLevel) {
     ///
     /// - warning: Will incur a measurable performance impact.
     RLMSyncLogLevelAll
-};
+} __attribute__((deprecated("Use `RLMLogLevel`/`LogLevel` instead")));
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
 /// A log callback function which can be set on RLMSyncManager.
 ///
 /// The log function may be called from multiple threads simultaneously, and is
 /// responsible for performing its own synchronization if any is required.
-RLM_SWIFT_SENDABLE // invoked on a backgroun thread
+RLM_SWIFT_SENDABLE // invoked on a background thread
 typedef void (^RLMSyncLogFunction)(RLMSyncLogLevel level, NSString *message);
+#pragma clang diagnostic pop
 
 /// A block type representing a block which can be used to report a sync-related error to the application. If the error
 /// pertains to a specific session, that session will also be passed into the block.
-RLM_SWIFT_SENDABLE // invoked on a backgroun thread
+RLM_SWIFT_SENDABLE // invoked on a background thread
 typedef void(^RLMSyncErrorReportingBlock)(NSError *, RLMSyncSession * _Nullable);
 
 /**
@@ -106,7 +111,8 @@ __attribute__((deprecated("This property is not used for anything")));
  @warning This property must be set before any synced Realms are opened. Setting it after
           opening any synced Realm will do nothing.
  */
-@property (atomic) RLMSyncLogLevel logLevel;
+@property (atomic) RLMSyncLogLevel logLevel
+__attribute__((deprecated("Use `RLMLogger.default.level`/`Logger.shared.level` to set/get the default logger threshold level.")));
 
 /**
  The function which will be invoked whenever the sync client has a log message.
@@ -114,9 +120,10 @@ __attribute__((deprecated("This property is not used for anything")));
  If nil, log strings are output to Apple System Logger instead.
 
  @warning This property must be set before any synced Realms are opened. Setting
- it after opening any synced Realm will do nothing.
+          it after opening any synced Realm will do nothing.
  */
-@property (atomic, nullable) RLMSyncLogFunction logger;
+@property (atomic, nullable) RLMSyncLogFunction logger
+__attribute__((deprecated("Use `RLMLogger.default`/`Logger.shared` to set/get the default logger.")));
 
 /**
  The name of the HTTP header to send authorization data in when making requests to Atlas App Services which has
