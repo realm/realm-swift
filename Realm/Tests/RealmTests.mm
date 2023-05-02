@@ -35,6 +35,10 @@
 #import <realm/util/file.hpp>
 #import <realm/db_options.hpp>
 
+#if !defined(REALM_COCOA_VERSION)
+#import "RLMVersion.h"
+#endif
+
 @interface RLMObjectSchema (Private)
 + (instancetype)schemaForObjectClass:(Class)objectClass;
 
@@ -2952,10 +2956,9 @@
     RLMLogger.defaultLogger = _logger;
 }
 - (void)testSetDefaultLogLevel {
-    __block NSString *logs = @"";
+    __block NSMutableString *logs = [[NSMutableString alloc] init];
     RLMLogger *logger = [[RLMLogger alloc] initWithLevel:RLMLogLevelAll logFunction:^(RLMLogLevel level, NSString *message) {
-        NSString *newLogs = [logs stringByAppendingFormat:@" %@ %lu %@", [NSDate date], level, message];
-        logs = newLogs;
+        [logs appendFormat:@" %@ %lu %@", [NSDate date], level, message];
     }];
     RLMLogger.defaultLogger = logger;
 
@@ -2964,7 +2967,7 @@
     XCTAssertTrue([logs containsString:@"5 DB:"]); // Detail
     XCTAssertTrue([logs containsString:@"7 DB:"]); // Trace
 
-    logs = @"";
+    [logs setString: @""];
     logger.level = RLMLogLevelDetail;
     @autoreleasepool { [RLMRealm defaultRealm]; }
     XCTAssertEqual([RLMLogger defaultLogger].level, RLMLogLevelDetail);
@@ -2973,11 +2976,10 @@
 }
 
 - (void)testDefaultLogger {
-    __block NSString *logs = @"";
+    __block NSMutableString *logs = [[NSMutableString alloc] init];
     RLMLogger *logger = [[RLMLogger alloc] initWithLevel:RLMLogLevelOff
                                              logFunction:^(RLMLogLevel level, NSString *message) {
-        NSString *newLogs = [logs stringByAppendingFormat:@" %@ %lu %@", [NSDate date], level, message];
-        logs = newLogs;
+        [logs appendFormat:@" %@ %lu %@", [NSDate date], level, message];
     }];
     RLMLogger.defaultLogger = logger;
     XCTAssertEqual(RLMLogger.defaultLogger.level, RLMLogLevelOff);
@@ -2988,23 +2990,22 @@
     // Test LogLevel Detail
     logger.level = RLMLogLevelDetail;
     @autoreleasepool { [RLMRealm defaultRealm]; }
-    XCTAssertTrue([logs length] >= 0);
+    XCTAssertTrue([logs length] > 0);
     XCTAssertTrue([logs containsString:@"5 DB:"]); // Detail
     XCTAssertFalse([logs containsString:@"7 DB:"]); // Trace
 
     // Test LogLevel All
     logger.level = RLMLogLevelAll;
     @autoreleasepool { [RLMRealm defaultRealm]; }
-    XCTAssertTrue([logs length] >= 0);
+    XCTAssertTrue([logs length] > 0);
     XCTAssertTrue([logs containsString:@"5 DB:"]); // Detail
     XCTAssertTrue([logs containsString:@"7 DB:"]); // Trace
 
-    logs = @"";
+    [logs setString: @""];
     // Init Custom Logger
     RLMLogger.defaultLogger = [[RLMLogger alloc] initWithLevel:RLMLogLevelDebug
                                                    logFunction:^(RLMLogLevel level, NSString * message) {
-        NSString *newLogs = [logs stringByAppendingFormat:@" %@ %lu %@", [NSDate date], level, message];
-        logs = newLogs;
+        [logs appendFormat:@" %@ %lu %@", [NSDate date], level, message];
     }];
 
     XCTAssertEqual(RLMLogger.defaultLogger.level, RLMLogLevelDebug);
@@ -3014,21 +3015,50 @@
 }
 
 - (void)testCustomLoggerLogMessage {
-    __block NSString *logs = @"";
+    __block NSMutableString *logs = [[NSMutableString alloc] init];
     RLMLogger *logger = [[RLMLogger alloc] initWithLevel:RLMLogLevelInfo
                                              logFunction:^(RLMLogLevel level, NSString * message) {
-        NSString *newLogs = [logs stringByAppendingFormat:@" %@ %lu %@", [NSDate date], level, message];
-        logs = newLogs;
-
+        [logs appendFormat:@" %@ %lu %@.", [NSDate date], level, message];
     }];
     RLMLogger.defaultLogger = logger;
-
-    @autoreleasepool { [RLMRealm defaultRealm]; }
-    XCTAssertTrue([logs length] >= 0);
 
     [logger logWithLevel:RLMLogLevelInfo message:@"%@ IMPORTANT INFO %i", @"TEST:", 0];
     [logger logWithLevel:RLMLogLevelTrace message:@"IMPORTANT TRACE"];
     XCTAssertTrue([logs containsString:@"TEST: IMPORTANT INFO 0"]); // Detail
     XCTAssertFalse([logs containsString:@"IMPORTANT TRACE"]); // Trace
+}
+@end
+
+@interface RLMMetricsTests : RLMTestCase
+@property (nonatomic, strong) RLMLogger *logger;
+@end
+
+@implementation RLMMetricsTests
+- (void)setUp {
+    _logger = RLMLogger.defaultLogger;
+}
+- (void)tearDown {
+    RLMLogger.defaultLogger = _logger;
+}
+
+- (void)testSyncConnectionMetrics {
+    __block NSMutableString *logs = [[NSMutableString alloc] init];
+    RLMLogger *logger = [[RLMLogger alloc] initWithLevel:RLMLogLevelDebug
+                                             logFunction:^(RLMLogLevel level, NSString * message) {
+        [logs appendFormat:@" %@ %lu %@.", [NSDate date], level, message];
+    }];
+    RLMLogger.defaultLogger = logger;
+    RLMApp *app = [RLMApp appWithId:@"test-id"];
+    // We don't even need the login to succeed, we only want for the logger
+    // to log the values on device info after trying to login.
+    [app loginWithCredential:[RLMCredentials anonymousCredentials] completion:^(RLMUser * _Nullable, NSError * _Nullable) {}];
+    // Verifying that this values are set on device_info.
+    // Only the following values are logged by core (sdk, sdk version, platform version).
+    NSString *realmVersion = [NSString stringWithFormat:@"sdk version: %@", REALM_COCOA_VERSION];
+    XCTAssertTrue([logs containsString: realmVersion]);
+    XCTAssertTrue([logs containsString:@"sdk: Realm Swift"]);
+    auto processInfo = [NSProcessInfo processInfo];
+    NSString *version = [NSString stringWithFormat:@"version: %@",[processInfo operatingSystemVersionString]];
+    XCTAssertTrue([logs containsString: version]);
 }
 @end

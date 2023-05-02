@@ -55,5 +55,7 @@
 // - Some info about the features been used when opening the realm for the first time.
 
 #import <Realm/RLMRealm.h>
+#import <Foundation/Foundation.h>
 
 void RLMSendAnalytics(RLMRealmConfiguration *configuration, RLMSchema *schema);
+NSString *RLMHashBase16Data(const void *bytes, size_t length);

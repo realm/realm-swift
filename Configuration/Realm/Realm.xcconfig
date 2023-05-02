@@ -24,3 +24,11 @@ LD_RUNPATH_SEARCH_PATHS[sdk=watch*] = $(inherited) @executable_path/Frameworks @
 LD_RUNPATH_SEARCH_PATHS[sdk=appletv*] = $(inherited) @executable_path/Frameworks @loader_path/Frameworks;
 
 REALM_IOPLATFORMUUID = "";
+
+OTHER_LDFLAGS[sdk=iphone*] = $(inherited) -framework UIKit
+OTHER_LDFLAGS[sdk=watch*] = $(inherited) -framework UIKit
+OTHER_LDFLAGS[sdk=appletv*] = $(inherited) -framework UIKit
+
+LINKER_FLAG_MACCATALYST_YES = $(inherited) -framework UIKit
+LINKER_FLAG_MACCATALYST_NO = ""
+OTHER_LDFLAGS[sdk=macosx*] = $(LINKER_FLAG_MACCATALYST_$(IS_MACCATALYST))

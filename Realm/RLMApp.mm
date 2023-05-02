@@ -18,6 +18,13 @@
 
 #import "RLMApp_Private.hpp"
 
+#import <sys/utsname.h>
+#if __has_include(<UIKit/UIDevice.h>)
+#import <UIKit/UIDevice.h>
+#define REALM_UIDEVICE_AVAILABLE
+#endif
+
+#import "RLMAnalytics.hpp"
 #import "RLMBSON_Private.hpp"
 #import "RLMCredentials_Private.hpp"
 #import "RLMEmailPasswordAuth.h"
@@ -128,19 +135,33 @@ namespace {
         self.localAppName = localAppName;
         self.localAppVersion = localAppVersion;
         self.defaultRequestTimeoutMS = defaultRequestTimeoutMS;
-
-        _config.device_info.sdk = "Realm Swift";
-
-        // Platform info isn't available when running via `swift test`.
-        // Non-Xcode SPM builds can't build for anything but macOS, so this is
-        // probably unimportant for now and we can just report "unknown"
-        auto processInfo = [NSProcessInfo processInfo];
-        RLMNSStringToStdString(_config.device_info.platform_version,
-                               [processInfo operatingSystemVersionString] ?: @"unknown");
-        RLMNSStringToStdString(_config.device_info.sdk_version, REALM_COCOA_VERSION);
+        RLMConfigureSyncConnectionParameters(_config);
         return self;
     }
     return nil;
+}
+
+static void RLMConfigureSyncConnectionParameters(realm::app::App::Config& config) {
+    // Anonymized BundleId
+    NSString *bundleId = [[NSBundle mainBundle] bundleIdentifier];
+    NSData *bundleIdData = [bundleId dataUsingEncoding:NSUTF8StringEncoding];
+    RLMNSStringToStdString(config.device_info.bundle_id, RLMHashBase16Data(bundleIdData.bytes, bundleIdData.length));
+
+    config.device_info.sdk = "Realm Swift";
+    RLMNSStringToStdString(config.device_info.sdk_version, REALM_COCOA_VERSION);
+
+    auto processInfo = [NSProcessInfo processInfo];
+    RLMNSStringToStdString(config.device_info.platform_version,
+                           [processInfo operatingSystemVersionString] ?: @"unknown");
+
+    RLMNSStringToStdString(config.device_info.framework_version, @__clang_version__);
+
+#ifdef REALM_UIDEVICE_AVAILABLE
+    RLMNSStringToStdString(config.device_info.device_name, [UIDevice currentDevice].model);
+#endif
+    struct utsname systemInfo;
+    uname(&systemInfo);
+    config.device_info.device_version = systemInfo.machine;
 }
 
 - (realm::app::App::Config&)config {
