@@ -355,6 +355,16 @@ Bson RLMConvertRLMBSONToBson(id<RLMBSON> b) {
     }
 }
 
+BsonDocument RLMConvertRLMBSONArrayToBsonDocument(NSArray<id<RLMBSON>> *array) {
+    BsonDocument bsonDocument = BsonDocument{};
+    for (NSDictionary<NSString *, id<RLMBSON>> *item in array) {
+        [item enumerateKeysAndObjectsUsingBlock:[&](NSString *key, id<RLMBSON> bson, BOOL *) {
+            bsonDocument[key.UTF8String] = RLMConvertRLMBSONToBson(bson);
+        }];
+    }
+    return bsonDocument;
+}
+
 #pragma mark BsonToRLMBSON
 
 id<RLMBSON> RLMConvertBsonToRLMBSON(const Bson& b) {
@@ -399,4 +409,15 @@ id<RLMBSON> RLMConvertBsonToRLMBSON(const Bson& b) {
 
 id<RLMBSON> RLMConvertBsonDocumentToRLMBSON(std::optional<BsonDocument> b) {
     return b ? RLMConvertBsonToRLMBSON(*b) : nil;
+}
+
+NSArray<id<RLMBSON>> *RLMConvertBsonDocumentToRLMBSONArray(std::optional<BsonDocument> b) {
+    if (!b) {
+        return @[];
+    }
+    NSMutableArray<id<RLMBSON>> *array = [[NSMutableArray alloc] init];
+    for (const auto& [key, value] : *b) {
+        [array addObject:@{@(key.c_str()): RLMConvertBsonToRLMBSON(value)}];
+    }
+    return array;
 }

@@ -18,6 +18,7 @@
 
 #import "RLMFindOptions_Private.hpp"
 #import "RLMBSON_Private.hpp"
+#import "RLMCollection.h"
 
 @interface RLMFindOptions() {
     realm::app::MongoCollection::FindOptions _options;
@@ -46,6 +47,26 @@
     return self;
 }
 
+- (instancetype)initWithLimit:(NSInteger)limit
+                   projection:(id<RLMBSON> _Nullable)projection
+                      sorting:(NSArray<id<RLMBSON>> *)sorting {
+    if (self = [super init]) {
+        self.projection = projection;
+        self.sorting = sorting;
+        self.limit = limit;
+    }
+    return self;
+}
+
+- (instancetype)initWithProjection:(id<RLMBSON> _Nullable)projection
+                           sorting:(NSArray<id<RLMBSON>> *)sorting {
+    if (self = [super init]) {
+        self.projection = projection;
+        self.sorting = sorting;
+    }
+    return self;
+}
+
 - (realm::app::MongoCollection::FindOptions)_findOptions {
     return _options;
 }
@@ -56,6 +77,10 @@
 
 - (id<RLMBSON>)sort {
     return RLMConvertBsonDocumentToRLMBSON(_options.sort_bson);
+}
+
+- (NSArray<id<RLMBSON>> *)sorting {
+    return RLMConvertBsonDocumentToRLMBSONArray(_options.sort_bson);
 }
 
 - (void)setProjection:(id<RLMBSON>)projection {
@@ -74,6 +99,10 @@
     } else {
         _options.sort_bson = realm::util::none;
     }
+}
+
+- (void)setSorting:(NSArray<id<RLMBSON>> *)sorting {
+    _options.sort_bson = RLMConvertRLMBSONArrayToBsonDocument(sorting);
 }
 
 - (NSInteger)limit {

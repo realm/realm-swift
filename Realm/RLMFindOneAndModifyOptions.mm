@@ -18,6 +18,7 @@
 
 #import "RLMFindOneAndModifyOptions_Private.hpp"
 #import "RLMBSON_Private.hpp"
+#import "RLMCollection.h"
 
 @interface RLMFindOneAndModifyOptions() {
     realm::app::MongoCollection::FindOneAndModifyOptions _options;
@@ -39,6 +40,19 @@
     return self;
 }
 
+- (instancetype)initWithProjection:(id<RLMBSON> _Nullable)projection
+                           sorting:(NSArray<id<RLMBSON>> *)sorting
+                            upsert:(BOOL)upsert
+           shouldReturnNewDocument:(BOOL)shouldReturnNewDocument {
+    if (self = [super init]) {
+        self.upsert = upsert;
+        self.shouldReturnNewDocument = shouldReturnNewDocument;
+        self.projection = projection;
+        self.sorting = sorting;
+    }
+    return self;
+}
+
 - (realm::app::MongoCollection::FindOneAndModifyOptions)_findOneAndModifyOptions {
     return _options;
 }
@@ -49,6 +63,10 @@
 
 - (id<RLMBSON>)sort {
     return RLMConvertBsonDocumentToRLMBSON(_options.sort_bson);
+}
+
+- (NSArray<id<RLMBSON>> *)sorting {
+    return RLMConvertBsonDocumentToRLMBSONArray(_options.sort_bson);
 }
 
 - (BOOL)upsert {
@@ -75,6 +93,10 @@
     } else {
         _options.sort_bson = realm::util::none;
     }
+}
+
+- (void)setSorting:(NSArray<id<RLMBSON>> *)sorting {
+    _options.sort_bson = RLMConvertRLMBSONArrayToBsonDocument(sorting);
 }
 
 - (void)setUpsert:(BOOL)upsert {
