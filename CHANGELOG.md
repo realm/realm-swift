@@ -89,6 +89,13 @@ x.y.z Release notes (yyyy-MM-dd)
   runtime actor data race detection (`OTHER_SWIFT_FLAGS=-Xfrontend
   -enable-actor-data-race-checks`) is strongly recommended when using
   actor-isolated Realms.
+* Add support for automatic partition-based to flexible sync migration.
+  Connecting to a server-side app configured to use flexible sync with a
+  client-side partition-based sync configuration is now supported, and will
+  automatically create the appropriate flexible sync subscriptions to subscribe
+  to the requested partition. This allows changing the configuration on the
+  server from partition-based to flexible without breaking existing clients.
+  ([Core #6554](https://github.com/realm/realm-core/issues/6554))
 * Now you can use an array `[["_id": 1], ["breed": 0]]` as sorting option for a MongoCollection. 
   This new API fixes the issue where the resulting documents when using more than 
   one sort parameter were not consistent between calls. 
@@ -108,7 +115,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * Xcode: 13.4-14.3.
 
 ### Internal
-* Upgraded realm-core from ? to ?
+* Upgraded realm-core from v13.9.4 to v13.10.0.
 
 10.38.3 Release notes (2023-04-28)
 =============================================================
