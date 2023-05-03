@@ -1,6 +1,8 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.39.0 Release notes (2023-05-03)
 =============================================================
+
 ### Enhancements
+
 * Add support for actor-isolated Realms, opened with `try await Realm(actor: actor)`.
 
   Rather than being confined to the current thread or a dispatch queue,
@@ -96,41 +98,39 @@ x.y.z Release notes (yyyy-MM-dd)
   to the requested partition. This allows changing the configuration on the
   server from partition-based to flexible without breaking existing clients.
   ([Core #6554](https://github.com/realm/realm-core/issues/6554))
-* Now you can use an array `[["_id": 1], ["breed": 0]]` as sorting option for a MongoCollection. 
-  This new API fixes the issue where the resulting documents when using more than 
-  one sort parameter were not consistent between calls. 
-  ([#7188](https://github.com/realm/realm-swift/issues/7188), since v10.0.0). 
+* Now you can use an array `[["_id": 1], ["breed": 0]]` as sorting option for a
+  MongoCollection. This new API fixes the issue where the resulting documents
+  when using more than one sort parameter were not consistent between calls.
+  ([#7188](https://github.com/realm/realm-swift/issues/7188), since v10.0.0).
 * Add support for adding a user created default logger, which allows implementing your own logging logic
   and the log threshold level.
   You can define your own logger creating an instance of `Logger` and define the log function which will be
   invoked whenever there is a log message.
 
- ```swift
- let logger = Logger(level: .all) { level, message in
-    print("Realm Log - \(level): \(message)")
- }
- ```
+  ```swift
+  let logger = Logger(level: .all) { level, message in
+     print("Realm Log - \(level): \(message)")
+  }
+  ```
 
   Set this custom logger as Realm default logger using `Logger.shared`.
- ```swift
-    Logger.shared = logger
- ```
+   ```swift
+  Logger.shared = logger
+   ```
 * It is now possible to change the default log threshold level at any point of the application's lifetime.
   ```swift
   Logger.shared.logLevel = .debug
   ```
   This will override the log level set anytime before by a user created logger.
-* We have set `.info` as the default log threshold level for Realm. You will now see some 
+* We have set `.info` as the default log threshold level for Realm. You will now see some
   log message in your console. To disable use `Logger.shared.level = .off`.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
+
 * Several schema initialization functions had incorrect `@MainActor`
   annotations, resulting in runtime warnings if the first time a Realm was
   opened was on a background thread
   ([#8222](https://github.com/realm/realm-swift/issues/8222), since v10.34.0).
-
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
 ### Deprecations
 
@@ -138,6 +138,7 @@ x.y.z Release notes (yyyy-MM-dd)
   setting a default logger.
 
 ### Compatibility
+
 * Realm Studio: 14.0.1 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 14.3.
@@ -145,6 +146,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * Xcode: 13.4-14.3.
 
 ### Internal
+
 * Upgraded realm-core from v13.9.4 to v13.10.0.
 
 10.38.3 Release notes (2023-04-28)
