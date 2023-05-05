@@ -1,3 +1,29 @@
+10.39.1 Release notes (2023-05-05)
+=============================================================
+
+### Enhancements
+
+* New notifiers can now be registered in write transactions until changes have
+  actually been made in the write transaction. This makes it so that new
+  notifications can be registered inside change notifications triggered by
+  beginning a write transaction (unless a previous callback performed writes).
+  ([#4818](https://github.com/realm/realm-swift/issues/4818)).
+* Reduce the memory footprint of an automatic (discard or recover) client reset
+  when there are large incoming changes from the server.
+  ([Core #6567](https://github.com/realm/realm-core/issues/6567)).
+
+### Compatibility
+
+* Realm Studio: 14.0.1 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 14.3.
+* CocoaPods: 1.10 or later.
+* Xcode: 13.4-14.3.
+
+### Internal
+
+* Upgraded realm-core from 13.10.0 to 13.10.1.
+
 10.39.0 Release notes (2023-05-03)
 =============================================================
 
