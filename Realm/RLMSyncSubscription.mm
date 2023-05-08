@@ -406,28 +406,31 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
     RLMClassInfo& info = _realm->_info[objectClassName];
     auto query = RLMPredicateToQuery(predicate, info.rlmObjectSchema, _realm.schema, _realm.group);
 
-    return [self addSubscriptionWithClassName:objectClassName
+    [self addSubscriptionWithClassName:objectClassName
                               subscriptionName:name
                                          query:query
                                 updateExisting:updateExisting];
 }
 
-- (void)addSubscriptionWithClassName:(NSString *)objectClassName
-                    subscriptionName:(nullable NSString *)name
-                               query:(realm::Query)query
-                      updateExisting:(BOOL)updateExisting {
+- (RLMObjectId *)addSubscriptionWithClassName:(NSString *)objectClassName
+                             subscriptionName:(nullable NSString *)name
+                                        query:(realm::Query)query
+                               updateExisting:(BOOL)updateExisting {
     [self verifyInWriteTransaction];
 
     if (name) {
         if (updateExisting || !_mutableSubscriptionSet->find(name.UTF8String)) {
-            _mutableSubscriptionSet->insert_or_assign(name.UTF8String, query);
+            auto it = _mutableSubscriptionSet->insert_or_assign(name.UTF8String, query);
+            return [[RLMObjectId alloc] initWithValue:it.first->id];
         }
         else {
+            // rewrite exception description
             @throw RLMException(@"A subscription named '%@' already exists. If you meant to update the existing subscription please use the `update` method.", name);
         }
     }
     else {
-        _mutableSubscriptionSet->insert_or_assign(query);
+        auto it = _mutableSubscriptionSet->insert_or_assign(query);
+        return [[RLMObjectId alloc] initWithValue:it.first->id];
     }
 }
 
@@ -482,6 +485,19 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
 
     for (auto it = _mutableSubscriptionSet->begin(); it != _mutableSubscriptionSet->end();) {
         if (it->id == subscription.identifier.value) {
+            it = _mutableSubscriptionSet->erase(it);
+            return;
+        }
+        it++;
+    }
+}
+
+// TODO: collapse removeSubscription impl into this onceyou know it works.
+- (void)removeSubscriptionWithId:(RLMObjectId *)objectId {
+    [self verifyInWriteTransaction];
+
+    for (auto it = _mutableSubscriptionSet->begin(); it != _mutableSubscriptionSet->end();) {
+        if (it->id == objectId.value) {
             it = _mutableSubscriptionSet->erase(it);
             return;
         }

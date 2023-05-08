@@ -484,7 +484,7 @@ __attribute__((warn_unused_result));
                completion:(RLMResultsCompletionBlock)completion NS_REFINED_FOR_SWIFT;
 
 // TODO: docs
-- (BOOL)unsubscribe NS_REFINED_FOR_SWIFT;
+- (void)unsubscribe NS_REFINED_FOR_SWIFT;
 
 
 

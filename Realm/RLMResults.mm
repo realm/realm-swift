@@ -56,6 +56,11 @@ using namespace realm;
 @interface RLMResults () <RLMThreadConfined_Private>
 @end
 
+// private properties
+@interface RLMResults ()
+@property (nonatomic, nullable) RLMObjectId *associatedSubscriptionId;
+@end
+
 //
 // RLMResults implementation
 //
@@ -596,52 +601,61 @@ keyPaths:(std::optional<std::vector<std::vector<std::pair<realm::TableKey, realm
                completion:(RLMResultsCompletionBlock)completion {
     RLMSyncSubscriptionSet *subscriptions = self.realm.subscriptions;
 
-    if (waitForSyncMode == RLMWaitForSyncModeNever) {
-        [subscriptions update:^{
-            [subscriptions addSubscriptionWithClassName:self.objectClassName
-                                       subscriptionName:name
-                                                  query:_results.get_query()
-                                         updateExisting:true];
-        }];
-        if (queue) {
-            return dispatch_async(queue, ^{
-                completion(self, nil);
-            });
-        }
-        completion(self, nil);
-        return;
-    }
-    if (waitForSyncMode == RLMWaitForSyncModeOnCreation) {
-        if (name) {
-            RLMSyncSubscription *sub = [subscriptions subscriptionWithName:name];
-            if (sub.stdString == _results.get_query().get_description()) {
-                if (queue) {
-                    return dispatch_async(queue, ^{
-                        completion(self, nil);
-                    });
+    switch(waitForSyncMode) {
+        case RLMWaitForSyncModeOnCreation:
+            // If an existing named sub matches the provided name and local query, return.
+            if (name) {
+                RLMSyncSubscription *sub = [subscriptions subscriptionWithName:name];
+                if (sub.stdString == _results.get_query().get_description()) {
+                    if (queue) {
+                        return dispatch_async(queue, ^{
+                            completion(self, nil);
+                        });
+                    }
+                    completion(self, nil);
+                    return;
                 }
-                completion(self, nil);
-                return;
-            }
-        } else {
-            RLMSyncSubscription *sub = [subscriptions subscriptionWithClassName:self.objectClassName query:_results.get_query()];
-            if (sub != nil) {
-                if (queue) {
-                    return dispatch_async(queue, ^{
-                        completion(self, nil);
-                    });
+            } else {
+                // otherwise check if an unnamed subscription already exists. Return if it does exist.
+                RLMSyncSubscription *sub = [subscriptions subscriptionWithClassName:self.objectClassName query:_results.get_query()];
+                if (sub != nil && sub.name == nil) {
+                    if (queue) {
+                        return dispatch_async(queue, ^{
+                            completion(self, nil);
+                        });
+                    }
+                    completion(self, nil);
+                    return;
                 }
-                completion(self, nil);
-                return;
             }
-        }
+            // No name was provided. No existing unnamed subscription matches the local query.
+            // break and create new subscription below.
+            break;
+        case RLMWaitForSyncModeAlways:
+            // break and continue to [subscriptions updateOnQueue:block:] below
+            break;
+        case RLMWaitForSyncModeNever:
+            // commit subscription synchronously and return.
+            [subscriptions update:^{
+                self.associatedSubscriptionId = [subscriptions addSubscriptionWithClassName:self.objectClassName
+                                                                           subscriptionName:name
+                                                                                      query:_results.get_query()
+                                                                             updateExisting:true];
+            }];
+            if (queue) {
+                return dispatch_async(queue, ^{
+                    completion(self, nil);
+                });
+            }
+            completion(self, nil);
+            return;
     }
-    // onComplete is called after synchronization from the server, which satisfies if (waitForSyncMode == RLMWaitForSyncModeAlways)
+
     [subscriptions updateOnQueue:queue block:^{
-        [subscriptions addSubscriptionWithClassName:self.objectClassName
-                                   subscriptionName:name
-                                              query:_results.get_query()
-                                     updateExisting:true];
+        self.associatedSubscriptionId = [subscriptions addSubscriptionWithClassName:self.objectClassName
+                                                                   subscriptionName:name
+                                                                              query:_results.get_query()
+                                                                     updateExisting:true];
     } onComplete:^(NSError *error) {
         if (error != nil) {
             if (queue) {
@@ -661,11 +675,13 @@ keyPaths:(std::optional<std::vector<std::vector<std::pair<realm::TableKey, realm
     }];
 }
 
+// FIXME: Ultimately needs something cancellable from realm-core instead of sdk-level workaround.
 - (void)subscribeWithName:(NSString *_Nullable)name
           waitForSyncMode:(RLMWaitForSyncMode)waitForSyncMode
                   onQueue:(dispatch_queue_t _Nullable)queue
                   timeout:(NSTimeInterval)timeout
                completion:(RLMResultsCompletionBlock)completion {
+    // Create an internal completion that will only be called once
     __block BOOL called = false;
     void(^methodCompletion)(RLMResults* _Nullable, NSError* _Nullable) = ^(RLMResults* _Nullable results, NSError* _Nullable error) {
         if (!called) {
@@ -678,23 +694,31 @@ keyPaths:(std::optional<std::vector<std::vector<std::pair<realm::TableKey, realm
         }
     };
 
+    // Setup timer
     dispatch_time_t time =  dispatch_time(DISPATCH_TIME_NOW, (int64_t)(timeout * NSEC_PER_SEC));
+    // If the asynchronouns subscribe call below doesn't return after `time` seconds, the internal completion is called with an error.
     dispatch_after(time, dispatch_get_main_queue(), ^{
         NSString* errorMessage = [NSString stringWithFormat:@"Waiting for subscribed data timed out after %.01f seconds.", timeout];
         NSError* error = [NSError errorWithDomain:RLMErrorDomain code:RLMErrorClientTimeout userInfo:@{NSLocalizedDescriptionKey: errorMessage}];
         methodCompletion(nil, error);
     });
+    // call asynchronous subscribe
     [self subscribeWithName:name waitForSyncMode:waitForSyncMode onQueue:queue completion:methodCompletion];
 }
 
-- (BOOL)unsubscribe {
+- (void)unsubscribe {
     RLMSyncSubscriptionSet *subscriptions = self.realm.subscriptions;
-    BOOL __block removed = false;
-    [subscriptions update:^{
-        removed = [subscriptions removeSubscriptionWithClassName:self.objectClassName
-                                                           query:_results.get_query()];
-    }];
-    return removed;
+
+    if (self.associatedSubscriptionId) {
+        [subscriptions update:^{
+            [subscriptions removeSubscriptionWithId:self.associatedSubscriptionId];
+        }];
+    } else {
+        [subscriptions update:^{
+            [subscriptions removeSubscriptionWithClassName:self.objectClassName
+                                                     query:_results.get_query()];
+        }];
+    }
 }
 
 - (BOOL)isAttached {

@@ -42,16 +42,19 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
 - (instancetype)initWithSubscriptionSet:(realm::sync::SubscriptionSet)subscriptionSet realm:(RLMRealm *)realm;
 
-- (void)addSubscriptionWithClassName:(NSString *)objectClassName
-                    subscriptionName:(nullable NSString *)name
-                               query:(realm::Query)query
-                      updateExisting:(BOOL)updateExisting;
+- (RLMObjectId *)addSubscriptionWithClassName:(NSString *)objectClassName
+                                     subscriptionName:(nullable NSString *)name
+                                                query:(realm::Query)query
+                                       updateExisting:(BOOL)updateExisting;
 
 - (nullable RLMSyncSubscription *)subscriptionWithClassName:(NSString *)ObjectClassName
                                                       query:(realm::Query)query;
 
+// TODO: make void
 - (BOOL)removeSubscriptionWithClassName:(NSString *)objectClassName
                                   query:(realm::Query)query;
+
+- (void)removeSubscriptionWithId:(RLMObjectId *)objectId;
 
 @end
 

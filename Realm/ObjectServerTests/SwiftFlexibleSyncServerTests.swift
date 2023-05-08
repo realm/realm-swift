@@ -1465,7 +1465,7 @@ extension SwiftFlexibleSyncServerTests {
 
         let results1 = try await realm.objects(SwiftPerson.self).where { $0.lastName == "lastname_3" }.subscribe()
         XCTAssertEqual(realm.subscriptions.count, 1)
-        XCTAssert(results1.unsubscribe())
+        results1.unsubscribe()
         XCTAssertEqual(realm.subscriptions.count, 0)
     }
 
@@ -1482,7 +1482,7 @@ extension SwiftFlexibleSyncServerTests {
         XCTAssertEqual(realm.subscriptions.count, 2) // "age >= 8" and "age >= 8 && age < 8"
         let results1 = realm.objects(SwiftPerson.self)
         XCTAssertEqual(results1.count, 3)
-        XCTAssert(results0.unsubscribe()) // unsubscribes from "age >= 8 && age < 8"
+        results0.unsubscribe() // unsubscribes from "age >= 8 && age < 8"
         XCTAssertEqual(realm.subscriptions.count, 1)
         XCTAssertNotNil(realm.subscriptions.first(ofType: SwiftPerson.self) { $0.age >= 8 })
         XCTAssertEqual(results0.count, 0) // local query is still "age >= 8 && age < 8".
@@ -1490,13 +1490,51 @@ extension SwiftFlexibleSyncServerTests {
     }
 
     @MainActor
-    func testUnsubscribeFalse() async throws {
+    // TODO: rewrite test
+    func testUnsubscribeWihtoutSubscription() async throws {
         try await populateSwiftPerson()
         let realm = try openFlexibleSyncRealm()
 
-        let results = try await realm.objects(SwiftPerson.self).where { $0.age >= 8 }.subscribe()
-        XCTAssertTrue(results.unsubscribe())
-        XCTAssertFalse(results.unsubscribe())
+        let results = realm.objects(SwiftPerson.self).where { $0.age >= 8 }
+        results.unsubscribe()
+    }
+
+    @MainActor
+    func testUnsubscribeNamed() async throws {
+        try await populateSwiftPerson()
+        let realm = try openFlexibleSyncRealm()
+
+        let _ = try await realm.objects(SwiftPerson.self).where { $0.age >= 8 }.subscribe()
+        let _ = try await realm.objects(SwiftPerson.self).where { $0.age >= 8 }.subscribe(name: "first_named")
+        let results = try await realm.objects(SwiftPerson.self).where { $0.age >= 8 }.subscribe(name: "second_named")
+        XCTAssertEqual(realm.subscriptions.count, 3)
+
+        results.unsubscribe()
+        XCTAssertEqual(realm.subscriptions.count, 2)
+        XCTAssertEqual(realm.subscriptions[0]!.name, nil)
+        XCTAssertEqual(realm.subscriptions[1]!.name, "first_named")
+        results.unsubscribe() // check a second time to ensure that a non-associated subscription is removed when the associated_subscription doesn't exist.
+        XCTAssertEqual(realm.subscriptions.count, 2)
+        XCTAssertEqual(realm.subscriptions[0]!.name, nil)
+        XCTAssertEqual(realm.subscriptions[1]!.name, "first_named")
+    }
+
+    @MainActor
+    func testUnsubscribeReassign() async throws {
+        try await populateSwiftPerson()
+        let realm = try openFlexibleSyncRealm()
+
+        let _ = try await realm.objects(SwiftPerson.self).where { $0.age >= 8 }.subscribe(name: "first_named")
+        var results = try await realm.objects(SwiftPerson.self).where { $0.age >= 8 }.subscribe(name: "second_named")
+        // expect `results` associatedSubscription to be reassigned to the id which matches the unnamed subscription
+        results = try await realm.objects(SwiftPerson.self).where { $0.age >= 8 }.subscribe()
+        XCTAssertEqual(realm.subscriptions.count, 3)
+
+        results.unsubscribe()
+        // so the two named subcsriptions remain.
+        XCTAssertEqual(realm.subscriptions.count, 2)
+        XCTAssertEqual(realm.subscriptions[0]!.name, "first_named")
+        XCTAssertEqual(realm.subscriptions[1]!.name, "second_named")
     }
 
     @MainActor
@@ -1621,24 +1659,6 @@ extension SwiftFlexibleSyncServerTests {
         XCTAssertEqual(realm.subscriptions.state, .complete)
     }
 #endif
-
-    @MainActor
-    func testSubscribeAndUpdateBlock() async throws {
-        try await populateSwiftPerson()
-        let realm = try openFlexibleSyncRealm()
-
-        let results = try await realm.objects(SwiftPerson.self).where { $0.age >= 8 }.subscribe(name: "8&up")
-        XCTAssertEqual(results.count, 3)
-        let subscriptions = realm.subscriptions
-        XCTAssertEqual(subscriptions.count, 1)
-        let sub = subscriptions.first(named: "8&up")
-        try await subscriptions.update {
-            sub!.updateQuery(toType: SwiftPerson.self, where: { $0.age >= 6 })
-        }
-        XCTAssertEqual(subscriptions.count, 1)
-        XCTAssertEqual(results.count, 3)
-        XCTAssertEqual(realm.objects(SwiftPerson.self).count, 5)
-    }
 
     // MARK: - Custom Column
 
