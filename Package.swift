@@ -98,10 +98,10 @@ func objectServerTestTarget(name: String, sources: [String]) -> Target {
 let package = Package(
     name: "Realm",
     platforms: [
-        .macOS(.v10_10),
+        .macOS(.v10_13),
         .iOS(.v11),
-        .tvOS(.v9),
-        .watchOS(.v2)
+        .tvOS(.v11),
+        .watchOS(.v4)
     ],
     products: [
         .library(

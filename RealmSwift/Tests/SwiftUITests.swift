@@ -16,7 +16,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#if !(os(iOS) && (arch(i386) || arch(arm)))
 import XCTest
 import RealmSwift
 import SwiftUI
@@ -938,4 +937,3 @@ class SwiftUITests: TestCase {
         XCTAssertEqual(objectSectionedResults.wrappedValue[0][0].str, "foo")
     }
 }
-#endif

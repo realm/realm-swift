@@ -125,27 +125,14 @@ Pod::Spec.new do |s|
                                 'CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF' => 'NO',
                                 'OTHER_CPLUSPLUSFLAGS' => '-isystem "${PODS_ROOT}/Realm/include/core" -fvisibility-inlines-hidden',
                                 'OTHER_CPLUSPLUSFLAGS[arch=armv7]' => '-isystem "${PODS_ROOT}/Realm/include/core" -fvisibility-inlines-hidden -fno-aligned-new',
-                                'USER_HEADER_SEARCH_PATHS' => '"${PODS_ROOT}/Realm/include" "${PODS_ROOT}/Realm/include/Realm"',
-
-                                'IPHONEOS_DEPLOYMENT_TARGET_1300' => '9.0',
-                                'IPHONEOS_DEPLOYMENT_TARGET_1400' => '11.0',
-                                'IPHONEOS_DEPLOYMENT_TARGET' => '$(IPHONEOS_DEPLOYMENT_TARGET_$(XCODE_VERSION_MAJOR))',
-                                'MACOSX_DEPLOYMENT_TARGET_1300' => '10.9',
-                                'MACOSX_DEPLOYMENT_TARGET_1400' => '10.13',
-                                'MACOSX_DEPLOYMENT_TARGET' => '$(MACOSX_DEPLOYMENT_TARGET_$(XCODE_VERSION_MAJOR))',
-                                'WATCHOS_DEPLOYMENT_TARGET_1300' => '2.0',
-                                'WATCHOS_DEPLOYMENT_TARGET_1400' => '4.0',
-                                'WATCHOS_DEPLOYMENT_TARGET' => '$(WATCHOS_DEPLOYMENT_TARGET_$(XCODE_VERSION_MAJOR))',
-                                'TVOS_DEPLOYMENT_TARGET_1300' => '9.0',
-                                'TVOS_DEPLOYMENT_TARGET_1400' => '11.0',
-                                'TVOS_DEPLOYMENT_TARGET' => '$(TVOS_DEPLOYMENT_TARGET_$(XCODE_VERSION_MAJOR))',
+                                'USER_HEADER_SEARCH_PATHS' => '"${PODS_ROOT}/Realm/include" "${PODS_ROOT}/Realm/include/Realm"'
                               }
   s.preserve_paths          = %w(include scripts)
 
-  s.ios.deployment_target   = '9.0'
-  s.osx.deployment_target   = '10.9'
-  s.watchos.deployment_target = '2.0'
-  s.tvos.deployment_target = '9.0'
+  s.ios.deployment_target   = '11.0'
+  s.osx.deployment_target   = '10.13'
+  s.watchos.deployment_target = '4.0'
+  s.tvos.deployment_target = '11.0'
 
   s.vendored_frameworks  = 'core/realm-monorepo.xcframework'
 

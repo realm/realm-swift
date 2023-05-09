@@ -274,7 +274,6 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
     }
 }
 
-#if canImport(_Concurrency)
 @available(macOS 12.0, *)
 extension SwiftSyncTestCase {
     public func basicCredentials(usernameSuffix: String = "", app: App? = nil) async throws -> Credentials {
@@ -303,7 +302,6 @@ extension SwiftSyncTestCase {
         return realm
     }
 }
-#endif // swift(>=5.6)
 
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 public extension Publisher {

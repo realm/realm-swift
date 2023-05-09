@@ -35,9 +35,6 @@
 #import <Availability.h>
 
 static void recordFailure(XCTestCase *self, NSString *message, NSString *fileName, NSUInteger lineNumber) {
-#ifndef __MAC_10_16
-    [self recordFailureWithDescription:message inFile:fileName atLine:lineNumber expected:NO];
-#else
     XCTSourceCodeLocation *loc = [[XCTSourceCodeLocation alloc] initWithFilePath:fileName lineNumber:lineNumber];
     XCTIssue *issue = [[XCTIssue alloc] initWithType:XCTIssueTypeAssertionFailure
                                   compactDescription:message
@@ -46,7 +43,6 @@ static void recordFailure(XCTestCase *self, NSString *message, NSString *fileNam
                                      associatedError:nil
                                          attachments:@[]];
     [self recordIssue:issue];
-#endif
 }
 
 void RLMAssertThrowsWithReasonMatchingSwift(XCTestCase *self,

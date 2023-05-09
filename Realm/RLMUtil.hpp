@@ -290,11 +290,6 @@ static inline bool numberIsDouble(__unsafe_unretained NSNumber *const obj) {
            data_type == *@encode(unsigned long long);
 }
 
-// The actual condition here is iOS >= 10.0 (or equivalent), but doing runtime
-// checking eliminates a lot of the benefit of using os_unfair_lock (better perf
-// and less storage required), so only use os_unfair_lock when our minimum
-// deployment target is high enough
-#if __clang_major__ >= 14
 class RLMUnfairMutex {
 public:
     RLMUnfairMutex() = default;
@@ -316,8 +311,5 @@ private:
     RLMUnfairMutex(RLMUnfairMutex const&) = delete;
     RLMUnfairMutex& operator=(RLMUnfairMutex const&) = delete;
 };
-#else
-using RLMUnfairMutex = std::mutex;
-#endif
 
 RLM_HIDDEN_END

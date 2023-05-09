@@ -1,10 +1,9 @@
-xcodeVersions = ['13.4.1', '14.1', '14.2', '14.3.1']
+xcodeVersions = ['14.1', '14.2', '14.3', '14.3.1']
 platforms = ['osx', 'ios', 'watchos', 'tvos', 'catalyst']
 carthagePlatforms = ['osx', 'ios', 'watchos', 'tvos']
 platformNames = ['osx': 'macOS', 'ios': 'iOS', 'watchos': 'watchOS', 'tvos': 'tvOS', 'catalyst': 'Catalyst']
-carthageXcodeVersion = '14.3.1'
-objcXcodeVersion = '13.4.1'
-docsSwiftVersion = '5.8.1'
+carthageXcodeVersion = '14.3'
+docsSwiftVersion = '5.8'
 
 def installationTest(platform, test, language) {
   return {
@@ -121,7 +120,7 @@ def doBuild() {
         node('osx') {
           deleteDir()
           unstash 'source'
-          sh "REALM_XCODE_VERSION=${objcXcodeVersion} ./build.sh package-ios-static"
+          sh "REALM_XCODE_VERSION=${carthageXcodeVersion} ./build.sh package-ios-static"
           dir("build/ios-static") {
             stash includes: "realm-framework-ios-static.zip", name: "ios-static"
           }
@@ -199,15 +198,14 @@ def doBuild() {
           deleteDir()
 
           for (def platform in platforms) {
-            unstash "${platform}-${objcXcodeVersion}"
+            unstash "${platform}-${carthageXcodeVersion}"
           }
 
-          unstash "watchos-14.1"
           unstash 'ios-static'
           unstash 'examples'
           unstash 'source'
 
-          sh "REALM_XCODE_VERSION=${objcXcodeVersion} ./build.sh package-release objc"
+          sh "REALM_XCODE_VERSION=${carthageXcodeVersion} ./build.sh package-release objc"
           stash includes: 'realm-objc-*.zip', name: 'objc-packaged'
           archiveArtifacts artifacts: 'realm-objc-*.zip'
         }

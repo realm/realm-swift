@@ -609,7 +609,6 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
         return XCTestSuite(name: "\(type(of: self))")
     }
 
-    @MainActor // for Xcode 13; 14 inherits it properly from the class
     override func tearDown() {
         cancellables.forEach { $0.cancel() }
         cancellables = []

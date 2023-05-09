@@ -18,7 +18,7 @@
 
 #import <XCTest/XCTest.h>
 
-#if __clang_major__ >= 13 && (!TARGET_OS_IOS || __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_14_0)
+#if !TARGET_OS_IOS || __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_14_0
 #define RLMConstantInt "NSConstantIntegerNumber"
 #define RLMConstantDouble "NSConstantDoubleNumber"
 #define RLMConstantFloat "NSConstantFloatNumber"

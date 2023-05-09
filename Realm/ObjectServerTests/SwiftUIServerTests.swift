@@ -37,7 +37,6 @@ class SwiftUIServerTests: SwiftSyncTestCase {
         return userConfiguration
     }
 
-    @MainActor // for Xcode 13; 14 inherits it properly from the class
     override func tearDown() {
         cancellables.forEach { $0.cancel() }
         cancellables = []

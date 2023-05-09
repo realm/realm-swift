@@ -18,9 +18,7 @@
 
 import Realm
 import Realm.Private
-#if canImport(Combine)
 import Combine
-#endif
 
 private protocol AnyProjected {
     var projectedKeyPath: AnyKeyPath { get }
@@ -714,7 +712,6 @@ extension Projection: ThreadConfined where Root: ThreadConfined {
     }
 }
 
-#if canImport(Combine)
 // MARK: - RealmSubscribable
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension ProjectionObservable {
@@ -737,7 +734,7 @@ extension ProjectionObservable {
         return observe(keyPaths: [PartialKeyPath<Self>](), { _ in _ = subscriber.receive() })
     }
 }
-#if !(os(iOS) && (arch(i386) || arch(arm)))
+
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Projection: ObservableObject, RealmSubscribable where Root: ThreadConfined {
     /// A publisher that emits Void each time the projection changes.
@@ -747,9 +744,6 @@ extension Projection: ObservableObject, RealmSubscribable where Root: ThreadConf
         RealmPublishers.WillChange(self)
     }
 }
-#endif // !(os(iOS) && (arch(i386) || arch(arm)))
-
-#endif // canImport(Combine)
 
 // MARK: Implementation
 
@@ -782,17 +776,6 @@ private func createLock() -> NSLocking {
     }
     return NSLock()
 }
-
-// withLock() was added in Xcode 14.1
-#if compiler(<5.7.1)
-extension NSLocking {
-    func withLock<R>(_ body: () throws -> R) rethrows -> R {
-        lock()
-        defer { unlock() }
-        return try body()
-    }
-}
-#endif
 
 // A property wrapper which unsafely disables concurrency checking for a property
 // This is required when a property is guarded by something which concurrency

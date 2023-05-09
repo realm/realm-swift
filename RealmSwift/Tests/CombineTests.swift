@@ -16,7 +16,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#if !(os(iOS) && (arch(i386) || arch(arm)))
 import XCTest
 import Combine
 import Realm.Private
@@ -4108,4 +4107,3 @@ class CombineAsyncRealmTests: CombinePublisherTestCase {
         wait(for: [exp], timeout: 3)
     }
 }
-#endif // canImport(Combine)

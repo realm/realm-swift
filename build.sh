@@ -1129,15 +1129,6 @@ case "$COMMAND" in
                 unzip "${WORKSPACE}/realm-framework-${platform}-${REALM_XCODE_VERSION}.zip" -d "${extract_dir}/${platform}"
             done
 
-            # Add the arm64 slice to the watchOS library
-            # The arm64 arch was added in Xcode 14, but we need the other
-            # slices to be built with Xcode 13 so that they have bitcode.
-            unzip "${WORKSPACE}/realm-framework-watchos-14.1.zip" -d "${extract_dir}/watchos"
-            lipo "${extract_dir}/watchos/swift-14.1/Realm.xcframework/watchos-arm64_arm64_32_armv7k/Realm.framework/Realm" -thin arm64 -output watchos-arm64-slice
-            lipo "${extract_dir}/watchos/swift-${REALM_XCODE_VERSION}/Realm.xcframework/watchos-arm64_32_armv7k/Realm.framework/Realm" watchos-arm64-slice -create -output watchos-fat
-            mv watchos-fat "${extract_dir}/watchos/swift-${REALM_XCODE_VERSION}/Realm.xcframework/watchos-arm64_32_armv7k/Realm.framework/Realm"
-            rm -r "${extract_dir}/watchos/swift-14.1"
-
             find "${extract_dir}" -name 'Realm.framework' \
                 | sed 's/.*/-framework &/' \
                 | xargs xcodebuild -create-xcframework -allow-internal-distribution -output "${package_dir}/Realm.xcframework"
@@ -1276,7 +1267,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 14.3.
 * CocoaPods: 1.10 or later.
-* Xcode: 13.4-14.3.1.
+* Xcode: 14.1-14.3.1.
 
 ### Internal
 * Upgraded realm-core from ? to ?

@@ -18,19 +18,10 @@
 
 #import <Foundation/Foundation.h>
 
-#ifdef NS_HEADER_AUDIT_BEGIN
 #define RLM_HEADER_AUDIT_BEGIN NS_HEADER_AUDIT_BEGIN
 #define RLM_HEADER_AUDIT_END NS_HEADER_AUDIT_END
-#else
-#define RLM_HEADER_AUDIT_BEGIN(...) NS_ASSUME_NONNULL_BEGIN
-#define RLM_HEADER_AUDIT_END(...) NS_ASSUME_NONNULL_END
-#endif
 
-#ifdef NS_SWIFT_SENDABLE
 #define RLM_SWIFT_SENDABLE NS_SWIFT_SENDABLE
-#else
-#define RLM_SWIFT_SENDABLE
-#endif
 
 #define RLM_FINAL __attribute__((objc_subclassing_restricted))
 
