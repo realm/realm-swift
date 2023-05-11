@@ -173,9 +173,9 @@ public typealias WaitForSyncMode = RLMWaitForSyncMode
     }
 #endif
 
-    public func unsubscribe() -> Bool {
+    public func unsubscribe() {
         let rlmResults = ObjectiveCSupport.convert(object: self)
-        return rlmResults.__unsubscribe()
+        rlmResults.__unsubscribe()
     }
 
 }

@@ -1490,13 +1490,16 @@ extension SwiftFlexibleSyncServerTests {
     }
 
     @MainActor
-    // TODO: rewrite test
-    func testUnsubscribeWihtoutSubscription() async throws {
+    func testUnsubscribeWithoutSubscription() async throws {
         try await populateSwiftPerson()
         let realm = try openFlexibleSyncRealm()
 
+        let _ = try await realm.objects(SwiftPerson.self).where { $0.age >= 8 }.subscribe(name: "sub1")
+        XCTAssertEqual(realm.subscriptions.count, 1)
         let results = realm.objects(SwiftPerson.self).where { $0.age >= 8 }
         results.unsubscribe()
+        XCTAssertEqual(realm.subscriptions.count, 1)
+        XCTAssertEqual(realm.subscriptions.first!.name, "sub1")
     }
 
     @MainActor
@@ -1513,7 +1516,7 @@ extension SwiftFlexibleSyncServerTests {
         XCTAssertEqual(realm.subscriptions.count, 2)
         XCTAssertEqual(realm.subscriptions[0]!.name, nil)
         XCTAssertEqual(realm.subscriptions[1]!.name, "first_named")
-        results.unsubscribe() // check a second time to ensure that a non-associated subscription is removed when the associated_subscription doesn't exist.
+        results.unsubscribe() // check again for case when subscription doesn't exist
         XCTAssertEqual(realm.subscriptions.count, 2)
         XCTAssertEqual(realm.subscriptions[0]!.name, nil)
         XCTAssertEqual(realm.subscriptions[1]!.name, "first_named")
@@ -1535,6 +1538,18 @@ extension SwiftFlexibleSyncServerTests {
         XCTAssertEqual(realm.subscriptions.count, 2)
         XCTAssertEqual(realm.subscriptions[0]!.name, "first_named")
         XCTAssertEqual(realm.subscriptions[1]!.name, "second_named")
+    }
+
+    @MainActor
+    func testUnsubscribeIdenticalFilter() async throws {
+        try await populateSwiftPerson()
+        let realm = try openFlexibleSyncRealm()
+
+        let _ = try await realm.objects(SwiftPerson.self).where { $0.age >= 8 }.subscribe()
+        let results2 = realm.objects(SwiftPerson.self).where { $0.age >= 8 }
+        XCTAssertEqual(realm.subscriptions.count, 1)
+        results2.unsubscribe()
+        XCTAssertEqual(realm.subscriptions.count, 0)
     }
 
     @MainActor
