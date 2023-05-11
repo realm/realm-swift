@@ -1557,31 +1557,12 @@ extension SwiftFlexibleSyncServerTests {
         try await populateSwiftPerson()
         let realm = try openFlexibleSyncRealm()
 
-        let results = try await realm.objects(SwiftPerson.self).where { $0.age >= 8 }.subscribe(name: "8 and older")
-        let firstCreated = realm.subscriptions.first!.createdAt
+        let results = try await realm.objects(SwiftPerson.self).where { $0.age >= 8 }.subscribe(name: "sameName")
         XCTAssertEqual(realm.subscriptions.count, 1)
         XCTAssertEqual(results.count, 3)
-//        let ex = XCTestExpectation(description: "expect error")
-//        do {
-        _ = try await realm.objects(SwiftTypesSyncObject.self).subscribe(name: "8 or older")
+        _ = try await realm.objects(SwiftTypesSyncObject.self).subscribe(name: "sameName")
         XCTAssertEqual(realm.subscriptions.count, 1)
-        // debug
-        for subscription in realm.subscriptions {
-            print("iterate")
-            print(subscription.name)
-            print(subscription.objectClassName)
-            print(subscription.identifier)
-        }
-        let secondCreated = realm.subscriptions.first!.createdAt
-        XCTAssertNotEqual(firstCreated, secondCreated)
         XCTAssertEqual(results.count, 0)
-//        } catch {
-//            print(error.localizedDescription)
-//            ex.fulfill()
-//        }
-//
-//        XCTAssertEqual(realm.subscriptions.count, 1)
-//        await fulfillment(of: [ex], timeout: 2.0)
     }
     
     @MainActor

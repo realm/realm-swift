@@ -582,15 +582,16 @@ keyPaths:(std::optional<std::vector<std::vector<std::pair<realm::TableKey, realm
     return [self subscribeWithName:name waitForSyncMode:RLMWaitForSyncModeOnCreation onQueue:queue completion:completion];
 }
 
-// TODO: need a completeOnQueue helper func
 - (void)completeOnQueue:(dispatch_queue_t _Nullable)queue
-             completion:(RLMResultsCompletionBlock)completion {
+             completion:(RLMResultsCompletionBlock)completion
+                  error:(NSError *_Nullable)error {
+    RLMResults *ret = (error != nil) ? nil : self;
     if (queue) {
         return dispatch_async(queue, ^{
-            completion(self, nil);
+            completion(ret, error);
         });
     } else {
-        completion(self, nil);
+        completion(ret, error);
     }
 }
 
@@ -602,36 +603,26 @@ keyPaths:(std::optional<std::vector<std::vector<std::pair<realm::TableKey, realm
 
     switch(waitForSyncMode) {
         case RLMWaitForSyncModeOnCreation:
-            // If an existing named sub matches the provided name and local query, return.
+            // If an existing named subscription matches the provided name and local query, return.
             if (name) {
                 RLMSyncSubscription *sub = [subscriptions subscriptionWithName:name];
                 if (sub.stdString == _results.get_query().get_description()) {
-                    if (queue) {
-                        return dispatch_async(queue, ^{
-                            completion(self, nil);
-                        });
-                    }
-                    completion(self, nil);
+                    [self completeOnQueue:queue completion:completion error:nil];
                     return;
                 }
             } else {
                 // otherwise check if an unnamed subscription already exists. Return if it does exist.
                 RLMSyncSubscription *sub = [subscriptions subscriptionWithClassName:self.objectClassName query:_results.get_query()];
                 if (sub != nil && sub.name == nil) {
-                    if (queue) {
-                        return dispatch_async(queue, ^{
-                            completion(self, nil);
-                        });
-                    }
-                    completion(self, nil);
+                    [self completeOnQueue:queue completion:completion error:nil];
                     return;
                 }
             }
-            // No name was provided. No existing unnamed subscription matches the local query.
+            // If no name was provided and no existing unnamed subscription matches.
             // break and create new subscription below.
             break;
         case RLMWaitForSyncModeAlways:
-            // break and continue to [subscriptions updateOnQueue:block:] below
+            // continue to [subscriptions updateOnQueue:block:] below
             break;
         case RLMWaitForSyncModeNever:
             // commit subscription synchronously and return.
@@ -641,12 +632,7 @@ keyPaths:(std::optional<std::vector<std::vector<std::pair<realm::TableKey, realm
                                                                                       query:_results.get_query()
                                                                              updateExisting:true];
             }];
-            if (queue) {
-                return dispatch_async(queue, ^{
-                    completion(self, nil);
-                });
-            }
-            completion(self, nil);
+            [self completeOnQueue:queue completion:completion error:nil];
             return;
     }
 
@@ -656,21 +642,7 @@ keyPaths:(std::optional<std::vector<std::vector<std::pair<realm::TableKey, realm
                                                                               query:_results.get_query()
                                                                      updateExisting:true];
     } onComplete:^(NSError *error) {
-        if (error != nil) {
-            if (queue) {
-                return dispatch_async(queue, ^{
-                    completion(nil, error);
-                });
-            }
-            completion(nil, error);
-        } else {
-            if (queue) {
-                return dispatch_async(queue, ^{
-                    completion(self, nil);
-                });
-            }
-            completion(self, nil);
-        }
+        [self completeOnQueue:queue completion:completion error:error];
     }];
 }
 
