@@ -429,10 +429,27 @@ __attribute__((warn_unused_result));
 #pragma mark - Flexible Sync
 
 // TODO: add more on specific behavior cases once settled
+// TODO: add notice about using removeAllSubscriptions
 /**
  Creates an RLMSyncSubscription matching the RLMResults' local filter.
 
- @param completion The block called after the subscription download is completed. The completion is called according to RLMWaitForSyncModeOnCreation behavior.
+ This method opens a write transaction that creates or updates a subcription.
+ It is advised to *not* use this method to batch multiple subscription changes
+ to the server.
+ For batch updates use `[RLMSyncSubscription update:onComplete:]`.
+
+ After committing the subscription to the realm's local subscription set, the method
+ will wait for downloads according to ``RLMWaitForSyncModeOnCreation`` behavior.
+ @see ``RLMWaitForSyncModeOnCreation`` and ``RLMWaitForSyncMode``
+
+ If `subscribeWithCompletion` is called on a query
+ that's already subscribed to without a name, another subscription is not created.
+ If `subscribeWithCompletion` is called on a query
+ that's already subscribed to with a name, an additional subscription is created without a name.
+
+ @param completion The block called after the subscription download
+ is completed. The completion is called according to
+ RLMWaitForSyncModeOnCreation behavior.
  @see ``RLMWaitForSyncModeOnCreation`` and ``RLMWaitForSyncMode``
  @param queue The queue where the completion disptaches.
  */
@@ -442,9 +459,31 @@ __attribute__((warn_unused_result));
 /**
  Creates an RLMSyncSubscription matching the RLMResults' local filter.
 
+ This method opens a write transaction that creates or updates a subcription.
+ It is advised to *not* use this method to batch multiple subscription changes
+ to the server.
+ For batch updates use `[RLMSyncSubscription update:onComplete:]`.
+
+ After committing the subscription to the realm's local subscription set, the method
+ will wait for downloads according to ``RLMWaitForSyncModeOnCreation`` behavior.
+ @see ``RLMWaitForSyncModeOnCreation`` and ``RLMWaitForSyncMode``
+
+ If `subscribeWithName` is called without a name on a query
+ that's already subscribed to without a name, another subscription is not created.
+ If `subscribeWithName` is called without a name on a query
+ that's already subscribed to with a name, an additional subscription is created without a name.
+ If `subscribeWithName` is called with a name on a query that's
+ already subscribed to without a name, an additional subscription is created
+ with the provided name.
+ If `subscribeWithName` is called with a name that's in use on
+ a different query, the old subscription is updated with the new query.
+ If `subscribeWithName` is called with the same name and
+ query of a different subscription, no new subscription is created.
+
  @param name The name used  to identify the subscription.
  @param queue The queue where the completion disptaches.
- @param completion The block called after the subscription download is completed.The completion is called according to RLMWaitForSyncModeOnCreation behavior.
+ @param completion The block called after the subscription download is
+ completed.The completion is called according to RLMWaitForSyncModeOnCreation behavior.
  @see ``RLMWaitForSyncModeOnCreation`` and ``RLMWaitForSyncMode``
  */
 - (void)subscribeWithName:(NSString *_Nullable)name
@@ -454,10 +493,32 @@ __attribute__((warn_unused_result));
 /**
  Creates an RLMSyncSubscription matching the RLMResults' local filter.
 
+ This method opens a write transaction that creates or updates a subcription.
+ It is advised to *not* use this method to batch multiple subscription changes
+ to the server.
+ For batch updates use `[RLMSyncSubscription update:onComplete:]`.
+
+ After committing the subscription to the realm's local subscription set, the method
+ will wait for downloads according to the `RLMWaitForSyncMode`.
+ @see ``RLMWaitForSyncMode``
+
+ If `subscribeWithName` is called without a name on a query
+ that's already subscribed to without a name, another subscription is not created.
+ If `subscribeWithName` is called without a name on a query
+ that's already subscribed to with a name, an additional subscription is created without a name.
+ If `subscribeWithName` is called with a name on a query that's
+ already subscribed to without a name, an additional subscription is created
+ with the provided name.
+ If `subscribeWithName` is called with a name that's in use on
+ a different query, the old subscription is updated with the new query.
+ If `subscribeWithName` is called with the same name and
+ query of a different subscription, no new subscription is created.
+
  @param name The name used  to identify the subscription.
  @param waitForSyncMode Dictates when the completion handler is called
  @param queue The queue where the completion disptaches.
- @param completion The block called after the subscription download is completed. Return behavior is dictated by the RLMWaitForSyncMode.
+ @param completion The block called after the subscription download is
+ completed. Return behavior is dictated by the RLMWaitForSyncMode.
  @see ``RLMWaitForSyncMode``
  */
 - (void)subscribeWithName:(NSString *_Nullable)name
@@ -468,13 +529,36 @@ __attribute__((warn_unused_result));
 /**
  Creates an RLMSyncSubscription matching the RLMResults' local filter.
 
+ This method opens a write transaction that creates or updates a subcription.
+ It is advised to *not* use this method to batch multiple subscription changes
+ to the server.
+ For batch updates use `[RLMSyncSubscription update:onComplete:]`.
+
+ After committing the subscription to the realm's local subscription set, the method
+ will wait for downloads according to the `RLMWaitForSyncMode`.
+ @see ``RLMWaitForSyncMode``
+
+ If `subscribeWithName` is called without a name on a query
+ that's already subscribed to without a name, another subscription is not created.
+ If `subscribeWithName` is called without a name on a query
+ that's already subscribed to with a name, an additional subscription is created without a name.
+ If `subscribeWithName` is called with a name on a query that's
+ already subscribed to without a name, an additional subscription is created
+ with the provided name.
+ If `subscribeWithName` is called with a name that's in use on
+ a different query, the old subscription is updated with the new query.
+ If `subscribeWithName` is called with the same name and
+ query of a different subscription, no new subscription is created.
+
  @param name The name used  to identify the subscription.
  @param waitForSyncMode Dictates when the completion handler is called
  @param queue The queue where the completion disptaches.
- @param timeout A timeout which ends waiting for downloads via the completion handler.
- If the timeout is exceeded the completion handler returns an `RLMErrorClientTimeout`.
+ @param timeout A timeout which ends waiting for downloads
+ via the completion handler. If the timeout is exceeded the completion
+ handler returns an `RLMErrorClientTimeout`.
  @see ``RLMErrorClientTimeout``
- @param completion The block called after the subscription download is completed. Return behavior is dictated by the RLMWaitForSyncMode.
+ @param completion The block called after the subscription download is
+ completed. Return behavior is dictated by the RLMWaitForSyncMode.
  @see ``RLMWaitForSyncMode``
  */
 - (void)subscribeWithName:(NSString *_Nullable)name

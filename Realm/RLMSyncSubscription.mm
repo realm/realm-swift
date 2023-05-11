@@ -480,18 +480,9 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
 }
 
 - (void)removeSubscription:(RLMSyncSubscription *)subscription {
-    [self verifyInWriteTransaction];
-
-    for (auto it = _mutableSubscriptionSet->begin(); it != _mutableSubscriptionSet->end();) {
-        if (it->id == subscription.identifier.value) {
-            it = _mutableSubscriptionSet->erase(it);
-            return;
-        }
-        it++;
-    }
+    [self removeSubscriptionWithId:subscription.identifier];
 }
 
-// TODO: collapse removeSubscription impl into this onceyou know it works.
 - (void)removeSubscriptionWithId:(RLMObjectId *)objectId {
     [self verifyInWriteTransaction];
 

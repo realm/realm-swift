@@ -159,7 +159,12 @@ public typealias WaitForSyncMode = RLMWaitForSyncMode
     }
     
     // MARK: Flexible Sync
-
+    
+    //TODO: addnote about local filter remains
+    // TODO: add note about flex sync only
+    /**
+     
+     */
 #if canImport(_Concurrency)
     @_unsafeInheritExecutor
     public func subscribe(name: String? = nil, waitForSync: WaitForSyncMode = .onCreation, timeout: TimeInterval? = nil) async throws -> Results<Element> {
