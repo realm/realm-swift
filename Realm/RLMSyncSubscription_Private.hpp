@@ -50,8 +50,7 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 - (nullable RLMSyncSubscription *)subscriptionWithClassName:(NSString *)ObjectClassName
                                                       query:(realm::Query)query;
 
-// TODO: make void
-- (BOOL)removeSubscriptionWithClassName:(NSString *)objectClassName
+- (void)removeSubscriptionWithClassName:(NSString *)objectClassName
                                   query:(realm::Query)query;
 
 - (void)removeSubscriptionWithId:(RLMObjectId *)objectId;

@@ -469,15 +469,14 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
     [self removeSubscriptionWithClassName:objectClassName query:query];
 }
 
-- (BOOL)removeSubscriptionWithClassName:(NSString *)objectClassName
+- (void)removeSubscriptionWithClassName:(NSString *)objectClassName
                                   query:(realm::Query)query {
     [self verifyInWriteTransaction];
 
     auto subscription = _subscriptionSet->find(query);
     if (subscription) {
-        return _mutableSubscriptionSet->erase(query);
+        _mutableSubscriptionSet->erase(query);
     }
-    return false;
 }
 
 - (void)removeSubscription:(RLMSyncSubscription *)subscription {

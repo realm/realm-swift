@@ -583,7 +583,6 @@ keyPaths:(std::optional<std::vector<std::vector<std::pair<realm::TableKey, realm
 }
 
 // TODO: need a completeOnQueue helper func
-
 - (void)completeOnQueue:(dispatch_queue_t _Nullable)queue
              completion:(RLMResultsCompletionBlock)completion {
     if (queue) {
@@ -714,10 +713,13 @@ keyPaths:(std::optional<std::vector<std::vector<std::pair<realm::TableKey, realm
             [subscriptions removeSubscriptionWithId:self.associatedSubscriptionId];
         }];
     } else {
-        [subscriptions update:^{
-            [subscriptions removeSubscriptionWithClassName:self.objectClassName
-                                                     query:_results.get_query()];
-        }];
+        RLMSyncSubscription *sub = [subscriptions subscriptionWithClassName:self.objectClassName query:_results.get_query()];
+        if (sub != nil  && sub.name == nil) {
+            [subscriptions update:^{
+                [subscriptions removeSubscriptionWithClassName:self.objectClassName
+                                                         query:_results.get_query()];
+            }];
+        }
     }
 }
 

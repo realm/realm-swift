@@ -1541,7 +1541,7 @@ extension SwiftFlexibleSyncServerTests {
     }
 
     @MainActor
-    func testUnsubscribeIdenticalFilter() async throws {
+    func testUnsubscribeSameQueryDifferentName() async throws {
         try await populateSwiftPerson()
         let realm = try openFlexibleSyncRealm()
 
@@ -1553,25 +1553,35 @@ extension SwiftFlexibleSyncServerTests {
     }
 
     @MainActor
-    func skip_testSubscribeNameAcrossTypes() async throws {
+    func testSubscribeNameAcrossTypes() async throws {
         try await populateSwiftPerson()
         let realm = try openFlexibleSyncRealm()
 
-        _ = try await realm.objects(SwiftPerson.self).where { $0.age >= 8 }.subscribe(name: "8 and older")
+        let results = try await realm.objects(SwiftPerson.self).where { $0.age >= 8 }.subscribe(name: "8 and older")
+        let firstCreated = realm.subscriptions.first!.createdAt
         XCTAssertEqual(realm.subscriptions.count, 1)
-        let ex = XCTestExpectation(description: "expect error")
-        do {
-            _ = try await realm.objects(SwiftTypesSyncObject.self).subscribe(name: "8 or older")
-        } catch {
-            print(error.localizedDescription)
-            ex.fulfill()
-        }
+        XCTAssertEqual(results.count, 3)
+//        let ex = XCTestExpectation(description: "expect error")
+//        do {
+        _ = try await realm.objects(SwiftTypesSyncObject.self).subscribe(name: "8 or older")
+        XCTAssertEqual(realm.subscriptions.count, 1)
+        // debug
         for subscription in realm.subscriptions {
             print("iterate")
-            print(subscription)
+            print(subscription.name)
+            print(subscription.objectClassName)
+            print(subscription.identifier)
         }
-        XCTAssertEqual(realm.subscriptions.count, 1)
-        await fulfillment(of: [ex], timeout: 2.0)
+        let secondCreated = realm.subscriptions.first!.createdAt
+        XCTAssertNotEqual(firstCreated, secondCreated)
+        XCTAssertEqual(results.count, 0)
+//        } catch {
+//            print(error.localizedDescription)
+//            ex.fulfill()
+//        }
+//
+//        XCTAssertEqual(realm.subscriptions.count, 1)
+//        await fulfillment(of: [ex], timeout: 2.0)
     }
     
     @MainActor
