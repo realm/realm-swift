@@ -298,8 +298,6 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         wait(forState: .connected)
     }
 
-    // TODO: test calling subscribe with partition realm
-
     // MARK: - Client reset
 
     func waitForSyncDisabled(flexibleSync: Bool = false, appServerId: String, syncServiceId: String) {

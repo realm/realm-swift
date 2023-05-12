@@ -23,17 +23,19 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 /// A block type used for APIs which asynchronously return an `RLMResults`.
 typedef void(^RLMResultsCompletionBlock)(RLMResults * _Nullable, NSError * _Nullable);
 
-/**  Determines wait for download behavior when subscribing on RLMResults.
+/**
+ Determines wait for download behavior when subscribing on RLMResults.
+ @see ``[RLMResults subscribeWithName:waitForSyncMode:onQueue:completion:]``
 */
 typedef NS_ENUM(NSUInteger, RLMWaitForSyncMode) {
-    /// A call to subscribe will return once matching objects are downloaded
+    /// `subscribeWithName` will return once matching objects are downloaded
     /// from the server only when the subscription is created the first time. If the
     /// subscriptions already exists, the method will return without waiting for new downloads.
     RLMWaitForSyncModeOnCreation,
-    /// A call to subscribe will always for downloads before returning.
+    /// `subscribeWithName` will always for downloads before returning.
     /// The method will not return in this mode unless an internet connection is established or a timeout is set.
     RLMWaitForSyncModeAlways,
-    /// A call to subscribe will not for downloads before returning.
+    /// `subscribeWithName` will not for downloads before returning.
     RLMWaitForSyncModeNever
 };
 
@@ -428,12 +430,10 @@ __attribute__((warn_unused_result));
 
 #pragma mark - Flexible Sync
 
-// TODO: add more on specific behavior cases once settled
-// TODO: add notice about using removeAllSubscriptions
 /**
  Creates an RLMSyncSubscription matching the RLMResults' local filter.
 
- This method opens a write transaction that creates or updates a subcription.
+ This method opens a write transaction that creates or updates a subscription.
  It is advised to *not* use this method to batch multiple subscription changes
  to the server.
  For batch updates use `[RLMSyncSubscription update:onComplete:]`.
@@ -459,7 +459,7 @@ __attribute__((warn_unused_result));
 /**
  Creates an RLMSyncSubscription matching the RLMResults' local filter.
 
- This method opens a write transaction that creates or updates a subcription.
+ This method opens a write transaction that creates or updates a subscription.
  It is advised to *not* use this method to batch multiple subscription changes
  to the server.
  For batch updates use `[RLMSyncSubscription update:onComplete:]`.
@@ -478,7 +478,7 @@ __attribute__((warn_unused_result));
  If `subscribeWithName` is called with a name that's in use on
  a different query, the old subscription is updated with the new query.
  If `subscribeWithName` is called with the same name and
- query of a different subscription, no new subscription is created.
+ same query of an existing subscription, no new subscription is created.
 
  @param name The name used  to identify the subscription.
  @param queue The queue where the completion disptaches.
@@ -493,7 +493,7 @@ __attribute__((warn_unused_result));
 /**
  Creates an RLMSyncSubscription matching the RLMResults' local filter.
 
- This method opens a write transaction that creates or updates a subcription.
+ This method opens a write transaction that creates or updates a subscription.
  It is advised to *not* use this method to batch multiple subscription changes
  to the server.
  For batch updates use `[RLMSyncSubscription update:onComplete:]`.
@@ -511,8 +511,8 @@ __attribute__((warn_unused_result));
  with the provided name.
  If `subscribeWithName` is called with a name that's in use on
  a different query, the old subscription is updated with the new query.
- If `subscribeWithName` is called with the same name and
- query of a different subscription, no new subscription is created.
+ If `subscribeWithName`is called with the same name and
+ same query of an existing subscription, no new subscription is created.
 
  @param name The name used  to identify the subscription.
  @param waitForSyncMode Dictates when the completion handler is called
@@ -529,7 +529,7 @@ __attribute__((warn_unused_result));
 /**
  Creates an RLMSyncSubscription matching the RLMResults' local filter.
 
- This method opens a write transaction that creates or updates a subcription.
+ This method opens a write transaction that creates or updates a subscription.
  It is advised to *not* use this method to batch multiple subscription changes
  to the server.
  For batch updates use `[RLMSyncSubscription update:onComplete:]`.
@@ -548,7 +548,7 @@ __attribute__((warn_unused_result));
  If `subscribeWithName` is called with a name that's in use on
  a different query, the old subscription is updated with the new query.
  If `subscribeWithName` is called with the same name and
- query of a different subscription, no new subscription is created.
+ same query of an existing subscription, no new subscription is created.
 
  @param name The name used  to identify the subscription.
  @param waitForSyncMode Dictates when the completion handler is called
@@ -567,7 +567,26 @@ __attribute__((warn_unused_result));
                   timeout:(NSTimeInterval)timeout
                completion:(RLMResultsCompletionBlock)completion NS_REFINED_FOR_SWIFT;
 
-// TODO: docs
+/**
+ Removes an RLMSubscription matching the RLMResults' local filter.
+
+ This method opens a write transaction that removes a subscription.
+ It is advised to *not* use this method to batch multiple subscription changes
+ to the server.
+ For batch updates use `[RLMSyncSubscription update:onComplete:]`.
+
+ The method returns after committing the subcsription removal to the
+ realm's local subscription set. Calling this method will not wait for objects to
+ be removed from the realm.
+
+ Calling unsubscribe on a RLMResults does not remove the local filter from the RLMResults.
+ After calling unsubscribe, RLMResults may still contain objects because
+ other subscriptions may exist in the RLMRealm's subscription set.
+
+ In order for a named subscription to be removed, the RLMResults
+ must have previously created the subscription. For example:
+ // TODO: add example
+ */
 - (void)unsubscribe NS_REFINED_FOR_SWIFT;
 
 

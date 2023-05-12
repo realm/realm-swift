@@ -89,16 +89,12 @@ extension Optional: SortableType where Wrapped: SortableType {}
 extension ObjectBase: KeypathSortable {}
 extension Projection: KeypathSortable {}
 
-// TODO: docs
+/**
+ Determines wait for download behavior when subscribing on RLMResults.
+
+ - see: `RLMWaitForSyncMode`
+ */
 public typealias WaitForSyncMode = RLMWaitForSyncMode
-//@frozen public enum WaitForSyncMode: Sendable {
-//    // TODO: docs
-//    case onCreation
-//    // TODO: docs
-//    case always
-//    // TODO: docs
-//    case never
-//}
 
 /**
  `Results` is an auto-updating container type in Realm returned from object queries.
@@ -159,11 +155,30 @@ public typealias WaitForSyncMode = RLMWaitForSyncMode
     }
     
     // MARK: Flexible Sync
-    
-    //TODO: addnote about local filter remains
-    // TODO: add note about flex sync only
+
     /**
-     
+     Creates a SyncSubscription matching the Results' local filter.
+
+     This method opens a write transaction that creates or updates a subscription.
+     It's advised to *not* use this method to batch multiple subscription changes
+     to the server.
+     For batch updates use `SyncSubscription.update`
+
+     After committing the subscription to the realm's local subscription set, the method
+     will wait for downloads according to the `WaitForSyncMode`.
+     - see: ``WaitForSyncMode``
+
+     If `.subscribe()` is called without a name on a query
+     that's already subscribed to without a name, another subscription is not created.
+     If `.subscribe()` is called without a name on a query
+     that's already subscribed to with a name, an additional subscription is created without a name.
+     If `.subscribe()` is called with a name on a query that's
+     already subscribed to without a name, an additional subscription is created
+     with the provided name.
+     If `.subscribe()` is called with a name that's in use on
+     a different query, the old subscription is updated with the new query.
+     If `.subscribe()` is called with the same name and
+     same query of an existing subscription, no new subscription is created.
      */
 #if canImport(_Concurrency)
     @_unsafeInheritExecutor
@@ -177,7 +192,33 @@ public typealias WaitForSyncMode = RLMWaitForSyncMode
         return Results(rlmResults)
     }
 #endif
+    /**
+     Removes a SyncSubscription matching the Results' local filter.
 
+     This method opens a write transaction that removes a subscription.
+     It is advised to *not* use this method to batch multiple subscription changes
+     to the server.
+     For batch updates use `SyncSubscription.update`
+
+     The method returns after committing the subcsription removal to the realm's
+     local subscriptionset. Calling this method will not wait for objects to
+     be removed from the realm.
+
+     Calling unsubscribe on a Results does not remove the local filter from the Results.
+     After calling unsubcsribe, Results may still contain objects because other
+     subscriptions may exist in the realm's subscription set.
+
+     In order for a named subscription to be removed, the Results
+     must have previously created the subscription. For example:
+     ```
+     let results1 = try await realm.objects(Dog.self).where { $0.age > 1 }.subscribe(name: "adults")
+     let results2 = try await realm.objects(Dog.self).where { $0.age > 1 }.subscribe(name: "overOne")
+     let results3 = try await realm.objects(Dog.self).where { $0.age > 1 }.subscribe()
+     // This will unsubscribe from the subscription named "overOne". The "adults" and unnamed
+     // subscription still remain.
+     results2.unsubscribe()
+     ```
+     */
     public func unsubscribe() {
         let rlmResults = ObjectiveCSupport.convert(object: self)
         rlmResults.__unsubscribe()
