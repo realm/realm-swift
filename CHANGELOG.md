@@ -35,6 +35,51 @@ x.y.z Release notes (yyyy-MM-dd)
   storage. ([Core #7201](https://github.com/realm/realm-core/issues/7201))
 * Allow in-memory synced Realms. This will allow setting an in-memory identifier on
   a flexible sync realm.
+* Added initial support for geospatial queries on points.
+  There is no new dedicated type to store Geospatial points, instead points should
+  be stored as ([GeoJson-shaped](https://www.mongodb.com/docs/manual/reference/geojson/)) embedded object, as the example below.
+  ```swift
+  public class Location: EmbeddedObject {
+    @Persisted private var coordinates: List<Double>
+    @Persisted private var type: String = "Point"
+
+    public var latitude: Double { return coordinates[1] }
+    public var longitude: Double { return coordinates[0] }
+
+    convenience init(_ latitude: Double, _ longitude: Double) {
+        self.init()
+        // Longitude comes first in the coordinates array of a GeoJson document
+        coordinates.append(objectsIn: [longitude, latitude])
+    }
+  }
+  ``` 
+  Geospatial queries (`geoWithin`) can only be executed in such a type of objects and 
+  will throw otherwise.
+  The queries can be used to filter objects whose points lie within a certain area, 
+  using the following pre-established shapes (`GeoBox`, `GeoPolygon`, `GeoCircle`).
+  ```swift
+  class Person: Object {
+    @Persisted var name: String
+    @Persisted var location: Location? // GeoJson embedded object
+  }
+  
+  let realm = realmWithTestPath()
+  try realm.write {
+    realm.add(PersonLocation(name: "Maria", location: Location(latitude: 55.6761, longitude: 12.5683)))
+  }
+  
+  let shape = GeoBox(bottomLeft: (55.6281, 12.0826), topRight: (55.6762, 12.5684))!
+  let locations = realm.objects(PersonLocation.self).where { $0.location.geoWithin(shape) })
+  ```
+  A `filter` or `NSPredicate` can be used as well to perform a Geospatial query.
+  ```swift
+  let shape = GeoPolygon(outerRing: [(0, 0), (1, 1), (2, 2), (0, 0)], holes: [[(0, 0), (1, 1), (2, 2), (0, 0)]])!
+  let locations = realm.objects(PersonLocation.self).filter("location IN %@", shape)
+  
+  let arguments = NSMutableArray()
+  arguments.add(shape)
+  let locations = realm.objects(PersonLocation.self).filter(NSPredicate(format: "location IN %@", argumentArray: arguments as? [Any])
+  ```
 
 ### Fixed
 

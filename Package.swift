@@ -26,6 +26,7 @@ let cxxSettings: [CXXSetting] = [
     .define("REALM_VERSION_PATCH", to: String(coreVersion.patch)),
     .define("REALM_VERSION_EXTRA", to: "\"\(coreVersion.prereleaseIdentifiers.first ?? "")\""),
     .define("REALM_VERSION_STRING", to: "\"\(coreVersion)\""),
+    .define("REALM_ENABLE_GEOSPATIAL", to: "1"),
 ]
 let testCxxSettings: [CXXSetting] = cxxSettings + [
     // Command-line `swift build` resolves header search paths
@@ -203,6 +204,7 @@ let package = Package(
                 "Realm/RLMEmbeddedObject.mm",
                 "Realm/RLMError.mm",
                 "Realm/RLMEvent.mm",
+                "Realm/RLMGeospatial.mm",
                 "Realm/RLMLogger.mm",
                 "Realm/RLMManagedArray.mm",
                 "Realm/RLMManagedDictionary.mm",
