@@ -25,9 +25,6 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 #pragma mark - Subscription
 
 @interface RLMSyncSubscription ()
-//@interface RLMSyncSubscription () {
-//std::unique_ptr<realm::sync::Subscription> _subscription;
-//}
 
 @property (nonatomic, readonly) RLMObjectId *identifier;
 

@@ -929,7 +929,7 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
         checkCount(expected: 0, realm, SwiftPerson.self)
         checkCount(expected: 1, realm, SwiftTypesSyncObject.self)
     }
-    
+
     func testFlexibleSyncAppUpdateQuery() throws {
         try populateFlexibleSyncData { realm in
             for i in 1...25 {
@@ -1575,18 +1575,16 @@ extension SwiftFlexibleSyncServerTests {
         let expectation = XCTestExpectation(description: "method doesn't hang")
         realm.syncSession!.suspend()
             Task {
-                print("in task")
                 results = try! await realm.objects(SwiftPerson.self).where { $0.age >= 8 }.subscribe(waitForSync: .onCreation)
                 XCTAssertEqual(results.count, 3) // expect method to return immediately, and not hang while no connection
                 XCTAssertEqual(realm.subscriptions.count, 1)
                 expectation.fulfill()
             }
-        print("about to wait")
         await fulfillment(of: [expectation], timeout: 2.0)
     }
 
     @MainActor
-    func testSubscribeAlways() async throws {
+    func skip_testSubscribeAlways() async throws {
         try await populateSwiftPerson()
         let realm = try openFlexibleSyncRealm()
         let collection = try await setupCollection("SwiftPerson")

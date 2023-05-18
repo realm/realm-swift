@@ -368,12 +368,10 @@ import Realm.Private
         rlmSyncSubscriptionSet.removeSubscription(withName: named)
     }
 
-    // TODO: update docs
     /**
      Removes all subscriptions from the subscription set.
 
      - parameter unnamedOnly: If true, only unnamed subscriptions are removed.
-
      - warning: This method may only be called during a write subscription block.
      - warning: Removing all subscriptions will result in an error if no new subscription is added. Server should
                 acknowledge at least one subscription.
