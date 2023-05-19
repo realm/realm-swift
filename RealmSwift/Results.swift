@@ -153,9 +153,10 @@ public typealias WaitForSyncMode = RLMWaitForSyncMode
     public func makeIterator() -> RLMIterator<Element> {
         return RLMIterator(collection: collection)
     }
-    
+
     // MARK: Flexible Sync
 
+#if canImport(_Concurrency)
     /**
      Creates a SyncSubscription matching the Results' local filter.
 
@@ -180,7 +181,7 @@ public typealias WaitForSyncMode = RLMWaitForSyncMode
      If `.subscribe()` is called with the same name and
      same query of an existing subscription, no new subscription is created.
      */
-#if canImport(_Concurrency)
+    @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
     @_unsafeInheritExecutor
     public func subscribe(name: String? = nil, waitForSync: WaitForSyncMode = .onCreation, timeout: TimeInterval? = nil) async throws -> Results<Element> {
         var rlmResults = ObjectiveCSupport.convert(object: self)
@@ -188,7 +189,7 @@ public typealias WaitForSyncMode = RLMWaitForSyncMode
             rlmResults = try await rlmResults.__subscribe(withName: name, waitForSyncMode: waitForSync, on: nil)
             return Results(rlmResults)
         }
-        rlmResults = try await rlmResults.__subscribe(withName: name, waitForSyncMode: waitForSync, on:nil, timeout: unwrapped)
+        rlmResults = try await rlmResults.__subscribe(withName: name, waitForSyncMode: waitForSync, on: nil, timeout: unwrapped)
         return Results(rlmResults)
     }
 #endif

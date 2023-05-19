@@ -1409,7 +1409,7 @@ extension SwiftFlexibleSyncServerTests {
         XCTAssertEqual(realm.subscriptions.count, 1)
 
     }
-    
+
     @MainActor
     func testSubscribeSameQuerySameName() async throws {
         try await populateSwiftPerson()
@@ -1494,7 +1494,7 @@ extension SwiftFlexibleSyncServerTests {
         try await populateSwiftPerson()
         let realm = try openFlexibleSyncRealm()
 
-        let _ = try await realm.objects(SwiftPerson.self).where { $0.age >= 8 }.subscribe(name: "sub1")
+        _ = try await realm.objects(SwiftPerson.self).where { $0.age >= 8 }.subscribe(name: "sub1")
         XCTAssertEqual(realm.subscriptions.count, 1)
         let results = realm.objects(SwiftPerson.self).where { $0.age >= 8 }
         results.unsubscribe()
@@ -1507,8 +1507,8 @@ extension SwiftFlexibleSyncServerTests {
         try await populateSwiftPerson()
         let realm = try openFlexibleSyncRealm()
 
-        let _ = try await realm.objects(SwiftPerson.self).where { $0.age >= 8 }.subscribe()
-        let _ = try await realm.objects(SwiftPerson.self).where { $0.age >= 8 }.subscribe(name: "first_named")
+        _ = try await realm.objects(SwiftPerson.self).where { $0.age >= 8 }.subscribe()
+        _ = try await realm.objects(SwiftPerson.self).where { $0.age >= 8 }.subscribe(name: "first_named")
         let results = try await realm.objects(SwiftPerson.self).where { $0.age >= 8 }.subscribe(name: "second_named")
         XCTAssertEqual(realm.subscriptions.count, 3)
 
@@ -1527,7 +1527,7 @@ extension SwiftFlexibleSyncServerTests {
         try await populateSwiftPerson()
         let realm = try openFlexibleSyncRealm()
 
-        let _ = try await realm.objects(SwiftPerson.self).where { $0.age >= 8 }.subscribe(name: "first_named")
+        _ = try await realm.objects(SwiftPerson.self).where { $0.age >= 8 }.subscribe(name: "first_named")
         var results = try await realm.objects(SwiftPerson.self).where { $0.age >= 8 }.subscribe(name: "second_named")
         // expect `results` associatedSubscription to be reassigned to the id which matches the unnamed subscription
         results = try await realm.objects(SwiftPerson.self).where { $0.age >= 8 }.subscribe()
@@ -1545,7 +1545,7 @@ extension SwiftFlexibleSyncServerTests {
         try await populateSwiftPerson()
         let realm = try openFlexibleSyncRealm()
 
-        let _ = try await realm.objects(SwiftPerson.self).where { $0.age >= 8 }.subscribe()
+        _ = try await realm.objects(SwiftPerson.self).where { $0.age >= 8 }.subscribe()
         let results2 = realm.objects(SwiftPerson.self).where { $0.age >= 8 }
         XCTAssertEqual(realm.subscriptions.count, 1)
         results2.unsubscribe()
@@ -1564,7 +1564,7 @@ extension SwiftFlexibleSyncServerTests {
         XCTAssertEqual(realm.subscriptions.count, 1)
         XCTAssertEqual(results.count, 0)
     }
-    
+
     @MainActor
     func testSubscribeOnCreation() async throws {
         try await populateSwiftPerson()
@@ -1609,7 +1609,7 @@ extension SwiftFlexibleSyncServerTests {
         XCTAssertEqual(collection.count(filter: [:]).await(self), 11) // continuously fails with different count (usually between 5-10 documents on server). Why? Any alternatives other than polling?
         // Another way to test this is to end the sync session. Wait with .always. Let the server hang, and after an arbitrary wait, end the wait and suceed the test.
         // But that seems like an awful test.
-        
+
         realm.syncSession!.resume()
         XCTAssertEqual(results.count, 2)
         results = try await realm.objects(SwiftPerson.self).where { $0.age >= 9 }.subscribe(waitForSync: .always)
@@ -1643,8 +1643,8 @@ extension SwiftFlexibleSyncServerTests {
         Task {
             let timeout = 2.0
             do {
-                let _ = try await realm.objects(SwiftPerson.self).where { $0.age >= 8 }.subscribe(waitForSync: .always, timeout: timeout)
-            } catch (let error as Realm.Error) {
+                _ = try await realm.objects(SwiftPerson.self).where { $0.age >= 8 }.subscribe(waitForSync: .always, timeout: timeout)
+            } catch let error as Realm.Error {
                 expectation.fulfill()
                 XCTAssertNotNil(error)
                 XCTAssertEqual(error.localizedDescription, "Waiting for subscribed data timed out after \(timeout) seconds.")
