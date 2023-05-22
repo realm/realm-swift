@@ -156,7 +156,7 @@ public typealias WaitForSyncMode = RLMWaitForSyncMode
 
     // MARK: Flexible Sync
 
-#if canImport(_Concurrency)
+#if swift(>=5.8)
     /**
      Creates a SyncSubscription matching the Results' local filter.
 
