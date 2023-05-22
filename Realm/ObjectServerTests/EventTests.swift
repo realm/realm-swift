@@ -547,7 +547,7 @@ class SwiftEventTests: SwiftSyncTestCase {
     }
 
     func testErrorHandler() throws {
-        var config = try self.config()
+        var config = self.config()
         let blockCalled = Locked(false)
         let ex = expectation(description: "Error callback called")
         config.eventConfiguration?.errorHandler = { error in

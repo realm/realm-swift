@@ -8,10 +8,45 @@ supported version.
 * Adjust the error message for private `Object` subclasses and subclasses
   nested inside other types to explain how to make them work rather than state
   that it's impossible. ([#5662](https://github.com/realm/realm-cocoa/issues/5662)).
+* Improve performance of SectionedResults. With a single section it is now ~10%
+  faster, and the runtime of sectioning no longer scales significantly with
+  section count, giving >100% speedups when there are large numbers of sections
+  ([Core #6606](https://github.com/realm/realm-core/pull/6606)).
+* Very slightly improve performance of runtime thread checking on the main
+  thread. ([Core #6606](https://github.com/realm/realm-core/pull/6606))
 
 ### Fixed
 * Allow support for implicit boolean queries on Swift's Type Safe Queries API
   ([#8212](https://github.com/realm/realm-swift/issues/8212)).
+* Fixed a fatal error (reported to the sync error handler) during client reset
+  or automatic partition-based to flexible sync migration if the reset has been
+  triggered during an async open and the schema being applied has added new
+  classes. Due to this bug automatic flexibly sync migration has been disabled
+  for older releases and this is now the minimum version required.
+  ([#6601](https://github.com/realm/realm-core/issues/6601), since automatic
+  client resets were introduced in v10.25.0)
+* Dictionaries sometimes failed to map unresolved links to nil. If the target
+  of a link in a dictionary was deleted by another sync client, reading that
+  field from the dictionary would sometimes give an invalid object rather than
+  nil. In addition, queries on dictionaries would sometimes have incorrect
+  results. ([Core #6644](https://github.com/realm/realm-core/pull/6644), since v10.8.0)
+* Older versions of Realm would sometimes fail to properly mark objects as
+  being the target of an incoming link from another object. When this happened,
+  deleting the target object would hit an assertion failure due to the
+  inconsistent state. We now reconstruct a valid state rather than crashing.
+  ([Core #6585](https://github.com/realm/realm-core/issues/6585), since v5.0.0)
+* Fix several UBSan failures which did not appear to result in functional bugs
+  ([Core #6649](https://github.com/realm/realm-core/pull/6649)).
+* Using both synchronous and asynchronous transactions on the same thread or
+  scheduler could hit the assertion failure "!realm.is_in_transaction()" if one
+  of the callbacks for an asynchronous transaction happened to be scheduled
+  during a synchronous transaction
+  ([Core #6659](https://github.com/realm/realm-core/issues/6659), since v10.26.0)
+* The stored deployment location for Apps was not being updated correctly after
+  receiving a redirect response from the server, resulting in every connection
+  attempting to connect to the old URL and getting redirected rather than only
+  the first connection after the deployment location changed.
+  ([Core #6630](https://github.com/realm/realm-core/issues/6630), since v10.38.2)
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
@@ -23,7 +58,7 @@ supported version.
 * Xcode: 14.1-14.3.1.
 
 ### Internal
-* Upgraded realm-core from ? to ?
+* Upgraded realm-core from 13.10.1 to 13.13.0.
 
 10.39.1 Release notes (2023-05-05)
 =============================================================
