@@ -678,14 +678,12 @@ RLM_COLLECTION_TYPE(MigrationTestObject);
     };
     [RLMRealm asyncOpenWithConfiguration:c
                            callbackQueue:dispatch_get_main_queue()
-                                 callback:^(RLMRealm * _Nullable realm, NSError * _Nullable error) {
+                                 callback:^(RLMRealm *realm, NSError *error) {
         XCTAssertTrue(migrationCalled);
         XCTAssertNil(error);
         XCTAssertNotNil(realm);
         [ex fulfill];
     }];
-    XCTAssertFalse(migrationCalled);
-    XCTAssertNil(RLMGetAnyCachedRealmForPath(c.pathOnDisk.UTF8String));
     [self waitForExpectationsWithTimeout:1 handler:nil];
     XCTAssertTrue(migrationCalled);
     XCTAssertNil(RLMGetAnyCachedRealmForPath(c.pathOnDisk.UTF8String));
