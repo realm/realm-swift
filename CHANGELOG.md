@@ -4,11 +4,17 @@ x.y.z Release notes (yyyy-MM-dd)
 Replace Xcode 14.3 binaries with 14.3.1, which has important bug fixes for Swift Concurrency.
 
 ### Enhancements
-* None.
+* Partition-Based to Flexible Sync Migration for migrating a client app that uses 
+  partition based sync to use flexible sync under the hood if the server has been 
+  migrated to flexible sync is officially supported with this release. Any clients 
+  using an older version of Realm (including the original support released in Core 13.10.0) 
+  will receive a "switch to flexible sync" error message when trying to sync with the app.
+  ([Core PR #6554](https://github.com/realm/realm-core/issues/6554)).
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
-* None.
+* Prevent crashing on `Results.freeze` if underlying object or table were removed by making 
+  `Results.isInvalidated` correctly report its state.
+  ([Core #6401](https://github.com/realm/realm-core/issues/6401)).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
@@ -20,7 +26,7 @@ Replace Xcode 14.3 binaries with 14.3.1, which has important bug fixes for Swift
 * Xcode: 13.4-14.3.1.
 
 ### Internal
-* Upgraded realm-core from ? to ?
+* Upgraded realm-core from 13.10.1 to 13.11.0.
 
 10.39.1 Release notes (2023-05-05)
 =============================================================
