@@ -146,6 +146,8 @@ std::shared_ptr<realm::util::Logger> RLMWrapLogFunction(RLMSyncLogFunction fn) {
                          RLMStringDataWithNSString(REALM_COCOA_VERSION));
         config.user_agent_application_info = RLMStringDataWithNSString(appId);
     }
+    // Session multiplexing is currently broken and causes use-after-frees
+    config.multiplex_sessions = false;
 
     return config;
 }

@@ -61,11 +61,11 @@ auto translateErrors(Function&& f) {
     return self;
 }
 
-- (NSArray<NSIndexPath *> *)indexesFromIndexMap:(std::map<size_t, realm::IndexSet> const&)indexMap {
+- (NSArray<NSIndexPath *> *)indexesFromVector:(std::vector<realm::IndexSet> const&)indexMap {
     NSMutableArray<NSIndexPath *> *a = [NSMutableArray new];
-    for (auto& [section_idx, indices] : indexMap) {
-        NSUInteger path[2] = {section_idx, 0};
-        for(auto index : indices.as_indexes()) {
+    for (size_t i = 0; i < indexMap.size(); ++i) {
+        NSUInteger path[2] = {i, 0};
+        for (auto index : indexMap[i].as_indexes()) {
             path[1] = index;
             [a addObject:[NSIndexPath indexPathWithIndexes:path length:2]];
         }
@@ -74,15 +74,15 @@ auto translateErrors(Function&& f) {
 }
 
 - (NSArray<NSIndexPath *> *)insertions {
-    return [self indexesFromIndexMap:_indices.insertions];
+    return [self indexesFromVector:_indices.insertions];
 }
 
 - (NSArray<NSIndexPath *> *)deletions {
-    return [self indexesFromIndexMap:_indices.deletions];
+    return [self indexesFromVector:_indices.deletions];
 }
 
 - (NSArray<NSIndexPath *> *)modifications {
-    return [self indexesFromIndexMap:_indices.modifications];
+    return [self indexesFromVector:_indices.modifications];
 }
 
 - (NSIndexSet *)sectionsToInsert {

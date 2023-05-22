@@ -135,10 +135,6 @@ namespace {
         // Non-Xcode SPM builds can't build for anything but macOS, so this is
         // probably unimportant for now and we can just report "unknown"
         auto processInfo = [NSProcessInfo processInfo];
-        auto platform = [processInfo.environment[@"RUN_DESTINATION_DEVICE_PLATFORM_IDENTIFIER"]
-                         componentsSeparatedByString:@"."].lastObject;
-        RLMNSStringToStdString(_config.device_info.platform,
-                               platform ?: @"unknown");
         RLMNSStringToStdString(_config.device_info.platform_version,
                                [processInfo operatingSystemVersionString] ?: @"unknown");
         RLMNSStringToStdString(_config.device_info.sdk_version, REALM_COCOA_VERSION);
