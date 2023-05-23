@@ -34,6 +34,10 @@ typedef void(^RLMUserNotificationBlock)(RLMUser *);
 /// Subscribe to notifications for this RLMUser.
 - (RLMUserSubscriptionToken *)subscribe:(RLMUserNotificationBlock)block;
 
+- (void)callFunctionWithStringResultNamed:(NSString *)name
+                arguments:(NSArray<id<RLMBSON>> *)arguments
+completionBlock:(RLMCallFunctionStringResultCompletionBlock)completionBlock NS_REFINED_FOR_SWIFT;
+
 - (void)logOut;
 @end
 

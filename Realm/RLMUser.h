@@ -51,6 +51,8 @@ typedef void(^RLMUserCustomDataBlock)(NSDictionary * _Nullable, NSError * _Nulla
 /// A block type for returning from function calls.
 RLM_SWIFT_SENDABLE
 typedef void(^RLMCallFunctionCompletionBlock)(id<RLMBSON> _Nullable, NSError * _Nullable);
+/// A block type for returning from function calls.
+typedef void(^RLMCallFunctionStringResultCompletionBlock)(NSString * _Nullable, NSError * _Nullable);
 
 RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
