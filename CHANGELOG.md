@@ -9,8 +9,8 @@ Replace Xcode 14.3 binaries with 14.3.1, which has important bug fixes for Swift
   that it's impossible. ([#5662](https://github.com/realm/realm-cocoa/issues/5662)).
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
-* None.
+* Allow support for implicit boolean queries on Swift's Type Safe Queries API
+  ([#8212](https://github.com/realm/realm-swift/issues/8212)).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 

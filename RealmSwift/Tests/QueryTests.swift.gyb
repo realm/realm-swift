@@ -34,8 +34,7 @@ import RealmSwift
     import collections
     import itertools
     import sys
-    reload(sys)
-    sys.setdefaultencoding('utf-8')
+
 
     def lowerFirst(str):
         return str[0].lower() + str[1:]
@@ -434,6 +433,29 @@ class QueryTests: TestCase {
         % for property in optProperties:
         validateEqualsNil("${property.colName}", \Query<${property.className}>.${property.colName})
         % end
+    }
+
+    func testImplicitBooleanOperation() {
+        assertQuery(ModernAllTypesObject.self, "boolCol == true", count: 0, { $0.boolCol })
+        assertQuery(ModernAllTypesObject.self, "boolCol == false", count: 1, { !$0.boolCol })
+
+        initLinkedCollectionAggregatesObject()
+        assertQuery(LinkToModernAllTypesObject.self, "object.boolCol == true", count: 0, { $0.object.boolCol })
+        assertQuery(LinkToModernAllTypesObject.self, "object.boolCol == false", count: 1, { !$0.object.boolCol })
+
+        let object = ModernEmbeddedParentObject()
+        let nestedObject = ModernEmbeddedTreeObject1()
+        object.object = nestedObject
+        try! realm.write {
+            realm.add(object)
+        }
+        assertQuery(ModernEmbeddedParentObject.self, "object.bool == true", count: 0, { $0.object.bool })
+        assertQuery(ModernEmbeddedParentObject.self, "object.bool == false", count: 1, { !$0.object.bool })
+
+        assertQuery(ModernAllTypesObject.self, "((intCol == %@) && boolCol == true)", 0, count: 0, { $0.intCol == 0 && $0.boolCol })
+        assertQuery(ModernAllTypesObject.self, "(boolCol == true && (intCol == %@))", 0, count: 0, { $0.boolCol && $0.intCol == 0 })
+        assertQuery(ModernAllTypesObject.self, "((intCol == %@) || boolCol == false)", 0, count: 1, { $0.intCol == 0 || !$0.boolCol })
+        assertQuery(ModernAllTypesObject.self, "(boolCol == false || (intCol == %@))", 0, count: 1, { !$0.boolCol || $0.intCol == 0 })
     }
 
     func testEqualAnyRealmValue() {
