@@ -147,7 +147,7 @@ typedef void(^RLMClientResetAfterBlock)(RLMRealm * _Nonnull beforeFrozen, RLMRea
  Atlas App Services. All classes with a property with this value will be synchronized to the
  Realm.
  */
-@property (nonatomic, readonly) id<RLMBSON> partitionValue;
+@property (nonatomic, readonly, nullable) id<RLMBSON> partitionValue;
 
 /**
  An enum which determines file recovery behavior in the event of a client reset.

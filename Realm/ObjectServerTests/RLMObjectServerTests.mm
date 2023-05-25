@@ -1120,7 +1120,7 @@ static NSString *randomEmail() {
         [self logOutUser:user];
         [self addPersonsToRealm:realm
                         persons:@[[Person john], [Person paul], [Person ringo]]];
-        user = [self logInUserForCredentials:credentials];
+        [self logInUserForCredentials:credentials];
         [self waitForUploadsForRealm:realm];
         CHECK_COUNT(4, Person, realm);
         [realm.syncSession suspend];
@@ -1147,7 +1147,7 @@ static NSString *randomEmail() {
         // Log out the user.
         [self logOutUser:user];
         // Log the user back in.
-        user = [self logInUserForCredentials:credentials];
+        [self logInUserForCredentials:credentials];
 
         RLMRunChildAndWait();
 
@@ -1197,7 +1197,7 @@ static NSString *randomEmail() {
         [self addPersonsToRealm:realm persons:@[[Person john]]];
         CHECK_COUNT(1, Person, realm);
 
-        user = [self logInUserForCredentials:credentials];
+        [self logInUserForCredentials:credentials];
         [self waitForDownloadsForRealm:realm];
         CHECK_COUNT(4, Person, realm);
 
@@ -1303,7 +1303,7 @@ static NSString *randomEmail() {
     CHECK_COUNT(5, Person, realm2);
 
     // Open the Realm again and get the items.
-    realm = [self openRealmForPartitionValue:self.name user:user];
+    [self openRealmForPartitionValue:self.name user:user];
     CHECK_COUNT(5, Person, realm2);
 }
 

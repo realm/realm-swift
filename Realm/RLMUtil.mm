@@ -427,10 +427,9 @@ realm::Mixed RLMObjcToMixedPrimitives(__unsafe_unretained id const value,
         RLMAccessorContext c{objBase->_info ? *objBase->_info : realm->_info[objBase->_objectSchema.className]};
         auto obj = c.unbox<realm::Obj>(value, createPolicy);
         return obj.is_valid() ? realm::Mixed(obj) : realm::Mixed();
-    }, [&](auto t) {
+    }, [&]<typename T>(T *) {
         RLMStatelessAccessorContext c;
-        auto mixed = realm::Mixed(c.unbox<std::decay_t<decltype(*t)>>(value));
-        return mixed;
+        return realm::Mixed(c.unbox<T>(value));
     }, [&](realm::Mixed*) -> realm::Mixed {
         REALM_UNREACHABLE();
     }});

@@ -167,11 +167,8 @@
     XCTAssertThrows([[realm objects:@"" where:@"age > 25"] sortedResultsUsingKeyPath:@"age" ascending:YES], @"missing class name");
 
     // nil class name
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wnonnull"
-    XCTAssertThrows([realm objects:nil where:@"age > 25"], @"nil class name");
-    XCTAssertThrows([[realm objects:nil where:@"age > 25"] sortedResultsUsingKeyPath:@"age" ascending:YES], @"nil class name");
-#pragma clang diagnostic pop
+    XCTAssertThrows([realm objects:self.nonLiteralNil where:@"age > 25"], @"nil class name");
+    XCTAssertThrows([[realm objects:self.nonLiteralNil where:@"age > 25"] sortedResultsUsingKeyPath:@"age" ascending:YES], @"nil class name");
 }
 
 - (void)testPredicateValidUse
@@ -312,7 +309,7 @@
     // malformed keypath operators
     RLMAssertThrowsWithReason([PersonObject objectsWhere:@"@count == 0"],
                               @"Invalid keypath '@count': collection operation '@count' must be applied to a collection");
-    NSPredicate *pred = [NSComparisonPredicate predicateWithLeftExpression:[NSExpression expressionForKeyPath:@"name.@"] rightExpression:[NSExpression expressionForConstantValue:@0] modifier:0 type:NSEqualToPredicateOperatorType options:0];
+    [NSComparisonPredicate predicateWithLeftExpression:[NSExpression expressionForKeyPath:@"name.@"] rightExpression:[NSExpression expressionForConstantValue:@0] modifier:0 type:NSEqualToPredicateOperatorType options:0];
     RLMAssertThrowsWithReason([PersonObject objectsWithPredicate:predicateWithKeyPath(@"children.@")],
                               @"Unsupported collection operation '@'");
     RLMAssertThrowsWithReason([PersonObject objectsWithPredicate:predicateWithKeyPath(@"children@")],
@@ -344,6 +341,7 @@
     RLMAssertThrowsWithReason([PersonObject objectsWhere:@"age BETWEEN {0, age}"], @"must be constant values");
     RLMAssertThrowsWithReason([PersonObject objectsWhere:@"age BETWEEN {0, {1, 10}}"], @"must be constant values");
 
+    NSPredicate *pred;
     pred = [NSPredicate predicateWithFormat:@"age BETWEEN %@", @[@1]];
     RLMAssertThrowsWithReason([PersonObject objectsWithPredicate:pred], @"exactly two objects");
 
@@ -3120,7 +3118,7 @@ static NSData *data(const char *str) {
     [arr.array addObject:[IntObject createInRealm:realm withValue:@[ @2 ]]];
     [arr.array addObject:[IntObject createInRealm:realm withValue:@[ @3 ]]];
 
-    arr = [IntegerArrayPropertyObject createInRealm:realm withValue:@[ @0, @[]]];
+    [IntegerArrayPropertyObject createInRealm:realm withValue:@[ @0, @[]]];
 
     [realm commitWriteTransaction];
 
@@ -3159,7 +3157,7 @@ static NSData *data(const char *str) {
     [set.set addObject:[IntObject createInRealm:realm withValue:@[ @2 ]]];
     [set.set addObject:[IntObject createInRealm:realm withValue:@[ @3 ]]];
 
-    set = [IntegerSetPropertyObject createInRealm:realm withValue:@[ @0, @[]]];
+    [IntegerSetPropertyObject createInRealm:realm withValue:@[ @0, @[]]];
 
     [realm commitWriteTransaction];
 
@@ -3198,7 +3196,7 @@ static NSData *data(const char *str) {
     idpo.dictionary[@"2"] = [IntObject createInRealm:realm withValue:@[ @2 ]];
     idpo.dictionary[@"3"] = [IntObject createInRealm:realm withValue:@[ @3 ]];
 
-    idpo = [IntegerDictionaryPropertyObject createInRealm:realm withValue:@[ @0, @[]]];
+    [IntegerDictionaryPropertyObject createInRealm:realm withValue:@[ @0, @[]]];
 
     [realm commitWriteTransaction];
 
@@ -3237,7 +3235,7 @@ static NSData *data(const char *str) {
     arr = [IntegerArrayPropertyObject createInRealm:realm withValue:@[ @2222, @[] ]];
     [arr.array addObject:[IntObject createInRealm:realm withValue:@[ @100 ]]];
 
-    arr = [IntegerArrayPropertyObject createInRealm:realm withValue:@[ @3333, @[] ]];
+    [IntegerArrayPropertyObject createInRealm:realm withValue:@[ @3333, @[] ]];
 
     [realm commitWriteTransaction];
 
@@ -3306,7 +3304,7 @@ static NSData *data(const char *str) {
     set = [IntegerSetPropertyObject createInRealm:realm withValue:@[ @2222, @[] ]];
     [set.set addObject:[IntObject createInRealm:realm withValue:@[ @100 ]]];
 
-    set = [IntegerSetPropertyObject createInRealm:realm withValue:@[ @3333, @[] ]];
+    [IntegerSetPropertyObject createInRealm:realm withValue:@[ @3333, @[] ]];
 
     [realm commitWriteTransaction];
 
@@ -3375,7 +3373,7 @@ static NSData *data(const char *str) {
     idpo = [IntegerDictionaryPropertyObject createInRealm:realm withValue:@[ @2222, @[] ]];
     idpo.dictionary[@"3"] = [IntObject createInRealm:realm withValue:@[ @100 ]];
 
-    idpo = [IntegerDictionaryPropertyObject createInRealm:realm withValue:@[ @3333, @[] ]];
+    [IntegerDictionaryPropertyObject createInRealm:realm withValue:@[ @3333, @[] ]];
 
     [realm commitWriteTransaction];
 

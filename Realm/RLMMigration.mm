@@ -38,6 +38,8 @@
 using namespace realm;
 
 @implementation RLMMigration {
+    RLMRealm *_oldRealm;
+    RLMRealm *_realm;
     realm::Schema *_schema;
 }
 
@@ -52,11 +54,11 @@ using namespace realm;
 }
 
 - (RLMSchema *)oldSchema {
-    return self.oldRealm.schema;
+    return _oldRealm.schema;
 }
 
 - (RLMSchema *)newSchema {
-    return self.realm.schema;
+    return _realm.schema;
 }
 
 - (void)enumerateObjects:(NSString *)className block:(__attribute__((noescape)) RLMObjectMigrationBlock)block {
