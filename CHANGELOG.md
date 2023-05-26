@@ -1,10 +1,11 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.40.0 Release notes (2023-05-26)
 =============================================================
 
 Drop support for Xcode 13 and add Xcode 14.3.1. Xcode 14.1 is now the minimum
 supported version.
 
 ### Enhancements
+
 * Adjust the error message for private `Object` subclasses and subclasses
   nested inside other types to explain how to make them work rather than state
   that it's impossible. ([#5662](https://github.com/realm/realm-cocoa/issues/5662)).
@@ -16,6 +17,7 @@ supported version.
   thread. ([Core #6606](https://github.com/realm/realm-core/pull/6606))
 
 ### Fixed
+
 * Allow support for implicit boolean queries on Swift's Type Safe Queries API
   ([#8212](https://github.com/realm/realm-swift/issues/8212)).
 * Fixed a fatal error (reported to the sync error handler) during client reset
@@ -48,9 +50,8 @@ supported version.
   the first connection after the deployment location changed.
   ([Core #6630](https://github.com/realm/realm-core/issues/6630), since v10.38.2)
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
-
 ### Compatibility
+
 * Realm Studio: 14.0.1 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 14.3.
@@ -58,6 +59,7 @@ supported version.
 * Xcode: 14.1-14.3.1.
 
 ### Internal
+
 * Upgraded realm-core from 13.10.1 to 13.13.0.
 
 10.39.1 Release notes (2023-05-05)
