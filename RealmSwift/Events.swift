@@ -154,7 +154,6 @@ public struct Events {
     }
 }
 
-#if !(os(iOS) && (arch(i386) || arch(arm)))
 @available(macOS 10.15, watchOS 6.0, iOS 13.0, tvOS 13.0, macCatalyst 13.0, *)
 extension Events.Scope {
     /**
@@ -211,7 +210,6 @@ public extension Events {
         }
     }
 }
-#endif
 
 extension Realm {
     /// Get the event context for the Realm. Will be `nil` unless an

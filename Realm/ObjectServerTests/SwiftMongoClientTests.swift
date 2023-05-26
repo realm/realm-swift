@@ -31,7 +31,6 @@ import RealmSwiftTestSupport
 
 // MARK: - SwiftMongoClientTests
 class SwiftMongoClientTests: SwiftSyncTestCase {
-    @MainActor // for Xcode 13; 14 inherits it properly from the class
     override func tearDown() {
         _ = setupMongoCollection()
         super.tearDown()
@@ -869,7 +868,6 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
 }
 
 // MARK: - AsyncAwaitMongoClientTests
-#if canImport(_Concurrency)
 @available(macOS 12.0, *)
 class AsyncAwaitMongoClientTests: SwiftSyncTestCase {
     override class var defaultTestSuite: XCTestSuite {
@@ -1247,5 +1245,4 @@ class AsyncAwaitMongoClientTests: SwiftSyncTestCase {
     }
 }
 
-#endif // swift(>=5.6)
 #endif // os(macOS)

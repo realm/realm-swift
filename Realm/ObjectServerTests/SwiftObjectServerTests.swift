@@ -2346,7 +2346,6 @@ class CombineObjectServerTests: SwiftSyncTestCase {
 
     var subscriptions: Set<AnyCancellable> = []
 
-    @MainActor // for Xcode 13; 14 inherits it properly from the class
     override func tearDown() {
         subscriptions.forEach { $0.cancel() }
         subscriptions = []
@@ -2928,8 +2927,6 @@ class CombineObjectServerTests: SwiftSyncTestCase {
     }
 }
 
-#if canImport(_Concurrency)
-
 @available(macOS 12.0, *)
 class AsyncAwaitObjectServerTests: SwiftSyncTestCase {
     override class var defaultTestSuite: XCTestSuite {
@@ -3374,5 +3371,4 @@ class AsyncAwaitObjectServerTests: SwiftSyncTestCase {
     }
 }
 
-#endif // swift(>=5.6)
 #endif // os(macOS)

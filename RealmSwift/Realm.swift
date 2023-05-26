@@ -151,7 +151,6 @@ public typealias AsyncTransactionId = RLMAsyncTransactionId
         }))
     }
 
-    #if !(os(iOS) && (arch(i386) || arch(arm)))
     /**
      Asynchronously open a Realm and deliver it to a block on the given queue.
 
@@ -173,7 +172,6 @@ public typealias AsyncTransactionId = RLMAsyncTransactionId
     public static func asyncOpen(configuration: Realm.Configuration = .defaultConfiguration) -> RealmPublishers.AsyncOpenPublisher {
         return RealmPublishers.AsyncOpenPublisher(configuration: configuration)
     }
-    #endif
 
     /**
      A task object which can be used to observe or cancel an async open.
@@ -1171,7 +1169,6 @@ extension Realm {
 /// The type of a block to run for notification purposes when the data in a Realm is modified.
 public typealias NotificationBlock = (_ notification: Realm.Notification, _ realm: Realm) -> Void
 
-#if canImport(_Concurrency)
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 private func shouldAsyncOpen(_ configuration: Realm.Configuration,
                              _ downloadBeforeOpen: Realm.OpenBehavior) -> Bool {
@@ -1493,8 +1490,6 @@ internal extension Actor {
         try await fn(self)
     }
 }
-
-#endif // canImport(_Concurrency)
 
 /**
  Objects which can be fetched from the Realm - Object or Projection

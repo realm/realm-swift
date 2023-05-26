@@ -18,7 +18,6 @@
 
 import Foundation
 
-#if !(os(iOS) && (arch(i386) || arch(arm)))
 import SwiftUI
 import Combine
 import Realm
@@ -1872,9 +1871,6 @@ extension SwiftUIKVO {
     }
 }
 
-// Adding `_Concurrency` flag is the only way to verify
-// if the BASE SDK contains latest framework updates
-#if canImport(_Concurrency)
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
 extension View {
     /// Marks this view as searchable, which configures the display of a search field.
@@ -2443,14 +2439,3 @@ extension View {
         }
     }
 }
-#endif
-#else
-@objc(RLMSwiftUIKVO) internal final class SwiftUIKVO: NSObject {
-    @objc(removeObserversFromObject:) public static func removeObservers(object: NSObject) -> Bool {
-        return false
-    }
-
-    @objc(addObserversToObject:) public static func addObservers(object: NSObject) {
-    }
-}
-#endif

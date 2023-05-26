@@ -18,13 +18,8 @@
 
 #import <Realm/Realm.h>
 
-#if __has_extension(objc_generics)
 #define RLM_GENERIC_ARRAY(CLASS) RLMArray<CLASS *><CLASS>
 #define RLM_GENERIC_SET(CLASS) RLMSet<CLASS *><CLASS>
-#else
-#define RLM_GENERIC_ARRAY(CLASS) RLMArray<CLASS>
-#define RLM_GENERIC_SET(CLASS) RLMSet<CLASS>
-#endif
 
 #pragma mark - Abstract Objects
 #pragma mark -

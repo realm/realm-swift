@@ -30,7 +30,6 @@ class CollectionSyncTestCase: SwiftSyncTestCase {
     var readRealm: Realm!
     var writeRealm: Realm!
 
-    @MainActor // for Xcode 13; 14 inherits it properly from the class
     override func setUp() {
         super.setUp()
 
@@ -44,7 +43,6 @@ class CollectionSyncTestCase: SwiftSyncTestCase {
         }
     }
 
-    @MainActor // for Xcode 13; 14 inherits it properly from the class
     override func tearDown() {
         readRealm = nil
         writeRealm = nil

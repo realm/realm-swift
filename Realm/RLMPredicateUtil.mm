@@ -19,27 +19,6 @@
 
 #include <realm/util/assert.hpp>
 
-// NSConditionalExpressionType is new in OS X 10.11 and iOS 9.0
-#if defined(__MAC_OS_X_VERSION_MIN_REQUIRED)
-#define CONDITIONAL_EXPRESSION_DECLARED (__MAC_OS_X_VERSION_MIN_REQUIRED >= 101100)
-#elif defined(__IPHONE_OS_VERSION_MIN_REQUIRED)
-#define CONDITIONAL_EXPRESSION_DECLARED (__IPHONE_OS_VERSION_MIN_REQUIRED >= 90000)
-#else
-#define CONDITIONAL_EXPRESSION_DECLARED 0
-#endif
-
-#if !CONDITIONAL_EXPRESSION_DECLARED
-
-#define NSConditionalExpressionType 20
-
-@interface NSExpression (NewIn1011And90)
-+ (NSExpression *)expressionForConditional:(NSPredicate *)predicate trueExpression:(NSExpression *)trueExpression falseExpression:(NSExpression *)falseExpression;
-- (NSExpression *)trueExpression;
-- (NSExpression *)falseExpression;
-@end
-
-#endif
-
 namespace {
 
 struct PredicateExpressionTransformer {

@@ -1,7 +1,8 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 
-Replace Xcode 14.3 binaries with 14.3.1, which has important bug fixes for Swift Concurrency.
+Drop support for Xcode 13 and add Xcode 14.3.1. Xcode 14.1 is now the minimum
+supported version.
 
 ### Enhancements
 * Adjust the error message for private `Object` subclasses and subclasses
@@ -19,7 +20,7 @@ Replace Xcode 14.3 binaries with 14.3.1, which has important bug fixes for Swift
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 14.3.
 * CocoaPods: 1.10 or later.
-* Xcode: 13.4-14.3.1.
+* Xcode: 14.1-14.3.1.
 
 ### Internal
 * Upgraded realm-core from ? to ?

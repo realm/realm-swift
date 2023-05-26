@@ -53,15 +53,6 @@ class MigrationTests: TestCase {
         XCTAssertEqual(0, try schemaVersionAtURL(config.fileURL!))
     }
 
-#if swift(<5.7)
-    // Work around pre-Swift 5.7 multiple trailing closures resolution
-    private func testMigration(shouldRun: Bool = true, schemaVersion: UInt64 = 1,
-                               block: MigrationBlock? = nil) throws {
-        try testMigration(shouldRun: shouldRun, schemaVersion: schemaVersion,
-                          block: block, validation: nil)
-    }
-#endif
-
     private func testMigration(shouldRun: Bool = true, schemaVersion: UInt64 = 1,
                                block: MigrationBlock? = nil,
                                validation: ((Realm, RLMSchema) -> Void)? = nil) throws {
