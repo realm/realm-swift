@@ -1354,6 +1354,11 @@ extension SwiftFlexibleSyncServerTests {
 
     // MARK: Subscribe
 
+#if swift(>=5.8)
+//     wait(for:) doesn't work in async functions because it blocks the calling
+//     thread and doesn't let async tasks run. Xcode 14.3 introduced a new async
+//     version of it which does work, but there doesn't appear to be a workaround
+//     for older Xcode versions.
     @MainActor
     func testSubscribe() async throws {
         try await populateSwiftPerson()
@@ -1385,11 +1390,6 @@ extension SwiftFlexibleSyncServerTests {
         XCTAssertEqual(results1.count, 3) // three objects on device because subscription "$0.age >= 8" still exists
     }
 
-#if swift(>=5.8)
-//     wait(for:) doesn't work in async functions because it blocks the calling
-//     thread and doesn't let async tasks run. Xcode 14.3 introduced a new async
-//     version of it which does work, but there doesn't appear to be a workaround
-//     for older Xcode versions.
     @MainActor
     func testSubscribeSameQueryNoName() async throws {
         try await populateSwiftPerson()
