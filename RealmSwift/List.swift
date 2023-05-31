@@ -34,6 +34,7 @@ import Realm.Private
 
  Properties of `List` type defined on `Object` subclasses must be declared as `let` and cannot be `dynamic`.
  */
+
 public final class List<Element: RealmCollectionValue>: RLMSwiftCollectionBase, RealmCollectionImpl {
     internal var lastAccessedNames: NSMutableArray?
 
@@ -114,6 +115,10 @@ public final class List<Element: RealmCollectionValue>: RLMSwiftCollectionBase, 
         rlmArray.add(staticBridgeCast(fromSwift: object) as AnyObject)
     }
 
+    public func append<Element: AnyRealm>(_ object: Element) {
+        rlmArray.add(staticBridgeCast(fromSwift: AnyRealmValue.convert(object)) as AnyObject)
+    }
+
     /**
      Appends the objects in the given sequence to the end of the list.
 
@@ -122,6 +127,14 @@ public final class List<Element: RealmCollectionValue>: RLMSwiftCollectionBase, 
     public func append<S: Sequence>(objectsIn objects: S) where S.Iterator.Element == Element {
         for obj in objects {
             rlmArray.add(staticBridgeCast(fromSwift: obj) as AnyObject)
+        }
+    }
+
+    public func append(objectsIn objects: [Any]) where Element == AnyRealmValue {
+        for obj in objects {
+            if obj is AnyRealm {
+                rlmArray.add(staticBridgeCast(fromSwift: AnyRealmValue.convert(obj)) as AnyObject)
+            }
         }
     }
 
@@ -238,6 +251,13 @@ public final class List<Element: RealmCollectionValue>: RLMSwiftCollectionBase, 
 
     @objc private func descriptionWithMaxDepth(_ depth: UInt) -> String {
         return RLMDescriptionWithMaxDepth("List", _rlmCollection, depth)
+    }
+}
+
+extension List: ExpressibleByArrayLiteral {
+    public convenience init(arrayLiteral elements: Element...) {
+        self.init()
+        elements.forEach { append($0) }
     }
 }
 

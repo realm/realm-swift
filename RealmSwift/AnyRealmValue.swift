@@ -20,8 +20,24 @@
 import Foundation
 import Realm
 
+/// Protocol representing the types that support `AnyRealmValue`
+public protocol AnyRealm {}
+
+extension NSNull: AnyRealm {}
+extension Int: AnyRealm {}
+extension Bool: AnyRealm {}
+extension Float: AnyRealm {}
+extension Double: AnyRealm {}
+extension String: AnyRealm {}
+extension Data: AnyRealm {}
+extension Date: AnyRealm {}
+extension ObjectId: AnyRealm {}
+extension Decimal128: AnyRealm {}
+extension UUID: AnyRealm {}
+extension ObjectBase: AnyRealm {}
+
 /// A enum for storing and retrieving values associated with an `AnyRealmValue` property.
-public enum AnyRealmValue: Hashable {
+public enum AnyRealmValue: AnyRealm, Hashable {
     /// Represents `nil`
     case none
     /// An integer type.
@@ -46,6 +62,36 @@ public enum AnyRealmValue: Hashable {
     case decimal128(Decimal128)
     /// A UUID type.
     case uuid(UUID)
+
+    /// :nodoc:
+    static func convert<T>(_ value: T) -> AnyRealmValue {
+        switch value {
+        case let val as Int:
+            return .int(val)
+        case let val as Bool:
+            return .bool(val)
+        case let val as Float:
+            return .float(val)
+        case let val as Double:
+            return .double(val)
+        case let val as String:
+            return .string(val)
+        case let val as Data:
+            return .data(val)
+        case let val as Date:
+            return .date(val)
+        case let val as Object:
+            return .object(val)
+        case let val as ObjectId:
+            return .objectId(val)
+        case let val as Decimal128:
+            return .decimal128(val)
+        case let val as UUID:
+            return .uuid(val)
+        default:
+            return .none
+        }
+    }
 
     /// Returns an `Int` if that is what the stored value is, otherwise `nil`.
     public var intValue: Int? {
@@ -157,3 +203,36 @@ public enum AnyRealmValue: Hashable {
         self = .none
     }
 }
+
+extension AnyRealmValue: ExpressibleByIntegerLiteral {
+    public init(integerLiteral value: Int) {
+        self = AnyRealmValue.convert(value)
+    }
+}
+
+extension AnyRealmValue: ExpressibleByStringLiteral {
+    public init(stringLiteral value: String) {
+        self = AnyRealmValue.convert(value)
+    }
+}
+
+extension AnyRealmValue: ExpressibleByNilLiteral {
+    public init(nilLiteral: ()) {
+        self = .none
+    }
+}
+
+extension AnyRealmValue: ExpressibleByFloatLiteral {
+    public init(floatLiteral value: Float) {
+        self = AnyRealmValue.convert(value)
+    }
+}
+
+extension AnyRealmValue: ExpressibleByBooleanLiteral {
+    public typealias BooleanLiteralType = Bool
+    public init(booleanLiteral value: BooleanLiteralType) {
+        self = AnyRealmValue.convert(value)
+    }
+}
+
+
