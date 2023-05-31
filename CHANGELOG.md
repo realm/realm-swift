@@ -18,6 +18,7 @@ x.y.z Release notes (yyyy-MM-dd)
 
 ### Internal
 * Upgraded realm-core from ? to ?
+* Overhauled SDK metrics collection to better drive future development efforts.
 
 10.40.0 Release notes (2023-05-26)
 =============================================================

@@ -41,7 +41,6 @@ typedef RLM_CLOSED_ENUM(NSUInteger, RLMSyncStopPolicy) {
 
 // Internal-only APIs
 @property (nonatomic, readwrite) RLMSyncStopPolicy stopPolicy;
-@property (nonatomic, readonly) BOOL enableFlexibleSync;
 
 @end
 

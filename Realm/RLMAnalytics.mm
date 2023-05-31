@@ -44,20 +44,25 @@
 // we give you.
 //
 // Currently the following information is reported:
-// - What version of Realm is being used, and from which language (obj-c or Swift).
-// - What version of OS X it's running on (in case Xcode aggressively drops
+// - What version of Realm and core is being used, and from which language (obj-c or Swift).
+// - Which platform and version of OS X it's running on (in case Xcode aggressively drops
 //   support for older versions again, we need to know what we need to support).
 // - The minimum iOS/OS X version that the application is targeting (again, to
 //   help us decide what versions we need to support).
 // - An anonymous MAC address and bundle ID to aggregate the other information on.
-// - What version of Swift is being used (if applicable).
+// - The host platform OSX and version.
+// - The XCode version.
+// - Some info about the features been used when opening the realm for the first time.
 
 #import "RLMAnalytics.hpp"
 
 #import <Foundation/Foundation.h>
 
 #if TARGET_IPHONE_SIMULATOR || TARGET_OS_MAC || (TARGET_OS_WATCH && TARGET_OS_SIMULATOR) || (TARGET_OS_TV && TARGET_OS_SIMULATOR)
-#import "RLMRealm.h"
+#import "RLMObjectSchema_Private.h"
+#import "RLMRealmConfiguration_Private.h"
+#import "RLMSchema_Private.h"
+#import "RLMSyncConfiguration.h"
 #import "RLMUtil.hpp"
 
 #import <array>
@@ -72,10 +77,9 @@
 #import "RLMVersion.h"
 #endif
 
-// Declared for RealmSwiftObjectUtil
-@interface NSObject (SwiftVersion)
-+ (NSString *)swiftVersion;
-@end
+#ifndef REALM_IOPLATFORMUUID
+#import <Realm/RLMPlatform.h>
+#endif
 
 // Wrapper for sysctl() that handles the memory management stuff
 static auto RLMSysCtl(int *mib, u_int mibSize, size_t *bufferSize) {
@@ -101,22 +105,28 @@ static auto RLMSysCtl(int *mib, u_int mibSize, size_t *bufferSize) {
 
 // Get the version of OS X we're running on (even in the simulator this gives
 // the OS X version and not the simulated iOS version)
-static NSString *RLMOSVersion() {
-    std::array<int, 2> mib = {{CTL_KERN, KERN_OSRELEASE}};
-    size_t bufferSize;
-    auto buffer = RLMSysCtl(&mib[0], mib.size(), &bufferSize);
-    if (!buffer) {
-        return nil;
-    }
+static NSString *RLMHostOSVersion() {
+    size_t size;
+    sysctlbyname("kern.osproductversion", NULL, &size, NULL, 0);
+    char *model = (char*)malloc(size);
+    sysctlbyname("kern.osproductversion", model, &size, NULL, 0);
+    NSString *deviceModel = [NSString stringWithCString:model encoding:NSUTF8StringEncoding];
+    free(model);
+    return deviceModel;
+}
 
-    return [[NSString alloc] initWithBytesNoCopy:buffer.release()
-                                          length:bufferSize - 1
-                                        encoding:NSUTF8StringEncoding
-                                    freeWhenDone:YES];
+static NSString *RLMTargetArch() {
+    NSString *targetArchitecture;
+#if TARGET_CPU_X86_64
+    targetArchitecture = @"x86_64";
+#elif TARGET_CPU_ARM64
+    targetArchitecture = @"arm64";
+#endif
+    return targetArchitecture;
 }
 
 // Hash the data in the given buffer and convert it to a hex-format string
-static NSString *RLMHashData(const void *bytes, size_t length) {
+static NSString *RLMHashBase16Data(const void *bytes, size_t length) {
     unsigned char buffer[CC_SHA256_DIGEST_LENGTH];
     CC_SHA256(bytes, static_cast<CC_LONG>(length), buffer);
 
@@ -167,15 +177,33 @@ static std::optional<std::array<unsigned char, 6>> getMacAddress(int id) {
 // Returns the hash of the MAC address of the first network adaptor since the
 // vendorIdentifier isn't constant between iOS simulators.
 static NSString *RLMMACAddress() {
-    for (int i = 0; i < 9; ++i) {
-        if (auto mac = getMacAddress(i)) {
-            return RLMHashData(&(*mac)[0], 6);
-        }
+     for (int i = 0; i < 9; ++i) {
+         if (auto mac = getMacAddress(i)) {
+             return RLMHashBase16Data(&(*mac)[0], 6);
+         }
+     }
+     return @"unknown";
+ }
+
+static NSString *RLMBuilderId() {
+    NSString *ioPlatformUuid = REALM_IOPLATFORMUUID;
+    if ([ioPlatformUuid length] == 0) {
+        return nil;
     }
-    return @"unknown";
+    NSString *salt = @"realm is great";
+    NSString *saltedId = [ioPlatformUuid stringByAppendingString:salt];
+    NSData *data = [saltedId dataUsingEncoding:NSUTF8StringEncoding];
+
+    unsigned char buffer[CC_SHA256_DIGEST_LENGTH];
+    CC_SHA256(data.bytes, static_cast<CC_LONG>(data.length), buffer);
+    NSData* hashedData = [NSData dataWithBytes:buffer length:CC_SHA256_DIGEST_LENGTH];
+    
+    // Base64 Encoding
+    return [hashedData base64EncodedStringWithOptions:kNilOptions];
 }
 
-static NSDictionary *RLMAnalyticsPayload() {
+static NSDictionary *RLMBaseMetrics() {
+    static NSString *kUnknownString = @"unknown";
     NSBundle *appBundle = NSBundle.mainBundle;
     NSString *hashedBundleID = appBundle.bundleIdentifier;
 
@@ -194,80 +222,205 @@ static NSDictionary *RLMAnalyticsPayload() {
     // information (e.g. the name of an unannounced product)
     if (hashedBundleID) {
         NSData *data = [hashedBundleID dataUsingEncoding:NSUTF8StringEncoding];
-        hashedBundleID = RLMHashData(data.bytes, data.length);
+        hashedBundleID = RLMHashBase16Data(data.bytes, data.length);
     }
 
-    NSString *osVersionString = [[NSProcessInfo processInfo] operatingSystemVersionString];
     Class swiftDecimal128 = NSClassFromString(@"RealmSwiftDecimal128");
     BOOL isSwift = swiftDecimal128 != nil;
 
-    static NSString *kUnknownString = @"unknown";
-    NSString *hashedMACAddress = RLMMACAddress();
+    NSString *hashedDistinctId = RLMMACAddress();
+    // We use the IOPlatformUUID if is available (Cocoapods, SPM),
+    // in case we cannot obtain it (Pre-built binaries) we use the hashed mac address.
+    NSString *hashedBuilderId = RLMBuilderId() ?: hashedDistinctId;
+
     NSDictionary *info = appBundle.infoDictionary;
 
     return @{
-             @"event": @"Run",
-             @"properties": @{
-                     // MixPanel properties
-                     @"token": @"ce0fac19508f6c8f20066d345d360fd0",
+        // MixPanel properties
+        @"token": @"ce0fac19508f6c8f20066d345d360fd0",
 
-                     // Anonymous identifiers to deduplicate events
-                     @"distinct_id": hashedMACAddress,
-                     @"Anonymized MAC Address": hashedMACAddress,
-                     @"Anonymized Bundle ID": hashedBundleID ?: kUnknownString,
+        // Anonymous identifiers to deduplicate events
+        @"distinct_id": hashedDistinctId,
+        @"builder_id": hashedBuilderId,
 
-                     // Which version of Realm is being used
-                     @"Binding": @"cocoa",
-                     @"Language": isSwift ? @"swift" : @"objc",
-                     @"Realm Version": REALM_COCOA_VERSION,
+        @"Anonymized MAC Address": hashedDistinctId,
+        @"Anonymized Bundle ID": hashedBundleID ?: kUnknownString,
+
+        // SDK Info
+        @"Binding": @"cocoa",
+        // Which version of Realm is being used
+        @"Realm Version": REALM_COCOA_VERSION,
+        @"Core Version": @REALM_VERSION,
+
+        // Language Info
+        @"Language": isSwift ? @"swift" : @"objc",
+
+        // Target Info
+        // Current OS version the app is targeting
+        @"Target OS Version": [[NSProcessInfo processInfo] operatingSystemVersionString],
+        // Minimum OS version the app is targeting
+        @"Target OS Minimum Version": info[@"MinimumOSVersion"] ?: info[@"LSMinimumSystemVersion"] ?: kUnknownString,
 #if TARGET_OS_WATCH
-                     @"Target OS Type": @"watchos",
+        @"Target OS Type": @"watchos",
 #elif TARGET_OS_TV
-                     @"Target OS Type": @"tvos",
+        @"Target OS Type": @"tvos",
 #elif TARGET_OS_IPHONE
-                     @"Target OS Type": @"ios",
+        @"Target OS Type": @"ios",
 #else
-                     @"Target OS Type": @"osx",
+        @"Target OS Type": @"macos",
 #endif
-                     @"Clang Version": @__clang_version__,
-                     @"Clang Major Version": @__clang_major__,
-                     // Current OS version the app is targeting
-                     @"Target OS Version": osVersionString,
-                     // Minimum OS version the app is targeting
-                     @"Target OS Minimum Version": info[@"MinimumOSVersion"] ?: info[@"LSMinimumSystemVersion"] ?: kUnknownString,
+        @"Target CPU Arch": RLMTargetArch() ?: kUnknownString,
 
-                     // Host OS version being built on
-                     @"Host OS Type": @"osx",
-                     @"Host OS Version": RLMOSVersion() ?: kUnknownString,
+        // Framework
+#if TARGET_OS_MACCATALYST
+        @"Framework": @"maccatalyst",
+#endif
 
+        // Host Info
+        // Host OS version being built on
+        @"Host OS Type": @"macos",
+        @"Host OS Version": RLMHostOSVersion() ?: kUnknownString,
+
+        // Installation method
 #ifdef SWIFT_PACKAGE
-                    @"Installation Method": @"Swift Package Manager",
+        @"Installation Method": @"spm",
 #elif defined(COCOAPODS)
-                    @"Installation Method": @"CocoaPods",
+        @"Installation Method": @"cocoapods",
 #elif defined(CARTHAGE)
-                    @"Installation Method": @"Carthage",
+        @"Installation Method": @"carthage",
 #elif defined(REALM_IOS_STATIC)
-                    @"Installation Method": @"Static Framework",
+        @"Installation Method": @"static framework",
 #else
-                    @"Installation Method": @"Other",
+        @"Installation Method": @"other",
 #endif
-                 }
-          };
+
+        // Compiler Info
+        @"Compiler": @"clang",
+        @"Clang Version": @__clang_version__,
+        @"Clang Major Version": @__clang_major__,
+    };
 }
 
-void RLMSendAnalytics() {
+// This will only be executed once but depending on the number of objects, could take sometime
+static NSDictionary *RLMSchemaMetrics(RLMSchema *schema) {
+    NSMutableDictionary *featuresDictionary = [@{@"Embedded_Object": @0,
+                                                 @"Asymmetric_Object": @0,
+                                                 @"Object_Link": @0,
+                                                 @"Mixed": @0,
+                                                 @"Primitive_List": @0,
+                                                 @"Primitive_Set": @0,
+                                                 @"Primitive_Dictionary": @0,
+                                                 @"Object_List": @0,
+                                                 @"Object_Set": @0,
+                                                 @"Object_Dictionary": @0,
+                                                 @"Backlink": @0,
+                                               } mutableCopy];
+
+    for (RLMObjectSchema *objectSchema in schema.objectSchema) {
+        if (objectSchema.isEmbedded) {
+            featuresDictionary[@"Embedded_Object"] = @1;
+        }
+        if (objectSchema.isAsymmetric) {
+            featuresDictionary[@"Asymmetric_Object"] = @1;
+        }
+
+        for (RLMProperty *property in objectSchema.properties) {
+            if (property.array) {
+                if (property.type == RLMPropertyTypeObject) {
+                    featuresDictionary[@"Object_List"] = @1;
+                } else {
+                    featuresDictionary[@"Primitive_List"] = @1;
+                }
+                continue;
+            }
+            if (property.set) {
+                if (property.type == RLMPropertyTypeObject) {
+                    featuresDictionary[@"Object_Set"] = @1;
+                } else {
+                    featuresDictionary[@"Primitive_Set"] = @1;
+                }
+                continue;
+            }
+            if (property.dictionary) {
+                if (property.type == RLMPropertyTypeObject) {
+                    featuresDictionary[@"Object_Dictionary"] = @1;
+                } else {
+                    featuresDictionary[@"Primitive_Dictionary"] = @1;
+                }
+                continue;
+            }
+
+            switch (property.type) {
+               case RLMPropertyTypeAny:
+                    featuresDictionary[@"Mixed"] = @1;
+                  break;
+               case RLMPropertyTypeObject:
+                    featuresDictionary[@"Object_Link"] = @1;
+                  break;
+                case RLMPropertyTypeLinkingObjects:
+                    featuresDictionary[@"Backlink"] = @1;
+                   break;
+               default:
+                    break;
+            }
+        }
+    }
+    return featuresDictionary;
+}
+
+static NSDictionary *RLMConfigurationMetrics(RLMRealmConfiguration *configuration) {
+    RLMSyncConfiguration *syncConfiguration = configuration.syncConfiguration;
+    bool isSync = syncConfiguration != nil;
+    bool isPBSSync = syncConfiguration.partitionValue != nil;
+    bool isFlexibleSync = (isSync && !isPBSSync);
+    auto resetMode = syncConfiguration.clientResetMode;
+
+    bool isCompactOnLaunch = configuration.shouldCompactOnLaunch != nil;
+    bool migrationBlock = configuration.migrationBlock != nil;
+
+    return @{
+        // Sync
+        @"Sync Enabled": isSync ? @"true" : @"false",
+        @"Flx_Sync": isFlexibleSync ? @1 : @0,
+        @"Pbs_Sync": isPBSSync ? @1 : @0,
+
+        // Client Reset
+        @"CR_Recover_Discard": (isSync && resetMode == RLMClientResetModeRecoverOrDiscardUnsyncedChanges) ? @1 : @0,
+        @"CR_Recover": (isSync && resetMode == RLMClientResetModeRecoverUnsyncedChanges) ? @1 : @0,
+        @"CR_Discard": (isSync && resetMode == RLMClientResetModeDiscardUnsyncedChanges) ? @1 : @0,
+        @"CR_Manual": (isSync && resetMode == RLMClientResetModeManual) ? @1 : @0,
+
+        // Configuration
+        @"Compact_On_Launch": isCompactOnLaunch ? @1 : @0,
+        @"Schema_Migration_Block": migrationBlock ? @1 : @0,
+    };
+}
+
+void RLMSendAnalytics(RLMRealmConfiguration *configuration, RLMSchema *schema) {
     if (getenv("REALM_DISABLE_ANALYTICS") || !RLMIsDebuggerAttached() || RLMIsRunningInPlayground()) {
         return;
     }
-    NSArray *urlStrings = @[@"https://data.mongodb-api.com/app/realmsdkmetrics-zmhtm/endpoint/metric_webhook/metric?data=%@"];
-    NSData *payload = [NSJSONSerialization dataWithJSONObject:RLMAnalyticsPayload() options:0 error:nil];
 
-    for (NSString *urlString in urlStrings) {
-        NSString *formatted = [NSString stringWithFormat:urlString, [payload base64EncodedStringWithOptions:0]];
+    id config = [configuration copy];
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        NSDictionary *baseMetrics = RLMBaseMetrics();
+        NSDictionary *schemaMetrics = RLMSchemaMetrics(schema);
+        NSDictionary *configurationMetrics = RLMConfigurationMetrics(config);
+
+        NSMutableDictionary *metrics = [[NSMutableDictionary alloc] init];
+        [metrics addEntriesFromDictionary:baseMetrics];
+        [metrics addEntriesFromDictionary:schemaMetrics];
+        [metrics addEntriesFromDictionary:configurationMetrics];
+
+        NSDictionary *payloadN = @{@"event": @"Run", @"properties": metrics};
+        NSData *payload = [NSJSONSerialization dataWithJSONObject:payloadN options:0 error:nil];
+
+        NSString *url = @"https://data.mongodb-api.com/app/realmsdkmetrics-zmhtm/endpoint/metric_webhook/metric?data=%@";
+        NSString *formatted = [NSString stringWithFormat:url, [payload base64EncodedStringWithOptions:0]];
         // No error handling or anything because logging errors annoyed people for no
         // real benefit, and it's not clear what else we could do
         [[NSURLSession.sharedSession dataTaskWithURL:[NSURL URLWithString:formatted]] resume];
-    }
+    });
 }
 
 #else

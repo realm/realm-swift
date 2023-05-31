@@ -75,6 +75,7 @@ command:
   examples-ios-swift:   builds all Swift iOS examples
   examples-osx:         builds all macOS examples
   get-version:          get the current version
+  get-ioplatformuuid:   get io platform uuid
   set-version version:  set the version
   cocoapods-setup:      download realm-core and create a stub RLMPlatform.h file to enable building via CocoaPods
 
@@ -953,6 +954,11 @@ case "$COMMAND" in
     ######################################
     "get-version")
         plist_get 'Realm/Realm-Info.plist' 'CFBundleShortVersionString'
+        exit 0
+        ;;
+
+    "get-ioplatformuuid")
+        ioreg -d2 -c IOPlatformExpertDevice | awk -F\" '/IOPlatformUUID/{print $(NF-1)}'
         exit 0
         ;;
 
