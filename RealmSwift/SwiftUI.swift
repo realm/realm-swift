@@ -315,12 +315,12 @@ private class ObservableResultsStorage<T>: ObservableStorage<T> where T: RealmSu
     }
 
     private var searchString: String = ""
-    fileprivate func searchText<T: ObjectBase>(_ text: String, on keyPath: KeyPath<T, String>) {
+    fileprivate func searchText<U: ObjectBase>(_ text: String, on keyPath: KeyPath<U, String>) {
         guard text != searchString else { return }
         if text.isEmpty {
             searchFilter = nil
         } else {
-            searchFilter = Query<T>()[dynamicMember: keyPath].contains(text).predicate
+            searchFilter = Query<U>()[dynamicMember: keyPath].contains(text).predicate
         }
         searchString = text
     }

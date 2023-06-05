@@ -58,7 +58,7 @@ extension ObjectBase: BuiltInObjcBridgeable {
         if let value = value as? Self {
             return value
         }
-        if Self.self == DynamicObject.self, let object = value as? ObjectBase {
+        if Self.self === DynamicObject.self, let object = value as? ObjectBase {
             // Without `as AnyObject` this will produce a warning which incorrectly
             // claims it could be replaced with `unsafeDowncast()`
             return unsafeBitCast(object as AnyObject, to: Self.self)
