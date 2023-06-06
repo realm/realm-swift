@@ -125,7 +125,20 @@ Pod::Spec.new do |s|
                                 'CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF' => 'NO',
                                 'OTHER_CPLUSPLUSFLAGS' => '-isystem "${PODS_ROOT}/Realm/include/core" -fvisibility-inlines-hidden',
                                 'OTHER_CPLUSPLUSFLAGS[arch=armv7]' => '-isystem "${PODS_ROOT}/Realm/include/core" -fvisibility-inlines-hidden -fno-aligned-new',
-                                'USER_HEADER_SEARCH_PATHS' => '"${PODS_ROOT}/Realm/include" "${PODS_ROOT}/Realm/include/Realm"'
+                                'USER_HEADER_SEARCH_PATHS' => '"${PODS_ROOT}/Realm/include" "${PODS_ROOT}/Realm/include/Realm"',
+
+                                'IPHONEOS_DEPLOYMENT_TARGET_1400' => '11.0',
+                                'IPHONEOS_DEPLOYMENT_TARGET_1500' => '12.0',
+                                'IPHONEOS_DEPLOYMENT_TARGET' => '$(IPHONEOS_DEPLOYMENT_TARGET_$(XCODE_VERSION_MAJOR))',
+                                'MACOSX_DEPLOYMENT_TARGET_1400' => '10.13',
+                                'MACOSX_DEPLOYMENT_TARGET_1500' => '10.14',
+                                'MACOSX_DEPLOYMENT_TARGET' => '$(MACOSX_DEPLOYMENT_TARGET_$(XCODE_VERSION_MAJOR))',
+                                'WATCHOS_DEPLOYMENT_TARGET_1400' => '4.0',
+                                'WATCHOS_DEPLOYMENT_TARGET_1500' => '5.0',
+                                'WATCHOS_DEPLOYMENT_TARGET' => '$(WATCHOS_DEPLOYMENT_TARGET_$(XCODE_VERSION_MAJOR))',
+                                'TVOS_DEPLOYMENT_TARGET_1400' => '11.0',
+                                'TVOS_DEPLOYMENT_TARGET_1500' => '12.0',
+                                'TVOS_DEPLOYMENT_TARGET' => '$(TVOS_DEPLOYMENT_TARGET_$(XCODE_VERSION_MAJOR))',
                               }
   s.preserve_paths          = %w(include scripts)
 
