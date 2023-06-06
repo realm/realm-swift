@@ -1,7 +1,8 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* Fix compilation with Xcode 15.
+* Fix compilation with Xcode 15. Note that iOS 12 is the minimum supported
+  deployment target when using Xcode 15.
 * Switch to building the Carthage release with Xcode 14.3.1.
 
 ### Fixed
