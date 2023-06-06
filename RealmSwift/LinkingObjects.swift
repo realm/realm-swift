@@ -30,8 +30,7 @@ import Realm
  enumerate over the linking objects that were present when the enumeration is begun, even if some of them are deleted or
  modified to no longer link to the target object during the enumeration.
 
- `LinkingObjects` can only be used as a property on `Object` models. Properties of this type must be declared as `let`
- and cannot be `dynamic`.
+ `LinkingObjects` can only be used as a property on `Object` models.
  */
 @frozen public struct LinkingObjects<Element: ObjectBase & RealmCollectionValue>: RealmCollectionImpl {
     // MARK: Initializers

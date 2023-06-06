@@ -41,8 +41,6 @@ extension String: _MapKey { }
  is opened as read-only.
  
  A Map can be filtered and sorted with the same predicates as `Results<Value>`.
- 
- Properties of `Map` type defined on `Object` subclasses must be declared as `let` and cannot be `dynamic`.
 */
 public final class Map<Key: _MapKey, Value: RealmCollectionValue>: RLMSwiftCollectionBase {
 
