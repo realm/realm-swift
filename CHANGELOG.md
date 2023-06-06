@@ -1,17 +1,14 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.40.1 Release notes (2023-06-06)
 =============================================================
+
 ### Enhancements
+
 * Fix compilation with Xcode 15. Note that iOS 12 is the minimum supported
   deployment target when using Xcode 15.
 * Switch to building the Carthage release with Xcode 14.3.1.
 
-### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
-* None.
-
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
-
 ### Compatibility
+
 * Realm Studio: 14.0.1 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 14.3.1.
@@ -19,7 +16,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * Xcode: 14.1-15 beta 1.
 
 ### Internal
-* Upgraded realm-core from ? to ?
+
 * Overhauled SDK metrics collection to better drive future development efforts.
 
 10.40.0 Release notes (2023-05-26)
