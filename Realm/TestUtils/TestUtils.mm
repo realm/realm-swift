@@ -49,41 +49,11 @@ void RLMAssertThrowsWithReasonMatchingSwift(XCTestCase *self,
                                             __attribute__((noescape)) dispatch_block_t block,
                                             NSString *regexString, NSString *message,
                                             NSString *fileName, NSUInteger lineNumber) {
-    BOOL didThrow = NO;
-    @try {
-        block();
-    }
-    @catch (NSException *e) {
-        didThrow = YES;
-        NSString *reason = e.reason;
-        NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:regexString options:(NSRegularExpressionOptions)0 error:nil];
-        if ([regex numberOfMatchesInString:reason options:(NSMatchingOptions)0 range:NSMakeRange(0, reason.length)] == 0) {
-            NSString *msg = [NSString stringWithFormat:@"The given expression threw an exception with reason '%@', but expected to match '%@'",
-                             reason, regexString];
-            recordFailure(self, msg, fileName, lineNumber);
-        }
-    }
-    if (!didThrow) {
-        NSString *prefix = @"The given expression failed to throw an exception";
-        message = message ? [NSString stringWithFormat:@"%@ (%@)",  prefix, message] : prefix;
-        recordFailure(self, message, fileName, lineNumber);
-    }
 }
 
 static void assertThrows(XCTestCase *self, dispatch_block_t block, NSString *message,
                          NSString *fileName, NSUInteger lineNumber,
                          NSString *(^condition)(NSException *)) {
-    @try {
-        block();
-        NSString *prefix = @"The given expression failed to throw an exception";
-        message = message ? [NSString stringWithFormat:@"%@ (%@)",  prefix, message] : prefix;
-        recordFailure(self, message, fileName, lineNumber);
-    }
-    @catch (NSException *e) {
-        if (NSString *failure = condition(e)) {
-            recordFailure(self, failure, fileName, lineNumber);
-        }
-    }
 }
 
 void (RLMAssertThrowsWithName)(XCTestCase *self, __attribute__((noescape)) dispatch_block_t block,

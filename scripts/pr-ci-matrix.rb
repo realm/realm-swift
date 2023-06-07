@@ -11,44 +11,11 @@ def minimum_version(major)
 end
 
 targets = {
-  'docs' => latest_only,
-  'swiftlint' => latest_only,
-
-  'osx' => all,
-  'osx-encryption' => latest_only,
-  'osx-object-server' => oldest_and_latest,
-
   'swiftpm' => oldest_and_latest,
   'swiftpm-debug' => all,
   'swiftpm-address' => latest_only,
   'swiftpm-thread' => latest_only,
   'swiftpm-ios' => all,
-
-  'ios-static' => oldest_and_latest,
-  'ios-dynamic' => oldest_and_latest,
-  'watchos' => oldest_and_latest,
-  'tvos' => oldest_and_latest,
-
-  'osx-swift' => all,
-  'ios-swift' => oldest_and_latest,
-  'tvos-swift' => oldest_and_latest,
-
-  'osx-swift-evolution' => latest_only,
-  'ios-swift-evolution' => latest_only,
-  'tvos-swift-evolution' => latest_only,
-
-  'catalyst' => oldest_and_latest,
-  'catalyst-swift' => oldest_and_latest,
-
-  'xcframework' => latest_only,
-
-  'cocoapods-osx' => all,
-  'cocoapods-ios' => oldest_and_latest,
-  'cocoapods-ios-dynamic' => oldest_and_latest,
-  'cocoapods-watchos' => oldest_and_latest,
-  # 'cocoapods-catalyst' => oldest_and_latest,
-  'swiftui-ios' => latest_only,
-  'swiftui-server-osx' => latest_only,
 }
 
 output_file = """
