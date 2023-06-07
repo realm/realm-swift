@@ -19,7 +19,28 @@
 import Foundation
 import RealmSwift
 import Realm
+import RealmMacro
 
+func _unmanagedStorage<T, each U>(_ fields: repeat KeyPath<T, each U>) -> (repeat each U)? {
+    return nil
+}
+
+class MacroObject2: Object {
+    @PersistedProperty(index: 0) var value: Int = 1
+}
+
+@RealmModel class MacroObject: Object {
+    @PrimaryKey var pk: ObjectId
+    @Ignored var ignored: Int = 1
+    var intCol: Int = 2
+    @Indexed var indexed: Int
+
+    var obj: MacroObject?
+    @OriginProperty(name: "obj")
+    var linkingObjects: LinkingObjects<MacroObject>
+}
+
+@RealmSchemaDiscovery
 class ModernAllTypesObject: Object {
     @Persisted(primaryKey: true) var pk: ObjectId
     var ignored: Int = 1
@@ -160,6 +181,7 @@ class ModernAllTypesObject: Object {
     var linkingObjects: LinkingObjects<ModernAllTypesObject>
 }
 
+@RealmSchemaDiscovery
 class LinkToModernAllTypesObject: Object {
     @Persisted var object: ModernAllTypesObject?
     @Persisted var list: List<ModernAllTypesObject>
@@ -188,19 +210,17 @@ class ModernImplicitlyUnwrappedOptionalObject: Object {
     @Persisted var optUuidCol: UUID!
 }
 
+@RealmSchemaDiscovery
 class ModernLinkToPrimaryStringObject: Object {
-    @Persisted var pk = ""
+    @Persisted(primaryKey: true) var pk: String = ""
     @Persisted var object: ModernPrimaryStringObject?
     @Persisted var objects: List<ModernPrimaryStringObject>
-
-    override class func primaryKey() -> String? {
-        return "pk"
-    }
 }
 
+@RealmSchemaDiscovery
 class ModernUTF8Object: Object {
     // swiftlint:disable:next identifier_name
-    @Persisted var 柱колоéнǢкƱаم👍 = "值значен™👍☞⎠‱௹♣︎☐▼❒∑⨌⧭иеمرحبا"
+    @Persisted var 柱колоéнǢкƱаم👍: String = "值значен™👍☞⎠‱௹♣︎☐▼❒∑⨌⧭иеمرحبا"
 }
 
 protocol ModernPrimaryKeyObject: Object {
@@ -208,86 +228,107 @@ protocol ModernPrimaryKeyObject: Object {
     var pk: PrimaryKey { get set }
 }
 
+@RealmSchemaDiscovery
 class ModernPrimaryStringObject: Object, ModernPrimaryKeyObject {
     @Persisted(primaryKey: true) var pk: String
 }
 
+@RealmSchemaDiscovery
 class ModernPrimaryOptionalStringObject: Object, ModernPrimaryKeyObject {
     @Persisted(primaryKey: true) var pk: String?
 }
 
+@RealmSchemaDiscovery
 class ModernPrimaryIntObject: Object, ModernPrimaryKeyObject {
     @Persisted(primaryKey: true) var pk: Int
 }
 
+@RealmSchemaDiscovery
 class ModernPrimaryOptionalIntObject: Object, ModernPrimaryKeyObject {
     @Persisted(primaryKey: true) var pk: Int?
 }
 
+@RealmSchemaDiscovery
 class ModernPrimaryInt8Object: Object, ModernPrimaryKeyObject {
     @Persisted(primaryKey: true) var pk: Int8
 }
 
+@RealmSchemaDiscovery
 class ModernPrimaryOptionalInt8Object: Object, ModernPrimaryKeyObject {
     @Persisted(primaryKey: true) var pk: Int8?
 }
 
+@RealmSchemaDiscovery
 class ModernPrimaryInt16Object: Object, ModernPrimaryKeyObject {
     @Persisted(primaryKey: true) var pk: Int16
 }
 
+@RealmSchemaDiscovery
 class ModernPrimaryOptionalInt16Object: Object, ModernPrimaryKeyObject {
     @Persisted(primaryKey: true) var pk: Int16?
 }
 
+@RealmSchemaDiscovery
 class ModernPrimaryInt32Object: Object, ModernPrimaryKeyObject {
     @Persisted(primaryKey: true) var pk: Int32
 }
 
+@RealmSchemaDiscovery
 class ModernPrimaryOptionalInt32Object: Object, ModernPrimaryKeyObject {
     @Persisted(primaryKey: true) var pk: Int32?
 }
 
+@RealmSchemaDiscovery
 class ModernPrimaryInt64Object: Object, ModernPrimaryKeyObject {
     @Persisted(primaryKey: true) var pk: Int64
 }
 
+@RealmSchemaDiscovery
 class ModernPrimaryOptionalInt64Object: Object, ModernPrimaryKeyObject {
     @Persisted(primaryKey: true) var pk: Int64?
 }
 
+@RealmSchemaDiscovery
 class ModernPrimaryUUIDObject: Object, ModernPrimaryKeyObject {
     @Persisted(primaryKey: true) var pk: UUID
 }
 
+@RealmSchemaDiscovery
 class ModernPrimaryOptionalUUIDObject: Object, ModernPrimaryKeyObject {
     @Persisted(primaryKey: true) var pk: UUID?
 }
 
+@RealmSchemaDiscovery
 class ModernPrimaryObjectIdObject: Object, ModernPrimaryKeyObject {
     @Persisted(primaryKey: true) var pk: ObjectId
 }
 
+@RealmSchemaDiscovery
 class ModernPrimaryOptionalObjectIdObject: Object, ModernPrimaryKeyObject {
     @Persisted(primaryKey: true) var pk: ObjectId?
 }
 
+@RealmSchemaDiscovery
 class ModernPrimaryIntEnumObject: Object, ModernPrimaryKeyObject {
     @Persisted(primaryKey: true) var pk: ModernIntEnum
 }
 
+@RealmSchemaDiscovery
 class ModernPrimaryOptionalIntEnumObject: Object, ModernPrimaryKeyObject {
     @Persisted(primaryKey: true) var pk: ModernIntEnum?
 }
 
+@RealmSchemaDiscovery
 class ModernIndexedIntEnumObject: Object {
     @Persisted(indexed: true) var value: ModernIntEnum
 }
 
+@RealmSchemaDiscovery
 class ModernIndexedOptionalIntEnumObject: Object {
     @Persisted(indexed: true) var value: ModernIntEnum?
 }
 
+@RealmSchemaDiscovery
 class ModernCustomInitializerObject: Object {
     @Persisted var stringCol: String
 
@@ -302,8 +343,9 @@ class ModernCustomInitializerObject: Object {
     }
 }
 
+@RealmSchemaDiscovery
 class ModernConvenienceInitializerObject: Object {
-    @Persisted var stringCol = ""
+    @Persisted var stringCol: String = ""
 
     convenience init(stringCol: String) {
         self.init()
@@ -311,16 +353,19 @@ class ModernConvenienceInitializerObject: Object {
     }
 }
 
+@RealmSchemaDiscovery
 @objc(ModernObjcRenamedObject)
 class ModernObjcRenamedObject: Object {
-    @Persisted var stringCol = ""
+    @Persisted var stringCol: String = ""
 }
 
+@RealmSchemaDiscovery
 @objc(ModernObjcRenamedObjectWithTotallyDifferentName)
 class ModernObjcArbitrarilyRenamedObject: Object {
-    @Persisted var boolCol = false
+    @Persisted var boolCol: Bool = false
 }
 
+@RealmSchemaDiscovery
 class ModernIntAndStringObject: Object {
     @Persisted var intCol: Int
     @Persisted var optIntCol: Int?
@@ -328,22 +373,26 @@ class ModernIntAndStringObject: Object {
     @Persisted var optStringCol: String?
 }
 
+@RealmSchemaDiscovery
 class ModernCollectionObject: Object {
     @Persisted var list: List<ModernAllTypesObject>
     @Persisted var set: MutableSet<ModernAllTypesObject>
     @Persisted var map: Map<String, ModernAllTypesObject?>
 }
 
+@RealmSchemaDiscovery
 class ModernCircleObject: Object {
     @Persisted var obj: ModernCircleObject?
     @Persisted var array: List<ModernCircleObject>
 }
 
+@RealmSchemaDiscovery
 class ModernEmbeddedParentObject: Object {
     @Persisted var object: ModernEmbeddedTreeObject1?
     @Persisted var array: List<ModernEmbeddedTreeObject1>
 }
 
+@RealmSchemaDiscovery
 class ModernEmbeddedPrimaryParentObject: Object {
     @Persisted(primaryKey: true) var pk: Int = 0
     @Persisted var object: ModernEmbeddedTreeObject1?
@@ -354,9 +403,10 @@ protocol ModernEmbeddedTreeObject: EmbeddedObject {
     var value: Int { get set }
 }
 
+@RealmSchemaDiscovery
 class ModernEmbeddedTreeObject1: EmbeddedObject, ModernEmbeddedTreeObject {
-    @Persisted var value = 0
-    @Persisted var bool = false
+    @Persisted var value: Int = 0
+    @Persisted var bool: Bool = false
     @Persisted var child: ModernEmbeddedTreeObject2?
     @Persisted var children: List<ModernEmbeddedTreeObject2>
 
@@ -366,8 +416,9 @@ class ModernEmbeddedTreeObject1: EmbeddedObject, ModernEmbeddedTreeObject {
     var parent2: LinkingObjects<ModernEmbeddedParentObject>
 }
 
+@RealmSchemaDiscovery
 class ModernEmbeddedTreeObject2: EmbeddedObject, ModernEmbeddedTreeObject {
-    @Persisted var value = 0
+    @Persisted var value: Int = 0
     @Persisted var child: ModernEmbeddedTreeObject3?
     @Persisted var children: List<ModernEmbeddedTreeObject3>
 
@@ -377,8 +428,9 @@ class ModernEmbeddedTreeObject2: EmbeddedObject, ModernEmbeddedTreeObject {
     var parent4: LinkingObjects<ModernEmbeddedTreeObject1>
 }
 
+@RealmSchemaDiscovery
 class ModernEmbeddedTreeObject3: EmbeddedObject, ModernEmbeddedTreeObject {
-    @Persisted var value = 0
+    @Persisted var value: Int = 0
 
     @Persisted(originProperty: "child")
     var parent3: LinkingObjects<ModernEmbeddedTreeObject2>
@@ -386,10 +438,12 @@ class ModernEmbeddedTreeObject3: EmbeddedObject, ModernEmbeddedTreeObject {
     var parent4: LinkingObjects<ModernEmbeddedTreeObject2>
 }
 
+@RealmSchemaDiscovery
 class ModernEmbeddedObject: EmbeddedObject {
-    @Persisted var value = 0
+    @Persisted var value: Int = 0
 }
 
+@RealmSchemaDiscovery
 class SetterObservers: Object {
     @Persisted var value: Int {
         willSet {
@@ -404,6 +458,7 @@ class SetterObservers: Object {
     var didSetCallback: (() -> Void)?
 }
 
+@RealmSchemaDiscovery
 class ObjectWithArcMethodCategoryNames: Object {
     // @objc properties with these names would crash with asan (and unreliably
     // without it) because they would not have the correct behavior for the
@@ -415,6 +470,7 @@ class ObjectWithArcMethodCategoryNames: Object {
     @Persisted var initValue: String
 }
 
+@RealmSchemaDiscovery
 class ModernAllIndexableTypesObject: Object {
     @Persisted(indexed: true) var boolCol: Bool
     @Persisted(indexed: true) var intCol: Int
@@ -443,6 +499,7 @@ class ModernAllIndexableTypesObject: Object {
     @Persisted(indexed: true) var optStringEnumCol: ModernStringEnum?
 }
 
+@RealmSchemaDiscovery
 class ModernAllIndexableButNotIndexedObject: Object {
     @Persisted(indexed: false) var boolCol: Bool
     @Persisted(indexed: false) var intCol: Int
@@ -471,6 +528,7 @@ class ModernAllIndexableButNotIndexedObject: Object {
     @Persisted(indexed: false) var optStringEnumCol: ModernStringEnum?
 }
 
+@RealmSchemaDiscovery
 class ModernCollectionsOfEnums: Object {
     @Persisted var listInt: List<EnumInt>
     @Persisted var listInt8: List<EnumInt8>
@@ -527,6 +585,7 @@ class ModernCollectionsOfEnums: Object {
     @Persisted var mapStringOpt: Map<String, EnumString?>
 }
 
+@RealmSchemaDiscovery
 class LinkToModernCollectionsOfEnums: Object {
     @Persisted var object: ModernCollectionsOfEnums?
     @Persisted var list: List<ModernCollectionsOfEnums>
@@ -534,6 +593,7 @@ class LinkToModernCollectionsOfEnums: Object {
     @Persisted var map: Map<String, ModernCollectionsOfEnums?>
 }
 
+@RealmSchemaDiscovery
 class ModernListAnyRealmValueObject: Object {
     @Persisted var value: List<AnyRealmValue>
 }

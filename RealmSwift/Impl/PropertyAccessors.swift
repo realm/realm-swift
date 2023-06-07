@@ -163,8 +163,8 @@ internal class RealmPropertyAccessor<Value: RealmPropertyType>: RLMManagedProper
 // MARK: - Modern Property Accessors
 
 internal class PersistedPropertyAccessor<T: _Persistable>: RLMManagedPropertyAccessor {
-    fileprivate static func bound(_ property: RLMProperty, _ obj: RLMObjectBase) -> UnsafeMutablePointer<Persisted<T>> {
-        return ptr(property, obj).assumingMemoryBound(to: Persisted<T>.self)
+    fileprivate static func bound(_ property: RLMProperty, _ obj: RLMObjectBase) -> UnsafeMutablePointer<PropertyStorage<T>> {
+        return ptr(property, obj).assumingMemoryBound(to: PropertyStorage<T>.self)
     }
 
     @objc override class func initialize(_ property: RLMProperty, on parent: RLMObjectBase) {
@@ -227,8 +227,8 @@ internal class PersistedMapAccessor<Key: _MapKey, Value: RealmCollectionValue & 
 }
 
 internal class PersistedLinkingObjectsAccessor<Element: ObjectBase & RealmCollectionValue & _Persistable>: RLMManagedPropertyAccessor {
-    private static func bound(_ property: RLMProperty, _ obj: RLMObjectBase) -> UnsafeMutablePointer<Persisted<LinkingObjects<Element>>> {
-        return ptr(property, obj).assumingMemoryBound(to: Persisted<LinkingObjects<Element>>.self)
+    private static func bound(_ property: RLMProperty, _ obj: RLMObjectBase) -> UnsafeMutablePointer<PropertyStorage<LinkingObjects<Element>>> {
+        return ptr(property, obj).assumingMemoryBound(to: PropertyStorage<LinkingObjects<Element>>.self)
     }
 
     @objc override class func initialize(_ property: RLMProperty, on parent: RLMObjectBase) {
