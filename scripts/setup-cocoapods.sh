@@ -10,7 +10,7 @@ fi
 
 rm -rf "$source_root/include"
 mkdir -p "$source_root/include"
-cp -R "$source_root/core/realm-monorepo.xcframework/ios-arm64_armv7/Headers" "$source_root/include/core"
+cp -R "$source_root/core/realm-monorepo.xcframework/ios-arm64/Headers" "$source_root/include/core"
 
 mkdir -p "$source_root/include"
 echo "#define REALM_IOPLATFORMUUID @\"$(sh $source_root/build.sh get-ioplatformuuid)\"" > "$source_root/Realm/RLMPlatform.h"
