@@ -1,7 +1,9 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+* `Actor.preconditionIsolated()` is now used for runtime actor checking when
+  available (i.e. building with Xcode 15 and running on iOS 17) rather than the
+  less reliable workaround.
 
 ### Fixed
 * If downloading the fresh Realm file failed during a client reset on a
