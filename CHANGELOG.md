@@ -1,11 +1,14 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.40.2 Release notes (2023-06-09)
 =============================================================
+
 ### Enhancements
+
 * `Actor.preconditionIsolated()` is now used for runtime actor checking when
   available (i.e. building with Xcode 15 and running on iOS 17) rather than the
   less reliable workaround.
 
 ### Fixed
+
 * If downloading the fresh Realm file failed during a client reset on a
   flexible sync Realm, the sync client would crash the next time the Realm was
   opened. ([Core #6494](https://github.com/realm/realm-core/issues/6494), since v10.28.2)
@@ -15,6 +18,7 @@ x.y.z Release notes (yyyy-MM-dd)
   data was read from it. ([Core 6693](https://github.com/realm/realm-core/issues/6693), since v10.40.0)
 
 ### Compatibility
+
 * Realm Studio: 14.0.1 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 14.3.1.
@@ -22,6 +26,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * Xcode: 14.1-15 beta 1.
 
 ### Internal
+
 * Upgraded realm-core from 13.13.0 to 13.16.0.
 * The prebuilt library used for CocoaPods installations is now built with Xcode
   14. This should not have any observable effects other than the download being
