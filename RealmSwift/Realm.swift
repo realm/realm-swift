@@ -1462,11 +1462,19 @@ extension RLMAsyncDownloadTask: TaskWithCancellation {}
 @available(macOS 10.15, tvOS 13.0, iOS 13.0, watchOS 6.0, *)
 internal extension Actor {
     func verifier() -> (@Sendable () -> Void) {
+#if swift(>=5.9)
+        // When possible use the official API for actor checking
+        if #available(macOS 14.0, iOS 17.0, tvOS 17.0, watchOS 10.0, *) {
+            return {
+                self.preconditionIsolated()
+            }
+        }
+#endif
+
         // This exploits a hole in Swift's type system to construct a function
         // which is isolated to the current actor, and then casts away that
         // information. This results in runtime warnings/aborts if it's called
         // from outside the actor when actor data race checking is enabled.
-        // SE-0392 introduces a much better way to perform this check.
         let fn: () -> Void = { _ = self }
         return unsafeBitCast(fn, to: (@Sendable () -> Void).self)
     }
