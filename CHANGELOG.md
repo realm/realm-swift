@@ -6,7 +6,8 @@ x.y.z Release notes (yyyy-MM-dd)
 ### Fixed
 * Import as `RLMRealm_Private.h` as a module would cause issues when using Realm as a subdependency.
   ([#8164](https://github.com/realm/realm-swift/issues/8164), since 10.37.0)
-* None.
+* Disable setting a custom logger by default on the sync client when the sync manager is created.
+  This was overriding the default logger set using `RLMLogger.defaultLogger`. (since v10.39.0).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 

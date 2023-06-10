@@ -133,7 +133,6 @@ std::shared_ptr<realm::util::Logger> RLMWrapLogFunction(RLMSyncLogFunction fn) {
 + (SyncClientConfig)configurationWithRootDirectory:(NSURL *)rootDirectory appId:(NSString *)appId {
     SyncClientConfig config;
     bool should_encrypt = !getenv("REALM_DISABLE_METADATA_ENCRYPTION") && !RLMIsRunningInPlayground();
-    config.logger_factory = defaultSyncLogger;
     config.metadata_mode = should_encrypt ? SyncManager::MetadataMode::Encryption
                                           : SyncManager::MetadataMode::NoEncryption;
     @autoreleasepool {
