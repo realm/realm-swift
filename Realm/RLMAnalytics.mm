@@ -190,7 +190,7 @@ static NSString *RLMBuilderId() {
     if ([ioPlatformUuid length] == 0) {
         return nil;
     }
-    NSString *salt = @"realm is great";
+    NSString *salt = @"Realm is great";
     NSString *saltedId = [ioPlatformUuid stringByAppendingString:salt];
     NSData *data = [saltedId dataUsingEncoding:NSUTF8StringEncoding];
 
