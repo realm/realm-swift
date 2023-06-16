@@ -218,6 +218,7 @@
 		3FA5E94D266064C4008F1345 /* ModernObjectCreationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FA5E94C266064C4008F1345 /* ModernObjectCreationTests.swift */; };
 		3FAF2D4129577100002EAC93 /* TestUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FAF2D4029577100002EAC93 /* TestUtils.swift */; };
 		3FAF2D4229577100002EAC93 /* TestUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FAF2D4029577100002EAC93 /* TestUtils.swift */; };
+		3FB0FF102A31019800E13BF3 /* RealmMacro in Frameworks */ = {isa = PBXBuildFile; productRef = 3FB0FF0F2A31019800E13BF3 /* RealmMacro */; };
 		3FB19069265ECF0C00DA7C76 /* ModernObjectTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FB19068265ECF0C00DA7C76 /* ModernObjectTests.swift */; };
 		3FB1906B265ED23300DA7C76 /* ModernTestObjects.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FB1906A265ED23300DA7C76 /* ModernTestObjects.swift */; };
 		3FB4FA1719F5D2740020D53B /* SwiftTestObjects.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8F8D90B196CB8DD00475368 /* SwiftTestObjects.swift */; };
@@ -941,6 +942,7 @@
 		3F9F53D42718E8E6000EEB4A /* CustomPersistableTestObjects.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomPersistableTestObjects.swift; sourceTree = "<group>"; };
 		3FA5E94C266064C4008F1345 /* ModernObjectCreationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ModernObjectCreationTests.swift; sourceTree = "<group>"; };
 		3FAF2D4029577100002EAC93 /* TestUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestUtils.swift; sourceTree = "<group>"; };
+		3FB0FF0E2A2FE6A200E13BF3 /* RealmMacro */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = RealmMacro; sourceTree = "<group>"; };
 		3FB19068265ECF0C00DA7C76 /* ModernObjectTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ModernObjectTests.swift; sourceTree = "<group>"; };
 		3FB1906A265ED23300DA7C76 /* ModernTestObjects.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ModernTestObjects.swift; sourceTree = "<group>"; };
 		3FB56E7E250D457A00A6216B /* ObjectServerTests.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ObjectServerTests.xcconfig; sourceTree = "<group>"; };
@@ -1306,6 +1308,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3F98162A2317763000C3543D /* libc++.tbd in Frameworks */,
+				3FB0FF102A31019800E13BF3 /* RealmMacro in Frameworks */,
 				3F98162B2317763600C3543D /* libz.tbd in Frameworks */,
 				5D66102A1BE98DD00021E04F /* Realm.framework in Frameworks */,
 			);
@@ -1840,6 +1843,7 @@
 		E8D89B8E1955FC6D00CF2B9A = {
 			isa = PBXGroup;
 			children = (
+				3FB0FF0E2A2FE6A200E13BF3 /* RealmMacro */,
 				5D660FB71BE98B770021E04F /* Configuration */,
 				1A7B82361D51254600750296 /* Frameworks */,
 				E81A1FB41955FCE000FDED82 /* LICENSE */,
@@ -2338,6 +2342,9 @@
 				5D66102C1BE98DF60021E04F /* PBXTargetDependency */,
 			);
 			name = RealmSwift;
+			packageProductDependencies = (
+				3FB0FF0F2A31019800E13BF3 /* RealmMacro */,
+			);
 			productName = RealmSwift;
 			productReference = 5D660FCC1BE98C560021E04F /* RealmSwift.framework */;
 			productType = "com.apple.product-type.framework";
@@ -3850,6 +3857,13 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		3FB0FF0F2A31019800E13BF3 /* RealmMacro */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = RealmMacro;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = E8D89B8F1955FC6D00CF2B9A /* Project object */;
 }

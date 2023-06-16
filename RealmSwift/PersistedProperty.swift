@@ -95,7 +95,7 @@ import Realm.Private
 ///  runtime errors.
 @propertyWrapper
 public struct Persisted<Value: _Persistable> {
-    private var storage: PropertyStorage<Value>
+    internal var storage: PropertyStorage<Value>
 
     /// :nodoc:
     @available(*, unavailable, message: "@Persisted can only be used as a property on a Realm object")
@@ -123,110 +123,11 @@ public struct Persisted<Value: _Persistable> {
         storage storageKeyPath: ReferenceWritableKeyPath<EnclosingSelf, Self>
         ) -> Value {
         get {
-            return observed[keyPath: storageKeyPath].get(observed)
+            return observed[keyPath: storageKeyPath].storage.get(observed)
         }
         set {
-            observed[keyPath: storageKeyPath].set(observed, value: newValue)
+            observed[keyPath: storageKeyPath].storage.set(observed, value: newValue)
         }
-    }
-
-    // Called via RLMInitializeSwiftAccessor() to initialize the wrapper on a
-    // newly created managed accessor object.
-    internal mutating func initialize(_ object: ObjectBase, key: PropertyKey) {
-        storage = .managed(key: key)
-    }
-
-    // Collection types use this instead of the above because when promoting a
-    // unmanaged object to a managed object we want to reuse the existing collection
-    // object if it exists. Currently it always will exist because we read the
-    // value of the property first, but there's a potential optimization to
-    // skip initializing it on that read.
-    internal mutating func initializeCollection(_ object: ObjectBase, key: PropertyKey) -> Value? {
-        if case let .unmanaged(value, _, _) = storage {
-            storage = .managedCached(value: value, key: key)
-            return value
-        }
-        if case let .unmanagedObserved(value, _) = storage {
-            storage = .managedCached(value: value, key: key)
-            return value
-        }
-        storage = .managed(key: key)
-        return nil
-    }
-
-    internal mutating func get(_ object: ObjectBase) -> Value {
-        switch storage {
-        case let .unmanaged(value, _, _):
-            return value
-        case .unmanagedNoDefault:
-            let value = Value._rlmDefaultValue()
-            storage = .unmanaged(value: value)
-            return value
-        case let .unmanagedObserved(value, key):
-            if let lastAccessedNames = object.lastAccessedNames {
-                let name: String
-                if Value._rlmType == .linkingObjects {
-                    name = RLMObjectBaseObjectSchema(object)!.computedProperties[Int(key)].name
-                } else {
-                    name = RLMObjectBaseObjectSchema(object)!.properties[Int(key)].name
-                }
-                lastAccessedNames.add(name)
-                if let type = Value.self as? KeypathRecorder.Type {
-                    return type.keyPathRecorder(with: lastAccessedNames) as! Value
-                }
-                return Value._rlmDefaultValue()
-            }
-            return value
-        case let .managed(key):
-            let v = Value._rlmGetProperty(object, key)
-            if Value._rlmRequiresCaching {
-                // Collection types are initialized once and stored on the
-                // object rather than on every access. Non-collection types
-                // cannot be cached without some mechanism for knowing when to
-                // reread them which we don't currently have.
-                storage = .managedCached(value: v, key: key)
-            }
-            return v
-        case let .managedCached(value, _):
-            return value
-        }
-    }
-
-    internal mutating func set(_ object: ObjectBase, value: Value) {
-        if value is MutableRealmCollection {
-            (get(object) as! MutableRealmCollection).assign(value)
-            return
-        }
-        switch storage {
-        case let .unmanagedObserved(_, key):
-            let name = RLMObjectBaseObjectSchema(object)!.properties[Int(key)].name
-            object.willChangeValue(forKey: name)
-            storage = .unmanagedObserved(value: value, key: key)
-            object.didChangeValue(forKey: name)
-        case .managed(let key), .managedCached(_, let key):
-            Value._rlmSetProperty(object, key, value)
-        case .unmanaged, .unmanagedNoDefault:
-            storage = .unmanaged(value: value, indexed: false, primary: false)
-        }
-    }
-
-    // Initialize an unmanaged property for observation
-    internal mutating func observe(_ object: ObjectBase, property: RLMProperty) {
-        let value: Value
-        switch storage {
-        case let .unmanaged(v, _, _):
-            value = v
-        case .unmanagedNoDefault:
-            value = Value._rlmDefaultValue()
-        case .unmanagedObserved, .managed, .managedCached:
-            return
-        }
-        // Mutating a collection triggers a KVO notification on the parent, so
-        // we need to ensure that the collection has a pointer to its parent.
-        if let value = value as? MutableRealmCollection {
-            value.setParent(object, property)
-        }
-        storage = .unmanagedObserved(value: value, key: PropertyKey(property.index))
     }
 }
 
@@ -411,7 +312,7 @@ extension Persisted: DiscoverablePersistedProperty where Value: _Persistable {
 // The indexed and primary members of the unmanaged cases are used only for
 // schema discovery and are not always preserved once the Persisted is actually
 // used for anything.
-private enum PropertyStorage<T> {
+public enum PropertyStorage<T: _Persistable> {
     // An unmanaged value. This is used as the initial state if the user did
     // supply a default value, or if an unmanaged property is read or written
     // (but not observed).
@@ -440,4 +341,103 @@ private enum PropertyStorage<T> {
     // performance optimization (creating them involves a few memory allocations)
     // and is required for KVO to work correctly.
     case managedCached(value: T, key: PropertyKey)
+
+    public mutating func get(_ object: ObjectBase) -> T {
+        switch self {
+        case let .unmanaged(value, _, _):
+            return value
+        case .unmanagedNoDefault:
+            let value = T._rlmDefaultValue()
+            self = .unmanaged(value: value)
+            return value
+        case let .unmanagedObserved(value, key):
+            if let lastAccessedNames = object.lastAccessedNames {
+                let name: String
+                if T._rlmType == .linkingObjects {
+                    name = RLMObjectBaseObjectSchema(object)!.computedProperties[Int(key)].name
+                } else {
+                    name = RLMObjectBaseObjectSchema(object)!.properties[Int(key)].name
+                }
+                lastAccessedNames.add(name)
+                if let type = T.self as? KeypathRecorder.Type {
+                    return type.keyPathRecorder(with: lastAccessedNames) as! T
+                }
+                return T._rlmDefaultValue()
+            }
+            return value
+        case let .managed(key):
+            let v = T._rlmGetProperty(object, key)
+            if T._rlmRequiresCaching {
+                // Collection types are initialized once and stored on the
+                // object rather than on every access. Non-collection types
+                // cannot be cached without some mechanism for knowing when to
+                // reread them which we don't currently have.
+                self = .managedCached(value: v, key: key)
+            }
+            return v
+        case let .managedCached(value, _):
+            return value
+        }
+    }
+
+    public mutating func set(_ object: ObjectBase, value: T) {
+        if value is MutableRealmCollection {
+            (get(object) as! MutableRealmCollection).assign(value)
+            return
+        }
+        switch self {
+        case let .unmanagedObserved(_, key):
+            let name = RLMObjectBaseObjectSchema(object)!.properties[Int(key)].name
+            object.willChangeValue(forKey: name)
+            self = .unmanagedObserved(value: value, key: key)
+            object.didChangeValue(forKey: name)
+        case .managed(let key), .managedCached(_, let key):
+            T._rlmSetProperty(object, key, value)
+        case .unmanaged, .unmanagedNoDefault:
+            self = .unmanaged(value: value, indexed: false, primary: false)
+        }
+    }
+
+    // Called via RLMInitializeSwiftAccessor() to initialize the wrapper on a
+    // newly created managed accessor object.
+    public mutating func initialize(_ object: ObjectBase, key: PropertyKey) {
+        self = .managed(key: key)
+    }
+
+    // Collection types use this instead of the above because when promoting a
+    // unmanaged object to a managed object we want to reuse the existing collection
+    // object if it exists. Currently it always will exist because we read the
+    // value of the property first, but there's a potential optimization to
+    // skip initializing it on that read.
+    public mutating func initializeCollection(_ object: ObjectBase, key: PropertyKey) -> T? {
+        if case let .unmanaged(value, _, _) = self {
+            self = .managedCached(value: value, key: key)
+            return value
+        }
+        if case let .unmanagedObserved(value, _) = self {
+            self = .managedCached(value: value, key: key)
+            return value
+        }
+        self = .managed(key: key)
+        return nil
+    }
+
+    // Initialize an unmanaged property for observation
+    public mutating func observe(_ object: ObjectBase, property: RLMProperty) {
+        let value: T
+        switch self {
+        case let .unmanaged(v, _, _):
+            value = v
+        case .unmanagedNoDefault:
+            value = T._rlmDefaultValue()
+        case .unmanagedObserved, .managed, .managedCached:
+            return
+        }
+        // Mutating a collection triggers a KVO notification on the parent, so
+        // we need to ensure that the collection has a pointer to its parent.
+        if let value = value as? MutableRealmCollection {
+            value.setParent(object, property)
+        }
+        self = .unmanagedObserved(value: value, key: PropertyKey(property.index))
+    }
 }
