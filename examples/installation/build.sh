@@ -19,6 +19,7 @@ command:
   test-ios-swift-dynamic:          tests iOS Swift dynamic example.
   test-ios-swift-xcframework:      tests iOS Swift xcframework example.
   test-ios-swift-cocoapods:        tests iOS Swift CocoaPods example.
+  test-ios-swift-cocoapods-subdependency: tests RealmSwift as a subdependency.
   test-ios-swift-carthage:         tests iOS Swift Carthage example.
   test-ios-spm:                    tests iOS Swift Package Manager example.
 
@@ -188,6 +189,10 @@ case "$COMMAND" in
 
     test-*-*-cocoapods-dynamic)
         xctest "$PLATFORM" "$LANGUAGE" CocoaPodsDynamicExample
+        ;;
+
+    test-*-*-cocoapods-subdependency)
+        xctest "$PLATFORM" "$LANGUAGE" CocoaPodsSubdependency
         ;;
 
     test-*-*-static)

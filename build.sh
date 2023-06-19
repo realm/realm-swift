@@ -674,6 +674,7 @@ case "$COMMAND" in
 
         sh build.sh verify-cocoapods-ios
         sh build.sh verify-cocoapods-ios-dynamic
+        sh build.sh verify-cocoapods-ios-subdependency
         sh build.sh verify-cocoapods-osx
         sh build.sh verify-cocoapods-watchos
 
@@ -683,6 +684,7 @@ case "$COMMAND" in
         sh build.sh test-ios-objc-cocoapods
         sh build.sh test-ios-objc-cocoapods-dynamic
         sh build.sh test-ios-swift-cocoapods
+        sh build.sh test-ios-swift-cocoapods-subdependency
         sh build.sh test-osx-objc-cocoapods
         sh build.sh test-osx-swift-cocoapods
         sh build.sh test-catalyst-objc-cocoapods
@@ -698,6 +700,14 @@ case "$COMMAND" in
         export EXPANDED_CODE_SIGN_IDENTITY=''
         cd examples/installation
         sh build.sh test-ios-objc-cocoapods-dynamic
+        ;;
+
+    verify-cocoapods-ios-subdependency)
+        PLATFORM=$(echo "$COMMAND" | cut -d - -f 3)
+        # https://github.com/CocoaPods/CocoaPods/issues/7708
+        export EXPANDED_CODE_SIGN_IDENTITY=''
+        cd examples/installation
+        sh build.sh test-ios-swift-cocoapods-subdependency
         ;;
 
     verify-cocoapods-*)
