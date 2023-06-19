@@ -4,8 +4,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * None.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
-* None.
+* Fix SessionWrapper use-after-free crash when tearing down sessions when using session multiplexing ([Core #6656](https://github.com/realm/realm-core/issues/6656), since v10.38.3)
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
@@ -17,7 +16,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * Xcode: 14.1-15 beta 1.
 
 ### Internal
-* Upgraded realm-core from ? to ?
+* Upgraded realm-core from 13.15.0 to 13.15.1
 
 10.40.2 Release notes (2023-06-09)
 =============================================================
@@ -36,7 +35,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * If the order of properties in the local class definitions did not match the
   order in the server-side schema, the before-reset Realm argument passed to a
   client reset handler would have an invalid schema and likely crash if any
-  data was read from it. ([Core 6693](https://github.com/realm/realm-core/issues/6693), since v10.40.0)
+  data was read from it. ([Core #6693](https://github.com/realm/realm-core/issues/6693), since v10.40.0)
 
 ### Compatibility
 
@@ -48,7 +47,7 @@ x.y.z Release notes (yyyy-MM-dd)
 
 ### Internal
 
-* Upgraded realm-core from 13.13.0 to 13.16.0.
+* Upgraded realm-core from 13.13.0 to 13.15.0.
 * The prebuilt library used for CocoaPods installations is now built with Xcode
   14. This should not have any observable effects other than the download being
   much smaller due to no longer including bitcode.
