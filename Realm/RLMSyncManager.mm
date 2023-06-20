@@ -107,13 +107,6 @@ std::shared_ptr<realm::util::Logger> RLMWrapLogFunction(RLMSyncLogFunction fn) {
 
 #pragma mark - RLMSyncManager
 
-@interface RLMSyncTimeoutOptions () {
-    @public
-    realm::SyncClientTimeouts _options;
-}
-- (instancetype)initWithOptions:(realm::SyncClientTimeouts)options;
-@end
-
 @implementation RLMSyncManager {
     RLMUnfairMutex _mutex;
     std::shared_ptr<SyncManager> _syncManager;
@@ -128,27 +121,6 @@ std::shared_ptr<realm::util::Logger> RLMWrapLogFunction(RLMSyncLogFunction fn) {
         return self;
     }
     return nil;
-}
-
-+ (SyncClientConfig)configurationWithRootDirectory:(NSURL *)rootDirectory appId:(NSString *)appId {
-    SyncClientConfig config;
-    bool should_encrypt = !getenv("REALM_DISABLE_METADATA_ENCRYPTION") && !RLMIsRunningInPlayground();
-    config.metadata_mode = should_encrypt ? SyncManager::MetadataMode::Encryption
-                                          : SyncManager::MetadataMode::NoEncryption;
-    @autoreleasepool {
-        rootDirectory = rootDirectory ?: [NSURL fileURLWithPath:RLMDefaultDirectoryForBundleIdentifier(nil)];
-        config.base_file_path = rootDirectory.path.UTF8String;
-
-        bool isSwift = !!NSClassFromString(@"RealmSwiftObjectUtil");
-        config.user_agent_binding_info =
-            util::format("Realm%1/%2", isSwift ? "Swift" : "ObjectiveC",
-                         RLMStringDataWithNSString(REALM_COCOA_VERSION));
-        config.user_agent_application_info = RLMStringDataWithNSString(appId);
-    }
-    // Session multiplexing is currently broken and causes use-after-frees
-    config.multiplex_sessions = false;
-
-    return config;
 }
 
 - (std::weak_ptr<realm::app::App>)app {

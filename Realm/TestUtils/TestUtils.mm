@@ -22,6 +22,7 @@
 #import <Realm/Realm.h>
 #import <Realm/RLMSchema_Private.h>
 
+#import "RLMApp_Private.hpp"
 #import "RLMRealmUtil.hpp"
 #import "RLMSyncConfiguration_Private.hpp"
 #import "RLMSyncManager_Private.hpp"
@@ -204,17 +205,16 @@ static std::string fakeJWT() {
 @end
 
 RLMUser *RLMDummyUser() {
+    RLMAppConfiguration *config = [[RLMAppConfiguration alloc] init];
+    config.appId = @"dummy";
+    config.encryptMetadata = false;
+    config.transport = [NoOpTransport new];
+
     // Add a fake user to the metadata Realm
     @autoreleasepool {
-        auto config = [RLMSyncManager configurationWithRootDirectory:nil appId:@"dummy"];
-        realm::SyncFileManager sfm(config.base_file_path, "dummy");
+        realm::SyncFileManager sfm(config.rootDirectory.path.UTF8String, "dummy");
         std::optional<std::vector<char>> encryption_key;
-        if (config.metadata_mode == realm::SyncClientConfig::MetadataMode::Encryption) {
-            encryption_key = realm::keychain::get_existing_metadata_realm_key();
-        }
-        realm::SyncMetadataManager metadata_manager(sfm.metadata_path(),
-                                                    encryption_key != realm::util::none,
-                                                    encryption_key);
+        realm::SyncMetadataManager metadata_manager(sfm.metadata_path(), false);
         auto user = metadata_manager.get_or_make_user_metadata("dummy", "https://example.invalid");
         auto token = fakeJWT();
         user->set_access_token(token);
@@ -222,9 +222,7 @@ RLMUser *RLMDummyUser() {
     }
 
     // Creating an app reads the fake cached user
-    RLMAppConfiguration *config = [RLMAppConfiguration new];
-    config.transport = [NoOpTransport new];
-    RLMApp *app = [RLMApp appWithId:@"dummy" configuration:config];
+    RLMApp *app = [RLMApp appWithConfiguration:config];
     return app.allUsers.allValues.firstObject;
 }
 

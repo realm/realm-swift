@@ -131,11 +131,13 @@ static NSURL *syncDirectoryForChildProcess() {
 }
 
 - (RLMAppConfiguration*)defaultAppConfiguration {
-    return  [[RLMAppConfiguration alloc] initWithBaseURL:@"http://localhost:9090"
-                                               transport:[TestNetworkTransport new]
-                                            localAppName:nil
-                                         localAppVersion:nil
-                                 defaultRequestTimeoutMS:60000];
+    auto config = [[RLMAppConfiguration alloc] initWithBaseURL:@"http://localhost:9090"
+                                                     transport:[TestNetworkTransport new]
+                                                  localAppName:nil
+                                               localAppVersion:nil
+                                       defaultRequestTimeoutMS:60000];
+    config.rootDirectory = self.clientDataRoot;
+    return config;
 }
 
 - (void)addPersonsToRealm:(RLMRealm *)realm persons:(NSArray<Person *> *)persons {
@@ -553,7 +555,7 @@ static NSURL *syncDirectoryForChildProcess() {
 
 - (RLMApp *)app {
     if (!_app) {
-        _app = [RLMApp appWithId:self.appId configuration:self.defaultAppConfiguration rootDirectory:self.clientDataRoot];
+        _app = [self appWithId:self.appId];
         RLMSyncManager *syncManager = self.app.syncManager;
         syncManager.userAgent = self.name;
         [RLMLogger defaultLogger].level = RLMLogLevelOff;
@@ -632,10 +634,10 @@ static NSURL *syncDirectoryForChildProcess() {
     return [self childTaskWithAppIds:_appId ? @[_appId] : @[]];
 }
 
-- (RLMApp *)appFromAppId:(NSString *)appId {
-    return [RLMApp appWithId:appId
-               configuration:self.defaultAppConfiguration
-               rootDirectory:self.clientDataRoot];
+- (RLMApp *)appWithId:(NSString *)appId {
+    auto config = self.defaultAppConfiguration;
+    config.appId = appId;
+    return [RLMApp appWithConfiguration:config];
 }
 
 - (NSString *)partitionBsonType:(id<RLMBSON>)bson {
@@ -678,11 +680,9 @@ static NSURL *syncDirectoryForChildProcess() {
 
 - (RLMApp *)flexibleSyncApp {
     if (!_flexibleSyncApp) {
-        _flexibleSyncApp = [RLMApp appWithId:self.flexibleSyncAppId
-                               configuration:self.defaultAppConfiguration
-                               rootDirectory:self.clientDataRoot];
+        _flexibleSyncApp = [self appWithId:self.flexibleSyncAppId];
         RLMSyncManager *syncManager = self.flexibleSyncApp.syncManager;
-        [RLMLogger defaultLogger].level = RLMLogLevelOff;
+        RLMLogger.defaultLogger.level = RLMLogLevelOff;
         syncManager.userAgent = self.name;
     }
     return _flexibleSyncApp;

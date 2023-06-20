@@ -149,7 +149,7 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
 - (NSString *)partitionBsonType:(id<RLMBSON>)bson;
 
-- (RLMApp *)appFromAppId:(NSString *)appId;
+- (RLMApp *)appWithId:(NSString *)appId;
 
 - (void)resetAppCache;
 

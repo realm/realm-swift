@@ -36,15 +36,15 @@ typedef void(^RLMAppNotificationBlock)(RLMApp *);
 /// Subscribe to notifications for this RLMApp.
 - (RLMAppSubscriptionToken *)subscribe:(RLMAppNotificationBlock)block;
 
-+ (instancetype)appWithId:(NSString *)appId
-            configuration:(nullable RLMAppConfiguration *)configuration
-            rootDirectory:(nullable NSURL *)rootDirectory;
-
-+ (instancetype)uncachedAppWithId:(NSString *)appId
-                    configuration:(RLMAppConfiguration *)configuration
-                    rootDirectory:(nullable NSURL *)rootDirectory;
++ (instancetype)appWithConfiguration:(RLMAppConfiguration *)configuration;
 
 + (void)resetAppCache;
+@end
+
+@interface RLMAppConfiguration ()
+@property (nonatomic) NSString *appId;
+@property (nonatomic) BOOL encryptMetadata;
+@property (nonatomic) NSURL *rootDirectory;
 @end
 
 RLM_HEADER_AUDIT_END(nullability, sendability)

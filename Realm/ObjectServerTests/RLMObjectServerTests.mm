@@ -733,12 +733,8 @@ static NSString *randomEmail() {
         appId2 = self.appIds[1];
     }
 
-    RLMApp *app1 = [RLMApp appWithId:appId1
-                       configuration:[self defaultAppConfiguration]
-                       rootDirectory:[self clientDataRoot]];
-    RLMApp *app2 = [RLMApp appWithId:appId2
-                       configuration:[self defaultAppConfiguration]
-                       rootDirectory:[self clientDataRoot]];
+    RLMApp *app1 = [self appWithId:appId1];
+    RLMApp *app2 = [self appWithId:appId2];
 
     [self logInUserForCredentials:[RLMCredentials anonymousCredentials] app:app1];
     [self logInUserForCredentials:[RLMCredentials anonymousCredentials] app:app2];
@@ -1840,6 +1836,9 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
                                                                   localAppName:nil
                                                                localAppVersion:nil
                                                        defaultRequestTimeoutMS:60];
+    RLMSyncTimeoutOptions *timeoutOptions = [RLMSyncTimeoutOptions new];
+    timeoutOptions.connectTimeout = 1000.0;
+    config.syncTimeouts = timeoutOptions;
     NSString *appId = [RealmServer.shared createAppAndReturnError:nil];
     RLMApp *app = [RLMApp appWithId:appId configuration:config];
     RLMUser *user = [self logInUserForCredentials:[RLMCredentials anonymousCredentials] app:app];
@@ -1849,10 +1848,6 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     RLMSyncConfiguration *syncConfig = c.syncConfiguration;
     syncConfig.cancelAsyncOpenOnNonFatalErrors = true;
     c.syncConfiguration = syncConfig;
-
-    RLMSyncTimeoutOptions *timeoutOptions = [RLMSyncTimeoutOptions new];
-    timeoutOptions.connectTimeout = 1000.0;
-    app.syncManager.timeoutOptions = timeoutOptions;
 
     // Set delay above the timeout so it should fail
     proxy.delay = 2.0;

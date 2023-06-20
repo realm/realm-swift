@@ -32,7 +32,7 @@ import RealmSwiftTestSupport
 class SwiftFlexibleSyncTests: SwiftSyncTestCase {
     func testCreateFlexibleSyncApp() throws {
         let appId = try RealmServer.shared.createAppWithQueryableFields(["age"])
-        let flexibleApp = app(fromAppId: appId)
+        let flexibleApp = app(withId: appId)
         let user = try logInUser(for: basicCredentials(app: flexibleApp), app: flexibleApp)
         XCTAssertNotNil(user)
         try RealmServer.shared.deleteApp(appId)
@@ -1002,12 +1002,8 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
 
         let appConfig = AppConfiguration(baseURL: "http://localhost:5678",
                                          transport: AsyncOpenConnectionTimeoutTransport(),
-                                         localAppName: nil, localAppVersion: nil)
+                                         syncTimeouts: SyncTimeoutOptions(connectTimeout: 2000))
         let app = App(id: flexibleSyncAppId, configuration: appConfig)
-
-        let syncTimeoutOptions = SyncTimeoutOptions()
-        syncTimeoutOptions.connectTimeout = 2000
-        app.syncManager.timeoutOptions = syncTimeoutOptions
 
         let user = try logInUser(for: basicCredentials(app: app), app: app)
         let config = user.flexibleSyncConfiguration(cancelAsyncOpenOnNonFatalErrors: true)

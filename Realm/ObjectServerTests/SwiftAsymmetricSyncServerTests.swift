@@ -148,11 +148,7 @@ class SwiftAsymmetricSyncTests: SwiftSyncTestCase {
             }
         }
 
-        let appConfig = AppConfiguration(baseURL: "http://localhost:9090",
-                                         transport: nil,
-                                         localAppName: nil,
-                                         localAppVersion: nil)
-        return App(id: appId!, configuration: appConfig)
+        return App(id: appId!, configuration: AppConfiguration(baseURL: "http://localhost:9090"))
     }
     static var asymmetricAppId: String?
 

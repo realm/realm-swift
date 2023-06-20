@@ -190,10 +190,7 @@ struct LoginView: View {
 class LoginHelper: ObservableObject {
     var cancellables = Set<AnyCancellable>()
 
-    private let appConfig = AppConfiguration(baseURL: "http://localhost:9090",
-                                             transport: nil,
-                                             localAppName: nil,
-                                             localAppVersion: nil)
+    private let appConfig = AppConfiguration(baseURL: "http://localhost:9090")
 
     func login(email: String, password: String, completion: @escaping (User) -> Void) {
         let app = RealmSwift.App(id: ProcessInfo.processInfo.environment["app_id"]!, configuration: appConfig)

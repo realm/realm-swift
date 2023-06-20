@@ -1623,10 +1623,8 @@ private class ObservableAsyncOpenStorage: ObservableObject {
         }
 
         // Setup timeout if needed
-        if let timeout = timeout {
-            let syncTimeoutOptions = SyncTimeoutOptions()
-            syncTimeoutOptions.connectTimeout = timeout
-            app.syncManager.timeoutOptions = syncTimeoutOptions
+        if let timeout {
+            app.syncManager.timeoutOptions = SyncTimeoutOptions(connectTimeout: timeout)
         }
         return app
     }
