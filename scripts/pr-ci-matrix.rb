@@ -45,6 +45,7 @@ targets = {
   'cocoapods-osx' => all,
   'cocoapods-ios' => oldest_and_latest,
   'cocoapods-ios-dynamic' => oldest_and_latest,
+  'cocoapods-ios-subdependency' => latest_only,
   'cocoapods-watchos' => oldest_and_latest,
   # 'cocoapods-catalyst' => oldest_and_latest,
   'swiftui-ios' => latest_only,

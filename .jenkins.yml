@@ -34,6 +34,7 @@ target:
  - cocoapods-osx
  - cocoapods-ios
  - cocoapods-ios-dynamic
+ - cocoapods-ios-subdependency
  - cocoapods-watchos
  - swiftui-ios
  - swiftui-server-osx
@@ -131,6 +132,12 @@ exclude:
 
   - xcode_version: 14.2
     target: cocoapods-ios-dynamic
+
+  - xcode_version: 14.1
+    target: cocoapods-ios-subdependency
+
+  - xcode_version: 14.2
+    target: cocoapods-ios-subdependency
 
   - xcode_version: 14.2
     target: cocoapods-watchos

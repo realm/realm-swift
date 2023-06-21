@@ -18,7 +18,7 @@
 
 #import <Realm/RLMAsyncTask.h>
 
-#import <Realm/RLMRealm_Private.h>
+#import "RLMRealm_Private.h"
 
 RLM_HEADER_AUDIT_BEGIN(nullability)
 
