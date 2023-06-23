@@ -325,17 +325,27 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
                                                   predicate:(NSPredicate *)predicate {
     RLMClassInfo& info = _realm->_info[objectClassName];
     auto query = RLMPredicateToQuery(predicate, info.rlmObjectSchema, _realm.schema, _realm.group);
-    return [self subscriptionWithClassName:objectClassName query:query];
+    return [self subscriptionWithQuery:query];
 }
 
-- (nullable RLMSyncSubscription *)subscriptionWithClassName:(NSString *)ObjectClassName
-                                                      query:(realm::Query)query {
+- (nullable RLMSyncSubscription *)subscriptionWithQuery:(realm::Query)query {
     auto subscription = _subscriptionSet->find(query);
     if (subscription) {
         return [[RLMSyncSubscription alloc] initWithSubscription:*subscription
                                                  subscriptionSet:self];
     }
     return nil;
+}
+
+- (nullable RLMSyncSubscription *)subscriptionWithName:(NSString *)name
+                                                 query:(realm::Query)query {
+    auto subscription = _subscriptionSet->find([name UTF8String]);
+    if (subscription && subscription->query_string == query.get_description()) {
+        return [[RLMSyncSubscription alloc] initWithSubscription:*subscription
+                                                 subscriptionSet:self];
+    } else {
+        return nil;
+    }
 }
 
 

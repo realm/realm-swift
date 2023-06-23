@@ -1397,17 +1397,15 @@ extension SwiftFlexibleSyncServerTests {
 
         let results0 = try await realm.objects(SwiftPerson.self).where { $0.age >= 8 }.subscribe()
         let ex = XCTestExpectation(description: "no attempt to re-create subscription, returns immediately")
+        realm.syncSession!.suspend()
         Task {
-            print("start task")
             _ = try await realm.objects(SwiftPerson.self).where { $0.age >= 8 }.subscribe()
             _ = try await results0.subscribe()
             XCTAssertEqual(realm.subscriptions.count, 1)
             ex.fulfill()
         }
-        print("start await")
-        await fulfillment(of: [ex], timeout: 5.0)
+        await fulfillment(of: [ex], timeout: 2.0)
         XCTAssertEqual(realm.subscriptions.count, 1)
-
     }
 
     @MainActor
@@ -1479,7 +1477,7 @@ extension SwiftFlexibleSyncServerTests {
         XCTAssertEqual(realm.subscriptions.count, 1)
         results0 = try await results0.where { $0.age < 8 }.subscribe() // subscribes to "age >= 8 && age < 8" because that's the local query
         XCTAssertEqual(results0.count, 0)
-        XCTAssertEqual(realm.subscriptions.count, 2) // "age >= 8" and "age >= 8 && age < 8"
+        XCTAssertEqual(realm.subscriptions.count, 2) // Two subs present:1) "age >= 8" 2) "age >= 8 && age < 8"
         let results1 = realm.objects(SwiftPerson.self)
         XCTAssertEqual(results1.count, 3)
         results0.unsubscribe() // unsubscribes from "age >= 8 && age < 8"

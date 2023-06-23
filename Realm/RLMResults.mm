@@ -604,14 +604,14 @@ keyPaths:(std::optional<std::vector<std::vector<std::pair<realm::TableKey, realm
         case RLMWaitForSyncModeOnCreation:
             // If an existing named subscription matches the provided name and local query, return.
             if (name) {
-                RLMSyncSubscription *sub = [subscriptions subscriptionWithName:name];
-                if (sub.stdString == _results.get_query().get_description()) {
+                RLMSyncSubscription *sub = [subscriptions subscriptionWithName:name query:_results.get_query()];
+                if (sub != nil) {
                     [self completeOnQueue:queue completion:completion error:nil];
                     return;
                 }
             } else {
                 // otherwise check if an unnamed subscription already exists. Return if it does exist.
-                RLMSyncSubscription *sub = [subscriptions subscriptionWithClassName:self.objectClassName query:_results.get_query()];
+                RLMSyncSubscription *sub = [subscriptions subscriptionWithQuery:_results.get_query()];
                 if (sub != nil && sub.name == nil) {
                     [self completeOnQueue:queue completion:completion error:nil];
                     return;
@@ -655,12 +655,12 @@ keyPaths:(std::optional<std::vector<std::vector<std::pair<realm::TableKey, realm
     __block BOOL called = false;
     void(^methodCompletion)(RLMResults* _Nullable, NSError* _Nullable) = ^(RLMResults* _Nullable results, NSError* _Nullable error) {
         if (!called) {
+            called = true;
             if (error != nil) {
                 completion(nil, error);
             } else {
                 completion(results, nil);
             }
-            called = true;
         }
     };
 
@@ -684,7 +684,7 @@ keyPaths:(std::optional<std::vector<std::vector<std::pair<realm::TableKey, realm
             [subscriptions removeSubscriptionWithId:self.associatedSubscriptionId];
         }];
     } else {
-        RLMSyncSubscription *sub = [subscriptions subscriptionWithClassName:self.objectClassName query:_results.get_query()];
+        RLMSyncSubscription *sub = [subscriptions subscriptionWithQuery:_results.get_query()];
         if (sub != nil  && sub.name == nil) {
             [subscriptions update:^{
                 [subscriptions removeSubscriptionWithClassName:self.objectClassName

@@ -47,8 +47,11 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
                                                 query:(realm::Query)query
                                        updateExisting:(BOOL)updateExisting;
 
-- (nullable RLMSyncSubscription *)subscriptionWithClassName:(NSString *)ObjectClassName
-                                                      query:(realm::Query)query;
+- (nullable RLMSyncSubscription *)subscriptionWithQuery:(realm::Query)query;
+
+// Return subscription that matches name *and* query
+- (nullable RLMSyncSubscription *)subscriptionWithName:(NSString *)name
+                                                 query:(realm::Query)query;
 
 - (void)removeSubscriptionWithClassName:(NSString *)objectClassName
                                   query:(realm::Query)query;
