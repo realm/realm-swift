@@ -1385,7 +1385,7 @@ extension SwiftFlexibleSyncServerTests {
         XCTAssertEqual(realm.subscriptions.count, 1)
         results0 = try await results0.where { $0.age < 8 }.subscribe() // results0 local query is { $0.age >= 8 AND $0.age < 8 }
         XCTAssertEqual(results0.count, 0) // no matches because local query is impossible
-        XCTAssertEqual(realm.subscriptions.count, 2) // two subsscriptions: "$0.age >= 8 AND $0.age < 8" and "$0.age >= 8"
+        XCTAssertEqual(realm.subscriptions.count, 2) // two subscriptions: "$0.age >= 8 AND $0.age < 8" and "$0.age >= 8"
         let results1 = realm.objects(SwiftPerson.self)
         XCTAssertEqual(results1.count, 3) // three objects on device because subscription "$0.age >= 8" still exists
     }

@@ -153,7 +153,7 @@ extension Projection: KeypathSortable {}
     /**
      Creates a SyncSubscription matching the Results' local filter.
 
-     This method opens a write transaction that creates or updates a subscription.
+     This method opens a transaction that creates or updates a subscription.
      It's advised to *not* use this method to batch multiple subscription changes
      to the server.
      For batch updates use `SyncSubscription.update`
@@ -181,7 +181,7 @@ extension Projection: KeypathSortable {}
     @_unsafeInheritExecutor
     public func subscribe(name: String? = nil, waitForSync: WaitForSyncMode = .onCreation, timeout: TimeInterval? = nil) async throws -> Results<Element> {
         var rlmResults = ObjectiveCSupport.convert(object: self)
-        guard let unwrapped = timeout else {
+        guard let timeout = timeout else {
             rlmResults = try await rlmResults.__subscribe(withName: name, waitForSyncMode: waitForSync, on: nil)
             return Results(rlmResults)
         }
@@ -192,13 +192,13 @@ extension Projection: KeypathSortable {}
     /**
      Removes a SyncSubscription matching the Results' local filter.
 
-     This method opens a write transaction that removes a subscription.
+     This method opens an update transaction that removes a subscription.
      It is advised to *not* use this method to batch multiple subscription changes
      to the server.
      For batch updates use `SyncSubscription.update`
 
-     The method returns after committing the subcsription removal to the realm's
-     local subscriptionset. Calling this method will not wait for objects to
+     The method returns after committing the subscription removal to the realm's
+     local subscription set. Calling this method will not wait for objects to
      be removed from the realm.
 
      - warning: Calling unsubscribe on a Results does not remove the local filter from the Results. After calling unsubcsribe, Results may still contain objects because other

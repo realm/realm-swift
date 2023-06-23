@@ -20,7 +20,7 @@
 
 RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
-/// A block type used for APIs which asynchronously return an `RLMResults`.
+/// A block type used for APIs which asynchronously return a `Results`.
 typedef void(^RLMResultsCompletionBlock)(RLMResults * _Nullable, NSError * _Nullable);
 
 /**
@@ -32,10 +32,10 @@ typedef NS_ENUM(NSUInteger, RLMWaitForSyncMode) {
     /// from the server only when the subscription is created the first time. If the
     /// subscriptions already exists, the method will return without waiting for new downloads.
     RLMWaitForSyncModeOnCreation,
-    /// `subscribeWithName` will always for downloads before returning.
+    /// `subscribeWithName` will always wait for downloads before returning.
     /// The method will not return in this mode unless an internet connection is established or a timeout is set.
     RLMWaitForSyncModeAlways,
-    /// `subscribeWithName` will not for downloads before returning.
+    /// `subscribeWithName` will not wait for downloads before returning.
     RLMWaitForSyncModeNever
 } NS_SWIFT_NAME(WaitForSyncMode);
 
