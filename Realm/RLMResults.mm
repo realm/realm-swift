@@ -21,7 +21,7 @@
 #import "RLMAccessor.hpp"
 #import "RLMArray_Private.hpp"
 #import "RLMCollection_Private.hpp"
-#import "RLMError_Private.hpp"
+#import "RLMError.h"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObjectStore.h"
 #import "RLMObject_Private.hpp"
@@ -31,7 +31,6 @@
 #import "RLMRealmConfiguration_Private.hpp"
 #import "RLMSchema_Private.h"
 #import "RLMSectionedResults_Private.hpp"
-#import "RLMSyncSubscription.h"
 #import "RLMSyncSubscription_Private.hpp"
 #import "RLMThreadSafeReference_Private.hpp"
 #import "RLMUtil.hpp"
@@ -571,17 +570,6 @@ keyPaths:(std::optional<std::vector<std::vector<std::pair<realm::TableKey, realm
     return _results.add_notification_callback(RLMWrapCollectionChangeCallback(block, self, true), std::move(keyPaths));
 }
 
-- (void)subscribeWithCompletion:(RLMResultsCompletionBlock)completion
-                        onQueue:(dispatch_queue_t _Nullable)queue {
-    return [self subscribeWithName:nil onQueue:queue completion:completion];
-};
-
-- (void)subscribeWithName:(NSString *_Nullable)name
-                  onQueue:(dispatch_queue_t _Nullable)queue
-               completion:(RLMResultsCompletionBlock)completion {
-    return [self subscribeWithName:name waitForSyncMode:RLMWaitForSyncModeOnCreation onQueue:queue completion:completion];
-}
-
 - (void)completeOnQueue:(dispatch_queue_t _Nullable)queue
              completion:(RLMResultsCompletionBlock)completion
                   error:(NSError *_Nullable)error {
@@ -593,6 +581,17 @@ keyPaths:(std::optional<std::vector<std::vector<std::pair<realm::TableKey, realm
     } else {
         completion(ret, error);
     }
+}
+
+- (void)subscribeWithCompletion:(RLMResultsCompletionBlock)completion
+                        onQueue:(dispatch_queue_t _Nullable)queue {
+    return [self subscribeWithName:nil onQueue:queue completion:completion];
+};
+
+- (void)subscribeWithName:(NSString *_Nullable)name
+                  onQueue:(dispatch_queue_t _Nullable)queue
+               completion:(RLMResultsCompletionBlock)completion {
+    return [self subscribeWithName:name waitForSyncMode:RLMWaitForSyncModeOnCreation onQueue:queue completion:completion];
 }
 
 - (void)subscribeWithName:(NSString *_Nullable)name
@@ -636,12 +635,12 @@ keyPaths:(std::optional<std::vector<std::vector<std::pair<realm::TableKey, realm
             return;
     }
 
-    [subscriptions updateOnQueue:queue block:^{
+    [subscriptions update: ^{
         self.associatedSubscriptionId = [subscriptions addSubscriptionWithClassName:self.objectClassName
                                                                    subscriptionName:name
                                                                               query:_results.get_query()
                                                                      updateExisting:true];
-    } onComplete:^(NSError *error) {
+    } queue: queue onComplete:^(NSError *error) {
         [self completeOnQueue:queue completion:completion error:error];
     }];
 }

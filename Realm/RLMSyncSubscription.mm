@@ -241,12 +241,16 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
 #pragma mark - Batch Update subscriptions
 
 - (void)update:(__attribute__((noescape)) void(^)(void))block {
-    return [self update:block onComplete:nil];
+    [self update:block onComplete:nil];
 }
 
-- (void)updateOnQueue:(nullable dispatch_queue_t)queue
-                block:(__attribute__((noescape)) void(^)(void))block
-           onComplete:(void(^)(NSError *))completionBlock {
+- (void)update:(__attribute__((noescape)) void(^)(void))block onComplete:(void(^)(NSError *))completionBlock {
+    [self update:block queue:nil onComplete:completionBlock];
+}
+
+- (void)update:(__attribute__((noescape)) void(^)(void))block
+         queue:(nullable dispatch_queue_t)queue
+    onComplete:(void(^)(NSError *))completionBlock {
     if (_mutableSubscriptionSet) {
         @throw RLMException(@"Cannot initiate a write transaction on subscription set that is already being updated.");
     }
@@ -274,10 +278,6 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
     if (completionBlock) {
         [self waitForSynchronizationOnQueue:queue completionBlock:completionBlock];
     }
-}
-
-- (void)update:(__attribute__((noescape)) void(^)(void))block onComplete:(void(^)(NSError *))completionBlock {
-    [self updateOnQueue:nil block:block onComplete:completionBlock];
 }
 
 - (void)waitForSynchronizationOnQueue:(nullable dispatch_queue_t)queue

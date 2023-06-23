@@ -90,13 +90,6 @@ extension ObjectBase: KeypathSortable {}
 extension Projection: KeypathSortable {}
 
 /**
- Determines wait for download behavior when subscribing on RLMResults.
-
- - see: `RLMWaitForSyncMode`
- */
-public typealias WaitForSyncMode = RLMWaitForSyncMode
-
-/**
  `Results` is an auto-updating container type in Realm returned from object queries.
 
  `Results` can be queried with the same predicates as `List<Element>`, and you can
@@ -169,17 +162,20 @@ public typealias WaitForSyncMode = RLMWaitForSyncMode
      will wait for downloads according to the `WaitForSyncMode`.
      - see: ``WaitForSyncMode``
 
-     If `.subscribe()` is called without a name on a query
-     that's already subscribed to without a name, another subscription is not created.
-     If `.subscribe()` is called without a name on a query
-     that's already subscribed to with a name, an additional subscription is created without a name.
-     If `.subscribe()` is called with a name on a query that's
-     already subscribed to without a name, an additional subscription is created
-     with the provided name.
-     If `.subscribe()` is called with a name that's in use on
-     a different query, the old subscription is updated with the new query.
-     If `.subscribe()` is called with the same name and
-     same query of an existing subscription, no new subscription is created.
+     __Unnamed subcsriptions:__
+     If `.subscribe()` is called without a name whose query matches an unnamed subscription, another subscription is not created.
+     If `.subscribe()` is called without a name whose query matches a named subscription, an additional  unnamed subscription is created.
+     __Named Subscriptions:__
+     If `.subscribe()` is called with a name whose query matches an unnamed subscription, an additional named subscription is created.
+     __Existing name and query:__
+     If `.subscribe()` is called with a name whose name is taken on a different query, the old subscription is updated with the new query.
+     If `.subscribe()` is called with a name that's in already in use by an identical query, no new subscription is created.
+
+     - parameter name: The name applied to the subscription
+     - parameter waitForSync: Determines the download behavior for the subscription. Defaults to `.onCreation`.
+     See `RLMWaitForSyncMode`.
+     - parameter timeout: An optional client timeout. The client will cancel waiting for subscription downloads after this time has elapsed. Reaching this timeout doesn't imply a server error.
+     - returns: A `Results` object.
      */
     @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
     @_unsafeInheritExecutor
@@ -205,8 +201,7 @@ public typealias WaitForSyncMode = RLMWaitForSyncMode
      local subscriptionset. Calling this method will not wait for objects to
      be removed from the realm.
 
-     Calling unsubscribe on a Results does not remove the local filter from the Results.
-     After calling unsubcsribe, Results may still contain objects because other
+     - warning: Calling unsubscribe on a Results does not remove the local filter from the Results. After calling unsubcsribe, Results may still contain objects because other
      subscriptions may exist in the realm's subscription set.
 
      In order for a named subscription to be removed, the Results
@@ -224,7 +219,6 @@ public typealias WaitForSyncMode = RLMWaitForSyncMode
         let rlmResults = ObjectiveCSupport.convert(object: self)
         rlmResults.__unsubscribe()
     }
-
 }
 
 extension Results: Encodable where Element: Encodable {}

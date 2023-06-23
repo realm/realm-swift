@@ -1490,7 +1490,7 @@ extension SwiftFlexibleSyncServerTests {
     }
 
     @MainActor
-    func testUnsubscribeWithoutSubscription() async throws {
+    func testUnsubscribeWithoutSubscriptionExistingNamed() async throws {
         try await populateSwiftPerson()
         let realm = try openFlexibleSyncRealm()
 
@@ -1500,6 +1500,15 @@ extension SwiftFlexibleSyncServerTests {
         results.unsubscribe()
         XCTAssertEqual(realm.subscriptions.count, 1)
         XCTAssertEqual(realm.subscriptions.first!.name, "sub1")
+    }
+
+    func testUnsubscribeNoExistingMatch() async throws {
+        try await populateSwiftPerson()
+        let realm = try openFlexibleSyncRealm()
+
+        XCTAssertEqual(realm.subscriptions.count, 0)
+        let results = realm.objects(SwiftPerson.self).where { $0.age >= 8 }
+        results.unsubscribe()
     }
 
     @MainActor
@@ -1584,16 +1593,16 @@ extension SwiftFlexibleSyncServerTests {
     }
 
     @MainActor
-    func skip_testSubscribeAlways() async throws {
+    func testSubscribeAlways() async throws {
+        let collection = try await setupCollection("SwiftPerson")
         try await populateSwiftPerson()
         let realm = try openFlexibleSyncRealm()
-        let collection = try await setupCollection("SwiftPerson")
 
         var results = try await realm.objects(SwiftPerson.self).where { $0.age >= 9 }.subscribe(waitForSync: .always)
         XCTAssertEqual(results.count, 2)
 
+        // suspend session on client. Add a document that isn't on the client.
         realm.syncSession!.suspend()
-
         let serverObject: Document = [
                      "_id": .objectId(ObjectId.generate()),
                      "firstName": .string("Paul"),
@@ -1606,15 +1615,13 @@ extension SwiftFlexibleSyncServerTests {
         while collection.count(filter: [:]).await(self) != 11 && start.timeIntervalSinceNow > -10.0 {
             sleep(1) // wait until server sync
         }
-        XCTAssertEqual(collection.count(filter: [:]).await(self), 11) // continuously fails with different count (usually between 5-10 documents on server). Why? Any alternatives other than polling?
-        // Another way to test this is to end the sync session. Wait with .always. Let the server hang, and after an arbitrary wait, end the wait and suceed the test.
-        // But that seems like an awful test.
 
+        // Resume the client session.
         realm.syncSession!.resume()
         XCTAssertEqual(results.count, 2)
         results = try await realm.objects(SwiftPerson.self).where { $0.age >= 9 }.subscribe(waitForSync: .always)
-        // Expect the second subscribe to wait for sync downloads, even though the subscription already existed
-        XCTAssertEqual(results.count, 3)
+        // Expect this subscribe call to wait for sync downloads, even though the subscription already existed
+        XCTAssertEqual(results.count, 3) // Count is 3 because it includes the object/document that was created while offline.
         XCTAssertEqual(realm.subscriptions.count, 1)
     }
 

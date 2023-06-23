@@ -37,7 +37,7 @@ typedef NS_ENUM(NSUInteger, RLMWaitForSyncMode) {
     RLMWaitForSyncModeAlways,
     /// `subscribeWithName` will not for downloads before returning.
     RLMWaitForSyncModeNever
-};
+} NS_SWIFT_NAME(WaitForSyncMode);
 
 @class RLMObject;
 
@@ -584,14 +584,7 @@ __attribute__((warn_unused_result));
  other subscriptions may exist in the RLMRealm's subscription set.
 
  In order for a named subscription to be removed, the RLMResults
- must have previously created the subscription. For example:
- ```
- let results1 = try await realm.objects(Dog.self).where { $0.age >= 2 }.subscribe(name: "dog_2andOver")
- let results2 = try await realm.objects(Dog.self).where { $0.age >= 2 }.subscribe(name: "dog_2andUp")
- // This removes the subscription named "dog_2andUp" only.
- // "dog_2andOver" remains in the subscription set.
- results2.unsubscribe()
- ```
+ must have previously created the subscription.
  */
 - (void)unsubscribe NS_REFINED_FOR_SWIFT;
 
