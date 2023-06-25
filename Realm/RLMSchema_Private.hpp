@@ -18,6 +18,8 @@
 
 #import "RLMSchema_Private.h"
 
+#import <Realm/RLMConstants.h>
+
 #import <memory>
 
 namespace realm {

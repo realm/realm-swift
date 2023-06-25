@@ -43,13 +43,13 @@ private:
 };
 
 @interface RLMUser ()
-- (instancetype)initWithUser:(std::shared_ptr<realm::SyncUser>)user app:(RLMApp *)app;
-- (std::string)pathForPartitionValue:(std::string const&)partitionValue;
-- (std::string)pathForFlexibleSync;
-- (std::shared_ptr<realm::SyncUser>)_syncUser;
-+ (void)_setUpBindingContextFactory;
 @property (weak, readonly) RLMApp *app;
 
+- (instancetype)initWithUser:(std::shared_ptr<realm::SyncUser>)user app:(RLMApp *)app RLM_DIRECT;
+- (std::string)pathForPartitionValue:(std::string const&)partitionValue RLM_DIRECT;
+- (std::string)pathForFlexibleSync RLM_DIRECT;
+- (std::shared_ptr<realm::SyncUser>)_syncUser;
++ (void)_setUpBindingContextFactory;
 @end
 
 @interface RLMUserProfile ()

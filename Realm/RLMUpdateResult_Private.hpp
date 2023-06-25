@@ -18,10 +18,12 @@
 
 #import <Realm/RLMUpdateResult.h>
 
+#import <Realm/RLMConstants.h>
+
 #import <realm/object-store/sync/mongo_collection.hpp>
 
 RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 @interface RLMUpdateResult ()
-- (instancetype)initWithUpdateResult:(realm::app::MongoCollection::UpdateResult)UpdateResult;
+- (instancetype)initWithUpdateResult:(realm::app::MongoCollection::UpdateResult)UpdateResult RLM_DIRECT;
 @end
 RLM_HEADER_AUDIT_END(nullability, sendability)

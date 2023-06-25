@@ -100,7 +100,7 @@ static const int RLMEnumerationBufferSize = 16;
 
 - (instancetype)initWithResults:(realm::Results&)results
                      collection:(id)collection
-                      classInfo:(RLMClassInfo&)info {
+                      classInfo:(RLMClassInfo&)info RLM_DIRECT {
     self = [super init];
     if (self) {
         _info = &info;
@@ -392,7 +392,7 @@ std::vector<std::pair<std::string, bool>> RLMSortDescriptorsToKeypathArray(NSArr
     realm::CollectionChangeSet _indices;
 }
 
-- (instancetype)initWithChanges:(realm::CollectionChangeSet)indices {
+- (instancetype)initWithChanges:(realm::CollectionChangeSet)indices RLM_DIRECT {
     self = [super init];
     if (self) {
         _indices = std::move(indices);

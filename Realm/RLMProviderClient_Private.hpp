@@ -18,6 +18,8 @@
 
 #import <Realm/RLMProviderClient.h>
 
+#import <Realm/RLMConstants.h>
+
 #import <realm/object-store/sync/app.hpp>
 
 @interface RLMProviderClient ()
