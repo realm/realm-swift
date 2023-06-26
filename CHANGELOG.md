@@ -1,6 +1,8 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.41.0 Release notes (2023-06-26)
 =============================================================
+
 ### Enhancements
+
 * Add support for multiplexing sync connections. When enabled (the default), a single
   connection is used per sync user rather than one per synchronized Realm. This
   reduces resource consumption when multiple Realms are opened and will
@@ -9,17 +11,20 @@ x.y.z Release notes (yyyy-MM-dd)
   other app-wide configuration settings ([PR #8282](https://github.com/realm/realm-swift/pull/8282)).
 
 ### Fixed
+
 * Import as `RLMRealm_Private.h` as a module would cause issues when using Realm as a subdependency.
   ([#8164](https://github.com/realm/realm-swift/issues/8164), since 10.37.0)
 * Disable setting a custom logger by default on the sync client when the sync manager is created.
   This was overriding the default logger set using `RLMLogger.defaultLogger`. (since v10.39.0).
 
 ### Breaking Changes
+
 * The `RLMSyncTimeouts.appConfiguration` property has been removed. This was an
   unimplemented read-only property which did not make any sense on the
   containing type ([PR #8282](https://github.com/realm/realm-swift/pull/8282)).
 
 ### Compatibility
+
 * Realm Studio: 14.0.1 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 14.3.1.
@@ -27,6 +32,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * Xcode: 14.1-15 beta 2.
 
 ### Internal
+
 * Upgraded realm-core from 13.15.0 to 13.15.1
 
 10.40.2 Release notes (2023-06-09)
