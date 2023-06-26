@@ -3,7 +3,7 @@ platforms = ['osx', 'ios', 'watchos', 'tvos', 'catalyst']
 carthagePlatforms = ['osx', 'ios', 'watchos', 'tvos']
 platformNames = ['osx': 'macOS', 'ios': 'iOS', 'watchos': 'watchOS', 'tvos': 'tvOS', 'catalyst': 'Catalyst']
 carthageXcodeVersion = '14.3.1'
-docsSwiftVersion = '5.8'
+docsSwiftVersion = '5.8.1'
 
 def installationTest(platform, test, language) {
   return {
