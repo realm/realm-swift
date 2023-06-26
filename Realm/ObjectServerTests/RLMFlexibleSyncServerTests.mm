@@ -32,11 +32,9 @@
 
 @implementation RLMFlexibleSyncTests
 - (void)testCreateFlexibleSyncApp {
-    NSString *appId =  [RealmServer.shared createAppWithQueryableFields:@[@"age", @"breed"]
-                                                                  error:nil];
-    RLMApp *app = [RLMApp appWithId:appId
-                      configuration:[self defaultAppConfiguration]
-                      rootDirectory:[self clientDataRoot]];
+    NSString *appId = [RealmServer.shared createAppWithQueryableFields:@[@"age", @"breed"]
+                                                                 error:nil];
+    RLMApp *app = [self appWithId:appId];
     XCTAssertNotNil(app);
     [RealmServer.shared deleteApp:appId error:nil];
 }
@@ -1061,6 +1059,9 @@
                                                                      localAppName:nil
                                                                   localAppVersion:nil
                                                           defaultRequestTimeoutMS:60];
+    RLMSyncTimeoutOptions *timeoutOptions = [RLMSyncTimeoutOptions new];
+    timeoutOptions.connectTimeout = 1000.0;
+    appConfig.syncTimeouts = timeoutOptions;
     RLMApp *app = [RLMApp appWithId:self.flexibleSyncAppId configuration:appConfig];
     RLMUser *user = [self logInUserForCredentials:[RLMCredentials anonymousCredentials] app:app];
 
@@ -1073,9 +1074,6 @@
     syncConfig.cancelAsyncOpenOnNonFatalErrors = true;
     config.syncConfiguration = syncConfig;
 
-    RLMSyncTimeoutOptions *timeoutOptions = [RLMSyncTimeoutOptions new];
-    timeoutOptions.connectTimeout = 1000.0;
-    app.syncManager.timeoutOptions = timeoutOptions;
 
     // Set delay above the timeout so it should fail
     proxy.delay = 2.0;

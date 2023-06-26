@@ -39,9 +39,7 @@
     }
 
     NSString *name = NSStringFromSelector(callerName);
-    RLMApp *app = [RLMApp appWithId:appId
-                      configuration:self.defaultAppConfiguration
-                      rootDirectory:self.clientDataRoot];
+    RLMApp *app = [self appWithId:appId];
     RLMCredentials *credentials = [self basicCredentialsWithName:name register:YES app:app];
     RLMUser *user = [self logInUserForCredentials:credentials app:app];
     RLMRealm *realm = [self openRealmForPartitionValue:value user:user];

@@ -1,7 +1,12 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+* Add support for multiplexing sync connections. When enabled (the default), a single
+  connection is used per sync user rather than one per synchronized Realm. This
+  reduces resource consumption when multiple Realms are opened and will
+  typically improve performance ([PR #8282](https://github.com/realm/realm-swift/pull/8282)).
+* Sync timeout options can now be set on `RLMAppConfiguration` along with the
+  other app-wide configuration settings ([PR #8282](https://github.com/realm/realm-swift/pull/8282)).
 
 ### Fixed
 * Import as `RLMRealm_Private.h` as a module would cause issues when using Realm as a subdependency.
@@ -9,17 +14,20 @@ x.y.z Release notes (yyyy-MM-dd)
 * Disable setting a custom logger by default on the sync client when the sync manager is created.
   This was overriding the default logger set using `RLMLogger.defaultLogger`. (since v10.39.0).
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+### Breaking Changes
+* The `RLMSyncTimeouts.appConfiguration` property has been removed. This was an
+  unimplemented read-only property which did not make any sense on the
+  containing type ([PR #8282](https://github.com/realm/realm-swift/pull/8282)).
 
 ### Compatibility
 * Realm Studio: 14.0.1 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 14.3.1.
 * CocoaPods: 1.10 or later.
-* Xcode: 14.1-15 beta 1.
+* Xcode: 14.1-15 beta 2.
 
 ### Internal
-* Upgraded realm-core from ? to ?
+* Upgraded realm-core from 13.15.0 to 13.15.1
 
 10.40.2 Release notes (2023-06-09)
 =============================================================
@@ -38,7 +46,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * If the order of properties in the local class definitions did not match the
   order in the server-side schema, the before-reset Realm argument passed to a
   client reset handler would have an invalid schema and likely crash if any
-  data was read from it. ([Core 6693](https://github.com/realm/realm-core/issues/6693), since v10.40.0)
+  data was read from it. ([Core #6693](https://github.com/realm/realm-core/issues/6693), since v10.40.0)
 
 ### Compatibility
 
@@ -50,7 +58,7 @@ x.y.z Release notes (yyyy-MM-dd)
 
 ### Internal
 
-* Upgraded realm-core from 13.13.0 to 13.16.0.
+* Upgraded realm-core from 13.13.0 to 13.15.0.
 * The prebuilt library used for CocoaPods installations is now built with Xcode
   14. This should not have any observable effects other than the download being
   much smaller due to no longer including bitcode.

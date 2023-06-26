@@ -109,9 +109,7 @@ class SwiftUIServerTests: SwiftSyncTestCase {
 
         let appId = try RealmServer.shared.createApp()
         let appConfig = AppConfiguration(baseURL: "http://localhost:5678",
-                                         transport: AsyncOpenConnectionTimeoutTransport(),
-                                         localAppName: nil,
-                                         localAppVersion: nil)
+                                         transport: AsyncOpenConnectionTimeoutTransport())
         let app = App(id: appId, configuration: appConfig)
         let user = try logInUser(for: basicCredentials(app: app), app: app)
 
@@ -347,10 +345,8 @@ class SwiftUIServerTests: SwiftSyncTestCase {
         let proxy = TimeoutProxyServer(port: 5678, targetPort: 9090)
         try proxy.start()
         let appConfig = AppConfiguration(baseURL: "http://localhost:5678",
-                                         transport: AsyncOpenConnectionTimeoutTransport(),
-                                         localAppName: nil,
-                                         localAppVersion: nil)
-        let app = App(id: appId, configuration: appConfig, rootDirectory: nil)
+                                         transport: AsyncOpenConnectionTimeoutTransport())
+        let app = App(id: appId, configuration: appConfig)
         let user = try logInUser(for: basicCredentials(app: app), app: app)
         proxy.dropConnections = true
         let ex = expectation(description: "download-realm-auto-open-no-connection")
@@ -384,9 +380,7 @@ class SwiftUIServerTests: SwiftSyncTestCase {
         let proxy = TimeoutProxyServer(port: 5678, targetPort: 9090)
         try proxy.start()
         let appConfig = AppConfiguration(baseURL: "http://localhost:5678",
-                                         transport: AsyncOpenConnectionTimeoutTransport(),
-                                         localAppName: nil,
-                                         localAppVersion: nil)
+                                         transport: AsyncOpenConnectionTimeoutTransport())
         let app = App(id: flexibleSyncAppId, configuration: appConfig)
 
         let user = try logInUser(for: basicCredentials(app: app), app: app)

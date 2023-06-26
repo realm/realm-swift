@@ -80,6 +80,57 @@ public typealias SyncManager = RLMSyncManager
   - see: `RLMSyncTimeoutOptions`
  */
 public typealias SyncTimeoutOptions = RLMSyncTimeoutOptions
+public extension SyncTimeoutOptions {
+    /**
+    Memberwise convenience initializer for SyncTimeoutOptions. All values are
+    in milliseconds, and use a default value if `nil`.
+
+    - Parameters:
+      - connectTimeout: The maximum time to allow for a connection to become
+        fully established. This includes the time to resolve the network
+        address, the TCP connect operation, the SSL handshake, and the
+        WebSocket handshake.
+      - connectionLingerTime: If session multiplexing is enabled, how long to
+        keep connections open while there are no active session.
+      - pingKeepalivePeriod: How long to wait between each ping message sent to
+        the server. The client periodically sends ping messages to the server
+        to check if the connection is still alive. Shorter periods make
+        connection state change notifications more responsive at the cost of
+        battery life (as the antenna will have to wake up more often).
+      - pongKeepaliveTimeout: How long to wait for the server to respond to a
+        ping message. Shorter values make connection state change notifications
+        more responsive, but increase the chance of spurious disconnections.
+      - fastReconnectLimit: When a client first connects to the server, it
+        downloads all data from the server before it begins to upload local
+        changes. This typically reduces the total amount of merging needed and
+        gets the local client into a useful state faster. If a disconnect and
+        reconnect happens within the time span of the fast reconnect limit,
+        this is skipped and the session behaves as if it were continuously
+        connected.
+     */
+    convenience init(connectTimeout: UInt? = nil,
+                     connectionLingerTime: UInt? = nil,
+                     pingKeepalivePeriod: UInt? = nil,
+                     pongKeepaliveTimeout: UInt? = nil,
+                     fastReconnectLimit: UInt? = nil) {
+        self.init()
+        if let connectTimeout {
+            self.connectTimeout = connectTimeout
+        }
+        if let connectionLingerTime {
+            self.connectionLingerTime = connectionLingerTime
+        }
+        if let pingKeepalivePeriod {
+            self.pingKeepalivePeriod = pingKeepalivePeriod
+        }
+        if let pongKeepaliveTimeout {
+            self.pongKeepaliveTimeout = pongKeepaliveTimeout
+        }
+        if let fastReconnectLimit {
+            self.fastReconnectLimit = fastReconnectLimit
+        }
+    }
+}
 
 /**
  A session object which represents communication between the client and server for a specific

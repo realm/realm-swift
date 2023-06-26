@@ -23,7 +23,7 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
 @protocol RLMNetworkTransport, RLMBSON;
 
-@class RLMUser, RLMCredentials, RLMSyncManager, RLMEmailPasswordAuth, RLMPushClient;
+@class RLMUser, RLMCredentials, RLMSyncManager, RLMEmailPasswordAuth, RLMPushClient, RLMSyncTimeoutOptions;
 
 /// A block type used for APIs which asynchronously vend an `RLMUser`.
 typedef void(^RLMUserCompletionBlock)(RLMUser * _Nullable, NSError * _Nullable);
@@ -35,7 +35,7 @@ typedef void(^RLMOptionalErrorBlock)(NSError * _Nullable);
 
 /// Properties representing the configuration of a client
 /// that communicate with a particular Realm application.
-@interface RLMAppConfiguration : NSObject
+@interface RLMAppConfiguration : NSObject <NSCopying>
 
 /// A custom base URL to request against.
 @property (nonatomic, strong, nullable) NSString *baseURL;
@@ -51,6 +51,24 @@ typedef void(^RLMOptionalErrorBlock)(NSError * _Nullable);
 
 /// The default timeout for network requests.
 @property (nonatomic, assign) NSUInteger defaultRequestTimeoutMS;
+
+/// If enabled (the default), a single connection is used for all Realms opened
+/// with a single sync user. If disabled, a separate connection is used for each
+/// Realm.
+///
+/// Session multiplexing reduces resources used and typically improves
+/// performance. When multiplexing is enabled, the connection is not immediately
+/// closed when the last session is closed, and instead remains open for
+/// ``RLMSyncTimeoutOptions.connectionLingerTime`` milliseconds (30 seconds by
+/// default).
+@property (nonatomic, assign) BOOL enableSessionMultiplexing;
+
+/**
+ Options for the assorted types of connection timeouts for sync connections.
+
+ If nil default values for all timeouts are used instead.
+ */
+@property (nonatomic, nullable, copy) RLMSyncTimeoutOptions *syncTimeouts;
 
 /**
 Create a new Realm App configuration.

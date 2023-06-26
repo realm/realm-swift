@@ -474,7 +474,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
     func prepareFlexibleClientReset(disableRecoveryMode: Bool = false) throws -> (User, String) {
         let appId = try RealmServer.shared.createAppWithQueryableFields(["age"])
-        let app = app(fromAppId: appId)
+        let app = app(withId: appId)
         let user = try logInUser(for: basicCredentials(app: app), app: app)
         let collection = setupMongoCollection(user: user, collectionName: "SwiftPerson")
 
@@ -1512,12 +1512,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let appId = try RealmServer.shared.createApp()
         let appConfig = AppConfiguration(baseURL: "http://localhost:5678",
                                          transport: AsyncOpenConnectionTimeoutTransport(),
-                                         localAppName: nil, localAppVersion: nil)
+                                         syncTimeouts: .init(connectTimeout: 2000, connectionLingerTime: 1))
         let app = App(id: appId, configuration: appConfig)
-
-        let syncTimeoutOptions = SyncTimeoutOptions()
-        syncTimeoutOptions.connectTimeout = 2000
-        app.syncManager.timeoutOptions = syncTimeoutOptions
 
         let user = try logInUser(for: basicCredentials(app: app), app: app)
         var config = user.configuration(partitionValue: #function, cancelAsyncOpenOnNonFatalErrors: true)
@@ -1535,6 +1531,11 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             }
             waitForExpectations(timeout: 10.0, handler: nil)
         }
+
+        // The client doesn't disconnect immediately, and there isn't a good way
+        // to wait for it. In practice this should take more like 10ms to happen
+        // so a 1s sleep is plenty.
+        sleep(1)
 
         // Two second timeout with a two second delay should fail
         autoreleasepool {
@@ -1650,7 +1651,6 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
     private func appConfig() -> AppConfiguration {
         return AppConfiguration(baseURL: "http://localhost:9090",
-                                transport: nil,
                                 localAppName: "auth-integration-tests",
                                 localAppVersion: "20180301")
     }

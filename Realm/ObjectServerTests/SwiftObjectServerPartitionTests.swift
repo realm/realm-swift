@@ -46,7 +46,7 @@ class SwiftObjectServerPartitionTests: SwiftSyncTestCase {
         let partitionType = partitionBsonType(ObjectiveCSupport.convert(object: AnyBSON(partitionValue))!)
         let appId = try RealmServer.shared.createAppForBSONType(partitionType)
 
-        let partitionApp = app(fromAppId: appId)
+        let partitionApp = app(withId: appId)
         let user = try logInUser(for: basicCredentials(app: partitionApp), app: partitionApp)
         let user2 = try logInUser(for: Credentials.anonymous, app: partitionApp)
         let realm = try openRealm(partitionValue: partitionValue, user: user)
