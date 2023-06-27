@@ -25,7 +25,7 @@ targets = {
   'swiftpm-ios' => all,
 
   'ios-static' => oldest_and_latest,
-  'ios-dynamic' => oldest_and_latest,
+  'ios' => oldest_and_latest,
   'watchos' => oldest_and_latest,
   'tvos' => oldest_and_latest,
 

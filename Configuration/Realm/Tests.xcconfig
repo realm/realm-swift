@@ -2,6 +2,7 @@
 
 INFOPLIST_FILE = Realm/Tests/RealmTests-Info.plist;
 OTHER_CFLAGS = -fobjc-arc-exceptions;
+OTHER_LDFLAGS = -ObjC;
 
 SWIFT_OBJC_BRIDGING_HEADER = Realm/Tests/Swift/Swift-Tests-Bridging-Header.h;
 SWIFT_OPTIMIZATION_LEVEL = -Onone;

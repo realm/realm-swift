@@ -139,10 +139,12 @@ In case you don't want to use the precompiled version, you can build Realm yours
 
 Prerequisites:
 
-* Building Realm requires Xcode 11.x or newer.
+* Building Realm requires Xcode 14.1 or newer.
 * Building Realm documentation requires [jazzy](https://github.com/realm/jazzy)
 
-Once you have all the necessary prerequisites, building Realm.framework just takes a single command: `sh build.sh build`. You'll need an internet connection the first time you build Realm to download the core binary.
+Once you have all the necessary prerequisites, building Realm just takes a single command: `sh build.sh build`.
+You'll need an internet connection the first time you build Realm to download the core binary.
+This will produce Realm.xcframework and RealmSwift.xcframework in `build/Release/`.
 
 Run `sh build.sh help` to see all the actions you can perform (build ios/osx, generate docs, test, etc.).
 
