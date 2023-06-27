@@ -23,13 +23,13 @@ def replace_in_file(filepath, pattern, replacement)
   end
 end
 
-def replace_framework(example, path)
+def replace_framework(example, framework, path)
   project_path = "#{example}/RealmExamples.xcodeproj"
   replace_in_file("#{project_path}/project.pbxproj",
-                  /lastKnownFileType = wrapper.framework; path = (Realm|RealmSwift).framework; sourceTree = BUILT_PRODUCTS_DIR;/,
+                  /lastKnownFileType = wrapper.framework; path = (#{framework}).framework; sourceTree = BUILT_PRODUCTS_DIR;/,
                   "lastKnownFileType = wrapper.xcframework; name = \\1.xcframework; path = \"#{path}/\\1.xcframework\"; sourceTree = \"<group>\";")
   replace_in_file("#{project_path}/project.pbxproj",
-                  /(Realm|RealmSwift).framework/, "\\1.xcframework")
+                  /(#{framework}).framework/, "\\1.xcframework")
 end
 
 ##########################
@@ -62,13 +62,15 @@ base_examples.each do |example|
 end
 
 # Update the paths to the prebuilt frameworks
-replace_framework('examples/ios/objc', '../../../ios-static')
-replace_framework('examples/osx/objc', '../../..')
-replace_framework('examples/tvos/objc', '../../..')
+replace_framework('examples/ios/objc', 'Realm', '../../../static')
+replace_framework('examples/osx/objc', 'Realm', '../../..')
+replace_framework('examples/tvos/objc', 'Realm', '../../..')
 
 xcode_versions.each do |xcode_version|
-  replace_framework("examples/ios/swift-#{xcode_version}", "../../../#{xcode_version}")
-  replace_framework("examples/tvos/swift-#{xcode_version}", "../../../#{xcode_version}")
+  replace_framework("examples/ios/swift-#{xcode_version}", 'Realm', "../../..")
+  replace_framework("examples/tvos/swift-#{xcode_version}", 'Realm', "../../..")
+  replace_framework("examples/ios/swift-#{xcode_version}", 'RealmSwift', "../../../#{xcode_version}")
+  replace_framework("examples/tvos/swift-#{xcode_version}", 'RealmSwift', "../../../#{xcode_version}")
 end
 
 # Update Playground imports and instructions
