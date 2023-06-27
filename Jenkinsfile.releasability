@@ -12,7 +12,7 @@ def installationTest(platform, test, xcode, language = 'swift', linkage = 'dynam
       unstash 'source'
 
       if (test == "xcframework") {
-        unstash "${language}-packaged"
+        unstash "packaged"
         sh "mv *.zip examples/installation"
       }
 
@@ -58,8 +58,8 @@ def doBuild() {
         ]
       )
 
-      stash includes: '**', name: 'source'
-      stash includes: 'build.sh,scripts/*', name: 'build-scripts'
+      stash name: 'source', includes: '**'
+      stash name: 'build-scripts', includes: 'build.sh,dependencies.list,LICENSE,scripts/*'
     }
   }
 
@@ -72,12 +72,7 @@ def doBuild() {
           sh """
           hostname
           export REALM_SWIFT_VERSION=${docsSwiftVersion}
-          export PATH='/Users/realm/.rbenv/bin:/Users/realm/.rbenv/shims:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Users/realm/.gems/bin'
-          ./scripts/reset-simulators.sh
-          ./build.sh docs
-          cd docs
-          zip -r objc-docs.zip objc_output
-          zip -r swift-docs.zip swift_output
+          sh build.sh package-docs
           """
           dir('docs') {
             archiveArtifacts artifacts: '*-docs.zip'
@@ -91,17 +86,6 @@ def doBuild() {
           unstash 'source'
           sh './build.sh package-examples'
           stash includes: 'realm-examples.zip', name: 'examples'
-        }
-      },
-
-      'iOS Obj-C static': {
-        node('osx') {
-          deleteDir()
-          unstash 'source'
-          sh "REALM_XCODE_VERSION=${carthageXcodeVersion} ./build.sh package-ios-static"
-          dir("build/ios-static") {
-            stash includes: "realm-framework-ios-static.zip", name: "ios-static"
-          }
         }
       }
     ]
@@ -157,8 +141,8 @@ def doBuild() {
             deleteDir()
             unstash 'source'
             sh "REALM_XCODE_VERSION=${xcodeVersion} ./build.sh package ${platform}"
-            dir("build/${platform}") {
-              stash includes: "realm-framework-${platform}-${xcodeVersion}.zip",
+            dir("build") {
+              stash includes: "realm-${platform}-${xcodeVersion}.zip",
                     name: "${platform}-${xcodeVersion}"
             }
           }
@@ -171,24 +155,7 @@ def doBuild() {
 
   stage('package') {
     parallel (
-      "Obj-C": {
-        node('osx') {
-          deleteDir()
-
-          for (def platform in platforms) {
-            unstash "${platform}-${carthageXcodeVersion}"
-          }
-
-          unstash 'ios-static'
-          unstash 'examples'
-          unstash 'source'
-
-          sh "REALM_XCODE_VERSION=${carthageXcodeVersion} ./build.sh package-release objc"
-          stash includes: 'realm-objc-*.zip', name: 'objc-packaged'
-          archiveArtifacts artifacts: 'realm-objc-*.zip'
-        }
-      },
-      "Swift": {
+      "Aggregate": {
         node('osx') {
           deleteDir()
 
@@ -196,13 +163,14 @@ def doBuild() {
             for (def xcodeVersion in xcodeVersions) {
               unstash "${platform}-${xcodeVersion}"
             }
+            unstash "${platform}-static"
           }
 
           unstash 'examples'
-          unstash 'source'
+          unstash 'build-scripts'
 
-          sh './build.sh package-release swift'
-          stash includes: 'realm-swift-*.zip', name: 'swift-packaged'
+          sh './build.sh package-release'
+          stash includes: 'realm-swift-*.zip', name: 'packaged'
           archiveArtifacts artifacts: 'realm-swift-*.zip'
         }
       },
@@ -230,31 +198,17 @@ def doBuild() {
 
   stage('test') {
     def parallelBuilds = [
-      'Test Obj-C Examples': {
+      'Test Examples': {
         node('osx') {
           deleteDir()
 
-          unstash 'objc-packaged'
+          unstash 'packaged'
           unstash 'build-scripts'
 
-          sh """
-          hostname
-          sh build.sh package-test-examples-objc
-          """
-        }
-      },
-
-      'Test Swift Examples': {
-        node('osx') {
-          deleteDir()
-
-          unstash 'swift-packaged'
-          unstash 'build-scripts'
-
-          sh """
-          hostname
-          sh build.sh package-test-examples-swift
-          """
+          sh '''
+            hostname
+            sh build.sh package-test-examples
+          '''
         }
       },
 
@@ -263,8 +217,11 @@ def doBuild() {
           deleteDir()
           unstash 'source'
 
-          sh './scripts/reset-simulators.rb'
-          sh 'sh build.sh test-ios-static'
+          sh '''
+            hostname
+            ./scripts/reset-simulators.rb
+            sh build.sh test-ios-static
+          '''
         }
       },
 
