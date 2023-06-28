@@ -77,7 +77,6 @@ command:
   get-version:          get the current version
   get-ioplatformuuid:   get io platform uuid
   set-version version:  set the version
-  cocoapods-setup:      download realm-core and create a stub RLMPlatform.h file to enable building via CocoaPods
 
 
 argument:
@@ -254,7 +253,6 @@ build_docs() {
         objc=""
     fi
 
-    touch Realm/RLMPlatform.h # jazzy will fail if it can't find all public header files
     jazzy \
       "${objc}" \
       --clean \
@@ -269,8 +267,6 @@ build_docs() {
       --output "docs/${language}_output" \
       --head "$(cat docs/custom_head.html)" \
       --exclude 'RealmSwift/Impl/*'
-
-    rm Realm/RLMPlatform.h
 }
 
 ######################################
