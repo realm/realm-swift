@@ -848,8 +848,7 @@ case "$COMMAND" in
 
     "examples-ios")
         workspace="examples/ios/objc/RealmExamples.xcworkspace"
-        pod install --project-directory="$workspace/.." --no-repo-update
-        examples="Simple TableView Migration Backlink GroupedTableView RACTableView Encryption Draw"
+        examples="Simple TableView Migration Backlink GroupedTableView Encryption Draw"
         versions="0 1 2 3 4 5"
         for example in $examples; do
             if [ "$example" = "Migration" ]; then
