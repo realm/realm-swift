@@ -37,18 +37,10 @@ Usage: sh $0 command [argument]
 command:
   clean:                clean up/remove all generated files
   download-core:        downloads core library (binary version)
-  build:                builds all iOS and macOS frameworks
-  ios-static:           builds fat iOS static framework
-  ios-dynamic:          builds iOS dynamic frameworks
-  ios-swift:            builds RealmSwift frameworks for iOS
-  watchos:              builds watchOS framwork
-  watchos-swift:        builds RealmSwift framework for watchOS
-  tvos:                 builds tvOS framework
-  tvos-swift:           builds RealmSwift framework for tvOS
-  osx:                  builds macOS framework
-  osx-swift:            builds RealmSwift framework for macOS
-  xcframework [plats]:  builds xcframeworks for Realm and RealmSwift for given platforms
+  build [platforms]:    builds xcframeworks for Realm and RealmSwift for given platforms (default all)
+  build-static [plats]: builds static xcframework for Realm platforms (default all)
   analyze-osx:          analyzes macOS framework
+
   test:                 tests all iOS and macOS frameworks
   test-all:             tests all iOS and macOS frameworks in both Debug and Release configurations
   test-ios-static:      tests static iOS framework on 32-bit and 64-bit simulators
@@ -69,18 +61,33 @@ command:
   test-swiftui-server-osx:  tests Server Sync in SwiftUI
   verify:               verifies docs, osx, osx-swift, ios-static, ios-dynamic, ios-swift, ios-device, swiftui-ios in both Debug and Release configurations, swiftlint
   verify-osx-object-server:  downloads the Realm Object Server and runs the Objective-C and Swift integration tests
+
   docs:                 builds docs in docs/output
   examples:             builds all examples
   examples-ios:         builds all static iOS examples
   examples-ios-swift:   builds all Swift iOS examples
   examples-osx:         builds all macOS examples
+
   get-version:          get the current version
   get-ioplatformuuid:   get io platform uuid
   set-version version:  set the version
 
+  package platform:     build release package for the given platform
+  package-release:      assemble per-platform release packages into a combined one
+  package-docs:         build release package the docs
+  package-examples:     build release package the examples
+  package-test-examples: test a built examples release package
+  test-package-release: locally build a complete release package for all platforms
+
+  publish-tag branch:   create and push a git tag for the given branch
+  publish-github:       create a Github release for the currently checked-out tag
+  publish-docs:         publish a built docs release to the website
+  publish-cocoapods tag: publish the requested tag to CocoaPods
 
 argument:
   version: version in the x.y.z format
+  platform: exactly one of "osx ios watchos tvos visionos"
+  platforms: one or more of "osx ios watchos tvos visionos"
 
 environment variables:
   XCMODE: xcodebuild (default), xcpretty or xctool
@@ -974,13 +981,16 @@ case "$COMMAND" in
         sh scripts/reset-simulators.sh
         sh build.sh docs
         cd docs
-        zip -r objc-docs.zip objc_output
-        zip -r swift-docs.zip swift_output
+        zip -r realm-docs.zip objc_output swift_output
         ;;
 
     "package-examples")
         ./scripts/package_examples.rb
         zip --symlinks -r realm-examples.zip examples -x "examples/installation/*"
+        ;;
+
+    "package-build-scripts")
+        zip -r build-scripts.zip build.sh dependencies.list scripts examples/installation
         ;;
 
     "package-test-examples")
@@ -1117,9 +1127,47 @@ EOF
         sh build.sh package-test-examples
         ;;
 
-    "github-release")
-        VERSION="$(sh build.sh get-version)"
+    "publish-github")
+        VERSION="$(sed -n 's/^VERSION=\(.*\)$/\1/p' "${source_root}/dependencies.list")"
         ./scripts/github_release.rb "$VERSION" "$REALM_XCODE_VERSION"
+        ;;
+
+    "publish-docs")
+        VERSION="$(sed -n 's/^VERSION=\(.*\)$/\1/p' "${source_root}/dependencies.list")"
+        PRERELEASE_REGEX='alpha|beta|rc|preview'
+        if [[ $VERSION =~ $PRERELEASE_REGEX ]]; then
+          exit 0
+        fi
+        rm -rf swift_output objc_output
+        unzip realm-docs.zip
+        s3cmd put --recursive --acl-public --access_key=${AWS_ACCESS_KEY_ID} --secret_key=${AWS_SECRET_ACCESS_KEY} swift_output/ s3://realm-sdks/docs/realm-sdks/swift/${VERSION}/
+        s3cmd put --recursive --acl-public --access_key=${AWS_ACCESS_KEY_ID} --secret_key=${AWS_SECRET_ACCESS_KEY} swift_output/ s3://realm-sdks/docs/realm-sdks/swift/latest/
+
+        s3cmd put --recursive --acl-public --access_key=${AWS_ACCESS_KEY_ID} --secret_key=${AWS_SECRET_ACCESS_KEY} objc_output/ s3://realm-sdks/docs/realm-sdks/objc/${VERSION}/
+        s3cmd put --recursive --acl-public --access_key=${AWS_ACCESS_KEY_ID} --secret_key=${AWS_SECRET_ACCESS_KEY} objc_output/ s3://realm-sdks/docs/realm-sdks/objc/latest/
+
+        # update static.realm.io/update/cocoa
+        printf "%s" "${VERSION}" > cocoa
+        s3cmd put cocoa s3://static.realm.io/update/
+        rm cocoa
+        ;;
+
+    "publish-tag")
+        git clone git@github.com:realm/realm-swift.git
+        cd realm-swift
+        git checkout "$2"
+        VERSION="$(sed -n 's/^VERSION=\(.*\)$/\1/p' dependencies.list)"
+        git tag -m "Release ${VERSION}" "v${VERSION}"
+        git push origin "v${VERSION}"
+        ;;
+
+    "publish-cocoapods")
+        git clone https://github.com/realm/realm-swift
+        cd realm-swift
+        git checkout "$2"
+        ./scripts/reset-simulators.rb
+        pod trunk push Realm.podspec --verbose --allow-warnings
+        pod trunk push RealmSwift.podspec --verbose --allow-warnings --synchronous
         ;;
 
     "add-empty-changelog")

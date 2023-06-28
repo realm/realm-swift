@@ -1,0 +1,122 @@
+def carthageXcodeVersion = '14.3.1'
+
+pipeline {
+  agent { label 'osx' }
+  parameters {
+    string(name: 'branch', defaultValue: 'master')
+    string(name: 'version', defaultValue: '')
+  }
+  environment {
+    REALM_XCODE_VERSION = "${carthageXcodeVersion}"
+  }
+  stages {
+    stage('Gather Info') {
+      steps {
+        deleteDir()
+        copyArtifacts projectName: 'cocoa-pipeline', filter: 'build-scripts.zip', selector: lastCompleted()
+        sh 'unzip build-scripts.zip'
+        script {
+          env.version = sh(script: "sed -n 's/^VERSION=\\(.*\\)\$/\\1/p' dependencies.list", returnStdout: true).trim()
+        }
+        stash name: 'build-scripts', includes: '*,scripts/*'
+      }
+    }
+
+    stage('Tag and publish docs') {
+      parallel {
+        stage('Tag release') {
+          steps {
+            deleteDir()
+            unstash 'build-scripts'
+            sh "./build.sh publish-tag ${branch}"
+          }
+        }
+
+        stage('Publish docs') {
+          steps {
+            deleteDir()
+            unstash 'build-scripts'
+            copyArtifacts projectName: 'cocoa-pipeline', filter: 'realm-docs.zip', selector: lastCompleted()
+            withAWS(credentials: 'cocoa-docs-s3-bucket', region: 'us-east-1') {
+              sh './build.sh publish-docs'
+            }
+          }
+        }
+      }
+    }
+
+    stage('Create Github and Cocoapods releases') {
+      parallel {
+        stage('Create Github Release') {
+          environment {
+            GITHUB_ACCESS_TOKEN = credentials('github-release-token')
+          }
+          steps {
+            deleteDir()
+            unstash 'build-scripts'
+            dir 'build' {
+              copyArtifacts projectName: 'cocoa-pipeline', selector: lastCompleted()
+            }
+            sh './build.sh publish-github'
+          }
+        }
+
+        stage('Publish CocoaPods') {
+          environment {
+            COCOAPODS_TRUNK_TOKEN = credentials('cocoapods-trunk-token')
+          }
+          steps {
+            deleteDir()
+            unstash 'build-scripts'
+            sh "./build.sh publish-cocoapods v${env.version}"
+          }
+        }
+      }
+    }
+
+    stage('Test release') {
+      matrix {
+        axes {
+          axis {
+            name 'platform'
+            values 'ios', 'osx', 'watchos', 'catalyst'
+          }
+          axis {
+            name 'method'
+            values 'xcframework', 'cocoapods', 'carthage', 'spm'
+          }
+          axis {
+            name 'linkage'
+            values 'static', 'dynamic'
+          }
+        }
+
+        excludes {
+          exclude {
+            axis {
+              name 'linkage'
+              values 'static'
+            }
+            axis {
+              name 'method'
+              values 'carthage', 'spm'
+            }
+          }
+        }
+
+        stages {
+          stage('test') {
+            environment {
+              REALM_TEST_VERSION = "${env.version}"
+            }
+            steps {
+              dir('examples/installation') {
+                sh "./build.rb ${platform} ${method} ${linkage}"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

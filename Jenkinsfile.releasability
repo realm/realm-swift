@@ -75,7 +75,7 @@ def doBuild() {
           sh build.sh package-docs
           """
           dir('docs') {
-            archiveArtifacts artifacts: '*-docs.zip'
+            archiveArtifacts artifacts: 'realm-docs.zip'
           }
         }
       },
@@ -86,6 +86,15 @@ def doBuild() {
           unstash 'source'
           sh './build.sh package-examples'
           stash includes: 'realm-examples.zip', name: 'examples'
+        }
+      },
+
+      'Build Scripts': {
+        node('osx') {
+          deleteDir()
+          unstash 'source'
+          sh './build.sh package-build-scripts'
+          archiveArtifacts artifacts: 'build-scripts.zip'
         }
       }
     ]

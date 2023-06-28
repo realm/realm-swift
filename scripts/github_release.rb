@@ -60,7 +60,7 @@ github = Octokit::Client.new
 github.access_token = ENV['GITHUB_ACCESS_TOKEN']
 
 puts 'Creating GitHub release'
-prerelease = (VERSION =~ /alpha|beta|rc/) ? true : false
+prerelease = (VERSION =~ /alpha|beta|rc|preview/) ? true : false
 response = github.create_release(REPOSITORY, RELEASE, name: RELEASE, body: RELEASE_NOTES, prerelease: prerelease)
 release_url = response[:url]
 
