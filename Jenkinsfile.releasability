@@ -156,7 +156,7 @@ def doBuild() {
       unstash 'examples'
       unstash 'build-scripts'
 
-      sh './build.sh package-release'
+      sh 'sh -x build.sh package-release'
       stash includes: 'realm-swift-*.zip', name: 'xcframework'
       archiveArtifacts artifacts: 'realm-swift-*.zip'
     }
