@@ -442,13 +442,13 @@ case "$COMMAND" in
         unset REALM_SWIFT_VERSION
         sh build.sh xcframework osx
         # copy the xcframework to the testing target
-        rm -rf examples/installation/xcframework-evolution
-        mkdir examples/installation/xcframework-evolution
-        cp -cr "build/$CONFIGURATION/"*.xcframework examples/installation/xcframework-evolution
+        rm -rf examples/installation/realm-swift-latest
+        mkdir examples/installation/realm-swift-latest
+        cp -cr "build/$CONFIGURATION/"*.xcframework examples/installation/realm-swift-latest
         export REALM_XCODE_VERSION=$REALM_XCODE_LATEST_VERSION
         unset REALM_SWIFT_VERSION
         cd examples/installation
-        sh build.sh "test-osx-swift-xcframework"
+        sh build.sh "test-osx-swift-dynamic"
 
         exit 0
         ;;

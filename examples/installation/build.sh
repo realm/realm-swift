@@ -12,23 +12,19 @@ command:
 
   test-ios-objc-static:            tests iOS Objective-C static example.
   test-ios-objc-dynamic:           tests iOS Objective-C dynamic example.
-  test-ios-objc-xcframework:       tests iOS Objective-C xcframework example.
   test-ios-objc-cocoapods:         tests iOS Objective-C CocoaPods example.
   test-ios-objc-cocoapods-dynamic: tests iOS Objective-C CocoaPods Dynamic example.
   test-ios-objc-carthage:          tests iOS Objective-C Carthage example.
   test-ios-swift-dynamic:          tests iOS Swift dynamic example.
-  test-ios-swift-xcframework:      tests iOS Swift xcframework example.
   test-ios-swift-cocoapods:        tests iOS Swift CocoaPods example.
   test-ios-swift-cocoapods-subdependency: tests RealmSwift as a subdependency.
   test-ios-swift-carthage:         tests iOS Swift Carthage example.
   test-ios-spm:                    tests iOS Swift Package Manager example.
 
   test-osx-objc-dynamic:           tests macOS Objective-C dynamic example.
-  test-osx-objc-xcframework:       tests macOS Objective-C xcframework example.
   test-osx-objc-cocoapods:         tests macOS Objective-C CocoaPods example.
   test-osx-objc-carthage:          tests macOS Objective-C Carthage example.
   test-osx-swift-dynamic:          tests macOS Swift dynamic example.
-  test-osx-swift-xcframework:      tests macOS Swift xcframework example.
   test-osx-swift-cocoapods:        tests macOS Swift CocoaPods example.
   test-catalyst-objc-cocoapods:    tests Mac Catalyst Objective-C CocoaPods example.
   test-catalyst-objc-cocoapods-dynamic:   tests Mac Catalyst Objective-C CocoaPods example.
@@ -37,11 +33,9 @@ command:
   test-osx-spm:                    tests macOS Swift Package Manager example.
 
   test-watchos-objc-dynamic:       tests watchOS Objective-C dynamic example.
-  test-watchos-objc-xcframework:   tests watchOS Objective-C xcframework example.
   test-watchos-objc-cocoapods:     tests watchOS Objective-C CocoaPods example.
   test-watchos-objc-carthage:      tests watchOS Objective-C Carthage example.
   test-watchos-swift-dynamic:      tests watchOS Swift dynamic example.
-  test-watchos-swift-xcframework:  tests watchOS Swift xcframework example.
   test-watchos-swift-cocoapods:    tests watchOS Swift CocoaPods example.
   test-watchos-swift-carthage:     tests watchOS Swift Carthage example.
 EOF
@@ -107,11 +101,6 @@ xctest() {
     elif [[ $NAME == SwiftPackageManager* ]]; then
         if [ -n "$sha" ]; then
             ex '+%s@branch = master@branch = "'"$sha"'"@' -scwq "$DIRECTORY/$NAME.xcodeproj/project.pbxproj"
-        fi
-    elif [[ $NAME == XCFramework* ]]; then
-        if ! [ -d xcframework-evolution ]; then
-            echo 'XCFramework does not exist'
-            exit 1
         fi
     else
         download_zip_if_needed
@@ -192,10 +181,6 @@ case "$COMMAND" in
 
     test-*-*-dynamic)
         xctest "$PLATFORM" "$LANGUAGE" DynamicExample
-        ;;
-
-    test-*-*-xcframework)
-        xctest "$PLATFORM" "$LANGUAGE" XCFrameworkExample
         ;;
 
     test-*-*-carthage)
