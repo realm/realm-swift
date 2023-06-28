@@ -7,7 +7,8 @@ x.y.z Release notes (yyyy-MM-dd)
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
 * None.
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+### Breaking Changes
+* Legacy non-xcframework Carthage installations are no longer supported.
 
 ### Compatibility
 * Realm Studio: 14.0.1 or later.

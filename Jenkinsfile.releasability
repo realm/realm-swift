@@ -1,6 +1,5 @@
 xcodeVersions = ['14.1', '14.2', '14.3.1']
 platforms = ['osx', 'ios', 'watchos', 'tvos', 'catalyst']
-carthagePlatforms = ['osx', 'ios', 'watchos', 'tvos']
 platformNames = ['osx': 'macOS', 'ios': 'iOS', 'watchos': 'watchOS', 'tvos': 'tvOS', 'catalyst': 'Catalyst']
 carthageXcodeVersion = '14.3.1'
 docsSwiftVersion = '5.8.1'
@@ -113,47 +112,6 @@ def doBuild() {
       }
     ]
 
-    for (def p in carthagePlatforms) {
-      def platform = p
-      def platformName = platformNames[platform]
-      parallelBuilds["${platformName} Carthage"] = {
-        node('osx') {
-          deleteDir()
-          unstash 'source'
-          sh """
-          hostname
-          export REALM_XCODE_VERSION=${carthageXcodeVersion}
-          . ./scripts/swift-version.sh
-          set_xcode_and_swift_versions
-          export REALM_CARTHAGE_ARM_DISABLED='YES'
-
-          # Carthage scans every xcodeproj in the directory looking for
-          # targets. This can be very slow and even spuriously time out, so
-          # remove the ones we don't want it to build.
-          rm -r examples plugin
-
-          # For whatever reason 'xcodebuild -list' is very slow sometimes which
-          # makes Carthage time out, but it's a lot faster if no simulators
-          # exist, so delete them all first and only create a single simulator
-          # for each platform.
-          ./scripts/reset-simulators.rb -firstOnly
-
-          # Carthage doesn't let us tell it which schemes to build, so delete
-          # all of them except for the two we actually want
-          find Realm.xcodeproj -name '*.xcscheme' \
-            -and -not -name 'Realm.xcscheme' \
-            -and -not -name 'RealmSwift.xcscheme' \
-            -delete
-
-          carthage build --no-skip-current --platform ${platform} --derived-data DerivedData
-          carthage archive --output Carthage-${platform}.framework.zip
-          """
-          stash includes: "Carthage-${platform}.framework.zip",
-                name: "${platform}-carthage"
-        }
-      }
-    }
-
     for (def p in platforms) {
       def platform = p
       def platformName = platformNames[platform]
@@ -177,46 +135,22 @@ def doBuild() {
   }
 
   stage('package') {
-    parallel (
-      "Aggregate": {
-        node('osx') {
-          deleteDir()
+    node('osx') {
+      deleteDir()
 
-          for (def platform in platforms) {
-            for (def xcodeVersion in xcodeVersions) {
-              unstash "${platform}-${xcodeVersion}"
-            }
-            unstash "${platform}-static"
-          }
-
-          unstash 'examples'
-          unstash 'build-scripts'
-
-          sh './build.sh package-release'
-          stash includes: 'realm-swift-*.zip', name: 'xcframework'
-          archiveArtifacts artifacts: 'realm-swift-*.zip'
-        }
-      },
-      "Carthage": {
-        node('osx') {
-          deleteDir()
-
-          for (def platform in carthagePlatforms) {
-            unstash "${platform}-carthage"
-          }
-
-          sh '''
-          for zip in Carthage-*.framework.zip; do
-            ditto -xk $zip merged/
-          done
-
-          ditto -ck merged/ Carthage.framework.zip
-          '''
-
-          archiveArtifacts artifacts: 'Carthage.framework.zip'
+      for (def platform in platforms) {
+        for (def xcodeVersion in xcodeVersions) {
+          unstash "${platform}-${xcodeVersion}"
         }
       }
-    )
+
+      unstash 'examples'
+      unstash 'build-scripts'
+
+      sh './build.sh package-release'
+      stash includes: 'realm-swift-*.zip', name: 'xcframework'
+      archiveArtifacts artifacts: 'realm-swift-*.zip'
+    }
   }
 
   stage('test') {

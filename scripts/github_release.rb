@@ -18,7 +18,6 @@ RELEASE = "v#{VERSION}"
 BUILD = BUILD_SH.parent + 'build'
 OBJC_ZIP = BUILD + "realm-objc-#{VERSION}.zip"
 SWIFT_ZIP = BUILD + "realm-swift-#{VERSION}.zip"
-CARTHAGE_ZIP = BUILD + 'Carthage.framework.zip'
 CARTHAGE_XCFRAMEWORK_ZIP = BUILD + 'Carthage.xcframework.zip'
 
 REPOSITORY = 'realm/realm-swift'
@@ -65,7 +64,7 @@ prerelease = (VERSION =~ /alpha|beta|rc/) ? true : false
 response = github.create_release(REPOSITORY, RELEASE, name: RELEASE, body: RELEASE_NOTES, prerelease: prerelease)
 release_url = response[:url]
 
-uploads = [OBJC_ZIP, SWIFT_ZIP, CARTHAGE_ZIP, CARTHAGE_XCFRAMEWORK_ZIP]
+uploads = [OBJC_ZIP, SWIFT_ZIP, CARTHAGE_XCFRAMEWORK_ZIP]
 uploads.each do |upload|
   puts "Uploading #{upload.basename} to GitHub"
   github.upload_asset(release_url, upload.to_path, content_type: 'application/zip')
