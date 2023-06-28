@@ -7,7 +7,9 @@ x.y.z Release notes (yyyy-MM-dd)
 * Fix nested properties observation on a `Projections` not notifying when there is a property change.
     ([#8276](https://github.com/realm/realm-swift/issues/8276), since v10.34.0).
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+### Breaking Changes
+* Legacy non-xcframework Carthage installations are no longer supported. Please
+  ensure you are using `--use-xcframeworks` if installing via Carthage.
 
 ### Compatibility
 * Realm Studio: 14.0.1 or later.
