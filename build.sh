@@ -1076,7 +1076,7 @@ case "$COMMAND" in
     "package-release")
         tempdir="$(mktemp -d "$TMPDIR/realm-release-package.XXXX")"
         extract_dir="$(mktemp -d "$TMPDIR/realm-release-package.XXXX")"
-        version="$(sh build.sh get-version)"
+        version="$(sed -n 's/^VERSION=\(.*\)$/\1/p' "${source_root}/dependencies.list")"
         package_dir="${tempdir}/realm-${version}"
 
         mkdir -p "${package_dir}"
