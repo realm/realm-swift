@@ -13,7 +13,6 @@ framework module Realm {
     header "RLMObject.h"
     header "RLMObjectId.h"
     header "RLMObjectSchema.h"
-    header "RLMPlatform.h"
     header "RLMProperty.h"
     header "RLMProviderClient.h"
     header "RLMRealm+Sync.h"

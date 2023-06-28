@@ -18,8 +18,6 @@ LD_RUNPATH_SEARCH_PATHS[sdk=iphone*] = $(inherited) @executable_path/Frameworks 
 LD_RUNPATH_SEARCH_PATHS[sdk=watch*] = $(inherited) @executable_path/Frameworks @loader_path/Frameworks;
 LD_RUNPATH_SEARCH_PATHS[sdk=appletv*] = $(inherited) @executable_path/Frameworks @loader_path/Frameworks;
 
-REALM_IOPLATFORMUUID = "";
-
 OTHER_LDFLAGS[sdk=iphone*] = $(inherited) -framework UIKit;
 OTHER_LDFLAGS[sdk=watch*] = $(inherited) -framework UIKit;
 OTHER_LDFLAGS[sdk=appletv*] = $(inherited) -framework UIKit;

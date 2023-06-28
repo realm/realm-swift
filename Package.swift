@@ -161,7 +161,6 @@ let package = Package(
                 "Realm.podspec",
                 "Realm.xcodeproj",
                 "Realm/ObjectServerTests",
-                "Realm/RLMPlatform.h.in",
                 "Realm/Realm-Info.plist",
                 "Realm/Swift/RLMSupport.swift",
                 "Realm/TestUtils",
