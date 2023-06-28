@@ -50,16 +50,15 @@ EOF
 COMMAND="$1"
 
 download_zip_if_needed() {
-    local lang="$1"
-    local directory="realm-$lang-latest"
-    local version
-    version=$(curl --silent https://static.realm.io/update/cocoa)
+    if [[ -z "${REALM_TEST_VERSION}" ]]; then
+        REALM_TEST_VERSION="$(curl --silent https://static.realm.io/update/cocoa)"
+    fi
+    local directory="realm-swift-${REALM_TEST_VERSION}"
 
     if [ ! -d "$directory" ]; then
-        curl -o "$directory".zip -L "https://static.realm.io/downloads/$lang/realm-$lang-$version.zip"
-        unzip "$directory".zip
-        rm "$directory".zip
-        mv realm-"$lang"-* "$directory"
+        curl -OL "https://github.com/realm/realm-swift/releases/download/v${REALM_TEST_VERSION}/realm-swift-${REALM_TEST_VERSION}.zip"
+        unzip "$directory.zip"
+        rm "$directory.zip"
     fi
 }
 
@@ -92,10 +91,10 @@ xctest() {
     elif [[ $NAME == Carthage* ]]; then
         (
             cd "$DIRECTORY"
-            if [ -n "${REALM_BUILD_USING_LATEST_RELEASE:-}" ]; then
+            if [ -n "${REALM_TEST_VERSION}" ]; then
                 echo "github \"realm/realm-swift\"" > Cartfile
             else
-                echo "github \"realm/realm-swift\" \"${sha:-master}\"" > Cartfile
+                echo "github \"realm/realm-swift\" \"v${REALM_TEST_VERSION}\"" > Cartfile
             fi
             if [[ $PLATFORM == ios ]]; then
                 carthage update --use-xcframeworks --platform iOS
@@ -114,10 +113,8 @@ xctest() {
             echo 'XCFramework does not exist'
             exit 1
         fi
-    elif [[ $LANG == swift* ]]; then
-        download_zip_if_needed swift
     else
-        download_zip_if_needed "$LANG"
+        download_zip_if_needed
     fi
     local destination=()
     if [[ $PLATFORM == ios ]]; then
