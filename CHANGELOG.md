@@ -8,7 +8,9 @@ x.y.z Release notes (yyyy-MM-dd)
   to the schema. This fix also applies to partition-based to flexible sync
   migration if async open is used. ([Core #6707](https://github.com/realm/realm-core/issues/6707), since v10.28.2)
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+### Breaking Changes
+* Legacy non-xcframework Carthage installations are no longer supported. Please
+  ensure you are using `--use-xcframeworks` if installing via Carthage.
 
 ### Compatibility
 * Realm Studio: 14.0.1 or later.
