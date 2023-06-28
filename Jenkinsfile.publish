@@ -1,0 +1,120 @@
+def carthageXcodeVersion = '14.3.1'
+
+pipeline {
+  agent { label 'osx' }
+  parameters {
+    string(name: 'branch', defaultValue: 'master')
+    string(name: 'version', defaultValue: '')
+  }
+  stages {
+    stage('Gather Info') {
+      steps {
+        deleteDir()
+        copyArtifacts(projectName: 'cocoa-pipeline', filter: 'build-scripts.zip', selector: lastCompleted)
+        sh 'unzip build-scripts.zip'
+        script {
+          env.version = sh("sed -n 's/^VERSION=\\(.*\\)\$/\\1/p' dependencies.list", returnStdout: true).trim()
+        }
+        stash name: 'build-scripts', includes: '*'
+      }
+    }
+
+    stage('Tag and publish docs') {
+      parallel {
+        stage('Tag release') {
+          steps {
+            deleteDir()
+            unstash 'build-scripts'
+            sh "build.sh publish-tag ${branch}"
+          }
+        }
+
+        stage('Publish docs') {
+          steps {
+            deleteDir()
+            unstash 'build-scripts'
+            copyArtifacts(projectName: 'cocoa-pipeline', filter: 'realm-docs.zip', selector: lastCompleted)
+            withAWS(credentials: 'cocoa-docs-s3-bucket', region: 'us-east-1') {
+              sh "build.sh publish-docs"
+            }
+          }
+        }
+      }
+    }
+
+    stage('Create Github and Cocoapods releases') {
+      parallel {
+        stage('Create Github Release') {
+          environment {
+            COCOAPODS_TRUNK_TOKEN = credentials('cocoapods-trunk-token')
+          }
+          steps {
+            deleteDir()
+            unstash 'build-scripts'
+            copyArtifacts(projectName: 'cocoa-pipeline', selector: lastCompleted)
+            sh "build.sh publish-github ${carthageXcodeVersion}"
+          }
+        }
+
+        stage('Publish CocoaPods') {
+          environment {
+            GITHUB_ACCESS_TOKEN = credentials('github-release-token')
+            REALM_XCODE_VERSION = "${carthageXcodeVersion}"
+          }
+          steps {
+            deleteDir()
+            unstash 'build-scripts'
+            sh "build.sh publish-cocoapods v${env.version}"
+          }
+        }
+      }
+    }
+
+    stage('Test release') {
+      matrix {
+        axes {
+          axis {
+            name 'SDK'
+            values 'objc', 'swift'
+          }
+          axis {
+            name 'platform'
+            values 'ios', 'osx', 'watchos', 'catalyst'
+          }
+          axis {
+            name 'method'
+            values 'static', 'dynamic', 'cocoapods', 'cocoapods-dynamic', 'carthage'
+          }
+        }
+
+        excludes {
+          exclude {
+            axis {
+              name 'SDK'
+              values 'swift'
+            }
+            axis {
+              name 'method'
+              values 'static'
+            }
+          }
+
+        }
+
+        stages {
+          stage('test') {
+            environment {
+              REALM_XCODE_VERSION = "${carthageXcodeVersion}"
+              REALM_TEST_VERSION = "${env.version}"
+            }
+            steps {
+              dir('examples/installation') {
+                sh "./build.sh test-${platform}-${sdk}-${method}"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

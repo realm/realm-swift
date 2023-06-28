@@ -1031,13 +1031,16 @@ case "$COMMAND" in
         sh scripts/reset-simulators.sh
         sh build.sh docs
         cd docs
-        zip -r objc-docs.zip objc_output
-        zip -r swift-docs.zip swift_output
+        zip -r realm-docs.zip objc_output swift_output
         ;;
 
     "package-examples")
         ./scripts/package_examples.rb
         zip --symlinks -r realm-examples.zip examples -x "examples/installation/*"
+        ;;
+
+    "package-build-scripts")
+        zip -r build-scripts.zip build.sh dependencies.list scripts examples/installation
         ;;
 
     "package-test-examples")
@@ -1174,9 +1177,42 @@ EOF
         sh build.sh package-test-examples
         ;;
 
-    "github-release")
-        VERSION="$(sh build.sh get-version)"
+    "publish-github")
+        VERSION="$(sed -n 's/^VERSION=\(.*\)$/\1/p' "${source_root}/dependencies.list")"
         ./scripts/github_release.rb "$VERSION" "$REALM_XCODE_VERSION"
+        ;;
+
+    "publish-docs")
+        VERSION="$(sed -n 's/^VERSION=\(.*\)$/\1/p' "${source_root}/dependencies.list")"
+        PRERELEASE_REGEX='alpha|beta|rc|preview'
+        if [[ $VERSION =~ $PRERELEASE_REGEX ]]; then
+          exit 0
+        fi
+        rm -rf swift_output objc_output
+        unzip realm-docs.zip
+        s3cmd put --recursive --acl-public --access_key=${AWS_ACCESS_KEY_ID} --secret_key=${AWS_SECRET_ACCESS_KEY} swift_output/ s3://realm-sdks/docs/realm-sdks/swift/${VERSION}/
+        s3cmd put --recursive --acl-public --access_key=${AWS_ACCESS_KEY_ID} --secret_key=${AWS_SECRET_ACCESS_KEY} swift_output/ s3://realm-sdks/docs/realm-sdks/swift/latest/
+
+        s3cmd put --recursive --acl-public --access_key=${AWS_ACCESS_KEY_ID} --secret_key=${AWS_SECRET_ACCESS_KEY} objc_output/ s3://realm-sdks/docs/realm-sdks/objc/${VERSION}/
+        s3cmd put --recursive --acl-public --access_key=${AWS_ACCESS_KEY_ID} --secret_key=${AWS_SECRET_ACCESS_KEY} objc_output/ s3://realm-sdks/docs/realm-sdks/objc/latest/
+        ;;
+
+    "publish-tag")
+        git clone git@github.com:realm/realm-swift.git
+        cd realm-swift
+        git checkout "$2"
+        VERSION="$(sed -n 's/^VERSION=\(.*\)$/\1/p' dependencies.list)"
+        git tag -m "Release ${VERSION}" "v${VERSION}"
+        git push origin "v${VERSION}"
+        ;;
+
+    "publish-cocoapods")
+        git clone https://github.com/realm/realm-swift
+        cd realm-swift
+        git checkout "$2"
+        ./scripts/reset-simulators.rb
+        pod trunk push Realm.podspec --verbose --allow-warnings
+        pod trunk push RealmSwift.podspec --verbose --allow-warnings --synchronous
         ;;
 
     "add-empty-changelog")
