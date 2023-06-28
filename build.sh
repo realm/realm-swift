@@ -464,18 +464,14 @@ case "$COMMAND" in
 
     "verify-xcframework-evolution-mode")
         export REALM_EXTRA_BUILD_ARGUMENTS="$REALM_EXTRA_BUILD_ARGUMENTS REALM_BUILD_LIBRARY_FOR_DISTRIBUTION=YES"
-        # set the Xcode version to the oldest
-        export REALM_XCODE_VERSION=$REALM_XCODE_OLDEST_VERSION
         unset REALM_SWIFT_VERSION
-        sh build.sh xcframework osx
-        # copy the xcframework to the testing target
-        rm -rf examples/installation/xcframework-evolution
-        mkdir examples/installation/xcframework-evolution
-        cp -cr build/*.xcframework examples/installation/xcframework-evolution
-        export REALM_XCODE_VERSION=$REALM_XCODE_LATEST_VERSION
-        unset REALM_SWIFT_VERSION
+
+        # Build with the oldest supported Xcode version
+        REALM_XCODE_VERSION=$REALM_XCODE_OLDEST_VERSION sh build.sh xcframework osx
+
+        # Try to import the built framework using the newest supported version
         cd examples/installation
-        sh build.sh "test-osx-swift-xcframework"
+        REALM_XCODE_VERSION=$REALM_XCODE_LATEST_VERSION ./build.rb osx xcframework
 
         exit 0
         ;;
@@ -583,9 +579,9 @@ case "$COMMAND" in
         exit 0
         ;;
 
-    test-swiftpm-ios)
+    test-ios-xcode-spm)
         cd examples/installation
-        sh build.sh test-ios-swift-spm
+        ./build.rb ios spm
         exit 0
         ;;
 
@@ -658,10 +654,11 @@ case "$COMMAND" in
         ;;
 
     "verify-cocoapods")
+        export REALM_TEST_BRANCH="$sha"
         if [[ -d .git ]]; then
           # Verify the current branch, unless one was already specified in the sha environment variable.
           if [[ -z $sha ]]; then
-            export sha=$(git rev-parse --abbrev-ref HEAD)
+            export REALM_TEST_BRANCH=$(git rev-parse --abbrev-ref HEAD)
           fi
 
           if [[ $(git log -1 '@{push}..') != "" ]] || ! git diff-index --quiet HEAD; then
@@ -672,50 +669,24 @@ case "$COMMAND" in
           fi
         fi
 
-        sh build.sh verify-cocoapods-ios
-        sh build.sh verify-cocoapods-ios-dynamic
-        sh build.sh verify-cocoapods-ios-subdependency
-        sh build.sh verify-cocoapods-osx
-        sh build.sh verify-cocoapods-watchos
-
-        # https://github.com/CocoaPods/CocoaPods/issues/7708
-        export EXPANDED_CODE_SIGN_IDENTITY=''
         cd examples/installation
-        sh build.sh test-ios-objc-cocoapods
-        sh build.sh test-ios-objc-cocoapods-dynamic
-        sh build.sh test-ios-swift-cocoapods
-        sh build.sh test-ios-swift-cocoapods-subdependency
-        sh build.sh test-osx-objc-cocoapods
-        sh build.sh test-osx-swift-cocoapods
-        sh build.sh test-catalyst-objc-cocoapods
-        sh build.sh test-catalyst-objc-cocoapods-dynamic
-        sh build.sh test-catalyst-swift-cocoapods
-        sh build.sh test-watchos-objc-cocoapods
-        sh build.sh test-watchos-swift-cocoapods
+        ./build.rb ios cocoapods static
+        ./build.rb ios cocoapods dynamic
+        ./build.rb osx cocoapods
+        ./build.rb tvos cocoapods
+        ./build.rb watchos cocoapods
+        ./build.rb catalyst cocoapods
         ;;
 
     verify-cocoapods-ios-dynamic)
-        PLATFORM=$(echo "$COMMAND" | cut -d - -f 3)
-        # https://github.com/CocoaPods/CocoaPods/issues/7708
-        export EXPANDED_CODE_SIGN_IDENTITY=''
         cd examples/installation
-        sh build.sh test-ios-objc-cocoapods-dynamic
-        ;;
-
-    verify-cocoapods-ios-subdependency)
-        PLATFORM=$(echo "$COMMAND" | cut -d - -f 3)
-        # https://github.com/CocoaPods/CocoaPods/issues/7708
-        export EXPANDED_CODE_SIGN_IDENTITY=''
-        cd examples/installation
-        sh build.sh test-ios-swift-cocoapods-subdependency
+        REALM_TEST_BRANCH="$sha" ./build.rb ios cocoapods
         ;;
 
     verify-cocoapods-*)
         PLATFORM=$(echo "$COMMAND" | cut -d - -f 3)
-        # https://github.com/CocoaPods/CocoaPods/issues/7708
-        export EXPANDED_CODE_SIGN_IDENTITY=''
         cd examples/installation
-        sh build.sh "test-$PLATFORM-swift-cocoapods"
+        REALM_TEST_BRANCH="$sha" ./build.rb "$PLATFORM" cocoapods
         ;;
 
     "verify-osx-encryption")
@@ -735,21 +706,6 @@ case "$COMMAND" in
         exit 0
         ;;
 
-    "verify-osx-swift")
-        sh build.sh test-osx-swift
-        exit 0
-        ;;
-
-    "verify-swiftui-ios")
-        sh build.sh test-swiftui-ios
-        exit 0
-        ;;
-
-    "verify-swiftui-server-osx")
-        sh build.sh test-swiftui-server-osx
-        exit 0
-        ;;
-
     "verify-osx-swift-evolution")
         export REALM_EXTRA_BUILD_ARGUMENTS="$REALM_EXTRA_BUILD_ARGUMENTS REALM_BUILD_LIBRARY_FOR_DISTRIBUTION=YES"
         sh build.sh test-osx-swift
@@ -762,10 +718,6 @@ case "$COMMAND" in
         sh build.sh examples-ios
         ;;
 
-    "verify-ios-dynamic")
-        sh build.sh test-ios-dynamic
-        ;;
-
     "verify-ios-swift")
         REALM_EXTRA_BUILD_ARGUMENTS="$REALM_EXTRA_BUILD_ARGUMENTS -workspace examples/ios/swift/RealmExamples.xcworkspace" \
             sh build.sh test-ios-swift
@@ -775,16 +727,6 @@ case "$COMMAND" in
     "verify-ios-swift-evolution")
         export REALM_EXTRA_BUILD_ARGUMENTS="$REALM_EXTRA_BUILD_ARGUMENTS REALM_BUILD_LIBRARY_FOR_DISTRIBUTION=YES"
         sh build.sh test-ios-swift
-        exit 0
-        ;;
-
-    "verify-ios-device-objc")
-        sh build.sh test-ios-devices-objc
-        exit 0
-        ;;
-
-    "verify-ios-device-swift")
-        sh build.sh test-ios-devices-swift
         exit 0
         ;;
 
@@ -826,11 +768,6 @@ case "$COMMAND" in
         exit 0
         ;;
 
-    "verify-tvos-device")
-        sh build.sh test-tvos-devices
-        exit 0
-        ;;
-
     "verify-swiftlint")
         swiftlint lint --strict
         exit 0
@@ -841,23 +778,13 @@ case "$COMMAND" in
         exit 0
         ;;
 
-    "verify-osx-object-server")
-        sh build.sh test-osx-object-server
-        exit 0
-        ;;
-
-    "verify-catalyst")
-        sh build.sh test-catalyst
-        exit 0
-        ;;
-
-    "verify-catalyst-swift")
-        sh build.sh test-catalyst-swift
-        exit 0
-        ;;
-
     "verify-xcframework")
         sh build.sh xcframework
+        exit 0
+        ;;
+
+    verify-*)
+        sh build.sh "test-$(echo "$COMMAND" | cut -d - -f 2-)"
         exit 0
         ;;
 

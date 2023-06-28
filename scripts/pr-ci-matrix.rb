@@ -22,7 +22,7 @@ targets = {
   'swiftpm-debug' => all,
   'swiftpm-address' => latest_only,
   'swiftpm-thread' => latest_only,
-  'swiftpm-ios' => all,
+  'ios-xcode-spm' => all,
 
   'ios-static' => oldest_and_latest,
   'ios-dynamic' => oldest_and_latest,
@@ -43,11 +43,11 @@ targets = {
   'xcframework' => latest_only,
 
   'cocoapods-osx' => all,
-  'cocoapods-ios' => oldest_and_latest,
-  'cocoapods-ios-dynamic' => oldest_and_latest,
-  'cocoapods-ios-subdependency' => latest_only,
-  'cocoapods-watchos' => oldest_and_latest,
-  # 'cocoapods-catalyst' => oldest_and_latest,
+  'cocoapods-ios' => latest_only,
+  'cocoapods-ios-dynamic' => latest_only,
+  'cocoapods-watchos' => latest_only,
+  'cocoapods-tvos' => latest_only,
+  'cocoapods-catalyst' => latest_only,
   'swiftui-ios' => latest_only,
   'swiftui-server-osx' => latest_only,
 }
