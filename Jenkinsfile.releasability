@@ -109,7 +109,7 @@ def doBuild() {
           sh './build.sh package-examples'
           stash includes: 'realm-examples.zip', name: 'examples'
         }
-      }
+      },
 
       'Build Scripts': {
         node('osx') {
