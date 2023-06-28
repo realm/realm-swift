@@ -126,6 +126,7 @@ def download_realm(platform, method, static)
                    when 'osx' then 'Mac'
                    when 'tvos' then 'tvOS'
                    when 'watchos' then 'watchOS'
+                   else raise "Unsupported platform for Carthage: #{platform}"
                    end
     sh 'carthage', 'update', '--use-xcframeworks', '--platform', platformName
 

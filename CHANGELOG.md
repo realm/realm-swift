@@ -18,6 +18,9 @@ x.y.z Release notes (yyyy-MM-dd)
 
 ### Internal
 * Upgraded realm-core from ? to ?
+* Release packages were being uploaded to several static.realm.io URLs which
+  are no longer linked to anywhere. These are no longer being updated, and
+  release packages are now only being uploaded to Github.
 
 10.41.1 Release notes (2023-07-17)
 =============================================================
@@ -56,9 +59,6 @@ x.y.z Release notes (yyyy-MM-dd)
 * The location where prebuilt core binaries are published has changed slightly.
   If you are using `REALM_BASE_URL` to mirror the binaries, you may need to
   adjust your mirroring logic.
-* Release packages were being uploaded to several static.realm.io URLs which
-  are no longer linked to anywhere. These are no longer being updated, and
-  release packages are now only being uploaded to Github.
 
 10.41.0 Release notes (2023-06-26)
 =============================================================
