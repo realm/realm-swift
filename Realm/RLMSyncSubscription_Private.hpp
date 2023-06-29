@@ -42,6 +42,11 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
 - (instancetype)initWithSubscriptionSet:(realm::sync::SubscriptionSet)subscriptionSet realm:(RLMRealm *)realm;
 
+- (void)update:(__attribute__((noescape)) void(^)(void))block
+         queue:(nullable dispatch_queue_t)queue
+       timeout:(NSTimeInterval)timeout
+    onComplete:(void(^)(NSError *))completionBlock;
+
 - (RLMObjectId *)addSubscriptionWithClassName:(NSString *)objectClassName
                                      subscriptionName:(nullable NSString *)name
                                                 query:(realm::Query)query

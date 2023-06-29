@@ -594,12 +594,16 @@ keyPaths:(std::optional<std::vector<std::vector<std::pair<realm::TableKey, realm
     return [self subscribeWithName:name waitForSyncMode:RLMWaitForSyncModeOnCreation onQueue:queue completion:completion];
 }
 
-- (void)subscribeWithName:(NSString *_Nullable)name
-          waitForSyncMode:(RLMWaitForSyncMode)waitForSyncMode
-                  onQueue:(dispatch_queue_t _Nullable)queue
-               completion:(RLMResultsCompletionBlock)completion {
+// Returns true if the completionBlock is called. Otherwise returns false.
+// The `timeout` param in subscribeWithName is a double and can't be nullable.
+// So there can't be a simple check for a null `timeout` in a single subscribeWithName method.
+// resolveSubscribeWithSyncMode holds the repeated switch statements. It returns a bool because some
+// cases fall through to a method calls which use a timeout.
+- (bool)checkEarlyReturnSubscribeWithSyncMode:(RLMWaitForSyncMode)waitForSyncMode
+                                name:(NSString *)name
+                             onQueue:(dispatch_queue_t _Nullable)queue
+                          completion:(RLMResultsCompletionBlock)completion {
     RLMSyncSubscriptionSet *subscriptions = self.realm.subscriptions;
-
     switch(waitForSyncMode) {
         case RLMWaitForSyncModeOnCreation:
             // If an existing named subscription matches the provided name and local query, return.
@@ -607,21 +611,21 @@ keyPaths:(std::optional<std::vector<std::vector<std::pair<realm::TableKey, realm
                 RLMSyncSubscription *sub = [subscriptions subscriptionWithName:name query:_results.get_query()];
                 if (sub != nil) {
                     [self completeOnQueue:queue completion:completion error:nil];
-                    return;
+                    return true;
                 }
             } else {
                 // otherwise check if an unnamed subscription already exists. Return if it does exist.
                 RLMSyncSubscription *sub = [subscriptions subscriptionWithQuery:_results.get_query()];
                 if (sub != nil && sub.name == nil) {
                     [self completeOnQueue:queue completion:completion error:nil];
-                    return;
+                    return true;
                 }
             }
             // If no name was provided and no existing unnamed subscription matches.
-            // break and create new subscription below.
+            // break and create new subscription later.
             break;
         case RLMWaitForSyncModeAlways:
-            // continue to [subscriptions updateOnQueue:block:] below
+            // never returns early
             break;
         case RLMWaitForSyncModeNever:
             // commit subscription synchronously and return.
@@ -632,49 +636,51 @@ keyPaths:(std::optional<std::vector<std::vector<std::pair<realm::TableKey, realm
                                                                              updateExisting:true];
             }];
             [self completeOnQueue:queue completion:completion error:nil];
-            return;
+            return true;
+        }
+    return false;
     }
 
-    [subscriptions update: ^{
-        // associated subscription id is nil when no name is provided.
-        self.associatedSubscriptionId = [subscriptions addSubscriptionWithClassName:self.objectClassName
-                                                                   subscriptionName:name
-                                                                              query:_results.get_query()
-                                                                     updateExisting:true];
-    } queue: queue onComplete:^(NSError *error) {
-        [self completeOnQueue:queue completion:completion error:error];
-    }];
+- (void)subscribeWithName:(NSString *_Nullable)name
+          waitForSyncMode:(RLMWaitForSyncMode)waitForSyncMode
+                  onQueue:(dispatch_queue_t _Nullable)queue
+               completion:(RLMResultsCompletionBlock)completion {
+    if ([self checkEarlyReturnSubscribeWithSyncMode:waitForSyncMode name:name onQueue:queue completion:completion]) {
+        return;
+    } else {
+        RLMSyncSubscriptionSet *subscriptions = self.realm.subscriptions;
+        [subscriptions update: ^{
+            // associated subscription id is nil when no name is provided.
+            self.associatedSubscriptionId = [subscriptions addSubscriptionWithClassName:self.objectClassName
+                                                                       subscriptionName:name
+                                                                                  query:_results.get_query()
+                                                                         updateExisting:true];
+        } queue: queue onComplete:^(NSError *error) {
+            [self completeOnQueue:queue completion:completion error:error];
+        }];
+    }
 }
 
-// FIXME: Ultimately needs something cancellable from realm-core instead of sdk-level workaround.
 - (void)subscribeWithName:(NSString *_Nullable)name
           waitForSyncMode:(RLMWaitForSyncMode)waitForSyncMode
                   onQueue:(dispatch_queue_t _Nullable)queue
                   timeout:(NSTimeInterval)timeout
                completion:(RLMResultsCompletionBlock)completion {
-    // Create an internal completion that will only be called once
-    __block BOOL called = false;
-    void(^methodCompletion)(RLMResults* _Nullable, NSError* _Nullable) = ^(RLMResults* _Nullable results, NSError* _Nullable error) {
-        if (!called) {
-            called = true;
-            if (error != nil) {
-                completion(nil, error);
-            } else {
-                completion(results, nil);
-            }
-        }
-    };
+    if ([self checkEarlyReturnSubscribeWithSyncMode:waitForSyncMode name:name onQueue:queue completion:completion]) {
+        return;
+    } else {
+        RLMSyncSubscriptionSet *subscriptions = self.realm.subscriptions;
+        [subscriptions update: ^{
+            // associated subscription id is nil when no name is provided.
+            self.associatedSubscriptionId = [subscriptions addSubscriptionWithClassName:self.objectClassName
+                                                                       subscriptionName:name
+                                                                                  query:_results.get_query()
+                                                                         updateExisting:true];
+        } queue: queue timeout:timeout onComplete:^(NSError *error) {
+            [self completeOnQueue:queue completion:completion error:error];
+        }];
+    }
 
-    // Setup timer
-    dispatch_time_t time =  dispatch_time(DISPATCH_TIME_NOW, (int64_t)(timeout * NSEC_PER_SEC));
-    // If the asynchronouns subscribe call below doesn't return after `time` seconds, the internal completion is called with an error.
-    dispatch_after(time, dispatch_get_main_queue(), ^{
-        NSString* errorMessage = [NSString stringWithFormat:@"Waiting for subscribed data timed out after %.01f seconds.", timeout];
-        NSError* error = [NSError errorWithDomain:RLMErrorDomain code:RLMErrorClientTimeout userInfo:@{NSLocalizedDescriptionKey: errorMessage}];
-        methodCompletion(nil, error);
-    });
-    // call asynchronous subscribe
-    [self subscribeWithName:name waitForSyncMode:waitForSyncMode onQueue:queue completion:methodCompletion];
 }
 
 - (void)unsubscribe {
