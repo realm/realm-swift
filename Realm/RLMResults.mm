@@ -636,6 +636,7 @@ keyPaths:(std::optional<std::vector<std::vector<std::pair<realm::TableKey, realm
     }
 
     [subscriptions update: ^{
+        // associated subscription id is nil when no name is provided.
         self.associatedSubscriptionId = [subscriptions addSubscriptionWithClassName:self.objectClassName
                                                                    subscriptionName:name
                                                                               query:_results.get_query()

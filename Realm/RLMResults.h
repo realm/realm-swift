@@ -436,7 +436,7 @@ __attribute__((warn_unused_result));
  This method opens a write transaction that creates or updates a subscription.
  It is advised to *not* use this method to batch multiple subscription changes
  to the server.
- For batch updates use `[RLMSyncSubscription update:onComplete:]`.
+ @see: `[RLMSyncSubscription update:queue:onComplete:]` for batch updates
 
  After committing the subscription to the realm's local subscription set, the method
  will wait for downloads according to ``RLMWaitForSyncModeOnCreation`` behavior.
@@ -462,7 +462,7 @@ __attribute__((warn_unused_result));
  This method opens a write transaction that creates or updates a subscription.
  It is advised to *not* use this method to batch multiple subscription changes
  to the server.
- For batch updates use `[RLMSyncSubscription update:onComplete:]`.
+ @see: `[RLMSyncSubscription update:queue:onComplete:]` for batch updates
 
  After committing the subscription to the realm's local subscription set, the method
  will wait for downloads according to ``RLMWaitForSyncModeOnCreation`` behavior.
@@ -496,7 +496,7 @@ __attribute__((warn_unused_result));
  This method opens a write transaction that creates or updates a subscription.
  It is advised to *not* use this method to batch multiple subscription changes
  to the server.
- For batch updates use `[RLMSyncSubscription update:onComplete:]`.
+ @see: `[RLMSyncSubscription update:queue:onComplete:]` for batch updates
 
  After committing the subscription to the realm's local subscription set, the method
  will wait for downloads according to the `RLMWaitForSyncMode`.
@@ -532,7 +532,7 @@ __attribute__((warn_unused_result));
  This method opens a write transaction that creates or updates a subscription.
  It is advised to *not* use this method to batch multiple subscription changes
  to the server.
- For batch updates use `[RLMSyncSubscription update:onComplete:]`.
+ @see: `[RLMSyncSubscription update:queue:onComplete:]` for batch updates
 
  After committing the subscription to the realm's local subscription set, the method
  will wait for downloads according to the `RLMWaitForSyncMode`.
@@ -573,7 +573,7 @@ __attribute__((warn_unused_result));
  This method opens a write transaction that removes a subscription.
  It is advised to *not* use this method to batch multiple subscription changes
  to the server.
- For batch updates use `[RLMSyncSubscription update:onComplete:]`.
+ @see: `[RLMSyncSubscription update:queue:onComplete:]` for batch updates
 
  The method returns after committing the subcsription removal to the
  realm's local subscription set. Calling this method will not wait for objects to

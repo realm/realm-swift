@@ -162,7 +162,9 @@ extension Projection: KeypathSortable {}
      will wait for downloads according to the `WaitForSyncMode`.
      - see: ``WaitForSyncMode``
 
-     __Unnamed subcsriptions:__
+     - Note: This method will wait for all data to be downloaded before returning when `WaitForSyncMode.always` and `.onCreation` (when the subscription is first created) is used. This requires an internet connection if no timeout is set.
+
+     __Unnamed subscriptions:__
      If `.subscribe()` is called without a name whose query matches an unnamed subscription, another subscription is not created.
      If `.subscribe()` is called without a name whose query matches a named subscription, an additional  unnamed subscription is created.
      __Named Subscriptions:__
@@ -195,7 +197,7 @@ extension Projection: KeypathSortable {}
      This method opens an update transaction that removes a subscription.
      It is advised to *not* use this method to batch multiple subscription changes
      to the server.
-     For batch updates use `SyncSubscription.update`
+     - see: `SyncSubscription.update` for batch updates
 
      The method returns after committing the subscription removal to the realm's
      local subscription set. Calling this method will not wait for objects to

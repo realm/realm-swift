@@ -1355,10 +1355,6 @@ extension SwiftFlexibleSyncServerTests {
     // MARK: Subscribe
 
 #if swift(>=5.8)
-//     wait(for:) doesn't work in async functions because it blocks the calling
-//     thread and doesn't let async tasks run. Xcode 14.3 introduced a new async
-//     version of it which does work, but there doesn't appear to be a workaround
-//     for older Xcode versions.
     @MainActor
     func testSubscribe() async throws {
         try await populateSwiftPerson()
@@ -1387,7 +1383,7 @@ extension SwiftFlexibleSyncServerTests {
         XCTAssertEqual(results0.count, 0) // no matches because local query is impossible
         XCTAssertEqual(realm.subscriptions.count, 2) // two subscriptions: "$0.age >= 8 AND $0.age < 8" and "$0.age >= 8"
         let results1 = realm.objects(SwiftPerson.self)
-        XCTAssertEqual(results1.count, 3) // three objects on device because subscription "$0.age >= 8" still exists
+        XCTAssertEqual(results1.count, 3) // three objects from "$0.age >= 8". None "$0.age >= 8 AND $0.age < 8".
     }
 
     @MainActor
