@@ -81,7 +81,7 @@ def doBuild() {
       )
 
       stash name: 'source', includes: '**'
-      stash name: 'build-scripts', includes: 'build.sh,dependencies.list,scripts/*'
+      stash name: 'build-scripts', includes: 'build.sh,dependencies.list,LICENSE,scripts/*'
     }
   }
 
