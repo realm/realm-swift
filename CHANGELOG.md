@@ -2,6 +2,10 @@ x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
 * Filesystem errors now include more information in the error message.
+* Add support for building for visionOS and add Xcode 15 binaries to the
+  release package. visionOS currently requires installing Realm via either
+  Swift Package Manager or by using a XCFramework as CocoaPods and Carthage do
+  not yet support it.
 
 ### Fixed
 * Fix an error during async open and client reset if properties have been added
@@ -17,18 +21,10 @@ x.y.z Release notes (yyyy-MM-dd)
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 14.3.1.
 * CocoaPods: 1.10 or later.
-* Xcode: 14.1-15 beta 3.
+* Xcode: 14.1-15 beta 4.
 
 ### Internal
 * Upgraded realm-core from 13.15.1 to 13.16.1
-* The location where prebuilt core binaries are published has changed slightly.
-  If you are using `REALM_BASE_URL` to mirror the binaries, you may need to
-  adjust your mirroring logic.
-* Release packages were being uploaded to several static.realm.io URLs which
-  are no longer linked to anywhere. These are no longer being updated, and
-  release packages are now only being uploaded to Github.
-* Upgraded realm-core from ? to ?
-* Upgraded realm-core from 13.15.1 to 13.16.0
 * The location where prebuilt core binaries are published has changed slightly.
   If you are using `REALM_BASE_URL` to mirror the binaries, you may need to
   adjust your mirroring logic.
