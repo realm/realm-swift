@@ -919,7 +919,7 @@ id RLMAccessorContext::box(realm::object_store::Dictionary&& d) {
 
 id RLMAccessorContext::box(realm::Object&& o) {
     REALM_ASSERT(currentProperty);
-    return RLMCreateObjectAccessor(_info.linkTargetType(currentProperty.index), o.obj());
+    return RLMCreateObjectAccessor(_info.linkTargetType(currentProperty.index), o.get_obj());
 }
 
 id RLMAccessorContext::box(realm::Obj&& r) {
@@ -1100,7 +1100,7 @@ RLMAccessorContext::createObject(id value, realm::CreatePolicy policy,
 
     try {
         realm::Object::create(*this, _realm->_realm, *_info.objectSchema,
-                              (id)value, policy, existingKey, outObj).obj();
+                              (id)value, policy, existingKey, outObj);
     }
     catch (std::exception const& e) {
         @throw RLMException(e);

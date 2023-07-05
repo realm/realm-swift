@@ -113,7 +113,7 @@ public:
     id box(realm::Mixed);
 
     void will_change(realm::Obj const&, realm::Property const&);
-    void will_change(realm::Object& obj, realm::Property const& prop) { will_change(obj.obj(), prop); }
+    void will_change(realm::Object& obj, realm::Property const& prop) { will_change(obj.get_obj(), prop); }
     void did_change();
 
     RLMOptionalId value_for_property(id dict, realm::Property const&, size_t prop_index);

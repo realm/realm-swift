@@ -440,7 +440,7 @@ id RLMCreateManagedAccessor(Class cls, RLMClassInfo *info) {
         return nil;
     }
     NSString *objectClassName = @(object.get_object_schema().name.c_str());
-    return RLMCreateObjectAccessor(realm->_info[objectClassName], object.obj());
+    return RLMCreateObjectAccessor(realm->_info[objectClassName], object.get_obj());
 }
 
 @end
