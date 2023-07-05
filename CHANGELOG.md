@@ -6,6 +6,8 @@ x.y.z Release notes (yyyy-MM-dd)
   release package. visionOS currently requires installing Realm via either
   Swift Package Manager or by using a XCFramework as CocoaPods and Carthage do
   not yet support it.
+* Zips compatible with SPM's `.binaryTarget()` are now published as part of the
+  reases on Github.
 
 ### Fixed
 * Fix an error during async open and client reset if properties have been added
