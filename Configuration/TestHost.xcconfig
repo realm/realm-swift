@@ -14,8 +14,10 @@ REALM_UI_FRAMEWORK_uikit = UIKit;
 
 OTHER_LDFLAGS[sdk=iphone*] = -framework UIKit;
 OTHER_LDFLAGS[sdk=appletv*] = -framework UIKit;
+OTHER_LDFLAGS[sdk=xr*] = -framework UIKit;
 OTHER_LDFLAGS[sdk=macosx*] = -framework $(REALM_UI_FRAMEWORK_$(RESOURCES_UI_FRAMEWORK_FAMILY));
 
 PRINCIPAL_CLASS[sdk=iphone*] = UIApplication;
 PRINCIPAL_CLASS[sdk=appletv*] = UIApplication;
+PRINCIPAL_CLASS[sdk=xr*] = UIApplication;
 PRINCIPAL_CLASS[sdk=macosx*] = NSApplication;

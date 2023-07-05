@@ -1,5 +1,3 @@
-SUPPORTED_PLATFORMS = macosx iphonesimulator iphoneos watchsimulator watchos appletvos appletvsimulator;
-APPLICATION_EXTENSION_API_ONLY = YES;
 SKIP_INSTALL = YES;
 
 DEFINES_MODULE = YES;
