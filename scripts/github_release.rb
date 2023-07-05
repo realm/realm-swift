@@ -17,23 +17,41 @@ RELEASE = "v#{VERSION}"
 
 BUILD = BUILD_SH.parent + 'build'
 SWIFT_ZIP = BUILD + "realm-swift-#{VERSION}.zip"
-CARTHAGE_XCFRAMEWORK_ZIP = BUILD + 'Carthage.xcframework.zip'
 
 REPOSITORY = 'realm/realm-swift'
 
-puts 'Creating Carthage XCFramework package'
-FileUtils.rm_f CARTHAGE_XCFRAMEWORK_ZIP
+uploads = [SWIFT_ZIP]
+
+puts 'Creating XCFramework packages'
+
+def sh(*args)
+  system(*args, :out=>"/dev/null") || exit(1)
+end
+
+def zip(name, files)
+  path = (BUILD + name).to_path
+  FileUtils.rm_f path
+  sh 'zip', '--symlinks', '-r', path, 'Realm.xcframework'
+  uploads.append(path)
+end
 
 Dir.mktmpdir do |tmp|
   Dir.chdir(tmp) do
-    system('unzip', SWIFT_ZIP.to_path,
-           "realm-swift-#{VERSION}/#{XCODE_VERSION}/RealmSwift.xcframework/*",
-           "realm-swift-#{VERSION}/Realm.xcframework/*",
-           :out=>"/dev/null") || exit(1)
-    FileUtils.mv "realm-swift-#{VERSION}/#{XCODE_VERSION}/RealmSwift.xcframework",
-                 "realm-swift-#{VERSION}/RealmSwift.xcframework"
-    Dir.chdir("realm-swift-#{VERSION}") do
-      system('zip', '--symlinks', '-r', CARTHAGE_XCFRAMEWORK_ZIP.to_path, 'Realm.xcframework', 'RealmSwift.xcframework', :out=>"/dev/null") || exit(1)
+    sh 'unzip', SWIFT_ZIP.to_path,
+           "realm-swift-#{VERSION}/*/RealmSwift.xcframework/*",
+           "realm-swift-#{VERSION}/Realm.xcframework/*"
+    Dir.chdir "realm-swift-#{VERSION}" do
+      zip 'Realm.xcframework.zip', 'Realm.xcframework'
+      Dir.glob '*/RealmSwift.xcframework' do |name|
+        version = Pathname(name).parent
+        Dir.chdir version do
+          zip "RealmSwift@#{version}.xcframework.zip", 'RealmSwift.xcframework'
+        end
+      end
+
+      FileUtils.mv "#{XCODE_VERSION}/RealmSwift.xcframework",
+                   'RealmSwift.xcframework'
+      zip 'Carthage.xcframework.zip', 'Realm.xcframework', 'RealmSwift.xcframework'
     end
   end
 end
@@ -63,7 +81,6 @@ prerelease = (VERSION =~ /alpha|beta|rc|preview/) ? true : false
 response = github.create_release(REPOSITORY, RELEASE, name: RELEASE, body: RELEASE_NOTES, prerelease: prerelease)
 release_url = response[:url]
 
-uploads = [SWIFT_ZIP, CARTHAGE_XCFRAMEWORK_ZIP]
 uploads.each do |upload|
   puts "Uploading #{upload.basename} to GitHub"
   github.upload_asset(release_url, upload.to_path, content_type: 'application/zip')
