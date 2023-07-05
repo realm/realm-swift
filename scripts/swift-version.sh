@@ -1,12 +1,7 @@
 #!/usr/bin/env bash
 
 : "${REALM_XCODE_VERSION:=}"
-: "${REALM_SWIFT_VERSION:=}"
 : "${DEVELOPER_DIR:=}"
-
-get_swift_version() {
-    "$1" --version 2>/dev/null | sed -ne 's/^Apple Swift version \([^\b ]*\).*/\1/p'
-}
 
 get_xcode_version() {
     "$1" -version 2>/dev/null | sed -ne 's/^Xcode \([^\b ]*\).*/\1/p'
@@ -27,7 +22,7 @@ find_xcode_with_version() {
 
     # First check if the currently active one is fine, unless we are in a CI run
     if [ -z "$JENKINS_HOME" ] && is_xcode_version xcodebuild "$required_version"; then
-        DEVELOPER_DIR=$(xcode-select -p)
+        xcode-select -p
         return 0
     fi
 
@@ -35,7 +30,7 @@ find_xcode_with_version() {
     path="/Applications/Xcode-${required_version}.app/Contents/Developer"
     if [ -d "$path" ]; then
         if is_xcode_version "$path/usr/bin/xcodebuild" "$required_version"; then
-            DEVELOPER_DIR=$path
+            echo "$path"
             return 0
         fi
     fi
@@ -43,7 +38,7 @@ find_xcode_with_version() {
     # Check all of the items in /Applications that look promising per #4534
     for path in /Applications/Xcode*.app/Contents/Developer; do
         if is_xcode_version "$path/usr/bin/xcodebuild" "$required_version"; then
-            DEVELOPER_DIR=$path
+            echo "$path"
             return 0
         fi
     done
@@ -55,7 +50,7 @@ find_xcode_with_version() {
             continue
         fi
         if is_xcode_version "$path/usr/bin/xcodebuild" "$required_version"; then
-            DEVELOPER_DIR=$path
+            echo "$path"
             return 0
         fi
     done
@@ -127,8 +122,8 @@ find_default_xcode_version() {
         return 0
     fi
 
-    echo "WARNING: The active Xcode command line tools, as returned by 'xcode-select -p', are not from Xcode."
-    echo "         The newest version of Xcode will be used instead."
+    echo "WARNING: The active Xcode command line tools, as returned by 'xcode-select -p', are not from Xcode." >&2
+    echo "         The newest version of Xcode will be used instead."                                          >&2
 
     # Find the newest version of Xcode available on the system, based on CFBundleVersion.
     local xcode_version newest_xcode_version newest_xcode_path
@@ -149,31 +144,21 @@ find_default_xcode_version() {
     DEVELOPER_DIR="$newest_xcode_path/Contents/Developer"
 }
 
-set_xcode_and_swift_versions() {
+set_xcode_version() {
     if [ -n "$REALM_XCODE_VERSION" ]; then
-        find_xcode_with_version "$REALM_XCODE_VERSION"
-
-        if [ -n "$REALM_SWIFT_VERSION" ] && ! test_xcode_for_swift_version "$DEVELOPER_DIR" "$REALM_SWIFT_VERSION"; then
-            echo "The version of Xcode specified ($REALM_XCODE_VERSION) does not support the Swift version required: $REALM_SWIFT_VERSION"
-            exit 1
-        fi
-    elif [ -n "$REALM_SWIFT_VERSION" ]; then
-        find_xcode_for_swift "$REALM_SWIFT_VERSION"
+        DEVELOPER_DIR=$(find_xcode_with_version "$REALM_XCODE_VERSION")
     elif [ -z "$DEVELOPER_DIR" ]; then
         find_default_xcode_version
     fi
     export DEVELOPER_DIR
+    # Setting this silences some seemingly spurious warnings
+    export XCODE_DEVELOPER_DIR_PATH="$DEVELOPER_DIR"
 
     REALM_XCODE_VERSION="$(get_xcode_version "$DEVELOPER_DIR/usr/bin/xcodebuild")"
     export REALM_XCODE_VERSION
-
-    if [ -z "$REALM_SWIFT_VERSION" ]; then
-        REALM_SWIFT_VERSION=$(get_swift_version "$(xcrun -f swift)")
-    fi
-    export REALM_SWIFT_VERSION
 }
 
 return 2>/dev/null || { # only run if called directly
-    set_xcode_and_swift_versions
-    echo "Found Swift version $REALM_SWIFT_VERSION in Xcode $REALM_XCODE_VERSION at $DEVELOPER_DIR"
+    set_xcode_version
+    echo "Found Xcode version $REALM_XCODE_VERSION at $DEVELOPER_DIR"
 }

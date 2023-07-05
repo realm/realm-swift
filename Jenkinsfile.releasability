@@ -2,7 +2,6 @@ xcodeVersions = ['14.1', '14.2', '14.3.1']
 platforms = ['osx', 'ios', 'watchos', 'tvos', 'catalyst']
 platformNames = ['osx': 'macOS', 'ios': 'iOS', 'watchos': 'watchOS', 'tvos': 'tvOS', 'catalyst': 'Catalyst']
 carthageXcodeVersion = '14.3.1'
-docsSwiftVersion = '5.8.1'
 
 def installationTest(platform, test, xcode, language = 'swift', linkage = 'dynamic') {
   return {
@@ -70,7 +69,7 @@ def doBuild() {
           unstash 'source'
           sh """
           hostname
-          export REALM_SWIFT_VERSION=${docsSwiftVersion}
+          export REALM_XCODE_VERSION=${carthageXcodeVersion}
           sh build.sh package-docs
           """
           dir('docs') {
