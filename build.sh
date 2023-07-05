@@ -71,6 +71,7 @@ command:
   get-version:          get the current version
   get-ioplatformuuid:   get io platform uuid
   set-version version:  set the version
+  set-core-version version: set the version of core to use
 
   package platform:     build release package for the given platform
   package-release:      assemble per-platform release packages into a combined one
