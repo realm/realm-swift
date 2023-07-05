@@ -32,6 +32,7 @@
 #import "RLMUser_Private.hpp"
 #import "RLMUtil.hpp"
 
+#import <realm/object-store/impl/realm_coordinator.hpp>
 #import <realm/object-store/sync/sync_manager.hpp>
 #import <realm/object-store/sync/sync_session.hpp>
 #import <realm/object-store/thread_safe_reference.hpp>
@@ -63,9 +64,14 @@ struct BeforeClientResetWrapper : CallbackSchema {
     RLMClientResetBeforeBlock block;
     void operator()(std::shared_ptr<Realm> local) {
         @autoreleasepool {
-            if (local->schema_version() != RLMNotVersioned) {
-                block([RLMRealm realmWithSharedRealm:local schema:getSchema(*local) dynamic:false]);
+            if (local->schema_version() == RLMNotVersioned) {
+                return;
             }
+            if (!dynamic) {
+                // FIXME: core is currently giving us a realm we can't call set_schema_subscript() on. Work around this by obtaining a new one
+                local = realm::_impl::RealmCoordinator::get_existing_coordinator(local->config().path)->get_realm(local->config(), *local->current_transaction_version());
+            }
+            block([RLMRealm realmWithSharedRealm:local schema:getSchema(*local) dynamic:dynamic]);
         }
     }
 };
@@ -74,17 +80,19 @@ struct AfterClientResetWrapper : CallbackSchema {
     RLMClientResetAfterBlock block;
     void operator()(std::shared_ptr<Realm> local, ThreadSafeReference remote, bool) {
         @autoreleasepool {
-            if (local->schema_version() != RLMNotVersioned) {
-                RLMSchema *schema = getSchema(*local);
-                RLMRealm *localRealm = [RLMRealm realmWithSharedRealm:local
-                                                               schema:schema
-                                                              dynamic:false];
-
-                RLMRealm *remoteRealm = [RLMRealm realmWithSharedRealm:Realm::get_shared_realm(std::move(remote))
-                                                                schema:schema
-                                                               dynamic:false];
-                block(localRealm, remoteRealm);
+            if (local->schema_version() == RLMNotVersioned) {
+                return;
             }
+
+            RLMSchema *schema = getSchema(*local);
+            RLMRealm *localRealm = [RLMRealm realmWithSharedRealm:local
+                                                           schema:schema
+                                                          dynamic:dynamic];
+
+            RLMRealm *remoteRealm = [RLMRealm realmWithSharedRealm:Realm::get_shared_realm(std::move(remote))
+                                                            schema:schema
+                                                           dynamic:false];
+            block(localRealm, remoteRealm);
         }
     }
 };

@@ -1529,12 +1529,12 @@ static NSString *randomEmail() {
         RLMRealm *versioned = [RLMRealm realmWithConfiguration:configVersioned error:nil];
         XCTAssertEqual(0U, versioned->_realm->schema_version());
     }
-    std::shared_ptr<realm::Realm> versioned = realm::Realm::get_shared_realm(configVersioned.config);
+    std::shared_ptr<realm::Realm> versioned = realm::Realm::get_shared_realm(configVersioned.config)->freeze();
 
     // Create a config that's not versioned.
     RLMRealmConfiguration *configUnversioned = [RLMRealmConfiguration defaultConfiguration];
     configUnversioned.configRef.schema_version = RLMNotVersioned;
-    std::shared_ptr<realm::Realm> unversioned = realm::Realm::get_shared_realm(configUnversioned.config);
+    std::shared_ptr<realm::Realm> unversioned = realm::Realm::get_shared_realm(configUnversioned.config)->freeze();
 
     XCTAssertNotEqual(versioned->schema_version(), RLMNotVersioned);
     XCTAssertEqual(unversioned->schema_version(), RLMNotVersioned);

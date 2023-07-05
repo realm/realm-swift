@@ -131,8 +131,17 @@ NSError *translateSystemError(std::error_code ec, const char *msg) {
                                || ec.category() == realm::util::error::basic_system_error_category();
     NSString *errorDomain = isGenericCategoryError ? NSPOSIXErrorDomain : RLMUnknownSystemErrorDomain;
 
+    // Core v13.16 duplicates the error message in sync errors, so remove the second copy
+    NSString *message = @(msg);
+    if (auto loc = [message rangeOfString:@" (SystemError"].location; loc != NSNotFound) {
+        auto prefix = [message substringToIndex:loc];
+        if ([message rangeOfString:prefix options:0 range:{loc, message.length - loc} locale:nil].location != NSNotFound) {
+            message = prefix;
+        }
+    }
+
     NSMutableDictionary *userInfo = [NSMutableDictionary new];
-    userInfo[NSLocalizedDescriptionKey] = @(msg);
+    userInfo[NSLocalizedDescriptionKey] = message;
     // FIXME: remove these in v11
     userInfo[@"Error Code"] = @(code);
     userInfo[@"Category"] = @(ec.category().name());
