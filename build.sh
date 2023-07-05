@@ -163,6 +163,11 @@ build_combined() {
             config_suffix=-appletvos
             simulator_suffix=appletvsimulator
             ;;
+        visionos)
+            destination='generic/platform=visionOS'
+            config_suffix=-xros
+            simulator_suffix=xrsimulator
+            ;;
         catalyst)
             destination='generic/platform=macOS,variant=Mac Catalyst'
             config_suffix=-maccatalyst
@@ -402,10 +407,23 @@ case "$COMMAND" in
         build_combined RealmSwift catalyst
         ;;
 
+    "visionos")
+        build_combined Realm visionos
+        ;;
+
+    "visionos-swift")
+        build_combined Realm visionos
+        build_combined RealmSwift visionos
+        ;;
+
     "xcframework")
         # Build all of the requested frameworks
         shift
-        PLATFORMS="${*:-osx ios watchos tvos catalyst}"
+        if (( $(xcode_version_major) < 15 )); then
+            PLATFORMS="${*:-osx ios watchos tvos catalyst}"
+        else
+            PLATFORMS="${*:-osx ios watchos tvos catalyst visionos}"
+        fi
         for platform in $PLATFORMS; do
             sh build.sh "$platform-swift"
         done
@@ -1035,6 +1053,10 @@ case "$COMMAND" in
             for platform in osx ios watchos tvos catalyst; do
                 unzip "realm-$platform-$xcode_version.zip" -d "${extract_dir}/${platform}"
             done
+            if (( "${xcode_version%%.*}" >= 15 )); then
+                unzip "realm-visionos-$xcode_version.zip" -d "${extract_dir}/visionos"
+            fi
+
             find "${extract_dir}" -name 'RealmSwift.framework' -path "*/Release/*" \
                 | sed 's/.*/-framework &/' \
                 | xargs xcodebuild -create-xcframework -allow-internal-distribution -output "${package_dir}/${xcode_version}/RealmSwift.xcframework"
@@ -1112,6 +1134,12 @@ EOF
         echo 'Packaging Catalyst'
         sh build.sh package catalyst
         cp "build/realm-catalyst-$REALM_XCODE_VERSION.zip" .
+
+        if (( "$(xcode_version_major)" >= 15 )); then
+            echo 'Packaging visionOS'
+            sh build.sh package visionOS
+            cp "build/realm-visionOS-$REALM_XCODE_VERSION.zip" .
+        fi
 
         echo 'Packaging examples'
         sh build.sh package-examples

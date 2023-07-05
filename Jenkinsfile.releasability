@@ -1,7 +1,22 @@
 xcodeVersions = ['14.1', '14.2', '14.3.1']
 platforms = ['osx', 'ios', 'watchos', 'tvos', 'catalyst']
-platformNames = ['osx': 'macOS', 'ios': 'iOS', 'watchos': 'watchOS', 'tvos': 'tvOS', 'catalyst': 'Catalyst']
+platformNames = ['osx': 'macOS', 'ios': 'iOS', 'watchos': 'watchOS', 'tvos': 'tvOS', 'catalyst': 'Catalyst', 'visionos': 'visionOS']
 carthageXcodeVersion = '14.3.1'
+
+def buildPlatform(platform, xcodeVersion, nodeLabel = 'osx') {
+  def platformName = platformNames[platform]
+  return {
+    node(nodeLabel) {
+      deleteDir()
+      unstash 'source'
+      sh "REALM_XCODE_VERSION=${xcodeVersion} ./build.sh package ${platform}"
+      dir("build") {
+        stash includes: "realm-${platform}-${xcodeVersion}.zip",
+              name: "${platform}-${xcodeVersion}"
+      }
+    }
+  }
+}
 
 def installationTest(platform, test, xcode, language = 'swift', linkage = 'dynamic') {
   return {
@@ -100,39 +115,34 @@ def doBuild() {
     for (def p in platforms) {
       def platform = p
       def platformName = platformNames[platform]
-      for (def v in xcodeVersions) {
-        def xcodeVersion = v
-        parallelBuilds["${platformName} ${xcodeVersion}"] = {
-          node('osx') {
-            deleteDir()
-            unstash 'source'
-            sh "REALM_XCODE_VERSION=${xcodeVersion} ./build.sh package ${platform}"
-            dir("build") {
-              stash includes: "realm-${platform}-${xcodeVersion}.zip",
-                    name: "${platform}-${xcodeVersion}"
-            }
-          }
-        }
+      for (def xcodeVersion in xcodeVersions) {
+        parallelBuilds["${platformName} ${xcodeVersion}"] = buildPlatform(platform, xcodeVersion)
       }
+      parallelBuilds["${platformName} 15.0"] = buildPlatform(platform, '15.0', 'macos_13')
     }
+    parallelBuilds["visionOS 15.0"] = buildPlatform('visionos', '15.0', 'macos_13')
 
     parallel parallelBuilds
   }
 
   stage('package') {
-    node('osx') {
+    node('macos_13') {
       deleteDir()
 
       for (def platform in platforms) {
         for (def xcodeVersion in xcodeVersions) {
           unstash "${platform}-${xcodeVersion}"
         }
+        unstash "${platform}-15.0"
       }
+      unstash 'visionos-15.0'
 
       unstash 'examples'
       unstash 'build-scripts'
 
-      sh './build.sh package-release'
+      withEnv(['REALM_XCODE_VERSION=15.0']) {
+        sh './build.sh package-release'
+      }
       stash includes: 'realm-swift-*.zip', name: 'packaged'
       archiveArtifacts artifacts: 'realm-swift-*.zip'
     }

@@ -1,7 +1,10 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+* Add support for building for visionOS and add Xcode 15 binaries to the
+  release package. visionOS currently requires installing Realm via either
+  Swift Package Manager or by using a XCFramework as CocoaPods and Carthage do
+  not yet support it.
 
 ### Fixed
 * Fix nested properties observation on a `Projections` not notifying when there is a property change.
