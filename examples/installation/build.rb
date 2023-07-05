@@ -34,7 +34,7 @@ end
 usage unless ARGV.length >= 1
 
 def read_setting(name)
-  `sh -c 'source ../../scripts/swift-version.sh; set_xcode_and_swift_versions; echo "$#{name}"'`.chomp()
+  `sh -c 'source ../../scripts/swift-version.sh; set_xcode_version; echo "$#{name}"'`.chomp()
 end
 
 ENV['DEVELOPER_DIR'] = read_setting 'DEVELOPER_DIR'

@@ -118,17 +118,16 @@ xcode() {
 xc() {
     # Logs xcodebuild output in realtime
     : "${NSUnbufferedIO:=YES}"
-    args=("SWIFT_VERSION=$REALM_SWIFT_VERSION" $REALM_EXTRA_BUILD_ARGUMENTS)
     if [[ "$XCMODE" == "xcodebuild" ]]; then
-        xcode "$@" "${args[@]}"
+        xcode "$@" "${REALM_EXTRA_BUILD_ARGUMENTS[@]}"
     elif [[ "$XCMODE" == "xcpretty" ]]; then
         mkdir -p build
-        xcode "$@" "${args[@]}" | tee build/build.log | xcpretty -c "${XCPRETTY_PARAMS[@]}" || {
+        xcode "$@" "${REALM_EXTRA_BUILD_ARGUMENTS[@]}" | tee build/build.log | xcpretty -c "${XCPRETTY_PARAMS[@]}" || {
             echo "The raw xcodebuild output is available in build/build.log"
             exit 1
         }
     elif [[ "$XCMODE" == "xctool" ]]; then
-        xctool "$@" "${args[@]}"
+        xctool "$@" "${REALM_EXTRA_BUILD_ARGUMENTS[@]}"
     fi
 }
 
@@ -304,12 +303,10 @@ case "$COMMAND" in
 esac
 export CONFIGURATION=${CONFIGURATION:-Release}
 
-
-# Pre-choose Xcode and Swift versions for those operations that do not set them
+# Pre-choose Xcode version for those operations that do not override it
 REALM_XCODE_VERSION=${xcode_version:-$REALM_XCODE_VERSION}
-REALM_SWIFT_VERSION=${swift_version:-$REALM_SWIFT_VERSION}
 source "${source_root}/scripts/swift-version.sh"
-set_xcode_and_swift_versions
+set_xcode_version
 
 ######################################
 # Commands
@@ -1012,10 +1009,6 @@ case "$COMMAND" in
 
     "package")
         PLATFORM="$2"
-        REALM_SWIFT_VERSION=
-
-        set_xcode_and_swift_versions
-
         sh build.sh "$PLATFORM-swift"
         if [[ "$PLATFORM" == ios ]]; then
             sh build.sh "$PLATFORM-static"
