@@ -29,6 +29,7 @@
 #import "RLMProperty_Private.h"
 #import "RLMQueryUtil.hpp"
 #import "RLMRealmConfiguration_Private.hpp"
+#import "RLMScheduler.h"
 #import "RLMSchema_Private.h"
 #import "RLMSectionedResults_Private.hpp"
 #import "RLMSyncSubscription_Private.hpp"
@@ -575,9 +576,10 @@ keyPaths:(std::optional<std::vector<std::vector<std::pair<realm::TableKey, realm
                   error:(NSError *_Nullable)error {
     RLMResults *ret = (error != nil) ? nil : self;
     if (queue) {
-        return dispatch_async(queue, ^{
+        RLMScheduler* scheduler = [RLMScheduler dispatchQueue:queue];
+        [scheduler invoke:^{
             completion(ret, error);
-        });
+        }];
     } else {
         completion(ret, error);
     }
@@ -600,9 +602,9 @@ keyPaths:(std::optional<std::vector<std::vector<std::pair<realm::TableKey, realm
 // resolveSubscribeWithSyncMode holds the repeated switch statements. It returns a bool because some
 // cases fall through to a method calls which use a timeout.
 - (bool)checkEarlyReturnSubscribeWithSyncMode:(RLMWaitForSyncMode)waitForSyncMode
-                                name:(NSString *)name
-                             onQueue:(dispatch_queue_t _Nullable)queue
-                          completion:(RLMResultsCompletionBlock)completion {
+                                         name:(NSString *)name
+                                      onQueue:(dispatch_queue_t _Nullable)queue
+                                   completion:(RLMResultsCompletionBlock)completion {
     RLMSyncSubscriptionSet *subscriptions = self.realm.subscriptions;
     switch(waitForSyncMode) {
         case RLMWaitForSyncModeOnCreation:

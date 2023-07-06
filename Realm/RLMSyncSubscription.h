@@ -121,7 +121,7 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
  @param block The block containing actions to perform to the subscription set.
  @param onComplete A block which is called upon synchronization of
-                   subscriptions from the server. The block will be passed `nil`
+                   data from the server. The block will be passed `nil`
                    if the update succeeded, and an error describing the problem
                    otherwise.
  */
@@ -139,14 +139,13 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
  @param block The block containing actions to perform to the subscription set.
  @param queue The serial queue to deliver notifications to.
  @param onComplete A block which is called upon synchronization of
-                   subscriptions from the server. The block will be passed `nil`
+                   data from the server. The block will be passed `nil`
                    if the update succeeded, and an error describing the problem
                    otherwise.
  */
  - (void)update:(__attribute__((noescape)) void(^)(void))block
           queue:(nullable dispatch_queue_t)queue
      onComplete:(void(^)(NSError *))onComplete
-__attribute__((swift_async(not_swift_private, 3)))
 __attribute__((swift_attr("@_unsafeInheritExecutor")));
 
 

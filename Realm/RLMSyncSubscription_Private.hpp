@@ -34,8 +34,6 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
 - (instancetype)initWithSubscription:(realm::sync::Subscription)subscription subscriptionSet:(RLMSyncSubscriptionSet *)subscriptionSet;
 
-@property (nonatomic, readonly) std::string_view stdString;
-
 @end
 
 @interface RLMSyncSubscriptionSet ()

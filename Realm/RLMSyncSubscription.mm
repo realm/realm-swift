@@ -67,10 +67,6 @@
     return RLMTimestampToNSDate(_subscription->updated_at);
 }
 
-- (std::string_view)stdString {
-    return _subscription->query_string;
-}
-
 - (NSString *)queryString {
     return @(_subscription->query_string.c_str());
 }

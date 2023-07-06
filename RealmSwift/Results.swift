@@ -188,7 +188,7 @@ extension Projection: KeypathSortable {}
             return Results(rlmResults)
         }
         rlmResults = try await rlmResults.__subscribe(withName: name, waitForSync: waitForSync, on: nil, timeout: timeout)
-        return Results(rlmResults)
+        return self
     }
 #endif
     /**
