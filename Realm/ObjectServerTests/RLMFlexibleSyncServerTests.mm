@@ -877,12 +877,14 @@
         [subs addSubscriptionWithClassName:Dog.className
                                      where:@"breed == 'Labradoodle' and partition == %@", NSStringFromSelector(_cmd)];
     }];
+    XCTAssertEqual(realm.subscriptions.count, 3U);
     CHECK_COUNT(2, Person, realm);
     CHECK_COUNT(1, Dog, realm);
 
     [self writeQueryAndCompleteForRealm:realm block:^(RLMSyncSubscriptionSet *subs) {
         [subs removeAllUnnamedSubscriptions];
     }];
+    XCTAssertEqual(realm.subscriptions.count, 1U);
     CHECK_COUNT(1, Person, realm);
     CHECK_COUNT(0, Dog, realm);
 }
@@ -1140,11 +1142,11 @@
     CHECK_COUNT(0, Person, realm);
 
     XCTestExpectation *ex = [self expectationWithDescription:@"wait for download"];
-    [[[Person allObjectsInRealm:realm] objectsWhere:@"lastName == 'Epstein'"] subscribeWithCompletion:^(RLMResults *results, NSError *error) {
+    [[[Person allObjectsInRealm:realm] objectsWhere:@"lastName == 'Epstein'"] subscribeWithName:@"5thBeatle" onQueue:dispatch_get_main_queue() completion:^(RLMResults *results, NSError *error) {
         XCTAssertNil(error);
         XCTAssertEqual(results.count, 1U);
         [ex fulfill];
-    } onQueue:dispatch_get_main_queue()];
+    }];
     XCTAssertEqual(realm.subscriptions.count, 1UL);
     [self waitForExpectationsWithTimeout:5.0 handler:nil];
 }

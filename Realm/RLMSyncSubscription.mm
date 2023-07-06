@@ -271,7 +271,7 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
     // If the call below doesn't return after `time` seconds, the internal completion is called with an error.
     dispatch_after(time, dispatch_get_main_queue(), ^{
         NSString* errorMessage = [NSString stringWithFormat:@"Waiting for update timed out after %.01f seconds.", timeout];
-        NSError* error = [NSError errorWithDomain:RLMErrorDomain code:RLMErrorClientTimeout userInfo:@{NSLocalizedDescriptionKey: errorMessage}];
+        NSError* error = [NSError errorWithDomain:NSPOSIXErrorDomain code:ETIMEDOUT userInfo:@{NSLocalizedDescriptionKey: errorMessage}];
         methodCompletion(error);
     });
     [self update:block queue:queue onComplete:methodCompletion];

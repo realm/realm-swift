@@ -1394,12 +1394,10 @@ extension SwiftFlexibleSyncServerTests {
         let results0 = try await realm.objects(SwiftPerson.self).where { $0.age >= 8 }.subscribe()
         let ex = XCTestExpectation(description: "no attempt to re-create subscription, returns immediately")
         realm.syncSession!.suspend()
-        Task {
-            _ = try await realm.objects(SwiftPerson.self).where { $0.age >= 8 }.subscribe()
-            _ = try await results0.subscribe()
-            XCTAssertEqual(realm.subscriptions.count, 1)
-            ex.fulfill()
-        }
+        _ = try await realm.objects(SwiftPerson.self).where { $0.age >= 8 }.subscribe()
+        _ = try await results0.subscribe()
+        XCTAssertEqual(realm.subscriptions.count, 1)
+        ex.fulfill()
         await fulfillment(of: [ex], timeout: 2.0)
         XCTAssertEqual(realm.subscriptions.count, 1)
     }
@@ -1432,7 +1430,7 @@ extension SwiftFlexibleSyncServerTests {
         _ = try await results0.subscribe(name: "older than 7")
         XCTAssertEqual(realm.subscriptions.count, 3)
         let first = realm.subscriptions.first(ofType: SwiftPerson.self) { $0.age >= 8 }
-        XCTAssertNil(first?.name)
+        XCTAssertNil(try XCTUnwrap(first).name)
         let second = realm.subscriptions[1]
         XCTAssertEqual(second!.name, "8 or older")
         let third = realm.subscriptions[2]
@@ -1577,12 +1575,12 @@ extension SwiftFlexibleSyncServerTests {
         XCTAssertEqual(results.count, 3)
         let expectation = XCTestExpectation(description: "method doesn't hang")
         realm.syncSession!.suspend()
-            Task {
-                results = try! await realm.objects(SwiftPerson.self).where { $0.age >= 8 }.subscribe(waitForSync: .onCreation)
-                XCTAssertEqual(results.count, 3) // expect method to return immediately, and not hang while no connection
-                XCTAssertEqual(realm.subscriptions.count, 1)
-                expectation.fulfill()
-            }
+        Task {
+            results = try! await realm.objects(SwiftPerson.self).where { $0.age >= 8 }.subscribe(waitForSync: .onCreation)
+            XCTAssertEqual(results.count, 3) // expect method to return immediately, and not hang while no connection
+            XCTAssertEqual(realm.subscriptions.count, 1)
+            expectation.fulfill()
+        }
         await fulfillment(of: [expectation], timeout: 2.0)
     }
 
@@ -1598,11 +1596,11 @@ extension SwiftFlexibleSyncServerTests {
         // suspend session on client. Add a document that isn't on the client.
         realm.syncSession!.suspend()
         let serverObject: Document = [
-                     "_id": .objectId(ObjectId.generate()),
-                     "firstName": .string("Paul"),
-                     "lastName": .string("M"),
-                     "age": .int32(30)
-                 ]
+            "_id": .objectId(ObjectId.generate()),
+            "firstName": .string("Paul"),
+            "lastName": .string("M"),
+            "age": .int32(30)
+        ]
         collection.insertOne(serverObject).await(self, timeout: 10.0)
 
         let start = Date()
@@ -1645,11 +1643,11 @@ extension SwiftFlexibleSyncServerTests {
             let timeout = 2.0
             do {
                 _ = try await realm.objects(SwiftPerson.self).where { $0.age >= 8 }.subscribe(waitForSync: .always, timeout: timeout)
-            } catch let error as Realm.Error {
+            } catch let error as NSError {
                 expectation.fulfill()
-                XCTAssertNotNil(error)
+                XCTAssertEqual(error.code, Int(ETIMEDOUT))
+                XCTAssertEqual(error.domain, NSPOSIXErrorDomain)
                 XCTAssertEqual(error.localizedDescription, "Waiting for update timed out after \(timeout) seconds.")
-                XCTAssertEqual(error.code, .clientTimeout)
             }
         }
         await fulfillment(of: [expectation], timeout: 3.0)

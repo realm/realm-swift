@@ -153,10 +153,10 @@ extension Projection: KeypathSortable {}
     /**
      Creates a SyncSubscription matching the Results' local filter.
 
-     This method opens a transaction that creates or updates a subscription.
-     It's advised to *not* use this method to batch multiple subscription changes
-     to the server.
-     For batch updates use `SyncSubscription.update`
+     This method opens a write transaction that creates or updates a subscription.
+     It's advised to *not* loop over this method in order to create multiple subcsriptions.
+     This could create a performance bottleneck by opeing multiple unecessary write transactions.
+     - note To create multiple subscriptions at once use `SyncSubscription.update`
 
      After committing the subscription to the realm's local subscription set, the method
      will wait for downloads according to the `WaitForSyncMode`.

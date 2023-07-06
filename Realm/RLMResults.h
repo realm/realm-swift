@@ -28,14 +28,14 @@ typedef void(^RLMResultsCompletionBlock)(RLMResults * _Nullable, NSError * _Null
  @see ``[RLMResults subscribeWithName:waitForSyncMode:onQueue:completion:]``
 */
 typedef NS_ENUM(NSUInteger, RLMWaitForSyncMode) {
-    /// `subscribeWithName` will return once matching objects are downloaded
+    /// `subscribeWithName`'s callback will be invoked once matching objects are downloaded
     /// from the server only when the subscription is created the first time. If the
-    /// subscriptions already exists, the method will return without waiting for new downloads.
+    /// subscription already exists, the callback is invoked without waiting for new downloads.
     RLMWaitForSyncModeOnCreation,
-    /// `subscribeWithName` will always wait for downloads before returning.
-    /// The method will not return in this mode unless an internet connection is established or a timeout is set.
+    /// `subscribeWithName`'s callback will wait for downloads before being invoked.
+    /// The calback can't be invoked in this mode unless an internet connection is established or a timeout is set.
     RLMWaitForSyncModeAlways,
-    /// `subscribeWithName` will not wait for downloads before returning.
+    /// `subscribeWithName`'s callback is always invoked without waiting for downloads.
     RLMWaitForSyncModeNever
 } NS_SWIFT_NAME(WaitForSyncMode);
 
@@ -434,9 +434,9 @@ __attribute__((warn_unused_result));
  Creates an RLMSyncSubscription matching the RLMResults' local filter.
 
  This method opens a write transaction that creates or updates a subscription.
- It is advised to *not* use this method to batch multiple subscription changes
- to the server.
- @see: `[RLMSyncSubscription update:queue:onComplete:]` for batch updates
+ It's advised to *not* loop over this method in order to create multiple subcsriptions at once.
+ This could create a performance bottleneck by opeing multiple unecessary write transactions.
+ @see: `[RLMSyncSubscription update:queue:onComplete:]` in order to create multiple subscriptions.
 
  After committing the subscription to the realm's local subscription set, the method
  will wait for downloads according to ``RLMWaitForSyncModeOnCreation`` behavior.
@@ -460,9 +460,9 @@ __attribute__((warn_unused_result));
  Creates an RLMSyncSubscription matching the RLMResults' local filter.
 
  This method opens a write transaction that creates or updates a subscription.
- It is advised to *not* use this method to batch multiple subscription changes
- to the server.
- @see: `[RLMSyncSubscription update:queue:onComplete:]` for batch updates
+ It's advised to *not* loop over this method in order to create multiple subcsriptions at once.
+ This could create a performance bottleneck by opeing multiple unecessary write transactions.
+ @see: `[RLMSyncSubscription update:queue:onComplete:]` in order to create multiple subscriptions.
 
  After committing the subscription to the realm's local subscription set, the method
  will wait for downloads according to ``RLMWaitForSyncModeOnCreation`` behavior.
@@ -494,9 +494,9 @@ __attribute__((warn_unused_result));
  Creates an RLMSyncSubscription matching the RLMResults' local filter.
 
  This method opens a write transaction that creates or updates a subscription.
- It is advised to *not* use this method to batch multiple subscription changes
- to the server.
- @see: `[RLMSyncSubscription update:queue:onComplete:]` for batch updates
+ It's advised to *not* loop over this method in order to create multiple subcsriptions at once.
+ This could create a performance bottleneck by opeing multiple unecessary write transactions.
+ @see: `[RLMSyncSubscription update:queue:onComplete:]` in order to create multiple subscriptions.
 
  After committing the subscription to the realm's local subscription set, the method
  will wait for downloads according to the `RLMWaitForSyncMode`.
@@ -530,9 +530,9 @@ __attribute__((warn_unused_result));
  Creates an RLMSyncSubscription matching the RLMResults' local filter.
 
  This method opens a write transaction that creates or updates a subscription.
- It is advised to *not* use this method to batch multiple subscription changes
- to the server.
- @see: `[RLMSyncSubscription update:queue:onComplete:]` for batch updates
+ It's advised to *not* loop over this method in order to create multiple subcsriptions at once.
+ This could create a performance bottleneck by opeing multiple unecessary write transactions.
+ @see: `[RLMSyncSubscription update:queue:onComplete:]` in order to create multiple subscriptions.
 
  After committing the subscription to the realm's local subscription set, the method
  will wait for downloads according to the `RLMWaitForSyncMode`.
@@ -570,10 +570,10 @@ __attribute__((warn_unused_result));
 /**
  Removes an RLMSubscription matching the RLMResults' local filter.
 
- This method opens a write transaction that removes a subscription.
- It is advised to *not* use this method to batch multiple subscription changes
- to the server.
- @see: `[RLMSyncSubscription update:queue:onComplete:]` for batch updates
+ This method opens a write transaction that creates or updates a subscription.
+ It's advised to *not* loop over this method in order to create multiple subcsriptions at once.
+ This could create a performance bottleneck by opeing multiple unecessary write transactions.
+ @see: `[RLMSyncSubscription update:queue:onComplete:]` in order to create multiple subscriptions.
 
  The method returns after committing the subcsription removal to the
  realm's local subscription set. Calling this method will not wait for objects to
