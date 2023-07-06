@@ -8,6 +8,8 @@ x.y.z Release notes (yyyy-MM-dd)
   not yet support it.
 * Zips compatible with SPM's `.binaryTarget()` are now published as part of the
   reases on Github.
+* Prebuilt XCFrameworks are now built with LTO enabled. This has insgificant
+* performance benefits, but cuts the size of the library by ~15%.
 
 ### Fixed
 * Fix an error during async open and client reset if properties have been added

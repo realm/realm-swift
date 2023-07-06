@@ -4,8 +4,8 @@ require 'FileUtils'
 
 def usage()
   puts <<~END
-    Usage: ruby $0 test-all
-    Usage: ruby $0 platform method [linkage]
+    Usage: ruby #{__FILE__} test-all
+    Usage: ruby #{__FILE__} platform method [linkage]
 
     platform:
       ios
@@ -244,7 +244,7 @@ if ARGV[0] == 'test-all'
   for platform in platforms
     for method in ['cocoapods', 'carthage', 'spm', 'xcframework']
       next if platform == 'catalyst' && method == 'carthage'
-      next if platform == 'visionos' && method != 'spm'
+      next if platform == 'visionos' && method != 'spm' && method != 'xcframework'
       test platform, method, 'dynamic'
     end
 

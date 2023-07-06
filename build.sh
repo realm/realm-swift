@@ -143,7 +143,7 @@ build_combined() {
     local platform="$2"
     local config="$CONFIGURATION"
 
-    local config_suffix simulator_suffix destination
+    local config_suffix simulator_suffix destination build_args
     case "$platform" in
         osx)
             destination='generic/platform=macOS'
@@ -175,6 +175,8 @@ build_combined() {
             ;;
     esac
 
+    build_args=(-scheme "$product" -configuration "$config" build REALM_HIDE_SYMBOLS=YES)
+
     # Derive build paths
     local build_products_path="build/DerivedData/Realm/Build/Products"
     local product_name="$product.framework"
@@ -184,10 +186,10 @@ build_combined() {
     local xcframework_path="$out_path/$product.xcframework"
 
     # Build for each platform
-    xc -scheme "$product" -configuration "$config" -destination "$destination" build
+    xc -destination "$destination" "${build_args[@]}"
     simulator_framework=()
     if [[ -n "$simulator_suffix" ]]; then
-        xc -scheme "$product" -configuration "$config" -destination "$destination Simulator" build
+        xc -destination "$destination Simulator" "${build_args[@]}"
         simulator_framework+=(-framework "$simulator_path")
     fi
 

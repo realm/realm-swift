@@ -670,6 +670,7 @@
 		3F275EBD2433A5DA00161E7F /* RLMApp_Private.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = RLMApp_Private.hpp; sourceTree = "<group>"; };
 		3F2E66611CA0B9D5004761D5 /* NotificationTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NotificationTests.m; sourceTree = "<group>"; };
 		3F3411A5273433B300EC9D25 /* ObjcBridgeable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjcBridgeable.swift; sourceTree = "<group>"; };
+		3F4071342A57472F00D9C4A3 /* PrivateSymbols.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = PrivateSymbols.txt; sourceTree = "<group>"; };
 		3F40C612276D1B05007FEF1A /* CustomObjectCreationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomObjectCreationTests.swift; sourceTree = "<group>"; };
 		3F452EC519C2279800AFC154 /* RLMSwiftSupport.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMSwiftSupport.m; path = Realm/RLMSwiftSupport.m; sourceTree = SOURCE_ROOT; };
 		3F4E0FF82654765C008B8C0B /* ModernKVOTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModernKVOTests.swift; sourceTree = "<group>"; };
@@ -1072,9 +1073,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3FEC915B2A4B65B30044BFF5 /* Realm.framework in Frameworks */,
-				3FEC91582A4B5D600044BFF5 /* libz.tbd in Frameworks */,
 				3FEC91562A4B5D520044BFF5 /* libcompression.tbd in Frameworks */,
+				3FEC91582A4B5D600044BFF5 /* libz.tbd in Frameworks */,
+				3FEC915B2A4B65B30044BFF5 /* Realm.framework in Frameworks */,
 				5D660FDD1BE98C7C0021E04F /* RealmSwift.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1106,8 +1107,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3FEC915A2A4B5DEF0044BFF5 /* libz.tbd in Frameworks */,
 				3FEC91592A4B5DE90044BFF5 /* libcompression.tbd in Frameworks */,
+				3FEC915A2A4B5DEF0044BFF5 /* libz.tbd in Frameworks */,
 				5D6156EE1BE0689200A4BD3F /* Realm.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1118,11 +1119,11 @@
 		1A7B82361D51254600750296 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				3FEC91572A4B5D600044BFF5 /* libz.tbd */,
-				3FEC91552A4B5D520044BFF5 /* libcompression.tbd */,
 				CFAE926A24A0A7F40033CB31 /* AuthenticationServices.framework */,
 				3F9816292317763000C3543D /* libc++.tbd */,
+				3FEC91552A4B5D520044BFF5 /* libcompression.tbd */,
 				3F08725427F3B5E0007A1175 /* libcompression.tbd */,
+				3FEC91572A4B5D600044BFF5 /* libz.tbd */,
 				1A7B82391D51259F00750296 /* libz.tbd */,
 				3FE5B4D424CF3F06004D4EF3 /* realm-monorepo.xcframework */,
 			);
@@ -1261,6 +1262,7 @@
 		5D659E6C1BE03981006515A0 /* Realm */ = {
 			isa = PBXGroup;
 			children = (
+				3F4071342A57472F00D9C4A3 /* PrivateSymbols.txt */,
 				5D659E761BE03E0D006515A0 /* Realm.xcconfig */,
 				5DD755E01BE05C19002800DA /* Tests.xcconfig */,
 			);
