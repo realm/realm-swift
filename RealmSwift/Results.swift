@@ -184,10 +184,10 @@ extension Projection: KeypathSortable {}
     public func subscribe(name: String? = nil, waitForSync: WaitForSyncMode = .onCreation, timeout: TimeInterval? = nil) async throws -> Results<Element> {
         var rlmResults = ObjectiveCSupport.convert(object: self)
         guard let timeout = timeout else {
-            rlmResults = try await rlmResults.__subscribe(withName: name, waitForSyncMode: waitForSync, on: nil)
+            rlmResults = try await rlmResults.__subscribe(withName: name, waitForSync: waitForSync, on: nil)
             return Results(rlmResults)
         }
-        rlmResults = try await rlmResults.__subscribe(withName: name, waitForSyncMode: waitForSync, on: nil, timeout: timeout)
+        rlmResults = try await rlmResults.__subscribe(withName: name, waitForSync: waitForSync, on: nil, timeout: timeout)
         return Results(rlmResults)
     }
 #endif

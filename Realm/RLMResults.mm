@@ -591,7 +591,7 @@ keyPaths:(std::optional<std::vector<std::vector<std::pair<realm::TableKey, realm
 - (void)subscribeWithName:(NSString *_Nullable)name
                   onQueue:(dispatch_queue_t _Nullable)queue
                completion:(RLMResultsCompletionBlock)completion {
-    return [self subscribeWithName:name waitForSyncMode:RLMWaitForSyncModeOnCreation onQueue:queue completion:completion];
+    return [self subscribeWithName:name waitForSync:RLMWaitForSyncModeOnCreation onQueue:queue completion:completion];
 }
 
 // Returns true if the completionBlock is called. Otherwise returns false.
@@ -642,7 +642,7 @@ keyPaths:(std::optional<std::vector<std::vector<std::pair<realm::TableKey, realm
     }
 
 - (void)subscribeWithName:(NSString *_Nullable)name
-          waitForSyncMode:(RLMWaitForSyncMode)waitForSyncMode
+              waitForSync:(RLMWaitForSyncMode)waitForSyncMode
                   onQueue:(dispatch_queue_t _Nullable)queue
                completion:(RLMResultsCompletionBlock)completion {
     if ([self checkEarlyReturnSubscribeWithSyncMode:waitForSyncMode name:name onQueue:queue completion:completion]) {
@@ -662,7 +662,7 @@ keyPaths:(std::optional<std::vector<std::vector<std::pair<realm::TableKey, realm
 }
 
 - (void)subscribeWithName:(NSString *_Nullable)name
-          waitForSyncMode:(RLMWaitForSyncMode)waitForSyncMode
+              waitForSync:(RLMWaitForSyncMode)waitForSyncMode
                   onQueue:(dispatch_queue_t _Nullable)queue
                   timeout:(NSTimeInterval)timeout
                completion:(RLMResultsCompletionBlock)completion {

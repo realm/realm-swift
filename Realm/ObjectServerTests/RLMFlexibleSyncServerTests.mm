@@ -1167,7 +1167,7 @@
     XCTestExpectation *ex = [self expectationWithDescription:@"expect timeout"];
     NSTimeInterval ti = 2.0;
     RLMResults *res = [[Person allObjectsInRealm:realm] objectsWhere:@"age >= 20"];
-    [res subscribeWithName:@"20up" waitForSyncMode:RLMWaitForSyncModeAlways onQueue:dispatch_get_main_queue() timeout:2.0 completion:^(RLMResults *results, NSError *error) {
+    [res subscribeWithName:@"20up" waitForSync:RLMWaitForSyncModeAlways onQueue:dispatch_get_main_queue() timeout:2.0 completion:^(RLMResults *results, NSError *error) {
         XCTAssert(error);
         NSString *expectedDesc = [NSString stringWithFormat:@"Waiting for subscribed data timed out after %.01f seconds.", ti];
         XCTAssert([error.localizedDescription isEqualToString:expectedDesc]);

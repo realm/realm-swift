@@ -25,7 +25,7 @@ typedef void(^RLMResultsCompletionBlock)(RLMResults * _Nullable, NSError * _Null
 
 /**
  Determines wait for download behavior when subscribing on RLMResults.
- @see ``[RLMResults subscribeWithName:waitForSyncMode:onQueue:completion:]``
+ @see ``[RLMResults subscribeWithName:waitForSync:onQueue:completion:]``
 */
 typedef NS_ENUM(NSUInteger, RLMWaitForSyncMode) {
     /// `subscribeWithName`'s callback will be invoked once matching objects are downloaded
@@ -522,7 +522,7 @@ __attribute__((warn_unused_result));
  @see ``RLMWaitForSyncMode``
  */
 - (void)subscribeWithName:(NSString *_Nullable)name
-          waitForSyncMode:(RLMWaitForSyncMode)waitForSyncMode
+              waitForSync:(RLMWaitForSyncMode)waitForSyncMode
                   onQueue:(dispatch_queue_t _Nullable)queue
                completion:(RLMResultsCompletionBlock)completion NS_REFINED_FOR_SWIFT;
 
@@ -562,7 +562,7 @@ __attribute__((warn_unused_result));
  @see ``RLMWaitForSyncMode``
  */
 - (void)subscribeWithName:(NSString *_Nullable)name
-          waitForSyncMode:(RLMWaitForSyncMode)waitForSyncMode
+              waitForSync:(RLMWaitForSyncMode)waitForSyncMode
                   onQueue:(dispatch_queue_t _Nullable)queue
                   timeout:(NSTimeInterval)timeout
                completion:(RLMResultsCompletionBlock)completion NS_REFINED_FOR_SWIFT;
