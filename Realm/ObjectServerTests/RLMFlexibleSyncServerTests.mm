@@ -1165,7 +1165,7 @@
 
     [[realm syncSession] suspend];
     XCTestExpectation *ex = [self expectationWithDescription:@"expect timeout"];
-    NSTimeInterval ti = 2.0;
+    NSTimeInterval timeout = 2.0;
     RLMResults *res = [[Person allObjectsInRealm:realm] objectsWhere:@"age >= 20"];
     [res subscribeWithName:@"20up" waitForSync:RLMWaitForSyncModeAlways onQueue:dispatch_get_main_queue() timeout:2.0 completion:^(RLMResults *results, NSError *error) {
         XCTAssert(error);

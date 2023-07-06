@@ -1445,9 +1445,7 @@ extension SwiftFlexibleSyncServerTests {
         _ = try await realm.objects(SwiftPerson.self).where { $0.age > 8 }.subscribe(name: "group1")
         _ = try await realm.objects(SwiftPerson.self).where { $0.age > 5 }.subscribe(name: "group1")
         XCTAssertEqual(realm.subscriptions.count, 1)
-        for subscription in realm.subscriptions {
-            XCTAssertEqual(subscription.queryString, "age > 5")
-        }
+XCTAssertNotNil(realm.subscriptions.first(ofType: SwiftPerson.self) { $0.age > 5 })
     }
 
     @MainActor
@@ -1499,8 +1497,13 @@ extension SwiftFlexibleSyncServerTests {
         let realm = try openFlexibleSyncRealm()
 
         XCTAssertEqual(realm.subscriptions.count, 0)
-        let results = realm.objects(SwiftPerson.self).where { $0.age >= 8 }
-        results.unsubscribe()
+        _ = try await realm.objects(SwiftPerson.self).where { $0.age >= 8 }.subscribe(name: "age_older_8")
+        let results0 = realm.objects(SwiftPerson.self).where { $0.age >= 8 }
+        XCTAssertEqual(realm.subscriptions.count, 1)
+        XCTAssertEqual(results0.count, 3)
+        results0.unsubscribe()
+        XCTAssertEqual(realm.subscriptions.count, 1)
+        XCTAssertEqual(results0.count, 3) // Results are not modified because there is no subscription associated to the unsubscribed result
     }
 
     @MainActor
@@ -1530,12 +1533,12 @@ extension SwiftFlexibleSyncServerTests {
 
         _ = try await realm.objects(SwiftPerson.self).where { $0.age >= 8 }.subscribe(name: "first_named")
         var results = try await realm.objects(SwiftPerson.self).where { $0.age >= 8 }.subscribe(name: "second_named")
-        // expect `results` associatedSubscription to be reassigned to the id which matches the unnamed subscription
+        // expect `results` associated subscription to be reassigned to the id which matches the unnamed subscription
         results = try await realm.objects(SwiftPerson.self).where { $0.age >= 8 }.subscribe()
         XCTAssertEqual(realm.subscriptions.count, 3)
 
         results.unsubscribe()
-        // so the two named subcsriptions remain.
+        // so the two named subscriptions remain.
         XCTAssertEqual(realm.subscriptions.count, 2)
         XCTAssertEqual(realm.subscriptions[0]!.name, "first_named")
         XCTAssertEqual(realm.subscriptions[1]!.name, "second_named")
@@ -1653,7 +1656,7 @@ extension SwiftFlexibleSyncServerTests {
         await fulfillment(of: [expectation], timeout: 3.0)
 
         // resume sync session and wait for subscription otherwise tear
-        // down can't complete successfuly
+        // down can't complete successfully
         realm.syncSession!.resume()
         let start = Date()
         while realm.subscriptions.state != .complete && start.timeIntervalSinceNow > -10.0 {
