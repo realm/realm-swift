@@ -10,6 +10,10 @@ x.y.z Release notes (yyyy-MM-dd)
   releases on Github.
 * Prebuilt XCFrameworks are now built with LTO enabled. This has insignificant
   performance benefits, but cuts the size of the library by ~15%.
+* Prebuilt XCFrameworks are now built with LTO enabled. This has insgificant
+* performance benefits, but cuts the size of the library by ~15%.
+* Prebuilt XCFrameworks are now built with LTO enabled. This has insignificant
+  performance benefits, but cuts the size of the library by ~15%.
 
 ### Fixed
 * Fix nested properties observation on a `Projections` not notifying when there is a property change.

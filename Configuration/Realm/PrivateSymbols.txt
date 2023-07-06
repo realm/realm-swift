@@ -1,0 +1,4 @@
+# Anything with a C++ mangled name
+__Z*
+# The Bid library used for decimal128
+___bid*

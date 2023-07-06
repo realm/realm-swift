@@ -12,17 +12,10 @@ PRODUCT_BUNDLE_IDENTIFIER = io.Realm.${PRODUCT_NAME:rfc1034identifier};
 PRODUCT_NAME = Realm;
 SKIP_INSTALL = YES;
 
+LD_RUNPATH_SEARCH_PATHS = $(inherited) @executable_path/Frameworks @loader_path/Frameworks;
 LD_RUNPATH_SEARCH_PATHS[sdk=macosx*] = $(inherited) @executable_path/../Frameworks @loader_path/../Frameworks;
-LD_RUNPATH_SEARCH_PATHS[sdk=iphone*] = $(inherited) @executable_path/Frameworks @loader_path/Frameworks;
-LD_RUNPATH_SEARCH_PATHS[sdk=watch*] = $(inherited) @executable_path/Frameworks @loader_path/Frameworks;
-LD_RUNPATH_SEARCH_PATHS[sdk=appletv*] = $(inherited) @executable_path/Frameworks @loader_path/Frameworks;
-LD_RUNPATH_SEARCH_PATHS[sdk=xr*] = $(inherited) @executable_path/Frameworks @loader_path/Frameworks;
 
-OTHER_LDFLAGS[sdk=iphone*] = $(inherited) -framework UIKit;
-OTHER_LDFLAGS[sdk=watch*] = $(inherited) -framework UIKit;
-OTHER_LDFLAGS[sdk=appletv*] = $(inherited) -framework UIKit;
-OTHER_LDFLAGS[sdk=xr*] = $(inherited) -framework UIKit;
-
-LINKER_FLAG_MACCATALYST_YES = $(inherited) -framework UIKit;
-LINKER_FLAG_MACCATALYST_NO = ""
+OTHER_LDFLAGS = $(REALM_OTHER_LDFLAGS) -framework UIKit;
+LINKER_FLAG_MACCATALYST_YES = $(REALM_OTHER_LDFLAGS) -framework UIKit;
+LINKER_FLAG_MACCATALYST_NO = $(REALM_OTHER_LDFLAGS);
 OTHER_LDFLAGS[sdk=macosx*] = $(LINKER_FLAG_MACCATALYST_$(IS_MACCATALYST));
