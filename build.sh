@@ -143,7 +143,8 @@ build_combined() {
     local platform="$2"
     local config="$CONFIGURATION"
 
-    local config_suffix simulator_suffix destination
+    local config_suffix simulator_suffix destination mergeable build_args
+    mergeable=(MERGEABLE_LIBRARY=YES)
     case "$platform" in
         osx)
             destination='generic/platform=macOS'
@@ -158,6 +159,11 @@ build_combined() {
             destination='generic/platform=watchOS'
             config_suffix=-watchos
             simulator_suffix=watchsimulator
+
+            # armv7k watchos doesn't support mergeable libraries. We could
+            # maybe build the watchsimulator slice as mergeable, but that isn't
+            # very useful.
+            mergeable=()
             ;;
         tvos)
             destination='generic/platform=tvOS'
@@ -175,6 +181,14 @@ build_combined() {
             ;;
     esac
 
+    # It's unclear why passing MERGEABLE_LIBRARY=YES to a static library build
+    # does anything at all, but as of Xcode 15 beta 3 it breaks things.
+    if [[ "${config}" == Static ]]; then
+        mergeable=()
+    fi
+
+    build_args=(-scheme "$product" -configuration "$config" build "${mergeable[@]}" REALM_HIDE_SYMBOLS=YES)
+
     # Derive build paths
     local build_products_path="build/DerivedData/Realm/Build/Products"
     local product_name="$product.framework"
@@ -184,10 +198,10 @@ build_combined() {
     local xcframework_path="$out_path/$product.xcframework"
 
     # Build for each platform
-    xc -scheme "$product" -configuration "$config" -destination "$destination" build
+    xc -destination "$destination" "${build_args[@]}"
     simulator_framework=()
     if [[ -n "$simulator_suffix" ]]; then
-        xc -scheme "$product" -configuration "$config" -destination "$destination Simulator" build
+        xc -destination "$destination Simulator" "${build_args[@]}"
         simulator_framework+=(-framework "$simulator_path")
     fi
 
@@ -1060,10 +1074,20 @@ case "$COMMAND" in
         done
         find "${extract_dir}" -name 'Realm.framework' -path "*/Release/*" \
             | sed 's/.*/-framework &/' \
-            | xargs xcodebuild -create-xcframework -allow-internal-distribution -output "${package_dir}/Realm.xcframework"
+            | xargs xcodebuild -create-xcframework -allow-internal-distribution -output "${package_dir}/objc-mergeable/Realm.xcframework"
         find "${extract_dir}" -name 'Realm.framework' -path "*/Static/*" \
             | sed 's/.*/-framework &/' \
-            | xargs xcodebuild -create-xcframework -allow-internal-distribution -output "${package_dir}/static/Realm.xcframework"
+            | xargs xcodebuild -create-xcframework -allow-internal-distribution -output "${package_dir}/objc-static/Realm.xcframework"
+
+        if (( "${xcode_version%%.*}" >= 15 )); then
+            cp -cR "${package_dir}/objc-mergeable" "${package_dir}/objc-dynamic"
+            # Strip the mergeable metadata from the dynamic frameworks. This
+            # isn't strictly required, but stripping it requires Xcode 15 and
+            # would otherwise bloat apps built with Xcode 14.
+            find "${package_dir}/objc-dynamic/Realm.xcframework" -name Realm -exec strip -no_atom_info {} \;
+        else
+            mv "${package_dir}/objc-mergeable" "${package_dir}/objc-dynamic"
+        fi
 
         cp "${WORKSPACE}/LICENSE" "${package_dir}"
 
