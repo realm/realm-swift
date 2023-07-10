@@ -17,7 +17,7 @@ target:
  - swiftpm-debug
  - swiftpm-address
  - swiftpm-thread
- - swiftpm-ios
+ - ios-xcode-spm
  - ios-static
  - ios-dynamic
  - watchos
@@ -34,8 +34,9 @@ target:
  - cocoapods-osx
  - cocoapods-ios
  - cocoapods-ios-dynamic
- - cocoapods-ios-subdependency
  - cocoapods-watchos
+ - cocoapods-tvos
+ - cocoapods-catalyst
  - swiftui-ios
  - swiftui-server-osx
 configuration:
@@ -127,20 +128,35 @@ exclude:
   - xcode_version: 14.2
     target: xcframework
 
+  - xcode_version: 14.1
+    target: cocoapods-ios
+
   - xcode_version: 14.2
     target: cocoapods-ios
+
+  - xcode_version: 14.1
+    target: cocoapods-ios-dynamic
 
   - xcode_version: 14.2
     target: cocoapods-ios-dynamic
 
   - xcode_version: 14.1
-    target: cocoapods-ios-subdependency
-
-  - xcode_version: 14.2
-    target: cocoapods-ios-subdependency
+    target: cocoapods-watchos
 
   - xcode_version: 14.2
     target: cocoapods-watchos
+
+  - xcode_version: 14.1
+    target: cocoapods-tvos
+
+  - xcode_version: 14.2
+    target: cocoapods-tvos
+
+  - xcode_version: 14.1
+    target: cocoapods-catalyst
+
+  - xcode_version: 14.2
+    target: cocoapods-catalyst
 
   - xcode_version: 14.1
     target: swiftui-ios

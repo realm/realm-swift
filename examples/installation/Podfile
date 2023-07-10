@@ -1,0 +1,27 @@
+project 'CocoaPods.xcodeproj'
+use_modular_headers!
+
+os = (ENV['REALM_PLATFORM'] || :ios).to_sym
+if os == :catalyst
+  os = :ios
+end
+version = case os
+          when :osx then 10.15
+          when :ios, :tvos then 12.0
+          when :watchos then 5.0
+          end
+target 'App' do
+  platform os, version
+  use_frameworks! unless ENV['REALM_BUILD_STATIC']
+
+  if ENV['REALM_TEST_RELEASE']
+    pod 'RealmSwift', ENV['REALM_TEST_RELEASE']
+  elsif ENV['REALM_TEST_BRANCH']
+    pod 'Realm', git: 'https://github.com/realm/realm-swift', branch: ENV['REALM_TEST_BRANCH']
+    pod 'RealmSwift', git: 'https://github.com/realm/realm-swift', branch: ENV['REALM_TEST_BRANCH']
+  else
+    pod 'RealmSwift'
+  end
+
+  pod 'SubRealm', path: 'SubRealm'
+end

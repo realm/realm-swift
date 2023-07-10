@@ -65,7 +65,6 @@
 		C0DC42101A7079D00067156A /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C0DC420F1A7079D00067156A /* MainInterface.storyboard */; };
 		C0DC42181A707B960067156A /* Tick.m in Sources */ = {isa = PBXBuildFile; fileRef = C0DC41FB1A7072DE0067156A /* Tick.m */; };
 		C0DC42191A707BF80067156A /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E8F70ED019BA52E8006F60D5 /* libc++.dylib */; };
-		C895987FDBFA45AF50225642 /* libPods-RACTableView.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C1FAC448B13A56875E51ABBA /* libPods-RACTableView.a */; };
 		E879D9CE1A12AA120035E2EB /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E8F70ED019BA52E8006F60D5 /* libc++.dylib */; };
 		E879D9CF1A12AA120035E2EB /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71AB19BA502500F3EDB4 /* CoreGraphics.framework */; };
 		E879D9D01A12AA120035E2EB /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71AD19BA502500F3EDB4 /* UIKit.framework */; };
@@ -193,7 +192,6 @@
 		7DD1D7D325DC2C7400E63229 /* default-v3.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = "default-v3.realm"; sourceTree = "<group>"; };
 		7DD1D7D425DC2C7400E63229 /* default-v0.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = "default-v0.realm"; sourceTree = "<group>"; };
 		7DD1D7D525DC2C7400E63229 /* default-v5.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = "default-v5.realm"; sourceTree = "<group>"; };
-		BCC00CB8F0405D9A0E8A33E2 /* Pods-RACTableView.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RACTableView.debug.xcconfig"; path = "Pods/Target Support Files/Pods-RACTableView/Pods-RACTableView.debug.xcconfig"; sourceTree = "<group>"; };
 		C0DC41CC1A7072670067156A /* extension.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = extension.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C0DC41D21A7072670067156A /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		C0DC41D31A7072670067156A /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -209,8 +207,6 @@
 		C0DC420F1A7079D00067156A /* MainInterface.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = MainInterface.storyboard; sourceTree = "<group>"; };
 		C0DC421B1A717B660067156A /* TodayExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = TodayExtension.entitlements; sourceTree = "<group>"; };
 		C0DC421C1A717BD00067156A /* Extension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Extension.entitlements; sourceTree = "<group>"; };
-		C1FAC448B13A56875E51ABBA /* libPods-RACTableView.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-RACTableView.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		D0E769395C2774DEBC9BBAF8 /* Pods-RACTableView.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RACTableView.release.xcconfig"; path = "Pods/Target Support Files/Pods-RACTableView/Pods-RACTableView.release.xcconfig"; sourceTree = "<group>"; };
 		E879D9D81A12AA120035E2EB /* GroupedTableView.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GroupedTableView.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E879D9DB1A12AA400035E2EB /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		E879D9DC1A12AA400035E2EB /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -292,7 +288,6 @@
 				3F78C9BE1B431CF300A0988E /* Foundation.framework in Frameworks */,
 				3F78C9BF1B431CF300A0988E /* libc++.dylib in Frameworks */,
 				3F08726327F3C983007A1175 /* libcompression.tbd in Frameworks */,
-				C895987FDBFA45AF50225642 /* libPods-RACTableView.a in Frameworks */,
 				3F78C9C01B431CF300A0988E /* Realm.framework in Frameworks */,
 				3F78C9C11B431CF300A0988E /* UIKit.framework in Frameworks */,
 			);
@@ -453,15 +448,6 @@
 			name = RACTableView;
 			sourceTree = "<group>";
 		};
-		52233CA796AF2EA4A29B84C2 /* Pods */ = {
-			isa = PBXGroup;
-			children = (
-				BCC00CB8F0405D9A0E8A33E2 /* Pods-RACTableView.debug.xcconfig */,
-				D0E769395C2774DEBC9BBAF8 /* Pods-RACTableView.release.xcconfig */,
-			);
-			name = Pods;
-			sourceTree = "<group>";
-		};
 		7D718BED25DAADE400A74FDD /* Examples */ = {
 			isa = PBXGroup;
 			children = (
@@ -547,7 +533,6 @@
 				E8AB71A819BA502500F3EDB4 /* Frameworks */,
 				E879D9DA1A12AA400035E2EB /* GroupedTableView */,
 				E8F70EAE19BA50A3006F60D5 /* Migration */,
-				52233CA796AF2EA4A29B84C2 /* Pods */,
 				E8AB71A719BA502500F3EDB4 /* Products */,
 				3F78C9AA1B431CB200A0988E /* RACTableView */,
 				E8F70EA319BA5093006F60D5 /* REST */,
@@ -584,7 +569,6 @@
 				E8F70ED019BA52E8006F60D5 /* libc++.dylib */,
 				F18464511DC1551200DAB8B9 /* libc++.tbd */,
 				3F08725D27F3C8CF007A1175 /* libcompression.tbd */,
-				C1FAC448B13A56875E51ABBA /* libPods-RACTableView.a */,
 				C0DC42071A7079D00067156A /* NotificationCenter.framework */,
 				0295B8FE19D102880036D6C3 /* Realm.framework */,
 				E8AB71AD19BA502500F3EDB4 /* UIKit.framework */,
@@ -718,7 +702,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 3F78C9C41B431CF300A0988E /* Build configuration list for PBXNativeTarget "RACTableView" */;
 			buildPhases = (
-				CDFC500ABD9C1292B3084DB9 /* [CP] Check Pods Manifest.lock */,
 				3F78C9B81B431CF300A0988E /* Sources */,
 				3F78C9BC1B431CF300A0988E /* Frameworks */,
 				3F78C9C21B431CF300A0988E /* Resources */,
@@ -1077,24 +1060,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		CDFC500ABD9C1292B3084DB9 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-RACTableView-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
 		F18DC0A41DC2B197007D2D69 /* Get Device IP Address */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -1236,7 +1201,6 @@
 /* Begin XCBuildConfiguration section */
 		3F78C9C51B431CF300A0988E /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = BCC00CB8F0405D9A0E8A33E2 /* Pods-RACTableView.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
@@ -1260,7 +1224,6 @@
 		};
 		3F78C9C61B431CF300A0988E /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = D0E769395C2774DEBC9BBAF8 /* Pods-RACTableView.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
@@ -1293,7 +1256,7 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = Extension/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.examples.$(PRODUCT_NAME:rfc1034identifier)";
@@ -1313,7 +1276,7 @@
 				DEVELOPMENT_TEAM = "";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				INFOPLIST_FILE = Extension/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.examples.$(PRODUCT_NAME:rfc1034identifier)";
@@ -1336,7 +1299,7 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = TodayExtension/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				MTL_ENABLE_DEBUG_INFO = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.examples.extension.$(PRODUCT_NAME:rfc1034identifier)-2";
@@ -1356,7 +1319,7 @@
 				DEVELOPMENT_TEAM = "";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				INFOPLIST_FILE = TodayExtension/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				MTL_ENABLE_DEBUG_INFO = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.examples.extension.$(PRODUCT_NAME:rfc1034identifier)-2";
@@ -1458,7 +1421,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = "-lz";
 				SDKROOT = iphoneos;
@@ -1509,7 +1472,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				OTHER_LDFLAGS = "-lz";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
