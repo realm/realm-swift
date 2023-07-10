@@ -644,7 +644,10 @@ extension Projection: _ObservedResultsValue { }
 @propertyWrapper public struct ObservedSectionedResults<Key: _Persistable & Hashable, ResultType>: DynamicProperty, BoundCollection where ResultType: _ObservedResultsValue & RealmFetchable & KeypathSortable & Identifiable {
     public typealias Element = ResultType
 
-    private class Storage: ObservableResultsStorage<SectionedResults<Key, ResultType>> {
+    private class Storage: ObservableResultsStorage<Results<ResultType>> {
+        var sectionedResults: SectionedResults<Key, ResultType>!
+        var token: AnyCancellable?
+
         override func updateValue() {
             let realm = try! Realm(configuration: configuration ?? Realm.Configuration.defaultConfiguration)
             var results = realm.objects(ResultType.self)
@@ -659,7 +662,23 @@ extension Projection: _ObservedResultsValue { }
                 sortDescriptors.append(.init(keyPath: keyPathString, ascending: true))
             }
 
-            value = results.sectioned(sortDescriptors: sortDescriptors, sectionBlock)
+            value = results
+
+            /*
+             Observing the sectioned results directly doesnt allow the SwiftUI diff to work
+             correctly as the previous state of the sectioned results will have the new values.
+
+             An example of when this is an issue is when an item is deleted in a List containing sectioned results,
+             the diff needs a stable state of the previous transaction but due to
+             the observation callback calling calculate_sections the collection will be brought up to date.
+
+             The solution around this is to store a frozen copy of the sectioned results and observe the parent `Results` instead.
+             Each time the results observation callback is invoked and the SwiftUI View is redrawn the sectioned results will be updated.
+             */
+            sectionedResults = value.sectioned(sortDescriptors: sortDescriptors, sectionBlock).freeze()
+            token = self.objectWillChange.sink { [unowned self] _ in
+                sectionedResults = value.sectioned(sortDescriptors: sortDescriptors, sectionBlock).freeze()
+            }
         }
 
         var sortDescriptors: [SortDescriptor] = [] {
@@ -684,7 +703,7 @@ extension Projection: _ObservedResultsValue { }
             if self.sortDescriptors.isEmpty {
                 throwRealmException("sortDescriptors must not be empty when sectioning ObservedSectionedResults with `sectionBlock`")
             }
-            super.init(value.sectioned(sortDescriptors: self.sortDescriptors, self.sectionBlock), keyPaths)
+            super.init(value, keyPaths)
         }
     }
 
@@ -717,11 +736,23 @@ extension Projection: _ObservedResultsValue { }
     /// :nodoc:
     public var wrappedValue: SectionedResults<Key, ResultType> {
         storage.setupValue()
-        return storage.value
+        return storage.sectionedResults
     }
     /// :nodoc:
     public var projectedValue: Self {
         return self
+    }
+
+    /// Removes items from an `@ObservedSectionedResults` collection
+    /// with a given `IndexSet` and `ResultsSection`.
+    /// - Parameters:
+    ///   - offsets: Index offsets in the section.
+    ///   - section: The section containing the items to remove.
+    public func remove(atOffsets offsets: IndexSet,
+                       section: ResultsSection<Key, ResultType>) where ResultType: ObjectBase & ThreadConfined {
+        write(wrappedValue) { collection in
+            collection.realm!.delete(offsets.map { section[$0].thaw()! })
+        }
     }
 
     private init(type: ResultType.Type,
