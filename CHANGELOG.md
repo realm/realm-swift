@@ -1,11 +1,12 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+* Add `@ObservedSectionedResults.remove(atOffsets:, section:)` which adds the ability to 
+  remove a Realm Object when using `onDelete` on `ForEach` in a SwiftUI `List`.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
-* None.
+* Deleting a Realm Object used in a `@ObservedSectionedResults` collection in `SwiftUI`
+  would cause a crash during the diff on the `View`. ([#8294](https://github.com/realm/realm-swift/issues/8294), since v10.29.0)
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 

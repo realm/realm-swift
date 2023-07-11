@@ -676,8 +676,9 @@ extension Projection: _ObservedResultsValue { }
              Each time the results observation callback is invoked and the SwiftUI View is redrawn the sectioned results will be updated.
              */
             sectionedResults = value.sectioned(sortDescriptors: sortDescriptors, sectionBlock).freeze()
-            token = self.objectWillChange.sink { [unowned self] _ in
-                sectionedResults = value.sectioned(sortDescriptors: sortDescriptors, sectionBlock).freeze()
+            token = self.objectWillChange.sink { [weak self] _ in
+                guard let self = self else { return }
+                self.sectionedResults = self.value.sectioned(sortDescriptors: self.sortDescriptors, self.sectionBlock).freeze()
             }
         }
 
