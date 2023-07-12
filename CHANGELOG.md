@@ -1,4 +1,4 @@
-x.y.z Release notes (yyyy-MM-dd)
+0.0.0-preview Release notes (2023-07-12)
 =============================================================
 ### Enhancements
 * Filesystem errors now include more information in the error message.
