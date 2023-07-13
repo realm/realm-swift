@@ -12,6 +12,7 @@ pipeline {
   stages {
     stage('Gather Info') {
       steps {
+        sh "hostname"
         deleteDir()
         copyArtifacts projectName: 'cocoa-pipeline', filter: 'build-scripts.zip', selector: lastCompleted()
         sh 'unzip build-scripts.zip'
@@ -19,7 +20,6 @@ pipeline {
           env.version = sh(script: "sed -n 's/^VERSION=\\(.*\\)\$/\\1/p' dependencies.list", returnStdout: true).trim()
         }
         stash name: 'build-scripts', includes: '*,scripts/*'
-        sh "hostname"
       }
     }
 
@@ -27,18 +27,18 @@ pipeline {
       parallel {
         stage('Tag release') {
           steps {
+            sh "hostname"
             deleteDir()
             unstash 'build-scripts'
-            sh "hostname"
             sh "./build.sh publish-tag ${branch}"
           }
         }
 
         stage('Publish docs') {
           steps {
+            sh "hostname"
             deleteDir()
             unstash 'build-scripts'
-            sh "hostname"
             copyArtifacts projectName: 'cocoa-pipeline', filter: 'realm-docs.zip', selector: lastCompleted()
             withAWS(credentials: 'cocoa-docs-s3-bucket', region: 'us-east-1') {
               sh './build.sh publish-docs'
@@ -55,6 +55,7 @@ pipeline {
             GITHUB_ACCESS_TOKEN = credentials('github-release-token')
           }
           steps {
+            sh "hostname"
             deleteDir()
             unstash 'build-scripts'
             dir 'build' {
@@ -69,6 +70,7 @@ pipeline {
             COCOAPODS_TRUNK_TOKEN = credentials('cocoapods-trunk-token')
           }
           steps {
+            sh "hostname"
             deleteDir()
             unstash 'build-scripts'
             // sh "./build.sh publish-cocoapods v${env.version}"
