@@ -47,7 +47,7 @@ typedef NS_ENUM(int, Kind) {
 @property enum Kind kind;
 + (Pet *)petWithName:(NSString *)name kind:(enum Kind)kind;
 @end
-RLM_ARRAY_TYPE(Pet)
+RLM_COLLECTION_TYPE(Pet)
 
 @implementation Pet
 + (Pet *)petWithName:(NSString *)name kind:(enum Kind)kind {

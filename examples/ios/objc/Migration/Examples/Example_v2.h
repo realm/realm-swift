@@ -37,7 +37,7 @@ NSInteger schemaVersion = 2;
 @property NSString *name;
 + (Dog *)dogWithName:(NSString *)name;
 @end
-RLM_ARRAY_TYPE(Dog)
+RLM_COLLECTION_TYPE(Dog)
 
 @implementation Dog
 + (Dog *)dogWithName:(NSString *)name {
