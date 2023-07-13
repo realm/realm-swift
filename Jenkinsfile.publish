@@ -1,6 +1,7 @@
 def carthageXcodeVersion = '14.3.1'
 
 pipeline {
+  agent { label 'osx' }
   parameters {
     string(name: 'branch', defaultValue: 'master')
     string(name: 'version', defaultValue: '')
