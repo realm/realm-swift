@@ -19,6 +19,7 @@ pipeline {
           env.version = sh(script: "sed -n 's/^VERSION=\\(.*\\)\$/\\1/p' dependencies.list", returnStdout: true).trim()
         }
         stash name: 'build-scripts', includes: '*,scripts/*'
+        sh "hostname"
       }
     }
 
@@ -28,6 +29,7 @@ pipeline {
           steps {
             deleteDir()
             unstash 'build-scripts'
+            sh "hostname"
             sh "./build.sh publish-tag ${branch}"
           }
         }
@@ -36,6 +38,7 @@ pipeline {
           steps {
             deleteDir()
             unstash 'build-scripts'
+            sh "hostname"
             copyArtifacts projectName: 'cocoa-pipeline', filter: 'realm-docs.zip', selector: lastCompleted()
             withAWS(credentials: 'cocoa-docs-s3-bucket', region: 'us-east-1') {
               sh './build.sh publish-docs'
@@ -68,7 +71,7 @@ pipeline {
           steps {
             deleteDir()
             unstash 'build-scripts'
-            sh "./build.sh publish-cocoapods v${env.version}"
+            // sh "./build.sh publish-cocoapods v${env.version}"
           }
         }
       }
