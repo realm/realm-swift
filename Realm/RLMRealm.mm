@@ -332,6 +332,53 @@ bool copySeedFile(RLMRealmConfiguration *configuration, NSError **error) {
     return autorelease(realm);
 }
 
++ (instancetype)realmWithSharedRealm:(std::shared_ptr<Realm>)osRealm
+                              schema:(RLMSchema *)schema
+                             dynamic:(bool)dynamic
+                              freeze:(bool)freeze {
+    RLMRealm *realm = [[RLMRealm alloc] initPrivate];
+    realm->_realm = osRealm;
+    realm->_dynamic = dynamic;
+
+    if (dynamic) {
+        realm->_schema = schema ?: [RLMSchema dynamicSchemaFromObjectStoreSchema:osRealm->schema()];
+    }
+    else @autoreleasepool {
+        if (auto cachedRealm = RLMGetAnyCachedRealmForPath(osRealm->config().path)) {
+            realm->_realm->set_schema_subset(cachedRealm->_realm->schema());
+            realm->_schema = cachedRealm.schema;
+            realm->_info = cachedRealm->_info.clone(cachedRealm->_realm->schema(), realm);
+        }
+        else if (osRealm->is_frozen()) {
+            realm->_schema = schema ?: RLMSchema.sharedSchema;
+            realm->_realm->set_schema_subset(realm->_schema.objectStoreCopy);
+        }
+        else {
+            realm->_schema = schema ?: RLMSchema.sharedSchema;
+            try {
+                // No migration function: currently this is only used as part of
+                // client resets on sync Realms, so none is needed. If that
+                // changes, this'll need to as well.
+                realm->_realm->update_schema(realm->_schema.objectStoreCopy, osRealm->config().schema_version);
+            }
+            catch (...) {
+                RLMRealmTranslateException(nil);
+                REALM_COMPILER_HINT_UNREACHABLE();
+            }
+        }
+    }
+
+    if (realm->_info.begin() == realm->_info.end()) {
+        realm->_info = RLMSchemaInfo(realm);
+    }
+
+    if (freeze && !realm->_realm->is_frozen()) {
+        realm->_realm = realm->_realm->freeze();
+    }
+
+    return realm;
+}
+
 + (instancetype)realmWithConfiguration:(RLMRealmConfiguration *)configuration error:(NSError **)error {
     return autorelease([self realmWithConfiguration:configuration
                                          confinedTo:RLMScheduler.currentRunLoop

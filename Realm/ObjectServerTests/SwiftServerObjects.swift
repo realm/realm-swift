@@ -33,6 +33,20 @@ public class SwiftPerson: Object {
     }
 }
 
+public class SwiftPersonWithAdditionalProperty: SwiftPerson {
+    @Persisted public var newProperty: Int
+
+    public override class func _realmIgnoreClass() -> Bool {
+        true
+    }
+    public override class func _realmObjectName() -> String {
+        "SwiftPerson"
+    }
+    public override class func className() -> String {
+        "SwiftPersonWithAdditionalProperty"
+    }
+}
+
 public class LinkToSwiftPerson: Object {
     @Persisted(primaryKey: true) public var _id: ObjectId
     @Persisted public var person: SwiftPerson?

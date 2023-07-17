@@ -1,11 +1,22 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+* Filesystem errors now include more information in the error message.
+* Sync connection and session reconnect timing/backoff logic has been reworked
+  and unified into a single implementation. Previously some categories of errors
+  would cause an hour-long wait before attempting to reconnect, while others
+  would use an exponential backoff strategy. All errors now result in the sync
+  client waiting for 1 second before retrying, doubling the wait after each
+  subsequent failure up to a maximum of five minutes. If the cause of the error
+  changes, the backoff will be reset. If the sync client voluntarily disconnects,
+  no backoff will be used. ([Core #6526]((https://github.com/realm/realm-core/pull/6526)))
 
 ### Fixed
-* Removed warnings for deprecated APIs internal use. 
-   ([#8251](https://github.com/realm/realm-swift/issues/8251), since v10.39.0)
+* Removed warnings for deprecated APIs internal use.
+  ([#8251](https://github.com/realm/realm-swift/issues/8251), since v10.39.0)
+* Fix an error during async open and client reset if properties have been added
+  to the schema. This fix also applies to partition-based to flexible sync
+  migration if async open is used. ([Core #6707](https://github.com/realm/realm-core/issues/6707), since v10.28.2)
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
@@ -14,10 +25,16 @@ x.y.z Release notes (yyyy-MM-dd)
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 14.3.1.
 * CocoaPods: 1.10 or later.
-* Xcode: 14.1-15 beta 1.
+* Xcode: 14.1-15 beta 4.
 
 ### Internal
-* Upgraded realm-core from ? to ?
+* Upgraded realm-core from 13.15.1 to 13.17.0
+* The location where prebuilt core binaries are published has changed slightly.
+  If you are using `REALM_BASE_URL` to mirror the binaries, you may need to
+  adjust your mirroring logic.
+* Release packages were being uploaded to several static.realm.io URLs which
+  are no longer linked to anywhere. These are no longer being updated, and
+  release packages are now only being uploaded to Github.
 
 10.41.0 Release notes (2023-06-26)
 =============================================================
@@ -3927,10 +3944,6 @@ This release also contains all changes from 5.3.2.
 * File format: Generates Realms with format v11 (Reads and upgrades all previous formats)
 * Realm Studio: 10.0.0 or later.
 * Carthage release for Swift is built with Xcode 11.5.
-
-### Internal
-* Upgraded realm-core from ? to ?
-* Upgraded realm-sync from ? to ?
 
 10.0.0-beta.2 Release notes (2020-06-09)
 =============================================================

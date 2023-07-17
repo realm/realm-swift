@@ -227,7 +227,7 @@ id RLMGetObject(RLMRealm *realm, NSString *objectClassName, id key) {
                                                       key ?: NSNull.null);
         if (!obj.is_valid())
             return nil;
-        return RLMCreateObjectAccessor(info, obj.obj());
+        return RLMCreateObjectAccessor(info, obj.get_obj());
     }
     catch (std::exception const& e) {
         @throw RLMException(e);
@@ -239,9 +239,9 @@ RLMObjectBase *RLMCreateObjectAccessor(RLMClassInfo& info, int64_t key) {
 }
 
 // Create accessor and register with realm
-RLMObjectBase *RLMCreateObjectAccessor(RLMClassInfo& info, realm::Obj&& obj) {
+RLMObjectBase *RLMCreateObjectAccessor(RLMClassInfo& info, const realm::Obj& obj) {
     RLMObjectBase *accessor = RLMCreateManagedAccessor(info.rlmObjectSchema.accessorClass, &info);
-    accessor->_row = std::move(obj);
+    accessor->_row = obj;
     RLMInitializeSwiftAccessor(accessor, false);
     return accessor;
 }
