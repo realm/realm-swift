@@ -50,7 +50,7 @@ typedef RLM_CLOSED_ENUM(NSUInteger, RLMSyncLogLevel) {
     ///
     /// - warning: Will incur a measurable performance impact.
     RLMSyncLogLevelAll
-} __attribute__((deprecated("Use `RLMLogLevel`/`LogLevel` instead")));
+};
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"

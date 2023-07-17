@@ -274,7 +274,6 @@ extension AppError {
 
  - see: `RLMSyncLogLevel`
  */
-@available(*, deprecated)
 public typealias SyncLogLevel = RLMSyncLogLevel
 
 /**

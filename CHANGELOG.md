@@ -4,8 +4,8 @@ x.y.z Release notes (yyyy-MM-dd)
 * None.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
-* None.
+* Removed warnings for deprecated APIs internal use. 
+   ([#8251](https://github.com/realm/realm-swift/issues/8251), since v10.39.0)
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
