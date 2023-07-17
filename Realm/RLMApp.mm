@@ -103,16 +103,7 @@ namespace {
         self.enableSessionMultiplexing = true;
         self.encryptMetadata = !getenv("REALM_DISABLE_METADATA_ENCRYPTION") && !RLMIsRunningInPlayground();
         RLMNSStringToStdString(_clientConfig.base_file_path, RLMDefaultDirectoryForBundleIdentifier(nil));
-
-        _config.device_info.sdk = "Realm Swift";
-
-        // Platform info isn't available when running via `swift test`.
-        // Non-Xcode SPM builds can't build for anything but macOS, so this is
-        // probably unimportant for now and we can just report "unknown"
-        auto processInfo = [NSProcessInfo processInfo];
-        RLMNSStringToStdString(_config.device_info.platform_version,
-                               [processInfo operatingSystemVersionString] ?: @"unknown");
-        RLMNSStringToStdString(_config.device_info.sdk_version, REALM_COCOA_VERSION);
+        configureSyncConnectionParameters(_config);
     }
     return self;
 }
@@ -139,7 +130,6 @@ namespace {
         self.localAppName = localAppName;
         self.localAppVersion = localAppVersion;
         self.defaultRequestTimeoutMS = defaultRequestTimeoutMS;
-        configureSyncConnectionParameters(_config);
     }
     return self;
 }
@@ -153,6 +143,9 @@ static void configureSyncConnectionParameters(realm::app::App::Config& config) {
     config.device_info.sdk = "Realm Swift";
     RLMNSStringToStdString(config.device_info.sdk_version, REALM_COCOA_VERSION);
 
+    // Platform info isn't available when running via `swift test`.
+    // Non-Xcode SPM builds can't build for anything but macOS, so this is
+    // probably unimportant for now and we can just report "unknown"
     auto processInfo = [NSProcessInfo processInfo];
     RLMNSStringToStdString(config.device_info.platform_version,
                            [processInfo operatingSystemVersionString] ?: @"unknown");
