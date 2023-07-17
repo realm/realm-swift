@@ -1,22 +1,11 @@
-10.41.1 Release notes (2023-07-17)
+x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* Filesystem errors now include more information in the error message.
-* Sync connection and session reconnect timing/backoff logic has been reworked
-  and unified into a single implementation. Previously some categories of errors
-  would cause an hour-long wait before attempting to reconnect, while others
-  would use an exponential backoff strategy. All errors now result in the sync
-  client waiting for 1 second before retrying, doubling the wait after each
-  subsequent failure up to a maximum of five minutes. If the cause of the error
-  changes, the backoff will be reset. If the sync client voluntarily disconnects,
-  no backoff will be used. ([Core #6526]((https://github.com/realm/realm-core/pull/6526)))
+* None.
 
 ### Fixed
-* Removed warnings for deprecated APIs internal use.
-  ([#8251](https://github.com/realm/realm-swift/issues/8251), since v10.39.0)
-* Fix an error during async open and client reset if properties have been added
-  to the schema. This fix also applies to partition-based to flexible sync
-  migration if async open is used. ([Core #6707](https://github.com/realm/realm-core/issues/6707), since v10.28.2)
+* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
+* None.
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
@@ -28,6 +17,41 @@
 * Xcode: 14.1-15 beta 4.
 
 ### Internal
+* Upgraded realm-core from ? to ?
+
+10.41.1 Release notes (2023-07-17)
+=============================================================
+
+### Enhancements
+
+* Filesystem errors now include more information in the error message.
+* Sync connection and session reconnect timing/backoff logic has been reworked
+  and unified into a single implementation. Previously some categories of errors
+  would cause an hour-long wait before attempting to reconnect, while others
+  would use an exponential backoff strategy. All errors now result in the sync
+  client waiting for 1 second before retrying, doubling the wait after each
+  subsequent failure up to a maximum of five minutes. If the cause of the error
+  changes, the backoff will be reset. If the sync client voluntarily disconnects,
+  no backoff will be used. ([Core #6526]((https://github.com/realm/realm-core/pull/6526)))
+
+### Fixed
+
+* Removed warnings for deprecated APIs internal use.
+  ([#8251](https://github.com/realm/realm-swift/issues/8251), since v10.39.0)
+* Fix an error during async open and client reset if properties have been added
+  to the schema. This fix also applies to partition-based to flexible sync
+  migration if async open is used. ([Core #6707](https://github.com/realm/realm-core/issues/6707), since v10.28.2)
+
+### Compatibility
+
+* Realm Studio: 14.0.1 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 14.3.1.
+* CocoaPods: 1.10 or later.
+* Xcode: 14.1-15 beta 4.
+
+### Internal
+
 * Upgraded realm-core from 13.15.1 to 13.17.0
 * The location where prebuilt core binaries are published has changed slightly.
   If you are using `REALM_BASE_URL` to mirror the binaries, you may need to
