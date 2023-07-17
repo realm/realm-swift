@@ -256,10 +256,11 @@ extension Object: _RealmCollectionValueInsideOptional {
      transaction is committed.
 
      If no key paths are given, the block will be executed on any insertion,
-     modification, or deletion for all object properties and the properties of
-     any nested, linked objects. If a key path or key paths are provided,
-     then the block will be called for changes which occur only on the
-     provided key paths. For example, if:
+     modification, or deletion for all object first-level properties of the object.
+     `Object` notifications are shallow by default, any nested property modification
+     will not trigger a notification, unless the key path to that property is specified.
+     If a key path or key paths are provided, then the block will be called for
+     changes which occur only on the provided key paths. For example, if:
      ```swift
      class Dog: Object {
          @Persisted var name: String
@@ -338,10 +339,11 @@ extension Object: _RealmCollectionValueInsideOptional {
      transaction is committed.
 
      If no key paths are given, the block will be executed on any insertion,
-     modification, or deletion for all object properties and the properties of
-     any nested, linked objects. If a key path or key paths are provided,
-     then the block will be called for changes which occur only on the
-     provided key paths. For example, if:
+     modification, or deletion for all object first-level properties of the object.
+     `Object` notifications are shallow by default, any nested property modification
+     will not trigger a notification, unless the key path to that property is specified.
+     If a key path or key paths are provided, then the block will be called for
+     changes which occur only on the provided key paths. For example, i
      ```swift
      class Dog: Object {
          @Persisted var name: String

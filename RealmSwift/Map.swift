@@ -35,8 +35,8 @@ extension String: _MapKey { }
 
  - Note: Optional versions of the above types *except* `Object` are only supported in non-synchronized Realms.
  
- Map only supports String as a key.
- 
+ Map only supports `String` as a key.  Realm disallows the use of `.` or `$` characters within a dictionary key.
+
  Unlike Swift's native collections, `Map`s is a reference types, and are only immutable if the Realm that manages them
  is opened as read-only.
  

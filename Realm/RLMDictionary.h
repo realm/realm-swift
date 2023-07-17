@@ -40,6 +40,8 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
  `RLMDictionary`s cannot be created directly. `RLMDictionary` properties on `RLMObject`s are
  lazily created when accessed, or can be obtained by querying a Realm.
 
+ `RLMDictionary` only supports `NSString` as a key.  Realm disallows the use of `.` or `$` characters within a dictionary key.
+
  ### Key-Value Observing
 
  `RLMDictionary` supports dictionary key-value observing on `RLMDictionary` properties on `RLMObject`
