@@ -104,7 +104,7 @@ pipeline {
         }
 
         excludes {
-          // Carthage is always dynamic, while SPM is magic
+          // Carthage is always dynamic
           exclude {
             axis {
               name 'linkage'
@@ -112,7 +112,7 @@ pipeline {
             }
             axis {
               name 'method'
-              values 'carthage', 'spm'
+              values 'carthage'
             }
           }
 

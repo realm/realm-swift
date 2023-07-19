@@ -131,26 +131,27 @@ def download_realm(platform, method, static)
     sh 'carthage', 'update', '--use-xcframeworks', '--platform', platformName
 
   when 'spm'
+    project = static ? 'SwiftPackageManager' : 'SwiftPackageManagerDynamic'
     # We have to hide the spm example from carthage because otherwise
     # it'll fetch the example's package dependencies as part of deciding
     # what to build from this repo.
-    unless File.symlink? 'SwiftPackageManager.xcodeproj/project.pbxproj'
-      FileUtils.mkdir_p 'SwiftPackageManager.xcodeproj'
-      File.symlink '../SwiftPackageManager.notxcodeproj/project.pbxproj',
-                   'SwiftPackageManager.xcodeproj/project.pbxproj'
+    unless File.symlink? "#{project}.xcodeproj/project.pbxproj"
+      FileUtils.mkdir_p "#{project}.xcodeproj"
+      File.symlink "../#{project}.notxcodeproj/project.pbxproj",
+                   "#{project}.xcodeproj/project.pbxproj"
     end
 
     # Update the XcodeProj to reference the requested branch or version
     if TEST_RELEASE
-      replace_in_file 'SwiftPackageManager.xcodeproj/project.pbxproj',
+      replace_in_file "#{project}.xcodeproj/project.pbxproj",
         /(branch|version) = .*;/, "version = #{TEST_RELEASE};",
         /kind = .*;/, "kind = exactVersion;"
     elsif TEST_BRANCH
-      replace_in_file 'SwiftPackageManager.xcodeproj/project.pbxproj',
+      replace_in_file "#{project}.xcodeproj/project.pbxproj",
         /(branch|version) = .*;/, "branch = #{TEST_BRANCH};",
         /kind = .*;/, "kind = branch;"
     end
-    sh 'xcodebuild', '-project', 'SwiftPackageManager.xcodeproj', '-resolvePackageDependencies'
+    sh 'xcodebuild', '-project', "#{project}.xcodeproj", '-resolvePackageDependencies'
 
   when 'xcframework'
     # If we're testing a branch then we should already have a built zip
@@ -200,7 +201,7 @@ def build_app(platform, method, static)
     sh 'xcodebuild', '-project', 'Carthage.xcodeproj', '-scheme', 'App', *build_args
 
   when 'spm'
-    sh 'xcodebuild', '-project', 'SwiftPackageManager.xcodeproj', '-scheme', 'App', *build_args
+    sh 'xcodebuild', '-project', static ? 'SwiftPackageManager.xcodeproj' : 'SwiftPackageManagerDynamic.xcodeproj', '-scheme', 'App', *build_args
 
   when 'xcframework'
     if static
@@ -221,9 +222,7 @@ def validate_build(static)
 end
 
 def test(platform, method, linkage = 'dynamic')
-  # Because we only have one target Xcode will choose to build us as a static
-  # library when using spm
-  static = linkage == 'static' || method == 'spm'
+  static = linkage == 'static'
   if static
     ENV['REALM_BUILD_STATIC'] = '1'
   else
@@ -251,6 +250,7 @@ if ARGV[0] == 'test-all'
     end
 
     test platform, 'cocoapods', 'static' unless platform == 'visionos'
+    test platform, 'spm', 'static'
   end
 
   test 'ios', 'xcframework', 'static'
