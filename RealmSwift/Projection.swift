@@ -344,12 +344,18 @@ extension ProjectionObservable {
 
             var projectedChanges = [PropertyChange]()
             for i in 0..<newValues.count {
-                for property in schema.filter({ prop in
-                    guard let keyPaths = keyPaths, !keyPaths.isEmpty else {
-                        return prop.originPropertyKeyPathString.components(separatedBy: ".").first == names[i]
+                let filter: (ProjectionProperty) -> Bool = { prop in
+                    if prop.originPropertyKeyPathString.components(separatedBy: ".").first != names[i] {
+                        return false
                     }
+                    guard let keyPaths, !keyPaths.isEmpty else {
+                        return true
+                    }
+
                     // This will allow us to notify `PropertyChange`s associated only to the keyPaths passed by the user, instead of any Property which has the same root as the notified one.
-                    return prop.originPropertyKeyPathString.components(separatedBy: ".").first == names[i] && keyPaths.contains(prop.originPropertyKeyPathString) }) {
+                    return keyPaths.contains(prop.originPropertyKeyPathString)
+                }
+                for property in schema.filter(filter) {
                     // If the root is marked as modified this will build a `PropertyChange` for each of the Projection properties with the same original root, even if there is no change on their value.
                     var changeOldValue: Any?
                     if oldValues != nil {
