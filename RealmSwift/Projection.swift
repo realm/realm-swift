@@ -269,6 +269,29 @@ extension ProjectionObservable {
 
      - warning: This method cannot be called during a write transaction, or when
                 the containing Realm is read-only.
+     - warning: For projected properties where the original property has the same root property name,
+                this will trigger a `PropertyChange` for each of the Projected properties even though
+                the change only corresponds to one of them.
+                For the following `Projection` object
+                ```swift
+                class PersonProjection: Projection<Person> {
+                    @Projected(\Person.firstName) var name
+                    @Projected(\Person.address.country) originCountry
+                    @Projected(\Person.address.phone.number) mobile
+                }
+
+                let token = projectedPerson.observe { changes in
+                    if case .change(_, let propertyChanges) = changes {
+                        propertyChanges[0].newValue as? String, "Winterfell" // Will notify the new value
+                        propertyChanges[1].newValue as? String, "555-555-555" // Will notify with the current value, which hasn't change.
+                    }
+                })
+
+                try realm.write {
+                    person.address.country = "Winterfell"
+                }
+                ```
+
      - parameter keyPaths: Only properties contained in the key paths array will trigger
                            the block when they are modified. If `nil`, notifications
                            will be delivered for any projected property change on the object.
@@ -321,15 +344,27 @@ extension ProjectionObservable {
 
             var projectedChanges = [PropertyChange]()
             for i in 0..<newValues.count {
-                for property in schema.filter({ $0.originPropertyKeyPathString == names[i] }) {
+                let filter: (ProjectionProperty) -> Bool = { prop in
+                    if prop.originPropertyKeyPathString.components(separatedBy: ".").first != names[i] {
+                        return false
+                    }
+                    guard let keyPaths, !keyPaths.isEmpty else {
+                        return true
+                    }
+
+                    // This will allow us to notify `PropertyChange`s associated only to the keyPaths passed by the user, instead of any Property which has the same root as the notified one.
+                    return keyPaths.contains(prop.originPropertyKeyPathString)
+                }
+                for property in schema.filter(filter) {
+                    // If the root is marked as modified this will build a `PropertyChange` for each of the Projection properties with the same original root, even if there is no change on their value.
                     var changeOldValue: Any?
                     if oldValues != nil {
                         changeOldValue = unmanagedRoot![keyPath: property.projectedKeyPath]
                     }
-                    let changeNewValue = object[keyPath: property.projectedKeyPath]
+                    let changedNewValue = object[keyPath: property.projectedKeyPath]
                     projectedChanges.append(.init(name: property.label,
                                                   oldValue: changeOldValue,
-                                                  newValue: changeNewValue))
+                                                  newValue: changedNewValue))
                 }
             }
 

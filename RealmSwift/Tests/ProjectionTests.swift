@@ -199,11 +199,25 @@ public class AddressSwift: EmbeddedObject {
     @Persisted var country = ""
 }
 
+public class ExtraInfo: Object {
+    @Persisted var phone: PhoneInfo?
+    @Persisted var email: String?
+}
+
+public class PhoneInfo: Object {
+    @Persisted var mobile: Mobile?
+}
+
+public class Mobile: EmbeddedObject {
+    @Persisted var number: String = ""
+}
+
 public class CommonPerson: Object {
     @Persisted var firstName: String
     @Persisted var lastName = ""
     @Persisted var birthday: Date
     @Persisted var address: AddressSwift?
+    @Persisted var extras: ExtraInfo?
     @Persisted public var friends: List<CommonPerson>
     @Persisted var reviews: List<String>
     @Persisted var money: Decimal128
@@ -214,6 +228,8 @@ public final class PersonProjection: Projection<CommonPerson> {
     @Projected(\CommonPerson.lastName.localizedUppercase) var lastNameCaps
     @Projected(\CommonPerson.birthday.timeIntervalSince1970) var birthdayAsEpochtime
     @Projected(\CommonPerson.address?.city) var homeCity
+    @Projected(\CommonPerson.extras?.email) var email
+    @Projected(\CommonPerson.extras?.phone?.mobile?.number) var mobile
     @Projected(\CommonPerson.friends.projectTo.firstName) var firstFriendsName: ProjectedCollection<String>
 }
 
@@ -416,7 +432,10 @@ class ProjectionTests: TestCase {
             let js = realm.create(CommonPerson.self, value: ["firstName": "John",
                                                              "lastName": "Snow",
                                                              "birthday": Date(timeIntervalSince1970: 10),
-                                                             "address": ["Winterfell", "Kingdom in the North"],
+                                                             "address": [
+                                                                "city": "Winterfell",
+                                                                "country": "Kingdom in the North"],
+                                                             "extras": ["phone": ["mobile": ["number": "555-555-555"]], "email": "john@doe.com"],
                                                              "money": Decimal128("2.22")])
             let dt = realm.create(CommonPerson.self, value: ["firstName": "Daenerys",
                                                              "lastName": "Targaryen",
@@ -493,7 +512,7 @@ class ProjectionTests: TestCase {
 
     func testDescription() {
         let actual = populatedRealm().objects(PersonProjection.self).filter("lastName == 'Snow'").first!.description
-        let expected = "PersonProjection<CommonPerson> <0x[0-9a-f]+> \\{\n\t\tfirstName\\(\\\\.firstName\\) = John;\n\tlastNameCaps\\(\\\\.lastName\\) = SNOW;\n\tbirthdayAsEpochtime\\(\\\\.birthday\\) = 10.0;\n\thomeCity\\(\\\\.address.city\\) = Optional\\(\"Winterfell\"\\);\n\tfirstFriendsName\\(\\\\.friends\\) = ProjectedCollection<String> \\{\n\t\\[0\\] Daenerys\n\\};\n\\}"
+        let expected = "PersonProjection<CommonPerson> <0x[0-9a-f]+> \\{\n\t\tfirstName\\(\\\\.firstName\\) = John;\n\tlastNameCaps\\(\\\\.lastName\\) = SNOW;\n\tbirthdayAsEpochtime\\(\\\\.birthday\\) = 10.0;\n\thomeCity\\(\\\\.address.city\\) = Optional\\(\"Winterfell\"\\);\n\temail\\(\\\\.extras.email\\) = Optional\\(\"john@doe.com\"\\);\n\tmobile\\(\\\\.extras.phone.mobile.number\\) = Optional\\(\"555-555-555\"\\);\n\tfirstFriendsName\\(\\\\.friends\\) = ProjectedCollection<String> \\{\n\t\\[0\\] Daenerys\n\\};\n\\}"
         assertMatches(actual, expected)
     }
 
@@ -943,6 +962,71 @@ class ProjectionTests: TestCase {
         }
         waitForExpectations(timeout: 1, handler: nil)
         token.invalidate()
+    }
+
+    func testObserveNestedProjection() {
+        let realm = populatedRealm()
+        let johnProjection = realm.objects(PersonProjection.self).first!
+
+        var ex = expectation(description: "testProjectionNotificationNestedWithKeyPath")
+        let token = johnProjection.observe(keyPaths: [\PersonProjection.mobile]) { changes in
+            if case .change(_, let propertyChange) = changes {
+                XCTAssertEqual(propertyChange[0].name, "mobile")
+                XCTAssertEqual((propertyChange[0].newValue as? String), "529-345-678")
+                ex.fulfill()
+            } else {
+                XCTFail("expected .change, got \(changes)")
+            }
+        }
+        dispatchSyncNewThread {
+            let realm = self.realmWithTestPath()
+            try! realm.write {
+                let johnObject = realm.objects(CommonPerson.self).filter("lastName == 'Snow'").first!
+                johnObject.extras?.phone?.mobile?.number = "529-345-678"
+            }
+        }
+        waitForExpectations(timeout: 2.0, handler: nil)
+        token.invalidate()
+
+        ex = expectation(description: "testProjectionNotificationNested")
+        let token2 = johnProjection.observe { changes in
+            if case .change(_, let propertyChange) = changes {
+                XCTAssertEqual(propertyChange[0].name, "email")
+                XCTAssertEqual(propertyChange[0].newValue as? String, "joe@realm.com")
+                ex.fulfill()
+            } else {
+                XCTFail("expected .change, got \(changes)")
+            }
+        }
+        dispatchSyncNewThread {
+            let realm = self.realmWithTestPath()
+            try! realm.write {
+                let johnObject = realm.objects(CommonPerson.self).filter("lastName == 'Snow'").first!
+                johnObject.extras?.email = "joe@realm.com"
+            }
+        }
+        waitForExpectations(timeout: 2.0, handler: nil)
+        token2.invalidate()
+
+        ex = expectation(description: "testProjectionNotificationEmbeddedNested")
+        let token3 = johnProjection.observe { changes in
+            if case .change(_, let propertyChange) = changes {
+                XCTAssertEqual(propertyChange[0].name, "homeCity")
+                XCTAssertEqual(propertyChange[0].newValue as? String, "Barranquilla")
+                ex.fulfill()
+            } else {
+                XCTFail("expected .change, got \(changes)")
+            }
+        }
+        dispatchSyncNewThread {
+            let realm = self.realmWithTestPath()
+            try! realm.write {
+                let johnObject = realm.objects(CommonPerson.self).filter("lastName == 'Snow'").first!
+                johnObject.address?.city = "Barranquilla"
+            }
+        }
+        waitForExpectations(timeout: 2.0, handler: nil)
+        token3.invalidate()
     }
 
     var changeDictionary: [NSKeyValueChangeKey: Any]?
