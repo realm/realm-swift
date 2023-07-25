@@ -19,7 +19,7 @@ target:
  - swiftpm-thread
  - ios-xcode-spm
  - ios-static
- - ios-dynamic
+ - ios
  - watchos
  - tvos
  - osx-swift
@@ -32,8 +32,8 @@ target:
  - catalyst-swift
  - xcframework
  - cocoapods-osx
+ - cocoapods-ios-static
  - cocoapods-ios
- - cocoapods-ios-dynamic
  - cocoapods-watchos
  - cocoapods-tvos
  - cocoapods-catalyst
@@ -84,7 +84,7 @@ exclude:
     target: ios-static
 
   - xcode_version: 14.2
-    target: ios-dynamic
+    target: ios
 
   - xcode_version: 14.2
     target: watchos
@@ -129,16 +129,16 @@ exclude:
     target: xcframework
 
   - xcode_version: 14.1
-    target: cocoapods-ios
+    target: cocoapods-ios-static
 
   - xcode_version: 14.2
-    target: cocoapods-ios
+    target: cocoapods-ios-static
 
   - xcode_version: 14.1
-    target: cocoapods-ios-dynamic
+    target: cocoapods-ios
 
   - xcode_version: 14.2
-    target: cocoapods-ios-dynamic
+    target: cocoapods-ios
 
   - xcode_version: 14.1
     target: cocoapods-watchos

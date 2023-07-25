@@ -1,9 +1,22 @@
 xcodeVersions = ['14.1', '14.2', '14.3.1']
 platforms = ['osx', 'ios', 'watchos', 'tvos', 'catalyst']
-carthagePlatforms = ['osx', 'ios', 'watchos', 'tvos']
-platformNames = ['osx': 'macOS', 'ios': 'iOS', 'watchos': 'watchOS', 'tvos': 'tvOS', 'catalyst': 'Catalyst']
+platformNames = ['osx': 'macOS', 'ios': 'iOS', 'watchos': 'watchOS', 'tvos': 'tvOS', 'catalyst': 'Catalyst', 'visionos': 'visionOS']
 carthageXcodeVersion = '14.3.1'
-docsSwiftVersion = '5.8.1'
+
+def buildPlatform(platform, xcodeVersion, nodeLabel = 'osx') {
+  def platformName = platformNames[platform]
+  return {
+    node(nodeLabel) {
+      deleteDir()
+      unstash 'source'
+      sh "REALM_XCODE_VERSION=${xcodeVersion} ./build.sh package ${platform}"
+      dir("build") {
+        stash includes: "realm-${platform}-${xcodeVersion}.zip",
+              name: "${platform}-${xcodeVersion}"
+      }
+    }
+  }
+}
 
 def installationTest(platform, test, xcode, language = 'swift', linkage = 'dynamic') {
   return {
@@ -12,7 +25,7 @@ def installationTest(platform, test, xcode, language = 'swift', linkage = 'dynam
       unstash 'source'
 
       if (test == "xcframework") {
-        unstash "${language}-packaged"
+        unstash "packaged"
         sh "mv *.zip examples/installation"
       }
 
@@ -58,8 +71,8 @@ def doBuild() {
         ]
       )
 
-      stash includes: '**', name: 'source'
-      stash includes: 'build.sh,scripts/*', name: 'build-scripts'
+      stash name: 'source', includes: '**'
+      stash name: 'build-scripts', includes: 'build.sh,dependencies.list,LICENSE,scripts/*'
     }
   }
 
@@ -71,16 +84,11 @@ def doBuild() {
           unstash 'source'
           sh """
           hostname
-          export REALM_SWIFT_VERSION=${docsSwiftVersion}
-          export PATH='/Users/realm/.rbenv/bin:/Users/realm/.rbenv/shims:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Users/realm/.gems/bin'
-          ./scripts/reset-simulators.sh
-          ./build.sh docs
-          cd docs
-          zip -r objc-docs.zip objc_output
-          zip -r swift-docs.zip swift_output
+          export REALM_XCODE_VERSION=${carthageXcodeVersion}
+          sh build.sh package-docs
           """
           dir('docs') {
-            archiveArtifacts artifacts: '*-docs.zip'
+            archiveArtifacts artifacts: 'realm-docs.zip'
           }
         }
       },
@@ -94,167 +102,65 @@ def doBuild() {
         }
       },
 
-      'iOS Obj-C static': {
+      'Source': {
         node('osx') {
           deleteDir()
           unstash 'source'
-          sh "REALM_XCODE_VERSION=${carthageXcodeVersion} ./build.sh package-ios-static"
-          dir("build/ios-static") {
-            stash includes: "realm-framework-ios-static.zip", name: "ios-static"
-          }
+          sh 'zip -r source.zip *'
+          archiveArtifacts artifacts: 'source.zip'
         }
       }
     ]
 
-    for (def p in carthagePlatforms) {
-      def platform = p
-      def platformName = platformNames[platform]
-      parallelBuilds["${platformName} Carthage"] = {
-        node('osx') {
-          deleteDir()
-          unstash 'source'
-          sh """
-          hostname
-          export REALM_XCODE_VERSION=${carthageXcodeVersion}
-          . ./scripts/swift-version.sh
-          set_xcode_and_swift_versions
-          export REALM_CARTHAGE_ARM_DISABLED='YES'
-
-          # Carthage scans every xcodeproj in the directory looking for
-          # targets. This can be very slow and even spuriously time out, so
-          # remove the ones we don't want it to build.
-          rm -r examples plugin
-
-          # For whatever reason 'xcodebuild -list' is very slow sometimes which
-          # makes Carthage time out, but it's a lot faster if no simulators
-          # exist, so delete them all first and only create a single simulator
-          # for each platform.
-          ./scripts/reset-simulators.rb -firstOnly
-
-          # Carthage doesn't let us tell it which schemes to build, so delete
-          # all of them except for the two we actually want
-          find Realm.xcodeproj -name '*.xcscheme' \
-            -and -not -name 'Realm.xcscheme' \
-            -and -not -name 'RealmSwift.xcscheme' \
-            -delete
-
-          carthage build --no-skip-current --platform ${platform} --derived-data DerivedData
-          carthage archive --output Carthage-${platform}.framework.zip
-          """
-          stash includes: "Carthage-${platform}.framework.zip",
-                name: "${platform}-carthage"
-        }
-      }
-    }
-
     for (def p in platforms) {
       def platform = p
       def platformName = platformNames[platform]
-      for (def v in xcodeVersions) {
-        def xcodeVersion = v
-        parallelBuilds["${platformName} ${xcodeVersion}"] = {
-          node('osx') {
-            deleteDir()
-            unstash 'source'
-            sh "REALM_XCODE_VERSION=${xcodeVersion} ./build.sh package ${platform}"
-            dir("build/${platform}") {
-              stash includes: "realm-framework-${platform}-${xcodeVersion}.zip",
-                    name: "${platform}-${xcodeVersion}"
-            }
-          }
-        }
+      for (def xcodeVersion in xcodeVersions) {
+        parallelBuilds["${platformName} ${xcodeVersion}"] = buildPlatform(platform, xcodeVersion)
       }
+      parallelBuilds["${platformName} 15.0"] = buildPlatform(platform, '15.0', 'macos_13')
     }
+    parallelBuilds["visionOS 15.0"] = buildPlatform('visionos', '15.0', 'macos_13')
 
     parallel parallelBuilds
   }
 
   stage('package') {
-    parallel (
-      "Obj-C": {
-        node('osx') {
-          deleteDir()
+    node('macos_13') {
+      deleteDir()
 
-          for (def platform in platforms) {
-            unstash "${platform}-${carthageXcodeVersion}"
-          }
-
-          unstash 'ios-static'
-          unstash 'examples'
-          unstash 'source'
-
-          sh "REALM_XCODE_VERSION=${carthageXcodeVersion} ./build.sh package-release objc"
-          stash includes: 'realm-objc-*.zip', name: 'objc-packaged'
-          archiveArtifacts artifacts: 'realm-objc-*.zip'
+      for (def platform in platforms) {
+        for (def xcodeVersion in xcodeVersions) {
+          unstash "${platform}-${xcodeVersion}"
         }
-      },
-      "Swift": {
-        node('osx') {
-          deleteDir()
-
-          for (def platform in platforms) {
-            for (def xcodeVersion in xcodeVersions) {
-              unstash "${platform}-${xcodeVersion}"
-            }
-          }
-
-          unstash 'examples'
-          unstash 'source'
-
-          sh './build.sh package-release swift'
-          stash includes: 'realm-swift-*.zip', name: 'swift-packaged'
-          archiveArtifacts artifacts: 'realm-swift-*.zip'
-        }
-      },
-      "Carthage": {
-        node('osx') {
-          deleteDir()
-
-          for (def platform in carthagePlatforms) {
-            unstash "${platform}-carthage"
-          }
-
-          sh '''
-          for zip in Carthage-*.framework.zip; do
-            ditto -xk $zip merged/
-          done
-
-          ditto -ck merged/ Carthage.framework.zip
-          '''
-
-          archiveArtifacts artifacts: 'Carthage.framework.zip'
-        }
+        unstash "${platform}-15.0"
       }
-    )
+      unstash 'visionos-15.0'
+
+      unstash 'examples'
+      unstash 'build-scripts'
+
+      withEnv(['REALM_XCODE_VERSION=15.0']) {
+        sh './build.sh package-release'
+      }
+      stash includes: 'realm-swift-*.zip', name: 'packaged'
+      archiveArtifacts artifacts: 'realm-swift-*.zip'
+    }
   }
 
   stage('test') {
     def parallelBuilds = [
-      'Test Obj-C Examples': {
+      'Test Examples': {
         node('osx') {
           deleteDir()
 
-          unstash 'objc-packaged'
+          unstash 'packaged'
           unstash 'build-scripts'
 
-          sh """
-          hostname
-          sh build.sh package-test-examples-objc
-          """
-        }
-      },
-
-      'Test Swift Examples': {
-        node('osx') {
-          deleteDir()
-
-          unstash 'swift-packaged'
-          unstash 'build-scripts'
-
-          sh """
-          hostname
-          sh build.sh package-test-examples-swift
-          """
+          sh '''
+            hostname
+            sh build.sh package-test-examples
+          '''
         }
       },
 
@@ -263,8 +169,11 @@ def doBuild() {
           deleteDir()
           unstash 'source'
 
-          sh './scripts/reset-simulators.rb'
-          sh 'sh build.sh test-ios-static'
+          sh '''
+            hostname
+            ./scripts/reset-simulators.rb
+            sh build.sh test-ios-static
+          '''
         }
       },
 

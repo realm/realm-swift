@@ -4,8 +4,8 @@ require 'FileUtils'
 
 def usage()
   puts <<~END
-    Usage: ruby $0 test-all
-    Usage: ruby $0 platform method [linkage]
+    Usage: ruby #{__FILE__} test-all
+    Usage: ruby #{__FILE__} platform method [linkage]
 
     platform:
       ios
@@ -34,7 +34,7 @@ end
 usage unless ARGV.length >= 1
 
 def read_setting(name)
-  `sh -c 'source ../../scripts/swift-version.sh; set_xcode_and_swift_versions; echo "$#{name}"'`.chomp()
+  `sh -c 'source ../../scripts/swift-version.sh; set_xcode_version; echo "$#{name}"'`.chomp()
 end
 
 ENV['DEVELOPER_DIR'] = read_setting 'DEVELOPER_DIR'
@@ -63,30 +63,39 @@ def sh(*args)
   system(*args) or exit(1)
 end
 
-def download_release(version, language)
-  unless Dir.exist? "realm-#{language}-#{version}"
-    unless File.exist? "realm-#{language}-#{version}.zip"
-      sh 'curl', '-OL', "https://github.com/realm/realm-swift/releases/download/v#{version}/realm-#{language}-#{version}.zip"
-    end
-    sh 'unzip', "realm-#{language}-#{version}.zip"
-    FileUtils.rm "realm-#{language}-#{version}.zip"
+# Copy a xcframework to the location which the installation example looks. This
+# shells out to `cp` because Ruby currently doesn't have native bindings for
+# clonefile-based copying.
+def copy_xcframework(path, framework, dir = '')
+  FileUtils.mkdir_p "../../build/#{dir}"
+  FileUtils.rm_rf "../../build/#{dir}/#{framework}.xcframework"
+
+  source = "#{path}/#{framework}.xcframework"
+  if not Dir.exist? source
+    raise "Missing XCFramework to test at '#{source}'"
   end
-  unless language != 'swift' || Dir.exist?("realm-swift-#{version}/#{XCODE_VERSION}")
+  sh 'cp', '-cR', source, "../../build/#{dir}"
+end
+
+def download_release(version)
+  # Download and extract the zip if the extracted directory doesn't already
+  # exist. For CI release testing, we already have a local copy of the zip that
+  # just needs to be extracted.
+  unless Dir.exist? "realm-swift-#{version}"
+    unless File.exist? "realm-swift-#{version}.zip"
+      sh 'curl', '-OL', "https://github.com/realm/realm-swift/releases/download/v#{version}/realm-swift-#{version}.zip"
+    end
+    sh 'unzip', "realm-swift-#{version}.zip"
+    FileUtils.rm "realm-swift-#{version}.zip"
+  end
+
+  unless Dir.exist?("realm-swift-#{version}/#{XCODE_VERSION}")
     raise "No build for Xcode version #{XCODE_VERSION} found in #{version} release package"
   end
-  FileUtils.rm_rf '../../build/Realm.xcframework'
-  FileUtils.rm_rf '../../build/RealmSwift.xcframework'
-  FileUtils.mkdir_p '../../build'
 
-  if language == 'swift'
-    sh 'cp', '-cR', "realm-swift-#{version}/#{XCODE_VERSION}/Realm.xcframework", "../../build"
-    sh 'cp', '-cR', "realm-swift-#{version}/#{XCODE_VERSION}/RealmSwift.xcframework", "../../build"
-  elsif language == 'objc'
-  FileUtils.mkdir_p '../../build/ios-static'
-    sh 'cp', '-cR', "realm-objc-#{version}/ios-static/Realm.xcframework", "../../build/ios-static"
-  else
-    raise "Unknown language #{language}"
-  end
+  copy_xcframework "realm-swift-#{version}", 'Realm'
+  copy_xcframework "realm-swift-#{version}/static", 'Realm', 'Static'
+  copy_xcframework "realm-swift-#{version}/#{XCODE_VERSION}", 'RealmSwift'
 end
 
 def download_realm(platform, method, static)
@@ -117,6 +126,7 @@ def download_realm(platform, method, static)
                    when 'osx' then 'Mac'
                    when 'tvos' then 'tvOS'
                    when 'watchos' then 'watchOS'
+                   else raise "Unsupported platform for Carthage: #{platform}"
                    end
     sh 'carthage', 'update', '--use-xcframeworks', '--platform', platformName
 
@@ -130,6 +140,7 @@ def download_realm(platform, method, static)
                    'SwiftPackageManager.xcodeproj/project.pbxproj'
     end
 
+    # Update the XcodeProj to reference the requested branch or version
     if TEST_RELEASE
       replace_in_file 'SwiftPackageManager.xcodeproj/project.pbxproj',
         /(branch|version) = .*;/, "version = #{TEST_RELEASE};",
@@ -142,11 +153,19 @@ def download_realm(platform, method, static)
     sh 'xcodebuild', '-project', 'SwiftPackageManager.xcodeproj', '-resolvePackageDependencies'
 
   when 'xcframework'
+    # If we're testing a branch then we should already have a built zip
+    # supplied by Jenkins, but we need to know what version tag it has. If
+    # we're testing a release, we'll download the zip.
     version = TEST_BRANCH ? DEPENDENCIES['VERSION'] : TEST_RELEASE
     if version
-      download_release version, static ? 'objc' : 'swift'
-    elsif not Dir.exist? '../../build/Realm.xcframework'
-      raise 'Missing XCFramework to test in ../../build'
+      download_release version
+    else
+      if static
+        copy_xcframework '../../build/Static', 'Realm'
+      else
+        copy_xcframework '../../build/Release', 'Realm'
+        copy_xcframework '../../build/Release', 'RealmSwift'
+      end
     end
 
   else
@@ -227,7 +246,7 @@ if ARGV[0] == 'test-all'
   for platform in platforms
     for method in ['cocoapods', 'carthage', 'spm', 'xcframework']
       next if platform == 'catalyst' && method == 'carthage'
-      next if platform == 'visionos' && method != 'spm'
+      next if platform == 'visionos' && method != 'spm' && method != 'xcframework'
       test platform, method, 'dynamic'
     end
 

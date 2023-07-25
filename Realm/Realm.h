@@ -29,7 +29,6 @@
 #import <Realm/RLMObject.h>
 #import <Realm/RLMObjectId.h>
 #import <Realm/RLMObjectSchema.h>
-#import <Realm/RLMPlatform.h>
 #import <Realm/RLMProperty.h>
 #import <Realm/RLMRealm.h>
 #import <Realm/RLMRealmConfiguration.h>

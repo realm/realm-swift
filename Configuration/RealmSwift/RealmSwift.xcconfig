@@ -1,15 +1,14 @@
-SUPPORTED_PLATFORMS = macosx iphonesimulator iphoneos watchsimulator watchos appletvos appletvsimulator;
-APPLICATION_EXTENSION_API_ONLY = YES;
 SKIP_INSTALL = YES;
 
+DEFINES_MODULE = YES;
 DYLIB_COMPATIBILITY_VERSION = 1;
 DYLIB_CURRENT_VERSION = 1;
 DYLIB_INSTALL_NAME_BASE = @rpath;
-LD_RUNPATH_SEARCH_PATHS = $(inherited) @executable_path/Frameworks @loader_path/Frameworks;
-DEFINES_MODULE = YES;
 INFOPLIST_FILE = RealmSwift/RealmSwift-Info.plist;
-PRODUCT_NAME = RealmSwift;
+LD_RUNPATH_SEARCH_PATHS = $(inherited) @executable_path/Frameworks @loader_path/Frameworks;
+MACH_O_TYPE = $(REALM_MACH_O_TYPE);
 PRODUCT_BUNDLE_IDENTIFIER = io.realm.RealmSwit;
+PRODUCT_NAME = RealmSwift;
 
 REALM_BUILD_LIBRARY_FOR_DISTRIBUTION = NO;
 BUILD_LIBRARY_FOR_DISTRIBUTION = $(REALM_BUILD_LIBRARY_FOR_DISTRIBUTION);

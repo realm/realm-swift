@@ -1,13 +1,27 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+* Add support for building for visionOS and add Xcode 15 binaries to the
+  release package. visionOS currently requires installing Realm via either
+  Swift Package Manager or by using a XCFramework as CocoaPods and Carthage do
+  not yet support it.
+* Zips compatible with SPM's `.binaryTarget()` are now published as part of the
+  reases on Github.
+  releases on Github.
+* Prebuilt XCFrameworks are now built with LTO enabled. This has insignificant
+  performance benefits, but cuts the size of the library by ~15%.
+* Prebuilt XCFrameworks are now built with LTO enabled. This has insgificant
+* performance benefits, but cuts the size of the library by ~15%.
+* Prebuilt XCFrameworks are now built with LTO enabled. This has insignificant
+  performance benefits, but cuts the size of the library by ~15%.
 
 ### Fixed
 * Fix nested properties observation on a `Projections` not notifying when there is a property change.
     ([#8276](https://github.com/realm/realm-swift/issues/8276), since v10.34.0).
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+### Breaking Changes
+* Legacy non-xcframework Carthage installations are no longer supported. Please
+  ensure you are using `--use-xcframeworks` if installing via Carthage.
 
 ### Compatibility
 * Realm Studio: 14.0.1 or later.
@@ -18,6 +32,9 @@ x.y.z Release notes (yyyy-MM-dd)
 
 ### Internal
 * Upgraded realm-core from ? to ?
+* Release packages were being uploaded to several static.realm.io URLs which
+  are no longer linked to anywhere. These are no longer being updated, and
+  release packages are now only being uploaded to Github.
 
 10.41.1 Release notes (2023-07-17)
 =============================================================
@@ -56,9 +73,6 @@ x.y.z Release notes (yyyy-MM-dd)
 * The location where prebuilt core binaries are published has changed slightly.
   If you are using `REALM_BASE_URL` to mirror the binaries, you may need to
   adjust your mirroring logic.
-* Release packages were being uploaded to several static.realm.io URLs which
-  are no longer linked to anywhere. These are no longer being updated, and
-  release packages are now only being uploaded to Github.
 
 10.41.0 Release notes (2023-06-26)
 =============================================================

@@ -72,15 +72,10 @@ TVOS_DEPLOYMENT_TARGET_1400 = 11.0;
 TVOS_DEPLOYMENT_TARGET_1500 = 12.0;
 TVOS_DEPLOYMENT_TARGET = $(TVOS_DEPLOYMENT_TARGET_$(XCODE_VERSION_MAJOR));
 
-// Disable building the arm64 simulators for some types of Carthage builds
-REALM_ARM_ARCHS_YES = arm64 arm64e;
-REALM_ARM_ARCHS = $(REALM_ARM_ARCHS_$(REALM_CARTHAGE_ARM_DISABLED))
-
-EXCLUDED_ARCHS[sdk=watchsimulator*] = $(REALM_ARM_ARCHS);
-EXCLUDED_ARCHS[sdk=iphonesimulator*] = $(REALM_ARM_ARCHS);
-EXCLUDED_ARCHS[sdk=appletvsimulator*] = $(REALM_ARM_ARCHS);
-
+APPLICATION_EXTENSION_API_ONLY = YES;
+REALM_MACH_O_TYPE = mh_dylib;
+SUPPORTED_PLATFORMS = macosx iphoneos iphonesimulator watchos watchsimulator appletvos appletvsimulator xros xrsimulator;
+SUPPORTS_MACCATALYST = YES;
 SWIFT_VERSION = 5.7;
-TARGETED_DEVICE_FAMILY = 1,2,3,4;
-SDKROOT = $(REALM_SDKROOT);
+TARGETED_DEVICE_FAMILY = 1,2,3,4,6,7;
 

@@ -25,7 +25,7 @@ targets = {
   'ios-xcode-spm' => all,
 
   'ios-static' => oldest_and_latest,
-  'ios-dynamic' => oldest_and_latest,
+  'ios' => oldest_and_latest,
   'watchos' => oldest_and_latest,
   'tvos' => oldest_and_latest,
 
@@ -43,8 +43,8 @@ targets = {
   'xcframework' => latest_only,
 
   'cocoapods-osx' => all,
+  'cocoapods-ios-static' => latest_only,
   'cocoapods-ios' => latest_only,
-  'cocoapods-ios-dynamic' => latest_only,
   'cocoapods-watchos' => latest_only,
   'cocoapods-tvos' => latest_only,
   'cocoapods-catalyst' => latest_only,
