@@ -59,7 +59,7 @@ command:
   test-swiftpm:         tests ObjC and Swift macOS frameworks via SwiftPM
   test-swiftui-ios:         tests SwiftUI framework UI tests
   test-swiftui-server-osx:  tests Server Sync in SwiftUI
-  verify:               verifies docs, osx, osx-swift, ios-static, ios-dynamic, ios-swift, ios-device, swiftui-ios in both Debug and Release configurations, swiftlint
+  verify:               verifies docs, osx, osx-swift, ios-static, ios-dynamic, ios-swift, ios-device, swiftui-ios in both Debug and Release configurations, swiftlint, ios-xcode-spm
   verify-osx-object-server:  downloads the Realm Object Server and runs the Objective-C and Swift integration tests
 
   docs:                 builds docs in docs/output
@@ -668,6 +668,7 @@ case "$COMMAND" in
         ;;
 
     verify-cocoapods-ios-dynamic)
+        cd examples/installation
         REALM_TEST_BRANCH="$sha" ./build.rb ios cocoapods
         ;;
 
@@ -768,6 +769,11 @@ case "$COMMAND" in
 
     "verify-xcframework")
         sh build.sh xcframework osx
+        exit 0
+        ;;
+
+    "verify-ios-xcode-spm")
+        REALM_TEST_BRANCH="$sha" sh build.sh test-ios-xcode-spm
         exit 0
         ;;
 

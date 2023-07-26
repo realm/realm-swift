@@ -6,18 +6,15 @@ x.y.z Release notes (yyyy-MM-dd)
   Swift Package Manager or by using a XCFramework as CocoaPods and Carthage do
   not yet support it.
 * Zips compatible with SPM's `.binaryTarget()` are now published as part of the
-  reases on Github.
   releases on Github.
-* Prebuilt XCFrameworks are now built with LTO enabled. This has insignificant
-  performance benefits, but cuts the size of the library by ~15%.
-* Prebuilt XCFrameworks are now built with LTO enabled. This has insgificant
-* performance benefits, but cuts the size of the library by ~15%.
 * Prebuilt XCFrameworks are now built with LTO enabled. This has insignificant
   performance benefits, but cuts the size of the library by ~15%.
 
 ### Fixed
 * Fix nested properties observation on a `Projections` not notifying when there is a property change.
     ([#8276](https://github.com/realm/realm-swift/issues/8276), since v10.34.0).
+* Fix undefined symbol error for `UIKit` when linking Realm to a framework using SPM.
+  ([#8308](https://github.com/realm/realm-swift/issues/8308), since v10.41.0)
 
 ### Breaking Changes
 * Legacy non-xcframework Carthage installations are no longer supported. Please

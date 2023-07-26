@@ -197,6 +197,7 @@ def doBuild() {
         }
       }
       parallelBuilds["Installation - ${platformName} CocoaPods static"] = installationTest(platform, 'cocoapods', carthageXcodeVersion, 'swift', 'static')
+      parallelBuilds["Installation - ${platformName} spm static"] = installationTest(platform, 'spm', carthageXcodeVersion, 'swift', 'static')
     }
     parallelBuilds['Installation - iOS Static'] = installationTest('ios', 'xcframework', carthageXcodeVersion, 'objc', 'static')
     parallelBuilds['Installation - XCFramework Evolution'] = xcframeworkEvolutionTest()

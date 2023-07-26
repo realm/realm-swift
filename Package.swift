@@ -249,7 +249,10 @@ let package = Package(
                 "Realm/RLMUserAPIKey.mm"
             ],
             publicHeadersPath: "include",
-            cxxSettings: cxxSettings
+            cxxSettings: cxxSettings,
+            linkerSettings: [
+                .linkedFramework("UIKit", .when(platforms: [.iOS, .macCatalyst, .tvOS, .watchOS]))
+            ]
         ),
         .target(
             name: "RealmSwift",
