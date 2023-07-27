@@ -54,6 +54,18 @@ class MongoDataAccessMacrosTests : XCTestCase {
                         document["name"] = AnyBSON(name)
                     document["age"] = AnyBSON(age)
                     }
+                    struct Filter : BSONFilter {
+                        var documentRef = DocumentRef()
+                        var name: BSONQuery<String>
+                        var age: BSONQuery<Int>
+                        init() {
+                            name = BSONQuery<String>(identifier: "name", documentRef: documentRef)
+                            age = BSONQuery<Int>(identifier: "age", documentRef: documentRef)
+                        }
+                        mutating func encode() -> Document {
+                            return documentRef.document
+                        }
+                    }
                 }
                 extension Person: BSONCodable {
                 }
