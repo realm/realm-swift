@@ -1,7 +1,8 @@
-// swift-tools-version:5.7
+// swift-tools-version:5.9
 
 import PackageDescription
 import Foundation
+import CompilerPluginSupport
 
 let coreVersion = Version("13.17.0")
 let cocoaVersion = Version("10.41.1")
@@ -125,13 +126,41 @@ func runCommand() -> String {
     return matches.last ?? ""
 }
 
+let addedTargets: [PackageDescription.Target]
+if #available(macOS 10.15, *) {
+    addedTargets = [
+        .macro(
+            name: "MongoDataAccessMacros",
+            dependencies: [
+                .product(name: "SwiftSyntax", package: "swift-syntax"),
+                .product(name: "SwiftSyntaxMacros", package: "swift-syntax"),
+                .product(name: "SwiftCompilerPlugin", package: "swift-syntax")
+            ],
+            path: "MongoDataAccessMacros"
+        ),
+        .target(
+            name: "MongoDataAccess",
+            dependencies: ["RealmSwift", "MongoDataAccessMacros"],
+            path: "MongoDataAccess",
+            exclude: ["Tests"]
+        ),
+        .testTarget(
+            name: "MongoDataAccessTests",
+            dependencies: ["MongoDataAccess", "MongoDataAccessMacros",
+                           .product(name: "SwiftSyntaxMacrosTestSupport", package: "swift-syntax")],
+            path: "MongoDataAccess/Tests"),
+    ]
+} else {
+    addedTargets = []
+}
+
 let package = Package(
     name: "Realm",
     platforms: [
-        .macOS(.v10_13),
-        .iOS(.v11),
+        .macOS(.v10_15),
+        .iOS(.v13),
         .tvOS(.v11),
-        .watchOS(.v4)
+        .watchOS(.v4),
     ],
     products: [
         .library(
@@ -140,14 +169,20 @@ let package = Package(
         .library(
             name: "RealmSwift",
             targets: ["Realm", "RealmSwift"]),
+        .library(
+            name: "MongoDataAccess",
+            targets: ["MongoDataAccess"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/realm/realm-core.git", exact: coreVersion)
+        .package(url: "https://github.com/realm/realm-core.git", exact: coreVersion),
+        .package(url: "https://github.com/apple/swift-syntax.git", from: "509.0.0-swift-5.9-DEVELOPMENT-SNAPSHOT-2023-07-22-a"),
     ],
     targets: [
       .target(
             name: "Realm",
-            dependencies: [.product(name: "RealmCore", package: "realm-core")],
+            dependencies: [
+                .product(name: "RealmCore", package: "realm-core")
+            ],
             path: ".",
             exclude: [
                 "CHANGELOG.md",
@@ -261,6 +296,27 @@ let package = Package(
                 "Tests",
             ]
         ),
+
+//        .macro(
+//            name: "MongoDataAccessMacros",
+//            dependencies: [
+//                .product(name: "SwiftSyntax", package: "swift-syntax"),
+//                .product(name: "SwiftSyntaxMacros", package: "swift-syntax"),
+//                .product(name: "SwiftCompilerPlugin", package: "swift-syntax")
+//            ],
+//            path: "MongoDataAccessMacros"
+//        ),
+//        .target(
+//            name: "MongoDataAccess",
+//            dependencies: ["RealmSwift", "MongoDataAccessMacros"],
+//            path: "MongoDataAccess",
+//            exclude: ["Tests"]
+//        ),
+//        .testTarget(
+//            name: "MongoDataAccessTests",
+//            dependencies: ["MongoDataAccess", "MongoDataAccessMacros",
+//                           .product(name: "SwiftSyntaxMacrosTestSupport", package: "swift-syntax")],
+//            path: "MongoDataAccess/Tests"),
         .target(
             name: "RealmTestSupport",
             dependencies: ["Realm"],
@@ -361,6 +417,6 @@ let package = Package(
                 "RLMWatchTestUtility.m"
             ]
         )
-    ],
+    ] + addedTargets,
     cxxLanguageStandard: .cxx20
 )
