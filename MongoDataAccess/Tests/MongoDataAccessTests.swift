@@ -57,10 +57,10 @@ class MongoDataAccessMacrosTests : XCTestCase {
                     struct Filter : BSONFilter {
                         var documentRef = DocumentRef()
                         var name: BSONQuery<String>
-                        var age: BSONQuery<Int>
+                    var age: BSONQuery<Int>
                         init() {
                             name = BSONQuery<String>(identifier: "name", documentRef: documentRef)
-                            age = BSONQuery<Int>(identifier: "age", documentRef: documentRef)
+                        age = BSONQuery<Int>(identifier: "age", documentRef: documentRef)
                         }
                         mutating func encode() -> Document {
                             return documentRef.document
