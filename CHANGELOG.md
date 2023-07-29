@@ -15,6 +15,12 @@ x.y.z Release notes (yyyy-MM-dd)
     ([#8276](https://github.com/realm/realm-swift/issues/8276), since v10.34.0).
 * Fix undefined symbol error for `UIKit` when linking Realm to a framework using SPM.
   ([#8308](https://github.com/realm/realm-swift/issues/8308), since v10.41.0)
+* If the app crashed at exactly the wrong time while opening a freshly
+  compacted Realm the file could be left in an invalid state
+  ([Core #6807](https://github.com/realm/realm-core/pull/6807), since v10.33.0).
+* Sync progress for DOWNLOAD messages was sometimes stored incorrectly,
+  resulting in an extra round trip to the server.
+  ([Core #6827](https://github.com/realm/realm-core/issues/6827), since v10.31.0)
 
 ### Breaking Changes
 * Legacy non-xcframework Carthage installations are no longer supported. Please
@@ -28,7 +34,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * Xcode: 14.1-15 beta 4.
 
 ### Internal
-* Upgraded realm-core from ? to ?
+* Upgraded realm-core from 13.17.0 to 13.17.1
 * Release packages were being uploaded to several static.realm.io URLs which
   are no longer linked to anywhere. These are no longer being updated, and
   release packages are now only being uploaded to Github.

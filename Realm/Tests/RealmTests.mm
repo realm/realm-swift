@@ -226,7 +226,7 @@
 #define AssertFileUnmodified(oldURL, newURL) do { \
     NSData *oldData = [NSData dataWithContentsOfURL:oldURL]; \
     NSData *newData = [NSData dataWithContentsOfURL:newURL]; \
-    if (oldData.length < realm::util::page_size()) { \
+    if (oldData.length != newData.length && oldData.length < realm::util::page_size()) { \
         XCTAssertEqual(newData.length, realm::util::page_size()); \
         XCTAssertEqualObjects(oldData, ([newData subdataWithRange:{0, oldData.length}])); \
     } \
