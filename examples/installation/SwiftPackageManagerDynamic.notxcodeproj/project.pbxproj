@@ -12,10 +12,10 @@
 		3FEC91722A4D3B150044BFF5 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3FEC91712A4D3B150044BFF5 /* Preview Assets.xcassets */; };
 		3FEC917A2A4D3DB90044BFF5 /* Realm in Frameworks */ = {isa = PBXBuildFile; productRef = 3FEC91792A4D3DB90044BFF5 /* Realm */; };
 		3FEC917C2A4D3DB90044BFF5 /* RealmSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 3FEC917B2A4D3DB90044BFF5 /* RealmSwift */; };
-		3FF673252A684E4400500A25 /* Framework1.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3FF6731F2A684E4400500A25 /* Framework1.framework */; platformFilters = (ios, macos, ); };
-		3FF673262A684E4400500A25 /* Framework1.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 3FF6731F2A684E4400500A25 /* Framework1.framework */; platformFilters = (ios, macos, ); settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		3FF673362A684E4E00500A25 /* Framework2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3FF673302A684E4E00500A25 /* Framework2.framework */; platformFilters = (ios, maccatalyst, ); };
-		3FF673372A684E4E00500A25 /* Framework2.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 3FF673302A684E4E00500A25 /* Framework2.framework */; platformFilters = (ios, maccatalyst, ); settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		3FF673252A684E4400500A25 /* Framework1.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3FF6731F2A684E4400500A25 /* Framework1.framework */; };
+		3FF673262A684E4400500A25 /* Framework1.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 3FF6731F2A684E4400500A25 /* Framework1.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		3FF673362A684E4E00500A25 /* Framework2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3FF673302A684E4E00500A25 /* Framework2.framework */; };
+		3FF673372A684E4E00500A25 /* Framework2.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 3FF673302A684E4E00500A25 /* Framework2.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		3FF6733D2A684E7200500A25 /* Realm in Frameworks */ = {isa = PBXBuildFile; productRef = 3FF6733C2A684E7200500A25 /* Realm */; };
 		3FF6733F2A684E7200500A25 /* RealmSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 3FF6733E2A684E7200500A25 /* RealmSwift */; };
 		3FF673412A684E7700500A25 /* Realm in Frameworks */ = {isa = PBXBuildFile; productRef = 3FF673402A684E7700500A25 /* Realm */; };
