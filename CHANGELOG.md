@@ -1,6 +1,8 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.42.0 Release notes (2023-07-30)
 =============================================================
+
 ### Enhancements
+
 * Add support for building for visionOS and add Xcode 15 binaries to the
   release package. visionOS currently requires installing Realm via either
   Swift Package Manager or by using a XCFramework as CocoaPods and Carthage do
@@ -11,8 +13,9 @@ x.y.z Release notes (yyyy-MM-dd)
   performance benefits, but cuts the size of the library by ~15%.
 
 ### Fixed
+
 * Fix nested properties observation on a `Projections` not notifying when there is a property change.
-    ([#8276](https://github.com/realm/realm-swift/issues/8276), since v10.34.0).
+  ([#8276](https://github.com/realm/realm-swift/issues/8276), since v10.34.0).
 * Fix undefined symbol error for `UIKit` when linking Realm to a framework using SPM.
   ([#8308](https://github.com/realm/realm-swift/issues/8308), since v10.41.0)
 * If the app crashed at exactly the wrong time while opening a freshly
@@ -23,17 +26,20 @@ x.y.z Release notes (yyyy-MM-dd)
   ([Core #6827](https://github.com/realm/realm-core/issues/6827), since v10.31.0)
 
 ### Breaking Changes
+
 * Legacy non-xcframework Carthage installations are no longer supported. Please
   ensure you are using `--use-xcframeworks` if installing via Carthage.
 
 ### Compatibility
+
 * Realm Studio: 14.0.1 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 14.3.1.
 * CocoaPods: 1.10 or later.
-* Xcode: 14.1-15 beta 4.
+* Xcode: 14.1-15 beta 5.
 
 ### Internal
+
 * Upgraded realm-core from 13.17.0 to 13.17.1
 * Release packages were being uploaded to several static.realm.io URLs which
   are no longer linked to anywhere. These are no longer being updated, and
