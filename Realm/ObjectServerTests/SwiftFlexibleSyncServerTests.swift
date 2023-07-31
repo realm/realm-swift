@@ -1429,12 +1429,10 @@ extension SwiftFlexibleSyncServerTests {
         _ = try await realm.objects(SwiftPerson.self).where { $0.age >= 8 }.subscribe(name: "8 or older")
         _ = try await results0.subscribe(name: "older than 7")
         XCTAssertEqual(realm.subscriptions.count, 3)
-        let first = realm.subscriptions.first(ofType: SwiftPerson.self) { $0.age >= 8 }
-        XCTAssertNil(try XCTUnwrap(first).name)
-        let second = realm.subscriptions[1]
-        XCTAssertEqual(second!.name, "8 or older")
-        let third = realm.subscriptions[2]
-        XCTAssertEqual(third!.name, "older than 7")
+        let subscriptions = realm.subscriptions
+        XCTAssertNil(subscriptions[0]!.name)
+        XCTAssertEqual(subscriptions[1]!.name, "8 or older")
+        XCTAssertEqual(subscriptions[2]!.name, "older than 7")
     }
 
     @MainActor

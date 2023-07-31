@@ -153,11 +153,6 @@ extension Projection: KeypathSortable {}
     /**
      Creates a SyncSubscription matching the Results' local filter.
 
-     This method opens a write transaction that creates or updates a subscription.
-     It's advised to *not* loop over this method in order to create multiple subcsriptions.
-     This could create a performance bottleneck by opeing multiple unecessary write transactions.
-     - note To create multiple subscriptions at once use `SyncSubscription.update`
-
      After committing the subscription to the realm's local subscription set, the method
      will wait for downloads according to the `WaitForSyncMode`.
      - see: ``WaitForSyncMode``
@@ -172,6 +167,11 @@ extension Projection: KeypathSortable {}
      __Existing name and query:__
      If `.subscribe()` is called with a name whose name is taken on a different query, the old subscription is updated with the new query.
      If `.subscribe()` is called with a name that's in already in use by an identical query, no new subscription is created.
+
+     - Note: This method opens a write transaction that creates or updates a subscription.
+     It's advised to *not* loop over this method in order to create multiple subscriptions.
+     This could create a performance bottleneck by opening multiple unnecessary write transactions.
+     - note To create multiple subscriptions at once use `SyncSubscription.update`.
 
      - parameter name: The name applied to the subscription
      - parameter waitForSync: Determines the download behavior for the subscription. Defaults to `.onCreation`.
@@ -203,8 +203,8 @@ extension Projection: KeypathSortable {}
      local subscription set. Calling this method will not wait for objects to
      be removed from the realm.
 
-     - warning: Calling unsubscribe on a Results does not remove the local filter from the Results. After calling unsubcsribe, Results may still contain objects because other
-     subscriptions may exist in the realm's subscription set.
+     - warning: Calling unsubscribe on a Results does not remove the local filter from the Results. After calling unsubscribe,
+     Results may still contain objects because other subscriptions may exist in the realm's subscription set.
 
      In order for a named subscription to be removed, the Results
      must have previously created the subscription. For example:

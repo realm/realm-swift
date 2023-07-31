@@ -31,13 +31,10 @@ class Query;
 RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
 @interface RLMSyncSubscription ()
-
 - (instancetype)initWithSubscription:(realm::sync::Subscription)subscription subscriptionSet:(RLMSyncSubscriptionSet *)subscriptionSet;
-
 @end
 
 @interface RLMSyncSubscriptionSet ()
-
 - (instancetype)initWithSubscriptionSet:(realm::sync::SubscriptionSet)subscriptionSet realm:(RLMRealm *)realm;
 
 - (void)update:(__attribute__((noescape)) void(^)(void))block
@@ -60,7 +57,6 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
                                   query:(realm::Query)query;
 
 - (void)removeSubscriptionWithId:(RLMObjectId *)objectId;
-
 @end
 
 RLM_HEADER_AUDIT_END(nullability, sendability)

@@ -1167,9 +1167,9 @@
     XCTestExpectation *ex = [self expectationWithDescription:@"expect timeout"];
     NSTimeInterval timeout = 2.0;
     RLMResults *res = [[Person allObjectsInRealm:realm] objectsWhere:@"age >= 20"];
-    [res subscribeWithName:@"20up" waitForSync:RLMWaitForSyncModeAlways onQueue:dispatch_get_main_queue() timeout:2.0 completion:^(RLMResults *results, NSError *error) {
+    [res subscribeWithName:@"20up" waitForSync:RLMWaitForSyncModeAlways onQueue:dispatch_get_main_queue() timeout:timeout completion:^(RLMResults *results, NSError *error) {
         XCTAssert(error);
-        NSString *expectedDesc = [NSString stringWithFormat:@"Waiting for update timed out after %.01f seconds.", ti];
+        NSString *expectedDesc = [NSString stringWithFormat:@"Waiting for update timed out after %.01f seconds.", timeout];
         XCTAssert([error.localizedDescription isEqualToString:expectedDesc]);
         XCTAssertNil(results);
         [ex fulfill];
@@ -1186,8 +1186,6 @@
     }
     XCTAssertEqual(realm.subscriptions.state, RLMSyncSubscriptionStateComplete);
 }
-
-- (void)testUnsubscribe {}
 
 #if 0 // FIXME: this is no longer an error and needs to be updated to something which is
 - (void)testFlexibleSyncInitialSubscriptionThrowsError {
