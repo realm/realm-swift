@@ -1106,7 +1106,6 @@
     syncConfig.cancelAsyncOpenOnNonFatalErrors = true;
     config.syncConfiguration = syncConfig;
 
-
     // Set delay above the timeout so it should fail
     proxy.delay = 2.0;
 

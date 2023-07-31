@@ -34,7 +34,11 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 - (instancetype)initWithSubscription:(realm::sync::Subscription)subscription subscriptionSet:(RLMSyncSubscriptionSet *)subscriptionSet;
 @end
 
-@interface RLMSyncSubscriptionSet ()
+@interface RLMSyncSubscriptionSet () {
+@public 
+    std::unique_ptr<realm::sync::SubscriptionSet> _subscriptionSet;
+}
+
 - (instancetype)initWithSubscriptionSet:(realm::sync::SubscriptionSet)subscriptionSet realm:(RLMRealm *)realm;
 
 - (void)update:(__attribute__((noescape)) void(^)(void))block

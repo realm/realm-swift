@@ -218,7 +218,7 @@ import Realm.Private
                              an `Error`describing what went wrong will be returned by the block
      */
     public func update(_ block: (() -> Void), onComplete: (@Sendable (Error?) -> Void)? = nil) {
-        rlmSyncSubscriptionSet.update(block, onComplete: onComplete ?? { _ in })
+        rlmSyncSubscriptionSet.update(block, onComplete: onComplete)
     }
 
     /// :nodoc:

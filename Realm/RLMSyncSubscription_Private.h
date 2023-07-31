@@ -57,6 +57,7 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
                       updateExisting:(BOOL)updateExisting;
 
 - (void)waitForSynchronizationOnQueue:(nullable dispatch_queue_t)queue
+                              timeout:(NSTimeInterval)timeout
                       completionBlock:(void(^)(NSError *))completionBlock;
 
 - (RLMSyncSubscriptionEnumerator *)fastEnumerator;

@@ -18,6 +18,7 @@
 
 #import "RLMSyncSubscription_Private.hpp"
 
+#import "RLMAsyncTask_Private.h"
 #import "RLMError_Private.hpp"
 #import "RLMObjectId_Private.hpp"
 #import "RLMQueryUtil.hpp"
@@ -31,7 +32,7 @@
 #pragma mark - Subscription
 
 @interface RLMSyncSubscription () {
-    std::unique_ptr<realm::sync::Subscription> _subscription;
+    std::shared_ptr<realm::sync::Subscription> _subscription;
     RLMSyncSubscriptionSet *_subscriptionSet;
 }
 @end
@@ -40,7 +41,7 @@
 
 - (instancetype)initWithSubscription:(realm::sync::Subscription)subscription subscriptionSet:(RLMSyncSubscriptionSet *)subscriptionSet {
     if (self = [super init]) {
-        _subscription = std::make_unique<realm::sync::Subscription>(subscription);
+        _subscription = std::make_shared<realm::sync::Subscription>(subscription);
         _subscriptionSet = subscriptionSet;
         return self;
     }
@@ -112,7 +113,6 @@
 #pragma mark - SubscriptionSet
 
 @interface RLMSyncSubscriptionSet () {
-    std::unique_ptr<realm::sync::SubscriptionSet> _subscriptionSet;
     std::unique_ptr<realm::sync::MutableSubscriptionSet> _mutableSubscriptionSet;
     NSHashTable<RLMSyncSubscriptionEnumerator *> *_enumerators;
 }
@@ -244,37 +244,15 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
     [self update:block queue:nil onComplete:completionBlock];
 }
 
-// FIXME: Ultimately needs something cancellable from realm-core instead of sdk-level workaround.
 - (void)update:(__attribute__((noescape)) void(^)(void))block
          queue:(nullable dispatch_queue_t)queue
-       timeout:(NSTimeInterval)timeout
     onComplete:(void(^)(NSError *))completionBlock {
-    // Create an internal completion block that will only be called once
-    __block BOOL called = false;
-    void(^methodCompletion)(NSError *) = ^(NSError* _Nullable error) {
-        if (!called) {
-            called = true;
-            if (error != nil) {
-                completionBlock(error);
-            } else {
-                completionBlock(nil);
-            }
-        }
-    };
-
-    // Setup timer
-    dispatch_time_t time =  dispatch_time(DISPATCH_TIME_NOW, (int64_t)(timeout * NSEC_PER_SEC));
-    // If the call below doesn't return after `time` seconds, the internal completion is called with an error.
-    dispatch_after(time, dispatch_get_main_queue(), ^{
-        NSString* errorMessage = [NSString stringWithFormat:@"Waiting for update timed out after %.01f seconds.", timeout];
-        NSError* error = [NSError errorWithDomain:NSPOSIXErrorDomain code:ETIMEDOUT userInfo:@{NSLocalizedDescriptionKey: errorMessage}];
-        methodCompletion(error);
-    });
-    [self update:block queue:queue onComplete:methodCompletion];
+    [self update:block queue:queue timeout:0 onComplete:completionBlock];
 }
 
 - (void)update:(__attribute__((noescape)) void(^)(void))block
          queue:(nullable dispatch_queue_t)queue
+       timeout:(NSTimeInterval)timeout
     onComplete:(void(^)(NSError *))completionBlock {
     if (_mutableSubscriptionSet) {
         @throw RLMException(@"Cannot initiate a write transaction on subscription set that is already being updated.");
@@ -301,21 +279,21 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
     }
 
     if (completionBlock) {
-        [self waitForSynchronizationOnQueue:queue completionBlock:completionBlock];
+        [self waitForSynchronizationOnQueue:queue
+                                    timeout:timeout
+                            completionBlock:completionBlock];
     }
 }
 
 - (void)waitForSynchronizationOnQueue:(nullable dispatch_queue_t)queue
+                              timeout:(NSTimeInterval)timeout
                       completionBlock:(void(^)(NSError *))completionBlock {
-    _subscriptionSet->get_state_change_notification(realm::sync::SubscriptionSet::State::Complete)
-        .get_async([completionBlock, queue](realm::StatusWith<realm::sync::SubscriptionSet::State> state) noexcept {
-            if (queue) {
-                return dispatch_async(queue, ^{
-                    completionBlock(makeError(state));
-                });
-            }
-            return completionBlock(makeError(state));
-        });
+    RLMAsyncSubscriptionTask *syncSubscriptionTask = [[RLMAsyncSubscriptionTask alloc]
+                                                      initWithSubscriptionSet:self
+                                                      queue:queue
+                                                      timeout:timeout
+                                                      completion:completionBlock];
+    [syncSubscriptionTask waitForSubscription];
 }
 
 #pragma mark - Find subscription

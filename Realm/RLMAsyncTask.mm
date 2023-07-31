@@ -22,7 +22,7 @@
 #import "RLMRealm_Private.hpp"
 #import "RLMRealmConfiguration_Private.hpp"
 #import "RLMScheduler.h"
-#import "RLMSyncSubscription_Private.h"
+#import "RLMSyncSubscription_Private.hpp"
 #import "RLMUtil.hpp"
 
 #import <realm/exceptions.hpp>
@@ -245,6 +245,7 @@ __attribute__((objc_direct_members))
         if (subscriptions.state == RLMSyncSubscriptionStatePending) {
             // FIXME: need cancellation for waiting for the subscription
             return [subscriptions waitForSynchronizationOnQueue:nil
+                                                        timeout:0
                                                 completionBlock:^(NSError *error) {
                 if (error) {
                     std::lock_guard lock(_mutex);
@@ -472,5 +473,82 @@ __attribute__((objc_direct_members))
 
     // It has either been completed or cancelled, so call the callback immediately
     completion();
+}
+@end
+
+@implementation RLMAsyncSubscriptionTask {
+    RLMUnfairMutex _mutex;
+
+    RLMSyncSubscriptionSet *_subscriptionSet;
+    dispatch_queue_t _queue;
+    NSTimeInterval _timeout;
+    void (^_completion)(NSError *);
+
+    bool _called;
+    dispatch_block_t _worker;
+}
+
+- (instancetype)initWithSubscriptionSet:(RLMSyncSubscriptionSet *)subscriptionSet
+                                  queue:(nullable dispatch_queue_t)queue
+                                timeout:(NSTimeInterval)timeout
+                             completion:(void(^)(NSError *))completion {
+    if (!(self = [super init])) {
+        return self;
+    }
+
+    _subscriptionSet = subscriptionSet;
+    _queue = queue;
+    _timeout = timeout;
+    _completion = completion;
+
+    return self;
+}
+
+- (void)waitForSubscription {
+    std::lock_guard lock(_mutex);
+
+    if (_timeout != 0) {
+        // Setup timer
+        dispatch_time_t time = dispatch_time(DISPATCH_BLOCK_INHERIT_QOS_CLASS, (int64_t)(_timeout * NSEC_PER_SEC));
+        // If the call below doesn't return after `time` seconds, the internal completion is called with an error.
+        _worker = dispatch_block_create(DISPATCH_BLOCK_ASSIGN_CURRENT, ^{
+            NSString* errorMessage = [NSString stringWithFormat:@"Waiting for update timed out after %.01f seconds.", _timeout];
+            NSError* error = [NSError errorWithDomain:NSPOSIXErrorDomain code:ETIMEDOUT userInfo:@{NSLocalizedDescriptionKey: errorMessage}];
+            [self invokeCompletionWithError:error];
+            _worker = nil;
+        });
+
+        dispatch_after(time, dispatch_get_main_queue(), _worker);
+    }
+
+    [self waitForSync];
+}
+
+-(void)waitForSync {
+    if (_completion) {
+        _subscriptionSet->_subscriptionSet->get_state_change_notification(realm::sync::SubscriptionSet::State::Complete)
+            .get_async([self](realm::StatusWith<realm::sync::SubscriptionSet::State> state) noexcept {
+                NSError *error = makeError(state);
+                [self invokeCompletionWithError:error];
+            });
+    }
+}
+
+-(void)invokeCompletionWithError:(NSError * _Nullable)error {
+    if (_called) {
+        return;
+    }
+
+    _called = true;
+    if (_worker) {
+        dispatch_block_cancel(_worker);
+    }
+
+    if (_queue) {
+        return dispatch_async(_queue, ^{
+            _completion(error);
+        });
+    }
+    _completion(error);
 }
 @end

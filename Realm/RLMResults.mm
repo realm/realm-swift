@@ -639,9 +639,9 @@ keyPaths:(std::optional<std::vector<std::vector<std::pair<realm::TableKey, realm
             }];
             [self completeOnQueue:queue completion:completion error:nil];
             return true;
-        }
-    return false;
     }
+    return false;
+}
 
 - (void)subscribeWithName:(NSString *_Nullable)name
               waitForSync:(RLMWaitForSyncMode)waitForSyncMode
@@ -682,7 +682,6 @@ keyPaths:(std::optional<std::vector<std::vector<std::pair<realm::TableKey, realm
             [self completeOnQueue:queue completion:completion error:error];
         }];
     }
-
 }
 
 - (void)unsubscribe {
