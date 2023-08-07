@@ -1,30 +1,13 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* Redesign `@AsyncOpen` and `@AutoOpen` initialisers to allow setting a client reset modes for any sync configuration,
- and avoid confusion with the injected configuration and the sync configuration from the user on each intialiser.
+* Fix `@AsyncOpen` and `@AutoOpen` not using the syncConfiguration passed through 
+  the `configuration`, this is not allowing for the `initialSubscription` and 
+  `clientResetMode` to be passed in the initialiser or as an environment value.
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
 * None.
-
-### Breaking Changes
-* `AsyncOpen.init(appId:partitionValue:configuration:timeout)` and 
-  `AutoOpen.init(appId:partitionValue:configuration:timeout)` will change behavior. Previously 
-  injecting both the configuration and a partition value will make the property wrappers to set
-  the injected configuration (if not nil) combine with the syncConfiguration from the 
-  `user.configuration(partitionValue:)`. This will change to either user the injected configuration (if not nil) 
-  or the configuration obtained from `user.configuration(partitionValue:)` for the current logged user.
-  This API will be deprecated on the next major release.
-* `AsyncOpen.init(appId:configuration:timeout)` and `AutoOpen.init(appId:configuration:timeout)` 
-  will change behavior. Previously this initialiser will set the injected configuration (if present) 
-  combine with the flexible sync configuration `user.flexibleSyncConfiguration` from the logged user. 
-  This will change to use the injected configuration which should already include a sync configuration.
-* `AsyncOpen.init(appId:partitionValue:timeout)` and `AutoOpen.init(appId:partitionValue:timeout)` 
-  are two new initialisers which allow us to configure the property wrappers for a partition based sync 
-  configuration for the current logged user.
-* `AsyncOpen.init(appId:timeout)` and `AutoOpen.init(appId:timeout)` are two new initialisers which 
-  allow us to configure the property wrappers for a flexible sync configuration for the current logged user.
 
 ### Compatibility
 * Realm Studio: 14.0.1 or later.

@@ -348,7 +348,7 @@ class SwiftUIServerTests: SwiftSyncTestCase {
     func testAsyncOpenPBSWithConfiguration() throws {
         let user = try logInUser(for: basicCredentials())
         if !isParent {
-            populateRealm(user: user, partitionValue: #function)
+            try populateRealm(user: user, partitionValue: #function)
             return
         }
         executeChild()
@@ -809,7 +809,7 @@ class SwiftUIServerTests: SwiftSyncTestCase {
     func testAutoOpenPBSWithConfiguration() throws {
         let user = try logInUser(for: basicCredentials())
         if !isParent {
-            populateRealm(user: user, partitionValue: #function)
+            try populateRealm(user: user, partitionValue: #function)
             return
         }
         executeChild()
