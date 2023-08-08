@@ -1,4 +1,7 @@
-![Realm](https://github.com/realm/realm-swift/raw/master/logo.png)
+<picture>
+    <source srcset="./media/logo-dark.svg" media="(prefers-color-scheme: dark)" alt="realm by MongoDB">
+    <img src="./media/logo.svg" alt="realm by MongoDB">
+</picture>
 
 # About Realm Database
 
@@ -10,7 +13,7 @@ This repository holds the source code for the iOS, macOS, tvOS & watchOS version
 * **Intuitive to Developers:** Realm’s object-oriented data model is simple to learn, doesn’t need an ORM, and lets you write less code.
 * **Built for Mobile:** Realm is fully-featured, lightweight, and efficiently uses memory, disk space, and battery life.
 * **Designed for Offline Use:** Realm’s local database persists data on-disk, so apps work as well offline as they do online.
-* **[Device Sync](https://www.mongodb.com/atlas/app-services/device-sync)**: Makes it simple to keep data in sync across users, devices, and your backend in real-time. Get started for free with [a template application](https://github.com/mongodb/template-app-swiftui-todo) and [create the cloud backend](http://mongodb.com/realm/register?utm_medium=github_atlas_CTA&utm_source=realm_swift_github). 
+* **[MongoDB Atlas Device Sync](https://www.mongodb.com/atlas/app-services/device-sync)**: Makes it simple to keep data in sync across users, devices, and your backend in real-time. Get started for free with [a template application](https://github.com/mongodb/template-app-swiftui-todo) and [create the cloud backend](http://mongodb.com/realm/register?utm_medium=github_atlas_CTA&utm_source=realm_swift_github). 
 
 ## Object-Oriented: Streamline Your Code
 
