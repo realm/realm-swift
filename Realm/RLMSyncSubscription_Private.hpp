@@ -18,7 +18,7 @@
 
 #import "RLMSyncSubscription_Private.h"
 
-#import <string>
+#import <memory>
 
 namespace realm::sync {
 class Subscription;

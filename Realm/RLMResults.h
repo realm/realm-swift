@@ -480,10 +480,10 @@ __attribute__((warn_unused_result));
  This could create a performance bottleneck by opening multiple unnecessary write transactions.
  @see: `[RLMSyncSubscription update:queue:onComplete:]` in order to create multiple subscriptions.
 
- @param name The name used  to identify the subscription.
+ @param name The name used to identify the subscription.
  @param queue The queue where the completion dispatches.
  @param completion The block called after the subscription download is
- completed.The completion is called according to RLMWaitForSyncModeOnCreation behavior.
+ completed. The completion is called according to RLMWaitForSyncModeOnCreation behavior.
  @see ``RLMWaitForSyncModeOnCreation`` and ``RLMWaitForSyncMode``
  */
 - (void)subscribeWithName:(NSString *_Nullable)name

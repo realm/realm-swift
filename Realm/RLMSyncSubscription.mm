@@ -288,11 +288,10 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
 - (void)waitForSynchronizationOnQueue:(nullable dispatch_queue_t)queue
                               timeout:(NSTimeInterval)timeout
                       completionBlock:(void(^)(NSError *))completionBlock {
-    RLMAsyncSubscriptionTask *syncSubscriptionTask = [[RLMAsyncSubscriptionTask alloc]
-                                                      initWithSubscriptionSet:self
-                                                      queue:queue
-                                                      timeout:timeout
-                                                      completion:completionBlock];
+    RLMAsyncSubscriptionTask *syncSubscriptionTask = [[RLMAsyncSubscriptionTask alloc] initWithSubscriptionSet:self
+                                                                                                         queue:queue
+                                                                                                       timeout:timeout
+                                                                                                    completion:completionBlock];
     [syncSubscriptionTask waitForSubscription];
 }
 
@@ -420,9 +419,9 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
     auto query = RLMPredicateToQuery(predicate, info.rlmObjectSchema, _realm.schema, _realm.group);
 
     [self addSubscriptionWithClassName:objectClassName
-                              subscriptionName:name
-                                         query:query
-                                updateExisting:updateExisting];
+                      subscriptionName:name
+                                 query:query
+                        updateExisting:updateExisting];
 }
 
 - (RLMObjectId *)addSubscriptionWithClassName:(NSString *)objectClassName

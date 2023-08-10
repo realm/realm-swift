@@ -509,16 +509,15 @@ __attribute__((objc_direct_members))
 
     if (_timeout != 0) {
         // Setup timer
-        dispatch_time_t time = dispatch_time(DISPATCH_BLOCK_INHERIT_QOS_CLASS, (int64_t)(_timeout * NSEC_PER_SEC));
+        dispatch_time_t time = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(_timeout * NSEC_PER_SEC));
         // If the call below doesn't return after `time` seconds, the internal completion is called with an error.
         _worker = dispatch_block_create(DISPATCH_BLOCK_ASSIGN_CURRENT, ^{
             NSString* errorMessage = [NSString stringWithFormat:@"Waiting for update timed out after %.01f seconds.", _timeout];
             NSError* error = [NSError errorWithDomain:NSPOSIXErrorDomain code:ETIMEDOUT userInfo:@{NSLocalizedDescriptionKey: errorMessage}];
             [self invokeCompletionWithError:error];
-            _worker = nil;
         });
 
-        dispatch_after(time, dispatch_get_main_queue(), _worker);
+        dispatch_after(time, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), _worker);
     }
 
     [self waitForSync];
@@ -535,13 +534,16 @@ __attribute__((objc_direct_members))
 }
 
 -(void)invokeCompletionWithError:(NSError * _Nullable)error {
+    std::lock_guard lock(_mutex);
+
     if (_called) {
         return;
     }
-
     _called = true;
+
     if (_worker) {
         dispatch_block_cancel(_worker);
+        _worker = nil;
     }
 
     if (_queue) {

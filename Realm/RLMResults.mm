@@ -657,7 +657,7 @@ keyPaths:(std::optional<std::vector<std::vector<std::pair<realm::TableKey, realm
                                                                        subscriptionName:name
                                                                                   query:_results.get_query()
                                                                          updateExisting:true];
-        } queue: queue onComplete:^(NSError *error) {
+        } queue:queue onComplete:^(NSError *error) {
             [self completeOnQueue:queue completion:completion error:error];
         }];
     }

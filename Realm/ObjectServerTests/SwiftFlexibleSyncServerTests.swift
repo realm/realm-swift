@@ -1663,22 +1663,20 @@ XCTAssertNotNil(realm.subscriptions.first(ofType: SwiftPerson.self) { $0.age > 5
         XCTAssertEqual(realm.subscriptions.state, .complete)
     }
 
-    // fails in teardown "Assertion failed: no_sessions"
-    // can't tell which?
-    func skip_testSubscribeTimeoutSucceeds() async throws {
+    func testSubscribeTimeoutSucceeds() async throws {
         try await populateSwiftPerson()
 
         let realm = try openFlexibleSyncRealm()
-        let results0 = try await realm.objects(SwiftPerson.self).where { $0.age >= 6 }.subscribe(timeout: 2)
+        let results0 = try await realm.objects(SwiftPerson.self).where { $0.age >= 6 }.subscribe(timeout: 2.0)
         XCTAssertEqual(results0.count, 5)
         XCTAssertEqual(realm.subscriptions.count, 1)
-        let results1 = try await realm.objects(SwiftPerson.self).where { $0.lastName == "lastname_3" }.subscribe(timeout: 2)
+        let results1 = try await realm.objects(SwiftPerson.self).where { $0.lastName == "lastname_3" }.subscribe(timeout: 2.0)
         XCTAssertEqual(results1.count, 1)
         XCTAssertEqual(results0.count, 5)
         XCTAssertEqual(realm.subscriptions.count, 2)
+
         let results2 = realm.objects(SwiftPerson.self)
         XCTAssertEqual(results2.count, 6)
-//        waitForDownloads(for: realm)
     }
 #endif
 
