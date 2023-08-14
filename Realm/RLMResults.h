@@ -524,7 +524,8 @@ __attribute__((warn_unused_result));
 - (void)subscribeWithName:(NSString *_Nullable)name
               waitForSync:(RLMWaitForSyncMode)waitForSyncMode
                   onQueue:(dispatch_queue_t _Nullable)queue
-               completion:(RLMResultsCompletionBlock)completion NS_REFINED_FOR_SWIFT;
+               completion:(RLMResultsCompletionBlock)completion NS_REFINED_FOR_SWIFT
+__attribute__((swift_attr("@_unsafeInheritExecutor")));
 
 /**
  Creates an RLMSyncSubscription matching the RLMResults' local filter.
@@ -565,7 +566,8 @@ __attribute__((warn_unused_result));
               waitForSync:(RLMWaitForSyncMode)waitForSyncMode
                   onQueue:(dispatch_queue_t _Nullable)queue
                   timeout:(NSTimeInterval)timeout
-               completion:(RLMResultsCompletionBlock)completion NS_REFINED_FOR_SWIFT;
+               completion:(RLMResultsCompletionBlock)completion NS_REFINED_FOR_SWIFT
+__attribute__((swift_attr("@_unsafeInheritExecutor")));
 
 /**
  Removes an RLMSubscription matching the RLMResults' local filter.

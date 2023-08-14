@@ -180,15 +180,15 @@ extension Projection: KeypathSortable {}
      - returns: A `Results` object.
      */
     @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-    @_unsafeInheritExecutor
+    @MainActor
     public func subscribe(name: String? = nil, waitForSync: WaitForSyncMode = .onCreation, timeout: TimeInterval? = nil) async throws -> Results<Element> {
         var rlmResults = ObjectiveCSupport.convert(object: self)
         guard let timeout = timeout else {
-            rlmResults = try await rlmResults.__subscribe(withName: name, waitForSync: waitForSync, on: nil)
+            rlmResults = try await rlmResults.__subscribe(withName: name, waitForSync: waitForSync, on: .main)
             return Results(rlmResults)
         }
-        rlmResults = try await rlmResults.__subscribe(withName: name, waitForSync: waitForSync, on: nil, timeout: timeout)
-        return self
+        rlmResults = try await rlmResults.__subscribe(withName: name, waitForSync: waitForSync, on: .main, timeout: timeout)
+        return Results(rlmResults)
     }
 #endif
     /**
