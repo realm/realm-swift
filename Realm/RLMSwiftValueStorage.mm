@@ -72,7 +72,7 @@ public:
     : _realm(obj->_realm)
     , _object(obj->_realm->_realm, *obj->_info->objectSchema, obj->_row)
     , _columnName(prop.columnName.UTF8String)
-    , _ctx(*obj->_info)
+    , _ctx(obj, obj->_info->objectSchema->property_for_name(prop.columnName.UTF8String))
     {
     }
 

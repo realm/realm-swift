@@ -84,6 +84,8 @@ typedef RLM_CLOSED_ENUM(int32_t, RLMPropertyType) {
     RLMPropertyTypeAny    = 9,
     /** Dates: `NSDate` */
     RLMPropertyTypeDate   = 4,
+    RLMPropertyTypeObjectId = 10,
+    RLMPropertyTypeDecimal128 = 11,
 
 #pragma mark - Linked object types
 
@@ -92,8 +94,12 @@ typedef RLM_CLOSED_ENUM(int32_t, RLMPropertyType) {
     /** Realm linking objects. See [Realm Models](https://www.mongodb.com/docs/realm/sdk/swift/fundamentals/relationships/#inverse-relationship) for more information. */
     RLMPropertyTypeLinkingObjects = 8,
 
-    RLMPropertyTypeObjectId = 10,
-    RLMPropertyTypeDecimal128 = 11
+#pragma mark - Collection types
+
+    /** Dictionary: `RLMDictionary`, `Map` (Swift) */
+    RLMPropertyTypeDictionary = 512,
+    /** Set: `RLMArray`, `List` (Swift) */
+    RLMPropertyTypeList = 128
 };
 
 #pragma mark - Notification Constants

@@ -3805,9 +3805,9 @@ static NSData *data(const char *str) {
 - (void)testDictionarySubscriptThrowsException {
     RLMRealm *realm = [self realm];
     RLMAssertThrowsWithReason(([realm objects:@"ArrayPropertyObject" where:@"array['invalid'] = NULL"]),
-                              @"Invalid keypath 'array[\"invalid\"]': only dictionaries support subscript predicates.");
+                              @"Invalid keypath 'array[\"invalid\"]': only dictionaries and mixed support subscript predicates.");
     RLMAssertThrowsWithReason(([realm objects:@"SetPropertyObject" where:@"set['invalid'] = NULL"]),
-                              @"Invalid keypath 'set[\"invalid\"]': only dictionaries support subscript predicates.");
+                              @"Invalid keypath 'set[\"invalid\"]': only dictionaries and mixed support subscript predicates.");
     RLMAssertThrowsWithReason(([realm objects:@"OwnerObject" where:@"dog['dogName'] = NULL"]),
                               @"Aggregate operations can only be used on key paths that include an collection property");
 }

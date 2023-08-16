@@ -758,6 +758,8 @@ public final class DynamicObject: Object {
             return array.isOptional ? List<ObjectId?>(collection: array) : List<ObjectId>(collection: array)
         case .object:
             return List<DynamicObject>(collection: array)
+        default:
+            fatalError()
         }
     }
 
@@ -789,6 +791,8 @@ public final class DynamicObject: Object {
             return set.isOptional ? MutableSet<ObjectId?>(collection: set) : MutableSet<ObjectId>(collection: set)
         case .object:
             return MutableSet<DynamicObject>(collection: set)
+        default:
+            fatalError()
         }
     }
 
@@ -820,6 +824,8 @@ public final class DynamicObject: Object {
             return dictionary.isOptional ? Map<String, ObjectId?>(objc: dictionary) : Map<String, ObjectId>(objc: dictionary)
         case .object:
             return Map<String, DynamicObject?>(objc: dictionary)
+        default:
+            fatalError()
         }
     }
 }

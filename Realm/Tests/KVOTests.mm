@@ -506,14 +506,14 @@ public:
     XCTAssertNoThrow([obj addObserver:self forKeyPath:@"int32Col" options:0 context:context1]);
     XCTAssertThrows([obj removeObserver:self forKeyPath:@"int32Col" context:context2]);
     XCTAssertNoThrow([obj removeObserver:self forKeyPath:@"int32Col" context:context1]);
-
+    
     XCTAssertNoThrow([obj addObserver:self forKeyPath:@"int32Col" options:0 context:context2]);
     XCTAssertNoThrow([obj removeObserver:self forKeyPath:@"int32Col" context:context2]);
 
     XCTAssertNoThrow([obj addObserver:self forKeyPath:@"int32Col" options:0 context:context2]);
     XCTAssertNoThrow([obj removeObserver:self forKeyPath:@"int32Col"]);
     XCTAssertThrows([obj removeObserver:self forKeyPath:@"int32Col"]);
-
+    
     XCTAssertNoThrow([obj addObserver:self forKeyPath:@"int32Col" options:0 context:context1]);
     XCTAssertNoThrow([obj addObserver:self forKeyPath:@"int32Col" options:0 context:context2]);
     XCTAssertNoThrow([obj removeObserver:self forKeyPath:@"int32Col" context:context1]);
@@ -1706,6 +1706,64 @@ public:
     id mutator = [obj mutableArrayValueForKey:@"objectArray"];
     [mutator addObject:obj];
     AssertChanged(r, @0, @1);
+}
+
+- (void)testMixedCollectionKVC {
+    KVOObject *obj = [self createObject];
+    NSDictionary *d = @{ @"key2" : @"hello2",
+                          @"key3" : @YES,
+                          @"key4" : @123,
+                          @"key5" : @456.789 };
+
+    NSArray *a = @[ @"hello2", @YES, @123, @456.789 ];
+
+    {
+        KVORecorder r(self, obj, @"anyCol");
+        obj.anyCol = d;
+        AssertCollectionChanged();
+    }
+
+    {
+        KVORecorder r(self, obj, @"anyCol");
+        [obj setValue:d forKey:@"anyCol"];
+        AssertCollectionChanged();
+        [obj setValue:nil forKey:@"anyCol"];
+        AssertCollectionChanged();
+    }
+
+    {
+        KVORecorder r(self, obj, @"anyCol");
+        obj.anyCol = a;
+        AssertCollectionChanged();
+    }
+
+    {
+        KVORecorder r(self, obj, @"anyCol");
+        [obj setValue:a forKey:@"anyCol"];
+        AssertCollectionChanged();
+        [obj setValue:nil forKey:@"anyCol"];
+        AssertCollectionChanged();
+    }
+
+    if (![obj respondsToSelector:@selector(setObject:forKeyedSubscript:)]) {
+        return;
+    }
+
+    {
+        KVORecorder r(self, obj, @"anyCol");
+        obj[@"anyCol"] = d;
+        AssertCollectionChanged();
+        obj[@"anyCol"] = nil;
+        AssertCollectionChanged();
+    }
+
+    {
+        KVORecorder r(self, obj, @"anyCol");
+        obj[@"anyCol"] = a;
+        AssertCollectionChanged();
+        obj[@"anyCol"] = nil;
+        AssertCollectionChanged();
+    }
 }
 @end
 

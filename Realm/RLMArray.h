@@ -17,9 +17,11 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Realm/RLMCollection.h>
+#import <Realm/RLMValue.h>
 
 RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
+@protocol RLMValue;
 @class RLMObject, RLMResults<RLMObjectType>;
 
 /**
@@ -55,7 +57,7 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
  object. Instead, you can call the mutation methods on the `RLMArray` directly.
  */
 
-@interface RLMArray<RLMObjectType> : NSObject<RLMCollection>
+@interface RLMArray<RLMObjectType> : NSObject<RLMCollection, RLMValue>
 
 #pragma mark - Properties
 

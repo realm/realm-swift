@@ -289,6 +289,23 @@ extension Query where T == Bool {
     }
 }
 
+// MARK: Mixed
+
+extension Query where T == AnyRealmValue {
+    /// :nodoc:
+    public subscript(position: Int) -> Query<AnyRealmValue> {
+        .init(appendKeyPath("[\(position)]", options: [.isPath]))
+    }
+    /// :nodoc:
+    public subscript(key: String) -> Query<AnyRealmValue> {
+        .init(appendKeyPath("['\(key)']", options: [.isPath]))
+    }
+    /// Query all indexes or keys in a mixed nested collecttion.
+    public var all: Query<AnyRealmValue> {
+        .init(appendKeyPath("['all']", options: [.isPath]))
+    }
+}
+
 // MARK: OptionalProtocol
 
 extension Query where T: OptionalProtocol {
@@ -971,7 +988,12 @@ private func buildPredicate(_ root: QueryNode, subqueryCount: Int = 0) -> (Strin
             if options.contains(.requiresAny) {
                 formatStr.append("ANY ")
             }
-            formatStr.append(kp.joined(separator: "."))
+
+            if options.contains(.isPath) {
+                formatStr.append(kp.joined())
+            } else {
+                formatStr.append(kp.joined(separator: "."))
+            }
         case .not(let child):
             if case .keyPath = child,
                isNewNode {
@@ -1017,6 +1039,7 @@ private struct KeyPathOptions: OptionSet {
 
     static let isCollection = KeyPathOptions(rawValue: 1)
     static let requiresAny = KeyPathOptions(rawValue: 2)
+    static let isPath = KeyPathOptions(rawValue: 4)
 }
 
 private struct SubqueryRewriter {

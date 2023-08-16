@@ -1445,6 +1445,8 @@ class ObjectCreationTests: TestCase {
         case .any:      return ["hello"]
         case .linkingObjects: fatalError("not supported")
         case .UUID: return [UUID(uuidString: "137decc8-b300-4954-a233-f89909f4fd89")!, UUID(uuidString: "00000000-0000-0000-0000-000000000000")!]
+        default:
+            fatalError()
         }
     }
 
@@ -1475,6 +1477,8 @@ class ObjectCreationTests: TestCase {
         case .any: return [List<String>()]
         case .linkingObjects: fatalError("not supported")
         case .UUID: return ["invalid"]
+        default:
+            fatalError()
         }
     }
 }

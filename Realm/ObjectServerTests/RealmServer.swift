@@ -80,6 +80,8 @@ private func bsonType(_ type: PropertyType) -> String {
     case .objectId: return "objectId"
     case .string: return "string"
     case .linkingObjects: return "linkingObjects"
+    default: // Types must be added when tested for sync
+        fatalError()
     }
 }
 

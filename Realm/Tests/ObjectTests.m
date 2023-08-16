@@ -785,7 +785,7 @@ static void addProperty(Class cls, const char *name, const char *type, size_t si
         }
 
         if ([keyToInvalidate isEqualToString:@"anyCol"]) {
-            obj = self;
+            continue;
         }
 
         invalidInput[keyToInvalidate] = obj;

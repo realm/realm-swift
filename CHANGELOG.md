@@ -85,6 +85,37 @@ store. Xcode 15.1 is now the minimum supported version.
 * The `transferredBytes` and `transferrableBytes` fields on `Progress` have been deprecated
   in favor of `progressEstimate` which is a value between 0.0 and 1.0 indicating the estimated
   progress toward the upload/download transfer. ([#8476](https://github.com/realm/realm-swift/issues/8476))
+  UUID/ObjectId types. ([.Net * #3566](https://github.com/realm/realm-dotnet/issues/3566))
+* Added `SyncConfiguration.initialSubscriptions` which describes the initial subscription configuration that was passed when constructing the `SyncConfiguration`. ([#8548](https://github.com/realm/realm-swift/issues/8548))
+* Added support for storing nested collections (List and Map not ManagedSet) in a `AnyRealmValue`.
+  ```swift
+  class MixedObject: Object {
+    @Persisted var anyValue: AnyRealmValue
+  }
+
+  // You can build a AnyRealmValue from a Swift's Dictionary.
+  let dictionary: Dictionary<String, AnyRealmValue> = ["key1": .string("hello"), "key2": .bool(false)]
+
+  // You can build a AnyRealmValue from a Swift's Map
+  // and nest a collection within another collection.
+  let list: Array<AnyRealmValue> = [.int(12), .double(14.17), AnyRealmValue.fromDictionary(dictionary)]
+
+  let realm = realmWithTestPath()
+  try realm.write {
+    let obj = MixedObject()
+    obj.anyValue = AnyRealmValue.fromArray(list)
+    realm.add(o)
+  }
+  ```
+* Added new operators to Swift's Query API for supporting querying nested collections.
+  ```swift
+  realm.objects(MixedObject.self).where { $0.anyValue[0][0][1] == .double(76.54) }
+  ```
+  
+  The `.all` operator allows looking up in all keys or indexes.
+  ```swift
+  realm.objects(MixedObject.self).where { $0.anyValue["key"].all == .bool(false) }
+  ```
 
 ### Fixed
 * `-[RLMUser allSessions]` did not include sessions which were currently

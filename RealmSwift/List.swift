@@ -361,6 +361,14 @@ extension List: MutableCollection {
     }
 }
 
+// MARK: - Hashable
+
+extension List: Hashable {
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(rlmArray)
+    }
+}
+
 // MARK: - Codable
 
 extension List: Decodable where Element: Decodable {

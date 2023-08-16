@@ -19,6 +19,12 @@
 #import "RLMTestCase.h"
 #import <Realm/RLMValue.h>
 
+@interface NotRealmObject : NSObject
+@end
+
+@implementation NotRealmObject
+@end
+
 @interface RLMValueTests : RLMTestCase
 @end
 
@@ -64,6 +70,16 @@
 - (void)testDecimal128Type {
     id<RLMValue> v = [RLMDecimal128 decimalWithNumber:@123.456];
     XCTAssertEqual(v.rlm_valueType, RLMPropertyTypeDecimal128);
+}
+
+- (void)testDictionaryType {
+    NSDictionary *dictionary = @{ @"key1" : @"hello" };
+    XCTAssertEqual(dictionary.rlm_valueType, RLMPropertyTypeDictionary);
+}
+
+- (void)testArrayType {
+    NSArray *array = @[ @"hello", @123456 ];
+    XCTAssertEqual(array.rlm_valueType, RLMPropertyTypeList);
 }
 
 #pragma mark - Comparison
@@ -144,6 +160,44 @@
     XCTAssertNotEqual(v1, [RLMDecimal128 decimalWithNumber:@456.123]);
 }
 
+- (void)testDictionaryAnyEquals {
+    NSDictionary *dictionary = @{ @"key2" : @"hello2",
+                                  @"key3" : @YES,
+                                  @"key4" : @123,
+                                  @"key5" : @456.789,
+                                  @"key6" : [NSData dataWithBytes:"hey" length:3],
+                                  @"key7" : [NSDate date],
+                                  @"key8" : [[MixedObject alloc] init],
+                                  @"key9" : [RLMObjectId objectId],
+                                  @"key10" : [RLMDecimal128 decimalWithNumber:@123.456] };
+    id<RLMValue> v1 = dictionary;
+    id<RLMValue> v2 = dictionary;
+    XCTAssertEqual(v1, dictionary);
+    XCTAssertEqual(v2, dictionary);
+    XCTAssertEqual(v1.rlm_valueType, RLMPropertyTypeDictionary);
+    XCTAssertEqual(v2.rlm_valueType, RLMPropertyTypeDictionary);
+    XCTAssertEqual(v1, v2);
+}
+
+- (void)testArrayAnyEquals {
+    NSArray *array = @[ @"hello2",
+                        @YES,
+                        @123,
+                        @456.789,
+                        [NSData dataWithBytes:"hey" length:3],
+                        [NSDate date],
+                        [[MixedObject alloc] init],
+                        [RLMObjectId objectId],
+                        [RLMDecimal128 decimalWithNumber:@123.456] ];
+    id<RLMValue> v1 = array;
+    id<RLMValue> v2 = array;
+    XCTAssertEqual(v1, array);
+    XCTAssertEqual(v2, array);
+    XCTAssertEqual(v1.rlm_valueType, RLMPropertyTypeList);
+    XCTAssertEqual(v2.rlm_valueType, RLMPropertyTypeList);
+    XCTAssertEqual(v1, v2);
+}
+
 #pragma mark - Managed Values
 
 - (void)testCreateManagedObjectManagedChild {
@@ -169,12 +223,64 @@
     XCTAssertTrue([((StringObject *)mo1.anyCol).stringCol isEqualToString:so.stringCol]);
     XCTAssertEqual(mo1.anyCol.rlm_valueType, RLMPropertyTypeObject);
     XCTAssertTrue([((StringObject *)mo1.anyArray.firstObject).stringCol isEqualToString:so.stringCol]);
+    XCTAssertEqual([StringObject allObjectsInRealm:r].count, 1U);
 }
+
+- (void)testCreateManagedObjectInAnyDictionary {
+    StringObject *so = [[StringObject alloc] init];
+    so.stringCol = @"hello";
+    
+    RLMRealm *r = [self realmWithTestPath];
+    [r beginWriteTransaction];
+    [r addObject:so];
+    
+    NSDictionary *dictionary = @{ @"key1" : so };
+    MixedObject *mo0 = [MixedObject createInRealm:r withValue:@[dictionary, @[dictionary]]];
+    
+    MixedObject *mo1 = [[MixedObject alloc] init];
+    mo1.anyCol = dictionary;
+    [mo1.anyArray addObject:dictionary];
+    [r commitWriteTransaction];
+    
+    XCTAssertNotNil(mo0.anyCol);
+    XCTAssertTrue([((StringObject *)((NSDictionary *)mo0.anyCol)[@"key1"]).stringCol isEqualToString:so.stringCol]);
+    XCTAssertTrue([((StringObject *)((NSDictionary *)mo0.anyArray.firstObject)[@"key1"]).stringCol isEqualToString:so.stringCol]);
+    
+    XCTAssertNotNil(mo1.anyCol);
+    XCTAssertTrue([((StringObject *)((NSDictionary *)mo1.anyCol)[@"key1"]).stringCol isEqualToString:so.stringCol]);
+    XCTAssertTrue([((StringObject *)((NSDictionary *)mo1.anyArray[0])[@"key1"]).stringCol isEqualToString:so.stringCol]);
+}
+
+- (void)testCreateManagedObjectInAnyArray {
+    StringObject *so = [[StringObject alloc] init];
+    so.stringCol = @"hello";
+    
+    RLMRealm *r = [self realmWithTestPath];
+    [r beginWriteTransaction];
+    [r addObject:so];
+    
+    NSArray *array = @[so];
+    MixedObject *mo0 = [MixedObject createInRealm:r withValue:@[array, @[array]]];
+    
+    MixedObject *mo1 = [[MixedObject alloc] init];
+    mo1.anyCol = array;
+    [mo1.anyArray addObject:array];
+    [r commitWriteTransaction];
+    
+    XCTAssertNotNil(mo0.anyCol);
+    XCTAssertTrue([((StringObject *)((NSArray *)mo0.anyCol)[0]).stringCol isEqualToString:so.stringCol]);
+    XCTAssertTrue([((StringObject *)((NSArray *)mo0.anyArray.firstObject)[0]).stringCol isEqualToString:so.stringCol]);
+    
+    XCTAssertNotNil(mo1.anyCol);
+    XCTAssertTrue([((StringObject *)((NSArray *)mo1.anyCol)[0]).stringCol isEqualToString:so.stringCol]);
+    XCTAssertTrue([((StringObject *)((NSArray *)mo1.anyArray[0])[0]).stringCol isEqualToString:so.stringCol]);
+}
+
 
 - (void)testCreateManagedObjectUnmanagedChild {
     StringObject *so = [[StringObject alloc] init];
     so.stringCol = @"hello";
-
+    
     StringObject *so1 = [[StringObject alloc] init];
     so1.stringCol = @"hello2";
     
@@ -200,6 +306,68 @@
     XCTAssertTrue([((StringObject *)mo1.anyCol).stringCol isEqualToString:so1.stringCol]);
     XCTAssertEqual(mo1.anyCol.rlm_valueType, RLMPropertyTypeObject);
     XCTAssertTrue([((StringObject *)mo1.anyArray[0]).stringCol isEqualToString:so.stringCol]);
+}
+
+- (void)testCreateManagedObjectUnmanagedChildInAnyDictionary {
+    StringObject *so = [[StringObject alloc] init];
+    so.stringCol = @"hello";
+    
+    StringObject *so1 = [[StringObject alloc] init];
+    so1.stringCol = @"hello2";
+    
+    RLMRealm *r = [self realmWithTestPath];
+    [r beginWriteTransaction];
+    
+    NSDictionary *dictionary = @{ @"key1" : so };
+    MixedObject *mo0 = [MixedObject createInRealm:r withValue:@[dictionary, @[dictionary]]];
+    
+    MixedObject *mo1 = [[MixedObject alloc] init];
+    [mo1.anyArray addObject:dictionary];
+    [r addObject:mo1];
+    [r commitWriteTransaction];
+    
+    XCTAssertThrows(mo1.anyCol = so1);
+    [r beginWriteTransaction];
+    mo1.anyCol = @{ @"key2" : so1 };
+    
+    XCTAssertNotNil(mo0.anyCol);
+    XCTAssertTrue([((StringObject *)((NSDictionary *)mo0.anyCol)[@"key1"]).stringCol isEqualToString:so.stringCol]);
+    XCTAssertTrue([((StringObject *)((NSDictionary *)mo0.anyArray.firstObject)[@"key1"]).stringCol isEqualToString:so.stringCol]);
+    
+    XCTAssertNotNil(mo1.anyCol);
+    XCTAssertTrue([((StringObject *)((NSDictionary *)mo1.anyCol)[@"key2"]).stringCol isEqualToString:so1.stringCol]);
+    XCTAssertTrue([((StringObject *)((NSDictionary *)mo1.anyArray[0])[@"key1"]).stringCol isEqualToString:so.stringCol]);
+}
+
+- (void)testCreateManagedObjectUnmanagedChildInAnyArray {
+    StringObject *so = [[StringObject alloc] init];
+    so.stringCol = @"hello";
+    
+    StringObject *so1 = [[StringObject alloc] init];
+    so1.stringCol = @"hello2";
+    
+    RLMRealm *r = [self realmWithTestPath];
+    [r beginWriteTransaction];
+    
+    NSArray *array = @[so];
+    MixedObject *mo0 = [MixedObject createInRealm:r withValue:@[array, @[array]]];
+    
+    MixedObject *mo1 = [[MixedObject alloc] init];
+    [mo1.anyArray addObject:array];
+    [r addObject:mo1];
+    [r commitWriteTransaction];
+    
+    XCTAssertThrows(mo1.anyCol = so1);
+    [r beginWriteTransaction];
+    mo1.anyCol = @[so1];
+    
+    XCTAssertNotNil(mo0.anyCol);
+    XCTAssertTrue([((StringObject *)((NSArray *)mo0.anyCol)[0]).stringCol isEqualToString:so.stringCol]);
+    XCTAssertTrue([((StringObject *)((NSArray *)mo0.anyArray.firstObject)[0]).stringCol isEqualToString:so.stringCol]);
+    
+    XCTAssertNotNil(mo1.anyCol);
+    XCTAssertTrue([((StringObject *)((NSArray *)mo1.anyCol)[0]).stringCol isEqualToString:so1.stringCol]);
+    XCTAssertTrue([((StringObject *)((NSArray *)mo1.anyArray[0])[0]).stringCol isEqualToString:so.stringCol]);
 }
 
 // difference between adding object and not!
@@ -319,6 +487,102 @@
     XCTAssertTrue([(RLMDecimal128 *)mo.anyArray[0] isEqual:d1]);
     XCTAssertTrue([(RLMDecimal128 *)mo.anyArray[1] isEqual:d2]);
     XCTAssertEqual(mo.anyCol.rlm_valueType, RLMPropertyTypeDecimal128);
+}
+
+- (void)testCreateManagedDictionary {
+    RLMRealm *r = [self realmWithTestPath];
+    StringObject *so = [[StringObject alloc] init];
+    so.stringCol = @"hello";
+    RLMObjectId *oid = [RLMObjectId objectId];
+    NSDate *d = [NSDate date];
+    NSDictionary *d1 = @{ @"key2" : @"hello2",
+                          @"key3" : @YES,
+                          @"key4" : @123,
+                          @"key5" : @456.789,
+                          @"key6" : [NSData dataWithBytes:"hey" length:3],
+                          @"key7" : d,
+                          @"key8" : so,
+                          @"key9" : oid,
+                          @"key10" : [RLMDecimal128 decimalWithNumber:@123.456] };
+    NSDictionary *d2 = @{ @"key1" : @"hello" };
+    [r beginWriteTransaction];
+    [MixedObject createInRealm:r withValue:@[d1, @[d1, d2]]];
+    [r commitWriteTransaction];
+    
+    XCTAssertEqual([MixedObject allObjectsInRealm:r].count, 1U);
+    MixedObject *result = [[MixedObject allObjectsInRealm:r] firstObject];
+    RLMDictionary *dictionary = (RLMDictionary *)result.anyCol;
+    XCTAssertTrue([dictionary[@"key2"] isEqual:@"hello2"]);
+    XCTAssertTrue([dictionary[@"key3"] isEqual:@YES]);
+    XCTAssertTrue([dictionary[@"key4"] isEqual:@123]);
+    XCTAssertTrue([dictionary[@"key5"] isEqual:@456.789]);
+    XCTAssertTrue([[[NSString alloc] initWithData:(NSData *)dictionary[@"key6"] encoding:NSUTF8StringEncoding] isEqual:@"hey"]);
+    XCTAssertEqualWithAccuracy(((NSDate *)dictionary[@"key7"]).timeIntervalSince1970, d.timeIntervalSince1970, 1.0);
+    XCTAssertTrue([((StringObject *)dictionary[@"key8"]).stringCol isEqual:@"hello"]);
+    XCTAssertTrue([((RLMObjectId *)dictionary[@"key9"]) isEqual:oid]);
+    XCTAssertTrue([dictionary[@"key10"] isEqual:[RLMDecimal128 decimalWithNumber:@123.456]]);
+    
+    RLMDictionary *dictionary1 = (RLMDictionary *)result.anyArray.firstObject;
+    XCTAssertTrue([dictionary1[@"key2"] isEqual:@"hello2"]);
+    XCTAssertTrue([dictionary1[@"key3"] isEqual:@YES]);
+    XCTAssertTrue([dictionary1[@"key4"] isEqual:@123]);
+    XCTAssertTrue([dictionary1[@"key5"] isEqual:@456.789]);
+    XCTAssertTrue([[[NSString alloc] initWithData:(NSData *)dictionary1[@"key6"] encoding:NSUTF8StringEncoding] isEqual:@"hey"]);
+    XCTAssertEqualWithAccuracy(((NSDate *)dictionary1[@"key7"]).timeIntervalSince1970, d.timeIntervalSince1970, 1.0);
+    XCTAssertTrue([((StringObject *)dictionary1[@"key8"]).stringCol isEqual:@"hello"]);
+    XCTAssertTrue([((RLMObjectId *)dictionary1[@"key9"]) isEqual:oid]);
+    XCTAssertTrue([dictionary1[@"key10"] isEqual:[RLMDecimal128 decimalWithNumber:@123.456]]);
+    
+    RLMDictionary *dictionary2 = (RLMDictionary *)result.anyArray.lastObject;
+    XCTAssertTrue([dictionary2[@"key1"] isEqual:@"hello"]);
+}
+
+- (void)testCreateManagedArray {
+    RLMRealm *r = [self realmWithTestPath];
+    StringObject *so = [[StringObject alloc] init];
+    so.stringCol = @"hello";
+    RLMObjectId *oid = [RLMObjectId objectId];
+    NSDate *d = [NSDate date];
+    NSArray *d1 = @[ @"hello2",
+                     @YES,
+                     @123,
+                     @456.789,
+                     [NSData dataWithBytes:"hey" length:3],
+                     d,
+                     so,
+                     oid,
+                     [RLMDecimal128 decimalWithNumber:@123.456] ];
+    NSArray *d2 = @[@"hello"];
+    [r beginWriteTransaction];
+    [MixedObject createInRealm:r withValue:@[d1, @[d1, d2]]];
+    [r commitWriteTransaction];
+    
+    XCTAssertEqual([MixedObject allObjectsInRealm:r].count, 1U);
+    MixedObject *result = [[MixedObject allObjectsInRealm:r] firstObject];
+    RLMArray *array = ((RLMArray *)result.anyCol);
+    XCTAssertTrue([array[0] isEqual:@"hello2"]);
+    XCTAssertTrue([array[1] isEqual:@YES]);
+    XCTAssertTrue([array[2] isEqual:@123]);
+    XCTAssertTrue([array[3] isEqual:@456.789]);
+    XCTAssertTrue([[[NSString alloc] initWithData:(NSData *)array[4] encoding:NSUTF8StringEncoding] isEqual:@"hey"]);
+    XCTAssertEqualWithAccuracy(((NSDate *)array[5]).timeIntervalSince1970, d.timeIntervalSince1970, 1.0);
+    XCTAssertTrue([((StringObject *)array[6]).stringCol isEqual:@"hello"]);
+    XCTAssertTrue([((RLMObjectId *)array[7]) isEqual:oid]);
+    XCTAssertTrue([array[8] isEqual:[RLMDecimal128 decimalWithNumber:@123.456]]);
+    
+    RLMArray *array1 = (RLMArray *)result.anyArray.firstObject;
+    XCTAssertTrue([array1[0] isEqual:@"hello2"]);
+    XCTAssertTrue([array1[1] isEqual:@YES]);
+    XCTAssertTrue([array1[2] isEqual:@123]);
+    XCTAssertTrue([array1[3] isEqual:@456.789]);
+    XCTAssertTrue([[[NSString alloc] initWithData:(NSData *)array1[4] encoding:NSUTF8StringEncoding] isEqual:@"hey"]);
+    XCTAssertEqualWithAccuracy(((NSDate *)array1[5]).timeIntervalSince1970, d.timeIntervalSince1970, 1.0);
+    XCTAssertTrue([((StringObject *)array1[6]).stringCol isEqual:@"hello"]);
+    XCTAssertTrue([((RLMObjectId *)array1[7]) isEqual:oid]);
+    XCTAssertTrue([array1[8] isEqual:[RLMDecimal128 decimalWithNumber:@123.456]]);
+    
+    RLMArray *array2 = (RLMArray *)result.anyArray.lastObject;
+    XCTAssertTrue([array2[0] isEqual:@"hello"]);
 }
 
 #pragma mark - Add Managed Values
@@ -463,6 +727,196 @@
     XCTAssertEqual(mo.anyCol.rlm_valueType, RLMPropertyTypeDecimal128);
 }
 
+- (void)testAddManagedDictionary {
+    StringObject *so = [[StringObject alloc] init];
+    so.stringCol = @"hello";
+    RLMObjectId *oid = [RLMObjectId objectId];
+    NSDate *d = [NSDate date];
+    NSDictionary *d1 = @{ @"key2" : @"hello2",
+                          @"key3" : @YES,
+                          @"key4" : @123,
+                          @"key5" : @456.789,
+                          @"key6" : [NSData dataWithBytes:"hey" length:3],
+                          @"key7" : d,
+                          @"key8" : so,
+                          @"key9" : oid,
+                          @"key10" : [RLMDecimal128 decimalWithNumber:@123.456] };
+    NSDictionary *d2 = @{ @"key1" : @"hello" };
+    MixedObject *mo = [[MixedObject alloc] init];
+    mo.anyCol = d1;
+    [mo.anyArray addObjects:@[d1, d2]];
+    
+    RLMRealm *r = [self realmWithTestPath];
+    [r beginWriteTransaction];
+    [r addObject:mo];
+    [r commitWriteTransaction];
+    
+    XCTAssertEqual([MixedObject allObjectsInRealm:r].count, 1U);
+    MixedObject *result = [[MixedObject allObjectsInRealm:r] firstObject];
+    RLMDictionary *dictionary = (RLMDictionary *)result.anyCol;
+    XCTAssertTrue([dictionary[@"key2"] isEqual:@"hello2"]);
+    XCTAssertTrue([dictionary[@"key3"] isEqual:@YES]);
+    XCTAssertTrue([dictionary[@"key4"] isEqual:@123]);
+    XCTAssertTrue([dictionary[@"key5"] isEqual:@456.789]);
+    XCTAssertTrue([[[NSString alloc] initWithData:(NSData *)dictionary[@"key6"] encoding:NSUTF8StringEncoding] isEqual:@"hey"]);
+    XCTAssertEqualWithAccuracy(((NSDate *)dictionary[@"key7"]).timeIntervalSince1970, d.timeIntervalSince1970, 1.0);
+    XCTAssertTrue([((StringObject *)dictionary[@"key8"]).stringCol isEqual:@"hello"]);
+    XCTAssertTrue([((RLMObjectId *)dictionary[@"key9"]) isEqual:oid]);
+    XCTAssertTrue([dictionary[@"key10"] isEqual:[RLMDecimal128 decimalWithNumber:@123.456]]);
+    
+    RLMDictionary *dictionary1 = (RLMDictionary *)result.anyArray.firstObject;
+    XCTAssertTrue([dictionary1[@"key2"] isEqual:@"hello2"]);
+    XCTAssertTrue([dictionary1[@"key3"] isEqual:@YES]);
+    XCTAssertTrue([dictionary1[@"key4"] isEqual:@123]);
+    XCTAssertTrue([dictionary1[@"key5"] isEqual:@456.789]);
+    XCTAssertTrue([[[NSString alloc] initWithData:(NSData *)dictionary1[@"key6"] encoding:NSUTF8StringEncoding] isEqual:@"hey"]);
+    XCTAssertEqualWithAccuracy(((NSDate *)dictionary1[@"key7"]).timeIntervalSince1970, d.timeIntervalSince1970, 1.0);
+    XCTAssertTrue([((StringObject *)dictionary1[@"key8"]).stringCol isEqual:@"hello"]);
+    XCTAssertTrue([((RLMObjectId *)dictionary1[@"key9"]) isEqual:oid]);
+    XCTAssertTrue([dictionary1[@"key10"] isEqual:[RLMDecimal128 decimalWithNumber:@123.456]]);
+    
+    RLMDictionary *dictionary2 = (RLMDictionary *)result.anyArray.lastObject;
+    XCTAssertTrue([dictionary2[@"key1"] isEqual:@"hello"]);
+}
+
+- (void)testAddManagedArray {
+    RLMRealm *r = [self realmWithTestPath];
+    StringObject *so = [[StringObject alloc] init];
+    so.stringCol = @"hello";
+    RLMObjectId *oid = [RLMObjectId objectId];
+    NSDate *d = [NSDate date];
+    NSArray *d1 = @[ @"hello2",
+                     @YES,
+                     @123,
+                     @456.789,
+                     [NSData dataWithBytes:"hey" length:3],
+                     d,
+                     so,
+                     oid,
+                     [RLMDecimal128 decimalWithNumber:@123.456] ];
+    NSArray *d2 = @[@"hello"];
+    MixedObject *mo = [[MixedObject alloc] init];
+    mo.anyCol = d1;
+    [mo.anyArray addObjects:@[d1, d2]];
+    
+    [r beginWriteTransaction];
+    [r addObject:mo];
+    [r commitWriteTransaction];
+    
+    XCTAssertEqual([MixedObject allObjectsInRealm:r].count, 1U);
+    MixedObject *result = [[MixedObject allObjectsInRealm:r] firstObject];
+    RLMArray *array = ((RLMArray *)result.anyCol);
+    XCTAssertTrue([array[0] isEqual:@"hello2"]);
+    XCTAssertTrue([array[1] isEqual:@YES]);
+    XCTAssertTrue([array[2] isEqual:@123]);
+    XCTAssertTrue([array[3] isEqual:@456.789]);
+    XCTAssertTrue([[[NSString alloc] initWithData:(NSData *)array[4] encoding:NSUTF8StringEncoding] isEqual:@"hey"]);
+    XCTAssertEqualWithAccuracy(((NSDate *)array[5]).timeIntervalSince1970, d.timeIntervalSince1970, 1.0);
+    XCTAssertTrue([((StringObject *)array[6]).stringCol isEqual:@"hello"]);
+    XCTAssertTrue([((RLMObjectId *)array[7]) isEqual:oid]);
+    XCTAssertTrue([array[8] isEqual:[RLMDecimal128 decimalWithNumber:@123.456]]);
+    
+    RLMArray *array1 = (RLMArray *)result.anyArray.firstObject;
+    XCTAssertTrue([array1[0] isEqual:@"hello2"]);
+    XCTAssertTrue([array1[1] isEqual:@YES]);
+    XCTAssertTrue([array1[2] isEqual:@123]);
+    XCTAssertTrue([array1[3] isEqual:@456.789]);
+    XCTAssertTrue([[[NSString alloc] initWithData:(NSData *)array1[4] encoding:NSUTF8StringEncoding] isEqual:@"hey"]);
+    XCTAssertEqualWithAccuracy(((NSDate *)array1[5]).timeIntervalSince1970, d.timeIntervalSince1970, 1.0);
+    XCTAssertTrue([((StringObject *)array1[6]).stringCol isEqual:@"hello"]);
+    XCTAssertTrue([((RLMObjectId *)array1[7]) isEqual:oid]);
+    XCTAssertTrue([array1[8] isEqual:[RLMDecimal128 decimalWithNumber:@123.456]]);
+    
+    RLMArray *array2 = (RLMArray *)result.anyArray.lastObject;
+    XCTAssertTrue([array2[0] isEqual:@"hello"]);
+}
+
+- (void)testDeleteAndUpdateValuesInManagedDictionary {
+    RLMRealm *r = [self realmWithTestPath];
+    StringObject *so = [[StringObject alloc] init];
+    so.stringCol = @"hello";
+    NSDictionary *d1 = @{ @"key2" : @"hello2",
+                          @"key3" : @YES};
+    NSDictionary *d2 = @{ @"key1" : @"hello" };
+    MixedObject *mo = [[MixedObject alloc] init];
+    mo.anyCol = d1;
+    [mo.anyArray addObjects:@[d1, d2]];
+    
+    [r beginWriteTransaction];
+    [r addObject:mo];
+    [r commitWriteTransaction];
+    
+    RLMDictionary *dictionary = (RLMDictionary *)mo.anyCol;
+    XCTAssertTrue([dictionary[@"key2"] isEqual:@"hello2"]);
+    XCTAssertTrue([dictionary[@"key3"] isEqual:@YES]);
+    
+    RLMDictionary *dictionary2 = (RLMDictionary *)mo.anyArray.lastObject;
+    XCTAssertTrue([dictionary2[@"key1"] isEqual:@"hello"]);
+    
+    [r beginWriteTransaction];
+    dictionary[@"key2"] = @1234;
+    dictionary2[@"key1"] = @123.456;
+    [r commitWriteTransaction];
+    
+    XCTAssertTrue([dictionary[@"key2"] isEqual:@1234]);
+    XCTAssertTrue([dictionary2[@"key1"] isEqual:@123.456]);
+    
+    [r beginWriteTransaction];
+    [dictionary removeObjectForKey:@"key3"];
+    [dictionary2 removeObjectForKey:@"key1"];
+    [r commitWriteTransaction];
+    
+    XCTAssertNil(dictionary[@"key3"]);
+    XCTAssertNil(dictionary2[@"key1"]);
+}
+
+- (void)testDeleteAndUpdateValuesInArray {
+    RLMRealm *r = [self realmWithTestPath];
+    StringObject *so = [[StringObject alloc] init];
+    so.stringCol = @"hello";
+    RLMObjectId *oid = [RLMObjectId objectId];
+    NSDate *d = [NSDate date];
+    NSArray *d1 = @[ @"hello2",
+                     @YES];
+    NSArray *d2 = @[@"hello"];
+    MixedObject *mo = [[MixedObject alloc] init];
+    mo.anyCol = d1;
+    [mo.anyArray addObjects:@[d1, d2]];
+    
+    [r beginWriteTransaction];
+    [r addObject:mo];
+    [r commitWriteTransaction];
+    
+    XCTAssertEqual([MixedObject allObjectsInRealm:r].count, 1U);
+    MixedObject *result = [[MixedObject allObjectsInRealm:r] firstObject];
+    RLMArray *array = (RLMArray *)result.anyCol;
+    XCTAssertTrue([array[0] isEqual:@"hello2"]);
+    XCTAssertTrue([array[1] isEqual:@YES]);
+    XCTAssertEqual(array.count, 2U);
+    
+    RLMArray *array2 = (RLMArray *)mo.anyArray.lastObject;
+    XCTAssertTrue([array2[0] isEqual:@"hello"]);
+    
+    [r beginWriteTransaction];
+    array[0] = @1234;
+    array2[0] = @123.456;
+    [r commitWriteTransaction];
+    
+    XCTAssertTrue([array[0] isEqual:@1234]);
+    XCTAssertTrue([array2[0] isEqual:@123.456]);
+    XCTAssertEqual(array.count, 2U);
+    XCTAssertEqual(array2.count, 1U);
+    
+    [r beginWriteTransaction];
+    [array removeObjectAtIndex:0];
+    [array2 removeObjectAtIndex:0];
+    [r commitWriteTransaction];
+    
+    XCTAssertFalse([array[0] isEqual:@1234]);
+    XCTAssertEqual(array.count, 1U);
+    XCTAssertEqual(array2.count, 0U);
+}
+
 #pragma mark - Dynamic Object Accessor
 
 - (void)testDynamicObjectAccessor {
@@ -520,5 +974,4 @@
     [self waitForExpectations:@[ex] timeout:1.0];
     (void)[[MixedObject allObjectsInRealm:realm2].firstObject anyCol];
 }
-
 @end

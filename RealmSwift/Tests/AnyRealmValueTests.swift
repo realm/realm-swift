@@ -641,6 +641,10 @@ class AnyRealmValueMutableSetTests<O: ObjectFactory, V: AnyValueFactory>: AnyRea
             XCTAssertEqual(kvc as! String, s)
         case let .uuid(u):
             XCTAssertEqual(kvc as! UUID, u)
+        case let .dictionary(d):
+            XCTAssertEqual(kvc as! Map<String, AnyRealmValue>, d)
+        case let .list(l):
+            XCTAssertEqual(kvc as! List<AnyRealmValue>, l)
         }
 
         assertThrows(mutableSet.value(forKey: "not self"), named: "NSUnknownKeyException")
@@ -937,6 +941,10 @@ class AnyRealmValueMapTests<O: ObjectFactory, V: AnyValueFactory>: AnyRealmValue
             XCTAssertEqual(kvc as! String, s)
         case let .uuid(u):
             XCTAssertEqual(kvc as! UUID, u)
+        case let .dictionary(d):
+            XCTAssertEqual(kvc as! Map<String, AnyRealmValue>, d)
+        case let .list(l):
+            XCTAssertEqual(kvc as! List<AnyRealmValue>, l)
         }
     }
 

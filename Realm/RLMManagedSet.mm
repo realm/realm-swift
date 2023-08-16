@@ -74,11 +74,11 @@
         REALM_ASSERT(set.get_realm() == _realm->_realm);
         _backingSet = std::move(set);
         _ownerInfo = parentInfo;
+        _property = property;
         if (property.type == RLMPropertyTypeObject)
             _objectInfo = &parentInfo->linkTargetType(property.index);
         else
             _objectInfo = _ownerInfo;
-        _key = property.name;
     }
     return self;
 }
@@ -138,7 +138,7 @@ static void changeSet(__unsafe_unretained RLMManagedSet *const set,
                                          set->_backingSet.get_parent_object_key(),
                                          *set->_ownerInfo);
     if (obsInfo) {
-        tracker.willChange(obsInfo, set->_key);
+        tracker.willChange(obsInfo, set->_property.name);
     }
 
     translateErrors(f);
@@ -482,7 +482,9 @@ static void ensureInWriteTransaction(NSString *message, RLMManagedSet *set, RLMM
     return translateErrors([&] {
         return [[RLMFastEnumerator alloc] initWithBackingCollection:_backingSet
                                                          collection:self
-                                                          classInfo:*_objectInfo];
+                                                          classInfo:*_objectInfo
+                                                         parentInfo:*_ownerInfo
+                                                           property:_property];
     });
 }
 
@@ -499,7 +501,7 @@ static void ensureInWriteTransaction(NSString *message, RLMManagedSet *set, RLMM
     return translateErrors([&] {
         return [[self.class alloc] initWithBackingCollection:_backingSet.freeze(realm->_realm)
                                                   parentInfo:&parentInfo
-                                                    property:parentInfo.rlmObjectSchema[_key]];
+                                                    property:parentInfo.rlmObjectSchema[_property.name]];
     });
 }
 
@@ -531,7 +533,7 @@ keyPaths:(std::optional<std::vector<std::vector<std::pair<realm::TableKey, realm
 - (RLMManagedSetHandoverMetadata *)objectiveCMetadata {
     RLMManagedSetHandoverMetadata *metadata = [[RLMManagedSetHandoverMetadata alloc] init];
     metadata.parentClassName = _ownerInfo->rlmObjectSchema.className;
-    metadata.key = _key;
+    metadata.key = _property.name;
     return metadata;
 }
 

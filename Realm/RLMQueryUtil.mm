@@ -30,6 +30,7 @@
 #import <realm/geospatial.hpp>
 #import <realm/object-store/object_store.hpp>
 #import <realm/object-store/results.hpp>
+#import <realm/path.hpp>
 #import <realm/query_engine.hpp>
 #import <realm/query_expression.hpp>
 #import <realm/util/cf_ptr.hpp>
@@ -1131,6 +1132,9 @@ void QueryBuilder::do_add_constraint(RLMPropertyType type, NSPredicateOperatorTy
                                      column.resolve<W<Mixed>>(),
                                      value);
             });
+        case RLMPropertyTypeDictionary:
+        case RLMPropertyTypeList:
+            break;
     }
 }
 
@@ -1328,7 +1332,7 @@ KeyPath key_path_from_string(RLMSchema *schema, RLMObjectSchema *objectSchema, N
 
 ColumnReference QueryBuilder::column_reference_from_key_path(KeyPath&& kp, bool isAggregate)
 {
-    if (isAggregate && !kp.containsToManyRelationship) {
+    if (isAggregate && !kp.containsToManyRelationship && kp.property.type != RLMPropertyTypeAny) {
         throwException(@"Invalid predicate",
                        @"Aggregate operations can only be used on key paths that include an collection property");
     } else if (!isAggregate && kp.containsToManyRelationship) {
@@ -1500,6 +1504,9 @@ void QueryBuilder::add_collection_operation_constraint(NSPredicateOperatorType o
                 case RLMPropertyTypeObject:
                 case RLMPropertyTypeLinkingObjects:
                     return add_numeric_constraint(type, operatorType, column.resolve<Link>().count(), rhsValue);
+                case RLMPropertyTypeDictionary:
+                case RLMPropertyTypeList:
+                    break;
             }
         }
         case CollectionOperation::Minimum:
@@ -1684,23 +1691,27 @@ NSExpression *simplify_self_value_for_key_path_function_expression(NSExpression 
 void QueryBuilder::apply_map_expression(RLMObjectSchema *objectSchema, NSExpression *functionExpression,
                                         NSComparisonPredicateOptions options, NSPredicateOperatorType operatorType,
                                         NSExpression *right) {
-    NSString *keyPath;
-    NSString *mapKey;
-    if (functionExpression.operand.expressionType == NSKeyPathExpressionType) {
-        NSExpression *mapItems = [functionExpression.arguments firstObject];
-        NSExpression *linkCol = [[functionExpression.operand arguments] firstObject];
-        NSExpression *mapCol = [mapItems.arguments firstObject];
-        mapKey = [mapItems.arguments[1] constantValue];
-        keyPath = [NSString stringWithFormat:@"%@.%@", linkCol.keyPath, mapCol.keyPath];
-    } else {
-        keyPath = [functionExpression.arguments.firstObject keyPath];
-        mapKey = [functionExpression.arguments[1] constantValue];
-    }
+    std::vector<PathElement> pathElements;
+    RLMGetPathElements(pathElements, functionExpression);
 
+    NSString *keyPath;
+    NSExpression *keyPathExpression = functionExpression;
+    for (int i = 0; i < pathElements.size(); i++) {
+        if (keyPathExpression.arguments[0].expressionType == NSKeyPathExpressionType) {
+            keyPath = [NSString stringWithFormat:@"%@", keyPathExpression.arguments[0]];
+        } else {
+            keyPathExpression = keyPathExpression.arguments[0];
+        }
+    }
     ColumnReference collectionColumn = column_reference_from_key_path(key_path_from_string(m_schema, objectSchema, keyPath), true);
-    RLMPrecondition(collectionColumn.property().dictionary, @"Invalid predicate",
-                    @"Invalid keypath '%@': only dictionaries support subscript predicates.", functionExpression);
-    add_mixed_constraint(operatorType, options, std::move(collectionColumn.resolve<Dictionary>().key(mapKey.UTF8String)), right.constantValue);
+
+    if (collectionColumn.property().type == RLMPropertyTypeAny && !collectionColumn.property().dictionary) {
+        add_mixed_constraint(operatorType, options, std::move(collectionColumn.resolve<realm::Mixed>().path(pathElements)), right.constantValue);
+    } else {
+        RLMPrecondition(collectionColumn.property().dictionary, @"Invalid predicate",
+                        @"Invalid keypath '%@': only dictionaries and mixed support subscript predicates.", functionExpression);
+        add_mixed_constraint(operatorType, options, std::move(collectionColumn.resolve<Dictionary>().key(pathElements[0].get_key())), right.constantValue);
+    }
 }
 
 void QueryBuilder::apply_function_expression(RLMObjectSchema *objectSchema, NSExpression *functionExpression,
@@ -1880,4 +1891,31 @@ RLMProperty *RLMValidatedProperty(RLMObjectSchema *desc, NSString *columnName) {
     RLMPrecondition(prop, @"Invalid property name",
                     @"Property '%@' not found in object of type '%@'", columnName, desc.className);
     return prop;
+}
+
+void RLMGetPathElements(std::vector<PathElement> &paths, NSExpression *expression) {
+    for (int i = 0; i < 2; i++) {
+        if ((expression.arguments.count > 1) && (expression.arguments[i].expressionType == NSFunctionExpressionType)) {
+            RLMGetPathElements(paths, expression.arguments[0]);
+        } else {
+            if (expression.arguments[i].expressionType == NSConstantValueExpressionType) {
+                id value = [expression.arguments[i] constantValue];
+                if ([value isKindOfClass:[NSNumber class]]) {
+                    NSNumber *index = (NSNumber *)value;
+                    if (index) {
+                        paths.push_back(PathElement{[index intValue]});
+                    }
+                } else if ([value isKindOfClass:[NSString class]]) {
+                    NSString *key = (NSString *)value;
+                    if ([key isEqual:@"all"]) {
+                        paths.push_back(PathElement{});
+                        break;
+                    }
+                    if (key) {
+                        paths.push_back(PathElement{key.UTF8String});
+                    }
+                }
+            }
+        }
+    }
 }

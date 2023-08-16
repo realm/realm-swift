@@ -155,7 +155,7 @@ let package = Package(
             targets: ["RealmSwift"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/realm/realm-core.git", exact: coreVersion)
+        .package(url: "https://github.com/realm/realm-core.git", branch:"je/nested-collection-accessor")
     ],
     targets: [
       .target(

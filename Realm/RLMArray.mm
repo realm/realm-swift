@@ -69,7 +69,7 @@
 
 - (void)setParent:(RLMObjectBase *)parentObject property:(RLMProperty *)property {
     _parentObject = parentObject;
-    _key = property.name;
+    _property = property;
     _isLegacyProperty = property.isLegacy;
 }
 
@@ -192,9 +192,9 @@ static void changeArray(__unsafe_unretained RLMArray *const ar,
 
     if (RLMObjectBase *parent = ar->_parentObject) {
         NSIndexSet *indexes = is();
-        [parent willChange:kind valuesAtIndexes:indexes forKey:ar->_key];
+        [parent willChange:kind valuesAtIndexes:indexes forKey:ar->_property.name];
         f();
-        [parent didChange:kind valuesAtIndexes:indexes forKey:ar->_key];
+        [parent didChange:kind valuesAtIndexes:indexes forKey:ar->_property.name];
     }
     else {
         f();
@@ -608,7 +608,7 @@ static void validateArrayBounds(__unsafe_unretained RLMArray *const ar,
 #pragma mark - Key Path Strings
 
 - (NSString *)propertyKey {
-    return _key;
+    return _property.name;
 }
 
 @end

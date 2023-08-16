@@ -122,3 +122,39 @@
 }
 
 @end
+
+#pragma mark Dictionary
+
+@implementation NSDictionary (RLMValue)
+
+- (RLMPropertyType)rlm_valueType {
+    return RLMPropertyTypeDictionary;
+}
+
+@end
+
+@implementation RLMDictionary (RLMValue)
+
+- (RLMPropertyType)rlm_valueType {
+    return RLMPropertyTypeDictionary;
+}
+
+@end
+
+#pragma mark Array
+
+@implementation NSArray (RLMValue)
+
+- (RLMPropertyType)rlm_valueType {
+    return RLMPropertyTypeList;
+}
+
+@end
+
+@implementation RLMArray (RLMValue)
+
+- (RLMPropertyType)rlm_valueType {
+    return RLMPropertyTypeList;
+}
+
+@end

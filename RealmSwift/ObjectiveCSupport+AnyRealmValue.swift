@@ -50,6 +50,10 @@ public extension ObjectiveCSupport {
             return u as NSUUID
         case let .object(o):
             return o
+        case let .dictionary(d):
+            return d._rlmObjcValue as? RLMDictionary<AnyObject, AnyObject>
+        case let .list(l):
+            return l._rlmObjcValue as? RLMArray<AnyObject>
         default:
             return nil
         }
@@ -120,6 +124,17 @@ public extension ObjectiveCSupport {
                 return .none
             }
             return .object(val)
+        case RLMPropertyType.dictionary:
+            guard let val = value as? RLMDictionary<AnyObject, AnyObject> else {
+                return .none
+            }
+            let d = Map<String, AnyRealmValue>(objc: val)
+            return AnyRealmValue.dictionary(d)
+        case RLMPropertyType.list:
+            guard let val = value as? RLMArray<RLMValue> else {
+                return .none
+            }
+            return AnyRealmValue.list(List<AnyRealmValue>(collection: val))
         default:
             return .none
         }

@@ -39,7 +39,7 @@ class RLMObservationInfo;
     BOOL _optional;
 @public
     // The name of the property which this RLMArray represents
-    NSString *_key;
+    RLMProperty *_property;
     __weak RLMObjectBase *_parentObject;
 }
 @end
