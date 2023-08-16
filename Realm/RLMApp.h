@@ -35,6 +35,10 @@ typedef void(^RLMOptionalErrorBlock)(NSError * _Nullable);
 
 /// Properties representing the configuration of a client
 /// that communicate with a particular Realm application.
+///
+/// `RLMAppConfiguration` options cannot be modified once the `RLMApp` using it
+/// is created. App's configuration values are cached when the App is created so any modifications after it
+/// will not have any effect.
 @interface RLMAppConfiguration : NSObject <NSCopying>
 
 /// A custom base URL to request against.

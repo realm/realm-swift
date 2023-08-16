@@ -26,6 +26,10 @@ import Realm.Private
 An object representing the Realm App configuration
 
 - see: `RLMAppConfiguration`
+
+- note: `AppConfiguration` options cannot be modified once the `App` using it
+         is created. App's configuration values are cached when the App is created so any modifications after it
+         will not have any effect.
 */
 public typealias AppConfiguration = RLMAppConfiguration
 public extension AppConfiguration {
