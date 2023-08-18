@@ -453,8 +453,8 @@ __attribute__((warn_unused_result));
  @see ``RLMWaitForSyncModeOnCreation`` and ``RLMWaitForSyncMode``
  @param queue The queue where the completion disptaches.
  */
-- (void)subscribeWithCompletion:(RLMResultsCompletionBlock)completion
-                        onQueue:(dispatch_queue_t _Nullable)queue NS_REFINED_FOR_SWIFT;
+- (void)subscribeWithCompletionOnQueue:(dispatch_queue_t _Nullable)queue
+                       completionBlock:(RLMResultsCompletionBlock)completion NS_REFINED_FOR_SWIFT;
 
 /**
  Creates an RLMSyncSubscription matching the RLMResults' local filter.

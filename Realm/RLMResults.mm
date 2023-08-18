@@ -571,10 +571,10 @@ keyPaths:(std::optional<std::vector<std::vector<std::pair<realm::TableKey, realm
     return _results.add_notification_callback(RLMWrapCollectionChangeCallback(block, self, true), std::move(keyPaths));
 }
 
-- (void)completeOnThreadSafeReference:(RLMThreadSafeReference * _Nullable)reference
-                                queue:(dispatch_queue_t _Nullable)queue
-                           completion:(RLMResultsCompletionBlock)completion
-                                error:(NSError *_Nullable)error {
+- (void)completionWithThreadSafeReference:(RLMThreadSafeReference * _Nullable)reference
+                                    queue:(dispatch_queue_t _Nullable)queue
+                               completion:(RLMResultsCompletionBlock)completion
+                                    error:(NSError *_Nullable)error {
     auto tsr = (error != nil) ? nil : reference;
     RLMRealmConfiguration *configuration = _realm.configuration;
     if (queue) {
@@ -597,8 +597,8 @@ keyPaths:(std::optional<std::vector<std::vector<std::pair<realm::TableKey, realm
     }
 }
 
-- (void)subscribeWithCompletion:(RLMResultsCompletionBlock)completion
-                        onQueue:(dispatch_queue_t _Nullable)queue {
+- (void)subscribeWithCompletionOnQueue:(dispatch_queue_t _Nullable)queue
+                       completionBlock:(RLMResultsCompletionBlock)completion {
     return [self subscribeWithName:nil onQueue:queue completion:completion];
 };
 
@@ -621,14 +621,14 @@ keyPaths:(std::optional<std::vector<std::vector<std::pair<realm::TableKey, realm
             if (name) {
                 RLMSyncSubscription *sub = [subscriptions subscriptionWithName:name query:_results.get_query()];
                 if (sub != nil) {
-                    [self completeOnThreadSafeReference:[RLMThreadSafeReference referenceWithThreadConfined:self] queue:queue completion:completion error:nil];
+                    [self completionWithThreadSafeReference:[RLMThreadSafeReference referenceWithThreadConfined:self] queue:queue completion:completion error:nil];
                     return true;
                 }
             } else {
                 // otherwise check if an unnamed subscription already exists. Return if it does exist.
                 RLMSyncSubscription *sub = [subscriptions subscriptionWithQuery:_results.get_query()];
                 if (sub != nil && sub.name == nil) {
-                    [self completeOnThreadSafeReference:[RLMThreadSafeReference referenceWithThreadConfined:self] queue:queue completion:completion error:nil];
+                    [self completionWithThreadSafeReference:[RLMThreadSafeReference referenceWithThreadConfined:self] queue:queue completion:completion error:nil];
                     return true;
                 }
             }
@@ -646,7 +646,7 @@ keyPaths:(std::optional<std::vector<std::vector<std::pair<realm::TableKey, realm
                                                                                       query:_results.get_query()
                                                                              updateExisting:true];
             }];
-            [self completeOnThreadSafeReference:[RLMThreadSafeReference referenceWithThreadConfined:self] queue:queue completion:completion error:nil];
+            [self completionWithThreadSafeReference:[RLMThreadSafeReference referenceWithThreadConfined:self] queue:queue completion:completion error:nil];
             return true;
     }
     return false;
@@ -664,20 +664,19 @@ keyPaths:(std::optional<std::vector<std::vector<std::pair<realm::TableKey, realm
                   onQueue:(dispatch_queue_t _Nullable)queue
                   timeout:(NSTimeInterval)timeout
                completion:(RLMResultsCompletionBlock)completion {
-
     if ([self checkEarlyReturnSubscribeWithSyncMode:waitForSyncMode name:name onQueue:queue completion:completion]) {
         return;
     } else {
         RLMThreadSafeReference *reference = [RLMThreadSafeReference referenceWithThreadConfined:self];
         RLMSyncSubscriptionSet *subscriptions = self.realm.subscriptions;
-        [subscriptions update: ^{
+        [subscriptions update:^{
             // associated subscription id is nil when no name is provided.
             self.associatedSubscriptionId = [subscriptions addSubscriptionWithClassName:self.objectClassName
                                                                        subscriptionName:name
                                                                                   query:_results.get_query()
                                                                          updateExisting:true];
         } queue:nil timeout:timeout onComplete:^(NSError *error) {
-            [self completeOnThreadSafeReference:reference queue:queue completion:completion error:error];
+            [self completionWithThreadSafeReference:reference queue:queue completion:completion error:error];
         }];
     }
 }
