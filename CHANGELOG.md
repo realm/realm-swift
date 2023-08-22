@@ -5,7 +5,9 @@ x.y.z Release notes (yyyy-MM-dd)
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
-* None.
+* The names of the prebuilt zips for SPM have changed to avoid having Carthage
+  download them instead of the intended Carthage zip
+  ([#8326](https://github.com/realm/realm-swift/issues/8326), since v10.42.0).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 

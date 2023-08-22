@@ -39,12 +39,12 @@ Dir.mktmpdir do |tmp|
            "realm-swift-#{VERSION}/*/RealmSwift.xcframework/*",
            "realm-swift-#{VERSION}/Realm.xcframework/*"
     Dir.chdir "realm-swift-#{VERSION}" do
-      zip 'Realm.xcframework.zip', 'Realm.xcframework'
+      zip 'Realm.spm.zip', 'Realm.xcframework'
       Dir.glob '*/RealmSwift.xcframework' do |name|
         version = Pathname(name).parent
         puts "Creating SPM package for #{version}"
         Dir.chdir version do
-          zip "RealmSwift@#{version}.xcframework.zip", 'RealmSwift.xcframework'
+          zip "RealmSwift@#{version}.spm.zip", 'RealmSwift.xcframework'
         end
       end
 
