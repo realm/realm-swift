@@ -1048,60 +1048,11 @@ case "$COMMAND" in
         ;;
 
     "package-release")
-        tempdir="$(mktemp -d "$TMPDIR/realm-release-package.XXXX")"
-        extract_dir="$(mktemp -d "$TMPDIR/realm-release-package.XXXX")"
         version="$(sed -n 's/^VERSION=\(.*\)$/\1/p' "${source_root}/dependencies.list")"
-        package_dir="${tempdir}/realm-swift-${version}"
-
-        mkdir -p "${package_dir}"
-
-        xcode_versions=$(find . -name 'realm-*-1*.zip' -maxdepth 1 | sed 's@./realm-[a-z]*-\(.*\).zip@\1@' | sort -u --version-sort)
-        for xcode_version in $xcode_versions; do
-            rm -rf "${extract_dir}"
-            mkdir -p "${extract_dir}"
-            for platform in osx ios watchos tvos catalyst; do
-                unzip "realm-$platform-$xcode_version.zip" -d "${extract_dir}/${platform}"
-            done
-            if (( "${xcode_version%%.*}" >= 15 )); then
-                unzip "realm-visionos-$xcode_version.zip" -d "${extract_dir}/visionos"
-            fi
-
-            find "${extract_dir}" -name 'RealmSwift.framework' -path "*/Release/*" \
-                | sed 's/.*/-framework &/' \
-                | xargs xcodebuild -create-xcframework -allow-internal-distribution -output "${package_dir}/${xcode_version}/RealmSwift.xcframework"
-        done
-        find "${extract_dir}" -name 'Realm.framework' -path "*/Release/*" \
-            | sed 's/.*/-framework &/' \
-            | xargs xcodebuild -create-xcframework -allow-internal-distribution -output "${package_dir}/Realm.xcframework"
-        find "${extract_dir}" -name 'Realm.framework' -path "*/Static/*" \
-            | sed 's/.*/-framework &/' \
-            | xargs xcodebuild -create-xcframework -allow-internal-distribution -output "${package_dir}/static/Realm.xcframework"
-
-        cp "${WORKSPACE}/LICENSE" "${package_dir}"
-
-        (
-            cd "${package_dir}"
-            unzip "${WORKSPACE}/realm-examples.zip"
-        )
-
-        for lang in objc swift; do
-            cat > "${package_dir}/${lang}-docs.webloc" <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-    <key>URL</key>
-    <string>https://www.mongodb.com/docs/realm-sdks/${lang}/${version}</string>
-</dict>
-</plist>
-EOF
-        done
-
-        (
-          cd "${tempdir}"
-          zip --symlinks -r "realm-swift-${version}.zip" "realm-swift-${version}"
-          mv "realm-swift-${version}.zip" "${WORKSPACE}"
-        )
+        find . -name 'realm-*-1*.zip' -maxdepth 1 \
+            | sed 's@./realm-[a-z]*-\(.*\).zip@\1@' \
+            | sort -u --version-sort \
+            | xargs ./scripts/create-release-package.rb "${WORKSPACE}/pkg" "${version}"
         ;;
 
     "test-package-release")
@@ -1163,7 +1114,7 @@ EOF
 
     "publish-github")
         VERSION="$(sed -n 's/^VERSION=\(.*\)$/\1/p' "${source_root}/dependencies.list")"
-        ./scripts/github_release.rb "$VERSION" "$REALM_XCODE_VERSION"
+        ./scripts/github_release.rb "$VERSION"
         ;;
 
     "publish-docs")
