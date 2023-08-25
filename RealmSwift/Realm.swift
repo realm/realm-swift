@@ -1494,7 +1494,7 @@ internal extension Actor {
     }
 
     // A helper to invoke a regular isolated sendable function with this actor
-    func invoke<T>(_ fn: @Sendable (isolated Self) async throws -> T) async rethrows -> T {
+    func invoke<T: Sendable>(_ fn: @Sendable (isolated Self) async throws -> T) async rethrows -> T {
         try await fn(self)
     }
 }

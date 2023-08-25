@@ -8,6 +8,10 @@ x.y.z Release notes (yyyy-MM-dd)
 * The names of the prebuilt zips for SPM have changed to avoid having Carthage
   download them instead of the intended Carthage zip
   ([#8326](https://github.com/realm/realm-swift/issues/8326), since v10.42.0).
+* The prebuild Realm.xcframework for SwiftPM now has all platforms other than
+  visionOS built with Xcode 14 to comply with app store rules
+  ([#8339](https://github.com/realm/realm-swift/issues/8339), since 10.42.0).
+* Fix visionOS compilation with Xcode beta 7.
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
@@ -16,7 +20,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 14.3.1.
 * CocoaPods: 1.10 or later.
-* Xcode: 14.1-15 beta 4.
+* Xcode: 14.1-15 beta 7.
 
 ### Internal
 * Upgraded realm-core from ? to ?
