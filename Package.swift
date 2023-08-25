@@ -3,7 +3,7 @@
 import PackageDescription
 import Foundation
 
-let coreVersion = Version("13.17.1")
+let coreVersion = Version("13.20.1")
 let cocoaVersion = Version("10.42.1")
 
 let cxxSettings: [CXXSetting] = [

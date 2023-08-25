@@ -1056,8 +1056,6 @@
 
     RLMAppConfiguration *appConfig = [[RLMAppConfiguration alloc] initWithBaseURL:@"http://localhost:9090"
                                                                         transport:[AsyncOpenConnectionTimeoutTransport new]
-                                                                     localAppName:nil
-                                                                  localAppVersion:nil
                                                           defaultRequestTimeoutMS:60];
     RLMSyncTimeoutOptions *timeoutOptions = [RLMSyncTimeoutOptions new];
     timeoutOptions.connectTimeout = 1000.0;

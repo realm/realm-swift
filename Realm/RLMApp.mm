@@ -134,6 +134,24 @@ namespace {
     return self;
 }
 
+- (instancetype)initWithBaseURL:(nullable NSString *)baseURL
+                      transport:(nullable id<RLMNetworkTransport>)transport {
+    return [self initWithBaseURL:baseURL
+                       transport:transport
+         defaultRequestTimeoutMS:60000];
+}
+
+- (instancetype)initWithBaseURL:(nullable NSString *)baseURL
+                      transport:(nullable id<RLMNetworkTransport>)transport
+        defaultRequestTimeoutMS:(NSUInteger)defaultRequestTimeoutMS {
+    if (self = [self init]) {
+        self.baseURL = baseURL;
+        self.transport = transport;
+        self.defaultRequestTimeoutMS = defaultRequestTimeoutMS;
+    }
+    return self;
+}
+
 static void configureSyncConnectionParameters(realm::app::App::Config& config) {
     // Anonymized BundleId
     NSString *bundleId = [[NSBundle mainBundle] bundleIdentifier];
@@ -221,22 +239,6 @@ static void setOptionalString(std::optional<std::string>& dst, NSString *src) {
         transport = [RLMNetworkTransport new];
     }
     _config.transport = std::make_shared<CocoaNetworkTransport>(transport);
-}
-
-- (NSString *)localAppName {
-    return getOptionalString(_config.local_app_name);
-}
-
-- (void)setLocalAppName:(nullable NSString *)localAppName {
-    setOptionalString(_config.local_app_name, localAppName);
-}
-
-- (NSString *)localAppVersion {
-    return getOptionalString(_config.local_app_version);
-}
-
-- (void)setLocalAppVersion:(nullable NSString *)localAppVersion {
-    setOptionalString(_config.local_app_version, localAppVersion);
 }
 
 - (NSUInteger)defaultRequestTimeoutMS {

@@ -551,7 +551,7 @@ class SwiftEventTests: SwiftSyncTestCase {
         let blockCalled = Locked(false)
         let ex = expectation(description: "Error callback called")
         config.eventConfiguration?.errorHandler = { error in
-            assertSyncError(error, .clientUserError, "Unable to refresh the user access token.")
+            assertSyncError(error, .clientUserError, "Unable to refresh the user access token: signature is invalid")
             blockCalled.value = true
             ex.fulfill()
         }

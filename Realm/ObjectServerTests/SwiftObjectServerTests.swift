@@ -47,8 +47,7 @@ func assertSyncError(_ error: Error, _ code: SyncError.Code, _ message: String,
     let e = error as NSError
     XCTAssertEqual(e.domain, RLMSyncErrorDomain, file: file, line: line)
     XCTAssertEqual(e.code, code.rawValue, file: file, line: line)
-    XCTAssertEqual(e.localizedDescription, "Unable to refresh the user access token.",
-                   file: file, line: line)
+    XCTAssertEqual(e.localizedDescription, message, file: file, line: line)
 }
 
 @available(OSX 10.14, *)
@@ -1580,19 +1579,24 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         waitForExpectations(timeout: 10.0, handler: nil)
     }
 
-    func testAsyncOpenTimeout() throws {
-        let proxy = TimeoutProxyServer(port: 5678, targetPort: 9090)
-        try proxy.start()
-
+    func config(baseURL: String, transport: RLMNetworkTransport, syncTimeouts: SyncTimeoutOptions? = nil) throws -> (String, Realm.Configuration) {
         let appId = try RealmServer.shared.createApp()
-        let appConfig = AppConfiguration(baseURL: "http://localhost:5678",
-                                         transport: AsyncOpenConnectionTimeoutTransport(),
-                                         syncTimeouts: .init(connectTimeout: 2000, connectionLingerTime: 1))
+        let appConfig = AppConfiguration(baseURL: baseURL, transport: transport, syncTimeouts: syncTimeouts)
         let app = App(id: appId, configuration: appConfig)
 
         let user = try logInUser(for: basicCredentials(app: app), app: app)
         var config = user.configuration(partitionValue: #function, cancelAsyncOpenOnNonFatalErrors: true)
         config.objectTypes = []
+        return (appId, config)
+    }
+
+    func testAsyncOpenTimeout() throws {
+        let proxy = TimeoutProxyServer(port: 5678, targetPort: 9090)
+        try proxy.start()
+
+        let (appId, config) = try config(baseURL: "http://localhost:5678",
+                                         transport: AsyncOpenConnectionTimeoutTransport(),
+                                         syncTimeouts: .init(connectTimeout: 2000, connectionLingerTime: 1))
 
         // Two second timeout with a one second delay should work
         autoreleasepool {
@@ -1631,6 +1635,42 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
 
         proxy.stop()
+        try RealmServer.shared.deleteApp(appId)
+    }
+
+    class LocationOverrideTransport: RLMNetworkTransport {
+        let hostname: String
+        let wsHostname: String
+        init(hostname: String = "http://localhost:9090", wsHostname: String = "ws://invalid.com:9090") {
+            self.hostname = hostname
+            self.wsHostname = wsHostname
+        }
+
+        override func sendRequest(toServer request: RLMRequest, completion: @escaping RLMNetworkTransportCompletionBlock) {
+            if request.url.hasSuffix("location") {
+                let response = RLMResponse()
+                response.httpStatusCode = 200
+                response.body = "{\"deployment_model\":\"GLOBAL\",\"location\":\"US-VA\",\"hostname\":\"\(hostname)\",\"ws_hostname\":\"\(wsHostname)\"}"
+                completion(response)
+            } else {
+                super.sendRequest(toServer: request, completion: completion)
+            }
+        }
+    }
+
+    func testDNSError() throws {
+        let (appId, config) = try config(baseURL: "http://localhost:9090", transport: LocationOverrideTransport(wsHostname: "ws://invalid.com:9090"))
+        Realm.asyncOpen(configuration: config).awaitFailure(self, timeout: 40) { error in
+            assertSyncError(error, .connectionFailed, "Failed to connect to sync: Host not found (authoritative)")
+        }
+        try RealmServer.shared.deleteApp(appId)
+    }
+
+    func testTLSError() throws {
+        let (appId, config) = try config(baseURL: "http://localhost:9090", transport: LocationOverrideTransport(wsHostname: "wss://localhost:9090"))
+        Realm.asyncOpen(configuration: config).awaitFailure(self) { error in
+            assertSyncError(error, .tlsHandshakeFailed, "TLS handshake failed: SecureTransport error: record overflow (-9847)")
+        }
         try RealmServer.shared.deleteApp(appId)
     }
 
@@ -1701,7 +1741,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let blockCalled = Locked(false)
         let ex = expectation(description: "Error callback should fire upon receiving an error")
         app.syncManager.errorHandler = { @Sendable (error, _) in
-            assertSyncError(error, .clientUserError, "Unable to refresh the user access token.")
+            assertSyncError(error, .clientUserError, "Unable to refresh the user access token: signature is invalid")
             blockCalled.value = true
             ex.fulfill()
         }
@@ -1725,9 +1765,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     // MARK: - App tests
 
     private func appConfig() -> AppConfiguration {
-        return AppConfiguration(baseURL: "http://localhost:9090",
-                                localAppName: "auth-integration-tests",
-                                localAppVersion: "20180301")
+        return AppConfiguration(baseURL: "http://localhost:9090")
     }
 
     func expectSuccess<T>(_ result: Result<T, Error>) -> T? {
@@ -1799,7 +1837,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let ex = expectation(description: "Error callback should fire upon receiving an error")
         ex.assertForOverFulfill = false // error handler can legally be called multiple times
         app.syncManager.errorHandler = { @Sendable (error, _) in
-            assertSyncError(error, .clientUserError, "Unable to refresh the user access token.")
+            assertSyncError(error, .clientUserError, "Unable to refresh the user access token: invalid session: failed to find refresh token")
             ex.fulfill()
         }
 

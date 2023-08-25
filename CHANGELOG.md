@@ -1,11 +1,41 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+* Add support for logging messages sent by the server.
+  ([Core #6476](https://github.com/realm/realm-core/pull/6476))
+* Unknown protocol errors received from the baas server will no longer cause
+  the application to crash if a valid error action is also received. Unknown
+  error actions will be treated as an ApplicationBug error action and will
+  cause sync to fail with an error via the sync error handler.
+  ([Core #6885](https://github.com/realm/realm-core/pull/6885))
+* Some sync error messages now contain more information about what went wrong.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
-* None.
+* The `MultipleSyncAgents` exception from opening a synchronized Realm in
+  multiple processes at once no longer leaves the sync client in an invalid
+  state. ([Core #6868](https://github.com/realm/realm-core/pull/6868), since v10.36.0)
+* Testing the size of a collection of links against zero would sometimes fail
+  (sometimes = "difficult to explain"). In particular:
+  ([Core #6850](https://github.com/realm/realm-core/issues/6850), since v10.41.0)
+* When async writes triggered a file compaction some internal state could be
+  corrupted, leading to later crashes in the slab allocator. This typically
+  resulted in the "ref + size <= next->first" assertion failure, but other
+  failures were possible. Many issues reported; see [Core #6340](https://github.com/realm/realm-core/issues/6340).
+  (since 10.35.0)
+* `Realm.Configuration.maximumNumberOfActiveVersions` now handles intermediate
+  versions which have been cleaned up correctly and checks the number of live
+  versions rather than the number of versions between the oldest live version
+  and current version (since 10.35.0).
+* If the client disconnected between uploading a change to flexible sync
+  subscriptions and receiving the new object data from the server resulting
+  from that subscription change, the next connection to the server would
+  sometimes result in a client reset
+  ([Core #6966](https://github.com/realm/realm-core/issues/6966), since v10.21.1).
+
+### Deprecations
+* `RLMApp` has `localAppName` and `localAppVersion` fields which never ended up
+  being used for anything and are now deprecated.
+* `RLMSyncAuthError` has not been used since v10.0.0 and is now deprecated.
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
@@ -17,7 +47,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * Xcode: 14.1-15 beta 7.
 
 ### Internal
-* Upgraded realm-core from ? to ?
+* Upgraded realm-core from 13.17.1 to 13.20.1
 
 10.42.1 Release notes (2023-08-28)
 =============================================================
