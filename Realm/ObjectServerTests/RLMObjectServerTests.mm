@@ -559,7 +559,7 @@ static NSString *randomEmail() {
     XCTestExpectation *expectation = [self expectationWithDescription:@"should fail after setting bad token"];
     self.app.syncManager.errorHandler = ^(NSError *error, __unused RLMSyncSession *session) {
         RLMValidateError(error, RLMSyncErrorDomain, RLMSyncErrorClientUserError,
-                         @"Unable to refresh the user access token.");
+                         @"Unable to refresh the user access token: signature is invalid");
         [expectation fulfill];
     };
 
@@ -1761,7 +1761,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     [RLMRealm asyncOpenWithConfiguration:c callbackQueue:dispatch_get_main_queue()
                                 callback:^(RLMRealm *realm, NSError *error) {
         XCTAssertNil(realm);
-        RLMValidateError(error, RLMAppErrorDomain, RLMAppErrorUnknown, @"signature is invalid");
+        RLMValidateError(error, RLMAppErrorDomain, RLMAppErrorUnknown, @"Unable to refresh the user access token: signature is invalid");
         [ex fulfill];
     }];
     [self waitForExpectationsWithTimeout:20.0 handler:nil];
@@ -1833,8 +1833,6 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 
     RLMAppConfiguration *config = [[RLMAppConfiguration alloc] initWithBaseURL:@"http://localhost:9090"
                                                                      transport:[AsyncOpenConnectionTimeoutTransport new]
-                                                                  localAppName:nil
-                                                               localAppVersion:nil
                                                        defaultRequestTimeoutMS:60];
     RLMSyncTimeoutOptions *timeoutOptions = [RLMSyncTimeoutOptions new];
     timeoutOptions.connectTimeout = 1000.0;

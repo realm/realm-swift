@@ -64,11 +64,7 @@ using namespace realm;
     NSAssert(session, @"Cannot call with invalid URL");
 
     std::shared_ptr<SyncSession> raw_session = session->_session.lock();
-    std::error_code code = std::error_code{
-        static_cast<int>(realm::sync::ProtocolError::bad_client_file_ident),
-        realm::sync::protocol_error_category()
-    };
-    realm::sync::SessionErrorInfo error = {code, "Not a real error message", true};
+    realm::sync::SessionErrorInfo error = {{realm::ErrorCodes::BadChangeset, "Not a real error message"}, true};
     error.server_requests_action = realm::sync::ProtocolErrorInfo::Action::ClientReset;
     SyncSession::OnlyForTesting::handle_error(*raw_session, std::move(error));
 }

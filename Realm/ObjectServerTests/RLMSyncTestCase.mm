@@ -133,8 +133,6 @@ static NSURL *syncDirectoryForChildProcess() {
 - (RLMAppConfiguration*)defaultAppConfiguration {
     auto config = [[RLMAppConfiguration alloc] initWithBaseURL:@"http://localhost:9090"
                                                      transport:[TestNetworkTransport new]
-                                                  localAppName:nil
-                                               localAppVersion:nil
                                        defaultRequestTimeoutMS:60000];
     config.rootDirectory = self.clientDataRoot;
     return config;

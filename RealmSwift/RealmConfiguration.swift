@@ -343,7 +343,7 @@ extension Realm {
                                                                       errorHandler: eventConfiguration.errorHandler)
             }
 
-            configuration.initialSubscriptions = ObjectiveCSupport.convert(block: rlmConfiguration.initialSubscriptions)
+            configuration.initialSubscriptions = rlmConfiguration.initialSubscriptions.map(ObjectiveCSupport.convert(block:))
             configuration.rerunOnOpen = rlmConfiguration.rerunOnOpen
 
             return configuration
