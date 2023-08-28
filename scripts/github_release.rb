@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 
+require 'pathname'
 require 'octokit'
 
 raise 'usage: github_release.rb version' unless ARGV.length == 1
