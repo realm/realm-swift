@@ -1,10 +1,8 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.42.1 Release notes (2023-08-28)
 =============================================================
-### Enhancements
-* None.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
+
 * The names of the prebuilt zips for SPM have changed to avoid having Carthage
   download them instead of the intended Carthage zip
   ([#8326](https://github.com/realm/realm-swift/issues/8326), since v10.42.0).
@@ -13,17 +11,13 @@ x.y.z Release notes (yyyy-MM-dd)
   ([#8339](https://github.com/realm/realm-swift/issues/8339), since 10.42.0).
 * Fix visionOS compilation with Xcode beta 7.
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
-
 ### Compatibility
+
 * Realm Studio: 14.0.1 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 14.3.1.
 * CocoaPods: 1.10 or later.
 * Xcode: 14.1-15 beta 7.
-
-### Internal
-* Upgraded realm-core from ? to ?
 
 10.42.0 Release notes (2023-07-30)
 =============================================================
