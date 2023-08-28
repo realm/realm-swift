@@ -41,7 +41,7 @@ extension Publisher {
 // results in a warning about it being redundant due to the enclosing check, so
 // it needs to be out of line.
 func hasCombine() -> Bool {
-    if #available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *) {
+    if #available(macOS 10.15, watchOS 6.0, iOS 13.0, tvOS 13.0, *) {
         return true
     }
     return false

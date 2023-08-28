@@ -143,8 +143,11 @@ def doBuild() {
       withEnv(['REALM_XCODE_VERSION=15.0']) {
         sh './build.sh package-release'
       }
-      stash includes: 'realm-swift-*.zip', name: 'packaged'
-      archiveArtifacts artifacts: 'realm-swift-*.zip'
+
+      dir("pkg") {
+        stash includes: 'realm-swift-*.zip', name: 'packaged'
+        archiveArtifacts artifacts: '*.zip'
+      }
     }
   }
 

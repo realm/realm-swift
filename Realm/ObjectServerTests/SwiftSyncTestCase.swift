@@ -313,7 +313,7 @@ extension SwiftSyncTestCase {
     }
 }
 
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+@available(macOS 10.15, watchOS 6.0, iOS 13.0, tvOS 13.0, *)
 public extension Publisher {
     func expectValue(_ testCase: XCTestCase, _ expectation: XCTestExpectation,
                      receiveValue: (@Sendable (Self.Output) -> Void)? = nil) -> AnyCancellable {

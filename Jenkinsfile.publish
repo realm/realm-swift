@@ -26,7 +26,7 @@ pipeline {
         // at the same time as this job
         stash name: 'source', includes: 'source.zip'
         stash name: 'docs', includes: 'realm-docs.zip'
-        stash name: 'binary', includes: 'realm-swift-*.zip'
+        stash name: 'binary', includes: 'realm-swift-*.zip,Carthage.xcframework.zip,*.spm.zip'
         sh 'unzip source.zip'
         script {
           env.version = sh(script: "sed -n 's/^VERSION=\\(.*\\)\$/\\1/p' dependencies.list", returnStdout: true).trim()
