@@ -31,13 +31,13 @@ if [ -n "${JENKINS_HOME}" ]; then
 fi
 
 if [ $CI ]; then
-    DERIVED_DATA=$CI_DERIVED_DATA_PATH
-    ROOT_WORKSPACE=$CI_WORKSPACE/
-    BRANCH=$CI_BRANCH
+    DERIVED_DATA="$CI_DERIVED_DATA_PATH"
+    ROOT_WORKSPACE="$CI_WORKSPACE/"
+    BRANCH="$CI_BRANCH"
 else
-    DERIVED_DATA=build/DerivedData/Realm
+    DERIVED_DATA="build/DerivedData/Realm"
     ROOT_WORKSPACE=""
-    BRANCH=$GITHUB_PR_SOURCE_BRANCH
+    BRANCH="$GITHUB_PR_SOURCE_BRANCH"
 fi
 
 usage() {
@@ -444,10 +444,10 @@ case "$COMMAND" in
 
         # Assemble them into xcframeworks
         rm -rf "$DERIVED_DATA/Build/Products"*.xcframework
-        find $DERIVED_DATA/Build/Products -name 'Realm.framework' \
+        find "$DERIVED_DATA/Build/Products" -name 'Realm.framework' \
             | sed 's/.*/-framework &/' \
             | xargs xcodebuild -create-xcframework -allow-internal-distribution -output "build/$CONFIGURATION/Realm.xcframework"
-        find $DERIVED_DATA/Build/Products -name 'RealmSwift.framework' \
+        find "$DERIVED_DATA/Build/Products" -name 'RealmSwift.framework' \
             | sed 's/.*/-framework &/' \
             | xargs xcodebuild -create-xcframework -allow-internal-distribution -output "build/$CONFIGURATION/RealmSwift.xcframework"
 
@@ -582,7 +582,7 @@ case "$COMMAND" in
         ;;
 
     test-ios-xcode-spm)
-        cd ${ROOT_WORKSPACE}examples/installation
+        cd "${ROOT_WORKSPACE}examples/installation"
         ./build.rb ios spm
         exit 0
         ;;
@@ -700,11 +700,7 @@ case "$COMMAND" in
         sh build.sh examples-osx
 
         (
-            if [ $CI ]; then
-                DERIVED_EXAMPLE_DATA=$CI_DERIVED_DATA_PATH
-            else
-                DERIVED_EXAMPLE_DATA=examples/osx/objc/build/DerivedData/RealmExamples
-            fi
+            DERIVED_EXAMPLE_DATA=${CI_DERIVED_DATA_PATH:-examples/osx/objc/build/DerivedData/RealmExamples}
 
             cd $DERIVED_EXAMPLE_DATA/Build/Products/$CONFIGURATION
             DYLD_FRAMEWORK_PATH=. ./JSONImport >/dev/null
@@ -982,7 +978,7 @@ case "$COMMAND" in
         elif [ "$target" = "swiftlint" ]; then
             sh build.sh verify-swiftlint
         else
-            export sha=$BRANCH
+            export sha="$BRANCH"
             export REALM_EXTRA_BUILD_ARGUMENTS='GCC_GENERATE_DEBUGGING_SYMBOLS=NO -allowProvisioningUpdates'
 
             if [[ "$target" = *ios* ]] || [[ "$target" = *tvos* ]] || [[ "$target" = *watchos* ]]; then
