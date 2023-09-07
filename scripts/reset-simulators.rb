@@ -34,62 +34,6 @@ def simctl(args)
   end
 end
 
-def wait_for_core_simulator_service
-  # Run until we get a result since switching simulator versions often causes CoreSimulatorService to throw an exception.
-  while simctl('list devices')[0].empty?
-  end
-end
-
-def running_devices(devices)
-  devices.select { |device| device['state'] != 'Shutdown' }
-end
-
-def shutdown_simulator_devices(devices)
-  # Shut down any simulators that need it.
-  running_devices(devices).each do |device|
-    puts "Shutting down simulator #{device['udid']}"
-    system("xcrun simctl shutdown #{device['udid']}") or puts "    Failed to shut down simulator #{device['udid']}"
-  end
-end
-
-def kill_running_simulator()
-  # Kill all the current simulator processes as they may be from a different Xcode version
-  print 'Killing running Simulator processes...'
-  while system('pgrep -q Simulator')
-    system('pkill Simulator 2>/dev/null')
-    system('pkill -9 update_dyld_sim_shared_cache 2>/dev/null')
-    # CoreSimulatorService doesn't exit when sent SIGTERM
-    system('pkill -9 Simulator 2>/dev/null')
-  end
-  wait_for_core_simulator_service
-  puts ' done!'
-end
-
-def shutdown_simulators()
-  print 'Shut down existing simulator devices...'
-  # Shut down any running simulator devices. This may take multiple attempts if some
-  # simulators are currently in the process of booting or being created.
-  all_available_devices = []
-  (0..5).each do |shutdown_attempt|
-    begin
-      devices_json = simctl('list devices -j')[0]
-      all_devices = JSON.parse(devices_json)['devices'].flat_map { |_, devices| devices }
-    rescue JSON::ParserError
-      sleep shutdown_attempt if shutdown_attempt > 0
-      next
-    end
-
-    # Exclude devices marked as unavailable as they're from a different version of Xcode.
-    all_available_devices = all_devices.reject { |device| device['availability'] =~ /unavailable/ }
-
-    break if running_devices(devices).empty?
-
-    shutdown_simulator_devices devices
-    sleep shutdown_attempt if shutdown_attempt > 0
-  end
-  puts ' done!'
-end
-
 attempts = 0
 begin
   print 'Prepare simulators...'
