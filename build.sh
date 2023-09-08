@@ -354,12 +354,6 @@ case "$COMMAND" in
         exit 0
         ;;
 
-    "prelaunch-simulator")
-        if [ -z "$REALM_SKIP_PRELAUNCH" ]; then
-            sh "${source_root}/scripts/reset-simulators.sh" "$1"
-        fi
-        ;;
-
     ######################################
     # Building
     ######################################
@@ -809,8 +803,6 @@ case "$COMMAND" in
     ######################################
     "examples")
         sh build.sh clean
-        sh build.sh prelaunch-simulator
-        export REALM_SKIP_PRELAUNCH=1
         sh build.sh examples-ios
         sh build.sh examples-ios-swift
         sh build.sh examples-osx
@@ -980,11 +972,6 @@ case "$COMMAND" in
         else
             export sha="$BRANCH"
             export REALM_EXTRA_BUILD_ARGUMENTS='GCC_GENERATE_DEBUGGING_SYMBOLS=NO -allowProvisioningUpdates'
-
-            if [[ "$target" = *ios* ]] || [[ "$target" = *tvos* ]] || [[ "$target" = *watchos* ]]; then
-                sh build.sh prelaunch-simulator "$target"
-            fi
-            export REALM_SKIP_PRELAUNCH=1
 
             if [[ "$target" = *"server"* ]] || [[ "$target" = "swiftpm"* ]]; then
                 mkdir .baas
