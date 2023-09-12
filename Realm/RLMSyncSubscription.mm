@@ -23,6 +23,7 @@
 #import "RLMObjectId_Private.hpp"
 #import "RLMQueryUtil.hpp"
 #import "RLMRealm_Private.hpp"
+#import "RLMScheduler.h"
 #import "RLMUtil.hpp"
 
 #import <realm/sync/subscriptions.hpp>
@@ -32,7 +33,7 @@
 #pragma mark - Subscription
 
 @interface RLMSyncSubscription () {
-    std::shared_ptr<realm::sync::Subscription> _subscription;
+    std::unique_ptr<realm::sync::Subscription> _subscription;
     RLMSyncSubscriptionSet *_subscriptionSet;
 }
 @end
@@ -41,7 +42,7 @@
 
 - (instancetype)initWithSubscription:(realm::sync::Subscription)subscription subscriptionSet:(RLMSyncSubscriptionSet *)subscriptionSet {
     if (self = [super init]) {
-        _subscription = std::make_shared<realm::sync::Subscription>(subscription);
+        _subscription = std::make_unique<realm::sync::Subscription>(subscription);
         _subscriptionSet = subscriptionSet;
         return self;
     }
@@ -254,6 +255,16 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
          queue:(nullable dispatch_queue_t)queue
        timeout:(NSTimeInterval)timeout
     onComplete:(void(^)(NSError *))completionBlock {
+    [self update:block
+      confinedTo:[RLMScheduler dispatchQueue:queue]
+         timeout:timeout
+      onComplete:completionBlock];
+}
+
+- (void)update:(__attribute__((noescape)) void(^)(void))block
+    confinedTo:(RLMScheduler *)confinement
+       timeout:(NSTimeInterval)timeout
+    onComplete:(void(^)(NSError *))completionBlock {
     if (_mutableSubscriptionSet) {
         @throw RLMException(@"Cannot initiate a write transaction on subscription set that is already being updated.");
     }
@@ -279,17 +290,17 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
     }
 
     if (completionBlock) {
-        [self waitForSynchronizationOnQueue:queue
-                                    timeout:timeout
-                            completionBlock:completionBlock];
+        [self waitForSynchronizationConfinedTo:confinement
+                                       timeout:timeout
+                               completionBlock:completionBlock];
     }
 }
 
-- (void)waitForSynchronizationOnQueue:(nullable dispatch_queue_t)queue
-                              timeout:(NSTimeInterval)timeout
-                      completionBlock:(void(^)(NSError *))completionBlock {
+- (void)waitForSynchronizationConfinedTo:(nullable RLMScheduler *)confinement
+                                 timeout:(NSTimeInterval)timeout
+                         completionBlock:(void(^)(NSError *))completionBlock {
     RLMAsyncSubscriptionTask *syncSubscriptionTask = [[RLMAsyncSubscriptionTask alloc] initWithSubscriptionSet:self
-                                                                                                         queue:queue
+                                                                                                    confinedTo:confinement
                                                                                                        timeout:timeout
                                                                                                     completion:completionBlock];
     [syncSubscriptionTask waitForSubscription];
@@ -436,7 +447,6 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
             return [[RLMObjectId alloc] initWithValue:it.first->id];
         }
         else {
-            // rewrite exception description
             @throw RLMException(@"A subscription named '%@' already exists. If you meant to update the existing subscription please use the `update` method.", name);
         }
     }

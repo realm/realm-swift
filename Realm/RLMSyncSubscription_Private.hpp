@@ -47,9 +47,9 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
     onComplete:(void(^)(NSError *))completionBlock;
 
 - (RLMObjectId *)addSubscriptionWithClassName:(NSString *)objectClassName
-                                     subscriptionName:(nullable NSString *)name
-                                                query:(realm::Query)query
-                                       updateExisting:(BOOL)updateExisting;
+                             subscriptionName:(nullable NSString *)name
+                                        query:(realm::Query)query
+                               updateExisting:(BOOL)updateExisting;
 
 - (nullable RLMSyncSubscription *)subscriptionWithQuery:(realm::Query)query;
 

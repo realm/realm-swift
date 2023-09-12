@@ -451,10 +451,12 @@ __attribute__((warn_unused_result));
  is completed. The completion is called according to
  RLMWaitForSyncModeOnCreation behavior.
  @see ``RLMWaitForSyncModeOnCreation`` and ``RLMWaitForSyncMode``
- @param queue The queue where the completion disptaches.
+ @param queue The queue where the completion dispatches.
+ @param completion The block called after the subscription download is
+ completed. The completion is called according to RLMWaitForSyncModeOnCreation behavior.
  */
 - (void)subscribeWithCompletionOnQueue:(dispatch_queue_t _Nullable)queue
-                       completionBlock:(RLMResultsCompletionBlock)completion NS_REFINED_FOR_SWIFT;
+                            completion:(RLMResultsCompletionBlock)completion;
 
 /**
  Creates an RLMSyncSubscription matching the RLMResults' local filter.
@@ -588,7 +590,7 @@ __attribute__((swift_attr("@_unsafeInheritExecutor")));
  This could create a performance bottleneck by opening multiple unnecessary write transactions.
  @see: `[RLMSyncSubscription update:queue:onComplete:]` in order to create multiple subscriptions..
  */
-- (void)unsubscribe NS_REFINED_FOR_SWIFT;
+- (void)unsubscribe;
 
 #pragma mark - Aggregating Property Values
 

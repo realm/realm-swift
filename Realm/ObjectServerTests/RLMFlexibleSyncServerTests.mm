@@ -1175,7 +1175,7 @@
 
         [[[Person allObjectsInRealm:realm] objectsWhere:@"lastName == 'Loren'"]
          subscribeWithCompletionOnQueue:dispatch_get_main_queue()
-         completionBlock:^(RLMResults *results, NSError *error) {
+         completion:^(RLMResults *results, NSError *error) {
             XCTAssertNil(error);
             XCTAssertEqual(results.count, 1U);
             XCTAssertEqual(realm.subscriptions.count, 1UL);

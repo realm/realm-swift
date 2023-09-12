@@ -17,7 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 import Foundation
-import Realm
+import Realm.Private
 
 // MARK: MinMaxType
 
@@ -178,17 +178,21 @@ extension Projection: KeypathSortable {}
      See `RLMWaitForSyncMode`.
      - parameter timeout: An optional client timeout. The client will cancel waiting for subscription downloads after this time has elapsed. Reaching this timeout doesn't imply a server error.
      - returns: A `Results` object.
+
+     - warning: This function is only supported for main thread and
+                actor-isolated Realms.
      */
     @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-    @MainActor
+    @_unsafeInheritExecutor
     public func subscribe(name: String? = nil, waitForSync: WaitForSyncMode = .onCreation, timeout: TimeInterval? = nil) async throws -> Results<Element> {
-        var rlmResults = ObjectiveCSupport.convert(object: self)
-        guard let timeout = timeout else {
-            rlmResults = try await rlmResults.__subscribe(withName: name, waitForSync: waitForSync, on: .main)
-            return Results(rlmResults)
+        guard let actor = realm?.rlmRealm.actor as? Actor else {
+            fatalError("`subscribe` can only be called on main thread or actor-isolated Realms")
         }
-        rlmResults = try await rlmResults.__subscribe(withName: name, waitForSync: waitForSync, on: .main, timeout: timeout)
-        return Results(rlmResults)
+
+        var rlmResults = ObjectiveCSupport.convert(object: self)
+        let scheduler = await RLMScheduler.actor(actor, invoke: actor.invoke, verify: actor.verifier())
+        rlmResults = try await rlmResults.subscribe(withName: name, waitForSync: waitForSync, confinedTo: scheduler, timeout: timeout ?? 0)
+        return self
     }
 #endif
     /**
@@ -219,7 +223,7 @@ extension Projection: KeypathSortable {}
      */
     public func unsubscribe() {
         let rlmResults = ObjectiveCSupport.convert(object: self)
-        rlmResults.__unsubscribe()
+        rlmResults.unsubscribe()
     }
 }
 

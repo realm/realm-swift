@@ -1447,6 +1447,42 @@ XCTAssertNotNil(realm.subscriptions.first(ofType: SwiftPerson.self) { $0.age > 5
     }
 
     @MainActor
+    func testSubscribeOnRealmConfinedActor() async throws {
+        try await populateSwiftPerson()
+
+        try await populateSwiftPerson()
+
+        let user = try await logInUser(for: basicCredentials(app: self.flexibleSyncApp), app: self.flexibleSyncApp)
+        var config = user.flexibleSyncConfiguration()
+        config.objectTypes = [SwiftPerson.self]
+        let realm = try await Realm(configuration: config, actor: MainActor.shared)
+        let results1 = try await realm.objects(SwiftPerson.self).where { $0.age > 8 }.subscribe(waitForSync: .onCreation)
+        XCTAssertEqual(results1.count, 2)
+        let results2 = try await realm.objects(SwiftPerson.self).where { $0.age > 6 }.subscribe(waitForSync: .always)
+        XCTAssertEqual(results2.count, 4)
+        let results3 = try await realm.objects(SwiftPerson.self).where { $0.age > 4 }.subscribe(waitForSync: .never)
+        XCTAssertEqual(results3.count, 4)
+        XCTAssertEqual(realm.subscriptions.count, 3)
+    }
+
+    @CustomGlobalActor
+    func testSubscribeOnRealmConfinedCustomActor() async throws {
+        try await populateSwiftPerson()
+
+        let user = try await logInUser(for: basicCredentials(app: self.flexibleSyncApp), app: self.flexibleSyncApp)
+        var config = user.flexibleSyncConfiguration()
+        config.objectTypes = [SwiftPerson.self]
+        let realm = try await Realm(configuration: config, actor: CustomGlobalActor.shared)
+        let results1 = try await realm.objects(SwiftPerson.self).where { $0.age > 8 }.subscribe(waitForSync: .onCreation)
+        XCTAssertEqual(results1.count, 2)
+        let results2 = try await realm.objects(SwiftPerson.self).where { $0.age > 6 }.subscribe(waitForSync: .always)
+        XCTAssertEqual(results2.count, 4)
+        let results3 = try await realm.objects(SwiftPerson.self).where { $0.age > 4 }.subscribe(waitForSync: .never)
+        XCTAssertEqual(results3.count, 4)
+        XCTAssertEqual(realm.subscriptions.count, 3)
+    }
+
+    @MainActor
     func testUnsubscribe() async throws {
         try await populateSwiftPerson()
         let realm = try openFlexibleSyncRealm()
@@ -1936,5 +1972,11 @@ extension SwiftFlexibleSyncServerTests {
     }
 #endif
 }
+
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+@globalActor actor CustomGlobalActor: GlobalActor {
+    static var shared = CustomGlobalActor()
+}
+
 #endif // canImport(Combine)
 #endif // os(macOS)

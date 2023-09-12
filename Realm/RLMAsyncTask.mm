@@ -244,9 +244,9 @@ __attribute__((objc_direct_members))
         auto subscriptions = _backgroundRealm.subscriptions;
         if (subscriptions.state == RLMSyncSubscriptionStatePending) {
             // FIXME: need cancellation for waiting for the subscription
-            return [subscriptions waitForSynchronizationOnQueue:nil
-                                                        timeout:0
-                                                completionBlock:^(NSError *error) {
+            return [subscriptions waitForSynchronizationConfinedTo:nil
+                                                           timeout:0
+                                                   completionBlock:^(NSError *error) {
                 if (error) {
                     std::lock_guard lock(_mutex);
                     return [self reportError:error];
@@ -480,7 +480,7 @@ __attribute__((objc_direct_members))
     RLMUnfairMutex _mutex;
 
     RLMSyncSubscriptionSet *_subscriptionSet;
-    dispatch_queue_t _queue;
+    RLMScheduler *_scheduler;
     NSTimeInterval _timeout;
     void (^_completion)(NSError *);
 
@@ -489,7 +489,7 @@ __attribute__((objc_direct_members))
 }
 
 - (instancetype)initWithSubscriptionSet:(RLMSyncSubscriptionSet *)subscriptionSet
-                                  queue:(nullable dispatch_queue_t)queue
+                             confinedTo:(RLMScheduler *)confinement
                                 timeout:(NSTimeInterval)timeout
                              completion:(void(^)(NSError *))completion {
     if (!(self = [super init])) {
@@ -497,7 +497,7 @@ __attribute__((objc_direct_members))
     }
 
     _subscriptionSet = subscriptionSet;
-    _queue = queue;
+    _scheduler = confinement;
     _timeout = timeout;
     _completion = completion;
 
@@ -534,8 +534,9 @@ __attribute__((objc_direct_members))
 }
 
 -(void)invokeCompletionWithError:(NSError * _Nullable)error {
-    std::lock_guard lock(_mutex);
-
+    std::unique_lock lock(_mutex);
+    auto completion = _completion;
+    
     if (_called) {
         return;
     }
@@ -546,11 +547,14 @@ __attribute__((objc_direct_members))
         _worker = nil;
     }
 
-    if (_queue) {
-        return dispatch_async(_queue, ^{
-            _completion(error);
-        });
+    lock.unlock();
+    if (_scheduler) {
+        [_scheduler invoke:^{
+            completion(error);
+        }];
+        return;
     }
-    _completion(error);
+
+    completion(error);
 }
 @end

@@ -18,7 +18,7 @@
 
 #import <Realm/RLMSyncSubscription.h>
 
-#import <Realm/RLMRealm.h>
+#import "RLMRealm_Private.h"
 
 RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
@@ -56,9 +56,14 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
                            predicate:(NSPredicate *)predicate
                       updateExisting:(BOOL)updateExisting;
 
-- (void)waitForSynchronizationOnQueue:(nullable dispatch_queue_t)queue
-                              timeout:(NSTimeInterval)timeout
-                      completionBlock:(void(^)(NSError *))completionBlock;
+- (void)update:(__attribute__((noescape)) void(^)(void))block
+    confinedTo:(RLMScheduler *)confinement
+       timeout:(NSTimeInterval)timeout
+    onComplete:(void(^)(NSError *))completionBlock;
+
+- (void)waitForSynchronizationConfinedTo:(nullable RLMScheduler *)confinement
+                                 timeout:(NSTimeInterval)timeout
+                         completionBlock:(void(^)(NSError *))completionBlock;
 
 - (RLMSyncSubscriptionEnumerator *)fastEnumerator;
 

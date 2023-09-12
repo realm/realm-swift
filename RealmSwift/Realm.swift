@@ -388,7 +388,7 @@ public typealias AsyncTransactionId = RLMAsyncTransactionId
     /**
      Asynchronously performs actions contained within the given block inside a write transaction.
      The write transaction is begun asynchronously as if calling `beginAsyncWrite`,
-     and by default the transaction is commited asynchronously after the block completes.
+     and by default the transaction is committed asynchronously after the block completes.
      You can also explicitly call `commitWrite` or `cancelWrite` from
      within the block to synchronously commit or cancel the write transaction.
      Returning without one of these calls is equivalent to calling `commitWrite`.
