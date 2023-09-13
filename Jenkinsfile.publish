@@ -83,6 +83,16 @@ pipeline {
             sh "./build.sh publish-cocoapods v${env.version}"
           }
         }
+
+        stage('Update update checker') {
+          agent { label 'osx' }
+          steps {
+            prepareWorkspace()
+            withCredentials([file(credentialsId: 's3cfg', variable: 'S3CMD_CONFIG')]) {
+              sh './build.sh publish-update-checker'
+            }
+          }
+        }
       }
     }
 

@@ -1130,6 +1130,14 @@ case "$COMMAND" in
 
         s3cmd put --recursive --acl-public --access_key=${AWS_ACCESS_KEY_ID} --secret_key=${AWS_SECRET_ACCESS_KEY} objc_output/ s3://realm-sdks/docs/realm-sdks/objc/${VERSION}/
         s3cmd put --recursive --acl-public --access_key=${AWS_ACCESS_KEY_ID} --secret_key=${AWS_SECRET_ACCESS_KEY} objc_output/ s3://realm-sdks/docs/realm-sdks/objc/latest/
+        ;;
+
+    "publish-update-checker")
+        VERSION="$(sed -n 's/^VERSION=\(.*\)$/\1/p' "${source_root}/dependencies.list")"
+        PRERELEASE_REGEX='alpha|beta|rc|preview'
+        if [[ $VERSION =~ $PRERELEASE_REGEX ]]; then
+          exit 0
+        fi
 
         # update static.realm.io/update/cocoa
         printf "%s" "${VERSION}" > cocoa
