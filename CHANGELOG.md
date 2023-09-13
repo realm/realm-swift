@@ -1,6 +1,8 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.42.2 Release notes (2023-09-13)
 =============================================================
+
 ### Enhancements
+
 * Add support for logging messages sent by the server.
   ([Core #6476](https://github.com/realm/realm-core/pull/6476))
 * Unknown protocol errors received from the baas server will no longer cause
@@ -11,6 +13,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * Some sync error messages now contain more information about what went wrong.
 
 ### Fixed
+
 * The `MultipleSyncAgents` exception from opening a synchronized Realm in
   multiple processes at once no longer leaves the sync client in an invalid
   state. ([Core #6868](https://github.com/realm/realm-core/pull/6868), since v10.36.0)
@@ -33,13 +36,13 @@ x.y.z Release notes (yyyy-MM-dd)
   ([Core #6966](https://github.com/realm/realm-core/issues/6966), since v10.21.1).
 
 ### Deprecations
+
 * `RLMApp` has `localAppName` and `localAppVersion` fields which never ended up
   being used for anything and are now deprecated.
 * `RLMSyncAuthError` has not been used since v10.0.0 and is now deprecated.
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
-
 ### Compatibility
+
 * Realm Studio: 14.0.1 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 14.3.1.
@@ -47,6 +50,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * Xcode: 14.1-15 beta 7.
 
 ### Internal
+
 * Upgraded realm-core from 13.17.1 to 13.20.1
 
 10.42.1 Release notes (2023-08-28)
