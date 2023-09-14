@@ -1149,6 +1149,34 @@
     [self waitForExpectationsWithTimeout:5.0 handler:nil];
 }
 
+- (void)testUnsubscribeWithinBlock {
+    bool didPopulate = [self populateData:^(RLMRealm *realm) {
+        Person *person = [[Person alloc] initWithPrimaryKey:[RLMObjectId objectId]
+                                                        age:30
+                                                  firstName:@"Joe"
+                                                   lastName:@"Doe"];
+        person.partition = NSStringFromSelector(_cmd);
+        [realm addObject:person];
+    }];
+    if (!didPopulate) {
+        return;
+    }
+
+    RLMRealm *realm = [self getFlexibleSyncRealm:_cmd];
+    XCTAssertNotNil(realm);
+    CHECK_COUNT(0, Person, realm);
+
+    XCTestExpectation *ex = [self expectationWithDescription:@"wait for download"];
+    [[[Person allObjectsInRealm:realm] objectsWhere:@"lastName == 'Doe'"] subscribeWithName:@"unknown" onQueue:dispatch_get_main_queue() completion:^(RLMResults *results, NSError *error) {
+        XCTAssertNil(error);
+        XCTAssertEqual(results.count, 1U);
+        [results unsubscribe];
+        [ex fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:5.0 handler:nil];
+    XCTAssertEqual(realm.subscriptions.count, 0);
+}
+
 - (void)testSubscribeOnQueue {
     bool didPopulate = [self populateData:^(RLMRealm *realm) {
         Person *person = [[Person alloc] initWithPrimaryKey:[RLMObjectId objectId]

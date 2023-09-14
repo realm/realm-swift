@@ -484,7 +484,6 @@ __attribute__((objc_direct_members))
     NSTimeInterval _timeout;
     void (^_completion)(NSError *);
 
-    bool _called;
     dispatch_block_t _worker;
 }
 
@@ -534,27 +533,26 @@ __attribute__((objc_direct_members))
 }
 
 -(void)invokeCompletionWithError:(NSError * _Nullable)error {
-    std::unique_lock lock(_mutex);
-    auto completion = _completion;
-    
-    if (_called) {
-        return;
+    void (^completion)(NSError *);
+    {
+        std::lock_guard lock(_mutex);
+        std::swap(completion, _completion);
     }
-    _called = true;
 
     if (_worker) {
         dispatch_block_cancel(_worker);
         _worker = nil;
     }
 
-    lock.unlock();
-    if (_scheduler) {
-        [_scheduler invoke:^{
-            completion(error);
-        }];
-        return;
-    }
+    if (completion) {
+        if (_scheduler) {
+            [_scheduler invoke:^{
+                completion(error);
+            }];
+            return;
+        }
 
-    completion(error);
+        completion(error);
+    }
 }
 @end

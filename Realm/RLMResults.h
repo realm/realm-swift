@@ -490,7 +490,7 @@ __attribute__((warn_unused_result));
  */
 - (void)subscribeWithName:(NSString *_Nullable)name
                   onQueue:(dispatch_queue_t _Nullable)queue
-               completion:(RLMResultsCompletionBlock)completion NS_REFINED_FOR_SWIFT;
+               completion:(RLMResultsCompletionBlock)completion;
 
 /**
  Creates an RLMSyncSubscription matching the RLMResults' local filter.
@@ -526,7 +526,7 @@ __attribute__((warn_unused_result));
 - (void)subscribeWithName:(NSString *_Nullable)name
               waitForSync:(RLMWaitForSyncMode)waitForSyncMode
                   onQueue:(dispatch_queue_t _Nullable)queue
-               completion:(RLMResultsCompletionBlock)completion NS_REFINED_FOR_SWIFT
+               completion:(RLMResultsCompletionBlock)completion
 __attribute__((swift_attr("@_unsafeInheritExecutor")));
 
 /**
@@ -568,7 +568,7 @@ __attribute__((swift_attr("@_unsafeInheritExecutor")));
               waitForSync:(RLMWaitForSyncMode)waitForSyncMode
                   onQueue:(dispatch_queue_t _Nullable)queue
                   timeout:(NSTimeInterval)timeout
-               completion:(RLMResultsCompletionBlock)completion NS_REFINED_FOR_SWIFT
+               completion:(RLMResultsCompletionBlock)completion
 __attribute__((swift_attr("@_unsafeInheritExecutor")));
 
 /**
@@ -584,6 +584,8 @@ __attribute__((swift_attr("@_unsafeInheritExecutor")));
 
  In order for a named subscription to be removed, the RLMResults
  must have previously created the subscription.
+ Returned `RLMResults`  from calling `subscribe` can be used later to unsubscribe from the same
+ subscription.
 
  This method opens a write transaction that creates or updates a subscription.
  It's advised to *not* loop over this method in order to create multiple subscriptions at once.
