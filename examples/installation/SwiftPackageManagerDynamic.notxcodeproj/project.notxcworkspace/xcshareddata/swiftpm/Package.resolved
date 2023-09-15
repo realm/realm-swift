@@ -6,8 +6,8 @@
         "kind" : "remoteSourceControl",
         "repositoryURL" : "https://github.com/realm/realm-core.git",
         "state" : {
-          "revision" : "c04f5e401a1ec682e6b08b1ee157e19a0f834a5f",
-          "version" : "13.17.1"
+          "revision" : "c569bec4d04da84030d94f376437bc4efda3686b",
+          "version" : "13.23.1",
         }
       },
       {
