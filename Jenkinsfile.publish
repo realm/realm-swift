@@ -88,7 +88,7 @@ pipeline {
           agent { label 'osx' }
           steps {
             prepareWorkspace()
-            withCredentials([file(credentialsId: 's3cfg', variable: 'S3CMD_CONFIG')]) {
+            withCredentials([file(credentialsId: 'c0cc8f9e-c3f1-4e22-b22f-6568392e26ae', variable: 'S3CMD_CONFIG')]) {
               sh './build.sh publish-update-checker'
             }
           }

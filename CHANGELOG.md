@@ -1,23 +1,23 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.42.3 Release notes (2023-09-18)
 =============================================================
+
 ### Enhancements
-* None.
+
+* Update packaging for the Xcode 15.0 release. Carthage release and obj-c
+  binaries are now built with Xcode 15.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
-* None.
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+* The prebuilt Realm.xcframework for SPM was packaged incorrectly and did not
+  work ([#8361](https://github.com/realm/realm-swift/issues/8361), since v10.42.1).
 
 ### Compatibility
+
 * Realm Studio: 14.0.1 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
-* Carthage release for Swift is built with Xcode 14.3.1.
+* Carthage release for Swift is built with Xcode 15.0.0.
 * CocoaPods: 1.10 or later.
-* Xcode: 14.1-15 beta 7.
-
-### Internal
-* Upgraded realm-core from ? to ?
+* Xcode: 14.1-15.0.0.
 
 10.42.2 Release notes (2023-09-13)
 =============================================================

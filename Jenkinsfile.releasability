@@ -1,15 +1,19 @@
 xcodeVersions = ['14.1', '14.2', '14.3.1']
 platforms = ['osx', 'ios', 'watchos', 'tvos', 'catalyst']
 platformNames = ['osx': 'macOS', 'ios': 'iOS', 'watchos': 'watchOS', 'tvos': 'tvOS', 'catalyst': 'Catalyst', 'visionos': 'visionOS']
-carthageXcodeVersion = '14.3.1'
+carthageXcodeVersion = '15.0'
+// This should be the same as carthageXcodeVersion, but we only have one Xcode 15 runner
+docsXcodeVersion = '14.3.1'
 
-def buildPlatform(platform, xcodeVersion, nodeLabel = 'osx') {
+def buildPlatform(platform, xcodeVersion, xcodeSuffix, nodeLabel = 'osx') {
   def platformName = platformNames[platform]
   return {
     node(nodeLabel) {
       deleteDir()
       unstash 'source'
-      sh "REALM_XCODE_VERSION=${xcodeVersion} ./build.sh package ${platform}"
+      withEnv(["DEVELOPER_DIR=/Applications/Xcode-${xcodeSuffix}.app/Contents/Developer"]) {
+        sh "./build.sh package ${platform}"
+      }
       dir("build") {
         stash includes: "realm-${platform}-${xcodeVersion}.zip",
               name: "${platform}-${xcodeVersion}"
@@ -31,7 +35,7 @@ def installationTest(platform, test, xcode, language = 'swift', linkage = 'dynam
 
       sh """
       hostname
-      export REALM_XCODE_VERSION='${xcode}'
+      export DEVELOPER_DIR='/Applications/Xcode-${xcode}.app/Contents/Developer'
       export REALM_TEST_BRANCH='${sha}'
       cd examples/installation
       ./build.rb ${platform} ${test} ${linkage}
@@ -84,7 +88,7 @@ def doBuild() {
           unstash 'source'
           sh """
           hostname
-          export REALM_XCODE_VERSION=${carthageXcodeVersion}
+          export REALM_XCODE_VERSION=${docsXcodeVersion}
           sh build.sh package-docs
           """
           dir('docs') {
@@ -116,11 +120,11 @@ def doBuild() {
       def platform = p
       def platformName = platformNames[platform]
       for (def xcodeVersion in xcodeVersions) {
-        parallelBuilds["${platformName} ${xcodeVersion}"] = buildPlatform(platform, xcodeVersion)
+        parallelBuilds["${platformName} ${xcodeVersion}"] = buildPlatform(platform, xcodeVersion, xcodeVersion)
       }
-      parallelBuilds["${platformName} 15.0"] = buildPlatform(platform, '15.0', 'macos_13')
+      parallelBuilds["${platformName} 15.0"] = buildPlatform(platform, '15.0', '15.0.0', 'macos_13')
     }
-    parallelBuilds["visionOS 15.0"] = buildPlatform('visionos', '15.0', 'macos_13')
+    parallelBuilds["visionOS 15.0"] = buildPlatform('visionos', '15.0', '15-beta', 'macos_13')
 
     parallel parallelBuilds
   }
@@ -140,7 +144,7 @@ def doBuild() {
       unstash 'examples'
       unstash 'build-scripts'
 
-      withEnv(['REALM_XCODE_VERSION=15.0']) {
+      withEnv(['DEVELOPER_DIR=/Applications/Xcode-15-beta.app/Contents/Developer']) {
         sh './build.sh package-release'
       }
 
@@ -196,13 +200,13 @@ def doBuild() {
       def platformName = platformNames[platform]
       for (def test in ['xcframework', 'cocoapods', 'carthage', 'spm']) {
         if (platform != 'catalyst' || test != 'carthage') {
-          parallelBuilds["Installation - ${platformName} ${test}"] = installationTest(platform, test, carthageXcodeVersion)
+          parallelBuilds["Installation - ${platformName} ${test}"] = installationTest(platform, test, docsXcodeVersion)
         }
       }
-      parallelBuilds["Installation - ${platformName} CocoaPods static"] = installationTest(platform, 'cocoapods', carthageXcodeVersion, 'swift', 'static')
-      parallelBuilds["Installation - ${platformName} spm static"] = installationTest(platform, 'spm', carthageXcodeVersion, 'swift', 'static')
+      parallelBuilds["Installation - ${platformName} CocoaPods static"] = installationTest(platform, 'cocoapods', docsXcodeVersion, 'swift', 'static')
+      parallelBuilds["Installation - ${platformName} spm static"] = installationTest(platform, 'spm', docsXcodeVersion, 'swift', 'static')
     }
-    parallelBuilds['Installation - iOS Static'] = installationTest('ios', 'xcframework', carthageXcodeVersion, 'objc', 'static')
+    parallelBuilds['Installation - iOS Static'] = installationTest('ios', 'xcframework', docsXcodeVersion, 'objc', 'static')
     parallelBuilds['Installation - XCFramework Evolution'] = xcframeworkEvolutionTest()
     for (def version in xcodeVersions) {
       parallelBuilds["Installation - Xcode ${version}"] = installationTest('osx', 'xcframework', version)

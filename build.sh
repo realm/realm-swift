@@ -508,12 +508,12 @@ case "$COMMAND" in
         ;;
 
     "test-ios")
-        xctest Realm -configuration "$CONFIGURATION" -sdk iphonesimulator -destination 'name=iPhone 8'
+        xctest Realm -configuration "$CONFIGURATION" -sdk iphonesimulator -destination 'name=iPhone 11'
         exit 0
         ;;
 
     "test-ios-swift")
-        xctest RealmSwift -configuration "$CONFIGURATION" -sdk iphonesimulator -destination 'name=iPhone 8'
+        xctest RealmSwift -configuration "$CONFIGURATION" -sdk iphonesimulator -destination 'name=iPhone 11'
         exit 0
         ;;
 
@@ -592,7 +592,7 @@ case "$COMMAND" in
         ;;
 
     "test-swiftui-ios")
-        xctest 'SwiftUITestHost' -configuration "$CONFIGURATION" -sdk iphonesimulator -destination 'name=iPhone 8'
+        xctest 'SwiftUITestHost' -configuration "$CONFIGURATION" -sdk iphonesimulator -destination 'name=iPhone 11'
         exit 0
         ;;
 
@@ -1179,9 +1179,9 @@ x.y.z Release notes (yyyy-MM-dd)
 ### Compatibility
 * Realm Studio: 14.0.1 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
-* Carthage release for Swift is built with Xcode 14.3.1.
+* Carthage release for Swift is built with Xcode 15.0.0.
 * CocoaPods: 1.10 or later.
-* Xcode: 14.1-15 beta 7.
+* Xcode: 14.1-15.0.0.
 
 ### Internal
 * Upgraded realm-core from ? to ?
