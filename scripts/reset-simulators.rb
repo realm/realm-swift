@@ -164,8 +164,8 @@ begin
     print 'Booting Apple TV simulator...'
     system("xcrun simctl boot 'Apple TV'") or raise "Failed to boot Apple TV simulator"
   else
-    print 'Booting iPhone 8 simulator...'
-    system("xcrun simctl boot 'iPhone 8'") or raise "Failed to boot iPhone 8 simulator"
+    print 'Booting iPhone 11 simulator...'
+    system("xcrun simctl boot 'iPhone 11'") or raise "Failed to boot iPhone 11 simulator"
   end
   puts ' done!'
 
