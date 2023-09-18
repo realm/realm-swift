@@ -431,87 +431,79 @@ __attribute__((warn_unused_result));
 #pragma mark - Flexible Sync
 
 /**
- Creates an RLMSyncSubscription matching the RLMResults' local filter.
+ Creates a RLMSyncSubscription matching the RLMResults's local filter.
 
  After committing the subscription to the realm's local subscription set, the method
- will wait for downloads according to ``RLMWaitForSyncModeOnCreation`` behavior.
- @see ``RLMWaitForSyncModeOnCreation`` and ``RLMWaitForSyncMode``
+ will wait for downloads according to ``RLMWaitForSyncMode`` behavior.
 
- If `subscribeWithCompletion` is called on a query
- that's already subscribed to without a name, another subscription is not created.
- If `subscribeWithCompletion` is called on a query
- that's already subscribed to with a name, an additional subscription is created without a name.
+ ### Unnamed subscriptions ###
+ If `subscribeWithCompletion:` is called without a name whose query matches an unnamed subscription, another subscription is not created.
 
- This method opens a write transaction that creates or updates a subscription.
+ If `subscribeWithCompletion:` is called without a name whose query matches a named subscription, an additional  unnamed subscription is created.
+ ### Named Subscriptions ###
+ If `subscribeWithCompletion:` is called with a name whose query matches an unnamed subscription, an additional named subscription is created.
+ ### Existing name and query ###
+ If `subscribeWithCompletion:` is called with a name whose name is taken on a different query, the old subscription is updated with the new query.
+
+ @note This method opens an update block transaction that creates or updates a subscription.
  It's advised to *not* loop over this method in order to create multiple subscriptions at once.
  This could create a performance bottleneck by opening multiple unnecessary write transactions.
  @see: `[RLMSyncSubscription update:queue:onComplete:]` in order to create multiple subscriptions.
 
- @param completion The block called after the subscription download
- is completed. The completion is called according to
- RLMWaitForSyncModeOnCreation behavior.
- @see ``RLMWaitForSyncModeOnCreation`` and ``RLMWaitForSyncMode``
  @param queue The queue where the completion dispatches.
- @param completion The block called after the subscription download is
- completed. The completion is called according to RLMWaitForSyncModeOnCreation behavior.
+ @param completion The completion block called after the subscription completes. The callback
+ will wait for downloads according to the value in `waitForSyncMode`.
+ @see ``RLMWaitForSyncMode``
  */
 - (void)subscribeWithCompletionOnQueue:(dispatch_queue_t _Nullable)queue
                             completion:(RLMResultsCompletionBlock)completion;
 
 /**
- Creates an RLMSyncSubscription matching the RLMResults' local filter.
+ Creates a RLMSyncSubscription matching the RLMResults's local filter.
 
  After committing the subscription to the realm's local subscription set, the method
- will wait for downloads according to ``RLMWaitForSyncModeOnCreation`` behavior.
- @see ``RLMWaitForSyncModeOnCreation`` and ``RLMWaitForSyncMode``
+ will wait for downloads according to ``RLMWaitForSyncMode`` behavior.
 
- If `subscribeWithName` is called without a name on a query
- that's already subscribed to without a name, another subscription is not created.
- If `subscribeWithName` is called without a name on a query
- that's already subscribed to with a name, an additional subscription is created without a name.
- If `subscribeWithName` is called with a name on a query that's
- already subscribed to without a name, an additional subscription is created
- with the provided name.
- If `subscribeWithName` is called with a name that's in use on
- a different query, the old subscription is updated with the new query.
- If `subscribeWithName` is called with the same name and
- same query of an existing subscription, no new subscription is created.
+ ### Unnamed subscriptions ###
+ If `subscribeWithCompletion:` is called without a name whose query matches an unnamed subscription, another subscription is not created.
 
- This method opens a write transaction that creates or updates a subscription.
+ If `subscribeWithCompletion:` is called without a name whose query matches a named subscription, an additional  unnamed subscription is created.
+ ### Named Subscriptions ###
+ If `subscribeWithCompletion:` is called with a name whose query matches an unnamed subscription, an additional named subscription is created.
+ ### Existing name and query ###
+ If `subscribeWithCompletion:` is called with a name whose name is taken on a different query, the old subscription is updated with the new query.
+
+ @note This method opens an update block transaction that creates or updates a subscription.
  It's advised to *not* loop over this method in order to create multiple subscriptions at once.
  This could create a performance bottleneck by opening multiple unnecessary write transactions.
  @see: `[RLMSyncSubscription update:queue:onComplete:]` in order to create multiple subscriptions.
 
  @param name The name used to identify the subscription.
  @param queue The queue where the completion dispatches.
- @param completion The block called after the subscription download is
- completed. The completion is called according to RLMWaitForSyncModeOnCreation behavior.
- @see ``RLMWaitForSyncModeOnCreation`` and ``RLMWaitForSyncMode``
+ @param completion The completion block called after the subscription completes. The callback
+ will wait for downloads according to the value in `waitForSyncMode`.
+ @see ``RLMWaitForSyncMode``
  */
 - (void)subscribeWithName:(NSString *_Nullable)name
                   onQueue:(dispatch_queue_t _Nullable)queue
                completion:(RLMResultsCompletionBlock)completion;
 
 /**
- Creates an RLMSyncSubscription matching the RLMResults' local filter.
+ Creates a RLMSyncSubscription matching the RLMResults's local filter.
 
  After committing the subscription to the realm's local subscription set, the method
- will wait for downloads according to the `RLMWaitForSyncMode`.
- @see ``RLMWaitForSyncMode``
+ will wait for downloads according to the ``RLMWaitForSyncMode``.
 
- If `subscribeWithName` is called without a name on a query
- that's already subscribed to without a name, another subscription is not created.
- If `subscribeWithName` is called without a name on a query
- that's already subscribed to with a name, an additional subscription is created without a name.
- If `subscribeWithName` is called with a name on a query that's
- already subscribed to without a name, an additional subscription is created
- with the provided name.
- If `subscribeWithName` is called with a name that's in use on
- a different query, the old subscription is updated with the new query.
- If `subscribeWithName`is called with the same name and
- same query of an existing subscription, no new subscription is created.
+ ### Unnamed subscriptions ###
+ If `subscribeWithCompletion:` is called without a name whose query matches an unnamed subscription, another subscription is not created.
 
- This method opens a write transaction that creates or updates a subscription.
+ If `subscribeWithCompletion:` is called without a name whose query matches a named subscription, an additional  unnamed subscription is created.
+ ### Named Subscriptions ###
+ If `subscribeWithCompletion:` is called with a name whose query matches an unnamed subscription, an additional named subscription is created.
+ ### Existing name and query ###
+ If `subscribeWithCompletion:` is called with a name whose name is taken on a different query, the old subscription is updated with the new query.
+
+ @note This method opens an update block transaction that creates or updates a subscription.
  It's advised to *not* loop over this method in order to create multiple subscriptions at once.
  This could create a performance bottleneck by opening multiple unnecessary write transactions.
  @see: `[RLMSyncSubscription update:queue:onComplete:]` in order to create multiple subscriptions.
@@ -519,8 +511,8 @@ __attribute__((warn_unused_result));
  @param name The name used  to identify the subscription.
  @param waitForSyncMode Dictates when the completion handler is called
  @param queue The queue where the completion dispatches.
- @param completion The block called after the subscription download is
- completed. Return behavior is dictated by the RLMWaitForSyncMode.
+ @param completion The completion block called after the subscription completes. The callback
+ will wait for downloads according to the value in `waitForSyncMode`.
  @see ``RLMWaitForSyncMode``
  */
 - (void)subscribeWithName:(NSString *_Nullable)name
@@ -530,25 +522,21 @@ __attribute__((warn_unused_result));
 __attribute__((swift_attr("@_unsafeInheritExecutor")));
 
 /**
- Creates an RLMSyncSubscription matching the RLMResults' local filter.
+ Creates a RLMSyncSubscription matching the RLMResults's local filter.
 
  After committing the subscription to the realm's local subscription set, the method
- will wait for downloads according to the `RLMWaitForSyncMode`.
- @see ``RLMWaitForSyncMode``
+ will wait for downloads according to the ``RLMWaitForSyncMode``.
 
- If `subscribeWithName` is called without a name on a query
- that's already subscribed to without a name, another subscription is not created.
- If `subscribeWithName` is called without a name on a query
- that's already subscribed to with a name, an additional subscription is created without a name.
- If `subscribeWithName` is called with a name on a query that's
- already subscribed to without a name, an additional subscription is created
- with the provided name.
- If `subscribeWithName` is called with a name that's in use on
- a different query, the old subscription is updated with the new query.
- If `subscribeWithName` is called with the same name and
- same query of an existing subscription, no new subscription is created
+ ### Unnamed subscriptions ###
+ If `subscribeWithCompletion:` is called without a name whose query matches an unnamed subscription, another subscription is not created.
 
- This method opens a write transaction that creates or updates a subscription.
+ If `subscribeWithCompletion:` is called without a name whose query matches a named subscription, an additional  unnamed subscription is created.
+ ### Named Subscriptions ###
+ If `subscribeWithCompletion:` is called with a name whose query matches an unnamed subscription, an additional named subscription is created.
+ ### Existing name and query ###
+ If `subscribeWithCompletion:` is called with a name whose name is taken on a different query, the old subscription is updated with the new query.
+
+ @note This method opens an update block transaction that creates or updates a subscription.
  It's advised to *not* loop over this method in order to create multiple subscriptions at once.
  This could create a performance bottleneck by opening multiple unnecessary write transactions.
  @see: `[RLMSyncSubscription update:queue:onComplete:]` in order to create multiple subscriptions.
@@ -558,10 +546,9 @@ __attribute__((swift_attr("@_unsafeInheritExecutor")));
  @param queue The queue where the completion dispatches.
  @param timeout A timeout which ends waiting for downloads
  via the completion handler. If the timeout is exceeded the completion
- handler returns an `RLMErrorClientTimeout`.
- @see ``RLMErrorClientTimeout``
- @param completion The block called after the subscription download is
- completed. Return behavior is dictated by the RLMWaitForSyncMode.
+ handler returns an error.
+ @param completion The completion block called after the subscription completes. The callback
+ will wait for downloads according to the value in `waitForSyncMode`.
  @see ``RLMWaitForSyncMode``
  */
 - (void)subscribeWithName:(NSString *_Nullable)name
@@ -572,7 +559,7 @@ __attribute__((swift_attr("@_unsafeInheritExecutor")));
 __attribute__((swift_attr("@_unsafeInheritExecutor")));
 
 /**
- Removes an RLMSubscription matching the RLMResults' local filter.
+ Removes a RLMSubscription matching the RLMResults'slocal filter.
 
  The method returns after committing the subscription removal to the
  realm's local subscription set. Calling this method will not wait for objects to
@@ -582,15 +569,14 @@ __attribute__((swift_attr("@_unsafeInheritExecutor")));
  After calling unsubscribe, RLMResults may still contain objects because
  other subscriptions may exist in the RLMRealm's subscription set.
 
- In order for a named subscription to be removed, the RLMResults
+ @note In order for a named subscription to be removed, the RLMResults
  must have previously created the subscription.
- Returned `RLMResults`  from calling `subscribe` can be used later to unsubscribe from the same
- subscription.
+ The `RLMResults` returned in the completion block when calling `subscribe` can be used to unsubscribe from the same subscription.
 
- This method opens a write transaction that creates or updates a subscription.
+ @note This method opens an update block transaction that creates or updates a subscription.
  It's advised to *not* loop over this method in order to create multiple subscriptions at once.
  This could create a performance bottleneck by opening multiple unnecessary write transactions.
- @see: `[RLMSyncSubscription update:queue:onComplete:]` in order to create multiple subscriptions..
+ @see: ``[RLMSyncSubscription update:queue:onComplete:]`` in order to create multiple subscriptions.
  */
 - (void)unsubscribe;
 

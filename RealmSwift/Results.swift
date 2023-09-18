@@ -151,40 +151,40 @@ extension Projection: KeypathSortable {}
 
 #if swift(>=5.8)
     /**
-     Creates a SyncSubscription matching the Results' local filter.
-
+     Creates a SyncSubscription matching the Results' local query.
      After committing the subscription to the realm's local subscription set, the method
-     will wait for downloads according to the `WaitForSyncMode`.
-     - see: ``WaitForSyncMode``
+     will wait for downloads according to `WaitForSyncMode`.
+
+     ### Unnamed subscriptions ###
+     If `.subscribe()` is called without a name whose query matches an unnamed subscription, another subscription is not created.
+
+     If `.subscribe()` is called without a name whose query matches a named subscription, an additional  unnamed subscription is created.
+     ### Named Subscriptions ###
+     If `.subscribe()` is called with a name whose query matches an unnamed subscription, an additional named subscription is created.
+     ### Existing name and query ###
+     If `.subscribe()` is called with a name whose name is taken on a different query, the old subscription is updated with the new query.
+
+     If `.subscribe()` is called with a name that's in already in use by an identical query, no new subscription is created.
+
 
      - Note: This method will wait for all data to be downloaded before returning when `WaitForSyncMode.always` and `.onCreation` (when the subscription is first created) is used. This requires an internet connection if no timeout is set.
 
-     __Unnamed subscriptions:__
-     If `.subscribe()` is called without a name whose query matches an unnamed subscription, another subscription is not created.
-     If `.subscribe()` is called without a name whose query matches a named subscription, an additional  unnamed subscription is created.
-     __Named Subscriptions:__
-     If `.subscribe()` is called with a name whose query matches an unnamed subscription, an additional named subscription is created.
-     __Existing name and query:__
-     If `.subscribe()` is called with a name whose name is taken on a different query, the old subscription is updated with the new query.
-     If `.subscribe()` is called with a name that's in already in use by an identical query, no new subscription is created.
-
-     - Note: This method opens a write transaction that creates or updates a subscription.
+     - Note: This method opens a update transaction that creates or updates a subscription.
      It's advised to *not* loop over this method in order to create multiple subscriptions.
-     This could create a performance bottleneck by opening multiple unnecessary write transactions.
-     - note To create multiple subscriptions at once use `SyncSubscription.update`.
+     This could create a performance bottleneck by opening multiple unnecessary update transactions.
+     To create multiple subscriptions at once use `SyncSubscription.update`.
 
      - parameter name: The name applied to the subscription
-     - parameter waitForSync: Determines the download behavior for the subscription. Defaults to `.onCreation`.
-     See `RLMWaitForSyncMode`.
+     - parameter waitForSync: ``WaitForSyncMode`` Determines the download behavior for the subscription. Defaults to `.onCreation`.
      - parameter timeout: An optional client timeout. The client will cancel waiting for subscription downloads after this time has elapsed. Reaching this timeout doesn't imply a server error.
-     - returns: A `Results` object.
+     - returns: Returns `self`.
 
      - warning: This function is only supported for main thread and
                 actor-isolated Realms.
      */
     @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
     @_unsafeInheritExecutor
-    public func subscribe(name: String? = nil, waitForSync: WaitForSyncMode = .onCreation, timeout: TimeInterval? = nil) async throws -> Results<Element> {
+public func subscribe(name: String? = nil, waitForSync: WaitForSyncMode = .onCreation, timeout: TimeInterval? = nil) async throws -> Results<Element> {
         guard let actor = realm?.rlmRealm.actor as? Actor else {
             fatalError("`subscribe` can only be called on main thread or actor-isolated Realms")
         }
@@ -198,17 +198,9 @@ extension Projection: KeypathSortable {}
     /**
      Removes a SyncSubscription matching the Results' local filter.
 
-     This method opens an update transaction that removes a subscription.
-     It is advised to *not* use this method to batch multiple subscription changes
-     to the server.
-     - see: `SyncSubscription.update` for batch updates
-
      The method returns after committing the subscription removal to the realm's
      local subscription set. Calling this method will not wait for objects to
      be removed from the realm.
-
-     - warning: Calling unsubscribe on a Results does not remove the local filter from the Results. After calling unsubscribe,
-     Results may still contain objects because other subscriptions may exist in the realm's subscription set.
 
      In order for a named subscription to be removed, the Results
      must have previously created the subscription. For example:
@@ -220,6 +212,14 @@ extension Projection: KeypathSortable {}
      // subscription still remain.
      results2.unsubscribe()
      ```
+
+     - Note: This method opens an update transaction that removes a subscription.
+     It is advised to *not* use this method to batch multiple subscription changes
+     to the server.
+     To unsubscribe multiple subscriptions at once use `SyncSubscription.update`.
+
+     - warning: Calling unsubscribe on a Results does not remove the local filter from the `Results`. After calling unsubscribe,
+     Results may still contain objects because other subscriptions may exist in the realm's subscription set.
      */
     public func unsubscribe() {
         let rlmResults = ObjectiveCSupport.convert(object: self)

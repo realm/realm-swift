@@ -255,16 +255,6 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
          queue:(nullable dispatch_queue_t)queue
        timeout:(NSTimeInterval)timeout
     onComplete:(void(^)(NSError *))completionBlock {
-    [self update:block
-      confinedTo:[RLMScheduler dispatchQueue:queue]
-         timeout:timeout
-      onComplete:completionBlock];
-}
-
-- (void)update:(__attribute__((noescape)) void(^)(void))block
-    confinedTo:(RLMScheduler *)confinement
-       timeout:(NSTimeInterval)timeout
-    onComplete:(void(^)(NSError *))completionBlock {
     if (_mutableSubscriptionSet) {
         @throw RLMException(@"Cannot initiate a write transaction on subscription set that is already being updated.");
     }
@@ -290,17 +280,17 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
     }
 
     if (completionBlock) {
-        [self waitForSynchronizationConfinedTo:confinement
-                                       timeout:timeout
-                               completionBlock:completionBlock];
+        [self waitForSynchronizationOnQueue:queue
+                                    timeout:timeout
+                            completionBlock:completionBlock];
     }
 }
 
-- (void)waitForSynchronizationConfinedTo:(nullable RLMScheduler *)confinement
-                                 timeout:(NSTimeInterval)timeout
-                         completionBlock:(void(^)(NSError *))completionBlock {
+- (void)waitForSynchronizationOnQueue:(nullable dispatch_queue_t)queue
+                              timeout:(NSTimeInterval)timeout
+                      completionBlock:(void(^)(NSError *))completionBlock {
     RLMAsyncSubscriptionTask *syncSubscriptionTask = [[RLMAsyncSubscriptionTask alloc] initWithSubscriptionSet:self
-                                                                                                    confinedTo:confinement
+                                                                                                         queue:queue
                                                                                                        timeout:timeout
                                                                                                     completion:completionBlock];
     [syncSubscriptionTask waitForSubscription];

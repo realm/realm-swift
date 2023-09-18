@@ -73,7 +73,7 @@ RLM_SWIFT_SENDABLE
 @interface RLMAsyncSubscriptionTask : NSObject
 
 - (instancetype)initWithSubscriptionSet:(RLMSyncSubscriptionSet *)subscriptionSet
-                             confinedTo:(RLMScheduler *_Nullable)confinement
+                                  queue:(nullable dispatch_queue_t)queue
                                 timeout:(NSTimeInterval)timeout
                              completion:(void(^)(NSError *))completion;
 

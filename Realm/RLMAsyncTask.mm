@@ -244,9 +244,9 @@ __attribute__((objc_direct_members))
         auto subscriptions = _backgroundRealm.subscriptions;
         if (subscriptions.state == RLMSyncSubscriptionStatePending) {
             // FIXME: need cancellation for waiting for the subscription
-            return [subscriptions waitForSynchronizationConfinedTo:nil
-                                                           timeout:0
-                                                   completionBlock:^(NSError *error) {
+            return [subscriptions waitForSynchronizationOnQueue:nil
+                                                        timeout:0
+                                                completionBlock:^(NSError *error) {
                 if (error) {
                     std::lock_guard lock(_mutex);
                     return [self reportError:error];
@@ -480,7 +480,7 @@ __attribute__((objc_direct_members))
     RLMUnfairMutex _mutex;
 
     RLMSyncSubscriptionSet *_subscriptionSet;
-    RLMScheduler *_scheduler;
+    dispatch_queue_t _queue;
     NSTimeInterval _timeout;
     void (^_completion)(NSError *);
 
@@ -488,7 +488,7 @@ __attribute__((objc_direct_members))
 }
 
 - (instancetype)initWithSubscriptionSet:(RLMSyncSubscriptionSet *)subscriptionSet
-                             confinedTo:(RLMScheduler *)confinement
+                                  queue:(nullable dispatch_queue_t)queue
                                 timeout:(NSTimeInterval)timeout
                              completion:(void(^)(NSError *))completion {
     if (!(self = [super init])) {
@@ -496,7 +496,7 @@ __attribute__((objc_direct_members))
     }
 
     _subscriptionSet = subscriptionSet;
-    _scheduler = confinement;
+    _queue = queue;
     _timeout = timeout;
     _completion = completion;
 
@@ -545,10 +545,10 @@ __attribute__((objc_direct_members))
     }
 
     if (completion) {
-        if (_scheduler) {
-            [_scheduler invoke:^{
+        if (_queue) {
+            dispatch_async(_queue, ^{
                 completion(error);
-            }];
+            });
             return;
         }
 

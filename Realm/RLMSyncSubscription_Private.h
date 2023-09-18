@@ -57,13 +57,13 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
                       updateExisting:(BOOL)updateExisting;
 
 - (void)update:(__attribute__((noescape)) void(^)(void))block
-    confinedTo:(RLMScheduler *)confinement
+         queue:(nullable dispatch_queue_t)queue
        timeout:(NSTimeInterval)timeout
     onComplete:(void(^)(NSError *))completionBlock;
 
-- (void)waitForSynchronizationConfinedTo:(nullable RLMScheduler *)confinement
-                                 timeout:(NSTimeInterval)timeout
-                         completionBlock:(void(^)(NSError *))completionBlock;
+- (void)waitForSynchronizationOnQueue:(nullable dispatch_queue_t)queue
+                              timeout:(NSTimeInterval)timeout
+                      completionBlock:(void(^)(NSError *))completionBlock;
 
 - (RLMSyncSubscriptionEnumerator *)fastEnumerator;
 

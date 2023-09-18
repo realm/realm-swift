@@ -1200,17 +1200,21 @@
         XCTAssertNotNil(realm);
         CHECK_COUNT(0, Person, realm);
 
-
         [[[Person allObjectsInRealm:realm] objectsWhere:@"lastName == 'Loren'"]
          subscribeWithCompletionOnQueue:dispatch_get_main_queue()
          completion:^(RLMResults *results, NSError *error) {
             XCTAssertNil(error);
-            XCTAssertEqual(results.count, 1U);
-            XCTAssertEqual(realm.subscriptions.count, 1UL);
+            XCTAssertEqual(results.realm.subscriptions.count, 1UL);
+            XCTAssertEqual(results.realm.subscriptions.state, RLMSyncSubscriptionStateComplete);
+            CHECK_COUNT(1, Person, results.realm);
             [ex fulfill];
         }];
     }];
-    [self waitForExpectationsWithTimeout:5.0 handler:nil];
+    [self waitForExpectationsWithTimeout:20.0 handler:nil];
+
+    RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
+    XCTAssertEqual(realm.subscriptions.count, 1UL);
+    CHECK_COUNT(1, Person, realm);
 }
 
 - (void)testSubscribeWithNameAndTimeout {

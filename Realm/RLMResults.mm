@@ -577,19 +577,16 @@ keyPaths:(std::optional<std::vector<std::vector<std::pair<realm::TableKey, realm
                                     error:(NSError *_Nullable)error {
     auto tsr = (error != nil) ? nil : reference;
     RLMRealmConfiguration *configuration = _realm.configuration;
-    if (reference) {
-        RLMRealm *realm = [RLMRealm realmWithConfiguration:configuration confinedTo:confinement error:nil];
-        RLMResults *collection = [realm resolveThreadSafeReference:tsr];
-        collection.associatedSubscriptionId = self.associatedSubscriptionId;
-        [realm refresh];
-        [confinement invoke:^{
+    [confinement invoke:^{
+        if (reference) {
+            RLMRealm *realm = [RLMRealm realmWithConfiguration:configuration error:nil];
+            RLMResults *collection = [realm resolveThreadSafeReference:tsr];
+            collection.associatedSubscriptionId = self.associatedSubscriptionId;
             completion(collection, error);
-        }];
-    } else {
-        [confinement invoke:^{
+        } else {
             completion(nil, error);
-        }];
-    }
+        }
+    }];
 }
 
 // Returns true if the calling method should call immediately the completion block, this can happen if the subscription
@@ -636,18 +633,19 @@ keyPaths:(std::optional<std::vector<std::vector<std::pair<realm::TableKey, realm
                confinedTo:(RLMScheduler *)confinement
                   timeout:(NSTimeInterval)timeout
                completion:(RLMResultsCompletionBlock)completion {
+    RLMThreadSafeReference *reference = [RLMThreadSafeReference referenceWithThreadConfined:self];
     if ([self shouldNotWaitForSubscriptionToComplete:waitForSyncMode name:name]) {
-        [self completionWithThreadSafeReference:[RLMThreadSafeReference referenceWithThreadConfined:self] confinedTo:confinement completion:completion error:nil];
+        [self completionWithThreadSafeReference:reference confinedTo:confinement completion:completion error:nil];
     } else {
         RLMThreadSafeReference *reference = [RLMThreadSafeReference referenceWithThreadConfined:self];
-        RLMSyncSubscriptionSet *subscriptions = self.realm.subscriptions;
+        RLMSyncSubscriptionSet *subscriptions = _realm.subscriptions;
         [subscriptions update:^{
             // associated subscription id is nil when no name is provided.
             self.associatedSubscriptionId = [subscriptions addSubscriptionWithClassName:self.objectClassName
                                                                        subscriptionName:name
                                                                                   query:_results.get_query()
                                                                          updateExisting:true];
-        } confinedTo:confinement timeout:timeout onComplete:^(NSError *error) {
+        } queue:nil timeout:timeout onComplete:^(NSError *error) {
             [self completionWithThreadSafeReference:reference confinedTo:confinement completion:completion error:error];
         }];
     }
