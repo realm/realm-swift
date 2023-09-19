@@ -1,7 +1,26 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+* Added `Results.subscribe` API for flexible sync.
+  Now you can subscribe and unsubscribe to a flexible sync subscription through an object `Result`.
+  ```swift
+  // Named subscription query
+  let results = try await realm.objects(Dog.self).where { $0.age > 18 }.subscribe(name: "adults")
+  results.unsubscribe()
+  
+  // Unnamed subscription query
+  let results = try await realm.objects(Dog.self).subscribe()
+  results.unsubscribe()
+  ````
+  
+  After committing the subscription to the realm's local subscription set, the method
+  will wait for downloads according to the `WaitForSyncMode`.
+  ```swift
+  let results = try await realm.objects(Dog.self).where { $0.age > 1 }.subscribe(waitForSync: .always)
+  ```
+  Where `.always` will always download the latest data for the subscription, `.onCreation` will do
+  it only the first time the subscription is created, and `.never` will never wait for the
+  data to be donwloaded.
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
@@ -26,26 +45,6 @@ x.y.z Release notes (yyyy-MM-dd)
 
 * Update packaging for the Xcode 15.0 release. Carthage release and obj-c
   binaries are now built with Xcode 15.
-* Added `Results.subscribe` API for flexible sync.
-  Now you can subscribe and unsubscribe to a flexible sync subscription through an object `Result`.
-  ```swift
-  // Named subscription query
-  let results = try await realm.objects(Dog.self).where { $0.age > 18 }.subscribe(name: "adults")
-  results.unsubscribe()
-  
-  // Unnamed subscription query
-  let results = try await realm.objects(Dog.self).subscribe()
-  results.unsubscribe()
-  ````
-  
-  After committing the subscription to the realm's local subscription set, the method
-  will wait for downloads according to the `WaitForSyncMode`.
-  ```swift
-  let results = try await realm.objects(Dog.self).where { $0.age > 1 }.subscribe(waitForSync: .always)
-  ```
-  Where `.always` will always download the latest data for the subscription, `.onCreation` will do
-  it only the first time the subscription is created, and `.never` will never wait for the
-  data to be donwloaded.
 
 ### Fixed
 
