@@ -1747,8 +1747,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
 
         // Screw up the token on the user.
-        manuallySetAccessToken(for: user, value: badAccessToken())
-        manuallySetRefreshToken(for: user, value: badAccessToken())
+        setInvalidTokensFor(user)
         // Try to open a Realm with the user; this will cause our errorHandler block defined above to be fired.
         XCTAssertFalse(blockCalled.value)
         _ = try immediatelyOpenRealm(partitionValue: "realm_id", user: user)

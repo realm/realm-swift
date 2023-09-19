@@ -130,11 +130,8 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
                     expectation:(nullable XCTestExpectation *)expectation
                           error:(NSError **)error;
 
-/// Manually set the access token for a user. Used for testing invalid token conditions.
-- (void)manuallySetAccessTokenForUser:(RLMUser *)user value:(NSString *)tokenValue;
-
-/// Manually set the refresh token for a user. Used for testing invalid token conditions.
-- (void)manuallySetRefreshTokenForUser:(RLMUser *)user value:(NSString *)tokenValue;
+/// Set the user's tokens to invalid ones to test invalid token handling.
+- (void)setInvalidTokensForUser:(RLMUser *)user;
 
 - (void)writeToPartition:(SEL)testSel block:(void (^)(RLMRealm *))block;
 - (void)writeToPartition:(nullable NSString *)testName userName:(NSString *)userNameBase block:(void (^)(RLMRealm *))block;

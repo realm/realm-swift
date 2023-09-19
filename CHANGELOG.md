@@ -1,13 +1,34 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+* Asymmetric objects are now allowed to link to non-embedded, non-asymmetric
+  objects. ([Core #6981](https://github.com/realm/realm-core/pull/6981))
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
-* None.
-
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+* The Swift package failed to link some required system libraries when building
+  for Catalyst, potentially resulting in linker errors if the application did
+  not pull them in (since v10.40.1)
+* Logging into a single user using multiple auth providers created a separate
+  SyncUser per auth provider. This mostly worked, but had some quirks:
+  - Sync sessions would not necessarily be associated with the specific
+    SyncUser used to create them. As a result, querying a user for its sessions
+    could give incorrect results, and logging one user out could close the wrong
+    sessions.
+  - Removing one of the SyncUsers would delete all local Realm files for all
+    SyncUsers for that user.
+  - Deleting the server-side user via one of the SyncUsers left the other
+    SyncUsers in an invalid state.
+  - A SyncUser which was originally created via anonymous login and then linked
+    to an identity would still be treated as an anonymous users and removed
+    entirely on logout.
+    ([Core #6837](https://github.com/realm/realm-core/pull/6837), since v10.0.0)
+* Reading existing logged-in users on app startup from the sync metadata Realm
+  performed three no-op writes per user on the metadata Realm
+  ([Core #6837](https://github.com/realm/realm-core/pull/6837), since v10.0.0).
+* If a user was logged out while an access token refresh was in progress, the
+  refresh completing would mark the user as logged in again and the user would
+  be in an inconsistent state ([Core #6837](https://github.com/realm/realm-core/pull/6837), since v10.0.0).
+* The Swift package failed to link required libraries when building for macCatalyst.
 
 ### Compatibility
 * Realm Studio: 14.0.1 or later.
@@ -17,7 +38,10 @@ x.y.z Release notes (yyyy-MM-dd)
 * Xcode: 14.1-15.0.0.
 
 ### Internal
-* Upgraded realm-core from ? to ?
+* Upgraded realm-core from 13.20.1 to 13.21.0
+* The schema version of the metadata Realm used to cache logged in users has
+  been bumped. Upgrading is handled automatically, but downgrading from this
+  version to older versions will result in cached logins being discarded.
 
 10.42.3 Release notes (2023-09-18)
 =============================================================

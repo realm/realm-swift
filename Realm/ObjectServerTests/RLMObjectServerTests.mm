@@ -563,8 +563,7 @@ static NSString *randomEmail() {
         [expectation fulfill];
     };
 
-    [self manuallySetAccessTokenForUser:user value:[self badAccessToken]];
-    [self manuallySetRefreshTokenForUser:user value:[self badAccessToken]];
+    [self setInvalidTokensForUser:user];
 
     [self immediatelyOpenRealmForPartitionValue:NSStringFromSelector(_cmd)
                                            user:user
@@ -1754,8 +1753,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     RLMCredentials *credentials = [self basicCredentialsWithName:NSStringFromSelector(_cmd)
                                                         register:self.isParent];
     RLMUser *user = [self logInUserForCredentials:credentials];
-    [self manuallySetAccessTokenForUser:user value:[self badAccessToken]];
-    [self manuallySetRefreshTokenForUser:user value:[self badAccessToken]];
+    [self setInvalidTokensForUser:user];
     auto ex = [self expectationWithDescription:@"async open"];
     auto c = [user configurationWithTestSelector:_cmd];
     [RLMRealm asyncOpenWithConfiguration:c callbackQueue:dispatch_get_main_queue()
