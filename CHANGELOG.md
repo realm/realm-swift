@@ -1,10 +1,13 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.42.4 Release notes (2023-09-25)
 =============================================================
+
 ### Enhancements
+
 * Asymmetric objects are now allowed to link to non-embedded, non-asymmetric
   objects. ([Core #6981](https://github.com/realm/realm-core/pull/6981))
 
 ### Fixed
+
 * The Swift package failed to link some required system libraries when building
   for Catalyst, potentially resulting in linker errors if the application did
   not pull them in (since v10.40.1)
@@ -28,9 +31,9 @@ x.y.z Release notes (yyyy-MM-dd)
 * If a user was logged out while an access token refresh was in progress, the
   refresh completing would mark the user as logged in again and the user would
   be in an inconsistent state ([Core #6837](https://github.com/realm/realm-core/pull/6837), since v10.0.0).
-* The Swift package failed to link required libraries when building for macCatalyst.
 
 ### Compatibility
+
 * Realm Studio: 14.0.1 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 15.0.0.
@@ -38,6 +41,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * Xcode: 14.1-15.0.0.
 
 ### Internal
+
 * Upgraded realm-core from 13.20.1 to 13.21.0
 * The schema version of the metadata Realm used to cache logged in users has
   been bumped. Upgrading is handled automatically, but downgrading from this
