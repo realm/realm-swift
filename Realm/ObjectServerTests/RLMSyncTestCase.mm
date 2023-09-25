@@ -440,12 +440,9 @@ static NSURL *syncDirectoryForChildProcess() {
     [realm refresh];
 }
 
-- (void)manuallySetAccessTokenForUser:(RLMUser *)user value:(NSString *)tokenValue {
-    [user _syncUser]->update_access_token(tokenValue.UTF8String);
-}
-
-- (void)manuallySetRefreshTokenForUser:(RLMUser *)user value:(NSString *)tokenValue {
-    [user _syncUser]->update_refresh_token(tokenValue.UTF8String);
+- (void)setInvalidTokensForUser:(RLMUser *)user {
+    auto token = self.badAccessToken.UTF8String;
+    user._syncUser->log_in(token, token);
 }
 
 - (void)writeToPartition:(SEL)testSel block:(void (^)(RLMRealm *))block {

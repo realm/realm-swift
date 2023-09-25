@@ -91,12 +91,10 @@ RLM_COLLECTION_TYPE(PersonAsymmetric);
 
 @interface UnsupportedLinkObject : RLMAsymmetricObject
 @property RLMObjectId *_id;
-@property Person *object;
 @property RLM_GENERIC_ARRAY(Person) *objectArray;
 @end
 
 @implementation UnsupportedLinkObject
-
 + (NSDictionary *)defaultPropertyValues {
     return @{@"_id": [RLMObjectId objectId]};
 }
@@ -230,9 +228,8 @@ RLM_COLLECTION_TYPE(PersonAsymmetric);
     NSError *error;
     RLMRealm *realm = [RLMRealm realmWithConfiguration:configuration error:&error];
     XCTAssertNil(realm);
-    // This error comes from core, we are not even adding this objects to the server schema.
-    XCTAssert([error.localizedDescription containsString:@"Asymmetric table with property 'UnsupportedLinkAsymmetric.object' of type 'object' cannot have a non-embedded object type"]);
-    XCTAssert([error.localizedDescription containsString:@"Asymmetric table with property 'UnsupportedLinkAsymmetric.objectArray' of type 'array' cannot have a non-embedded object type."]);
+    XCTAssert([error.localizedDescription containsString:@"Property 'UnsupportedLinkAsymmetric.object' of type 'object' cannot be a link to an asymmetric object."]);
+    XCTAssert([error.localizedDescription containsString:@"Property 'UnsupportedLinkAsymmetric.objectArray' of type 'array' cannot be a link to an asymmetric object."]);
 }
 
 - (void)testUnsupportedAsymmetricLinkObjectThrowsError  {
@@ -242,9 +239,9 @@ RLM_COLLECTION_TYPE(PersonAsymmetric);
     NSError *error;
     RLMRealm *realm = [RLMRealm realmWithConfiguration:configuration error:&error];
     XCTAssertNil(realm);
-    // This error comes from core, we are not even adding this objects to the server schema.
-    XCTAssert([error.localizedDescription containsString:@"Asymmetric table with property 'UnsupportedLinkObject.object' of type 'object' cannot have a non-embedded object type."]);
-    XCTAssert([error.localizedDescription containsString:@"Asymmetric table with property 'UnsupportedLinkObject.objectArray' of type 'array' cannot have a non-embedded object type."]);
+    // Schema validation allows this but then creating the column fails. This is
+    // a core bug and this test will start failing as soon as it's fixed.
+    XCTAssert([error.localizedDescription containsString:@"List of objects not supported in asymmetric table"]);
 }
 
 - (void)testUnsupportedObjectLinksAsymmetricThrowsError  {

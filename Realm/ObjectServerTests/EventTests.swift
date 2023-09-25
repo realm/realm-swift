@@ -557,8 +557,7 @@ class SwiftEventTests: SwiftSyncTestCase {
         }
         let realm = try openRealm(configuration: config)
         let events = realm.events!
-        manuallySetAccessToken(for: user, value: badAccessToken())
-        manuallySetRefreshToken(for: user, value: badAccessToken())
+        setInvalidTokensFor(user)
 
         // Recording the audit event should succeed, but we should get a sync
         // error when trying to actually upload it due to the user having
