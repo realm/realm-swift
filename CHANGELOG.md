@@ -20,7 +20,9 @@ x.y.z Release notes (yyyy-MM-dd)
   ```
   Where `.always` will always download the latest data for the subscription, `.onCreation` will do
   it only the first time the subscription is created, and `.never` will never wait for the
-  data to be donwloaded.
+  data to be downloaded.
+  
+  This API is currently in `Preview` and may be subject to changes in the future.
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)

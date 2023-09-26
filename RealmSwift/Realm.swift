@@ -1101,7 +1101,6 @@ extension Realm {
      - returns: A `SyncSubscriptionSet`.
      - Warning: This feature is currently in beta and its API is subject to change.
      */
-    @available(*, message: "This feature is currently in beta.")
     public var subscriptions: SyncSubscriptionSet {
         return SyncSubscriptionSet(rlmRealm.subscriptions)
     }

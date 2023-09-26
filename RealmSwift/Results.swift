@@ -181,6 +181,7 @@ extension Projection: KeypathSortable {}
 
      - warning: This function is only supported for main thread and
                 actor-isolated Realms.
+     - warning: This API is currently in `Preview` and may be subject to changes in the future.
      */
     @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
     @_unsafeInheritExecutor
@@ -220,6 +221,7 @@ extension Projection: KeypathSortable {}
 
      - warning: Calling unsubscribe on a Results does not remove the local filter from the `Results`. After calling unsubscribe,
      Results may still contain objects because other subscriptions may exist in the realm's subscription set.
+     - warning: This API is currently in `Preview` and may be subject to changes in the future.
      */
     public func unsubscribe() {
         let rlmResults = ObjectiveCSupport.convert(object: self)

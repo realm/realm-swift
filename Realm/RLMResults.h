@@ -454,6 +454,7 @@ __attribute__((warn_unused_result));
  @param completion The completion block called after the subscription completes. The callback
  will wait for downloads according to the value in `waitForSyncMode`.
  @see ``RLMWaitForSyncMode``
+ @warning This API is currently in `Preview` and may be subject to changes in the future.
  */
 - (void)subscribeWithCompletionOnQueue:(dispatch_queue_t _Nullable)queue
                             completion:(RLMResultsCompletionBlock)completion;
@@ -483,6 +484,7 @@ __attribute__((warn_unused_result));
  @param completion The completion block called after the subscription completes. The callback
  will wait for downloads according to the value in `waitForSyncMode`.
  @see ``RLMWaitForSyncMode``
+ @warning This API is currently in `Preview` and may be subject to changes in the future.
  */
 - (void)subscribeWithName:(NSString *_Nullable)name
                   onQueue:(dispatch_queue_t _Nullable)queue
@@ -514,6 +516,7 @@ __attribute__((warn_unused_result));
  @param completion The completion block called after the subscription completes. The callback
  will wait for downloads according to the value in `waitForSyncMode`.
  @see ``RLMWaitForSyncMode``
+ @warning This API is currently in `Preview` and may be subject to changes in the future.
  */
 - (void)subscribeWithName:(NSString *_Nullable)name
               waitForSync:(RLMWaitForSyncMode)waitForSyncMode
@@ -550,6 +553,7 @@ __attribute__((swift_attr("@_unsafeInheritExecutor")));
  @param completion The completion block called after the subscription completes. The callback
  will wait for downloads according to the value in `waitForSyncMode`.
  @see ``RLMWaitForSyncMode``
+ @warning This API is currently in `Preview` and may be subject to changes in the future.
  */
 - (void)subscribeWithName:(NSString *_Nullable)name
               waitForSync:(RLMWaitForSyncMode)waitForSyncMode
@@ -577,6 +581,7 @@ __attribute__((swift_attr("@_unsafeInheritExecutor")));
  It's advised to *not* loop over this method in order to create multiple subscriptions at once.
  This could create a performance bottleneck by opening multiple unnecessary write transactions.
  @see: ``[RLMSyncSubscription update:queue:onComplete:]`` in order to create multiple subscriptions.
+ @warning This API is currently in `Preview` and may be subject to changes in the future.
  */
 - (void)unsubscribe;
 
