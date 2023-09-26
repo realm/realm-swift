@@ -184,7 +184,7 @@ extension Projection: KeypathSortable {}
      */
     @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
     @_unsafeInheritExecutor
-public func subscribe(name: String? = nil, waitForSync: WaitForSyncMode = .onCreation, timeout: TimeInterval? = nil) async throws -> Results<Element> {
+    public func subscribe(name: String? = nil, waitForSync: WaitForSyncMode = .onCreation, timeout: TimeInterval? = nil) async throws -> Results<Element> {
         guard let actor = realm?.rlmRealm.actor as? Actor else {
             fatalError("`subscribe` can only be called on main thread or actor-isolated Realms")
         }

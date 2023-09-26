@@ -1174,7 +1174,7 @@
         [ex fulfill];
     }];
     [self waitForExpectationsWithTimeout:5.0 handler:nil];
-    XCTAssertEqual(realm.subscriptions.count, 0);
+    XCTAssertEqual(realm.subscriptions.count, 0U);
 }
 
 - (void)testSubscribeOnQueue {

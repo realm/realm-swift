@@ -578,11 +578,12 @@ keyPaths:(std::optional<std::vector<std::vector<std::pair<realm::TableKey, realm
     auto tsr = (error != nil) ? nil : reference;
     RLMRealmConfiguration *configuration = _realm.configuration;
     [confinement invoke:^{
-        if (reference) {
-            RLMRealm *realm = [RLMRealm realmWithConfiguration:configuration error:nil];
+        if (tsr) {
+            NSError *err;
+            RLMRealm *realm = [RLMRealm realmWithConfiguration:configuration error:&err];
             RLMResults *collection = [realm resolveThreadSafeReference:tsr];
             collection.associatedSubscriptionId = self.associatedSubscriptionId;
-            completion(collection, error);
+            completion(collection, err);
         } else {
             completion(nil, error);
         }
