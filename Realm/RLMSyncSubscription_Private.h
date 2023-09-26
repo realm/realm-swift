@@ -18,7 +18,7 @@
 
 #import <Realm/RLMSyncSubscription.h>
 
-#import "RLMRealm_Private.h"
+#import <Realm/RLMRealm.h>
 
 RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 

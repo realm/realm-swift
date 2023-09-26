@@ -23,6 +23,10 @@ x.y.z Release notes (yyyy-MM-dd)
   data to be downloaded.
   
   This API is currently in `Preview` and may be subject to changes in the future.
+* Added a new API which allows to remove all the unnamed subscriptions from the subscription set.
+  ```swift
+  realm.subscriptions.removeAll(unnamedOnly: true)
+  ```
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
