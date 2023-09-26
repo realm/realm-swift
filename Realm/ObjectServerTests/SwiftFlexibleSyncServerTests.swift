@@ -424,6 +424,33 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
         XCTAssertEqual(subscriptions.count, 0)
     }
 
+    func testRemoveAllUnnamedSubscriptions() throws {
+        let realm = try openFlexibleSyncRealm()
+        let subscriptions = realm.subscriptions
+        subscriptions.update {
+            subscriptions.append(
+                QuerySubscription<SwiftPerson>(name: "alex") {
+                    $0.firstName == "Alex"
+                },
+                QuerySubscription<SwiftPerson> {
+                    $0.firstName == "Belle"
+                },
+                QuerySubscription<SwiftPerson> {
+                    $0.firstName == "Charles"
+                })
+            subscriptions.append(QuerySubscription<SwiftTypesSyncObject>(name: "zero") {
+                $0.intCol > 0
+            })
+        }
+        XCTAssertEqual(subscriptions.count, 4)
+
+        subscriptions.update {
+            subscriptions.removeAll(unnamedOnly: true)
+        }
+
+        XCTAssertEqual(subscriptions.count, 2)
+    }
+
     func testSubscriptionSetIterate() throws {
         let realm = try openFlexibleSyncRealm()
         let subscriptions = realm.subscriptions
@@ -1046,6 +1073,20 @@ extension SwiftFlexibleSyncServerTests {
         try realm.write {
             block(realm)
         }
+        waitForUploads(for: realm)
+    }
+
+    @MainActor
+    func populateSwiftPerson() async throws {
+        try await populateFlexibleSyncData { realm in
+            realm.deleteAll() // Remove all objects for a clean state
+            for i in 1...10 {
+                let person = SwiftPerson(firstName: "\(#function)",
+                                         lastName: "lastname_\(i)",
+                                         age: i)
+                realm.add(person)
+            }
+        }
     }
 
     @MainActor
@@ -1311,6 +1352,370 @@ extension SwiftFlexibleSyncServerTests {
         XCTAssertEqual(realm.subscriptions.count, 1)
     }
 
+    // MARK: Subscribe
+
+#if swift(>=5.8)
+    @MainActor
+    func testSubscribe() async throws {
+        try await populateSwiftPerson()
+
+        let realm = try openFlexibleSyncRealm()
+        let results0 = try await realm.objects(SwiftPerson.self).where { $0.age >= 6 }.subscribe()
+        XCTAssertEqual(results0.count, 5)
+        XCTAssertEqual(realm.subscriptions.count, 1)
+        let results1 = try await realm.objects(SwiftPerson.self).where { $0.lastName == "lastname_3" }.subscribe()
+        XCTAssertEqual(results1.count, 1)
+        XCTAssertEqual(results0.count, 5)
+        XCTAssertEqual(realm.subscriptions.count, 2)
+        let results2 = realm.objects(SwiftPerson.self)
+        XCTAssertEqual(results2.count, 6)
+    }
+
+    @MainActor
+    func testSubscribeReassign() async throws {
+        try await populateSwiftPerson()
+        let realm = try openFlexibleSyncRealm()
+
+        var results0 = try await realm.objects(SwiftPerson.self).where { $0.age >= 8 }.subscribe()
+        XCTAssertEqual(results0.count, 3)
+        XCTAssertEqual(realm.subscriptions.count, 1)
+        results0 = try await results0.where { $0.age < 8 }.subscribe() // results0 local query is { $0.age >= 8 AND $0.age < 8 }
+        XCTAssertEqual(results0.count, 0) // no matches because local query is impossible
+        XCTAssertEqual(realm.subscriptions.count, 2) // two subscriptions: "$0.age >= 8 AND $0.age < 8" and "$0.age >= 8"
+        let results1 = realm.objects(SwiftPerson.self)
+        XCTAssertEqual(results1.count, 3) // three objects from "$0.age >= 8". None "$0.age >= 8 AND $0.age < 8".
+    }
+
+    @MainActor
+    func testSubscribeSameQueryNoName() async throws {
+        try await populateSwiftPerson()
+        let realm = try openFlexibleSyncRealm()
+
+        let results0 = try await realm.objects(SwiftPerson.self).where { $0.age >= 8 }.subscribe()
+        let ex = XCTestExpectation(description: "no attempt to re-create subscription, returns immediately")
+        realm.syncSession!.suspend()
+        _ = try await realm.objects(SwiftPerson.self).where { $0.age >= 8 }.subscribe()
+        _ = try await results0.subscribe()
+        XCTAssertEqual(realm.subscriptions.count, 1)
+        ex.fulfill()
+        await fulfillment(of: [ex], timeout: 2.0)
+        XCTAssertEqual(realm.subscriptions.count, 1)
+    }
+
+    @MainActor
+    func testSubscribeSameQuerySameName() async throws {
+        try await populateSwiftPerson()
+        let realm = try openFlexibleSyncRealm()
+
+        let results0 = try await realm.objects(SwiftPerson.self).where { $0.age >= 8 }.subscribe(name: "8 or older")
+        realm.syncSession!.suspend()
+        let ex = XCTestExpectation(description: "no attempt to re-create subscription, returns immediately")
+        Task {
+            _ = try await realm.objects(SwiftPerson.self).where { $0.age >= 8 }.subscribe(name: "8 or older")
+            _ = try await results0.subscribe(name: "8 or older")
+            XCTAssertEqual(realm.subscriptions.count, 1)
+            ex.fulfill()
+        }
+        await fulfillment(of: [ex], timeout: 5.0)
+        XCTAssertEqual(realm.subscriptions.count, 1)
+    }
+
+    @MainActor
+    func testSubscribeSameQueryDifferentName() async throws {
+        try await populateSwiftPerson()
+        let realm = try openFlexibleSyncRealm()
+
+        let results0 = try await realm.objects(SwiftPerson.self).where { $0.age >= 8 }.subscribe()
+        _ = try await realm.objects(SwiftPerson.self).where { $0.age >= 8 }.subscribe(name: "8 or older")
+        _ = try await results0.subscribe(name: "older than 7")
+        XCTAssertEqual(realm.subscriptions.count, 3)
+        let subscriptions = realm.subscriptions
+        XCTAssertNil(subscriptions[0]!.name)
+        XCTAssertEqual(subscriptions[1]!.name, "8 or older")
+        XCTAssertEqual(subscriptions[2]!.name, "older than 7")
+    }
+
+    @MainActor
+    func testSubscribeDifferentQuerySameName() async throws {
+        try await populateSwiftPerson()
+        let realm = try openFlexibleSyncRealm()
+
+        _ = try await realm.objects(SwiftPerson.self).where { $0.age > 8 }.subscribe(name: "group1")
+        _ = try await realm.objects(SwiftPerson.self).where { $0.age > 5 }.subscribe(name: "group1")
+        XCTAssertEqual(realm.subscriptions.count, 1)
+XCTAssertNotNil(realm.subscriptions.first(ofType: SwiftPerson.self) { $0.age > 5 })
+    }
+
+    @MainActor
+    func testSubscribeOnRealmConfinedActor() async throws {
+        try await populateSwiftPerson()
+
+        try await populateSwiftPerson()
+
+        let user = try await logInUser(for: basicCredentials(app: self.flexibleSyncApp), app: self.flexibleSyncApp)
+        var config = user.flexibleSyncConfiguration()
+        config.objectTypes = [SwiftPerson.self]
+        let realm = try await Realm(configuration: config, actor: MainActor.shared)
+        let results1 = try await realm.objects(SwiftPerson.self).where { $0.age > 8 }.subscribe(waitForSync: .onCreation)
+        XCTAssertEqual(results1.count, 2)
+        let results2 = try await realm.objects(SwiftPerson.self).where { $0.age > 6 }.subscribe(waitForSync: .always)
+        XCTAssertEqual(results2.count, 4)
+        let results3 = try await realm.objects(SwiftPerson.self).where { $0.age > 4 }.subscribe(waitForSync: .never)
+        XCTAssertEqual(results3.count, 4)
+        XCTAssertEqual(realm.subscriptions.count, 3)
+    }
+
+    @CustomGlobalActor
+    func testSubscribeOnRealmConfinedCustomActor() async throws {
+        try await populateSwiftPerson()
+
+        let user = try await logInUser(for: basicCredentials(app: self.flexibleSyncApp), app: self.flexibleSyncApp)
+        var config = user.flexibleSyncConfiguration()
+        config.objectTypes = [SwiftPerson.self]
+        let realm = try await Realm(configuration: config, actor: CustomGlobalActor.shared)
+        let results1 = try await realm.objects(SwiftPerson.self).where { $0.age > 8 }.subscribe(waitForSync: .onCreation)
+        XCTAssertEqual(results1.count, 2)
+        let results2 = try await realm.objects(SwiftPerson.self).where { $0.age > 6 }.subscribe(waitForSync: .always)
+        XCTAssertEqual(results2.count, 4)
+        let results3 = try await realm.objects(SwiftPerson.self).where { $0.age > 4 }.subscribe(waitForSync: .never)
+        XCTAssertEqual(results3.count, 4)
+        XCTAssertEqual(realm.subscriptions.count, 3)
+    }
+
+    @MainActor
+    func testUnsubscribe() async throws {
+        try await populateSwiftPerson()
+        let realm = try openFlexibleSyncRealm()
+
+        let results1 = try await realm.objects(SwiftPerson.self).where { $0.lastName == "lastname_3" }.subscribe()
+        XCTAssertEqual(realm.subscriptions.count, 1)
+        results1.unsubscribe()
+        XCTAssertEqual(realm.subscriptions.count, 0)
+    }
+
+    @MainActor
+    func testUnsubscribeAfterReassign() async throws {
+        try await populateSwiftPerson()
+        let realm = try openFlexibleSyncRealm()
+
+        var results0 = try await realm.objects(SwiftPerson.self).where { $0.age >= 8 }.subscribe()
+        XCTAssertEqual(results0.count, 3)
+        XCTAssertEqual(realm.subscriptions.count, 1)
+        results0 = try await results0.where { $0.age < 8 }.subscribe() // subscribes to "age >= 8 && age < 8" because that's the local query
+        XCTAssertEqual(results0.count, 0)
+        XCTAssertEqual(realm.subscriptions.count, 2) // Two subs present:1) "age >= 8" 2) "age >= 8 && age < 8"
+        let results1 = realm.objects(SwiftPerson.self)
+        XCTAssertEqual(results1.count, 3)
+        results0.unsubscribe() // unsubscribes from "age >= 8 && age < 8"
+        XCTAssertEqual(realm.subscriptions.count, 1)
+        XCTAssertNotNil(realm.subscriptions.first(ofType: SwiftPerson.self) { $0.age >= 8 })
+        XCTAssertEqual(results0.count, 0) // local query is still "age >= 8 && age < 8".
+        XCTAssertEqual(results1.count, 3)
+    }
+
+    @MainActor
+    func testUnsubscribeWithoutSubscriptionExistingNamed() async throws {
+        try await populateSwiftPerson()
+        let realm = try openFlexibleSyncRealm()
+
+        _ = try await realm.objects(SwiftPerson.self).where { $0.age >= 8 }.subscribe(name: "sub1")
+        XCTAssertEqual(realm.subscriptions.count, 1)
+        let results = realm.objects(SwiftPerson.self).where { $0.age >= 8 }
+        results.unsubscribe()
+        XCTAssertEqual(realm.subscriptions.count, 1)
+        XCTAssertEqual(realm.subscriptions.first!.name, "sub1")
+    }
+
+    func testUnsubscribeNoExistingMatch() async throws {
+        try await populateSwiftPerson()
+        let realm = try openFlexibleSyncRealm()
+
+        XCTAssertEqual(realm.subscriptions.count, 0)
+        _ = try await realm.objects(SwiftPerson.self).where { $0.age >= 8 }.subscribe(name: "age_older_8")
+        let results0 = realm.objects(SwiftPerson.self).where { $0.age >= 8 }
+        XCTAssertEqual(realm.subscriptions.count, 1)
+        XCTAssertEqual(results0.count, 3)
+        results0.unsubscribe()
+        XCTAssertEqual(realm.subscriptions.count, 1)
+        XCTAssertEqual(results0.count, 3) // Results are not modified because there is no subscription associated to the unsubscribed result
+    }
+
+    @MainActor
+    func testUnsubscribeNamed() async throws {
+        try await populateSwiftPerson()
+        let realm = try openFlexibleSyncRealm()
+
+        _ = try await realm.objects(SwiftPerson.self).where { $0.age >= 8 }.subscribe()
+        _ = try await realm.objects(SwiftPerson.self).where { $0.age >= 8 }.subscribe(name: "first_named")
+        let results = try await realm.objects(SwiftPerson.self).where { $0.age >= 8 }.subscribe(name: "second_named")
+        XCTAssertEqual(realm.subscriptions.count, 3)
+
+        results.unsubscribe()
+        XCTAssertEqual(realm.subscriptions.count, 2)
+        XCTAssertEqual(realm.subscriptions[0]!.name, nil)
+        XCTAssertEqual(realm.subscriptions[1]!.name, "first_named")
+        results.unsubscribe() // check again for case when subscription doesn't exist
+        XCTAssertEqual(realm.subscriptions.count, 2)
+        XCTAssertEqual(realm.subscriptions[0]!.name, nil)
+        XCTAssertEqual(realm.subscriptions[1]!.name, "first_named")
+    }
+
+    @MainActor
+    func testUnsubscribeReassign() async throws {
+        try await populateSwiftPerson()
+        let realm = try openFlexibleSyncRealm()
+
+        _ = try await realm.objects(SwiftPerson.self).where { $0.age >= 8 }.subscribe(name: "first_named")
+        var results = try await realm.objects(SwiftPerson.self).where { $0.age >= 8 }.subscribe(name: "second_named")
+        // expect `results` associated subscription to be reassigned to the id which matches the unnamed subscription
+        results = try await realm.objects(SwiftPerson.self).where { $0.age >= 8 }.subscribe()
+        XCTAssertEqual(realm.subscriptions.count, 3)
+
+        results.unsubscribe()
+        // so the two named subscriptions remain.
+        XCTAssertEqual(realm.subscriptions.count, 2)
+        XCTAssertEqual(realm.subscriptions[0]!.name, "first_named")
+        XCTAssertEqual(realm.subscriptions[1]!.name, "second_named")
+    }
+
+    @MainActor
+    func testUnsubscribeSameQueryDifferentName() async throws {
+        try await populateSwiftPerson()
+        let realm = try openFlexibleSyncRealm()
+
+        _ = try await realm.objects(SwiftPerson.self).where { $0.age >= 8 }.subscribe()
+        let results2 = realm.objects(SwiftPerson.self).where { $0.age >= 8 }
+        XCTAssertEqual(realm.subscriptions.count, 1)
+        results2.unsubscribe()
+        XCTAssertEqual(realm.subscriptions.count, 0)
+    }
+
+    @MainActor
+    func testSubscribeNameAcrossTypes() async throws {
+        try await populateSwiftPerson()
+        let realm = try openFlexibleSyncRealm()
+
+        let results = try await realm.objects(SwiftPerson.self).where { $0.age >= 8 }.subscribe(name: "sameName")
+        XCTAssertEqual(realm.subscriptions.count, 1)
+        XCTAssertEqual(results.count, 3)
+        _ = try await realm.objects(SwiftTypesSyncObject.self).subscribe(name: "sameName")
+        XCTAssertEqual(realm.subscriptions.count, 1)
+        XCTAssertEqual(results.count, 0)
+    }
+
+    @MainActor
+    func testSubscribeOnCreation() async throws {
+        try await populateSwiftPerson()
+        let realm = try openFlexibleSyncRealm()
+
+        var results = try await realm.objects(SwiftPerson.self).where { $0.age >= 8 }.subscribe(waitForSync: .onCreation)
+        XCTAssertEqual(results.count, 3)
+        let expectation = XCTestExpectation(description: "method doesn't hang")
+        realm.syncSession!.suspend()
+        Task {
+            results = try! await realm.objects(SwiftPerson.self).where { $0.age >= 8 }.subscribe(waitForSync: .onCreation)
+            XCTAssertEqual(results.count, 3) // expect method to return immediately, and not hang while no connection
+            XCTAssertEqual(realm.subscriptions.count, 1)
+            expectation.fulfill()
+        }
+        await fulfillment(of: [expectation], timeout: 2.0)
+    }
+
+    @MainActor
+    func testSubscribeAlways() async throws {
+        let collection = try await setupCollection("SwiftPerson")
+        try await populateSwiftPerson()
+        let realm = try openFlexibleSyncRealm()
+
+        var results = try await realm.objects(SwiftPerson.self).where { $0.age >= 9 }.subscribe(waitForSync: .always)
+        XCTAssertEqual(results.count, 2)
+
+        // suspend session on client. Add a document that isn't on the client.
+        realm.syncSession!.suspend()
+        let serverObject: Document = [
+            "_id": .objectId(ObjectId.generate()),
+            "firstName": .string("Paul"),
+            "lastName": .string("M"),
+            "age": .int32(30)
+        ]
+        collection.insertOne(serverObject).await(self, timeout: 10.0)
+
+        let start = Date()
+        while collection.count(filter: [:]).await(self) != 11 && start.timeIntervalSinceNow > -10.0 {
+            sleep(1) // wait until server sync
+        }
+
+        // Resume the client session.
+        realm.syncSession!.resume()
+        XCTAssertEqual(results.count, 2)
+        results = try await realm.objects(SwiftPerson.self).where { $0.age >= 9 }.subscribe(waitForSync: .always)
+        // Expect this subscribe call to wait for sync downloads, even though the subscription already existed
+        XCTAssertEqual(results.count, 3) // Count is 3 because it includes the object/document that was created while offline.
+        XCTAssertEqual(realm.subscriptions.count, 1)
+    }
+
+    @MainActor
+    func testSubscribeNever() async throws {
+        try await populateSwiftPerson()
+        let realm = try openFlexibleSyncRealm()
+
+        let expectation = XCTestExpectation(description: "test doesn't hang")
+        Task {
+            let results = try await realm.objects(SwiftPerson.self).where { $0.age >= 8 }.subscribe(waitForSync: .never)
+            XCTAssertEqual(results.count, 0) // expect no objects to be able to sync because of immediate return
+            XCTAssertEqual(realm.subscriptions.count, 1)
+            expectation.fulfill()
+        }
+        await fulfillment(of: [expectation], timeout: 1)
+    }
+
+    @MainActor
+    func testSubscribeTimeout() async throws {
+        try await populateSwiftPerson()
+        let realm = try openFlexibleSyncRealm()
+
+        realm.syncSession!.suspend()
+        let expectation = XCTestExpectation(description: "doesn't wait longer than expected")
+        Task {
+            let timeout = 2.0
+            do {
+                _ = try await realm.objects(SwiftPerson.self).where { $0.age >= 8 }.subscribe(waitForSync: .always, timeout: timeout)
+            } catch let error as NSError {
+                expectation.fulfill()
+                XCTAssertEqual(error.code, Int(ETIMEDOUT))
+                XCTAssertEqual(error.domain, NSPOSIXErrorDomain)
+                XCTAssertEqual(error.localizedDescription, "Waiting for update timed out after \(timeout) seconds.")
+            }
+        }
+        await fulfillment(of: [expectation], timeout: 3.0)
+
+        // resume sync session and wait for subscription otherwise tear
+        // down can't complete successfully
+        realm.syncSession!.resume()
+        let start = Date()
+        while realm.subscriptions.state != .complete && start.timeIntervalSinceNow > -10.0 {
+            sleep(1)
+        }
+        XCTAssertEqual(realm.subscriptions.state, .complete)
+    }
+
+    func testSubscribeTimeoutSucceeds() async throws {
+        try await populateSwiftPerson()
+
+        let realm = try openFlexibleSyncRealm()
+        let results0 = try await realm.objects(SwiftPerson.self).where { $0.age >= 6 }.subscribe(timeout: 2.0)
+        XCTAssertEqual(results0.count, 5)
+        XCTAssertEqual(realm.subscriptions.count, 1)
+        let results1 = try await realm.objects(SwiftPerson.self).where { $0.lastName == "lastname_3" }.subscribe(timeout: 2.0)
+        XCTAssertEqual(results1.count, 1)
+        XCTAssertEqual(results0.count, 5)
+        XCTAssertEqual(realm.subscriptions.count, 2)
+
+        let results2 = realm.objects(SwiftPerson.self)
+        XCTAssertEqual(results2.count, 6)
+    }
+#endif
+
     // MARK: - Custom Column
 
     @MainActor
@@ -1567,5 +1972,11 @@ extension SwiftFlexibleSyncServerTests {
     }
 #endif
 }
+
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+@globalActor actor CustomGlobalActor: GlobalActor {
+    static var shared = CustomGlobalActor()
+}
+
 #endif // canImport(Combine)
 #endif // os(macOS)

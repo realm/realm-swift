@@ -218,7 +218,7 @@ import Realm.Private
                              an `Error`describing what went wrong will be returned by the block
      */
     public func update(_ block: (() -> Void), onComplete: (@Sendable (Error?) -> Void)? = nil) {
-        rlmSyncSubscriptionSet.update(block, onComplete: onComplete ?? { _ in })
+        rlmSyncSubscriptionSet.update(block, onComplete: onComplete)
     }
 
     /// :nodoc:
@@ -371,12 +371,17 @@ import Realm.Private
     /**
      Removes all subscriptions from the subscription set.
 
+     - parameter unnamedOnly: If true, only unnamed subscriptions are removed.
      - warning: This method may only be called during a write subscription block.
      - warning: Removing all subscriptions will result in an error if no new subscription is added. Server should
                 acknowledge at least one subscription.
      */
-    public func removeAll() {
-        rlmSyncSubscriptionSet.removeAllSubscriptions()
+    public func removeAll(unnamedOnly: Bool = false) {
+        if unnamedOnly {
+            rlmSyncSubscriptionSet.removeAllUnnamedSubscriptions()
+        } else {
+            rlmSyncSubscriptionSet.removeAllSubscriptions()
+        }
     }
 
     /**

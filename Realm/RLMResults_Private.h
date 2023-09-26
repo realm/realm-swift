@@ -18,6 +18,8 @@
 
 #import <Realm/RLMResults.h>
 
+#import "RLMRealm_Private.h"
+
 @class RLMObjectSchema;
 
 RLM_HEADER_AUDIT_BEGIN(nullability)
@@ -27,6 +29,12 @@ RLM_HEADER_AUDIT_BEGIN(nullability)
 
 + (instancetype)emptyDetachedResults;
 - (RLMResults *)snapshot;
+
+- (void)subscribeWithName:(NSString *_Nullable)name
+              waitForSync:(RLMWaitForSyncMode)waitForSyncMode
+               confinedTo:(RLMScheduler *)confinement
+                  timeout:(NSTimeInterval)timeout
+               completion:(RLMResultsCompletionBlock)completion;
 
 @end
 

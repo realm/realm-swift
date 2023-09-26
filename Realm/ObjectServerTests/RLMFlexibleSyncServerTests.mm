@@ -855,6 +855,40 @@
     CHECK_COUNT(1, Dog, realm);
 }
 
+- (void)testRemoveAllUnnamedSubscriptions {
+    bool didPopulate = [self populateData:^(RLMRealm *realm) {
+        [self createPeople:realm partition:_cmd];
+        [self createDog:realm partition:_cmd];
+    }];
+    if (!didPopulate) {
+        return;
+    }
+
+    RLMRealm *realm = [self getFlexibleSyncRealm:_cmd];
+    XCTAssertNotNil(realm);
+    CHECK_COUNT(0, Person, realm);
+
+    [self writeQueryAndCompleteForRealm:realm block:^(RLMSyncSubscriptionSet *subs) {
+        [subs addSubscriptionWithClassName:Person.className
+                                     where:@"age > 20 and partition == %@", NSStringFromSelector(_cmd)];
+        [subs addSubscriptionWithClassName:Person.className
+                          subscriptionName:@"person_age_2"
+                                     where:@"firstName == 'firstname_1' and partition == %@", NSStringFromSelector(_cmd)];
+        [subs addSubscriptionWithClassName:Dog.className
+                                     where:@"breed == 'Labradoodle' and partition == %@", NSStringFromSelector(_cmd)];
+    }];
+    XCTAssertEqual(realm.subscriptions.count, 3U);
+    CHECK_COUNT(2, Person, realm);
+    CHECK_COUNT(1, Dog, realm);
+
+    [self writeQueryAndCompleteForRealm:realm block:^(RLMSyncSubscriptionSet *subs) {
+        [subs removeAllUnnamedSubscriptions];
+    }];
+    XCTAssertEqual(realm.subscriptions.count, 1U);
+    CHECK_COUNT(1, Person, realm);
+    CHECK_COUNT(0, Dog, realm);
+}
+
 - (void)testFlexibleSyncUpdateQuery {
     bool didPopulate = [self populateData:^(RLMRealm *realm) {
         [self createPeople:realm partition:_cmd];
@@ -1072,7 +1106,6 @@
     syncConfig.cancelAsyncOpenOnNonFatalErrors = true;
     config.syncConfiguration = syncConfig;
 
-
     // Set delay above the timeout so it should fail
     proxy.delay = 2.0;
 
@@ -1088,6 +1121,136 @@
     [self waitForExpectationsWithTimeout:30.0 handler:nil];
 
     [proxy stop];
+}
+
+- (void)testSubscribeWithName {
+    bool didPopulate = [self populateData:^(RLMRealm *realm) {
+        Person *person = [[Person alloc] initWithPrimaryKey:[RLMObjectId objectId]
+                                                        age:30
+                                                  firstName:@"Brian"
+                                                   lastName:@"Epstein"];
+        person.partition = NSStringFromSelector(_cmd);
+        [realm addObject:person];
+    }];
+    if (!didPopulate) {
+        return;
+    }
+
+    RLMRealm *realm = [self getFlexibleSyncRealm:_cmd];
+    XCTAssertNotNil(realm);
+    CHECK_COUNT(0, Person, realm);
+
+    XCTestExpectation *ex = [self expectationWithDescription:@"wait for download"];
+    [[[Person allObjectsInRealm:realm] objectsWhere:@"lastName == 'Epstein'"] subscribeWithName:@"5thBeatle" onQueue:dispatch_get_main_queue() completion:^(RLMResults *results, NSError *error) {
+        XCTAssertNil(error);
+        XCTAssertEqual(results.count, 1U);
+        [ex fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:5.0 handler:nil];
+}
+
+- (void)testUnsubscribeWithinBlock {
+    bool didPopulate = [self populateData:^(RLMRealm *realm) {
+        Person *person = [[Person alloc] initWithPrimaryKey:[RLMObjectId objectId]
+                                                        age:30
+                                                  firstName:@"Joe"
+                                                   lastName:@"Doe"];
+        person.partition = NSStringFromSelector(_cmd);
+        [realm addObject:person];
+    }];
+    if (!didPopulate) {
+        return;
+    }
+
+    RLMRealm *realm = [self getFlexibleSyncRealm:_cmd];
+    XCTAssertNotNil(realm);
+    CHECK_COUNT(0, Person, realm);
+
+    XCTestExpectation *ex = [self expectationWithDescription:@"wait for download"];
+    [[[Person allObjectsInRealm:realm] objectsWhere:@"lastName == 'Doe'"] subscribeWithName:@"unknown" onQueue:dispatch_get_main_queue() completion:^(RLMResults *results, NSError *error) {
+        XCTAssertNil(error);
+        XCTAssertEqual(results.count, 1U);
+        [results unsubscribe];
+        [ex fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:5.0 handler:nil];
+    XCTAssertEqual(realm.subscriptions.count, 0U);
+}
+
+- (void)testSubscribeOnQueue {
+    bool didPopulate = [self populateData:^(RLMRealm *realm) {
+        Person *person = [[Person alloc] initWithPrimaryKey:[RLMObjectId objectId]
+                                                        age:30
+                                                  firstName:@"Sophia"
+                                                   lastName:@"Loren"];
+        person.partition = NSStringFromSelector(_cmd);
+        [realm addObject:person];
+    }];
+    if (!didPopulate) {
+        return;
+    }
+
+    RLMUser *user = [self flexibleSyncUser:_cmd];
+    RLMRealmConfiguration *config = [user flexibleSyncConfiguration];
+    config.objectClasses = @[Person.self];
+
+    XCTestExpectation *ex = [self expectationWithDescription:@"wait for download"];
+    [self dispatchAsyncAndWait:^{
+        RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
+        XCTAssertNotNil(realm);
+        CHECK_COUNT(0, Person, realm);
+
+        [[[Person allObjectsInRealm:realm] objectsWhere:@"lastName == 'Loren'"]
+         subscribeWithCompletionOnQueue:dispatch_get_main_queue()
+         completion:^(RLMResults *results, NSError *error) {
+            XCTAssertNil(error);
+            XCTAssertEqual(results.realm.subscriptions.count, 1UL);
+            XCTAssertEqual(results.realm.subscriptions.state, RLMSyncSubscriptionStateComplete);
+            CHECK_COUNT(1, Person, results.realm);
+            [ex fulfill];
+        }];
+    }];
+    [self waitForExpectationsWithTimeout:20.0 handler:nil];
+
+    RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
+    XCTAssertEqual(realm.subscriptions.count, 1UL);
+    CHECK_COUNT(1, Person, realm);
+}
+
+- (void)testSubscribeWithNameAndTimeout {
+    bool didPopulate = [self populateData:^(RLMRealm *realm) {
+        [self createPeople:realm partition:_cmd];
+    }];
+    if (!didPopulate) {
+        return;
+    }
+
+    RLMRealm *realm = [self getFlexibleSyncRealm:_cmd];
+    XCTAssertNotNil(realm);
+    CHECK_COUNT(0, Person, realm);
+
+    [[realm syncSession] suspend];
+    XCTestExpectation *ex = [self expectationWithDescription:@"expect timeout"];
+    NSTimeInterval timeout = 2.0;
+    RLMResults *res = [[Person allObjectsInRealm:realm] objectsWhere:@"age >= 20"];
+    [res subscribeWithName:@"20up" waitForSync:RLMWaitForSyncModeAlways onQueue:dispatch_get_main_queue() timeout:timeout completion:^(RLMResults *results, NSError *error) {
+        XCTAssert(error);
+        NSString *expectedDesc = [NSString stringWithFormat:@"Waiting for update timed out after %.01f seconds.", timeout];
+        XCTAssert([error.localizedDescription isEqualToString:expectedDesc]);
+        XCTAssertNil(results);
+        [ex fulfill];
+    }];
+    XCTAssertEqual(realm.subscriptions.count, 1UL);
+    [self waitForExpectationsWithTimeout:5.0 handler:nil];
+
+    // resume session and wait for complete
+    // otherwise test will not tear down successfully
+    [[realm syncSession] resume];
+    NSDate * start = [[NSDate alloc] init];
+    while (realm.subscriptions.state != RLMSyncSubscriptionStateComplete && start.timeIntervalSinceNow > -10.0) {
+        sleep(1);
+    }
+    XCTAssertEqual(realm.subscriptions.state, RLMSyncSubscriptionStateComplete);
 }
 
 #if 0 // FIXME: this is no longer an error and needs to be updated to something which is
