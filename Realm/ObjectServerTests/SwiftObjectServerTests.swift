@@ -1730,7 +1730,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                                 localAppVersion: "20180301")
     }
 
-    func expectSuccess<T>(_ result: Result<T, Error>) -> T? {
+    func expectSuccess<FieldType>(_ result: Result<FieldType, Error>) -> FieldType? {
         switch result {
         case .success(let value):
             return value
@@ -3009,7 +3009,7 @@ class AsyncAwaitObjectServerTests: SwiftSyncTestCase {
         return super.defaultTestSuite
     }
 
-    func assertThrowsError<T, E: Error>(_ expression: @autoclosure () async throws -> T,
+    func assertThrowsError<FieldType, E: Error>(_ expression: @autoclosure () async throws -> FieldType,
                                         file: StaticString = #filePath, line: UInt = #line,
                                         _ errorHandler: (_ error: E) -> Void) async {
         do {

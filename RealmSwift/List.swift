@@ -374,3 +374,12 @@ extension List: Decodable where Element: Decodable {
 }
 
 extension List: Encodable where Element: Encodable {}
+
+// MARK: ExpressibleByArrayLiteral
+
+extension List: ExpressibleByArrayLiteral {
+    public convenience init(arrayLiteral elements: Element...) {
+        self.init()
+        append(objectsIn: elements)
+    }
+}

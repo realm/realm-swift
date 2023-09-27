@@ -1532,8 +1532,8 @@ class ObjectTests: TestCase {
 
 #if swift(>=5.8)
     @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-    func expectChange<T: Object>(_ obj: T, _ ex: XCTestExpectation, newValue: Int)
-    -> @Sendable (isolated CustomGlobalActor, ObjectChange<T>) -> Void {
+    func expectChange<FieldType: Object>(_ obj: FieldType, _ ex: XCTestExpectation, newValue: Int)
+    -> @Sendable (isolated CustomGlobalActor, ObjectChange<FieldType>) -> Void {
         let unchecked = Unchecked(obj)
         return { _, change in
             XCTAssertFalse(Thread.isMainThread)

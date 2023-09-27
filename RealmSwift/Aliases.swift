@@ -88,15 +88,15 @@ extension ObjectBase {
 
 #if swift(>=5.8)
     @available(macOS 10.15, tvOS 13.0, iOS 13.0, watchOS 6.0, *)
-    internal func _observe<A: Actor, T: ObjectBase>(
+    internal func _observe<A: Actor, FieldType: ObjectBase>(
         keyPaths: [String]? = nil, on actor: isolated A,
-        _ block: @Sendable @escaping (isolated A, ObjectChange<T>) -> Void
+        _ block: @Sendable @escaping (isolated A, ObjectChange<FieldType>) -> Void
     ) async -> NotificationToken {
         let token = RLMObjectNotificationToken()
         token.observe(self, keyPaths: keyPaths) { object, names, oldValues, newValues, error in
             assert(error == nil)
             assumeOnActorExecutor(actor) { actor in
-                block(actor, .init(object: object as? T, names: names,
+                block(actor, .init(object: object as? FieldType, names: names,
                         oldValues: oldValues, newValues: newValues))
             }
         }

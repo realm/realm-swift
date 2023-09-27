@@ -29,7 +29,7 @@ import RealmSwiftTestSupport
 #endif
 
 public extension User {
-    func configuration<T: BSON>(testName: T) -> Realm.Configuration {
+    func configuration<FieldType: BSON>(testName: FieldType) -> Realm.Configuration {
         var config = self.configuration(partitionValue: testName)
         config.objectTypes = [SwiftPerson.self, SwiftHugeSyncObject.self, SwiftTypesSyncObject.self, SwiftCustomColumnObject.self]
         return config
@@ -85,7 +85,7 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
         return try openRealm(configuration: config)
     }
 
-    public func openRealm<T: BSON>(partitionValue: T,
+    public func openRealm<FieldType: BSON>(partitionValue: FieldType,
                                    user: User,
                                    clientResetMode: ClientResetMode? = .recoverUnsyncedChanges(),
                                    file: StaticString = #file,
@@ -139,9 +139,9 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
         waitForDownloads(for: ObjectiveCSupport.convert(object: realm))
     }
 
-    public func checkCount<T: Object>(expected: Int,
+    public func checkCount<FieldType: Object>(expected: Int,
                                       _ realm: Realm,
-                                      _ type: T.Type,
+                                      _ type: FieldType.Type,
                                       file: StaticString = #file,
                                       line: UInt = #line) {
         realm.refresh()
@@ -154,26 +154,26 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
 
     var exceptionThrown = false
 
-    public func assertThrows<T>(_ block: @autoclosure () -> T, named: String? = RLMExceptionName,
+    public func assertThrows<FieldType>(_ block: @autoclosure () -> FieldType, named: String? = RLMExceptionName,
                                 _ message: String? = nil, fileName: String = #file, lineNumber: UInt = #line) {
         exceptionThrown = true
         RLMAssertThrowsWithName(self, { _ = block() }, named, message, fileName, lineNumber)
     }
 
-    public func assertThrows<T>(_ block: @autoclosure () -> T, reason: String,
+    public func assertThrows<FieldType>(_ block: @autoclosure () -> FieldType, reason: String,
                                 _ message: String? = nil, fileName: String = #file, lineNumber: UInt = #line) {
         exceptionThrown = true
         RLMAssertThrowsWithReason(self, { _ = block() }, reason, message, fileName, lineNumber)
     }
 
-    public func assertThrows<T>(_ block: @autoclosure () -> T, reasonMatching regexString: String,
+    public func assertThrows<FieldType>(_ block: @autoclosure () -> FieldType, reasonMatching regexString: String,
                                 _ message: String? = nil, fileName: String = #file, lineNumber: UInt = #line) {
         exceptionThrown = true
         RLMAssertThrowsWithReasonMatching(self, { _ = block() }, regexString, message, fileName, lineNumber)
     }
 
     public static let bigObjectCount = 2
-    public func populateRealm<T: BSON>(user: User? = nil, partitionValue: T) throws {
+    public func populateRealm<FieldType: BSON>(user: User? = nil, partitionValue: FieldType) throws {
         try autoreleasepool {
             let user = try (user ?? logInUser(for: basicCredentials()))
             let config = user.configuration(testName: partitionValue)

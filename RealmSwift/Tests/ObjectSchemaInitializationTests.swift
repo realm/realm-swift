@@ -274,7 +274,7 @@ class ObjectSchemaInitializationTests: TestCase {
     }
 
     #if DEBUG // this test depends on @testable import
-    func assertType<T: SchemaDiscoverable>(_ value: T, _ propertyType: PropertyType,
+    func assertType<FieldType: SchemaDiscoverable>(_ value: FieldType, _ propertyType: PropertyType,
                                            optional: Bool = false, list: Bool = false,
                                            set: Bool = false, objectType: String? = nil,
                                            hasSelectors: Bool = true, line: UInt = #line) {
@@ -405,11 +405,11 @@ class ObjectSchemaInitializationTests: TestCase {
         assertType(MutableSet<Object>(), .object, set: true, objectType: "RealmSwiftObject", hasSelectors: false)
     }
 
-    func assertType<T: _Persistable>(_ type: T.Type, _ propertyType: PropertyType,
+    func assertType<FieldType: _Persistable>(_ type: FieldType.Type, _ propertyType: PropertyType,
                                      optional: Bool = false, list: Bool = false,
                                      set: Bool = false, map: Bool = false,
                                      objectType: String? = nil, line: UInt = #line) {
-        let prop = RLMProperty(name: "_property", value: Persisted<T>())
+        let prop = RLMProperty(name: "_property", value: Persisted<FieldType>())
         XCTAssertEqual(prop.name, "property", line: line)
         XCTAssertEqual(prop.type, propertyType, line: line)
         XCTAssertEqual(prop.optional, optional, line: line)

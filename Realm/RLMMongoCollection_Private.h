@@ -32,6 +32,12 @@ RLM_HEADER_AUDIT_BEGIN(nullability)
                                  idFilter:(nullable id<RLMBSON>)idFilter
                                  delegate:(id<RLMChangeEventDelegate>)delegate
                                 scheduler:(void (^)(dispatch_block_t))scheduler;
+
+
+@property (nonatomic, strong) RLMUser *user;
+@property (nonatomic, strong) NSString *serviceName;
+@property (nonatomic, strong) NSString *databaseName;
+
 @end
 
 RLM_HEADER_AUDIT_END(nullability)

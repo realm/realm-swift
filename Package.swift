@@ -143,6 +143,7 @@ if #available(macOS 10.15, *) {
             dependencies: ["RealmSwift", "MongoDataAccessMacros"],
             path: "MongoDataAccess",
             exclude: ["Tests"]
+//            swiftSettings: [.enableExperimentalFeature("RuntimeDiscoverableAttrs")]
         ),
         .testTarget(
             name: "MongoDataAccessTests",
@@ -175,7 +176,7 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/realm/realm-core.git", exact: coreVersion),
-        .package(url: "https://github.com/apple/swift-syntax.git", from: "509.0.0-swift-5.9-DEVELOPMENT-SNAPSHOT-2023-07-22-a"),
+        .package(url: "https://github.com/apple/swift-syntax.git", branch: "main"),
     ],
     targets: [
       .target(

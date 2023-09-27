@@ -488,3 +488,21 @@ extension SyncSubscriptionSet {
         }
     }
 }
+
+extension SyncSubscriptionSet {
+    private func appendOne<T: Object>(_ type: T.Type) {
+        rlmSyncSubscriptionSet.addSubscription(withClassName: type.className(),
+                                               subscriptionName: nil,
+                                               predicate: NSPredicate(format: "TRUEPREDICATE"))
+    }
+    /**
+     Appends one or several subscriptions to the subscription set.
+
+     - warning: This method may only be called during a write subscription block.
+
+     - parameter subscriptions: The subscriptions to be added to the subscription set.
+     */
+    public func `append`<each T: Object>(_ subscriptions: repeat (each T).Type) {
+        repeat (appendOne(each subscriptions))
+    }
+}

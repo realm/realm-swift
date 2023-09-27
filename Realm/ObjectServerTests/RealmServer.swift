@@ -1222,7 +1222,7 @@ public class RealmServer: NSObject {
     }
 }
 
-@Sendable private func failOnError<T>(_ result: Result<T, Error>) {
+@Sendable private func failOnError<FieldType>(_ result: Result<FieldType, Error>) {
     if case .failure(let error) = result {
         XCTFail(error.localizedDescription)
     }

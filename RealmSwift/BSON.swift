@@ -490,3 +490,43 @@ extension AnyBSON: ExpressibleByArrayLiteral {
 extension AnyBSON: Equatable {}
 
 extension AnyBSON: Hashable {}
+
+extension AnyBSON : Codable {
+    private struct _AnyBSONContainer : Codable {
+        let `case`: AnyBSON
+    }
+    
+    public init(from decoder: Decoder) throws {
+        let value = try decoder.singleValueContainer()
+        self = try value.decode(_AnyBSONContainer.self).case
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(_AnyBSONContainer(case: self))
+    }
+}
+
+extension AnyBSON {
+    public var asBSON: any BSON {
+        switch self {
+        case .double(let double): return double
+        case .string(let string): return string
+        case .document(let document): return document
+        case .array(let array): return array
+        case .binary(let binary): return binary
+        case .objectId(let objectId): return objectId
+        case .bool(let bool): return bool
+        case .datetime(let date): return date
+        case .regex(let regex): return regex
+        case .int32(let int32): return int32
+        case .timestamp(let timestamp): return timestamp
+        case .int64(let int64): return int64
+        case .decimal128(let decimal): return decimal
+        case .uuid(let uuid): return uuid
+        case .minKey: return MinKey()
+        case .maxKey: return MaxKey()
+        case .null: return NSNull()
+        }
+    }
+}
