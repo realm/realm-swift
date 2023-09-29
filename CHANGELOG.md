@@ -38,6 +38,8 @@ x.y.z Release notes (yyyy-MM-dd)
   the xcframework ([#8370](https://github.com/realm/realm-swift/issues/8370)).
 * Permission errors when creating asymmetric objects were not handled
   correctly, leading to a crash ([Core #6978](https://github.com/realm/realm-core/issues/6978), since 10.35.0)
+* Permission errors when creating asymmetric objects were not handled
+  correctly, leading to a crash ([Core #6978](https://github.com/realm/realm-core/issues/6978), since 10.35.0)
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
@@ -49,7 +51,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * Xcode: 14.1-15.0.0.
 
 ### Internal
-* Upgraded realm-core from ? to ?
+* Upgraded realm-core from 13.21.0 to 13.22.0
 
 10.42.4 Release notes (2023-09-25)
 =============================================================
