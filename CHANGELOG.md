@@ -7,12 +7,12 @@ x.y.z Release notes (yyyy-MM-dd)
   // Named subscription query
   let results = try await realm.objects(Dog.self).where { $0.age > 18 }.subscribe(name: "adults")
   results.unsubscribe()
-  
+
   // Unnamed subscription query
   let results = try await realm.objects(Dog.self).subscribe()
   results.unsubscribe()
   ````
-  
+
   After committing the subscription to the realm's local subscription set, the method
   will wait for downloads according to the `WaitForSyncMode`.
   ```swift
@@ -21,7 +21,7 @@ x.y.z Release notes (yyyy-MM-dd)
   Where `.always` will always download the latest data for the subscription, `.onCreation` will do
   it only the first time the subscription is created, and `.never` will never wait for the
   data to be downloaded.
-  
+
   This API is currently in `Preview` and may be subject to changes in the future.
 * Added a new API which allows to remove all the unnamed subscriptions from the subscription set.
   ```swift
@@ -30,7 +30,10 @@ x.y.z Release notes (yyyy-MM-dd)
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
-* None.
+* Build the prebuilt libraries with the classic linker to work around the new
+  linker being broken on iOS <15. When using CocoaPods or SPM, you will need to
+  manually add `-Wl,-classic_ld` to `OTHER_LDFLAGS` for your application until
+  Apple fixes the bug.
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 

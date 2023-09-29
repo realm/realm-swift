@@ -12,6 +12,6 @@ LLVM_LTO = YES_THIN;
 VALIDATE_PRODUCT = YES;
 
 REALM_HIDE_SYMBOLS = NO;
-REALM_OTHER_LDFLAGS_NO = ;
-REALM_OTHER_LDFLAGS_YES = -Xlinker -unexported_symbols_list -Xlinker Configuration/Realm/PrivateSymbols.txt;
-REALM_OTHER_LDFLAGS = $(REALM_OTHER_LDFLAGS_$(REALM_HIDE_SYMBOLS)) $(inherited);
+REALM_SYMBOLS_FLAGS_NO = ;
+REALM_SYMBOLS_FLAGS_YES = -Xlinker -unexported_symbols_list -Xlinker Configuration/Realm/PrivateSymbols.txt;
+REALM_SYMBOLS_FLAGS = $(REALM_SYMBOLS_FLAGS_$(REALM_HIDE_SYMBOLS));
