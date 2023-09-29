@@ -34,6 +34,10 @@ x.y.z Release notes (yyyy-MM-dd)
   linker being broken on iOS <15. When using CocoaPods or SPM, you will need to
   manually add `-Wl,-classic_ld` to `OTHER_LDFLAGS` for your application until
   Apple fixes the bug.
+* Remove the visionOS slice from the Carthage build as it makes Carthage reject
+  the xcframework ([#8370](https://github.com/realm/realm-swift/issues/8370)).
+* Permission errors when creating asymmetric objects were not handled
+  correctly, leading to a crash ([Core #6978](https://github.com/realm/realm-core/issues/6978), since 10.35.0)
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 

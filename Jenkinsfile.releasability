@@ -1,8 +1,6 @@
 xcodeVersions = ['14.1', '14.2', '14.3.1']
 platforms = ['osx', 'ios', 'watchos', 'tvos', 'catalyst']
 platformNames = ['osx': 'macOS', 'ios': 'iOS', 'watchos': 'watchOS', 'tvos': 'tvOS', 'catalyst': 'Catalyst', 'visionos': 'visionOS']
-carthageXcodeVersion = '15.0'
-// This should be the same as carthageXcodeVersion, but we only have one Xcode 15 runner
 docsXcodeVersion = '14.3.1'
 
 def buildPlatform(platform, xcodeVersion, xcodeSuffix, nodeLabel = 'osx') {
