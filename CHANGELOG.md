@@ -1,6 +1,8 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.43.0 Release notes (2023-09-29)
 =============================================================
+
 ### Enhancements
+
 * Added `Results.subscribe` API for flexible sync.
   Now you can subscribe and unsubscribe to a flexible sync subscription through an object `Result`.
   ```swift
@@ -29,7 +31,7 @@ x.y.z Release notes (yyyy-MM-dd)
   ```
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
+
 * Build the prebuilt libraries with the classic linker to work around the new
   linker being broken on iOS <15. When using CocoaPods or SPM, you will need to
   manually add `-Wl,-classic_ld` to `OTHER_LDFLAGS` for your application until
@@ -38,12 +40,9 @@ x.y.z Release notes (yyyy-MM-dd)
   the xcframework ([#8370](https://github.com/realm/realm-swift/issues/8370)).
 * Permission errors when creating asymmetric objects were not handled
   correctly, leading to a crash ([Core #6978](https://github.com/realm/realm-core/issues/6978), since 10.35.0)
-* Permission errors when creating asymmetric objects were not handled
-  correctly, leading to a crash ([Core #6978](https://github.com/realm/realm-core/issues/6978), since 10.35.0)
-
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
 ### Compatibility
+
 * Realm Studio: 14.0.1 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 15.0.0.
@@ -51,6 +50,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * Xcode: 14.1-15.0.0.
 
 ### Internal
+
 * Upgraded realm-core from 13.21.0 to 13.22.0
 
 10.42.4 Release notes (2023-09-25)
