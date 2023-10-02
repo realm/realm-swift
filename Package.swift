@@ -251,7 +251,8 @@ let package = Package(
             publicHeadersPath: "include",
             cxxSettings: cxxSettings,
             linkerSettings: [
-                .linkedFramework("UIKit", .when(platforms: [.iOS, .macCatalyst, .tvOS, .watchOS]))
+                .linkedFramework("UIKit", .when(platforms: [.iOS, .macCatalyst, .tvOS, .watchOS])),
+                .unsafeFlags(["-ld_classic"])
             ]
         ),
         .target(
@@ -262,6 +263,9 @@ let package = Package(
                 "Nonsync.swift",
                 "RealmSwift-Info.plist",
                 "Tests",
+            ],
+            linkerSettings: [
+                .unsafeFlags(["-ld_classic"])
             ]
         ),
         .target(
