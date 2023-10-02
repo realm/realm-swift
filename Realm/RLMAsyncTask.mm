@@ -504,9 +504,8 @@ __attribute__((objc_direct_members))
 }
 
 - (void)waitForSubscription {
-    std::lock_guard lock(_mutex);
-
     if (_timeout != 0) {
+        std::lock_guard lock(_mutex);
         // Setup timer
         dispatch_time_t time = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(_timeout * NSEC_PER_SEC));
         // If the call below doesn't return after `time` seconds, the internal completion is called with an error.
@@ -522,7 +521,8 @@ __attribute__((objc_direct_members))
     [self waitForSync];
 }
 
--(void)waitForSync {
+- (void)waitForSync {
+    std::lock_guard lock(_mutex);
     if (_completion) {
         _subscriptionSet->_subscriptionSet->get_state_change_notification(realm::sync::SubscriptionSet::State::Complete)
             .get_async([self](realm::StatusWith<realm::sync::SubscriptionSet::State> state) noexcept {
@@ -532,16 +532,16 @@ __attribute__((objc_direct_members))
     }
 }
 
--(void)invokeCompletionWithError:(NSError * _Nullable)error {
+- (void)invokeCompletionWithError:(NSError * _Nullable)error {
     void (^completion)(NSError *);
     {
         std::lock_guard lock(_mutex);
         std::swap(completion, _completion);
-    }
-
-    if (_worker) {
-        dispatch_block_cancel(_worker);
-        _worker = nil;
+        if (_worker) {
+            dispatch_block_cancel(_worker);
+            _worker = nil;
+        }
+        _subscriptionSet = nil;
     }
 
     if (completion) {
