@@ -1675,30 +1675,19 @@ XCTAssertNotNil(realm.subscriptions.first(ofType: SwiftPerson.self) { $0.age > 5
         let realm = try openFlexibleSyncRealm()
 
         realm.syncSession!.suspend()
-        let expectation = XCTestExpectation(description: "doesn't wait longer than expected")
-        Task {
-            let timeout = 2.0
-            do {
-                _ = try await realm.objects(SwiftPerson.self).where { $0.age >= 8 }.subscribe(waitForSync: .always, timeout: timeout)
-            } catch let error as NSError {
-                expectation.fulfill()
-                XCTAssertEqual(error.code, Int(ETIMEDOUT))
-                XCTAssertEqual(error.domain, NSPOSIXErrorDomain)
-                XCTAssertEqual(error.localizedDescription, "Waiting for update timed out after \(timeout) seconds.")
-            }
+        let timeout = 1.0
+        do {
+            _ = try await realm.objects(SwiftPerson.self).where { $0.age >= 8 }
+                .subscribe(waitForSync: .always, timeout: timeout)
+            XCTFail("subscribe did not time out")
+        } catch let error as NSError {
+            XCTAssertEqual(error.code, Int(ETIMEDOUT))
+            XCTAssertEqual(error.domain, NSPOSIXErrorDomain)
+            XCTAssertEqual(error.localizedDescription, "Waiting for update timed out after \(timeout) seconds.")
         }
-        await fulfillment(of: [expectation], timeout: 3.0)
-
-        // resume sync session and wait for subscription otherwise tear
-        // down can't complete successfully
-        realm.syncSession!.resume()
-        let start = Date()
-        while realm.subscriptions.state != .complete && start.timeIntervalSinceNow > -10.0 {
-            sleep(1)
-        }
-        XCTAssertEqual(realm.subscriptions.state, .complete)
     }
 
+    @MainActor
     func testSubscribeTimeoutSucceeds() async throws {
         try await populateSwiftPerson()
 
