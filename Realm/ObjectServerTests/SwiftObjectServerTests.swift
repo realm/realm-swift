@@ -393,7 +393,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         XCTAssertEqual(error.code, .clientResetError)
         let resetInfo = try XCTUnwrap(error.clientResetInfo())
         XCTAssertTrue(resetInfo.0.contains("mongodb-realm/\(self.appId)/recovered-realms/recovered_realm"))
-        XCTAssertNotNil(realm)
+
+        realm.invalidate() // ensure realm is kept alive to here
     }
 
     func testClientResetManualInitiation() throws {

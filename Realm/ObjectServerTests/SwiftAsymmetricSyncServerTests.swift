@@ -227,7 +227,6 @@ extension SwiftAsymmetricSyncTests {
     @MainActor
     func testCreateAsymmetricObject() async throws {
         let realm = try await realm()
-        XCTAssertNotNil(realm)
 
         // Create Asymmetric Objects
         try realm.write {
@@ -248,7 +247,6 @@ extension SwiftAsymmetricSyncTests {
     func testPropertyTypesAsymmetricObject() async throws {
         let collection = try await setupCollection("SwiftObjectAsymmetric")
         let realm = try await realm()
-        XCTAssertNotNil(realm)
 
         // Create Asymmetric Objects
         try realm.write {
@@ -276,7 +274,6 @@ extension SwiftAsymmetricSyncTests {
     @MainActor
     func testCreateHugeAsymmetricObject() async throws {
         let realm = try await realm()
-        XCTAssertNotNil(realm)
 
         // Create Asymmetric Objects
         try realm.write {
@@ -293,7 +290,6 @@ extension SwiftAsymmetricSyncTests {
     func testCreateCustomAsymmetricObject() async throws {
         let collection = try await setupCollection("SwiftCustomColumnAsymmetricObject")
         let realm = try await realm()
-        XCTAssertNotNil(realm)
 
         let objectId = ObjectId.generate()
         let valuesDictionary: [String: Any] = ["id": objectId,

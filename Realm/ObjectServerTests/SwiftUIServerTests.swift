@@ -67,7 +67,6 @@ class SwiftUIServerTests: SwiftSyncTestCase {
         let ex = expectation(description: "download-realm-async-open")
         asyncOpen(user: user, appId: appId, partitionValue: #function) { asyncOpenState in
             if case let .open(realm) = asyncOpenState {
-                XCTAssertNotNil(realm)
                 ex.fulfill()
             }
         }
@@ -83,7 +82,6 @@ class SwiftUIServerTests: SwiftSyncTestCase {
         let ex = expectation(description: "download-populated-realm-async-open")
         asyncOpen(user: user, appId: appId, partitionValue: #function) { asyncOpenState in
             if case let .open(realm) = asyncOpenState {
-                XCTAssertNotNil(realm)
                 self.checkCount(expected: SwiftSyncTestCase.bigObjectCount, realm, SwiftHugeSyncObject.self)
                 ex.fulfill()
             }
@@ -158,7 +156,6 @@ class SwiftUIServerTests: SwiftSyncTestCase {
         let ex = expectation(description: "download-cached-app-async-open")
         asyncOpen(user: user, partitionValue: #function) { asyncOpenState in
             if case let .open(realm) = asyncOpenState {
-                XCTAssertNotNil(realm)
                 self.checkCount(expected: SwiftSyncTestCase.bigObjectCount, realm, SwiftHugeSyncObject.self)
                 ex.fulfill()
             }
@@ -191,7 +188,6 @@ class SwiftUIServerTests: SwiftSyncTestCase {
         let ex = expectation(description: "download-partition-value-async-open")
         asyncOpen(user: user, partitionValue: partitionValueA) { asyncOpenState in
             if case let .open(realm) = asyncOpenState {
-                XCTAssertNotNil(realm)
                 self.checkCount(expected: SwiftSyncTestCase.bigObjectCount, realm, SwiftHugeSyncObject.self)
                 ex.fulfill()
             }
@@ -200,7 +196,6 @@ class SwiftUIServerTests: SwiftSyncTestCase {
         let ex2 = expectation(description: "download-other-partition-value-async-open")
         asyncOpen(user: user, partitionValue: partitionValueB) { asyncOpenState in
             if case let .open(realm) = asyncOpenState {
-                XCTAssertNotNil(realm)
                 self.checkCount(expected: 0, realm, SwiftHugeSyncObject.self)
                 ex2.fulfill()
             }
@@ -224,7 +219,6 @@ class SwiftUIServerTests: SwiftSyncTestCase {
         let ex = expectation(description: "test-multiuser1-app-async-open")
         asyncOpen(user: syncUser2, appId: appId, partitionValue: partitionValueB) { asyncOpenState in
             if case let .open(realm) = asyncOpenState {
-                XCTAssertNotNil(realm)
                 self.checkCount(expected: 0, realm, SwiftHugeSyncObject.self)
                 ex.fulfill()
             }
@@ -237,7 +231,6 @@ class SwiftUIServerTests: SwiftSyncTestCase {
         let ex2 = expectation(description: "test-multiuser2-app-async-open")
         asyncOpen(user: syncUser2, appId: appId, partitionValue: partitionValueA) { asyncOpenState in
             if case let .open(realm) = asyncOpenState {
-                XCTAssertNotNil(realm)
                 self.checkCount(expected: SwiftSyncTestCase.bigObjectCount, realm, SwiftHugeSyncObject.self)
                 ex2.fulfill()
             }
@@ -258,7 +251,6 @@ class SwiftUIServerTests: SwiftSyncTestCase {
         let ex = expectation(description: "download-realm-anonymous-user-async-open")
         asyncOpen(user: anonymousUser, appId: appId, partitionValue: partitionValueA) { asyncOpenState in
             if case let .open(realm) = asyncOpenState {
-                XCTAssertNotNil(realm)
                 self.checkCount(expected: 0, realm, SwiftHugeSyncObject.self)
                 ex.fulfill()
             }
@@ -269,7 +261,6 @@ class SwiftUIServerTests: SwiftSyncTestCase {
         let ex2 = expectation(description: "download-realm-after-logout-async-open")
         asyncOpen(user: user, appId: appId, partitionValue: partitionValueB) { asyncOpenState in
             if case let .open(realm) = asyncOpenState {
-                XCTAssertNotNil(realm)
                 self.checkCount(expected: SwiftSyncTestCase.bigObjectCount, realm, SwiftHugeSyncObject.self)
                 ex2.fulfill()
             }
@@ -297,7 +288,6 @@ class SwiftUIServerTests: SwiftSyncTestCase {
         let ex = expectation(description: "download-realm-auto-open")
         autoOpen(user: user, appId: appId, partitionValue: #function) { autoOpenState in
             if case let .open(realm) = autoOpenState {
-                XCTAssertNotNil(realm)
                 ex.fulfill()
             }
         }
@@ -314,7 +304,6 @@ class SwiftUIServerTests: SwiftSyncTestCase {
         let ex = expectation(description: "download-populated-realm-auto-open")
         autoOpen(user: user, appId: appId, partitionValue: #function) { autoOpenState in
             if case let .open(realm) = autoOpenState {
-                XCTAssertNotNil(realm)
                 self.checkCount(expected: SwiftSyncTestCase.bigObjectCount, realm, SwiftHugeSyncObject.self)
                 ex.fulfill()
             }
@@ -437,7 +426,6 @@ class SwiftUIServerTests: SwiftSyncTestCase {
         let ex = expectation(description: "download-cached-app-auto-open")
         autoOpen(user: user, partitionValue: #function) { autoOpenState in
             if case let .open(realm) = autoOpenState {
-                XCTAssertNotNil(realm)
                 self.checkCount(expected: SwiftSyncTestCase.bigObjectCount, realm, SwiftHugeSyncObject.self)
                 ex.fulfill()
             }
@@ -476,7 +464,6 @@ class SwiftUIServerTests: SwiftSyncTestCase {
         let ex = expectation(description: "test-multiuser1-app-auto-open")
         autoOpen(user: syncUser2, appId: appId, partitionValue: partitionValueB) { autoOpenState in
             if case let .open(realm) = autoOpenState {
-                XCTAssertNotNil(realm)
                 self.checkCount(expected: 0, realm, SwiftHugeSyncObject.self)
                 ex.fulfill()
             }
@@ -489,7 +476,6 @@ class SwiftUIServerTests: SwiftSyncTestCase {
         let ex2 = expectation(description: "test-multiuser2-app-auto-open")
         autoOpen(user: syncUser1, appId: appId, partitionValue: partitionValueA) { autoOpenState in
             if case let .open(realm) = autoOpenState {
-                XCTAssertNotNil(realm)
                 self.checkCount(expected: SwiftSyncTestCase.bigObjectCount, realm, SwiftHugeSyncObject.self)
                 ex2.fulfill()
             }
@@ -504,7 +490,6 @@ class SwiftUIServerTests: SwiftSyncTestCase {
         let ex = expectation(description: "download-realm-anonymous-user-auto-open")
         autoOpen(user: anonymousUser, appId: appId, partitionValue: partitionValueA) { autoOpenState in
             if case let .open(realm) = autoOpenState {
-                XCTAssertNotNil(realm)
                 self.checkCount(expected: 0, realm, SwiftHugeSyncObject.self)
                 ex.fulfill()
             }
@@ -521,7 +506,6 @@ class SwiftUIServerTests: SwiftSyncTestCase {
         let ex2 = expectation(description: "download-realm-after-logout-auto-open")
         autoOpen(user: user, appId: appId, partitionValue: partitionValueB) { autoOpenState in
             if case let .open(realm) = autoOpenState {
-                XCTAssertNotNil(realm)
                 self.checkCount(expected: SwiftSyncTestCase.bigObjectCount, realm, SwiftHugeSyncObject.self)
                 ex2.fulfill()
             }
@@ -541,7 +525,6 @@ class SwiftUIServerTests: SwiftSyncTestCase {
         let ex = expectation(description: "download-partition-value-auto-open")
         autoOpen(user: user, partitionValue: partitionValueA) { autoOpenState in
             if case let .open(realm) = autoOpenState {
-                XCTAssertNotNil(realm)
                 self.checkCount(expected: SwiftSyncTestCase.bigObjectCount, realm, SwiftHugeSyncObject.self)
                 ex.fulfill()
             }
@@ -550,7 +533,6 @@ class SwiftUIServerTests: SwiftSyncTestCase {
         let ex2 = expectation(description: "download-other-partition-value-auto-open")
         autoOpen(user: user, partitionValue: partitionValueB) { autoOpenState in
             if case let .open(realm) = autoOpenState {
-                XCTAssertNotNil(realm)
                 self.checkCount(expected: 0, realm, SwiftHugeSyncObject.self)
                 ex2.fulfill()
             }
@@ -571,7 +553,6 @@ class SwiftUIServerTests: SwiftSyncTestCase {
         let ex = expectation(description: "download-partition-value-async-open-mixed")
         asyncOpen(user: user, partitionValue: partitionValueA) { asyncOpenState in
             if case let .open(realm) = asyncOpenState {
-                XCTAssertNotNil(realm)
                 self.checkCount(expected: SwiftSyncTestCase.bigObjectCount, realm, SwiftHugeSyncObject.self)
                 ex.fulfill()
             }
@@ -580,7 +561,6 @@ class SwiftUIServerTests: SwiftSyncTestCase {
         let ex2 = expectation(description: "download-partition-value-auto-open-mixed")
         autoOpen(user: user, partitionValue: partitionValueB) { autoOpenState in
             if case let .open(realm) = autoOpenState {
-                XCTAssertNotNil(realm)
                 self.checkCount(expected: 0, realm, SwiftHugeSyncObject.self)
                 ex2.fulfill()
             }
@@ -604,7 +584,6 @@ class SwiftUIServerTests: SwiftSyncTestCase {
         let ex = expectation(description: "test-combine-multiuser1-app-auto-open")
         autoOpen(user: syncUser2, appId: appId, partitionValue: partitionValueB) { autoOpenState in
             if case let .open(realm) = autoOpenState {
-                XCTAssertNotNil(realm)
                 self.checkCount(expected: 0, realm, SwiftHugeSyncObject.self)
                 ex.fulfill()
             }
@@ -617,7 +596,6 @@ class SwiftUIServerTests: SwiftSyncTestCase {
         let ex2 = expectation(description: "test-combine-multiuser2-app-auto-open")
         asyncOpen(user: syncUser1, appId: appId, partitionValue: partitionValueA) { asyncOpenState in
             if case let .open(realm) = asyncOpenState {
-                XCTAssertNotNil(realm)
                 self.checkCount(expected: SwiftSyncTestCase.bigObjectCount, realm, SwiftHugeSyncObject.self)
                 ex2.fulfill()
             }
