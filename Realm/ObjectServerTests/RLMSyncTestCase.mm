@@ -767,11 +767,8 @@ static NSURL *syncDirectoryForChildProcess() {
     [subs update:^{
         block(subs);
     } onComplete:^(NSError* error) {
-        if (error == nil) {
-            [ex fulfill];
-        } else {
-            XCTFail();
-        }
+        XCTAssertNil(error);
+        [ex fulfill];
     }];
     XCTAssertNotNil(subs);
     [self waitForExpectationsWithTimeout:20.0 handler:nil];
