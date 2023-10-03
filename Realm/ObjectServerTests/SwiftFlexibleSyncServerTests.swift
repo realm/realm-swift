@@ -683,11 +683,8 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
                 $0.age > 15 && $0.firstName == "\(#function)"
             })
         }, onComplete: { error in
-            if error == nil {
-                ex.fulfill()
-            } else {
-                XCTFail("Subscription Set could not complete with \(error!)")
-            }
+            XCTAssertNil(error)
+            ex.fulfill()
         })
 
         waitForExpectations(timeout: 20.0, handler: nil)
@@ -724,11 +721,8 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
                 $0.intCol == 1 && $0.stringCol == "\(#function)"
             })
         }, onComplete: { error in
-            if error == nil {
-                ex.fulfill()
-            } else {
-                XCTFail("Subscription Set could not complete with \(error!)")
-            }
+            XCTAssertNil(error)
+            ex.fulfill()
         })
         waitForExpectations(timeout: 20.0, handler: nil)
 
@@ -765,11 +759,8 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
                 $0.intCol == 1 && $0.stringCol == "\(#function)"
             })
         }, onComplete: { error in
-            if error == nil {
-                ex.fulfill()
-            } else {
-                XCTFail("Subscription Set could not complete with \(error!)")
-            }
+            XCTAssertNil(error)
+            ex.fulfill()
         })
         waitForExpectations(timeout: 20.0, handler: nil)
 
@@ -781,11 +772,8 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
         subscriptions.update({
             subscriptions.remove(named: "person_age_5")
         }, onComplete: { error in
-            if error == nil {
-                ex2.fulfill()
-            } else {
-                XCTFail("Subscription Set could not complete with \(error!)")
-            }
+            XCTAssertNil(error)
+            ex2.fulfill()
         })
         waitForExpectations(timeout: 20.0, handler: nil)
 
@@ -822,11 +810,8 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
                 $0.intCol == 1 && $0.stringCol == "\(#function)"
             })
         }, onComplete: { error in
-            if error == nil {
-                ex.fulfill()
-            } else {
-                XCTFail("Subscription Set could not complete with \(error!)")
-            }
+            XCTAssertNil(error)
+            ex.fulfill()
         })
 
         waitForExpectations(timeout: 20.0, handler: nil)
@@ -842,11 +827,8 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
                 $0.age > 20 && $0.firstName == "\(#function)"
             })
         }, onComplete: { error in
-            if error == nil {
-                ex2.fulfill()
-            } else {
-                XCTFail("Subscription Set could not complete with \(error!)")
-            }
+            XCTAssertNil(error)
+            ex2.fulfill()
         })
         waitForExpectations(timeout: 20.0, handler: nil)
 
@@ -887,11 +869,8 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
                 $0.intCol == 1 && $0.stringCol == "\(#function)"
             })
         }, onComplete: { error in
-            if error == nil {
-                ex.fulfill()
-            } else {
-                XCTFail("Subscription Set could not complete with \(error!)")
-            }
+            XCTAssertNil(error)
+            ex.fulfill()
         })
         waitForExpectations(timeout: 20.0, handler: nil)
 
@@ -903,11 +882,8 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
         subscriptions.update({
             subscriptions.removeAll(ofType: SwiftPerson.self)
         }, onComplete: { error in
-            if error == nil {
-                ex2.fulfill()
-            } else {
-                XCTFail("Subscription Set could not complete with \(error!)")
-            }
+            XCTAssertNil(error)
+            ex2.fulfill()
         })
         waitForExpectations(timeout: 20.0, handler: nil)
 
@@ -938,11 +914,8 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
                 $0.age > 20 && $0.firstName == "\(#function)"
             })
         }, onComplete: { error in
-            if error == nil {
-                ex.fulfill()
-            } else {
-                XCTFail("Subscription Set could not complete with \(error!)")
-            }
+            XCTAssertNil(error)
+            ex.fulfill()
         })
         waitForExpectations(timeout: 20.0, handler: nil)
 
@@ -958,11 +931,8 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
                 $0.age > 5 && $0.firstName == "\(#function)"
             })
         }, onComplete: { error in
-            if error == nil {
-                ex2.fulfill()
-            } else {
-                XCTFail("Subscription Set could not complete with \(error!)")
-            }
+            XCTAssertNil(error)
+            ex2.fulfill()
         })
         waitForExpectations(timeout: 20.0, handler: nil)
 
