@@ -39,8 +39,7 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
     }
 
     func testFlexibleSyncOpenRealm() throws {
-        let realm = try openFlexibleSyncRealm()
-        XCTAssertNotNil(realm)
+        _ = try openFlexibleSyncRealm()
     }
 
     func testGetSubscriptionsWhenLocalRealm() throws {
@@ -72,8 +71,7 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
     func testWriteEmptyBlock() throws {
         let realm = try openFlexibleSyncRealm()
         let subscriptions = realm.subscriptions
-        subscriptions.update {
-        }
+        subscriptions.update {}
 
         XCTAssertEqual(subscriptions.count, 0)
     }
@@ -654,11 +652,9 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
         }
 
         let realm = try flexibleSyncRealm()
-        XCTAssertNotNil(realm)
         checkCount(expected: 0, realm, SwiftPerson.self)
 
         let subscriptions = realm.subscriptions
-        XCTAssertNotNil(subscriptions)
         XCTAssertEqual(subscriptions.count, 0)
 
         waitForDownloads(for: realm)
@@ -676,11 +672,9 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
         }
 
         let realm = try flexibleSyncRealm()
-        XCTAssertNotNil(realm)
         checkCount(expected: 0, realm, SwiftPerson.self)
 
         let subscriptions = realm.subscriptions
-        XCTAssertNotNil(subscriptions)
         XCTAssertEqual(subscriptions.count, 0)
 
         let ex = expectation(description: "state change complete")
@@ -716,11 +710,9 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
         }
 
         let realm = try flexibleSyncRealm()
-        XCTAssertNotNil(realm)
         checkCount(expected: 0, realm, SwiftPerson.self)
 
         let subscriptions = realm.subscriptions
-        XCTAssertNotNil(subscriptions)
         XCTAssertEqual(subscriptions.count, 0)
 
         let ex = expectation(description: "state change complete")
@@ -759,11 +751,9 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
         }
 
         let realm = try flexibleSyncRealm()
-        XCTAssertNotNil(realm)
         checkCount(expected: 0, realm, SwiftPerson.self)
 
         let subscriptions = realm.subscriptions
-        XCTAssertNotNil(subscriptions)
         XCTAssertEqual(subscriptions.count, 0)
 
         let ex = expectation(description: "state change complete")
@@ -818,11 +808,9 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
         }
 
         let realm = try flexibleSyncRealm()
-        XCTAssertNotNil(realm)
         checkCount(expected: 0, realm, SwiftPerson.self)
 
         let subscriptions = realm.subscriptions
-        XCTAssertNotNil(subscriptions)
         XCTAssertEqual(subscriptions.count, 0)
 
         let ex = expectation(description: "state change complete")
@@ -881,11 +869,9 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
         }
 
         let realm = try flexibleSyncRealm()
-        XCTAssertNotNil(realm)
         checkCount(expected: 0, realm, SwiftPerson.self)
 
         let subscriptions = realm.subscriptions
-        XCTAssertNotNil(subscriptions)
         XCTAssertEqual(subscriptions.count, 0)
 
         let ex = expectation(description: "state change complete")
@@ -941,11 +927,9 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
         }
 
         let realm = try flexibleSyncRealm()
-        XCTAssertNotNil(realm)
         checkCount(expected: 0, realm, SwiftPerson.self)
 
         let subscriptions = realm.subscriptions
-        XCTAssertNotNil(subscriptions)
         XCTAssertEqual(subscriptions.count, 0)
 
         let ex = expectation(description: "state change complete")
@@ -1008,7 +992,6 @@ class SwiftFlexibleSyncServerTests: SwiftSyncTestCase {
         }
         let realm = try Realm(configuration: config)
         let subscriptions = realm.subscriptions
-        XCTAssertNotNil(subscriptions)
         XCTAssertEqual(subscriptions.count, 1)
 
         checkCount(expected: 0, realm, SwiftPerson.self)
@@ -1111,11 +1094,9 @@ extension SwiftFlexibleSyncServerTests {
         }
 
         let realm = try await flexibleSyncRealm()
-        XCTAssertNotNil(realm)
         checkCount(expected: 0, realm, SwiftPerson.self)
 
         let subscriptions = realm.subscriptions
-        XCTAssertNotNil(subscriptions)
         XCTAssertEqual(subscriptions.count, 0)
 
         try await subscriptions.update {
@@ -1131,8 +1112,6 @@ extension SwiftFlexibleSyncServerTests {
     @MainActor
     func testStates() async throws {
         let realm = try await flexibleSyncRealm()
-        XCTAssertNotNil(realm)
-
         let subscriptions = realm.subscriptions
         XCTAssertEqual(subscriptions.count, 0)
 
@@ -1172,11 +1151,9 @@ extension SwiftFlexibleSyncServerTests {
         }
 
         let realm = try await flexibleSyncRealm()
-        XCTAssertNotNil(realm)
         checkCount(expected: 0, realm, SwiftPerson.self)
 
         let subscriptions = realm.subscriptions
-        XCTAssertNotNil(subscriptions)
         XCTAssertEqual(subscriptions.count, 0)
 
         try await subscriptions.update {
@@ -1191,8 +1168,6 @@ extension SwiftFlexibleSyncServerTests {
     func testFlexibleSyncNotInitialSubscriptions() async throws {
         let config = try await flexibleSyncConfig()
         let realm = try await Realm(configuration: config, downloadBeforeOpen: .always)
-        XCTAssertNotNil(realm)
-
         XCTAssertEqual(realm.subscriptions.count, 0)
     }
 
@@ -1218,8 +1193,6 @@ extension SwiftFlexibleSyncServerTests {
             config.objectTypes = [SwiftPerson.self]
         }
         let realm = try await Realm(configuration: config, downloadBeforeOpen: .once)
-        XCTAssertNotNil(realm)
-
         XCTAssertEqual(realm.subscriptions.count, 1)
         checkCount(expected: 10, realm, SwiftPerson.self)
     }
@@ -1237,7 +1210,6 @@ extension SwiftFlexibleSyncServerTests {
             config.objectTypes = [SwiftPerson.self]
         }
         let realm = try await Realm(configuration: config, downloadBeforeOpen: .once)
-        XCTAssertNotNil(realm)
         XCTAssertEqual(realm.subscriptions.count, 1)
 
         let realm2 = try await Realm(configuration: config, downloadBeforeOpen: .once)
@@ -1260,7 +1232,6 @@ extension SwiftFlexibleSyncServerTests {
             config.objectTypes = [SwiftPerson.self]
         }
         let realm = try await Realm(configuration: config, downloadBeforeOpen: .once)
-        XCTAssertNotNil(realm)
         XCTAssertEqual(realm.subscriptions.count, 1)
 
         let realm2 = try await Realm(configuration: config, downloadBeforeOpen: .once)
@@ -1302,14 +1273,12 @@ extension SwiftFlexibleSyncServerTests {
         let c = config
         _ = try await Task { @MainActor in
             let realm = try await Realm(configuration: c, downloadBeforeOpen: .always)
-            XCTAssertNotNil(realm)
             XCTAssertEqual(realm.subscriptions.count, 1)
             checkCount(expected: 9, realm, SwiftTypesSyncObject.self)
         }.value
 
         _ = try await Task { @MainActor in
             let realm = try await Realm(configuration: c, downloadBeforeOpen: .always)
-            XCTAssertNotNil(realm)
             XCTAssertEqual(realm.subscriptions.count, 2)
             checkCount(expected: 19, realm, SwiftTypesSyncObject.self)
         }.value
@@ -1744,7 +1713,6 @@ XCTAssertNotNil(realm.subscriptions.first(ofType: SwiftPerson.self) { $0.age > 5
         })
         config.objectTypes = [SwiftCustomColumnObject.self]
         let realm = try await Realm(configuration: config, downloadBeforeOpen: .once)
-        XCTAssertNotNil(realm)
         XCTAssertEqual(realm.subscriptions.count, 1)
 
         let foundObject = realm.object(ofType: SwiftCustomColumnObject.self, forPrimaryKey: objectId)
@@ -1783,7 +1751,6 @@ XCTAssertNotNil(realm.subscriptions.first(ofType: SwiftPerson.self) { $0.age > 5
         })
         config.objectTypes = [SwiftCustomColumnObject.self]
         let realm = try await Realm(configuration: config, downloadBeforeOpen: .once)
-        XCTAssertNotNil(realm)
         XCTAssertEqual(realm.subscriptions.count, 1)
         checkCount(expected: 2, realm, SwiftCustomColumnObject.self)
 
@@ -1823,7 +1790,6 @@ XCTAssertNotNil(realm.subscriptions.first(ofType: SwiftPerson.self) { $0.age > 5
         })
         config.objectTypes = [SwiftCustomColumnObject.self]
         let realm = try await Realm(configuration: config, downloadBeforeOpen: .once)
-        XCTAssertNotNil(realm)
         XCTAssertEqual(realm.subscriptions.count, 1)
         checkCount(expected: 2, realm, SwiftCustomColumnObject.self)
 
@@ -1865,7 +1831,6 @@ XCTAssertNotNil(realm.subscriptions.first(ofType: SwiftPerson.self) { $0.age > 5
         })
         config.objectTypes = [SwiftCustomColumnObject.self]
         let realm = try await Realm(configuration: config, downloadBeforeOpen: .once)
-        XCTAssertNotNil(realm)
         XCTAssertEqual(realm.subscriptions.count, 1)
         checkCount(expected: 2, realm, SwiftCustomColumnObject.self)
 
@@ -1903,11 +1868,9 @@ extension SwiftFlexibleSyncServerTests {
         }
 
         let realm = try flexibleSyncRealm()
-        XCTAssertNotNil(realm)
         checkCount(expected: 0, realm, SwiftPerson.self)
 
         let subscriptions = realm.subscriptions
-        XCTAssertNotNil(subscriptions)
         XCTAssertEqual(subscriptions.count, 0)
 
         let ex = expectation(description: "state change complete")
@@ -1928,11 +1891,9 @@ extension SwiftFlexibleSyncServerTests {
 #if false // FIXME: this is no longer an error and needs to be updated to something which is
     func testFlexibleSyncCombineWriteFails() throws {
         let realm = try flexibleSyncRealm()
-        XCTAssertNotNil(realm)
         checkCount(expected: 0, realm, SwiftPerson.self)
 
         let subscriptions = realm.subscriptions
-        XCTAssertNotNil(subscriptions)
         XCTAssertEqual(subscriptions.count, 0)
 
         let ex = expectation(description: "state change error")
