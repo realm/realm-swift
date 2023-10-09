@@ -87,27 +87,6 @@ RLM_COLLECTION_TYPE(PersonAsymmetric);
 }
 @end
 
-#pragma mark UnsupportedLinkObject
-
-@interface UnsupportedLinkObject : RLMAsymmetricObject
-@property RLMObjectId *_id;
-@property RLM_GENERIC_ARRAY(Person) *objectArray;
-@end
-
-@implementation UnsupportedLinkObject
-+ (NSDictionary *)defaultPropertyValues {
-    return @{@"_id": [RLMObjectId objectId]};
-}
-
-+ (NSString *)primaryKey {
-    return @"_id";
-}
-
-+ (bool)_realmIgnoreClass {
-    return true;
-}
-@end
-
 #pragma mark UnsupportedObjectLinkAsymmetric
 
 @interface UnsupportedObjectLinkAsymmetric : RLMObject
@@ -230,18 +209,6 @@ RLM_COLLECTION_TYPE(PersonAsymmetric);
     XCTAssertNil(realm);
     XCTAssert([error.localizedDescription containsString:@"Property 'UnsupportedLinkAsymmetric.object' of type 'object' cannot be a link to an asymmetric object."]);
     XCTAssert([error.localizedDescription containsString:@"Property 'UnsupportedLinkAsymmetric.objectArray' of type 'array' cannot be a link to an asymmetric object."]);
-}
-
-- (void)testUnsupportedAsymmetricLinkObjectThrowsError  {
-    RLMUser *user = [self userForSelector:_cmd];
-    RLMRealmConfiguration *configuration = [user flexibleSyncConfiguration];
-    configuration.objectClasses = @[UnsupportedLinkObject.self, Person.self];
-    NSError *error;
-    RLMRealm *realm = [RLMRealm realmWithConfiguration:configuration error:&error];
-    XCTAssertNil(realm);
-    // Schema validation allows this but then creating the column fails. This is
-    // a core bug and this test will start failing as soon as it's fixed.
-    XCTAssert([error.localizedDescription containsString:@"List of objects not supported in asymmetric table"]);
 }
 
 - (void)testUnsupportedObjectLinksAsymmetricThrowsError  {

@@ -106,7 +106,7 @@ using namespace realm;
     }
 }
 
-- (void)execute:(RLMMigrationBlock)block objectClass:(Class)dynamicObjectClass {
+- (void)execute:(RLMMigrationBlock)block objectClass:(::Class)dynamicObjectClass {
     if (!dynamicObjectClass) {
         dynamicObjectClass = RLMDynamicObject.class;
     }

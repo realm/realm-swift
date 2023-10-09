@@ -38,10 +38,7 @@
 #import <realm/object-store/object_schema.hpp>
 #import <realm/object-store/shared_realm.hpp>
 
-using namespace realm;
-
 const NSUInteger RLMDescriptionMaxDepth = 5;
-
 
 static bool isManagedAccessorClass(Class cls) {
     const char *className = class_getName(cls);
@@ -425,7 +422,7 @@ id RLMCreateManagedAccessor(Class cls, RLMClassInfo *info) {
 #pragma mark - Thread Confined Protocol Conformance
 
 - (realm::ThreadSafeReference)makeThreadSafeReference {
-    return Object(_realm->_realm, *_info->objectSchema, _row);
+    return realm::Object(_realm->_realm, *_info->objectSchema, _row);
 }
 
 - (id)objectiveCMetadata {
@@ -435,7 +432,7 @@ id RLMCreateManagedAccessor(Class cls, RLMClassInfo *info) {
 + (instancetype)objectWithThreadSafeReference:(realm::ThreadSafeReference)reference
                                      metadata:(__unused id)metadata
                                         realm:(RLMRealm *)realm {
-    Object object = reference.resolve<Object>(realm->_realm);
+    auto object = reference.resolve<realm::Object>(realm->_realm);
     if (!object.is_valid()) {
         return nil;
     }
