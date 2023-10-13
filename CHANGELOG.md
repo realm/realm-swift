@@ -1,15 +1,20 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.43.1 Release notes (2023-10-13)
 =============================================================
+
 ### Enhancements
-* None.
+
+* Empty commits no longer trigger an extra invocation of the sync progress
+  handler reporting the exact same information as the previous invocation
+  ([Core #7031](https://github.com/realm/realm-core/pull/7031)).
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
-* None.
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+* Updating subscriptions did not trigger Realm autorefreshes, sometimes
+  resulting in Realm.asyncRefresh() hanging until another write was performed by
+  something else ([Core #7031](https://github.com/realm/realm-core/pull/7031)).
 
 ### Compatibility
+
 * Realm Studio: 14.0.1 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 15.0.0.
@@ -17,7 +22,8 @@ x.y.z Release notes (yyyy-MM-dd)
 * Xcode: 14.1-15.0.0.
 
 ### Internal
-* Upgraded realm-core from 13.22.0 to 13.23.0
+
+* Upgraded realm-core from 13.22.0 to 13.23.1
 
 10.43.0 Release notes (2023-09-29)
 =============================================================
