@@ -161,6 +161,23 @@ RLM_SWIFT_SENDABLE RLM_FINAL // is internally thread-safe
 - (void)resume;
 
 /**
+ Request an immediate reconnection to the server if the session is disconnected.
+
+ Realm automatically reconnects after disconnects with an exponential backoff,
+ which is reset when the reachability handler reports a network status change.
+ In some scenarios an application may wish to skip the reconnect delay, such as
+ when an application receives the DidBecomeActive notification, which can be
+ done by calling this method. Calling this method is never required.
+
+ This method is asynchronous and merely skips the current reconnect delay, so
+ the connection state will still normally be disconnected immediately after
+ calling it.
+
+ Has no effect if the session is currently connected.
+ */
+- (void)reconnect;
+
+/**
  Register a progress notification block.
 
  Multiple blocks can be registered with the same session at once. Each block

@@ -174,6 +174,12 @@ static RLMSyncConnectionState convertConnectionState(SyncSession::ConnectionStat
     }
 }
 
+- (void)reconnect {
+    if (auto session = _session.lock()) {
+        session->handle_reconnect();
+    }
+}
+
 static util::UniqueFunction<void(Status)> wrapCompletion(dispatch_queue_t queue,
                                                          void (^callback)(NSError *)) {
     queue = queue ?: dispatch_get_main_queue();
