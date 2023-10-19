@@ -19,8 +19,12 @@ export GEM_HOME=$HOME/gems
 export PATH="$GEM_HOME/bin:$PATH"
 
 ######################################
-# CI Helpers
+# Dependency Installer
 ######################################
+
+JAZZY_VERSION="0.14.4"
+RUBY_VERSION="3.1.2"
+XCPRETTY_VERSION="0.3.0"
 
 install_dependencies() {
     echo ">>> Installing dependencies for ${CI_WORKFLOW}"
@@ -29,7 +33,8 @@ install_dependencies() {
 
     if [[ "$CI_WORKFLOW" == "docs"* ]]; then
         install_ruby
-        gem install jazzy -v 0.14.3
+        gem install activesupport -v 7.0.8 # Workaround until this is fixed https://github.com/realm/jazzy/issues/1370
+        gem install jazzy -v ${JAZZY_VERSION}
     elif [[ "$CI_WORKFLOW" == "swiftlint"* ]]; then
         brew install swiftlint
     elif [[ "$CI_WORKFLOW" == "cocoapods"* ]]; then
@@ -39,16 +44,18 @@ install_dependencies() {
         install_ruby
     fi
 
-    gem install xcpretty -v 0.3.0
+    gem install xcpretty -v ${XCPRETTY_VERSION}
     echo ">>> Using ruby version $(ruby -v)"
 }
 
 install_ruby() {
     # Ruby Installation
     echo ">>> Installing new Version of ruby"
-    brew install ruby
-    echo 'export PATH="/usr/local/opt/ruby/bin:$PATH"' >> ~/.bash_profile
-    source ~/.bash_profile
+    brew install rbenv ruby-build
+    rbenv install ${RUBY_VERSION}
+    rbenv global ${RUBY_VERSION}
+    echo 'export PATH=$HOME/.rbenv/bin:$PATH' >>~/.bash_profile
+    eval "$(rbenv init -)"
 }
 
 # Dependencies
