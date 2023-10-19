@@ -484,9 +484,9 @@ class CodableTests: TestCase {
         XCTAssertEqual(obj.otherDouble.value, .none)
     }
 
-    func testObject() {
+    func testObject() throws {
         let decoder = JSONDecoder()
-        let obj = try! decoder.decode(CodableObject.self, from: Data(legacyObjectString().utf8))
+        let obj = try decoder.decode(CodableObject.self, from: Data(legacyObjectString().utf8))
 
         XCTAssertEqual(obj.bool, true)
         XCTAssertEqual(obj.int, 123)
@@ -612,8 +612,10 @@ class CodableTests: TestCase {
 
         let expected = "{\"doubleOptMap\":{\"foo\":2.5},\"floatSet\":[2.5],\"int8\":123,\"otherInt32\":123,\"int16Map\":{\"foo\":123},\"stringOpt\":\"abc\",\"uuidOptSet\":[\"00000000-0000-0000-0000-000000000000\"],\"int8OptMap\":{\"foo\":123},\"dataOptSet\":[\"ZGVm\"],\"stringOptSet\":[\"abc\"],\"doubleMap\":{\"foo\":2.5},\"int16OptMap\":{\"foo\":123},\"decimalOpt\":\"1.5E2\",\"decimalOptSet\":[\"1.5E2\"],\"uuidList\":[\"00000000-0000-0000-0000-000000000000\"],\"otherFloat\":2.5,\"dateOptSet\":[2.5],\"uuid\":\"00000000-0000-0000-0000-000000000000\",\"floatOpt\":2.5,\"int32OptSet\":[123],\"string\":\"abc\",\"dataOpt\":\"ZGVm\",\"int8Opt\":123,\"int16\":123,\"floatMap\":{\"foo\":2.5},\"decimalMap\":{\"foo\":\"1.5E2\"},\"dateOpt\":2.5,\"int64List\":[123],\"otherBool\":true,\"floatOptList\":[2.5],\"boolOptList\":[true],\"intOptSet\":[123],\"int32\":123,\"floatList\":[2.5],\"date\":2.5,\"dataSet\":[\"ZGVm\"],\"uuidOptList\":[\"00000000-0000-0000-0000-000000000000\"],\"int8Set\":[123],\"intOptList\":[123],\"int32Set\":[123],\"int32OptMap\":{\"foo\":123},\"dateSet\":[2.5],\"int32List\":[123],\"objectId\":\"1234567890abcdef12345678\",\"stringOptMap\":{\"foo\":\"abc\"},\"doubleOpt\":2.5,\"objectIdOptMap\":{\"foo\":\"1234567890abcdef12345678\"},\"boolOptSet\":[true],\"otherInt16\":123,\"intOpt\":123,\"intMap\":{\"foo\":123},\"objectIdOptSet\":[\"1234567890abcdef12345678\"],\"stringOptList\":[\"abc\"],\"int8OptList\":[123],\"int32Opt\":123,\"double\":2.5,\"stringSet\":[\"abc\"],\"otherDouble\":2.5,\"decimal\":\"1.5E2\",\"int32Map\":{\"foo\":123},\"int8OptSet\":[123],\"boolMap\":{\"foo\":true},\"int64OptList\":[123],\"dateOptList\":[2.5],\"intOptMap\":{\"foo\":123},\"bool\":true,\"int32OptList\":[123],\"intSet\":[123],\"dataOptList\":[\"ZGVm\"],\"float\":2.5,\"floatOptSet\":[2.5],\"decimalOptMap\":{\"foo\":\"1.5E2\"},\"uuidMap\":{\"foo\":\"00000000-0000-0000-0000-000000000000\"},\"int\":123,\"decimalSet\":[\"1.5E2\"],\"int16List\":[123],\"dataList\":[\"ZGVm\"],\"uuidOptMap\":{\"foo\":\"00000000-0000-0000-0000-000000000000\"},\"dataOptMap\":{\"foo\":\"ZGVm\"},\"otherEnum\":1,\"int8List\":[123],\"objectIdSet\":[\"1234567890abcdef12345678\"],\"objectIdOptList\":[\"1234567890abcdef12345678\"],\"otherInt64\":123,\"doubleOptList\":[2.5],\"floatOptMap\":{\"foo\":2.5},\"intList\":[123],\"int64Set\":[123],\"dateOptMap\":{\"foo\":2.5},\"int16OptList\":[123],\"boolList\":[true],\"doubleOptSet\":[2.5],\"doubleSet\":[2.5],\"stringMap\":{\"foo\":\"abc\"},\"int64OptSet\":[123],\"decimalOptList\":[\"1.5E2\"],\"otherInt\":123,\"dateList\":[2.5],\"objectIdList\":[\"1234567890abcdef12345678\"],\"stringList\":[\"abc\"],\"boolOpt\":true,\"objectIdMap\":{\"foo\":\"1234567890abcdef12345678\"},\"doubleList\":[2.5],\"dataMap\":{\"foo\":\"ZGVm\"},\"int16Set\":[123],\"int64\":123,\"int8Map\":{\"foo\":123},\"int64Opt\":123,\"boolSet\":[true],\"int64Map\":{\"foo\":123},\"dateMap\":{\"foo\":2.5},\"uuidOpt\":\"00000000-0000-0000-0000-000000000000\",\"int64OptMap\":{\"foo\":123},\"boolOptMap\":{\"foo\":true},\"otherInt8\":123,\"objectIdOpt\":\"1234567890abcdef12345678\",\"data\":\"ZGVm\",\"int16OptSet\":[123],\"decimalList\":[\"1.5E2\"],\"int16Opt\":123,\"uuidSet\":[\"00000000-0000-0000-0000-000000000000\"]}"
 
-        let encoder = JSONEncoder()
-        XCTAssertEqual(try! String(data: encoder.encode(obj), encoding: .utf8), expected)
+        let expectedData = expected.data(using: .utf8)!
+        let expectedDictionary = try JSONSerialization.jsonObject(with: expectedData, options: []) as? [String: Any]
+        let encodedDictionary  = try JSONSerialization.jsonObject(with: encoder.encode(obj), options: []) as? [String: Any]
+        XCTAssertEqual(expectedDictionary! as NSDictionary, encodedDictionary! as NSDictionary)
     }
 
     func testLegacyObjectOptionalNotRequired() {
@@ -755,7 +757,7 @@ class CodableTests: TestCase {
         XCTAssertNil(obj.objectIdOpt)
     }
 
-    func testModernObject() {
+    func testModernObject() throws {
         let str = """
         {
             "bool": true,
@@ -890,7 +892,7 @@ class CodableTests: TestCase {
         }
         """
         let decoder = JSONDecoder()
-        let obj = try! decoder.decode(ModernCodableObject.self, from: Data(str.utf8))
+        let obj = try decoder.decode(ModernCodableObject.self, from: Data(str.utf8))
 
         XCTAssertEqual(obj.bool, true)
         XCTAssertEqual(obj.int, 123)
@@ -1006,9 +1008,10 @@ class CodableTests: TestCase {
 
         let expected = #"{"double":2.5,"decimalMap":{"foo":"1.5E2"},"int16OptList":[123],"dateSet":[2.5],"intOpt":123,"dataOptSet":["ZGVm"],"doubleOptSet":[2.5],"boolMap":{"foo":true},"decimalList":["1.5E2"],"boolOptSet":[true],"int64":123,"stringOpt":"abc","int16List":[123],"int8Map":{"foo":123},"stringMap":{"foo":"abc"},"objectIdOptMap":{"foo":"1234567890abcdef12345678"},"boolSet":[true],"decimalOpt":"1.5E2","uuidOpt":"00000000-0000-0000-0000-000000000000","string":"abc","int8Set":[123],"dataOptList":["ZGVm"],"dataMap":{"foo":"ZGVm"},"doubleSet":[2.5],"uuidOptSet":["00000000-0000-0000-0000-000000000000"],"int32OptList":[123],"objectIdMap":{"foo":"1234567890abcdef12345678"},"int32OptMap":{"foo":123},"objectIdOptSet":["1234567890abcdef12345678"],"floatList":[2.5],"boolOptMap":{"foo":true},"dataOptMap":{"foo":"ZGVm"},"intOptSet":[123],"int16OptMap":{"foo":123},"int":123,"dataSet":["ZGVm"],"dataList":["ZGVm"],"intList":[123],"int8List":[123],"objectIdOptList":["1234567890abcdef12345678"],"decimalOptMap":{"foo":"1.5E2"},"dateOpt":2.5,"dateList":[2.5],"uuidOptMap":{"foo":"00000000-0000-0000-0000-000000000000"},"int8":123,"stringOptList":["abc"],"int64OptSet":[123],"doubleOptMap":{"foo":2.5},"uuid":"00000000-0000-0000-0000-000000000000","intOptList":[123],"stringOptSet":["abc"],"decimalOptList":["1.5E2"],"boolOpt":true,"int16":123,"int8OptSet":[123],"floatOptMap":{"foo":2.5},"int8Opt":123,"decimalOptSet":["1.5E2"],"floatSet":[2.5],"floatOpt":2.5,"int32":123,"dataOpt":"ZGVm","data":[100,101,102],"boolOptList":[true],"int8OptMap":{"foo":123},"intSet":[123],"floatMap":{"foo":2.5},"int32Set":[123],"int32Opt":123,"doubleOpt":2.5,"doubleMap":{"foo":2.5},"decimal":"1.5E2","stringSet":["abc"],"objectIdSet":["1234567890abcdef12345678"],"int32OptSet":[123],"int64List":[123],"floatOptList":[2.5],"intOptMap":{"foo":123},"float":2.5,"boolList":[true],"dateOptList":[2.5],"objectIdOpt":"1234567890abcdef12345678","int16OptSet":[123],"int32Map":{"foo":123},"stringOptMap":{"foo":"abc"},"int64Set":[123],"dateOptSet":[2.5],"objectId":"1234567890abcdef12345678","int64Opt":123,"uuidList":["00000000-0000-0000-0000-000000000000"],"int8OptList":[123],"bool":true,"objectIdList":["1234567890abcdef12345678"],"doubleList":[2.5],"doubleOptList":[2.5],"int16Opt":123,"int16Set":[123],"uuidMap":{"foo":"00000000-0000-0000-0000-000000000000"},"decimalSet":["1.5E2"],"int64OptList":[123],"stringList":["abc"],"int64Map":{"foo":123},"uuidSet":["00000000-0000-0000-0000-000000000000"],"int16Map":{"foo":123},"int64OptMap":{"foo":123},"dateOptMap":{"foo":2.5},"int32List":[123],"date":2.5,"intMap":{"foo":123},"floatOptSet":[2.5],"uuidOptList":["00000000-0000-0000-0000-000000000000"],"dateMap":{"foo":2.5}}"#
 
-        let encoder = JSONEncoder()
-        let encoded = try! String(data: encoder.encode(obj), encoding: .utf8)!
-        XCTAssertEqual(encoded, expected)
+        let expectedData = expected.data(using: .utf8)!
+        let expectedDictionary = try JSONSerialization.jsonObject(with: expectedData, options: []) as? [String: Any]
+        let encodedDictionary  = try JSONSerialization.jsonObject(with: encoder.encode(obj), options: []) as? [String: Any]
+        XCTAssertEqual(expectedDictionary! as NSDictionary, encodedDictionary! as NSDictionary)
 
         let realm = try! Realm()
         try! realm.write {
