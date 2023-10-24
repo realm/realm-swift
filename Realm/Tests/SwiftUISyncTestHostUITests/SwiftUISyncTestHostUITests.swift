@@ -327,7 +327,7 @@ extension SwiftUISyncTestHostUITests {
         XCTAssertTrue(logoutButtonView.waitForExistence(timeout: 2))
         logoutButtonView.tap()
 
-        let waitingUserView = application.staticTexts["waiting_user_view"]
+        let waitingUserView = application.buttons["waiting_user_view"]
         XCTAssertTrue(waitingUserView.waitForExistence(timeout: 2))
     }
 
@@ -470,7 +470,7 @@ extension SwiftUISyncTestHostUITests {
         XCTAssertTrue(logoutButtonView.waitForExistence(timeout: 2))
         logoutButtonView.tap()
 
-        let waitingUserView = application.staticTexts["waiting_user_view"]
+        let waitingUserView = application.buttons["waiting_user_view"]
         XCTAssertTrue(waitingUserView.waitForExistence(timeout: 2))
     }
 
