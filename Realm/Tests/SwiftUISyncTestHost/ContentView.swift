@@ -325,9 +325,11 @@ struct AsyncOpenPartitionView: View {
             case .connecting:
                 ProgressView()
             case .waitingForUser:
-                Text("")
-                    .accessibilityIdentifier("waiting_user_view")
-                ProgressView("Waiting for user to logged in...")
+                VStack {
+                    Button("User") {}
+                        .accessibilityIdentifier("waiting_user_view")
+                    ProgressView("Waiting for user to logged in...")
+                }
             case .open(let realm):
                 if ProcessInfo.processInfo.environment["is_sectioned_results"] == "true" {
                     if #available(macOS 12.0, *) {
@@ -366,9 +368,11 @@ struct AutoOpenPartitionView: View {
             case .connecting:
                 ProgressView()
             case .waitingForUser:
-                Text("")
-                    .accessibilityIdentifier("waiting_user_view")
-                ProgressView("Waiting for user to logged in...")
+                VStack {
+                    Button("User") {}
+                        .accessibilityIdentifier("waiting_user_view")
+                    ProgressView("Waiting for user to logged in...")
+                }
             case .open(let realm):
                 ListView()
                     .environment(\.realm, realm)
