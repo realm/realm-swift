@@ -6,60 +6,46 @@ require 'json'
 require "base64"
 require "jwt"
 require_relative "pr-ci-matrix"
+require 'getoptlong'
 
 include WORKFLOWS
 
 def usage()
     puts <<~END
-    Usage: ruby #{__FILE__} -list-workflows
-    Usage: ruby #{__FILE__} -list-products
-    Usage: ruby #{__FILE__} -list-repositories
-    Usage: ruby #{__FILE__} -list-mac-versions
-    Usage: ruby #{__FILE__} -list-xcode-versions
-    Usage: ruby #{__FILE__} -workflow [workflow_id]
-    Usage: ruby #{__FILE__} -create [workflow_id]
-    Usage: ruby #{__FILE__} -delete [workflow_id]
-    Usage: ruby #{__FILE__} -build [workflow_id]
-    Usage: ruby #{__FILE__} -create-new
-    Usage: ruby #{__FILE__} -clear-unused
+    Usage: ruby #{__FILE__} --list-workflows
+    Usage: ruby #{__FILE__} --list-products
+    Usage: ruby #{__FILE__} --list-repositories
+    Usage: ruby #{__FILE__} --list-mac-versions
+    Usage: ruby #{__FILE__} --list-xcode-versions
+    Usage: ruby #{__FILE__} --info-workflow [workflow_id]
+    Usage: ruby #{__FILE__} --create-workflow [name] [xcode_version]
+    Usage: ruby #{__FILE__} --delete-workflow [workflow_id]
+    Usage: ruby #{__FILE__} --build-workflow [workflow_id]
+    Usage: ruby #{__FILE__} --update-workflows
+    Usage: ruby #{__FILE__} --clear-unused-workflows
 
     environment variables:
-    ISSUER_ID: Issuer Id from the App connect APIKey.
-    KEY_ID: Key Id from the App connect APIKey.
-    PK_PATH: Path to the `.p8` file containing the private key from the App connect APIKey.
-    PRODUCT_ID: The product Id parent for all the workflows.
-    REPOSITORY_ID: The repository Id pointing `realm-swift` repository.
-    TEAM_ID: Team id used for XCode cloud.
     END
     exit 1
 end
 
-# Apple App Connect credentials
-ISSUER_ID = ENV["ISSUER_ID"]
-KEY_ID = ENV["KEY_ID"]
-PK_PATH = ENV["PK_PATH"]
-
-# XCode Cloud information
-PRODUCT_ID = ENV["PRODUCT_ID"]
-REPOSITORY_ID = ENV["REPOSITORY_ID"]
-TEAM_ID = ENV["TEAM_ID"]
-
 APP_STORE_URL="https://api.appstoreconnect.apple.com/v1"
 
-def get_jwt_bearer
-    private_key = OpenSSL::PKey.read(File.read(PK_PATH))
+def get_jwt_bearer(issuer_id, key_id, pk_path)
+    private_key = OpenSSL::PKey.read(File.read(pk_path))
     info = {
-        iss: ISSUER_ID,
+        iss: issuer_id,
         exp: Time.now.to_i + 10 * 60,
         aud: "appstoreconnect-v1"
     }
-    header_fields = { kid: KEY_ID }
+    header_fields = { kid: key_id }
     token = JWT.encode(info, private_key, "ES256", header_fields)
-    return token
+    puts "Token -> #{token}"
 end
 
 def get_workflows
-    response = get("/ciProducts/#{PRODUCT_ID}/workflows?limit=200")
+    product_id = get_realm_product_id
+    response = get("/ciProducts/#{product_id}/workflows?limit=200")
     result = JSON.parse(response.body)
     list_workflows = []
     result.collect do |doc|
@@ -137,6 +123,7 @@ def get_workflow_info(id)
 end
 
 def get(path)
+    url = "#{APP_STORE_URL}#{path}"
     uri = URI.parse(url)
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true
@@ -167,7 +154,8 @@ def create_workflow(name, xcode_version)
         result = JSON.parse(response.body)
         id = result["data"]["id"]
         puts "Worfklow created id: #{id} target: #{name} xcode version: #{xcode_version}"
-        puts "https://appstoreconnect.apple.com/teams/#{TEAM_ID}/frameworks/#{PRODUCT_ID}/workflows/#{id}"
+        product_id = get_realm_product_id
+        puts "https://appstoreconnect.apple.com/teams/#{TEAM_ID}/frameworks/#{product_id}/workflows/#{id}"
         return id
     else
         puts "ERROR!!! #{response.code} #{response.body}"
@@ -209,8 +197,8 @@ def create_workflow_request(name, xcode_version)
     {
         "xcodeVersion" => { "data" => { "type" => "ciXcodeVersions", "id" => xcode_version_id }},
         "macOsVersion" => { "data" => { "type" => "ciMacOsVersions", "id" => mac_os_id }},
-        "product" => { "data" => { "type" => "ciProducts", "id" => PRODUCT_ID }},
-        "repository" => { "data" => { "type" => "scmRepositories", "id" => REPOSITORY_ID }}
+        "product" => { "data" => { "type" => "ciProducts", "id" => get_realm_product_id }},
+        "repository" => { "data" => { "type" => "scmRepositories", "id" => get_realm_repository_id }}
     }
     data =
     {
@@ -394,29 +382,216 @@ def delete_unused_workflows
     end
 end
 
-JWT_BEARER = get_jwt_bearer()
-if ARGV[0] == '-list-workflows'
+def get_realm_product_id
+    product = get_products
+    product.each do |product|
+        if product["product"] == "RealmSwift"
+            return product["id"]
+        end
+    end
+    return product
+end
+
+def get_realm_repository_id
+    repositories = get_repositories
+    repositories.each do |repo|
+        if repo["name"] == "realm-swift"
+            return repo["id"]
+        end
+    end
+    return product
+end
+
+
+opts = GetoptLong.new(
+    [ '--help', '-h', GetoptLong::NO_ARGUMENT ],
+    [ '--token', '-t', GetoptLong::REQUIRED_ARGUMENT ],
+    [ '--team-id', GetoptLong::OPTIONAL_ARGUMENT ],
+    [ '--xcode-version', '-x', GetoptLong::REQUIRED_ARGUMENT ],
+    [ '--issuer-id', GetoptLong::REQUIRED_ARGUMENT ],
+    [ '--key-id', GetoptLong::REQUIRED_ARGUMENT ],
+    [ '--pk-path', GetoptLong::REQUIRED_ARGUMENT ],
+    [ '--list-workflows', GetoptLong::NO_ARGUMENT ],
+    [ '--list-products', GetoptLong::NO_ARGUMENT ],
+    [ '--list-repositories', GetoptLong::NO_ARGUMENT ],
+    [ '--list-mac-versions', GetoptLong::NO_ARGUMENT ],
+    [ '--list-xcode-versions', GetoptLong::NO_ARGUMENT ],
+    [ '--info-workflow', GetoptLong::REQUIRED_ARGUMENT ],
+    [ '--create-workflow', GetoptLong::REQUIRED_ARGUMENT ],
+    [ '--delete-workflow', GetoptLong::REQUIRED_ARGUMENT ],
+    [ '--build-workflow', GetoptLong::REQUIRED_ARGUMENT ],
+    [ '--update-workflows', GetoptLong::NO_ARGUMENT ],
+    [ '--clear_unused', GetoptLong::NO_ARGUMENT ],
+    [ '--get-token', GetoptLong::NO_ARGUMENT ]
+)
+
+JWT_BEARER = ''
+TEAM_ID = ''
+
+option = ''
+name = ''
+workflow_id = ''
+xcode_version = ''
+issuer_id = ''
+key_id = ''
+pk_path = ''
+
+opts.each do |opt, arg|
+    case opt
+        when '--help'
+            puts <<-EOF
+hello [OPTION] ...
+
+-h, --help:
+    show help
+
+--token [token], -t [token]:
+    Apple connect API token 
+
+--team-id [team_id]:
+    Apple connect Tealm ID, to be used to return the url to the created workflow
+
+--xcode-version [xcode_version]:
+    XCode version used to create a new workflow
+
+--issuer-id [issuer_id]:
+    Apple Connect API Issuer ID.
+
+--key-id [key_id]:
+    Apple Connect API Key ID.
+
+--pk-path [pk_path]:
+    Apple Connect API path to private key file.
+
+--list-workflows:
+    Returns a list of current workflows for the RealmSwift product.
+
+--list-products:
+    Returns a list of products associated to the Apple Connect Store account.
+
+--list-repositories:
+    Returns a list of repositories integrated with XCode Cloud.
+
+--list-mac-versions:
+    Returns a list of available mac versions.
+
+--list-xcode-versions:
+    Returns a list of available xcode version.
+
+--info-workflow [workflow_id]:
+    Returns the infor the corresponding workflow.
+
+--create-workflow [name]:
+    Use with --xcode-version
+    Create a new workflow with the corresponding name.
+
+--delete-workflow [workflow_id]:
+    Delete the workflow with the corrresponding id.
+
+--build-workflow [workflow_id]:
+    Run a build for the corresponding workflow.
+
+--update-workflows:
+    Adds the missing workflows corresponding to the list of targets and xcode versions in `pr-ci-matrix.rb`.
+
+--clear_unused:
+    Clear all unused workflows which are not in the list of targets and xcode versions in `pr-ci-matrix.rb`.
+
+            EOF
+            exit
+        when '--token'
+            if arg == ''
+                raise "Token is required to execute this"
+            else
+                JWT_BEARER = arg
+            end
+        when '--team-id'
+            if arg != ''
+                TEAM_ID = arg
+            end
+        when '--issuer-id'
+            if arg != ''
+                issuer_id = arg
+            end
+        when '--key-id'
+            if arg != ''
+                key_id = arg
+            end
+        when '--pk-path'
+            if arg != ''
+                pk_path = arg
+            end
+        when '--info-workflow'
+            if arg != ''
+                name = arg
+            end
+        when '--create-workflow'
+            if arg != ''
+                name = arg
+            end
+        when '--delete-workflow', '--info-workflow', '--build-workflow'
+            if arg != ''
+                workflow_id = arg
+            end
+            option = arg
+        when '--xcode_version'
+            if arg != ''
+                workflow_id = arg
+            end
+            option = opt
+        else
+            option = opt
+    end
+end
+
+if JWT_BEARER == '' && option != '--get-token'
+    raise 'Token is needed to run this.'
+end
+
+if option == '--list-workflows'
     puts get_workflows
-elsif ARGV[0] == '-list-products'
+elsif option == '--list-products'
     puts get_products
-elsif ARGV[0] == '-list-repositories'
+elsif option == '--list-repositories'
     puts get_repositories
-elsif ARGV[0] == '-list-mac-versions'
+elsif option == '--list-mac-versions'
     puts get_macos_versions
-elsif ARGV[0] == '-list-xcode-versions'
+elsif option == '--list-xcode-versions'
     puts get_xcode_versions
-elsif ARGV[0] == '-workflow'
-    get_workflow_info(ARGV[1])
-elsif ARGV[0] == '-create'
-    create_workflow(ARGV[1], ARGV[2])
-elsif ARGV[0] == '-delete'
-    deleteWorkflow(ARGV[1])
-elsif ARGV[0] == '-build'
-    start_build(ARGV[1])
-elsif ARGV[0] == '-create-new'
+elsif option == '--info-workflow'
+    if workflow_id == ''
+        raise 'Needs workflow id'
+    else
+        get_workflow_info(workflow)
+    end
+elsif option == '--create-workflow'
+    if name == '' || xcode_version == ''
+        raise 'Needs name and xcode version'
+    else
+        create_workflow(name, xcode_version)
+    end
+elsif option == '--delete-workflow'
+    if workflow_id == ''
+        raise 'Needs workflow id'
+    else
+        deleteWorkflow(workflow)
+    end
+elsif option == '--build'
+    if workflow_id == ''
+        raise 'Needs workflow id'
+    else
+        start_build(workflow)
+    end
+elsif option == '--update-workflows'
     create_new_workflows
-elsif ARGV[0] == '-clear-unused'
+elsif option == '--clear-unused-workflows'
     delete_unused_workflows
+elsif option == '--get-token'
+    if issuer_id == '' || key_id == '' || pk_path == ''
+        raise 'Needs issuer id, key id or pk id.'
+    else
+        get_jwt_bearer(issuer_id, key_id, pk_path)
+    end
 else
-    puts "Error, needs an argument"
+    raise 'Option not available'
 end
