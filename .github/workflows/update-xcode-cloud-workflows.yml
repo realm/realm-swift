@@ -2,10 +2,10 @@ name: Update XCode Cloud Workflows
 "on": workflow_dispatch
 jobs:
   main:
-    runs-on: windows-latest
-    environment: Production
+    runs-on: ubuntu-latest
     steps:
     - name: Get Token
+      id: token
       uses: yuki0n0/action-appstoreconnect-token@v1.0
       with:
         # UUID. Can get from App Store Connect.
@@ -14,6 +14,9 @@ jobs:
         key id: ${{ APPLE_STORE_CONNECT_KEY_ID }}
         # P8 private key. Can get from App Store Connect.
         key:  ${{ secrets.APPLE_STORE_CONNECT_API_KEY }}
-    - name: Use token
-      run: |
-        JSON=`curl -sS -H "Authorization:Bearer ${{ steps.asc.outputs.token }}" https://api.appstoreconnect.apple.com/v1/apps`
+    - name: Check out the repository to the runner
+      uses: actions/checkout@v4  
+    - name: Run ruby script
+      run: ruby scripts/xcode_cloud_helper.rb --list-workflows --token ${{ steps.asc.outputs.token }}
+
+
