@@ -1,6 +1,5 @@
 name: Update XCode Cloud Workflows
 on: 
-  workflow_dispatch
   pull_request:
 jobs:
   main:
