@@ -18,6 +18,6 @@ jobs:
     - name: Check out the repository to the runner
       uses: actions/checkout@v4  
     - name: Run ruby script
-      run: ruby scripts/xcode_cloud_helper.rb --list-workflows --token ${{ steps.token.outputs.token }}
+      run: ruby ./scripts/xcode_cloud_helper.rb --list-workflows --token ${{ steps.token.outputs.token }}
 
 
