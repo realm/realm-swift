@@ -1,4 +1,4 @@
-name: Update XCode Cloud Workflows
+name: Clear XCode Cloud Workflows
 on: 
   pull_request:
 jobs:
