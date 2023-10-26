@@ -10,19 +10,28 @@ require 'getoptlong'
 
 include WORKFLOWS
 
+JWT_BEARER = ''
+TEAM_ID = ''
+$product_id = ''
+$repository_id = ''
+$xcode_list = ''
+$mac_dict = Hash.new
+$workflows_list = ''
+
 def usage()
     puts <<~END
-    Usage: ruby #{__FILE__} --list-workflows
-    Usage: ruby #{__FILE__} --list-products
-    Usage: ruby #{__FILE__} --list-repositories
-    Usage: ruby #{__FILE__} --list-mac-versions
-    Usage: ruby #{__FILE__} --list-xcode-versions
-    Usage: ruby #{__FILE__} --info-workflow [workflow_id]
-    Usage: ruby #{__FILE__} --create-workflow [name] [xcode_version]
-    Usage: ruby #{__FILE__} --delete-workflow [workflow_id]
-    Usage: ruby #{__FILE__} --build-workflow [workflow_id]
-    Usage: ruby #{__FILE__} --update-workflows
-    Usage: ruby #{__FILE__} --clear-unused-workflows
+    Usage: ruby #{__FILE__} --list-workflows --token [token]
+    Usage: ruby #{__FILE__} --list-products --token [token]
+    Usage: ruby #{__FILE__} --list-repositories --token [token]
+    Usage: ruby #{__FILE__} --list-mac-versions --token [token]
+    Usage: ruby #{__FILE__} --list-xcode-versions --token [token]
+    Usage: ruby #{__FILE__} --info-workflow [workflow_id] --token [token]
+    Usage: ruby #{__FILE__} --create-workflow [name] --xcode-version [xcode_version] --token [token]
+    Usage: ruby #{__FILE__} --delete-workflow [workflow_id] --token [token]
+    Usage: ruby #{__FILE__} --build-workflow [workflow_id] --token [token]
+    Usage: ruby #{__FILE__} --update-workflows --token [token]
+    Usage: ruby #{__FILE__} --clear-unused-workflows --token [token]
+    Usage: ruby #{__FILE__} --get-token --issuer-id [issuer_id] --key-id [key_id] --pk_path [pk_path]
 
     environment variables:
     END
@@ -51,9 +60,7 @@ def get_workflows
     result.collect do |doc|
         doc[1].each { |workflow|
             if workflow.class == Hash
-                name = workflow["attributes"]["name"].partition('_').first
-                version = workflow["attributes"]["name"].partition('_').last
-                list_workflows.append({ "workflow" => workflow["attributes"]["name"], "id" => workflow["id"], "target" => name, "version" => version })
+                list_workflows.append(workflow)
             end
         }
     end
@@ -116,10 +123,15 @@ def get_xcode_versions
     return list_xcodeversion
 end
 
+def print_workflow_info(id)
+    workflow_info = get_workflow_info(id)
+    puts "Workflow Info:"
+    puts workflow_info
+end
+
 def get_workflow_info(id)
     response = get("/ciWorkflows/#{id}")
-    puts "Workflow Info:"
-    puts response.body
+    return response.body
 end
 
 def get(path)
@@ -163,17 +175,7 @@ def create_workflow(name, xcode_version)
 end
 
 def create_workflow_request(name, xcode_version)
-    build_action =
-    [{
-        "name" => "Build - macOS",
-        "actionType" => "BUILD",
-        "destination" => "ANY_MAC",
-        "buildDistributionAudience" => nil,
-        "testConfiguration" => nil,
-        "scheme" => "CI",
-        "platform" => "MACOS",
-        "isRequiredToPass" => true
-    }]
+    build_action = get_action_for_target(name)
     pull_request_start_condition =
     {
         "source" => { "isAllMatch" => true, "patterns" => [] },
@@ -182,11 +184,11 @@ def create_workflow_request(name, xcode_version)
     }
     attributes =
     {
-        "name" => name,
-        "description" => name,
+        "name" => "#{name}_#{xcode_version}",
+        "description" => 'Create by Github Action Update XCode Cloud Workflows',
         "isLockedForEditing" => false,
         "containerFilePath" => "Realm.xcodeproj",
-        "isEnabled" => false,
+        "isEnabled" => true,
         "clean" => false,
         "pullRequestStartCondition" => pull_request_start_condition,
         "actions" => build_action
@@ -208,24 +210,6 @@ def create_workflow_request(name, xcode_version)
     }
     body = { "data" => data }
     return body
-end
-
-def get_xcode_id(version)
-    list_xcodeversion = get_xcode_versions
-    list_xcodeversion.each do |xcode|
-        if xcode["name"].include? version
-            return xcode["id"]
-        end
-    end
-end
-
-def get_macos_latest_release(xcodeVersionId)
-    list_macosversion = get_macos_versionsForXCodeVersion(xcodeVersionId)
-    list_macosversion.each do |mac_os, id|
-        if mac_os.include? "Latest Release"
-            return id
-        end
-    end
 end
 
 def update_workflow(id)
@@ -329,12 +313,20 @@ def get_macos_versions_for_xcode_version(version)
 end
 
 def create_new_workflows
-    print "Are you sure you want to create this workflows?, this will create declared local workflows that may not currently working in other PRs [Y/N]\n"
+    if !ENV.include?('CI')
+        print "Are you sure you want to create this workflows?, this will create declared local workflows that may not currently working in other PRs [Y/N]\n"
+        user_input = STDIN.gets.chomp.downcase
+    else 
+        user_input = 'y'
+    end
 
-    user_input = STDIN.gets.chomp.downcase
     if user_input == "y"
         workflows_to_create = []
-        current_workflows = get_workflows().map { |workflow| { "target" => workflow["target"], "version" => workflow["version"] }}
+        current_workflows = get_workflows().map { |workflow| 
+            name = workflow["attributes"]["name"].partition('_').first
+            version = workflow["attributes"]["name"].partition('_').last
+            { "target" => name, "version" => version }
+        }
         WORKFLOWS::TARGETS.each { |name, filter|
             WORKFLOWS::XCODE_VERSIONS.each { |version|
                 if filter.call(version)
@@ -349,7 +341,8 @@ def create_new_workflows
         workflows_to_create.each { |workflow|
             name = workflow['target']
             version = workflow['version']
-            create_workflow("#{name}_#{version}", version)
+            workflow_id = create_workflow(name, version)
+            update_workflow(workflow_id)
         }
     else
         puts "No"
@@ -357,9 +350,13 @@ def create_new_workflows
 end
 
 def delete_unused_workflows
-    print "Are you sure you want to clear unused workflow?, this will delete not-declared local workflows that may be currently working in other PRs [Y/N]\n"
-
-    user_input = STDIN.gets.chomp.downcase
+    if !ENV.include?('CI')
+        print "Are you sure you want to clear unused workflow?, this will delete not-declared local workflows that may be currently working in other PRs [Y/N]\n"
+        user_input = STDIN.gets.chomp.downcase
+    else 
+        user_input = 'y'
+    end
+    
     if user_input == "y"
         local_workflows = []
         WORKFLOWS::TARGETS.each { |name, filter|
@@ -371,10 +368,15 @@ def delete_unused_workflows
         }
 
         remote_workflows = get_workflows
-        remote_workflows.each { |workflow|
-            unless local_workflows.include? workflow["workflow"]
-                puts "#{workflow["id"]} #{workflow["target"]}_#{workflow["version"]}"
-                delete_workflow(workflow["id"])
+        remote_workflows.each.map { |workflow| 
+            if workflow["attributes"]["name"].include? "Cocoa-prepare"
+                return nil
+            end
+
+            name = workflow["name"]
+            unless local_workflows.include? name
+                puts "#{workflow["id"]} #{name}"
+                #delete_workflow(workflow["id"])
             end
         }
     else
@@ -382,26 +384,168 @@ def delete_unused_workflows
     end
 end
 
+def get_action_for_target(name)
+    workflow_id = get_workflow_id_for_name(name)
+    if workflow_id.nil? 
+        get_new_action_for_target(name)
+    else
+        workflow_info = get_workflow_info(workflow_id)
+        result = JSON.parse(workflow_info)
+        build_action = result["data"]["attributes"]["actions"]
+        return build_action
+    end
+end 
+
+def get_new_action_for_target(name)
+    name_split = name.split('_')
+    platform = name_split[0]
+    scheme = name_split[1]
+
+    name = ''
+    platform = ''
+    test_destination = ''
+    case platform
+    when 'catalyst'
+        build_action = {
+        name = 'Test - macOS (Catalyst)'
+        platform = 'MACOS'
+        test_destination = {
+            "deviceTypeName" => "Mac (Mac Catalyst)",
+            "deviceTypeIdentifier" => "mac_catalyst",
+            "runtimeName" => "Same As Selected macOS Version",
+            "runtimeIdentifier" => "builder",
+            "kind" => "MAC"
+        }
+    when 'ios'
+        name = 'Test - iOS'
+        platform = 'IOS'
+        test_destination =  {
+            "deviceTypeName" => "iPhone 11",
+            "deviceTypeIdentifier" => "com.apple.CoreSimulator.SimDeviceType.iPhone-11",
+            "runtimeName" => "Latest from Selected Xcode (iOS 16.1)",
+            "runtimeIdentifier" => "default",
+            "kind" => "SIMULATOR"
+        }
+    when 'tvos'
+        name = 'Test - tvOS'
+        platform = 'TVOS'
+        test_destination = {
+            "deviceTypeName" : "Recommended Apple TVs",
+            "deviceTypeIdentifier" : "recommended_apple_tvs",
+            "runtimeName" : "Latest from Selected Xcode (tvOS 16.4)",
+            "runtimeIdentifier" : "default",
+            "kind" : "SIMULATOR"
+        }
+    when 'watchos'
+        name = 'Test - watchOS'
+        platform = 'WATCHOS'
+        test_destination =  {
+            "deviceTypeName" => "Recommended Apple Watches",
+            "deviceTypeIdentifier" => "recommended_apple_watches",
+            "runtimeName" => "Latest from Selected Xcode (watchOS 9.4)",
+            "runtimeIdentifier" => "default",
+            "kind" => "SIMULATOR"
+        }
+    else #docs, swiftlint, cocoapods, swiftpm
+        return {
+            "name" : "Build - macOS",
+            "actionType" : "BUILD",
+            "destination" : "ANY_MAC",
+            "buildDistributionAudience" : null,
+            "testConfiguration" : null,
+            "scheme" : "CI",
+            "platform" : "MACOS",
+            "isRequiredToPass" : true
+        }
+    end
+
+    build_action = {
+        "name" => name,
+        "actionType" => "TEST",
+        "destination" => null,
+        "buildDistributionAudience" => null,
+        "testConfiguration" => {
+            "kind" => "USE_SCHEME_SETTINGS",
+            "testPlanName" => "",
+            "testDestinations" => test_destination
+        },
+        "scheme" => scheme == "swift" ? "RealmSwift" : "Realm",
+        "platform" => platform,
+        "isRequiredToPass" => true
+    }
+end 
+
+def get_xcode_id(version)
+    list_xcodeversion = ''
+    if $xcode_list != ''
+        list_xcodeversion = $xcode_list
+    else 
+        list_xcodeversion = get_xcode_versions
+        $xcode_list = list_xcodeversion
+    end
+    list_xcodeversion.each do |xcode|
+        if xcode["name"] == "Xcode #{version}"
+            return xcode["id"]
+        end
+    end
+end
+
+def get_macos_latest_release(xcodeVersionId)
+    list_macosversion = ''
+    if $mac_dict[xcodeVersionId] == ''
+        list_macosversion = $mac_dict[xcodeVersionId]
+    else 
+        list_macosversion = get_macos_versions_for_xcode_version(xcodeVersionId)
+        $mac_dict[xcodeVersionId] = list_macosversion
+    end
+    list_macosversion.each do |mac_os, id|
+        if mac_os.include? "Latest Release"
+            return id
+        end
+    end
+end
+
+
 def get_realm_product_id
+    if $product_id != ''
+        return $product_id
+    end
     product = get_products
     product.each do |product|
         if product["product"] == "RealmSwift"
+            $product_id = product["id"]
             return product["id"]
         end
     end
-    return product
 end
 
 def get_realm_repository_id
+    if $repository_id != ''
+        return $repository_id
+    end
     repositories = get_repositories
     repositories.each do |repo|
         if repo["name"] == "realm-swift"
+            $repository_id = repo["id"]
             return repo["id"]
         end
     end
-    return product
 end
 
+def get_workflow_id_for_name(name)
+    workflows = ''
+    if $workflows_list != ''
+        workflows = $workflows_list
+    else 
+        workflows = get_workflows
+        $workflows_list = workflows
+    end
+    workflows.each do |workflow|
+        if workflow["attributes"]["name"].split('_')[0] == name
+            return workflow["id"]
+        end
+    end
+end
 
 opts = GetoptLong.new(
     [ '--help', '-h', GetoptLong::NO_ARGUMENT ],
@@ -418,15 +562,13 @@ opts = GetoptLong.new(
     [ '--list-xcode-versions', GetoptLong::NO_ARGUMENT ],
     [ '--info-workflow', GetoptLong::REQUIRED_ARGUMENT ],
     [ '--create-workflow', GetoptLong::REQUIRED_ARGUMENT ],
+    [ '--update-workflow', GetoptLong::REQUIRED_ARGUMENT ],
     [ '--delete-workflow', GetoptLong::REQUIRED_ARGUMENT ],
     [ '--build-workflow', GetoptLong::REQUIRED_ARGUMENT ],
-    [ '--update-workflows', GetoptLong::NO_ARGUMENT ],
-    [ '--clear_unused', GetoptLong::NO_ARGUMENT ],
+    [ '--new-workflows', GetoptLong::NO_ARGUMENT ],
+    [ '--clear-unused-workflows', GetoptLong::NO_ARGUMENT ],
     [ '--get-token', GetoptLong::NO_ARGUMENT ]
 )
-
-JWT_BEARER = ''
-TEAM_ID = ''
 
 option = ''
 name = ''
@@ -437,6 +579,9 @@ key_id = ''
 pk_path = ''
 
 opts.each do |opt, arg|
+    if opt != '--token' && opt != '--xcode-version' && opt != '--issuer-id' && opt != '--key-id' && opt != '--pk-path' && opt != '--team-id'
+        option = opt
+    end
     case opt
         when '--help'
             puts <<-EOF
@@ -485,17 +630,23 @@ hello [OPTION] ...
     Use with --xcode-version
     Create a new workflow with the corresponding name.
 
+--update-workflow [workflow_id]:
+    Updates workflow with the corresponding id.
+
 --delete-workflow [workflow_id]:
     Delete the workflow with the corrresponding id.
 
 --build-workflow [workflow_id]:
     Run a build for the corresponding workflow.
 
---update-workflows:
+--new-workflows:
     Adds the missing workflows corresponding to the list of targets and xcode versions in `pr-ci-matrix.rb`.
 
---clear_unused:
+--clear-unused-workflows:
     Clear all unused workflows which are not in the list of targets and xcode versions in `pr-ci-matrix.rb`.
+
+--get-token:
+    Get Apple Connect Store API Token for local use.
 
             EOF
             exit
@@ -523,24 +674,20 @@ hello [OPTION] ...
             end
         when '--info-workflow'
             if arg != ''
-                name = arg
+                workflow_id = arg
             end
         when '--create-workflow'
             if arg != ''
                 name = arg
             end
-        when '--delete-workflow', '--info-workflow', '--build-workflow'
+        when '--delete-workflow', '--info-workflow', '--build-workflow', '--update-workflow'
             if arg != ''
                 workflow_id = arg
             end
-            option = arg
-        when '--xcode_version'
+        when '--xcode-version'
             if arg != ''
-                workflow_id = arg
+                xcode_version = arg
             end
-            option = opt
-        else
-            option = opt
     end
 end
 
@@ -562,7 +709,7 @@ elsif option == '--info-workflow'
     if workflow_id == ''
         raise 'Needs workflow id'
     else
-        get_workflow_info(workflow)
+        print_workflow_info(workflow_id)
     end
 elsif option == '--create-workflow'
     if name == '' || xcode_version == ''
@@ -570,20 +717,30 @@ elsif option == '--create-workflow'
     else
         create_workflow(name, xcode_version)
     end
+elsif option == '--update-workflow'
+    if workflow_id == ''
+        raise 'Needs workflow id'
+    else
+        update_workflow(workflow_id)
+    end
 elsif option == '--delete-workflow'
     if workflow_id == ''
         raise 'Needs workflow id'
     else
-        deleteWorkflow(workflow)
+        delete_workflow(workflow_id)
     end
-elsif option == '--build'
+elsif option == '--build-workflow'
     if workflow_id == ''
         raise 'Needs workflow id'
     else
-        start_build(workflow)
+        start_build(workflow_id)
     end
-elsif option == '--update-workflows'
-    create_new_workflows
+elsif option == '--new-workflows'
+    if TEAM_ID == ''
+        raise 'Needs workflow id'
+    else
+        create_new_workflows
+    end
 elsif option == '--clear-unused-workflows'
     delete_unused_workflows
 elsif option == '--get-token'
@@ -592,6 +749,4 @@ elsif option == '--get-token'
     else
         get_jwt_bearer(issuer_id, key_id, pk_path)
     end
-else
-    raise 'Option not available'
 end
