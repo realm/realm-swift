@@ -2,7 +2,7 @@
 # Matrix of current targets and XCode versions, and is used to add/update/delete XCode cloud workflows.
 
 module WORKFLOWS
-  XCODE_VERSIONS = %w(14.1 14.2 14.3.1)
+  XCODE_VERSIONS = %w(14.1 14.2 14.3.1  )
 
   all = ->(v) { true }
   latest_only = ->(v) { v == XCODE_VERSIONS.last }
@@ -14,7 +14,6 @@ module WORKFLOWS
 
     'osx' => all,
     'osx-encryption' => latest_only,
-    'osx-object-server' => oldest_and_latest,
 
     'swiftpm' => oldest_and_latest,
     'swiftpm-debug' => all,
@@ -46,7 +45,10 @@ module WORKFLOWS
     'cocoapods-watchos' => latest_only,
     'cocoapods-tvos' => latest_only,
     'cocoapods-catalyst' => latest_only,
-    'swiftui-ios' => latest_only,
-    'swiftui-server-osx' => latest_only,
+
+    'objectserver-osx' => oldest_and_latest,
+
+    'ios-swiftui' => latest_only,
+    'osx-swiftuiserver' => latest_only,
   }
 end
