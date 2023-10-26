@@ -188,7 +188,7 @@ def create_workflow_request(name, xcode_version)
         "description" => 'Create by Github Action Update XCode Cloud Workflows',
         "isLockedForEditing" => false,
         "containerFilePath" => "Realm.xcodeproj",
-        "isEnabled" => true,
+        "isEnabled" => false,
         "clean" => false,
         "pullRequestStartCondition" => pull_request_start_condition,
         "actions" => build_action
@@ -341,8 +341,8 @@ def create_new_workflows
         workflows_to_create.each { |workflow|
             name = workflow['target']
             version = workflow['version']
+            puts "Creating new workflow for target: #{name} and version #{version}"
             workflow_id = create_workflow(name, version)
-            update_workflow(workflow_id)
         }
     else
         puts "No"
@@ -373,10 +373,10 @@ def delete_unused_workflows
                 return nil
             end
 
-            name = workflow["name"]
+            name = workflow["attributes"]["name"]
             unless local_workflows.include? name
-                puts "#{workflow["id"]} #{name}"
-                #delete_workflow(workflow["id"])
+                puts "Deleting unused workflow #{workflow["id"]} #{name}"
+                delete_workflow(workflow["id"])
             end
         }
     else
@@ -386,7 +386,7 @@ end
 
 def get_action_for_target(name)
     workflow_id = get_workflow_id_for_name(name)
-    if workflow_id.nil? 
+    if workflow_id.nil?
         get_new_action_for_target(name)
     else
         workflow_info = get_workflow_info(workflow_id)
@@ -397,18 +397,27 @@ def get_action_for_target(name)
 end 
 
 def get_new_action_for_target(name)
-    name_split = name.split('_')
-    platform = name_split[0]
-    scheme = name_split[1]
+    target_split = name.split('-')
+    platform = target_split[0]
+    target = target_split[1]
 
     name = ''
-    platform = ''
+    build_platform = ''
     test_destination = ''
     case platform
+    when 'osx'
+        name = 'Test - macOS'
+        build_platform = 'MACOS'
+        test_destination = {
+            "deviceTypeName" => "Mac",
+            "deviceTypeIdentifier" => "mac",
+            "runtimeName" => "Same As Selected macOS Version",
+            "runtimeIdentifier" => "builder",
+            "kind" => "MAC"
+        }
     when 'catalyst'
-        build_action = {
         name = 'Test - macOS (Catalyst)'
-        platform = 'MACOS'
+        build_platform = 'MACOS'
         test_destination = {
             "deviceTypeName" => "Mac (Mac Catalyst)",
             "deviceTypeIdentifier" => "mac_catalyst",
@@ -418,8 +427,8 @@ def get_new_action_for_target(name)
         }
     when 'ios'
         name = 'Test - iOS'
-        platform = 'IOS'
-        test_destination =  {
+        build_platform = 'IOS'
+        test_destination = {
             "deviceTypeName" => "iPhone 11",
             "deviceTypeIdentifier" => "com.apple.CoreSimulator.SimDeviceType.iPhone-11",
             "runtimeName" => "Latest from Selected Xcode (iOS 16.1)",
@@ -428,51 +437,63 @@ def get_new_action_for_target(name)
         }
     when 'tvos'
         name = 'Test - tvOS'
-        platform = 'TVOS'
+        build_platform = 'TVOS'
         test_destination = {
-            "deviceTypeName" : "Recommended Apple TVs",
-            "deviceTypeIdentifier" : "recommended_apple_tvs",
-            "runtimeName" : "Latest from Selected Xcode (tvOS 16.4)",
-            "runtimeIdentifier" : "default",
-            "kind" : "SIMULATOR"
+            "deviceTypeName" => "Recommended Apple TVs",
+            "deviceTypeIdentifier" =>  "recommended_apple_tvs",
+            "runtimeName" =>  "Latest from Selected Xcode (tvOS 16.4)",
+            "runtimeIdentifier" =>  "default",
+            "kind" =>  "SIMULATOR"
         }
     when 'watchos'
         name = 'Test - watchOS'
-        platform = 'WATCHOS'
-        test_destination =  {
+        build_platform = 'WATCHOS'
+        test_destination = {
             "deviceTypeName" => "Recommended Apple Watches",
             "deviceTypeIdentifier" => "recommended_apple_watches",
             "runtimeName" => "Latest from Selected Xcode (watchOS 9.4)",
             "runtimeIdentifier" => "default",
             "kind" => "SIMULATOR"
         }
-    else #docs, swiftlint, cocoapods, swiftpm
-        return {
-            "name" : "Build - macOS",
-            "actionType" : "BUILD",
-            "destination" : "ANY_MAC",
-            "buildDistributionAudience" : null,
-            "testConfiguration" : null,
-            "scheme" : "CI",
-            "platform" : "MACOS",
-            "isRequiredToPass" : true
-        }
+    else #docs, swiftlint, cocoapods, swiftpm, spm, xcframework, objectserver
+        return [{
+            "name" =>  "Build - macOS",
+            "actionType" => "BUILD",
+            "destination" => "ANY_MAC",
+            "buildDistributionAudience" => nil,
+            "testConfiguration" => nil,
+            "scheme" => "CI",
+            "platform" => "MACOS",
+            "isRequiredToPass" => true
+        }]
     end
 
-    build_action = {
+    scheme = ''
+    case target
+    when 'swift'
+        scheme = "RealmSwift"
+    when 'swiftui'
+        scheme = "SwiftUITests"
+    when 'swiftuiserver'
+        scheme = "SwiftUISyncTests"
+    else
+        scheme = "Realm"
+    end
+
+    return [{
         "name" => name,
         "actionType" => "TEST",
-        "destination" => null,
-        "buildDistributionAudience" => null,
+        "destination" => nil,
+        "buildDistributionAudience" => nil,
         "testConfiguration" => {
             "kind" => "USE_SCHEME_SETTINGS",
             "testPlanName" => "",
-            "testDestinations" => test_destination
+            "testDestinations" => [ test_destination ]
         },
-        "scheme" => scheme == "swift" ? "RealmSwift" : "Realm",
-        "platform" => platform,
+        "scheme" => scheme,
+        "platform" => build_platform,
         "isRequiredToPass" => true
-    }
+    }]
 end 
 
 def get_xcode_id(version)
@@ -545,6 +566,7 @@ def get_workflow_id_for_name(name)
             return workflow["id"]
         end
     end
+    return nil
 end
 
 opts = GetoptLong.new(
@@ -565,7 +587,7 @@ opts = GetoptLong.new(
     [ '--update-workflow', GetoptLong::REQUIRED_ARGUMENT ],
     [ '--delete-workflow', GetoptLong::REQUIRED_ARGUMENT ],
     [ '--build-workflow', GetoptLong::REQUIRED_ARGUMENT ],
-    [ '--new-workflows', GetoptLong::NO_ARGUMENT ],
+    [ '--create-new-workflows', GetoptLong::NO_ARGUMENT ],
     [ '--clear-unused-workflows', GetoptLong::NO_ARGUMENT ],
     [ '--get-token', GetoptLong::NO_ARGUMENT ]
 )
@@ -639,7 +661,7 @@ hello [OPTION] ...
 --build-workflow [workflow_id]:
     Run a build for the corresponding workflow.
 
---new-workflows:
+--create-new-workflows:
     Adds the missing workflows corresponding to the list of targets and xcode versions in `pr-ci-matrix.rb`.
 
 --clear-unused-workflows:
@@ -735,9 +757,9 @@ elsif option == '--build-workflow'
     else
         start_build(workflow_id)
     end
-elsif option == '--new-workflows'
+elsif option == '--create-new-workflows'
     if TEAM_ID == ''
-        raise 'Needs workflow id'
+        raise 'Needs team id'
     else
         create_new_workflows
     end

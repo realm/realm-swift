@@ -70,7 +70,6 @@ command:
   test-swiftui-ios:         tests SwiftUI framework UI tests
   test-swiftui-server-osx:  tests Server Sync in SwiftUI
   verify:               verifies docs, osx, osx-swift, ios-static, ios-dynamic, ios-swift, ios-device, swiftui-ios, swiftlint, ios-xcode-spm in both Debug and Release configurations
-  verify-osx-object-server:  downloads the Realm Object Server and runs the Objective-C and Swift integration tests
 
   docs:                 builds docs in docs/output
   examples:             builds all examples
@@ -862,8 +861,13 @@ case "$COMMAND" in
         exit 0
         ;;
 
-    "verify-ios-xcode-spm")
+    "verify-spm-ios")
         REALM_TEST_BRANCH="$sha" sh build.sh test-ios-xcode-spm
+        exit 0
+        ;;
+
+    "verify-objectserver-osx")
+        REALM_TEST_BRANCH="$sha" sh build.sh test-osx-object-server
         exit 0
         ;;
 
