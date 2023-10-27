@@ -68,9 +68,8 @@ command:
   test-catalyst-swift:  tests RealmSwift Mac Catalyst framework
   test-swiftpm:         tests ObjC and Swift macOS frameworks via SwiftPM
   test-swiftui-ios:         tests SwiftUI framework UI tests
-  test-swiftui-server-osx:  tests Server Sync in SwiftUI
+  test-swiftuiserver-osx:  tests Server Sync in SwiftUI
   verify:               verifies docs, osx, osx-swift, ios-static, ios-dynamic, ios-swift, ios-device, swiftui-ios, swiftlint, ios-xcode-spm in both Debug and Release configurations
-  verify-osx-object-server:  downloads the Realm Object Server and runs the Objective-C and Swift integration tests
 
   docs:                 builds docs in docs/output
   examples:             builds all examples
@@ -626,12 +625,12 @@ case "$COMMAND" in
         exit 0
         ;;
 
-    "test-osx-object-server")
+    "test-objectserver-osx")
         xctest 'Object Server Tests' -configuration "$CONFIGURATION" -sdk macosx -destination "platform=macOS,arch=$(uname -m)"
         exit 0
         ;;
 
-    test-ios-xcode-spm)
+    test-spm-ios)
         cd examples/installation
         ./build.rb ios spm
         exit 0
@@ -652,7 +651,7 @@ case "$COMMAND" in
         exit 0
         ;;
 
-    "test-swiftui-ios")
+    "test-ios-swiftui")
        if [ "$CI" ]; then
             change_schema_configuration SwiftUITests
         else
@@ -680,7 +679,7 @@ case "$COMMAND" in
         exit 0
         ;;
 
-    "test-swiftui-server-osx")
+    "test-swiftuiserver-osx")
         xctest 'SwiftUISyncTestHost' -configuration "$CONFIGURATION" -sdk macosx -destination 'platform=macOS'
         exit 0
         ;;
@@ -712,8 +711,8 @@ case "$COMMAND" in
         sh build.sh verify-osx-object-server
         sh build.sh verify-catalyst
         sh build.sh verify-catalyst-swift
-        sh build.sh verify-swiftui-ios
-        sh build.sh verify-swiftui-server-osx
+        sh build.sh verify-ios-swiftui
+        sh build.sh verify-swiftuiserver-osx
         ;;
 
     "verify-cocoapods")
@@ -750,6 +749,7 @@ case "$COMMAND" in
 
     "verify-osx-encryption")
         if [ "$CI" ]; then
+            export REALM_ENCRYPT_ALL=YES
             sh build.sh test-osx
         else
             REALM_ENCRYPT_ALL=YES sh build.sh test-osx
@@ -862,8 +862,13 @@ case "$COMMAND" in
         exit 0
         ;;
 
-    "verify-ios-xcode-spm")
-        REALM_TEST_BRANCH="$sha" sh build.sh test-ios-xcode-spm
+    "verify-spm-ios")
+        REALM_TEST_BRANCH="$sha" sh build.sh test-spm-ios
+        exit 0
+        ;;
+
+    "verify-objectserver-osx")
+        REALM_TEST_BRANCH="$sha" sh build.sh test-objectserver-osx
         exit 0
         ;;
 
