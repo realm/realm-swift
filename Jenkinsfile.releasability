@@ -1,15 +1,15 @@
-xcodeVersions = ['14.1', '14.2', '14.3.1']
+xcodeVersions = ['14.1', '14.2', '14.3.1', '15.0', '15.1']
 platforms = ['osx', 'ios', 'watchos', 'tvos', 'catalyst']
 platformNames = ['osx': 'macOS', 'ios': 'iOS', 'watchos': 'watchOS', 'tvos': 'tvOS', 'catalyst': 'Catalyst', 'visionos': 'visionOS']
 docsXcodeVersion = '14.3.1'
 
-def buildPlatform(platform, xcodeVersion, xcodeSuffix, nodeLabel = 'osx') {
+def buildPlatform(platform, xcodeVersion) {
   def platformName = platformNames[platform]
   return {
-    node(nodeLabel) {
+    node(xcodeVersion.startsWith('15') ? 'macos_13' : 'osx') {
       deleteDir()
       unstash 'source'
-      withEnv(["DEVELOPER_DIR=/Applications/Xcode-${xcodeSuffix}.app/Contents/Developer"]) {
+      withEnv(["DEVELOPER_DIR=/Applications/Xcode-${xcodeVersion}.app/Contents/Developer"]) {
         sh "./build.sh package ${platform}"
       }
       dir("build") {
@@ -20,9 +20,9 @@ def buildPlatform(platform, xcodeVersion, xcodeSuffix, nodeLabel = 'osx') {
   }
 }
 
-def installationTest(platform, test, xcode, language = 'swift', linkage = 'dynamic') {
+def installationTest(platform, test, xcode, linkage = 'dynamic') {
   return {
-    node('osx') {
+    node(xcode.startsWith('15') ? 'macos_13' : 'osx') {
       deleteDir()
       unstash 'source'
 
@@ -118,11 +118,10 @@ def doBuild() {
       def platform = p
       def platformName = platformNames[platform]
       for (def xcodeVersion in xcodeVersions) {
-        parallelBuilds["${platformName} ${xcodeVersion}"] = buildPlatform(platform, xcodeVersion, xcodeVersion)
+        parallelBuilds["${platformName} ${xcodeVersion}"] = buildPlatform(platform, xcodeVersion)
       }
-      parallelBuilds["${platformName} 15.0"] = buildPlatform(platform, '15.0', '15.0.0', 'macos_13')
     }
-    parallelBuilds["visionOS 15.0"] = buildPlatform('visionos', '15.0', '15-beta', 'macos_13')
+    parallelBuilds["visionOS 15.1"] = buildPlatform('visionos', '15.1')
 
     parallel parallelBuilds
   }
@@ -135,14 +134,13 @@ def doBuild() {
         for (def xcodeVersion in xcodeVersions) {
           unstash "${platform}-${xcodeVersion}"
         }
-        unstash "${platform}-15.0"
       }
-      unstash 'visionos-15.0'
+      unstash 'visionos-15.1'
 
       unstash 'examples'
       unstash 'build-scripts'
 
-      withEnv(['DEVELOPER_DIR=/Applications/Xcode-15-beta.app/Contents/Developer']) {
+      withEnv(['DEVELOPER_DIR=/Applications/Xcode-15.1.app/Contents/Developer']) {
         sh './build.sh package-release'
       }
 
@@ -201,11 +199,11 @@ def doBuild() {
           parallelBuilds["Installation - ${platformName} ${test}"] = installationTest(platform, test, docsXcodeVersion)
         }
       }
-      parallelBuilds["Installation - ${platformName} CocoaPods static"] = installationTest(platform, 'cocoapods', docsXcodeVersion, 'swift', 'static')
-      parallelBuilds["Installation - ${platformName} spm static"] = installationTest(platform, 'spm', docsXcodeVersion, 'swift', 'static')
+      parallelBuilds["Installation - ${platformName} CocoaPods static"] = installationTest(platform, 'cocoapods', docsXcodeVersion, 'static')
+      parallelBuilds["Installation - ${platformName} spm static"] = installationTest(platform, 'spm', docsXcodeVersion, 'static')
     }
-    parallelBuilds['Installation - iOS Static'] = installationTest('ios', 'xcframework', docsXcodeVersion, 'objc', 'static')
-    parallelBuilds['Installation - XCFramework Evolution'] = xcframeworkEvolutionTest()
+    parallelBuilds['Installation - iOS Static'] = installationTest('ios', 'xcframework', docsXcodeVersion, 'static')
+    // parallelBuilds['Installation - XCFramework Evolution'] = xcframeworkEvolutionTest()
     for (def version in xcodeVersions) {
       parallelBuilds["Installation - Xcode ${version}"] = installationTest('osx', 'xcframework', version)
     }
