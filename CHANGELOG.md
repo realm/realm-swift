@@ -4,6 +4,8 @@ x.y.z Release notes (yyyy-MM-dd)
 * Expose `SyncSession.reconnect()`, which requests an immediate reconnection if
   the session is currently disconnected rather than waiting for the normal
   reconnect delay.
+* Update release packaging for Xcode 15.1 beta. visionOS slices are now only
+  included for 15.1 rather than splicing them into the non-beta 15.0 release.
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)

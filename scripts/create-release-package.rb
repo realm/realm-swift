@@ -20,7 +20,7 @@ def sh(*args)
 end
 
 def platforms(xcode_version)
-  if xcode_version.start_with? '15'
+  if xcode_version.start_with? '15.1'
     %w{osx ios watchos tvos catalyst visionos}
   else
     %w{osx ios watchos tvos catalyst}
