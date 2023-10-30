@@ -30,8 +30,8 @@ module WORKFLOWS
     'watchos' => oldest_and_latest,
 
     'ios-swiftui' => latest_only,
-    'osx-swiftuiserver' => latest_only,
-
+    
+    'swiftuiserver-osx' => latest_only,
     'objectserver-osx' => oldest_and_latest,
 
     'docs' => latest_only,

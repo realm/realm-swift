@@ -1,9 +1,7 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* Expose `SyncSession.reconnect()`, which requests an immediate reconnection if
-  the session is currently disconnected rather than waiting for the normal
-  reconnect delay.
+* None.
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
@@ -20,6 +18,26 @@ x.y.z Release notes (yyyy-MM-dd)
 
 ### Internal
 * Upgraded realm-core from ? to ?
+* Migrated our current CI Pipelines to Xcode Cloud.
+
+10.44.0 Release notes (2023-10-29)
+=============================================================
+
+### Enhancements
+
+* Expose `SyncSession.reconnect()`, which requests an immediate reconnection if
+  the session is currently disconnected rather than waiting for the normal
+  reconnect delay.
+* Update release packaging for Xcode 15.1 beta. visionOS slices are now only
+  included for 15.1 rather than splicing them into the non-beta 15.0 release.
+
+### Compatibility
+
+* Realm Studio: 14.0.1 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 15.0.0.
+* CocoaPods: 1.10 or later.
+* Xcode: 14.1-15.0.0.
 
 10.43.1 Release notes (2023-10-13)
 =============================================================

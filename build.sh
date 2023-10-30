@@ -68,7 +68,7 @@ command:
   test-catalyst-swift:  tests RealmSwift Mac Catalyst framework
   test-swiftpm:         tests ObjC and Swift macOS frameworks via SwiftPM
   test-swiftui-ios:         tests SwiftUI framework UI tests
-  test-swiftui-server-osx:  tests Server Sync in SwiftUI
+  test-swiftuiserver-osx:  tests Server Sync in SwiftUI
   verify:               verifies docs, osx, osx-swift, ios-static, ios-dynamic, ios-swift, ios-device, swiftui-ios, swiftlint, ios-xcode-spm in both Debug and Release configurations
 
   docs:                 builds docs in docs/output
@@ -625,12 +625,12 @@ case "$COMMAND" in
         exit 0
         ;;
 
-    "test-osx-object-server")
+    "test-objectserver-osx")
         xctest 'Object Server Tests' -configuration "$CONFIGURATION" -sdk macosx -destination "platform=macOS,arch=$(uname -m)"
         exit 0
         ;;
 
-    test-ios-xcode-spm)
+    test-spm-ios)
         cd examples/installation
         ./build.rb ios spm
         exit 0
@@ -651,7 +651,7 @@ case "$COMMAND" in
         exit 0
         ;;
 
-    "test-swiftui-ios")
+    "test-ios-swiftui")
        if [ "$CI" ]; then
             change_schema_configuration SwiftUITests
         else
@@ -679,7 +679,7 @@ case "$COMMAND" in
         exit 0
         ;;
 
-    "test-swiftui-server-osx")
+    "test-swiftuiserver-osx")
         xctest 'SwiftUISyncTestHost' -configuration "$CONFIGURATION" -sdk macosx -destination 'platform=macOS'
         exit 0
         ;;
@@ -711,8 +711,8 @@ case "$COMMAND" in
         sh build.sh verify-osx-object-server
         sh build.sh verify-catalyst
         sh build.sh verify-catalyst-swift
-        sh build.sh verify-swiftui-ios
-        sh build.sh verify-swiftui-server-osx
+        sh build.sh verify-ios-swiftui
+        sh build.sh verify-swiftuiserver-osx
         ;;
 
     "verify-cocoapods")
@@ -862,7 +862,12 @@ case "$COMMAND" in
         ;;
 
     "verify-spm-ios")
-        REALM_TEST_BRANCH="$sha" sh build.sh test-ios-xcode-spm
+        REALM_TEST_BRANCH="$sha" sh build.sh test-spm-ios
+        exit 0
+        ;;
+
+    "verify-objectserver-osx")
+        REALM_TEST_BRANCH="$sha" sh build.sh test-objectserver-osx
         exit 0
         ;;
 
@@ -910,14 +915,14 @@ case "$COMMAND" in
             if [ "$example" = "Migration" ]; then
                 # The migration example needs to be built for each schema version to ensure each compiles.
                 for version in $versions; do
-                    xc -workspace "$workspace" -scheme "$example" -configuration "$CONFIGURATION" -sdk iphonesimulator build ARCHS=x86_64 "${CODESIGN_PARAMS[@]}" GCC_PREPROCESSOR_DEFINITIONS="\$(GCC_PREPROCESSOR_DEFINITIONS) SCHEMA_VERSION_$version"
+                    xc -workspace "$workspace" -scheme "$example" -configuration "$CONFIGURATION" -sdk iphonesimulator "${CODESIGN_PARAMS[@]}" GCC_PREPROCESSOR_DEFINITIONS="\$(GCC_PREPROCESSOR_DEFINITIONS) SCHEMA_VERSION_$version"
                 done
             else
-                xc -workspace "$workspace" -scheme "$example" -configuration "$CONFIGURATION" -sdk iphonesimulator build ARCHS=x86_64 "${CODESIGN_PARAMS[@]}"
+                xc -workspace "$workspace" -scheme "$example" -configuration "$CONFIGURATION" -sdk iphonesimulator "${CODESIGN_PARAMS[@]}"
             fi
         done
         if [ "$CI" ]; then
-            xc -workspace "$workspace" -scheme Extension -configuration "$CONFIGURATION" -sdk iphonesimulator build ARCHS=x86_64 "${CODESIGN_PARAMS[@]}"
+            xc -workspace "$workspace" -scheme Extension -configuration "$CONFIGURATION" -sdk iphonesimulator "${CODESIGN_PARAMS[@]}"
         fi
 
         exit 0
@@ -938,10 +943,10 @@ case "$COMMAND" in
             if [ "$example" = "Migration" ]; then
                 # The migration example needs to be built for each schema version to ensure each compiles.
                 for version in $versions; do
-                    xc -workspace "$workspace" -scheme "$example" -configuration "$CONFIGURATION" -sdk iphonesimulator build ARCHS=x86_64 "${CODESIGN_PARAMS[@]}" OTHER_SWIFT_FLAGS="\$(OTHER_SWIFT_FLAGS) -DSCHEMA_VERSION_$version"
+                    xc -workspace "$workspace" -scheme "$example" -configuration "$CONFIGURATION" -sdk iphonesimulator "${CODESIGN_PARAMS[@]}" OTHER_SWIFT_FLAGS="\$(OTHER_SWIFT_FLAGS) -DSCHEMA_VERSION_$version"
                 done
             else
-                xc -workspace "$workspace" -scheme "$example" -configuration "$CONFIGURATION" -sdk iphonesimulator build ARCHS=x86_64 "${CODESIGN_PARAMS[@]}"
+                xc -workspace "$workspace" -scheme "$example" -configuration "$CONFIGURATION" -sdk iphonesimulator "${CODESIGN_PARAMS[@]}"
             fi
         done
 
@@ -968,7 +973,7 @@ case "$COMMAND" in
 
         examples="DownloadCache PreloadedData"
         for example in $examples; do
-            xc -workspace "$workspace" -scheme "$example" -configuration "$CONFIGURATION" -sdk appletvsimulator build ARCHS=x86_64 "${CODESIGN_PARAMS[@]}"
+            xc -workspace "$workspace" -scheme "$example" -configuration "$CONFIGURATION" -sdk appletvsimulator "${CODESIGN_PARAMS[@]}"
         done
 
         exit 0
@@ -985,7 +990,7 @@ case "$COMMAND" in
 
         examples="DownloadCache PreloadedData"
         for example in $examples; do
-            xc -workspace "$workspace" -scheme "$example" -configuration "$CONFIGURATION" -sdk appletvsimulator build ARCHS=x86_64 "${CODESIGN_PARAMS[@]}"
+            xc -workspace "$workspace" -scheme "$example" -configuration "$CONFIGURATION" -sdk appletvsimulator "${CODESIGN_PARAMS[@]}"
         done
 
         exit 0
