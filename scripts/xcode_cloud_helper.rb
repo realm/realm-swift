@@ -147,7 +147,7 @@ def get(path)
     if response.code == "200"
         return response
     else
-        puts "ERROR!!! #{response.code} #{response.body}"
+        raise "Error: #{response.code} #{response.body}"
     end
 end
 
@@ -170,7 +170,7 @@ def create_workflow(name, xcode_version)
         puts "https://appstoreconnect.apple.com/teams/#{TEAM_ID}/frameworks/#{product_id}/workflows/#{id}"
         return id
     else
-        puts "ERROR!!! #{response.code} #{response.body}"
+        raise "Error: #{response.code} #{response.body}"
     end
 end
 
@@ -235,7 +235,7 @@ def update_workflow(id)
         puts "Worfklow updated #{id}"
         return id
     else
-        puts "ERROR!!! #{response.code} #{response.body}"
+        raise "Error: #{response.code} #{response.body}"
     end
 end
 
@@ -251,7 +251,7 @@ def delete_workflow(id)
     if response.code == "204"
         puts "Workflow deleted #{id}"
     else
-        puts "ERROR!!! #{response.code} #{response.body}"
+        raise "Error: #{response.code} #{response.body}"
     end
 end
 
@@ -279,7 +279,7 @@ def start_build(id)
         puts response.body
         return id
     else
-        puts "ERROR!!! #{response.code} #{response.body}"
+        raise "Error: #{response.code} #{response.body}"
     end
 end
 
@@ -308,7 +308,7 @@ def get_macos_versions_for_xcode_version(version)
         end
         return list_macosversion
     else
-        puts "ERROR!!! #{response.code} #{response.body}"
+        raise "Error: #{response.code} #{response.body}"
     end
 end
 
@@ -458,16 +458,15 @@ def get_new_action_for_target(name)
         }]
     end
 
-    scheme = ''
-    case target
+    scheme = case target
     when 'swift'
-        scheme = "RealmSwift"
+        "RealmSwift"
     when 'swiftui'
-        scheme = "SwiftUITests"
+        "SwiftUITests"
     when 'swiftuiserver'
-        scheme = "SwiftUISyncTests"
+        "SwiftUISyncTests"
     else
-        scheme = "Realm"
+        "Realm"
     end
 
     return [{

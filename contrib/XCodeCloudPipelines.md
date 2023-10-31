@@ -13,7 +13,8 @@ Follow these steps to automatically create new XCode cloud workflows for any new
 4. Run manually the Github action `Update XCode Cloud Workflows` from the Github actions UI targeting the branch   
    from the PR. 
    https://github.com/realm/realm-swift/actions/workflows/update-xcode-cloud-workflows.yml
-5. Each new workflow created should 
+5. Each new workflow created should return an url which should be used to enable each of the new workflows. Current 
+   API doesn't add this created workflows to the product until this manual step is executed.
 6. After the workflows are created, merge this branch to `master`.
 
 ## Clear unused workflows.
@@ -32,4 +33,5 @@ Follow these steps to clear unused workflows, meaning current remote workflows w
 
 * Clear unused workflows only after the PR with the targets and Xcode versions changes is merged to `master`.
 * New workflows which includes an environment value should update the environment values manually, e.g. targets
-  with server test. `App Store Connect API` doesn't have allow to set environment values for workflows throughj
+  with server test. `App Store Connect API` doesn't have allow to set environment values for workflows in the current
+  API.
