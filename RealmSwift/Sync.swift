@@ -924,22 +924,36 @@ public extension SyncSession {
         }
     }
     
-    @preconcurrency
-    func wait(for direction: ProgressDirection, block: @Sendable @escaping (Error?) -> Void) {
+    /**
+     Wait for pending uploads or downloads to complete or the session to expire, and dispatch the callback onto the specified queue.
+     - parameter direction: The transfer direction (upload or download) to wait for.
+     - parameter queue:     The queue to dispatch the callback onto.
+     - parameter block:     The block to invoke when waiting is complete.
+
+     - see: `ProgressDirection`
+     */
+    func wait(for direction: ProgressDirection,
+              queue: DispatchQueue? = nil,
+              block: @Sendable @escaping (Error?) -> Void) {
         switch direction {
         case .upload:
-            __waitForUploadCompletion(on: nil) { error in
+            __waitForUploadCompletion(on: queue) { error in
                 block(error)
             }
         case .download:
-            __waitForDownloadCompletion(on: nil) { error in
+            __waitForDownloadCompletion(on: queue) { error in
                 block(error)
             }
         }
     }
     
+    /**
+     Wait for pending uploads or downloads to complete or the session to expire, and dispatch the callback onto the specified queue.
+     - parameter direction: The transfer direction (upload or download) to wait for.
+
+     - see: `ProgressDirection`
+     */
     @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-    @_unsafeInheritExecutor
     func wait(for direction: ProgressDirection) async throws {
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
             wait(for: direction) { error in
