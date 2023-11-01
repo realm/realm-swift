@@ -1,7 +1,18 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* Expose waiting for upload/download on SyncSession.
+* Expose waiting for upload/download on SyncSession, which will suspend
+  the current method (or call an asynchronous block) until an upload or download
+  completes for a given sync session, e.g.,:
+  ```swift
+  try realm.write {
+    realm.add(Person())
+  }
+  try await realm.syncSession?.wait(for: .upload)
+  ```  
+  Note that this should not generally be used– sync is eventually consistent 
+  and should be used as such. However, there are special cases (notable in 
+  testing) where this may be used.
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)

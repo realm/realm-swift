@@ -931,6 +931,7 @@ public extension SyncSession {
      - parameter block:     The block to invoke when waiting is complete.
 
      - see: `ProgressDirection`
+     - warning: This method is not meant to be used except in special cases, notably for testing.
      */
     func wait(for direction: ProgressDirection,
               queue: DispatchQueue? = nil,
@@ -952,6 +953,7 @@ public extension SyncSession {
      - parameter direction: The transfer direction (upload or download) to wait for.
 
      - see: `ProgressDirection`
+     - warning: This method is not meant to be used except in special cases, notably for testing.
      */
     @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
     func wait(for direction: ProgressDirection) async throws {
