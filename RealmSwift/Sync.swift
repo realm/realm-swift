@@ -923,6 +923,34 @@ public extension SyncSession {
                                                 block(Progress(transferred: transferred, transferrable: transferrable))
         }
     }
+    
+    @preconcurrency
+    func wait(for direction: ProgressDirection, block: @Sendable @escaping (Error?) -> Void) {
+        switch direction {
+        case .upload:
+            __waitForUploadCompletion(on: nil) { error in
+                block(error)
+            }
+        case .download:
+            __waitForDownloadCompletion(on: nil) { error in
+                block(error)
+            }
+        }
+    }
+    
+    @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+    @_unsafeInheritExecutor
+    func wait(for direction: ProgressDirection) async throws {
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+            wait(for: direction) { error in
+                if let error = error {
+                    continuation.resume(throwing: error)
+                } else {
+                    continuation.resume()
+                }
+            }
+        }
+    }
 }
 
 extension Realm {

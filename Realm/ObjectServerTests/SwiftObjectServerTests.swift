@@ -3476,6 +3476,45 @@ class AsyncAwaitObjectServerTests: SwiftSyncTestCase {
         XCTAssertNil(app.currentUser)
         XCTAssertEqual(app.allUsers.count, 0)
     }
+    
+    /// If client B adds objects to a Realm, client A should see those new objects.
+    func testSwiftAddObjectsAsync() async throws {
+        let user = try await logInUser(for: basicCredentials())
+        let realm = try openRealm(partitionValue: #function, user: user)
+        if isParent {
+            checkCount(expected: 0, realm, SwiftPerson.self)
+            checkCount(expected: 0, realm, SwiftTypesSyncObject.self)
+            executeChild()
+            try await realm.syncSession?.wait(for: .download)
+            checkCount(expected: 4, realm, SwiftPerson.self)
+            checkCount(expected: 1, realm, SwiftTypesSyncObject.self)
+
+            let obj = realm.objects(SwiftTypesSyncObject.self).first!
+            XCTAssertEqual(obj.boolCol, true)
+            XCTAssertEqual(obj.intCol, 1)
+            XCTAssertEqual(obj.doubleCol, 1.1)
+            XCTAssertEqual(obj.stringCol, "string")
+            XCTAssertEqual(obj.binaryCol, "string".data(using: String.Encoding.utf8)!)
+            XCTAssertEqual(obj.decimalCol, Decimal128(1))
+            XCTAssertEqual(obj.dateCol, Date(timeIntervalSince1970: -1))
+            XCTAssertEqual(obj.longCol, Int64(1))
+            XCTAssertEqual(obj.uuidCol, UUID(uuidString: "85d4fbee-6ec6-47df-bfa1-615931903d7e")!)
+            XCTAssertEqual(obj.anyCol.intValue, 1)
+            XCTAssertEqual(obj.objectCol!.firstName, "George")
+
+        } else {
+            // Add objects
+            try realm.write {
+                realm.add(SwiftPerson(firstName: "Ringo", lastName: "Starr"))
+                realm.add(SwiftPerson(firstName: "John", lastName: "Lennon"))
+                realm.add(SwiftPerson(firstName: "Paul", lastName: "McCartney"))
+                realm.add(SwiftTypesSyncObject(person: SwiftPerson(firstName: "George", lastName: "Harrison")))
+            }
+            try await realm.syncSession?.wait(for: .upload)
+            checkCount(expected: 4, realm, SwiftPerson.self)
+            checkCount(expected: 1, realm, SwiftTypesSyncObject.self)
+        }
+    }
 }
 
 #endif // os(macOS)

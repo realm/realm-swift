@@ -212,6 +212,13 @@ RLM_SWIFT_SENDABLE RLM_FINAL // is internally thread-safe
                                                                          block:(RLMProgressNotificationBlock)block
 NS_REFINED_FOR_SWIFT;
 
+
+/// Wait for pending uploads to complete or the session to expire, and dispatch the callback onto the specified queue.
+- (BOOL)waitForUploadCompletionOnQueue:(nullable dispatch_queue_t)queue callback:(void(^)(NSError * _Nullable))callback NS_REFINED_FOR_SWIFT;
+
+/// Wait for pending downloads to complete or the session to expire, and dispatch the callback onto the specified queue.
+- (BOOL)waitForDownloadCompletionOnQueue:(nullable dispatch_queue_t)queue callback:(void(^)(NSError * _Nullable))callback NS_REFINED_FOR_SWIFT;
+
 /**
  Given an error action token, immediately handle the corresponding action.
  
