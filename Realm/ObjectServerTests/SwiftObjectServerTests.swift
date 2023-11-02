@@ -3476,7 +3476,7 @@ class AsyncAwaitObjectServerTests: SwiftSyncTestCase {
         XCTAssertNil(app.currentUser)
         XCTAssertEqual(app.allUsers.count, 0)
     }
-    
+
     /// If client B adds objects to a Realm, client A should see those new objects.
     func testSwiftAddObjectsAsync() async throws {
         let user = try await logInUser(for: basicCredentials())

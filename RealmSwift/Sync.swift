@@ -923,7 +923,7 @@ public extension SyncSession {
                                                 block(Progress(transferred: transferred, transferrable: transferrable))
         }
     }
-    
+
     /**
      Wait for pending uploads or downloads to complete or the session to expire, and dispatch the callback onto the specified queue.
      - parameter direction: The transfer direction (upload or download) to wait for.
@@ -947,7 +947,7 @@ public extension SyncSession {
             }
         }
     }
-    
+
     /**
      Wait for pending uploads or downloads to complete or the session to expire.
      - parameter direction: The transfer direction (upload or download) to wait for.
