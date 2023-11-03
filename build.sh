@@ -131,7 +131,7 @@ xc() {
     # Logs xcodebuild output in realtime
     : "${NSUnbufferedIO:=YES}"
     if [[ "$XCMODE" == "xcodebuild" ]]; then
-        xcode "$@" "${REALM_EXTRA_BUILD_ARGUMENTS[@]}"
+        xcode "$@" ${REALM_EXTRA_BUILD_ARGUMENTS[@]}
     elif [[ "$XCMODE" == "xctool" ]]; then
         xctool "$@" "${REALM_EXTRA_BUILD_ARGUMENTS[@]}"
     fi
