@@ -998,7 +998,6 @@ case "$COMMAND" in
 
         sed -i '' "s/^REALM_CORE_VERSION=.*/REALM_CORE_VERSION=$new_version/" dependencies.list
         sed -i '' "s/^let coreVersion =.*/let coreVersion = Version(\"$new_version\")/" Package.swift
-        sed -i '' "s/\"version\" : .*,/\"version\" : \"$new_version\",/" examples/installation/SwiftPackageManagerDynamic.notxcodeproj/project.notxcworkspace/xcshareddata/swiftpm/Package.resolved
         sed -i '' "s/Upgraded realm-core from ? to ?/Upgraded realm-core from $old_version to $new_version/" CHANGELOG.md
 
         exit 0

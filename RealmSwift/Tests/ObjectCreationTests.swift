@@ -418,7 +418,7 @@ class ObjectCreationTests: TestCase {
         XCTAssertEqual(object.objects.first!, persistedObject)
     }
 
-    func testCreateWithObjectsFromAnotherRealm() {
+    func testCreateWithObjectsFromAnotherRealm() throws {
         let values: [String: Any] = [
             "boolCol": true,
             "intCol": 1,
@@ -443,9 +443,10 @@ class ObjectCreationTests: TestCase {
         let otherRealmObject = realmWithTestPath().create(SwiftObject.self, value: values)
         try! realmWithTestPath().commitWrite()
 
-        try! Realm().beginWrite()
-        let object = try! Realm().create(SwiftObject.self, value: otherRealmObject)
-        try! Realm().commitWrite()
+        let realm = try Realm()
+        let object = try realm.write {
+            realm.create(SwiftObject.self, value: otherRealmObject)
+        }
 
         XCTAssertNotEqual(otherRealmObject, object)
         verifySwiftObjectWithDictionaryLiteral(object, dictionary: values, boolObjectValue: true,

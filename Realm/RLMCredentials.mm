@@ -21,7 +21,7 @@
 #import "RLMBSON_Private.hpp"
 #import "RLMUtil.hpp"
 
-#import <realm/object-store/util/bson/bson.hpp>
+#import <realm/util/bson/bson.hpp>
 
 using namespace realm::app;
 

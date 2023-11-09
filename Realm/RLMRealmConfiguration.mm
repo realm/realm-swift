@@ -32,7 +32,7 @@
 #import "RLMUser_Private.hpp"
 
 #import <realm/object-store/sync/sync_manager.hpp>
-#import <realm/object-store/util/bson/bson.hpp>
+#import <realm/util/bson/bson.hpp>
 #import <realm/sync/config.hpp>
 #else
 @class RLMSyncConfiguration;
