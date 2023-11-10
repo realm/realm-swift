@@ -59,6 +59,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * Xcode: 14.2-15.2.0.
 
 ### Internal
+* Migrated Release pipelines to Github Actions.
 * Upgraded realm-core from ? to ?
 
 10.46.0 Release notes (2024-01-23)
