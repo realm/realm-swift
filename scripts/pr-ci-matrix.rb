@@ -1,80 +1,56 @@
 #!/usr/bin/env ruby
-# A script to generate the .jenkins.yml file for the CI pull request job
-XCODE_VERSIONS = %w(14.1 14.2 14.3.1)
+# Matrix of current targets and XCode versions, and is used to add/update/delete XCode cloud workflows.
 
-all = ->(v) { true }
-latest_only = ->(v) { v == XCODE_VERSIONS.last }
-oldest_and_latest = ->(v) { v == XCODE_VERSIONS.first or v == XCODE_VERSIONS.last }
+module WORKFLOWS
+  XCODE_VERSIONS = %w(14.1 14.2 14.3.1)
 
-def minimum_version(major)
-  ->(v) { v.split('.').first.to_i >= major }
-end
+  all = ->(v) { true }
+  latest_only = ->(v) { v == XCODE_VERSIONS.last }
+  oldest_and_latest = ->(v) { v == XCODE_VERSIONS.first or v == XCODE_VERSIONS.last }
 
-targets = {
-  'docs' => latest_only,
-  'swiftlint' => latest_only,
 
-  'osx' => all,
-  'osx-encryption' => latest_only,
-  'osx-object-server' => oldest_and_latest,
+  TARGETS = {
+    'osx' => all,
+    'osx-encryption' => latest_only,
+    'osx-swift' => all,
+    'osx-swift-evolution' => latest_only,
 
-  'swiftpm' => oldest_and_latest,
-  'swiftpm-debug' => all,
-  'swiftpm-address' => latest_only,
-  'swiftpm-thread' => latest_only,
-  'ios-xcode-spm' => all,
+    'ios' => oldest_and_latest,
+    'ios-static' => oldest_and_latest,
+    'ios-swift' => oldest_and_latest,
+    'ios-swift-evolution' => latest_only,
 
-  'ios-static' => oldest_and_latest,
-  'ios' => oldest_and_latest,
-  'watchos' => oldest_and_latest,
-  'tvos' => oldest_and_latest,
+    'tvos' => oldest_and_latest,
+    'tvos-swift' => oldest_and_latest,
+    'tvos-swift-evolution' => latest_only,
 
-  'osx-swift' => all,
-  'ios-swift' => oldest_and_latest,
-  'tvos-swift' => oldest_and_latest,
+    'catalyst' => oldest_and_latest,
+    'catalyst-swift' => oldest_and_latest,
 
-  'osx-swift-evolution' => latest_only,
-  'ios-swift-evolution' => latest_only,
-  'tvos-swift-evolution' => latest_only,
+    'watchos' => oldest_and_latest,
 
-  'catalyst' => oldest_and_latest,
-  'catalyst-swift' => oldest_and_latest,
+    'ios-swiftui' => latest_only,
+    
+    'swiftuiserver-osx' => latest_only,
+    'objectserver-osx' => oldest_and_latest,
 
-  'xcframework' => latest_only,
+    'docs' => latest_only,
+    'swiftlint' => latest_only,
 
-  'cocoapods-osx' => all,
-  'cocoapods-ios-static' => latest_only,
-  'cocoapods-ios' => latest_only,
-  'cocoapods-watchos' => latest_only,
-  'cocoapods-tvos' => latest_only,
-  'cocoapods-catalyst' => latest_only,
-  'swiftui-ios' => latest_only,
-  'swiftui-server-osx' => latest_only,
-}
+    'swiftpm' => oldest_and_latest,
+    'swiftpm-debug' => all,
+    'swiftpm-address' => latest_only,
+    'swiftpm-thread' => latest_only,
 
-output_file = """
-# Yaml Axis Plugin
-# https://wiki.jenkins-ci.org/display/JENKINS/Yaml+Axis+Plugin
-# This is a generated file produced by scripts/pr-ci-matrix.rb.
+    'xcframework' => latest_only,
 
-xcode_version:#{XCODE_VERSIONS.map { |v| "\n - #{v}" }.join()}
-target:#{targets.map { |k, v| "\n - #{k}" }.join()}
-configuration:
- - N/A
+    'cocoapods-osx' => all,
+    'cocoapods-ios-static' => latest_only,
+    'cocoapods-ios' => latest_only,
+    'cocoapods-watchos' => latest_only,
+    'cocoapods-tvos' => latest_only,
+    'cocoapods-catalyst' => latest_only,
 
-exclude:
-"""
-targets.each { |name, filter|
-  XCODE_VERSIONS.each { |version|
-    if not filter.call(version)
-      output_file << """
-  - xcode_version: #{version}
-    target: #{name}
-"""
-    end
+    'spm-ios' => all,
   }
-}
-
-File.open('.jenkins.yml', "w") do |file|
-  file.puts output_file
 end
