@@ -4,19 +4,13 @@ jobs:
   main:
     runs-on: ubuntu-latest
     steps:
-    - name: Get Token
-      id: token
-      uses: yuki0n0/action-appstoreconnect-token@v1.0
-      with:
-        # UUID. Can get from App Store Connect.
-        issuer id: ${{ secrets.APPLE_STORE_CONNECT_ISSUER_ID }}
-        # Key ID. Can get from App Store Connect.
-        key id: ${{ secrets.APPLE_STORE_CONNECT_KEY_ID }}
-        # P8 private key. Can get from App Store Connect.
-        key:  ${{ secrets.APPLE_STORE_CONNECT_API_KEY }}
-    - name: Check out the repository to the runner
-      uses: actions/checkout@v4  
-    - name: Run ruby script
-      run: ruby ./scripts/xcode_cloud_helper.rb --create-new-workflows --token ${{ steps.token.outputs.token }} --team-id ${{ secrets.APPLE_STORE_CONNECT_TEAM_ID }} 
+      - uses: actions/checkout@v4
+      - name: Get Token
+        id: token
+        run: |
+          token=$(ruby ./scripts/xcode_cloud_helper.rb --issuer-id ${{ secrets.APPLE_STORE_CONNECT_ISSUER_ID }} --key-id ${{ secrets.APPLE_STORE_CONNECT_KEY_ID }} --pk "${{ secrets.APPLE_STORE_CONNECT_API_KEY }}" get-token)
+          echo "TOKEN=$token" >> $GITHUB_OUTPUT
+      - name: Run ruby script
+        run: echo "both" | ./scripts/xcode_cloud_helper.rb -t ${{ steps.token.outputs.TOKEN }} synchronize-workflows
 
 

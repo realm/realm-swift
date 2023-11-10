@@ -155,7 +155,7 @@ def download_realm(platform, method, static)
 
   when 'xcframework'
     # If we're testing a branch then we should already have a built zip
-    # supplied by Jenkins, but we need to know what version tag it has. If
+    # supplied by Github actions, but we need to know what version tag it has. If
     # we're testing a release, we'll download the zip.
     version = TEST_BRANCH ? DEPENDENCIES['VERSION'] : TEST_RELEASE
     if version

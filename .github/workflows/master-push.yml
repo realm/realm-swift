@@ -8,7 +8,6 @@ env:
   PLATFORM: "['ios', 'osx', 'watchos', 'tvos', 'catalyst', 'visionos']"
   BUILD_PLATFORM: "['ios', 'iossimulator', 'osx', 'watchos', 'watchossimulator', 'tvos', 'tvossimulator', 'catalyst', 'visionos', 'visionossimulator']"
   DOC_VERSION: '15.2'
-  JAZZY_VERSION: '0.14.4'
   RELEASE_VERSION: '15.2'
   TEST_VERSION: '15.2'
 jobs:
