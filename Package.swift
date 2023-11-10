@@ -165,7 +165,6 @@ let package = Package(
                 "CONTRIBUTING.md",
                 "Carthage",
                 "Configuration",
-                "Jenkinsfile.releasability",
                 "LICENSE",
                 "Package.swift",
                 "README.md",
